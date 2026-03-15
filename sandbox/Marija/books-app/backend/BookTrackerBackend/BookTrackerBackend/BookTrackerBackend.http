@@ -1,0 +1,6 @@
+@BookTrackerBackend_HostAddress = http://localhost:5152
+
+GET {{BookTrackerBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
