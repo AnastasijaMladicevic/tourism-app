@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TestService } from './services/TestService';
 
@@ -12,11 +12,12 @@ export class AppComponent implements OnInit {
 
   messages: string[] = [];
 
-  constructor(private service: TestService) {}
+  constructor(private service: TestService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(){
     this.service.getMessage().subscribe((data: any) => {
       this.messages = data.messages;
+      this.cdr.detectChanges();
     });
   }
 
