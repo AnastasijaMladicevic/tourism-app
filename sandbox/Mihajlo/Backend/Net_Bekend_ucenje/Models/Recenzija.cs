@@ -7,7 +7,7 @@
         public string AutorNaziv { get; set; } = string.Empty;
         public short Ocena { get; set; }
         public string? Komentar { get; set; }
-        public DateTime Kreirano { get; set; }
+        public DateTime Kreiran { get; set; }
 
         public Destinacija Destinacija { get; set; } = null!;
     }

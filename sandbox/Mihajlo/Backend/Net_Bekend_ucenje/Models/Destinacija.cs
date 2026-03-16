@@ -7,7 +7,7 @@
         public string? Opis { get; set; }
         public string Lokacija { get; set; } = string.Empty;
         public string Zemlja { get; set; } = "Srbija";
-        public string? Url_slike { get; set; }
+        public string? UrlSlike { get; set; }
         public Guid KategorijaId { get; set; }
         public decimal ProsecnaOcena { get; set; }
         public int BrojRecenzija { get; set; }

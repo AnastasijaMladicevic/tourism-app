@@ -1,3 +1,6 @@
+--CREATE DATABASE turizam;
+--CREATE USER turizam_korisnik WITH PASSWORD 'turizam_sifra';
+--GRANT ALL PRIVILEGES ON DATABASE turizam TO turizam_korisnik;
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
