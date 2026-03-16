@@ -21,14 +21,12 @@ namespace server.Controllers
             _context = context;
         }
 
-        // GET: api/PaymentDetail
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PaymentDetail>>> GetPaymentDetails()
         {
             return await _context.PaymentDetails.ToListAsync();
         }
 
-        // GET: api/PaymentDetail/5
         [HttpGet("{id}")]
         public async Task<ActionResult<PaymentDetail>> GetPaymentDetail(int id)
         {
@@ -42,8 +40,6 @@ namespace server.Controllers
             return paymentDetail;
         }
 
-        // PUT: api/PaymentDetail/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPaymentDetail(int id, PaymentDetail paymentDetail)
         {
@@ -73,8 +69,6 @@ namespace server.Controllers
             return Ok(await _context.PaymentDetails.ToListAsync());
         }
 
-        // POST: api/PaymentDetail
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<PaymentDetail>> PostPaymentDetail(PaymentDetail paymentDetail)
         {
@@ -84,7 +78,6 @@ namespace server.Controllers
             return Ok(await _context.PaymentDetails.ToListAsync());
         }
 
-        // DELETE: api/PaymentDetail/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePaymentDetail(int id)
         {
