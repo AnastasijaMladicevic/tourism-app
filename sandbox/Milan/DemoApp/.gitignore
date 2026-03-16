@@ -1,0 +1,80 @@
+# =========================
+# Angular / Node
+# =========================
+
+node_modules/
+dist/
+tmp/
+out-tsc/
+.angular/
+.cache/
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# =========================
+# .NET / ASP.NET Core
+# =========================
+
+bin/
+obj/
+
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# VS Code temporary
+.vscode-test/
+
+# Logs
+*.log
+
+# Publish output
+publish/
+
+# NuGet
+*.nupkg
+.nuget/
+
+# Test results
+TestResults/
+
+# =========================
+# Build artifacts
+# =========================
+
+*.dll
+*.exe
+*.pdb
+
+# Temporary files
+*.tmp
+*.temp
+
+# =========================
+# Angular build cache
+# =========================
+
+.angular/cache
