@@ -1,6 +1,6 @@
 ﻿namespace Net_Bekend_ucenje.Models
 {
-    public class Kategorije
+    public class Kategorija
     {
         public Guid Id { get; set; }
         public string Naziv { get; set; } = string.Empty;
