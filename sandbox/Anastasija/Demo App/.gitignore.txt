@@ -1,0 +1,38 @@
+# Angular / Node
+node_modules/
+.angular/
+dist/
+tmp/
+out-tsc/
+
+# Angular cache
+.angular/cache
+
+# Logs
+npm-debug.log*
+yarn-error.log*
+
+# IDE
+.vscode/
+.idea/
+
+# Visual Studio
+.vs/
+
+# .NET build
+bin/
+obj/
+
+# User files
+*.user
+*.suo
+*.rsuser
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# OS files
+.DS_Store
+Thumbs.db
