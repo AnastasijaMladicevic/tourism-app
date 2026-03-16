@@ -1,0 +1,46 @@
+<h2>Dodaj novu knjigu</h2>
+
+<div (ngSubmit)="addBook()">
+
+  <input
+    type="text"
+    placeholder="Naslov"
+    [(ngModel)]="newBook.title"
+    name="title"
+    required
+  />
+
+  <input
+    type="text"
+    placeholder="Autor"
+    [(ngModel)]="newBook.author"
+    name="author"
+    required
+  />
+
+  <input
+    type="number"
+    placeholder="Godina"
+    [(ngModel)]="newBook.year"
+    name="year"
+    required
+  />
+
+  <button type="button" (click)="addBook()">Dodaj knjigu</button>
+
+</div>
+
+<h2>Moje pročitane knjige</h2>
+
+<ul>
+  <li *ngFor="let book of books">
+
+    {{ book.title }} - {{ book.author }} ({{ book.year }})
+
+    
+    <button type="button" (click)="deleteBook(book.id)">
+      Obriši
+    </button>
+
+  </li>
+</ul>
