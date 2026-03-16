@@ -16,23 +16,6 @@ export class PaymentDetailFormComponent {
   }
 
   onSubmit(form: NgForm) {
-    this.service.formSubmitted = true;
-  
-    if (form.valid) {
-      this.service.postPaymentDetail().subscribe({
-        next: res => {
-          this.service.refreshList();  
-          form.reset();
-          this.service.formSubmitted = false;
-        },
-        error: err => {
-          console.log(err);
-        }
-      });
-    }
-  }
-
-  /*onSubmit(form: NgForm) {
     this.service.formSubmitted = true
     if (form.valid) {
       if (this.service.formData.paymentDetailId == 0)
@@ -41,7 +24,7 @@ export class PaymentDetailFormComponent {
         this.updateRecord(form)
     }
 
-  }*/
+  }
 
   insertRecord(form: NgForm) {
     this.service.postPaymentDetail()

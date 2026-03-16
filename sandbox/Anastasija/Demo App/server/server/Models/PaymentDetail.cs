@@ -1,29 +1,24 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace server.Models
 {
     public class PaymentDetail
     {
+        [Key]
         public int PaymentDetailId { get; set; }
 
-        [Required(ErrorMessage = "Name on card is required.")]
-        [RegularExpression(@"^[a-zA-Z\s]+$",
-        ErrorMessage = "Name on card can contain only letters and spaces.")]
-        public string CardOwnerName { get; set; }
+        [Column(TypeName = "nvarchar(100)")]
+        public string CardOwnerName { get; set; } = "";
 
-        [Required(ErrorMessage = "Card number is required.")]
-        [RegularExpression(@"^[0-9]+$",
-        ErrorMessage = "Card number must contain numbers only.")]
-        public string CardNumber { get; set; }
+        [Column(TypeName = "nvarchar(16)")]
+        public String CardNumber { get; set; } = "";
 
-        [Required(ErrorMessage = "Security code is required.")]
-        [RegularExpression(@"^[0-9]{3}$",
-        ErrorMessage = "Security code must be a 3 digit number.")]
-        public string SecurityCode { get; set; }
+        [Column(TypeName = "nvarchar(16)")]
+        public String ExpirationDate { get; set; } = "";
 
-        [Required(ErrorMessage = "Valid through date is required.")]
-        [RegularExpression(@"^(0[1-9]|1[0-2])\/\d{2}$",
-        ErrorMessage = "Valid through must be in MM/YY format (example: 05/27).")]
-        public string ExpirationDate { get; set; }
+        [Column(TypeName = "nvarchar(16)")]
+        public String SecurityCode { get; set; } = "";
+
     }
 }

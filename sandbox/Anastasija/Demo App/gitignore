@@ -1,0 +1,54 @@
+# ========================
+# Build folders (.NET)
+# ========================
+bin/
+obj/
+Debug/
+Release/
+
+# ========================
+# Node / Angular
+# ========================
+node_modules/
+dist/
+.angular/cache/
+coverage/
+
+# ========================
+# Logs
+# ========================
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# ========================
+# Visual Studio
+# ========================
+.vs/
+*.user
+*.rsuser
+*.suo
+*.sln.docstates
+
+# ========================
+# VS Code
+# ========================
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# ========================
+# Temporary files
+# ========================
+*.tmp
+*.cache
+*.pdb
+*.obj
+
+# ========================
+# OS files
+# ========================
+.DS_Store
+Thumbs.db
