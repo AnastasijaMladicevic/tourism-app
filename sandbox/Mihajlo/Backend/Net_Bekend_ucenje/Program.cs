@@ -10,7 +10,12 @@ builder.Services.AddDbContext<KonekcijaKaBazi>(options =>
 builder.Services.AddScoped<DestinacijeServis>();
 builder.Services.AddScoped<RecenzijeServis>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler =
+            System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+    });
 
 
 builder.Services.AddEndpointsApiExplorer();
@@ -21,7 +26,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins("http://localhost:4200", "https://localhost:4200")
+
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -35,9 +41,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.UseHttpsRedirection();
 app.UseCors("AllowAngular");
+//app.UseHttpsRedirection();
+
 app.UseAuthorization();
 app.MapControllers();
 

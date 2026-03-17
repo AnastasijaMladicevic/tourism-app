@@ -1,7 +1,9 @@
 --CREATE DATABASE turizam;
 --CREATE USER turizam_korisnik WITH PASSWORD 'turizam_sifra';
 --GRANT ALL PRIVILEGES ON DATABASE turizam TO turizam_korisnik;
-
+--GRANT ALL ON SCHEMA public TO turizam_korisnik;
+--ALTER USER turizam_korisnik CREATEDB;
+--\q
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE kategorije (
@@ -31,7 +33,7 @@ CREATE INDEX idx_destinacije_category ON destinacije(kategorija_id);
 
 CREATE INDEX idx_destinacije_ocena ON destinacije(prosecna_ocena DESC);
 
-CREATE TABLE recenzija (
+CREATE TABLE recenzije (
     id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     destinacija_id  UUID NOT NULL REFERENCES destinacije(id) ON DELETE CASCADE,
     autor_naziv     VARCHAR(100) NOT NULL,
@@ -49,12 +51,12 @@ BEGIN
     SET
         prosecna_ocena   = (
             SELECT COALESCE(ROUND(AVG(ocena)::NUMERIC, 2), 0)
-            FROM recenzija
+            FROM recenzije
             WHERE destinacija_id = COALESCE(NEW.destinacija_id, OLD.destinacija_id)
         ),
         broj_recenzija = (
             SELECT COUNT(*)
-            FROM recenzija
+            FROM recenzije
             WHERE destinacija_id = COALESCE(NEW.destinacija_id, OLD.destinacija_id)
         ),
         updejtovan  = NOW()
@@ -65,7 +67,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trg_review_ocena
-AFTER INSERT OR UPDATE OR DELETE ON recenzija
+AFTER INSERT OR UPDATE OR DELETE ON recenzije
 FOR EACH ROW EXECUTE FUNCTION update_destinacija_ocena();
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$

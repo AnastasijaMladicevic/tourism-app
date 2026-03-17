@@ -23,15 +23,15 @@ namespace Net_Bekend_ucenje.Data
                 entity.ToTable("kategorije");
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.Naziv).HasColumnName("naziv");
-                entity.Property(e => e.Ikonica).HasColumnName("inkonica");
+                entity.Property(e => e.Ikonica).HasColumnName("ikonica");
                 entity.Property(e => e.Kreiran).HasColumnName("kreiran");
             });
 
             modelBuilder.Entity<Destinacija>(entity =>
             {
-                entity.ToTable("Destinacije");
+                entity.ToTable("destinacije");
                 entity.Property(e => e.Id).HasColumnName("id");
-                entity.Property(e => e.Naziv).HasColumnName("Naziv");
+                entity.Property(e => e.Naziv).HasColumnName("naziv");
                 entity.Property(e => e.Opis).HasColumnName("opis");
                 entity.Property(e => e.Lokacija).HasColumnName("lokacija");
                 entity.Property(e => e.Zemlja).HasColumnName("zemlja");
@@ -49,12 +49,12 @@ namespace Net_Bekend_ucenje.Data
 
             modelBuilder.Entity<Recenzija>(entity =>
             {
-                entity.ToTable("Recenzije");
+                entity.ToTable("recenzije");
                 entity.Property(e => e.Id).HasColumnName("id");
                 entity.Property(e => e.DestinacijaId).HasColumnName("destinacija_id");
                 entity.Property(e => e.AutorNaziv).HasColumnName("autor_naziv");
                 entity.Property(e => e.Ocena).HasColumnName("ocena");
-                entity.Property(e => e.Komentar).HasColumnName("comment");
+                entity.Property(e => e.Komentar).HasColumnName("komentar");
                 entity.Property(e => e.Kreiran).HasColumnName("kreiran");
 
                 entity.HasOne(r => r.Destinacija)

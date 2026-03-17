@@ -1,4 +1,6 @@
-﻿namespace Net_Bekend_ucenje.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Net_Bekend_ucenje.Models
 {
     public class Recenzija
     {
@@ -6,6 +8,7 @@
         public Guid DestinacijaId { get; set; }
         public string AutorNaziv { get; set; } = string.Empty;
         public short Ocena { get; set; }
+        [Column("komentar")]
         public string? Komentar { get; set; }
         public DateTime Kreiran { get; set; }
 
