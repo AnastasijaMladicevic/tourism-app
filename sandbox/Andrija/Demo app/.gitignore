@@ -1,0 +1,32 @@
+# Node / Angular
+**/node_modules/
+**/.angular/
+**/dist/
+**/coverage/
+
+# .NET build output
+**/bin/
+**/obj/
+
+# Local app configuration
+**/appsettings.Development.json
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE files
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Logs and temp files
+*.log
+*.tmp
+*.temp
+
+# OS files
+.DS_Store
+Thumbs.db

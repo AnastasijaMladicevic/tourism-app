@@ -1,0 +1,85 @@
+<div class="page-shell">
+  <section class="hero-card">
+    <div>
+      <h1>Football Players Demo</h1>
+      <p class="hero-text">
+        Jednostavna demo aplikacija za evidenciju fudbalera. Omogucava pregled, pretragu, dodavanje, izmenu i brisanje igraca.
+      </p>
+    </div>
+
+  </section>
+
+  <section class="content-grid">
+    <div class="main-card">
+      <div class="toolbar">
+        <div class="search-box">
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            placeholder="Pretraga po imenu, klubu ili poziciji"
+            (keyup.enter)="loadPlayers()">
+          <button class="search-btn" (click)="loadPlayers()">Pretrazi</button>
+        </div>
+        <button class="add-btn" (click)="openCreateForm()">+ Dodaj igraca</button>
+      </div>
+
+      <p class="error-banner" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+      <div class="loading-state" *ngIf="loading">Ucitavanje igraca...</div>
+
+      <div class="table-wrapper" *ngIf="!loading">
+        <table *ngIf="players.length > 0; else emptyState">
+          <thead>
+            <tr>
+              <th>Igrac</th>
+              <th>Klub</th>
+              <th>Pozicija</th>
+              <th>Dres</th>
+              <th>Godine</th>
+              <th>Akcije</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let player of players; trackBy: trackById">
+              <td>
+                <div class="player-name">
+                  <span class="avatar">{{ player.firstName[0] }}{{ player.lastName[0] }}</span>
+                  <div>
+                    <strong>{{ player.firstName }} {{ player.lastName }}</strong>
+                    <small>ID: {{ player.id }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>{{ player.club }}</td>
+              <td><span class="position-chip">{{ player.position }}</span></td>
+              <td>#{{ player.jerseyNumber }}</td>
+              <td>{{ player.age }}</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="edit-btn" (click)="openEditForm(player)">Izmeni</button>
+                  <button class="delete-btn" (click)="deletePlayer(player)">Obrisi</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #emptyState>
+        <div class="empty-state">
+          <h3>Nema rezultata</h3>
+          <p>Dodaj prvog igraca ili promeni pojam za pretragu.</p>
+        </div>
+      </ng-template>
+    </div>
+
+    <div *ngIf="showForm">
+      <app-player-form
+        [player]="selectedPlayer"
+        [loading]="submitting"
+        (save)="handleSave($event)"
+        (cancel)="closeForm()">
+      </app-player-form>
+    </div>
+  </section>
+</div>
