@@ -1,0 +1,85 @@
+<div class="kontejner">
+  <a routerLink="/" class="nazad">← Nazad na listu</a>
+
+  @if (ucitavanje()) {
+    <div class="poruka">Učitavanje...</div>
+  }
+  @if (greska()) {
+    <div class="greska">{{ greska() }}</div>
+  }
+  @if (destinacija(); as dest) {
+    <div class="zaglavlje">
+      <div class="kategorija-badge">
+        {{ dest.kategorija?.ikonica }} {{ dest.kategorija?.naziv }}
+      </div>
+      <h1>{{ dest.naziv }}</h1>
+      <p class="lokacija">{{ dest.lokacija }}, {{ dest.zemlja }}</p>
+      <div class="ocena-red">
+        <span class="zvezdice">{{ ocenaUZvezdice(dest.prosecnaOcena) }}</span>
+        <span class="ocena-broj">{{ dest.prosecnaOcena | number:'1.1-1' }}</span>
+        <span class="rec-broj">({{ dest.brojRecenzija }} recenzija)</span>
+      </div>
+      <p class="opis">{{ dest.opis }}</p>
+    </div>
+
+    <div class="sekcija">
+      <h2>Recenzije</h2>
+      @if (recenzije().length === 0) {
+        <div class="prazno">Još nema recenzija. Budite prvi!</div>
+      }
+      @for (r of recenzije(); track r.id) {
+        <div class="recenzija-kartica">
+          <div class="rec-zaglavlje">
+            <span class="rec-autor">{{ r.autorNaziv }}</span>
+            <span class="rec-zvezdice">{{ ocenaUZvezdice(r.ocena) }}</span>
+            <span class="rec-datum">{{ r.kreiran | date:'dd.MM.yyyy' }}</span>
+          </div>
+          <p class="rec-komentar">{{ r.komentar }}</p>
+        </div>
+      }
+    </div>
+
+    <div class="sekcija">
+      <h2>Dodaj recenziju</h2>
+      @if (uspesnoDodata()) {
+        <div class="uspeh">Recenzija je uspešno dodata!</div>
+      }
+      <form (ngSubmit)="posaljiRecenziju()" class="forma">
+        <div class="polje">
+          <label>Vaše ime</label>
+          <input type="text"
+            [ngModel]="novaRecenzija().autorNaziv"
+            (ngModelChange)="novaRecenzija.update(r => ({...r, autorNaziv: $event}))"
+            name="autorNaziv"
+            placeholder="Unesite ime..." />
+        </div>
+        <div class="polje">
+          <label>Ocena</label>
+          <select
+            [ngModel]="novaRecenzija().ocena"
+            (ngModelChange)="novaRecenzija.update(r => ({...r, ocena: +$event}))"
+            name="ocena">
+            <option value="5">★★★★★ — Odlično</option>
+            <option value="4">★★★★☆ — Vrlo dobro</option>
+            <option value="3">★★★☆☆ — Dobro</option>
+            <option value="2">★★☆☆☆ — Loše</option>
+            <option value="1">★☆☆☆☆ — Veoma loše</option>
+          </select>
+        </div>
+        <div class="polje">
+          <label>Komentar</label>
+          <textarea
+            [ngModel]="novaRecenzija().komentar"
+            (ngModelChange)="novaRecenzija.update(r => ({...r, komentar: $event}))"
+            name="komentar"
+            rows="4"
+            placeholder="Opišite vaše iskustvo...">
+          </textarea>
+        </div>
+        <button type="submit" [disabled]="slanjePodataka()">
+          {{ slanjePodataka() ? 'Slanje...' : 'Pošalji recenziju' }}
+        </button>
+      </form>
+    </div>
+  }
+</div>
