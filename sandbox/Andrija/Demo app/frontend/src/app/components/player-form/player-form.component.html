@@ -1,0 +1,58 @@
+<div class="form-card">
+  <div class="form-header">
+    <div>
+      <p class="eyebrow">{{ player ? 'Izmena igraca' : 'Novi igrac' }}</p>
+      <h2>{{ player ? 'Azuriraj podatke' : 'Dodaj fudbalera' }}</h2>
+    </div>
+    <button type="button" class="ghost-btn" (click)="cancel.emit()">Zatvori</button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="player-form">
+    <label>
+      Ime
+      <input type="text" formControlName="firstName" placeholder="npr. Dusan">
+      <span class="error" *ngIf="form.controls.firstName.touched && form.controls.firstName.invalid">Unesi ime.</span>
+    </label>
+
+    <label>
+      Prezime
+      <input type="text" formControlName="lastName" placeholder="npr. Vlahovic">
+      <span class="error" *ngIf="form.controls.lastName.touched && form.controls.lastName.invalid">Unesi prezime.</span>
+    </label>
+
+    <label>
+      Klub
+      <input type="text" formControlName="club" placeholder="npr. Juventus">
+      <span class="error" *ngIf="form.controls.club.touched && form.controls.club.invalid">Unesi klub.</span>
+    </label>
+
+    <label>
+      Pozicija
+      <select formControlName="position">
+        <option value="Golman">Golman</option>
+        <option value="Odbrana">Odbrana</option>
+        <option value="Vezni">Vezni</option>
+        <option value="Napadac">Napadac</option>
+      </select>
+    </label>
+
+    <div class="two-columns">
+      <label>
+        Broj dresa
+        <input type="number" formControlName="jerseyNumber" min="1" max="99">
+      </label>
+
+      <label>
+        Godine
+        <input type="number" formControlName="age" min="15" max="45">
+      </label>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="ghost-btn" (click)="cancel.emit()">Odustani</button>
+      <button type="submit" class="primary-btn" [disabled]="loading">
+        {{ loading ? 'Cuvanje...' : (player ? 'Sacuvaj izmene' : 'Dodaj igraca') }}
+      </button>
+    </div>
+  </form>
+</div>

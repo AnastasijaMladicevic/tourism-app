@@ -1,14 +1,14 @@
-#Klijent
+**Klijent**
 
 Ovaj deo projekta je napravljen pomocu Angular CLI verzije 17.2.1.
 
 
-#Server
+**Server**
 
 Ovaj deo projekta je odradjen pomocu .NET verzije 8.0.
 
 
-#Demo aplikacija
+**Demo aplikacija**
 
 U ovoj demo aplikaciji je implementirana simulacija placanja platnom karticom.
 Korisnik unosi sledeće podatke:
