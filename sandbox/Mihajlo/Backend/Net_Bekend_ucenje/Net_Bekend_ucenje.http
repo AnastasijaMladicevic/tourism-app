@@ -1,0 +1,6 @@
+@Net_Bekend_ucenje_HostAddress = http://localhost:5185
+
+GET {{Net_Bekend_ucenje_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
