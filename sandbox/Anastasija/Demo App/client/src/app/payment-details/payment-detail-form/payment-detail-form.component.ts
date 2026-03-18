@@ -21,7 +21,7 @@ export class PaymentDetailFormComponent {
     if (form.valid) {
       this.service.postPaymentDetail().subscribe({
         next: res => {
-          this.service.refreshList();  
+          this.service.refreshList();   // OVO je KLJUČNO
           form.reset();
           this.service.formSubmitted = false;
         },
@@ -31,7 +31,8 @@ export class PaymentDetailFormComponent {
       });
     }
   }
-
+  
+  
   /*onSubmit(form: NgForm) {
     this.service.formSubmitted = true
     if (form.valid) {

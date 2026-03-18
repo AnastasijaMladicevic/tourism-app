@@ -1,4 +1,6 @@
-# See http://help.github.com/ignore-files/ for more about ignoring files.
+# =========================
+# Angular / Frontend
+# =========================
 
 # Compiled output
 /dist
@@ -11,7 +13,48 @@
 npm-debug.log
 yarn-error.log
 
+# Angular cache
+/.angular/cache
+
+# Build artifacts
+/dist/*
+/coverage
+
+# Environments (optional local overrides)
+src/environments/*.local.ts
+
+# =========================
+# .NET / Backend
+# =========================
+
+# Build folders
+bin/
+obj/
+
+# Visual Studio
+.vs/
+
+# User-specific files
+*.user
+*.suo
+*.userossc
+*.sln.docstates
+
+# Logs
+*.log
+
+# Publish output
+publish/
+
+# SQLite database (ako koristiš)
+*.db
+*.db-shm
+*.db-wal
+
+# =========================
 # IDEs and editors
+# =========================
+
 .idea/
 .project
 .classpath
@@ -28,15 +71,19 @@ yarn-error.log
 !.vscode/extensions.json
 .history/*
 
+# =========================
 # Miscellaneous
-/.angular/cache
+# =========================
+
 .sass-cache/
 /connect.lock
-/coverage
 /libpeerconnection.log
 testem.log
 /typings
 
+# =========================
 # System files
+# =========================
+
 .DS_Store
 Thumbs.db

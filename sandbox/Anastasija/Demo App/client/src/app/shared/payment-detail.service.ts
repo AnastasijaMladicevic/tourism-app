@@ -19,9 +19,9 @@ export class PaymentDetailService {
   refreshList(){
     this.http.get(this.url)
     .subscribe({
-      next : res => {
-        this.list = res as PaymentDetail[]},
-      error : err => {console.log(err)}
+      next: res => {
+        this.list = res as PaymentDetail[];
+      }
     })
   }
 
