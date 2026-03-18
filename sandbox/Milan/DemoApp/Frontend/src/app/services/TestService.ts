@@ -6,9 +6,11 @@ import { HttpClient } from '@angular/common/http';
 })
 export class TestService {
 
+  api = 'http://localhost:5177/api/test';
+
   constructor(private http: HttpClient) {}
 
-  getMessage(){
-    return this.http.get('http://localhost:5177/api/test');
+  getAll() {
+    return this.http.get<any>(this.api);
   }
 }
