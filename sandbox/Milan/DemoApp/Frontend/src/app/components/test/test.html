@@ -1,0 +1,6 @@
+<h1>Test podaci</h1>
+@if (data$ | async; as data) {
+  @for (m of data.messages; track m) {
+    <div>{{ m }}</div>
+  }
+}

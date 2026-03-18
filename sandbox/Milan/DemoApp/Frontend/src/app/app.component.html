@@ -1,5 +1,10 @@
-<h1>Angular + .NET + PostgreSQL</h1>
+<h2>Moja aplikacija</h2>
 
-@for (m of messages; track m) {
-  <div>{{ m }}</div>
-}
+<nav>
+  <a routerLink="/">Home</a> | <a routerLink="/words">Words</a> |
+  <a routerLink="/test">Test</a>
+</nav>
+
+<hr />
+
+<router-outlet></router-outlet>
