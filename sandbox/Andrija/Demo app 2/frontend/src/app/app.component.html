@@ -1,0 +1,20 @@
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" routerLink="/">Football Demo</a>
+
+    <nav class="nav-links">
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }">
+        Home
+      </a>
+      <a routerLink="/players" routerLinkActive="active">Players</a>
+      <a routerLink="/info" routerLinkActive="active">Info</a>
+    </nav>
+  </header>
+
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+</div>
