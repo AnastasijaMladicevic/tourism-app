@@ -1,0 +1,308 @@
+1. gradovi
+gradovi(
+  id        	SERIAL                  PK, NOT NULL,		
+  naziv     	VARCHAR(150)            NOT NULL,
+  opis      	TEXT                    NULL,
+  geolokacija  	GEOMETRY(Point, 4326)   NOT NULL,
+  aktivan  	BOOLEAN                 NOT NULL, DEFAULT TRUE,
+  kreirano 	TIMESTAMPTZ           	NOT NULL, DEFAULT NOW()
+)
+id - identifikator
+naziv - ime grada
+opis - kratak opis grada
+geolokacija - GPS koordinate, postGIS point tip
+aktivan - ako je false grad se ne prikazuje turistima
+kreirano - vreme dodavanja u bazu
+Primer reda:
+id: 		1
+naziv: 		"Kotor"
+opis: 		Primorski grad poznat po starom gradu i Bokokotorskom zalivu"
+geolokacija: 	ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326)
+aktivan: 	true
+kreirano: 	2026-03-19 10:00:00
+
+2. uloge
+uloge(
+  id          	SERIAL        PK, NOT NULL,
+  naziv       	VARCHAR(30)   NOT NULL, UNIQUE,
+              	CHECK (naziv IN ('admin', 'menadzer', 'turista')),
+  kreirano	TIMESTAMPTZ   NOT NULL, DEFAULT NOW()
+)
+id - identifikator
+naziv - naziv uloge (jedna od tri vrednosti - menadzer, admin, turista)
+kreirano - vreme dodavanja u bazu
+Primer reda:
+id: 		1
+naziv: 		"menadzer"
+kreirano: 	2026-03-19 10:02:35
+
+3. korisnici
+korisnici(
+  id			SERIAL        PK, NOT NULL,
+  ime			VARCHAR(100)  NOT NULL,
+  prezime		VARCHAR(100)  NOT NULL,
+  email			VARCHAR(200)  NOT NULL, UNIQUE,
+  lozinka_hash		VARCHAR(500)  NOT NULL,
+  id_uloge		INT           NOT NULL, FK -> uloge.id ON DELETE RESTRICT,
+  verifikovan		BOOLEAN       NOT NULL, DEFAULT FALSE,
+  jezik			VARCHAR(5)    NOT NULL, DEFAULT 'sr', CHECK (jezik IN ('sr', 'en', 'de', 'fr', 'it')),
+  verif_token		VARCHAR(200)  NULL,
+  verif_token_istek	TIMESTAMPTZ   NULL,
+  reset_token		VARCHAR(200)  NULL,
+  reset_token_istek	TIMESTAMPTZ   NULL,
+  aktivan		BOOLEAN       NOT NULL, DEFAULT TRUE,
+  kreirano		TIMESTAMPTZ   NOT NULL, DEFAULT NOW(),
+  izmenjeno		TIMESTAMPTZ   NOT NULL, DEFAULT NOW()
+)
+id - identifikator
+ime, prezime - licni podaci
+email - jedinstven, koristi se za login
+lozinka_hash - uvek se cuva kao hash
+id_uloge - strani kljuc na tabelu uloge
+verifikovan - false dok se ne uradi verifikacija preko email-a
+jezik - za prikaz sadrzaja
+verif_token - nasumicni token koji se salje emailom pri registraciji, null nakon verifikacija
+verif_token_istek - token vazi 24h, posle toga mora da se trazi novi
+reset_token - token za reset lozinke, null kad nije aktivan
+reset_token_istek - reset token vazi 1h
+aktivan - false za suspendovani nalog, korisnik ne moze da se prijavi ali svi njegovi podaci ostaju u bazi
+kreirano - vreme dodavanja u bazu
+izmenjeno - vreme poslednje izmene podataka
+Primer reda:
+id: 5
+ime: "Ana"
+prezime: "Jovanovic"
+email: "ana@gmail.com"
+lozinka_hash: "$2b$10$abc123..."
+id_uloge: 3
+verifikovan: true
+jezik: "sr"
+verif_token: NULL
+verif_token_istek: NULL
+reset_token: NULL
+reset_token_istek: NULL
+aktivan: true
+kreirano: 2026-03-18 14:22:00
+izmenjeno: 2026-03-18 14:22:00
+
+4. destinacije
+destinacije(
+  id          SERIAL                  PK, NOT NULL,
+  id_grada    INT                     NOT NULL, FK -> gradovi.id ON DELETE CASCADE,
+  naziv       VARCHAR(150)            NOT NULL,
+  id_tipa     INT        	      NOT NULL, FK -> tipovi_destinacija.id ON DELETE CASCADE,
+  opis        TEXT                    NULL,
+  geolokacija GEOMETRY(Point, 4326)   NOT NULL,
+  aktivan     BOOLEAN                 NOT NULL, DEFAULT TRUE,
+  kreirano    TIMESTAMPTZ             NOT NULL, DEFAULT NOW(),
+  izmenjeno   TIMESTAMPTZ             NOT NULL, DEFAULT NOW()
+)
+id - identifikator
+id_grada - kom gradu destinacija pripada
+naziv - ime destinacije
+id_tipa - identifikator tipa iz tabele tipovi_destinacija
+opis - opis destinacije
+geolokacija - GPS koordinate, postGIS point tip
+aktivan - ako je false grad se ne prikazuje turistima
+kreirano - vreme dodavanja u bazu
+izmenjeno - vreme poslednje izmene podataka
+Primer reda:
+id: 		1
+id_grada: 	1
+naziv: 		"Stari grad Kotor"
+id_tipa: 	1
+opis: 		"Dobro očuvani srednjovekovni grad, na UNESCO listi"
+geolokacija: 	ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326)
+aktivan: 	true
+kreirano: 	2026-03-19 10:00:00
+izmenjeno: 	2026-03-19 10:00:00
+
+4.1. tipovi_destinacija
+tipovi_destinacija(
+  id		SERIAL		PK, NOT NULL,
+  naziv		VARCHAR(50)	NOT NULL, UNIQUE
+)
+id - identifikator
+naziv - jedinstveni tip destinacije
+Primer reda:
+id:	1
+naziv:	'reka'
+
+5. objekti
+objekti(
+  id                SERIAL                  PK, NOT NULL,
+  naziv             VARCHAR(200)            NOT NULL,
+  id_tipa           INT 	            NOT NULL, FK -> tipovi_objekata.id ON DELETE CASCADE,
+  opis              TEXT                    NULL,
+  adresa            VARCHAR(300)            NULL,
+  id_destinacije    INT                     NOT NULL, FK -> destinacije.id ON DELETE CASCADE,
+  geolokacija       GEOMETRY(Point, 4326)   NOT NULL,
+  telefon           VARCHAR(30)             NULL,
+  sajt              VARCHAR(300)            NULL,
+  radno_vreme       JSONB                   NULL,
+  prosecna_ocena    DECIMAL(3,2)            NOT NULL, DEFAULT 0.00,
+                    CHECK (prosecna_ocena BETWEEN 0 AND 5),
+  broj_recenzija    INT                     NOT NULL, DEFAULT 0,
+                    CHECK (broj_recenzija >= 0),
+  aktivan           BOOLEAN                 NOT NULL, DEFAULT TRUE,
+  kreirano          TIMESTAMPTZ             NOT NULL, DEFAULT NOW(),
+  izmenjeno         TIMESTAMPTZ             NOT NULL, DEFAULT NOW()
+)
+id - identifikator
+naziv - ime objekta
+id_tipa - identifikator tipa iz tabele tipovi_objekata
+opis - opis objekta
+adresa - fizicka adresa
+id_destinacije - kojoj destinaciji pripada objekat
+geolokacija - GPS koordinate, postGIS point tip
+telefon, sajt - kontakt podaci
+radno_vreme - JSONB format zbog slozenog rasporeda
+prosecna_ocena - azurira triger
+broj_recenzija - azurira triger
+aktivan - false za suspendovano
+kreirano - vreme dodavanja u bazu
+izmenjeno - vreme poslednje izmene podataka
+Primer reda:
+id: 		10
+naziv: 		"Hotel Palisad"
+id_tipa:	1
+opis: 		"Hotel sa 4 zvezdice na Zlatiboru"
+adresa: 	"Zlatibor bb"
+id_destinacije:	1
+geolokacija:	ST_SetSRID(ST_MakePoint(19.698, 43.728), 4326)
+telefon: 	"+38160123456"
+sajt: 		"https://palisad.rs"
+radno_vreme: 	{"pon":"00:00-24:00","uto":"00:00-24:00","ned":"00:00-24:00"}
+prosecna_ocena:	4.75
+broj_recenzija:	12
+aktivan:	true
+kreirano: 	2026-03-19 10:00:00
+izmenjeno: 	2026-03-19 10:00:00
+
+5.1. tipovi_objekata
+tipovi_objekata(
+  id		SERIAL		PK, NOT NULL,
+  naziv		VARCHAR(80)	NOT NULL, UNIQUE
+)
+id - identifikator
+naziv - jedinstveni tip objekta
+Primer reda:
+id:	1
+naziv:	'hotel'
+
+6. aktivnosti
+aktivnosti(
+  id          SERIAL          PK, NOT NULL,
+  naziv       VARCHAR(150)    NOT NULL,
+  id_tipa     INT	      NOT NULL, FK -> tipovi_aktivnosti.id ON DELETE CASCADE,
+  opis        TEXT            NULL,
+  id_objekta  INT             NOT NULL, FK -> objekti.id ON DELETE CASCADE,
+  cena        DECIMAL(10,2)   NULL, CHECK (cena >= 0),
+  trajanje    INT             NULL, CHECK (trajanje > 0),
+  kreirano    TIMESTAMPTZ     NOT NULL, DEFAULT NOW(),
+  izmenjeno   TIMESTAMPTZ     NOT NULL, DEFAULT NOW()
+)
+id - identifikator
+naziv - ime aktivnosti
+id_tipa - identifikator tipa iz tabele tipovi_aktivnosti
+opis - opis aktivnosti
+id_objekta - za koji objekat je vezana aktivnost
+cena - cena u evrima
+trajanje - trajanje u minutima
+kreirano - vreme dodavanja u bazu
+izmenjeno - vreme poslednje izmene podataka
+Primer reda:
+id:		1
+naziv:		"Kajak tura"
+id_tipa:	2
+opis:		"Tura kajakom"
+id_objekta:	10
+cena:		25.00
+trajanje:	120
+kreirano: 	2026-03-19 10:00:00
+izmenjeno: 	2026-03-19 10:00:00
+
+6.2 tipovi_aktivnosti
+tipovi_aktivnosti(
+  id		SERIAL		PK, NOT NULL,
+  naziv		VARCHAR(80)	NOT NULL, UNIQUE
+)
+id - identifikator
+naziv - jedinstveni tip aktivnosti
+Primer reda:
+id:		2
+naziv:		'pesacenje'
+
+7. dogadjaji
+dogadjaji(
+  id              SERIAL          PK, NOT NULL,
+  naziv           VARCHAR(200)    NOT NULL,
+  id_tipa         INT    	  NOT NULL, FK -> tipovi_dogadjaja.id ON DELETE CASCADE,
+  opis            TEXT            NULL,
+  datum_pocetak   TIMESTAMPTZ     NOT NULL,
+  datum_kraj      TIMESTAMPTZ     NULL,
+                  CHECK (datum_kraj IS NULL OR datum_kraj > datum_pocetak),
+  id_objekta      INT             NOT NULL, FK -> objekti.id ON DELETE CASCADE,
+  cena            DECIMAL(10,2)   NULL, CHECK (cena >= 0),
+  max_posetilaca  INT             NULL, CHECK (max_posetilaca > 0),
+  aktivan         BOOLEAN         NOT NULL, DEFAULT TRUE,
+  kreirano        TIMESTAMPTZ     NOT NULL, DEFAULT NOW(),
+  izmenjeno       TIMESTAMPTZ     NOT NULL, DEFAULT NOW()
+)
+id - identifikator
+naziv - ime dogadjaja
+id_tipa - identifikator tipa iz tabele tipovi_dogadjaja
+opis - opis dogadjaja
+datum_pocetak - kada dogadjaj pocinje
+datum_kraj - kada se dogadjaj zavrsava
+id_objekta - za koji objekat je vezan
+cena - cena ulaznice
+max_posetilaca - maksimalan kapacitet
+aktivan - false za suspendovano
+kreirano - vreme dodavanja u bazu
+izmenjeno - vreme poslednje izmene podataka
+id: 		3
+naziv: 		"Koncert na Lovcenu
+id_tipa: 	1
+datum_pocetak: 	2026-07-10 20:00:00
+datum_kraj: 	2026-07-10 23:00:00
+id_objekta: 	10
+cena: 		15.00
+max_posetilaca: 500
+aktivan: 	true
+kreirano: 	2026-03-19 10:00:00
+izmenjeno: 	2026-03-19 10:00:00
+
+7.1 tipovi_dogadjaja
+tipovi_dogadjaja(
+  id		SERIAL		PK, NOT NULL,
+  naziv		VARCHAR(80)	NOT NULL, UNIQUE
+)
+id - identifikator
+naziv - jedinstveni tip dogadjaja
+Primer reda:
+id:	1
+naziv:	'koncert'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
