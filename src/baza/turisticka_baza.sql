@@ -1,4 +1,4 @@
-create database turisticka_baza
+create database turisticka_baza;
 
 create extension if not exists postgis;
 
@@ -22,7 +22,7 @@ create table korisnici(
 	ime varchar(100) not null,
 	prezime varchar(100) not null,
 	email varchar(200) not null unique,
-	lozinka_hash varchar(500) not null,
+	lozinka_hash text not null,
 	id_uloge int not null references uloge(id) on delete restrict,
 	verifikovan boolean not null default false,
 	jezik varchar(5) not null default 'sr' check(jezik in('sr', 'en', 'de', 'fr', 'it')),
@@ -42,9 +42,9 @@ create table tipovi_destinacija (
 
 create table destinacije (
 	id serial primary key, 
-	id_grada int not null references gradovi(id) on delete cascade,
+	id_grada int not null references gradovi(id) on delete restrict,
 	naziv varchar(150) not null,
-	id_tipa int not null references tipovi_destinacija(id),
+	id_tipa int not null references tipovi_destinacija(id) on delete restrict,
 	opis text,
 	geolokacija geometry(Point, 4326) not null,
 	aktivan boolean not null default true,
@@ -60,10 +60,10 @@ create table tipovi_objekata (
 create table objekti(
 	id serial primary key,
 	naziv varchar(200) not null,
-	id_tipa int not null references tipovi_objekata(id),
+	id_tipa int not null references tipovi_objekata(id) on delete restrict,
 	opis text,
 	adresa varchar(300),
-	id_destinacije int not null references destinacije(id) on delete cascade,
+	id_destinacije int not null references destinacije(id) on delete restrict,
 	geolokacija geometry(Point, 4326) not null,
 	telefon varchar(30),
 	sajt varchar(300),
@@ -83,9 +83,9 @@ create table tipovi_aktivnosti (
 create table aktivnosti (
 	id serial primary key,
 	naziv varchar(150) not null,
-	id_tipa int not null references tipovi_aktivnosti(id), 
+	id_tipa int not null references tipovi_aktivnosti(id) on delete restrict, 
 	opis text,
-	id_objekta int not null references objekti(id) on delete cascade,
+	id_objekta int not null references objekti(id) on delete restrict,
 	cena decimal(10,2) check (cena >= 0),
 	trajanje int check (trajanje > 0),
 	kreirano timestamptz not null default now(),
@@ -100,12 +100,12 @@ create table tipovi_dogadjaja(
 create table dogadjaji (
 	id serial primary key, 
 	naziv varchar(200) not null,
-	id_tipa int not null references tipovi_dogadjaja(id),
+	id_tipa int not null references tipovi_dogadjaja(id) on delete restrict,
 	opis text,
 	datum_pocetak timestamptz not null,
 	datum_kraj timestamptz, 
 	check (datum_kraj is null or datum_kraj > datum_pocetak),
-	id_objekta int not null references objekti(id) on delete cascade,
+	id_objekta int not null references objekti(id) on delete restrict,
 	cena decimal (10, 2) check (cena >= 0),
 	max_posetilaca int check (max_posetilaca > 0),
 	aktivan boolean not null default true,
@@ -153,18 +153,19 @@ insert into tipovi_destinacija(naziv) values
 ('grad'),
 ('park'),
 ('reka'),
-('plaza');
+('plaza'), 
+('nacionalni park');
 
 insert into destinacije (id_grada, naziv, id_tipa, opis, geolokacija) values
-(1, 'Stari grad Kotor', 3, 'Istorijska lokacija',
+(7, 'Stari grad Kotor', 3, 'Istorijska lokacija',
 ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326)),
-(1, 'Kotorski zaliv', 2, 'Poznat po prirodnoj lepoti i planinama',
+(7, 'Kotorski zaliv', 2, 'Poznat po prirodnoj lepoti i planinama',
  ST_SetSRID(ST_MakePoint(18.770, 42.430), 4326)),
-(3, 'Stari grad Budva', 3, 'Istorijsko jezgro Budve',
+(1, 'Stari grad Budva', 3, 'Istorijsko jezgro Budve',
  ST_SetSRID(ST_MakePoint(18.837, 42.279), 4326)),
-(3, 'Plaža Mogren', 2, 'Jedna od najlepših plaža u Budvi',
+(1, 'Plaža Mogren', 2, 'Jedna od najlepših plaža u Budvi',
  ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326)),
-(5, 'Durmitor', 1, 'Nacionalni park i planinski masiv',
+(3, 'Durmitor', 1, 'Nacionalni park i planinski masiv',
  ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326));
 
 insert into tipovi_objekata (naziv) values
