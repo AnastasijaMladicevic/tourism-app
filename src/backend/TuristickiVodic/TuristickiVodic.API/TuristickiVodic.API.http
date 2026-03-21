@@ -1,0 +1,6 @@
+@TuristickiVodic.API_HostAddress = http://localhost:5047
+
+GET {{TuristickiVodic.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="TuristickiVodic.API/TuristickiVodic.API.csproj" />
+  <Project Path="TuristickiVodic.Core/TuristickiVodic.Core.csproj" />
+  <Project Path="TuristickiVodic.Infrastructure/TuristickiVodic.Infrastructure.csproj" />
+  <Project Path="TuristickiVodic.Services/TuristickiVodic.Services.csproj" />
+</Solution>
