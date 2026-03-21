@@ -256,10 +256,13 @@ insert into tipovi_destinacija(naziv) values
 ('reka'),
 ('plaza'), 
 ('nacionalni park');
+<<<<<<< HEAD
 
 update tipovi_destinacija
 set naziv = 'nacionalni_park' 
 where naziv = 'nacionalni park';
+=======
+>>>>>>> 6e99d5342af9998bca2e29bc901140bda1a4a60f
 
 insert into destinacije (id_grada, naziv, id_tipa, opis, geolokacija) values
 (7, 'Stari grad Kotor', 3, 'Istorijska lokacija',
@@ -302,6 +305,10 @@ geolokacija, telefon, sajt, radno_vreme) values
  ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326),
  '+38233456780', NULL,
  '{"pon":"08:00-02:00"}'),
+<<<<<<< HEAD
+=======
+-- Žabljak
+>>>>>>> 6e99d5342af9998bca2e29bc901140bda1a4a60f
 ('Planinarski dom Durmitor', 5, 'Dom za planinare', 'Durmitor bb', 5,
  ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326),
  '+38233456781', NULL,
@@ -318,7 +325,9 @@ insert into tipovi_aktivnosti (naziv) values
 ('planinarenje');
 
 insert into aktivnosti (naziv, id_tipa, opis, id_objekta, cena, trajanje) values
+-- Kotor
 ('Degustacija morskih specijaliteta', 4, 'Lokalna kuhinja', 2, 25.00, 90),
+-- Budva
 ('Noćni izlazak', 7, 'Zabava uz muziku', 3, 10.00, 240),
 ('Planinarenje na Durmitoru', 8, 'Pešačka tura kroz prirodu', 5, 0.00, 300);
 
