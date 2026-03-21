@@ -21,6 +21,7 @@ create table korisnici(
 	id serial primary key,
 	ime varchar(100) not null,
 	prezime varchar(100) not null,
+	datum_rodjenja date not null,
 	email varchar(200) not null unique,
 	lozinka_hash text not null,
 	id_uloge int not null references uloge(id) on delete restrict,
@@ -143,9 +144,9 @@ insert into uloge (naziv) values
 ('menadzer'),
 ('turista');
 
-insert into korisnici (ime, prezime, email, lozinka_hash, id_uloge, verifikovan) values
-('Ana', 'Jovanovic', 'ana@gmail.com', 'hash123', 3, true),
-('Marko', 'Markovic', 'marko@gmail.com', 'hash456', 2, true);
+insert into korisnici (ime, prezime, datum_rodjenja, email, lozinka_hash, id_uloge, verifikovan) values
+('Ana', 'Jovanovic', '1998-05-12', 'ana@gmail.com', 'hash123', 3, true),
+('Marko', 'Markovic', '1995-09-23', 'marko@gmail.com', 'hash456', 2, true);
 
 insert into tipovi_destinacija(naziv) values
 ('planina'),
@@ -163,7 +164,7 @@ ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326)),
  ST_SetSRID(ST_MakePoint(18.770, 42.430), 4326)),
 (1, 'Stari grad Budva', 3, 'Istorijsko jezgro Budve',
  ST_SetSRID(ST_MakePoint(18.837, 42.279), 4326)),
-(1, 'Plaža Mogren', 2, 'Jedna od najlepših plaža u Budvi',
+(1, 'Plaža Mogren', 6, 'Jedna od najlepših plaža u Budvi',
  ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326)),
 (3, 'Durmitor', 1, 'Nacionalni park i planinski masiv',
  ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326));
@@ -172,7 +173,8 @@ insert into tipovi_objekata (naziv) values
 ('hotel'), 
 ('restoran'),
 ('kafic'),
-('klub');
+('klub'),
+('dom');
 
 insert into objekti (naziv, id_tipa, opis, adresa, id_destinacije,
 geolokacija, telefon, sajt, radno_vreme) values
@@ -196,7 +198,7 @@ geolokacija, telefon, sajt, radno_vreme) values
  '+38233456780', NULL,
  '{"pon":"08:00-02:00"}'),
 -- Žabljak
-('Planinarski dom Durmitor', 4, 'Dom za planinare', 'Durmitor bb', 5,
+('Planinarski dom Durmitor', 5, 'Dom za planinare', 'Durmitor bb', 5,
  ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326),
  '+38233456781', NULL,
  '{"pon":"00:00-24:00"}');
@@ -213,7 +215,7 @@ insert into tipovi_aktivnosti (naziv) values
 
 insert into aktivnosti (naziv, id_tipa, opis, id_objekta, cena, trajanje) values
 -- Kotor
-('Degustacija morskih specijaliteta', 4, 'Lokalna kuhinja', 1, 25.00, 90),
+('Degustacija morskih specijaliteta', 4, 'Lokalna kuhinja', 2, 25.00, 90),
 -- Budva
 ('Noćni izlazak', 7, 'Zabava uz muziku', 3, 10.00, 240),
 -- Žabljak
