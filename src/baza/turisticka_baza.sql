@@ -201,6 +201,9 @@ create table slike (
 	)
 );
 
+ALTER TABLE recenzije RENAME COLUMN kreirana TO kreirano;
+ALTER TABLE slike RENAME COLUMN kreirana TO kreirano;
+
 create table ankete (
 	id serial primary key,
 	id_korisnika int not null references korisnici(id) on delete cascade,
@@ -269,7 +272,7 @@ ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326)),
 (3, 'Durmitor', 1, 'Nacionalni park i planinski masiv',
  ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326));
 
- UPDATE destinacije
+UPDATE destinacije
 SET id_tipa = 7
 WHERE naziv = 'Durmitor';
 
@@ -298,7 +301,6 @@ geolokacija, telefon, sajt, radno_vreme) values
  ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326),
  '+38233456780', NULL,
  '{"pon":"08:00-02:00"}'),
--- Žabljak
 ('Planinarski dom Durmitor', 5, 'Dom za planinare', 'Durmitor bb', 5,
  ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326),
  '+38233456781', NULL,
@@ -315,9 +317,7 @@ insert into tipovi_aktivnosti (naziv) values
 ('planinarenje');
 
 insert into aktivnosti (naziv, id_tipa, opis, id_objekta, cena, trajanje) values
--- Kotor
 ('Degustacija morskih specijaliteta', 4, 'Lokalna kuhinja', 2, 25.00, 90),
--- Budva
 ('Noćni izlazak', 7, 'Zabava uz muziku', 3, 10.00, 240),
 ('Planinarenje na Durmitoru', 8, 'Pešačka tura kroz prirodu', 5, 0.00, 300);
 
@@ -392,13 +392,12 @@ insert into korisnik_log (id_korisnika, sesija_id, id_objekta, akcija, trajanje_
 (2,    null,        3,    'view',      60),
 (2,    null,        5,    'view',      90),
 (2,    null,        3,    'favourite', null),
+(1,    null,         1,   'share',     null),
+(2,    null,         3,   'share',     null)
 -- neregistrovani korisnik
 (null, 'ses_abc123', 1,   'view',      20),
 (null, 'ses_abc123', 2,   'view',      15),
-(null, 'ses_xyz789', null,'search',    null),
--- deljenje
-(1,    null,         1,   'share',     null),
-(2,    null,         3,   'share',     null);
+(null, 'ses_xyz789', null,'search',    null);
 
 -- aktivnosti: 1=Degustacija(obj 2), 2=Noćni izlazak(obj 4), 3=Planinarenje(obj 5)
 insert into korisnik_aktivnosti (id_korisnika, id_aktivnosti) values
