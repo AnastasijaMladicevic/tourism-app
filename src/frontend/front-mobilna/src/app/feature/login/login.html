@@ -1,0 +1,31 @@
+<div class="login-container">
+  <div class="overlay">
+    <div class="logo">
+      <h1>SpireGO</h1>
+      <p>"Every place has a story — find yours."</p>
+    </div>
+
+    <div class="form">
+      <input type="text" placeholder="Email" />
+      <input type="password" placeholder="Password" />
+
+      <button class="login-btn">Log In</button>
+
+      <button class="guest-btn" (click)="goHome()">Continue as Guest</button>
+
+      <p class="links">
+        Don't have an account?
+        <span (click)="goRegister()">Sign Up</span>
+      </p>
+
+      <p class="forgot" (click)="goForgot()">Forgot password?</p>
+    </div>
+
+    <div class="footer">
+      By signing in, you agree to our
+      <span (click)="goTerms()">Terms of Service</span>
+      and
+      <span (click)="goTerms()">Privacy Policy</span>
+    </div>
+  </div>
+</div>
