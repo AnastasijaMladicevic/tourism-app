@@ -5,7 +5,7 @@ public class Korisnik
     public int Id { get; set; }
     public string Ime { get; set; } = string.Empty;
     public string Prezime { get; set; } = string.Empty;
-    public DateOnly? DatumRodjenja { get; set; }
+    public DateOnly DatumRodjenja { get; set; }
     public string Email { get; set; } = string.Empty;
     public string LozinkaHash { get; set; } = string.Empty;
     public int IdUloge { get; set; }

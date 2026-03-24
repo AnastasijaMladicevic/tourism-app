@@ -7,6 +7,7 @@ namespace TuristickiVodic.Core.Models
     public class TipAktivnosti
     {
         public int Id { get; set; }
-        public string Naziv { get; set; }
+        public string Naziv { get; set; } = string.Empty;
+        public ICollection<Aktivnost> Aktivnosti { get; set; } = new List<Aktivnost>();
     }
 }
