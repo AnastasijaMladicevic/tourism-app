@@ -393,7 +393,7 @@ insert into korisnik_log (id_korisnika, sesija_id, id_objekta, akcija, trajanje_
 (2,    null,        5,    'view',      90),
 (2,    null,        3,    'favourite', null),
 (1,    null,         1,   'share',     null),
-(2,    null,         3,   'share',     null)
+(2,    null,         3,   'share',     null),
 -- neregistrovani korisnik
 (null, 'ses_abc123', 1,   'view',      20),
 (null, 'ses_abc123', 2,   'view',      15),

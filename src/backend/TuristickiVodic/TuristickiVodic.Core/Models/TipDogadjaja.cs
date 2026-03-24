@@ -7,6 +7,6 @@ namespace TuristickiVodic.Core.Models
     public class TipDogadjaja
     {
         public int Id { get; set; }
-        public string Naziv { get; set; }
+        public string? Naziv { get; set; }
     }
 }
