@@ -18,7 +18,6 @@ public class Korisnik
     public bool Aktivan { get; set; } = true;
     public DateTime Kreirano { get; set; }
     public DateTime Izmenjeno { get; set; }
-
     public Uloga Uloga { get; set; } = null!;
     public ICollection<Recenzija> Recenzije { get; set; } = new List<Recenzija>();
     public ICollection<Favorit> Favoriti { get; set; } = new List<Favorit>();

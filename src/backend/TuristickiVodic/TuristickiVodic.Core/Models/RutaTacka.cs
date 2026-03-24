@@ -10,6 +10,5 @@ public class RutaTacka
     public Point Geolokacija { get; set; } = null!;
     public string? NazivTacke { get; set; }
     public DateTime Kreirano { get; set; }
-
     public Ruta Ruta { get; set; } = null!;
 }
