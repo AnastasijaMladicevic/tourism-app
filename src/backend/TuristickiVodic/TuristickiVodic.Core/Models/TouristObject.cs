@@ -29,9 +29,7 @@ namespace TuristickiVodic.Core.Models
         public decimal AverageRating { get; set; } = 0;
         public int ReviewCount { get; set; } = 0;
 
-        public ContentStatus Status { get; set; }
-            = ContentStatus.Pending;
-
+        public ContentStatus Status { get; set; } = ContentStatus.Pending;
         public bool IsActive { get; set; } = true;
 
         [Required]
@@ -42,18 +40,27 @@ namespace TuristickiVodic.Core.Models
         public int LocationId { get; set; }
         public Location Location { get; set; }
 
+        // Opciono - može biti direktno vezan za destinaciju
         public int? DestinationId { get; set; }
         public Destination? Destination { get; set; }
 
         [Required]
         public int CreatedByUserId { get; set; }
-
         [ForeignKey("CreatedByUserId")]
         public User CreatedBy { get; set; }
+
+        // Ko je odobrio (menadžer ili admin)
+        public int? ApprovedByUserId { get; set; }
+        [ForeignKey("ApprovedByUserId")]
+        public User? ApprovedBy { get; set; }
+
+        public DateTime? ApprovedAt { get; set; }
+        public string? RejectionReason { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
+        // Navigacije
         public ICollection<Review> Reviews { get; set; }
         public ICollection<Image> Images { get; set; }
         public ICollection<Favorite> Favorites { get; set; }
