@@ -1,143 +1,380 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TuristickiVodic.Core.Models;
+using Image = TuristickiVodic.Core.Models.Image;
+using Location = TuristickiVodic.Core.Models.Location;
 
-namespace TuristickiVodic.Infrastructure.Data
+namespace TuristickiVodic.Infrastructure.Data;
+
+public class AppDbContext : DbContext
 {
-    public class AppDbContext : DbContext
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options) { }
+
+    public DbSet<Role> Roles { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<LocationType> LocationTypes { get; set; }
+    public DbSet<Location> Locations { get; set; }
+    public DbSet<DestinationType> DestinationTypes { get; set; }
+    public DbSet<Destination> Destinations { get; set; }
+    public DbSet<ObjectType> ObjectTypes { get; set; }
+    public DbSet<TouristObject> Objects { get; set; }
+    public DbSet<ActivityType> ActivityTypes { get; set; }
+    public DbSet<Activity> Activities { get; set; }
+    public DbSet<EventType> EventTypes { get; set; }
+    public DbSet<Event> Events { get; set; }
+    public DbSet<Review> Reviews { get; set; }
+    public DbSet<Image> Images { get; set; }
+    public DbSet<Favorite> Favorites { get; set; }
+    public DbSet<Route> Routes { get; set; }
+    public DbSet<RoutePoint> RoutePoints { get; set; }
+    public DbSet<UserLog> UserLogs { get; set; }
+    public DbSet<ManagerReport> ManagerReports { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder mb)
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+        // ==================== USER ====================
+        mb.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
 
-        public DbSet<Grad> Gradovi { get; set; }
-        public DbSet<Uloga> Uloge { get; set; }
-        public DbSet<Korisnik> Korisnici { get; set; }
-        public DbSet<Destinacija> Destinacije { get; set; }
-        public DbSet<TipDestinacije> TipoviDestinacija { get; set; }
-        public DbSet<Objekat> Objekti { get; set; }
-        public DbSet<TipObjekta> TipoviObjekata { get; set; }
-        public DbSet<Aktivnost> Aktivnosti { get; set; }
-        public DbSet<TipAktivnosti> TipoviAktivnosti { get; set; }
-        public DbSet<Dogadjaj> Dogadjaji { get; set; }
-        public DbSet<TipDogadjaja> TipoviDogadjaja { get; set; }
-        public DbSet<Recenzija> Recenzije { get; set; }
-        public DbSet<Favorit> Favoriti { get; set; }
-        public DbSet<KorisnikLog> KorisnikLog { get; set; }
-        public DbSet<KorisnikAktivnost> KorisnikAktivnosti { get; set; }
-        public DbSet<Slika> Slike { get; set; }
-        public DbSet<Anketa> Ankete { get; set; }
-        public DbSet<Ruta> Rute { get; set; }
-        public DbSet<RutaTacka> RutaTacke { get; set; }
+        mb.Entity<User>()
+            .HasOne(u => u.Role)
+            .WithMany(r => r.Users)
+            .HasForeignKey(u => u.RoleId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
+        mb.Entity<User>()
+            .HasOne(u => u.ManagedDestination)
+            .WithOne(d => d.ManagedBy)
+            .HasForeignKey<Destination>(d => d.ManagedByUserId)
+            .OnDelete(DeleteBehavior.SetNull);
 
-            // Default schema
-            modelBuilder.HasDefaultSchema("public");
+        // ==================== DESTINATION ====================
+        mb.Entity<Destination>()
+            .Property(d => d.Status)
+            .HasConversion<string>();
 
-            // Grad
-            modelBuilder.Entity<Grad>()
-                .Property(g => g.Naziv)
-                .HasMaxLength(150);
-            modelBuilder.Entity<Grad>().ToTable("gradovi");
+        mb.Entity<Destination>()
+            .HasIndex(d => d.Geolocation)
+            .HasMethod("GIST");
 
-            // Uloga
-            modelBuilder.Entity<Uloga>().ToTable("uloge");
+        mb.Entity<Destination>()
+            .HasOne(d => d.CreatedBy)
+            .WithMany(u => u.CreatedDestinations)
+            .HasForeignKey(d => d.CreatedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
 
-            // Korisnik
-            modelBuilder.Entity<Korisnik>()
-                .HasIndex(k => k.Email)
-                .IsUnique();
-            modelBuilder.Entity<Korisnik>()
-                .HasOne(k => k.Uloga)
-                .WithMany(u => u.Korisnici)
-                .HasForeignKey(k => k.IdUloge)
-                .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<Korisnik>().ToTable("korisnici");
+        mb.Entity<Destination>()
+            .HasOne(d => d.DestinationType)
+            .WithMany(dt => dt.Destinations)
+            .HasForeignKey(d => d.DestinationTypeId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-            // Destinacija
-            modelBuilder.Entity<Destinacija>()
-                .HasOne(d => d.Grad)
-                .WithMany(g => g.Destinacije)
-                .HasForeignKey(d => d.IdGrada)
-                .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<Destinacija>().ToTable("destinacije");
+        // ==================== LOCATION ====================
+        mb.Entity<Location>()
+            .HasIndex(l => l.Geolocation)
+            .HasMethod("GIST");
 
-            // Objekat
-            modelBuilder.Entity<Objekat>()
-                .HasOne(o => o.Destinacija)
-                .WithMany(d => d.Objekti)
-                .HasForeignKey(o => o.IdDestinacije)
-                .OnDelete(DeleteBehavior.Restrict);
-            modelBuilder.Entity<Objekat>().ToTable("objekti");
+        mb.Entity<Location>()
+            .HasOne(l => l.Destination)
+            .WithMany(d => d.Locations)
+            .HasForeignKey(l => l.DestinationId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-            // Tipovi
-            modelBuilder.Entity<TipDestinacije>().ToTable("tipovi_destinacija");
-            modelBuilder.Entity<TipObjekta>().ToTable("tipovi_objekata");
-            modelBuilder.Entity<TipAktivnosti>().ToTable("tipovi_aktivnosti");
-            modelBuilder.Entity<TipDogadjaja>().ToTable("tipovi_dogadjaja");
+        mb.Entity<Location>()
+            .HasOne(l => l.LocationType)
+            .WithMany(lt => lt.Locations)
+            .HasForeignKey(l => l.LocationTypeId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-            // Aktivnosti i Dogadjaji
-            modelBuilder.Entity<Aktivnost>().ToTable("aktivnosti");
-            modelBuilder.Entity<Dogadjaj>().ToTable("dogadjaji");
+        mb.Entity<Location>()
+            .HasOne(l => l.CreatedBy)
+            .WithMany()
+            .HasForeignKey(l => l.CreatedByUserId)
+            .OnDelete(DeleteBehavior.SetNull);
 
-            // Recenzije
-            modelBuilder.Entity<Recenzija>()
-                .HasOne(r => r.Korisnik)
-                .WithMany(k => k.Recenzije)
-                .HasForeignKey(r => r.IdKorisnika)
-                .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Recenzija>()
-                .HasOne(r => r.Objekat)
-                .WithMany(o => o.Recenzije)
-                .HasForeignKey(r => r.IdObjekta)
-                .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Recenzija>()
-                .HasIndex(r => new { r.IdKorisnika, r.IdObjekta })
-                .IsUnique();
-            modelBuilder.Entity<Recenzija>().ToTable("recenzije");
+        // ==================== TOURIST OBJECT ====================
+        mb.Entity<TouristObject>()
+            .Property(o => o.Status)
+            .HasConversion<string>();
 
-            // Favoriti
-            modelBuilder.Entity<Favorit>()
-                .HasOne(f => f.Korisnik)
-                .WithMany(k => k.Favoriti)
-                .HasForeignKey(f => f.IdKorisnika)
-                .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Favorit>()
-                .HasOne(f => f.Objekat)
-                .WithMany(o => o.Favoriti)
-                .HasForeignKey(f => f.IdObjekta)
-                .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Favorit>()
-                .HasOne(f => f.Ruta)
-                .WithMany(r => r.Favoriti)
-                .HasForeignKey(f => f.IdRute)
-                .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Favorit>()
-                .HasOne(f => f.Dogadjaj)
-                .WithMany(d => d.Favoriti)
-                .HasForeignKey(f => f.IdDogadjaja)
-                .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<Favorit>().ToTable("favoriti");
+        mb.Entity<TouristObject>()
+            .HasIndex(o => o.Geolocation)
+            .HasMethod("GIST");
 
-            // Log i aktivnosti korisnika
-            modelBuilder.Entity<KorisnikLog>().ToTable("korisnik_log");
-            modelBuilder.Entity<KorisnikAktivnost>().ToTable("korisnik_aktivnosti");
+        mb.Entity<TouristObject>()
+            .HasOne(o => o.Location)
+            .WithMany(l => l.Objects)
+            .HasForeignKey(o => o.LocationId)
+            .OnDelete(DeleteBehavior.Restrict);
 
-            // Slike i Ankete
-            modelBuilder.Entity<Slika>().ToTable("slike");
-            modelBuilder.Entity<Anketa>().ToTable("ankete");
+        mb.Entity<TouristObject>()
+            .HasOne(o => o.Destination)
+            .WithMany(d => d.Objects)
+            .HasForeignKey(o => o.DestinationId)
+            .OnDelete(DeleteBehavior.SetNull);
 
-            // Rute i tacke
-            modelBuilder.Entity<Ruta>().ToTable("rute");
-            modelBuilder.Entity<RutaTacka>()
-                .HasOne(rt => rt.Ruta)
-                .WithMany(r => r.RutaTacke)
-                .HasForeignKey(rt => rt.IdRute)
-                .OnDelete(DeleteBehavior.Cascade);
-            modelBuilder.Entity<RutaTacka>()
-                .HasIndex(rt => new { rt.IdRute, rt.Redosled })
-                .IsUnique();
-            modelBuilder.Entity<RutaTacka>().ToTable("ruta_tacke");
-        }
+        mb.Entity<TouristObject>()
+            .HasOne(o => o.ObjectType)
+            .WithMany(ot => ot.Objects)
+            .HasForeignKey(o => o.ObjectTypeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<TouristObject>()
+            .HasOne(o => o.CreatedBy)
+            .WithMany(u => u.CreatedObjects)
+            .HasForeignKey(o => o.CreatedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        mb.Entity<TouristObject>()
+            .HasOne(o => o.ApprovedBy)
+            .WithMany()
+            .HasForeignKey(o => o.ApprovedByUserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // ==================== EVENT ====================
+        mb.Entity<Event>()
+            .Property(e => e.Status)
+            .HasConversion<string>();
+
+        mb.Entity<Event>()
+            .HasOne(e => e.Location)
+            .WithMany(l => l.Events)
+            .HasForeignKey(e => e.LocationId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        mb.Entity<Event>()
+            .HasOne(e => e.Destination)
+            .WithMany(d => d.Events)
+            .HasForeignKey(e => e.DestinationId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        mb.Entity<Event>()
+            .HasOne(e => e.Object)
+            .WithMany(o => o.Events)
+            .HasForeignKey(e => e.ObjectId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        mb.Entity<Event>()
+            .HasOne(e => e.EventType)
+            .WithMany(et => et.Events)
+            .HasForeignKey(e => e.EventTypeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Event>()
+            .HasOne(e => e.CreatedBy)
+            .WithMany(u => u.CreatedEvents)
+            .HasForeignKey(e => e.CreatedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        mb.Entity<Event>()
+            .HasOne(e => e.ApprovedBy)
+            .WithMany()
+            .HasForeignKey(e => e.ApprovedByUserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // ==================== ACTIVITY ====================
+        mb.Entity<Activity>()
+            .HasIndex(a => a.Geolocation)
+            .HasMethod("GIST");
+
+        mb.Entity<Activity>()
+            .HasOne(a => a.Location)
+            .WithMany(l => l.Activities)
+            .HasForeignKey(a => a.LocationId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        mb.Entity<Activity>()
+            .HasOne(a => a.Destination)
+            .WithMany(d => d.Activities)
+            .HasForeignKey(a => a.DestinationId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        mb.Entity<Activity>()
+            .HasOne(a => a.Object)
+            .WithMany(o => o.Activities)
+            .HasForeignKey(a => a.ObjectId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        mb.Entity<Activity>()
+            .HasOne(a => a.ActivityType)
+            .WithMany(at => at.Activities)
+            .HasForeignKey(a => a.ActivityTypeId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Activity>()
+            .HasOne(a => a.CreatedBy)
+            .WithMany()
+            .HasForeignKey(a => a.CreatedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // ==================== REVIEW ====================
+        mb.Entity<Review>()
+            .Property(r => r.Status)
+            .HasConversion<string>();
+
+        mb.Entity<Review>()
+            .HasIndex(r => new { r.UserId, r.ObjectId })
+            .IsUnique();
+
+        mb.Entity<Review>()
+            .HasOne(r => r.User)
+            .WithMany(u => u.Reviews)
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        mb.Entity<Review>()
+            .HasOne(r => r.Object)
+            .WithMany(o => o.Reviews)
+            .HasForeignKey(r => r.ObjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Review>()
+            .HasOne(r => r.ReviewedBy)
+            .WithMany()
+            .HasForeignKey(r => r.ReviewedByUserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // ==================== FAVORITE ====================
+        mb.Entity<Favorite>()
+            .ToTable(t => t.HasCheckConstraint(
+                "CK_Favorite_OnlyOne",
+                @"(CASE WHEN ""ObjectId"" IS NOT NULL THEN 1 ELSE 0 END +
+                   CASE WHEN ""ActivityId"" IS NOT NULL THEN 1 ELSE 0 END +
+                   CASE WHEN ""DestinationId"" IS NOT NULL THEN 1 ELSE 0 END +
+                   CASE WHEN ""RouteId"" IS NOT NULL THEN 1 ELSE 0 END) = 1"));
+
+        mb.Entity<Favorite>()
+            .HasOne(f => f.User)
+            .WithMany(u => u.Favorites)
+            .HasForeignKey(f => f.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Favorite>()
+            .HasOne(f => f.Object)
+            .WithMany(o => o.Favorites)
+            .HasForeignKey(f => f.ObjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Favorite>()
+            .HasOne(f => f.Activity)
+            .WithMany(a => a.Favorites)
+            .HasForeignKey(f => f.ActivityId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Favorite>()
+            .HasOne(f => f.Destination)
+            .WithMany(d => d.Favorites)
+            .HasForeignKey(f => f.DestinationId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Favorite>()
+            .HasOne(f => f.Route)
+            .WithMany(r => r.Favorites)
+            .HasForeignKey(f => f.RouteId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // ==================== IMAGE ====================
+        mb.Entity<Image>()
+            .ToTable(t => t.HasCheckConstraint(
+                "CK_Image_OnlyOne",
+                @"(CASE WHEN ""ObjectId"" IS NOT NULL THEN 1 ELSE 0 END +
+                   CASE WHEN ""ActivityId"" IS NOT NULL THEN 1 ELSE 0 END +
+                   CASE WHEN ""EventId"" IS NOT NULL THEN 1 ELSE 0 END +
+                   CASE WHEN ""DestinationId"" IS NOT NULL THEN 1 ELSE 0 END +
+                   CASE WHEN ""LocationId"" IS NOT NULL THEN 1 ELSE 0 END) = 1"));
+
+        mb.Entity<Image>()
+            .HasOne(i => i.Object)
+            .WithMany(o => o.Images)
+            .HasForeignKey(i => i.ObjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Image>()
+            .HasOne(i => i.Activity)
+            .WithMany(a => a.Images)
+            .HasForeignKey(i => i.ActivityId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Image>()
+            .HasOne(i => i.Event)
+            .WithMany(e => e.Images)
+            .HasForeignKey(i => i.EventId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Image>()
+            .HasOne(i => i.Destination)
+            .WithMany(d => d.Images)
+            .HasForeignKey(i => i.DestinationId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Image>()
+            .HasOne(i => i.Location)
+            .WithMany(l => l.Images)
+            .HasForeignKey(i => i.LocationId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // ==================== ROUTE & ROUTE POINT ====================
+        mb.Entity<RoutePoint>()
+            .HasIndex(rp => new { rp.RouteId, rp.Order })
+            .IsUnique();
+
+        mb.Entity<RoutePoint>()
+            .HasOne(rp => rp.Route)
+            .WithMany(r => r.RoutePoints)
+            .HasForeignKey(rp => rp.RouteId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Route>()
+            .HasOne(r => r.CreatedBy)
+            .WithMany()
+            .HasForeignKey(r => r.CreatedByUserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // ==================== USER LOG ====================
+        mb.Entity<UserLog>()
+            .ToTable(t => t.HasCheckConstraint(
+                "CK_UserLog_UserOrSession",
+                @"""UserId"" IS NOT NULL OR ""SessionId"" IS NOT NULL"));
+
+        mb.Entity<UserLog>()
+            .Property(l => l.Action)
+            .HasConversion<string>();
+
+        mb.Entity<UserLog>()
+            .HasOne(ul => ul.User)
+            .WithMany(u => u.UserLogs)
+            .HasForeignKey(ul => ul.UserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        mb.Entity<UserLog>()
+            .HasOne(ul => ul.Object)
+            .WithMany()
+            .HasForeignKey(ul => ul.ObjectId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // ==================== MANAGER REPORT ====================
+        mb.Entity<ManagerReport>()
+            .HasOne(r => r.Manager)
+            .WithMany(u => u.SentReports)
+            .HasForeignKey(r => r.ManagerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        mb.Entity<ManagerReport>()
+            .HasOne(r => r.ReportedUser)
+            .WithMany()
+            .HasForeignKey(r => r.ReportedUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        mb.Entity<ManagerReport>()
+            .HasOne(r => r.ResolvedBy)
+            .WithMany()
+            .HasForeignKey(r => r.ResolvedByUserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // ==================== ROLE ====================
+        mb.Entity<Role>()
+            .Property(r => r.Name)
+            .HasConversion<string>();
     }
 }
