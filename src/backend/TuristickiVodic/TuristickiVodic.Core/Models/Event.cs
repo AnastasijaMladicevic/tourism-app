@@ -23,16 +23,14 @@ namespace TuristickiVodic.Core.Models
 
         public bool IsActive { get; set; } = true;
 
-        public ContentStatus Status { get; set; }
-            = ContentStatus.Pending;
+        public ContentStatus Status { get; set; } = ContentStatus.Pending;
 
         [Required]
         public int EventTypeId { get; set; }
         public EventType EventType { get; set; }
 
-        [Required]
-        public int LocationId { get; set; }
-        public Location Location { get; set; }
+        public int? LocationId { get; set; }
+        public Location? Location { get; set; }
 
         public int? DestinationId { get; set; }
         public Destination? Destination { get; set; }
@@ -42,14 +40,19 @@ namespace TuristickiVodic.Core.Models
 
         [Required]
         public int CreatedByUserId { get; set; }
-
         [ForeignKey("CreatedByUserId")]
         public User CreatedBy { get; set; }
+
+        public int? ApprovedByUserId { get; set; }
+        [ForeignKey("ApprovedByUserId")]
+        public User? ApprovedBy { get; set; }
+
+        public DateTime? ApprovedAt { get; set; }
+        public string? RejectionReason { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<Image> Images { get; set; }
-        public ICollection<Favorite> Favorites { get; set; }
     }
 }
