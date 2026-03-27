@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using NetTopologySuite.Geometries;
-using System.Text;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace TuristickiVodic.Core.Models
 {
@@ -16,19 +15,30 @@ namespace TuristickiVodic.Core.Models
 
         public string? Description { get; set; }
 
-        // NetTopologySuite za geolokaciju
         public Point? Geolocation { get; set; }
 
         public bool IsActive { get; set; } = true;
 
         [Required]
+        public int DestinationId { get; set; }
+        public Destination Destination { get; set; }
+
+        [Required]
         public int LocationTypeId { get; set; }
         public LocationType LocationType { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        // Ko je kreirao lokaciju (može biti menadžer ili admin)
+        public int? CreatedByUserId { get; set; }
+        [ForeignKey("CreatedByUserId")]
+        public User? CreatedBy { get; set; }
 
-        public ICollection<Destination> Destinations { get; set; }
-        public ICollection<User> Users { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
+
+        // Navigacije
+        public ICollection<TouristObject> Objects { get; set; }
+        public ICollection<Event> Events { get; set; }
+        public ICollection<Activity> Activities { get; set; }
         public ICollection<Image> Images { get; set; }
     }
 }
