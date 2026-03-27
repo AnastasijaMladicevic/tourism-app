@@ -17,28 +17,23 @@ namespace TuristickiVodic.Core.Models
         public decimal? Price { get; set; }
         public int? DurationMinutes { get; set; }
 
-        public ContentStatus Status { get; set; }
-            = ContentStatus.Pending;
-
         public bool IsActive { get; set; } = true;
 
         [Required]
         public int ActivityTypeId { get; set; }
         public ActivityType ActivityType { get; set; }
 
-        [Required]
-        public int LocationId { get; set; }
-        public Location Location { get; set; }
-
         public int? DestinationId { get; set; }
         public Destination? Destination { get; set; }
+
+        public int? LocationId { get; set; }
+        public Location? Location { get; set; }
 
         public int? ObjectId { get; set; }
         public TouristObject? Object { get; set; }
 
         [Required]
         public int CreatedByUserId { get; set; }
-
         [ForeignKey("CreatedByUserId")]
         public User CreatedBy { get; set; }
 
@@ -47,6 +42,5 @@ namespace TuristickiVodic.Core.Models
 
         public ICollection<Image> Images { get; set; }
         public ICollection<Favorite> Favorites { get; set; }
-        public ICollection<UserActivity> UserActivities { get; set; }
     }
 }
