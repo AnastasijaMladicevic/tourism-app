@@ -14,14 +14,9 @@ namespace TuristickiVodic.Core.Models
         public string? Description { get; set; }
         public Point? Geolocation { get; set; }
 
-        public ContentStatus Status { get; set; }
-            = ContentStatus.Pending;
+        public ContentStatus Status { get; set; } = ContentStatus.Pending;
 
         public bool IsActive { get; set; } = true;
-
-        [Required]
-        public int LocationId { get; set; }
-        public Location Location { get; set; }
 
         [Required]
         public int DestinationTypeId { get; set; }
@@ -33,13 +28,17 @@ namespace TuristickiVodic.Core.Models
         [ForeignKey("CreatedByUserId")]
         public User CreatedBy { get; set; }
 
+        public int? ManagedByUserId { get; set; }
+        public User? ManagedBy { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        public ICollection<Image> Images { get; set; }
-        public ICollection<Favorite> Favorites { get; set; }
-        public ICollection<TouristObject> Objects { get; set; }
-        public ICollection<Activity> Activities { get; set; }
-        public ICollection<Event> Events { get; set; }
+        public ICollection<Location> Locations { get; set; } = new List<Location>();
+        public ICollection<Image> Images { get; set; } = new List<Image>();
+        public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
+        public ICollection<TouristObject> Objects { get; set; } = new List<TouristObject>();
+        public ICollection<Event> Events { get; set; } = new List<Event>();
+        public ICollection<Activity> Activities { get; set; } = new List<Activity>();
     }
 }
