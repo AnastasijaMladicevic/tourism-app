@@ -20,7 +20,7 @@ namespace TuristickiVodic.Core.Models
         public TouristObject? Object { get; set; }
 
         [Required]
-        public LogAction Action { get; set; }
+        public string Action { get; set; }
 
         public int? DurationSeconds { get; set; }
 
