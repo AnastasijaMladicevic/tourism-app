@@ -70,6 +70,14 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
                 .ForMember(dest => dest.Latitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.Y : (double?)null))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+
+            CreateMap<Activity, ActivityDto>()
+                .ForMember(dest => dest.ActivityTypeName, opt => opt.MapFrom(src => src.ActivityType.Name))
+                .ForMember(dest => dest.LocationName, opt => opt.MapFrom(src => src.Location != null ? src.Location.Name : null))
+                .ForMember(dest => dest.DestinationName, opt => opt.MapFrom(src => src.Destination != null ? src.Destination.Name : null))
+                .ForMember(dest => dest.ObjectName, opt => opt.MapFrom(src => src.Object != null ? src.Object.Name : null))
+                .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
+                .ForMember(dest => dest.Latitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.Y : (double?)null));
         }
     }
 }
