@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.DTOs;
 using TuristickiVodic.Core.Models;
 
@@ -57,6 +58,12 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.CreatedEvents, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedDestinations, opt => opt.Ignore())
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
+            CreateMap<Location, LocationDto>()
+                .ForMember(dest => dest.DestinationName, opt => opt.MapFrom(src => src.Destination.Name))
+                .ForMember(dest => dest.LocationTypeName, opt => opt.MapFrom(src => src.LocationType.Name))
+                .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
+                .ForMember(dest => dest.Latitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.Y : (double?)null));
         }
     }
 }
