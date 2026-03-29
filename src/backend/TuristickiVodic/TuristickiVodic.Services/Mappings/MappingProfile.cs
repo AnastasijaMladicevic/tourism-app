@@ -78,6 +78,21 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.ObjectName, opt => opt.MapFrom(src => src.Object != null ? src.Object.Name : null))
                 .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
                 .ForMember(dest => dest.Latitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.Y : (double?)null));
+
+            CreateMap<Event, EventDto>()
+                .ForMember(dest => dest.EventTypeName, opt => opt.MapFrom(src => src.EventType.Name))
+                .ForMember(dest => dest.LocationName, opt => opt.MapFrom(src => src.Location != null ? src.Location.Name : null))
+                .ForMember(dest => dest.DestinationName, opt => opt.MapFrom(src => src.Destination != null ? src.Destination.Name : null))
+                .ForMember(dest => dest.ObjectName, opt => opt.MapFrom(src => src.Object != null ? src.Object.Name : null))
+                .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
+                .ForMember(dest => dest.Latitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.Y : (double?)null))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+
+            CreateMap<Review, ReviewDto>()
+                .ForMember(dest => dest.UserFullName, opt => opt.MapFrom(src => src.User.FirstName + " " + src.User.LastName))
+                .ForMember(dest => dest.ObjectName, opt => opt.MapFrom(src => src.Object.Name))
+                .ForMember(dest => dest.ReviewedByFullName, opt => opt.MapFrom(src => src.ReviewedBy != null ? src.ReviewedBy.FirstName + " " + src.ReviewedBy.LastName : null))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
         }
     }
 }
