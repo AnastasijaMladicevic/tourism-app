@@ -1,0 +1,93 @@
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using TuristickiVodic.Core.DTOs;
+using TuristickiVodic.Services;
+
+namespace TuristickiVodic.API.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class DestinationsController : ControllerBase
+    {
+        private readonly IDestinationService _destinationService;
+
+        public DestinationsController(IDestinationService destinationService)
+        {
+            _destinationService = destinationService;
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAll()
+        {
+            var destinations = await _destinationService.GetAllAsync();
+            return Ok(destinations);
+        }
+
+        [HttpGet("{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var destination = await _destinationService.GetByIdAsync(id);
+
+            if (destination == null)
+                return NotFound();
+
+            return Ok(destination);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create([FromBody] CreateDestinationDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var created = await _destinationService.CreateAsync(dto, userId);
+                return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateDestinationDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var updated = await _destinationService.UpdateAsync(id, dto);
+
+                if (updated == null)
+                    return NotFound();
+
+                return Ok(updated);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var deleted = await _destinationService.DeleteAsync(id);
+
+            if (!deleted)
+                return NotFound();
+
+            return NoContent();
+        }
+    }
+}
