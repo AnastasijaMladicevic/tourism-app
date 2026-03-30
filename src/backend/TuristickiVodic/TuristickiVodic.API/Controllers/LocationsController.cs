@@ -40,7 +40,7 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Create([FromBody] CreateLocationDto dto)
         {
             if (!ModelState.IsValid)
@@ -61,7 +61,7 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateLocationDto dto)
         {
             if (!ModelState.IsValid)
@@ -86,7 +86,7 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Delete(int id)
         {
             try

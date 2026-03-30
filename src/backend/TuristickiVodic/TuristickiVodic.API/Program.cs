@@ -6,7 +6,6 @@ using System.Text;
 using TuristickiVodic.Infrastructure.Data;
 using TuristickiVodic.Services;
 using TuristickiVodic.Services.Services;
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -57,6 +56,8 @@ builder.Services.AddScoped<IDestinationService, DestinationService>();
 builder.Services.AddScoped<IActivityService, ActivityService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<IFavoriteService, FavoriteService>();
+builder.Services.AddScoped<ITouristObjectService, TouristObjectService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

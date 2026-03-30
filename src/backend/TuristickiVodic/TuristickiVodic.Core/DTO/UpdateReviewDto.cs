@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace TuristickiVodic.Core.DTO
 {
@@ -12,5 +9,20 @@ namespace TuristickiVodic.Core.DTO
 
         [MaxLength(1000)]
         public string? Text { get; set; }
+    }
+
+    public class RespondToReviewDto
+    {
+        [Required]
+        [MaxLength(1000)]
+        public string CreatorResponse { get; set; } = string.Empty;
+    }
+
+    public class ApproveReviewDto
+    {
+        [Required]
+        public bool Approve { get; set; }
+
+        public string? RejectionReason { get; set; }
     }
 }

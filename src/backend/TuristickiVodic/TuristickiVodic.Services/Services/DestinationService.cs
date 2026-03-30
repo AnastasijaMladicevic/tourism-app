@@ -68,7 +68,8 @@ namespace TuristickiVodic.Services
             return _mapper.Map<DestinationDto>(created);
         }
 
-        public async Task<DestinationDto?> UpdateAsync(int id, UpdateDestinationDto dto)
+        // Admin može sve; Menadžer može samo svoju destinaciju
+        public async Task<DestinationDto?> UpdateAsync(int id, UpdateDestinationDto dto, int requestingUserId, string roleName)
         {
             var destination = await _context.Destinations
                 .Include(d => d.DestinationType)
@@ -76,6 +77,9 @@ namespace TuristickiVodic.Services
 
             if (destination == null)
                 return null;
+
+            if (roleName == "Manager" && destination.ManagedByUserId != requestingUserId)
+                throw new UnauthorizedAccessException("Manager can only update their own destination.");
 
             if (dto.DestinationTypeId.HasValue)
             {
@@ -111,12 +115,26 @@ namespace TuristickiVodic.Services
             return _mapper.Map<DestinationDto>(updated);
         }
 
+        // Brisanje je blokirano ako destinacija ima lokacije, objekte ili evente
         public async Task<bool> DeleteAsync(int id)
         {
-            var destination = await _context.Destinations.FindAsync(id);
+            var destination = await _context.Destinations
+                .Include(d => d.Locations)
+                .Include(d => d.Objects)
+                .Include(d => d.Events)
+                .FirstOrDefaultAsync(d => d.Id == id);
 
             if (destination == null)
                 return false;
+
+            if (destination.Locations.Any())
+                throw new InvalidOperationException("Cannot delete destination that has locations. Remove them first.");
+
+            if (destination.Objects.Any())
+                throw new InvalidOperationException("Cannot delete destination that has objects. Remove them first.");
+
+            if (destination.Events.Any())
+                throw new InvalidOperationException("Cannot delete destination that has events. Remove them first.");
 
             _context.Destinations.Remove(destination);
             await _context.SaveChangesAsync();

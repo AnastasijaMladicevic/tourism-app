@@ -57,7 +57,7 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateDestinationDto dto)
         {
             if (!ModelState.IsValid)
@@ -65,13 +65,17 @@ namespace TuristickiVodic.API.Controllers
 
             try
             {
-                var updated = await _destinationService.UpdateAsync(id, dto);
+                var requestingUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var roleName = User.FindFirstValue(ClaimTypes.Role)!;
+
+                var updated = await _destinationService.UpdateAsync(id, dto, requestingUserId, roleName);
 
                 if (updated == null)
                     return NotFound();
 
                 return Ok(updated);
             }
+            catch (UnauthorizedAccessException) { return Forbid(); }
             catch (InvalidOperationException ex)
             {
                 return BadRequest(new { message = ex.Message });
@@ -82,12 +86,16 @@ namespace TuristickiVodic.API.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
-            var deleted = await _destinationService.DeleteAsync(id);
-
-            if (!deleted)
-                return NotFound();
-
-            return NoContent();
+            try
+            {
+                var deleted = await _destinationService.DeleteAsync(id);
+                if (!deleted) return NotFound();
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

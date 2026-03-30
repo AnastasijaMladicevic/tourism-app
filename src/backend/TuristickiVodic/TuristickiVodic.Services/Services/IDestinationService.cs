@@ -1,4 +1,4 @@
-﻿using TuristickiVodic.Core.DTOs;
+using TuristickiVodic.Core.DTOs;
 
 namespace TuristickiVodic.Services
 {
@@ -7,7 +7,7 @@ namespace TuristickiVodic.Services
         Task<IEnumerable<DestinationDto>> GetAllAsync();
         Task<DestinationDto?> GetByIdAsync(int id);
         Task<DestinationDto> CreateAsync(CreateDestinationDto dto, int userId);
-        Task<DestinationDto?> UpdateAsync(int id, UpdateDestinationDto dto);
+        Task<DestinationDto?> UpdateAsync(int id, UpdateDestinationDto dto, int requestingUserId, string roleName);
         Task<bool> DeleteAsync(int id);
     }
 }

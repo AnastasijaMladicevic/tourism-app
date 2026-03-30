@@ -51,12 +51,17 @@ namespace TuristickiVodic.Services.Services
 
             if (dto.LocationId.HasValue)
             {
-                var locationExists = await _context.Locations.AnyAsync(x => x.Id == dto.LocationId.Value);
-                if (!locationExists)
+                var location = await _context.Locations.FindAsync(dto.LocationId.Value);
+                if (location == null)
                     throw new InvalidOperationException("Location not found");
-            }
 
-            if (dto.DestinationId.HasValue)
+                if (dto.DestinationId.HasValue && dto.DestinationId.Value != location.DestinationId)
+                    throw new InvalidOperationException("Location does not belong to the specified destination.");
+
+                // Automatski postavi DestinationId sa lokacije
+                dto.DestinationId = location.DestinationId;
+            }
+            else if (dto.DestinationId.HasValue)
             {
                 var destinationExists = await _context.Destinations.AnyAsync(x => x.Id == dto.DestinationId.Value);
                 if (!destinationExists)

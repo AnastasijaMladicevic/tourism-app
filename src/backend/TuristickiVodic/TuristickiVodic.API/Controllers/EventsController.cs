@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TuristickiVodic.Core.DTO;
-using TuristickiVodic.Services;
 using TuristickiVodic.Services.Services;
 
 namespace TuristickiVodic.API.Controllers
@@ -31,81 +30,77 @@ namespace TuristickiVodic.API.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var ev = await _eventService.GetByIdAsync(id);
-
-            if (ev == null)
-                return NotFound();
-
+            if (ev == null) return NotFound();
             return Ok(ev);
         }
 
+        // ContentCreator i Menadžer mogu da kreiraju evente
         [HttpPost]
-        [Authorize(Roles = "Admin,ContentCreator,Manager")]
+        [Authorize(Roles = "ContentCreator,Manager,Admin")]
         public async Task<IActionResult> Create([FromBody] CreateEventDto dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            try
-            {
-                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-                var created = await _eventService.CreateAsync(dto, userId);
-                return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,ContentCreator,Manager")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateEventDto dto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            if (!ModelState.IsValid) return BadRequest(ModelState);
 
             try
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
                 var roleName = User.FindFirstValue(ClaimTypes.Role)!;
+                var created = await _eventService.CreateAsync(dto, userId, roleName);
+                return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            }
+            catch (UnauthorizedAccessException) { return Forbid(); }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+        }
 
+        [HttpPut("{id}")]
+        [Authorize(Roles = "ContentCreator,Manager,Admin")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateEventDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var roleName = User.FindFirstValue(ClaimTypes.Role)!;
                 var updated = await _eventService.UpdateAsync(id, dto, userId, roleName);
-
-                if (updated == null)
-                    return NotFound();
-
+                if (updated == null) return NotFound();
                 return Ok(updated);
             }
-            catch (UnauthorizedAccessException)
+            catch (UnauthorizedAccessException) { return Forbid(); }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+        }
+
+        // Menadžer (za svoju destinaciju) ili Admin odobrava/odbija event
+        [HttpPost("{id}/approve")]
+        [Authorize(Roles = "Manager,Admin")]
+        public async Task<IActionResult> Approve(int id, [FromBody] ApproveContentDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
             {
-                return Forbid();
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var roleName = User.FindFirstValue(ClaimTypes.Role)!;
+                var updated = await _eventService.ApproveAsync(id, dto, userId, roleName);
+                if (updated == null) return NotFound();
+                return Ok(updated);
             }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            catch (UnauthorizedAccessException) { return Forbid(); }
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin,ContentCreator,Manager")]
+        [Authorize(Roles = "ContentCreator,Manager,Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
                 var roleName = User.FindFirstValue(ClaimTypes.Role)!;
-
                 var deleted = await _eventService.DeleteAsync(id, userId, roleName);
-
-                if (!deleted)
-                    return NotFound();
-
+                if (!deleted) return NotFound();
                 return NoContent();
             }
-            catch (UnauthorizedAccessException)
-            {
-                return Forbid();
-            }
+            catch (UnauthorizedAccessException) { return Forbid(); }
         }
     }
 }
