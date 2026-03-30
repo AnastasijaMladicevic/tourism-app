@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using TuristickiVodic.Core.DTOs;
 using TuristickiVodic.Core.Models;
@@ -162,6 +162,33 @@ namespace TuristickiVodic.Services
 
             if (user.Role.Name != RoleType.Tourist)
                 throw new InvalidOperationException("Only tourists can request creator role");
+
+            return true;
+        }
+
+        public async Task<bool> ApproveCreatorRoleAsync(int userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return false;
+
+            if (user.Role.Name != RoleType.Tourist)
+                throw new InvalidOperationException("Only tourists can be approved for content creator role");
+
+            var contentCreatorRole = await _context.Roles
+                .FirstOrDefaultAsync(r => r.Name == RoleType.ContentCreator);
+
+            if (contentCreatorRole == null)
+                throw new InvalidOperationException("Content creator role not found");
+
+            user.RoleId = contentCreatorRole.Id;
+            user.Role = contentCreatorRole;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
 
             return true;
         }
