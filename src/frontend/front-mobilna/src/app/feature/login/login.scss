@@ -1,0 +1,139 @@
+
+.login-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.overlay {
+  width: 90%;
+  max-width: 390px;
+  padding: 20px;
+  color: white;
+  text-align: center;
+  backdrop-filter: blur(10px);
+    border-radius: 20px;
+    background: rgba(200, 200, 200, 0.2);
+}
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 120px;
+  .text-noise {
+    position: relative;
+    display: inline-block;
+  }
+  img {
+    width: 70px;
+    height: auto;
+  }
+
+  h1 {
+    margin: 0;
+  }
+
+  h1 {
+    font-size: 32px;
+    font-weight: bold;
+    color: #38DFF6;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+  h1 span{
+    color: #067DE7;
+  }
+  p {
+    font-size: 14px;
+    opacity: 0.8;
+  }
+}
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+.input-group {
+  display: flex;
+  align-items: center;
+box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  background: #EEF9FB;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 15px;
+  height: 30px;
+
+  input {
+    border: none;
+    outline: none;
+    flex: 1;
+    background: transparent;
+  }
+
+  .icon {
+    margin-right: 10px;
+    color: gray;
+    font-family: 'Material Icons';
+  }
+}
+  button {
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .login-btn {
+    background: #168AAD;
+    color: white;
+    font-weight: bold;
+    font-size: 20;
+    margin-bottom: 50px;
+    height: 50px;
+    border-radius: 20px;
+  }
+}
+
+.links span,
+.forgot,
+.footer span {
+  cursor: pointer;
+}
+
+.terms{
+  color: #168AAD;
+  text-decoration: underline;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  margin-top: 60px;
+  font-size: 11px;
+  color: #555555;
+
+}
+.signup {
+  color: #168AAD;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  color: #555555;
+
+  .link {
+    cursor: pointer;
+    margin: 0 3px;
+  }
+}
+.error span{
+  color: #ff6d6f;
+  font-size: 12px;
+}
