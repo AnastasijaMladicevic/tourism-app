@@ -1,31 +1,81 @@
 <div class="login-container">
   <div class="overlay">
     <div class="logo">
-      <h1>SpireGO</h1>
-      <p>"Every place has a story — find yours."</p>
+      <img src="../../../assets/minilogo.svg" alt="logo" />
+      <h1 class="text-noise"><span>Spire</span>GO</h1>
     </div>
 
     <div class="form">
-      <input type="text" placeholder="Email" />
-      <input type="password" placeholder="Password" />
+      <form [formGroup]="form">
+        <!-- EMAIL -->
+        <div class="input-group">
+          <span class="icon">mail</span>
+          <input type="email" placeholder="Email" formControlName="email" />
+        </div>
+        @if (email?.touched && email?.invalid) {
+          <div class="error">
+            @if (email?.errors?.['required']) {
+              <span>Email is required</span>
+            }
+            @if (email?.errors?.['email']) {
+              <span>Invalid email format</span>
+            }
+          </div>
+        }
+        <!-- PASSWORD -->
+        <div class="input-group">
+          <span class="icon">lock</span>
 
-      <button class="login-btn">Log In</button>
+          <input
+            [type]="hidePassword ? 'password' : 'text'"
+            placeholder="Password"
+            formControlName="password"
+          />
 
-      <button class="guest-btn" (click)="goHome()">Continue as Guest</button>
+          <span class="icon eye" (click)="togglePassword()">
+            {{ hidePassword ? 'visibility' : 'visibility_off' }}
+          </span>
+        </div>
+        @if (password?.touched && password?.invalid) {
+          <div class="error">
+            <span>
+              Password must be at least 6 characters long, contain at least one uppercase letter,
+              one number, and one special character.
+            </span>
+          </div>
+        }
+        <!-- BUTTON -->
+        <!-- <button class="login-btn" (click)="login()">Log In</button> -->
+      </form>
+      <!-- <div class="input-group">
+        <span class="icon">mail</span>
+        <input type="email" placeholder="Email" />
+      </div>
+
+      <div class="input-group">
+        <span class="icon">lock</span>
+        <input type="password" placeholder="Password" />
+      </div> -->
+
+      <button class="login-btn" (click)="login()" [disabled]="form.invalid">Log In</button>
 
       <p class="links">
-        Don't have an account?
-        <span (click)="goRegister()">Sign Up</span>
-      </p>
+        <span class="row">
+          Don't have an account?
+          <span class="link signup" (click)="goRegister()">Sign Up</span>
+        </span>
 
-      <p class="forgot" (click)="goForgot()">Forgot password?</p>
+        <span class="link forgot" (click)="goForgot()">Forgot password?</span>
+      </p>
     </div>
 
     <div class="footer">
       By signing in, you agree to our
-      <span (click)="goTerms()">Terms of Service</span>
-      and
-      <span (click)="goTerms()">Privacy Policy</span>
+      <span>
+        <span class="terms" (click)="goTerms()">Terms of Service</span>
+        and
+        <span class="terms" (click)="goTerms()">Privacy Policy</span>
+      </span>
     </div>
   </div>
 </div>
