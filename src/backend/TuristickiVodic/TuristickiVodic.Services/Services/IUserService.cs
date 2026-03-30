@@ -1,4 +1,4 @@
-﻿using TuristickiVodic.Core.DTOs;
+using TuristickiVodic.Core.DTOs;
 
 namespace TuristickiVodic.Services
 {
@@ -13,6 +13,7 @@ namespace TuristickiVodic.Services
         Task<bool> ChangePasswordAsync(int userId, ChangePasswordDto changePasswordDto);
         Task<AuthResponseDto?> LoginAsync(LoginDto loginDto);
         Task<bool> RequestCreatorRoleAsync(int userId, string creatorType);
+        Task<bool> ApproveCreatorRoleAsync(int userId);
         Task<bool> ToggleUserActiveAsync(int userId, bool isActive);
     }
 }
