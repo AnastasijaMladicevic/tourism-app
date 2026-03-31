@@ -51,7 +51,7 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // Vlasnik ili Admin može da menja rutu
+        // Samo vlasnik može da menja rutu
         [HttpPut("{id}")]
         [Authorize]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateRouteDto dto)
@@ -61,8 +61,7 @@ namespace TuristickiVodic.API.Controllers
             try
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-                var roleName = User.FindFirstValue(ClaimTypes.Role)!;
-                var updated = await _routeService.UpdateAsync(id, dto, userId, roleName);
+                var updated = await _routeService.UpdateAsync(id, dto, userId);
                 if (updated == null) return NotFound();
                 return Ok(updated);
             }
@@ -70,7 +69,7 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // Vlasnik ili Admin može da obriše rutu
+        // Samo vlasnik može da obriše rutu
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> Delete(int id)
@@ -78,8 +77,7 @@ namespace TuristickiVodic.API.Controllers
             try
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-                var roleName = User.FindFirstValue(ClaimTypes.Role)!;
-                var deleted = await _routeService.DeleteAsync(id, userId, roleName);
+                var deleted = await _routeService.DeleteAsync(id, userId);
                 if (!deleted) return NotFound();
                 return NoContent();
             }

@@ -32,6 +32,25 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
+        [HttpGet("my")]
+        [Authorize]
+        public async Task<IActionResult> GetMyRequests()
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _deletionRequestService.GetByUserIdAsync(userId);
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        [Authorize]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var request = await _deletionRequestService.GetByIdAsync(id);
+            if (request == null) return NotFound();
+
+            return Ok(request);
+        }
+
         // CC podnosi zahtev za brisanje svog Approved eventa
         [HttpPost("api/events/{eventId}/deletion-request")]
         [Authorize(Roles = "ContentCreator")]

@@ -79,13 +79,10 @@ namespace TuristickiVodic.Services.Services
         }
 
         // Vlasnik rute ili Admin može da je menja
-        public async Task<RouteDto?> UpdateAsync(int id, UpdateRouteDto dto, int userId, string roleName)
+        public async Task<RouteDto?> UpdateAsync(int id, UpdateRouteDto dto, int userId)
         {
             var route = await LoadRouteAsync(id);
             if (route == null) return null;
-
-            if (roleName != "Admin" && route.CreatedByUserId != userId)
-                throw new UnauthorizedAccessException("You can only update your own routes.");
 
             if (!string.IsNullOrWhiteSpace(dto.Name)) route.Name = dto.Name;
             if (dto.Description != null) route.Description = dto.Description;
@@ -131,9 +128,8 @@ namespace TuristickiVodic.Services.Services
             return MapToDto(await LoadRouteAsync(route.Id));
         }
 
-        // Vlasnik ili Admin može da obriše rutu
-        // Ne može se obrisati ruta koja je u nečijim favoritima
-        public async Task<bool> DeleteAsync(int id, int userId, string roleName)
+        // Samo vlasnik može da obriše rutu
+        public async Task<bool> DeleteAsync(int id, int userId)
         {
             var route = await _context.Routes
                 .Include(r => r.Favorites)
@@ -141,8 +137,6 @@ namespace TuristickiVodic.Services.Services
 
             if (route == null) return false;
 
-            if (roleName != "Admin" && route.CreatedByUserId != userId)
-                throw new UnauthorizedAccessException("You can only delete your own routes.");
 
             if (route.Favorites.Any())
                 throw new InvalidOperationException("Cannot delete a route that is in someone's favorites.");

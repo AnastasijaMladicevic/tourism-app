@@ -117,6 +117,36 @@ namespace TuristickiVodic.Services.Services
             return requests.Select(MapToDto);
         }
 
+        public async Task<IEnumerable<DeletionRequestDto>> GetByUserIdAsync(int userId)
+        {
+            var requests = await _context.DeletionRequests
+                .Include(dr => dr.Object)
+                .Include(dr => dr.Event)
+                .Include(dr => dr.RequestedBy)
+                .Include(dr => dr.ReviewedBy)
+                .Where(dr => dr.RequestedByUserId == userId)
+                .OrderByDescending(dr => dr.CreatedAt)
+                .ToListAsync();
+
+            return requests.Select(MapToDto);
+        }
+
+        public async Task<DeletionRequestDto?> GetByIdAsync(int id)
+        {
+            var request = await _context.DeletionRequests
+                .Include(dr => dr.Object)
+                .Include(dr => dr.Event)
+                .Include(dr => dr.RequestedBy)
+                .Include(dr => dr.ReviewedBy)
+                .FirstOrDefaultAsync(dr => dr.Id == id);
+
+            if (request == null)
+                return null;
+
+            return MapToDto(request);
+        }
+
+
         // Menadžer/Admin odobrava ili odbija; ako je odobren → objekat/event se briše
         public async Task<DeletionRequestDto?> ReviewAsync(int requestId, ApproveDeletionRequestDto dto, int reviewedByUserId, string roleName)
         {

@@ -53,6 +53,7 @@ namespace TuristickiVodic.Core.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        public ICollection<Image> Images { get; set; }
+        public ICollection<Image> Images { get; set; } = new List<Image>();
+        public ICollection<EventPlannerItem> EventPlannerItems { get; set; } = new List<EventPlannerItem>();
     }
 }

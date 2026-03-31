@@ -15,5 +15,7 @@ namespace TuristickiVodic.Services.Services
 
         // Menadžer/Admin odobrava ili odbija; ako je odobren → objekat/event se briše
         Task<DeletionRequestDto?> ReviewAsync(int requestId, ApproveDeletionRequestDto dto, int reviewedByUserId, string roleName);
+        Task<IEnumerable<DeletionRequestDto>> GetByUserIdAsync(int userId);
+        Task<DeletionRequestDto?> GetByIdAsync(int id);
     }
 }

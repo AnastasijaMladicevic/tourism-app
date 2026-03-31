@@ -23,6 +23,8 @@ namespace TuristickiVodic.Core.Models
         public int? ResolvedByUserId { get; set; }
         public User? ResolvedBy { get; set; }
 
+        public string? RejectionReason { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? ResolvedAt { get; set; }
     }

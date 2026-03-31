@@ -57,6 +57,7 @@ namespace TuristickiVodic.Core.Models
 
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
+        public ICollection<EventPlannerItem> EventPlannerItems { get; set; } = new List<EventPlannerItem>();
         public ICollection<UserLog> UserLogs { get; set; } = new List<UserLog>();
         public ICollection<ManagerReport> SentReports { get; set; } = new List<ManagerReport>();
 

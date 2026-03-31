@@ -32,6 +32,8 @@ public class AppDbContext : DbContext
     public DbSet<UserLog> UserLogs { get; set; }
     public DbSet<ManagerReport> ManagerReports { get; set; }
     public DbSet<DeletionRequest> DeletionRequests { get; set; }
+    public DbSet<EventPlannerItem> EventPlannerItems { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder mb)
     {
@@ -366,6 +368,23 @@ public class AppDbContext : DbContext
             .HasForeignKey(r => r.CreatedByUserId)
             .OnDelete(DeleteBehavior.SetNull);
 
+        // ==================== EVENT PLANNER ====================
+        mb.Entity<EventPlannerItem>()
+            .HasIndex(x => new { x.UserId, x.EventId })
+            .IsUnique();
+
+        mb.Entity<EventPlannerItem>()
+            .HasOne(x => x.User)
+            .WithMany(u => u.EventPlannerItems)
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<EventPlannerItem>()
+            .HasOne(x => x.Event)
+            .WithMany(e => e.EventPlannerItems)
+            .HasForeignKey(x => x.EventId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         // ==================== USER LOG ====================
         mb.Entity<UserLog>()
             .ToTable(t => t.HasCheckConstraint(
@@ -387,6 +406,15 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(ul => ul.ObjectId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        mb.Entity<ManagerReport>()
+           .HasIndex(r => r.ManagerId);
+
+        mb.Entity<ManagerReport>()
+            .HasIndex(r => r.ReportedUserId)
+            .HasFilter("\"Status\" = 0")
+            .IsUnique();
+
 
         // ==================== MANAGER REPORT ====================
         mb.Entity<ManagerReport>()
