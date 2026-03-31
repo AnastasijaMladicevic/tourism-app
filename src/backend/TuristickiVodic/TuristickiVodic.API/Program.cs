@@ -59,6 +59,7 @@ builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 builder.Services.AddScoped<ITouristObjectService, TouristObjectService>();
 builder.Services.AddScoped<IDeletionRequestService, DeletionRequestService>();
+builder.Services.AddScoped<IRouteService, RouteService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
