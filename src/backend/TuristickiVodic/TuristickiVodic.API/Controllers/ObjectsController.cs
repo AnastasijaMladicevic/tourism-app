@@ -92,9 +92,10 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // CC briše samo svoje Pending objekte; Menadžer/Admin mogu sve (bez recenzija)
+        // Samo CC može direktno da obriše objekat, i to samo svoj Pending
+        // Approved objekti idu kroz deletion request
         [HttpDelete("{id}")]
-        [Authorize(Roles = "ContentCreator,Manager,Admin")]
+        [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Delete(int id)
         {
             try

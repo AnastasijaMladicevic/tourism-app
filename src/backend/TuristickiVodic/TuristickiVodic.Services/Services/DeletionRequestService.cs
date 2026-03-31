@@ -77,7 +77,6 @@ namespace TuristickiVodic.Services.Services
                 .Include(r => r.Object)
                     .ThenInclude(o => o.Location)
                         .ThenInclude(l => l.Destination)
-                .Include(r => r.Object.Reviews)
                 .Include(r => r.RequestedBy)
                 .Include(r => r.ReviewedBy)
                 .FirstOrDefaultAsync(r => r.Id == requestId);
@@ -109,9 +108,6 @@ namespace TuristickiVodic.Services.Services
 
             if (dto.Approve)
             {
-                if (request.Object.Reviews.Any())
-                    throw new InvalidOperationException("Cannot delete an object that has reviews.");
-
                 _context.Objects.Remove(request.Object);
             }
 

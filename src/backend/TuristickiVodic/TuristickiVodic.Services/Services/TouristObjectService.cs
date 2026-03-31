@@ -153,32 +153,21 @@ namespace TuristickiVodic.Services.Services
             return MapToDto(await LoadObjectAsync(obj.Id));
         }
 
-        // CC briše samo svoje objekte koji su Pending; Menadžer/Admin mogu sve
-        // Ne može se obrisati objekat koji ima recenzije
         public async Task<bool> DeleteAsync(int id, int userId, string roleName)
         {
             var obj = await _context.Objects
-                .Include(o => o.Reviews)
-                .Include(o => o.Location)
-                    .ThenInclude(l => l.Destination)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (obj == null) return false;
 
-            if (roleName == "ContentCreator")
-            {
-                if (obj.CreatedByUserId != userId)
-                    throw new UnauthorizedAccessException("You can only delete your own objects.");
+            if (roleName != "ContentCreator")
+                throw new UnauthorizedAccessException("Only content creators can delete objects directly.");
 
-                if (obj.Status == ContentStatus.Approved)
-                    throw new InvalidOperationException("Cannot delete an approved object. Contact the manager.");
-            }
+            if (obj.CreatedByUserId != userId)
+                throw new UnauthorizedAccessException("You can only delete your own objects.");
 
-            if (roleName == "Manager" && obj.Location?.Destination?.ManagedByUserId != userId)
-                throw new UnauthorizedAccessException("Manager can only delete objects in their destination.");
-
-            if (obj.Reviews.Any())
-                throw new InvalidOperationException("Cannot delete an object that has reviews.");
+            if (obj.Status == ContentStatus.Approved)
+                throw new InvalidOperationException("Cannot delete an approved object directly. Submit a deletion request.");
 
             _context.Objects.Remove(obj);
             await _context.SaveChangesAsync();
