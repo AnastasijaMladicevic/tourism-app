@@ -126,22 +126,33 @@ namespace TuristickiVodic.Services.Services
                 activity.ActivityTypeId = dto.ActivityTypeId.Value;
             }
 
-            if (dto.LocationId.HasValue)
+            // Konzistentnost LocationId i DestinationId
+            int? newLocationId = dto.LocationId ?? activity.LocationId;
+            int? newDestinationId = dto.DestinationId ?? activity.DestinationId;
+
+            if (dto.LocationId.HasValue || dto.DestinationId.HasValue)
             {
-                var locationExists = await _context.Locations.AnyAsync(x => x.Id == dto.LocationId.Value);
-                if (!locationExists)
-                    throw new InvalidOperationException("Location not found");
+                if (newLocationId.HasValue)
+                {
+                    var location = await _context.Locations.FindAsync(newLocationId.Value);
+                    if (location == null)
+                        throw new InvalidOperationException("Location not found.");
 
-                activity.LocationId = dto.LocationId.Value;
-            }
+                    if (newDestinationId.HasValue && newDestinationId.Value != location.DestinationId)
+                        throw new InvalidOperationException("Location does not belong to the specified destination.");
 
-            if (dto.DestinationId.HasValue)
-            {
-                var destinationExists = await _context.Destinations.AnyAsync(x => x.Id == dto.DestinationId.Value);
-                if (!destinationExists)
-                    throw new InvalidOperationException("Destination not found");
+                    // Automatski postavi DestinationId sa lokacije
+                    newDestinationId = location.DestinationId;
+                }
+                else if (newDestinationId.HasValue)
+                {
+                    var destinationExists = await _context.Destinations.AnyAsync(x => x.Id == newDestinationId.Value);
+                    if (!destinationExists)
+                        throw new InvalidOperationException("Destination not found.");
+                }
 
-                activity.DestinationId = dto.DestinationId.Value;
+                activity.LocationId = newLocationId;
+                activity.DestinationId = newDestinationId;
             }
 
             if (dto.ObjectId.HasValue)

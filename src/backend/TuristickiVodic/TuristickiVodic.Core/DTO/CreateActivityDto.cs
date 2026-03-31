@@ -1,8 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace TuristickiVodic.Core.DTOs
 {
-    public class CreateActivityDto
+    public class CreateActivityDto : IValidatableObject
     {
         [Required]
         [MaxLength(150)]
@@ -28,5 +28,13 @@ namespace TuristickiVodic.Core.DTOs
         public int? ObjectId { get; set; }
 
         public bool IsActive { get; set; } = true;
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!LocationId.HasValue && !DestinationId.HasValue)
+                yield return new ValidationResult(
+                    "Activity must have either a LocationId or a DestinationId.",
+                    new[] { nameof(LocationId), nameof(DestinationId) });
+        }
     }
 }
