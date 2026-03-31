@@ -35,9 +35,9 @@ namespace TuristickiVodic.API.Controllers
             return Ok(obj);
         }
 
-        // CC i Menadžer mogu da dodaju objekte
+        // Samo CC može da dodaje objekte
         [HttpPost]
-        [Authorize(Roles = "ContentCreator,Manager,Admin")]
+        [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Create([FromBody] CreateTouristObjectDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -53,9 +53,9 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // CC menja samo svoje; Menadžer menja u svojoj destinaciji; Admin sve
+        // Samo CC može da menja objekte, i to samo svoje
         [HttpPut("{id}")]
-        [Authorize(Roles = "ContentCreator,Manager,Admin")]
+        [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateTouristObjectDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -72,7 +72,8 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // Menadžer odobrava/odbija objekte u svojoj destinaciji; Admin sve
+        // Menadžer odobrava/odbija objekte u svojoj destinaciji
+        // Ako destinacija nema Menadžera, odobrava Admin
         [HttpPost("{id}/approve")]
         [Authorize(Roles = "Manager,Admin")]
         public async Task<IActionResult> Approve(int id, [FromBody] ApproveContentDto dto)
@@ -88,6 +89,7 @@ namespace TuristickiVodic.API.Controllers
                 return Ok(updated);
             }
             catch (UnauthorizedAccessException) { return Forbid(); }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
         // CC briše samo svoje Pending objekte; Menadžer/Admin mogu sve (bez recenzija)

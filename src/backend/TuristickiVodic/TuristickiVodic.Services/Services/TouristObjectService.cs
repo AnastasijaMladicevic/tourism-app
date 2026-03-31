@@ -36,7 +36,7 @@ namespace TuristickiVodic.Services.Services
             return obj == null ? null : MapToDto(obj);
         }
 
-        // CC i Menadžer mogu da kreiraju objekte
+        // Samo CC može da kreira objekte; status uvek Pending, čeka odobrenje
         // Objekat mora imati lokaciju; DestinationId se automatski preuzima iz lokacije
         public async Task<TouristObjectDto> CreateAsync(CreateTouristObjectDto dto, int userId, string roleName)
         {
@@ -49,10 +49,6 @@ namespace TuristickiVodic.Services.Services
 
             if (!await _context.ObjectTypes.AnyAsync(x => x.Id == dto.ObjectTypeId))
                 throw new InvalidOperationException("Object type not found.");
-
-            // Menadžer može da kreira objekte samo u svojoj destinaciji
-            if (roleName == "Manager" && location.Destination?.ManagedByUserId != userId)
-                throw new UnauthorizedAccessException("Manager can only create objects in their destination.");
 
             var obj = new TouristObject
             {
@@ -69,19 +65,11 @@ namespace TuristickiVodic.Services.Services
                 // DestinationId se automatski preuzima iz lokacije
                 DestinationId = location.DestinationId,
                 CreatedByUserId = userId,
-                // Menadžer/Admin automatski odobrava, CC čeka
-                Status = roleName == "Manager" || roleName == "Admin"
-                    ? ContentStatus.Approved
-                    : ContentStatus.Pending,
+                // CC uvek čeka odobrenje
+                Status = ContentStatus.Pending,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
-
-            if (obj.Status == ContentStatus.Approved)
-            {
-                obj.ApprovedByUserId = userId;
-                obj.ApprovedAt = DateTime.UtcNow;
-            }
 
             _context.Objects.Add(obj);
             await _context.SaveChangesAsync();
@@ -89,17 +77,17 @@ namespace TuristickiVodic.Services.Services
             return MapToDto(await LoadObjectAsync(obj.Id));
         }
 
-        // CC menja samo svoje objekte; Menadžer menja objekte u svojoj destinaciji; Admin sve
+        // Samo CC može da menja objekte, i to samo svoje
         public async Task<TouristObjectDto?> UpdateAsync(int id, UpdateTouristObjectDto dto, int userId, string roleName)
         {
             var obj = await LoadObjectAsync(id);
             if (obj == null) return null;
 
-            if (roleName == "ContentCreator" && obj.CreatedByUserId != userId)
-                throw new UnauthorizedAccessException("You can only update your own objects.");
+            if (roleName != "ContentCreator")
+                throw new UnauthorizedAccessException("Only content creators can update objects.");
 
-            if (roleName == "Manager" && obj.Location?.Destination?.ManagedByUserId != userId)
-                throw new UnauthorizedAccessException("Manager can only update objects in their destination.");
+            if (obj.CreatedByUserId != userId)
+                throw new UnauthorizedAccessException("You can only update your own objects.");
 
             if (dto.ObjectTypeId.HasValue)
             {
@@ -125,20 +113,33 @@ namespace TuristickiVodic.Services.Services
             return MapToDto(await LoadObjectAsync(obj.Id));
         }
 
-        // Menadžer odobrava/odbija objekte u svojoj destinaciji; Admin sve
+        // Menadžer odobrava/odbija objekte u svojoj destinaciji
+        // Ako destinacija nema Menadžera, odobrava Admin
         public async Task<TouristObjectDto?> ApproveAsync(int id, ApproveContentDto dto, int userId, string roleName)
         {
             var obj = await LoadObjectAsync(id);
             if (obj == null) return null;
 
+            if (obj.Status != ContentStatus.Pending)
+                throw new InvalidOperationException("Only pending objects can be approved or rejected.");
+
+            var destination = obj.Location?.Destination;
+
             if (roleName == "Manager")
             {
-                if (obj.Location?.Destination?.ManagedByUserId != userId)
+                // Menadžer može samo za svoju destinaciju
+                if (destination?.ManagedByUserId != userId)
                     throw new UnauthorizedAccessException("Manager can only approve objects in their destination.");
             }
-            else if (roleName != "Admin")
+            else if (roleName == "Admin")
             {
-                throw new UnauthorizedAccessException("Only managers or admins can approve objects.");
+                // Admin može samo ako destinacija nema Menadžera
+                if (destination?.ManagedByUserId != null)
+                    throw new UnauthorizedAccessException("This destination has a manager. The manager must approve this object.");
+            }
+            else
+            {
+                throw new UnauthorizedAccessException("Only a manager or admin can approve objects.");
             }
 
             obj.Status = dto.Approve ? ContentStatus.Approved : ContentStatus.Rejected;
