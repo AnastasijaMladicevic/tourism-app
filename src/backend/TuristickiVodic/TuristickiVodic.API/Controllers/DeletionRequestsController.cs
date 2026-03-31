@@ -8,6 +8,7 @@ namespace TuristickiVodic.API.Controllers
 {
     [ApiController]
     [Authorize]
+    [Route("api/deletion-requests")]
     public class DeletionRequestsController : ControllerBase
     {
         private readonly IDeletionRequestService _deletionRequestService;
@@ -18,7 +19,7 @@ namespace TuristickiVodic.API.Controllers
         }
 
         // CC podnosi zahtev za brisanje svog Approved objekta
-        [HttpPost("api/objects/{objectId}/deletion-request")]
+        [HttpPost("/api/objects/{objectId}/deletion-request")]
         [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> CreateForObject(int objectId, [FromBody] CreateDeletionRequestDto dto)
         {
@@ -26,33 +27,14 @@ namespace TuristickiVodic.API.Controllers
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
                 var result = await _deletionRequestService.CreateForObjectAsync(objectId, dto, userId);
-                return CreatedAtAction(nameof(Review), new { requestId = result.Id }, result);
+                return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
             }
             catch (UnauthorizedAccessException) { return Forbid(); }
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        [HttpGet("my")]
-        [Authorize]
-        public async Task<IActionResult> GetMyRequests()
-        {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var result = await _deletionRequestService.GetByUserIdAsync(userId);
-            return Ok(result);
-        }
-
-        [HttpGet("{id}")]
-        [Authorize]
-        public async Task<IActionResult> GetById(int id)
-        {
-            var request = await _deletionRequestService.GetByIdAsync(id);
-            if (request == null) return NotFound();
-
-            return Ok(request);
-        }
-
         // CC podnosi zahtev za brisanje svog Approved eventa
-        [HttpPost("api/events/{eventId}/deletion-request")]
+        [HttpPost("/api/events/{eventId}/deletion-request")]
         [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> CreateForEvent(int eventId, [FromBody] CreateDeletionRequestDto dto)
         {
@@ -60,14 +42,38 @@ namespace TuristickiVodic.API.Controllers
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
                 var result = await _deletionRequestService.CreateForEventAsync(eventId, dto, userId);
-                return CreatedAtAction(nameof(Review), new { requestId = result.Id }, result);
+                return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
             }
             catch (UnauthorizedAccessException) { return Forbid(); }
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
+        // CC vidi samo svoje zahteve
+        [HttpGet("my")]
+        [Authorize(Roles = "ContentCreator")]
+        public async Task<IActionResult> GetMyRequests()
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _deletionRequestService.GetByUserIdAsync(userId);
+            return Ok(result);
+        }
+
+        // CC vidi samo svoj konkretan zahtev
+        [HttpGet("{id}")]
+        [Authorize(Roles = "ContentCreator")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var request = await _deletionRequestService.GetByIdForUserAsync(id, userId);
+
+            if (request == null)
+                return NotFound();
+
+            return Ok(request);
+        }
+
         // Menadžer/Admin vidi zahteve za brisanje
-        [HttpGet("api/deletion-requests")]
+        [HttpGet]
         [Authorize(Roles = "Manager,Admin")]
         public async Task<IActionResult> GetAll()
         {
@@ -78,7 +84,7 @@ namespace TuristickiVodic.API.Controllers
         }
 
         // Menadžer/Admin odobrava ili odbija zahtev
-        [HttpPost("api/deletion-requests/{requestId}/review")]
+        [HttpPost("{requestId}/review")]
         [Authorize(Roles = "Manager,Admin")]
         public async Task<IActionResult> Review(int requestId, [FromBody] ApproveDeletionRequestDto dto)
         {
@@ -87,7 +93,10 @@ namespace TuristickiVodic.API.Controllers
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
                 var roleName = User.FindFirstValue(ClaimTypes.Role)!;
                 var result = await _deletionRequestService.ReviewAsync(requestId, dto, userId, roleName);
-                if (result == null) return NotFound();
+
+                if (result == null)
+                    return NotFound();
+
                 return Ok(result);
             }
             catch (UnauthorizedAccessException) { return Forbid(); }

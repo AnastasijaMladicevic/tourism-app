@@ -213,6 +213,21 @@ namespace TuristickiVodic.Services.Services
             return MapToDto(request);
         }
 
+        public async Task<DeletionRequestDto?> GetByIdForUserAsync(int id, int userId)
+        {
+            var request = await _context.DeletionRequests
+                .Include(dr => dr.Object)
+                .Include(dr => dr.Event)
+                .Include(dr => dr.RequestedBy)
+                .Include(dr => dr.ReviewedBy)
+                .FirstOrDefaultAsync(dr => dr.Id == id && dr.RequestedByUserId == userId);
+
+            if (request == null)
+                return null;
+
+            return MapToDto(request);
+        }
+
         private static DeletionRequestDto MapToDto(DeletionRequest r) => new()
         {
             Id = r.Id,

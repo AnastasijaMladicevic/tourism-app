@@ -17,5 +17,6 @@ namespace TuristickiVodic.Services.Services
         Task<DeletionRequestDto?> ReviewAsync(int requestId, ApproveDeletionRequestDto dto, int reviewedByUserId, string roleName);
         Task<IEnumerable<DeletionRequestDto>> GetByUserIdAsync(int userId);
         Task<DeletionRequestDto?> GetByIdAsync(int id);
+        Task<DeletionRequestDto?> GetByIdForUserAsync(int id, int userId);
     }
 }
