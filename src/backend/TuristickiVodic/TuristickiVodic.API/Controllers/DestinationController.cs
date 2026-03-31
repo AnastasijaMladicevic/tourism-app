@@ -57,7 +57,7 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateDestinationDto dto)
         {
             if (!ModelState.IsValid)

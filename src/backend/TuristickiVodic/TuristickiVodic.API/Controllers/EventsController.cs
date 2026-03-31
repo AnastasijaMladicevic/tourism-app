@@ -53,7 +53,7 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "ContentCreator,Manager,Admin")]
+        [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateEventDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -89,7 +89,7 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "ContentCreator,Manager,Admin")]
+        [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Delete(int id)
         {
             try

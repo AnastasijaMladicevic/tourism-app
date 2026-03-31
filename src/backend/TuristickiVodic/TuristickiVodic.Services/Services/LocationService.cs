@@ -55,8 +55,16 @@ namespace TuristickiVodic.Services
             if (!locationTypeExists)
                 throw new InvalidOperationException("Location type not found");
 
-            if (roleName == "Manager" && destination.ManagedByUserId != userId)
-                throw new InvalidOperationException("Manager can create locations only for the destination they manage");
+            if (roleName == "Manager")
+            {
+                if (destination.ManagedByUserId != userId)
+                    throw new InvalidOperationException("Manager can create locations only for the destination they manage");
+            }
+            else if (roleName == "Admin")
+            {
+                if (destination.ManagedByUserId != null)
+                    throw new InvalidOperationException("Admin can create locations only for destinations without a manager");
+            }
 
             var location = new Core.Models.Location
             {
@@ -100,8 +108,22 @@ namespace TuristickiVodic.Services
             if (destination == null)
                 throw new InvalidOperationException("Destination not found");
 
-            if (roleName == "Manager" && destination.ManagedByUserId != userId)
-                throw new InvalidOperationException("Manager can update locations only for the destination they manage");
+            if (roleName == "Manager")
+            {
+                if (location.Destination?.ManagedByUserId != userId)
+                    throw new InvalidOperationException("Manager can update only locations in their own destination");
+
+                if (destination.ManagedByUserId != userId)
+                    throw new InvalidOperationException("Manager can move locations only within destinations they manage");
+            }
+            else if (roleName == "Admin")
+            {
+                if (location.Destination?.ManagedByUserId != null)
+                    throw new InvalidOperationException("Admin can update locations only when the current destination has no manager");
+
+                if (destination.ManagedByUserId != null)
+                    throw new InvalidOperationException("Admin can move locations only to destinations without a manager");
+            }
 
             if (dto.LocationTypeId.HasValue)
             {
@@ -150,8 +172,16 @@ namespace TuristickiVodic.Services
             if (location == null)
                 return false;
 
-            if (roleName == "Manager" && location.Destination?.ManagedByUserId != userId)
-                throw new InvalidOperationException("Manager can delete locations only for the destination they manage");
+            if (roleName == "Manager")
+            {
+                if (location.Destination?.ManagedByUserId != userId)
+                    throw new InvalidOperationException("Manager can delete locations only for the destination they manage");
+            }
+            else if (roleName == "Admin")
+            {
+                if (location.Destination?.ManagedByUserId != null)
+                    throw new InvalidOperationException("Admin can delete locations only when the destination has no manager");
+            }
 
             _context.Locations.Remove(location);
             await _context.SaveChangesAsync();
