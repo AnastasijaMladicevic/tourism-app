@@ -29,6 +29,7 @@ public class AppDbContext : DbContext
     public DbSet<RoutePoint> RoutePoints { get; set; }
     public DbSet<UserLog> UserLogs { get; set; }
     public DbSet<ManagerReport> ManagerReports { get; set; }
+    public DbSet<DeletionRequest> DeletionRequests { get; set; }
 
     protected override void OnModelCreating(ModelBuilder mb)
     {
@@ -376,5 +377,35 @@ public class AppDbContext : DbContext
         mb.Entity<Role>()
             .Property(r => r.Name)
             .HasConversion<string>();
+
+        // ==================== DELETION REQUEST ====================
+        mb.Entity<DeletionRequest>()
+            .Property(r => r.Status)
+            .HasConversion<string>();
+
+        mb.Entity<DeletionRequest>()
+            .HasOne(r => r.Object)
+            .WithMany()
+            .HasForeignKey(r => r.ObjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<DeletionRequest>()
+            .HasOne(r => r.RequestedBy)
+            .WithMany()
+            .HasForeignKey(r => r.RequestedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        mb.Entity<DeletionRequest>()
+            .HasOne(r => r.ReviewedBy)
+            .WithMany()
+            .HasForeignKey(r => r.ReviewedByUserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        // Sprečava više Pending zahteva za isti objekat
+        mb.Entity<DeletionRequest>()
+            .HasIndex(r => r.ObjectId)
+            .HasFilter("\"Status\" = 'Pending'")
+            .IsUnique();
+
     }
 }

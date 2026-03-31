@@ -142,8 +142,9 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
-        // Korisnik može da pošalje zahtev samo za sebe
+        // Samo Tourist može da pošalje zahtev, i to samo u svoje ime
         [HttpPost("{id}/request-creator")]
+        [Authorize(Roles = "Tourist")]
         public async Task<IActionResult> RequestCreatorRole(int id, [FromBody] string creatorType)
         {
             var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
