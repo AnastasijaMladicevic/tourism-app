@@ -22,6 +22,9 @@ namespace TuristickiVodic.Core.Models
         public int? RouteId { get; set; }
         public Route? Route { get; set; }
 
+        public int? LocationId { get; set; }
+        public Location? Location { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

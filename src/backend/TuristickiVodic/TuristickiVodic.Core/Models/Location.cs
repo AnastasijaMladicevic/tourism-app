@@ -40,5 +40,6 @@ namespace TuristickiVodic.Core.Models
         public ICollection<Event> Events { get; set; }
         public ICollection<Activity> Activities { get; set; }
         public ICollection<Image> Images { get; set; }
+        public ICollection<Favorite> Favorites { get; set; }
     }
 }

@@ -18,37 +18,34 @@ namespace TuristickiVodic.Services.Services
         {
             var favorites = await _context.Favorites
                 .Include(f => f.Object)
+                .Include(f => f.Activity)
                 .Include(f => f.Destination)
+                .Include(f => f.Route)
+                .Include(f => f.Location)
                 .Where(f => f.UserId == userId)
                 .OrderByDescending(f => f.CreatedAt)
                 .ToListAsync();
 
-            return favorites.Select(f => new FavoriteDto
-            {
-                Id = f.Id,
-                UserId = f.UserId,
-                ObjectId = f.ObjectId,
-                ObjectName = f.Object?.Name,
-                DestinationId = f.DestinationId,
-                DestinationName = f.Destination?.Name,
-                RouteId = f.RouteId,
-                CreatedAt = f.CreatedAt
-            });
+            return favorites.Select(MapToDto);
         }
 
         public async Task<FavoriteDto> AddAsync(CreateFavoriteDto dto, int userId)
         {
-            // Mora biti naveden tačno jedan od: ObjectId, DestinationId, RouteId
             int filledCount = (dto.ObjectId.HasValue ? 1 : 0)
+                            + (dto.ActivityId.HasValue ? 1 : 0)
                             + (dto.DestinationId.HasValue ? 1 : 0)
-                            + (dto.RouteId.HasValue ? 1 : 0);
+                            + (dto.RouteId.HasValue ? 1 : 0)
+                            + (dto.LocationId.HasValue ? 1 : 0);
 
+            // Mora biti naveden tačno jedan od: ObjectId, DestinationId, LocationId, ActivityId, RouteId
             if (filledCount != 1)
-                throw new InvalidOperationException("Exactly one of ObjectId, DestinationId or RouteId must be provided.");
+                throw new InvalidOperationException("Exactly one of ObjectId, ActivityId, DestinationId, RouteId or LocationId must be provided.");
 
-            // Proveri da li stavka postoji
             if (dto.ObjectId.HasValue && !await _context.Objects.AnyAsync(o => o.Id == dto.ObjectId.Value))
                 throw new InvalidOperationException("Object not found.");
+
+            if (dto.ActivityId.HasValue && !await _context.Activities.AnyAsync(a => a.Id == dto.ActivityId.Value))
+                throw new InvalidOperationException("Activity not found.");
 
             if (dto.DestinationId.HasValue && !await _context.Destinations.AnyAsync(d => d.Id == dto.DestinationId.Value))
                 throw new InvalidOperationException("Destination not found.");
@@ -56,13 +53,18 @@ namespace TuristickiVodic.Services.Services
             if (dto.RouteId.HasValue && !await _context.Routes.AnyAsync(r => r.Id == dto.RouteId.Value))
                 throw new InvalidOperationException("Route not found.");
 
-            // Proveri duplikat
+            if (dto.LocationId.HasValue && !await _context.Locations.AnyAsync(l => l.Id == dto.LocationId.Value))
+                throw new InvalidOperationException("Location not found.");
+
             var alreadyExists = await _context.Favorites.AnyAsync(f =>
                 f.UserId == userId &&
                 f.ObjectId == dto.ObjectId &&
+                f.ActivityId == dto.ActivityId &&
                 f.DestinationId == dto.DestinationId &&
-                f.RouteId == dto.RouteId);
+                f.RouteId == dto.RouteId &&
+                f.LocationId == dto.LocationId);
 
+            // Proveri duplikat
             if (alreadyExists)
                 throw new InvalidOperationException("This item is already in your favorites.");
 
@@ -70,31 +72,25 @@ namespace TuristickiVodic.Services.Services
             {
                 UserId = userId,
                 ObjectId = dto.ObjectId,
+                ActivityId = dto.ActivityId,
                 DestinationId = dto.DestinationId,
                 RouteId = dto.RouteId,
+                LocationId = dto.LocationId,
                 CreatedAt = DateTime.UtcNow
             };
 
             _context.Favorites.Add(favorite);
             await _context.SaveChangesAsync();
 
-            // Učitaj sa navigacijama
             var created = await _context.Favorites
                 .Include(f => f.Object)
+                .Include(f => f.Activity)
                 .Include(f => f.Destination)
+                .Include(f => f.Route)
+                .Include(f => f.Location)
                 .FirstAsync(f => f.Id == favorite.Id);
 
-            return new FavoriteDto
-            {
-                Id = created.Id,
-                UserId = created.UserId,
-                ObjectId = created.ObjectId,
-                ObjectName = created.Object?.Name,
-                DestinationId = created.DestinationId,
-                DestinationName = created.Destination?.Name,
-                RouteId = created.RouteId,
-                CreatedAt = created.CreatedAt
-            };
+            return MapToDto(created);
         }
 
         public async Task<bool> RemoveAsync(int id, int userId)
@@ -109,6 +105,26 @@ namespace TuristickiVodic.Services.Services
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        private static FavoriteDto MapToDto(Favorite favorite)
+        {
+            return new FavoriteDto
+            {
+                Id = favorite.Id,
+                UserId = favorite.UserId,
+                ObjectId = favorite.ObjectId,
+                ObjectName = favorite.Object?.Name,
+                ActivityId = favorite.ActivityId,
+                ActivityName = favorite.Activity?.Name,
+                DestinationId = favorite.DestinationId,
+                DestinationName = favorite.Destination?.Name,
+                RouteId = favorite.RouteId,
+                RouteName = favorite.Route?.Name,
+                LocationId = favorite.LocationId,
+                LocationName = favorite.Location?.Name,
+                CreatedAt = favorite.CreatedAt
+            };
         }
     }
 }

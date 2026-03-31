@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 using TuristickiVodic.Core.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 using Image = TuristickiVodic.Core.Models.Image;
 using Location = TuristickiVodic.Core.Models.Location;
 
@@ -243,7 +245,8 @@ public class AppDbContext : DbContext
                 @"(CASE WHEN ""ObjectId"" IS NOT NULL THEN 1 ELSE 0 END +
                    CASE WHEN ""ActivityId"" IS NOT NULL THEN 1 ELSE 0 END +
                    CASE WHEN ""DestinationId"" IS NOT NULL THEN 1 ELSE 0 END +
-                   CASE WHEN ""RouteId"" IS NOT NULL THEN 1 ELSE 0 END) = 1"));
+                   CASE WHEN ""RouteId"" IS NOT NULL THEN 1 ELSE 0 END +
+                   CASE WHEN ""LocationId"" IS NOT NULL THEN 1 ELSE 0 END) = 1"));
 
         mb.Entity<Favorite>()
             .HasOne(f => f.User)
@@ -274,6 +277,37 @@ public class AppDbContext : DbContext
             .WithMany(r => r.Favorites)
             .HasForeignKey(f => f.RouteId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Favorite>()
+            .HasOne(f => f.Location)
+            .WithMany(l => l.Favorites)
+            .HasForeignKey(f => f.LocationId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Favorite>()
+            .HasIndex(f => new { f.UserId, f.ObjectId })
+            .IsUnique()
+            .HasFilter("\"ObjectId\" IS NOT NULL");
+
+        mb.Entity<Favorite>()
+            .HasIndex(f => new { f.UserId, f.ActivityId })
+            .IsUnique()
+            .HasFilter("\"ActivityId\" IS NOT NULL");
+
+        mb.Entity<Favorite>()
+            .HasIndex(f => new { f.UserId, f.DestinationId })
+            .IsUnique()
+            .HasFilter("\"DestinationId\" IS NOT NULL");
+
+        mb.Entity<Favorite>()
+            .HasIndex(f => new { f.UserId, f.RouteId })
+            .IsUnique()
+            .HasFilter("\"RouteId\" IS NOT NULL");
+
+        mb.Entity<Favorite>()
+            .HasIndex(f => new { f.UserId, f.LocationId })
+            .IsUnique()
+            .HasFilter("\"LocationId\" IS NOT NULL");
 
         // ==================== IMAGE ====================
         mb.Entity<Image>()
