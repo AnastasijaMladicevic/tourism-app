@@ -142,9 +142,8 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
-        // Samo Tourist može da pošalje zahtev, i to samo u svoje ime
+        // Korisnik može da pošalje zahtev samo za sebe
         [HttpPost("{id}/request-creator")]
-        [Authorize(Roles = "Tourist")]
         public async Task<IActionResult> RequestCreatorRole(int id, [FromBody] string creatorType)
         {
             var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -197,11 +196,16 @@ namespace TuristickiVodic.API.Controllers
             return Ok(new { message = $"User {(isActive ? "activated" : "deactivated")} successfully" });
         }
 
-        // Samo Admin može da briše korisnike
+        // Samo Admin može da briše korisnike, ali ne i sam sebe
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            if (currentUserId == id)
+                return BadRequest(new { message = "Admin cannot delete their own account" });
+
             var result = await _userService.DeleteAsync(id);
             if (!result)
                 return NotFound();
