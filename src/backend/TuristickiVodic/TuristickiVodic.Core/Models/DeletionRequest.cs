@@ -7,11 +7,14 @@ namespace TuristickiVodic.Core.Models
     {
         public int Id { get; set; }
 
-        [Required]
-        public int ObjectId { get; set; }
-
+        // Tačno jedno od ova dva biće popunjeno
+        public int? ObjectId { get; set; }
         [ForeignKey("ObjectId")]
-        public TouristObject Object { get; set; }
+        public TouristObject? Object { get; set; }
+
+        public int? EventId { get; set; }
+        [ForeignKey("EventId")]
+        public Event? Event { get; set; }
 
         [Required]
         public int RequestedByUserId { get; set; }

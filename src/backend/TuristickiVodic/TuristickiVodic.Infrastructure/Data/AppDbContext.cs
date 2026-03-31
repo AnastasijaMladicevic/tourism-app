@@ -384,9 +384,21 @@ public class AppDbContext : DbContext
             .HasConversion<string>();
 
         mb.Entity<DeletionRequest>()
+            .ToTable(t => t.HasCheckConstraint(
+                "CK_DeletionRequest_OnlyOne",
+                @"(CASE WHEN ""ObjectId"" IS NOT NULL THEN 1 ELSE 0 END +
+                   CASE WHEN ""EventId"" IS NOT NULL THEN 1 ELSE 0 END) = 1"));
+
+        mb.Entity<DeletionRequest>()
             .HasOne(r => r.Object)
             .WithMany()
             .HasForeignKey(r => r.ObjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<DeletionRequest>()
+            .HasOne(r => r.Event)
+            .WithMany()
+            .HasForeignKey(r => r.EventId)
             .OnDelete(DeleteBehavior.Cascade);
 
         mb.Entity<DeletionRequest>()
@@ -404,7 +416,13 @@ public class AppDbContext : DbContext
         // Sprečava više Pending zahteva za isti objekat
         mb.Entity<DeletionRequest>()
             .HasIndex(r => r.ObjectId)
-            .HasFilter("\"Status\" = 'Pending'")
+            .HasFilter("\"ObjectId\" IS NOT NULL AND \"Status\" = 'Pending'")
+            .IsUnique();
+
+        // Sprečava više Pending zahteva za isti event
+        mb.Entity<DeletionRequest>()
+            .HasIndex(r => r.EventId)
+            .HasFilter("\"EventId\" IS NOT NULL AND \"Status\" = 'Pending'")
             .IsUnique();
 
     }
