@@ -120,6 +120,9 @@ namespace TuristickiVodic.Services.Services
             if (review.Object.CreatedByUserId != userId)
                 throw new UnauthorizedAccessException("You can only respond to reviews on your own objects.");
 
+            if (string.IsNullOrWhiteSpace(review.Text))
+                throw new InvalidOperationException("Cannot respond to a review that has no comment.");
+
             review.CreatorResponse = dto.CreatorResponse;
             review.CreatorResponseAt = DateTime.UtcNow;
 
