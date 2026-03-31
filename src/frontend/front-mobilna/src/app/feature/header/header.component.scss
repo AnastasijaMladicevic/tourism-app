@@ -1,0 +1,26 @@
+.header {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px 0;
+  min-height: 52px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  color: var(--text-dark);
+  text-decoration: none;
+  transition: background 0.2s;
+
+  &:hover {
+    background: var(--primary-light);
+  }
+}
+
+.spacer {
+  width: 36px;
+}
