@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using TuristickiVodic.Core.DTOs;
 using TuristickiVodic.Services;
 
@@ -17,16 +18,25 @@ namespace TuristickiVodic.API.Controllers
             _userService = userService;
         }
 
+        // Samo Admin može da vidi sve korisnike
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
         {
             var users = await _userService.GetAllAsync();
             return Ok(users);
         }
 
+        // Korisnik može da vidi samo sebe; Admin može svakoga
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var isAdmin = User.IsInRole("Admin");
+
+            if (!isAdmin && currentUserId != id)
+                return Forbid();
+
             var user = await _userService.GetByIdAsync(id);
             if (user == null)
                 return NotFound();
@@ -34,7 +44,9 @@ namespace TuristickiVodic.API.Controllers
             return Ok(user);
         }
 
+        // Samo Admin može da traži korisnika po emailu
         [HttpGet("email/{email}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetByEmail(string email)
         {
             var user = await _userService.GetByEmailAsync(email);
@@ -83,11 +95,18 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
+        // Korisnik može da menja samo sebe; Admin može svakoga
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateUserDto updateUserDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var isAdmin = User.IsInRole("Admin");
+
+            if (!isAdmin && currentUserId != id)
+                return Forbid();
 
             var user = await _userService.UpdateAsync(id, updateUserDto);
             if (user == null)
@@ -96,11 +115,18 @@ namespace TuristickiVodic.API.Controllers
             return Ok(user);
         }
 
+        // Korisnik može da menja lozinku samo sebi; Admin može svakome
         [HttpPost("{id}/change-password")]
         public async Task<IActionResult> ChangePassword(int id, [FromBody] ChangePasswordDto changePasswordDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var isAdmin = User.IsInRole("Admin");
+
+            if (!isAdmin && currentUserId != id)
+                return Forbid();
 
             try
             {
@@ -116,9 +142,16 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
+        // Samo Tourist može da pošalje zahtev, i to samo u svoje ime
         [HttpPost("{id}/request-creator")]
+        [Authorize(Roles = "Tourist")]
         public async Task<IActionResult> RequestCreatorRole(int id, [FromBody] string creatorType)
         {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            if (currentUserId != id)
+                return Forbid();
+
             try
             {
                 var result = await _userService.RequestCreatorRoleAsync(id, creatorType);
@@ -133,6 +166,7 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
+        // Samo Admin može da odobri ContentCreator ulogu
         [HttpPost("{id}/approve-creator")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ApproveCreatorRole(int id)
@@ -151,6 +185,7 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
+        // Samo Admin može da aktivira/deaktivira korisnike
         [HttpPost("{id}/toggle-active")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ToggleActive(int id, [FromBody] bool isActive)
@@ -162,6 +197,7 @@ namespace TuristickiVodic.API.Controllers
             return Ok(new { message = $"User {(isActive ? "activated" : "deactivated")} successfully" });
         }
 
+        // Samo Admin može da briše korisnike
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
