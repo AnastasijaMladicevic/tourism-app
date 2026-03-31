@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TuristickiVodic.Core.DTO
 {
-    public class CreateEventDto
+    public class CreateEventDto : IValidatableObject
     {
         [Required]
         [MaxLength(200)]
@@ -36,5 +36,13 @@ namespace TuristickiVodic.Core.DTO
         public int? ObjectId { get; set; }
 
         public bool IsActive { get; set; } = true;
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!LocationId.HasValue && !DestinationId.HasValue)
+                yield return new ValidationResult(
+                    "Event must have either a LocationId or a DestinationId.",
+                    new[] { nameof(LocationId), nameof(DestinationId) });
+        }
     }
 }

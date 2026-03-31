@@ -121,18 +121,27 @@ namespace TuristickiVodic.Services.Services
             if (ev == null)
                 return null;
 
-            // CC može da menja samo svoje evente, Menadžer/Admin sve
+            // CC može da menja samo svoje evente
+            // Manager samo evente u svojoj destinaciji
+            // Admin samo ako destinacija nema Menadžera
             if (roleName == "ContentCreator" && ev.CreatedByUserId != userId)
                 throw new UnauthorizedAccessException("You can update only your own events.");
 
-            if (roleName == "Manager")
+            if (roleName == "Manager" || roleName == "Admin")
             {
-                var destinationId = ev.DestinationId;
-                if (destinationId.HasValue)
+                var destination = ev.DestinationId.HasValue
+                    ? await _context.Destinations.FindAsync(ev.DestinationId.Value)
+                    : null;
+
+                if (roleName == "Manager")
                 {
-                    var destination = await _context.Destinations.FindAsync(destinationId.Value);
                     if (destination?.ManagedByUserId != userId)
                         throw new UnauthorizedAccessException("Manager can update events only in their destination.");
+                }
+                else // Admin
+                {
+                    if (destination?.ManagedByUserId != null)
+                        throw new UnauthorizedAccessException("This destination has a manager. The manager must update this event.");
                 }
             }
 
@@ -189,7 +198,7 @@ namespace TuristickiVodic.Services.Services
             return _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
         }
 
-        // Menadžer odobrava/odbija event za svoju destinaciju; Admin odobrava sve
+        // Menadžer odobrava/odbija event za svoju destinaciju; Admin samo ako destinacija nema Menadžera
         public async Task<EventDto?> ApproveAsync(int id, ApproveContentDto dto, int userId, string roleName)
         {
             var ev = await _context.Events
@@ -199,12 +208,22 @@ namespace TuristickiVodic.Services.Services
             if (ev == null)
                 return null;
 
+            if (ev.Status != ContentStatus.Pending)
+                throw new InvalidOperationException("Only pending events can be approved or rejected.");
+
+            var destination = ev.Destination;
+
             if (roleName == "Manager")
             {
-                if (ev.Destination?.ManagedByUserId != userId)
+                if (destination?.ManagedByUserId != userId)
                     throw new UnauthorizedAccessException("Manager can only approve events for their destination.");
             }
-            else if (roleName != "Admin")
+            else if (roleName == "Admin")
+            {
+                if (destination?.ManagedByUserId != null)
+                    throw new UnauthorizedAccessException("This destination has a manager. The manager must approve this event.");
+            }
+            else
             {
                 throw new UnauthorizedAccessException("Only managers or admins can approve events.");
             }
@@ -222,13 +241,33 @@ namespace TuristickiVodic.Services.Services
 
         public async Task<bool> DeleteAsync(int id, int userId, string roleName)
         {
-            var ev = await _context.Events.FirstOrDefaultAsync(e => e.Id == id);
+            var ev = await _context.Events
+                .Include(e => e.Destination)
+                .FirstOrDefaultAsync(e => e.Id == id);
 
             if (ev == null)
                 return false;
 
-            if (roleName == "ContentCreator" && ev.CreatedByUserId != userId)
-                throw new UnauthorizedAccessException("You can delete only your own events.");
+            if (roleName == "ContentCreator")
+            {
+                if (ev.CreatedByUserId != userId)
+                    throw new UnauthorizedAccessException("You can delete only your own events.");
+            }
+            else if (roleName == "Manager" || roleName == "Admin")
+            {
+                var destination = ev.Destination;
+
+                if (roleName == "Manager")
+                {
+                    if (destination?.ManagedByUserId != userId)
+                        throw new UnauthorizedAccessException("Manager can delete events only in their destination.");
+                }
+                else // Admin
+                {
+                    if (destination?.ManagedByUserId != null)
+                        throw new UnauthorizedAccessException("This destination has a manager. The manager must delete this event.");
+                }
+            }
 
             _context.Events.Remove(ev);
             await _context.SaveChangesAsync();
