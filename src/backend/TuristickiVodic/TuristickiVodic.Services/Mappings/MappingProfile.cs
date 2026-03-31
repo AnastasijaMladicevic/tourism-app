@@ -93,6 +93,14 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.ObjectName, opt => opt.MapFrom(src => src.Object.Name))
                 .ForMember(dest => dest.ReviewedByFullName, opt => opt.MapFrom(src => src.ReviewedBy != null ? src.ReviewedBy.FirstName + " " + src.ReviewedBy.LastName : null))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+
+            CreateMap<RoutePoint, RoutePointDto>()
+                .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : 0))
+                .ForMember(dest => dest.Latitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.Y : 0));
+
+            CreateMap<Route, RouteDto>()
+                .ForMember(dest => dest.CreatedByFullName, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.FirstName + " " + src.CreatedBy.LastName : null))
+                .ForMember(dest => dest.RoutePoints, opt => opt.MapFrom(src => src.RoutePoints));
         }
     }
 }
