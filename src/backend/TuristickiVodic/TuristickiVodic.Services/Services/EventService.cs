@@ -66,14 +66,6 @@ namespace TuristickiVodic.Services.Services
                     dto.DestinationId = location.DestinationId;
             }
 
-            // Menadžer može da kreira event samo za svoju destinaciju
-            if (roleName == "Manager" && dto.DestinationId.HasValue)
-            {
-                var destination = await _context.Destinations.FindAsync(dto.DestinationId.Value);
-                if (destination?.ManagedByUserId != userId)
-                    throw new UnauthorizedAccessException("Manager can only create events for their destination.");
-            }
-
             var ev = new Event
             {
                 Name = dto.Name,
@@ -89,19 +81,10 @@ namespace TuristickiVodic.Services.Services
                 DestinationId = dto.DestinationId,
                 ObjectId = dto.ObjectId,
                 CreatedByUserId = userId,
-                // Menadžer automatski odobrava, CC čeka odobrenje
-                Status = roleName == "Manager" || roleName == "Admin"
-                    ? ContentStatus.Approved
-                    : ContentStatus.Pending,
+                Status = ContentStatus.Pending,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
-
-            if (ev.Status == ContentStatus.Approved)
-            {
-                ev.ApprovedByUserId = userId;
-                ev.ApprovedAt = DateTime.UtcNow;
-            }
 
             _context.Events.Add(ev);
             await _context.SaveChangesAsync();

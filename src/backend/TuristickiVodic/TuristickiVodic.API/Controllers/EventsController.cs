@@ -36,7 +36,7 @@ namespace TuristickiVodic.API.Controllers
 
         // ContentCreator i Menadžer mogu da kreiraju evente
         [HttpPost]
-        [Authorize(Roles = "ContentCreator,Manager,Admin")]
+        [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Create([FromBody] CreateEventDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
