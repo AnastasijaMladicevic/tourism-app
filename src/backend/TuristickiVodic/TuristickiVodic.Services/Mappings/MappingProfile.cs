@@ -101,6 +101,8 @@ namespace TuristickiVodic.Services.Mappings
             CreateMap<Route, RouteDto>()
                 .ForMember(dest => dest.CreatedByFullName, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.FirstName + " " + src.CreatedBy.LastName : null))
                 .ForMember(dest => dest.RoutePoints, opt => opt.MapFrom(src => src.RoutePoints));
+
+            CreateMap<Image, ImageDto>();
         }
     }
 }
