@@ -3,15 +3,6 @@ using System.Collections.Generic;
 
 namespace TuristickiVodic.Core.DTO
 {
-    public class RoutePointDto
-    {
-        public int Id { get; set; }
-        public short Order { get; set; }
-        public double Longitude { get; set; }
-        public double Latitude { get; set; }
-        public string? PointName { get; set; }
-    }
-
     public class RouteDto
     {
         public int Id { get; set; }

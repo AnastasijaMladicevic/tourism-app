@@ -60,6 +60,7 @@ builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 builder.Services.AddScoped<ITouristObjectService, TouristObjectService>();
 builder.Services.AddScoped<IDeletionRequestService, DeletionRequestService>();
 builder.Services.AddScoped<IRouteService, RouteService>();
+builder.Services.AddScoped<IRoutePointService, RoutePointService>();
 builder.Services.AddScoped<IEventPlannerService, EventPlannerService>();
 builder.Services.AddScoped<IManagerReportService, ManagerReportService>();
 builder.Services.AddScoped<IImageService, ImageService>();

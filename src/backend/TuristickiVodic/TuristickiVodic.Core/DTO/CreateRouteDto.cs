@@ -3,21 +3,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TuristickiVodic.Core.DTO
 {
-    public class CreateRoutePointDto
-    {
-        [Required]
-        public short Order { get; set; }
-
-        [Required]
-        public double Longitude { get; set; }
-
-        [Required]
-        public double Latitude { get; set; }
-
-        [MaxLength(150)]
-        public string? PointName { get; set; }
-    }
-
     public class CreateRouteDto
     {
         [Required, MaxLength(200)]
