@@ -177,4 +177,3 @@
 - Slike mogu da se brišu.
 - Brisanjem roditeljskog entiteta brišu se i njegove slike (`cascade delete`).
 - Sistem može imati više slika po entitetu.
-- `IsMain` se koristi za označavanje jedne glavne slike po entitetu
