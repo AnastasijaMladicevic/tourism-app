@@ -62,6 +62,7 @@ builder.Services.AddScoped<IDeletionRequestService, DeletionRequestService>();
 builder.Services.AddScoped<IRouteService, RouteService>();
 builder.Services.AddScoped<IEventPlannerService, EventPlannerService>();
 builder.Services.AddScoped<IManagerReportService, ManagerReportService>();
+builder.Services.AddScoped<IImageService, ImageService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
