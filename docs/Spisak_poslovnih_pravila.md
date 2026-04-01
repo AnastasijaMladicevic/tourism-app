@@ -43,7 +43,7 @@
 
 **EVENTI**
 
-- `ContentCreator`, `Manager` i `Admin` mogu da kreiraju evente.
+- `ContentCreator` moze da kreiraju evente.
 - Kada `ContentCreator` kreira event, status se postavlja na `Pending`.
 - Kada `Manager` ili `Admin` kreira event, status se postavlja na `Approved`.
 - Event mora imati `LocationId` ili `DestinationId`.
@@ -143,3 +143,37 @@
   - korisnik gubi `ContentCreator` ulogu
   - korisnik postaje `Tourist`
   - korisnik se stavlja na blacklist
+
+
+**ROUTE POINTS**
+
+- Route point pripada jednoj ruti (`RouteId`).
+- Svi korisnici mogu da vide tačke rute.
+- Samo vlasnik rute može da dodaje tačke.
+- Samo vlasnik rute može da menja tačke.
+- Samo vlasnik rute može da briše tačke.
+- Prilikom dodavanja tačke, `Order` mora biti jedinstven u okviru rute.
+- Prilikom izmene tačke, `Order` mora ostati jedinstven u okviru rute.
+- Nije dozvoljeno imati dve tačke sa istim redosledom u istoj ruti.
+- Ruta mora imati minimum 2 tačke.
+- Brisanje tačke je zabranjeno ako bi ruta ostala sa manje od 2 tačke.
+- Svaka promena tačke (dodavanje, izmena, brisanje) ažurira `Route.UpdatedAt`.
+
+**SLIKE**
+
+- Slika mora imati `Url`.
+- `Url` ima maksimalnu dužinu od 500 karaktera.
+- `AltText` je opcioni i ima maksimalnu dužinu od 200 karaktera.
+- `IsMain` označava glavnu sliku.
+- Slika mora biti vezana za tačno jedan entitet, nije dozvoljeno da bude vezana za više entiteta istovremeno.
+- Slika može biti vezana za:
+  - objekat
+  - aktivnost
+  - event
+  - destinaciju
+  - lokaciju
+- Slike mogu da se dodaju samo za postojeće entitete.
+- Slike mogu da se menjaju samo ako pripadaju validnom entitetu.
+- Slike mogu da se brišu.
+- Brisanjem roditeljskog entiteta brišu se i njegove slike (`cascade delete`).
+- Sistem može imati više slika po entitetu.
