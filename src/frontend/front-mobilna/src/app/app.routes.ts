@@ -4,7 +4,7 @@ export const routes: Routes = [
   // { path: '', loadComponent: () => import('./feature/splash/splash').then(m => m.SplashComponent) },
   { path: '', loadComponent: () => import('./feature/login/login').then(m => m.LoginComponent) },
   { path: 'login', loadComponent: () => import('./feature/login/login').then(m => m.LoginComponent) },
-  { path: 'register', loadComponent: () => import('./feature/signup/signup.component').then(m => m.RegisterComponent) },
+  { path: 'register', loadComponent: () => import('./feature/signup/signup.component').then(m => m.SignupComponent) },
   { path: 'forgot-password', loadComponent: () => import('./feature/auth/forgot-password/forgot-password').then(m => m.ForgotPasswordComponent) },
 
   // { path: 'home', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) },
