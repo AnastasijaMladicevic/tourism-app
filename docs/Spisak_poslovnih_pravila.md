@@ -43,7 +43,7 @@
 
 **EVENTI**
 
-- `ContentCreator`, `Manager` i `Admin` mogu da kreiraju evente.
+- `ContentCreator` moze da kreiraju evente.
 - Kada `ContentCreator` kreira event, status se postavlja na `Pending`.
 - Kada `Manager` ili `Admin` kreira event, status se postavlja na `Approved`.
 - Event mora imati `LocationId` ili `DestinationId`.
