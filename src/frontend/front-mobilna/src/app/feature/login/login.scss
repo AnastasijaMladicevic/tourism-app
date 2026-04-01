@@ -8,14 +8,14 @@
 }
 
 .overlay {
-  width: 90%;
-  max-width: 390px;
+  width: 80%;
+  max-width: 430px;
   padding: 20px;
   color: white;
   text-align: center;
   backdrop-filter: blur(10px);
     border-radius: 20px;
-    background: rgba(200, 200, 200, 0.2);
+    
 }
 .logo {
   display: flex;
@@ -43,10 +43,6 @@
   }
   h1 span{
     color: #067DE7;
-  }
-  p {
-    font-size: 14px;
-    opacity: 0.8;
   }
 }
 .form {
@@ -100,10 +96,10 @@ box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 .footer span {
   cursor: pointer;
 }
-
 .terms{
   color: #168AAD;
   text-decoration: underline;
+  font-weight: 500;
 }
 
 .footer {
@@ -117,7 +113,8 @@ box-shadow: 0 5px 15px rgba(0,0,0,0.2);
   color: #555555;
 
 }
-.signup {
+.signup,
+.forgot {
   color: #168AAD;
 }
 
@@ -131,9 +128,15 @@ box-shadow: 0 5px 15px rgba(0,0,0,0.2);
   .link {
     cursor: pointer;
     margin: 0 3px;
+    font-weight: 500;
   }
 }
 .error span{
   color: #ff6d6f;
   font-size: 12px;
+}
+@media (min-width: 435px) {
+  .overlay {
+    background: rgba(200, 200, 200, 0.2);
+  }
 }
