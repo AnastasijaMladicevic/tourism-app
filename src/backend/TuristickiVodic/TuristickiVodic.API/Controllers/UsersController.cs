@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TuristickiVodic.Core.DTOs;
 using TuristickiVodic.Services;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace TuristickiVodic.API.Controllers
 {
@@ -117,15 +118,29 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpPost("logout")]
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
-            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdClaim, out var userId))
+                return Unauthorized();
 
-            var result = await _userService.LogoutAsync(currentUserId);
-            if (!result)
+            var jti = User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+
+            var expClaim = User.FindFirst(JwtRegisteredClaimNames.Exp)?.Value;
+            DateTime? expiresAtUtc = null;
+
+            if (long.TryParse(expClaim, out var expUnix))
+            {
+                expiresAtUtc = DateTimeOffset.FromUnixTimeSeconds(expUnix).UtcDateTime;
+            }
+
+            var success = await _userService.LogoutAsync(userId, jti, expiresAtUtc);
+
+            if (!success)
                 return NotFound();
 
-            return Ok(new { message = "Logged out successfully" });
+            return Ok(new { message = "Logged out successfully." });
         }
 
         [HttpPut("{id}")]

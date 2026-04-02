@@ -17,5 +17,6 @@ namespace TuristickiVodic.Services
         Task<bool> RequestCreatorRoleAsync(int userId, string creatorType);
         Task<bool> ApproveCreatorRoleAsync(int userId);
         Task<bool> ToggleUserActiveAsync(int userId, bool isActive);
+        Task<bool> LogoutAsync(int userId, string? jti, DateTime? accessTokenExpiryUtc);
     }
 }

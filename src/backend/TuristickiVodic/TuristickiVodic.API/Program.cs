@@ -7,6 +7,9 @@ using System.Text;
 using TuristickiVodic.Infrastructure.Data;
 using TuristickiVodic.Services;
 using TuristickiVodic.Services.Services;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -86,6 +89,30 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             NameClaimType = ClaimTypes.NameIdentifier,
             RoleClaimType = ClaimTypes.Role,
             ClockSkew = TimeSpan.Zero
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                var jti = context.Principal?.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
+
+                if (string.IsNullOrWhiteSpace(jti))
+                {
+                    context.Fail("Token does not contain jti.");
+                    return;
+                }
+
+                var db = context.HttpContext.RequestServices.GetRequiredService<AppDbContext>();
+
+                var isRevoked = await db.RevokedTokens
+                    .AnyAsync(x => x.Jti == jti && x.ExpiresAt > DateTime.UtcNow);
+
+                if (isRevoked)
+                {
+                    context.Fail("Token has been revoked.");
+                }
+            }
         };
     });
 

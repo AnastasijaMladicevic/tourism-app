@@ -34,6 +34,7 @@ public class AppDbContext : DbContext
     public DbSet<DeletionRequest> DeletionRequests { get; set; }
     public DbSet<EventPlannerItem> EventPlannerItems { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<RevokedToken> RevokedTokens { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder mb)
@@ -488,12 +489,19 @@ public class AppDbContext : DbContext
             .HasFilter("\"EventId\" IS NOT NULL AND \"Status\" = 'Pending'")
             .IsUnique();
 
-        // ==================== ROLE ====================
+        // ==================== REFRESH TOKEN ====================
         mb.Entity<RefreshToken>()
             .HasOne(rt => rt.User)
             .WithOne(u => u.RefreshToken)
             .HasForeignKey<RefreshToken>(rt => rt.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // ==================== REVOKED TOKEN ====================
+        mb.Entity<RevokedToken>()
+            .HasIndex(rt => rt.Jti)
+            .IsUnique();
+        mb.Entity<RevokedToken>()
+            .HasIndex(rt => rt.ExpiresAt);
 
     }
 }

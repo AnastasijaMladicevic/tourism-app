@@ -289,6 +289,40 @@ namespace TuristickiVodic.Services
             };
         }
 
+        public async Task<bool> LogoutAsync(int userId, string? jti, DateTime? accessTokenExpiryUtc)
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+                return false;
+
+            await RevokeRefreshTokenAsync(user.Id);
+
+            await CleanupExpiredRevokedTokensAsync();
+
+            if (!string.IsNullOrWhiteSpace(jti) && accessTokenExpiryUtc.HasValue && accessTokenExpiryUtc.Value > DateTime.UtcNow)
+            {
+                var alreadyRevoked = await _context.RevokedTokens
+                    .AnyAsync(x => x.Jti == jti);
+
+                if (!alreadyRevoked)
+                {
+                    _context.RevokedTokens.Add(new RevokedToken
+                    {
+                        Jti = jti,
+                        ExpiresAt = accessTokenExpiryUtc.Value,
+                        RevokedAt = DateTime.UtcNow
+                    });
+                }
+            }
+
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
         private async Task RevokeRefreshTokenAsync(int userId)
         {
             var refreshToken = await _context.RefreshTokens
@@ -297,6 +331,18 @@ namespace TuristickiVodic.Services
             if (refreshToken != null)
             {
                 _context.RefreshTokens.Remove(refreshToken);
+            }
+        }
+
+        private async Task CleanupExpiredRevokedTokensAsync()
+        {
+            var expiredTokens = await _context.RevokedTokens
+                .Where(x => x.ExpiresAt <= DateTime.UtcNow)
+                .ToListAsync();
+
+            if (expiredTokens.Count > 0)
+            {
+                _context.RevokedTokens.RemoveRange(expiredTokens);
             }
         }
 
