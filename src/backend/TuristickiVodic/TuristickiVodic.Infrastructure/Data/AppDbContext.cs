@@ -3,7 +3,7 @@ using NetTopologySuite.Geometries;
 using TuristickiVodic.Core.Models;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Image = TuristickiVodic.Core.Models.Image;
-using Location = TuristickiVodic.Core.Models.Location;
+using Locality = TuristickiVodic.Core.Models.Locality;
 
 namespace TuristickiVodic.Infrastructure.Data;
 
@@ -14,8 +14,8 @@ public class AppDbContext : DbContext
 
     public DbSet<Role> Roles { get; set; }
     public DbSet<User> Users { get; set; }
-    public DbSet<LocationType> LocationTypes { get; set; }
-    public DbSet<Location> Locations { get; set; }
+    public DbSet<LocalityType> LocalityTypes { get; set; }
+    public DbSet<Locality> Localities { get; set; }
     public DbSet<DestinationType> DestinationTypes { get; set; }
     public DbSet<Destination> Destinations { get; set; }
     public DbSet<ObjectType> ObjectTypes { get; set; }
@@ -76,23 +76,23 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         // ==================== LOCATION ====================
-        mb.Entity<Location>()
+        mb.Entity<Locality>()
             .HasIndex(l => l.Geolocation)
             .HasMethod("GIST");
 
-        mb.Entity<Location>()
+        mb.Entity<Locality>()
             .HasOne(l => l.Destination)
-            .WithMany(d => d.Locations)
+            .WithMany(d => d.Localities)
             .HasForeignKey(l => l.DestinationId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        mb.Entity<Location>()
-            .HasOne(l => l.LocationType)
-            .WithMany(lt => lt.Locations)
-            .HasForeignKey(l => l.LocationTypeId)
+        mb.Entity<Locality>()
+            .HasOne(l => l.LocalityType)
+            .WithMany(lt => lt.Localities)
+            .HasForeignKey(l => l.LocalityTypeId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        mb.Entity<Location>()
+        mb.Entity<Locality>()
             .HasOne(l => l.CreatedBy)
             .WithMany()
             .HasForeignKey(l => l.CreatedByUserId)
@@ -108,9 +108,9 @@ public class AppDbContext : DbContext
             .HasMethod("GIST");
 
         mb.Entity<TouristObject>()
-            .HasOne(o => o.Location)
+            .HasOne(o => o.Locality)
             .WithMany(l => l.Objects)
-            .HasForeignKey(o => o.LocationId)
+            .HasForeignKey(o => o.LocalityId)
             .OnDelete(DeleteBehavior.Restrict);
 
         mb.Entity<TouristObject>()
@@ -143,9 +143,9 @@ public class AppDbContext : DbContext
             .HasConversion<string>();
 
         mb.Entity<Event>()
-            .HasOne(e => e.Location)
+            .HasOne(e => e.Locality)
             .WithMany(l => l.Events)
-            .HasForeignKey(e => e.LocationId)
+            .HasForeignKey(e => e.LocalityId)
             .OnDelete(DeleteBehavior.SetNull);
 
         mb.Entity<Event>()
@@ -184,9 +184,9 @@ public class AppDbContext : DbContext
             .HasMethod("GIST");
 
         mb.Entity<Activity>()
-            .HasOne(a => a.Location)
+            .HasOne(a => a.Locality)
             .WithMany(l => l.Activities)
-            .HasForeignKey(a => a.LocationId)
+            .HasForeignKey(a => a.LocalityId)
             .OnDelete(DeleteBehavior.SetNull);
 
         mb.Entity<Activity>()
@@ -248,7 +248,7 @@ public class AppDbContext : DbContext
                    CASE WHEN ""ActivityId"" IS NOT NULL THEN 1 ELSE 0 END +
                    CASE WHEN ""DestinationId"" IS NOT NULL THEN 1 ELSE 0 END +
                    CASE WHEN ""RouteId"" IS NOT NULL THEN 1 ELSE 0 END +
-                   CASE WHEN ""LocationId"" IS NOT NULL THEN 1 ELSE 0 END) = 1"));
+                   CASE WHEN ""LocalityId"" IS NOT NULL THEN 1 ELSE 0 END) = 1"));
 
         mb.Entity<Favorite>()
             .HasOne(f => f.User)
@@ -281,9 +281,9 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         mb.Entity<Favorite>()
-            .HasOne(f => f.Location)
+            .HasOne(f => f.Locality)
             .WithMany(l => l.Favorites)
-            .HasForeignKey(f => f.LocationId)
+            .HasForeignKey(f => f.LocalityId)
             .OnDelete(DeleteBehavior.Cascade);
 
         mb.Entity<Favorite>()
@@ -307,9 +307,9 @@ public class AppDbContext : DbContext
             .HasFilter("\"RouteId\" IS NOT NULL");
 
         mb.Entity<Favorite>()
-            .HasIndex(f => new { f.UserId, f.LocationId })
+            .HasIndex(f => new { f.UserId, f.LocalityId })
             .IsUnique()
-            .HasFilter("\"LocationId\" IS NOT NULL");
+            .HasFilter("\"LocalityId\" IS NOT NULL");
 
         // ==================== IMAGE ====================
         mb.Entity<Image>()
@@ -319,7 +319,7 @@ public class AppDbContext : DbContext
                    CASE WHEN ""ActivityId"" IS NOT NULL THEN 1 ELSE 0 END +
                    CASE WHEN ""EventId"" IS NOT NULL THEN 1 ELSE 0 END +
                    CASE WHEN ""DestinationId"" IS NOT NULL THEN 1 ELSE 0 END +
-                   CASE WHEN ""LocationId"" IS NOT NULL THEN 1 ELSE 0 END) = 1"));
+                   CASE WHEN ""LocalityId"" IS NOT NULL THEN 1 ELSE 0 END) = 1"));
 
         mb.Entity<Image>()
             .HasOne(i => i.Object)
@@ -346,9 +346,9 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.Cascade);
 
         mb.Entity<Image>()
-            .HasOne(i => i.Location)
+            .HasOne(i => i.Locality)
             .WithMany(l => l.Images)
-            .HasForeignKey(i => i.LocationId)
+            .HasForeignKey(i => i.LocalityId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // ==================== ROUTE & ROUTE POINT ====================

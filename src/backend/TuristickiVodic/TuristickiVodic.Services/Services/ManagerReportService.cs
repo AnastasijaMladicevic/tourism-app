@@ -52,19 +52,19 @@ namespace TuristickiVodic.Services.Services
             var destinationId = manager.ManagedDestinationId.Value;
 
             var hasObjectInDestination = await _context.Objects
-                .Include(o => o.Location)
+                .Include(o => o.Locality)
                 .AnyAsync(o => o.CreatedByUserId == dto.ReportedUserId &&
-                    ((o.Location != null && o.Location.DestinationId == destinationId) ||
+                    ((o.Locality != null && o.Locality.DestinationId == destinationId) ||
                      o.DestinationId == destinationId));
 
             var hasEventInDestination = await _context.Events
-                .Include(e => e.Location)
+                .Include(e => e.Locality)
                 .Include(e => e.Object)
-                    .ThenInclude(o => o.Location)
+                    .ThenInclude(o => o.Locality)
                 .AnyAsync(e => e.CreatedByUserId == dto.ReportedUserId &&
                     ((e.DestinationId == destinationId) ||
-                     (e.Location != null && e.Location.DestinationId == destinationId) ||
-                     (e.Object != null && ((e.Object.Location != null && e.Object.Location.DestinationId == destinationId) ||
+                     (e.Locality != null && e.Locality.DestinationId == destinationId) ||
+                     (e.Object != null && ((e.Object.Locality != null && e.Object.Locality.DestinationId == destinationId) ||
                                            e.Object.DestinationId == destinationId))));
 
             if (!hasObjectInDestination && !hasEventInDestination)

@@ -19,6 +19,6 @@ namespace TuristickiVodic.Core.DTO
         public int? ActivityId { get; set; }
         public int? EventId { get; set; }
         public int? DestinationId { get; set; }
-        public int? LocationId { get; set; }
+        public int? LocalityId { get; set; }
     }
 }

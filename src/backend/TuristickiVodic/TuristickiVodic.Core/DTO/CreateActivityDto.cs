@@ -21,7 +21,7 @@ namespace TuristickiVodic.Core.DTOs
         [Required]
         public int ActivityTypeId { get; set; }
 
-        public int? LocationId { get; set; }
+        public int? LocalityId { get; set; }
 
         public int? DestinationId { get; set; }
 
@@ -31,10 +31,10 @@ namespace TuristickiVodic.Core.DTOs
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (!LocationId.HasValue && !DestinationId.HasValue)
+            if (!LocalityId.HasValue && !DestinationId.HasValue)
                 yield return new ValidationResult(
-                    "Activity must have either a LocationId or a DestinationId.",
-                    new[] { nameof(LocationId), nameof(DestinationId) });
+                    "Activity must have either a LocalityId or a DestinationId.",
+                    new[] { nameof(LocalityId), nameof(DestinationId) });
         }
     }
 }

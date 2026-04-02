@@ -10,38 +10,38 @@ namespace TuristickiVodic.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class LocationsController : ControllerBase
+    public class LocalitiesController : ControllerBase
     {
-        private readonly ILocationService _locationService;
+        private readonly ILocalityService _localityService;
 
-        public LocationsController(ILocationService locationService)
+        public LocalitiesController(ILocalityService localityService)
         {
-            _locationService = locationService;
+            _localityService = localityService;
         }
 
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetAll()
         {
-            var locations = await _locationService.GetAllAsync();
-            return Ok(locations);
+            var localities = await _localityService.GetAllAsync();
+            return Ok(localities);
         }
 
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
-            var location = await _locationService.GetByIdAsync(id);
+            var locality = await _localityService.GetByIdAsync(id);
 
-            if (location == null)
+            if (locality == null)
                 return NotFound();
 
-            return Ok(location);
+            return Ok(locality);
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> Create([FromBody] CreateLocationDto dto)
+        [Authorize(Roles = "Admin, Manager")]
+        public async Task<IActionResult> Create([FromBody] CreateLocalityDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -51,7 +51,7 @@ namespace TuristickiVodic.API.Controllers
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
                 var roleName = User.FindFirstValue(ClaimTypes.Role)!;
 
-                var created = await _locationService.CreateAsync(dto, userId, roleName);
+                var created = await _localityService.CreateAsync(dto, userId, roleName);
                 return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
             }
             catch (InvalidOperationException ex)
@@ -61,8 +61,8 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> Update(int id, [FromBody] UpdateLocationDto dto)
+        [Authorize(Roles = "Admin, Manager")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateLocalityDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -72,7 +72,7 @@ namespace TuristickiVodic.API.Controllers
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
                 var roleName = User.FindFirstValue(ClaimTypes.Role)!;
 
-                var updated = await _locationService.UpdateAsync(id, dto, userId, roleName);
+                var updated = await _localityService.UpdateAsync(id, dto, userId, roleName);
 
                 if (updated == null)
                     return NotFound();
@@ -94,7 +94,7 @@ namespace TuristickiVodic.API.Controllers
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
                 var roleName = User.FindFirstValue(ClaimTypes.Role)!;
 
-                var deleted = await _locationService.DeleteAsync(id, userId, roleName);
+                var deleted = await _localityService.DeleteAsync(id, userId, roleName);
 
                 if (!deleted)
                     return NotFound();

@@ -190,7 +190,7 @@ namespace TuristickiVodic.Services.Services
         {
             var review = await _context.Reviews
                 .Include(r => r.Object)
-                    .ThenInclude(o => o.Location)
+                    .ThenInclude(o => o.Locality)
                         .ThenInclude(l => l.Destination)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
@@ -200,7 +200,7 @@ namespace TuristickiVodic.Services.Services
             if (roleName == "Manager")
             {
                 // Menadžer može da odobrava samo recenzije za objekte na svojoj destinaciji
-                var destinationId = review.Object?.Location?.DestinationId ?? review.Object?.DestinationId;
+                var destinationId = review.Object?.Locality?.DestinationId ?? review.Object?.DestinationId;
                 var destination = destinationId.HasValue
                     ? await _context.Destinations.FindAsync(destinationId.Value)
                     : null;

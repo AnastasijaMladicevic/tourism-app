@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TuristickiVodic.Core.DTO
 {
-    public class CreateLocationDto
+    public class CreateLocalityDto
     {
         [Required]
         [MaxLength(150)]
@@ -21,7 +21,7 @@ namespace TuristickiVodic.Core.DTO
         public int DestinationId { get; set; }
 
         [Required]
-        public int LocationTypeId { get; set; }
+        public int LocalityTypeId { get; set; }
 
         public bool IsActive { get; set; } = true;
     }

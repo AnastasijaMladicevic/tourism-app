@@ -20,7 +20,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(x => x.Event)
                     .ThenInclude(e => e.EventType)
                 .Include(x => x.Event)
-                    .ThenInclude(e => e.Location)
+                    .ThenInclude(e => e.Locality)
                 .Include(x => x.Event)
                     .ThenInclude(e => e.Destination)
                 .Include(x => x.Event)
@@ -37,7 +37,7 @@ namespace TuristickiVodic.Services.Services
         {
             var ev = await _context.Events
                 .Include(e => e.EventType)
-                .Include(e => e.Location)
+                .Include(e => e.Locality)
                 .Include(e => e.Destination)
                 .Include(e => e.Object)
                 .FirstOrDefaultAsync(e => e.Id == dto.EventId);
@@ -75,7 +75,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(x => x.Event)
                     .ThenInclude(e => e.EventType)
                 .Include(x => x.Event)
-                    .ThenInclude(e => e.Location)
+                    .ThenInclude(e => e.Locality)
                 .Include(x => x.Event)
                     .ThenInclude(e => e.Destination)
                 .Include(x => x.Event)
@@ -112,8 +112,8 @@ namespace TuristickiVodic.Services.Services
                 EndDate = ev.EndDate,
                 EventTypeId = ev.EventTypeId,
                 EventTypeName = ev.EventType?.Name ?? string.Empty,
-                LocationId = ev.LocationId,
-                LocationName = ev.Location?.Name,
+                LocalityId = ev.LocalityId,
+                LocalityName = ev.Locality?.Name,
                 DestinationId = ev.DestinationId,
                 DestinationName = ev.Destination?.Name,
                 ObjectId = ev.ObjectId,

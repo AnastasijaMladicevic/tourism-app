@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TuristickiVodic.Core.Models
 {
-    public class LocationType
+    public class LocalityType
     {
         public int Id { get; set; }
 
@@ -13,6 +13,6 @@ namespace TuristickiVodic.Core.Models
         public string Name { get; set; }
         // "Grad", "Opstina", "Region"
 
-        public ICollection<Location> Locations { get; set; }
+        public ICollection<Locality> Localities { get; set; }
     }
 }

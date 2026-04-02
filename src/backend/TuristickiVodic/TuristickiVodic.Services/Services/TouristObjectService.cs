@@ -22,7 +22,7 @@ namespace TuristickiVodic.Services.Services
         {
             var objects = await _context.Objects
                 .Include(o => o.ObjectType)
-                .Include(o => o.Location)
+                .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
                 .OrderBy(o => o.Id)
                 .ToListAsync();
@@ -37,15 +37,15 @@ namespace TuristickiVodic.Services.Services
         }
 
         // Samo CC može da kreira objekte; status uvek Pending, čeka odobrenje
-        // Objekat mora imati lokaciju; DestinationId se automatski preuzima iz lokacije
+        // Objekat mora imati lokalitet; DestinationId se automatski preuzima iz lokaliteta
         public async Task<TouristObjectDto> CreateAsync(CreateTouristObjectDto dto, int userId, string roleName)
         {
-            var location = await _context.Locations
+            var locality = await _context.Localities
                 .Include(l => l.Destination)
-                .FirstOrDefaultAsync(l => l.Id == dto.LocationId);
+                .FirstOrDefaultAsync(l => l.Id == dto.LocalityId);
 
-            if (location == null)
-                throw new InvalidOperationException("Location not found.");
+            if (locality == null)
+                throw new InvalidOperationException("Locality not found.");
 
             if (!await _context.ObjectTypes.AnyAsync(x => x.Id == dto.ObjectTypeId))
                 throw new InvalidOperationException("Object type not found.");
@@ -61,9 +61,9 @@ namespace TuristickiVodic.Services.Services
                 Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
                 IsActive = dto.IsActive,
                 ObjectTypeId = dto.ObjectTypeId,
-                LocationId = dto.LocationId,
+                LocalityId = dto.LocalityId,
                 // DestinationId se automatski preuzima iz lokacije
-                DestinationId = location.DestinationId,
+                DestinationId = locality.DestinationId,
                 CreatedByUserId = userId,
                 // CC uvek čeka odobrenje
                 Status = ContentStatus.Pending,
@@ -123,7 +123,7 @@ namespace TuristickiVodic.Services.Services
             if (obj.Status != ContentStatus.Pending)
                 throw new InvalidOperationException("Only pending objects can be approved or rejected.");
 
-            var destination = obj.Location?.Destination;
+            var destination = obj.Locality?.Destination;
 
             if (roleName == "Manager")
             {
@@ -179,7 +179,7 @@ namespace TuristickiVodic.Services.Services
         {
             return await _context.Objects
                 .Include(o => o.ObjectType)
-                .Include(o => o.Location)
+                .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
@@ -201,10 +201,10 @@ namespace TuristickiVodic.Services.Services
             IsActive = o.IsActive,
             ObjectTypeId = o.ObjectTypeId,
             ObjectTypeName = o.ObjectType?.Name ?? string.Empty,
-            LocationId = o.LocationId,
-            LocationName = o.Location?.Name ?? string.Empty,
-            DestinationId = o.Location?.DestinationId ?? o.DestinationId,
-            DestinationName = o.Location?.Destination?.Name ?? string.Empty,
+            LocalityId = o.LocalityId,
+            LocalityName = o.Locality?.Name ?? string.Empty,
+            DestinationId = o.Locality?.DestinationId ?? o.DestinationId,
+            DestinationName = o.Locality?.Destination?.Name ?? string.Empty,
             CreatedByUserId = o.CreatedByUserId,
             ApprovedByUserId = o.ApprovedByUserId,
             ApprovedAt = o.ApprovedAt,

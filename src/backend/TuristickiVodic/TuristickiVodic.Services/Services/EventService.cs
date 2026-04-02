@@ -22,7 +22,7 @@ namespace TuristickiVodic.Services.Services
         {
             var events = await _context.Events
                 .Include(e => e.EventType)
-                .Include(e => e.Location)
+                .Include(e => e.Locality)
                 .Include(e => e.Destination)
                 .Include(e => e.Object)
                 .OrderBy(e => e.Id)
@@ -35,7 +35,7 @@ namespace TuristickiVodic.Services.Services
         {
             var ev = await _context.Events
                 .Include(e => e.EventType)
-                .Include(e => e.Location)
+                .Include(e => e.Locality)
                 .Include(e => e.Destination)
                 .Include(e => e.Object)
                 .FirstOrDefaultAsync(e => e.Id == id);
@@ -46,24 +46,24 @@ namespace TuristickiVodic.Services.Services
         // CC i Menadžer mogu da kreiraju event; Menadžer samo za svoju destinaciju
         public async Task<EventDto> CreateAsync(CreateEventDto dto, int userId, string roleName)
         {
-            await ValidateReferences(dto.EventTypeId, dto.LocationId, dto.DestinationId, dto.ObjectId);
+            await ValidateReferences(dto.EventTypeId, dto.LocalityId, dto.DestinationId, dto.ObjectId);
 
             if (dto.EndDate.HasValue && dto.EndDate.Value < dto.StartDate)
                 throw new InvalidOperationException("End date cannot be before start date.");
 
-            // Ako je naveden LocationId, DestinationId mora biti isti kao destinacija lokacije
-            if (dto.LocationId.HasValue)
+            // Ako je naveden LocalityId, DestinationId mora biti isti kao destinacija lokacije
+            if (dto.LocalityId.HasValue)
             {
-                var location = await _context.Locations
+                var locality = await _context.Localities
                     .Include(l => l.Destination)
-                    .FirstAsync(l => l.Id == dto.LocationId.Value);
+                    .FirstAsync(l => l.Id == dto.LocalityId.Value);
 
-                if (dto.DestinationId.HasValue && dto.DestinationId.Value != location.DestinationId)
-                    throw new InvalidOperationException("Location does not belong to the specified destination.");
+                if (dto.DestinationId.HasValue && dto.DestinationId.Value != locality.DestinationId)
+                    throw new InvalidOperationException("Locality does not belong to the specified destination.");
 
                 // Automatski postavi DestinationId sa lokacije ako nije naveden
                 if (!dto.DestinationId.HasValue)
-                    dto.DestinationId = location.DestinationId;
+                    dto.DestinationId = locality.DestinationId;
             }
 
             var ev = new Event
@@ -77,7 +77,7 @@ namespace TuristickiVodic.Services.Services
                 MaxVisitors = dto.MaxVisitors,
                 IsActive = dto.IsActive,
                 EventTypeId = dto.EventTypeId,
-                LocationId = dto.LocationId,
+                LocalityId = dto.LocalityId,
                 DestinationId = dto.DestinationId,
                 ObjectId = dto.ObjectId,
                 CreatedByUserId = userId,
@@ -96,7 +96,7 @@ namespace TuristickiVodic.Services.Services
         {
             var ev = await _context.Events
                 .Include(e => e.EventType)
-                .Include(e => e.Location)
+                .Include(e => e.Locality)
                 .Include(e => e.Destination)
                 .Include(e => e.Object)
                 .FirstOrDefaultAsync(e => e.Id == id);
@@ -118,22 +118,22 @@ namespace TuristickiVodic.Services.Services
                 ev.EventTypeId = dto.EventTypeId.Value;
             }
 
-            // Validacija lokacija/destinacija konzistentnosti
-            int? newLocationId = dto.LocationId ?? ev.LocationId;
+            // Validacija lokalitet/destinacija konzistentnosti
+            int? newLocalityId = dto.LocalityId ?? ev.LocalityId;
             int? newDestinationId = dto.DestinationId ?? ev.DestinationId;
 
-            if (newLocationId.HasValue)
+            if (newLocalityId.HasValue)
             {
-                var location = await _context.Locations.FindAsync(newLocationId.Value);
-                if (location == null) throw new InvalidOperationException("Location not found.");
+                var locality = await _context.Localities.FindAsync(newLocalityId.Value);
+                if (locality == null) throw new InvalidOperationException("Locality not found.");
 
-                if (newDestinationId.HasValue && newDestinationId.Value != location.DestinationId)
-                    throw new InvalidOperationException("Location does not belong to the specified destination.");
+                if (newDestinationId.HasValue && newDestinationId.Value != locality.DestinationId)
+                    throw new InvalidOperationException("Locality does not belong to the specified destination.");
 
-                newDestinationId = location.DestinationId;
+                newDestinationId = locality.DestinationId;
             }
 
-            ev.LocationId = newLocationId;
+            ev.LocalityId = newLocalityId;
             ev.DestinationId = newDestinationId;
 
             if (dto.ObjectId.HasValue)
@@ -232,19 +232,19 @@ namespace TuristickiVodic.Services.Services
         {
             return await _context.Events
                 .Include(e => e.EventType)
-                .Include(e => e.Location)
+                .Include(e => e.Locality)
                 .Include(e => e.Destination)
                 .Include(e => e.Object)
                 .FirstAsync(e => e.Id == id);
         }
 
-        private async Task ValidateReferences(int eventTypeId, int? locationId, int? destinationId, int? objectId)
+        private async Task ValidateReferences(int eventTypeId, int? localityId, int? destinationId, int? objectId)
         {
             if (!await _context.EventTypes.AnyAsync(x => x.Id == eventTypeId))
                 throw new InvalidOperationException("Event type not found.");
 
-            if (locationId.HasValue && !await _context.Locations.AnyAsync(x => x.Id == locationId.Value))
-                throw new InvalidOperationException("Location not found.");
+            if (localityId.HasValue && !await _context.Localities.AnyAsync(x => x.Id == localityId.Value))
+                throw new InvalidOperationException("Locality not found.");
 
             if (destinationId.HasValue && !await _context.Destinations.AnyAsync(x => x.Id == destinationId.Value))
                 throw new InvalidOperationException("Destination not found.");

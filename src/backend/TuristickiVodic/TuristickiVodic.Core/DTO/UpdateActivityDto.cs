@@ -16,7 +16,7 @@
 
         public int? ActivityTypeId { get; set; }
 
-        public int? LocationId { get; set; }
+        public int? LocalityId { get; set; }
 
         public int? DestinationId { get; set; }
 

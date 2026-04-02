@@ -6,7 +6,7 @@ using NetTopologySuite.Geometries;
 
 namespace TuristickiVodic.Core.Models
 {
-    public class Location
+    public class Locality
     {
         public int Id { get; set; }
 
@@ -24,10 +24,10 @@ namespace TuristickiVodic.Core.Models
         public Destination Destination { get; set; }
 
         [Required]
-        public int LocationTypeId { get; set; }
-        public LocationType LocationType { get; set; }
+        public int LocalityTypeId { get; set; }
+        public LocalityType LocalityType { get; set; }
 
-        // Ko je kreirao lokaciju (može biti menadžer ili admin)
+        // Ko je kreirao lokalitet (može biti menadžer ili admin)
         public int? CreatedByUserId { get; set; }
         [ForeignKey("CreatedByUserId")]
         public User? CreatedBy { get; set; }

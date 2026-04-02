@@ -51,7 +51,7 @@ builder.Services.AddAutoMapper(typeof(TuristickiVodic.Services.Mappings.MappingP
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<ILocationService, LocationService>();
+builder.Services.AddScoped<ILocalityService, LocalityService>();
 builder.Services.AddScoped<IDestinationService, DestinationService>();
 builder.Services.AddScoped<IActivityService, ActivityService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();

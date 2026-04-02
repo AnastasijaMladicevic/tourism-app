@@ -26,8 +26,8 @@ namespace TuristickiVodic.Core.Models
         public int? DestinationId { get; set; }
         public Destination? Destination { get; set; }
 
-        public int? LocationId { get; set; }
-        public Location? Location { get; set; }
+        public int? LocalityId { get; set; }
+        public Locality? Locality { get; set; }
 
         public int? ObjectId { get; set; }
         public TouristObject? Object { get; set; }

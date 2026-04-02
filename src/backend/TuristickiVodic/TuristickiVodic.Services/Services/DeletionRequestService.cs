@@ -18,7 +18,7 @@ namespace TuristickiVodic.Services.Services
         public async Task<DeletionRequestDto> CreateForObjectAsync(int objectId, CreateDeletionRequestDto dto, int requestedByUserId)
         {
             var obj = await _context.Objects
-                .Include(o => o.Location)
+                .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
                 .FirstOrDefaultAsync(o => o.Id == objectId);
 
@@ -96,7 +96,7 @@ namespace TuristickiVodic.Services.Services
         {
             var query = _context.DeletionRequests
                 .Include(r => r.Object)
-                    .ThenInclude(o => o.Location)
+                    .ThenInclude(o => o.Locality)
                         .ThenInclude(l => l.Destination)
                 .Include(r => r.Event)
                     .ThenInclude(e => e.Destination)
@@ -106,11 +106,11 @@ namespace TuristickiVodic.Services.Services
 
             if (roleName == "Manager")
                 query = query.Where(r =>
-                    (r.ObjectId != null && r.Object.Location.Destination.ManagedByUserId == userId) ||
+                    (r.ObjectId != null && r.Object.Locality.Destination.ManagedByUserId == userId) ||
                     (r.EventId != null && r.Event.Destination.ManagedByUserId == userId));
             else if (roleName == "Admin")
                 query = query.Where(r =>
-                    (r.ObjectId != null && r.Object.Location.Destination.ManagedByUserId == null) ||
+                    (r.ObjectId != null && r.Object.Locality.Destination.ManagedByUserId == null) ||
                     (r.EventId != null && r.Event.Destination.ManagedByUserId == null));
 
             var requests = await query.OrderByDescending(r => r.CreatedAt).ToListAsync();
@@ -152,7 +152,7 @@ namespace TuristickiVodic.Services.Services
         {
             var request = await _context.DeletionRequests
                 .Include(r => r.Object)
-                    .ThenInclude(o => o.Location)
+                    .ThenInclude(o => o.Locality)
                         .ThenInclude(l => l.Destination)
                 .Include(r => r.Event)
                     .ThenInclude(e => e.Destination)
@@ -168,7 +168,7 @@ namespace TuristickiVodic.Services.Services
 
             // Odredi destinaciju iz objekta ili eventa
             var destination = request.ObjectId != null
-                ? request.Object?.Location?.Destination
+                ? request.Object?.Locality?.Destination
                 : request.Event?.Destination;
 
             if (roleName == "Manager")

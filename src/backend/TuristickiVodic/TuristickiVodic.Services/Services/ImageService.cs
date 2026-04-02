@@ -49,7 +49,7 @@ namespace TuristickiVodic.Services.Services
                 ActivityId = dto.ActivityId,
                 EventId = dto.EventId,
                 DestinationId = dto.DestinationId,
-                LocationId = dto.LocationId,
+                LocalityId = dto.LocalityId,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -90,7 +90,7 @@ namespace TuristickiVodic.Services.Services
                 image.DestinationId = dto.DestinationId;
 
             if (dto.LocationId.HasValue)
-                image.LocationId = dto.LocationId;
+                image.LocalityId = dto.LocationId;
 
             await _context.SaveChangesAsync();
 

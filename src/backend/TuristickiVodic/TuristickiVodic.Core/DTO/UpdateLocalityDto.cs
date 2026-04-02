@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TuristickiVodic.Core.DTO
 {
-    public class UpdateLocationDto
+    public class UpdateLocalityDto
     {
         public string? Name { get; set; }
 
@@ -16,7 +16,7 @@ namespace TuristickiVodic.Core.DTO
 
         public int? DestinationId { get; set; }
 
-        public int? LocationTypeId { get; set; }
+        public int? LocalityTypeId { get; set; }
 
         public bool? IsActive { get; set; }
     }

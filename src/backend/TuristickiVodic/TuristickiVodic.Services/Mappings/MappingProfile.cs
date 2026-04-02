@@ -59,9 +59,9 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.CreatedDestinations, opt => opt.Ignore())
                 .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
 
-            CreateMap<Location, LocationDto>()
+            CreateMap<Locality, LocalityDto>()
                 .ForMember(dest => dest.DestinationName, opt => opt.MapFrom(src => src.Destination.Name))
-                .ForMember(dest => dest.LocationTypeName, opt => opt.MapFrom(src => src.LocationType.Name))
+                .ForMember(dest => dest.LocalityTypeName, opt => opt.MapFrom(src => src.LocalityType.Name))
                 .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
                 .ForMember(dest => dest.Latitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.Y : (double?)null));
 
@@ -73,7 +73,7 @@ namespace TuristickiVodic.Services.Mappings
 
             CreateMap<Activity, ActivityDto>()
                 .ForMember(dest => dest.ActivityTypeName, opt => opt.MapFrom(src => src.ActivityType.Name))
-                .ForMember(dest => dest.LocationName, opt => opt.MapFrom(src => src.Location != null ? src.Location.Name : null))
+                .ForMember(dest => dest.LocalityName, opt => opt.MapFrom(src => src.Locality != null ? src.Locality.Name : null))
                 .ForMember(dest => dest.DestinationName, opt => opt.MapFrom(src => src.Destination != null ? src.Destination.Name : null))
                 .ForMember(dest => dest.ObjectName, opt => opt.MapFrom(src => src.Object != null ? src.Object.Name : null))
                 .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
@@ -81,7 +81,7 @@ namespace TuristickiVodic.Services.Mappings
 
             CreateMap<Event, EventDto>()
                 .ForMember(dest => dest.EventTypeName, opt => opt.MapFrom(src => src.EventType.Name))
-                .ForMember(dest => dest.LocationName, opt => opt.MapFrom(src => src.Location != null ? src.Location.Name : null))
+                .ForMember(dest => dest.LocalityName, opt => opt.MapFrom(src => src.Locality != null ? src.Locality.Name : null))
                 .ForMember(dest => dest.DestinationName, opt => opt.MapFrom(src => src.Destination != null ? src.Destination.Name : null))
                 .ForMember(dest => dest.ObjectName, opt => opt.MapFrom(src => src.Object != null ? src.Object.Name : null))
                 .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))

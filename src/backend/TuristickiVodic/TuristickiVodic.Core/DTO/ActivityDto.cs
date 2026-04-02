@@ -24,9 +24,9 @@ namespace TuristickiVodic.Core.DTOs
 
         public string ActivityTypeName { get; set; } = string.Empty;
 
-        public int? LocationId { get; set; }
+        public int? LocalityId { get; set; }
 
-        public string? LocationName { get; set; }
+        public string? LocalityName { get; set; }
 
         public int? DestinationId { get; set; }
 

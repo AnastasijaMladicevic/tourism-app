@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TuristickiVodic.Core.DTO
 {
-    public class LocationDto
+    public class LocalityDto
     {
         public int Id { get; set; }
 
@@ -22,9 +22,9 @@ namespace TuristickiVodic.Core.DTO
 
         public string DestinationName { get; set; } = string.Empty;
 
-        public int LocationTypeId { get; set; }
+        public int LocalityTypeId { get; set; }
 
-        public string LocationTypeName { get; set; } = string.Empty;
+        public string LocalityTypeName { get; set; } = string.Empty;
 
         public int? CreatedByUserId { get; set; }
 

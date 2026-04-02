@@ -21,7 +21,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(f => f.Activity)
                 .Include(f => f.Destination)
                 .Include(f => f.Route)
-                .Include(f => f.Location)
+                .Include(f => f.Locality)
                 .Where(f => f.UserId == userId)
                 .OrderByDescending(f => f.CreatedAt)
                 .ToListAsync();
@@ -35,9 +35,9 @@ namespace TuristickiVodic.Services.Services
                             + (dto.ActivityId.HasValue ? 1 : 0)
                             + (dto.DestinationId.HasValue ? 1 : 0)
                             + (dto.RouteId.HasValue ? 1 : 0)
-                            + (dto.LocationId.HasValue ? 1 : 0);
+                            + (dto.LocalityId.HasValue ? 1 : 0);
 
-            // Mora biti naveden tačno jedan od: ObjectId, DestinationId, LocationId, ActivityId, RouteId
+            // Mora biti naveden tačno jedan od: ObjectId, DestinationId, LocalityId, ActivityId, RouteId
             if (filledCount != 1)
                 throw new InvalidOperationException("Exactly one of ObjectId, ActivityId, DestinationId, RouteId or LocationId must be provided.");
 
@@ -53,8 +53,8 @@ namespace TuristickiVodic.Services.Services
             if (dto.RouteId.HasValue && !await _context.Routes.AnyAsync(r => r.Id == dto.RouteId.Value))
                 throw new InvalidOperationException("Route not found.");
 
-            if (dto.LocationId.HasValue && !await _context.Locations.AnyAsync(l => l.Id == dto.LocationId.Value))
-                throw new InvalidOperationException("Location not found.");
+            if (dto.LocalityId.HasValue && !await _context.Localities.AnyAsync(l => l.Id == dto.LocalityId.Value))
+                throw new InvalidOperationException("Locality not found.");
 
             var alreadyExists = await _context.Favorites.AnyAsync(f =>
                 f.UserId == userId &&
@@ -62,7 +62,7 @@ namespace TuristickiVodic.Services.Services
                 f.ActivityId == dto.ActivityId &&
                 f.DestinationId == dto.DestinationId &&
                 f.RouteId == dto.RouteId &&
-                f.LocationId == dto.LocationId);
+                f.LocalityId == dto.LocalityId);
 
             // Proveri duplikat
             if (alreadyExists)
@@ -75,7 +75,7 @@ namespace TuristickiVodic.Services.Services
                 ActivityId = dto.ActivityId,
                 DestinationId = dto.DestinationId,
                 RouteId = dto.RouteId,
-                LocationId = dto.LocationId,
+                LocalityId = dto.LocalityId,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -87,7 +87,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(f => f.Activity)
                 .Include(f => f.Destination)
                 .Include(f => f.Route)
-                .Include(f => f.Location)
+                .Include(f => f.Locality)
                 .FirstAsync(f => f.Id == favorite.Id);
 
             return MapToDto(created);
@@ -121,8 +121,8 @@ namespace TuristickiVodic.Services.Services
                 DestinationName = favorite.Destination?.Name,
                 RouteId = favorite.RouteId,
                 RouteName = favorite.Route?.Name,
-                LocationId = favorite.LocationId,
-                LocationName = favorite.Location?.Name,
+                LocalityId = favorite.LocalityId,
+                LocalityName = favorite.Locality?.Name,
                 CreatedAt = favorite.CreatedAt
             };
         }

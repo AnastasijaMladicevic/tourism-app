@@ -34,7 +34,7 @@ namespace TuristickiVodic.Core.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        public ICollection<Location> Locations { get; set; } = new List<Location>();
+        public ICollection<Locality> Localities { get; set; } = new List<Locality>();
         public ICollection<Image> Images { get; set; } = new List<Image>();
         public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
         public ICollection<TouristObject> Objects { get; set; } = new List<TouristObject>();

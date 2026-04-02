@@ -37,8 +37,8 @@ namespace TuristickiVodic.Core.Models
         public ObjectType ObjectType { get; set; }
 
         [Required]
-        public int LocationId { get; set; }
-        public Location Location { get; set; }
+        public int LocalityId { get; set; }
+        public Locality Locality { get; set; }
 
         // Opciono - može biti direktno vezan za destinaciju
         public int? DestinationId { get; set; }

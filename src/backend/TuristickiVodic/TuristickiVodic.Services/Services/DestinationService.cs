@@ -119,7 +119,7 @@ namespace TuristickiVodic.Services
         public async Task<bool> DeleteAsync(int id)
         {
             var destination = await _context.Destinations
-                .Include(d => d.Locations)
+                .Include(d => d.Localities)
                 .Include(d => d.Objects)
                 .Include(d => d.Events)
                 .FirstOrDefaultAsync(d => d.Id == id);
@@ -127,8 +127,8 @@ namespace TuristickiVodic.Services
             if (destination == null)
                 return false;
 
-            if (destination.Locations.Any())
-                throw new InvalidOperationException("Cannot delete destination that has locations. Remove them first.");
+            if (destination.Localities.Any())
+                throw new InvalidOperationException("Cannot delete destination that has localities. Remove them first.");
 
             if (destination.Objects.Any())
                 throw new InvalidOperationException("Cannot delete destination that has objects. Remove them first.");

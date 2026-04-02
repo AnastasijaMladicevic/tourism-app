@@ -17,8 +17,8 @@ namespace TuristickiVodic.Core.DTO
         public int? RouteId { get; set; }
         public string? RouteName { get; set; }
 
-        public int? LocationId { get; set; }
-        public string? LocationName { get; set; }
+        public int? LocalityId { get; set; }
+        public string? LocalityName { get; set; }
 
         public DateTime CreatedAt { get; set; }
     }

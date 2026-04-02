@@ -6,6 +6,6 @@
         public int? ActivityId { get; set; }
         public int? DestinationId { get; set; }
         public int? RouteId { get; set; }
-        public int? LocationId { get; set; }
+        public int? LocalityId { get; set; }
     }
 }

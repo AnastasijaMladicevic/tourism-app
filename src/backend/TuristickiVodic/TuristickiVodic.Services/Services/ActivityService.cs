@@ -22,7 +22,7 @@ namespace TuristickiVodic.Services.Services
         {
             var activities = await _context.Activities
                 .Include(a => a.ActivityType)
-                .Include(a => a.Location)
+                .Include(a => a.Locality)
                 .Include(a => a.Destination)
                 .Include(a => a.Object)
                 .OrderBy(a => a.Id)
@@ -35,7 +35,7 @@ namespace TuristickiVodic.Services.Services
         {
             var activity = await _context.Activities
                 .Include(a => a.ActivityType)
-                .Include(a => a.Location)
+                .Include(a => a.Locality)
                 .Include(a => a.Destination)
                 .Include(a => a.Object)
                 .FirstOrDefaultAsync(a => a.Id == id);
@@ -49,17 +49,17 @@ namespace TuristickiVodic.Services.Services
             if (!activityTypeExists)
                 throw new InvalidOperationException("Activity type not found");
 
-            if (dto.LocationId.HasValue)
+            if (dto.LocalityId.HasValue)
             {
-                var location = await _context.Locations.FindAsync(dto.LocationId.Value);
-                if (location == null)
-                    throw new InvalidOperationException("Location not found");
+                var locality = await _context.Localities.FindAsync(dto.LocalityId.Value);
+                if (locality == null)
+                    throw new InvalidOperationException("Locality not found");
 
-                if (dto.DestinationId.HasValue && dto.DestinationId.Value != location.DestinationId)
-                    throw new InvalidOperationException("Location does not belong to the specified destination.");
+                if (dto.DestinationId.HasValue && dto.DestinationId.Value != locality.DestinationId)
+                    throw new InvalidOperationException("Locality does not belong to the specified destination.");
 
-                // Automatski postavi DestinationId sa lokacije
-                dto.DestinationId = location.DestinationId;
+                // Automatski postavi DestinationId sa lokaliteta
+                dto.DestinationId = locality.DestinationId;
             }
             else if (dto.DestinationId.HasValue)
             {
@@ -84,7 +84,7 @@ namespace TuristickiVodic.Services.Services
                 DurationMinutes = dto.DurationMinutes,
                 IsActive = dto.IsActive,
                 ActivityTypeId = dto.ActivityTypeId,
-                LocationId = dto.LocationId,
+                LocalityId = dto.LocalityId,
                 DestinationId = dto.DestinationId,
                 ObjectId = dto.ObjectId,
                 CreatedByUserId = userId,
@@ -97,7 +97,7 @@ namespace TuristickiVodic.Services.Services
 
             var created = await _context.Activities
                 .Include(a => a.ActivityType)
-                .Include(a => a.Location)
+                .Include(a => a.Locality)
                 .Include(a => a.Destination)
                 .Include(a => a.Object)
                 .FirstAsync(a => a.Id == activity.Id);
@@ -109,7 +109,7 @@ namespace TuristickiVodic.Services.Services
         {
             var activity = await _context.Activities
                 .Include(a => a.ActivityType)
-                .Include(a => a.Location)
+                .Include(a => a.Locality)
                 .Include(a => a.Destination)
                 .Include(a => a.Object)
                 .FirstOrDefaultAsync(a => a.Id == id);
@@ -126,23 +126,23 @@ namespace TuristickiVodic.Services.Services
                 activity.ActivityTypeId = dto.ActivityTypeId.Value;
             }
 
-            // Konzistentnost LocationId i DestinationId
-            int? newLocationId = dto.LocationId ?? activity.LocationId;
+            // Konzistentnost LocalityId i DestinationId
+            int? newLocalityId = dto.LocalityId ?? activity.LocalityId;
             int? newDestinationId = dto.DestinationId ?? activity.DestinationId;
 
-            if (dto.LocationId.HasValue || dto.DestinationId.HasValue)
+            if (dto.LocalityId.HasValue || dto.DestinationId.HasValue)
             {
-                if (newLocationId.HasValue)
+                if (newLocalityId.HasValue)
                 {
-                    var location = await _context.Locations.FindAsync(newLocationId.Value);
-                    if (location == null)
-                        throw new InvalidOperationException("Location not found.");
+                    var locality = await _context.Localities.FindAsync(newLocalityId.Value);
+                    if (locality == null)
+                        throw new InvalidOperationException("Locality not found.");
 
-                    if (newDestinationId.HasValue && newDestinationId.Value != location.DestinationId)
-                        throw new InvalidOperationException("Location does not belong to the specified destination.");
+                    if (newDestinationId.HasValue && newDestinationId.Value != locality.DestinationId)
+                        throw new InvalidOperationException("Locality does not belong to the specified destination.");
 
-                    // Automatski postavi DestinationId sa lokacije
-                    newDestinationId = location.DestinationId;
+                    // Automatski postavi DestinationId sa lokaliteta
+                    newDestinationId = locality.DestinationId;
                 }
                 else if (newDestinationId.HasValue)
                 {
@@ -151,7 +151,7 @@ namespace TuristickiVodic.Services.Services
                         throw new InvalidOperationException("Destination not found.");
                 }
 
-                activity.LocationId = newLocationId;
+                activity.LocalityId = newLocalityId;
                 activity.DestinationId = newDestinationId;
             }
 
@@ -188,7 +188,7 @@ namespace TuristickiVodic.Services.Services
 
             var updated = await _context.Activities
                 .Include(a => a.ActivityType)
-                .Include(a => a.Location)
+                .Include(a => a.Locality)
                 .Include(a => a.Destination)
                 .Include(a => a.Object)
                 .FirstAsync(a => a.Id == activity.Id);

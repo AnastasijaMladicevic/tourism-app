@@ -9,14 +9,14 @@ TRUNCATE TABLE
     "Events",
     "Activities",
     "Objects",
-    "Locations",
+    "Localities",
     "Destinations",
     "Users",
     "EventTypes",
     "ActivityTypes",
     "ObjectTypes",
     "DestinationTypes",
-    "LocationTypes",
+    "LocalityTypes",
     "Roles"
 RESTART IDENTITY CASCADE;
 
@@ -40,14 +40,15 @@ INSERT INTO "Roles" ("Name", "CreatedAt") VALUES
 -- 2. TYPES
 -- ============================================
 
-INSERT INTO "LocationTypes" ("Name") VALUES
+INSERT INTO "LocalityTypes" ("Name") VALUES
 ('Grad'),
 ('Opstina'),
 ('Region'),
 ('Stari Grad'),
 ('Turisticka Zona'),
 ('Setaliste'),
-('Trg');
+('Trg'),
+('Park');
 
 INSERT INTO "DestinationTypes" ("Name") VALUES
 ('Grad'),
@@ -58,8 +59,7 @@ INSERT INTO "DestinationTypes" ("Name") VALUES
 ('Zaliv'),
 ('Banja'),
 ('Stari Grad'),
-('Plaza'),
-('Park');
+('Plaza');
 
 INSERT INTO "ObjectTypes" ("Name") VALUES
 ('Restoran'),
@@ -208,69 +208,69 @@ SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'St
 WHERE "Email" = 'marko@spirego.com';
 
 -- ============================================
--- 5. LOCATIONS
+-- 5. LOCALITIES
 -- ============================================
-INSERT INTO "Locations"
-("Name", "Description", "Geolocation", "IsActive", "DestinationId", "LocationTypeId", "CreatedByUserId", "CreatedAt")
+INSERT INTO "Localities"
+("Name", "Description", "Geolocation", "IsActive", "DestinationId", "LocalityTypeId", "CreatedByUserId", "CreatedAt")
 VALUES
 ('Budva', 'Poznato turisticko mesto na Jadranu',
  ST_SetSRID(ST_MakePoint(18.840, 42.286), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
- (SELECT "Id" FROM "LocationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
 ('Podgorica', 'Glavni grad Crne Gore',
  ST_SetSRID(ST_MakePoint(19.262, 42.441), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
- (SELECT "Id" FROM "LocationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
 ('Zabljak', 'Planinski grad u blizini Durmitora',
  ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
- (SELECT "Id" FROM "LocationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
 ('Herceg Novi', 'Primorski grad na ulazu u Bokokotorski zaliv',
  ST_SetSRID(ST_MakePoint(18.537, 42.453), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
- (SELECT "Id" FROM "LocationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
 ('Bar', 'Grad poznat po luci i Starom Baru',
  ST_SetSRID(ST_MakePoint(19.100, 42.093), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
- (SELECT "Id" FROM "LocationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
 ('Ulcinj', 'Najjuzniji grad na primorju',
  ST_SetSRID(ST_MakePoint(19.224, 41.929), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
- (SELECT "Id" FROM "LocationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
 ('Kotor', 'Primorski grad poznat po starom gradu',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
- (SELECT "Id" FROM "LocationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
 ('Cetinje', 'Istorijska prestonica Crne Gore',
  ST_SetSRID(ST_MakePoint(18.924, 42.390), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
- (SELECT "Id" FROM "LocationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
 ('Niksic', 'Drugi po velicini grad',
  ST_SetSRID(ST_MakePoint(18.956, 42.773), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
- (SELECT "Id" FROM "LocationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
 ('Tivat', 'Primorski grad poznat po marini',
  ST_SetSRID(ST_MakePoint(18.693, 42.434), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
- (SELECT "Id" FROM "LocationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW());
 
 -- ============================================
@@ -278,12 +278,12 @@ VALUES
 -- ============================================
 INSERT INTO "Objects"
 ("Name", "Description", "Address", "PhoneNumber", "Website", "WorkingHours", "Geolocation", "AverageRating", "ReviewCount",
- "Status", "IsActive", "ObjectTypeId", "LocationId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
+ "Status", "IsActive", "ObjectTypeId", "LocalityId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
 VALUES
 ('Hotel Vardar', 'Hotel u srcu starog grada Kotora', 'Stari grad Kotor', '+38232345678', 'https://hotelvardar.com',
  '{"pon":"00:00-24:00"}', ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
- (SELECT "Id" FROM "Locations" WHERE "Name" = 'Kotor'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
@@ -292,7 +292,7 @@ VALUES
 ('Restoran Galion', 'Restoran sa pogledom na zaliv', 'Skaljari bb, Kotor', '+38232345679', 'https://galion.me',
  '{"pon":"10:00-23:00"}', ST_SetSRID(ST_MakePoint(18.768, 42.427), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
- (SELECT "Id" FROM "Locations" WHERE "Name" = 'Kotor'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotorski zaliv'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
@@ -301,7 +301,7 @@ VALUES
 ('Hotel Avala', 'Luksuzni hotel pored mora', 'Budva centar', '+38233456789', 'https://avala.me',
  '{"pon":"00:00-24:00"}', ST_SetSRID(ST_MakePoint(18.838, 42.279), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
- (SELECT "Id" FROM "Locations" WHERE "Name" = 'Budva'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
@@ -310,7 +310,7 @@ VALUES
 ('Mogren Beach Bar', 'Kafic na plazi', 'Plaza Mogren', '+38233456780', NULL,
  '{"pon":"08:00-02:00"}', ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafana'),
- (SELECT "Id" FROM "Locations" WHERE "Name" = 'Budva'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plaza Mogren'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
@@ -319,7 +319,7 @@ VALUES
 ('Planinarski dom Durmitor', 'Dom za planinare na Durmitoru', 'Durmitor bb', '+38233456781', NULL,
  '{"pon":"00:00-24:00"}', ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Planinarski dom'),
- (SELECT "Id" FROM "Locations" WHERE "Name" = 'Zabljak'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Zabljak'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
@@ -329,12 +329,12 @@ VALUES
 -- 7. ACTIVITIES
 -- ============================================
 INSERT INTO "Activities"
-("Name", "Description", "Geolocation", "Price", "DurationMinutes", "IsActive", "ActivityTypeId", "LocationId", "DestinationId", "ObjectId", "CreatedByUserId", "CreatedAt", "UpdatedAt")
+("Name", "Description", "Geolocation", "Price", "DurationMinutes", "IsActive", "ActivityTypeId", "LocalityId", "DestinationId", "ObjectId", "CreatedByUserId", "CreatedAt", "UpdatedAt")
 VALUES
 ('Degustacija morskih specijaliteta', 'Lokalna kuhinja - degustacija ribljih specijaliteta',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 25.00, 90, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Poseta Restoranu'),
- (SELECT "Id" FROM "Locations" WHERE "Name" = 'Kotor'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
@@ -343,7 +343,7 @@ VALUES
 ('Nocni izlazak Budva', 'Zabava uz muziku u budvanskim klubovima',
  ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), 10.00, 240, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Nocni Izlazak'),
- (SELECT "Id" FROM "Locations" WHERE "Name" = 'Budva'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
@@ -352,7 +352,7 @@ VALUES
 ('Planinarenje na Durmitoru', 'Pesacka tura kroz prirodu Durmitora',
  ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326), 0.00, 300, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Planinarenje'),
- (SELECT "Id" FROM "Locations" WHERE "Name" = 'Zabljak'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Zabljak'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
@@ -361,7 +361,7 @@ VALUES
 ('Setnja starim gradom Kotora', 'Razgledanje istorijskih znamenitosti',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 0.00, 120, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Setnja'),
- (SELECT "Id" FROM "Locations" WHERE "Name" = 'Kotor'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
  NULL,
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
@@ -371,12 +371,12 @@ VALUES
 -- 8. EVENTS
 -- ============================================
 INSERT INTO "Events"
-("Name", "Description", "Geolocation", "StartDate", "EndDate", "Price", "MaxVisitors", "IsActive", "Status", "EventTypeId", "LocationId", "DestinationId", "ObjectId", "CreatedByUserId", "CreatedAt", "UpdatedAt")
+("Name", "Description", "Geolocation", "StartDate", "EndDate", "Price", "MaxVisitors", "IsActive", "Status", "EventTypeId", "LocalityId", "DestinationId", "ObjectId", "CreatedByUserId", "CreatedAt", "UpdatedAt")
 VALUES
 ('KotorArt festival', 'Kulturni festival muzike i umetnosti',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), '2026-07-15 20:00', '2026-07-30 23:00', 20.00, 1000, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
- (SELECT "Id" FROM "Locations" WHERE "Name" = 'Kotor'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
@@ -385,7 +385,7 @@ VALUES
 ('Vece klasicne muzike', 'Koncert u starom gradu Kotora',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), '2026-08-05 21:00', '2026-08-05 23:00', 15.00, 200, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Koncert'),
- (SELECT "Id" FROM "Locations" WHERE "Name" = 'Kotor'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
@@ -394,7 +394,7 @@ VALUES
 ('Budva Summer Festival', 'Letnji festival na otvorenom',
  ST_SetSRID(ST_MakePoint(18.837, 42.279), 4326), '2026-07-01 19:00', '2026-07-10 23:00', 10.00, 1500, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
- (SELECT "Id" FROM "Locations" WHERE "Name" = 'Budva'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
@@ -403,7 +403,7 @@ VALUES
 ('DJ Night Mogren', 'Elektronska muzika na plazi Mogren',
  ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), '2026-08-10 22:00', '2026-08-11 03:00', 8.00, 500, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Nastup'),
- (SELECT "Id" FROM "Locations" WHERE "Name" = 'Budva'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plaza Mogren'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
@@ -412,7 +412,7 @@ VALUES
 ('Planinarski susret', 'Okupljanje planinara na Durmitoru',
  ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326), '2026-09-01 08:00', '2026-09-01 18:00', 5.00, 100, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Okupljanje'),
- (SELECT "Id" FROM "Locations" WHERE "Name" = 'Zabljak'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Zabljak'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
@@ -440,33 +440,33 @@ VALUES
 -- 10. INDEXES
 -- ============================================
 
-CREATE INDEX IF NOT EXISTS idx_locations_geo ON "Locations" USING gist("Geolocation");
+CREATE INDEX IF NOT EXISTS idx_localities_geo ON "Localities" USING gist("Geolocation");
 CREATE INDEX IF NOT EXISTS idx_destinations_geo ON "Destinations" USING gist("Geolocation");
 CREATE INDEX IF NOT EXISTS idx_objects_geo ON "Objects" USING gist("Geolocation");
 CREATE INDEX IF NOT EXISTS idx_activities_geo ON "Activities" USING gist("Geolocation");
 CREATE INDEX IF NOT EXISTS idx_events_geo ON "Events" USING gist("Geolocation");
 
-CREATE INDEX IF NOT EXISTS idx_locations_active ON "Locations"("IsActive");
-CREATE INDEX IF NOT EXISTS idx_locations_type ON "Locations"("LocationTypeId");
-CREATE INDEX IF NOT EXISTS idx_locations_destination ON "Locations"("DestinationId");
+CREATE INDEX IF NOT EXISTS idx_localities_active ON "Localities"("IsActive");
+CREATE INDEX IF NOT EXISTS idx_localities_type ON "Localities"("LocalityTypeId");
+CREATE INDEX IF NOT EXISTS idx_localities_destination ON "Localities"("DestinationId");
 
 CREATE INDEX IF NOT EXISTS idx_destinations_type ON "Destinations"("DestinationTypeId");
 CREATE INDEX IF NOT EXISTS idx_destinations_status ON "Destinations"("Status");
 CREATE INDEX IF NOT EXISTS idx_destinations_active ON "Destinations"("IsActive");
 CREATE INDEX IF NOT EXISTS idx_destinations_managed_by ON "Destinations"("ManagedByUserId");
 
-CREATE INDEX IF NOT EXISTS idx_objects_location ON "Objects"("LocationId");
+CREATE INDEX IF NOT EXISTS idx_objects_locality ON "Objects"("LocalityId");
 CREATE INDEX IF NOT EXISTS idx_objects_destination ON "Objects"("DestinationId");
 CREATE INDEX IF NOT EXISTS idx_objects_type ON "Objects"("ObjectTypeId");
 CREATE INDEX IF NOT EXISTS idx_objects_status ON "Objects"("Status");
 CREATE INDEX IF NOT EXISTS idx_objects_active ON "Objects"("IsActive");
 CREATE INDEX IF NOT EXISTS idx_objects_rating ON "Objects"("AverageRating" DESC);
 
-CREATE INDEX IF NOT EXISTS idx_activities_location ON "Activities"("LocationId");
+CREATE INDEX IF NOT EXISTS idx_activities_locality ON "Activities"("LocalityId");
 CREATE INDEX IF NOT EXISTS idx_activities_type ON "Activities"("ActivityTypeId");
 CREATE INDEX IF NOT EXISTS idx_activities_active ON "Activities"("IsActive");
 
-CREATE INDEX IF NOT EXISTS idx_events_location ON "Events"("LocationId");
+CREATE INDEX IF NOT EXISTS idx_events_locality ON "Events"("LocalityId");
 CREATE INDEX IF NOT EXISTS idx_events_type ON "Events"("EventTypeId");
 CREATE INDEX IF NOT EXISTS idx_events_status ON "Events"("Status");
 CREATE INDEX IF NOT EXISTS idx_events_active ON "Events"("IsActive");
@@ -574,10 +574,10 @@ BEGIN
             UPDATE "Images"
             SET "IsMain" = false
             WHERE "DestinationId" = NEW."DestinationId" AND "Id" != NEW."Id";
-        ELSIF NEW."LocationId" IS NOT NULL THEN
+        ELSIF NEW."LocalityId" IS NOT NULL THEN
             UPDATE "Images"
             SET "IsMain" = false
-            WHERE "LocationId" = NEW."LocationId" AND "Id" != NEW."Id";
+            WHERE "LocalityId" = NEW."LocalityId" AND "Id" != NEW."Id";
         END IF;
     END IF;
 
@@ -613,8 +613,8 @@ FOR EACH ROW EXECUTE FUNCTION deactivate_past_events();
 SELECT '=== FINAL CHECK ===' AS "Status";
 
 SELECT 'Roles:' AS "Table", COUNT(*) AS "Count" FROM "Roles" UNION ALL
-SELECT 'LocationTypes:', COUNT(*) FROM "LocationTypes" UNION ALL
-SELECT 'Locations:', COUNT(*) FROM "Locations" UNION ALL
+SELECT 'LocalityTypes:', COUNT(*) FROM "LocalityTypes" UNION ALL
+SELECT 'Localities:', COUNT(*) FROM "Localities" UNION ALL
 SELECT 'DestinationTypes:', COUNT(*) FROM "DestinationTypes" UNION ALL
 SELECT 'Destinations:', COUNT(*) FROM "Destinations" UNION ALL
 SELECT 'ObjectTypes:', COUNT(*) FROM "ObjectTypes" UNION ALL
