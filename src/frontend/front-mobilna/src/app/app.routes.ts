@@ -6,7 +6,7 @@ export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./feature/login/login').then(m => m.LoginComponent) },
   { path: 'register', loadComponent: () => import('./feature/signup/signup.component').then(m => m.SignupComponent) },
   { path: 'forgot-password', loadComponent: () => import('./feature/auth/forgot-password/forgot-password').then(m => m.ForgotPasswordComponent) },
+  { path: 'terms', loadComponent: () => import('./feature/terms/terms.component').then(m => m.TermsComponent) },
 
   // { path: 'home', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) },
-  // { path: 'terms', loadComponent: () => import('./pages/terms/terms.component').then(m => m.TermsComponent) },
 ];
