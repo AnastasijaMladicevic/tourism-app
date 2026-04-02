@@ -5,7 +5,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100vh;
   padding: 24px 16px;
   font-family: 'DM Sans', sans-serif;
 }
@@ -19,21 +18,10 @@
 
 // ─── Back button ───────────────────────────────────────────────────────────────
 .back-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
   border: none;
   background: transparent;
   color: var(--emperor);
   cursor: pointer;
-  margin-bottom: 28px;
-  transition: color 0.2s;
-
-  &:hover {
-    color: var(--primary);
-  }
 }
 
 // ─── Logo ──────────────────────────────────────────────────────────────────────
@@ -41,7 +29,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 36px;
+  margin-bottom: 80px;
 }
 
 img {
@@ -50,26 +38,26 @@ img {
   }
 .logo-text {
   font-size: 32px;
-  font-weight: 500;
+  font-weight: bold;
   color: #067DE7;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 
   strong {
-    font-weight: 700;
+    font-weight: bold;
     color: #38DFF6;
   }
 }
 
 // ─── Heading ───────────────────────────────────────────────────────────────────
 .title {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 500;
   color: var(--emperor);
-  margin: 0 0 8px;
+  margin-bottom: 15px;
 }
 
 .subtitle {
-  font-size: 13.5px;
+  font-size: 10px;
   color: var(--emperor);
   line-height: 1.6;
   margin: 0 0 28px;
@@ -90,11 +78,11 @@ img {
 // ─── OTP single input ──────────────────────────────────────────────────────────
 .otp-input {
   flex: 1;
-  width: 58px;
-  height: 58px;
+  width: 15%;
+  height: 50px;
   border: 1.5px solid #D8E3EC;
   border-radius: 12px;
-  background: var(--athens-gray);   /* ← change input background here */
+  background: var(--athens-gray);   
   text-align: center;
   font-family: 'DM Sans', sans-serif;
   font-size: 22px;
@@ -111,7 +99,7 @@ img {
 
 .otp-input--filled {
   border-color: var(--primary);
-  background: var(--athens-gray);   /* stays same bg when filled, adjust if needed */
+  background: var(--athens-gray);   
 }
 
 .otp-input--error {
@@ -145,8 +133,8 @@ img {
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 52px;
-  border-radius: 14px;
+  height: 40px;
+  border-radius: 12px;
   border: none;
   font-family: 'DM Sans', sans-serif;
   font-size: 15px;
@@ -167,12 +155,17 @@ img {
 
 // ─── Primary button ────────────────────────────────────────────────────────────
 .btn-primary {
-  background: var(--primary);       /* ← uses your root --primary variable */
+  background: var(--primary);       
   color: #ffffff;
   box-shadow: 0 4px 16px rgba(26, 172, 207, 0.3);
 
   &:not(:disabled):hover {
     opacity: 0.92;
+  }
+  &[disabled] {
+    background: var(--primary) !important;
+    color: #ffffff !important;
+    opacity: 0.5;
   }
 }
 
@@ -199,4 +192,18 @@ img {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+@media (min-width: 435px) {
+  .page{
+  min-height: 100vh;
+  }
+}
+button.btn-primary,
+button.btn-primary[disabled] {
+  background-color: #168AAD !important;
+  color: #ffffff !important;
+}
+ 
+button.btn-primary[disabled] {
+  opacity: 0.5;
 }
