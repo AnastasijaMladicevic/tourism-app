@@ -95,7 +95,39 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
-        // Korisnik može da menja samo sebe; Admin može svakoga
+        [HttpPost("refresh")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenDto refreshTokenDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var response = await _userService.RefreshTokenAsync(refreshTokenDto);
+                if (response == null)
+                    return Unauthorized(new { message = "Invalid or expired refresh token" });
+
+                return Ok(response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            var result = await _userService.LogoutAsync(currentUserId);
+            if (!result)
+                return NotFound();
+
+            return Ok(new { message = "Logged out successfully" });
+        }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateUserDto updateUserDto)
         {

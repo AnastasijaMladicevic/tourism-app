@@ -173,6 +173,14 @@ namespace TuristickiVodic.Services.Services
                 report.ReportedUser.Role = touristRole;
                 report.ReportedUser.IsBlacklisted = true;
                 report.ReportedUser.UpdatedAt = DateTime.UtcNow;
+
+                var refreshToken = await _context.RefreshTokens
+                    .FirstOrDefaultAsync(rt => rt.UserId == report.ReportedUser.Id);
+
+                if (refreshToken != null)
+                {
+                    _context.RefreshTokens.Remove(refreshToken);
+                }
             }
 
             await _context.SaveChangesAsync();

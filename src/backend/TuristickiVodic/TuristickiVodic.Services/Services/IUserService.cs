@@ -12,6 +12,8 @@ namespace TuristickiVodic.Services
         Task<bool> DeleteAsync(int id);
         Task<bool> ChangePasswordAsync(int userId, ChangePasswordDto changePasswordDto);
         Task<AuthResponseDto?> LoginAsync(LoginDto loginDto);
+        Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenDto refreshTokenDto);
+        Task<bool> LogoutAsync(int userId);
         Task<bool> RequestCreatorRoleAsync(int userId, string creatorType);
         Task<bool> ApproveCreatorRoleAsync(int userId);
         Task<bool> ToggleUserActiveAsync(int userId, bool isActive);

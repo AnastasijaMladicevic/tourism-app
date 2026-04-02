@@ -33,6 +33,7 @@ public class AppDbContext : DbContext
     public DbSet<ManagerReport> ManagerReports { get; set; }
     public DbSet<DeletionRequest> DeletionRequests { get; set; }
     public DbSet<EventPlannerItem> EventPlannerItems { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder mb)
@@ -486,6 +487,13 @@ public class AppDbContext : DbContext
             .HasIndex(r => r.EventId)
             .HasFilter("\"EventId\" IS NOT NULL AND \"Status\" = 'Pending'")
             .IsUnique();
+
+        // ==================== ROLE ====================
+        mb.Entity<RefreshToken>()
+            .HasOne(rt => rt.User)
+            .WithOne(u => u.RefreshToken)
+            .HasForeignKey<RefreshToken>(rt => rt.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
     }
 }

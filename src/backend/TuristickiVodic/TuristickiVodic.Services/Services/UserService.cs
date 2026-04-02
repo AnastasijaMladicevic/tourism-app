@@ -1,5 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
 using TuristickiVodic.Core.DTOs;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
@@ -101,6 +103,8 @@ namespace TuristickiVodic.Services
             if (user == null)
                 return false;
 
+            await RevokeRefreshTokenAsync(user.Id);
+
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
 
@@ -118,6 +122,7 @@ namespace TuristickiVodic.Services
                 throw new InvalidOperationException("Current password is incorrect");
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(changePasswordDto.NewPassword);
+            await RevokeRefreshTokenAsync(user.Id);
             user.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -140,15 +145,51 @@ namespace TuristickiVodic.Services
             if (!user.IsActive)
                 throw new InvalidOperationException("Account is deactivated");
 
-            var token = _tokenService.GenerateToken(user);
-            var userDto = _mapper.Map<UserDto>(user);
+            return await IssueTokensAsync(user);
+        }
 
-            return new AuthResponseDto
-            {
-                Token = token,
-                User = userDto,
-                ExpiresAt = DateTime.UtcNow.AddHours(24)
-            };
+        public async Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenDto refreshTokenDto)
+        {
+            var refreshTokenHash = HashRefreshToken(refreshTokenDto.RefreshToken);
+
+            var storedRefreshToken = await _context.RefreshTokens
+                .FirstOrDefaultAsync(rt => rt.RefreshTokenHash == refreshTokenHash);
+
+            if (storedRefreshToken == null)
+                return null;
+
+            if (storedRefreshToken.RefreshTokenExpiry <= DateTime.UtcNow)
+                return null;
+
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == storedRefreshToken.UserId);
+
+            if (user == null)
+                return null;
+
+            if (user.IsBlacklisted)
+                throw new InvalidOperationException("User is blacklisted");
+
+            if (!user.IsActive)
+                throw new InvalidOperationException("Account is deactivated");
+
+            return await IssueTokensAsync(user);
+        }
+
+        public async Task<bool> LogoutAsync(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+
+            if (user == null)
+                return false;
+
+            await RevokeRefreshTokenAsync(user.Id);
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
         public async Task<bool> RequestCreatorRoleAsync(int userId, string creatorType)
@@ -186,6 +227,7 @@ namespace TuristickiVodic.Services
 
             user.RoleId = contentCreatorRole.Id;
             user.Role = contentCreatorRole;
+            await RevokeRefreshTokenAsync(user.Id);
             user.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -201,11 +243,67 @@ namespace TuristickiVodic.Services
                 return false;
 
             user.IsActive = isActive;
+
+            if (!isActive)
+            {
+                await RevokeRefreshTokenAsync(user.Id);
+            }
+
             user.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        private async Task<AuthResponseDto> IssueTokensAsync(User user)
+        {
+            var accessToken = _tokenService.GenerateToken(user);
+            var refreshToken = _tokenService.GenerateRefreshToken();
+
+            var refreshTokenEntity = await _context.RefreshTokens
+                .FirstOrDefaultAsync(rt => rt.UserId == user.Id);
+
+            if (refreshTokenEntity == null)
+            {
+                refreshTokenEntity = new RefreshToken
+                {
+                    UserId = user.Id
+                };
+
+                _context.RefreshTokens.Add(refreshTokenEntity);
+            }
+
+            refreshTokenEntity.RefreshTokenHash = HashRefreshToken(refreshToken);
+            refreshTokenEntity.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return new AuthResponseDto
+            {
+                Token = accessToken,
+                RefreshToken = refreshToken,
+                User = _mapper.Map<UserDto>(user),
+                ExpiresAt = DateTime.UtcNow.AddMinutes(15)
+            };
+        }
+
+        private async Task RevokeRefreshTokenAsync(int userId)
+        {
+            var refreshToken = await _context.RefreshTokens
+                .FirstOrDefaultAsync(rt => rt.UserId == userId);
+
+            if (refreshToken != null)
+            {
+                _context.RefreshTokens.Remove(refreshToken);
+            }
+        }
+
+        private static string HashRefreshToken(string refreshToken)
+        {
+            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
+            return Convert.ToBase64String(bytes);
         }
     }
 }

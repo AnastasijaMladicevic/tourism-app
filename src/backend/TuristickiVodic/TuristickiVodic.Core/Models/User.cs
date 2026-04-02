@@ -61,6 +61,7 @@ namespace TuristickiVodic.Core.Models
         public ICollection<UserLog> UserLogs { get; set; } = new List<UserLog>();
         public ICollection<ManagerReport> SentReports { get; set; } = new List<ManagerReport>();
 
+        public RefreshToken? RefreshToken { get; set; }
         public ICollection<TouristObject> CreatedObjects { get; set; } = new List<TouristObject>();
         public ICollection<Event> CreatedEvents { get; set; } = new List<Event>();
         public ICollection<Destination> CreatedDestinations { get; set; } = new List<Destination>();
