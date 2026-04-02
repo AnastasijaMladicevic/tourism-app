@@ -177,21 +177,6 @@ namespace TuristickiVodic.Services
             return await IssueTokensAsync(user);
         }
 
-        public async Task<bool> LogoutAsync(int userId)
-        {
-            var user = await _context.Users.FindAsync(userId);
-
-            if (user == null)
-                return false;
-
-            await RevokeRefreshTokenAsync(user.Id);
-            user.UpdatedAt = DateTime.UtcNow;
-
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
-
         public async Task<bool> RequestCreatorRoleAsync(int userId, string creatorType)
         {
             var user = await _context.Users
