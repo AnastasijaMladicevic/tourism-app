@@ -1,0 +1,76 @@
+<div class="page">
+  <div class="card">
+    <!-- Back button -->
+    <button class="back-btn" (click)="goBack()" aria-label="Go back">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M15 18L9 12L15 6"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
+
+    <!-- Logo -->
+    <div class="logo">
+      <img src="assets/minilogo.svg" alt="logo" />
+
+      <span class="logo-text">Spire<strong>GO</strong></span>
+    </div>
+
+    <!-- Heading -->
+    <h1 class="title">Code Verification</h1>
+    <p class="subtitle">
+      Enter OTP (One time password) sent to<br />
+      <span class="email">{{ email }}</span>
+    </p>
+
+    <!-- OTP inputs -->
+    <div class="otp-row" (paste)="onPaste($event)">
+      @for (val of otpValues; track $index) {
+        <input
+          #otpInput
+          class="otp-input"
+          [class.otp-input--filled]="otpValues[$index] !== ''"
+          [class.otp-input--error]="errorMessage !== ''"
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          autocomplete="one-time-code"
+          [value]="otpValues[$index]"
+          (input)="onInput($event, $index)"
+          (keydown)="onKeyDown($event, $index)"
+          [attr.aria-label]="'OTP digit ' + ($index + 1)"
+        />
+      }
+    </div>
+
+    <!-- Timer -->
+    <p class="timer" [class.timer--expired]="isExpired">{{ timerDisplay }}</p>
+
+    <!-- Error -->
+    @if (errorMessage) {
+      <p class="error" role="alert">{{ errorMessage }}</p>
+    }
+
+    <!-- Buttons -->
+    <button
+      class="btn btn-primary"
+      [class.btn-loading]="isLoading"
+      [disabled]="isLoading || !isOtpComplete || isExpired"
+      (click)="verifyCode()"
+    >
+      @if (isLoading) {
+        <span class="spinner"></span>
+      } @else {
+        Verify Code
+      }
+    </button>
+
+    <button class="btn btn-outline" [disabled]="isLoading" (click)="resendCode()">
+      Resend Code
+    </button>
+  </div>
+</div>

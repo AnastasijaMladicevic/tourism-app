@@ -24,9 +24,9 @@ export class ForgotPasswordComponent {
   submit() {
     if (this.form.valid) {
       console.log("Reset link sent to:", this.form.value.email);
+      this.router.navigate(['/code-verification'], { state: { email: this.form.value.email } });
 
       // kasnije ide backend
-      alert("Reset link sent!");
     } else {
       this.form.markAllAsTouched();
     }

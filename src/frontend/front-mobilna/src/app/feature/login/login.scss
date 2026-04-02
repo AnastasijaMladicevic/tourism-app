@@ -51,10 +51,11 @@
   gap: 15px;
 
 .input-group {
+  box-sizing: content-box;
   display: flex;
   align-items: center;
 box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  background: #EEF9FB;
+  background: var(--athens-gray);
   border-radius: 10px;
   padding: 10px;
   margin-bottom: 15px;
@@ -81,7 +82,7 @@ box-shadow: 0 5px 15px rgba(0,0,0,0.2);
   }
 
   .login-btn {
-    background: #168AAD;
+    background: var(--primary);
     color: white;
     font-weight: bold;
     font-size: 20;
@@ -97,7 +98,7 @@ box-shadow: 0 5px 15px rgba(0,0,0,0.2);
   cursor: pointer;
 }
 .terms{
-  color: #168AAD;
+  color: var(--primary);
   text-decoration: underline;
   font-weight: 500;
 }
@@ -110,12 +111,12 @@ box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 
   margin-top: 60px;
   font-size: 11px;
-  color: #555555;
+  color: var(--emperor);
 
 }
 .signup,
 .forgot {
-  color: #168AAD;
+  color: var(--primary);
 }
 
 .links {
@@ -123,7 +124,7 @@ box-shadow: 0 5px 15px rgba(0,0,0,0.2);
   flex-direction: column;
   align-items: center;
   text-align: center;
-  color: #555555;
+  color: var(--emperor);
 
   .link {
     cursor: pointer;
@@ -132,11 +133,6 @@ box-shadow: 0 5px 15px rgba(0,0,0,0.2);
   }
 }
 .error span{
-  color: #ff6d6f;
+  color: var(--error);
   font-size: 12px;
-}
-@media (min-width: 435px) {
-  .overlay {
-    background: rgba(200, 200, 200, 0.2);
-  }
 }
