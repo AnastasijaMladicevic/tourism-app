@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using TuristickiVodic.Core.Models;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace TuristickiVodic.Services
 {
@@ -25,7 +26,8 @@ namespace TuristickiVodic.Services
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Role, user.Role.Name.ToString())
+                new Claim(ClaimTypes.Role, user.Role.Name.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor
