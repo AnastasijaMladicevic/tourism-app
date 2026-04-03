@@ -90,6 +90,11 @@ box-shadow: 0 5px 15px rgba(0,0,0,0.2);
     height: 50px;
     border-radius: 20px;
   }
+  .login-btn[disabled]{
+    background-color: var(--primary);
+    color: white;
+    opacity: 0.5;
+  }
 }
 
 .links span,
