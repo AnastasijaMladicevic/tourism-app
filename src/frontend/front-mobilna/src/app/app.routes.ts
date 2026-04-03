@@ -8,7 +8,7 @@ export const routes: Routes = [
   { path: 'forgot-password', loadComponent: () => import('./feature/auth/forgot-password/forgot-password').then(m => m.ForgotPasswordComponent) },
   { path: 'terms', loadComponent: () => import('./feature/terms/terms.component').then(m => m.TermsComponent) },
   { path: 'code-verification', loadComponent: () => import('./feature/auth/code-verification/code-verification').then(m => m.CodeVerificationComponent) },
-  // { path: 'new-credentials',   loadComponent: () => import('./feature/auth/new-credentials/new-credentials.component').then(m => m.NewCredentialsComponent) },
+  { path: 'new-credentials', loadComponent: () => import('./feature/new-credentials/new-credentials.component').then(m => m.NewCredentialsComponent) },
   { path: 'password-updated', loadComponent: () => import('./feature/auth/password-updated/password-updated').then(m => m.PasswordUpdatedComponent) },
   // { path: 'home', loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent) },
 ];
