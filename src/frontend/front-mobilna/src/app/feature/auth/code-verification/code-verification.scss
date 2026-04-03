@@ -40,7 +40,7 @@ img {
   font-size: 32px;
   font-weight: bold;
   color: #067DE7;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 
   strong {
     font-weight: bold;
@@ -162,11 +162,6 @@ img {
   &:not(:disabled):hover {
     opacity: 0.92;
   }
-  &[disabled] {
-    background: var(--primary) !important;
-    color: #ffffff !important;
-    opacity: 0.5;
-  }
 }
 
 // ─── Outline button ────────────────────────────────────────────────────────────
@@ -197,13 +192,4 @@ img {
   .page{
   min-height: 100vh;
   }
-}
-button.btn-primary,
-button.btn-primary[disabled] {
-  background-color: #168AAD !important;
-  color: #ffffff !important;
-}
- 
-button.btn-primary[disabled] {
-  opacity: 0.5;
 }
