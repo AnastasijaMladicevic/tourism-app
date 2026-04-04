@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Services.Services;
 
@@ -26,39 +26,47 @@ namespace TuristickiVodic.API.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var image = await _service.GetByIdAsync(id);
-
             if (image == null)
                 return NotFound();
-
             return Ok(image);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateImageDto dto)
         {
-            var created = await _service.CreateAsync(dto);
-            return Ok(created);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var created = await _service.CreateAsync(dto);
+                return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, UpdateImageDto dto)
         {
-            var updated = await _service.UpdateAsync(id, dto);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            if (updated == null)
-                return NotFound();
-
-            return Ok(updated);
+            try
+            {
+                var updated = await _service.UpdateAsync(id, dto);
+                if (updated == null)
+                    return NotFound();
+                return Ok(updated);
+            }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var success = await _service.DeleteAsync(id);
-
             if (!success)
                 return NotFound();
-
             return NoContent();
         }
     }

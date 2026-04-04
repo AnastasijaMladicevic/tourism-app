@@ -83,7 +83,7 @@ namespace TuristickiVodic.Services
             return _mapper.Map<DestinationDto>(created);
         }
 
-        // Menadžer može da menja sadržaj svoje destinacije (naziv, opis, geolokaciju, tip).
+        // Samo Admin može da menja destinacije.
         // Promena menadžera ide kroz AssignManagerAsync - odvojeni Admin endpoint.
         public async Task<DestinationDto?> UpdateAsync(int id, UpdateDestinationDto dto, int requestingUserId, string roleName)
         {
@@ -93,9 +93,6 @@ namespace TuristickiVodic.Services
 
             if (destination == null)
                 return null;
-
-            if (roleName == "Manager" && destination.ManagedByUserId != requestingUserId)
-                throw new UnauthorizedAccessException("Manager can only update their own destination.");
 
             if (dto.DestinationTypeId.HasValue)
             {

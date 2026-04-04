@@ -119,7 +119,7 @@ namespace TuristickiVodic.Services.Services
         }
 
         // ContentCreator kreira event sa statusom Pending (čeka odobrenje menadžera)
-        // Manager i Admin kreiraju event sa statusom Approved
+        // Samo ContentCreator kreira event sa statusom Pending (čeka odobrenje menadžera)
         public async Task<EventDto> CreateAsync(CreateEventDto dto, int userId, string roleName)
         {
             await ValidateReferences(dto.EventTypeId, dto.LocalityId, dto.DestinationId, dto.ObjectId);
@@ -157,10 +157,8 @@ namespace TuristickiVodic.Services.Services
                 DestinationId = dto.DestinationId,
                 ObjectId = dto.ObjectId,
                 CreatedByUserId = userId,
-                // Manager i Admin kreiraju event direktno kao Approved
-                Status = (roleName == "Manager" || roleName == "Admin")
-                    ? ContentStatus.Approved
-                    : ContentStatus.Pending,
+                // ContentCreator uvek kreira event sa statusom Pending
+                Status = ContentStatus.Pending,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };

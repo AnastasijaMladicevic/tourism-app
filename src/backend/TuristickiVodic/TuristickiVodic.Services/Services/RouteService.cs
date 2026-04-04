@@ -78,11 +78,14 @@ namespace TuristickiVodic.Services.Services
             return MapToDto(await LoadRouteAsync(route.Id));
         }
 
-        // Vlasnik rute ili Admin može da je menja
+        // Samo vlasnik rute može da je menja
         public async Task<RouteDto?> UpdateAsync(int id, UpdateRouteDto dto, int userId)
         {
             var route = await LoadRouteAsync(id);
             if (route == null) return null;
+
+            if (route.CreatedByUserId != userId)
+                throw new UnauthorizedAccessException("You can only update your own routes.");
 
             if (!string.IsNullOrWhiteSpace(dto.Name)) route.Name = dto.Name;
             if (dto.Description != null) route.Description = dto.Description;
@@ -137,6 +140,8 @@ namespace TuristickiVodic.Services.Services
 
             if (route == null) return false;
 
+            if (route.CreatedByUserId != userId)
+                throw new UnauthorizedAccessException("You can only delete your own routes.");
 
             if (route.Favorites.Any())
                 throw new InvalidOperationException("Cannot delete a route that is in someone's favorites.");

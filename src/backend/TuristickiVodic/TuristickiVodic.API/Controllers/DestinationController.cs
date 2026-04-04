@@ -51,10 +51,9 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // Menadžer menja sadržaj svoje destinacije (naziv, opis, tip, geolokaciju)
-        // Admin može da menja bilo koju destinaciju
+        // Samo Admin može da menja destinacije
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateDestinationDto dto)
         {
             if (!ModelState.IsValid)
