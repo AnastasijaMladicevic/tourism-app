@@ -48,6 +48,21 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
+        // CC podnosi zahtev za brisanje svoje Approved aktivnosti
+        [HttpPost("/api/activities/{activityId}/deletion-request")]
+        [Authorize(Roles = "ContentCreator")]
+        public async Task<IActionResult> CreateForActivity(int activityId, [FromBody] CreateDeletionRequestDto dto)
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var result = await _deletionRequestService.CreateForActivityAsync(activityId, dto, userId);
+                return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+            }
+            catch (UnauthorizedAccessException) { return Forbid(); }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+        }
+
         // CC vidi samo svoje zahteve
         [HttpGet("my")]
         [Authorize(Roles = "ContentCreator")]

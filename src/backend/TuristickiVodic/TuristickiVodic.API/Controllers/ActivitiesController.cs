@@ -34,9 +34,9 @@ namespace TuristickiVodic.API.Controllers
             return Ok(activity);
         }
 
-        // ContentCreator kreira aktivnost (status Pending, čeka odobrenje); Menadžer kreira direktno kao Approved
+        // Samo ContentCreator može da kreira aktivnost (status -> Pending, čeka odobrenje menadžera)
         [HttpPost]
-        [Authorize(Roles = "ContentCreator,Manager")]
+        [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Create([FromBody] CreateActivityDto dto)
         {
             if (!ModelState.IsValid)
@@ -53,9 +53,10 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // CC menja svoju Pending aktivnost; Menadžer menja sve u svojoj destinaciji
+        // Samo ContentCreator može da menja svoju aktivnost
+        // Jednom odobrena aktivnost više ne mora da dobije dozvolu da bi bila izmenjena
         [HttpPut("{id}")]
-        [Authorize(Roles = "ContentCreator,Manager")]
+        [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateActivityDto dto)
         {
             if (!ModelState.IsValid)
@@ -73,24 +74,7 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // CC briše svoju Pending aktivnost; Menadžer briše sve u svojoj destinaciji
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "ContentCreator,Manager")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            try
-            {
-                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-                var roleName = User.FindFirstValue(ClaimTypes.Role)!;
-                var deleted = await _activityService.DeleteAsync(id, userId, roleName);
-                if (!deleted) return NotFound();
-                return NoContent();
-            }
-            catch (UnauthorizedAccessException) { return Forbid(); }
-            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
-        }
-
-        // Menadžer odobrava/odbija aktivnost u svojoj destinaciji
+        // Samo odgovorni menadžer može da odobri/odbije aktivnost u svojoj destinaciji
         [HttpPost("{id}/approve")]
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Approve(int id, [FromBody] ApproveContentDto dto)
@@ -105,6 +89,24 @@ namespace TuristickiVodic.API.Controllers
                 var updated = await _activityService.ApproveAsync(id, dto, userId, roleName);
                 if (updated == null) return NotFound();
                 return Ok(updated);
+            }
+            catch (UnauthorizedAccessException) { return Forbid(); }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+        }
+
+        // Samo ContentCreator može direktno da obriše svoju aktivnost koja nije Approved
+        // Approved aktivnost se briše kroz DeletionRequest
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "ContentCreator")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var roleName = User.FindFirstValue(ClaimTypes.Role)!;
+                var deleted = await _activityService.DeleteAsync(id, userId, roleName);
+                if (!deleted) return NotFound();
+                return NoContent();
             }
             catch (UnauthorizedAccessException) { return Forbid(); }
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }

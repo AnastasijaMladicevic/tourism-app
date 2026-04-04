@@ -48,7 +48,7 @@ namespace TuristickiVodic.Services
             // Destinacija mora imati menadžera pri kreiranju – ne može da se instancira bez njega
             var manager = await _context.Users
                 .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Id == dto.ManagedByUserId);
+                .FirstOrDefaultAsync(u => u.Id == dto.ManagedByUserId!.Value);
 
             if (manager == null)
                 throw new InvalidOperationException("Manager user not found.");
@@ -67,7 +67,7 @@ namespace TuristickiVodic.Services
                 Status = ContentStatus.Approved,
                 IsActive = dto.IsActive,
                 DestinationTypeId = dto.DestinationTypeId,
-                ManagedByUserId = dto.ManagedByUserId,
+                ManagedByUserId = dto.ManagedByUserId!.Value,
                 CreatedByUserId = userId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -131,11 +131,9 @@ namespace TuristickiVodic.Services
             return _mapper.Map<DestinationDto>(updated);
         }
 
-        /// <summary>
         /// Samo Admin može da promeni menadžera destinacije.
         /// Novi menadžer mora da ima rolu Manager i ne sme već da vodi drugu destinaciju.
         /// Stari menadžer se oslobađa (ManagedDestinationId -> null).
-        /// </summary>
         public async Task<DestinationDto?> AssignManagerAsync(int destinationId, int newManagerUserId)
         {
             var destination = await _context.Destinations

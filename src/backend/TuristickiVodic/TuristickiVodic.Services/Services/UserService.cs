@@ -111,23 +111,27 @@ namespace TuristickiVodic.Services
             return true;
         }
 
-        public async Task<bool> ChangePasswordAsync(int userId, ChangePasswordDto changePasswordDto)
+        public async Task ChangePasswordAsync(int userId, ChangePasswordDto dto, int currentUserId, string roleName)
         {
             var user = await _context.Users.FindAsync(userId);
 
             if (user == null)
-                return false;
+                throw new InvalidOperationException("User not found.");
 
-            if (!BCrypt.Net.BCrypt.Verify(changePasswordDto.CurrentPassword, user.PasswordHash))
-                throw new InvalidOperationException("Current password is incorrect");
+            if (roleName != "Admin")
+            {
+                if (user.Id != currentUserId)
+                    throw new UnauthorizedAccessException("You can change only your own password.");
 
-            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(changePasswordDto.NewPassword);
+                if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.PasswordHash))
+                    throw new InvalidOperationException("Current password is incorrect");
+            }
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
             await RevokeRefreshTokenAsync(user.Id);
             user.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
-
-            return true;
         }
 
         public async Task<AuthResponseDto?> LoginAsync(LoginDto loginDto)
@@ -200,6 +204,9 @@ namespace TuristickiVodic.Services
 
             if (user == null)
                 return false;
+
+            if (user.IsBlacklisted)
+                throw new InvalidOperationException("Blacklisted users cannot be approved for content creator role.");
 
             if (user.Role.Name != RoleType.Tourist)
                 throw new InvalidOperationException("Only tourists can be approved for content creator role");

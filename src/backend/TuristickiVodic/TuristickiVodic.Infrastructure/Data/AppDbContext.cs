@@ -451,7 +451,8 @@ public class AppDbContext : DbContext
             .ToTable(t => t.HasCheckConstraint(
                 "CK_DeletionRequest_OnlyOne",
                 @"(CASE WHEN ""ObjectId"" IS NOT NULL THEN 1 ELSE 0 END +
-                   CASE WHEN ""EventId"" IS NOT NULL THEN 1 ELSE 0 END) = 1"));
+                   CASE WHEN ""EventId"" IS NOT NULL THEN 1 ELSE 0 END +
+                   CASE WHEN ""ActivityId"" IS NOT NULL THEN 1 ELSE 0 END) = 1"));
 
         mb.Entity<DeletionRequest>()
             .HasOne(r => r.Object)
@@ -463,6 +464,12 @@ public class AppDbContext : DbContext
             .HasOne(r => r.Event)
             .WithMany()
             .HasForeignKey(r => r.EventId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<DeletionRequest>()
+            .HasOne(r => r.Activity)
+            .WithMany()
+            .HasForeignKey(r => r.ActivityId)
             .OnDelete(DeleteBehavior.Cascade);
 
         mb.Entity<DeletionRequest>()

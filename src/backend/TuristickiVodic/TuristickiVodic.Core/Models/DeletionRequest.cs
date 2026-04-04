@@ -16,6 +16,10 @@ namespace TuristickiVodic.Core.Models
         [ForeignKey("EventId")]
         public Event? Event { get; set; }
 
+        public int? ActivityId { get; set; }
+        [ForeignKey("ActivityId")]
+        public Activity? Activity { get; set; }
+
         [Required]
         public int RequestedByUserId { get; set; }
 

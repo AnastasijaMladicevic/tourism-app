@@ -91,6 +91,46 @@ namespace TuristickiVodic.Services.Services
             return await LoadDtoAsync(request.Id);
         }
 
+        // CC podnosi zahtev za brisanje svoje Approved aktivnosti
+        public async Task<DeletionRequestDto> CreateForActivityAsync(int activityId, CreateDeletionRequestDto dto, int requestedByUserId)
+        {
+            var activity = await _context.Activities
+                .Include(a => a.Destination)
+                .Include(a => a.Locality)
+                    .ThenInclude(l => l.Destination)
+                .FirstOrDefaultAsync(a => a.Id == activityId);
+
+            if (activity == null)
+                throw new InvalidOperationException("Activity not found.");
+
+            if (activity.CreatedByUserId != requestedByUserId)
+                throw new UnauthorizedAccessException("You can only request deletion of your own activities.");
+
+            if (activity.Status != ContentStatus.Approved)
+                throw new InvalidOperationException("Only approved activities require a deletion request. Pending activities can be deleted directly.");
+
+            var existing = await _context.DeletionRequests
+                .FirstOrDefaultAsync(r => r.ActivityId == activityId && r.Status == ContentStatus.Pending);
+
+            if (existing != null)
+                throw new InvalidOperationException("A deletion request for this activity is already pending.");
+
+            var request = new DeletionRequest
+            {
+                ActivityId = activityId,
+                RequestedByUserId = requestedByUserId,
+                Reason = dto.Reason,
+                Status = ContentStatus.Pending,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _context.DeletionRequests.Add(request);
+            await _context.SaveChangesAsync();
+
+            return await LoadDtoAsync(request.Id);
+        }
+
         // Menadžer vidi zahteve za svoju destinaciju, Admin vidi zahteve za destinacije bez menadžera
         public async Task<IEnumerable<DeletionRequestDto>> GetAllAsync(int userId, string roleName)
         {
@@ -100,27 +140,32 @@ namespace TuristickiVodic.Services.Services
                         .ThenInclude(l => l.Destination)
                 .Include(r => r.Event)
                     .ThenInclude(e => e.Destination)
+                .Include(r => r.Activity)
+                    .ThenInclude(a => a.Destination)
+                .Include(r => r.Activity)
+                    .ThenInclude(a => a.Locality)
+                        .ThenInclude(l => l.Destination)
                 .Include(r => r.RequestedBy)
                 .Include(r => r.ReviewedBy)
                 .AsQueryable();
 
             if (roleName == "Manager")
             {
-                // Menadžer vidi zahteve za svoju destinaciju.
-                // Ako je neka destinacija ostala bez menadžera (izuzetna situacija),
-                // najbliži menadžer preuzima odgovornost – ali ta logika se rešava
-                // na nivou ReviewAsync; ovde prikazujemo samo direktno dodeljene.
                 query = query.Where(r =>
                     (r.ObjectId != null && r.Object.Locality.Destination.ManagedByUserId == userId) ||
-                    (r.EventId != null && r.Event.Destination.ManagedByUserId == userId));
+                    (r.EventId != null && r.Event.Destination.ManagedByUserId == userId) ||
+                    (r.ActivityId != null && (
+                        r.Activity.Destination.ManagedByUserId == userId ||
+                        (r.Activity.Locality != null && r.Activity.Locality.Destination.ManagedByUserId == userId))));
             }
             else if (roleName == "Admin")
             {
-                // Admin može da vidi zahteve samo za destinacije koje nemaju menadžera.
-                // Ovo je izuzetna situacija – u normalnom toku destinacija uvek ima menadžera.
                 query = query.Where(r =>
                     (r.ObjectId != null && r.Object.Locality.Destination.ManagedByUserId == null) ||
-                    (r.EventId != null && r.Event.Destination.ManagedByUserId == null));
+                    (r.EventId != null && r.Event.Destination.ManagedByUserId == null) ||
+                    (r.ActivityId != null && (
+                        r.Activity.Destination.ManagedByUserId == null ||
+                        (r.Activity.Locality != null && r.Activity.Locality.Destination.ManagedByUserId == null))));
             }
 
             var requests = await query.OrderByDescending(r => r.CreatedAt).ToListAsync();
@@ -132,6 +177,7 @@ namespace TuristickiVodic.Services.Services
             var requests = await _context.DeletionRequests
                 .Include(dr => dr.Object)
                 .Include(dr => dr.Event)
+                .Include(dr => dr.Activity)
                 .Include(dr => dr.RequestedBy)
                 .Include(dr => dr.ReviewedBy)
                 .Where(dr => dr.RequestedByUserId == userId)
@@ -146,6 +192,7 @@ namespace TuristickiVodic.Services.Services
             var request = await _context.DeletionRequests
                 .Include(dr => dr.Object)
                 .Include(dr => dr.Event)
+                .Include(dr => dr.Activity)
                 .Include(dr => dr.RequestedBy)
                 .Include(dr => dr.ReviewedBy)
                 .FirstOrDefaultAsync(dr => dr.Id == id);
@@ -166,6 +213,11 @@ namespace TuristickiVodic.Services.Services
                         .ThenInclude(l => l.Destination)
                 .Include(r => r.Event)
                     .ThenInclude(e => e.Destination)
+                .Include(r => r.Activity)
+                    .ThenInclude(a => a.Destination)
+                .Include(r => r.Activity)
+                    .ThenInclude(a => a.Locality)
+                        .ThenInclude(l => l.Destination)
                 .Include(r => r.RequestedBy)
                 .Include(r => r.ReviewedBy)
                 .FirstOrDefaultAsync(r => r.Id == requestId);
@@ -176,10 +228,12 @@ namespace TuristickiVodic.Services.Services
             if (request.Status != ContentStatus.Pending)
                 throw new InvalidOperationException("This request has already been reviewed.");
 
-            // Odredi destinaciju iz objekta ili eventa
+            // Odredi destinaciju iz objekta, eventa ili aktivnosti
             var destination = request.ObjectId != null
                 ? request.Object?.Locality?.Destination
-                : request.Event?.Destination;
+                : request.EventId != null
+                    ? request.Event?.Destination
+                    : request.Activity?.Destination ?? request.Activity?.Locality?.Destination;
 
             // Proverava ko je odgovoran menadžer za ovu destinaciju.
             // Ako destinacija ima svog menadžera – samo on može da obradi zahtev.
@@ -209,6 +263,8 @@ namespace TuristickiVodic.Services.Services
                     _context.Objects.Remove(request.Object!);
                 else if (request.EventId != null)
                     _context.Events.Remove(request.Event!);
+                else if (request.ActivityId != null)
+                    _context.Activities.Remove(request.Activity!);
             }
 
             await _context.SaveChangesAsync();
@@ -221,6 +277,7 @@ namespace TuristickiVodic.Services.Services
             var request = await _context.DeletionRequests
                 .Include(r => r.Object)
                 .Include(r => r.Event)
+                .Include(r => r.Activity)
                 .Include(r => r.RequestedBy)
                 .Include(r => r.ReviewedBy)
                 .FirstAsync(r => r.Id == requestId);
@@ -233,6 +290,7 @@ namespace TuristickiVodic.Services.Services
             var request = await _context.DeletionRequests
                 .Include(dr => dr.Object)
                 .Include(dr => dr.Event)
+                .Include(dr => dr.Activity)
                 .Include(dr => dr.RequestedBy)
                 .Include(dr => dr.ReviewedBy)
                 .FirstOrDefaultAsync(dr => dr.Id == id && dr.RequestedByUserId == userId);
@@ -250,6 +308,8 @@ namespace TuristickiVodic.Services.Services
             ObjectName = r.Object?.Name,
             EventId = r.EventId,
             EventName = r.Event?.Name,
+            ActivityId = r.ActivityId,
+            ActivityName = r.Activity?.Name,
             RequestedByUserId = r.RequestedByUserId,
             RequestedByName = r.RequestedBy != null
                 ? $"{r.RequestedBy.FirstName} {r.RequestedBy.LastName}"

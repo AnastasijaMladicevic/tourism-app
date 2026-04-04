@@ -159,6 +159,7 @@ namespace TuristickiVodic.Services.Services
         public async Task<bool> DeleteAsync(int id, int userId, string roleName)
         {
             var obj = await _context.Objects
+                .Include(o => o.Reviews)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (obj == null) return false;
@@ -171,6 +172,10 @@ namespace TuristickiVodic.Services.Services
 
             if (obj.Status == ContentStatus.Approved)
                 throw new InvalidOperationException("Cannot delete an approved object directly. Submit a deletion request.");
+
+            // Recenzije se brišu zajedno sa objektom (cascade)
+            if (obj.Reviews != null && obj.Reviews.Any())
+                _context.Reviews.RemoveRange(obj.Reviews);
 
             _context.Objects.Remove(obj);
             await _context.SaveChangesAsync();

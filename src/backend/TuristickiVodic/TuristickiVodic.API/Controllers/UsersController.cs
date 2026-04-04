@@ -170,6 +170,7 @@ namespace TuristickiVodic.API.Controllers
                 return BadRequest(ModelState);
 
             var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var roleName = User.FindFirst(ClaimTypes.Role)!.Value;
             var isAdmin = User.IsInRole("Admin");
 
             if (!isAdmin && currentUserId != id)
@@ -177,11 +178,12 @@ namespace TuristickiVodic.API.Controllers
 
             try
             {
-                var result = await _userService.ChangePasswordAsync(id, changePasswordDto);
-                if (!result)
-                    return NotFound();
-
+                await _userService.ChangePasswordAsync(id, changePasswordDto, currentUserId, roleName);
                 return Ok(new { message = "Password changed successfully" });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
             }
             catch (InvalidOperationException ex)
             {

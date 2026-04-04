@@ -67,7 +67,13 @@ namespace TuristickiVodic.Services.Services
                      (e.Object != null && ((e.Object.Locality != null && e.Object.Locality.DestinationId == destinationId) ||
                                            e.Object.DestinationId == destinationId))));
 
-            if (!hasObjectInDestination && !hasEventInDestination)
+            var hasActivityInDestination = await _context.Activities
+                .Include(a => a.Locality)
+                .AnyAsync(a => a.CreatedByUserId == dto.ReportedUserId &&
+                    ((a.DestinationId == destinationId) ||
+                     (a.Locality != null && a.Locality.DestinationId == destinationId)));
+
+            if (!hasObjectInDestination && !hasEventInDestination && !hasActivityInDestination)
                 throw new InvalidOperationException("The content creator must have content in your destination.");
 
             var existingPending = await _context.ManagerReports
