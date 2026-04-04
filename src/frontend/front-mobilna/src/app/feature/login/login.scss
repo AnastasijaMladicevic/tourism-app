@@ -2,9 +2,9 @@
 .login-container {
   height: 100vh;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
+  gap: 48px;
 }
 
 .overlay {
@@ -140,4 +140,17 @@ box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 .error span{
   color: var(--error);
   font-size: 12px;
+}
+.image-side {
+  display: none;
+
+  img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  @media (min-width: 768px) {
+    display: flex;
+  }
 }
