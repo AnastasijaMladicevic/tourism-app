@@ -21,29 +21,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 120px;
-  .text-noise {
-    position: relative;
-    display: inline-block;
-  }
-  img {
-    width: 70px;
-    height: auto;
-  }
-
-  h1 {
-    margin: 0;
-  }
-
-  h1 {
-    font-size: 32px;
-    font-weight: bold;
-    color: #38DFF6;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  }
-  h1 span{
-    color: #067DE7;
-  }
 }
 .form {
   display: flex;
@@ -140,17 +117,4 @@ box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 .error span{
   color: var(--error);
   font-size: 12px;
-}
-.image-side {
-  display: none;
-
-  img {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-  }
-
-  @media (min-width: 768px) {
-    display: flex;
-  }
 }

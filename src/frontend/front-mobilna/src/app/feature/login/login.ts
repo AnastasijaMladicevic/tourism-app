@@ -2,78 +2,79 @@ import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { LogoComponent } from '../../shared/components/logo/logo';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, LogoComponent],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
 export class LoginComponent {
   form: FormGroup;
+  hidePassword = true;
+  isLoading = false;
+  errorMessage = '';
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private authService: AuthService,
+  ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [
         Validators.required,
         Validators.minLength(6),
-        this.passwordStrengthValidator
-      ]]
+        this.passwordStrengthValidator,
+      ]],
     });
   }
-  hidePassword = true;
+
   passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
     const value = control.value;
     if (!value) return null;
-
     const hasUpperCase = /[A-Z]/.test(value);
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(value);
     const hasNumber = /[0-9]/.test(value);
-    const valid = hasUpperCase && hasSpecialChar && hasNumber;
-    return valid ? null : { weakPassword: true };
+    return hasUpperCase && hasSpecialChar && hasNumber ? null : { weakPassword: true };
   }
 
-  submit() {
-    if (this.form.valid) {
-      this.login()
-    } else {
-      console.log('Forma nije validna');
-    }
-  }
-  get email() {
-    return this.form.get('email');
-  }
-  get password() {
-    return this.form.get('password');
-  }
-  togglePassword() {
-    this.hidePassword = !this.hidePassword;
-  }
-  login() {
-    if (this.form.valid) {
-      console.log("Login data:", this.form.value);
-      setTimeout(() => {
-        this.goHome();
-      }, 500);
-    } else {
-      this.form.markAllAsTouched();
-    }
-  }
-  goHome() {
-    this.router.navigate(['/home']);
+  get email() { return this.form.get('email'); }
+  get password() { return this.form.get('password'); }
+
+  togglePassword(): void { this.hidePassword = !this.hidePassword; }
+
+  submit(): void {
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    this.login();
   }
 
-  goRegister() {
-    this.router.navigate(['/register']);
+  login(): void {
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.authService.login({
+      email: this.form.value.email,
+      password: this.form.value.password,
+    }).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.router.navigate(['/home']);
+      },
+      error: err => {
+        this.isLoading = false;
+        this.errorMessage = err?.error?.message ?? 'Invalid email or password.';
+      },
+    });
   }
 
-  goForgot() {
-    this.router.navigate(['/forgot-password']);
-  }
-
-  goTerms() {
-    this.router.navigate(['/terms']);
-  }
+  goHome(): void { this.router.navigate(['/home']); }
+  goRegister(): void { this.router.navigate(['/register']); }
+  goForgot(): void { this.router.navigate(['/forgot-password']); }
+  goTerms(): void { this.router.navigate(['/terms']); }
 }

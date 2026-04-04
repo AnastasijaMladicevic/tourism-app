@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { LogoComponent } from '../../../shared/components/logo/logo';
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, LogoComponent],
   templateUrl: './forgot-password.html',
   styleUrls: ['./forgot-password.scss']
 })

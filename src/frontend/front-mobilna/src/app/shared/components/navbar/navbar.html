@@ -1,0 +1,33 @@
+@if (isVisible) {
+  <!-- ── Desktop sidebar (left, sticky) ── -->
+  <nav class="sidebar">
+    <div class="sidebar__logo">
+      <app-logo size="sm"></app-logo>
+    </div>
+
+    @for (item of navItems; track item.route) {
+      <button
+        class="sidebar__item"
+        [class.sidebar__item--active]="isActive(item.route)"
+        (click)="goTo(item.route)"
+      >
+        <mat-icon>{{ item.icon }}</mat-icon>
+        <span>{{ item.label }}</span>
+      </button>
+    }
+  </nav>
+
+  <!-- ── Mobile bottom nav ── -->
+  <nav class="bottom-nav">
+    @for (item of navItems; track item.route) {
+      <button
+        class="bottom-nav__item"
+        [class.bottom-nav__item--active]="isActive(item.route)"
+        (click)="goTo(item.route)"
+      >
+        <mat-icon>{{ item.icon }}</mat-icon>
+        <span>{{ item.label }}</span>
+      </button>
+    }
+  </nav>
+}

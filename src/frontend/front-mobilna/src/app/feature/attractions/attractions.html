@@ -1,0 +1,193 @@
+<div class="screen">
+  <!-- ── Header ── -->
+  <div class="header">
+    <button class="icon-btn" (click)="goBack()" aria-label="Go back">
+      <mat-icon>arrow_back_ios</mat-icon>
+    </button>
+
+    <!-- Title — hidden on desktop when search is open -->
+    <h1 class="header__title" [class.header__title--hidden]="showSearch">Attractions</h1>
+
+    <!-- Desktop inline search (visible when showSearch=true on large screens) -->
+    <div class="header__search-inline" [class.header__search-inline--open]="showSearch">
+      <mat-icon class="search-inline__icon">search</mat-icon>
+      <input
+        #desktopSearch
+        class="search-inline__input"
+        type="text"
+        placeholder="Search attractions..."
+        [(ngModel)]="searchQuery"
+      />
+      <button class="icon-btn" (click)="toggleSearch()" aria-label="Close search">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="header__actions">
+      <button class="icon-btn" (click)="toggleSearch()" aria-label="Search">
+        <mat-icon>search</mat-icon>
+      </button>
+
+      <!-- Sort button with label -->
+      <button
+        class="sort-anchor icon-btn sort-btn"
+        (click)="$event.stopPropagation(); showSortMenu = !showSortMenu"
+        aria-label="Sort"
+      >
+        <mat-icon>swap_vert</mat-icon>
+      </button>
+
+      <!-- Sort dropdown -->
+      @if (showSortMenu) {
+        <div class="sort-menu sort-anchor">
+          <button
+            class="sort-menu__item"
+            [class.sort-menu__item--active]="sortOption === 'rating'"
+            (click)="setSort('rating')"
+          >
+            <mat-icon>star</mat-icon> Top Rated
+          </button>
+          <button
+            class="sort-menu__item"
+            [class.sort-menu__item--active]="sortOption === 'distance'"
+            (click)="setSort('distance')"
+          >
+            <mat-icon>near_me</mat-icon> Nearest First
+          </button>
+          <button
+            class="sort-menu__item"
+            [class.sort-menu__item--active]="sortOption === 'az'"
+            (click)="setSort('az')"
+          >
+            <mat-icon>sort_by_alpha</mat-icon> A → Z
+          </button>
+          <button
+            class="sort-menu__item"
+            [class.sort-menu__item--active]="sortOption === 'za'"
+            (click)="setSort('za')"
+          >
+            <mat-icon>sort_by_alpha</mat-icon> Z → A
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- ── Mobile search bar (below header, only on mobile) ── -->
+  @if (showSearch) {
+    <div class="search-bar mobile-only">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        placeholder="Search attractions..."
+        [(ngModel)]="searchQuery"
+        class="search-bar__input"
+        autofocus
+      />
+      @if (searchQuery) {
+        <button class="icon-btn" (click)="searchQuery = ''" aria-label="Clear">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </div>
+  }
+
+  <!-- ── Filter tabs ── -->
+  <div class="filters">
+    <button
+      class="filter-btn"
+      [class.filter-btn--active]="activeFilter === 'All'"
+      (click)="setFilter('All')"
+    >
+      All
+    </button>
+    @for (type of destinationTypes; track type.id) {
+      <button
+        class="filter-btn"
+        [class.filter-btn--active]="activeFilter === type.name"
+        (click)="setFilter(type.name)"
+      >
+        {{ type.name }}
+      </button>
+    }
+  </div>
+
+  <!-- ── Results bar ── -->
+  <div class="results-bar">
+    <span class="results-bar__count">{{ filtered.length }} places found</span>
+    <span class="results-bar__sort">
+      <mat-icon>swap_vert</mat-icon>
+      {{ sortLabel() }}
+    </span>
+  </div>
+  @if (isLoading) {
+    <div class="loading">
+      <mat-icon>hourglass_empty</mat-icon>
+      <p>Loading attractions...</p>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="error-state">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ errorMessage }}</p>
+      <button (click)="loadData()">Retry</button>
+    </div>
+  }
+
+  <!-- ── Grid ── -->
+  <div class="grid">
+    @for (destination of filtered; track destination.id) {
+      <div class="card">
+        <!-- Image -->
+        <div class="card__image-wrap">
+          <img class="card__image" [src]="getMainImage(destination)" [alt]="destination.name" />
+          <span class="card__distance">
+            <mat-icon>radio_button_checked</mat-icon>
+            {{ formatDistance(destination.distanceKm) }}
+          </span>
+          <button
+            class="card__fav"
+            [class.card__fav--active]="destination.isFavorite"
+            (click)="toggleFavorite(destination, $event)"
+            aria-label="Toggle favourite"
+          >
+            <mat-icon>{{ destination.isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="card__body">
+          <div class="card__title-row">
+            <h2 class="card__name">{{ destination.name }}</h2>
+            <span class="card__rating">
+              <mat-icon>star</mat-icon>
+              {{ destination.averageRating?.toFixed(1) }}
+            </span>
+          </div>
+
+          <p class="card__type">
+            <mat-icon>place</mat-icon>
+            {{ destination.destinationTypeName }}
+          </p>
+
+          <p class="card__desc">{{ destination.description }}</p>
+
+          <div class="card__footer">
+            <span class="card__reviews"
+              >{{ destination.reviewCount?.toLocaleString() }} REVIEWS</span
+            >
+            <button class="card__details" (click)="viewDetails(destination)">VIEW DETAILS</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (filtered.length === 0) {
+      <div class="empty">
+        <mat-icon>search_off</mat-icon>
+        <p>No attractions found.</p>
+      </div>
+    }
+  </div>
+</div>
