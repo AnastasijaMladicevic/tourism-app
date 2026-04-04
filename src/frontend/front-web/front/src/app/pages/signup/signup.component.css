@@ -1,0 +1,106 @@
+.container {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #F0FAFE;
+}
+
+.container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  display: flex;
+  width: 900px;
+  height: 550px;
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* LEFT SIDE nije uradjena zato sto jos uvek nemam potrebnu sliku i logo
+.left {
+  width: 50%;
+  background: url('../../../assets/pozadina.webp') no-repeat center center;
+  background-size: cover;
+}*/
+
+.left img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* RIGHT SIDE */
+.right {
+  width: 50%;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.right h2 {
+  margin-bottom: 20px;
+}
+
+/* INPUT */
+.input-group {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.input-group input {
+  width: 80%;
+  padding: 12px 40px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  outline: none;
+}
+
+.icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.eye {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+/* BUTTON */
+.btn {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #2aa7ff;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #1b8fe0;
+}
+
+/* HELP TEXT */
+.help {
+  margin-top: 15px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.help a {
+  color: #2aa7ff;
+  text-decoration: none;
+}
