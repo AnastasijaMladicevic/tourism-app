@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TuristickiVodic.Core.DTOs
+namespace TuristickiVodic.Core.DTO
 {
     public class CreateUserDto
     {

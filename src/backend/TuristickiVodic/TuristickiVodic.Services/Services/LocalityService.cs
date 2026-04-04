@@ -1,8 +1,8 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.Operation.Distance;
 using TuristickiVodic.Core.DTO;
-using TuristickiVodic.Core.DTOs;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
 using TuristickiVodic.Services.Services;
@@ -55,15 +55,18 @@ namespace TuristickiVodic.Services
             if (!localityTypeExists)
                 throw new InvalidOperationException("Locality type not found");
 
+            // Samo menadžer upravlja lokalitetima.
+            // Ako je destinacija ostala bez menadžera (izuzetna situacija),
+            // odgovornost preuzima menadžer geografski najbliže destinacije – NE admin.
             if (roleName == "Manager")
             {
-                if (destination.ManagedByUserId != userId)
-                    throw new InvalidOperationException("Manager can create localities only for the destination they manage");
+                var isResponsible = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, destination, userId);
+                if (!isResponsible)
+                    throw new InvalidOperationException("You are not the responsible manager for this destination.");
             }
             else if (roleName == "Admin")
             {
-                if (destination.ManagedByUserId != null)
-                    throw new InvalidOperationException("Admin can create localities only for destinations without a manager");
+                throw new InvalidOperationException("Admins cannot manage localities directly. The responsible manager handles localities.");
             }
 
             var locality = new Core.Models.Locality
@@ -108,21 +111,30 @@ namespace TuristickiVodic.Services
             if (destination == null)
                 throw new InvalidOperationException("Destination not found");
 
+            // Samo menadžer može da menja lokalitete.
+            // Ako je destinacija ostala bez menadžera (izuzetna situacija),
+            // odgovornost preuzima menadžer geografski najbliže destinacije – NE admin.
             if (roleName == "Manager")
             {
-                if (locality.Destination?.ManagedByUserId != userId)
-                    throw new InvalidOperationException("Manager can update only localities in their own destination");
+                // Proverava odgovornost za trenutnu destinaciju lokaliteta
+                if (locality.Destination == null)
+                    throw new InvalidOperationException("Cannot determine destination of this locality.");
 
-                if (destination.ManagedByUserId != userId)
-                    throw new InvalidOperationException("Manager can move localities only within destinations they manage");
+                var isResponsibleForCurrent = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, locality.Destination, userId);
+                if (!isResponsibleForCurrent)
+                    throw new InvalidOperationException("You are not the responsible manager for the current destination of this locality.");
+
+                // Ako se lokalitet premešta, proverava i ciljnu destinaciju
+                if (dto.DestinationId.HasValue && dto.DestinationId.Value != locality.DestinationId)
+                {
+                    var isResponsibleForTarget = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, destination, userId);
+                    if (!isResponsibleForTarget)
+                        throw new InvalidOperationException("You are not the responsible manager for the target destination.");
+                }
             }
             else if (roleName == "Admin")
             {
-                if (locality.Destination?.ManagedByUserId != null)
-                    throw new InvalidOperationException("Admin can update localities only when the current destination has no manager");
-
-                if (destination.ManagedByUserId != null)
-                    throw new InvalidOperationException("Admin can move localities only to destinations without a manager");
+                throw new InvalidOperationException("Admins cannot manage localities directly. The responsible manager handles localities.");
             }
 
             if (dto.LocalityTypeId.HasValue)
@@ -172,15 +184,21 @@ namespace TuristickiVodic.Services
             if (locality == null)
                 return false;
 
+            // Samo menadžer može da briše lokalitete.
+            // Ako je destinacija ostala bez menadžera (izuzetna situacija),
+            // odgovornost preuzima menadžer geografski najbliže destinacije – NE admin.
             if (roleName == "Manager")
             {
-                if (locality.Destination?.ManagedByUserId != userId)
-                    throw new InvalidOperationException("Manager can delete localities only for the destination they manage");
+                if (locality.Destination == null)
+                    throw new InvalidOperationException("Cannot determine destination of this locality.");
+
+                var isResponsible = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, locality.Destination, userId);
+                if (!isResponsible)
+                    throw new InvalidOperationException("You are not the responsible manager for this destination.");
             }
             else if (roleName == "Admin")
             {
-                if (locality.Destination?.ManagedByUserId != null)
-                    throw new InvalidOperationException("Admin can delete localities only when the destination has no manager");
+                throw new InvalidOperationException("Admins cannot delete localities directly. The responsible manager handles localities.");
             }
 
             _context.Localities.Remove(locality);

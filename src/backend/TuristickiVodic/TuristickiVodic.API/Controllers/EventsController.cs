@@ -19,10 +19,27 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] EventFilterDto? filter)
         {
-            var events = await _eventService.GetAllAsync();
-            return Ok(events);
+            try
+            {
+                if (filter == null ||
+                    (!filter.Date.HasValue &&
+                     !filter.NextDays.HasValue &&
+                     !filter.StartDate.HasValue &&
+                     !filter.EndDate.HasValue))
+                {
+                    var events = await _eventService.GetAllAsync();
+                    return Ok(events);
+                }
+
+                var filteredEvents = await _eventService.GetAllAsync(filter);
+                return Ok(filteredEvents);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpGet("{id}")]
@@ -34,7 +51,7 @@ namespace TuristickiVodic.API.Controllers
             return Ok(ev);
         }
 
-        // ContentCreator i Menadžer mogu da kreiraju evente
+        // Samo ContentCreator može da kreira event (status -> Pending, čeka odobrenje menadžera)
         [HttpPost]
         [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Create([FromBody] CreateEventDto dto)
@@ -70,9 +87,9 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // Menadžer (za svoju destinaciju) ili Admin odobrava/odbija event
+        // Samo odgovorni menadžer može da odobri/odbije event
         [HttpPost("{id}/approve")]
-        [Authorize(Roles = "Manager,Admin")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Approve(int id, [FromBody] ApproveContentDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -86,8 +103,10 @@ namespace TuristickiVodic.API.Controllers
                 return Ok(updated);
             }
             catch (UnauthorizedAccessException) { return Forbid(); }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
+        // Samo ContentCreator može direktno da obriše event koji nije Approved
         [HttpDelete("{id}")]
         [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Delete(int id)
@@ -101,6 +120,7 @@ namespace TuristickiVodic.API.Controllers
                 return NoContent();
             }
             catch (UnauthorizedAccessException) { return Forbid(); }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
     }
 }

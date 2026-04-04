@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TuristickiVodic.Core.DTOs
+namespace TuristickiVodic.Core.DTO
 {
     public class ActivityDto
     {
@@ -37,6 +37,14 @@ namespace TuristickiVodic.Core.DTOs
         public string? ObjectName { get; set; }
 
         public int CreatedByUserId { get; set; }
+
+        public string Status { get; set; } = string.Empty;
+
+        public int? ApprovedByUserId { get; set; }
+
+        public DateTime? ApprovedAt { get; set; }
+
+        public string? RejectionReason { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

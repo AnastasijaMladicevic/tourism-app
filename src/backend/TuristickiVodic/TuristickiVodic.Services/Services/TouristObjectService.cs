@@ -125,21 +125,24 @@ namespace TuristickiVodic.Services.Services
 
             var destination = obj.Locality?.Destination;
 
+            // Proverava ko je odgovoran menadžer za ovu destinaciju.
+            // Ako destinacija ima svog menadžera – samo on može da odobri.
+            // Ako je ostala bez menadžera (izuzetna situacija) – odgovornost preuzima
+            // menadžer geografski najbliže destinacije, NE admin.
             if (roleName == "Manager")
             {
-                // Menadžer može samo za svoju destinaciju
-                if (destination?.ManagedByUserId != userId)
-                    throw new UnauthorizedAccessException("Manager can only approve objects in their destination.");
+                var isResponsible = destination != null &&
+                    await DestinationManagerHelper.IsResponsibleManagerAsync(_context, destination, userId);
+                if (!isResponsible)
+                    throw new UnauthorizedAccessException("You are not the responsible manager for this destination.");
             }
             else if (roleName == "Admin")
             {
-                // Admin može samo ako destinacija nema Menadžera
-                if (destination?.ManagedByUserId != null)
-                    throw new UnauthorizedAccessException("This destination has a manager. The manager must approve this object.");
+                throw new UnauthorizedAccessException("Admins do not directly approve tourist objects. The responsible manager handles approvals.");
             }
             else
             {
-                throw new UnauthorizedAccessException("Only a manager or admin can approve objects.");
+                throw new UnauthorizedAccessException("Only the responsible manager can approve objects.");
             }
 
             obj.Status = dto.Approve ? ContentStatus.Approved : ContentStatus.Rejected;

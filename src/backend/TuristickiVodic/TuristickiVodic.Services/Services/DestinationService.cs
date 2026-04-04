@@ -1,7 +1,7 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
-using TuristickiVodic.Core.DTOs;
+using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
 
@@ -45,6 +45,20 @@ namespace TuristickiVodic.Services
             if (!destinationTypeExists)
                 throw new InvalidOperationException("Destination type not found");
 
+            // Destinacija mora imati menadžera pri kreiranju – ne može da se instancira bez njega
+            var manager = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == dto.ManagedByUserId);
+
+            if (manager == null)
+                throw new InvalidOperationException("Manager user not found.");
+
+            if (manager.Role?.Name != RoleType.Manager)
+                throw new InvalidOperationException("The assigned user does not have the Manager role.");
+
+            if (manager.ManagedDestinationId != null)
+                throw new InvalidOperationException("This manager already manages another destination. Each manager can manage only one destination.");
+
             var destination = new Destination
             {
                 Name = dto.Name,
@@ -53,6 +67,7 @@ namespace TuristickiVodic.Services
                 Status = ContentStatus.Approved,
                 IsActive = dto.IsActive,
                 DestinationTypeId = dto.DestinationTypeId,
+                ManagedByUserId = dto.ManagedByUserId,
                 CreatedByUserId = userId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -68,7 +83,8 @@ namespace TuristickiVodic.Services
             return _mapper.Map<DestinationDto>(created);
         }
 
-        // Admin može sve; Menadžer može samo svoju destinaciju
+        // Menadžer može da menja sadržaj svoje destinacije (naziv, opis, geolokaciju, tip).
+        // Promena menadžera ide kroz AssignManagerAsync - odvojeni Admin endpoint.
         public async Task<DestinationDto?> UpdateAsync(int id, UpdateDestinationDto dto, int requestingUserId, string roleName)
         {
             var destination = await _context.Destinations
@@ -111,6 +127,62 @@ namespace TuristickiVodic.Services
             var updated = await _context.Destinations
                 .Include(d => d.DestinationType)
                 .FirstAsync(d => d.Id == destination.Id);
+
+            return _mapper.Map<DestinationDto>(updated);
+        }
+
+        /// <summary>
+        /// Samo Admin može da promeni menadžera destinacije.
+        /// Novi menadžer mora da ima rolu Manager i ne sme već da vodi drugu destinaciju.
+        /// Stari menadžer se oslobađa (ManagedDestinationId -> null).
+        /// </summary>
+        public async Task<DestinationDto?> AssignManagerAsync(int destinationId, int newManagerUserId)
+        {
+            var destination = await _context.Destinations
+                .Include(d => d.DestinationType)
+                .FirstOrDefaultAsync(d => d.Id == destinationId);
+
+            if (destination == null)
+                return null;
+
+            var newManager = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == newManagerUserId);
+
+            if (newManager == null)
+                throw new InvalidOperationException("User not found.");
+
+            if (newManager.Role?.Name != RoleType.Manager)
+                throw new InvalidOperationException("The assigned user does not have the Manager role.");
+
+            if (newManager.ManagedDestinationId != null && newManager.ManagedDestinationId != destinationId)
+                throw new InvalidOperationException("This manager already manages another destination.");
+
+            // Oslobodi starog menadžera ako postoji
+            if (destination.ManagedByUserId.HasValue && destination.ManagedByUserId != newManagerUserId)
+            {
+                var oldManager = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Id == destination.ManagedByUserId.Value);
+
+                if (oldManager != null)
+                {
+                    oldManager.ManagedDestinationId = null;
+                    oldManager.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+            // Dodeli novog menadžera
+            destination.ManagedByUserId = newManagerUserId;
+            destination.UpdatedAt = DateTime.UtcNow;
+
+            newManager.ManagedDestinationId = destinationId;
+            newManager.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            var updated = await _context.Destinations
+                .Include(d => d.DestinationType)
+                .FirstAsync(d => d.Id == destinationId);
 
             return _mapper.Map<DestinationDto>(updated);
         }

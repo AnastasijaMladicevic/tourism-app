@@ -18,6 +18,17 @@ namespace TuristickiVodic.Services.Services
             _mapper = mapper;
         }
 
+        private static DateTime EnsureUtc(DateTime value)
+        {
+            return value.Kind switch
+            {
+                DateTimeKind.Utc => value,
+                DateTimeKind.Local => value.ToUniversalTime(),
+                DateTimeKind.Unspecified => DateTime.SpecifyKind(value, DateTimeKind.Utc),
+                _ => value
+            };
+        }
+
         public async Task<IEnumerable<EventDto>> GetAllAsync()
         {
             var events = await _context.Events
@@ -26,6 +37,70 @@ namespace TuristickiVodic.Services.Services
                 .Include(e => e.Destination)
                 .Include(e => e.Object)
                 .OrderBy(e => e.Id)
+                .ToListAsync();
+
+            return _mapper.Map<IEnumerable<EventDto>>(events);
+        }
+
+        public async Task<IEnumerable<EventDto>> GetAllAsync(EventFilterDto? filter = null)
+        {
+            var query = _context.Events
+                .Include(e => e.EventType)
+                .Include(e => e.Locality)
+                .Include(e => e.Destination)
+                .Include(e => e.Object)
+                .AsQueryable();
+
+            if (filter != null)
+            {
+                var hasDate = filter.Date.HasValue;
+                var hasNextDays = filter.NextDays.HasValue;
+                var hasRange = filter.StartDate.HasValue || filter.EndDate.HasValue;
+
+                var filterCount = 0;
+                if (hasDate) filterCount++;
+                if (hasNextDays) filterCount++;
+                if (hasRange) filterCount++;
+
+                if (filterCount > 1)
+                    throw new InvalidOperationException("Use only one type of date filter at a time.");
+
+                DateTime? periodStart = null;
+                DateTime? periodEnd = null;
+
+                if (hasDate)
+                {
+                    periodStart = EnsureUtc(filter.Date!.Value.Date);
+                    periodEnd = EnsureUtc(periodStart.Value.AddDays(1));
+                }
+                else if (hasNextDays)
+                {
+                    if (filter.NextDays!.Value != 7 && filter.NextDays.Value != 30)
+                        throw new InvalidOperationException("NextDays can only be 7 or 30.");
+
+                    periodStart = DateTime.UtcNow.Date;
+                    periodEnd = periodStart.Value.AddDays(filter.NextDays.Value);
+                }
+                else if (hasRange)
+                {
+                    periodStart = EnsureUtc((filter.StartDate ?? filter.EndDate)!.Value.Date);
+                    periodEnd = EnsureUtc(((filter.EndDate ?? filter.StartDate)!.Value.Date).AddDays(1));
+
+                    if (periodEnd <= periodStart)
+                        throw new InvalidOperationException("EndDate must be greater than or equal to StartDate.");
+                }
+
+                if (periodStart.HasValue && periodEnd.HasValue)
+                {
+                    query = query.Where(e =>
+                        e.StartDate < periodEnd.Value &&
+                        (!e.EndDate.HasValue || e.EndDate.Value >= periodStart.Value));
+                }
+            }
+
+            var events = await query
+                .OrderBy(e => e.StartDate)
+                .ThenBy(e => e.Id)
                 .ToListAsync();
 
             return _mapper.Map<IEnumerable<EventDto>>(events);
@@ -43,7 +118,8 @@ namespace TuristickiVodic.Services.Services
             return ev == null ? null : _mapper.Map<EventDto>(ev);
         }
 
-        // CC i Menadžer mogu da kreiraju event; Menadžer samo za svoju destinaciju
+        // ContentCreator kreira event sa statusom Pending (čeka odobrenje menadžera)
+        // Manager i Admin kreiraju event sa statusom Approved
         public async Task<EventDto> CreateAsync(CreateEventDto dto, int userId, string roleName)
         {
             await ValidateReferences(dto.EventTypeId, dto.LocalityId, dto.DestinationId, dto.ObjectId);
@@ -81,7 +157,10 @@ namespace TuristickiVodic.Services.Services
                 DestinationId = dto.DestinationId,
                 ObjectId = dto.ObjectId,
                 CreatedByUserId = userId,
-                Status = ContentStatus.Pending,
+                // Manager i Admin kreiraju event direktno kao Approved
+                Status = (roleName == "Manager" || roleName == "Admin")
+                    ? ContentStatus.Approved
+                    : ContentStatus.Pending,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -92,6 +171,7 @@ namespace TuristickiVodic.Services.Services
             return _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
         }
 
+        // Samo ContentCreator može da menja sadržaj eventa, i to samo svoj
         public async Task<EventDto?> UpdateAsync(int id, UpdateEventDto dto, int userId, string roleName)
         {
             var ev = await _context.Events
@@ -104,7 +184,6 @@ namespace TuristickiVodic.Services.Services
             if (ev == null)
                 return null;
 
-            // Samo ContentCreator može da menja sadržaj eventa, i to samo svoj
             if (roleName != "ContentCreator")
                 throw new UnauthorizedAccessException("Only content creators can update events.");
 
@@ -164,7 +243,10 @@ namespace TuristickiVodic.Services.Services
             return _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
         }
 
-        // Menadžer odobrava/odbija event za svoju destinaciju; Admin samo ako destinacija nema Menadžera
+        // Proverava ko je odgovoran menadžer za ovu destinaciju.
+        // Ako destinacija ima svog menadžera – samo on može da odobri.
+        // Ako je ostala bez menadžera (izuzetna situacija) – odgovornost preuzima
+        // menadžer geografski najbliže destinacije, NE admin.
         public async Task<EventDto?> ApproveAsync(int id, ApproveContentDto dto, int userId, string roleName)
         {
             var ev = await _context.Events
@@ -181,17 +263,18 @@ namespace TuristickiVodic.Services.Services
 
             if (roleName == "Manager")
             {
-                if (destination?.ManagedByUserId != userId)
-                    throw new UnauthorizedAccessException("Manager can only approve events for their destination.");
+                var isResponsible = destination != null &&
+                    await DestinationManagerHelper.IsResponsibleManagerAsync(_context, destination, userId);
+                if (!isResponsible)
+                    throw new UnauthorizedAccessException("You are not the responsible manager for this destination.");
             }
             else if (roleName == "Admin")
             {
-                if (destination?.ManagedByUserId != null)
-                    throw new UnauthorizedAccessException("This destination has a manager. The manager must approve this event.");
+                throw new UnauthorizedAccessException("Admins do not directly approve events. The responsible manager handles approvals.");
             }
             else
             {
-                throw new UnauthorizedAccessException("Only managers or admins can approve events.");
+                throw new UnauthorizedAccessException("Only the responsible manager can approve events.");
             }
 
             ev.Status = dto.Approve ? ContentStatus.Approved : ContentStatus.Rejected;
@@ -205,6 +288,7 @@ namespace TuristickiVodic.Services.Services
             return _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
         }
 
+        // Samo ContentCreator može direktno da obriše event koji nije Approved
         public async Task<bool> DeleteAsync(int id, int userId, string roleName)
         {
             var ev = await _context.Events

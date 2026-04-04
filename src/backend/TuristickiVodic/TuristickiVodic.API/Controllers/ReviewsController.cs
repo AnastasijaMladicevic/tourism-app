@@ -108,9 +108,9 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // ContentCreator briše odgovor na recenziju za svoj objekat
+        // ContentCreator briše odgovor na recenziju za svoj objekat; Menadžer može da obriše odgovor u svojoj destinaciji
         [HttpDelete("{id}/respond")]
-        [Authorize(Roles = "ContentCreator")]
+        [Authorize(Roles = "ContentCreator,Manager")]
         public async Task<IActionResult> DeleteResponse(int id)
         {
             try
@@ -127,7 +127,7 @@ namespace TuristickiVodic.API.Controllers
 
         // Menadžer (ili Admin ako nema menadžera) odobrava/odbija recenziju
         [HttpPost("{id}/approve")]
-        [Authorize(Roles = "Manager,Admin")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Approve(int id, [FromBody] ApproveReviewDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -143,9 +143,9 @@ namespace TuristickiVodic.API.Controllers
             catch (UnauthorizedAccessException) { return Forbid(); }
         }
 
-        // Tourist briše svoju, Admin briše bilo koju
+        // Tourist briše svoju recenziju; Menadžer može da briše recenzije u svojoj destinaciji
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Tourist,Admin")]
+        [Authorize(Roles = "Tourist,Manager")]
         public async Task<IActionResult> Delete(int id)
         {
             try

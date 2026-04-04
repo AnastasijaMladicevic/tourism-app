@@ -1,4 +1,4 @@
-using TuristickiVodic.Core.DTOs;
+using TuristickiVodic.Core.DTO;
 
 namespace TuristickiVodic.Services
 {

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using TuristickiVodic.Core.DTOs;
+using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Services;
 using System.IdentityModel.Tokens.Jwt;
 

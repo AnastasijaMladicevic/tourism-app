@@ -158,21 +158,41 @@ namespace TuristickiVodic.Services.Services
             return _mapper.Map<ReviewDto>(await LoadReviewAsync(review.Id));
         }
 
-        // ContentCreator briše svoj odgovor na recenziju
+        // ContentCreator briše svoj odgovor; Menadžer može da obriše odgovor na recenziju u svojoj destinaciji
         public async Task<ReviewDto?> DeleteResponseAsync(int id, int userId, string roleName)
         {
-            if (roleName != "ContentCreator")
-                throw new UnauthorizedAccessException("Only content creators can delete review responses.");
-
             var review = await _context.Reviews
                 .Include(r => r.Object)
+                    .ThenInclude(o => o.Locality)
+                        .ThenInclude(l => l.Destination)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (review == null)
                 return null;
 
-            if (review.Object.CreatedByUserId != userId)
-                throw new UnauthorizedAccessException("You can only delete responses on your own objects.");
+            if (roleName == "ContentCreator")
+            {
+                if (review.Object.CreatedByUserId != userId)
+                    throw new UnauthorizedAccessException("You can only delete responses on your own objects.");
+            }
+            else if (roleName == "Manager")
+            {
+                var reviewDestinationId = review.Object?.Locality?.DestinationId ?? review.Object?.DestinationId;
+                var reviewDestination = reviewDestinationId.HasValue
+                    ? await _context.Destinations.FindAsync(reviewDestinationId.Value)
+                    : null;
+
+                if (reviewDestination == null)
+                    throw new UnauthorizedAccessException("Cannot determine destination for this review.");
+
+                var isResponsible = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, reviewDestination, userId);
+                if (!isResponsible)
+                    throw new UnauthorizedAccessException("You are not the responsible manager for this destination.");
+            }
+            else
+            {
+                throw new UnauthorizedAccessException("Only content creators and managers can delete review responses.");
+            }
 
             if (review.CreatorResponse == null)
                 throw new InvalidOperationException("This review has no response to delete.");
@@ -197,20 +217,31 @@ namespace TuristickiVodic.Services.Services
             if (review == null)
                 return null;
 
+            // Proverava ko je odgovoran menadžer za destinaciju objekta.
+            // Ako destinacija ima svog menadžera – samo on može da odobri recenziju.
+            // Ako je ostala bez menadžera (izuzetna situacija) – odgovornost preuzima
+            // menadžer geografski najbliže destinacije, NE admin.
+            var reviewDestinationId = review.Object?.Locality?.DestinationId ?? review.Object?.DestinationId;
+            var reviewDestination = reviewDestinationId.HasValue
+                ? await _context.Destinations.FindAsync(reviewDestinationId.Value)
+                : null;
+
             if (roleName == "Manager")
             {
-                // Menadžer može da odobrava samo recenzije za objekte na svojoj destinaciji
-                var destinationId = review.Object?.Locality?.DestinationId ?? review.Object?.DestinationId;
-                var destination = destinationId.HasValue
-                    ? await _context.Destinations.FindAsync(destinationId.Value)
-                    : null;
+                if (reviewDestination == null)
+                    throw new UnauthorizedAccessException("Cannot determine destination for this review.");
 
-                if (destination == null || destination.ManagedByUserId != userId)
-                    throw new UnauthorizedAccessException("Manager can only approve reviews for objects in their destination.");
+                var isResponsible = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, reviewDestination, userId);
+                if (!isResponsible)
+                    throw new UnauthorizedAccessException("You are not the responsible manager for this destination.");
             }
-            else if (roleName != "Admin")
+            else if (roleName == "Admin")
             {
-                throw new UnauthorizedAccessException("Only managers or admins can approve reviews.");
+                throw new UnauthorizedAccessException("Admins do not directly approve reviews. The responsible manager handles approvals.");
+            }
+            else
+            {
+                throw new UnauthorizedAccessException("Only the responsible manager can approve reviews.");
             }
 
             review.Status = dto.Approve ? ContentStatus.Approved : ContentStatus.Rejected;
@@ -223,14 +254,40 @@ namespace TuristickiVodic.Services.Services
 
         public async Task<bool> DeleteAsync(int id, int userId, string roleName)
         {
-            var review = await _context.Reviews.FirstOrDefaultAsync(r => r.Id == id);
+            var review = await _context.Reviews
+                .Include(r => r.Object)
+                    .ThenInclude(o => o.Locality)
+                        .ThenInclude(l => l.Destination)
+                .FirstOrDefaultAsync(r => r.Id == id);
 
             if (review == null)
                 return false;
 
-            // Tourist može da briše svoju, Admin može sve
-            if (roleName != "Admin" && review.UserId != userId)
-                throw new UnauthorizedAccessException("You can delete only your own reviews.");
+            if (roleName == "Manager")
+            {
+                // Menadžer može da briše recenzije na objektima unutar svoje destinacije
+                var reviewDestinationId = review.Object?.Locality?.DestinationId ?? review.Object?.DestinationId;
+                var reviewDestination = reviewDestinationId.HasValue
+                    ? await _context.Destinations.FindAsync(reviewDestinationId.Value)
+                    : null;
+
+                if (reviewDestination == null)
+                    throw new UnauthorizedAccessException("Cannot determine destination for this review.");
+
+                var isResponsible = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, reviewDestination, userId);
+                if (!isResponsible)
+                    throw new UnauthorizedAccessException("You are not the responsible manager for this destination.");
+            }
+            else if (roleName == "Tourist")
+            {
+                // Tourist može da briše samo svoju recenziju
+                if (review.UserId != userId)
+                    throw new UnauthorizedAccessException("You can delete only your own reviews.");
+            }
+            else
+            {
+                throw new UnauthorizedAccessException("You are not authorized to delete reviews.");
+            }
 
             var objectId = review.ObjectId;
 

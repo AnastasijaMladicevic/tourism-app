@@ -105,13 +105,23 @@ namespace TuristickiVodic.Services.Services
                 .AsQueryable();
 
             if (roleName == "Manager")
+            {
+                // Menadžer vidi zahteve za svoju destinaciju.
+                // Ako je neka destinacija ostala bez menadžera (izuzetna situacija),
+                // najbliži menadžer preuzima odgovornost – ali ta logika se rešava
+                // na nivou ReviewAsync; ovde prikazujemo samo direktno dodeljene.
                 query = query.Where(r =>
                     (r.ObjectId != null && r.Object.Locality.Destination.ManagedByUserId == userId) ||
                     (r.EventId != null && r.Event.Destination.ManagedByUserId == userId));
+            }
             else if (roleName == "Admin")
+            {
+                // Admin može da vidi zahteve samo za destinacije koje nemaju menadžera.
+                // Ovo je izuzetna situacija – u normalnom toku destinacija uvek ima menadžera.
                 query = query.Where(r =>
                     (r.ObjectId != null && r.Object.Locality.Destination.ManagedByUserId == null) ||
                     (r.EventId != null && r.Event.Destination.ManagedByUserId == null));
+            }
 
             var requests = await query.OrderByDescending(r => r.CreatedAt).ToListAsync();
             return requests.Select(MapToDto);
@@ -171,15 +181,20 @@ namespace TuristickiVodic.Services.Services
                 ? request.Object?.Locality?.Destination
                 : request.Event?.Destination;
 
+            // Proverava ko je odgovoran menadžer za ovu destinaciju.
+            // Ako destinacija ima svog menadžera – samo on može da obradi zahtev.
+            // Ako je ostala bez menadžera (izuzetna situacija) – odgovornost preuzima
+            // menadžer geografski najbliže destinacije, NE admin.
             if (roleName == "Manager")
             {
-                if (destination?.ManagedByUserId != reviewedByUserId)
-                    throw new UnauthorizedAccessException("Manager can only review deletion requests for their destination.");
+                var isResponsible = destination != null &&
+                    await DestinationManagerHelper.IsResponsibleManagerAsync(_context, destination, reviewedByUserId);
+                if (!isResponsible)
+                    throw new UnauthorizedAccessException("You are not the responsible manager for this destination.");
             }
             else if (roleName == "Admin")
             {
-                if (destination?.ManagedByUserId != null)
-                    throw new UnauthorizedAccessException("This destination has a manager. The manager must review this request.");
+                throw new UnauthorizedAccessException("Admins do not directly process deletion requests. The responsible manager handles them.");
             }
 
             request.Status = dto.Approve ? ContentStatus.Approved : ContentStatus.Rejected;

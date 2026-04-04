@@ -2,9 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TuristickiVodic.Core.DTO
 {
-    public class RefreshTokenDto
+    public class AssignManagerDto
     {
         [Required]
-        public string RefreshToken { get; set; }
+        public int ManagerUserId { get; set; }
     }
 }

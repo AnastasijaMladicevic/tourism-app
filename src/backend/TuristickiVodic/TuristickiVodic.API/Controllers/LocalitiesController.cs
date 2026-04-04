@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TuristickiVodic.Core.DTO;
-using TuristickiVodic.Core.DTOs;
 using TuristickiVodic.Services;
 using TuristickiVodic.Services.Services;
 
@@ -40,7 +39,7 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Create([FromBody] CreateLocalityDto dto)
         {
             if (!ModelState.IsValid)
@@ -61,7 +60,7 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateLocalityDto dto)
         {
             if (!ModelState.IsValid)
@@ -86,7 +85,7 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Delete(int id)
         {
             try

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using TuristickiVodic.Core.DTO;
-using TuristickiVodic.Core.DTOs;
 using TuristickiVodic.Core.Models;
 
 namespace TuristickiVodic.Services.Mappings
@@ -77,7 +76,8 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.DestinationName, opt => opt.MapFrom(src => src.Destination != null ? src.Destination.Name : null))
                 .ForMember(dest => dest.ObjectName, opt => opt.MapFrom(src => src.Object != null ? src.Object.Name : null))
                 .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
-                .ForMember(dest => dest.Latitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.Y : (double?)null));
+                .ForMember(dest => dest.Latitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.Y : (double?)null))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
             CreateMap<Event, EventDto>()
                 .ForMember(dest => dest.EventTypeName, opt => opt.MapFrom(src => src.EventType.Name))

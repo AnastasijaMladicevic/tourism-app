@@ -32,10 +32,20 @@ namespace TuristickiVodic.Core.Models
         public int? ObjectId { get; set; }
         public TouristObject? Object { get; set; }
 
+        public ContentStatus Status { get; set; } = ContentStatus.Pending;
+
         [Required]
         public int CreatedByUserId { get; set; }
         [ForeignKey("CreatedByUserId")]
         public User CreatedBy { get; set; }
+
+        public int? ApprovedByUserId { get; set; }
+        [ForeignKey("ApprovedByUserId")]
+        public User? ApprovedBy { get; set; }
+
+        public DateTime? ApprovedAt { get; set; }
+
+        public string? RejectionReason { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

@@ -1,4 +1,4 @@
-﻿namespace TuristickiVodic.Core.DTOs
+﻿namespace TuristickiVodic.Core.DTO
 {
     public class UpdateActivityDto
     {

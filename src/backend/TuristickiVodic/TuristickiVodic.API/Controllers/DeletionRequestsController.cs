@@ -72,7 +72,8 @@ namespace TuristickiVodic.API.Controllers
             return Ok(request);
         }
 
-        // Menadžer/Admin vidi zahteve za brisanje
+        // Menadžer vidi zahteve za svoju destinaciju
+        // Admin može da vidi zahteve za destinacije koje (izuzetno) nemaju menadžera
         [HttpGet]
         [Authorize(Roles = "Manager,Admin")]
         public async Task<IActionResult> GetAll()
@@ -83,9 +84,9 @@ namespace TuristickiVodic.API.Controllers
             return Ok(requests);
         }
 
-        // Menadžer/Admin odobrava ili odbija zahtev
+        // Samo menadžer (ili odgovorni menadžer za destinacije bez menadžera) odobrava ili odbija zahtev
         [HttpPost("{requestId}/review")]
-        [Authorize(Roles = "Manager,Admin")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Review(int requestId, [FromBody] ApproveDeletionRequestDto dto)
         {
             try

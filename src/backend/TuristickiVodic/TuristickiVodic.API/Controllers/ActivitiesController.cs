@@ -1,8 +1,8 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TuristickiVodic.Core.DTOs;
 using TuristickiVodic.Services;
+using TuristickiVodic.Core.DTO;
 
 namespace TuristickiVodic.API.Controllers
 {
@@ -30,15 +30,13 @@ namespace TuristickiVodic.API.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var activity = await _activityService.GetByIdAsync(id);
-
-            if (activity == null)
-                return NotFound();
-
+            if (activity == null) return NotFound();
             return Ok(activity);
         }
 
+        // ContentCreator kreira aktivnost (status Pending, čeka odobrenje); Menadžer kreira direktno kao Approved
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ContentCreator,Manager")]
         public async Task<IActionResult> Create([FromBody] CreateActivityDto dto)
         {
             if (!ModelState.IsValid)
@@ -47,17 +45,17 @@ namespace TuristickiVodic.API.Controllers
             try
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-                var created = await _activityService.CreateAsync(dto, userId);
+                var roleName = User.FindFirstValue(ClaimTypes.Role)!;
+                var created = await _activityService.CreateAsync(dto, userId, roleName);
                 return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
             }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            catch (UnauthorizedAccessException) { return Forbid(); }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
+        // CC menja svoju Pending aktivnost; Menadžer menja sve u svojoj destinaciji
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ContentCreator,Manager")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateActivityDto dto)
         {
             if (!ModelState.IsValid)
@@ -65,29 +63,51 @@ namespace TuristickiVodic.API.Controllers
 
             try
             {
-                var updated = await _activityService.UpdateAsync(id, dto);
-
-                if (updated == null)
-                    return NotFound();
-
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var roleName = User.FindFirstValue(ClaimTypes.Role)!;
+                var updated = await _activityService.UpdateAsync(id, dto, userId, roleName);
+                if (updated == null) return NotFound();
                 return Ok(updated);
             }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            catch (UnauthorizedAccessException) { return Forbid(); }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
+        // CC briše svoju Pending aktivnost; Menadžer briše sve u svojoj destinaciji
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ContentCreator,Manager")]
         public async Task<IActionResult> Delete(int id)
         {
-            var deleted = await _activityService.DeleteAsync(id);
+            try
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var roleName = User.FindFirstValue(ClaimTypes.Role)!;
+                var deleted = await _activityService.DeleteAsync(id, userId, roleName);
+                if (!deleted) return NotFound();
+                return NoContent();
+            }
+            catch (UnauthorizedAccessException) { return Forbid(); }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+        }
 
-            if (!deleted)
-                return NotFound();
+        // Menadžer odobrava/odbija aktivnost u svojoj destinaciji
+        [HttpPost("{id}/approve")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> Approve(int id, [FromBody] ApproveContentDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-            return NoContent();
+            try
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var roleName = User.FindFirstValue(ClaimTypes.Role)!;
+                var updated = await _activityService.ApproveAsync(id, dto, userId, roleName);
+                if (updated == null) return NotFound();
+                return Ok(updated);
+            }
+            catch (UnauthorizedAccessException) { return Forbid(); }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
     }
 }

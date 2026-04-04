@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TuristickiVodic.Core.DTOs
+namespace TuristickiVodic.Core.DTO
 {
     public class CreateDestinationDto
     {
@@ -18,5 +18,11 @@ namespace TuristickiVodic.Core.DTOs
         public int DestinationTypeId { get; set; }
 
         public bool IsActive { get; set; } = true;
+
+        /// <summary>
+        /// Obavezno – destinacija ne može da se kreira bez dodeljenog menadžera.
+        /// </summary>
+        [Required]
+        public int ManagedByUserId { get; set; }
     }
 }

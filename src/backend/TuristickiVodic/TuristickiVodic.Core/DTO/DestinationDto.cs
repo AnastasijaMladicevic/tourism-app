@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TuristickiVodic.Core.DTOs
+namespace TuristickiVodic.Core.DTO
 {
     public class DestinationDto
     {

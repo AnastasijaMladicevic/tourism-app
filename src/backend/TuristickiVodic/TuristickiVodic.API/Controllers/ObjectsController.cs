@@ -75,7 +75,7 @@ namespace TuristickiVodic.API.Controllers
         // Menadžer odobrava/odbija objekte u svojoj destinaciji
         // Ako destinacija nema Menadžera, odobrava Admin
         [HttpPost("{id}/approve")]
-        [Authorize(Roles = "Manager,Admin")]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Approve(int id, [FromBody] ApproveContentDto dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
