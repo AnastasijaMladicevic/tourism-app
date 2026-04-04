@@ -19,10 +19,27 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] EventFilterDto? filter)
         {
-            var events = await _eventService.GetAllAsync();
-            return Ok(events);
+            try
+            {
+                if (filter == null ||
+                    (!filter.Date.HasValue &&
+                     !filter.NextDays.HasValue &&
+                     !filter.StartDate.HasValue &&
+                     !filter.EndDate.HasValue))
+                {
+                    var events = await _eventService.GetAllAsync();
+                    return Ok(events);
+                }
+
+                var filteredEvents = await _eventService.GetAllAsync(filter);
+                return Ok(filteredEvents);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpGet("{id}")]
