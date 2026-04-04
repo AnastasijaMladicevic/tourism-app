@@ -10,36 +10,32 @@
 - `Admin` ne može da obriše sam sebe.
 - Samo `Tourist` može da pošalje zahtev za `ContentCreator` ulogu, i to samo za sebe.
 - Samo `Admin` može da odobri `ContentCreator` ulogu.
-// Razmisliti da li admin kao entitet treba da bude singleton
 
 **DESTINACIJE**
 
 - Samo `Admin` može da kreira destinacije.
 - Samo `Admin` može da menja destinacije.
 - Samo `Admin` može da briše destinacije.
-- Brisanje destinacije je blokirano ako destinacija ima lokacije, objekte ili evente.
+- Brisanje destinacije je blokirano ako destinacija ima lokalitete, objekte ili evente.
+- Jedan `Manager` ne moze da rukovodi sa vise destinacija.
 
-**LOKACIJE**
-// Predlozeno drugo ime za lokaciju - LOKALITET
+**LOKALITET**
 
-- Lokacije može da kreira `Manager` samo za svoju destinaciju ili `Admin` samo za destinaciju bez menadžera.
-- `Manager` može da menja samo lokacije u svojoj destinaciji.
-- `Manager` može da briše samo lokacije u svojoj destinaciji.
-- `Admin` može da menja lokacije samo ako trenutna i ciljna destinacija nemaju menadžera.
-- `Admin` može da briše lokacije samo ako destinacija nema menadžera.
-- Pri premeštanju lokacije proveravaju se i trenutna i ciljna destinacija.
-// Samo menadzer moze da upravlja lokalitetima. Destinacija ne bi trebalo da se instancira bez da joj se dodeli menadzer, a ako kasnije dodje do toga da neka destinacija nema menadzera, preuzima je menadzer cija je destinacija najbliza destinaciji koja nema menadzera (geografski).
+- Lokalitete može da kreira `Manager` samo za svoju destinaciju.
+- `Manager` može da menja samo lokalitete u svojoj destinaciji.
+- `Manager` može da briše samo lokalitete u svojoj destinaciji.
+- Pri premeštanju lokalitete proveravaju se i trenutna i ciljna destinacija.
+- Samo menadzer moze da upravlja lokalitetima. Destinacija ne bi trebalo da se instancira bez da joj se dodeli menadzer.
 
 **TURISTIČKI OBJEKTI**
 
 - Samo `ContentCreator` može da kreira objekat.
 - Kada `ContentCreator` kreira objekat, status se postavlja na `Pending`.
+- Jednom odobren objekat vise ne mora da dobije dozvolu da bi bio izmenjen.
 - `DestinationId` se automatski preuzima iz `LocationId`.
 - Samo `ContentCreator` može da menja sadržaj objekta.
 - `ContentCreator` može da menja samo svoje objekte.
 - `Manager` ne menja sadržaj objekta, već samo odobrava ili odbija status za objekte u svojoj destinaciji.
-- `Admin` ne menja sadržaj objekta, već samo odobrava ili odbija status ako destinacija nema menadžera.
-// GOREPOMENUTO PRAVILO NE VAZI AKO SE USVOJI DA NAJBLIZI MENADZER PREUZIMA DESTINACIJU, A NE ADMIN.
 - Samo `ContentCreator` može direktno da obriše objekat.
 - `ContentCreator` može direktno da obriše samo svoj `Pending` objekat.
 - `Approved` objekti se ne brišu direktno, već kroz `DeletionRequest`.
@@ -49,23 +45,23 @@
 
 - `ContentCreator` moze da kreiraju evente.
 - Kada `ContentCreator` kreira event, status se postavlja na `Pending`.
-- Kada `Manager` ili `Admin` kreira event, status se postavlja na `Approved`.
-- Event mora imati `LocationId` ili `DestinationId`.
+- Jednom odobren event vise ne mora da dobije dozvolu da bi bio izmenjen.
+- Event mora imati 'LocationId' ili 'DestinationId'.
 - `LocationId` i `DestinationId` moraju biti konzistentni.
 - Samo `ContentCreator` može da menja sadržaj eventa.
 - `ContentCreator` može da menja samo svoje evente.
 - `Manager` ne menja sadržaj eventa, već samo odobrava ili odbija status za evente u svojoj destinaciji.
-- `Admin` ne menja sadržaj eventa, već samo odobrava ili odbija status ako destinacija nema menadžera.
-// GOREPOMENUTO PRAVILO NE VAZI AKO SE USVOJI DA NAJBLIZI MENADZER PREUZIMA DESTINACIJU, A NE ADMIN.
 - Samo `ContentCreator` može direktno da obriše event.
 - `ContentCreator` može direktno da obriše samo svoj event koji nije `Approved`.
 - `Approved` event se ne briše direktno, već kroz `DeletionRequest`.
 
 **AKTIVNOSTI**
 
-- Samo `Admin` može da kreira aktivnosti.
-- Samo `Admin` može da menja aktivnosti.
-- Samo `Admin` može da briše aktivnosti.
+- Samo `ContentCreator` može da kreira aktivnosti.
+- Samo `ContentCreator` može da menja aktivnosti.
+- Samo `ContentCreator` može da briše aktivnosti.
+- Kada `ContentCreator` kreira aktivnost, status se postavlja na `Pending`.
+- Jednom odobrena aktivnost vise ne mora da dobije dozvolu da bi bio izmenjena.
 - Aktivnost mora imati `LocationId` ili `DestinationId`.
 - `LocationId` i `DestinationId` moraju biti konzistentni.
 
@@ -79,8 +75,6 @@
 - `ContentCreator` može da menja svoj odgovor na recenziju.
 - `ContentCreator` može da briše svoj odgovor na recenziju.
 - `Manager` može da odobrava i odbija recenzije za objekte u svojoj destinaciji.
-- `Admin` može da odobrava i odbija recenzije samo kada destinacija nema menadžera.
-// GOREPOMENUTO PRAVILO NE VAZI AKO SE USVOJI DA NAJBLIZI MENADZER PREUZIMA DESTINACIJU, A NE ADMIN.
 
 **OMILJENI (FAVORITES)**
 
@@ -88,7 +82,7 @@
 - Samo `Tourist` može da briše favorite.
 - U jednom zahtevu može biti dodat tačno jedan od sledećih entiteta:
   - objekat
-  - lokacija
+  - lokalitet
   - destinacija
   - aktivnost
   - ruta
@@ -116,13 +110,9 @@
 - `ContentCreator` može da vidi samo svoje deletion request-ove.
 - `ContentCreator` može da vidi samo svoj konkretan deletion request po ID-u.
 - `Manager` vidi samo deletion request-ove za svoju destinaciju.
-- `Admin` vidi samo deletion request-ove za destinacije koje nemaju menadžera.
-// GOREPOMENUTO PRAVILO NE VAZI AKO SE USVOJI DA NAJBLIZI MENADZER PREUZIMA DESTINACIJU, A NE ADMIN.
 - Samo `Manager` ili `Admin` mogu da pregledaju listu deletion request-ova za obradu.
 - Samo `Manager` ili `Admin` mogu da odobre ili odbiju deletion request.
 - Ako `Manager` rešava zahtev, to može da uradi samo za svoju destinaciju.
-- Ako `Admin` rešava zahtev, to može da uradi samo za destinaciju bez menadžera.
-// GOREPOMENUTO PRAVILO NE VAZI AKO SE USVOJI DA NAJBLIZI MENADZER PREUZIMA DESTINACIJU, A NE ADMIN.
 - Kada je zahtev odobren, briše se objekat ili event na koji se zahtev odnosi.
 - Deletion request zapis ostaje u sistemu kao evidencija odluke.
 
@@ -179,7 +169,7 @@
   - aktivnost
   - event
   - destinaciju
-  - lokaciju
+  - lokalitet
 - Slike mogu da se dodaju samo za postojeće entitete.
 - Slike mogu da se menjaju samo ako pripadaju validnom entitetu.
 - Slike mogu da se brišu.
