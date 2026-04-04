@@ -18,6 +18,7 @@
 - Samo `Admin` može da briše destinacije.
 - Brisanje destinacije je blokirano ako destinacija ima lokalitete, objekte ili evente.
 - Jedan `Manager` ne moze da rukovodi sa vise destinacija.
+- Destinacija ne bi trebalo da se instancira bez da joj se dodeli menadzer.
 
 **LOKALITET**
 
@@ -25,7 +26,7 @@
 - `Manager` može da menja samo lokalitete u svojoj destinaciji.
 - `Manager` može da briše samo lokalitete u svojoj destinaciji.
 - Pri premeštanju lokalitete proveravaju se i trenutna i ciljna destinacija.
-- Samo menadzer moze da upravlja lokalitetima. Destinacija ne bi trebalo da se instancira bez da joj se dodeli menadzer.
+- Samo menadzer moze da upravlja lokalitetima. 
 
 **TURISTIČKI OBJEKTI**
 
@@ -39,7 +40,7 @@
 - Samo `ContentCreator` može direktno da obriše objekat.
 - `ContentCreator` može direktno da obriše samo svoj `Pending` objekat.
 - `Approved` objekti se ne brišu direktno, već kroz `DeletionRequest`.
-- Objekat koji ima recenzije ne može da se obriše.
+- Objekat koji ima recenzije može da se obriše (kaskadno se brišu i recenzije).
 
 **EVENTI**
 
@@ -47,7 +48,7 @@
 - Kada `ContentCreator` kreira event, status se postavlja na `Pending`.
 - Jednom odobren event vise ne mora da dobije dozvolu da bi bio izmenjen.
 - Event mora imati 'LocationId' ili 'DestinationId'.
-- `LocationId` i `DestinationId` moraju biti konzistentni.
+- `LocalityId` i `DestinationId` moraju biti konzistentni.
 - Samo `ContentCreator` može da menja sadržaj eventa.
 - `ContentCreator` može da menja samo svoje evente.
 - `Manager` ne menja sadržaj eventa, već samo odobrava ili odbija status za evente u svojoj destinaciji.
@@ -62,8 +63,8 @@
 - Samo `ContentCreator` može da briše aktivnosti.
 - Kada `ContentCreator` kreira aktivnost, status se postavlja na `Pending`.
 - Jednom odobrena aktivnost vise ne mora da dobije dozvolu da bi bio izmenjena.
-- Aktivnost mora imati `LocationId` ili `DestinationId`.
-- `LocationId` i `DestinationId` moraju biti konzistentni.
+- Aktivnost mora imati `LocalityId` ili `DestinationId`.
+- `LocalityId` i `DestinationId` moraju biti konzistentni.
 
 **RECENZIJE**
 
@@ -74,7 +75,7 @@
 - `ContentCreator` može da odgovori samo na recenzije svojih objekata.
 - `ContentCreator` može da menja svoj odgovor na recenziju.
 - `ContentCreator` može da briše svoj odgovor na recenziju.
-- `Manager` može da odobrava i odbija recenzije za objekte u svojoj destinaciji.
+- `Manager` može da odobrava i odbija recenzije za objekte u svojoj destinaciji i da ih brise.
 
 **OMILJENI (FAVORITES)**
 
@@ -110,10 +111,10 @@
 - `ContentCreator` može da vidi samo svoje deletion request-ove.
 - `ContentCreator` može da vidi samo svoj konkretan deletion request po ID-u.
 - `Manager` vidi samo deletion request-ove za svoju destinaciju.
-- Samo `Manager` ili `Admin` mogu da pregledaju listu deletion request-ova za obradu.
-- Samo `Manager` ili `Admin` mogu da odobre ili odbiju deletion request.
-- Ako `Manager` rešava zahtev, to može da uradi samo za svoju destinaciju.
-- Kada je zahtev odobren, briše se objekat ili event na koji se zahtev odnosi.
+- Samo `Manager` moze da pregleda listu deletion request-ova za obradu.
+- Samo `Manager` moze da odobri ili odbije deletion request.
+- Kada `Manager` rešava zahtev, to može da uradi samo za svoju destinaciju.
+- Kada je zahtev odobren, briše se objekat ili event ili akticnost na koju se zahtev odnosi.
 - Deletion request zapis ostaje u sistemu kao evidencija odluke.
 
 **EVENT PLANNER**
@@ -140,7 +141,7 @@
 - Kada `Admin` odobri prijavu:
   - korisnik gubi `ContentCreator` ulogu
   - korisnik postaje `Tourist`
-  - korisnik se stavlja na blacklist
+  - korisnik se stavlja na `blacklist` (ne moze ponovo postati cc)
 
 
 **ROUTE POINTS**
