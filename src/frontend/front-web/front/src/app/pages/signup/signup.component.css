@@ -21,17 +21,23 @@
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
 }
 
-/* LEFT SIDE nije uradjena zato sto jos uvek nemam potrebnu sliku i logo
+ /*LEFT SIDE nije uradjena zato sto jos uvek nemam potrebnu sliku i logo*/
 .left {
   width: 50%;
-  background: url('../../../assets/pozadina.webp') no-repeat center center;
-  background-size: cover;
-}*/
+  background: url('/assets/pozadina.png') no-repeat center center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e8f0fe;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center
+}
 
 .left img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 80%;
+  height: auto;
+  object-fit: contain;
 }
 
 /* RIGHT SIDE */

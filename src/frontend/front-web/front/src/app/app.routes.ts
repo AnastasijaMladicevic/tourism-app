@@ -3,16 +3,11 @@ import { Signout } from './pages/signout/signout';
 import { SignupComponent } from './pages/signup/signup.component';
 
 export const routes: Routes = [
-  /*{
-      path: '',
-    redirectTo: 'login',
-    pathMatch: 'full',
-  },
   {
-    path: 'login',
-    loadComponent: () =>
-      import('./pages/login/login.component').then((m) => m.LoginComponent),
-  },*/
+      path: '',
+    redirectTo: 'signup',
+    pathMatch: 'full'
+  },
   {
     path: 'signup',
     loadComponent: () =>
