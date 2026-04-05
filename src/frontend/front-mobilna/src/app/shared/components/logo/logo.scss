@@ -1,0 +1,38 @@
+.logo {
+  display: flex;
+  align-items: center;
+
+  img {
+    height: auto;
+    width: 40px; // default (md)
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+    color: #38DFF6;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+    span {
+      color: #067DE7;
+    }
+  }
+}
+
+// ─── Size variants ─────────────────────────────────────────────────────────────
+.logo--sm {
+  img  { width: 28px; }
+  h1   { font-size: 18px; }
+}
+
+.logo--md {
+  img  { width: 40px; }
+  h1   { font-size: 24px; }
+}
+
+.logo--lg {
+  img          { width: 70px; }
+  h1           { font-size: 32px; }
+  margin-bottom: 120px; // samo na auth ekranima
+}

@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy, ViewChildren, QueryList, ElementRef, NgZone, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { LogoComponent } from '../../../shared/components/logo/logo';
 
 @Component({
   selector: 'app-code-verification',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, LogoComponent],
   templateUrl: './code-verification.html',
   styleUrls: ['./code-verification.scss'],
   encapsulation: ViewEncapsulation.None, // lets root CSS variables like --primary reach this component

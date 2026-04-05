@@ -1,0 +1,15 @@
+/* app.component.scss ili global styles.scss */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-content {
+  flex: 1;
+  min-width: 0; // sprečava overflow
+  padding-bottom: 64px; // prostor za mobile nav
+
+  @media (min-width: 768px) {
+    padding-bottom: 0; // na desktopu nema bottom nav
+  }
+}
