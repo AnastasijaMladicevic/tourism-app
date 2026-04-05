@@ -13,8 +13,8 @@ using TuristickiVodic.Infrastructure.Data;
 namespace TuristickiVodic.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260402155452_AddRevokedTokens")]
-    partial class AddRevokedTokens
+    [Migration("20260405121354_AddActivityToDeletionRequest")]
+    partial class AddActivityToDeletionRequest
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,6 +36,12 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ActivityTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("ApprovedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ApprovedByUserId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
@@ -73,12 +79,20 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<decimal?>("Price")
                         .HasColumnType("numeric");
 
+                    b.Property<string>("RejectionReason")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ActivityTypeId");
+
+                    b.HasIndex("ApprovedByUserId");
 
                     b.HasIndex("CreatedByUserId");
 
@@ -121,6 +135,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("ActivityId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -156,6 +173,8 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ActivityId");
+
                     b.HasIndex("EventId")
                         .IsUnique()
                         .HasFilter("\"EventId\" IS NOT NULL AND \"Status\" = 'Pending'");
@@ -170,7 +189,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.ToTable("DeletionRequests", t =>
                         {
-                            t.HasCheckConstraint("CK_DeletionRequest_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"EventId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
+                            t.HasCheckConstraint("CK_DeletionRequest_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"EventId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
                         });
                 });
 
@@ -442,7 +461,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.ToTable("Favorites", t =>
                         {
-                            t.HasCheckConstraint("CK_Favorite_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"DestinationId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"RouteId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"LocalityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
+                            t.HasCheckConstraint("CK_Favorite_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"DestinationId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"RouteId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"LocalityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
                         });
                 });
 
@@ -498,7 +517,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.ToTable("Images", t =>
                         {
-                            t.HasCheckConstraint("CK_Image_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"EventId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"DestinationId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"LocalityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
+                            t.HasCheckConstraint("CK_Image_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"EventId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"DestinationId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"LocalityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
                         });
                 });
 
@@ -953,6 +972,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<bool>("HasRequestedCreatorRole")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -1059,6 +1081,10 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TuristickiVodic.Core.Models.User", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedByUserId");
+
                     b.HasOne("TuristickiVodic.Core.Models.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedByUserId")
@@ -1082,6 +1108,8 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.Navigation("ActivityType");
 
+                    b.Navigation("ApprovedBy");
+
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Destination");
@@ -1093,6 +1121,11 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
             modelBuilder.Entity("TuristickiVodic.Core.Models.DeletionRequest", b =>
                 {
+                    b.HasOne("TuristickiVodic.Core.Models.Activity", "Activity")
+                        .WithMany()
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("TuristickiVodic.Core.Models.Event", "Event")
                         .WithMany()
                         .HasForeignKey("EventId")
@@ -1113,6 +1146,8 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .WithMany()
                         .HasForeignKey("ReviewedByUserId")
                         .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Activity");
 
                     b.Navigation("Event");
 

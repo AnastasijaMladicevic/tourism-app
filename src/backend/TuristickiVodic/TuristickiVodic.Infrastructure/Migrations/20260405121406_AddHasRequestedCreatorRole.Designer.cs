@@ -13,8 +13,8 @@ using TuristickiVodic.Infrastructure.Data;
 namespace TuristickiVodic.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260405120906_AddRefreshTokens")]
-    partial class AddRefreshTokens
+    [Migration("20260405121406_AddHasRequestedCreatorRole")]
+    partial class AddHasRequestedCreatorRole
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

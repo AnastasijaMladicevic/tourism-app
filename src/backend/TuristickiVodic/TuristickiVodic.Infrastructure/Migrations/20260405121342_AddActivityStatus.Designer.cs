@@ -13,8 +13,8 @@ using TuristickiVodic.Infrastructure.Data;
 namespace TuristickiVodic.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260404202222_AddActivityToDeletionRequest")]
-    partial class AddActivityToDeletionRequest
+    [Migration("20260405121342_AddActivityStatus")]
+    partial class AddActivityStatus
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -971,6 +971,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("HasRequestedCreatorRole")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
