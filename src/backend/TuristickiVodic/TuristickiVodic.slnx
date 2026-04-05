@@ -3,4 +3,5 @@
   <Project Path="TuristickiVodic.Core/TuristickiVodic.Core.csproj" />
   <Project Path="TuristickiVodic.Infrastructure/TuristickiVodic.Infrastructure.csproj" />
   <Project Path="TuristickiVodic.Services/TuristickiVodic.Services.csproj" />
+  <Project Path="TuristickiVodic.Tests/TuristickiVodic.Tests.csproj" />
 </Solution>
