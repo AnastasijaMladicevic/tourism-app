@@ -149,7 +149,7 @@ namespace TuristickiVodic.Services
             if (!user.IsActive)
                 throw new InvalidOperationException("Account is deactivated");
 
-            return await IssueTokensAsync(user);
+            return await IssueTokensAsync(user, loginDto.RememberMe);
         }
 
         public async Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenDto refreshTokenDto)
@@ -193,6 +193,11 @@ namespace TuristickiVodic.Services
             if (user.Role.Name != RoleType.Tourist)
                 throw new InvalidOperationException("Only tourists can request creator role");
 
+            if (user.IsBlacklisted)
+                throw new InvalidOperationException("Blacklisted users cannot request creator role.");
+
+            user.HasRequestedCreatorRole = true;
+            await _context.SaveChangesAsync();
             return true;
         }
 
@@ -204,6 +209,9 @@ namespace TuristickiVodic.Services
 
             if (user == null)
                 return false;
+
+            if (!user.HasRequestedCreatorRole)
+                throw new InvalidOperationException("User has not requested creator role.");
 
             if (user.IsBlacklisted)
                 throw new InvalidOperationException("Blacklisted users cannot be approved for content creator role.");
@@ -221,6 +229,7 @@ namespace TuristickiVodic.Services
             user.Role = contentCreatorRole;
             await RevokeRefreshTokenAsync(user.Id);
             user.UpdatedAt = DateTime.UtcNow;
+            user.HasRequestedCreatorRole = false;
 
             await _context.SaveChangesAsync();
 
@@ -248,7 +257,7 @@ namespace TuristickiVodic.Services
             return true;
         }
 
-        private async Task<AuthResponseDto> IssueTokensAsync(User user)
+        private async Task<AuthResponseDto> IssueTokensAsync(User user, bool rememberMe = false)
         {
             var accessToken = _tokenService.GenerateToken(user);
             var refreshToken = _tokenService.GenerateRefreshToken();
@@ -267,7 +276,7 @@ namespace TuristickiVodic.Services
             }
 
             refreshTokenEntity.RefreshTokenHash = HashRefreshToken(refreshToken);
-            refreshTokenEntity.RefreshTokenExpiry = DateTime.UtcNow.AddDays(7);
+            refreshTokenEntity.RefreshTokenExpiry = rememberMe ? DateTime.UtcNow.AddDays(30) : DateTime.UtcNow.AddDays(7);
             user.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
