@@ -45,10 +45,12 @@ namespace TuristickiVodic.Services
             if (!destinationTypeExists)
                 throw new InvalidOperationException("Destination type not found");
 
-            // Destinacija mora imati menadžera pri kreiranju – ne može da se instancira bez njega
+            if (dto.ManagedByUserId == null)
+                throw new InvalidOperationException("Destination must have a manager.");
+
             var manager = await _context.Users
                 .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Id == dto.ManagedByUserId!.Value);
+                .FirstOrDefaultAsync(u => u.Id == dto.ManagedByUserId.Value);
 
             if (manager == null)
                 throw new InvalidOperationException("Manager user not found.");
@@ -67,13 +69,16 @@ namespace TuristickiVodic.Services
                 Status = ContentStatus.Approved,
                 IsActive = dto.IsActive,
                 DestinationTypeId = dto.DestinationTypeId,
-                ManagedByUserId = dto.ManagedByUserId!.Value,
+                ManagedByUserId = dto.ManagedByUserId.Value,
                 CreatedByUserId = userId,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
 
             _context.Destinations.Add(destination);
+            await _context.SaveChangesAsync();
+
+            manager.ManagedDestinationId = destination.Id;
             await _context.SaveChangesAsync();
 
             var created = await _context.Destinations

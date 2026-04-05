@@ -208,31 +208,29 @@ namespace TuristickiVodic.Services
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)
-                return false;
+                throw new KeyNotFoundException("User not found.");
+
+            if (user.IsBlacklisted)
+                throw new InvalidOperationException("User is blacklisted.");
+
+            if (user.Role.Name != RoleType.Tourist)
+                throw new InvalidOperationException("Only tourists can be approved for content creator role.");
 
             if (!user.HasRequestedCreatorRole)
                 throw new InvalidOperationException("User has not requested creator role.");
-
-            if (user.IsBlacklisted)
-                throw new InvalidOperationException("Blacklisted users cannot be approved for content creator role.");
-
-            if (user.Role.Name != RoleType.Tourist)
-                throw new InvalidOperationException("Only tourists can be approved for content creator role");
 
             var contentCreatorRole = await _context.Roles
                 .FirstOrDefaultAsync(r => r.Name == RoleType.ContentCreator);
 
             if (contentCreatorRole == null)
-                throw new InvalidOperationException("Content creator role not found");
+                throw new KeyNotFoundException("Content creator role not found.");
 
             user.RoleId = contentCreatorRole.Id;
             user.Role = contentCreatorRole;
-            await RevokeRefreshTokenAsync(user.Id);
-            user.UpdatedAt = DateTime.UtcNow;
             user.HasRequestedCreatorRole = false;
+            user.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
-
             return true;
         }
 

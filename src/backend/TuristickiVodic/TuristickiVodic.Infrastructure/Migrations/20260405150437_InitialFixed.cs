@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace TuristickiVodic.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialClean : Migration
+    public partial class InitialFixed : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -56,7 +56,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LocationTypes",
+                name: "LocalityTypes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -65,7 +65,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LocationTypes", x => x.Id);
+                    table.PrimaryKey("PK_LocalityTypes", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -79,6 +79,21 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ObjectTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RevokedTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Jti = table.Column<string>(type: "text", nullable: false),
+                    ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    RevokedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RevokedTokens", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -116,6 +131,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     ResetTokenExpiry = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     IsBlacklisted = table.Column<bool>(type: "boolean", nullable: false),
+                    HasRequestedCreatorRole = table.Column<bool>(type: "boolean", nullable: false),
                     RoleId = table.Column<int>(type: "integer", nullable: false),
                     ManagedDestinationId = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -183,6 +199,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     Reason = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     ResolvedByUserId = table.Column<int>(type: "integer", nullable: true),
+                    RejectionReason = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ResolvedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -207,6 +224,27 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RefreshTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RefreshTokenHash = table.Column<string>(type: "text", nullable: false),
+                    RefreshTokenExpiry = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UserId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RefreshTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RefreshTokens_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -235,7 +273,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Locations",
+                name: "Localities",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -245,28 +283,28 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     Geolocation = table.Column<Point>(type: "geometry", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     DestinationId = table.Column<int>(type: "integer", nullable: false),
-                    LocationTypeId = table.Column<int>(type: "integer", nullable: false),
+                    LocalityTypeId = table.Column<int>(type: "integer", nullable: false),
                     CreatedByUserId = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Locations", x => x.Id);
+                    table.PrimaryKey("PK_Localities", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Locations_Destinations_DestinationId",
+                        name: "FK_Localities_Destinations_DestinationId",
                         column: x => x.DestinationId,
                         principalTable: "Destinations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Locations_LocationTypes_LocationTypeId",
-                        column: x => x.LocationTypeId,
-                        principalTable: "LocationTypes",
+                        name: "FK_Localities_LocalityTypes_LocalityTypeId",
+                        column: x => x.LocalityTypeId,
+                        principalTable: "LocalityTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Locations_Users_CreatedByUserId",
+                        name: "FK_Localities_Users_CreatedByUserId",
                         column: x => x.CreatedByUserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -314,7 +352,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     Status = table.Column<string>(type: "text", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     ObjectTypeId = table.Column<int>(type: "integer", nullable: false),
-                    LocationId = table.Column<int>(type: "integer", nullable: false),
+                    LocalityId = table.Column<int>(type: "integer", nullable: false),
                     DestinationId = table.Column<int>(type: "integer", nullable: true),
                     CreatedByUserId = table.Column<int>(type: "integer", nullable: false),
                     ApprovedByUserId = table.Column<int>(type: "integer", nullable: true),
@@ -333,9 +371,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
-                        name: "FK_Objects_Locations_LocationId",
-                        column: x => x.LocationId,
-                        principalTable: "Locations",
+                        name: "FK_Objects_Localities_LocalityId",
+                        column: x => x.LocalityId,
+                        principalTable: "Localities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -372,9 +410,13 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     ActivityTypeId = table.Column<int>(type: "integer", nullable: false),
                     DestinationId = table.Column<int>(type: "integer", nullable: true),
-                    LocationId = table.Column<int>(type: "integer", nullable: true),
+                    LocalityId = table.Column<int>(type: "integer", nullable: true),
                     ObjectId = table.Column<int>(type: "integer", nullable: true),
+                    Status = table.Column<int>(type: "integer", nullable: false),
                     CreatedByUserId = table.Column<int>(type: "integer", nullable: false),
+                    ApprovedByUserId = table.Column<int>(type: "integer", nullable: true),
+                    ApprovedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    RejectionReason = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -394,9 +436,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
-                        name: "FK_Activities_Locations_LocationId",
-                        column: x => x.LocationId,
-                        principalTable: "Locations",
+                        name: "FK_Activities_Localities_LocalityId",
+                        column: x => x.LocalityId,
+                        principalTable: "Localities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
@@ -405,6 +447,11 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         principalTable: "Objects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Activities_Users_ApprovedByUserId",
+                        column: x => x.ApprovedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Activities_Users_CreatedByUserId",
                         column: x => x.CreatedByUserId,
@@ -429,7 +476,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     EventTypeId = table.Column<int>(type: "integer", nullable: false),
-                    LocationId = table.Column<int>(type: "integer", nullable: true),
+                    LocalityId = table.Column<int>(type: "integer", nullable: true),
                     DestinationId = table.Column<int>(type: "integer", nullable: true),
                     ObjectId = table.Column<int>(type: "integer", nullable: true),
                     CreatedByUserId = table.Column<int>(type: "integer", nullable: false),
@@ -455,9 +502,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Events_Locations_LocationId",
-                        column: x => x.LocationId,
-                        principalTable: "Locations",
+                        name: "FK_Events_Localities_LocalityId",
+                        column: x => x.LocalityId,
+                        principalTable: "Localities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
@@ -561,12 +608,13 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     ActivityId = table.Column<int>(type: "integer", nullable: true),
                     DestinationId = table.Column<int>(type: "integer", nullable: true),
                     RouteId = table.Column<int>(type: "integer", nullable: true),
+                    LocalityId = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Favorites", x => x.Id);
-                    table.CheckConstraint("CK_Favorite_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"DestinationId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"RouteId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
+                    table.CheckConstraint("CK_Favorite_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"DestinationId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"RouteId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"LocalityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
                     table.ForeignKey(
                         name: "FK_Favorites_Activities_ActivityId",
                         column: x => x.ActivityId,
@@ -577,6 +625,12 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         name: "FK_Favorites_Destinations_DestinationId",
                         column: x => x.DestinationId,
                         principalTable: "Destinations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Favorites_Localities_LocalityId",
+                        column: x => x.LocalityId,
+                        principalTable: "Localities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -600,6 +654,87 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DeletionRequests",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ObjectId = table.Column<int>(type: "integer", nullable: true),
+                    EventId = table.Column<int>(type: "integer", nullable: true),
+                    ActivityId = table.Column<int>(type: "integer", nullable: true),
+                    RequestedByUserId = table.Column<int>(type: "integer", nullable: false),
+                    Reason = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    ReviewedByUserId = table.Column<int>(type: "integer", nullable: true),
+                    RejectionReason = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    ReviewedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DeletionRequests", x => x.Id);
+                    table.CheckConstraint("CK_DeletionRequest_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"EventId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
+                    table.ForeignKey(
+                        name: "FK_DeletionRequests_Activities_ActivityId",
+                        column: x => x.ActivityId,
+                        principalTable: "Activities",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DeletionRequests_Events_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Events",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DeletionRequests_Objects_ObjectId",
+                        column: x => x.ObjectId,
+                        principalTable: "Objects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DeletionRequests_Users_RequestedByUserId",
+                        column: x => x.RequestedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_DeletionRequests_Users_ReviewedByUserId",
+                        column: x => x.ReviewedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EventPlannerItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    EventId = table.Column<int>(type: "integer", nullable: false),
+                    AddedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EventPlannerItems", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EventPlannerItems_Events_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Events",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EventPlannerItems_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Images",
                 columns: table => new
                 {
@@ -612,13 +747,13 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     ActivityId = table.Column<int>(type: "integer", nullable: true),
                     EventId = table.Column<int>(type: "integer", nullable: true),
                     DestinationId = table.Column<int>(type: "integer", nullable: true),
-                    LocationId = table.Column<int>(type: "integer", nullable: true),
+                    LocalityId = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Images", x => x.Id);
-                    table.CheckConstraint("CK_Image_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"EventId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"DestinationId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"LocationId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
+                    table.CheckConstraint("CK_Image_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"EventId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"DestinationId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"LocalityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
                     table.ForeignKey(
                         name: "FK_Images_Activities_ActivityId",
                         column: x => x.ActivityId,
@@ -638,9 +773,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Images_Locations_LocationId",
-                        column: x => x.LocationId,
-                        principalTable: "Locations",
+                        name: "FK_Images_Localities_LocalityId",
+                        column: x => x.LocalityId,
+                        principalTable: "Localities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -655,6 +790,11 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 name: "IX_Activities_ActivityTypeId",
                 table: "Activities",
                 column: "ActivityTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Activities_ApprovedByUserId",
+                table: "Activities",
+                column: "ApprovedByUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Activities_CreatedByUserId",
@@ -673,14 +813,43 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 .Annotation("Npgsql:IndexMethod", "GIST");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Activities_LocationId",
+                name: "IX_Activities_LocalityId",
                 table: "Activities",
-                column: "LocationId");
+                column: "LocalityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Activities_ObjectId",
                 table: "Activities",
                 column: "ObjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DeletionRequests_ActivityId",
+                table: "DeletionRequests",
+                column: "ActivityId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DeletionRequests_EventId",
+                table: "DeletionRequests",
+                column: "EventId",
+                unique: true,
+                filter: "\"EventId\" IS NOT NULL AND \"Status\" = 'Pending'");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DeletionRequests_ObjectId",
+                table: "DeletionRequests",
+                column: "ObjectId",
+                unique: true,
+                filter: "\"ObjectId\" IS NOT NULL AND \"Status\" = 'Pending'");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DeletionRequests_RequestedByUserId",
+                table: "DeletionRequests",
+                column: "RequestedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DeletionRequests_ReviewedByUserId",
+                table: "DeletionRequests",
+                column: "ReviewedByUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Destinations_CreatedByUserId",
@@ -705,6 +874,17 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_EventPlannerItems_EventId",
+                table: "EventPlannerItems",
+                column: "EventId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventPlannerItems_UserId_EventId",
+                table: "EventPlannerItems",
+                columns: new[] { "UserId", "EventId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Events_ApprovedByUserId",
                 table: "Events",
                 column: "ApprovedByUserId");
@@ -725,9 +905,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 column: "EventTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Events_LocationId",
+                name: "IX_Events_LocalityId",
                 table: "Events",
-                column: "LocationId");
+                column: "LocalityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Events_ObjectId",
@@ -745,6 +925,11 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 column: "DestinationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Favorites_LocalityId",
+                table: "Favorites",
+                column: "LocalityId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Favorites_ObjectId",
                 table: "Favorites",
                 column: "ObjectId");
@@ -755,9 +940,39 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 column: "RouteId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Favorites_UserId",
+                name: "IX_Favorites_UserId_ActivityId",
                 table: "Favorites",
-                column: "UserId");
+                columns: new[] { "UserId", "ActivityId" },
+                unique: true,
+                filter: "\"ActivityId\" IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Favorites_UserId_DestinationId",
+                table: "Favorites",
+                columns: new[] { "UserId", "DestinationId" },
+                unique: true,
+                filter: "\"DestinationId\" IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Favorites_UserId_LocalityId",
+                table: "Favorites",
+                columns: new[] { "UserId", "LocalityId" },
+                unique: true,
+                filter: "\"LocalityId\" IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Favorites_UserId_ObjectId",
+                table: "Favorites",
+                columns: new[] { "UserId", "ObjectId" },
+                unique: true,
+                filter: "\"ObjectId\" IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Favorites_UserId_RouteId",
+                table: "Favorites",
+                columns: new[] { "UserId", "RouteId" },
+                unique: true,
+                filter: "\"RouteId\" IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Images_ActivityId",
@@ -775,9 +990,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 column: "EventId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Images_LocationId",
+                name: "IX_Images_LocalityId",
                 table: "Images",
-                column: "LocationId");
+                column: "LocalityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Images_ObjectId",
@@ -785,25 +1000,25 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 column: "ObjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Locations_CreatedByUserId",
-                table: "Locations",
+                name: "IX_Localities_CreatedByUserId",
+                table: "Localities",
                 column: "CreatedByUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Locations_DestinationId",
-                table: "Locations",
+                name: "IX_Localities_DestinationId",
+                table: "Localities",
                 column: "DestinationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Locations_Geolocation",
-                table: "Locations",
+                name: "IX_Localities_Geolocation",
+                table: "Localities",
                 column: "Geolocation")
                 .Annotation("Npgsql:IndexMethod", "GIST");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Locations_LocationTypeId",
-                table: "Locations",
-                column: "LocationTypeId");
+                name: "IX_Localities_LocalityTypeId",
+                table: "Localities",
+                column: "LocalityTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ManagerReports_ManagerId",
@@ -813,7 +1028,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ManagerReports_ReportedUserId",
                 table: "ManagerReports",
-                column: "ReportedUserId");
+                column: "ReportedUserId",
+                unique: true,
+                filter: "\"Status\" = 0");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ManagerReports_ResolvedByUserId",
@@ -842,14 +1059,20 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 .Annotation("Npgsql:IndexMethod", "GIST");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Objects_LocationId",
+                name: "IX_Objects_LocalityId",
                 table: "Objects",
-                column: "LocationId");
+                column: "LocalityId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Objects_ObjectTypeId",
                 table: "Objects",
                 column: "ObjectTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RefreshTokens_UserId",
+                table: "RefreshTokens",
+                column: "UserId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reviews_ObjectId",
@@ -865,6 +1088,17 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 name: "IX_Reviews_UserId_ObjectId",
                 table: "Reviews",
                 columns: new[] { "UserId", "ObjectId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RevokedTokens_ExpiresAt",
+                table: "RevokedTokens",
+                column: "ExpiresAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RevokedTokens_Jti",
+                table: "RevokedTokens",
+                column: "Jti",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -904,6 +1138,12 @@ namespace TuristickiVodic.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "DeletionRequests");
+
+            migrationBuilder.DropTable(
+                name: "EventPlannerItems");
+
+            migrationBuilder.DropTable(
                 name: "Favorites");
 
             migrationBuilder.DropTable(
@@ -913,7 +1153,13 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 name: "ManagerReports");
 
             migrationBuilder.DropTable(
+                name: "RefreshTokens");
+
+            migrationBuilder.DropTable(
                 name: "Reviews");
+
+            migrationBuilder.DropTable(
+                name: "RevokedTokens");
 
             migrationBuilder.DropTable(
                 name: "RoutePoints");
@@ -940,7 +1186,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 name: "Objects");
 
             migrationBuilder.DropTable(
-                name: "Locations");
+                name: "Localities");
 
             migrationBuilder.DropTable(
                 name: "ObjectTypes");
@@ -949,7 +1195,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 name: "Destinations");
 
             migrationBuilder.DropTable(
-                name: "LocationTypes");
+                name: "LocalityTypes");
 
             migrationBuilder.DropTable(
                 name: "DestinationTypes");

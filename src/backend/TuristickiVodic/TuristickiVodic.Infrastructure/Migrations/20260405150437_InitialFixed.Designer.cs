@@ -13,8 +13,8 @@ using TuristickiVodic.Infrastructure.Data;
 namespace TuristickiVodic.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260405121354_AddActivityToDeletionRequest")]
-    partial class AddActivityToDeletionRequest
+    [Migration("20260405150437_InitialFixed")]
+    partial class InitialFixed
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
