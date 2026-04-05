@@ -160,10 +160,7 @@
 
 **SLIKE**
 
-- Slika mora imati `Url`.
-- `Url` ima maksimalnu dužinu od 500 karaktera.
-- `AltText` je opcioni i ima maksimalnu dužinu od 200 karaktera.
-- `IsMain` označava glavnu sliku.
+- `IsMain` označava glavnu sliku (jedna slika mora biti).
 - Slika mora biti vezana za tačno jedan entitet, nije dozvoljeno da bude vezana za više entiteta istovremeno.
 - Slika može biti vezana za:
   - objekat
