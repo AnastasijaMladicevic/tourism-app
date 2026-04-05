@@ -111,16 +111,16 @@ INSERT INTO "Users"
 ("FirstName", "LastName", "DateOfBirth", "Email", "PasswordHash", "PhoneNumber", "Country", "Language",
  "IsVerified", "IsActive", "IsBlacklisted", "HasRequestedCreatorRole", "RoleId", "ManagedDestinationId", "CreatedAt", "UpdatedAt")
 VALUES
-('Nikola', 'Nikolic', '1990-01-01', 'admin@spirego.com', '$2y$11$...', NULL, 'Crna Gora', 'sr', true, true, false, false,
+('Nikola', 'Nikolic', '1990-01-01', 'admin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW()),
 
-('Marko', 'Jovanovic', '1992-05-15', 'marko@spirego.com', '$2y$11$...', '+38269123456', 'Crna Gora', 'sr', true, true, false, false,
+('Marko', 'Jovanovic', '1992-05-15', 'marko@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269123456', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW()),
 
-('Ana', 'Petrovic', '1995-03-20', 'ana@spirego.com', '$2y$11$...', '+38269234567', 'Crna Gora', 'sr', true, true, false, false,
+('Ana', 'Petrovic', '1995-03-20', 'ana@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269234567', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'ContentCreator'), NULL, NOW(), NOW()),
 
-('Ana', 'Anic', '1998-07-10', 'ana@gmail.com', '$2y$11$...', NULL, 'Srbija', 'sr', true, true, false, false,
+('Ana', 'Anic', '1998-07-10', 'ana@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW());
 
 -- ============================================
@@ -329,7 +329,7 @@ VALUES
 -- 7. ACTIVITIES
 -- ============================================
 INSERT INTO "Activities"
-("Name", "Description", "Geolocation", "Price", "DurationMinutes", "IsActive", "ActivityTypeId", "LocalityId", "DestinationId", "ObjectId", "CreatedByUserId", "CreatedAt", "UpdatedAt")
+("Name", "Description", "Geolocation", "Price", "DurationMinutes", "IsActive", "ActivityTypeId", "LocalityId", "DestinationId", "ObjectId", "Status", "CreatedByUserId", "CreatedAt", "UpdatedAt")
 VALUES
 ('Degustacija morskih specijaliteta', 'Lokalna kuhinja - degustacija ribljih specijaliteta',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 25.00, 90, true,
@@ -337,6 +337,7 @@ VALUES
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
+ 1,
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
  NOW(), NOW()),
 
@@ -346,6 +347,7 @@ VALUES
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
+ 1,
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
  NOW(), NOW()),
 
@@ -355,6 +357,7 @@ VALUES
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Zabljak'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
+ 1,
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
  NOW(), NOW()),
 
@@ -364,6 +367,7 @@ VALUES
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
  NULL,
+ 1,
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
  NOW(), NOW());
 
