@@ -10,6 +10,7 @@ import { forkJoin } from 'rxjs';
 import { DestinationService, DestinationDto } from '../../services/destination';
 import { FavoriteService } from '../../services/favorite';
 import { DestinationTypeService, DestinationTypeDto } from '../../services/destination-type';
+import { AuthService } from '../../services/auth';
 
 export interface DestinationView extends DestinationDto {
   isFavorite: boolean;
@@ -24,14 +25,6 @@ const MOCK_TYPES: DestinationTypeDto[] = [
 ];
 
 const MOCK_DESTINATIONS: DestinationView[] = [
-  {
-    id: 1, name: 'Kotor Old Town',
-    description: 'A well-preserved medieval town with winding streets, ancient churches, and the stunning San Giovanni fortress above.',
-    distanceKm: 0.5, averageRating: 4.9, reviewCount: 1240,
-    isActive: true, destinationTypeId: 1, destinationTypeName: 'History',
-    images: [{ id: 1, url: 'https://images.unsplash.com/photo-1555990793-da11153b4559?w=800', altText: 'Kotor Old Town', isMain: true }],
-    isFavorite: false,
-  },
   {
     id: 2, name: 'Our Lady of the Rocks',
     description: 'A stunning island church built on an artificially created islet in the Bay of Kotor.',
@@ -90,7 +83,6 @@ const MOCK_DESTINATIONS: DestinationView[] = [
 export class AttractionsComponent implements OnInit {
 
   searchQuery = '';
-  showSearch = false;
   activeFilter = 'All';
   sortOption: 'rating' | 'az' | 'za' | 'distance' = 'rating';
   showSortMenu = false;
@@ -105,6 +97,7 @@ export class AttractionsComponent implements OnInit {
     private destinationService: DestinationService,
     private favoriteService: FavoriteService,
     private destinationTypeService: DestinationTypeService,
+    private authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -194,15 +187,13 @@ export class AttractionsComponent implements OnInit {
     return map[this.sortOption];
   }
 
-  toggleSearch(): void {
-    this.showSearch = !this.showSearch;
-    if (!this.showSearch) this.searchQuery = '';
-  }
-
   // ── Favorites ──────────────────────────────────────────────────────────────
   toggleFavorite(destination: DestinationView, event: Event): void {
     event.stopPropagation();
-
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
     // ── MOCK — zakomentariši kad backend bude spreman ──────────────────────
     destination.isFavorite = !destination.isFavorite;
     // ── KRAJ MOCK ───────────────────────────────────────────────────────────

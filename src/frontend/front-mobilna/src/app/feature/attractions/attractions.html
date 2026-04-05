@@ -4,121 +4,84 @@
     <button class="icon-btn" (click)="goBack()" aria-label="Go back">
       <mat-icon>arrow_back_ios</mat-icon>
     </button>
-
-    <!-- Title — hidden on desktop when search is open -->
-    <h1 class="header__title" [class.header__title--hidden]="showSearch">Attractions</h1>
-
-    <!-- Desktop inline search (visible when showSearch=true on large screens) -->
-    <div class="header__search-inline" [class.header__search-inline--open]="showSearch">
-      <mat-icon class="search-inline__icon">search</mat-icon>
-      <input
-        #desktopSearch
-        class="search-inline__input"
-        type="text"
-        placeholder="Search attractions..."
-        [(ngModel)]="searchQuery"
-      />
-      <button class="icon-btn" (click)="toggleSearch()" aria-label="Close search">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-
-    <div class="header__actions">
-      <button class="icon-btn" (click)="toggleSearch()" aria-label="Search">
-        <mat-icon>search</mat-icon>
-      </button>
-
-      <!-- Sort button with label -->
-      <button
-        class="sort-anchor icon-btn sort-btn"
-        (click)="$event.stopPropagation(); showSortMenu = !showSortMenu"
-        aria-label="Sort"
-      >
-        <mat-icon>swap_vert</mat-icon>
-      </button>
-
-      <!-- Sort dropdown -->
-      @if (showSortMenu) {
-        <div class="sort-menu sort-anchor">
-          <button
-            class="sort-menu__item"
-            [class.sort-menu__item--active]="sortOption === 'rating'"
-            (click)="setSort('rating')"
-          >
-            <mat-icon>star</mat-icon> Top Rated
-          </button>
-          <button
-            class="sort-menu__item"
-            [class.sort-menu__item--active]="sortOption === 'distance'"
-            (click)="setSort('distance')"
-          >
-            <mat-icon>near_me</mat-icon> Nearest First
-          </button>
-          <button
-            class="sort-menu__item"
-            [class.sort-menu__item--active]="sortOption === 'az'"
-            (click)="setSort('az')"
-          >
-            <mat-icon>sort_by_alpha</mat-icon> A → Z
-          </button>
-          <button
-            class="sort-menu__item"
-            [class.sort-menu__item--active]="sortOption === 'za'"
-            (click)="setSort('za')"
-          >
-            <mat-icon>sort_by_alpha</mat-icon> Z → A
-          </button>
-        </div>
-      }
-    </div>
+    <h1 class="header__title">Attractions</h1>
   </div>
 
-  <!-- ── Mobile search bar (below header, only on mobile) ── -->
-  @if (showSearch) {
-    <div class="search-bar mobile-only">
-      <mat-icon>search</mat-icon>
-      <input
-        type="text"
-        placeholder="Search attractions..."
-        [(ngModel)]="searchQuery"
-        class="search-bar__input"
-        autofocus
-      />
-      @if (searchQuery) {
-        <button class="icon-btn" (click)="searchQuery = ''" aria-label="Clear">
-          <mat-icon>close</mat-icon>
+  <!-- ── Filter tabs ── -->
+  <div class="filters-row">
+    <!-- Search i sort — uvek vidljivi gore -->
+    <div class="filters-right">
+      <div class="search-inline">
+        <mat-icon>search</mat-icon>
+        <input type="text" placeholder="Search..." [(ngModel)]="searchQuery" />
+      </div>
+
+      <div
+        class="sort-anchor sort-trigger"
+        (click)="$event.stopPropagation(); showSortMenu = !showSortMenu"
+      >
+        <span>{{ sortLabel() }}</span>
+        <mat-icon>expand_more</mat-icon>
+
+        @if (showSortMenu) {
+          <div class="sort-menu sort-anchor">
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'rating'"
+              (click)="setSort('rating')"
+            >
+              <mat-icon>star</mat-icon> Top Rated
+            </button>
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'distance'"
+              (click)="setSort('distance')"
+            >
+              <mat-icon>near_me</mat-icon> Nearest
+            </button>
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'az'"
+              (click)="setSort('az')"
+            >
+              <mat-icon>sort_by_alpha</mat-icon> A → Z
+            </button>
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'za'"
+              (click)="setSort('za')"
+            >
+              <mat-icon>sort_by_alpha</mat-icon> Z → A
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Filteri ispod, scrolluju -->
+    <div class="filters-scroll">
+      <button
+        class="filter-btn"
+        [class.filter-btn--active]="activeFilter === 'All'"
+        (click)="setFilter('All')"
+      >
+        All
+      </button>
+      @for (type of destinationTypes; track type.id) {
+        <button
+          class="filter-btn"
+          [class.filter-btn--active]="activeFilter === type.name"
+          (click)="setFilter(type.name)"
+        >
+          {{ type.name }}
         </button>
       }
     </div>
-  }
-
-  <!-- ── Filter tabs ── -->
-  <div class="filters">
-    <button
-      class="filter-btn"
-      [class.filter-btn--active]="activeFilter === 'All'"
-      (click)="setFilter('All')"
-    >
-      All
-    </button>
-    @for (type of destinationTypes; track type.id) {
-      <button
-        class="filter-btn"
-        [class.filter-btn--active]="activeFilter === type.name"
-        (click)="setFilter(type.name)"
-      >
-        {{ type.name }}
-      </button>
-    }
   </div>
 
   <!-- ── Results bar ── -->
   <div class="results-bar">
     <span class="results-bar__count">{{ filtered.length }} places found</span>
-    <span class="results-bar__sort">
-      <mat-icon>swap_vert</mat-icon>
-      {{ sortLabel() }}
-    </span>
   </div>
   @if (isLoading) {
     <div class="loading">
