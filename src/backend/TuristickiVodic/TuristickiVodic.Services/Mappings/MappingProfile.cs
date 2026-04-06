@@ -111,8 +111,22 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.CreatedByFullName, opt => opt.MapFrom(src => src.CreatedBy != null ? src.CreatedBy.FirstName + " " + src.CreatedBy.LastName : null))
                 .ForMember(dest => dest.RoutePoints, opt => opt.MapFrom(src => src.RoutePoints));
 
+            CreateMap<TouristObject, TouristObjectDto>()
+                .ForMember(dest => dest.ObjectTypeName, opt => opt.MapFrom(src => src.ObjectType != null ? src.ObjectType.Name : null))
+                .ForMember(dest => dest.LocalityName, opt => opt.MapFrom(src => src.Locality != null ? src.Locality.Name : null))
+                .ForMember(dest => dest.DestinationName,
+                    opt => opt.MapFrom(src =>
+                        src.Destination != null
+                            ? src.Destination.Name
+                            : src.Locality != null && src.Locality.Destination != null
+                                ? src.Locality.Destination.Name
+                                : null))
+                .ForMember(dest => dest.Longitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
+                .ForMember(dest => dest.Latitude, opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.Y : (double?)null))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+
             CreateMap<Image, ImageDto>()
-                .ForMember(dest => dest.LocationId, opt => opt.MapFrom(src => src.LocalityId));
+                .ForMember(dest => dest.LocalityId, opt => opt.MapFrom(src => src.LocalityId));
         }
     }
 }

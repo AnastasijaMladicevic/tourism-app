@@ -374,5 +374,106 @@ namespace TuristickiVodic.Tests.Mappings
 
             dto.DestinationName.Should().BeNullOrEmpty();
         }
+
+        // ═══════════════════════════════════════════
+        //  TouristObject -> TouristObjectDto
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void TouristObjectToDto_MapiraOsnovnaPolja()
+        {
+            var obj = new TouristObject
+            {
+                Id = 1,
+                Name = "Hotel Vardar",
+                Description = "Opis",
+                Address = "Adresa",
+                PhoneNumber = "+38232123456",
+                Website = "https://hotel.com",
+                WorkingHours = "00:00-24:00",
+                IsActive = true,
+                Status = ContentStatus.Pending,
+                ObjectTypeId = 2,
+                ObjectType = new ObjectType { Id = 2, Name = "Hotel" },
+                LocalityId = 3,
+                Locality = new Locality
+                {
+                    Id = 3,
+                    Name = "Kotor",
+                    DestinationId = 4,
+                    Destination = new Destination { Id = 4, Name = "Stari grad Kotor", CreatedByUserId = 99 }
+                },
+                DestinationId = 4,
+                CreatedByUserId = 10,
+                CreatedAt = new DateTime(2024, 1, 1),
+                UpdatedAt = new DateTime(2024, 1, 2)
+            };
+
+            var dto = _mapper.Map<TouristObjectDto>(obj);
+
+            dto.Id.Should().Be(1);
+            dto.Name.Should().Be("Hotel Vardar");
+            dto.ObjectTypeId.Should().Be(2);
+            dto.ObjectTypeName.Should().Be("Hotel");
+            dto.LocalityId.Should().Be(3);
+            dto.LocalityName.Should().Be("Kotor");
+            dto.DestinationId.Should().Be(4);
+            dto.DestinationName.Should().Be("Stari grad Kotor");
+            dto.Status.Should().Be("Pending");
+        }
+
+        [Fact]
+        public void TouristObjectToDto_GeolokacijaSeMapiraULongitudeLatitude()
+        {
+            var obj = new TouristObject
+            {
+                Id = 2,
+                Name = "Objekat",
+                Geolocation = new Point(18.77, 42.42) { SRID = 4326 },
+                ObjectTypeId = 1,
+                ObjectType = new ObjectType { Id = 1, Name = "Muzej" },
+                LocalityId = 1,
+                Locality = new Locality
+                {
+                    Id = 1,
+                    Name = "Kotor",
+                    DestinationId = 1,
+                    Destination = new Destination { Id = 1, Name = "Kotor", CreatedByUserId = 99 }
+                },
+                CreatedByUserId = 10
+            };
+
+            var dto = _mapper.Map<TouristObjectDto>(obj);
+
+            dto.Longitude.Should().BeApproximately(18.77, 0.001);
+            dto.Latitude.Should().BeApproximately(42.42, 0.001);
+        }
+
+        [Fact]
+        public void TouristObjectToDto_BezGeolokacije_LongLatJeNull()
+        {
+            var obj = new TouristObject
+            {
+                Id = 3,
+                Name = "Objekat",
+                Geolocation = null,
+                ObjectTypeId = 1,
+                ObjectType = new ObjectType { Id = 1, Name = "Muzej" },
+                LocalityId = 1,
+                Locality = new Locality
+                {
+                    Id = 1,
+                    Name = "Kotor",
+                    DestinationId = 1,
+                    Destination = new Destination { Id = 1, Name = "Kotor", CreatedByUserId = 99 }
+                },
+                CreatedByUserId = 10
+            };
+
+            var dto = _mapper.Map<TouristObjectDto>(obj);
+
+            dto.Longitude.Should().BeNull();
+            dto.Latitude.Should().BeNull();
+        }
     }
 }
