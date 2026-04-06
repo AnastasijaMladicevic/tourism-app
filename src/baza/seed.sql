@@ -1,4 +1,4 @@
-TRUNCATE TABLE
+/*TRUNCATE TABLE
     "Images",
     "Favorites",
     "Reviews",
@@ -18,7 +18,7 @@ TRUNCATE TABLE
     "DestinationTypes",
     "LocalityTypes",
     "Roles"
-RESTART IDENTITY CASCADE;
+RESTART IDENTITY CASCADE;*/
 
 -- ============================================
 -- TEST PASSWORD FOR SEEDED USERS

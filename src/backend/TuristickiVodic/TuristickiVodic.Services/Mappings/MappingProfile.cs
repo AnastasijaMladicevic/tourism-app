@@ -14,6 +14,8 @@ namespace TuristickiVodic.Services.Mappings
 
             CreateMap<CreateUserDto, User>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.DateOfBirth,
+                    opt => opt.MapFrom(src => DateTime.SpecifyKind(src.DateOfBirth, DateTimeKind.Utc)))
                 .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
                 .ForMember(dest => dest.RoleId, opt => opt.Ignore())
                 .ForMember(dest => dest.Role, opt => opt.Ignore())
@@ -42,6 +44,10 @@ namespace TuristickiVodic.Services.Mappings
             CreateMap<UpdateUserDto, User>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.Email, opt => opt.Ignore())
+                .ForMember(dest => dest.DateOfBirth,
+                    opt => opt.MapFrom(src => src.DateOfBirth.HasValue
+                        ? DateTime.SpecifyKind(src.DateOfBirth.Value, DateTimeKind.Utc)
+                        : default(DateTime?)))
                 .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
                 .ForMember(dest => dest.RoleId, opt => opt.Ignore())
                 .ForMember(dest => dest.Role, opt => opt.Ignore())

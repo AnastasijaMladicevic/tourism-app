@@ -5,7 +5,7 @@ import { CreateUserDto, LoginDto, AuthResponse } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'http://localhost:5000/api/users';
+  private apiUrl = 'https://localhost:7047/api/users';
 
   constructor(private http: HttpClient) {}
 
