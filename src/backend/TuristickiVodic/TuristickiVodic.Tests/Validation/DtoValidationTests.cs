@@ -532,5 +532,82 @@ namespace TuristickiVodic.Tests.Validation
 
             IsValid(dto).Should().BeTrue();
         }
+
+        // ═══════════════════════════════════════════
+        //  CreateEventDto
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void CreateEventDto_KadaImaLocalityId_JeValidan()
+        {
+            var dto = new CreateEventDto
+            {
+                Name = "Koncert",
+                EventTypeId = 1,
+                LocalityId = 1,
+                StartDate = new DateTime(2026, 5, 1, 20, 0, 0)
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateEventDto_KadaImaDestinationId_JeValidan()
+        {
+            var dto = new CreateEventDto
+            {
+                Name = "Festival",
+                EventTypeId = 1,
+                DestinationId = 2,
+                StartDate = new DateTime(2026, 5, 2, 20, 0, 0)
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateEventDto_BezLocalityIBezDestination_NijeValidan()
+        {
+            var dto = new CreateEventDto
+            {
+                Name = "Event",
+                EventTypeId = 1,
+                StartDate = new DateTime(2026, 5, 3, 20, 0, 0)
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.ErrorMessage != null &&
+                                               r.ErrorMessage.Contains("either a LocalityId or a DestinationId"));
+        }
+
+        [Fact]
+        public void CreateEventDto_BezName_NijeValidan()
+        {
+            var dto = new CreateEventDto
+            {
+                Name = string.Empty,
+                EventTypeId = 1,
+                LocalityId = 1,
+                StartDate = new DateTime(2026, 5, 4, 20, 0, 0)
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateEventDto.Name)));
+        }
+
+        [Fact]
+        public void CreateEventDto_NameDuzeOd200Karaktera_NijeValidan()
+        {
+            var dto = new CreateEventDto
+            {
+                Name = new string('X', 201),
+                EventTypeId = 1,
+                LocalityId = 1,
+                StartDate = new DateTime(2026, 5, 5, 20, 0, 0)
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateEventDto.Name)));
+        }
     }
 }

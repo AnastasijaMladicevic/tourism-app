@@ -475,5 +475,106 @@ namespace TuristickiVodic.Tests.Mappings
             dto.Longitude.Should().BeNull();
             dto.Latitude.Should().BeNull();
         }
+
+        // ═══════════════════════════════════════════
+        //  Event -> EventDto
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void EventToDto_MapiraNazivePovezanihEntiteta()
+        {
+            var ev = new Event
+            {
+                Id = 1,
+                Name = "Sea Dance",
+                Description = "Opis",
+                StartDate = new DateTime(2026, 6, 1, 20, 0, 0, DateTimeKind.Utc),
+                EndDate = new DateTime(2026, 6, 2, 1, 0, 0, DateTimeKind.Utc),
+                Status = ContentStatus.Pending,
+                EventTypeId = 1,
+                EventType = new EventType { Id = 1, Name = "Koncert" },
+                LocalityId = 2,
+                Locality = new Locality { Id = 2, Name = "Stari grad" },
+                DestinationId = 3,
+                Destination = new Destination { Id = 3, Name = "Kotor", CreatedByUserId = 99 },
+                ObjectId = 4,
+                Object = new TouristObject { Id = 4, Name = "Tvrdjava" },
+                CreatedByUserId = 20,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            var dto = _mapper.Map<EventDto>(ev);
+
+            dto.EventTypeName.Should().Be("Koncert");
+            dto.LocalityName.Should().Be("Stari grad");
+            dto.DestinationName.Should().Be("Kotor");
+            dto.ObjectName.Should().Be("Tvrdjava");
+        }
+
+        [Fact]
+        public void EventToDto_GeolokacijaSeMapiraULongitudeILatitude()
+        {
+            var ev = new Event
+            {
+                Id = 2,
+                Name = "Festival",
+                EventTypeId = 1,
+                EventType = new EventType { Id = 1, Name = "Festival" },
+                StartDate = new DateTime(2026, 6, 10, 20, 0, 0, DateTimeKind.Utc),
+                Geolocation = new Point(18.77, 42.42) { SRID = 4326 },
+                CreatedByUserId = 20,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            var dto = _mapper.Map<EventDto>(ev);
+
+            dto.Longitude.Should().BeApproximately(18.77, 0.001);
+            dto.Latitude.Should().BeApproximately(42.42, 0.001);
+        }
+
+        [Fact]
+        public void EventToDto_BezGeolokacije_LongitudeILatitudeSuNull()
+        {
+            var ev = new Event
+            {
+                Id = 3,
+                Name = "Predavanje",
+                EventTypeId = 1,
+                EventType = new EventType { Id = 1, Name = "Predavanje" },
+                StartDate = new DateTime(2026, 6, 11, 20, 0, 0, DateTimeKind.Utc),
+                Geolocation = null,
+                CreatedByUserId = 20,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            var dto = _mapper.Map<EventDto>(ev);
+
+            dto.Longitude.Should().BeNull();
+            dto.Latitude.Should().BeNull();
+        }
+
+        [Fact]
+        public void EventToDto_StatusSeMapiraKaoString()
+        {
+            var ev = new Event
+            {
+                Id = 4,
+                Name = "Sajam",
+                EventTypeId = 1,
+                EventType = new EventType { Id = 1, Name = "Sajam" },
+                StartDate = new DateTime(2026, 6, 12, 20, 0, 0, DateTimeKind.Utc),
+                Status = ContentStatus.Approved,
+                CreatedByUserId = 20,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            var dto = _mapper.Map<EventDto>(ev);
+
+            dto.Status.Should().Be("Approved");
+        }
     }
 }
