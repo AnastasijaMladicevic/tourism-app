@@ -576,5 +576,101 @@ namespace TuristickiVodic.Tests.Mappings
 
             dto.Status.Should().Be("Approved");
         }
+
+        // ═══════════════════════════════════════════
+        //  Activity -> ActivityDto
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void ActivityToDto_MapiraNazivePovezanihEntiteta()
+        {
+            var activity = new Activity
+            {
+                Id = 1,
+                Name = "Pesacka tura",
+                Description = "Opis",
+                Status = ContentStatus.Pending,
+                ActivityTypeId = 1,
+                ActivityType = new ActivityType { Id = 1, Name = "Setnja" },
+                LocalityId = 2,
+                Locality = new Locality { Id = 2, Name = "Stari grad" },
+                DestinationId = 3,
+                Destination = new Destination { Id = 3, Name = "Kotor", CreatedByUserId = 99 },
+                ObjectId = 4,
+                Object = new TouristObject { Id = 4, Name = "Tvrdjava" },
+                CreatedByUserId = 20,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            var dto = _mapper.Map<ActivityDto>(activity);
+
+            dto.ActivityTypeName.Should().Be("Setnja");
+            dto.LocalityName.Should().Be("Stari grad");
+            dto.DestinationName.Should().Be("Kotor");
+            dto.ObjectName.Should().Be("Tvrdjava");
+        }
+
+        [Fact]
+        public void ActivityToDto_GeolokacijaSeMapiraULongitudeILatitude()
+        {
+            var activity = new Activity
+            {
+                Id = 2,
+                Name = "Biciklisticka ruta",
+                ActivityTypeId = 1,
+                ActivityType = new ActivityType { Id = 1, Name = "Biciklizam" },
+                Geolocation = new Point(18.77, 42.42) { SRID = 4326 },
+                CreatedByUserId = 20,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            var dto = _mapper.Map<ActivityDto>(activity);
+
+            dto.Longitude.Should().BeApproximately(18.77, 0.001);
+            dto.Latitude.Should().BeApproximately(42.42, 0.001);
+        }
+
+        [Fact]
+        public void ActivityToDto_BezGeolokacije_LongitudeILatitudeSuNull()
+        {
+            var activity = new Activity
+            {
+                Id = 3,
+                Name = "Obilazak",
+                ActivityTypeId = 1,
+                ActivityType = new ActivityType { Id = 1, Name = "Obilazak" },
+                Geolocation = null,
+                CreatedByUserId = 20,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            var dto = _mapper.Map<ActivityDto>(activity);
+
+            dto.Longitude.Should().BeNull();
+            dto.Latitude.Should().BeNull();
+        }
+
+        [Fact]
+        public void ActivityToDto_StatusSeMapiraKaoString()
+        {
+            var activity = new Activity
+            {
+                Id = 4,
+                Name = "Kajak",
+                ActivityTypeId = 1,
+                ActivityType = new ActivityType { Id = 1, Name = "Voda" },
+                Status = ContentStatus.Approved,
+                CreatedByUserId = 20,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            var dto = _mapper.Map<ActivityDto>(activity);
+
+            dto.Status.Should().Be("Approved");
+        }
     }
 }

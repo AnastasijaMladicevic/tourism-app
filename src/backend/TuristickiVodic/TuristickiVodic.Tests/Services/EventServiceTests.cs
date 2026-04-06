@@ -16,10 +16,13 @@ namespace TuristickiVodic.Tests.Services
         private static AppDbContext CreateInMemoryContext(string dbName)
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseInMemoryDatabase(dbName)
+                .UseInMemoryDatabase($"{dbName}_{Guid.NewGuid()}")
                 .Options;
 
-            return new AppDbContext(options);
+            var ctx = new AppDbContext(options);
+            ctx.Database.EnsureDeleted();
+            ctx.Database.EnsureCreated();
+            return ctx;
         }
 
         private static IMapper CreateMapper()
@@ -185,22 +188,29 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(CreateAsync_ContentCreator_KreiraEvent_StatusJePending));
             var (_, _, _, eventType, _, _, locality, _, creator, _, _, _, _) = SeedBase(ctx);
+
+            var eventTypeId = eventType.Id;
+            var localityId = locality.Id;
+            var creatorId = creator.Id;
+
+            ctx.ChangeTracker.Clear();
+
             var svc = new EventService(ctx, CreateMapper());
 
             var result = await svc.CreateAsync(new CreateEventDto
             {
                 Name = "Sea Dance",
-                EventTypeId = eventType.Id,
-                LocalityId = locality.Id,
+                EventTypeId = eventTypeId,
+                LocalityId = localityId,
                 StartDate = new DateTime(2026, 5, 1, 18, 0, 0, DateTimeKind.Utc)
-            }, creator.Id, "ContentCreator");
+            }, creatorId, "ContentCreator");
 
             result.Name.Should().Be("Sea Dance");
             result.Status.Should().Be("Pending");
 
             var saved = ctx.Events.Single();
             saved.Status.Should().Be(ContentStatus.Pending);
-            saved.CreatedByUserId.Should().Be(creator.Id);
+            saved.CreatedByUserId.Should().Be(creatorId);
         }
 
         [Fact]
@@ -218,13 +228,16 @@ namespace TuristickiVodic.Tests.Services
 
             var svc = new EventService(ctx, CreateMapper());
 
-            await svc.CreateAsync(new CreateEventDto
+            var result = await svc.CreateAsync(new CreateEventDto
             {
                 Name = "Koncert",
                 EventTypeId = eventTypeId,
                 LocalityId = localityId,
                 StartDate = new DateTime(2026, 5, 2, 20, 0, 0, DateTimeKind.Utc)
             }, creatorId, "ContentCreator");
+
+            result.Should().NotBeNull();
+            result.DestinationId.Should().Be(destinationId);
 
             ctx.Events.Single().DestinationId.Should().Be(destinationId);
         }
@@ -234,18 +247,26 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(CreateAsync_LocalityIDestinationNisuKonzistentni_BacaException));
             var (_, _, _, eventType, _, otherDestination, locality, _, creator, _, _, _, _) = SeedBase(ctx);
+
+            var eventTypeId = eventType.Id;
+            var localityId = locality.Id;
+            var otherDestinationId = otherDestination.Id;
+            var creatorId = creator.Id;
+
+            ctx.ChangeTracker.Clear();
+
             var svc = new EventService(ctx, CreateMapper());
 
             await svc.Invoking(s => s.CreateAsync(new CreateEventDto
             {
                 Name = "Koncert",
-                EventTypeId = eventType.Id,
-                LocalityId = locality.Id,
-                DestinationId = otherDestination.Id,
+                EventTypeId = eventTypeId,
+                LocalityId = localityId,
+                DestinationId = otherDestinationId,
                 StartDate = new DateTime(2026, 5, 3, 20, 0, 0, DateTimeKind.Utc)
-            }, creator.Id, "ContentCreator"))
+            }, creatorId, "ContentCreator"))
                 .Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*Locality does not belong to the specified destination.*");
+                .WithMessage("*Locality does not belong to the specified destination*");
         }
 
         [Fact]

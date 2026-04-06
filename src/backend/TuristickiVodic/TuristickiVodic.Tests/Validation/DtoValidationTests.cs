@@ -609,5 +609,109 @@ namespace TuristickiVodic.Tests.Validation
             IsValid(dto).Should().BeFalse();
             Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateEventDto.Name)));
         }
+
+        // ═══════════════════════════════════════════
+        //  CreateActivityDto
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void CreateActivityDto_KadaImaLocalityId_JeValidno()
+        {
+            var dto = new CreateActivityDto
+            {
+                Name = "Setnja",
+                ActivityTypeId = 1,
+                LocalityId = 1
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateActivityDto_KadaImaDestinationId_JeValidno()
+        {
+            var dto = new CreateActivityDto
+            {
+                Name = "Tura",
+                ActivityTypeId = 1,
+                DestinationId = 2
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateActivityDto_BezLocalityIBezDestination_NijeValidno()
+        {
+            var dto = new CreateActivityDto
+            {
+                Name = "Aktivnost",
+                ActivityTypeId = 1
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.ErrorMessage != null &&
+                                               r.ErrorMessage.Contains("either a LocalityId or a DestinationId"));
+        }
+
+        [Fact]
+        public void CreateActivityDto_BezName_NijeValidno()
+        {
+            var dto = new CreateActivityDto
+            {
+                Name = string.Empty,
+                ActivityTypeId = 1,
+                LocalityId = 1
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateActivityDto.Name)));
+        }
+
+        [Fact]
+        public void CreateActivityDto_NameDuzeOd150Karaktera_NijeValidno()
+        {
+            var dto = new CreateActivityDto
+            {
+                Name = new string('X', 151),
+                ActivityTypeId = 1,
+                LocalityId = 1
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateActivityDto.Name)));
+        }
+
+        [Fact]
+        public void CreateActivityDto_NameTacno150Karaktera_JeValidno()
+        {
+            var dto = new CreateActivityDto
+            {
+                Name = new string('X', 150),
+                ActivityTypeId = 1,
+                LocalityId = 1
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void UpdateActivityDto_SvaPoljaNull_JeValidno()
+        {
+            var dto = new UpdateActivityDto();
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void UpdateActivityDto_SamoName_JeValidno()
+        {
+            var dto = new UpdateActivityDto
+            {
+                Name = "Novo ime aktivnosti"
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
     }
 }
