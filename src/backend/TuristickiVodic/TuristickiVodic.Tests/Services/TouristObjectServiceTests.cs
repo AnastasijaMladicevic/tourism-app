@@ -16,10 +16,13 @@ namespace TuristickiVodic.Tests.Services
         private static AppDbContext CreateInMemoryContext(string dbName)
         {
             var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseInMemoryDatabase(dbName)
+                .UseInMemoryDatabase($"{dbName}_{Guid.NewGuid()}")
                 .Options;
 
-            return new AppDbContext(options);
+            var ctx = new AppDbContext(options);
+            ctx.Database.EnsureDeleted();
+            ctx.Database.EnsureCreated();
+            return ctx;
         }
 
         private static IMapper CreateMapper()
