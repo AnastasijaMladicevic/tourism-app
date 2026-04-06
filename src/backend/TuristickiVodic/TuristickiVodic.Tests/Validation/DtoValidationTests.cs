@@ -255,5 +255,139 @@ namespace TuristickiVodic.Tests.Validation
             IsValid(dto).Should().BeFalse();
             Validate(dto).Should().Contain(r => r.MemberNames.Contains("CurrentPassword"));
         }
+
+        // ═══════════════════════════════════════════
+        //  CreateLocalityDto
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void CreateLocalityDto_SvaObaveznaPolja_JeValidno()
+        {
+            var dto = new CreateLocalityDto
+            {
+                Name = "Stara Varos",
+                DestinationId = 1,
+                LocalityTypeId = 1
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateLocalityDto_SaOpcionalimPoljimaPopunjenim_JeValidno()
+        {
+            var dto = new CreateLocalityDto
+            {
+                Name = "Dobrota",
+                Description = "Primorsko naselje",
+                Longitude = 18.77,
+                Latitude = 42.42,
+                DestinationId = 1,
+                LocalityTypeId = 2,
+                IsActive = false
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateLocalityDto_BezName_NijeValidno()
+        {
+            var dto = new CreateLocalityDto
+            {
+                DestinationId = 1,
+                LocalityTypeId = 1
+            };
+
+            dto.Name = null!;
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains("Name"));
+        }
+
+        [Fact]
+        public void CreateLocalityDto_PrazanName_NijeValidno()
+        {
+            var dto = new CreateLocalityDto
+            {
+                Name = "",
+                DestinationId = 1,
+                LocalityTypeId = 1
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains("Name"));
+        }
+
+        [Fact]
+        public void CreateLocalityDto_NameDuzi150Karaktera_NijeValidno()
+        {
+            var dto = new CreateLocalityDto
+            {
+                Name = new string('A', 151),
+                DestinationId = 1,
+                LocalityTypeId = 1
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains("Name"));
+        }
+
+        [Fact]
+        public void CreateLocalityDto_NameTacno150Karaktera_JeValidno()
+        {
+            var dto = new CreateLocalityDto
+            {
+                Name = new string('A', 150),
+                DestinationId = 1,
+                LocalityTypeId = 1
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateLocalityDto_OpcionalnaPoljaNull_JeValidno()
+        {
+            var dto = new CreateLocalityDto
+            {
+                Name = "Test",
+                Description = null,
+                Longitude = null,
+                Latitude = null,
+                DestinationId = 1,
+                LocalityTypeId = 1
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        // ═══════════════════════════════════════════
+        //  UpdateLocalityDto  — partial update
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void UpdateLocalityDto_SvaPoljaNull_JeValidno()
+        {
+            var dto = new UpdateLocalityDto();
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void UpdateLocalityDto_SamoName_JeValidno()
+        {
+            var dto = new UpdateLocalityDto { Name = "Novo Ime" };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void UpdateLocalityDto_SamoDestinationId_JeValidno()
+        {
+            var dto = new UpdateLocalityDto { DestinationId = 2 };
+
+            IsValid(dto).Should().BeTrue();
+        }
     }
 }

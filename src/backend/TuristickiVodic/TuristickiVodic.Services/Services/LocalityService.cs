@@ -112,23 +112,22 @@ namespace TuristickiVodic.Services
                 throw new InvalidOperationException("Destination not found");
 
             // Samo menadžer može da menja lokalitete.
-            // Ako je destinacija ostala bez menadžera (izuzetna situacija),
-            // odgovornost preuzima menadžer geografski najbliže destinacije – NE admin.
+            // Menadžer može da menja samo lokalitete u svojoj destinaciji.
+            // Ako se lokalitet premešta, menadžer mora biti odgovoran i za ciljnu destinaciju.
             if (roleName == "Manager")
             {
-                // Proverava odgovornost za trenutnu destinaciju lokaliteta
-                if (locality.Destination == null)
-                    throw new InvalidOperationException("Cannot determine destination of this locality.");
+                var manager = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Id == userId);
 
-                var isResponsibleForCurrent = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, locality.Destination, userId);
-                if (!isResponsibleForCurrent)
+                if (manager == null)
+                    throw new InvalidOperationException("User not found");
+
+                if (manager.ManagedDestinationId != locality.DestinationId)
                     throw new InvalidOperationException("You are not the responsible manager for the current destination of this locality.");
 
-                // Ako se lokalitet premešta, proverava i ciljnu destinaciju
                 if (dto.DestinationId.HasValue && dto.DestinationId.Value != locality.DestinationId)
                 {
-                    var isResponsibleForTarget = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, destination, userId);
-                    if (!isResponsibleForTarget)
+                    if (manager.ManagedDestinationId != dto.DestinationId.Value)
                         throw new InvalidOperationException("You are not the responsible manager for the target destination.");
                 }
             }

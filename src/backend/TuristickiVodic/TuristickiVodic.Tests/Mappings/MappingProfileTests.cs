@@ -248,5 +248,131 @@ namespace TuristickiVodic.Tests.Mappings
 
             dto.DestinationTypeName.Should().Be("Istorijski Grad");
         }
+
+        // ═══════════════════════════════════════════
+        //  Locality -> LocalityDto
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void LocalityToDto_MapiraOsnovnaPolja()
+        {
+            var locality = new Locality
+            {
+                Id = 1,
+                Name = "Stara Varos",
+                Description = "Istorijsko jezgro",
+                IsActive = true,
+                DestinationId = 5,
+                Destination = new Destination { Id = 5, Name = "Kotor", CreatedByUserId = 99 },
+                LocalityTypeId = 2,
+                LocalityType = new LocalityType { Id = 2, Name = "Centar" },
+                CreatedByUserId = 10,
+                CreatedAt = new DateTime(2024, 1, 15)
+            };
+
+            var dto = _mapper.Map<LocalityDto>(locality);
+
+            dto.Id.Should().Be(1);
+            dto.Name.Should().Be("Stara Varos");
+            dto.Description.Should().Be("Istorijsko jezgro");
+            dto.IsActive.Should().BeTrue();
+            dto.DestinationId.Should().Be(5);
+            dto.LocalityTypeId.Should().Be(2);
+            dto.CreatedByUserId.Should().Be(10);
+        }
+
+        [Fact]
+        public void LocalityToDto_DestinationName_MapiraSeIzNavigacije()
+        {
+            var locality = new Locality
+            {
+                Id = 2,
+                Name = "Dobrota",
+                DestinationId = 5,
+                Destination = new Destination { Id = 5, Name = "Kotor", CreatedByUserId = 99 },
+                LocalityTypeId = 1,
+                LocalityType = new LocalityType { Id = 1, Name = "Primorje" }
+            };
+
+            var dto = _mapper.Map<LocalityDto>(locality);
+
+            dto.DestinationName.Should().Be("Kotor");
+        }
+
+        [Fact]
+        public void LocalityToDto_LocalityTypeName_MapiraSeIzNavigacije()
+        {
+            var locality = new Locality
+            {
+                Id = 3,
+                Name = "Prcanj",
+                DestinationId = 5,
+                Destination = new Destination { Id = 5, Name = "Kotor", CreatedByUserId = 99 },
+                LocalityTypeId = 3,
+                LocalityType = new LocalityType { Id = 3, Name = "Primorsko Naselje" }
+            };
+
+            var dto = _mapper.Map<LocalityDto>(locality);
+
+            dto.LocalityTypeName.Should().Be("Primorsko Naselje");
+        }
+
+        [Fact]
+        public void LocalityToDto_GeolokacijaSeMapiraULongitudeLatitude()
+        {
+            var locality = new Locality
+            {
+                Id = 4,
+                Name = "L1",
+                Geolocation = new Point(18.77, 42.42) { SRID = 4326 },
+                DestinationId = 1,
+                Destination = new Destination { Id = 1, Name = "Kotor", CreatedByUserId = 99 },
+                LocalityTypeId = 1,
+                LocalityType = new LocalityType { Id = 1, Name = "Tip" }
+            };
+
+            var dto = _mapper.Map<LocalityDto>(locality);
+
+            dto.Longitude.Should().BeApproximately(18.77, 0.001);
+            dto.Latitude.Should().BeApproximately(42.42, 0.001);
+        }
+
+        [Fact]
+        public void LocalityToDto_BezGeolokacije_LongLatJeNull()
+        {
+            var locality = new Locality
+            {
+                Id = 5,
+                Name = "L2",
+                Geolocation = null,
+                DestinationId = 1,
+                Destination = new Destination { Id = 1, Name = "Kotor", CreatedByUserId = 99 },
+                LocalityTypeId = 1,
+                LocalityType = new LocalityType { Id = 1, Name = "Tip" }
+            };
+
+            var dto = _mapper.Map<LocalityDto>(locality);
+
+            dto.Longitude.Should().BeNull();
+            dto.Latitude.Should().BeNull();
+        }
+
+        [Fact]
+        public void LocalityToDto_NullDestinationNavigacija_DestinationNameJeNull()
+        {
+            var locality = new Locality
+            {
+                Id = 6,
+                Name = "L3",
+                DestinationId = 99,
+                Destination = null,
+                LocalityTypeId = 1,
+                LocalityType = new LocalityType { Id = 1, Name = "Tip" }
+            };
+
+            var dto = _mapper.Map<LocalityDto>(locality);
+
+            dto.DestinationName.Should().BeNullOrEmpty();
+        }
     }
 }
