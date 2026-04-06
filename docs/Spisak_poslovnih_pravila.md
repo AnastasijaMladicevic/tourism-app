@@ -10,6 +10,7 @@
 - `Admin` ne može da obriše sam sebe.
 - Samo `Tourist` može da pošalje zahtev za `ContentCreator` ulogu, i to samo za sebe.
 - Samo `Admin` može da odobri `ContentCreator` ulogu.
+- Uloga ContentCreator-a se odobrava samo ako je turista poslao zahtev za nju.
 
 **DESTINACIJE**
 
@@ -55,6 +56,7 @@
 - Samo `ContentCreator` može direktno da obriše event.
 - `ContentCreator` može direktno da obriše samo svoj event koji nije `Approved`.
 - `Approved` event se ne briše direktno, već kroz `DeletionRequest`.
+- Moguce je izlistati sve eventove, eventove za odredjeni dan, za 7 ili 30 dana unapred i od - do datuma.
 
 **AKTIVNOSTI**
 
