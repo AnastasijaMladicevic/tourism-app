@@ -64,6 +64,11 @@ export class LoginComponent {
     }).subscribe({
       next: () => {
         this.isLoading = false;
+        if (this.authService.isAdmin()) {
+          this.errorMessage = 'Admin access is not available here.';
+          this.authService.logout().subscribe();
+          return;
+        }
         this.router.navigate(['/home']);
       },
       error: err => {
