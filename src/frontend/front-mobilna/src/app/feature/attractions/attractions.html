@@ -1,5 +1,5 @@
 <div class="screen">
-  <!-- ── Header ── -->
+  <!-- Header -->
   <div class="header">
     <button class="icon-btn" (click)="goBack()" aria-label="Go back">
       <mat-icon>arrow_back_ios</mat-icon>
@@ -7,13 +7,12 @@
     <h1 class="header__title">Attractions</h1>
   </div>
 
-  <!-- ── Filter tabs ── -->
+  <!-- Filters -->
   <div class="filters-row">
-    <!-- Search i sort — uvek vidljivi gore -->
     <div class="filters-right">
       <div class="search-inline">
         <mat-icon>search</mat-icon>
-        <input type="text" placeholder="Search..." [(ngModel)]="searchQuery" />
+        <input type="text" placeholder="Search attractions..." [(ngModel)]="searchQuery" />
       </div>
 
       <div
@@ -25,13 +24,6 @@
 
         @if (showSortMenu) {
           <div class="sort-menu sort-anchor">
-            <button
-              class="sort-menu__item"
-              [class.sort-menu__item--active]="sortOption === 'rating'"
-              (click)="setSort('rating')"
-            >
-              <mat-icon>star</mat-icon> Top Rated
-            </button>
             <button
               class="sort-menu__item"
               [class.sort-menu__item--active]="sortOption === 'distance'"
@@ -58,7 +50,6 @@
       </div>
     </div>
 
-    <!-- Filteri ispod, scrolluju -->
     <div class="filters-scroll">
       <button
         class="filter-btn"
@@ -79,14 +70,15 @@
     </div>
   </div>
 
-  <!-- ── Results bar ── -->
+  <!-- Results -->
   <div class="results-bar">
     <span class="results-bar__count">{{ filtered.length }} places found</span>
   </div>
+
   @if (isLoading) {
     <div class="loading">
       <mat-icon>hourglass_empty</mat-icon>
-      <p>Loading attractions...</p>
+      <p>Loading...</p>
     </div>
   }
 
@@ -98,55 +90,57 @@
     </div>
   }
 
-  <!-- ── Grid ── -->
+  <!-- Grid -->
   <div class="grid">
     @for (destination of filtered; track destination.id) {
       <div class="card">
-        <!-- Image -->
         <div class="card__image-wrap">
-          <img class="card__image" [src]="getMainImage(destination)" [alt]="destination.name" />
+          @if (getMainImage(destination)) {
+            <img
+              class="card__image"
+              [src]="getMainImage(destination)"
+              [alt]="destination.name"
+              (error)="onImageError($event)"
+              title="Image URL: {{ getMainImage(destination) }}"
+            />
+          }
+
+          @if (!getMainImage(destination)) {
+            <div class="card__image card__image--empty">
+              <mat-icon>landscape</mat-icon>
+            </div>
+          }
+
           <span class="card__distance">
-            <mat-icon>radio_button_checked</mat-icon>
-            {{ formatDistance(destination.distanceKm) }}
+            <mat-icon>radio_button_checked</mat-icon> {{ formatDistance(destination.distanceKm) }}
           </span>
+
           <button
             class="card__fav"
             [class.card__fav--active]="destination.isFavorite"
             (click)="toggleFavorite(destination, $event)"
-            aria-label="Toggle favourite"
           >
             <mat-icon>{{ destination.isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
           </button>
         </div>
 
-        <!-- Body -->
         <div class="card__body">
-          <div class="card__title-row">
-            <h2 class="card__name">{{ destination.name }}</h2>
-            <span class="card__rating">
-              <mat-icon>star</mat-icon>
-              {{ destination.averageRating?.toFixed(1) }}
-            </span>
-          </div>
+          <h2 class="card__name">{{ destination.name }}</h2>
 
-          <p class="card__type">
-            <mat-icon>place</mat-icon>
-            {{ destination.destinationTypeName }}
-          </p>
+          <p class="card__type"><mat-icon>place</mat-icon> {{ destination.destinationTypeName }}</p>
 
           <p class="card__desc">{{ destination.description }}</p>
 
           <div class="card__footer">
-            <span class="card__reviews"
-              >{{ destination.reviewCount?.toLocaleString() }} REVIEWS</span
-            >
+            <span></span>
+            <!-- prazan za flex poravnanje -->
             <button class="card__details" (click)="viewDetails(destination)">VIEW DETAILS</button>
           </div>
         </div>
       </div>
     }
 
-    @if (filtered.length === 0) {
+    @if (filtered.length === 0 && !isLoading) {
       <div class="empty">
         <mat-icon>search_off</mat-icon>
         <p>No attractions found.</p>

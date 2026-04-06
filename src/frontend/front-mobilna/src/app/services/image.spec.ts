@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { DestinationType } from './destination-type';
+import { Image } from './image';
 
-describe('DestinationType', () => {
-  let service: DestinationType;
+describe('Image', () => {
+  let service: Image;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(DestinationType);
+    service = TestBed.inject(Image);
   });
 
   it('should be created', () => {
