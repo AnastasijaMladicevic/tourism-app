@@ -1,45 +1,72 @@
 <div class="container">
   <div class="card">
-
     <div class="left">
+      <div class="logo">
+        <img src="assets/logo.png" alt="SpireGO icon" class="logo-icon" />
+      </div>
+      <img src="/assets/pozadina.png" alt="illustration" class="illustration" />
     </div>
 
-    <!-- RIGHT SIDE FORM -->
     <div class="right">
       <h2>Welcome</h2>
 
-      <form>
-        <!-- USERNAME -->
-        <label>Username</label>
-        <div class="input-group">
-          <span class="material-symbols-outlined icon">person</span>
-          <input type="text" placeholder="Your Username" />
-        </div>
+      <div class="alert error" *ngIf="errorMessage">{{ errorMessage }}</div>
+      <div class="alert success" *ngIf="successMessage">{{ successMessage }}</div>
 
-        <!-- EMAIL -->
+      <form>
+        <label>First Name</label>
+<div class="input-group">
+  <span class="material-symbols-outlined icon">person</span>
+  <input type="text" placeholder="First Name" [(ngModel)]="firstName" name="firstName" />
+</div>
+
+<label>Last Name</label>
+<div class="input-group">
+  <span class="material-symbols-outlined icon">person</span>
+  <input type="text" placeholder="Last Name" [(ngModel)]="lastName" name="lastName" />
+</div>
+
+<label>Date of Birth</label>
+<div class="input-group">
+  <span class="material-symbols-outlined icon">calendar_today</span>
+  <input type="date" [(ngModel)]="dateOfBirth" name="dateOfBirth" />
+</div>
+
         <label>Email</label>
         <div class="input-group">
           <span class="material-symbols-outlined icon">mail</span>
-          <input type="email" placeholder="youremail@pmf.kg.ac.rs" />
+          <input type="email" placeholder="youremail@pmf.kg.ac.rs" [(ngModel)]="email" name="email" />
         </div>
 
-        <!-- PASSWORD -->
         <label>Password</label>
         <div class="input-group">
-          <span class="material-symbols-outlined icon">lock</span>
-          <input type="password" placeholder="••••••••••" />
-          <span class="material-symbols-outlined eye">visibility</span>
-        </div>
+  <span class="material-symbols-outlined icon">lock</span>
+  
+  <input [type]="showPassword ? 'text' : 'password'" 
+         placeholder="••••••••••" 
+         [(ngModel)]="password" 
+         name="password" />
+  
+  <span class="material-symbols-outlined eye" (click)="togglePassword()">
+    {{ showPassword ? 'visibility' : 'visibility_off' }}
+  </span>
+</div>
 
-        <!-- CONFIRM PASSWORD -->
         <label>Confirm Password</label>
         <div class="input-group">
-          <span class="material-symbols-outlined icon">lock_reset</span>
-          <input type="password" placeholder="••••••••••" />
-          <span class="material-symbols-outlined eye">visibility</span>
-        </div>
+  <span class="material-symbols-outlined icon">lock_reset</span>
+  
+  <input [type]="showConfirmPassword ? 'text' : 'password'" 
+         placeholder="••••••••••" 
+         [(ngModel)]="confirmPassword" 
+         name="confirmPassword" />
+         
+  <span class="material-symbols-outlined eye" (click)="toggleConfirmPassword()">
+    {{ showConfirmPassword ? 'visibility' : 'visibility_off' }}
+  </span>
+</div>
 
-        <button type="button" class="btn">Sign Up →</button>
+        <button type="button" class="btn-signup" (click)="onSignUp()">Sign Up →</button>
 
         <p class="help">
           Need technical support?
@@ -47,6 +74,5 @@
         </p>
       </form>
     </div>
-
   </div>
 </div>
