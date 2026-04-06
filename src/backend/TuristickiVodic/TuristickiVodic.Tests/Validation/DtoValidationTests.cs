@@ -389,5 +389,148 @@ namespace TuristickiVodic.Tests.Validation
 
             IsValid(dto).Should().BeTrue();
         }
+
+        // ═══════════════════════════════════════════
+        //  CreateTouristObjectDto
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void CreateTouristObjectDto_SvaObaveznaPolja_JeValidno()
+        {
+            var dto = new CreateTouristObjectDto
+            {
+                Name = "Pomorski muzej",
+                ObjectTypeId = 1,
+                LocalityId = 1
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateTouristObjectDto_BezName_NijeValidno()
+        {
+            var dto = new CreateTouristObjectDto
+            {
+                ObjectTypeId = 1,
+                LocalityId = 1
+            };
+
+            dto.Name = null!;
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains("Name"));
+        }
+
+        [Fact]
+        public void CreateTouristObjectDto_PrazanName_NijeValidno()
+        {
+            var dto = new CreateTouristObjectDto
+            {
+                Name = "",
+                ObjectTypeId = 1,
+                LocalityId = 1
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains("Name"));
+        }
+
+        [Fact]
+        public void CreateTouristObjectDto_NameDuzi200Karaktera_NijeValidno()
+        {
+            var dto = new CreateTouristObjectDto
+            {
+                Name = new string('A', 201),
+                ObjectTypeId = 1,
+                LocalityId = 1
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains("Name"));
+        }
+
+        [Fact]
+        public void CreateTouristObjectDto_SaOpcionalnimPoljima_JeValidno()
+        {
+            var dto = new CreateTouristObjectDto
+            {
+                Name = "Hotel Vardar",
+                Description = "Hotel u starom gradu",
+                Address = "Kotor bb",
+                PhoneNumber = "+38232123456",
+                Website = "https://hotel.com",
+                WorkingHours = "00:00-24:00",
+                Longitude = 18.77,
+                Latitude = 42.42,
+                IsActive = true,
+                ObjectTypeId = 1,
+                LocalityId = 1
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        // ═══════════════════════════════════════════
+        //  UpdateTouristObjectDto  — partial update
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void UpdateTouristObjectDto_SvaPoljaNull_JeValidno()
+        {
+            var dto = new UpdateTouristObjectDto();
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void UpdateTouristObjectDto_SamoName_JeValidno()
+        {
+            var dto = new UpdateTouristObjectDto
+            {
+                Name = "Novo ime"
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void UpdateTouristObjectDto_ObjectTypeIdPostavljen_JeValidno()
+        {
+            var dto = new UpdateTouristObjectDto
+            {
+                ObjectTypeId = 2
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        // ═══════════════════════════════════════════
+        //  ApproveContentDto
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void ApproveContentDto_OdobravanjeBezRazloga_JeValidno()
+        {
+            var dto = new ApproveContentDto
+            {
+                Approve = true,
+                RejectionReason = null
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void ApproveContentDto_OdbijanjeSaRazlogom_JeValidno()
+        {
+            var dto = new ApproveContentDto
+            {
+                Approve = false,
+                RejectionReason = "Ne ispunjava kriterijume"
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
     }
 }
