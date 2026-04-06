@@ -713,5 +713,134 @@ namespace TuristickiVodic.Tests.Validation
 
             IsValid(dto).Should().BeTrue();
         }
+
+        // ═══════════════════════════════════════════
+        //  CreateReviewDto / UpdateReviewDto / RespondToReviewDto
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void CreateReviewDto_SvaObaveznaPolja_JeValidno()
+        {
+            var dto = new CreateReviewDto
+            {
+                ObjectId = 1,
+                Rating = 5,
+                Text = "Odlican objekat"
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateReviewDto_ObjectIdJeNula_NijeValidno()
+        {
+            var dto = new CreateReviewDto
+            {
+                ObjectId = 0,
+                Rating = 5,
+                Text = "Komentar"
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateReviewDto.ObjectId)));
+        }
+
+        [Fact]
+        public void CreateReviewDto_RatingVanOpsega_NijeValidno()
+        {
+            var dto = new CreateReviewDto
+            {
+                ObjectId = 1,
+                Rating = 6,
+                Text = "Komentar"
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateReviewDto.Rating)));
+        }
+
+        [Fact]
+        public void CreateReviewDto_BezText_NijeValidno()
+        {
+            var dto = new CreateReviewDto
+            {
+                ObjectId = 1,
+                Rating = 5,
+                Text = ""
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateReviewDto.Text)));
+        }
+
+        [Fact]
+        public void CreateReviewDto_TextDuziOd1000Karaktera_NijeValidno()
+        {
+            var dto = new CreateReviewDto
+            {
+                ObjectId = 1,
+                Rating = 5,
+                Text = new string('A', 1001)
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateReviewDto.Text)));
+        }
+
+        [Fact]
+        public void UpdateReviewDto_SvaPoljaNull_JeValidno()
+        {
+            var dto = new UpdateReviewDto();
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void UpdateReviewDto_RatingVanOpsega_NijeValidno()
+        {
+            var dto = new UpdateReviewDto
+            {
+                Rating = 0
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(UpdateReviewDto.Rating)));
+        }
+
+        [Fact]
+        public void RespondToReviewDto_ValidnoPopunjeno_JeValidno()
+        {
+            var dto = new RespondToReviewDto
+            {
+                CreatorResponse = "Hvala na recenziji."
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void RespondToReviewDto_BezCreatorResponse_NijeValidno()
+        {
+            var dto = new RespondToReviewDto
+            {
+                CreatorResponse = ""
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(RespondToReviewDto.CreatorResponse)));
+        }
+
+        [Fact]
+        public void ApproveReviewDto_ApproveJeObavezan_JeValidnoKadaJePostavljen()
+        {
+            var dto = new ApproveReviewDto
+            {
+                Approve = true
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+
     }
 }

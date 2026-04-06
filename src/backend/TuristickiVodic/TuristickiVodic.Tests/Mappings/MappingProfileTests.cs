@@ -672,5 +672,69 @@ namespace TuristickiVodic.Tests.Mappings
 
             dto.Status.Should().Be("Approved");
         }
+
+        // ═══════════════════════════════════════════
+        //  Review -> ReviewDto
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void ReviewToDto_MapiraOsnovnaPoljaINazive()
+        {
+            var review = new Review
+            {
+                Id = 1,
+                UserId = 10,
+                User = new User { Id = 10, FirstName = "Ana", LastName = "Anić" },
+                ObjectId = 20,
+                Object = new TouristObject { Id = 20, Name = "Pomorski muzej" },
+                Rating = 5,
+                Text = "Odlicno",
+                CreatorResponse = "Hvala",
+                CreatorResponseAt = new DateTime(2026, 1, 1, 10, 0, 0, DateTimeKind.Utc),
+                Status = ContentStatus.Approved,
+                ReviewedByUserId = 30,
+                ReviewedBy = new User { Id = 30, FirstName = "Marko", LastName = "Marković" },
+                CreatedAt = new DateTime(2026, 1, 1, 9, 0, 0, DateTimeKind.Utc)
+            };
+
+            var dto = _mapper.Map<ReviewDto>(review);
+
+            dto.Id.Should().Be(1);
+            dto.UserId.Should().Be(10);
+            dto.UserFullName.Should().Be("Ana Anić");
+            dto.ObjectId.Should().Be(20);
+            dto.ObjectName.Should().Be("Pomorski muzej");
+            dto.Rating.Should().Be(5);
+            dto.Text.Should().Be("Odlicno");
+            dto.CreatorResponse.Should().Be("Hvala");
+            dto.Status.Should().Be("Approved");
+            dto.ReviewedByUserId.Should().Be(30);
+            dto.ReviewedByFullName.Should().Be("Marko Marković");
+        }
+
+        [Fact]
+        public void ReviewToDto_BezReviewedBy_ReviewedByFullNameJeNull()
+        {
+            var review = new Review
+            {
+                Id = 2,
+                UserId = 11,
+                User = new User { Id = 11, FirstName = "Iva", LastName = "Ivić" },
+                ObjectId = 21,
+                Object = new TouristObject { Id = 21, Name = "Tvrdjava" },
+                Rating = 4,
+                Text = "Dobro",
+                Status = ContentStatus.Pending,
+                ReviewedByUserId = null,
+                ReviewedBy = null,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            var dto = _mapper.Map<ReviewDto>(review);
+
+            dto.ReviewedByUserId.Should().BeNull();
+            dto.ReviewedByFullName.Should().BeNull();
+            dto.Status.Should().Be("Pending");
+        }
     }
 }
