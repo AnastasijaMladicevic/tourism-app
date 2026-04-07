@@ -44,9 +44,9 @@ namespace TuristickiVodic.Tests.Services
         private static (Role tourist, Role cc, Role manager, Role admin) SeedRoles(AppDbContext ctx)
         {
             var tourist = new Role { Id = 1, Name = RoleType.Tourist };
-            var cc      = new Role { Id = 2, Name = RoleType.ContentCreator };
+            var cc = new Role { Id = 2, Name = RoleType.ContentCreator };
             var manager = new Role { Id = 3, Name = RoleType.Manager };
-            var admin   = new Role { Id = 4, Name = RoleType.Admin };
+            var admin = new Role { Id = 4, Name = RoleType.Admin };
             ctx.Roles.AddRange(tourist, cc, manager, admin);
             ctx.SaveChanges();
             return (tourist, cc, manager, admin);
@@ -66,8 +66,10 @@ namespace TuristickiVodic.Tests.Services
 
             var dto = new CreateUserDto
             {
-                FirstName = "Marko", LastName = "Marković",
-                Email = "marko@test.com", Password = "lozinka123",
+                FirstName = "Marko",
+                LastName = "Marković",
+                Email = "marko@test.com",
+                Password = "lozinka123",
                 DateOfBirth = new DateTime(1995, 1, 1)
             };
 
@@ -85,8 +87,12 @@ namespace TuristickiVodic.Tests.Services
             var (tourist, _, _, _) = SeedRoles(ctx);
             ctx.Users.Add(new User
             {
-                FirstName = "Ana", LastName = "A", Email = "ana@test.com",
-                PasswordHash = "hash", RoleId = tourist.Id, Role = tourist,
+                FirstName = "Ana",
+                LastName = "A",
+                Email = "ana@test.com",
+                PasswordHash = "hash",
+                RoleId = tourist.Id,
+                Role = tourist,
                 DateOfBirth = new DateTime(1990, 1, 1)
             });
             ctx.SaveChanges();
@@ -96,8 +102,11 @@ namespace TuristickiVodic.Tests.Services
 
             var dto = new CreateUserDto
             {
-                FirstName = "Ana2", LastName = "A2", Email = "ana@test.com",
-                Password = "lozinka123", DateOfBirth = new DateTime(1990, 1, 1)
+                FirstName = "Ana2",
+                LastName = "A2",
+                Email = "ana@test.com",
+                Password = "lozinka123",
+                DateOfBirth = new DateTime(1990, 1, 1)
             };
 
             await svc.Invoking(s => s.CreateAsync(dto))
@@ -108,7 +117,6 @@ namespace TuristickiVodic.Tests.Services
         [Fact]
         public async Task CreateAsync_KorisnikJeNeaktivan_VrataFalse_IsActive()
         {
-            // Novi korisnik mora biti aktivan po defaultu
             using var ctx = CreateInMemoryContext(nameof(CreateAsync_KorisnikJeNeaktivan_VrataFalse_IsActive));
             var (tourist, _, _, _) = SeedRoles(ctx);
             var tokenSvc = new Mock<ITokenService>();
@@ -116,8 +124,11 @@ namespace TuristickiVodic.Tests.Services
 
             var result = await svc.CreateAsync(new CreateUserDto
             {
-                FirstName = "Test", LastName = "T", Email = "t@t.com",
-                Password = "lozinka1", DateOfBirth = new DateTime(2000, 1, 1)
+                FirstName = "Test",
+                LastName = "T",
+                Email = "t@t.com",
+                Password = "lozinka1",
+                DateOfBirth = new DateTime(2000, 1, 1)
             });
 
             var korisnik = ctx.Users.First();
@@ -137,10 +148,14 @@ namespace TuristickiVodic.Tests.Services
             var (tourist, _, _, _) = SeedRoles(ctx);
             ctx.Users.Add(new User
             {
-                FirstName = "B", LastName = "B", Email = "b@b.com",
+                FirstName = "B",
+                LastName = "B",
+                Email = "b@b.com",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("pass"),
-                RoleId = tourist.Id, Role = tourist,
-                IsBlacklisted = true, IsActive = true,
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsBlacklisted = true,
+                IsActive = true,
                 DateOfBirth = new DateTime(1990, 1, 1)
             });
             ctx.SaveChanges();
@@ -160,10 +175,14 @@ namespace TuristickiVodic.Tests.Services
             var (tourist, _, _, _) = SeedRoles(ctx);
             ctx.Users.Add(new User
             {
-                FirstName = "C", LastName = "C", Email = "c@c.com",
+                FirstName = "C",
+                LastName = "C",
+                Email = "c@c.com",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("pass"),
-                RoleId = tourist.Id, Role = tourist,
-                IsBlacklisted = false, IsActive = false,
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsBlacklisted = false,
+                IsActive = false,
                 DateOfBirth = new DateTime(1990, 1, 1)
             });
             ctx.SaveChanges();
@@ -183,9 +202,13 @@ namespace TuristickiVodic.Tests.Services
             var (tourist, _, _, _) = SeedRoles(ctx);
             ctx.Users.Add(new User
             {
-                FirstName = "D", LastName = "D", Email = "d@d.com",
+                FirstName = "D",
+                LastName = "D",
+                Email = "d@d.com",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("tacnaLozinka"),
-                RoleId = tourist.Id, Role = tourist, IsActive = true,
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
                 DateOfBirth = new DateTime(1990, 1, 1)
             });
             ctx.SaveChanges();
@@ -209,9 +232,14 @@ namespace TuristickiVodic.Tests.Services
             var (tourist, _, _, _) = SeedRoles(ctx);
             var user = new User
             {
-                Id = 5, FirstName = "E", LastName = "E", Email = "e@e.com",
+                Id = 5,
+                FirstName = "E",
+                LastName = "E",
+                Email = "e@e.com",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("staraLozinka"),
-                RoleId = tourist.Id, Role = tourist, IsActive = true,
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
                 DateOfBirth = new DateTime(1990, 1, 1)
             };
             ctx.Users.Add(user);
@@ -220,9 +248,16 @@ namespace TuristickiVodic.Tests.Services
             var tokenSvc = new Mock<ITokenService>();
             var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
 
-            await svc.ChangePasswordAsync(5,
-                new ChangePasswordDto { CurrentPassword = "staraLozinka", NewPassword = "novaLozinka1", ConfirmPassword = "novaLozinka1" },
-                currentUserId: 5, roleName: "Tourist");
+            await svc.ChangePasswordAsync(
+                5,
+                new ChangePasswordDto
+                {
+                    CurrentPassword = "staraLozinka",
+                    NewPassword = "novaLozinka1",
+                    ConfirmPassword = "novaLozinka1"
+                },
+                currentUserId: 5,
+                roleName: "Tourist");
 
             var updated = ctx.Users.Find(5);
             BCrypt.Net.BCrypt.Verify("novaLozinka1", updated!.PasswordHash).Should().BeTrue();
@@ -235,7 +270,7 @@ namespace TuristickiVodic.Tests.Services
         [Fact]
         public async Task CreateManagerAsync_SaIspravnimPodacima_KreiraKorisnikaSaUlogomManager()
         {
-            var ctx = CreateInMemoryContext(nameof(CreateManagerAsync_SaIspravnimPodacima_KreiraKorisnikaSaUlogomManager));
+            using var ctx = CreateInMemoryContext(nameof(CreateManagerAsync_SaIspravnimPodacima_KreiraKorisnikaSaUlogomManager));
             var (_, _, manager, _) = SeedRoles(ctx);
             await ctx.SaveChangesAsync();
 
@@ -257,9 +292,24 @@ namespace TuristickiVodic.Tests.Services
         [Fact]
         public async Task CreateManagerAsync_KadaEmailVecPostoji_BacaInvalidOperationException()
         {
-            var ctx = CreateInMemoryContext(nameof(CreateManagerAsync_KadaEmailVecPostoji_BacaInvalidOperationException));
-            SeedRoles(ctx);
-            ctx.Users.Add(new User { Email = "manager@test.com", PasswordHash = "x", RoleId = 3, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
+            using var ctx = CreateInMemoryContext(nameof(CreateManagerAsync_KadaEmailVecPostoji_BacaInvalidOperationException));
+            var (touristRole, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                FirstName = "Postojeci",
+                LastName = "Korisnik",
+                Email = "manager@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("staraLozinka123"),
+                RoleId = touristRole.Id,
+                Role = touristRole,
+                IsActive = true,
+                IsVerified = false,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1990, 1, 1),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
             await ctx.SaveChangesAsync();
 
             var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
@@ -282,7 +332,7 @@ namespace TuristickiVodic.Tests.Services
         [Fact]
         public async Task CreateAdminAsync_SaIspravnimPodacima_KreiraKorisnikaSaUlogomAdmin()
         {
-            var ctx = CreateInMemoryContext(nameof(CreateAdminAsync_SaIspravnimPodacima_KreiraKorisnikaSaUlogomAdmin));
+            using var ctx = CreateInMemoryContext(nameof(CreateAdminAsync_SaIspravnimPodacima_KreiraKorisnikaSaUlogomAdmin));
             SeedRoles(ctx);
             await ctx.SaveChangesAsync();
 
@@ -304,9 +354,23 @@ namespace TuristickiVodic.Tests.Services
         [Fact]
         public async Task CreateAdminAsync_KadaEmailVecPostoji_BacaInvalidOperationException()
         {
-            var ctx = CreateInMemoryContext(nameof(CreateAdminAsync_KadaEmailVecPostoji_BacaInvalidOperationException));
-            SeedRoles(ctx);
-            ctx.Users.Add(new User { Email = "admin2@test.com", PasswordHash = "x", RoleId = 4, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
+            using var ctx = CreateInMemoryContext(nameof(CreateAdminAsync_KadaEmailVecPostoji_BacaInvalidOperationException));
+            var (touristRole, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                FirstName = "Postojeci",
+                LastName = "Korisnik",
+                Email = "admin@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("staraLozinka123"),
+                RoleId = touristRole.Id,
+                Role = touristRole,
+                IsActive = true,
+                IsVerified = false,
+                IsBlacklisted = false,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
             await ctx.SaveChangesAsync();
 
             var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
@@ -314,11 +378,11 @@ namespace TuristickiVodic.Tests.Services
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 service.CreateAdminAsync(new CreateUserDto
                 {
-                    FirstName = "J",
-                    LastName = "M",
-                    Email = "admin2@test.com",
+                    FirstName = "Novi",
+                    LastName = "Admin",
+                    Email = "admin@test.com",
                     Password = "pass123",
-                    DateOfBirth = new DateTime(1985, 1, 1)
+                    DateOfBirth = new DateTime(1995, 1, 1)
                 }));
         }
 
@@ -329,9 +393,14 @@ namespace TuristickiVodic.Tests.Services
             var (tourist, _, _, _) = SeedRoles(ctx);
             ctx.Users.Add(new User
             {
-                Id = 6, FirstName = "F", LastName = "F", Email = "f@f.com",
+                Id = 6,
+                FirstName = "F",
+                LastName = "F",
+                Email = "f@f.com",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("tacna"),
-                RoleId = tourist.Id, Role = tourist, IsActive = true,
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
                 DateOfBirth = new DateTime(1990, 1, 1)
             });
             ctx.SaveChanges();
@@ -339,9 +408,16 @@ namespace TuristickiVodic.Tests.Services
             var tokenSvc = new Mock<ITokenService>();
             var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
 
-            await svc.Invoking(s => s.ChangePasswordAsync(6,
-                new ChangePasswordDto { CurrentPassword = "pogresna", NewPassword = "nova1234", ConfirmPassword = "nova1234" },
-                currentUserId: 6, roleName: "Tourist"))
+            await svc.Invoking(s => s.ChangePasswordAsync(
+                    6,
+                    new ChangePasswordDto
+                    {
+                        CurrentPassword = "pogresna",
+                        NewPassword = "nova1234",
+                        ConfirmPassword = "nova1234"
+                    },
+                    currentUserId: 6,
+                    roleName: "Tourist"))
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*incorrect*");
         }
@@ -349,14 +425,18 @@ namespace TuristickiVodic.Tests.Services
         [Fact]
         public async Task ChangePasswordAsync_AdminMenjaTuđuLozinkuBezStare_Uspeh()
         {
-            // Admin ne mora da unosi staru lozinku
             using var ctx = CreateInMemoryContext(nameof(ChangePasswordAsync_AdminMenjaTuđuLozinkuBezStare_Uspeh));
             var (tourist, _, _, admin) = SeedRoles(ctx);
             ctx.Users.Add(new User
             {
-                Id = 7, FirstName = "G", LastName = "G", Email = "g@g.com",
+                Id = 7,
+                FirstName = "G",
+                LastName = "G",
+                Email = "g@g.com",
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara"),
-                RoleId = tourist.Id, Role = tourist, IsActive = true,
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
                 DateOfBirth = new DateTime(1990, 1, 1)
             });
             ctx.SaveChanges();
@@ -364,10 +444,16 @@ namespace TuristickiVodic.Tests.Services
             var tokenSvc = new Mock<ITokenService>();
             var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
 
-            // CurrentPassword je ignorisana za Admin — ne baca grešku
-            await svc.ChangePasswordAsync(7,
-                new ChangePasswordDto { CurrentPassword = "", NewPassword = "novaAdmin1", ConfirmPassword = "novaAdmin1" },
-                currentUserId: 99, roleName: "Admin");
+            await svc.ChangePasswordAsync(
+                7,
+                new ChangePasswordDto
+                {
+                    CurrentPassword = "",
+                    NewPassword = "novaAdmin1",
+                    ConfirmPassword = "novaAdmin1"
+                },
+                currentUserId: 99,
+                roleName: "Admin");
 
             var updated = ctx.Users.Find(7);
             BCrypt.Net.BCrypt.Verify("novaAdmin1", updated!.PasswordHash).Should().BeTrue();
@@ -381,9 +467,16 @@ namespace TuristickiVodic.Tests.Services
             var tokenSvc = new Mock<ITokenService>();
             var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
 
-            await svc.Invoking(s => s.ChangePasswordAsync(9999,
-                new ChangePasswordDto { CurrentPassword = "x", NewPassword = "y123456", ConfirmPassword = "y123456" },
-                9999, "Tourist"))
+            await svc.Invoking(s => s.ChangePasswordAsync(
+                    9999,
+                    new ChangePasswordDto
+                    {
+                        CurrentPassword = "x",
+                        NewPassword = "y123456",
+                        ConfirmPassword = "y123456"
+                    },
+                    9999,
+                    "Tourist"))
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*not found*");
         }
@@ -430,9 +523,15 @@ namespace TuristickiVodic.Tests.Services
             var (tourist, _, _, _) = SeedRoles(ctx);
             ctx.Users.Add(new User
             {
-                Id = 11, FirstName = "I", LastName = "I", Email = "i@i.com",
-                PasswordHash = "hash", RoleId = tourist.Id, Role = tourist,
-                IsActive = true, IsBlacklisted = true,
+                Id = 11,
+                FirstName = "I",
+                LastName = "I",
+                Email = "i@i.com",
+                PasswordHash = "hash",
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = true,
                 DateOfBirth = new DateTime(1990, 1, 1)
             });
             ctx.SaveChanges();
@@ -448,14 +547,19 @@ namespace TuristickiVodic.Tests.Services
         [Fact]
         public async Task ApproveCreatorRoleAsync_VecJeCC_BacaException()
         {
-            // Samo Tourist može da postane CC
             using var ctx = CreateInMemoryContext(nameof(ApproveCreatorRoleAsync_VecJeCC_BacaException));
             var (_, cc, _, _) = SeedRoles(ctx);
             ctx.Users.Add(new User
             {
-                Id = 12, FirstName = "J", LastName = "J", Email = "j@j.com",
-                PasswordHash = "hash", RoleId = cc.Id, Role = cc,
-                IsActive = true, IsBlacklisted = false,
+                Id = 12,
+                FirstName = "J",
+                LastName = "J",
+                Email = "j@j.com",
+                PasswordHash = "hash",
+                RoleId = cc.Id,
+                Role = cc,
+                IsActive = true,
+                IsBlacklisted = false,
                 DateOfBirth = new DateTime(1990, 1, 1)
             });
             ctx.SaveChanges();
@@ -479,9 +583,15 @@ namespace TuristickiVodic.Tests.Services
             var (tourist, _, _, _) = SeedRoles(ctx);
             ctx.Users.Add(new User
             {
-                Id = 13, FirstName = "K", LastName = "K", Email = "k@k.com",
-                PasswordHash = "hash", RoleId = tourist.Id, Role = tourist,
-                IsActive = true, DateOfBirth = new DateTime(1990, 1, 1)
+                Id = 13,
+                FirstName = "K",
+                LastName = "K",
+                Email = "k@k.com",
+                PasswordHash = "hash",
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
             });
             ctx.SaveChanges();
 
@@ -518,9 +628,15 @@ namespace TuristickiVodic.Tests.Services
             var (tourist, _, _, _) = SeedRoles(ctx);
             ctx.Users.Add(new User
             {
-                Id = 14, FirstName = "L", LastName = "L", Email = "l@l.com",
-                PasswordHash = "hash", RoleId = tourist.Id, Role = tourist,
-                IsActive = true, DateOfBirth = new DateTime(1990, 1, 1)
+                Id = 14,
+                FirstName = "L",
+                LastName = "L",
+                Email = "l@l.com",
+                PasswordHash = "hash",
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
             });
             ctx.SaveChanges();
 
@@ -544,6 +660,98 @@ namespace TuristickiVodic.Tests.Services
             var result = await svc.DeleteAsync(9999);
 
             result.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task CreateAdminAsync_UpisujeAdminRoleIdIRole()
+        {
+            using var ctx = CreateInMemoryContext(nameof(CreateAdminAsync_UpisujeAdminRoleIdIRole));
+            var (_, _, _, admin) = SeedRoles(ctx);
+
+            var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
+
+            await service.CreateAdminAsync(new CreateUserDto
+            {
+                FirstName = "Jelena",
+                LastName = "Marić",
+                Email = "admin3@test.com",
+                Password = "pass123",
+                DateOfBirth = new DateTime(1985, 1, 1)
+            });
+
+            var user = ctx.Users.Include(u => u.Role).Single(u => u.Email == "admin3@test.com");
+            user.RoleId.Should().Be(admin.Id);
+            user.Role.Should().NotBeNull();
+            user.Role!.Name.Should().Be(RoleType.Admin);
+        }
+
+        [Fact]
+        public async Task CreateManagerAsync_UpisujeManagerRoleIdIRole()
+        {
+            using var ctx = CreateInMemoryContext(nameof(CreateManagerAsync_UpisujeManagerRoleIdIRole));
+            var (_, _, manager, _) = SeedRoles(ctx);
+
+            var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
+
+            await service.CreateManagerAsync(new CreateUserDto
+            {
+                FirstName = "Nikola",
+                LastName = "Jović",
+                Email = "manager2@test.com",
+                Password = "pass123",
+                DateOfBirth = new DateTime(1990, 1, 1)
+            });
+
+            var user = ctx.Users.Include(u => u.Role).Single(u => u.Email == "manager2@test.com");
+            user.RoleId.Should().Be(manager.Id);
+            user.Role.Should().NotBeNull();
+            user.Role!.Name.Should().Be(RoleType.Manager);
+        }
+
+        [Fact]
+        public async Task CreateAdminAsync_NovKorisnik_PostavljaPodrazumevaneVrednosti()
+        {
+            using var ctx = CreateInMemoryContext(nameof(CreateAdminAsync_NovKorisnik_PostavljaPodrazumevaneVrednosti));
+            SeedRoles(ctx);
+
+            var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
+
+            await service.CreateAdminAsync(new CreateUserDto
+            {
+                FirstName = "Jelena",
+                LastName = "Marić",
+                Email = "admin@test.com",
+                Password = "pass123",
+                DateOfBirth = new DateTime(1985, 1, 1)
+            });
+
+            var user = ctx.Users.Single(u => u.Email == "admin@test.com");
+            user.IsActive.Should().BeTrue();
+            user.IsBlacklisted.Should().BeFalse();
+            user.IsVerified.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task CreateManagerAsync_NovKorisnik_PostavljaPodrazumevaneVrednosti()
+        {
+            using var ctx = CreateInMemoryContext(nameof(CreateManagerAsync_NovKorisnik_PostavljaPodrazumevaneVrednosti));
+            SeedRoles(ctx);
+
+            var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
+
+            await service.CreateManagerAsync(new CreateUserDto
+            {
+                FirstName = "Nikola",
+                LastName = "Jović",
+                Email = "manager@test.com",
+                Password = "pass123",
+                DateOfBirth = new DateTime(1990, 1, 1)
+            });
+
+            var user = ctx.Users.Single(u => u.Email == "manager@test.com");
+            user.IsActive.Should().BeTrue();
+            user.IsBlacklisted.Should().BeFalse();
+            user.IsVerified.Should().BeFalse();
         }
     }
 }
