@@ -902,5 +902,25 @@ namespace TuristickiVodic.Tests.Mappings
             dto.Status.Should().Be("Approved");
             dto.ResolvedAt.Should().Be(new DateTime(2026, 1, 2));
         }
-}
+        [Fact]
+        public void ImageToDto_MapiraIsMainPolje()
+        {
+            var image = new Image
+            {
+                Id = 1,
+                Url = "test.jpg",
+                AltText = "opis",
+                IsMain = true,
+                ObjectId = 1
+            };
+
+            var dto = _mapper.Map<ImageDto>(image);
+
+            dto.Url.Should().Be("test.jpg");
+            dto.AltText.Should().Be("opis");
+            dto.IsMain.Should().BeTrue();
+        }
+
+
+    }
 }
