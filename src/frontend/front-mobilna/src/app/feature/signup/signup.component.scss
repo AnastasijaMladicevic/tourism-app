@@ -54,6 +54,14 @@
   width: 100%;
 }
 
+.field-error,
+.submit-error {
+  margin: 8px 4px 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #b42318;
+}
+
 .input-wrapper {
   display: flex;
   align-items: center;
@@ -70,6 +78,10 @@
   }
 }
 
+.date-input-wrapper {
+  position: relative;
+}
+
 .input-icon {
   color: var(--primary);
   display: flex;
@@ -78,7 +90,8 @@
   margin-right: 10px;
 }
 
-input {
+input,
+select {
   flex: 1;
   border: none;
   background: transparent;
@@ -88,12 +101,35 @@ input {
   font-size: 14px;
   font-weight: 600;
   color: #000000;
+  appearance: none;
 
   &::placeholder {
     color: #000000;
     font-weight: 600;
     opacity: 0.85;
   }
+}
+
+.date-input.is-empty {
+  color: transparent;
+}
+
+.date-input.is-empty::-webkit-datetime-edit {
+  color: transparent;
+}
+
+.date-placeholder {
+  position: absolute;
+  left: 42px;
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #000000;
+  font-family: 'Nunito', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.85;
 }
 
 /* Button */
@@ -120,6 +156,13 @@ input {
 
   &:active {
     transform: translateY(0);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+    box-shadow: 0 4px 16px rgba(58, 181, 198, 0.2);
   }
 }
 
@@ -155,5 +198,65 @@ input {
     color: #168AAD;
     font-weight: 700;
     text-decoration: underline;
+  }
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding: 32px 24px 48px;
+  }
+
+  .content {
+    max-width: 560px;
+    padding: 24px 40px 48px;
+  }
+
+  .title-section {
+    margin: 12px 0 32px;
+
+    h1 {
+      font-size: 32px;
+    }
+
+    p {
+      font-size: 16px;
+    }
+  }
+
+  .form {
+    gap: 16px;
+  }
+
+  input,
+  select {
+    padding: 17px 0;
+    font-size: 15px;
+  }
+
+  .date-placeholder {
+    font-size: 15px;
+  }
+
+  .btn-primary {
+    margin-top: 12px;
+    padding: 16px;
+    font-size: 17px;
+  }
+
+  .login-link {
+    margin-top: 32px;
+    font-size: 14px;
+  }
+
+  .terms {
+    margin-top: 18px;
+    max-width: 460px;
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .content {
+    max-width: 640px;
   }
 }
