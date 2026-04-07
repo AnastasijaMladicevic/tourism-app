@@ -1151,5 +1151,44 @@ namespace TuristickiVodic.Tests.Validation
 
             IsValid(dto).Should().BeTrue();
         }
+
+        // ═══════════════════════════════════════════
+        //  CreateEventPlannerDto
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void CreateEventPlannerDto_EventIdJedan_JeValidno()
+        {
+            var dto = new CreateEventPlannerDto
+            {
+                EventId = 1
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateEventPlannerDto_EventIdJeNula_NijeValidno()
+        {
+            var dto = new CreateEventPlannerDto
+            {
+                EventId = 0
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateEventPlannerDto.EventId)));
+        }
+
+        [Fact]
+        public void CreateEventPlannerDto_EventIdJeNegativan_NijeValidno()
+        {
+            var dto = new CreateEventPlannerDto
+            {
+                EventId = -5
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateEventPlannerDto.EventId)));
+        }
     }
 }
