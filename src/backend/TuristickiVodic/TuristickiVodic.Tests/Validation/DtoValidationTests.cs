@@ -1190,5 +1190,103 @@ namespace TuristickiVodic.Tests.Validation
             IsValid(dto).Should().BeFalse();
             Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateEventPlannerDto.EventId)));
         }
+
+        // ═══════════════════════════════════════════
+        //  CreateImageDto
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void CreateImageDto_UrlMax500_JeValidan()
+        {
+            var dto = new CreateImageDto
+            {
+                Url = new string('A', 500),
+                ObjectId = 1
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+        [Fact]
+        public void CreateImageDto_Validno_JeValidno()
+        {
+            var dto = new CreateImageDto
+            {
+                Url = "test.jpg",
+                ObjectId = 1
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateImageDto_BezUrl_NijeValidno()
+        {
+            var dto = new CreateImageDto
+            {
+                ObjectId = 1
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateImageDto.Url)));
+        }
+
+        [Fact]
+        public void CreateImageDto_UrlDuzinaPreko500_NijeValidno()
+        {
+            var dto = new CreateImageDto
+            {
+                Url = new string('A', 501),
+                ObjectId = 1
+            };
+
+            IsValid(dto).Should().BeFalse();
+        }
+        [Fact]
+        public void CreateImageDto_PrazanUrl_NijeValidno()
+        {
+            var dto = new CreateImageDto
+            {
+                Url = "",
+                ObjectId = 1
+            };
+
+            IsValid(dto).Should().BeFalse();
+        }
+        [Fact]
+        public void CreateImageDto_NullUrl_NijeValidno()
+        {
+            var dto = new CreateImageDto
+            {
+                Url = null,
+                ObjectId = 1
+            };
+
+            IsValid(dto).Should().BeFalse();
+        }
+        [Fact]
+        public void CreateImageDto_AltTextMax200_JeValidan()
+        {
+            var dto = new CreateImageDto
+            {
+                Url = "test.jpg",
+                AltText = new string('A', 200),
+                ObjectId = 1
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+        [Fact]
+        public void CreateImageDto_IsMain_JeValidno()
+        {
+            var dto = new CreateImageDto
+            {
+                Url = "test.jpg",
+                ObjectId = 1,
+                IsMain = true
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
     }
 }
