@@ -12,9 +12,13 @@ export interface CreateUserDto {
 export interface LoginDto {
   email: string;
   password: string;
+  rememberMe: boolean;
 }
 
-export interface AuthResponse {
+
+export interface AuthResponseDto {
   token: string;
   refreshToken: string;
+  user: CreateUserDto;
+  expiresAt: string;
 }
