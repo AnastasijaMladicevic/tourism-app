@@ -1288,5 +1288,83 @@ namespace TuristickiVodic.Tests.Validation
             IsValid(dto).Should().BeTrue();
         }
 
+        // ═══════════════════════════════════════════
+        //  UpdateImageDto
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void UpdateImageDto_ValidanUrl_JeValidan()
+        {
+            var dto = new UpdateImageDto
+            {
+                Url = "test.jpg"
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void UpdateImageDto_UrlMax500_JeValidan()
+        {
+            var dto = new UpdateImageDto
+            {
+                Url = new string('A', 500)
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void UpdateImageDto_UrlPreko500_NijeValidan()
+        {
+            var dto = new UpdateImageDto
+            {
+                Url = new string('A', 501)
+            };
+
+            IsValid(dto).Should().BeFalse();
+        }
+
+        [Fact]
+        public void UpdateImageDto_AltTextMax200_JeValidan()
+        {
+            var dto = new UpdateImageDto
+            {
+                AltText = new string('A', 200)
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void UpdateImageDto_AltTextPreko200_NijeValidan()
+        {
+            var dto = new UpdateImageDto
+            {
+                AltText = new string('A', 201)
+            };
+
+            IsValid(dto).Should().BeFalse();
+        }
+
+        [Fact]
+        public void UpdateImageDto_IsMain_JeValidno()
+        {
+            var dto = new UpdateImageDto
+            {
+                IsMain = true
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void UpdateImageDto_PrazanDto_JeValidan()
+        {
+            var dto = new UpdateImageDto();
+
+            IsValid(dto).Should().BeTrue();
+        }
+
     }
 }

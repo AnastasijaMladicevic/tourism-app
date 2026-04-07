@@ -902,6 +902,7 @@ namespace TuristickiVodic.Tests.Mappings
             dto.Status.Should().Be("Approved");
             dto.ResolvedAt.Should().Be(new DateTime(2026, 1, 2));
         }
+
         [Fact]
         public void ImageToDto_MapiraIsMainPolje()
         {
@@ -921,6 +922,34 @@ namespace TuristickiVodic.Tests.Mappings
             dto.IsMain.Should().BeTrue();
         }
 
+        [Fact]
+        public void ImageToDto_MapiraSvaBitnaPolja()
+        {
+            var image = new Image
+            {
+                Id = 1,
+                Url = "test.jpg",
+                AltText = "opis",
+                IsMain = true,
+                ObjectId = 10,
+                ActivityId = 20,
+                EventId = 30,
+                DestinationId = 40,
+                LocalityId = 50,
+                CreatedAt = new DateTime(2026, 1, 1)
+            };
 
+            var dto = _mapper.Map<ImageDto>(image);
+
+            dto.Id.Should().Be(1);
+            dto.Url.Should().Be("test.jpg");
+            dto.AltText.Should().Be("opis");
+            dto.IsMain.Should().BeTrue();
+            dto.ObjectId.Should().Be(10);
+            dto.ActivityId.Should().Be(20);
+            dto.EventId.Should().Be(30);
+            dto.DestinationId.Should().Be(40);
+            dto.LocalityId.Should().Be(50);
+        }
     }
 }
