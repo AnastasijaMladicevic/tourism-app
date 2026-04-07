@@ -50,6 +50,8 @@ namespace TuristickiVodic.Core.DTO
 
         public string? RejectionReason { get; set; }
 
+        public int? ImageId { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         public DateTime UpdatedAt { get; set; }

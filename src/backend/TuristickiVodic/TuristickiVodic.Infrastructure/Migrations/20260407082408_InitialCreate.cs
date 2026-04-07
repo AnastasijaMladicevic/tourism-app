@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace TuristickiVodic.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialFixed : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -53,6 +53,22 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_EventTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Images",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Url = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    AltText = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    IsMain = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Images", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -162,6 +178,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     DestinationTypeId = table.Column<int>(type: "integer", nullable: false),
                     CreatedByUserId = table.Column<int>(type: "integer", nullable: false),
                     ManagedByUserId = table.Column<int>(type: "integer", nullable: true),
+                    ImageId = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -174,6 +191,12 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         principalTable: "DestinationTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Destinations_Images_ImageId",
+                        column: x => x.ImageId,
+                        principalTable: "Images",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Destinations_Users_CreatedByUserId",
                         column: x => x.CreatedByUserId,
@@ -285,6 +308,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     DestinationId = table.Column<int>(type: "integer", nullable: false),
                     LocalityTypeId = table.Column<int>(type: "integer", nullable: false),
                     CreatedByUserId = table.Column<int>(type: "integer", nullable: true),
+                    ImageId = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -297,6 +321,12 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         principalTable: "Destinations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Localities_Images_ImageId",
+                        column: x => x.ImageId,
+                        principalTable: "Images",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Localities_LocalityTypes_LocalityTypeId",
                         column: x => x.LocalityTypeId,
@@ -358,6 +388,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     ApprovedByUserId = table.Column<int>(type: "integer", nullable: true),
                     ApprovedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     RejectionReason = table.Column<string>(type: "text", nullable: true),
+                    ImageId = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -368,6 +399,12 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         name: "FK_Objects_Destinations_DestinationId",
                         column: x => x.DestinationId,
                         principalTable: "Destinations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Objects_Images_ImageId",
+                        column: x => x.ImageId,
+                        principalTable: "Images",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
@@ -417,6 +454,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     ApprovedByUserId = table.Column<int>(type: "integer", nullable: true),
                     ApprovedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     RejectionReason = table.Column<string>(type: "text", nullable: true),
+                    ImageId = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -433,6 +471,12 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         name: "FK_Activities_Destinations_DestinationId",
                         column: x => x.DestinationId,
                         principalTable: "Destinations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Activities_Images_ImageId",
+                        column: x => x.ImageId,
+                        principalTable: "Images",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
@@ -483,6 +527,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     ApprovedByUserId = table.Column<int>(type: "integer", nullable: true),
                     ApprovedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     RejectionReason = table.Column<string>(type: "text", nullable: true),
+                    ImageId = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -501,6 +546,12 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         principalTable: "EventTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Events_Images_ImageId",
+                        column: x => x.ImageId,
+                        principalTable: "Images",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Events_Localities_LocalityId",
                         column: x => x.LocalityId,
@@ -734,58 +785,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Images",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Url = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    AltText = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
-                    IsMain = table.Column<bool>(type: "boolean", nullable: false),
-                    ObjectId = table.Column<int>(type: "integer", nullable: true),
-                    ActivityId = table.Column<int>(type: "integer", nullable: true),
-                    EventId = table.Column<int>(type: "integer", nullable: true),
-                    DestinationId = table.Column<int>(type: "integer", nullable: true),
-                    LocalityId = table.Column<int>(type: "integer", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Images", x => x.Id);
-                    table.CheckConstraint("CK_Image_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"EventId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"DestinationId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"LocalityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
-                    table.ForeignKey(
-                        name: "FK_Images_Activities_ActivityId",
-                        column: x => x.ActivityId,
-                        principalTable: "Activities",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Images_Destinations_DestinationId",
-                        column: x => x.DestinationId,
-                        principalTable: "Destinations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Images_Events_EventId",
-                        column: x => x.EventId,
-                        principalTable: "Events",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Images_Localities_LocalityId",
-                        column: x => x.LocalityId,
-                        principalTable: "Localities",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Images_Objects_ObjectId",
-                        column: x => x.ObjectId,
-                        principalTable: "Objects",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Activities_ActivityTypeId",
                 table: "Activities",
@@ -811,6 +810,11 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 table: "Activities",
                 column: "Geolocation")
                 .Annotation("Npgsql:IndexMethod", "GIST");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Activities_ImageId",
+                table: "Activities",
+                column: "ImageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Activities_LocalityId",
@@ -868,6 +872,11 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 .Annotation("Npgsql:IndexMethod", "GIST");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Destinations_ImageId",
+                table: "Destinations",
+                column: "ImageId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Destinations_ManagedByUserId",
                 table: "Destinations",
                 column: "ManagedByUserId",
@@ -903,6 +912,11 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 name: "IX_Events_EventTypeId",
                 table: "Events",
                 column: "EventTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Events_ImageId",
+                table: "Events",
+                column: "ImageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Events_LocalityId",
@@ -975,31 +989,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 filter: "\"RouteId\" IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Images_ActivityId",
-                table: "Images",
-                column: "ActivityId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Images_DestinationId",
-                table: "Images",
-                column: "DestinationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Images_EventId",
-                table: "Images",
-                column: "EventId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Images_LocalityId",
-                table: "Images",
-                column: "LocalityId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Images_ObjectId",
-                table: "Images",
-                column: "ObjectId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Localities_CreatedByUserId",
                 table: "Localities",
                 column: "CreatedByUserId");
@@ -1014,6 +1003,11 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 table: "Localities",
                 column: "Geolocation")
                 .Annotation("Npgsql:IndexMethod", "GIST");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Localities_ImageId",
+                table: "Localities",
+                column: "ImageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Localities_LocalityTypeId",
@@ -1057,6 +1051,11 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 table: "Objects",
                 column: "Geolocation")
                 .Annotation("Npgsql:IndexMethod", "GIST");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Objects_ImageId",
+                table: "Objects",
+                column: "ImageId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Objects_LocalityId",
@@ -1147,9 +1146,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 name: "Favorites");
 
             migrationBuilder.DropTable(
-                name: "Images");
-
-            migrationBuilder.DropTable(
                 name: "ManagerReports");
 
             migrationBuilder.DropTable(
@@ -1168,19 +1164,19 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 name: "UserLogs");
 
             migrationBuilder.DropTable(
-                name: "Activities");
+                name: "Events");
 
             migrationBuilder.DropTable(
-                name: "Events");
+                name: "Activities");
 
             migrationBuilder.DropTable(
                 name: "Routes");
 
             migrationBuilder.DropTable(
-                name: "ActivityTypes");
+                name: "EventTypes");
 
             migrationBuilder.DropTable(
-                name: "EventTypes");
+                name: "ActivityTypes");
 
             migrationBuilder.DropTable(
                 name: "Objects");
@@ -1199,6 +1195,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "DestinationTypes");
+
+            migrationBuilder.DropTable(
+                name: "Images");
 
             migrationBuilder.DropTable(
                 name: "Users");

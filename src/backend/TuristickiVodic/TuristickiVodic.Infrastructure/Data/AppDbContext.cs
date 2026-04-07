@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using TuristickiVodic.Core.Models;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -314,44 +314,35 @@ public class AppDbContext : DbContext
             .HasFilter("\"LocalityId\" IS NOT NULL");
 
         // ==================== IMAGE ====================
-        mb.Entity<Image>()
-            .ToTable(t => t.HasCheckConstraint(
-                "CK_Image_OnlyOne",
-                @"(CASE WHEN ""ObjectId"" IS NOT NULL THEN 1 ELSE 0 END +
-                   CASE WHEN ""ActivityId"" IS NOT NULL THEN 1 ELSE 0 END +
-                   CASE WHEN ""EventId"" IS NOT NULL THEN 1 ELSE 0 END +
-                   CASE WHEN ""DestinationId"" IS NOT NULL THEN 1 ELSE 0 END +
-                   CASE WHEN ""LocalityId"" IS NOT NULL THEN 1 ELSE 0 END) = 1"));
+        mb.Entity<Destination>()
+            .HasOne(d => d.Image)
+            .WithMany()
+            .HasForeignKey(d => d.ImageId)
+            .OnDelete(DeleteBehavior.SetNull);
 
-        mb.Entity<Image>()
-            .HasOne(i => i.Object)
-            .WithMany(o => o.Images)
-            .HasForeignKey(i => i.ObjectId)
-            .OnDelete(DeleteBehavior.Cascade);
+        mb.Entity<Locality>()
+            .HasOne(l => l.Image)
+            .WithMany()
+            .HasForeignKey(l => l.ImageId)
+            .OnDelete(DeleteBehavior.SetNull);
 
-        mb.Entity<Image>()
-            .HasOne(i => i.Activity)
-            .WithMany(a => a.Images)
-            .HasForeignKey(i => i.ActivityId)
-            .OnDelete(DeleteBehavior.Cascade);
+        mb.Entity<TouristObject>()
+            .HasOne(o => o.Image)
+            .WithMany()
+            .HasForeignKey(o => o.ImageId)
+            .OnDelete(DeleteBehavior.SetNull);
 
-        mb.Entity<Image>()
-            .HasOne(i => i.Event)
-            .WithMany(e => e.Images)
-            .HasForeignKey(i => i.EventId)
-            .OnDelete(DeleteBehavior.Cascade);
+        mb.Entity<Activity>()
+            .HasOne(a => a.Image)
+            .WithMany()
+            .HasForeignKey(a => a.ImageId)
+            .OnDelete(DeleteBehavior.SetNull);
 
-        mb.Entity<Image>()
-            .HasOne(i => i.Destination)
-            .WithMany(d => d.Images)
-            .HasForeignKey(i => i.DestinationId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        mb.Entity<Image>()
-            .HasOne(i => i.Locality)
-            .WithMany(l => l.Images)
-            .HasForeignKey(i => i.LocalityId)
-            .OnDelete(DeleteBehavior.Cascade);
+        mb.Entity<Event>()
+            .HasOne(e => e.Image)
+            .WithMany()
+            .HasForeignKey(e => e.ImageId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         // ==================== ROUTE & ROUTE POINT ====================
         mb.Entity<RoutePoint>()

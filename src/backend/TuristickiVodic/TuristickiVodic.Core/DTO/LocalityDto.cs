@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -27,6 +27,8 @@ namespace TuristickiVodic.Core.DTO
         public string LocalityTypeName { get; set; } = string.Empty;
 
         public int? CreatedByUserId { get; set; }
+
+        public int? ImageId { get; set; }
 
         public DateTime CreatedAt { get; set; }
     }

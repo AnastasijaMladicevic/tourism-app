@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using NetTopologySuite.Geometries;
 
@@ -50,10 +50,12 @@ namespace TuristickiVodic.Core.Models
         public DateTime? ApprovedAt { get; set; }
         public string? RejectionReason { get; set; }
 
+        public int? ImageId { get; set; }
+        public Image? Image { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-        public ICollection<Image> Images { get; set; } = new List<Image>();
         public ICollection<EventPlannerItem> EventPlannerItems { get; set; } = new List<EventPlannerItem>();
     }
 }

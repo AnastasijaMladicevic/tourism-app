@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using NetTopologySuite.Geometries;
 
@@ -31,11 +31,13 @@ namespace TuristickiVodic.Core.Models
         public int? ManagedByUserId { get; set; }
         public User? ManagedBy { get; set; }
 
+        public int? ImageId { get; set; }
+        public Image? Image { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<Locality> Localities { get; set; } = new List<Locality>();
-        public ICollection<Image> Images { get; set; } = new List<Image>();
         public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
         public ICollection<TouristObject> Objects { get; set; } = new List<TouristObject>();
         public ICollection<Event> Events { get; set; } = new List<Event>();
