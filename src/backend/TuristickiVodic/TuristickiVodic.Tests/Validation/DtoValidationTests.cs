@@ -841,6 +841,137 @@ namespace TuristickiVodic.Tests.Validation
             IsValid(dto).Should().BeTrue();
         }
 
+        // ═══════════════════════════════════════════
+        //  CreateRouteDto / UpdateRouteDto / CreateRoutePointDto
+        // ═══════════════════════════════════════════
 
+        [Fact]
+        public void CreateRouteDto_SvaObaveznaPolja_JeValidno()
+        {
+            var dto = new CreateRouteDto
+            {
+                Name = "Ruta 1",
+                RoutePoints = new List<CreateRoutePointDto>
+                {
+                    new CreateRoutePointDto { Order = 1, Longitude = 18.70, Latitude = 42.40, PointName = "A" },
+                    new CreateRoutePointDto { Order = 2, Longitude = 18.71, Latitude = 42.41, PointName = "B" }
+                }
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateRouteDto_BezName_NijeValidno()
+        {
+            var dto = new CreateRouteDto
+            {
+                Name = "",
+                RoutePoints = new List<CreateRoutePointDto>
+                {
+                    new CreateRoutePointDto { Order = 1, Longitude = 18.70, Latitude = 42.40 },
+                    new CreateRoutePointDto { Order = 2, Longitude = 18.71, Latitude = 42.41 }
+                }
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateRouteDto.Name)));
+        }
+
+        [Fact]
+        public void CreateRouteDto_NameDuzeOd200Karaktera_NijeValidno()
+        {
+            var dto = new CreateRouteDto
+            {
+                Name = new string('X', 201),
+                RoutePoints = new List<CreateRoutePointDto>
+                {
+                    new CreateRoutePointDto { Order = 1, Longitude = 18.70, Latitude = 42.40 },
+                    new CreateRoutePointDto { Order = 2, Longitude = 18.71, Latitude = 42.41 }
+                }
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateRouteDto.Name)));
+        }
+
+        [Fact]
+        public void CreateRouteDto_SaJednomTackom_NijeValidno()
+        {
+            var dto = new CreateRouteDto
+            {
+                Name = "Ruta",
+                RoutePoints = new List<CreateRoutePointDto>
+                {
+                    new CreateRoutePointDto { Order = 1, Longitude = 18.70, Latitude = 42.40 }
+                }
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateRouteDto.RoutePoints)));
+        }
+
+        [Fact]
+        public void CreateRoutePointDto_LongitudeVanOpsega_NijeValidno()
+        {
+            var dto = new CreateRoutePointDto
+            {
+                Order = 1,
+                Longitude = 200,
+                Latitude = 42.40
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateRoutePointDto.Longitude)));
+        }
+
+        [Fact]
+        public void CreateRoutePointDto_LatitudeVanOpsega_NijeValidno()
+        {
+            var dto = new CreateRoutePointDto
+            {
+                Order = 1,
+                Longitude = 18.70,
+                Latitude = 100
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateRoutePointDto.Latitude)));
+        }
+
+        [Fact]
+        public void CreateRoutePointDto_PointNameDuzeOd150Karaktera_NijeValidno()
+        {
+            var dto = new CreateRoutePointDto
+            {
+                Order = 1,
+                Longitude = 18.70,
+                Latitude = 42.40,
+                PointName = new string('A', 151)
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateRoutePointDto.PointName)));
+        }
+
+        [Fact]
+        public void UpdateRouteDto_SvaPoljaNull_JeValidno()
+        {
+            var dto = new UpdateRouteDto();
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void UpdateRouteDto_NameDuzeOd200Karaktera_NijeValidno()
+        {
+            var dto = new UpdateRouteDto
+            {
+                Name = new string('X', 201)
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(UpdateRouteDto.Name)));
+        }
     }
 }

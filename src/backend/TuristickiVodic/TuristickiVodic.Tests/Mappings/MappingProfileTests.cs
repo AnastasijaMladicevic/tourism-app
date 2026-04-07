@@ -736,5 +736,121 @@ namespace TuristickiVodic.Tests.Mappings
             dto.ReviewedByFullName.Should().BeNull();
             dto.Status.Should().Be("Pending");
         }
+
+        // ═══════════════════════════════════════════
+        //  RoutePoint -> RoutePointDto
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void RoutePointToDto_GeolokacijaSeMapiraULongitudeLatitude()
+        {
+            var point = new RoutePoint
+            {
+                Id = 1,
+                RouteId = 10,
+                Order = 2,
+                Geolocation = new Point(18.77, 42.42) { SRID = 4326 },
+                PointName = "Tacka 2",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            var dto = _mapper.Map<RoutePointDto>(point);
+
+            dto.Id.Should().Be(1);
+            dto.RouteId.Should().Be(10);
+            dto.Order.Should().Be(2);
+            dto.Longitude.Should().BeApproximately(18.77, 0.001);
+            dto.Latitude.Should().BeApproximately(42.42, 0.001);
+            dto.PointName.Should().Be("Tacka 2");
+        }
+
+        [Fact]
+        public void RoutePointToDto_BezGeolokacije_LongitudeILatitudeSuNula()
+        {
+            var point = new RoutePoint
+            {
+                Id = 2,
+                RouteId = 10,
+                Order = 1,
+                Geolocation = null!,
+                PointName = "Bez geo",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            var dto = _mapper.Map<RoutePointDto>(point);
+
+            dto.Longitude.Should().Be(0);
+            dto.Latitude.Should().Be(0);
+        }
+
+        // ═══════════════════════════════════════════
+        //  Route -> RouteDto
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void RouteToDto_MapiraCreatedByFullNameIRoutePoints()
+        {
+            var route = new Route
+            {
+                Id = 1,
+                Name = "Ruta 1",
+                Description = "Opis",
+                Difficulty = "Easy",
+                LengthKm = 5.5m,
+                CreatedByUserId = 10,
+                CreatedBy = new User { Id = 10, FirstName = "Ana", LastName = "Anić" },
+                CreatedAt = new DateTime(2026, 1, 1),
+                UpdatedAt = new DateTime(2026, 1, 2),
+                RoutePoints = new List<RoutePoint>
+                {
+                    new RoutePoint
+                    {
+                        Id = 1,
+                        RouteId = 1,
+                        Order = 1,
+                        Geolocation = new Point(18.70, 42.40) { SRID = 4326 },
+                        PointName = "A"
+                    },
+                    new RoutePoint
+                    {
+                        Id = 2,
+                        RouteId = 1,
+                        Order = 2,
+                        Geolocation = new Point(18.71, 42.41) { SRID = 4326 },
+                        PointName = "B"
+                    }
+                }
+            };
+
+            var dto = _mapper.Map<RouteDto>(route);
+
+            dto.Id.Should().Be(1);
+            dto.Name.Should().Be("Ruta 1");
+            dto.Description.Should().Be("Opis");
+            dto.Difficulty.Should().Be("Easy");
+            dto.LengthKm.Should().Be(5.5m);
+            dto.CreatedByUserId.Should().Be(10);
+            dto.CreatedByFullName.Should().Be("Ana Anić");
+            dto.RoutePoints.Should().HaveCount(2);
+        }
+
+        [Fact]
+        public void RouteToDto_BezCreatedBy_CreatedByFullNameJeNull()
+        {
+            var route = new Route
+            {
+                Id = 2,
+                Name = "Ruta 2",
+                CreatedByUserId = null,
+                CreatedBy = null,
+                RoutePoints = new List<RoutePoint>()
+            };
+
+            var dto = _mapper.Map<RouteDto>(route);
+
+            dto.CreatedByUserId.Should().BeNull();
+            dto.CreatedByFullName.Should().BeNull();
+            dto.RoutePoints.Should().BeEmpty();
+        }
     }
 }
