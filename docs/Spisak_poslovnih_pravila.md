@@ -134,7 +134,7 @@
 
 - Samo `Manager` može da prijavi korisnika.
 - `Manager` može da prijavi samo korisnika sa ulogom `ContentCreator`.
-- Prijavljeni `ContentCreator` mora imati objekat ili event u destinaciji kojom upravlja taj `Manager`.
+- Prijavljeni `ContentCreator` mora imati objekat, event ili aktivnost u destinaciji kojom upravlja taj `Manager`.
 - Ne može da postoji više `Pending` prijava za istog `ContentCreator`-a.
 - `Manager` vidi samo svoje prijave.
 - `Admin` vidi sve prijave.
