@@ -912,6 +912,44 @@ namespace TuristickiVodic.Tests.Validation
         }
 
         [Fact]
+        public void UpdateRouteDto_SvaPoljaNull_JeValidno()
+        {
+            var dto = new UpdateRouteDto();
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void UpdateRouteDto_NameDuzeOd200Karaktera_NijeValidno()
+        {
+            var dto = new UpdateRouteDto
+            {
+                Name = new string('X', 201)
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(UpdateRouteDto.Name)));
+        }
+
+        // ═══════════════════════════════════════════
+        //  CreateRoutePointDto / UpdateRoutePointDto
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void CreateRoutePointDto_SvaObaveznaPolja_JeValidno()
+        {
+            var dto = new CreateRoutePointDto
+            {
+                Order = 1,
+                Longitude = 18.70,
+                Latitude = 42.40,
+                PointName = "A"
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
         public void CreateRoutePointDto_LongitudeVanOpsega_NijeValidno()
         {
             var dto = new CreateRoutePointDto
@@ -955,23 +993,47 @@ namespace TuristickiVodic.Tests.Validation
         }
 
         [Fact]
-        public void UpdateRouteDto_SvaPoljaNull_JeValidno()
+        public void UpdateRoutePointDto_SvaPoljaNull_JeValidno()
         {
-            var dto = new UpdateRouteDto();
+            var dto = new UpdateRoutePointDto();
 
             IsValid(dto).Should().BeTrue();
         }
 
         [Fact]
-        public void UpdateRouteDto_NameDuzeOd200Karaktera_NijeValidno()
+        public void UpdateRoutePointDto_LongitudeVanOpsega_NijeValidno()
         {
-            var dto = new UpdateRouteDto
+            var dto = new UpdateRoutePointDto
             {
-                Name = new string('X', 201)
+                Longitude = 181
             };
 
             IsValid(dto).Should().BeFalse();
-            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(UpdateRouteDto.Name)));
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(UpdateRoutePointDto.Longitude)));
+        }
+
+        [Fact]
+        public void UpdateRoutePointDto_LatitudeVanOpsega_NijeValidno()
+        {
+            var dto = new UpdateRoutePointDto
+            {
+                Latitude = 91
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(UpdateRoutePointDto.Latitude)));
+        }
+
+        [Fact]
+        public void UpdateRoutePointDto_PointNameDuzeOd150Karaktera_NijeValidno()
+        {
+            var dto = new UpdateRoutePointDto
+            {
+                PointName = new string('A', 151)
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(UpdateRoutePointDto.PointName)));
         }
     }
 }
