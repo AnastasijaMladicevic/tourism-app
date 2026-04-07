@@ -75,6 +75,32 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
+        [HttpPost("register-manager")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RegisterManager([FromBody] CreateUserDto createUserDto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            try
+            {
+                var user = await _userService.CreateManagerAsync(createUserDto);
+                return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+            }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+        }
+
+        [HttpPost("register-admin")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RegisterAdmin([FromBody] CreateUserDto createUserDto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            try
+            {
+                var user = await _userService.CreateAdminAsync(createUserDto);
+                return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+            }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+        }
+
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)

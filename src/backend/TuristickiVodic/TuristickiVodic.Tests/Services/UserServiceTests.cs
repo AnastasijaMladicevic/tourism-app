@@ -228,6 +228,100 @@ namespace TuristickiVodic.Tests.Services
             BCrypt.Net.BCrypt.Verify("novaLozinka1", updated!.PasswordHash).Should().BeTrue();
         }
 
+        // ═══════════════════════════════════════════
+        //  CreateManagerAsync
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public async Task CreateManagerAsync_SaIspravnimPodacima_KreiraKorisnikaSaUlogomManager()
+        {
+            var ctx = CreateInMemoryContext(nameof(CreateManagerAsync_SaIspravnimPodacima_KreiraKorisnikaSaUlogomManager));
+            var (_, _, manager, _) = SeedRoles(ctx);
+            await ctx.SaveChangesAsync();
+
+            var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
+
+            var result = await service.CreateManagerAsync(new CreateUserDto
+            {
+                FirstName = "Nikola",
+                LastName = "Jović",
+                Email = "manager@test.com",
+                Password = "pass123",
+                DateOfBirth = new DateTime(1990, 1, 1)
+            });
+
+            result.RoleName.Should().Be("Manager");
+            ctx.Users.Should().ContainSingle(u => u.Email == "manager@test.com");
+        }
+
+        [Fact]
+        public async Task CreateManagerAsync_KadaEmailVecPostoji_BacaInvalidOperationException()
+        {
+            var ctx = CreateInMemoryContext(nameof(CreateManagerAsync_KadaEmailVecPostoji_BacaInvalidOperationException));
+            SeedRoles(ctx);
+            ctx.Users.Add(new User { Email = "manager@test.com", PasswordHash = "x", RoleId = 3, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
+            await ctx.SaveChangesAsync();
+
+            var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.CreateManagerAsync(new CreateUserDto
+                {
+                    FirstName = "N",
+                    LastName = "J",
+                    Email = "manager@test.com",
+                    Password = "pass123",
+                    DateOfBirth = new DateTime(1990, 1, 1)
+                }));
+        }
+
+        // ═══════════════════════════════════════════
+        //  CreateAdminAsync
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public async Task CreateAdminAsync_SaIspravnimPodacima_KreiraKorisnikaSaUlogomAdmin()
+        {
+            var ctx = CreateInMemoryContext(nameof(CreateAdminAsync_SaIspravnimPodacima_KreiraKorisnikaSaUlogomAdmin));
+            SeedRoles(ctx);
+            await ctx.SaveChangesAsync();
+
+            var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
+
+            var result = await service.CreateAdminAsync(new CreateUserDto
+            {
+                FirstName = "Jelena",
+                LastName = "Marić",
+                Email = "admin2@test.com",
+                Password = "pass123",
+                DateOfBirth = new DateTime(1985, 1, 1)
+            });
+
+            result.RoleName.Should().Be("Admin");
+            ctx.Users.Should().ContainSingle(u => u.Email == "admin2@test.com");
+        }
+
+        [Fact]
+        public async Task CreateAdminAsync_KadaEmailVecPostoji_BacaInvalidOperationException()
+        {
+            var ctx = CreateInMemoryContext(nameof(CreateAdminAsync_KadaEmailVecPostoji_BacaInvalidOperationException));
+            SeedRoles(ctx);
+            ctx.Users.Add(new User { Email = "admin2@test.com", PasswordHash = "x", RoleId = 4, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow });
+            await ctx.SaveChangesAsync();
+
+            var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                service.CreateAdminAsync(new CreateUserDto
+                {
+                    FirstName = "J",
+                    LastName = "M",
+                    Email = "admin2@test.com",
+                    Password = "pass123",
+                    DateOfBirth = new DateTime(1985, 1, 1)
+                }));
+        }
+
         [Fact]
         public async Task ChangePasswordAsync_KorisnikMenjaSaPogresnomStarom_BacaException()
         {
