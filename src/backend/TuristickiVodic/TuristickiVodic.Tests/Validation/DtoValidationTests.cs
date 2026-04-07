@@ -33,8 +33,10 @@ namespace TuristickiVodic.Tests.Validation
         {
             var dto = new CreateUserDto
             {
-                FirstName = "Marko", LastName = "Marković",
-                Email = "marko@test.com", Password = "lozinka123",
+                FirstName = "Marko",
+                LastName = "Marković",
+                Email = "marko@test.com",
+                Password = "lozinka123",
                 DateOfBirth = new DateTime(1990, 1, 1)
             };
 
@@ -46,8 +48,10 @@ namespace TuristickiVodic.Tests.Validation
         {
             var dto = new CreateUserDto
             {
-                LastName = "M", Email = "m@m.com",
-                Password = "lozinka1", DateOfBirth = new DateTime(1990, 1, 1)
+                LastName = "M",
+                Email = "m@m.com",
+                Password = "lozinka1",
+                DateOfBirth = new DateTime(1990, 1, 1)
             };
 
             IsValid(dto).Should().BeFalse();
@@ -59,8 +63,10 @@ namespace TuristickiVodic.Tests.Validation
         {
             var dto = new CreateUserDto
             {
-                FirstName = "A", LastName = "B",
-                Password = "lozinka1", DateOfBirth = new DateTime(1990, 1, 1)
+                FirstName = "A",
+                LastName = "B",
+                Password = "lozinka1",
+                DateOfBirth = new DateTime(1990, 1, 1)
             };
 
             IsValid(dto).Should().BeFalse();
@@ -72,8 +78,11 @@ namespace TuristickiVodic.Tests.Validation
         {
             var dto = new CreateUserDto
             {
-                FirstName = "A", LastName = "B", Email = "nijemail",
-                Password = "lozinka1", DateOfBirth = new DateTime(1990, 1, 1)
+                FirstName = "A",
+                LastName = "B",
+                Email = "nijemail",
+                Password = "lozinka1",
+                DateOfBirth = new DateTime(1990, 1, 1)
             };
 
             IsValid(dto).Should().BeFalse();
@@ -85,7 +94,9 @@ namespace TuristickiVodic.Tests.Validation
         {
             var dto = new CreateUserDto
             {
-                FirstName = "A", LastName = "B", Email = "a@b.com",
+                FirstName = "A",
+                LastName = "B",
+                Email = "a@b.com",
                 Password = "krat",  // < 6
                 DateOfBirth = new DateTime(1990, 1, 1)
             };
@@ -100,8 +111,10 @@ namespace TuristickiVodic.Tests.Validation
             var dto = new CreateUserDto
             {
                 FirstName = new string('A', 101),
-                LastName = "B", Email = "a@b.com",
-                Password = "lozinka1", DateOfBirth = new DateTime(1990, 1, 1)
+                LastName = "B",
+                Email = "a@b.com",
+                Password = "lozinka1",
+                DateOfBirth = new DateTime(1990, 1, 1)
             };
 
             IsValid(dto).Should().BeFalse();
@@ -117,7 +130,9 @@ namespace TuristickiVodic.Tests.Validation
         {
             var dto = new CreateDestinationDto
             {
-                Name = "Kotor", DestinationTypeId = 1, ManagedByUserId = 5
+                Name = "Kotor",
+                DestinationTypeId = 1,
+                ManagedByUserId = 5
             };
 
             IsValid(dto).Should().BeTrue();
@@ -128,7 +143,8 @@ namespace TuristickiVodic.Tests.Validation
         {
             var dto = new CreateDestinationDto
             {
-                DestinationTypeId = 1, ManagedByUserId = 5
+                DestinationTypeId = 1,
+                ManagedByUserId = 5
             };
 
             IsValid(dto).Should().BeFalse();
@@ -141,7 +157,8 @@ namespace TuristickiVodic.Tests.Validation
             // Destinacija ne može da se instancira bez menadžera
             var dto = new CreateDestinationDto
             {
-                Name = "Test", DestinationTypeId = 1
+                Name = "Test",
+                DestinationTypeId = 1
                 // ManagedByUserId = null — nije postavljeno
             };
 
@@ -155,7 +172,9 @@ namespace TuristickiVodic.Tests.Validation
             // Range(1, int.MaxValue) — vrednost 0 mora biti odbijena
             var dto = new CreateDestinationDto
             {
-                Name = "Test", DestinationTypeId = 1, ManagedByUserId = 0
+                Name = "Test",
+                DestinationTypeId = 1,
+                ManagedByUserId = 0
             };
 
             IsValid(dto).Should().BeFalse();
@@ -167,7 +186,9 @@ namespace TuristickiVodic.Tests.Validation
         {
             var dto = new CreateDestinationDto
             {
-                Name = "Test", DestinationTypeId = 1, ManagedByUserId = -1
+                Name = "Test",
+                DestinationTypeId = 1,
+                ManagedByUserId = -1
             };
 
             IsValid(dto).Should().BeFalse();
@@ -180,7 +201,9 @@ namespace TuristickiVodic.Tests.Validation
             // Minimalna validna vrednost je 1
             var dto = new CreateDestinationDto
             {
-                Name = "Test", DestinationTypeId = 1, ManagedByUserId = 1
+                Name = "Test",
+                DestinationTypeId = 1,
+                ManagedByUserId = 1
             };
 
             IsValid(dto).Should().BeTrue();
@@ -191,7 +214,9 @@ namespace TuristickiVodic.Tests.Validation
         {
             var dto = new CreateDestinationDto
             {
-                Name = new string('X', 151), DestinationTypeId = 1, ManagedByUserId = 1
+                Name = new string('X', 151),
+                DestinationTypeId = 1,
+                ManagedByUserId = 1
             };
 
             IsValid(dto).Should().BeFalse();
@@ -1035,5 +1060,45 @@ namespace TuristickiVodic.Tests.Validation
             IsValid(dto).Should().BeFalse();
             Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(UpdateRoutePointDto.PointName)));
         }
+
+        [Fact]
+        public void CreateFavoriteDto_KadaNijednoPoljeNijeProsledjeno_NijeValidno()
+        {
+            var dto = new CreateFavoriteDto();
+
+            var results = Validate(dto);
+
+            results.Should().NotBeEmpty();
+            results.Should().Contain(r => r.ErrorMessage!.Contains("Tačno jedno"));
+        }
+
+        [Fact]
+        public void CreateFavoriteDto_KadaJeProsledjenoVisePolja_NijeValidno()
+        {
+            var dto = new CreateFavoriteDto
+            {
+                DestinationId = 1,
+                LocalityId = 2
+            };
+
+            var results = Validate(dto);
+
+            results.Should().NotBeEmpty();
+            results.Should().Contain(r => r.ErrorMessage!.Contains("Tačno jedno"));
+        }
+
+        [Fact]
+        public void CreateFavoriteDto_KadaJeProsledjenoTacnoJednoPolje_ValidnoJe()
+        {
+            var dto = new CreateFavoriteDto
+            {
+                RouteId = 5
+            };
+
+            var results = Validate(dto);
+
+            results.Should().BeEmpty();
+        }
     }
+
 }

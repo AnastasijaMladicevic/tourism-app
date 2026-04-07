@@ -170,6 +170,19 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.Status,
                     opt => opt.MapFrom(src => src.Status.ToString()));
 
+
+            CreateMap<Favorite, FavoriteDto>()
+                .ForMember(dest => dest.ObjectName,
+                    opt => opt.MapFrom(src => src.Object != null ? src.Object.Name : null))
+                .ForMember(dest => dest.ActivityName,
+                    opt => opt.MapFrom(src => src.Activity != null ? src.Activity.Name : null))
+                .ForMember(dest => dest.DestinationName,
+                    opt => opt.MapFrom(src => src.Destination != null ? src.Destination.Name : null))
+                .ForMember(dest => dest.RouteName,
+                    opt => opt.MapFrom(src => src.Route != null ? src.Route.Name : null))
+                .ForMember(dest => dest.LocalityName,
+                    opt => opt.MapFrom(src => src.Locality != null ? src.Locality.Name : null));
+
             CreateMap<Image, ImageDto>();
         }
     }
