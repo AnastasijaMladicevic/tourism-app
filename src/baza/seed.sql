@@ -444,93 +444,93 @@ VALUES
 -- ============================================
 -- 10. IMAGES - DESTINATIONS
 -- ============================================
-INSERT INTO "Images" ("Url", "AltText", "IsMain", "CreatedAt")
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 VALUES
 (
     'https://afar.brightspotcdn.com/dims4/default/3a97ce6/2147483647/strip/false/crop/1600x800+0+0/resize/1486x743!/quality/90/?url=https%3A%2F%2Fk3-prod-afar-media.s3.us-west-2.amazonaws.com%2Fbrightspot%2Ff4%2F0e%2Fabb2c7bf50f46954835d19e83029%2Foriginal-956aea8bdeae0f9b8479b054a6ff8e85.jpg',
     'Stari grad Kotor',
     true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
     NOW()),
 (
     'https://www.montenegrosubmarine.me/public/assets/images/img/Boka%20Bay%20222.jpg',
     'Kotorski zaliv',
     true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotorski zaliv'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/0/00/Budva_(26871774051).jpg',
     'Budva',
     true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
     NOW()),
 (
     'https://kofer.info/wp-content/uploads/2020/02/shutterstock_191127089.jpg',
     'Stari grad Budva',
     true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Budva'),
     NOW()),
 (
     'https://www.ekapija.com/thumbs169/plaza_mogren_u_budvi_220525_tw1024.jpg',
     'Plaza Mogren',
     true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plaza Mogren'),
     NOW()),
 (
     'https://twopacksandapup.com/wp-content/uploads/2025/06/Durmitor-Feat-scaled.jpg',
     'Durmitor',
     true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Sveti_Stefan_(06).jpg/1280px-Sveti_Stefan_(06).jpg',
     'Sveti Stefan',
     true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sveti Stefan'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/4/4b/PodgoricaOverview.jpg',
     'Podgorica',
     true,
-    NOW()),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
+    NOW()
+),
 (
     'https://idsb.tmgrup.com.tr/ly/uploads/images/2023/04/03/265755.jpg',
     'Herceg Novi',
     true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
     NOW()),
 (
     'https://www.visit-montenegro.com/wp-content/uploads/2026/01/Depositphotos_668449212_XL-scaled.jpg',
     'Bar',
     true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
     NOW()),
 (
     'https://ulcinj.travel/wp-content/uploads/2024/02/47.jpg',
     'Ulcinj',
     true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
     NOW()),
 (
     'https://www.montenegro.travel/imagine_cache/og/uploads/banners/1_unique_montengro/1.Cetinje.webp',
     'Cetinje',
     true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/d/d3/Nikšić.jpg',
     'Niksic',
     true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
     NOW()),
 (
     'https://opstinativat.me/wp-content/uploads/2020/09/DJI_0022-1-1100x450.jpg',
     'Tivat',
     true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
     NOW());
-
-UPDATE "Destinations" SET "ImageId" = (SELECT "Id" FROM "Images" WHERE "AltText" = 'Stari grad Kotor' AND "IsMain" = true) WHERE "Name" = 'Stari grad Kotor';
-UPDATE "Destinations" SET "ImageId" = (SELECT "Id" FROM "Images" WHERE "AltText" = 'Kotorski zaliv' AND "IsMain" = true) WHERE "Name" = 'Kotorski zaliv';
-UPDATE "Destinations" SET "ImageId" = (SELECT "Id" FROM "Images" WHERE "AltText" = 'Budva' AND "IsMain" = true) WHERE "Name" = 'Budva';
-UPDATE "Destinations" SET "ImageId" = (SELECT "Id" FROM "Images" WHERE "AltText" = 'Stari grad Budva' AND "IsMain" = true) WHERE "Name" = 'Stari grad Budva';
-UPDATE "Destinations" SET "ImageId" = (SELECT "Id" FROM "Images" WHERE "AltText" = 'Plaza Mogren' AND "IsMain" = true) WHERE "Name" = 'Plaza Mogren';
-UPDATE "Destinations" SET "ImageId" = (SELECT "Id" FROM "Images" WHERE "AltText" = 'Durmitor' AND "IsMain" = true) WHERE "Name" = 'Durmitor';
-UPDATE "Destinations" SET "ImageId" = (SELECT "Id" FROM "Images" WHERE "AltText" = 'Sveti Stefan' AND "IsMain" = true) WHERE "Name" = 'Sveti Stefan';
-UPDATE "Destinations" SET "ImageId" = (SELECT "Id" FROM "Images" WHERE "AltText" = 'Podgorica' AND "IsMain" = true) WHERE "Name" = 'Podgorica';
-UPDATE "Destinations" SET "ImageId" = (SELECT "Id" FROM "Images" WHERE "AltText" = 'Herceg Novi' AND "IsMain" = true) WHERE "Name" = 'Herceg Novi';
-UPDATE "Destinations" SET "ImageId" = (SELECT "Id" FROM "Images" WHERE "AltText" = 'Bar' AND "IsMain" = true) WHERE "Name" = 'Bar';
-UPDATE "Destinations" SET "ImageId" = (SELECT "Id" FROM "Images" WHERE "AltText" = 'Ulcinj' AND "IsMain" = true) WHERE "Name" = 'Ulcinj';
-UPDATE "Destinations" SET "ImageId" = (SELECT "Id" FROM "Images" WHERE "AltText" = 'Cetinje' AND "IsMain" = true) WHERE "Name" = 'Cetinje';
-UPDATE "Destinations" SET "ImageId" = (SELECT "Id" FROM "Images" WHERE "AltText" = 'Niksic' AND "IsMain" = true) WHERE "Name" = 'Niksic';
-UPDATE "Destinations" SET "ImageId" = (SELECT "Id" FROM "Images" WHERE "AltText" = 'Tivat' AND "IsMain" = true) WHERE "Name" = 'Tivat';
 
 -- ============================================
 -- 11. INDEXES
@@ -650,9 +650,41 @@ CREATE TRIGGER tg_events_updated
 BEFORE UPDATE ON "Events"
 FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
--- Trigger ensure_one_main_image je uklonjen jer Images vise ne cuva FK ka entitetima.
--- Entiteti (Destinations, Localities, Objects, Activities, Events) sada cuvaju ImageId,
--- pa je ogranicenje "jedna glavna slika po entitetu" implicitno kroz tu kolonu.
+CREATE OR REPLACE FUNCTION ensure_one_main_image()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW."IsMain" = true THEN
+        IF NEW."ObjectId" IS NOT NULL THEN
+            UPDATE "Images"
+            SET "IsMain" = false
+            WHERE "ObjectId" = NEW."ObjectId" AND "Id" != NEW."Id";
+        ELSIF NEW."ActivityId" IS NOT NULL THEN
+            UPDATE "Images"
+            SET "IsMain" = false
+            WHERE "ActivityId" = NEW."ActivityId" AND "Id" != NEW."Id";
+        ELSIF NEW."EventId" IS NOT NULL THEN
+            UPDATE "Images"
+            SET "IsMain" = false
+            WHERE "EventId" = NEW."EventId" AND "Id" != NEW."Id";
+        ELSIF NEW."DestinationId" IS NOT NULL THEN
+            UPDATE "Images"
+            SET "IsMain" = false
+            WHERE "DestinationId" = NEW."DestinationId" AND "Id" != NEW."Id";
+        ELSIF NEW."LocalityId" IS NOT NULL THEN
+            UPDATE "Images"
+            SET "IsMain" = false
+            WHERE "LocalityId" = NEW."LocalityId" AND "Id" != NEW."Id";
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS tg_one_main_image ON "Images";
+CREATE TRIGGER tg_one_main_image
+BEFORE INSERT OR UPDATE ON "Images"
+FOR EACH ROW EXECUTE FUNCTION ensure_one_main_image();
 
 CREATE OR REPLACE FUNCTION deactivate_past_events()
 RETURNS TRIGGER AS $$

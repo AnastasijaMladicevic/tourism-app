@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace TuristickiVodic.Core.DTO
 {
@@ -45,8 +45,6 @@ namespace TuristickiVodic.Core.DTO
         public DateTime? ApprovedAt { get; set; }
 
         public string? RejectionReason { get; set; }
-
-        public int? ImageId { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

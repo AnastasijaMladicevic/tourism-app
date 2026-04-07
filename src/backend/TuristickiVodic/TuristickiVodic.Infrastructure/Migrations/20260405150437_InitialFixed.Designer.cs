@@ -13,8 +13,8 @@ using TuristickiVodic.Infrastructure.Data;
 namespace TuristickiVodic.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260407082408_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260405150437_InitialFixed")]
+    partial class InitialFixed
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -62,9 +62,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<Point>("Geolocation")
                         .HasColumnType("geometry");
 
-                    b.Property<int?>("ImageId")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -104,8 +101,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.HasIndex("Geolocation");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Geolocation"), "GIST");
-
-                    b.HasIndex("ImageId");
 
                     b.HasIndex("LocalityId");
 
@@ -221,9 +216,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<Point>("Geolocation")
                         .HasColumnType("geometry");
 
-                    b.Property<int?>("ImageId")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -251,8 +243,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.HasIndex("Geolocation");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Geolocation"), "GIST");
-
-                    b.HasIndex("ImageId");
 
                     b.HasIndex("ManagedByUserId")
                         .IsUnique();
@@ -313,9 +303,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<Point>("Geolocation")
                         .HasColumnType("geometry");
 
-                    b.Property<int?>("ImageId")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -358,8 +345,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.HasIndex("DestinationId");
 
                     b.HasIndex("EventTypeId");
-
-                    b.HasIndex("ImageId");
 
                     b.HasIndex("LocalityId");
 
@@ -488,6 +473,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("ActivityId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("AltText")
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
@@ -495,8 +483,20 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int?>("DestinationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("EventId")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsMain")
                         .HasColumnType("boolean");
+
+                    b.Property<int?>("LocalityId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("ObjectId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Url")
                         .IsRequired()
@@ -505,7 +505,20 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Images");
+                    b.HasIndex("ActivityId");
+
+                    b.HasIndex("DestinationId");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("LocalityId");
+
+                    b.HasIndex("ObjectId");
+
+                    b.ToTable("Images", t =>
+                        {
+                            t.HasCheckConstraint("CK_Image_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"EventId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"DestinationId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"LocalityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
+                        });
                 });
 
             modelBuilder.Entity("TuristickiVodic.Core.Models.Locality", b =>
@@ -531,9 +544,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<Point>("Geolocation")
                         .HasColumnType("geometry");
 
-                    b.Property<int?>("ImageId")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -557,8 +567,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.HasIndex("Geolocation");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Geolocation"), "GIST");
-
-                    b.HasIndex("ImageId");
 
                     b.HasIndex("LocalityTypeId");
 
@@ -879,9 +887,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<Point>("Geolocation")
                         .HasColumnType("geometry");
 
-                    b.Property<int?>("ImageId")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -931,8 +936,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.HasIndex("Geolocation");
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Geolocation"), "GIST");
-
-                    b.HasIndex("ImageId");
 
                     b.HasIndex("LocalityId");
 
@@ -1093,11 +1096,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .HasForeignKey("DestinationId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("TuristickiVodic.Core.Models.Image", "Image")
-                        .WithMany()
-                        .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("TuristickiVodic.Core.Models.Locality", "Locality")
                         .WithMany("Activities")
                         .HasForeignKey("LocalityId")
@@ -1115,8 +1113,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Destination");
-
-                    b.Navigation("Image");
 
                     b.Navigation("Locality");
 
@@ -1176,11 +1172,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TuristickiVodic.Core.Models.Image", "Image")
-                        .WithMany()
-                        .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("TuristickiVodic.Core.Models.User", "ManagedBy")
                         .WithOne("ManagedDestination")
                         .HasForeignKey("TuristickiVodic.Core.Models.Destination", "ManagedByUserId")
@@ -1189,8 +1180,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("DestinationType");
-
-                    b.Navigation("Image");
 
                     b.Navigation("ManagedBy");
                 });
@@ -1219,11 +1208,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TuristickiVodic.Core.Models.Image", "Image")
-                        .WithMany()
-                        .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("TuristickiVodic.Core.Models.Locality", "Locality")
                         .WithMany("Events")
                         .HasForeignKey("LocalityId")
@@ -1241,8 +1225,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("Destination");
 
                     b.Navigation("EventType");
-
-                    b.Navigation("Image");
 
                     b.Navigation("Locality");
 
@@ -1314,6 +1296,44 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TuristickiVodic.Core.Models.Image", b =>
+                {
+                    b.HasOne("TuristickiVodic.Core.Models.Activity", "Activity")
+                        .WithMany("Images")
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TuristickiVodic.Core.Models.Destination", "Destination")
+                        .WithMany("Images")
+                        .HasForeignKey("DestinationId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TuristickiVodic.Core.Models.Event", "Event")
+                        .WithMany("Images")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TuristickiVodic.Core.Models.Locality", "Locality")
+                        .WithMany("Images")
+                        .HasForeignKey("LocalityId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TuristickiVodic.Core.Models.TouristObject", "Object")
+                        .WithMany("Images")
+                        .HasForeignKey("ObjectId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Activity");
+
+                    b.Navigation("Destination");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Locality");
+
+                    b.Navigation("Object");
+                });
+
             modelBuilder.Entity("TuristickiVodic.Core.Models.Locality", b =>
                 {
                     b.HasOne("TuristickiVodic.Core.Models.User", "CreatedBy")
@@ -1327,11 +1347,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TuristickiVodic.Core.Models.Image", "Image")
-                        .WithMany()
-                        .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("TuristickiVodic.Core.Models.LocalityType", "LocalityType")
                         .WithMany("Localities")
                         .HasForeignKey("LocalityTypeId")
@@ -1341,8 +1356,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Destination");
-
-                    b.Navigation("Image");
 
                     b.Navigation("LocalityType");
                 });
@@ -1449,11 +1462,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .HasForeignKey("DestinationId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("TuristickiVodic.Core.Models.Image", "Image")
-                        .WithMany()
-                        .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("TuristickiVodic.Core.Models.Locality", "Locality")
                         .WithMany("Objects")
                         .HasForeignKey("LocalityId")
@@ -1471,8 +1479,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("Destination");
-
-                    b.Navigation("Image");
 
                     b.Navigation("Locality");
 
@@ -1510,6 +1516,8 @@ namespace TuristickiVodic.Infrastructure.Migrations
             modelBuilder.Entity("TuristickiVodic.Core.Models.Activity", b =>
                 {
                     b.Navigation("Favorites");
+
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("TuristickiVodic.Core.Models.ActivityType", b =>
@@ -1525,6 +1533,8 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.Navigation("Favorites");
 
+                    b.Navigation("Images");
+
                     b.Navigation("Localities");
 
                     b.Navigation("Objects");
@@ -1538,6 +1548,8 @@ namespace TuristickiVodic.Infrastructure.Migrations
             modelBuilder.Entity("TuristickiVodic.Core.Models.Event", b =>
                 {
                     b.Navigation("EventPlannerItems");
+
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("TuristickiVodic.Core.Models.EventType", b =>
@@ -1552,6 +1564,8 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("Events");
 
                     b.Navigation("Favorites");
+
+                    b.Navigation("Images");
 
                     b.Navigation("Objects");
                 });
@@ -1585,6 +1599,8 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("Events");
 
                     b.Navigation("Favorites");
+
+                    b.Navigation("Images");
 
                     b.Navigation("Reviews");
                 });

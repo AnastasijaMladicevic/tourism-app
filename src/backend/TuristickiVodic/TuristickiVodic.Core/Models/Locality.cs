@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -32,9 +32,6 @@ namespace TuristickiVodic.Core.Models
         [ForeignKey("CreatedByUserId")]
         public User? CreatedBy { get; set; }
 
-        public int? ImageId { get; set; }
-        public Image? Image { get; set; }
-
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
 
@@ -42,6 +39,7 @@ namespace TuristickiVodic.Core.Models
         public ICollection<TouristObject> Objects { get; set; }
         public ICollection<Event> Events { get; set; }
         public ICollection<Activity> Activities { get; set; }
+        public ICollection<Image> Images { get; set; }
         public ICollection<Favorite> Favorites { get; set; }
     }
 }

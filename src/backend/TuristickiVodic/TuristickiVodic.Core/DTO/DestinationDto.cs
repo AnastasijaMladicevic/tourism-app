@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace TuristickiVodic.Core.DTO
 {
@@ -25,8 +25,6 @@ namespace TuristickiVodic.Core.DTO
         public int CreatedByUserId { get; set; }
 
         public int? ManagedByUserId { get; set; }
-
-        public int? ImageId { get; set; }
 
         public DateTime CreatedAt { get; set; }
 
