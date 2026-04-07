@@ -1089,5 +1089,67 @@ namespace TuristickiVodic.Tests.Validation
 
             IsValid(dto).Should().BeTrue();
         }
-}
+
+        // ═══════════════════════════════════════════
+        //  DeletionRequest DTO
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public void CreateDeletionRequestDto_BezReason_JeValidno()
+        {
+            var dto = new CreateDeletionRequestDto
+            {
+                Reason = null
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateDeletionRequestDto_SaReason_JeValidno()
+        {
+            var dto = new CreateDeletionRequestDto
+            {
+                Reason = "Zastareo sadrzaj"
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void ApproveDeletionRequestDto_OdobravanjeBezRazloga_JeValidno()
+        {
+            var dto = new ApproveDeletionRequestDto
+            {
+                Approve = true,
+                RejectionReason = null
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void ApproveDeletionRequestDto_OdbijanjeBezRazloga_JeValidnoPoTrenutnomDto()
+        {
+            var dto = new ApproveDeletionRequestDto
+            {
+                Approve = false,
+                RejectionReason = null
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void ApproveDeletionRequestDto_OdbijanjeSaRazlogom_JeValidno()
+        {
+            var dto = new ApproveDeletionRequestDto
+            {
+                Approve = false,
+                RejectionReason = "Ne prihvata se"
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+    }
 }
