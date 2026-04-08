@@ -7,9 +7,11 @@
     <div class="form">
       <form [formGroup]="form">
         <!-- EMAIL -->
+        <label for="email">EMAIL</label>
+
         <div class="input-group">
           <span class="icon">mail</span>
-          <input type="email" placeholder="Email" formControlName="email" />
+          <input type="email" placeholder="admin@azurehorizon.com" formControlName="email" />
         </div>
         @if (email?.touched && email?.invalid) {
           <div class="error">
@@ -22,12 +24,14 @@
           </div>
         }
         <!-- PASSWORD -->
+        <label for="password">PASSWORD</label>
+
         <div class="input-group">
           <span class="icon">lock</span>
 
           <input
             [type]="hidePassword ? 'password' : 'text'"
-            placeholder="Password"
+            placeholder="••••••••••••"
             formControlName="password"
           />
 
