@@ -365,5 +365,15 @@ namespace TuristickiVodic.Services
             var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
             return Convert.ToBase64String(bytes);
         }
+
+        public async Task<IEnumerable<CreatorRoleRequestDto>> GetCreatorRequestsAsync()
+        {
+            var users = await _context.Users
+                .Include(u => u.Role)
+                .Where(u => u.Role.Name == RoleType.Tourist && u.HasRequestedCreatorRole)
+                .ToListAsync();
+
+            return _mapper.Map<IEnumerable<CreatorRoleRequestDto>>(users);
+        }
     }
 }

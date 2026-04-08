@@ -185,6 +185,10 @@ namespace TuristickiVodic.Services.Mappings
 
             CreateMap<Image, ImageDto>();
 
+            CreateMap<User, CreatorRoleRequestDto>()
+                .ForMember(dest => dest.RoleName,
+                    opt => opt.MapFrom(src => src.Role != null ? src.Role.Name.ToString() : string.Empty));
+
             CreateMap<ManagerReport, ManagerReportDto>()
                 .ForMember(dest => dest.ManagerName,
                     opt => opt.MapFrom(src => src.Manager != null

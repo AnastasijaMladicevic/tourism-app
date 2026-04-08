@@ -40,55 +40,11 @@ namespace TuristickiVodic.Tests.Services
             await _context.SaveChangesAsync();
         }
 
-        private async Task AddActivityAsync(int id = 1)
-        {
-            _context.Activities.Add(new Activity
-            {
-                Id = id,
-                Name = $"Aktivnost{id}"
-            });
-
-            await _context.SaveChangesAsync();
-        }
-
-        private async Task AddEventAsync(int id = 1)
-        {
-            _context.Events.Add(new Event
-            {
-                Id = id,
-                Name = $"Dogadjaj{id}"
-            });
-
-            await _context.SaveChangesAsync();
-        }
-
-        private async Task AddDestinationAsync(int id = 1)
-        {
-            _context.Destinations.Add(new Destination
-            {
-                Id = id,
-                Name = $"Destinacija{id}"
-            });
-
-            await _context.SaveChangesAsync();
-        }
-
-        private async Task AddLocalityAsync(int id = 1)
-        {
-            _context.Localities.Add(new Locality
-            {
-                Id = id,
-                Name = $"Lokalitet{id}"
-            });
-
-            await _context.SaveChangesAsync();
-        }
-
         [Fact]
         public async Task GetAllAsync_VracaSveSlikeSortiranePoId()
         {
-            _context.Images.Add(new Image { Id = 2, Url = "2.jpg", ObjectId = 2 });
-            _context.Images.Add(new Image { Id = 1, Url = "1.jpg", ObjectId = 1 });
+            _context.Images.Add(new Image { Id = 2, Url = "2.jpg", ObjectId = 2, IsMain = false });
+            _context.Images.Add(new Image { Id = 1, Url = "1.jpg", ObjectId = 1, IsMain = true });
             await _context.SaveChangesAsync();
 
             var result = (await _service.GetAllAsync()).ToList();
@@ -129,7 +85,7 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
-        public async Task CreateAsync_ValidanObjectId_DodajeSliku()
+        public async Task CreateAsync_PrvaSlikaKojaJeMain_DodajeSliku()
         {
             await AddObjectAsync(1);
 
@@ -144,129 +100,27 @@ namespace TuristickiVodic.Tests.Services
             var result = await _service.CreateAsync(dto);
 
             result.Should().NotBeNull();
-            result.Url.Should().Be("test.jpg");
-            result.AltText.Should().Be("opis");
             result.IsMain.Should().BeTrue();
             result.ObjectId.Should().Be(1);
-
             _context.Images.Should().HaveCount(1);
         }
 
         [Fact]
-        public async Task CreateAsync_ValidanActivityId_DodajeSliku()
+        public async Task CreateAsync_PrvaSlikaKojaNijeMain_BacaGresku()
         {
-            await AddActivityAsync(1);
+            await AddObjectAsync(1);
 
-            var dto = new CreateImageDto
-            {
-                Url = "activity.jpg",
-                ActivityId = 1
-            };
-
-            var result = await _service.CreateAsync(dto);
-
-            result.Should().NotBeNull();
-            result.ActivityId.Should().Be(1);
-            _context.Images.Should().HaveCount(1);
-        }
-
-        [Fact]
-        public async Task CreateAsync_ValidanEventId_DodajeSliku()
-        {
-            await AddEventAsync(1);
-
-            var dto = new CreateImageDto
-            {
-                Url = "event.jpg",
-                EventId = 1
-            };
-
-            var result = await _service.CreateAsync(dto);
-
-            result.Should().NotBeNull();
-            result.EventId.Should().Be(1);
-            _context.Images.Should().HaveCount(1);
-        }
-
-        [Fact]
-        public async Task CreateAsync_ValidanDestinationId_DodajeSliku()
-        {
-            await AddDestinationAsync(1);
-
-            var dto = new CreateImageDto
-            {
-                Url = "destination.jpg",
-                DestinationId = 1
-            };
-
-            var result = await _service.CreateAsync(dto);
-
-            result.Should().NotBeNull();
-            result.DestinationId.Should().Be(1);
-            _context.Images.Should().HaveCount(1);
-        }
-
-        [Fact]
-        public async Task CreateAsync_ValidanLocalityId_DodajeSliku()
-        {
-            await AddLocalityAsync(1);
-
-            var dto = new CreateImageDto
-            {
-                Url = "locality.jpg",
-                LocalityId = 1
-            };
-
-            var result = await _service.CreateAsync(dto);
-
-            result.Should().NotBeNull();
-            result.LocalityId.Should().Be(1);
-            _context.Images.Should().HaveCount(1);
-        }
-
-        [Fact]
-        public async Task CreateAsync_BezRelacije_BacaGresku()
-        {
-            var dto = new CreateImageDto
-            {
-                Url = "test.jpg"
-            };
-
-            var action = async () => await _service.CreateAsync(dto);
-
-            await action.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*exactly one entity*");
-        }
-
-        [Fact]
-        public async Task CreateAsync_ViseRelacija_BacaGresku()
-        {
             var dto = new CreateImageDto
             {
                 Url = "test.jpg",
-                ObjectId = 1,
-                ActivityId = 1
+                IsMain = false,
+                ObjectId = 1
             };
 
             var action = async () => await _service.CreateAsync(dto);
 
             await action.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*exactly one entity*");
-        }
-
-        [Fact]
-        public async Task CreateAsync_KadReferenciraniObjectNePostoji_BacaGresku()
-        {
-            var dto = new CreateImageDto
-            {
-                Url = "test.jpg",
-                ObjectId = 999
-            };
-
-            var action = async () => await _service.CreateAsync(dto);
-
-            await action.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*Object with id 999 not found*");
+                .WithMessage("*First image for an entity must be main*");
         }
 
         [Fact]
@@ -296,7 +150,7 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
-        public async Task CreateAsync_NonMainSlikaZaIstiEntitet_JeDozvoljena()
+        public async Task CreateAsync_DrugaSlikaKojaNijeMain_JeDozvoljena()
         {
             await AddObjectAsync(1);
 
@@ -318,7 +172,56 @@ namespace TuristickiVodic.Tests.Services
             var result = await _service.CreateAsync(dto);
 
             result.Should().NotBeNull();
+            result.IsMain.Should().BeFalse();
             _context.Images.Should().HaveCount(2);
+        }
+
+        [Fact]
+        public async Task CreateAsync_BezRelacije_BacaGresku()
+        {
+            var dto = new CreateImageDto
+            {
+                Url = "test.jpg",
+                IsMain = true
+            };
+
+            var action = async () => await _service.CreateAsync(dto);
+
+            await action.Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*exactly one entity*");
+        }
+
+        [Fact]
+        public async Task CreateAsync_ViseRelacija_BacaGresku()
+        {
+            var dto = new CreateImageDto
+            {
+                Url = "test.jpg",
+                IsMain = true,
+                ObjectId = 1,
+                ActivityId = 1
+            };
+
+            var action = async () => await _service.CreateAsync(dto);
+
+            await action.Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*exactly one entity*");
+        }
+
+        [Fact]
+        public async Task CreateAsync_KadReferenciraniObjectNePostoji_BacaGresku()
+        {
+            var dto = new CreateImageDto
+            {
+                Url = "test.jpg",
+                IsMain = true,
+                ObjectId = 999
+            };
+
+            var action = async () => await _service.CreateAsync(dto);
+
+            await action.Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*Object with id 999 not found*");
         }
 
         [Fact]
@@ -342,6 +245,7 @@ namespace TuristickiVodic.Tests.Services
                 Id = 1,
                 Url = "old.jpg",
                 AltText = "staro",
+                IsMain = true,
                 ObjectId = 1
             });
             await _context.SaveChangesAsync();
@@ -370,6 +274,7 @@ namespace TuristickiVodic.Tests.Services
             {
                 Id = 1,
                 Url = "old.jpg",
+                IsMain = true,
                 ObjectId = 1
             });
             await _context.SaveChangesAsync();
@@ -386,41 +291,7 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateAsync_IsMainTrue_KadVecPostojiDrugaMainSlika_BacaGresku()
-        {
-            await AddObjectAsync(1);
-
-            _context.Images.Add(new Image
-            {
-                Id = 1,
-                Url = "1.jpg",
-                IsMain = false,
-                ObjectId = 1
-            });
-
-            _context.Images.Add(new Image
-            {
-                Id = 2,
-                Url = "2.jpg",
-                IsMain = true,
-                ObjectId = 1
-            });
-
-            await _context.SaveChangesAsync();
-
-            var dto = new UpdateImageDto
-            {
-                IsMain = true
-            };
-
-            var action = async () => await _service.UpdateAsync(1, dto);
-
-            await action.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*Only one main image allowed per entity*");
-        }
-
-        [Fact]
-        public async Task UpdateAsync_IsMainFalse_MenjaPolje()
+        public async Task UpdateAsync_JedinaMainNeMozePostatiFalse()
         {
             _context.Images.Add(new Image
             {
@@ -436,10 +307,78 @@ namespace TuristickiVodic.Tests.Services
                 IsMain = false
             };
 
+            var action = async () => await _service.UpdateAsync(1, dto);
+
+            await action.Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*exactly one main image*");
+        }
+
+        [Fact]
+        public async Task UpdateAsync_NonMainMozePostatiMainAkoNemaDrugeMainZaNoviEntitet()
+        {
+            _context.Images.Add(new Image
+            {
+                Id = 1,
+                Url = "1.jpg",
+                IsMain = true,
+                ObjectId = 1
+            });
+
+            _context.Images.Add(new Image
+            {
+                Id = 2,
+                Url = "2.jpg",
+                IsMain = false,
+                ObjectId = 1
+            });
+
+            await _context.SaveChangesAsync();
+
+            var dto = new UpdateImageDto
+            {
+                IsMain = true
+            };
+
+            var action = async () => await _service.UpdateAsync(2, dto);
+
+            await action.Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*Only one main image allowed per entity*");
+        }
+
+        [Fact]
+        public async Task UpdateAsync_PromenaRelacije_PostavljaTacnoJedanEntitet()
+        {
+            _context.Images.Add(new Image
+            {
+                Id = 1,
+                Url = "test.jpg",
+                IsMain = true,
+                ObjectId = 1
+            });
+
+            _context.Destinations.Add(new Destination
+            {
+                Id = 5,
+                Name = "Destinacija5"
+            });
+
+            await _context.SaveChangesAsync();
+
+            var dto = new UpdateImageDto
+            {
+                DestinationId = 5,
+                IsMain = true
+            };
+
             var result = await _service.UpdateAsync(1, dto);
 
             result.Should().NotBeNull();
-            result!.IsMain.Should().BeFalse();
+            result!.ObjectId.Should().BeNull();
+            result.DestinationId.Should().Be(5);
+
+            var imageInDb = await _context.Images.FindAsync(1);
+            imageInDb!.ObjectId.Should().BeNull();
+            imageInDb.DestinationId.Should().Be(5);
         }
 
         [Fact]
@@ -449,6 +388,7 @@ namespace TuristickiVodic.Tests.Services
             {
                 Id = 1,
                 Url = "test.jpg",
+                IsMain = true,
                 ObjectId = 1
             });
             await _context.SaveChangesAsync();
@@ -466,61 +406,13 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateAsync_NovaRelacijaNaNepostojeciEntitet_BacaGresku()
+        public async Task DeleteAsync_KadSlikaPostojiIVanilaJeJedina_VracaTrue()
         {
             _context.Images.Add(new Image
             {
                 Id = 1,
                 Url = "test.jpg",
-                ObjectId = 1
-            });
-            await _context.SaveChangesAsync();
-
-            var dto = new UpdateImageDto
-            {
-                DestinationId = 999
-            };
-
-            var action = async () => await _service.UpdateAsync(1, dto);
-
-            await action.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*Destination with id 999 not found*");
-        }
-
-        [Fact]
-        public async Task UpdateAsync_MenjaRelacijuNaValidanEntitet()
-        {
-            await AddDestinationAsync(5);
-
-            _context.Images.Add(new Image
-            {
-                Id = 1,
-                Url = "test.jpg",
-                ObjectId = 1
-            });
-            await _context.SaveChangesAsync();
-
-            var dto = new UpdateImageDto
-            {
-                DestinationId = 5
-            };
-
-            var result = await _service.UpdateAsync(1, dto);
-
-            result.Should().NotBeNull();
-            result!.DestinationId.Should().Be(5);
-
-            var imageInDb = await _context.Images.FindAsync(1);
-            imageInDb!.DestinationId.Should().Be(5);
-        }
-
-        [Fact]
-        public async Task DeleteAsync_KadSlikaPostoji_VracaTrueIBriseSliku()
-        {
-            _context.Images.Add(new Image
-            {
-                Id = 1,
-                Url = "test.jpg",
+                IsMain = true,
                 ObjectId = 1
             });
             await _context.SaveChangesAsync();
@@ -529,6 +421,33 @@ namespace TuristickiVodic.Tests.Services
 
             result.Should().BeTrue();
             _context.Images.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task DeleteAsync_NeDozvoljavaBrisanjeJedinogMainAkoPostojeDrugeSlike()
+        {
+            _context.Images.Add(new Image
+            {
+                Id = 1,
+                Url = "main.jpg",
+                IsMain = true,
+                ObjectId = 1
+            });
+
+            _context.Images.Add(new Image
+            {
+                Id = 2,
+                Url = "other.jpg",
+                IsMain = false,
+                ObjectId = 1
+            });
+
+            await _context.SaveChangesAsync();
+
+            var action = async () => await _service.DeleteAsync(1);
+
+            await action.Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*exactly one main image*");
         }
 
         [Fact]

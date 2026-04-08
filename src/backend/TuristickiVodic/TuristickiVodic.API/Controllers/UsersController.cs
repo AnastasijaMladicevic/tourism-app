@@ -217,6 +217,14 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
+        [HttpGet("creator-requests")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetCreatorRequests()
+        {
+            var requests = await _userService.GetCreatorRequestsAsync();
+            return Ok(requests);
+        }
+
         // Samo Tourist može da pošalje zahtev, i to samo u svoje ime
         [HttpPost("{id}/request-creator")]
         [Authorize(Roles = "Tourist")]
