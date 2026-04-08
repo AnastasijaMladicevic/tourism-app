@@ -11,7 +11,7 @@
 
         <div class="input-group">
           <span class="icon">mail</span>
-          <input type="email" placeholder="admin@azurehorizon.com" formControlName="email" />
+          <input type="email" placeholder="tourist@gmail.com" formControlName="email" />
         </div>
         @if (email?.touched && email?.invalid) {
           <div class="error">
@@ -35,9 +35,9 @@
             formControlName="password"
           />
 
-          <span class="icon eye" (click)="togglePassword()">
-            {{ hidePassword ? 'visibility' : 'visibility_off' }}
-          </span>
+          <button class="icon eye" type="button" (click)="togglePassword()">
+          {{ hidePassword ? 'visibility_off' : 'visibility' }}
+        </button>
         </div>
         @if (password?.touched && password?.invalid) {
           <div class="error">
