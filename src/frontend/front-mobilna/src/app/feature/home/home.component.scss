@@ -1,16 +1,18 @@
 .page {
-  min-height: 100vh;
+  height: 100dvh;
   background: var(--bg);
   display: flex;
   flex-direction: column;
   max-width: 430px;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .scroll-content {
   flex: 1;
   overflow-y: auto;
   animation: fadeUp 0.4s ease;
+  padding-bottom: 96px;
 }
 
 @keyframes fadeUp {
@@ -378,4 +380,191 @@
 
 .bottom-spacer {
   height: 8px;
+}
+
+@media (min-width: 768px) {
+  .page {
+    max-width: none;
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+    background:
+      radial-gradient(circle at top left, rgba(22, 138, 173, 0.08), transparent 24%),
+      linear-gradient(180deg, #f8fdff 0%, var(--bg) 28%);
+  }
+
+  .scroll-content {
+    overflow-y: visible;
+    padding: 8px 0 28px;
+    width: min(1180px, calc(100% - 48px));
+    margin: 0 auto;
+  }
+
+  .greeting {
+    padding: 12px 28px 20px;
+
+    .greeting-sub {
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .greeting-name {
+      font-size: 34px;
+      letter-spacing: -0.8px;
+    }
+  }
+
+  .search-bar {
+    margin: 0 28px 28px;
+    padding: 16px 20px;
+    border-radius: 18px;
+
+    span {
+      font-size: 15px;
+    }
+  }
+
+  .section {
+    padding: 0 28px 28px;
+  }
+
+  .section-title {
+    font-size: 24px;
+    letter-spacing: -0.4px;
+  }
+
+  .section-header {
+    margin-bottom: 18px;
+  }
+
+  .see-all {
+    font-size: 14px;
+  }
+
+  .categories {
+    gap: 16px;
+    margin-top: 18px;
+    overflow: visible;
+    flex-wrap: wrap;
+  }
+
+  .category {
+    gap: 10px;
+
+    .cat-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+    }
+
+    span {
+      font-size: 13px;
+    }
+  }
+
+  .featured-banner {
+    margin: 0 28px 34px;
+    height: 280px;
+    border-radius: 28px;
+  }
+
+  .featured-overlay {
+    padding: 28px;
+  }
+
+  .featured-tag {
+    font-size: 12px;
+    padding: 7px 14px;
+  }
+
+  .featured-text {
+    h2 {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      max-width: 420px;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+  }
+
+  .explore-btn {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+
+  .cards-row {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 22px;
+    margin-top: 18px;
+  }
+
+  .place-card,
+  .event-card {
+    border-radius: 20px;
+    box-shadow: 0 18px 40px rgba(22, 138, 173, 0.08);
+  }
+
+  .place-img {
+    height: 190px;
+  }
+
+  .heart-btn {
+    top: 14px;
+    right: 14px;
+    width: 38px;
+    height: 38px;
+  }
+
+  .place-info,
+  .event-info {
+    padding: 16px 16px 18px;
+
+    h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+  }
+
+  .place-location,
+  .event-location,
+  .place-rating,
+  .event-date {
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .event-img {
+    height: 200px;
+    padding: 16px;
+  }
+
+  .event-price,
+  .event-time,
+  .trending-badge {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .scroll-content {
+    width: min(1280px, calc(100% - 72px));
+  }
+
+  .cards-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .featured-banner {
+    height: 320px;
+  }
+
+  .featured-text {
+    h2 {
+      font-size: 46px;
+    }
+  }
 }

@@ -9,9 +9,8 @@
       <p>Join and explore Montenegro</p>
     </div>
 
-    <div class="form">
+    <form class="form" [formGroup]="form" (ngSubmit)="submit()">
 
-      <!-- Full Name -->
       <div class="field">
         <div class="input-wrapper">
           <span class="input-icon">
@@ -21,11 +20,39 @@
               <circle cx="12" cy="7" r="4"/>
             </svg>
           </span>
-          <input type="text" placeholder="Full name" />
+          <input type="text" formControlName="fullName" placeholder="Full name" />
         </div>
+        @if (fullName?.touched && fullName?.hasError('required')) {
+          <p class="field-error">Full name is required.</p>
+        }
+        @if (fullName?.touched && fullName?.hasError('minlength')) {
+          <p class="field-error">Enter at least 2 characters.</p>
+        }
       </div>
 
-      <!-- Email -->
+      <div class="field">
+        <div class="input-wrapper date-input-wrapper">
+          <span class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 7V3m8 4V3m-9 8h10m-12 9h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2z"/>
+            </svg>
+          </span>
+          <input
+            type="date"
+            formControlName="dateOfBirth"
+            class="date-input"
+            [class.is-empty]="!dateOfBirth?.value"
+          />
+          @if (!dateOfBirth?.value) {
+            <span class="date-placeholder">Date of Birth</span>
+          }
+        </div>
+        @if (dateOfBirth?.touched && dateOfBirth?.hasError('required')) {
+          <p class="field-error">Date of birth is required.</p>
+        }
+      </div>
+
       <div class="field">
         <div class="input-wrapper">
           <span class="input-icon">
@@ -35,11 +62,58 @@
               <polyline points="22,6 12,13 2,6"/>
             </svg>
           </span>
-          <input type="email" placeholder="Email" />
+          <input type="email" formControlName="email" placeholder="Email" />
+        </div>
+        @if (email?.touched && email?.hasError('required')) {
+          <p class="field-error">Email is required.</p>
+        }
+        @if (email?.touched && email?.hasError('email')) {
+          <p class="field-error">Enter a valid email address.</p>
+        }
+      </div>
+
+      <div class="field">
+        <div class="input-wrapper">
+          <span class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.63 2.63a2 2 0 0 1-.45 2.11L8 9.91a16 16 0 0 0 6.09 6.09l1.45-1.29a2 2 0 0 1 2.11-.45c.85.3 1.73.51 2.63.63A2 2 0 0 1 22 16.92z"/>
+            </svg>
+          </span>
+          <input type="tel" formControlName="phoneNumber" placeholder="Phone number (optional)" />
         </div>
       </div>
 
-      <!-- Password -->
+      <div class="field">
+        <div class="input-wrapper">
+          <span class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10z"/>
+              <circle cx="12" cy="11" r="2"/>
+            </svg>
+          </span>
+          <input type="text" formControlName="country" placeholder="Country (optional)" />
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="input-wrapper">
+          <span class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M2 12h20"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+          </span>
+          <select formControlName="language">
+            <option value="sr">Srpski</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+      </div>
+
       <div class="field">
         <div class="input-wrapper">
           <span class="input-icon">
@@ -49,11 +123,19 @@
               <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
             </svg>
           </span>
-          <input type="password" placeholder="Password" />
+          <input type="password" formControlName="password" placeholder="Password" />
         </div>
+        @if (password?.touched && password?.hasError('required')) {
+          <p class="field-error">Password is required.</p>
+        }
+        @if (password?.touched && password?.hasError('minlength')) {
+          <p class="field-error">Password must have at least 6 characters.</p>
+        }
+        @if (password?.touched && password?.hasError('weakPassword')) {
+          <p class="field-error">Use one uppercase letter, one number, and one special character.</p>
+        }
       </div>
 
-      <!-- Confirm Password -->
       <div class="field">
         <div class="input-wrapper">
           <span class="input-icon">
@@ -63,13 +145,24 @@
               <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
             </svg>
           </span>
-          <input type="password" placeholder="Confirm password" />
+          <input type="password" formControlName="confirmPassword" placeholder="Confirm password" />
         </div>
+        @if (confirmPassword?.touched && confirmPassword?.hasError('required')) {
+          <p class="field-error">Please confirm your password.</p>
+        }
+        @if (form.touched && form.hasError('passwordsMismatch')) {
+          <p class="field-error">Passwords do not match.</p>
+        }
       </div>
 
-      <!-- Sign Up Button -->
-      <button class="btn-primary" type="button">Sign Up</button>
-    </div>
+      @if (errorMessage) {
+        <p class="submit-error">{{ errorMessage }}</p>
+      }
+
+      <button class="btn-primary" type="submit" [disabled]="isLoading">
+        {{ isLoading ? 'Creating account...' : 'Sign Up' }}
+      </button>
+    </form>
 
     <div class="login-link">
       <span>Already have an account?</span>
