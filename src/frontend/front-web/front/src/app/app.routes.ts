@@ -16,5 +16,10 @@ export const routes: Routes = [
   {
     path: 'signout',
     component: Signout
-  }
+  },
+  {
+  path: 'adashboard',
+  loadComponent: () =>
+    import('./pages/dashboardAdmin/dashboard/adashboard.component').then(m => m.DashboardComponent)
+}
 ];
