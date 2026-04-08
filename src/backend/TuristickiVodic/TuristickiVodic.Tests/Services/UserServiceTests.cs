@@ -80,6 +80,487 @@ namespace TuristickiVodic.Tests.Services
             ctx.Users.Count().Should().Be(1);
         }
 
+        private static Mock<ITokenService> CreateTokenServiceMock(
+        string token = "jwt-token",
+        string refreshToken = "refresh-token")
+        {
+            var tokenSvc = new Mock<ITokenService>();
+            tokenSvc.Setup(t => t.GenerateToken(It.IsAny<User>())).Returns(token);
+            tokenSvc.Setup(t => t.GenerateRefreshToken()).Returns(refreshToken);
+            return tokenSvc;
+        }
+
+        [Fact]
+        public async Task LoginAsync_SaIspravnimKredencijalimaRememberMeFalse_CuvaRefreshTokenNa7Dana()
+        {
+            using var ctx = CreateInMemoryContext(nameof(LoginAsync_SaIspravnimKredencijalimaRememberMeFalse_CuvaRefreshTokenNa7Dana));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 100,
+                FirstName = "Login",
+                LastName = "User",
+                Email = "login@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("pass123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var tokenSvc = CreateTokenServiceMock("jwt-1", "refresh-1");
+            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+
+            var before = DateTime.UtcNow;
+            var result = await svc.LoginAsync(new LoginDto
+            {
+                Email = "login@test.com",
+                Password = "pass123",
+                RememberMe = false
+            });
+            var after = DateTime.UtcNow;
+
+            result.Should().NotBeNull();
+            result!.Token.Should().Be("jwt-1");
+            result.RefreshToken.Should().Be("refresh-1");
+
+            var stored = await ctx.RefreshTokens.SingleAsync(rt => rt.UserId == 100);
+            stored.RememberMe.Should().BeFalse();
+            stored.RefreshTokenExpiry.Should().BeAfter(before.AddDays(6));
+            stored.RefreshTokenExpiry.Should().BeBefore(after.AddDays(8));
+        }
+
+        [Fact]
+        public async Task LoginAsync_SaIspravnimKredencijalimaRememberMeTrue_CuvaRefreshTokenNa30Dana()
+        {
+            using var ctx = CreateInMemoryContext(nameof(LoginAsync_SaIspravnimKredencijalimaRememberMeTrue_CuvaRefreshTokenNa30Dana));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 101,
+                FirstName = "Login",
+                LastName = "User",
+                Email = "remember@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("pass123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var tokenSvc = CreateTokenServiceMock("jwt-2", "refresh-2");
+            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+
+            var before = DateTime.UtcNow;
+            var result = await svc.LoginAsync(new LoginDto
+            {
+                Email = "remember@test.com",
+                Password = "pass123",
+                RememberMe = true
+            });
+            var after = DateTime.UtcNow;
+
+            result.Should().NotBeNull();
+            result!.Token.Should().Be("jwt-2");
+            result.RefreshToken.Should().Be("refresh-2");
+
+            var stored = await ctx.RefreshTokens.SingleAsync(rt => rt.UserId == 101);
+            stored.RememberMe.Should().BeTrue();
+            stored.RefreshTokenExpiry.Should().BeAfter(before.AddDays(29));
+            stored.RefreshTokenExpiry.Should().BeBefore(after.AddDays(31));
+        }
+
+        [Fact]
+        public async Task RefreshTokenAsync_NevalidanToken_VracaNull()
+        {
+            using var ctx = CreateInMemoryContext(nameof(RefreshTokenAsync_NevalidanToken_VracaNull));
+            SeedRoles(ctx);
+
+            var tokenSvc = CreateTokenServiceMock("jwt-3", "refresh-3");
+            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+
+            var result = await svc.RefreshTokenAsync(new RefreshTokenDto
+            {
+                RefreshToken = "nepostojeci-token"
+            });
+
+            result.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task RefreshTokenAsync_IstekaoToken_VracaNull()
+        {
+            using var ctx = CreateInMemoryContext(nameof(RefreshTokenAsync_IstekaoToken_VracaNull));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            var user = new User
+            {
+                Id = 102,
+                FirstName = "Expired",
+                LastName = "User",
+                Email = "expired@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("pass123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            };
+
+            ctx.Users.Add(user);
+            ctx.RefreshTokens.Add(new RefreshToken
+            {
+                UserId = 102,
+                RefreshTokenHash = Convert.ToBase64String(
+                    System.Security.Cryptography.SHA256.HashData(
+                        System.Text.Encoding.UTF8.GetBytes("expired-refresh"))),
+                RefreshTokenExpiry = DateTime.UtcNow.AddMinutes(-1),
+                RememberMe = false
+            });
+            await ctx.SaveChangesAsync();
+
+            var tokenSvc = CreateTokenServiceMock("jwt-4", "refresh-4");
+            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+
+            var result = await svc.RefreshTokenAsync(new RefreshTokenDto
+            {
+                RefreshToken = "expired-refresh"
+            });
+
+            result.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task RefreshTokenAsync_RememberMeFalse_Zadrzava7DanaIRotiraToken()
+        {
+            using var ctx = CreateInMemoryContext(nameof(RefreshTokenAsync_RememberMeFalse_Zadrzava7DanaIRotiraToken));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            var user = new User
+            {
+                Id = 103,
+                FirstName = "Refresh",
+                LastName = "User",
+                Email = "refresh7@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("pass123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            };
+
+            ctx.Users.Add(user);
+            ctx.RefreshTokens.Add(new RefreshToken
+            {
+                UserId = 103,
+                RefreshTokenHash = Convert.ToBase64String(
+                    System.Security.Cryptography.SHA256.HashData(
+                        System.Text.Encoding.UTF8.GetBytes("old-refresh-7"))),
+                RefreshTokenExpiry = DateTime.UtcNow.AddDays(2),
+                RememberMe = false
+            });
+            await ctx.SaveChangesAsync();
+
+            var tokenSvc = CreateTokenServiceMock("jwt-5", "new-refresh-7");
+            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+
+            var before = DateTime.UtcNow;
+            var result = await svc.RefreshTokenAsync(new RefreshTokenDto
+            {
+                RefreshToken = "old-refresh-7"
+            });
+            var after = DateTime.UtcNow;
+
+            result.Should().NotBeNull();
+            result!.Token.Should().Be("jwt-5");
+            result.RefreshToken.Should().Be("new-refresh-7");
+
+            ctx.RefreshTokens.Should().ContainSingle(rt => rt.UserId == 103);
+
+            var stored = await ctx.RefreshTokens.SingleAsync(rt => rt.UserId == 103);
+            stored.RememberMe.Should().BeFalse();
+            stored.RefreshTokenExpiry.Should().BeAfter(before.AddDays(6));
+            stored.RefreshTokenExpiry.Should().BeBefore(after.AddDays(8));
+            stored.RefreshTokenHash.Should().NotBe(Convert.ToBase64String(
+                System.Security.Cryptography.SHA256.HashData(
+                    System.Text.Encoding.UTF8.GetBytes("old-refresh-7"))));
+        }
+
+        [Fact]
+        public async Task RefreshTokenAsync_RememberMeTrue_Zadrzava30DanaIRotiraToken()
+        {
+            using var ctx = CreateInMemoryContext(nameof(RefreshTokenAsync_RememberMeTrue_Zadrzava30DanaIRotiraToken));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            var user = new User
+            {
+                Id = 104,
+                FirstName = "Refresh",
+                LastName = "User",
+                Email = "refresh30@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("pass123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            };
+
+            ctx.Users.Add(user);
+            ctx.RefreshTokens.Add(new RefreshToken
+            {
+                UserId = 104,
+                RefreshTokenHash = Convert.ToBase64String(
+                    System.Security.Cryptography.SHA256.HashData(
+                        System.Text.Encoding.UTF8.GetBytes("old-refresh-30"))),
+                RefreshTokenExpiry = DateTime.UtcNow.AddDays(10),
+                RememberMe = true
+            });
+            await ctx.SaveChangesAsync();
+
+            var tokenSvc = CreateTokenServiceMock("jwt-6", "new-refresh-30");
+            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+
+            var before = DateTime.UtcNow;
+            var result = await svc.RefreshTokenAsync(new RefreshTokenDto
+            {
+                RefreshToken = "old-refresh-30"
+            });
+            var after = DateTime.UtcNow;
+
+            result.Should().NotBeNull();
+            result!.Token.Should().Be("jwt-6");
+            result.RefreshToken.Should().Be("new-refresh-30");
+
+            ctx.RefreshTokens.Should().ContainSingle(rt => rt.UserId == 104);
+
+            var stored = await ctx.RefreshTokens.SingleAsync(rt => rt.UserId == 104);
+            stored.RememberMe.Should().BeTrue();
+            stored.RefreshTokenExpiry.Should().BeAfter(before.AddDays(29));
+            stored.RefreshTokenExpiry.Should().BeBefore(after.AddDays(31));
+        }
+
+        [Fact]
+        public async Task RefreshTokenAsync_BlacklistedKorisnik_BacaException()
+        {
+            using var ctx = CreateInMemoryContext(nameof(RefreshTokenAsync_BlacklistedKorisnik_BacaException));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 105,
+                FirstName = "Blacklisted",
+                LastName = "User",
+                Email = "black@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("pass123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = true,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+
+            ctx.RefreshTokens.Add(new RefreshToken
+            {
+                UserId = 105,
+                RefreshTokenHash = Convert.ToBase64String(
+                    System.Security.Cryptography.SHA256.HashData(
+                        System.Text.Encoding.UTF8.GetBytes("black-refresh"))),
+                RefreshTokenExpiry = DateTime.UtcNow.AddDays(2),
+                RememberMe = false
+            });
+
+            await ctx.SaveChangesAsync();
+
+            var tokenSvc = CreateTokenServiceMock("jwt-7", "refresh-7");
+            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+
+            await svc.Invoking(s => s.RefreshTokenAsync(new RefreshTokenDto
+            {
+                RefreshToken = "black-refresh"
+            }))
+            .Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*blacklisted*");
+        }
+
+        [Fact]
+        public async Task RefreshTokenAsync_DeaktiviranKorisnik_BacaException()
+        {
+            using var ctx = CreateInMemoryContext(nameof(RefreshTokenAsync_DeaktiviranKorisnik_BacaException));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 106,
+                FirstName = "Inactive",
+                LastName = "User",
+                Email = "inactive@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("pass123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = false,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+
+            ctx.RefreshTokens.Add(new RefreshToken
+            {
+                UserId = 106,
+                RefreshTokenHash = Convert.ToBase64String(
+                    System.Security.Cryptography.SHA256.HashData(
+                        System.Text.Encoding.UTF8.GetBytes("inactive-refresh"))),
+                RefreshTokenExpiry = DateTime.UtcNow.AddDays(2),
+                RememberMe = false
+            });
+
+            await ctx.SaveChangesAsync();
+
+            var tokenSvc = CreateTokenServiceMock("jwt-8", "refresh-8");
+            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+
+            await svc.Invoking(s => s.RefreshTokenAsync(new RefreshTokenDto
+            {
+                RefreshToken = "inactive-refresh"
+            }))
+            .Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*deactivated*");
+        }
+
+        [Fact]
+        public async Task ToggleUserActiveAsync_Deaktivacija_BriseRefreshToken()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ToggleUserActiveAsync_Deaktivacija_BriseRefreshToken));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 107,
+                FirstName = "Toggle",
+                LastName = "User",
+                Email = "toggle@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("pass123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+
+            ctx.RefreshTokens.Add(new RefreshToken
+            {
+                UserId = 107,
+                RefreshTokenHash = "hash-token",
+                RefreshTokenExpiry = DateTime.UtcNow.AddDays(7),
+                RememberMe = false
+            });
+
+            await ctx.SaveChangesAsync();
+
+            var svc = new UserService(ctx, CreateMapper(), CreateTokenServiceMock().Object);
+
+            var result = await svc.ToggleUserActiveAsync(107, false);
+
+            result.Should().BeTrue();
+            ctx.RefreshTokens.Should().NotContain(rt => rt.UserId == 107);
+            ctx.Users.Single(u => u.Id == 107).IsActive.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task RefreshTokenAsync_BriseStariRefreshTokenIzBaze()
+        {
+            using var ctx = CreateInMemoryContext(nameof(RefreshTokenAsync_BriseStariRefreshTokenIzBaze));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            var oldRawToken = "stari-refresh";
+            var oldHash = Convert.ToBase64String(
+                System.Security.Cryptography.SHA256.HashData(
+                    System.Text.Encoding.UTF8.GetBytes(oldRawToken)));
+
+            var user = new User
+            {
+                Id = 200,
+                FirstName = "Rotate",
+                LastName = "User",
+                Email = "rotate@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("pass123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            };
+
+            ctx.Users.Add(user);
+            ctx.RefreshTokens.Add(new RefreshToken
+            {
+                UserId = 200,
+                RefreshTokenHash = oldHash,
+                RefreshTokenExpiry = DateTime.UtcNow.AddDays(2),
+                RememberMe = false
+            });
+
+            await ctx.SaveChangesAsync();
+
+            var tokenSvc = CreateTokenServiceMock("jwt-rotate", "novi-refresh");
+            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+
+            var result = await svc.RefreshTokenAsync(new RefreshTokenDto
+            {
+                RefreshToken = oldRawToken
+            });
+
+            result.Should().NotBeNull();
+
+            ctx.RefreshTokens.Should().ContainSingle(rt => rt.UserId == 200);
+            ctx.RefreshTokens.Should().NotContain(rt => rt.RefreshTokenHash == oldHash);
+        }
+
+        [Fact]
+        public async Task DeleteAsync_BriseIKorisnikaIRefreshToken()
+        {
+            using var ctx = CreateInMemoryContext(nameof(DeleteAsync_BriseIKorisnikaIRefreshToken));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 108,
+                FirstName = "Delete",
+                LastName = "User",
+                Email = "delete@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("pass123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+
+            ctx.RefreshTokens.Add(new RefreshToken
+            {
+                UserId = 108,
+                RefreshTokenHash = "hash-delete",
+                RefreshTokenExpiry = DateTime.UtcNow.AddDays(7),
+                RememberMe = false
+            });
+
+            await ctx.SaveChangesAsync();
+
+            var svc = new UserService(ctx, CreateMapper(), CreateTokenServiceMock().Object);
+
+            var result = await svc.DeleteAsync(108);
+
+            result.Should().BeTrue();
+            ctx.Users.Should().NotContain(u => u.Id == 108);
+            ctx.RefreshTokens.Should().NotContain(rt => rt.UserId == 108);
+        }
+
         [Fact]
         public async Task CreateAsync_PostojeciEmail_BacaException()
         {

@@ -193,7 +193,10 @@ namespace TuristickiVodic.Services
             if (!user.IsActive)
                 throw new InvalidOperationException("Account is deactivated");
 
-            return await IssueTokensAsync(user);
+            _context.RefreshTokens.Remove(storedRefreshToken);
+            await _context.SaveChangesAsync();
+
+            return await IssueTokensAsync(user, storedRefreshToken.RememberMe);
         }
 
         public async Task<bool> RequestCreatorRoleAsync(int userId, string creatorType)
@@ -272,31 +275,34 @@ namespace TuristickiVodic.Services
 
         private async Task<AuthResponseDto> IssueTokensAsync(User user, bool rememberMe = false)
         {
-            var accessToken = _tokenService.GenerateToken(user);
+            var token = _tokenService.GenerateToken(user);
             var refreshToken = _tokenService.GenerateRefreshToken();
+            var refreshTokenHash = HashRefreshToken(refreshToken);
 
-            var refreshTokenEntity = await _context.RefreshTokens
+            var existingRefreshToken = await _context.RefreshTokens
                 .FirstOrDefaultAsync(rt => rt.UserId == user.Id);
 
-            if (refreshTokenEntity == null)
+            if (existingRefreshToken != null)
             {
-                refreshTokenEntity = new RefreshToken
-                {
-                    UserId = user.Id
-                };
-
-                _context.RefreshTokens.Add(refreshTokenEntity);
+                _context.RefreshTokens.Remove(existingRefreshToken);
             }
 
-            refreshTokenEntity.RefreshTokenHash = HashRefreshToken(refreshToken);
-            refreshTokenEntity.RefreshTokenExpiry = rememberMe ? DateTime.UtcNow.AddDays(30) : DateTime.UtcNow.AddDays(7);
-            user.UpdatedAt = DateTime.UtcNow;
+            var newRefreshToken = new RefreshToken
+            {
+                UserId = user.Id,
+                RefreshTokenHash = refreshTokenHash,
+                RefreshTokenExpiry = rememberMe
+                    ? DateTime.UtcNow.AddDays(30)
+                    : DateTime.UtcNow.AddDays(7),
+                RememberMe = rememberMe
+            };
 
+            _context.RefreshTokens.Add(newRefreshToken);
             await _context.SaveChangesAsync();
 
             return new AuthResponseDto
             {
-                Token = accessToken,
+                Token = token,
                 RefreshToken = refreshToken,
                 User = _mapper.Map<UserDto>(user),
                 ExpiresAt = DateTime.UtcNow.AddMinutes(15)
