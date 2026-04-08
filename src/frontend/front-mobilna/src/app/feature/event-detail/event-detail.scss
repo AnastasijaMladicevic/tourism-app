@@ -1,0 +1,408 @@
+h1{
+  font-size: 32px;
+}
+.section{
+  margin-bottom: 40px;
+}
+button:hover{
+  transform: translateY(-2px);
+}
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+}
+
+.icon-btn {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--emperor);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.header__title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--emperor);
+  margin: 0;
+}
+
+.hero {
+  height: 300px;
+  width: 100%;
+  background: linear-gradient(135deg, var(--primary), #60a5fa);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 90px;
+  margin-bottom: -40px;
+
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero-placeholder {
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary), #60a5fa);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 80px;
+  }
+}
+.fav-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.95);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  color: var(--emperor);
+  z-index: 10;
+}
+.fav-btn--active {
+  color: #e74c3c;
+}
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px 12px 50px;
+  background: var(--white);
+  border-radius: 25px;
+  position: relative;
+  z-index: 1;
+}
+
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+.hero-card {
+  grid-column: span 2;
+  margin-top: -60px;
+  z-index: 2;
+}
+.header-info {
+  margin-bottom: 16px;
+}
+.location-bold {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--emperor);
+  margin: 0 0 6px;
+}
+.top-actions {
+  display: flex;
+  gap: 15px;
+  margin: 35px 0 36px;
+}
+.header-section {
+  display: flex;
+  flex-direction: column;
+  // gap: 15px;
+  max-width: 600px;
+}
+.title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--emperor);
+  margin: 0 0 8px;
+}
+.date {
+  font-size: 15.5px;
+  color: var(--text-gray);
+  margin-bottom: 28px;
+}
+.planner-btn {
+  margin-bottom: 32px;
+  width: 100%;
+}
+.location-info{
+  display: flex;
+}
+.location-section {
+  h2 { margin-bottom: 16px; }
+}
+.location-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+.location-image {
+  height: 250px;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+}
+.location-image::after {
+  content: "Hotel Vardar";
+  color: var(--primary);
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  background: white;
+  padding: 5px 10px;
+  border-radius: 8px;
+}
+.location-image-placeholder {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 60px;
+  color: #9ca3af;
+}
+.meta .date {
+  font-size: 15.5px;
+  color: var(--emperor);
+  font-weight: 500;
+}
+
+.meta .location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-gray);
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 15px;
+  // margin: 24px 0;
+}
+.btn {
+  flex: 1;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.btn-primary { 
+  background: var(--primary); 
+  color: white; 
+  border: none; 
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);  
+}
+.btn-outline { 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--primary); 
+  color: var(--primary); 
+  background: transparent; 
+}
+
+.section h2 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--emperor);
+  margin: 28px 0 12px;
+}
+
+.description {
+  line-height: 1.7;
+  color: var(--text-gray);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.info-card {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+
+  h3 {
+    margin: 0 0 8px;
+    font-size: 14px;
+    color: var(--emperor);
+  }
+
+  .price {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+}
+.price-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+  text-align: left;
+}
+.price-label {
+  font-size: 13px;
+  color: var(--text-gray);
+}
+.price-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary);
+}
+.ticket-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 18px 16px;
+  transition: 0.2s;
+  margin-top: 5px;
+}
+
+.ticket-card:hover {
+  transform: translateY(-3px);
+}
+
+.ticket-type {
+  font-weight: 600;
+  font-size: 15px;
+}
+.ticket-price {
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--primary);
+  display: block;
+  margin-top: 4px;
+}
+
+.btn-small {
+  padding: 8px 20px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.venue {
+  display: flex;
+  font-size: 15.5px;
+  color: var(--text-gray);
+  margin-bottom: 28px;
+  align-items: center;
+  mat-icon {
+    font-size: 20px;
+  }
+}
+.venue-big {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--emperor);
+  margin-bottom: 16px;
+}
+.map-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.map-btn-overlay {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.btn {
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  width: 100%;
+}
+.btn-map, .btn-reserve {
+  width: 100%;
+  margin-top: 8px;
+  padding: 14px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.btn-map {
+  background: transparent;
+  border: 2px solid var(--primary);
+  color: var(--primary);
+}
+
+.btn-reserve {
+  width: 100%;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 16px;
+  font-size: 16px;
+  font-weight: 700;
+}
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+/* Desktop - dve kolone */
+@media (min-width: 900px) {
+  .content {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 40px;
+    padding: 30px 20px 60px;
+    background: #f5f7fa;
+  }
+
+  .right {
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+  }
+
+  .hero {
+    height: 380px;
+    margin-bottom: -60px;
+  }
+
+  .title {
+    font-size: 32px;
+  }
+}

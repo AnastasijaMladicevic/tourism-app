@@ -36,4 +36,8 @@ export const routes: Routes = [
     loadComponent: () => import('./feature/objects/objects').then(m => m.ObjectsComponent),
     data: { type: null, title: 'Places' }
   },
+  { 
+    path: 'event/:id', 
+    loadComponent: () => import('./feature/event-detail/event-detail').then(m => m.EventDetailComponent) 
+  },
 ];
