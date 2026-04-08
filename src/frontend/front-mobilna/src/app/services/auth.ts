@@ -11,8 +11,12 @@ export interface LoginDto {
 export interface CreateUserDto {
   firstName: string;
   lastName: string;
+  dateOfBirth: string;
   email: string;
   password: string;
+  phoneNumber?: string | null;
+  country?: string | null;
+  language?: string;
 }
 
 export interface UserDto {
