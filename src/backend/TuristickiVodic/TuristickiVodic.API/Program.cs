@@ -159,7 +159,7 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
 
-    if (app.Environment.IsDevelopment())
+    if (app.Environment.IsDevelopment() && !db.Roles.Any())
     {
         var solutionRoot = Path.GetFullPath(
             Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..")
@@ -190,6 +190,10 @@ using (var scope = app.Services.CreateScope())
         {
             Console.WriteLine("seed.sql NOT FOUND.");
         }
+    }
+    else if (app.Environment.IsDevelopment())
+    {
+        Console.WriteLine("Seed skipped because data already exists.");
     }
 }
 

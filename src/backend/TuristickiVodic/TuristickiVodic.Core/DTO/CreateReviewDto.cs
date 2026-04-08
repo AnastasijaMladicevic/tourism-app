@@ -8,6 +8,7 @@ namespace TuristickiVodic.Core.DTO
     public class CreateReviewDto
     {
         [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "ObjectId must be greater than 0.")]
         public int ObjectId { get; set; }
 
         [Required]

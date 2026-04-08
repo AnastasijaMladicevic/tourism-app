@@ -11,4 +11,29 @@ export const routes: Routes = [
   { path: 'new-credentials', loadComponent: () => import('./feature/new-credentials/new-credentials.component').then(m => m.NewCredentialsComponent) },
   { path: 'password-updated', loadComponent: () => import('./feature/auth/password-updated/password-updated').then(m => m.PasswordUpdatedComponent) },
   { path: 'attractions', loadComponent: () => import('./feature/attractions/attractions').then(m => m.AttractionsComponent) },
+  {
+    path: 'hotels',
+    loadComponent: () => import('./feature/objects/objects').then(m => m.ObjectsComponent),
+    data: { type: 'Hotel', title: 'Hotels' }
+  },
+  {
+    path: 'restaurants',
+    loadComponent: () => import('./feature/objects/objects').then(m => m.ObjectsComponent),
+    data: { type: 'Restoran', title: 'Restaurants' }
+  },
+  {
+    path: 'kafane',
+    loadComponent: () => import('./feature/objects/objects').then(m => m.ObjectsComponent),
+    data: { type: 'Kafana', title: 'Kafane' }
+  },
+  {
+    path: 'planinarski-domovi',
+    loadComponent: () => import('./feature/objects/objects').then(m => m.ObjectsComponent),
+    data: { type: 'Planinarski dom', title: 'Planinarski domovi' }
+  },
+  {
+    path: 'objects',
+    loadComponent: () => import('./feature/objects/objects').then(m => m.ObjectsComponent),
+    data: { type: null, title: 'Places' }
+  },
 ];

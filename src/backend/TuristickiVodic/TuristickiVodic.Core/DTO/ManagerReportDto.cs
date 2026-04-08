@@ -1,17 +1,5 @@
 namespace TuristickiVodic.Core.DTO
 {
-    public class CreateManagerReportDto
-    {
-        public int ReportedUserId { get; set; }
-        public string Reason { get; set; } = string.Empty;
-    }
-
-    public class ReviewManagerReportDto
-    {
-        public bool Approve { get; set; }
-        public string? RejectionReason { get; set; }
-    }
-
     public class ManagerReportDto
     {
         public int Id { get; set; }

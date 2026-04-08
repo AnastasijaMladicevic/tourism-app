@@ -1,4 +1,4 @@
-TRUNCATE TABLE
+/*TRUNCATE TABLE
     "Images",
     "Favorites",
     "Reviews",
@@ -18,7 +18,7 @@ TRUNCATE TABLE
     "DestinationTypes",
     "LocalityTypes",
     "Roles"
-RESTART IDENTITY CASCADE;
+RESTART IDENTITY CASCADE;*/
 
 -- ============================================
 -- TEST PASSWORD FOR SEEDED USERS
@@ -440,8 +440,100 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
  5, 'Luksuzno i udobno, vredi svake pare. Dzakuzi vrhunski.', 'Approved', NOW());
 
+
 -- ============================================
--- 10. INDEXES
+-- 10. IMAGES - DESTINATIONS
+-- ============================================
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
+VALUES
+(
+    'https://afar.brightspotcdn.com/dims4/default/3a97ce6/2147483647/strip/false/crop/1600x800+0+0/resize/1486x743!/quality/90/?url=https%3A%2F%2Fk3-prod-afar-media.s3.us-west-2.amazonaws.com%2Fbrightspot%2Ff4%2F0e%2Fabb2c7bf50f46954835d19e83029%2Foriginal-956aea8bdeae0f9b8479b054a6ff8e85.jpg',
+    'Stari grad Kotor',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
+    NOW()),
+(
+    'https://www.montenegrosubmarine.me/public/assets/images/img/Boka%20Bay%20222.jpg',
+    'Kotorski zaliv',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotorski zaliv'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/0/00/Budva_(26871774051).jpg',
+    'Budva',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
+    NOW()),
+(
+    'https://kofer.info/wp-content/uploads/2020/02/shutterstock_191127089.jpg',
+    'Stari grad Budva',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Budva'),
+    NOW()),
+(
+    'https://www.ekapija.com/thumbs169/plaza_mogren_u_budvi_220525_tw1024.jpg',
+    'Plaza Mogren',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plaza Mogren'),
+    NOW()),
+(
+    'https://twopacksandapup.com/wp-content/uploads/2025/06/Durmitor-Feat-scaled.jpg',
+    'Durmitor',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Sveti_Stefan_(06).jpg/1280px-Sveti_Stefan_(06).jpg',
+    'Sveti Stefan',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sveti Stefan'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/4/4b/PodgoricaOverview.jpg',
+    'Podgorica',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
+    NOW()
+),
+(
+    'https://idsb.tmgrup.com.tr/ly/uploads/images/2023/04/03/265755.jpg',
+    'Herceg Novi',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
+    NOW()),
+(
+    'https://www.visit-montenegro.com/wp-content/uploads/2026/01/Depositphotos_668449212_XL-scaled.jpg',
+    'Bar',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
+    NOW()),
+(
+    'https://ulcinj.travel/wp-content/uploads/2024/02/47.jpg',
+    'Ulcinj',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
+    NOW()),
+(
+    'https://www.montenegro.travel/imagine_cache/og/uploads/banners/1_unique_montengro/1.Cetinje.webp',
+    'Cetinje',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/d/d3/Nikšić.jpg',
+    'Niksic',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+    NOW()),
+(
+    'https://opstinativat.me/wp-content/uploads/2020/09/DJI_0022-1-1100x450.jpg',
+    'Tivat',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
+    NOW());
+
+-- ============================================
+-- 11. INDEXES
 -- ============================================
 
 CREATE INDEX IF NOT EXISTS idx_localities_geo ON "Localities" USING gist("Geolocation");

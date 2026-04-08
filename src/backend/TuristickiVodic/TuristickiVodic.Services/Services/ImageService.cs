@@ -36,6 +36,13 @@ namespace TuristickiVodic.Services.Services
         {
             await ValidateCreateRelationAsync(dto);
 
+
+            // PROVERA: samo jedna main slika po entitetu
+            if (dto.IsMain)
+            {
+                await EnsureNoOtherMainImage(dto);
+            }
+
             var image = new Image
             {
                 Url = dto.Url,
@@ -70,7 +77,12 @@ namespace TuristickiVodic.Services.Services
                 image.AltText = dto.AltText;
 
             if (dto.IsMain.HasValue)
+            {
+                if (dto.IsMain.Value)
+                    await EnsureNoOtherMainImageForUpdate(image);
+
                 image.IsMain = dto.IsMain.Value;
+            }
 
             if (dto.ObjectId.HasValue)
                 image.ObjectId = dto.ObjectId;
@@ -171,6 +183,41 @@ namespace TuristickiVodic.Services.Services
                 if (!exists)
                     throw new InvalidOperationException($"Locality with id {localityId.Value} not found.");
             }
+
+        }
+
+
+        private async Task EnsureNoOtherMainImage(CreateImageDto dto)
+        {
+            bool exists = await _context.Images.AnyAsync(i =>
+                i.IsMain &&
+                (
+                    (dto.ObjectId.HasValue && i.ObjectId == dto.ObjectId) ||
+                    (dto.ActivityId.HasValue && i.ActivityId == dto.ActivityId) ||
+                    (dto.EventId.HasValue && i.EventId == dto.EventId) ||
+                    (dto.DestinationId.HasValue && i.DestinationId == dto.DestinationId) ||
+                    (dto.LocalityId.HasValue && i.LocalityId == dto.LocalityId)
+                ));
+
+            if (exists)
+                throw new InvalidOperationException("Only one main image allowed per entity.");
+        }
+
+        private async Task EnsureNoOtherMainImageForUpdate(Image current)
+        {
+            bool exists = await _context.Images.AnyAsync(i =>
+                i.Id != current.Id &&
+                i.IsMain &&
+                (
+                    (current.ObjectId.HasValue && i.ObjectId == current.ObjectId) ||
+                    (current.ActivityId.HasValue && i.ActivityId == current.ActivityId) ||
+                    (current.EventId.HasValue && i.EventId == current.EventId) ||
+                    (current.DestinationId.HasValue && i.DestinationId == current.DestinationId) ||
+                    (current.LocalityId.HasValue && i.LocalityId == current.LocalityId)
+                ));
+
+            if (exists)
+                throw new InvalidOperationException("Only one main image allowed per entity.");
         }
     }
 }

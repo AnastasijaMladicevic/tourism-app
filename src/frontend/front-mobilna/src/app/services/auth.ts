@@ -97,4 +97,7 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
+  isAdmin(): boolean {
+    return this.getCurrentUser()?.roleName === 'Admin';
+  }
 }
