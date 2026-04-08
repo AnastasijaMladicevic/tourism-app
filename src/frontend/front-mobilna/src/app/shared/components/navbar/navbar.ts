@@ -4,6 +4,7 @@ import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { LogoComponent } from '../logo/logo';
 import { filter } from 'rxjs/operators';
+import { AuthService } from '../../../services/auth';
 
 interface NavItem {
   label: string;
@@ -41,7 +42,7 @@ export class NavbarComponent {
     { label: 'Profile', icon: 'person_outline',  route: '/profile' },
   ];
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private authService: AuthService) {
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe((e: NavigationEnd) => {
@@ -58,6 +59,11 @@ export class NavbarComponent {
   }
 
   goTo(route: string): void {
+    const protectedRoutes = ['/saved', '/planner', '/profile'];
+    if (protectedRoutes.includes(route) && !this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
     this.router.navigate([route]);
   }
 }

@@ -75,6 +75,32 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
+        [HttpPost("register-manager")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RegisterManager([FromBody] CreateUserDto createUserDto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            try
+            {
+                var user = await _userService.CreateManagerAsync(createUserDto);
+                return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+            }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+        }
+
+        [HttpPost("register-admin")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RegisterAdmin([FromBody] CreateUserDto createUserDto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            try
+            {
+                var user = await _userService.CreateAdminAsync(createUserDto);
+                return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+            }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+        }
+
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
@@ -189,6 +215,14 @@ namespace TuristickiVodic.API.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+        [HttpGet("creator-requests")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetCreatorRequests()
+        {
+            var requests = await _userService.GetCreatorRequestsAsync();
+            return Ok(requests);
         }
 
         // Samo Tourist može da pošalje zahtev, i to samo u svoje ime

@@ -124,6 +124,9 @@ namespace TuristickiVodic.Services.Services
         {
             await ValidateReferences(dto.EventTypeId, dto.LocalityId, dto.DestinationId, dto.ObjectId);
 
+            if (roleName != "ContentCreator")
+                throw new UnauthorizedAccessException("Only content creators can create events.");
+
             if (dto.EndDate.HasValue && dto.EndDate.Value < dto.StartDate)
                 throw new InvalidOperationException("End date cannot be before start date.");
 

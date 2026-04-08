@@ -23,6 +23,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-bottom: 5px;
 }
 
 .sidebar__item {
@@ -35,7 +36,7 @@
   border-radius: 12px;
   background: transparent;
   font-family: 'DM Sans', sans-serif;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
   color: var(--text-gray);
   cursor: pointer;

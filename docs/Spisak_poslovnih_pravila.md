@@ -10,6 +10,7 @@
 - `Admin` ne može da obriše sam sebe.
 - Samo `Tourist` može da pošalje zahtev za `ContentCreator` ulogu, i to samo za sebe.
 - Samo `Admin` može da odobri `ContentCreator` ulogu.
+- Uloga ContentCreator-a se odobrava samo ako je turista poslao zahtev za nju.
 
 **DESTINACIJE**
 
@@ -55,6 +56,7 @@
 - Samo `ContentCreator` može direktno da obriše event.
 - `ContentCreator` može direktno da obriše samo svoj event koji nije `Approved`.
 - `Approved` event se ne briše direktno, već kroz `DeletionRequest`.
+- Moguce je izlistati sve eventove, eventove za odredjeni dan, za 7 ili 30 dana unapred i od - do datuma.
 
 **AKTIVNOSTI**
 
@@ -132,7 +134,7 @@
 
 - Samo `Manager` može da prijavi korisnika.
 - `Manager` može da prijavi samo korisnika sa ulogom `ContentCreator`.
-- Prijavljeni `ContentCreator` mora imati objekat ili event u destinaciji kojom upravlja taj `Manager`.
+- Prijavljeni `ContentCreator` mora imati objekat, event ili aktivnost u destinaciji kojom upravlja taj `Manager`.
 - Ne može da postoji više `Pending` prijava za istog `ContentCreator`-a.
 - `Manager` vidi samo svoje prijave.
 - `Admin` vidi sve prijave.

@@ -8,6 +8,8 @@ namespace TuristickiVodic.Services
         Task<UserDto?> GetByIdAsync(int id);
         Task<UserDto?> GetByEmailAsync(string email);
         Task<UserDto> CreateAsync(CreateUserDto createUserDto);
+        Task<UserDto> CreateManagerAsync(CreateUserDto createUserDto);
+        Task<UserDto> CreateAdminAsync(CreateUserDto createUserDto);
         Task<UserDto?> UpdateAsync(int id, UpdateUserDto updateUserDto);
         Task<bool> DeleteAsync(int id);
         Task ChangePasswordAsync(int userId, ChangePasswordDto dto, int currentUserId, string roleName);
@@ -17,5 +19,6 @@ namespace TuristickiVodic.Services
         Task<bool> ApproveCreatorRoleAsync(int userId);
         Task<bool> ToggleUserActiveAsync(int userId, bool isActive);
         Task<bool> LogoutAsync(int userId, string? jti, DateTime? accessTokenExpiryUtc);
+        Task<IEnumerable<CreatorRoleRequestDto>> GetCreatorRequestsAsync();
     }
 }
