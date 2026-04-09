@@ -14,7 +14,8 @@ export interface ImageDto {
 
 @Injectable({ providedIn: 'root' })
 export class ImageService {
-<<<<<<< src/frontend/front-mobilna/src/app/services/image.ts
+
+  private apiUrl = `${environment.apiUrl}/images`;
 
   constructor(private http: HttpClient) {}
 
@@ -26,6 +27,7 @@ export class ImageService {
   getMainForEvent(eventId: number): Observable<ImageDto> {
     return this.http.get<ImageDto>(`${environment.apiUrl}/events/${eventId}/images/main`);
   }
+
   // === DESTINATION IMAGES ===
   getForDestination(destinationId: number): Observable<ImageDto[]> {
     return this.http.get<ImageDto[]>(`${environment.apiUrl}/destinations/${destinationId}/images`);
@@ -34,14 +36,8 @@ export class ImageService {
   getMainForDestination(destinationId: number): Observable<ImageDto> {
     return this.http.get<ImageDto>(`${environment.apiUrl}/destinations/${destinationId}/images/main`);
   }
-}
-=======
-  private apiUrl = `${environment.apiUrl}/images`;
-
-  constructor(private http: HttpClient) {}
 
   getAll(): Observable<ImageDto[]> {
     return this.http.get<ImageDto[]>(this.apiUrl);
   }
 }
->>>>>>> src/frontend/front-mobilna/src/app/services/image.ts

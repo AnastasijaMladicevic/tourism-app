@@ -150,7 +150,7 @@
             <div class="attendees">
               <span class="attending-text">{{ event.attendeesText }}</span>
             </div>
-            <button type="button" class="view-btn">View Event</button>
+            <button type="button" class="view-btn" (click)="openEvent(event.id)">View Event</button>
           </div>
         </div>
       </article>
