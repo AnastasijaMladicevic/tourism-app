@@ -14,7 +14,6 @@ export interface ChangePasswordDto {
   confirmPassword: string;
 }
 
-
 export interface CreateUserDto {
   firstName: string;
   lastName: string;
@@ -49,7 +48,6 @@ export interface RefreshTokenDto {
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-
   private url = `${environment.apiUrl}/users`;
 
   constructor(private http: HttpClient) {}
@@ -62,11 +60,11 @@ export class AuthService {
   // POST /api/users/login
   login(dto: LoginDto): Observable<AuthResponseDto> {
     return this.http.post<AuthResponseDto>(`${this.url}/login`, dto).pipe(
-      tap(res => {
+      tap((res) => {
         localStorage.setItem('token', res.token);
         localStorage.setItem('refreshToken', res.refreshToken);
         localStorage.setItem('user', JSON.stringify(res.user));
-      })
+      }),
     );
   }
 
@@ -77,21 +75,23 @@ export class AuthService {
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
-      })
+      }),
     );
   }
 
   // POST /api/users/refresh
   refresh(): Observable<AuthResponseDto> {
     const refreshToken = localStorage.getItem('refreshToken');
-    return this.http.post<AuthResponseDto>(`${this.url}/refresh`, { refreshToken } as RefreshTokenDto).pipe(
-      tap(res => {
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('refreshToken', res.refreshToken);
-      })
-    );
+    return this.http
+      .post<AuthResponseDto>(`${this.url}/refresh`, { refreshToken } as RefreshTokenDto)
+      .pipe(
+        tap((res) => {
+          localStorage.setItem('token', res.token);
+          localStorage.setItem('refreshToken', res.refreshToken);
+        }),
+      );
   }
-  
+
   changePassword(userId: number, dto: ChangePasswordDto): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.url}/${userId}/change-password`, dto);
   }

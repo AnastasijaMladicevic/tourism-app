@@ -55,7 +55,7 @@ export class EventsComponent implements OnInit {
   }
 
   get categories(): { key: EventCategory; label: string; icon: string }[] {
-    const unique = Array.from(new Set(this.events.map(event => event.category)));
+    const unique = Array.from(new Set(this.events.map((event) => event.category)));
     return [
       { key: 'All', label: 'All', icon: '' },
       ...unique.map((name) => ({ key: name, label: name, icon: this.categoryIcon(name) })),
@@ -67,8 +67,9 @@ export class EventsComponent implements OnInit {
 
     const q = this.searchQuery.trim().toLowerCase();
     if (q) {
-      list = list.filter(event =>
-        event.title.toLowerCase().includes(q) || event.location.toLowerCase().includes(q)
+      list = list.filter(
+        (event) =>
+          event.title.toLowerCase().includes(q) || event.location.toLowerCase().includes(q),
       );
     }
 
@@ -127,47 +128,53 @@ export class EventsComponent implements OnInit {
     forkJoin({
       events: this.eventService.getAll().pipe(catchError(() => of([] as unknown[]))),
       images: this.imageService.getAll().pipe(catchError(() => of([] as unknown[]))),
-    }).pipe(
-      finalize(() => {
-        this.isLoading = false;
-        this.flushUi();
-      })
-    ).subscribe({
-      next: ({ events, images }) => {
-        try {
-          const eventList = this.toArray<EventDto>(events).map((event) => this.normalizeEvent(event));
-          const imageList = this.toArray<ImageDto>(images);
-          const imageMap = this.pickMainImageMap(imageList, 'eventId');
+    })
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.flushUi();
+        }),
+      )
+      .subscribe({
+        next: ({ events, images }) => {
+          try {
+            const eventList = this.toArray<EventDto>(events).map((event) =>
+              this.normalizeEvent(event),
+            );
+            const imageList = this.toArray<ImageDto>(images);
+            const imageMap = this.pickMainImageMap(imageList, 'eventId');
 
-          const active = eventList
-            .filter((event) => event.id > 0 && event.isActive !== false)
-            .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+            const active = eventList
+              .filter((event) => event.id > 0 && event.isActive !== false)
+              .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
 
-          const now = new Date();
-          const futureOnly = active.filter((event) => new Date(event.startDate) >= now);
-          const source = futureOnly.length ? futureOnly : active;
+            const now = new Date();
+            const futureOnly = active.filter((event) => new Date(event.startDate) >= now);
+            const source = futureOnly.length ? futureOnly : active;
 
-          this.events = source.map((event) => ({
-            id: event.id,
-            title: event.name,
-            category: this.normalizeCategory(event.eventTypeName),
-            dateText: this.formatDate(event.startDate),
-            timeText: this.formatTimeRange(event.startDate, event.endDate),
-            location: event.localityName ?? event.destinationName ?? 'Montenegro',
-            priceText: this.formatPrice(event.price),
-            imageUrl: imageMap.get(event.id),
-            attendeesText: event.maxVisitors ? `Max ${event.maxVisitors} visitors` : 'No attendee data',
-          }));
-        } catch {
+            this.events = source.map((event) => ({
+              id: event.id,
+              title: event.name,
+              category: this.normalizeCategory(event.eventTypeName),
+              dateText: this.formatDate(event.startDate),
+              timeText: this.formatTimeRange(event.startDate, event.endDate),
+              location: event.localityName ?? event.destinationName ?? 'Montenegro',
+              priceText: this.formatPrice(event.price),
+              imageUrl: imageMap.get(event.id),
+              attendeesText: event.maxVisitors
+                ? `Max ${event.maxVisitors} visitors`
+                : 'No attendee data',
+            }));
+          } catch {
+            this.events = [];
+          }
+          this.flushUi();
+        },
+        error: () => {
           this.events = [];
-        }
-        this.flushUi();
-      },
-      error: () => {
-        this.events = [];
-        this.flushUi();
-      },
-    });
+          this.flushUi();
+        },
+      });
   }
 
   private normalizeEvent(raw: EventDto): {
@@ -190,8 +197,14 @@ export class EventsComponent implements OnInit {
       id: Number(dto['id'] ?? dto['Id'] ?? 0),
       name: String(dto['name'] ?? dto['Name'] ?? ''),
       eventTypeName: (dto['eventTypeName'] ?? dto['EventTypeName'] ?? null) as string | null,
-      startDate: typeof startDate === 'string' ? startDate : new Date(startDate as string | number | Date).toISOString(),
-      endDate: typeof endDate === 'string' || endDate == null ? (endDate as string | null | undefined) : new Date(endDate as string | number | Date).toISOString(),
+      startDate:
+        typeof startDate === 'string'
+          ? startDate
+          : new Date(startDate as string | number | Date).toISOString(),
+      endDate:
+        typeof endDate === 'string' || endDate == null
+          ? (endDate as string | null | undefined)
+          : new Date(endDate as string | number | Date).toISOString(),
       price: this.readOptionalNumber(dto, ['price', 'Price']),
       maxVisitors: this.readOptionalNumber(dto, ['maxVisitors', 'MaxVisitors']),
       isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
@@ -236,7 +249,7 @@ export class EventsComponent implements OnInit {
 
     const result = new Map<number, string>();
     for (const [id, list] of grouped.entries()) {
-      const main = list.find(i => this.isMainImage(i)) ?? list[0];
+      const main = list.find((i) => this.isMainImage(i)) ?? list[0];
       const resolved = this.resolveMediaUrl(this.readImageUrl(main));
       if (resolved) result.set(id, resolved);
     }

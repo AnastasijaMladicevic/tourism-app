@@ -60,7 +60,10 @@
     max-width: 0;
     overflow: hidden;
     opacity: 0;
-    transition: max-width 0.3s ease, opacity 0.2s, border-color 0.2s;
+    transition:
+      max-width 0.3s ease,
+      opacity 0.2s,
+      border-color 0.2s;
 
     &--open {
       max-width: 400px;
@@ -103,7 +106,9 @@
   color: var(--emperor);
   cursor: pointer;
   border-radius: 10px;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 
   mat-icon {
     font-size: 20px;
@@ -225,7 +230,10 @@
   font-weight: 500;
   color: var(--emperor);
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s;
 
   &:hover {
     border-color: var(--primary);
@@ -300,7 +308,9 @@
   overflow: hidden;
   background: #fff;
   box-shadow: 0 6px 16px rgba(17, 28, 45, 0.08);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 
   &:hover {
     transform: translateY(-2px);

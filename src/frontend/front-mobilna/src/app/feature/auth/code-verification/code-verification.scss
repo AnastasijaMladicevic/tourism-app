@@ -63,16 +63,18 @@
   flex: 1;
   width: 15%;
   height: 50px;
-  border: 1.5px solid #D8E3EC;
+  border: 1.5px solid #d8e3ec;
   border-radius: 12px;
-  background: var(--athens-gray);   
+  background: var(--athens-gray);
   text-align: center;
   font-family: 'DM Sans', sans-serif;
   font-size: 22px;
   font-weight: 700;
-  color: #1A1A2E;
+  color: #1a1a2e;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 
   &:focus {
     border-color: var(--primary);
@@ -82,7 +84,7 @@
 
 .otp-input--filled {
   border-color: var(--primary);
-  background: var(--athens-gray);   
+  background: var(--athens-gray);
 }
 
 .otp-input--error {
@@ -124,7 +126,9 @@
   font-weight: 600;
   cursor: pointer;
   margin-top: 12px;
-  transition: opacity 0.2s, transform 0.15s;
+  transition:
+    opacity 0.2s,
+    transform 0.15s;
 
   &:disabled {
     opacity: 0.5;
@@ -138,7 +142,7 @@
 
 // ─── Primary button ────────────────────────────────────────────────────────────
 .btn-primary {
-  background: var(--primary);       
+  background: var(--primary);
   color: #ffffff;
   box-shadow: 0 4px 16px rgba(26, 172, 207, 0.3);
 
@@ -169,10 +173,12 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 @media (min-width: 435px) {
-  .page{
-  min-height: 100vh;
+  .page {
+    min-height: 100vh;
   }
 }

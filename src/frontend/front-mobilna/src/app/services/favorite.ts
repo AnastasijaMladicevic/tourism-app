@@ -29,7 +29,6 @@ export interface CreateFavoriteDto {
 
 @Injectable({ providedIn: 'root' })
 export class FavoriteService {
-
   private url = `${environment.apiUrl}/favorites`;
 
   constructor(private http: HttpClient) {}

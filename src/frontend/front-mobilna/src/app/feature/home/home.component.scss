@@ -16,8 +16,14 @@
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Greeting */
@@ -72,7 +78,9 @@
     color: var(--text-gray);
   }
 
-  svg { flex-shrink: 0; }
+  svg {
+    flex-shrink: 0;
+  }
 }
 
 /* Sections */
@@ -111,7 +119,9 @@
   overflow-x: auto;
   padding-bottom: 4px;
 
-  &::-webkit-scrollbar { display: none; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .category {
@@ -150,7 +160,9 @@
       color: var(--primary);
       border: 1.5px solid var(--primary);
     }
-    span { color: var(--text-dark); }
+    span {
+      color: var(--text-dark);
+    }
   }
 
   &:hover .cat-icon {
@@ -222,7 +234,9 @@
   cursor: pointer;
   transition: transform 0.2s;
 
-  &:hover { transform: scale(1.04); }
+  &:hover {
+    transform: scale(1.04);
+  }
 }
 
 /* Place cards */
@@ -248,7 +262,9 @@
   background: var(--white);
   border: 1px solid var(--border);
   box-shadow: 0 8px 24px rgba(22, 138, 173, 0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
@@ -335,7 +351,9 @@
   background: var(--white);
   border: 1px solid var(--border);
   box-shadow: 0 8px 24px rgba(22, 138, 173, 0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);

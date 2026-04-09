@@ -36,7 +36,7 @@ interface EventCard {
   standalone: true,
   imports: [NavbarComponent, BottomNavComponent, FormsModule],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.scss'
+  styleUrl: './home.component.scss',
 })
 export class HomeComponent implements OnInit {
   userName = 'Alex Taylor';
@@ -91,35 +91,43 @@ export class HomeComponent implements OnInit {
     forkJoin({
       destinations: this.destinationService.getAll().pipe(catchError(() => of([] as unknown[]))),
       images: this.imageService.getAll().pipe(catchError(() => of([] as unknown[]))),
-    }).pipe(
-      finalize(() => {
-        this.isLoadingPlaces = false;
+    })
+      .pipe(
+        finalize(() => {
+          this.isLoadingPlaces = false;
+          this.flushUi();
+        }),
+      )
+      .subscribe(({ destinations, images }) => {
+        console.log('🚀 ~ HomeComponent ~ loadPlaceCards ~ destinations:', destinations);
+        const destinationList = this.toArray<DestinationDto>(destinations);
+        const imageList = this.toArray<ImageDto>(images);
+        const active = destinationList
+          .map((d) => this.normalizeDestination(d))
+          .filter((d) => d.id > 0 && d.isActive !== false);
+        const imageMap = this.pickMainImageMap(imageList, 'destinationId');
+
+        const cards = active.map(
+          (d): PlaceCard => ({
+            title: d.name,
+            location: d.destinationTypeName || 'Montenegro',
+            ratingText: this.ratingText(d),
+            imageUrl: this.pickDestinationImage(d, imageMap),
+            isFavorite: this.favoriteMap.has(d.id),
+            destinationId: d.id,
+            favoriteId: this.favoriteMap.get(d.id),
+          }),
+        );
+        console.log('🚀 ~ HomeComponent ~ loadPlaceCards ~ cards:', cards);
+
+        const split = Math.min(8, cards.length);
+        this.recommended = cards.slice(0, split);
+        this.popular =
+          cards.length > split
+            ? cards.slice(split, split + 8)
+            : cards.slice(0, Math.min(8, cards.length));
         this.flushUi();
-      })
-    ).subscribe(({ destinations, images }) => {
-      const destinationList = this.toArray<DestinationDto>(destinations);
-      const imageList = this.toArray<ImageDto>(images);
-      const active = destinationList
-        .map(d => this.normalizeDestination(d))
-        .filter(d => d.id > 0 && d.isActive !== false);
-      const imageMap = this.pickMainImageMap(imageList, 'destinationId');
-
-      const cards = active.map((d): PlaceCard => ({
-        title: d.name,
-        location: d.destinationTypeName || 'Montenegro',
-        ratingText: this.ratingText(d),
-        imageUrl: this.pickDestinationImage(d, imageMap),
-        isFavorite: this.favoriteMap.has(d.id),
-        destinationId: d.id,
-        favoriteId: this.favoriteMap.get(d.id),
-      }));
-      console.log("🚀 ~ HomeComponent ~ loadPlaceCards ~ cards:", cards)
-
-      const split = Math.min(8, cards.length);
-      this.recommended = cards.slice(0, split);
-      this.popular = cards.length > split ? cards.slice(split, split + 8) : cards.slice(0, Math.min(8, cards.length));
-      this.flushUi();
-    });
+      });
   }
 
   private loadEventCards(): void {
@@ -128,57 +136,64 @@ export class HomeComponent implements OnInit {
     forkJoin({
       events: this.eventService.getAll().pipe(catchError(() => of([] as unknown[]))),
       images: this.imageService.getAll().pipe(catchError(() => of([] as unknown[]))),
-    }).pipe(
-      finalize(() => {
-        this.isLoadingEvents = false;
+    })
+      .pipe(
+        finalize(() => {
+          this.isLoadingEvents = false;
+          this.flushUi();
+        }),
+      )
+      .subscribe(({ events, images }) => {
+        const eventList = this.toArray<EventDto>(events);
+        const imageList = this.toArray<ImageDto>(images);
+        const eventImageMap = this.pickMainImageMap(imageList, 'eventId');
+
+        const future = eventList
+          .map((e) => this.normalizeEvent(e))
+          .filter((e) => e.id > 0 && e.isActive !== false && new Date(e.startDate) >= new Date())
+          .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+
+        this.upcomingEvents = future.slice(0, 8).map(
+          (e): EventCard => ({
+            id: e.id,
+            title: e.name,
+            location: e.localityName ?? e.destinationName ?? 'Montenegro',
+            dateText: this.eventDate(e.startDate),
+            priceText: this.eventPrice(e.price),
+            isFree: !e.price || e.price <= 0,
+            timeText: this.eventTime(e.startDate, e.endDate),
+            imageUrl: eventImageMap.get(e.id),
+          }),
+        );
+
         this.flushUi();
-      })
-    ).subscribe(({ events, images }) => {
-      const eventList = this.toArray<EventDto>(events);
-      const imageList = this.toArray<ImageDto>(images);
-      const eventImageMap = this.pickMainImageMap(imageList, 'eventId');
-
-      const future = eventList
-        .map(e => this.normalizeEvent(e))
-        .filter(e => e.id > 0 && e.isActive !== false && new Date(e.startDate) >= new Date())
-        .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-
-      this.upcomingEvents = future.slice(0, 8).map((e): EventCard => ({
-        id: e.id,
-        title: e.name,
-        location: e.localityName ?? e.destinationName ?? 'Montenegro',
-        dateText: this.eventDate(e.startDate),
-        priceText: this.eventPrice(e.price),
-        isFree: !e.price || e.price <= 0,
-        timeText: this.eventTime(e.startDate, e.endDate),
-        imageUrl: eventImageMap.get(e.id),
-      }));
-
-      this.flushUi();
-    });
+      });
   }
 
   private loadFavorites(): void {
-    this.favoriteService.getMyFavorites().pipe(catchError(() => of([] as FavoriteDto[]))).subscribe(favorites => {
-      this.favoriteMap = new Map<number, number>();
-      for (const f of favorites) {
-        const raw = f as unknown as Record<string, unknown>;
-        const destinationId = Number(raw['destinationId'] ?? raw['DestinationId'] ?? 0);
-        const favoriteId = Number(raw['id'] ?? raw['Id'] ?? 0);
-        if (destinationId && favoriteId) this.favoriteMap.set(destinationId, favoriteId);
-      }
-
-      const patch = (list: PlaceCard[]) => {
-        for (const card of list) {
-          card.isFavorite = this.favoriteMap.has(card.destinationId);
-          card.favoriteId = this.favoriteMap.get(card.destinationId);
+    this.favoriteService
+      .getMyFavorites()
+      .pipe(catchError(() => of([] as FavoriteDto[])))
+      .subscribe((favorites) => {
+        this.favoriteMap = new Map<number, number>();
+        for (const f of favorites) {
+          const raw = f as unknown as Record<string, unknown>;
+          const destinationId = Number(raw['destinationId'] ?? raw['DestinationId'] ?? 0);
+          const favoriteId = Number(raw['id'] ?? raw['Id'] ?? 0);
+          if (destinationId && favoriteId) this.favoriteMap.set(destinationId, favoriteId);
         }
-      };
 
-      patch(this.recommended);
-      patch(this.popular);
-      this.flushUi();
-    });
+        const patch = (list: PlaceCard[]) => {
+          for (const card of list) {
+            card.isFavorite = this.favoriteMap.has(card.destinationId);
+            card.favoriteId = this.favoriteMap.get(card.destinationId);
+          }
+        };
+
+        patch(this.recommended);
+        patch(this.popular);
+        this.flushUi();
+      });
   }
 
   private toArray<T>(raw: unknown): T[] {
@@ -230,8 +245,14 @@ export class HomeComponent implements OnInit {
     return {
       id: Number(dto['id'] ?? dto['Id'] ?? 0),
       name: String(dto['name'] ?? dto['Name'] ?? ''),
-      startDate: typeof startDate === 'string' ? startDate : new Date(startDate as string | number | Date).toISOString(),
-      endDate: typeof endDate === 'string' || endDate == null ? (endDate as string | null | undefined) : new Date(endDate as string | number | Date).toISOString(),
+      startDate:
+        typeof startDate === 'string'
+          ? startDate
+          : new Date(startDate as string | number | Date).toISOString(),
+      endDate:
+        typeof endDate === 'string' || endDate == null
+          ? (endDate as string | null | undefined)
+          : new Date(endDate as string | number | Date).toISOString(),
       price: this.readOptionalNumber(dto, ['price', 'Price']),
       isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
       localityName: (dto['localityName'] ?? dto['LocalityName'] ?? null) as string | null,
@@ -249,7 +270,10 @@ export class HomeComponent implements OnInit {
     return undefined;
   }
 
-  private pickMainImageMap(images: ImageDto[], key: 'destinationId' | 'eventId'): Map<number, string> {
+  private pickMainImageMap(
+    images: ImageDto[],
+    key: 'destinationId' | 'eventId',
+  ): Map<number, string> {
     const grouped = new Map<number, ImageDto[]>();
     const keyPascal = key === 'destinationId' ? 'DestinationId' : 'EventId';
 
@@ -264,15 +288,20 @@ export class HomeComponent implements OnInit {
 
     const result = new Map<number, string>();
     for (const [id, list] of grouped.entries()) {
-      const main = list.find(i => this.isMainImage(i)) ?? list[0];
+      const main = list.find((i) => this.isMainImage(i)) ?? list[0];
       const resolved = this.resolveMediaUrl(this.readImageUrl(main));
       if (resolved) result.set(id, resolved);
     }
     return result;
   }
 
-  private pickDestinationImage(destination: { id: number; images?: unknown[] }, imageMap: Map<number, string>): string | undefined {
-    const fromDto = destination.images?.find(i => this.isMainImage(i as unknown as ImageDto)) ?? destination.images?.[0];
+  private pickDestinationImage(
+    destination: { id: number; images?: unknown[] },
+    imageMap: Map<number, string>,
+  ): string | undefined {
+    const fromDto =
+      destination.images?.find((i) => this.isMainImage(i as unknown as ImageDto)) ??
+      destination.images?.[0];
     const dtoUrl = this.resolveMediaUrl(this.readImageUrl(fromDto as unknown as ImageDto));
     return dtoUrl || imageMap.get(destination.id);
   }
@@ -303,7 +332,8 @@ export class HomeComponent implements OnInit {
   }
 
   private ratingText(destination: { averageRating?: number; reviewCount?: number }): string {
-    if (destination.averageRating == null || destination.reviewCount == null) return 'No ratings yet';
+    if (destination.averageRating == null || destination.reviewCount == null)
+      return 'No ratings yet';
     return `${destination.averageRating.toFixed(1)} (${destination.reviewCount} reviews)`;
   }
 
@@ -342,16 +372,16 @@ export class HomeComponent implements OnInit {
   get filteredEvents(): EventCard[] {
     const q = this.normalizedQuery;
     if (!q) return this.upcomingEvents;
-    return this.upcomingEvents.filter(e =>
-      e.title.toLowerCase().includes(q) || e.location.toLowerCase().includes(q)
+    return this.upcomingEvents.filter(
+      (e) => e.title.toLowerCase().includes(q) || e.location.toLowerCase().includes(q),
     );
   }
 
   private filterPlaces(list: PlaceCard[]): PlaceCard[] {
     const q = this.normalizedQuery;
     if (!q) return list;
-    return list.filter(p =>
-      p.title.toLowerCase().includes(q) || p.location.toLowerCase().includes(q)
+    return list.filter(
+      (p) => p.title.toLowerCase().includes(q) || p.location.toLowerCase().includes(q),
     );
   }
 
@@ -359,16 +389,22 @@ export class HomeComponent implements OnInit {
     event.stopPropagation();
 
     if (card.isFavorite && card.favoriteId) {
-      this.favoriteService.remove(card.favoriteId).pipe(catchError(() => of(void 0))).subscribe(() => {
-        this.patchFavorite(card.destinationId, false, undefined);
-      });
+      this.favoriteService
+        .remove(card.favoriteId)
+        .pipe(catchError(() => of(void 0)))
+        .subscribe(() => {
+          this.patchFavorite(card.destinationId, false, undefined);
+        });
       return;
     }
 
-    this.favoriteService.add({ destinationId: card.destinationId }).pipe(catchError(() => of(null))).subscribe(fav => {
-      if (!fav) return;
-      this.patchFavorite(card.destinationId, true, fav.id);
-    });
+    this.favoriteService
+      .add({ destinationId: card.destinationId })
+      .pipe(catchError(() => of(null)))
+      .subscribe((fav) => {
+        if (!fav) return;
+        this.patchFavorite(card.destinationId, true, fav.id);
+      });
   }
 
   private patchFavorite(destinationId: number, isFavorite: boolean, favoriteId?: number): void {

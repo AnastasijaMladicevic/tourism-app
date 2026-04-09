@@ -118,9 +118,15 @@
   <div class="events-list">
     @for (event of filteredEvents; track event.id) {
       <article class="event-card">
-        <div class="event-image" [style.background-image]="imageStyle(event.imageUrl)" [class.event-image--empty]="!event.imageUrl">
+        <div
+          class="event-image"
+          [style.background-image]="imageStyle(event.imageUrl)"
+          [class.event-image--empty]="!event.imageUrl"
+        >
           <span class="event-tag">{{ event.category === 'Rute' ? 'Nature' : event.category }}</span>
-          <span class="event-price" [class.event-price--free]="event.priceText === 'Free'">{{ event.priceText }}</span>
+          <span class="event-price" [class.event-price--free]="event.priceText === 'Free'">{{
+            event.priceText
+          }}</span>
           <h3>{{ event.title }}</h3>
         </div>
 

@@ -1,5 +1,9 @@
 import {
-  Component, OnInit, ViewEncapsulation, HostListener, ChangeDetectorRef
+  Component,
+  OnInit,
+  ViewEncapsulation,
+  HostListener,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -24,7 +28,6 @@ export interface DestinationView extends DestinationDto {
   encapsulation: ViewEncapsulation.None,
 })
 export class AttractionsComponent implements OnInit {
-
   searchQuery = '';
   activeFilter = 'All';
   sortOption: 'az' | 'za' | 'distance' = 'az';
@@ -39,7 +42,7 @@ export class AttractionsComponent implements OnInit {
     private router: Router,
     private destinationService: DestinationService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -54,10 +57,10 @@ export class AttractionsComponent implements OnInit {
       next: (destinations) => {
         console.log('✅ Destinations loaded:', destinations.length, destinations);
 
-        this.destinations = destinations.map(d => ({
+        this.destinations = destinations.map((d) => ({
           ...d,
           isFavorite: false,
-          favoriteId: undefined
+          favoriteId: undefined,
         }));
 
         this.destinationTypes = this.extractUniqueTypes(this.destinations);
@@ -69,13 +72,13 @@ export class AttractionsComponent implements OnInit {
         this.isLoading = false;
         this.errorMessage = 'Failed to load attractions.';
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
   private extractUniqueTypes(destinations: DestinationView[]): { id: number; name: string }[] {
     const map = new Map();
-    destinations.forEach(d => {
+    destinations.forEach((d) => {
       if (d.destinationTypeName) {
         map.set(d.destinationTypeName, { id: d.destinationTypeId, name: d.destinationTypeName });
       }
@@ -93,22 +96,30 @@ export class AttractionsComponent implements OnInit {
 
     if (this.searchQuery.trim()) {
       const q = this.searchQuery.toLowerCase();
-      list = list.filter(d => d.name.toLowerCase().includes(q));
+      list = list.filter((d) => d.name.toLowerCase().includes(q));
     }
 
     if (this.activeFilter !== 'All') {
-      list = list.filter(d => d.destinationTypeName === this.activeFilter);
+      list = list.filter((d) => d.destinationTypeName === this.activeFilter);
     }
 
     switch (this.sortOption) {
-      case 'az': list.sort((a, b) => a.name.localeCompare(b.name)); break;
-      case 'za': list.sort((a, b) => b.name.localeCompare(a.name)); break;
-      case 'distance': list.sort((a, b) => (a.distanceKm ?? 0) - (b.distanceKm ?? 0)); break;
+      case 'az':
+        list.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'za':
+        list.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'distance':
+        list.sort((a, b) => (a.distanceKm ?? 0) - (b.distanceKm ?? 0));
+        break;
     }
     return list;
   }
 
-  setFilter(filter: string): void { this.activeFilter = filter; }
+  setFilter(filter: string): void {
+    this.activeFilter = filter;
+  }
 
   setSort(option: 'az' | 'za' | 'distance'): void {
     this.sortOption = option;
@@ -130,7 +141,7 @@ export class AttractionsComponent implements OnInit {
   }
 
   getMainImage(destination: DestinationView): string {
-    const img = destination.images?.find(i => i.isMain) ?? destination.images?.[0];
+    const img = destination.images?.find((i) => i.isMain) ?? destination.images?.[0];
     const url = img?.url ?? '';
     console.log(`Image for ${destination.name}:`, url);
     return url;
@@ -151,5 +162,7 @@ export class AttractionsComponent implements OnInit {
     this.router.navigate(['/destination', destination.id]);
   }
 
-  goBack(): void { this.router.navigate(['/home']); }
+  goBack(): void {
+    this.router.navigate(['/home']);
+  }
 }

@@ -1,6 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { HeaderComponent } from '../header/header.component';
@@ -11,7 +17,7 @@ import { LogoComponent } from '../header/logo.component';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterLink, HeaderComponent, LogoComponent],
   templateUrl: './signup.component.html',
-  styleUrl: './signup.component.scss'
+  styleUrl: './signup.component.scss',
 })
 export class SignupComponent {
   isLoading = false;
@@ -24,16 +30,22 @@ export class SignupComponent {
     private authService: AuthService,
     private router: Router,
   ) {
-    this.form = this.fb.group({
-      fullName: ['', [Validators.required, Validators.minLength(2)]],
-      dateOfBirth: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      phoneNumber: [''],
-      country: [''],
-      language: ['sr', Validators.required],
-      password: ['', [Validators.required, Validators.minLength(6), this.passwordStrengthValidator]],
-      confirmPassword: ['', [Validators.required]],
-    }, { validators: this.passwordsMatchValidator });
+    this.form = this.fb.group(
+      {
+        fullName: ['', [Validators.required, Validators.minLength(2)]],
+        dateOfBirth: ['', Validators.required],
+        email: ['', [Validators.required, Validators.email]],
+        phoneNumber: [''],
+        country: [''],
+        language: ['sr', Validators.required],
+        password: [
+          '',
+          [Validators.required, Validators.minLength(6), this.passwordStrengthValidator],
+        ],
+        confirmPassword: ['', [Validators.required]],
+      },
+      { validators: this.passwordsMatchValidator },
+    );
   }
 
   private passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
@@ -73,33 +85,51 @@ export class SignupComponent {
     const dateOfBirthValue = this.form.value.dateOfBirth ?? '';
     const dateOfBirth = dateOfBirthValue ? `${dateOfBirthValue}T00:00:00Z` : '';
 
-    this.authService.register({
-      firstName,
-      lastName,
-      dateOfBirth,
-      email: this.form.value.email ?? '',
-      password: this.form.value.password ?? '',
-      phoneNumber: this.form.value.phoneNumber?.trim() || null,
-      country: this.form.value.country?.trim() || null,
-      language: this.form.value.language ?? 'sr',
-    }).subscribe({
-      next: () => {
-        this.isLoading = false;
-        this.router.navigate(['/login']);
-      },
-      error: err => {
-        this.isLoading = false;
-        this.errorMessage = err?.error?.message ?? 'Registration failed.';
-      }
-    });
+    this.authService
+      .register({
+        firstName,
+        lastName,
+        dateOfBirth,
+        email: this.form.value.email ?? '',
+        password: this.form.value.password ?? '',
+        phoneNumber: this.form.value.phoneNumber?.trim() || null,
+        country: this.form.value.country?.trim() || null,
+        language: this.form.value.language ?? 'sr',
+      })
+      .subscribe({
+        next: () => {
+          this.isLoading = false;
+          this.router.navigate(['/login']);
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.errorMessage = err?.error?.message ?? 'Registration failed.';
+        },
+      });
   }
 
-  get fullName() { return this.form.get('fullName'); }
-  get dateOfBirth() { return this.form.get('dateOfBirth'); }
-  get email() { return this.form.get('email'); }
-  get phoneNumber() { return this.form.get('phoneNumber'); }
-  get country() { return this.form.get('country'); }
-  get language() { return this.form.get('language'); }
-  get password() { return this.form.get('password'); }
-  get confirmPassword() { return this.form.get('confirmPassword'); }
+  get fullName() {
+    return this.form.get('fullName');
+  }
+  get dateOfBirth() {
+    return this.form.get('dateOfBirth');
+  }
+  get email() {
+    return this.form.get('email');
+  }
+  get phoneNumber() {
+    return this.form.get('phoneNumber');
+  }
+  get country() {
+    return this.form.get('country');
+  }
+  get language() {
+    return this.form.get('language');
+  }
+  get password() {
+    return this.form.get('password');
+  }
+  get confirmPassword() {
+    return this.form.get('confirmPassword');
+  }
 }
