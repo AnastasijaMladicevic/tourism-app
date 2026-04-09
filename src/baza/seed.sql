@@ -421,9 +421,7 @@ Uz dinamičan program i opuštenu atmosferu, događaj pruža savršenu priliku z
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW()),
 
-('Planinarski susret', 'Planinarski susret na Durmitoru predstavlja idealnu priliku za sve ljubitelje prirode, pešačenja i boravka na svežem planinskom vazduhu. Događaj okuplja planinare, rekreativce i avanturiste koji žele da provedu dan u druženju, istraživanju prirodnih lepota i uživanju u spektakularnim pejzažima jednog od najlepših planinskih predela. Program je osmišljen tako da spoji aktivan odmor, rekreaciju i zajedničko uživanje u prirodi.
-
-Pored same šetnje i okupljanja, učesnici imaju priliku da upoznaju druge zaljubljenike u planinu i provedu vreme u prijatnoj i opuštenoj atmosferi. Ovaj događaj pruža savršen beg od svakodnevice i mogućnost da se doživi mir, lepota i autentičan duh Durmitora kroz aktivan i ispunjen dan u prirodi.',
+('Planinarski susret', 'Okupljanje planinara na Durmitoru',
  ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326), '2026-09-01 08:00', '2026-09-01 18:00', 5.00, 100, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Okupljanje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Zabljak'),
@@ -703,7 +701,7 @@ VALUES
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
     NOW()),
 (
-    'hhttps://images.trvl-media.com/place/10048/00b6d9ee-0ab8-44e6-8080-8e12858437b4.jpg',
+    'https://images.trvl-media.com/place/10048/00b6d9ee-0ab8-44e6-8080-8e12858437b4.jpg',
     'Podgorica',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
@@ -940,7 +938,7 @@ VALUES
     'https://www.radiodux.me/sites/default/files/2017/10-07-2017-gradska-muzika-kotor-priredila-gradu-velicanstvenu-noc/dsc0935resize.jpg',
     'Vece klasicne muzike',
     true,
-    (SELECT "Id" FROM "Events" WHERE "Name" = 'Vece klasicne muzikel'),
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Vece klasicne muzike'),
     NOW()),
 (
     'https://radiokotor.info/files/images/1771230895-1771170853-IMG-a22537d6019981f93e0bc6c1e3e12e28-V.jpg',
@@ -1019,7 +1017,7 @@ VALUES
     'Grupna slika',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Planinarski susret'),
-    NOW()),
+    NOW());
 
 
 
