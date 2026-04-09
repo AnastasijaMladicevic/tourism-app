@@ -573,6 +573,12 @@ VALUES
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Budva'),
     NOW()),
 (
+    'https://upload.wikimedia.org/wikipedia/commons/2/2c/Mogren_beach_aptil_19_th.jpg',
+    'Plaza Mogren',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plaza Mogren'),
+    NOW()),
+(
     'https://upoznajcrnugoru.com/wp-content/uploads/2018/04/Plaza-Mogren-Budva_fs.jpg',
     'Plaza Mogren',
     false,
@@ -591,15 +597,39 @@ VALUES
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plaza Mogren'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/2/2c/Mogren_beach_aptil_19_th.jpg',
-    'Plaza Mogren',
-    true,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plaza Mogren'),
-    NOW()),
-(
     'https://twopacksandapup.com/wp-content/uploads/2025/06/Durmitor-Feat-scaled.jpg',
     'Durmitor',
     true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
+    NOW()),
+(
+    'https://srbijazamlade.rs/fajlovi/productitem/194_638c9bed0dfdf.jpg',
+    'Durmitor',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
+    NOW()),
+(
+    'https://montours.me/wp-content/uploads/2024/11/National-Park-Durmitor-Trip-.jpg',
+    'Durmitor',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
+    NOW()),
+(
+    'https://explore-serbia.rs/wp-content/uploads/2023/03/Crno-jezero-Durmitor.jpg',
+    'Durmitor',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
+    NOW()),
+(
+    'https://nparkovi.me/educational_corner/durmitor/images/npark-durmitor-01.jpg',
+    'Durmitor',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
+    NOW()),
+(
+    'https://www.funtravelnis.rs/wp-content/uploads/2017/11/durmitor-2.jpg',
+    'Durmitor',
+    false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
     NOW()),
 (
@@ -609,16 +639,99 @@ VALUES
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sveti Stefan'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/4/4b/PodgoricaOverview.jpg',
+    'https://i.ytimg.com/vi/GqaIdM-zQcc/maxresdefault.jpg',
+    'Sveti Stefan',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sveti Stefan'),
+    NOW()),
+(
+    'https://i0.wp.com/sarajevotimes.com/wp-content/uploads/2025/06/IMG_4573.jpeg?fit=670%2C446&ssl=1',
+    'Sveti Stefan',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sveti Stefan'),
+    NOW()),
+(
+    'https://thetwirlingtraveler.nl/wp-content/uploads/2023/08/IMG_1174.jpg',
+    'Sveti Stefan',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sveti Stefan'),
+    NOW()),
+(
+    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/328531171.jpg?k=deadf8ac55f804730deed83810ba03bf3bae80ce63d4ba5132bbaea59e55bbd4&o=',
+    'Sveti Stefan',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sveti Stefan'),
+    NOW()),
+(
+    'https://img.freepik.com/premium-photo/sveti-stefan-island-near-budva-montenegro-luxury-resort-with-beautiful-beach-adriatic-sea-famous-travel-destination_545689-5403.jpg',
+    'Sveti Stefan',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sveti Stefan'),
+    NOW()),
+(
+    'https://www.pelago.com/img/collections/podgorica/0614-0301_podgorica-large.jpg',
     'Podgorica',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
-    NOW()
-),
+    NOW()),
+(
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqTPvjpUP6lwFTZ6ncPwS33xZWGDuKo8UN6w&s',
+    'Podgorica',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/4/4b/PodgoricaOverview.jpg',
+    'Podgorica',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
+    NOW()),
+(
+    'https://d37rmf1ynyg9aw.cloudfront.net/fit-in/1280x1280/data/v4/resources/images/736413d4-55f2-4775-bbc9-0db59d457858.jpg',
+    'Podgorica',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
+    NOW()),
+(
+    'hhttps://images.trvl-media.com/place/10048/00b6d9ee-0ab8-44e6-8080-8e12858437b4.jpg',
+    'Podgorica',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
+    NOW()),
+(
+    'https://cdn.airmontenegro.com/public/media/library/2026/01/20260116_141458_flight-belgrade-podgorica.webp',
+    'Podgorica',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
+    NOW()),
 (
     'https://idsb.tmgrup.com.tr/ly/uploads/images/2023/04/03/265755.jpg',
     'Herceg Novi',
     true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
+    NOW()),
+(
+    'https://hercegnovi.travel/images/app/stari-grad.jpg',
+    'Herceg Novi',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
+    NOW()),
+(
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRu9l8gWkFoJXuTFICuqvCXqLSqTI19OeTQrg&s',
+    'Herceg Novi',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
+    NOW()),
+(
+    'https://b2cservice.kontiki.rs/media/images/location/0/595/534',
+    'Herceg Novi',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
+    NOW()),
+(
+    'https://novaontheroad.com/wp-content/uploads/2024/09/things-to-do-in-herceg-novi10.png',
+    'Herceg Novi',
+    false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
     NOW()),
 (
@@ -628,9 +741,57 @@ VALUES
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
     NOW()),
 (
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4peM4e7ivXjmLQe1x1PGXrnVapOK5k9ixWw&s',
+    'Bar',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
+    NOW()),
+(
+    'https://bar.me/wp-content/uploads/geografski-polozaj.jpg',
+    'Bar',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
+    NOW()),
+(
+    'https://www.olympic.rs/wp-content/uploads/Bar-1.jpg',
+    'Bar',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
+    NOW()),
+(
+    'https://www.visit-montenegro.com/wp-content/uploads/2026/01/Depositphotos_668449212_XL-scaled.jpg',
+    'Bar',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
+    NOW()),
+(
+    'https://www.travelland.rs/wp-content/uploads/Bar-CG.jpg',
+    'Bar',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
+    NOW()),
+(
     'https://ulcinj.travel/wp-content/uploads/2024/02/47.jpg',
     'Ulcinj',
     true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
+    NOW()),
+(
+    'https://tvsensor.com/wp-content/uploads/2025/05/ulcinj-castle-during-1024x633-1.jpg',
+    'Ulcinj',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
+    NOW()),
+(
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_P5n_UZEjenN5H9UYadcGrsjSLVnJACoylQ&s',
+    'Ulcinj',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
+    NOW()),
+(
+    'https://gte-gcms.images.tshiftcdn.com/AI0DIWHkBQZyx6oBkSd3hz/resize=width:2048,fit:max/dd3OMz6gRqiIyc6u5M9v?crop=1.91%3A1&fit=crop&width=1200',
+    'Ulcinj',
+    false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
     NOW()),
 (
@@ -640,9 +801,51 @@ VALUES
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/d/d3/Nikšić.jpg',
+    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/11/91/02/43/caption.jpg?w=1200&h=700&s=1',
+    'Cetinje',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
+    NOW()),
+(
+    'https://komunalnocetinje.me/files/slideshow/1677505382-slide1-min.JPG',
+    'Cetinje',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
+    NOW()),
+(
+    'https://s3.eu-central-1.amazonaws.com/web.repository/gradska-static/static-images/06_cetinje/cetinje_hero_1920x1080.jpg    p',
+    'Cetinje',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
+    NOW()),
+(
+    'https://rtnk.me/wp-content/uploads/2023/11/Niksic-foto-Milan-Sapuric-22-3.jpg',
     'Niksic',
     true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/d/d3/Nikšić.jpg',
+    'Niksic',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+    NOW()),
+(
+    'https://rtnk.me/wp-content/uploads/2025/08/niksic-rtnk.jpg',
+    'Niksic',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+    NOW()),
+(
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWVeb5mWVFUHrP0NE5AEUvRAJATkTuTocOqA&s',
+    'Niksic',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+    NOW()),
+(
+    'https://diplomacyandcommerce.me/wp-content/uploads/2025/12/Diplomacy-and-Commerce-Montenegro-niksic-2030-capital-of-culture.jpeg',
+    'Niksic',
+    false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
     NOW()),
 (
@@ -650,10 +853,51 @@ VALUES
     'Tivat',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
+    NOW()),
+(
+    'https://mymagicearth.com/wp-content/uploads/2020/12/Post-Image_Tivat-the-Town-with-a-Modern-Porto-Montenegro-scaled.jpg',
+    'Tivat',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
+    NOW()),
+(
+    'https://www.visit-montenegro.com/wp-content/uploads/2026/01/tivat-aerial-scaled.jpg',
+    'Tivat',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
+    NOW()),
+(
+    'https://www.b92.net/data/images/2024-05-04/23696_shutterstock-1248509359_f.jpg',
+    'Tivat',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
+    NOW()),
+(
+    'https://www.montenegro.travel/imagine_cache/900x900/uploads/1_MICE/tivat.jpg',
+    'Tivat',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
+    NOW()),
+(
+    'https://tosamja.media/wp-content/uploads/2024/08/tivat-luka-porto-montenegro.jpg',
+    'Tivat',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
+    NOW()),
+(
+    'https://montenegrovillas.com/storage/app/uploads/public/635/658/ea1/635658ea10bce141065334.webp',
+    'Tivat',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
     NOW());
 
+
 -- ============================================
--- 11. INDEXES
+-- 10. IMAGES - EVENTS
+-- ============================================
+
+-- ============================================
+-- INDEXES
 -- ============================================
 
 CREATE INDEX IF NOT EXISTS idx_localities_geo ON "Localities" USING gist("Geolocation");
@@ -705,7 +949,7 @@ CREATE INDEX IF NOT EXISTS idx_favorites_route ON "Favorites"("RouteId") WHERE "
 CREATE INDEX IF NOT EXISTS idx_images_main ON "Images"("IsMain") WHERE "IsMain" = true;
 
 -- ============================================
--- 11. TRIGGERS
+-- TRIGGERS
 -- ============================================
 
 CREATE OR REPLACE FUNCTION update_object_rating()
