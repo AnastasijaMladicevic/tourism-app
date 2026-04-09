@@ -25,6 +25,8 @@ namespace TuristickiVodic.Services
             var localities = await _context.Localities
                 .Include(l => l.Destination)
                 .Include(l => l.LocalityType)
+                .Include(l => l.Images)
+                .Where(l => l.Images.Any(i => i.IsMain))
                 .OrderBy(l => l.Id)
                 .ToListAsync();
 

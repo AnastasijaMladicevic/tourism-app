@@ -6,14 +6,29 @@ import { environment } from '../../environment/environment';
 export interface EventDto {
   id: number;
   name: string;
-  eventTypeName?: string | null;
+  description?: string;
+  longitude?: number;
+  latitude?: number;
   startDate: string;
-  endDate?: string | null;
-  price?: number | null;
-  maxVisitors?: number | null;
+  endDate: string;
+  price?: number;
+  maxVisitors?: number;
   isActive: boolean;
-  localityName?: string | null;
-  destinationName?: string | null;
+  status: string;
+  eventTypeId: number;
+  eventTypeName: string;
+  localityName?: string;
+  destinationName?: string;
+  objectId?: number;
+  objectName?: string;
+  images?: EventImageDto[];
+}
+
+export interface EventImageDto {
+  id: number;
+  url: string;
+  altText?: string;
+  isMain: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -22,6 +37,11 @@ export class EventService {
 
   constructor(private http: HttpClient) {}
 
+  getById(id: number): Observable<EventDto> {
+    return this.http.get<EventDto>(`${this.url}/${id}`);
+  }
+
+  // za listu festivala kasnije
   getAll(): Observable<EventDto[]> {
     return this.http.get<EventDto[]>(this.url);
   }

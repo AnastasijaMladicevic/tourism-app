@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.AspNetCore.Http;
 
 namespace TuristickiVodic.Tests.Helpers
 {
@@ -21,6 +22,13 @@ namespace TuristickiVodic.Tests.Helpers
 
             var identity = new ClaimsIdentity(claims, "TestAuthentication");
             return new ClaimsPrincipal(identity);
+        }
+
+        public static HttpContext CreateHttpContextWithUser(int userId, string role = "Tourist")
+        {
+            var context = new DefaultHttpContext();
+            context.User = CreateUser(userId, role);
+            return context;
         }
     }
 }

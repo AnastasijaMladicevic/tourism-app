@@ -1,461 +1,424 @@
-﻿using Xunit;
+using AutoMapper;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using AutoMapper;
-using TuristickiVodic.Services.Services;
-using TuristickiVodic.Infrastructure.Data;
 using TuristickiVodic.Core.DTO;
-using TuristickiVodic.Services.Mappings;
 using TuristickiVodic.Core.Models;
+using TuristickiVodic.Infrastructure.Data;
+using TuristickiVodic.Services.Mappings;
+using TuristickiVodic.Services.Services;
+using Xunit;
 
 namespace TuristickiVodic.Tests.Services
 {
     public class ImageServiceTests
     {
-        private readonly AppDbContext _context;
-        private readonly ImageService _service;
-
-        public ImageServiceTests()
-        {
-            var options = new DbContextOptionsBuilder<AppDbContext>()
+        private static AppDbContext CreateContext() =>
+            new AppDbContext(new DbContextOptionsBuilder<AppDbContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
-                .Options;
+                .Options);
 
-            _context = new AppDbContext(options);
+        private static IMapper CreateMapper() =>
+            new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>())
+                .CreateMapper();
 
-            var mapperConfig = new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>());
-            var mapper = mapperConfig.CreateMapper();
-
-            _service = new ImageService(_context, mapper);
-        }
-
-        private async Task AddObjectAsync(int id = 1)
+        private static TouristObject SeedObject(AppDbContext ctx, int id = 1, int createdByUserId = 5)
         {
-            _context.Objects.Add(new TouristObject
+            var obj = new TouristObject
             {
                 Id = id,
-                Name = $"Objekat{id}"
-            });
-
-            await _context.SaveChangesAsync();
+                Name = $"Objekat{id}",
+                CreatedByUserId = createdByUserId,
+                ObjectTypeId = 1,
+                LocalityId = 1
+            };
+            ctx.Objects.Add(obj);
+            ctx.SaveChanges();
+            return obj;
         }
 
-        [Fact]
-        public async Task GetAllAsync_VracaSveSlikeSortiranePoId()
+        private static Activity SeedActivity(AppDbContext ctx, int id = 1, int createdByUserId = 5)
         {
-            _context.Images.Add(new Image { Id = 2, Url = "2.jpg", ObjectId = 2, IsMain = false });
-            _context.Images.Add(new Image { Id = 1, Url = "1.jpg", ObjectId = 1, IsMain = true });
-            await _context.SaveChangesAsync();
+            var act = new Activity
+            {
+                Id = id,
+                Name = $"Aktivnost{id}",
+                CreatedByUserId = createdByUserId,
+                ActivityTypeId = 1
+            };
+            ctx.Activities.Add(act);
+            ctx.SaveChanges();
+            return act;
+        }
 
-            var result = (await _service.GetAllAsync()).ToList();
+        private static Event SeedEvent(AppDbContext ctx, int id = 1, int createdByUserId = 5)
+        {
+            var ev = new Event
+            {
+                Id = id,
+                Name = $"Event{id}",
+                CreatedByUserId = createdByUserId,
+                EventTypeId = 1,
+                StartDate = DateTime.UtcNow.AddDays(1)
+            };
+            ctx.Events.Add(ev);
+            ctx.SaveChanges();
+            return ev;
+        }
 
-            result.Should().HaveCount(2);
-            result[0].Id.Should().Be(1);
-            result[1].Id.Should().Be(2);
+        private static Destination SeedDestination(AppDbContext ctx, int id = 1, int? managedByUserId = null)
+        {
+            var dest = new Destination
+            {
+                Id = id,
+                Name = $"Destinacija{id}",
+                DestinationTypeId = 1,
+                CreatedByUserId = 1,
+                ManagedByUserId = managedByUserId
+            };
+            ctx.Destinations.Add(dest);
+            ctx.SaveChanges();
+            return dest;
+        }
+
+        private static Locality SeedLocality(AppDbContext ctx, int id = 1, int destinationId = 1)
+        {
+            var loc = new Locality
+            {
+                Id = id,
+                Name = $"Lokalitet{id}",
+                DestinationId = destinationId,
+                LocalityTypeId = 1
+            };
+            ctx.Localities.Add(loc);
+            ctx.SaveChanges();
+            return loc;
+        }
+
+        private static Image SeedImage(AppDbContext ctx, bool isMain,
+            int? objectId = null, int? activityId = null, int? eventId = null,
+            int? destinationId = null, int? localityId = null)
+        {
+            var img = new Image
+            {
+                Url = $"https://img/{Guid.NewGuid()}.jpg",
+                IsMain = isMain,
+                ObjectId = objectId,
+                ActivityId = activityId,
+                EventId = eventId,
+                DestinationId = destinationId,
+                LocalityId = localityId,
+                CreatedAt = DateTime.UtcNow
+            };
+            ctx.Images.Add(img);
+            ctx.SaveChanges();
+            return img;
         }
 
         [Fact]
         public async Task GetByIdAsync_KadSlikaPostoji_VracaDto()
         {
-            var image = new Image
-            {
-                Url = "test.jpg",
-                AltText = "opis",
-                IsMain = true,
-                ObjectId = 1
-            };
+            using var ctx = CreateContext();
+            var img = SeedImage(ctx, isMain: true, objectId: 1);
+            var svc = new ImageService(ctx, CreateMapper());
 
-            _context.Images.Add(image);
-            await _context.SaveChangesAsync();
-
-            var result = await _service.GetByIdAsync(image.Id);
+            var result = await svc.GetByIdAsync(img.Id);
 
             result.Should().NotBeNull();
-            result!.Url.Should().Be("test.jpg");
-            result.AltText.Should().Be("opis");
+            result!.Url.Should().Be(img.Url);
             result.IsMain.Should().BeTrue();
         }
 
         [Fact]
-        public async Task GetByIdAsync_KadSlikaNePostoji_VracaNull()
+        public async Task AddToObjectAsync_PrvaSlika_IsMainTrue_Uspeh()
         {
-            var result = await _service.GetByIdAsync(999);
+            using var ctx = CreateContext();
+            SeedObject(ctx, createdByUserId: 5);
+            var svc = new ImageService(ctx, CreateMapper());
 
-            result.Should().BeNull();
-        }
+            var result = await svc.AddToObjectAsync(1, new AddImageDto { Url = "a.jpg", IsMain = true }, 5, "ContentCreator");
 
-        [Fact]
-        public async Task CreateAsync_PrvaSlikaKojaJeMain_DodajeSliku()
-        {
-            await AddObjectAsync(1);
-
-            var dto = new CreateImageDto
-            {
-                Url = "test.jpg",
-                AltText = "opis",
-                IsMain = true,
-                ObjectId = 1
-            };
-
-            var result = await _service.CreateAsync(dto);
-
-            result.Should().NotBeNull();
             result.IsMain.Should().BeTrue();
             result.ObjectId.Should().Be(1);
-            _context.Images.Should().HaveCount(1);
         }
 
         [Fact]
-        public async Task CreateAsync_PrvaSlikaKojaNijeMain_BacaGresku()
+        public async Task AddToObjectAsync_TudjiObjekat_BacaUnauthorized()
         {
-            await AddObjectAsync(1);
+            using var ctx = CreateContext();
+            SeedObject(ctx, createdByUserId: 99);
+            var svc = new ImageService(ctx, CreateMapper());
 
-            var dto = new CreateImageDto
-            {
-                Url = "test.jpg",
-                IsMain = false,
-                ObjectId = 1
-            };
-
-            var action = async () => await _service.CreateAsync(dto);
-
-            await action.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*First image for an entity must be main*");
+            await svc.Invoking(s => s.AddToObjectAsync(1, new AddImageDto { Url = "a.jpg", IsMain = true }, 5, "ContentCreator"))
+                .Should().ThrowAsync<UnauthorizedAccessException>();
         }
 
         [Fact]
-        public async Task CreateAsync_DrugaMainSlikaZaIstiEntitet_BacaGresku()
+        public async Task AddToActivityAsync_TudjaAktivnost_BacaUnauthorized()
         {
-            await AddObjectAsync(1);
+            using var ctx = CreateContext();
+            SeedActivity(ctx, createdByUserId: 99);
+            var svc = new ImageService(ctx, CreateMapper());
 
-            _context.Images.Add(new Image
-            {
-                Url = "1.jpg",
-                IsMain = true,
-                ObjectId = 1
-            });
-            await _context.SaveChangesAsync();
-
-            var dto = new CreateImageDto
-            {
-                Url = "2.jpg",
-                IsMain = true,
-                ObjectId = 1
-            };
-
-            var action = async () => await _service.CreateAsync(dto);
-
-            await action.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*Only one main image allowed per entity*");
+            await svc.Invoking(s => s.AddToActivityAsync(1, new AddImageDto { Url = "a.jpg", IsMain = true }, 5, "ContentCreator"))
+                .Should().ThrowAsync<UnauthorizedAccessException>();
         }
 
         [Fact]
-        public async Task CreateAsync_DrugaSlikaKojaNijeMain_JeDozvoljena()
+        public async Task AddToEventAsync_TudjiEvent_BacaUnauthorized()
         {
-            await AddObjectAsync(1);
+            using var ctx = CreateContext();
+            SeedEvent(ctx, createdByUserId: 99);
+            var svc = new ImageService(ctx, CreateMapper());
 
-            _context.Images.Add(new Image
-            {
-                Url = "1.jpg",
-                IsMain = true,
-                ObjectId = 1
-            });
-            await _context.SaveChangesAsync();
+            await svc.Invoking(s => s.AddToEventAsync(1, new AddImageDto { Url = "a.jpg", IsMain = true }, 5, "ContentCreator"))
+                .Should().ThrowAsync<UnauthorizedAccessException>();
+        }
 
-            var dto = new CreateImageDto
-            {
-                Url = "2.jpg",
-                IsMain = false,
-                ObjectId = 1
-            };
+        [Fact]
+        public async Task AddToDestinationAsync_NijeAdmin_BacaUnauthorized()
+        {
+            using var ctx = CreateContext();
+            SeedDestination(ctx);
+            var svc = new ImageService(ctx, CreateMapper());
 
-            var result = await _service.CreateAsync(dto);
+            await svc.Invoking(s => s.AddToDestinationAsync(1, new AddImageDto { Url = "a.jpg", IsMain = true }, 5, "Manager"))
+                .Should().ThrowAsync<UnauthorizedAccessException>();
+        }
+
+        [Fact]
+        public async Task AddToLocalityAsync_OdgovorniManager_Uspeh()
+        {
+            using var ctx = CreateContext();
+            SeedDestination(ctx, managedByUserId: 10);
+            SeedLocality(ctx, destinationId: 1);
+            var svc = new ImageService(ctx, CreateMapper());
+
+            var result = await svc.AddToLocalityAsync(1, new AddImageDto { Url = "a.jpg", IsMain = true }, 10, "Manager");
+
+            result.LocalityId.Should().Be(1);
+            result.IsMain.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task AddToLocalityAsync_ManagerVanSvojeDestinacije_BacaUnauthorized()
+        {
+            using var ctx = CreateContext();
+            SeedDestination(ctx, managedByUserId: 99);
+            SeedLocality(ctx, destinationId: 1);
+            var svc = new ImageService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.AddToLocalityAsync(1, new AddImageDto { Url = "a.jpg", IsMain = true }, 10, "Manager"))
+                .Should().ThrowAsync<UnauthorizedAccessException>();
+        }
+
+        [Fact]
+        public async Task AddToObjectAsync_PrvaSlika_IsMainFalse_BacaGresku()
+        {
+            using var ctx = CreateContext();
+            SeedObject(ctx, createdByUserId: 5);
+            var svc = new ImageService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.AddToObjectAsync(1, new AddImageDto { Url = "a.jpg", IsMain = false }, 5, "ContentCreator"))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*First image*must be*main*");
+        }
+
+        [Fact]
+        public async Task AddToDestinationAsync_DrugaMainSlika_BacaGresku()
+        {
+            using var ctx = CreateContext();
+            SeedDestination(ctx);
+            SeedImage(ctx, isMain: true, destinationId: 1);
+            var svc = new ImageService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.AddToDestinationAsync(1, new AddImageDto { Url = "b.jpg", IsMain = true }, 1, "Admin"))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*already has a main image*");
+        }
+
+        [Fact]
+        public async Task GetForDestinationAsync_NepostojecaDestinacija_BacaKeyNotFoundException()
+        {
+            using var ctx = CreateContext();
+            var svc = new ImageService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.GetForDestinationAsync(999))
+                .Should().ThrowAsync<KeyNotFoundException>();
+        }
+
+        [Fact]
+        public async Task GetMainForLocalityAsync_NepostojeciLokalitet_BacaKeyNotFoundException()
+        {
+            using var ctx = CreateContext();
+            var svc = new ImageService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.GetMainForLocalityAsync(999))
+                .Should().ThrowAsync<KeyNotFoundException>();
+        }
+
+        [Fact]
+        public async Task UpdateAsync_PokusajPremestanjaNaDrugiEntitet_BacaInvalidOperationException()
+        {
+            using var ctx = CreateContext();
+            SeedObject(ctx, id: 1, createdByUserId: 5);
+            SeedEvent(ctx, id: 1, createdByUserId: 5);
+            var img = SeedImage(ctx, isMain: true, objectId: 1);
+            var svc = new ImageService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.UpdateAsync(img.Id, new UpdateImageDto { EventId = 1 }, 5, "ContentCreator"))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*cannot be moved*");
+        }
+
+        [Fact]
+        public async Task UpdateAsync_TudjaSlikaObjekta_BacaUnauthorized()
+        {
+            using var ctx = CreateContext();
+            SeedObject(ctx, id: 1, createdByUserId: 99);
+            var img = SeedImage(ctx, isMain: true, objectId: 1);
+            var svc = new ImageService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.UpdateAsync(img.Id, new UpdateImageDto { Url = "x.jpg" }, 5, "ContentCreator"))
+                .Should().ThrowAsync<UnauthorizedAccessException>();
+        }
+
+        [Fact]
+        public async Task UpdateAsync_MainNeMozeDaPostaneFalseAkoNePostojiDrugaMain()
+        {
+            using var ctx = CreateContext();
+            SeedObject(ctx, id: 1, createdByUserId: 5);
+            var img = SeedImage(ctx, isMain: true, objectId: 1);
+            var svc = new ImageService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.UpdateAsync(img.Id, new UpdateImageDto { IsMain = false }, 5, "ContentCreator"))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*must always have exactly one main image*");
+        }
+
+        [Fact]
+        public async Task UpdateAsync_DrugaSlikaPostajeMain_BacaAkoVecPostojiMain()
+        {
+            using var ctx = CreateContext();
+            SeedObject(ctx, id: 1, createdByUserId: 5);
+            SeedImage(ctx, isMain: true, objectId: 1);
+            var img2 = SeedImage(ctx, isMain: false, objectId: 1);
+            var svc = new ImageService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.UpdateAsync(img2.Id, new UpdateImageDto { IsMain = true }, 5, "ContentCreator"))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*Only one main image allowed*");
+        }
+
+        [Fact]
+        public async Task DeleteAsync_JedinaMainSlika_BacaGresku()
+        {
+            using var ctx = CreateContext();
+            SeedObject(ctx, id: 1, createdByUserId: 5);
+            var img = SeedImage(ctx, isMain: true, objectId: 1);
+            var svc = new ImageService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.DeleteAsync(img.Id, 5, "ContentCreator"))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*must always have a main image*");
+        }
+
+        [Fact]
+        public async Task DeleteAsync_TudjaSlika_BacaUnauthorized()
+        {
+            using var ctx = CreateContext();
+            SeedObject(ctx, id: 1, createdByUserId: 99);
+            var img = SeedImage(ctx, isMain: true, objectId: 1);
+            var svc = new ImageService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.DeleteAsync(img.Id, 5, "ContentCreator"))
+                .Should().ThrowAsync<UnauthorizedAccessException>();
+        }
+
+        [Fact]
+        public async Task GetForObjectAsync_VracaSamoSlikeObjektaIMainJePrva()
+        {
+            using var ctx = CreateContext();
+            SeedObject(ctx, id: 1, createdByUserId: 5);
+            SeedObject(ctx, id: 2, createdByUserId: 5);
+            SeedImage(ctx, isMain: false, objectId: 1);
+            SeedImage(ctx, isMain: true, objectId: 1);
+            SeedImage(ctx, isMain: true, objectId: 2);
+            var svc = new ImageService(ctx, CreateMapper());
+
+            var result = (await svc.GetForObjectAsync(1)).ToList();
+
+            result.Should().HaveCount(2);
+            result.First().IsMain.Should().BeTrue();
+            result.All(x => x.ObjectId == 1).Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task GetMainForEventAsync_KadaPostoji_VracaMain()
+        {
+            using var ctx = CreateContext();
+            SeedEvent(ctx, id: 1, createdByUserId: 5);
+            SeedImage(ctx, isMain: false, eventId: 1);
+            var main = SeedImage(ctx, isMain: true, eventId: 1);
+            var svc = new ImageService(ctx, CreateMapper());
+
+            var result = await svc.GetMainForEventAsync(1);
 
             result.Should().NotBeNull();
-            result.IsMain.Should().BeFalse();
-            _context.Images.Should().HaveCount(2);
+            result!.Id.Should().Be(main.Id);
+            result.IsMain.Should().BeTrue();
         }
 
         [Fact]
-        public async Task CreateAsync_BezRelacije_BacaGresku()
+        public async Task SetMainImageAsync_DrugaSlikaPostajeMain_Uspeh()
         {
-            var dto = new CreateImageDto
-            {
-                Url = "test.jpg",
-                IsMain = true
-            };
+            using var ctx = CreateContext();
+            SeedObject(ctx, id: 1, createdByUserId: 5);
 
-            var action = async () => await _service.CreateAsync(dto);
+            var oldMain = SeedImage(ctx, isMain: true, objectId: 1);
+            var newMain = SeedImage(ctx, isMain: false, objectId: 1);
 
-            await action.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*exactly one entity*");
+            var svc = new ImageService(ctx, CreateMapper());
+
+            var result = await svc.SetMainImageAsync(newMain.Id, 5, "ContentCreator");
+
+            result.IsMain.Should().BeTrue();
+
+            var images = ctx.Images.Where(i => i.ObjectId == 1).OrderBy(i => i.Id).ToList();
+            images.Single(i => i.Id == oldMain.Id).IsMain.Should().BeFalse();
+            images.Single(i => i.Id == newMain.Id).IsMain.Should().BeTrue();
         }
 
         [Fact]
-        public async Task CreateAsync_ViseRelacija_BacaGresku()
+        public async Task SetMainImageAsync_TudjaSlika_BacaUnauthorized()
         {
-            var dto = new CreateImageDto
-            {
-                Url = "test.jpg",
-                IsMain = true,
-                ObjectId = 1,
-                ActivityId = 1
-            };
+            using var ctx = CreateContext();
+            SeedObject(ctx, id: 1, createdByUserId: 99);
 
-            var action = async () => await _service.CreateAsync(dto);
+            var main = SeedImage(ctx, isMain: true, objectId: 1);
+            var other = SeedImage(ctx, isMain: false, objectId: 1);
 
-            await action.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*exactly one entity*");
+            var svc = new ImageService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.SetMainImageAsync(other.Id, 5, "ContentCreator"))
+                .Should().ThrowAsync<UnauthorizedAccessException>();
         }
 
         [Fact]
-        public async Task CreateAsync_KadReferenciraniObjectNePostoji_BacaGresku()
+        public async Task SetMainImageAsync_KadJeVecMain_VracaIstogBezPromene()
         {
-            var dto = new CreateImageDto
-            {
-                Url = "test.jpg",
-                IsMain = true,
-                ObjectId = 999
-            };
+            using var ctx = CreateContext();
+            SeedObject(ctx, id: 1, createdByUserId: 5);
 
-            var action = async () => await _service.CreateAsync(dto);
+            var main = SeedImage(ctx, isMain: true, objectId: 1);
+            SeedImage(ctx, isMain: false, objectId: 1);
 
-            await action.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*Object with id 999 not found*");
-        }
+            var svc = new ImageService(ctx, CreateMapper());
 
-        [Fact]
-        public async Task UpdateAsync_KadSlikaNePostoji_VracaNull()
-        {
-            var dto = new UpdateImageDto
-            {
-                Url = "updated.jpg"
-            };
+            var result = await svc.SetMainImageAsync(main.Id, 5, "ContentCreator");
 
-            var result = await _service.UpdateAsync(999, dto);
-
-            result.Should().BeNull();
-        }
-
-        [Fact]
-        public async Task UpdateAsync_MenjaUrlIAltText()
-        {
-            _context.Images.Add(new Image
-            {
-                Id = 1,
-                Url = "old.jpg",
-                AltText = "staro",
-                IsMain = true,
-                ObjectId = 1
-            });
-            await _context.SaveChangesAsync();
-
-            var dto = new UpdateImageDto
-            {
-                Url = "new.jpg",
-                AltText = "novo"
-            };
-
-            var result = await _service.UpdateAsync(1, dto);
-
-            result.Should().NotBeNull();
-            result!.Url.Should().Be("new.jpg");
-            result.AltText.Should().Be("novo");
-
-            var imageInDb = await _context.Images.FindAsync(1);
-            imageInDb!.Url.Should().Be("new.jpg");
-            imageInDb.AltText.Should().Be("novo");
-        }
-
-        [Fact]
-        public async Task UpdateAsync_PrazanUrl_NeMenjaPostojeciUrl()
-        {
-            _context.Images.Add(new Image
-            {
-                Id = 1,
-                Url = "old.jpg",
-                IsMain = true,
-                ObjectId = 1
-            });
-            await _context.SaveChangesAsync();
-
-            var dto = new UpdateImageDto
-            {
-                Url = "   "
-            };
-
-            var result = await _service.UpdateAsync(1, dto);
-
-            result.Should().NotBeNull();
-            result!.Url.Should().Be("old.jpg");
-        }
-
-        [Fact]
-        public async Task UpdateAsync_JedinaMainNeMozePostatiFalse()
-        {
-            _context.Images.Add(new Image
-            {
-                Id = 1,
-                Url = "1.jpg",
-                IsMain = true,
-                ObjectId = 1
-            });
-            await _context.SaveChangesAsync();
-
-            var dto = new UpdateImageDto
-            {
-                IsMain = false
-            };
-
-            var action = async () => await _service.UpdateAsync(1, dto);
-
-            await action.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*exactly one main image*");
-        }
-
-        [Fact]
-        public async Task UpdateAsync_NonMainMozePostatiMainAkoNemaDrugeMainZaNoviEntitet()
-        {
-            _context.Images.Add(new Image
-            {
-                Id = 1,
-                Url = "1.jpg",
-                IsMain = true,
-                ObjectId = 1
-            });
-
-            _context.Images.Add(new Image
-            {
-                Id = 2,
-                Url = "2.jpg",
-                IsMain = false,
-                ObjectId = 1
-            });
-
-            await _context.SaveChangesAsync();
-
-            var dto = new UpdateImageDto
-            {
-                IsMain = true
-            };
-
-            var action = async () => await _service.UpdateAsync(2, dto);
-
-            await action.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*Only one main image allowed per entity*");
-        }
-
-        [Fact]
-        public async Task UpdateAsync_PromenaRelacije_PostavljaTacnoJedanEntitet()
-        {
-            _context.Images.Add(new Image
-            {
-                Id = 1,
-                Url = "test.jpg",
-                IsMain = true,
-                ObjectId = 1
-            });
-
-            _context.Destinations.Add(new Destination
-            {
-                Id = 5,
-                Name = "Destinacija5"
-            });
-
-            await _context.SaveChangesAsync();
-
-            var dto = new UpdateImageDto
-            {
-                DestinationId = 5,
-                IsMain = true
-            };
-
-            var result = await _service.UpdateAsync(1, dto);
-
-            result.Should().NotBeNull();
-            result!.ObjectId.Should().BeNull();
-            result.DestinationId.Should().Be(5);
-
-            var imageInDb = await _context.Images.FindAsync(1);
-            imageInDb!.ObjectId.Should().BeNull();
-            imageInDb.DestinationId.Should().Be(5);
-        }
-
-        [Fact]
-        public async Task UpdateAsync_ViseNovihRelacija_BacaGresku()
-        {
-            _context.Images.Add(new Image
-            {
-                Id = 1,
-                Url = "test.jpg",
-                IsMain = true,
-                ObjectId = 1
-            });
-            await _context.SaveChangesAsync();
-
-            var dto = new UpdateImageDto
-            {
-                ActivityId = 1,
-                EventId = 1
-            };
-
-            var action = async () => await _service.UpdateAsync(1, dto);
-
-            await action.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*only be re-linked to one entity at a time*");
-        }
-
-        [Fact]
-        public async Task DeleteAsync_KadSlikaPostojiIVanilaJeJedina_VracaTrue()
-        {
-            _context.Images.Add(new Image
-            {
-                Id = 1,
-                Url = "test.jpg",
-                IsMain = true,
-                ObjectId = 1
-            });
-            await _context.SaveChangesAsync();
-
-            var result = await _service.DeleteAsync(1);
-
-            result.Should().BeTrue();
-            _context.Images.Should().BeEmpty();
-        }
-
-        [Fact]
-        public async Task DeleteAsync_NeDozvoljavaBrisanjeJedinogMainAkoPostojeDrugeSlike()
-        {
-            _context.Images.Add(new Image
-            {
-                Id = 1,
-                Url = "main.jpg",
-                IsMain = true,
-                ObjectId = 1
-            });
-
-            _context.Images.Add(new Image
-            {
-                Id = 2,
-                Url = "other.jpg",
-                IsMain = false,
-                ObjectId = 1
-            });
-
-            await _context.SaveChangesAsync();
-
-            var action = async () => await _service.DeleteAsync(1);
-
-            await action.Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*exactly one main image*");
-        }
-
-        [Fact]
-        public async Task DeleteAsync_KadSlikaNePostoji_VracaFalse()
-        {
-            var result = await _service.DeleteAsync(999);
-
-            result.Should().BeFalse();
+            result.Id.Should().Be(main.Id);
+            result.IsMain.Should().BeTrue();
+            ctx.Images.Count(i => i.ObjectId == 1 && i.IsMain).Should().Be(1);
         }
     }
 }
