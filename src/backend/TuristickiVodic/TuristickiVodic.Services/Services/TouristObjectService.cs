@@ -25,6 +25,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(o => o.ObjectType)
                 .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
+                .Where(o => _context.Images.Any(i => i.ObjectId == o.Id && i.IsMain))
                 .OrderBy(o => o.Id)
                 .ToListAsync();
 
@@ -34,7 +35,14 @@ namespace TuristickiVodic.Services.Services
         public async Task<TouristObjectDto?> GetByIdAsync(int id)
         {
             var obj = await LoadObjectAsync(id);
-            return obj == null ? null : MapToDto(obj);
+            if (obj == null)
+                return null;
+
+            var hasMainImage = await _context.Images.AnyAsync(i => i.ObjectId == obj.Id && i.IsMain);
+            if (!hasMainImage)
+                return null;
+
+            return MapToDto(obj);
         }
 
         // Samo CC može da kreira objekte; status uvek Pending, čeka odobrenje
@@ -233,5 +241,7 @@ namespace TuristickiVodic.Services.Services
             if (!longitude.HasValue || !latitude.HasValue) return null;
             return new Point(longitude.Value, latitude.Value) { SRID = 4326 };
         }
+
+
     }
 }
