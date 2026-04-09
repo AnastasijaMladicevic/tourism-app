@@ -48,7 +48,7 @@ export interface UpdateDestinationDto {
 @Injectable({ providedIn: 'root' })
 export class DestinationService {
 
-  private url = `${environment.apiUrl}/destinations`;
+  private url = `${environment.apiUrl}/Destinations`;
 
   constructor(private http: HttpClient) {}
 

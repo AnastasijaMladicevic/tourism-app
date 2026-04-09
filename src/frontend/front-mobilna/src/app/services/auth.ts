@@ -8,6 +8,13 @@ export interface LoginDto {
   password: string;
 }
 
+export interface ChangePasswordDto {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+
 export interface CreateUserDto {
   firstName: string;
   lastName: string;
@@ -83,6 +90,10 @@ export class AuthService {
         localStorage.setItem('refreshToken', res.refreshToken);
       })
     );
+  }
+  
+  changePassword(userId: number, dto: ChangePasswordDto): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.url}/${userId}/change-password`, dto);
   }
 
   getToken(): string | null {
