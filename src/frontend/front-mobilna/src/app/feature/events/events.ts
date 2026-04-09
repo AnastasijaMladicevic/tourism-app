@@ -7,6 +7,7 @@ import { catchError, finalize, forkJoin, of } from 'rxjs';
 import { environment } from '../../../environment/environment';
 import { EventDto, EventService } from '../../services/event';
 import { ImageDto, ImageService } from '../../services/image';
+import { Router } from '@angular/router';
 
 type EventCategory = 'All' | string;
 
@@ -35,6 +36,7 @@ export class EventsComponent implements OnInit {
   private readonly ngZone = inject(NgZone);
   private readonly eventService = inject(EventService);
   private readonly imageService = inject(ImageService);
+  private readonly router = inject(Router);
 
   activeCategory: EventCategory = 'All';
   isLoading = true;
@@ -118,41 +120,47 @@ export class EventsComponent implements OnInit {
     this.location.back();
   }
 
+  openEvent(id: number): void {
+    this.router.navigate(['/event', id]);
+  }
+
   imageStyle(imageUrl?: string): string | null {
     return imageUrl ? `url(${imageUrl})` : null;
   }
 
   private loadEvents(): void {
-    this.isLoading = true;
+  this.isLoading = true;
 
-    forkJoin({
-      events: this.eventService.getAll().pipe(catchError(() => of([] as unknown[]))),
-      images: this.imageService.getAll().pipe(catchError(() => of([] as unknown[]))),
-    })
-      .pipe(
-        finalize(() => {
-          this.isLoading = false;
-          this.flushUi();
-        }),
-      )
-      .subscribe({
-        next: ({ events, images }) => {
-          try {
-            const eventList = this.toArray<EventDto>(events).map((event) =>
-              this.normalizeEvent(event),
-            );
-            const imageList = this.toArray<ImageDto>(images);
-            const imageMap = this.pickMainImageMap(imageList, 'eventId');
+  this.eventService.getAll().subscribe({
+    next: async (events) => {
+      try {
+        const eventList = this.toArray<EventDto>(events).map((event) =>
+          this.normalizeEvent(event),
+        );
 
-            const active = eventList
-              .filter((event) => event.id > 0 && event.isActive !== false)
-              .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+        const active = eventList
+          .filter((event) => event.id > 0 && event.isActive !== false)
+          .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
 
-            const now = new Date();
-            const futureOnly = active.filter((event) => new Date(event.startDate) >= now);
-            const source = futureOnly.length ? futureOnly : active;
+        const now = new Date();
+        const futureOnly = active.filter((event) => new Date(event.startDate) >= now);
+        const source = futureOnly.length ? futureOnly : active;
 
-            this.events = source.map((event) => ({
+        this.events = await Promise.all(
+          source.map(async (event) => {
+            let imageUrl: string | undefined = undefined;
+
+            try {
+              const images = await this.imageService.getForEvent(event.id).toPromise();
+              if (images && images.length > 0) {
+                const main = images.find((i) => i.isMain) ?? images[0];
+                imageUrl = this.resolveMediaUrl(main.url);
+              }
+            } catch {
+              imageUrl = undefined;
+            }
+
+            return {
               id: event.id,
               title: event.name,
               category: this.normalizeCategory(event.eventTypeName),
@@ -160,22 +168,27 @@ export class EventsComponent implements OnInit {
               timeText: this.formatTimeRange(event.startDate, event.endDate),
               location: event.localityName ?? event.destinationName ?? 'Montenegro',
               priceText: this.formatPrice(event.price),
-              imageUrl: imageMap.get(event.id),
+              imageUrl,
               attendeesText: event.maxVisitors
                 ? `Max ${event.maxVisitors} visitors`
                 : 'No attendee data',
-            }));
-          } catch {
-            this.events = [];
-          }
-          this.flushUi();
-        },
-        error: () => {
-          this.events = [];
-          this.flushUi();
-        },
-      });
-  }
+            };
+          })
+        );
+      } catch {
+        this.events = [];
+      }
+
+      this.isLoading = false;
+      this.flushUi();
+    },
+    error: () => {
+      this.events = [];
+      this.isLoading = false;
+      this.flushUi();
+    },
+  });
+}
 
   private normalizeEvent(raw: EventDto): {
     id: number;
