@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
@@ -118,8 +119,6 @@ namespace TuristickiVodic.Services.Services
             return ev == null ? null : _mapper.Map<EventDto>(ev);
         }
 
-        // ContentCreator kreira event sa statusom Pending (čeka odobrenje menadžera)
-        // Samo ContentCreator kreira event sa statusom Pending (čeka odobrenje menadžera)
         public async Task<EventDto> CreateAsync(CreateEventDto dto, int userId, string roleName)
         {
             await ValidateReferences(dto.EventTypeId, dto.LocalityId, dto.DestinationId, dto.ObjectId);
@@ -130,7 +129,6 @@ namespace TuristickiVodic.Services.Services
             if (dto.EndDate.HasValue && dto.EndDate.Value < dto.StartDate)
                 throw new InvalidOperationException("End date cannot be before start date.");
 
-            // Ako je naveden LocalityId, DestinationId mora biti isti kao destinacija lokacije
             if (dto.LocalityId.HasValue)
             {
                 var locality = await _context.Localities
@@ -140,7 +138,6 @@ namespace TuristickiVodic.Services.Services
                 if (dto.DestinationId.HasValue && dto.DestinationId.Value != locality.DestinationId)
                     throw new InvalidOperationException("Locality does not belong to the specified destination.");
 
-                // Automatski postavi DestinationId sa lokacije ako nije naveden
                 if (!dto.DestinationId.HasValue)
                     dto.DestinationId = locality.DestinationId;
             }
@@ -160,7 +157,6 @@ namespace TuristickiVodic.Services.Services
                 DestinationId = dto.DestinationId,
                 ObjectId = dto.ObjectId,
                 CreatedByUserId = userId,
-                // ContentCreator uvek kreira event sa statusom Pending
                 Status = ContentStatus.Pending,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -172,14 +168,9 @@ namespace TuristickiVodic.Services.Services
             return _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
         }
 
-        // Samo ContentCreator može da menja sadržaj eventa, i to samo svoj
         public async Task<EventDto?> UpdateAsync(int id, UpdateEventDto dto, int userId, string roleName)
         {
             var ev = await _context.Events
-                .Include(e => e.EventType)
-                .Include(e => e.Locality)
-                .Include(e => e.Destination)
-                .Include(e => e.Object)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             if (ev == null)
@@ -198,23 +189,27 @@ namespace TuristickiVodic.Services.Services
                 ev.EventTypeId = dto.EventTypeId.Value;
             }
 
-            // Validacija lokalitet/destinacija konzistentnosti
-            int? newLocalityId = dto.LocalityId ?? ev.LocalityId;
-            int? newDestinationId = dto.DestinationId ?? ev.DestinationId;
-
-            if (newLocalityId.HasValue)
+            if (dto.LocalityId.HasValue)
             {
-                var locality = await _context.Localities.FindAsync(newLocalityId.Value);
-                if (locality == null) throw new InvalidOperationException("Locality not found.");
+                var locality = await _context.Localities
+                    .FirstOrDefaultAsync(x => x.Id == dto.LocalityId.Value);
 
-                if (newDestinationId.HasValue && newDestinationId.Value != locality.DestinationId)
+                if (locality == null)
+                    throw new InvalidOperationException("Locality not found.");
+
+                if (dto.DestinationId.HasValue && dto.DestinationId.Value != locality.DestinationId)
                     throw new InvalidOperationException("Locality does not belong to the specified destination.");
 
-                newDestinationId = locality.DestinationId;
+                ev.LocalityId = dto.LocalityId.Value;
+                ev.DestinationId = locality.DestinationId;
             }
 
-            ev.LocalityId = newLocalityId;
-            ev.DestinationId = newDestinationId;
+            if (dto.DestinationId.HasValue && !dto.LocalityId.HasValue)
+            {
+                var exists = await _context.Destinations.AnyAsync(x => x.Id == dto.DestinationId.Value);
+                if (!exists) throw new InvalidOperationException("Destination not found.");
+                ev.DestinationId = dto.DestinationId.Value;
+            }
 
             if (dto.ObjectId.HasValue)
             {
@@ -244,10 +239,6 @@ namespace TuristickiVodic.Services.Services
             return _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
         }
 
-        // Proverava ko je odgovoran menadžer za ovu destinaciju.
-        // Ako destinacija ima svog menadžera – samo on može da odobri.
-        // Ako je ostala bez menadžera (izuzetna situacija) – odgovornost preuzima
-        // menadžer geografski najbliže destinacije, NE admin.
         public async Task<EventDto?> ApproveAsync(int id, ApproveContentDto dto, int userId, string roleName)
         {
             var ev = await _context.Events
@@ -266,6 +257,7 @@ namespace TuristickiVodic.Services.Services
             {
                 var isResponsible = destination != null &&
                     await DestinationManagerHelper.IsResponsibleManagerAsync(_context, destination, userId);
+
                 if (!isResponsible)
                     throw new UnauthorizedAccessException("You are not the responsible manager for this destination.");
             }
@@ -278,6 +270,12 @@ namespace TuristickiVodic.Services.Services
                 throw new UnauthorizedAccessException("Only the responsible manager can approve events.");
             }
 
+            var hasMainImage = await _context.Images
+                .AnyAsync(i => i.EventId == ev.Id && i.IsMain);
+
+            if (!hasMainImage)
+                throw new InvalidOperationException("Event must have a main image before approval.");
+
             ev.Status = dto.Approve ? ContentStatus.Approved : ContentStatus.Rejected;
             ev.RejectionReason = dto.Approve ? null : dto.RejectionReason;
             ev.ApprovedByUserId = userId;
@@ -289,7 +287,6 @@ namespace TuristickiVodic.Services.Services
             return _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
         }
 
-        // Samo ContentCreator može direktno da obriše event koji nije Approved
         public async Task<bool> DeleteAsync(int id, int userId, string roleName)
         {
             var ev = await _context.Events

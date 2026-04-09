@@ -277,6 +277,15 @@ namespace TuristickiVodic.Tests.Services
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             });
+
+            ctx.Images.Add(new Image
+            {
+                ObjectId = 1,
+                Url = "main.jpg",
+                IsMain = true,
+                CreatedAt = DateTime.UtcNow
+            });
+
             ctx.SaveChanges();
 
             var svc = new TouristObjectService(ctx, CreateMapper());
@@ -286,6 +295,7 @@ namespace TuristickiVodic.Tests.Services
                 Approve = true
             }, manager.Id, "Manager");
 
+            result.Should().NotBeNull();
             result!.Status.Should().Be("Approved");
         }
 
@@ -293,7 +303,7 @@ namespace TuristickiVodic.Tests.Services
         public async Task ApproveAsync_Manager_NeMozeVanSvojeDestinacije()
         {
             using var ctx = CreateInMemoryContext(nameof(ApproveAsync_Manager_NeMozeVanSvojeDestinacije));
-            var (_, _, _, objectType, _, locality, creator, _, manager, admin) = SeedBase(ctx);
+            var (_, _, _, objectType, _, _, creator, _, manager, admin) = SeedBase(ctx);
 
             var otherDestinationType = ctx.DestinationTypes.First();
             var localityType = ctx.LocalityTypes.First();
@@ -340,6 +350,15 @@ namespace TuristickiVodic.Tests.Services
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             });
+
+            ctx.Images.Add(new Image
+            {
+                ObjectId = 1,
+                Url = "main.jpg",
+                IsMain = true,
+                CreatedAt = DateTime.UtcNow
+            });
+
             ctx.SaveChanges();
 
             var svc = new TouristObjectService(ctx, CreateMapper());
@@ -370,6 +389,15 @@ namespace TuristickiVodic.Tests.Services
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             });
+
+            ctx.Images.Add(new Image
+            {
+                ObjectId = 1,
+                Url = "main.jpg",
+                IsMain = true,
+                CreatedAt = DateTime.UtcNow
+            });
+
             ctx.SaveChanges();
 
             var svc = new TouristObjectService(ctx, CreateMapper());
@@ -380,6 +408,76 @@ namespace TuristickiVodic.Tests.Services
             }, admin.Id, "Admin"))
                 .Should().ThrowAsync<UnauthorizedAccessException>()
                 .WithMessage("*Admins do not directly approve tourist objects*");
+        }
+
+        [Fact]
+        public async Task ApproveAsync_ObjekatBezMainSlike_BacaGresku()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ApproveAsync_ObjekatBezMainSlike_BacaGresku));
+            var (_, _, _, objectType, destination, locality, creator, _, manager, _) = SeedBase(ctx);
+
+            ctx.Objects.Add(new TouristObject
+            {
+                Id = 1,
+                Name = "Objekat bez slike",
+                ObjectTypeId = objectType.Id,
+                LocalityId = locality.Id,
+                DestinationId = destination.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Pending,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+            ctx.SaveChanges();
+
+            var svc = new TouristObjectService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.ApproveAsync(1, new ApproveContentDto
+            {
+                Approve = true
+            }, manager.Id, "Manager"))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*main image*");
+        }
+
+        [Fact]
+        public async Task ApproveAsync_ObjekatSaMainSlikom_Uspeh()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ApproveAsync_ObjekatSaMainSlikom_Uspeh));
+            var (_, _, _, objectType, destination, locality, creator, _, manager, _) = SeedBase(ctx);
+
+            ctx.Objects.Add(new TouristObject
+            {
+                Id = 1,
+                Name = "Objekat sa slikom",
+                ObjectTypeId = objectType.Id,
+                LocalityId = locality.Id,
+                DestinationId = destination.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Pending,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+
+            ctx.Images.Add(new Image
+            {
+                ObjectId = 1,
+                Url = "main.jpg",
+                IsMain = true,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            ctx.SaveChanges();
+
+            var svc = new TouristObjectService(ctx, CreateMapper());
+
+            var result = await svc.ApproveAsync(1, new ApproveContentDto
+            {
+                Approve = true
+            }, manager.Id, "Manager");
+
+            result.Should().NotBeNull();
+            result!.Status.Should().Be("Approved");
         }
 
         [Fact]

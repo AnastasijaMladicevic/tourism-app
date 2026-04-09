@@ -217,6 +217,11 @@ namespace TuristickiVodic.Services.Services
 
             if (activity == null)
                 return null;
+            var hasMainImage = await _context.Images
+                .AnyAsync(i => i.ActivityId == activity.Id && i.IsMain);
+
+            if (!hasMainImage)
+                throw new InvalidOperationException("Activity must have a main image before approval.");
 
             if (activity.Status != ContentStatus.Pending)
                 throw new InvalidOperationException("Only pending activities can be approved or rejected.");

@@ -4,6 +4,7 @@ using NetTopologySuite.Geometries;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TuristickiVodic.Services.Services
 {
@@ -119,6 +120,12 @@ namespace TuristickiVodic.Services.Services
         {
             var obj = await LoadObjectAsync(id);
             if (obj == null) return null;
+
+            var hasMainImage = await _context.Images
+                .AnyAsync(i => i.ObjectId == obj.Id && i.IsMain);
+
+            if (!hasMainImage)
+                throw new InvalidOperationException("Object must have a main image before approval.");
 
             if (obj.Status != ContentStatus.Pending)
                 throw new InvalidOperationException("Only pending objects can be approved or rejected.");

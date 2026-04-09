@@ -206,9 +206,47 @@ namespace TuristickiVodic.Tests.Services
             var (_, manager, _, tip) = SeedBase(ctx);
             var mgr = CreateManager(60, "mgr5@test.com", manager);
             ctx.Users.Add(mgr);
-            ctx.Destinations.AddRange(
-                new Destination { Name = "D1", DestinationTypeId = tip.Id, DestinationType = tip, CreatedByUserId = 99, Status = ContentStatus.Approved },
-                new Destination { Name = "D2", DestinationTypeId = tip.Id, DestinationType = tip, CreatedByUserId = 99, Status = ContentStatus.Approved }
+
+            var d1 = new Destination
+            {
+                Id = 1,
+                Name = "D1",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                ManagedByUserId = mgr.Id,
+                CreatedByUserId = 99,
+                Status = ContentStatus.Approved
+            };
+
+            var d2 = new Destination
+            {
+                Id = 2,
+                Name = "D2",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                ManagedByUserId = mgr.Id,
+                CreatedByUserId = 99,
+                Status = ContentStatus.Approved
+            };
+
+            ctx.Destinations.AddRange(d1, d2);
+            ctx.SaveChanges();
+
+            ctx.Images.AddRange(
+                new Image
+                {
+                    Id = 1,
+                    DestinationId = 1,
+                    Url = "d1-main.jpg",
+                    IsMain = true
+                },
+                new Image
+                {
+                    Id = 2,
+                    DestinationId = 2,
+                    Url = "d2-main.jpg",
+                    IsMain = true
+                }
             );
             ctx.SaveChanges();
 
