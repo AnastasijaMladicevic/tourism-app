@@ -1,5 +1,9 @@
 import {
-  Component, OnInit, ViewEncapsulation, HostListener, ChangeDetectorRef
+  Component,
+  OnInit,
+  ViewEncapsulation,
+  HostListener,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,7 +23,6 @@ import { AuthService } from '../../services/auth';
   encapsulation: ViewEncapsulation.None,
 })
 export class ObjectsComponent implements OnInit {
-
   searchQuery = '';
   activeFilter = 'All';
   minRatingFilter = 0;
@@ -29,7 +32,7 @@ export class ObjectsComponent implements OnInit {
   errorMessage = '';
 
   pageTitle = 'Places';
-  hideTypeFilters = false;           // ← novo: sakrivamo filtere kad je specifičan tip
+  hideTypeFilters = false; // ← novo: sakrivamo filtere kad je specifičan tip
 
   objectTypes: { id: number; name: string }[] = [];
   objects: ObjectView[] = [];
@@ -39,18 +42,18 @@ export class ObjectsComponent implements OnInit {
     private route: ActivatedRoute,
     private objectService: ObjectService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
-    this.route.data.subscribe(routeData => {
+    this.route.data.subscribe((routeData) => {
       const type = routeData['type'] as string | null;
       const title = routeData['title'] as string;
 
       if (type) {
         this.activeFilter = type;
         this.pageTitle = title;
-        this.hideTypeFilters = true;        // sakrij type filtere
+        this.hideTypeFilters = true; // sakrij type filtere
       } else {
         this.pageTitle = 'Places';
         this.hideTypeFilters = false;
@@ -66,10 +69,10 @@ export class ObjectsComponent implements OnInit {
 
     this.objectService.getAll().subscribe({
       next: (data) => {
-        this.objects = data.map(o => ({
+        this.objects = data.map((o) => ({
           ...o,
           isFavorite: false,
-          favoriteId: undefined
+          favoriteId: undefined,
         }));
 
         this.objectTypes = this.extractUniqueTypes(data);
@@ -81,14 +84,15 @@ export class ObjectsComponent implements OnInit {
         this.isLoading = false;
         this.errorMessage = 'Failed to load places.';
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
   private extractUniqueTypes(data: ObjectDto[]): { id: number; name: string }[] {
     const map = new Map<string, { id: number; name: string }>();
-    data.forEach(o => {
-      if (o.objectTypeName) map.set(o.objectTypeName, { id: o.objectTypeId, name: o.objectTypeName });
+    data.forEach((o) => {
+      if (o.objectTypeName)
+        map.set(o.objectTypeName, { id: o.objectTypeId, name: o.objectTypeName });
     });
     return Array.from(map.values());
   }
@@ -102,28 +106,40 @@ export class ObjectsComponent implements OnInit {
     let list = [...this.objects];
 
     if (this.searchQuery.trim()) {
-      list = list.filter(o => o.name.toLowerCase().includes(this.searchQuery.toLowerCase()));
+      list = list.filter((o) => o.name.toLowerCase().includes(this.searchQuery.toLowerCase()));
     }
 
     if (this.activeFilter !== 'All') {
-      list = list.filter(o => o.objectTypeName === this.activeFilter);
+      list = list.filter((o) => o.objectTypeName === this.activeFilter);
     }
 
     if (this.minRatingFilter > 0) {
-      list = list.filter(o => (o.averageRating ?? 0) >= this.minRatingFilter);
+      list = list.filter((o) => (o.averageRating ?? 0) >= this.minRatingFilter);
     }
 
     switch (this.sortOption) {
-      case 'rating':   list.sort((a, b) => (b.averageRating ?? 0) - (a.averageRating ?? 0)); break;
-      case 'az':       list.sort((a, b) => a.name.localeCompare(b.name)); break;
-      case 'za':       list.sort((a, b) => b.name.localeCompare(a.name)); break;
-      case 'distance': list.sort((a, b) => (a.distanceKm ?? 0) - (b.distanceKm ?? 0)); break;
+      case 'rating':
+        list.sort((a, b) => (b.averageRating ?? 0) - (a.averageRating ?? 0));
+        break;
+      case 'az':
+        list.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'za':
+        list.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'distance':
+        list.sort((a, b) => (a.distanceKm ?? 0) - (b.distanceKm ?? 0));
+        break;
     }
     return list;
   }
 
-  setFilter(filter: string): void { this.activeFilter = filter; }
-  setMinRating(r: number): void { this.minRatingFilter = r; }
+  setFilter(filter: string): void {
+    this.activeFilter = filter;
+  }
+  setMinRating(r: number): void {
+    this.minRatingFilter = r;
+  }
 
   setSort(option: 'rating' | 'az' | 'za' | 'distance'): void {
     this.sortOption = option;
@@ -145,7 +161,7 @@ export class ObjectsComponent implements OnInit {
   }
 
   getMainImage(obj: ObjectView): string {
-    const img = obj.images?.find(i => i.isMain) ?? obj.images?.[0];
+    const img = obj.images?.find((i) => i.isMain) ?? obj.images?.[0];
     return img?.url ?? '';
   }
 
@@ -167,7 +183,7 @@ export class ObjectsComponent implements OnInit {
       const todayKey = dayNames[now.getDay()];
 
       let todayHours = hours[todayKey] || hours['pon'];
-      if (!todayHours || todayHours === "00:00-24:00") return true;
+      if (!todayHours || todayHours === '00:00-24:00') return true;
 
       const [openStr, closeStr] = todayHours.split('-');
       const current = now.getHours() * 60 + now.getMinutes();

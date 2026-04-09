@@ -33,7 +33,6 @@ export interface EventImageDto {
 
 @Injectable({ providedIn: 'root' })
 export class EventService {
-
   private url = `${environment.apiUrl}/events`;
 
   constructor(private http: HttpClient) {}

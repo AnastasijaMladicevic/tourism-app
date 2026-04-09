@@ -1,4 +1,3 @@
-
 .login-container {
   height: 100vh;
   display: flex;
@@ -14,8 +13,7 @@
   color: white;
   text-align: center;
   backdrop-filter: blur(10px);
-    border-radius: 20px;
-    
+  border-radius: 20px;
 }
 .logo {
   display: flex;
@@ -27,49 +25,52 @@
   flex-direction: column;
   gap: 15px;
 
-.input-group {
-  box-sizing: content-box;
-  display: flex;
-  align-items: center;
-  //box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  border: 1px solid #DDE0E4;
-  background: var(--athens-gray);
-  border-radius: 10px;
-  padding: 10px;
-  margin-bottom: 15px;
-  height: 30px;
-
-  input {
-    border: none;
-    outline: none;
-    flex: 1;
-    background: transparent;
-  }
-
-  .icon {
-    margin-right: 10px;
-    font-size: 20px;
-    color: gray;
-    font-family: 'Material Symbols Outlined';
-  }
-  .icon.eye{
+  .input-group {
+    box-sizing: content-box;
     display: flex;
     align-items: center;
-    justify-content: center;
-    color: #8a95a9;
-    font-family: 'Material Symbols Outlined';
-    font-size: 20px;
-    line-height: 1;
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    //box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    border: 1px solid #dde0e4;
+    background: var(--athens-gray);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 15px;
+    height: 30px;
+
+    input {
+      border: none;
+      outline: none;
+      flex: 1;
+      background: transparent;
+    }
+
+    .icon {
+      margin-right: 10px;
+      font-size: 20px;
+      color: gray;
+      font-family: 'Material Symbols Outlined';
+    }
+    .icon.eye {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #8a95a9;
+      font-family: 'Material Symbols Outlined';
+      font-size: 20px;
+      line-height: 1;
+      font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+    }
+    .eye {
+      border: none;
+      background: none;
+      padding: 0;
+      cursor: pointer;
+    }
   }
-  .eye {
-    
-  border: none;
-  background: none;
-  padding: 0;
-  cursor: pointer;
-}
-}
   button {
     padding: 14px;
     border-radius: 12px;
@@ -86,7 +87,7 @@
     height: 50px;
     border-radius: 20px;
   }
-  .login-btn[disabled]{
+  .login-btn[disabled] {
     background-color: var(--primary);
     color: white;
     opacity: 0.5;
@@ -98,7 +99,7 @@
 .footer span {
   cursor: pointer;
 }
-.terms{
+.terms {
   color: var(--primary);
   text-decoration: underline;
   font-weight: 500;
@@ -113,7 +114,6 @@
   margin-top: 60px;
   font-size: 11px;
   color: var(--emperor);
-
 }
 .signup,
 .forgot {
@@ -133,7 +133,7 @@
     font-weight: 500;
   }
 }
-.error span{
+.error span {
   color: var(--error);
   font-size: 12px;
 }

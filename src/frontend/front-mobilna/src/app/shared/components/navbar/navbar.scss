@@ -41,7 +41,9 @@
   color: var(--text-gray);
   cursor: pointer;
   text-align: left;
-  transition: background 0.2s, color 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 
   mat-icon {
     font-size: 20px;
@@ -102,7 +104,9 @@
     height: 22px;
   }
 
-  &:hover { color: var(--primary); }
+  &:hover {
+    color: var(--primary);
+  }
 }
 
 .bottom-nav__item--active {

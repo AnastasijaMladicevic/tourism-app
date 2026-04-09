@@ -118,13 +118,13 @@ import { forkJoin } from 'rxjs';
   encapsulation: ViewEncapsulation.None,
 })
 export class EventDetailComponent implements OnInit {
-
   event: EventDto | null = null;
   images: ImageDto[] = [];
   mainImage = '';
   isLoading = true;
   errorMessage = '';
   isFavorite = false;
+  pinEmoji = '\u{1F4CD}';
 
   constructor(
     private route: ActivatedRoute,
@@ -185,7 +185,7 @@ export class EventDetailComponent implements OnInit {
     return new Date(dateStr).toLocaleDateString('sr-RS', {
       day: 'numeric',
       month: 'long',
-      year: 'numeric'
+      year: 'numeric',
     });
   }
 

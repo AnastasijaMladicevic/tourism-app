@@ -8,11 +8,13 @@ export interface ImageDto {
   url: string;
   altText?: string;
   isMain: boolean;
-  eventId?: number;
+  destinationId?: number | null;
+  eventId?: number | null;
 }
 
 @Injectable({ providedIn: 'root' })
 export class ImageService {
+<<<<<<< src/frontend/front-mobilna/src/app/services/image.ts
 
   constructor(private http: HttpClient) {}
 
@@ -33,3 +35,13 @@ export class ImageService {
     return this.http.get<ImageDto>(`${environment.apiUrl}/destinations/${destinationId}/images/main`);
   }
 }
+=======
+  private apiUrl = `${environment.apiUrl}/images`;
+
+  constructor(private http: HttpClient) {}
+
+  getAll(): Observable<ImageDto[]> {
+    return this.http.get<ImageDto[]>(this.apiUrl);
+  }
+}
+>>>>>>> src/frontend/front-mobilna/src/app/services/image.ts

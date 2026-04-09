@@ -1,10 +1,10 @@
-h1{
+h1 {
   font-size: 32px;
 }
-.section{
+.section {
   margin-bottom: 40px;
 }
-button:hover{
+button:hover {
   transform: translateY(-2px);
 }
 .header {
@@ -47,7 +47,6 @@ button:hover{
   font-size: 90px;
   margin-bottom: -40px;
 
-
   img {
     width: 100%;
     height: 100%;
@@ -71,12 +70,12 @@ button:hover{
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.95);
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   color: var(--emperor);
   z-index: 10;
 }
@@ -98,7 +97,7 @@ button:hover{
   background: white;
   border-radius: 20px;
   padding: 24px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 .hero-card {
   grid-column: span 2;
@@ -140,11 +139,13 @@ button:hover{
   margin-bottom: 32px;
   width: 100%;
 }
-.location-info{
+.location-info {
   display: flex;
 }
 .location-section {
-  h2 { margin-bottom: 16px; }
+  h2 {
+    margin-bottom: 16px;
+  }
 }
 .location-grid {
   display: grid;
@@ -158,7 +159,7 @@ button:hover{
   position: relative;
 }
 .location-image::after {
-  content: "Hotel Vardar";
+  content: 'Hotel Vardar';
   color: var(--primary);
   position: absolute;
   bottom: 15px;
@@ -202,20 +203,20 @@ button:hover{
   text-align: center;
 }
 
-.btn-primary { 
-  background: var(--primary); 
-  color: white; 
-  border: none; 
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border: none;
   font-weight: 600;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.15);  
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
-.btn-outline { 
+.btn-outline {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--primary); 
-  color: var(--primary); 
-  background: transparent; 
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  background: transparent;
 }
 
 .section h2 {
@@ -347,7 +348,8 @@ button:hover{
   font-weight: 600;
   width: 100%;
 }
-.btn-map, .btn-reserve {
+.btn-map,
+.btn-reserve {
   width: 100%;
   margin-top: 8px;
   padding: 14px;
