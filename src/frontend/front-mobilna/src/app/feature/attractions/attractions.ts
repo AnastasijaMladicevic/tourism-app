@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { DestinationService, DestinationDto } from '../../services/destination';
 import { AuthService } from '../../services/auth';
+import { ImageService } from '../../services/image';
 
 export interface DestinationView extends DestinationDto {
   isFavorite: boolean;
@@ -43,6 +44,7 @@ export class AttractionsComponent implements OnInit {
     private destinationService: DestinationService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
+    private imageService: ImageService
   ) {}
 
   ngOnInit(): void {
@@ -51,24 +53,37 @@ export class AttractionsComponent implements OnInit {
 
   loadData(): void {
     this.isLoading = true;
-    this.errorMessage = '';
 
     this.destinationService.getAll().subscribe({
-      next: (destinations) => {
-        console.log('✅ Destinations loaded:', destinations.length, destinations);
+      next: async (destinations) => {
+        const destinationsWithImages = await Promise.all(
+          destinations.map(async (d) => {
+            try {
+              const images = await this.imageService.getForDestination(d.id).toPromise();
+              return {
+                ...d,
+                images: images || [],
+                isFavorite: false,
+                favoriteId: undefined
+              };
+            } catch {
+              return {
+                ...d,
+                images: [],
+                isFavorite: false,
+                favoriteId: undefined
+              };
+            }
+          })
+        );
 
-        this.destinations = destinations.map((d) => ({
-          ...d,
-          isFavorite: false,
-          favoriteId: undefined,
-        }));
-
+        this.destinations = destinationsWithImages;
         this.destinationTypes = this.extractUniqueTypes(this.destinations);
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('❌ Load destinations failed:', err);
+        console.error(err);
         this.isLoading = false;
         this.errorMessage = 'Failed to load attractions.';
         this.cdr.detectChanges();
@@ -141,10 +156,13 @@ export class AttractionsComponent implements OnInit {
   }
 
   getMainImage(destination: DestinationView): string {
-    const img = destination.images?.find((i) => i.isMain) ?? destination.images?.[0];
-    const url = img?.url ?? '';
+  if (destination.images && destination.images.length > 0) {
+    const main = destination.images.find(i => i.isMain);
+    const url = main?.url ?? destination.images[0].url;
     console.log(`Image for ${destination.name}:`, url);
     return url;
+  }
+    return '';
   }
 
   onImageError(event: Event): void {

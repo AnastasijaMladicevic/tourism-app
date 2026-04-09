@@ -421,9 +421,7 @@ Uz dinamičan program i opuštenu atmosferu, događaj pruža savršenu priliku z
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW()),
 
-('Planinarski susret', 'Planinarski susret na Durmitoru predstavlja idealnu priliku za sve ljubitelje prirode, pešačenja i boravka na svežem planinskom vazduhu. Događaj okuplja planinare, rekreativce i avanturiste koji žele da provedu dan u druženju, istraživanju prirodnih lepota i uživanju u spektakularnim pejzažima jednog od najlepših planinskih predela. Program je osmišljen tako da spoji aktivan odmor, rekreaciju i zajedničko uživanje u prirodi.
-
-Pored same šetnje i okupljanja, učesnici imaju priliku da upoznaju druge zaljubljenike u planinu i provedu vreme u prijatnoj i opuštenoj atmosferi. Ovaj događaj pruža savršen beg od svakodnevice i mogućnost da se doživi mir, lepota i autentičan duh Durmitora kroz aktivan i ispunjen dan u prirodi.',
+('Planinarski susret', 'Okupljanje planinara na Durmitoru',
  ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326), '2026-09-01 08:00', '2026-09-01 18:00', 5.00, 100, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Okupljanje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Zabljak'),
