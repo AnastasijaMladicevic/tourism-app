@@ -377,7 +377,9 @@ VALUES
 INSERT INTO "Events"
 ("Name", "Description", "Geolocation", "StartDate", "EndDate", "Price", "MaxVisitors", "IsActive", "Status", "EventTypeId", "LocalityId", "DestinationId", "ObjectId", "CreatedByUserId", "CreatedAt", "UpdatedAt")
 VALUES
-('KotorArt festival', 'Kulturni festival muzike i umetnosti',
+('KotorArt festival', 'KotorArt festival predstavlja jedinstven spoj muzike, umetnosti i kulturnog nasleđa u prelepom ambijentu Kotora. Tokom trajanja festivala, posetioci mogu uživati u raznovrsnom programu koji obuhvata koncerte, umetničke performanse i sadržaje inspirisane bogatom tradicijom ovog primorskog grada. Događaj okuplja ljubitelje kulture, domaće i strane goste, stvarajući živu i inspirativnu atmosferu.
+
+Poseban doživljaj pruža spoj savremene umetnosti i istorijskog okruženja, gde svaka večer donosi novo iskustvo i priliku za uživanje u kreativnom izrazu. Festival je idealan za sve koji žele da leto provedu u znaku kulture, dobrog raspoloženja i nezaboravnih trenutaka u jednom od najlepših gradova na Jadranu.',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), '2026-07-15 20:00', '2026-07-30 23:00', 20.00, 1000, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kotor'),
@@ -386,7 +388,9 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW()),
 
-('Vece klasicne muzike', 'Koncert u starom gradu Kotora',
+('Vece klasicne muzike', 'U čarobnoj atmosferi starog grada Kotora, ovo veče klasične muzike nudi jedinstven spoj umetnosti i istorije. Program obuhvata pažljivo odabrane kompozicije koje izvode talentovani muzičari, stvarajući intimnu i sofisticiranu atmosferu. Idealno za sve ljubitelje kulture, muzike i romantičnih večeri pod otvorenim nebom.
+
+Autentični ambijent kamenih trgova i osvetljenih uličica dodatno pojačava doživljaj, pretvarajući svaki ton u posebno emotivno iskustvo. Posetioci će imati priliku da se prepuste zvucima klasične muzike dok uživaju u jedinstvenom spoju tradicije i umetnosti. Ovaj događaj pruža savršenu priliku za opuštanje, inspiraciju i stvaranje nezaboravnih uspomena u jednom od najlepših primorskih gradova.',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), '2026-08-05 21:00', '2026-08-05 23:00', 15.00, 200, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Koncert'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kotor'),
@@ -395,7 +399,9 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW()),
 
-('Budva Summer Festival', 'Letnji festival na otvorenom',
+('Budva Summer Festival', 'Budva Summer Festival donosi energičan i raznovrstan letnji program namenjen svima koji žele da uživaju u muzici, zabavi i prijatnoj atmosferi na otvorenom. Festival okuplja veliki broj posetilaca i nudi sadržaje koji spajaju savremenu zabavu sa prepoznatljivim mediteranskim duhom Budve. Tokom više festivalskih dana, grad postaje mesto susreta dobre muzike, opuštanja i letnjih uspomena.
+
+Uz atraktivan ambijent i bogat program, posetioci imaju priliku da provedu nezaboravne večeri u društvu prijatelja i porodice. Ovaj događaj je savršen izbor za sve koji žele da iskuse letnju energiju Budve, uživaju u kvalitetnom programu i provedu vreme u jednoj od najpoznatijih turističkih destinacija na crnogorskom primorju.',
  ST_SetSRID(ST_MakePoint(18.837, 42.279), 4326), '2026-07-01 19:00', '2026-07-10 23:00', 10.00, 1500, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Budva'),
@@ -404,7 +410,9 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW()),
 
-('DJ Night Mogren', 'Elektronska muzika na plazi Mogren',
+('DJ Night Mogren', 'DJ Night Mogren je večernji događaj namenjen ljubiteljima elektronske muzike, plesa i letnje atmosfere pored mora. Smešten u atraktivnom ambijentu plaže Mogren, ovaj događaj okuplja posetioce koji žele da uživaju u modernim ritmovima, dobroj energiji i nezaboravnom noćnom provodu. Spoj muzike, mora i letnje večeri stvara poseban ambijent koji privlači kako turiste tako i lokalne posetioce.
+
+Uz dinamičan program i opuštenu atmosferu, događaj pruža savršenu priliku za druženje, zabavu i uživanje u jedinstvenom noćnom iskustvu na obali. DJ Night Mogren je idealan za sve koji žele da dožive živopisnu letnju scenu Budve i provedu noć ispunjenu muzikom, plesom i odličnim raspoloženjem.',
  ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), '2026-08-10 22:00', '2026-08-11 03:00', 8.00, 500, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Nastup'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Budva'),
@@ -413,7 +421,9 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW()),
 
-('Planinarski susret', 'Okupljanje planinara na Durmitoru',
+('Planinarski susret', 'Planinarski susret na Durmitoru predstavlja idealnu priliku za sve ljubitelje prirode, pešačenja i boravka na svežem planinskom vazduhu. Događaj okuplja planinare, rekreativce i avanturiste koji žele da provedu dan u druženju, istraživanju prirodnih lepota i uživanju u spektakularnim pejzažima jednog od najlepših planinskih predela. Program je osmišljen tako da spoji aktivan odmor, rekreaciju i zajedničko uživanje u prirodi.
+
+Pored same šetnje i okupljanja, učesnici imaju priliku da upoznaju druge zaljubljenike u planinu i provedu vreme u prijatnoj i opuštenoj atmosferi. Ovaj događaj pruža savršen beg od svakodnevice i mogućnost da se doživi mir, lepota i autentičan duh Durmitora kroz aktivan i ispunjen dan u prirodi.',
  ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326), '2026-09-01 08:00', '2026-09-01 18:00', 5.00, 100, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Okupljanje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Zabljak'),
@@ -891,10 +901,129 @@ VALUES
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
     NOW());
 
-
 -- ============================================
 -- 10. IMAGES - EVENTS
 -- ============================================
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
+VALUES
+(
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBA0xI7-o4rZ9sVD3J8u7gNO3NExDx5tGDiw&s',
+    'Logo',
+    true,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'KotorArt festival'),
+    NOW()),
+(
+    'https://kotor.art/wp-content/uploads/2025/02/kotor-art-festival-002.jpg',
+    'Publika na KotorArt festivalu',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'KotorArt festival'),
+    NOW()),
+(
+    'https://www.montenegrofortravellers.com/sites/default/files/styles/monte1140x550/public/events/mezhdunarodnyy_festival_kotorart.jpg?itok=jy61u3fJ',
+    'Bina KotorArt festivala',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'KotorArt festival'),
+    NOW()),
+(
+    'https://kotor.art/wp-content/uploads/2025/02/kotor-art-festival-006-1024x681.jpg',
+    'Neki izvodjac na festivalu',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'KotorArt festival'),
+    NOW()),
+(
+    'https://sbkotorsistercity.com/wp-content/uploads/sites/106/2023/03/SBKotorApril.jpeg',
+    'KotorArt festival',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'KotorArt festival'),
+    NOW()),
+(
+    'https://www.radiodux.me/sites/default/files/2017/10-07-2017-gradska-muzika-kotor-priredila-gradu-velicanstvenu-noc/dsc0935resize.jpg',
+    'Vece klasicne muzike',
+    true,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Vece klasicne muzikel'),
+    NOW()),
+(
+    'https://radiokotor.info/files/images/1771230895-1771170853-IMG-a22537d6019981f93e0bc6c1e3e12e28-V.jpg',
+    'Poster',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Vece klasicne muzike'),
+    NOW()),
+(
+    'https://bokanews.me/wp-content/uploads/2025/12/Begovic_resize.jpg',
+    'Vece klasicne muzike izvodjac',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Vece klasicne muzike'),
+    NOW()),
+(
+    'https://www.wofafestivals.com/wp-content/uploads/2024/10/IMG_2885-scaled.webp',
+    'devojcica sa zastavom',
+    true,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Budva Summer Festival'),
+    NOW()),
+(
+    'https://eaff.eu/cache/images/festivals/998/1600x900c/998-2.jpg',
+    'Igra',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Budva Summer Festival'),
+    NOW()),
+(
+    'https://www.wofafestivals.com/wp-content/uploads/2024/10/IMG_2470-scaled.webp',
+    'Kolo',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Budva Summer Festival'),
+    NOW()),
+(
+    'https://i1.sndcdn.com/avatars-Ai7sk2G6lJfwqYux-Yo4y5A-t500x500.jpg',
+    'Poster',
+    true,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'DJ Night Mogren'),
+    NOW()),
+(
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEylQmHhAkQGi4ZNUGxMCLFn_QXr9HaqYTQg&s',
+    'DJ',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'DJ Night Mogren'),
+    NOW()),
+(
+    'https://img.freepik.com/free-photo/closeup-shot-dj-s-equipment-people-dancing-club_181624-58753.jpg?semt=ais_hybrid&w=740&q=80',
+    'NightClub',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'DJ Night Mogren'),
+    NOW()),
+(
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQt6JR4eLND81QXmtmlPO8ZTpkTdrVdg-i0Og&s',
+    'DJ Nigel',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'DJ Night Mogren'),
+    NOW()),
+(
+    'https://viaferratapiva.me/wp-content/uploads/2025/10/via-ferrata-durmitor-montenegro-hiking.webp',
+    'Okup',
+    true,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Planinarski susret'),
+    NOW()),
+(
+    'https://www.jankovac.hr/wp-content/grand-media/image/Durmitor_2018_005.jpg',
+    'Par',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Planinarski susret'),
+    NOW()),
+(
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4A95dHfmkuuRKJMl0755n-_t4GrVbpYo95A&s',
+    'Pesacenje',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Planinarski susret'),
+    NOW()),
+(
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTr0woQBFbTZNwJ8HJW22FvCNEMX_glAUpH4w&s',
+    'Grupna slika',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Planinarski susret'),
+    NOW()),
+
+
+
+
 
 -- ============================================
 -- INDEXES
