@@ -282,11 +282,20 @@
   color: var(--emperor);
   cursor: pointer;
   white-space: nowrap;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  transition: all 0.2s ease;
 
   &:hover {
     border-color: var(--primary);
     color: var(--primary);
+  }
+  &:active,
+  &:focus {
+    outline: none;
+  }
+  &--active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white !important;
   }
 }
 

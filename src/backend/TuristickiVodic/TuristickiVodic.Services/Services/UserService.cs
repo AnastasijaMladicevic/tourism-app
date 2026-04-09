@@ -51,22 +51,37 @@ namespace TuristickiVodic.Services
 
         public async Task<UserDto> CreateAsync(CreateUserDto createUserDto)
         {
+            return await CreateWithRoleAsync(createUserDto, RoleType.Tourist);
+        }
+
+        public async Task<UserDto> CreateManagerAsync(CreateUserDto createUserDto)
+        {
+            return await CreateWithRoleAsync(createUserDto, RoleType.Manager);
+        }
+
+        public async Task<UserDto> CreateAdminAsync(CreateUserDto createUserDto)
+        {
+            return await CreateWithRoleAsync(createUserDto, RoleType.Admin);
+        }
+
+        private async Task<UserDto> CreateWithRoleAsync(CreateUserDto createUserDto, RoleType roleType)
+        {
             var existingUser = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == createUserDto.Email);
 
             if (existingUser != null)
                 throw new InvalidOperationException("Email already exists");
 
-            var touristRole = await _context.Roles
-                .FirstOrDefaultAsync(r => r.Name == RoleType.Tourist);
+            var role = await _context.Roles
+                .FirstOrDefaultAsync(r => r.Name == roleType);
 
-            if (touristRole == null)
-                throw new InvalidOperationException("Tourist role not found");
+            if (role == null)
+                throw new InvalidOperationException($"{roleType} role not found");
 
             var user = _mapper.Map<User>(createUserDto);
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password);
-            user.RoleId = touristRole.Id;
-            user.Role = touristRole;
+            user.RoleId = role.Id;
+            user.Role = role;
             user.IsVerified = false;
             user.IsActive = true;
             user.IsBlacklisted = false;
@@ -178,7 +193,10 @@ namespace TuristickiVodic.Services
             if (!user.IsActive)
                 throw new InvalidOperationException("Account is deactivated");
 
-            return await IssueTokensAsync(user);
+            _context.RefreshTokens.Remove(storedRefreshToken);
+            await _context.SaveChangesAsync();
+
+            return await IssueTokensAsync(user, storedRefreshToken.RememberMe);
         }
 
         public async Task<bool> RequestCreatorRoleAsync(int userId, string creatorType)
@@ -257,31 +275,34 @@ namespace TuristickiVodic.Services
 
         private async Task<AuthResponseDto> IssueTokensAsync(User user, bool rememberMe = false)
         {
-            var accessToken = _tokenService.GenerateToken(user);
+            var token = _tokenService.GenerateToken(user);
             var refreshToken = _tokenService.GenerateRefreshToken();
+            var refreshTokenHash = HashRefreshToken(refreshToken);
 
-            var refreshTokenEntity = await _context.RefreshTokens
+            var existingRefreshToken = await _context.RefreshTokens
                 .FirstOrDefaultAsync(rt => rt.UserId == user.Id);
 
-            if (refreshTokenEntity == null)
+            if (existingRefreshToken != null)
             {
-                refreshTokenEntity = new RefreshToken
-                {
-                    UserId = user.Id
-                };
-
-                _context.RefreshTokens.Add(refreshTokenEntity);
+                _context.RefreshTokens.Remove(existingRefreshToken);
             }
 
-            refreshTokenEntity.RefreshTokenHash = HashRefreshToken(refreshToken);
-            refreshTokenEntity.RefreshTokenExpiry = rememberMe ? DateTime.UtcNow.AddDays(30) : DateTime.UtcNow.AddDays(7);
-            user.UpdatedAt = DateTime.UtcNow;
+            var newRefreshToken = new RefreshToken
+            {
+                UserId = user.Id,
+                RefreshTokenHash = refreshTokenHash,
+                RefreshTokenExpiry = rememberMe
+                    ? DateTime.UtcNow.AddDays(30)
+                    : DateTime.UtcNow.AddDays(7),
+                RememberMe = rememberMe
+            };
 
+            _context.RefreshTokens.Add(newRefreshToken);
             await _context.SaveChangesAsync();
 
             return new AuthResponseDto
             {
-                Token = accessToken,
+                Token = token,
                 RefreshToken = refreshToken,
                 User = _mapper.Map<UserDto>(user),
                 ExpiresAt = DateTime.UtcNow.AddMinutes(15)
@@ -349,6 +370,16 @@ namespace TuristickiVodic.Services
         {
             var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
             return Convert.ToBase64String(bytes);
+        }
+
+        public async Task<IEnumerable<CreatorRoleRequestDto>> GetCreatorRequestsAsync()
+        {
+            var users = await _context.Users
+                .Include(u => u.Role)
+                .Where(u => u.Role.Name == RoleType.Tourist && u.HasRequestedCreatorRole)
+                .ToListAsync();
+
+            return _mapper.Map<IEnumerable<CreatorRoleRequestDto>>(users);
         }
     }
 }

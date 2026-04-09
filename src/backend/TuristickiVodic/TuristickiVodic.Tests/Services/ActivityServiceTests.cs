@@ -493,5 +493,70 @@ namespace TuristickiVodic.Tests.Services
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*Submit a deletion request instead*");
         }
+
+        [Fact]
+        public async Task ApproveAsync_AktivnostBezMainSlike_BacaGresku()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ApproveAsync_AktivnostBezMainSlike_BacaGresku));
+            var (_, _, _, activityType, destination, _, locality, _, creator, _, manager, _, _) = SeedBase(ctx);
+
+            ctx.Activities.Add(new Activity
+            {
+                Id = 1,
+                Name = "Aktivnost",
+                ActivityTypeId = activityType.Id,
+                LocalityId = locality.Id,
+                DestinationId = destination.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Pending,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+            ctx.SaveChanges();
+
+            var svc = new ActivityService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.ApproveAsync(1, new ApproveContentDto { Approve = true }, manager.Id, "Manager"))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*main image*");
+        }
+
+        [Fact]
+        public async Task ApproveAsync_AktivnostSaMainSlikom_Uspeh()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ApproveAsync_AktivnostSaMainSlikom_Uspeh));
+            var (_, _, _, activityType, destination, _, locality, _, creator, _, manager, _, _) = SeedBase(ctx);
+
+            ctx.Activities.Add(new Activity
+            {
+                Id = 1,
+                Name = "Aktivnost",
+                ActivityTypeId = activityType.Id,
+                LocalityId = locality.Id,
+                DestinationId = destination.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Pending,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+
+            ctx.Images.Add(new Image
+            {
+                ActivityId = 1,
+                Url = "img.jpg",
+                IsMain = true
+            });
+
+            ctx.SaveChanges();
+
+            var svc = new ActivityService(ctx, CreateMapper());
+
+            var result = await svc.ApproveAsync(1, new ApproveContentDto { Approve = true }, manager.Id, "Manager");
+
+            result.Should().NotBeNull();
+            result!.Status.Should().Be("Approved");
+        }
+
+
     }
 }

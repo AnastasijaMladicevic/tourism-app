@@ -1,0 +1,201 @@
+<div class="screen">
+  <!-- Header -->
+  <div class="header">
+    <button class="icon-btn" (click)="goBack()" aria-label="Go back">
+      <mat-icon>arrow_back_ios</mat-icon>
+    </button>
+    <h1 class="header__title">{{ pageTitle }}</h1>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-row">
+    <div class="filters-right">
+      <div class="search-inline">
+        <mat-icon>search</mat-icon>
+        <input type="text" placeholder="Search..." [(ngModel)]="searchQuery" />
+      </div>
+
+      <div
+        class="sort-anchor sort-trigger"
+        (click)="$event.stopPropagation(); showSortMenu = !showSortMenu"
+      >
+        <span>{{ sortLabel() }}</span>
+        <mat-icon>expand_more</mat-icon>
+
+        @if (showSortMenu) {
+          <div class="sort-menu sort-anchor">
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'rating'"
+              (click)="setSort('rating')"
+            >
+              <mat-icon>star</mat-icon> Top Rated
+            </button>
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'distance'"
+              (click)="setSort('distance')"
+            >
+              <mat-icon>near_me</mat-icon> Nearest
+            </button>
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'az'"
+              (click)="setSort('az')"
+            >
+              <mat-icon>sort_by_alpha</mat-icon> A → Z
+            </button>
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'za'"
+              (click)="setSort('za')"
+            >
+              <mat-icon>sort_by_alpha</mat-icon> Z → A
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Type filters - sakrij ako je specifičan tip (Hotels, Restaurants...) -->
+    @if (!hideTypeFilters) {
+      <div class="filters-scroll">
+        <button
+          class="filter-btn"
+          [class.filter-btn--active]="activeFilter === 'All'"
+          (click)="setFilter('All')"
+        >
+          All
+        </button>
+        @for (type of objectTypes; track type.id) {
+          <button
+            class="filter-btn"
+            [class.filter-btn--active]="activeFilter === type.name"
+            (click)="setFilter(type.name)"
+          >
+            {{ type.name }}
+          </button>
+        }
+      </div>
+    }
+
+    <!-- Rating filters - uvek vidljivi -->
+    <div class="filters-scroll">
+      <button
+        class="filter-btn"
+        [class.filter-btn--active]="minRatingFilter === 0"
+        (click)="setMinRating(0)"
+      >
+        Any
+      </button>
+      <button
+        class="filter-btn"
+        [class.filter-btn--active]="minRatingFilter === 4"
+        (click)="setMinRating(4)"
+      >
+        4+
+      </button>
+      <button
+        class="filter-btn"
+        [class.filter-btn--active]="minRatingFilter === 4.5"
+        (click)="setMinRating(4.5)"
+      >
+        4.5+
+      </button>
+      <button
+        class="filter-btn"
+        [class.filter-btn--active]="minRatingFilter === 5"
+        (click)="setMinRating(5)"
+      >
+        5.0
+      </button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="results-bar">
+    <span class="results-bar__count">{{ filtered.length }} places found</span>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading">
+      <mat-icon>hourglass_empty</mat-icon>
+      <p>Loading...</p>
+    </div>
+  }
+  @if (errorMessage) {
+    <div class="error-state">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ errorMessage }}</p>
+      <button (click)="loadData()">Retry</button>
+    </div>
+  }
+
+  <!-- Grid -->
+  <div class="grid">
+    @for (obj of filtered; track obj.id) {
+      <div class="card">
+        <div class="card__image-wrap">
+          @if (getMainImage(obj)) {
+            <img
+              class="card__image"
+              [src]="getMainImage(obj)"
+              [alt]="obj.name"
+              (error)="onImageError($event)"
+            />
+          } @else {
+            <div class="card__image card__image--empty">
+              <mat-icon>landscape</mat-icon>
+            </div>
+          }
+
+          <!-- Open badge -->
+          @if (isOpenNow(obj)) {
+            <span class="card__open-badge">Open</span>
+          }
+
+          <span class="card__distance">
+            <mat-icon>radio_button_checked</mat-icon> {{ formatDistance(obj.distanceKm) }}
+          </span>
+
+          <button
+            class="card__fav"
+            [class.card__fav--active]="obj.isFavorite"
+            (click)="toggleFavorite(obj, $event)"
+          >
+            <mat-icon>{{ obj.isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
+          </button>
+        </div>
+
+        <div class="card__body">
+          <div class="card__title-row">
+            <h2 class="card__name">{{ obj.name }}</h2>
+            @if (obj.averageRating !== undefined && obj.averageRating > 0) {
+              <span class="card__rating">
+                <mat-icon>star</mat-icon>
+                {{ obj.averageRating.toFixed(1) }}
+                <small>({{ obj.reviewCount }})</small>
+              </span>
+            }
+          </div>
+
+          <p class="card__type"><mat-icon>place</mat-icon> {{ obj.objectTypeName }}</p>
+
+          <p class="card__desc">{{ obj.description }}</p>
+
+          <div class="card__footer">
+            <span></span>
+            <button class="card__details" (click)="viewDetails(obj)">VIEW DETAILS</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (filtered.length === 0 && !isLoading) {
+      <div class="empty">
+        <mat-icon>search_off</mat-icon>
+        <p>No places found.</p>
+      </div>
+    }
+  </div>
+</div>

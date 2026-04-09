@@ -1,0 +1,82 @@
+<div class="page">
+  <div class="card">
+
+    <!-- LOGO -->
+    <div class="logo">
+      <img src="assets/logo.png" alt="logo">
+    </div>
+
+    <div class="content">
+
+      <!-- LEVA STRANA (SLIKA) -->
+      <div class="left">
+        <div class="circle">
+          <img src="assets/pozadina.png" alt="illustration">
+        </div>
+      </div>
+
+      <!-- DESNA STRANA -->
+      <div class="right">
+        <h2>Log in</h2>
+        <p class="subtitle">
+          Enter your administrative credentials to access
+          the SpireGO control panel.
+        </p>
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <label>Email</label>
+          <div class="input">
+            <span class="icon">mail</span>
+            <input type="email" placeholder="email@spirego.com" formControlName="email">
+          </div>
+          @if (email?.touched && email?.invalid) {
+            <p class="field-error">Enter a valid email address.</p>
+          }
+
+          <label>Password</label>
+          <div class="input">
+            <span class="icon">lock</span>
+            <input [type]="showPassword ? 'text' : 'password'" placeholder="••••••••••••" formControlName="password">
+            <button
+              class="eye"
+              type="button"
+              (click)="togglePassword()"
+              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+            >
+              {{ showPassword ? 'visibility_off' : 'visibility' }}
+            </button>
+          </div>
+          @if (password?.touched && password?.invalid) {
+            <p class="field-error">Password is required.</p>
+          }
+
+          <div class="options">
+            <label class="remember">
+              <input type="checkbox" formControlName="rememberMe">
+              Keep me logged in for 30 days
+            </label>
+
+            <a href="#">Forgot?</a>
+          </div>
+
+          <button class="btn" type="submit" [disabled]="form.invalid || isLoading">
+            {{ isLoading ? 'Logging in...' : 'Log In' }}
+          </button>
+        </form>
+
+        @if (successMessage) {
+          <p class="success-message">{{ successMessage }}</p>
+        }
+
+        @if (errorMessage) {
+          <p class="field-error">{{ errorMessage }}</p>
+        }
+
+        <p class="signup">
+          Don't have an account? <a (click)="goToSignup()">Sign Up</a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>

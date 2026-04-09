@@ -115,6 +115,104 @@ namespace TuristickiVodic.Tests.Controllers
             result.Should().BeOfType<ForbidResult>();
         }
 
+        // ═══════════════════════════════════════════
+        //  POST /api/users/register-manager
+        //  Samo Admin može da registruje menadžera
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public async Task RegisterManager_KadaAdminKreira_VracaCreatedSaUlogomManager()
+        {
+            var mockService = new Mock<IUserService>();
+            var dto = new UserDto { Id = 30, FirstName = "Nikola", Email = "nikola@test.com", RoleName = "Manager" };
+            mockService.Setup(s => s.CreateManagerAsync(It.IsAny<CreateUserDto>())).ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            var result = await controller.RegisterManager(new CreateUserDto
+            {
+                FirstName = "Nikola",
+                LastName = "Jović",
+                Email = "nikola@test.com",
+                Password = "lozinka123",
+                DateOfBirth = new DateTime(1990, 3, 15)
+            });
+
+            var created = result.Should().BeOfType<CreatedAtActionResult>().Subject;
+            created.StatusCode.Should().Be(201);
+            ((UserDto)created.Value!).RoleName.Should().Be("Manager");
+        }
+
+        [Fact]
+        public async Task RegisterManager_KadaEmailVecPostoji_VracaBadRequest()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.CreateManagerAsync(It.IsAny<CreateUserDto>()))
+                .ThrowsAsync(new InvalidOperationException("Email already exists"));
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            var result = await controller.RegisterManager(new CreateUserDto
+            {
+                FirstName = "Nikola",
+                LastName = "Jović",
+                Email = "nikola@test.com",
+                Password = "lozinka123",
+                DateOfBirth = new DateTime(1990, 3, 15)
+            });
+
+            result.Should().BeOfType<BadRequestObjectResult>();
+        }
+
+        // ═══════════════════════════════════════════
+        //  POST /api/users/register-admin
+        //  Samo Admin može da registruje drugog admina
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public async Task RegisterAdmin_KadaAdminKreira_VracaCreatedSaUlogomAdmin()
+        {
+            var mockService = new Mock<IUserService>();
+            var dto = new UserDto { Id = 31, FirstName = "Jelena", Email = "jelena@test.com", RoleName = "Admin" };
+            mockService.Setup(s => s.CreateAdminAsync(It.IsAny<CreateUserDto>())).ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            var result = await controller.RegisterAdmin(new CreateUserDto
+            {
+                FirstName = "Jelena",
+                LastName = "Marić",
+                Email = "jelena@test.com",
+                Password = "lozinka123",
+                DateOfBirth = new DateTime(1985, 7, 20)
+            });
+
+            var created = result.Should().BeOfType<CreatedAtActionResult>().Subject;
+            created.StatusCode.Should().Be(201);
+            ((UserDto)created.Value!).RoleName.Should().Be("Admin");
+        }
+
+        [Fact]
+        public async Task RegisterAdmin_KadaEmailVecPostoji_VracaBadRequest()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.CreateAdminAsync(It.IsAny<CreateUserDto>()))
+                .ThrowsAsync(new InvalidOperationException("Email already exists"));
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            var result = await controller.RegisterAdmin(new CreateUserDto
+            {
+                FirstName = "Jelena",
+                LastName = "Marić",
+                Email = "jelena@test.com",
+                Password = "lozinka123",
+                DateOfBirth = new DateTime(1985, 7, 20)
+            });
+
+            result.Should().BeOfType<BadRequestObjectResult>();
+        }
+
         [Fact]
         public async Task GetById_KadaManagerTražiDrugogKorisnika_VracaForbid()
         {
@@ -633,6 +731,104 @@ namespace TuristickiVodic.Tests.Controllers
             var result = await controller.ApproveCreatorRole(8);
 
             result.Should().BeOfType<BadRequestObjectResult>();
+        }
+
+        [Fact]
+        public async Task RegisterAdmin_ProsledjujeIspravanDtoServisu()
+        {
+            var mockService = new Mock<IUserService>();
+            CreateUserDto? prosledjeniDto = null;
+
+            mockService.Setup(s => s.CreateAdminAsync(It.IsAny<CreateUserDto>()))
+                .Callback<CreateUserDto>(dto => prosledjeniDto = dto)
+                .ReturnsAsync(new UserDto { Id = 31, Email = "admin@test.com", RoleName = "Admin" });
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            await controller.RegisterAdmin(new CreateUserDto
+            {
+                FirstName = "Jelena",
+                LastName = "Marić",
+                Email = "admin@test.com",
+                Password = "pass123",
+                DateOfBirth = new DateTime(1985, 1, 1)
+            });
+
+            prosledjeniDto.Should().NotBeNull();
+            prosledjeniDto!.Email.Should().Be("admin@test.com");
+            prosledjeniDto.FirstName.Should().Be("Jelena");
+        }
+
+        [Fact]
+        public async Task RegisterManager_ProsledjujeIspravanDtoServisu()
+        {
+            var mockService = new Mock<IUserService>();
+            CreateUserDto? prosledjeniDto = null;
+
+            mockService.Setup(s => s.CreateManagerAsync(It.IsAny<CreateUserDto>()))
+                .Callback<CreateUserDto>(dto => prosledjeniDto = dto)
+                .ReturnsAsync(new UserDto { Id = 30, Email = "manager@test.com", RoleName = "Manager" });
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            await controller.RegisterManager(new CreateUserDto
+            {
+                FirstName = "Nikola",
+                LastName = "Jović",
+                Email = "manager@test.com",
+                Password = "pass123",
+                DateOfBirth = new DateTime(1990, 1, 1)
+            });
+
+            prosledjeniDto.Should().NotBeNull();
+            prosledjeniDto!.Email.Should().Be("manager@test.com");
+            prosledjeniDto.FirstName.Should().Be("Nikola");
+        }
+
+        [Fact]
+        public async Task RegisterAdmin_PozivaCreateAdminAsync()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.CreateAdminAsync(It.IsAny<CreateUserDto>()))
+                .ReturnsAsync(new UserDto { Id = 31, Email = "admin@test.com", RoleName = "Admin" });
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            await controller.RegisterAdmin(new CreateUserDto
+            {
+                FirstName = "Jelena",
+                LastName = "Marić",
+                Email = "admin@test.com",
+                Password = "pass123",
+                DateOfBirth = new DateTime(1985, 1, 1)
+            });
+
+            mockService.Verify(s => s.CreateAdminAsync(It.IsAny<CreateUserDto>()), Times.Once);
+            mockService.Verify(s => s.CreateManagerAsync(It.IsAny<CreateUserDto>()), Times.Never);
+            mockService.Verify(s => s.CreateAsync(It.IsAny<CreateUserDto>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task RegisterManager_PozivaCreateManagerAsync()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.CreateManagerAsync(It.IsAny<CreateUserDto>()))
+                .ReturnsAsync(new UserDto { Id = 30, Email = "manager@test.com", RoleName = "Manager" });
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            await controller.RegisterManager(new CreateUserDto
+            {
+                FirstName = "Nikola",
+                LastName = "Jović",
+                Email = "manager@test.com",
+                Password = "pass123",
+                DateOfBirth = new DateTime(1990, 1, 1)
+            });
+
+            mockService.Verify(s => s.CreateManagerAsync(It.IsAny<CreateUserDto>()), Times.Once);
+            mockService.Verify(s => s.CreateAdminAsync(It.IsAny<CreateUserDto>()), Times.Never);
+            mockService.Verify(s => s.CreateAsync(It.IsAny<CreateUserDto>()), Times.Never);
         }
 
         [Fact]

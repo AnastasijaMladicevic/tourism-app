@@ -125,9 +125,28 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(GetAllAsync_VracaSveLokalitete));
             var (_, _, lt, mgr, dest, _) = SeedBase(ctx);
-            ctx.Localities.AddRange(
-                MakeLocality(1, "Prčanj",  dest, lt, mgr.Id),
-                MakeLocality(2, "Dobrota", dest, lt, mgr.Id)
+
+            var l1 = MakeLocality(1, "Prčanj", dest, lt, mgr.Id);
+            var l2 = MakeLocality(2, "Dobrota", dest, lt, mgr.Id);
+
+            ctx.Localities.AddRange(l1, l2);
+            ctx.SaveChanges();
+
+            ctx.Images.AddRange(
+                new Image
+                {
+                    Id = 1,
+                    LocalityId = l1.Id,
+                    Url = "l1-main.jpg",
+                    IsMain = true
+                },
+                new Image
+                {
+                    Id = 2,
+                    LocalityId = l2.Id,
+                    Url = "l2-main.jpg",
+                    IsMain = true
+                }
             );
             ctx.SaveChanges();
 

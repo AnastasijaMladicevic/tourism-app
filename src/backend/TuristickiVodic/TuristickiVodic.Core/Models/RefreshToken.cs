@@ -10,6 +10,7 @@ namespace TuristickiVodic.Core.Models
 
         [Required]
         public string RefreshTokenHash { get; set; } = string.Empty;
+        public bool RememberMe { get; set; }
 
         public DateTime RefreshTokenExpiry { get; set; }
 

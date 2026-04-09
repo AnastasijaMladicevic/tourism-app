@@ -186,7 +186,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.ToTable("DeletionRequests", t =>
                         {
-                            t.HasCheckConstraint("CK_DeletionRequest_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"EventId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
+                            t.HasCheckConstraint("CK_DeletionRequest_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"EventId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
                         });
                 });
 
@@ -458,7 +458,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.ToTable("Favorites", t =>
                         {
-                            t.HasCheckConstraint("CK_Favorite_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"DestinationId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"RouteId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"LocalityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
+                            t.HasCheckConstraint("CK_Favorite_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"DestinationId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"RouteId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"LocalityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
                         });
                 });
 
@@ -514,7 +514,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.ToTable("Images", t =>
                         {
-                            t.HasCheckConstraint("CK_Image_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"EventId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"DestinationId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"LocalityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
+                            t.HasCheckConstraint("CK_Image_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"EventId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"DestinationId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"LocalityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
                         });
                 });
 
@@ -667,6 +667,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<string>("RefreshTokenHash")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<bool>("RememberMe")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");

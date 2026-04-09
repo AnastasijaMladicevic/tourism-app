@@ -154,6 +154,7 @@ label {
 .help a {
   color: #2aa7ff;
   text-decoration: none;
+  cursor: pointer
 }
 .alert {
   padding: 10px 14px;

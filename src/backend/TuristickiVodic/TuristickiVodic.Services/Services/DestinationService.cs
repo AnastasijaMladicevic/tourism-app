@@ -22,6 +22,8 @@ namespace TuristickiVodic.Services
         {
             var destinations = await _context.Destinations
                 .Include(d => d.DestinationType)
+                .Include(d => d.Images)
+                .Where(d => d.Images.Any(i => i.IsMain))
                 .OrderBy(d => d.Id)
                 .ToListAsync();
 

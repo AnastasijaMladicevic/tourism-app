@@ -7,9 +7,11 @@
     <div class="form">
       <form [formGroup]="form">
         <!-- EMAIL -->
+        <label for="email">EMAIL</label>
+
         <div class="input-group">
           <span class="icon">mail</span>
-          <input type="email" placeholder="Email" formControlName="email" />
+          <input type="email" placeholder="tourist@gmail.com" formControlName="email" />
         </div>
         @if (email?.touched && email?.invalid) {
           <div class="error">
@@ -22,18 +24,20 @@
           </div>
         }
         <!-- PASSWORD -->
+        <label for="password">PASSWORD</label>
+
         <div class="input-group">
           <span class="icon">lock</span>
 
           <input
             [type]="hidePassword ? 'password' : 'text'"
-            placeholder="Password"
+            placeholder="••••••••••••"
             formControlName="password"
           />
 
-          <span class="icon eye" (click)="togglePassword()">
-            {{ hidePassword ? 'visibility' : 'visibility_off' }}
-          </span>
+          <button class="icon eye" type="button" (click)="togglePassword()">
+          {{ hidePassword ? 'visibility_off' : 'visibility' }}
+        </button>
         </div>
         @if (password?.touched && password?.invalid) {
           <div class="error">

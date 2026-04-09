@@ -134,7 +134,7 @@
 
 - Samo `Manager` može da prijavi korisnika.
 - `Manager` može da prijavi samo korisnika sa ulogom `ContentCreator`.
-- Prijavljeni `ContentCreator` mora imati objekat ili event u destinaciji kojom upravlja taj `Manager`.
+- Prijavljeni `ContentCreator` mora imati objekat, event ili aktivnost u destinaciji kojom upravlja taj `Manager`.
 - Ne može da postoji više `Pending` prijava za istog `ContentCreator`-a.
 - `Manager` vidi samo svoje prijave.
 - `Admin` vidi sve prijave.
@@ -160,18 +160,28 @@
 - Brisanje tačke je zabranjeno ako bi ruta ostala sa manje od 2 tačke.
 - Svaka promena tačke (dodavanje, izmena, brisanje) ažurira `Route.UpdatedAt`.
 
-**SLIKE**
+**IMAGES**
 
-- `IsMain` označava glavnu sliku (jedna slika mora biti).
+- `IsMain` označava glavnu sliku (tačno jedna glavna slika mora postojati po entitetu).
+- Nije dozvoljeno da entitet ima više od jedne glavne slike.
+- Nije dozvoljeno da entitet nema nijednu glavnu sliku.
+- Prva slika koja se dodaje za entitet mora biti glavna (IsMain = true).
 - Slika mora biti vezana za tačno jedan entitet, nije dozvoljeno da bude vezana za više entiteta istovremeno.
 - Slika može biti vezana za:
-  - objekat
-  - aktivnost
-  - event
-  - destinaciju
-  - lokalitet
+  - objekat  
+  - aktivnost  
+  - event  
+  - destinaciju  
+  - lokalitet  
 - Slike mogu da se dodaju samo za postojeće entitete.
+- Mora biti definisan tačno jedan od ID-jeva (ObjectId, ActivityId, EventId, DestinationId ili LocalityId).
 - Slike mogu da se menjaju samo ako pripadaju validnom entitetu.
+- Prilikom izmene slike mora ostati vezana za tačno jedan entitet.
+- Ako se menja entitet slike, prethodna veza se uklanja i postavlja nova (tačno jedna).
+- Nije dozvoljeno ukloniti glavnu sliku (IsMain = false) ako time entitet ostaje bez glavne slike.
+- Nije dozvoljeno dodati novu glavnu sliku ako već postoji glavna slika za taj entitet.
 - Slike mogu da se brišu.
-- Brisanjem roditeljskog entiteta brišu se i njegove slike (`cascade delete`).
-- Sistem može imati više slika po entitetu.
+- Nije dozvoljeno obrisati glavnu sliku ako postoje druge slike za isti entitet.
+- Dozvoljeno je obrisati sliku ako je to jedina slika tog entiteta.
+- Brisanjem roditeljskog entiteta brišu se i njegove slike (cascade delete).
+- Sistem može imati više slika po entitetu, ali tačno jedna mora biti označena kao glavna.

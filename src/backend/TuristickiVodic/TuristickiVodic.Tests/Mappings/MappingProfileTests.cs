@@ -50,16 +50,10 @@ namespace TuristickiVodic.Tests.Mappings
         {
             var user = new User
             {
-                Id = 1,
-                FirstName = "Marko",
-                LastName = "Marković",
-                Email = "marko@test.com",
-                PasswordHash = "hash",
-                IsActive = true,
-                IsVerified = false,
-                IsBlacklisted = false,
-                Language = "sr",
-                DateOfBirth = new DateTime(1990, 1, 1),
+                Id = 1, FirstName = "Marko", LastName = "Marković",
+                Email = "marko@test.com", PasswordHash = "hash",
+                IsActive = true, IsVerified = false, IsBlacklisted = false,
+                Language = "sr", DateOfBirth = new DateTime(1990, 1, 1),
                 CreatedAt = DateTime.UtcNow,
                 Role = new Role { Id = 1, Name = RoleType.Tourist },
                 RoleId = 1
@@ -81,17 +75,10 @@ namespace TuristickiVodic.Tests.Mappings
         {
             var user = new User
             {
-                Id = 2,
-                FirstName = "Admin",
-                LastName = "A",
-                Email = "admin@test.com",
-                PasswordHash = "hash",
-                IsActive = true,
-                IsVerified = true,
-                Language = "sr",
-                DateOfBirth = new DateTime(1980, 1, 1),
-                Role = new Role { Id = 4, Name = RoleType.Admin },
-                RoleId = 4
+                Id = 2, FirstName = "Admin", LastName = "A", Email = "admin@test.com",
+                PasswordHash = "hash", IsActive = true, IsVerified = true,
+                Language = "sr", DateOfBirth = new DateTime(1980, 1, 1),
+                Role = new Role { Id = 4, Name = RoleType.Admin }, RoleId = 4
             };
 
             var dto = _mapper.Map<UserDto>(user);
@@ -108,14 +95,10 @@ namespace TuristickiVodic.Tests.Mappings
         {
             var dto = new CreateUserDto
             {
-                FirstName = "Stefan",
-                LastName = "Stefanović",
-                Email = "stefan@test.com",
-                Password = "lozinka123",
+                FirstName = "Stefan", LastName = "Stefanović",
+                Email = "stefan@test.com", Password = "lozinka123",
                 DateOfBirth = new DateTime(1995, 6, 15),
-                PhoneNumber = "0641234567",
-                Country = "Srbija",
-                Language = "sr"
+                PhoneNumber = "0641234567", Country = "Srbija", Language = "sr"
             };
 
             var user = _mapper.Map<User>(dto);
@@ -136,11 +119,8 @@ namespace TuristickiVodic.Tests.Mappings
             // Novi korisnik mora biti aktivan i ne na blacklisti
             var dto = new CreateUserDto
             {
-                FirstName = "Test",
-                LastName = "T",
-                Email = "t@t.com",
-                Password = "lozinka1",
-                DateOfBirth = new DateTime(2000, 1, 1)
+                FirstName = "Test", LastName = "T", Email = "t@t.com",
+                Password = "lozinka1", DateOfBirth = new DateTime(2000, 1, 1)
             };
 
             var user = _mapper.Map<User>(dto);
@@ -160,14 +140,10 @@ namespace TuristickiVodic.Tests.Mappings
             // ForAllMembers + Condition(srcMember != null) — null ne sme da prepiše vrednost
             var existing = new User
             {
-                FirstName = "OriginalnoIme",
-                LastName = "OriginalnoPrezi",
-                Email = "orig@orig.com",
-                PasswordHash = "hash",
-                Language = "sr",
-                DateOfBirth = new DateTime(1990, 1, 1),
-                Role = new Role { Name = RoleType.Tourist },
-                RoleId = 1
+                FirstName = "OriginalnoIme", LastName = "OriginalnoPrezi",
+                Email = "orig@orig.com", PasswordHash = "hash",
+                Language = "sr", DateOfBirth = new DateTime(1990, 1, 1),
+                Role = new Role { Name = RoleType.Tourist }, RoleId = 1
             };
 
             var updateDto = new UpdateUserDto
@@ -187,15 +163,11 @@ namespace TuristickiVodic.Tests.Mappings
         {
             var existing = new User
             {
-                FirstName = "Ime",
-                LastName = "Prezime",
-                Email = "e@e.com",
-                PasswordHash = "hash",
-                Language = "sr",
-                Country = "Srbija",
+                FirstName = "Ime", LastName = "Prezime",
+                Email = "e@e.com", PasswordHash = "hash",
+                Language = "sr", Country = "Srbija",
                 DateOfBirth = new DateTime(1990, 1, 1),
-                Role = new Role { Name = RoleType.Tourist },
-                RoleId = 1
+                Role = new Role { Name = RoleType.Tourist }, RoleId = 1
             };
 
             _mapper.Map(new UpdateUserDto(), existing);
@@ -214,9 +186,7 @@ namespace TuristickiVodic.Tests.Mappings
         {
             var dest = new Destination
             {
-                Id = 1,
-                Name = "Kotor",
-                Status = ContentStatus.Approved,
+                Id = 1, Name = "Kotor", Status = ContentStatus.Approved,
                 Geolocation = new Point(18.77, 42.42) { SRID = 4326 },
                 DestinationTypeId = 1,
                 DestinationType = new DestinationType { Id = 1, Name = "Stari Grad" },
@@ -234,9 +204,7 @@ namespace TuristickiVodic.Tests.Mappings
         {
             var dest = new Destination
             {
-                Id = 2,
-                Name = "Budva",
-                Status = ContentStatus.Approved,
+                Id = 2, Name = "Budva", Status = ContentStatus.Approved,
                 Geolocation = null,
                 DestinationTypeId = 1,
                 DestinationType = new DestinationType { Id = 1, Name = "Plaza" },
@@ -254,9 +222,7 @@ namespace TuristickiVodic.Tests.Mappings
         {
             var dest = new Destination
             {
-                Id = 3,
-                Name = "Bar",
-                Status = ContentStatus.Pending,
+                Id = 3, Name = "Bar", Status = ContentStatus.Pending,
                 DestinationTypeId = 1,
                 DestinationType = new DestinationType { Id = 1, Name = "Luka" },
                 CreatedByUserId = 99
@@ -272,9 +238,7 @@ namespace TuristickiVodic.Tests.Mappings
         {
             var dest = new Destination
             {
-                Id = 4,
-                Name = "Ulcinj",
-                Status = ContentStatus.Approved,
+                Id = 4, Name = "Ulcinj", Status = ContentStatus.Approved,
                 DestinationTypeId = 2,
                 DestinationType = new DestinationType { Id = 2, Name = "Istorijski Grad" },
                 CreatedByUserId = 99
@@ -888,61 +852,104 @@ namespace TuristickiVodic.Tests.Mappings
             dto.CreatedByFullName.Should().BeNull();
             dto.RoutePoints.Should().BeEmpty();
         }
+    
+        [Fact]
+        public void ManagerReportToDto_MapiraImenaIStatus()
+        {
+            var report = new ManagerReport
+            {
+                Id = 7,
+                ManagerId = 30,
+                Manager = new User { FirstName = "Milan", LastName = "Manager" },
+                ReportedUserId = 20,
+                ReportedUser = new User { FirstName = "Ceca", LastName = "Creator" },
+                Reason = "Spam sadrzaj",
+                Status = ContentStatus.Pending,
+                CreatedAt = new DateTime(2026, 1, 1)
+            };
+
+            var dto = _mapper.Map<ManagerReportDto>(report);
+
+            dto.Id.Should().Be(7);
+            dto.ManagerId.Should().Be(30);
+            dto.ManagerName.Should().Be("Milan Manager");
+            dto.ReportedUserId.Should().Be(20);
+            dto.ReportedUserName.Should().Be("Ceca Creator");
+            dto.Reason.Should().Be("Spam sadrzaj");
+            dto.Status.Should().Be("Pending");
+        }
 
         [Fact]
-        public void FavoriteToDto_MapiraNazivePovezanihEntiteta()
+        public void ManagerReportToDto_MapiraResolvedByNameKadaPostoji()
         {
-            var favorite = new Favorite
+            var report = new ManagerReport
+            {
+                Id = 8,
+                ManagerId = 30,
+                ReportedUserId = 20,
+                Reason = "Neprimeren sadrzaj",
+                Status = ContentStatus.Approved,
+                ResolvedByUserId = 40,
+                ResolvedBy = new User { FirstName = "Ana", LastName = "Admin" },
+                CreatedAt = new DateTime(2026, 1, 1),
+                ResolvedAt = new DateTime(2026, 1, 2)
+            };
+
+            var dto = _mapper.Map<ManagerReportDto>(report);
+
+            dto.ResolvedByUserId.Should().Be(40);
+            dto.ResolvedByName.Should().Be("Ana Admin");
+            dto.Status.Should().Be("Approved");
+            dto.ResolvedAt.Should().Be(new DateTime(2026, 1, 2));
+        }
+
+        [Fact]
+        public void ImageToDto_MapiraIsMainPolje()
+        {
+            var image = new Image
             {
                 Id = 1,
-                UserId = 15,
-                DestinationId = 2,
-                Destination = new Destination { Id = 2, Name = "Kotor" },
-                LocalityId = 3,
-                Locality = new Locality { Id = 3, Name = "Stari grad" },
-                ActivityId = 4,
-                Activity = new Activity { Id = 4, Name = "Setnja" },
-                RouteId = 5,
-                Route = new Route { Id = 5, Name = "Panorama" },
-                ObjectId = 6,
-                Object = new TouristObject { Id = 6, Name = "Muzej" },
-                CreatedAt = new DateTime(2026, 1, 1, 10, 0, 0, DateTimeKind.Utc)
+                Url = "test.jpg",
+                AltText = "opis",
+                IsMain = true,
+                ObjectId = 1
             };
 
-            var dto = _mapper.Map<FavoriteDto>(favorite);
+            var dto = _mapper.Map<ImageDto>(image);
 
-            dto.Id.Should().Be(1);
-            dto.UserId.Should().Be(15);
-            dto.DestinationName.Should().Be("Kotor");
-            dto.LocalityName.Should().Be("Stari grad");
-            dto.ActivityName.Should().Be("Setnja");
-            dto.RouteName.Should().Be("Panorama");
-            dto.ObjectName.Should().Be("Muzej");
-            dto.CreatedAt.Should().Be(favorite.CreatedAt);
+            dto.Url.Should().Be("test.jpg");
+            dto.AltText.Should().Be("opis");
+            dto.IsMain.Should().BeTrue();
         }
 
         [Fact]
-        public void FavoriteToDto_KadaNavigacijeNisuUcitanje_NaziviSuNull()
+        public void ImageToDto_MapiraSvaBitnaPolja()
         {
-            var favorite = new Favorite
+            var image = new Image
             {
-                Id = 2,
-                UserId = 20,
-                DestinationId = 1,
-                LocalityId = 2,
-                ActivityId = 3,
-                RouteId = 4,
-                ObjectId = 5
+                Id = 1,
+                Url = "test.jpg",
+                AltText = "opis",
+                IsMain = true,
+                ObjectId = 10,
+                ActivityId = 20,
+                EventId = 30,
+                DestinationId = 40,
+                LocalityId = 50,
+                CreatedAt = new DateTime(2026, 1, 1)
             };
 
-            var dto = _mapper.Map<FavoriteDto>(favorite);
+            var dto = _mapper.Map<ImageDto>(image);
 
-            dto.DestinationName.Should().BeNull();
-            dto.LocalityName.Should().BeNull();
-            dto.ActivityName.Should().BeNull();
-            dto.RouteName.Should().BeNull();
-            dto.ObjectName.Should().BeNull();
+            dto.Id.Should().Be(1);
+            dto.Url.Should().Be("test.jpg");
+            dto.AltText.Should().Be("opis");
+            dto.IsMain.Should().BeTrue();
+            dto.ObjectId.Should().Be(10);
+            dto.ActivityId.Should().Be(20);
+            dto.EventId.Should().Be(30);
+            dto.DestinationId.Should().Be(40);
+            dto.LocalityId.Should().Be(50);
         }
     }
-
 }

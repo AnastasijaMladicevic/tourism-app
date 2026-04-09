@@ -368,7 +368,7 @@ namespace TuristickiVodic.Tests.Services
             using var ctx = CreateInMemoryContext(nameof(ApproveAsync_Manager_OdobravaPendingEventUSvojojDestinaciji));
             var (_, _, _, eventType, destination, _, locality, _, creator, _, manager, _, _) = SeedBase(ctx);
 
-            ctx.Events.Add(new Event
+            var ev = new Event
             {
                 Id = 1,
                 Name = "Pending event",
@@ -381,6 +381,17 @@ namespace TuristickiVodic.Tests.Services
                 StartDate = new DateTime(2026, 5, 7, 18, 0, 0, DateTimeKind.Utc),
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
+            };
+
+            ctx.Events.Add(ev);
+            ctx.SaveChanges();
+
+            ctx.Images.Add(new Image
+            {
+                Id = 1,
+                EventId = ev.Id,
+                Url = "event-main.jpg",
+                IsMain = true
             });
             ctx.SaveChanges();
 
@@ -628,6 +639,125 @@ namespace TuristickiVodic.Tests.Services
             await svc.Invoking(s => s.GetAllAsync(new EventFilterDto { NextDays = 5 }))
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*NextDays can only be 7 or 30.*");
+        }
+
+        [Fact]
+        public async Task ApproveAsync_EventBezMainSlike_BacaGresku()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ApproveAsync_EventBezMainSlike_BacaGresku));
+            var (_, _, _, eventType, destination, _, locality, _, creator, _, manager, _, _) = SeedBase(ctx);
+
+            ctx.Events.Add(new Event
+            {
+                Id = 1,
+                Name = "Event",
+                EventTypeId = eventType.Id,
+                LocalityId = locality.Id,
+                DestinationId = destination.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Pending,
+                StartDate = new DateTime(2026, 7, 1, 18, 0, 0, DateTimeKind.Utc),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+            ctx.SaveChanges();
+
+            var svc = new EventService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.ApproveAsync(1, new ApproveContentDto { Approve = true }, manager.Id, "Manager"))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*main image*");
+        }
+
+        [Fact]
+        public async Task ApproveAsync_EventSaMainSlikom_Uspeh()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ApproveAsync_EventSaMainSlikom_Uspeh));
+
+            var managerRole = new Role
+            {
+                Id = 3,
+                Name = RoleType.Manager
+            };
+
+            var destinationType = new DestinationType
+            {
+                Id = 1,
+                Name = "Primorje"
+            };
+
+            var eventType = new EventType
+            {
+                Id = 1,
+                Name = "Festival"
+            };
+
+            var manager = new User
+            {
+                Id = 10,
+                FirstName = "M",
+                LastName = "Manager",
+                Email = "manager@test.com",
+                PasswordHash = "hash",
+                RoleId = managerRole.Id,
+                Role = managerRole,
+                IsActive = true,
+                DateOfBirth = new DateTime(1985, 1, 1),
+                ManagedDestinationId = 1
+            };
+
+            var destination = new Destination
+            {
+                Id = 1,
+                Name = "Destinacija",
+                DestinationTypeId = destinationType.Id,
+                DestinationType = destinationType,
+                CreatedByUserId = 1,
+                ManagedByUserId = manager.Id,
+                Status = ContentStatus.Approved
+            };
+
+            var ev = new Event
+            {
+                Id = 1,
+                Name = "Event",
+                EventTypeId = eventType.Id,
+                EventType = eventType,
+                DestinationId = destination.Id,
+                Destination = destination,
+                CreatedByUserId = 5,
+                StartDate = DateTime.UtcNow.AddDays(1),
+                Status = ContentStatus.Pending,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            ctx.Roles.Add(managerRole);
+            ctx.DestinationTypes.Add(destinationType);
+            ctx.EventTypes.Add(eventType);
+            ctx.Users.Add(manager);
+            ctx.Destinations.Add(destination);
+            ctx.Events.Add(ev);
+            ctx.Images.Add(new Image
+            {
+                Id = 1,
+                EventId = ev.Id,
+                Url = "img.jpg",
+                IsMain = true
+            });
+
+            ctx.SaveChanges();
+
+            var service = new EventService(ctx, CreateMapper());
+
+            var result = await service.ApproveAsync(
+                1,
+                new ApproveContentDto { Approve = true },
+                manager.Id,
+                "Manager");
+
+            result.Should().NotBeNull();
+            result!.Status.Should().Be("Approved");
         }
     }
 }

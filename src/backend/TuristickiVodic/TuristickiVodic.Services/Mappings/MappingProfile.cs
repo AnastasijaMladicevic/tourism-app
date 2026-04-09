@@ -184,6 +184,26 @@ namespace TuristickiVodic.Services.Mappings
                     opt => opt.MapFrom(src => src.Locality != null ? src.Locality.Name : null));
 
             CreateMap<Image, ImageDto>();
+
+            CreateMap<User, CreatorRoleRequestDto>()
+                .ForMember(dest => dest.RoleName,
+                    opt => opt.MapFrom(src => src.Role != null ? src.Role.Name.ToString() : string.Empty));
+
+            CreateMap<ManagerReport, ManagerReportDto>()
+                .ForMember(dest => dest.ManagerName,
+                    opt => opt.MapFrom(src => src.Manager != null
+                        ? src.Manager.FirstName + " " + src.Manager.LastName
+                        : string.Empty))
+                .ForMember(dest => dest.ReportedUserName,
+                    opt => opt.MapFrom(src => src.ReportedUser != null
+                        ? src.ReportedUser.FirstName + " " + src.ReportedUser.LastName
+                        : string.Empty))
+                .ForMember(dest => dest.Status,
+                    opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.ResolvedByName,
+                    opt => opt.MapFrom(src => src.ResolvedBy != null
+                        ? src.ResolvedBy.FirstName + " " + src.ResolvedBy.LastName
+                        : null));
         }
     }
 }

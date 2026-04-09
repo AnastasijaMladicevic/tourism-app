@@ -1,0 +1,100 @@
+<div class="screen">
+  <!-- Header -->
+  <div class="header">
+    <button class="icon-btn" (click)="goBack()">
+      <mat-icon>arrow_back_ios</mat-icon>
+    </button>
+    <h1 class="header__title">Događaj</h1>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading">
+      <mat-icon>hourglass_empty</mat-icon>
+      <p>Učitavanje...</p>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="error-state">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ errorMessage }}</p>
+      <button (click)="goBack()">Nazad</button>
+    </div>
+  }
+
+  @if (event) {
+    <!-- Hero slika - iza svega -->
+    <div class="hero">
+      <div class="hero-placeholder">
+        <mat-icon>celebration</mat-icon>
+      </div>
+      <button class="fav-btn" (click)="toggleFavorite()" [class.fav-btn--active]="isFavorite">
+        <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
+      </button>
+    </div>
+
+    <div class="content">
+      <!-- LEVA STRANA -->
+      <div class="left">
+        <!-- HEADER / HERO INFO -->
+        <div class="card">
+          <h1 class="title">{{ event.name }}</h1>
+
+          <p class="location-bold">{{ event.localityName }}, {{ event.destinationName }}</p>
+
+          <p class="venue"><mat-icon>location_on</mat-icon>{{ event.objectName || 'N/A' }}</p>
+
+          <p class="date">{{ formatDate(event.startDate) }} – {{ formatDate(event.endDate) }}</p>
+
+          <div class="actions">
+            <button class="btn btn-outline" (click)="addToPlanner()">
+              <mat-icon>add_circle</mat-icon>
+              Dodaj u Planner
+            </button>
+
+            <button class="btn btn-primary" (click)="buyTicket()">Kupi Kartu</button>
+          </div>
+        </div>
+
+        <!-- OPIS -->
+        <div class="card">
+          <h2>O događaju</h2>
+          <p class="description">
+            {{ event.description || 'Opis nije dostupan.' }}
+          </p>
+        </div>
+
+        <!-- ULAZNICE -->
+      </div>
+
+      <!-- DESNA STRANA (MAPA) -->
+      <div class="right">
+        <div class="card">
+          <h2>Lokacija</h2>
+
+          <div class="location-image">
+            <div class="location-image-placeholder">
+              <mat-icon>place</mat-icon>
+            </div>
+
+            <button class="map-btn-overlay" (click)="viewOnMap()">Pogledaj na mapi</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Dostupne ulaznice</h2>
+
+          <div class="ticket-card">
+            <div>
+              <span class="ticket-type">Standardna ulaznica</span>
+              <span class="ticket-price">
+                {{ event.price ? event.price + ' €' : 'Besplatno' }}
+              </span>
+            </div>
+
+            <button class="btn-small" (click)="buyTicket()">Odaberi</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,73 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using TuristickiVodic.Core.DTO;
+using TuristickiVodic.Services.Services;
+
+namespace TuristickiVodic.API.Controllers
+{
+    [ApiController]
+    [Route("api/activities/{activityId}/images")]
+    public class ActivityImagesController : ControllerBase
+    {
+        private readonly IImageService _service;
+
+        public ActivityImagesController(IImageService service)
+        {
+            _service = service;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll(int activityId)
+        {
+            try
+            {
+                return Ok(await _service.GetForActivityAsync(activityId));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("main")]
+        public async Task<IActionResult> GetMain(int activityId)
+        {
+            try
+            {
+                var img = await _service.GetMainForActivityAsync(activityId);
+                return img == null ? NotFound(new { message = "No main image found for this activity." }) : Ok(img);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "ContentCreator")]
+        public async Task<IActionResult> Add(int activityId, [FromBody] AddImageDto dto)
+        {
+            try
+            {
+                var result = await _service.AddToActivityAsync(activityId, dto, GetUserId(), GetRole());
+                return CreatedAtAction(nameof(ImagesController.GetById), "Image", new { id = result.Id }, result);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        private string GetRole() => User.FindFirstValue(ClaimTypes.Role)!;
+    }
+}
