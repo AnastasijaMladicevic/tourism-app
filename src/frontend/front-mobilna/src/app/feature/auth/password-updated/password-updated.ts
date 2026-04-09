@@ -10,7 +10,6 @@ import { LogoComponent } from '../../../shared/components/logo/logo';
   imports: [LogoComponent],
 })
 export class PasswordUpdatedComponent {
-
   constructor(private router: Router) {}
 
   goBack(): void {

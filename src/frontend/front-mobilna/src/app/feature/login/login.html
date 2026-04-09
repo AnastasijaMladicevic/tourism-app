@@ -36,8 +36,8 @@
           />
 
           <button class="icon eye" type="button" (click)="togglePassword()">
-          {{ hidePassword ? 'visibility_off' : 'visibility' }}
-        </button>
+            {{ hidePassword ? 'visibility_off' : 'visibility' }}
+          </button>
         </div>
         @if (password?.touched && password?.invalid) {
           <div class="error">

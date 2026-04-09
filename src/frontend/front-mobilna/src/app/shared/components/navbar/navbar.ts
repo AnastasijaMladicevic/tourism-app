@@ -21,7 +21,6 @@ interface NavItem {
   encapsulation: ViewEncapsulation.None,
 })
 export class NavbarComponent {
-
   activeRoute = '';
 
   // Rute na kojima se navbar NE prikazuje
@@ -35,23 +34,26 @@ export class NavbarComponent {
   ];
 
   navItems: NavItem[] = [
-    { label: 'Home',    icon: 'home',            route: '/home'    },
-    { label: 'Map',     icon: 'map',             route: '/map'     },
-    { label: 'Saved',   icon: 'bookmark_border', route: '/saved'   },
-    { label: 'Planner', icon: 'calendar_month',  route: '/planner' },
-    { label: 'Profile', icon: 'person_outline',  route: '/profile' },
+    { label: 'Home', icon: 'home', route: '/home' },
+    { label: 'Map', icon: 'map', route: '/map' },
+    { label: 'Saved', icon: 'bookmark_border', route: '/saved' },
+    { label: 'Planner', icon: 'calendar_month', route: '/planner' },
+    { label: 'Profile', icon: 'person_outline', route: '/profile' },
   ];
 
-  constructor(private router: Router, private authService: AuthService) {
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+  ) {
     this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd))
+      .pipe(filter((e) => e instanceof NavigationEnd))
       .subscribe((e: NavigationEnd) => {
         this.activeRoute = e.urlAfterRedirects;
       });
   }
 
   get isVisible(): boolean {
-    return !this.hiddenRoutes.some(r => this.activeRoute.startsWith(r));
+    return !this.hiddenRoutes.some((r) => this.activeRoute.startsWith(r));
   }
 
   isActive(route: string): boolean {

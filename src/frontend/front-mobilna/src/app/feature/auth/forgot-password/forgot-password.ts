@@ -9,12 +9,15 @@ import { LogoComponent } from '../../../shared/components/logo/logo';
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule, LogoComponent],
   templateUrl: './forgot-password.html',
-  styleUrls: ['./forgot-password.scss']
+  styleUrls: ['./forgot-password.scss'],
 })
 export class ForgotPasswordComponent {
   form: any;
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+  ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
     });
@@ -24,7 +27,7 @@ export class ForgotPasswordComponent {
   }
   submit() {
     if (this.form.valid) {
-      console.log("Reset link sent to:", this.form.value.email);
+      console.log('Reset link sent to:', this.form.value.email);
       this.router.navigate(['/code-verification'], { state: { email: this.form.value.email } });
 
       // kasnije ide backend

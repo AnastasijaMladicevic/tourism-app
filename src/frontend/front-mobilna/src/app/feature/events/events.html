@@ -1,0 +1,167 @@
+<div class="screen">
+  <div class="header">
+    <button class="icon-btn" (click)="goBack()" aria-label="Go back">
+      <mat-icon>arrow_back_ios</mat-icon>
+    </button>
+
+    <h1 class="header__title" [class.header__title--hidden]="showSearch">Events</h1>
+
+    <div class="header__search-inline" [class.header__search-inline--open]="showSearch">
+      <mat-icon class="search-inline__icon">search</mat-icon>
+      <input
+        class="search-inline__input"
+        type="text"
+        placeholder="Search events..."
+        [(ngModel)]="searchQuery"
+      />
+      <button class="icon-btn" (click)="toggleSearch()" aria-label="Close search">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="header__actions">
+      <button class="icon-btn" (click)="toggleSearch()" aria-label="Search">
+        <mat-icon>search</mat-icon>
+      </button>
+
+      <button
+        class="sort-anchor icon-btn sort-btn"
+        (click)="$event.stopPropagation(); showSortMenu = !showSortMenu"
+        aria-label="Sort"
+      >
+        <mat-icon>swap_vert</mat-icon>
+      </button>
+
+      @if (showSortMenu) {
+        <div class="sort-menu sort-anchor">
+          <button
+            class="sort-menu__item"
+            [class.sort-menu__item--active]="sortOption === 'date'"
+            (click)="setSort('date')"
+          >
+            <mat-icon>schedule</mat-icon> Soonest
+          </button>
+          <button
+            class="sort-menu__item"
+            [class.sort-menu__item--active]="sortOption === 'price'"
+            (click)="setSort('price')"
+          >
+            <mat-icon>sell</mat-icon> Lowest Price
+          </button>
+          <button
+            class="sort-menu__item"
+            [class.sort-menu__item--active]="sortOption === 'az'"
+            (click)="setSort('az')"
+          >
+            <mat-icon>sort_by_alpha</mat-icon> A -> Z
+          </button>
+          <button
+            class="sort-menu__item"
+            [class.sort-menu__item--active]="sortOption === 'za'"
+            (click)="setSort('za')"
+          >
+            <mat-icon>sort_by_alpha</mat-icon> Z -> A
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+
+  @if (showSearch) {
+    <div class="search-bar mobile-only">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        placeholder="Search events..."
+        [(ngModel)]="searchQuery"
+        class="search-bar__input"
+        autofocus
+      />
+      @if (searchQuery) {
+        <button class="icon-btn" (click)="searchQuery = ''" aria-label="Clear">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </div>
+  }
+
+  <div class="filters">
+    @for (category of categories; track category.key) {
+      <button
+        class="filter-btn"
+        [class.filter-btn--active]="activeCategory === category.key"
+        (click)="setCategory(category.key)"
+      >
+        @if (category.icon) {
+          <span class="filter-chip-icon">{{ category.icon }}</span>
+        }
+        {{ category.label }}
+      </button>
+    }
+  </div>
+
+  <div class="results-bar">
+    <span class="results-bar__count">{{ filteredEvents.length }} events found</span>
+    <span class="results-bar__sort">
+      <mat-icon>swap_vert</mat-icon>
+      {{ sortLabel() }}
+    </span>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading">
+      <mat-icon>hourglass_empty</mat-icon>
+      <p>Loading events...</p>
+    </div>
+  }
+
+  <div class="events-list">
+    @for (event of filteredEvents; track event.id) {
+      <article class="event-card">
+        <div
+          class="event-image"
+          [style.background-image]="imageStyle(event.imageUrl)"
+          [class.event-image--empty]="!event.imageUrl"
+        >
+          <span class="event-tag">{{ event.category === 'Rute' ? 'Nature' : event.category }}</span>
+          <span class="event-price" [class.event-price--free]="event.priceText === 'Free'">{{
+            event.priceText
+          }}</span>
+          <h3>{{ event.title }}</h3>
+        </div>
+
+        <div class="event-body">
+          <div class="event-meta">
+            <p>
+              <span class="meta-icon">Date</span>
+              {{ event.dateText }}
+            </p>
+            <p>
+              <span class="meta-icon">Time</span>
+              {{ event.timeText }}
+            </p>
+          </div>
+          <p class="event-location">
+            <span class="meta-icon">Place</span>
+            {{ event.location }}
+          </p>
+
+          <div class="event-footer">
+            <div class="attendees">
+              <span class="attending-text">{{ event.attendeesText }}</span>
+            </div>
+            <button type="button" class="view-btn">View Event</button>
+          </div>
+        </div>
+      </article>
+    }
+
+    @if (!isLoading && filteredEvents.length === 0) {
+      <article class="event-card">
+        <div class="event-body">
+          <p class="event-location">No events found.</p>
+        </div>
+      </article>
+    }
+  </div>
+</div>
