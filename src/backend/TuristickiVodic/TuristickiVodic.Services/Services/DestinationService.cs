@@ -34,9 +34,16 @@ namespace TuristickiVodic.Services
         {
             var destination = await _context.Destinations
                 .Include(d => d.DestinationType)
+                .Include(d => d.Images)
                 .FirstOrDefaultAsync(d => d.Id == id);
 
-            return destination == null ? null : _mapper.Map<DestinationDto>(destination);
+            if (destination == null)
+                return null;
+
+            if (!destination.Images.Any(i => i.IsMain))
+                return null;
+
+            return _mapper.Map<DestinationDto>(destination);
         }
 
         public async Task<DestinationDto> CreateAsync(CreateDestinationDto dto, int userId)

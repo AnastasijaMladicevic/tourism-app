@@ -37,6 +37,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(e => e.Locality)
                 .Include(e => e.Destination)
                 .Include(e => e.Object)
+                .Where(e => _context.Images.Any(i => i.EventId == e.Id && i.IsMain))
                 .OrderBy(e => e.Id)
                 .ToListAsync();
 
@@ -116,7 +117,14 @@ namespace TuristickiVodic.Services.Services
                 .Include(e => e.Object)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
-            return ev == null ? null : _mapper.Map<EventDto>(ev);
+            if (ev == null)
+                return null;
+
+            var hasMainImage = await _context.Images.AnyAsync(i => i.EventId == ev.Id && i.IsMain);
+            if (!hasMainImage)
+                return null;
+
+            return _mapper.Map<EventDto>(ev);
         }
 
         public async Task<EventDto> CreateAsync(CreateEventDto dto, int userId, string roleName)

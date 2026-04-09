@@ -173,7 +173,18 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_PostojeciLokalitet_VracaDto));
             var (_, _, lt, mgr, dest, _) = SeedBase(ctx);
-            ctx.Localities.Add(MakeLocality(1, "Prčanj", dest, lt, mgr.Id));
+
+            var locality = MakeLocality(1, "Prčanj", dest, lt, mgr.Id);
+            ctx.Localities.Add(locality);
+            ctx.SaveChanges();
+
+            ctx.Images.Add(new Image
+            {
+                Url = "main.jpg",
+                IsMain = true,
+                LocalityId = locality.Id,
+                CreatedAt = DateTime.UtcNow
+            });
             ctx.SaveChanges();
 
             var svc = new LocalityService(ctx, CreateMapper());
@@ -182,6 +193,83 @@ namespace TuristickiVodic.Tests.Services
             result.Should().NotBeNull();
             result!.Name.Should().Be("Prčanj");
             result.DestinationName.Should().Be("Kotor");
+        }
+
+        [Fact]
+        public async Task GetByIdAsync_LokalitetBezMainSlike_VracaNull()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_LokalitetBezMainSlike_VracaNull));
+            var mapper = CreateMapper();
+
+            var adminRole = new Role { Id = 1, Name = RoleType.Admin };
+            var managerRole = new Role { Id = 2, Name = RoleType.Manager };
+            var destinationType = new DestinationType { Id = 1, Name = "Grad" };
+            var localityType = new LocalityType { Id = 1, Name = "Centar" };
+
+            var admin = new User
+            {
+                Id = 1,
+                FirstName = "Admin",
+                LastName = "A",
+                Email = "admin@test.com",
+                PasswordHash = "hash",
+                RoleId = adminRole.Id,
+                Role = adminRole,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            };
+
+            var manager = new User
+            {
+                Id = 2,
+                FirstName = "Manager",
+                LastName = "M",
+                Email = "manager@test.com",
+                PasswordHash = "hash",
+                RoleId = managerRole.Id,
+                Role = managerRole,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            };
+
+            ctx.Roles.AddRange(adminRole, managerRole);
+            ctx.DestinationTypes.Add(destinationType);
+            ctx.LocalityTypes.Add(localityType);
+            ctx.Users.AddRange(admin, manager);
+            ctx.SaveChanges();
+
+            var destination = new Destination
+            {
+                Id = 1,
+                Name = "Kotor",
+                DestinationTypeId = destinationType.Id,
+                ManagedByUserId = manager.Id,
+                CreatedByUserId = admin.Id,
+                Status = ContentStatus.Approved
+            };
+
+            ctx.Destinations.Add(destination);
+            ctx.SaveChanges();
+
+            var locality = new Locality
+            {
+                Id = 1,
+                Name = "Stari grad",
+                DestinationId = destination.Id,
+                LocalityTypeId = localityType.Id,
+                CreatedByUserId = admin.Id,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            ctx.Localities.Add(locality);
+            ctx.SaveChanges();
+
+            var svc = new LocalityService(ctx, mapper);
+
+            var result = await svc.GetByIdAsync(locality.Id);
+
+            result.Should().BeNull();
         }
 
         [Fact]

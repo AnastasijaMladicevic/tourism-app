@@ -557,6 +557,65 @@ namespace TuristickiVodic.Tests.Services
             result!.Status.Should().Be("Approved");
         }
 
+        [Fact]
+        public async Task GetByIdAsync_PostojiSaMainSlikom_VracaDto()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_PostojiSaMainSlikom_VracaDto));
+            var (_, _, _, activityType, destination, _, locality, _, creator, _, _, _, _) = SeedBase(ctx);
 
+            var activity = new Activity
+            {
+                Id = 1,
+                Name = "Setnja",
+                ActivityTypeId = activityType.Id,
+                LocalityId = locality.Id,
+                DestinationId = destination.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Approved
+            };
+
+            ctx.Activities.Add(activity);
+
+            ctx.Images.Add(new Image
+            {
+                ActivityId = activity.Id,
+                Url = "main.jpg",
+                IsMain = true,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            ctx.SaveChanges();
+
+            var svc = new ActivityService(ctx, CreateMapper());
+            var result = await svc.GetByIdAsync(1);
+
+            result.Should().NotBeNull();
+            result!.Name.Should().Be("Setnja");
+        }
+
+        [Fact]
+        public async Task GetByIdAsync_BezMainSlike_VracaNull()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_BezMainSlike_VracaNull));
+            var (_, _, _, activityType, destination, _, locality, _, creator, _, _, _, _) = SeedBase(ctx);
+
+            ctx.Activities.Add(new Activity
+            {
+                Id = 1,
+                Name = "Setnja",
+                ActivityTypeId = activityType.Id,
+                LocalityId = locality.Id,
+                DestinationId = destination.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Approved
+            });
+
+            ctx.SaveChanges();
+
+            var svc = new ActivityService(ctx, CreateMapper());
+            var result = await svc.GetByIdAsync(1);
+
+            result.Should().BeNull();
+        }
     }
 }

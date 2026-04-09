@@ -180,11 +180,81 @@ namespace TuristickiVodic.Tests.Services
             ctx.Destinations.Add(dest);
             ctx.SaveChanges();
 
+            ctx.Images.Add(new Image
+            {
+                Url = "main.jpg",
+                IsMain = true,
+                DestinationId = dest.Id,
+                CreatedAt = DateTime.UtcNow
+            });
+            ctx.SaveChanges();
+
             var svc = new DestinationService(ctx, CreateMapper());
             var result = await svc.GetByIdAsync(1);
 
             result.Should().NotBeNull();
             result!.Name.Should().Be("Budva");
+        }
+
+        [Fact]
+        public async Task GetByIdAsync_DestinacijaBezMainSlike_VracaNull()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_DestinacijaBezMainSlike_VracaNull));
+            var mapper = CreateMapper();
+
+            var destinationType = new DestinationType { Id = 1, Name = "Grad" };
+            var adminRole = new Role { Id = 1, Name = RoleType.Admin };
+            var managerRole = new Role { Id = 2, Name = RoleType.Manager };
+
+            var admin = new User
+            {
+                Id = 1,
+                FirstName = "Admin",
+                LastName = "A",
+                Email = "admin@test.com",
+                PasswordHash = "hash",
+                RoleId = adminRole.Id,
+                Role = adminRole,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            };
+
+            var manager = new User
+            {
+                Id = 2,
+                FirstName = "Manager",
+                LastName = "M",
+                Email = "manager@test.com",
+                PasswordHash = "hash",
+                RoleId = managerRole.Id,
+                Role = managerRole,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            };
+
+            ctx.Roles.AddRange(adminRole, managerRole);
+            ctx.DestinationTypes.Add(destinationType);
+            ctx.Users.AddRange(admin, manager);
+            ctx.SaveChanges();
+
+            var destination = new Destination
+            {
+                Id = 1,
+                Name = "Kotor",
+                DestinationTypeId = destinationType.Id,
+                ManagedByUserId = manager.Id,
+                CreatedByUserId = admin.Id,
+                Status = ContentStatus.Approved
+            };
+
+            ctx.Destinations.Add(destination);
+            ctx.SaveChanges();
+
+            var svc = new DestinationService(ctx, mapper);
+
+            var result = await svc.GetByIdAsync(destination.Id);
+
+            result.Should().BeNull();
         }
 
         [Fact]
