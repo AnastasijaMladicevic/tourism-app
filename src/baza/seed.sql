@@ -703,7 +703,7 @@ VALUES
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
     NOW()),
 (
-    'hhttps://images.trvl-media.com/place/10048/00b6d9ee-0ab8-44e6-8080-8e12858437b4.jpg',
+    'https://images.trvl-media.com/place/10048/00b6d9ee-0ab8-44e6-8080-8e12858437b4.jpg',
     'Podgorica',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
@@ -940,7 +940,7 @@ VALUES
     'https://www.radiodux.me/sites/default/files/2017/10-07-2017-gradska-muzika-kotor-priredila-gradu-velicanstvenu-noc/dsc0935resize.jpg',
     'Vece klasicne muzike',
     true,
-    (SELECT "Id" FROM "Events" WHERE "Name" = 'Vece klasicne muzikel'),
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Vece klasicne muzike'),
     NOW()),
 (
     'https://radiokotor.info/files/images/1771230895-1771170853-IMG-a22537d6019981f93e0bc6c1e3e12e28-V.jpg',
