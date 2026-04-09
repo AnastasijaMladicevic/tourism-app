@@ -1019,7 +1019,7 @@ VALUES
     'Grupna slika',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Planinarski susret'),
-    NOW()),
+    NOW());
 
 
 
