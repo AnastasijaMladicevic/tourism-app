@@ -1,4 +1,14 @@
-import { Component, OnInit, OnDestroy, ViewChildren, QueryList, ElementRef, NgZone, ChangeDetectorRef, ViewEncapsulation } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChildren,
+  QueryList,
+  ElementRef,
+  NgZone,
+  ChangeDetectorRef,
+  ViewEncapsulation,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LogoComponent } from '../../../shared/components/logo/logo';
@@ -117,12 +127,18 @@ export class CodeVerificationComponent implements OnInit, OnDestroy {
   // ── Actions ──────────────────────────────────────────────────────────────
 
   get isOtpComplete(): boolean {
-    return this.otpValues.every(v => v !== '');
+    return this.otpValues.every((v) => v !== '');
   }
 
   verifyCode(): void {
-    if (!this.isOtpComplete) { this.errorMessage = 'Please enter all 5 digits.'; return; }
-    if (this.isExpired)      { this.errorMessage = 'Code expired. Please resend.'; return; }
+    if (!this.isOtpComplete) {
+      this.errorMessage = 'Please enter all 5 digits.';
+      return;
+    }
+    if (this.isExpired) {
+      this.errorMessage = 'Code expired. Please resend.';
+      return;
+    }
     this.isLoading = true;
     this.errorMessage = '';
     // TODO: replace with real auth service call
@@ -134,7 +150,7 @@ export class CodeVerificationComponent implements OnInit, OnDestroy {
 
   resendCode(): void {
     this.otpValues = ['', '', '', '', ''];
-    this.otpInputs?.forEach(i => (i.nativeElement.value = ''));
+    this.otpInputs?.forEach((i) => (i.nativeElement.value = ''));
     this.errorMessage = '';
     this.clearTimer();
     this.startTimer();

@@ -4,6 +4,6 @@ import { Component } from '@angular/core';
   selector: 'app-bottom-nav',
   standalone: true,
   templateUrl: './bottom-nav.component.html',
-  styleUrl: './bottom-nav.component.scss'
+  styleUrl: './bottom-nav.component.scss',
 })
 export class BottomNavComponent {}

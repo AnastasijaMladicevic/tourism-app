@@ -16,19 +16,18 @@ import { AuthService } from '../../services/auth';
   encapsulation: ViewEncapsulation.None,
 })
 export class EventDetailComponent implements OnInit {
-
   event: EventDto | null = null;
   isLoading = true;
   errorMessage = '';
-  isFavorite = false;   
-  pinEmoji = '\u{1F4CD}';      
+  isFavorite = false;
+  pinEmoji = '\u{1F4CD}';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private eventService: EventService,
     private cdr: ChangeDetectorRef,
-    private authService: AuthService
+    private authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -45,7 +44,7 @@ export class EventDetailComponent implements OnInit {
         this.isLoading = false;
         this.errorMessage = 'Greška pri učitavanju događaja.';
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -68,7 +67,7 @@ export class EventDetailComponent implements OnInit {
     return new Date(dateStr).toLocaleDateString('eu', {
       day: 'numeric',
       month: 'long',
-      year: 'numeric'
+      year: 'numeric',
     });
   }
 
