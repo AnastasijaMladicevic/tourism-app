@@ -1,0 +1,38 @@
+# Frontend
+node_modules/
+dist/
+.angular/
+coverage/
+tmp/
+out-tsc/
+bazel-out/
+
+# .NET / Visual Studio
+bin/
+obj/
+.vs/
+Debug/
+Release/
+
+# IDE / editor
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+.idea/
+
+# Logs
+*.log
+
+# User-specific
+*.user
+*.suo
+*.userossc
+*.sln.docstates
+*.rsuser
+
+# System
+.DS_Store
+Thumbs.db
