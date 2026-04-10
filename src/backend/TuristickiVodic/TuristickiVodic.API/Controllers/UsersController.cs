@@ -217,6 +217,32 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
+        [HttpPut("{id}/profile-image")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpdateProfileImage(int id, [FromForm] UploadProfileImageDto dto)
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            if (currentUserId != id)
+                return Forbid();
+
+            if (dto.File == null || dto.File.Length == 0)
+                return BadRequest(new { message = "Image file is required." });
+
+            try
+            {
+                var user = await _userService.UpdateProfileImageAsync(id, dto.File);
+                if (user == null)
+                    return NotFound();
+
+                return Ok(user);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpGet("creator-requests")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetCreatorRequests()

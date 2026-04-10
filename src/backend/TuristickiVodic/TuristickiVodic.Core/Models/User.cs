@@ -43,6 +43,8 @@ namespace TuristickiVodic.Core.Models
         public bool IsActive { get; set; } = true;
         public bool IsBlacklisted { get; set; } = false;
         public bool HasRequestedCreatorRole { get; set; } = false;
+        [MaxLength(500)]
+        public string? ProfileImageUrl { get; set; }
 
         [Required]
         public int RoleId { get; set; }
