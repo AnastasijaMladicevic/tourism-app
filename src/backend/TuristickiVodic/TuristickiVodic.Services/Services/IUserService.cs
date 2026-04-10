@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using TuristickiVodic.Core.DTO;
 
 namespace TuristickiVodic.Services
@@ -20,5 +21,6 @@ namespace TuristickiVodic.Services
         Task<bool> ToggleUserActiveAsync(int userId, bool isActive);
         Task<bool> LogoutAsync(int userId, string? jti, DateTime? accessTokenExpiryUtc);
         Task<IEnumerable<CreatorRoleRequestDto>> GetCreatorRequestsAsync();
+        Task<UserDto?> UpdateProfileImageAsync(int id, IFormFile file);
     }
 }
