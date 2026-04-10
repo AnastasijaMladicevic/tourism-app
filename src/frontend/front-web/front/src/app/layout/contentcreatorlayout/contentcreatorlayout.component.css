@@ -297,4 +297,33 @@
     padding-bottom: 8px;
     position: static;
   }
+
+  .topbar {
+    padding: 0 14px;
+    gap: 12px;
+  }
+
+  .topbar-logo {
+    width: auto;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .search-wrapper {
+    position: static;
+    left: auto;
+    transform: none;
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .sidebar-logout {
+    margin-top: 12px;
+    border-top: none;
+    padding-top: 8px;
+  }
+
+  .user-meta {
+    display: none;
+  }
 }

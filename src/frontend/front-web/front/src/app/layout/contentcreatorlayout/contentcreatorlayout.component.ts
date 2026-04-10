@@ -6,13 +6,13 @@ import { AuthService } from '../../services/auth.service';
 import { UserDto } from '../../models/user.model';
 
 @Component({
-  selector: 'app-manager-layout',
+  selector: 'app-content-creator-layout',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './managerlayout.component.html',
-  styleUrls: ['./managerlayout.component.css'],
+  templateUrl: './contentcreatorlayout.component.html',
+  styleUrls: ['./contentcreatorlayout.component.css'],
 })
-export class ManagerLayoutComponent implements OnInit {
+export class ContentCreatorLayoutComponent implements OnInit {
   searchQuery = '';
   user: any = {
     name: '',
