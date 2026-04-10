@@ -1320,7 +1320,7 @@ VALUES
     NOW());
 
 -- ============================================
--- 11. IMAGES - OBJECTS
+-- 12. IMAGES - OBJECTS
 -- ============================================
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 VALUES
@@ -1445,14 +1445,111 @@ VALUES
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
     NOW());
 
+-- ============================================
+-- 13. IMAGES - ACTIVITIES
+-- ============================================
+
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
+VALUES
+(
+    'https://infinityadventure.me/wp-content/uploads/2023/12/durmitor-planinarenje.png',
+    'Planinarenje na Durmitoru',
+    true,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje na Durmitoru'),
+    NOW()),
+(
+    'https://durmitoradventure.com/static/4b5891e1e968e8f1d6d4708e4c7be588/df7b5/hero_Hiking_1900x1267_e5b7b9b462.jpg',
+    'Planinarenje na Durmitoru',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje na Durmitoru'),
+    NOW()),
+(
+    'https://explore-serbia.rs/wp-content/uploads/2022/09/Durmitor-Bobotov-Kuk-1.jpg',
+    'Planinarenje na Durmitoru',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje na Durmitoru'),
+    NOW()),
+(
+    'https://explore-serbia.rs/wp-content/uploads/2022/09/Durmitor-Bobotov-Kuk-2.jpg',
+    'Planinarenje na Durmitoru',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje na Durmitoru'),
+    NOW()),
+(
+    'https://www.montenegrofortravellers.com/sites/default/files/styles/monte1140x550/public/place/top_hill_budva_nochnoy_klub_top_hill_v_budve.jpg?itok=zTr34xsE',
+    'Nocni provod Budva',
+    true,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Nocni provod Budva'),
+    NOW()),
+(
+    'https://apartments-sofija.com/wp-content/uploads/budva-party-apartments-1.jpg',
+    'Nocni provod Budva',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Nocni provod Budva'),
+    NOW()),
+(
+    'https://www.budvanocu.com/getimage.php?img=p18rspcf3312ih5uk1uf4eb99bm1.jpg&w=600',
+    'Nocni provod Budva',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Nocni provod Budva'),
+    NOW()),
+(
+    'https://balkanfun.travel/sites/default/files/inline-images/nocni-klub-plesanje.jpg',
+    'Nocni provod Budva',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Nocni provod Budva'),
+    NOW()),
+(
+    'https://www.sentandrea.com/images/2018/11/s2.jpg',
+    'Degustacija morskih specijaliteta',
+    true,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
+    NOW()),
+(
+    'https://www.sentandrea.com/images/2018/11/s4.jpg',
+    'Degustacija morskih specijaliteta',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
+    NOW()),
+(
+    'https://www.bevanda.co.rs/images/w2.jpg',
+    'Degustacija morskih specijaliteta',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
+    NOW()),
+(
+    'https://www.sentandrea.com/images/2018/11/oh2-650x630.jpg',
+    'Degustacija morskih specijaliteta',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
+    NOW()),
+(
+    'https://cdn.getyourguide.com/img/tour/b462479da72df66db77e9a7154f272c7ba1b86fe125727996216cb2ad1a398fc.jpg/99.jpg',
+    'Setnja starim gradom Kotora',
+    true,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Setnja starim gradom Kotora'),
+    NOW()),
+(
+    'https://monteonline.org/wp-content/uploads/2023/01/oldtownkotor05.jpg',
+    'Setnja starim gradom Kotora',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Setnja starim gradom Kotora'),
+    NOW()),
+(
+    'https://kofer.info/wp-content/uploads/2020/03/shutterstock_1703935768-1000x600.jpg',
+    'Setnja starim gradom Kotora',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Setnja starim gradom Kotora'),
+    NOW()),
+(
+    'https://respectacar.com/storage/blog/c5cf293f-db96-4743-9f6c-6ad90f46846b/kotor-old-town.jpg',
+    'Setnja starim gradom Kotora',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Setnja starim gradom Kotora'),
+    NOW());
 
 
-
-
-
-
-
-
+    
 -- ============================================
 -- INDEXES
 -- ============================================
