@@ -1,7 +1,8 @@
 import { Routes } from '@angular/router';
 import { AdminLayoutComponent } from './layout/adminlayout/adminlayout.component';
-// import { ManagerLayoutComponent } from './layout/manager-layout/manager-layout.component';
-// import { ContentCreatorLayoutComponent } from './layout/content-creator-layout/content-creator-layout.component';
+import { ManagerLayoutComponent } from './layout/managerlayout/managerlayout.component';
+import { authGuard } from './guards/auth.guard';
+import { roleGuard } from './guards/role.guard';
  
 export const routes: Routes = [
   // Root redirect
@@ -21,6 +22,7 @@ export const routes: Routes = [
   // Signout
   {
     path: 'signout',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/signout/signout').then(m => m.Signout)
   },
@@ -29,6 +31,7 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: AdminLayoutComponent,
+    canActivate: [authGuard, roleGuard(['admin'])],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
@@ -60,32 +63,44 @@ export const routes: Routes = [
   },
  
   // === MANAGER ===
-  // {
-  //   path: 'manager',
-  //   component: ManagerLayoutComponent,
-  //   children: [
-  //     { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  //     {
-  //       path: 'dashboard',
-  //       loadComponent: () =>
-  //         import('./pages/manager/dashboard/dashboard.component').then(m => m.DashboardComponent)
-  //     },
-  //   ]
-  // },
- 
-  // === CONTENT CREATOR ===
-  // {
-  //   path: 'content-creator',
-  //   component: ContentCreatorLayoutComponent,
-  //   children: [
-  //     { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-  //     {
-  //       path: 'dashboard',
-  //       loadComponent: () =>
-  //         import('./pages/content-creator/dashboard/dashboard.component').then(m => m.DashboardComponent)
-  //     },
-  //   ]
-  // },
+  {
+    path: 'manager',
+    component: ManagerLayoutComponent,
+    canActivate: [authGuard, roleGuard(['manager'])],
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./pages/manager/dashboard/dashboard.component').then(m => m.ManagerDashboardComponent)
+      },
+      {
+        path: 'objects',
+        loadComponent: () =>
+          import('./pages/manager/objects/objects.component').then(m => m.ManagerObjectsComponent)
+      },
+      {
+        path: 'activities',
+        loadComponent: () =>
+          import('./pages/manager/activities/activities.component').then(m => m.ManagerActivitiesComponent)
+      },
+      {
+        path: 'events',
+        loadComponent: () =>
+          import('./pages/manager/events/events.component').then(m => m.ManagerEventsComponent)
+      },
+      {
+        path: 'reviews',
+        loadComponent: () =>
+          import('./pages/manager/reviews/reviews.component').then(m => m.ManagerReviewsComponent)
+      },
+      {
+        path: 'map',
+        loadComponent: () =>
+          import('./pages/manager/map/map.component').then(m => m.ManagerMapComponent)
+      }
+    ]
+  },
  
   // Fallback
   {
