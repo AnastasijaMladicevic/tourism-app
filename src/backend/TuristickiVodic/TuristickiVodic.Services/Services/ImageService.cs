@@ -29,7 +29,6 @@ namespace TuristickiVodic.Services.Services
             if (image == null)
                 return null;
 
-            ValidateEntityReassignmentIsNotAttempted(image, dto);
             await EnsureCanManageImageAsync(image, userId, roleName);
 
             var targetIsMain = dto.IsMain ?? image.IsMain;
@@ -381,18 +380,6 @@ namespace TuristickiVodic.Services.Services
                     (destinationId.HasValue && i.DestinationId == destinationId) ||
                     (localityId.HasValue && i.LocalityId == localityId)
                 ));
-        }
-
-        private static void ValidateEntityReassignmentIsNotAttempted(Image image, UpdateImageDto dto)
-        {
-            if ((dto.ObjectId.HasValue && dto.ObjectId != image.ObjectId) ||
-                (dto.ActivityId.HasValue && dto.ActivityId != image.ActivityId) ||
-                (dto.EventId.HasValue && dto.EventId != image.EventId) ||
-                (dto.DestinationId.HasValue && dto.DestinationId != image.DestinationId) ||
-                (dto.LocalityId.HasValue && dto.LocalityId != image.LocalityId))
-            {
-                throw new InvalidOperationException("Image cannot be moved to another entity.");
-            }
         }
 
         private async Task EnsureCanManageImageAsync(Image image, int userId, string roleName)
