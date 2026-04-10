@@ -257,17 +257,32 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateAsync_PokusajPremestanjaNaDrugiEntitet_BacaInvalidOperationException()
+        public async Task UpdateAsync_MenjaUrlAltTextIIsMain_UspesnoAzuriraSliku()
         {
             using var ctx = CreateContext();
             SeedObject(ctx, id: 1, createdByUserId: 5);
-            SeedEvent(ctx, id: 1, createdByUserId: 5);
             var img = SeedImage(ctx, isMain: true, objectId: 1);
             var svc = new ImageService(ctx, CreateMapper());
 
-            await svc.Invoking(s => s.UpdateAsync(img.Id, new UpdateImageDto { EventId = 1 }, 5, "ContentCreator"))
-                .Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*cannot be moved*");
+            var dto = new UpdateImageDto
+            {
+                Url = "https://novo.com/slika.jpg",
+                AltText = "Nova slika",
+                IsMain = true
+            };
+
+            var result = await svc.UpdateAsync(img.Id, dto, 5, "ContentCreator");
+
+            result.Should().NotBeNull();
+            result!.Url.Should().Be("https://novo.com/slika.jpg");
+            result.AltText.Should().Be("Nova slika");
+            result.IsMain.Should().BeTrue();
+
+            var updated = await ctx.Images.FindAsync(img.Id);
+            updated.Should().NotBeNull();
+            updated!.Url.Should().Be("https://novo.com/slika.jpg");
+            updated.AltText.Should().Be("Nova slika");
+            updated.IsMain.Should().BeTrue();
         }
 
         [Fact]

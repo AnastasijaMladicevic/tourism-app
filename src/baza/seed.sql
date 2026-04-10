@@ -1319,8 +1319,237 @@ VALUES
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Porto Montenegro'),
     NOW());
 
+-- ============================================
+-- 12. IMAGES - OBJECTS
+-- ============================================
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
+VALUES
+(
+    'https://images.trvl-media.com/lodging/3000000/2500000/2497700/2497664/26b21f8d.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill',
+    'Hotel Vardar',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
+    NOW()),
+(
+    'https://vardarkotor.me-hotel.com/data/Imgs/OriginalPhoto/13136/1313656/1313656486/hotel-vardar-kotor-img-5.JPEG',
+    'Hotel Vardar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
+    NOW()),
+(
+    'https://soleazur.rs/uploads/0000/1/2021/11/22/vardar-kotor-2.jpg',
+    'Hotel Vardar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
+    NOW()),
+(
+    'https://alf.ua/public/uploads/media/thumbnails/0002/06/4cfefe4960e0f0615dbcfbb47d94d9b76d0497a4.jpeg',
+    'Hotel Vardar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
+    NOW()),
+(
+    'https://mcdn.pro/data/objects/images/40419/1-5vpoci-l-ptkdlq.jpg',
+    'Hotel Avala',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
+    NOW()),
+(
+    'https://globus-tours.co/storage/2023/05/avala-resort-2.jpg',
+    'Hotel Avala',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
+    NOW()),
+(
+    'https://www.kongresniturizam.com/storage/objects/vGHRn278rdNRSipA.jpg',
+    'Hotel Avala',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
+    NOW()),
+(
+    'https://www.avalaresort.com/photos/1/Gallery/Spa%20&%20Wellness/homepage/DSC_7301.jpg',
+    'Hotel Avala',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
+    NOW()),
+(
+    'https://www.luxurylifestylemag.co.uk/wp-content/uploads/2022/11/140-Hotel-Vardar-photo-Edvard-Nalbantjan-.jpg',
+    'Restoran Galion',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
+    NOW()),
+(
+    'https://www.luxurylifestylemag.co.uk/wp-content/uploads/2022/11/132-Hotel-Vardar-photo-Edvard-Nalbantjan-.jpg',
+    'Restoran Galion',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
+    NOW()),
+(
+    'https://turistickiinfocentar.rs/wp-content/uploads/CF026968favsmanjeno-min-1-1-scaled.jpg',
+    'Restoran Galion',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
+    NOW()),
+(
+    'https://www.montenegrofortravellers.com/sites/default/files/styles/monte1140x550/public/place/restaurant_galion_restoran_galion_v_kotore.jpg?itok=wLuoKPQe',
+    'Restoran Galion',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
+    NOW()),
+(
+    'https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1920,fit=crop/A854j9RqjjF9MZww/hmphoto-24-dWxbarqLqquob7Qz.jpg',
+    'Mogren Beach Bar',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
+    NOW()),
+(
+    'https://adriaticways.com/wp-content/uploads/2026/01/Mogren-2-Beach.webp',
+    'Mogren Beach Bar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
+    NOW()),
+(
+    'https://montenegro.org/wp-content/uploads/2023/11/IMG_7522-1024x768.jpg',
+    'Mogren Beach Bar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
+    NOW()),
+(
+    'https://montenegro.org/wp-content/uploads/2023/11/IMG_7553-1024x768.jpg',
+    'Mogren Beach Bar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
+    NOW()),
+(
+    'https://www.antenam.net/uploads/a/f/9/af9e3af739604df73554e1fb290f080a.jpeg',
+    'Planinarski dom Durmitor',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
+    NOW()),
+(
+    'https://www.vijesti.me/data/images/2019/02/17/00/3076728_20190217020252_5c68bf02b789684ea0f98e47jpeg_ls.jpg',
+    'Planinarski dom Durmitor',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
+    NOW()),
+(
+    'https://durmitor.wordpress.com/wp-content/uploads/2012/03/planinarski-dom-orjen.jpg?w=584',
+    'Planinarski dom Durmitor',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
+    NOW()),
+(
+    'https://lh3.googleusercontent.com/p/AF1QipNRrYNagkDHzZ-UBtBHSm3Y7nF12mw_KBVbmdgZ=s1600-w640',
+    'Planinarski dom Durmitor',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
+    NOW());
+
+-- ============================================
+-- 13. IMAGES - ACTIVITIES
+-- ============================================
+
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
+VALUES
+(
+    'https://infinityadventure.me/wp-content/uploads/2023/12/durmitor-planinarenje.png',
+    'Planinarenje na Durmitoru',
+    true,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje na Durmitoru'),
+    NOW()),
+(
+    'https://durmitoradventure.com/static/4b5891e1e968e8f1d6d4708e4c7be588/df7b5/hero_Hiking_1900x1267_e5b7b9b462.jpg',
+    'Planinarenje na Durmitoru',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje na Durmitoru'),
+    NOW()),
+(
+    'https://explore-serbia.rs/wp-content/uploads/2022/09/Durmitor-Bobotov-Kuk-1.jpg',
+    'Planinarenje na Durmitoru',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje na Durmitoru'),
+    NOW()),
+(
+    'https://explore-serbia.rs/wp-content/uploads/2022/09/Durmitor-Bobotov-Kuk-2.jpg',
+    'Planinarenje na Durmitoru',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje na Durmitoru'),
+    NOW()),
+(
+    'https://www.montenegrofortravellers.com/sites/default/files/styles/monte1140x550/public/place/top_hill_budva_nochnoy_klub_top_hill_v_budve.jpg?itok=zTr34xsE',
+    'Nocni provod Budva',
+    true,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Nocni provod Budva'),
+    NOW()),
+(
+    'https://apartments-sofija.com/wp-content/uploads/budva-party-apartments-1.jpg',
+    'Nocni provod Budva',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Nocni provod Budva'),
+    NOW()),
+(
+    'https://www.budvanocu.com/getimage.php?img=p18rspcf3312ih5uk1uf4eb99bm1.jpg&w=600',
+    'Nocni provod Budva',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Nocni provod Budva'),
+    NOW()),
+(
+    'https://balkanfun.travel/sites/default/files/inline-images/nocni-klub-plesanje.jpg',
+    'Nocni provod Budva',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Nocni provod Budva'),
+    NOW()),
+(
+    'https://www.sentandrea.com/images/2018/11/s2.jpg',
+    'Degustacija morskih specijaliteta',
+    true,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
+    NOW()),
+(
+    'https://www.sentandrea.com/images/2018/11/s4.jpg',
+    'Degustacija morskih specijaliteta',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
+    NOW()),
+(
+    'https://www.bevanda.co.rs/images/w2.jpg',
+    'Degustacija morskih specijaliteta',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
+    NOW()),
+(
+    'https://www.sentandrea.com/images/2018/11/oh2-650x630.jpg',
+    'Degustacija morskih specijaliteta',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
+    NOW()),
+(
+    'https://cdn.getyourguide.com/img/tour/b462479da72df66db77e9a7154f272c7ba1b86fe125727996216cb2ad1a398fc.jpg/99.jpg',
+    'Setnja starim gradom Kotora',
+    true,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Setnja starim gradom Kotora'),
+    NOW()),
+(
+    'https://monteonline.org/wp-content/uploads/2023/01/oldtownkotor05.jpg',
+    'Setnja starim gradom Kotora',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Setnja starim gradom Kotora'),
+    NOW()),
+(
+    'https://kofer.info/wp-content/uploads/2020/03/shutterstock_1703935768-1000x600.jpg',
+    'Setnja starim gradom Kotora',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Setnja starim gradom Kotora'),
+    NOW()),
+(
+    'https://respectacar.com/storage/blog/c5cf293f-db96-4743-9f6c-6ad90f46846b/kotor-old-town.jpg',
+    'Setnja starim gradom Kotora',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Setnja starim gradom Kotora'),
+    NOW());
 
 
+    
 -- ============================================
 -- INDEXES
 -- ============================================
