@@ -121,9 +121,29 @@ export const routes: Routes = [
           import('./pages/manager/objects/objects.component').then(m => m.ManagerObjectsComponent)
       },
       {
+        path: 'activities',
+        loadComponent: () =>
+          import('./pages/manager/activities/activities.component').then(m => m.ManagerActivitiesComponent)
+      },
+      {
         path: 'events',
         loadComponent: () =>
           import('./pages/manager/events/events.component').then(m => m.ManagerEventsComponent)
+      },
+      {
+        path: 'reviews',
+        loadComponent: () =>
+          import('./pages/manager/reviews/reviews.component').then(m => m.ManagerReviewsComponent)
+      },
+      {
+        path: 'localities',
+        loadComponent: () =>
+          import('./pages/manager/destinations/destinations.component').then(m => m.ManagerDestinationsComponent)
+      },
+      {
+        path: 'destinations',
+        redirectTo: 'localities',
+        pathMatch: 'full'
       },
       {
         path: 'map',
