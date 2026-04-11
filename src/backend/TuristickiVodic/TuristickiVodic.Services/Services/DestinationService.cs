@@ -18,19 +18,35 @@ namespace TuristickiVodic.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<DestinationDto>> GetAllAsync()
+        public async Task<IEnumerable<DestinationDto>> GetAllAsync(int? userId, string? role)
         {
-            var destinations = await _context.Destinations
+            var query = _context.Destinations
                 .Include(d => d.DestinationType)
                 .Include(d => d.Images)
-                .Where(d => d.Images.Any(i => i.IsMain))
+                .Where(d => d.Images.Any(i => i.IsMain));
+
+            // 🔒 SAMO Manager ima ograničenje
+            if (role != null && role == RoleType.Manager.ToString())
+            {
+                var user = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user?.ManagedDestinationId == null)
+                    return new List<DestinationDto>();
+
+                query = query.Where(d => d.Id == user.ManagedDestinationId);
+            }
+
+            // ✅ svi ostali (Admin, Tourist, ContentCreator, guest) → sve
+
+            var destinations = await query
                 .OrderBy(d => d.Id)
                 .ToListAsync();
 
             return _mapper.Map<IEnumerable<DestinationDto>>(destinations);
         }
 
-        public async Task<DestinationDto?> GetByIdAsync(int id)
+        public async Task<DestinationDto?> GetByIdAsync(int id, int userId, string role)
         {
             var destination = await _context.Destinations
                 .Include(d => d.DestinationType)
@@ -42,6 +58,16 @@ namespace TuristickiVodic.Services
 
             if (!destination.Images.Any(i => i.IsMain))
                 return null;
+
+            // 🔒 OGRANIČENJE ZA MANAGERA
+            if (role == RoleType.Manager.ToString())
+            {
+                var user = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user?.ManagedDestinationId != destination.Id)
+                    throw new UnauthorizedAccessException();
+            }
 
             return _mapper.Map<DestinationDto>(destination);
         }

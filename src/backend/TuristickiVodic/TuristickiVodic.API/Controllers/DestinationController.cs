@@ -21,7 +21,13 @@ namespace TuristickiVodic.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAll()
         {
-            var destinations = await _destinationService.GetAllAsync();
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var roleClaim = User.FindFirstValue(ClaimTypes.Role);
+
+            int? userId = userIdClaim != null ? int.Parse(userIdClaim) : null;
+            string? role = roleClaim;
+
+            var destinations = await _destinationService.GetAllAsync(userId, role);
             return Ok(destinations);
         }
 
@@ -29,9 +35,22 @@ namespace TuristickiVodic.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
-            var destination = await _destinationService.GetByIdAsync(id);
-            if (destination == null) return NotFound();
-            return Ok(destination);
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var roleClaim = User.FindFirstValue(ClaimTypes.Role);
+
+            int userId = userIdClaim != null ? int.Parse(userIdClaim) : 0;
+            string role = roleClaim ?? "";
+
+            try
+            {
+                var destination = await _destinationService.GetByIdAsync(id, userId, role);
+                if (destination == null) return NotFound();
+                return Ok(destination);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
         }
 
         // Admin kreira destinaciju – mora da navede menadžera (ManagedByUserId)
