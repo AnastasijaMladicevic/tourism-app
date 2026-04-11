@@ -25,7 +25,6 @@ namespace TuristickiVodic.Services
                 .Include(d => d.Images)
                 .Where(d => d.Images.Any(i => i.IsMain));
 
-            // 🔒 SAMO Manager ima ograničenje
             if (role != null && role == RoleType.Manager.ToString())
             {
                 var user = await _context.Users
@@ -37,8 +36,6 @@ namespace TuristickiVodic.Services
                 query = query.Where(d => d.Id == user.ManagedDestinationId);
             }
 
-            // ✅ svi ostali (Admin, Tourist, ContentCreator, guest) → sve
-
             var destinations = await query
                 .OrderBy(d => d.Id)
                 .ToListAsync();
@@ -46,7 +43,7 @@ namespace TuristickiVodic.Services
             return _mapper.Map<IEnumerable<DestinationDto>>(destinations);
         }
 
-        public async Task<DestinationDto?> GetByIdAsync(int id, int userId, string role)
+        public async Task<DestinationDto?> GetByIdAsync(int id, int? userId, string role)
         {
             var destination = await _context.Destinations
                 .Include(d => d.DestinationType)
@@ -59,7 +56,6 @@ namespace TuristickiVodic.Services
             if (!destination.Images.Any(i => i.IsMain))
                 return null;
 
-            // 🔒 OGRANIČENJE ZA MANAGERA
             if (role == RoleType.Manager.ToString())
             {
                 var user = await _context.Users

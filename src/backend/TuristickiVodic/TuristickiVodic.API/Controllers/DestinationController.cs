@@ -38,8 +38,8 @@ namespace TuristickiVodic.API.Controllers
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var roleClaim = User.FindFirstValue(ClaimTypes.Role);
 
-            int userId = userIdClaim != null ? int.Parse(userIdClaim) : 0;
-            string role = roleClaim ?? "";
+            int? userId = userIdClaim != null ? int.Parse(userIdClaim) : null;
+            string? role = roleClaim;
 
             try
             {

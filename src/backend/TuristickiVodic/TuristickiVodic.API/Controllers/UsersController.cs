@@ -4,6 +4,7 @@ using System.Security.Claims;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Services;
 using System.IdentityModel.Tokens.Jwt;
+using SixLabors.ImageSharp;
 
 namespace TuristickiVodic.API.Controllers
 {
@@ -219,6 +220,7 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpPut("{id}/profile-image")]
         [Consumes("multipart/form-data")]
+        [RequestSizeLimit(5 * 1024 * 1024)]
         public async Task<IActionResult> UpdateProfileImage(int id, [FromForm] UploadProfileImageDto dto)
         {
             var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
@@ -228,6 +230,30 @@ namespace TuristickiVodic.API.Controllers
 
             if (dto.File == null || dto.File.Length == 0)
                 return BadRequest(new { message = "Image file is required." });
+
+            if (dto.File.Length > 5 * 1024 * 1024)
+                return BadRequest(new { message = "Image size must not exceed 5MB." });
+
+            var allowedExtensions = new[] { ".png", ".jpg", ".jpeg" };
+            var allowedContentTypes = new[] { "image/png", "image/jpeg" };
+
+            var extension = Path.GetExtension(dto.File.FileName).ToLowerInvariant();
+            var contentType = dto.File.ContentType?.ToLowerInvariant();
+
+            if (string.IsNullOrWhiteSpace(extension) || !allowedExtensions.Contains(extension))
+                return BadRequest(new { message = "Only PNG, JPG and JPEG formats are allowed." });
+
+            if (string.IsNullOrWhiteSpace(contentType) || !allowedContentTypes.Contains(contentType))
+                return BadRequest(new { message = "Only PNG, JPG and JPEG formats are allowed." });
+
+            try
+            {
+                using var image = await Image.LoadAsync(dto.File.OpenReadStream());
+            }
+            catch
+            {
+                return BadRequest(new { message = "Fajl nije ispravna slika." });
+            }
 
             try
             {
