@@ -24,6 +24,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/signout/signout').then(m => m.Signout)
   },
+  //Signin
+  {
+      path:'signup',
+      loadComponent:() =>
+        import('./pages/signup/signup.component').then(m=>m.SignupComponent)
+  },
  
   // === ADMIN ===
   {
@@ -31,6 +37,11 @@ export const routes: Routes = [
     component: AdminLayoutComponent,
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+  path: 'profile',
+  loadComponent: () =>
+    import('./pages/admin/profile/profile.component').then(m => m.ProfileComponent)
+  },
       {
         path: 'dashboard',
         loadComponent: () =>
