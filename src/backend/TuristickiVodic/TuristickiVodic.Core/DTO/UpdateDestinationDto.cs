@@ -11,7 +11,5 @@
         public double? Latitude { get; set; }
 
         public int? DestinationTypeId { get; set; }
-
-        public bool? IsActive { get; set; }
     }
 }

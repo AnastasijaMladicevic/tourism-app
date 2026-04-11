@@ -190,7 +190,7 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var svc = new DestinationService(ctx, CreateMapper());
-            var result = await svc.GetByIdAsync(1);
+            var result = await svc.GetByIdAsync(1, null, null);
 
             result.Should().NotBeNull();
             result!.Name.Should().Be("Budva");
@@ -252,7 +252,7 @@ namespace TuristickiVodic.Tests.Services
 
             var svc = new DestinationService(ctx, mapper);
 
-            var result = await svc.GetByIdAsync(destination.Id);
+            var result = await svc.GetByIdAsync(destination.Id, null, null);
 
             result.Should().BeNull();
         }
@@ -264,7 +264,7 @@ namespace TuristickiVodic.Tests.Services
             SeedBase(ctx);
             var svc = new DestinationService(ctx, CreateMapper());
 
-            var result = await svc.GetByIdAsync(9999);
+            var result = await svc.GetByIdAsync(9999, null, null);
 
             result.Should().BeNull();
         }
@@ -321,7 +321,7 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var svc = new DestinationService(ctx, CreateMapper());
-            var result = await svc.GetAllAsync();
+            var result = await svc.GetAllAsync(null, null);
 
             result.Should().HaveCount(2);
         }

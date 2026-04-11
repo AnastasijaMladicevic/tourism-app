@@ -17,11 +17,6 @@ namespace TuristickiVodic.Core.DTO
         [Required]
         public int DestinationTypeId { get; set; }
 
-        public bool IsActive { get; set; } = true;
-
-        /// <summary>
-        /// Obavezno – destinacija ne može da se kreira bez dodeljenog menadžera.
-        /// </summary>
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "ManagedByUserId mora biti validan ID menadžera (vrednost >= 1).")]
         public int? ManagedByUserId { get; set; }

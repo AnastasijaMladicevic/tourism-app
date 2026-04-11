@@ -26,7 +26,7 @@ namespace TuristickiVodic.Services
                 .Include(l => l.Destination)
                 .Include(l => l.LocalityType)
                 .Include(l => l.Images)
-                .Where(l => l.Images.Any(i => i.IsMain))
+                .Where(l => l.IsActive && l.Images.Any(i => i.IsMain))
                 .OrderBy(l => l.Id)
                 .ToListAsync();
 
@@ -42,6 +42,9 @@ namespace TuristickiVodic.Services
                 .FirstOrDefaultAsync(l => l.Id == id);
 
             if (locality == null)
+                return null;
+
+            if (!locality.IsActive)
                 return null;
 
             if (!locality.Images.Any(i => i.IsMain))
@@ -83,7 +86,6 @@ namespace TuristickiVodic.Services
                 Name = dto.Name,
                 Description = dto.Description,
                 Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
-                IsActive = dto.IsActive,
                 DestinationId = dto.DestinationId,
                 LocalityTypeId = dto.LocalityTypeId,
                 CreatedByUserId = userId,
@@ -168,9 +170,6 @@ namespace TuristickiVodic.Services
             if (dto.Longitude.HasValue && dto.Latitude.HasValue)
                 locality.Geolocation = CreatePoint(dto.Longitude.Value, dto.Latitude.Value);
 
-            if (dto.IsActive.HasValue)
-                locality.IsActive = dto.IsActive.Value;
-
             locality.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -221,6 +220,39 @@ namespace TuristickiVodic.Services
                 return null;
 
             return new Point(longitude.Value, latitude.Value) { SRID = 4326 };
+        }
+
+        public async Task<LocalityDto?> ToggleActiveAsync(int id, bool isActive, int userId, string roleName)
+        {
+            var locality = await _context.Localities
+                .Include(l => l.Destination)
+                .Include(l => l.LocalityType)
+                .FirstOrDefaultAsync(l => l.Id == id);
+
+            if (locality == null)
+                return null;
+
+            if (roleName != "Manager")
+                throw new UnauthorizedAccessException("Only managers can change locality visibility.");
+
+            if (locality.Destination == null)
+                throw new InvalidOperationException("Cannot determine destination of this locality.");
+
+            var isResponsible = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, locality.Destination, userId);
+            if (!isResponsible)
+                throw new UnauthorizedAccessException("You are not the responsible manager for this destination.");
+
+            locality.IsActive = isActive;
+            locality.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            var updated = await _context.Localities
+                .Include(l => l.Destination)
+                .Include(l => l.LocalityType)
+                .FirstAsync(l => l.Id == locality.Id);
+
+            return _mapper.Map<LocalityDto>(updated);
         }
     }
 }

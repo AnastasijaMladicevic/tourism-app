@@ -21,7 +21,5 @@
         public int? DestinationId { get; set; }
 
         public int? ObjectId { get; set; }
-
-        public bool? IsActive { get; set; }
     }
 }

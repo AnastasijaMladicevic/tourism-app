@@ -37,7 +37,10 @@ namespace TuristickiVodic.Services.Services
                 .Include(e => e.Locality)
                 .Include(e => e.Destination)
                 .Include(e => e.Object)
-                .Where(e => _context.Images.Any(i => i.EventId == e.Id && i.IsMain))
+                .Where(e =>
+                    e.Status == ContentStatus.Approved &&
+                    e.IsActive &&
+                    _context.Images.Any(i => i.EventId == e.Id && i.IsMain))
                 .OrderBy(e => e.Id)
                 .ToListAsync();
 
@@ -51,6 +54,10 @@ namespace TuristickiVodic.Services.Services
                 .Include(e => e.Locality)
                 .Include(e => e.Destination)
                 .Include(e => e.Object)
+                .Where(e =>
+                    e.Status == ContentStatus.Approved &&
+                    e.IsActive &&
+                    _context.Images.Any(i => i.EventId == e.Id && i.IsMain))
                 .AsQueryable();
 
             if (filter != null)
@@ -120,6 +127,9 @@ namespace TuristickiVodic.Services.Services
             if (ev == null)
                 return null;
 
+            if (ev.Status != ContentStatus.Approved || !ev.IsActive)
+                return null;
+
             var hasMainImage = await _context.Images.AnyAsync(i => i.EventId == ev.Id && i.IsMain);
             if (!hasMainImage)
                 return null;
@@ -159,7 +169,6 @@ namespace TuristickiVodic.Services.Services
                 EndDate = dto.EndDate,
                 Price = dto.Price,
                 MaxVisitors = dto.MaxVisitors,
-                IsActive = dto.IsActive,
                 EventTypeId = dto.EventTypeId,
                 LocalityId = dto.LocalityId,
                 DestinationId = dto.DestinationId,
@@ -238,7 +247,6 @@ namespace TuristickiVodic.Services.Services
 
             if (dto.Price.HasValue) ev.Price = dto.Price.Value;
             if (dto.MaxVisitors.HasValue) ev.MaxVisitors = dto.MaxVisitors.Value;
-            if (dto.IsActive.HasValue) ev.IsActive = dto.IsActive.Value;
 
             ev.UpdatedAt = DateTime.UtcNow;
 
@@ -349,6 +357,41 @@ namespace TuristickiVodic.Services.Services
                 return null;
 
             return new Point(longitude.Value, latitude.Value) { SRID = 4326 };
+        }
+
+        public async Task<EventDto?> ToggleActiveAsync(int id, bool isActive, int userId, string roleName)
+        {
+            var ev = await _context.Events
+                .Include(e => e.Locality)
+                    .ThenInclude(l => l.Destination)
+                .Include(e => e.Destination)
+                .Include(e => e.EventType)
+                .Include(e => e.Object)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (ev == null)
+                return null;
+
+            if (roleName != "Manager")
+                throw new UnauthorizedAccessException("Only managers can change event visibility.");
+
+            if (ev.Status != ContentStatus.Approved)
+                throw new InvalidOperationException("Only approved events can have visibility changed.");
+
+            var destination = ev.Destination ?? ev.Locality?.Destination;
+            if (destination == null)
+                throw new InvalidOperationException("Cannot determine destination for this event.");
+
+            var isResponsible = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, destination, userId);
+            if (!isResponsible)
+                throw new UnauthorizedAccessException("You are not the responsible manager for this destination.");
+
+            ev.IsActive = isActive;
+            ev.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
         }
     }
 }

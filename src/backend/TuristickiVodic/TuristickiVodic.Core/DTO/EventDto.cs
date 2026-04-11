@@ -15,6 +15,7 @@ namespace TuristickiVodic.Core.DTO
         public double? Longitude { get; set; }
 
         public double? Latitude { get; set; }
+        public bool IsActive { get; set; }
 
         public DateTime StartDate { get; set; }
 
@@ -23,8 +24,6 @@ namespace TuristickiVodic.Core.DTO
         public decimal? Price { get; set; }
 
         public int? MaxVisitors { get; set; }
-
-        public bool IsActive { get; set; }
 
         public string Status { get; set; } = string.Empty;
 

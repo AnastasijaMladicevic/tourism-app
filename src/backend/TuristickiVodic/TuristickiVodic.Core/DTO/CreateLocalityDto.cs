@@ -22,7 +22,5 @@ namespace TuristickiVodic.Core.DTO
 
         [Required]
         public int LocalityTypeId { get; set; }
-
-        public bool IsActive { get; set; } = true;
     }
 }

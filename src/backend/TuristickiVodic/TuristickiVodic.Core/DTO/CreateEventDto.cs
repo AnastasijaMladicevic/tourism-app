@@ -35,14 +35,19 @@ namespace TuristickiVodic.Core.DTO
 
         public int? ObjectId { get; set; }
 
-        public bool IsActive { get; set; } = true;
-
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (!LocalityId.HasValue && !DestinationId.HasValue)
                 yield return new ValidationResult(
                     "Event must have either a LocalityId or a DestinationId.",
                     new[] { nameof(LocalityId), nameof(DestinationId) });
+
+            if (EndDate.HasValue && EndDate.Value < StartDate)
+            {
+                yield return new ValidationResult(
+                    "EndDate cannot be earlier than StartDate.",
+                    new[] { nameof(EndDate), nameof(StartDate) });
+            }
         }
     }
 }

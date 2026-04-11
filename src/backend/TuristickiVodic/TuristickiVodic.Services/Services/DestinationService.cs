@@ -98,7 +98,6 @@ namespace TuristickiVodic.Services
                 Description = dto.Description,
                 Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
                 Status = ContentStatus.Approved,
-                IsActive = dto.IsActive,
                 DestinationTypeId = dto.DestinationTypeId,
                 ManagedByUserId = dto.ManagedByUserId.Value,
                 CreatedByUserId = userId,
@@ -149,9 +148,6 @@ namespace TuristickiVodic.Services
 
             if (dto.Longitude.HasValue && dto.Latitude.HasValue)
                 destination.Geolocation = CreatePoint(dto.Longitude, dto.Latitude);
-
-            if (dto.IsActive.HasValue)
-                destination.IsActive = dto.IsActive.Value;
 
             destination.UpdatedAt = DateTime.UtcNow;
 

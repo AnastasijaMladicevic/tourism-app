@@ -49,6 +49,7 @@ namespace TuristickiVodic.Services.Mappings
                     opt => opt.MapFrom(src => src.DateOfBirth.HasValue
                         ? DateTime.SpecifyKind(src.DateOfBirth.Value, DateTimeKind.Utc)
                         : default(DateTime?)))
+                .ForMember(dest => dest.ProfileImageUrl, opt => opt.Ignore())
                 .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
                 .ForMember(dest => dest.RoleId, opt => opt.Ignore())
                 .ForMember(dest => dest.Role, opt => opt.Ignore())

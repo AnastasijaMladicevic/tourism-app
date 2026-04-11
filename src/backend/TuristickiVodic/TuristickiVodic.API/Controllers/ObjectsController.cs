@@ -17,7 +17,6 @@ namespace TuristickiVodic.API.Controllers
             _objectService = objectService;
         }
 
-        // Svi mogu da vide objekte
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetAll()
@@ -35,7 +34,6 @@ namespace TuristickiVodic.API.Controllers
             return Ok(obj);
         }
 
-        // Samo CC može da dodaje objekte
         [HttpPost]
         [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Create([FromBody] CreateTouristObjectDto dto)
@@ -53,7 +51,6 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // Samo CC može da menja objekte, i to samo svoje
         [HttpPut("{id}")]
         [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateTouristObjectDto dto)
@@ -72,8 +69,6 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // Menadžer odobrava/odbija objekte u svojoj destinaciji
-        // Ako destinacija nema Menadžera, odobrava Admin
         [HttpPost("{id}/approve")]
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Approve(int id, [FromBody] ApproveContentDto dto)
@@ -92,8 +87,26 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // Samo CC može direktno da obriše objekat, i to samo svoj Pending
-        // Approved objekti idu kroz deletion request
+        [HttpPut("{id}/toggle-active")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> ToggleActive(int id, [FromBody] ToggleActiveDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var roleName = User.FindFirstValue(ClaimTypes.Role)!;
+
+                var updated = await _objectService.ToggleActiveAsync(id, dto.IsActive, userId, roleName);
+                if (updated == null) return NotFound();
+
+                return Ok(updated);
+            }
+            catch (UnauthorizedAccessException) { return Forbid(); }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+        }
+
         [HttpDelete("{id}")]
         [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Delete(int id)

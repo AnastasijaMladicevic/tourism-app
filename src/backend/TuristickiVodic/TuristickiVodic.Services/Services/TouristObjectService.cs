@@ -25,7 +25,10 @@ namespace TuristickiVodic.Services.Services
                 .Include(o => o.ObjectType)
                 .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
-                .Where(o => _context.Images.Any(i => i.ObjectId == o.Id && i.IsMain))
+                .Where(o =>
+                    o.Status == ContentStatus.Approved &&
+                    o.IsActive &&
+                    _context.Images.Any(i => i.ObjectId == o.Id && i.IsMain))
                 .OrderBy(o => o.Id)
                 .ToListAsync();
 
@@ -36,6 +39,9 @@ namespace TuristickiVodic.Services.Services
         {
             var obj = await LoadObjectAsync(id);
             if (obj == null)
+                return null;
+
+            if (obj.Status != ContentStatus.Approved || !obj.IsActive)
                 return null;
 
             var hasMainImage = await _context.Images.AnyAsync(i => i.ObjectId == obj.Id && i.IsMain);
@@ -68,7 +74,6 @@ namespace TuristickiVodic.Services.Services
                 Website = dto.Website,
                 WorkingHours = dto.WorkingHours,
                 Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
-                IsActive = dto.IsActive,
                 ObjectTypeId = dto.ObjectTypeId,
                 LocalityId = dto.LocalityId,
                 // DestinationId se automatski preuzima iz lokacije
@@ -113,8 +118,7 @@ namespace TuristickiVodic.Services.Services
             if (dto.WorkingHours != null) obj.WorkingHours = dto.WorkingHours;
             if (dto.Longitude.HasValue && dto.Latitude.HasValue)
                 obj.Geolocation = CreatePoint(dto.Longitude, dto.Latitude);
-            if (dto.IsActive.HasValue) obj.IsActive = dto.IsActive.Value;
-
+            
             obj.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -221,7 +225,6 @@ namespace TuristickiVodic.Services.Services
             AverageRating = o.AverageRating,
             ReviewCount = o.ReviewCount,
             Status = o.Status.ToString(),
-            IsActive = o.IsActive,
             ObjectTypeId = o.ObjectTypeId,
             ObjectTypeName = o.ObjectType?.Name ?? string.Empty,
             LocalityId = o.LocalityId,
@@ -242,6 +245,36 @@ namespace TuristickiVodic.Services.Services
             return new Point(longitude.Value, latitude.Value) { SRID = 4326 };
         }
 
+        public async Task<TouristObjectDto?> ToggleActiveAsync(int id, bool isActive, int userId, string roleName)
+        {
+            var obj = await _context.Objects
+                .Include(o => o.Locality)
+                    .ThenInclude(l => l.Destination)
+                .FirstOrDefaultAsync(o => o.Id == id);
 
+            if (obj == null)
+                return null;
+
+            if (roleName != "Manager")
+                throw new UnauthorizedAccessException("Only managers can change object visibility.");
+
+            if (obj.Status != ContentStatus.Approved)
+                throw new InvalidOperationException("Only approved objects can have visibility changed.");
+
+            var destination = obj.Locality?.Destination;
+            if (destination == null)
+                throw new InvalidOperationException("Cannot determine destination for this object.");
+
+            var isResponsible = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, destination, userId);
+            if (!isResponsible)
+                throw new UnauthorizedAccessException("You are not the responsible manager for this destination.");
+
+            obj.IsActive = isActive;
+            obj.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return MapToDto(await LoadObjectAsync(obj.Id));
+        }
     }
 }

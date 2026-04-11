@@ -1,8 +1,8 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TuristickiVodic.Services;
 using TuristickiVodic.Core.DTO;
+using TuristickiVodic.Services;
 
 namespace TuristickiVodic.API.Controllers
 {
@@ -34,7 +34,6 @@ namespace TuristickiVodic.API.Controllers
             return Ok(activity);
         }
 
-        // Samo ContentCreator može da kreira aktivnost (status -> Pending, čeka odobrenje menadžera)
         [HttpPost]
         [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Create([FromBody] CreateActivityDto dto)
@@ -53,8 +52,6 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // Samo ContentCreator može da menja svoju aktivnost
-        // Jednom odobrena aktivnost više ne mora da dobije dozvolu da bi bila izmenjena
         [HttpPut("{id}")]
         [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateActivityDto dto)
@@ -74,7 +71,6 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // Samo odgovorni menadžer može da odobri/odbije aktivnost u svojoj destinaciji
         [HttpPost("{id}/approve")]
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Approve(int id, [FromBody] ApproveContentDto dto)
@@ -94,8 +90,26 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // Samo ContentCreator može direktno da obriše svoju aktivnost koja nije Approved
-        // Approved aktivnost se briše kroz DeletionRequest
+        [HttpPut("{id}/toggle-active")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> ToggleActive(int id, [FromBody] ToggleActiveDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var roleName = User.FindFirstValue(ClaimTypes.Role)!;
+
+                var updated = await _activityService.ToggleActiveAsync(id, dto.IsActive, userId, roleName);
+                if (updated == null) return NotFound();
+
+                return Ok(updated);
+            }
+            catch (UnauthorizedAccessException) { return Forbid(); }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+        }
+
         [HttpDelete("{id}")]
         [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Delete(int id)

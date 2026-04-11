@@ -26,7 +26,10 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.Locality)
                 .Include(a => a.Destination)
                 .Include(a => a.Object)
-                .Where(a => _context.Images.Any(i => i.ActivityId == a.Id && i.IsMain))
+                .Where(a =>
+                    a.Status == ContentStatus.Approved &&
+                    a.IsActive &&
+                    _context.Images.Any(i => i.ActivityId == a.Id && i.IsMain))
                 .OrderBy(a => a.Id)
                 .ToListAsync();
 
@@ -43,6 +46,9 @@ namespace TuristickiVodic.Services.Services
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (activity == null)
+                return null;
+
+            if (activity.Status != ContentStatus.Approved || !activity.IsActive)
                 return null;
 
             var hasMainImage = await _context.Images.AnyAsync(i => i.ActivityId == activity.Id && i.IsMain);
@@ -99,7 +105,6 @@ namespace TuristickiVodic.Services.Services
                 Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
                 Price = dto.Price,
                 DurationMinutes = dto.DurationMinutes,
-                IsActive = dto.IsActive,
                 ActivityTypeId = dto.ActivityTypeId,
                 LocalityId = dto.LocalityId,
                 DestinationId = dto.DestinationId,
@@ -197,8 +202,7 @@ namespace TuristickiVodic.Services.Services
                 activity.Geolocation = CreatePoint(dto.Longitude, dto.Latitude);
             if (dto.Price.HasValue) activity.Price = dto.Price.Value;
             if (dto.DurationMinutes.HasValue) activity.DurationMinutes = dto.DurationMinutes.Value;
-            if (dto.IsActive.HasValue) activity.IsActive = dto.IsActive.Value;
-
+            
             activity.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
@@ -291,6 +295,48 @@ namespace TuristickiVodic.Services.Services
             if (!longitude.HasValue || !latitude.HasValue)
                 return null;
             return new Point(longitude.Value, latitude.Value) { SRID = 4326 };
+        }
+
+        public async Task<ActivityDto?> ToggleActiveAsync(int id, bool isActive, int userId, string roleName)
+        {
+            var activity = await _context.Activities
+                .Include(a => a.ActivityType)
+                .Include(a => a.Locality)
+                    .ThenInclude(l => l.Destination)
+                .Include(a => a.Destination)
+                .Include(a => a.Object)
+                .FirstOrDefaultAsync(a => a.Id == id);
+
+            if (activity == null)
+                return null;
+
+            if (roleName != "Manager")
+                throw new UnauthorizedAccessException("Only managers can change activity visibility.");
+
+            if (activity.Status != ContentStatus.Approved)
+                throw new InvalidOperationException("Only approved activities can have visibility changed.");
+
+            var destination = activity.Destination ?? activity.Locality?.Destination;
+            if (destination == null)
+                throw new InvalidOperationException("Cannot determine destination for this activity.");
+
+            var isResponsible = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, destination, userId);
+            if (!isResponsible)
+                throw new UnauthorizedAccessException("You are not the responsible manager for this destination.");
+
+            activity.IsActive = isActive;
+            activity.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            var updated = await _context.Activities
+                .Include(a => a.ActivityType)
+                .Include(a => a.Locality)
+                .Include(a => a.Destination)
+                .Include(a => a.Object)
+                .FirstAsync(a => a.Id == activity.Id);
+
+            return _mapper.Map<ActivityDto>(updated);
         }
     }
 }
