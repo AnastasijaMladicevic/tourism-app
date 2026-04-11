@@ -32,11 +32,14 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var role = User.FindFirstValue(ClaimTypes.Role)!;
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var roleClaim = User.FindFirstValue(ClaimTypes.Role);
+
+            int userId = userIdClaim != null ? int.Parse(userIdClaim) : 0;
+            string role = roleClaim ?? "";
 
             try
             {
