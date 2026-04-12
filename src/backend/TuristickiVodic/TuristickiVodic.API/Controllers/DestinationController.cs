@@ -19,7 +19,7 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] DestinationQueryDto query)
         {
             var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var roleClaim = User.FindFirstValue(ClaimTypes.Role);
@@ -27,7 +27,7 @@ namespace TuristickiVodic.API.Controllers
             int? userId = userIdClaim != null ? int.Parse(userIdClaim) : null;
             string? role = roleClaim;
 
-            var destinations = await _destinationService.GetAllAsync(userId, role);
+            var destinations = await _destinationService.GetAllAsync(userId, role, query);
             return Ok(destinations);
         }
 
