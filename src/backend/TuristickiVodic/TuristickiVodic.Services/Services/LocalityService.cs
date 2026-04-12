@@ -38,9 +38,16 @@ namespace TuristickiVodic.Services
             var locality = await _context.Localities
                 .Include(l => l.Destination)
                 .Include(l => l.LocalityType)
+                .Include(l => l.Images)
                 .FirstOrDefaultAsync(l => l.Id == id);
 
-            return locality == null ? null : _mapper.Map<LocalityDto>(locality);
+            if (locality == null)
+                return null;
+
+            if (!locality.Images.Any(i => i.IsMain))
+                return null;
+
+            return _mapper.Map<LocalityDto>(locality);
         }
 
         public async Task<LocalityDto> CreateAsync(CreateLocalityDto dto, int userId, string roleName)

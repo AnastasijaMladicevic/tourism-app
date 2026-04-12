@@ -9,14 +9,14 @@ export interface DestinationDto {
   description?: string;
   latitude?: number;
   longitude?: number;
-  distanceKm?: number;      // backend će ovo dodati kad implementiraš lat/lng filter
+  distanceKm?: number; // backend će ovo dodati kad implementiraš lat/lng filter
   averageRating?: number;
   reviewCount?: number;
   isActive: boolean;
   destinationTypeId: number;
   destinationTypeName: string;
   images: DestinationImageDto[];
-  isFavorite?: boolean;     // frontend resolves ovo upoređivanjem sa favorites listom
+  isFavorite?: boolean; // frontend resolves ovo upoređivanjem sa favorites listom
   favoriteId?: number;
 }
 
@@ -47,8 +47,7 @@ export interface UpdateDestinationDto {
 
 @Injectable({ providedIn: 'root' })
 export class DestinationService {
-
-  private url = `${environment.apiUrl}/destinations`;
+  private url = `${environment.apiUrl}/Destinations`;
 
   constructor(private http: HttpClient) {}
 

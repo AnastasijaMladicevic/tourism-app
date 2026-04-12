@@ -7,6 +7,14 @@
 /bazel-out
 /build
 
+# Node / Angular
+node_modules/
+dist/
+.angular/
+coverage/
+tmp/
+out-tsc/
+
 # -------------------------
 # Node
 # -------------------------

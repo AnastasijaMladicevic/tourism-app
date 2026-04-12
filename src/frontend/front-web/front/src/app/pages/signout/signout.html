@@ -14,9 +14,11 @@
       Are you sure you want to end your current session and exit the admin panel?
     </p>
 
-    <button class="logout">Sign Out</button>
+    <button class="logout" (click)="confirmSignOut()">
+      Sign Out
+    </button>
 
-    <button class="cancel">
+    <button class="cancel" (click)="cancel()">
       ← Keep me signed in
     </button>
 

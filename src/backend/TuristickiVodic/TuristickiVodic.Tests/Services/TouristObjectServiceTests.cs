@@ -534,5 +534,66 @@ namespace TuristickiVodic.Tests.Services
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*approved object directly*");
         }
+
+        [Fact]
+        public async Task GetByIdAsync_PostojiSaMainSlikom_VracaDto()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_PostojiSaMainSlikom_VracaDto));
+            var (_, _, _, objectType, destination, locality, creator, _, _, _) = SeedBase(ctx);
+
+            var obj = new TouristObject
+            {
+                Id = 1,
+                Name = "Objekat",
+                ObjectTypeId = objectType.Id,
+                LocalityId = locality.Id,
+                DestinationId = destination.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Approved
+            };
+
+            ctx.Objects.Add(obj);
+
+            ctx.Images.Add(new Image
+            {
+                ObjectId = obj.Id,
+                Url = "main.jpg",
+                IsMain = true,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            ctx.SaveChanges();
+
+            var svc = new TouristObjectService(ctx, CreateMapper());
+            var result = await svc.GetByIdAsync(1);
+
+            result.Should().NotBeNull();
+            result!.Name.Should().Be("Objekat");
+        }
+
+        [Fact]
+        public async Task GetByIdAsync_BezMainSlike_VracaNull()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_BezMainSlike_VracaNull));
+            var (_, _, _, objectType, destination, locality, creator, _, _, _) = SeedBase(ctx);
+
+            ctx.Objects.Add(new TouristObject
+            {
+                Id = 1,
+                Name = "Objekat",
+                ObjectTypeId = objectType.Id,
+                LocalityId = locality.Id,
+                DestinationId = destination.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Approved
+            });
+
+            ctx.SaveChanges();
+
+            var svc = new TouristObjectService(ctx, CreateMapper());
+            var result = await svc.GetByIdAsync(1);
+
+            result.Should().BeNull();
+        }
     }
 }

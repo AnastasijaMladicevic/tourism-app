@@ -1,4 +1,4 @@
-/*TRUNCATE TABLE
+TRUNCATE TABLE
     "Images",
     "Favorites",
     "Reviews",
@@ -18,7 +18,7 @@
     "DestinationTypes",
     "LocalityTypes",
     "Roles"
-RESTART IDENTITY CASCADE;*/
+RESTART IDENTITY CASCADE;
 
 -- ============================================
 -- TEST PASSWORD FOR SEEDED USERS
@@ -41,25 +41,39 @@ INSERT INTO "Roles" ("Name", "CreatedAt") VALUES
 -- ============================================
 
 INSERT INTO "LocalityTypes" ("Name") VALUES
-('Grad'),
-('Opstina'),
-('Region'),
 ('Stari Grad'),
 ('Turisticka Zona'),
 ('Setaliste'),
 ('Trg'),
-('Park');
+('Park'),
+('Vidikovac'),
+('Plaza'),
+('Uvala'),
+('Marina'),
+('Centar grada'),
+('Izletiste'),
+('Istorijska lokacija'),
+('Kulturna cetvrt'),
+('Pesacka zona'),
+('Tvrdjava'),
+('Spomen park'),
+('Prirodni lokalitet');
 
 INSERT INTO "DestinationTypes" ("Name") VALUES
 ('Grad'),
 ('Planina'),
 ('Nacionalni Park'),
 ('Jezero'),
+('Reka'),
+('More'),
 ('Obala'),
+('Ostrvo'),
 ('Zaliv'),
 ('Banja'),
-('Stari Grad'),
-('Plaza');
+('Selo'),
+('Turisticka Regija'),
+('Rezervat prirode'),
+('Ski centar');
 
 INSERT INTO "ObjectTypes" ("Name") VALUES
 ('Restoran'),
@@ -73,7 +87,26 @@ INSERT INTO "ObjectTypes" ("Name") VALUES
 ('Benzinska Pumpa'),
 ('Muzej'),
 ('Galerija'),
-('Planinarski dom');
+('Planinarski dom'),
+('Kafic'),
+('Bar'),
+('Pansion'),
+('Hostel'),
+('Etno selo'),
+('Vinarija'),
+('Akva park'),
+('Zoo vrt'),
+('Akvarijum'),
+('Igraliste'),
+('Pozoriste'),
+('Bioskop'),
+('Biblioteka'),
+('Crkva'),
+('Manastir'),
+('Sportski centar'),
+('Wellness centar'),
+('Trznica'),
+('Suvenirnica');
 
 INSERT INTO "ActivityTypes" ("Name") VALUES
 ('Plivanje'),
@@ -81,18 +114,28 @@ INSERT INTO "ActivityTypes" ("Name") VALUES
 ('Skijanje'),
 ('Soping'),
 ('Paraglajding'),
-('Setnja'),
 ('Planinarenje'),
 ('Biciklizam'),
 ('Jahanje'),
 ('Poseta Restoranu'),
-('Nocni Izlazak'),
 ('Pesacenje'),
 ('Sport'),
-('Relax'),
-('Ishrana'),
 ('Obilazak'),
-('Izlazak');
+('Voznja camcem'),
+('Kajak'),
+('Rafting'),
+('Pecanje'),
+('Skijanje na vodi'),
+('Snowboarding'),
+('Klizanje'),
+('Joga'),
+('Spa i wellness'),
+('Fotografisanje'),
+('Razgledanje'),
+('Degustacija vina'),
+('Degustacija hrane'),
+('Kupovina'),
+('Nocni provod');
 
 INSERT INTO "EventTypes" ("Name") VALUES
 ('Koncert'),
@@ -102,26 +145,37 @@ INSERT INTO "EventTypes" ("Name") VALUES
 ('Festival'),
 ('Izlozba'),
 ('Nastup'),
-('Okupljanje');
+('Okupljanje'),
+('Sajam'),
+('Sportski dogadjaj'),
+('Konferencija'),
+('Radionica'),
+('Seminar'),
+('Takmicenje'),
+('Karneval'),
+('Proslava'),
+('Stand-up'),
+('DJ vece'),
+('Turnir');
 
 -- ============================================
 -- 3. USERS
 -- ============================================
 INSERT INTO "Users"
 ("FirstName", "LastName", "DateOfBirth", "Email", "PasswordHash", "PhoneNumber", "Country", "Language",
- "IsVerified", "IsActive", "IsBlacklisted", "HasRequestedCreatorRole", "RoleId", "ManagedDestinationId", "CreatedAt", "UpdatedAt")
+ "IsVerified", "IsActive", "IsBlacklisted", "HasRequestedCreatorRole", "RoleId", "ManagedDestinationId", "CreatedAt", "UpdatedAt", "ProfileImageUrl")
 VALUES
 ('Nikola', 'Nikolic', '1990-01-01', 'admin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Crna Gora', 'sr', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW()),
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 
 ('Marko', 'Jovanovic', '1992-05-15', 'marko@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269123456', 'Crna Gora', 'sr', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW()),
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 
 ('Ana', 'Petrovic', '1995-03-20', 'ana@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269234567', 'Crna Gora', 'sr', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'ContentCreator'), NULL, NOW(), NOW()),
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'ContentCreator'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 
 ('Ana', 'Anic', '1998-07-10', 'ana@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW());
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
 
 -- ============================================
 -- 4. DESTINATIONS
@@ -129,29 +183,19 @@ VALUES
 INSERT INTO "Destinations"
 ("Name", "Description", "Geolocation", "Status", "IsActive", "DestinationTypeId", "CreatedByUserId", "ManagedByUserId", "CreatedAt", "UpdatedAt")
 VALUES
-('Stari grad Kotor', 'Istorijska lokacija u srcu Kotora',
- ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 'Approved', true,
- (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Stari Grad'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
-
 ('Kotorski zaliv', 'Poznat po prirodnoj lepoti i Boki Kotorskoj',
  ST_SetSRID(ST_MakePoint(18.770, 42.430), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Zaliv'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
 
-('Budva', 'Primorski grad poznat po turizmu i starom gradu',
- ST_SetSRID(ST_MakePoint(18.840, 42.286), 4326), 'Approved', true,
+('Kotor', 'Primorski grad poznat po starom gradu i Bokokotorskom zalivu',
+ ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
 
-('Stari grad Budva', 'Istorijsko jezgro Budve',
- ST_SetSRID(ST_MakePoint(18.837, 42.279), 4326), 'Approved', true,
- (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Stari Grad'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
-
-('Plaza Mogren', 'Jedna od najlepsih plaza na Jadranu',
- ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), 'Approved', true,
- (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Plaza'),
+('Budva', 'Primorski grad poznat po turizmu i starom gradu',
+ ST_SetSRID(ST_MakePoint(18.840, 42.286), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
 
 ('Durmitor', 'Planinski masiv i nacionalni park',
@@ -201,10 +245,10 @@ VALUES
 
 UPDATE "Destinations"
 SET "ManagedByUserId" = (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com')
-WHERE "Name" = 'Stari grad Kotor';
+WHERE "Name" = 'Kotor';
 
 UPDATE "Users"
-SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor')
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor')
 WHERE "Email" = 'marko@spirego.com';
 
 -- ============================================
@@ -213,64 +257,70 @@ WHERE "Email" = 'marko@spirego.com';
 INSERT INTO "Localities"
 ("Name", "Description", "Geolocation", "IsActive", "DestinationId", "LocalityTypeId", "CreatedByUserId", "CreatedAt")
 VALUES
-('Budva', 'Poznato turisticko mesto na Jadranu',
- ST_SetSRID(ST_MakePoint(18.840, 42.286), 4326), true,
+('Stari grad Budva', 'Istorijsko jezgro Budve sa zidinama, trgovima i uskim ulicama',
+ ST_SetSRID(ST_MakePoint(18.837, 42.279), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
- (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Stari Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Podgorica', 'Glavni grad Crne Gore',
+('Centar Podgorice', 'Centralna gradska zona Podgorice sa trgovima, kaficima i institucijama',
  ST_SetSRID(ST_MakePoint(19.262, 42.441), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
- (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Zabljak', 'Planinski grad u blizini Durmitora',
- ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326), true,
+('Crno jezero', 'Poznati prirodni lokalitet u blizini Zabljaka i Durmitora',
+ ST_SetSRID(ST_MakePoint(19.091, 43.146), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
- (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Prirodni lokalitet'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Herceg Novi', 'Primorski grad na ulazu u Bokokotorski zaliv',
- ST_SetSRID(ST_MakePoint(18.537, 42.453), 4326), true,
+('Plaza Mogren', 'Jedna od najlepsih plaza na Jadranu',
+ ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Plaza'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
+
+('Setaliste Pet Danica', 'Poznato setaliste uz more u Herceg Novom',
+ ST_SetSRID(ST_MakePoint(18.537, 42.451), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
- (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Setaliste'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Bar', 'Grad poznat po luci i Starom Baru',
- ST_SetSRID(ST_MakePoint(19.100, 42.093), 4326), true,
+('Stari Bar', 'Istorijska lokacija i stari utvrdjeni deo Bara',
+ ST_SetSRID(ST_MakePoint(19.140, 42.097), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
- (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Ulcinj', 'Najjuzniji grad na primorju',
- ST_SetSRID(ST_MakePoint(19.224, 41.929), 4326), true,
+('Velika plaza', 'Poznata pescana plaza i obalna zona u Ulcinju',
+ ST_SetSRID(ST_MakePoint(19.238, 41.906), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
- (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Plaza'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Kotor', 'Primorski grad poznat po starom gradu',
+('Stari grad Kotor', 'Srednjovekovno gradsko jezgro Kotora pod zastitom UNESCO-a',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
- (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Stari Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Cetinje', 'Istorijska prestonica Crne Gore',
- ST_SetSRID(ST_MakePoint(18.924, 42.390), 4326), true,
+('Cetinjski manastir', 'Istorijska i duhovna lokacija od velikog znacaja',
+ ST_SetSRID(ST_MakePoint(18.922, 42.391), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
- (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Niksic', 'Drugi po velicini grad',
- ST_SetSRID(ST_MakePoint(18.956, 42.773), 4326), true,
+('Trg Slobode', 'Glavni trg i centar gradskih desavanja u Niksicu',
+ ST_SetSRID(ST_MakePoint(18.956, 42.774), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
- (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Trg'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Tivat', 'Primorski grad poznat po marini',
- ST_SetSRID(ST_MakePoint(18.693, 42.434), 4326), true,
+('Porto Montenegro', 'Marina i luksuzna obalna zona u Tivtu',
+ ST_SetSRID(ST_MakePoint(18.694, 42.434), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
- (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Marina'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW());
 
 -- ============================================
@@ -283,8 +333,8 @@ VALUES
 ('Hotel Vardar', 'Hotel u srcu starog grada Kotora', 'Stari grad Kotor', '+38232345678', 'https://hotelvardar.com',
  '{"pon":"00:00-24:00"}', ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kotor'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
@@ -292,7 +342,7 @@ VALUES
 ('Restoran Galion', 'Restoran sa pogledom na zaliv', 'Skaljari bb, Kotor', '+38232345679', 'https://galion.me',
  '{"pon":"10:00-23:00"}', ST_SetSRID(ST_MakePoint(18.768, 42.427), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kotor'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotorski zaliv'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
@@ -301,7 +351,7 @@ VALUES
 ('Hotel Avala', 'Luksuzni hotel pored mora', 'Budva centar', '+38233456789', 'https://avala.me',
  '{"pon":"00:00-24:00"}', ST_SetSRID(ST_MakePoint(18.838, 42.279), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Budva'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
@@ -310,8 +360,8 @@ VALUES
 ('Mogren Beach Bar', 'Kafic na plazi', 'Plaza Mogren', '+38233456780', NULL,
  '{"pon":"08:00-02:00"}', ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafana'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Budva'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plaza Mogren'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaza Mogren'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
  NOW(), NOW(), NOW()),
@@ -319,7 +369,7 @@ VALUES
 ('Planinarski dom Durmitor', 'Dom za planinare na Durmitoru', 'Durmitor bb', '+38233456781', NULL,
  '{"pon":"00:00-24:00"}', ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Planinarski dom'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Zabljak'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
@@ -334,17 +384,17 @@ VALUES
 ('Degustacija morskih specijaliteta', 'Lokalna kuhinja - degustacija ribljih specijaliteta',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 25.00, 90, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Poseta Restoranu'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kotor'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
  1,
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
  NOW(), NOW()),
 
-('Nocni izlazak Budva', 'Zabava uz muziku u budvanskim klubovima',
+('Nocni provod Budva', 'Zabava uz muziku u budvanskim klubovima',
  ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), 10.00, 240, true,
- (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Nocni Izlazak'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Budva'),
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Nocni provod'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaza Mogren'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
  1,
@@ -354,7 +404,7 @@ VALUES
 ('Planinarenje na Durmitoru', 'Pesacka tura kroz prirodu Durmitora',
  ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326), 0.00, 300, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Planinarenje'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Zabljak'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
  1,
@@ -363,9 +413,9 @@ VALUES
 
 ('Setnja starim gradom Kotora', 'Razgledanje istorijskih znamenitosti',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 0.00, 120, true,
- (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Setnja'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kotor'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Razgledanje'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
  NULL,
  1,
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
@@ -377,31 +427,25 @@ VALUES
 INSERT INTO "Events"
 ("Name", "Description", "Geolocation", "StartDate", "EndDate", "Price", "MaxVisitors", "IsActive", "Status", "EventTypeId", "LocalityId", "DestinationId", "ObjectId", "CreatedByUserId", "CreatedAt", "UpdatedAt")
 VALUES
-('KotorArt festival', 'KotorArt festival predstavlja jedinstven spoj muzike, umetnosti i kulturnog nasleđa u prelepom ambijentu Kotora. Tokom trajanja festivala, posetioci mogu uživati u raznovrsnom programu koji obuhvata koncerte, umetničke performanse i sadržaje inspirisane bogatom tradicijom ovog primorskog grada. Događaj okuplja ljubitelje kulture, domaće i strane goste, stvarajući živu i inspirativnu atmosferu.
-
-Poseban doživljaj pruža spoj savremene umetnosti i istorijskog okruženja, gde svaka večer donosi novo iskustvo i priliku za uživanje u kreativnom izrazu. Festival je idealan za sve koji žele da leto provedu u znaku kulture, dobrog raspoloženja i nezaboravnih trenutaka u jednom od najlepših gradova na Jadranu.',
+('KotorArt festival', 'KotorArt festival predstavlja jedinstven spoj muzike, umetnosti i kulturnog nasleđa u prelepom ambijentu Kotora. Tokom trajanja festivala, posetioci mogu uživati u raznovrsnom programu koji obuhvata koncerte, umetničke performanse i sadržaje inspirisane bogatom tradicijom ovog primorskog grada. Događaj okuplja ljubitelje kulture, domaće i strane goste, stvarajući živu i inspirativnu atmosferu. Poseban doživljaj pruža spoj savremene umetnosti i istorijskog okruženja, gde svaka večer donosi novo iskustvo i priliku za uživanje u kreativnom izrazu. Festival je idealan za sve koji žele da leto provedu u znaku kulture, dobrog raspoloženja i nezaboravnih trenutaka u jednom od najlepših gradova na Jadranu.',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), '2026-07-15 20:00', '2026-07-30 23:00', 20.00, 1000, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kotor'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW()),
 
-('Vece klasicne muzike', 'U čarobnoj atmosferi starog grada Kotora, ovo veče klasične muzike nudi jedinstven spoj umetnosti i istorije. Program obuhvata pažljivo odabrane kompozicije koje izvode talentovani muzičari, stvarajući intimnu i sofisticiranu atmosferu. Idealno za sve ljubitelje kulture, muzike i romantičnih večeri pod otvorenim nebom.
-
-Autentični ambijent kamenih trgova i osvetljenih uličica dodatno pojačava doživljaj, pretvarajući svaki ton u posebno emotivno iskustvo. Posetioci će imati priliku da se prepuste zvucima klasične muzike dok uživaju u jedinstvenom spoju tradicije i umetnosti. Ovaj događaj pruža savršenu priliku za opuštanje, inspiraciju i stvaranje nezaboravnih uspomena u jednom od najlepših primorskih gradova.',
+('Vece klasicne muzike', 'U čarobnoj atmosferi starog grada Kotora, ovo veče klasične muzike nudi jedinstven spoj umetnosti i istorije. Program obuhvata pažljivo odabrane kompozicije koje izvode talentovani muzičari, stvarajući intimnu i sofisticiranu atmosferu. Idealno za sve ljubitelje kulture, muzike i romantičnih večeri pod otvorenim nebom. Autentični ambijent kamenih trgova i osvetljenih uličica dodatno pojačava doživljaj, pretvarajući svaki ton u posebno emotivno iskustvo. Posetioci će imati priliku da se prepuste zvucima klasične muzike dok uživaju u jedinstvenom spoju tradicije i umetnosti. Ovaj događaj pruža savršenu priliku za opuštanje, inspiraciju i stvaranje nezaboravnih uspomena u jednom od najlepših primorskih gradova.',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), '2026-08-05 21:00', '2026-08-05 23:00', 15.00, 200, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Koncert'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kotor'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW()),
 
-('Budva Summer Festival', 'Budva Summer Festival donosi energičan i raznovrstan letnji program namenjen svima koji žele da uživaju u muzici, zabavi i prijatnoj atmosferi na otvorenom. Festival okuplja veliki broj posetilaca i nudi sadržaje koji spajaju savremenu zabavu sa prepoznatljivim mediteranskim duhom Budve. Tokom više festivalskih dana, grad postaje mesto susreta dobre muzike, opuštanja i letnjih uspomena.
-
-Uz atraktivan ambijent i bogat program, posetioci imaju priliku da provedu nezaboravne večeri u društvu prijatelja i porodice. Ovaj događaj je savršen izbor za sve koji žele da iskuse letnju energiju Budve, uživaju u kvalitetnom programu i provedu vreme u jednoj od najpoznatijih turističkih destinacija na crnogorskom primorju.',
+('Budva Summer Festival', 'Budva Summer Festival donosi energičan i raznovrstan letnji program namenjen svima koji žele da uživaju u muzici, zabavi i prijatnoj atmosferi na otvorenom. Festival okuplja veliki broj posetilaca i nudi sadržaje koji spajaju savremenu zabavu sa prepoznatljivim mediteranskim duhom Budve. Tokom više festivalskih dana, grad postaje mesto susreta dobre muzike, opuštanja i letnjih uspomena. Uz atraktivan ambijent i bogat program, posetioci imaju priliku da provedu nezaboravne večeri u društvu prijatelja i porodice. Ovaj događaj je savršen izbor za sve koji žele da iskuse letnju energiju Budve, uživaju u kvalitetnom programu i provedu vreme u jednoj od najpoznatijih turističkih destinacija na crnogorskom primorju.',
  ST_SetSRID(ST_MakePoint(18.837, 42.279), 4326), '2026-07-01 19:00', '2026-07-10 23:00', 10.00, 1500, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Budva'),
@@ -410,20 +454,16 @@ Uz atraktivan ambijent i bogat program, posetioci imaju priliku da provedu nezab
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW()),
 
-('DJ Night Mogren', 'DJ Night Mogren je večernji događaj namenjen ljubiteljima elektronske muzike, plesa i letnje atmosfere pored mora. Smešten u atraktivnom ambijentu plaže Mogren, ovaj događaj okuplja posetioce koji žele da uživaju u modernim ritmovima, dobroj energiji i nezaboravnom noćnom provodu. Spoj muzike, mora i letnje večeri stvara poseban ambijent koji privlači kako turiste tako i lokalne posetioce.
-
-Uz dinamičan program i opuštenu atmosferu, događaj pruža savršenu priliku za druženje, zabavu i uživanje u jedinstvenom noćnom iskustvu na obali. DJ Night Mogren je idealan za sve koji žele da dožive živopisnu letnju scenu Budve i provedu noć ispunjenu muzikom, plesom i odličnim raspoloženjem.',
+('DJ Night Mogren', 'DJ Night Mogren je večernji događaj namenjen ljubiteljima elektronske muzike, plesa i letnje atmosfere pored mora. Smešten u atraktivnom ambijentu plaže Mogren, ovaj događaj okuplja posetioce koji žele da uživaju u modernim ritmovima, dobroj energiji i nezaboravnom noćnom provodu. Spoj muzike, mora i letnje večeri stvara poseban ambijent koji privlači kako turiste tako i lokalne posetioce. Uz dinamičan program i opuštenu atmosferu, događaj pruža savršenu priliku za druženje, zabavu i uživanje u jedinstvenom noćnom iskustvu na obali. DJ Night Mogren je idealan za sve koji žele da dožive živopisnu letnju scenu Budve i provedu noć ispunjenu muzikom, plesom i odličnim raspoloženjem.',
  ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), '2026-08-10 22:00', '2026-08-11 03:00', 8.00, 500, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Nastup'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Budva'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plaza Mogren'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaza Mogren'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW()),
 
-('Planinarski susret', 'Planinarski susret na Durmitoru predstavlja idealnu priliku za sve ljubitelje prirode, pešačenja i boravka na svežem planinskom vazduhu. Događaj okuplja planinare, rekreativce i avanturiste koji žele da provedu dan u druženju, istraživanju prirodnih lepota i uživanju u spektakularnim pejzažima jednog od najlepših planinskih predela. Program je osmišljen tako da spoji aktivan odmor, rekreaciju i zajedničko uživanje u prirodi.
-
-Pored same šetnje i okupljanja, učesnici imaju priliku da upoznaju druge zaljubljenike u planinu i provedu vreme u prijatnoj i opuštenoj atmosferi. Ovaj događaj pruža savršen beg od svakodnevice i mogućnost da se doživi mir, lepota i autentičan duh Durmitora kroz aktivan i ispunjen dan u prirodi.',
+('Planinarski susret', 'Planinarski susret na Durmitoru predstavlja idealnu priliku za sve ljubitelje prirode, pešačenja i boravka na svežem planinskom vazduhu. Događaj okuplja planinare, rekreativce i avanturiste koji žele da provedu dan u druženju, istraživanju prirodnih lepota i uživanju u spektakularnim pejzažima jednog od najlepših planinskih predela. Program je osmišljen tako da spoji aktivan odmor, rekreaciju i zajedničko uživanje u prirodi. Pored same šetnje i okupljanja, učesnici imaju priliku da upoznaju druge zaljubljenike u planinu i provedu vreme u prijatnoj i opuštenoj atmosferi. Ovaj događaj pruža savršen beg od svakodnevice i mogućnost da se doživi mir, lepota i autentičan duh Durmitora kroz aktivan i ispunjen dan u prirodi.',
  ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326), '2026-09-01 08:00', '2026-09-01 18:00', 5.00, 100, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Okupljanje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Zabljak'),
@@ -458,33 +498,33 @@ INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 VALUES
 (
     'https://afar.brightspotcdn.com/dims4/default/3a97ce6/2147483647/strip/false/crop/1600x800+0+0/resize/1486x743!/quality/90/?url=https%3A%2F%2Fk3-prod-afar-media.s3.us-west-2.amazonaws.com%2Fbrightspot%2Ff4%2F0e%2Fabb2c7bf50f46954835d19e83029%2Foriginal-956aea8bdeae0f9b8479b054a6ff8e85.jpg',
-    'Stari grad Kotor',
+    'Kotor',
     true,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
     NOW()),
 (
     'https://www.mojacrnagora.rs/wp-content/uploads/2018/08/Kotor-Stari-Grad-02-1024x682.jpg',
-    'Stari grad Kotor',
+    'Kotor',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
     NOW()),
 (
     'https://images.myguide-cdn.com/montenegro/companies/kotor-stari-grad/large/kotor-stari-grad-81619.jpg',
-    'Stari grad Kotor',
+    'Kotor',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
     NOW()),
 (
     'https://kofer.info/wp-content/uploads/2020/03/shutterstock_1703935768.jpg',
-    'Stari grad Kotor',
+    'Kotor',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
     NOW()),
 (
     'https://www.portomontenegro.com/wp-content/uploads/2022/04/faruk-kaymak-b_e5K7B3MzQ-unsplash-2-1-960x800.jpg',
-    'Stari grad Kotor',
+    'Kotor',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Kotor'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/d/d4/%D0%91%D0%BE%D0%BA%D0%B0_%D0%9A%D0%BE%D1%82%D0%BE%D1%80%D1%81%D0%BA%D0%B0_%D0%BD%D0%BE%D1%9B%D1%83.jpg',
@@ -560,51 +600,27 @@ VALUES
     NOW()),
 (
     'https://kofer.info/wp-content/uploads/2020/02/shutterstock_191127089.jpg',
-    'Stari grad Budva',
+    'Budva',
     true,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Budva'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
     NOW()),
 (
     'https://butuaresidence.com/wp-content/uploads/2018/03/988242_20190203050212_5c566a9bb7896801fb658cf0jpeg_ls.jpg',
-    'Stari grad Budva',
+    'Budva',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Budva'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
     NOW()),
 (
     'https://kamenovo.me/wp-content/uploads/2020/07/budva-stari-grad.jpg',
-    'Stari grad Budva',
+    'Budva',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Budva'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2025/06/08/00/5651288_ricardova-glava_ls.jpg',
-    'Stari grad Budva',
+    'Budva',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Stari grad Budva'),
-    NOW()),
-(
-    'https://upload.wikimedia.org/wikipedia/commons/2/2c/Mogren_beach_aptil_19_th.jpg',
-    'Plaza Mogren',
-    true,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plaza Mogren'),
-    NOW()),
-(
-    'https://upoznajcrnugoru.com/wp-content/uploads/2018/04/Plaza-Mogren-Budva_fs.jpg',
-    'Plaza Mogren',
-    false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plaza Mogren'),
-    NOW()),
-(
-    'https://sharemontenegro.me/wp-content/uploads/2019/06/62000806_632077597307537_4593433872003235840_n.jpg',
-    'Plaza Mogren',
-    false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plaza Mogren'),
-    NOW()),
-(
-    'https://hgbudvanskarivijera.com/media/yootheme/cache/52/mogren-1-2-plaza-52d17106.jpg',
-    'Plaza Mogren',
-    false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plaza Mogren'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
     NOW()),
 (
     'https://twopacksandapup.com/wp-content/uploads/2025/06/Durmitor-Feat-scaled.jpg',
@@ -703,7 +719,7 @@ VALUES
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
     NOW()),
 (
-    'hhttps://images.trvl-media.com/place/10048/00b6d9ee-0ab8-44e6-8080-8e12858437b4.jpg',
+    'https://images.trvl-media.com/place/10048/00b6d9ee-0ab8-44e6-8080-8e12858437b4.jpg',
     'Podgorica',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
@@ -907,9 +923,15 @@ VALUES
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 VALUES
 (
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBA0xI7-o4rZ9sVD3J8u7gNO3NExDx5tGDiw&s',
+    'https://sbkotorsistercity.com/wp-content/uploads/sites/106/2025/09/KotorArt.png',
     'Logo',
     true,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'KotorArt festival'),
+    NOW()),
+(
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBA0xI7-o4rZ9sVD3J8u7gNO3NExDx5tGDiw&s',
+    'Logo',
+    false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'KotorArt festival'),
     NOW()),
 (
@@ -940,7 +962,7 @@ VALUES
     'https://www.radiodux.me/sites/default/files/2017/10-07-2017-gradska-muzika-kotor-priredila-gradu-velicanstvenu-noc/dsc0935resize.jpg',
     'Vece klasicne muzike',
     true,
-    (SELECT "Id" FROM "Events" WHERE "Name" = 'Vece klasicne muzikel'),
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Vece klasicne muzike'),
     NOW()),
 (
     'https://radiokotor.info/files/images/1771230895-1771170853-IMG-a22537d6019981f93e0bc6c1e3e12e28-V.jpg',
@@ -973,9 +995,15 @@ VALUES
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Budva Summer Festival'),
     NOW()),
 (
+    'https://dancingastronaut.com/wp-content/uploads/2022/11/FgO_zYEWQAE8Iya.jpg',
+    'Naslovna',
+    true,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'DJ Night Mogren'),
+    NOW()),
+(
     'https://i1.sndcdn.com/avatars-Ai7sk2G6lJfwqYux-Yo4y5A-t500x500.jpg',
     'Poster',
-    true,
+    false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'DJ Night Mogren'),
     NOW()),
 (
@@ -1019,12 +1047,509 @@ VALUES
     'Grupna slika',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Planinarski susret'),
+    NOW());
+
+-- ============================================
+-- 11. IMAGES - LOCALITIES
+-- ============================================
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
+VALUES
+(
+    'https://upload.wikimedia.org/wikipedia/commons/2/2c/Mogren_beach_aptil_19_th.jpg',
+    'Plaza Mogren',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaza Mogren'),
     NOW()),
+(
+    'https://upoznajcrnugoru.com/wp-content/uploads/2018/04/Plaza-Mogren-Budva_fs.jpg',
+    'Plaza Mogren',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaza Mogren'),
+    NOW()),
+(
+    'https://sharemontenegro.me/wp-content/uploads/2019/06/62000806_632077597307537_4593433872003235840_n.jpg',
+    'Plaza Mogren',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaza Mogren'),
+    NOW()),
+(
+    'https://hgbudvanskarivijera.com/media/yootheme/cache/52/mogren-1-2-plaza-52d17106.jpg',
+    'Plaza Mogren',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaza Mogren'),
+    NOW()),
+(
+    'https://media.istockphoto.com/id/1481840480/photo/the-iron-gate-to-the-old-town-of-budva.jpg?s=612x612&w=0&k=20&c=NfMBwy76q1IjxDfStL2_887kLmLryFIlXipBJYnGzeo=',
+    'Stari grad Budva',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
+    NOW()),
+(
+    'https://foodbook.me/storage/restaurants/3/PAsmXBVhYOPiT5lSFvCVuZKt3KAl2sZmiB0bbY9R.jpg',
+    'Stari grad Budva',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
+    NOW()),
+(
+    'https://www.ekapija.com/thumbs/budva_stari_grad_060323_tw1024.jpg',
+    'Stari grad Budva',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
+    NOW()),
+(
+    'https://foodbook.me/storage/restaurants/139/SESjiK44XQxShsTrOwPmlsy8eTcRf3s5uQRwGHUg.jpg',
+    'Stari grad Budva',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
+    NOW()),
+(
+    'https://www.gradnja.rs/wp-content/uploads/2020/12/Podgorica_Cover.jpg',
+    'Centar Podgorice',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
+    NOW()),
+(
+    'https://www.standard.co.me/wp-content/uploads/2020/12/Trg-nezavisnosti.jpg',
+    'Centar Podgorice',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
+    NOW()),
+(
+    'https://cdnuploads.aa.com.tr/uploads/Contents/2022/01/01/thumbs_b_c_4a0d89f632f4e881ec6fe1fc00c7df08.jpg?v=123852',
+    'Centar Podgorice',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
+    NOW()),
+(
+    'https://www.cdm.me/wp-content/uploads/2017/10/bDMIFv_podgorica-marathon-1-768x511.jpg',
+    'Centar Podgorice',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
+    NOW()),
+(
+    'https://24kroz7.com/247/wp-content/uploads/2024/05/2-5-1024x683.jpg',
+    'Crno jezero',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
+    NOW()),
+(
+    'https://wevotravel.com/wp-content/uploads/2023/04/turisticka-agencija-guliver-izlet-durmitor-tara-moraca-panorama.jpg',
+    'Crno jezero',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
+    NOW()),
+(
+    'https://bookaweb.s3.eu-central-1.amazonaws.com/media/30306/crno-jezero-2-%281%29.jpg',
+    'Crno jezero',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
+    NOW()),
+(
+    'https://www.montenegrocar.me/data/public/crno-jezero-pogled-iz-sume.webp',
+    'Crno jezero',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
+    NOW()),
+(
+    'https://kofer.info/wp-content/uploads/2020/03/shutterstock_291029393.jpg',
+    'Setaliste Pet Danica',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
+    NOW()),
+(
+    'https://kofer.info/wp-content/uploads/2020/03/shutterstock_1548398111-1000x600.jpg',
+    'Setaliste Pet Danica',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
+    NOW()),
+(
+    'https://bokanews.me/wp-content/uploads/2019/11/%C5%A1etali%C5%A1te.jpg',
+    'Setaliste Pet Danica',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
+    NOW()),
+(
+    'https://www.montenegrofortravellers.com/sites/default/files/styles/monte1140x550/public/place/setaliste_pet_danica_gorodskaya_naberezhnaya_pet_danica_v_herceg-novi.jpg?itok=fPmqL_Ro',
+    'Setaliste Pet Danica',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
+    NOW()),
+(
+    'https://bar.me/wp-content/uploads/bar_61.jpg',
+    'Stari Bar',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari Bar'),
+    NOW()),
+(
+    'https://foodbook.me/storage/restaurants/511/X0g1zQpHiJZTtGQ4PreZkHg8707hokwFLSzM57Y4.jpg',
+    'Stari Bar',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari Bar'),
+    NOW()),
+(
+    'https://www.vijesti.me/data/images/2024/10/20/18/5600044_viber-image-20241018-161252598_ls.jpg',
+    'Stari Bar',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari Bar'),
+    NOW()),
+(
+    'https://sharemontenegro.me/wp-content/uploads/2020/04/Bar_Crna_Gora_Stari_Grad_Foto_Balkan_Media_Tim.jpg',
+    'Stari Bar',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari Bar'),
+    NOW()),
+(
+    'https://visitadabojana.com/wp-content/uploads/2025/09/velika-plaza-aerial-coastline-view.webp',
+    'Velika plaza',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaza'),
+    NOW()),
+(
+    'https://www.gradnja.rs/wp-content/uploads/2025/04/velika-plaza-ulcinj.jpg',
+    'Velika plaza',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaza'),
+    NOW()),
+(
+    'https://kofer.info/wp-content/uploads/2020/02/shutterstock_1809771406-1000x600.jpg',
+    'Velika plaza',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaza'),
+    NOW()),
+(
+    'https://itinari-images.s3.eu-west-1.amazonaws.com/activity/images/original/610157eb-d89f-4b83-82df-62255fbe753b-velika_6.jpg',
+    'Velika plaza',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaza'),
+    NOW()),
+(
+    'https://www.golivegotravel.nl/wp-content/uploads/2018/04/Stair-Grad-Kotor-8-1160x773.jpg',
+    'Stari grad Kotor',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
+    NOW()),
+(
+    'https://putovanjazapet.com/wp-content/uploads/2021/12/Zadivljujuci-Kotor-grad-za-sva-godisnja-doba.jpg',
+    'Stari grad Kotor',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
+    NOW()),
+(
+    'https://images.myguide-cdn.com/montenegro/companies/kotor-stari-grad/large/kotor-stari-grad-81619.jpg',
+    'Stari grad Kotor',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
+    NOW()),
+(
+    'https://bookaweb.s3.eu-central-1.amazonaws.com/media/29566/stari-grad-kotor-2.jpg',
+    'Stari grad Kotor',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/3/35/Monastero_di_cetinje%2C_01.JPG',
+    'Cetinjski manastir',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Cetinjski manastir'),
+    NOW()),
+(
+    'https://media.pobjeda.me/media/2022/09/24/1664011895-glavna-manastiri-tekst-cetinjski-manastir-foto-lazar-pejovic-001-12-i_1280x800.jpg?cacheControl=1664011896',
+    'Cetinjski manastir',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Cetinjski manastir'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/d/dc/Cetinjski_manastir.jpg',
+    'Cetinjski manastir',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Cetinjski manastir'),
+    NOW()),
+(
+    'https://leks.canu.ac.me/web/Slike/Fig-LLUCG-3234-2759.jpg',
+    'Cetinjski manastir',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Cetinjski manastir'),
+    NOW()),
+(
+    'https://rtnk.me/wp-content/uploads/2025/09/Untitled-design-30.png',
+    'Trg Slobode',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/7/78/Trg_Slobode_NK.JPG',
+    'Trg Slobode',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode'),
+    NOW()),
+(
+    'https://www.vijesti.me/data/images/2020/01/02/00/4911722_20200102190116_74bf8f62ea2dc9beeca3e77c529a990ee429ad8d67f875e64bff8c89fe95dbe7_share.jpg',
+    'Trg Slobode',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode'),
+    NOW()),
+(
+    'https://me.ekapija.com/thumbs/niksic_050323_tw1024.jpg',
+    'Trg Slobode',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/0/0e/Porto_Montenegro.jpg',
+    'Porto Montenegro',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Porto Montenegro'),
+    NOW()),
+(
+    'https://www.americanexpress.com/en-us/travel/discover/photos/300669/127803/1600/Droneshot1.jpg?ch=560',
+    'Porto Montenegro',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Porto Montenegro'),
+    NOW()),
+(
+    'https://images.trvl-media.com/lodging/9000000/8210000/8207000/8206933/2064a2f1.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill',
+    'Porto Montenegro',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Porto Montenegro'),
+    NOW()),
+(
+    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/683356911.jpg?k=f8c9f35b3acc86c083776cf1fe2947e00f359fd5f265394430e82a4bc2378b43&o=',
+    'Porto Montenegro',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Porto Montenegro'),
+    NOW());
+
+-- ============================================
+-- 12. IMAGES - OBJECTS
+-- ============================================
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
+VALUES
+(
+    'https://images.trvl-media.com/lodging/3000000/2500000/2497700/2497664/26b21f8d.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill',
+    'Hotel Vardar',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
+    NOW()),
+(
+    'https://vardarkotor.me-hotel.com/data/Imgs/OriginalPhoto/13136/1313656/1313656486/hotel-vardar-kotor-img-5.JPEG',
+    'Hotel Vardar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
+    NOW()),
+(
+    'https://soleazur.rs/uploads/0000/1/2021/11/22/vardar-kotor-2.jpg',
+    'Hotel Vardar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
+    NOW()),
+(
+    'https://alf.ua/public/uploads/media/thumbnails/0002/06/4cfefe4960e0f0615dbcfbb47d94d9b76d0497a4.jpeg',
+    'Hotel Vardar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
+    NOW()),
+(
+    'https://mcdn.pro/data/objects/images/40419/1-5vpoci-l-ptkdlq.jpg',
+    'Hotel Avala',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
+    NOW()),
+(
+    'https://globus-tours.co/storage/2023/05/avala-resort-2.jpg',
+    'Hotel Avala',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
+    NOW()),
+(
+    'https://www.kongresniturizam.com/storage/objects/vGHRn278rdNRSipA.jpg',
+    'Hotel Avala',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
+    NOW()),
+(
+    'https://www.avalaresort.com/photos/1/Gallery/Spa%20&%20Wellness/homepage/DSC_7301.jpg',
+    'Hotel Avala',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
+    NOW()),
+(
+    'https://www.luxurylifestylemag.co.uk/wp-content/uploads/2022/11/140-Hotel-Vardar-photo-Edvard-Nalbantjan-.jpg',
+    'Restoran Galion',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
+    NOW()),
+(
+    'https://www.luxurylifestylemag.co.uk/wp-content/uploads/2022/11/132-Hotel-Vardar-photo-Edvard-Nalbantjan-.jpg',
+    'Restoran Galion',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
+    NOW()),
+(
+    'https://turistickiinfocentar.rs/wp-content/uploads/CF026968favsmanjeno-min-1-1-scaled.jpg',
+    'Restoran Galion',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
+    NOW()),
+(
+    'https://www.montenegrofortravellers.com/sites/default/files/styles/monte1140x550/public/place/restaurant_galion_restoran_galion_v_kotore.jpg?itok=wLuoKPQe',
+    'Restoran Galion',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
+    NOW()),
+(
+    'https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1920,fit=crop/A854j9RqjjF9MZww/hmphoto-24-dWxbarqLqquob7Qz.jpg',
+    'Mogren Beach Bar',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
+    NOW()),
+(
+    'https://adriaticways.com/wp-content/uploads/2026/01/Mogren-2-Beach.webp',
+    'Mogren Beach Bar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
+    NOW()),
+(
+    'https://montenegro.org/wp-content/uploads/2023/11/IMG_7522-1024x768.jpg',
+    'Mogren Beach Bar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
+    NOW()),
+(
+    'https://montenegro.org/wp-content/uploads/2023/11/IMG_7553-1024x768.jpg',
+    'Mogren Beach Bar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
+    NOW()),
+(
+    'https://www.antenam.net/uploads/a/f/9/af9e3af739604df73554e1fb290f080a.jpeg',
+    'Planinarski dom Durmitor',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
+    NOW()),
+(
+    'https://www.vijesti.me/data/images/2019/02/17/00/3076728_20190217020252_5c68bf02b789684ea0f98e47jpeg_ls.jpg',
+    'Planinarski dom Durmitor',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
+    NOW()),
+(
+    'https://durmitor.wordpress.com/wp-content/uploads/2012/03/planinarski-dom-orjen.jpg?w=584',
+    'Planinarski dom Durmitor',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
+    NOW()),
+(
+    'https://lh3.googleusercontent.com/p/AF1QipNRrYNagkDHzZ-UBtBHSm3Y7nF12mw_KBVbmdgZ=s1600-w640',
+    'Planinarski dom Durmitor',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
+    NOW());
+
+-- ============================================
+-- 13. IMAGES - ACTIVITIES
+-- ============================================
+
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
+VALUES
+(
+    'https://infinityadventure.me/wp-content/uploads/2023/12/durmitor-planinarenje.png',
+    'Planinarenje na Durmitoru',
+    true,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje na Durmitoru'),
+    NOW()),
+(
+    'https://durmitoradventure.com/static/4b5891e1e968e8f1d6d4708e4c7be588/df7b5/hero_Hiking_1900x1267_e5b7b9b462.jpg',
+    'Planinarenje na Durmitoru',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje na Durmitoru'),
+    NOW()),
+(
+    'https://explore-serbia.rs/wp-content/uploads/2022/09/Durmitor-Bobotov-Kuk-1.jpg',
+    'Planinarenje na Durmitoru',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje na Durmitoru'),
+    NOW()),
+(
+    'https://explore-serbia.rs/wp-content/uploads/2022/09/Durmitor-Bobotov-Kuk-2.jpg',
+    'Planinarenje na Durmitoru',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje na Durmitoru'),
+    NOW()),
+(
+    'https://www.montenegrofortravellers.com/sites/default/files/styles/monte1140x550/public/place/top_hill_budva_nochnoy_klub_top_hill_v_budve.jpg?itok=zTr34xsE',
+    'Nocni provod Budva',
+    true,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Nocni provod Budva'),
+    NOW()),
+(
+    'https://apartments-sofija.com/wp-content/uploads/budva-party-apartments-1.jpg',
+    'Nocni provod Budva',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Nocni provod Budva'),
+    NOW()),
+(
+    'https://www.budvanocu.com/getimage.php?img=p18rspcf3312ih5uk1uf4eb99bm1.jpg&w=600',
+    'Nocni provod Budva',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Nocni provod Budva'),
+    NOW()),
+(
+    'https://balkanfun.travel/sites/default/files/inline-images/nocni-klub-plesanje.jpg',
+    'Nocni provod Budva',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Nocni provod Budva'),
+    NOW()),
+(
+    'https://www.sentandrea.com/images/2018/11/s2.jpg',
+    'Degustacija morskih specijaliteta',
+    true,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
+    NOW()),
+(
+    'https://www.sentandrea.com/images/2018/11/s4.jpg',
+    'Degustacija morskih specijaliteta',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
+    NOW()),
+(
+    'https://www.bevanda.co.rs/images/w2.jpg',
+    'Degustacija morskih specijaliteta',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
+    NOW()),
+(
+    'https://www.sentandrea.com/images/2018/11/oh2-650x630.jpg',
+    'Degustacija morskih specijaliteta',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
+    NOW()),
+(
+    'https://cdn.getyourguide.com/img/tour/b462479da72df66db77e9a7154f272c7ba1b86fe125727996216cb2ad1a398fc.jpg/99.jpg',
+    'Setnja starim gradom Kotora',
+    true,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Setnja starim gradom Kotora'),
+    NOW()),
+(
+    'https://monteonline.org/wp-content/uploads/2023/01/oldtownkotor05.jpg',
+    'Setnja starim gradom Kotora',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Setnja starim gradom Kotora'),
+    NOW()),
+(
+    'https://kofer.info/wp-content/uploads/2020/03/shutterstock_1703935768-1000x600.jpg',
+    'Setnja starim gradom Kotora',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Setnja starim gradom Kotora'),
+    NOW()),
+(
+    'https://respectacar.com/storage/blog/c5cf293f-db96-4743-9f6c-6ad90f46846b/kotor-old-town.jpg',
+    'Setnja starim gradom Kotora',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Setnja starim gradom Kotora'),
+    NOW());
 
 
-
-
-
+    
 -- ============================================
 -- INDEXES
 -- ============================================
@@ -1195,29 +1720,3 @@ DROP TRIGGER IF EXISTS tg_deactivate_events ON "Events";
 CREATE TRIGGER tg_deactivate_events
 AFTER INSERT OR UPDATE ON "Events"
 FOR EACH ROW EXECUTE FUNCTION deactivate_past_events();
-
--- ============================================
--- 12. FINAL CHECK
--- ============================================
-SELECT '=== FINAL CHECK ===' AS "Status";
-
-SELECT 'Roles:' AS "Table", COUNT(*) AS "Count" FROM "Roles" UNION ALL
-SELECT 'LocalityTypes:', COUNT(*) FROM "LocalityTypes" UNION ALL
-SELECT 'Localities:', COUNT(*) FROM "Localities" UNION ALL
-SELECT 'DestinationTypes:', COUNT(*) FROM "DestinationTypes" UNION ALL
-SELECT 'Destinations:', COUNT(*) FROM "Destinations" UNION ALL
-SELECT 'ObjectTypes:', COUNT(*) FROM "ObjectTypes" UNION ALL
-SELECT 'Objects:', COUNT(*) FROM "Objects" UNION ALL
-SELECT 'ActivityTypes:', COUNT(*) FROM "ActivityTypes" UNION ALL
-SELECT 'Activities:', COUNT(*) FROM "Activities" UNION ALL
-SELECT 'EventTypes:', COUNT(*) FROM "EventTypes" UNION ALL
-SELECT 'Events:', COUNT(*) FROM "Events" UNION ALL
-SELECT 'Users:', COUNT(*) FROM "Users" UNION ALL
-SELECT 'Reviews:', COUNT(*) FROM "Reviews";
-
-SELECT "Id", "FirstName", "LastName", "Email", "RoleId"
-FROM "Users"
-ORDER BY "Id";
-
-SELECT "Id", "Email", "PasswordHash"
-FROM "Users";

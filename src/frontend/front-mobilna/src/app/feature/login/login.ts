@@ -1,5 +1,12 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+  ValidationErrors,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LogoComponent } from '../../shared/components/logo/logo';
@@ -25,11 +32,10 @@ export class LoginComponent {
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [
-        Validators.required,
-        Validators.minLength(6),
-        this.passwordStrengthValidator,
-      ]],
+      password: [
+        '',
+        [Validators.required, Validators.minLength(6), this.passwordStrengthValidator],
+      ],
     });
   }
 
@@ -42,44 +48,66 @@ export class LoginComponent {
     return hasUpperCase && hasSpecialChar && hasNumber ? null : { weakPassword: true };
   }
 
-  get email() { return this.form.get('email'); }
-  get password() { return this.form.get('password'); }
+  get email() {
+    return this.form.get('email');
+  }
+  get password() {
+    return this.form.get('password');
+  }
 
-  togglePassword(): void { this.hidePassword = !this.hidePassword; }
+  togglePassword(): void {
+    this.hidePassword = !this.hidePassword;
+  }
 
   submit(): void {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
     this.login();
   }
 
   login(): void {
-    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
 
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.authService.login({
-      email: this.form.value.email,
-      password: this.form.value.password,
-    }).subscribe({
-      next: () => {
-        this.isLoading = false;
-        if (this.authService.isAdmin()) {
-          this.errorMessage = 'Admin access is not available here.';
-          this.authService.logout().subscribe();
-          return;
-        }
-        this.router.navigate(['/home']);
-      },
-      error: err => {
-        this.isLoading = false;
-        this.errorMessage = err?.error?.message ?? 'Invalid email or password.';
-      },
-    });
+    this.authService
+      .login({
+        email: this.form.value.email,
+        password: this.form.value.password,
+      })
+      .subscribe({
+        next: () => {
+          this.isLoading = false;
+          if (this.authService.isAdmin()) {
+            this.errorMessage = 'Admin access is not available here.';
+            // this.authService.logout().subscribe();
+            return;
+          }
+          this.router.navigate(['/home']);
+        },
+        error: (err) => {
+          this.isLoading = false;
+          this.errorMessage = err?.error?.message ?? 'Invalid email or password.';
+        },
+      });
   }
 
-  goHome(): void { this.router.navigate(['/home']); }
-  goRegister(): void { this.router.navigate(['/register']); }
-  goForgot(): void { this.router.navigate(['/forgot-password']); }
-  goTerms(): void { this.router.navigate(['/terms']); }
+  goHome(): void {
+    this.router.navigate(['/home']);
+  }
+  goRegister(): void {
+    this.router.navigate(['/register']);
+  }
+  goForgot(): void {
+    this.router.navigate(['/forgot-password']);
+  }
+  goTerms(): void {
+    this.router.navigate(['/terms']);
+  }
 }

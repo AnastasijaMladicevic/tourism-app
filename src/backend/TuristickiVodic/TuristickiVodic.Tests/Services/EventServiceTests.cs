@@ -759,5 +759,67 @@ namespace TuristickiVodic.Tests.Services
             result.Should().NotBeNull();
             result!.Status.Should().Be("Approved");
         }
+
+        [Fact]
+        public async Task GetByIdAsync_PostojiSaMainSlikom_VracaDto()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_PostojiSaMainSlikom_VracaDto));
+            var (_, _, _, eventType, destination, _, locality, _, creator, _, _, _, _) = SeedBase(ctx);
+
+            var ev = new Event
+            {
+                Id = 1,
+                Name = "Event",
+                EventTypeId = eventType.Id,
+                LocalityId = locality.Id,
+                DestinationId = destination.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Approved,
+                StartDate = DateTime.UtcNow.AddDays(1)
+            };
+
+            ctx.Events.Add(ev);
+
+            ctx.Images.Add(new Image
+            {
+                EventId = ev.Id,
+                Url = "main.jpg",
+                IsMain = true,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            ctx.SaveChanges();
+
+            var svc = new EventService(ctx, CreateMapper());
+            var result = await svc.GetByIdAsync(1);
+
+            result.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task GetByIdAsync_BezMainSlike_VracaNull()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_BezMainSlike_VracaNull));
+            var (_, _, _, eventType, destination, _, locality, _, creator, _, _, _, _) = SeedBase(ctx);
+
+            ctx.Events.Add(new Event
+            {
+                Id = 1,
+                Name = "Event",
+                EventTypeId = eventType.Id,
+                LocalityId = locality.Id,
+                DestinationId = destination.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Approved,
+                StartDate = DateTime.UtcNow.AddDays(1)
+            });
+
+            ctx.SaveChanges();
+
+            var svc = new EventService(ctx, CreateMapper());
+            var result = await svc.GetByIdAsync(1);
+
+            result.Should().BeNull();
+        }
     }
 }

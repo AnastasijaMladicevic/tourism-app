@@ -6,6 +6,6 @@ import { LogoComponent } from '../../shared/components/logo/logo';
   standalone: true,
   imports: [LogoComponent],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.scss'
+  styleUrl: './navbar.component.scss',
 })
 export class NavbarComponent {}

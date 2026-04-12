@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -15,6 +16,7 @@ export class Login {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -55,26 +57,32 @@ export class Login {
       email: email ?? '',
       password: password ?? '',
       rememberMe: !!rememberMe,
-    }).subscribe({
-      next: () => {
+    }).pipe(
+      finalize(() => {
         this.isLoading = false;
-        //TODO add dashboard depending on user role
-        // this.router.navigate(['/dashboard']);
-        alert("Login successfull!");
+        this.cdr.detectChanges();
+      })
+    ).subscribe({
+      next: (response) => {
+        const role = this.authService.getNormalizedRole(response.user);
+
+        if (role === 'tourist') {
+          this.authService.logout();
+          this.errorMessage = `${role} portal is coming soon. Please check back later.`;
+          return;
+        }
+
+        const targetRoute = this.authService.getDashboardRouteForRole(role);
+        this.router.navigateByUrl(targetRoute);
       },
       error: (error: any) => {
-        this.isLoading = false;
         this.errorMessage = error?.error?.message ?? 'Invalid email or password.';
-        alert(error?.error?.message); 
+        return;
       },
     });
   }
 
   goToSignup(): void {
     this.router.navigate(['/signup']);
-  }
-
-  goSignout(): void {
-    this.router.navigate(['/signout']);
   }
 }

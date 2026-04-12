@@ -25,9 +25,13 @@
   @if (event) {
     <!-- Hero slika - iza svega -->
     <div class="hero">
-      <div class="hero-placeholder">
-        <mat-icon>celebration</mat-icon>
-      </div>
+      @if (mainImage) {
+        <img [src]="mainImage" [alt]="event.name" (error)="onImageError($event)" />
+      } @else {
+        <div class="hero-placeholder">
+          <mat-icon>celebration</mat-icon>
+        </div>
+      }
       <button class="fav-btn" (click)="toggleFavorite()" [class.fav-btn--active]="isFavorite">
         <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
       </button>
@@ -63,8 +67,23 @@
             {{ event.description || 'Opis nije dostupan.' }}
           </p>
         </div>
+        <!-- Galerija -->
+        <div class="section">
+          <div class="card gallery-card">
+            <div class="gallery-header">
+              <h2>Galerija</h2>
+              <button class="see-all-btn" (click)="openGallery(0)">See All ></button>
+            </div>
 
-        <!-- ULAZNICE -->
+            <div class="gallery-scroll">
+              @for (img of images; track img.id; let i = $index) {
+                <div class="gallery-item" (click)="openGallery(i)">
+                  <img [src]="img.url" [alt]="img.altText || ''" (error)="onImageError($event)" />
+                </div>
+              }
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- DESNA STRANA (MAPA) -->
@@ -98,3 +117,59 @@
     </div>
   }
 </div>
+<!-- MODAL GALERIJA -->
+@if (showGalleryModal && images.length > 0) {
+  <div class="gallery-modal" (click)="closeGallery()">
+    <div class="modal-content" (click)="$event.stopImmediatePropagation()">
+      <!-- Close dugme -->
+      <button class="modal-close" (click)="closeGallery()">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <!-- Glavna slika -->
+      <div
+        class="modal-image-container"
+        (touchstart)="onTouchStart($event)"
+        (touchend)="onTouchEnd($event)"
+      >
+        @if (images[currentImageIndex]) {
+          <img
+            [src]="images[currentImageIndex]?.url"
+            [alt]="images[currentImageIndex]?.altText || ''"
+          />
+        }
+      </div>
+
+      <!-- Navigacija na desktopu -->
+      <button class="modal-nav modal-nav-left" (click)="prevImage()">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <button class="modal-nav modal-nav-right" (click)="nextImage()">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+
+      <!-- Thumbnailovi na desktopu -->
+      <div class="modal-thumbnails">
+        @for (img of images; track img.id; let i = $index) {
+          <img
+            [src]="img.url"
+            [class.active]="i === currentImageIndex"
+            (click)="currentImageIndex = i; $event.stopImmediatePropagation()"
+          />
+        }
+      </div>
+
+      <!-- Tačkice na mobilnom -->
+      <div class="modal-dots">
+        @for (img of images; track img.id; let i = $index) {
+          <span
+            class="dot"
+            [class.active]="i === currentImageIndex"
+            (click)="currentImageIndex = i; $event.stopImmediatePropagation()"
+          >
+          </span>
+        }
+      </div>
+    </div>
+  </div>
+}

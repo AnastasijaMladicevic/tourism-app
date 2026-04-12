@@ -1,10 +1,14 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
 using System.Text;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
+using System.IO;
+using System.Linq;
 
 namespace TuristickiVodic.Services
 {
@@ -13,12 +17,14 @@ namespace TuristickiVodic.Services
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
+        private readonly IWebHostEnvironment _environment;
 
-        public UserService(AppDbContext context, IMapper mapper, ITokenService tokenService)
+        public UserService(AppDbContext context, IMapper mapper, ITokenService tokenService, IWebHostEnvironment environment)
         {
             _context = context;
             _mapper = mapper;
             _tokenService = tokenService;
+            _environment = environment;
         }
 
         public async Task<IEnumerable<UserDto>> GetAllAsync()
@@ -54,6 +60,53 @@ namespace TuristickiVodic.Services
             return await CreateWithRoleAsync(createUserDto, RoleType.Tourist);
         }
 
+        public async Task<UserDto?> UpdateProfileImageAsync(int id, IFormFile file)
+        {
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+                return null;
+
+            if (file == null || file.Length == 0)
+                throw new InvalidOperationException("Image file is required.");
+
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(extension))
+                throw new InvalidOperationException("Only .jpg, .jpeg, .png and .webp files are allowed.");
+
+            var profilesFolder = Path.Combine(_environment.WebRootPath, "images", "profiles");
+            Directory.CreateDirectory(profilesFolder);
+
+            var fileName = $"user_{id}_{Guid.NewGuid():N}{extension}";
+            var filePath = Path.Combine(profilesFolder, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            if (!string.IsNullOrWhiteSpace(user.ProfileImageUrl) &&
+                user.ProfileImageUrl != "/images/profiles/default_icon.png")
+            {
+                var oldRelativePath = user.ProfileImageUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
+                var oldFullPath = Path.Combine(_environment.WebRootPath, oldRelativePath);
+
+                if (File.Exists(oldFullPath))
+                    File.Delete(oldFullPath);
+            }
+
+            user.ProfileImageUrl = $"/images/profiles/{fileName}";
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<UserDto>(user);
+        }
+
         public async Task<UserDto> CreateManagerAsync(CreateUserDto createUserDto)
         {
             return await CreateWithRoleAsync(createUserDto, RoleType.Manager);
@@ -85,6 +138,7 @@ namespace TuristickiVodic.Services
             user.IsVerified = false;
             user.IsActive = true;
             user.IsBlacklisted = false;
+            user.ProfileImageUrl = "/images/profiles/default_icon.png";
             user.CreatedAt = DateTime.UtcNow;
             user.UpdatedAt = DateTime.UtcNow;
 

@@ -17,7 +17,7 @@ export interface ObjectDto {
   address?: string;
   phoneNumber?: string;
   website?: string;
-  workingHours?: string;           
+  workingHours?: string;
   longitude?: number;
   latitude?: number;
   averageRating?: number;
@@ -38,7 +38,6 @@ export interface ObjectView extends ObjectDto {
 
 @Injectable({ providedIn: 'root' })
 export class ObjectService {
-
   private url = `${environment.apiUrl}/objects`;
 
   constructor(private http: HttpClient) {}

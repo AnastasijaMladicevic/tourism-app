@@ -14,6 +14,7 @@ namespace TuristickiVodic.Services.Mappings
 
             CreateMap<CreateUserDto, User>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.ProfileImageUrl, opt => opt.Ignore())
                 .ForMember(dest => dest.DateOfBirth,
                     opt => opt.MapFrom(src => DateTime.SpecifyKind(src.DateOfBirth, DateTimeKind.Utc)))
                 .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())

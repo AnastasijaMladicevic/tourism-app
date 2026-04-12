@@ -8,27 +8,25 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const token = authService.getToken();
 
-  const authReq = token
-    ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-    : req;
+  const authReq = token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req;
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401 && !req.url.includes('/refresh')) {
         return authService.refresh().pipe(
-          switchMap(res => {
+          switchMap((res) => {
             const retryReq = req.clone({
-              setHeaders: { Authorization: `Bearer ${res.token}` }
+              setHeaders: { Authorization: `Bearer ${res.token}` },
             });
             return next(retryReq);
           }),
-          catchError(refreshError => {
+          catchError((refreshError) => {
             authService.logout().subscribe();
             return throwError(() => refreshError);
-          })
+          }),
         );
       }
       return throwError(() => error);
-    })
+    }),
   );
 };

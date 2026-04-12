@@ -162,26 +162,31 @@
 
 **IMAGES**
 
-- `IsMain` označava glavnu sliku (tačno jedna glavna slika mora postojati po entitetu).
-- Nije dozvoljeno da entitet ima više od jedne glavne slike.
+- Entitet može imati više slika.
+- Svaki entitet mora imati tačno jednu glavnu sliku (`IsMain = true`) u svakom trenutku.
+- Nije dozvoljeno imati više od jedne glavne slike.
 - Nije dozvoljeno da entitet nema nijednu glavnu sliku.
-- Prva slika koja se dodaje za entitet mora biti glavna (IsMain = true).
-- Slika mora biti vezana za tačno jedan entitet, nije dozvoljeno da bude vezana za više entiteta istovremeno.
-- Slika može biti vezana za:
-  - objekat  
-  - aktivnost  
-  - event  
-  - destinaciju  
-  - lokalitet  
-- Slike mogu da se dodaju samo za postojeće entitete.
-- Mora biti definisan tačno jedan od ID-jeva (ObjectId, ActivityId, EventId, DestinationId ili LocalityId).
-- Slike mogu da se menjaju samo ako pripadaju validnom entitetu.
-- Prilikom izmene slike mora ostati vezana za tačno jedan entitet.
-- Ako se menja entitet slike, prethodna veza se uklanja i postavlja nova (tačno jedna).
-- Nije dozvoljeno ukloniti glavnu sliku (IsMain = false) ako time entitet ostaje bez glavne slike.
-- Nije dozvoljeno dodati novu glavnu sliku ako već postoji glavna slika za taj entitet.
-- Slike mogu da se brišu.
-- Nije dozvoljeno obrisati glavnu sliku ako postoje druge slike za isti entitet.
-- Dozvoljeno je obrisati sliku ako je to jedina slika tog entiteta.
+- Slike se mogu dodavati samo za postojeće entitete.
+- Prva slika za entitet mora biti glavna.
+- Ako već postoji glavna slika, nova slika ne može biti glavna dok se postojeća ne promeni.
+- Slika mora biti vezana za tačno jedan entiteti može pripadati:
+  - objektu
+  - aktivnosti
+  - eventu
+  - destinaciji
+  - lokalitetu
+- Nije dozvoljeno da slika pripada više entiteta.
+- Nije dozvoljeno da slika nema nijedan entitet.
+- Dozvoljeno je menjati:
+  - Url
+  - AltText
+  - IsMain
+- Nije dozvoljeno premeštanje slike na drugi entitet.
+- Promena glavne slike vrši se kroz posebnu operaciju SetMainImage.
+- Kada se nova slika postavi kao glavna, prethodna glavna slika automatski prestaje da bude glavna.
+- Dozvoljeno je brisanje slika koje nisu glavne.
+- Nije dozvoljeno obrisati glavnu sliku ako time entitet ostaje bez glavne slike.
+- Ako entitet ima više slika, pre brisanja glavne slike druga slika mora biti postavljena kao glavna.
+- Jedina glavna slika entiteta ne može se obrisati direktno.
 - Brisanjem roditeljskog entiteta brišu se i njegove slike (cascade delete).
-- Sistem može imati više slika po entitetu, ali tačno jedna mora biti označena kao glavna.
+- Destination i Locality se prikazuju samo ako imaju glavnu sliku (Ovo se ne čuva u bazi, već se rešava kroz query u servisu)

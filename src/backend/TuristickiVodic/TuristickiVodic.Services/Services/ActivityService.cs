@@ -26,6 +26,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.Locality)
                 .Include(a => a.Destination)
                 .Include(a => a.Object)
+                .Where(a => _context.Images.Any(i => i.ActivityId == a.Id && i.IsMain))
                 .OrderBy(a => a.Id)
                 .ToListAsync();
 
@@ -41,7 +42,14 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.Object)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
-            return activity == null ? null : _mapper.Map<ActivityDto>(activity);
+            if (activity == null)
+                return null;
+
+            var hasMainImage = await _context.Images.AnyAsync(i => i.ActivityId == activity.Id && i.IsMain);
+            if (!hasMainImage)
+                return null;
+
+            return _mapper.Map<ActivityDto>(activity);
         }
 
         // Samo ContentCreator kreira aktivnost – status uvek Pending, čeka odobrenje menadžera.
