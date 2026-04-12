@@ -338,5 +338,112 @@ namespace TuristickiVodic.Services.Services
 
             return _mapper.Map<ActivityDto>(updated);
         }
+
+        public async Task<PagedResultDto<ActivityDto>> SearchAsync(ActivityQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var activitiesQuery = _context.Activities
+                .Include(a => a.ActivityType)
+                .Include(a => a.Destination)
+                .Include(a => a.Locality)
+                .Include(a => a.Images)
+                .Where(a => a.Status == ContentStatus.Approved)
+                .Where(a => a.IsActive)
+                .Where(a => a.Images.Any(i => i.IsMain))
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+
+                activitiesQuery = activitiesQuery.Where(a =>
+                    a.ActivityType != null &&
+                    a.ActivityType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+
+                activitiesQuery = activitiesQuery.Where(a =>
+                    a.Destination != null &&
+                    a.Destination.Name.ToLower().Contains(destination));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+
+                activitiesQuery = activitiesQuery.Where(a =>
+                    a.Name.ToLower().Contains(search) ||
+                    (a.Description != null && a.Description.ToLower().Contains(search)));
+            }
+
+            activitiesQuery = ApplyActivitySorting(activitiesQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await activitiesQuery.CountAsync();
+
+            var items = await activitiesQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToListAsync();
+
+            var mappedItems = _mapper.Map<List<ActivityDto>>(items);
+
+            return new PagedResultDto<ActivityDto>
+            {
+                Items = mappedItems,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
+        private static IQueryable<Activity> ApplyActivitySorting(IQueryable<Activity> query, string? sortBy, string? sortOrder)
+        {
+            var sortByValue = sortBy?.Trim().ToLower();
+            var isDesc = sortOrder?.Trim().ToLower() == "desc";
+
+            if (sortByValue == "type")
+            {
+                return isDesc
+                    ? query.OrderByDescending(a => a.ActivityType!.Name)
+                    : query.OrderBy(a => a.ActivityType!.Name);
+            }
+
+            if (sortByValue == "destination")
+            {
+                return isDesc
+                    ? query.OrderByDescending(a => a.Destination!.Name)
+                    : query.OrderBy(a => a.Destination!.Name);
+            }
+
+            if (sortByValue == "price")
+            {
+                return isDesc
+                    ? query.OrderByDescending(a => a.Price)
+                    : query.OrderBy(a => a.Price);
+            }
+
+            if (sortByValue == "duration")
+            {
+                return isDesc
+                    ? query.OrderByDescending(a => a.DurationMinutes)
+                    : query.OrderBy(a => a.DurationMinutes);
+            }
+
+            return isDesc
+                ? query.OrderByDescending(a => a.Name)
+                : query.OrderBy(a => a.Name);
+        }
     }
 }

@@ -34,6 +34,21 @@ namespace TuristickiVodic.API.Controllers
             return Ok(obj);
         }
 
+        [HttpGet("search")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Search([FromQuery] TouristObjectQueryDto query)
+        {
+            try
+            {
+                var result = await _objectService.SearchAsync(query);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpPost]
         [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Create([FromBody] CreateTouristObjectDto dto)
