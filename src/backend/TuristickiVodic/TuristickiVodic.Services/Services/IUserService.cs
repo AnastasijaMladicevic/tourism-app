@@ -5,7 +5,7 @@ namespace TuristickiVodic.Services
 {
     public interface IUserService
     {
-        Task<IEnumerable<UserDto>> GetAllAsync();
+        Task<PagedResultDto<UserDto>> GetAllAsync(UserQueryDto query);
         Task<UserDto?> GetByIdAsync(int id);
         Task<UserDto?> GetByEmailAsync(string email);
         Task<UserDto> CreateAsync(CreateUserDto createUserDto);

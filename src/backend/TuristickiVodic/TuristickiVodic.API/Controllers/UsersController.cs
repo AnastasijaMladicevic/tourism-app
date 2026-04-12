@@ -20,12 +20,12 @@ namespace TuristickiVodic.API.Controllers
             _userService = userService;
         }
 
-        // Samo Admin može da vidi sve korisnike
+        // Samo Admin može da vidi sve korisnike + paginacija
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] UserQueryDto query)
         {
-            var users = await _userService.GetAllAsync();
+            var users = await _userService.GetAllAsync(query);
             return Ok(users);
         }
 

@@ -393,5 +393,102 @@ namespace TuristickiVodic.Services.Services
 
             return _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
         }
+
+        public async Task<PagedResultDto<EventDto>> SearchAsync(EventQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var eventsQuery = _context.Events
+                .Include(e => e.EventType)
+                .Include(e => e.Destination)
+                .Include(e => e.Locality)
+                .Include(e => e.Images)
+                .Where(e => e.Status == ContentStatus.Approved)
+                .Where(e => e.IsActive)
+                .Where(e => e.Images.Any(i => i.IsMain))
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    e.EventType != null &&
+                    e.EventType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    e.Destination != null &&
+                    e.Destination.Name.ToLower().Contains(destination));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    e.Name.ToLower().Contains(search) ||
+                    (e.Description != null && e.Description.ToLower().Contains(search)));
+            }
+
+            eventsQuery = ApplySorting(eventsQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await eventsQuery.CountAsync();
+
+            var items = await eventsQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToListAsync();
+
+            var mappedItems = _mapper.Map<List<EventDto>>(items);
+
+            return new PagedResultDto<EventDto>
+            {
+                Items = mappedItems,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
+        private static IQueryable<Event> ApplySorting(IQueryable<Event> query, string? sortBy, string? sortOrder)
+        {
+            var sortByValue = sortBy?.Trim().ToLower();
+            var isDesc = sortOrder?.Trim().ToLower() == "desc";
+
+            if (sortByValue == "name")
+            {
+                return isDesc
+                    ? query.OrderByDescending(e => e.Name)
+                    : query.OrderBy(e => e.Name);
+            }
+
+            if (sortByValue == "type")
+            {
+                return isDesc
+                    ? query.OrderByDescending(e => e.EventType!.Name)
+                    : query.OrderBy(e => e.EventType!.Name);
+            }
+
+            if (sortByValue == "destination")
+            {
+                return isDesc
+                    ? query.OrderByDescending(e => e.Destination!.Name)
+                    : query.OrderBy(e => e.Destination!.Name);
+            }
+
+            return isDesc
+                ? query.OrderByDescending(e => e.StartDate)
+                : query.OrderBy(e => e.StartDate);
+        }
     }
 }

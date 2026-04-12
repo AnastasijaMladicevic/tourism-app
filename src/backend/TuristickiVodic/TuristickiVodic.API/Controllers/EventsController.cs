@@ -42,6 +42,15 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
+
+        [HttpGet("search")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Search([FromQuery] EventQueryDto query)
+        {
+            var result = await _eventService.SearchAsync(query);
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)

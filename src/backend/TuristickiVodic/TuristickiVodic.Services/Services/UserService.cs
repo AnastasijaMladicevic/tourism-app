@@ -27,14 +27,59 @@ namespace TuristickiVodic.Services
             _environment = environment;
         }
 
-        public async Task<IEnumerable<UserDto>> GetAllAsync()
+        public async Task<PagedResultDto<UserDto>> GetAllAsync(UserQueryDto query)
         {
-            var users = await _context.Users
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var usersQuery = _context.Users
                 .Include(u => u.Role)
-                .OrderBy(u => u.Id)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+
+                usersQuery = usersQuery.Where(u =>
+                    u.FirstName.ToLower().Contains(search) ||
+                    u.LastName.ToLower().Contains(search) ||
+                    u.Email.ToLower().Contains(search));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Role))
+            {
+                var role = query.Role.Trim().ToLower();
+
+                usersQuery = usersQuery.Where(u =>
+                    u.Role != null &&
+                    u.Role.Name.ToString().ToLower().Contains(role));
+            }
+
+            usersQuery = ApplyUserSorting(usersQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await usersQuery.CountAsync();
+
+            var users = await usersQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
                 .ToListAsync();
 
-            return _mapper.Map<IEnumerable<UserDto>>(users);
+            var mappedUsers = _mapper.Map<List<UserDto>>(users);
+
+            return new PagedResultDto<UserDto>
+            {
+                Items = mappedUsers,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
         }
 
         public async Task<UserDto?> GetByIdAsync(int id)
@@ -434,6 +479,37 @@ namespace TuristickiVodic.Services
                 .ToListAsync();
 
             return _mapper.Map<IEnumerable<CreatorRoleRequestDto>>(users);
+        }
+
+        private static IQueryable<User> ApplyUserSorting(IQueryable<User> query, string? sortBy, string? sortOrder)
+        {
+            var sortByValue = sortBy?.Trim().ToLower();
+            var isDesc = sortOrder?.Trim().ToLower() == "desc";
+
+            if (sortByValue == "firstname")
+            {
+                return isDesc
+                    ? query.OrderByDescending(u => u.FirstName)
+                    : query.OrderBy(u => u.FirstName);
+            }
+
+            if (sortByValue == "lastname")
+            {
+                return isDesc
+                    ? query.OrderByDescending(u => u.LastName)
+                    : query.OrderBy(u => u.LastName);
+            }
+
+            if (sortByValue == "email")
+            {
+                return isDesc
+                    ? query.OrderByDescending(u => u.Email)
+                    : query.OrderBy(u => u.Email);
+            }
+
+            return isDesc
+                ? query.OrderByDescending(u => u.Id)
+                : query.OrderBy(u => u.Id);
         }
     }
 }
