@@ -254,5 +254,103 @@ namespace TuristickiVodic.Services
 
             return _mapper.Map<LocalityDto>(updated);
         }
+
+        public async Task<PagedResultDto<LocalityDto>> SearchAsync(LocalityQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var localitiesQuery = _context.Localities
+                .Include(l => l.Destination)
+                .Include(l => l.LocalityType)
+                .Include(l => l.Images)
+                .Where(l => l.IsActive)
+                .Where(l => l.Images.Any(i => i.IsMain))
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+
+                localitiesQuery = localitiesQuery.Where(l =>
+                    l.Destination != null &&
+                    l.Destination.Name.ToLower().Contains(destination));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+
+                localitiesQuery = localitiesQuery.Where(l =>
+                    l.LocalityType != null &&
+                    l.LocalityType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+
+                localitiesQuery = localitiesQuery.Where(l =>
+                    l.Name.ToLower().Contains(search) ||
+                    (l.Description != null && l.Description.ToLower().Contains(search)));
+            }
+
+            localitiesQuery = ApplyLocalitySorting(localitiesQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await localitiesQuery.CountAsync();
+
+            var items = await localitiesQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToListAsync();
+
+            var mappedItems = _mapper.Map<List<LocalityDto>>(items);
+
+            return new PagedResultDto<LocalityDto>
+            {
+                Items = mappedItems,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
+        private static IQueryable<Locality> ApplyLocalitySorting(IQueryable<Locality> query, string? sortBy, string? sortOrder)
+        {
+            var sortByValue = sortBy?.Trim().ToLower();
+            var isDesc = sortOrder?.Trim().ToLower() == "desc";
+
+            if (sortByValue == "destination")
+            {
+                return isDesc
+                    ? query.OrderByDescending(l => l.Destination!.Name)
+                    : query.OrderBy(l => l.Destination!.Name);
+            }
+
+            if (sortByValue == "type")
+            {
+                return isDesc
+                    ? query.OrderByDescending(l => l.LocalityType!.Name)
+                    : query.OrderBy(l => l.LocalityType!.Name);
+            }
+
+            if (sortByValue == "createdat")
+            {
+                return isDesc
+                    ? query.OrderByDescending(l => l.CreatedAt)
+                    : query.OrderBy(l => l.CreatedAt);
+            }
+
+            return isDesc
+                ? query.OrderByDescending(l => l.Name)
+                : query.OrderBy(l => l.Name);
+        }
     }
 }

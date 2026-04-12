@@ -37,6 +37,14 @@ namespace TuristickiVodic.API.Controllers
             return Ok(locality);
         }
 
+        [HttpGet("search")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Search([FromQuery] LocalityQueryDto query)
+        {
+            var result = await _localityService.SearchAsync(query);
+            return Ok(result);
+        }
+
         [HttpPost]
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Create([FromBody] CreateLocalityDto dto)
