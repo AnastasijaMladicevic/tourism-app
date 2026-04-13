@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { BottomNavComponent } from '../bottom-nav/bottom-nav.component';
 import { ObjectDto, ObjectService } from '../../services/object';
+import { ImageService } from '../../services/image';
 import { environment } from '../../../environment/environment';
 
 export interface Hotel {
@@ -27,6 +28,7 @@ export interface Hotel {
   saved: boolean;
   typeName: string;
   locality?: string;
+  destination?: string;
   description?: string;
 }
 
@@ -46,10 +48,12 @@ export class HotelsComponent implements OnInit {
   showSortMenu = false;
   sortOption: 'rating' | 'az' | 'za' = 'rating';
 
+  hotelCategories: string[] = [];
   hotels: Hotel[] = [];
 
   constructor(
     private objectService: ObjectService,
+    private imageService: ImageService,
     private cdr: ChangeDetectorRef,
     private location: Location,
   ) {}
@@ -61,11 +65,6 @@ export class HotelsComponent implements OnInit {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
     if (!(event.target as HTMLElement).closest('.sort-anchor')) this.showSortMenu = false;
-  }
-
-  get categories(): string[] {
-    const unique = Array.from(new Set(this.hotels.map((hotel) => hotel.typeName).filter(Boolean)));
-    return ['All Hotels', ...unique];
   }
 
   get filteredHotels(): Hotel[] {
@@ -81,7 +80,9 @@ export class HotelsComponent implements OnInit {
     }
 
     if (this.activeCategory !== 'All Hotels') {
-      list = list.filter((hotel) => hotel.typeName === this.activeCategory);
+      list = list.filter(
+        (hotel) => (hotel.destination ?? hotel.locality ?? hotel.typeName) === this.activeCategory,
+      );
     }
 
     switch (this.sortOption) {
@@ -126,11 +127,14 @@ export class HotelsComponent implements OnInit {
     this.errorMessage = '';
 
     this.objectService.getAll().subscribe({
-      next: (objects) => {
+      next: async (objects) => {
         const objectList = this.toArray<ObjectDto>(objects).map((obj) => this.normalizeObject(obj));
         const hotelObjects = objectList.filter((obj) => this.isHotel(obj.objectTypeName));
 
-        this.hotels = hotelObjects.map((obj) => this.toHotelCard(obj));
+        this.hotels = await Promise.all(
+          hotelObjects.map(async (obj) => this.toHotelCard(obj)),
+        );
+        this.hotelCategories = this.extractUniqueCategories(this.hotels);
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -196,12 +200,58 @@ export class HotelsComponent implements OnInit {
     return typeName.trim().toLowerCase().includes('hotel');
   }
 
-  private toHotelCard(obj: ObjectDto): Hotel {
+  private extractUniqueCategories(hotels: Hotel[]): string[] {
+    const categories = new Set<string>();
+
+    for (const hotel of hotels) {
+      const category = (hotel.destination ?? hotel.locality)?.trim();
+      if (category) categories.add(category);
+    }
+
+    return Array.from(categories.values());
+  }
+
+  private async toHotelCard(obj: ObjectDto): Promise<Hotel> {
     const rating = obj.averageRating ?? 0;
+    let image = this.mainImage(obj);
+
+    console.log('[Hotels] object from API:', {
+      id: obj.id,
+      name: obj.name,
+      type: obj.objectTypeName,
+      embeddedImages: obj.images?.length ?? 0,
+    });
+
+    if (!image) {
+      try {
+        const images = await this.imageService.getForObject(obj.id).toPromise();
+        console.log('[Hotels] images endpoint result:', {
+          id: obj.id,
+          name: obj.name,
+          count: images?.length ?? 0,
+          images,
+        });
+        const main = images?.find((img) => img.isMain) ?? images?.[0];
+        image = this.resolveMediaUrl(main?.url);
+      } catch {
+        console.warn('[Hotels] images endpoint failed:', {
+          id: obj.id,
+          name: obj.name,
+        });
+        image = undefined;
+      }
+    }
+
+    console.log('[Hotels] final card image:', {
+      id: obj.id,
+      name: obj.name,
+      image,
+    });
+
     return {
       id: obj.id,
       name: obj.name,
-      image: this.mainImage(obj),
+      image,
       badge: rating >= 4.7 ? 'Top Rated' : rating >= 4.2 ? 'Great Value' : undefined,
       badgeType: rating >= 4.7 ? 'top' : rating >= 4.2 ? 'value' : undefined,
       rating,
@@ -212,6 +262,7 @@ export class HotelsComponent implements OnInit {
       saved: false,
       typeName: obj.objectTypeName || 'Hotel',
       locality: obj.localityName ?? obj.destinationName ?? 'Montenegro',
+      destination: obj.destinationName ?? obj.localityName ?? 'Montenegro',
       description: obj.description ?? obj.address ?? 'Stay close to the best local experiences.',
     };
   }
@@ -233,7 +284,7 @@ export class HotelsComponent implements OnInit {
   }
 
   private distanceText(distanceKm?: number): string {
-    if (distanceKm == null) return 'Location available';
+    if (distanceKm == null) return '';
     if (distanceKm < 1) return `${Math.round(distanceKm * 1000)} m from center`;
     return `${distanceKm.toFixed(1)} km from center`;
   }

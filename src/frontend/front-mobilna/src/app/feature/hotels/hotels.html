@@ -49,7 +49,14 @@
     </div>
 
     <div class="filters-scroll">
-      @for (category of categories; track category) {
+      <button
+        class="filter-btn"
+        [class.filter-btn--active]="activeCategory === 'All Hotels'"
+        (click)="setCategory('All Hotels')"
+      >
+        All
+      </button>
+      @for (category of hotelCategories; track category) {
         <button
           class="filter-btn"
           [class.filter-btn--active]="activeCategory === category"
