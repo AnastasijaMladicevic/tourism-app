@@ -56,8 +56,11 @@ export class AttractionsComponent implements OnInit {
 
     this.destinationService.getAll().subscribe({
       next: async (destinations) => {
+        const destinationList = this.toArray<DestinationDto>(destinations).map((d) =>
+          this.normalizeDestination(d),
+        );
         const destinationsWithImages = await Promise.all(
-          destinations.map(async (d) => {
+          destinationList.map(async (d) => {
             try {
               const images = await this.imageService.getForDestination(d.id).toPromise();
               return {
@@ -89,6 +92,50 @@ export class AttractionsComponent implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  private toArray<T>(raw: unknown): T[] {
+    if (Array.isArray(raw)) return raw as T[];
+    if (!raw || typeof raw !== 'object') return [];
+    const obj = raw as Record<string, unknown>;
+    const listKeys = ['items', 'data', 'results', 'value'];
+    for (const key of listKeys) {
+      const candidate = obj[key];
+      if (Array.isArray(candidate)) return candidate as T[];
+    }
+    return [];
+  }
+
+  private normalizeDestination(raw: DestinationDto): DestinationDto {
+    const dto = raw as unknown as Record<string, unknown>;
+    return {
+      id: Number(dto['id'] ?? dto['Id'] ?? 0),
+      name: String(dto['name'] ?? dto['Name'] ?? ''),
+      description: (dto['description'] ?? dto['Description'] ?? undefined) as string | undefined,
+      latitude: this.readOptionalNumber(dto, ['latitude', 'Latitude']),
+      longitude: this.readOptionalNumber(dto, ['longitude', 'Longitude']),
+      distanceKm: this.readOptionalNumber(dto, ['distanceKm', 'DistanceKm']),
+      averageRating: this.readOptionalNumber(dto, ['averageRating', 'AverageRating']),
+      reviewCount: this.readOptionalNumber(dto, ['reviewCount', 'ReviewCount']),
+      isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
+      destinationTypeId: Number(dto['destinationTypeId'] ?? dto['DestinationTypeId'] ?? 0),
+      destinationTypeName: String(
+        dto['destinationTypeName'] ?? dto['DestinationTypeName'] ?? '',
+      ),
+      images: ((dto['images'] ?? dto['Images'] ?? []) as DestinationDto['images']) || [],
+      isFavorite: Boolean(dto['isFavorite'] ?? dto['IsFavorite'] ?? false),
+      favoriteId: this.readOptionalNumber(dto, ['favoriteId', 'FavoriteId']),
+    };
+  }
+
+  private readOptionalNumber(obj: Record<string, unknown>, keys: string[]): number | undefined {
+    for (const key of keys) {
+      const value = obj[key];
+      if (value == null) continue;
+      const num = Number(value);
+      if (!Number.isNaN(num)) return num;
+    }
+    return undefined;
   }
 
   private extractUniqueTypes(destinations: DestinationView[]): { id: number; name: string }[] {

@@ -1,0 +1,155 @@
+<div class="screen">
+  <div class="header">
+    <button class="icon-btn" (click)="goBack()" aria-label="Go back">
+      <mat-icon>arrow_back_ios</mat-icon>
+    </button>
+    <h1 class="header__title">Hotels</h1>
+  </div>
+
+  <div class="filters-row">
+    <div class="filters-right">
+      <div class="search-inline">
+        <mat-icon>search</mat-icon>
+        <input type="text" placeholder="Search hotels..." [(ngModel)]="searchQuery" />
+      </div>
+
+      <div
+        class="sort-anchor sort-trigger"
+        (click)="$event.stopPropagation(); showSortMenu = !showSortMenu"
+      >
+        <span>{{ sortLabel() }}</span>
+        <mat-icon>expand_more</mat-icon>
+
+        @if (showSortMenu) {
+          <div class="sort-menu sort-anchor">
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'rating'"
+              (click)="setSort('rating')"
+            >
+              <mat-icon>star</mat-icon> Top Rated
+            </button>
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'az'"
+              (click)="setSort('az')"
+            >
+              <mat-icon>sort_by_alpha</mat-icon> A -> Z
+            </button>
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'za'"
+              (click)="setSort('za')"
+            >
+              <mat-icon>sort_by_alpha</mat-icon> Z -> A
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="filters-scroll">
+      <button
+        class="filter-btn"
+        [class.filter-btn--active]="activeCategory === 'All Hotels'"
+        (click)="setCategory('All Hotels')"
+      >
+        All
+      </button>
+      @for (category of hotelCategories; track category) {
+        <button
+          class="filter-btn"
+          [class.filter-btn--active]="activeCategory === category"
+          (click)="setCategory(category)"
+        >
+          {{ category }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="results-bar">
+    <span class="results-bar__count">{{ filteredHotels.length }} hotels found</span>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading">
+      <mat-icon>hourglass_empty</mat-icon>
+      <p>Loading hotels...</p>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="error-state">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ errorMessage }}</p>
+      <button (click)="loadHotels()">Retry</button>
+    </div>
+  }
+
+  <div class="grid">
+    @for (hotel of filteredHotels; track hotel.id) {
+      <div class="card">
+        <div class="card__image-wrap">
+          @if (hotel.image) {
+            <img class="card__image" [src]="hotel.image" [alt]="hotel.name" />
+          } @else {
+            <div class="card__image card__image--empty">
+              <mat-icon>hotel</mat-icon>
+            </div>
+          }
+
+          @if (hotel.badge) {
+            <span
+              class="card__badge"
+              [class.card__badge--top]="hotel.badgeType === 'top'"
+              [class.card__badge--value]="hotel.badgeType === 'value'"
+            >
+              {{ hotel.badge }}
+            </span>
+          }
+
+          <span class="card__distance">
+            <mat-icon>radio_button_checked</mat-icon> {{ hotel.distance }}
+          </span>
+
+          <button
+            class="card__fav"
+            [class.card__fav--active]="hotel.saved"
+            (click)="toggleSave(hotel)"
+          >
+            <mat-icon>{{ hotel.saved ? 'favorite' : 'favorite_border' }}</mat-icon>
+          </button>
+        </div>
+
+        <div class="card__body">
+          <div class="card__title-row">
+            <h2 class="card__name">{{ hotel.name }}</h2>
+            <div class="card__rating">
+              <mat-icon>star</mat-icon>
+              <span>{{ hotel.rating ? (hotel.rating | number: '1.1-1') : 'New' }}</span>
+            </div>
+          </div>
+
+          <p class="card__type"><mat-icon>place</mat-icon> {{ hotel.locality }}</p>
+
+          <p class="card__desc">{{ hotel.description }}</p>
+
+          <div class="card__footer">
+            <span class="card__reviews">{{ hotel.reviews }} REVIEWS</span>
+            <button class="card__details">VIEW DETAILS</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (filteredHotels.length === 0 && !isLoading && !errorMessage) {
+      <div class="empty">
+        <mat-icon>search_off</mat-icon>
+        <p>No hotels found.</p>
+      </div>
+    }
+  </div>
+
+  <app-bottom-nav />
+</div>
