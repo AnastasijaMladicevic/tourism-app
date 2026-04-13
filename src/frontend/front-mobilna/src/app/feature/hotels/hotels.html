@@ -1,0 +1,106 @@
+<div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <button class="back-btn">‹</button>
+      <h1 class="header-title">Hotels</h1>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="search-section">
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          placeholder="Where to stay?"
+          [(ngModel)]="searchQuery"
+          class="search-input"
+        />
+      </div>
+      <button class="filter-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="4" y1="6" x2="20" y2="6"/>
+          <line x1="8" y1="12" x2="16" y2="12"/>
+          <line x1="11" y1="18" x2="13" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Categories -->
+    <div class="categories-scroll">
+      <div class="categories">
+        <button
+          *ngFor="let cat of categories"
+          class="category-chip"
+          [class.active]="activeCategory === cat"
+          (click)="setCategory(cat)"
+        >
+          {{ cat }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Count -->
+    <div class="results-count">
+      Showing <strong>{{ filteredHotels.length }} top hotels</strong> in Montenegro
+    </div>
+
+    <!-- Hotel List -->
+    <div class="hotel-list">
+      <div class="hotel-card" *ngFor="let hotel of filteredHotels">
+        <!-- Image -->
+        <div class="card-image-wrap">
+          <img [src]="hotel.image" [alt]="hotel.name" class="card-image" />
+          <span
+            *ngIf="hotel.badge"
+            class="badge"
+            [class.badge-top]="hotel.badgeType === 'top'"
+            [class.badge-value]="hotel.badgeType === 'value'"
+          >
+            {{ hotel.badge }}
+          </span>
+          <button class="save-btn" (click)="toggleSave(hotel)" [class.saved]="hotel.saved">
+            <svg width="18" height="18" viewBox="0 0 24 24" [attr.fill]="hotel.saved ? '#ef4444' : 'none'" [attr.stroke]="hotel.saved ? '#ef4444' : 'currentColor'" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Info -->
+        <div class="card-body">
+          <div class="card-header-row">
+            <h2 class="hotel-name">{{ hotel.name }}</h2>
+            <div class="rating">
+              <span class="star">★</span>
+              <span class="rating-value">{{ hotel.rating }}</span>
+              <span class="reviews">({{ hotel.reviews }})</span>
+            </div>
+          </div>
+
+          <div class="distance">
+            <span class="pin-icon">📍</span>
+            {{ hotel.distance }}
+          </div>
+
+          <div class="amenities">
+            <span class="amenity" *ngFor="let a of hotel.amenities">
+              <span class="amenity-icon">{{ amenityIcons[a] }}</span>
+              {{ a }}
+            </span>
+          </div>
+
+          <div class="card-footer">
+            <div class="price">
+              <span class="price-amount">${{ hotel.price }}</span>
+              <span class="price-night">/night</span>
+            </div>
+            <button class="book-btn">Book Now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Disclaimer -->
+    <p class="disclaimer">Prices may vary based on selection and seasonality</p>
+
+    <app-bottom-nav />
+</div>

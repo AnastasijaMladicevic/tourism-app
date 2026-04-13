@@ -57,8 +57,7 @@ export const routes: Routes = [
   },
   {
     path: 'hotels',
-    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
-    data: { type: 'Hotel', title: 'Hotels' },
+    loadComponent: () => import('./feature/hotels/hotels').then((m) => m.HotelsComponent),
   },
   {
     path: 'restaurants',

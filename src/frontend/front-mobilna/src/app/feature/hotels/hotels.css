@@ -1,0 +1,394 @@
+/* ===== RESET & ROOT ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:host {
+  display: block;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ===== APP CONTAINER ===== */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f7f8fa;
+  padding-bottom: 72px;
+  background: #f7f8fa;
+}
+
+/* ===== HEADER ===== */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px 10px;
+  background: #fff;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: #111;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.header-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111;
+  letter-spacing: -0.3px;
+}
+
+/* ===== SEARCH ===== */
+.search-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: #fff;
+}
+
+.search-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  background: #f2f3f5;
+  border-radius: 12px;
+  padding: 10px 14px;
+  gap: 8px;
+}
+
+.search-icon {
+  font-size: 14px;
+  opacity: 0.5;
+}
+
+.search-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+  color: #555;
+  flex: 1;
+  font-family: inherit;
+}
+
+.search-input::placeholder {
+  color: #aaa;
+}
+
+.filter-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1.5px solid #e0e2e8;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #333;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.filter-btn:hover {
+  background: #f2f3f5;
+}
+
+/* ===== CATEGORIES ===== */
+.categories-scroll {
+  background: #fff;
+  padding: 0 16px 14px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.categories-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.categories {
+  display: flex;
+  gap: 8px;
+  min-width: max-content;
+}
+
+.category-chip {
+  padding: 8px 18px;
+  border-radius: 24px;
+  border: 1.5px solid #e0e2e8;
+  background: #fff;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.category-chip.active {
+  background: #0a9e8c;
+  border-color: #0a9e8c;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(10,158,140,0.3);
+}
+
+.category-chip:hover:not(.active) {
+  border-color: #0a9e8c;
+  color: #0a9e8c;
+}
+
+/* ===== RESULTS COUNT ===== */
+.results-count {
+  padding: 14px 20px 8px;
+  font-size: 13.5px;
+  color: #666;
+}
+
+.results-count strong {
+  color: #111;
+  font-weight: 600;
+}
+
+/* ===== HOTEL LIST ===== */
+.hotel-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px 16px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.hotel-list::-webkit-scrollbar {
+  width: 0;
+}
+
+/* ===== HOTEL CARD ===== */
+.hotel-card {
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hotel-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+
+/* Card Image */
+.card-image-wrap {
+  position: relative;
+  height: 180px;
+  overflow: hidden;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.hotel-card:hover .card-image {
+  transform: scale(1.04);
+}
+
+/* Badge */
+.badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.badge-top {
+  background: #0a9e8c;
+  color: #fff;
+}
+
+.badge-value {
+  background: #2563eb;
+  color: #fff;
+}
+
+/* Save Button */
+.save-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  background: rgba(255,255,255,0.92);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #666;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: transform 0.2s ease;
+}
+
+.save-btn:hover {
+  transform: scale(1.1);
+}
+
+.save-btn.saved {
+  background: #fff0f0;
+}
+
+/* Card Body */
+.card-body {
+  padding: 14px 16px 16px;
+}
+
+.card-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+
+.hotel-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111;
+  letter-spacing: -0.2px;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.star {
+  color: #f59e0b;
+  font-size: 14px;
+}
+
+.rating-value {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #111;
+}
+
+.reviews {
+  font-size: 12.5px;
+  color: #888;
+}
+
+/* Distance */
+.distance {
+  font-size: 12.5px;
+  color: #888;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.pin-icon {
+  font-size: 11px;
+}
+
+/* Amenities */
+.amenities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.amenity {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #555;
+  background: #f5f6f8;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.amenity-icon {
+  font-size: 11px;
+}
+
+/* Card Footer */
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.price {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.price-amount {
+  font-size: 22px;
+  font-weight: 800;
+  color: #111;
+  letter-spacing: -0.5px;
+}
+
+.price-night {
+  font-size: 13px;
+  color: #888;
+  font-weight: 400;
+}
+
+.book-btn {
+  background: #0a9e8c;
+  color: #fff;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  letter-spacing: 0.2px;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(10,158,140,0.3);
+}
+
+.book-btn:hover {
+  background: #089080;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(10,158,140,0.4);
+}
+
+.book-btn:active {
+  transform: translateY(0);
+}
+
+/* ===== DISCLAIMER ===== */
+.disclaimer {
+  text-align: center;
+  font-size: 11.5px;
+  color: #aaa;
+  padding: 4px 20px 16px;
+  font-style: italic;
+}
