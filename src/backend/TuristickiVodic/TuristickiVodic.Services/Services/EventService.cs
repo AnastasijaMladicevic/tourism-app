@@ -37,7 +37,10 @@ namespace TuristickiVodic.Services.Services
                 .Include(e => e.Locality)
                 .Include(e => e.Destination)
                 .Include(e => e.Object)
-                .Where(e => _context.Images.Any(i => i.EventId == e.Id && i.IsMain))
+                .Where(e =>
+                    e.Status == ContentStatus.Approved &&
+                    e.IsActive &&
+                    _context.Images.Any(i => i.EventId == e.Id && i.IsMain))
                 .OrderBy(e => e.Id)
                 .ToListAsync();
 
@@ -51,6 +54,10 @@ namespace TuristickiVodic.Services.Services
                 .Include(e => e.Locality)
                 .Include(e => e.Destination)
                 .Include(e => e.Object)
+                .Where(e =>
+                    e.Status == ContentStatus.Approved &&
+                    e.IsActive &&
+                    _context.Images.Any(i => i.EventId == e.Id && i.IsMain))
                 .AsQueryable();
 
             if (filter != null)
@@ -120,6 +127,9 @@ namespace TuristickiVodic.Services.Services
             if (ev == null)
                 return null;
 
+            if (ev.Status != ContentStatus.Approved || !ev.IsActive)
+                return null;
+
             var hasMainImage = await _context.Images.AnyAsync(i => i.EventId == ev.Id && i.IsMain);
             if (!hasMainImage)
                 return null;
@@ -159,7 +169,6 @@ namespace TuristickiVodic.Services.Services
                 EndDate = dto.EndDate,
                 Price = dto.Price,
                 MaxVisitors = dto.MaxVisitors,
-                IsActive = dto.IsActive,
                 EventTypeId = dto.EventTypeId,
                 LocalityId = dto.LocalityId,
                 DestinationId = dto.DestinationId,
@@ -238,7 +247,6 @@ namespace TuristickiVodic.Services.Services
 
             if (dto.Price.HasValue) ev.Price = dto.Price.Value;
             if (dto.MaxVisitors.HasValue) ev.MaxVisitors = dto.MaxVisitors.Value;
-            if (dto.IsActive.HasValue) ev.IsActive = dto.IsActive.Value;
 
             ev.UpdatedAt = DateTime.UtcNow;
 
@@ -349,6 +357,138 @@ namespace TuristickiVodic.Services.Services
                 return null;
 
             return new Point(longitude.Value, latitude.Value) { SRID = 4326 };
+        }
+
+        public async Task<EventDto?> ToggleActiveAsync(int id, bool isActive, int userId, string roleName)
+        {
+            var ev = await _context.Events
+                .Include(e => e.Locality)
+                    .ThenInclude(l => l.Destination)
+                .Include(e => e.Destination)
+                .Include(e => e.EventType)
+                .Include(e => e.Object)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (ev == null)
+                return null;
+
+            if (roleName != "Manager")
+                throw new UnauthorizedAccessException("Only managers can change event visibility.");
+
+            if (ev.Status != ContentStatus.Approved)
+                throw new InvalidOperationException("Only approved events can have visibility changed.");
+
+            var destination = ev.Destination ?? ev.Locality?.Destination;
+            if (destination == null)
+                throw new InvalidOperationException("Cannot determine destination for this event.");
+
+            var isResponsible = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, destination, userId);
+            if (!isResponsible)
+                throw new UnauthorizedAccessException("You are not the responsible manager for this destination.");
+
+            ev.IsActive = isActive;
+            ev.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
+        }
+
+        public async Task<PagedResultDto<EventDto>> SearchAsync(EventQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var eventsQuery = _context.Events
+                .Include(e => e.EventType)
+                .Include(e => e.Destination)
+                .Include(e => e.Locality)
+                .Include(e => e.Images)
+                .Where(e => e.Status == ContentStatus.Approved)
+                .Where(e => e.IsActive)
+                .Where(e => e.Images.Any(i => i.IsMain))
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    e.EventType != null &&
+                    e.EventType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    e.Destination != null &&
+                    e.Destination.Name.ToLower().Contains(destination));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    e.Name.ToLower().Contains(search) ||
+                    (e.Description != null && e.Description.ToLower().Contains(search)));
+            }
+
+            eventsQuery = ApplySorting(eventsQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await eventsQuery.CountAsync();
+
+            var items = await eventsQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToListAsync();
+
+            var mappedItems = _mapper.Map<List<EventDto>>(items);
+
+            return new PagedResultDto<EventDto>
+            {
+                Items = mappedItems,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
+        private static IQueryable<Event> ApplySorting(IQueryable<Event> query, string? sortBy, string? sortOrder)
+        {
+            var sortByValue = sortBy?.Trim().ToLower();
+            var isDesc = sortOrder?.Trim().ToLower() == "desc";
+
+            if (sortByValue == "name")
+            {
+                return isDesc
+                    ? query.OrderByDescending(e => e.Name)
+                    : query.OrderBy(e => e.Name);
+            }
+
+            if (sortByValue == "type")
+            {
+                return isDesc
+                    ? query.OrderByDescending(e => e.EventType!.Name)
+                    : query.OrderBy(e => e.EventType!.Name);
+            }
+
+            if (sortByValue == "destination")
+            {
+                return isDesc
+                    ? query.OrderByDescending(e => e.Destination!.Name)
+                    : query.OrderBy(e => e.Destination!.Name);
+            }
+
+            return isDesc
+                ? query.OrderByDescending(e => e.StartDate)
+                : query.OrderBy(e => e.StartDate);
         }
     }
 }

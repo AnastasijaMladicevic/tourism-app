@@ -1,12 +1,14 @@
 using AutoMapper;
+using FluentAssertions;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
 using TuristickiVodic.Services;
-using Moq;
 using Xunit;
-using FluentAssertions;
+using System.IO;
 
 namespace TuristickiVodic.Tests.Services
 {
@@ -41,6 +43,19 @@ namespace TuristickiVodic.Tests.Services
             return config.CreateMapper();
         }
 
+        private static Mock<IWebHostEnvironment> CreateEnvironmentMock()
+        {
+            var environmentMock = new Mock<IWebHostEnvironment>();
+            environmentMock.Setup(x => x.WebRootPath).Returns(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"));
+            environmentMock.Setup(x => x.ContentRootPath).Returns(Directory.GetCurrentDirectory());
+            return environmentMock;
+        }
+
+        private static UserService CreateUserService(AppDbContext ctx, Mock<ITokenService> tokenSvc)
+        {
+            return new UserService(ctx, CreateMapper(), tokenSvc.Object, CreateEnvironmentMock().Object);
+        }
+
         private static (Role tourist, Role cc, Role manager, Role admin) SeedRoles(AppDbContext ctx)
         {
             var tourist = new Role { Id = 1, Name = RoleType.Tourist };
@@ -62,7 +77,7 @@ namespace TuristickiVodic.Tests.Services
             using var ctx = CreateInMemoryContext(nameof(CreateAsync_NovRegistracija_KreiraKorisnikaKaoTourist));
             var (tourist, _, _, _) = SeedRoles(ctx);
             var tokenSvc = new Mock<ITokenService>();
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             var dto = new CreateUserDto
             {
@@ -112,7 +127,7 @@ namespace TuristickiVodic.Tests.Services
             await ctx.SaveChangesAsync();
 
             var tokenSvc = CreateTokenServiceMock("jwt-1", "refresh-1");
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             var before = DateTime.UtcNow;
             var result = await svc.LoginAsync(new LoginDto
@@ -155,7 +170,7 @@ namespace TuristickiVodic.Tests.Services
             await ctx.SaveChangesAsync();
 
             var tokenSvc = CreateTokenServiceMock("jwt-2", "refresh-2");
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             var before = DateTime.UtcNow;
             var result = await svc.LoginAsync(new LoginDto
@@ -183,7 +198,7 @@ namespace TuristickiVodic.Tests.Services
             SeedRoles(ctx);
 
             var tokenSvc = CreateTokenServiceMock("jwt-3", "refresh-3");
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             var result = await svc.RefreshTokenAsync(new RefreshTokenDto
             {
@@ -226,7 +241,7 @@ namespace TuristickiVodic.Tests.Services
             await ctx.SaveChangesAsync();
 
             var tokenSvc = CreateTokenServiceMock("jwt-4", "refresh-4");
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             var result = await svc.RefreshTokenAsync(new RefreshTokenDto
             {
@@ -269,7 +284,7 @@ namespace TuristickiVodic.Tests.Services
             await ctx.SaveChangesAsync();
 
             var tokenSvc = CreateTokenServiceMock("jwt-5", "new-refresh-7");
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             var before = DateTime.UtcNow;
             var result = await svc.RefreshTokenAsync(new RefreshTokenDto
@@ -326,7 +341,7 @@ namespace TuristickiVodic.Tests.Services
             await ctx.SaveChangesAsync();
 
             var tokenSvc = CreateTokenServiceMock("jwt-6", "new-refresh-30");
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             var before = DateTime.UtcNow;
             var result = await svc.RefreshTokenAsync(new RefreshTokenDto
@@ -380,7 +395,7 @@ namespace TuristickiVodic.Tests.Services
             await ctx.SaveChangesAsync();
 
             var tokenSvc = CreateTokenServiceMock("jwt-7", "refresh-7");
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             await svc.Invoking(s => s.RefreshTokenAsync(new RefreshTokenDto
             {
@@ -423,7 +438,7 @@ namespace TuristickiVodic.Tests.Services
             await ctx.SaveChangesAsync();
 
             var tokenSvc = CreateTokenServiceMock("jwt-8", "refresh-8");
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             await svc.Invoking(s => s.RefreshTokenAsync(new RefreshTokenDto
             {
@@ -463,7 +478,7 @@ namespace TuristickiVodic.Tests.Services
 
             await ctx.SaveChangesAsync();
 
-            var svc = new UserService(ctx, CreateMapper(), CreateTokenServiceMock().Object);
+            var svc = CreateUserService(ctx, CreateTokenServiceMock());
 
             var result = await svc.ToggleUserActiveAsync(107, false);
 
@@ -509,7 +524,7 @@ namespace TuristickiVodic.Tests.Services
             await ctx.SaveChangesAsync();
 
             var tokenSvc = CreateTokenServiceMock("jwt-rotate", "novi-refresh");
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             var result = await svc.RefreshTokenAsync(new RefreshTokenDto
             {
@@ -552,7 +567,7 @@ namespace TuristickiVodic.Tests.Services
 
             await ctx.SaveChangesAsync();
 
-            var svc = new UserService(ctx, CreateMapper(), CreateTokenServiceMock().Object);
+            var svc = CreateUserService(ctx, CreateTokenServiceMock());
 
             var result = await svc.DeleteAsync(108);
 
@@ -579,7 +594,7 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var tokenSvc = new Mock<ITokenService>();
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             var dto = new CreateUserDto
             {
@@ -601,7 +616,7 @@ namespace TuristickiVodic.Tests.Services
             using var ctx = CreateInMemoryContext(nameof(CreateAsync_KorisnikJeNeaktivan_VrataFalse_IsActive));
             var (tourist, _, _, _) = SeedRoles(ctx);
             var tokenSvc = new Mock<ITokenService>();
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             var result = await svc.CreateAsync(new CreateUserDto
             {
@@ -642,7 +657,7 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var tokenSvc = new Mock<ITokenService>();
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             await svc.Invoking(s => s.LoginAsync(new LoginDto { Email = "b@b.com", Password = "pass" }))
                 .Should().ThrowAsync<InvalidOperationException>()
@@ -669,7 +684,7 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var tokenSvc = new Mock<ITokenService>();
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             await svc.Invoking(s => s.LoginAsync(new LoginDto { Email = "c@c.com", Password = "pass" }))
                 .Should().ThrowAsync<InvalidOperationException>()
@@ -695,7 +710,7 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var tokenSvc = new Mock<ITokenService>();
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             var result = await svc.LoginAsync(new LoginDto { Email = "d@d.com", Password = "pogresna" });
 
@@ -727,7 +742,7 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var tokenSvc = new Mock<ITokenService>();
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             await svc.ChangePasswordAsync(
                 5,
@@ -755,7 +770,7 @@ namespace TuristickiVodic.Tests.Services
             var (_, _, manager, _) = SeedRoles(ctx);
             await ctx.SaveChangesAsync();
 
-            var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
 
             var result = await service.CreateManagerAsync(new CreateUserDto
             {
@@ -793,7 +808,7 @@ namespace TuristickiVodic.Tests.Services
             });
             await ctx.SaveChangesAsync();
 
-            var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
 
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 service.CreateManagerAsync(new CreateUserDto
@@ -817,7 +832,7 @@ namespace TuristickiVodic.Tests.Services
             SeedRoles(ctx);
             await ctx.SaveChangesAsync();
 
-            var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
 
             var result = await service.CreateAdminAsync(new CreateUserDto
             {
@@ -854,7 +869,7 @@ namespace TuristickiVodic.Tests.Services
             });
             await ctx.SaveChangesAsync();
 
-            var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
 
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 service.CreateAdminAsync(new CreateUserDto
@@ -887,7 +902,7 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var tokenSvc = new Mock<ITokenService>();
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             await svc.Invoking(s => s.ChangePasswordAsync(
                     6,
@@ -923,7 +938,7 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var tokenSvc = new Mock<ITokenService>();
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             await svc.ChangePasswordAsync(
                 7,
@@ -946,7 +961,7 @@ namespace TuristickiVodic.Tests.Services
             using var ctx = CreateInMemoryContext(nameof(ChangePasswordAsync_KorisnikNijePronadjen_BacaException));
             SeedRoles(ctx);
             var tokenSvc = new Mock<ITokenService>();
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             await svc.Invoking(s => s.ChangePasswordAsync(
                     9999,
@@ -988,7 +1003,7 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var tokenSvc = new Mock<ITokenService>();
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             var result = await svc.ApproveCreatorRoleAsync(10);
 
@@ -1018,7 +1033,7 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var tokenSvc = new Mock<ITokenService>();
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             await svc.Invoking(s => s.ApproveCreatorRoleAsync(11))
                 .Should().ThrowAsync<InvalidOperationException>()
@@ -1046,7 +1061,7 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var tokenSvc = new Mock<ITokenService>();
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             await svc.Invoking(s => s.ApproveCreatorRoleAsync(12))
                 .Should().ThrowAsync<InvalidOperationException>()
@@ -1077,7 +1092,7 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var tokenSvc = new Mock<ITokenService>();
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             var result = await svc.ToggleUserActiveAsync(13, false);
 
@@ -1091,7 +1106,7 @@ namespace TuristickiVodic.Tests.Services
             using var ctx = CreateInMemoryContext(nameof(ToggleUserActiveAsync_NepostojeciKorisnik_VracaFalse));
             SeedRoles(ctx);
             var tokenSvc = new Mock<ITokenService>();
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             var result = await svc.ToggleUserActiveAsync(9999, false);
 
@@ -1122,7 +1137,7 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var tokenSvc = new Mock<ITokenService>();
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             var result = await svc.DeleteAsync(14);
 
@@ -1136,7 +1151,7 @@ namespace TuristickiVodic.Tests.Services
             using var ctx = CreateInMemoryContext(nameof(DeleteAsync_NepostojeciKorisnik_VracaFalse));
             SeedRoles(ctx);
             var tokenSvc = new Mock<ITokenService>();
-            var svc = new UserService(ctx, CreateMapper(), tokenSvc.Object);
+            var svc = CreateUserService(ctx, tokenSvc);
 
             var result = await svc.DeleteAsync(9999);
 
@@ -1149,7 +1164,7 @@ namespace TuristickiVodic.Tests.Services
             using var ctx = CreateInMemoryContext(nameof(CreateAdminAsync_UpisujeAdminRoleIdIRole));
             var (_, _, _, admin) = SeedRoles(ctx);
 
-            var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
 
             await service.CreateAdminAsync(new CreateUserDto
             {
@@ -1172,7 +1187,7 @@ namespace TuristickiVodic.Tests.Services
             using var ctx = CreateInMemoryContext(nameof(CreateManagerAsync_UpisujeManagerRoleIdIRole));
             var (_, _, manager, _) = SeedRoles(ctx);
 
-            var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
 
             await service.CreateManagerAsync(new CreateUserDto
             {
@@ -1195,7 +1210,7 @@ namespace TuristickiVodic.Tests.Services
             using var ctx = CreateInMemoryContext(nameof(CreateAdminAsync_NovKorisnik_PostavljaPodrazumevaneVrednosti));
             SeedRoles(ctx);
 
-            var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
 
             await service.CreateAdminAsync(new CreateUserDto
             {
@@ -1218,7 +1233,7 @@ namespace TuristickiVodic.Tests.Services
             using var ctx = CreateInMemoryContext(nameof(CreateManagerAsync_NovKorisnik_PostavljaPodrazumevaneVrednosti));
             SeedRoles(ctx);
 
-            var service = new UserService(ctx, CreateMapper(), new Mock<ITokenService>().Object);
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
 
             await service.CreateManagerAsync(new CreateUserDto
             {

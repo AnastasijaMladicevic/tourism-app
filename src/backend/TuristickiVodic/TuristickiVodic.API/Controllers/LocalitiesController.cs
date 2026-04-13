@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TuristickiVodic.Core.DTO;
-using TuristickiVodic.Services;
 using TuristickiVodic.Services.Services;
 
 namespace TuristickiVodic.API.Controllers
@@ -38,6 +37,14 @@ namespace TuristickiVodic.API.Controllers
             return Ok(locality);
         }
 
+        [HttpGet("search")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Search([FromQuery] LocalityQueryDto query)
+        {
+            var result = await _localityService.SearchAsync(query);
+            return Ok(result);
+        }
+
         [HttpPost]
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Create([FromBody] CreateLocalityDto dto)
@@ -53,10 +60,8 @@ namespace TuristickiVodic.API.Controllers
                 var created = await _localityService.CreateAsync(dto, userId, roleName);
                 return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
             }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            catch (UnauthorizedAccessException) { return Forbid(); }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
         [HttpPut("{id}")]
@@ -78,10 +83,31 @@ namespace TuristickiVodic.API.Controllers
 
                 return Ok(updated);
             }
+            catch (UnauthorizedAccessException) { return Forbid(); }
             catch (InvalidOperationException ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+        [HttpPut("{id}/toggle-active")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> ToggleActive(int id, [FromBody] ToggleActiveDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var roleName = User.FindFirstValue(ClaimTypes.Role)!;
+
+                var updated = await _localityService.ToggleActiveAsync(id, dto.IsActive, userId, roleName);
+                if (updated == null) return NotFound();
+
+                return Ok(updated);
+            }
+            catch (UnauthorizedAccessException) { return Forbid(); }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
         [HttpDelete("{id}")]
@@ -100,6 +126,7 @@ namespace TuristickiVodic.API.Controllers
 
                 return NoContent();
             }
+            catch (UnauthorizedAccessException) { return Forbid(); }
             catch (InvalidOperationException ex)
             {
                 return BadRequest(new { message = ex.Message });

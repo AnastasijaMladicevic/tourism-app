@@ -17,6 +17,7 @@ namespace TuristickiVodic.Tests.Services
     /// - Samo Admin menja destinacije (servis ne provjerava rolu, to je controller)
     /// - AssignManager oslobađa starog i dodjeljuje novog menadžera
     /// - Brisanje blokirano ako destinacija ima lokalitete, objekte ili evente
+    /// - Manager vidi samo svoju destinaciju
     /// </summary>
     public class DestinationServiceTests
     {
@@ -39,20 +40,28 @@ namespace TuristickiVodic.Tests.Services
         {
             var tourist = new Role { Id = 1, Name = RoleType.Tourist };
             var manager = new Role { Id = 3, Name = RoleType.Manager };
-            var admin   = new Role { Id = 4, Name = RoleType.Admin };
+            var admin = new Role { Id = 4, Name = RoleType.Admin };
             var tip = new DestinationType { Id = 1, Name = "Stari Grad" };
+
             ctx.Roles.AddRange(tourist, manager, admin);
             ctx.DestinationTypes.Add(tip);
             ctx.SaveChanges();
+
             return (tourist, manager, admin, tip);
         }
 
         private static User CreateManager(int id, string email, Role managerRole, int? managedDestId = null) =>
             new User
             {
-                Id = id, FirstName = "Mgr", LastName = "Mgr", Email = email,
-                PasswordHash = "hash", RoleId = managerRole.Id, Role = managerRole,
-                IsActive = true, IsBlacklisted = false,
+                Id = id,
+                FirstName = "Mgr",
+                LastName = "Mgr",
+                Email = email,
+                PasswordHash = "hash",
+                RoleId = managerRole.Id,
+                Role = managerRole,
+                IsActive = true,
+                IsBlacklisted = false,
                 ManagedDestinationId = managedDestId,
                 DateOfBirth = new DateTime(1985, 1, 1)
             };
@@ -66,6 +75,7 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(CreateAsync_ValidanManager_KreiraDestinaciju));
             var (_, manager, _, tip) = SeedBase(ctx);
+
             var mgr = CreateManager(10, "mgr@test.com", manager);
             ctx.Users.Add(mgr);
             ctx.SaveChanges();
@@ -88,11 +98,14 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(CreateAsync_ManagerNijePronadjen_BacaException));
             var (_, _, _, tip) = SeedBase(ctx);
+
             var svc = new DestinationService(ctx, CreateMapper());
 
             await svc.Invoking(s => s.CreateAsync(new CreateDestinationDto
             {
-                Name = "Test", DestinationTypeId = tip.Id, ManagedByUserId = 9999
+                Name = "Test",
+                DestinationTypeId = tip.Id,
+                ManagedByUserId = 9999
             }, 1))
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*not found*");
@@ -103,12 +116,20 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(CreateAsync_DodeljenoLiceNijeManager_BacaException));
             var (tourist, _, _, tip) = SeedBase(ctx);
+
             var tourist_user = new User
             {
-                Id = 20, FirstName = "T", LastName = "T", Email = "t@t.com",
-                PasswordHash = "hash", RoleId = tourist.Id, Role = tourist,
-                IsActive = true, DateOfBirth = new DateTime(1990, 1, 1)
+                Id = 20,
+                FirstName = "T",
+                LastName = "T",
+                Email = "t@t.com",
+                PasswordHash = "hash",
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
             };
+
             ctx.Users.Add(tourist_user);
             ctx.SaveChanges();
 
@@ -116,7 +137,9 @@ namespace TuristickiVodic.Tests.Services
 
             await svc.Invoking(s => s.CreateAsync(new CreateDestinationDto
             {
-                Name = "Test", DestinationTypeId = tip.Id, ManagedByUserId = tourist_user.Id
+                Name = "Test",
+                DestinationTypeId = tip.Id,
+                ManagedByUserId = tourist_user.Id
             }, 1))
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*Manager role*");
@@ -125,9 +148,9 @@ namespace TuristickiVodic.Tests.Services
         [Fact]
         public async Task CreateAsync_ManagerVecRukovodiDrugom_BacaException()
         {
-            // Jedan Manager ne može da rukovodi sa više destinacija
             using var ctx = CreateInMemoryContext(nameof(CreateAsync_ManagerVecRukovodiDrugom_BacaException));
             var (_, manager, _, tip) = SeedBase(ctx);
+
             var mgr = CreateManager(30, "mgr2@test.com", manager, managedDestId: 1);
             ctx.Users.Add(mgr);
             ctx.SaveChanges();
@@ -136,7 +159,9 @@ namespace TuristickiVodic.Tests.Services
 
             await svc.Invoking(s => s.CreateAsync(new CreateDestinationDto
             {
-                Name = "Nova", DestinationTypeId = tip.Id, ManagedByUserId = mgr.Id
+                Name = "Nova",
+                DestinationTypeId = tip.Id,
+                ManagedByUserId = mgr.Id
             }, 1))
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*already manages*");
@@ -147,6 +172,7 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(CreateAsync_TipDestinacijeNePostoji_BacaException));
             var (_, manager, _, _) = SeedBase(ctx);
+
             var mgr = CreateManager(40, "mgr3@test.com", manager);
             ctx.Users.Add(mgr);
             ctx.SaveChanges();
@@ -155,7 +181,9 @@ namespace TuristickiVodic.Tests.Services
 
             await svc.Invoking(s => s.CreateAsync(new CreateDestinationDto
             {
-                Name = "Test", DestinationTypeId = 9999, ManagedByUserId = mgr.Id
+                Name = "Test",
+                DestinationTypeId = 9999,
+                ManagedByUserId = mgr.Id
             }, 1))
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*type not found*");
@@ -170,13 +198,21 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_PostojecaDestinacija_VracaDto));
             var (_, manager, _, tip) = SeedBase(ctx);
+
             var mgr = CreateManager(50, "mgr4@test.com", manager);
             ctx.Users.Add(mgr);
+
             var dest = new Destination
             {
-                Id = 1, Name = "Budva", DestinationTypeId = tip.Id, DestinationType = tip,
-                ManagedByUserId = mgr.Id, CreatedByUserId = 99, Status = ContentStatus.Approved
+                Id = 1,
+                Name = "Budva",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                ManagedByUserId = mgr.Id,
+                CreatedByUserId = 99,
+                Status = ContentStatus.Approved
             };
+
             ctx.Destinations.Add(dest);
             ctx.SaveChanges();
 
@@ -190,7 +226,7 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var svc = new DestinationService(ctx, CreateMapper());
-            var result = await svc.GetByIdAsync(1);
+            var result = await svc.GetByIdAsync(1, null, null);
 
             result.Should().NotBeNull();
             result!.Name.Should().Be("Budva");
@@ -252,19 +288,20 @@ namespace TuristickiVodic.Tests.Services
 
             var svc = new DestinationService(ctx, mapper);
 
-            var result = await svc.GetByIdAsync(destination.Id);
+            var result = await svc.GetByIdAsync(destination.Id, null, null);
 
             result.Should().BeNull();
         }
 
         [Fact]
-        public async Task GetByIdAsync_NepostojećaDestinacija_VracaNull()
+        public async Task GetByIdAsync_NepostojecaDestinacija_VracaNull()
         {
-            using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_NepostojećaDestinacija_VracaNull));
+            using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_NepostojecaDestinacija_VracaNull));
             SeedBase(ctx);
+
             var svc = new DestinationService(ctx, CreateMapper());
 
-            var result = await svc.GetByIdAsync(9999);
+            var result = await svc.GetByIdAsync(9999, null, null);
 
             result.Should().BeNull();
         }
@@ -274,6 +311,7 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(GetAllAsync_VracaSveDestinacije));
             var (_, manager, _, tip) = SeedBase(ctx);
+
             var mgr = CreateManager(60, "mgr5@test.com", manager);
             ctx.Users.Add(mgr);
 
@@ -321,7 +359,343 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var svc = new DestinationService(ctx, CreateMapper());
-            var result = await svc.GetAllAsync();
+            var result = await svc.GetAllAsync(null, null);
+
+            result.Should().HaveCount(2);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_Manager_VracaSamoSvojuDestinaciju()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_Manager_VracaSamoSvojuDestinaciju));
+            var (_, managerRole, adminRole, tip) = SeedBase(ctx);
+
+            var adminUser = new User
+            {
+                Id = 100,
+                FirstName = "Admin",
+                LastName = "A",
+                Email = "admin@test.com",
+                PasswordHash = "hash",
+                RoleId = adminRole.Id,
+                Role = adminRole,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            };
+
+            var manager1 = CreateManager(10, "mgr1@test.com", managerRole, managedDestId: 1);
+            var manager2 = CreateManager(11, "mgr2@test.com", managerRole, managedDestId: 2);
+
+            ctx.Users.AddRange(adminUser, manager1, manager2);
+
+            var d1 = new Destination
+            {
+                Id = 1,
+                Name = "Kotor",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                ManagedByUserId = manager1.Id,
+                CreatedByUserId = adminUser.Id,
+                Status = ContentStatus.Approved
+            };
+
+            var d2 = new Destination
+            {
+                Id = 2,
+                Name = "Budva",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                ManagedByUserId = manager2.Id,
+                CreatedByUserId = adminUser.Id,
+                Status = ContentStatus.Approved
+            };
+
+            ctx.Destinations.AddRange(d1, d2);
+
+            ctx.Images.AddRange(
+                new Image
+                {
+                    Id = 1,
+                    DestinationId = d1.Id,
+                    Url = "kotor-main.jpg",
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Image
+                {
+                    Id = 2,
+                    DestinationId = d2.Id,
+                    Url = "budva-main.jpg",
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                }
+            );
+
+            ctx.SaveChanges();
+
+            var svc = new DestinationService(ctx, CreateMapper());
+
+            var result = await svc.GetAllAsync(manager1.Id, "Manager");
+
+            result.Should().HaveCount(1);
+            result.Single().Name.Should().Be("Kotor");
+        }
+
+        [Fact]
+        public async Task GetAllAsync_Manager_BezDodeljeneDestinacije_VracaPrazno()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_Manager_BezDodeljeneDestinacije_VracaPrazno));
+            var (_, managerRole, adminRole, tip) = SeedBase(ctx);
+
+            var adminUser = new User
+            {
+                Id = 100,
+                FirstName = "Admin",
+                LastName = "A",
+                Email = "admin@test.com",
+                PasswordHash = "hash",
+                RoleId = adminRole.Id,
+                Role = adminRole,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            };
+
+            var manager = CreateManager(10, "mgr@test.com", managerRole, managedDestId: null);
+
+            ctx.Users.AddRange(adminUser, manager);
+
+            var d1 = new Destination
+            {
+                Id = 1,
+                Name = "Kotor",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                CreatedByUserId = adminUser.Id,
+                Status = ContentStatus.Approved
+            };
+
+            ctx.Destinations.Add(d1);
+
+            ctx.Images.Add(new Image
+            {
+                Id = 1,
+                DestinationId = d1.Id,
+                Url = "kotor-main.jpg",
+                IsMain = true,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            ctx.SaveChanges();
+
+            var svc = new DestinationService(ctx, CreateMapper());
+
+            var result = await svc.GetAllAsync(manager.Id, "Manager");
+
+            result.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task GetByIdAsync_Manager_MozeDaVidiSvojuDestinaciju()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_Manager_MozeDaVidiSvojuDestinaciju));
+            var (_, managerRole, adminRole, tip) = SeedBase(ctx);
+
+            var adminUser = new User
+            {
+                Id = 100,
+                FirstName = "Admin",
+                LastName = "A",
+                Email = "admin@test.com",
+                PasswordHash = "hash",
+                RoleId = adminRole.Id,
+                Role = adminRole,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            };
+
+            var manager = CreateManager(10, "mgr@test.com", managerRole, managedDestId: 1);
+
+            ctx.Users.AddRange(adminUser, manager);
+
+            var d1 = new Destination
+            {
+                Id = 1,
+                Name = "Kotor",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                ManagedByUserId = manager.Id,
+                CreatedByUserId = adminUser.Id,
+                Status = ContentStatus.Approved
+            };
+
+            ctx.Destinations.Add(d1);
+
+            ctx.Images.Add(new Image
+            {
+                Id = 1,
+                DestinationId = d1.Id,
+                Url = "kotor-main.jpg",
+                IsMain = true,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            ctx.SaveChanges();
+
+            var svc = new DestinationService(ctx, CreateMapper());
+
+            var result = await svc.GetByIdAsync(1, manager.Id, "Manager");
+
+            result.Should().NotBeNull();
+            result!.Name.Should().Be("Kotor");
+        }
+
+        [Fact]
+        public async Task GetByIdAsync_Manager_NeMozeDaVidiTudjuDestinaciju()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_Manager_NeMozeDaVidiTudjuDestinaciju));
+            var (_, managerRole, adminRole, tip) = SeedBase(ctx);
+
+            var adminUser = new User
+            {
+                Id = 100,
+                FirstName = "Admin",
+                LastName = "A",
+                Email = "admin@test.com",
+                PasswordHash = "hash",
+                RoleId = adminRole.Id,
+                Role = adminRole,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            };
+
+            var manager1 = CreateManager(10, "mgr1@test.com", managerRole, managedDestId: 1);
+            var manager2 = CreateManager(11, "mgr2@test.com", managerRole, managedDestId: 2);
+
+            ctx.Users.AddRange(adminUser, manager1, manager2);
+
+            var d1 = new Destination
+            {
+                Id = 1,
+                Name = "Kotor",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                ManagedByUserId = manager1.Id,
+                CreatedByUserId = adminUser.Id,
+                Status = ContentStatus.Approved
+            };
+
+            var d2 = new Destination
+            {
+                Id = 2,
+                Name = "Budva",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                ManagedByUserId = manager2.Id,
+                CreatedByUserId = adminUser.Id,
+                Status = ContentStatus.Approved
+            };
+
+            ctx.Destinations.AddRange(d1, d2);
+
+            ctx.Images.AddRange(
+                new Image
+                {
+                    Id = 1,
+                    DestinationId = d1.Id,
+                    Url = "kotor-main.jpg",
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Image
+                {
+                    Id = 2,
+                    DestinationId = d2.Id,
+                    Url = "budva-main.jpg",
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                }
+            );
+
+            ctx.SaveChanges();
+
+            var svc = new DestinationService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.GetByIdAsync(2, manager1.Id, "Manager"))
+                .Should().ThrowAsync<UnauthorizedAccessException>();
+        }
+
+        [Fact]
+        public async Task GetAllAsync_Admin_VracaSveDestinacije()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_Admin_VracaSveDestinacije));
+            var (_, managerRole, adminRole, tip) = SeedBase(ctx);
+
+            var adminUser = new User
+            {
+                Id = 100,
+                FirstName = "Admin",
+                LastName = "A",
+                Email = "admin@test.com",
+                PasswordHash = "hash",
+                RoleId = adminRole.Id,
+                Role = adminRole,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            };
+
+            var manager1 = CreateManager(10, "mgr1@test.com", managerRole, managedDestId: 1);
+            var manager2 = CreateManager(11, "mgr2@test.com", managerRole, managedDestId: 2);
+
+            ctx.Users.AddRange(adminUser, manager1, manager2);
+
+            var d1 = new Destination
+            {
+                Id = 1,
+                Name = "Kotor",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                ManagedByUserId = manager1.Id,
+                CreatedByUserId = adminUser.Id,
+                Status = ContentStatus.Approved
+            };
+
+            var d2 = new Destination
+            {
+                Id = 2,
+                Name = "Budva",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                ManagedByUserId = manager2.Id,
+                CreatedByUserId = adminUser.Id,
+                Status = ContentStatus.Approved
+            };
+
+            ctx.Destinations.AddRange(d1, d2);
+
+            ctx.Images.AddRange(
+                new Image
+                {
+                    Id = 1,
+                    DestinationId = d1.Id,
+                    Url = "kotor-main.jpg",
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Image
+                {
+                    Id = 2,
+                    DestinationId = d2.Id,
+                    Url = "budva-main.jpg",
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                }
+            );
+
+            ctx.SaveChanges();
+
+            var svc = new DestinationService(ctx, CreateMapper());
+
+            var result = await svc.GetAllAsync(adminUser.Id, "Admin");
 
             result.Should().HaveCount(2);
         }
@@ -335,14 +709,23 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(AssignManagerAsync_ValidanNovManager_AzuriraDestinaciju));
             var (_, manager, _, tip) = SeedBase(ctx);
+
             var mgr1 = CreateManager(70, "mgr6@test.com", manager);
             var mgr2 = CreateManager(71, "mgr7@test.com", manager);
+
             ctx.Users.AddRange(mgr1, mgr2);
+
             var dest = new Destination
             {
-                Id = 2, Name = "Cetinje", DestinationTypeId = tip.Id, DestinationType = tip,
-                ManagedByUserId = mgr1.Id, CreatedByUserId = 99, Status = ContentStatus.Approved
+                Id = 2,
+                Name = "Cetinje",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                ManagedByUserId = mgr1.Id,
+                CreatedByUserId = 99,
+                Status = ContentStatus.Approved
             };
+
             ctx.Destinations.Add(dest);
             mgr1.ManagedDestinationId = dest.Id;
             ctx.SaveChanges();
@@ -352,7 +735,6 @@ namespace TuristickiVodic.Tests.Services
 
             result.Should().NotBeNull();
             result!.ManagedByUserId.Should().Be(mgr2.Id);
-            // Stari menadžer je oslobođen
             ctx.Users.Find(mgr1.Id)!.ManagedDestinationId.Should().BeNull();
         }
 
@@ -361,13 +743,20 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(AssignManagerAsync_ManagerVecVodiDruguDestinaciju_BacaException));
             var (_, manager, _, tip) = SeedBase(ctx);
+
             var mgrZauzet = CreateManager(80, "zauzet@test.com", manager, managedDestId: 99);
             ctx.Users.Add(mgrZauzet);
+
             var dest = new Destination
             {
-                Id = 3, Name = "Niksic", DestinationTypeId = tip.Id, DestinationType = tip,
-                CreatedByUserId = 99, Status = ContentStatus.Approved
+                Id = 3,
+                Name = "Niksic",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                CreatedByUserId = 99,
+                Status = ContentStatus.Approved
             };
+
             ctx.Destinations.Add(dest);
             ctx.SaveChanges();
 
@@ -383,18 +772,32 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(AssignManagerAsync_KorisnikNijeManager_BacaException));
             var (tourist, _, _, tip) = SeedBase(ctx);
+
             var tourist_user = new User
             {
-                Id = 90, FirstName = "T2", LastName = "T2", Email = "t2@t.com",
-                PasswordHash = "hash", RoleId = tourist.Id, Role = tourist,
-                IsActive = true, DateOfBirth = new DateTime(1990, 1, 1)
+                Id = 90,
+                FirstName = "T2",
+                LastName = "T2",
+                Email = "t2@t.com",
+                PasswordHash = "hash",
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
             };
+
             ctx.Users.Add(tourist_user);
+
             var dest = new Destination
             {
-                Id = 4, Name = "Bar", DestinationTypeId = tip.Id, DestinationType = tip,
-                CreatedByUserId = 99, Status = ContentStatus.Approved
+                Id = 4,
+                Name = "Bar",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                CreatedByUserId = 99,
+                Status = ContentStatus.Approved
             };
+
             ctx.Destinations.Add(dest);
             ctx.SaveChanges();
 
@@ -414,11 +817,17 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(DeleteAsync_PraznaDestinacija_Uspeh));
             var (_, _, _, tip) = SeedBase(ctx);
+
             var dest = new Destination
             {
-                Id = 5, Name = "Ulcinj", DestinationTypeId = tip.Id, DestinationType = tip,
-                CreatedByUserId = 99, Status = ContentStatus.Approved
+                Id = 5,
+                Name = "Ulcinj",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                CreatedByUserId = 99,
+                Status = ContentStatus.Approved
             };
+
             ctx.Destinations.Add(dest);
             ctx.SaveChanges();
 
@@ -434,6 +843,7 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(DeleteAsync_NepostojecaDestinacija_VracaFalse));
             SeedBase(ctx);
+
             var svc = new DestinationService(ctx, CreateMapper());
 
             var result = await svc.DeleteAsync(9999);
@@ -446,19 +856,31 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(DeleteAsync_DestinacijaImaLokalitete_BacaException));
             var (_, _, _, tip) = SeedBase(ctx);
+
             var dest = new Destination
             {
-                Id = 6, Name = "Podgorica", DestinationTypeId = tip.Id, DestinationType = tip,
-                CreatedByUserId = 99, Status = ContentStatus.Approved
+                Id = 6,
+                Name = "Podgorica",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                CreatedByUserId = 99,
+                Status = ContentStatus.Approved
             };
+
             ctx.Destinations.Add(dest);
+
             var localityType = new LocalityType { Id = 1, Name = "Centar" };
             ctx.LocalityTypes.Add(localityType);
+
             ctx.Localities.Add(new Locality
             {
-                Id = 1, Name = "Stara Varos", DestinationId = dest.Id,
-                LocalityTypeId = 1, CreatedByUserId = 99
+                Id = 1,
+                Name = "Stara Varos",
+                DestinationId = dest.Id,
+                LocalityTypeId = 1,
+                CreatedByUserId = 99
             });
+
             ctx.SaveChanges();
 
             var svc = new DestinationService(ctx, CreateMapper());
@@ -472,20 +894,32 @@ namespace TuristickiVodic.Tests.Services
         public async Task DeleteAsync_DestinacijaImaObjekte_BacaException()
         {
             using var ctx = CreateInMemoryContext(nameof(DeleteAsync_DestinacijaImaObjekte_BacaException));
-            var (tourist, _, _, tip) = SeedBase(ctx);
+            var (_, _, _, tip) = SeedBase(ctx);
+
             var dest = new Destination
             {
-                Id = 7, Name = "Herceg Novi", DestinationTypeId = tip.Id, DestinationType = tip,
-                CreatedByUserId = 99, Status = ContentStatus.Approved
+                Id = 7,
+                Name = "Herceg Novi",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                CreatedByUserId = 99,
+                Status = ContentStatus.Approved
             };
+
             ctx.Destinations.Add(dest);
+
             var objType = new ObjectType { Id = 1, Name = "Muzej" };
             ctx.ObjectTypes.Add(objType);
+
             ctx.Objects.Add(new TouristObject
             {
-                Id = 1, Name = "Kanli Kula", ObjectTypeId = 1,
-                DestinationId = dest.Id, CreatedByUserId = 99
+                Id = 1,
+                Name = "Kanli Kula",
+                ObjectTypeId = 1,
+                DestinationId = dest.Id,
+                CreatedByUserId = 99
             });
+
             ctx.SaveChanges();
 
             var svc = new DestinationService(ctx, CreateMapper());
@@ -500,20 +934,32 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(DeleteAsync_DestinacijaImaEvente_BacaException));
             var (_, _, _, tip) = SeedBase(ctx);
+
             var dest = new Destination
             {
-                Id = 8, Name = "Tivat", DestinationTypeId = tip.Id, DestinationType = tip,
-                CreatedByUserId = 99, Status = ContentStatus.Approved
+                Id = 8,
+                Name = "Tivat",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                CreatedByUserId = 99,
+                Status = ContentStatus.Approved
             };
+
             ctx.Destinations.Add(dest);
+
             var evType = new EventType { Id = 1, Name = "Festival" };
             ctx.EventTypes.Add(evType);
+
             ctx.Events.Add(new Event
             {
-                Id = 1, Name = "Sea Dance", EventTypeId = 1,
-                DestinationId = dest.Id, CreatedByUserId = 99,
+                Id = 1,
+                Name = "Sea Dance",
+                EventTypeId = 1,
+                DestinationId = dest.Id,
+                CreatedByUserId = 99,
                 StartDate = DateTime.UtcNow.AddDays(10)
             });
+
             ctx.SaveChanges();
 
             var svc = new DestinationService(ctx, CreateMapper());

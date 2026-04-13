@@ -9,5 +9,7 @@ namespace TuristickiVodic.Services
         Task<ActivityDto?> UpdateAsync(int id, UpdateActivityDto dto, int userId, string roleName);
         Task<ActivityDto?> ApproveAsync(int id, ApproveContentDto dto, int userId, string roleName);
         Task<bool> DeleteAsync(int id, int userId, string roleName);
+        Task<ActivityDto?> ToggleActiveAsync(int id, bool isActive, int userId, string roleName);
+        Task<PagedResultDto<ActivityDto>> SearchAsync(ActivityQueryDto query);
     }
 }

@@ -31,6 +31,11 @@ namespace TuristickiVodic.Tests.Services
             return config.CreateMapper();
         }
 
+        private static ActivityService CreateService(AppDbContext ctx)
+        {
+            return new ActivityService(ctx, CreateMapper());
+        }
+
         private static (Role ccRole, Role managerRole, Role adminRole, ActivityType activityType,
             Destination destination, Destination otherDestination, Locality locality, Locality otherLocality,
             User creator, User otherCreator, User manager, User otherManager, User admin)
@@ -260,6 +265,34 @@ namespace TuristickiVodic.Tests.Services
             }, creatorId, "ContentCreator");
 
             ctx.Activities.Single().DestinationId.Should().Be(destinationId);
+        }
+
+        [Fact]
+        public async Task CreateAsync_ContentCreator_PostavljaIsActiveNaFalse()
+        {
+            using var ctx = CreateInMemoryContext(nameof(CreateAsync_ContentCreator_PostavljaIsActiveNaFalse));
+            var (_, _, _, activityType, _, _, locality, _, creator, _, _, _, _) = SeedBase(ctx);
+
+            var svc = CreateService(ctx);
+
+            var dto = new CreateActivityDto
+            {
+                Name = "Planinarenje",
+                ActivityTypeId = activityType.Id,
+                LocalityId = locality.Id,
+                Longitude = 18.77,
+                Latitude = 42.42
+            };
+
+            var result = await svc.CreateAsync(dto, creator.Id, "ContentCreator");
+
+            result.Should().NotBeNull();
+
+            var saved = ctx.Activities.First();
+            saved.Name.Should().Be("Planinarenje");
+            saved.Status.Should().Be(ContentStatus.Pending);
+            saved.IsActive.Should().BeTrue();
+            saved.CreatedByUserId.Should().Be(creator.Id);
         }
 
         [Fact]
@@ -571,7 +604,8 @@ namespace TuristickiVodic.Tests.Services
                 LocalityId = locality.Id,
                 DestinationId = destination.Id,
                 CreatedByUserId = creator.Id,
-                Status = ContentStatus.Approved
+                Status = ContentStatus.Approved,
+                IsActive = true
             };
 
             ctx.Activities.Add(activity);

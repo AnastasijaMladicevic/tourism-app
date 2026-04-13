@@ -18,19 +18,83 @@ namespace TuristickiVodic.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<DestinationDto>> GetAllAsync()
+        public async Task<PagedResultDto<DestinationDto>> GetAllAsync(int? userId, string? role, DestinationQueryDto query)
         {
-            var destinations = await _context.Destinations
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var destinationsQuery = _context.Destinations
                 .Include(d => d.DestinationType)
                 .Include(d => d.Images)
                 .Where(d => d.Images.Any(i => i.IsMain))
-                .OrderBy(d => d.Id)
+                .AsQueryable();
+
+            if (role != null && role == RoleType.Manager.ToString())
+            {
+                var user = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user?.ManagedDestinationId == null)
+                {
+                    return new PagedResultDto<DestinationDto>
+                    {
+                        Items = new List<DestinationDto>(),
+                        Page = query.Page,
+                        PageSize = query.PageSize,
+                        TotalCount = 0,
+                        TotalPages = 0
+                    };
+                }
+
+                destinationsQuery = destinationsQuery.Where(d => d.Id == user.ManagedDestinationId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+
+                destinationsQuery = destinationsQuery.Where(d =>
+                    d.DestinationType != null &&
+                    d.DestinationType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+
+                destinationsQuery = destinationsQuery.Where(d =>
+                    d.Name.ToLower().Contains(search) ||
+                    (d.Description != null && d.Description.ToLower().Contains(search)));
+            }
+
+            destinationsQuery = ApplyDestinationSorting(destinationsQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await destinationsQuery.CountAsync();
+
+            var destinations = await destinationsQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
                 .ToListAsync();
 
-            return _mapper.Map<IEnumerable<DestinationDto>>(destinations);
+            var mappedItems = _mapper.Map<List<DestinationDto>>(destinations);
+
+            return new PagedResultDto<DestinationDto>
+            {
+                Items = mappedItems,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
         }
 
-        public async Task<DestinationDto?> GetByIdAsync(int id)
+        public async Task<DestinationDto?> GetByIdAsync(int id, int? userId, string role)
         {
             var destination = await _context.Destinations
                 .Include(d => d.DestinationType)
@@ -42,6 +106,15 @@ namespace TuristickiVodic.Services
 
             if (!destination.Images.Any(i => i.IsMain))
                 return null;
+
+            if (role == RoleType.Manager.ToString())
+            {
+                var user = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user?.ManagedDestinationId != destination.Id)
+                    throw new UnauthorizedAccessException();
+            }
 
             return _mapper.Map<DestinationDto>(destination);
         }
@@ -76,7 +149,6 @@ namespace TuristickiVodic.Services
                 Description = dto.Description,
                 Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
                 Status = ContentStatus.Approved,
-                IsActive = dto.IsActive,
                 DestinationTypeId = dto.DestinationTypeId,
                 ManagedByUserId = dto.ManagedByUserId.Value,
                 CreatedByUserId = userId,
@@ -127,9 +199,6 @@ namespace TuristickiVodic.Services
 
             if (dto.Longitude.HasValue && dto.Latitude.HasValue)
                 destination.Geolocation = CreatePoint(dto.Longitude, dto.Latitude);
-
-            if (dto.IsActive.HasValue)
-                destination.IsActive = dto.IsActive.Value;
 
             destination.UpdatedAt = DateTime.UtcNow;
 
@@ -229,6 +298,30 @@ namespace TuristickiVodic.Services
                 return null;
 
             return new Point(longitude.Value, latitude.Value) { SRID = 4326 };
+        }
+
+        private static IQueryable<Destination> ApplyDestinationSorting(IQueryable<Destination> query, string? sortBy, string? sortOrder)
+        {
+            var sortByValue = sortBy?.Trim().ToLower();
+            var isDesc = sortOrder?.Trim().ToLower() == "desc";
+
+            if (sortByValue == "type")
+            {
+                return isDesc
+                    ? query.OrderByDescending(d => d.DestinationType!.Name)
+                    : query.OrderBy(d => d.DestinationType!.Name);
+            }
+
+            if (sortByValue == "createdat")
+            {
+                return isDesc
+                    ? query.OrderByDescending(d => d.CreatedAt)
+                    : query.OrderBy(d => d.CreatedAt);
+            }
+
+            return isDesc
+                ? query.OrderByDescending(d => d.Name)
+                : query.OrderBy(d => d.Name);
         }
     }
 }

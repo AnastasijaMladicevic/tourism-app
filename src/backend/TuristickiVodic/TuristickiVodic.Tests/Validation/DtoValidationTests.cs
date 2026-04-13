@@ -284,7 +284,6 @@ namespace TuristickiVodic.Tests.Validation
                 Latitude = 42.42,
                 DestinationId = 1,
                 LocalityTypeId = 2,
-                IsActive = false
             };
 
             IsValid(dto).Should().BeTrue();
@@ -463,7 +462,6 @@ namespace TuristickiVodic.Tests.Validation
                 WorkingHours = "00:00-24:00",
                 Longitude = 18.77,
                 Latitude = 42.42,
-                IsActive = true,
                 ObjectTypeId = 1,
                 LocalityId = 1
             };

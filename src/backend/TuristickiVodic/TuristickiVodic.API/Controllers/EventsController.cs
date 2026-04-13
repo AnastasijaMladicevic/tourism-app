@@ -42,6 +42,15 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
+
+        [HttpGet("search")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Search([FromQuery] EventQueryDto query)
+        {
+            var result = await _eventService.SearchAsync(query);
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
@@ -51,7 +60,6 @@ namespace TuristickiVodic.API.Controllers
             return Ok(ev);
         }
 
-        // Samo ContentCreator može da kreira event (status -> Pending, čeka odobrenje menadžera)
         [HttpPost]
         [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Create([FromBody] CreateEventDto dto)
@@ -87,7 +95,6 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // Samo odgovorni menadžer može da odobri/odbije event
         [HttpPost("{id}/approve")]
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Approve(int id, [FromBody] ApproveContentDto dto)
@@ -106,7 +113,26 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // Samo ContentCreator može direktno da obriše event koji nije Approved
+        [HttpPut("{id}/toggle-active")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> ToggleActive(int id, [FromBody] ToggleActiveDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var roleName = User.FindFirstValue(ClaimTypes.Role)!;
+
+                var updated = await _eventService.ToggleActiveAsync(id, dto.IsActive, userId, roleName);
+                if (updated == null) return NotFound();
+
+                return Ok(updated);
+            }
+            catch (UnauthorizedAccessException) { return Forbid(); }
+            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+        }
+
         [HttpDelete("{id}")]
         [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> Delete(int id)

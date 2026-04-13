@@ -26,7 +26,7 @@ namespace TuristickiVodic.Services
                 .Include(l => l.Destination)
                 .Include(l => l.LocalityType)
                 .Include(l => l.Images)
-                .Where(l => l.Images.Any(i => i.IsMain))
+                .Where(l => l.IsActive && l.Images.Any(i => i.IsMain))
                 .OrderBy(l => l.Id)
                 .ToListAsync();
 
@@ -42,6 +42,9 @@ namespace TuristickiVodic.Services
                 .FirstOrDefaultAsync(l => l.Id == id);
 
             if (locality == null)
+                return null;
+
+            if (!locality.IsActive)
                 return null;
 
             if (!locality.Images.Any(i => i.IsMain))
@@ -83,7 +86,6 @@ namespace TuristickiVodic.Services
                 Name = dto.Name,
                 Description = dto.Description,
                 Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
-                IsActive = dto.IsActive,
                 DestinationId = dto.DestinationId,
                 LocalityTypeId = dto.LocalityTypeId,
                 CreatedByUserId = userId,
@@ -168,9 +170,6 @@ namespace TuristickiVodic.Services
             if (dto.Longitude.HasValue && dto.Latitude.HasValue)
                 locality.Geolocation = CreatePoint(dto.Longitude.Value, dto.Latitude.Value);
 
-            if (dto.IsActive.HasValue)
-                locality.IsActive = dto.IsActive.Value;
-
             locality.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -221,6 +220,137 @@ namespace TuristickiVodic.Services
                 return null;
 
             return new Point(longitude.Value, latitude.Value) { SRID = 4326 };
+        }
+
+        public async Task<LocalityDto?> ToggleActiveAsync(int id, bool isActive, int userId, string roleName)
+        {
+            var locality = await _context.Localities
+                .Include(l => l.Destination)
+                .Include(l => l.LocalityType)
+                .FirstOrDefaultAsync(l => l.Id == id);
+
+            if (locality == null)
+                return null;
+
+            if (roleName != "Manager")
+                throw new UnauthorizedAccessException("Only managers can change locality visibility.");
+
+            if (locality.Destination == null)
+                throw new InvalidOperationException("Cannot determine destination of this locality.");
+
+            var isResponsible = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, locality.Destination, userId);
+            if (!isResponsible)
+                throw new UnauthorizedAccessException("You are not the responsible manager for this destination.");
+
+            locality.IsActive = isActive;
+            locality.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            var updated = await _context.Localities
+                .Include(l => l.Destination)
+                .Include(l => l.LocalityType)
+                .FirstAsync(l => l.Id == locality.Id);
+
+            return _mapper.Map<LocalityDto>(updated);
+        }
+
+        public async Task<PagedResultDto<LocalityDto>> SearchAsync(LocalityQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var localitiesQuery = _context.Localities
+                .Include(l => l.Destination)
+                .Include(l => l.LocalityType)
+                .Include(l => l.Images)
+                .Where(l => l.IsActive)
+                .Where(l => l.Images.Any(i => i.IsMain))
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+
+                localitiesQuery = localitiesQuery.Where(l =>
+                    l.Destination != null &&
+                    l.Destination.Name.ToLower().Contains(destination));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+
+                localitiesQuery = localitiesQuery.Where(l =>
+                    l.LocalityType != null &&
+                    l.LocalityType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+
+                localitiesQuery = localitiesQuery.Where(l =>
+                    l.Name.ToLower().Contains(search) ||
+                    (l.Description != null && l.Description.ToLower().Contains(search)));
+            }
+
+            localitiesQuery = ApplyLocalitySorting(localitiesQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await localitiesQuery.CountAsync();
+
+            var items = await localitiesQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToListAsync();
+
+            var mappedItems = _mapper.Map<List<LocalityDto>>(items);
+
+            return new PagedResultDto<LocalityDto>
+            {
+                Items = mappedItems,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
+        private static IQueryable<Locality> ApplyLocalitySorting(IQueryable<Locality> query, string? sortBy, string? sortOrder)
+        {
+            var sortByValue = sortBy?.Trim().ToLower();
+            var isDesc = sortOrder?.Trim().ToLower() == "desc";
+
+            if (sortByValue == "destination")
+            {
+                return isDesc
+                    ? query.OrderByDescending(l => l.Destination!.Name)
+                    : query.OrderBy(l => l.Destination!.Name);
+            }
+
+            if (sortByValue == "type")
+            {
+                return isDesc
+                    ? query.OrderByDescending(l => l.LocalityType!.Name)
+                    : query.OrderBy(l => l.LocalityType!.Name);
+            }
+
+            if (sortByValue == "createdat")
+            {
+                return isDesc
+                    ? query.OrderByDescending(l => l.CreatedAt)
+                    : query.OrderBy(l => l.CreatedAt);
+            }
+
+            return isDesc
+                ? query.OrderByDescending(l => l.Name)
+                : query.OrderBy(l => l.Name);
         }
     }
 }

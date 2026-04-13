@@ -42,7 +42,7 @@ namespace TuristickiVodic.Tests.Controllers
         public async Task GetAll_AnonimniKorisnik_VracaOkSaListom()
         {
             var mockService = new Mock<IDestinationService>();
-            mockService.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<DestinationDto>
+            mockService.Setup(s => s.GetAllAsync(It.IsAny<int?>(), It.IsAny<string?>())).ReturnsAsync(new List<DestinationDto>
             {
                 new DestinationDto { Id = 1, Name = "Kotor" },
                 new DestinationDto { Id = 2, Name = "Budva" }
@@ -62,7 +62,7 @@ namespace TuristickiVodic.Tests.Controllers
         public async Task GetAll_KadaNemaDestinacija_VracaOkSaPrazномListom()
         {
             var mockService = new Mock<IDestinationService>();
-            mockService.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<DestinationDto>());
+            mockService.Setup(s => s.GetAllAsync(It.IsAny<int?>(), It.IsAny<string?>())).ReturnsAsync(new List<DestinationDto>());
 
             var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
 
@@ -81,7 +81,7 @@ namespace TuristickiVodic.Tests.Controllers
         {
             var mockService = new Mock<IDestinationService>();
             var dto = new DestinationDto { Id = 1, Name = "Kotor" };
-            mockService.Setup(s => s.GetByIdAsync(1)).ReturnsAsync(dto);
+            mockService.Setup(s => s.GetByIdAsync(1, It.IsAny<int?>(), It.IsAny<string?>())).ReturnsAsync(dto);
 
             var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
 
@@ -95,7 +95,7 @@ namespace TuristickiVodic.Tests.Controllers
         public async Task GetById_KadaDestinacijaNijePronadjena_VracaNotFound()
         {
             var mockService = new Mock<IDestinationService>();
-            mockService.Setup(s => s.GetByIdAsync(999)).ReturnsAsync((DestinationDto?)null);
+            mockService.Setup(s => s.GetByIdAsync(999, It.IsAny<int?>(), It.IsAny<string?>())).ReturnsAsync((DestinationDto?)null);
 
             var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
 

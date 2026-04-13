@@ -13,12 +13,11 @@ namespace TuristickiVodic.Core.DTO
         public double? Longitude { get; set; }
 
         public double? Latitude { get; set; }
+        public bool IsActive { get; set; }
 
         public decimal? Price { get; set; }
 
         public int? DurationMinutes { get; set; }
-
-        public bool IsActive { get; set; }
 
         public int ActivityTypeId { get; set; }
 

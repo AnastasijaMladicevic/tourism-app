@@ -46,10 +46,12 @@ namespace TuristickiVodic.Tests.Services
             return config.CreateMapper();
         }
 
-        /// <summary>
-        /// Seed: uloge, tip destinacije, tip lokaliteta, jedna destinacija sa menadžerom.
-        /// Opciono se dodaje i druga destinacija (za testove premeštanja).
-        /// </summary>
+        private static LocalityService CreateService(AppDbContext ctx)
+        {
+            return new LocalityService(ctx, CreateMapper());
+        }
+
+
         private static (
             Role managerRole,
             Role adminRole,
@@ -397,6 +399,34 @@ namespace TuristickiVodic.Tests.Services
             }, mgr.Id, "Manager"))
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*Locality type not found*");
+        }
+
+        [Fact]
+        public async Task CreateAsync_Manager_PostavljaIsActiveNaTrue()
+        {
+            using var ctx = CreateInMemoryContext(nameof(CreateAsync_Manager_PostavljaIsActiveNaTrue));
+            var (_, _, localityType, manager, destination, _) = SeedBase(ctx);
+
+            manager.ManagedDestinationId = destination.Id;
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+
+            var dto = new CreateLocalityDto
+            {
+                Name = "Dobrota",
+                DestinationId = destination.Id,
+                LocalityTypeId = localityType.Id,
+                Longitude = 18.77,
+                Latitude = 42.42
+            };
+
+            var result = await svc.CreateAsync(dto, manager.Id, "Manager");
+
+            result.Should().NotBeNull();
+
+            var saved = ctx.Localities.First(l => l.Name == "Dobrota");
+            saved.IsActive.Should().BeTrue();
         }
 
         // ═══════════════════════════════════════════

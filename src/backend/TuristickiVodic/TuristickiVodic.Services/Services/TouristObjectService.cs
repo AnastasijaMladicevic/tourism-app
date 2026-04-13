@@ -25,7 +25,10 @@ namespace TuristickiVodic.Services.Services
                 .Include(o => o.ObjectType)
                 .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
-                .Where(o => _context.Images.Any(i => i.ObjectId == o.Id && i.IsMain))
+                .Where(o =>
+                    o.Status == ContentStatus.Approved &&
+                    o.IsActive &&
+                    _context.Images.Any(i => i.ObjectId == o.Id && i.IsMain))
                 .OrderBy(o => o.Id)
                 .ToListAsync();
 
@@ -36,6 +39,9 @@ namespace TuristickiVodic.Services.Services
         {
             var obj = await LoadObjectAsync(id);
             if (obj == null)
+                return null;
+
+            if (obj.Status != ContentStatus.Approved || !obj.IsActive)
                 return null;
 
             var hasMainImage = await _context.Images.AnyAsync(i => i.ObjectId == obj.Id && i.IsMain);
@@ -68,7 +74,6 @@ namespace TuristickiVodic.Services.Services
                 Website = dto.Website,
                 WorkingHours = dto.WorkingHours,
                 Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
-                IsActive = dto.IsActive,
                 ObjectTypeId = dto.ObjectTypeId,
                 LocalityId = dto.LocalityId,
                 // DestinationId se automatski preuzima iz lokacije
@@ -113,8 +118,7 @@ namespace TuristickiVodic.Services.Services
             if (dto.WorkingHours != null) obj.WorkingHours = dto.WorkingHours;
             if (dto.Longitude.HasValue && dto.Latitude.HasValue)
                 obj.Geolocation = CreatePoint(dto.Longitude, dto.Latitude);
-            if (dto.IsActive.HasValue) obj.IsActive = dto.IsActive.Value;
-
+            
             obj.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -221,7 +225,6 @@ namespace TuristickiVodic.Services.Services
             AverageRating = o.AverageRating,
             ReviewCount = o.ReviewCount,
             Status = o.Status.ToString(),
-            IsActive = o.IsActive,
             ObjectTypeId = o.ObjectTypeId,
             ObjectTypeName = o.ObjectType?.Name ?? string.Empty,
             LocalityId = o.LocalityId,
@@ -242,6 +245,176 @@ namespace TuristickiVodic.Services.Services
             return new Point(longitude.Value, latitude.Value) { SRID = 4326 };
         }
 
+        public async Task<TouristObjectDto?> ToggleActiveAsync(int id, bool isActive, int userId, string roleName)
+        {
+            var obj = await _context.Objects
+                .Include(o => o.Locality)
+                    .ThenInclude(l => l.Destination)
+                .FirstOrDefaultAsync(o => o.Id == id);
 
+            if (obj == null)
+                return null;
+
+            if (roleName != "Manager")
+                throw new UnauthorizedAccessException("Only managers can change object visibility.");
+
+            if (obj.Status != ContentStatus.Approved)
+                throw new InvalidOperationException("Only approved objects can have visibility changed.");
+
+            var destination = obj.Locality?.Destination;
+            if (destination == null)
+                throw new InvalidOperationException("Cannot determine destination for this object.");
+
+            var isResponsible = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, destination, userId);
+            if (!isResponsible)
+                throw new UnauthorizedAccessException("You are not the responsible manager for this destination.");
+
+            obj.IsActive = isActive;
+            obj.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return MapToDto(await LoadObjectAsync(obj.Id));
+        }
+
+        public async Task<PagedResultDto<TouristObjectDto>> SearchAsync(TouristObjectQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var objectsQuery = _context.Objects
+                .Include(o => o.ObjectType)
+                .Include(o => o.Destination)
+                .Include(o => o.Locality)
+                .Include(o => o.Images)
+                .Where(o => o.Status == ContentStatus.Approved)
+                .Where(o => o.IsActive)
+                .Where(o => o.Images.Any(i => i.IsMain))
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+
+                objectsQuery = objectsQuery.Where(o =>
+                    o.ObjectType != null &&
+                    o.ObjectType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+
+                objectsQuery = objectsQuery.Where(o =>
+                    o.Destination != null &&
+                    o.Destination.Name.ToLower().Contains(destination));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Locality))
+            {
+                var locality = query.Locality.Trim().ToLower();
+
+                objectsQuery = objectsQuery.Where(o =>
+                    o.Locality != null &&
+                    o.Locality.Name.ToLower().Contains(locality));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination) && !string.IsNullOrWhiteSpace(query.Locality))
+            {
+                var destination = query.Destination.Trim().ToLower();
+                var locality = query.Locality.Trim().ToLower();
+
+                var localityEntity = await _context.Localities
+                    .Include(l => l.Destination)
+                    .FirstOrDefaultAsync(l => l.Name.ToLower().Contains(locality));
+
+                if (localityEntity != null &&
+                    localityEntity.Destination != null &&
+                    !localityEntity.Destination.Name.ToLower().Contains(destination))
+                {
+                    throw new InvalidOperationException("The selected locality does not belong to the selected destination.");
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+
+                objectsQuery = objectsQuery.Where(o =>
+                    o.Name.ToLower().Contains(search) ||
+                    (o.Description != null && o.Description.ToLower().Contains(search)));
+            }
+
+            objectsQuery = ApplyObjectSorting(objectsQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await objectsQuery.CountAsync();
+
+            var items = await objectsQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToListAsync();
+
+            var mappedItems = _mapper.Map<List<TouristObjectDto>>(items);
+
+            return new PagedResultDto<TouristObjectDto>
+            {
+                Items = mappedItems,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
+        private static IQueryable<TouristObject> ApplyObjectSorting(IQueryable<TouristObject> query, string? sortBy, string? sortOrder)
+        {
+            var sortByValue = sortBy?.Trim().ToLower();
+            var isDesc = sortOrder?.Trim().ToLower() == "desc";
+
+            if (sortByValue == "type")
+            {
+                return isDesc
+                    ? query.OrderByDescending(o => o.ObjectType!.Name)
+                    : query.OrderBy(o => o.ObjectType!.Name);
+            }
+
+            if (sortByValue == "destination")
+            {
+                return isDesc
+                    ? query.OrderByDescending(o => o.Destination!.Name)
+                    : query.OrderBy(o => o.Destination!.Name);
+            }
+
+            if (sortByValue == "locality")
+            {
+                return isDesc
+                    ? query.OrderByDescending(o => o.Locality!.Name)
+                    : query.OrderBy(o => o.Locality!.Name);
+            }
+
+            if (sortByValue == "rating")
+            {
+                return isDesc
+                    ? query.OrderByDescending(o => o.AverageRating)
+                    : query.OrderBy(o => o.AverageRating);
+            }
+
+            if (sortByValue == "reviewcount")
+            {
+                return isDesc
+                    ? query.OrderByDescending(o => o.ReviewCount)
+                    : query.OrderBy(o => o.ReviewCount);
+            }
+
+            return isDesc
+                ? query.OrderByDescending(o => o.Name)
+                : query.OrderBy(o => o.Name);
+        }
     }
 }

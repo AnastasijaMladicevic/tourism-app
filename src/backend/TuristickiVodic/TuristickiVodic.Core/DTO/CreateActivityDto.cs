@@ -27,8 +27,6 @@ namespace TuristickiVodic.Core.DTO
 
         public int? ObjectId { get; set; }
 
-        public bool IsActive { get; set; } = true;
-
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (!LocalityId.HasValue && !DestinationId.HasValue)

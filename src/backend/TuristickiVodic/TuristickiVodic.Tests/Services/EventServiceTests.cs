@@ -31,6 +31,11 @@ namespace TuristickiVodic.Tests.Services
             return config.CreateMapper();
         }
 
+        private static EventService CreateService(AppDbContext ctx)
+        {
+            return new EventService(ctx, CreateMapper());
+        }
+
         private static (Role ccRole, Role managerRole, Role adminRole, EventType eventType, Destination destination,
             Destination otherDestination, Locality locality, Locality otherLocality, User creator, User otherCreator,
             User manager, User otherManager, User admin)
@@ -181,6 +186,187 @@ namespace TuristickiVodic.Tests.Services
 
             return (ccRole, managerRole, adminRole, eventType, destination, otherDestination, locality, otherLocality,
                 creator, otherCreator, manager, otherManager, admin);
+        }
+
+        [Fact]
+        public async Task CreateAsync_ContentCreator_PostavljaIsActiveNaFalse()
+        {
+            using var ctx = CreateInMemoryContext(nameof(CreateAsync_ContentCreator_PostavljaIsActiveNaFalse));
+            var (_, _, _, eventType, _, _, locality, _, creator, _, _, _, _) = SeedBase(ctx);
+
+            var svc = CreateService(ctx);
+
+            var dto = new CreateEventDto
+            {
+                Name = "Koncert",
+                EventTypeId = eventType.Id,
+                LocalityId = locality.Id,
+                StartDate = DateTime.UtcNow.AddDays(3),
+                Longitude = 18.77,
+                Latitude = 42.42
+            };
+
+            var result = await svc.CreateAsync(dto, creator.Id, "ContentCreator");
+
+            result.Should().NotBeNull();
+
+            var saved = ctx.Events.First();
+            saved.Name.Should().Be("Koncert");
+            saved.Status.Should().Be(ContentStatus.Pending);
+            saved.IsActive.Should().BeTrue();
+            saved.CreatedByUserId.Should().Be(creator.Id);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_VracaSamoApprovedIAktivneEventoveSaGlavnomSlikom()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_VracaSamoApprovedIAktivneEventoveSaGlavnomSlikom));
+            var (_, _, _, eventType, _, _, locality, _, creator, _, _, _, _) = SeedBase(ctx);
+
+            var approvedVisible = new Event
+            {
+                Id = 1,
+                Name = "Vidljiv event",
+                EventTypeId = eventType.Id,
+                EventType = eventType,
+                LocalityId = locality.Id,
+                Locality = locality,
+                StartDate = DateTime.UtcNow.AddDays(2),
+                Status = ContentStatus.Approved,
+                IsActive = true,
+                CreatedByUserId = creator.Id
+            };
+
+            var approvedHidden = new Event
+            {
+                Id = 2,
+                Name = "Sakriven event",
+                EventTypeId = eventType.Id,
+                EventType = eventType,
+                LocalityId = locality.Id,
+                Locality = locality,
+                StartDate = DateTime.UtcNow.AddDays(2),
+                Status = ContentStatus.Approved,
+                IsActive = false,
+                CreatedByUserId = creator.Id
+            };
+
+            var pendingVisible = new Event
+            {
+                Id = 3,
+                Name = "Pending event",
+                EventTypeId = eventType.Id,
+                EventType = eventType,
+                LocalityId = locality.Id,
+                Locality = locality,
+                StartDate = DateTime.UtcNow.AddDays(2),
+                Status = ContentStatus.Pending,
+                IsActive = true,
+                CreatedByUserId = creator.Id
+            };
+
+            ctx.Events.AddRange(approvedVisible, approvedHidden, pendingVisible);
+
+            ctx.Images.Add(new Image
+            {
+                Id = 1,
+                EventId = 1,
+                Url = "main1.jpg",
+                IsMain = true
+            });
+
+            ctx.Images.Add(new Image
+            {
+                Id = 2,
+                EventId = 2,
+                Url = "main2.jpg",
+                IsMain = true
+            });
+
+            ctx.Images.Add(new Image
+            {
+                Id = 3,
+                EventId = 3,
+                Url = "main3.jpg",
+                IsMain = true
+            });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+
+            var result = await svc.GetAllAsync();
+
+            result.Select(x => x.Name).Should().ContainSingle().Which.Should().Be("Vidljiv event");
+        }
+
+        [Fact]
+        public async Task ToggleActiveAsync_OdgovorniManager_MenjaIsActive()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ToggleActiveAsync_OdgovorniManager_MenjaIsActive));
+            var (_, _, _, eventType, destination, _, locality, _, creator, _, manager, _, _) = SeedBase(ctx);
+
+            manager.ManagedDestinationId = destination.Id;
+
+            var ev = new Event
+            {
+                Id = 1,
+                Name = "Koncert",
+                EventTypeId = eventType.Id,
+                EventType = eventType,
+                LocalityId = locality.Id,
+                Locality = locality,
+                DestinationId = destination.Id,
+                Destination = destination,
+                StartDate = DateTime.UtcNow.AddDays(2),
+                Status = ContentStatus.Approved,
+                IsActive = true,
+                CreatedByUserId = creator.Id
+            };
+
+            ctx.Events.Add(ev);
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+
+            var result = await svc.ToggleActiveAsync(ev.Id, false, manager.Id, "Manager");
+
+            result.Should().NotBeNull();
+
+            var saved = ctx.Events.First(e => e.Id == ev.Id);
+            saved.IsActive.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task ToggleActiveAsync_NeodgovorniManager_BacaUnauthorizedAccessException()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ToggleActiveAsync_NeodgovorniManager_BacaUnauthorizedAccessException));
+            var (_, _, _, eventType, destination, _, locality, _, creator, _, _, otherManager, _) = SeedBase(ctx);
+
+            var ev = new Event
+            {
+                Id = 1,
+                Name = "Koncert",
+                EventTypeId = eventType.Id,
+                EventType = eventType,
+                LocalityId = locality.Id,
+                Locality = locality,
+                DestinationId = destination.Id,
+                Destination = destination,
+                StartDate = DateTime.UtcNow.AddDays(2),
+                Status = ContentStatus.Approved,
+                IsActive = true,
+                CreatedByUserId = creator.Id
+            };
+
+            ctx.Events.Add(ev);
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+
+            var act = async () => await svc.ToggleActiveAsync(ev.Id, false, otherManager.Id, "Manager");
+
+            await act.Should().ThrowAsync<UnauthorizedAccessException>();
         }
 
         [Fact]
@@ -510,7 +696,8 @@ namespace TuristickiVodic.Tests.Services
                     LocalityId = locality.Id,
                     DestinationId = destination.Id,
                     CreatedByUserId = creator.Id,
-                    Status = ContentStatus.Pending,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
                     StartDate = new DateTime(2026, 6, 1, 10, 0, 0, DateTimeKind.Utc),
                     EndDate = new DateTime(2026, 6, 1, 12, 0, 0, DateTimeKind.Utc)
                 },
@@ -522,9 +709,29 @@ namespace TuristickiVodic.Tests.Services
                     LocalityId = locality.Id,
                     DestinationId = destination.Id,
                     CreatedByUserId = creator.Id,
-                    Status = ContentStatus.Pending,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
                     StartDate = new DateTime(2026, 6, 2, 10, 0, 0, DateTimeKind.Utc)
                 });
+
+            ctx.Images.AddRange(
+                new Image
+                {
+                    Id = 101,
+                    EventId = 1,
+                    Url = "danas-main.jpg",
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Image
+                {
+                    Id = 102,
+                    EventId = 2,
+                    Url = "sutra-main.jpg",
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                });
+
             ctx.SaveChanges();
 
             var svc = new EventService(ctx, CreateMapper());
@@ -552,7 +759,8 @@ namespace TuristickiVodic.Tests.Services
                     LocalityId = locality.Id,
                     DestinationId = destination.Id,
                     CreatedByUserId = creator.Id,
-                    Status = ContentStatus.Pending,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
                     StartDate = today.AddDays(3)
                 },
                 new Event
@@ -563,9 +771,29 @@ namespace TuristickiVodic.Tests.Services
                     LocalityId = locality.Id,
                     DestinationId = destination.Id,
                     CreatedByUserId = creator.Id,
-                    Status = ContentStatus.Pending,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
                     StartDate = today.AddDays(10)
                 });
+
+            ctx.Images.AddRange(
+                new Image
+                {
+                    Id = 201,
+                    EventId = 1,
+                    Url = "za3dana-main.jpg",
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Image
+                {
+                    Id = 202,
+                    EventId = 2,
+                    Url = "za10dana-main.jpg",
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                });
+
             ctx.SaveChanges();
 
             var svc = new EventService(ctx, CreateMapper());
@@ -590,7 +818,8 @@ namespace TuristickiVodic.Tests.Services
                     LocalityId = locality.Id,
                     DestinationId = destination.Id,
                     CreatedByUserId = creator.Id,
-                    Status = ContentStatus.Pending,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
                     StartDate = new DateTime(2026, 7, 1, 10, 0, 0, DateTimeKind.Utc)
                 },
                 new Event
@@ -601,7 +830,8 @@ namespace TuristickiVodic.Tests.Services
                     LocalityId = locality.Id,
                     DestinationId = destination.Id,
                     CreatedByUserId = creator.Id,
-                    Status = ContentStatus.Pending,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
                     StartDate = new DateTime(2026, 7, 15, 10, 0, 0, DateTimeKind.Utc)
                 },
                 new Event
@@ -612,9 +842,37 @@ namespace TuristickiVodic.Tests.Services
                     LocalityId = locality.Id,
                     DestinationId = destination.Id,
                     CreatedByUserId = creator.Id,
-                    Status = ContentStatus.Pending,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
                     StartDate = new DateTime(2026, 8, 1, 10, 0, 0, DateTimeKind.Utc)
                 });
+
+            ctx.Images.AddRange(
+                new Image
+                {
+                    Id = 301,
+                    EventId = 1,
+                    Url = "prvi-main.jpg",
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Image
+                {
+                    Id = 302,
+                    EventId = 2,
+                    Url = "drugi-main.jpg",
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Image
+                {
+                    Id = 303,
+                    EventId = 3,
+                    Url = "treci-main.jpg",
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                });
+
             ctx.SaveChanges();
 
             var svc = new EventService(ctx, CreateMapper());

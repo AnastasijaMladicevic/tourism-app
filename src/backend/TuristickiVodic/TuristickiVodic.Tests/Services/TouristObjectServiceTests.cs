@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using TuristickiVodic.Core.DTO;
@@ -30,6 +31,11 @@ namespace TuristickiVodic.Tests.Services
             var config = new MapperConfiguration(cfg =>
                 cfg.AddProfile<MappingProfile>());
             return config.CreateMapper();
+        }
+
+        private static TouristObjectService CreateService(AppDbContext ctx)
+        {
+            return new TouristObjectService(ctx, CreateMapper());
         }
 
         private static (Role ccRole, Role managerRole, Role adminRole, ObjectType objectType, Destination destination, Locality locality, User creator, User otherCreator, User manager, User admin)
@@ -153,13 +159,41 @@ namespace TuristickiVodic.Tests.Services
                 LocalityId = locality.Id,
                 Longitude = 18.77,
                 Latitude = 42.42,
-                IsActive = true
             }, creator.Id, "ContentCreator");
 
             result.Name.Should().Be("Pomorski muzej");
 
             var saved = ctx.Objects.First();
             saved.Status.Should().Be(ContentStatus.Pending);
+            saved.CreatedByUserId.Should().Be(creator.Id);
+            saved.IsActive.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task CreateAsync_ContentCreator_PostavljaIsActiveNaFalse()
+        {
+            using var ctx = CreateInMemoryContext(nameof(CreateAsync_ContentCreator_PostavljaIsActiveNaFalse));
+            var (_, _, _, objectType, _, locality, creator, _, _, _) = SeedBase(ctx);
+
+            var svc = CreateService(ctx);
+
+            var dto = new CreateTouristObjectDto
+            {
+                Name = "Pomorski muzej",
+                ObjectTypeId = objectType.Id,
+                LocalityId = locality.Id,
+                Longitude = 18.77,
+                Latitude = 42.42
+            };
+
+            var result = await svc.CreateAsync(dto, creator.Id, "ContentCreator");
+
+            result.Should().NotBeNull();
+
+            var saved = ctx.Objects.First();
+            saved.Name.Should().Be("Pomorski muzej");
+            saved.Status.Should().Be(ContentStatus.Pending);
+            saved.IsActive.Should().BeTrue();
             saved.CreatedByUserId.Should().Be(creator.Id);
         }
 
@@ -244,6 +278,7 @@ namespace TuristickiVodic.Tests.Services
                 DestinationId = destination.Id,
                 CreatedByUserId = creator.Id,
                 Status = ContentStatus.Approved,
+                IsActive = true,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             });
