@@ -90,6 +90,20 @@
   color: #1a56db;
 }
 
+.nav-item .material-symbols-outlined {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  font-size: 22px;
+  line-height: 1;
+  color: #6b6b6b;
+  transition: color 0.12s;
+}
+
+.nav-item.active .material-symbols-outlined {
+  color: #1a56db;
+}
+
 .main {
   flex: 1;
   display: flex;
