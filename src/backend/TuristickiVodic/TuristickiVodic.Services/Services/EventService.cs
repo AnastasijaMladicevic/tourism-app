@@ -29,90 +29,114 @@ namespace TuristickiVodic.Services.Services
                 _ => value
             };
         }
-
-        public async Task<IEnumerable<EventDto>> GetAllAsync()
+        public async Task<PagedResultDto<EventDto>> GetAllAsync(EventQueryDto query)
         {
-            var events = await _context.Events
-                .Include(e => e.EventType)
-                .Include(e => e.Locality)
-                .Include(e => e.Destination)
-                .Include(e => e.Object)
-                .Where(e =>
-                    e.Status == ContentStatus.Approved &&
-                    e.IsActive &&
-                    _context.Images.Any(i => i.EventId == e.Id && i.IsMain))
-                .OrderBy(e => e.Id)
-                .ToListAsync();
+            if (query.Page < 1)
+                query.Page = 1;
 
-            return _mapper.Map<IEnumerable<EventDto>>(events);
-        }
+            if (query.PageSize < 1)
+                query.PageSize = 10;
 
-        public async Task<IEnumerable<EventDto>> GetAllAsync(EventFilterDto? filter = null)
-        {
-            var query = _context.Events
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var eventsQuery = _context.Events
                 .Include(e => e.EventType)
-                .Include(e => e.Locality)
                 .Include(e => e.Destination)
-                .Include(e => e.Object)
-                .Where(e =>
-                    e.Status == ContentStatus.Approved &&
-                    e.IsActive &&
-                    _context.Images.Any(i => i.EventId == e.Id && i.IsMain))
+                .Include(e => e.Locality)
+                .Include(e => e.Images)
+                .Where(e => e.Status == ContentStatus.Approved)
+                .Where(e => e.IsActive)
+                .Where(e => e.Images.Any(i => i.IsMain))
                 .AsQueryable();
 
-            if (filter != null)
+            if (!string.IsNullOrWhiteSpace(query.Type))
             {
-                var hasDate = filter.Date.HasValue;
-                var hasNextDays = filter.NextDays.HasValue;
-                var hasRange = filter.StartDate.HasValue || filter.EndDate.HasValue;
-
-                var filterCount = 0;
-                if (hasDate) filterCount++;
-                if (hasNextDays) filterCount++;
-                if (hasRange) filterCount++;
-
-                if (filterCount > 1)
-                    throw new InvalidOperationException("Use only one type of date filter at a time.");
-
-                DateTime? periodStart = null;
-                DateTime? periodEnd = null;
-
-                if (hasDate)
-                {
-                    periodStart = EnsureUtc(filter.Date!.Value.Date);
-                    periodEnd = EnsureUtc(periodStart.Value.AddDays(1));
-                }
-                else if (hasNextDays)
-                {
-                    if (filter.NextDays!.Value != 7 && filter.NextDays.Value != 30)
-                        throw new InvalidOperationException("NextDays can only be 7 or 30.");
-
-                    periodStart = DateTime.UtcNow.Date;
-                    periodEnd = periodStart.Value.AddDays(filter.NextDays.Value);
-                }
-                else if (hasRange)
-                {
-                    periodStart = EnsureUtc((filter.StartDate ?? filter.EndDate)!.Value.Date);
-                    periodEnd = EnsureUtc(((filter.EndDate ?? filter.StartDate)!.Value.Date).AddDays(1));
-
-                    if (periodEnd <= periodStart)
-                        throw new InvalidOperationException("EndDate must be greater than or equal to StartDate.");
-                }
-
-                if (periodStart.HasValue && periodEnd.HasValue)
-                {
-                    query = query.Where(e =>
-                        e.StartDate < periodEnd.Value &&
-                        (!e.EndDate.HasValue || e.EndDate.Value >= periodStart.Value));
-                }
+                var type = query.Type.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    e.EventType != null &&
+                    e.EventType.Name.ToLower().Contains(type));
             }
 
-            var events = await query
-                .OrderBy(e => e.StartDate)
-                .ThenBy(e => e.Id)
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    e.Destination != null &&
+                    e.Destination.Name.ToLower().Contains(destination));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    e.Name.ToLower().Contains(search) ||
+                    (e.Description != null && e.Description.ToLower().Contains(search)));
+            }
+
+            var hasDate = query.Date.HasValue;
+            var hasNextDays = query.NextDays.HasValue;
+            var hasRange = query.StartDate.HasValue || query.EndDate.HasValue;
+
+            var filterCount = 0;
+            if (hasDate) filterCount++;
+            if (hasNextDays) filterCount++;
+            if (hasRange) filterCount++;
+
+            if (filterCount > 1)
+                throw new InvalidOperationException("Use only one type of date filter at a time.");
+
+            DateTime? periodStart = null;
+            DateTime? periodEnd = null;
+
+            if (hasDate)
+            {
+                periodStart = EnsureUtc(query.Date!.Value.Date);
+                periodEnd = EnsureUtc(periodStart.Value.AddDays(1));
+            }
+            else if (hasNextDays)
+            {
+                if (query.NextDays!.Value != 7 && query.NextDays.Value != 30)
+                    throw new InvalidOperationException("NextDays can only be 7 or 30.");
+
+                periodStart = DateTime.UtcNow.Date;
+                periodEnd = periodStart.Value.AddDays(query.NextDays.Value);
+            }
+            else if (hasRange)
+            {
+                periodStart = EnsureUtc((query.StartDate ?? query.EndDate)!.Value.Date);
+                periodEnd = EnsureUtc(((query.EndDate ?? query.StartDate)!.Value.Date).AddDays(1));
+
+                if (periodEnd <= periodStart)
+                    throw new InvalidOperationException("EndDate must be greater than or equal to StartDate.");
+            }
+
+            if (periodStart.HasValue && periodEnd.HasValue)
+            {
+                eventsQuery = eventsQuery.Where(e =>
+                    e.StartDate < periodEnd.Value &&
+                    (!e.EndDate.HasValue || e.EndDate.Value >= periodStart.Value));
+            }
+
+            eventsQuery = ApplySorting(eventsQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await eventsQuery.CountAsync();
+
+            var items = await eventsQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
                 .ToListAsync();
 
-            return _mapper.Map<IEnumerable<EventDto>>(events);
+            var mappedItems = _mapper.Map<List<EventDto>>(items);
+
+            return new PagedResultDto<EventDto>
+            {
+                Items = mappedItems,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
         }
 
         public async Task<EventDto?> GetByIdAsync(int id)
