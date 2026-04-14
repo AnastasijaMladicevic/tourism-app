@@ -860,7 +860,12 @@ namespace TuristickiVodic.Tests.Mappings
             {
                 Id = 7,
                 ManagerId = 30,
-                Manager = new User { FirstName = "Milan", LastName = "Manager" },
+                Manager = new User
+                {
+                    FirstName = "Milan",
+                    LastName = "Manager",
+                    ManagedDestination = new Destination { Name = "Kotor" }
+                },
                 ReportedUserId = 20,
                 ReportedUser = new User { FirstName = "Ceca", LastName = "Creator" },
                 Reason = "Spam sadrzaj",
@@ -873,6 +878,7 @@ namespace TuristickiVodic.Tests.Mappings
             dto.Id.Should().Be(7);
             dto.ManagerId.Should().Be(30);
             dto.ManagerName.Should().Be("Milan Manager");
+            dto.DestinationName.Should().Be("Kotor");
             dto.ReportedUserId.Should().Be(20);
             dto.ReportedUserName.Should().Be("Ceca Creator");
             dto.Reason.Should().Be("Spam sadrzaj");

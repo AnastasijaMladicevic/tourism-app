@@ -57,18 +57,49 @@ namespace TuristickiVodic.Tests.Controllers
         public async Task GetAll_Admin_VracaOkSaSvimPrijavama()
         {
             var mockService = new Mock<IManagerReportService>();
-            mockService.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<ManagerReportDto>
+            mockService.Setup(s => s.GetAllAsync(It.IsAny<ManagerReportQueryDto>())).ReturnsAsync(new PagedResultDto<ManagerReportDto>
             {
-                new ManagerReportDto { Id = 1, Status = "Pending" },
-                new ManagerReportDto { Id = 2, Status = "Approved" }
+                Items = new List<ManagerReportDto>
+                {
+                    new ManagerReportDto { Id = 1, Status = "Pending" },
+                    new ManagerReportDto { Id = 2, Status = "Approved" }
+                },
+                TotalCount = 2,
+                Page = 1,
+                PageSize = 10,
+                TotalPages = 1
             });
 
             var controller = CreateController(mockService, FakeUserHelper.CreateUser(40, "Admin"));
 
-            var result = await controller.GetAll();
+            var result = await controller.GetAll(new ManagerReportQueryDto());
 
             result.Should().BeOfType<OkObjectResult>()
-                .Which.Value.Should().BeAssignableTo<IEnumerable<ManagerReportDto>>();
+                .Which.Value.Should().BeAssignableTo<PagedResultDto<ManagerReportDto>>();
+        }
+
+        [Fact]
+        public async Task GetMyReports_Manager_VracaPagedRezultat()
+        {
+            var mockService = new Mock<IManagerReportService>();
+            mockService.Setup(s => s.GetForManagerAsync(30, It.IsAny<ManagerReportQueryDto>())).ReturnsAsync(new PagedResultDto<ManagerReportDto>
+            {
+                Items = new List<ManagerReportDto>
+                {
+                    new ManagerReportDto { Id = 1, Status = "Pending" }
+                },
+                TotalCount = 1,
+                Page = 1,
+                PageSize = 10,
+                TotalPages = 1
+            });
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(30, "Manager"));
+
+            var result = await controller.GetMyReports(new ManagerReportQueryDto());
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeAssignableTo<PagedResultDto<ManagerReportDto>>();
         }
 
         [Fact]

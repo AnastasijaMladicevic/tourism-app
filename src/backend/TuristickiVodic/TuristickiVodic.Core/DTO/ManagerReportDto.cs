@@ -5,6 +5,7 @@ namespace TuristickiVodic.Core.DTO
         public int Id { get; set; }
         public int ManagerId { get; set; }
         public string ManagerName { get; set; } = string.Empty;
+        public string DestinationName { get; set; } = string.Empty;
         public int ReportedUserId { get; set; }
         public string ReportedUserName { get; set; } = string.Empty;
         public string Reason { get; set; } = string.Empty;

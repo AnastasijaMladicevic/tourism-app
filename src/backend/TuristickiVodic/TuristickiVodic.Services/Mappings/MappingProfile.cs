@@ -198,6 +198,10 @@ namespace TuristickiVodic.Services.Mappings
                     opt => opt.MapFrom(src => src.Manager != null
                         ? src.Manager.FirstName + " " + src.Manager.LastName
                         : string.Empty))
+                .ForMember(dest => dest.DestinationName,
+                    opt => opt.MapFrom(src => src.Manager != null && src.Manager.ManagedDestination != null
+                        ? src.Manager.ManagedDestination.Name
+                        : string.Empty))
                 .ForMember(dest => dest.ReportedUserName,
                     opt => opt.MapFrom(src => src.ReportedUser != null
                         ? src.ReportedUser.FirstName + " " + src.ReportedUser.LastName

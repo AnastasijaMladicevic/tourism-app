@@ -275,11 +275,11 @@ namespace TuristickiVodic.Tests.Services
 
             var service = new ManagerReportService(ctx);
 
-            var result = (await service.GetForManagerAsync(manager.Id)).ToList();
+            var result = await service.GetForManagerAsync(manager.Id, new ManagerReportQueryDto());
 
-            result.Should().HaveCount(1);
-            result[0].ManagerId.Should().Be(manager.Id);
-            result[0].Reason.Should().Be("R1");
+            result.Items.Should().HaveCount(1);
+            result.Items[0].ManagerId.Should().Be(manager.Id);
+            result.Items[0].Reason.Should().Be("R1");
         }
 
         [Fact]
@@ -296,9 +296,129 @@ namespace TuristickiVodic.Tests.Services
 
             var service = new ManagerReportService(ctx);
 
-            var result = (await service.GetAllAsync()).ToList();
+            var result = await service.GetAllAsync(new ManagerReportQueryDto());
 
-            result.Should().HaveCount(2);
+            result.Items.Should().HaveCount(2);
+            result.TotalCount.Should().Be(2);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_KadaSeFiltriraPoStatusuIDestinaciji_VracaSamoTrazeniRezultat()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaSeFiltriraPoStatusuIDestinaciji_VracaSamoTrazeniRezultat));
+            var (_, _, _, _, manager, otherManager, _, creator, otherCreator, _, _, _, _, _, _, _) = SeedBase(ctx);
+
+            ctx.ManagerReports.AddRange(
+                new ManagerReport
+                {
+                    Id = 1,
+                    ManagerId = manager.Id,
+                    Manager = manager,
+                    ReportedUserId = creator.Id,
+                    ReportedUser = creator,
+                    Reason = "Prijava za Kotor",
+                    Status = ContentStatus.Pending,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new ManagerReport
+                {
+                    Id = 2,
+                    ManagerId = otherManager.Id,
+                    Manager = otherManager,
+                    ReportedUserId = otherCreator.Id,
+                    ReportedUser = otherCreator,
+                    Reason = "Prijava za Budvu",
+                    Status = ContentStatus.Approved,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-5)
+                });
+            ctx.SaveChanges();
+
+            var service = new ManagerReportService(ctx);
+
+            var result = await service.GetAllAsync(new ManagerReportQueryDto
+            {
+                Status = "Pending",
+                Destination = "kotor"
+            });
+
+            result.TotalCount.Should().Be(1);
+            result.Items.Should().ContainSingle();
+            result.Items[0].DestinationName.Should().Be("Kotor");
+            result.Items[0].Status.Should().Be("Pending");
+        }
+
+        [Fact]
+        public async Task GetAllAsync_KadaSeKoristiPaginacijaISortPoReportedUser_VracaTrazeniSegment()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaSeKoristiPaginacijaISortPoReportedUser_VracaTrazeniSegment));
+            var (_, _, _, _, manager, otherManager, _, creator, otherCreator, _, _, _, _, _, _, _) = SeedBase(ctx);
+
+            var thirdCreator = new User
+            {
+                Id = 30,
+                FirstName = "Aca",
+                LastName = "Author",
+                Email = "aca@test.com",
+                PasswordHash = "hash",
+                RoleId = 2,
+                Role = ctx.Roles.First(r => r.Id == 2),
+                IsActive = true,
+                DateOfBirth = new DateTime(1994, 1, 1)
+            };
+            ctx.Users.Add(thirdCreator);
+
+            ctx.ManagerReports.AddRange(
+                new ManagerReport
+                {
+                    Id = 1,
+                    ManagerId = manager.Id,
+                    Manager = manager,
+                    ReportedUserId = creator.Id,
+                    ReportedUser = creator,
+                    Reason = "R1",
+                    Status = ContentStatus.Pending,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new ManagerReport
+                {
+                    Id = 2,
+                    ManagerId = otherManager.Id,
+                    Manager = otherManager,
+                    ReportedUserId = otherCreator.Id,
+                    ReportedUser = otherCreator,
+                    Reason = "R2",
+                    Status = ContentStatus.Pending,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-5)
+                },
+                new ManagerReport
+                {
+                    Id = 3,
+                    ManagerId = manager.Id,
+                    Manager = manager,
+                    ReportedUserId = thirdCreator.Id,
+                    ReportedUser = thirdCreator,
+                    Reason = "R3",
+                    Status = ContentStatus.Rejected,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-10)
+                });
+            ctx.SaveChanges();
+
+            var service = new ManagerReportService(ctx);
+
+            var result = await service.GetAllAsync(new ManagerReportQueryDto
+            {
+                Page = 2,
+                PageSize = 1,
+                SortBy = "reportedUser",
+                SortOrder = "asc"
+            });
+
+            result.TotalCount.Should().Be(3);
+            result.Page.Should().Be(2);
+            result.PageSize.Should().Be(1);
+            result.TotalPages.Should().Be(3);
+            result.Items.Should().ContainSingle();
+            result.Items[0].ReportedUserName.Should().Be("Creator One");
         }
 
         [Fact]

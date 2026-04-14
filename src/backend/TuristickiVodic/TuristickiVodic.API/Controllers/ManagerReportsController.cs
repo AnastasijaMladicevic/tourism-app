@@ -40,18 +40,18 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpGet("my")]
         [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> GetMyReports()
+        public async Task<IActionResult> GetMyReports([FromQuery] ManagerReportQueryDto query)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var reports = await _managerReportService.GetForManagerAsync(userId);
+            var reports = await _managerReportService.GetForManagerAsync(userId, query);
             return Ok(reports);
         }
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] ManagerReportQueryDto query)
         {
-            var reports = await _managerReportService.GetAllAsync();
+            var reports = await _managerReportService.GetAllAsync(query);
             return Ok(reports);
         }
 
