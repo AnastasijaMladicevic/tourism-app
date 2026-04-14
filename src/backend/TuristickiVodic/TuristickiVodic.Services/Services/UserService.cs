@@ -511,5 +511,32 @@ namespace TuristickiVodic.Services
                 ? query.OrderByDescending(u => u.Id)
                 : query.OrderBy(u => u.Id);
         }
+
+        public async Task<UserDto?> RemoveProfileImageAsync(int id)
+        {
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+                return null;
+
+            if (!string.IsNullOrWhiteSpace(user.ProfileImageUrl) &&
+                user.ProfileImageUrl != "/images/profiles/default_icon.png")
+            {
+                var oldRelativePath = user.ProfileImageUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
+                var oldFullPath = Path.Combine(_environment.WebRootPath, oldRelativePath);
+
+                if (File.Exists(oldFullPath))
+                    File.Delete(oldFullPath);
+            }
+
+            user.ProfileImageUrl = "/images/profiles/default_icon.png";
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<UserDto>(user);
+        }
     }
 }

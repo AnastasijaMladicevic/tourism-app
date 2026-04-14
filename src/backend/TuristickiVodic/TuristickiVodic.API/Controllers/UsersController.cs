@@ -269,6 +269,21 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
+        [HttpDelete("{id}/profile-image")]
+        public async Task<IActionResult> RemoveProfileImage(int id)
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            if (currentUserId != id)
+                return Forbid();
+
+            var user = await _userService.RemoveProfileImageAsync(id);
+            if (user == null)
+                return NotFound();
+
+            return Ok(user);
+        }
+
         [HttpGet("creator-requests")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetCreatorRequests()
