@@ -25,10 +25,10 @@ namespace TuristickiVodic.Core.DTO
 
         public double? Latitude { get; set; }
 
-        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "ObjectTypeId is required.")]
         public int ObjectTypeId { get; set; }
 
-        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "DestinationId is required.")]
         public int DestinationId { get; set; }
 
         public int? LocalityId { get; set; }

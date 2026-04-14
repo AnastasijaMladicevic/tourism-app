@@ -38,36 +38,45 @@ namespace TuristickiVodic.Tests.Controllers
         // ═══════════════════════════════════════════
 
         [Fact]
-        public async Task GetAll_KadaAdminPozove_VracaOkSaListomKorisnika()
+        public async Task GetAll_KadaAdminPozove_VracaOkSaRezultatom()
         {
             var mockService = new Mock<IUserService>();
-            mockService.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<UserDto>
+            var rezultat = new PagedResultDto<UserDto>
             {
-                new UserDto { Id = 1, FirstName = "Marko", Email = "marko@test.com", RoleName = "Tourist" },
-                new UserDto { Id = 2, FirstName = "Ana",   Email = "ana@test.com",   RoleName = "Admin" }
-            });
+                TotalCount = 2
+            };
+
+            mockService
+                .Setup(s => s.GetAllAsync(It.IsAny<UserQueryDto>()))
+                .ReturnsAsync(rezultat);
 
             var controller = CreateController(mockService, FakeUserHelper.CreateUser(99, "Admin"));
 
-            var result = await controller.GetAll();
+            var result = await controller.GetAll(new UserQueryDto());
 
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            ok.Value.Should().BeAssignableTo<IEnumerable<UserDto>>()
-                .Which.Should().HaveCount(2);
+            ok.Value.Should().BeSameAs(rezultat);
         }
 
         [Fact]
-        public async Task GetAll_KadaServisVracaPrazanSeznam_VracaOkSaPrazномListom()
+        public async Task GetAll_KadaServisVracaPrazanRezultat_VracaOk()
         {
             var mockService = new Mock<IUserService>();
-            mockService.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<UserDto>());
+            var rezultat = new PagedResultDto<UserDto>
+            {
+                TotalCount = 0
+            };
+
+            mockService
+                .Setup(s => s.GetAllAsync(It.IsAny<UserQueryDto>()))
+                .ReturnsAsync(rezultat);
 
             var controller = CreateController(mockService, FakeUserHelper.CreateUser(99, "Admin"));
 
-            var result = await controller.GetAll();
+            var result = await controller.GetAll(new UserQueryDto());
 
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            ok.Value.Should().BeAssignableTo<IEnumerable<UserDto>>().Which.Should().BeEmpty();
+            ok.Value.Should().BeSameAs(rezultat);
         }
 
         // ═══════════════════════════════════════════

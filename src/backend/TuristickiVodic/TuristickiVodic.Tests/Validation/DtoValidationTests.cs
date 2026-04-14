@@ -400,6 +400,7 @@ namespace TuristickiVodic.Tests.Validation
             {
                 Name = "Pomorski muzej",
                 ObjectTypeId = 1,
+                DestinationId = 1,
                 LocalityId = 1
             };
 
@@ -407,46 +408,43 @@ namespace TuristickiVodic.Tests.Validation
         }
 
         [Fact]
-        public void CreateTouristObjectDto_BezName_NijeValidno()
+        public void CreateTouristObjectDto_BezDestinationId_NijeValidno()
         {
             var dto = new CreateTouristObjectDto
             {
-                ObjectTypeId = 1,
-                LocalityId = 1
+                Name = "Pomorski muzej",
+                ObjectTypeId = 1
             };
 
-            dto.Name = null!;
-
             IsValid(dto).Should().BeFalse();
-            Validate(dto).Should().Contain(r => r.MemberNames.Contains("Name"));
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains("DestinationId"));
         }
 
         [Fact]
-        public void CreateTouristObjectDto_PrazanName_NijeValidno()
+        public void CreateTouristObjectDto_LokalitetNijeObavezan_JeValidno()
         {
             var dto = new CreateTouristObjectDto
             {
-                Name = "",
+                Name = "Objekat bez lokaliteta",
                 ObjectTypeId = 1,
-                LocalityId = 1
+                DestinationId = 1
             };
 
-            IsValid(dto).Should().BeFalse();
-            Validate(dto).Should().Contain(r => r.MemberNames.Contains("Name"));
+            IsValid(dto).Should().BeTrue();
         }
 
         [Fact]
-        public void CreateTouristObjectDto_NameDuzi200Karaktera_NijeValidno()
+        public void CreateTouristObjectDto_KoordinateMorajuBitiUParu_NijeValidnoKadaNedostajeLatitude()
         {
             var dto = new CreateTouristObjectDto
             {
-                Name = new string('A', 201),
+                Name = "Objekat",
                 ObjectTypeId = 1,
-                LocalityId = 1
+                DestinationId = 1,
+                Longitude = 18.77
             };
 
             IsValid(dto).Should().BeFalse();
-            Validate(dto).Should().Contain(r => r.MemberNames.Contains("Name"));
         }
 
         [Fact]
@@ -463,6 +461,7 @@ namespace TuristickiVodic.Tests.Validation
                 Longitude = 18.77,
                 Latitude = 42.42,
                 ObjectTypeId = 1,
+                DestinationId = 1,
                 LocalityId = 1
             };
 
@@ -487,6 +486,17 @@ namespace TuristickiVodic.Tests.Validation
             var dto = new UpdateTouristObjectDto
             {
                 Name = "Novo ime"
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void UpdateTouristObjectDto_DestinationIdPostavljen_JeValidno()
+        {
+            var dto = new UpdateTouristObjectDto
+            {
+                DestinationId = 2
             };
 
             IsValid(dto).Should().BeTrue();

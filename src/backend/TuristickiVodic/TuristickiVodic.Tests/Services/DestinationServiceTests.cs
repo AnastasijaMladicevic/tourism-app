@@ -359,9 +359,9 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var svc = new DestinationService(ctx, CreateMapper());
-            var result = await svc.GetAllAsync(null, null);
+            var result = await svc.GetAllAsync(null, null, new DestinationQueryDto());
 
-            result.Should().HaveCount(2);
+            result.TotalCount.Should().Be(2);
         }
 
         [Fact]
@@ -435,10 +435,9 @@ namespace TuristickiVodic.Tests.Services
 
             var svc = new DestinationService(ctx, CreateMapper());
 
-            var result = await svc.GetAllAsync(manager1.Id, "Manager");
+            var result = await svc.GetAllAsync(manager1.Id, "Manager", new DestinationQueryDto());
 
-            result.Should().HaveCount(1);
-            result.Single().Name.Should().Be("Kotor");
+            result.TotalCount.Should().Be(1);
         }
 
         [Fact]
@@ -489,9 +488,9 @@ namespace TuristickiVodic.Tests.Services
 
             var svc = new DestinationService(ctx, CreateMapper());
 
-            var result = await svc.GetAllAsync(manager.Id, "Manager");
+            var result = await svc.GetAllAsync(manager.Id, "Manager", new DestinationQueryDto());
 
-            result.Should().BeEmpty();
+            result.TotalCount.Should().Be(0);
         }
 
         [Fact]
@@ -695,9 +694,9 @@ namespace TuristickiVodic.Tests.Services
 
             var svc = new DestinationService(ctx, CreateMapper());
 
-            var result = await svc.GetAllAsync(adminUser.Id, "Admin");
+            var result = await svc.GetAllAsync(adminUser.Id, "Admin", new DestinationQueryDto());
 
-            result.Should().HaveCount(2);
+            result.TotalCount.Should().Be(2);
         }
 
         // ═══════════════════════════════════════════
@@ -852,9 +851,9 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
-        public async Task DeleteAsync_DestinacijaImaLokalitete_BacaException()
+        public async Task DeleteAsync_DestinacijaSaLokalitetima_VracaTrue()
         {
-            using var ctx = CreateInMemoryContext(nameof(DeleteAsync_DestinacijaImaLokalitete_BacaException));
+            using var ctx = CreateInMemoryContext(nameof(DeleteAsync_DestinacijaSaLokalitetima_VracaTrue));
             var (_, _, _, tip) = SeedBase(ctx);
 
             var dest = new Destination
@@ -868,10 +867,8 @@ namespace TuristickiVodic.Tests.Services
             };
 
             ctx.Destinations.Add(dest);
-
             var localityType = new LocalityType { Id = 1, Name = "Centar" };
             ctx.LocalityTypes.Add(localityType);
-
             ctx.Localities.Add(new Locality
             {
                 Id = 1,
@@ -880,20 +877,19 @@ namespace TuristickiVodic.Tests.Services
                 LocalityTypeId = 1,
                 CreatedByUserId = 99
             });
-
             ctx.SaveChanges();
 
             var svc = new DestinationService(ctx, CreateMapper());
+            var deleted = await svc.DeleteAsync(6);
 
-            await svc.Invoking(s => s.DeleteAsync(6))
-                .Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*localities*");
+            deleted.Should().BeTrue();
+            ctx.Destinations.Find(6).Should().BeNull();
         }
 
         [Fact]
-        public async Task DeleteAsync_DestinacijaImaObjekte_BacaException()
+        public async Task DeleteAsync_DestinacijaSaObjektima_VracaTrue()
         {
-            using var ctx = CreateInMemoryContext(nameof(DeleteAsync_DestinacijaImaObjekte_BacaException));
+            using var ctx = CreateInMemoryContext(nameof(DeleteAsync_DestinacijaSaObjektima_VracaTrue));
             var (_, _, _, tip) = SeedBase(ctx);
 
             var dest = new Destination
@@ -907,10 +903,8 @@ namespace TuristickiVodic.Tests.Services
             };
 
             ctx.Destinations.Add(dest);
-
             var objType = new ObjectType { Id = 1, Name = "Muzej" };
             ctx.ObjectTypes.Add(objType);
-
             ctx.Objects.Add(new TouristObject
             {
                 Id = 1,
@@ -919,20 +913,19 @@ namespace TuristickiVodic.Tests.Services
                 DestinationId = dest.Id,
                 CreatedByUserId = 99
             });
-
             ctx.SaveChanges();
 
             var svc = new DestinationService(ctx, CreateMapper());
+            var deleted = await svc.DeleteAsync(7);
 
-            await svc.Invoking(s => s.DeleteAsync(7))
-                .Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*objects*");
+            deleted.Should().BeTrue();
+            ctx.Destinations.Find(7).Should().BeNull();
         }
 
         [Fact]
-        public async Task DeleteAsync_DestinacijaImaEvente_BacaException()
+        public async Task DeleteAsync_DestinacijaSaEventima_VracaTrue()
         {
-            using var ctx = CreateInMemoryContext(nameof(DeleteAsync_DestinacijaImaEvente_BacaException));
+            using var ctx = CreateInMemoryContext(nameof(DeleteAsync_DestinacijaSaEventima_VracaTrue));
             var (_, _, _, tip) = SeedBase(ctx);
 
             var dest = new Destination
@@ -946,10 +939,8 @@ namespace TuristickiVodic.Tests.Services
             };
 
             ctx.Destinations.Add(dest);
-
             var evType = new EventType { Id = 1, Name = "Festival" };
             ctx.EventTypes.Add(evType);
-
             ctx.Events.Add(new Event
             {
                 Id = 1,
@@ -959,14 +950,13 @@ namespace TuristickiVodic.Tests.Services
                 CreatedByUserId = 99,
                 StartDate = DateTime.UtcNow.AddDays(10)
             });
-
             ctx.SaveChanges();
 
             var svc = new DestinationService(ctx, CreateMapper());
+            var deleted = await svc.DeleteAsync(8);
 
-            await svc.Invoking(s => s.DeleteAsync(8))
-                .Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*events*");
+            deleted.Should().BeTrue();
+            ctx.Destinations.Find(8).Should().BeNull();
         }
     }
 }
