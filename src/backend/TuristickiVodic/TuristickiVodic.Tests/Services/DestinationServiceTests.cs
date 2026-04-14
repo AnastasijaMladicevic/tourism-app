@@ -1,11 +1,14 @@
 using AutoMapper;
+using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Moq;
+using System.Security.Claims;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
 using TuristickiVodic.Services;
 using Xunit;
-using FluentAssertions;
 
 namespace TuristickiVodic.Tests.Services
 {

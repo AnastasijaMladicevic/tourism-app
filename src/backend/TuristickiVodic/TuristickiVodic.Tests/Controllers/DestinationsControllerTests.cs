@@ -354,6 +354,34 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
+        public async Task GetAll_SaSearchParametrom_VracaPagedRezultat()
+        {
+            var mockService = new Mock<IDestinationService>();
+            var dto = new PagedResultDto<DestinationDto>
+            {
+                TotalCount = 1,
+                Page = 1,
+                PageSize = 10,
+                TotalPages = 1,
+                Items = new List<DestinationDto>
+        {
+            new DestinationDto { Id = 1, Name = "Kotor" }
+        }
+            };
+
+            mockService
+                .Setup(s => s.GetAllAsync(It.IsAny<int?>(), It.IsAny<string?>(), It.IsAny<DestinationQueryDto>()))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.GetAll(new DestinationQueryDto { Search = "kot" });
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
         public async Task Delete_KadaServisUspesnoObrise_VracaNoContent()
         {
             var mockService = new Mock<IDestinationService>();
