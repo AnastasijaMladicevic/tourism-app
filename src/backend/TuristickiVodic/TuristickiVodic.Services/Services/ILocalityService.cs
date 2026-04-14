@@ -7,12 +7,11 @@ namespace TuristickiVodic.Services.Services
 {
     public interface ILocalityService
     {
-        Task<IEnumerable<LocalityDto>> GetAllAsync();
         Task<LocalityDto?> GetByIdAsync(int id);
         Task<LocalityDto> CreateAsync(CreateLocalityDto dto, int userId, string roleName);
         Task<LocalityDto?> UpdateAsync(int id, UpdateLocalityDto dto, int userId, string roleName);
         Task<bool> DeleteAsync(int id, int userId, string roleName);
         Task<LocalityDto?> ToggleActiveAsync(int id, bool isActive, int userId, string roleName);
-        Task<PagedResultDto<LocalityDto>> SearchAsync(LocalityQueryDto query);
+        Task<PagedResultDto<LocalityDto>> GetAllAsync(LocalityQueryDto query);
     }
 }

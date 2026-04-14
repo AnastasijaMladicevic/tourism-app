@@ -19,10 +19,10 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] LocalityQueryDto query)
         {
-            var localities = await _localityService.GetAllAsync();
-            return Ok(localities);
+            var result = await _localityService.GetAllAsync(query);
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
@@ -37,13 +37,13 @@ namespace TuristickiVodic.API.Controllers
             return Ok(locality);
         }
 
-        [HttpGet("search")]
+        /*[HttpGet("search")]
         [AllowAnonymous]
         public async Task<IActionResult> Search([FromQuery] LocalityQueryDto query)
         {
             var result = await _localityService.SearchAsync(query);
             return Ok(result);
-        }
+        }*/
 
         [HttpPost]
         [Authorize(Roles = "Manager")]

@@ -153,21 +153,61 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var svc = new LocalityService(ctx, CreateMapper());
-            var result = await svc.GetAllAsync();
+            var result = await svc.GetAllAsync(new LocalityQueryDto());
 
-            result.Should().HaveCount(2);
+            result.TotalCount.Should().Be(2);
+            result.Items.Should().HaveCount(2);
         }
 
         [Fact]
-        public async Task GetAllAsync_BezLokaliteta_VracaPrazanSeznam()
+        public async Task GetAllAsync_BezLokaliteta_VracaPrazanRezultat()
         {
-            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_BezLokaliteta_VracaPrazanSeznam));
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_BezLokaliteta_VracaPrazanRezultat));
             SeedBase(ctx);
 
             var svc = new LocalityService(ctx, CreateMapper());
-            var result = await svc.GetAllAsync();
+            var result = await svc.GetAllAsync(new LocalityQueryDto());
 
-            result.Should().BeEmpty();
+            result.TotalCount.Should().Be(0);
+            result.Items.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task GetAllAsync_SaSearchParametrom_VracaFiltriraneLokalitete()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_SaSearchParametrom_VracaFiltriraneLokalitete));
+            var (_, _, lt, mgr, dest, _) = SeedBase(ctx);
+
+            var l1 = MakeLocality(1, "Stara Varos", dest, lt, mgr.Id);
+            var l2 = MakeLocality(2, "Dobrota", dest, lt, mgr.Id);
+
+            ctx.Localities.AddRange(l1, l2);
+            ctx.SaveChanges();
+
+            ctx.Images.AddRange(
+                new Image
+                {
+                    Id = 1,
+                    LocalityId = l1.Id,
+                    Url = "l1-main.jpg",
+                    IsMain = true
+                },
+                new Image
+                {
+                    Id = 2,
+                    LocalityId = l2.Id,
+                    Url = "l2-main.jpg",
+                    IsMain = true
+                }
+            );
+            ctx.SaveChanges();
+
+            var svc = new LocalityService(ctx, CreateMapper());
+            var result = await svc.GetAllAsync(new LocalityQueryDto { Search = "stara" });
+
+            result.TotalCount.Should().Be(1);
+            result.Items.Should().ContainSingle();
+            result.Items.Single().Name.Should().Be("Stara Varos");
         }
 
         [Fact]

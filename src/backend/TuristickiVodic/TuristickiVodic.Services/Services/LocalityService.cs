@@ -255,7 +255,7 @@ namespace TuristickiVodic.Services
             return _mapper.Map<LocalityDto>(updated);
         }
 
-        public async Task<PagedResultDto<LocalityDto>> SearchAsync(LocalityQueryDto query)
+        public async Task<PagedResultDto<LocalityDto>> GetAllAsync(LocalityQueryDto query)
         {
             if (query.Page < 1)
                 query.Page = 1;
