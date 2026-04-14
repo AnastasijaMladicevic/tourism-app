@@ -72,6 +72,17 @@ export class HomeComponent implements OnInit {
     return this.isLoadingPlaces || this.isLoadingEvents;
   }
 
+  private get isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  private pickEventImage(event: { id: number; images?: unknown[] }): string | undefined {
+    const fromDto =
+      event.images?.find((i) => this.isMainImage(i as unknown as ImageDto)) ??
+      event.images?.[0];
+    return this.resolveMediaUrl(this.readImageUrl(fromDto as unknown as ImageDto));
+  }
+
   private loadUserName(): void {
     const raw = localStorage.getItem('user');
     if (!raw) return;
@@ -88,31 +99,29 @@ export class HomeComponent implements OnInit {
   private loadPlaceCards(): void {
     this.isLoadingPlaces = true;
 
-    forkJoin({
-      destinations: this.destinationService.getAll().pipe(catchError(() => of([] as unknown[]))),
-      images: this.imageService.getAll().pipe(catchError(() => of([] as unknown[]))),
-    })
+    // Slike dolaze embedded sa destinacijama, ne trebamo GET /api/images endpoint
+    this.destinationService
+      .getAll()
       .pipe(
+        catchError(() => of([] as unknown[])),
         finalize(() => {
           this.isLoadingPlaces = false;
           this.flushUi();
         }),
       )
-      .subscribe(({ destinations, images }) => {
+      .subscribe((destinations) => {
         console.log('🚀 ~ HomeComponent ~ loadPlaceCards ~ destinations:', destinations);
         const destinationList = this.toArray<DestinationDto>(destinations);
-        const imageList = this.toArray<ImageDto>(images);
         const active = destinationList
           .map((d) => this.normalizeDestination(d))
           .filter((d) => d.id > 0 && d.isActive !== false);
-        const imageMap = this.pickMainImageMap(imageList, 'destinationId');
 
         const cards = active.map(
           (d): PlaceCard => ({
             title: d.name,
             location: d.destinationTypeName || 'Montenegro',
             ratingText: this.ratingText(d),
-            imageUrl: this.pickDestinationImage(d, imageMap),
+            imageUrl: this.pickDestinationImage(d, new Map()),
             isFavorite: this.favoriteMap.has(d.id),
             destinationId: d.id,
             favoriteId: this.favoriteMap.get(d.id),
@@ -133,20 +142,18 @@ export class HomeComponent implements OnInit {
   private loadEventCards(): void {
     this.isLoadingEvents = true;
 
-    forkJoin({
-      events: this.eventService.getAll().pipe(catchError(() => of([] as unknown[]))),
-      images: this.imageService.getAll().pipe(catchError(() => of([] as unknown[]))),
-    })
+    // Slike dolaze embedded sa eventima, ne trebamo GET /api/images endpoint
+    this.eventService
+      .getAll()
       .pipe(
+        catchError(() => of([] as unknown[])),
         finalize(() => {
           this.isLoadingEvents = false;
           this.flushUi();
         }),
       )
-      .subscribe(({ events, images }) => {
+      .subscribe((events) => {
         const eventList = this.toArray<EventDto>(events);
-        const imageList = this.toArray<ImageDto>(images);
-        const eventImageMap = this.pickMainImageMap(imageList, 'eventId');
 
         const future = eventList
           .map((e) => this.normalizeEvent(e))
@@ -162,7 +169,7 @@ export class HomeComponent implements OnInit {
             priceText: this.eventPrice(e.price),
             isFree: !e.price || e.price <= 0,
             timeText: this.eventTime(e.startDate, e.endDate),
-            imageUrl: eventImageMap.get(e.id),
+            imageUrl: this.pickEventImage(e),
           }),
         );
 
@@ -171,6 +178,11 @@ export class HomeComponent implements OnInit {
   }
 
   private loadFavorites(): void {
+    // Samo učitaj favorites ako je korisnik ulogovan
+    if (!this.isLoggedIn) {
+      return;
+    }
+
     this.favoriteService
       .getMyFavorites()
       .pipe(catchError(() => of([] as FavoriteDto[])))
