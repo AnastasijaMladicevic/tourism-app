@@ -434,6 +434,10 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['/events']);
   }
 
+  openHotels(): void {
+    this.router.navigate(['/hotels']);
+  }
+
   private flushUi(): void {
     this.ngZone.run(() => {
       this.cdr.detectChanges();

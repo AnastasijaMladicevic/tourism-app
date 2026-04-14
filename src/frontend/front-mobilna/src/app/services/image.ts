@@ -10,6 +10,7 @@ export interface ImageDto {
   isMain: boolean;
   destinationId?: number | null;
   eventId?: number | null;
+  objectId?: number | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -35,6 +36,15 @@ export class ImageService {
 
   getMainForDestination(destinationId: number): Observable<ImageDto> {
     return this.http.get<ImageDto>(`${environment.apiUrl}/destinations/${destinationId}/images/main`);
+  }
+
+  // === OBJECT IMAGES ===
+  getForObject(objectId: number): Observable<ImageDto[]> {
+    return this.http.get<ImageDto[]>(`${environment.apiUrl}/objects/${objectId}/images`);
+  }
+
+  getMainForObject(objectId: number): Observable<ImageDto> {
+    return this.http.get<ImageDto>(`${environment.apiUrl}/objects/${objectId}/images/main`);
   }
 
   getAll(): Observable<ImageDto[]> {
