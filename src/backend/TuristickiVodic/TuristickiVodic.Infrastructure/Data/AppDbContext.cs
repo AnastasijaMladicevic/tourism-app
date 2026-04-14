@@ -113,13 +113,13 @@ public class AppDbContext : DbContext
             .HasOne(o => o.Locality)
             .WithMany(l => l.Objects)
             .HasForeignKey(o => o.LocalityId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.SetNull);
 
         mb.Entity<TouristObject>()
             .HasOne(o => o.Destination)
             .WithMany(d => d.Objects)
             .HasForeignKey(o => o.DestinationId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.Restrict);
 
         mb.Entity<TouristObject>()
             .HasOne(o => o.ObjectType)

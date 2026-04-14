@@ -25,5 +25,8 @@ namespace TuristickiVodic.Core.DTO
         public double? Latitude { get; set; }
 
         public int? ObjectTypeId { get; set; }
+
+        public int? DestinationId { get; set; }
+        public int? LocalityId { get; set; }
     }
 }

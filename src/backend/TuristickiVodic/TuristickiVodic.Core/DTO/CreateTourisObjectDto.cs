@@ -2,7 +2,7 @@
 
 namespace TuristickiVodic.Core.DTO
 {
-    public class CreateTouristObjectDto
+    public class CreateTouristObjectDto : IValidatableObject
     {
         [Required]
         [MaxLength(200)]
@@ -29,6 +29,18 @@ namespace TuristickiVodic.Core.DTO
         public int ObjectTypeId { get; set; }
 
         [Required]
-        public int LocalityId { get; set; }
+        public int DestinationId { get; set; }
+
+        public int? LocalityId { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if ((Longitude.HasValue && !Latitude.HasValue) || (!Longitude.HasValue && Latitude.HasValue))
+            {
+                yield return new ValidationResult(
+                    "Both Longitude and Latitude must be provided together.",
+                    new[] { nameof(Longitude), nameof(Latitude) });
+            }
+        }
     }
 }

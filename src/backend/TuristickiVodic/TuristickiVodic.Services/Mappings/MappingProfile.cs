@@ -158,13 +158,15 @@ namespace TuristickiVodic.Services.Mappings
                     opt => opt.MapFrom(src => src.ObjectType != null ? src.ObjectType.Name : string.Empty))
                 .ForMember(dest => dest.LocalityName,
                     opt => opt.MapFrom(src => src.Locality != null ? src.Locality.Name : string.Empty))
+                .ForMember(dest => dest.DestinationId,
+                    opt => opt.MapFrom(src => src.DestinationId))
                 .ForMember(dest => dest.DestinationName,
                     opt => opt.MapFrom(src =>
                         src.Destination != null
                             ? src.Destination.Name
                             : src.Locality != null && src.Locality.Destination != null
                                 ? src.Locality.Destination.Name
-                                : null))
+                                : string.Empty))
                 .ForMember(dest => dest.Longitude,
                     opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
                 .ForMember(dest => dest.Latitude,

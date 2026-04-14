@@ -23,6 +23,7 @@ namespace TuristickiVodic.Services.Services
         {
             var objects = await _context.Objects
                 .Include(o => o.ObjectType)
+                .Include(o => o.Destination)
                 .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
                 .Where(o =>
@@ -52,15 +53,27 @@ namespace TuristickiVodic.Services.Services
         }
 
         // Samo CC može da kreira objekte; status uvek Pending, čeka odobrenje
-        // Objekat mora imati lokalitet; DestinationId se automatski preuzima iz lokaliteta
+        // Objekat mora imati destinaciju; lokalitet je opcioni, ali ako postoji mora pripadati toj destinaciji
         public async Task<TouristObjectDto> CreateAsync(CreateTouristObjectDto dto, int userId, string roleName)
         {
-            var locality = await _context.Localities
-                .Include(l => l.Destination)
-                .FirstOrDefaultAsync(l => l.Id == dto.LocalityId);
+            var destination = await _context.Destinations
+                .FirstOrDefaultAsync(d => d.Id == dto.DestinationId);
 
-            if (locality == null)
-                throw new InvalidOperationException("Locality not found.");
+            if (destination == null)
+                throw new InvalidOperationException("Destination not found.");
+
+            Locality? locality = null;
+            if (dto.LocalityId.HasValue)
+            {
+                locality = await _context.Localities
+                    .FirstOrDefaultAsync(l => l.Id == dto.LocalityId.Value);
+
+                if (locality == null)
+                    throw new InvalidOperationException("Locality not found.");
+
+                if (locality.DestinationId != dto.DestinationId)
+                    throw new InvalidOperationException("Selected locality does not belong to the selected destination.");
+            }
 
             if (!await _context.ObjectTypes.AnyAsync(x => x.Id == dto.ObjectTypeId))
                 throw new InvalidOperationException("Object type not found.");
@@ -75,11 +88,9 @@ namespace TuristickiVodic.Services.Services
                 WorkingHours = dto.WorkingHours,
                 Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
                 ObjectTypeId = dto.ObjectTypeId,
+                DestinationId = dto.DestinationId,
                 LocalityId = dto.LocalityId,
-                // DestinationId se automatski preuzima iz lokacije
-                DestinationId = locality.DestinationId,
                 CreatedByUserId = userId,
-                // CC uvek čeka odobrenje
                 Status = ContentStatus.Pending,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -110,6 +121,34 @@ namespace TuristickiVodic.Services.Services
                 obj.ObjectTypeId = dto.ObjectTypeId.Value;
             }
 
+            var newDestinationId = dto.DestinationId ?? obj.DestinationId;
+            var newLocalityId = dto.LocalityId.HasValue ? dto.LocalityId : obj.LocalityId;
+
+            if (dto.DestinationId.HasValue)
+            {
+                if (!await _context.Destinations.AnyAsync(d => d.Id == dto.DestinationId.Value))
+                    throw new InvalidOperationException("Destination not found.");
+                obj.DestinationId = dto.DestinationId.Value;
+            }
+
+            if (dto.LocalityId.HasValue)
+            {
+                var locality = await _context.Localities.FirstOrDefaultAsync(l => l.Id == dto.LocalityId.Value);
+                if (locality == null)
+                    throw new InvalidOperationException("Locality not found.");
+
+                if (locality.DestinationId != newDestinationId)
+                    throw new InvalidOperationException("Selected locality does not belong to the selected destination.");
+
+                obj.LocalityId = dto.LocalityId.Value;
+            }
+            else if (dto.DestinationId.HasValue && obj.LocalityId.HasValue)
+            {
+                var currentLocality = await _context.Localities.FirstOrDefaultAsync(l => l.Id == obj.LocalityId.Value);
+                if (currentLocality != null && currentLocality.DestinationId != obj.DestinationId)
+                    obj.LocalityId = null;
+            }
+
             if (!string.IsNullOrWhiteSpace(dto.Name)) obj.Name = dto.Name;
             if (dto.Description != null) obj.Description = dto.Description;
             if (dto.Address != null) obj.Address = dto.Address;
@@ -118,7 +157,7 @@ namespace TuristickiVodic.Services.Services
             if (dto.WorkingHours != null) obj.WorkingHours = dto.WorkingHours;
             if (dto.Longitude.HasValue && dto.Latitude.HasValue)
                 obj.Geolocation = CreatePoint(dto.Longitude, dto.Latitude);
-            
+
             obj.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -142,7 +181,7 @@ namespace TuristickiVodic.Services.Services
             if (obj.Status != ContentStatus.Pending)
                 throw new InvalidOperationException("Only pending objects can be approved or rejected.");
 
-            var destination = obj.Locality?.Destination;
+            var destination = obj.Destination ?? obj.Locality?.Destination;
 
             // Proverava ko je odgovoran menadžer za ovu destinaciju.
             // Ako destinacija ima svog menadžera – samo on može da odobri.
@@ -206,6 +245,7 @@ namespace TuristickiVodic.Services.Services
         {
             return await _context.Objects
                 .Include(o => o.ObjectType)
+                .Include(o => o.Destination)
                 .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
                 .FirstOrDefaultAsync(o => o.Id == id);
@@ -228,9 +268,9 @@ namespace TuristickiVodic.Services.Services
             ObjectTypeId = o.ObjectTypeId,
             ObjectTypeName = o.ObjectType?.Name ?? string.Empty,
             LocalityId = o.LocalityId,
-            LocalityName = o.Locality?.Name ?? string.Empty,
-            DestinationId = o.Locality?.DestinationId ?? o.DestinationId,
-            DestinationName = o.Locality?.Destination?.Name ?? string.Empty,
+            LocalityName = o.Locality?.Name,
+            DestinationId = o.DestinationId,
+            DestinationName = o.Destination?.Name ?? o.Locality?.Destination?.Name ?? string.Empty,
             CreatedByUserId = o.CreatedByUserId,
             ApprovedByUserId = o.ApprovedByUserId,
             ApprovedAt = o.ApprovedAt,
@@ -248,6 +288,7 @@ namespace TuristickiVodic.Services.Services
         public async Task<TouristObjectDto?> ToggleActiveAsync(int id, bool isActive, int userId, string roleName)
         {
             var obj = await _context.Objects
+                .Include(o => o.Destination)
                 .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
                 .FirstOrDefaultAsync(o => o.Id == id);
@@ -261,7 +302,7 @@ namespace TuristickiVodic.Services.Services
             if (obj.Status != ContentStatus.Approved)
                 throw new InvalidOperationException("Only approved objects can have visibility changed.");
 
-            var destination = obj.Locality?.Destination;
+            var destination = obj.Destination ?? obj.Locality?.Destination;
             if (destination == null)
                 throw new InvalidOperationException("Cannot determine destination for this object.");
 
@@ -312,8 +353,8 @@ namespace TuristickiVodic.Services.Services
                 var destination = query.Destination.Trim().ToLower();
 
                 objectsQuery = objectsQuery.Where(o =>
-                    o.Destination != null &&
-                    o.Destination.Name.ToLower().Contains(destination));
+                    ((o.Destination != null && o.Destination.Name.ToLower().Contains(destination)) ||
+                     (o.Destination == null && o.Locality != null && o.Locality.Destination != null && o.Locality.Destination.Name.ToLower().Contains(destination))));
             }
 
             if (!string.IsNullOrWhiteSpace(query.Locality))
@@ -387,15 +428,15 @@ namespace TuristickiVodic.Services.Services
             if (sortByValue == "destination")
             {
                 return isDesc
-                    ? query.OrderByDescending(o => o.Destination!.Name)
-                    : query.OrderBy(o => o.Destination!.Name);
+                    ? query.OrderByDescending(o => o.Destination != null ? o.Destination.Name : string.Empty)
+                    : query.OrderBy(o => o.Destination != null ? o.Destination.Name : string.Empty);
             }
 
             if (sortByValue == "locality")
             {
                 return isDesc
-                    ? query.OrderByDescending(o => o.Locality!.Name)
-                    : query.OrderBy(o => o.Locality!.Name);
+                    ? query.OrderByDescending(o => o.Locality != null ? o.Locality.Name : string.Empty)
+                    : query.OrderBy(o => o.Locality != null ? o.Locality.Name : string.Empty);
             }
 
             if (sortByValue == "rating")

@@ -19,10 +19,10 @@ namespace TuristickiVodic.Core.DTO
         public string Status { get; set; } = string.Empty;
         public int ObjectTypeId { get; set; }
         public string ObjectTypeName { get; set; } = string.Empty;
-        public int LocalityId { get; set; }
-        public string LocalityName { get; set; } = string.Empty;
-        public int? DestinationId { get; set; }
-        public string? DestinationName { get; set; }
+        public int? LocalityId { get; set; }
+        public string? LocalityName { get; set; }
+        public int DestinationId { get; set; }
+        public string DestinationName { get; set; } = string.Empty;
         public int CreatedByUserId { get; set; }
         public int? ApprovedByUserId { get; set; }
         public DateTime? ApprovedAt { get; set; }
