@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { BottomNavComponent } from '../bottom-nav/bottom-nav.component';
@@ -56,6 +57,7 @@ export class HotelsComponent implements OnInit {
     private imageService: ImageService,
     private cdr: ChangeDetectorRef,
     private location: Location,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
@@ -116,6 +118,10 @@ export class HotelsComponent implements OnInit {
 
   toggleSave(hotel: Hotel): void {
     hotel.saved = !hotel.saved;
+  }
+
+  viewDetails(hotelId: number): void {
+    this.router.navigate(['/hotel', hotelId]);
   }
 
   goBack(): void {
