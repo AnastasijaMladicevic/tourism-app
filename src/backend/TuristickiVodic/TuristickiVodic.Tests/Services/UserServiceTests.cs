@@ -1,14 +1,17 @@
 using AutoMapper;
 using FluentAssertions;
+using FluentAssertions.Common;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using System.IO;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
 using TuristickiVodic.Services;
+using TuristickiVodic.Tests.Helpers;
 using Xunit;
-using System.IO;
 
 namespace TuristickiVodic.Tests.Services
 {
@@ -1248,6 +1251,52 @@ namespace TuristickiVodic.Tests.Services
             user.IsActive.Should().BeTrue();
             user.IsBlacklisted.Should().BeFalse();
             user.IsVerified.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task RemoveProfileImageAsync_KadaKorisnikImaCustomSliku_PostavljaDefault()
+        {
+            using var ctx = CreateInMemoryContext(nameof(RemoveProfileImageAsync_KadaKorisnikImaCustomSliku_PostavljaDefault));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 201,
+                FirstName = "Profile",
+                LastName = "User",
+                Email = "profile@test.com",
+                PasswordHash = "hash",
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                DateOfBirth = new DateTime(1995, 1, 1),
+                ProfileImageUrl = "/images/profiles/custom.png"
+            });
+            await ctx.SaveChangesAsync();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            var result = await svc.RemoveProfileImageAsync(201);
+
+            result.Should().NotBeNull();
+            result!.ProfileImageUrl.Should().Be("/images/profiles/default_icon.png");
+
+            var updated = await ctx.Users.FindAsync(201);
+            updated.Should().NotBeNull();
+            updated!.ProfileImageUrl.Should().Be("/images/profiles/default_icon.png");
+        }
+
+        [Fact]
+        public async Task RemoveProfileImageAsync_KadaKorisnikNePostoji_VracaNull()
+        {
+            using var ctx = CreateInMemoryContext(nameof(RemoveProfileImageAsync_KadaKorisnikNePostoji_VracaNull));
+            SeedRoles(ctx);
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            var result = await svc.RemoveProfileImageAsync(999);
+
+            result.Should().BeNull();
         }
     }
 }

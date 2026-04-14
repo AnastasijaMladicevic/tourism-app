@@ -852,5 +852,55 @@ namespace TuristickiVodic.Tests.Controllers
 
             result.Should().BeOfType<NotFoundResult>();
         }
+
+        [Fact]
+        public async Task RemoveProfileImage_KadaKorisnikBriseSvojuSliku_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            var dto = new UserDto
+            {
+                Id = 5,
+                Email = "user@test.com",
+                ProfileImageUrl = "/images/profiles/default_icon.png"
+            };
+
+            mockService
+                .Setup(s => s.RemoveProfileImageAsync(5))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
+
+            var result = await controller.RemoveProfileImage(5);
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
+        public async Task RemoveProfileImage_KadaKorisnikBriseTudjuSliku_VracaForbid()
+        {
+            var mockService = new Mock<IUserService>();
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(3, "Tourist"));
+
+            var result = await controller.RemoveProfileImage(5);
+
+            result.Should().BeOfType<ForbidResult>();
+        }
+
+        [Fact]
+        public async Task RemoveProfileImage_KadaKorisnikNePostoji_VracaNotFound()
+        {
+            var mockService = new Mock<IUserService>();
+
+            mockService
+                .Setup(s => s.RemoveProfileImageAsync(5))
+                .ReturnsAsync((UserDto?)null);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
+
+            var result = await controller.RemoveProfileImage(5);
+
+            result.Should().BeOfType<NotFoundResult>();
+        }
     }
 }
