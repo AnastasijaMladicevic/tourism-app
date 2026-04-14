@@ -66,7 +66,7 @@ export class Login {
       next: (response) => {
         const role = this.authService.getNormalizedRole(response.user);
 
-        if (role === 'tourist' || role === 'content-creator') {
+        if (role === 'tourist') {
           this.authService.logout();
           this.errorMessage = `${role} portal is coming soon. Please check back later.`;
           return;

@@ -133,10 +133,10 @@ export class AuthService {
     switch (role) {
       case 'admin':
         return '/admin/dashboard';
+      case 'content-creator':
+        return '/content-creator/dashboard';
       case 'manager':
         return '/manager/dashboard';
-      case 'content-creator':
-        return '/login';
       case 'tourist':
         return '/login';
       default:
