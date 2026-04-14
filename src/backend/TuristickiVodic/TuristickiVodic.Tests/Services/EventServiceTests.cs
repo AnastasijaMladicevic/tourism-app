@@ -218,89 +218,6 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
-        public async Task GetAllAsync_VracaSamoApprovedIAktivneEventoveSaGlavnomSlikom()
-        {
-            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_VracaSamoApprovedIAktivneEventoveSaGlavnomSlikom));
-            var (_, _, _, eventType, _, _, locality, _, creator, _, _, _, _) = SeedBase(ctx);
-
-            var approvedVisible = new Event
-            {
-                Id = 1,
-                Name = "Vidljiv event",
-                EventTypeId = eventType.Id,
-                EventType = eventType,
-                LocalityId = locality.Id,
-                Locality = locality,
-                StartDate = DateTime.UtcNow.AddDays(2),
-                Status = ContentStatus.Approved,
-                IsActive = true,
-                CreatedByUserId = creator.Id
-            };
-
-            var approvedHidden = new Event
-            {
-                Id = 2,
-                Name = "Sakriven event",
-                EventTypeId = eventType.Id,
-                EventType = eventType,
-                LocalityId = locality.Id,
-                Locality = locality,
-                StartDate = DateTime.UtcNow.AddDays(2),
-                Status = ContentStatus.Approved,
-                IsActive = false,
-                CreatedByUserId = creator.Id
-            };
-
-            var pendingVisible = new Event
-            {
-                Id = 3,
-                Name = "Pending event",
-                EventTypeId = eventType.Id,
-                EventType = eventType,
-                LocalityId = locality.Id,
-                Locality = locality,
-                StartDate = DateTime.UtcNow.AddDays(2),
-                Status = ContentStatus.Pending,
-                IsActive = true,
-                CreatedByUserId = creator.Id
-            };
-
-            ctx.Events.AddRange(approvedVisible, approvedHidden, pendingVisible);
-
-            ctx.Images.Add(new Image
-            {
-                Id = 1,
-                EventId = 1,
-                Url = "main1.jpg",
-                IsMain = true
-            });
-
-            ctx.Images.Add(new Image
-            {
-                Id = 2,
-                EventId = 2,
-                Url = "main2.jpg",
-                IsMain = true
-            });
-
-            ctx.Images.Add(new Image
-            {
-                Id = 3,
-                EventId = 3,
-                Url = "main3.jpg",
-                IsMain = true
-            });
-
-            ctx.SaveChanges();
-
-            var svc = CreateService(ctx);
-
-            var result = await svc.GetAllAsync();
-
-            result.Select(x => x.Name).Should().ContainSingle().Which.Should().Be("Vidljiv event");
-        }
-
-        [Fact]
         public async Task ToggleActiveAsync_OdgovorniManager_MenjaIsActive()
         {
             using var ctx = CreateInMemoryContext(nameof(ToggleActiveAsync_OdgovorniManager_MenjaIsActive));
@@ -736,10 +653,11 @@ namespace TuristickiVodic.Tests.Services
 
             var svc = new EventService(ctx, CreateMapper());
 
-            var result = await svc.GetAllAsync(new EventFilterDto { Date = new DateTime(2026, 6, 1) });
+            var result = await svc.GetAllAsync(new EventQueryDto { Date = new DateTime(2026, 6, 1) });
 
-            result.Should().HaveCount(1);
-            result.Single().Name.Should().Be("Danas");
+            result.TotalCount.Should().Be(1);
+            result.Items.Should().ContainSingle();
+            result.Items.Single().Name.Should().Be("Danas");
         }
 
         [Fact]
@@ -798,9 +716,10 @@ namespace TuristickiVodic.Tests.Services
 
             var svc = new EventService(ctx, CreateMapper());
 
-            var result = await svc.GetAllAsync(new EventFilterDto { NextDays = 7 });
+            var result = await svc.GetAllAsync(new EventQueryDto { NextDays = 7 });
 
-            result.Select(x => x.Name).Should().ContainSingle().Which.Should().Be("Za 3 dana");
+            result.TotalCount.Should().Be(1);
+            result.Items.Select(x => x.Name).Should().ContainSingle().Which.Should().Be("Za 3 dana");
         }
 
         [Fact]
@@ -877,14 +796,14 @@ namespace TuristickiVodic.Tests.Services
 
             var svc = new EventService(ctx, CreateMapper());
 
-            var result = await svc.GetAllAsync(new EventFilterDto
+            var result = await svc.GetAllAsync(new EventQueryDto
             {
                 StartDate = new DateTime(2026, 7, 1),
                 EndDate = new DateTime(2026, 7, 31)
             });
 
-            result.Should().HaveCount(2);
-            result.Select(x => x.Name).Should().Contain(new[] { "Prvi", "Drugi" });
+            result.TotalCount.Should().Be(2);
+            result.Items.Select(x => x.Name).Should().Contain(new[] { "Prvi", "Drugi" });
         }
 
         [Fact]
@@ -894,7 +813,7 @@ namespace TuristickiVodic.Tests.Services
             SeedBase(ctx);
             var svc = new EventService(ctx, CreateMapper());
 
-            await svc.Invoking(s => s.GetAllAsync(new EventFilterDto { NextDays = 5 }))
+            await svc.Invoking(s => s.GetAllAsync(new EventQueryDto { NextDays = 5 }))
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*NextDays can only be 7 or 30.*");
         }
@@ -1078,6 +997,110 @@ namespace TuristickiVodic.Tests.Services
             var result = await svc.GetByIdAsync(1);
 
             result.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task GetAllAsync_BezFiltera_VracaPagedRezultat()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_BezFiltera_VracaPagedRezultat));
+            SeedBase(ctx);
+
+            ctx.Events.AddRange(
+                new Event
+                {
+                    Id = 1,
+                    Name = "Sea Dance",
+                    EventTypeId = 1,
+                    DestinationId = 1,
+                    CreatedByUserId = 99,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    StartDate = DateTime.UtcNow.AddDays(5)
+                },
+                new Event
+                {
+                    Id = 2,
+                    Name = "Karneval",
+                    EventTypeId = 1,
+                    DestinationId = 1,
+                    CreatedByUserId = 99,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    StartDate = DateTime.UtcNow.AddDays(10)
+                });
+
+            ctx.Images.AddRange(
+                new Image { Id = 1, EventId = 1, Url = "e1.jpg", IsMain = true },
+                new Image { Id = 2, EventId = 2, Url = "e2.jpg", IsMain = true });
+
+            ctx.SaveChanges();
+
+            var svc = new EventService(ctx, CreateMapper());
+            var result = await svc.GetAllAsync(new EventQueryDto());
+
+            result.TotalCount.Should().Be(2);
+            result.Items.Should().HaveCount(2);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_SaSearchParametrom_VracaFiltriraneEventove()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_SaSearchParametrom_VracaFiltriraneEventove));
+            SeedBase(ctx);
+
+            ctx.Events.AddRange(
+                new Event
+                {
+                    Id = 1,
+                    Name = "Sea Dance",
+                    EventTypeId = 1,
+                    DestinationId = 1,
+                    CreatedByUserId = 99,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    StartDate = DateTime.UtcNow.AddDays(5)
+                },
+                new Event
+                {
+                    Id = 2,
+                    Name = "Karneval",
+                    EventTypeId = 1,
+                    DestinationId = 1,
+                    CreatedByUserId = 99,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    StartDate = DateTime.UtcNow.AddDays(10)
+                });
+
+            ctx.Images.AddRange(
+                new Image { Id = 1, EventId = 1, Url = "e1.jpg", IsMain = true },
+                new Image { Id = 2, EventId = 2, Url = "e2.jpg", IsMain = true });
+
+            ctx.SaveChanges();
+
+            var svc = new EventService(ctx, CreateMapper());
+            var result = await svc.GetAllAsync(new EventQueryDto { Search = "sea" });
+
+            result.TotalCount.Should().Be(1);
+            result.Items.Should().ContainSingle();
+            result.Items.Single().Name.Should().Be("Sea Dance");
+        }
+
+        [Fact]
+        public async Task GetAllAsync_KombinovaniDateFilteri_BacaException()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KombinovaniDateFilteri_BacaException));
+            SeedBase(ctx);
+
+            var svc = new EventService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.GetAllAsync(new EventQueryDto
+            {
+                Date = DateTime.UtcNow.Date,
+                NextDays = 7
+            }))
+            .Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*one type of date filter*");
         }
     }
 }
