@@ -34,13 +34,13 @@ namespace TuristickiVodic.API.Controllers
             return Ok(activity);
         }
 
-        [HttpGet("search")]
+        /*[HttpGet("search")]
         [AllowAnonymous]
         public async Task<IActionResult> Search([FromQuery] ActivityQueryDto query)
         {
             var result = await _activityService.GetAllAsync(query);
             return Ok(result);
-        }
+        }*/
 
         [HttpPost]
         [Authorize(Roles = "ContentCreator")]

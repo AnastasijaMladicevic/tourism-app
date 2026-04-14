@@ -19,21 +19,100 @@ namespace TuristickiVodic.Services.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<TouristObjectDto>> GetAllAsync()
+        public async Task<PagedResultDto<TouristObjectDto>> GetAllAsync(TouristObjectQueryDto query)
         {
-            var objects = await _context.Objects
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var objectsQuery = _context.Objects
                 .Include(o => o.ObjectType)
                 .Include(o => o.Destination)
                 .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
-                .Where(o =>
-                    o.Status == ContentStatus.Approved &&
-                    o.IsActive &&
-                    _context.Images.Any(i => i.ObjectId == o.Id && i.IsMain))
-                .OrderBy(o => o.Id)
+                .Include(o => o.Images)
+                .Where(o => o.Status == ContentStatus.Approved)
+                .Where(o => o.IsActive)
+                .Where(o => o.Images.Any(i => i.IsMain))
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+
+                objectsQuery = objectsQuery.Where(o =>
+                    o.ObjectType != null &&
+                    o.ObjectType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+
+                objectsQuery = objectsQuery.Where(o =>
+                    ((o.Destination != null && o.Destination.Name.ToLower().Contains(destination)) ||
+                     (o.Destination == null && o.Locality != null && o.Locality.Destination != null && o.Locality.Destination.Name.ToLower().Contains(destination))));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Locality))
+            {
+                var locality = query.Locality.Trim().ToLower();
+
+                objectsQuery = objectsQuery.Where(o =>
+                    o.Locality != null &&
+                    o.Locality.Name.ToLower().Contains(locality));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination) && !string.IsNullOrWhiteSpace(query.Locality))
+            {
+                var destination = query.Destination.Trim().ToLower();
+                var locality = query.Locality.Trim().ToLower();
+
+                var localityEntity = await _context.Localities
+                    .Include(l => l.Destination)
+                    .FirstOrDefaultAsync(l => l.Name.ToLower().Contains(locality));
+
+                if (localityEntity != null &&
+                    localityEntity.Destination != null &&
+                    !localityEntity.Destination.Name.ToLower().Contains(destination))
+                {
+                    throw new InvalidOperationException("The selected locality does not belong to the selected destination.");
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+
+                objectsQuery = objectsQuery.Where(o =>
+                    o.Name.ToLower().Contains(search) ||
+                    (o.Description != null && o.Description.ToLower().Contains(search)));
+            }
+
+            objectsQuery = ApplyObjectSorting(objectsQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await objectsQuery.CountAsync();
+
+            var items = await objectsQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
                 .ToListAsync();
 
-            return objects.Select(MapToDto);
+            var mappedItems = items.Select(MapToDto).ToList();
+
+            return new PagedResultDto<TouristObjectDto>
+            {
+                Items = mappedItems,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
         }
 
         public async Task<TouristObjectDto?> GetByIdAsync(int id)
@@ -320,97 +399,7 @@ namespace TuristickiVodic.Services.Services
 
         public async Task<PagedResultDto<TouristObjectDto>> SearchAsync(TouristObjectQueryDto query)
         {
-            if (query.Page < 1)
-                query.Page = 1;
-
-            if (query.PageSize < 1)
-                query.PageSize = 10;
-
-            if (query.PageSize > 100)
-                query.PageSize = 100;
-
-            var objectsQuery = _context.Objects
-                .Include(o => o.ObjectType)
-                .Include(o => o.Destination)
-                .Include(o => o.Locality)
-                .Include(o => o.Images)
-                .Where(o => o.Status == ContentStatus.Approved)
-                .Where(o => o.IsActive)
-                .Where(o => o.Images.Any(i => i.IsMain))
-                .AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(query.Type))
-            {
-                var type = query.Type.Trim().ToLower();
-
-                objectsQuery = objectsQuery.Where(o =>
-                    o.ObjectType != null &&
-                    o.ObjectType.Name.ToLower().Contains(type));
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.Destination))
-            {
-                var destination = query.Destination.Trim().ToLower();
-
-                objectsQuery = objectsQuery.Where(o =>
-                    ((o.Destination != null && o.Destination.Name.ToLower().Contains(destination)) ||
-                     (o.Destination == null && o.Locality != null && o.Locality.Destination != null && o.Locality.Destination.Name.ToLower().Contains(destination))));
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.Locality))
-            {
-                var locality = query.Locality.Trim().ToLower();
-
-                objectsQuery = objectsQuery.Where(o =>
-                    o.Locality != null &&
-                    o.Locality.Name.ToLower().Contains(locality));
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.Destination) && !string.IsNullOrWhiteSpace(query.Locality))
-            {
-                var destination = query.Destination.Trim().ToLower();
-                var locality = query.Locality.Trim().ToLower();
-
-                var localityEntity = await _context.Localities
-                    .Include(l => l.Destination)
-                    .FirstOrDefaultAsync(l => l.Name.ToLower().Contains(locality));
-
-                if (localityEntity != null &&
-                    localityEntity.Destination != null &&
-                    !localityEntity.Destination.Name.ToLower().Contains(destination))
-                {
-                    throw new InvalidOperationException("The selected locality does not belong to the selected destination.");
-                }
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
-
-                objectsQuery = objectsQuery.Where(o =>
-                    o.Name.ToLower().Contains(search) ||
-                    (o.Description != null && o.Description.ToLower().Contains(search)));
-            }
-
-            objectsQuery = ApplyObjectSorting(objectsQuery, query.SortBy, query.SortOrder);
-
-            var totalCount = await objectsQuery.CountAsync();
-
-            var items = await objectsQuery
-                .Skip((query.Page - 1) * query.PageSize)
-                .Take(query.PageSize)
-                .ToListAsync();
-
-            var mappedItems = _mapper.Map<List<TouristObjectDto>>(items);
-
-            return new PagedResultDto<TouristObjectDto>
-            {
-                Items = mappedItems,
-                Page = query.Page,
-                PageSize = query.PageSize,
-                TotalCount = totalCount,
-                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
-            };
+            return await GetAllAsync(query);
         }
 
         private static IQueryable<TouristObject> ApplyObjectSorting(IQueryable<TouristObject> query, string? sortBy, string? sortOrder)

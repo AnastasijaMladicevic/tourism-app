@@ -19,10 +19,17 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] TouristObjectQueryDto query)
         {
-            var objects = await _objectService.GetAllAsync();
-            return Ok(objects);
+            try
+            {
+                var result = await _objectService.GetAllAsync(query);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpGet("{id}")]
@@ -34,7 +41,7 @@ namespace TuristickiVodic.API.Controllers
             return Ok(obj);
         }
 
-        [HttpGet("search")]
+        /*[HttpGet("search")]
         [AllowAnonymous]
         public async Task<IActionResult> Search([FromQuery] TouristObjectQueryDto query)
         {
@@ -47,7 +54,7 @@ namespace TuristickiVodic.API.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
-        }
+        }*/
 
         [HttpPost]
         [Authorize(Roles = "ContentCreator")]

@@ -24,6 +24,61 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
+        public async Task GetAll_VracaPagedRezultat()
+        {
+            var mockService = new Mock<ITouristObjectService>();
+            var dto = new PagedResultDto<TouristObjectDto>
+            {
+                Items = new List<TouristObjectDto>
+                {
+                    new TouristObjectDto { Id = 1, Name = "Pomorski muzej", DestinationId = 1 },
+                    new TouristObjectDto { Id = 2, Name = "Sat kula", DestinationId = 1 }
+                },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 2,
+                TotalPages = 1
+            };
+
+            mockService
+                .Setup(s => s.GetAllAsync(It.IsAny<TouristObjectQueryDto>()))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+            var result = await controller.GetAll(new TouristObjectQueryDto());
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
+        public async Task GetAll_SaSearchParametrom_VracaPagedRezultat()
+        {
+            var mockService = new Mock<ITouristObjectService>();
+            var dto = new PagedResultDto<TouristObjectDto>
+            {
+                Items = new List<TouristObjectDto>
+        {
+            new TouristObjectDto { Id = 1, Name = "Pomorski muzej", DestinationId = 1 }
+        },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 1,
+                TotalPages = 1
+            };
+
+            mockService
+                .Setup(s => s.GetAllAsync(It.IsAny<TouristObjectQueryDto>()))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+            var result = await controller.GetAll(new TouristObjectQueryDto { Search = "muzej" });
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
         public async Task Create_ContentCreator_VracaCreated()
         {
             var mockService = new Mock<ITouristObjectService>();
