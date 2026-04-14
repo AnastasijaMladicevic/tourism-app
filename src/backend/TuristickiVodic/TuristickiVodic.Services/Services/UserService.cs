@@ -478,14 +478,62 @@ namespace TuristickiVodic.Services
             return Convert.ToBase64String(bytes);
         }
 
-        public async Task<IEnumerable<CreatorRoleRequestDto>> GetCreatorRequestsAsync()
+        public async Task<PagedResultDto<CreatorRoleRequestDto>> GetCreatorRequestsAsync(CreatorRoleRequestQueryDto query)
         {
-            var users = await _context.Users
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var usersQuery = _context.Users
                 .Include(u => u.Role)
+                .Where(u => u.Role != null)
                 .Where(u => u.Role.Name == RoleType.Tourist && u.HasRequestedCreatorRole)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+
+                usersQuery = usersQuery.Where(u =>
+                    u.FirstName.ToLower().Contains(search) ||
+                    u.LastName.ToLower().Contains(search) ||
+                    u.Email.ToLower().Contains(search));
+            }
+
+            if (query.IsActive.HasValue)
+            {
+                usersQuery = usersQuery.Where(u => u.IsActive == query.IsActive.Value);
+            }
+
+            if (query.IsVerified.HasValue)
+            {
+                usersQuery = usersQuery.Where(u => u.IsVerified == query.IsVerified.Value);
+            }
+
+            usersQuery = ApplyCreatorRequestSorting(usersQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await usersQuery.CountAsync();
+
+            var users = await usersQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
                 .ToListAsync();
 
-            return _mapper.Map<IEnumerable<CreatorRoleRequestDto>>(users);
+            var mappedItems = _mapper.Map<List<CreatorRoleRequestDto>>(users);
+
+            return new PagedResultDto<CreatorRoleRequestDto>
+            {
+                Items = mappedItems,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
         }
 
         private static IQueryable<User> ApplyUserSorting(IQueryable<User> query, string? sortBy, string? sortOrder)
@@ -545,6 +593,51 @@ namespace TuristickiVodic.Services
             return isDesc
                 ? query.OrderByDescending(u => u.Id)
                 : query.OrderBy(u => u.Id);
+        }
+
+        private static IQueryable<User> ApplyCreatorRequestSorting(IQueryable<User> query, string? sortBy, string? sortOrder)
+        {
+            var sortByValue = sortBy?.Trim().ToLower();
+            var isDesc = sortOrder?.Trim().ToLower() == "desc";
+
+            if (sortByValue == "firstname")
+            {
+                return isDesc
+                    ? query.OrderByDescending(u => u.FirstName)
+                    : query.OrderBy(u => u.FirstName);
+            }
+
+            if (sortByValue == "lastname")
+            {
+                return isDesc
+                    ? query.OrderByDescending(u => u.LastName)
+                    : query.OrderBy(u => u.LastName);
+            }
+
+            if (sortByValue == "email")
+            {
+                return isDesc
+                    ? query.OrderByDescending(u => u.Email)
+                    : query.OrderBy(u => u.Email);
+            }
+
+            if (sortByValue == "isactive")
+            {
+                return isDesc
+                    ? query.OrderByDescending(u => u.IsActive)
+                    : query.OrderBy(u => u.IsActive);
+            }
+
+            if (sortByValue == "isverified")
+            {
+                return isDesc
+                    ? query.OrderByDescending(u => u.IsVerified)
+                    : query.OrderBy(u => u.IsVerified);
+            }
+
+            return isDesc
+                ? query.OrderByDescending(u => u.CreatedAt)
+                : query.OrderBy(u => u.CreatedAt);
         }
 
         public async Task<UserDto?> RemoveProfileImageAsync(int id)

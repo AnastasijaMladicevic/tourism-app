@@ -20,9 +20,9 @@ namespace TuristickiVodic.API.Controllers
         // Svi mogu da vide rute
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] RouteQueryDto query)
         {
-            var routes = await _routeService.GetAllAsync();
+            var routes = await _routeService.GetAllAsync(query);
             return Ok(routes);
         }
 

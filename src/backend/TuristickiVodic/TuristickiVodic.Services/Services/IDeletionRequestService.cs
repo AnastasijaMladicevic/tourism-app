@@ -13,12 +13,13 @@ namespace TuristickiVodic.Services.Services
         // CC podnosi zahtev za brisanje svoje Approved aktivnosti
         Task<DeletionRequestDto> CreateForActivityAsync(int activityId, CreateDeletionRequestDto dto, int requestedByUserId);
 
-        // Menadžer vidi zahteve za svoju destinaciju, Admin vidi zahteve za destinacije bez menadžera
-        Task<IEnumerable<DeletionRequestDto>> GetAllAsync(int userId, string roleName);
+        // Menadzer vidi zahteve za svoju destinaciju
+        Task<PagedResultDto<DeletionRequestDto>> GetAllAsync(int userId, string roleName, DeletionRequestQueryDto query);
 
-        // Menadžer/Admin odobrava ili odbija; ako je odobren → objekat/event se briše
+        // Menadzer odobrava ili odbija; ako je odobren, sadrzaj se brise
         Task<DeletionRequestDto?> ReviewAsync(int requestId, ApproveDeletionRequestDto dto, int reviewedByUserId, string roleName);
-        Task<IEnumerable<DeletionRequestDto>> GetByUserIdAsync(int userId);
+
+        Task<PagedResultDto<DeletionRequestDto>> GetByUserIdAsync(int userId, DeletionRequestQueryDto query);
         Task<DeletionRequestDto?> GetByIdAsync(int id);
         Task<DeletionRequestDto?> GetByIdForUserAsync(int id, int userId);
     }

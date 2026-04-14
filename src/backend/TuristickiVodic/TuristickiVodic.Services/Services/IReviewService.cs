@@ -4,7 +4,7 @@ namespace TuristickiVodic.Services.Services
 {
     public interface IReviewService
     {
-        Task<IEnumerable<ReviewDto>> GetAllAsync();
+        Task<PagedResultDto<ReviewDto>> GetAllAsync(ReviewQueryDto query);
         Task<ReviewDto?> GetByIdAsync(int id);
         Task<ReviewDto> CreateAsync(CreateReviewDto dto, int userId, string roleName);
         Task<ReviewDto?> UpdateAsync(int id, UpdateReviewDto dto, int userId, string roleName);

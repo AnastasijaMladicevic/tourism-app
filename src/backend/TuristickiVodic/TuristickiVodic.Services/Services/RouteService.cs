@@ -15,15 +15,83 @@ namespace TuristickiVodic.Services.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<RouteDto>> GetAllAsync()
+        public async Task<PagedResultDto<RouteDto>> GetAllAsync(RouteQueryDto query)
         {
-            var routes = await _context.Routes
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var routesQuery = _context.Routes
                 .Include(r => r.RoutePoints)
                 .Include(r => r.CreatedBy)
-                .OrderBy(r => r.Id)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+
+                routesQuery = routesQuery.Where(r =>
+                    r.Name.ToLower().Contains(search) ||
+                    (r.Description != null && r.Description.ToLower().Contains(search)) ||
+                    r.RoutePoints.Any(p => p.PointName != null && p.PointName.ToLower().Contains(search)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Difficulty))
+            {
+                var difficulty = query.Difficulty.Trim().ToLower();
+
+                routesQuery = routesQuery.Where(r =>
+                    r.Difficulty != null &&
+                    r.Difficulty.ToLower().Contains(difficulty));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.CreatedBy))
+            {
+                var createdBy = query.CreatedBy.Trim().ToLower();
+
+                routesQuery = routesQuery.Where(r =>
+                    r.CreatedBy != null && (
+                        r.CreatedBy.FirstName.ToLower().Contains(createdBy) ||
+                        r.CreatedBy.LastName.ToLower().Contains(createdBy) ||
+                        (r.CreatedBy.FirstName + " " + r.CreatedBy.LastName).ToLower().Contains(createdBy)));
+            }
+
+            if (query.MinLengthKm.HasValue)
+            {
+                routesQuery = routesQuery.Where(r =>
+                    r.LengthKm.HasValue &&
+                    r.LengthKm.Value >= query.MinLengthKm.Value);
+            }
+
+            if (query.MaxLengthKm.HasValue)
+            {
+                routesQuery = routesQuery.Where(r =>
+                    r.LengthKm.HasValue &&
+                    r.LengthKm.Value <= query.MaxLengthKm.Value);
+            }
+
+            routesQuery = ApplyRouteSorting(routesQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await routesQuery.CountAsync();
+
+            var routes = await routesQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
                 .ToListAsync();
 
-            return routes.Select(MapToDto);
+            return new PagedResultDto<RouteDto>
+            {
+                Items = routes.Select(MapToDto).ToList(),
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
         }
 
         public async Task<RouteDto?> GetByIdAsync(int id)
@@ -158,6 +226,46 @@ namespace TuristickiVodic.Services.Services
                 .Include(r => r.RoutePoints)
                 .Include(r => r.CreatedBy)
                 .FirstOrDefaultAsync(r => r.Id == id);
+        }
+
+        private static IQueryable<Route> ApplyRouteSorting(IQueryable<Route> query, string? sortBy, string? sortOrder)
+        {
+            var sortByValue = sortBy?.Trim().ToLower();
+            var isDesc = sortOrder?.Trim().ToLower() == "desc";
+
+            if (sortByValue == "name")
+            {
+                return isDesc
+                    ? query.OrderByDescending(r => r.Name)
+                    : query.OrderBy(r => r.Name);
+            }
+
+            if (sortByValue == "difficulty")
+            {
+                return isDesc
+                    ? query.OrderByDescending(r => r.Difficulty)
+                    : query.OrderBy(r => r.Difficulty);
+            }
+
+            if (sortByValue == "length" || sortByValue == "lengthkm")
+            {
+                return isDesc
+                    ? query.OrderByDescending(r => r.LengthKm)
+                    : query.OrderBy(r => r.LengthKm);
+            }
+
+            if (sortByValue == "createdby")
+            {
+                return isDesc
+                    ? query.OrderByDescending(r => r.CreatedBy != null ? r.CreatedBy.FirstName : string.Empty)
+                        .ThenByDescending(r => r.CreatedBy != null ? r.CreatedBy.LastName : string.Empty)
+                    : query.OrderBy(r => r.CreatedBy != null ? r.CreatedBy.FirstName : string.Empty)
+                        .ThenBy(r => r.CreatedBy != null ? r.CreatedBy.LastName : string.Empty);
+            }
+
+            return isDesc
+                ? query.OrderByDescending(r => r.CreatedAt)
+                : query.OrderBy(r => r.CreatedAt);
         }
 
         private static RouteDto MapToDto(Route r) => new()

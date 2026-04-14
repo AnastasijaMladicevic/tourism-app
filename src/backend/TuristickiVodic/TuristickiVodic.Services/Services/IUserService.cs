@@ -20,7 +20,7 @@ namespace TuristickiVodic.Services
         Task<bool> ApproveCreatorRoleAsync(int userId);
         Task<bool> ToggleUserActiveAsync(int userId, bool isActive);
         Task<bool> LogoutAsync(int userId, string? jti, DateTime? accessTokenExpiryUtc);
-        Task<IEnumerable<CreatorRoleRequestDto>> GetCreatorRequestsAsync();
+        Task<PagedResultDto<CreatorRoleRequestDto>> GetCreatorRequestsAsync(CreatorRoleRequestQueryDto query);
         Task<UserDto?> UpdateProfileImageAsync(int id, IFormFile file);
         Task<UserDto?> RemoveProfileImageAsync(int id);
     }

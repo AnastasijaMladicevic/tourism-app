@@ -403,11 +403,11 @@ namespace TuristickiVodic.Tests.Services
 
             var service = new DeletionRequestService(ctx);
 
-            var result = (await service.GetByUserIdAsync(creator.Id)).ToList();
+            var result = await service.GetByUserIdAsync(creator.Id, new DeletionRequestQueryDto());
 
-            result.Should().HaveCount(1);
-            result[0].RequestedByUserId.Should().Be(creator.Id);
-            result[0].ObjectId.Should().Be(100);
+            result.Items.Should().HaveCount(1);
+            result.Items[0].RequestedByUserId.Should().Be(creator.Id);
+            result.Items[0].ObjectId.Should().Be(100);
         }
 
         [Fact]
@@ -479,11 +479,164 @@ namespace TuristickiVodic.Tests.Services
 
             var service = new DeletionRequestService(ctx);
 
-            var result = (await service.GetAllAsync(manager.Id, "Manager")).ToList();
+            var result = await service.GetAllAsync(manager.Id, "Manager", new DeletionRequestQueryDto());
 
-            result.Should().HaveCount(1);
-            result[0].ObjectId.Should().Be(1);
-            result[0].RequestedByUserId.Should().Be(creator.Id);
+            result.Items.Should().HaveCount(1);
+            result.Items[0].ObjectId.Should().Be(1);
+            result.Items[0].RequestedByUserId.Should().Be(creator.Id);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_KadaSeFiltriraPoStatusuTipuIDestinaciji_VracaTrazeniRezultat()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaSeFiltriraPoStatusuTipuIDestinaciji_VracaTrazeniRezultat));
+            var (_, _, _, _, manager, _, _, creator, otherCreator, _, destination, _, locality, _, objectType, eventType, _) = SeedBase(ctx);
+
+            ctx.Objects.Add(new TouristObject
+            {
+                Id = 1,
+                Name = "Objekat u Kotoru",
+                ObjectTypeId = objectType.Id,
+                ObjectType = objectType,
+                LocalityId = locality.Id,
+                Locality = locality,
+                DestinationId = destination.Id,
+                Destination = destination,
+                CreatedByUserId = creator.Id,
+                CreatedBy = creator,
+                Status = ContentStatus.Approved
+            });
+
+            ctx.Events.Add(new Event
+            {
+                Id = 2,
+                Name = "Event u Kotoru",
+                EventTypeId = eventType.Id,
+                EventType = eventType,
+                LocalityId = locality.Id,
+                Locality = locality,
+                DestinationId = destination.Id,
+                Destination = destination,
+                CreatedByUserId = otherCreator.Id,
+                CreatedBy = otherCreator,
+                Status = ContentStatus.Approved,
+                StartDate = DateTime.UtcNow.AddDays(3)
+            });
+            ctx.SaveChanges();
+
+            ctx.DeletionRequests.AddRange(
+                new DeletionRequest
+                {
+                    Id = 1,
+                    ObjectId = 1,
+                    RequestedByUserId = creator.Id,
+                    RequestedBy = creator,
+                    Reason = "Pogresan objekat",
+                    Status = ContentStatus.Pending,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-5),
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new DeletionRequest
+                {
+                    Id = 2,
+                    EventId = 2,
+                    RequestedByUserId = otherCreator.Id,
+                    RequestedBy = otherCreator,
+                    Reason = "Odbijeni event",
+                    Status = ContentStatus.Rejected,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-2),
+                    UpdatedAt = DateTime.UtcNow
+                });
+            ctx.SaveChanges();
+
+            var service = new DeletionRequestService(ctx);
+
+            var result = await service.GetAllAsync(manager.Id, "Manager", new DeletionRequestQueryDto
+            {
+                Status = "Pending",
+                ContentType = "object",
+                Destination = "kotor"
+            });
+
+            result.Items.Should().HaveCount(1);
+            result.Items[0].ObjectName.Should().Be("Objekat u Kotoru");
+            result.Items[0].DestinationName.Should().Be("Kotor");
+            result.Items[0].Status.Should().Be("Pending");
+        }
+
+        [Fact]
+        public async Task GetAllAsync_KadaSeKoristiPaginacijaISortPoRequestedBy_VracaTrazeniSegment()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaSeKoristiPaginacijaISortPoRequestedBy_VracaTrazeniSegment));
+            var (_, _, _, _, manager, _, _, creator, otherCreator, _, destination, _, locality, _, objectType, _, _) = SeedBase(ctx);
+
+            ctx.Objects.AddRange(
+                new TouristObject
+                {
+                    Id = 1,
+                    Name = "Objekat jedan",
+                    ObjectTypeId = objectType.Id,
+                    ObjectType = objectType,
+                    LocalityId = locality.Id,
+                    Locality = locality,
+                    DestinationId = destination.Id,
+                    Destination = destination,
+                    CreatedByUserId = creator.Id,
+                    CreatedBy = creator,
+                    Status = ContentStatus.Approved
+                },
+                new TouristObject
+                {
+                    Id = 2,
+                    Name = "Objekat dva",
+                    ObjectTypeId = objectType.Id,
+                    ObjectType = objectType,
+                    LocalityId = locality.Id,
+                    Locality = locality,
+                    DestinationId = destination.Id,
+                    Destination = destination,
+                    CreatedByUserId = otherCreator.Id,
+                    CreatedBy = otherCreator,
+                    Status = ContentStatus.Approved
+                });
+            ctx.SaveChanges();
+
+            ctx.DeletionRequests.AddRange(
+                new DeletionRequest
+                {
+                    Id = 1,
+                    ObjectId = 1,
+                    RequestedByUserId = creator.Id,
+                    RequestedBy = creator,
+                    Status = ContentStatus.Pending,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-5),
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new DeletionRequest
+                {
+                    Id = 2,
+                    ObjectId = 2,
+                    RequestedByUserId = otherCreator.Id,
+                    RequestedBy = otherCreator,
+                    Status = ContentStatus.Pending,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-4),
+                    UpdatedAt = DateTime.UtcNow
+                });
+            ctx.SaveChanges();
+
+            var service = new DeletionRequestService(ctx);
+
+            var result = await service.GetAllAsync(manager.Id, "Manager", new DeletionRequestQueryDto
+            {
+                Page = 2,
+                PageSize = 1,
+                SortBy = "requestedBy",
+                SortOrder = "asc"
+            });
+
+            result.Items.Should().HaveCount(1);
+            result.TotalCount.Should().Be(2);
+            result.Items[0].RequestedByName.Should().Be("Creator Two");
         }
 
         [Fact]

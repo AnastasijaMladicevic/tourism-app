@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -24,22 +24,30 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
-        public async Task GetAll_AnonimniKorisnik_VracaOkSaListom()
+        public async Task GetAll_AnonimniKorisnik_VracaOkSaPagedRezultatom()
         {
             var mockService = new Mock<IRouteService>();
-            mockService.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<RouteDto>
+            var paged = new PagedResultDto<RouteDto>
             {
-                new RouteDto { Id = 1, Name = "Ruta 1" },
-                new RouteDto { Id = 2, Name = "Ruta 2" }
-            });
+                Items =
+                {
+                    new RouteDto { Id = 1, Name = "Ruta 1" },
+                    new RouteDto { Id = 2, Name = "Ruta 2" }
+                },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 2,
+                TotalPages = 1
+            };
+
+            mockService.Setup(s => s.GetAllAsync(It.IsAny<RouteQueryDto>())).ReturnsAsync(paged);
 
             var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
 
-            var result = await controller.GetAll();
+            var result = await controller.GetAll(new RouteQueryDto());
 
             result.Should().BeOfType<OkObjectResult>()
-                .Which.Value.Should().BeAssignableTo<IEnumerable<RouteDto>>()
-                .Which.Should().HaveCount(2);
+                .Which.Value.Should().BeEquivalentTo(paged);
         }
 
         [Fact]

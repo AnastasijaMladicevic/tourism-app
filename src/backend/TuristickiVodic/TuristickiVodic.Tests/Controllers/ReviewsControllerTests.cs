@@ -24,20 +24,29 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
-        public async Task GetAll_VracaOkSaListom()
+        public async Task GetAll_VracaOkSaPagedRezultatom()
         {
             var mockService = new Mock<IReviewService>();
-            mockService.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<ReviewDto>
+            var paged = new PagedResultDto<ReviewDto>
             {
-                new ReviewDto { Id = 1, Text = "Odlicno", Status = "Approved" },
-                new ReviewDto { Id = 2, Text = "Dobro", Status = "Approved" }
-            });
+                Items =
+                {
+                    new ReviewDto { Id = 1, Text = "Odlicno", Status = "Approved" },
+                    new ReviewDto { Id = 2, Text = "Dobro", Status = "Approved" }
+                },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 2,
+                TotalPages = 1
+            };
+
+            mockService.Setup(s => s.GetAllAsync(It.IsAny<ReviewQueryDto>())).ReturnsAsync(paged);
 
             var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
-            var result = await controller.GetAll();
+            var result = await controller.GetAll(new ReviewQueryDto());
 
             result.Should().BeOfType<OkObjectResult>()
-                .Which.Value.Should().BeAssignableTo<IEnumerable<ReviewDto>>();
+                .Which.Value.Should().BeEquivalentTo(paged);
         }
 
         [Fact]

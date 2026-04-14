@@ -14,6 +14,8 @@ namespace TuristickiVodic.Core.DTO
     public class DeletionRequestDto
     {
         public int Id { get; set; }
+        public string ContentType { get; set; } = string.Empty;
+        public string? DestinationName { get; set; }
 
         // Tačno jedno od ova dva biće popunjeno
         public int? ObjectId { get; set; }

@@ -19,10 +19,10 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMyPlanner()
+        public async Task<IActionResult> GetMyPlanner([FromQuery] EventPlannerQueryDto query)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var items = await _eventPlannerService.GetMyPlannerAsync(userId);
+            var items = await _eventPlannerService.GetMyPlannerAsync(userId, query);
             return Ok(items);
         }
 

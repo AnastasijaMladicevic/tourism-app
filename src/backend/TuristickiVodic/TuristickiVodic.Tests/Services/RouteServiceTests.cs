@@ -193,9 +193,77 @@ namespace TuristickiVodic.Tests.Services
 
             var svc = new RouteService(ctx);
 
-            var result = await svc.GetAllAsync();
+            var result = await svc.GetAllAsync(new RouteQueryDto());
 
-            result.Should().HaveCount(2);
+            result.Items.Should().HaveCount(2);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_KadaSeFiltriraPoDifficultyICreatedBy_VracaTrazeniRezultat()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaSeFiltriraPoDifficultyICreatedBy_VracaTrazeniRezultat));
+            var (_, _, _, _, tourist, _, creator, _, _, _, _) = SeedBase(ctx);
+
+            ctx.Routes.Add(new Route
+            {
+                Id = 3,
+                Name = "Kreator ruta",
+                Description = "Planinska staza",
+                Difficulty = "Hard",
+                LengthKm = 12.3m,
+                CreatedByUserId = creator.Id,
+                CreatedBy = creator,
+                CreatedAt = DateTime.UtcNow.AddHours(-1),
+                UpdatedAt = DateTime.UtcNow.AddHours(-1)
+            });
+            ctx.SaveChanges();
+
+            var svc = new RouteService(ctx);
+
+            var result = await svc.GetAllAsync(new RouteQueryDto
+            {
+                Difficulty = "hard",
+                CreatedBy = "creator one"
+            });
+
+            result.Items.Should().HaveCount(1);
+            result.Items[0].Name.Should().Be("Kreator ruta");
+            result.Items[0].CreatedByUserId.Should().Be(creator.Id);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_KadaSeKoristiPaginacijaISortPoLength_VracaTrazeniSegment()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaSeKoristiPaginacijaISortPoLength_VracaTrazeniSegment));
+            var (_, _, _, _, tourist, _, _, _, _, _, _) = SeedBase(ctx);
+
+            ctx.Routes.Add(new Route
+            {
+                Id = 3,
+                Name = "Najduza ruta",
+                Description = "Opis 3",
+                Difficulty = "Hard",
+                LengthKm = 15.1m,
+                CreatedByUserId = tourist.Id,
+                CreatedBy = tourist,
+                CreatedAt = DateTime.UtcNow.AddMinutes(-1),
+                UpdatedAt = DateTime.UtcNow.AddMinutes(-1)
+            });
+            ctx.SaveChanges();
+
+            var svc = new RouteService(ctx);
+
+            var result = await svc.GetAllAsync(new RouteQueryDto
+            {
+                Page = 2,
+                PageSize = 1,
+                SortBy = "length",
+                SortOrder = "desc"
+            });
+
+            result.Items.Should().HaveCount(1);
+            result.TotalCount.Should().Be(3);
+            result.Items[0].Name.Should().Be("Tudja ruta");
         }
 
         [Fact]

@@ -902,5 +902,38 @@ namespace TuristickiVodic.Tests.Controllers
 
             result.Should().BeOfType<NotFoundResult>();
         }
+
+        [Fact]
+        public async Task GetCreatorRequests_KadaAdminPozove_VracaPagedRezultat()
+        {
+            var mockService = new Mock<IUserService>();
+            var rezultat = new PagedResultDto<CreatorRoleRequestDto>
+            {
+                Items = new List<CreatorRoleRequestDto>
+                {
+                    new CreatorRoleRequestDto
+                    {
+                        Id = 5,
+                        Email = "creator@test.com",
+                        HasRequestedCreatorRole = true
+                    }
+                },
+                TotalCount = 1,
+                Page = 1,
+                PageSize = 10,
+                TotalPages = 1
+            };
+
+            mockService
+                .Setup(s => s.GetCreatorRequestsAsync(It.IsAny<CreatorRoleRequestQueryDto>()))
+                .ReturnsAsync(rezultat);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            var result = await controller.GetCreatorRequests(new CreatorRoleRequestQueryDto());
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeSameAs(rezultat);
+        }
     }
 }

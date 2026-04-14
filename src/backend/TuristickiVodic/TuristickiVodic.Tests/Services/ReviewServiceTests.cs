@@ -127,6 +127,118 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task GetAllAsync_KadaSeFiltriraPoObjectUserRatingIResponse_VracaTrazeniRezultat()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaSeFiltriraPoObjectUserRatingIResponse_VracaTrazeniRezultat));
+            var (tourist, otherTourist, creator, _, approvedObject, _) = SeedBase(ctx);
+
+            ctx.Reviews.AddRange(
+                new Review
+                {
+                    Id = 1,
+                    UserId = tourist.Id,
+                    User = tourist,
+                    ObjectId = approvedObject.Id,
+                    Object = approvedObject,
+                    Rating = 5,
+                    Text = "Fenomenalno mesto",
+                    CreatorResponse = "Hvala puno",
+                    Status = ContentStatus.Approved,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-10)
+                },
+                new Review
+                {
+                    Id = 2,
+                    UserId = otherTourist.Id,
+                    User = otherTourist,
+                    ObjectId = approvedObject.Id,
+                    Object = approvedObject,
+                    Rating = 3,
+                    Text = "Moze bolje",
+                    Status = ContentStatus.Pending,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-5)
+                });
+            ctx.SaveChanges();
+
+            var svc = new ReviewService(ctx, CreateMapper());
+
+            var result = await svc.GetAllAsync(new ReviewQueryDto
+            {
+                Object = "pomorski",
+                User = "tourist one",
+                MinRating = 5,
+                HasResponse = true,
+                Status = "Approved"
+            });
+
+            result.Items.Should().HaveCount(1);
+            result.Items[0].Text.Should().Be("Fenomenalno mesto");
+            result.Items[0].UserFullName.Should().Be("Tourist One");
+            result.Items[0].ObjectName.Should().Be("Pomorski muzej");
+        }
+
+        [Fact]
+        public async Task GetAllAsync_KadaSeKoristiPaginacijaISortPoRatingu_VracaTrazeniSegment()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaSeKoristiPaginacijaISortPoRatingu_VracaTrazeniSegment));
+            var (tourist, otherTourist, _, _, approvedObject, _) = SeedBase(ctx);
+
+            ctx.Reviews.AddRange(
+                new Review
+                {
+                    Id = 1,
+                    UserId = tourist.Id,
+                    User = tourist,
+                    ObjectId = approvedObject.Id,
+                    Object = approvedObject,
+                    Rating = 5,
+                    Text = "Sjajno",
+                    Status = ContentStatus.Approved,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-10)
+                },
+                new Review
+                {
+                    Id = 2,
+                    UserId = otherTourist.Id,
+                    User = otherTourist,
+                    ObjectId = approvedObject.Id,
+                    Object = approvedObject,
+                    Rating = 2,
+                    Text = "Slabije",
+                    Status = ContentStatus.Approved,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-5)
+                },
+                new Review
+                {
+                    Id = 3,
+                    UserId = tourist.Id,
+                    User = tourist,
+                    ObjectId = approvedObject.Id,
+                    Object = approvedObject,
+                    Rating = 4,
+                    Text = "Vrlo dobro",
+                    Status = ContentStatus.Approved,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-2)
+                });
+            ctx.SaveChanges();
+
+            var svc = new ReviewService(ctx, CreateMapper());
+
+            var result = await svc.GetAllAsync(new ReviewQueryDto
+            {
+                Page = 2,
+                PageSize = 1,
+                SortBy = "rating",
+                SortOrder = "desc"
+            });
+
+            result.Items.Should().HaveCount(1);
+            result.TotalCount.Should().Be(3);
+            result.Items[0].Rating.Should().Be(4);
+            result.Items[0].Text.Should().Be("Vrlo dobro");
+        }
+
+        [Fact]
         public async Task CreateAsync_Tourist_KreiraApprovedRecenziju()
         {
             using var ctx = CreateInMemoryContext(nameof(CreateAsync_Tourist_KreiraApprovedRecenziju));

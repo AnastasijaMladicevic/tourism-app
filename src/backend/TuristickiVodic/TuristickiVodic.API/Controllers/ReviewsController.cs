@@ -19,9 +19,9 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] ReviewQueryDto query)
         {
-            var reviews = await _reviewService.GetAllAsync();
+            var reviews = await _reviewService.GetAllAsync(query);
             return Ok(reviews);
         }
 

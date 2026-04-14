@@ -14,19 +14,37 @@ namespace TuristickiVodic.Services.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<FavoriteDto>> GetMyFavoritesAsync(int userId)
+        public async Task<PagedResultDto<FavoriteDto>> GetMyFavoritesAsync(int userId, FavoriteQueryDto query)
         {
-            var favorites = await _context.Favorites
+            NormalizeQuery(query);
+
+            var favoritesQuery = _context.Favorites
                 .Include(f => f.Object)
                 .Include(f => f.Activity)
                 .Include(f => f.Destination)
                 .Include(f => f.Route)
                 .Include(f => f.Locality)
                 .Where(f => f.UserId == userId)
-                .OrderByDescending(f => f.CreatedAt)
+                .AsQueryable();
+
+            favoritesQuery = ApplyFilters(favoritesQuery, query);
+            favoritesQuery = ApplySorting(favoritesQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await favoritesQuery.CountAsync();
+
+            var favorites = await favoritesQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
                 .ToListAsync();
 
-            return favorites.Select(MapToDto);
+            return new PagedResultDto<FavoriteDto>
+            {
+                Items = favorites.Select(MapToDto).ToList(),
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
         }
 
         public async Task<FavoriteDto> AddAsync(CreateFavoriteDto dto, int userId)
@@ -64,7 +82,6 @@ namespace TuristickiVodic.Services.Services
                 f.RouteId == dto.RouteId &&
                 f.LocalityId == dto.LocalityId);
 
-            // Proveri duplikat
             if (alreadyExists)
                 throw new InvalidOperationException("This item is already in your favorites.");
 
@@ -105,6 +122,101 @@ namespace TuristickiVodic.Services.Services
             await _context.SaveChangesAsync();
 
             return true;
+        }
+
+        private static void NormalizeQuery(FavoriteQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+        }
+
+        private static IQueryable<Favorite> ApplyFilters(IQueryable<Favorite> query, FavoriteQueryDto filters)
+        {
+            if (!string.IsNullOrWhiteSpace(filters.Search))
+            {
+                var search = filters.Search.Trim().ToLower();
+
+                query = query.Where(f =>
+                    (f.Object != null && f.Object.Name.ToLower().Contains(search)) ||
+                    (f.Activity != null && f.Activity.Name.ToLower().Contains(search)) ||
+                    (f.Destination != null && f.Destination.Name.ToLower().Contains(search)) ||
+                    (f.Route != null && f.Route.Name.ToLower().Contains(search)) ||
+                    (f.Locality != null && f.Locality.Name.ToLower().Contains(search)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.Type))
+            {
+                var type = filters.Type.Trim().ToLower();
+
+                if (type == "object")
+                    query = query.Where(f => f.ObjectId != null);
+                else if (type == "activity")
+                    query = query.Where(f => f.ActivityId != null);
+                else if (type == "destination")
+                    query = query.Where(f => f.DestinationId != null);
+                else if (type == "route")
+                    query = query.Where(f => f.RouteId != null);
+                else if (type == "locality")
+                    query = query.Where(f => f.LocalityId != null);
+                else
+                    query = query.Where(_ => false);
+            }
+
+            return query;
+        }
+
+        private static IQueryable<Favorite> ApplySorting(IQueryable<Favorite> query, string? sortBy, string? sortOrder)
+        {
+            var sortByValue = sortBy?.Trim().ToLower();
+            var isDesc = sortOrder?.Trim().ToLower() == "desc";
+
+            if (sortByValue == "name")
+            {
+                return isDesc
+                    ? query.OrderByDescending(f =>
+                        f.Object != null ? f.Object.Name :
+                        f.Activity != null ? f.Activity.Name :
+                        f.Destination != null ? f.Destination.Name :
+                        f.Route != null ? f.Route.Name :
+                        f.Locality != null ? f.Locality.Name :
+                        string.Empty)
+                    : query.OrderBy(f =>
+                        f.Object != null ? f.Object.Name :
+                        f.Activity != null ? f.Activity.Name :
+                        f.Destination != null ? f.Destination.Name :
+                        f.Route != null ? f.Route.Name :
+                        f.Locality != null ? f.Locality.Name :
+                        string.Empty);
+            }
+
+            if (sortByValue == "type")
+            {
+                return isDesc
+                    ? query.OrderByDescending(f =>
+                        f.ObjectId != null ? "Object" :
+                        f.ActivityId != null ? "Activity" :
+                        f.DestinationId != null ? "Destination" :
+                        f.RouteId != null ? "Route" :
+                        f.LocalityId != null ? "Locality" :
+                        string.Empty)
+                    : query.OrderBy(f =>
+                        f.ObjectId != null ? "Object" :
+                        f.ActivityId != null ? "Activity" :
+                        f.DestinationId != null ? "Destination" :
+                        f.RouteId != null ? "Route" :
+                        f.LocalityId != null ? "Locality" :
+                        string.Empty);
+            }
+
+            return isDesc
+                ? query.OrderByDescending(f => f.CreatedAt)
+                : query.OrderBy(f => f.CreatedAt);
         }
 
         private static FavoriteDto MapToDto(Favorite favorite)
