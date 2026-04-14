@@ -265,26 +265,14 @@ namespace TuristickiVodic.Services
             return _mapper.Map<DestinationDto>(updated);
         }
 
-        // Brisanje je blokirano ako destinacija ima lokacije, objekte ili evente
+        // Brisanjem destinacije kaskadno se brišu njeni lokaliteti i objekti.
         public async Task<bool> DeleteAsync(int id)
         {
             var destination = await _context.Destinations
-                .Include(d => d.Localities)
-                .Include(d => d.Objects)
-                .Include(d => d.Events)
                 .FirstOrDefaultAsync(d => d.Id == id);
 
             if (destination == null)
                 return false;
-
-            if (destination.Localities.Any())
-                throw new InvalidOperationException("Cannot delete destination that has localities. Remove them first.");
-
-            if (destination.Objects.Any())
-                throw new InvalidOperationException("Cannot delete destination that has objects. Remove them first.");
-
-            if (destination.Events.Any())
-                throw new InvalidOperationException("Cannot delete destination that has events. Remove them first.");
 
             _context.Destinations.Remove(destination);
             await _context.SaveChangesAsync();
