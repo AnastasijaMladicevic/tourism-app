@@ -24,37 +24,53 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
-        public async Task GetAll_AnonimniKorisnik_VracaOkSaListom()
+        public async Task GetAll_AnonimniKorisnik_VracaOkSaPaginiranimRezultatom()
         {
             var mockService = new Mock<IActivityService>();
-            mockService.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<ActivityDto>
+            var paged = new PagedResultDto<ActivityDto>
             {
-                new ActivityDto { Id = 1, Name = "Setnja", Status = "Approved" },
-                new ActivityDto { Id = 2, Name = "Tura", Status = "Pending" }
-            });
+                Items = new List<ActivityDto>
+                {
+                    new ActivityDto { Id = 1, Name = "Setnja", Status = "Approved" },
+                    new ActivityDto { Id = 2, Name = "Tura", Status = "Pending" }
+                },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 2,
+                TotalPages = 1
+            };
+
+            mockService.Setup(s => s.GetAllAsync(It.IsAny<ActivityQueryDto>())).ReturnsAsync(paged);
 
             var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
 
-            var result = await controller.GetAll();
+            var result = await controller.GetAll(new ActivityQueryDto());
 
             result.Should().BeOfType<OkObjectResult>()
-                .Which.Value.Should().BeAssignableTo<IEnumerable<ActivityDto>>()
-                .Which.Should().HaveCount(2);
+                .Which.Value.Should().BeEquivalentTo(paged);
         }
 
         [Fact]
-        public async Task GetAll_KadaNemaAktivnosti_VracaOkSaPraznomListom()
+        public async Task GetAll_KadaNemaAktivnosti_VracaOkSaPraznimPaginiranimRezultatom()
         {
             var mockService = new Mock<IActivityService>();
-            mockService.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<ActivityDto>());
+            var paged = new PagedResultDto<ActivityDto>
+            {
+                Items = new List<ActivityDto>(),
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 0,
+                TotalPages = 0
+            };
+
+            mockService.Setup(s => s.GetAllAsync(It.IsAny<ActivityQueryDto>())).ReturnsAsync(paged);
 
             var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
 
-            var result = await controller.GetAll();
+            var result = await controller.GetAll(new ActivityQueryDto());
 
             result.Should().BeOfType<OkObjectResult>()
-                .Which.Value.Should().BeAssignableTo<IEnumerable<ActivityDto>>()
-                .Which.Should().BeEmpty();
+                .Which.Value.Should().BeEquivalentTo(paged);
         }
 
         [Fact]
