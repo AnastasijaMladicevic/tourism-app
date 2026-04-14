@@ -196,11 +196,161 @@ namespace TuristickiVodic.Tests.Services
 
             var service = new EventPlannerService(ctx);
 
-            var result = (await service.GetMyPlannerAsync(tourist.Id)).ToList();
+            var result = await service.GetMyPlannerAsync(tourist.Id, new EventPlannerQueryDto());
 
-            result.Should().HaveCount(2);
-            result.Should().OnlyContain(x => x.UserId == tourist.Id);
-            result.Select(x => x.EventName).Should().Contain(new[] { "Koncert", "Festival" });
+            result.Items.Should().HaveCount(2);
+            result.Items.Should().OnlyContain(x => x.UserId == tourist.Id);
+            result.Items.Select(x => x.EventName).Should().Contain(new[] { "Koncert", "Festival" });
+        }
+
+        [Fact]
+        public async Task GetMyPlannerAsync_KadaSeFiltriraPoDestinacijiTipuIStatusu_VracaTrazeniRezultat()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetMyPlannerAsync_KadaSeFiltriraPoDestinacijiTipuIStatusu_VracaTrazeniRezultat));
+            var (tourist, _, _, destination, locality, eventType) = SeedBase(ctx);
+
+            var concert = new Event
+            {
+                Id = 1,
+                Name = "Koncert",
+                EventTypeId = eventType.Id,
+                EventType = eventType,
+                LocalityId = locality.Id,
+                Locality = locality,
+                DestinationId = destination.Id,
+                Destination = destination,
+                CreatedByUserId = tourist.Id,
+                StartDate = DateTime.UtcNow.AddDays(3),
+                Status = ContentStatus.Approved,
+                IsActive = true
+            };
+
+            var pendingEvent = new Event
+            {
+                Id = 2,
+                Name = "Pending festival",
+                EventTypeId = eventType.Id,
+                EventType = eventType,
+                LocalityId = locality.Id,
+                Locality = locality,
+                DestinationId = destination.Id,
+                Destination = destination,
+                CreatedByUserId = tourist.Id,
+                StartDate = DateTime.UtcNow.AddDays(5),
+                Status = ContentStatus.Pending,
+                IsActive = true
+            };
+
+            ctx.Events.AddRange(concert, pendingEvent);
+            ctx.EventPlannerItems.AddRange(
+                new EventPlannerItem
+                {
+                    Id = 1,
+                    UserId = tourist.Id,
+                    User = tourist,
+                    EventId = concert.Id,
+                    Event = concert,
+                    AddedAt = DateTime.UtcNow.AddMinutes(-3)
+                },
+                new EventPlannerItem
+                {
+                    Id = 2,
+                    UserId = tourist.Id,
+                    User = tourist,
+                    EventId = pendingEvent.Id,
+                    Event = pendingEvent,
+                    AddedAt = DateTime.UtcNow.AddMinutes(-2)
+                });
+            await ctx.SaveChangesAsync();
+
+            var service = new EventPlannerService(ctx);
+
+            var result = await service.GetMyPlannerAsync(tourist.Id, new EventPlannerQueryDto
+            {
+                Destination = "kotor",
+                EventType = "festival",
+                Status = "Approved",
+                IsActive = true
+            });
+
+            result.Items.Should().HaveCount(1);
+            result.Items[0].EventName.Should().Be("Koncert");
+            result.Items[0].DestinationName.Should().Be("Kotor");
+        }
+
+        [Fact]
+        public async Task GetMyPlannerAsync_KadaSeKoristiPaginacijaISortPoAddedAt_VracaTrazeniSegment()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetMyPlannerAsync_KadaSeKoristiPaginacijaISortPoAddedAt_VracaTrazeniSegment));
+            var (tourist, _, _, destination, locality, eventType) = SeedBase(ctx);
+
+            var event1 = new Event
+            {
+                Id = 1,
+                Name = "Koncert",
+                EventTypeId = eventType.Id,
+                EventType = eventType,
+                LocalityId = locality.Id,
+                Locality = locality,
+                DestinationId = destination.Id,
+                Destination = destination,
+                CreatedByUserId = tourist.Id,
+                StartDate = DateTime.UtcNow.AddDays(3),
+                Status = ContentStatus.Approved,
+                IsActive = true
+            };
+
+            var event2 = new Event
+            {
+                Id = 2,
+                Name = "Festival",
+                EventTypeId = eventType.Id,
+                EventType = eventType,
+                LocalityId = locality.Id,
+                Locality = locality,
+                DestinationId = destination.Id,
+                Destination = destination,
+                CreatedByUserId = tourist.Id,
+                StartDate = DateTime.UtcNow.AddDays(4),
+                Status = ContentStatus.Approved,
+                IsActive = true
+            };
+
+            ctx.Events.AddRange(event1, event2);
+            ctx.EventPlannerItems.AddRange(
+                new EventPlannerItem
+                {
+                    Id = 1,
+                    UserId = tourist.Id,
+                    User = tourist,
+                    EventId = event1.Id,
+                    Event = event1,
+                    AddedAt = DateTime.UtcNow.AddMinutes(-5)
+                },
+                new EventPlannerItem
+                {
+                    Id = 2,
+                    UserId = tourist.Id,
+                    User = tourist,
+                    EventId = event2.Id,
+                    Event = event2,
+                    AddedAt = DateTime.UtcNow.AddMinutes(-1)
+                });
+            await ctx.SaveChangesAsync();
+
+            var service = new EventPlannerService(ctx);
+
+            var result = await service.GetMyPlannerAsync(tourist.Id, new EventPlannerQueryDto
+            {
+                Page = 2,
+                PageSize = 1,
+                SortBy = "addedAt",
+                SortOrder = "desc"
+            });
+
+            result.Items.Should().HaveCount(1);
+            result.TotalCount.Should().Be(2);
+            result.Items[0].EventName.Should().Be("Koncert");
         }
 
         [Fact]
