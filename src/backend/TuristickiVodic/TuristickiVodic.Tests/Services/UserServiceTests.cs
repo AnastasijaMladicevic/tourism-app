@@ -98,6 +98,166 @@ namespace TuristickiVodic.Tests.Services
             ctx.Users.Count().Should().Be(1);
         }
 
+        [Fact]
+        public async Task GetAllAsync_KadaSeProslediRoleFilter_VracaSamoTrazeniRole()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaSeProslediRoleFilter_VracaSamoTrazeniRole));
+            var (tourist, _, manager, admin) = SeedRoles(ctx);
+
+            ctx.Users.AddRange(
+                new User
+                {
+                    Id = 1,
+                    FirstName = "Ana",
+                    LastName = "Admin",
+                    Email = "ana.admin@test.com",
+                    PasswordHash = "hash",
+                    RoleId = admin.Id,
+                    Role = admin,
+                    IsActive = true,
+                    DateOfBirth = new DateTime(1990, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-3),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-3)
+                },
+                new User
+                {
+                    Id = 2,
+                    FirstName = "Milan",
+                    LastName = "Manager",
+                    Email = "milan.manager@test.com",
+                    PasswordHash = "hash",
+                    RoleId = manager.Id,
+                    Role = manager,
+                    IsActive = true,
+                    DateOfBirth = new DateTime(1991, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-2),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-2)
+                },
+                new User
+                {
+                    Id = 3,
+                    FirstName = "Tara",
+                    LastName = "Tourist",
+                    Email = "tara.tourist@test.com",
+                    PasswordHash = "hash",
+                    RoleId = tourist.Id,
+                    Role = tourist,
+                    IsActive = true,
+                    DateOfBirth = new DateTime(1992, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-1),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-1)
+                });
+            await ctx.SaveChangesAsync();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            var result = await svc.GetAllAsync(new UserQueryDto
+            {
+                Role = "manager"
+            });
+
+            result.TotalCount.Should().Be(1);
+            result.Items.Should().ContainSingle();
+            result.Items[0].Email.Should().Be("milan.manager@test.com");
+            result.Items[0].RoleName.Should().Be("Manager");
+        }
+
+        [Fact]
+        public async Task GetAllAsync_KadaJeRoleFilterNepostojeci_VracaPrazanRezultat()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaJeRoleFilterNepostojeci_VracaPrazanRezultat));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 10,
+                FirstName = "Petar",
+                LastName = "Petrovic",
+                Email = "petar@test.com",
+                PasswordHash = "hash",
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+            await ctx.SaveChangesAsync();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            var result = await svc.GetAllAsync(new UserQueryDto
+            {
+                Role = "superadmin"
+            });
+
+            result.TotalCount.Should().Be(0);
+            result.Items.Should().BeEmpty();
+            result.TotalPages.Should().Be(0);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_KadaSeSortiraPoRoliOpadajuce_VracaIspravanRedosled()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaSeSortiraPoRoliOpadajuce_VracaIspravanRedosled));
+            var (tourist, _, manager, admin) = SeedRoles(ctx);
+
+            ctx.Users.AddRange(
+                new User
+                {
+                    Id = 21,
+                    FirstName = "Tamara",
+                    LastName = "Tourist",
+                    Email = "tamara@test.com",
+                    PasswordHash = "hash",
+                    RoleId = tourist.Id,
+                    Role = tourist,
+                    IsActive = true,
+                    DateOfBirth = new DateTime(1992, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-1),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-1)
+                },
+                new User
+                {
+                    Id = 22,
+                    FirstName = "Marko",
+                    LastName = "Manager",
+                    Email = "marko@test.com",
+                    PasswordHash = "hash",
+                    RoleId = manager.Id,
+                    Role = manager,
+                    IsActive = true,
+                    DateOfBirth = new DateTime(1991, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-2),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-2)
+                },
+                new User
+                {
+                    Id = 23,
+                    FirstName = "Andjela",
+                    LastName = "Admin",
+                    Email = "andjela@test.com",
+                    PasswordHash = "hash",
+                    RoleId = admin.Id,
+                    Role = admin,
+                    IsActive = true,
+                    DateOfBirth = new DateTime(1990, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-3),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-3)
+                });
+            await ctx.SaveChangesAsync();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            var result = await svc.GetAllAsync(new UserQueryDto
+            {
+                SortBy = "role",
+                SortOrder = "desc"
+            });
+
+            result.Items.Select(x => x.RoleName).Should().Equal("Admin", "Manager", "Tourist");
+        }
+
         private static Mock<ITokenService> CreateTokenServiceMock(
         string token = "jwt-token",
         string refreshToken = "refresh-token")

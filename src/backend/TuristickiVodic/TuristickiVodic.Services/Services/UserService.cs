@@ -54,11 +54,18 @@ namespace TuristickiVodic.Services
 
             if (!string.IsNullOrWhiteSpace(query.Role))
             {
-                var role = query.Role.Trim().ToLower();
+                var roleFilter = query.Role.Trim();
 
-                usersQuery = usersQuery.Where(u =>
-                    u.Role != null &&
-                    u.Role.Name.ToString().ToLower().Contains(role));
+                if (Enum.TryParse<RoleType>(roleFilter, true, out var parsedRole))
+                {
+                    usersQuery = usersQuery.Where(u =>
+                        u.Role != null &&
+                        u.Role.Name == parsedRole);
+                }
+                else
+                {
+                    usersQuery = usersQuery.Where(_ => false);
+                }
             }
 
             usersQuery = ApplyUserSorting(usersQuery, query.SortBy, query.SortOrder);
@@ -505,6 +512,34 @@ namespace TuristickiVodic.Services
                 return isDesc
                     ? query.OrderByDescending(u => u.Email)
                     : query.OrderBy(u => u.Email);
+            }
+
+            if (sortByValue == "role" || sortByValue == "rolename")
+            {
+                var roleSortOrder = query.Select(u => new
+                {
+                    User = u,
+                    RoleSortOrder = u.Role == null
+                        ? 0
+                        : u.Role.Name == RoleType.Admin
+                            ? 4
+                            : u.Role.Name == RoleType.Manager
+                                ? 3
+                                : u.Role.Name == RoleType.ContentCreator
+                                    ? 2
+                                    : 1
+                });
+
+                return isDesc
+                    ? roleSortOrder.OrderByDescending(x => x.RoleSortOrder).Select(x => x.User)
+                    : roleSortOrder.OrderBy(x => x.RoleSortOrder).Select(x => x.User);
+            }
+
+            if (sortByValue == "createdat")
+            {
+                return isDesc
+                    ? query.OrderByDescending(u => u.CreatedAt)
+                    : query.OrderBy(u => u.CreatedAt);
             }
 
             return isDesc
