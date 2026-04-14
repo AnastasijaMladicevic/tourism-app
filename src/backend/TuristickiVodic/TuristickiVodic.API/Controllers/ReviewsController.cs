@@ -108,9 +108,9 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // ContentCreator briše odgovor na recenziju za svoj objekat; Menadžer može da obriše odgovor u svojoj destinaciji
+        // ContentCreator briše svoj odgovor na recenziju za svoj objekat
         [HttpDelete("{id}/respond")]
-        [Authorize(Roles = "ContentCreator,Manager")]
+        [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> DeleteResponse(int id)
         {
             try
@@ -125,27 +125,10 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // Menadžer (ili Admin ako nema menadžera) odobrava/odbija recenziju
-        [HttpPost("{id}/approve")]
-        [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> Approve(int id, [FromBody] ApproveReviewDto dto)
-        {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            try
-            {
-                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-                var roleName = User.FindFirstValue(ClaimTypes.Role)!;
-                var updated = await _reviewService.ApproveAsync(id, dto, userId, roleName);
-                if (updated == null) return NotFound();
-                return Ok(updated);
-            }
-            catch (UnauthorizedAccessException) { return Forbid(); }
-        }
-
-        // Tourist briše svoju recenziju; Menadžer može da briše recenzije u svojoj destinaciji
+        // Tourist briše samo svoju recenziju
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Tourist,Manager")]
+        [Authorize(Roles = "Tourist")]
         public async Task<IActionResult> Delete(int id)
         {
             try

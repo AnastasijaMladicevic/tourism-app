@@ -11,7 +11,6 @@ namespace TuristickiVodic.Services.Services
         Task<ReviewDto?> RespondAsync(int id, RespondToReviewDto dto, int userId, string roleName);
         Task<ReviewDto?> UpdateResponseAsync(int id, RespondToReviewDto dto, int userId, string roleName);
         Task<ReviewDto?> DeleteResponseAsync(int id, int userId, string roleName);
-        Task<ReviewDto?> ApproveAsync(int id, ApproveReviewDto dto, int userId, string roleName);
         Task<bool> DeleteAsync(int id, int userId, string roleName);
     }
 }

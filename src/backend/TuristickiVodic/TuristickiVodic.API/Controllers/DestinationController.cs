@@ -107,7 +107,7 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
 
-        // Admin briše destinaciju (samo ako je prazna)
+        // Admin briše destinaciju (kaskadno briše povezane lokalitete i objekte)
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
