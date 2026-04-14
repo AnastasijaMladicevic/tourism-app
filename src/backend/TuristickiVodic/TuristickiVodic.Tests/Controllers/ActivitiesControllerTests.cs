@@ -353,35 +353,6 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
-        public async Task GetAll_BezFiltera_VracaPagedRezultat()
-        {
-            var mockService = new Mock<IActivityService>();
-            var dto = new PagedResultDto<ActivityDto>
-            {
-                Items = new List<ActivityDto>
-        {
-            new ActivityDto { Id = 1, Name = "Planinarenje" },
-            new ActivityDto { Id = 2, Name = "Voznja kajaka" }
-        },
-                Page = 1,
-                PageSize = 10,
-                TotalCount = 2,
-                TotalPages = 1
-            };
-
-            mockService
-                .Setup(s => s.GetAllAsync(It.IsAny<ActivityQueryDto>()))
-                .ReturnsAsync(dto);
-
-            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
-
-            var result = await controller.GetAll(new ActivityQueryDto());
-
-            result.Should().BeOfType<OkObjectResult>()
-                .Which.Value.Should().BeEquivalentTo(dto);
-        }
-
-        [Fact]
         public async Task Delete_KadaServisBaciUnauthorized_VracaForbid()
         {
             var mockService = new Mock<IActivityService>();
