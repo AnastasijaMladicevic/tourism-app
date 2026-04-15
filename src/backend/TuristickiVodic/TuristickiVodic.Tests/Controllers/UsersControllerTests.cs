@@ -247,6 +247,20 @@ namespace TuristickiVodic.Tests.Controllers
             result.Should().BeOfType<NotFoundResult>();
         }
 
+        [Fact]
+        public async Task Delete_KadaManagerImaDestinaciju_VracaBadRequest()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.DeleteAsync(7))
+                .ThrowsAsync(new InvalidOperationException("Manager who is assigned to a destination cannot be deleted until another manager is assigned."));
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            var result = await controller.Delete(7);
+
+            result.Should().BeOfType<BadRequestObjectResult>();
+        }
+
         // ═══════════════════════════════════════════
         //  GET /api/users/email/{email}
         //  Samo Admin može da pretražuje po emailu

@@ -70,9 +70,9 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
-        public async Task CreateAsync_ContentCreator_KreiraObjekat_SaObaveznomDestinacijom()
+        public async Task CreateAsync_ContentCreator_KreiraObjekat_AutomatskiPreuzimaDestinacijuIzLokaliteta()
         {
-            using var ctx = CreateInMemoryContext(nameof(CreateAsync_ContentCreator_KreiraObjekat_SaObaveznomDestinacijom));
+            using var ctx = CreateInMemoryContext(nameof(CreateAsync_ContentCreator_KreiraObjekat_AutomatskiPreuzimaDestinacijuIzLokaliteta));
             var (objectType, destination, _, locality, _, creator, _, _, _) = SeedBase(ctx);
             var svc = CreateService(ctx);
 
@@ -80,7 +80,6 @@ namespace TuristickiVodic.Tests.Services
             {
                 Name = "Pomorski muzej",
                 ObjectTypeId = objectType.Id,
-                DestinationId = destination.Id,
                 LocalityId = locality.Id,
                 Longitude = 18.77,
                 Latitude = 42.42,
@@ -199,9 +198,9 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateAsync_LocalityMoraPripadatiNovojDestinaciji()
+        public async Task UpdateAsync_PromenaLokaliteta_AutomatskiMenjaIDestinaciju()
         {
-            using var ctx = CreateInMemoryContext(nameof(UpdateAsync_LocalityMoraPripadatiNovojDestinaciji));
+            using var ctx = CreateInMemoryContext(nameof(UpdateAsync_PromenaLokaliteta_AutomatskiMenjaIDestinaciju));
             var (objectType, destination, _, locality, otherLocality, creator, _, _, _) = SeedBase(ctx);
             ctx.Objects.Add(new TouristObject
             {
@@ -218,9 +217,11 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
             var svc = CreateService(ctx);
 
-            await svc.Invoking(s => s.UpdateAsync(1, new UpdateTouristObjectDto { LocalityId = otherLocality.Id }, creator.Id, "ContentCreator"))
-                .Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*does not belong to the selected destination*");
+            var result = await svc.UpdateAsync(1, new UpdateTouristObjectDto { LocalityId = otherLocality.Id }, creator.Id, "ContentCreator");
+
+            result.Should().NotBeNull();
+            result!.LocalityId.Should().Be(otherLocality.Id);
+            result.DestinationId.Should().Be(otherLocality.DestinationId);
         }
 
         [Fact]

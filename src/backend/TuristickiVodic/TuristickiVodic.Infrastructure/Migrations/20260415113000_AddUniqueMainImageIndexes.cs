@@ -8,6 +8,25 @@ namespace TuristickiVodic.Infrastructure.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Destinations_Users_ManagedByUserId",
+                table: "Destinations");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Destinations_Users_ManagedByUserId",
+                table: "Destinations",
+                column: "ManagedByUserId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DeletionRequests_ActivityId",
+                table: "DeletionRequests",
+                column: "ActivityId",
+                unique: true,
+                filter: "\"ActivityId\" IS NOT NULL AND \"Status\" = 'Pending'");
+
             migrationBuilder.CreateIndex(
                 name: "IX_Images_ActivityId_IsMain_MainUnique",
                 table: "Images",
@@ -46,6 +65,14 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Destinations_Users_ManagedByUserId",
+                table: "Destinations");
+
+            migrationBuilder.DropIndex(
+                name: "IX_DeletionRequests_ActivityId",
+                table: "DeletionRequests");
+
             migrationBuilder.DropIndex(
                 name: "IX_Images_ActivityId_IsMain_MainUnique",
                 table: "Images");
@@ -65,6 +92,14 @@ namespace TuristickiVodic.Infrastructure.Migrations
             migrationBuilder.DropIndex(
                 name: "IX_Images_ObjectId_IsMain_MainUnique",
                 table: "Images");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Destinations_Users_ManagedByUserId",
+                table: "Destinations",
+                column: "ManagedByUserId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.SetNull);
         }
     }
 }

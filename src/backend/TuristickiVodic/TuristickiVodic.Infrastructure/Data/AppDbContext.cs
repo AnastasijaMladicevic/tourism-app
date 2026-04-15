@@ -54,7 +54,7 @@ public class AppDbContext : DbContext
             .HasOne(u => u.ManagedDestination)
             .WithOne(d => d.ManagedBy)
             .HasForeignKey<Destination>(d => d.ManagedByUserId)
-            .OnDelete(DeleteBehavior.SetNull);
+            .OnDelete(DeleteBehavior.Restrict);
 
         // ==================== DESTINATION ====================
         mb.Entity<Destination>()
@@ -524,6 +524,12 @@ public class AppDbContext : DbContext
         mb.Entity<DeletionRequest>()
             .HasIndex(r => r.EventId)
             .HasFilter("\"EventId\" IS NOT NULL AND \"Status\" = 'Pending'")
+            .IsUnique();
+
+        // Sprečava više Pending zahteva za istu aktivnost
+        mb.Entity<DeletionRequest>()
+            .HasIndex(r => r.ActivityId)
+            .HasFilter("\"ActivityId\" IS NOT NULL AND \"Status\" = 'Pending'")
             .IsUnique();
 
         // ==================== REFRESH TOKEN ====================

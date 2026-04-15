@@ -172,7 +172,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ActivityId");
+                    b.HasIndex("ActivityId")
+                        .IsUnique()
+                        .HasFilter("\"ActivityId\" IS NOT NULL AND \"Status\" = 'Pending'");
 
                     b.HasIndex("EventId")
                         .IsUnique()
@@ -1206,7 +1208,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.HasOne("TuristickiVodic.Core.Models.User", "ManagedBy")
                         .WithOne("ManagedDestination")
                         .HasForeignKey("TuristickiVodic.Core.Models.Destination", "ManagedByUserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreatedBy");
 

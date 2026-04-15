@@ -135,12 +135,6 @@ namespace TuristickiVodic.Services.Services
         // Objekat mora imati destinaciju; lokalitet je opcioni, ali ako postoji mora pripadati toj destinaciji
         public async Task<TouristObjectDto> CreateAsync(CreateTouristObjectDto dto, int userId, string roleName)
         {
-            var destination = await _context.Destinations
-                .FirstOrDefaultAsync(d => d.Id == dto.DestinationId);
-
-            if (destination == null)
-                throw new InvalidOperationException("Destination not found.");
-
             Locality? locality = null;
             if (dto.LocalityId.HasValue)
             {
@@ -150,9 +144,20 @@ namespace TuristickiVodic.Services.Services
                 if (locality == null)
                     throw new InvalidOperationException("Locality not found.");
 
-                if (locality.DestinationId != dto.DestinationId)
+                if (dto.DestinationId.HasValue && locality.DestinationId != dto.DestinationId.Value)
                     throw new InvalidOperationException("Selected locality does not belong to the selected destination.");
+
+                dto.DestinationId = locality.DestinationId;
             }
+
+            if (!dto.DestinationId.HasValue)
+                throw new InvalidOperationException("Destination not found.");
+
+            var destinationExists = await _context.Destinations
+                .AnyAsync(d => d.Id == dto.DestinationId.Value);
+
+            if (!destinationExists)
+                throw new InvalidOperationException("Destination not found.");
 
             if (!await _context.ObjectTypes.AnyAsync(x => x.Id == dto.ObjectTypeId))
                 throw new InvalidOperationException("Object type not found.");
@@ -167,7 +172,7 @@ namespace TuristickiVodic.Services.Services
                 WorkingHours = dto.WorkingHours,
                 Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
                 ObjectTypeId = dto.ObjectTypeId,
-                DestinationId = dto.DestinationId,
+                DestinationId = dto.DestinationId.Value,
                 LocalityId = dto.LocalityId,
                 CreatedByUserId = userId,
                 Status = ContentStatus.Pending,
@@ -200,28 +205,27 @@ namespace TuristickiVodic.Services.Services
                 obj.ObjectTypeId = dto.ObjectTypeId.Value;
             }
 
-            var newDestinationId = dto.DestinationId ?? obj.DestinationId;
-            var newLocalityId = dto.LocalityId.HasValue ? dto.LocalityId : obj.LocalityId;
-
-            if (dto.DestinationId.HasValue)
-            {
-                if (!await _context.Destinations.AnyAsync(d => d.Id == dto.DestinationId.Value))
-                    throw new InvalidOperationException("Destination not found.");
-                obj.DestinationId = dto.DestinationId.Value;
-            }
-
             if (dto.LocalityId.HasValue)
             {
                 var locality = await _context.Localities.FirstOrDefaultAsync(l => l.Id == dto.LocalityId.Value);
                 if (locality == null)
                     throw new InvalidOperationException("Locality not found.");
 
-                if (locality.DestinationId != newDestinationId)
+                if (dto.DestinationId.HasValue && locality.DestinationId != dto.DestinationId.Value)
                     throw new InvalidOperationException("Selected locality does not belong to the selected destination.");
 
                 obj.LocalityId = dto.LocalityId.Value;
+                obj.DestinationId = locality.DestinationId;
             }
-            else if (dto.DestinationId.HasValue && obj.LocalityId.HasValue)
+            else if (dto.DestinationId.HasValue)
+            {
+                if (!await _context.Destinations.AnyAsync(d => d.Id == dto.DestinationId.Value))
+                    throw new InvalidOperationException("Destination not found.");
+
+                obj.DestinationId = dto.DestinationId.Value;
+            }
+
+            if (dto.DestinationId.HasValue && !dto.LocalityId.HasValue && obj.LocalityId.HasValue)
             {
                 var currentLocality = await _context.Localities.FirstOrDefaultAsync(l => l.Id == obj.LocalityId.Value);
                 if (currentLocality != null && currentLocality.DestinationId != obj.DestinationId)

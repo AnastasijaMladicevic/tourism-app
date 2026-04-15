@@ -357,11 +357,18 @@ namespace TuristickiVodic.API.Controllers
             if (currentUserId == id)
                 return BadRequest(new { message = "Admin cannot delete their own account" });
 
-            var result = await _userService.DeleteAsync(id);
-            if (!result)
-                return NotFound();
+            try
+            {
+                var result = await _userService.DeleteAsync(id);
+                if (!result)
+                    return NotFound();
 
-            return NoContent();
+                return NoContent();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

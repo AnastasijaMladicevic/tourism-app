@@ -224,6 +224,9 @@ namespace TuristickiVodic.Services
             if (user == null)
                 return false;
 
+            if (user.ManagedDestinationId.HasValue)
+                throw new InvalidOperationException("Manager who is assigned to a destination cannot be deleted until another manager is assigned.");
+
             await RevokeRefreshTokenAsync(user.Id);
 
             _context.Users.Remove(user);

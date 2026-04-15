@@ -1322,6 +1322,34 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task DeleteAsync_ManagerKojiUpravljaDestinacijom_BacaException()
+        {
+            using var ctx = CreateInMemoryContext(nameof(DeleteAsync_ManagerKojiUpravljaDestinacijom_BacaException));
+            var (_, _, manager, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 33,
+                FirstName = "Milan",
+                LastName = "Manager",
+                Email = "milan.manager@test.com",
+                PasswordHash = "hash",
+                RoleId = manager.Id,
+                Role = manager,
+                ManagedDestinationId = 7,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            });
+            ctx.SaveChanges();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            await svc.Invoking(s => s.DeleteAsync(33))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*cannot be deleted until another manager is assigned*");
+        }
+
+        [Fact]
         public async Task CreateAdminAsync_UpisujeAdminRoleIdIRole()
         {
             using var ctx = CreateInMemoryContext(nameof(CreateAdminAsync_UpisujeAdminRoleIdIRole));

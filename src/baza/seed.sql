@@ -1600,6 +1600,13 @@ CREATE INDEX IF NOT EXISTS idx_favorites_activity ON "Favorites"("ActivityId") W
 CREATE INDEX IF NOT EXISTS idx_favorites_destination ON "Favorites"("DestinationId") WHERE "DestinationId" IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_favorites_route ON "Favorites"("RouteId") WHERE "RouteId" IS NOT NULL;
 
+CREATE UNIQUE INDEX IF NOT EXISTS idx_deletion_requests_pending_object ON "DeletionRequests"("ObjectId")
+WHERE "ObjectId" IS NOT NULL AND "Status" = 'Pending';
+CREATE UNIQUE INDEX IF NOT EXISTS idx_deletion_requests_pending_event ON "DeletionRequests"("EventId")
+WHERE "EventId" IS NOT NULL AND "Status" = 'Pending';
+CREATE UNIQUE INDEX IF NOT EXISTS idx_deletion_requests_pending_activity ON "DeletionRequests"("ActivityId")
+WHERE "ActivityId" IS NOT NULL AND "Status" = 'Pending';
+
 CREATE INDEX IF NOT EXISTS idx_images_main ON "Images"("IsMain") WHERE "IsMain" = true;
 CREATE UNIQUE INDEX IF NOT EXISTS idx_images_main_object ON "Images"("ObjectId", "IsMain") WHERE "ObjectId" IS NOT NULL AND "IsMain" = true;
 CREATE UNIQUE INDEX IF NOT EXISTS idx_images_main_activity ON "Images"("ActivityId", "IsMain") WHERE "ActivityId" IS NOT NULL AND "IsMain" = true;
