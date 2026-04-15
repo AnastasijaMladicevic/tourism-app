@@ -241,6 +241,16 @@ VALUES
 ('Tivat', 'Primorski grad poznat po marini Porto Montenegro',
  ST_SetSRID(ST_MakePoint(18.693, 42.434), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
+ 
+ ('Igalo Banja', 'Poznata banja i zdravstveni centar na moru',
+ ST_SetSRID(ST_MakePoint(18.516, 42.460), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Banja'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
+ 
+ ('Selo Njegusi', 'Tradicionalno planinsko selo poznato po pršuti i siru',
+ ST_SetSRID(ST_MakePoint(18.820, 42.420), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Selo'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW());
 
 UPDATE "Destinations"
@@ -321,6 +331,12 @@ VALUES
  ST_SetSRID(ST_MakePoint(18.694, 42.434), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Marina'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
+ 
+ ('Spomen park Slobode Niksic',  'Memorijalni park posvećen istorijskim događajima i borcima',
+ ST_SetSRID(ST_MakePoint(18.943, 42.773), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Spomen park'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW());
 
 -- ============================================
@@ -373,6 +389,24 @@ VALUES
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
+ NOW(), NOW(), NOW()),
+ 
+ ('Biblioteka Niksic', 'Gradska biblioteka u Nikšiću', 'Trg Slobode, Nikšić',  '+38220000001', NULL,
+ '{"pon":"08:00-20:00"}', ST_SetSRID(ST_MakePoint(18.956, 42.774), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Biblioteka'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Nikšić'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
+ NOW(), NOW(), NOW()),
+ 
+ ('Crkva Svetog Nikole Bar', 'Pravoslavna crkva u Starom Baru', 'Stari Bar', '+38220000002', NULL,
+ '{"pon":"06:00-18:00"}', ST_SetSRID(ST_MakePoint(19.142, 42.097), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Crkva'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari Bar'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW());
 
 -- ============================================
@@ -915,7 +949,68 @@ VALUES
     'Tivat',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
-    NOW());
+    NOW()),
+(
+    'https://igalospa.com/wp-content/uploads/2023/12/institut-igalo-slide.jpg',
+    'Igalo Banja',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Igalo Banja'),
+    NOW()),
+(
+    'https://forzatravel.rs/fajlovi/productitem/institut-dr-simo-milosevic-844.jpg',
+    'Igalo Banja',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Igalo Banja'),
+    NOW()),
+(
+    'https://www.ponte.rs/UPLOADS-PONTE/2022/12/IGALO.jpg',
+    'Igalo Banja',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Igalo Banja'),
+    NOW()),
+(
+    'https://beaches-searcher.com/images/beaches/499201004/ME201004.jpg',
+    'Igalo Banja',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Igalo Banja'),
+    NOW()),
+(
+    'https://www.maestral.co.rs/wp-content/uploads/2023/04/Letovanje-Igalo-Crna-Gora-3.jpg',
+    'Igalo Banja',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Igalo Banja'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/6/63/Igalo3_by_Klackalica.jpg',
+    'Igalo Banja',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Igalo Banja'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/d/d2/View_over_Njegusi.jpg',
+    'Selo Njegusi',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Selo Njegusi'),
+    NOW()),
+(
+    'https://aktuelno.s3.eu-central-1.amazonaws.com/media/aktuelno/2023/02/thumbnail_Pogled-na-panoramu-sela-Dugi-Do-Njegusi.jpg',
+    'Selo Njegusi',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Selo Njegusi'),
+    NOW()),
+(
+    'https://i.ytimg.com/vi/FkusxN_I2gA/maxresdefault.jpg',
+    'Selo Njegusi',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Selo Njegusi'),
+    NOW()),
+(
+    'https://aktuelno.s3.eu-central-1.amazonaws.com/media/aktuelno/2023/02/thumbnail_Jedno-od-sacuvanih-guvna-u-selu-Dugi-Do-Njegusi-pod-snijegom.jpg',
+    'Selo Njegusi',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Selo Njegusi'),
+    NOW()),
+    ;
 
 -- ============================================
 -- 10. IMAGES - EVENTS
@@ -1317,7 +1412,32 @@ VALUES
     'Porto Montenegro',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Porto Montenegro'),
-    NOW());
+    NOW()),
+(
+    'https://me.ekapija.com/thumbs169/niksic_050323_tw1024.jpg',
+    'Spomen park Slobode Niksic',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Niksic'),
+    NOW()),
+(
+    'https://rtnk.me/wp-content/uploads/2024/09/spomen-kompleks-sloboda-foto-RTCG.jpeg',
+    'Spomen park Slobode Niksic',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Niksic'),
+    NOW()),
+(
+    'https://onogost.me/wp-content/uploads/2023/08/IMG-ce6b0b6e8eb214a51739afacf4b2173e-V-1024x768.jpg',
+    'Spomen park Slobode Niksic',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Niksic'),
+    NOW()),
+(
+    'https://s3.eu-south-1.wasabisys.com/in4s.net/2021/02/Niksic-trg-Slobode.jpg',
+    'Spomen park Slobode Niksic',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Niksic'),
+    NOW()),
+;
 
 -- ============================================
 -- 12. IMAGES - OBJECTS
@@ -1443,7 +1563,50 @@ VALUES
     'Planinarski dom Durmitor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
-    NOW());
+    NOW()),
+(
+    'https://rtnk.me/wp-content/uploads/2025/10/gradska-kuca-rtnk.jpg',
+    'Biblioteka Niksic',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Niksic'),
+    NOW()),
+(
+    'https://onogost.me/wp-content/uploads/2021/03/bbb_0.jpg',
+    'Biblioteka Niksic',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Niksic'),
+    NOW()),
+(
+    'https://bibliotekank.me/wp-content/uploads/2025/05/Biblioteka-Njegos.jpg',
+    'Biblioteka Niksic',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Niksic'),
+    NOW()),
+(
+    'https://onogost.me/wp-content/uploads/2022/09/154027101_447757199800263_2417071867195548541_n.jpg',
+    'Biblioteka Niksic',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Niksic'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Katoli%C4%8Dka_crkva_svetog_Nikole_u_Starom_Baru.JPG/1280px-Katoli%C4%8Dka_crkva_svetog_Nikole_u_Starom_Baru.JPG',
+    'Crkva Svetog Nikole Bar',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Nikole Bar'),
+    NOW()),
+(
+    'https://www.ekapija.com/thumbs169/crkva_svetog_nikole_stari_grad_bar_031224_tw1024.jpg',
+    'Crkva Svetog Nikole Bar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Nikole Bar'),
+    NOW()),
+(
+    'https://s3.eu-south-1.wasabisys.com/in4s.net/2019/04/crkva-sv-Nikole-u-Baru.jpg',
+    'Crkva Svetog Nikole Bar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Nikole Bar'),
+    NOW()),
+    ;
 
 -- ============================================
 -- 13. IMAGES - ACTIVITIES
