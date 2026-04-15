@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -12,9 +13,10 @@ using TuristickiVodic.Infrastructure.Data;
 namespace TuristickiVodic.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260415113000_AddUniqueMainImageIndexes")]
+    partial class AddUniqueMainImageIndexes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -502,34 +504,44 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ActivityId");
+
                     b.HasIndex("ActivityId", "IsMain")
-                        .IsUnique()
                         .HasDatabaseName("IX_Images_ActivityId_IsMain_MainUnique")
+                        .IsUnique()
                         .HasFilter("\"ActivityId\" IS NOT NULL AND \"IsMain\" = TRUE");
 
+                    b.HasIndex("DestinationId");
+
                     b.HasIndex("DestinationId", "IsMain")
-                        .IsUnique()
                         .HasDatabaseName("IX_Images_DestinationId_IsMain_MainUnique")
+                        .IsUnique()
                         .HasFilter("\"DestinationId\" IS NOT NULL AND \"IsMain\" = TRUE");
 
+                    b.HasIndex("EventId");
+
                     b.HasIndex("EventId", "IsMain")
-                        .IsUnique()
                         .HasDatabaseName("IX_Images_EventId_IsMain_MainUnique")
+                        .IsUnique()
                         .HasFilter("\"EventId\" IS NOT NULL AND \"IsMain\" = TRUE");
 
+                    b.HasIndex("LocalityId");
+
                     b.HasIndex("LocalityId", "IsMain")
-                        .IsUnique()
                         .HasDatabaseName("IX_Images_LocalityId_IsMain_MainUnique")
+                        .IsUnique()
                         .HasFilter("\"LocalityId\" IS NOT NULL AND \"IsMain\" = TRUE");
 
+                    b.HasIndex("ObjectId");
+
                     b.HasIndex("ObjectId", "IsMain")
-                        .IsUnique()
                         .HasDatabaseName("IX_Images_ObjectId_IsMain_MainUnique")
+                        .IsUnique()
                         .HasFilter("\"ObjectId\" IS NOT NULL AND \"IsMain\" = TRUE");
 
                     b.ToTable("Images", t =>
                         {
-                            t.HasCheckConstraint("CK_Image_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"EventId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"DestinationId\" IS NOT NULL THEN 1 ELSE 0 END +\n                   CASE WHEN \"LocalityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
+                            t.HasCheckConstraint("CK_Image_OnlyOne", "(CASE WHEN \"ObjectId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"ActivityId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"EventId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"DestinationId\" IS NOT NULL THEN 1 ELSE 0 END +\r\n                   CASE WHEN \"LocalityId\" IS NOT NULL THEN 1 ELSE 0 END) = 1");
                         });
                 });
 

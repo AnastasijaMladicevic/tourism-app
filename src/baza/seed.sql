@@ -601,7 +601,7 @@ VALUES
 (
     'https://kofer.info/wp-content/uploads/2020/02/shutterstock_191127089.jpg',
     'Budva',
-    true,
+    false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
     NOW()),
 (
@@ -1601,6 +1601,11 @@ CREATE INDEX IF NOT EXISTS idx_favorites_destination ON "Favorites"("Destination
 CREATE INDEX IF NOT EXISTS idx_favorites_route ON "Favorites"("RouteId") WHERE "RouteId" IS NOT NULL;
 
 CREATE INDEX IF NOT EXISTS idx_images_main ON "Images"("IsMain") WHERE "IsMain" = true;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_images_main_object ON "Images"("ObjectId", "IsMain") WHERE "ObjectId" IS NOT NULL AND "IsMain" = true;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_images_main_activity ON "Images"("ActivityId", "IsMain") WHERE "ActivityId" IS NOT NULL AND "IsMain" = true;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_images_main_event ON "Images"("EventId", "IsMain") WHERE "EventId" IS NOT NULL AND "IsMain" = true;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_images_main_destination ON "Images"("DestinationId", "IsMain") WHERE "DestinationId" IS NOT NULL AND "IsMain" = true;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_images_main_locality ON "Images"("LocalityId", "IsMain") WHERE "LocalityId" IS NOT NULL AND "IsMain" = true;
 
 -- ============================================
 -- TRIGGERS
@@ -1668,6 +1673,7 @@ CREATE TRIGGER tg_events_updated
 BEFORE UPDATE ON "Events"
 FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
+
 CREATE OR REPLACE FUNCTION ensure_one_main_image()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -1675,23 +1681,27 @@ BEGIN
         IF NEW."ObjectId" IS NOT NULL THEN
             UPDATE "Images"
             SET "IsMain" = false
-            WHERE "ObjectId" = NEW."ObjectId" AND "Id" != NEW."Id";
+            WHERE "ObjectId" = NEW."ObjectId";
+
         ELSIF NEW."ActivityId" IS NOT NULL THEN
             UPDATE "Images"
             SET "IsMain" = false
-            WHERE "ActivityId" = NEW."ActivityId" AND "Id" != NEW."Id";
+            WHERE "ActivityId" = NEW."ActivityId";
+
         ELSIF NEW."EventId" IS NOT NULL THEN
             UPDATE "Images"
             SET "IsMain" = false
-            WHERE "EventId" = NEW."EventId" AND "Id" != NEW."Id";
+            WHERE "EventId" = NEW."EventId";
+
         ELSIF NEW."DestinationId" IS NOT NULL THEN
             UPDATE "Images"
             SET "IsMain" = false
-            WHERE "DestinationId" = NEW."DestinationId" AND "Id" != NEW."Id";
+            WHERE "DestinationId" = NEW."DestinationId";
+
         ELSIF NEW."LocalityId" IS NOT NULL THEN
             UPDATE "Images"
             SET "IsMain" = false
-            WHERE "LocalityId" = NEW."LocalityId" AND "Id" != NEW."Id";
+            WHERE "LocalityId" = NEW."LocalityId";
         END IF;
     END IF;
 

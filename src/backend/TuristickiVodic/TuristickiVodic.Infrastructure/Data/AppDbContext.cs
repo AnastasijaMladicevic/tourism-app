@@ -324,6 +324,36 @@ public class AppDbContext : DbContext
                    CASE WHEN ""LocalityId"" IS NOT NULL THEN 1 ELSE 0 END) = 1"));
 
         mb.Entity<Image>()
+            .HasIndex(i => new { i.ObjectId, i.IsMain })
+            .HasDatabaseName("IX_Images_ObjectId_IsMain_MainUnique")
+            .IsUnique()
+            .HasFilter("\"ObjectId\" IS NOT NULL AND \"IsMain\" = TRUE");
+
+        mb.Entity<Image>()
+            .HasIndex(i => new { i.ActivityId, i.IsMain })
+            .HasDatabaseName("IX_Images_ActivityId_IsMain_MainUnique")
+            .IsUnique()
+            .HasFilter("\"ActivityId\" IS NOT NULL AND \"IsMain\" = TRUE");
+
+        mb.Entity<Image>()
+            .HasIndex(i => new { i.EventId, i.IsMain })
+            .HasDatabaseName("IX_Images_EventId_IsMain_MainUnique")
+            .IsUnique()
+            .HasFilter("\"EventId\" IS NOT NULL AND \"IsMain\" = TRUE");
+
+        mb.Entity<Image>()
+            .HasIndex(i => new { i.DestinationId, i.IsMain })
+            .HasDatabaseName("IX_Images_DestinationId_IsMain_MainUnique")
+            .IsUnique()
+            .HasFilter("\"DestinationId\" IS NOT NULL AND \"IsMain\" = TRUE");
+
+        mb.Entity<Image>()
+            .HasIndex(i => new { i.LocalityId, i.IsMain })
+            .HasDatabaseName("IX_Images_LocalityId_IsMain_MainUnique")
+            .IsUnique()
+            .HasFilter("\"LocalityId\" IS NOT NULL AND \"IsMain\" = TRUE");
+
+        mb.Entity<Image>()
             .HasOne(i => i.Object)
             .WithMany(o => o.Images)
             .HasForeignKey(i => i.ObjectId)
