@@ -88,4 +88,8 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./feature/event-detail/event-detail').then((m) => m.EventDetailComponent),
   },
+  { 
+    path: 'restaurant/:id', 
+    loadComponent: () => 
+      import('./feature/restaurant-detail/restaurant-detail').then(m => m.RestaurantDetailComponent) },
 ];
