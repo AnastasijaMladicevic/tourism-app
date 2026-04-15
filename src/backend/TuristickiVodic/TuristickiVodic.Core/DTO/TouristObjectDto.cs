@@ -12,6 +12,8 @@ namespace TuristickiVodic.Core.DTO
         public string? PhoneNumber { get; set; }
         public string? Website { get; set; }
         public string? WorkingHours { get; set; }
+        public decimal? Price { get; set; }
+        public string[] Amenities { get; set; } = Array.Empty<string>();
         public double? Longitude { get; set; }
         public double? Latitude { get; set; }
         public bool IsActive { get; set; }

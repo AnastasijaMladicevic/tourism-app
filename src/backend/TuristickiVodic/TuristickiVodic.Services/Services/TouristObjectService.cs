@@ -94,6 +94,32 @@ namespace TuristickiVodic.Services.Services
                     (o.Description != null && o.Description.ToLower().Contains(search)));
             }
 
+            if (query.MinPrice.HasValue)
+            {
+                objectsQuery = objectsQuery.Where(o =>
+                    o.Price.HasValue &&
+                    o.Price.Value >= query.MinPrice.Value);
+            }
+
+            if (query.MaxPrice.HasValue)
+            {
+                objectsQuery = objectsQuery.Where(o =>
+                    o.Price.HasValue &&
+                    o.Price.Value <= query.MaxPrice.Value);
+            }
+
+            if (query.MinRating.HasValue)
+            {
+                objectsQuery = objectsQuery.Where(o =>
+                    o.AverageRating >= query.MinRating.Value);
+            }
+
+            if (query.MaxRating.HasValue)
+            {
+                objectsQuery = objectsQuery.Where(o =>
+                    o.AverageRating <= query.MaxRating.Value);
+            }
+
             objectsQuery = ApplyObjectSorting(objectsQuery, query.SortBy, query.SortOrder);
 
             var totalCount = await objectsQuery.CountAsync();
@@ -162,6 +188,9 @@ namespace TuristickiVodic.Services.Services
             if (!await _context.ObjectTypes.AnyAsync(x => x.Id == dto.ObjectTypeId))
                 throw new InvalidOperationException("Object type not found.");
 
+            if (dto.Price.HasValue && dto.Price.Value < 0)
+                throw new InvalidOperationException("Price cannot be negative.");
+
             var obj = new TouristObject
             {
                 Name = dto.Name,
@@ -170,6 +199,8 @@ namespace TuristickiVodic.Services.Services
                 PhoneNumber = dto.PhoneNumber,
                 Website = dto.Website,
                 WorkingHours = dto.WorkingHours,
+                Price = dto.Price,
+                Amenities = NormalizeAmenities(dto.Amenities),
                 Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
                 ObjectTypeId = dto.ObjectTypeId,
                 DestinationId = dto.DestinationId.Value,
@@ -238,6 +269,18 @@ namespace TuristickiVodic.Services.Services
             if (dto.PhoneNumber != null) obj.PhoneNumber = dto.PhoneNumber;
             if (dto.Website != null) obj.Website = dto.Website;
             if (dto.WorkingHours != null) obj.WorkingHours = dto.WorkingHours;
+
+            if (dto.Price.HasValue)
+            {
+                if (dto.Price.Value < 0)
+                    throw new InvalidOperationException("Price cannot be negative.");
+
+                obj.Price = dto.Price.Value;
+            }
+
+            if (dto.Amenities != null)
+                obj.Amenities = NormalizeAmenities(dto.Amenities);
+
             if (dto.Longitude.HasValue && dto.Latitude.HasValue)
                 obj.Geolocation = CreatePoint(dto.Longitude, dto.Latitude);
 
@@ -405,7 +448,7 @@ namespace TuristickiVodic.Services.Services
                     : query.OrderBy(o => o.Locality != null ? o.Locality.Name : string.Empty);
             }
 
-            if (sortByValue == "rating")
+            if (sortByValue == "rating" || sortByValue == "averagerating")
             {
                 return isDesc
                     ? query.OrderByDescending(o => o.AverageRating)
@@ -419,9 +462,28 @@ namespace TuristickiVodic.Services.Services
                     : query.OrderBy(o => o.ReviewCount);
             }
 
+            if (sortByValue == "price")
+            {
+                return isDesc
+                    ? query.OrderByDescending(o => o.Price ?? decimal.MinValue)
+                    : query.OrderBy(o => o.Price ?? decimal.MaxValue);
+            }
+
             return isDesc
                 ? query.OrderByDescending(o => o.Name)
                 : query.OrderBy(o => o.Name);
+        }
+
+        private static string[] NormalizeAmenities(string[]? amenities)
+        {
+            if (amenities == null)
+                return Array.Empty<string>();
+
+            return amenities
+                .Where(a => !string.IsNullOrWhiteSpace(a))
+                .Select(a => a.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
         }
     }
 }

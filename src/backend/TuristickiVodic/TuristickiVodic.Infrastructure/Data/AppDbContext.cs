@@ -106,6 +106,10 @@ public class AppDbContext : DbContext
             .HasConversion<string>();
 
         mb.Entity<TouristObject>()
+            .Property(o => o.Amenities)
+            .HasColumnType("text[]");
+
+        mb.Entity<TouristObject>()
             .HasIndex(o => o.Geolocation)
             .HasMethod("GIST");
 

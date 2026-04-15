@@ -20,6 +20,8 @@ namespace TuristickiVodic.Core.DTO
         public string? Website { get; set; }
 
         public string? WorkingHours { get; set; }
+        public decimal? Price { get; set; }
+        public string[]? Amenities { get; set; }
 
         public double? Longitude { get; set; }
 

@@ -1646,6 +1646,21 @@ CREATE TRIGGER tg_update_rating
 AFTER INSERT OR UPDATE OR DELETE ON "Reviews"
 FOR EACH ROW EXECUTE FUNCTION update_object_rating();
 
+UPDATE "Objects" o
+SET
+    "AverageRating" = COALESCE((
+        SELECT ROUND(AVG(r."Rating")::numeric, 2)
+        FROM "Reviews" r
+        WHERE r."ObjectId" = o."Id"
+          AND r."Status" = 'Approved'
+    ), 0),
+    "ReviewCount" = (
+        SELECT COUNT(*)
+        FROM "Reviews" r
+        WHERE r."ObjectId" = o."Id"
+          AND r."Status" = 'Approved'
+    );
+
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN

@@ -408,7 +408,7 @@ namespace TuristickiVodic.Tests.Validation
         }
 
         [Fact]
-        public void CreateTouristObjectDto_BezDestinationId_NijeValidno()
+        public void CreateTouristObjectDto_BezDestinationIdILocalityId_NijeValidno()
         {
             var dto = new CreateTouristObjectDto
             {
@@ -417,7 +417,9 @@ namespace TuristickiVodic.Tests.Validation
             };
 
             IsValid(dto).Should().BeFalse();
-            Validate(dto).Should().Contain(r => r.MemberNames.Contains("DestinationId"));
+            Validate(dto).Should().Contain(r =>
+                r.MemberNames.Contains(nameof(CreateTouristObjectDto.DestinationId)) &&
+                r.MemberNames.Contains(nameof(CreateTouristObjectDto.LocalityId)));
         }
 
         [Fact]
@@ -428,6 +430,19 @@ namespace TuristickiVodic.Tests.Validation
                 Name = "Objekat bez lokaliteta",
                 ObjectTypeId = 1,
                 DestinationId = 1
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateTouristObjectDto_SamoLocalityId_JeValidno()
+        {
+            var dto = new CreateTouristObjectDto
+            {
+                Name = "Objekat sa lokalitetom",
+                ObjectTypeId = 1,
+                LocalityId = 1
             };
 
             IsValid(dto).Should().BeTrue();
@@ -458,6 +473,8 @@ namespace TuristickiVodic.Tests.Validation
                 PhoneNumber = "+38232123456",
                 Website = "https://hotel.com",
                 WorkingHours = "00:00-24:00",
+                Price = 135.50m,
+                Amenities = new[] { "wifi", "parking", "bazen" },
                 Longitude = 18.77,
                 Latitude = 42.42,
                 ObjectTypeId = 1,

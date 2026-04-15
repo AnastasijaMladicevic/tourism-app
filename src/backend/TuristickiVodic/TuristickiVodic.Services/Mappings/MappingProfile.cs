@@ -2,6 +2,8 @@
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 
+using System;
+
 namespace TuristickiVodic.Services.Mappings
 {
     public class MappingProfile : Profile
@@ -191,6 +193,8 @@ namespace TuristickiVodic.Services.Mappings
                     opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
                 .ForMember(dest => dest.Latitude,
                     opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.Y : (double?)null))
+                .ForMember(dest => dest.Amenities,
+                    opt => opt.MapFrom(src => src.Amenities ?? Array.Empty<string>()))
                 .ForMember(dest => dest.Status,
                     opt => opt.MapFrom(src => src.Status.ToString()));
 

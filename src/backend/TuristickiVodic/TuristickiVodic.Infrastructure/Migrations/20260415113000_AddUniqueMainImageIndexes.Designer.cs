@@ -892,6 +892,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
 
+                    b.PrimitiveCollection<string[]>("Amenities")
+                        .HasColumnType("text[]");
+
                     b.Property<DateTime?>("ApprovedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -933,6 +936,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)");
+
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("RejectionReason")
                         .HasColumnType("text");

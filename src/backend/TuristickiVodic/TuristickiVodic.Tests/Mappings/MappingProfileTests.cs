@@ -401,7 +401,11 @@ namespace TuristickiVodic.Tests.Mappings
                 PhoneNumber = "+38232123456",
                 Website = "https://hotel.com",
                 WorkingHours = "00:00-24:00",
+                Price = 120m,
+                Amenities = new[] { "WiFi", "Parking" },
                 IsActive = true,
+                AverageRating = 4.7m,
+                ReviewCount = 12,
                 Status = ContentStatus.Pending,
                 ObjectTypeId = 2,
                 ObjectType = new ObjectType { Id = 2, Name = "Hotel" },
@@ -434,6 +438,10 @@ namespace TuristickiVodic.Tests.Mappings
             dto.DestinationId.Should().Be(4);
             dto.DestinationName.Should().Be("Stari grad Kotor");
             dto.Status.Should().Be("Pending");
+            dto.Price.Should().Be(120m);
+            dto.Amenities.Should().Equal("WiFi", "Parking");
+            dto.AverageRating.Should().Be(4.7m);
+            dto.ReviewCount.Should().Be(12);
             dto.MainImageUrl.Should().Be("https://img.test/object-main.jpg");
         }
 

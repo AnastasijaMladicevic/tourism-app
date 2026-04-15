@@ -12,6 +12,18 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 name: "FK_Destinations_Users_ManagedByUserId",
                 table: "Destinations");
 
+            migrationBuilder.AddColumn<string[]>(
+                name: "Amenities",
+                table: "Objects",
+                type: "text[]",
+                nullable: true);
+
+            migrationBuilder.AddColumn<decimal>(
+                name: "Price",
+                table: "Objects",
+                type: "numeric",
+                nullable: true);
+
             migrationBuilder.AddForeignKey(
                 name: "FK_Destinations_Users_ManagedByUserId",
                 table: "Destinations",
@@ -68,6 +80,14 @@ namespace TuristickiVodic.Infrastructure.Migrations
             migrationBuilder.DropForeignKey(
                 name: "FK_Destinations_Users_ManagedByUserId",
                 table: "Destinations");
+
+            migrationBuilder.DropColumn(
+                name: "Amenities",
+                table: "Objects");
+
+            migrationBuilder.DropColumn(
+                name: "Price",
+                table: "Objects");
 
             migrationBuilder.DropIndex(
                 name: "IX_DeletionRequests_ActivityId",

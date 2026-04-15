@@ -81,13 +81,19 @@ namespace TuristickiVodic.Tests.Services
                 Name = "Pomorski muzej",
                 ObjectTypeId = objectType.Id,
                 LocalityId = locality.Id,
+                Price = 150m,
+                Amenities = new[] { "WiFi", "Parking", "wifi" },
                 Longitude = 18.77,
                 Latitude = 42.42,
             }, creator.Id, "ContentCreator");
 
             result.Name.Should().Be("Pomorski muzej");
+            result.Price.Should().Be(150m);
+            result.Amenities.Should().Equal("WiFi", "Parking");
             ctx.Objects.Single().DestinationId.Should().Be(destination.Id);
             ctx.Objects.Single().LocalityId.Should().Be(locality.Id);
+            ctx.Objects.Single().Price.Should().Be(150m);
+            ctx.Objects.Single().Amenities.Should().Equal("WiFi", "Parking");
             ctx.Objects.Single().Status.Should().Be(ContentStatus.Pending);
         }
 
@@ -225,6 +231,38 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task UpdateAsync_MenjaPriceIAmenities()
+        {
+            using var ctx = CreateInMemoryContext(nameof(UpdateAsync_MenjaPriceIAmenities));
+            var (objectType, destination, _, _, _, creator, _, _, _) = SeedBase(ctx);
+            ctx.Objects.Add(new TouristObject
+            {
+                Id = 1,
+                Name = "Objekat",
+                ObjectTypeId = objectType.Id,
+                DestinationId = destination.Id,
+                CreatedByUserId = creator.Id,
+                Price = 80m,
+                Amenities = new[] { "WiFi" },
+                Status = ContentStatus.Pending,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+            ctx.SaveChanges();
+            var svc = CreateService(ctx);
+
+            var result = await svc.UpdateAsync(1, new UpdateTouristObjectDto
+            {
+                Price = 125m,
+                Amenities = new[] { "Parking", "WiFi", "parking" }
+            }, creator.Id, "ContentCreator");
+
+            result.Should().NotBeNull();
+            result!.Price.Should().Be(125m);
+            result.Amenities.Should().Equal("Parking", "WiFi");
+        }
+
+        [Fact]
         public async Task DeleteAsync_ContentCreator_NeMozeApprovedObjekatDirektno()
         {
             using var ctx = CreateInMemoryContext(nameof(DeleteAsync_ContentCreator_NeMozeApprovedObjekatDirektno));
@@ -246,6 +284,77 @@ namespace TuristickiVodic.Tests.Services
             await svc.Invoking(s => s.DeleteAsync(1, creator.Id, "ContentCreator"))
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*deletion request*");
+        }
+
+        [Fact]
+        public async Task GetAllAsync_KadaSeFiltriraPoProsecnojOceni_VracaSamoObjekteUNaZadatomOpsegu()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaSeFiltriraPoProsecnojOceni_VracaSamoObjekteUNaZadatomOpsegu));
+            var (objectType, destination, _, locality, _, creator, _, _, _) = SeedBase(ctx);
+
+            ctx.Objects.AddRange(
+                new TouristObject
+                {
+                    Id = 1,
+                    Name = "Objekat 1",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    AverageRating = 4.8m,
+                    ReviewCount = 12,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new TouristObject
+                {
+                    Id = 2,
+                    Name = "Objekat 2",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    AverageRating = 3.2m,
+                    ReviewCount = 7,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+            ctx.Images.AddRange(
+                new Image
+                {
+                    Id = 1,
+                    ObjectId = 1,
+                    Url = "https://test.com/1.jpg",
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Image
+                {
+                    Id = 2,
+                    ObjectId = 2,
+                    Url = "https://test.com/2.jpg",
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+
+            var result = await svc.GetAllAsync(new TouristObjectQueryDto
+            {
+                MinRating = 4.0m,
+                MaxRating = 5.0m
+            });
+
+            result.Items.Should().HaveCount(1);
+            result.Items[0].Name.Should().Be("Objekat 1");
+            result.Items[0].AverageRating.Should().Be(4.8m);
         }
     }
 }

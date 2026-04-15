@@ -315,7 +315,7 @@ namespace TuristickiVodic.Services.Services
                 return;
 
             var ratings = await _context.Reviews
-                .Where(r => r.ObjectId == objectId)
+                .Where(r => r.ObjectId == objectId && r.Status == ContentStatus.Approved)
                 .Select(r => r.Rating)
                 .ToListAsync();
 
