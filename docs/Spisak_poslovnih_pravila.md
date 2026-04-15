@@ -73,11 +73,9 @@
 - Samo `Tourist` može da piše recenzije.
 - Recenzija može da se napiše samo za `Approved` objekat.
 - Jedan `Tourist` može imati samo jednu recenziju po objektu.
-- `Tourist` može da menja samo svoju recenziju i da je brise (kao i menadzer).
+- `Tourist` može da menja samo svoju recenziju i da je brise.
 - `ContentCreator` može da odgovori samo na recenzije svojih objekata.
-- `ContentCreator` može da menja svoj odgovor na recenziju.
-- `ContentCreator` može da briše svoj odgovor na recenziju (kao i menadzer).
-- `Manager` može da odobrava i odbija recenzije za objekte u svojoj destinaciji i da ih brise.
+- `ContentCreator` može da menja i briše svoj odgovor na recenziju.
 
 **OMILJENI (FAVORITES)**
 
