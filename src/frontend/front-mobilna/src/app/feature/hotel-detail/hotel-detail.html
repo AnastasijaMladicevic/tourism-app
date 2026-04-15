@@ -133,6 +133,54 @@
             }
           </div>
         </div>
+
+        <!-- REVIEWS -->
+        <div class="section">
+          <div class="card reviews-card">
+            <div class="reviews-header">
+              <h2>Review</h2>
+              @if (reviews.length > 2) {
+                <button class="see-all-btn" (click)="toggleReviewsExpanded()">
+                  {{ showAllReviews ? 'Show Less >' : 'See All >' }}
+                </button>
+              }
+            </div>
+
+            @if (visibleReviews.length > 0) {
+              <div class="reviews-list">
+                @for (review of visibleReviews; track review.id) {
+                  <article class="review-item">
+                    <div class="review-item__top">
+                      <div class="review-item__identity">
+                        <div class="review-avatar">{{ review.initials }}</div>
+                        <div class="review-meta">
+                          <h3>{{ review.author }}</h3>
+                          <div class="review-stars" aria-label="Review rating">
+                            @for (filled of review.stars; track $index) {
+                              <mat-icon [class.review-stars__empty]="!filled">star</mat-icon>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                      <span class="review-date">{{ review.relativeDate }}</span>
+                    </div>
+
+                    <p class="review-text">{{ review.text }}</p>
+
+                    @if (review.creatorResponse) {
+                      <div class="review-response">
+                        <span class="review-response__label">Hotel response</span>
+                        <p>{{ review.creatorResponse }}</p>
+                      </div>
+                    }
+                  </article>
+                }
+              </div>
+            } @else {
+              <div class="reviews-empty">Reviews će biti prikazani kada stignu sa backenda.</div>
+            }
+          </div>
+        </div>
       </div>
 
       <!-- DESNA STRANA (MAPA) -->
