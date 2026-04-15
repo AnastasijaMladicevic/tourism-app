@@ -1,5 +1,4 @@
 <div class="screen">
-  <!-- Header -->
   <div class="header">
     <button class="icon-btn" (click)="goBack()">
       <mat-icon>arrow_back_ios</mat-icon>
@@ -10,7 +9,7 @@
   @if (isLoading) {
     <div class="loading">
       <mat-icon>hourglass_empty</mat-icon>
-      <p>Učitavanje...</p>
+      <p>Ucitavanje...</p>
     </div>
   }
 
@@ -23,7 +22,6 @@
   }
 
   @if (hotel) {
-    <!-- Hero slika -->
     <div class="hero">
       @if (mainImage) {
         <img [src]="mainImage" [alt]="hotel.name" (error)="onImageError($event)" />
@@ -38,9 +36,7 @@
     </div>
 
     <div class="content">
-      <!-- LEVA STRANA -->
       <div class="left">
-        <!-- HEADER / HERO INFO -->
         <div class="card">
           <h1 class="title">{{ hotel.name }}</h1>
 
@@ -53,9 +49,7 @@
           </div>
 
           <p class="location-bold">{{ hotel.localityName || hotel.destinationName }}, Montenegro</p>
-
           <p class="address"><mat-icon>location_on</mat-icon>{{ hotel.address || 'Address not available' }}</p>
-
           <p class="price-tag">Starting from <strong>$320/night</strong></p>
 
           <div class="actions">
@@ -63,7 +57,6 @@
           </div>
         </div>
 
-        <!-- AMENITIES -->
         <div class="card">
           <h2>Hotel Amenities</h2>
           <div class="amenities-grid">
@@ -90,7 +83,6 @@
           </div>
         </div>
 
-        <!-- AKCIJE -->
         <div class="action-buttons">
           <button class="btn btn-action" (click)="callHotel()">
             <mat-icon>call</mat-icon>
@@ -102,7 +94,6 @@
           </button>
         </div>
 
-        <!-- O HOTELU -->
         <div class="card">
           <h2>About</h2>
           <p class="description">
@@ -110,7 +101,6 @@
           </p>
         </div>
 
-        <!-- GALERIJA -->
         <div class="section">
           <div class="card gallery-card">
             <div class="gallery-header">
@@ -134,7 +124,6 @@
           </div>
         </div>
 
-        <!-- REVIEWS -->
         <div class="section">
           <div class="card reviews-card">
             <div class="reviews-header">
@@ -177,15 +166,56 @@
                 }
               </div>
             } @else {
-              <div class="reviews-empty">Reviews će biti prikazani kada stignu sa backenda.</div>
+              <div class="reviews-empty">Reviews ce biti prikazani kada stignu sa backenda.</div>
+            }
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="card nearby-card">
+            <div class="nearby-header">
+              <h2>Nearby Hotels</h2>
+            </div>
+
+            @if (nearbyHotels.length > 0) {
+              <div class="nearby-list">
+                @for (nearbyHotel of nearbyHotels; track nearbyHotel.id) {
+                  <article class="nearby-item" (click)="openNearbyHotel(nearbyHotel.id)">
+                    <div class="nearby-item__image">
+                      @if (nearbyHotel.image) {
+                        <img [src]="nearbyHotel.image" [alt]="nearbyHotel.name" (error)="onImageError($event)" />
+                      } @else {
+                        <div class="nearby-item__placeholder">
+                          <mat-icon>hotel</mat-icon>
+                        </div>
+                      }
+                    </div>
+
+                    <div class="nearby-item__body">
+                      <h3>{{ nearbyHotel.name }}</h3>
+                      <p class="nearby-item__location">
+                        <mat-icon>location_on</mat-icon>
+                        <span>{{ nearbyHotel.location }}</span>
+                      </p>
+                      <p class="nearby-item__rating">
+                        <mat-icon>star</mat-icon>
+                        <span>
+                          {{ nearbyHotel.rating ? (nearbyHotel.rating | number: '1.1-1') : 'New' }}
+                          ({{ nearbyHotel.reviews }} reviews)
+                        </span>
+                      </p>
+                    </div>
+                  </article>
+                }
+              </div>
+            } @else {
+              <div class="nearby-empty">Nema drugih hotela u istoj lokaciji.</div>
             }
           </div>
         </div>
       </div>
 
-      <!-- DESNA STRANA (MAPA) -->
       <div class="right">
-        <!-- LOKACIJA -->
         <div class="card">
           <h2>Location</h2>
 
@@ -198,17 +228,16 @@
           </div>
         </div>
 
-        <!-- KONTAKT INFORMACIJE -->
         <div class="card">
           <h2>Contact</h2>
-          
+
           @if (hotel.phoneNumber) {
             <div class="contact-item">
               <mat-icon>phone</mat-icon>
               <a [href]="'tel:' + hotel.phoneNumber">{{ hotel.phoneNumber }}</a>
             </div>
           }
-          
+
           @if (hotel.website) {
             <div class="contact-item">
               <mat-icon>language</mat-icon>
@@ -228,16 +257,13 @@
   }
 </div>
 
-<!-- MODAL GALERIJA -->
 @if (showGalleryModal && images.length > 0) {
   <div class="gallery-modal" (click)="closeGallery()">
     <div class="modal-content" (click)="$event.stopImmediatePropagation()">
-      <!-- Close dugme -->
       <button class="modal-close" (click)="closeGallery()">
         <mat-icon>close</mat-icon>
       </button>
 
-      <!-- Glavna slika -->
       <div
         class="modal-image-container"
         (touchstart)="onTouchStart($event)"
@@ -251,7 +277,6 @@
         }
       </div>
 
-      <!-- Navigacija na desktopu -->
       <button class="modal-nav modal-nav-left" (click)="prevImage()">
         <mat-icon>chevron_left</mat-icon>
       </button>
@@ -259,7 +284,6 @@
         <mat-icon>chevron_right</mat-icon>
       </button>
 
-      <!-- Brojač slika -->
       <div class="modal-counter">
         {{ currentImageIndex + 1 }} / {{ images.length }}
       </div>

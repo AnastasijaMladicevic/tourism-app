@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { forkJoin } from 'rxjs';
+import { firstValueFrom, forkJoin } from 'rxjs';
 
 import { AuthService } from '../../services/auth';
 import { ImageDto, ImageService } from '../../services/image';
 import { ObjectDto, ObjectImageDto, ObjectService } from '../../services/object';
 import { ReviewDto, ReviewService } from '../../services/review';
+import { environment } from '../../../environment/environment';
 
 interface ReviewCard {
   id: number;
@@ -19,6 +20,15 @@ interface ReviewCard {
   text: string;
   relativeDate: string;
   creatorResponse?: string | null;
+}
+
+interface NearbyHotelCard {
+  id: number;
+  name: string;
+  image?: string;
+  location: string;
+  rating?: number;
+  reviews: number;
 }
 
 @Component({
@@ -33,6 +43,7 @@ export class HotelDetailComponent implements OnInit {
   hotel: ObjectDto | null = null;
   images: (ImageDto | ObjectImageDto)[] = [];
   reviews: ReviewCard[] = [];
+  nearbyHotels: NearbyHotelCard[] = [];
   mainImage = '';
   isLoading = true;
   errorMessage = '';
@@ -63,15 +74,21 @@ export class HotelDetailComponent implements OnInit {
       object: this.objectService.getById(id),
       images: this.imageService.getForObject(id),
       reviews: this.reviewService.getAll(),
+      allObjects: this.objectService.getAll(),
     }).subscribe({
-      next: ({ object, images, reviews }) => {
-        this.hotel = object;
-        this.workingHoursText = object.workingHours ? this.formatWorkingHours(object.workingHours) : '';
+      next: async ({ object, images, reviews, allObjects }) => {
+        const normalizedObject = this.normalizeObject(object);
 
-        const embeddedImages = object.images || [];
+        this.hotel = normalizedObject;
+        this.workingHoursText = normalizedObject.workingHours
+          ? this.formatWorkingHours(normalizedObject.workingHours)
+          : '';
+
+        const embeddedImages = normalizedObject.images || [];
         this.images = [...embeddedImages, ...images];
         this.mainImage = this.getMainImage(this.images);
-        this.reviews = this.toReviewCards(reviews, object.id);
+        this.reviews = this.toReviewCards(reviews, normalizedObject.id);
+        this.nearbyHotels = await this.buildNearbyHotels(allObjects, normalizedObject);
 
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -107,6 +124,10 @@ export class HotelDetailComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/hotels']);
+  }
+
+  openNearbyHotel(hotelId: number): void {
+    this.router.navigate(['/hotel', hotelId]);
   }
 
   bookNow(): void {
@@ -242,6 +263,46 @@ export class HotelDetailComponent implements OnInit {
       }));
   }
 
+  private async buildNearbyHotels(rawObjects: ObjectDto[], currentHotel: ObjectDto): Promise<NearbyHotelCard[]> {
+    const allHotels = this.toArray<ObjectDto>(rawObjects)
+      .map((object) => this.normalizeObject(object))
+      .filter((object) => this.isHotel(object.objectTypeName))
+      .filter((object) => object.id !== currentHotel.id);
+
+    const currentLocality = this.normalizeLocation(currentHotel.localityName);
+
+    const candidates = currentLocality
+      ? allHotels.filter((object) => this.normalizeLocation(object.localityName) === currentLocality)
+      : [];
+
+    const selected = candidates.slice(0, 2);
+
+    return Promise.all(
+      selected.map(async (object) => ({
+        id: object.id,
+        name: object.name,
+        image: await this.getNearbyHotelImage(object),
+        location: object.localityName ?? object.destinationName ?? 'Montenegro',
+        rating: object.averageRating,
+        reviews: object.reviewCount ?? 0,
+      }))
+    );
+  }
+
+  private async getNearbyHotelImage(object: ObjectDto): Promise<string | undefined> {
+    const mainEmbedded = object.images?.find((image) => image.isMain) ?? object.images?.[0];
+    const embeddedUrl = this.resolveMediaUrl(mainEmbedded?.url);
+    if (embeddedUrl) return embeddedUrl;
+
+    try {
+      const images = await firstValueFrom(this.imageService.getForObject(object.id));
+      const mainImage = images?.find((image) => image.isMain) ?? images?.[0];
+      return this.resolveMediaUrl(mainImage?.url);
+    } catch {
+      return undefined;
+    }
+  }
+
   private normalizeReview(raw: ReviewDto): ReviewDto {
     const dto = raw as unknown as Record<string, unknown>;
     const reviewedByUserIdValue = dto['reviewedByUserId'] ?? dto['ReviewedByUserId'] ?? null;
@@ -275,6 +336,61 @@ export class HotelDetailComponent implements OnInit {
     }
 
     return [];
+  }
+
+  private normalizeObject(raw: ObjectDto): ObjectDto {
+    const dto = raw as unknown as Record<string, unknown>;
+    return {
+      id: Number(dto['id'] ?? dto['Id'] ?? 0),
+      name: String(dto['name'] ?? dto['Name'] ?? ''),
+      description: (dto['description'] ?? dto['Description'] ?? undefined) as string | undefined,
+      address: (dto['address'] ?? dto['Address'] ?? undefined) as string | undefined,
+      phoneNumber: (dto['phoneNumber'] ?? dto['PhoneNumber'] ?? undefined) as string | undefined,
+      website: (dto['website'] ?? dto['Website'] ?? undefined) as string | undefined,
+      workingHours: (dto['workingHours'] ?? dto['WorkingHours'] ?? undefined) as string | undefined,
+      longitude: this.readOptionalNumber(dto, ['longitude', 'Longitude']),
+      latitude: this.readOptionalNumber(dto, ['latitude', 'Latitude']),
+      averageRating: this.readOptionalNumber(dto, ['averageRating', 'AverageRating']),
+      reviewCount: this.readOptionalNumber(dto, ['reviewCount', 'ReviewCount']),
+      distanceKm: this.readOptionalNumber(dto, ['distanceKm', 'DistanceKm']),
+      isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
+      objectTypeId: Number(dto['objectTypeId'] ?? dto['ObjectTypeId'] ?? 0),
+      objectTypeName: String(dto['objectTypeName'] ?? dto['ObjectTypeName'] ?? ''),
+      localityName: (dto['localityName'] ?? dto['LocalityName'] ?? undefined) as string | undefined,
+      destinationName:
+        (dto['destinationName'] ?? dto['DestinationName'] ?? undefined) as string | undefined,
+      images: ((dto['images'] ?? dto['Images'] ?? []) as ObjectDto['images']) || [],
+    };
+  }
+
+  private readOptionalNumber(obj: Record<string, unknown>, keys: string[]): number | undefined {
+    for (const key of keys) {
+      const value = obj[key];
+      if (value == null) continue;
+      const num = Number(value);
+      if (!Number.isNaN(num)) return num;
+    }
+    return undefined;
+  }
+
+  private isHotel(typeName?: string): boolean {
+    if (!typeName) return false;
+    return typeName.trim().toLowerCase().includes('hotel');
+  }
+
+  private normalizeLocation(value?: string): string {
+    return (value ?? '').trim().toLowerCase();
+  }
+
+  private resolveMediaUrl(raw?: string): string | undefined {
+    if (!raw) return undefined;
+    const trimmed = raw.trim();
+    if (!trimmed) return undefined;
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+
+    const apiBase = environment.apiUrl.replace(/\/api\/?$/, '');
+    if (trimmed.startsWith('/')) return `${apiBase}${trimmed}`;
+    return `${apiBase}/${trimmed}`;
   }
 
   private getInitials(fullName?: string): string {
