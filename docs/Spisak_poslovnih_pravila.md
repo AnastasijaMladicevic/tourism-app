@@ -18,6 +18,8 @@
 - Samo `Admin` može da briše destinacije.
 - Brisanje destinacije se vrsi kaskadno .
 - Jedan `Manager` ne moze da rukovodi sa vise destinacija.
+- Svaka destinacija mora imati dodeljenog Manager-a u svakom trenutku.
+- Manager koji upravlja destinacijom ne može biti obrisan dok se toj destinaciji ne dodeli drugi Manager.
 - Admin moze obrisati destinaciju. Brisanje je nepovratno i zahteva eksplicitnu potvrdu korisnika (front).
 
 **LOKALITET**
@@ -33,7 +35,7 @@
 - Samo `ContentCreator` može da kreira objekat.
 - Kada `ContentCreator` kreira objekat, status se postavlja na `Pending`.
 - Jednom odobren objekat vise ne mora da dobije dozvolu da bi bio izmenjen.
-- `DestinationId` se automatski preuzima iz `LocationId`.
+- `DestinationId` se automatski preuzima iz `LocalityId`.
 - Samo `ContentCreator` može da menja sadržaj objekta.
 - `ContentCreator` može da menja samo svoje objekte.
 - `Manager` ne menja sadržaj objekta, već samo odobrava ili odbija status za objekte u svojoj destinaciji.
@@ -101,12 +103,10 @@
 
 **DELETION REQUESTS**
 
-- Samo `ContentCreator` može da pošalje zahtev za brisanje objekta.
-- Samo `ContentCreator` može da pošalje zahtev za brisanje eventa.
+- Samo `ContentCreator` može da pošalje zahtev za brisanje `objekta`, `eventa` ili `aktivnosti`.
 - `ContentCreator` može da pošalje zahtev samo za svoj sadržaj.
-- Deletion request može da se pošalje samo za `Approved` objekat ili event.
-- Ne može da postoji više `Pending` zahteva za isti objekat.
-- Ne može da postoji više `Pending` zahteva za isti event.
+- Deletion request može da se pošalje samo za `Approved` objekat, event ili aktivnost.
+- Ne može da postoji više `Pending` zahteva za isti objekat, event ili aktivnost
 - `ContentCreator` može da vidi samo svoje deletion request-ove.
 - `ContentCreator` može da vidi samo svoj konkretan deletion request po ID-u.
 - `Manager` vidi samo deletion request-ove za svoju destinaciju.
@@ -161,7 +161,10 @@
 
 - Entitet može imati više slika.
 - Svaki entitet mora imati tačno jednu glavnu sliku (`IsMain = true`) u svakom trenutku.
-- Entitet se ne prikazuje javno dok nema glavnu sliku, ali moze biti kreiran bez slika.
+- Entitet može biti kreiran bez slika.
+- Entitet se ne prikazuje javno dok nema glavnu sliku.
+- Kada entitet ima slike, mora postojati tačno jedna glavna slika.
+- Nije dozvoljeno da entitet koji ima slike ostane bez glavne slike.
 - Nije dozvoljeno imati više od jedne glavne slike.
 - Nije dozvoljeno da entitet nema nijednu glavnu sliku.
 - Slike se mogu dodavati samo za postojeće entitete.
