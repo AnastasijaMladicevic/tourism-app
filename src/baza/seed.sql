@@ -251,7 +251,28 @@ VALUES
  ('Selo Njegusi', 'Tradicionalno planinsko selo poznato po pršuti i siru',
  ST_SetSRID(ST_MakePoint(18.820, 42.420), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Selo'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW());
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
+ 
+ ('Lovcen', 'Planina poznata po Njegosevom mauzoleju i nacionalnom parku',
+ ST_SetSRID(ST_MakePoint(18.839, 42.399), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Planina'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
+
+('Skadarsko jezero', 'Najvece jezero na Balkanu poznato po biodiverzitetu',
+ ST_SetSRID(ST_MakePoint(19.300, 42.200), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Jezero'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
+
+('Kolasin', 'Planinski grad i ski centar na severu Crne Gore',
+ ST_SetSRID(ST_MakePoint(19.522, 42.822), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ski centar'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
+
+('Zabljak', 'Planinski grad u blizini Durmitora',
+ ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Selo'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW())
+ ;
 
 UPDATE "Destinations"
 SET "ManagedByUserId" = (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com')
@@ -337,7 +358,33 @@ VALUES
  ST_SetSRID(ST_MakePoint(18.943, 42.773), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Spomen park'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW());
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
+ 
+ ('Njegosev mauzolej', 'Mauzolej Petra II Petrovica Njegosa na Lovcenu',
+ ST_SetSRID(ST_MakePoint(18.839, 42.399), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovcen'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
+ 
+ ('Virpazar', 'Malo mesto na obali Skadarskog jezera, polazna tacka za ture',
+ ST_SetSRID(ST_MakePoint(19.091, 42.246), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Turisticka Zona'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
+
+ ('Biogradsko jezero', 'Lednicko jezero u nacionalnom parku Biogradska gora',
+ ST_SetSRID(ST_MakePoint(19.565, 42.890), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Prirodni lokalitet'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
+ 
+ ('Centar Zabljaka', 'Glavna turisticka zona Zabljaka',
+ ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW())
+ ;
+
 
 -- ============================================
 -- 6. OBJECTS
@@ -407,7 +454,26 @@ VALUES
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
- NOW(), NOW(), NOW());
+ NOW(), NOW(), NOW()),
+ 
+ ('Restoran Jezero', 'Restoran sa pogledom na Skadarsko jezero',  'Virpazar bb', '+38220000003', NULL,
+ '{"pon":"09:00-22:00"}', ST_SetSRID(ST_MakePoint(19.091, 42.246), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+ ('Hotel Bianca Kolasin', 'Popularan hotel u Kolasinu',  'Kolasin centar', '+38220000004', NULL,
+ '{"pon":"00:00-24:00"}', ST_SetSRID(ST_MakePoint(19.522, 42.822), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Biogradsko jezero'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
+ NOW(), NOW(), NOW())
+ ;
 
 -- ============================================
 -- 7. ACTIVITIES
@@ -452,8 +518,29 @@ VALUES
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
  NULL,
  1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), 
+ NOW(), NOW()),
+ 
+ ('Voznja camcem Skadarsko jezero', 'Organizovana voznja camcem kroz prirodu',
+ ST_SetSRID(ST_MakePoint(19.091, 42.246), 4326), 15.00, 120, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Voznja camcem'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
+ NULL,
+ 1,
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
- NOW(), NOW());
+ NOW(), NOW()),
+
+ ('Skijanje Kolasin', 'Skijanje na ski stazama Kolasina',
+ ST_SetSRID(ST_MakePoint(19.522, 42.822), 4326), 30.00, 240, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Skijanje'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Biogradsko jezero'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+ NULL,
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
+ NOW(), NOW())
+ ;
 
 -- ============================================
 -- 8. EVENTS
@@ -1010,6 +1097,139 @@ VALUES
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Selo Njegusi'),
     NOW()),
+
+(
+    'https://upload.wikimedia.org/wikipedia/commons/8/8c/Lovcen-008-p1010045.jpg',
+    'Lovcen',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovcen'),
+    NOW()),
+
+(
+    'https://upload.wikimedia.org/wikipedia/commons/2/20/Jezerski_vrh_na_Lovcenu_-_Njegosev_mauzolej_08.jpg',
+    'Lovcen',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovcen'),
+    NOW()),
+
+(
+    'https://nparkovi.me/educational_corner/lovcen/npark-lovcen-02t.jpg',
+    'Lovcen',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovcen'),
+    NOW()),
+
+(
+    'https://storage.medialib.dev/media/kotor-cable-car/2025/06/19/17503687890escg2e9w71ys2nb-i_1497x842.jpg',
+    'Lovcen',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovcen'),
+    NOW()),
+
+(
+    'https://visitcetinje.com/lat/wp-content/uploads/2024/10/lovcen.jpg',
+    'Lovcen',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovcen'),
+    NOW()),
+
+(
+    'https://upload.wikimedia.org/wikipedia/commons/b/b6/Lac_de_Shkodra.jpg',
+    'Skadarsko jezero',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
+    NOW()),
+
+(
+    'https://apartments-sofija.com/wp-content/uploads/skadarsko-jezero-crna-gora-1.jpg',
+    'Skadarsko jezero',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
+    NOW()),
+
+(
+    'https://www.portomontenegro.com/wp-content/uploads/2022/05/skadar-national-park-825x465.jpg',
+    'Skadarsko jezero',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
+    NOW()),
+
+(
+    'https://visitadabojana.com/wp-content/uploads/2025/10/pavlova-strana-viewpoint.webp',
+    'Skadarsko jezero',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
+    NOW()),
+
+(
+    'https://parksdinarides.org/wp-content/uploads/2022/04/Skadarsko-jezero-4..jpg',
+    'Skadarsko jezero',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
+    NOW()),
+
+(
+    'https://upload.wikimedia.org/wikipedia/commons/0/0e/Kola%C5%A1in_Town_Center.jpg',
+    'Kolasin',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+    NOW()),
+
+(
+    'https://upload.wikimedia.org/wikipedia/commons/2/24/Kolasin_-_Town_view.JPG',
+    'Kolasin',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+    NOW()),
+
+(
+    'https://skijalista.me/wp-content/uploads/DJI_0765.jpg',
+    'Kolasin',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+    NOW()),
+    
+(
+    'https://kolasin1450.com/img/home/skijaliste1.jpg',
+    'Kolasin',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+    NOW()),
+
+(
+    'https://www.zabljak.com/img/hero/hero-2.jpg',
+    'Zabljak',
+    true,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+    NOW()),
+
+(
+    'https://sharemontenegro.me/wp-content/uploads/2019/02/viber-image-1280x853.jpg',
+    'Zabljak',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+    NOW()),
+
+(
+    'https://rezidenthotel.com/wp-content/uploads/2025/05/crno-jezero-zabljak-rezident-hotel.webp',
+    'Zabljak',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+    NOW()),
+
+(
+    'https://zabljak.me/wp-content/uploads/2025/06/slika-zabljak-slider-06.jpg',
+    'Zabljak',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+    NOW()),
+
+(
+    'https://zabljak.me/wp-content/uploads/2025/06/slika-zabljak-slider-06.jpg',
+    'Zabljak',
+    false,
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+    NOW())
     ;
 
 -- ============================================
@@ -1437,6 +1657,126 @@ VALUES
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Niksic'),
     NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/a/ad/Petar_II_Petrovi%C4%87-Njego%C5%A1_mausoleum_08.jpg',
+    'Njegosev mauzolej',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njegosev mauzolej'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/1/18/Lovcen.jpg',
+    'Njegosev mauzolej',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njegosev mauzolej'),
+    NOW()),
+(
+    'https://adrion5senses.eu/wp-content/uploads/sw_win/files/strict_cache/1040x6608aaebc16a31607216b5ea7255d611811-l.jpg',
+    'Njegosev mauzolej',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njegosev mauzolej'),
+    NOW()),
+(
+    'https://www.3dvirtualheritage.me/storage/posts/nBkWuggeMo3PI8TY7vUfjVwqzUnEf0kARObRnrmr.png',
+    'Njegosev mauzolej',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njegosev mauzolej'),
+    NOW()),
+(
+    'https://www.danas.rs/wp-content/uploads/2017/08/00_Lovcen-1.jpg',
+    'Njegosev mauzolej',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njegosev mauzolej'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/5/53/Virpazar.jpg',
+    'Virpazar',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
+    NOW()),
+(
+    'https://www.ekapija.com/thumbs169/naselje_virpazar_na_skadarskom_jezeru_1_050925_tw1024.jpg',
+    'Virpazar',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
+    NOW()),
+(
+    'https://www.visit-montenegro.com/wp-content/uploads/2026/01/virpazar-01-scaled.jpg',
+    'Virpazar',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
+    NOW()),
+(
+    'https://undiscoveredmontenegro.com/wp-content/uploads/2025/02/Virpazar-view-2.png',
+    'Virpazar',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
+    NOW()),
+(
+    'https://tinymontenegro.com/wp-content/uploads/2023/10/imageedit_1_2824406581.jpg',
+    'Virpazar',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/9/96/Biogradsko_jezero_%282%29.JPG',
+    'Biogradsko jezero',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Biogradsko jezero'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/a/a9/Crno_jezero_%28Durmitor%29.jpg',
+    'Biogradsko jezero',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Biogradsko jezero'),
+    NOW()),
+(
+    'https://www.kolasin.com/img/article/biogradska-gora/biogradska-gora-1.jpg',
+    'Biogradsko jezero',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Biogradsko jezero'),
+    NOW()),
+(
+    'https://podgorica.travel/wp-content/uploads/2024/05/biogradsko-lake.jpg',
+    'Biogradsko jezero',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Biogradsko jezero'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/0/0c/Biogradsko_jezero4.jpg',
+    'Biogradsko jezero',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Biogradsko jezero'),
+    NOW()),
+(
+    'https://www.gradnja.rs/wp-content/uploads/2023/12/trg-zabljak-konkurs-03.jpg',
+    'Centar Zabljaka',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
+    NOW()),
+(
+    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/144223095.jpg?k=d4bd79559ef5e7fbdc95e84b3c945ea62a730fc194992f4328b0635694225719&o=',
+    'Centar Zabljaka',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
+    NOW()),
+(
+    'https://www.gradnja.rs/wp-content/uploads/2023/12/trg-zabljak-konkurs-04.jpg',
+    'Centar Zabljaka',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
+    NOW()),
+(
+    'https://zabljak.me/wp-content/uploads/2024/06/O-Zabljak-6.webp',
+    'Centar Zabljaka',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
+    NOW()),
+(
+    'https://zabljak.me/wp-content/uploads/2025/06/slika-zabljak-slider-06.jpg',
+    'Centar Zabljaka',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
+    NOW())
 ;
 
 -- ============================================
@@ -1606,6 +1946,60 @@ VALUES
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Nikole Bar'),
     NOW()),
+(
+    'https://foodbook.me/storage/restaurants/14/Gj29LMFOkJ0Uj2gFTgW7O9Eab4bldkTUzZfYmfaQ.png',
+    'Restoran Jezero',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
+    NOW()),
+(
+    'https://bankar.me/wp-content/uploads/2023/03/restoran-jezero-e1679131895469.jpg',
+    'Restoran Jezero',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
+    NOW()),
+(
+    'https://foodbook.me/storage/restaurants/495/53kcPdHYXiiYrXl3Clx4xNnzsI9jSCDQWQinQs4u.jpeg',
+    'Restoran Jezero',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
+    NOW()),
+(
+    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/77650626.jpg?k=5626605edcaec3c0992f24c5d442839d08193e6d27e5c514ba354d7b20394a75&o=',
+    'Hotel Bianca Kolasin',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolasin'),
+    NOW()),
+(
+    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/19026752.jpg?k=e14990f4ba96f2a7cf0c568743d3285f1ad3a7129866214c4f33d8e67b9d6d91&o=',
+    'Hotel Bianca Kolasin',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolasin'),
+    NOW()),
+(
+    'https://www.kongresniturizam.com/storage/objects/BJU4szY2A66Ga5KK.jpg',
+    'Hotel Bianca Kolasin',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolasin'),
+    NOW()),
+(
+    'https://www.kongresniturizam.com/storage/objects/iDePcQLPEZgcGGcT.jpg',
+    'Hotel Bianca Kolasin',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolasin'),
+    NOW()),
+(
+    'https://imgcy.trivago.com/c_fill,d_dummy.jpeg,e_sharpen:60,f_auto,h_627,q_auto,w_1200/hotelier-images/37/95/f3ad44894d237c95c00e61b7b0f5f8e2c82512f95629fd1cd3e22ad5cc8f.jpeg',
+    'Hotel Bianca Kolasin',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolasin'),
+    NOW()),
+(
+    'https://imgcy.trivago.com/c_fill,d_dummy.jpeg,e_sharpen:60,f_auto,h_627,q_auto,w_1200/hotelier-images/37/95/f3ad44894d237c95c00e61b7b0f5f8e2c82512f95629fd1cd3e22ad5cc8f.jpeg',
+    'Hotel Bianca Kolasin',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolasin'),
+    NOW())
     ;
 
 -- ============================================
@@ -1709,7 +2103,68 @@ VALUES
     'Setnja starim gradom Kotora',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Setnja starim gradom Kotora'),
-    NOW());
+    NOW()),
+(
+    'https://skadarlakeboatcruise.com/wp-content/uploads/1111.jpg',
+    'Voznja camcem Skadarsko jezero',
+    true,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Voznja camcem Skadarsko jezero'),
+    NOW()),
+(
+    'https://skadarlakeboatcruise.com/wp-content/uploads/5-27.jpg',
+    'Voznja camcem Skadarsko jezero',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Voznja camcem Skadarsko jezero'),
+    NOW()),
+(
+    'https://putovanjazapet.com/wp-content/uploads/2025/06/Skadarsko-jezero-voznja-camcem-1024x683.jpg',
+    'Voznja camcem Skadarsko jezero',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Voznja camcem Skadarsko jezero'),
+    NOW()),
+(
+    'https://montesoltravel.me/assets/images/uploads/58/4.jpg',
+    'Voznja camcem Skadarsko jezero',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Voznja camcem Skadarsko jezero'),
+    NOW()),
+(
+    'https://skadarlakeboatcruise.com/wp-content/uploads/7-7.jpg',
+    'Voznja camcem Skadarsko jezero',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Voznja camcem Skadarsko jezero'),
+    NOW()),
+(
+    'https://skijalista.me/wp-content/uploads/DJI_0765.jpg',
+    'Skijanje Kolasin',
+    true,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolasin'),
+    NOW()),
+(
+    'https://skijalista.me/wp-content/uploads/DJI_0410-Copy.jpg',
+    'Skijanje Kolasin',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolasin'),
+    NOW()),
+(
+    'https://kolasin1450.com/img/home/skijaliste1.jpg',
+    'Skijanje Kolasin',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolasin'),
+    NOW()),
+(
+    'https://kolasin1450.com/img/home/skijaliste8.jpg',
+    'Skijanje Kolasin',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolasin'),
+    NOW()),
+(
+    'https://srbijazamlade.rs/fajlovi/productitem/kolasin-1600-skijaliste_5ffefd29559fc.jpg',
+    'Skijanje Kolasin',
+    false,
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolasin'),
+    NOW())
+    ;
 
 
     
