@@ -327,6 +327,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(o => o.Destination)
                 .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
+                .Include(o => o.Images)
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
@@ -335,6 +336,7 @@ namespace TuristickiVodic.Services.Services
             Id = o.Id,
             Name = o.Name,
             Description = o.Description,
+            MainImageUrl = o.Images?.FirstOrDefault(i => i.IsMain)?.Url,
             Address = o.Address,
             PhoneNumber = o.PhoneNumber,
             Website = o.Website,

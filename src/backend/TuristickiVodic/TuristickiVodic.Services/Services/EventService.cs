@@ -146,6 +146,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(e => e.Locality)
                 .Include(e => e.Destination)
                 .Include(e => e.Object)
+                .Include(e => e.Images)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             if (ev == null)
@@ -357,6 +358,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(e => e.Locality)
                 .Include(e => e.Destination)
                 .Include(e => e.Object)
+                .Include(e => e.Images)
                 .FirstAsync(e => e.Id == id);
         }
 

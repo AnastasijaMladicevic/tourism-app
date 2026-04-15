@@ -12,6 +12,8 @@ namespace TuristickiVodic.Core.DTO
 
         public string? Description { get; set; }
 
+        public string? MainImageUrl { get; set; }
+
         public double? Longitude { get; set; }
 
         public double? Latitude { get; set; }

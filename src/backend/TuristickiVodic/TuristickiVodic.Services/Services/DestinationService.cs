@@ -164,6 +164,7 @@ namespace TuristickiVodic.Services
 
             var created = await _context.Destinations
                 .Include(d => d.DestinationType)
+                .Include(d => d.Images)
                 .FirstAsync(d => d.Id == destination.Id);
 
             return _mapper.Map<DestinationDto>(created);
@@ -206,6 +207,7 @@ namespace TuristickiVodic.Services
 
             var updated = await _context.Destinations
                 .Include(d => d.DestinationType)
+                .Include(d => d.Images)
                 .FirstAsync(d => d.Id == destination.Id);
 
             return _mapper.Map<DestinationDto>(updated);
@@ -260,6 +262,7 @@ namespace TuristickiVodic.Services
 
             var updated = await _context.Destinations
                 .Include(d => d.DestinationType)
+                .Include(d => d.Images)
                 .FirstAsync(d => d.Id == destinationId);
 
             return _mapper.Map<DestinationDto>(updated);

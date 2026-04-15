@@ -241,12 +241,17 @@ namespace TuristickiVodic.Tests.Mappings
                 Id = 4, Name = "Ulcinj", Status = ContentStatus.Approved,
                 DestinationTypeId = 2,
                 DestinationType = new DestinationType { Id = 2, Name = "Istorijski Grad" },
+                Images = new List<Image>
+                {
+                    new Image { Url = "https://img.test/destination-main.jpg", IsMain = true }
+                },
                 CreatedByUserId = 99
             };
 
             var dto = _mapper.Map<DestinationDto>(dest);
 
             dto.DestinationTypeName.Should().Be("Istorijski Grad");
+            dto.MainImageUrl.Should().Be("https://img.test/destination-main.jpg");
         }
 
         // ═══════════════════════════════════════════
@@ -266,6 +271,10 @@ namespace TuristickiVodic.Tests.Mappings
                 Destination = new Destination { Id = 5, Name = "Kotor", CreatedByUserId = 99 },
                 LocalityTypeId = 2,
                 LocalityType = new LocalityType { Id = 2, Name = "Centar" },
+                Images = new List<Image>
+                {
+                    new Image { Url = "https://img.test/locality-main.jpg", IsMain = true }
+                },
                 CreatedByUserId = 10,
                 CreatedAt = new DateTime(2024, 1, 15)
             };
@@ -279,6 +288,7 @@ namespace TuristickiVodic.Tests.Mappings
             dto.DestinationId.Should().Be(5);
             dto.LocalityTypeId.Should().Be(2);
             dto.CreatedByUserId.Should().Be(10);
+            dto.MainImageUrl.Should().Be("https://img.test/locality-main.jpg");
         }
 
         [Fact]
@@ -403,6 +413,10 @@ namespace TuristickiVodic.Tests.Mappings
                     DestinationId = 4,
                     Destination = new Destination { Id = 4, Name = "Stari grad Kotor", CreatedByUserId = 99 }
                 },
+                Images = new List<Image>
+                {
+                    new Image { Url = "https://img.test/object-main.jpg", IsMain = true }
+                },
                 DestinationId = 4,
                 CreatedByUserId = 10,
                 CreatedAt = new DateTime(2024, 1, 1),
@@ -420,6 +434,7 @@ namespace TuristickiVodic.Tests.Mappings
             dto.DestinationId.Should().Be(4);
             dto.DestinationName.Should().Be("Stari grad Kotor");
             dto.Status.Should().Be("Pending");
+            dto.MainImageUrl.Should().Be("https://img.test/object-main.jpg");
         }
 
         [Fact]
@@ -499,6 +514,10 @@ namespace TuristickiVodic.Tests.Mappings
                 Destination = new Destination { Id = 3, Name = "Kotor", CreatedByUserId = 99 },
                 ObjectId = 4,
                 Object = new TouristObject { Id = 4, Name = "Tvrdjava" },
+                Images = new List<Image>
+                {
+                    new Image { Url = "https://img.test/event-main.jpg", IsMain = true }
+                },
                 CreatedByUserId = 20,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -510,6 +529,7 @@ namespace TuristickiVodic.Tests.Mappings
             dto.LocalityName.Should().Be("Stari grad");
             dto.DestinationName.Should().Be("Kotor");
             dto.ObjectName.Should().Be("Tvrdjava");
+            dto.MainImageUrl.Should().Be("https://img.test/event-main.jpg");
         }
 
         [Fact]
@@ -598,6 +618,10 @@ namespace TuristickiVodic.Tests.Mappings
                 Destination = new Destination { Id = 3, Name = "Kotor", CreatedByUserId = 99 },
                 ObjectId = 4,
                 Object = new TouristObject { Id = 4, Name = "Tvrdjava" },
+                Images = new List<Image>
+                {
+                    new Image { Url = "https://img.test/activity-main.jpg", IsMain = true }
+                },
                 CreatedByUserId = 20,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -609,6 +633,7 @@ namespace TuristickiVodic.Tests.Mappings
             dto.LocalityName.Should().Be("Stari grad");
             dto.DestinationName.Should().Be("Kotor");
             dto.ObjectName.Should().Be("Tvrdjava");
+            dto.MainImageUrl.Should().Be("https://img.test/activity-main.jpg");
         }
 
         [Fact]

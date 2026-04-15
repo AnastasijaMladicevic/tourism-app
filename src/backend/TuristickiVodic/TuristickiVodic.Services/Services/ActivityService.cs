@@ -96,6 +96,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.Locality)
                 .Include(a => a.Destination)
                 .Include(a => a.Object)
+                .Include(a => a.Images)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (activity == null)
@@ -176,6 +177,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.Locality)
                 .Include(a => a.Destination)
                 .Include(a => a.Object)
+                .Include(a => a.Images)
                 .FirstAsync(a => a.Id == activity.Id);
 
             return _mapper.Map<ActivityDto>(created);
@@ -264,6 +266,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.Locality)
                 .Include(a => a.Destination)
                 .Include(a => a.Object)
+                .Include(a => a.Images)
                 .FirstAsync(a => a.Id == activity.Id);
 
             return _mapper.Map<ActivityDto>(updated);
@@ -278,6 +281,7 @@ namespace TuristickiVodic.Services.Services
                     .ThenInclude(l => l.Destination)
                 .Include(a => a.Destination)
                 .Include(a => a.Object)
+                .Include(a => a.Images)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (activity == null)
@@ -314,6 +318,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.Locality)
                 .Include(a => a.Destination)
                 .Include(a => a.Object)
+                .Include(a => a.Images)
                 .FirstAsync(a => a.Id == activity.Id);
 
             return _mapper.Map<ActivityDto>(updated);
@@ -358,6 +363,7 @@ namespace TuristickiVodic.Services.Services
                     .ThenInclude(l => l.Destination)
                 .Include(a => a.Destination)
                 .Include(a => a.Object)
+                .Include(a => a.Images)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (activity == null)
@@ -387,6 +393,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.Locality)
                 .Include(a => a.Destination)
                 .Include(a => a.Object)
+                .Include(a => a.Images)
                 .FirstAsync(a => a.Id == activity.Id);
 
             return _mapper.Map<ActivityDto>(updated);
