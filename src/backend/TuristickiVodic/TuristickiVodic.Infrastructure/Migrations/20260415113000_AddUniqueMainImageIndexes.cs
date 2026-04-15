@@ -32,6 +32,10 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
 
+            migrationBuilder.DropIndex(
+                name: "IX_DeletionRequests_ActivityId",
+                table: "DeletionRequests");
+
             migrationBuilder.CreateIndex(
                 name: "IX_DeletionRequests_ActivityId",
                 table: "DeletionRequests",
@@ -81,14 +85,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                 name: "FK_Destinations_Users_ManagedByUserId",
                 table: "Destinations");
 
-            migrationBuilder.DropColumn(
-                name: "Amenities",
-                table: "Objects");
-
-            migrationBuilder.DropColumn(
-                name: "Price",
-                table: "Objects");
-
             migrationBuilder.DropIndex(
                 name: "IX_DeletionRequests_ActivityId",
                 table: "DeletionRequests");
@@ -112,6 +108,19 @@ namespace TuristickiVodic.Infrastructure.Migrations
             migrationBuilder.DropIndex(
                 name: "IX_Images_ObjectId_IsMain_MainUnique",
                 table: "Images");
+
+            migrationBuilder.DropColumn(
+                name: "Amenities",
+                table: "Objects");
+
+            migrationBuilder.DropColumn(
+                name: "Price",
+                table: "Objects");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DeletionRequests_ActivityId",
+                table: "DeletionRequests",
+                column: "ActivityId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Destinations_Users_ManagedByUserId",
