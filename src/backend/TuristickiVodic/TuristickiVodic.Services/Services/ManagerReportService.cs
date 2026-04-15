@@ -97,37 +97,62 @@ namespace TuristickiVodic.Services.Services
             return await LoadDtoAsync(report.Id);
         }
 
-        public async Task<IEnumerable<ManagerReportDto>> GetForManagerAsync(int managerUserId)
+        public async Task<PagedResultDto<ManagerReportDto>> GetForManagerAsync(int managerUserId, ManagerReportQueryDto query)
         {
-            var reports = await _context.ManagerReports
-                .Include(r => r.Manager)
-                .Include(r => r.ReportedUser)
-                .Include(r => r.ResolvedBy)
-                .Where(r => r.ManagerId == managerUserId)
-                .OrderByDescending(r => r.CreatedAt)
+            NormalizeQuery(query);
+
+            var reportsQuery = BuildReportsQuery()
+                .Where(r => r.ManagerId == managerUserId);
+
+            reportsQuery = ApplyFilters(reportsQuery, query);
+            reportsQuery = ApplySorting(reportsQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await reportsQuery.CountAsync();
+
+            var reports = await reportsQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
                 .ToListAsync();
 
-            return reports.Select(MapToDto);
+            return new PagedResultDto<ManagerReportDto>
+            {
+                Items = reports.Select(MapToDto).ToList(),
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
         }
 
-        public async Task<IEnumerable<ManagerReportDto>> GetAllAsync()
+        public async Task<PagedResultDto<ManagerReportDto>> GetAllAsync(ManagerReportQueryDto query)
         {
-            var reports = await _context.ManagerReports
-                .Include(r => r.Manager)
-                .Include(r => r.ReportedUser)
-                .Include(r => r.ResolvedBy)
-                .OrderByDescending(r => r.CreatedAt)
+            NormalizeQuery(query);
+
+            var reportsQuery = BuildReportsQuery();
+
+            reportsQuery = ApplyFilters(reportsQuery, query);
+            reportsQuery = ApplySorting(reportsQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await reportsQuery.CountAsync();
+
+            var reports = await reportsQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
                 .ToListAsync();
 
-            return reports.Select(MapToDto);
+            return new PagedResultDto<ManagerReportDto>
+            {
+                Items = reports.Select(MapToDto).ToList(),
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
         }
 
         public async Task<ManagerReportDto?> GetByIdAsync(int id, int userId, string roleName)
         {
-            var report = await _context.ManagerReports
-                .Include(r => r.Manager)
-                .Include(r => r.ReportedUser)
-                .Include(r => r.ResolvedBy)
+            var report = await BuildReportsQuery()
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (report == null)
@@ -150,6 +175,7 @@ namespace TuristickiVodic.Services.Services
         {
             var report = await _context.ManagerReports
                 .Include(r => r.Manager)
+                    .ThenInclude(m => m.ManagedDestination)
                 .Include(r => r.ReportedUser)
                     .ThenInclude(u => u.Role)
                 .Include(r => r.ResolvedBy)
@@ -214,13 +240,170 @@ namespace TuristickiVodic.Services.Services
 
         private async Task<ManagerReportDto> LoadDtoAsync(int id)
         {
-            var report = await _context.ManagerReports
-                .Include(r => r.Manager)
-                .Include(r => r.ReportedUser)
-                .Include(r => r.ResolvedBy)
+            var report = await BuildReportsQuery()
                 .FirstAsync(r => r.Id == id);
 
             return MapToDto(report);
+        }
+
+        private IQueryable<ManagerReport> BuildReportsQuery()
+        {
+            return _context.ManagerReports
+                .Include(r => r.Manager)
+                    .ThenInclude(m => m.ManagedDestination)
+                .Include(r => r.ReportedUser)
+                .Include(r => r.ResolvedBy)
+                .AsQueryable();
+        }
+
+        private static void NormalizeQuery(ManagerReportQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+        }
+
+        private static IQueryable<ManagerReport> ApplyFilters(IQueryable<ManagerReport> reportsQuery, ManagerReportQueryDto query)
+        {
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+
+                reportsQuery = reportsQuery.Where(r =>
+                    r.Reason.ToLower().Contains(search) ||
+                    (r.RejectionReason != null && r.RejectionReason.ToLower().Contains(search)) ||
+                    (r.Manager != null && (
+                        r.Manager.FirstName.ToLower().Contains(search) ||
+                        r.Manager.LastName.ToLower().Contains(search) ||
+                        (r.Manager.FirstName + " " + r.Manager.LastName).ToLower().Contains(search))) ||
+                    (r.ReportedUser != null && (
+                        r.ReportedUser.FirstName.ToLower().Contains(search) ||
+                        r.ReportedUser.LastName.ToLower().Contains(search) ||
+                        (r.ReportedUser.FirstName + " " + r.ReportedUser.LastName).ToLower().Contains(search))) ||
+                    (r.ResolvedBy != null && (
+                        r.ResolvedBy.FirstName.ToLower().Contains(search) ||
+                        r.ResolvedBy.LastName.ToLower().Contains(search) ||
+                        (r.ResolvedBy.FirstName + " " + r.ResolvedBy.LastName).ToLower().Contains(search))) ||
+                    (r.Manager != null &&
+                     r.Manager.ManagedDestination != null &&
+                     r.Manager.ManagedDestination.Name.ToLower().Contains(search)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Manager))
+            {
+                var manager = query.Manager.Trim().ToLower();
+
+                reportsQuery = reportsQuery.Where(r =>
+                    r.Manager != null && (
+                        r.Manager.FirstName.ToLower().Contains(manager) ||
+                        r.Manager.LastName.ToLower().Contains(manager) ||
+                        (r.Manager.FirstName + " " + r.Manager.LastName).ToLower().Contains(manager)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.ReportedUser))
+            {
+                var reportedUser = query.ReportedUser.Trim().ToLower();
+
+                reportsQuery = reportsQuery.Where(r =>
+                    r.ReportedUser != null && (
+                        r.ReportedUser.FirstName.ToLower().Contains(reportedUser) ||
+                        r.ReportedUser.LastName.ToLower().Contains(reportedUser) ||
+                        (r.ReportedUser.FirstName + " " + r.ReportedUser.LastName).ToLower().Contains(reportedUser)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+
+                reportsQuery = reportsQuery.Where(r =>
+                    r.Manager != null &&
+                    r.Manager.ManagedDestination != null &&
+                    r.Manager.ManagedDestination.Name.ToLower().Contains(destination));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Status))
+            {
+                var statusFilter = query.Status.Trim();
+
+                if (Enum.TryParse<ContentStatus>(statusFilter, true, out var parsedStatus))
+                {
+                    reportsQuery = reportsQuery.Where(r => r.Status == parsedStatus);
+                }
+                else
+                {
+                    reportsQuery = reportsQuery.Where(_ => false);
+                }
+            }
+
+            return reportsQuery;
+        }
+
+        private static IQueryable<ManagerReport> ApplySorting(IQueryable<ManagerReport> query, string? sortBy, string? sortOrder)
+        {
+            var sortByValue = sortBy?.Trim().ToLower();
+            var isDesc = sortOrder?.Trim().ToLower() == "desc";
+
+            if (sortByValue == "manager")
+            {
+                return isDesc
+                    ? query.OrderByDescending(r => r.Manager != null ? r.Manager.FirstName : string.Empty)
+                        .ThenByDescending(r => r.Manager != null ? r.Manager.LastName : string.Empty)
+                    : query.OrderBy(r => r.Manager != null ? r.Manager.FirstName : string.Empty)
+                        .ThenBy(r => r.Manager != null ? r.Manager.LastName : string.Empty);
+            }
+
+            if (sortByValue == "reporteduser" || sortByValue == "user")
+            {
+                return isDesc
+                    ? query.OrderByDescending(r => r.ReportedUser != null ? r.ReportedUser.FirstName : string.Empty)
+                        .ThenByDescending(r => r.ReportedUser != null ? r.ReportedUser.LastName : string.Empty)
+                    : query.OrderBy(r => r.ReportedUser != null ? r.ReportedUser.FirstName : string.Empty)
+                        .ThenBy(r => r.ReportedUser != null ? r.ReportedUser.LastName : string.Empty);
+            }
+
+            if (sortByValue == "destination")
+            {
+                return isDesc
+                    ? query.OrderByDescending(r => r.Manager != null && r.Manager.ManagedDestination != null
+                        ? r.Manager.ManagedDestination.Name
+                        : string.Empty)
+                    : query.OrderBy(r => r.Manager != null && r.Manager.ManagedDestination != null
+                        ? r.Manager.ManagedDestination.Name
+                        : string.Empty);
+            }
+
+            if (sortByValue == "resolvedat")
+            {
+                return isDesc
+                    ? query.OrderByDescending(r => r.ResolvedAt)
+                    : query.OrderBy(r => r.ResolvedAt);
+            }
+
+            if (sortByValue == "status")
+            {
+                var statusSortQuery = query.Select(r => new
+                {
+                    Report = r,
+                    StatusSortOrder = r.Status == ContentStatus.Pending
+                        ? 1
+                        : r.Status == ContentStatus.Approved
+                            ? 2
+                            : 3
+                });
+
+                return isDesc
+                    ? statusSortQuery.OrderByDescending(x => x.StatusSortOrder).Select(x => x.Report)
+                    : statusSortQuery.OrderBy(x => x.StatusSortOrder).Select(x => x.Report);
+            }
+
+            return isDesc
+                ? query.OrderByDescending(r => r.CreatedAt)
+                : query.OrderBy(r => r.CreatedAt);
         }
 
         private static ManagerReportDto MapToDto(ManagerReport report)
@@ -230,6 +413,7 @@ namespace TuristickiVodic.Services.Services
                 Id = report.Id,
                 ManagerId = report.ManagerId,
                 ManagerName = report.Manager != null ? $"{report.Manager.FirstName} {report.Manager.LastName}" : string.Empty,
+                DestinationName = report.Manager?.ManagedDestination?.Name ?? string.Empty,
                 ReportedUserId = report.ReportedUserId,
                 ReportedUserName = report.ReportedUser != null ? $"{report.ReportedUser.FirstName} {report.ReportedUser.LastName}" : string.Empty,
                 Reason = report.Reason,

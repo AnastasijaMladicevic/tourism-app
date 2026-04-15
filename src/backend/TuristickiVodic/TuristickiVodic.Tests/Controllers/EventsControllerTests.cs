@@ -24,56 +24,6 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
-        public async Task GetAll_BezFiltera_VracaOkSaListom()
-        {
-            var mockService = new Mock<IEventService>();
-            mockService.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<EventDto>
-            {
-                new EventDto { Id = 1, Name = "Koncert", Status = "Approved" },
-                new EventDto { Id = 2, Name = "Festival", Status = "Pending" }
-            });
-
-            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
-
-            var result = await controller.GetAll(null);
-
-            result.Should().BeOfType<OkObjectResult>()
-                .Which.Value.Should().BeAssignableTo<IEnumerable<EventDto>>();
-        }
-
-        [Fact]
-        public async Task GetAll_SaFilterom_VracaOkSaFiltriranomListom()
-        {
-            var mockService = new Mock<IEventService>();
-            var filter = new EventFilterDto { NextDays = 7 };
-            mockService.Setup(s => s.GetAllAsync(filter)).ReturnsAsync(new List<EventDto>
-            {
-                new EventDto { Id = 1, Name = "Koncert", Status = "Pending" }
-            });
-
-            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
-
-            var result = await controller.GetAll(filter);
-
-            result.Should().BeOfType<OkObjectResult>()
-                .Which.Value.Should().BeAssignableTo<IEnumerable<EventDto>>();
-        }
-
-        [Fact]
-        public async Task GetAll_KadaServisBaciInvalidOperation_VracaBadRequest()
-        {
-            var mockService = new Mock<IEventService>();
-            mockService.Setup(s => s.GetAllAsync(It.IsAny<EventFilterDto>()))
-                .ThrowsAsync(new InvalidOperationException("NextDays can only be 7 or 30."));
-
-            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
-
-            var result = await controller.GetAll(new EventFilterDto { NextDays = 5 });
-
-            result.Should().BeOfType<BadRequestObjectResult>();
-        }
-
-        [Fact]
         public async Task GetById_KadaEventPostoji_VracaOk()
         {
             var mockService = new Mock<IEventService>();
@@ -86,6 +36,26 @@ namespace TuristickiVodic.Tests.Controllers
 
             result.Should().BeOfType<OkObjectResult>()
                 .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
+        public async Task GetAll_KadaServisBaciInvalidOperation_VracaBadRequest()
+        {
+            var mockService = new Mock<IEventService>();
+
+            mockService
+                .Setup(s => s.GetAllAsync(It.IsAny<EventQueryDto>()))
+                .ThrowsAsync(new InvalidOperationException("Use only one type of date filter at a time."));
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.GetAll(new EventQueryDto
+            {
+                Date = DateTime.UtcNow.Date,
+                NextDays = 7
+            });
+
+            result.Should().BeOfType<BadRequestObjectResult>();
         }
 
         [Fact]
@@ -234,6 +204,63 @@ namespace TuristickiVodic.Tests.Controllers
             var result = await controller.Delete(999);
 
             result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Fact]
+        public async Task GetAll_BezFiltera_VracaPagedRezultat()
+        {
+            var mockService = new Mock<IEventService>();
+            var dto = new PagedResultDto<EventDto>
+            {
+                Items = new List<EventDto>
+        {
+            new EventDto { Id = 1, Name = "Sea Dance" },
+            new EventDto { Id = 2, Name = "Karneval" }
+        },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 2,
+                TotalPages = 1
+            };
+
+            mockService
+                .Setup(s => s.GetAllAsync(It.IsAny<EventQueryDto>()))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.GetAll(new EventQueryDto());
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
+        public async Task GetAll_SaSearchParametrom_VracaPagedRezultat()
+        {
+            var mockService = new Mock<IEventService>();
+            var dto = new PagedResultDto<EventDto>
+            {
+                Items = new List<EventDto>
+        {
+            new EventDto { Id = 1, Name = "Sea Dance" }
+        },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 1,
+                TotalPages = 1
+            };
+
+            mockService
+                .Setup(s => s.GetAllAsync(It.IsAny<EventQueryDto>()))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.GetAll(new EventQueryDto { Search = "sea" });
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
         }
     }
 }

@@ -19,22 +19,12 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAll([FromQuery] EventFilterDto? filter)
+        public async Task<IActionResult> GetAll([FromQuery] EventQueryDto query)
         {
             try
             {
-                if (filter == null ||
-                    (!filter.Date.HasValue &&
-                     !filter.NextDays.HasValue &&
-                     !filter.StartDate.HasValue &&
-                     !filter.EndDate.HasValue))
-                {
-                    var events = await _eventService.GetAllAsync();
-                    return Ok(events);
-                }
-
-                var filteredEvents = await _eventService.GetAllAsync(filter);
-                return Ok(filteredEvents);
+                var result = await _eventService.GetAllAsync(query);
+                return Ok(result);
             }
             catch (InvalidOperationException ex)
             {
@@ -42,14 +32,13 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
-
-        [HttpGet("search")]
+        /*[HttpGet("search")]
         [AllowAnonymous]
         public async Task<IActionResult> Search([FromQuery] EventQueryDto query)
         {
             var result = await _eventService.SearchAsync(query);
             return Ok(result);
-        }
+        }*/
 
         [HttpGet("{id}")]
         [AllowAnonymous]

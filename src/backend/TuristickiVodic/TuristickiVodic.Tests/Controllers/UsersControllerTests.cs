@@ -38,36 +38,45 @@ namespace TuristickiVodic.Tests.Controllers
         // ═══════════════════════════════════════════
 
         [Fact]
-        public async Task GetAll_KadaAdminPozove_VracaOkSaListomKorisnika()
+        public async Task GetAll_KadaAdminPozove_VracaOkSaRezultatom()
         {
             var mockService = new Mock<IUserService>();
-            mockService.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<UserDto>
+            var rezultat = new PagedResultDto<UserDto>
             {
-                new UserDto { Id = 1, FirstName = "Marko", Email = "marko@test.com", RoleName = "Tourist" },
-                new UserDto { Id = 2, FirstName = "Ana",   Email = "ana@test.com",   RoleName = "Admin" }
-            });
+                TotalCount = 2
+            };
+
+            mockService
+                .Setup(s => s.GetAllAsync(It.IsAny<UserQueryDto>()))
+                .ReturnsAsync(rezultat);
 
             var controller = CreateController(mockService, FakeUserHelper.CreateUser(99, "Admin"));
 
-            var result = await controller.GetAll();
+            var result = await controller.GetAll(new UserQueryDto());
 
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            ok.Value.Should().BeAssignableTo<IEnumerable<UserDto>>()
-                .Which.Should().HaveCount(2);
+            ok.Value.Should().BeSameAs(rezultat);
         }
 
         [Fact]
-        public async Task GetAll_KadaServisVracaPrazanSeznam_VracaOkSaPrazномListom()
+        public async Task GetAll_KadaServisVracaPrazanRezultat_VracaOk()
         {
             var mockService = new Mock<IUserService>();
-            mockService.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<UserDto>());
+            var rezultat = new PagedResultDto<UserDto>
+            {
+                TotalCount = 0
+            };
+
+            mockService
+                .Setup(s => s.GetAllAsync(It.IsAny<UserQueryDto>()))
+                .ReturnsAsync(rezultat);
 
             var controller = CreateController(mockService, FakeUserHelper.CreateUser(99, "Admin"));
 
-            var result = await controller.GetAll();
+            var result = await controller.GetAll(new UserQueryDto());
 
             var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            ok.Value.Should().BeAssignableTo<IEnumerable<UserDto>>().Which.Should().BeEmpty();
+            ok.Value.Should().BeSameAs(rezultat);
         }
 
         // ═══════════════════════════════════════════
@@ -236,6 +245,20 @@ namespace TuristickiVodic.Tests.Controllers
             var result = await controller.GetById(99);
 
             result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Fact]
+        public async Task Delete_KadaManagerImaDestinaciju_VracaBadRequest()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.DeleteAsync(7))
+                .ThrowsAsync(new InvalidOperationException("Manager who is assigned to a destination cannot be deleted until another manager is assigned."));
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            var result = await controller.Delete(7);
+
+            result.Should().BeOfType<BadRequestObjectResult>();
         }
 
         // ═══════════════════════════════════════════
@@ -842,6 +865,89 @@ namespace TuristickiVodic.Tests.Controllers
             var result = await controller.ApproveCreatorRole(999);
 
             result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Fact]
+        public async Task RemoveProfileImage_KadaKorisnikBriseSvojuSliku_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            var dto = new UserDto
+            {
+                Id = 5,
+                Email = "user@test.com",
+                ProfileImageUrl = "/images/profiles/default_icon.png"
+            };
+
+            mockService
+                .Setup(s => s.RemoveProfileImageAsync(5))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
+
+            var result = await controller.RemoveProfileImage(5);
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
+        public async Task RemoveProfileImage_KadaKorisnikBriseTudjuSliku_VracaForbid()
+        {
+            var mockService = new Mock<IUserService>();
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(3, "Tourist"));
+
+            var result = await controller.RemoveProfileImage(5);
+
+            result.Should().BeOfType<ForbidResult>();
+        }
+
+        [Fact]
+        public async Task RemoveProfileImage_KadaKorisnikNePostoji_VracaNotFound()
+        {
+            var mockService = new Mock<IUserService>();
+
+            mockService
+                .Setup(s => s.RemoveProfileImageAsync(5))
+                .ReturnsAsync((UserDto?)null);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
+
+            var result = await controller.RemoveProfileImage(5);
+
+            result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Fact]
+        public async Task GetCreatorRequests_KadaAdminPozove_VracaPagedRezultat()
+        {
+            var mockService = new Mock<IUserService>();
+            var rezultat = new PagedResultDto<CreatorRoleRequestDto>
+            {
+                Items = new List<CreatorRoleRequestDto>
+                {
+                    new CreatorRoleRequestDto
+                    {
+                        Id = 5,
+                        Email = "creator@test.com",
+                        HasRequestedCreatorRole = true
+                    }
+                },
+                TotalCount = 1,
+                Page = 1,
+                PageSize = 10,
+                TotalPages = 1
+            };
+
+            mockService
+                .Setup(s => s.GetCreatorRequestsAsync(It.IsAny<CreatorRoleRequestQueryDto>()))
+                .ReturnsAsync(rezultat);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            var result = await controller.GetCreatorRequests(new CreatorRoleRequestQueryDto());
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeSameAs(rezultat);
         }
     }
 }

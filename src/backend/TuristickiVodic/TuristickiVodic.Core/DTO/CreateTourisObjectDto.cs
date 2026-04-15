@@ -20,21 +20,29 @@ namespace TuristickiVodic.Core.DTO
         public string? Website { get; set; }
 
         public string? WorkingHours { get; set; }
+        public decimal? Price { get; set; }
+        public string[]? Amenities { get; set; }
 
         public double? Longitude { get; set; }
 
         public double? Latitude { get; set; }
 
-        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "ObjectTypeId is required.")]
         public int ObjectTypeId { get; set; }
 
-        [Required]
-        public int DestinationId { get; set; }
+        public int? DestinationId { get; set; }
 
         public int? LocalityId { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
+            if (!DestinationId.HasValue && !LocalityId.HasValue)
+            {
+                yield return new ValidationResult(
+                    "Tourist object must have either a DestinationId or a LocalityId.",
+                    new[] { nameof(DestinationId), nameof(LocalityId) });
+            }
+
             if ((Longitude.HasValue && !Latitude.HasValue) || (!Longitude.HasValue && Latitude.HasValue))
             {
                 yield return new ValidationResult(

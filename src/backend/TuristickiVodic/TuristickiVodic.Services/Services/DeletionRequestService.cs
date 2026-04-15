@@ -14,12 +14,12 @@ namespace TuristickiVodic.Services.Services
             _context = context;
         }
 
-        // CC podnosi zahtev za brisanje svog Approved objekta
         public async Task<DeletionRequestDto> CreateForObjectAsync(int objectId, CreateDeletionRequestDto dto, int requestedByUserId)
         {
             var obj = await _context.Objects
                 .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
+                .Include(o => o.Destination)
                 .FirstOrDefaultAsync(o => o.Id == objectId);
 
             if (obj == null)
@@ -53,11 +53,17 @@ namespace TuristickiVodic.Services.Services
             return await LoadDtoAsync(request.Id);
         }
 
-        // CC podnosi zahtev za brisanje svog Approved eventa
         public async Task<DeletionRequestDto> CreateForEventAsync(int eventId, CreateDeletionRequestDto dto, int requestedByUserId)
         {
             var ev = await _context.Events
                 .Include(e => e.Destination)
+                .Include(e => e.Locality)
+                    .ThenInclude(l => l.Destination)
+                .Include(e => e.Object)
+                    .ThenInclude(o => o.Destination)
+                .Include(e => e.Object)
+                    .ThenInclude(o => o.Locality)
+                        .ThenInclude(l => l.Destination)
                 .FirstOrDefaultAsync(e => e.Id == eventId);
 
             if (ev == null)
@@ -91,7 +97,6 @@ namespace TuristickiVodic.Services.Services
             return await LoadDtoAsync(request.Id);
         }
 
-        // CC podnosi zahtev za brisanje svoje Approved aktivnosti
         public async Task<DeletionRequestDto> CreateForActivityAsync(int activityId, CreateDeletionRequestDto dto, int requestedByUserId)
         {
             var activity = await _context.Activities
@@ -131,95 +136,85 @@ namespace TuristickiVodic.Services.Services
             return await LoadDtoAsync(request.Id);
         }
 
-        // Menadžer vidi zahteve za svoju destinaciju, Admin vidi zahteve za destinacije bez menadžera
-        public async Task<IEnumerable<DeletionRequestDto>> GetAllAsync(int userId, string roleName)
+        public async Task<PagedResultDto<DeletionRequestDto>> GetAllAsync(int userId, string roleName, DeletionRequestQueryDto query)
         {
-            var query = _context.DeletionRequests
-                .Include(r => r.Object)
-                    .ThenInclude(o => o.Locality)
-                        .ThenInclude(l => l.Destination)
-                .Include(r => r.Event)
-                    .ThenInclude(e => e.Destination)
-                .Include(r => r.Activity)
-                    .ThenInclude(a => a.Destination)
-                .Include(r => r.Activity)
-                    .ThenInclude(a => a.Locality)
-                        .ThenInclude(l => l.Destination)
-                .Include(r => r.RequestedBy)
-                .Include(r => r.ReviewedBy)
-                .AsQueryable();
+            NormalizeQuery(query);
 
-            if (roleName == "Manager")
-            {
-                query = query.Where(r =>
-                    (r.ObjectId != null && r.Object.Locality.Destination.ManagedByUserId == userId) ||
-                    (r.EventId != null && r.Event.Destination.ManagedByUserId == userId) ||
+            if (!string.Equals(roleName, "Manager", StringComparison.OrdinalIgnoreCase))
+                throw new UnauthorizedAccessException("Only managers can view deletion requests.");
+
+            var requestsQuery = BuildRequestsQuery()
+                .Where(r =>
+                    (r.ObjectId != null && (
+                        (r.Object != null && r.Object.Destination != null && r.Object.Destination.ManagedByUserId == userId) ||
+                        (r.Object != null && r.Object.Locality != null && r.Object.Locality.Destination.ManagedByUserId == userId))) ||
+                    (r.EventId != null && (
+                        (r.Event != null && r.Event.Destination != null && r.Event.Destination.ManagedByUserId == userId) ||
+                        (r.Event != null && r.Event.Locality != null && r.Event.Locality.Destination.ManagedByUserId == userId) ||
+                        (r.Event != null && r.Event.Object != null && r.Event.Object.Destination != null && r.Event.Object.Destination.ManagedByUserId == userId) ||
+                        (r.Event != null && r.Event.Object != null && r.Event.Object.Locality != null && r.Event.Object.Locality.Destination.ManagedByUserId == userId))) ||
                     (r.ActivityId != null && (
-                        r.Activity.Destination.ManagedByUserId == userId ||
-                        (r.Activity.Locality != null && r.Activity.Locality.Destination.ManagedByUserId == userId))));
-            }
-            else if (roleName == "Admin")
-            {
-                query = query.Where(r =>
-                    (r.ObjectId != null && r.Object.Locality.Destination.ManagedByUserId == null) ||
-                    (r.EventId != null && r.Event.Destination.ManagedByUserId == null) ||
-                    (r.ActivityId != null && (
-                        r.Activity.Destination.ManagedByUserId == null ||
-                        (r.Activity.Locality != null && r.Activity.Locality.Destination.ManagedByUserId == null))));
-            }
+                        (r.Activity != null && r.Activity.Destination != null && r.Activity.Destination.ManagedByUserId == userId) ||
+                        (r.Activity != null && r.Activity.Locality != null && r.Activity.Locality.Destination.ManagedByUserId == userId))));
 
-            var requests = await query.OrderByDescending(r => r.CreatedAt).ToListAsync();
-            return requests.Select(MapToDto);
-        }
+            requestsQuery = ApplyFilters(requestsQuery, query);
+            requestsQuery = ApplySorting(requestsQuery, query.SortBy, query.SortOrder);
 
-        public async Task<IEnumerable<DeletionRequestDto>> GetByUserIdAsync(int userId)
-        {
-            var requests = await _context.DeletionRequests
-                .Include(dr => dr.Object)
-                .Include(dr => dr.Event)
-                .Include(dr => dr.Activity)
-                .Include(dr => dr.RequestedBy)
-                .Include(dr => dr.ReviewedBy)
-                .Where(dr => dr.RequestedByUserId == userId)
-                .OrderByDescending(dr => dr.CreatedAt)
+            var totalCount = await requestsQuery.CountAsync();
+
+            var requests = await requestsQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
                 .ToListAsync();
 
-            return requests.Select(MapToDto);
+            return new PagedResultDto<DeletionRequestDto>
+            {
+                Items = requests.Select(MapToDto).ToList(),
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
+        public async Task<PagedResultDto<DeletionRequestDto>> GetByUserIdAsync(int userId, DeletionRequestQueryDto query)
+        {
+            NormalizeQuery(query);
+
+            var requestsQuery = BuildRequestsQuery()
+                .Where(dr => dr.RequestedByUserId == userId);
+
+            requestsQuery = ApplyFilters(requestsQuery, query);
+            requestsQuery = ApplySorting(requestsQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await requestsQuery.CountAsync();
+
+            var requests = await requestsQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToListAsync();
+
+            return new PagedResultDto<DeletionRequestDto>
+            {
+                Items = requests.Select(MapToDto).ToList(),
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
         }
 
         public async Task<DeletionRequestDto?> GetByIdAsync(int id)
         {
-            var request = await _context.DeletionRequests
-                .Include(dr => dr.Object)
-                .Include(dr => dr.Event)
-                .Include(dr => dr.Activity)
-                .Include(dr => dr.RequestedBy)
-                .Include(dr => dr.ReviewedBy)
+            var request = await BuildRequestsQuery()
                 .FirstOrDefaultAsync(dr => dr.Id == id);
 
-            if (request == null)
-                return null;
-
-            return MapToDto(request);
+            return request == null ? null : MapToDto(request);
         }
 
-
-        // Menadžer/Admin odobrava ili odbija; ako je odobren → objekat/event se briše
         public async Task<DeletionRequestDto?> ReviewAsync(int requestId, ApproveDeletionRequestDto dto, int reviewedByUserId, string roleName)
         {
-            var request = await _context.DeletionRequests
-                .Include(r => r.Object)
-                    .ThenInclude(o => o.Locality)
-                        .ThenInclude(l => l.Destination)
-                .Include(r => r.Event)
-                    .ThenInclude(e => e.Destination)
-                .Include(r => r.Activity)
-                    .ThenInclude(a => a.Destination)
-                .Include(r => r.Activity)
-                    .ThenInclude(a => a.Locality)
-                        .ThenInclude(l => l.Destination)
-                .Include(r => r.RequestedBy)
-                .Include(r => r.ReviewedBy)
+            var request = await BuildRequestsQuery()
                 .FirstOrDefaultAsync(r => r.Id == requestId);
 
             if (request == null)
@@ -228,28 +223,15 @@ namespace TuristickiVodic.Services.Services
             if (request.Status != ContentStatus.Pending)
                 throw new InvalidOperationException("This request has already been reviewed.");
 
-            // Odredi destinaciju iz objekta, eventa ili aktivnosti
-            var destination = request.ObjectId != null
-                ? request.Object?.Locality?.Destination
-                : request.EventId != null
-                    ? request.Event?.Destination
-                    : request.Activity?.Destination ?? request.Activity?.Locality?.Destination;
+            var destination = ResolveDestination(request);
 
-            // Proverava ko je odgovoran menadžer za ovu destinaciju.
-            // Ako destinacija ima svog menadžera – samo on može da obradi zahtev.
-            // Ako je ostala bez menadžera (izuzetna situacija) – odgovornost preuzima
-            // menadžer geografski najbliže destinacije, NE admin.
-            if (roleName == "Manager")
-            {
-                var isResponsible = destination != null &&
-                    await DestinationManagerHelper.IsResponsibleManagerAsync(_context, destination, reviewedByUserId);
-                if (!isResponsible)
-                    throw new UnauthorizedAccessException("You are not the responsible manager for this destination.");
-            }
-            else if (roleName == "Admin")
-            {
-                throw new UnauthorizedAccessException("Admins do not directly process deletion requests. The responsible manager handles them.");
-            }
+            if (!string.Equals(roleName, "Manager", StringComparison.OrdinalIgnoreCase))
+                throw new UnauthorizedAccessException("Only managers process deletion requests.");
+
+            var isResponsible = destination != null &&
+                await DestinationManagerHelper.IsResponsibleManagerAsync(_context, destination, reviewedByUserId);
+            if (!isResponsible)
+                throw new UnauthorizedAccessException("You are not the responsible manager for this destination.");
 
             request.Status = dto.Approve ? ContentStatus.Approved : ContentStatus.Rejected;
             request.RejectionReason = dto.Approve ? null : dto.RejectionReason;
@@ -272,38 +254,341 @@ namespace TuristickiVodic.Services.Services
             return MapToDto(request);
         }
 
+        public async Task<DeletionRequestDto?> GetByIdForUserAsync(int id, int userId)
+        {
+            var request = await BuildRequestsQuery()
+                .FirstOrDefaultAsync(dr => dr.Id == id && dr.RequestedByUserId == userId);
+
+            return request == null ? null : MapToDto(request);
+        }
+
         private async Task<DeletionRequestDto> LoadDtoAsync(int requestId)
         {
-            var request = await _context.DeletionRequests
-                .Include(r => r.Object)
-                .Include(r => r.Event)
-                .Include(r => r.Activity)
-                .Include(r => r.RequestedBy)
-                .Include(r => r.ReviewedBy)
+            var request = await BuildRequestsQuery()
                 .FirstAsync(r => r.Id == requestId);
 
             return MapToDto(request);
         }
 
-        public async Task<DeletionRequestDto?> GetByIdForUserAsync(int id, int userId)
+        private IQueryable<DeletionRequest> BuildRequestsQuery()
         {
-            var request = await _context.DeletionRequests
-                .Include(dr => dr.Object)
-                .Include(dr => dr.Event)
-                .Include(dr => dr.Activity)
-                .Include(dr => dr.RequestedBy)
-                .Include(dr => dr.ReviewedBy)
-                .FirstOrDefaultAsync(dr => dr.Id == id && dr.RequestedByUserId == userId);
+            return _context.DeletionRequests
+                .Include(r => r.Object)
+                    .ThenInclude(o => o.Destination)
+                .Include(r => r.Object)
+                    .ThenInclude(o => o.Locality)
+                        .ThenInclude(l => l.Destination)
+                .Include(r => r.Event)
+                    .ThenInclude(e => e.Destination)
+                .Include(r => r.Event)
+                    .ThenInclude(e => e.Locality)
+                        .ThenInclude(l => l.Destination)
+                .Include(r => r.Event)
+                    .ThenInclude(e => e.Object)
+                        .ThenInclude(o => o.Destination)
+                .Include(r => r.Event)
+                    .ThenInclude(e => e.Object)
+                        .ThenInclude(o => o.Locality)
+                            .ThenInclude(l => l.Destination)
+                .Include(r => r.Activity)
+                    .ThenInclude(a => a.Destination)
+                .Include(r => r.Activity)
+                    .ThenInclude(a => a.Locality)
+                        .ThenInclude(l => l.Destination)
+                .Include(r => r.RequestedBy)
+                .Include(r => r.ReviewedBy)
+                .AsQueryable();
+        }
 
-            if (request == null)
-                return null;
+        private static void NormalizeQuery(DeletionRequestQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
 
-            return MapToDto(request);
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+        }
+
+        private static IQueryable<DeletionRequest> ApplyFilters(IQueryable<DeletionRequest> query, DeletionRequestQueryDto filters)
+        {
+            if (!string.IsNullOrWhiteSpace(filters.Search))
+            {
+                var search = filters.Search.Trim().ToLower();
+
+                query = query.Where(r =>
+                    (r.Reason != null && r.Reason.ToLower().Contains(search)) ||
+                    (r.RejectionReason != null && r.RejectionReason.ToLower().Contains(search)) ||
+                    (r.Object != null && r.Object.Name.ToLower().Contains(search)) ||
+                    (r.Event != null && r.Event.Name.ToLower().Contains(search)) ||
+                    (r.Activity != null && r.Activity.Name.ToLower().Contains(search)) ||
+                    (r.RequestedBy != null && (
+                        r.RequestedBy.FirstName.ToLower().Contains(search) ||
+                        r.RequestedBy.LastName.ToLower().Contains(search) ||
+                        (r.RequestedBy.FirstName + " " + r.RequestedBy.LastName).ToLower().Contains(search))) ||
+                    (r.ReviewedBy != null && (
+                        r.ReviewedBy.FirstName.ToLower().Contains(search) ||
+                        r.ReviewedBy.LastName.ToLower().Contains(search) ||
+                        (r.ReviewedBy.FirstName + " " + r.ReviewedBy.LastName).ToLower().Contains(search))) ||
+                    (
+                        (
+                            r.Object != null
+                                ? (r.Object.Destination != null
+                                    ? r.Object.Destination.Name
+                                    : r.Object.Locality != null
+                                        ? r.Object.Locality.Destination.Name
+                                        : string.Empty)
+                                : r.Event != null
+                                    ? (r.Event.Destination != null
+                                        ? r.Event.Destination.Name
+                                        : r.Event.Locality != null
+                                            ? r.Event.Locality.Destination.Name
+                                            : r.Event.Object != null && r.Event.Object.Destination != null
+                                                ? r.Event.Object.Destination.Name
+                                                : r.Event.Object != null && r.Event.Object.Locality != null
+                                                    ? r.Event.Object.Locality.Destination.Name
+                                                    : string.Empty)
+                                    : r.Activity != null
+                                        ? (r.Activity.Destination != null
+                                            ? r.Activity.Destination.Name
+                                            : r.Activity.Locality != null
+                                                ? r.Activity.Locality.Destination.Name
+                                                : string.Empty)
+                                        : string.Empty
+                        ).ToLower().Contains(search)
+                    ));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.Status))
+            {
+                var statusFilter = filters.Status.Trim();
+
+                if (Enum.TryParse<ContentStatus>(statusFilter, true, out var parsedStatus))
+                {
+                    query = query.Where(r => r.Status == parsedStatus);
+                }
+                else
+                {
+                    query = query.Where(_ => false);
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.ContentType))
+            {
+                var contentType = filters.ContentType.Trim().ToLower();
+
+                if (contentType == "object")
+                    query = query.Where(r => r.ObjectId != null);
+                else if (contentType == "event")
+                    query = query.Where(r => r.EventId != null);
+                else if (contentType == "activity")
+                    query = query.Where(r => r.ActivityId != null);
+                else
+                    query = query.Where(_ => false);
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.RequestedBy))
+            {
+                var requestedBy = filters.RequestedBy.Trim().ToLower();
+
+                query = query.Where(r =>
+                    r.RequestedBy != null && (
+                        r.RequestedBy.FirstName.ToLower().Contains(requestedBy) ||
+                        r.RequestedBy.LastName.ToLower().Contains(requestedBy) ||
+                        (r.RequestedBy.FirstName + " " + r.RequestedBy.LastName).ToLower().Contains(requestedBy)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.ReviewedBy))
+            {
+                var reviewedBy = filters.ReviewedBy.Trim().ToLower();
+
+                query = query.Where(r =>
+                    r.ReviewedBy != null && (
+                        r.ReviewedBy.FirstName.ToLower().Contains(reviewedBy) ||
+                        r.ReviewedBy.LastName.ToLower().Contains(reviewedBy) ||
+                        (r.ReviewedBy.FirstName + " " + r.ReviewedBy.LastName).ToLower().Contains(reviewedBy)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.Destination))
+            {
+                var destination = filters.Destination.Trim().ToLower();
+                query = query.Where(r =>
+                    (
+                        r.Object != null
+                            ? (r.Object.Destination != null
+                                ? r.Object.Destination.Name
+                                : r.Object.Locality != null
+                                    ? r.Object.Locality.Destination.Name
+                                    : string.Empty)
+                            : r.Event != null
+                                ? (r.Event.Destination != null
+                                    ? r.Event.Destination.Name
+                                    : r.Event.Locality != null
+                                        ? r.Event.Locality.Destination.Name
+                                        : r.Event.Object != null && r.Event.Object.Destination != null
+                                            ? r.Event.Object.Destination.Name
+                                            : r.Event.Object != null && r.Event.Object.Locality != null
+                                                ? r.Event.Object.Locality.Destination.Name
+                                                : string.Empty)
+                                : r.Activity != null
+                                    ? (r.Activity.Destination != null
+                                        ? r.Activity.Destination.Name
+                                        : r.Activity.Locality != null
+                                            ? r.Activity.Locality.Destination.Name
+                                            : string.Empty)
+                                    : string.Empty
+                    ).ToLower().Contains(destination));
+            }
+
+            return query;
+        }
+
+        private static IQueryable<DeletionRequest> ApplySorting(IQueryable<DeletionRequest> query, string? sortBy, string? sortOrder)
+        {
+            var sortByValue = sortBy?.Trim().ToLower();
+            var isDesc = sortOrder?.Trim().ToLower() == "desc";
+
+            if (sortByValue == "requestedby")
+            {
+                return isDesc
+                    ? query.OrderByDescending(r => r.RequestedBy != null ? r.RequestedBy.FirstName : string.Empty)
+                        .ThenByDescending(r => r.RequestedBy != null ? r.RequestedBy.LastName : string.Empty)
+                    : query.OrderBy(r => r.RequestedBy != null ? r.RequestedBy.FirstName : string.Empty)
+                        .ThenBy(r => r.RequestedBy != null ? r.RequestedBy.LastName : string.Empty);
+            }
+
+            if (sortByValue == "reviewedby")
+            {
+                return isDesc
+                    ? query.OrderByDescending(r => r.ReviewedBy != null ? r.ReviewedBy.FirstName : string.Empty)
+                        .ThenByDescending(r => r.ReviewedBy != null ? r.ReviewedBy.LastName : string.Empty)
+                    : query.OrderBy(r => r.ReviewedBy != null ? r.ReviewedBy.FirstName : string.Empty)
+                        .ThenBy(r => r.ReviewedBy != null ? r.ReviewedBy.LastName : string.Empty);
+            }
+
+            if (sortByValue == "destination")
+            {
+                return isDesc
+                    ? query.OrderByDescending(r =>
+                        r.Object != null
+                            ? (r.Object.Destination != null
+                                ? r.Object.Destination.Name
+                                : r.Object.Locality != null
+                                    ? r.Object.Locality.Destination.Name
+                                    : string.Empty)
+                            : r.Event != null
+                                ? (r.Event.Destination != null
+                                    ? r.Event.Destination.Name
+                                    : r.Event.Locality != null
+                                        ? r.Event.Locality.Destination.Name
+                                        : r.Event.Object != null && r.Event.Object.Destination != null
+                                            ? r.Event.Object.Destination.Name
+                                            : r.Event.Object != null && r.Event.Object.Locality != null
+                                                ? r.Event.Object.Locality.Destination.Name
+                                                : string.Empty)
+                                : r.Activity != null
+                                    ? (r.Activity.Destination != null
+                                        ? r.Activity.Destination.Name
+                                        : r.Activity.Locality != null
+                                            ? r.Activity.Locality.Destination.Name
+                                            : string.Empty)
+                                    : string.Empty)
+                    : query.OrderBy(r =>
+                        r.Object != null
+                            ? (r.Object.Destination != null
+                                ? r.Object.Destination.Name
+                                : r.Object.Locality != null
+                                    ? r.Object.Locality.Destination.Name
+                                    : string.Empty)
+                            : r.Event != null
+                                ? (r.Event.Destination != null
+                                    ? r.Event.Destination.Name
+                                    : r.Event.Locality != null
+                                        ? r.Event.Locality.Destination.Name
+                                        : r.Event.Object != null && r.Event.Object.Destination != null
+                                            ? r.Event.Object.Destination.Name
+                                            : r.Event.Object != null && r.Event.Object.Locality != null
+                                                ? r.Event.Object.Locality.Destination.Name
+                                                : string.Empty)
+                                : r.Activity != null
+                                    ? (r.Activity.Destination != null
+                                        ? r.Activity.Destination.Name
+                                        : r.Activity.Locality != null
+                                            ? r.Activity.Locality.Destination.Name
+                                            : string.Empty)
+                                    : string.Empty);
+            }
+
+            if (sortByValue == "status")
+            {
+                return isDesc
+                    ? query.OrderByDescending(r => r.Status)
+                    : query.OrderBy(r => r.Status);
+            }
+
+            if (sortByValue == "contenttype")
+            {
+                return isDesc
+                    ? query.OrderByDescending(r => r.ObjectId != null ? "Object" : r.EventId != null ? "Event" : "Activity")
+                    : query.OrderBy(r => r.ObjectId != null ? "Object" : r.EventId != null ? "Event" : "Activity");
+            }
+
+            return isDesc
+                ? query.OrderByDescending(r => r.CreatedAt)
+                : query.OrderBy(r => r.CreatedAt);
+        }
+
+        private static string GetDestinationNameForQuery(DeletionRequest request)
+        {
+            return request.Object != null
+                ? request.Object.Destination != null
+                    ? request.Object.Destination.Name
+                    : request.Object.Locality != null
+                        ? request.Object.Locality.Destination.Name
+                        : string.Empty
+                : request.Event != null
+                    ? request.Event.Destination != null
+                        ? request.Event.Destination.Name
+                        : request.Event.Locality != null
+                            ? request.Event.Locality.Destination.Name
+                            : request.Event.Object != null && request.Event.Object.Destination != null
+                                ? request.Event.Object.Destination.Name
+                                : request.Event.Object != null && request.Event.Object.Locality != null
+                                    ? request.Event.Object.Locality.Destination.Name
+                                    : string.Empty
+                    : request.Activity != null
+                        ? request.Activity.Destination != null
+                            ? request.Activity.Destination.Name
+                            : request.Activity.Locality != null
+                                ? request.Activity.Locality.Destination.Name
+                                : string.Empty
+                        : string.Empty;
+        }
+
+        private static Destination? ResolveDestination(DeletionRequest request)
+        {
+            if (request.Object != null)
+                return request.Object.Destination ?? request.Object.Locality?.Destination;
+
+            if (request.Event != null)
+                return request.Event.Destination
+                    ?? request.Event.Locality?.Destination
+                    ?? request.Event.Object?.Destination
+                    ?? request.Event.Object?.Locality?.Destination;
+
+            if (request.Activity != null)
+                return request.Activity.Destination ?? request.Activity.Locality?.Destination;
+
+            return null;
         }
 
         private static DeletionRequestDto MapToDto(DeletionRequest r) => new()
         {
             Id = r.Id,
+            ContentType = r.ObjectId != null ? "Object" : r.EventId != null ? "Event" : "Activity",
+            DestinationName = GetDestinationNameForQuery(r),
             ObjectId = r.ObjectId,
             ObjectName = r.Object?.Name,
             EventId = r.EventId,

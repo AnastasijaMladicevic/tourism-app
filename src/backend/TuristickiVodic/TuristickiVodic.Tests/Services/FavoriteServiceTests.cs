@@ -187,12 +187,111 @@ namespace TuristickiVodic.Tests.Services
 
             var service = new FavoriteService(ctx);
 
-            var result = (await service.GetMyFavoritesAsync(tourist.Id)).ToList();
+            var result = await service.GetMyFavoritesAsync(tourist.Id, new FavoriteQueryDto());
 
-            result.Should().HaveCount(2);
-            result.Should().OnlyContain(f => f.UserId == tourist.Id);
-            result[0].LocalityName.Should().Be("Stari grad");
-            result[1].DestinationName.Should().Be("Kotor");
+            result.Items.Should().HaveCount(2);
+            result.Items.Should().OnlyContain(f => f.UserId == tourist.Id);
+            result.Items[0].LocalityName.Should().Be("Stari grad");
+            result.Items[1].DestinationName.Should().Be("Kotor");
+        }
+
+        [Fact]
+        public async Task GetMyFavoritesAsync_KadaSeFiltriraPoTipuIVrsiPretraga_VracaTrazeniRezultat()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetMyFavoritesAsync_KadaSeFiltriraPoTipuIVrsiPretraga_VracaTrazeniRezultat));
+            var (tourist, _, _, destination, locality, activity, route, touristObject) = SeedBase(ctx);
+
+            ctx.Favorites.AddRange(
+                new Favorite
+                {
+                    Id = 1,
+                    UserId = tourist.Id,
+                    User = tourist,
+                    DestinationId = destination.Id,
+                    Destination = destination,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-3)
+                },
+                new Favorite
+                {
+                    Id = 2,
+                    UserId = tourist.Id,
+                    User = tourist,
+                    RouteId = route.Id,
+                    Route = route,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-2)
+                },
+                new Favorite
+                {
+                    Id = 3,
+                    UserId = tourist.Id,
+                    User = tourist,
+                    ObjectId = touristObject.Id,
+                    Object = touristObject,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-1)
+                });
+            await ctx.SaveChangesAsync();
+
+            var service = new FavoriteService(ctx);
+
+            var result = await service.GetMyFavoritesAsync(tourist.Id, new FavoriteQueryDto
+            {
+                Type = "object",
+                Search = "muzej"
+            });
+
+            result.Items.Should().HaveCount(1);
+            result.Items[0].ObjectName.Should().Be("Muzej mora");
+        }
+
+        [Fact]
+        public async Task GetMyFavoritesAsync_KadaSeKoristiPaginacijaISortPoNazivu_VracaTrazeniSegment()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetMyFavoritesAsync_KadaSeKoristiPaginacijaISortPoNazivu_VracaTrazeniSegment));
+            var (tourist, _, _, destination, locality, activity, route, touristObject) = SeedBase(ctx);
+
+            ctx.Favorites.AddRange(
+                new Favorite
+                {
+                    Id = 1,
+                    UserId = tourist.Id,
+                    User = tourist,
+                    DestinationId = destination.Id,
+                    Destination = destination,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-3)
+                },
+                new Favorite
+                {
+                    Id = 2,
+                    UserId = tourist.Id,
+                    User = tourist,
+                    RouteId = route.Id,
+                    Route = route,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-2)
+                },
+                new Favorite
+                {
+                    Id = 3,
+                    UserId = tourist.Id,
+                    User = tourist,
+                    ActivityId = activity.Id,
+                    Activity = activity,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-1)
+                });
+            await ctx.SaveChangesAsync();
+
+            var service = new FavoriteService(ctx);
+
+            var result = await service.GetMyFavoritesAsync(tourist.Id, new FavoriteQueryDto
+            {
+                Page = 2,
+                PageSize = 1,
+                SortBy = "name",
+                SortOrder = "asc"
+            });
+
+            result.Items.Should().HaveCount(1);
+            result.TotalCount.Should().Be(3);
+            result.Items[0].ActivityName.Should().Be("Pesacka tura");
         }
 
         [Fact]

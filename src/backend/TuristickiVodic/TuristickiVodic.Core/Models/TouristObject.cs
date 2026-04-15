@@ -23,6 +23,8 @@ namespace TuristickiVodic.Core.Models
         public string? Website { get; set; }
 
         public string? WorkingHours { get; set; }
+        public decimal? Price { get; set; }
+        public string[]? Amenities { get; set; }
 
         public Point? Geolocation { get; set; }
 

@@ -19,10 +19,10 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMyFavorites()
+        public async Task<IActionResult> GetMyFavorites([FromQuery] FavoriteQueryDto query)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var favorites = await _favoriteService.GetMyFavoritesAsync(userId);
+            var favorites = await _favoriteService.GetMyFavoritesAsync(userId, query);
             return Ok(favorites);
         }
 

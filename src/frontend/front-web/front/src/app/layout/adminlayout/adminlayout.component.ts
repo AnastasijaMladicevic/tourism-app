@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -10,22 +11,40 @@ import { Router, RouterModule } from '@angular/router';
   templateUrl: './adminlayout.component.html',
   styleUrls: ['./adminlayout.component.css']
 })
-export class AdminLayoutComponent {
+export class AdminLayoutComponent implements OnInit {
 
   searchQuery = '';
 
-  // Ovo ces kasnije dobijati iz AuthService-a
   user = {
-    name: 'Jarry McLovin',
-    email: 'mclovin@spirego.com',
-    initials: 'JM',
-    avatarUrl: 'assets/avatar.jpg' // ili '' ako nema slike
+    name: '',
+    email: '',
+    initials: '',
+    avatarUrl: ''
   };
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit(): void {
+    const userData = this.authService.getUser();
+
+    if (!userData) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.user = {
+      name: `${userData.firstName} ${userData.lastName}`,
+      email: userData.email,
+      initials: `${userData.firstName[0]}${userData.lastName[0]}`.toUpperCase(),
+      avatarUrl: ''
+    };
+  }
 
   signOut(): void {
-    // Ovde ocisti token / sesiju
+    this.authService.logout();
     this.router.navigate(['/login']);
   }
 }

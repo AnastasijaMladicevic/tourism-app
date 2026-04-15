@@ -2,6 +2,8 @@
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 
+using System;
+
 namespace TuristickiVodic.Services.Mappings
 {
     public class MappingProfile : Profile
@@ -81,6 +83,10 @@ namespace TuristickiVodic.Services.Mappings
                     opt => opt.MapFrom(src => src.Destination != null ? src.Destination.Name : string.Empty))
                 .ForMember(dest => dest.LocalityTypeName,
                     opt => opt.MapFrom(src => src.LocalityType != null ? src.LocalityType.Name : string.Empty))
+                .ForMember(dest => dest.MainImageUrl,
+                    opt => opt.MapFrom(src => src.Images != null
+                        ? src.Images.Where(i => i.IsMain).Select(i => i.Url).FirstOrDefault()
+                        : null))
                 .ForMember(dest => dest.Longitude,
                     opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
                 .ForMember(dest => dest.Latitude,
@@ -89,6 +95,10 @@ namespace TuristickiVodic.Services.Mappings
             CreateMap<Destination, DestinationDto>()
                 .ForMember(dest => dest.DestinationTypeName,
                     opt => opt.MapFrom(src => src.DestinationType != null ? src.DestinationType.Name : string.Empty))
+                .ForMember(dest => dest.MainImageUrl,
+                    opt => opt.MapFrom(src => src.Images != null
+                        ? src.Images.Where(i => i.IsMain).Select(i => i.Url).FirstOrDefault()
+                        : null))
                 .ForMember(dest => dest.Longitude,
                     opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
                 .ForMember(dest => dest.Latitude,
@@ -105,6 +115,10 @@ namespace TuristickiVodic.Services.Mappings
                     opt => opt.MapFrom(src => src.Destination != null ? src.Destination.Name : null))
                 .ForMember(dest => dest.ObjectName,
                     opt => opt.MapFrom(src => src.Object != null ? src.Object.Name : null))
+                .ForMember(dest => dest.MainImageUrl,
+                    opt => opt.MapFrom(src => src.Images != null
+                        ? src.Images.Where(i => i.IsMain).Select(i => i.Url).FirstOrDefault()
+                        : null))
                 .ForMember(dest => dest.Longitude,
                     opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
                 .ForMember(dest => dest.Latitude,
@@ -121,6 +135,10 @@ namespace TuristickiVodic.Services.Mappings
                     opt => opt.MapFrom(src => src.Destination != null ? src.Destination.Name : null))
                 .ForMember(dest => dest.ObjectName,
                     opt => opt.MapFrom(src => src.Object != null ? src.Object.Name : null))
+                .ForMember(dest => dest.MainImageUrl,
+                    opt => opt.MapFrom(src => src.Images != null
+                        ? src.Images.Where(i => i.IsMain).Select(i => i.Url).FirstOrDefault()
+                        : null))
                 .ForMember(dest => dest.Longitude,
                     opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
                 .ForMember(dest => dest.Latitude,
@@ -134,6 +152,16 @@ namespace TuristickiVodic.Services.Mappings
                         src.User != null ? (src.User.FirstName + " " + src.User.LastName) : string.Empty))
                 .ForMember(dest => dest.ObjectName,
                     opt => opt.MapFrom(src => src.Object != null ? src.Object.Name : string.Empty))
+                .ForMember(dest => dest.ReviewedByFullName,
+                    opt => opt.MapFrom(src =>
+                        src.ReviewedBy != null ? (src.ReviewedBy.FirstName + " " + src.ReviewedBy.LastName) : null))
+                .ForMember(dest => dest.Status,
+                    opt => opt.MapFrom(src => src.Status.ToString()));
+
+            CreateMap<Review, TouristObjectReviewDto>()
+                .ForMember(dest => dest.UserFullName,
+                    opt => opt.MapFrom(src =>
+                        src.User != null ? (src.User.FirstName + " " + src.User.LastName) : string.Empty))
                 .ForMember(dest => dest.ReviewedByFullName,
                     opt => opt.MapFrom(src =>
                         src.ReviewedBy != null ? (src.ReviewedBy.FirstName + " " + src.ReviewedBy.LastName) : null))
@@ -158,6 +186,10 @@ namespace TuristickiVodic.Services.Mappings
                     opt => opt.MapFrom(src => src.ObjectType != null ? src.ObjectType.Name : string.Empty))
                 .ForMember(dest => dest.LocalityName,
                     opt => opt.MapFrom(src => src.Locality != null ? src.Locality.Name : string.Empty))
+                .ForMember(dest => dest.MainImageUrl,
+                    opt => opt.MapFrom(src => src.Images != null
+                        ? src.Images.Where(i => i.IsMain).Select(i => i.Url).FirstOrDefault()
+                        : null))
                 .ForMember(dest => dest.DestinationId,
                     opt => opt.MapFrom(src => src.DestinationId))
                 .ForMember(dest => dest.DestinationName,
@@ -171,6 +203,15 @@ namespace TuristickiVodic.Services.Mappings
                     opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
                 .ForMember(dest => dest.Latitude,
                     opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.Y : (double?)null))
+                .ForMember(dest => dest.Amenities,
+                    opt => opt.MapFrom(src => src.Amenities ?? Array.Empty<string>()))
+                .ForMember(dest => dest.Reviews,
+                    opt => opt.MapFrom(src =>
+                        src.Reviews != null
+                            ? src.Reviews
+                                .Where(r => r.Status == ContentStatus.Approved)
+                                .OrderByDescending(r => r.CreatedAt)
+                            : Enumerable.Empty<Review>()))
                 .ForMember(dest => dest.Status,
                     opt => opt.MapFrom(src => src.Status.ToString()));
 
@@ -197,6 +238,10 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.ManagerName,
                     opt => opt.MapFrom(src => src.Manager != null
                         ? src.Manager.FirstName + " " + src.Manager.LastName
+                        : string.Empty))
+                .ForMember(dest => dest.DestinationName,
+                    opt => opt.MapFrom(src => src.Manager != null && src.Manager.ManagedDestination != null
+                        ? src.Manager.ManagedDestination.Name
                         : string.Empty))
                 .ForMember(dest => dest.ReportedUserName,
                     opt => opt.MapFrom(src => src.ReportedUser != null

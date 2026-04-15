@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace TuristickiVodic.Core.DTO
 {
@@ -7,15 +8,19 @@ namespace TuristickiVodic.Core.DTO
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
+        public string? MainImageUrl { get; set; }
         public string? Address { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Website { get; set; }
         public string? WorkingHours { get; set; }
+        public decimal? Price { get; set; }
+        public string[] Amenities { get; set; } = Array.Empty<string>();
         public double? Longitude { get; set; }
         public double? Latitude { get; set; }
         public bool IsActive { get; set; }
         public decimal AverageRating { get; set; }
         public int ReviewCount { get; set; }
+        public List<TouristObjectReviewDto> Reviews { get; set; } = new();
         public string Status { get; set; } = string.Empty;
         public int ObjectTypeId { get; set; }
         public string ObjectTypeName { get; set; } = string.Empty;

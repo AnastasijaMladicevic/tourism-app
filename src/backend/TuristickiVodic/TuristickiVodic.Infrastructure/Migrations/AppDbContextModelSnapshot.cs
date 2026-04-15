@@ -170,7 +170,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ActivityId");
+                    b.HasIndex("ActivityId")
+                        .IsUnique()
+                        .HasFilter("\"ActivityId\" IS NOT NULL AND \"Status\" = 'Pending'");
 
                     b.HasIndex("EventId")
                         .IsUnique()
@@ -502,15 +504,30 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ActivityId");
+                    b.HasIndex("ActivityId", "IsMain")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Images_ActivityId_IsMain_MainUnique")
+                        .HasFilter("\"ActivityId\" IS NOT NULL AND \"IsMain\" = TRUE");
 
-                    b.HasIndex("DestinationId");
+                    b.HasIndex("DestinationId", "IsMain")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Images_DestinationId_IsMain_MainUnique")
+                        .HasFilter("\"DestinationId\" IS NOT NULL AND \"IsMain\" = TRUE");
 
-                    b.HasIndex("EventId");
+                    b.HasIndex("EventId", "IsMain")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Images_EventId_IsMain_MainUnique")
+                        .HasFilter("\"EventId\" IS NOT NULL AND \"IsMain\" = TRUE");
 
-                    b.HasIndex("LocalityId");
+                    b.HasIndex("LocalityId", "IsMain")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Images_LocalityId_IsMain_MainUnique")
+                        .HasFilter("\"LocalityId\" IS NOT NULL AND \"IsMain\" = TRUE");
 
-                    b.HasIndex("ObjectId");
+                    b.HasIndex("ObjectId", "IsMain")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Images_ObjectId_IsMain_MainUnique")
+                        .HasFilter("\"ObjectId\" IS NOT NULL AND \"IsMain\" = TRUE");
 
                     b.ToTable("Images", t =>
                         {
@@ -863,6 +880,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
 
+                    b.PrimitiveCollection<string[]>("Amenities")
+                        .HasColumnType("text[]");
+
                     b.Property<DateTime?>("ApprovedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -904,6 +924,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)");
+
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("RejectionReason")
                         .HasColumnType("text");
@@ -1179,7 +1202,7 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.HasOne("TuristickiVodic.Core.Models.User", "ManagedBy")
                         .WithOne("ManagedDestination")
                         .HasForeignKey("TuristickiVodic.Core.Models.Destination", "ManagedByUserId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreatedBy");
 

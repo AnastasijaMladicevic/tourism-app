@@ -36,25 +36,32 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
-        public async Task GetMyFavorites_VracaSamoFavoriteTrenutnogKorisnika()
+        public async Task GetMyFavorites_VracaPagedRezultatZaTrenutnogKorisnika()
         {
             var mockService = new Mock<IFavoriteService>();
-            var favorites = new List<FavoriteDto>
+            var paged = new PagedResultDto<FavoriteDto>
             {
-                new FavoriteDto { Id = 1, UserId = 5, DestinationId = 10, DestinationName = "Kotor" },
-                new FavoriteDto { Id = 2, UserId = 5, LocalityId = 3, LocalityName = "Stari grad" }
+                Items =
+                {
+                    new FavoriteDto { Id = 1, UserId = 5, DestinationId = 10, DestinationName = "Kotor" },
+                    new FavoriteDto { Id = 2, UserId = 5, LocalityId = 3, LocalityName = "Stari grad" }
+                },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 2,
+                TotalPages = 1
             };
 
-            mockService.Setup(s => s.GetMyFavoritesAsync(5)).ReturnsAsync(favorites);
+            mockService.Setup(s => s.GetMyFavoritesAsync(5, It.IsAny<FavoriteQueryDto>())).ReturnsAsync(paged);
 
             var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
 
-            var result = await controller.GetMyFavorites();
+            var result = await controller.GetMyFavorites(new FavoriteQueryDto());
 
             result.Should().BeOfType<OkObjectResult>()
-                .Which.Value.Should().BeEquivalentTo(favorites);
+                .Which.Value.Should().BeEquivalentTo(paged);
 
-            mockService.Verify(s => s.GetMyFavoritesAsync(5), Times.Once);
+            mockService.Verify(s => s.GetMyFavoritesAsync(5, It.IsAny<FavoriteQueryDto>()), Times.Once);
         }
 
         [Fact]

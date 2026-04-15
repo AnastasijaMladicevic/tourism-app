@@ -93,4 +93,8 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./feature/hotel-detail/hotel-detail').then((m) => m.HotelDetailComponent),
   },
+  { 
+    path: 'restaurant/:id', 
+    loadComponent: () => 
+      import('./feature/restaurant-detail/restaurant-detail').then(m => m.RestaurantDetailComponent) }
 ];

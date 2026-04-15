@@ -17,16 +17,105 @@ namespace TuristickiVodic.Services.Services
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ReviewDto>> GetAllAsync()
+        public async Task<PagedResultDto<ReviewDto>> GetAllAsync(ReviewQueryDto query)
         {
-            var reviews = await _context.Reviews
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var reviewsQuery = _context.Reviews
                 .Include(r => r.User)
                 .Include(r => r.Object)
                 .Include(r => r.ReviewedBy)
-                .OrderByDescending(r => r.CreatedAt)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+
+                reviewsQuery = reviewsQuery.Where(r =>
+                    r.Text.ToLower().Contains(search) ||
+                    (r.CreatorResponse != null && r.CreatorResponse.ToLower().Contains(search)) ||
+                    (r.Object != null && r.Object.Name.ToLower().Contains(search)) ||
+                    (r.User != null && (
+                        r.User.FirstName.ToLower().Contains(search) ||
+                        r.User.LastName.ToLower().Contains(search) ||
+                        (r.User.FirstName + " " + r.User.LastName).ToLower().Contains(search))));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Object))
+            {
+                var objectValue = query.Object.Trim().ToLower();
+
+                reviewsQuery = reviewsQuery.Where(r =>
+                    r.Object != null &&
+                    r.Object.Name.ToLower().Contains(objectValue));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.User))
+            {
+                var userValue = query.User.Trim().ToLower();
+
+                reviewsQuery = reviewsQuery.Where(r =>
+                    r.User != null && (
+                        r.User.FirstName.ToLower().Contains(userValue) ||
+                        r.User.LastName.ToLower().Contains(userValue) ||
+                        (r.User.FirstName + " " + r.User.LastName).ToLower().Contains(userValue)));
+            }
+
+            if (query.MinRating.HasValue)
+            {
+                reviewsQuery = reviewsQuery.Where(r => r.Rating >= query.MinRating.Value);
+            }
+
+            if (query.MaxRating.HasValue)
+            {
+                reviewsQuery = reviewsQuery.Where(r => r.Rating <= query.MaxRating.Value);
+            }
+
+            if (query.HasResponse.HasValue)
+            {
+                reviewsQuery = query.HasResponse.Value
+                    ? reviewsQuery.Where(r => r.CreatorResponse != null)
+                    : reviewsQuery.Where(r => r.CreatorResponse == null);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Status))
+            {
+                var statusFilter = query.Status.Trim();
+
+                if (Enum.TryParse<ContentStatus>(statusFilter, true, out var parsedStatus))
+                {
+                    reviewsQuery = reviewsQuery.Where(r => r.Status == parsedStatus);
+                }
+                else
+                {
+                    reviewsQuery = reviewsQuery.Where(_ => false);
+                }
+            }
+
+            reviewsQuery = ApplyReviewSorting(reviewsQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await reviewsQuery.CountAsync();
+
+            var reviews = await reviewsQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
                 .ToListAsync();
 
-            return _mapper.Map<IEnumerable<ReviewDto>>(reviews);
+            return new PagedResultDto<ReviewDto>
+            {
+                Items = _mapper.Map<List<ReviewDto>>(reviews),
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
         }
 
         public async Task<ReviewDto?> GetByIdAsync(int id)
@@ -226,7 +315,7 @@ namespace TuristickiVodic.Services.Services
                 return;
 
             var ratings = await _context.Reviews
-                .Where(r => r.ObjectId == objectId)
+                .Where(r => r.ObjectId == objectId && r.Status == ContentStatus.Approved)
                 .Select(r => r.Rating)
                 .ToListAsync();
 
@@ -234,6 +323,39 @@ namespace TuristickiVodic.Services.Services
             touristObject.AverageRating = ratings.Count == 0 ? 0 : Math.Round((decimal)ratings.Average(), 2);
 
             await _context.SaveChangesAsync();
+        }
+
+        private static IQueryable<Review> ApplyReviewSorting(IQueryable<Review> query, string? sortBy, string? sortOrder)
+        {
+            var sortByValue = sortBy?.Trim().ToLower();
+            var isDesc = sortOrder?.Trim().ToLower() == "desc";
+
+            if (sortByValue == "rating")
+            {
+                return isDesc
+                    ? query.OrderByDescending(r => r.Rating)
+                    : query.OrderBy(r => r.Rating);
+            }
+
+            if (sortByValue == "user")
+            {
+                return isDesc
+                    ? query.OrderByDescending(r => r.User != null ? r.User.FirstName : string.Empty)
+                        .ThenByDescending(r => r.User != null ? r.User.LastName : string.Empty)
+                    : query.OrderBy(r => r.User != null ? r.User.FirstName : string.Empty)
+                        .ThenBy(r => r.User != null ? r.User.LastName : string.Empty);
+            }
+
+            if (sortByValue == "object")
+            {
+                return isDesc
+                    ? query.OrderByDescending(r => r.Object != null ? r.Object.Name : string.Empty)
+                    : query.OrderBy(r => r.Object != null ? r.Object.Name : string.Empty);
+            }
+
+            return isDesc
+                ? query.OrderByDescending(r => r.CreatedAt)
+                : query.OrderBy(r => r.CreatedAt);
         }
     }
 }

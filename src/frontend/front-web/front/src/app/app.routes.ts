@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { AdminLayoutComponent } from './layout/adminlayout/adminlayout.component';
+import { ContentCreatorLayoutComponent } from './layout/contentcreatorlayout/contentcreatorlayout.component';
 import { ManagerLayoutComponent } from './layout/managerlayout/managerlayout.component';
 import { authGuard } from './guards/auth.guard';
 import { roleGuard } from './guards/role.guard';
@@ -26,6 +27,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/signout/signout').then(m => m.Signout)
   },
+  //Signin
+  {
+      path:'signup',
+      loadComponent:() =>
+        import('./pages/signup/signup.component').then(m=>m.SignupComponent)
+  },
  
   // === ADMIN ===
   {
@@ -34,6 +41,11 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard(['admin'])],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+  path: 'profile',
+  loadComponent: () =>
+    import('./pages/admin/profile/profile.component').then(m => m.ProfileComponent)
+  },
       {
         path: 'dashboard',
         loadComponent: () =>
@@ -62,6 +74,46 @@ export const routes: Routes = [
     ]
   },
  
+  // === CONTENT CREATOR ===
+  {
+    path: 'content-creator',
+    component: ContentCreatorLayoutComponent,
+    canActivate: [authGuard, roleGuard(['content-creator'])],
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./pages/content-creator/dashboard/dashboard.component').then(m => m.ContentCreatorDashboardComponent)
+      },
+      {
+        path: 'objects',
+        loadComponent: () =>
+          import('./pages/content-creator/objects/objects.component').then(m => m.ContentCreatorObjectsComponent)
+      },
+      {
+        path: 'activities',
+        loadComponent: () =>
+          import('./pages/content-creator/activities/activities.component').then(m => m.ContentCreatorActivitiesComponent)
+      },
+      {
+        path: 'events',
+        loadComponent: () =>
+          import('./pages/content-creator/events/events.component').then(m => m.ContentCreatorEventsComponent)
+      },
+      {
+        path: 'reviews',
+        loadComponent: () =>
+          import('./pages/content-creator/reviews/reviews.component').then(m => m.ContentCreatorReviewsComponent)
+      },
+      {
+        path: 'map',
+        loadComponent: () =>
+          import('./pages/content-creator/map/map.component').then(m => m.ContentCreatorMapComponent)
+      }
+    ]
+  },
+
   // === MANAGER ===
   {
     path: 'manager',
@@ -90,9 +142,14 @@ export const routes: Routes = [
           import('./pages/manager/events/events.component').then(m => m.ManagerEventsComponent)
       },
       {
-        path: 'reviews',
+        path: 'localities',
         loadComponent: () =>
-          import('./pages/manager/reviews/reviews.component').then(m => m.ManagerReviewsComponent)
+          import('./pages/manager/destinations/destinations.component').then(m => m.ManagerDestinationsComponent)
+      },
+      {
+        path: 'destinations',
+        redirectTo: 'localities',
+        pathMatch: 'full'
       },
       {
         path: 'map',

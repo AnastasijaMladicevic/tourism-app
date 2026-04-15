@@ -10,50 +10,56 @@ namespace TuristickiVodic.API.Controllers
     [Route("api/[controller]")]
     public class DestinationsController : ControllerBase
     {
-        private readonly IDestinationService _destinationService;
+        private readonly IDestinationService _service;
 
-        public DestinationsController(IDestinationService destinationService)
+        public DestinationsController(IDestinationService service)
         {
-            _destinationService = destinationService;
+            _service = service;
         }
 
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetAll([FromQuery] DestinationQueryDto query)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var roleClaim = User.FindFirstValue(ClaimTypes.Role);
+            int? userId = null;
+            string? role = null;
 
-            int? userId = userIdClaim != null ? int.Parse(userIdClaim) : null;
-            string? role = roleClaim;
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (int.TryParse(userIdClaim, out var parsedUserId))
+                    userId = parsedUserId;
 
-            var destinations = await _destinationService.GetAllAsync(userId, role, query);
-            return Ok(destinations);
+                role = User.FindFirst(ClaimTypes.Role)?.Value;
+            }
+
+            var result = await _service.GetAllAsync(userId, role, query);
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
-            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var roleClaim = User.FindFirstValue(ClaimTypes.Role);
+            int? userId = null;
+            string? role = null;
 
-            int? userId = userIdClaim != null ? int.Parse(userIdClaim) : null;
-            string? role = roleClaim;
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (int.TryParse(userIdClaim, out var parsedUserId))
+                    userId = parsedUserId;
 
-            try
-            {
-                var destination = await _destinationService.GetByIdAsync(id, userId, role);
-                if (destination == null) return NotFound();
-                return Ok(destination);
+                role = User.FindFirst(ClaimTypes.Role)?.Value;
             }
-            catch (UnauthorizedAccessException)
-            {
-                return Forbid();
-            }
+
+            var destination = await _service.GetByIdAsync(id, userId, role);
+            if (destination == null)
+                return NotFound();
+
+            return Ok(destination);
         }
 
-        // Admin kreira destinaciju – mora da navede menadžera (ManagedByUserId)
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([FromBody] CreateDestinationDto dto)
@@ -64,13 +70,15 @@ namespace TuristickiVodic.API.Controllers
             try
             {
                 var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-                var created = await _destinationService.CreateAsync(dto, userId);
+                var created = await _service.CreateAsync(dto, userId);
                 return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
             }
-            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
-        // Samo Admin može da menja destinacije
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateDestinationDto dto)
@@ -80,17 +88,21 @@ namespace TuristickiVodic.API.Controllers
 
             try
             {
-                var requestingUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-                var roleName = User.FindFirstValue(ClaimTypes.Role)!;
-                var updated = await _destinationService.UpdateAsync(id, dto, requestingUserId, roleName);
-                if (updated == null) return NotFound();
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var role = User.FindFirstValue(ClaimTypes.Role)!;
+
+                var updated = await _service.UpdateAsync(id, dto, userId, role);
+                if (updated == null)
+                    return NotFound();
+
                 return Ok(updated);
             }
-            catch (UnauthorizedAccessException) { return Forbid(); }
-            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
-        // Samo Admin može da promeni menadžera destinacije
         [HttpPut("{id}/assign-manager")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AssignManager(int id, [FromBody] AssignManagerDto dto)
@@ -100,25 +112,27 @@ namespace TuristickiVodic.API.Controllers
 
             try
             {
-                var updated = await _destinationService.AssignManagerAsync(id, dto.ManagerUserId);
-                if (updated == null) return NotFound();
+                var updated = await _service.AssignManagerAsync(id, dto.ManagerUserId);
+                if (updated == null)
+                    return NotFound();
+
                 return Ok(updated);
             }
-            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
-        // Admin briše destinaciju (kaskadno briše povezane lokalitete i objekte)
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
-            try
-            {
-                var deleted = await _destinationService.DeleteAsync(id);
-                if (!deleted) return NotFound();
-                return NoContent();
-            }
-            catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+            var deleted = await _service.DeleteAsync(id);
+            if (!deleted)
+                return NotFound();
+
+            return NoContent();
         }
     }
 }

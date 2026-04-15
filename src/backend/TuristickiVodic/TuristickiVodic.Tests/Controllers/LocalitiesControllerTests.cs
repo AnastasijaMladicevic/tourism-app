@@ -39,36 +39,85 @@ namespace TuristickiVodic.Tests.Controllers
         // ═══════════════════════════════════════════
 
         [Fact]
-        public async Task GetAll_AnonimniKorisnik_VracaOkSaListom()
+        public async Task GetAll_AnonimniKorisnik_VracaOkSaPaginiranimRezultatom()
         {
             var mockService = new Mock<ILocalityService>();
-            mockService.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<LocalityDto>
+            var dto = new PagedResultDto<LocalityDto>
             {
-                new LocalityDto { Id = 1, Name = "Stara Varos", DestinationName = "Kotor" },
-                new LocalityDto { Id = 2, Name = "Dobrota",     DestinationName = "Kotor" }
-            });
+                Items = new List<LocalityDto>
+        {
+            new LocalityDto { Id = 1, Name = "Stara Varos", DestinationName = "Kotor" },
+            new LocalityDto { Id = 2, Name = "Dobrota", DestinationName = "Kotor" }
+        },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 2,
+                TotalPages = 1
+            };
+
+            mockService
+                .Setup(s => s.GetAllAsync(It.IsAny<LocalityQueryDto>()))
+                .ReturnsAsync(dto);
 
             var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
 
-            var result = await controller.GetAll();
+            var result = await controller.GetAll(new LocalityQueryDto());
 
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            ok.Value.Should().BeAssignableTo<IEnumerable<LocalityDto>>()
-                .Which.Should().HaveCount(2);
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
         }
 
         [Fact]
-        public async Task GetAll_BezLokaliteta_VracaOkSaPrazномListom()
+        public async Task GetAll_BezLokaliteta_VracaOkSaPraznimPaginiranimRezultatom()
         {
             var mockService = new Mock<ILocalityService>();
-            mockService.Setup(s => s.GetAllAsync()).ReturnsAsync(new List<LocalityDto>());
+            var dto = new PagedResultDto<LocalityDto>
+            {
+                Items = new List<LocalityDto>(),
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 0,
+                TotalPages = 0
+            };
+
+            mockService
+                .Setup(s => s.GetAllAsync(It.IsAny<LocalityQueryDto>()))
+                .ReturnsAsync(dto);
 
             var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
 
-            var result = await controller.GetAll();
+            var result = await controller.GetAll(new LocalityQueryDto());
 
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            ok.Value.Should().BeAssignableTo<IEnumerable<LocalityDto>>().Which.Should().BeEmpty();
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
+        public async Task GetAll_SaSearchParametrom_VracaPagedRezultat()
+        {
+            var mockService = new Mock<ILocalityService>();
+            var dto = new PagedResultDto<LocalityDto>
+            {
+                Items = new List<LocalityDto>
+        {
+            new LocalityDto { Id = 1, Name = "Stara Varos", DestinationName = "Kotor" }
+        },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 1,
+                TotalPages = 1
+            };
+
+            mockService
+                .Setup(s => s.GetAllAsync(It.IsAny<LocalityQueryDto>()))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.GetAll(new LocalityQueryDto { Search = "stara" });
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
         }
 
         // ═══════════════════════════════════════════

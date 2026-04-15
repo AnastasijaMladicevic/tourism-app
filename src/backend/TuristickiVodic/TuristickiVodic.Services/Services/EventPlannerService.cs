@@ -14,9 +14,11 @@ namespace TuristickiVodic.Services.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<EventPlannerDto>> GetMyPlannerAsync(int userId)
+        public async Task<PagedResultDto<EventPlannerDto>> GetMyPlannerAsync(int userId, EventPlannerQueryDto query)
         {
-            var items = await _context.EventPlannerItems
+            NormalizeQuery(query);
+
+            var itemsQuery = _context.EventPlannerItems
                 .Include(x => x.Event)
                     .ThenInclude(e => e.EventType)
                 .Include(x => x.Event)
@@ -26,11 +28,26 @@ namespace TuristickiVodic.Services.Services
                 .Include(x => x.Event)
                     .ThenInclude(e => e.Object)
                 .Where(x => x.UserId == userId)
-                .OrderBy(x => x.Event.StartDate)
-                .ThenByDescending(x => x.AddedAt)
+                .AsQueryable();
+
+            itemsQuery = ApplyFilters(itemsQuery, query);
+            itemsQuery = ApplySorting(itemsQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await itemsQuery.CountAsync();
+
+            var items = await itemsQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
                 .ToListAsync();
 
-            return items.Select(MapToDto);
+            return new PagedResultDto<EventPlannerDto>
+            {
+                Items = items.Select(MapToDto).ToList(),
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
         }
 
         public async Task<EventPlannerDto> AddAsync(CreateEventPlannerDto dto, int userId)
@@ -96,6 +113,101 @@ namespace TuristickiVodic.Services.Services
             _context.EventPlannerItems.Remove(item);
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        private static void NormalizeQuery(EventPlannerQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+        }
+
+        private static IQueryable<EventPlannerItem> ApplyFilters(IQueryable<EventPlannerItem> query, EventPlannerQueryDto filters)
+        {
+            if (!string.IsNullOrWhiteSpace(filters.Search))
+            {
+                var search = filters.Search.Trim().ToLower();
+                query = query.Where(x =>
+                    x.Event.Name.ToLower().Contains(search) ||
+                    (x.Event.Object != null && x.Event.Object.Name.ToLower().Contains(search)) ||
+                    (x.Event.Locality != null && x.Event.Locality.Name.ToLower().Contains(search)) ||
+                    (x.Event.Destination != null && x.Event.Destination.Name.ToLower().Contains(search)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.Destination))
+            {
+                var destination = filters.Destination.Trim().ToLower();
+                query = query.Where(x => x.Event.Destination != null && x.Event.Destination.Name.ToLower().Contains(destination));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.Locality))
+            {
+                var locality = filters.Locality.Trim().ToLower();
+                query = query.Where(x => x.Event.Locality != null && x.Event.Locality.Name.ToLower().Contains(locality));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.EventType))
+            {
+                var eventType = filters.EventType.Trim().ToLower();
+                query = query.Where(x => x.Event.EventType != null && x.Event.EventType.Name.ToLower().Contains(eventType));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.Status))
+            {
+                var statusFilter = filters.Status.Trim();
+
+                if (Enum.TryParse<ContentStatus>(statusFilter, true, out var parsedStatus))
+                    query = query.Where(x => x.Event.Status == parsedStatus);
+                else
+                    query = query.Where(_ => false);
+            }
+
+            if (filters.IsActive.HasValue)
+                query = query.Where(x => x.Event.IsActive == filters.IsActive.Value);
+
+            if (filters.FromDate.HasValue)
+                query = query.Where(x => x.Event.StartDate >= filters.FromDate.Value);
+
+            if (filters.ToDate.HasValue)
+                query = query.Where(x => x.Event.StartDate <= filters.ToDate.Value);
+
+            return query;
+        }
+
+        private static IQueryable<EventPlannerItem> ApplySorting(IQueryable<EventPlannerItem> query, string? sortBy, string? sortOrder)
+        {
+            var sortByValue = sortBy?.Trim().ToLower();
+            var isDesc = sortOrder?.Trim().ToLower() == "desc";
+
+            if (sortByValue == "event" || sortByValue == "name" || sortByValue == "eventname")
+            {
+                return isDesc
+                    ? query.OrderByDescending(x => x.Event.Name)
+                    : query.OrderBy(x => x.Event.Name);
+            }
+
+            if (sortByValue == "destination")
+            {
+                return isDesc
+                    ? query.OrderByDescending(x => x.Event.Destination != null ? x.Event.Destination.Name : string.Empty)
+                    : query.OrderBy(x => x.Event.Destination != null ? x.Event.Destination.Name : string.Empty);
+            }
+
+            if (sortByValue == "addedat" || sortByValue == "added")
+            {
+                return isDesc
+                    ? query.OrderByDescending(x => x.AddedAt)
+                    : query.OrderBy(x => x.AddedAt);
+            }
+
+            return isDesc
+                ? query.OrderByDescending(x => x.Event.StartDate).ThenByDescending(x => x.AddedAt)
+                : query.OrderBy(x => x.Event.StartDate).ThenByDescending(x => x.AddedAt);
         }
 
         private static EventPlannerDto MapToDto(EventPlannerItem item)

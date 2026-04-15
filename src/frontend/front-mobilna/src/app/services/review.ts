@@ -21,11 +21,28 @@ export interface ReviewDto {
 
 @Injectable({ providedIn: 'root' })
 export class ReviewService {
-  private url = `${environment.apiUrl}/reviews`;
+
+  private baseUrl = `${environment.apiUrl}/reviews`;
 
   constructor(private http: HttpClient) {}
 
+  // Sve recenzije za određeni objekat
+  getForObject(objectId: number): Observable<ReviewDto[]> {
+    return this.http.get<ReviewDto[]>(`${this.baseUrl}/object/${objectId}`);
+  }
+
+  // Sve recenzije (za "See All" stranicu)
   getAll(): Observable<ReviewDto[]> {
-    return this.http.get<ReviewDto[]>(this.url);
+    return this.http.get<ReviewDto[]>(this.baseUrl);
+  }
+
+  // Jedna recenzija po ID
+  getById(id: number): Observable<ReviewDto> {
+    return this.http.get<ReviewDto>(`${this.baseUrl}/${id}`);
+  }
+
+  // Kreiranje nove recenzije (samo Tourist)
+  create(dto: any): Observable<ReviewDto> {
+    return this.http.post<ReviewDto>(this.baseUrl, dto);
   }
 }

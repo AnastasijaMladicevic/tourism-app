@@ -82,6 +82,30 @@ button:hover {
 .fav-btn--active {
   color: #e74c3c;
 }
+/* desktop verzija sakrivena po defaultu */
+.fav-btn--desktop {
+  display: none;
+}
+@media (min-width: 900px) {
+
+  /* sakrij hero dugme */
+  .hero .fav-btn {
+    display: none;
+  }
+
+  /* prikaži desktop dugme */
+  .fav-btn--desktop {
+    display: flex;
+    position: static;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #f5f7fa;
+    box-shadow: none;
+    margin-top: -10px;
+    margin-bottom: 5px;
+  }
+}
 .content {
   display: flex;
   flex-direction: column;
@@ -124,12 +148,18 @@ button:hover {
   // gap: 15px;
   max-width: 600px;
 }
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 .title {
   font-size: 26px;
   font-weight: 700;
   color: var(--emperor);
   margin: 0 0 8px;
 }
+
 .date {
   font-size: 15.5px;
   color: var(--text-gray);
@@ -159,7 +189,7 @@ button:hover {
   position: relative;
 }
 .location-image::after {
-  content: 'Hotel Vardar';
+  content: attr(data-name);
   color: var(--primary);
   position: absolute;
   bottom: 15px;
@@ -211,6 +241,7 @@ button:hover {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 .btn-outline {
+  white-space: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -42,8 +42,16 @@
       <div class="left">
         <!-- HEADER / HERO INFO -->
         <div class="card">
-          <h1 class="title">{{ event.name }}</h1>
-
+          <div class="title-row">
+            <h1 class="title">{{ event.name }}</h1>
+            <button
+              class="fav-btn fav-btn--desktop"
+              (click)="toggleFavorite()"
+              [class.fav-btn--active]="isFavorite"
+            >
+              <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
+            </button>
+          </div>
           <p class="location-bold">{{ event.localityName }}, {{ event.destinationName }}</p>
 
           <p class="venue"><mat-icon>location_on</mat-icon>{{ event.objectName || 'N/A' }}</p>
@@ -91,11 +99,10 @@
         <div class="card">
           <h2>Lokacija</h2>
 
-          <div class="location-image">
+          <div class="location-image" [attr.data-name]="event.objectName || 'N/A'">
             <div class="location-image-placeholder">
               <mat-icon>place</mat-icon>
             </div>
-
             <button class="map-btn-overlay" (click)="viewOnMap()">Pogledaj na mapi</button>
           </div>
         </div>

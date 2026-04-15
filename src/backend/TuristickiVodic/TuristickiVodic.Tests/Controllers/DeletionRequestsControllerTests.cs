@@ -77,22 +77,31 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
-        public async Task GetMyRequests_ContentCreator_VracaOkSaSamoNjegovimZahtevima()
+        public async Task GetMyRequests_ContentCreator_VracaPagedRezultat()
         {
             var mockService = new Mock<IDeletionRequestService>();
-            mockService.Setup(s => s.GetByUserIdAsync(20)).ReturnsAsync(new List<DeletionRequestDto>
+            var paged = new PagedResultDto<DeletionRequestDto>
             {
-                new DeletionRequestDto { Id = 1, ObjectId = 10, RequestedByUserId = 20, RequestedByName = "Creator One", Status = "Pending" },
-                new DeletionRequestDto { Id = 2, EventId = 11, RequestedByUserId = 20, RequestedByName = "Creator One", Status = "Rejected" }
-            });
+                Items =
+                {
+                    new DeletionRequestDto { Id = 1, ObjectId = 10, RequestedByUserId = 20, RequestedByName = "Creator One", Status = "Pending" },
+                    new DeletionRequestDto { Id = 2, EventId = 11, RequestedByUserId = 20, RequestedByName = "Creator One", Status = "Rejected" }
+                },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 2,
+                TotalPages = 1
+            };
+
+            mockService.Setup(s => s.GetByUserIdAsync(20, It.IsAny<DeletionRequestQueryDto>()))
+                .ReturnsAsync(paged);
 
             var controller = CreateController(mockService, FakeUserHelper.CreateUser(20, "ContentCreator"));
 
-            var result = await controller.GetMyRequests();
+            var result = await controller.GetMyRequests(new DeletionRequestQueryDto());
 
-            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
-            ok.Value.Should().BeAssignableTo<IEnumerable<DeletionRequestDto>>()
-                .Which.Should().HaveCount(2);
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(paged);
         }
 
         [Fact]
@@ -132,21 +141,38 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
-        public async Task GetAll_Manager_VracaOkSaZahtevimaZaNjegovuDestinaciju()
+        public async Task GetAll_Manager_VracaPagedRezultat()
         {
             var mockService = new Mock<IDeletionRequestService>();
-            mockService.Setup(s => s.GetAllAsync(10, "Manager")).ReturnsAsync(new List<DeletionRequestDto>
+            var paged = new PagedResultDto<DeletionRequestDto>
             {
-                new DeletionRequestDto { Id = 1, ObjectId = 1, RequestedByUserId = 20, RequestedByName = "Creator One", Status = "Pending" }
-            });
+                Items =
+                {
+                    new DeletionRequestDto
+                    {
+                        Id = 1,
+                        ObjectId = 1,
+                        RequestedByUserId = 20,
+                        RequestedByName = "Creator One",
+                        Status = "Pending",
+                        DestinationName = "Kotor"
+                    }
+                },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 1,
+                TotalPages = 1
+            };
+
+            mockService.Setup(s => s.GetAllAsync(10, "Manager", It.IsAny<DeletionRequestQueryDto>()))
+                .ReturnsAsync(paged);
 
             var controller = CreateController(mockService, FakeUserHelper.CreateUser(10, "Manager"));
 
-            var result = await controller.GetAll();
+            var result = await controller.GetAll(new DeletionRequestQueryDto());
 
             result.Should().BeOfType<OkObjectResult>()
-                .Which.Value.Should().BeAssignableTo<IEnumerable<DeletionRequestDto>>()
-                .Which.Should().HaveCount(1);
+                .Which.Value.Should().BeEquivalentTo(paged);
         }
 
         [Fact]

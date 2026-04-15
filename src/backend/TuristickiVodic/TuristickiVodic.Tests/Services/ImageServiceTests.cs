@@ -257,7 +257,7 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateAsync_MenjaUrlAltTextIIsMain_UspesnoAzuriraSliku()
+        public async Task UpdateAsync_MenjaUrlIAltText_UspesnoAzuriraSliku()
         {
             using var ctx = CreateContext();
             SeedObject(ctx, id: 1, createdByUserId: 5);
@@ -267,8 +267,7 @@ namespace TuristickiVodic.Tests.Services
             var dto = new UpdateImageDto
             {
                 Url = "https://novo.com/slika.jpg",
-                AltText = "Nova slika",
-                IsMain = true
+                AltText = "Nova slika"
             };
 
             var result = await svc.UpdateAsync(img.Id, dto, 5, "ContentCreator");
@@ -286,6 +285,20 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task UpdateAsync_PromenaIsMainMoraKrozSetMainImage()
+        {
+            using var ctx = CreateContext();
+            SeedObject(ctx, id: 1, createdByUserId: 5);
+            SeedImage(ctx, isMain: true, objectId: 1);
+            var secondary = SeedImage(ctx, isMain: false, objectId: 1);
+            var svc = new ImageService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.UpdateAsync(secondary.Id, new UpdateImageDto { IsMain = true }, 5, "ContentCreator"))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*SetMainImage*");
+        }
+
+        [Fact]
         public async Task UpdateAsync_TudjaSlikaObjekta_BacaUnauthorized()
         {
             using var ctx = CreateContext();
@@ -295,33 +308,6 @@ namespace TuristickiVodic.Tests.Services
 
             await svc.Invoking(s => s.UpdateAsync(img.Id, new UpdateImageDto { Url = "x.jpg" }, 5, "ContentCreator"))
                 .Should().ThrowAsync<UnauthorizedAccessException>();
-        }
-
-        [Fact]
-        public async Task UpdateAsync_MainNeMozeDaPostaneFalseAkoNePostojiDrugaMain()
-        {
-            using var ctx = CreateContext();
-            SeedObject(ctx, id: 1, createdByUserId: 5);
-            var img = SeedImage(ctx, isMain: true, objectId: 1);
-            var svc = new ImageService(ctx, CreateMapper());
-
-            await svc.Invoking(s => s.UpdateAsync(img.Id, new UpdateImageDto { IsMain = false }, 5, "ContentCreator"))
-                .Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*must always have exactly one main image*");
-        }
-
-        [Fact]
-        public async Task UpdateAsync_DrugaSlikaPostajeMain_BacaAkoVecPostojiMain()
-        {
-            using var ctx = CreateContext();
-            SeedObject(ctx, id: 1, createdByUserId: 5);
-            SeedImage(ctx, isMain: true, objectId: 1);
-            var img2 = SeedImage(ctx, isMain: false, objectId: 1);
-            var svc = new ImageService(ctx, CreateMapper());
-
-            await svc.Invoking(s => s.UpdateAsync(img2.Id, new UpdateImageDto { IsMain = true }, 5, "ContentCreator"))
-                .Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*Only one main image allowed*");
         }
 
         [Fact]

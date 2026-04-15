@@ -241,12 +241,17 @@ namespace TuristickiVodic.Tests.Mappings
                 Id = 4, Name = "Ulcinj", Status = ContentStatus.Approved,
                 DestinationTypeId = 2,
                 DestinationType = new DestinationType { Id = 2, Name = "Istorijski Grad" },
+                Images = new List<Image>
+                {
+                    new Image { Url = "https://img.test/destination-main.jpg", IsMain = true }
+                },
                 CreatedByUserId = 99
             };
 
             var dto = _mapper.Map<DestinationDto>(dest);
 
             dto.DestinationTypeName.Should().Be("Istorijski Grad");
+            dto.MainImageUrl.Should().Be("https://img.test/destination-main.jpg");
         }
 
         // ═══════════════════════════════════════════
@@ -266,6 +271,10 @@ namespace TuristickiVodic.Tests.Mappings
                 Destination = new Destination { Id = 5, Name = "Kotor", CreatedByUserId = 99 },
                 LocalityTypeId = 2,
                 LocalityType = new LocalityType { Id = 2, Name = "Centar" },
+                Images = new List<Image>
+                {
+                    new Image { Url = "https://img.test/locality-main.jpg", IsMain = true }
+                },
                 CreatedByUserId = 10,
                 CreatedAt = new DateTime(2024, 1, 15)
             };
@@ -279,6 +288,7 @@ namespace TuristickiVodic.Tests.Mappings
             dto.DestinationId.Should().Be(5);
             dto.LocalityTypeId.Should().Be(2);
             dto.CreatedByUserId.Should().Be(10);
+            dto.MainImageUrl.Should().Be("https://img.test/locality-main.jpg");
         }
 
         [Fact]
@@ -391,7 +401,11 @@ namespace TuristickiVodic.Tests.Mappings
                 PhoneNumber = "+38232123456",
                 Website = "https://hotel.com",
                 WorkingHours = "00:00-24:00",
+                Price = 120m,
+                Amenities = new[] { "WiFi", "Parking" },
                 IsActive = true,
+                AverageRating = 4.7m,
+                ReviewCount = 12,
                 Status = ContentStatus.Pending,
                 ObjectTypeId = 2,
                 ObjectType = new ObjectType { Id = 2, Name = "Hotel" },
@@ -402,6 +416,23 @@ namespace TuristickiVodic.Tests.Mappings
                     Name = "Kotor",
                     DestinationId = 4,
                     Destination = new Destination { Id = 4, Name = "Stari grad Kotor", CreatedByUserId = 99 }
+                },
+                Images = new List<Image>
+                {
+                    new Image { Url = "https://img.test/object-main.jpg", IsMain = true }
+                },
+                Reviews = new List<Review>
+                {
+                    new Review
+                    {
+                        Id = 11,
+                        UserId = 100,
+                        User = new User { Id = 100, FirstName = "Iva", LastName = "Ivic" },
+                        Rating = 5,
+                        Text = "Sjajno mesto",
+                        Status = ContentStatus.Approved,
+                        CreatedAt = new DateTime(2024, 1, 3)
+                    }
                 },
                 DestinationId = 4,
                 CreatedByUserId = 10,
@@ -420,6 +451,14 @@ namespace TuristickiVodic.Tests.Mappings
             dto.DestinationId.Should().Be(4);
             dto.DestinationName.Should().Be("Stari grad Kotor");
             dto.Status.Should().Be("Pending");
+            dto.Price.Should().Be(120m);
+            dto.Amenities.Should().Equal("WiFi", "Parking");
+            dto.AverageRating.Should().Be(4.7m);
+            dto.ReviewCount.Should().Be(12);
+            dto.MainImageUrl.Should().Be("https://img.test/object-main.jpg");
+            dto.Reviews.Should().HaveCount(1);
+            dto.Reviews[0].UserFullName.Should().Be("Iva Ivic");
+            dto.Reviews[0].Rating.Should().Be(5);
         }
 
         [Fact]
@@ -499,6 +538,10 @@ namespace TuristickiVodic.Tests.Mappings
                 Destination = new Destination { Id = 3, Name = "Kotor", CreatedByUserId = 99 },
                 ObjectId = 4,
                 Object = new TouristObject { Id = 4, Name = "Tvrdjava" },
+                Images = new List<Image>
+                {
+                    new Image { Url = "https://img.test/event-main.jpg", IsMain = true }
+                },
                 CreatedByUserId = 20,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -510,6 +553,7 @@ namespace TuristickiVodic.Tests.Mappings
             dto.LocalityName.Should().Be("Stari grad");
             dto.DestinationName.Should().Be("Kotor");
             dto.ObjectName.Should().Be("Tvrdjava");
+            dto.MainImageUrl.Should().Be("https://img.test/event-main.jpg");
         }
 
         [Fact]
@@ -598,6 +642,10 @@ namespace TuristickiVodic.Tests.Mappings
                 Destination = new Destination { Id = 3, Name = "Kotor", CreatedByUserId = 99 },
                 ObjectId = 4,
                 Object = new TouristObject { Id = 4, Name = "Tvrdjava" },
+                Images = new List<Image>
+                {
+                    new Image { Url = "https://img.test/activity-main.jpg", IsMain = true }
+                },
                 CreatedByUserId = 20,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -609,6 +657,7 @@ namespace TuristickiVodic.Tests.Mappings
             dto.LocalityName.Should().Be("Stari grad");
             dto.DestinationName.Should().Be("Kotor");
             dto.ObjectName.Should().Be("Tvrdjava");
+            dto.MainImageUrl.Should().Be("https://img.test/activity-main.jpg");
         }
 
         [Fact]
@@ -860,7 +909,12 @@ namespace TuristickiVodic.Tests.Mappings
             {
                 Id = 7,
                 ManagerId = 30,
-                Manager = new User { FirstName = "Milan", LastName = "Manager" },
+                Manager = new User
+                {
+                    FirstName = "Milan",
+                    LastName = "Manager",
+                    ManagedDestination = new Destination { Name = "Kotor" }
+                },
                 ReportedUserId = 20,
                 ReportedUser = new User { FirstName = "Ceca", LastName = "Creator" },
                 Reason = "Spam sadrzaj",
@@ -873,6 +927,7 @@ namespace TuristickiVodic.Tests.Mappings
             dto.Id.Should().Be(7);
             dto.ManagerId.Should().Be(30);
             dto.ManagerName.Should().Be("Milan Manager");
+            dto.DestinationName.Should().Be("Kotor");
             dto.ReportedUserId.Should().Be(20);
             dto.ReportedUserName.Should().Be("Ceca Creator");
             dto.Reason.Should().Be("Spam sadrzaj");

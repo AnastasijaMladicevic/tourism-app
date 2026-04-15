@@ -1,14 +1,17 @@
 using AutoMapper;
 using FluentAssertions;
+using FluentAssertions.Common;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using System.IO;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
 using TuristickiVodic.Services;
+using TuristickiVodic.Tests.Helpers;
 using Xunit;
-using System.IO;
 
 namespace TuristickiVodic.Tests.Services
 {
@@ -93,6 +96,166 @@ namespace TuristickiVodic.Tests.Services
             result.RoleName.Should().Be("Tourist");
             result.Email.Should().Be("marko@test.com");
             ctx.Users.Count().Should().Be(1);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_KadaSeProslediRoleFilter_VracaSamoTrazeniRole()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaSeProslediRoleFilter_VracaSamoTrazeniRole));
+            var (tourist, _, manager, admin) = SeedRoles(ctx);
+
+            ctx.Users.AddRange(
+                new User
+                {
+                    Id = 1,
+                    FirstName = "Ana",
+                    LastName = "Admin",
+                    Email = "ana.admin@test.com",
+                    PasswordHash = "hash",
+                    RoleId = admin.Id,
+                    Role = admin,
+                    IsActive = true,
+                    DateOfBirth = new DateTime(1990, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-3),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-3)
+                },
+                new User
+                {
+                    Id = 2,
+                    FirstName = "Milan",
+                    LastName = "Manager",
+                    Email = "milan.manager@test.com",
+                    PasswordHash = "hash",
+                    RoleId = manager.Id,
+                    Role = manager,
+                    IsActive = true,
+                    DateOfBirth = new DateTime(1991, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-2),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-2)
+                },
+                new User
+                {
+                    Id = 3,
+                    FirstName = "Tara",
+                    LastName = "Tourist",
+                    Email = "tara.tourist@test.com",
+                    PasswordHash = "hash",
+                    RoleId = tourist.Id,
+                    Role = tourist,
+                    IsActive = true,
+                    DateOfBirth = new DateTime(1992, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-1),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-1)
+                });
+            await ctx.SaveChangesAsync();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            var result = await svc.GetAllAsync(new UserQueryDto
+            {
+                Role = "manager"
+            });
+
+            result.TotalCount.Should().Be(1);
+            result.Items.Should().ContainSingle();
+            result.Items[0].Email.Should().Be("milan.manager@test.com");
+            result.Items[0].RoleName.Should().Be("Manager");
+        }
+
+        [Fact]
+        public async Task GetAllAsync_KadaJeRoleFilterNepostojeci_VracaPrazanRezultat()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaJeRoleFilterNepostojeci_VracaPrazanRezultat));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 10,
+                FirstName = "Petar",
+                LastName = "Petrovic",
+                Email = "petar@test.com",
+                PasswordHash = "hash",
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+            await ctx.SaveChangesAsync();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            var result = await svc.GetAllAsync(new UserQueryDto
+            {
+                Role = "superadmin"
+            });
+
+            result.TotalCount.Should().Be(0);
+            result.Items.Should().BeEmpty();
+            result.TotalPages.Should().Be(0);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_KadaSeSortiraPoRoliOpadajuce_VracaIspravanRedosled()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaSeSortiraPoRoliOpadajuce_VracaIspravanRedosled));
+            var (tourist, _, manager, admin) = SeedRoles(ctx);
+
+            ctx.Users.AddRange(
+                new User
+                {
+                    Id = 21,
+                    FirstName = "Tamara",
+                    LastName = "Tourist",
+                    Email = "tamara@test.com",
+                    PasswordHash = "hash",
+                    RoleId = tourist.Id,
+                    Role = tourist,
+                    IsActive = true,
+                    DateOfBirth = new DateTime(1992, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-1),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-1)
+                },
+                new User
+                {
+                    Id = 22,
+                    FirstName = "Marko",
+                    LastName = "Manager",
+                    Email = "marko@test.com",
+                    PasswordHash = "hash",
+                    RoleId = manager.Id,
+                    Role = manager,
+                    IsActive = true,
+                    DateOfBirth = new DateTime(1991, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-2),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-2)
+                },
+                new User
+                {
+                    Id = 23,
+                    FirstName = "Andjela",
+                    LastName = "Admin",
+                    Email = "andjela@test.com",
+                    PasswordHash = "hash",
+                    RoleId = admin.Id,
+                    Role = admin,
+                    IsActive = true,
+                    DateOfBirth = new DateTime(1990, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-3),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-3)
+                });
+            await ctx.SaveChangesAsync();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            var result = await svc.GetAllAsync(new UserQueryDto
+            {
+                SortBy = "role",
+                SortOrder = "desc"
+            });
+
+            result.Items.Select(x => x.RoleName).Should().Equal("Admin", "Manager", "Tourist");
         }
 
         private static Mock<ITokenService> CreateTokenServiceMock(
@@ -1159,6 +1322,34 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task DeleteAsync_ManagerKojiUpravljaDestinacijom_BacaException()
+        {
+            using var ctx = CreateInMemoryContext(nameof(DeleteAsync_ManagerKojiUpravljaDestinacijom_BacaException));
+            var (_, _, manager, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 33,
+                FirstName = "Milan",
+                LastName = "Manager",
+                Email = "milan.manager@test.com",
+                PasswordHash = "hash",
+                RoleId = manager.Id,
+                Role = manager,
+                ManagedDestinationId = 7,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            });
+            ctx.SaveChanges();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            await svc.Invoking(s => s.DeleteAsync(33))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*cannot be deleted until another manager is assigned*");
+        }
+
+        [Fact]
         public async Task CreateAdminAsync_UpisujeAdminRoleIdIRole()
         {
             using var ctx = CreateInMemoryContext(nameof(CreateAdminAsync_UpisujeAdminRoleIdIRole));
@@ -1248,6 +1439,199 @@ namespace TuristickiVodic.Tests.Services
             user.IsActive.Should().BeTrue();
             user.IsBlacklisted.Should().BeFalse();
             user.IsVerified.Should().BeFalse();
+        }
+
+        [Fact]
+        public async Task RemoveProfileImageAsync_KadaKorisnikImaCustomSliku_PostavljaDefault()
+        {
+            using var ctx = CreateInMemoryContext(nameof(RemoveProfileImageAsync_KadaKorisnikImaCustomSliku_PostavljaDefault));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 201,
+                FirstName = "Profile",
+                LastName = "User",
+                Email = "profile@test.com",
+                PasswordHash = "hash",
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                DateOfBirth = new DateTime(1995, 1, 1),
+                ProfileImageUrl = "/images/profiles/custom.png"
+            });
+            await ctx.SaveChangesAsync();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            var result = await svc.RemoveProfileImageAsync(201);
+
+            result.Should().NotBeNull();
+            result!.ProfileImageUrl.Should().Be("/images/profiles/default_icon.png");
+
+            var updated = await ctx.Users.FindAsync(201);
+            updated.Should().NotBeNull();
+            updated!.ProfileImageUrl.Should().Be("/images/profiles/default_icon.png");
+        }
+
+        [Fact]
+        public async Task RemoveProfileImageAsync_KadaKorisnikNePostoji_VracaNull()
+        {
+            using var ctx = CreateInMemoryContext(nameof(RemoveProfileImageAsync_KadaKorisnikNePostoji_VracaNull));
+            SeedRoles(ctx);
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            var result = await svc.RemoveProfileImageAsync(999);
+
+            result.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task GetCreatorRequestsAsync_KadaPostojeZahtevi_VracaPagedFiltriranRezultat()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetCreatorRequestsAsync_KadaPostojeZahtevi_VracaPagedFiltriranRezultat));
+            var (tourist, cc, _, _) = SeedRoles(ctx);
+
+            ctx.Users.AddRange(
+                new User
+                {
+                    Id = 301,
+                    FirstName = "Ana",
+                    LastName = "Request",
+                    Email = "ana@test.com",
+                    PasswordHash = "hash",
+                    RoleId = tourist.Id,
+                    Role = tourist,
+                    HasRequestedCreatorRole = true,
+                    IsActive = true,
+                    IsVerified = true,
+                    DateOfBirth = new DateTime(1995, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-1),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-1)
+                },
+                new User
+                {
+                    Id = 302,
+                    FirstName = "Marko",
+                    LastName = "Inactive",
+                    Email = "marko@test.com",
+                    PasswordHash = "hash",
+                    RoleId = tourist.Id,
+                    Role = tourist,
+                    HasRequestedCreatorRole = true,
+                    IsActive = false,
+                    IsVerified = true,
+                    DateOfBirth = new DateTime(1994, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-2),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-2)
+                },
+                new User
+                {
+                    Id = 303,
+                    FirstName = "Ceca",
+                    LastName = "Creator",
+                    Email = "ceca@test.com",
+                    PasswordHash = "hash",
+                    RoleId = cc.Id,
+                    Role = cc,
+                    HasRequestedCreatorRole = true,
+                    IsActive = true,
+                    IsVerified = true,
+                    DateOfBirth = new DateTime(1993, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-3),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-3)
+                });
+            await ctx.SaveChangesAsync();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            var result = await svc.GetCreatorRequestsAsync(new CreatorRoleRequestQueryDto
+            {
+                Search = "ana",
+                IsActive = true,
+                IsVerified = true
+            });
+
+            result.TotalCount.Should().Be(1);
+            result.Items.Should().ContainSingle();
+            result.Items[0].Email.Should().Be("ana@test.com");
+            result.Items[0].HasRequestedCreatorRole.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task GetCreatorRequestsAsync_KadaSeKoristiPaginacijaISortPoEmailu_VracaTrazeniSegment()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetCreatorRequestsAsync_KadaSeKoristiPaginacijaISortPoEmailu_VracaTrazeniSegment));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.AddRange(
+                new User
+                {
+                    Id = 311,
+                    FirstName = "Jelena",
+                    LastName = "A",
+                    Email = "jelena@test.com",
+                    PasswordHash = "hash",
+                    RoleId = tourist.Id,
+                    Role = tourist,
+                    HasRequestedCreatorRole = true,
+                    IsActive = true,
+                    IsVerified = false,
+                    DateOfBirth = new DateTime(1994, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-1),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-1)
+                },
+                new User
+                {
+                    Id = 312,
+                    FirstName = "Ana",
+                    LastName = "B",
+                    Email = "ana@test.com",
+                    PasswordHash = "hash",
+                    RoleId = tourist.Id,
+                    Role = tourist,
+                    HasRequestedCreatorRole = true,
+                    IsActive = true,
+                    IsVerified = true,
+                    DateOfBirth = new DateTime(1995, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-2),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-2)
+                },
+                new User
+                {
+                    Id = 313,
+                    FirstName = "Marko",
+                    LastName = "C",
+                    Email = "marko@test.com",
+                    PasswordHash = "hash",
+                    RoleId = tourist.Id,
+                    Role = tourist,
+                    HasRequestedCreatorRole = true,
+                    IsActive = true,
+                    IsVerified = true,
+                    DateOfBirth = new DateTime(1996, 1, 1),
+                    CreatedAt = DateTime.UtcNow.AddDays(-3),
+                    UpdatedAt = DateTime.UtcNow.AddDays(-3)
+                });
+            await ctx.SaveChangesAsync();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            var result = await svc.GetCreatorRequestsAsync(new CreatorRoleRequestQueryDto
+            {
+                Page = 2,
+                PageSize = 1,
+                SortBy = "email",
+                SortOrder = "asc"
+            });
+
+            result.TotalCount.Should().Be(3);
+            result.Page.Should().Be(2);
+            result.PageSize.Should().Be(1);
+            result.TotalPages.Should().Be(3);
+            result.Items.Should().ContainSingle();
+            result.Items[0].Email.Should().Be("jelena@test.com");
         }
     }
 }

@@ -19,10 +19,10 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] ActivityQueryDto query)
         {
-            var activities = await _activityService.GetAllAsync();
-            return Ok(activities);
+            var result = await _activityService.GetAllAsync(query);
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
@@ -34,13 +34,13 @@ namespace TuristickiVodic.API.Controllers
             return Ok(activity);
         }
 
-        [HttpGet("search")]
+        /*[HttpGet("search")]
         [AllowAnonymous]
         public async Task<IActionResult> Search([FromQuery] ActivityQueryDto query)
         {
-            var result = await _activityService.SearchAsync(query);
+            var result = await _activityService.GetAllAsync(query);
             return Ok(result);
-        }
+        }*/
 
         [HttpPost]
         [Authorize(Roles = "ContentCreator")]

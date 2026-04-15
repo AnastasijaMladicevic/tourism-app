@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -36,39 +36,46 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
-        public async Task GetMyPlanner_VracaSamoPlannerTrenutnogKorisnika()
+        public async Task GetMyPlanner_VracaPagedRezultatZaTrenutnogKorisnika()
         {
             var mockService = new Mock<IEventPlannerService>();
-            var items = new List<EventPlannerDto>
+            var paged = new PagedResultDto<EventPlannerDto>
             {
-                new EventPlannerDto
+                Items =
                 {
-                    Id = 1,
-                    UserId = 5,
-                    EventId = 10,
-                    EventName = "Koncert",
-                    Status = "Approved"
+                    new EventPlannerDto
+                    {
+                        Id = 1,
+                        UserId = 5,
+                        EventId = 10,
+                        EventName = "Koncert",
+                        Status = "Approved"
+                    },
+                    new EventPlannerDto
+                    {
+                        Id = 2,
+                        UserId = 5,
+                        EventId = 11,
+                        EventName = "Festival",
+                        Status = "Approved"
+                    }
                 },
-                new EventPlannerDto
-                {
-                    Id = 2,
-                    UserId = 5,
-                    EventId = 11,
-                    EventName = "Festival",
-                    Status = "Approved"
-                }
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 2,
+                TotalPages = 1
             };
 
-            mockService.Setup(s => s.GetMyPlannerAsync(5)).ReturnsAsync(items);
+            mockService.Setup(s => s.GetMyPlannerAsync(5, It.IsAny<EventPlannerQueryDto>())).ReturnsAsync(paged);
 
             var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
 
-            var result = await controller.GetMyPlanner();
+            var result = await controller.GetMyPlanner(new EventPlannerQueryDto());
 
             result.Should().BeOfType<OkObjectResult>()
-                .Which.Value.Should().BeEquivalentTo(items);
+                .Which.Value.Should().BeEquivalentTo(paged);
 
-            mockService.Verify(s => s.GetMyPlannerAsync(5), Times.Once);
+            mockService.Verify(s => s.GetMyPlannerAsync(5, It.IsAny<EventPlannerQueryDto>()), Times.Once);
         }
 
         [Fact]
