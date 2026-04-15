@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace TuristickiVodic.Core.DTO
 {
@@ -19,6 +20,7 @@ namespace TuristickiVodic.Core.DTO
         public bool IsActive { get; set; }
         public decimal AverageRating { get; set; }
         public int ReviewCount { get; set; }
+        public List<TouristObjectReviewDto> Reviews { get; set; } = new();
         public string Status { get; set; } = string.Empty;
         public int ObjectTypeId { get; set; }
         public string ObjectTypeName { get; set; } = string.Empty;

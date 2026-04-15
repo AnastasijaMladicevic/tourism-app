@@ -356,5 +356,71 @@ namespace TuristickiVodic.Tests.Services
             result.Items[0].Name.Should().Be("Objekat 1");
             result.Items[0].AverageRating.Should().Be(4.8m);
         }
+
+        [Fact]
+        public async Task GetByIdAsync_VracaIListuApprovedRecenzija()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_VracaIListuApprovedRecenzija));
+            var (objectType, destination, _, locality, _, creator, otherCreator, _, _) = SeedBase(ctx);
+
+            ctx.Objects.Add(new TouristObject
+            {
+                Id = 1,
+                Name = "Objekat 1",
+                ObjectTypeId = objectType.Id,
+                DestinationId = destination.Id,
+                LocalityId = locality.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Approved,
+                IsActive = true,
+                AverageRating = 5m,
+                ReviewCount = 1,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+
+            ctx.Images.Add(new Image
+            {
+                Id = 1,
+                ObjectId = 1,
+                Url = "https://test.com/1.jpg",
+                IsMain = true,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            ctx.Reviews.AddRange(
+                new Review
+                {
+                    Id = 1,
+                    UserId = creator.Id,
+                    User = creator,
+                    ObjectId = 1,
+                    Rating = 5,
+                    Text = "Odlicno",
+                    Status = ContentStatus.Approved,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-5)
+                },
+                new Review
+                {
+                    Id = 2,
+                    UserId = otherCreator.Id,
+                    User = otherCreator,
+                    ObjectId = 1,
+                    Rating = 2,
+                    Text = "Pending review",
+                    Status = ContentStatus.Pending,
+                    CreatedAt = DateTime.UtcNow
+                });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetByIdAsync(1);
+
+            result.Should().NotBeNull();
+            result!.Reviews.Should().HaveCount(1);
+            result.Reviews[0].Text.Should().Be("Odlicno");
+            result.Reviews[0].UserFullName.Should().Be("Creator C");
+        }
     }
 }

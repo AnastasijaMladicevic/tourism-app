@@ -36,9 +36,14 @@ namespace TuristickiVodic.Services.Services
                 .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
                 .Include(o => o.Images)
+                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
+                    .ThenInclude(r => r.User)
+                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
+                    .ThenInclude(r => r.ReviewedBy)
                 .Where(o => o.Status == ContentStatus.Approved)
                 .Where(o => o.IsActive)
                 .Where(o => o.Images.Any(i => i.IsMain))
+                .AsSplitQuery()
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.Type))
@@ -375,6 +380,11 @@ namespace TuristickiVodic.Services.Services
                 .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
                 .Include(o => o.Images)
+                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
+                    .ThenInclude(r => r.User)
+                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
+                    .ThenInclude(r => r.ReviewedBy)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 

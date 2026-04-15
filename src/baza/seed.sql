@@ -175,6 +175,12 @@ VALUES
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'ContentCreator'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 
 ('Ana', 'Anic', '1998-07-10', 'ana@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+
+('Mila', 'Milic', '1997-04-12', 'mila@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+
+('Ivan', 'Ivanic', '1996-09-03', 'ivan@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
 
 -- ============================================
@@ -488,7 +494,35 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
- 5, 'Luksuzno i udobno, vredi svake pare. Dzakuzi vrhunski.', 'Approved', NOW());
+ 5, 'Luksuzno i udobno, vredi svake pare. Dzakuzi vrhunski.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
+ 4, 'Lep hotel i odlicna lokacija, dorucak moze biti bolji.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
+ 4, 'Vrlo prijatan smestaj i sjajan pogled sa terase.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
+ 5, 'Fenomenalna usluga i pogled, vraticu se opet.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
+ 4, 'Opustena atmosfera i super muzika predvece.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
+ 5, 'Odlicno mesto za pice posle plaze.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
+ 5, 'Savrsena baza za planinarenje, osoblje veoma ljubazno.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
+ 4, 'Topla preporuka za ljubitelje prirode i planine.', 'Approved', NOW());
 
 
 -- ============================================

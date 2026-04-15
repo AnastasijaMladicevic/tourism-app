@@ -421,6 +421,19 @@ namespace TuristickiVodic.Tests.Mappings
                 {
                     new Image { Url = "https://img.test/object-main.jpg", IsMain = true }
                 },
+                Reviews = new List<Review>
+                {
+                    new Review
+                    {
+                        Id = 11,
+                        UserId = 100,
+                        User = new User { Id = 100, FirstName = "Iva", LastName = "Ivic" },
+                        Rating = 5,
+                        Text = "Sjajno mesto",
+                        Status = ContentStatus.Approved,
+                        CreatedAt = new DateTime(2024, 1, 3)
+                    }
+                },
                 DestinationId = 4,
                 CreatedByUserId = 10,
                 CreatedAt = new DateTime(2024, 1, 1),
@@ -443,6 +456,9 @@ namespace TuristickiVodic.Tests.Mappings
             dto.AverageRating.Should().Be(4.7m);
             dto.ReviewCount.Should().Be(12);
             dto.MainImageUrl.Should().Be("https://img.test/object-main.jpg");
+            dto.Reviews.Should().HaveCount(1);
+            dto.Reviews[0].UserFullName.Should().Be("Iva Ivic");
+            dto.Reviews[0].Rating.Should().Be(5);
         }
 
         [Fact]
