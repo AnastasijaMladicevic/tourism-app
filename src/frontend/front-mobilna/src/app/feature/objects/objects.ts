@@ -167,9 +167,16 @@ export class ObjectsComponent implements OnInit {
   }
 
   getMainImage(obj: ObjectView): string {
-    const img = obj.images?.find((i) => i.isMain) ?? obj.images?.[0];
-    return img?.url ?? '';
+  const anyObj = obj as any;
+  const mainImageUrl = anyObj.mainImageUrl as string | undefined;
+
+  if (mainImageUrl?.trim()) {
+    return mainImageUrl;
   }
+
+  const img = obj.images?.find((i) => i.isMain) ?? obj.images?.[0];
+  return img?.url ?? '';
+}
 
   onImageError(event: Event): void {
     (event.target as HTMLImageElement).style.display = 'none';
