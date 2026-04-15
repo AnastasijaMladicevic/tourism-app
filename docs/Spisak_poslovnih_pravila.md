@@ -4,8 +4,7 @@
 - Korisnik može da vidi samo svoj profil; `Admin` može da vidi bilo kog korisnika.
 - Korisnik može da menja samo svoj profil; `Admin` može da menja bilo kog korisnika.
 - Korisnik može da menja lozinku samo sebi; `Admin` može da menja lozinku bilo kom korisniku.
-- Samo `Admin` može da vidi listu svih korisnika.
-- Samo `Admin` može da pretražuje korisnike po email adresi.
+- Samo `Admin` moze da pretrazuje korisnike po email adresi, imenu i prezimenu i da vidi listu korisnika.
 - Samo `Admin` može da aktivira/deaktivira korisnike.
 - `Admin` ne može da obriše sam sebe.
 - Samo `Tourist` može da pošalje zahtev za `ContentCreator` ulogu, i to samo za sebe.
@@ -17,9 +16,9 @@
 - Samo `Admin` može da kreira destinacije.
 - Samo `Admin` može da menja destinacije.
 - Samo `Admin` može da briše destinacije.
-- Brisanje destinacije je blokirano ako destinacija ima lokalitete, objekte ili evente.
+- Brisanje destinacije se vrsi kaskadno .
 - Jedan `Manager` ne moze da rukovodi sa vise destinacija.
-- Destinacija ne bi trebalo da se instancira bez da joj se dodeli menadzer.
+- Admin moze obrisati destinaciju. Brisanje je nepovratno i zahteva eksplicitnu potvrdu korisnika (front).
 
 **LOKALITET**
 
@@ -39,7 +38,7 @@
 - `ContentCreator` može da menja samo svoje objekte.
 - `Manager` ne menja sadržaj objekta, već samo odobrava ili odbija status za objekte u svojoj destinaciji.
 - Samo `ContentCreator` može direktno da obriše objekat.
-- `ContentCreator` može direktno da obriše samo svoj `Pending` objekat.
+- `ContentCreator` može direktno da obriše samo svoj objekat koji nije `Approved`.
 - `Approved` objekti se ne brišu direktno, već kroz `DeletionRequest`.
 - Objekat koji ima recenzije može da se obriše (kaskadno se brišu i recenzije).
 
@@ -162,6 +161,7 @@
 
 - Entitet može imati više slika.
 - Svaki entitet mora imati tačno jednu glavnu sliku (`IsMain = true`) u svakom trenutku.
+- Entitet se ne prikazuje javno dok nema glavnu sliku, ali moze biti kreiran bez slika.
 - Nije dozvoljeno imati više od jedne glavne slike.
 - Nije dozvoljeno da entitet nema nijednu glavnu sliku.
 - Slike se mogu dodavati samo za postojeće entitete.
@@ -178,11 +178,11 @@
 - Dozvoljeno je menjati:
   - Url
   - AltText
-  - IsMain
 - Nije dozvoljeno premeštanje slike na drugi entitet.
 - Promena glavne slike vrši se kroz posebnu operaciju SetMainImage.
 - Kada se nova slika postavi kao glavna, prethodna glavna slika automatski prestaje da bude glavna.
 - Dozvoljeno je brisanje slika koje nisu glavne.
+- Sadržaj koji podleže odobravanju ne može biti odobren dok nema glavnu sliku
 - Nije dozvoljeno obrisati glavnu sliku ako time entitet ostaje bez glavne slike.
 - Ako entitet ima više slika, pre brisanja glavne slike druga slika mora biti postavljena kao glavna.
 - Jedina glavna slika entiteta ne može se obrisati direktno.
