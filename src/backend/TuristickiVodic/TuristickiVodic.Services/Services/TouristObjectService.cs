@@ -99,6 +99,17 @@ namespace TuristickiVodic.Services.Services
                     (o.Description != null && o.Description.ToLower().Contains(search)));
             }
 
+            var requestedAmenities = NormalizeAmenities(query.Amenities);
+            if (requestedAmenities.Length > 0)
+            {
+                foreach (var amenity in requestedAmenities)
+                {
+                    objectsQuery = objectsQuery.Where(o =>
+                        o.Amenities != null &&
+                        o.Amenities.Contains(amenity));
+                }
+            }
+
             if (query.MinPrice.HasValue)
             {
                 objectsQuery = objectsQuery.Where(o =>

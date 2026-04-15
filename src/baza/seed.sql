@@ -183,6 +183,45 @@ VALUES
 ('Ivan', 'Ivanic', '1996-09-03', 'ivan@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
 
+INSERT INTO "Users"
+("FirstName", "LastName", "DateOfBirth", "Email", "PasswordHash", "PhoneNumber", "Country", "Language",
+ "IsVerified", "IsActive", "IsBlacklisted", "HasRequestedCreatorRole", "RoleId", "ManagedDestinationId", "CreatedAt", "UpdatedAt", "ProfileImageUrl")
+VALUES
+('Jelena', 'Bokic', '1991-02-11', 'manager.kotorskizaliv@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000001', 'Crna Gora', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Ivana', 'Budimir', '1993-06-14', 'manager.budva@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000002', 'Crna Gora', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Petar', 'Duric', '1989-09-02', 'manager.durmitor@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000003', 'Crna Gora', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Milena', 'Stefanic', '1990-03-25', 'manager.svetistefan@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000004', 'Crna Gora', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Luka', 'Jovanovic', '1988-12-01', 'manager.podgorica@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000005', 'Crna Gora', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Sanja', 'Ilic', '1992-04-18', 'manager.hercegnovi@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000006', 'Crna Gora', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Nikola', 'Sretenovic', '1991-08-09', 'manager.bar@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000007', 'Crna Gora', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Amar', 'Jovic', '1994-01-30', 'manager.ulcinj@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000008', 'Crna Gora', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Teodora', 'Jokic', '1990-11-19', 'manager.cetinje@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000009', 'Crna Gora', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Vuk', 'Milivojevic', '1987-07-12', 'manager.niksic@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000010', 'Crna Gora', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Jovana', 'Stojanovic', '1993-05-21', 'manager.tivat@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000011', 'Crna Gora', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Milos', 'Stanojevic', '1989-10-05', 'manager.igalo@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000012', 'Crna Gora', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Katarina', 'Milanovic', '1992-02-27', 'manager.njegusi@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000013', 'Crna Gora', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Stefan', 'Obradovic', '1991-06-30', 'manager.lovcen@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000014', 'Crna Gora', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Marija', 'Markovic', '1990-09-17', 'manager.skadarsko@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000015', 'Crna Gora', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Dusan', 'Miladinovic', '1988-01-08', 'manager.kolasin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000016', 'Crna Gora', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Andjela', 'Petrovic', '1994-03-13', 'manager.zabljak@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000017', 'Crna Gora', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
+
 -- ============================================
 -- 4. DESTINATIONS
 -- ============================================
@@ -280,13 +319,65 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW())
  ;
 
-UPDATE "Destinations"
-SET "ManagedByUserId" = (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com')
-WHERE "Name" = 'Kotor';
+WITH manager_assignments AS (
+    SELECT d."Id" AS destination_id, u."Id" AS manager_id
+    FROM (VALUES
+        ('Kotorski zaliv', 'manager.kotorskizaliv@spirego.com'),
+        ('Kotor', 'marko@spirego.com'),
+        ('Budva', 'manager.budva@spirego.com'),
+        ('Durmitor', 'manager.durmitor@spirego.com'),
+        ('Sveti Stefan', 'manager.svetistefan@spirego.com'),
+        ('Podgorica', 'manager.podgorica@spirego.com'),
+        ('Herceg Novi', 'manager.hercegnovi@spirego.com'),
+        ('Bar', 'manager.bar@spirego.com'),
+        ('Ulcinj', 'manager.ulcinj@spirego.com'),
+        ('Cetinje', 'manager.cetinje@spirego.com'),
+        ('Niksic', 'manager.niksic@spirego.com'),
+        ('Tivat', 'manager.tivat@spirego.com'),
+        ('Igalo Banja', 'manager.igalo@spirego.com'),
+        ('Selo Njegusi', 'manager.njegusi@spirego.com'),
+        ('Lovcen', 'manager.lovcen@spirego.com'),
+        ('Skadarsko jezero', 'manager.skadarsko@spirego.com'),
+        ('Kolasin', 'manager.kolasin@spirego.com'),
+        ('Zabljak', 'manager.zabljak@spirego.com')
+    ) AS map(destination_name, manager_email)
+    JOIN "Destinations" d ON d."Name" = map.destination_name
+    JOIN "Users" u ON u."Email" = map.manager_email
+)
+UPDATE "Destinations" d
+SET "ManagedByUserId" = m.manager_id
+FROM manager_assignments m
+WHERE d."Id" = m.destination_id;
 
-UPDATE "Users"
-SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor')
-WHERE "Email" = 'marko@spirego.com';
+WITH manager_assignments AS (
+    SELECT d."Id" AS destination_id, u."Id" AS manager_id
+    FROM (VALUES
+        ('Kotorski zaliv', 'manager.kotorskizaliv@spirego.com'),
+        ('Kotor', 'marko@spirego.com'),
+        ('Budva', 'manager.budva@spirego.com'),
+        ('Durmitor', 'manager.durmitor@spirego.com'),
+        ('Sveti Stefan', 'manager.svetistefan@spirego.com'),
+        ('Podgorica', 'manager.podgorica@spirego.com'),
+        ('Herceg Novi', 'manager.hercegnovi@spirego.com'),
+        ('Bar', 'manager.bar@spirego.com'),
+        ('Ulcinj', 'manager.ulcinj@spirego.com'),
+        ('Cetinje', 'manager.cetinje@spirego.com'),
+        ('Niksic', 'manager.niksic@spirego.com'),
+        ('Tivat', 'manager.tivat@spirego.com'),
+        ('Igalo Banja', 'manager.igalo@spirego.com'),
+        ('Selo Njegusi', 'manager.njegusi@spirego.com'),
+        ('Lovcen', 'manager.lovcen@spirego.com'),
+        ('Skadarsko jezero', 'manager.skadarsko@spirego.com'),
+        ('Kolasin', 'manager.kolasin@spirego.com'),
+        ('Zabljak', 'manager.zabljak@spirego.com')
+    ) AS map(destination_name, manager_email)
+    JOIN "Destinations" d ON d."Name" = map.destination_name
+    JOIN "Users" u ON u."Email" = map.manager_email
+)
+UPDATE "Users" u
+SET "ManagedDestinationId" = m.destination_id
+FROM manager_assignments m
+WHERE u."Id" = m.manager_id;
 
 -- ============================================
 -- 5. LOCALITIES
@@ -384,12 +475,20 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Prirodni lokalitet'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
- ('Centar Zabljaka', 'Glavna turisticka zona Zabljaka',
+('Centar Zabljaka', 'Glavna turisticka zona Zabljaka',
  ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW())
  ;
+
+-- Lokalitetima upravlja menadzer dodeljen destinaciji kojoj pripadaju.
+UPDATE "Localities" l
+SET "CreatedByUserId" = d."ManagedByUserId",
+    "UpdatedAt" = NOW()
+FROM "Destinations" d
+WHERE l."DestinationId" = d."Id"
+  AND d."ManagedByUserId" IS NOT NULL;
 
 
 -- ============================================
@@ -412,7 +511,7 @@ VALUES
  '{"pon":"10:00-23:00"}', 35.00, ARRAY['WiFi', 'Terasa', 'Pogled na more', 'Rezervacije'], ST_SetSRID(ST_MakePoint(18.768, 42.427), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotorski zaliv'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
@@ -445,16 +544,16 @@ VALUES
  NOW(), NOW(), NOW()),
  
  ('Biblioteka Niksic', 'Gradska biblioteka u Nikšiću', 'Trg Slobode, Nikšić',  '+38220000001', NULL,
- '{"pon":"08:00-20:00"}', ST_SetSRID(ST_MakePoint(18.956, 42.774), 4326), 0, 0, 'Approved', true,
+ '{"pon":"08:00-20:00"}', NULL, ARRAY['WiFi', 'Citaonica', 'Klimatizovano'], ST_SetSRID(ST_MakePoint(18.956, 42.774), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Biblioteka'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Nikšić'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
  
  ('Crkva Svetog Nikole Bar', 'Pravoslavna crkva u Starom Baru', 'Stari Bar', '+38220000002', NULL,
- '{"pon":"06:00-18:00"}', ST_SetSRID(ST_MakePoint(19.142, 42.097), 4326), 0, 0, 'Approved', true,
+ '{"pon":"06:00-18:00"}', NULL, ARRAY['Vodic', 'Mirno okruzenje'], ST_SetSRID(ST_MakePoint(19.142, 42.097), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Crkva'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari Bar'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
@@ -463,7 +562,7 @@ VALUES
  NOW(), NOW(), NOW()),
  
  ('Restoran Jezero', 'Restoran sa pogledom na Skadarsko jezero',  'Virpazar bb', '+38220000003', NULL,
- '{"pon":"09:00-22:00"}', ST_SetSRID(ST_MakePoint(19.091, 42.246), 4326), 0, 0, 'Approved', true,
+ '{"pon":"09:00-22:00"}', 22.00, ARRAY['Terasa', 'Pogled na jezero', 'Parking', 'Rezervacije'], ST_SetSRID(ST_MakePoint(19.091, 42.246), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
@@ -472,7 +571,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Hotel Bianca Kolasin', 'Popularan hotel u Kolasinu',  'Kolasin centar', '+38220000004', NULL,
- '{"pon":"00:00-24:00"}', ST_SetSRID(ST_MakePoint(19.522, 42.822), 4326), 0, 0, 'Approved', true,
+ '{"pon":"00:00-24:00"}', 130.00, ARRAY['WiFi', 'Spa', 'Parking', 'Dorucak', 'Ski ostava'], ST_SetSRID(ST_MakePoint(19.522, 42.822), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Biogradsko jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
@@ -480,6 +579,24 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
  NOW(), NOW(), NOW())
  ;
+
+-- Objekte kreira ContentCreator, a odobrava menadzer nadlezan za destinaciju.
+UPDATE "Objects" o
+SET "DestinationId" = l."DestinationId"
+FROM "Localities" l
+WHERE o."LocalityId" = l."Id"
+  AND o."DestinationId" IS DISTINCT FROM l."DestinationId";
+
+UPDATE "Objects" o
+SET "CreatedByUserId" = cc."Id",
+    "ApprovedByUserId" = d."ManagedByUserId",
+    "ApprovedAt" = CASE
+        WHEN o."Status" = 'Approved' THEN COALESCE(o."ApprovedAt", NOW())
+        ELSE o."ApprovedAt"
+    END
+FROM "Destinations" d,
+     (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com') cc
+WHERE o."DestinationId" = d."Id";
 
 -- ============================================
 -- 7. ACTIVITIES
@@ -548,6 +665,24 @@ VALUES
  NOW(), NOW())
  ;
 
+-- Aktivnosti kreira ContentCreator, a odobrava menadzer nadlezan za destinaciju.
+UPDATE "Activities" a
+SET "DestinationId" = l."DestinationId"
+FROM "Localities" l
+WHERE a."LocalityId" = l."Id"
+  AND a."DestinationId" IS DISTINCT FROM l."DestinationId";
+
+UPDATE "Activities" a
+SET "CreatedByUserId" = cc."Id",
+    "ApprovedByUserId" = d."ManagedByUserId",
+    "ApprovedAt" = CASE
+        WHEN a."Status" = 1 THEN COALESCE(a."ApprovedAt", NOW())
+        ELSE a."ApprovedAt"
+    END
+FROM "Destinations" d,
+     (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com') cc
+WHERE a."DestinationId" = d."Id";
+
 -- ============================================
 -- 8. EVENTS
 -- ============================================
@@ -598,6 +733,32 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW());
+
+UPDATE "Events"
+SET "LocalityId" = (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva')
+WHERE "Name" = 'Budva Summer Festival';
+
+UPDATE "Events"
+SET "LocalityId" = (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero')
+WHERE "Name" = 'Planinarski susret';
+
+-- Evente kreira ContentCreator, a odobrava menadzer nadlezan za destinaciju.
+UPDATE "Events" e
+SET "DestinationId" = l."DestinationId"
+FROM "Localities" l
+WHERE e."LocalityId" = l."Id"
+  AND e."DestinationId" IS DISTINCT FROM l."DestinationId";
+
+UPDATE "Events" e
+SET "CreatedByUserId" = cc."Id",
+    "ApprovedByUserId" = d."ManagedByUserId",
+    "ApprovedAt" = CASE
+        WHEN e."Status" = 'Approved' THEN COALESCE(e."ApprovedAt", NOW())
+        ELSE e."ApprovedAt"
+    END
+FROM "Destinations" d,
+     (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com') cc
+WHERE e."DestinationId" = d."Id";
 
 -- ============================================
 -- 9. REVIEWS

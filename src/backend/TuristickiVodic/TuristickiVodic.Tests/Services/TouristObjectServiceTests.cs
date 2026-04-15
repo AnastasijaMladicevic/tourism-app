@@ -358,6 +358,74 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task GetAllAsync_KadaSeFiltriraPoAmenities_VracaSamoObjekteKojiImajuSveTrazenePogodnosti()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaSeFiltriraPoAmenities_VracaSamoObjekteKojiImajuSveTrazenePogodnosti));
+            var (objectType, destination, _, locality, _, creator, _, _, _) = SeedBase(ctx);
+
+            ctx.Objects.AddRange(
+                new TouristObject
+                {
+                    Id = 1,
+                    Name = "Hotel sa svim pogodnostima",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    Amenities = new[] { "WiFi", "Parking", "Spa" },
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new TouristObject
+                {
+                    Id = 2,
+                    Name = "Hotel bez parkinga",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    Amenities = new[] { "WiFi", "Spa" },
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+            ctx.Images.AddRange(
+                new Image
+                {
+                    Id = 1,
+                    ObjectId = 1,
+                    Url = "https://test.com/object-1.jpg",
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                },
+                new Image
+                {
+                    Id = 2,
+                    ObjectId = 2,
+                    Url = "https://test.com/object-2.jpg",
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+
+            var result = await svc.GetAllAsync(new TouristObjectQueryDto
+            {
+                Amenities = new[] { "WiFi", "Parking" }
+            });
+
+            result.Items.Should().HaveCount(1);
+            result.Items[0].Name.Should().Be("Hotel sa svim pogodnostima");
+            result.Items[0].Amenities.Should().Contain(new[] { "WiFi", "Parking" });
+        }
+
+        [Fact]
         public async Task GetByIdAsync_VracaIListuApprovedRecenzija()
         {
             using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_VracaIListuApprovedRecenzija));

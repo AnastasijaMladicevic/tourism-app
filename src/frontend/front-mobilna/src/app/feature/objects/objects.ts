@@ -64,29 +64,34 @@ export class ObjectsComponent implements OnInit {
   }
 
   loadData(): void {
-    this.isLoading = true;
-    this.errorMessage = '';
+  this.isLoading = true;
+  this.errorMessage = '';
 
-    this.objectService.getAll().subscribe({
-      next: (data) => {
-        this.objects = data.map((o) => ({
-          ...o,
-          isFavorite: false,
-          favoriteId: undefined,
-        }));
+  this.objectService.getAll().subscribe({
+    next: (response: any) => {
+      const data: ObjectDto[] = Array.isArray(response)
+        ? response
+        : response?.items ?? response?.data ?? response?.results ?? response?.value ?? [];
 
-        this.objectTypes = this.extractUniqueTypes(data);
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error(err);
-        this.isLoading = false;
-        this.errorMessage = 'Failed to load places.';
-        this.cdr.detectChanges();
-      },
-    });
-  }
+      this.objects = data.map((o) => ({
+        ...o,
+        isFavorite: false,
+        favoriteId: undefined,
+      }));
+
+      this.objectTypes = this.extractUniqueTypes(data);
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    },
+    error: (err) => {
+      console.error(err);
+      this.objects = [];
+      this.isLoading = false;
+      this.errorMessage = 'Failed to load places.';
+      this.cdr.detectChanges();
+    },
+  });
+}
 
   private extractUniqueTypes(data: ObjectDto[]): { id: number; name: string }[] {
     const map = new Map<string, { id: number; name: string }>();
@@ -110,7 +115,8 @@ export class ObjectsComponent implements OnInit {
     }
 
     if (this.activeFilter !== 'All') {
-      list = list.filter((o) => o.objectTypeName === this.activeFilter);
+      const active = this.activeFilter.trim().toLowerCase();
+      list = list.filter((o) => o.objectTypeName?.trim().toLowerCase() === active);
     }
 
     if (this.minRatingFilter > 0) {
@@ -202,8 +208,20 @@ export class ObjectsComponent implements OnInit {
   }
 
   viewDetails(obj: ObjectView): void {
-    this.router.navigate(['/object', obj.id]);
+  const type = obj.objectTypeName?.trim().toLowerCase();
+
+  if (type === 'restoran') {
+    this.router.navigate(['/restaurant', obj.id]);
+    return;
   }
+
+  if (type === 'hotel') {
+    this.router.navigate(['/hotel', obj.id]);
+    return;
+  }
+
+  this.router.navigate(['/objects']);
+}
 
   goBack(): void {
     this.router.navigate(['/home']);
