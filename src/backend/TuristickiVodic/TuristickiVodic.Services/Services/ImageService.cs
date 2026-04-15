@@ -31,24 +31,14 @@ namespace TuristickiVodic.Services.Services
 
             await EnsureCanManageImageAsync(image, userId, roleName);
 
-            var targetIsMain = dto.IsMain ?? image.IsMain;
-
-            await ValidateMainRuleOnUpdateAsync(
-                image.Id,
-                targetIsMain,
-                image.ObjectId,
-                image.ActivityId,
-                image.EventId,
-                image.DestinationId,
-                image.LocalityId);
+            if (dto.IsMain.HasValue && dto.IsMain.Value != image.IsMain)
+                throw new InvalidOperationException("Use SetMainImage operation to change the main image.");
 
             if (!string.IsNullOrWhiteSpace(dto.Url))
                 image.Url = dto.Url;
 
             if (dto.AltText != null)
                 image.AltText = dto.AltText;
-
-            image.IsMain = targetIsMain;
 
             await _context.SaveChangesAsync();
             return _mapper.Map<ImageDto>(image);
@@ -294,6 +284,16 @@ namespace TuristickiVodic.Services.Services
             int? activityId = null,
             int? eventId = null)
         {
+            var linkedEntityCount =
+                (destinationId.HasValue ? 1 : 0) +
+                (localityId.HasValue ? 1 : 0) +
+                (objectId.HasValue ? 1 : 0) +
+                (activityId.HasValue ? 1 : 0) +
+                (eventId.HasValue ? 1 : 0);
+
+            if (linkedEntityCount != 1)
+                throw new InvalidOperationException("Image must belong to exactly one entity.");
+
             return new Image
             {
                 Url = dto.Url,
@@ -341,25 +341,6 @@ namespace TuristickiVodic.Services.Services
                 if (mainExists)
                     throw new InvalidOperationException("Entity already has a main image. Update the existing main image first.");
             }
-        }
-
-        private async Task ValidateMainRuleOnUpdateAsync(
-            int currentImageId,
-            bool targetIsMain,
-            int? objectId,
-            int? activityId,
-            int? eventId,
-            int? destinationId,
-            int? localityId)
-        {
-            bool anotherMainExists = await ExistsAnotherMainForSameEntityAsync(
-                currentImageId, objectId, activityId, eventId, destinationId, localityId);
-
-            if (targetIsMain && anotherMainExists)
-                throw new InvalidOperationException("Only one main image allowed per entity.");
-
-            if (!targetIsMain && !anotherMainExists)
-                throw new InvalidOperationException("Entity must always have exactly one main image.");
         }
 
         private async Task<bool> ExistsAnotherMainForSameEntityAsync(

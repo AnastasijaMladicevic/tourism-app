@@ -103,7 +103,7 @@ namespace TuristickiVodic.Services.Services
                 .Take(query.PageSize)
                 .ToListAsync();
 
-            var mappedItems = items.Select(MapToDto).ToList();
+            var mappedItems = _mapper.Map<List<TouristObjectDto>>(items);
 
             return new PagedResultDto<TouristObjectDto>
             {
@@ -128,7 +128,7 @@ namespace TuristickiVodic.Services.Services
             if (!hasMainImage)
                 return null;
 
-            return MapToDto(obj);
+            return _mapper.Map<TouristObjectDto>(obj);
         }
 
         // Samo CC može da kreira objekte; status uvek Pending, čeka odobrenje
@@ -178,7 +178,7 @@ namespace TuristickiVodic.Services.Services
             _context.Objects.Add(obj);
             await _context.SaveChangesAsync();
 
-            return MapToDto(await LoadObjectAsync(obj.Id));
+            return _mapper.Map<TouristObjectDto>(await LoadObjectAsync(obj.Id));
         }
 
         // Samo CC može da menja objekte, i to samo svoje
@@ -241,7 +241,7 @@ namespace TuristickiVodic.Services.Services
 
             await _context.SaveChangesAsync();
 
-            return MapToDto(await LoadObjectAsync(obj.Id));
+            return _mapper.Map<TouristObjectDto>(await LoadObjectAsync(obj.Id));
         }
 
         // Menadžer odobrava/odbija objekte u svojoj destinaciji
@@ -290,7 +290,7 @@ namespace TuristickiVodic.Services.Services
 
             await _context.SaveChangesAsync();
 
-            return MapToDto(await LoadObjectAsync(obj.Id));
+            return _mapper.Map<TouristObjectDto>(await LoadObjectAsync(obj.Id));
         }
 
         public async Task<bool> DeleteAsync(int id, int userId, string roleName)
@@ -331,35 +331,6 @@ namespace TuristickiVodic.Services.Services
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
-        private static TouristObjectDto MapToDto(TouristObject o) => new()
-        {
-            Id = o.Id,
-            Name = o.Name,
-            Description = o.Description,
-            MainImageUrl = o.Images?.FirstOrDefault(i => i.IsMain)?.Url,
-            Address = o.Address,
-            PhoneNumber = o.PhoneNumber,
-            Website = o.Website,
-            WorkingHours = o.WorkingHours,
-            Longitude = o.Geolocation?.X,
-            Latitude = o.Geolocation?.Y,
-            AverageRating = o.AverageRating,
-            ReviewCount = o.ReviewCount,
-            Status = o.Status.ToString(),
-            ObjectTypeId = o.ObjectTypeId,
-            ObjectTypeName = o.ObjectType?.Name ?? string.Empty,
-            LocalityId = o.LocalityId,
-            LocalityName = o.Locality?.Name,
-            DestinationId = o.DestinationId,
-            DestinationName = o.Destination?.Name ?? o.Locality?.Destination?.Name ?? string.Empty,
-            CreatedByUserId = o.CreatedByUserId,
-            ApprovedByUserId = o.ApprovedByUserId,
-            ApprovedAt = o.ApprovedAt,
-            RejectionReason = o.RejectionReason,
-            CreatedAt = o.CreatedAt,
-            UpdatedAt = o.UpdatedAt
-        };
-
         private static Point? CreatePoint(double? longitude, double? latitude)
         {
             if (!longitude.HasValue || !latitude.HasValue) return null;
@@ -396,7 +367,7 @@ namespace TuristickiVodic.Services.Services
 
             await _context.SaveChangesAsync();
 
-            return MapToDto(await LoadObjectAsync(obj.Id));
+            return _mapper.Map<TouristObjectDto>(await LoadObjectAsync(obj.Id));
         }
 
         public async Task<PagedResultDto<TouristObjectDto>> SearchAsync(TouristObjectQueryDto query)
