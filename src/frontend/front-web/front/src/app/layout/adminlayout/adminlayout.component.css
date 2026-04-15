@@ -1,15 +1,9 @@
-/* =====================
-   RESET & BASE
-   ===================== */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* =====================
-   LAYOUT
-   ===================== */
 .admin-layout {
   display: flex;
   height: 100vh;
@@ -29,8 +23,8 @@
   border-right: 1px solid #ebebeb;
   display: flex;
   flex-direction: column;
-  padding-top: 8px;
   overflow-y: auto;
+  padding-top: 8px;
 }
 
 .sidebar-section-label {
@@ -42,9 +36,9 @@
   padding: 20px 20px 8px;
 }
 
-.sidebar-section-label.system {
-  margin-top: 8px;
+.system-label {
   border-top: 1px solid #f0f0f0;
+  margin-top: 8px;
   padding-top: 20px;
 }
 
@@ -57,9 +51,9 @@
   font-size: 14px;
   font-weight: 400;
   text-decoration: none;
-  border-radius: 0;
   transition: background 0.12s, color 0.12s;
   position: relative;
+  cursor: pointer;
 }
 
 .nav-item:hover {
@@ -73,7 +67,6 @@
   font-weight: 600;
 }
 
-/* Leva plava linija na aktivnoj stavci */
 .nav-item.active::before {
   content: '';
   position: absolute;
@@ -99,6 +92,30 @@
 
 .nav-item:hover .nav-icon {
   color: #111111;
+}
+
+/* Sign Out na dnu */
+.sidebar-bottom {
+  margin-top: auto;
+  border-top: 1px solid #f0f0f0;
+  padding: 8px 0;
+}
+
+.signout-item {
+  color: #e53e3e;
+}
+
+.signout-item .nav-icon {
+  color: #e53e3e;
+}
+
+.signout-item:hover {
+  background: #fff5f5;
+  color: #c53030;
+}
+
+.signout-item:hover .nav-icon {
+  color: #c53030;
 }
 
 /* =====================
@@ -127,10 +144,7 @@
   z-index: 100;
 }
 
-/* Logo */
-.topbar-logo {
-  flex-shrink: 0;
-}
+.topbar-logo { flex-shrink: 0; }
 
 .logo-img {
   height: 34px;
@@ -138,7 +152,6 @@
   display: block;
 }
 
-/* Search */
 .search-wrapper {
   flex: 1;
   max-width: 420px;
@@ -167,9 +180,7 @@
   transition: border-color 0.15s, background 0.15s;
 }
 
-.search-input::placeholder {
-  color: #a0a0a0;
-}
+.search-input::placeholder { color: #a0a0a0; }
 
 .search-input:focus {
   border-color: #a8c0f8;
@@ -177,7 +188,6 @@
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
 }
 
-/* Desna strana */
 .topbar-right {
   margin-left: auto;
   display: flex;
@@ -204,7 +214,6 @@
   color: #111111;
 }
 
-/* User */
 .topbar-user {
   display: flex;
   align-items: center;
