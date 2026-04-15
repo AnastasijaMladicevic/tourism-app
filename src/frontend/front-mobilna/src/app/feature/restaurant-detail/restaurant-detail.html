@@ -1,10 +1,9 @@
 <div class="screen">
-  <!-- Header -->
   <div class="header">
     <button class="icon-btn" (click)="goBack()">
       <mat-icon>arrow_back_ios</mat-icon>
     </button>
-    <h1 class="header__title">Događaj</h1>
+    <h1 class="header__title">Restoran</h1>
   </div>
 
   @if (isLoading) {
@@ -22,14 +21,13 @@
     </div>
   }
 
-  @if (event) {
-    <!-- Hero slika - iza svega -->
+  @if (object) {
     <div class="hero">
       @if (mainImage) {
-        <img [src]="mainImage" [alt]="event.name" (error)="onImageError($event)" />
+        <img [src]="mainImage" [alt]="object.name" (error)="onImageError($event)" />
       } @else {
         <div class="hero-placeholder">
-          <mat-icon>celebration</mat-icon>
+          <mat-icon>restaurant</mat-icon>
         </div>
       }
       <button class="fav-btn" (click)="toggleFavorite()" [class.fav-btn--active]="isFavorite">
@@ -40,10 +38,9 @@
     <div class="content">
       <!-- LEVA STRANA -->
       <div class="left">
-        <!-- HEADER / HERO INFO -->
         <div class="card">
           <div class="title-row">
-            <h1 class="title">{{ event.name }}</h1>
+            <h1 class="title">{{ object.name }}</h1>
             <button
               class="fav-btn fav-btn--desktop"
               (click)="toggleFavorite()"
@@ -52,29 +49,40 @@
               <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
             </button>
           </div>
-          <p class="location-bold">{{ event.localityName }}, {{ event.destinationName }}</p>
 
-          <p class="venue"><mat-icon>location_on</mat-icon>{{ event.objectName || 'N/A' }}</p>
-
-          <p class="date">{{ formatDate(event.startDate) }} – {{ formatDate(event.endDate) }}</p>
+          <p class="location-bold">{{ object.localityName }}, {{ object.destinationName }}</p>
+          <p class="venue"><mat-icon>location_on</mat-icon> {{ object.address || 'N/A' }}</p>
+          <!-- Kontakt Info - Nova sekcija -->
+          <div class="contact-info">
+            <h3>Kontakt info</h3>
+            @if (object.phoneNumber) {
+              <p>
+                <mat-icon>phone</mat-icon>
+                <a [href]="'tel:' + object.phoneNumber">{{ object.phoneNumber }}</a>
+              </p>
+            }
+            @if (object.website) {
+              <p>
+                <mat-icon>language</mat-icon>
+                <a [href]="object.website" target="_blank" rel="noopener">{{ object.website }}</a>
+              </p>
+            }
+          </div>
+          @if (object.workingHours) {
+            <p class="date"><mat-icon>access_time</mat-icon> {{ getWorkingHours() }}</p>
+          }
 
           <div class="actions">
-            <button class="btn btn-outline" (click)="addToPlanner()">
-              <mat-icon>add_circle</mat-icon>
-              Dodaj u Planner
-            </button>
-
-            <button class="btn btn-primary" (click)="buyTicket()">Kupi Kartu</button>
+            <button class="btn btn-primary" (click)="viewOnMap()">Rezerviši odmah</button>
           </div>
         </div>
 
-        <!-- OPIS -->
+        <!-- O restoranu -->
         <div class="card">
-          <h2>O događaju</h2>
-          <p class="description">
-            {{ event.description || 'Opis nije dostupan.' }}
-          </p>
+          <h2>O restoranu</h2>
+          <p class="description">{{ object.description || 'Opis nije dostupan.' }}</p>
         </div>
+
         <!-- Galerija -->
         <div class="section">
           <div class="card gallery-card">
@@ -82,7 +90,6 @@
               <h2>Galerija</h2>
               <button class="see-all-btn" (click)="openGallery(0)">See All ></button>
             </div>
-
             <div class="gallery-scroll">
               @for (img of images; track img.id; let i = $index) {
                 <div class="gallery-item" (click)="openGallery(i)">
@@ -94,36 +101,55 @@
         </div>
       </div>
 
-      <!-- DESNA STRANA (MAPA) -->
+      <!-- DESNA STRANA -->
       <div class="right">
         <div class="card">
           <h2>Lokacija</h2>
-
-          <div class="location-image" [attr.data-name]="event.objectName || 'N/A'">
+          <div
+            class="location-image"
+            [attr.data-name]="object.address || object.objectName || 'N/A'"
+          >
             <div class="location-image-placeholder">
               <mat-icon>place</mat-icon>
             </div>
             <button class="map-btn-overlay" (click)="viewOnMap()">Pogledaj na mapi</button>
           </div>
         </div>
-        <div class="card">
-          <h2>Dostupne ulaznice</h2>
-
-          <div class="ticket-card">
-            <div>
-              <span class="ticket-type">Standardna ulaznica</span>
-              <span class="ticket-price">
-                {{ event.price ? event.price + ' €' : 'Besplatno' }}
-              </span>
+        <!-- Recenzije -->
+        <div class="section">
+          <div class="card reviews-card">
+            <div class="reviews-header">
+              <h2>Recenzije</h2>
+              <button class="see-all-btn" (click)="openAllReviews()">See All ></button>
             </div>
 
-            <button class="btn-small" (click)="buyTicket()">Odaberi</button>
+            <div class="reviews-list">
+              @for (review of reviews; track review.id; let i = $index) {
+                <div class="review-item">
+                  <div class="review-header">
+                    <span class="review-author">{{ review.userFullName }}</span>
+                    <span class="review-date">{{ formatReviewDate(review.createdAt) }}</span>
+                  </div>
+                  <div class="review-rating">
+                    @for (star of [1, 2, 3, 4, 5]; track star) {
+                      <mat-icon [class.filled]="star <= review.rating">star</mat-icon>
+                    }
+                  </div>
+                  <p class="review-text">{{ review.text }}</p>
+                </div>
+              }
+            </div>
+
+            <button class="add-review-btn" (click)="openWriteReview()">
+              <mat-icon>add</mat-icon> Dodaj recenziju
+            </button>
           </div>
         </div>
       </div>
     </div>
   }
 </div>
+
 <!-- MODAL GALERIJA -->
 @if (showGalleryModal && images.length > 0) {
   <div class="gallery-modal" (click)="closeGallery()">

@@ -45,7 +45,9 @@ export class ObjectService {
   getAll(): Observable<ObjectDto[]> {
     return this.http.get<ObjectDto[]>(this.url);
   }
-
+  getById(id: number): Observable<ObjectDto> {
+    return this.http.get<ObjectDto>(`${this.url}/${id}`);
+  }
   // ako kasnije budeš filtrirao po tipu na backendu
   getByType(typeName: string): Observable<ObjectDto[]> {
     return this.http.get<ObjectDto[]>(`${this.url}?type=${typeName}`);

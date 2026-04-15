@@ -4,60 +4,61 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
-import { EventService, EventDto } from '../../services/event';
+import { ObjectService } from '../../services/object';
 import { ImageService, ImageDto } from '../../services/image';
 import { AuthService } from '../../services/auth';
 import { forkJoin } from 'rxjs';
+import { ReviewService, ReviewDto } from '../../services/review';
 
 @Component({
-  selector: 'app-event-detail',
+  selector: 'app-restaurant-detail',
   standalone: true,
   imports: [CommonModule, MatIconModule, MatButtonModule],
-  templateUrl: './event-detail.html',
-  styleUrls: ['./event-detail.scss'],
+  templateUrl: './restaurant-detail.html',
+  styleUrls: ['./restaurant-detail.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class EventDetailComponent implements OnInit {
-  event: EventDto | null = null;
+export class RestaurantDetailComponent implements OnInit {
+
+  object: any = null;
   images: ImageDto[] = [];
   mainImage = '';
   isLoading = true;
   errorMessage = '';
   isFavorite = false;
-  pinEmoji = '\u{1F4CD}';
+  reviews: ReviewDto[] = [];
+
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private eventService: EventService,
+    private objectService: ObjectService,
     private imageService: ImageService,
+    private reviewService: ReviewService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
   const id = Number(this.route.snapshot.paramMap.get('id'));
-  console.log(`🔍 Učitavanje eventa ID: ${id}`);
 
   forkJoin({
-    event: this.eventService.getById(id),
-    images: this.imageService.getForEvent(id)
+    object: this.objectService.getById(id),
+    images: this.imageService.getForObject(id),
+    // reviews: this.reviewService.getForObject(id)   
   }).subscribe({
-    next: ({ event, images }) => {
-      console.log('✅ Event učitan:', event);
-      console.log('✅ Slike učitane:', images.length);
-
-      this.event = event;
+    next: ({ object, images, /*reviews*/ }) => {
+      this.object = object;
       this.images = images || [];
-      this.mainImage = this.getMainImage(this.images);
-      
+      // this.reviews = reviews || [];               
+      this.mainImage = this.getMainImage(images);
       this.isLoading = false;
       this.cdr.detectChanges();
     },
     error: (err) => {
-      console.error('❌ Greška pri učitavanju:', err);
+      console.error(err);
       this.isLoading = false;
-      this.errorMessage = 'Greška pri učitavanju događaja.';
+      this.errorMessage = 'Greška pri učitavanju restorana.';
       this.cdr.detectChanges();
     }
   });
@@ -85,31 +86,21 @@ export class EventDetailComponent implements OnInit {
     return new Date(dateStr).toLocaleDateString('sr-RS', {
       day: 'numeric',
       month: 'long',
-      year: 'numeric',
+      year: 'numeric'
     });
   }
 
-  goBack(): void { this.router.navigate(['/events']); }
-
-  addToPlanner(): void {
-    if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
-      return;
-    }
-    alert('Događaj je dodat u Planner');
-  }
-
-  buyTicket(): void {
-    const price = this.event?.price ? `${this.event.price} €` : 'Besplatno';
-    alert(`Kupovina karte - Cena: ${price}`);
+  goBack(): void {
+    this.router.navigate(['/restaurants']);   // ili /objects
   }
 
   viewOnMap(): void {
-    if (!this.event?.latitude || !this.event?.longitude) return;
-    const lat = this.event.latitude;
-    const lng = this.event.longitude;
+    if (!this.object?.latitude || !this.object?.longitude) return;
+    const lat = this.object.latitude;
+    const lng = this.object.longitude;
     window.open(`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=17`, '_blank');
   }
+
   // === MODAL GALERIJA ===
   showGalleryModal = false;
   currentImageIndex = 0;
@@ -166,5 +157,38 @@ export class EventDetailComponent implements OnInit {
       // swipe RIGHT → prethodna slika
       this.prevImage();
     }
+  }
+  getWorkingHours(): string {
+    if (!this.object?.workingHours) return 'Radno vreme nije navedeno';
+
+    try {
+      const hours = JSON.parse(this.object.workingHours);
+      const today = new Date().getDay(); // 0=ned, 1=pon...
+      const dayKeys = ['ned', 'pon', 'uto', 'sre', 'cet', 'pet', 'sub'];
+      const todayKey = dayKeys[today];
+
+      return hours[todayKey] || hours['pon'] || 'Radno vreme nije navedeno';
+    } catch {
+      return this.object.workingHours;
+    }
+  }
+  
+
+  openAllReviews(): void {
+    this.router.navigate(['/reviews', this.object.id]);
+  }
+
+  openWriteReview(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    // Otvori modal ili stranicu za pisanje recenzije
+    alert('Otvaram formu za pisanje recenzije');
+  }
+
+  formatReviewDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('sr-RS', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 }
