@@ -23,6 +23,7 @@ export class HotelDetailComponent implements OnInit {
   mainImage = '';
   isLoading = true;
   errorMessage = '';
+  workingHoursText = '';
   isFavorite = false;
 
   constructor(
@@ -47,6 +48,7 @@ export class HotelDetailComponent implements OnInit {
         console.log('✅ Slike učitane:', images.length);
 
         this.hotel = object;
+        this.workingHoursText = object.workingHours ? this.formatWorkingHours(object.workingHours) : '';
         
         // Kombinuj embedded slike sa endpoint slikama
         const embeddedImages = object.images || [];
@@ -69,6 +71,47 @@ export class HotelDetailComponent implements OnInit {
     if (!images || images.length === 0) return '';
     const main = images.find(i => i.isMain);
     return main?.url ?? images[0].url;
+  }
+
+  private formatWorkingHours(workingHours: string): string {
+    try {
+      const parsed = JSON.parse(workingHours) as Record<string, string>;
+      const order = ['pon', 'uto', 'sre', 'cet', 'pet', 'sub', 'ned'];
+      const labels: Record<string, string> = {
+        pon: 'Mon',
+        uto: 'Tue',
+        sre: 'Wed',
+        cet: 'Thu',
+        pet: 'Fri',
+        sub: 'Sat',
+        ned: 'Sun',
+      };
+
+      const entries = Object.entries(parsed)
+        .filter(([, value]) => value)
+        .sort((a, b) => order.indexOf(a[0]) - order.indexOf(b[0]));
+
+      if (entries.length === 0) return '';
+      if (entries.length === 1) {
+        const [day, value] = entries[0];
+        if (value === '00:00-24:00') {
+          return 'Open 24/7';
+        }
+        return `${labels[day] ?? day}: ${value}`;
+      }
+
+      const allValues = entries.map(([, value]) => value);
+      const firstValue = allValues[0];
+      if (allValues.every((value) => value === firstValue)) {
+        return `Daily: ${firstValue}`;
+      }
+
+      return entries
+        .map(([day, value]) => `${labels[day] ?? day}: ${value}`)
+        .join(', ');
+    } catch {
+      return workingHours;
+    }
   }
 
   toggleFavorite(): void {
