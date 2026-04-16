@@ -89,6 +89,13 @@ export const routes: Routes = [
       import('./feature/profile/profile.component').then((m) => m.ProfileComponent),
   },
   {
+    path: 'profile/edit',
+    loadComponent: () =>
+      import('./feature/edit-profile/edit-profile.component').then(
+        (m) => m.EditProfileComponent,
+      ),
+  },
+  {
     path: 'event/:id',
     loadComponent: () =>
       import('./feature/event-detail/event-detail').then((m) => m.EventDetailComponent),

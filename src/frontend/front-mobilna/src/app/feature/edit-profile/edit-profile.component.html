@@ -1,5 +1,13 @@
 <div class="edit-profile-page">
   <div class="edit-profile-shell">
+    <input
+      #photoInput
+      type="file"
+      accept=".png,.jpg,.jpeg,.webp"
+      class="visually-hidden"
+      (change)="onPhotoSelected($event)"
+    />
+
     <header class="edit-topbar">
       <button class="back-button" type="button" (click)="goBack()" aria-label="Nazad">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -12,18 +20,15 @@
 
     <section class="photo-panel">
       <div class="photo-avatar-wrap">
-        @if (imageUrl(); as avatarSrc) {
-          <img class="photo-avatar" [src]="avatarSrc" alt="Profilna fotografija" />
-        } @else {
-          <div class="photo-avatar photo-avatar--fallback">
-            {{ name().charAt(0) }}{{ lastName().charAt(0) }}
-          </div>
-        }
-        <button class="photo-edit-button" type="button" (click)="changePhoto()" aria-label="Promeni fotografiju">
+        <img class="photo-avatar" [src]="imageUrl()" alt="Profilna fotografija" />
+        <button
+          class="photo-edit-button"
+          type="button"
+          (click)="changePhoto()"
+          aria-label="Promeni fotografiju"
+        >
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="M4 15.5V20h4.5L19 9.5 14.5 5 4 15.5Zm13.7-8.8a1 1 0 0 0 0-1.4l-1.9-1.9a1 1 0 0 0-1.4 0l-1.4 1.4 4.5 4.5 1.2-1.2Z"
-            />
+            <path d="m9.2 12.8 1.9 1.9 4.7-4.7" />
           </svg>
         </button>
       </div>
@@ -73,7 +78,7 @@
               <path d="m4 7 8 6 8-6" />
             </svg>
           </div>
-          <input [ngModel]="email()" (ngModelChange)="email.set($event)" type="email" />
+          <input [ngModel]="email()" type="email" readonly />
         </div>
       </label>
 
@@ -117,7 +122,7 @@
       </div>
     </section>
 
-    <button class="language-card" type="button">
+    <button class="language-card" type="button" (click)="openLanguagePicker()">
       <div class="language-card__icon">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path
@@ -135,8 +140,20 @@
     </button>
 
     <div class="actions">
-      <button class="save-button" type="button" (click)="saveChanges()">Sačuvaj promene</button>
+      <button class="save-button" type="button" (click)="saveChanges()">
+        {{ isSaving() ? 'Čuvanje...' : 'Sačuvaj promene' }}
+      </button>
       <button class="cancel-button" type="button" (click)="cancelChanges()">Otkaži izmene</button>
     </div>
+
+    @if (feedbackMessage()) {
+      <p
+        class="feedback"
+        [class.feedback--success]="feedbackTone() === 'success'"
+        [class.feedback--error]="feedbackTone() === 'error'"
+      >
+        {{ feedbackMessage() }}
+      </p>
+    }
   </div>
 </div>
