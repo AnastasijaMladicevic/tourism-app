@@ -1391,5 +1391,72 @@ namespace TuristickiVodic.Tests.Validation
             IsValid(dto).Should().BeTrue();
         }
 
+        [Fact]
+        public void ForgotPasswordDto_ValidanEmail_JeValidno()
+        {
+            var dto = new ForgotPasswordDto
+            {
+                Email = "ana@test.com"
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void ForgotPasswordDto_NevalidanEmail_NijeValidno()
+        {
+            var dto = new ForgotPasswordDto
+            {
+                Email = "nije-email"
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(ForgotPasswordDto.Email)));
+        }
+
+        [Fact]
+        public void ResetPasswordDto_ValidnoPopunjeno_JeValidno()
+        {
+            var dto = new ResetPasswordDto
+            {
+                Email = "ana@test.com",
+                Code = "123456",
+                NewPassword = "nova1234",
+                ConfirmPassword = "nova1234"
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void ResetPasswordDto_KodNijeSestCifara_NijeValidno()
+        {
+            var dto = new ResetPasswordDto
+            {
+                Email = "ana@test.com",
+                Code = "12345",
+                NewPassword = "nova1234",
+                ConfirmPassword = "nova1234"
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(ResetPasswordDto.Code)));
+        }
+
+        [Fact]
+        public void ResetPasswordDto_ConfirmPasswordSeNePoklapa_NijeValidno()
+        {
+            var dto = new ResetPasswordDto
+            {
+                Email = "ana@test.com",
+                Code = "123456",
+                NewPassword = "nova1234",
+                ConfirmPassword = "druga123"
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(ResetPasswordDto.ConfirmPassword)));
+        }
+
     }
 }

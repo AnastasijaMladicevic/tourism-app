@@ -949,5 +949,79 @@ namespace TuristickiVodic.Tests.Controllers
             result.Should().BeOfType<OkObjectResult>()
                 .Which.Value.Should().BeSameAs(rezultat);
         }
+
+        [Fact]
+        public async Task ForgotPassword_KadaJeDtoValidan_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.ForgotPasswordAsync(It.IsAny<ForgotPasswordDto>()))
+                .Returns(Task.CompletedTask);
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.ForgotPassword(new ForgotPasswordDto
+            {
+                Email = "ana@test.com"
+            });
+
+            result.Should().BeOfType<OkObjectResult>();
+        }
+
+        [Fact]
+        public async Task ForgotPassword_KadaSlanjeMailaPadne_VracaBadRequest()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.ForgotPasswordAsync(It.IsAny<ForgotPasswordDto>()))
+                .ThrowsAsync(new InvalidOperationException("SMTP settings are not configured."));
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.ForgotPassword(new ForgotPasswordDto
+            {
+                Email = "ana@test.com"
+            });
+
+            result.Should().BeOfType<BadRequestObjectResult>();
+        }
+
+        [Fact]
+        public async Task ResetPassword_KadaJeKodValidan_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.ResetPasswordAsync(It.IsAny<ResetPasswordDto>()))
+                .Returns(Task.CompletedTask);
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.ResetPassword(new ResetPasswordDto
+            {
+                Email = "ana@test.com",
+                Code = "123456",
+                NewPassword = "nova1234",
+                ConfirmPassword = "nova1234"
+            });
+
+            result.Should().BeOfType<OkObjectResult>();
+        }
+
+        [Fact]
+        public async Task ResetPassword_KadaJeKodNevalidan_VracaBadRequest()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.ResetPasswordAsync(It.IsAny<ResetPasswordDto>()))
+                .ThrowsAsync(new InvalidOperationException("Invalid or expired reset code."));
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.ResetPassword(new ResetPasswordDto
+            {
+                Email = "ana@test.com",
+                Code = "123456",
+                NewPassword = "nova1234",
+                ConfirmPassword = "nova1234"
+            });
+
+            result.Should().BeOfType<BadRequestObjectResult>();
+        }
     }
 }

@@ -9,6 +9,7 @@ using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
 using System.IO;
 using System.Linq;
+using TuristickiVodic.Services.Services;
 
 namespace TuristickiVodic.Services
 {
@@ -17,13 +18,20 @@ namespace TuristickiVodic.Services
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
+        private readonly IEmailService _emailService;
         private readonly IWebHostEnvironment _environment;
 
-        public UserService(AppDbContext context, IMapper mapper, ITokenService tokenService, IWebHostEnvironment environment)
+        public UserService(
+            AppDbContext context,
+            IMapper mapper,
+            ITokenService tokenService,
+            IEmailService emailService,
+            IWebHostEnvironment environment)
         {
             _context = context;
             _mapper = mapper;
             _tokenService = tokenService;
+            _emailService = emailService;
             _environment = environment;
         }
 
@@ -258,6 +266,61 @@ namespace TuristickiVodic.Services
             await _context.SaveChangesAsync();
         }
 
+        public async Task ForgotPasswordAsync(ForgotPasswordDto dto)
+        {
+            var normalizedEmail = dto.Email.Trim().ToLower();
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
+
+            if (user == null || !user.IsActive || user.IsBlacklisted)
+                return;
+
+            var resetCode = GenerateResetCode();
+
+            user.ResetToken = HashResetToken(resetCode);
+            user.ResetTokenExpiry = DateTime.UtcNow.AddMinutes(15);
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            await _emailService.SendAsync(
+                user.Email,
+                "Kod za reset lozinke",
+                BuildResetPasswordEmailBody(user.FirstName, resetCode, user.ResetTokenExpiry.Value));
+        }
+
+        public async Task ResetPasswordAsync(ResetPasswordDto dto)
+        {
+            var normalizedEmail = dto.Email.Trim().ToLower();
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
+
+            if (user == null || !user.IsActive || user.IsBlacklisted)
+                throw new InvalidOperationException("Invalid or expired reset code.");
+
+            if (string.IsNullOrWhiteSpace(user.ResetToken) ||
+                !user.ResetTokenExpiry.HasValue ||
+                user.ResetTokenExpiry.Value <= DateTime.UtcNow)
+            {
+                throw new InvalidOperationException("Invalid or expired reset code.");
+            }
+
+            var providedCodeHash = HashResetToken(dto.Code.Trim());
+
+            if (user.ResetToken != providedCodeHash)
+                throw new InvalidOperationException("Invalid or expired reset code.");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            user.ResetToken = null;
+            user.ResetTokenExpiry = null;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await RevokeRefreshTokenAsync(user.Id);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<AuthResponseDto?> LoginAsync(LoginDto loginDto)
         {
             var user = await _context.Users
@@ -479,6 +542,30 @@ namespace TuristickiVodic.Services
         {
             var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
             return Convert.ToBase64String(bytes);
+        }
+
+        private static string HashResetToken(string resetCode)
+        {
+            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(resetCode));
+            return Convert.ToBase64String(bytes);
+        }
+
+        private static string GenerateResetCode()
+        {
+            return RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
+        }
+
+        private static string BuildResetPasswordEmailBody(string firstName, string resetCode, DateTime expiresAtUtc)
+        {
+            return $@"
+                <div style=""font-family: Arial, sans-serif; line-height: 1.6;"">
+                    <h2>Reset lozinke</h2>
+                    <p>Zdravo {System.Net.WebUtility.HtmlEncode(firstName)},</p>
+                    <p>Tvoj kod za reset lozinke je:</p>
+                    <p style=""font-size: 28px; font-weight: bold; letter-spacing: 4px;"">{resetCode}</p>
+                    <p>Kod važi do {expiresAtUtc.ToLocalTime():dd.MM.yyyy. HH:mm}.</p>
+                    <p>Ako nisi ti tražio reset lozinke, slobodno ignoriši ovu poruku.</p>
+                </div>";
         }
 
         public async Task<PagedResultDto<CreatorRoleRequestDto>> GetCreatorRequestsAsync(CreatorRoleRequestQueryDto query)

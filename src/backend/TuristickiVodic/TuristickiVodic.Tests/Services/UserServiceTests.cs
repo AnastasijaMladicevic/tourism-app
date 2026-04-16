@@ -10,6 +10,7 @@ using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
 using TuristickiVodic.Services;
+using TuristickiVodic.Services.Services;
 using TuristickiVodic.Tests.Helpers;
 using Xunit;
 
@@ -54,9 +55,13 @@ namespace TuristickiVodic.Tests.Services
             return environmentMock;
         }
 
-        private static UserService CreateUserService(AppDbContext ctx, Mock<ITokenService> tokenSvc)
+        private static UserService CreateUserService(
+            AppDbContext ctx,
+            Mock<ITokenService> tokenSvc,
+            Mock<IEmailService>? emailSvc = null)
         {
-            return new UserService(ctx, CreateMapper(), tokenSvc.Object, CreateEnvironmentMock().Object);
+            emailSvc ??= new Mock<IEmailService>();
+            return new UserService(ctx, CreateMapper(), tokenSvc.Object, emailSvc.Object, CreateEnvironmentMock().Object);
         }
 
         private static (Role tourist, Role cc, Role manager, Role admin) SeedRoles(AppDbContext ctx)
@@ -1632,6 +1637,145 @@ namespace TuristickiVodic.Tests.Services
             result.TotalPages.Should().Be(3);
             result.Items.Should().ContainSingle();
             result.Items[0].Email.Should().Be("jelena@test.com");
+        }
+
+        [Fact]
+        public async Task ForgotPasswordAsync_KadaKorisnikPostoji_GeneriseKodICuvaExpiryISaljeMail()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ForgotPasswordAsync_KadaKorisnikPostoji_GeneriseKodICuvaExpiryISaljeMail));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 150,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var emailSvc = new Mock<IEmailService>();
+            var service = CreateUserService(ctx, new Mock<ITokenService>(), emailSvc);
+
+            await service.ForgotPasswordAsync(new ForgotPasswordDto
+            {
+                Email = "ana@test.com"
+            });
+
+            var user = await ctx.Users.FindAsync(150);
+            user.Should().NotBeNull();
+            user!.ResetToken.Should().NotBeNullOrWhiteSpace();
+            user.ResetTokenExpiry.Should().NotBeNull();
+            user.ResetTokenExpiry.Should().BeAfter(DateTime.UtcNow.AddMinutes(10));
+
+            emailSvc.Verify(s => s.SendAsync(
+                "ana@test.com",
+                "Kod za reset lozinke",
+                It.Is<string>(body => body.Contains("Reset lozinke") && body.Contains("Ana"))), Times.Once);
+        }
+
+        [Fact]
+        public async Task ForgotPasswordAsync_KadaKorisnikNePostoji_NeSaljeMail()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ForgotPasswordAsync_KadaKorisnikNePostoji_NeSaljeMail));
+            SeedRoles(ctx);
+
+            var emailSvc = new Mock<IEmailService>();
+            var service = CreateUserService(ctx, new Mock<ITokenService>(), emailSvc);
+
+            await service.ForgotPasswordAsync(new ForgotPasswordDto
+            {
+                Email = "nepostoji@test.com"
+            });
+
+            emailSvc.Verify(s => s.SendAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task ResetPasswordAsync_KadaJeKodValidan_MenjaLozinkuICistiResetPolja()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ResetPasswordAsync_KadaJeKodValidan_MenjaLozinkuICistiResetPolja));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            var validCode = "123456";
+            var hashedCode = Convert.ToBase64String(
+                System.Security.Cryptography.SHA256.HashData(
+                    System.Text.Encoding.UTF8.GetBytes(validCode)));
+
+            ctx.Users.Add(new User
+            {
+                Id = 151,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana.reset@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                ResetToken = hashedCode,
+                ResetTokenExpiry = DateTime.UtcNow.AddMinutes(15),
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+
+            await service.ResetPasswordAsync(new ResetPasswordDto
+            {
+                Email = "ana.reset@test.com",
+                Code = validCode,
+                NewPassword = "nova1234",
+                ConfirmPassword = "nova1234"
+            });
+
+            var user = await ctx.Users.FindAsync(151);
+            user.Should().NotBeNull();
+            BCrypt.Net.BCrypt.Verify("nova1234", user!.PasswordHash).Should().BeTrue();
+            user.ResetToken.Should().BeNull();
+            user.ResetTokenExpiry.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task ResetPasswordAsync_KadaJeKodNevalidan_BacaException()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ResetPasswordAsync_KadaJeKodNevalidan_BacaException));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 152,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana.invalid@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                ResetToken = "pogresan-hash",
+                ResetTokenExpiry = DateTime.UtcNow.AddMinutes(15),
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+
+            await service.Invoking(s => s.ResetPasswordAsync(new ResetPasswordDto
+            {
+                Email = "ana.invalid@test.com",
+                Code = "123456",
+                NewPassword = "nova1234",
+                ConfirmPassword = "nova1234"
+            }))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*Invalid or expired reset code*");
         }
     }
 }
