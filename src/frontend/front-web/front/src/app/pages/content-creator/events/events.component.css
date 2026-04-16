@@ -44,6 +44,7 @@
 .row-actions {
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
 .header-actions {
