@@ -48,6 +48,7 @@ export class EventFormComponent implements OnInit {
     price: [''],
     maxVisitors: [''],
     externalLink: [''],
+    imageUrl: [''],
     longitude: [''],
     latitude: [''],
     localityId: [''],
@@ -217,7 +218,8 @@ export class EventFormComponent implements OnInit {
       latitude: this.parseOptionalNumber(formValue.latitude),
       localityId: this.parseOptionalNumber(formValue.localityId),
       destinationId: this.parseOptionalNumber(formValue.destinationId),
-      objectId: this.parseOptionalNumber(formValue.objectId)
+      objectId: this.parseOptionalNumber(formValue.objectId),
+      imageUrl: formValue.imageUrl || this.bannerPreviewUrl || undefined
     };
 
     const request = this.isEditMode && this.eventId

@@ -31,6 +31,7 @@ export interface CreateEventDto {
   localityId?: number;
   destinationId?: number;
   objectId?: number;
+  imageUrl?: string;
 }
 
 export interface UpdateEventDto {

@@ -207,6 +207,20 @@ namespace TuristickiVodic.Services.Services
             _context.Events.Add(ev);
             await _context.SaveChangesAsync();
 
+            // Save image if provided
+            if (!string.IsNullOrWhiteSpace(dto.ImageUrl))
+            {
+                var image = new Image
+                {
+                    EventId = ev.Id,
+                    Url = dto.ImageUrl,
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Images.Add(image);
+                await _context.SaveChangesAsync();
+            }
+
             return _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
         }
 
