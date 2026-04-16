@@ -51,8 +51,6 @@ export class ContentCreatorEventsComponent implements OnInit {
   searchQuery = '';
   statusFilter = 'all';
   categoryFilter = 'all';
-  startDateFilter = '';
-  endDateFilter = '';
   sortBy = 'startDate';
   sortOrder: 'asc' | 'desc' = 'asc';
 
@@ -101,8 +99,6 @@ export class ContentCreatorEventsComponent implements OnInit {
       search: this.searchQuery || undefined,
       sortBy: this.sortBy,
       sortOrder: this.sortOrder,
-      startDate: this.startDateFilter || undefined,
-      endDate: this.endDateFilter || undefined
     };
 
     this.eventService.getAll(query).subscribe({
@@ -124,8 +120,6 @@ export class ContentCreatorEventsComponent implements OnInit {
     const search = this.searchQuery.trim().toLowerCase();
     const selectedCategory = this.categoryFilter.toLowerCase();
     const selectedStatus = this.statusFilter.toLowerCase();
-    const startDate = this.startDateFilter ? new Date(this.startDateFilter) : null;
-    const endDate = this.endDateFilter ? new Date(this.endDateFilter) : null;
 
     this.filteredEvents = this.events.filter((event) => {
       const eventStatus = this.getStatusForComparison(event.status);
@@ -134,15 +128,12 @@ export class ContentCreatorEventsComponent implements OnInit {
         .filter(Boolean)
         .join(' ')
         .toLowerCase();
-      const eventStart = new Date(event.startDate);
 
       const matchesSearch = !search || eventText.includes(search);
       const matchesStatus = selectedStatus === 'all' || eventStatus === selectedStatus;
       const matchesCategory = selectedCategory === 'all' || eventCategory === selectedCategory;
-      const matchesStartDate = !startDate || eventStart >= this.startOfDay(startDate);
-      const matchesEndDate = !endDate || eventStart <= this.endOfDay(endDate);
 
-      return matchesSearch && matchesStatus && matchesCategory && matchesStartDate && matchesEndDate;
+      return matchesSearch && matchesStatus && matchesCategory;
     });
 
     this.totalCount = this.filteredEvents.length;
@@ -168,8 +159,6 @@ export class ContentCreatorEventsComponent implements OnInit {
     this.searchQuery = '';
     this.statusFilter = 'all';
     this.categoryFilter = 'all';
-    this.startDateFilter = '';
-    this.endDateFilter = '';
     this.currentPage = 1;
     this.loadEvents();
   }
@@ -190,7 +179,6 @@ export class ContentCreatorEventsComponent implements OnInit {
     this.currentPage = 1;
     this.applyLocalFilters();
   }
-
   onCreateEvent(): void {
     this.router.navigate(['/content-creator/events/create']);
   }
@@ -336,11 +324,4 @@ export class ContentCreatorEventsComponent implements OnInit {
     ];
   }
 
-  private startOfDay(date: Date): Date {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
-  }
-
-  private endOfDay(date: Date): Date {
-    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
-  }
 }

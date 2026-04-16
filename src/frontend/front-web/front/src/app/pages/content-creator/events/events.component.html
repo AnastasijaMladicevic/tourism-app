@@ -3,7 +3,10 @@
     <div>
       <p class="eyebrow">Events management</p>
       <h1>Events &amp; Schedules</h1>
-      <p class="page-intro">Manage published events, review the selected event, and jump straight into creation or edits.</p>
+      <p class="page-intro">
+        Manage published events, review the selected event, and jump straight into creation or
+        edits.
+      </p>
     </div>
 
     <div class="header-actions">
@@ -30,15 +33,10 @@
       />
     </div>
 
-    <label class="toolbar-pill">
+    <button type="button" class="ghost-btn date-pill" aria-label="Date range filter">
       <span class="material-symbols-outlined">calendar_month</span>
-      <input type="date" [(ngModel)]="startDateFilter" (ngModelChange)="onFilterChange()" />
-    </label>
-
-    <label class="toolbar-pill">
-      <span class="material-symbols-outlined">event</span>
-      <input type="date" [(ngModel)]="endDateFilter" (ngModelChange)="onFilterChange()" />
-    </label>
+      <span class="date-pill-text">Oct 1, 2024 - Dec 31, 2024</span>
+    </button>
 
     <button type="button" class="ghost-btn slim-btn" (click)="onClearSearch()">
       <span class="material-symbols-outlined">tune</span>
@@ -52,14 +50,18 @@
         <label>
           <span>Status</span>
           <select [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()">
-            <option *ngFor="let option of statusOptions" [value]="option.value">{{ option.label }}</option>
+            <option *ngFor="let option of statusOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
           </select>
         </label>
 
         <label>
           <span>Category</span>
           <select [(ngModel)]="categoryFilter" (ngModelChange)="onFilterChange()">
-            <option *ngFor="let option of categoryOptions" [value]="option.value">{{ option.label }}</option>
+            <option *ngFor="let option of categoryOptions" [value]="option.value">
+              {{ option.label }}
+            </option>
           </select>
         </label>
 
@@ -126,17 +128,31 @@
                   <td>
                     <div class="capacity-cell">
                       <div class="capacity-bar">
-                        <span [style.width.%]="Math.min(((event.maxVisitors ?? 3000) / 5000) * 100, 100)"></span>
+                        <span
+                          [style.width.%]="
+                            Math.min(((event.maxVisitors ?? 3000) / 5000) * 100, 100)
+                          "
+                        ></span>
                       </div>
                       <small>{{ getCapacityLabel(event) }}</small>
                     </div>
                   </td>
                   <td>
                     <div class="row-actions">
-                      <button type="button" class="icon-btn" (click)="onViewEvent(event); $event.stopPropagation()" title="Select">
+                      <button
+                        type="button"
+                        class="icon-btn"
+                        (click)="onViewEvent(event); $event.stopPropagation()"
+                        title="Select"
+                      >
                         <span class="material-symbols-outlined">visibility</span>
                       </button>
-                      <button type="button" class="icon-btn" (click)="onEditEvent(event); $event.stopPropagation()" title="Edit">
+                      <button
+                        type="button"
+                        class="icon-btn"
+                        (click)="onEditEvent(event); $event.stopPropagation()"
+                        title="Edit"
+                      >
                         <span class="material-symbols-outlined">edit</span>
                       </button>
                     </div>
@@ -149,15 +165,33 @@
           <div class="table-footer">
             <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ filteredEvents.length }} events</p>
             <div class="pager">
-              <button type="button" class="ghost-btn slim-btn" (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
-              <button type="button" class="ghost-btn slim-btn" (click)="onNextPage()" [disabled]="currentPage * pageSize >= totalCount">Next</button>
+              <button
+                type="button"
+                class="ghost-btn slim-btn"
+                (click)="onPreviousPage()"
+                [disabled]="currentPage === 1"
+              >
+                Previous
+              </button>
+              <button
+                type="button"
+                class="ghost-btn slim-btn"
+                (click)="onNextPage()"
+                [disabled]="currentPage * pageSize >= totalCount"
+              >
+                Next
+              </button>
             </div>
           </div>
         }
       </div>
 
       <div class="insights-grid">
-        <article class="insight-card card" *ngFor="let insight of selectedInsightCards" [attr.data-tone]="insight.tone">
+        <article
+          class="insight-card card"
+          *ngFor="let insight of selectedInsightCards"
+          [attr.data-tone]="insight.tone"
+        >
           <p>{{ insight.label }}</p>
           <strong>{{ insight.value }}</strong>
           <span>{{ insight.hint }}</span>
@@ -168,26 +202,39 @@
     <aside class="detail-column card">
       @if (selectedEvent) {
         <div class="event-hero">
-          <div class="hero-media" [style.background-image]="'url(' + getDetailBanner(selectedEvent) + ')'">
+          <div
+            class="hero-media"
+            [style.background-image]="'url(' + getDetailBanner(selectedEvent) + ')'"
+          >
             <span class="hero-badge">{{ getCategoryLabel(selectedEvent) }}</span>
             <button type="button" class="hero-edit">Edit Media</button>
           </div>
           <div class="hero-copy">
             <p class="eyebrow">Featured event</p>
             <h2>{{ selectedEvent.name }}</h2>
-            <p class="hero-meta">{{ getLocationLabel(selectedEvent) }} · {{ formatDate(selectedEvent.startDate) }}</p>
-            <span class="detail-status" [ngClass]="getStatusBadgeClass(selectedEvent.status)">{{ selectedEvent.status || 'Draft' }}</span>
+            <p class="hero-meta">
+              {{ getLocationLabel(selectedEvent) }} · {{ formatDate(selectedEvent.startDate) }}
+            </p>
+            <span class="detail-status" [ngClass]="getStatusBadgeClass(selectedEvent.status)">{{
+              selectedEvent.status || 'Draft'
+            }}</span>
           </div>
         </div>
 
         <div class="detail-metrics">
           <div class="metric-card">
             <span>Pricing</span>
-            <strong>{{ selectedEvent.price ? ('$' + selectedEvent.price.toFixed(2)) : 'Free' }}</strong>
+            <strong>{{
+              selectedEvent.price ? '$' + selectedEvent.price.toFixed(2) : 'Free'
+            }}</strong>
           </div>
           <div class="metric-card">
             <span>Capacity</span>
-            <strong>{{ selectedEvent.maxVisitors ? selectedEvent.maxVisitors.toLocaleString('en-US') : '5,000' }}</strong>
+            <strong>{{
+              selectedEvent.maxVisitors
+                ? selectedEvent.maxVisitors.toLocaleString('en-US')
+                : '5,000'
+            }}</strong>
           </div>
         </div>
 
@@ -233,8 +280,12 @@
         <div class="empty-state">
           <p class="eyebrow">No event selected</p>
           <h2>Pick an event from the table</h2>
-          <p>Select a row to inspect media, schedule, and staffing details in the right-hand panel.</p>
-          <button type="button" class="primary-btn" (click)="onCreateEvent()">Create New Event</button>
+          <p>
+            Select a row to inspect media, schedule, and staffing details in the right-hand panel.
+          </p>
+          <button type="button" class="primary-btn" (click)="onCreateEvent()">
+            Create New Event
+          </button>
         </div>
       }
     </aside>

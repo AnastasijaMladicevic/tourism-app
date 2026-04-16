@@ -99,12 +99,14 @@
 .toolbar {
   gap: 12px;
   padding: 14px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
 }
 
 .toolbar-search {
   position: relative;
-  flex: 1 1 330px;
+  max-width: 95%;
 }
 
 .search-icon {
@@ -119,6 +121,27 @@
 .toolbar-input,
 .toolbar-pill input,
 .filters-row select {
+
+.date-pill {
+  min-width: 220px;
+  max-width: 100%;
+  justify-content: flex-start;
+  gap: 10px;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.date-pill .material-symbols-outlined {
+  font-size: 19px;
+  color: #475569;
+}
+
+.date-pill-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+}
   width: 100%;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -130,6 +153,7 @@
 
 .toolbar-input {
   padding: 11px 14px 11px 38px;
+  min-width: 0;
 }
 
 .toolbar-pill {
@@ -617,5 +641,19 @@ tbody tr:hover,
 
   .crew-item {
     grid-template-columns: 40px 1fr;
+  }
+
+  .toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar-search,
+  .date-pill,
+  .toolbar .ghost-btn.slim-btn {
+    width: 100%;
+  }
+
+  .date-pill {
+    width: 100%;
   }
 }
