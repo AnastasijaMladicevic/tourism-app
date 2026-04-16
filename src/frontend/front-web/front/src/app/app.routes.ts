@@ -98,8 +98,28 @@ export const routes: Routes = [
       },
       {
         path: 'events',
-        loadComponent: () =>
-          import('./pages/content-creator/events/events.component').then(m => m.ContentCreatorEventsComponent)
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./pages/content-creator/events/events.component').then(m => m.ContentCreatorEventsComponent)
+          },
+          {
+            path: 'create',
+            loadComponent: () =>
+              import('./pages/content-creator/events/event-form/event-form.component').then(m => m.EventFormComponent)
+          },
+          {
+            path: 'edit/:id',
+            loadComponent: () =>
+              import('./pages/content-creator/events/event-form/event-form.component').then(m => m.EventFormComponent)
+          },
+          {
+            path: 'view/:id',
+            loadComponent: () =>
+              import('./pages/content-creator/events/event-details/event-details.component').then(m => m.EventDetailsComponent)
+          }
+        ]
       },
       {
         path: 'reviews',

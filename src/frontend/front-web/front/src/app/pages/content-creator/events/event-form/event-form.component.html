@@ -1,0 +1,354 @@
+<section class="event-form-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Events > Create Event</p>
+      <h1>{{ isEditMode ? 'Edit Event' : 'Create Event' }}</h1>
+      <p class="page-intro">Build the event page, manage location data, and prepare the schedule inside the creator workspace.</p>
+    </div>
+
+    <div class="header-actions">
+      @if (isEditMode) {
+        <button
+          type="button"
+          class="danger-btn"
+          (click)="openDeleteModal()"
+          [disabled]="isSubmitting || isDeleting"
+        >
+          <span class="material-symbols-outlined">delete</span>
+          Delete
+        </button>
+      }
+
+      <button type="button" class="ghost-btn" (click)="cancel()">
+        <span class="material-symbols-outlined">close</span>
+        Cancel
+      </button>
+      <button type="button" class="ghost-btn" (click)="saveDraft()" [disabled]="isSubmitting">
+        <span class="material-symbols-outlined">save</span>
+        Save Draft
+      </button>
+      <button type="button" class="primary-btn" (click)="submit()" [disabled]="isSubmitting">
+        <span class="material-symbols-outlined">check_circle</span>
+        {{ isEditMode ? 'Update Event' : 'Create Event' }}
+      </button>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <div class="alert alert-error">{{ errorMessage }}</div>
+  }
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+
+  <div class="form-layout">
+    <div class="form-main">
+      <div
+        class="upload-card card"
+        [class.image-drop-active]="isImageDropActive"
+        (dragover)="onImageDragOver($event)"
+        (dragleave)="onImageDragLeave($event)"
+        (drop)="onImageDrop($event)"
+      >
+        <div class="section-title compact">
+          <h2>Event Image</h2>
+          <p>Paste a public image URL and preview it before saving.</p>
+        </div>
+
+        <label class="form-field full-width">
+          <span>Image URL</span>
+          <input
+            class="form-control"
+            type="url"
+            formControlName="imageUrl"
+            placeholder="https://example.com/event-banner.jpg"
+            (input)="onImageUrlChange($any($event.target).value)"
+            (dragover)="onImageDragOver($event)"
+            (dragleave)="onImageDragLeave($event)"
+            (drop)="onImageDrop($event)"
+          />
+        </label>
+
+        <div class="upload-area preview-only" aria-label="Event image preview">
+          @if (imagePreviewUrl && !isImagePreviewBroken) {
+            <button type="button" class="preview-clear-btn" (click)="clearImage()" aria-label="Remove image">
+              <span class="material-symbols-outlined">close</span>
+              Remove
+            </button>
+            <img [src]="imagePreviewUrl" alt="Event banner preview" (error)="onImagePreviewError()" />
+          } @else {
+            <div class="upload-placeholder">
+              <span class="material-symbols-outlined">image</span>
+              <strong>No usable image preview yet</strong>
+              <p>Paste or drag a direct image URL here. If the URL points to a page instead of the image file, the preview will stay blank.</p>
+              <small>The URL must resolve directly to an image.</small>
+            </div>
+          }
+        </div>
+      </div>
+
+      <form class="editor-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <section class="card section-card">
+          <div class="section-title">
+            <h2>General Information</h2>
+            <p>Essential details about your upcoming event.</p>
+          </div>
+
+          <div class="field-grid two-columns">
+            <label class="form-field full-width">
+              <span>Event Title *</span>
+              <input class="form-control" type="text" formControlName="name" placeholder="e.g. Summer Jazz Festival 2024" />
+            </label>
+
+            <label class="form-field">
+              <span>Event Type *</span>
+              <select class="form-control" formControlName="eventTypeId">
+                <option value="">Select type</option>
+                <option *ngFor="let type of eventTypes" [value]="type.id">{{ type.name }}</option>
+              </select>
+            </label>
+
+            <label class="form-field">
+              <span>Organizer *</span>
+              <input class="form-control" type="text" [value]="organizerName" readonly />
+            </label>
+
+            <label class="form-field">
+              <span>Destination *</span>
+              <select class="form-control" formControlName="destinationId">
+                <option value="">Select destination</option>
+                <option *ngFor="let destination of destinations" [value]="destination.id">{{ destination.name }}</option>
+              </select>
+            </label>
+
+            <label class="form-field">
+              <span>Object Type *</span>
+              <select class="form-control" formControlName="objectId">
+                <option value="">Select object</option>
+                <option *ngFor="let venue of venueOptions" [value]="venue.id">{{ venue.name }}</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="form-field full-width description-field">
+            <span>Full Description</span>
+            <textarea class="form-control text-area" formControlName="description" rows="8" placeholder="Write a detailed description including what guests can expect..."></textarea>
+          </label>
+        </section>
+
+        <section class="card section-card schedule-card">
+          <div class="section-title">
+            <h2>Schedule</h2>
+            <p>When and how often this event takes place.</p>
+          </div>
+
+          <div class="field-grid schedule-grid">
+            <label class="form-field half-width">
+              <span>Start Date &amp; Time *</span>
+              <div class="inline-fields">
+                <input class="form-control" type="date" formControlName="startDate" />
+                <input class="form-control" type="time" formControlName="startTime" />
+              </div>
+            </label>
+
+            <label class="form-field half-width">
+              <span>End Date &amp; Time *</span>
+              <div class="inline-fields">
+                <input class="form-control" type="date" formControlName="endDate" />
+                <input class="form-control" type="time" formControlName="endTime" />
+              </div>
+            </label>
+
+            <div class="recurring-row full-width">
+              <div class="recurring-copy">
+                <strong>Recurring Event</strong>
+                <span>Setup daily, weekly, or custom schedules.</span>
+              </div>
+              <label class="toggle-switch">
+                <input type="checkbox" formControlName="recurringEvent" />
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+
+            <label class="form-field full-width">
+              <span>Timezone</span>
+              <select class="form-control" formControlName="timezone">
+                <option *ngFor="let timezone of timezoneOptions" [value]="timezone">{{ timezone }}</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section class="card section-card">
+          <div class="section-title">
+            <h2>Ticketing &amp; Capacity</h2>
+            <p>Manage ticket prices and attendee limits.</p>
+          </div>
+
+          <div class="field-grid ticket-grid">
+            <label class="form-field">
+              <span>Price (EUR) *</span>
+              <div class="input-prefix">
+                <span>€</span>
+                <input class="form-control" type="number" min="0" step="0.01" formControlName="price" placeholder="45.00" />
+              </div>
+            </label>
+
+            <label class="form-field">
+              <span>Capacity *</span>
+              <div class="input-prefix">
+                <span class="material-symbols-outlined prefix-icon">group</span>
+                <input class="form-control" type="number" min="1" step="1" formControlName="maxVisitors" placeholder="500" />
+              </div>
+            </label>
+
+            <label class="form-field">
+              <span>External Link</span>
+              <div class="input-prefix">
+                <span class="material-symbols-outlined prefix-icon">link</span>
+                <input class="form-control" type="url" formControlName="externalLink" placeholder="https://..." />
+              </div>
+            </label>
+          </div>
+        </section>
+
+        <section class="card section-card highlighted-card">
+          <div class="section-title">
+            <h2>Categorization &amp; Restrictions</h2>
+            <p>Tags and access controls for the event listing.</p>
+          </div>
+
+          <label class="form-field full-width">
+            <span>Tags &amp; Categories</span>
+            <div class="tag-editor">
+              <span class="tag-chip" *ngFor="let tag of tags">
+                {{ tag }}
+                <button type="button" (click)="removeTag(tag)">×</button>
+              </span>
+              <input
+                class="tag-input"
+                type="text"
+                [(ngModel)]="pendingTag"
+                [ngModelOptions]="{ standalone: true }"
+                placeholder="Add tag..."
+                (keydown.enter)="$event.preventDefault(); addTag()"
+              />
+            </div>
+          </label>
+
+          <label class="form-field restriction-field">
+            <span>Age Restriction</span>
+            <select class="form-control" formControlName="ageRestriction">
+              <option value="">Select restriction</option>
+              <option *ngFor="let restriction of ageRestrictionOptions" [value]="restriction">{{ restriction }}</option>
+            </select>
+          </label>
+        </section>
+      </form>
+    </div>
+
+    <aside class="form-side">
+      <section class="card side-card">
+        <div class="section-title compact">
+          <h2>Venue &amp; Location</h2>
+          <p>Select venue data for the linked object.</p>
+        </div>
+
+        <label class="form-field">
+          <span>Select Venue (Linked Object)</span>
+          <input class="form-control" type="text" [(ngModel)]="venueSearchTerm" [ngModelOptions]="{ standalone: true }" placeholder="Grand Horizon Resort" />
+        </label>
+
+        <div class="mini-map">
+          <div class="map-grid"></div>
+          <div class="map-pin"></div>
+          <div class="map-meta">
+            <strong>{{ selectedVenue.name }}</strong>
+            <span>{{ selectedVenue.address }}</span>
+          </div>
+        </div>
+
+        <div class="venue-card">
+          <strong>{{ selectedVenue.name }}</strong>
+          <p>{{ selectedVenue.address }}</p>
+        </div>
+      </section>
+
+      <section class="card side-card">
+        <div class="section-title compact">
+          <h2>Related Activities</h2>
+          <p>Attach the activities that should appear alongside this event.</p>
+        </div>
+
+        <div class="activity-list">
+          <label class="activity-row" *ngFor="let activity of relatedActivities">
+            <div class="activity-meta">
+              <strong>{{ activity.name }}</strong>
+              <span>{{ activity.meta }}</span>
+            </div>
+            <input type="checkbox" [checked]="selectedActivityIds.has(activity.id)" (change)="toggleActivity(activity.id)" />
+          </label>
+        </div>
+
+        <button type="button" class="link-btn">+ Link more activities</button>
+      </section>
+
+      <section class="card side-card tips-card">
+        <div class="section-title compact">
+          <h2>Creator Tips</h2>
+        </div>
+
+        <ul>
+          <li>Events with high-resolution banners get more engagement.</li>
+          <li>Link your event to a specific venue object to show automated directions.</li>
+          <li>Clear start and end times help with exported calendars.</li>
+        </ul>
+
+        <a class="link-btn" href="javascript:void(0)">Learn more about events</a>
+      </section>
+    </aside>
+  </div>
+
+  @if (showDeleteModal) {
+    <div class="event-delete-backdrop" (click)="closeDeleteModal()">
+      <section
+        class="card event-delete-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-modal-title"
+        aria-describedby="delete-modal-description"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="event-delete-modal-icon" aria-hidden="true">
+          <span class="material-symbols-outlined">delete</span>
+        </div>
+
+        <h3 id="delete-modal-title">Confirm deletion</h3>
+        <p id="delete-modal-description">
+          Are you sure you want to delete this item?<br />
+          This action cannot be undone.
+        </p>
+
+        <div class="event-delete-modal-actions">
+          <button
+            type="button"
+            class="ghost-btn"
+            (click)="closeDeleteModal()"
+            [disabled]="isDeleting"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="confirm-delete-btn"
+            (click)="deleteEvent()"
+            [disabled]="isDeleting"
+          >
+            {{ isDeleting ? 'Deleting...' : 'Delete' }}
+          </button>
+        </div>
+      </section>
+    </div>
+  }
+</section>

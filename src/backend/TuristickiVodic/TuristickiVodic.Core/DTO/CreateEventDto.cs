@@ -35,6 +35,8 @@ namespace TuristickiVodic.Core.DTO
 
         public int? ObjectId { get; set; }
 
+        public string? ImageUrl { get; set; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (!LocalityId.HasValue && !DestinationId.HasValue)
