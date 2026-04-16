@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, forkJoin, map, of } from 'rxjs';
+import { environment } from '../../../environment/environment';
 import { AuthService, UserDto } from '../../services/auth';
 import { FavoriteService } from '../../services/favorite';
 import { ReviewDto, ReviewService } from '../../services/review';
@@ -91,18 +92,11 @@ export class ProfileComponent implements OnInit {
     return this.user?.email?.trim() || 'marko.jovanovic@email.com';
   }
 
-  protected get initials(): string {
-    const parts = this.fullName
-      .split(' ')
-      .map((part) => part.trim())
-      .filter(Boolean)
-      .slice(0, 2);
-
-    if (!parts.length) {
-      return 'MJ';
-    }
-
-    return parts.map((part) => part[0]?.toUpperCase() ?? '').join('');
+  protected get profileImageUrl(): string {
+    const raw = this.user?.profileImageUrl?.trim() || '/images/profiles/default_icon.png';
+    const apiBase = environment.apiUrl.replace(/\/api\/?$/, '');
+    if (/^https?:\/\//i.test(raw)) return raw;
+    return `${apiBase}${raw.startsWith('/') ? raw : `/${raw}`}`;
   }
 
   protected handleAction(item: ProfileAction): void {
@@ -122,6 +116,10 @@ export class ProfileComponent implements OnInit {
     if (item.route) {
       this.router.navigate([item.route]);
     }
+  }
+
+  protected openEditProfile(): void {
+    this.router.navigate(['/profile/edit']);
   }
 
   protected trackSection(_: number, section: ProfileSection): string {
