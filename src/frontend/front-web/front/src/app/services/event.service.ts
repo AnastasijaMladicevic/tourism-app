@@ -60,4 +60,13 @@ export class EventService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  /**
+   * Submit deletion request for approved event
+   */
+  requestDeletion(id: number, reason?: string): Observable<unknown> {
+    return this.http.post(`${this.apiUrl}/${id}/deletion-request`, {
+      reason: reason || undefined
+    });
+  }
 }

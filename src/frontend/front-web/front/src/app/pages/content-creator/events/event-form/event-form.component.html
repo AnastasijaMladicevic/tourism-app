@@ -7,6 +7,18 @@
     </div>
 
     <div class="header-actions">
+      @if (isEditMode) {
+        <button
+          type="button"
+          class="danger-btn"
+          (click)="openDeleteModal()"
+          [disabled]="isSubmitting || isDeleting"
+        >
+          <span class="material-symbols-outlined">delete</span>
+          Delete
+        </button>
+      }
+
       <button type="button" class="ghost-btn" (click)="cancel()">
         <span class="material-symbols-outlined">close</span>
         Cancel
@@ -297,4 +309,46 @@
       </section>
     </aside>
   </div>
+
+  @if (showDeleteModal) {
+    <div class="event-delete-backdrop" (click)="closeDeleteModal()">
+      <section
+        class="card event-delete-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-modal-title"
+        aria-describedby="delete-modal-description"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="event-delete-modal-icon" aria-hidden="true">
+          <span class="material-symbols-outlined">delete</span>
+        </div>
+
+        <h3 id="delete-modal-title">Confirm deletion</h3>
+        <p id="delete-modal-description">
+          Are you sure you want to delete this item?<br />
+          This action cannot be undone.
+        </p>
+
+        <div class="event-delete-modal-actions">
+          <button
+            type="button"
+            class="ghost-btn"
+            (click)="closeDeleteModal()"
+            [disabled]="isDeleting"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="confirm-delete-btn"
+            (click)="deleteEvent()"
+            [disabled]="isDeleting"
+          >
+            {{ isDeleting ? 'Deleting...' : 'Delete' }}
+          </button>
+        </div>
+      </section>
+    </div>
+  }
 </section>

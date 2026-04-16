@@ -64,6 +64,8 @@ export class EventFormComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
   isSubmitting = false;
+  isDeleting = false;
+  showDeleteModal = false;
   isImageDropActive = false;
   isImagePreviewBroken = false;
   organizerName = 'Current Content Creator';
@@ -250,6 +252,58 @@ export class EventFormComponent implements OnInit {
 
   cancel(): void {
     this.router.navigate(['/content-creator/events']);
+  }
+
+  openDeleteModal(): void {
+    if (!this.isEditMode || !this.eventId || this.isSubmitting || this.isDeleting) {
+      return;
+    }
+
+    this.showDeleteModal = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+  }
+
+  closeDeleteModal(): void {
+    if (this.isDeleting) {
+      return;
+    }
+
+    this.showDeleteModal = false;
+  }
+
+  deleteEvent(): void {
+    if (!this.isEditMode || !this.eventId || this.isSubmitting || this.isDeleting) {
+      return;
+    }
+
+    this.submitDeletionRequest();
+  }
+
+  private submitDeletionRequest(): void {
+    if (!this.eventId || this.isDeleting) {
+      return;
+    }
+
+    this.isDeleting = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    this.eventService.requestDeletion(this.eventId).pipe(
+      finalize(() => {
+        this.isDeleting = false;
+        this.cdr.detectChanges();
+      })
+    ).subscribe({
+      next: () => {
+        this.showDeleteModal = false;
+        this.successMessage = 'Deletion request submitted. A manager must review it before event removal.';
+        setTimeout(() => this.router.navigate(['/content-creator/events']), 1200);
+      },
+      error: (error: any) => {
+        this.errorMessage = error?.error?.message ?? 'Failed to submit deletion request';
+      }
+    });
   }
 
   onImageUrlChange(value: string): void {
