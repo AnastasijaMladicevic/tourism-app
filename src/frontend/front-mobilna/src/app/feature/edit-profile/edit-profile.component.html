@@ -1,0 +1,142 @@
+<div class="edit-profile-page">
+  <div class="edit-profile-shell">
+    <header class="edit-topbar">
+      <button class="back-button" type="button" (click)="goBack()" aria-label="Nazad">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+      </button>
+      <h1>Izmeni profil</h1>
+      <div class="topbar-placeholder" aria-hidden="true"></div>
+    </header>
+
+    <section class="photo-panel">
+      <div class="photo-avatar-wrap">
+        @if (imageUrl(); as avatarSrc) {
+          <img class="photo-avatar" [src]="avatarSrc" alt="Profilna fotografija" />
+        } @else {
+          <div class="photo-avatar photo-avatar--fallback">
+            {{ name().charAt(0) }}{{ lastName().charAt(0) }}
+          </div>
+        }
+        <button class="photo-edit-button" type="button" (click)="changePhoto()" aria-label="Promeni fotografiju">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M4 15.5V20h4.5L19 9.5 14.5 5 4 15.5Zm13.7-8.8a1 1 0 0 0 0-1.4l-1.9-1.9a1 1 0 0 0-1.4 0l-1.4 1.4 4.5 4.5 1.2-1.2Z"
+            />
+          </svg>
+        </button>
+      </div>
+      <button class="remove-photo-button" type="button" (click)="removePhoto()">
+        Ukloni fotografiju
+      </button>
+    </section>
+
+    <section class="form-section">
+      <label class="field">
+        <span>Ime</span>
+        <div class="field-box">
+          <input [ngModel]="name()" (ngModelChange)="name.set($event)" type="text" />
+        </div>
+      </label>
+
+      <label class="field">
+        <span>Prezime</span>
+        <div class="field-box">
+          <input [ngModel]="lastName()" (ngModelChange)="lastName.set($event)" type="text" />
+        </div>
+      </label>
+
+      <label class="field">
+        <span>Država</span>
+        <div class="field-box field-box--select">
+          <div class="field-prefix">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.9 9h-3.1a15.9 15.9 0 0 0-1.5-5A8 8 0 0 1 18.9 11ZM12 4c1.2 1.5 2.1 4 2.4 7H9.6c.3-3 1.2-5.5 2.4-7ZM6.7 6a15.9 15.9 0 0 0-1.5 5H2.1A8 8 0 0 1 6.7 6ZM4.1 13h3.1a15.9 15.9 0 0 0 1.5 5A8 8 0 0 1 4.1 13Zm5.5 0h4.8c-.3 3-1.2 5.5-2.4 7-1.2-1.5-2.1-4-2.4-7Zm4.7 5a15.9 15.9 0 0 0 1.5-5h3.1a8 8 0 0 1-4.6 5Z"
+              />
+            </svg>
+          </div>
+          <input [ngModel]="country()" (ngModelChange)="country.set($event)" type="text" />
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m9 6 6 6-6 6" />
+          </svg>
+        </div>
+      </label>
+
+      <label class="field">
+        <span>Email adresa</span>
+        <div class="field-box field-box--icon">
+          <div class="field-prefix">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 6h16v12H4z" />
+              <path d="m4 7 8 6 8-6" />
+            </svg>
+          </div>
+          <input [ngModel]="email()" (ngModelChange)="email.set($event)" type="email" />
+        </div>
+      </label>
+
+      <label class="field">
+        <span>Broj telefona</span>
+        <div class="field-box field-box--icon">
+          <div class="field-prefix">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M6.6 10.8a15.5 15.5 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24 11.4 11.4 0 0 0 3.6.58 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.4a1 1 0 0 1 1 1 11.4 11.4 0 0 0 .58 3.6 1 1 0 0 1-.24 1l-2.18 2.2Z"
+              />
+            </svg>
+          </div>
+          <input [ngModel]="phone()" (ngModelChange)="phone.set($event)" type="tel" />
+        </div>
+      </label>
+    </section>
+
+    <section class="interests-section">
+      <div class="interests-header">
+        <div>
+          <h2>Tvoja interesovanja</h2>
+        </div>
+        <span>Odaberi bar 3</span>
+      </div>
+
+      <div class="interest-chips">
+        @for (interest of interests(); track interest.label) {
+          <button
+            class="interest-chip"
+            type="button"
+            [class.interest-chip--active]="interest.selected"
+            (click)="toggleInterest(interest.label)"
+          >
+            @if (interest.selected) {
+              <span class="checkmark">✓</span>
+            }
+            {{ interest.label }}
+          </button>
+        }
+      </div>
+    </section>
+
+    <button class="language-card" type="button">
+      <div class="language-card__icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.9 9h-3.1a15.9 15.9 0 0 0-1.5-5A8 8 0 0 1 18.9 11ZM12 4c1.2 1.5 2.1 4 2.4 7H9.6c.3-3 1.2-5.5 2.4-7ZM6.7 6a15.9 15.9 0 0 0-1.5 5H2.1A8 8 0 0 1 6.7 6ZM4.1 13h3.1a15.9 15.9 0 0 0 1.5 5A8 8 0 0 1 4.1 13Zm5.5 0h4.8c-.3 3-1.2 5.5-2.4 7-1.2-1.5-2.1-4-2.4-7Zm4.7 5a15.9 15.9 0 0 0 1.5-5h3.1a8 8 0 0 1-4.6 5Z"
+          />
+        </svg>
+      </div>
+      <div class="language-card__content">
+        <strong>Jezik aplikacije</strong>
+        <span>Trenutno: {{ appLanguage() }}</span>
+      </div>
+      <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m9 6 6 6-6 6" />
+      </svg>
+    </button>
+
+    <div class="actions">
+      <button class="save-button" type="button" (click)="saveChanges()">Sačuvaj promene</button>
+      <button class="cancel-button" type="button" (click)="cancelChanges()">Otkaži izmene</button>
+    </div>
+  </div>
+</div>
