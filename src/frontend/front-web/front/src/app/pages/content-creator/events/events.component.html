@@ -1,3 +1,242 @@
-<section class="content-creator-page">
-  <h1>Events</h1>
+<section class="events-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Events management</p>
+      <h1>Events &amp; Schedules</h1>
+      <p class="page-intro">Manage published events, review the selected event, and jump straight into creation or edits.</p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="ghost-btn">
+        <span class="material-symbols-outlined">download</span>
+        Export
+      </button>
+      <button type="button" class="primary-btn" (click)="onCreateEvent()">
+        <span class="material-symbols-outlined">add</span>
+        Create New Event
+      </button>
+    </div>
+  </div>
+
+  <div class="toolbar card">
+    <div class="toolbar-search">
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input
+        type="text"
+        class="toolbar-input"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearch()"
+        placeholder="Search events, venues, or organizers..."
+      />
+    </div>
+
+    <label class="toolbar-pill">
+      <span class="material-symbols-outlined">calendar_month</span>
+      <input type="date" [(ngModel)]="startDateFilter" (ngModelChange)="onFilterChange()" />
+    </label>
+
+    <label class="toolbar-pill">
+      <span class="material-symbols-outlined">event</span>
+      <input type="date" [(ngModel)]="endDateFilter" (ngModelChange)="onFilterChange()" />
+    </label>
+
+    <button type="button" class="ghost-btn slim-btn" (click)="onClearSearch()">
+      <span class="material-symbols-outlined">tune</span>
+      More Filters
+    </button>
+  </div>
+
+  <div class="events-layout">
+    <div class="main-column">
+      <div class="filters-row card">
+        <label>
+          <span>Status</span>
+          <select [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()">
+            <option *ngFor="let option of statusOptions" [value]="option.value">{{ option.label }}</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Category</span>
+          <select [(ngModel)]="categoryFilter" (ngModelChange)="onFilterChange()">
+            <option *ngFor="let option of categoryOptions" [value]="option.value">{{ option.label }}</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Sort by</span>
+          <select [(ngModel)]="sortBy" (ngModelChange)="onChangeSortBy($event)">
+            <option value="startDate">Start date</option>
+            <option value="name">Name</option>
+            <option value="status">Status</option>
+          </select>
+        </label>
+
+        <label>
+          <span>Order</span>
+          <select [(ngModel)]="sortOrder" (ngModelChange)="onChangeSortOrder($event)">
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="card table-card">
+        @if (isLoading) {
+          <div class="state state-loading">Loading events...</div>
+        } @else if (errorMessage) {
+          <div class="state state-error">{{ errorMessage }}</div>
+        } @else {
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Event Details</th>
+                  <th>Location</th>
+                  <th>Category</th>
+                  <th>Capacity</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let event of pagedEvents; trackBy: trackByEventId"
+                  [class.active-row]="selectedEvent?.id === event.id"
+                  (click)="selectEvent(event)"
+                >
+                  <td>
+                    <span class="status-chip" [ngClass]="getStatusBadgeClass(event.status)">
+                      {{ event.status || 'Draft' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="event-cell">
+                      <strong>{{ event.name }}</strong>
+                      <span>{{ formatDate(event.startDate) }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="event-cell">
+                      <strong>{{ getLocationLabel(event) }}</strong>
+                      <span>Locality / destination</span>
+                    </div>
+                  </td>
+                  <td>{{ getCategoryLabel(event) }}</td>
+                  <td>
+                    <div class="capacity-cell">
+                      <div class="capacity-bar">
+                        <span [style.width.%]="Math.min(((event.maxVisitors ?? 3000) / 5000) * 100, 100)"></span>
+                      </div>
+                      <small>{{ getCapacityLabel(event) }}</small>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="row-actions">
+                      <button type="button" class="icon-btn" (click)="onViewEvent(event); $event.stopPropagation()" title="Select">
+                        <span class="material-symbols-outlined">visibility</span>
+                      </button>
+                      <button type="button" class="icon-btn" (click)="onEditEvent(event); $event.stopPropagation()" title="Edit">
+                        <span class="material-symbols-outlined">edit</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-footer">
+            <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ filteredEvents.length }} events</p>
+            <div class="pager">
+              <button type="button" class="ghost-btn slim-btn" (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
+              <button type="button" class="ghost-btn slim-btn" (click)="onNextPage()" [disabled]="currentPage * pageSize >= totalCount">Next</button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="insights-grid">
+        <article class="insight-card card" *ngFor="let insight of selectedInsightCards" [attr.data-tone]="insight.tone">
+          <p>{{ insight.label }}</p>
+          <strong>{{ insight.value }}</strong>
+          <span>{{ insight.hint }}</span>
+        </article>
+      </div>
+    </div>
+
+    <aside class="detail-column card">
+      @if (selectedEvent) {
+        <div class="event-hero">
+          <div class="hero-media" [style.background-image]="'url(' + getDetailBanner(selectedEvent) + ')'">
+            <span class="hero-badge">{{ getCategoryLabel(selectedEvent) }}</span>
+            <button type="button" class="hero-edit">Edit Media</button>
+          </div>
+          <div class="hero-copy">
+            <p class="eyebrow">Featured event</p>
+            <h2>{{ selectedEvent.name }}</h2>
+            <p class="hero-meta">{{ getLocationLabel(selectedEvent) }} · {{ formatDate(selectedEvent.startDate) }}</p>
+            <span class="detail-status" [ngClass]="getStatusBadgeClass(selectedEvent.status)">{{ selectedEvent.status || 'Draft' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-metrics">
+          <div class="metric-card">
+            <span>Pricing</span>
+            <strong>{{ selectedEvent.price ? ('$' + selectedEvent.price.toFixed(2)) : 'Free' }}</strong>
+          </div>
+          <div class="metric-card">
+            <span>Capacity</span>
+            <strong>{{ selectedEvent.maxVisitors ? selectedEvent.maxVisitors.toLocaleString('en-US') : '5,000' }}</strong>
+          </div>
+        </div>
+
+        <section class="detail-section">
+          <div class="section-head">
+            <h3>Schedule</h3>
+            <button type="button" class="text-btn">Edit Schedule</button>
+          </div>
+
+          <div class="schedule-list">
+            <div class="schedule-item" *ngFor="let item of selectedSchedule">
+              <span>{{ item.label }}</span>
+              <strong>{{ item.value }}</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h3>Description</h3>
+          <p class="description-copy">{{ getSelectedSummary(selectedEvent) }}</p>
+        </section>
+
+        <section class="detail-section">
+          <div class="section-head">
+            <h3>Staff &amp; Organizers</h3>
+            <button type="button" class="icon-btn plain" title="Add staff">
+              <span class="material-symbols-outlined">add</span>
+            </button>
+          </div>
+
+          <div class="crew-list">
+            <article class="crew-item" *ngFor="let member of crew">
+              <div class="crew-avatar">{{ member.initials }}</div>
+              <div>
+                <strong>{{ member.name }}</strong>
+                <span>{{ member.role }}</span>
+              </div>
+              <button type="button" class="icon-btn plain" title="More">⋮</button>
+            </article>
+          </div>
+        </section>
+      } @else {
+        <div class="empty-state">
+          <p class="eyebrow">No event selected</p>
+          <h2>Pick an event from the table</h2>
+          <p>Select a row to inspect media, schedule, and staffing details in the right-hand panel.</p>
+          <button type="button" class="primary-btn" (click)="onCreateEvent()">Create New Event</button>
+        </div>
+      }
+    </aside>
+  </div>
 </section>
