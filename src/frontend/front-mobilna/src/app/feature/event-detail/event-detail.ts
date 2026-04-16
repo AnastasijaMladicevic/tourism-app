@@ -8,11 +8,13 @@ import { EventService, EventDto } from '../../services/event';
 import { ImageService, ImageDto } from '../../services/image';
 import { AuthService } from '../../services/auth';
 import { forkJoin } from 'rxjs';
+import { MapComponent } from '../../shared/components/map/map';
+
 
 @Component({
   selector: 'app-event-detail',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, MatIconModule, MatButtonModule, MapComponent],
   templateUrl: './event-detail.html',
   styleUrls: ['./event-detail.scss'],
   encapsulation: ViewEncapsulation.None,

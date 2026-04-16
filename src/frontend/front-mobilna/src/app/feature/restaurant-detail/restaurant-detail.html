@@ -109,9 +109,13 @@
             class="location-image"
             [attr.data-name]="object.address || object.objectName || 'N/A'"
           >
-            <div class="location-image-placeholder">
-              <mat-icon>place</mat-icon>
-            </div>
+            <app-map
+              [lat]="object.latitude || 42.424"
+              [lng]="object.longitude || 18.771"
+              [popupText]="object.name"
+              [interactive]="false"
+            >
+            </app-map>
             <button class="map-btn-overlay" (click)="viewOnMap()">Pogledaj na mapi</button>
           </div>
         </div>
@@ -124,7 +128,7 @@
             </div>
 
             <div class="reviews-list">
-              @for (review of reviews; track review.id; let i = $index) {
+              @for (review of reviews | slice: 0 : 3; track review.id) {
                 <div class="review-item">
                   <div class="review-header">
                     <span class="review-author">{{ review.userFullName }}</span>
@@ -132,7 +136,7 @@
                   </div>
                   <div class="review-rating">
                     @for (star of [1, 2, 3, 4, 5]; track star) {
-                      <mat-icon [class.filled]="star <= review.rating">star</mat-icon>
+                      <mat-icon [class.filled]="star <= (review.rating || 0)">star</mat-icon>
                     }
                   </div>
                   <p class="review-text">{{ review.text }}</p>
@@ -201,6 +205,62 @@
             (click)="currentImageIndex = i; $event.stopImmediatePropagation()"
           >
           </span>
+        }
+      </div>
+    </div>
+  </div>
+}
+<!-- MODAL - ALL REVIEWS (kao na slici) -->
+@if (showAllReviewsModal) {
+  <div class="all-reviews-modal" (click)="closeAllReviews()">
+    <div class="modal-content" (click)="$event.stopImmediatePropagation()">
+      <!-- Header -->
+      <div class="modal-header">
+        <button class="modal-close" (click)="closeAllReviews()">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h2>All Reviews</h2>
+      </div>
+
+      <!-- Prosečna ocena + grafik -->
+      <div class="rating-summary">
+        <div class="average">
+          <span class="big-rating">{{ object.averageRating?.toFixed(1) || '0.0' }}</span>
+          <div class="stars">
+            @for (star of [1, 2, 3, 4, 5]; track star) {
+              <mat-icon [class.filled]="star <= (object.averageRating || 0)">star</mat-icon>
+            }
+          </div>
+          <span class="total-reviews">{{ object.reviewCount || 0 }} Reviews</span>
+        </div>
+
+        <div class="rating-bars">
+          @for (r of [5, 4, 3, 2, 1]; track r) {
+            <div class="bar-row">
+              <span>{{ r }}</span>
+              <div class="bar">
+                <div class="bar-fill" [style.width.%]="getRatingPercentage(r)"></div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Lista recenzija -->
+      <div class="reviews-list-full">
+        @for (review of reviews; track review.id) {
+          <div class="review-item">
+            <div class="review-header">
+              <span class="review-author">{{ review.userFullName }}</span>
+              <span class="review-date">{{ formatReviewDate(review.createdAt) }}</span>
+            </div>
+            <div class="review-rating">
+              @for (star of [1, 2, 3, 4, 5]; track star) {
+                <mat-icon [class.filled]="star <= review.rating">star</mat-icon>
+              }
+            </div>
+            <p class="review-text">{{ review.text }}</p>
+          </div>
         }
       </div>
     </div>
