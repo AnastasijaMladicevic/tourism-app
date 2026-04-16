@@ -64,7 +64,8 @@ export class EventFormComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
   isSubmitting = false;
-  bannerPreviewUrl = '';
+  isImageDropActive = false;
+  isImagePreviewBroken = false;
   organizerName = 'Current Content Creator';
   venueSearchTerm = 'Grand Horizon Resort';
   selectedActivityIds = new Set<number>([2]);
@@ -150,7 +151,6 @@ export class EventFormComponent implements OnInit {
     this.eventService.getById(this.eventId).subscribe({
       next: (event: EventDto) => {
         this.populateForm(event);
-        this.bannerPreviewUrl = event.mainImageUrl ?? '';
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -182,6 +182,7 @@ export class EventFormComponent implements OnInit {
       localityId: '',
       destinationId: '',
       objectId: this.selectedVenue.id.toString(),
+      imageUrl: event.mainImageUrl ?? '',
       ageRestriction: '',
       tagsInput: ''
     });
@@ -219,7 +220,7 @@ export class EventFormComponent implements OnInit {
       localityId: this.parseOptionalNumber(formValue.localityId),
       destinationId: this.parseOptionalNumber(formValue.destinationId),
       objectId: this.parseOptionalNumber(formValue.objectId),
-      imageUrl: formValue.imageUrl || this.bannerPreviewUrl || undefined
+      imageUrl: formValue.imageUrl || undefined
     };
 
     const request = this.isEditMode && this.eventId
@@ -251,6 +252,50 @@ export class EventFormComponent implements OnInit {
     this.router.navigate(['/content-creator/events']);
   }
 
+  onImageUrlChange(value: string): void {
+    this.isImagePreviewBroken = false;
+    this.form.patchValue({ imageUrl: value.trim() }, { emitEvent: false });
+  }
+
+  get imagePreviewUrl(): string {
+    return (this.form.get('imageUrl')?.value ?? '').trim();
+  }
+
+  onImageDrop(event: DragEvent): void {
+    event.preventDefault();
+    this.isImageDropActive = false;
+
+    const droppedUrl = this.getDroppedImageUrl(event);
+    if (!droppedUrl) {
+      return;
+    }
+
+    this.form.patchValue({ imageUrl: droppedUrl });
+    this.isImagePreviewBroken = false;
+    this.cdr.detectChanges();
+  }
+
+  onImageDragOver(event: DragEvent): void {
+    event.preventDefault();
+    this.isImageDropActive = true;
+  }
+
+  onImageDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    this.isImageDropActive = false;
+  }
+
+  onImagePreviewError(): void {
+    this.isImagePreviewBroken = true;
+  }
+
+  clearImage(): void {
+    this.form.patchValue({ imageUrl: '' });
+    this.isImagePreviewBroken = false;
+    this.isImageDropActive = false;
+    this.cdr.detectChanges();
+  }
+
   /**
    * Combines a date string (YYYY-MM-DD) and time string (HH:mm) into an ISO 8601 UTC datetime.
    * Example: "2026-04-16" + "18:30" → "2026-04-16T18:30:00Z"
@@ -277,22 +322,6 @@ export class EventFormComponent implements OnInit {
     }
 
     this.selectedActivityIds.add(activityId);
-  }
-
-  onBannerSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-
-    if (!file) {
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.bannerPreviewUrl = String(reader.result ?? '');
-      this.cdr.detectChanges();
-    };
-    reader.readAsDataURL(file);
   }
 
   addTag(): void {
@@ -342,5 +371,65 @@ export class EventFormComponent implements OnInit {
     const minutes = String(parsed.getMinutes()).padStart(2, '0');
 
     return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  private getDroppedImageUrl(event: DragEvent): string {
+    const transfer = event.dataTransfer;
+    if (!transfer) {
+      return '';
+    }
+
+    const files = transfer.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (file.type.startsWith('image/')) {
+        return URL.createObjectURL(file);
+      }
+    }
+
+    const plainText = transfer.getData('text/uri-list') || transfer.getData('text/plain');
+    const normalizedPlainText = plainText.trim();
+    if (this.isValidImageUrl(normalizedPlainText)) {
+      return normalizedPlainText;
+    }
+
+    const html = transfer.getData('text/html');
+    const extractedFromHtml = this.extractImageUrlFromHtml(html);
+    if (this.isValidImageUrl(extractedFromHtml)) {
+      return extractedFromHtml;
+    }
+
+    return '';
+  }
+
+  private extractImageUrlFromHtml(html: string): string {
+    if (!html) {
+      return '';
+    }
+
+    const srcMatch = html.match(/src=["']([^"']+)["']/i);
+    if (srcMatch?.[1]) {
+      return srcMatch[1].trim();
+    }
+
+    const hrefMatch = html.match(/href=["']([^"']+)["']/i);
+    if (hrefMatch?.[1]) {
+      return hrefMatch[1].trim();
+    }
+
+    return '';
+  }
+
+  private isValidImageUrl(value: string): boolean {
+    if (!value) {
+      return false;
+    }
+
+    try {
+      const parsed = new URL(value);
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch {
+      return false;
+    }
   }
 }

@@ -32,25 +32,48 @@
 
   <div class="form-layout">
     <div class="form-main">
-      <div class="upload-card card">
-        <button type="button" class="upload-area" (click)="bannerInput.click()">
-          @if (bannerPreviewUrl) {
-            <img [src]="bannerPreviewUrl" alt="Event banner preview" />
+      <div
+        class="upload-card card"
+        [class.image-drop-active]="isImageDropActive"
+        (dragover)="onImageDragOver($event)"
+        (dragleave)="onImageDragLeave($event)"
+        (drop)="onImageDrop($event)"
+      >
+        <div class="section-title compact">
+          <h2>Event Image</h2>
+          <p>Paste a public image URL and preview it before saving.</p>
+        </div>
+
+        <label class="form-field full-width">
+          <span>Image URL</span>
+          <input
+            class="form-control"
+            type="url"
+            formControlName="imageUrl"
+            placeholder="https://example.com/event-banner.jpg"
+            (input)="onImageUrlChange($any($event.target).value)"
+            (dragover)="onImageDragOver($event)"
+            (dragleave)="onImageDragLeave($event)"
+            (drop)="onImageDrop($event)"
+          />
+        </label>
+
+        <div class="upload-area preview-only" aria-label="Event image preview">
+          @if (imagePreviewUrl && !isImagePreviewBroken) {
+            <button type="button" class="preview-clear-btn" (click)="clearImage()" aria-label="Remove image">
+              <span class="material-symbols-outlined">close</span>
+              Remove
+            </button>
+            <img [src]="imagePreviewUrl" alt="Event banner preview" (error)="onImagePreviewError()" />
           } @else {
             <div class="upload-placeholder">
-              <span class="material-symbols-outlined">upload</span>
-              <strong>Upload Event Banner</strong>
-              <p>Drag and drop your event image here, or click to browse.</p>
-              <small>Recommended size: 1920x1080px (max 5MB).</small>
-              <div class="format-pills">
-                <span>JPG</span>
-                <span>PNG</span>
-                <span>WebP</span>
-              </div>
+              <span class="material-symbols-outlined">image</span>
+              <strong>No usable image preview yet</strong>
+              <p>Paste or drag a direct image URL here. If the URL points to a page instead of the image file, the preview will stay blank.</p>
+              <small>The URL must resolve directly to an image.</small>
             </div>
           }
-        </button>
-        <input #bannerInput type="file" accept="image/*" hidden (change)="onBannerSelected($event)" />
+        </div>
       </div>
 
       <form class="editor-grid" [formGroup]="form" (ngSubmit)="submit()">
