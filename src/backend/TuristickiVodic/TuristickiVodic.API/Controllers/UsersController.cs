@@ -133,7 +133,7 @@ namespace TuristickiVodic.API.Controllers
             try
             {
                 await _userService.ForgotPasswordAsync(forgotPasswordDto);
-                return Ok(new { message = "If an account with that email exists, a reset code has been sent." });
+                return Ok(new { message = "Reset code has been sent to the provided email address." });
             }
             catch (InvalidOperationException ex)
             {
@@ -374,8 +374,12 @@ namespace TuristickiVodic.API.Controllers
         // Samo Admin može da aktivira/deaktivira korisnike
         [HttpPost("{id}/toggle-active")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ToggleActive(int id, [FromBody] bool isActive)
+        public async Task<IActionResult> ToggleActive(int id, [FromBody] ToggleUserActiveDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var isActive = dto.State == UserAccountState.Active;
             var result = await _userService.ToggleUserActiveAsync(id, isActive);
             if (!result)
                 return NotFound();

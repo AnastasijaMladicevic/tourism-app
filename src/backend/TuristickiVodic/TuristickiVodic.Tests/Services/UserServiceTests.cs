@@ -1681,18 +1681,20 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
-        public async Task ForgotPasswordAsync_KadaKorisnikNePostoji_NeSaljeMail()
+        public async Task ForgotPasswordAsync_KadaKorisnikNePostoji_BacaExceptionINeSaljeMail()
         {
-            using var ctx = CreateInMemoryContext(nameof(ForgotPasswordAsync_KadaKorisnikNePostoji_NeSaljeMail));
+            using var ctx = CreateInMemoryContext(nameof(ForgotPasswordAsync_KadaKorisnikNePostoji_BacaExceptionINeSaljeMail));
             SeedRoles(ctx);
 
             var emailSvc = new Mock<IEmailService>();
             var service = CreateUserService(ctx, new Mock<ITokenService>(), emailSvc);
 
-            await service.ForgotPasswordAsync(new ForgotPasswordDto
+            await service.Invoking(s => s.ForgotPasswordAsync(new ForgotPasswordDto
             {
                 Email = "nepostoji@test.com"
-            });
+            }))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*nije registrovan*");
 
             emailSvc.Verify(s => s.SendAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
         }

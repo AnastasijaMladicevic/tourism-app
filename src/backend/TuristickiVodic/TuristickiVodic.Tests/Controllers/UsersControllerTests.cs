@@ -575,7 +575,7 @@ namespace TuristickiVodic.Tests.Controllers
 
             var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
 
-            var result = await controller.ToggleActive(5, true);
+            var result = await controller.ToggleActive(5, new ToggleUserActiveDto { State = UserAccountState.Active });
 
             result.Should().BeOfType<OkObjectResult>();
         }
@@ -588,7 +588,7 @@ namespace TuristickiVodic.Tests.Controllers
 
             var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
 
-            var result = await controller.ToggleActive(5, false);
+            var result = await controller.ToggleActive(5, new ToggleUserActiveDto { State = UserAccountState.Inactive });
 
             result.Should().BeOfType<OkObjectResult>();
         }
@@ -601,7 +601,7 @@ namespace TuristickiVodic.Tests.Controllers
 
             var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
 
-            var result = await controller.ToggleActive(999, true);
+            var result = await controller.ToggleActive(999, new ToggleUserActiveDto { State = UserAccountState.Active });
 
             result.Should().BeOfType<NotFoundResult>();
         }

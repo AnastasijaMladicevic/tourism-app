@@ -274,8 +274,14 @@ namespace TuristickiVodic.Services
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
 
-            if (user == null || !user.IsActive || user.IsBlacklisted)
-                return;
+            if (user == null)
+                throw new InvalidOperationException("Korisnik sa ovom email adresom jos uvek nije registrovan.");
+
+            if (!user.IsActive)
+                throw new InvalidOperationException("Korisnicki nalog nije aktivan.");
+
+            if (user.IsBlacklisted)
+                throw new InvalidOperationException("Reset lozinke nije dostupan za ovaj nalog.");
 
             var resetCode = GenerateResetCode();
 
