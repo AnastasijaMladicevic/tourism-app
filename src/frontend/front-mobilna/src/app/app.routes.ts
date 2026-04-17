@@ -40,6 +40,11 @@ export const routes: Routes = [
       import('./feature/language/language.component').then((m) => m.LanguageComponent),
   },
   {
+    path: 'support',
+    loadComponent: () =>
+      import('./feature/support/support.component').then((m) => m.SupportComponent),
+  },
+  {
     path: 'code-verification',
     loadComponent: () =>
       import('./feature/auth/code-verification/code-verification').then(
