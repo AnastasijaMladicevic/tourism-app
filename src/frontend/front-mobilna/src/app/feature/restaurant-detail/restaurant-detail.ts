@@ -96,9 +96,13 @@ export class RestaurantDetailComponent implements OnInit {
 
   viewOnMap(): void {
     if (!this.object?.latitude || !this.object?.longitude) return;
-    const lat = this.object.latitude;
-    const lng = this.object.longitude;
-    window.open(`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=17`, '_blank');
+    this.router.navigate(['/map'], {
+      state: {
+        lat: this.object.latitude,
+        lng: this.object.longitude,
+        zoom: 16
+      }
+    });
   }
 
   // === MODAL GALERIJA ===

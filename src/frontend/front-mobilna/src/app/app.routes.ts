@@ -96,5 +96,11 @@ export const routes: Routes = [
   { 
     path: 'restaurant/:id', 
     loadComponent: () => 
-      import('./feature/restaurant-detail/restaurant-detail').then(m => m.RestaurantDetailComponent) }
+      import('./feature/restaurant-detail/restaurant-detail').then(m => m.RestaurantDetailComponent) 
+  },
+  { 
+    path: 'map', 
+    loadComponent: () => 
+      import('./feature/map/map').then(m => m.MapComponent) 
+  }
 ];
