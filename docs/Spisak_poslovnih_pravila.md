@@ -10,6 +10,11 @@
 - Samo `Tourist` može da pošalje zahtev za `ContentCreator` ulogu, i to samo za sebe.
 - Samo `Admin` može da odobri `ContentCreator` ulogu.
 - Uloga `ContentCreator`-a se odobrava samo ako je turista poslao zahtev za nju.
+- Za forgot password:
+    - ako `email postoji` i nalog je validan, šalje se kod.
+    - ako `email ne postoji`, vraća se greška: `Korisnik sa ovom email adresom jos uvek nije registrovan`.
+    - ako nalog `nije aktivan`, vraća se: `Korisnicki nalog nije aktivan`.
+    - ako je nalog `blacklisted`, vraća se: `Reset lozinke nije dostupan za ovaj nalog`.
 
 **DESTINACIJE**
 
