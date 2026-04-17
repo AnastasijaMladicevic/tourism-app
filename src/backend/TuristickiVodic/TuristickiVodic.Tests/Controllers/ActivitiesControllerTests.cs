@@ -106,6 +106,22 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
+        public async Task GetById_KadaJeManagerNadlezan_VracaNeodobrenuAktivnostIzSvojeDestinacije()
+        {
+            var mockService = new Mock<IActivityService>();
+            var dto = new ActivityDto { Id = 5, Name = "Aktivnost za odobravanje", Status = "Pending" };
+
+            mockService.Setup(s => s.GetForManagerByIdAsync(5, 10)).ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(10, "Manager"));
+
+            var result = await controller.GetById(5);
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
         public async Task GetById_KadaAktivnostNePostoji_VracaNotFound()
         {
             var mockService = new Mock<IActivityService>();
@@ -402,6 +418,31 @@ namespace TuristickiVodic.Tests.Controllers
 
             var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "ContentCreator"));
             var result = await controller.GetMy(new ActivityQueryDto());
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(paged);
+        }
+
+        [Fact]
+        public async Task GetForManager_Manager_VracaPagedRezultat()
+        {
+            var mockService = new Mock<IActivityService>();
+            var paged = new PagedResultDto<ActivityDto>
+            {
+                Items = new List<ActivityDto>
+                {
+                    new ActivityDto { Id = 1, Name = "Pending aktivnost", Status = "Pending" }
+                },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 1,
+                TotalPages = 1
+            };
+
+            mockService.Setup(s => s.GetForManagerAsync(10, It.IsAny<ActivityQueryDto>())).ReturnsAsync(paged);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(10, "Manager"));
+            var result = await controller.GetForManager(new ActivityQueryDto());
 
             result.Should().BeOfType<OkObjectResult>()
                 .Which.Value.Should().BeEquivalentTo(paged);

@@ -203,11 +203,125 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
+        public async Task<PagedResultDto<EventDto>> GetForManagerAsync(int userId, EventQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var destinationIds = await DestinationManagerHelper.GetResponsibleDestinationIdsAsync(_context, userId);
+
+            var eventsQuery = _context.Events
+                .Include(e => e.EventType)
+                .Include(e => e.Destination)
+                .Include(e => e.Locality)
+                    .ThenInclude(l => l.Destination)
+                .Include(e => e.Object)
+                .Include(e => e.Images)
+                .Where(e =>
+                    (e.DestinationId.HasValue && destinationIds.Contains(e.DestinationId.Value)) ||
+                    (!e.DestinationId.HasValue && e.Locality != null && destinationIds.Contains(e.Locality.DestinationId)))
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    e.EventType != null &&
+                    e.EventType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    ((e.Destination != null && e.Destination.Name.ToLower().Contains(destination)) ||
+                     (e.Destination == null && e.Locality != null && e.Locality.Destination != null && e.Locality.Destination.Name.ToLower().Contains(destination))));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    e.Name.ToLower().Contains(search) ||
+                    (e.Description != null && e.Description.ToLower().Contains(search)));
+            }
+
+            var hasDate = query.Date.HasValue;
+            var hasNextDays = query.NextDays.HasValue;
+            var hasRange = query.StartDate.HasValue || query.EndDate.HasValue;
+
+            var filterCount = 0;
+            if (hasDate) filterCount++;
+            if (hasNextDays) filterCount++;
+            if (hasRange) filterCount++;
+
+            if (filterCount > 1)
+                throw new InvalidOperationException("Use only one type of date filter at a time.");
+
+            DateTime? periodStart = null;
+            DateTime? periodEnd = null;
+
+            if (hasDate)
+            {
+                periodStart = EnsureUtc(query.Date!.Value.Date);
+                periodEnd = EnsureUtc(periodStart.Value.AddDays(1));
+            }
+            else if (hasNextDays)
+            {
+                if (query.NextDays!.Value != 7 && query.NextDays.Value != 30)
+                    throw new InvalidOperationException("NextDays can only be 7 or 30.");
+
+                periodStart = DateTime.UtcNow.Date;
+                periodEnd = periodStart.Value.AddDays(query.NextDays.Value);
+            }
+            else if (hasRange)
+            {
+                periodStart = EnsureUtc((query.StartDate ?? query.EndDate)!.Value.Date);
+                periodEnd = EnsureUtc(((query.EndDate ?? query.StartDate)!.Value.Date).AddDays(1));
+
+                if (periodEnd <= periodStart)
+                    throw new InvalidOperationException("EndDate must be greater than or equal to StartDate.");
+            }
+
+            if (periodStart.HasValue && periodEnd.HasValue)
+            {
+                eventsQuery = eventsQuery.Where(e =>
+                    e.StartDate < periodEnd.Value &&
+                    (!e.EndDate.HasValue || e.EndDate.Value >= periodStart.Value));
+            }
+
+            eventsQuery = ApplyStatusFilter(eventsQuery, query.Status);
+            eventsQuery = ApplySorting(eventsQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await eventsQuery.CountAsync();
+
+            var items = await eventsQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToListAsync();
+
+            return new PagedResultDto<EventDto>
+            {
+                Items = _mapper.Map<List<EventDto>>(items),
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
         public async Task<EventDto?> GetByIdAsync(int id)
         {
             var ev = await _context.Events
                 .Include(e => e.EventType)
                 .Include(e => e.Locality)
+                    .ThenInclude(l => l.Destination)
                 .Include(e => e.Destination)
                 .Include(e => e.Object)
                 .Include(e => e.Images)
@@ -231,12 +345,38 @@ namespace TuristickiVodic.Services.Services
             var ev = await _context.Events
                 .Include(e => e.EventType)
                 .Include(e => e.Locality)
+                    .ThenInclude(l => l.Destination)
                 .Include(e => e.Destination)
                 .Include(e => e.Object)
                 .Include(e => e.Images)
                 .FirstOrDefaultAsync(e => e.Id == id && e.CreatedByUserId == userId);
 
             return ev == null ? null : _mapper.Map<EventDto>(ev);
+        }
+
+        public async Task<EventDto?> GetForManagerByIdAsync(int id, int userId)
+        {
+            var ev = await _context.Events
+                .Include(e => e.EventType)
+                .Include(e => e.Locality)
+                    .ThenInclude(l => l.Destination)
+                .Include(e => e.Destination)
+                .Include(e => e.Object)
+                .Include(e => e.Images)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (ev == null)
+                return null;
+
+            var destination = ev.Destination ?? ev.Locality?.Destination;
+            if (destination == null)
+                return null;
+
+            var isResponsible = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, destination, userId);
+            if (!isResponsible)
+                return null;
+
+            return _mapper.Map<EventDto>(ev);
         }
 
         public async Task<EventDto> CreateAsync(CreateEventDto dto, int userId, string roleName)
@@ -458,6 +598,7 @@ namespace TuristickiVodic.Services.Services
             return await _context.Events
                 .Include(e => e.EventType)
                 .Include(e => e.Locality)
+                    .ThenInclude(l => l.Destination)
                 .Include(e => e.Destination)
                 .Include(e => e.Object)
                 .Include(e => e.Images)

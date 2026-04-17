@@ -37,11 +37,21 @@ namespace TuristickiVodic.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
-            if (User.Identity?.IsAuthenticated == true && string.Equals(User.FindFirstValue(ClaimTypes.Role), "ContentCreator", StringComparison.OrdinalIgnoreCase))
+            if (User.Identity?.IsAuthenticated == true)
             {
-                var creatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-                var ownObject = await _objectService.GetMineByIdAsync(id, creatorId);
-                if (ownObject != null) return Ok(ownObject);
+                var roleName = User.FindFirstValue(ClaimTypes.Role);
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+                if (string.Equals(roleName, "ContentCreator", StringComparison.OrdinalIgnoreCase))
+                {
+                    var ownObject = await _objectService.GetMineByIdAsync(id, userId);
+                    if (ownObject != null) return Ok(ownObject);
+                }
+                else if (string.Equals(roleName, "Manager", StringComparison.OrdinalIgnoreCase))
+                {
+                    var managedObject = await _objectService.GetForManagerByIdAsync(id, userId);
+                    if (managedObject != null) return Ok(managedObject);
+                }
             }
 
             var obj = await _objectService.GetByIdAsync(id);
@@ -55,6 +65,15 @@ namespace TuristickiVodic.API.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var result = await _objectService.GetMyAsync(userId, query);
+            return Ok(result);
+        }
+
+        [HttpGet("manager")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> GetForManager([FromQuery] TouristObjectQueryDto query)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _objectService.GetForManagerAsync(userId, query);
             return Ok(result);
         }
 

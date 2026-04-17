@@ -30,11 +30,21 @@ namespace TuristickiVodic.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
-            if (User.Identity?.IsAuthenticated == true && string.Equals(User.FindFirstValue(ClaimTypes.Role), "ContentCreator", StringComparison.OrdinalIgnoreCase))
+            if (User.Identity?.IsAuthenticated == true)
             {
-                var creatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-                var ownActivity = await _activityService.GetMineByIdAsync(id, creatorId);
-                if (ownActivity != null) return Ok(ownActivity);
+                var roleName = User.FindFirstValue(ClaimTypes.Role);
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+                if (string.Equals(roleName, "ContentCreator", StringComparison.OrdinalIgnoreCase))
+                {
+                    var ownActivity = await _activityService.GetMineByIdAsync(id, userId);
+                    if (ownActivity != null) return Ok(ownActivity);
+                }
+                else if (string.Equals(roleName, "Manager", StringComparison.OrdinalIgnoreCase))
+                {
+                    var managedActivity = await _activityService.GetForManagerByIdAsync(id, userId);
+                    if (managedActivity != null) return Ok(managedActivity);
+                }
             }
 
             var activity = await _activityService.GetByIdAsync(id);
@@ -48,6 +58,15 @@ namespace TuristickiVodic.API.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var result = await _activityService.GetMyAsync(userId, query);
+            return Ok(result);
+        }
+
+        [HttpGet("manager")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> GetForManager([FromQuery] ActivityQueryDto query)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _activityService.GetForManagerAsync(userId, query);
             return Ok(result);
         }
 

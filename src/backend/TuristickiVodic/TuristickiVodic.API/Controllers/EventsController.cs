@@ -45,12 +45,23 @@ namespace TuristickiVodic.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
-            if (User.Identity?.IsAuthenticated == true && string.Equals(User.FindFirstValue(ClaimTypes.Role), "ContentCreator", StringComparison.OrdinalIgnoreCase))
+            if (User.Identity?.IsAuthenticated == true)
             {
-                var creatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-                var ownEvent = await _eventService.GetMineByIdAsync(id, creatorId);
-                if (ownEvent != null)
-                    return Ok(ownEvent);
+                var roleName = User.FindFirstValue(ClaimTypes.Role);
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+                if (string.Equals(roleName, "ContentCreator", StringComparison.OrdinalIgnoreCase))
+                {
+                    var ownEvent = await _eventService.GetMineByIdAsync(id, userId);
+                    if (ownEvent != null)
+                        return Ok(ownEvent);
+                }
+                else if (string.Equals(roleName, "Manager", StringComparison.OrdinalIgnoreCase))
+                {
+                    var managedEvent = await _eventService.GetForManagerByIdAsync(id, userId);
+                    if (managedEvent != null)
+                        return Ok(managedEvent);
+                }
             }
 
             var ev = await _eventService.GetByIdAsync(id);
@@ -64,6 +75,15 @@ namespace TuristickiVodic.API.Controllers
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var result = await _eventService.GetMyAsync(userId, query);
+            return Ok(result);
+        }
+
+        [HttpGet("manager")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> GetForManager([FromQuery] EventQueryDto query)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _eventService.GetForManagerAsync(userId, query);
             return Ok(result);
         }
 

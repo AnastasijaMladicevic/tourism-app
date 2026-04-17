@@ -1,52 +1,38 @@
 using Microsoft.EntityFrameworkCore;
-using NetTopologySuite.Geometries;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
 
 namespace TuristickiVodic.Services.Services
 {
     /// <summary>
-    /// Pomoćna klasa za određivanje odgovornog menadžera destinacije.
+    /// Pomocna klasa za odredjivanje odgovornog menadzera destinacije.
     ///
-    /// Pravilo: Destinacija se uvek kreira sa menadžerom.
-    /// Ako se ipak desi izuzetna situacija da destinacija ostane bez menadžera
-    /// (npr. menadžer napusti sistem), sadržaj te destinacije preuzima
-    /// menadžer geografski najbliže destinacije – NE admin.
+    /// Pravilo: destinacija se kreira sa menadzerom.
+    /// Ako ipak ostane bez menadzera, odgovornost prelazi na menadzera
+    /// geografski najblize destinacije - ne na admina.
     /// </summary>
     public static class DestinationManagerHelper
     {
-        /// <summary>
-        /// Vraća ID menadžera koji je odgovoran za datu destinaciju.
-        /// Ako destinacija ima svog menadžera, vraća njega.
-        /// Ako nema, traži geografski najbližu destinaciju koja ima menadžera.
-        /// Vraća null samo ako u sistemu ne postoji nijedan menadžer.
-        /// </summary>
-        public static async Task<int?> GetResponsibleManagerIdAsync(AppDbContext context, Destination destination)
+        private static int? ResolveResponsibleManagerId(Destination destination, IReadOnlyCollection<Destination> allDestinations)
         {
-            // Normalan slučaj – destinacija ima svog menadžera
             if (destination.ManagedByUserId.HasValue)
                 return destination.ManagedByUserId;
 
-            // Izuzetna situacija – destinacija nema menadžera
-            // Nalazimo geografski najbliži menadžer iz svih destinacija koje imaju menadžera
-            var managedDestinations = await context.Destinations
+            var managedDestinations = allDestinations
                 .Where(d => d.ManagedByUserId != null && d.Id != destination.Id)
-                .ToListAsync();
+                .ToList();
 
             if (!managedDestinations.Any())
-                return null; // Nema nijednog menadžera u sistemu
+                return null;
 
-            // Ako destinacija nema geolokaciju, uzimamo prvog dostupnog menadžera
             if (destination.Geolocation == null)
                 return managedDestinations.First().ManagedByUserId;
 
-            // Nalazimo najbližu destinaciju po geografskoj udaljenosti
             var nearest = managedDestinations
                 .Where(d => d.Geolocation != null)
                 .OrderBy(d => destination.Geolocation.Distance(d.Geolocation!))
                 .FirstOrDefault();
 
-            // Ako nema destinacija sa geolokacijom, uzimamo prvu dostupnu
             if (nearest == null)
                 nearest = managedDestinations.First();
 
@@ -54,8 +40,34 @@ namespace TuristickiVodic.Services.Services
         }
 
         /// <summary>
+        /// Vraca ID menadzera koji je odgovoran za datu destinaciju.
+        /// Ako destinacija ima svog menadzera, vraca njega.
+        /// Ako nema, trazi geografski najblizu destinaciju koja ima menadzera.
+        /// </summary>
+        public static async Task<int?> GetResponsibleManagerIdAsync(AppDbContext context, Destination destination)
+        {
+            var destinations = await context.Destinations.ToListAsync();
+            return ResolveResponsibleManagerId(destination, destinations);
+        }
+
+        /// <summary>
+        /// Vraca ID-jeve svih destinacija za koje je dati menadzer odgovoran.
+        /// Pokriva i izuzetne slucajeve kada neka destinacija ostane bez menadzera.
+        /// </summary>
+        public static async Task<int[]> GetResponsibleDestinationIdsAsync(AppDbContext context, int userId)
+        {
+            var destinations = await context.Destinations.ToListAsync();
+
+            return destinations
+                .Where(destination => ResolveResponsibleManagerId(destination, destinations) == userId)
+                .Select(destination => destination.Id)
+                .Distinct()
+                .ToArray();
+        }
+
+        /// <summary>
         /// Proverava da li je dati korisnik odgovoran za datu destinaciju.
-        /// Koristi se za autorizaciju kod odobravanja, brisanja, itd.
+        /// Koristi se za autorizaciju kod odobravanja, brisanja i pregleda.
         /// </summary>
         public static async Task<bool> IsResponsibleManagerAsync(AppDbContext context, Destination destination, int userId)
         {

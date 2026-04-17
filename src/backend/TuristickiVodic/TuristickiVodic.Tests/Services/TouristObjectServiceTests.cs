@@ -547,5 +547,110 @@ namespace TuristickiVodic.Tests.Services
             result.Items.Select(x => x.Name).Should().Equal("Moj pending objekat", "Moj rejected objekat");
             result.Items.Select(x => x.Status).Should().Equal("Pending", "Rejected");
         }
+
+        [Fact]
+        public async Task GetForManagerAsync_ManagerVidiSamoObjekteSvojeDestinacijeNezavisnoOdStatusa()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetForManagerAsync_ManagerVidiSamoObjekteSvojeDestinacijeNezavisnoOdStatusa));
+            var (objectType, destination, otherDestination, locality, otherLocality, creator, _, manager, _) = SeedBase(ctx);
+
+            var managerRole = ctx.Roles.Single(r => r.Name == RoleType.Manager);
+
+            var otherManager = new User
+            {
+                Id = 12,
+                FirstName = "Other",
+                LastName = "Manager",
+                Email = "othermanager@test.com",
+                PasswordHash = "hash",
+                RoleId = managerRole.Id,
+                Role = managerRole,
+                IsActive = true,
+                DateOfBirth = new DateTime(1991, 1, 1)
+            };
+
+            ctx.Users.Add(otherManager);
+            otherDestination.ManagedByUserId = otherManager.Id;
+
+            ctx.Objects.AddRange(
+                new TouristObject
+                {
+                    Id = 1,
+                    Name = "Pending moj objekat",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new TouristObject
+                {
+                    Id = 2,
+                    Name = "Rejected moj objekat",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Rejected,
+                    IsActive = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new TouristObject
+                {
+                    Id = 3,
+                    Name = "Objekat druge destinacije",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = otherDestination.Id,
+                    LocalityId = otherLocality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetForManagerAsync(manager.Id, new TouristObjectQueryDto { SortBy = "name", SortOrder = "asc" });
+
+            result.TotalCount.Should().Be(2);
+            result.Items.Select(x => x.Name).Should().Equal("Pending moj objekat", "Rejected moj objekat");
+            result.Items.Select(x => x.Status).Should().Equal("Pending", "Rejected");
+        }
+
+        [Fact]
+        public async Task GetForManagerByIdAsync_OdgovorniManagerMozeDaDobijeIPendingObjekat()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetForManagerByIdAsync_OdgovorniManagerMozeDaDobijeIPendingObjekat));
+            var (objectType, destination, _, locality, _, creator, _, manager, _) = SeedBase(ctx);
+
+            ctx.Objects.Add(new TouristObject
+            {
+                Id = 1,
+                Name = "Manager pending objekat",
+                ObjectTypeId = objectType.Id,
+                DestinationId = destination.Id,
+                LocalityId = locality.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Pending,
+                IsActive = false,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetForManagerByIdAsync(1, manager.Id);
+
+            result.Should().NotBeNull();
+            result!.Status.Should().Be("Pending");
+            result.Name.Should().Be("Manager pending objekat");
+        }
     }
 }

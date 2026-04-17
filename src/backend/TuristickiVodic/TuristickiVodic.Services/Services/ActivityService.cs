@@ -154,6 +154,78 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
+        public async Task<PagedResultDto<ActivityDto>> GetForManagerAsync(int userId, ActivityQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var destinationIds = await DestinationManagerHelper.GetResponsibleDestinationIdsAsync(_context, userId);
+
+            var activitiesQuery = _context.Activities
+                .Include(a => a.ActivityType)
+                .Include(a => a.Destination)
+                .Include(a => a.Locality)
+                    .ThenInclude(l => l.Destination)
+                .Include(a => a.Object)
+                .Include(a => a.Images)
+                .Where(a =>
+                    (a.DestinationId.HasValue && destinationIds.Contains(a.DestinationId.Value)) ||
+                    (!a.DestinationId.HasValue && a.Locality != null && destinationIds.Contains(a.Locality.DestinationId)))
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+
+                activitiesQuery = activitiesQuery.Where(a =>
+                    a.ActivityType != null &&
+                    a.ActivityType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+
+                activitiesQuery = activitiesQuery.Where(a =>
+                    ((a.Destination != null && a.Destination.Name.ToLower().Contains(destination)) ||
+                     (a.Destination == null && a.Locality != null && a.Locality.Destination != null && a.Locality.Destination.Name.ToLower().Contains(destination))));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+
+                activitiesQuery = activitiesQuery.Where(a =>
+                    a.Name.ToLower().Contains(search) ||
+                    (a.Description != null && a.Description.ToLower().Contains(search)));
+            }
+
+            activitiesQuery = ApplyStatusFilter(activitiesQuery, query.Status);
+            activitiesQuery = ApplyActivitySorting(activitiesQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await activitiesQuery.CountAsync();
+
+            var items = await activitiesQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToListAsync();
+
+            return new PagedResultDto<ActivityDto>
+            {
+                Items = _mapper.Map<List<ActivityDto>>(items),
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
         public async Task<ActivityDto?> GetByIdAsync(int id)
         {
             var activity = await _context.Activities
@@ -182,12 +254,38 @@ namespace TuristickiVodic.Services.Services
             var activity = await _context.Activities
                 .Include(a => a.ActivityType)
                 .Include(a => a.Locality)
+                    .ThenInclude(l => l.Destination)
                 .Include(a => a.Destination)
                 .Include(a => a.Object)
                 .Include(a => a.Images)
                 .FirstOrDefaultAsync(a => a.Id == id && a.CreatedByUserId == userId);
 
             return activity == null ? null : _mapper.Map<ActivityDto>(activity);
+        }
+
+        public async Task<ActivityDto?> GetForManagerByIdAsync(int id, int userId)
+        {
+            var activity = await _context.Activities
+                .Include(a => a.ActivityType)
+                .Include(a => a.Locality)
+                    .ThenInclude(l => l.Destination)
+                .Include(a => a.Destination)
+                .Include(a => a.Object)
+                .Include(a => a.Images)
+                .FirstOrDefaultAsync(a => a.Id == id);
+
+            if (activity == null)
+                return null;
+
+            var destination = activity.Destination ?? activity.Locality?.Destination;
+            if (destination == null)
+                return null;
+
+            var isResponsible = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, destination, userId);
+            if (!isResponsible)
+                return null;
+
+            return _mapper.Map<ActivityDto>(activity);
         }
 
         // Samo ContentCreator kreira aktivnost – status uvek Pending, čeka odobrenje menadžera.
