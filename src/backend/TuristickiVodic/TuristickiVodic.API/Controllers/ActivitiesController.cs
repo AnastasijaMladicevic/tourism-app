@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TuristickiVodic.Core.DTO;
@@ -29,9 +30,25 @@ namespace TuristickiVodic.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
+            if (User.Identity?.IsAuthenticated == true && string.Equals(User.FindFirstValue(ClaimTypes.Role), "ContentCreator", StringComparison.OrdinalIgnoreCase))
+            {
+                var creatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var ownActivity = await _activityService.GetMineByIdAsync(id, creatorId);
+                if (ownActivity != null) return Ok(ownActivity);
+            }
+
             var activity = await _activityService.GetByIdAsync(id);
             if (activity == null) return NotFound();
             return Ok(activity);
+        }
+
+        [HttpGet("my")]
+        [Authorize(Roles = "ContentCreator")]
+        public async Task<IActionResult> GetMy([FromQuery] ActivityQueryDto query)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _activityService.GetMyAsync(userId, query);
+            return Ok(result);
         }
 
         /*[HttpGet("search")]

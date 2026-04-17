@@ -198,6 +198,21 @@ namespace TuristickiVodic.Tests.Validation
             Validate(dto).Should().Contain(r => r.MemberNames.Contains("Name"));
         }
 
+        [Fact]
+        public void CreateDestinationDto_SamoLongitude_NijeValidno()
+        {
+            var dto = new CreateDestinationDto
+            {
+                Name = "Test",
+                DestinationTypeId = 1,
+                ManagedByUserId = 1,
+                Longitude = 18.77
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateDestinationDto.Longitude)));
+        }
+
         // ═══════════════════════════════════════════
         //  ChangePasswordDto
         // ═══════════════════════════════════════════
@@ -387,6 +402,21 @@ namespace TuristickiVodic.Tests.Validation
             var dto = new UpdateLocalityDto { DestinationId = 2 };
 
             IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateLocalityDto_SamoLongitude_NijeValidno()
+        {
+            var dto = new CreateLocalityDto
+            {
+                Name = "Test",
+                Longitude = 18.75,
+                DestinationId = 1,
+                LocalityTypeId = 1
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateLocalityDto.Longitude)));
         }
 
         // ═══════════════════════════════════════════
@@ -635,6 +665,49 @@ namespace TuristickiVodic.Tests.Validation
             Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateEventDto.Name)));
         }
 
+        [Fact]
+        public void CreateEventDto_EventTypeIdJeNula_NijeValidan()
+        {
+            var dto = new CreateEventDto
+            {
+                Name = "Koncert",
+                EventTypeId = 0,
+                LocalityId = 1,
+                StartDate = new DateTime(2026, 5, 5, 20, 0, 0)
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateEventDto.EventTypeId)));
+        }
+
+        [Fact]
+        public void CreateEventDto_SamoJednaKoordinata_NijeValidan()
+        {
+            var dto = new CreateEventDto
+            {
+                Name = "Koncert",
+                EventTypeId = 1,
+                LocalityId = 1,
+                StartDate = new DateTime(2026, 5, 5, 20, 0, 0),
+                Longitude = 18.77
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateEventDto.Longitude)));
+        }
+
+        [Fact]
+        public void UpdateEventDto_SamoJednaKoordinata_NijeValidan()
+        {
+            var dto = new UpdateEventDto
+            {
+                Longitude = 18.77
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(UpdateEventDto.Longitude)));
+        }
+
         // ═══════════════════════════════════════════
         //  CreateActivityDto
         // ═══════════════════════════════════════════
@@ -737,6 +810,33 @@ namespace TuristickiVodic.Tests.Validation
             };
 
             IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateActivityDto_SamoJednaKoordinata_NijeValidno()
+        {
+            var dto = new CreateActivityDto
+            {
+                Name = "Setnja",
+                ActivityTypeId = 1,
+                LocalityId = 1,
+                Longitude = 18.77
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateActivityDto.Longitude)));
+        }
+
+        [Fact]
+        public void UpdateActivityDto_NegativnaCena_NijeValidno()
+        {
+            var dto = new UpdateActivityDto
+            {
+                Price = -5m
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(UpdateActivityDto.Price)));
         }
 
         // ═══════════════════════════════════════════

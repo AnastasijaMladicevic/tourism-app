@@ -490,5 +490,62 @@ namespace TuristickiVodic.Tests.Services
             result.Reviews[0].Text.Should().Be("Odlicno");
             result.Reviews[0].UserFullName.Should().Be("Creator C");
         }
+
+        [Fact]
+        public async Task GetMyAsync_ContentCreator_VidiSamoSvojeObjekteNezavisnoOdStatusa()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetMyAsync_ContentCreator_VidiSamoSvojeObjekteNezavisnoOdStatusa));
+            var (objectType, destination, _, locality, _, creator, otherCreator, _, _) = SeedBase(ctx);
+
+            ctx.Objects.AddRange(
+                new TouristObject
+                {
+                    Id = 1,
+                    Name = "Moj pending objekat",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new TouristObject
+                {
+                    Id = 2,
+                    Name = "Moj rejected objekat",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Rejected,
+                    IsActive = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new TouristObject
+                {
+                    Id = 3,
+                    Name = "Tudji objekat",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = otherCreator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetMyAsync(creator.Id, new TouristObjectQueryDto { SortBy = "name", SortOrder = "asc" });
+
+            result.TotalCount.Should().Be(2);
+            result.Items.Select(x => x.Name).Should().Equal("Moj pending objekat", "Moj rejected objekat");
+            result.Items.Select(x => x.Status).Should().Equal("Pending", "Rejected");
+        }
     }
 }

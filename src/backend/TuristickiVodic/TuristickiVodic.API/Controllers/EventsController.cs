@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Security.Claims;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Services.Services;
@@ -44,9 +45,26 @@ namespace TuristickiVodic.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
+            if (User.Identity?.IsAuthenticated == true && string.Equals(User.FindFirstValue(ClaimTypes.Role), "ContentCreator", StringComparison.OrdinalIgnoreCase))
+            {
+                var creatorId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var ownEvent = await _eventService.GetMineByIdAsync(id, creatorId);
+                if (ownEvent != null)
+                    return Ok(ownEvent);
+            }
+
             var ev = await _eventService.GetByIdAsync(id);
             if (ev == null) return NotFound();
             return Ok(ev);
+        }
+
+        [HttpGet("my")]
+        [Authorize(Roles = "ContentCreator")]
+        public async Task<IActionResult> GetMy([FromQuery] EventQueryDto query)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _eventService.GetMyAsync(userId, query);
+            return Ok(result);
         }
 
         [HttpPost]

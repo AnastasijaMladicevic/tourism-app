@@ -39,6 +39,21 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
+        public async Task GetById_KadaJeContentCreatorIVlasnik_VracaSopstveniNeodobrenEvent()
+        {
+            var mockService = new Mock<IEventService>();
+            var dto = new EventDto { Id = 5, Name = "Moj pending event", Status = "Pending" };
+            mockService.Setup(s => s.GetMineByIdAsync(5, 5)).ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "ContentCreator"));
+
+            var result = await controller.GetById(5);
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
         public async Task GetAll_KadaServisBaciInvalidOperation_VracaBadRequest()
         {
             var mockService = new Mock<IEventService>();
@@ -204,6 +219,33 @@ namespace TuristickiVodic.Tests.Controllers
             var result = await controller.Delete(999);
 
             result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Fact]
+        public async Task GetMy_ContentCreator_VracaPagedRezultat()
+        {
+            var mockService = new Mock<IEventService>();
+            var dto = new PagedResultDto<EventDto>
+            {
+                Items = new List<EventDto>
+                {
+                    new EventDto { Id = 1, Name = "Moj pending event", Status = "Pending" }
+                },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 1,
+                TotalPages = 1
+            };
+
+            mockService
+                .Setup(s => s.GetMyAsync(5, It.IsAny<EventQueryDto>()))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "ContentCreator"));
+            var result = await controller.GetMy(new EventQueryDto());
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
         }
 
         [Fact]

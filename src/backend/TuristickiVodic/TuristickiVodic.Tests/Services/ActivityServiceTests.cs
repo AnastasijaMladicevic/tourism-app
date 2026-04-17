@@ -651,5 +651,62 @@ namespace TuristickiVodic.Tests.Services
 
             result.Should().BeNull();
         }
+
+        [Fact]
+        public async Task GetMyAsync_ContentCreator_VidiSamoSvojeAktivnostiNezavisnoOdStatusa()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetMyAsync_ContentCreator_VidiSamoSvojeAktivnostiNezavisnoOdStatusa));
+            var (_, _, _, activityType, destination, _, locality, _, creator, otherCreator, _, _, _) = SeedBase(ctx);
+
+            ctx.Activities.AddRange(
+                new Activity
+                {
+                    Id = 1,
+                    Name = "Moja pending aktivnost",
+                    ActivityTypeId = activityType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new Activity
+                {
+                    Id = 2,
+                    Name = "Moja rejected aktivnost",
+                    ActivityTypeId = activityType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Rejected,
+                    IsActive = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new Activity
+                {
+                    Id = 3,
+                    Name = "Tudja aktivnost",
+                    ActivityTypeId = activityType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = otherCreator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+            ctx.SaveChanges();
+
+            var svc = new ActivityService(ctx, CreateMapper());
+            var result = await svc.GetMyAsync(creator.Id, new ActivityQueryDto { SortBy = "name", SortOrder = "asc" });
+
+            result.TotalCount.Should().Be(2);
+            result.Items.Select(x => x.Name).Should().Equal("Moja pending aktivnost", "Moja rejected aktivnost");
+            result.Items.Select(x => x.Status).Should().Equal("Pending", "Rejected");
+        }
     }
 }

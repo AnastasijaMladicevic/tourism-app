@@ -90,6 +90,22 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
+        public async Task GetById_KadaJeContentCreatorIVlasnik_VracaSopstvenuNeodobrenuAktivnost()
+        {
+            var mockService = new Mock<IActivityService>();
+            var dto = new ActivityDto { Id = 5, Name = "Moja aktivnost", Status = "Pending" };
+
+            mockService.Setup(s => s.GetMineByIdAsync(5, 5)).ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "ContentCreator"));
+
+            var result = await controller.GetById(5);
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
         public async Task GetById_KadaAktivnostNePostoji_VracaNotFound()
         {
             var mockService = new Mock<IActivityService>();
@@ -364,6 +380,31 @@ namespace TuristickiVodic.Tests.Controllers
             var result = await controller.Delete(1);
 
             result.Should().BeOfType<ForbidResult>();
+        }
+
+        [Fact]
+        public async Task GetMy_ContentCreator_VracaPagedRezultat()
+        {
+            var mockService = new Mock<IActivityService>();
+            var paged = new PagedResultDto<ActivityDto>
+            {
+                Items = new List<ActivityDto>
+                {
+                    new ActivityDto { Id = 1, Name = "Moja aktivnost", Status = "Pending" }
+                },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 1,
+                TotalPages = 1
+            };
+
+            mockService.Setup(s => s.GetMyAsync(5, It.IsAny<ActivityQueryDto>())).ReturnsAsync(paged);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "ContentCreator"));
+            var result = await controller.GetMy(new ActivityQueryDto());
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(paged);
         }
     }
 }

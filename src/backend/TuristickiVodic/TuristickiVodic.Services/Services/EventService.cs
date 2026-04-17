@@ -139,6 +139,70 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
+        public async Task<PagedResultDto<EventDto>> GetMyAsync(int userId, EventQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var eventsQuery = _context.Events
+                .Include(e => e.EventType)
+                .Include(e => e.Destination)
+                .Include(e => e.Locality)
+                .Include(e => e.Object)
+                .Include(e => e.Images)
+                .Where(e => e.CreatedByUserId == userId)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    e.EventType != null &&
+                    e.EventType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    e.Destination != null &&
+                    e.Destination.Name.ToLower().Contains(destination));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    e.Name.ToLower().Contains(search) ||
+                    (e.Description != null && e.Description.ToLower().Contains(search)));
+            }
+
+            eventsQuery = ApplyStatusFilter(eventsQuery, query.Status);
+            eventsQuery = ApplySorting(eventsQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await eventsQuery.CountAsync();
+
+            var items = await eventsQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToListAsync();
+
+            return new PagedResultDto<EventDto>
+            {
+                Items = _mapper.Map<List<EventDto>>(items),
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
         public async Task<EventDto?> GetByIdAsync(int id)
         {
             var ev = await _context.Events
@@ -162,12 +226,27 @@ namespace TuristickiVodic.Services.Services
             return _mapper.Map<EventDto>(ev);
         }
 
+        public async Task<EventDto?> GetMineByIdAsync(int id, int userId)
+        {
+            var ev = await _context.Events
+                .Include(e => e.EventType)
+                .Include(e => e.Locality)
+                .Include(e => e.Destination)
+                .Include(e => e.Object)
+                .Include(e => e.Images)
+                .FirstOrDefaultAsync(e => e.Id == id && e.CreatedByUserId == userId);
+
+            return ev == null ? null : _mapper.Map<EventDto>(ev);
+        }
+
         public async Task<EventDto> CreateAsync(CreateEventDto dto, int userId, string roleName)
         {
             await ValidateReferences(dto.EventTypeId, dto.LocalityId, dto.DestinationId, dto.ObjectId);
 
             if (roleName != "ContentCreator")
                 throw new UnauthorizedAccessException("Only content creators can create events.");
+
+            ValidateEventPayload(dto.StartDate, dto.EndDate, dto.Price, dto.MaxVisitors, dto.Longitude, dto.Latitude);
 
             if (dto.EndDate.HasValue && dto.EndDate.Value < dto.StartDate)
                 throw new InvalidOperationException("End date cannot be before start date.");
@@ -237,6 +316,15 @@ namespace TuristickiVodic.Services.Services
 
             if (ev.CreatedByUserId != userId)
                 throw new UnauthorizedAccessException("You can update only your own events.");
+
+            if ((dto.Longitude.HasValue && !dto.Latitude.HasValue) || (!dto.Longitude.HasValue && dto.Latitude.HasValue))
+                throw new InvalidOperationException("Both longitude and latitude must be provided together.");
+
+            if (dto.Price.HasValue && dto.Price.Value < 0)
+                throw new InvalidOperationException("Price cannot be negative.");
+
+            if (dto.MaxVisitors.HasValue && dto.MaxVisitors.Value <= 0)
+                throw new InvalidOperationException("MaxVisitors must be greater than 0.");
 
             if (dto.EventTypeId.HasValue)
             {
@@ -391,6 +479,24 @@ namespace TuristickiVodic.Services.Services
                 throw new InvalidOperationException("Object not found.");
         }
 
+        private static void ValidateEventPayload(DateTime startDate, DateTime? endDate, decimal? price, int? maxVisitors, double? longitude, double? latitude)
+        {
+            if (startDate == default)
+                throw new InvalidOperationException("Start date is required.");
+
+            if ((longitude.HasValue && !latitude.HasValue) || (!longitude.HasValue && latitude.HasValue))
+                throw new InvalidOperationException("Both longitude and latitude must be provided together.");
+
+            if (price.HasValue && price.Value < 0)
+                throw new InvalidOperationException("Price cannot be negative.");
+
+            if (maxVisitors.HasValue && maxVisitors.Value <= 0)
+                throw new InvalidOperationException("MaxVisitors must be greater than 0.");
+
+            if (endDate.HasValue && endDate.Value < startDate)
+                throw new InvalidOperationException("End date cannot be before start date.");
+        }
+
         private static Point? CreatePoint(double? longitude, double? latitude)
         {
             if (!longitude.HasValue || !latitude.HasValue)
@@ -500,6 +606,17 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
+        private static IQueryable<Event> ApplyStatusFilter(IQueryable<Event> query, string? status)
+        {
+            if (string.IsNullOrWhiteSpace(status))
+                return query;
+
+            if (!Enum.TryParse<ContentStatus>(status.Trim(), true, out var parsedStatus))
+                return query.Where(_ => false);
+
+            return query.Where(e => e.Status == parsedStatus);
+        }
+
         private static IQueryable<Event> ApplySorting(IQueryable<Event> query, string? sortBy, string? sortOrder)
         {
             var sortByValue = sortBy?.Trim().ToLower();
@@ -524,6 +641,13 @@ namespace TuristickiVodic.Services.Services
                 return isDesc
                     ? query.OrderByDescending(e => e.Destination!.Name)
                     : query.OrderBy(e => e.Destination!.Name);
+            }
+
+            if (sortByValue == "status")
+            {
+                return isDesc
+                    ? query.OrderByDescending(e => e.Status)
+                    : query.OrderBy(e => e.Status);
             }
 
             return isDesc

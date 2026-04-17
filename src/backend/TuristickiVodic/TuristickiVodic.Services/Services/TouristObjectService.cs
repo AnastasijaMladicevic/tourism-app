@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using System;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
@@ -157,6 +158,119 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
+        public async Task<PagedResultDto<TouristObjectDto>> GetMyAsync(int userId, TouristObjectQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var objectsQuery = _context.Objects
+                .Include(o => o.ObjectType)
+                .Include(o => o.Destination)
+                .Include(o => o.Locality)
+                    .ThenInclude(l => l.Destination)
+                .Include(o => o.Images)
+                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
+                    .ThenInclude(r => r.User)
+                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
+                    .ThenInclude(r => r.ReviewedBy)
+                .Where(o => o.CreatedByUserId == userId)
+                .AsSplitQuery()
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+                objectsQuery = objectsQuery.Where(o =>
+                    o.ObjectType != null &&
+                    o.ObjectType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+                objectsQuery = objectsQuery.Where(o =>
+                    ((o.Destination != null && o.Destination.Name.ToLower().Contains(destination)) ||
+                     (o.Destination == null && o.Locality != null && o.Locality.Destination != null && o.Locality.Destination.Name.ToLower().Contains(destination))));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Locality))
+            {
+                var locality = query.Locality.Trim().ToLower();
+                objectsQuery = objectsQuery.Where(o =>
+                    o.Locality != null &&
+                    o.Locality.Name.ToLower().Contains(locality));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+                objectsQuery = objectsQuery.Where(o =>
+                    o.Name.ToLower().Contains(search) ||
+                    (o.Description != null && o.Description.ToLower().Contains(search)));
+            }
+
+            objectsQuery = ApplyStatusFilter(objectsQuery, query.Status);
+
+            var requestedAmenities = NormalizeAmenities(query.Amenities);
+            if (requestedAmenities.Length > 0)
+            {
+                foreach (var amenity in requestedAmenities)
+                {
+                    objectsQuery = objectsQuery.Where(o =>
+                        o.Amenities != null &&
+                        o.Amenities.Contains(amenity));
+                }
+            }
+
+            if (query.MinPrice.HasValue)
+            {
+                objectsQuery = objectsQuery.Where(o =>
+                    o.Price.HasValue &&
+                    o.Price.Value >= query.MinPrice.Value);
+            }
+
+            if (query.MaxPrice.HasValue)
+            {
+                objectsQuery = objectsQuery.Where(o =>
+                    o.Price.HasValue &&
+                    o.Price.Value <= query.MaxPrice.Value);
+            }
+
+            if (query.MinRating.HasValue)
+            {
+                objectsQuery = objectsQuery.Where(o => o.AverageRating >= query.MinRating.Value);
+            }
+
+            if (query.MaxRating.HasValue)
+            {
+                objectsQuery = objectsQuery.Where(o => o.AverageRating <= query.MaxRating.Value);
+            }
+
+            objectsQuery = ApplyObjectSorting(objectsQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await objectsQuery.CountAsync();
+
+            var items = await objectsQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToListAsync();
+
+            return new PagedResultDto<TouristObjectDto>
+            {
+                Items = _mapper.Map<List<TouristObjectDto>>(items),
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
         public async Task<TouristObjectDto?> GetByIdAsync(int id)
         {
             var obj = await LoadObjectAsync(id);
@@ -173,10 +287,22 @@ namespace TuristickiVodic.Services.Services
             return _mapper.Map<TouristObjectDto>(obj);
         }
 
+        public async Task<TouristObjectDto?> GetMineByIdAsync(int id, int userId)
+        {
+            var obj = await LoadObjectAsync(id);
+            if (obj == null || obj.CreatedByUserId != userId)
+                return null;
+
+            return _mapper.Map<TouristObjectDto>(obj);
+        }
+
         // Samo CC može da kreira objekte; status uvek Pending, čeka odobrenje
         // Objekat mora imati destinaciju; lokalitet je opcioni, ali ako postoji mora pripadati toj destinaciji
         public async Task<TouristObjectDto> CreateAsync(CreateTouristObjectDto dto, int userId, string roleName)
         {
+            if ((dto.Longitude.HasValue && !dto.Latitude.HasValue) || (!dto.Longitude.HasValue && dto.Latitude.HasValue))
+                throw new InvalidOperationException("Both longitude and latitude must be provided together.");
+
             Locality? locality = null;
             if (dto.LocalityId.HasValue)
             {
@@ -244,6 +370,9 @@ namespace TuristickiVodic.Services.Services
 
             if (obj.CreatedByUserId != userId)
                 throw new UnauthorizedAccessException("You can only update your own objects.");
+
+            if ((dto.Longitude.HasValue && !dto.Latitude.HasValue) || (!dto.Longitude.HasValue && dto.Latitude.HasValue))
+                throw new InvalidOperationException("Both longitude and latitude must be provided together.");
 
             if (dto.ObjectTypeId.HasValue)
             {
@@ -443,6 +572,17 @@ namespace TuristickiVodic.Services.Services
             return await GetAllAsync(query);
         }
 
+        private static IQueryable<TouristObject> ApplyStatusFilter(IQueryable<TouristObject> query, string? status)
+        {
+            if (string.IsNullOrWhiteSpace(status))
+                return query;
+
+            if (!Enum.TryParse<ContentStatus>(status.Trim(), true, out var parsedStatus))
+                return query.Where(_ => false);
+
+            return query.Where(o => o.Status == parsedStatus);
+        }
+
         private static IQueryable<TouristObject> ApplyObjectSorting(IQueryable<TouristObject> query, string? sortBy, string? sortOrder)
         {
             var sortByValue = sortBy?.Trim().ToLower();
@@ -488,6 +628,13 @@ namespace TuristickiVodic.Services.Services
                 return isDesc
                     ? query.OrderByDescending(o => o.Price ?? decimal.MinValue)
                     : query.OrderBy(o => o.Price ?? decimal.MaxValue);
+            }
+
+            if (sortByValue == "status")
+            {
+                return isDesc
+                    ? query.OrderByDescending(o => o.Status)
+                    : query.OrderBy(o => o.Status);
             }
 
             return isDesc
