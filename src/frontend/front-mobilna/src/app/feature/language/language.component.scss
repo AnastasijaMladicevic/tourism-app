@@ -224,22 +224,123 @@
 }
 
 @media (min-width: 768px) {
-  .language-shell,
-  .language-footer p,
-  .apply-btn {
-    width: min(100%, 520px);
-  }
-
-  .language-shell {
-    padding-top: 24px;
+  .language-page {
+    min-height: 100%;
+    padding: 12px 24px 28px;
   }
 
   .language-topbar {
-    min-height: 84px;
-    padding-top: 20px;
+    width: min(100%, 700px);
+    margin: 0 auto 4px;
+    min-height: 76px;
+    padding: 16px 0 8px;
+    background: transparent;
+    border-bottom: none;
+    backdrop-filter: none;
 
     h1 {
       font-size: 22px;
     }
+  }
+
+  .language-shell,
+  .language-footer p,
+  .apply-btn {
+    width: min(100%, 700px);
+  }
+
+  .language-shell {
+    padding: 8px 0 14px;
+  }
+
+  .language-section {
+    h2 {
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+  }
+
+  .language-card {
+    border-radius: 24px;
+  }
+
+  .language-option {
+    padding: 18px 20px 17px;
+  }
+
+  .language-option__content {
+    strong {
+      font-size: 18px;
+    }
+
+    span {
+      font-size: 11px;
+    }
+  }
+
+  .language-option__radio {
+    width: 30px;
+    height: 30px;
+
+    &--active span {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  .language-note {
+    margin-top: 18px;
+    border-radius: 22px;
+    padding: 18px 18px 16px;
+  }
+
+  .language-note__icon {
+    width: 24px;
+    height: 24px;
+    font-size: 13px;
+  }
+
+  .language-note__content {
+    strong {
+      font-size: 15px;
+    }
+
+    p {
+      font-size: 13px;
+    }
+  }
+
+  .language-feedback {
+    margin-top: 14px;
+    font-size: 13px;
+  }
+
+  .language-footer {
+    width: min(100%, 700px);
+    margin: 0 auto;
+    padding: 8px 0 0;
+    background: transparent;
+    border-top: none;
+
+    p {
+      margin-top: 12px;
+      font-size: 12px;
+    }
+  }
+
+  .apply-btn {
+    border-radius: 20px;
+    padding: 17px 20px;
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .language-shell,
+  .language-footer,
+  .language-topbar,
+  .language-footer p,
+  .apply-btn {
+    width: min(100%, 760px);
   }
 }

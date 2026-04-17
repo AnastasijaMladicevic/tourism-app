@@ -280,21 +280,135 @@
 }
 
 @media (min-width: 768px) {
-  .support-shell {
-    width: min(100%, 560px);
-    padding-top: 24px;
+  .support-page {
+    min-height: 100%;
+    padding: 12px 24px 28px;
   }
 
   .support-topbar {
-    min-height: 84px;
-    padding-top: 20px;
+    width: min(100%, 700px);
+    margin: 0 auto 4px;
+    min-height: 76px;
+    padding: 16px 0 8px;
+    background: transparent;
+    border-bottom: none;
+    backdrop-filter: none;
 
     h1 {
       font-size: 22px;
     }
   }
 
-  .support-hero h2 {
-    font-size: 34px;
+  .support-shell {
+    width: min(100%, 700px);
+    padding: 8px 0 14px;
+  }
+
+  .support-hero {
+    margin-bottom: 18px;
+
+    h2 {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+  }
+
+  .search-box {
+    min-height: 50px;
+    padding: 0 16px;
+    border-radius: 18px;
+
+    input {
+      font-size: 13px;
+    }
+  }
+
+  .support-section {
+    margin-top: 20px;
+
+    h3 {
+      margin-bottom: 14px;
+      font-size: 19px;
+    }
+  }
+
+  .faq-card {
+    border-radius: 24px;
+  }
+
+  .faq-item {
+    padding: 18px 18px 17px;
+
+    p {
+      margin-top: 10px;
+      font-size: 13px;
+    }
+  }
+
+  .faq-item__row span:first-child {
+    font-size: 15px;
+  }
+
+  .contact-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .contact-card {
+    min-height: 96px;
+    border-radius: 22px;
+    padding: 16px;
+  }
+
+  .contact-card__icon {
+    width: 46px;
+    height: 46px;
+    font-size: 20px;
+  }
+
+  .contact-card__content {
+    strong {
+      font-size: 15px;
+    }
+
+    span {
+      font-size: 13px;
+      line-height: 1.45;
+    }
+  }
+
+  .hours-card {
+    margin-top: 22px;
+    border-radius: 24px;
+    padding: 18px 18px 14px;
+  }
+
+  .hours-card__title {
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+
+  .hours-grid {
+    gap: 18px;
+
+    span {
+      font-size: 12px;
+    }
+
+    strong {
+      font-size: 18px;
+    }
+  }
+
+  .hours-card p {
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .support-topbar,
+  .support-shell {
+    width: min(100%, 760px);
   }
 }
