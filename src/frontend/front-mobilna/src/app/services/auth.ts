@@ -133,6 +133,10 @@ export class AuthService {
     return this.http.post<{ message: string }>(`${this.url}/${userId}/change-password`, dto);
   }
 
+  requestCreatorRole(userId: number, creatorType: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.url}/${userId}/request-creator`, creatorType);
+  }
+
   getToken(): string | null {
     return localStorage.getItem('token');
   }

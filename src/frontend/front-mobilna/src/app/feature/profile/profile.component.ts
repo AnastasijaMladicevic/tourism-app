@@ -70,7 +70,12 @@ export class ProfileComponent implements OnInit {
       items: [
         { title: 'Privatnost i podaci', icon: 'shield', accent: 'blue' },
         { title: 'Uslovi korišćenja', icon: 'document', accent: 'gray', route: '/terms' },
-        { title: 'Zatraži dozvolu za moderatora', icon: 'document', accent: 'gray' },
+        {
+          title: 'Zatraži dozvolu za moderatora',
+          icon: 'document',
+          accent: 'gray',
+          route: '/moderator-access',
+        },
         { title: 'Odjavi se', icon: 'logout', accent: 'red', action: 'logout' },
       ],
     },

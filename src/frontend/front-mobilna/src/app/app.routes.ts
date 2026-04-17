@@ -45,6 +45,13 @@ export const routes: Routes = [
       import('./feature/support/support.component').then((m) => m.SupportComponent),
   },
   {
+    path: 'moderator-access',
+    loadComponent: () =>
+      import('./feature/moderator-access/moderator-access.component').then(
+        (m) => m.ModeratorAccessComponent,
+      ),
+  },
+  {
     path: 'code-verification',
     loadComponent: () =>
       import('./feature/auth/code-verification/code-verification').then(
