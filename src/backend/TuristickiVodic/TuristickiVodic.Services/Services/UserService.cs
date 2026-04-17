@@ -15,6 +15,7 @@ namespace TuristickiVodic.Services
 {
     public class UserService : IUserService
     {
+        private const int ResetCodeLifetimeMinutes = 5;
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
@@ -279,7 +280,7 @@ namespace TuristickiVodic.Services
             var resetCode = GenerateResetCode();
 
             user.ResetToken = HashResetToken(resetCode);
-            user.ResetTokenExpiry = DateTime.UtcNow.AddMinutes(15);
+            user.ResetTokenExpiry = DateTime.UtcNow.AddMinutes(ResetCodeLifetimeMinutes);
             user.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -287,7 +288,7 @@ namespace TuristickiVodic.Services
             await _emailService.SendAsync(
                 user.Email,
                 "Kod za reset lozinke",
-                BuildResetPasswordEmailBody(user.FirstName, resetCode, user.ResetTokenExpiry.Value));
+                BuildResetPasswordEmailBodyForFiveMinuteExpiry(user.FirstName, resetCode, user.ResetTokenExpiry.Value));
         }
 
         public async Task ResetPasswordAsync(ResetPasswordDto dto)
@@ -553,6 +554,19 @@ namespace TuristickiVodic.Services
         private static string GenerateResetCode()
         {
             return RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
+        }
+
+        private static string BuildResetPasswordEmailBodyForFiveMinuteExpiry(string firstName, string resetCode, DateTime expiresAtUtc)
+        {
+            return $@"
+                <div style=""font-family: Arial, sans-serif; line-height: 1.6;"">
+                    <h2>Reset lozinke</h2>
+                    <p>Zdravo {System.Net.WebUtility.HtmlEncode(firstName)},</p>
+                    <p>Tvoj kod za reset lozinke je:</p>
+                    <p style=""font-size: 28px; font-weight: bold; letter-spacing: 4px;"">{resetCode}</p>
+                    <p>Kod vazi 5 minuta, odnosno do {expiresAtUtc.ToLocalTime():dd.MM.yyyy. HH:mm}.</p>
+                    <p>Ako nisi ti trazio reset lozinke, slobodno ignorisi ovu poruku.</p>
+                </div>";
         }
 
         private static string BuildResetPasswordEmailBody(string firstName, string resetCode, DateTime expiresAtUtc)

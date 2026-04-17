@@ -1672,7 +1672,7 @@ namespace TuristickiVodic.Tests.Services
             user.Should().NotBeNull();
             user!.ResetToken.Should().NotBeNullOrWhiteSpace();
             user.ResetTokenExpiry.Should().NotBeNull();
-            user.ResetTokenExpiry.Should().BeAfter(DateTime.UtcNow.AddMinutes(10));
+            user.ResetTokenExpiry.Should().BeAfter(DateTime.UtcNow.AddMinutes(3));
 
             emailSvc.Verify(s => s.SendAsync(
                 "ana@test.com",
@@ -1720,7 +1720,7 @@ namespace TuristickiVodic.Tests.Services
                 IsActive = true,
                 IsBlacklisted = false,
                 ResetToken = hashedCode,
-                ResetTokenExpiry = DateTime.UtcNow.AddMinutes(15),
+                ResetTokenExpiry = DateTime.UtcNow.AddMinutes(5),
                 DateOfBirth = new DateTime(1995, 1, 1)
             });
             await ctx.SaveChangesAsync();
@@ -1760,7 +1760,7 @@ namespace TuristickiVodic.Tests.Services
                 IsActive = true,
                 IsBlacklisted = false,
                 ResetToken = "pogresan-hash",
-                ResetTokenExpiry = DateTime.UtcNow.AddMinutes(15),
+                ResetTokenExpiry = DateTime.UtcNow.AddMinutes(5),
                 DateOfBirth = new DateTime(1995, 1, 1)
             });
             await ctx.SaveChangesAsync();
