@@ -61,7 +61,7 @@ export class ProfileComponent implements OnInit {
     {
       title: 'PODEŠAVANJA',
       items: [
-        { title: 'Jezik', icon: 'language', accent: 'green' },
+        { title: 'Jezik', icon: 'language', accent: 'green', route: '/language' },
         { title: 'Pomoć i podrška', icon: 'help', accent: 'gray' },
       ],
     },
