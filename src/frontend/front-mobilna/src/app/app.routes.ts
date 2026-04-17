@@ -30,6 +30,11 @@ export const routes: Routes = [
     loadComponent: () => import('./feature/terms/terms.component').then((m) => m.TermsComponent),
   },
   {
+    path: 'about',
+    loadComponent: () =>
+      import('./feature/about/about.component').then((m) => m.AboutComponent),
+  },
+  {
     path: 'code-verification',
     loadComponent: () =>
       import('./feature/auth/code-verification/code-verification').then(
