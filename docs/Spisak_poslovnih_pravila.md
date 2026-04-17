@@ -1,20 +1,29 @@
 **KORISNICI**
 
 - Registracija kreira nalog sa ulogom `Tourist`.
+- Novoregistrovani korisnik se kreira kao aktivan (`IsActive = true`) i nije blacklistovan (`IsBlacklisted = false`).
 - Korisnik može da vidi samo svoj profil; `Admin` može da vidi bilo kog korisnika.
 - Korisnik može da menja samo svoj profil; `Admin` može da menja bilo kog korisnika.
 - Korisnik može da menja lozinku samo sebi; `Admin` može da menja lozinku bilo kom korisniku.
 - Samo `Admin` može da pretražuje korisnike po email adresi, imenu i prezimenu i da vidi listu korisnika.
 - Samo `Admin` može da aktivira/deaktivira korisnike.
+- Deaktiviran korisnik ne može da se prijavi niti da koristi refresh token dok ga `Admin` ponovo ne aktivira.
 - `Admin` ne može da obriše sam sebe.
 - Samo `Tourist` može da pošalje zahtev za `ContentCreator` ulogu, i to samo za sebe.
 - Samo `Admin` može da odobri `ContentCreator` ulogu.
 - Uloga `ContentCreator`-a se odobrava samo ako je turista poslao zahtev za nju.
-- Za forgot password:
-    - ako `email postoji` i nalog je validan, šalje se kod.
-    - ako `email ne postoji`, vraća se greška: `Korisnik sa ovom email adresom jos uvek nije registrovan`.
-    - ako nalog `nije aktivan`, vraća se: `Korisnicki nalog nije aktivan`.
-    - ako je nalog `blacklisted`, vraća se: `Reset lozinke nije dostupan za ovaj nalog`.
+- Blacklistovan korisnik ne može da se prijavi, da koristi refresh token, da zatraži `ContentCreator` ulogu niti da bude odobren za `ContentCreator` ulogu.
+
+
+**FORGOT PASSWORD**
+
+- Kod za reset lozinke može da se pošalje samo ako email postoji u bazi i nalog je validan.
+- Ako email ne postoji, vraća se greška da korisnik sa tom email adresom još uvek nije registrovan.
+- Ako nalog nije aktivan, vraća se greška da korisnički nalog nije aktivan.
+- Ako je nalog blacklistovan, reset lozinke nije dostupan za taj nalog.
+- Kod za reset lozinke važi `5` minuta.
+- Lozinka može biti resetovana samo uz validan i neistekao kod.
+
 
 **DESTINACIJE**
 
