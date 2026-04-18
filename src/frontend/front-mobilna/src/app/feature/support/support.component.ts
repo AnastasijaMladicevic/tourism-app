@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 interface FaqItem {
   question: string;
@@ -15,29 +15,32 @@ interface FaqItem {
   styleUrl: './support.component.scss',
 })
 export class SupportComponent {
+  private readonly route = inject(ActivatedRoute);
+
+  protected readonly backLink = this.route.snapshot.queryParamMap.get('returnTo') || '/profile';
   protected readonly query = signal('');
   protected readonly openIndex = signal<number | null>(1);
 
   protected readonly faqs: FaqItem[] = [
     {
-      question: 'Kako da platim turističku taksu?',
+      question: 'Kako da azuriram podatke na profilu?',
       answer:
-        'Turističku taksu možete platiti na recepciji smeštaja, u turističkom centru ili prema instrukcijama lokalne samouprave za destinaciju u kojoj boravite.',
+        'Na ekranu Izmeni profil mozes promeniti ime, prezime, telefon, drzavu i profilnu fotografiju koristeci postojece nalog opcije.',
     },
     {
-      question: 'Da li je aplikacija dostupna offline?',
+      question: 'Gde vidim sacuvane stavke?',
       answer:
-        'Osnovni pregled ranije učitanog sadržaja može biti dostupan i bez interneta, ali za ažurne informacije, mape i rezervacije preporučujemo aktivnu internet konekciju.',
+        'Favorites ekran prikazuje sve stavke sacuvane preko postojeceg API-ja i omogucava brzo uklanjanje onoga sto ti vise ne treba.',
     },
     {
-      question: 'Kako da otkažem rezervaciju karte?',
+      question: 'Kako radi planer putovanja?',
       answer:
-        'Otvaranjem detalja rezervacije možete proveriti uslove otkazivanja. Ako je otkazivanje dozvoljeno, pratite korake u potvrdi rezervacije ili kontaktirajte organizatora.',
+        'Planer trenutno radi lokalno na uredjaju i ne trazi backend izmene. Mozes sacuvati destinaciju, datum, beleske i checklistu.',
     },
     {
-      question: 'Gde mogu pronaći hitnu pomoć?',
+      question: 'Kako da promenim jezik aplikacije?',
       answer:
-        'Za hitne situacije koristite lokalne brojeve službi pomoći ili se obratite najbližem turističkom centru, hotelu ili zdravstvenoj ustanovi u mestu boravka.',
+        'Na ekranu Jezik mozes izabrati trenutno podrzanu varijantu i sacuvati promenu preko postojece korisnicke rute.',
     },
   ];
 
