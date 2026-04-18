@@ -1,196 +1,180 @@
-.page {
-  min-height: 100vh;
-  background: var(--bg);
-  display: flex;
-  flex-direction: column;
+.info-page {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at top center, rgba(22, 138, 173, 0.08), transparent 28%),
+    linear-gradient(180deg, #fbfeff 0%, #eef8fb 62%, #ebf6fa 100%);
 }
 
-.content {
-  flex: 1;
-  max-width: 420px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 16px 20px 36px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  animation: fadeUp 0.4s ease;
-}
+.info-topbar {
+  min-height: 76px;
+  padding: 18px 20px 10px;
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  border-bottom: 1px solid rgba(208, 234, 240, 0.9);
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(10px);
 
-@keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  h1 {
+    text-align: center;
+    font-size: 17px;
+    font-weight: 800;
+    color: #263945;
   }
 }
 
-/* Welcome card */
-.welcome-card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 16px;
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
+.back-btn,
+.topbar-spacer {
+  width: 40px;
+  height: 40px;
 }
 
-.welcome-icon {
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  background: var(--primary-light);
-  border-radius: 12px;
-  display: flex;
+.back-btn {
+  color: #203540;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--primary);
-}
-
-.welcome-text {
-  h3 {
-    font-size: 14px;
-    font-weight: 800;
-    color: var(--text-dark);
-    margin: 0 0 5px;
-  }
-
-  p {
-    font-size: 12px;
-    color: var(--text-gray);
-    font-weight: 500;
-    margin: 0;
-    line-height: 1.6;
-  }
-}
-
-/* Items card */
-.items-card {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 4px 16px;
-}
-
-.item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--border);
-
-  &--last {
-    border-bottom: none;
-  }
-}
-
-.item-badge {
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 1px;
+  text-decoration: none;
 
-  &--num {
-    background: var(--primary-light);
-    font-size: 11px;
-    font-weight: 800;
-    color: var(--primary);
-  }
-
-  &--check {
-    background: var(--primary);
+  svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 }
 
-.item-body {
-  h4 {
-    font-size: 13px;
-    font-weight: 800;
-    color: var(--text-dark);
-    margin: 0 0 4px;
+.info-shell {
+  width: min(100%, 430px);
+  margin: 0 auto;
+  padding: 18px 18px 30px;
+}
+
+.hero-card,
+.section-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(215, 229, 236, 0.95);
+  box-shadow: 0 14px 34px rgba(23, 110, 134, 0.06);
+}
+
+.hero-card {
+  border-radius: 24px;
+  padding: 20px 18px;
+  margin-bottom: 18px;
+
+  h2 {
+    margin: 8px 0 10px;
+    font-size: 24px;
+    line-height: 1.15;
+    font-weight: 900;
+    color: #1f2d35;
   }
 
   p {
-    font-size: 12px;
-    color: var(--text-gray);
-    font-weight: 500;
-    margin: 0;
-    line-height: 1.6;
+    color: #68808a;
+    font-size: 14px;
+    line-height: 1.65;
   }
 }
 
-/* Checkbox */
-.checkbox-row {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px 16px;
+.eyebrow {
+  display: inline-block;
+  color: #2a9ac4;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.section-card {
+  border-radius: 22px;
+  padding: 18px 16px;
+  margin-bottom: 16px;
+
+  h3 {
+    margin-bottom: 8px;
+    color: #22323a;
+    font-size: 17px;
+    font-weight: 900;
+  }
+}
+
+.section-card--muted {
+  background: rgba(248, 252, 254, 0.96);
+}
+
+.list-item {
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(227, 235, 239, 0.95);
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  p {
+    color: #62757d;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+}
+
+.bullet-list {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 12px;
 }
 
-.checkbox-box {
-  width: 22px;
-  height: 22px;
+.bullet-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  p {
+    color: #62757d;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+}
+
+.bullet-dot {
+  width: 9px;
+  height: 9px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: #2a9ac4;
   flex-shrink: 0;
-  background: var(--primary);
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.checkbox-label {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-dark);
-}
-
-/* Button */
-.btn-primary {
-  width: 100%;
-  padding: 16px;
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 16px;
-  font-family: 'Nunito', sans-serif;
-  font-size: 16px;
-  font-weight: 800;
-  cursor: pointer;
-  letter-spacing: 0.2px;
-  box-shadow: 0 4px 16px rgba(58, 181, 198, 0.3);
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(58, 181, 198, 0.4);
+@media (min-width: 768px) {
+  .info-page {
+    min-height: 100%;
+    padding: 12px 24px 28px;
   }
 
-  &:active {
-    transform: translateY(0);
-  }
-}
+  .info-topbar {
+    width: min(100%, 700px);
+    margin: 0 auto 4px;
+    min-height: 76px;
+    padding: 16px 0 8px;
+    background: transparent;
+    border-bottom: none;
+    backdrop-filter: none;
 
-/* Protected */
-.protected {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-gray);
-  padding-top: 4px;
+    h1 {
+      font-size: 22px;
+    }
+  }
+
+  .info-shell {
+    width: min(100%, 700px);
+    padding: 8px 0 14px;
+  }
 }
