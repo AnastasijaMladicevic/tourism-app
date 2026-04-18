@@ -1,0 +1,66 @@
+<div class="reviews-page">
+  <header class="reviews-topbar">
+    <a class="back-btn" routerLink="/profile" aria-label="Nazad">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m15 18-6-6 6-6" />
+      </svg>
+    </a>
+    <h1>Moje recenzije</h1>
+    <div class="topbar-spacer" aria-hidden="true"></div>
+  </header>
+
+  <div class="reviews-shell">
+    <section class="hero-card">
+      <span class="eyebrow">TVOJ UTISAK</span>
+      <h2>Sve recenzije koje si ostavio nalaze se ovde.</h2>
+      <p>Pregledaj sta si ocenio, kada je komentar ostavljen i da li postoji odgovor.</p>
+    </section>
+
+    @if (errorMessage()) {
+      <p class="feedback feedback--error">{{ errorMessage() }}</p>
+    }
+
+    @if (isLoading()) {
+      <section class="state-card">
+        <strong>Ucitavanje...</strong>
+        <p>Pripremamo tvoje recenzije.</p>
+      </section>
+    } @else if (!reviews().length) {
+      <section class="state-card">
+        <strong>Jos nemas recenzija</strong>
+        <p>Kada ostavis komentar na objekat ili destinaciju, ovde ces ga videti.</p>
+      </section>
+    } @else {
+      <section class="reviews-list">
+        @for (item of reviews(); track trackReview($index, item)) {
+          <article class="review-card">
+            <div class="review-card__header">
+              <div>
+                <span class="status-badge">{{ item.statusLabel }}</span>
+                <h3>{{ item.objectName }}</h3>
+              </div>
+              <div class="rating-box" [attr.aria-label]="'Ocena ' + item.ratingLabel">
+                <div class="stars">
+                  @for (star of item.ratingStars; track $index) {
+                    <span>{{ star === 'star' ? '★' : '' }}</span>
+                  }
+                </div>
+                <strong>{{ item.ratingLabel }}</strong>
+              </div>
+            </div>
+
+            <p class="review-text">{{ item.text }}</p>
+            <p class="review-date">Objavljeno: {{ item.createdLabel }}</p>
+
+            @if (item.creatorResponse) {
+              <div class="response-card">
+                <strong>Odgovor kreatora</strong>
+                <p>{{ item.creatorResponse }}</p>
+              </div>
+            }
+          </article>
+        }
+      </section>
+    }
+  </div>
+</div>
