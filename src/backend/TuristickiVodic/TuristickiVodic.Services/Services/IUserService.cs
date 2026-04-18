@@ -25,5 +25,8 @@ namespace TuristickiVodic.Services
         Task<PagedResultDto<CreatorRoleRequestDto>> GetCreatorRequestsAsync(CreatorRoleRequestQueryDto query);
         Task<UserDto?> UpdateProfileImageAsync(int id, IFormFile file);
         Task<UserDto?> RemoveProfileImageAsync(int id);
+        Task<UserLocationDto?> GetCurrentLocationAsync(int userId);
+        Task<UserLocationDto?> UpdateCurrentLocationAsync(int userId, UpdateUserLocationDto dto);
+        Task<bool> ClearCurrentLocationAsync(int userId);
     }
 }

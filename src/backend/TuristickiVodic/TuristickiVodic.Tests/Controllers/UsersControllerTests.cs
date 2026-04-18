@@ -248,6 +248,67 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
+        public async Task GetMyLocation_KadaLokacijaPostoji_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            var dto = new UserLocationDto
+            {
+                Longitude = 18.77,
+                Latitude = 42.42,
+                AccuracyMeters = 35,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            mockService.Setup(s => s.GetCurrentLocationAsync(5)).ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
+            var result = await controller.GetMyLocation();
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
+        public async Task UpdateMyLocation_KadaDtoValidan_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            var response = new UserLocationDto
+            {
+                Longitude = 18.77,
+                Latitude = 42.42,
+                AccuracyMeters = 40,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            mockService
+                .Setup(s => s.UpdateCurrentLocationAsync(5, It.IsAny<UpdateUserLocationDto>()))
+                .ReturnsAsync(response);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
+            var result = await controller.UpdateMyLocation(new UpdateUserLocationDto
+            {
+                Longitude = 18.77,
+                Latitude = 42.42,
+                AccuracyMeters = 40
+            });
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(response);
+        }
+
+        [Fact]
+        public async Task ClearMyLocation_KadaLokacijaPostoji_VracaNoContent()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.ClearCurrentLocationAsync(5)).ReturnsAsync(true);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
+            var result = await controller.ClearMyLocation();
+
+            result.Should().BeOfType<NoContentResult>();
+        }
+
+        [Fact]
         public async Task Delete_KadaManagerImaDestinaciju_VracaBadRequest()
         {
             var mockService = new Mock<IUserService>();

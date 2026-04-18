@@ -1012,6 +1012,15 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .HasMaxLength(5)
                         .HasColumnType("character varying(5)");
 
+                    b.Property<double?>("LastLocationAccuracyMeters")
+                        .HasColumnType("double precision");
+
+                    b.Property<Point>("LastKnownLocation")
+                        .HasColumnType("geometry");
+
+                    b.Property<DateTime?>("LastLocationUpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -1054,6 +1063,10 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.HasIndex("Email")
                         .IsUnique();
+
+                    b.HasIndex("LastKnownLocation");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("LastKnownLocation"), "GIST");
 
                     b.HasIndex("RoleId");
 

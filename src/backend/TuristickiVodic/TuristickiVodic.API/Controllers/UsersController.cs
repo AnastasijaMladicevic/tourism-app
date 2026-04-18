@@ -46,6 +46,45 @@ namespace TuristickiVodic.API.Controllers
             return Ok(user);
         }
 
+        [HttpGet("me/location")]
+        public async Task<IActionResult> GetMyLocation()
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var location = await _userService.GetCurrentLocationAsync(currentUserId);
+
+            if (location == null)
+                return NotFound();
+
+            return Ok(location);
+        }
+
+        [HttpPut("me/location")]
+        public async Task<IActionResult> UpdateMyLocation([FromBody] UpdateUserLocationDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var location = await _userService.UpdateCurrentLocationAsync(currentUserId, dto);
+
+            if (location == null)
+                return NotFound();
+
+            return Ok(location);
+        }
+
+        [HttpDelete("me/location")]
+        public async Task<IActionResult> ClearMyLocation()
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var cleared = await _userService.ClearCurrentLocationAsync(currentUserId);
+
+            if (!cleared)
+                return NotFound();
+
+            return NoContent();
+        }
+
         // Samo Admin može da traži korisnika po emailu
         [HttpGet("email/{email}")]
         [Authorize(Roles = "Admin")]

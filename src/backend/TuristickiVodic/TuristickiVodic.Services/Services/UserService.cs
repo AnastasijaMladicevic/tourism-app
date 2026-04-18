@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 using System.Security.Cryptography;
 using System.Text;
 using TuristickiVodic.Core.DTO;
@@ -114,6 +115,64 @@ namespace TuristickiVodic.Services
                 .FirstOrDefaultAsync(u => u.Email == email);
 
             return user == null ? null : _mapper.Map<UserDto>(user);
+        }
+
+        public async Task<UserLocationDto?> GetCurrentLocationAsync(int userId)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null || user.LastKnownLocation == null || !user.LastLocationUpdatedAt.HasValue)
+                return null;
+
+            return new UserLocationDto
+            {
+                Longitude = user.LastKnownLocation.X,
+                Latitude = user.LastKnownLocation.Y,
+                AccuracyMeters = user.LastLocationAccuracyMeters,
+                UpdatedAt = user.LastLocationUpdatedAt.Value
+            };
+        }
+
+        public async Task<UserLocationDto?> UpdateCurrentLocationAsync(int userId, UpdateUserLocationDto dto)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return null;
+
+            user.LastKnownLocation = new Point(dto.Longitude, dto.Latitude) { SRID = 4326 };
+            user.LastLocationAccuracyMeters = dto.AccuracyMeters;
+            user.LastLocationUpdatedAt = DateTime.UtcNow;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return new UserLocationDto
+            {
+                Longitude = user.LastKnownLocation.X,
+                Latitude = user.LastKnownLocation.Y,
+                AccuracyMeters = user.LastLocationAccuracyMeters,
+                UpdatedAt = user.LastLocationUpdatedAt.Value
+            };
+        }
+
+        public async Task<bool> ClearCurrentLocationAsync(int userId)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return false;
+
+            user.LastKnownLocation = null;
+            user.LastLocationAccuracyMeters = null;
+            user.LastLocationUpdatedAt = null;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         public async Task<UserDto> CreateAsync(CreateUserDto createUserDto)

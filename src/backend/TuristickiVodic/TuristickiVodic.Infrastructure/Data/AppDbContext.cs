@@ -45,6 +45,10 @@ public class AppDbContext : DbContext
             .IsUnique();
 
         mb.Entity<User>()
+            .HasIndex(u => u.LastKnownLocation)
+            .HasMethod("GIST");
+
+        mb.Entity<User>()
             .HasOne(u => u.Role)
             .WithMany(r => r.Users)
             .HasForeignKey(u => u.RoleId)
