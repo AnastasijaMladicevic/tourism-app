@@ -148,6 +148,17 @@
   }
 }
 
+.field-error {
+  color: #d75656;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: -2px;
+}
+
+.field-error--standalone {
+  margin: -4px 0 12px;
+}
+
 .field-box {
   height: 50px;
   border-radius: 14px;
@@ -275,6 +286,45 @@
   margin-bottom: 14px;
 }
 
+.language-picker {
+  margin: -2px 0 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(207, 224, 230, 0.95);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 8px 22px rgba(56, 101, 117, 0.06);
+  overflow: hidden;
+}
+
+.language-option {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid rgba(227, 235, 239, 0.95);
+  background: transparent;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #42545c;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.language-option--active {
+  background: #f2fbfe;
+  color: #1b8bb7;
+}
+
+.language-option__check {
+  font-size: 14px;
+  font-weight: 900;
+}
+
 .language-card__icon {
   width: 26px;
   height: 26px;
@@ -332,6 +382,11 @@
   font-size: 17px;
   font-weight: 800;
   box-shadow: 0 14px 26px rgba(20, 142, 182, 0.22);
+
+  &:disabled {
+    opacity: 0.7;
+    box-shadow: none;
+  }
 }
 
 .cancel-button {
@@ -341,6 +396,10 @@
   font-size: 15px;
   font-weight: 800;
   padding: 4px 0 0;
+
+  &:disabled {
+    opacity: 0.65;
+  }
 }
 
 .feedback {

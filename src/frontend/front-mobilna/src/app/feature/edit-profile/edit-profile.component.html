@@ -41,19 +41,25 @@
       <label class="field">
         <span>Ime</span>
         <div class="field-box">
-          <input [ngModel]="name()" (ngModelChange)="name.set($event)" type="text" />
+          <input [ngModel]="name()" (ngModelChange)="updateName($event)" type="text" />
         </div>
+        @if (fieldErrors().name) {
+          <small class="field-error">{{ fieldErrors().name }}</small>
+        }
       </label>
 
       <label class="field">
         <span>Prezime</span>
         <div class="field-box">
-          <input [ngModel]="lastName()" (ngModelChange)="lastName.set($event)" type="text" />
+          <input [ngModel]="lastName()" (ngModelChange)="updateLastName($event)" type="text" />
         </div>
+        @if (fieldErrors().lastName) {
+          <small class="field-error">{{ fieldErrors().lastName }}</small>
+        }
       </label>
 
       <label class="field">
-        <span>Država</span>
+        <span>Drzava</span>
         <div class="field-box field-box--select">
           <div class="field-prefix">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -62,11 +68,14 @@
               />
             </svg>
           </div>
-          <input [ngModel]="country()" (ngModelChange)="country.set($event)" type="text" />
+          <input [ngModel]="country()" (ngModelChange)="updateCountry($event)" type="text" />
           <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
             <path d="m9 6 6 6-6 6" />
           </svg>
         </div>
+        @if (fieldErrors().country) {
+          <small class="field-error">{{ fieldErrors().country }}</small>
+        }
       </label>
 
       <label class="field">
@@ -92,8 +101,11 @@
               />
             </svg>
           </div>
-          <input [ngModel]="phone()" (ngModelChange)="phone.set($event)" type="tel" />
+          <input [ngModel]="phone()" (ngModelChange)="updatePhone($event)" type="tel" />
         </div>
+        @if (fieldErrors().phone) {
+          <small class="field-error">{{ fieldErrors().phone }}</small>
+        }
       </label>
     </section>
 
@@ -102,7 +114,7 @@
         <div>
           <h2>Tvoja interesovanja</h2>
         </div>
-        <span>Odaberi bar 3</span>
+        <span>Izabrano: {{ selectedInterestCount() }}</span>
       </div>
 
       <div class="interest-chips">
@@ -122,7 +134,7 @@
       </div>
     </section>
 
-    <button class="language-card" type="button" (click)="openLanguagePicker()">
+    <button class="language-card" type="button" (click)="toggleLanguageMenu()">
       <div class="language-card__icon">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path
@@ -139,11 +151,35 @@
       </svg>
     </button>
 
+    @if (isLanguageMenuOpen()) {
+      <div class="language-picker">
+        @for (option of languageOptions; track option.code) {
+          <button
+            class="language-option"
+            type="button"
+            [class.language-option--active]="appLanguage() === (option.code === 'en' ? 'Engleski' : 'Crnogorski')"
+            (click)="selectLanguageOption(option.code)"
+          >
+            <span>{{ option.label }}</span>
+            @if (appLanguage() === (option.code === 'en' ? 'Engleski' : 'Crnogorski')) {
+              <span class="language-option__check">✓</span>
+            }
+          </button>
+        }
+      </div>
+    }
+
+    @if (fieldErrors().photo) {
+      <p class="field-error field-error--standalone">{{ fieldErrors().photo }}</p>
+    }
+
     <div class="actions">
-      <button class="save-button" type="button" (click)="saveChanges()">
-        {{ isSaving() ? 'Čuvanje...' : 'Sačuvaj promene' }}
+      <button class="save-button" type="button" [disabled]="isSaving()" (click)="saveChanges()">
+        {{ isSaving() ? 'Cuvanje...' : 'Sacuvaj promene' }}
       </button>
-      <button class="cancel-button" type="button" (click)="cancelChanges()">Otkaži izmene</button>
+      <button class="cancel-button" type="button" [disabled]="isSaving()" (click)="cancelChanges()">
+        Otkazi izmene
+      </button>
     </div>
 
     @if (feedbackMessage()) {

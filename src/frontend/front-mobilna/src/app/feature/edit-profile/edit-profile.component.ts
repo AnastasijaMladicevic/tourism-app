@@ -11,6 +11,16 @@ interface InterestOption {
   selected: boolean;
 }
 
+interface ProfileFieldErrors {
+  name: string;
+  lastName: string;
+  country: string;
+  phone: string;
+  photo: string;
+}
+
+const INTERESTS_STORAGE_KEY = 'spirego-mobile-profile-interests';
+
 @Component({
   selector: 'app-edit-profile',
   standalone: true,
@@ -33,8 +43,20 @@ export class EditProfileComponent implements OnInit {
   protected readonly phone = signal('');
   protected readonly appLanguage = signal('Crnogorski');
   protected readonly isSaving = signal(false);
+  protected readonly isLanguageMenuOpen = signal(false);
   protected readonly feedbackMessage = signal('');
   protected readonly feedbackTone = signal<'success' | 'error' | 'neutral'>('neutral');
+  protected readonly fieldErrors = signal<ProfileFieldErrors>({
+    name: '',
+    lastName: '',
+    country: '',
+    phone: '',
+    photo: '',
+  });
+  protected readonly languageOptions = [
+    { code: 'sr', label: 'Crnogorski / Srpski' },
+    { code: 'en', label: 'English' },
+  ];
 
   protected readonly imageUrl = computed(() => {
     const raw = this.user?.profileImageUrl?.trim() || '/images/profiles/default_icon.png';
@@ -44,14 +66,18 @@ export class EditProfileComponent implements OnInit {
   });
 
   protected readonly interests = signal<InterestOption[]>([
-    { label: 'Plaže', selected: true },
+    { label: 'Plaze', selected: true },
     { label: 'Planinarenje', selected: false },
     { label: 'Istorija', selected: true },
     { label: 'Gastronomija', selected: false },
-    { label: 'Noćni život', selected: false },
+    { label: 'Nocni zivot', selected: false },
     { label: 'Kultura', selected: true },
     { label: 'Nacionalni parkovi', selected: false },
   ]);
+
+  protected readonly selectedInterestCount = computed(
+    () => this.interests().filter((item) => item.selected).length,
+  );
 
   ngOnInit(): void {
     const currentUser = this.authService.getCurrentUser();
@@ -62,12 +88,13 @@ export class EditProfileComponent implements OnInit {
 
     this.user = currentUser;
     this.patchFromUser(currentUser);
+    this.loadInterests();
 
     this.authService
       .getById(currentUser.id)
       .pipe(
         catchError(() => {
-          this.setFeedback('Profil nije osvežen sa servera. Prikazani su lokalni podaci.', 'neutral');
+          this.setFeedback('Profil nije osvezen sa servera. Prikazani su lokalni podaci.', 'neutral');
           return of(null);
         }),
       )
@@ -82,8 +109,29 @@ export class EditProfileComponent implements OnInit {
     this.router.navigate(['/profile']);
   }
 
+  protected updateName(value: string): void {
+    this.name.set(value);
+    this.clearFieldError('name');
+  }
+
+  protected updateLastName(value: string): void {
+    this.lastName.set(value);
+    this.clearFieldError('lastName');
+  }
+
+  protected updateCountry(value: string): void {
+    this.country.set(value);
+    this.clearFieldError('country');
+  }
+
+  protected updatePhone(value: string): void {
+    this.phone.set(value);
+    this.clearFieldError('phone');
+  }
+
   protected saveChanges(): void {
     if (!this.user?.id || this.isSaving()) return;
+    if (!this.validateForm()) return;
 
     const dto: UpdateUserDto = {
       firstName: this.name().trim(),
@@ -98,7 +146,7 @@ export class EditProfileComponent implements OnInit {
       .update(this.user.id, dto)
       .pipe(
         catchError((error) => {
-          this.setFeedback(this.readErrorMessage(error, 'Promene nisu sačuvane.'), 'error');
+          this.setFeedback(this.readErrorMessage(error, 'Promene nisu sacuvane.'), 'error');
           return of(null);
         }),
         finalize(() => {
@@ -109,7 +157,8 @@ export class EditProfileComponent implements OnInit {
         if (!user) return;
         this.user = user;
         this.patchFromUser(user);
-        this.setFeedback('Promene su uspešno sačuvane.', 'success');
+        this.persistInterests();
+        this.setFeedback('Promene su uspesno sacuvane.', 'success');
       });
   }
 
@@ -150,12 +199,26 @@ export class EditProfileComponent implements OnInit {
     const file = input?.files?.[0];
     if (!file || !this.user?.id) return;
 
+    this.clearFieldError('photo');
+
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+      this.setFieldError('photo', 'Dozvoljeni formati su PNG, JPG i WEBP.');
+      if (input) input.value = '';
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      this.setFieldError('photo', 'Fotografija ne sme biti veca od 5MB.');
+      if (input) input.value = '';
+      return;
+    }
+
     this.isSaving.set(true);
     this.authService
       .updateProfileImage(this.user.id, file)
       .pipe(
         catchError((error) => {
-          this.setFeedback(this.readErrorMessage(error, 'Fotografija nije sačuvana.'), 'error');
+          this.setFeedback(this.readErrorMessage(error, 'Fotografija nije sacuvana.'), 'error');
           return of(null);
         }),
         finalize(() => {
@@ -167,23 +230,18 @@ export class EditProfileComponent implements OnInit {
         if (!user) return;
         this.user = user;
         this.patchFromUser(user);
-        this.setFeedback('Fotografija je uspešno ažurirana.', 'success');
+        this.setFeedback('Fotografija je uspesno azurirana.', 'success');
       });
   }
 
-  protected openLanguagePicker(): void {
-    const current = this.toLanguageCode(this.appLanguage());
-    const answer = window.prompt('Izaberi jezik: sr ili en', current);
-    if (answer === null) return;
+  protected toggleLanguageMenu(): void {
+    this.isLanguageMenuOpen.update((current) => !current);
+  }
 
-    const normalized = answer.trim().toLowerCase();
-    if (!['sr', 'en'].includes(normalized)) {
-      this.setFeedback('Dozvoljene vrednosti su sr ili en.', 'error');
-      return;
-    }
-
-    this.appLanguage.set(this.mapLanguage(normalized));
-    this.setFeedback(`Izabran je jezik: ${this.mapLanguage(normalized)}.`, 'neutral');
+  protected selectLanguageOption(code: string): void {
+    this.appLanguage.set(this.mapLanguage(code));
+    this.isLanguageMenuOpen.set(false);
+    this.setFeedback(`Izabran je jezik: ${this.mapLanguage(code)}.`, 'neutral');
   }
 
   protected toggleInterest(label: string): void {
@@ -192,6 +250,7 @@ export class EditProfileComponent implements OnInit {
         item.label === label ? { ...item, selected: !item.selected } : item,
       ),
     );
+    this.persistInterests();
   }
 
   private patchFromUser(user: UserDto): void {
@@ -216,8 +275,81 @@ export class EditProfileComponent implements OnInit {
     this.feedbackTone.set(tone);
   }
 
+  private validateForm(): boolean {
+    const nextErrors: ProfileFieldErrors = {
+      name: '',
+      lastName: '',
+      country: '',
+      phone: '',
+      photo: '',
+    };
+
+    if (this.name().trim().length < 2) {
+      nextErrors.name = 'Ime mora imati najmanje 2 karaktera.';
+    }
+
+    if (this.lastName().trim().length < 2) {
+      nextErrors.lastName = 'Prezime mora imati najmanje 2 karaktera.';
+    }
+
+    if (this.country().trim().length > 40) {
+      nextErrors.country = 'Drzava moze imati najvise 40 karaktera.';
+    }
+
+    const phone = this.phone().trim();
+    if (phone && !/^\+?[0-9][0-9\s/-]{5,19}$/.test(phone)) {
+      nextErrors.phone = 'Telefon unesi u formatu +382 67 000 000 ili slicno.';
+    }
+
+    this.fieldErrors.set(nextErrors);
+
+    const hasError = Object.values(nextErrors).some((value) => !!value);
+
+    if (hasError) {
+      this.setFeedback('Proveri oznacena polja pre cuvanja.', 'error');
+    }
+
+    return !hasError;
+  }
+
+  private setFieldError(field: keyof ProfileFieldErrors, message: string): void {
+    this.fieldErrors.update((current) => ({ ...current, [field]: message }));
+  }
+
+  private clearFieldError(field: keyof ProfileFieldErrors): void {
+    this.fieldErrors.update((current) => ({ ...current, [field]: '' }));
+  }
+
   private readErrorMessage(error: unknown, fallback: string): string {
     const candidate = error as { error?: { message?: string } };
     return candidate?.error?.message || fallback;
+  }
+
+  private loadInterests(): void {
+    const raw = localStorage.getItem(INTERESTS_STORAGE_KEY);
+    if (!raw) return;
+
+    try {
+      const selectedLabels = JSON.parse(raw) as string[];
+
+      if (!Array.isArray(selectedLabels)) return;
+
+      this.interests.update((items) =>
+        items.map((item) => ({
+          ...item,
+          selected: selectedLabels.includes(item.label),
+        })),
+      );
+    } catch {
+      localStorage.removeItem(INTERESTS_STORAGE_KEY);
+    }
+  }
+
+  private persistInterests(): void {
+    const selectedLabels = this.interests()
+      .filter((item) => item.selected)
+      .map((item) => item.label);
+
+    localStorage.setItem(INTERESTS_STORAGE_KEY, JSON.stringify(selectedLabels));
   }
 }
