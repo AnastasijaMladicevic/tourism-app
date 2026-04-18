@@ -81,43 +81,6 @@
   }
 }
 
-.partner-row {
-  display: flex;
-  gap: 14px;
-  padding-bottom: 22px;
-  overflow-x: auto;
-}
-
-.partner-card {
-  min-width: 110px;
-  height: 62px;
-  border-radius: 16px;
-  border: 1px solid rgba(215, 229, 236, 0.95);
-  box-shadow: 0 8px 22px rgba(56, 101, 117, 0.08);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  &--globe {
-    background:
-      linear-gradient(135deg, rgba(25, 25, 35, 0.35), rgba(25, 25, 35, 0.05)),
-      radial-gradient(circle at 72% 38%, #7bc8ff 0, #7bc8ff 14%, transparent 15%),
-      linear-gradient(120deg, #2b1409, #8e633a 42%, #26233b 100%);
-  }
-
-  &--hotel {
-    background:
-      linear-gradient(135deg, rgba(13, 39, 67, 0.2), rgba(13, 39, 67, 0.05)),
-      linear-gradient(120deg, #c7dce9, #9ab2c4 42%, #e8c6a0 100%);
-  }
-
-  &--mountain {
-    background:
-      linear-gradient(135deg, rgba(22, 45, 57, 0.24), rgba(22, 45, 57, 0.08)),
-      linear-gradient(120deg, #f1d0b4, #b7c9d2 48%, #708a8c 100%);
-  }
-}
-
 .link-list {
   display: flex;
   flex-direction: column;
@@ -134,6 +97,7 @@
   align-items: center;
   gap: 14px;
   padding: 16px;
+  text-decoration: none;
 }
 
 .info-card__icon {
@@ -254,19 +218,6 @@
     h2 {
       margin-bottom: 18px;
     }
-  }
-
-  .partner-row {
-    gap: 16px;
-    padding-bottom: 24px;
-    overflow: visible;
-  }
-
-  .partner-card {
-    flex: 1;
-    min-width: 0;
-    height: 120px;
-    border-radius: 20px;
   }
 
   .link-list {

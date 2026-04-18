@@ -18,45 +18,35 @@
     </section>
 
     <section class="section-block">
-      <h2>Nasi partneri</h2>
-
-      <div class="partner-row">
-        <article class="partner-card partner-card--globe"></article>
-        <article class="partner-card partner-card--hotel"></article>
-        <article class="partner-card partner-card--mountain"></article>
-      </div>
-    </section>
-
-    <section class="section-block">
       <h2>Informacije i podrska</h2>
 
       <div class="link-list">
-        <article class="info-card">
+        <a class="info-card" [routerLink]="['/privacy-data']" [queryParams]="{ returnTo: '/about' }">
           <div class="info-card__icon">🛡</div>
           <div class="info-card__body">
             <strong>Politika privatnosti</strong>
             <span>Kako stitimo vase podatke</span>
           </div>
           <div class="info-card__chevron">›</div>
-        </article>
+        </a>
 
-        <article class="info-card">
+        <a class="info-card" [routerLink]="['/terms']" [queryParams]="{ returnTo: '/about' }">
           <div class="info-card__icon">📄</div>
           <div class="info-card__body">
             <strong>Uslovi koriscenja</strong>
             <span>Pravila koriscenja aplikacije</span>
           </div>
           <div class="info-card__chevron">›</div>
-        </article>
+        </a>
 
-        <article class="info-card">
+        <a class="info-card" [routerLink]="['/support']" [queryParams]="{ returnTo: '/about' }">
           <div class="info-card__icon">✉</div>
           <div class="info-card__body">
             <strong>Kontaktirajte nas</strong>
             <span>Pitanja, sugestije ili problemi</span>
           </div>
           <div class="info-card__chevron">›</div>
-        </article>
+        </a>
       </div>
     </section>
 
