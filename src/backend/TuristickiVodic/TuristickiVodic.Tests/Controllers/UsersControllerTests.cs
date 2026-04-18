@@ -309,6 +309,88 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
+        public async Task GetMyLocationHistory_KadaPostojeTacke_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            var dto = new PagedResultDto<UserLocationHistoryPointDto>
+            {
+                Items = new List<UserLocationHistoryPointDto>
+                {
+                    new UserLocationHistoryPointDto
+                    {
+                        Id = 1,
+                        Longitude = 18.77,
+                        Latitude = 42.42,
+                        AccuracyMeters = 25,
+                        RecordedAt = DateTime.UtcNow
+                    }
+                },
+                Page = 1,
+                PageSize = 50,
+                TotalCount = 1,
+                TotalPages = 1
+            };
+
+            mockService.Setup(s => s.GetLocationHistoryAsync(5, It.IsAny<UserLocationHistoryQueryDto>()))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
+            var result = await controller.GetMyLocationHistory(new UserLocationHistoryQueryDto());
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
+        public async Task GetMyLocationPath_KadaPostojeTacke_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            var dto = new UserLocationPathDto
+            {
+                PointCount = 2,
+                ApproximateDistanceMeters = 140.5,
+                Points = new List<UserLocationHistoryPointDto>
+                {
+                    new UserLocationHistoryPointDto
+                    {
+                        Id = 1,
+                        Longitude = 18.77,
+                        Latitude = 42.42,
+                        RecordedAt = DateTime.UtcNow.AddMinutes(-1)
+                    },
+                    new UserLocationHistoryPointDto
+                    {
+                        Id = 2,
+                        Longitude = 18.78,
+                        Latitude = 42.43,
+                        RecordedAt = DateTime.UtcNow
+                    }
+                }
+            };
+
+            mockService.Setup(s => s.GetLocationPathAsync(5, It.IsAny<UserLocationPathQueryDto>()))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
+            var result = await controller.GetMyLocationPath(new UserLocationPathQueryDto());
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
+        public async Task ClearMyLocationHistory_KadaPostojiIstorija_VracaNoContent()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.ClearLocationHistoryAsync(5)).ReturnsAsync(true);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
+            var result = await controller.ClearMyLocationHistory();
+
+            result.Should().BeOfType<NoContentResult>();
+        }
+
+        [Fact]
         public async Task Delete_KadaManagerImaDestinaciju_VracaBadRequest()
         {
             var mockService = new Mock<IUserService>();

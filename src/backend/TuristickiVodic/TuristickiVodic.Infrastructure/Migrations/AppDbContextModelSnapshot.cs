@@ -1073,6 +1073,47 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("TuristickiVodic.Core.Models.UserLocationHistory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<double?>("AccuracyMeters")
+                        .HasColumnType("double precision");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("HeadingDegrees")
+                        .HasColumnType("double precision");
+
+                    b.Property<Point>("Location")
+                        .IsRequired()
+                        .HasColumnType("geometry");
+
+                    b.Property<DateTime>("RecordedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<double?>("SpeedMetersPerSecond")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Location");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Location"), "GIST");
+
+                    b.HasIndex("UserId", "RecordedAt");
+
+                    b.ToTable("UserLocationHistories");
+                });
+
             modelBuilder.Entity("TuristickiVodic.Core.Models.UserLog", b =>
                 {
                     b.Property<long>("Id")
@@ -1536,6 +1577,17 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("TuristickiVodic.Core.Models.UserLocationHistory", b =>
+                {
+                    b.HasOne("TuristickiVodic.Core.Models.User", "User")
+                        .WithMany("LocationHistory")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TuristickiVodic.Core.Models.UserLog", b =>
                 {
                     b.HasOne("TuristickiVodic.Core.Models.TouristObject", "Object")
@@ -1658,6 +1710,8 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("Favorites");
 
                     b.Navigation("ManagedDestination");
+
+                    b.Navigation("LocationHistory");
 
                     b.Navigation("RefreshToken");
 

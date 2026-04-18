@@ -12,5 +12,13 @@ namespace TuristickiVodic.Core.DTO
 
         [Range(0, 100000, ErrorMessage = "AccuracyMeters must be between 0 and 100000.")]
         public double? AccuracyMeters { get; set; }
+
+        [Range(0, 200, ErrorMessage = "SpeedMetersPerSecond must be between 0 and 200.")]
+        public double? SpeedMetersPerSecond { get; set; }
+
+        [Range(0, 360, ErrorMessage = "HeadingDegrees must be between 0 and 360.")]
+        public double? HeadingDegrees { get; set; }
+
+        public DateTime? RecordedAtUtc { get; set; }
     }
 }

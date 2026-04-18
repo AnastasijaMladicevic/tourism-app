@@ -142,10 +142,22 @@ namespace TuristickiVodic.Services
             if (user == null)
                 return null;
 
+            var recordedAtUtc = NormalizeRecordedAtUtc(dto.RecordedAtUtc);
             user.LastKnownLocation = new Point(dto.Longitude, dto.Latitude) { SRID = 4326 };
             user.LastLocationAccuracyMeters = dto.AccuracyMeters;
-            user.LastLocationUpdatedAt = DateTime.UtcNow;
+            user.LastLocationUpdatedAt = recordedAtUtc;
             user.UpdatedAt = DateTime.UtcNow;
+
+            _context.UserLocationHistories.Add(new UserLocationHistory
+            {
+                UserId = user.Id,
+                Location = new Point(dto.Longitude, dto.Latitude) { SRID = 4326 },
+                AccuracyMeters = dto.AccuracyMeters,
+                SpeedMetersPerSecond = dto.SpeedMetersPerSecond,
+                HeadingDegrees = dto.HeadingDegrees,
+                RecordedAt = recordedAtUtc,
+                CreatedAt = DateTime.UtcNow
+            });
 
             await _context.SaveChangesAsync();
 
@@ -155,6 +167,92 @@ namespace TuristickiVodic.Services
                 Latitude = user.LastKnownLocation.Y,
                 AccuracyMeters = user.LastLocationAccuracyMeters,
                 UpdatedAt = user.LastLocationUpdatedAt.Value
+            };
+        }
+
+        public async Task<PagedResultDto<UserLocationHistoryPointDto>> GetLocationHistoryAsync(int userId, UserLocationHistoryQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 100;
+
+            if (query.PageSize > 1000)
+                query.PageSize = 1000;
+
+            var historyQuery = BuildUserLocationHistoryQuery(userId, query.FromUtc, query.ToUtc);
+
+            var isDesc = !string.Equals(query.SortOrder?.Trim(), "asc", StringComparison.OrdinalIgnoreCase);
+            historyQuery = isDesc
+                ? historyQuery.OrderByDescending(x => x.RecordedAt).ThenByDescending(x => x.Id)
+                : historyQuery.OrderBy(x => x.RecordedAt).ThenBy(x => x.Id);
+
+            var totalCount = await historyQuery.CountAsync();
+
+            var items = await historyQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .Select(x => new UserLocationHistoryPointDto
+                {
+                    Id = x.Id,
+                    Longitude = x.Location.X,
+                    Latitude = x.Location.Y,
+                    AccuracyMeters = x.AccuracyMeters,
+                    SpeedMetersPerSecond = x.SpeedMetersPerSecond,
+                    HeadingDegrees = x.HeadingDegrees,
+                    RecordedAt = x.RecordedAt
+                })
+                .ToListAsync();
+
+            return new PagedResultDto<UserLocationHistoryPointDto>
+            {
+                Items = items,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
+        public async Task<UserLocationPathDto> GetLocationPathAsync(int userId, UserLocationPathQueryDto query)
+        {
+            var maxPoints = query.MaxPoints;
+
+            if (maxPoints < 1)
+                maxPoints = 500;
+
+            if (maxPoints > 2000)
+                maxPoints = 2000;
+
+            var points = await BuildUserLocationHistoryQuery(userId, query.FromUtc, query.ToUtc)
+                .OrderByDescending(x => x.RecordedAt)
+                .ThenByDescending(x => x.Id)
+                .Take(maxPoints)
+                .Select(x => new UserLocationHistoryPointDto
+                {
+                    Id = x.Id,
+                    Longitude = x.Location.X,
+                    Latitude = x.Location.Y,
+                    AccuracyMeters = x.AccuracyMeters,
+                    SpeedMetersPerSecond = x.SpeedMetersPerSecond,
+                    HeadingDegrees = x.HeadingDegrees,
+                    RecordedAt = x.RecordedAt
+                })
+                .ToListAsync();
+
+            points = points
+                .OrderBy(x => x.RecordedAt)
+                .ThenBy(x => x.Id)
+                .ToList();
+
+            return new UserLocationPathDto
+            {
+                Points = points,
+                PointCount = points.Count,
+                StartedAt = points.FirstOrDefault()?.RecordedAt,
+                EndedAt = points.LastOrDefault()?.RecordedAt,
+                ApproximateDistanceMeters = CalculateApproximateDistanceMeters(points)
             };
         }
 
@@ -170,6 +268,26 @@ namespace TuristickiVodic.Services
             user.LastLocationAccuracyMeters = null;
             user.LastLocationUpdatedAt = null;
             user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> ClearLocationHistoryAsync(int userId)
+        {
+            var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+
+            if (!userExists)
+                return false;
+
+            var historyItems = await _context.UserLocationHistories
+                .Where(x => x.UserId == userId)
+                .ToListAsync();
+
+            if (historyItems.Count > 0)
+            {
+                _context.UserLocationHistories.RemoveRange(historyItems);
+            }
 
             await _context.SaveChangesAsync();
             return true;
@@ -609,6 +727,78 @@ namespace TuristickiVodic.Services
             var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
             return Convert.ToBase64String(bytes);
         }
+
+        private IQueryable<UserLocationHistory> BuildUserLocationHistoryQuery(int userId, DateTime? fromUtc, DateTime? toUtc)
+        {
+            var query = _context.UserLocationHistories
+                .Where(x => x.UserId == userId)
+                .AsQueryable();
+
+            if (fromUtc.HasValue)
+            {
+                var normalizedFromUtc = NormalizeRecordedAtUtc(fromUtc);
+                query = query.Where(x => x.RecordedAt >= normalizedFromUtc);
+            }
+
+            if (toUtc.HasValue)
+            {
+                var normalizedToUtc = NormalizeRecordedAtUtc(toUtc);
+                query = query.Where(x => x.RecordedAt <= normalizedToUtc);
+            }
+
+            return query;
+        }
+
+        private static DateTime NormalizeRecordedAtUtc(DateTime? recordedAtUtc)
+        {
+            if (!recordedAtUtc.HasValue)
+                return DateTime.UtcNow;
+
+            var normalized = recordedAtUtc.Value.Kind == DateTimeKind.Utc
+                ? recordedAtUtc.Value
+                : recordedAtUtc.Value.ToUniversalTime();
+
+            return normalized > DateTime.UtcNow ? DateTime.UtcNow : normalized;
+        }
+
+        private static double CalculateApproximateDistanceMeters(IReadOnlyList<UserLocationHistoryPointDto> points)
+        {
+            if (points.Count < 2)
+                return 0;
+
+            var distanceMeters = 0d;
+
+            for (var i = 1; i < points.Count; i++)
+            {
+                distanceMeters += CalculateHaversineDistanceMeters(
+                    points[i - 1].Latitude,
+                    points[i - 1].Longitude,
+                    points[i].Latitude,
+                    points[i].Longitude);
+            }
+
+            return Math.Round(distanceMeters, 2);
+        }
+
+        private static double CalculateHaversineDistanceMeters(double latitude1, double longitude1, double latitude2, double longitude2)
+        {
+            const double earthRadiusMeters = 6371000d;
+
+            var deltaLatitude = DegreesToRadians(latitude2 - latitude1);
+            var deltaLongitude = DegreesToRadians(longitude2 - longitude1);
+            var normalizedLatitude1 = DegreesToRadians(latitude1);
+            var normalizedLatitude2 = DegreesToRadians(latitude2);
+
+            var a =
+                Math.Sin(deltaLatitude / 2) * Math.Sin(deltaLatitude / 2) +
+                Math.Cos(normalizedLatitude1) * Math.Cos(normalizedLatitude2) *
+                Math.Sin(deltaLongitude / 2) * Math.Sin(deltaLongitude / 2);
+
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return earthRadiusMeters * c;
+        }
+
+        private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180d;
 
         private static string HashResetToken(string resetCode)
         {

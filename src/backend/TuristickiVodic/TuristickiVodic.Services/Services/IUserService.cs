@@ -28,5 +28,8 @@ namespace TuristickiVodic.Services
         Task<UserLocationDto?> GetCurrentLocationAsync(int userId);
         Task<UserLocationDto?> UpdateCurrentLocationAsync(int userId, UpdateUserLocationDto dto);
         Task<bool> ClearCurrentLocationAsync(int userId);
+        Task<PagedResultDto<UserLocationHistoryPointDto>> GetLocationHistoryAsync(int userId, UserLocationHistoryQueryDto query);
+        Task<UserLocationPathDto> GetLocationPathAsync(int userId, UserLocationPathQueryDto query);
+        Task<bool> ClearLocationHistoryAsync(int userId);
     }
 }

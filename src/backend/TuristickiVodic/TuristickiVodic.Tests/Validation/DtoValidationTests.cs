@@ -218,6 +218,32 @@ namespace TuristickiVodic.Tests.Validation
         // ═══════════════════════════════════════════
 
         [Fact]
+        public void UpdateUserLocationDto_HeadingVeceOd360_NijeValidno()
+        {
+            var dto = new UpdateUserLocationDto
+            {
+                Longitude = 18.77,
+                Latitude = 42.42,
+                HeadingDegrees = 361
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(UpdateUserLocationDto.HeadingDegrees)));
+        }
+
+        [Fact]
+        public void UserLocationPathQueryDto_MaxPointsJeNula_NijeValidno()
+        {
+            var dto = new UserLocationPathQueryDto
+            {
+                MaxPoints = 0
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(UserLocationPathQueryDto.MaxPoints)));
+        }
+
+        [Fact]
         public void ChangePasswordDto_ValidnoPopunjeno_JeValidno()
         {
             var dto = new ChangePasswordDto

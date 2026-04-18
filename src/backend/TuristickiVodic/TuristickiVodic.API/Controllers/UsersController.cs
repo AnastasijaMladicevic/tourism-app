@@ -73,11 +73,45 @@ namespace TuristickiVodic.API.Controllers
             return Ok(location);
         }
 
+        [HttpGet("me/location/history")]
+        public async Task<IActionResult> GetMyLocationHistory([FromQuery] UserLocationHistoryQueryDto query)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var history = await _userService.GetLocationHistoryAsync(currentUserId, query);
+            return Ok(history);
+        }
+
+        [HttpGet("me/location/path")]
+        public async Task<IActionResult> GetMyLocationPath([FromQuery] UserLocationPathQueryDto query)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var path = await _userService.GetLocationPathAsync(currentUserId, query);
+            return Ok(path);
+        }
+
         [HttpDelete("me/location")]
         public async Task<IActionResult> ClearMyLocation()
         {
             var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             var cleared = await _userService.ClearCurrentLocationAsync(currentUserId);
+
+            if (!cleared)
+                return NotFound();
+
+            return NoContent();
+        }
+
+        [HttpDelete("me/location/history")]
+        public async Task<IActionResult> ClearMyLocationHistory()
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var cleared = await _userService.ClearLocationHistoryAsync(currentUserId);
 
             if (!cleared)
                 return NotFound();

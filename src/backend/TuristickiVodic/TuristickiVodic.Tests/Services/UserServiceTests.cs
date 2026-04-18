@@ -1681,6 +1681,13 @@ namespace TuristickiVodic.Tests.Services
             user.LastKnownLocation.Y.Should().BeApproximately(42.42, 0.001);
             user.LastLocationAccuracyMeters.Should().Be(32);
             user.LastLocationUpdatedAt.Should().NotBeNull();
+
+            ctx.UserLocationHistories.Should().ContainSingle();
+            var historyPoint = await ctx.UserLocationHistories.SingleAsync();
+            historyPoint.UserId.Should().Be(149);
+            historyPoint.Location.X.Should().BeApproximately(18.77, 0.001);
+            historyPoint.Location.Y.Should().BeApproximately(42.42, 0.001);
+            historyPoint.AccuracyMeters.Should().Be(32);
         }
 
         [Fact]
@@ -1750,6 +1757,175 @@ namespace TuristickiVodic.Tests.Services
             user!.LastKnownLocation.Should().BeNull();
             user.LastLocationAccuracyMeters.Should().BeNull();
             user.LastLocationUpdatedAt.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task GetLocationHistoryAsync_KadaPostojeTacke_VracaPaginiranRezultat()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetLocationHistoryAsync_KadaPostojeTacke_VracaPaginiranRezultat));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 146,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana.history@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+
+            ctx.UserLocationHistories.AddRange(
+                new UserLocationHistory
+                {
+                    Id = 1,
+                    UserId = 146,
+                    Location = new NetTopologySuite.Geometries.Point(18.70, 42.40) { SRID = 4326 },
+                    AccuracyMeters = 10,
+                    RecordedAt = DateTime.UtcNow.AddMinutes(-3),
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-3)
+                },
+                new UserLocationHistory
+                {
+                    Id = 2,
+                    UserId = 146,
+                    Location = new NetTopologySuite.Geometries.Point(18.71, 42.41) { SRID = 4326 },
+                    AccuracyMeters = 12,
+                    RecordedAt = DateTime.UtcNow.AddMinutes(-2),
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-2)
+                },
+                new UserLocationHistory
+                {
+                    Id = 3,
+                    UserId = 146,
+                    Location = new NetTopologySuite.Geometries.Point(18.72, 42.42) { SRID = 4326 },
+                    AccuracyMeters = 15,
+                    RecordedAt = DateTime.UtcNow.AddMinutes(-1),
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-1)
+                });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+            var result = await service.GetLocationHistoryAsync(146, new UserLocationHistoryQueryDto
+            {
+                Page = 1,
+                PageSize = 2,
+                SortOrder = "desc"
+            });
+
+            result.TotalCount.Should().Be(3);
+            result.Items.Should().HaveCount(2);
+            result.Items.Select(x => x.Longitude).Should().Equal(18.72, 18.71);
+        }
+
+        [Fact]
+        public async Task GetLocationPathAsync_KadaPostojeTacke_VracaPutanjuHronoloski()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetLocationPathAsync_KadaPostojeTacke_VracaPutanjuHronoloski));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 145,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana.path@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+
+            ctx.UserLocationHistories.AddRange(
+                new UserLocationHistory
+                {
+                    Id = 10,
+                    UserId = 145,
+                    Location = new NetTopologySuite.Geometries.Point(18.70, 42.40) { SRID = 4326 },
+                    RecordedAt = DateTime.UtcNow.AddMinutes(-3),
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-3)
+                },
+                new UserLocationHistory
+                {
+                    Id = 11,
+                    UserId = 145,
+                    Location = new NetTopologySuite.Geometries.Point(18.71, 42.41) { SRID = 4326 },
+                    RecordedAt = DateTime.UtcNow.AddMinutes(-2),
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-2)
+                },
+                new UserLocationHistory
+                {
+                    Id = 12,
+                    UserId = 145,
+                    Location = new NetTopologySuite.Geometries.Point(18.72, 42.42) { SRID = 4326 },
+                    RecordedAt = DateTime.UtcNow.AddMinutes(-1),
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-1)
+                });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+            var result = await service.GetLocationPathAsync(145, new UserLocationPathQueryDto
+            {
+                MaxPoints = 10
+            });
+
+            result.PointCount.Should().Be(3);
+            result.Points.Select(x => x.Longitude).Should().Equal(18.70, 18.71, 18.72);
+            result.ApproximateDistanceMeters.Should().BeGreaterThan(0);
+            result.StartedAt.Should().NotBeNull();
+            result.EndedAt.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task ClearLocationHistoryAsync_KadaPostojiIstorija_BriseSveTacke()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ClearLocationHistoryAsync_KadaPostojiIstorija_BriseSveTacke));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 144,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana.clearhistory@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+
+            ctx.UserLocationHistories.AddRange(
+                new UserLocationHistory
+                {
+                    Id = 20,
+                    UserId = 144,
+                    Location = new NetTopologySuite.Geometries.Point(18.70, 42.40) { SRID = 4326 },
+                    RecordedAt = DateTime.UtcNow.AddMinutes(-2),
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-2)
+                },
+                new UserLocationHistory
+                {
+                    Id = 21,
+                    UserId = 144,
+                    Location = new NetTopologySuite.Geometries.Point(18.71, 42.41) { SRID = 4326 },
+                    RecordedAt = DateTime.UtcNow.AddMinutes(-1),
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-1)
+                });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+            var cleared = await service.ClearLocationHistoryAsync(144);
+
+            cleared.Should().BeTrue();
+            ctx.UserLocationHistories.Should().BeEmpty();
         }
 
         [Fact]
