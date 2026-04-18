@@ -52,8 +52,13 @@
               <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
             </button>
           </div>
-          <p class="location-bold">{{ event.localityName }}, {{ event.destinationName }}</p>
-
+          @if (event.localityName && event.destinationName) {
+            <p class="location-bold">{{ event.localityName }}, {{ event.destinationName }}</p>
+          } @else if (event.localityName) {
+            <p class="location-bold">{{ event.localityName }}</p>
+          } @else if (event.destinationName) {
+            <p class="location-bold">{{ event.destinationName }}</p>
+          }
           <p class="venue"><mat-icon>location_on</mat-icon>{{ event.objectName || 'N/A' }}</p>
 
           <p class="date">{{ formatDate(event.startDate) }} – {{ formatDate(event.endDate) }}</p>
@@ -100,9 +105,13 @@
           <h2>Lokacija</h2>
 
           <div class="location-image" [attr.data-name]="event.objectName || 'N/A'">
-            <div class="location-image-placeholder">
-              <mat-icon>place</mat-icon>
-            </div>
+            <app-map
+              [lat]="event.latitude || 42.424"
+              [lng]="event.longitude || 18.771"
+              [popupText]="event.name"
+              [interactive]="false"
+            >
+            </app-map>
             <button class="map-btn-overlay" (click)="viewOnMap()">Pogledaj na mapi</button>
           </div>
         </div>

@@ -1,0 +1,92 @@
+<div class="map-page">
+  <!-- Search bar -->
+  <div class="search-bar">
+    <div class="search-input">
+      <mat-icon>search</mat-icon>
+      <input type="text" placeholder="Search places, routes..." [(ngModel)]="searchQuery" />
+    </div>
+    <button class="filter-icon-btn">
+      <mat-icon>filter_list</mat-icon>
+    </button>
+  </div>
+
+  <!-- Mapa -->
+  <div id="main-map" class="main-map"></div>
+
+  <!-- Kontrole desno -->
+  <div class="map-controls">
+    <button class="control-btn gps-btn" (click)="centerOnMyLocation()" aria-label="My location">
+      <mat-icon>my_location</mat-icon>
+    </button>
+    <button class="control-btn" (click)="zoomIn()" aria-label="Zoom in">
+      <mat-icon>add</mat-icon>
+    </button>
+    <button class="control-btn" (click)="zoomOut()" aria-label="Zoom out">
+      <mat-icon>remove</mat-icon>
+    </button>
+  </div>
+
+  <!-- Bottom card — prikazuje se kad se klikne marker -->
+  @if (selectedItem) {
+    <div class="bottom-card" (click)="$event.stopPropagation()">
+      <button class="bottom-card__close" (click)="closeCard()" aria-label="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <!-- Slika -->
+      <div class="bottom-card__image-wrap">
+        @if (getItemImage()) {
+          <img [src]="getItemImage()" [alt]="selectedItem.name" class="bottom-card__image" />
+        } @else {
+          <div class="bottom-card__image bottom-card__image--empty">
+            <mat-icon>landscape</mat-icon>
+          </div>
+        }
+      </div>
+
+      <!-- Info -->
+      <div class="bottom-card__body">
+        <div class="bottom-card__top">
+          <div class="bottom-card__info">
+            <h3 class="bottom-card__name">{{ selectedItem.name }}</h3>
+            <p class="bottom-card__meta">
+              @if (getItemLocation()) {
+                <mat-icon>place</mat-icon>
+                {{ getItemLocation() }}
+              }
+            </p>
+          </div>
+
+          <!-- Rating samo za objects koji ga imaju -->
+          @if (selectedItem.averageRating > 0) {
+            <div class="bottom-card__rating">
+              <mat-icon>star</mat-icon>
+              {{ selectedItem.averageRating.toFixed(1) }}
+            </div>
+          }
+        </div>
+
+        <!-- Open/distance row -->
+        <div class="bottom-card__badges">
+          @if (getWorkingStatus() !== null) {
+            <span
+              class="badge"
+              [class.badge--open]="getWorkingStatus()"
+              [class.badge--closed]="!getWorkingStatus()"
+            >
+              {{ getWorkingStatus() ? 'OPEN NOW' : 'CLOSED' }}
+            </span>
+          }
+          @if (selectedItem.distanceKm != null) {
+            <span class="badge badge--distance">
+              <mat-icon>near_me</mat-icon>
+              {{ formatDistance(selectedItem.distanceKm) }}
+            </span>
+          }
+        </div>
+
+        <button class="bottom-card__btn" (click)="openDetails()">Details</button>
+      </div>
+    </div>
+  }
+</div>

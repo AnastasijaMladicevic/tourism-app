@@ -118,6 +118,9 @@ button:hover {
 }
 
 .card {
+  h2{
+    margin-bottom: 5px;
+  }
   background: white;
   border-radius: 20px;
   padding: 24px;
@@ -190,6 +193,7 @@ button:hover {
 }
 .location-image::after {
   content: attr(data-name);
+  z-index: 1000;
   color: var(--primary);
   position: absolute;
   bottom: 15px;
@@ -372,6 +376,7 @@ button:hover {
   border-radius: 9999px;
   font-size: 13px;
   font-weight: 600;
+  z-index: 1000;
 }
 .btn {
   padding: 14px 20px;
