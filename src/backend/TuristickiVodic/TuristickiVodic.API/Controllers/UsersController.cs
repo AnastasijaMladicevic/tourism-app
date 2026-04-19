@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Security.Claims;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Services;
@@ -26,7 +27,7 @@ namespace TuristickiVodic.API.Controllers
         public async Task<IActionResult> GetAll([FromQuery] UserQueryDto query)
         {
             var users = await _userService.GetAllAsync(query);
-            return Ok(users);
+            return Ok(NormalizeUsers(users));
         }
 
         // Korisnik može da vidi samo sebe; Admin može svakoga
@@ -43,7 +44,7 @@ namespace TuristickiVodic.API.Controllers
             if (user == null)
                 return NotFound();
 
-            return Ok(user);
+            return Ok(NormalizeUser(user));
         }
 
         [HttpGet("me/location")]
@@ -128,7 +129,7 @@ namespace TuristickiVodic.API.Controllers
             if (user == null)
                 return NotFound();
 
-            return Ok(user);
+            return Ok(NormalizeUser(user));
         }
 
         [HttpPost("register")]
@@ -141,7 +142,7 @@ namespace TuristickiVodic.API.Controllers
             try
             {
                 var user = await _userService.CreateAsync(createUserDto);
-                return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+                return CreatedAtAction(nameof(GetById), new { id = user.Id }, NormalizeUser(user));
             }
             catch (InvalidOperationException ex)
             {
@@ -157,7 +158,7 @@ namespace TuristickiVodic.API.Controllers
             try
             {
                 var user = await _userService.CreateManagerAsync(createUserDto);
-                return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+                return CreatedAtAction(nameof(GetById), new { id = user.Id }, NormalizeUser(user));
             }
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
@@ -170,7 +171,7 @@ namespace TuristickiVodic.API.Controllers
             try
             {
                 var user = await _userService.CreateAdminAsync(createUserDto);
-                return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+                return CreatedAtAction(nameof(GetById), new { id = user.Id }, NormalizeUser(user));
             }
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
@@ -188,7 +189,7 @@ namespace TuristickiVodic.API.Controllers
                 if (response == null)
                     return Unauthorized(new { message = "Invalid email or password" });
 
-                return Ok(response);
+                return Ok(NormalizeAuthResponse(response));
             }
             catch (InvalidOperationException ex)
             {
@@ -263,7 +264,7 @@ namespace TuristickiVodic.API.Controllers
                 if (response == null)
                     return Unauthorized(new { message = "Invalid or expired refresh token" });
 
-                return Ok(response);
+                return Ok(NormalizeAuthResponse(response));
             }
             catch (InvalidOperationException ex)
             {
@@ -313,7 +314,7 @@ namespace TuristickiVodic.API.Controllers
             if (user == null)
                 return NotFound();
 
-            return Ok(user);
+            return Ok(NormalizeUser(user));
         }
 
         // Korisnik može da menja lozinku samo sebi; Admin može svakome
@@ -388,7 +389,7 @@ namespace TuristickiVodic.API.Controllers
                 if (user == null)
                     return NotFound();
 
-                return Ok(user);
+                return Ok(NormalizeUser(user));
             }
             catch (InvalidOperationException ex)
             {
@@ -408,7 +409,7 @@ namespace TuristickiVodic.API.Controllers
             if (user == null)
                 return NotFound();
 
-            return Ok(user);
+            return Ok(NormalizeUser(user));
         }
 
         [HttpGet("creator-requests")]
@@ -500,6 +501,42 @@ namespace TuristickiVodic.API.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+        private PagedResultDto<UserDto> NormalizeUsers(PagedResultDto<UserDto> result)
+        {
+            foreach (var user in result.Items)
+            {
+                NormalizeUser(user);
+            }
+
+            return result;
+        }
+
+        private AuthResponseDto NormalizeAuthResponse(AuthResponseDto response)
+        {
+            NormalizeUser(response.User);
+            return response;
+        }
+
+        private UserDto NormalizeUser(UserDto user)
+        {
+            user.ProfileImageUrl = BuildAbsoluteProfileImageUrl(user.ProfileImageUrl);
+            return user;
+        }
+
+        private string? BuildAbsoluteProfileImageUrl(string? profileImageUrl)
+        {
+            if (string.IsNullOrWhiteSpace(profileImageUrl))
+                return profileImageUrl;
+
+            if (Uri.IsWellFormedUriString(profileImageUrl, UriKind.Absolute))
+                return profileImageUrl;
+
+            if (!Request.Host.HasValue || !profileImageUrl.StartsWith("/"))
+                return profileImageUrl;
+
+            return $"{Request.Scheme}://{Request.Host.Value}{profileImageUrl}";
         }
     }
 }
