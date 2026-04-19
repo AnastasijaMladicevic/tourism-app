@@ -9,7 +9,7 @@ import { ReviewDto, ReviewService } from '../../services/review';
 
 interface ProfileStat {
   label: string;
-  value: number;
+  value: string | number;
   icon: string;
 }
 
@@ -45,7 +45,6 @@ export class ProfileComponent implements OnInit {
   protected user: UserDto | null = null;
   protected stats: ProfileStat[] = [
     { label: 'FAVORITES', value: 0, icon: 'heart' },
-    { label: 'PLANOVI', value: 4, icon: 'calendar' },
     { label: 'RECENZIJE', value: 0, icon: 'star' },
   ];
 
@@ -53,48 +52,63 @@ export class ProfileComponent implements OnInit {
     {
       title: 'MOJA PUTOVANJA',
       items: [
-        { title: 'Favorites', icon: 'heart', accent: 'teal' },
-        { title: 'Moje recenzije', icon: 'star', accent: 'blue' },
-        { title: 'Planer putovanja', icon: 'calendar', accent: 'gray' },
+        { title: 'Favorites', icon: 'heart', accent: 'teal', route: '/favorites' },
+        { title: 'Moje recenzije', icon: 'star', accent: 'blue', route: '/my-reviews' },
       ],
     },
     {
-      title: 'PODEŠAVANJA',
+      title: 'PODESAVANJA',
       items: [
         { title: 'Jezik', icon: 'language', accent: 'green', route: '/language' },
-        { title: 'Pomoć i podrška', icon: 'help', accent: 'gray', route: '/support' },
+        { title: 'Pomoc i podrska', icon: 'help', accent: 'gray', route: '/support' },
       ],
     },
     {
       title: 'NALOG',
       items: [
-        { title: 'Privatnost i podaci', icon: 'shield', accent: 'blue' },
-        { title: 'Uslovi korišćenja', icon: 'document', accent: 'gray', route: '/terms' },
+        { title: 'Privatnost i podaci', icon: 'shield', accent: 'blue', route: '/privacy-data' },
+        { title: 'Uslovi koriscenja', icon: 'document', accent: 'gray', route: '/terms' },
         {
-          title: 'Zatraži dozvolu za moderatora',
+          title: 'Zatrazi dozvolu za moderatora',
           icon: 'document',
           accent: 'gray',
           route: '/moderator-access',
         },
+        { title: 'O nama', icon: 'document', accent: 'gray', route: '/about' },
         { title: 'Odjavi se', icon: 'logout', accent: 'red', action: 'logout' },
       ],
     },
   ];
 
   ngOnInit(): void {
-    this.user = this.authService.getCurrentUser();
-    this.loadStats();
+    const currentUser = this.authService.getCurrentUser();
+
+    if (!currentUser?.id) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    this.user = currentUser;
+    this.loadStats(currentUser.id);
+
+    this.authService
+      .getById(currentUser.id)
+      .pipe(catchError(() => of(null)))
+      .subscribe((user) => {
+        if (!user) return;
+        this.user = user;
+      });
   }
 
   protected get fullName(): string {
     const first = this.user?.firstName?.trim() ?? '';
     const last = this.user?.lastName?.trim() ?? '';
     const fullName = `${first} ${last}`.trim();
-    return fullName || 'Marko Jovanović';
+    return fullName || 'SpireGO korisnik';
   }
 
   protected get email(): string {
-    return this.user?.email?.trim() || 'marko.jovanovic@email.com';
+    return this.user?.email?.trim() || 'Email nije dostupan';
   }
 
   protected get profileImageUrl(): string {
@@ -139,9 +153,8 @@ export class ProfileComponent implements OnInit {
     return stat.label;
   }
 
-  private loadStats(): void {
-    const currentUserId = this.user?.id;
-    if (!currentUserId || !this.authService.isLoggedIn()) {
+  private loadStats(currentUserId: number): void {
+    if (!this.authService.isLoggedIn()) {
       return;
     }
 
@@ -157,7 +170,6 @@ export class ProfileComponent implements OnInit {
     }).subscribe(({ favorites, reviews }) => {
       this.stats = [
         { label: 'FAVORITES', value: favorites, icon: 'heart' },
-        { label: 'PLANOVI', value: 4, icon: 'calendar' },
         { label: 'RECENZIJE', value: reviews, icon: 'star' },
       ];
     });
