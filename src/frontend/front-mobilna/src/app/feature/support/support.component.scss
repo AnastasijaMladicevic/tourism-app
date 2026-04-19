@@ -1,0 +1,414 @@
+.support-page {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at top center, rgba(22, 138, 173, 0.08), transparent 28%),
+    linear-gradient(180deg, #fbfeff 0%, #eef8fb 62%, #ebf6fa 100%);
+}
+
+.support-topbar {
+  min-height: 76px;
+  padding: 18px 20px 10px;
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  border-bottom: 1px solid rgba(208, 234, 240, 0.9);
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(10px);
+
+  h1 {
+    text-align: center;
+    font-size: 17px;
+    font-weight: 800;
+    color: #263945;
+  }
+}
+
+.back-btn,
+.topbar-spacer {
+  width: 40px;
+  height: 40px;
+}
+
+.back-btn {
+  color: #203540;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  text-decoration: none;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+.support-shell {
+  width: min(100%, 430px);
+  margin: 0 auto;
+  padding: 18px 18px 30px;
+}
+
+.support-hero {
+  margin-bottom: 18px;
+
+  h2 {
+    margin: 0 0 18px;
+    font-size: 26px;
+    line-height: 1.15;
+    font-weight: 900;
+    color: #1f2d35;
+  }
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 15px;
+  border-radius: 18px;
+  border: 1px solid rgba(215, 229, 236, 0.95);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 14px 34px rgba(23, 110, 134, 0.05);
+
+  svg {
+    width: 17px;
+    height: 17px;
+    fill: none;
+    stroke: #6b7c84;
+    stroke-width: 2;
+    flex-shrink: 0;
+  }
+
+  input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 13px;
+    color: #263945;
+  }
+}
+
+.support-section {
+  margin-top: 20px;
+
+  h3 {
+    margin: 0 0 14px;
+    font-size: 17px;
+    font-weight: 900;
+    color: #24333b;
+  }
+}
+
+.faq-card,
+.contact-card,
+.hours-card {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(215, 229, 236, 0.95);
+  box-shadow: 0 14px 34px rgba(23, 110, 134, 0.06);
+}
+
+.faq-card {
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.faq-item {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid rgba(227, 235, 239, 0.95);
+  background: transparent;
+  padding: 18px 16px;
+  text-align: left;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  p {
+    margin-top: 10px;
+    color: #6c7c83;
+    font-size: 13px;
+    line-height: 1.65;
+  }
+}
+
+.faq-item__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  span:first-child {
+    color: #2b373e;
+    font-size: 15px;
+    line-height: 1.35;
+  }
+}
+
+.faq-item__chevron {
+  width: 18px;
+  height: 18px;
+  color: #5b6870;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &--open {
+    transform: rotate(90deg);
+  }
+}
+
+.contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contact-card {
+  border-radius: 22px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+}
+
+.contact-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #eef4f7;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 21px;
+  flex-shrink: 0;
+
+  &--alert {
+    color: #d63131;
+    font-weight: 900;
+  }
+}
+
+.contact-card__content {
+  flex: 1;
+
+  strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #1f2d35;
+    font-size: 15px;
+    font-weight: 900;
+  }
+
+  span {
+    color: #6c7c83;
+    font-size: 13px;
+  }
+}
+
+.contact-card__arrow {
+  color: #506068;
+  font-size: 22px;
+}
+
+.hours-card {
+  margin-top: 24px;
+  border-radius: 24px;
+  border-style: dashed;
+  padding: 18px 16px;
+}
+
+.hours-card__title {
+  margin-bottom: 18px;
+  color: #454d53;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hours-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  span {
+    display: block;
+    margin-bottom: 6px;
+    color: #6f7f86;
+    font-size: 12px;
+  }
+
+  strong {
+    color: #222f36;
+    font-size: 16px;
+    font-weight: 900;
+  }
+}
+
+.hours-divider {
+  height: 1px;
+  margin: 18px 0 14px;
+  background: rgba(212, 220, 224, 0.95);
+}
+
+.hours-card p {
+  margin: 0 0 8px;
+  color: #747f85;
+  font-size: 12px;
+  line-height: 1.6;
+  font-style: italic;
+}
+
+@media (min-width: 768px) {
+  .support-page {
+    min-height: 100%;
+    padding: 12px 24px 28px;
+  }
+
+  .support-topbar {
+    width: min(100%, 700px);
+    margin: 0 auto 4px;
+    min-height: 76px;
+    padding: 16px 0 8px;
+    background: transparent;
+    border-bottom: none;
+    backdrop-filter: none;
+
+    h1 {
+      font-size: 22px;
+    }
+  }
+
+  .support-shell {
+    width: min(100%, 700px);
+    padding: 8px 0 14px;
+  }
+
+  .support-hero {
+    margin-bottom: 18px;
+
+    h2 {
+      font-size: 28px;
+      margin-bottom: 16px;
+    }
+  }
+
+  .search-box {
+    min-height: 50px;
+    padding: 0 16px;
+    border-radius: 18px;
+
+    input {
+      font-size: 13px;
+    }
+  }
+
+  .support-section {
+    margin-top: 20px;
+
+    h3 {
+      margin-bottom: 14px;
+      font-size: 19px;
+    }
+  }
+
+  .faq-card {
+    border-radius: 24px;
+  }
+
+  .faq-item {
+    padding: 18px 18px 17px;
+
+    p {
+      margin-top: 10px;
+      font-size: 13px;
+    }
+  }
+
+  .faq-item__row span:first-child {
+    font-size: 15px;
+  }
+
+  .contact-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .contact-card {
+    min-height: 96px;
+    border-radius: 22px;
+    padding: 16px;
+  }
+
+  .contact-card__icon {
+    width: 46px;
+    height: 46px;
+    font-size: 20px;
+  }
+
+  .contact-card__content {
+    strong {
+      font-size: 15px;
+    }
+
+    span {
+      font-size: 13px;
+      line-height: 1.45;
+    }
+  }
+
+  .hours-card {
+    margin-top: 22px;
+    border-radius: 24px;
+    padding: 18px 18px 14px;
+  }
+
+  .hours-card__title {
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+
+  .hours-grid {
+    gap: 18px;
+
+    span {
+      font-size: 12px;
+    }
+
+    strong {
+      font-size: 18px;
+    }
+  }
+
+  .hours-card p {
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 1100px) {
+  .support-topbar,
+  .support-shell {
+    width: min(100%, 760px);
+  }
+}

@@ -30,6 +30,28 @@ export const routes: Routes = [
     loadComponent: () => import('./feature/terms/terms.component').then((m) => m.TermsComponent),
   },
   {
+    path: 'about',
+    loadComponent: () =>
+      import('./feature/about/about.component').then((m) => m.AboutComponent),
+  },
+  {
+    path: 'language',
+    loadComponent: () =>
+      import('./feature/language/language.component').then((m) => m.LanguageComponent),
+  },
+  {
+    path: 'support',
+    loadComponent: () =>
+      import('./feature/support/support.component').then((m) => m.SupportComponent),
+  },
+  {
+    path: 'moderator-access',
+    loadComponent: () =>
+      import('./feature/moderator-access/moderator-access.component').then(
+        (m) => m.ModeratorAccessComponent,
+      ),
+  },
+  {
     path: 'code-verification',
     loadComponent: () =>
       import('./feature/auth/code-verification/code-verification').then(
@@ -84,6 +106,18 @@ export const routes: Routes = [
     loadComponent: () => import('./feature/events/events').then((m) => m.EventsComponent),
   },
   {
+    path: 'profile',
+    loadComponent: () =>
+      import('./feature/profile/profile.component').then((m) => m.ProfileComponent),
+  },
+  {
+    path: 'profile/edit',
+    loadComponent: () =>
+      import('./feature/edit-profile/edit-profile.component').then(
+        (m) => m.EditProfileComponent,
+      ),
+  },
+  {
     path: 'event/:id',
     loadComponent: () =>
       import('./feature/event-detail/event-detail').then((m) => m.EventDetailComponent),
@@ -93,14 +127,17 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./feature/hotel-detail/hotel-detail').then((m) => m.HotelDetailComponent),
   },
-  { 
-    path: 'restaurant/:id', 
-    loadComponent: () => 
-      import('./feature/restaurant-detail/restaurant-detail').then(m => m.RestaurantDetailComponent) 
+  {
+    path: 'restaurant/:id',
+    loadComponent: () =>
+      import('./feature/restaurant-detail/restaurant-detail').then(
+        (m) => m.RestaurantDetailComponent,
+      ),
   },
-  { 
-    path: 'map', 
-    loadComponent: () => 
-      import('./feature/map/map').then(m => m.MapComponent) 
-  }
+  {
+    path: 'map',
+    loadComponent: () => import('./feature/map/map').then((m) => m.MapComponent),
+  },
 ];
+
+

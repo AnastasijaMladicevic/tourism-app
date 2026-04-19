@@ -1,0 +1,264 @@
+.about-page {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at top center, rgba(22, 138, 173, 0.1), transparent 30%),
+    linear-gradient(180deg, #fbfeff 0%, #eef8fb 62%, #ebf6fa 100%);
+}
+
+.about-page__content {
+  width: min(100%, 430px);
+  margin: 0 auto;
+  padding: 12px 18px 42px;
+}
+
+.about-hero {
+  padding: 22px 10px 28px;
+  border-bottom: 1px solid rgba(205, 221, 227, 0.8);
+}
+
+.brand-lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+
+  img {
+    width: 170px;
+    max-width: 100%;
+  }
+}
+
+.brand-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  strong {
+    font-size: 24px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    color: #1889dc;
+    text-shadow: 0 8px 20px rgba(24, 137, 220, 0.18);
+  }
+
+  span {
+    min-height: 30px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: #f0f0f0;
+    color: #777;
+    display: inline-flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 700;
+  }
+}
+
+.mission-quote {
+  margin: 0;
+  padding: 0 0 0 18px;
+  border-left: 5px solid #2c92c9;
+  color: #65757c;
+  font-size: 17px;
+  line-height: 1.55;
+  font-style: italic;
+  text-align: center;
+}
+
+.section-block {
+  padding: 20px 0 0;
+  border-bottom: 1px solid rgba(205, 221, 227, 0.8);
+
+  h2 {
+    margin: 0 0 16px;
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    color: #41484d;
+    text-transform: uppercase;
+  }
+}
+
+.link-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 22px;
+}
+
+.info-card {
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(215, 229, 236, 0.95);
+  border-radius: 20px;
+  box-shadow: 0 10px 24px rgba(56, 101, 117, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  text-decoration: none;
+}
+
+.info-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: #edf7fb;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+}
+
+.info-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  strong {
+    font-size: 15px;
+    font-weight: 800;
+    color: #2f3439;
+  }
+
+  span {
+    font-size: 12px;
+    color: #7c8a91;
+    font-weight: 600;
+  }
+}
+
+.info-card__chevron {
+  color: #b3bcc1;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.about-footer {
+  padding: 26px 0 8px;
+  text-align: center;
+  color: #6f8088;
+
+  p {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  small {
+    display: block;
+    font-size: 12px;
+    margin-top: 12px;
+    color: #9aa8ae;
+  }
+}
+
+.about-footer__meta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  padding: 0 14px;
+  border-left: 1px solid #d4e1e6;
+  border-right: 1px solid #d4e1e6;
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #57656d;
+  font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .about-page {
+    min-height: 100%;
+  }
+
+  .about-page__content {
+    width: min(100%, 820px);
+    padding: 18px 24px 44px;
+  }
+
+  .about-hero {
+    padding: 24px 8px 28px;
+  }
+
+  .brand-lockup {
+    gap: 14px;
+    margin-bottom: 22px;
+
+    img {
+      width: 190px;
+    }
+  }
+
+  .brand-copy {
+    strong {
+      font-size: 32px;
+    }
+
+    span {
+      min-height: 34px;
+      padding: 0 16px;
+      font-size: 14px;
+    }
+  }
+
+  .mission-quote {
+    max-width: 640px;
+    margin: 0 auto;
+    padding-left: 20px;
+    font-size: 19px;
+    line-height: 1.6;
+  }
+
+  .section-block {
+    padding-top: 24px;
+
+    h2 {
+      margin-bottom: 18px;
+    }
+  }
+
+  .link-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding-bottom: 24px;
+  }
+
+  .info-card {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .info-card__icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+  }
+
+  .info-card__body {
+    strong {
+      font-size: 16px;
+    }
+
+    span {
+      font-size: 12px;
+    }
+  }
+
+  .about-footer {
+    padding-top: 28px;
+
+    p {
+      font-size: 15px;
+    }
+  }
+}
+
+@media (min-width: 1100px) {
+  .about-page__content {
+    width: min(100%, 900px);
+  }
+}

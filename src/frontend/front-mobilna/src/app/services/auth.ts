@@ -30,6 +30,10 @@ export interface UserDto {
   firstName: string;
   lastName: string;
   email: string;
+  phoneNumber?: string | null;
+  country?: string | null;
+  language?: string;
+  profileImageUrl?: string | null;
   roleName: string;
   isActive: boolean;
   isVerified: boolean;
@@ -44,6 +48,14 @@ export interface AuthResponseDto {
 
 export interface RefreshTokenDto {
   refreshToken: string;
+}
+
+export interface UpdateUserDto {
+  firstName?: string | null;
+  lastName?: string | null;
+  phoneNumber?: string | null;
+  country?: string | null;
+  language?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -88,12 +100,41 @@ export class AuthService {
         tap((res) => {
           localStorage.setItem('token', res.token);
           localStorage.setItem('refreshToken', res.refreshToken);
+          localStorage.setItem('user', JSON.stringify(res.user));
         }),
       );
   }
 
+  getById(userId: number): Observable<UserDto> {
+    return this.http.get<UserDto>(`${this.url}/${userId}`).pipe(tap((user) => this.setCurrentUser(user)));
+  }
+
+  update(userId: number, dto: UpdateUserDto): Observable<UserDto> {
+    return this.http
+      .put<UserDto>(`${this.url}/${userId}`, dto)
+      .pipe(tap((user) => this.setCurrentUser(user)));
+  }
+
+  updateProfileImage(userId: number, file: File): Observable<UserDto> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http
+      .put<UserDto>(`${this.url}/${userId}/profile-image`, formData)
+      .pipe(tap((user) => this.setCurrentUser(user)));
+  }
+
+  removeProfileImage(userId: number): Observable<UserDto> {
+    return this.http
+      .delete<UserDto>(`${this.url}/${userId}/profile-image`)
+      .pipe(tap((user) => this.setCurrentUser(user)));
+  }
+
   changePassword(userId: number, dto: ChangePasswordDto): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.url}/${userId}/change-password`, dto);
+  }
+
+  requestCreatorRole(userId: number, creatorType: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.url}/${userId}/request-creator`, creatorType);
   }
 
   getToken(): string | null {
@@ -103,6 +144,10 @@ export class AuthService {
   getCurrentUser(): UserDto | null {
     const u = localStorage.getItem('user');
     return u ? JSON.parse(u) : null;
+  }
+
+  setCurrentUser(user: UserDto): void {
+    localStorage.setItem('user', JSON.stringify(user));
   }
 
   isLoggedIn(): boolean {

@@ -1,0 +1,58 @@
+<div class="favorites-page">
+  <header class="favorites-topbar">
+    <a class="back-btn" routerLink="/profile" aria-label="Nazad">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m15 18-6-6 6-6" />
+      </svg>
+    </a>
+    <h1>Favorites</h1>
+    <div class="topbar-spacer" aria-hidden="true"></div>
+  </header>
+
+  <div class="favorites-shell">
+    <section class="hero-card">
+      <span class="eyebrow">SACUVANO</span>
+      <h2>Tvoje omiljene stavke su na jednom mestu.</h2>
+      <p>
+        Pregledaj sve sto si sacuvao i brzo ukloni stavke koje vise ne zelis da cuvas.
+      </p>
+    </section>
+
+    @if (errorMessage()) {
+      <p class="feedback feedback--error">{{ errorMessage() }}</p>
+    }
+
+    @if (isLoading()) {
+      <section class="state-card">
+        <strong>Ucitavanje...</strong>
+        <p>Pripremamo tvoje sacuvane stavke.</p>
+      </section>
+    } @else if (!favorites().length) {
+      <section class="state-card">
+        <strong>Nemas sacuvanih stavki</strong>
+        <p>Kada sacuvas destinaciju ili objekat, ovde ce se pojaviti.</p>
+      </section>
+    } @else {
+      <section class="favorites-list">
+        @for (item of favorites(); track trackFavorite($index, item)) {
+          <article class="favorite-card">
+            <div class="favorite-card__content">
+              <span class="type-badge">{{ item.typeLabel }}</span>
+              <h3>{{ item.title }}</h3>
+              <p>Sacuvano: {{ item.createdLabel }}</p>
+            </div>
+
+            <button
+              class="remove-btn"
+              type="button"
+              [disabled]="isRemoving() === item.id"
+              (click)="removeFavorite(item.id)"
+            >
+              {{ isRemoving() === item.id ? 'Uklanjanje...' : 'Ukloni' }}
+            </button>
+          </article>
+        }
+      </section>
+    }
+  </div>
+</div>
