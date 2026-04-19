@@ -1541,12 +1541,36 @@ namespace TuristickiVodic.Tests.Validation
         }
 
         [Fact]
+        public void VerifyResetCodeDto_ValidnoPopunjeno_JeValidno()
+        {
+            var dto = new VerifyResetCodeDto
+            {
+                Email = "ana@test.com",
+                Code = "123456"
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void VerifyResetCodeDto_KodNijeSestCifara_NijeValidno()
+        {
+            var dto = new VerifyResetCodeDto
+            {
+                Email = "ana@test.com",
+                Code = "12345"
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(VerifyResetCodeDto.Code)));
+        }
+
+        [Fact]
         public void ResetPasswordDto_ValidnoPopunjeno_JeValidno()
         {
             var dto = new ResetPasswordDto
             {
-                Email = "ana@test.com",
-                Code = "123456",
+                ResetSessionToken = "ABC123TOKEN",
                 NewPassword = "nova1234",
                 ConfirmPassword = "nova1234"
             };
@@ -1555,27 +1579,11 @@ namespace TuristickiVodic.Tests.Validation
         }
 
         [Fact]
-        public void ResetPasswordDto_KodNijeSestCifara_NijeValidno()
-        {
-            var dto = new ResetPasswordDto
-            {
-                Email = "ana@test.com",
-                Code = "12345",
-                NewPassword = "nova1234",
-                ConfirmPassword = "nova1234"
-            };
-
-            IsValid(dto).Should().BeFalse();
-            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(ResetPasswordDto.Code)));
-        }
-
-        [Fact]
         public void ResetPasswordDto_ConfirmPasswordSeNePoklapa_NijeValidno()
         {
             var dto = new ResetPasswordDto
             {
-                Email = "ana@test.com",
-                Code = "123456",
+                ResetSessionToken = "ABC123TOKEN",
                 NewPassword = "nova1234",
                 ConfirmPassword = "druga123"
             };

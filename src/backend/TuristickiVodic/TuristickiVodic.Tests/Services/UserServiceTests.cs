@@ -1989,9 +1989,9 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
-        public async Task ResetPasswordAsync_KadaJeKodValidan_MenjaLozinkuICistiResetPolja()
+        public async Task VerifyResetCodeAsync_KadaJeKodValidan_VracaResetSessionTokenICuvaNoviHash()
         {
-            using var ctx = CreateInMemoryContext(nameof(ResetPasswordAsync_KadaJeKodValidan_MenjaLozinkuICistiResetPolja));
+            using var ctx = CreateInMemoryContext(nameof(VerifyResetCodeAsync_KadaJeKodValidan_VracaResetSessionTokenICuvaNoviHash));
             var (tourist, _, _, _) = SeedRoles(ctx);
 
             var validCode = "123456";
@@ -2018,25 +2018,29 @@ namespace TuristickiVodic.Tests.Services
 
             var service = CreateUserService(ctx, new Mock<ITokenService>());
 
-            await service.ResetPasswordAsync(new ResetPasswordDto
+            var result = await service.VerifyResetCodeAsync(new VerifyResetCodeDto
             {
                 Email = "ana.reset@test.com",
-                Code = validCode,
-                NewPassword = "nova1234",
-                ConfirmPassword = "nova1234"
+                Code = validCode
             });
+
+            result.Should().NotBeNull();
+            result.ResetSessionToken.Should().NotBeNullOrWhiteSpace();
+            result.ExpiresAt.Should().BeAfter(DateTime.UtcNow);
 
             var user = await ctx.Users.FindAsync(151);
             user.Should().NotBeNull();
-            BCrypt.Net.BCrypt.Verify("nova1234", user!.PasswordHash).Should().BeTrue();
-            user.ResetToken.Should().BeNull();
-            user.ResetTokenExpiry.Should().BeNull();
+            user!.ResetToken.Should().NotBeNullOrWhiteSpace();
+            user.ResetToken.Should().NotBe(hashedCode);
+            user.ResetToken.Should().Be(Convert.ToBase64String(
+                System.Security.Cryptography.SHA256.HashData(
+                    System.Text.Encoding.UTF8.GetBytes(result.ResetSessionToken))));
         }
 
         [Fact]
-        public async Task ResetPasswordAsync_KadaJeKodNevalidan_BacaException()
+        public async Task VerifyResetCodeAsync_KadaJeKodNevalidan_BacaException()
         {
-            using var ctx = CreateInMemoryContext(nameof(ResetPasswordAsync_KadaJeKodNevalidan_BacaException));
+            using var ctx = CreateInMemoryContext(nameof(VerifyResetCodeAsync_KadaJeKodNevalidan_BacaException));
             var (tourist, _, _, _) = SeedRoles(ctx);
 
             ctx.Users.Add(new User
@@ -2058,15 +2062,92 @@ namespace TuristickiVodic.Tests.Services
 
             var service = CreateUserService(ctx, new Mock<ITokenService>());
 
-            await service.Invoking(s => s.ResetPasswordAsync(new ResetPasswordDto
+            await service.Invoking(s => s.VerifyResetCodeAsync(new VerifyResetCodeDto
             {
                 Email = "ana.invalid@test.com",
-                Code = "123456",
+                Code = "123456"
+            }))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*Invalid or expired reset code*");
+        }
+
+        [Fact]
+        public async Task ResetPasswordAsync_KadaJeSessionTokenValidan_MenjaLozinkuICistiResetPolja()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ResetPasswordAsync_KadaJeSessionTokenValidan_MenjaLozinkuICistiResetPolja));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            var validSessionToken = "SESSIONTOKEN123";
+            var hashedSessionToken = Convert.ToBase64String(
+                System.Security.Cryptography.SHA256.HashData(
+                    System.Text.Encoding.UTF8.GetBytes(validSessionToken)));
+
+            ctx.Users.Add(new User
+            {
+                Id = 153,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana.finishreset@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                ResetToken = hashedSessionToken,
+                ResetTokenExpiry = DateTime.UtcNow.AddMinutes(5),
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+
+            await service.ResetPasswordAsync(new ResetPasswordDto
+            {
+                ResetSessionToken = validSessionToken,
+                NewPassword = "nova1234",
+                ConfirmPassword = "nova1234"
+            });
+
+            var user = await ctx.Users.FindAsync(153);
+            user.Should().NotBeNull();
+            BCrypt.Net.BCrypt.Verify("nova1234", user!.PasswordHash).Should().BeTrue();
+            user.ResetToken.Should().BeNull();
+            user.ResetTokenExpiry.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task ResetPasswordAsync_KadaJeSessionTokenNevalidan_BacaException()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ResetPasswordAsync_KadaJeSessionTokenNevalidan_BacaException));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 154,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana.invalidsession@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                ResetToken = "pogresan-hash",
+                ResetTokenExpiry = DateTime.UtcNow.AddMinutes(5),
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+
+            await service.Invoking(s => s.ResetPasswordAsync(new ResetPasswordDto
+            {
+                ResetSessionToken = "SESSIONTOKEN123",
                 NewPassword = "nova1234",
                 ConfirmPassword = "nova1234"
             }))
                 .Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*Invalid or expired reset code*");
+                .WithMessage("*Invalid or expired reset session*");
         }
     }
 }

@@ -17,6 +17,7 @@ namespace TuristickiVodic.Services
     public class UserService : IUserService
     {
         private const int ResetCodeLifetimeMinutes = 5;
+        private const int ResetSessionLifetimeMinutes = 5;
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
@@ -474,7 +475,7 @@ namespace TuristickiVodic.Services
                 BuildResetPasswordEmailBodyForFiveMinuteExpiry(user.FirstName, resetCode, user.ResetTokenExpiry.Value));
         }
 
-        public async Task ResetPasswordAsync(ResetPasswordDto dto)
+        public async Task<ResetPasswordVerificationDto> VerifyResetCodeAsync(VerifyResetCodeDto dto)
         {
             var normalizedEmail = dto.Email.Trim().ToLower();
 
@@ -495,6 +496,33 @@ namespace TuristickiVodic.Services
 
             if (user.ResetToken != providedCodeHash)
                 throw new InvalidOperationException("Invalid or expired reset code.");
+
+            var resetSessionToken = GenerateResetSessionToken();
+            user.ResetToken = HashResetToken(resetSessionToken);
+            user.ResetTokenExpiry = DateTime.UtcNow.AddMinutes(ResetSessionLifetimeMinutes);
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return new ResetPasswordVerificationDto
+            {
+                ResetSessionToken = resetSessionToken,
+                ExpiresAt = user.ResetTokenExpiry.Value
+            };
+        }
+
+        public async Task ResetPasswordAsync(ResetPasswordDto dto)
+        {
+            var resetSessionTokenHash = HashResetToken(dto.ResetSessionToken.Trim());
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u =>
+                    u.ResetToken == resetSessionTokenHash &&
+                    u.ResetTokenExpiry.HasValue &&
+                    u.ResetTokenExpiry.Value > DateTime.UtcNow);
+
+            if (user == null || !user.IsActive || user.IsBlacklisted)
+                throw new InvalidOperationException("Invalid or expired reset session.");
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
             user.ResetToken = null;
@@ -809,6 +837,11 @@ namespace TuristickiVodic.Services
         private static string GenerateResetCode()
         {
             return RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
+        }
+
+        private static string GenerateResetSessionToken()
+        {
+            return Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
         }
 
         private static string BuildResetPasswordEmailBodyForFiveMinuteExpiry(string firstName, string resetCode, DateTime expiresAtUtc)
