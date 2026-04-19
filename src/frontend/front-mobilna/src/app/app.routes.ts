@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { profileAuthGuard } from './guards/profile-auth.guard';
 
 export const routes: Routes = [
   {
@@ -27,6 +28,7 @@ export const routes: Routes = [
   },
   {
     path: 'terms',
+    canActivate: [profileAuthGuard],
     loadComponent: () => import('./feature/terms/terms.component').then((m) => m.TermsComponent),
   },
   {
@@ -36,16 +38,19 @@ export const routes: Routes = [
   },
   {
     path: 'language',
+    canActivate: [profileAuthGuard],
     loadComponent: () =>
       import('./feature/language/language.component').then((m) => m.LanguageComponent),
   },
   {
     path: 'support',
+    canActivate: [profileAuthGuard],
     loadComponent: () =>
       import('./feature/support/support.component').then((m) => m.SupportComponent),
   },
   {
     path: 'moderator-access',
+    canActivate: [profileAuthGuard],
     loadComponent: () =>
       import('./feature/moderator-access/moderator-access.component').then(
         (m) => m.ModeratorAccessComponent,
@@ -107,14 +112,42 @@ export const routes: Routes = [
   },
   {
     path: 'profile',
+    canActivate: [profileAuthGuard],
     loadComponent: () =>
       import('./feature/profile/profile.component').then((m) => m.ProfileComponent),
   },
   {
     path: 'profile/edit',
+    canActivate: [profileAuthGuard],
     loadComponent: () =>
       import('./feature/edit-profile/edit-profile.component').then(
         (m) => m.EditProfileComponent,
+      ),
+  },
+  {
+    path: 'favorites',
+    canActivate: [profileAuthGuard],
+    loadComponent: () =>
+      import('./feature/favorites/favorites.component').then((m) => m.FavoritesComponent),
+  },
+  {
+    path: 'saved',
+    canActivate: [profileAuthGuard],
+    loadComponent: () =>
+      import('./feature/favorites/favorites.component').then((m) => m.FavoritesComponent),
+  },
+  {
+    path: 'my-reviews',
+    canActivate: [profileAuthGuard],
+    loadComponent: () =>
+      import('./feature/my-reviews/my-reviews.component').then((m) => m.MyReviewsComponent),
+  },
+  {
+    path: 'privacy-data',
+    canActivate: [profileAuthGuard],
+    loadComponent: () =>
+      import('./feature/privacy-data/privacy-data.component').then(
+        (m) => m.PrivacyDataComponent,
       ),
   },
   {
