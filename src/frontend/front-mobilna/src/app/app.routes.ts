@@ -4,7 +4,7 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'attractions',
+    redirectTo: 'home',
   },
   {
     path: 'login',
@@ -102,5 +102,9 @@ export const routes: Routes = [
     path: 'map', 
     loadComponent: () => 
       import('./feature/map/map').then(m => m.MapComponent) 
-  }
+  },
+  { path: 'object/:id', 
+    loadComponent: () => 
+      import('./feature/object-detail/object-detail').then(m => m.ObjectDetailComponent) 
+  },
 ];

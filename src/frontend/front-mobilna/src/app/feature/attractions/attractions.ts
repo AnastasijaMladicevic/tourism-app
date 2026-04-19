@@ -224,7 +224,7 @@ export class AttractionsComponent implements OnInit {
   }
 
   viewDetails(destination: DestinationView): void {
-    this.router.navigate(['/destination', destination.id]);
+    this.router.navigate(['/object', destination.id]);
   }
 
   goBack(): void {

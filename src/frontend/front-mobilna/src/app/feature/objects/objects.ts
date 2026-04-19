@@ -217,16 +217,10 @@ export class ObjectsComponent implements OnInit {
   viewDetails(obj: ObjectView): void {
   const type = obj.objectTypeName?.trim().toLowerCase();
 
-  if (type === 'restoran') {
-    this.router.navigate(['/restaurant', obj.id]);
+  if (type != null) {
+    this.router.navigate(['/object', obj.id]);
     return;
   }
-
-  if (type === 'hotel') {
-    this.router.navigate(['/hotel', obj.id]);
-    return;
-  }
-
   this.router.navigate(['/objects']);
 }
 
