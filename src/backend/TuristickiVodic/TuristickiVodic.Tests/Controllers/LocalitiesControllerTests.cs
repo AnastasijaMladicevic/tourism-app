@@ -120,6 +120,45 @@ namespace TuristickiVodic.Tests.Controllers
                 .Which.Value.Should().BeEquivalentTo(dto);
         }
 
+        [Fact]
+        public async Task GetNearby_AnonimniKorisnik_VracaOkSaRezultatima()
+        {
+            var mockService = new Mock<ILocalityService>();
+            var dto = new PagedResultDto<LocalityDto>
+            {
+                Items = new List<LocalityDto>
+                {
+                    new LocalityDto
+                    {
+                        Id = 1,
+                        Name = "Stari grad",
+                        DestinationName = "Kotor",
+                        DistanceMeters = 120.5
+                    }
+                },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 1,
+                TotalPages = 1
+            };
+
+            mockService
+                .Setup(s => s.GetNearbyAsync(It.IsAny<NearbyLocalityQueryDto>()))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.GetNearby(new NearbyLocalityQueryDto
+            {
+                Latitude = 42.42,
+                Longitude = 18.77,
+                RadiusMeters = 5000
+            });
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
         // ═══════════════════════════════════════════
         //  GET /api/localities/{id}  — anonimno
         // ═══════════════════════════════════════════
