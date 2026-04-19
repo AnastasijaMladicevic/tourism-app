@@ -5,6 +5,7 @@ namespace TuristickiVodic.Core.DTO
     public class LoginDto
     {
         [Required, EmailAddress]
+        [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Neispravan format email-a")]
         public string Email { get; set; }
 
         [Required]
