@@ -1128,7 +1128,47 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
-        public async Task ResetPassword_KadaJeKodValidan_VracaOk()
+        public async Task VerifyResetCode_KadaJeKodValidan_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.VerifyResetCodeAsync(It.IsAny<VerifyResetCodeDto>()))
+                .ReturnsAsync(new ResetPasswordVerificationDto
+                {
+                    ResetSessionToken = "SESSION_TOKEN",
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(5)
+                });
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.VerifyResetCode(new VerifyResetCodeDto
+            {
+                Email = "ana@test.com",
+                Code = "123456"
+            });
+
+            result.Should().BeOfType<OkObjectResult>();
+        }
+
+        [Fact]
+        public async Task VerifyResetCode_KadaJeKodNevalidan_VracaBadRequest()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.VerifyResetCodeAsync(It.IsAny<VerifyResetCodeDto>()))
+                .ThrowsAsync(new InvalidOperationException("Invalid or expired reset code."));
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.VerifyResetCode(new VerifyResetCodeDto
+            {
+                Email = "ana@test.com",
+                Code = "123456"
+            });
+
+            result.Should().BeOfType<BadRequestObjectResult>();
+        }
+
+        [Fact]
+        public async Task ResetPassword_KadaJeSessionTokenValidan_VracaOk()
         {
             var mockService = new Mock<IUserService>();
             mockService.Setup(s => s.ResetPasswordAsync(It.IsAny<ResetPasswordDto>()))
@@ -1138,8 +1178,7 @@ namespace TuristickiVodic.Tests.Controllers
 
             var result = await controller.ResetPassword(new ResetPasswordDto
             {
-                Email = "ana@test.com",
-                Code = "123456",
+                ResetSessionToken = "SESSION_TOKEN",
                 NewPassword = "nova1234",
                 ConfirmPassword = "nova1234"
             });
@@ -1148,18 +1187,17 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
-        public async Task ResetPassword_KadaJeKodNevalidan_VracaBadRequest()
+        public async Task ResetPassword_KadaJeSessionTokenNevalidan_VracaBadRequest()
         {
             var mockService = new Mock<IUserService>();
             mockService.Setup(s => s.ResetPasswordAsync(It.IsAny<ResetPasswordDto>()))
-                .ThrowsAsync(new InvalidOperationException("Invalid or expired reset code."));
+                .ThrowsAsync(new InvalidOperationException("Invalid or expired reset session."));
 
             var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
 
             var result = await controller.ResetPassword(new ResetPasswordDto
             {
-                Email = "ana@test.com",
-                Code = "123456",
+                ResetSessionToken = "SESSION_TOKEN",
                 NewPassword = "nova1234",
                 ConfirmPassword = "nova1234"
             });
