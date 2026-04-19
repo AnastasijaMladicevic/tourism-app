@@ -13,6 +13,7 @@ namespace TuristickiVodic.Services.Services
         Task<bool> DeleteAsync(int id, int userId, string roleName);
         Task<EventDto?> ToggleActiveAsync(int id, bool isActive, int userId, string roleName);
         Task<PagedResultDto<EventDto>> GetAllAsync(EventQueryDto query);
+        Task<PagedResultDto<EventDto>> GetNearbyAsync(NearbyEventQueryDto query);
         Task<PagedResultDto<EventDto>> GetMyAsync(int userId, EventQueryDto query);
         Task<PagedResultDto<EventDto>> GetForManagerAsync(int userId, EventQueryDto query);
         Task<PagedResultDto<EventDto>> SearchAsync(EventQueryDto query);
