@@ -651,5 +651,151 @@ namespace TuristickiVodic.Tests.Services
 
             result.Should().BeNull();
         }
+
+        [Fact]
+        public async Task GetMyAsync_ContentCreator_VidiSamoSvojeAktivnostiNezavisnoOdStatusa()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetMyAsync_ContentCreator_VidiSamoSvojeAktivnostiNezavisnoOdStatusa));
+            var (_, _, _, activityType, destination, _, locality, _, creator, otherCreator, _, _, _) = SeedBase(ctx);
+
+            ctx.Activities.AddRange(
+                new Activity
+                {
+                    Id = 1,
+                    Name = "Moja pending aktivnost",
+                    ActivityTypeId = activityType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new Activity
+                {
+                    Id = 2,
+                    Name = "Moja rejected aktivnost",
+                    ActivityTypeId = activityType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Rejected,
+                    IsActive = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new Activity
+                {
+                    Id = 3,
+                    Name = "Tudja aktivnost",
+                    ActivityTypeId = activityType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = otherCreator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+            ctx.SaveChanges();
+
+            var svc = new ActivityService(ctx, CreateMapper());
+            var result = await svc.GetMyAsync(creator.Id, new ActivityQueryDto { SortBy = "name", SortOrder = "asc" });
+
+            result.TotalCount.Should().Be(2);
+            result.Items.Select(x => x.Name).Should().Equal("Moja pending aktivnost", "Moja rejected aktivnost");
+            result.Items.Select(x => x.Status).Should().Equal("Pending", "Rejected");
+        }
+
+        [Fact]
+        public async Task GetForManagerAsync_ManagerVidiSamoAktivnostiSvojeDestinacijeNezavisnoOdStatusa()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetForManagerAsync_ManagerVidiSamoAktivnostiSvojeDestinacijeNezavisnoOdStatusa));
+            var (_, _, _, activityType, destination, otherDestination, locality, otherLocality, creator, _, manager, otherManager, _) = SeedBase(ctx);
+
+            ctx.Activities.AddRange(
+                new Activity
+                {
+                    Id = 1,
+                    Name = "Pending moja aktivnost",
+                    ActivityTypeId = activityType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new Activity
+                {
+                    Id = 2,
+                    Name = "Rejected moja aktivnost",
+                    ActivityTypeId = activityType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Rejected,
+                    IsActive = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new Activity
+                {
+                    Id = 3,
+                    Name = "Aktivnost druge destinacije",
+                    ActivityTypeId = activityType.Id,
+                    DestinationId = otherDestination.Id,
+                    LocalityId = otherLocality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = false,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+            manager.ManagedDestinationId = destination.Id;
+            otherManager.ManagedDestinationId = otherDestination.Id;
+            ctx.SaveChanges();
+
+            var svc = new ActivityService(ctx, CreateMapper());
+            var result = await svc.GetForManagerAsync(manager.Id, new ActivityQueryDto { SortBy = "name", SortOrder = "asc" });
+
+            result.TotalCount.Should().Be(2);
+            result.Items.Select(x => x.Name).Should().Equal("Pending moja aktivnost", "Rejected moja aktivnost");
+            result.Items.Select(x => x.Status).Should().Equal("Pending", "Rejected");
+        }
+
+        [Fact]
+        public async Task GetForManagerByIdAsync_OdgovorniManagerMozeDaDobijeIPendingAktivnost()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetForManagerByIdAsync_OdgovorniManagerMozeDaDobijeIPendingAktivnost));
+            var (_, _, _, activityType, destination, _, locality, _, creator, _, manager, _, _) = SeedBase(ctx);
+
+            ctx.Activities.Add(new Activity
+            {
+                Id = 1,
+                Name = "Manager pending aktivnost",
+                ActivityTypeId = activityType.Id,
+                DestinationId = destination.Id,
+                LocalityId = locality.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Pending,
+                IsActive = false,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+
+            ctx.SaveChanges();
+
+            var svc = new ActivityService(ctx, CreateMapper());
+            var result = await svc.GetForManagerByIdAsync(1, manager.Id);
+
+            result.Should().NotBeNull();
+            result!.Status.Should().Be("Pending");
+            result.Name.Should().Be("Manager pending aktivnost");
+        }
     }
 }

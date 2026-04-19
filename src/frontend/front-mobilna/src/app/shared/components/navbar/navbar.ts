@@ -37,6 +37,8 @@ export class NavbarComponent {
     { label: 'Home', icon: 'home', route: '/home' },
     { label: 'Map', icon: 'map', route: '/map' },
     { label: 'Saved', icon: 'bookmark_border', route: '/saved' },
+    { label: 'Favorite', icon: 'favorite', route: '/favorite' },
+    { label: 'Planner', icon: 'calendar_month', route: '/planner' },
     { label: 'Profile', icon: 'person_outline', route: '/profile' },
   ];
 

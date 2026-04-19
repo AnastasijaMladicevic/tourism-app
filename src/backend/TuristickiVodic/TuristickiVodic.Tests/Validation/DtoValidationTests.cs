@@ -198,9 +198,50 @@ namespace TuristickiVodic.Tests.Validation
             Validate(dto).Should().Contain(r => r.MemberNames.Contains("Name"));
         }
 
+        [Fact]
+        public void CreateDestinationDto_SamoLongitude_NijeValidno()
+        {
+            var dto = new CreateDestinationDto
+            {
+                Name = "Test",
+                DestinationTypeId = 1,
+                ManagedByUserId = 1,
+                Longitude = 18.77
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateDestinationDto.Longitude)));
+        }
+
         // ═══════════════════════════════════════════
         //  ChangePasswordDto
         // ═══════════════════════════════════════════
+
+        [Fact]
+        public void UpdateUserLocationDto_HeadingVeceOd360_NijeValidno()
+        {
+            var dto = new UpdateUserLocationDto
+            {
+                Longitude = 18.77,
+                Latitude = 42.42,
+                HeadingDegrees = 361
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(UpdateUserLocationDto.HeadingDegrees)));
+        }
+
+        [Fact]
+        public void UserLocationPathQueryDto_MaxPointsJeNula_NijeValidno()
+        {
+            var dto = new UserLocationPathQueryDto
+            {
+                MaxPoints = 0
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(UserLocationPathQueryDto.MaxPoints)));
+        }
 
         [Fact]
         public void ChangePasswordDto_ValidnoPopunjeno_JeValidno()
@@ -387,6 +428,21 @@ namespace TuristickiVodic.Tests.Validation
             var dto = new UpdateLocalityDto { DestinationId = 2 };
 
             IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateLocalityDto_SamoLongitude_NijeValidno()
+        {
+            var dto = new CreateLocalityDto
+            {
+                Name = "Test",
+                Longitude = 18.75,
+                DestinationId = 1,
+                LocalityTypeId = 1
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateLocalityDto.Longitude)));
         }
 
         // ═══════════════════════════════════════════
@@ -635,6 +691,49 @@ namespace TuristickiVodic.Tests.Validation
             Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateEventDto.Name)));
         }
 
+        [Fact]
+        public void CreateEventDto_EventTypeIdJeNula_NijeValidan()
+        {
+            var dto = new CreateEventDto
+            {
+                Name = "Koncert",
+                EventTypeId = 0,
+                LocalityId = 1,
+                StartDate = new DateTime(2026, 5, 5, 20, 0, 0)
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateEventDto.EventTypeId)));
+        }
+
+        [Fact]
+        public void CreateEventDto_SamoJednaKoordinata_NijeValidan()
+        {
+            var dto = new CreateEventDto
+            {
+                Name = "Koncert",
+                EventTypeId = 1,
+                LocalityId = 1,
+                StartDate = new DateTime(2026, 5, 5, 20, 0, 0),
+                Longitude = 18.77
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateEventDto.Longitude)));
+        }
+
+        [Fact]
+        public void UpdateEventDto_SamoJednaKoordinata_NijeValidan()
+        {
+            var dto = new UpdateEventDto
+            {
+                Longitude = 18.77
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(UpdateEventDto.Longitude)));
+        }
+
         // ═══════════════════════════════════════════
         //  CreateActivityDto
         // ═══════════════════════════════════════════
@@ -737,6 +836,33 @@ namespace TuristickiVodic.Tests.Validation
             };
 
             IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateActivityDto_SamoJednaKoordinata_NijeValidno()
+        {
+            var dto = new CreateActivityDto
+            {
+                Name = "Setnja",
+                ActivityTypeId = 1,
+                LocalityId = 1,
+                Longitude = 18.77
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateActivityDto.Longitude)));
+        }
+
+        [Fact]
+        public void UpdateActivityDto_NegativnaCena_NijeValidno()
+        {
+            var dto = new UpdateActivityDto
+            {
+                Price = -5m
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(UpdateActivityDto.Price)));
         }
 
         // ═══════════════════════════════════════════
@@ -1389,6 +1515,81 @@ namespace TuristickiVodic.Tests.Validation
             var dto = new UpdateImageDto();
 
             IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void ForgotPasswordDto_ValidanEmail_JeValidno()
+        {
+            var dto = new ForgotPasswordDto
+            {
+                Email = "ana@test.com"
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void ForgotPasswordDto_NevalidanEmail_NijeValidno()
+        {
+            var dto = new ForgotPasswordDto
+            {
+                Email = "nije-email"
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(ForgotPasswordDto.Email)));
+        }
+
+        [Fact]
+        public void VerifyResetCodeDto_ValidnoPopunjeno_JeValidno()
+        {
+            var dto = new VerifyResetCodeDto
+            {
+                Email = "ana@test.com",
+                Code = "123456"
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void VerifyResetCodeDto_KodNijeSestCifara_NijeValidno()
+        {
+            var dto = new VerifyResetCodeDto
+            {
+                Email = "ana@test.com",
+                Code = "12345"
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(VerifyResetCodeDto.Code)));
+        }
+
+        [Fact]
+        public void ResetPasswordDto_ValidnoPopunjeno_JeValidno()
+        {
+            var dto = new ResetPasswordDto
+            {
+                ResetSessionToken = "ABC123TOKEN",
+                NewPassword = "nova1234",
+                ConfirmPassword = "nova1234"
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void ResetPasswordDto_ConfirmPasswordSeNePoklapa_NijeValidno()
+        {
+            var dto = new ResetPasswordDto
+            {
+                ResetSessionToken = "ABC123TOKEN",
+                NewPassword = "nova1234",
+                ConfirmPassword = "druga123"
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(ResetPasswordDto.ConfirmPassword)));
         }
 
     }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
+import { ReviewDto } from './review';
 
 export interface ObjectImageDto {
   id: number;
@@ -29,8 +30,8 @@ export interface ObjectDto {
   localityName?: string;
   destinationName?: string;
   images?: ObjectImageDto[];
+  reviews?: ReviewDto[];
 }
-
 export interface ObjectView extends ObjectDto {
   isFavorite: boolean;
   favoriteId?: number;

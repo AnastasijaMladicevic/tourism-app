@@ -35,6 +35,7 @@ public class AppDbContext : DbContext
     public DbSet<EventPlannerItem> EventPlannerItems { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<RevokedToken> RevokedTokens { get; set; }
+    public DbSet<UserLocationHistory> UserLocationHistories { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder mb)
@@ -43,6 +44,23 @@ public class AppDbContext : DbContext
         mb.Entity<User>()
             .HasIndex(u => u.Email)
             .IsUnique();
+
+        mb.Entity<User>()
+            .HasIndex(u => u.LastKnownLocation)
+            .HasMethod("GIST");
+
+        mb.Entity<UserLocationHistory>()
+            .HasIndex(ulh => new { ulh.UserId, ulh.RecordedAt });
+
+        mb.Entity<UserLocationHistory>()
+            .HasIndex(ulh => ulh.Location)
+            .HasMethod("GIST");
+
+        mb.Entity<UserLocationHistory>()
+            .HasOne(ulh => ulh.User)
+            .WithMany(u => u.LocationHistory)
+            .HasForeignKey(ulh => ulh.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         mb.Entity<User>()
             .HasOne(u => u.Role)

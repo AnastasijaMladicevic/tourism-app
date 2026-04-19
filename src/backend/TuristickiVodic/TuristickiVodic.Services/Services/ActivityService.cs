@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
+using System;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
@@ -89,6 +90,142 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
+        public async Task<PagedResultDto<ActivityDto>> GetMyAsync(int userId, ActivityQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var activitiesQuery = _context.Activities
+                .Include(a => a.ActivityType)
+                .Include(a => a.Destination)
+                .Include(a => a.Locality)
+                .Include(a => a.Object)
+                .Include(a => a.Images)
+                .Where(a => a.CreatedByUserId == userId)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+                activitiesQuery = activitiesQuery.Where(a =>
+                    a.ActivityType != null &&
+                    a.ActivityType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+                activitiesQuery = activitiesQuery.Where(a =>
+                    a.Destination != null &&
+                    a.Destination.Name.ToLower().Contains(destination));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+                activitiesQuery = activitiesQuery.Where(a =>
+                    a.Name.ToLower().Contains(search) ||
+                    (a.Description != null && a.Description.ToLower().Contains(search)));
+            }
+
+            activitiesQuery = ApplyStatusFilter(activitiesQuery, query.Status);
+            activitiesQuery = ApplyActivitySorting(activitiesQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await activitiesQuery.CountAsync();
+
+            var items = await activitiesQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToListAsync();
+
+            return new PagedResultDto<ActivityDto>
+            {
+                Items = _mapper.Map<List<ActivityDto>>(items),
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
+        public async Task<PagedResultDto<ActivityDto>> GetForManagerAsync(int userId, ActivityQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var destinationIds = await DestinationManagerHelper.GetResponsibleDestinationIdsAsync(_context, userId);
+
+            var activitiesQuery = _context.Activities
+                .Include(a => a.ActivityType)
+                .Include(a => a.Destination)
+                .Include(a => a.Locality)
+                    .ThenInclude(l => l.Destination)
+                .Include(a => a.Object)
+                .Include(a => a.Images)
+                .Where(a =>
+                    (a.DestinationId.HasValue && destinationIds.Contains(a.DestinationId.Value)) ||
+                    (!a.DestinationId.HasValue && a.Locality != null && destinationIds.Contains(a.Locality.DestinationId)))
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+
+                activitiesQuery = activitiesQuery.Where(a =>
+                    a.ActivityType != null &&
+                    a.ActivityType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+
+                activitiesQuery = activitiesQuery.Where(a =>
+                    ((a.Destination != null && a.Destination.Name.ToLower().Contains(destination)) ||
+                     (a.Destination == null && a.Locality != null && a.Locality.Destination != null && a.Locality.Destination.Name.ToLower().Contains(destination))));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+
+                activitiesQuery = activitiesQuery.Where(a =>
+                    a.Name.ToLower().Contains(search) ||
+                    (a.Description != null && a.Description.ToLower().Contains(search)));
+            }
+
+            activitiesQuery = ApplyStatusFilter(activitiesQuery, query.Status);
+            activitiesQuery = ApplyActivitySorting(activitiesQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await activitiesQuery.CountAsync();
+
+            var items = await activitiesQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToListAsync();
+
+            return new PagedResultDto<ActivityDto>
+            {
+                Items = _mapper.Map<List<ActivityDto>>(items),
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
         public async Task<ActivityDto?> GetByIdAsync(int id)
         {
             var activity = await _context.Activities
@@ -112,6 +249,45 @@ namespace TuristickiVodic.Services.Services
             return _mapper.Map<ActivityDto>(activity);
         }
 
+        public async Task<ActivityDto?> GetMineByIdAsync(int id, int userId)
+        {
+            var activity = await _context.Activities
+                .Include(a => a.ActivityType)
+                .Include(a => a.Locality)
+                    .ThenInclude(l => l.Destination)
+                .Include(a => a.Destination)
+                .Include(a => a.Object)
+                .Include(a => a.Images)
+                .FirstOrDefaultAsync(a => a.Id == id && a.CreatedByUserId == userId);
+
+            return activity == null ? null : _mapper.Map<ActivityDto>(activity);
+        }
+
+        public async Task<ActivityDto?> GetForManagerByIdAsync(int id, int userId)
+        {
+            var activity = await _context.Activities
+                .Include(a => a.ActivityType)
+                .Include(a => a.Locality)
+                    .ThenInclude(l => l.Destination)
+                .Include(a => a.Destination)
+                .Include(a => a.Object)
+                .Include(a => a.Images)
+                .FirstOrDefaultAsync(a => a.Id == id);
+
+            if (activity == null)
+                return null;
+
+            var destination = activity.Destination ?? activity.Locality?.Destination;
+            if (destination == null)
+                return null;
+
+            var isResponsible = await DestinationManagerHelper.IsResponsibleManagerAsync(_context, destination, userId);
+            if (!isResponsible)
+                return null;
+
+            return _mapper.Map<ActivityDto>(activity);
+        }
+
         // Samo ContentCreator kreira aktivnost – status uvek Pending, čeka odobrenje menadžera.
         // Aktivnost mora imati LocalityId ili DestinationId (validirano u DTO).
         // Ako je naveden LocalityId, DestinationId mora biti konzistentan.
@@ -119,6 +295,8 @@ namespace TuristickiVodic.Services.Services
         {
             if (roleName != "ContentCreator")
                 throw new UnauthorizedAccessException("Only content creators can create activities.");
+
+            ValidateActivityPayload(dto.Price, dto.DurationMinutes, dto.Longitude, dto.Latitude);
 
             var activityTypeExists = await _context.ActivityTypes.AnyAsync(x => x.Id == dto.ActivityTypeId);
             if (!activityTypeExists)
@@ -203,6 +381,15 @@ namespace TuristickiVodic.Services.Services
 
             if (activity.CreatedByUserId != userId)
                 throw new UnauthorizedAccessException("You can only update your own activities.");
+
+            if ((dto.Longitude.HasValue && !dto.Latitude.HasValue) || (!dto.Longitude.HasValue && dto.Latitude.HasValue))
+                throw new InvalidOperationException("Both longitude and latitude must be provided together.");
+
+            if (dto.Price.HasValue && dto.Price.Value < 0)
+                throw new InvalidOperationException("Price cannot be negative.");
+
+            if (dto.DurationMinutes.HasValue && dto.DurationMinutes.Value <= 0)
+                throw new InvalidOperationException("DurationMinutes must be greater than 0.");
 
             // Validiraj i razreši LocalityId/DestinationId konzistentnost ako se menjaju
             if (dto.LocalityId.HasValue || dto.DestinationId.HasValue)
@@ -355,6 +542,18 @@ namespace TuristickiVodic.Services.Services
             return new Point(longitude.Value, latitude.Value) { SRID = 4326 };
         }
 
+        private static void ValidateActivityPayload(decimal? price, int? durationMinutes, double? longitude, double? latitude)
+        {
+            if ((longitude.HasValue && !latitude.HasValue) || (!longitude.HasValue && latitude.HasValue))
+                throw new InvalidOperationException("Both longitude and latitude must be provided together.");
+
+            if (price.HasValue && price.Value < 0)
+                throw new InvalidOperationException("Price cannot be negative.");
+
+            if (durationMinutes.HasValue && durationMinutes.Value <= 0)
+                throw new InvalidOperationException("DurationMinutes must be greater than 0.");
+        }
+
         public async Task<ActivityDto?> ToggleActiveAsync(int id, bool isActive, int userId, string roleName)
         {
             var activity = await _context.Activities
@@ -432,9 +631,27 @@ namespace TuristickiVodic.Services.Services
                     : query.OrderBy(a => a.DurationMinutes);
             }
 
+            if (sortByValue == "status")
+            {
+                return isDesc
+                    ? query.OrderByDescending(a => a.Status)
+                    : query.OrderBy(a => a.Status);
+            }
+
             return isDesc
                 ? query.OrderByDescending(a => a.Name)
                 : query.OrderBy(a => a.Name);
+        }
+
+        private static IQueryable<Activity> ApplyStatusFilter(IQueryable<Activity> query, string? status)
+        {
+            if (string.IsNullOrWhiteSpace(status))
+                return query;
+
+            if (!Enum.TryParse<ContentStatus>(status.Trim(), true, out var parsedStatus))
+                return query.Where(_ => false);
+
+            return query.Where(a => a.Status == parsedStatus);
         }
     }
 }

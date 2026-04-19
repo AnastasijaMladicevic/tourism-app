@@ -248,6 +248,149 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
+        public async Task GetMyLocation_KadaLokacijaPostoji_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            var dto = new UserLocationDto
+            {
+                Longitude = 18.77,
+                Latitude = 42.42,
+                AccuracyMeters = 35,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            mockService.Setup(s => s.GetCurrentLocationAsync(5)).ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
+            var result = await controller.GetMyLocation();
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
+        public async Task UpdateMyLocation_KadaDtoValidan_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            var response = new UserLocationDto
+            {
+                Longitude = 18.77,
+                Latitude = 42.42,
+                AccuracyMeters = 40,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            mockService
+                .Setup(s => s.UpdateCurrentLocationAsync(5, It.IsAny<UpdateUserLocationDto>()))
+                .ReturnsAsync(response);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
+            var result = await controller.UpdateMyLocation(new UpdateUserLocationDto
+            {
+                Longitude = 18.77,
+                Latitude = 42.42,
+                AccuracyMeters = 40
+            });
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(response);
+        }
+
+        [Fact]
+        public async Task ClearMyLocation_KadaLokacijaPostoji_VracaNoContent()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.ClearCurrentLocationAsync(5)).ReturnsAsync(true);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
+            var result = await controller.ClearMyLocation();
+
+            result.Should().BeOfType<NoContentResult>();
+        }
+
+        [Fact]
+        public async Task GetMyLocationHistory_KadaPostojeTacke_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            var dto = new PagedResultDto<UserLocationHistoryPointDto>
+            {
+                Items = new List<UserLocationHistoryPointDto>
+                {
+                    new UserLocationHistoryPointDto
+                    {
+                        Id = 1,
+                        Longitude = 18.77,
+                        Latitude = 42.42,
+                        AccuracyMeters = 25,
+                        RecordedAt = DateTime.UtcNow
+                    }
+                },
+                Page = 1,
+                PageSize = 50,
+                TotalCount = 1,
+                TotalPages = 1
+            };
+
+            mockService.Setup(s => s.GetLocationHistoryAsync(5, It.IsAny<UserLocationHistoryQueryDto>()))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
+            var result = await controller.GetMyLocationHistory(new UserLocationHistoryQueryDto());
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
+        public async Task GetMyLocationPath_KadaPostojeTacke_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            var dto = new UserLocationPathDto
+            {
+                PointCount = 2,
+                ApproximateDistanceMeters = 140.5,
+                Points = new List<UserLocationHistoryPointDto>
+                {
+                    new UserLocationHistoryPointDto
+                    {
+                        Id = 1,
+                        Longitude = 18.77,
+                        Latitude = 42.42,
+                        RecordedAt = DateTime.UtcNow.AddMinutes(-1)
+                    },
+                    new UserLocationHistoryPointDto
+                    {
+                        Id = 2,
+                        Longitude = 18.78,
+                        Latitude = 42.43,
+                        RecordedAt = DateTime.UtcNow
+                    }
+                }
+            };
+
+            mockService.Setup(s => s.GetLocationPathAsync(5, It.IsAny<UserLocationPathQueryDto>()))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
+            var result = await controller.GetMyLocationPath(new UserLocationPathQueryDto());
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
+        public async Task ClearMyLocationHistory_KadaPostojiIstorija_VracaNoContent()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.ClearLocationHistoryAsync(5)).ReturnsAsync(true);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "Tourist"));
+            var result = await controller.ClearMyLocationHistory();
+
+            result.Should().BeOfType<NoContentResult>();
+        }
+
+        [Fact]
         public async Task Delete_KadaManagerImaDestinaciju_VracaBadRequest()
         {
             var mockService = new Mock<IUserService>();
@@ -575,7 +718,7 @@ namespace TuristickiVodic.Tests.Controllers
 
             var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
 
-            var result = await controller.ToggleActive(5, true);
+            var result = await controller.ToggleActive(5, new ToggleUserActiveDto { State = UserAccountState.Active });
 
             result.Should().BeOfType<OkObjectResult>();
         }
@@ -588,7 +731,7 @@ namespace TuristickiVodic.Tests.Controllers
 
             var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
 
-            var result = await controller.ToggleActive(5, false);
+            var result = await controller.ToggleActive(5, new ToggleUserActiveDto { State = UserAccountState.Inactive });
 
             result.Should().BeOfType<OkObjectResult>();
         }
@@ -601,7 +744,7 @@ namespace TuristickiVodic.Tests.Controllers
 
             var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
 
-            var result = await controller.ToggleActive(999, true);
+            var result = await controller.ToggleActive(999, new ToggleUserActiveDto { State = UserAccountState.Active });
 
             result.Should().BeOfType<NotFoundResult>();
         }
@@ -948,6 +1091,118 @@ namespace TuristickiVodic.Tests.Controllers
 
             result.Should().BeOfType<OkObjectResult>()
                 .Which.Value.Should().BeSameAs(rezultat);
+        }
+
+        [Fact]
+        public async Task ForgotPassword_KadaJeDtoValidan_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.ForgotPasswordAsync(It.IsAny<ForgotPasswordDto>()))
+                .Returns(Task.CompletedTask);
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.ForgotPassword(new ForgotPasswordDto
+            {
+                Email = "ana@test.com"
+            });
+
+            result.Should().BeOfType<OkObjectResult>();
+        }
+
+        [Fact]
+        public async Task ForgotPassword_KadaSlanjeMailaPadne_VracaBadRequest()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.ForgotPasswordAsync(It.IsAny<ForgotPasswordDto>()))
+                .ThrowsAsync(new InvalidOperationException("SMTP settings are not configured."));
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.ForgotPassword(new ForgotPasswordDto
+            {
+                Email = "ana@test.com"
+            });
+
+            result.Should().BeOfType<BadRequestObjectResult>();
+        }
+
+        [Fact]
+        public async Task VerifyResetCode_KadaJeKodValidan_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.VerifyResetCodeAsync(It.IsAny<VerifyResetCodeDto>()))
+                .ReturnsAsync(new ResetPasswordVerificationDto
+                {
+                    ResetSessionToken = "SESSION_TOKEN",
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(5)
+                });
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.VerifyResetCode(new VerifyResetCodeDto
+            {
+                Email = "ana@test.com",
+                Code = "123456"
+            });
+
+            result.Should().BeOfType<OkObjectResult>();
+        }
+
+        [Fact]
+        public async Task VerifyResetCode_KadaJeKodNevalidan_VracaBadRequest()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.VerifyResetCodeAsync(It.IsAny<VerifyResetCodeDto>()))
+                .ThrowsAsync(new InvalidOperationException("Invalid or expired reset code."));
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.VerifyResetCode(new VerifyResetCodeDto
+            {
+                Email = "ana@test.com",
+                Code = "123456"
+            });
+
+            result.Should().BeOfType<BadRequestObjectResult>();
+        }
+
+        [Fact]
+        public async Task ResetPassword_KadaJeSessionTokenValidan_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.ResetPasswordAsync(It.IsAny<ResetPasswordDto>()))
+                .Returns(Task.CompletedTask);
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.ResetPassword(new ResetPasswordDto
+            {
+                ResetSessionToken = "SESSION_TOKEN",
+                NewPassword = "nova1234",
+                ConfirmPassword = "nova1234"
+            });
+
+            result.Should().BeOfType<OkObjectResult>();
+        }
+
+        [Fact]
+        public async Task ResetPassword_KadaJeSessionTokenNevalidan_VracaBadRequest()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.ResetPasswordAsync(It.IsAny<ResetPasswordDto>()))
+                .ThrowsAsync(new InvalidOperationException("Invalid or expired reset session."));
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.ResetPassword(new ResetPasswordDto
+            {
+                ResetSessionToken = "SESSION_TOKEN",
+                NewPassword = "nova1234",
+                ConfirmPassword = "nova1234"
+            });
+
+            result.Should().BeOfType<BadRequestObjectResult>();
         }
     }
 }

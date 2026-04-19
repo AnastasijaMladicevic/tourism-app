@@ -9,11 +9,12 @@ import { ImageService, ImageDto } from '../../services/image';
 import { AuthService } from '../../services/auth';
 import { forkJoin } from 'rxjs';
 import { ReviewService, ReviewDto } from '../../services/review';
+import { MapComponent } from '../../shared/components/map/map';
 
 @Component({
   selector: 'app-restaurant-detail',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, MatIconModule, MatButtonModule, MapComponent],
   templateUrl: './restaurant-detail.html',
   styleUrls: ['./restaurant-detail.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -44,13 +45,12 @@ export class RestaurantDetailComponent implements OnInit {
 
   forkJoin({
     object: this.objectService.getById(id),
-    images: this.imageService.getForObject(id),
-    // reviews: this.reviewService.getForObject(id)   
+    images: this.imageService.getForObject(id),   
   }).subscribe({
     next: ({ object, images, /*reviews*/ }) => {
       this.object = object;
       this.images = images || [];
-      // this.reviews = reviews || [];               
+      this.reviews = object.reviews || [];               
       this.mainImage = this.getMainImage(images);
       this.isLoading = false;
       this.cdr.detectChanges();
@@ -96,9 +96,13 @@ export class RestaurantDetailComponent implements OnInit {
 
   viewOnMap(): void {
     if (!this.object?.latitude || !this.object?.longitude) return;
-    const lat = this.object.latitude;
-    const lng = this.object.longitude;
-    window.open(`https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=17`, '_blank');
+    this.router.navigate(['/map'], {
+      state: {
+        lat: this.object.latitude,
+        lng: this.object.longitude,
+        zoom: 16
+      }
+    });
   }
 
   // === MODAL GALERIJA ===
@@ -174,8 +178,27 @@ export class RestaurantDetailComponent implements OnInit {
   }
   
 
+  formatReviewDate(dateStr: string): string {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('eu', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  // === MODAL ZA SVE RECENZIJE ===
+  showAllReviewsModal = false;
+  getRatingPercentage(rating: number): number {
+    if (!this.reviews || this.reviews.length === 0) return 0;
+
+    const count = this.reviews.filter(r => Math.floor(r.rating) === rating).length;
+    return Math.round((count / this.reviews.length) * 100);
+  }
   openAllReviews(): void {
-    this.router.navigate(['/reviews', this.object.id]);
+    this.showAllReviewsModal = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeAllReviews(): void {
+    this.showAllReviewsModal = false;
+    document.body.style.overflow = 'visible';
   }
 
   openWriteReview(): void {
@@ -183,12 +206,6 @@ export class RestaurantDetailComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-    // Otvori modal ili stranicu za pisanje recenzije
-    alert('Otvaram formu za pisanje recenzije');
-  }
-
-  formatReviewDate(dateStr: string): string {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('sr-RS', { day: 'numeric', month: 'short', year: 'numeric' });
+    alert('Otvaram formu za novu recenziju (u izradi)');
   }
 }

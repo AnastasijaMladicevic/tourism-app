@@ -10,6 +10,7 @@ using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
 using TuristickiVodic.Services;
+using TuristickiVodic.Services.Services;
 using TuristickiVodic.Tests.Helpers;
 using Xunit;
 
@@ -54,9 +55,13 @@ namespace TuristickiVodic.Tests.Services
             return environmentMock;
         }
 
-        private static UserService CreateUserService(AppDbContext ctx, Mock<ITokenService> tokenSvc)
+        private static UserService CreateUserService(
+            AppDbContext ctx,
+            Mock<ITokenService> tokenSvc,
+            Mock<IEmailService>? emailSvc = null)
         {
-            return new UserService(ctx, CreateMapper(), tokenSvc.Object, CreateEnvironmentMock().Object);
+            emailSvc ??= new Mock<IEmailService>();
+            return new UserService(ctx, CreateMapper(), tokenSvc.Object, emailSvc.Object, CreateEnvironmentMock().Object);
         }
 
         private static (Role tourist, Role cc, Role manager, Role admin) SeedRoles(AppDbContext ctx)
@@ -1632,6 +1637,517 @@ namespace TuristickiVodic.Tests.Services
             result.TotalPages.Should().Be(3);
             result.Items.Should().ContainSingle();
             result.Items[0].Email.Should().Be("jelena@test.com");
+        }
+
+        [Fact]
+        public async Task UpdateCurrentLocationAsync_KadaKorisnikPostoji_CuvaLokacijuPreciznostIVreme()
+        {
+            using var ctx = CreateInMemoryContext(nameof(UpdateCurrentLocationAsync_KadaKorisnikPostoji_CuvaLokacijuPreciznostIVreme));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 149,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana.location@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+
+            var result = await service.UpdateCurrentLocationAsync(149, new UpdateUserLocationDto
+            {
+                Longitude = 18.77,
+                Latitude = 42.42,
+                AccuracyMeters = 32
+            });
+
+            result.Should().NotBeNull();
+            result!.Longitude.Should().BeApproximately(18.77, 0.001);
+            result.Latitude.Should().BeApproximately(42.42, 0.001);
+            result.AccuracyMeters.Should().Be(32);
+
+            var user = await ctx.Users.FindAsync(149);
+            user.Should().NotBeNull();
+            user!.LastKnownLocation.Should().NotBeNull();
+            user.LastKnownLocation!.X.Should().BeApproximately(18.77, 0.001);
+            user.LastKnownLocation.Y.Should().BeApproximately(42.42, 0.001);
+            user.LastLocationAccuracyMeters.Should().Be(32);
+            user.LastLocationUpdatedAt.Should().NotBeNull();
+
+            ctx.UserLocationHistories.Should().ContainSingle();
+            var historyPoint = await ctx.UserLocationHistories.SingleAsync();
+            historyPoint.UserId.Should().Be(149);
+            historyPoint.Location.X.Should().BeApproximately(18.77, 0.001);
+            historyPoint.Location.Y.Should().BeApproximately(42.42, 0.001);
+            historyPoint.AccuracyMeters.Should().Be(32);
+        }
+
+        [Fact]
+        public async Task GetCurrentLocationAsync_KadaLokacijaPostoji_VracaLokacijuKorisnika()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetCurrentLocationAsync_KadaLokacijaPostoji_VracaLokacijuKorisnika));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 148,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana.getlocation@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                LastKnownLocation = new NetTopologySuite.Geometries.Point(18.78, 42.43) { SRID = 4326 },
+                LastLocationAccuracyMeters = 18,
+                LastLocationUpdatedAt = DateTime.UtcNow,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+            var result = await service.GetCurrentLocationAsync(148);
+
+            result.Should().NotBeNull();
+            result!.Longitude.Should().BeApproximately(18.78, 0.001);
+            result.Latitude.Should().BeApproximately(42.43, 0.001);
+            result.AccuracyMeters.Should().Be(18);
+        }
+
+        [Fact]
+        public async Task ClearCurrentLocationAsync_KadaLokacijaPostoji_BriseLokaciju()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ClearCurrentLocationAsync_KadaLokacijaPostoji_BriseLokaciju));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 147,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana.clearlocation@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                LastKnownLocation = new NetTopologySuite.Geometries.Point(18.79, 42.44) { SRID = 4326 },
+                LastLocationAccuracyMeters = 20,
+                LastLocationUpdatedAt = DateTime.UtcNow,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+            var cleared = await service.ClearCurrentLocationAsync(147);
+
+            cleared.Should().BeTrue();
+
+            var user = await ctx.Users.FindAsync(147);
+            user.Should().NotBeNull();
+            user!.LastKnownLocation.Should().BeNull();
+            user.LastLocationAccuracyMeters.Should().BeNull();
+            user.LastLocationUpdatedAt.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task GetLocationHistoryAsync_KadaPostojeTacke_VracaPaginiranRezultat()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetLocationHistoryAsync_KadaPostojeTacke_VracaPaginiranRezultat));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 146,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana.history@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+
+            ctx.UserLocationHistories.AddRange(
+                new UserLocationHistory
+                {
+                    Id = 1,
+                    UserId = 146,
+                    Location = new NetTopologySuite.Geometries.Point(18.70, 42.40) { SRID = 4326 },
+                    AccuracyMeters = 10,
+                    RecordedAt = DateTime.UtcNow.AddMinutes(-3),
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-3)
+                },
+                new UserLocationHistory
+                {
+                    Id = 2,
+                    UserId = 146,
+                    Location = new NetTopologySuite.Geometries.Point(18.71, 42.41) { SRID = 4326 },
+                    AccuracyMeters = 12,
+                    RecordedAt = DateTime.UtcNow.AddMinutes(-2),
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-2)
+                },
+                new UserLocationHistory
+                {
+                    Id = 3,
+                    UserId = 146,
+                    Location = new NetTopologySuite.Geometries.Point(18.72, 42.42) { SRID = 4326 },
+                    AccuracyMeters = 15,
+                    RecordedAt = DateTime.UtcNow.AddMinutes(-1),
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-1)
+                });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+            var result = await service.GetLocationHistoryAsync(146, new UserLocationHistoryQueryDto
+            {
+                Page = 1,
+                PageSize = 2,
+                SortOrder = "desc"
+            });
+
+            result.TotalCount.Should().Be(3);
+            result.Items.Should().HaveCount(2);
+            result.Items.Select(x => x.Longitude).Should().Equal(18.72, 18.71);
+        }
+
+        [Fact]
+        public async Task GetLocationPathAsync_KadaPostojeTacke_VracaPutanjuHronoloski()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetLocationPathAsync_KadaPostojeTacke_VracaPutanjuHronoloski));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 145,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana.path@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+
+            ctx.UserLocationHistories.AddRange(
+                new UserLocationHistory
+                {
+                    Id = 10,
+                    UserId = 145,
+                    Location = new NetTopologySuite.Geometries.Point(18.70, 42.40) { SRID = 4326 },
+                    RecordedAt = DateTime.UtcNow.AddMinutes(-3),
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-3)
+                },
+                new UserLocationHistory
+                {
+                    Id = 11,
+                    UserId = 145,
+                    Location = new NetTopologySuite.Geometries.Point(18.71, 42.41) { SRID = 4326 },
+                    RecordedAt = DateTime.UtcNow.AddMinutes(-2),
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-2)
+                },
+                new UserLocationHistory
+                {
+                    Id = 12,
+                    UserId = 145,
+                    Location = new NetTopologySuite.Geometries.Point(18.72, 42.42) { SRID = 4326 },
+                    RecordedAt = DateTime.UtcNow.AddMinutes(-1),
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-1)
+                });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+            var result = await service.GetLocationPathAsync(145, new UserLocationPathQueryDto
+            {
+                MaxPoints = 10
+            });
+
+            result.PointCount.Should().Be(3);
+            result.Points.Select(x => x.Longitude).Should().Equal(18.70, 18.71, 18.72);
+            result.ApproximateDistanceMeters.Should().BeGreaterThan(0);
+            result.StartedAt.Should().NotBeNull();
+            result.EndedAt.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task ClearLocationHistoryAsync_KadaPostojiIstorija_BriseSveTacke()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ClearLocationHistoryAsync_KadaPostojiIstorija_BriseSveTacke));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 144,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana.clearhistory@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+
+            ctx.UserLocationHistories.AddRange(
+                new UserLocationHistory
+                {
+                    Id = 20,
+                    UserId = 144,
+                    Location = new NetTopologySuite.Geometries.Point(18.70, 42.40) { SRID = 4326 },
+                    RecordedAt = DateTime.UtcNow.AddMinutes(-2),
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-2)
+                },
+                new UserLocationHistory
+                {
+                    Id = 21,
+                    UserId = 144,
+                    Location = new NetTopologySuite.Geometries.Point(18.71, 42.41) { SRID = 4326 },
+                    RecordedAt = DateTime.UtcNow.AddMinutes(-1),
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-1)
+                });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+            var cleared = await service.ClearLocationHistoryAsync(144);
+
+            cleared.Should().BeTrue();
+            ctx.UserLocationHistories.Should().BeEmpty();
+        }
+
+        [Fact]
+        public async Task ForgotPasswordAsync_KadaKorisnikPostoji_GeneriseKodICuvaExpiryISaljeMail()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ForgotPasswordAsync_KadaKorisnikPostoji_GeneriseKodICuvaExpiryISaljeMail));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 150,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var emailSvc = new Mock<IEmailService>();
+            var service = CreateUserService(ctx, new Mock<ITokenService>(), emailSvc);
+
+            await service.ForgotPasswordAsync(new ForgotPasswordDto
+            {
+                Email = "ana@test.com"
+            });
+
+            var user = await ctx.Users.FindAsync(150);
+            user.Should().NotBeNull();
+            user!.ResetToken.Should().NotBeNullOrWhiteSpace();
+            user.ResetTokenExpiry.Should().NotBeNull();
+            user.ResetTokenExpiry.Should().BeAfter(DateTime.UtcNow.AddMinutes(3));
+
+            emailSvc.Verify(s => s.SendAsync(
+                "ana@test.com",
+                "Kod za reset lozinke",
+                It.Is<string>(body => body.Contains("Reset lozinke") && body.Contains("Ana"))), Times.Once);
+        }
+
+        [Fact]
+        public async Task ForgotPasswordAsync_KadaKorisnikNePostoji_BacaExceptionINeSaljeMail()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ForgotPasswordAsync_KadaKorisnikNePostoji_BacaExceptionINeSaljeMail));
+            SeedRoles(ctx);
+
+            var emailSvc = new Mock<IEmailService>();
+            var service = CreateUserService(ctx, new Mock<ITokenService>(), emailSvc);
+
+            await service.Invoking(s => s.ForgotPasswordAsync(new ForgotPasswordDto
+            {
+                Email = "nepostoji@test.com"
+            }))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*nije registrovan*");
+
+            emailSvc.Verify(s => s.SendAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task VerifyResetCodeAsync_KadaJeKodValidan_VracaResetSessionTokenICuvaNoviHash()
+        {
+            using var ctx = CreateInMemoryContext(nameof(VerifyResetCodeAsync_KadaJeKodValidan_VracaResetSessionTokenICuvaNoviHash));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            var validCode = "123456";
+            var hashedCode = Convert.ToBase64String(
+                System.Security.Cryptography.SHA256.HashData(
+                    System.Text.Encoding.UTF8.GetBytes(validCode)));
+
+            ctx.Users.Add(new User
+            {
+                Id = 151,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana.reset@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                ResetToken = hashedCode,
+                ResetTokenExpiry = DateTime.UtcNow.AddMinutes(5),
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+
+            var result = await service.VerifyResetCodeAsync(new VerifyResetCodeDto
+            {
+                Email = "ana.reset@test.com",
+                Code = validCode
+            });
+
+            result.Should().NotBeNull();
+            result.ResetSessionToken.Should().NotBeNullOrWhiteSpace();
+            result.ExpiresAt.Should().BeAfter(DateTime.UtcNow);
+
+            var user = await ctx.Users.FindAsync(151);
+            user.Should().NotBeNull();
+            user!.ResetToken.Should().NotBeNullOrWhiteSpace();
+            user.ResetToken.Should().NotBe(hashedCode);
+            user.ResetToken.Should().Be(Convert.ToBase64String(
+                System.Security.Cryptography.SHA256.HashData(
+                    System.Text.Encoding.UTF8.GetBytes(result.ResetSessionToken))));
+        }
+
+        [Fact]
+        public async Task VerifyResetCodeAsync_KadaJeKodNevalidan_BacaException()
+        {
+            using var ctx = CreateInMemoryContext(nameof(VerifyResetCodeAsync_KadaJeKodNevalidan_BacaException));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 152,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana.invalid@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                ResetToken = "pogresan-hash",
+                ResetTokenExpiry = DateTime.UtcNow.AddMinutes(5),
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+
+            await service.Invoking(s => s.VerifyResetCodeAsync(new VerifyResetCodeDto
+            {
+                Email = "ana.invalid@test.com",
+                Code = "123456"
+            }))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*Invalid or expired reset code*");
+        }
+
+        [Fact]
+        public async Task ResetPasswordAsync_KadaJeSessionTokenValidan_MenjaLozinkuICistiResetPolja()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ResetPasswordAsync_KadaJeSessionTokenValidan_MenjaLozinkuICistiResetPolja));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            var validSessionToken = "SESSIONTOKEN123";
+            var hashedSessionToken = Convert.ToBase64String(
+                System.Security.Cryptography.SHA256.HashData(
+                    System.Text.Encoding.UTF8.GetBytes(validSessionToken)));
+
+            ctx.Users.Add(new User
+            {
+                Id = 153,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana.finishreset@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                ResetToken = hashedSessionToken,
+                ResetTokenExpiry = DateTime.UtcNow.AddMinutes(5),
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+
+            await service.ResetPasswordAsync(new ResetPasswordDto
+            {
+                ResetSessionToken = validSessionToken,
+                NewPassword = "nova1234",
+                ConfirmPassword = "nova1234"
+            });
+
+            var user = await ctx.Users.FindAsync(153);
+            user.Should().NotBeNull();
+            BCrypt.Net.BCrypt.Verify("nova1234", user!.PasswordHash).Should().BeTrue();
+            user.ResetToken.Should().BeNull();
+            user.ResetTokenExpiry.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task ResetPasswordAsync_KadaJeSessionTokenNevalidan_BacaException()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ResetPasswordAsync_KadaJeSessionTokenNevalidan_BacaException));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 154,
+                FirstName = "Ana",
+                LastName = "Anic",
+                Email = "ana.invalidsession@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("stara123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                ResetToken = "pogresan-hash",
+                ResetTokenExpiry = DateTime.UtcNow.AddMinutes(5),
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+
+            await service.Invoking(s => s.ResetPasswordAsync(new ResetPasswordDto
+            {
+                ResetSessionToken = "SESSIONTOKEN123",
+                NewPassword = "nova1234",
+                ConfirmPassword = "nova1234"
+            }))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*Invalid or expired reset session*");
         }
     }
 }

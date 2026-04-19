@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TuristickiVodic.Core.DTO;
@@ -29,9 +30,44 @@ namespace TuristickiVodic.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var roleName = User.FindFirstValue(ClaimTypes.Role);
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+                if (string.Equals(roleName, "ContentCreator", StringComparison.OrdinalIgnoreCase))
+                {
+                    var ownActivity = await _activityService.GetMineByIdAsync(id, userId);
+                    if (ownActivity != null) return Ok(ownActivity);
+                }
+                else if (string.Equals(roleName, "Manager", StringComparison.OrdinalIgnoreCase))
+                {
+                    var managedActivity = await _activityService.GetForManagerByIdAsync(id, userId);
+                    if (managedActivity != null) return Ok(managedActivity);
+                }
+            }
+
             var activity = await _activityService.GetByIdAsync(id);
             if (activity == null) return NotFound();
             return Ok(activity);
+        }
+
+        [HttpGet("my")]
+        [Authorize(Roles = "ContentCreator")]
+        public async Task<IActionResult> GetMy([FromQuery] ActivityQueryDto query)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _activityService.GetMyAsync(userId, query);
+            return Ok(result);
+        }
+
+        [HttpGet("manager")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> GetForManager([FromQuery] ActivityQueryDto query)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _activityService.GetForManagerAsync(userId, query);
+            return Ok(result);
         }
 
         /*[HttpGet("search")]

@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 using System.Security.Cryptography;
 using System.Text;
 using TuristickiVodic.Core.DTO;
@@ -9,21 +10,31 @@ using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
 using System.IO;
 using System.Linq;
+using TuristickiVodic.Services.Services;
 
 namespace TuristickiVodic.Services
 {
     public class UserService : IUserService
     {
+        private const int ResetCodeLifetimeMinutes = 5;
+        private const int ResetSessionLifetimeMinutes = 5;
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
+        private readonly IEmailService _emailService;
         private readonly IWebHostEnvironment _environment;
 
-        public UserService(AppDbContext context, IMapper mapper, ITokenService tokenService, IWebHostEnvironment environment)
+        public UserService(
+            AppDbContext context,
+            IMapper mapper,
+            ITokenService tokenService,
+            IEmailService emailService,
+            IWebHostEnvironment environment)
         {
             _context = context;
             _mapper = mapper;
             _tokenService = tokenService;
+            _emailService = emailService;
             _environment = environment;
         }
 
@@ -105,6 +116,182 @@ namespace TuristickiVodic.Services
                 .FirstOrDefaultAsync(u => u.Email == email);
 
             return user == null ? null : _mapper.Map<UserDto>(user);
+        }
+
+        public async Task<UserLocationDto?> GetCurrentLocationAsync(int userId)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null || user.LastKnownLocation == null || !user.LastLocationUpdatedAt.HasValue)
+                return null;
+
+            return new UserLocationDto
+            {
+                Longitude = user.LastKnownLocation.X,
+                Latitude = user.LastKnownLocation.Y,
+                AccuracyMeters = user.LastLocationAccuracyMeters,
+                UpdatedAt = user.LastLocationUpdatedAt.Value
+            };
+        }
+
+        public async Task<UserLocationDto?> UpdateCurrentLocationAsync(int userId, UpdateUserLocationDto dto)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return null;
+
+            var recordedAtUtc = NormalizeRecordedAtUtc(dto.RecordedAtUtc);
+            user.LastKnownLocation = new Point(dto.Longitude, dto.Latitude) { SRID = 4326 };
+            user.LastLocationAccuracyMeters = dto.AccuracyMeters;
+            user.LastLocationUpdatedAt = recordedAtUtc;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            _context.UserLocationHistories.Add(new UserLocationHistory
+            {
+                UserId = user.Id,
+                Location = new Point(dto.Longitude, dto.Latitude) { SRID = 4326 },
+                AccuracyMeters = dto.AccuracyMeters,
+                SpeedMetersPerSecond = dto.SpeedMetersPerSecond,
+                HeadingDegrees = dto.HeadingDegrees,
+                RecordedAt = recordedAtUtc,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+
+            return new UserLocationDto
+            {
+                Longitude = user.LastKnownLocation.X,
+                Latitude = user.LastKnownLocation.Y,
+                AccuracyMeters = user.LastLocationAccuracyMeters,
+                UpdatedAt = user.LastLocationUpdatedAt.Value
+            };
+        }
+
+        public async Task<PagedResultDto<UserLocationHistoryPointDto>> GetLocationHistoryAsync(int userId, UserLocationHistoryQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 100;
+
+            if (query.PageSize > 1000)
+                query.PageSize = 1000;
+
+            var historyQuery = BuildUserLocationHistoryQuery(userId, query.FromUtc, query.ToUtc);
+
+            var isDesc = !string.Equals(query.SortOrder?.Trim(), "asc", StringComparison.OrdinalIgnoreCase);
+            historyQuery = isDesc
+                ? historyQuery.OrderByDescending(x => x.RecordedAt).ThenByDescending(x => x.Id)
+                : historyQuery.OrderBy(x => x.RecordedAt).ThenBy(x => x.Id);
+
+            var totalCount = await historyQuery.CountAsync();
+
+            var items = await historyQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .Select(x => new UserLocationHistoryPointDto
+                {
+                    Id = x.Id,
+                    Longitude = x.Location.X,
+                    Latitude = x.Location.Y,
+                    AccuracyMeters = x.AccuracyMeters,
+                    SpeedMetersPerSecond = x.SpeedMetersPerSecond,
+                    HeadingDegrees = x.HeadingDegrees,
+                    RecordedAt = x.RecordedAt
+                })
+                .ToListAsync();
+
+            return new PagedResultDto<UserLocationHistoryPointDto>
+            {
+                Items = items,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
+        public async Task<UserLocationPathDto> GetLocationPathAsync(int userId, UserLocationPathQueryDto query)
+        {
+            var maxPoints = query.MaxPoints;
+
+            if (maxPoints < 1)
+                maxPoints = 500;
+
+            if (maxPoints > 2000)
+                maxPoints = 2000;
+
+            var points = await BuildUserLocationHistoryQuery(userId, query.FromUtc, query.ToUtc)
+                .OrderByDescending(x => x.RecordedAt)
+                .ThenByDescending(x => x.Id)
+                .Take(maxPoints)
+                .Select(x => new UserLocationHistoryPointDto
+                {
+                    Id = x.Id,
+                    Longitude = x.Location.X,
+                    Latitude = x.Location.Y,
+                    AccuracyMeters = x.AccuracyMeters,
+                    SpeedMetersPerSecond = x.SpeedMetersPerSecond,
+                    HeadingDegrees = x.HeadingDegrees,
+                    RecordedAt = x.RecordedAt
+                })
+                .ToListAsync();
+
+            points = points
+                .OrderBy(x => x.RecordedAt)
+                .ThenBy(x => x.Id)
+                .ToList();
+
+            return new UserLocationPathDto
+            {
+                Points = points,
+                PointCount = points.Count,
+                StartedAt = points.FirstOrDefault()?.RecordedAt,
+                EndedAt = points.LastOrDefault()?.RecordedAt,
+                ApproximateDistanceMeters = CalculateApproximateDistanceMeters(points)
+            };
+        }
+
+        public async Task<bool> ClearCurrentLocationAsync(int userId)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return false;
+
+            user.LastKnownLocation = null;
+            user.LastLocationAccuracyMeters = null;
+            user.LastLocationUpdatedAt = null;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> ClearLocationHistoryAsync(int userId)
+        {
+            var userExists = await _context.Users.AnyAsync(u => u.Id == userId);
+
+            if (!userExists)
+                return false;
+
+            var historyItems = await _context.UserLocationHistories
+                .Where(x => x.UserId == userId)
+                .ToListAsync();
+
+            if (historyItems.Count > 0)
+            {
+                _context.UserLocationHistories.RemoveRange(historyItems);
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         public async Task<UserDto> CreateAsync(CreateUserDto createUserDto)
@@ -255,6 +442,94 @@ namespace TuristickiVodic.Services
             await RevokeRefreshTokenAsync(user.Id);
             user.UpdatedAt = DateTime.UtcNow;
 
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task ForgotPasswordAsync(ForgotPasswordDto dto)
+        {
+            var normalizedEmail = dto.Email.Trim().ToLower();
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
+
+            if (user == null)
+                throw new InvalidOperationException("Korisnik sa ovom email adresom jos uvek nije registrovan.");
+
+            if (!user.IsActive)
+                throw new InvalidOperationException("Korisnicki nalog nije aktivan.");
+
+            if (user.IsBlacklisted)
+                throw new InvalidOperationException("Reset lozinke nije dostupan za ovaj nalog.");
+
+            var resetCode = GenerateResetCode();
+
+            user.ResetToken = HashResetToken(resetCode);
+            user.ResetTokenExpiry = DateTime.UtcNow.AddMinutes(ResetCodeLifetimeMinutes);
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            await _emailService.SendAsync(
+                user.Email,
+                "Kod za reset lozinke",
+                BuildResetPasswordEmailBodyForFiveMinuteExpiry(user.FirstName, resetCode, user.ResetTokenExpiry.Value));
+        }
+
+        public async Task<ResetPasswordVerificationDto> VerifyResetCodeAsync(VerifyResetCodeDto dto)
+        {
+            var normalizedEmail = dto.Email.Trim().ToLower();
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
+
+            if (user == null || !user.IsActive || user.IsBlacklisted)
+                throw new InvalidOperationException("Invalid or expired reset code.");
+
+            if (string.IsNullOrWhiteSpace(user.ResetToken) ||
+                !user.ResetTokenExpiry.HasValue ||
+                user.ResetTokenExpiry.Value <= DateTime.UtcNow)
+            {
+                throw new InvalidOperationException("Invalid or expired reset code.");
+            }
+
+            var providedCodeHash = HashResetToken(dto.Code.Trim());
+
+            if (user.ResetToken != providedCodeHash)
+                throw new InvalidOperationException("Invalid or expired reset code.");
+
+            var resetSessionToken = GenerateResetSessionToken();
+            user.ResetToken = HashResetToken(resetSessionToken);
+            user.ResetTokenExpiry = DateTime.UtcNow.AddMinutes(ResetSessionLifetimeMinutes);
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return new ResetPasswordVerificationDto
+            {
+                ResetSessionToken = resetSessionToken,
+                ExpiresAt = user.ResetTokenExpiry.Value
+            };
+        }
+
+        public async Task ResetPasswordAsync(ResetPasswordDto dto)
+        {
+            var resetSessionTokenHash = HashResetToken(dto.ResetSessionToken.Trim());
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u =>
+                    u.ResetToken == resetSessionTokenHash &&
+                    u.ResetTokenExpiry.HasValue &&
+                    u.ResetTokenExpiry.Value > DateTime.UtcNow);
+
+            if (user == null || !user.IsActive || user.IsBlacklisted)
+                throw new InvalidOperationException("Invalid or expired reset session.");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            user.ResetToken = null;
+            user.ResetTokenExpiry = null;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await RevokeRefreshTokenAsync(user.Id);
             await _context.SaveChangesAsync();
         }
 
@@ -479,6 +754,120 @@ namespace TuristickiVodic.Services
         {
             var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
             return Convert.ToBase64String(bytes);
+        }
+
+        private IQueryable<UserLocationHistory> BuildUserLocationHistoryQuery(int userId, DateTime? fromUtc, DateTime? toUtc)
+        {
+            var query = _context.UserLocationHistories
+                .Where(x => x.UserId == userId)
+                .AsQueryable();
+
+            if (fromUtc.HasValue)
+            {
+                var normalizedFromUtc = NormalizeRecordedAtUtc(fromUtc);
+                query = query.Where(x => x.RecordedAt >= normalizedFromUtc);
+            }
+
+            if (toUtc.HasValue)
+            {
+                var normalizedToUtc = NormalizeRecordedAtUtc(toUtc);
+                query = query.Where(x => x.RecordedAt <= normalizedToUtc);
+            }
+
+            return query;
+        }
+
+        private static DateTime NormalizeRecordedAtUtc(DateTime? recordedAtUtc)
+        {
+            if (!recordedAtUtc.HasValue)
+                return DateTime.UtcNow;
+
+            var normalized = recordedAtUtc.Value.Kind == DateTimeKind.Utc
+                ? recordedAtUtc.Value
+                : recordedAtUtc.Value.ToUniversalTime();
+
+            return normalized > DateTime.UtcNow ? DateTime.UtcNow : normalized;
+        }
+
+        private static double CalculateApproximateDistanceMeters(IReadOnlyList<UserLocationHistoryPointDto> points)
+        {
+            if (points.Count < 2)
+                return 0;
+
+            var distanceMeters = 0d;
+
+            for (var i = 1; i < points.Count; i++)
+            {
+                distanceMeters += CalculateHaversineDistanceMeters(
+                    points[i - 1].Latitude,
+                    points[i - 1].Longitude,
+                    points[i].Latitude,
+                    points[i].Longitude);
+            }
+
+            return Math.Round(distanceMeters, 2);
+        }
+
+        private static double CalculateHaversineDistanceMeters(double latitude1, double longitude1, double latitude2, double longitude2)
+        {
+            const double earthRadiusMeters = 6371000d;
+
+            var deltaLatitude = DegreesToRadians(latitude2 - latitude1);
+            var deltaLongitude = DegreesToRadians(longitude2 - longitude1);
+            var normalizedLatitude1 = DegreesToRadians(latitude1);
+            var normalizedLatitude2 = DegreesToRadians(latitude2);
+
+            var a =
+                Math.Sin(deltaLatitude / 2) * Math.Sin(deltaLatitude / 2) +
+                Math.Cos(normalizedLatitude1) * Math.Cos(normalizedLatitude2) *
+                Math.Sin(deltaLongitude / 2) * Math.Sin(deltaLongitude / 2);
+
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return earthRadiusMeters * c;
+        }
+
+        private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180d;
+
+        private static string HashResetToken(string resetCode)
+        {
+            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(resetCode));
+            return Convert.ToBase64String(bytes);
+        }
+
+        private static string GenerateResetCode()
+        {
+            return RandomNumberGenerator.GetInt32(100000, 1000000).ToString();
+        }
+
+        private static string GenerateResetSessionToken()
+        {
+            return Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
+        }
+
+        private static string BuildResetPasswordEmailBodyForFiveMinuteExpiry(string firstName, string resetCode, DateTime expiresAtUtc)
+        {
+            return $@"
+                <div style=""font-family: Arial, sans-serif; line-height: 1.6;"">
+                    <h2>Reset lozinke</h2>
+                    <p>Zdravo {System.Net.WebUtility.HtmlEncode(firstName)},</p>
+                    <p>Tvoj kod za reset lozinke je:</p>
+                    <p style=""font-size: 28px; font-weight: bold; letter-spacing: 4px;"">{resetCode}</p>
+                    <p>Kod vazi 5 minuta, odnosno do {expiresAtUtc.ToLocalTime():dd.MM.yyyy. HH:mm}.</p>
+                    <p>Ako nisi ti trazio reset lozinke, slobodno ignorisi ovu poruku.</p>
+                </div>";
+        }
+
+        private static string BuildResetPasswordEmailBody(string firstName, string resetCode, DateTime expiresAtUtc)
+        {
+            return $@"
+                <div style=""font-family: Arial, sans-serif; line-height: 1.6;"">
+                    <h2>Reset lozinke</h2>
+                    <p>Zdravo {System.Net.WebUtility.HtmlEncode(firstName)},</p>
+                    <p>Tvoj kod za reset lozinke je:</p>
+                    <p style=""font-size: 28px; font-weight: bold; letter-spacing: 4px;"">{resetCode}</p>
+                    <p>Kod važi do {expiresAtUtc.ToLocalTime():dd.MM.yyyy. HH:mm}.</p>
+                    <p>Ako nisi ti tražio reset lozinke, slobodno ignoriši ovu poruku.</p>
+                </div>";
         }
 
         public async Task<PagedResultDto<CreatorRoleRequestDto>> GetCreatorRequestsAsync(CreatorRoleRequestQueryDto query)

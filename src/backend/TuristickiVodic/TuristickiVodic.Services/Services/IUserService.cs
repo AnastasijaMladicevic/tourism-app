@@ -14,6 +14,9 @@ namespace TuristickiVodic.Services
         Task<UserDto?> UpdateAsync(int id, UpdateUserDto updateUserDto);
         Task<bool> DeleteAsync(int id);
         Task ChangePasswordAsync(int userId, ChangePasswordDto dto, int currentUserId, string roleName);
+        Task ForgotPasswordAsync(ForgotPasswordDto dto);
+        Task<ResetPasswordVerificationDto> VerifyResetCodeAsync(VerifyResetCodeDto dto);
+        Task ResetPasswordAsync(ResetPasswordDto dto);
         Task<AuthResponseDto?> LoginAsync(LoginDto loginDto);
         Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenDto refreshTokenDto);
         Task<bool> RequestCreatorRoleAsync(int userId, string creatorType);
@@ -23,5 +26,11 @@ namespace TuristickiVodic.Services
         Task<PagedResultDto<CreatorRoleRequestDto>> GetCreatorRequestsAsync(CreatorRoleRequestQueryDto query);
         Task<UserDto?> UpdateProfileImageAsync(int id, IFormFile file);
         Task<UserDto?> RemoveProfileImageAsync(int id);
+        Task<UserLocationDto?> GetCurrentLocationAsync(int userId);
+        Task<UserLocationDto?> UpdateCurrentLocationAsync(int userId, UpdateUserLocationDto dto);
+        Task<bool> ClearCurrentLocationAsync(int userId);
+        Task<PagedResultDto<UserLocationHistoryPointDto>> GetLocationHistoryAsync(int userId, UserLocationHistoryQueryDto query);
+        Task<UserLocationPathDto> GetLocationPathAsync(int userId, UserLocationPathQueryDto query);
+        Task<bool> ClearLocationHistoryAsync(int userId);
     }
 }

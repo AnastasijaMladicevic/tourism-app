@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using NetTopologySuite.Geometries;
 
 namespace TuristickiVodic.Core.Models
 {
@@ -40,6 +41,10 @@ namespace TuristickiVodic.Core.Models
         public string? ResetToken { get; set; }
         public DateTime? ResetTokenExpiry { get; set; }
 
+        public Point? LastKnownLocation { get; set; }
+        public double? LastLocationAccuracyMeters { get; set; }
+        public DateTime? LastLocationUpdatedAt { get; set; }
+
         public bool IsActive { get; set; } = true;
         public bool IsBlacklisted { get; set; } = false;
         public bool HasRequestedCreatorRole { get; set; } = false;
@@ -62,6 +67,7 @@ namespace TuristickiVodic.Core.Models
         public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
         public ICollection<EventPlannerItem> EventPlannerItems { get; set; } = new List<EventPlannerItem>();
         public ICollection<UserLog> UserLogs { get; set; } = new List<UserLog>();
+        public ICollection<UserLocationHistory> LocationHistory { get; set; } = new List<UserLocationHistory>();
         public ICollection<ManagerReport> SentReports { get; set; } = new List<ManagerReport>();
 
         public RefreshToken? RefreshToken { get; set; }

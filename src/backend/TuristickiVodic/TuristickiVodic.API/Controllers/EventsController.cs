@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Security.Claims;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Services.Services;
@@ -44,9 +45,46 @@ namespace TuristickiVodic.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var roleName = User.FindFirstValue(ClaimTypes.Role);
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+                if (string.Equals(roleName, "ContentCreator", StringComparison.OrdinalIgnoreCase))
+                {
+                    var ownEvent = await _eventService.GetMineByIdAsync(id, userId);
+                    if (ownEvent != null)
+                        return Ok(ownEvent);
+                }
+                else if (string.Equals(roleName, "Manager", StringComparison.OrdinalIgnoreCase))
+                {
+                    var managedEvent = await _eventService.GetForManagerByIdAsync(id, userId);
+                    if (managedEvent != null)
+                        return Ok(managedEvent);
+                }
+            }
+
             var ev = await _eventService.GetByIdAsync(id);
             if (ev == null) return NotFound();
             return Ok(ev);
+        }
+
+        [HttpGet("my")]
+        [Authorize(Roles = "ContentCreator")]
+        public async Task<IActionResult> GetMy([FromQuery] EventQueryDto query)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _eventService.GetMyAsync(userId, query);
+            return Ok(result);
+        }
+
+        [HttpGet("manager")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> GetForManager([FromQuery] EventQueryDto query)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _eventService.GetForManagerAsync(userId, query);
+            return Ok(result);
         }
 
         [HttpPost]

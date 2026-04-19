@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Security.Claims;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Services;
@@ -26,7 +27,7 @@ namespace TuristickiVodic.API.Controllers
         public async Task<IActionResult> GetAll([FromQuery] UserQueryDto query)
         {
             var users = await _userService.GetAllAsync(query);
-            return Ok(users);
+            return Ok(NormalizeUsers(users));
         }
 
         // Korisnik može da vidi samo sebe; Admin može svakoga
@@ -43,7 +44,80 @@ namespace TuristickiVodic.API.Controllers
             if (user == null)
                 return NotFound();
 
-            return Ok(user);
+            return Ok(NormalizeUser(user));
+        }
+
+        [HttpGet("me/location")]
+        public async Task<IActionResult> GetMyLocation()
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var location = await _userService.GetCurrentLocationAsync(currentUserId);
+
+            if (location == null)
+                return NotFound();
+
+            return Ok(location);
+        }
+
+        [HttpPut("me/location")]
+        public async Task<IActionResult> UpdateMyLocation([FromBody] UpdateUserLocationDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var location = await _userService.UpdateCurrentLocationAsync(currentUserId, dto);
+
+            if (location == null)
+                return NotFound();
+
+            return Ok(location);
+        }
+
+        [HttpGet("me/location/history")]
+        public async Task<IActionResult> GetMyLocationHistory([FromQuery] UserLocationHistoryQueryDto query)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var history = await _userService.GetLocationHistoryAsync(currentUserId, query);
+            return Ok(history);
+        }
+
+        [HttpGet("me/location/path")]
+        public async Task<IActionResult> GetMyLocationPath([FromQuery] UserLocationPathQueryDto query)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var path = await _userService.GetLocationPathAsync(currentUserId, query);
+            return Ok(path);
+        }
+
+        [HttpDelete("me/location")]
+        public async Task<IActionResult> ClearMyLocation()
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var cleared = await _userService.ClearCurrentLocationAsync(currentUserId);
+
+            if (!cleared)
+                return NotFound();
+
+            return NoContent();
+        }
+
+        [HttpDelete("me/location/history")]
+        public async Task<IActionResult> ClearMyLocationHistory()
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var cleared = await _userService.ClearLocationHistoryAsync(currentUserId);
+
+            if (!cleared)
+                return NotFound();
+
+            return NoContent();
         }
 
         // Samo Admin može da traži korisnika po emailu
@@ -55,7 +129,7 @@ namespace TuristickiVodic.API.Controllers
             if (user == null)
                 return NotFound();
 
-            return Ok(user);
+            return Ok(NormalizeUser(user));
         }
 
         [HttpPost("register")]
@@ -68,7 +142,7 @@ namespace TuristickiVodic.API.Controllers
             try
             {
                 var user = await _userService.CreateAsync(createUserDto);
-                return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+                return CreatedAtAction(nameof(GetById), new { id = user.Id }, NormalizeUser(user));
             }
             catch (InvalidOperationException ex)
             {
@@ -84,7 +158,7 @@ namespace TuristickiVodic.API.Controllers
             try
             {
                 var user = await _userService.CreateManagerAsync(createUserDto);
-                return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+                return CreatedAtAction(nameof(GetById), new { id = user.Id }, NormalizeUser(user));
             }
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
@@ -97,7 +171,7 @@ namespace TuristickiVodic.API.Controllers
             try
             {
                 var user = await _userService.CreateAdminAsync(createUserDto);
-                return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+                return CreatedAtAction(nameof(GetById), new { id = user.Id }, NormalizeUser(user));
             }
             catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
         }
@@ -115,7 +189,61 @@ namespace TuristickiVodic.API.Controllers
                 if (response == null)
                     return Unauthorized(new { message = "Invalid email or password" });
 
+                return Ok(NormalizeAuthResponse(response));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("forgot-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                await _userService.ForgotPasswordAsync(forgotPasswordDto);
+                return Ok(new { message = "Reset code has been sent to the provided email address." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("verify-reset-code")]
+        [AllowAnonymous]
+        public async Task<IActionResult> VerifyResetCode([FromBody] VerifyResetCodeDto verifyResetCodeDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var response = await _userService.VerifyResetCodeAsync(verifyResetCodeDto);
                 return Ok(response);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("reset-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                await _userService.ResetPasswordAsync(resetPasswordDto);
+                return Ok(new { message = "Password reset successfully." });
             }
             catch (InvalidOperationException ex)
             {
@@ -136,7 +264,7 @@ namespace TuristickiVodic.API.Controllers
                 if (response == null)
                     return Unauthorized(new { message = "Invalid or expired refresh token" });
 
-                return Ok(response);
+                return Ok(NormalizeAuthResponse(response));
             }
             catch (InvalidOperationException ex)
             {
@@ -186,7 +314,7 @@ namespace TuristickiVodic.API.Controllers
             if (user == null)
                 return NotFound();
 
-            return Ok(user);
+            return Ok(NormalizeUser(user));
         }
 
         // Korisnik može da menja lozinku samo sebi; Admin može svakome
@@ -261,7 +389,7 @@ namespace TuristickiVodic.API.Controllers
                 if (user == null)
                     return NotFound();
 
-                return Ok(user);
+                return Ok(NormalizeUser(user));
             }
             catch (InvalidOperationException ex)
             {
@@ -281,7 +409,7 @@ namespace TuristickiVodic.API.Controllers
             if (user == null)
                 return NotFound();
 
-            return Ok(user);
+            return Ok(NormalizeUser(user));
         }
 
         [HttpGet("creator-requests")]
@@ -338,8 +466,12 @@ namespace TuristickiVodic.API.Controllers
         // Samo Admin može da aktivira/deaktivira korisnike
         [HttpPost("{id}/toggle-active")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ToggleActive(int id, [FromBody] bool isActive)
+        public async Task<IActionResult> ToggleActive(int id, [FromBody] ToggleUserActiveDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var isActive = dto.State == UserAccountState.Active;
             var result = await _userService.ToggleUserActiveAsync(id, isActive);
             if (!result)
                 return NotFound();
@@ -369,6 +501,42 @@ namespace TuristickiVodic.API.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+        private PagedResultDto<UserDto> NormalizeUsers(PagedResultDto<UserDto> result)
+        {
+            foreach (var user in result.Items)
+            {
+                NormalizeUser(user);
+            }
+
+            return result;
+        }
+
+        private AuthResponseDto NormalizeAuthResponse(AuthResponseDto response)
+        {
+            NormalizeUser(response.User);
+            return response;
+        }
+
+        private UserDto NormalizeUser(UserDto user)
+        {
+            user.ProfileImageUrl = BuildAbsoluteProfileImageUrl(user.ProfileImageUrl);
+            return user;
+        }
+
+        private string? BuildAbsoluteProfileImageUrl(string? profileImageUrl)
+        {
+            if (string.IsNullOrWhiteSpace(profileImageUrl))
+                return profileImageUrl;
+
+            if (Uri.IsWellFormedUriString(profileImageUrl, UriKind.Absolute))
+                return profileImageUrl;
+
+            if (!Request.Host.HasValue || !profileImageUrl.StartsWith("/"))
+                return profileImageUrl;
+
+            return $"{Request.Scheme}://{Request.Host.Value}{profileImageUrl}";
         }
     }
 }

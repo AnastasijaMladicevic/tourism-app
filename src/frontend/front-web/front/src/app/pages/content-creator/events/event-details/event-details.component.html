@@ -1,0 +1,111 @@
+<section class="event-details-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Events > Event Details</p>
+      <h1>{{ event?.name || 'Event Details' }}</h1>
+      <p class="page-intro">Review the event summary, schedule, and assigned crew inside the creator workspace.</p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="ghost-btn" (click)="goBack()">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Back
+      </button>
+      <button type="button" class="ghost-btn" (click)="editEvent()" [disabled]="!event">
+        <span class="material-symbols-outlined">edit</span>
+        Edit
+      </button>
+      <button type="button" class="primary-btn">
+        <span class="material-symbols-outlined">share</span>
+        Share
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="card state">Loading event details...</div>
+  } @else if (errorMessage) {
+    <div class="card state state-error">{{ errorMessage }}</div>
+  } @else if (event) {
+    <div class="details-grid">
+      <div class="main-column">
+        <article class="hero card">
+          <div class="hero-banner" [style.background-image]="'url(' + bannerUrl + ')'">
+            <span class="hero-tag">{{ categoryLabel }}</span>
+            <span class="hero-status">{{ statusLabel }}</span>
+          </div>
+
+          <div class="hero-content">
+            <p class="eyebrow">Featured event</p>
+            <h2>{{ event.name }}</h2>
+            <p class="hero-meta">{{ formatDate(event.startDate) }} · {{ formatDate(event.endDate ?? event.startDate) }}</p>
+            <p class="summary">{{ summary }}</p>
+          </div>
+        </article>
+
+        <section class="card section-card">
+          <div class="section-title">
+            <h3>Quick facts</h3>
+          </div>
+
+          <div class="facts-grid">
+            <article class="fact-item" *ngFor="let item of detailItems">
+              <span>{{ item.label }}</span>
+              <strong>{{ item.value }}</strong>
+            </article>
+          </div>
+        </section>
+
+        <section class="card section-card">
+          <div class="section-title">
+            <h3>About this event</h3>
+          </div>
+          <p class="body-copy">{{ summary }}</p>
+        </section>
+      </div>
+
+      <aside class="side-column">
+        <section class="card section-card">
+          <div class="section-title compact">
+            <h3>Schedule</h3>
+          </div>
+
+          <div class="detail-list">
+            <div class="detail-row" *ngFor="let item of detailItems">
+              <span>{{ item.label }}</span>
+              <strong>{{ item.value }}</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="card section-card">
+          <div class="section-title compact">
+            <h3>Organizers</h3>
+          </div>
+
+          <div class="organizer-list">
+            <article class="organizer-row" *ngFor="let name of organizerNames; let i = index">
+              <div class="avatar">{{ organizerInitials[i] }}</div>
+              <div>
+                <strong>{{ name }}</strong>
+                <span>Content Creator</span>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="card section-card">
+          <div class="section-title compact">
+            <h3>Venue</h3>
+          </div>
+
+          <div class="venue-map"></div>
+          <div class="venue-meta">
+            <strong>{{ event.eventTypeName || 'Linked venue' }}</strong>
+            <span>Location is linked from the event payload.</span>
+          </div>
+        </section>
+      </aside>
+    </div>
+  }
+</section>

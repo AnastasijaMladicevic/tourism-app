@@ -1102,5 +1102,171 @@ namespace TuristickiVodic.Tests.Services
             .Should().ThrowAsync<InvalidOperationException>()
             .WithMessage("*one type of date filter*");
         }
+
+        [Fact]
+        public async Task GetMyAsync_ContentCreator_VidiSamoSvojeEventoveNezavisnoOdStatusa()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetMyAsync_ContentCreator_VidiSamoSvojeEventoveNezavisnoOdStatusa));
+            var (_, _, _, eventType, destination, _, locality, _, creator, otherCreator, _, _, _) = SeedBase(ctx);
+
+            ctx.Events.AddRange(
+                new Event
+                {
+                    Id = 1,
+                    Name = "Moj pending event",
+                    EventTypeId = eventType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = false,
+                    StartDate = DateTime.UtcNow.AddDays(1)
+                },
+                new Event
+                {
+                    Id = 2,
+                    Name = "Moj rejected event",
+                    EventTypeId = eventType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Rejected,
+                    IsActive = false,
+                    StartDate = DateTime.UtcNow.AddDays(2)
+                },
+                new Event
+                {
+                    Id = 3,
+                    Name = "Tudji pending event",
+                    EventTypeId = eventType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = otherCreator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = false,
+                    StartDate = DateTime.UtcNow.AddDays(3)
+                });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetMyAsync(creator.Id, new EventQueryDto { SortBy = "name", SortOrder = "asc" });
+
+            result.TotalCount.Should().Be(2);
+            result.Items.Select(x => x.Name).Should().Equal("Moj pending event", "Moj rejected event");
+            result.Items.Select(x => x.Status).Should().Equal("Pending", "Rejected");
+        }
+
+        [Fact]
+        public async Task GetMineByIdAsync_VlasnikMozeDaDobijeIPendingEvent()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetMineByIdAsync_VlasnikMozeDaDobijeIPendingEvent));
+            var (_, _, _, eventType, destination, _, locality, _, creator, _, _, _, _) = SeedBase(ctx);
+
+            ctx.Events.Add(new Event
+            {
+                Id = 1,
+                Name = "Pending event",
+                EventTypeId = eventType.Id,
+                DestinationId = destination.Id,
+                LocalityId = locality.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Pending,
+                IsActive = false,
+                StartDate = DateTime.UtcNow.AddDays(1)
+            });
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetMineByIdAsync(1, creator.Id);
+
+            result.Should().NotBeNull();
+            result!.Status.Should().Be("Pending");
+            result.Name.Should().Be("Pending event");
+        }
+
+        [Fact]
+        public async Task GetForManagerAsync_ManagerVidiSamoEventoveSvojeDestinacijeNezavisnoOdStatusa()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetForManagerAsync_ManagerVidiSamoEventoveSvojeDestinacijeNezavisnoOdStatusa));
+            var (_, _, _, eventType, destination, otherDestination, locality, otherLocality, creator, _, manager, otherManager, _) = SeedBase(ctx);
+
+            ctx.Events.AddRange(
+                new Event
+                {
+                    Id = 1,
+                    Name = "Pending moj event",
+                    EventTypeId = eventType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = false,
+                    StartDate = DateTime.UtcNow.AddDays(1)
+                },
+                new Event
+                {
+                    Id = 2,
+                    Name = "Rejected moj event",
+                    EventTypeId = eventType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Rejected,
+                    IsActive = false,
+                    StartDate = DateTime.UtcNow.AddDays(2)
+                },
+                new Event
+                {
+                    Id = 3,
+                    Name = "Approved tudji manager event",
+                    EventTypeId = eventType.Id,
+                    DestinationId = otherDestination.Id,
+                    LocalityId = otherLocality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    StartDate = DateTime.UtcNow.AddDays(3)
+                });
+
+            manager.ManagedDestinationId = destination.Id;
+            otherManager.ManagedDestinationId = otherDestination.Id;
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetForManagerAsync(manager.Id, new EventQueryDto { SortBy = "name", SortOrder = "asc" });
+
+            result.TotalCount.Should().Be(2);
+            result.Items.Select(x => x.Name).Should().Equal("Pending moj event", "Rejected moj event");
+            result.Items.Select(x => x.Status).Should().Equal("Pending", "Rejected");
+        }
+
+        [Fact]
+        public async Task GetForManagerByIdAsync_OdgovorniManagerMozeDaDobijeIPendingEvent()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetForManagerByIdAsync_OdgovorniManagerMozeDaDobijeIPendingEvent));
+            var (_, _, _, eventType, destination, _, locality, _, creator, _, manager, _, _) = SeedBase(ctx);
+
+            ctx.Events.Add(new Event
+            {
+                Id = 1,
+                Name = "Manager pending event",
+                EventTypeId = eventType.Id,
+                DestinationId = destination.Id,
+                LocalityId = locality.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Pending,
+                IsActive = false,
+                StartDate = DateTime.UtcNow.AddDays(1)
+            });
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetForManagerByIdAsync(1, manager.Id);
+
+            result.Should().NotBeNull();
+            result!.Status.Should().Be("Pending");
+            result.Name.Should().Be("Manager pending event");
+        }
     }
 }

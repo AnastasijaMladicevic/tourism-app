@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Security.Claims;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Services.Services;
@@ -36,9 +37,44 @@ namespace TuristickiVodic.API.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
         {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var roleName = User.FindFirstValue(ClaimTypes.Role);
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+                if (string.Equals(roleName, "ContentCreator", StringComparison.OrdinalIgnoreCase))
+                {
+                    var ownObject = await _objectService.GetMineByIdAsync(id, userId);
+                    if (ownObject != null) return Ok(ownObject);
+                }
+                else if (string.Equals(roleName, "Manager", StringComparison.OrdinalIgnoreCase))
+                {
+                    var managedObject = await _objectService.GetForManagerByIdAsync(id, userId);
+                    if (managedObject != null) return Ok(managedObject);
+                }
+            }
+
             var obj = await _objectService.GetByIdAsync(id);
             if (obj == null) return NotFound();
             return Ok(obj);
+        }
+
+        [HttpGet("my")]
+        [Authorize(Roles = "ContentCreator")]
+        public async Task<IActionResult> GetMy([FromQuery] TouristObjectQueryDto query)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _objectService.GetMyAsync(userId, query);
+            return Ok(result);
+        }
+
+        [HttpGet("manager")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> GetForManager([FromQuery] TouristObjectQueryDto query)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var result = await _objectService.GetForManagerAsync(userId, query);
+            return Ok(result);
         }
 
         /*[HttpGet("search")]

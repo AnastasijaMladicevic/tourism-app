@@ -79,6 +79,34 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
+        public async Task GetById_KadaJeContentCreatorIVlasnik_VracaSopstveniNeodobrenObjekat()
+        {
+            var mockService = new Mock<ITouristObjectService>();
+            var dto = new TouristObjectDto { Id = 5, Name = "Moj objekat", Status = "Pending", DestinationId = 1 };
+            mockService.Setup(s => s.GetMineByIdAsync(5, 5)).ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "ContentCreator"));
+            var result = await controller.GetById(5);
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
+        public async Task GetById_KadaJeManagerNadlezan_VracaNeodobrenObjekatIzSvojeDestinacije()
+        {
+            var mockService = new Mock<ITouristObjectService>();
+            var dto = new TouristObjectDto { Id = 5, Name = "Objekat za odobravanje", Status = "Pending", DestinationId = 1 };
+            mockService.Setup(s => s.GetForManagerByIdAsync(5, 10)).ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(10, "Manager"));
+            var result = await controller.GetById(5);
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
         public async Task Create_ContentCreator_VracaCreated()
         {
             var mockService = new Mock<ITouristObjectService>();
@@ -144,6 +172,60 @@ namespace TuristickiVodic.Tests.Controllers
             var result = await controller.Delete(1);
 
             result.Should().BeOfType<NoContentResult>();
+        }
+
+        [Fact]
+        public async Task GetMy_ContentCreator_VracaPagedRezultat()
+        {
+            var mockService = new Mock<ITouristObjectService>();
+            var dto = new PagedResultDto<TouristObjectDto>
+            {
+                Items = new List<TouristObjectDto>
+                {
+                    new TouristObjectDto { Id = 1, Name = "Moj objekat", Status = "Pending", DestinationId = 1 }
+                },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 1,
+                TotalPages = 1
+            };
+
+            mockService
+                .Setup(s => s.GetMyAsync(5, It.IsAny<TouristObjectQueryDto>()))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(5, "ContentCreator"));
+            var result = await controller.GetMy(new TouristObjectQueryDto());
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
+        public async Task GetForManager_Manager_VracaPagedRezultat()
+        {
+            var mockService = new Mock<ITouristObjectService>();
+            var dto = new PagedResultDto<TouristObjectDto>
+            {
+                Items = new List<TouristObjectDto>
+                {
+                    new TouristObjectDto { Id = 1, Name = "Pending objekat", Status = "Pending", DestinationId = 1 }
+                },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 1,
+                TotalPages = 1
+            };
+
+            mockService
+                .Setup(s => s.GetForManagerAsync(10, It.IsAny<TouristObjectQueryDto>()))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(10, "Manager"));
+            var result = await controller.GetForManager(new TouristObjectQueryDto());
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
         }
     }
 }
