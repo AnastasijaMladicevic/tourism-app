@@ -26,6 +26,14 @@ namespace TuristickiVodic.API.Controllers
             return Ok(result);
         }
 
+        [HttpGet("nearby")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetNearby([FromQuery] NearbyActivityQueryDto query)
+        {
+            var result = await _activityService.GetNearbyAsync(query);
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
