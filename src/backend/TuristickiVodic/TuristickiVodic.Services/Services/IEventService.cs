@@ -7,6 +7,7 @@ namespace TuristickiVodic.Services.Services
         Task<EventDto?> GetByIdAsync(int id);
         Task<EventDto?> GetMineByIdAsync(int id, int userId);
         Task<EventDto?> GetForManagerByIdAsync(int id, int userId);
+        Task<List<EventTypeOptionDto>> GetEventTypesAsync();
         Task<EventDto> CreateAsync(CreateEventDto dto, int userId, string roleName);
         Task<EventDto?> UpdateAsync(int id, UpdateEventDto dto, int userId, string roleName);
         Task<EventDto?> ApproveAsync(int id, ApproveContentDto dto, int userId, string roleName);

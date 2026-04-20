@@ -336,6 +336,18 @@ namespace TuristickiVodic.Services.Services
                 TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
             };
         }
+        
+        public async Task<List<EventTypeOptionDto>> GetEventTypesAsync()
+        {
+            return await _context.EventTypes
+                .OrderBy(t => t.Name)
+                .Select(t => new EventTypeOptionDto
+                {
+                    Id = t.Id,
+                    Name = t.Name
+                })
+                .ToListAsync();
+        }
 
         public async Task<PagedResultDto<EventDto>> GetForManagerAsync(int userId, EventQueryDto query)
         {
@@ -739,19 +751,45 @@ namespace TuristickiVodic.Services.Services
                 .FirstAsync(e => e.Id == id);
         }
 
-        private async Task ValidateReferences(int eventTypeId, int? localityId, int? destinationId, int? objectId)
+       private async Task ValidateReferences(int eventTypeId, int? localityId, int? destinationId, int? objectId)
         {
             if (!await _context.EventTypes.AnyAsync(x => x.Id == eventTypeId))
                 throw new InvalidOperationException("Event type not found.");
 
+            int? effectiveDestinationId = destinationId;
+
             if (localityId.HasValue && !await _context.Localities.AnyAsync(x => x.Id == localityId.Value))
                 throw new InvalidOperationException("Locality not found.");
 
+            if (localityId.HasValue)
+            {
+                var localityDestinationId = await _context.Localities
+                    .Where(x => x.Id == localityId.Value)
+                    .Select(x => x.DestinationId)
+                    .FirstAsync();
+
+                if (destinationId.HasValue && destinationId.Value != localityDestinationId)
+                    throw new InvalidOperationException("Locality does not belong to the specified destination.");
+
+                effectiveDestinationId ??= localityDestinationId;
+            }
+
             if (destinationId.HasValue && !await _context.Destinations.AnyAsync(x => x.Id == destinationId.Value))
                 throw new InvalidOperationException("Destination not found.");
+                if (objectId.HasValue)
+            {
+                var touristObject = await _context.Objects
+                    .AsNoTracking()
+                    .Where(x => x.Id == objectId.Value)
+                    .Select(x => new { x.Id, x.DestinationId })
+                    .FirstOrDefaultAsync();
 
-            if (objectId.HasValue && !await _context.Objects.AnyAsync(x => x.Id == objectId.Value))
-                throw new InvalidOperationException("Object not found.");
+                if (touristObject == null)
+                    throw new InvalidOperationException("Object not found.");
+
+                if (effectiveDestinationId.HasValue && touristObject.DestinationId != effectiveDestinationId.Value)
+                    throw new InvalidOperationException("Selected object does not belong to the specified destination.");
+            }
         }
 
         private static void ValidateEventPayload(DateTime startDate, DateTime? endDate, decimal? price, int? maxVisitors, double? longitude, double? latitude)
