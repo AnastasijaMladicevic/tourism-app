@@ -89,6 +89,39 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
+        public async Task GetNearby_BezAuth_VracaPagedRezultat()
+        {
+            var mockService = new Mock<IEventService>();
+            var dto = new PagedResultDto<EventDto>
+            {
+                Items = new List<EventDto>
+                {
+                    new EventDto { Id = 1, Name = "Sea Dance", DistanceMeters = 245.5 }
+                },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 1,
+                TotalPages = 1
+            };
+
+            mockService
+                .Setup(s => s.GetNearbyAsync(It.IsAny<NearbyEventQueryDto>()))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.GetNearby(new NearbyEventQueryDto
+            {
+                Latitude = 42.42,
+                Longitude = 18.77,
+                RadiusMeters = 5000
+            });
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
         public async Task GetById_KadaEventNePostoji_VracaNotFound()
         {
             var mockService = new Mock<IEventService>();

@@ -1541,6 +1541,62 @@ namespace TuristickiVodic.Tests.Validation
         }
 
         [Fact]
+        public void NearbyLocalityQueryDto_NegativanRadius_NijeValidno()
+        {
+            var dto = new NearbyLocalityQueryDto
+            {
+                Latitude = 42.42,
+                Longitude = 18.77,
+                RadiusMeters = -5
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(NearbyLocalityQueryDto.RadiusMeters)));
+        }
+
+        [Fact]
+        public void NearbyEventQueryDto_NegativanRadius_NijeValidno()
+        {
+            var dto = new NearbyEventQueryDto
+            {
+                Latitude = 42.42,
+                Longitude = 18.77,
+                RadiusMeters = -5
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(NearbyEventQueryDto.RadiusMeters)));
+        }
+
+        [Fact]
+        public void NearbyTouristObjectQueryDto_NegativanRadius_NijeValidno()
+        {
+            var dto = new NearbyTouristObjectQueryDto
+            {
+                Latitude = 42.42,
+                Longitude = 18.77,
+                RadiusMeters = -5
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(NearbyTouristObjectQueryDto.RadiusMeters)));
+        }
+
+        [Fact]
+        public void NearbyActivityQueryDto_NegativanRadius_NijeValidno()
+        {
+            var dto = new NearbyActivityQueryDto
+            {
+                Latitude = 42.42,
+                Longitude = 18.77,
+                RadiusMeters = -5
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(NearbyActivityQueryDto.RadiusMeters)));
+        }
+
+        [Fact]
         public void VerifyResetCodeDto_ValidnoPopunjeno_JeValidno()
         {
             var dto = new VerifyResetCodeDto

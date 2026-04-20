@@ -4,6 +4,7 @@ namespace TuristickiVodic.Services
     public interface IActivityService
     {
         Task<PagedResultDto<ActivityDto>> GetAllAsync(ActivityQueryDto query);
+        Task<PagedResultDto<ActivityDto>> GetNearbyAsync(NearbyActivityQueryDto query);
         Task<PagedResultDto<ActivityDto>> GetMyAsync(int userId, ActivityQueryDto query);
         Task<PagedResultDto<ActivityDto>> GetForManagerAsync(int userId, ActivityQueryDto query);
         Task<ActivityDto?> GetByIdAsync(int id);

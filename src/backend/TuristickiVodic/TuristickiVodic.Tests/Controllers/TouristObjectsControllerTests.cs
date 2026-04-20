@@ -79,6 +79,38 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
+        public async Task GetNearby_BezAuth_VracaPagedRezultat()
+        {
+            var mockService = new Mock<ITouristObjectService>();
+            var dto = new PagedResultDto<TouristObjectDto>
+            {
+                Items = new List<TouristObjectDto>
+                {
+                    new TouristObjectDto { Id = 1, Name = "Pomorski muzej", DestinationId = 1, DistanceMeters = 185.3 }
+                },
+                Page = 1,
+                PageSize = 10,
+                TotalCount = 1,
+                TotalPages = 1
+            };
+
+            mockService
+                .Setup(s => s.GetNearbyAsync(It.IsAny<NearbyTouristObjectQueryDto>()))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+            var result = await controller.GetNearby(new NearbyTouristObjectQueryDto
+            {
+                Latitude = 42.42,
+                Longitude = 18.77,
+                RadiusMeters = 5000
+            });
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
         public async Task GetById_KadaJeContentCreatorIVlasnik_VracaSopstveniNeodobrenObjekat()
         {
             var mockService = new Mock<ITouristObjectService>();

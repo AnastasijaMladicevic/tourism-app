@@ -1,7 +1,6 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
-using NetTopologySuite.Operation.Distance;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
@@ -326,6 +325,96 @@ namespace TuristickiVodic.Services
             };
         }
 
+        public async Task<PagedResultDto<LocalityDto>> GetNearbyAsync(NearbyLocalityQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var localitiesQuery = _context.Localities
+                .Include(l => l.Destination)
+                .Include(l => l.LocalityType)
+                .Include(l => l.Images)
+                .Where(l => l.IsActive)
+                .Where(l => l.Geolocation != null)
+                .Where(l => l.Images.Any(i => i.IsMain))
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+
+                localitiesQuery = localitiesQuery.Where(l =>
+                    l.Destination != null &&
+                    l.Destination.Name.ToLower().Contains(destination));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+
+                localitiesQuery = localitiesQuery.Where(l =>
+                    l.LocalityType != null &&
+                    l.LocalityType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+
+                localitiesQuery = localitiesQuery.Where(l =>
+                    l.Name.ToLower().Contains(search) ||
+                    (l.Description != null && l.Description.ToLower().Contains(search)));
+            }
+
+            var localities = await localitiesQuery.ToListAsync();
+
+            var nearbyLocalities = localities
+                .Select(locality => new
+                {
+                    Locality = locality,
+                    DistanceMeters = CalculateDistanceMeters(
+                        query.Latitude,
+                        query.Longitude,
+                        locality.Geolocation!.Y,
+                        locality.Geolocation.X)
+                })
+                .Where(x => x.DistanceMeters <= query.RadiusMeters)
+                .ToList();
+
+            var isDesc = string.Equals(query.SortOrder?.Trim(), "desc", StringComparison.OrdinalIgnoreCase);
+            nearbyLocalities = isDesc
+                ? nearbyLocalities.OrderByDescending(x => x.DistanceMeters).ThenBy(x => x.Locality.Name).ToList()
+                : nearbyLocalities.OrderBy(x => x.DistanceMeters).ThenBy(x => x.Locality.Name).ToList();
+
+            var totalCount = nearbyLocalities.Count;
+
+            var items = nearbyLocalities
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .Select(x =>
+                {
+                    var dto = _mapper.Map<LocalityDto>(x.Locality);
+                    dto.DistanceMeters = Math.Round(x.DistanceMeters, 2);
+                    return dto;
+                })
+                .ToList();
+
+            return new PagedResultDto<LocalityDto>
+            {
+                Items = items,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
         private static IQueryable<Locality> ApplyLocalitySorting(IQueryable<Locality> query, string? sortBy, string? sortOrder)
         {
             var sortByValue = sortBy?.Trim().ToLower();
@@ -356,5 +445,25 @@ namespace TuristickiVodic.Services
                 ? query.OrderByDescending(l => l.Name)
                 : query.OrderBy(l => l.Name);
         }
+
+        private static double CalculateDistanceMeters(double latitude1, double longitude1, double latitude2, double longitude2)
+        {
+            const double earthRadiusMeters = 6371000d;
+
+            var deltaLatitude = DegreesToRadians(latitude2 - latitude1);
+            var deltaLongitude = DegreesToRadians(longitude2 - longitude1);
+            var normalizedLatitude1 = DegreesToRadians(latitude1);
+            var normalizedLatitude2 = DegreesToRadians(latitude2);
+
+            var a =
+                Math.Sin(deltaLatitude / 2) * Math.Sin(deltaLatitude / 2) +
+                Math.Cos(normalizedLatitude1) * Math.Cos(normalizedLatitude2) *
+                Math.Sin(deltaLongitude / 2) * Math.Sin(deltaLongitude / 2);
+
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return earthRadiusMeters * c;
+        }
+
+        private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180d;
     }
 }

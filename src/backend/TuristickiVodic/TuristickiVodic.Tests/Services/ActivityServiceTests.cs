@@ -653,6 +653,94 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task GetNearbyAsync_UKruguVracaSamoJavneAktivnostiSortiranePoUdaljenosti()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetNearbyAsync_UKruguVracaSamoJavneAktivnostiSortiranePoUdaljenosti));
+            var (_, _, _, activityType, destination, _, locality, _, creator, _, _, _, _) = SeedBase(ctx);
+
+            ctx.Activities.AddRange(
+                new Activity
+                {
+                    Id = 1,
+                    Name = "Bliza aktivnost",
+                    ActivityTypeId = activityType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    Geolocation = new Point(18.7705, 42.4243) { SRID = 4326 },
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new Activity
+                {
+                    Id = 2,
+                    Name = "Dalja aktivnost",
+                    ActivityTypeId = activityType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    Geolocation = new Point(18.7750, 42.4280) { SRID = 4326 },
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new Activity
+                {
+                    Id = 3,
+                    Name = "Van kruga",
+                    ActivityTypeId = activityType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    Geolocation = new Point(18.84, 42.29) { SRID = 4326 },
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new Activity
+                {
+                    Id = 4,
+                    Name = "Pending aktivnost",
+                    ActivityTypeId = activityType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = true,
+                    Geolocation = new Point(18.7706, 42.4244) { SRID = 4326 },
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+            ctx.Images.AddRange(
+                new Image { Id = 1, ActivityId = 1, Url = "bliza.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 2, ActivityId = 2, Url = "dalja.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 3, ActivityId = 3, Url = "vankruga.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 4, ActivityId = 4, Url = "pending.jpg", IsMain = true, CreatedAt = DateTime.UtcNow });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetNearbyAsync(new NearbyActivityQueryDto
+            {
+                Latitude = 42.4243,
+                Longitude = 18.7705,
+                RadiusMeters = 1000
+            });
+
+            result.TotalCount.Should().Be(2);
+            result.Items.Should().HaveCount(2);
+            result.Items.Select(x => x.Name).Should().Equal("Bliza aktivnost", "Dalja aktivnost");
+            result.Items[0].DistanceMeters.Should().NotBeNull();
+            result.Items[1].DistanceMeters.Should().NotBeNull();
+            result.Items[0].DistanceMeters!.Value.Should().BeLessThan(result.Items[1].DistanceMeters!.Value);
+        }
+
+        [Fact]
         public async Task GetMyAsync_ContentCreator_VidiSamoSvojeAktivnostiNezavisnoOdStatusa()
         {
             using var ctx = CreateInMemoryContext(nameof(GetMyAsync_ContentCreator_VidiSamoSvojeAktivnostiNezavisnoOdStatusa));
