@@ -92,13 +92,22 @@ namespace TuristickiVodic.API.Controllers
             var result = await _eventService.GetMyAsync(userId, query);
             return Ok(result);
         }
-
+        
         [HttpGet("manager")]
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> GetForManager([FromQuery] EventQueryDto query)
         {
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var result = await _eventService.GetForManagerAsync(userId, query);
+            return Ok(result);
+        }
+
+
+        [HttpGet("types")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetTypes()
+        {
+            var result = await _eventService.GetEventTypesAsync();
             return Ok(result);
         }
 
