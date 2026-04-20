@@ -19,6 +19,8 @@ export interface ObjectDto {
   phoneNumber?: string;
   website?: string;
   workingHours?: string;
+  price?: Int16Array;
+  amenities?: [];
   longitude?: number;
   latitude?: number;
   averageRating?: number;
