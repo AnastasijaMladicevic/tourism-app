@@ -287,6 +287,38 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task ApproveAsync_RejectObjektaBezMainSlike_Uspeh()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ApproveAsync_RejectObjektaBezMainSlike_Uspeh));
+            var (objectType, destination, _, locality, _, creator, _, manager, _) = SeedBase(ctx);
+            var svc = CreateService(ctx);
+
+            ctx.Objects.Add(new TouristObject
+            {
+                Id = 1,
+                Name = "Objekat",
+                ObjectTypeId = objectType.Id,
+                LocalityId = locality.Id,
+                DestinationId = destination.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Pending,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+            ctx.SaveChanges();
+
+            var result = await svc.ApproveAsync(1, new ApproveContentDto
+            {
+                Approve = false,
+                RejectionReason = "Nedovoljno podataka"
+            }, manager.Id, "Manager");
+
+            result.Should().NotBeNull();
+            result!.Status.Should().Be("Rejected");
+            result.RejectionReason.Should().Be("Nedovoljno podataka");
+        }
+
+        [Fact]
         public async Task GetAllAsync_KadaSeFiltriraPoProsecnojOceni_VracaSamoObjekteUNaZadatomOpsegu()
         {
             using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaSeFiltriraPoProsecnojOceni_VracaSamoObjekteUNaZadatomOpsegu));

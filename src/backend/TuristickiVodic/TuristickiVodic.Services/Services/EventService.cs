@@ -699,11 +699,14 @@ namespace TuristickiVodic.Services.Services
                 throw new UnauthorizedAccessException("Only the responsible manager can approve events.");
             }
 
-            var hasMainImage = await _context.Images
-                .AnyAsync(i => i.EventId == ev.Id && i.IsMain);
+            if (dto.Approve)
+            {
+                var hasMainImage = await _context.Images
+                    .AnyAsync(i => i.EventId == ev.Id && i.IsMain);
 
-            if (!hasMainImage)
-                throw new InvalidOperationException("Event must have a main image before approval.");
+                if (!hasMainImage)
+                    throw new InvalidOperationException("Event must have a main image before approval.");
+            }
 
             ev.Status = dto.Approve ? ContentStatus.Approved : ContentStatus.Rejected;
             ev.RejectionReason = dto.Approve ? null : dto.RejectionReason;

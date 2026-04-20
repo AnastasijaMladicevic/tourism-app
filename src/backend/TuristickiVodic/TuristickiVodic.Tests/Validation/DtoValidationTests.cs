@@ -723,6 +723,37 @@ namespace TuristickiVodic.Tests.Validation
         }
 
         [Fact]
+        public void CreateEventDto_ImageUrlMax2000_JeValidan()
+        {
+            var dto = new CreateEventDto
+            {
+                Name = "Koncert",
+                EventTypeId = 1,
+                DestinationId = 1,
+                StartDate = new DateTime(2026, 5, 5, 20, 0, 0),
+                ImageUrl = new string('A', 2000)
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void CreateEventDto_ImageUrlPreko2000_NijeValidan()
+        {
+            var dto = new CreateEventDto
+            {
+                Name = "Koncert",
+                EventTypeId = 1,
+                DestinationId = 1,
+                StartDate = new DateTime(2026, 5, 5, 20, 0, 0),
+                ImageUrl = new string('A', 2001)
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(CreateEventDto.ImageUrl)));
+        }
+
+        [Fact]
         public void UpdateEventDto_SamoJednaKoordinata_NijeValidan()
         {
             var dto = new UpdateEventDto
@@ -1347,11 +1378,11 @@ namespace TuristickiVodic.Tests.Validation
         // ═══════════════════════════════════════════
 
         [Fact]
-        public void CreateImageDto_UrlMax500_JeValidan()
+        public void CreateImageDto_UrlMax2000_JeValidan()
         {
             var dto = new CreateImageDto
             {
-                Url = new string('A', 500),
+                Url = new string('A', 2000),
                 ObjectId = 1
             };
 
@@ -1382,11 +1413,11 @@ namespace TuristickiVodic.Tests.Validation
         }
 
         [Fact]
-        public void CreateImageDto_UrlDuzinaPreko500_NijeValidno()
+        public void CreateImageDto_UrlDuzinaPreko2000_NijeValidno()
         {
             var dto = new CreateImageDto
             {
-                Url = new string('A', 501),
+                Url = new string('A', 2001),
                 ObjectId = 1
             };
 
@@ -1455,22 +1486,22 @@ namespace TuristickiVodic.Tests.Validation
         }
 
         [Fact]
-        public void UpdateImageDto_UrlMax500_JeValidan()
+        public void UpdateImageDto_UrlMax2000_JeValidan()
         {
             var dto = new UpdateImageDto
             {
-                Url = new string('A', 500)
+                Url = new string('A', 2000)
             };
 
             IsValid(dto).Should().BeTrue();
         }
 
         [Fact]
-        public void UpdateImageDto_UrlPreko500_NijeValidan()
+        public void UpdateImageDto_UrlPreko2000_NijeValidan()
         {
             var dto = new UpdateImageDto
             {
-                Url = new string('A', 501)
+                Url = new string('A', 2001)
             };
 
             IsValid(dto).Should().BeFalse();
