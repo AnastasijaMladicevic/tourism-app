@@ -10,6 +10,10 @@ namespace TuristickiVodic.Services.Mappings
     {
         public MappingProfile()
         {
+            // We only map from properties in this project. Disabling method mapping avoids
+            // AutoMapper scanning LINQ generic helpers (for example MaxFloat on .NET 10).
+            ShouldMapMethod = _ => false;
+
             CreateMap<User, UserDto>()
                 .ForMember(dest => dest.RoleName,
                     opt => opt.MapFrom(src => src.Role != null ? src.Role.Name.ToString() : string.Empty));

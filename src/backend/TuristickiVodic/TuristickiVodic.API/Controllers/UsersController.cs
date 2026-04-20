@@ -519,8 +519,11 @@ namespace TuristickiVodic.API.Controllers
             return response;
         }
 
-        private UserDto NormalizeUser(UserDto user)
+        private UserDto? NormalizeUser(UserDto? user)
         {
+            if (user == null)
+                return null;
+
             user.ProfileImageUrl = BuildAbsoluteProfileImageUrl(user.ProfileImageUrl);
             return user;
         }
