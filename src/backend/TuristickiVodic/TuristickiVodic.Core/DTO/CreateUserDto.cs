@@ -15,7 +15,7 @@ namespace TuristickiVodic.Core.DTO
 
         [Required, EmailAddress]
         [MaxLength(200)]
-        [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Neispravan format email-a")]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$", ErrorMessage = "Neispravan format email-a")]
         public string Email { get; set; }
 
         [Required, MinLength(6)]
