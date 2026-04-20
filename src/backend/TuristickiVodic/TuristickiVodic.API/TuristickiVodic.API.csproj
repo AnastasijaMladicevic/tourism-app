@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <NuGetAuditMode>direct</NuGetAuditMode>
+    <UserSecretsId>21296d5e-0092-4275-a345-4fd1547ddf37</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
