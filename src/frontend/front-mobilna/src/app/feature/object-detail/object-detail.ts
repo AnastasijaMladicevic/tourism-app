@@ -96,14 +96,22 @@ export class ObjectDetailComponent implements OnInit {
   goBack(): void {
     this.router.navigate(['/restaurants']);   // ili /objects
   }
-
+  private getType(): string {
+  const t = (this.object?.objectTypeName ?? '').toLowerCase();
+  if (t.includes('hotel')) return 'hotel';
+  if (t.includes('restoran')) return 'restaurant'; // mapira na 'restaurant' ne 'restoran'
+  if (t.includes('kafana')) return 'kafana';
+  return 'object';
+}
   viewOnMap(): void {
     if (!this.object?.latitude || !this.object?.longitude) return;
     this.router.navigate(['/map'], {
       state: {
         lat: this.object.latitude,
         lng: this.object.longitude,
-        zoom: 16
+        zoom: 19,
+        selectedItem: this.object,         
+      selectedType: this.getType()
       }
     });
   }

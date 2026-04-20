@@ -3,6 +3,8 @@ import * as L from 'leaflet';
 
 @Injectable({ providedIn: 'root' })
 export class MapService {
+  private markers: any[] = [];
+  private markerMap = new Map<string, any>();
   // Nova metoda samo za glavnu map stranicu
   addMainMapMarker(lat: number, lng: number, popupText: string = ''): L.Marker | null {
     if (!this.map) {
@@ -114,37 +116,85 @@ export class MapService {
  * Univerzalna metoda za dodavanje markera sa tipom
  */
   addMarkerWithType(
-    lat: number,
-    lng: number,
-    type: 'destination' | 'hotel' | 'restaurant' | 'kafana' | 'event' | 'locality' | 'activity',
-    data: any,
-    onClick?: () => void
-  ): L.Marker | null {
-  
-    if (!this.map) return null;
-  
-    const iconHtml = this.getMarkerIconHtml(type);
-  
-    const customIcon = L.divIcon({
-      className: 'custom-type-marker',
-      html: iconHtml,
-      iconSize: [46, 46],
-      iconAnchor: [23, 46],
-      popupAnchor: [0, -40]
-    });
-  
-    const marker = L.marker([lat, lng], { icon: customIcon }).addTo(this.map);
-  
-    // Klik na marker — dispatch Angular event umesto Leaflet popup-a
-    marker.on('click', () => {
-      window.dispatchEvent(new CustomEvent('map-marker-clicked', {
-        detail: { data, type }
-      }));
-      if (onClick) onClick();
-    });
-  
-    return marker;
+  lat: number,
+  lng: number,
+  type: string,
+  data: any,
+  onClick?: () => void
+): L.Marker | null {
+
+  if (!this.map) return null;
+
+  const iconHtml = this.getMarkerIconHtml(type);
+  const customIcon = L.divIcon({
+    className: 'custom-type-marker',
+    html: iconHtml,
+    iconSize: [46, 46],
+    iconAnchor: [23, 46],
+    popupAnchor: [0, -40]
+  });
+
+  const marker = L.marker([lat, lng], { icon: customIcon }).addTo(this.map);
+  this.markers.push({ marker, data, type, lat, lng });
+
+  const key = `${type}:${data.id}`;
+  this.markerMap.set(key, { marker, data, type, lat, lng });
+
+  marker.on('click', () => {
+    this.activateMarker(key);
+    if (onClick) onClick();
+  });
+
+  return marker;
+}
+
+// Centralna metoda za aktivaciju markera — koriste je i klik i triggerMarkerClick
+activateMarker(key: string): void {
+  const found = this.markerMap.get(key);
+  if (!found) { console.warn('Marker not found:', key); return; }
+
+  const { marker, data, type, lat, lng } = found;
+
+  // Vrati prethodni custom marker
+  const prevKey = (window as any).activeMarkerKey;
+  if (prevKey && prevKey !== key) {
+    const prev = this.markerMap.get(prevKey);
+    if (prev && !this.map?.hasLayer(prev.marker)) {
+      prev.marker.addTo(this.map!);
+    }
   }
+
+  // Ukloni regularni pin ako postoji
+  const prevRegular = (window as any).currentRegularMarker;
+  if (prevRegular) { prevRegular.remove(); }
+
+  // Sakrij custom pin i dodaj regularni
+  marker.remove();
+  const regularMarker = this.addMarker(lat, lng, data.name);
+
+  // Sačuvaj state
+  (window as any).activeMarkerKey = key;
+  (window as any).currentRegularMarker = regularMarker;
+
+  window.dispatchEvent(new CustomEvent('map-marker-clicked', {
+    detail: { data, type }
+  }));
+}
+
+triggerMarkerClick(type: string, id: number, zoom: number = 16): void {
+  console.log('triggerMarkerClick called:', type, id);
+  console.log('markerMap size:', this.markerMap.size);
+  console.log('markerMap keys:', Array.from(this.markerMap.keys()));
+
+  const key = `${type}:${id}`;
+  const found = this.markerMap.get(key);
+  console.log('found:', found);
+
+  if (!found) { console.warn('Marker not found:', key); return; }
+
+  this.activateMarker(key);
+  this.map?.flyTo([found.lat, found.lng], zoom);
+}
   
   private getMarkerIconHtml(type: string): string {
     const map: any = {

@@ -622,11 +622,19 @@ button:hover {
     gap: 40px;
     padding: 30px 20px 60px;
     background: #f5f7fa;
+    align-items: start;
   }
-
+  .left{
+    grid-column: 1;
+  }
+  .reviews-card{
+    grid-column: 1;
+  }
   .right {
     top: 20px;
     height: fit-content;
+    grid-column: 2;
+    grid-row: 1 / span 2;
   }
 
   .hero {

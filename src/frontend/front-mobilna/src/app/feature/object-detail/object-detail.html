@@ -52,28 +52,7 @@
 
           <p class="location-bold">{{ object.localityName }}, {{ object.destinationName }}</p>
           <p class="venue"><mat-icon>location_on</mat-icon> {{ object.address || 'N/A' }}</p>
-          <!-- Kontakt Info - Nova sekcija -->
-          <div class="contact-info">
-            <h3>Kontakt info</h3>
-            @if (object.phoneNumber) {
-              <p>
-                <mat-icon>phone</mat-icon>
-                <a [href]="'tel:' + object.phoneNumber">{{ object.phoneNumber }}</a>
-              </p>
-            }
-            @if (object.website) {
-              <p>
-                <mat-icon>language</mat-icon>
-                <a [href]="object.website" target="_blank" rel="noopener">{{ object.website }}</a>
-              </p>
-            }
-          </div>
-          @if (object.workingHours) {
-            <p class="date"><mat-icon>access_time</mat-icon> {{ getWorkingHours() }}</p>
-          }
-          <p class="price-tag">
-            Starting from <strong>{{ object.price }}$</strong>
-          </p>
+
           <div class="actions">
             <button class="btn btn-primary" (click)="viewOnMap()">Rezerviši odmah</button>
           </div>
@@ -116,7 +95,34 @@
           </div>
         </div>
       </div>
+      <!-- Recenzije -->
+      <div class="card reviews-card">
+        <div class="reviews-header">
+          <h2>Recenzije</h2>
+          <button class="see-all-btn" (click)="openAllReviews()">See All ></button>
+        </div>
 
+        <div class="reviews-list">
+          @for (review of reviews | slice: 0 : 3; track review.id) {
+            <div class="review-item">
+              <div class="review-header">
+                <span class="review-author">{{ review.userFullName }}</span>
+                <span class="review-date">{{ formatReviewDate(review.createdAt) }}</span>
+              </div>
+              <div class="review-rating">
+                @for (star of [1, 2, 3, 4, 5]; track star) {
+                  <mat-icon [class.filled]="star <= (review.rating || 0)">star</mat-icon>
+                }
+              </div>
+              <p class="review-text">{{ review.text }}</p>
+            </div>
+          }
+        </div>
+
+        <button class="add-review-btn" (click)="openWriteReview()">
+          <mat-icon>add</mat-icon> Dodaj recenziju
+        </button>
+      </div>
       <!-- DESNA STRANA -->
       <div class="right">
         <div class="card">
@@ -135,34 +141,43 @@
             <button class="map-btn-overlay" (click)="viewOnMap()">Pogledaj na mapi</button>
           </div>
         </div>
-        <!-- Recenzije -->
-        <div class="section">
-          <div class="card reviews-card">
-            <div class="reviews-header">
-              <h2>Recenzije</h2>
-              <button class="see-all-btn" (click)="openAllReviews()">See All ></button>
-            </div>
 
-            <div class="reviews-list">
-              @for (review of reviews | slice: 0 : 3; track review.id) {
-                <div class="review-item">
-                  <div class="review-header">
-                    <span class="review-author">{{ review.userFullName }}</span>
-                    <span class="review-date">{{ formatReviewDate(review.createdAt) }}</span>
-                  </div>
-                  <div class="review-rating">
-                    @for (star of [1, 2, 3, 4, 5]; track star) {
-                      <mat-icon [class.filled]="star <= (review.rating || 0)">star</mat-icon>
-                    }
-                  </div>
-                  <p class="review-text">{{ review.text }}</p>
-                </div>
+        <div class="section">
+          <div class="card contact-card">
+            <div class="contact-header">
+              <h2>Contact info</h2>
+            </div>
+            <div class="contact-info">
+              @if (object.phoneNumber) {
+                <p>
+                  <mat-icon>phone</mat-icon>
+                  <a [href]="'tel:' + object.phoneNumber">{{ object.phoneNumber }}</a>
+                </p>
+              }
+              @if (object.website) {
+                <p>
+                  <mat-icon>language</mat-icon>
+                  <a [href]="object.website" target="_blank" rel="noopener">{{ object.website }}</a>
+                </p>
               }
             </div>
-
-            <button class="add-review-btn" (click)="openWriteReview()">
-              <mat-icon>add</mat-icon> Dodaj recenziju
-            </button>
+            @if (object.workingHours) {
+              <p class="date"><mat-icon>access_time</mat-icon> {{ getWorkingHours() }}</p>
+            }
+          </div>
+        </div>
+        <div class="section">
+          <div class="card price-card">
+            <div class="price-header">
+              <h2>Price</h2>
+            </div>
+            <div class="section">
+              <div class="card price-card">
+                <p class="price-tag">
+                  Starting from <strong>{{ object.price }}$</strong>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
         <div class="card nearby-card">
