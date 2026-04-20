@@ -226,6 +226,8 @@ export class EventFormComponent implements OnInit {
   }
 
   private syncObjectSelectionWithDestination(): void {
+    this.updateObjectControlState();
+
     const selectedObjectId = this.parseOptionalNumber(this.form.get('objectId')?.value);
 
     if (selectedObjectId && !this.filteredVenueOptions.some((venue) => venue.id === selectedObjectId)) {
@@ -242,6 +244,24 @@ export class EventFormComponent implements OnInit {
     }
 
     this.venueSearchTerm = this.filteredVenueOptions[0]?.name ?? '';
+  }
+
+  private updateObjectControlState(): void {
+    const objectControl = this.form.get('objectId');
+    if (!objectControl) {
+      return;
+    }
+
+    const shouldDisable = !!this.selectedDestinationId && this.filteredVenueOptions.length === 0;
+
+    if (shouldDisable && objectControl.enabled) {
+      objectControl.disable({ emitEvent: false });
+      return;
+    }
+
+    if (!shouldDisable && objectControl.disabled) {
+      objectControl.enable({ emitEvent: false });
+    }
   }
 
   loadEvent(): void {

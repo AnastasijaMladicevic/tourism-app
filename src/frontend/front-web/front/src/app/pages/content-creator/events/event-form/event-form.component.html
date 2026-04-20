@@ -44,7 +44,7 @@
   }
 
   <div class="form-layout">
-    <div class="form-main">
+    <div class="form-main" [formGroup]="form">
       <div
         class="upload-card card"
         [class.image-drop-active]="isImageDropActive"
@@ -125,7 +125,7 @@
 
             <label class="form-field">
               <span>Object Type *</span>
-              <select class="form-control" formControlName="objectId" [disabled]="!!selectedDestinationId && filteredVenueOptions.length === 0">
+              <select class="form-control" formControlName="objectId">
                 <option value="">{{ selectedDestinationId ? 'Select object' : 'Select destination first' }}</option>
                 <option *ngFor="let venue of filteredVenueOptions" [value]="venue.id">{{ venue.name }}</option>
               </select>
