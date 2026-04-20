@@ -2,7 +2,7 @@ export interface EventDto {
   id: number;
   name: string;
   description?: string;
-  ImageUrl?: string;
+  mainImageUrl?: string;
   longitude?: number;
   latitude?: number;
   isActive: boolean;

@@ -286,7 +286,7 @@ export class EventFormComponent implements OnInit {
       localityId: '',
       destinationId: event.destinationId?.toString() || '',
       objectId: event.objectId?.toString() || '',
-      imageUrl: event.ImageUrl ?? '',
+      imageUrl: event.mainImageUrl ?? '',
       ageRestriction: '',
       tagsInput: ''
     });

@@ -101,7 +101,7 @@ export class EventService {
    * Get event by ID only if it belongs to current content creator
    */
   getMyById(id: number): Observable<EventDto> {
-    return this.http.get<EventDto>(`${this.apiUrl}/my/${id}`);
+    return this.http.get<EventDto>(`${this.apiUrl}/${id}`);
   }
 
   /**

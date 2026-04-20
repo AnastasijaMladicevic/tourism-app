@@ -64,7 +64,7 @@ export class EventDetailsComponent implements OnInit {
   }
 
   get bannerUrl(): string {
-    return this.normalizeImageUrl(this.event?.ImageUrl) || '/assets/pozadina.png';
+    return this.normalizeImageUrl(this.event?.mainImageUrl) || '/assets/pozadina.png';
   }
 
   get categoryLabel(): string {

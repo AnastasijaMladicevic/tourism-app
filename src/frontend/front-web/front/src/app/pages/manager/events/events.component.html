@@ -5,7 +5,6 @@
       <h1>Events</h1>
       <p class="subtle-text">{{ managedDestinationLabel }}</p>
     </div>
-
   </div>
 
   <div class="toolbar card">
@@ -91,7 +90,9 @@
                   </td>
                   <td>
                     <span class="category-pill">
-                      <span class="material-symbols-outlined tiny-icon">{{ getCategoryIcon(event) }}</span>
+                      <span class="material-symbols-outlined tiny-icon">{{
+                        getCategoryIcon(event)
+                      }}</span>
                       {{ getCategoryLabel(event) }}
                     </span>
                   </td>
@@ -145,19 +146,22 @@
 
     <aside class="event-side-column card">
       @if (selectedEvent) {
-        <div class="featured-media" [style.background-image]="'url(' + getDetailBanner(selectedEvent) + ')'">
-          <button type="button" class="media-edit-btn">
-            <span class="material-symbols-outlined">edit_square</span>
-            Edit Media
-          </button>
-        </div>
-
+        <div
+          class="featured-media"
+          [style.background-image]="'url(' + getDetailBanner(selectedEvent) + ')'"
+        ></div>
         <div class="featured-copy">
           <p class="featured-type">{{ getCategoryLabel(selectedEvent) }}</p>
           <h3>{{ selectedEvent.name }}</h3>
-          <p class="featured-meta">{{ getLocationLabel(selectedEvent) }} · {{ formatDate(selectedEvent.startDate) }}</p>
+          <p class="featured-meta">
+            {{ getLocationLabel(selectedEvent) }} · {{ formatDate(selectedEvent.startDate) }}
+          </p>
 
-          <div class="status-tooltip-wrap" [class.has-tooltip]="hasSelectedEventRejectionReason(selectedEvent)" tabindex="0">
+          <div
+            class="status-tooltip-wrap"
+            [class.has-tooltip]="hasSelectedEventRejectionReason(selectedEvent)"
+            tabindex="0"
+          >
             <span class="publish-badge" [ngClass]="getStatusBadgeClass(selectedEvent.status)">
               {{ selectedEvent.status || 'Published' }}
             </span>
@@ -174,11 +178,17 @@
         <div class="detail-metrics">
           <div>
             <span>Pricing</span>
-            <strong>{{ selectedEvent.price ? '$' + selectedEvent.price.toFixed(2) : '$45.00' }}</strong>
+            <strong>{{
+              selectedEvent.price ? '$' + selectedEvent.price.toFixed(2) : '$45.00'
+            }}</strong>
           </div>
           <div>
             <span>Capacity</span>
-            <strong>{{ selectedEvent.maxVisitors ? selectedEvent.maxVisitors.toLocaleString('en-US') : '5,000' }}</strong>
+            <strong>{{
+              selectedEvent.maxVisitors
+                ? selectedEvent.maxVisitors.toLocaleString('en-US')
+                : '5,000'
+            }}</strong>
           </div>
         </div>
 
