@@ -33,6 +33,21 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
+        [HttpGet("nearby")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetNearby([FromQuery] NearbyEventQueryDto query)
+        {
+            try
+            {
+                var result = await _eventService.GetNearbyAsync(query);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         /*[HttpGet("search")]
         [AllowAnonymous]
         public async Task<IActionResult> Search([FromQuery] EventQueryDto query)

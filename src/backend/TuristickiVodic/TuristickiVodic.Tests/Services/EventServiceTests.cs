@@ -938,6 +938,41 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task ApproveAsync_RejectBezMainSlike_Uspeh()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ApproveAsync_RejectBezMainSlike_Uspeh));
+            var (_, _, _, eventType, destination, _, locality, _, creator, _, manager, _, _) = SeedBase(ctx);
+
+            ctx.Events.Add(new Event
+            {
+                Id = 1,
+                Name = "Pending event",
+                EventTypeId = eventType.Id,
+                LocalityId = locality.Id,
+                DestinationId = destination.Id,
+                Destination = destination,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Pending,
+                StartDate = new DateTime(2026, 7, 2, 18, 0, 0, DateTimeKind.Utc),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+
+            var result = await svc.ApproveAsync(1, new ApproveContentDto
+            {
+                Approve = false,
+                RejectionReason = "Nedovoljno podataka"
+            }, manager.Id, "Manager");
+
+            result.Should().NotBeNull();
+            result!.Status.Should().Be("Rejected");
+            result.RejectionReason.Should().Be("Nedovoljno podataka");
+        }
+
+        [Fact]
         public async Task GetByIdAsync_PostojiSaMainSlikom_VracaDto()
         {
             using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_PostojiSaMainSlikom_VracaDto));
@@ -1084,6 +1119,76 @@ namespace TuristickiVodic.Tests.Services
             result.TotalCount.Should().Be(1);
             result.Items.Should().ContainSingle();
             result.Items.Single().Name.Should().Be("Sea Dance");
+        }
+
+        [Fact]
+        public async Task GetNearbyAsync_UKruguVracaSamoJavneEventoveSortiranePoUdaljenosti()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetNearbyAsync_UKruguVracaSamoJavneEventoveSortiranePoUdaljenosti));
+            var (_, _, _, eventType, destination, _, locality, _, creator, _, _, _, _) = SeedBase(ctx);
+
+            ctx.Events.AddRange(
+                new Event
+                {
+                    Id = 1,
+                    Name = "Blizi event",
+                    EventTypeId = eventType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    StartDate = DateTime.UtcNow.AddDays(2),
+                    Geolocation = new Point(18.7705, 42.4243) { SRID = 4326 }
+                },
+                new Event
+                {
+                    Id = 2,
+                    Name = "Dalji event",
+                    EventTypeId = eventType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    StartDate = DateTime.UtcNow.AddDays(3),
+                    Geolocation = new Point(18.7750, 42.4280) { SRID = 4326 }
+                },
+                new Event
+                {
+                    Id = 3,
+                    Name = "Van kruga",
+                    EventTypeId = eventType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    StartDate = DateTime.UtcNow.AddDays(4),
+                    Geolocation = new Point(18.84, 42.29) { SRID = 4326 }
+                });
+
+            ctx.Images.AddRange(
+                new Image { Id = 1, EventId = 1, Url = "blizi.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 2, EventId = 2, Url = "dalji.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 3, EventId = 3, Url = "vankruga.jpg", IsMain = true, CreatedAt = DateTime.UtcNow });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetNearbyAsync(new NearbyEventQueryDto
+            {
+                Latitude = 42.4243,
+                Longitude = 18.7705,
+                RadiusMeters = 1000
+            });
+
+            result.TotalCount.Should().Be(2);
+            result.Items.Should().HaveCount(2);
+            result.Items.Select(x => x.Name).Should().Equal("Blizi event", "Dalji event");
+            result.Items[0].DistanceMeters.Should().NotBeNull();
+            result.Items[1].DistanceMeters.Should().NotBeNull();
+            result.Items[0].DistanceMeters!.Value.Should().BeLessThan(result.Items[1].DistanceMeters!.Value);
         }
 
         [Fact]

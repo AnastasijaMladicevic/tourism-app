@@ -287,6 +287,38 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task ApproveAsync_RejectObjektaBezMainSlike_Uspeh()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ApproveAsync_RejectObjektaBezMainSlike_Uspeh));
+            var (objectType, destination, _, locality, _, creator, _, manager, _) = SeedBase(ctx);
+            var svc = CreateService(ctx);
+
+            ctx.Objects.Add(new TouristObject
+            {
+                Id = 1,
+                Name = "Objekat",
+                ObjectTypeId = objectType.Id,
+                LocalityId = locality.Id,
+                DestinationId = destination.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Pending,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+            ctx.SaveChanges();
+
+            var result = await svc.ApproveAsync(1, new ApproveContentDto
+            {
+                Approve = false,
+                RejectionReason = "Nedovoljno podataka"
+            }, manager.Id, "Manager");
+
+            result.Should().NotBeNull();
+            result!.Status.Should().Be("Rejected");
+            result.RejectionReason.Should().Be("Nedovoljno podataka");
+        }
+
+        [Fact]
         public async Task GetAllAsync_KadaSeFiltriraPoProsecnojOceni_VracaSamoObjekteUNaZadatomOpsegu()
         {
             using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaSeFiltriraPoProsecnojOceni_VracaSamoObjekteUNaZadatomOpsegu));
@@ -423,6 +455,94 @@ namespace TuristickiVodic.Tests.Services
             result.Items.Should().HaveCount(1);
             result.Items[0].Name.Should().Be("Hotel sa svim pogodnostima");
             result.Items[0].Amenities.Should().Contain(new[] { "WiFi", "Parking" });
+        }
+
+        [Fact]
+        public async Task GetNearbyAsync_UKruguVracaSamoJavneObjekteSortiranePoUdaljenosti()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetNearbyAsync_UKruguVracaSamoJavneObjekteSortiranePoUdaljenosti));
+            var (objectType, destination, _, locality, _, creator, _, _, _) = SeedBase(ctx);
+
+            ctx.Objects.AddRange(
+                new TouristObject
+                {
+                    Id = 1,
+                    Name = "Blizi objekat",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    Geolocation = new Point(18.7705, 42.4243) { SRID = 4326 },
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new TouristObject
+                {
+                    Id = 2,
+                    Name = "Dalji objekat",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    Geolocation = new Point(18.7750, 42.4280) { SRID = 4326 },
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new TouristObject
+                {
+                    Id = 3,
+                    Name = "Van kruga",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    Geolocation = new Point(18.84, 42.29) { SRID = 4326 },
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new TouristObject
+                {
+                    Id = 4,
+                    Name = "Pending objekat",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = true,
+                    Geolocation = new Point(18.7706, 42.4244) { SRID = 4326 },
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+            ctx.Images.AddRange(
+                new Image { Id = 1, ObjectId = 1, Url = "blizi.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 2, ObjectId = 2, Url = "dalji.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 3, ObjectId = 3, Url = "vankruga.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 4, ObjectId = 4, Url = "pending.jpg", IsMain = true, CreatedAt = DateTime.UtcNow });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetNearbyAsync(new NearbyTouristObjectQueryDto
+            {
+                Latitude = 42.4243,
+                Longitude = 18.7705,
+                RadiusMeters = 1000
+            });
+
+            result.TotalCount.Should().Be(2);
+            result.Items.Should().HaveCount(2);
+            result.Items.Select(x => x.Name).Should().Equal("Blizi objekat", "Dalji objekat");
+            result.Items[0].DistanceMeters.Should().NotBeNull();
+            result.Items[1].DistanceMeters.Should().NotBeNull();
+            result.Items[0].DistanceMeters!.Value.Should().BeLessThan(result.Items[1].DistanceMeters!.Value);
         }
 
         [Fact]

@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
+using TuristickiVodic.Core.Validation;
 
 namespace TuristickiVodic.Core.DTO
 {
     public class CreateImageDto
     {
-        [Required, MaxLength(500)]
+        [Required, MaxLength(ValidationLengths.ImageUrl)]
         public string Url { get; set; }
 
-        [MaxLength(200)]
+        [MaxLength(ValidationLengths.ImageAltText)]
         public string? AltText { get; set; }
 
         public bool IsMain { get; set; }

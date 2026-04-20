@@ -90,6 +90,99 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
+        public async Task<PagedResultDto<ActivityDto>> GetNearbyAsync(NearbyActivityQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var activitiesQuery = _context.Activities
+                .Include(a => a.ActivityType)
+                .Include(a => a.Destination)
+                .Include(a => a.Locality)
+                .Include(a => a.Object)
+                .Include(a => a.Images)
+                .Where(a => a.Status == ContentStatus.Approved)
+                .Where(a => a.IsActive)
+                .Where(a => a.Geolocation != null)
+                .Where(a => a.Images.Any(i => i.IsMain))
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+
+                activitiesQuery = activitiesQuery.Where(a =>
+                    a.ActivityType != null &&
+                    a.ActivityType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+
+                activitiesQuery = activitiesQuery.Where(a =>
+                    a.Destination != null &&
+                    a.Destination.Name.ToLower().Contains(destination));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+
+                activitiesQuery = activitiesQuery.Where(a =>
+                    a.Name.ToLower().Contains(search) ||
+                    (a.Description != null && a.Description.ToLower().Contains(search)));
+            }
+
+            var activities = await activitiesQuery.ToListAsync();
+
+            var nearbyActivities = activities
+                .Select(activity => new
+                {
+                    Activity = activity,
+                    DistanceMeters = CalculateDistanceMeters(
+                        query.Latitude,
+                        query.Longitude,
+                        activity.Geolocation!.Y,
+                        activity.Geolocation.X)
+                })
+                .Where(x => x.DistanceMeters <= query.RadiusMeters)
+                .ToList();
+
+            var isDesc = string.Equals(query.SortOrder?.Trim(), "desc", StringComparison.OrdinalIgnoreCase);
+            nearbyActivities = isDesc
+                ? nearbyActivities.OrderByDescending(x => x.DistanceMeters).ThenBy(x => x.Activity.Name).ToList()
+                : nearbyActivities.OrderBy(x => x.DistanceMeters).ThenBy(x => x.Activity.Name).ToList();
+
+            var totalCount = nearbyActivities.Count;
+
+            var items = nearbyActivities
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .Select(x =>
+                {
+                    var dto = _mapper.Map<ActivityDto>(x.Activity);
+                    dto.DistanceMeters = Math.Round(x.DistanceMeters, 2);
+                    return dto;
+                })
+                .ToList();
+
+            return new PagedResultDto<ActivityDto>
+            {
+                Items = items,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
         public async Task<PagedResultDto<ActivityDto>> GetMyAsync(int userId, ActivityQueryDto query)
         {
             if (query.Page < 1)
@@ -473,11 +566,14 @@ namespace TuristickiVodic.Services.Services
 
             if (activity == null)
                 return null;
-            var hasMainImage = await _context.Images
-                .AnyAsync(i => i.ActivityId == activity.Id && i.IsMain);
+            if (dto.Approve)
+            {
+                var hasMainImage = await _context.Images
+                    .AnyAsync(i => i.ActivityId == activity.Id && i.IsMain);
 
-            if (!hasMainImage)
-                throw new InvalidOperationException("Activity must have a main image before approval.");
+                if (!hasMainImage)
+                    throw new InvalidOperationException("Activity must have a main image before approval.");
+            }
 
             if (activity.Status != ContentStatus.Pending)
                 throw new InvalidOperationException("Only pending activities can be approved or rejected.");
@@ -541,6 +637,26 @@ namespace TuristickiVodic.Services.Services
                 return null;
             return new Point(longitude.Value, latitude.Value) { SRID = 4326 };
         }
+
+        private static double CalculateDistanceMeters(double latitude1, double longitude1, double latitude2, double longitude2)
+        {
+            const double earthRadiusMeters = 6371000d;
+
+            var deltaLatitude = DegreesToRadians(latitude2 - latitude1);
+            var deltaLongitude = DegreesToRadians(longitude2 - longitude1);
+            var normalizedLatitude1 = DegreesToRadians(latitude1);
+            var normalizedLatitude2 = DegreesToRadians(latitude2);
+
+            var a =
+                Math.Sin(deltaLatitude / 2) * Math.Sin(deltaLatitude / 2) +
+                Math.Cos(normalizedLatitude1) * Math.Cos(normalizedLatitude2) *
+                Math.Sin(deltaLongitude / 2) * Math.Sin(deltaLongitude / 2);
+
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return earthRadiusMeters * c;
+        }
+
+        private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180d;
 
         private static void ValidateActivityPayload(decimal? price, int? durationMinutes, double? longitude, double? latitude)
         {

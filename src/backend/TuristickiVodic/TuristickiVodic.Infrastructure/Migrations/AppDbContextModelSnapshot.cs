@@ -499,8 +499,8 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.Property<string>("Url")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
 
                     b.HasKey("Id");
 
@@ -1012,11 +1012,11 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .HasMaxLength(5)
                         .HasColumnType("character varying(5)");
 
-                    b.Property<double?>("LastLocationAccuracyMeters")
-                        .HasColumnType("double precision");
-
                     b.Property<Point>("LastKnownLocation")
                         .HasColumnType("geometry");
+
+                    b.Property<double?>("LastLocationAccuracyMeters")
+                        .HasColumnType("double precision");
 
                     b.Property<DateTime?>("LastLocationUpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1709,9 +1709,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.Navigation("Favorites");
 
-                    b.Navigation("ManagedDestination");
-
                     b.Navigation("LocationHistory");
+
+                    b.Navigation("ManagedDestination");
 
                     b.Navigation("RefreshToken");
 

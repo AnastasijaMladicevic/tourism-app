@@ -5,6 +5,7 @@ namespace TuristickiVodic.Services.Services
     public interface ITouristObjectService
     {
         Task<PagedResultDto<TouristObjectDto>> GetAllAsync(TouristObjectQueryDto query);
+        Task<PagedResultDto<TouristObjectDto>> GetNearbyAsync(NearbyTouristObjectQueryDto query);
         Task<PagedResultDto<TouristObjectDto>> GetMyAsync(int userId, TouristObjectQueryDto query);
         Task<PagedResultDto<TouristObjectDto>> GetForManagerAsync(int userId, TouristObjectQueryDto query);
         Task<PagedResultDto<TouristObjectDto>> SearchAsync(TouristObjectQueryDto query);

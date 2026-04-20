@@ -158,6 +158,164 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
+        public async Task<PagedResultDto<TouristObjectDto>> GetNearbyAsync(NearbyTouristObjectQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var objectsQuery = _context.Objects
+                .Include(o => o.ObjectType)
+                .Include(o => o.Destination)
+                .Include(o => o.Locality)
+                    .ThenInclude(l => l.Destination)
+                .Include(o => o.Images)
+                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
+                    .ThenInclude(r => r.User)
+                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
+                    .ThenInclude(r => r.ReviewedBy)
+                .Where(o => o.Status == ContentStatus.Approved)
+                .Where(o => o.IsActive)
+                .Where(o => o.Geolocation != null)
+                .Where(o => o.Images.Any(i => i.IsMain))
+                .AsSplitQuery()
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+                objectsQuery = objectsQuery.Where(o =>
+                    o.ObjectType != null &&
+                    o.ObjectType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+
+                objectsQuery = objectsQuery.Where(o =>
+                    ((o.Destination != null && o.Destination.Name.ToLower().Contains(destination)) ||
+                     (o.Destination == null && o.Locality != null && o.Locality.Destination != null && o.Locality.Destination.Name.ToLower().Contains(destination))));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Locality))
+            {
+                var locality = query.Locality.Trim().ToLower();
+
+                objectsQuery = objectsQuery.Where(o =>
+                    o.Locality != null &&
+                    o.Locality.Name.ToLower().Contains(locality));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination) && !string.IsNullOrWhiteSpace(query.Locality))
+            {
+                var destination = query.Destination.Trim().ToLower();
+                var locality = query.Locality.Trim().ToLower();
+
+                var localityEntity = await _context.Localities
+                    .Include(l => l.Destination)
+                    .FirstOrDefaultAsync(l => l.Name.ToLower().Contains(locality));
+
+                if (localityEntity != null &&
+                    localityEntity.Destination != null &&
+                    !localityEntity.Destination.Name.ToLower().Contains(destination))
+                {
+                    throw new InvalidOperationException("The selected locality does not belong to the selected destination.");
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+
+                objectsQuery = objectsQuery.Where(o =>
+                    o.Name.ToLower().Contains(search) ||
+                    (o.Description != null && o.Description.ToLower().Contains(search)));
+            }
+
+            var requestedAmenities = NormalizeAmenities(query.Amenities);
+            if (requestedAmenities.Length > 0)
+            {
+                foreach (var amenity in requestedAmenities)
+                {
+                    objectsQuery = objectsQuery.Where(o =>
+                        o.Amenities != null &&
+                        o.Amenities.Contains(amenity));
+                }
+            }
+
+            if (query.MinPrice.HasValue)
+            {
+                objectsQuery = objectsQuery.Where(o =>
+                    o.Price.HasValue &&
+                    o.Price.Value >= query.MinPrice.Value);
+            }
+
+            if (query.MaxPrice.HasValue)
+            {
+                objectsQuery = objectsQuery.Where(o =>
+                    o.Price.HasValue &&
+                    o.Price.Value <= query.MaxPrice.Value);
+            }
+
+            if (query.MinRating.HasValue)
+            {
+                objectsQuery = objectsQuery.Where(o => o.AverageRating >= query.MinRating.Value);
+            }
+
+            if (query.MaxRating.HasValue)
+            {
+                objectsQuery = objectsQuery.Where(o => o.AverageRating <= query.MaxRating.Value);
+            }
+
+            var objects = await objectsQuery.ToListAsync();
+
+            var nearbyObjects = objects
+                .Select(obj => new
+                {
+                    Object = obj,
+                    DistanceMeters = CalculateDistanceMeters(
+                        query.Latitude,
+                        query.Longitude,
+                        obj.Geolocation!.Y,
+                        obj.Geolocation.X)
+                })
+                .Where(x => x.DistanceMeters <= query.RadiusMeters)
+                .ToList();
+
+            var isDesc = string.Equals(query.SortOrder?.Trim(), "desc", StringComparison.OrdinalIgnoreCase);
+            nearbyObjects = isDesc
+                ? nearbyObjects.OrderByDescending(x => x.DistanceMeters).ThenBy(x => x.Object.Name).ToList()
+                : nearbyObjects.OrderBy(x => x.DistanceMeters).ThenBy(x => x.Object.Name).ToList();
+
+            var totalCount = nearbyObjects.Count;
+
+            var items = nearbyObjects
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .Select(x =>
+                {
+                    var dto = _mapper.Map<TouristObjectDto>(x.Object);
+                    dto.DistanceMeters = Math.Round(x.DistanceMeters, 2);
+                    return dto;
+                })
+                .ToList();
+
+            return new PagedResultDto<TouristObjectDto>
+            {
+                Items = items,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
         public async Task<PagedResultDto<TouristObjectDto>> GetMyAsync(int userId, TouristObjectQueryDto query)
         {
             if (query.Page < 1)
@@ -581,11 +739,14 @@ namespace TuristickiVodic.Services.Services
             var obj = await LoadObjectAsync(id);
             if (obj == null) return null;
 
-            var hasMainImage = await _context.Images
-                .AnyAsync(i => i.ObjectId == obj.Id && i.IsMain);
+            if (dto.Approve)
+            {
+                var hasMainImage = await _context.Images
+                    .AnyAsync(i => i.ObjectId == obj.Id && i.IsMain);
 
-            if (!hasMainImage)
-                throw new InvalidOperationException("Object must have a main image before approval.");
+                if (!hasMainImage)
+                    throw new InvalidOperationException("Object must have a main image before approval.");
+            }
 
             if (obj.Status != ContentStatus.Pending)
                 throw new InvalidOperationException("Only pending objects can be approved or rejected.");
@@ -791,5 +952,25 @@ namespace TuristickiVodic.Services.Services
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToArray();
         }
+
+        private static double CalculateDistanceMeters(double latitude1, double longitude1, double latitude2, double longitude2)
+        {
+            const double earthRadiusMeters = 6371000d;
+
+            var deltaLatitude = DegreesToRadians(latitude2 - latitude1);
+            var deltaLongitude = DegreesToRadians(longitude2 - longitude1);
+            var normalizedLatitude1 = DegreesToRadians(latitude1);
+            var normalizedLatitude2 = DegreesToRadians(latitude2);
+
+            var a =
+                Math.Sin(deltaLatitude / 2) * Math.Sin(deltaLatitude / 2) +
+                Math.Cos(normalizedLatitude1) * Math.Cos(normalizedLatitude2) *
+                Math.Sin(deltaLongitude / 2) * Math.Sin(deltaLongitude / 2);
+
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return earthRadiusMeters * c;
+        }
+
+        private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180d;
     }
 }

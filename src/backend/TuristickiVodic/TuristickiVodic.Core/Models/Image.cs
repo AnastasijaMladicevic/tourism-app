@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using TuristickiVodic.Core.Validation;
 
 namespace TuristickiVodic.Core.Models
 {
@@ -9,11 +10,11 @@ namespace TuristickiVodic.Core.Models
     {
         public int Id { get; set; }
 
-        [Required, MaxLength(500)]
+        [Required, MaxLength(ValidationLengths.ImageUrl)]
         public string Url { get; set; }
 
         // Accessibility
-        [MaxLength(200)]
+        [MaxLength(ValidationLengths.ImageAltText)]
         public string? AltText { get; set; }
 
         public bool IsMain { get; set; } = false;

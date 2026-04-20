@@ -139,6 +139,140 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
+        public async Task<PagedResultDto<EventDto>> GetNearbyAsync(NearbyEventQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var eventsQuery = _context.Events
+                .Include(e => e.EventType)
+                .Include(e => e.Destination)
+                .Include(e => e.Locality)
+                .Include(e => e.Object)
+                .Include(e => e.Images)
+                .Where(e => e.Status == ContentStatus.Approved)
+                .Where(e => e.IsActive)
+                .Where(e => e.Geolocation != null)
+                .Where(e => e.Images.Any(i => i.IsMain))
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.Type))
+            {
+                var type = query.Type.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    e.EventType != null &&
+                    e.EventType.Name.ToLower().Contains(type));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Destination))
+            {
+                var destination = query.Destination.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    e.Destination != null &&
+                    e.Destination.Name.ToLower().Contains(destination));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+                eventsQuery = eventsQuery.Where(e =>
+                    e.Name.ToLower().Contains(search) ||
+                    (e.Description != null && e.Description.ToLower().Contains(search)));
+            }
+
+            var hasDate = query.Date.HasValue;
+            var hasNextDays = query.NextDays.HasValue;
+            var hasRange = query.StartDate.HasValue || query.EndDate.HasValue;
+
+            var filterCount = 0;
+            if (hasDate) filterCount++;
+            if (hasNextDays) filterCount++;
+            if (hasRange) filterCount++;
+
+            if (filterCount > 1)
+                throw new InvalidOperationException("Use only one type of date filter at a time.");
+
+            DateTime? periodStart = null;
+            DateTime? periodEnd = null;
+
+            if (hasDate)
+            {
+                periodStart = EnsureUtc(query.Date!.Value.Date);
+                periodEnd = EnsureUtc(periodStart.Value.AddDays(1));
+            }
+            else if (hasNextDays)
+            {
+                if (query.NextDays!.Value != 7 && query.NextDays.Value != 30)
+                    throw new InvalidOperationException("NextDays can only be 7 or 30.");
+
+                periodStart = DateTime.UtcNow.Date;
+                periodEnd = periodStart.Value.AddDays(query.NextDays.Value);
+            }
+            else if (hasRange)
+            {
+                periodStart = EnsureUtc((query.StartDate ?? query.EndDate)!.Value.Date);
+                periodEnd = EnsureUtc(((query.EndDate ?? query.StartDate)!.Value.Date).AddDays(1));
+
+                if (periodEnd <= periodStart)
+                    throw new InvalidOperationException("EndDate must be greater than or equal to StartDate.");
+            }
+
+            if (periodStart.HasValue && periodEnd.HasValue)
+            {
+                eventsQuery = eventsQuery.Where(e =>
+                    e.StartDate < periodEnd.Value &&
+                    (!e.EndDate.HasValue || e.EndDate.Value >= periodStart.Value));
+            }
+
+            var events = await eventsQuery.ToListAsync();
+
+            var nearbyEvents = events
+                .Select(ev => new
+                {
+                    Event = ev,
+                    DistanceMeters = CalculateDistanceMeters(
+                        query.Latitude,
+                        query.Longitude,
+                        ev.Geolocation!.Y,
+                        ev.Geolocation.X)
+                })
+                .Where(x => x.DistanceMeters <= query.RadiusMeters)
+                .ToList();
+
+            var isDesc = string.Equals(query.SortOrder?.Trim(), "desc", StringComparison.OrdinalIgnoreCase);
+            nearbyEvents = isDesc
+                ? nearbyEvents.OrderByDescending(x => x.DistanceMeters).ThenBy(x => x.Event.Name).ToList()
+                : nearbyEvents.OrderBy(x => x.DistanceMeters).ThenBy(x => x.Event.Name).ToList();
+
+            var totalCount = nearbyEvents.Count;
+
+            var items = nearbyEvents
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .Select(x =>
+                {
+                    var dto = _mapper.Map<EventDto>(x.Event);
+                    dto.DistanceMeters = Math.Round(x.DistanceMeters, 2);
+                    return dto;
+                })
+                .ToList();
+
+            return new PagedResultDto<EventDto>
+            {
+                Items = items,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
         public async Task<PagedResultDto<EventDto>> GetMyAsync(int userId, EventQueryDto query)
         {
             if (query.Page < 1)
@@ -553,11 +687,14 @@ namespace TuristickiVodic.Services.Services
                 throw new UnauthorizedAccessException("Only the responsible manager can approve events.");
             }
 
-            var hasMainImage = await _context.Images
-                .AnyAsync(i => i.EventId == ev.Id && i.IsMain);
+            if (dto.Approve)
+            {
+                var hasMainImage = await _context.Images
+                    .AnyAsync(i => i.EventId == ev.Id && i.IsMain);
 
-            if (!hasMainImage)
-                throw new InvalidOperationException("Event must have a main image before approval.");
+                if (!hasMainImage)
+                    throw new InvalidOperationException("Event must have a main image before approval.");
+            }
 
             ev.Status = dto.Approve ? ContentStatus.Approved : ContentStatus.Rejected;
             ev.RejectionReason = dto.Approve ? null : dto.RejectionReason;
@@ -645,6 +782,26 @@ namespace TuristickiVodic.Services.Services
 
             return new Point(longitude.Value, latitude.Value) { SRID = 4326 };
         }
+
+        private static double CalculateDistanceMeters(double latitude1, double longitude1, double latitude2, double longitude2)
+        {
+            const double earthRadiusMeters = 6371000d;
+
+            var deltaLatitude = DegreesToRadians(latitude2 - latitude1);
+            var deltaLongitude = DegreesToRadians(longitude2 - longitude1);
+            var normalizedLatitude1 = DegreesToRadians(latitude1);
+            var normalizedLatitude2 = DegreesToRadians(latitude2);
+
+            var a =
+                Math.Sin(deltaLatitude / 2) * Math.Sin(deltaLatitude / 2) +
+                Math.Cos(normalizedLatitude1) * Math.Cos(normalizedLatitude2) *
+                Math.Sin(deltaLongitude / 2) * Math.Sin(deltaLongitude / 2);
+
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return earthRadiusMeters * c;
+        }
+
+        private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180d;
 
         public async Task<EventDto?> ToggleActiveAsync(int id, bool isActive, int userId, string roleName)
         {

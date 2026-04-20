@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using TuristickiVodic.Core.Models;
+using TuristickiVodic.Core.Validation;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using Image = TuristickiVodic.Core.Models.Image;
 using Locality = TuristickiVodic.Core.Models.Locality;
@@ -336,6 +337,14 @@ public class AppDbContext : DbContext
             .HasFilter("\"LocalityId\" IS NOT NULL");
 
         // ==================== IMAGE ====================
+        mb.Entity<Image>()
+            .Property(i => i.Url)
+            .HasMaxLength(ValidationLengths.ImageUrl);
+
+        mb.Entity<Image>()
+            .Property(i => i.AltText)
+            .HasMaxLength(ValidationLengths.ImageAltText);
+
         mb.Entity<Image>()
             .ToTable(t => t.HasCheckConstraint(
                 "CK_Image_OnlyOne",

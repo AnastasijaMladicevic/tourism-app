@@ -211,6 +211,71 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task GetNearbyAsync_VracaSamoLokaliteteUnutarRadijusaSortiranePoUdaljenosti()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetNearbyAsync_VracaSamoLokaliteteUnutarRadijusaSortiranePoUdaljenosti));
+            var (_, _, lt, mgr, dest, _) = SeedBase(ctx);
+
+            var nearest = MakeLocality(1, "Blizu", dest, lt, mgr.Id);
+            nearest.Geolocation = new Point(18.7710, 42.4240) { SRID = 4326 };
+
+            var farther = MakeLocality(2, "Dalje", dest, lt, mgr.Id);
+            farther.Geolocation = new Point(18.7750, 42.4270) { SRID = 4326 };
+
+            var outOfRadius = MakeLocality(3, "Predaleko", dest, lt, mgr.Id);
+            outOfRadius.Geolocation = new Point(19.1000, 43.1000) { SRID = 4326 };
+
+            ctx.Localities.AddRange(nearest, farther, outOfRadius);
+            ctx.SaveChanges();
+
+            ctx.Images.AddRange(
+                new Image { Id = 1, LocalityId = nearest.Id, Url = "nearest-main.jpg", IsMain = true },
+                new Image { Id = 2, LocalityId = farther.Id, Url = "farther-main.jpg", IsMain = true },
+                new Image { Id = 3, LocalityId = outOfRadius.Id, Url = "out-main.jpg", IsMain = true }
+            );
+            ctx.SaveChanges();
+
+            var svc = new LocalityService(ctx, CreateMapper());
+            var result = await svc.GetNearbyAsync(new NearbyLocalityQueryDto
+            {
+                Latitude = 42.4243,
+                Longitude = 18.7705,
+                RadiusMeters = 700,
+                Page = 1,
+                PageSize = 10
+            });
+
+            result.TotalCount.Should().Be(2);
+            result.Items.Select(x => x.Name).Should().Equal("Blizu", "Dalje");
+            result.Items.All(x => x.DistanceMeters.HasValue).Should().BeTrue();
+            result.Items[0].DistanceMeters!.Value.Should().BeLessThan(result.Items[1].DistanceMeters!.Value);
+        }
+
+        [Fact]
+        public async Task GetNearbyAsync_LokalitetBezMainSlike_NeUlaziURezultat()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetNearbyAsync_LokalitetBezMainSlike_NeUlaziURezultat));
+            var (_, _, lt, mgr, dest, _) = SeedBase(ctx);
+
+            var locality = MakeLocality(1, "Bez slike", dest, lt, mgr.Id);
+            locality.Geolocation = new Point(18.7710, 42.4240) { SRID = 4326 };
+
+            ctx.Localities.Add(locality);
+            ctx.SaveChanges();
+
+            var svc = new LocalityService(ctx, CreateMapper());
+            var result = await svc.GetNearbyAsync(new NearbyLocalityQueryDto
+            {
+                Latitude = 42.4243,
+                Longitude = 18.7705,
+                RadiusMeters = 500
+            });
+
+            result.TotalCount.Should().Be(0);
+            result.Items.Should().BeEmpty();
+        }
+
+        [Fact]
         public async Task GetByIdAsync_PostojeciLokalitet_VracaDto()
         {
             using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_PostojeciLokalitet_VracaDto));
