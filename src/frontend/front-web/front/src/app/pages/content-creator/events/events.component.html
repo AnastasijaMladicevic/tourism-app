@@ -40,7 +40,7 @@
     </button>
 
     <button type="button" class="ghost-btn slim-btn" (click)="onClearSearch()">
-      <span class="material-symbols-outlined">tune</span>
+      <span class="material-symbols-outlined"> filter_alt </span>
       More Filters
     </button>
   </div>
@@ -130,9 +130,7 @@
                     <div class="capacity-cell">
                       <div class="capacity-bar">
                         <span
-                          [style.width.%]="
-                            Math.min(((event.maxVisitors ?? 300) / 500) * 100, 100)
-                          "
+                          [style.width.%]="Math.min(((event.maxVisitors ?? 300) / 500) * 100, 100)"
                         ></span>
                       </div>
                       <small>{{ getCapacityLabel(event) }}</small>
@@ -207,7 +205,11 @@
             <p class="hero-meta">
               {{ getLocationLabel(selectedEvent) }} · {{ formatDate(selectedEvent.startDate) }}
             </p>
-            <div class="status-tooltip-wrap" [class.has-tooltip]="hasRejectionReason(selectedEvent)" tabindex="0">
+            <div
+              class="status-tooltip-wrap"
+              [class.has-tooltip]="hasRejectionReason(selectedEvent)"
+              tabindex="0"
+            >
               <span class="detail-status" [ngClass]="getStatusBadgeClass(selectedEvent.status)">
                 {{ selectedEvent.status || 'Draft' }}
               </span>
