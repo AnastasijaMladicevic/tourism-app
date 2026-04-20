@@ -15,7 +15,7 @@
           [disabled]="isSubmitting || isDeleting"
         >
           <span class="material-symbols-outlined">delete</span>
-          Delete
+          {{ isApprovedEvent ? 'Request Deletion' : 'Delete' }}
         </button>
       }
 
@@ -124,10 +124,13 @@
 
             <label class="form-field">
               <span>Object Type *</span>
-              <select class="form-control" formControlName="objectId">
-                <option value="">Select object</option>
-                <option *ngFor="let venue of venueOptions" [value]="venue.id">{{ venue.name }}</option>
+              <select class="form-control" formControlName="objectId" [disabled]="!!selectedDestinationId && filteredVenueOptions.length === 0">
+                <option value="">{{ selectedDestinationId ? 'Select object' : 'Select destination first' }}</option>
+                <option *ngFor="let venue of filteredVenueOptions" [value]="venue.id">{{ venue.name }}</option>
               </select>
+              @if (selectedDestinationId && filteredVenueOptions.length === 0) {
+                <small class="form-field-note">No objects found for selected destination.</small>
+              }
             </label>
           </div>
 
@@ -324,10 +327,10 @@
           <span class="material-symbols-outlined">delete</span>
         </div>
 
-        <h3 id="delete-modal-title">Confirm deletion</h3>
+        <h3 id="delete-modal-title">{{ deleteModalTitle }}</h3>
         <p id="delete-modal-description">
-          Are you sure you want to delete this item?<br />
-          This action cannot be undone.
+          {{ deleteModalDescription }}<br />
+          {{ isApprovedEvent ? 'A manager will review the request before the event is removed.' : 'This action cannot be undone.' }}
         </p>
 
         <div class="event-delete-modal-actions">
@@ -345,7 +348,7 @@
             (click)="deleteEvent()"
             [disabled]="isDeleting"
           >
-            {{ isDeleting ? 'Deleting...' : 'Delete' }}
+            {{ isDeleting ? (isApprovedEvent ? 'Submitting...' : 'Deleting...') : (isApprovedEvent ? 'Request deletion' : 'Delete') }}
           </button>
         </div>
       </section>

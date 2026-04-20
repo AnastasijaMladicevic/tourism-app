@@ -101,7 +101,7 @@ export class ContentCreatorEventsComponent implements OnInit {
       sortOrder: this.sortOrder,
     };
 
-    this.eventService.getAll(query).subscribe({
+    this.eventService.getMy(query).subscribe({
       next: (response) => {
         this.events = response.items;
         this.applyLocalFilters();
@@ -233,6 +233,19 @@ export class ContentCreatorEventsComponent implements OnInit {
     }
   }
 
+  getRejectionReason(event: EventDto | null): string {
+    const reason = event?.rejectionReason?.trim();
+    if (!reason || (event?.status ?? '').toLowerCase() !== 'rejected') {
+      return '';
+    }
+
+    return reason;
+  }
+
+  hasRejectionReason(event: EventDto | null): boolean {
+    return this.getRejectionReason(event).length > 0;
+  }
+
   formatDate(date: string | Date | undefined): string {
     if (!date) return '-';
     const d = new Date(date);
@@ -281,10 +294,10 @@ export class ContentCreatorEventsComponent implements OnInit {
 
   getDetailBanner(event: EventDto | null): string {
     if (event?.mainImageUrl) {
-      return event.mainImageUrl;
+      return this.normalizeImageUrl(event.mainImageUrl);
     }
 
-    return 'assets/pozadina.png';
+    return '/assets/pozadina.png';
   }
 
   getSelectedSummary(event: EventDto | null): string {
@@ -322,6 +335,24 @@ export class ContentCreatorEventsComponent implements OnInit {
       { label: 'Location', value: this.getLocationLabel(this.selectedEvent) },
       { label: 'Category', value: this.getCategoryLabel(this.selectedEvent) }
     ];
+  }
+
+  private normalizeImageUrl(value: string): string {
+    const trimmed = value.trim();
+
+    if (!trimmed) {
+      return '';
+    }
+
+    if (/^(data:|blob:|https?:\/\/|\/\/)/i.test(trimmed)) {
+      return trimmed;
+    }
+
+    try {
+      return encodeURI(new URL(trimmed, document.baseURI).href);
+    } catch {
+      return encodeURI(trimmed);
+    }
   }
 
 }

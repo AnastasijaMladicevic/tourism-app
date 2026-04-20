@@ -207,9 +207,18 @@
             <p class="hero-meta">
               {{ getLocationLabel(selectedEvent) }} · {{ formatDate(selectedEvent.startDate) }}
             </p>
-            <span class="detail-status" [ngClass]="getStatusBadgeClass(selectedEvent.status)">{{
-              selectedEvent.status || 'Draft'
-            }}</span>
+            <div class="status-tooltip-wrap" [class.has-tooltip]="hasRejectionReason(selectedEvent)" tabindex="0">
+              <span class="detail-status" [ngClass]="getStatusBadgeClass(selectedEvent.status)">
+                {{ selectedEvent.status || 'Draft' }}
+              </span>
+
+              @if (hasRejectionReason(selectedEvent)) {
+                <div class="status-tooltip" role="tooltip">
+                  <strong>Rejection reason</strong>
+                  <p>{{ getRejectionReason(selectedEvent) }}</p>
+                </div>
+              }
+            </div>
           </div>
         </div>
 

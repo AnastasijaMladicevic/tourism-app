@@ -2,8 +2,9 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { catchError, finalize, forkJoin, map, of } from 'rxjs';
 import { AuthService } from '../../../../services/auth.service';
+import { DestinationService } from '../../../../services/destination.service';
 import { EventService } from '../../../../services/event.service';
 import { CreateEventDto, EventDto, UpdateEventDto } from '../../../../models/event.model';
 
@@ -11,6 +12,7 @@ interface VenueOption {
   id: number;
   name: string;
   address: string;
+  destinationId: number;
 }
 
 interface RelatedActivity {
@@ -29,6 +31,7 @@ interface RelatedActivity {
 export class EventFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
+  private readonly destinationService = inject(DestinationService);
   private readonly eventService = inject(EventService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -68,11 +71,12 @@ export class EventFormComponent implements OnInit {
   showDeleteModal = false;
   isImageDropActive = false;
   isImagePreviewBroken = false;
+  eventStatus = '';
   organizerName = 'Current Content Creator';
   venueSearchTerm = 'Grand Horizon Resort';
   selectedActivityIds = new Set<number>([2]);
 
-  readonly eventTypes = [
+  private readonly fallbackEventTypes = [
     { id: 1, name: 'Festival' },
     { id: 2, name: 'Workshop' },
     { id: 3, name: 'Sports' },
@@ -81,18 +85,22 @@ export class EventFormComponent implements OnInit {
     { id: 6, name: 'Concert' }
   ];
 
-  readonly destinations = [
+  private readonly fallbackDestinations = [
     { id: 1, name: 'Belgrade' },
     { id: 2, name: 'Novi Sad' },
     { id: 3, name: 'Kopaonik' },
     { id: 4, name: 'Nis' }
   ];
 
-  readonly venueOptions: VenueOption[] = [
-    { id: 1, name: 'Grand Horizon Resort', address: 'Azure Coast Drive 15, Belgrade, Serbia' },
-    { id: 2, name: 'Sunset Pavilion', address: 'Riverside Promenade 8, Novi Sad, Serbia' },
-    { id: 3, name: 'City Museum Courtyard', address: 'Old Town Square 3, Nis, Serbia' }
+  private readonly fallbackVenueOptions: VenueOption[] = [
+    { id: 1, name: 'Grand Horizon Resort', address: 'Azure Coast Drive 15, Belgrade, Serbia', destinationId: 1 },
+    { id: 2, name: 'Sunset Pavilion', address: 'Riverside Promenade 8, Novi Sad, Serbia', destinationId: 2 },
+    { id: 3, name: 'City Museum Courtyard', address: 'Old Town Square 3, Nis, Serbia', destinationId: 4 }
   ];
+
+  eventTypes = [...this.fallbackEventTypes];
+  destinations = [...this.fallbackDestinations];
+  venueOptions: VenueOption[] = [...this.fallbackVenueOptions];
 
   readonly relatedActivities: RelatedActivity[] = [
     { id: 1, name: 'Sunset Boat Tour', meta: 'Activity · 2 hrs' },
@@ -124,9 +132,31 @@ export class EventFormComponent implements OnInit {
   readonly tags = ['Outdoor', 'Live Music', 'Summer'];
   pendingTag = '';
 
+  get selectedDestinationId(): number | undefined {
+    return this.parseOptionalNumber(this.form.get('destinationId')?.value);
+  }
+
+  get filteredVenueOptions(): VenueOption[] {
+    const destinationId = this.selectedDestinationId;
+    if (!destinationId) {
+      return this.venueOptions;
+    }
+
+    return this.venueOptions.filter((venue) => venue.destinationId === destinationId);
+  }
+
   get selectedVenue(): VenueOption {
+    if (this.filteredVenueOptions.length === 0) {
+      return {
+        id: 0,
+        name: 'No venue available',
+        address: 'No address available',
+        destinationId: 0
+      };
+    }
+
     const term = this.venueSearchTerm.trim().toLowerCase();
-    return this.venueOptions.find((venue) => venue.name.toLowerCase().includes(term)) ?? this.venueOptions[0];
+    return this.filteredVenueOptions.find((venue) => venue.name.toLowerCase().includes(term)) ?? this.filteredVenueOptions[0];
   }
 
   ngOnInit(): void {
@@ -134,6 +164,9 @@ export class EventFormComponent implements OnInit {
     if (user) {
       this.organizerName = `${user.firstName} ${user.lastName}`.trim();
     }
+
+    this.loadDropdownOptions();
+    this.setupDestinationObjectSync();
 
     this.route.params.subscribe((params) => {
       if (params['id']) {
@@ -144,20 +177,88 @@ export class EventFormComponent implements OnInit {
     });
   }
 
+  private loadDropdownOptions(): void {
+    forkJoin({
+      eventTypes: this.eventService.getEventTypes().pipe(
+        catchError(() => of(this.fallbackEventTypes))
+      ),
+      destinations: this.destinationService.getAll({ page: 1, pageSize: 200, sortBy: 'name', sortOrder: 'asc' }).pipe(
+        map((response) => response.items.map((destination) => ({ id: destination.id, name: destination.name }))),
+        catchError(() => of(this.fallbackDestinations))
+      ),
+      venues: this.eventService.getObjectOptions({ page: 1, pageSize: 200, sortBy: 'name', sortOrder: 'asc' }).pipe(
+        map((response) => response.items.map((item) => ({
+          id: item.id,
+          name: item.name,
+          address: item.address ?? 'No address available',
+          destinationId: item.destinationId
+        }))),
+        catchError(() => of(this.fallbackVenueOptions))
+      )
+    }).subscribe(({ eventTypes, destinations, venues }) => {
+      this.eventTypes = eventTypes.length > 0 ? eventTypes : [...this.fallbackEventTypes];
+      this.destinations = destinations.length > 0 ? destinations : [...this.fallbackDestinations];
+      this.venueOptions = venues.length > 0 ? venues : [...this.fallbackVenueOptions];
+
+      this.syncObjectSelectionWithDestination();
+
+      this.cdr.detectChanges();
+    });
+  }
+
+  private setupDestinationObjectSync(): void {
+    this.form.get('destinationId')?.valueChanges.subscribe(() => {
+      this.syncObjectSelectionWithDestination();
+      this.cdr.detectChanges();
+    });
+
+    this.form.get('objectId')?.valueChanges.subscribe((value) => {
+      const objectId = this.parseOptionalNumber(value);
+      if (!objectId) {
+        return;
+      }
+
+      const selected = this.filteredVenueOptions.find((venue) => venue.id === objectId);
+      if (selected) {
+        this.venueSearchTerm = selected.name;
+      }
+    });
+  }
+
+  private syncObjectSelectionWithDestination(): void {
+    const selectedObjectId = this.parseOptionalNumber(this.form.get('objectId')?.value);
+
+    if (selectedObjectId && !this.filteredVenueOptions.some((venue) => venue.id === selectedObjectId)) {
+      this.form.patchValue({ objectId: '' }, { emitEvent: false });
+    }
+
+    const activeObjectId = this.parseOptionalNumber(this.form.get('objectId')?.value);
+    if (activeObjectId) {
+      const selected = this.filteredVenueOptions.find((venue) => venue.id === activeObjectId);
+      if (selected) {
+        this.venueSearchTerm = selected.name;
+        return;
+      }
+    }
+
+    this.venueSearchTerm = this.filteredVenueOptions[0]?.name ?? '';
+  }
+
   loadEvent(): void {
     if (!this.eventId) {
       return;
     }
 
     this.isLoading = true;
-    this.eventService.getById(this.eventId).subscribe({
+    this.eventService.getMyById(this.eventId).subscribe({
       next: (event: EventDto) => {
         this.populateForm(event);
+        this.eventStatus = event.status ?? '';
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: (error: any) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to load event';
+        this.errorMessage = error?.error?.message ?? 'Event not found or you do not have permission to edit it.';
         this.isLoading = false;
         this.cdr.detectChanges();
       }
@@ -165,14 +266,15 @@ export class EventFormComponent implements OnInit {
   }
 
   populateForm(event: EventDto): void {
+    this.eventStatus = event.status ?? '';
     this.form.patchValue({
       name: event.name,
       description: event.description,
       eventTypeId: event.eventTypeId?.toString() || '',
-      startDate: this.formatDateForInput(event.startDate),
-      startTime: '18:30',
-      endDate: this.formatDateForInput(event.endDate),
-      endTime: '22:00',
+      startDate: this.formatDateOnlyForInput(event.startDate),
+      startTime: this.formatTimeForInput(event.startDate),
+      endDate: this.formatDateOnlyForInput(event.endDate),
+      endTime: this.formatTimeForInput(event.endDate),
       timezone: 'Europe/Belgrade',
       recurringEvent: false,
       recurrencePattern: '',
@@ -182,12 +284,14 @@ export class EventFormComponent implements OnInit {
       longitude: event.longitude?.toString() || '',
       latitude: event.latitude?.toString() || '',
       localityId: '',
-      destinationId: '',
-      objectId: this.selectedVenue.id.toString(),
+      destinationId: event.destinationId?.toString() || '',
+      objectId: event.objectId?.toString() || '',
       imageUrl: event.mainImageUrl ?? '',
       ageRestriction: '',
       tagsInput: ''
     });
+
+    this.syncObjectSelectionWithDestination();
   }
 
   submit(): void {
@@ -222,7 +326,7 @@ export class EventFormComponent implements OnInit {
       localityId: this.parseOptionalNumber(formValue.localityId),
       destinationId: this.parseOptionalNumber(formValue.destinationId),
       objectId: this.parseOptionalNumber(formValue.objectId),
-      imageUrl: formValue.imageUrl || undefined
+      imageUrl: this.getPersistentImageUrl(formValue.imageUrl)
     };
 
     const request = this.isEditMode && this.eventId
@@ -277,7 +381,30 @@ export class EventFormComponent implements OnInit {
       return;
     }
 
-    this.submitDeletionRequest();
+    if (this.isApprovedEvent) {
+      this.submitDeletionRequest();
+      return;
+    }
+
+    this.submitDirectDeletion();
+  }
+
+  get isApprovedEvent(): boolean {
+    return this.eventStatus.toLowerCase() === 'approved';
+  }
+
+  get deleteButtonLabel(): string {
+    return this.isApprovedEvent ? 'Request Deletion' : 'Delete Event';
+  }
+
+  get deleteModalTitle(): string {
+    return this.isApprovedEvent ? 'Request deletion' : 'Confirm deletion';
+  }
+
+  get deleteModalDescription(): string {
+    return this.isApprovedEvent
+      ? 'This event is approved, so removal requires a manager deletion request.'
+      : 'This event is still pending, so it can be removed immediately.';
   }
 
   private submitDeletionRequest(): void {
@@ -306,13 +433,39 @@ export class EventFormComponent implements OnInit {
     });
   }
 
+  private submitDirectDeletion(): void {
+    if (!this.eventId || this.isDeleting) {
+      return;
+    }
+
+    this.isDeleting = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    this.eventService.delete(this.eventId).pipe(
+      finalize(() => {
+        this.isDeleting = false;
+        this.cdr.detectChanges();
+      })
+    ).subscribe({
+      next: () => {
+        this.showDeleteModal = false;
+        this.successMessage = 'Event deleted successfully.';
+        setTimeout(() => this.router.navigate(['/content-creator/events']), 1200);
+      },
+      error: (error: any) => {
+        this.errorMessage = error?.error?.message ?? 'Failed to delete event';
+      }
+    });
+  }
+
   onImageUrlChange(value: string): void {
     this.isImagePreviewBroken = false;
     this.form.patchValue({ imageUrl: value.trim() }, { emitEvent: false });
   }
 
   get imagePreviewUrl(): string {
-    return (this.form.get('imageUrl')?.value ?? '').trim();
+    return this.normalizeImageUrl(this.form.get('imageUrl')?.value ?? '');
   }
 
   onImageDrop(event: DragEvent): void {
@@ -412,7 +565,7 @@ export class EventFormComponent implements OnInit {
     return Number.isNaN(parsed) ? undefined : parsed;
   }
 
-  private formatDateForInput(date: string | Date | undefined): string {
+  private formatDateOnlyForInput(date: string | Date | undefined): string {
     if (!date) {
       return '';
     }
@@ -421,10 +574,48 @@ export class EventFormComponent implements OnInit {
     const year = parsed.getFullYear();
     const month = String(parsed.getMonth() + 1).padStart(2, '0');
     const day = String(parsed.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+  }
+
+  private formatTimeForInput(date: string | Date | undefined): string {
+    if (!date) {
+      return '';
+    }
+
+    const parsed = new Date(date);
     const hours = String(parsed.getHours()).padStart(2, '0');
     const minutes = String(parsed.getMinutes()).padStart(2, '0');
 
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    return `${hours}:${minutes}`;
+  }
+
+  private normalizeImageUrl(value: string): string {
+    const trimmed = value.trim();
+
+    if (!trimmed) {
+      return '';
+    }
+
+    if (/^(data:|blob:|https?:\/\/|\/\/)/i.test(trimmed)) {
+      return trimmed;
+    }
+
+    try {
+      return encodeURI(new URL(trimmed, document.baseURI).href);
+    } catch {
+      return encodeURI(trimmed);
+    }
+  }
+
+  private getPersistentImageUrl(value: string | null | undefined): string | undefined {
+    const normalized = this.normalizeImageUrl(value ?? '');
+
+    if (!normalized || normalized.startsWith('blob:') || normalized.startsWith('data:')) {
+      return undefined;
+    }
+
+    return normalized;
   }
 
   private getDroppedImageUrl(event: DragEvent): string {
@@ -435,10 +626,7 @@ export class EventFormComponent implements OnInit {
 
     const files = transfer.files;
     if (files && files.length > 0) {
-      const file = files[0];
-      if (file.type.startsWith('image/')) {
-        return URL.createObjectURL(file);
-      }
+      return '';
     }
 
     const plainText = transfer.getData('text/uri-list') || transfer.getData('text/plain');

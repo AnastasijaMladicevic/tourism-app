@@ -39,6 +39,18 @@
             <p class="eyebrow">Featured event</p>
             <h2>{{ event.name }}</h2>
             <p class="hero-meta">{{ formatDate(event.startDate) }} · {{ formatDate(event.endDate ?? event.startDate) }}</p>
+            <div class="status-tooltip-wrap" [class.has-tooltip]="hasRejectionReason" tabindex="0">
+              <span class="detail-status" [ngClass]="getStatusBadgeClass(event.status)">
+                {{ event.status || 'Draft' }}
+              </span>
+
+              @if (hasRejectionReason) {
+                <div class="status-tooltip" role="tooltip">
+                  <strong>Rejection reason</strong>
+                  <p>{{ rejectionReason }}</p>
+                </div>
+              }
+            </div>
             <p class="summary">{{ summary }}</p>
           </div>
         </article>
