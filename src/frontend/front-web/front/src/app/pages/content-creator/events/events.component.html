@@ -10,10 +10,11 @@
     </div>
 
     <div class="header-actions">
-      <button type="button" class="ghost-btn">
+      <!-- TBD Exports -->
+      <!-- <button type="button" class="ghost-btn">
         <span class="material-symbols-outlined">download</span>
         Export
-      </button>
+      </button> -->
       <button type="button" class="primary-btn" (click)="onCreateEvent()">
         <span class="material-symbols-outlined">add</span>
         Create New Event
@@ -130,7 +131,7 @@
                       <div class="capacity-bar">
                         <span
                           [style.width.%]="
-                            Math.min(((event.maxVisitors ?? 3000) / 5000) * 100, 100)
+                            Math.min(((event.maxVisitors ?? 300) / 500) * 100, 100)
                           "
                         ></span>
                       </div>
@@ -199,7 +200,6 @@
             [style.background-image]="'url(' + getDetailBanner(selectedEvent) + ')'"
           >
             <span class="hero-badge">{{ getCategoryLabel(selectedEvent) }}</span>
-            <button type="button" class="hero-edit">Edit Media</button>
           </div>
           <div class="hero-copy">
             <p class="eyebrow">Featured event</p>

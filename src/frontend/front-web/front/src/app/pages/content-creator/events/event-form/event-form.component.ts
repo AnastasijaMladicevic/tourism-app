@@ -286,7 +286,7 @@ export class EventFormComponent implements OnInit {
       localityId: '',
       destinationId: event.destinationId?.toString() || '',
       objectId: event.objectId?.toString() || '',
-      imageUrl: event.mainImageUrl ?? '',
+      imageUrl: event.ImageUrl ?? '',
       ageRestriction: '',
       tagsInput: ''
     });
@@ -614,7 +614,6 @@ export class EventFormComponent implements OnInit {
     if (!normalized || normalized.startsWith('blob:') || normalized.startsWith('data:')) {
       return undefined;
     }
-
     return normalized;
   }
 

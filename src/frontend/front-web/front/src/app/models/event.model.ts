@@ -2,7 +2,7 @@ export interface EventDto {
   id: number;
   name: string;
   description?: string;
-  mainImageUrl?: string;
+  ImageUrl?: string;
   longitude?: number;
   latitude?: number;
   isActive: boolean;
@@ -54,6 +54,7 @@ export interface UpdateEventDto {
   localityId?: number;
   destinationId?: number;
   objectId?: number;
+  imageUrl?: string;
 }
 
 export interface EventQueryDto {
