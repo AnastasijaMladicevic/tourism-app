@@ -17,6 +17,7 @@ namespace TuristickiVodic.Core.DTO
         public string[] Amenities { get; set; } = Array.Empty<string>();
         public double? Longitude { get; set; }
         public double? Latitude { get; set; }
+        public double? DistanceMeters { get; set; }
         public bool IsActive { get; set; }
         public decimal AverageRating { get; set; }
         public int ReviewCount { get; set; }

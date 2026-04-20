@@ -426,6 +426,94 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task GetNearbyAsync_UKruguVracaSamoJavneObjekteSortiranePoUdaljenosti()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetNearbyAsync_UKruguVracaSamoJavneObjekteSortiranePoUdaljenosti));
+            var (objectType, destination, _, locality, _, creator, _, _, _) = SeedBase(ctx);
+
+            ctx.Objects.AddRange(
+                new TouristObject
+                {
+                    Id = 1,
+                    Name = "Blizi objekat",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    Geolocation = new Point(18.7705, 42.4243) { SRID = 4326 },
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new TouristObject
+                {
+                    Id = 2,
+                    Name = "Dalji objekat",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    Geolocation = new Point(18.7750, 42.4280) { SRID = 4326 },
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new TouristObject
+                {
+                    Id = 3,
+                    Name = "Van kruga",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    Geolocation = new Point(18.84, 42.29) { SRID = 4326 },
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new TouristObject
+                {
+                    Id = 4,
+                    Name = "Pending objekat",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = true,
+                    Geolocation = new Point(18.7706, 42.4244) { SRID = 4326 },
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+            ctx.Images.AddRange(
+                new Image { Id = 1, ObjectId = 1, Url = "blizi.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 2, ObjectId = 2, Url = "dalji.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 3, ObjectId = 3, Url = "vankruga.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 4, ObjectId = 4, Url = "pending.jpg", IsMain = true, CreatedAt = DateTime.UtcNow });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetNearbyAsync(new NearbyTouristObjectQueryDto
+            {
+                Latitude = 42.4243,
+                Longitude = 18.7705,
+                RadiusMeters = 1000
+            });
+
+            result.TotalCount.Should().Be(2);
+            result.Items.Should().HaveCount(2);
+            result.Items.Select(x => x.Name).Should().Equal("Blizi objekat", "Dalji objekat");
+            result.Items[0].DistanceMeters.Should().NotBeNull();
+            result.Items[1].DistanceMeters.Should().NotBeNull();
+            result.Items[0].DistanceMeters!.Value.Should().BeLessThan(result.Items[1].DistanceMeters!.Value);
+        }
+
+        [Fact]
         public async Task GetByIdAsync_VracaIListuApprovedRecenzija()
         {
             using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_VracaIListuApprovedRecenzija));

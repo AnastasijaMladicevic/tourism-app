@@ -1569,6 +1569,20 @@ namespace TuristickiVodic.Tests.Validation
         }
 
         [Fact]
+        public void NearbyTouristObjectQueryDto_NegativanRadius_NijeValidno()
+        {
+            var dto = new NearbyTouristObjectQueryDto
+            {
+                Latitude = 42.42,
+                Longitude = 18.77,
+                RadiusMeters = -5
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(NearbyTouristObjectQueryDto.RadiusMeters)));
+        }
+
+        [Fact]
         public void VerifyResetCodeDto_ValidnoPopunjeno_JeValidno()
         {
             var dto = new VerifyResetCodeDto

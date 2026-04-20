@@ -198,6 +198,8 @@ namespace TuristickiVodic.Services.Mappings
                     opt => opt.MapFrom(src => src.ObjectType != null ? src.ObjectType.Name : string.Empty))
                 .ForMember(dest => dest.LocalityName,
                     opt => opt.MapFrom(src => src.Locality != null ? src.Locality.Name : string.Empty))
+                .ForMember(dest => dest.DistanceMeters,
+                    opt => opt.Ignore())
                 .ForMember(dest => dest.MainImageUrl,
                     opt => opt.MapFrom(src => src.Images != null
                         ? src.Images.Where(i => i.IsMain).Select(i => i.Url).FirstOrDefault()
