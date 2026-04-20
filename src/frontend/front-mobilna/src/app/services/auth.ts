@@ -156,4 +156,14 @@ export class AuthService {
   isAdmin(): boolean {
     return this.getCurrentUser()?.roleName === 'Admin';
   }
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.url}/forgot-password`, { email });
+  }
+
+  resetPassword(email: string, code: string, newPassword: string): Observable<any> {
+    return this.http.post(`${this.url}/reset-password`, { email, code, newPassword });
+  }
+  updateMyLocation(latitude: number, longitude: number): Observable<any> {
+    return this.http.put(`${this.url}/me/location`, { latitude, longitude });
+  }
 }

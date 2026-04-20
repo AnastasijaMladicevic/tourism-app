@@ -3,6 +3,7 @@ import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LogoComponent } from '../../../shared/components/logo/logo';
+import { AuthService } from '../../../services/auth';
 
 @Component({
   selector: 'app-forgot-password',
@@ -13,10 +14,13 @@ import { LogoComponent } from '../../../shared/components/logo/logo';
 })
 export class ForgotPasswordComponent {
   form: any;
+  isLoading = false;
+  errorMessage = '';
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private authService: AuthService,
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -26,14 +30,23 @@ export class ForgotPasswordComponent {
     return this.form.get('email');
   }
   submit() {
-    if (this.form.valid) {
-      console.log('Reset link sent to:', this.form.value.email);
-      this.router.navigate(['/code-verification'], { state: { email: this.form.value.email } });
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
 
-      // kasnije ide backend
-    } else {
-      this.form.markAllAsTouched();
-    }
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.authService.forgotPassword(this.form.value.email).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.router.navigate(['/code-verification'], {
+          state: { email: this.form.value.email }
+        });
+      },
+      error: err => {
+        this.isLoading = false;
+        this.errorMessage = err?.error?.message ?? 'Something went wrong. Please try again.';
+      }
+    });
   }
 
   goBack() {

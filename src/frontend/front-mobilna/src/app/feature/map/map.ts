@@ -8,6 +8,7 @@ import { MapService } from '../../services/map.service';
 import { DestinationService } from '../../services/destination';
 import { ObjectService } from '../../services/object';
 import { EventService } from '../../services/event';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-map',
@@ -28,6 +29,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     private router: Router,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
+    private authService: AuthService,
     private destinationService: DestinationService,
     private objectService: ObjectService,
     private eventService: EventService,
@@ -190,14 +192,41 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // ── Map controls ──────────────────────────────────────────────────────────
   centerOnMyLocation(): void {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        pos => this.mapService.flyTo(pos.coords.latitude, pos.coords.longitude, 16),
-        () => alert('Nije moguće dobiti vašu lokaciju.')
-      );
+    if (!navigator.geolocation) {
+      alert('Geolocation nije podržana u ovom browseru.');
+      return;
     }
-  }
 
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+
+        // Leti na lokaciju
+        this.mapService.flyTo(lat, lng, 16);
+
+        // Sačuvaj na backendu ako je korisnik ulogovan
+        if (this.authService.isLoggedIn()) {
+          this.authService.updateMyLocation(lat, lng).subscribe({
+            error: err => console.error('Failed to update location:', err)
+          });
+        }
+      },
+      err => {
+        switch (err.code) {
+          case err.PERMISSION_DENIED:
+            alert('Dozvolite pristup lokaciji u podešavanjima browsera.');
+            break;
+          case err.POSITION_UNAVAILABLE:
+            alert('Lokacija trenutno nije dostupna.');
+            break;
+          default:
+            alert('Nije moguće dobiti vašu lokaciju.');
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
   zoomIn(): void { (this.mapService as any)['map']?.zoomIn(); }
   zoomOut(): void { (this.mapService as any)['map']?.zoomOut(); }
 }

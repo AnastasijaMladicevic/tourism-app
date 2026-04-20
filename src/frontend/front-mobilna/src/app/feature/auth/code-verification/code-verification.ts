@@ -12,6 +12,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LogoComponent } from '../../../shared/components/logo/logo';
+import { AuthService } from '../../../services/auth';
 
 @Component({
   selector: 'app-code-verification',
@@ -24,9 +25,9 @@ import { LogoComponent } from '../../../shared/components/logo/logo';
 export class CodeVerificationComponent implements OnInit, OnDestroy {
   @ViewChildren('otpInput') otpInputs!: QueryList<ElementRef<HTMLInputElement>>;
 
-  otpValues: string[] = ['', '', '', '', ''];
-  timeLeft = 120;
-  timerDisplay = '2:00 mins';
+  otpValues: string[] = ['', '', '', '', '', ''];
+  timeLeft = 300;
+  timerDisplay = '5:00 mins';
   isExpired = false;
   isLoading = false;
   errorMessage = '';
@@ -38,6 +39,7 @@ export class CodeVerificationComponent implements OnInit, OnDestroy {
     private router: Router,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
+    private authService: AuthService,
   ) {
     // history.state is the standard way to read router state in Angular 17+
     this.email = history.state?.['email'] ?? '';
@@ -55,7 +57,7 @@ export class CodeVerificationComponent implements OnInit, OnDestroy {
 
   private startTimer(): void {
     this.isExpired = false;
-    this.timeLeft = 120;
+    this.timeLeft = 300;
     this.updateTimerDisplay();
 
     this.timerInterval = setInterval(() => {
@@ -92,7 +94,7 @@ export class CodeVerificationComponent implements OnInit, OnDestroy {
     if (input.value.length > 1) input.value = input.value.slice(-1);
     this.otpValues[index] = input.value;
     this.errorMessage = '';
-    if (input.value && index < 4) {
+    if (input.value && index < 5) {
       this.otpInputs.toArray()[index + 1]?.nativeElement.focus();
     }
   }
@@ -115,7 +117,7 @@ export class CodeVerificationComponent implements OnInit, OnDestroy {
 
   onPaste(event: ClipboardEvent): void {
     event.preventDefault();
-    const digits = (event.clipboardData?.getData('text') ?? '').replace(/\D/g, '').slice(0, 5);
+    const digits = (event.clipboardData?.getData('text') ?? '').replace(/\D/g, '').slice(0, 6);
     digits.split('').forEach((char, i) => {
       this.otpValues[i] = char;
       const el = this.otpInputs.toArray()[i];
@@ -129,10 +131,12 @@ export class CodeVerificationComponent implements OnInit, OnDestroy {
   get isOtpComplete(): boolean {
     return this.otpValues.every((v) => v !== '');
   }
-
+  get otpCode(): string {
+    return this.otpValues.join('');
+  }
   verifyCode(): void {
     if (!this.isOtpComplete) {
-      this.errorMessage = 'Please enter all 5 digits.';
+      this.errorMessage = 'Please enter all 6 digits.';
       return;
     }
     if (this.isExpired) {
@@ -141,20 +145,25 @@ export class CodeVerificationComponent implements OnInit, OnDestroy {
     }
     this.isLoading = true;
     this.errorMessage = '';
-    // TODO: replace with real auth service call
-    setTimeout(() => {
-      this.isLoading = false;
-      this.router.navigate(['/new-credentials']);
-    }, 1000);
+    this.router.navigate(['/new-credentials'], {
+      state: {
+        email: this.email,
+        code: this.otpCode
+      }
+    });
+
+    this.isLoading = false;
   }
 
   resendCode(): void {
-    this.otpValues = ['', '', '', '', ''];
+    this.otpValues = ['', '', '', '', '', ''];
     this.otpInputs?.forEach((i) => (i.nativeElement.value = ''));
     this.errorMessage = '';
     this.clearTimer();
     this.startTimer();
-    // TODO: call authService.resendOtp(this.email)
+    this.authService.forgotPassword(this.email).subscribe({
+      error: err => this.errorMessage = err?.error?.message ?? 'Failed to resend code.'
+    });
     this.otpInputs?.toArray()[0]?.nativeElement.focus();
   }
 
