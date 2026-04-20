@@ -591,6 +591,39 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task ApproveAsync_RejectAktivnostiBezMainSlike_Uspeh()
+        {
+            using var ctx = CreateInMemoryContext(nameof(ApproveAsync_RejectAktivnostiBezMainSlike_Uspeh));
+            var (_, _, _, activityType, destination, _, locality, _, creator, _, manager, _, _) = SeedBase(ctx);
+
+            ctx.Activities.Add(new Activity
+            {
+                Id = 1,
+                Name = "Aktivnost",
+                ActivityTypeId = activityType.Id,
+                LocalityId = locality.Id,
+                DestinationId = destination.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Pending,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+            ctx.SaveChanges();
+
+            var svc = new ActivityService(ctx, CreateMapper());
+
+            var result = await svc.ApproveAsync(1, new ApproveContentDto
+            {
+                Approve = false,
+                RejectionReason = "Nedovoljno podataka"
+            }, manager.Id, "Manager");
+
+            result.Should().NotBeNull();
+            result!.Status.Should().Be("Rejected");
+            result.RejectionReason.Should().Be("Nedovoljno podataka");
+        }
+
+        [Fact]
         public async Task GetByIdAsync_PostojiSaMainSlikom_VracaDto()
         {
             using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_PostojiSaMainSlikom_VracaDto));
