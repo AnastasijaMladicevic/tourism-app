@@ -1,3 +1,208 @@
-<section class="manager-page">
-  <h1>Events</h1>
+<section class="manager-events-page">
+  <div class="page-head">
+    <div>
+      <p class="breadcrumbs">Dashboard <span>></span> Events</p>
+      <h1>Events</h1>
+      <p class="subtle-text">{{ managedDestinationLabel }}</p>
+    </div>
+
+  </div>
+
+  <div class="toolbar card">
+    <label class="search-field" aria-label="Search events">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange()"
+        placeholder="Search events, venues, or organizers..."
+      />
+    </label>
+
+    <button type="button" class="ghost-btn date-pill" aria-label="Date range filter">
+      <span class="material-symbols-outlined">calendar_month</span>
+      Oct 1, 2024 - Dec 31, 2024
+    </button>
+
+    <button type="button" class="ghost-btn" (click)="onMoreFilters()">
+      <span class="material-symbols-outlined">filter_list</span>
+      More Filters
+    </button>
+  </div>
+
+  <div class="event-content-grid">
+    <div class="event-main-column">
+      <div class="stats-row">
+        <article class="stat-card" *ngFor="let stat of stats" [attr.data-tone]="stat.tone">
+          <p>{{ stat.label }}</p>
+          <strong>{{ stat.value }}</strong>
+          <span>{{ stat.hint }}</span>
+        </article>
+      </div>
+
+      <section class="event-table-wrap card">
+        <header class="table-header">
+          <h2>{{ managedDestinationLabel }}</h2>
+        </header>
+
+        @if (isLoading) {
+          <div class="state">Loading events...</div>
+        } @else if (errorMessage) {
+          <div class="state state-error">{{ errorMessage }}</div>
+        } @else {
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Event Details</th>
+                  <th>Location</th>
+                  <th>Category</th>
+                  <th>Capacity</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let event of pagedEvents; trackBy: trackByEventId"
+                  [class.active-row]="selectedEvent?.id === event.id"
+                  (click)="onViewEvent(event)"
+                >
+                  <td>
+                    <span class="status-chip" [ngClass]="getStatusBadgeClass(event.status)">
+                      <span class="chip-dot">●</span>
+                      {{ event.status || 'Draft' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="table-event-cell">
+                      <strong>{{ event.name }}</strong>
+                      <span>
+                        <span class="material-symbols-outlined tiny-icon">calendar_month</span>
+                        {{ formatDate(event.startDate) }}
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="table-event-cell">
+                      <strong>{{ getLocationLabel(event) }}</strong>
+                      <span>{{ getLocationSubLabel(event) }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="category-pill">
+                      <span class="material-symbols-outlined tiny-icon">{{ getCategoryIcon(event) }}</span>
+                      {{ getCategoryLabel(event) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="capacity-cell">
+                      <div class="capacity-bar">
+                        <span [style.width.%]="getCapacityProgress(event)"></span>
+                      </div>
+                      <small>{{ getCapacityLabel(event) }}</small>
+                    </div>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      title="Review event"
+                      (click)="onEditEvent(event); $event.stopPropagation()"
+                    >
+                      <span class="material-symbols-outlined">open_in_new</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="table-footer">
+            <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ filteredEvents.length }} events</p>
+            <div class="pager">
+              <button
+                type="button"
+                class="ghost-btn small-btn"
+                (click)="onPreviousPage()"
+                [disabled]="currentPage === 1"
+              >
+                Previous
+              </button>
+              <button
+                type="button"
+                class="ghost-btn small-btn"
+                (click)="onNextPage()"
+                [disabled]="currentPage * pageSize >= totalCount"
+              >
+                Next
+              </button>
+            </div>
+          </footer>
+        }
+      </section>
+    </div>
+
+    <aside class="event-side-column card">
+      @if (selectedEvent) {
+        <div class="featured-media" [style.background-image]="'url(' + getDetailBanner(selectedEvent) + ')'">
+          <button type="button" class="media-edit-btn">
+            <span class="material-symbols-outlined">edit_square</span>
+            Edit Media
+          </button>
+        </div>
+
+        <div class="featured-copy">
+          <p class="featured-type">{{ getCategoryLabel(selectedEvent) }}</p>
+          <h3>{{ selectedEvent.name }}</h3>
+          <p class="featured-meta">{{ getLocationLabel(selectedEvent) }} · {{ formatDate(selectedEvent.startDate) }}</p>
+
+          <div class="status-tooltip-wrap" [class.has-tooltip]="hasSelectedEventRejectionReason(selectedEvent)" tabindex="0">
+            <span class="publish-badge" [ngClass]="getStatusBadgeClass(selectedEvent.status)">
+              {{ selectedEvent.status || 'Published' }}
+            </span>
+
+            @if (hasSelectedEventRejectionReason(selectedEvent)) {
+              <div class="status-tooltip" role="tooltip">
+                <strong>Rejection reason</strong>
+                <p>{{ getSelectedEventRejectionReason(selectedEvent) }}</p>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="detail-metrics">
+          <div>
+            <span>Pricing</span>
+            <strong>{{ selectedEvent.price ? '$' + selectedEvent.price.toFixed(2) : '$45.00' }}</strong>
+          </div>
+          <div>
+            <span>Capacity</span>
+            <strong>{{ selectedEvent.maxVisitors ? selectedEvent.maxVisitors.toLocaleString('en-US') : '5,000' }}</strong>
+          </div>
+        </div>
+
+        <section class="detail-section">
+          <div class="section-head">
+            <h4>Schedule</h4>
+            <button type="button" class="text-link">Edit Schedule</button>
+          </div>
+
+          <div class="schedule-list">
+            <article class="schedule-row" *ngFor="let row of selectedSchedule">
+              <strong>{{ row.label }}</strong>
+              <span>{{ row.value }}</span>
+            </article>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h4>Description</h4>
+          <p>{{ getSelectedSummary(selectedEvent) }}</p>
+        </section>
+      } @else {
+        <div class="state">No events available.</div>
+      }
+    </aside>
+  </div>
 </section>
