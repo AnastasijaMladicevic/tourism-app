@@ -433,6 +433,12 @@
   min-width: 0;
 }
 
+.form-field-note {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
 .form-control {
   width: 100%;
   max-width: 100%;

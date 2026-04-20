@@ -37,14 +37,14 @@ export class EventDetailsComponent implements OnInit {
       return;
     }
 
-    this.eventService.getById(id).subscribe({
+    this.eventService.getMyById(id).subscribe({
       next: (event) => {
         this.event = event;
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: (error: any) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to load event details';
+        this.errorMessage = error?.error?.message ?? 'Event not found or you do not have permission to view it.';
         this.isLoading = false;
         this.cdr.detectChanges();
       }
@@ -64,7 +64,7 @@ export class EventDetailsComponent implements OnInit {
   }
 
   get bannerUrl(): string {
-    return this.event?.mainImageUrl || 'assets/pozadina.png';
+    return this.normalizeImageUrl(this.event?.mainImageUrl) || '/assets/pozadina.png';
   }
 
   get categoryLabel(): string {
@@ -73,6 +73,34 @@ export class EventDetailsComponent implements OnInit {
 
   get statusLabel(): string {
     return this.event?.status || 'Draft';
+  }
+
+  getStatusBadgeClass(status: string | undefined): string {
+    switch ((status ?? '').toLowerCase()) {
+      case 'approved':
+      case 'published':
+        return 'badge-approved';
+      case 'pending':
+        return 'badge-pending';
+      case 'rejected':
+      case 'cancelled':
+        return 'badge-rejected';
+      default:
+        return 'badge-default';
+    }
+  }
+
+  get rejectionReason(): string {
+    const reason = this.event?.rejectionReason?.trim();
+    if (!reason || (this.event?.status ?? '').toLowerCase() !== 'rejected') {
+      return '';
+    }
+
+    return reason;
+  }
+
+  get hasRejectionReason(): boolean {
+    return this.rejectionReason.length > 0;
   }
 
   get detailItems(): DetailItem[] {
@@ -108,5 +136,23 @@ export class EventDetailsComponent implements OnInit {
     }
 
     return this.event.description;
+  }
+
+  private normalizeImageUrl(value?: string | null): string {
+    const trimmed = value?.trim();
+
+    if (!trimmed) {
+      return '';
+    }
+
+    if (/^(data:|blob:|https?:\/\/|\/\/)/i.test(trimmed)) {
+      return trimmed;
+    }
+
+    try {
+      return encodeURI(new URL(trimmed, document.baseURI).href);
+    } catch {
+      return encodeURI(trimmed);
+    }
   }
 }

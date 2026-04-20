@@ -13,9 +13,16 @@ export interface EventDto {
   status: string;
   eventTypeId: number;
   eventTypeName?: string;
+  localityId?: number;
+  localityName?: string;
+  destinationId?: number;
+  destinationName?: string;
+  objectId?: number;
+  objectName?: string;
   createdAt?: Date | string;
   updatedAt?: Date | string;
   createdByUserId?: number;
+  rejectionReason?: string;
 }
 
 export interface CreateEventDto {
@@ -47,6 +54,7 @@ export interface UpdateEventDto {
   localityId?: number;
   destinationId?: number;
   objectId?: number;
+  imageUrl?: string;
 }
 
 export interface EventQueryDto {
@@ -68,9 +76,39 @@ export interface EventQueryResponse {
   totalCount: number;
   page: number;
   pageSize: number;
+  totalPages: number;
 }
 
 export interface EventType {
   id: number;
   name: string;
+}
+
+export interface TouristObjectDto {
+  id: number;
+  name: string;
+  address?: string;
+  destinationId: number;
+  destinationName?: string;
+}
+
+export interface TouristObjectQueryDto {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: string;
+}
+
+export interface TouristObjectQueryResponse {
+  items: TouristObjectDto[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export interface ApproveContentDto {
+  approve: boolean;
+  rejectionReason?: string;
 }

@@ -10,10 +10,11 @@
     </div>
 
     <div class="header-actions">
-      <button type="button" class="ghost-btn">
+      <!-- TBD Exports -->
+      <!-- <button type="button" class="ghost-btn">
         <span class="material-symbols-outlined">download</span>
         Export
-      </button>
+      </button> -->
       <button type="button" class="primary-btn" (click)="onCreateEvent()">
         <span class="material-symbols-outlined">add</span>
         Create New Event
@@ -39,7 +40,7 @@
     </button>
 
     <button type="button" class="ghost-btn slim-btn" (click)="onClearSearch()">
-      <span class="material-symbols-outlined">tune</span>
+      <span class="material-symbols-outlined"> filter_alt </span>
       More Filters
     </button>
   </div>
@@ -129,9 +130,7 @@
                     <div class="capacity-cell">
                       <div class="capacity-bar">
                         <span
-                          [style.width.%]="
-                            Math.min(((event.maxVisitors ?? 3000) / 5000) * 100, 100)
-                          "
+                          [style.width.%]="Math.min(((event.maxVisitors ?? 300) / 500) * 100, 100)"
                         ></span>
                       </div>
                       <small>{{ getCapacityLabel(event) }}</small>
@@ -199,7 +198,6 @@
             [style.background-image]="'url(' + getDetailBanner(selectedEvent) + ')'"
           >
             <span class="hero-badge">{{ getCategoryLabel(selectedEvent) }}</span>
-            <button type="button" class="hero-edit">Edit Media</button>
           </div>
           <div class="hero-copy">
             <p class="eyebrow">Featured event</p>
@@ -207,9 +205,22 @@
             <p class="hero-meta">
               {{ getLocationLabel(selectedEvent) }} · {{ formatDate(selectedEvent.startDate) }}
             </p>
-            <span class="detail-status" [ngClass]="getStatusBadgeClass(selectedEvent.status)">{{
-              selectedEvent.status || 'Draft'
-            }}</span>
+            <div
+              class="status-tooltip-wrap"
+              [class.has-tooltip]="hasRejectionReason(selectedEvent)"
+              tabindex="0"
+            >
+              <span class="detail-status" [ngClass]="getStatusBadgeClass(selectedEvent.status)">
+                {{ selectedEvent.status || 'Draft' }}
+              </span>
+
+              @if (hasRejectionReason(selectedEvent)) {
+                <div class="status-tooltip" role="tooltip">
+                  <strong>Rejection reason</strong>
+                  <p>{{ getRejectionReason(selectedEvent) }}</p>
+                </div>
+              }
+            </div>
           </div>
         </div>
 
@@ -233,7 +244,6 @@
         <section class="detail-section">
           <div class="section-head">
             <h3>Schedule</h3>
-            <button type="button" class="text-btn">Edit Schedule</button>
           </div>
 
           <div class="schedule-list">
@@ -248,8 +258,8 @@
           <h3>Description</h3>
           <p class="description-copy">{{ getSelectedSummary(selectedEvent) }}</p>
         </section>
-
-        <section class="detail-section">
+<!-- TBD DA LI CEMO OVO DA IMAMO -->
+        <!-- <section class="detail-section">
           <div class="section-head">
             <h3>Staff &amp; Organizers</h3>
             <button type="button" class="icon-btn plain" title="Add staff">
@@ -267,7 +277,7 @@
               <button type="button" class="icon-btn plain" title="More">⋮</button>
             </article>
           </div>
-        </section>
+        </section> -->
       } @else {
         <div class="empty-state">
           <p class="eyebrow">No event selected</p>

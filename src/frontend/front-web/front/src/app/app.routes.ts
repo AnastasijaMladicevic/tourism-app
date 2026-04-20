@@ -158,8 +158,18 @@ export const routes: Routes = [
       },
       {
         path: 'events',
-        loadComponent: () =>
-          import('./pages/manager/events/events.component').then(m => m.ManagerEventsComponent)
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./pages/manager/events/events.component').then(m => m.ManagerEventsComponent)
+          },
+          {
+            path: 'edit/:id',
+            loadComponent: () =>
+              import('./pages/manager/events/event-form/event-form.component').then(m => m.ManagerEventFormComponent)
+          }
+        ]
       },
       {
         path: 'localities',
