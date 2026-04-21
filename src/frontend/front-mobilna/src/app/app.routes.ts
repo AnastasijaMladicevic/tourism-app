@@ -131,12 +131,6 @@ export const routes: Routes = [
       import('./feature/favorites/favorites.component').then((m) => m.FavoritesComponent),
   },
   {
-    path: 'saved',
-    canActivate: [profileAuthGuard],
-    loadComponent: () =>
-      import('./feature/favorites/favorites.component').then((m) => m.FavoritesComponent),
-  },
-  {
     path: 'my-reviews',
     canActivate: [profileAuthGuard],
     loadComponent: () =>

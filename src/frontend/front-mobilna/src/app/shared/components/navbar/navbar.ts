@@ -36,8 +36,7 @@ export class NavbarComponent {
   navItems: NavItem[] = [
     { label: 'Home', icon: 'home', route: '/home' },
     { label: 'Map', icon: 'map', route: '/map' },
-    { label: 'Saved', icon: 'bookmark_border', route: '/saved' },
-    { label: 'Favorite', icon: 'favorite', route: '/favorite' },
+    { label: 'Favorites', icon: 'favorite', route: '/favorites' },
     { label: 'Planner', icon: 'calendar_month', route: '/planner' },
     { label: 'Profile', icon: 'person_outline', route: '/profile' },
   ];
@@ -62,7 +61,7 @@ export class NavbarComponent {
   }
 
   goTo(route: string): void {
-    const protectedRoutes = ['/saved', '/profile'];
+    const protectedRoutes = ['/favorites', '/profile'];
     if (protectedRoutes.includes(route) && !this.authService.isLoggedIn()) {
       this.router.navigate(['/login']);
       return;
