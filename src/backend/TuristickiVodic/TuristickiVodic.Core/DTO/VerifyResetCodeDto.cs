@@ -5,7 +5,8 @@ namespace TuristickiVodic.Core.DTO
     public class VerifyResetCodeDto
     {
         [Required, EmailAddress]
-        public string Email { get; set; } = string.Empty;
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$", ErrorMessage = "Neispravan format email-a")]
+        public string Email { get; set; }
 
         [Required, RegularExpression(@"^\d{6}$")]
         public string Code { get; set; } = string.Empty;
