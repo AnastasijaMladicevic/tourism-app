@@ -5,7 +5,7 @@
     </div>
 
     <div class="form">
-      <form [formGroup]="form">
+      <form [formGroup]="form" (keydown.enter)="submit()">
         <!-- EMAIL -->
         <label for="email">EMAIL</label>
 
@@ -47,6 +47,10 @@
             </span>
           </div>
         }
+        <div class="remember-me">
+          <input type="checkbox" formControlName="rememberMe" id="rememberMe" />
+          <label for="rememberMe">Remember me</label>
+        </div>
       </form>
 
       <button class="login-btn" (click)="submit()" [disabled]="form.invalid || isLoading">

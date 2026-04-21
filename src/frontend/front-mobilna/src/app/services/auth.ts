@@ -6,6 +6,7 @@ import { environment } from '../../environment/environment';
 export interface LoginDto {
   email: string;
   password: string;
+  rememberMe: boolean;
 }
 
 export interface ChangePasswordDto {
@@ -190,8 +191,12 @@ export class AuthService {
     return this.http.post(`${this.url}/forgot-password`, { email });
   }
 
-  resetPassword(email: string, code: string, newPassword: string): Observable<any> {
-    return this.http.post(`${this.url}/reset-password`, { email, code, newPassword });
+  verifyResetCode(data: any) {
+    return this.http.post('/api/verify-reset-code', data);
+  }
+
+  resetPassword(data: any) {
+    return this.http.post('/api/reset-password', data);
   }
   updateMyLocation(latitude: number, longitude: number): Observable<any> {
     return this.http.put(`${this.url}/me/location`, { latitude, longitude });

@@ -9,7 +9,7 @@
       <p>Join and explore Montenegro</p>
     </div>
 
-    <form class="form" [formGroup]="form" (ngSubmit)="submit()">
+    <form class="form" [formGroup]="form" (ngSubmit)="submit()" (keydown.enter)="submit()">
       <div class="field">
         <div class="input-wrapper">
           <span class="input-icon">
@@ -232,7 +232,7 @@
         <p class="submit-error">{{ errorMessage }}</p>
       }
 
-      <button class="btn-primary" type="submit" [disabled]="isLoading">
+      <button class="btn-primary" type="submit" [disabled]="form.invalid || isLoading">
         {{ isLoading ? 'Creating account...' : 'Sign Up' }}
       </button>
     </form>
