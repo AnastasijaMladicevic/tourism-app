@@ -30,6 +30,8 @@ namespace TuristickiVodic.Core.DTO
 
         public string Status { get; set; } = string.Empty;
 
+        public bool HasPendingDeletionRequest { get; set; }
+
         public int EventTypeId { get; set; }
 
         public string EventTypeName { get; set; } = string.Empty;

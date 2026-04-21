@@ -128,6 +128,7 @@ namespace TuristickiVodic.Services.Services
                 .ToListAsync();
 
             var mappedItems = _mapper.Map<List<EventDto>>(items);
+            await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
 
             return new PagedResultDto<EventDto>
             {
@@ -263,6 +264,8 @@ namespace TuristickiVodic.Services.Services
                 })
                 .ToList();
 
+            await ApplyPendingDeletionRequestFlagsAsync(items);
+
             return new PagedResultDto<EventDto>
             {
                 Items = items,
@@ -327,9 +330,12 @@ namespace TuristickiVodic.Services.Services
                 .Take(query.PageSize)
                 .ToListAsync();
 
+            var mappedItems = _mapper.Map<List<EventDto>>(items);
+            await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
+
             return new PagedResultDto<EventDto>
             {
-                Items = _mapper.Map<List<EventDto>>(items),
+                Items = mappedItems,
                 Page = query.Page,
                 PageSize = query.PageSize,
                 TotalCount = totalCount,
@@ -452,9 +458,12 @@ namespace TuristickiVodic.Services.Services
                 .Take(query.PageSize)
                 .ToListAsync();
 
+            var mappedItems = _mapper.Map<List<EventDto>>(items);
+            await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
+
             return new PagedResultDto<EventDto>
             {
-                Items = _mapper.Map<List<EventDto>>(items),
+                Items = mappedItems,
                 Page = query.Page,
                 PageSize = query.PageSize,
                 TotalCount = totalCount,
@@ -483,7 +492,9 @@ namespace TuristickiVodic.Services.Services
             if (!hasMainImage)
                 return null;
 
-            return _mapper.Map<EventDto>(ev);
+            var dto = _mapper.Map<EventDto>(ev);
+            await ApplyPendingDeletionRequestFlagsAsync(dto);
+            return dto;
         }
 
         public async Task<EventDto?> GetMineByIdAsync(int id, int userId)
@@ -497,7 +508,12 @@ namespace TuristickiVodic.Services.Services
                 .Include(e => e.Images)
                 .FirstOrDefaultAsync(e => e.Id == id && e.CreatedByUserId == userId);
 
-            return ev == null ? null : _mapper.Map<EventDto>(ev);
+            if (ev == null)
+                return null;
+
+            var dto = _mapper.Map<EventDto>(ev);
+            await ApplyPendingDeletionRequestFlagsAsync(dto);
+            return dto;
         }
 
         public async Task<EventDto?> GetForManagerByIdAsync(int id, int userId)
@@ -522,7 +538,9 @@ namespace TuristickiVodic.Services.Services
             if (!isResponsible)
                 return null;
 
-            return _mapper.Map<EventDto>(ev);
+            var dto = _mapper.Map<EventDto>(ev);
+            await ApplyPendingDeletionRequestFlagsAsync(dto);
+            return dto;
         }
 
         public async Task<EventDto> CreateAsync(CreateEventDto dto, int userId, string roleName)
@@ -586,7 +604,9 @@ namespace TuristickiVodic.Services.Services
                 await _context.SaveChangesAsync();
             }
 
-            return _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
+            var result = _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
+            await ApplyPendingDeletionRequestFlagsAsync(result);
+            return result;
         }
 
         public async Task<EventDto?> UpdateAsync(int id, UpdateEventDto dto, int userId, string roleName)
@@ -665,7 +685,9 @@ namespace TuristickiVodic.Services.Services
 
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
+            var result = _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
+            await ApplyPendingDeletionRequestFlagsAsync(result);
+            return result;
         }
 
         public async Task<EventDto?> ApproveAsync(int id, ApproveContentDto dto, int userId, string roleName)
@@ -716,7 +738,9 @@ namespace TuristickiVodic.Services.Services
 
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
+            var result = _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
+            await ApplyPendingDeletionRequestFlagsAsync(result);
+            return result;
         }
 
         public async Task<bool> DeleteAsync(int id, int userId, string roleName)
@@ -873,7 +897,9 @@ namespace TuristickiVodic.Services.Services
 
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
+            var result = _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
+            await ApplyPendingDeletionRequestFlagsAsync(result);
+            return result;
         }
 
         public async Task<PagedResultDto<EventDto>> SearchAsync(EventQueryDto query)
@@ -931,6 +957,7 @@ namespace TuristickiVodic.Services.Services
                 .ToListAsync();
 
             var mappedItems = _mapper.Map<List<EventDto>>(items);
+            await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
 
             return new PagedResultDto<EventDto>
             {
@@ -989,6 +1016,35 @@ namespace TuristickiVodic.Services.Services
             return isDesc
                 ? query.OrderByDescending(e => e.StartDate)
                 : query.OrderBy(e => e.StartDate);
+        }
+
+        private async Task ApplyPendingDeletionRequestFlagsAsync(List<EventDto> items)
+        {
+            if (items.Count == 0)
+                return;
+
+            var eventIds = items.Select(x => x.Id).Distinct().ToList();
+
+            var pendingIds = await _context.DeletionRequests
+                .AsNoTracking()
+                .Where(dr => dr.EventId.HasValue
+                    && eventIds.Contains(dr.EventId.Value)
+                    && dr.Status == ContentStatus.Pending)
+                .Select(dr => dr.EventId!.Value)
+                .Distinct()
+                .ToListAsync();
+
+            var pendingIdSet = pendingIds.ToHashSet();
+
+            foreach (var item in items)
+            {
+                item.HasPendingDeletionRequest = pendingIdSet.Contains(item.Id);
+            }
+        }
+
+        private Task ApplyPendingDeletionRequestFlagsAsync(EventDto item)
+        {
+            return ApplyPendingDeletionRequestFlagsAsync(new List<EventDto> { item });
         }
     }
 }
