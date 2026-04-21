@@ -51,7 +51,23 @@ export class AuthService {
     }
 
     try {
-      return JSON.parse(raw) as UserDto;
+      const user = JSON.parse(raw) as UserDto;
+      const authenticatedRole = this.getAuthenticatedRole();
+
+      if (!authenticatedRole) {
+        return user;
+      }
+
+      const normalizedUser: UserDto = {
+        ...user,
+        roleName: this.mapNormalizedRoleToBackendRole(authenticatedRole),
+      };
+
+      if (normalizedUser.roleName !== user.roleName) {
+        localStorage.setItem(this.userKey, JSON.stringify(normalizedUser));
+      }
+
+      return normalizedUser;
     } catch {
       return null;
     }
@@ -145,6 +161,21 @@ export class AuthService {
     }
 
     return role;
+  }
+
+  private mapNormalizedRoleToBackendRole(role: string): string {
+    switch (role) {
+      case 'admin':
+        return 'Admin';
+      case 'manager':
+        return 'Manager';
+      case 'content-creator':
+        return 'ContentCreator';
+      case 'tourist':
+        return 'Tourist';
+      default:
+        return role;
+    }
   }
 
   getDashboardRouteForRole(role: string | null): string {
