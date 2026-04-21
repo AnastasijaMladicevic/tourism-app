@@ -27,7 +27,7 @@ export class LanguageComponent implements OnInit {
   ];
 
   protected readonly selectedCode = signal('sr');
-  protected readonly savedCode = signal('sr');
+  protected readonly appliedCode = signal('sr');
   protected readonly isSaving = signal(false);
   protected readonly feedback = signal('');
 
@@ -43,7 +43,7 @@ export class LanguageComponent implements OnInit {
     this.user = currentUser;
     const code = this.normalizeLanguage(currentUser.language);
     this.selectedCode.set(code);
-    this.savedCode.set(code);
+    this.appliedCode.set(code);
 
     this.authService
       .getById(currentUser.id)
@@ -53,7 +53,7 @@ export class LanguageComponent implements OnInit {
         this.user = user;
         const latestCode = this.normalizeLanguage(user.language);
         this.selectedCode.set(latestCode);
-        this.savedCode.set(latestCode);
+        this.appliedCode.set(latestCode);
       });
   }
 
@@ -70,7 +70,7 @@ export class LanguageComponent implements OnInit {
     if (!this.user?.id || this.isSaving()) return;
 
     const selected = this.selectedCode();
-    if (selected === this.savedCode()) {
+    if (selected === this.appliedCode()) {
       this.feedback.set('Jezik je već aktivan.');
       return;
     }
@@ -93,9 +93,9 @@ export class LanguageComponent implements OnInit {
       .subscribe((user) => {
         if (!user) return;
         this.user = user;
-        const saved = this.normalizeLanguage(user.language);
-        this.selectedCode.set(saved);
-        this.savedCode.set(saved);
+        const applied = this.normalizeLanguage(user.language);
+        this.selectedCode.set(applied);
+        this.appliedCode.set(applied);
         this.feedback.set('Jezik je uspešno ažuriran.');
       });
   }
@@ -105,7 +105,7 @@ export class LanguageComponent implements OnInit {
   }
 
   protected canApply(): boolean {
-    return !this.isSaving() && this.selectedCode() !== this.savedCode();
+    return !this.isSaving() && this.selectedCode() !== this.appliedCode();
   }
 
   private normalizeLanguage(language?: string | null): string {
