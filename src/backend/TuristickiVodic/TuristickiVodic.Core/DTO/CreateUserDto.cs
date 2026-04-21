@@ -13,7 +13,9 @@ namespace TuristickiVodic.Core.DTO
         [Required]
         public DateTime DateOfBirth { get; set; }
 
-        [Required, EmailAddress, MaxLength(200)]
+        [Required, EmailAddress]
+        [MaxLength(200)]
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$", ErrorMessage = "Neispravan format email-a")]
         public string Email { get; set; }
 
         [Required, MinLength(6)]
