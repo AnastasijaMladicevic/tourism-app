@@ -143,7 +143,31 @@ export class AuthService {
 
   getCurrentUser(): UserDto | null {
     const u = localStorage.getItem('user');
-    return u ? JSON.parse(u) : null;
+    if (!u) {
+      return null;
+    }
+
+    try {
+      const user = JSON.parse(u) as UserDto;
+      const authenticatedRole = this.getAuthenticatedRole();
+
+      if (!authenticatedRole) {
+        return user;
+      }
+
+      const normalizedUser = {
+        ...user,
+        roleName: this.mapNormalizedRoleToBackendRole(authenticatedRole),
+      };
+
+      if (normalizedUser.roleName !== user.roleName) {
+        this.setCurrentUser(normalizedUser);
+      }
+
+      return normalizedUser;
+    } catch {
+      return null;
+    }
   }
 
   setCurrentUser(user: UserDto): void {
@@ -153,9 +177,15 @@ export class AuthService {
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
-  isAdmin(): boolean {
-    return this.getCurrentUser()?.roleName === 'Admin';
+
+  getAuthenticatedRole(): string | null {
+    return this.normalizeRawRole(this.getRoleFromToken());
   }
+
+  isAdmin(): boolean {
+    return this.getAuthenticatedRole() === 'admin';
+  }
+
   forgotPassword(email: string): Observable<any> {
     return this.http.post(`${this.url}/forgot-password`, { email });
   }
@@ -165,5 +195,93 @@ export class AuthService {
   }
   updateMyLocation(latitude: number, longitude: number): Observable<any> {
     return this.http.put(`${this.url}/me/location`, { latitude, longitude });
+  }
+
+  private getRoleFromToken(): string | null {
+    const token = this.getToken();
+    if (!token) {
+      return null;
+    }
+
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      return null;
+    }
+
+    try {
+      const base64Payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const paddedBase64Payload = base64Payload.padEnd(base64Payload.length + ((4 - (base64Payload.length % 4)) % 4), '=');
+      const decodedPayload = decodeURIComponent(
+        atob(paddedBase64Payload)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join(''),
+      );
+
+      const payload = JSON.parse(decodedPayload) as Record<string, unknown>;
+      const directRole = payload['role'];
+      const claimRole = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+      const roles = payload['roles'];
+
+      if (typeof directRole === 'string') {
+        return directRole;
+      }
+
+      if (typeof claimRole === 'string') {
+        return claimRole;
+      }
+
+      if (Array.isArray(roles)) {
+        const firstRole = roles.find((value): value is string => typeof value === 'string');
+        if (firstRole) {
+          return firstRole;
+        }
+      }
+    } catch {
+      return null;
+    }
+
+    return null;
+  }
+
+  private normalizeRawRole(rawRole: string | null | undefined): string | null {
+    if (!rawRole) {
+      return null;
+    }
+
+    const role = rawRole.toLowerCase().replace(/[_\s]+/g, '-');
+
+    if (role.includes('admin')) {
+      return 'admin';
+    }
+
+    if (role.includes('manager')) {
+      return 'manager';
+    }
+
+    if (role.includes('content-creator') || role.includes('contentcreator') || role.includes('creator')) {
+      return 'content-creator';
+    }
+
+    if (role.includes('tourist')) {
+      return 'tourist';
+    }
+
+    return role;
+  }
+
+  private mapNormalizedRoleToBackendRole(role: string): UserDto['roleName'] {
+    switch (role) {
+      case 'admin':
+        return 'Admin';
+      case 'manager':
+        return 'Manager';
+      case 'content-creator':
+        return 'ContentCreator';
+      case 'tourist':
+        return 'Tourist';
+      default:
+        return role;
+    }
   }
 }

@@ -59,14 +59,23 @@ export class AuthService {
 
   getNormalizedRole(user?: UserDto | null): string | null {
     const source = user ?? this.getUser();
-    const tokenRole = this.getRoleFromToken();
+    const normalizedTokenRole = this.getAuthenticatedRole();
 
-    if (!source) {
-      return this.normalizeRawRole(tokenRole);
+    // Always trust the signed JWT claim over mutable local storage user data.
+    if (normalizedTokenRole) {
+      return normalizedTokenRole;
     }
 
-    const rawRole = source.roleName || source.role || source.userType || source.roles?.[0] || tokenRole || null;
+    if (!source) {
+      return null;
+    }
+
+    const rawRole = source.roleName || source.role || source.userType || source.roles?.[0] || null;
     return this.normalizeRawRole(rawRole);
+  }
+
+  getAuthenticatedRole(): string | null {
+    return this.normalizeRawRole(this.getRoleFromToken());
   }
 
   private getRoleFromToken(): string | null {
@@ -82,8 +91,9 @@ export class AuthService {
 
     try {
       const base64Payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const paddedBase64Payload = base64Payload.padEnd(base64Payload.length + ((4 - (base64Payload.length % 4)) % 4), '=');
       const decodedPayload = decodeURIComponent(
-        atob(base64Payload)
+        atob(paddedBase64Payload)
           .split('')
           .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
           .join('')
@@ -92,6 +102,7 @@ export class AuthService {
       const payload = JSON.parse(decodedPayload) as Record<string, unknown>;
       const directRole = payload['role'];
       const claimRole = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+      const roles = payload['roles'];
 
       if (typeof directRole === 'string') {
         return directRole;
@@ -99,6 +110,13 @@ export class AuthService {
 
       if (typeof claimRole === 'string') {
         return claimRole;
+      }
+
+      if (Array.isArray(roles)) {
+        const firstRole = roles.find((value): value is string => typeof value === 'string');
+        if (firstRole) {
+          return firstRole;
+        }
       }
     } catch {
       return null;
@@ -145,11 +163,11 @@ export class AuthService {
   }
 
   getDashboardRouteFromStoredUser(): string {
-    return this.getDashboardRouteForRole(this.getNormalizedRole());
+    return this.getDashboardRouteForRole(this.getAuthenticatedRole() ?? this.getNormalizedRole());
   }
 
   hasAnyRole(allowedRoles: string[]): boolean {
-    const normalizedCurrentRole = this.getNormalizedRole();
+    const normalizedCurrentRole = this.getAuthenticatedRole();
     if (!normalizedCurrentRole) {
       return false;
     }

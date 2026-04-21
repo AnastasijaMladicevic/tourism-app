@@ -15,6 +15,7 @@ export const roleGuard = (allowedRoles: string[]): CanActivateFn => {
       return true;
     }
 
-    return router.parseUrl(authService.getDashboardRouteFromStoredUser());
+    const authenticatedRole = authService.getAuthenticatedRole();
+    return router.parseUrl(authService.getDashboardRouteForRole(authenticatedRole));
   };
 };
