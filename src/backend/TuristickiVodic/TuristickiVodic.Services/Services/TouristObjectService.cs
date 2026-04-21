@@ -147,6 +147,7 @@ namespace TuristickiVodic.Services.Services
                 .ToListAsync();
 
             var mappedItems = _mapper.Map<List<TouristObjectDto>>(items);
+            await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
 
             return new PagedResultDto<TouristObjectDto>
             {
@@ -306,6 +307,8 @@ namespace TuristickiVodic.Services.Services
                 })
                 .ToList();
 
+            await ApplyPendingDeletionRequestFlagsAsync(items);
+
             return new PagedResultDto<TouristObjectDto>
             {
                 Items = items,
@@ -419,9 +422,12 @@ namespace TuristickiVodic.Services.Services
                 .Take(query.PageSize)
                 .ToListAsync();
 
+            var mappedItems = _mapper.Map<List<TouristObjectDto>>(items);
+            await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
+
             return new PagedResultDto<TouristObjectDto>
             {
-                Items = _mapper.Map<List<TouristObjectDto>>(items),
+                Items = mappedItems,
                 Page = query.Page,
                 PageSize = query.PageSize,
                 TotalCount = totalCount,
@@ -540,9 +546,12 @@ namespace TuristickiVodic.Services.Services
                 .Take(query.PageSize)
                 .ToListAsync();
 
+            var mappedItems = _mapper.Map<List<TouristObjectDto>>(items);
+            await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
+
             return new PagedResultDto<TouristObjectDto>
             {
-                Items = _mapper.Map<List<TouristObjectDto>>(items),
+                Items = mappedItems,
                 Page = query.Page,
                 PageSize = query.PageSize,
                 TotalCount = totalCount,
@@ -563,7 +572,9 @@ namespace TuristickiVodic.Services.Services
             if (!hasMainImage)
                 return null;
 
-            return _mapper.Map<TouristObjectDto>(obj);
+            var dto = _mapper.Map<TouristObjectDto>(obj);
+            await ApplyPendingDeletionRequestFlagsAsync(dto);
+            return dto;
         }
 
         public async Task<TouristObjectDto?> GetMineByIdAsync(int id, int userId)
@@ -572,7 +583,9 @@ namespace TuristickiVodic.Services.Services
             if (obj == null || obj.CreatedByUserId != userId)
                 return null;
 
-            return _mapper.Map<TouristObjectDto>(obj);
+            var dto = _mapper.Map<TouristObjectDto>(obj);
+            await ApplyPendingDeletionRequestFlagsAsync(dto);
+            return dto;
         }
 
         public async Task<TouristObjectDto?> GetForManagerByIdAsync(int id, int userId)
@@ -589,7 +602,9 @@ namespace TuristickiVodic.Services.Services
             if (!isResponsible)
                 return null;
 
-            return _mapper.Map<TouristObjectDto>(obj);
+            var dto = _mapper.Map<TouristObjectDto>(obj);
+            await ApplyPendingDeletionRequestFlagsAsync(dto);
+            return dto;
         }
 
         // Samo CC može da kreira objekte; status uvek Pending, čeka odobrenje
@@ -652,7 +667,9 @@ namespace TuristickiVodic.Services.Services
             _context.Objects.Add(obj);
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<TouristObjectDto>(await LoadObjectAsync(obj.Id));
+            var result = _mapper.Map<TouristObjectDto>(await LoadObjectAsync(obj.Id));
+            await ApplyPendingDeletionRequestFlagsAsync(result);
+            return result;
         }
 
         // Samo CC može da menja objekte, i to samo svoje
@@ -729,7 +746,9 @@ namespace TuristickiVodic.Services.Services
 
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<TouristObjectDto>(await LoadObjectAsync(obj.Id));
+            var result = _mapper.Map<TouristObjectDto>(await LoadObjectAsync(obj.Id));
+            await ApplyPendingDeletionRequestFlagsAsync(result);
+            return result;
         }
 
         // Menadžer odobrava/odbija objekte u svojoj destinaciji
@@ -781,7 +800,9 @@ namespace TuristickiVodic.Services.Services
 
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<TouristObjectDto>(await LoadObjectAsync(obj.Id));
+            var result = _mapper.Map<TouristObjectDto>(await LoadObjectAsync(obj.Id));
+            await ApplyPendingDeletionRequestFlagsAsync(result);
+            return result;
         }
 
         public async Task<bool> DeleteAsync(int id, int userId, string roleName)
@@ -863,7 +884,9 @@ namespace TuristickiVodic.Services.Services
 
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<TouristObjectDto>(await LoadObjectAsync(obj.Id));
+            var result = _mapper.Map<TouristObjectDto>(await LoadObjectAsync(obj.Id));
+            await ApplyPendingDeletionRequestFlagsAsync(result);
+            return result;
         }
 
         public async Task<PagedResultDto<TouristObjectDto>> SearchAsync(TouristObjectQueryDto query)
@@ -969,6 +992,35 @@ namespace TuristickiVodic.Services.Services
 
             var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
             return earthRadiusMeters * c;
+        }
+
+        private async Task ApplyPendingDeletionRequestFlagsAsync(List<TouristObjectDto> items)
+        {
+            if (items.Count == 0)
+                return;
+
+            var objectIds = items.Select(x => x.Id).Distinct().ToList();
+
+            var pendingIds = await _context.DeletionRequests
+                .AsNoTracking()
+                .Where(dr => dr.ObjectId.HasValue
+                    && objectIds.Contains(dr.ObjectId.Value)
+                    && dr.Status == ContentStatus.Pending)
+                .Select(dr => dr.ObjectId!.Value)
+                .Distinct()
+                .ToListAsync();
+
+            var pendingIdSet = pendingIds.ToHashSet();
+
+            foreach (var item in items)
+            {
+                item.HasPendingDeletionRequest = pendingIdSet.Contains(item.Id);
+            }
+        }
+
+        private Task ApplyPendingDeletionRequestFlagsAsync(TouristObjectDto item)
+        {
+            return ApplyPendingDeletionRequestFlagsAsync(new List<TouristObjectDto> { item });
         }
 
         private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180d;

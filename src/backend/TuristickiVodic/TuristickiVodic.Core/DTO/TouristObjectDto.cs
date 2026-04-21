@@ -23,6 +23,7 @@ namespace TuristickiVodic.Core.DTO
         public int ReviewCount { get; set; }
         public List<TouristObjectReviewDto> Reviews { get; set; } = new();
         public string Status { get; set; } = string.Empty;
+        public bool HasPendingDeletionRequest { get; set; }
         public int ObjectTypeId { get; set; }
         public string ObjectTypeName { get; set; } = string.Empty;
         public int? LocalityId { get; set; }
