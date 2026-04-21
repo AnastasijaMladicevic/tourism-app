@@ -1233,7 +1233,7 @@ VALUES
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
     NOW()),
 (
-    'https://igalospa.com/wp-content/uploads/2023/12/institut-igalo-slide.jpg',
+    'https://ocdn.eu/pulscms-transforms/1/3fjktkpTURBXy85YjhmOTMwYzFjYzQ2MDZhYTNmYmRmYmIxZmYxYzVhMC5qcGeRkwXNBLDNA4Q',
     'Igalo Banja',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Igalo Banja'),
@@ -1245,19 +1245,13 @@ VALUES
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Igalo Banja'),
     NOW()),
 (
-    'https://www.ponte.rs/UPLOADS-PONTE/2022/12/IGALO.jpg',
+    'https://igalospa.com/wp-content/uploads/2019/07/podvodna-tus-masaza-institut-igalo.jpg',
     'Igalo Banja',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Igalo Banja'),
     NOW()),
 (
-    'https://beaches-searcher.com/images/beaches/499201004/ME201004.jpg',
-    'Igalo Banja',
-    false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Igalo Banja'),
-    NOW()),
-(
-    'https://www.maestral.co.rs/wp-content/uploads/2023/04/Letovanje-Igalo-Crna-Gora-3.jpg',
+    'https://startravelnis.rs/wp-content/uploads/2022/02/igalo-institut-simo-14.jpg',
     'Igalo Banja',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Igalo Banja'),
@@ -1366,7 +1360,7 @@ VALUES
 (
     'https://upload.wikimedia.org/wikipedia/commons/0/0e/Kola%C5%A1in_Town_Center.jpg',
     'Kolasin',
-    true,
+    false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
     NOW()),
 
@@ -1380,7 +1374,7 @@ VALUES
 (
     'https://skijalista.me/wp-content/uploads/DJI_0765.jpg',
     'Kolasin',
-    false,
+    true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
     NOW()),
     
@@ -1417,15 +1411,7 @@ VALUES
     'Zabljak',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
-    NOW()),
-
-(
-    'https://zabljak.me/wp-content/uploads/2025/06/slika-zabljak-slider-06.jpg',
-    'Zabljak',
-    false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
-    NOW())
-    ;
+    NOW());
 
 -- ============================================
 -- 10. IMAGES - EVENTS
