@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using TuristickiVodic.Core.Validation;
 
 namespace TuristickiVodic.Core.DTO
 {
@@ -13,9 +14,9 @@ namespace TuristickiVodic.Core.DTO
         [Required]
         public DateTime DateOfBirth { get; set; }
 
-        [Required, EmailAddress]
+        [Required]
         [MaxLength(200)]
-        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$", ErrorMessage = "Neispravan format email-a")]
+        [RfcEmailAddress]
         public string Email { get; set; }
 
         [Required, MinLength(6)]

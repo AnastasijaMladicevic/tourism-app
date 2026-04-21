@@ -62,7 +62,9 @@ export interface UpdateUserDto {
 export class AuthService {
   private url = `${environment.apiUrl}/users`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.syncStoredUserWithAuthenticatedRole();
+  }
 
   // POST /api/users/register
   register(dto: CreateUserDto): Observable<UserDto> {
@@ -148,23 +150,7 @@ export class AuthService {
     }
 
     try {
-      const user = JSON.parse(u) as UserDto;
-      const authenticatedRole = this.getAuthenticatedRole();
-
-      if (!authenticatedRole) {
-        return user;
-      }
-
-      const normalizedUser = {
-        ...user,
-        roleName: this.mapNormalizedRoleToBackendRole(authenticatedRole),
-      };
-
-      if (normalizedUser.roleName !== user.roleName) {
-        this.setCurrentUser(normalizedUser);
-      }
-
-      return normalizedUser;
+      return this.normalizeUser(JSON.parse(u) as UserDto);
     } catch {
       return null;
     }
@@ -195,6 +181,38 @@ export class AuthService {
   }
   updateMyLocation(latitude: number, longitude: number): Observable<any> {
     return this.http.put(`${this.url}/me/location`, { latitude, longitude });
+  }
+
+  private syncStoredUserWithAuthenticatedRole(): void {
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser) {
+      return;
+    }
+
+    try {
+      this.normalizeUser(JSON.parse(storedUser) as UserDto);
+    } catch {
+      localStorage.removeItem('user');
+    }
+  }
+
+  private normalizeUser(user: UserDto): UserDto {
+    const authenticatedRole = this.getAuthenticatedRole();
+
+    if (!authenticatedRole) {
+      return user;
+    }
+
+    const normalizedUser = {
+      ...user,
+      roleName: this.mapNormalizedRoleToBackendRole(authenticatedRole),
+    };
+
+    if (normalizedUser.roleName !== user.roleName) {
+      this.setCurrentUser(normalizedUser);
+    }
+
+    return normalizedUser;
   }
 
   private getRoleFromToken(): string | null {

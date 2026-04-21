@@ -9,6 +9,7 @@ import { EventDto, EventService } from '../../services/event';
 import { FavoriteDto, FavoriteService } from '../../services/favorite';
 import { ImageDto, ImageService } from '../../services/image';
 import { environment } from '../../../environment/environment';
+import { AuthService } from '../../services/auth';
 
 interface PlaceCard {
   title: string;
@@ -59,6 +60,7 @@ export class HomeComponent implements OnInit {
     private favoriteService: FavoriteService,
     private eventService: EventService,
     private imageService: ImageService,
+    private authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -84,16 +86,13 @@ export class HomeComponent implements OnInit {
   }
 
   private loadUserName(): void {
-    const raw = localStorage.getItem('user');
-    if (!raw) return;
-
-    try {
-      const user = JSON.parse(raw) as { firstName?: string; lastName?: string };
-      const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
-      if (fullName) this.userName = fullName;
-    } catch {
-      this.userName = 'Alex Taylor';
+    const user = this.authService.getCurrentUser();
+    if (!user) {
+      return;
     }
+
+    const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+    if (fullName) this.userName = fullName;
   }
 
   private loadPlaceCards(): void {
