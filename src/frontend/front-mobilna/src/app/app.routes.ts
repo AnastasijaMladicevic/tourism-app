@@ -224,7 +224,16 @@ export const routes: Routes = [
     path: 'my-reviews',
     canActivate: [profileAuthGuard],
     loadComponent: () =>
-      import('./feature/my-reviews/my-reviews.component').then((m) => m.MyReviewsComponent),
+      import('./feature/my-reviews-preview/my-reviews-preview.component').then(
+        (m) => m.MyReviewsPreviewComponent,
+      ),
+  },
+  {
+    path: 'my-reviews-preview',
+    loadComponent: () =>
+      import('./feature/my-reviews-preview/my-reviews-preview.component').then(
+        (m) => m.MyReviewsPreviewComponent,
+      ),
   },
   {
     path: 'privacy-data',

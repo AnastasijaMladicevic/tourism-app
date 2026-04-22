@@ -63,4 +63,8 @@ export class ReviewService {
   create(dto: any): Observable<ReviewDto> {
     return this.http.post<ReviewDto>(this.baseUrl, dto);
   }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
 }
