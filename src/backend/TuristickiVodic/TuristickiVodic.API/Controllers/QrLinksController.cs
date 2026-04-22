@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TuristickiVodic.Core.DTO;
+using TuristickiVodic.Services;
 using TuristickiVodic.Services.Services;
 
 namespace TuristickiVodic.API.Controllers
@@ -12,15 +13,21 @@ namespace TuristickiVodic.API.Controllers
     {
         private const string DefaultPublicAppBaseUrl = "http://localhost:4200";
 
+        private readonly IDestinationService _destinationService;
+        private readonly ILocalityService _localityService;
         private readonly IEventService _eventService;
         private readonly ITouristObjectService _touristObjectService;
         private readonly IConfiguration _configuration;
 
         public QrLinksController(
+            IDestinationService destinationService,
+            ILocalityService localityService,
             IEventService eventService,
             ITouristObjectService touristObjectService,
             IConfiguration configuration)
         {
+            _destinationService = destinationService;
+            _localityService = localityService;
             _eventService = eventService;
             _touristObjectService = touristObjectService;
             _configuration = configuration;
@@ -30,6 +37,30 @@ namespace TuristickiVodic.API.Controllers
         public ActionResult<QrLinkDto> GetPlatformQr()
         {
             return Ok(BuildQrLink("Turisticka aplikacija", "/home"));
+        }
+
+        [HttpGet("destinations/{id:int}")]
+        public async Task<ActionResult<QrLinkDto>> GetDestinationQr(int id)
+        {
+            var destination = await _destinationService.GetByIdAsync(id, null, "Tourist");
+            if (destination == null)
+                return NotFound();
+
+            return Ok(BuildQrLink(
+                $"Destinacija: {destination.Name}",
+                $"/map?focusType=destination&focusId={id}"));
+        }
+
+        [HttpGet("localities/{id:int}")]
+        public async Task<ActionResult<QrLinkDto>> GetLocalityQr(int id)
+        {
+            var locality = await _localityService.GetByIdAsync(id);
+            if (locality == null)
+                return NotFound();
+
+            return Ok(BuildQrLink(
+                $"Lokalitet: {locality.Name}",
+                $"/map?focusType=locality&focusId={id}"));
         }
 
         [HttpGet("events/{id:int}")]
