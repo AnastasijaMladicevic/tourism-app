@@ -1,19 +1,19 @@
 <div class="support-page">
   <header class="support-topbar">
-    <a class="back-btn" [routerLink]="backLink" aria-label="Nazad">
+    <a class="back-btn" [routerLink]="backLink" [attr.aria-label]="'common.back' | translate">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="m15 18-6-6 6-6" />
       </svg>
     </a>
-    <h1>Pomoc i podrska</h1>
+    <h1>{{ 'support.title' | translate }}</h1>
     <div class="topbar-spacer" aria-hidden="true"></div>
   </header>
 
   <div class="support-shell">
     <section class="support-hero">
-      <h2>Pomoc za profil i mobilna podesavanja</h2>
+      <h2>{{ 'support.heroTitle' | translate }}</h2>
 
-      <label class="search-box" aria-label="Pretraga pitanja">
+      <label class="search-box" [attr.aria-label]="'support.searchAria' | translate">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M10.5 4a6.5 6.5 0 1 0 4.1 11.5l4.4 4.4 1.4-1.4-4.4-4.4A6.5 6.5 0 0 0 10.5 4Z" />
         </svg>
@@ -21,19 +21,19 @@
           type="text"
           [value]="query()"
           (input)="onSearch(($any($event.target)).value)"
-          placeholder="Pretrazi cesto postavljana pitanja..."
+          [placeholder]="'support.searchPlaceholder' | translate"
         />
       </label>
     </section>
 
     <section class="support-section">
-      <h3>Cesto postavljana pitanja</h3>
+      <h3>{{ 'support.faqTitle' | translate }}</h3>
 
       <div class="faq-card">
         @for (item of filteredFaqs; track item.originalIndex) {
           <button class="faq-item" type="button" (click)="toggleFaq(item.originalIndex)">
             <div class="faq-item__row">
-              <span>{{ item.question }}</span>
+              <span>{{ item.questionKey | translate }}</span>
               <span
                 class="faq-item__chevron"
                 [class.faq-item__chevron--open]="isOpen(item.originalIndex)"
@@ -45,7 +45,7 @@
             </div>
 
             @if (isOpen(item.originalIndex)) {
-              <p>{{ item.answer }}</p>
+              <p>{{ item.answerKey | translate }}</p>
             }
           </button>
         }
@@ -53,14 +53,14 @@
     </section>
 
     <section class="support-section">
-      <h3>Direktan kontakt</h3>
+      <h3>{{ 'support.contactTitle' | translate }}</h3>
 
       <div class="contact-list">
         <a class="contact-card" href="tel:+38220123456">
           <div class="contact-card__icon">☎</div>
           <div class="contact-card__content">
-            <strong>Podrska korisnicima</strong>
-            <span>Pozovi nas za brza pitanja u vezi naloga i aplikacije</span>
+            <strong>{{ 'support.contactUsers' | translate }}</strong>
+            <span>{{ 'support.contactUsersBody' | translate }}</span>
           </div>
           <span class="contact-card__arrow">›</span>
         </a>
@@ -68,8 +68,8 @@
         <a class="contact-card" href="mailto:support@spirego.com">
           <div class="contact-card__icon contact-card__icon--alert">!</div>
           <div class="contact-card__content">
-            <strong>Prijavi problem</strong>
-            <span>Posalji detalje ako neka profile funkcija ne radi kako treba</span>
+            <strong>{{ 'support.reportProblem' | translate }}</strong>
+            <span>{{ 'support.reportProblemBody' | translate }}</span>
           </div>
           <span class="contact-card__arrow">›</span>
         </a>
@@ -77,23 +77,23 @@
     </section>
 
     <section class="hours-card">
-      <div class="hours-card__title">Radno vreme podrske</div>
+      <div class="hours-card__title">{{ 'support.hoursTitle' | translate }}</div>
 
       <div class="hours-grid">
         <div>
-          <span>Ponedeljak - Petak</span>
+          <span>{{ 'support.weekdays' | translate }}</span>
           <strong>08:00 - 20:00</strong>
         </div>
         <div>
-          <span>Subota - Nedelja</span>
+          <span>{{ 'support.weekend' | translate }}</span>
           <strong>09:00 - 17:00</strong>
         </div>
       </div>
 
       <div class="hours-divider"></div>
 
-      <p>* Prosecno vreme odgovora na chat je manje od 5 minuta.</p>
-      <p>* Odgovori na prijave problema stizu u roku od 24h.</p>
+      <p>{{ 'support.chatNote' | translate }}</p>
+      <p>{{ 'support.ticketNote' | translate }}</p>
     </section>
   </div>
 </div>

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environment/environment';
+import { TranslationService } from './translation.service';
 
 export interface LoginDto {
   email: string;
@@ -62,7 +63,15 @@ export interface UpdateUserDto {
 export class AuthService {
   private url = `${environment.apiUrl}/users`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private translationService: TranslationService,
+  ) {
+    const currentUser = this.readStoredUser();
+    if (currentUser?.language) {
+      this.translationService.setLanguage(currentUser.language);
+    }
+  }
 
   // POST /api/users/register
   register(dto: CreateUserDto): Observable<UserDto> {
@@ -72,11 +81,7 @@ export class AuthService {
   // POST /api/users/login
   login(dto: LoginDto): Observable<AuthResponseDto> {
     return this.http.post<AuthResponseDto>(`${this.url}/login`, dto).pipe(
-      tap((res) => {
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('refreshToken', res.refreshToken);
-        localStorage.setItem('user', JSON.stringify(res.user));
-      }),
+      tap((res) => this.persistSession(res)),
     );
   }
 
@@ -96,13 +101,7 @@ export class AuthService {
     const refreshToken = localStorage.getItem('refreshToken');
     return this.http
       .post<AuthResponseDto>(`${this.url}/refresh`, { refreshToken } as RefreshTokenDto)
-      .pipe(
-        tap((res) => {
-          localStorage.setItem('token', res.token);
-          localStorage.setItem('refreshToken', res.refreshToken);
-          localStorage.setItem('user', JSON.stringify(res.user));
-        }),
-      );
+      .pipe(tap((res) => this.persistSession(res)));
   }
 
   getById(userId: number): Observable<UserDto> {
@@ -172,6 +171,7 @@ export class AuthService {
 
   setCurrentUser(user: UserDto): void {
     localStorage.setItem('user', JSON.stringify(user));
+    this.translationService.setLanguage(user.language);
   }
 
   isLoggedIn(): boolean {
@@ -195,6 +195,25 @@ export class AuthService {
   }
   updateMyLocation(latitude: number, longitude: number): Observable<any> {
     return this.http.put(`${this.url}/me/location`, { latitude, longitude });
+  }
+
+  private persistSession(response: AuthResponseDto): void {
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('refreshToken', response.refreshToken);
+    this.setCurrentUser(response.user);
+  }
+
+  private readStoredUser(): UserDto | null {
+    const raw = localStorage.getItem('user');
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(raw) as UserDto;
+    } catch {
+      return null;
+    }
   }
 
   private getRoleFromToken(): string | null {

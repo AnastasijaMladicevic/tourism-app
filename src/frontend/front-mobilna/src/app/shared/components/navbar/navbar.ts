@@ -5,9 +5,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { LogoComponent } from '../logo/logo';
 import { filter } from 'rxjs/operators';
 import { AuthService } from '../../../services/auth';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 interface NavItem {
-  label: string;
+  labelKey: string;
   icon: string;
   route: string;
 }
@@ -15,7 +16,7 @@ interface NavItem {
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule, LogoComponent],
+  imports: [CommonModule, RouterModule, MatIconModule, LogoComponent, TranslatePipe],
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -34,11 +35,11 @@ export class NavbarComponent {
   ];
 
   navItems: NavItem[] = [
-    { label: 'Home', icon: 'home', route: '/home' },
-    { label: 'Map', icon: 'map', route: '/map' },
-    { label: 'Favorites', icon: 'favorite', route: '/favorites' },
-    { label: 'Planner', icon: 'calendar_month', route: '/planner' },
-    { label: 'Profile', icon: 'person_outline', route: '/profile' },
+    { labelKey: 'nav.home', icon: 'home', route: '/home' },
+    { labelKey: 'nav.map', icon: 'map', route: '/map' },
+    { labelKey: 'nav.favorites', icon: 'favorite', route: '/favorites' },
+    { labelKey: 'nav.planner', icon: 'calendar_month', route: '/planner' },
+    { labelKey: 'nav.profile', icon: 'person_outline', route: '/profile' },
   ];
 
   constructor(

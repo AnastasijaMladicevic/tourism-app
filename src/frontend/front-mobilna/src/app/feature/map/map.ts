@@ -9,21 +9,23 @@ import { DestinationService } from '../../services/destination';
 import { ObjectService } from '../../services/object';
 import { EventService } from '../../services/event';
 import { AuthService } from '../../services/auth';
+import { TranslationService } from '../../services/translation.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-map',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, TranslatePipe],
   templateUrl: './map.html',
   styleUrls: ['./map.scss'],
   encapsulation: ViewEncapsulation.None,
 })
 export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
-
   searchQuery = '';
   selectedItem: any = null;
-  selectedType: string = '';
-  private currentMarker: any = null;   // čuva trenutni kliknuti marker
+  selectedType = '';
+  private currentMarker: any = null;
+
   constructor(
     private mapService: MapService,
     private router: Router,
@@ -33,39 +35,39 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     private destinationService: DestinationService,
     private objectService: ObjectService,
     private eventService: EventService,
+    private translationService: TranslationService,
   ) {}
 
   ngOnInit(): void {
-  window.addEventListener('map-marker-clicked', (event: any) => {
-    this.ngZone.run(() => {
-      this.selectedItem = event.detail.data;
-      this.selectedType = event.detail.type;
-      this.cdr.detectChanges();
+    window.addEventListener('map-marker-clicked', (event: any) => {
+      this.ngZone.run(() => {
+        this.selectedItem = event.detail.data;
+        this.selectedType = event.detail.type;
+        this.cdr.detectChanges();
+      });
     });
-  });
-}
+  }
 
   ngAfterViewInit(): void {
-  const state = history.state;
-  const lat = state?.lat ?? 42.424;
-  const lng = state?.lng ?? 18.771;
-  const zoom = state?.zoom ?? 13;
+    const state = history.state;
+    const lat = state?.lat ?? 42.424;
+    const lng = state?.lng ?? 18.771;
+    const zoom = state?.zoom ?? 13;
 
-  this.mapService.initMap('main-map', lat, lng, zoom);
-  this.loadAllData(state);  // prosledi state
+    this.mapService.initMap('main-map', lat, lng, zoom);
+    this.loadAllData(state);
 
-  const map = this.mapService['map'];
-  if (map) {
-    map.on('click', () => this.closeCard());
+    const map = (this.mapService as any).map;
+    if (map) {
+      map.on('click', () => this.closeCard());
+    }
   }
-}
 
   ngOnDestroy(): void {
     window.removeEventListener('map-marker-clicked', this.markerClickHandler);
     this.mapService.destroyMap();
   }
 
-  // ── Marker click handler ──────────────────────────────────────────────────
   private markerClickHandler = (event: any) => {
     this.ngZone.run(() => {
       this.selectedItem = event.detail.data;
@@ -74,73 +76,70 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   closeCard(): void {
-  this.selectedItem = null;
-  this.selectedType = '';
+    this.selectedItem = null;
+    this.selectedType = '';
 
-  // Vrati active custom marker
-  const activeKey = (window as any).activeMarkerKey;
-  if (activeKey) {
-    const found = this.mapService['markerMap']?.get(activeKey);
-    if (found && !this.mapService['map']?.hasLayer(found.marker)) {
-      found.marker.addTo(this.mapService['map']);
+    const activeKey = (window as any).activeMarkerKey;
+    if (activeKey) {
+      const found = (this.mapService as any).markerMap?.get(activeKey);
+      if (found && !(this.mapService as any).map?.hasLayer(found.marker)) {
+        found.marker.addTo((this.mapService as any).map);
+      }
+      (window as any).activeMarkerKey = null;
     }
-    (window as any).activeMarkerKey = null;
+
+    const regularMarker = (window as any).currentRegularMarker;
+    if (regularMarker) {
+      regularMarker.remove();
+      (window as any).currentRegularMarker = null;
+    }
+
+    this.cdr.detectChanges();
   }
 
-  // Ukloni regularni pin
-  const regularMarker = (window as any).currentRegularMarker;
-  if (regularMarker) {
-    regularMarker.remove();
-    (window as any).currentRegularMarker = null;
-  }
-
-  this.cdr.detectChanges();
-}
-
-  // ── Data loading ──────────────────────────────────────────────────────────
   private loadAllData(state?: any): void {
-  forkJoin({
-    destinations: this.destinationService.getAll(),
-    objects: this.objectService.getAll(),
-    events: this.eventService.getAll(),
-  }).subscribe({
-    next: ({ destinations, objects, events }) => {
-      const destinationList = this.toArray<any>(destinations);
-      const objectList = this.toArray<any>(objects);
-      const eventList = this.toArray<any>(events);
+    forkJoin({
+      destinations: this.destinationService.getAll(),
+      objects: this.objectService.getAll(),
+      events: this.eventService.getAll(),
+    }).subscribe({
+      next: ({ destinations, objects, events }) => {
+        const destinationList = this.toArray<any>(destinations);
+        const objectList = this.toArray<any>(objects);
+        const eventList = this.toArray<any>(events);
 
-      destinationList.forEach(d => {
-        if (d.latitude && d.longitude)
-          this.mapService.addMarkerWithType(d.latitude, d.longitude, 'destination', d);
-      });
+        destinationList.forEach((destination) => {
+          if (destination.latitude && destination.longitude) {
+            this.mapService.addMarkerWithType(destination.latitude, destination.longitude, 'destination', destination);
+          }
+        });
 
-      objectList.forEach(obj => {
-        if (obj.latitude && obj.longitude) {
-          const type = this.getObjectType(obj.objectTypeName || '');
-          this.mapService.addMarkerWithType(obj.latitude, obj.longitude, type, obj);
+        objectList.forEach((obj) => {
+          if (obj.latitude && obj.longitude) {
+            const type = this.getObjectType(obj.objectTypeName || '');
+            this.mapService.addMarkerWithType(obj.latitude, obj.longitude, type, obj);
+          }
+        });
+
+        eventList.forEach((event) => {
+          if (event.latitude && event.longitude) {
+            this.mapService.addMarkerWithType(event.latitude, event.longitude, 'event', event);
+          }
+        });
+
+        if (state?.selectedItem) {
+          setTimeout(() => {
+            this.ngZone.run(() => {
+              const type = state.selectedType || 'object';
+              this.mapService.triggerMarkerClick(type, state.selectedItem.id, state.zoom ?? 16);
+              this.cdr.detectChanges();
+            });
+          }, 100);
         }
-      });
-
-      eventList.forEach(e => {
-        if (e.latitude && e.longitude)
-          this.mapService.addMarkerWithType(e.latitude, e.longitude, 'event', e);
-      });
-
-      // Nakon što su svi markeri učitani, simuliraj klik ako smo došli sa detalja
-       if (state?.selectedItem) {
-    setTimeout(() => {
-      this.ngZone.run(() => {
-        const type = state.selectedType || 'object';
-        console.log('About to trigger, markerMap size:', this.mapService['markerMap'].size);
-this.mapService.triggerMarkerClick(type, state.selectedItem.id, state.zoom ?? 16);
-        this.cdr.detectChanges();
-      });
-    }, 100);
-}
-    },
-    error: err => console.error('❌ Greška pri učitavanju podataka:', err),
-  });
-}
+      },
+      error: (err) => console.error('Failed to load map data:', err),
+    });
+  }
 
   private toArray<T>(response: any): T[] {
     if (Array.isArray(response)) return response;
@@ -150,19 +149,16 @@ this.mapService.triggerMarkerClick(type, state.selectedItem.id, state.zoom ?? 16
   }
 
   private getObjectType(name: string): any {
-    const n = name.toLowerCase();
-    if (n.includes('hotel')) return 'hotel';
-    if (n.includes('restoran')) return 'restaurant';
-    if (n.includes('kafana')) return 'kafana';
+    const normalized = name.toLowerCase();
+    if (normalized.includes('hotel')) return 'hotel';
+    if (normalized.includes('restoran')) return 'restaurant';
+    if (normalized.includes('kafana')) return 'kafana';
     return 'restaurant';
   }
 
-  // ── Card helpers ──────────────────────────────────────────────────────────
   getItemImage(): string {
     if (!this.selectedItem) return '';
-    return this.selectedItem.mainImageUrl
-      || this.selectedItem.images?.[0]?.url
-      || '';
+    return this.selectedItem.mainImageUrl || this.selectedItem.images?.[0]?.url || '';
   }
 
   getItemLocation(): string {
@@ -172,32 +168,30 @@ this.mapService.triggerMarkerClick(type, state.selectedItem.id, state.zoom ?? 16
       return this.selectedItem.destinationTypeName ?? '';
     }
 
-    const parts = [
-      this.selectedItem.localityName,
-      this.selectedItem.destinationName,
-    ].filter(Boolean);
-
+    const parts = [this.selectedItem.localityName, this.selectedItem.destinationName].filter(Boolean);
     return parts.join(', ');
-}
+  }
 
-  // Returns true=open, false=closed, null=no working hours
   getWorkingStatus(): boolean | null {
-    const wh = this.selectedItem?.workingHours;
-    if (!wh) return null;
+    const workingHours = this.selectedItem?.workingHours;
+    if (!workingHours) return null;
+
     try {
-      const parsed = typeof wh === 'string' ? JSON.parse(wh) : wh;
+      const parsed = typeof workingHours === 'string' ? JSON.parse(workingHours) : workingHours;
       const days = ['ned', 'pon', 'uto', 'sri', 'cet', 'pet', 'sub'];
       const today = days[new Date().getDay()];
       const hours = parsed[today] || parsed['pon'];
       if (!hours || hours === '00:00-24:00') return true;
+
       const [open, close] = hours.split('-');
       const now = new Date();
-      const cur = now.getHours() * 60 + now.getMinutes();
-      const toMin = (t: string) => {
-        const [h, m] = t.split(':').map(Number);
-        return h * 60 + m;
+      const current = now.getHours() * 60 + now.getMinutes();
+      const toMinutes = (value: string) => {
+        const [hoursPart, minutesPart] = value.split(':').map(Number);
+        return hoursPart * 60 + minutesPart;
       };
-      return cur >= toMin(open) && cur <= toMin(close);
+
+      return current >= toMinutes(open) && current <= toMinutes(close);
     } catch {
       return null;
     }
@@ -215,11 +209,7 @@ this.mapService.triggerMarkerClick(type, state.selectedItem.id, state.zoom ?? 16
         this.router.navigate(['/destination', this.selectedItem.id]);
         break;
       case 'hotel':
-        this.router.navigate(['/object', this.selectedItem.id]);
-        break;
       case 'restaurant':
-        this.router.navigate(['/object', this.selectedItem.id]);
-        break;
       case 'kafana':
         this.router.navigate(['/object', this.selectedItem.id]);
         break;
@@ -227,48 +217,50 @@ this.mapService.triggerMarkerClick(type, state.selectedItem.id, state.zoom ?? 16
         this.router.navigate(['/event', this.selectedItem.id]);
         break;
       default:
-        // Ruta ne postoji — ostani na mapi
         break;
     }
-}
+  }
 
-  // ── Map controls ──────────────────────────────────────────────────────────
   centerOnMyLocation(): void {
     if (!navigator.geolocation) {
-      alert('Geolocation nije podržana u ovom browseru.');
+      alert(this.translationService.translate('map.geoUnsupported'));
       return;
     }
 
     navigator.geolocation.getCurrentPosition(
-      pos => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
 
-        // Leti na lokaciju
         this.mapService.flyTo(lat, lng, 16);
 
-        // Sačuvaj na backendu ako je korisnik ulogovan
         if (this.authService.isLoggedIn()) {
           this.authService.updateMyLocation(lat, lng).subscribe({
-            error: err => console.error('Failed to update location:', err)
+            error: (err) => console.error('Failed to update location:', err),
           });
         }
       },
-      err => {
+      (err) => {
         switch (err.code) {
           case err.PERMISSION_DENIED:
-            alert('Dozvolite pristup lokaciji u podešavanjima browsera.');
+            alert(this.translationService.translate('map.geoDenied'));
             break;
           case err.POSITION_UNAVAILABLE:
-            alert('Lokacija trenutno nije dostupna.');
+            alert(this.translationService.translate('map.geoUnavailable'));
             break;
           default:
-            alert('Nije moguće dobiti vašu lokaciju.');
+            alert(this.translationService.translate('map.geoFailed'));
         }
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 10000 },
     );
   }
-  zoomIn(): void { (this.mapService as any)['map']?.zoomIn(); }
-  zoomOut(): void { (this.mapService as any)['map']?.zoomOut(); }
+
+  zoomIn(): void {
+    (this.mapService as any).map?.zoomIn();
+  }
+
+  zoomOut(): void {
+    (this.mapService as any).map?.zoomOut();
+  }
 }

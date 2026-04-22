@@ -6,15 +6,17 @@ import { environment } from '../../../environment/environment';
 import { AuthService, UserDto } from '../../services/auth';
 import { FavoriteService } from '../../services/favorite';
 import { ReviewDto, ReviewService } from '../../services/review';
+import { TranslationService } from '../../services/translation.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 interface ProfileStat {
-  label: string;
+  labelKey: string;
   value: string | number;
   icon: string;
 }
 
 interface ProfileAction {
-  title: string;
+  titleKey: string;
   icon: string;
   accent: 'teal' | 'blue' | 'green' | 'gray' | 'red';
   route?: string;
@@ -22,14 +24,14 @@ interface ProfileAction {
 }
 
 interface ProfileSection {
-  title: string;
+  titleKey: string;
   items: ProfileAction[];
 }
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
@@ -38,44 +40,42 @@ export class ProfileComponent implements OnInit {
   private readonly favoriteService = inject(FavoriteService);
   private readonly reviewService = inject(ReviewService);
   private readonly router = inject(Router);
-
-  protected readonly editLabel = 'Uredi';
-  protected readonly activityLabel = 'Aktivan nalog';
+  private readonly translationService = inject(TranslationService);
 
   protected user: UserDto | null = null;
   protected stats: ProfileStat[] = [
-    { label: 'FAVORITES', value: 0, icon: 'heart' },
-    { label: 'RECENZIJE', value: 0, icon: 'star' },
+    { labelKey: 'profile.stats.favorites', value: 0, icon: 'heart' },
+    { labelKey: 'profile.stats.reviews', value: 0, icon: 'star' },
   ];
 
   protected readonly sections: ProfileSection[] = [
     {
-      title: 'MOJA PUTOVANJA',
+      titleKey: 'profile.section.trips',
       items: [
-        { title: 'Favorites', icon: 'heart', accent: 'teal', route: '/favorites' },
-        { title: 'Moje recenzije', icon: 'star', accent: 'blue', route: '/my-reviews' },
+        { titleKey: 'profile.favorites', icon: 'heart', accent: 'teal', route: '/favorites' },
+        { titleKey: 'profile.myReviews', icon: 'star', accent: 'blue', route: '/my-reviews' },
       ],
     },
     {
-      title: 'PODESAVANJA',
+      titleKey: 'profile.section.settings',
       items: [
-        { title: 'Jezik', icon: 'language', accent: 'green', route: '/language' },
-        { title: 'Pomoc i podrska', icon: 'help', accent: 'gray', route: '/support' },
+        { titleKey: 'profile.language', icon: 'language', accent: 'green', route: '/language' },
+        { titleKey: 'profile.support', icon: 'help', accent: 'gray', route: '/support' },
       ],
     },
     {
-      title: 'NALOG',
+      titleKey: 'profile.section.account',
       items: [
-        { title: 'Privatnost i podaci', icon: 'shield', accent: 'blue', route: '/privacy-data' },
-        { title: 'Uslovi koriscenja', icon: 'document', accent: 'gray', route: '/terms' },
+        { titleKey: 'profile.privacy', icon: 'shield', accent: 'blue', route: '/privacy-data' },
+        { titleKey: 'profile.terms', icon: 'document', accent: 'gray', route: '/terms' },
         {
-          title: 'Zatrazi dozvolu za moderatora',
+          titleKey: 'profile.moderator',
           icon: 'document',
           accent: 'gray',
           route: '/moderator-access',
         },
-        { title: 'O nama', icon: 'document', accent: 'gray', route: '/about' },
-        { title: 'Odjavi se', icon: 'logout', accent: 'red', action: 'logout' },
+        { titleKey: 'profile.about', icon: 'document', accent: 'gray', route: '/about' },
+        { titleKey: 'profile.logout', icon: 'logout', accent: 'red', action: 'logout' },
       ],
     },
   ];
@@ -104,11 +104,19 @@ export class ProfileComponent implements OnInit {
     const first = this.user?.firstName?.trim() ?? '';
     const last = this.user?.lastName?.trim() ?? '';
     const fullName = `${first} ${last}`.trim();
-    return fullName || 'SpireGO korisnik';
+    return fullName || this.translationService.translate('profile.defaultUser');
   }
 
   protected get email(): string {
-    return this.user?.email?.trim() || 'Email nije dostupan';
+    return this.user?.email?.trim() || this.translationService.translate('common.emailNotAvailable');
+  }
+
+  protected get editLabel(): string {
+    return this.translationService.translate('profile.edit');
+  }
+
+  protected get activityLabel(): string {
+    return this.translationService.translate('profile.activeAccount');
   }
 
   protected get profileImageUrl(): string {
@@ -142,15 +150,15 @@ export class ProfileComponent implements OnInit {
   }
 
   protected trackSection(_: number, section: ProfileSection): string {
-    return section.title;
+    return section.titleKey;
   }
 
   protected trackItem(_: number, item: ProfileAction): string {
-    return item.title;
+    return item.titleKey;
   }
 
   protected trackStat(_: number, stat: ProfileStat): string {
-    return stat.label;
+    return stat.labelKey;
   }
 
   private loadStats(currentUserId: number): void {
@@ -169,8 +177,8 @@ export class ProfileComponent implements OnInit {
       ),
     }).subscribe(({ favorites, reviews }) => {
       this.stats = [
-        { label: 'FAVORITES', value: favorites, icon: 'heart' },
-        { label: 'RECENZIJE', value: reviews, icon: 'star' },
+        { labelKey: 'profile.stats.favorites', value: favorites, icon: 'heart' },
+        { labelKey: 'profile.stats.reviews', value: reviews, icon: 'star' },
       ];
     });
   }

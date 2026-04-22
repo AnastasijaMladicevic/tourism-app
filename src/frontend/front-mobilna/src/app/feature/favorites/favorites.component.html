@@ -1,21 +1,19 @@
 <div class="favorites-page">
   <header class="favorites-topbar">
-    <a class="back-btn" routerLink="/profile" aria-label="Nazad">
+    <a class="back-btn" routerLink="/profile" [attr.aria-label]="'common.back' | translate">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="m15 18-6-6 6-6" />
       </svg>
     </a>
-    <h1>Favorites</h1>
+    <h1>{{ 'nav.favorites' | translate }}</h1>
     <div class="topbar-spacer" aria-hidden="true"></div>
   </header>
 
   <div class="favorites-shell">
     <section class="hero-card">
-      <span class="eyebrow">SACUVANO</span>
-      <h2>Tvoje omiljene stavke su na jednom mestu.</h2>
-      <p>
-        Pregledaj sve sto si sacuvao i brzo ukloni stavke koje vise ne zelis da cuvas.
-      </p>
+      <span class="eyebrow">{{ 'favorites.heroEyebrow' | translate }}</span>
+      <h2>{{ 'favorites.heroTitle' | translate }}</h2>
+      <p>{{ 'favorites.heroBody' | translate }}</p>
     </section>
 
     @if (errorMessage()) {
@@ -24,13 +22,13 @@
 
     @if (isLoading()) {
       <section class="state-card">
-        <strong>Ucitavanje...</strong>
-        <p>Pripremamo tvoje sacuvane stavke.</p>
+        <strong>{{ 'common.loading' | translate }}</strong>
+        <p>{{ 'favorites.loadingBody' | translate }}</p>
       </section>
     } @else if (!favorites().length) {
       <section class="state-card">
-        <strong>Nemas sacuvanih stavki</strong>
-        <p>Kada sacuvas destinaciju ili objekat, ovde ce se pojaviti.</p>
+        <strong>{{ 'favorites.emptyTitle' | translate }}</strong>
+        <p>{{ 'favorites.emptyBody' | translate }}</p>
       </section>
     } @else {
       <section class="favorites-list">
@@ -39,7 +37,7 @@
             <div class="favorite-card__content">
               <span class="type-badge">{{ item.typeLabel }}</span>
               <h3>{{ item.title }}</h3>
-              <p>Sacuvano: {{ item.createdLabel }}</p>
+              <p>{{ 'common.savedOn' | translate }}: {{ item.createdLabel }}</p>
             </div>
 
             <button
@@ -48,7 +46,7 @@
               [disabled]="isRemoving() === item.id"
               (click)="removeFavorite(item.id)"
             >
-              {{ isRemoving() === item.id ? 'Uklanjanje...' : 'Ukloni' }}
+              {{ isRemoving() === item.id ? ('favorites.removing' | translate) : ('common.remove' | translate) }}
             </button>
           </article>
         }

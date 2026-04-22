@@ -7,25 +7,22 @@
         <img src="assets/minilogo.svg" alt="SpireGO logo" />
         <div class="brand-copy">
           <strong>SpireGO</strong>
-          <span>Verzija 2.4.0</span>
+          <span>{{ 'about.version' | translate }}</span>
         </div>
       </div>
 
-      <blockquote class="mission-quote">
-        "Nasa misija je da svakom putniku pruzimo autenticno iskustvo Crne Gore, od skrivenih plaza
-        na jugu do netaknutih planinskih vrhova na sjeveru."
-      </blockquote>
+      <blockquote class="mission-quote">{{ 'about.quote' | translate }}</blockquote>
     </section>
 
     <section class="section-block">
-      <h2>Informacije i podrska</h2>
+      <h2>{{ 'about.supportTitle' | translate }}</h2>
 
       <div class="link-list">
         <a class="info-card" [routerLink]="['/privacy-data']" [queryParams]="{ returnTo: '/about' }">
           <div class="info-card__icon">🛡</div>
           <div class="info-card__body">
-            <strong>Politika privatnosti</strong>
-            <span>Kako stitimo vase podatke</span>
+            <strong>{{ 'about.privacy' | translate }}</strong>
+            <span>{{ 'about.privacyBody' | translate }}</span>
           </div>
           <div class="info-card__chevron">›</div>
         </a>
@@ -33,8 +30,8 @@
         <a class="info-card" [routerLink]="['/terms']" [queryParams]="{ returnTo: '/about' }">
           <div class="info-card__icon">📄</div>
           <div class="info-card__body">
-            <strong>Uslovi koriscenja</strong>
-            <span>Pravila koriscenja aplikacije</span>
+            <strong>{{ 'about.terms' | translate }}</strong>
+            <span>{{ 'about.termsBody' | translate }}</span>
           </div>
           <div class="info-card__chevron">›</div>
         </a>
@@ -42,8 +39,8 @@
         <a class="info-card" [routerLink]="['/support']" [queryParams]="{ returnTo: '/about' }">
           <div class="info-card__icon">✉</div>
           <div class="info-card__body">
-            <strong>Kontaktirajte nas</strong>
-            <span>Pitanja, sugestije ili problemi</span>
+            <strong>{{ 'about.contact' | translate }}</strong>
+            <span>{{ 'about.contactBody' | translate }}</span>
           </div>
           <div class="info-card__chevron">›</div>
         </a>
@@ -51,11 +48,11 @@
     </section>
 
     <footer class="about-footer">
-      <p>Napravljeno sa srcem u Crnoj Gori</p>
+      <p>{{ 'about.footerMade' | translate }}</p>
       <div class="about-footer__meta">
         <span>SpireGO v2.4</span>
       </div>
-      <small>© 2026 Montenegro Guide d.o.o. Sva prava zadrzana.</small>
+      <small>© 2026 Montenegro Guide d.o.o. {{ 'about.footerRights' | translate }}</small>
     </footer>
   </div>
 </div>

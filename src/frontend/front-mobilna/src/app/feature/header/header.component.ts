@@ -1,14 +1,15 @@
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   template: `
     <div class="header">
       @if (backLink) {
-        <a [routerLink]="backLink" class="back-btn" aria-label="Nazad">
+        <a [routerLink]="backLink" class="back-btn" [attr.aria-label]="'common.back' | translate">
           <svg
             width="20"
             height="20"

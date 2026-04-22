@@ -3,27 +3,29 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import { AuthService, UserDto } from '../../services/auth';
+import { TranslationService } from '../../services/translation.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 interface LanguageOption {
   code: string;
-  label: string;
-  subtitle?: string;
+  labelKey: string;
 }
 
 @Component({
   selector: 'app-language',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './language.component.html',
   styleUrl: './language.component.scss',
 })
 export class LanguageComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly translationService = inject(TranslationService);
 
   protected readonly options: LanguageOption[] = [
-    { code: 'en', label: 'English' },
-    { code: 'sr', label: 'Crnogorski / Srpski' },
+    { code: 'en', labelKey: 'language.english' },
+    { code: 'sr', labelKey: 'language.serbian' },
   ];
 
   protected readonly selectedCode = signal('sr');
@@ -71,7 +73,7 @@ export class LanguageComponent implements OnInit {
 
     const selected = this.selectedCode();
     if (selected === this.appliedCode()) {
-      this.feedback.set('Jezik je već aktivan.');
+      this.feedback.set(this.translationService.translate('language.active'));
       return;
     }
 
@@ -83,7 +85,7 @@ export class LanguageComponent implements OnInit {
       .pipe(
         catchError((error) => {
           const message = (error as { error?: { message?: string } })?.error?.message;
-          this.feedback.set(message || 'Promena jezika nije sačuvana.');
+          this.feedback.set(message || this.translationService.translate('language.saveFailed'));
           return of(null);
         }),
         finalize(() => {
@@ -94,9 +96,10 @@ export class LanguageComponent implements OnInit {
         if (!user) return;
         this.user = user;
         const applied = this.normalizeLanguage(user.language);
+        this.translationService.setLanguage(applied);
         this.selectedCode.set(applied);
         this.appliedCode.set(applied);
-        this.feedback.set('Jezik je uspešno ažuriran.');
+        this.feedback.set(this.translationService.translate('language.saved'));
       });
   }
 
@@ -106,6 +109,12 @@ export class LanguageComponent implements OnInit {
 
   protected canApply(): boolean {
     return !this.isSaving() && this.selectedCode() !== this.appliedCode();
+  }
+
+  protected getSelectedLanguageLabel(): string {
+    return this.translationService.translate(
+      this.selectedCode() === 'en' ? 'language.english' : 'language.serbian',
+    );
   }
 
   private normalizeLanguage(language?: string | null): string {

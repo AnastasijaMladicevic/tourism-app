@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-privacy-data',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './privacy-data.component.html',
   styleUrl: './privacy-data.component.scss',
 })
@@ -14,26 +15,10 @@ export class PrivacyDataComponent {
 
   protected readonly backLink = this.route.snapshot.queryParamMap.get('returnTo') || '/profile';
   protected readonly sections = [
-    {
-      title: 'Podaci naloga',
-      body:
-        'Na mobilnom frontendu trenutno prikazujemo osnovne podatke naloga kao sto su ime, prezime, email, telefon, drzava i fotografija profila.',
-    },
-    {
-      title: 'Lokalno sacuvani podaci',
-      body:
-        'Planer putovanja i interesovanja mogu biti sacuvani lokalno na uredjaju, bez slanja novih podataka na backend.',
-    },
-    {
-      title: 'Kako prijaviti izmenu',
-      body:
-        'Ako zelis ispravku podataka ili dodatna objasnjenja, koristi ekran Pomoc i podrska ili kontakt adresu navedenu u aplikaciji.',
-    },
+    { titleKey: 'privacy.section.1.title', bodyKey: 'privacy.section.1.body' },
+    { titleKey: 'privacy.section.2.title', bodyKey: 'privacy.section.2.body' },
+    { titleKey: 'privacy.section.3.title', bodyKey: 'privacy.section.3.body' },
   ];
 
-  protected readonly notes = [
-    'Frontend deo ne upravlja brisanjem naloga ni eksportom podataka bez backend podrske.',
-    'Profilna fotografija i izmene osnovnih podataka koriste postojece API rute koje su vec dostupne.',
-    'Za osetljive nalog akcije potrebno je dodatno backend resenje i dozvole.',
-  ];
+  protected readonly noteKeys = ['privacy.note.1', 'privacy.note.2', 'privacy.note.3'];
 }
