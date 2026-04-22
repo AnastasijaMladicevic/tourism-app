@@ -1,54 +1,51 @@
 <div class="moderator-page">
   <header class="moderator-topbar">
-    <a class="back-btn" routerLink="/profile" aria-label="Nazad">
+    <a class="back-btn" routerLink="/profile" [attr.aria-label]="'common.back' | translate">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="m15 18-6-6 6-6" />
       </svg>
     </a>
-    <h1>Pristup moderatoru</h1>
+    <h1>{{ 'moderator.title' | translate }}</h1>
     <div class="topbar-spacer" aria-hidden="true"></div>
   </header>
 
   <div class="moderator-shell">
     <section class="hero-card">
       <div class="hero-copy">
-        <span class="eyebrow">POSEBNA ULOGA</span>
-        <h2>Pošaljite zahtev za pristup moderatorskim opcijama</h2>
-        <p>
-          Ako želite veću ulogu u održavanju kvaliteta sadržaja, ovde možete poslati zahtev koji
-          administracija naknadno proverava i odobrava.
-        </p>
+        <span class="eyebrow">{{ 'moderator.eyebrow' | translate }}</span>
+        <h2>{{ 'moderator.heroTitle' | translate }}</h2>
+        <p>{{ 'moderator.heroBody' | translate }}</p>
       </div>
 
       <aside class="status-card">
-        <span class="status-card__label">Trenutni status</span>
+        <span class="status-card__label">{{ 'moderator.currentStatus' | translate }}</span>
         <strong>{{ statusBadge() }}</strong>
-        <p>Vaša aktivna uloga: {{ roleLabel() }}</p>
+        <p>{{ 'moderator.currentRole' | translate: { role: roleLabel() } }}</p>
       </aside>
     </section>
 
     <div class="content-grid">
       <section class="info-card">
-        <h3>Šta dobijate</h3>
+        <h3>{{ 'moderator.whatYouGet' | translate }}</h3>
 
         <div class="bullet-list">
-          @for (item of responsibilities; track item) {
+          @for (item of responsibilityKeys; track item) {
             <div class="bullet-row">
               <span class="bullet-dot"></span>
-              <p>{{ item }}</p>
+              <p>{{ item | translate }}</p>
             </div>
           }
         </div>
       </section>
 
       <section class="info-card info-card--soft">
-        <h3>Uslovi za prijavu</h3>
+        <h3>{{ 'moderator.requirements' | translate }}</h3>
 
         <div class="bullet-list">
-          @for (item of requirements; track item) {
+          @for (item of requirementKeys; track item) {
             <div class="bullet-row">
               <span class="bullet-dot bullet-dot--muted"></span>
-              <p>{{ item }}</p>
+              <p>{{ item | translate }}</p>
             </div>
           }
         </div>
@@ -57,15 +54,12 @@
 
     <section class="request-card">
       <div class="request-card__copy">
-        <h3>Pošaljite zahtev</h3>
-        <p>
-          Klikom na dugme šaljete zahtev timu za proveru. Nakon obrade, pristup će biti odobren ili
-          odbijen u skladu sa pravilima platforme.
-        </p>
+        <h3>{{ 'moderator.sendRequestTitle' | translate }}</h3>
+        <p>{{ 'moderator.sendRequestBody' | translate }}</p>
       </div>
 
       <button class="request-btn" type="button" [disabled]="!canRequest()" (click)="submitRequest()">
-        {{ isSubmitting() ? 'Slanje zahteva...' : 'Pošalji zahtev' }}
+        {{ isSubmitting() ? ('moderator.submitting' | translate) : ('moderator.sendRequest' | translate) }}
       </button>
     </section>
 

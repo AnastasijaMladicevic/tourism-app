@@ -1,6 +1,89 @@
 import { Routes } from '@angular/router';
 import { profileAuthGuard } from './guards/profile-auth.guard';
 
+const objectTypeRoutes: Routes = [
+  {
+    path: 'objects/hotels',
+    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
+    data: { type: 'Hotel', title: 'Hotels' },
+  },
+  {
+    path: 'objects/restaurants',
+    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
+    data: { type: 'Restoran', title: 'Restaurants' },
+  },
+  {
+    path: 'objects/kafane',
+    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
+    data: { type: 'Kafana', title: 'Kafane' },
+  },
+  {
+    path: 'objects/planinarski-domovi',
+    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
+    data: { type: 'Planinarski dom', title: 'Planinarski domovi' },
+  },
+  {
+    path: 'objects/apartments',
+    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
+    data: { type: 'Apartman', title: 'Apartments' },
+  },
+  {
+    path: 'objects/spa-centers',
+    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
+    data: { type: 'Spa Centar', title: 'Spa centers' },
+  },
+  {
+    path: 'objects/monuments',
+    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
+    data: { type: 'Spomenik', title: 'Monuments' },
+  },
+  {
+    path: 'objects/museums',
+    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
+    data: { type: 'Muzej', title: 'Museums' },
+  },
+  {
+    path: 'objects/galleries',
+    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
+    data: { type: 'Galerija', title: 'Galleries' },
+  },
+  {
+    path: 'objects/cafes',
+    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
+    data: { type: 'Kafic', title: 'Cafes' },
+  },
+  {
+    path: 'objects/bars',
+    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
+    data: { type: 'Bar', title: 'Bars' },
+  },
+  {
+    path: 'objects/pensions',
+    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
+    data: { type: 'Pansion', title: 'Pensions' },
+  },
+  {
+    path: 'objects/churches',
+    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
+    data: { type: 'Crkva', title: 'Churches' },
+  },
+  {
+    path: 'objects/monasteries',
+    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
+    data: { type: 'Manastir', title: 'Monasteries' },
+  },
+  {
+    path: 'objects/sports-centers',
+    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
+    data: { type: 'Sportski centar', title: 'Sports centers' },
+  },
+  {
+    path: 'objects/wellness-centers',
+    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
+    data: { type: 'Wellness centar', title: 'Wellness centers' },
+  },
+];
+
 export const routes: Routes = [
   {
     path: '',
@@ -50,10 +133,16 @@ export const routes: Routes = [
   },
   {
     path: 'moderator-access',
-    canActivate: [profileAuthGuard],
     loadComponent: () =>
-      import('./feature/moderator-access/moderator-access.component').then(
-        (m) => m.ModeratorAccessComponent,
+      import('./feature/moderator-access-preview/moderator-access-preview.component').then(
+        (m) => m.ModeratorAccessPreviewComponent,
+      ),
+  },
+  {
+    path: 'moderator-access-preview',
+    loadComponent: () =>
+      import('./feature/moderator-access-preview/moderator-access-preview.component').then(
+        (m) => m.ModeratorAccessPreviewComponent,
       ),
   },
   {
@@ -106,6 +195,7 @@ export const routes: Routes = [
     loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
     data: { type: null, title: 'Places' },
   },
+  ...objectTypeRoutes,
   {
     path: 'events',
     loadComponent: () => import('./feature/events/events').then((m) => m.EventsComponent),
@@ -131,16 +221,19 @@ export const routes: Routes = [
       import('./feature/favorites/favorites.component').then((m) => m.FavoritesComponent),
   },
   {
-    path: 'saved',
-    canActivate: [profileAuthGuard],
-    loadComponent: () =>
-      import('./feature/favorites/favorites.component').then((m) => m.FavoritesComponent),
-  },
-  {
     path: 'my-reviews',
     canActivate: [profileAuthGuard],
     loadComponent: () =>
-      import('./feature/my-reviews/my-reviews.component').then((m) => m.MyReviewsComponent),
+      import('./feature/my-reviews-preview/my-reviews-preview.component').then(
+        (m) => m.MyReviewsPreviewComponent,
+      ),
+  },
+  {
+    path: 'my-reviews-preview',
+    loadComponent: () =>
+      import('./feature/my-reviews-preview/my-reviews-preview.component').then(
+        (m) => m.MyReviewsPreviewComponent,
+      ),
   },
   {
     path: 'privacy-data',
