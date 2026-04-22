@@ -112,7 +112,9 @@ export class EventDetailComponent implements OnInit {
       state: {
         lat: this.event.latitude,
         lng: this.event.longitude,
-        zoom: 16
+        zoom: 19,
+        selectedItem: this.event,         
+      selectedType: 'event'
       }
     });
   }

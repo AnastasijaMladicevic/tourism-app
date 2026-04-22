@@ -41,11 +41,11 @@ export class CodeVerificationComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private authService: AuthService,
   ) {
-    // history.state is the standard way to read router state in Angular 17+
-    this.email = history.state?.['email'] ?? '';
+    this.email = history.state?.email || '';
   }
 
   ngOnInit(): void {
+    
     this.startTimer();
   }
 
@@ -135,6 +135,7 @@ export class CodeVerificationComponent implements OnInit, OnDestroy {
     return this.otpValues.join('');
   }
   verifyCode(): void {
+    console.log(this.otpValues);
     if (!this.isOtpComplete) {
       this.errorMessage = 'Please enter all 6 digits.';
       return;
@@ -143,16 +144,31 @@ export class CodeVerificationComponent implements OnInit, OnDestroy {
       this.errorMessage = 'Code expired. Please resend.';
       return;
     }
+    const payload = {
+      email: this.email,
+      code: this.otpCode.trim()
+    };
+console.log('PAYLOAD:', payload);
     this.isLoading = true;
-    this.errorMessage = '';
+  this.errorMessage = '';   
+
+  this.authService.verifyResetCode(payload).subscribe({
+    next: (response: any) => {
+    this.isLoading = false;
     this.router.navigate(['/new-credentials'], {
-      state: {
-        email: this.email,
-        code: this.otpCode
+      queryParams: { email: this.email },
+      state: { 
+        code: this.otpCode,
+        resetSessionToken: response.resetSessionToken ?? response.token ?? response 
       }
     });
-
-    this.isLoading = false;
+  },
+    error: (err) => {
+      this.isLoading = false;
+      this.errorMessage = err?.error?.message ?? 'Invalid code';
+      console.log(err);
+    }
+  });
   }
 
   resendCode(): void {

@@ -32,6 +32,7 @@
           [value]="otpValues[$index]"
           (input)="onInput($event, $index)"
           (keydown)="onKeyDown($event, $index)"
+          (keydown.enter)="verifyCode()"
           [attr.aria-label]="'OTP digit ' + ($index + 1)"
         />
       }
