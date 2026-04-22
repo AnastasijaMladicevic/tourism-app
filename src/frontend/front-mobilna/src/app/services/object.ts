@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ReviewDto } from './review';
@@ -39,14 +39,36 @@ export interface ObjectView extends ObjectDto {
   favoriteId?: number;
 }
 
+export interface ObjectQueryParams {
+  type?: string;
+  destination?: string;
+  locality?: string;
+  status?: string;
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ObjectService {
   private url = `${environment.apiUrl}/objects`;
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<ObjectDto[]> {
-    return this.http.get<ObjectDto[]>(this.url);
+  getAll(query?: ObjectQueryParams): Observable<ObjectDto[]> {
+    let params = new HttpParams();
+
+    if (query) {
+      Object.entries(query).forEach(([key, value]) => {
+        if (value != null && value !== '') {
+          params = params.set(key, String(value));
+        }
+      });
+    }
+
+    return this.http.get<ObjectDto[]>(this.url, { params });
   }
 
   getById(id: number): Observable<ObjectDto> {

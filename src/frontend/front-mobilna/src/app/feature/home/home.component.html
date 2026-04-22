@@ -72,8 +72,8 @@
         <button class="see-all" type="button">See all ></button>
       </div>
       <div class="cards-row">
-        @for (card of filteredRecommended; track card.destinationId) {
-          <div class="place-card" (click)="openAttractions()">
+        @for (card of filteredRecommended; track card.itemType + '-' + card.itemId) {
+          <div class="place-card" (click)="openPlace(card)">
             <div
               class="place-img place-img--dynamic"
               [style.background-image]="cardBackground(card.imageUrl)"
@@ -143,8 +143,8 @@
         <button class="see-all" type="button">See all ></button>
       </div>
       <div class="cards-row">
-        @for (card of filteredPopular; track card.destinationId) {
-          <div class="place-card" (click)="openAttractions()">
+        @for (card of filteredPopular; track card.itemType + '-' + card.itemId) {
+          <div class="place-card" (click)="openPlace(card)">
             <div
               class="place-img place-img--dynamic"
               [style.background-image]="cardBackground(card.imageUrl)"
