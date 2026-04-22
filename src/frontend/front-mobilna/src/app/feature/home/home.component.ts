@@ -65,22 +65,12 @@ export class HomeComponent implements OnInit {
   userName = 'Alex Taylor';
   searchQuery = '';
   readonly categories: HomeCategory[] = [
-    { label: 'Hotels', route: '/objects/hotels', icon: 'hotel' },
-    { label: 'Restaurants', route: '/objects/restaurants', icon: 'restaurant' },
-    { label: 'Kafane', route: '/objects/kafane', icon: 'cafe' },
-    { label: 'Planinarski domovi', route: '/objects/planinarski-domovi', icon: 'mountain' },
-    { label: 'Apartments', route: '/objects/apartments', icon: 'home' },
-    { label: 'Spa centers', route: '/objects/spa-centers', icon: 'sparkles' },
-    { label: 'Monuments', route: '/objects/monuments', icon: 'monument' },
-    { label: 'Museums', route: '/objects/museums', icon: 'museum' },
-    { label: 'Galleries', route: '/objects/galleries', icon: 'gallery' },
-    { label: 'Cafes', route: '/objects/cafes', icon: 'cafe' },
-    { label: 'Bars', route: '/objects/bars', icon: 'bar' },
-    { label: 'Pensions', route: '/objects/pensions', icon: 'hotel' },
-    { label: 'Churches', route: '/objects/churches', icon: 'church' },
-    { label: 'Monasteries', route: '/objects/monasteries', icon: 'church' },
-    { label: 'Sports centers', route: '/objects/sports-centers', icon: 'sport' },
-    { label: 'Wellness centers', route: '/objects/wellness-centers', icon: 'sparkles' },
+    { label: 'Attractions', route: '/attractions', icon: 'monument' },
+    { label: 'Restorani', route: '/objects/restaurants', icon: 'restaurant' },
+    { label: 'Apartmani', route: '/objects/apartments', icon: 'home' },
+    { label: 'Hoteli', route: '/objects/hotels', icon: 'hotel' },
+    { label: 'Kafici', route: '/objects/cafes', icon: 'cafe' },
+    { label: 'Barovi', route: '/objects/bars', icon: 'bar' },
   ];
 
   recommended: PlaceCard[] = [];
