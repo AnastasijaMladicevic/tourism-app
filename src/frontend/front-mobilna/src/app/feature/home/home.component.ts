@@ -31,6 +31,12 @@ interface EventCard {
   imageUrl?: string;
 }
 
+interface HomeCategory {
+  label: string;
+  route: string;
+  icon: 'hotel' | 'restaurant' | 'cafe' | 'mountain' | 'home' | 'sparkles' | 'monument' | 'museum' | 'gallery' | 'bar' | 'church' | 'sport';
+}
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -41,6 +47,24 @@ interface EventCard {
 export class HomeComponent implements OnInit {
   userName = 'Alex Taylor';
   searchQuery = '';
+  readonly categories: HomeCategory[] = [
+    { label: 'Hotels', route: '/objects/hotels', icon: 'hotel' },
+    { label: 'Restaurants', route: '/objects/restaurants', icon: 'restaurant' },
+    { label: 'Kafane', route: '/objects/kafane', icon: 'cafe' },
+    { label: 'Planinarski domovi', route: '/objects/planinarski-domovi', icon: 'mountain' },
+    { label: 'Apartments', route: '/objects/apartments', icon: 'home' },
+    { label: 'Spa centers', route: '/objects/spa-centers', icon: 'sparkles' },
+    { label: 'Monuments', route: '/objects/monuments', icon: 'monument' },
+    { label: 'Museums', route: '/objects/museums', icon: 'museum' },
+    { label: 'Galleries', route: '/objects/galleries', icon: 'gallery' },
+    { label: 'Cafes', route: '/objects/cafes', icon: 'cafe' },
+    { label: 'Bars', route: '/objects/bars', icon: 'bar' },
+    { label: 'Pensions', route: '/objects/pensions', icon: 'hotel' },
+    { label: 'Churches', route: '/objects/churches', icon: 'church' },
+    { label: 'Monasteries', route: '/objects/monasteries', icon: 'church' },
+    { label: 'Sports centers', route: '/objects/sports-centers', icon: 'sport' },
+    { label: 'Wellness centers', route: '/objects/wellness-centers', icon: 'sparkles' },
+  ];
 
   recommended: PlaceCard[] = [];
   popular: PlaceCard[] = [];
@@ -462,6 +486,41 @@ export class HomeComponent implements OnInit {
 
   openHotels(): void {
     this.router.navigate(['/hotels']);
+  }
+
+  openCategory(category: HomeCategory): void {
+    this.router.navigateByUrl(category.route);
+  }
+
+  categoryIconPath(icon: HomeCategory['icon']): string {
+    switch (icon) {
+      case 'hotel':
+        return 'M4.5 19V6.75A1.75 1.75 0 0 1 6.25 5h11.5A1.75 1.75 0 0 1 19.5 6.75V19M2.75 19h18.5M8 9.25h3M13 9.25h3M8 12.75h3M13 12.75h3';
+      case 'restaurant':
+        return 'M7.25 4.5v7.25M5 4.5v4.25a2.25 2.25 0 0 0 4.5 0V4.5M14.5 4.5v14.75M14.5 9.25h3.75c.41 0 .75-.34.75-.75V6.75A2.25 2.25 0 0 0 16.75 4.5H14.5';
+      case 'cafe':
+        return 'M6 10.5h9.5a0 0 0 0 1 0 0v2.25A3.75 3.75 0 0 1 11.75 16.5H9.75A3.75 3.75 0 0 1 6 12.75V10.5A0 0 0 0 1 6 10.5Zm9.5.5h1A2.5 2.5 0 0 1 19 13.5h0A2.5 2.5 0 0 1 16.5 16h-1M8 5.5c0 1-1 1.5-1 2.5M11 5.5c0 1-1 1.5-1 2.5M14 5.5c0 1-1 1.5-1 2.5M6 19h11';
+      case 'mountain':
+        return 'M3.75 18.5 9.5 8.25l2.75 4.25 2-2.75 5 8.75M8.75 18.5h10.5';
+      case 'home':
+        return 'M4.75 10.25 12 4.5l7.25 5.75V18a1 1 0 0 1-1 1h-3.5v-5.25h-5.5V19h-3.5a1 1 0 0 1-1-1v-7.75Z';
+      case 'sparkles':
+        return 'M12 4.5 13.2 8.1 16.8 9.3 13.2 10.5 12 14.1 10.8 10.5 7.2 9.3 10.8 8.1 12 4.5Zm5 8 0.7 2.1 2.1 0.7-2.1 0.7-.7 2.1-.7-2.1-2.1-.7 2.1-.7.7-2.1ZM6.5 13.5l0.8 2.3 2.2 0.8-2.2 0.7-.8 2.3-.7-2.3-2.3-.7 2.3-.8.7-2.3Z';
+      case 'monument':
+        return 'M6 19h12M8 19V9.25h8V19M7 9.25h10L12 5 7 9.25Zm2.5 3v4.5M12 12.25v4.5M14.5 12.25v4.5';
+      case 'museum':
+        return 'M4.5 8.75 12 5l7.5 3.75M5.75 10.25h12.5M6.5 10.25V18M10 10.25V18M14 10.25V18M17.5 10.25V18M4.5 19h15';
+      case 'gallery':
+        return 'M5.25 6.25h13.5a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1H5.25a1 1 0 0 1-1-1v-9.5a1 1 0 0 1 1-1Zm2.5 2.5a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5Zm10 6.5-3.25-3.25-3 3-1.5-1.5-3 3';
+      case 'bar':
+        return 'M7 5.5h10l-3.25 5v3.75a1 1 0 0 0 .3.7l1.2 1.2V18.5h-6.5v-1.35l1.2-1.2a1 1 0 0 0 .3-.7V10.5L7 5.5Z';
+      case 'church':
+        return 'M12 4.25v3.5M10.25 6h3.5M6.5 19v-7.25h11V19M8.5 11.75V8.5L12 6l3.5 2.5v3.25M10.25 19v-3.75h3.5V19';
+      case 'sport':
+        return 'M7 18.5 10 12l2.25 3.25L17 5.5M6 8.5h3.25M13.5 18.5h4.5';
+      default:
+        return '';
+    }
   }
 
   private flushUi(): void {

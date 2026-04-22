@@ -32,105 +32,26 @@
     <div class="section">
       <h2 class="section-title">Categories</h2>
       <div class="categories">
-        <button class="category active" type="button" (click)="openAttractions()">
-          <div class="cat-icon">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-          </div>
-          <span>Attractions</span>
-        </button>
-
-        <button class="category" type="button">
-          <div class="cat-icon">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <polygon points="12 2 22 21 2 21" />
-            </svg>
-          </div>
-          <span>Activities</span>
-        </button>
-
-        <button class="category" type="button">
-          <div class="cat-icon">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <line x1="8" y1="6" x2="8" y2="18" />
-              <line x1="12" y1="3" x2="12" y2="18" />
-              <line x1="16" y1="6" x2="16" y2="18" />
-            </svg>
-          </div>
-          <span>Restaurants</span>
-        </button>
-
-        <button class="category" type="button" (click)="openEvents()">
-          <div class="cat-icon">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
-              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
-              <line x1="6" y1="1" x2="6" y2="4" />
-              <line x1="10" y1="1" x2="10" y2="4" />
-              <line x1="14" y1="1" x2="14" y2="4" />
-            </svg>
-          </div>
-          <span>Events</span>
-        </button>
-
-        <button class="category" type="button" (click)="openHotels()">
-          <div class="cat-icon">
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <rect x="3" y="3" width="7" height="7" />
-              <rect x="14" y="3" width="7" height="7" />
-              <rect x="3" y="14" width="7" height="7" />
-              <rect x="14" y="14" width="7" height="7" />
-            </svg>
-          </div>
-          <span>Hotels</span>
-        </button>
+        @for (category of categories; track category.route) {
+          <button class="category" type="button" (click)="openCategory(category)">
+            <div class="cat-icon">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path [attr.d]="categoryIconPath(category.icon)" />
+              </svg>
+            </div>
+            <span class="category-label">{{ category.label }}</span>
+          </button>
+        }
       </div>
     </div>
 
