@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-terms',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './terms.component.html',
   styleUrl: './terms.component.scss',
 })
@@ -14,26 +15,10 @@ export class TermsComponent {
 
   protected readonly backLink = this.route.snapshot.queryParamMap.get('returnTo') || '/profile';
   protected readonly sections = [
-    {
-      title: 'Koriscenje aplikacije',
-      body:
-        'Mobilni frontend omogucava pregled destinacija, objekata, sacuvanih stavki i licnih podesavanja. Korisnik je odgovoran za tacnost podataka koje unosi na svom nalogu.',
-    },
-    {
-      title: 'Sadrzaj i informacije',
-      body:
-        'Prikazani podaci zavise od dostupnih API odgovora. Frontend prikazuje ono sto backend trenutno vraca i ne garantuje dodatne funkcionalnosti koje nisu podrzane rutama sistema.',
-    },
-    {
-      title: 'Nalog i bezbednost',
-      body:
-        'Odjava, izmena osnovnih podataka i promena fotografije koriste postojece nalog mehanizme. Za dodatne nalog akcije potrebna je posebna backend podrska.',
-    },
+    { titleKey: 'terms.section.1.title', bodyKey: 'terms.section.1.body' },
+    { titleKey: 'terms.section.2.title', bodyKey: 'terms.section.2.body' },
+    { titleKey: 'terms.section.3.title', bodyKey: 'terms.section.3.body' },
   ];
 
-  protected readonly notes = [
-    'Sacuvane stavke, recenzije i profilni podaci vezani su za trenutno ulogovan nalog.',
-    'Lokalno sacuvani planer radi samo na uredjaju na kom je kreiran.',
-    'Za pravne i produkcione verzije uslova potrebno je uskladjivanje sa timom i backend specifikacijom.',
-  ];
+  protected readonly noteKeys = ['terms.note.1', 'terms.note.2', 'terms.note.3'];
 }

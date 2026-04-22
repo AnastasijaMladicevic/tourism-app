@@ -18,6 +18,8 @@ import { EventService } from '../../services/event';
 import { LocalityService } from '../../services/locality';
 import { MapService } from '../../services/map.service';
 import { ObjectService } from '../../services/object';
+import { TranslationService } from '../../services/translation.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 type MapSelectionState = {
   lat: number;
@@ -32,7 +34,7 @@ type MapSelectionState = {
 @Component({
   selector: 'app-map',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, TranslatePipe],
   templateUrl: './map.html',
   styleUrls: ['./map.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -57,6 +59,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     private localityService: LocalityService,
     private objectService: ObjectService,
     private eventService: EventService,
+    private translationService: TranslationService,
   ) {}
 
   ngOnInit(): void {
@@ -69,7 +72,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.mapService.initMap('main-map', initialState.lat, initialState.lng, initialState.zoom);
     this.loadAllData(initialState);
 
-    const map = (this.mapService as any)['map'];
+    const map = (this.mapService as any).map;
     if (map) {
       map.on('click', () => this.closeCard());
     }
@@ -200,10 +203,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private hasCoordinates(item: any): boolean {
-    return item?.latitude != null && item?.longitude != null;
-  }
-
   private toArray<T>(response: any): T[] {
     if (Array.isArray(response)) return response;
     if (response?.items) return response.items;
@@ -211,12 +210,16 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     return [];
   }
 
-  private getObjectType(name: string): string {
-    const normalizedName = name.toLowerCase();
+  private hasCoordinates(item: any): boolean {
+    return item?.latitude != null && item?.longitude != null;
+  }
 
-    if (normalizedName.includes('hotel')) return 'hotel';
-    if (normalizedName.includes('restoran')) return 'restaurant';
-    if (normalizedName.includes('kafana')) return 'kafana';
+  private getObjectType(name: string): string {
+    const normalized = name.toLowerCase();
+
+    if (normalized.includes('hotel')) return 'hotel';
+    if (normalized.includes('restoran')) return 'restaurant';
+    if (normalized.includes('kafana')) return 'kafana';
 
     return 'restaurant';
   }
@@ -227,9 +230,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const activeKey = (window as any).activeMarkerKey;
     if (activeKey) {
-      const found = (this.mapService as any)['markerMap']?.get(activeKey);
-      if (found && !(this.mapService as any)['map']?.hasLayer(found.marker)) {
-        found.marker.addTo((this.mapService as any)['map']);
+      const found = (this.mapService as any).markerMap?.get(activeKey);
+      if (found && !(this.mapService as any).map?.hasLayer(found.marker)) {
+        found.marker.addTo((this.mapService as any).map);
       }
       (window as any).activeMarkerKey = null;
     }
@@ -267,7 +270,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   getActionLabel(): string {
     return this.selectedType === 'destination' || this.selectedType === 'locality'
       ? 'Center here'
-      : 'Details';
+      : this.translationService.translate('common.details');
   }
 
   getWorkingStatus(): boolean | null {
@@ -283,14 +286,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       if (!hours || hours === '00:00-24:00') return true;
 
       const [open, close] = hours.split('-');
-      const now = new Date();
-      const currentMinutes = now.getHours() * 60 + now.getMinutes();
-      const toMinutes = (time: string) => {
-        const [hoursValue, minutesValue] = time.split(':').map(Number);
-        return hoursValue * 60 + minutesValue;
+      const current = new Date().getHours() * 60 + new Date().getMinutes();
+      const toMinutes = (value: string) => {
+        const [hoursPart, minutesPart] = value.split(':').map(Number);
+        return hoursPart * 60 + minutesPart;
       };
 
-      return currentMinutes >= toMinutes(open) && currentMinutes <= toMinutes(close);
+      return current >= toMinutes(open) && current <= toMinutes(close);
     } catch {
       return null;
     }
@@ -325,7 +327,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   centerOnMyLocation(): void {
     if (!navigator.geolocation) {
-      alert('Geolocation nije podrzana u ovom browseru.');
+      alert(this.translationService.translate('map.geoUnsupported'));
       return;
     }
 
@@ -345,13 +347,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       (err) => {
         switch (err.code) {
           case err.PERMISSION_DENIED:
-            alert('Dozvolite pristup lokaciji u podesavanjima browsera.');
+            alert(this.translationService.translate('map.geoDenied'));
             break;
           case err.POSITION_UNAVAILABLE:
-            alert('Lokacija trenutno nije dostupna.');
+            alert(this.translationService.translate('map.geoUnavailable'));
             break;
           default:
-            alert('Nije moguce dobiti vasu lokaciju.');
+            alert(this.translationService.translate('map.geoFailed'));
         }
       },
       { enableHighAccuracy: true, timeout: 10000 },
@@ -359,11 +361,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   zoomIn(): void {
-    ((this.mapService as any)['map'] as any)?.zoomIn();
+    (this.mapService as any).map?.zoomIn();
   }
 
   zoomOut(): void {
-    ((this.mapService as any)['map'] as any)?.zoomOut();
+    (this.mapService as any).map?.zoomOut();
   }
 }
-

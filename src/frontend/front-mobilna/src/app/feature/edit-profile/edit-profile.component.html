@@ -9,23 +9,23 @@
     />
 
     <header class="edit-topbar">
-      <button class="back-button" type="button" (click)="goBack()" aria-label="Nazad">
+      <button class="back-button" type="button" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="m15 18-6-6 6-6" />
         </svg>
       </button>
-      <h1>Izmeni profil</h1>
+      <h1>{{ 'editProfile.title' | translate }}</h1>
       <div class="topbar-placeholder" aria-hidden="true"></div>
     </header>
 
     <section class="photo-panel">
       <div class="photo-avatar-wrap">
-        <img class="photo-avatar" [src]="imageUrl()" alt="Profilna fotografija" />
+        <img class="photo-avatar" [src]="imageUrl()" [alt]="'editProfile.photoAlt' | translate" />
         <button
           class="photo-edit-button"
           type="button"
           (click)="changePhoto()"
-          aria-label="Promeni fotografiju"
+          [attr.aria-label]="'editProfile.changePhoto' | translate"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="m9.2 12.8 1.9 1.9 4.7-4.7" />
@@ -33,13 +33,13 @@
         </button>
       </div>
       <button class="remove-photo-button" type="button" (click)="removePhoto()">
-        Ukloni fotografiju
+        {{ 'editProfile.removePhoto' | translate }}
       </button>
     </section>
 
     <section class="form-section">
       <label class="field">
-        <span>Ime</span>
+        <span>{{ 'editProfile.firstName' | translate }}</span>
         <div class="field-box">
           <input [ngModel]="name()" (ngModelChange)="updateName($event)" type="text" />
         </div>
@@ -49,7 +49,7 @@
       </label>
 
       <label class="field">
-        <span>Prezime</span>
+        <span>{{ 'editProfile.lastName' | translate }}</span>
         <div class="field-box">
           <input [ngModel]="lastName()" (ngModelChange)="updateLastName($event)" type="text" />
         </div>
@@ -59,7 +59,7 @@
       </label>
 
       <label class="field">
-        <span>Drzava</span>
+        <span>{{ 'editProfile.country' | translate }}</span>
         <div class="field-box field-box--select">
           <div class="field-prefix">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -79,7 +79,7 @@
       </label>
 
       <label class="field">
-        <span>Email adresa</span>
+        <span>{{ 'editProfile.email' | translate }}</span>
         <div class="field-box field-box--icon">
           <div class="field-prefix">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -92,7 +92,7 @@
       </label>
 
       <label class="field">
-        <span>Broj telefona</span>
+        <span>{{ 'editProfile.phone' | translate }}</span>
         <div class="field-box field-box--icon">
           <div class="field-prefix">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -112,23 +112,23 @@
     <section class="interests-section">
       <div class="interests-header">
         <div>
-          <h2>Tvoja interesovanja</h2>
+          <h2>{{ 'editProfile.interests' | translate }}</h2>
         </div>
-        <span>Izabrano: {{ selectedInterestCount() }}</span>
+        <span>{{ 'editProfile.selectedCount' | translate: { count: selectedInterestCount() } }}</span>
       </div>
 
       <div class="interest-chips">
-        @for (interest of interests(); track interest.label) {
+        @for (interest of interests(); track interest.key) {
           <button
             class="interest-chip"
             type="button"
             [class.interest-chip--active]="interest.selected"
-            (click)="toggleInterest(interest.label)"
+            (click)="toggleInterest(interest.key)"
           >
             @if (interest.selected) {
               <span class="checkmark">✓</span>
             }
-            {{ interest.label }}
+            {{ interest.labelKey | translate }}
           </button>
         }
       </div>
@@ -143,8 +143,8 @@
         </svg>
       </div>
       <div class="language-card__content">
-        <strong>Jezik aplikacije</strong>
-        <span>Trenutno: {{ appLanguage() }}</span>
+        <strong>{{ 'editProfile.appLanguage' | translate }}</strong>
+        <span>{{ 'editProfile.currentLanguage' | translate: { language: languageLabel() } }}</span>
       </div>
       <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
         <path d="m9 6 6 6-6 6" />
@@ -157,11 +157,11 @@
           <button
             class="language-option"
             type="button"
-            [class.language-option--active]="appLanguage() === (option.code === 'en' ? 'Engleski' : 'Crnogorski')"
+            [class.language-option--active]="appLanguageCode() === option.code"
             (click)="selectLanguageOption(option.code)"
           >
-            <span>{{ option.label }}</span>
-            @if (appLanguage() === (option.code === 'en' ? 'Engleski' : 'Crnogorski')) {
+            <span>{{ option.labelKey | translate }}</span>
+            @if (appLanguageCode() === option.code) {
               <span class="language-option__check">✓</span>
             }
           </button>
@@ -175,10 +175,10 @@
 
     <div class="actions">
       <button class="save-button" type="button" [disabled]="isSaving()" (click)="saveChanges()">
-        {{ isSaving() ? 'Cuvanje...' : 'Sacuvaj promene' }}
+        {{ isSaving() ? ('editProfile.saving' | translate) : ('editProfile.saveChanges' | translate) }}
       </button>
       <button class="cancel-button" type="button" [disabled]="isSaving()" (click)="cancelChanges()">
-        Otkazi izmene
+        {{ 'editProfile.cancelChanges' | translate }}
       </button>
     </div>
 

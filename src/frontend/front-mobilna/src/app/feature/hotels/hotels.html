@@ -115,10 +115,10 @@
 
           <button
             class="card__fav"
-            [class.card__fav--active]="hotel.saved"
-            (click)="toggleSave(hotel)"
+            [class.card__fav--active]="hotel.isFavorite"
+            (click)="toggleFavorite(hotel)"
           >
-            <mat-icon>{{ hotel.saved ? 'favorite' : 'favorite_border' }}</mat-icon>
+            <mat-icon>{{ hotel.isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
           </button>
         </div>
 

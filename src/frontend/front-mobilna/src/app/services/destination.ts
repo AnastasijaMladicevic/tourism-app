@@ -7,6 +7,7 @@ export interface DestinationDto {
   id: number;
   name: string;
   description?: string;
+  mainImageUrl?: string;
   latitude?: number;
   longitude?: number;
   distanceKm?: number; // backend će ovo dodati kad implementiraš lat/lng filter
@@ -25,6 +26,15 @@ export interface DestinationImageDto {
   url: string;
   altText?: string;
   isMain: boolean;
+}
+
+export interface DestinationQueryParams {
+  page?: number;
+  pageSize?: number;
+  type?: string;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: string;
 }
 
 export interface CreateDestinationDto {
@@ -53,8 +63,18 @@ export class DestinationService {
 
   // GET /api/destinations
   // Kad backend doda lat/lng podršku, dodaćeš params ovde
-  getAll(): Observable<DestinationDto[]> {
-    return this.http.get<DestinationDto[]>(this.url);
+  getAll(query?: DestinationQueryParams): Observable<DestinationDto[]> {
+    let params = new HttpParams();
+
+    if (query) {
+      Object.entries(query).forEach(([key, value]) => {
+        if (value != null && value !== '') {
+          params = params.set(key, String(value));
+        }
+      });
+    }
+
+    return this.http.get<DestinationDto[]>(this.url, { params });
   }
 
   // GET /api/destinations/{id}

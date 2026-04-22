@@ -5,7 +5,7 @@
         <img src="assets/minilogo.svg" alt="SpireGO logo" />
         <span><strong>Spire</strong>GO</span>
       </div>
-      <h1>Profil</h1>
+      <h1>{{ 'profile.title' | translate }}</h1>
       <div class="topbar-spacer" aria-hidden="true"></div>
     </header>
 
@@ -59,14 +59,14 @@
             }
           </div>
           <strong>{{ stat.value }}</strong>
-          <span>{{ stat.label }}</span>
+          <span>{{ stat.labelKey | translate }}</span>
         </article>
       }
     </section>
 
     @for (section of sections; track trackSection($index, section)) {
       <section class="menu-section">
-        <h3>{{ section.title }}</h3>
+        <h3>{{ section.titleKey | translate }}</h3>
 
         <div class="menu-card">
           @for (item of section.items; track trackItem($index, item)) {
@@ -137,7 +137,7 @@
                     }
                   }
                 </span>
-                <span class="menu-title">{{ item.title }}</span>
+                <span class="menu-title">{{ item.titleKey | translate }}</span>
               </div>
 
               @if (item.action !== 'logout') {

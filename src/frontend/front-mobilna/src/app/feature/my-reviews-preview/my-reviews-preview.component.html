@@ -1,0 +1,179 @@
+<div class="reviews-preview-page">
+  <div class="reviews-preview-shell">
+    <header class="topbar">
+      <a class="icon-btn" routerLink="/profile" aria-label="Nazad">
+        <svg viewBox="0 0 24 24">
+          <path d="m14.5 6.5-5 5.5 5 5.5" />
+        </svg>
+      </a>
+      <h1>Moji utisci</h1>
+      <div class="topbar-spacer" aria-hidden="true"></div>
+    </header>
+
+    <div class="content">
+      @if (errorMessage()) {
+        <p class="feedback feedback--error">{{ errorMessage() }}</p>
+      }
+
+      <section class="profile-strip">
+        <div class="avatar-wrap">
+          @if (profileImageUrl()) {
+            <img [src]="profileImageUrl()!" [alt]="displayName()" />
+          } @else {
+            <div class="avatar-fallback">{{ initials() }}</div>
+          }
+          <span class="online-dot"></span>
+        </div>
+
+        <div class="profile-copy">
+          <h2>{{ displayName() }}</h2>
+          <p>{{ profileSubtitle() }}</p>
+        </div>
+      </section>
+
+      <section class="rating-card">
+        <div class="rating-summary">
+          <strong>{{ averageRating() }}</strong>
+          <div class="stars" aria-hidden="true">
+            @for (star of stars(5); track star) {
+              <span [class.star--filled]="star < roundedAverageRating()">★</span>
+            }
+          </div>
+          <p>Ukupno {{ totalReviews() }} utisaka</p>
+        </div>
+
+        <div class="rating-bars">
+          @for (row of ratingRows(); track row.label) {
+            <div class="rating-row">
+              <span>{{ row.label }}</span>
+              <div class="rating-track">
+                <div class="rating-fill" [style.width.%]="row.value * 100"></div>
+              </div>
+              <strong>{{ row.count }}</strong>
+            </div>
+          }
+        </div>
+      </section>
+
+      <label class="search-box">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-3.5-3.5"></path>
+        </svg>
+        <input
+          type="search"
+          [value]="searchTerm()"
+          (input)="setSearch($any($event.target).value)"
+          placeholder="Pretrazi moje utiske..."
+          aria-label="Pretrazi moje utiske"
+        />
+      </label>
+
+      <div class="filter-row">
+        @for (filter of filters(); track trackFilter($index, filter)) {
+          <button
+            class="filter-chip"
+            type="button"
+            [class.filter-chip--active]="activeFilter() === filter.value"
+            (click)="setFilter(filter.value)"
+          >
+            {{ filter.label }}
+          </button>
+        }
+      </div>
+
+      @if (isLoading()) {
+        <section class="state-card">
+          <strong>Ucitavanje...</strong>
+          <p>Pripremamo tvoje utiske i statistiku naloga.</p>
+        </section>
+      } @else if (!hasAnyReviews()) {
+        <section class="state-card">
+          <strong>Jos nemas utisaka</strong>
+          <p>Kada ostavis komentar na neki objekat, ovde ces ga odmah videti.</p>
+        </section>
+      } @else if (!hasFilteredResults()) {
+        <section class="state-card">
+          <strong>Nema rezultata</strong>
+          <p>Probaj drugi filter ili pretragu da bi prikazao svoje utiske.</p>
+        </section>
+      } @else {
+        <section class="reviews-list">
+          @for (card of visibleReviews(); track trackReview($index, card)) {
+            <article class="review-card">
+              <div class="review-header">
+                <div class="review-thumb">{{ card.objectTypeShort }}</div>
+
+                <div class="review-title">
+                  <h3>{{ card.title }}</h3>
+                  <p>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M12 21s-6-5.4-6-10a6 6 0 0 1 12 0c0 4.6-6 10-6 10Z" />
+                      <circle cx="12" cy="11" r="2.2" />
+                    </svg>
+                    {{ card.location }}
+                  </p>
+                </div>
+
+                <span class="status-chip">{{ card.status }}</span>
+              </div>
+
+              <div class="review-meta">
+                <div class="stars stars--row">
+                  @for (star of stars(5); track star) {
+                    <span [class.star--filled]="star < card.rating">★</span>
+                  }
+                </div>
+                <span class="dot"></span>
+                <span class="time">{{ card.timeAgo }}</span>
+                <span class="dot"></span>
+                <span class="time">{{ card.createdLabel }}</span>
+              </div>
+
+              <p class="review-body">{{ card.text }}</p>
+
+              @if (card.creatorResponse) {
+                <div class="response-card">
+                  <strong>Odgovor kreatora</strong>
+                  <p>{{ card.creatorResponse }}</p>
+                </div>
+              }
+
+              <div class="review-divider"></div>
+
+              <div class="review-actions">
+                <div class="meta-pill">{{ card.objectType }}</div>
+
+                <div class="review-buttons">
+                  <button class="action-btn action-btn--muted" type="button" (click)="openObject(card)">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M5 12h14M13 5l7 7-7 7" />
+                    </svg>
+                    <span>Otvori</span>
+                  </button>
+
+                  <button
+                    class="action-btn action-btn--danger"
+                    type="button"
+                    (click)="deleteReview(card)"
+                    [disabled]="deletingId() === card.id"
+                  >
+                    <svg viewBox="0 0 24 24">
+                      <path d="M5 7h14M9 7V5.5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1V7M8 10v7M12 10v7M16 10v7M7.5 19.5h9a1 1 0 0 0 1-1V7h-11v11.5a1 1 0 0 0 1 1Z" />
+                    </svg>
+                    <span>{{ deletingId() === card.id ? 'Brisem...' : 'Obrisi' }}</span>
+                  </button>
+                </div>
+              </div>
+            </article>
+          }
+        </section>
+
+        @if (canLoadMore()) {
+          <button class="load-more-btn" type="button" (click)="loadMore()">Ucitaj jos utisaka</button>
+        }
+      }
+    </div>
+
+  </div>
+</div>
