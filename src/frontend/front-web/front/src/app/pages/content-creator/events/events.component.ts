@@ -48,8 +48,10 @@ export class ContentCreatorEventsComponent implements OnInit {
   currentPage = 1;
   pageSize = 5;
   totalCount = 0;
+  readonly pageSizeOptions = [5, 10, 20, 50];
 
   searchQuery = '';
+  draftSearchQuery = '';
   statusFilter = 'all';
   categoryFilter = 'all';
   sortBy = 'startDate';
@@ -67,7 +69,7 @@ export class ContentCreatorEventsComponent implements OnInit {
     { name: 'Ana Petrovic', role: 'Event Support', initials: 'AP' }
   ];
 
-  readonly categoryOptions = [
+  private readonly fallbackCategoryOptions = [
     { value: 'all', label: 'All Categories' },
     { value: 'Festival', label: 'Festival' },
     { value: 'Workshop', label: 'Workshop' },
@@ -77,7 +79,7 @@ export class ContentCreatorEventsComponent implements OnInit {
     { value: 'Concert', label: 'Concert' }
   ];
 
-  readonly statusOptions = [
+  private readonly fallbackStatusOptions = [
     { value: 'all', label: 'All Statuses' },
     { value: 'published', label: 'Published' },
     { value: 'draft', label: 'Draft' },
@@ -86,7 +88,11 @@ export class ContentCreatorEventsComponent implements OnInit {
     { value: 'cancelled', label: 'Cancelled' }
   ];
 
+  categoryOptions = [...this.fallbackCategoryOptions];
+  statusOptions = [...this.fallbackStatusOptions];
+
   ngOnInit(): void {
+    this.loadCategoryOptions();
     this.loadEvents();
   }
 
@@ -103,17 +109,26 @@ export class ContentCreatorEventsComponent implements OnInit {
     };
 
     const query: EventQueryDto = buildEventQueryDto(filterState, {
-      page: 1,
-      pageSize: 100,
-      includeStatus: false,
-      includeCategoryAsType: false,
+      page: this.currentPage,
+      pageSize: this.pageSize,
+      includeStatus: true,
+      includeCategoryAsType: true,
       includeDateFilters: false
     });
 
     this.eventService.getMy(query).subscribe({
       next: (response) => {
         this.events = response.items;
-        this.applyLocalFilters();
+        this.filteredEvents = response.items;
+        this.pagedEvents = response.items;
+        this.totalCount = response.totalCount;
+        this.currentPage = response.page;
+        this.syncStatusOptionsFromEvents();
+
+        if (!this.selectedEvent || !this.pagedEvents.some((event) => event.id === this.selectedEvent?.id)) {
+          this.selectedEvent = this.pagedEvents[0] ?? null;
+        }
+
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -125,47 +140,22 @@ export class ContentCreatorEventsComponent implements OnInit {
     });
   }
 
-  applyLocalFilters(): void {
-    const search = this.searchQuery.trim().toLowerCase();
-    const selectedCategory = this.categoryFilter.toLowerCase();
-    const selectedStatus = this.statusFilter.toLowerCase();
-
-    this.filteredEvents = this.events.filter((event) => {
-      const eventStatus = this.getStatusForComparison(event.status);
-      const eventCategory = this.getCategoryLabel(event).toLowerCase();
-      const eventText = [event.name, event.description, event.eventTypeName, event.status]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase();
-
-      const matchesSearch = !search || eventText.includes(search);
-      const matchesStatus = selectedStatus === 'all' || eventStatus === selectedStatus;
-      const matchesCategory = selectedCategory === 'all' || eventCategory === selectedCategory;
-
-      return matchesSearch && matchesStatus && matchesCategory;
-    });
-
-    this.totalCount = this.filteredEvents.length;
-    const maxPage = Math.max(1, Math.ceil(this.totalCount / this.pageSize));
-    if (this.currentPage > maxPage) {
-      this.currentPage = maxPage;
-    }
-
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    this.pagedEvents = this.filteredEvents.slice(startIndex, startIndex + this.pageSize);
-
-    if (!this.selectedEvent || !this.filteredEvents.some((event) => event.id === this.selectedEvent?.id)) {
-      this.selectedEvent = this.pagedEvents[0] ?? this.filteredEvents[0] ?? null;
-    }
+  onSearch(): void {
+    // Intentionally no-op: search is applied only on Enter or explicit Apply.
   }
 
-  onSearch(): void {
-    this.currentPage = 1;
-    this.loadEvents();
+  onSearchEnter(event: Event): void {
+    event.preventDefault();
+    this.onApplyFilters();
+  }
+
+  onApplyFilters(): void {
+    this.applySearchAndReload();
   }
 
   onClearSearch(): void {
     this.searchQuery = '';
+    this.draftSearchQuery = '';
     this.statusFilter = 'all';
     this.categoryFilter = 'all';
     this.currentPage = 1;
@@ -186,7 +176,13 @@ export class ContentCreatorEventsComponent implements OnInit {
 
   onFilterChange(): void {
     this.currentPage = 1;
-    this.applyLocalFilters();
+    this.loadEvents();
+  }
+
+  onPageSizeChange(value: number | string): void {
+    this.pageSize = Number(value);
+    this.currentPage = 1;
+    this.loadEvents();
   }
   onCreateEvent(): void {
     this.router.navigate(['/content-creator/events/create']);
@@ -206,16 +202,16 @@ export class ContentCreatorEventsComponent implements OnInit {
   }
 
   onNextPage(): void {
-    if (this.currentPage * this.pageSize < this.totalCount) {
+    if (this.currentPage < this.totalPages) {
       this.currentPage++;
-      this.applyLocalFilters();
+      this.loadEvents();
     }
   }
 
   onPreviousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
-      this.applyLocalFilters();
+      this.loadEvents();
     }
   }
 
@@ -265,10 +261,6 @@ export class ContentCreatorEventsComponent implements OnInit {
       hour: '2-digit',
       minute: '2-digit'
     });
-  }
-
-  getStatusForComparison(status: string | undefined): string {
-    return (status ?? '').toLowerCase();
   }
 
   getCategoryLabel(event: EventDto): string {
@@ -326,7 +318,15 @@ export class ContentCreatorEventsComponent implements OnInit {
   }
 
   get pageEnd(): number {
-    return Math.min(this.currentPage * this.pageSize, this.totalCount);
+    return this.pageStart + this.pagedEvents.length - 1;
+  }
+
+  get totalPages(): number {
+    if (!this.totalCount || this.pageSize < 1) {
+      return 1;
+    }
+
+    return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
   }
 
   get selectedInsightCards(): EventInsightCard[] {
@@ -362,6 +362,65 @@ export class ContentCreatorEventsComponent implements OnInit {
     } catch {
       return encodeURI(trimmed);
     }
+  }
+
+  private applySearchAndReload(): void {
+    this.searchQuery = this.draftSearchQuery.trim();
+    this.currentPage = 1;
+    this.loadEvents();
+  }
+
+  private loadCategoryOptions(): void {
+    this.eventService.getEventTypes().subscribe({
+      next: (types) => {
+        const dynamicCategories = (types ?? [])
+          .map((type) => type.name?.trim())
+          .filter((name): name is string => !!name)
+          .filter((name, index, all) => all.findIndex((x) => x.toLowerCase() === name.toLowerCase()) === index)
+          .sort((a, b) => a.localeCompare(b))
+          .map((name) => ({ value: name, label: name }));
+
+        this.categoryOptions = dynamicCategories.length > 0
+          ? [{ value: 'all', label: 'All Categories' }, ...dynamicCategories]
+          : [...this.fallbackCategoryOptions];
+
+        if (!this.categoryOptions.some((option) => option.value === this.categoryFilter)) {
+          this.categoryFilter = 'all';
+        }
+      },
+      error: () => {
+        this.categoryOptions = [...this.fallbackCategoryOptions];
+      }
+    });
+  }
+
+  private syncStatusOptionsFromEvents(): void {
+    const dynamicStatuses = this.events
+      .map((event) => event.status?.trim())
+      .filter((status): status is string => !!status)
+      .filter((status, index, all) => all.findIndex((x) => x.toLowerCase() === status.toLowerCase()) === index)
+      .sort((a, b) => a.localeCompare(b))
+      .map((status) => ({
+        value: status.toLowerCase(),
+        label: this.toTitleCase(status)
+      }));
+
+    this.statusOptions = dynamicStatuses.length > 0
+      ? [{ value: 'all', label: 'All Statuses' }, ...dynamicStatuses]
+      : [...this.fallbackStatusOptions];
+
+    if (!this.statusOptions.some((option) => option.value === this.statusFilter)) {
+      this.statusFilter = 'all';
+    }
+  }
+
+  private toTitleCase(value: string): string {
+    return value
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 
 }

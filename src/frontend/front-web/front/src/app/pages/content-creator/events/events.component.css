@@ -361,6 +361,40 @@ tbody tr:hover,
   gap: 8px;
 }
 
+.page-size-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid #dbe1ea;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.page-size-control span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.page-size-select {
+  min-width: 74px;
+  padding: 6px 28px 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.page-size-select:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.3);
+}
+
 .insights-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -757,5 +791,14 @@ tbody tr:hover,
 
   .date-pill {
     width: 100%;
+  }
+
+  .pager {
+    flex-wrap: wrap;
+  }
+
+  .page-size-control {
+    width: 100%;
+    justify-content: space-between;
   }
 }

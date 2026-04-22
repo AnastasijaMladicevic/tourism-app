@@ -28,8 +28,9 @@
       <input
         type="text"
         class="toolbar-input"
-        [(ngModel)]="searchQuery"
+        [(ngModel)]="draftSearchQuery"
         (ngModelChange)="onSearch()"
+        (keydown.enter)="onSearchEnter($event)"
         placeholder="Search events, venues, or organizers..."
       />
     </div>
@@ -40,8 +41,17 @@
     </button>
 
     <button type="button" class="ghost-btn slim-btn" (click)="onClearSearch()">
-      <span class="material-symbols-outlined"> filter_alt </span>
-      More Filters
+      <span class="material-symbols-outlined"> clear_all </span>
+      Clear Filters
+    </button>
+
+    <button
+      type="button"
+      class="primary-btn slim-btn"
+      style="display: none"
+      (click)="onApplyFilters()"
+    >
+      Apply
     </button>
   </div>
 
@@ -154,8 +164,15 @@
           </div>
 
           <div class="table-footer">
-            <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ filteredEvents.length }} events</p>
+            <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ totalCount }} events</p>
             <div class="pager">
+              <label class="page-size-control">
+                <span>Page size</span>
+                <select class="page-size-select" [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+                  <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
+                </select>
+              </label>
+
               <button
                 type="button"
                 class="ghost-btn slim-btn"
@@ -168,7 +185,7 @@
                 type="button"
                 class="ghost-btn slim-btn"
                 (click)="onNextPage()"
-                [disabled]="currentPage * pageSize >= totalCount"
+                [disabled]="currentPage >= totalPages"
               >
                 Next
               </button>
@@ -258,7 +275,7 @@
           <h3>Description</h3>
           <p class="description-copy">{{ getSelectedSummary(selectedEvent) }}</p>
         </section>
-<!-- TBD DA LI CEMO OVO DA IMAMO -->
+        <!-- TBD DA LI CEMO OVO DA IMAMO -->
         <!-- <section class="detail-section">
           <div class="section-head">
             <h3>Staff &amp; Organizers</h3>
