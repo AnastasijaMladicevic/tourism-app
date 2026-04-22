@@ -26,6 +26,17 @@
   --emperor: #555555;
   --athens-gray: #f9fafb;
   --error: #ff6d6f;
+  --font-family-base: 'Nunito', sans-serif;
+  --font-size-button: 13px;
+  --font-size-body: 14px;
+  --font-size-body-lg: 15px;
+  --font-size-title-sm: 16px;
+  --font-size-title-md: 18px;
+  --font-size-title-lg: 22px;
+  --font-size-label: 12px;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
 }
 
 html {
@@ -53,7 +64,7 @@ body {
   // variables at https://material.angular.dev/guide/system-variables
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-family-base);
   font: var(--mat-sys-body-medium);
 
   // Reset the user agent margin.
@@ -71,5 +82,12 @@ body {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
-  font-family: 'Nunito', sans-serif;
+  font-family: var(--font-family-base);
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-family-base);
 }
