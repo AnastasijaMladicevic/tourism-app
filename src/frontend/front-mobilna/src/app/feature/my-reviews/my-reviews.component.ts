@@ -53,7 +53,7 @@ export class MyReviewsComponent implements OnInit {
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe((items) => {
-        const ownReviews = items
+        const ownReviews = this.toArray(items)
           .filter((item) => Number(item.userId) === currentUser.id)
           .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
           .map((item) => this.mapReview(item));
@@ -68,6 +68,23 @@ export class MyReviewsComponent implements OnInit {
 
   protected ratingAria(ratingLabel: string): string {
     return this.translationService.translate('reviews.ratingAria', { rating: ratingLabel });
+  }
+
+  private toArray(raw: unknown): ReviewDto[] {
+    if (Array.isArray(raw)) return raw as ReviewDto[];
+    if (!raw || typeof raw !== 'object') return [];
+
+    const obj = raw as Record<string, unknown>;
+    const listKeys = ['items', 'data', 'results', 'value'];
+
+    for (const key of listKeys) {
+      const candidate = obj[key];
+      if (Array.isArray(candidate)) {
+        return candidate as ReviewDto[];
+      }
+    }
+
+    return [];
   }
 
   private mapReview(item: ReviewDto): ReviewCard {
