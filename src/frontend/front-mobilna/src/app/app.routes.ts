@@ -50,10 +50,16 @@ export const routes: Routes = [
   },
   {
     path: 'moderator-access',
-    canActivate: [profileAuthGuard],
     loadComponent: () =>
-      import('./feature/moderator-access/moderator-access.component').then(
-        (m) => m.ModeratorAccessComponent,
+      import('./feature/moderator-access-preview/moderator-access-preview.component').then(
+        (m) => m.ModeratorAccessPreviewComponent,
+      ),
+  },
+  {
+    path: 'moderator-access-preview',
+    loadComponent: () =>
+      import('./feature/moderator-access-preview/moderator-access-preview.component').then(
+        (m) => m.ModeratorAccessPreviewComponent,
       ),
   },
   {

@@ -133,7 +133,15 @@ export class AuthService {
   }
 
   requestCreatorRole(userId: number, creatorType: string): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.url}/${userId}/request-creator`, creatorType);
+    return this.http.post<{ message: string }>(
+      `${this.url}/${userId}/request-creator`,
+      JSON.stringify(creatorType),
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
   }
 
   getToken(): string | null {
