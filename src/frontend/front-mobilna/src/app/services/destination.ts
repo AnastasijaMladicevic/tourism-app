@@ -7,6 +7,7 @@ export interface DestinationDto {
   id: number;
   name: string;
   description?: string;
+  mainImageUrl?: string;
   latitude?: number;
   longitude?: number;
   distanceKm?: number; // backend će ovo dodati kad implementiraš lat/lng filter

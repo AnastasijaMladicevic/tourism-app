@@ -1,13 +1,13 @@
 import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { catchError, finalize, of } from 'rxjs';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { BottomNavComponent } from '../bottom-nav/bottom-nav.component';
 import { DestinationDto, DestinationService } from '../../services/destination';
 import { EventDto, EventService } from '../../services/event';
 import { FavoriteDto, FavoriteService } from '../../services/favorite';
-import { ImageDto, ImageService } from '../../services/image';
+import { ImageDto } from '../../services/image';
 import { environment } from '../../../environment/environment';
 
 interface PlaceCard {
@@ -58,7 +58,6 @@ export class HomeComponent implements OnInit {
     private destinationService: DestinationService,
     private favoriteService: FavoriteService,
     private eventService: EventService,
-    private imageService: ImageService,
   ) {}
 
   ngOnInit(): void {
@@ -77,6 +76,11 @@ export class HomeComponent implements OnInit {
   }
 
   private pickEventImage(event: { id: number; images?: unknown[] }): string | undefined {
+    const directUrl = this.resolveMediaUrl(this.readMainImageUrl(event as Record<string, unknown>));
+    if (directUrl) {
+      return directUrl;
+    }
+
     const fromDto =
       event.images?.find((i) => this.isMainImage(i as unknown as ImageDto)) ??
       event.images?.[0];
@@ -121,7 +125,7 @@ export class HomeComponent implements OnInit {
             title: d.name,
             location: d.destinationTypeName || 'Montenegro',
             ratingText: this.ratingText(d),
-            imageUrl: this.pickDestinationImage(d, new Map()),
+            imageUrl: this.pickDestinationImage(d),
             isFavorite: this.favoriteMap.has(d.id),
             destinationId: d.id,
             favoriteId: this.favoriteMap.get(d.id),
@@ -227,6 +231,7 @@ export class HomeComponent implements OnInit {
     isActive: boolean;
     averageRating?: number;
     reviewCount?: number;
+    mainImageUrl?: string;
     images?: unknown[];
   } {
     const dto = raw as unknown as Record<string, unknown>;
@@ -237,6 +242,7 @@ export class HomeComponent implements OnInit {
       isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
       averageRating: this.readOptionalNumber(dto, ['averageRating', 'AverageRating']),
       reviewCount: this.readOptionalNumber(dto, ['reviewCount', 'ReviewCount']),
+      mainImageUrl: this.readString(dto, ['mainImageUrl', 'MainImageUrl']),
       images: (dto['images'] ?? dto['Images']) as unknown[] | undefined,
     };
   }
@@ -250,6 +256,7 @@ export class HomeComponent implements OnInit {
     isActive: boolean;
     localityName?: string | null;
     destinationName?: string | null;
+    mainImageUrl?: string;
   } {
     const dto = raw as unknown as Record<string, unknown>;
     const startDate = dto['startDate'] ?? dto['StartDate'];
@@ -269,6 +276,7 @@ export class HomeComponent implements OnInit {
       isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
       localityName: (dto['localityName'] ?? dto['LocalityName'] ?? null) as string | null,
       destinationName: (dto['destinationName'] ?? dto['DestinationName'] ?? null) as string | null,
+      mainImageUrl: this.readString(dto, ['mainImageUrl', 'MainImageUrl']),
     };
   }
 
@@ -282,46 +290,43 @@ export class HomeComponent implements OnInit {
     return undefined;
   }
 
-  private pickMainImageMap(
-    images: ImageDto[],
-    key: 'destinationId' | 'eventId',
-  ): Map<number, string> {
-    const grouped = new Map<number, ImageDto[]>();
-    const keyPascal = key === 'destinationId' ? 'DestinationId' : 'EventId';
-
-    for (const image of images ?? []) {
-      const raw = image as unknown as Record<string, unknown>;
-      const refId = Number(raw[key] ?? raw[keyPascal]);
-      if (!refId) continue;
-      const list = grouped.get(refId) ?? [];
-      list.push(image);
-      grouped.set(refId, list);
+  private readString(obj: Record<string, unknown>, keys: string[]): string | undefined {
+    for (const key of keys) {
+      const value = obj[key];
+      if (typeof value === 'string' && value.trim()) {
+        return value;
+      }
     }
 
-    const result = new Map<number, string>();
-    for (const [id, list] of grouped.entries()) {
-      const main = list.find((i) => this.isMainImage(i)) ?? list[0];
-      const resolved = this.resolveMediaUrl(this.readImageUrl(main));
-      if (resolved) result.set(id, resolved);
-    }
-    return result;
+    return undefined;
   }
 
-  private pickDestinationImage(
-    destination: { id: number; images?: unknown[] },
-    imageMap: Map<number, string>,
-  ): string | undefined {
+  private pickDestinationImage(destination: {
+    id: number;
+    images?: unknown[];
+    mainImageUrl?: string;
+  }): string | undefined {
+    const directUrl = this.resolveMediaUrl(destination.mainImageUrl);
+    if (directUrl) {
+      return directUrl;
+    }
+
     const fromDto =
       destination.images?.find((i) => this.isMainImage(i as unknown as ImageDto)) ??
       destination.images?.[0];
     const dtoUrl = this.resolveMediaUrl(this.readImageUrl(fromDto as unknown as ImageDto));
-    return dtoUrl || imageMap.get(destination.id);
+    return dtoUrl;
   }
 
   private readImageUrl(image?: ImageDto): string | undefined {
     if (!image) return undefined;
     const raw = image as unknown as Record<string, unknown>;
     const value = raw['url'] ?? raw['Url'];
+    return typeof value === 'string' ? value : undefined;
+  }
+
+  private readMainImageUrl(raw: Record<string, unknown>): string | undefined {
+    const value = raw['mainImageUrl'] ?? raw['MainImageUrl'];
     return typeof value === 'string' ? value : undefined;
   }
 
@@ -435,7 +440,16 @@ export class HomeComponent implements OnInit {
   }
 
   cardBackground(imageUrl?: string): string | null {
-    return imageUrl ? `url(${imageUrl})` : null;
+    if (!imageUrl) {
+      return null;
+    }
+
+    const safeUrl = imageUrl
+      .replace(/\(/g, '%28')
+      .replace(/\)/g, '%29')
+      .replace(/"/g, '%22');
+
+    return `url("${safeUrl}")`;
   }
 
   openAttractions(): void {
