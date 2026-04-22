@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { EventService } from '../../../services/event.service';
 import { DestinationService } from '../../../services/destination.service';
 import { EventDto, EventQueryDto } from '../../../models/event.model';
+import { buildEventQueryDto, EventFilterState } from '../../../models/event-filters.model';
 
 interface EventInsightCard {
   label: string;
@@ -73,12 +74,21 @@ export class ManagerEventsComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const query: EventQueryDto = {
-      page: 1,
-      pageSize: 100,
+    const filterState: EventFilterState = {
+      searchQuery: this.searchQuery,
+      statusFilter: 'all',
+      categoryFilter: 'all',
       sortBy: 'startDate',
       sortOrder: 'asc'
     };
+
+    const query: EventQueryDto = buildEventQueryDto(filterState, {
+      page: 1,
+      pageSize: 100,
+      includeStatus: false,
+      includeCategoryAsType: false,
+      includeDateFilters: false
+    });
 
     this.loadManagerEventsPage(query, 1, []);
   }

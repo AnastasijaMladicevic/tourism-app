@@ -21,26 +21,34 @@ export class EventService {
   private readonly apiUrl = 'https://localhost:7047/api/events';
   private readonly objectsApiUrl = 'https://localhost:7047/api/objects';
 
+  private buildEventQueryParams(query?: EventQueryDto): HttpParams {
+    let params = new HttpParams();
+
+    if (!query) {
+      return params;
+    }
+
+    if (query.type) params = params.set('type', query.type);
+    if (query.destination) params = params.set('destination', query.destination);
+    if (query.status) params = params.set('status', query.status);
+    if (query.page) params = params.set('page', query.page.toString());
+    if (query.pageSize) params = params.set('pageSize', query.pageSize.toString());
+    if (query.search) params = params.set('search', query.search);
+    if (query.sortBy) params = params.set('sortBy', query.sortBy);
+    if (query.sortOrder) params = params.set('sortOrder', query.sortOrder);
+    if (query.date) params = params.set('date', new Date(query.date).toISOString());
+    if (query.nextDays) params = params.set('nextDays', query.nextDays.toString());
+    if (query.startDate) params = params.set('startDate', new Date(query.startDate).toISOString());
+    if (query.endDate) params = params.set('endDate', new Date(query.endDate).toISOString());
+
+    return params;
+  }
+
   /**
    * Get all events with optional filtering and pagination
    */
   getAll(query?: EventQueryDto): Observable<EventQueryResponse> {
-    let params = new HttpParams();
-
-    if (query) {
-      if (query.type) params = params.set('type', query.type);
-      if (query.destination) params = params.set('destination', query.destination);
-      if (query.page) params = params.set('page', query.page.toString());
-      if (query.pageSize) params = params.set('pageSize', query.pageSize.toString());
-      if (query.search) params = params.set('search', query.search);
-      if (query.sortBy) params = params.set('sortBy', query.sortBy);
-      if (query.sortOrder) params = params.set('sortOrder', query.sortOrder);
-      if (query.date) params = params.set('date', new Date(query.date).toISOString());
-      if (query.nextDays) params = params.set('nextDays', query.nextDays.toString());
-      if (query.startDate) params = params.set('startDate', new Date(query.startDate).toISOString());
-      if (query.endDate) params = params.set('endDate', new Date(query.endDate).toISOString());
-    }
-
+    const params = this.buildEventQueryParams(query);
     return this.http.get<EventQueryResponse>(this.apiUrl, { params });
   }
 
@@ -48,22 +56,7 @@ export class EventService {
    * Get events visible to the current manager
    */
   getForManager(query?: EventQueryDto): Observable<EventQueryResponse> {
-    let params = new HttpParams();
-
-    if (query) {
-      if (query.type) params = params.set('type', query.type);
-      if (query.destination) params = params.set('destination', query.destination);
-      if (query.page) params = params.set('page', query.page.toString());
-      if (query.pageSize) params = params.set('pageSize', query.pageSize.toString());
-      if (query.search) params = params.set('search', query.search);
-      if (query.sortBy) params = params.set('sortBy', query.sortBy);
-      if (query.sortOrder) params = params.set('sortOrder', query.sortOrder);
-      if (query.date) params = params.set('date', new Date(query.date).toISOString());
-      if (query.nextDays) params = params.set('nextDays', query.nextDays.toString());
-      if (query.startDate) params = params.set('startDate', new Date(query.startDate).toISOString());
-      if (query.endDate) params = params.set('endDate', new Date(query.endDate).toISOString());
-    }
-
+    const params = this.buildEventQueryParams(query);
     return this.http.get<EventQueryResponse>(`${this.apiUrl}/manager`, { params });
   }
 
@@ -71,22 +64,7 @@ export class EventService {
    * Get events created by the current content creator
    */
   getMy(query?: EventQueryDto): Observable<EventQueryResponse> {
-    let params = new HttpParams();
-
-    if (query) {
-      if (query.type) params = params.set('type', query.type);
-      if (query.destination) params = params.set('destination', query.destination);
-      if (query.page) params = params.set('page', query.page.toString());
-      if (query.pageSize) params = params.set('pageSize', query.pageSize.toString());
-      if (query.search) params = params.set('search', query.search);
-      if (query.sortBy) params = params.set('sortBy', query.sortBy);
-      if (query.sortOrder) params = params.set('sortOrder', query.sortOrder);
-      if (query.date) params = params.set('date', new Date(query.date).toISOString());
-      if (query.nextDays) params = params.set('nextDays', query.nextDays.toString());
-      if (query.startDate) params = params.set('startDate', new Date(query.startDate).toISOString());
-      if (query.endDate) params = params.set('endDate', new Date(query.endDate).toISOString());
-    }
-
+    const params = this.buildEventQueryParams(query);
     return this.http.get<EventQueryResponse>(`${this.apiUrl}/my`, { params });
   }
 

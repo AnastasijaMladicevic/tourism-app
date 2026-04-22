@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { EventService } from '../../../services/event.service';
 import { EventDto, EventQueryDto } from '../../../models/event.model';
+import { buildEventQueryDto, EventFilterState } from '../../../models/event-filters.model';
 
 interface EventInsightCard {
   label: string;
@@ -93,13 +94,21 @@ export class ContentCreatorEventsComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    const query: EventQueryDto = {
+    const filterState: EventFilterState = {
+      searchQuery: this.searchQuery,
+      statusFilter: this.statusFilter,
+      categoryFilter: this.categoryFilter,
+      sortBy: this.sortBy,
+      sortOrder: this.sortOrder
+    };
+
+    const query: EventQueryDto = buildEventQueryDto(filterState, {
       page: 1,
       pageSize: 100,
-      search: this.searchQuery || undefined,
-      sortBy: this.sortBy,
-      sortOrder: this.sortOrder,
-    };
+      includeStatus: false,
+      includeCategoryAsType: false,
+      includeDateFilters: false
+    });
 
     this.eventService.getMy(query).subscribe({
       next: (response) => {

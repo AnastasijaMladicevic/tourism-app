@@ -60,6 +60,7 @@ export interface UpdateEventDto {
 export interface EventQueryDto {
   type?: string;
   destination?: string;
+  status?: string;
   page?: number;
   pageSize?: number;
   search?: string;
