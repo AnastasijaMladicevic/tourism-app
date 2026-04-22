@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Services;
 using TuristickiVodic.Services.Services;
@@ -100,10 +103,69 @@ namespace TuristickiVodic.API.Controllers
         {
             var configuredBaseUrl = _configuration["PublicApp:BaseUrl"];
 
-            if (string.IsNullOrWhiteSpace(configuredBaseUrl))
-                return DefaultPublicAppBaseUrl;
+            if (!string.IsNullOrWhiteSpace(configuredBaseUrl))
+                return configuredBaseUrl.Trim().TrimEnd('/');
 
-            return configuredBaseUrl.Trim().TrimEnd('/');
+            var autoDetectLocalNetworkBaseUrl = _configuration.GetValue<bool>("PublicApp:AutoDetectLocalNetworkBaseUrl");
+            if (autoDetectLocalNetworkBaseUrl)
+            {
+                var frontendPort = _configuration.GetValue<int?>("PublicApp:FrontendPort") ?? 4200;
+                var detectedLocalNetworkIp = DetectLocalNetworkIpv4();
+
+                if (!string.IsNullOrWhiteSpace(detectedLocalNetworkIp))
+                    return $"http://{detectedLocalNetworkIp}:{frontendPort}";
+            }
+
+            return DefaultPublicAppBaseUrl;
+        }
+
+        private static string? DetectLocalNetworkIpv4()
+        {
+            var candidate = NetworkInterface.GetAllNetworkInterfaces()
+                .Where(network =>
+                    network.OperationalStatus == OperationalStatus.Up &&
+                    network.NetworkInterfaceType != NetworkInterfaceType.Loopback &&
+                    network.NetworkInterfaceType != NetworkInterfaceType.Tunnel)
+                .Select(network => new
+                {
+                    Network = network,
+                    Properties = network.GetIPProperties()
+                })
+                .SelectMany(item => item.Properties.UnicastAddresses.Select(address => new
+                {
+                    Address = address.Address,
+                    Score = CalculateNetworkScore(item.Network, item.Properties, address.Address)
+                }))
+                .Where(item =>
+                    item.Address.AddressFamily == AddressFamily.InterNetwork &&
+                    !IPAddress.IsLoopback(item.Address) &&
+                    !item.Address.ToString().StartsWith("169.254."))
+                .OrderByDescending(item => item.Score)
+                .FirstOrDefault();
+
+            return candidate?.Address.ToString();
+        }
+
+        private static int CalculateNetworkScore(NetworkInterface network, IPInterfaceProperties properties, IPAddress address)
+        {
+            var score = 0;
+
+            if (properties.GatewayAddresses.Any(gateway => gateway.Address.AddressFamily == AddressFamily.InterNetwork))
+                score += 100;
+
+            if (network.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
+                score += 50;
+
+            if (network.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
+                score += 40;
+
+            if (!network.Description.Contains("Virtual", StringComparison.OrdinalIgnoreCase))
+                score += 20;
+
+            if (address.ToString().StartsWith("192.168.") || address.ToString().StartsWith("10.") || address.ToString().StartsWith("172."))
+                score += 10;
+
+            return score;
         }
     }
 }

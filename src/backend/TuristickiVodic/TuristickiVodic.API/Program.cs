@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Net;
+using System.Net.Sockets;
 using System.Security.Claims;
 using System.Text;
 using TuristickiVodic.Infrastructure.Data;
@@ -132,7 +134,9 @@ builder.Services.AddCors(options =>
             .GetSection("Cors:AllowedOrigins")
             .Get<string[]>() ?? new[] { "http://localhost:4200" };
 
-        policy.WithOrigins(allowedOrigins)
+        policy.SetIsOriginAllowed(origin =>
+            allowedOrigins.Contains(origin, StringComparer.OrdinalIgnoreCase) ||
+            (builder.Environment.IsDevelopment() && IsAllowedDevelopmentOrigin(origin)))
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -184,13 +188,19 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
 
-    if (app.Environment.IsDevelopment() && !db.Roles.Any())
+    var runSeedOnStartup = app.Configuration.GetValue<bool>("SeedData:RunOnStartup");
+
+    if ((app.Environment.IsDevelopment() || runSeedOnStartup) && !db.Roles.Any())
     {
+        var configuredSeedFilePath = app.Configuration["SeedData:FilePath"];
+
         var solutionRoot = Path.GetFullPath(
             Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..")
         );
 
-        var seedFilePath = Path.Combine(solutionRoot, "baza", "seed.sql");
+        var seedFilePath = !string.IsNullOrWhiteSpace(configuredSeedFilePath)
+            ? configuredSeedFilePath
+            : Path.Combine(solutionRoot, "baza", "seed.sql");
 
         Console.WriteLine($"Seed path: {seedFilePath}");
 
@@ -216,10 +226,37 @@ using (var scope = app.Services.CreateScope())
             Console.WriteLine("seed.sql NOT FOUND.");
         }
     }
-    else if (app.Environment.IsDevelopment())
+    else if (app.Environment.IsDevelopment() || runSeedOnStartup)
     {
         Console.WriteLine("Seed skipped because data already exists.");
     }
 }
 
 app.Run();
+
+static bool IsAllowedDevelopmentOrigin(string origin)
+{
+    if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri))
+        return false;
+
+    if (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps)
+        return false;
+
+    if (string.Equals(uri.Host, "localhost", StringComparison.OrdinalIgnoreCase) ||
+        string.Equals(uri.Host, "127.0.0.1", StringComparison.OrdinalIgnoreCase))
+        return true;
+
+    if (!IPAddress.TryParse(uri.Host, out var ipAddress))
+        return false;
+
+    return ipAddress.AddressFamily == AddressFamily.InterNetwork && IsPrivateIpv4(ipAddress);
+}
+
+static bool IsPrivateIpv4(IPAddress ipAddress)
+{
+    var bytes = ipAddress.GetAddressBytes();
+
+    return bytes[0] == 10 ||
+           (bytes[0] == 172 && bytes[1] >= 16 && bytes[1] <= 31) ||
+           (bytes[0] == 192 && bytes[1] == 168);
+}
