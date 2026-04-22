@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using TuristickiVodic.Core.Validation;
 
 namespace TuristickiVodic.Core.DTO
 {
@@ -13,7 +14,9 @@ namespace TuristickiVodic.Core.DTO
         [Required]
         public DateTime DateOfBirth { get; set; }
 
-        [Required, EmailAddress, MaxLength(200)]
+        [Required]
+        [MaxLength(200)]
+        [RfcEmailAddress]
         public string Email { get; set; }
 
         [Required, MinLength(6)]

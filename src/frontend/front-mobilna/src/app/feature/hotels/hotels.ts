@@ -26,7 +26,7 @@ export interface Hotel {
   distance: string;
   amenities: string[];
   price?: number;
-  saved: boolean;
+  isFavorite: boolean;
   typeName: string;
   locality?: string;
   destination?: string;
@@ -116,8 +116,8 @@ export class HotelsComponent implements OnInit {
     return map[this.sortOption];
   }
 
-  toggleSave(hotel: Hotel): void {
-    hotel.saved = !hotel.saved;
+  toggleFavorite(hotel: Hotel): void {
+    hotel.isFavorite = !hotel.isFavorite;
   }
 
   viewDetails(hotelId: number): void {
@@ -265,7 +265,7 @@ export class HotelsComponent implements OnInit {
       distance: this.distanceText(obj.distanceKm),
       amenities: this.amenitiesFromObject(obj),
       price: undefined,
-      saved: false,
+      isFavorite: false,
       typeName: obj.objectTypeName || 'Hotel',
       locality: obj.localityName ?? obj.destinationName ?? 'Montenegro',
       destination: obj.destinationName ?? obj.localityName ?? 'Montenegro',

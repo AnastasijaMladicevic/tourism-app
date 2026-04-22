@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environment/environment';
+import { TranslationService } from './translation.service';
 
 export interface LoginDto {
   email: string;
@@ -63,25 +64,28 @@ export interface UpdateUserDto {
 export class AuthService {
   private url = `${environment.apiUrl}/users`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private translationService: TranslationService,
+  ) {
+    this.syncStoredUserWithAuthenticatedRole();
 
-  // POST /api/users/register
+    const currentUser = this.readStoredUser();
+    if (currentUser?.language) {
+      this.translationService.setLanguage(currentUser.language);
+    }
+  }
+
   register(dto: CreateUserDto): Observable<UserDto> {
     return this.http.post<UserDto>(`${this.url}/register`, dto);
   }
 
-  // POST /api/users/login
   login(dto: LoginDto): Observable<AuthResponseDto> {
     return this.http.post<AuthResponseDto>(`${this.url}/login`, dto).pipe(
-      tap((res) => {
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('refreshToken', res.refreshToken);
-        localStorage.setItem('user', JSON.stringify(res.user));
-      }),
+      tap((res) => this.persistSession(res)),
     );
   }
 
-  // POST /api/users/logout
   logout(): Observable<any> {
     return this.http.post(`${this.url}/logout`, {}).pipe(
       tap(() => {
@@ -92,22 +96,17 @@ export class AuthService {
     );
   }
 
-  // POST /api/users/refresh
   refresh(): Observable<AuthResponseDto> {
     const refreshToken = localStorage.getItem('refreshToken');
     return this.http
       .post<AuthResponseDto>(`${this.url}/refresh`, { refreshToken } as RefreshTokenDto)
-      .pipe(
-        tap((res) => {
-          localStorage.setItem('token', res.token);
-          localStorage.setItem('refreshToken', res.refreshToken);
-          localStorage.setItem('user', JSON.stringify(res.user));
-        }),
-      );
+      .pipe(tap((res) => this.persistSession(res)));
   }
 
   getById(userId: number): Observable<UserDto> {
-    return this.http.get<UserDto>(`${this.url}/${userId}`).pipe(tap((user) => this.setCurrentUser(user)));
+    return this.http
+      .get<UserDto>(`${this.url}/${userId}`)
+      .pipe(tap((user) => this.setCurrentUser(user)));
   }
 
   update(userId: number, dto: UpdateUserDto): Observable<UserDto> {
@@ -135,7 +134,15 @@ export class AuthService {
   }
 
   requestCreatorRole(userId: number, creatorType: string): Observable<{ message: string }> {
-    return this.http.post<{ message: string }>(`${this.url}/${userId}/request-creator`, creatorType);
+    return this.http.post<{ message: string }>(
+      `${this.url}/${userId}/request-creator`,
+      JSON.stringify(creatorType),
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
   }
 
   getToken(): string | null {
@@ -143,29 +150,13 @@ export class AuthService {
   }
 
   getCurrentUser(): UserDto | null {
-    const u = localStorage.getItem('user');
-    if (!u) {
+    const raw = localStorage.getItem('user');
+    if (!raw) {
       return null;
     }
 
     try {
-      const user = JSON.parse(u) as UserDto;
-      const authenticatedRole = this.getAuthenticatedRole();
-
-      if (!authenticatedRole) {
-        return user;
-      }
-
-      const normalizedUser = {
-        ...user,
-        roleName: this.mapNormalizedRoleToBackendRole(authenticatedRole),
-      };
-
-      if (normalizedUser.roleName !== user.roleName) {
-        this.setCurrentUser(normalizedUser);
-      }
-
-      return normalizedUser;
+      return this.normalizeUser(JSON.parse(raw) as UserDto);
     } catch {
       return null;
     }
@@ -173,6 +164,7 @@ export class AuthService {
 
   setCurrentUser(user: UserDto): void {
     localStorage.setItem('user', JSON.stringify(user));
+    this.translationService.setLanguage(user.language);
   }
 
   isLoggedIn(): boolean {
@@ -203,8 +195,60 @@ export class AuthService {
       resetSessionToken
     });
   }
+
   updateMyLocation(latitude: number, longitude: number): Observable<any> {
     return this.http.put(`${this.url}/me/location`, { latitude, longitude });
+  }
+
+  private syncStoredUserWithAuthenticatedRole(): void {
+    const storedUser = this.readStoredUser();
+    if (!storedUser) {
+      return;
+    }
+
+    try {
+      this.normalizeUser(storedUser);
+    } catch {
+      localStorage.removeItem('user');
+    }
+  }
+
+  private normalizeUser(user: UserDto): UserDto {
+    const authenticatedRole = this.getAuthenticatedRole();
+
+    if (!authenticatedRole) {
+      return user;
+    }
+
+    const normalizedUser = {
+      ...user,
+      roleName: this.mapNormalizedRoleToBackendRole(authenticatedRole),
+    };
+
+    if (normalizedUser.roleName !== user.roleName) {
+      this.setCurrentUser(normalizedUser);
+    }
+
+    return normalizedUser;
+  }
+
+  private persistSession(response: AuthResponseDto): void {
+    localStorage.setItem('token', response.token);
+    localStorage.setItem('refreshToken', response.refreshToken);
+    this.setCurrentUser(response.user);
+  }
+
+  private readStoredUser(): UserDto | null {
+    const raw = localStorage.getItem('user');
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(raw) as UserDto;
+    } catch {
+      return null;
+    }
   }
 
   private getRoleFromToken(): string | null {
@@ -220,7 +264,10 @@ export class AuthService {
 
     try {
       const base64Payload = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-      const paddedBase64Payload = base64Payload.padEnd(base64Payload.length + ((4 - (base64Payload.length % 4)) % 4), '=');
+      const paddedBase64Payload = base64Payload.padEnd(
+        base64Payload.length + ((4 - (base64Payload.length % 4)) % 4),
+        '=',
+      );
       const decodedPayload = decodeURIComponent(
         atob(paddedBase64Payload)
           .split('')
@@ -269,7 +316,11 @@ export class AuthService {
       return 'manager';
     }
 
-    if (role.includes('content-creator') || role.includes('contentcreator') || role.includes('creator')) {
+    if (
+      role.includes('content-creator') ||
+      role.includes('contentcreator') ||
+      role.includes('creator')
+    ) {
       return 'content-creator';
     }
 

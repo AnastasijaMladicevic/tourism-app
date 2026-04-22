@@ -16,6 +16,7 @@ namespace TuristickiVodic.Core.DTO
 
         public double? Latitude { get; set; }
         public double? DistanceMeters { get; set; }
+        public bool HasPendingDeletionRequest { get; set; }
         public bool IsActive { get; set; }
 
         public decimal? Price { get; set; }

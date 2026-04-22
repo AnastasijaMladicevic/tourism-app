@@ -831,6 +831,60 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task GetMyAsync_OznacavaHasPendingDeletionRequestZaAktivnostiKojeImajuPendingZahtev()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetMyAsync_OznacavaHasPendingDeletionRequestZaAktivnostiKojeImajuPendingZahtev));
+            var (_, _, _, activityType, destination, _, locality, _, creator, _, _, _, _) = SeedBase(ctx);
+
+            ctx.Activities.AddRange(
+                new Activity
+                {
+                    Id = 1,
+                    Name = "Aktivnost sa pending zahtevom",
+                    ActivityTypeId = activityType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new Activity
+                {
+                    Id = 2,
+                    Name = "Aktivnost bez pending zahteva",
+                    ActivityTypeId = activityType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+            ctx.DeletionRequests.Add(new DeletionRequest
+            {
+                Id = 1,
+                ActivityId = 1,
+                RequestedByUserId = creator.Id,
+                Status = ContentStatus.Pending,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetMyAsync(creator.Id, new ActivityQueryDto { SortBy = "name", SortOrder = "asc" });
+
+            result.TotalCount.Should().Be(2);
+            result.Items.Select(x => x.Name).Should().Equal("Aktivnost bez pending zahteva", "Aktivnost sa pending zahtevom");
+            result.Items.Select(x => x.HasPendingDeletionRequest).Should().Equal(false, true);
+        }
+
+        [Fact]
         public async Task GetForManagerAsync_ManagerVidiSamoAktivnostiSvojeDestinacijeNezavisnoOdStatusa()
         {
             using var ctx = CreateInMemoryContext(nameof(GetForManagerAsync_ManagerVidiSamoAktivnostiSvojeDestinacijeNezavisnoOdStatusa));

@@ -1,59 +1,49 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { TranslationService } from '../../services/translation.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 interface FaqItem {
-  question: string;
-  answer: string;
+  questionKey: string;
+  answerKey: string;
 }
 
 @Component({
   selector: 'app-support',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './support.component.html',
   styleUrl: './support.component.scss',
 })
 export class SupportComponent {
   private readonly route = inject(ActivatedRoute);
+  private readonly translationService = inject(TranslationService);
 
   protected readonly backLink = this.route.snapshot.queryParamMap.get('returnTo') || '/profile';
   protected readonly query = signal('');
   protected readonly openIndex = signal<number | null>(1);
 
   protected readonly faqs: FaqItem[] = [
-    {
-      question: 'Kako da azuriram podatke na profilu?',
-      answer:
-        'Na ekranu Izmeni profil mozes promeniti ime, prezime, telefon, drzavu i profilnu fotografiju koristeci postojece nalog opcije.',
-    },
-    {
-      question: 'Gde vidim sacuvane stavke?',
-      answer:
-        'Favorites ekran prikazuje sve stavke sacuvane preko postojeceg API-ja i omogucava brzo uklanjanje onoga sto ti vise ne treba.',
-    },
-    {
-      question: 'Kako radi planer putovanja?',
-      answer:
-        'Planer trenutno radi lokalno na uredjaju i ne trazi backend izmene. Mozes sacuvati destinaciju, datum, beleske i checklistu.',
-    },
-    {
-      question: 'Kako da promenim jezik aplikacije?',
-      answer:
-        'Na ekranu Jezik mozes izabrati trenutno podrzanu varijantu i sacuvati promenu preko postojece korisnicke rute.',
-    },
+    { questionKey: 'support.faq.1.q', answerKey: 'support.faq.1.a' },
+    { questionKey: 'support.faq.2.q', answerKey: 'support.faq.2.a' },
+    { questionKey: 'support.faq.3.q', answerKey: 'support.faq.3.a' },
+    { questionKey: 'support.faq.4.q', answerKey: 'support.faq.4.a' },
   ];
 
   protected get filteredFaqs(): Array<FaqItem & { originalIndex: number }> {
     const search = this.query().trim().toLowerCase();
     return this.faqs
       .map((item, index) => ({ ...item, originalIndex: index }))
-      .filter(
-        (item) =>
-          !search
-          || item.question.toLowerCase().includes(search)
-          || item.answer.toLowerCase().includes(search),
-      );
+      .filter((item) => {
+        if (!search) {
+          return true;
+        }
+
+        const question = this.translationService.translate(item.questionKey).toLowerCase();
+        const answer = this.translationService.translate(item.answerKey).toLowerCase();
+        return question.includes(search) || answer.includes(search);
+      });
   }
 
   protected toggleFaq(index: number): void {

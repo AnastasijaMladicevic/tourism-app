@@ -81,6 +81,38 @@ namespace TuristickiVodic.Tests.Validation
         }
 
         [Fact]
+        public void CreateUserDto_EmailSaDuplomTackomUDomenu_NijeValidno()
+        {
+            var dto = new CreateUserDto
+            {
+                FirstName = "A",
+                LastName = "B",
+                Email = "test@example..com",
+                Password = "lozinka1",
+                DateOfBirth = new DateTime(1990, 1, 1)
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains("Email"));
+        }
+
+        [Fact]
+        public void CreateUserDto_EmailSaCrticomNaPocetkuDomena_NijeValidno()
+        {
+            var dto = new CreateUserDto
+            {
+                FirstName = "A",
+                LastName = "B",
+                Email = "test@-example.com",
+                Password = "lozinka1",
+                DateOfBirth = new DateTime(1990, 1, 1)
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains("Email"));
+        }
+
+        [Fact]
         public void CreateUserDto_LozinkaKraca6Karaktera_NijeValidno()
         {
             var dto = new CreateUserDto
@@ -1572,6 +1604,43 @@ namespace TuristickiVodic.Tests.Validation
         }
 
         [Fact]
+        public void ForgotPasswordDto_EmailSaDisplayName_NijeValidno()
+        {
+            var dto = new ForgotPasswordDto
+            {
+                Email = "Ana <ana@test.com>"
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(ForgotPasswordDto.Email)));
+        }
+
+        [Fact]
+        public void LoginDto_ValidanEmail_JeValidno()
+        {
+            var dto = new LoginDto
+            {
+                Email = "ana+tag@test.com",
+                Password = "lozinka123"
+            };
+
+            IsValid(dto).Should().BeTrue();
+        }
+
+        [Fact]
+        public void LoginDto_EmailSaDuplomTackomUDomenu_NijeValidno()
+        {
+            var dto = new LoginDto
+            {
+                Email = "ana@test..com",
+                Password = "lozinka123"
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(LoginDto.Email)));
+        }
+
+        [Fact]
         public void NearbyLocalityQueryDto_NegativanRadius_NijeValidno()
         {
             var dto = new NearbyLocalityQueryDto
@@ -1650,6 +1719,19 @@ namespace TuristickiVodic.Tests.Validation
 
             IsValid(dto).Should().BeFalse();
             Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(VerifyResetCodeDto.Code)));
+        }
+
+        [Fact]
+        public void VerifyResetCodeDto_EmailSaCrticomNaPocetkuDomena_NijeValidno()
+        {
+            var dto = new VerifyResetCodeDto
+            {
+                Email = "ana@-test.com",
+                Code = "123456"
+            };
+
+            IsValid(dto).Should().BeFalse();
+            Validate(dto).Should().Contain(r => r.MemberNames.Contains(nameof(VerifyResetCodeDto.Email)));
         }
 
         [Fact]

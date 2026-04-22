@@ -1,19 +1,16 @@
 <div class="map-page">
-  <!-- Search bar -->
   <div class="search-bar">
     <div class="search-input">
       <mat-icon>search</mat-icon>
-      <input type="text" placeholder="Search places, routes..." [(ngModel)]="searchQuery" />
+      <input type="text" [placeholder]="'map.searchPlaceholder' | translate" [(ngModel)]="searchQuery" />
     </div>
     <button class="filter-icon-btn">
       <mat-icon>filter_list</mat-icon>
     </button>
   </div>
 
-  <!-- Mapa -->
   <div id="main-map" class="main-map"></div>
 
-  <!-- Kontrole desno -->
   <div class="map-controls">
     <button class="control-btn gps-btn" (click)="centerOnMyLocation()" aria-label="My location">
       <mat-icon>my_location</mat-icon>
@@ -26,14 +23,12 @@
     </button>
   </div>
 
-  <!-- Bottom card — prikazuje se kad se klikne marker -->
   @if (selectedItem) {
     <div class="bottom-card" (click)="$event.stopPropagation()">
       <button class="bottom-card__close" (click)="closeCard()" aria-label="Close">
         <mat-icon>close</mat-icon>
       </button>
 
-      <!-- Slika -->
       <div class="bottom-card__image-wrap">
         @if (getItemImage()) {
           <img [src]="getItemImage()" [alt]="selectedItem.name" class="bottom-card__image" />
@@ -44,7 +39,6 @@
         }
       </div>
 
-      <!-- Info -->
       <div class="bottom-card__body">
         <div class="bottom-card__top">
           <div class="bottom-card__info">
@@ -57,7 +51,6 @@
             </p>
           </div>
 
-          <!-- Rating samo za objects koji ga imaju -->
           @if (selectedItem.averageRating > 0) {
             <div class="bottom-card__rating">
               <mat-icon>star</mat-icon>
@@ -66,7 +59,6 @@
           }
         </div>
 
-        <!-- Open/distance row -->
         <div class="bottom-card__badges">
           @if (getWorkingStatus() !== null) {
             <span
@@ -74,7 +66,7 @@
               [class.badge--open]="getWorkingStatus()"
               [class.badge--closed]="!getWorkingStatus()"
             >
-              {{ getWorkingStatus() ? 'OPEN NOW' : 'CLOSED' }}
+              {{ getWorkingStatus() ? ('common.openNow' | translate) : ('common.closed' | translate) }}
             </span>
           }
           @if (selectedItem.distanceKm != null) {
@@ -85,7 +77,7 @@
           }
         </div>
 
-        <button class="bottom-card__btn" (click)="openDetails()">Details</button>
+        <button class="bottom-card__btn" (click)="openDetails()">{{ getActionLabel() }}</button>
       </div>
     </div>
   }

@@ -7,6 +7,7 @@ export interface EventDto {
   id: number;
   name: string;
   description?: string;
+  mainImageUrl?: string;
   longitude?: number;
   latitude?: number;
   startDate: string;

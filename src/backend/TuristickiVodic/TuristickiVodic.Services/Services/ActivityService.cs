@@ -79,6 +79,7 @@ namespace TuristickiVodic.Services.Services
                 .ToListAsync();
 
             var mappedItems = _mapper.Map<List<ActivityDto>>(items);
+            await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
 
             return new PagedResultDto<ActivityDto>
             {
@@ -173,6 +174,8 @@ namespace TuristickiVodic.Services.Services
                 })
                 .ToList();
 
+            await ApplyPendingDeletionRequestFlagsAsync(items);
+
             return new PagedResultDto<ActivityDto>
             {
                 Items = items,
@@ -237,9 +240,12 @@ namespace TuristickiVodic.Services.Services
                 .Take(query.PageSize)
                 .ToListAsync();
 
+            var mappedItems = _mapper.Map<List<ActivityDto>>(items);
+            await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
+
             return new PagedResultDto<ActivityDto>
             {
-                Items = _mapper.Map<List<ActivityDto>>(items),
+                Items = mappedItems,
                 Page = query.Page,
                 PageSize = query.PageSize,
                 TotalCount = totalCount,
@@ -309,9 +315,12 @@ namespace TuristickiVodic.Services.Services
                 .Take(query.PageSize)
                 .ToListAsync();
 
+            var mappedItems = _mapper.Map<List<ActivityDto>>(items);
+            await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
+
             return new PagedResultDto<ActivityDto>
             {
-                Items = _mapper.Map<List<ActivityDto>>(items),
+                Items = mappedItems,
                 Page = query.Page,
                 PageSize = query.PageSize,
                 TotalCount = totalCount,
@@ -339,7 +348,9 @@ namespace TuristickiVodic.Services.Services
             if (!hasMainImage)
                 return null;
 
-            return _mapper.Map<ActivityDto>(activity);
+            var dto = _mapper.Map<ActivityDto>(activity);
+            await ApplyPendingDeletionRequestFlagsAsync(dto);
+            return dto;
         }
 
         public async Task<ActivityDto?> GetMineByIdAsync(int id, int userId)
@@ -353,7 +364,12 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.Images)
                 .FirstOrDefaultAsync(a => a.Id == id && a.CreatedByUserId == userId);
 
-            return activity == null ? null : _mapper.Map<ActivityDto>(activity);
+            if (activity == null)
+                return null;
+
+            var dto = _mapper.Map<ActivityDto>(activity);
+            await ApplyPendingDeletionRequestFlagsAsync(dto);
+            return dto;
         }
 
         public async Task<ActivityDto?> GetForManagerByIdAsync(int id, int userId)
@@ -378,7 +394,9 @@ namespace TuristickiVodic.Services.Services
             if (!isResponsible)
                 return null;
 
-            return _mapper.Map<ActivityDto>(activity);
+            var dto = _mapper.Map<ActivityDto>(activity);
+            await ApplyPendingDeletionRequestFlagsAsync(dto);
+            return dto;
         }
 
         // Samo ContentCreator kreira aktivnost – status uvek Pending, čeka odobrenje menadžera.
@@ -451,7 +469,9 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.Images)
                 .FirstAsync(a => a.Id == activity.Id);
 
-            return _mapper.Map<ActivityDto>(created);
+            var result = _mapper.Map<ActivityDto>(created);
+            await ApplyPendingDeletionRequestFlagsAsync(result);
+            return result;
         }
 
         // Samo ContentCreator može da menja svoju aktivnost.
@@ -549,7 +569,9 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.Images)
                 .FirstAsync(a => a.Id == activity.Id);
 
-            return _mapper.Map<ActivityDto>(updated);
+            var result = _mapper.Map<ActivityDto>(updated);
+            await ApplyPendingDeletionRequestFlagsAsync(result);
+            return result;
         }
 
         // Samo odgovorni menadžer može da odobri/odbije Pending aktivnost u svojoj destinaciji.
@@ -604,7 +626,9 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.Images)
                 .FirstAsync(a => a.Id == activity.Id);
 
-            return _mapper.Map<ActivityDto>(updated);
+            var result = _mapper.Map<ActivityDto>(updated);
+            await ApplyPendingDeletionRequestFlagsAsync(result);
+            return result;
         }
 
         // Samo ContentCreator može direktno da obriše svoju aktivnost koja nije Approved.
@@ -654,6 +678,35 @@ namespace TuristickiVodic.Services.Services
 
             var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
             return earthRadiusMeters * c;
+        }
+
+        private async Task ApplyPendingDeletionRequestFlagsAsync(List<ActivityDto> items)
+        {
+            if (items.Count == 0)
+                return;
+
+            var activityIds = items.Select(x => x.Id).Distinct().ToList();
+
+            var pendingIds = await _context.DeletionRequests
+                .AsNoTracking()
+                .Where(dr => dr.ActivityId.HasValue
+                    && activityIds.Contains(dr.ActivityId.Value)
+                    && dr.Status == ContentStatus.Pending)
+                .Select(dr => dr.ActivityId!.Value)
+                .Distinct()
+                .ToListAsync();
+
+            var pendingIdSet = pendingIds.ToHashSet();
+
+            foreach (var item in items)
+            {
+                item.HasPendingDeletionRequest = pendingIdSet.Contains(item.Id);
+            }
+        }
+
+        private Task ApplyPendingDeletionRequestFlagsAsync(ActivityDto item)
+        {
+            return ApplyPendingDeletionRequestFlagsAsync(new List<ActivityDto> { item });
         }
 
         private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180d;
@@ -711,7 +764,9 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.Images)
                 .FirstAsync(a => a.Id == activity.Id);
 
-            return _mapper.Map<ActivityDto>(updated);
+            var result = _mapper.Map<ActivityDto>(updated);
+            await ApplyPendingDeletionRequestFlagsAsync(result);
+            return result;
         }
 
         private static IQueryable<Activity> ApplyActivitySorting(IQueryable<Activity> query, string? sortBy, string? sortOrder)

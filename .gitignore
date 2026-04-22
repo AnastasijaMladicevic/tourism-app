@@ -36,3 +36,6 @@ Release/
 # System
 .DS_Store
 Thumbs.db
+# Deployment
+.env
+

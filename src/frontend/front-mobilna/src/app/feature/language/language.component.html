@@ -1,26 +1,23 @@
 <div class="language-page">
   <header class="language-topbar">
-    <button class="back-btn" type="button" (click)="goBack()" aria-label="Nazad">
+    <button class="back-btn" type="button" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="m15 18-6-6 6-6" />
       </svg>
     </button>
-    <h1>Jezik</h1>
+    <h1>{{ 'language.title' | translate }}</h1>
     <div class="topbar-spacer" aria-hidden="true"></div>
   </header>
 
   <div class="language-shell">
     <section class="language-section">
-      <h2>Dostupni jezici</h2>
+      <h2>{{ 'language.available' | translate }}</h2>
 
       <div class="language-card">
         @for (option of options; track option.code) {
           <button class="language-option" type="button" (click)="selectLanguage(option.code)">
             <div class="language-option__content">
-              <strong>{{ option.label }}</strong>
-              @if (option.subtitle) {
-                <span>{{ option.subtitle }}</span>
-              }
+              <strong>{{ option.labelKey | translate }}</strong>
             </div>
 
             <span class="language-option__radio" [class.language-option__radio--active]="isSelected(option.code)">
@@ -36,10 +33,8 @@
     <section class="language-note">
       <div class="language-note__icon">i</div>
       <div class="language-note__content">
-        <strong>Promena jezika zahteva restart</strong>
-        <p>
-          Aplikacija će se automatski ponovo pokrenuti kako bi se primenila sva podešavanja prevoda na izabrani jezik.
-        </p>
+        <strong>{{ 'language.infoTitle' | translate }}</strong>
+        <p>{{ 'language.infoBody' | translate }}</p>
       </div>
     </section>
 
@@ -50,11 +45,8 @@
 
   <footer class="language-footer">
     <button class="apply-btn" type="button" [disabled]="!canApply()" (click)="applyLanguage()">
-      {{ isSaving() ? 'Čuvanje...' : 'Primeni i ponovo pokreni' }}
+      {{ isSaving() ? ('language.saving' | translate) : ('language.apply' | translate) }}
     </button>
-    <p>
-      Klikom na dugme potvrđujete promenu lokalizacije aplikacije na
-      {{ selectedCode() === 'en' ? 'English' : 'Crnogorski / Srpski' }}.
-    </p>
+    <p>{{ 'language.confirm' | translate: { language: getSelectedLanguageLabel() } }}</p>
   </footer>
 </div>

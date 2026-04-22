@@ -1,11 +1,13 @@
 using System.ComponentModel.DataAnnotations;
+using TuristickiVodic.Core.Validation;
 
 namespace TuristickiVodic.Core.DTO
 {
     public class VerifyResetCodeDto
     {
-        [Required, EmailAddress]
-        public string Email { get; set; } = string.Empty;
+        [Required]
+        [RfcEmailAddress]
+        public string Email { get; set; }
 
         [Required, RegularExpression(@"^\d{6}$")]
         public string Code { get; set; } = string.Empty;

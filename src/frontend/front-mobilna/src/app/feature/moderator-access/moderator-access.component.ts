@@ -3,17 +3,20 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import { AuthService, UserDto } from '../../services/auth';
+import { TranslationService } from '../../services/translation.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-moderator-access',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './moderator-access.component.html',
   styleUrl: './moderator-access.component.scss',
 })
 export class ModeratorAccessComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly translationService = inject(TranslationService);
 
   protected readonly isSubmitting = signal(false);
   protected readonly feedback = signal('');
@@ -22,25 +25,24 @@ export class ModeratorAccessComponent implements OnInit {
 
   protected user: UserDto | null = null;
 
-  protected readonly requirements = [
-    'Nalog treba da bude aktivan i uredno korišćen.',
-    'Poželjno je da imate iskustva sa prijavama sadržaja i pravilima zajednice.',
-    'Nakon prijave, administracija proverava zahtev i status naloga.',
+  protected readonly requirementKeys = [
+    'moderator.req.1',
+    'moderator.req.2',
+    'moderator.req.3',
   ];
 
-  protected readonly responsibilities = [
-    'Pregled prijavljenog sadržaja i osnovna moderacija objava.',
-    'Brža komunikacija sa podrškom kada je potrebno reagovati.',
-    'Doprinos kvalitetu i sigurnosti sadržaja unutar aplikacije.',
+  protected readonly responsibilityKeys = [
+    'moderator.resp.1',
+    'moderator.resp.2',
+    'moderator.resp.3',
   ];
 
   protected readonly roleLabel = computed(() => {
     const roleName = this.user?.roleName?.trim();
-    if (!roleName) return 'Turista';
-    if (roleName === 'ContentCreator') return 'Moderator';
-    if (roleName === 'Admin') return 'Administrator';
-    if (roleName === 'Manager') return 'Menadžer';
-    if (roleName === 'Tourist') return 'Turista';
+    if (!roleName || roleName === 'Tourist') return this.translationService.translate('moderator.role.tourist');
+    if (roleName === 'ContentCreator') return this.translationService.translate('moderator.role.moderator');
+    if (roleName === 'Admin') return this.translationService.translate('moderator.role.admin');
+    if (roleName === 'Manager') return this.translationService.translate('moderator.role.manager');
     return roleName;
   });
 
@@ -49,9 +51,9 @@ export class ModeratorAccessComponent implements OnInit {
   });
 
   protected readonly statusBadge = computed(() => {
-    if (this.user?.roleName === 'ContentCreator') return 'Pristup odobren';
-    if (this.user?.roleName && this.user.roleName !== 'Tourist') return 'Posebna uloga aktivna';
-    return 'Zahtev dostupan';
+    if (this.user?.roleName === 'ContentCreator') return this.translationService.translate('moderator.badge.approved');
+    if (this.user?.roleName && this.user.roleName !== 'Tourist') return this.translationService.translate('moderator.badge.activeRole');
+    return this.translationService.translate('moderator.badge.available');
   });
 
   ngOnInit(): void {
@@ -84,7 +86,7 @@ export class ModeratorAccessComponent implements OnInit {
         catchError((error) => {
           const message = (error as { error?: { message?: string } })?.error?.message;
           this.feedbackTone.set('error');
-          this.feedback.set(message || 'Zahtev trenutno nije moguće poslati.');
+          this.feedback.set(message || this.translationService.translate('moderator.requestFailed'));
           return of(null);
         }),
         finalize(() => this.isSubmitting.set(false)),
@@ -93,7 +95,11 @@ export class ModeratorAccessComponent implements OnInit {
         if (!result) return;
 
         this.feedbackTone.set('success');
-        this.feedback.set('Zahtev za pristup moderatoru je uspešno poslat.');
+        this.feedback.set(this.translationService.translate('moderator.requestSent'));
       });
+  }
+
+  protected translate(key: string): string {
+    return this.translationService.translate(key);
   }
 }
