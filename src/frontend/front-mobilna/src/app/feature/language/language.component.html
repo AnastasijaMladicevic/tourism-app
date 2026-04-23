@@ -1,31 +1,39 @@
 <div class="language-page">
   <header class="language-topbar">
-    <button
-      class="back-btn"
-      type="button"
-      (click)="goBack()"
-      [attr.aria-label]="'common.back' | translate"
-    >
+    <button class="back-btn" type="button" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="m15 18-6-6 6-6" />
       </svg>
     </button>
-    <h1>{{ 'region.title' | translate }}</h1>
+    <h1>{{ 'language.title' | translate }}</h1>
     <div class="topbar-spacer" aria-hidden="true"></div>
   </header>
 
   <div class="language-shell">
     <section class="language-section">
-      <h2>{{ 'region.available' | translate }}</h2>
+      <h2>{{ 'language.available' | translate }}</h2>
+      <div class="language-card">
+        @for (option of options; track option.code) {
+          <button class="language-option" type="button" (click)="selectLanguage(option.code)">
+            <div class="language-option__content">
+              <strong>{{ option.labelKey | translate }}</strong>
+            </div>
 
-      <div class="language-card"></div>
+            <span class="language-option__radio" [class.language-option__radio--active]="isSelected(option.code)">
+              @if (isSelected(option.code)) {
+                <span></span>
+              }
+            </span>
+          </button>
+        }
+      </div>
     </section>
 
     <section class="language-note">
       <div class="language-note__icon">i</div>
       <div class="language-note__content">
-        <strong>{{ 'region.infoTitle' | translate }}</strong>
-        <p>{{ 'region.infoBody' | translate }}</p>
+        <strong>{{ 'language.infoTitle' | translate }}</strong>
+        <p>{{ 'language.infoBody' | translate }}</p>
       </div>
     </section>
 
@@ -36,8 +44,8 @@
 
   <footer class="language-footer">
     <button class="apply-btn" type="button" [disabled]="!canApply()" (click)="applyLanguage()">
-      {{ isSaving() ? ('language.saving' | translate) : ('region.apply' | translate) }}
+      {{ isSaving() ? ('language.saving' | translate) : ('language.apply' | translate) }}
     </button>
-    <p>{{ 'region.confirm' | translate: { language: getSelectedLanguageLabel() } }}</p>
+    <p>{{ 'language.confirm' | translate: { language: getSelectedLanguageLabel() } }}</p>
   </footer>
 </div>

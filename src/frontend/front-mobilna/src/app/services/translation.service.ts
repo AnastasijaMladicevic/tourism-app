@@ -50,6 +50,7 @@ const TRANSLATIONS: Record<string, Record<AppLanguage, string>> = {
   'profile.section.account': { sr: 'NALOG', en: 'ACCOUNT' },
   'profile.favorites': { sr: 'Favoriti', en: 'Favorites' },
   'profile.myReviews': { sr: 'Moje recenzije', en: 'My reviews' },
+  'profile.language': { sr: 'Jezik', en: 'Language' },
   'profile.region': { sr: 'Region', en: 'Region' },
   'profile.support': { sr: 'Pomoc i podrska', en: 'Help and support' },
   'profile.privacy': { sr: 'Privatnost i podaci', en: 'Privacy and data' },
@@ -65,10 +66,25 @@ const TRANSLATIONS: Record<string, Record<AppLanguage, string>> = {
     sr: 'Nakon cuvanja, kompletan mobilni interfejs ce odmah biti prikazan na izabranom regionu.',
     en: 'After saving, the entire mobile interface will switch to the selected region immediately.',
   },
+  'language.title': { sr: 'Jezik', en: 'Language' },
+  'language.available': { sr: 'Dostupni jezici', en: 'Available languages' },
+  'language.infoTitle': {
+    sr: 'Promena jezika se primenjuje odmah',
+    en: 'Language changes apply instantly',
+  },
+  'language.infoBody': {
+    sr: 'Nakon cuvanja, mobilni interfejs ce odmah biti prikazan na izabranom jeziku.',
+    en: 'After saving, the mobile interface will immediately switch to the selected language.',
+  },
   'language.active': { sr: 'Jezik je vec aktivan.', en: 'This language is already active.' },
   'language.saveFailed': { sr: 'Promena jezika nije sacuvana.', en: 'Language change was not saved.' },
   'language.saved': { sr: 'Jezik je uspesno azuriran.', en: 'Language was updated successfully.' },
   'language.saving': { sr: 'Cuvanje...', en: 'Saving...' },
+  'language.apply': { sr: 'Primeni jezik', en: 'Apply language' },
+  'language.confirm': {
+    sr: 'Klikom na dugme potvrdujete promenu jezika aplikacije na {{language}}.',
+    en: 'By tapping the button you confirm switching the app language to {{language}}.',
+  },
   'region.apply': { sr: 'Primeni region', en: 'Apply region' },
   'region.confirm': {
     sr: 'Klikom na dugme potvrdujete promenu regiona aplikacije na {{language}}.',

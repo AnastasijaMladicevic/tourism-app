@@ -58,7 +58,9 @@
               }
             }
           </div>
-          <strong>{{ stat.value }}</strong>
+          @if (shouldShowStatValue(stat)) {
+            <strong>{{ stat.value }}</strong>
+          }
           <span>{{ stat.labelKey | translate }}</span>
         </article>
       }
@@ -100,7 +102,7 @@
                         />
                       </svg>
                     }
-                    @case ('region') {
+                    @case ('language') {
                       <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path
                           d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.9 9h-3.1a15.9 15.9 0 0 0-1.5-5A8 8 0 0 1 18.9 11ZM12 4c1.2 1.5 2.1 4 2.4 7H9.6c.3-3 1.2-5.5 2.4-7ZM6.7 6a15.9 15.9 0 0 0-1.5 5H2.1A8 8 0 0 1 6.7 6ZM4.1 13h3.1a15.9 15.9 0 0 0 1.5 5A8 8 0 0 1 4.1 13Zm5.5 0h4.8c-.3 3-1.2 5.5-2.4 7-1.2-1.5-2.1-4-2.4-7Zm4.7 5a15.9 15.9 0 0 0 1.5-5h3.1a8 8 0 0 1-4.6 5Z"

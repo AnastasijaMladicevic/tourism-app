@@ -52,7 +52,7 @@ interface SearchResult {
 interface HomeCategory {
   label: string;
   route: string;
-  key: 'object' | 'locality' | 'event' | 'activity' | 'attraction'
+  key: 'object' | 'locality' | 'event' | 'activity' | 'destination'
 }
 
 @Component({
@@ -66,7 +66,7 @@ export class HomeComponent implements OnInit {
   userName = '';
   searchQuery = '';
   readonly categories: HomeCategory[] = [
-    { label: 'Attractions', route: '/attractions', key: 'attraction' },
+    { label: 'Destinations', route: '/destinations', key: 'destination' },
     { label: 'Objects', route: '/objects', key: 'object' },
     { label: 'Localities', route: '/localities', key: 'locality' },
     { label: 'Activities', route: '/activities', key: 'activity' },
@@ -267,20 +267,6 @@ export class HomeComponent implements OnInit {
   }, 10000);
 }
   
-  selectedRegion = 'Montenegro';
-
-  regions = ['Montenegro', 'Spain'];
-
-  showRegionMenu = false;
-
-  toggleRegionMenu(): void {
-    this.showRegionMenu = !this.showRegionMenu;
-  }
-
-  setRegion(region: string): void {
-    this.selectedRegion = region;
-    this.showRegionMenu = false;
-  }
   get isLoadingHome(): boolean {
     return this.isLoadingPlaces || this.isLoadingEvents;
   }
@@ -859,8 +845,8 @@ export class HomeComponent implements OnInit {
       case 'object':
         route = 'object';
         break;
-      case 'attraction':
-        route = 'attraction';
+      case 'destination':
+        route = 'destination';
         break;
       case 'activity':
         route = 'activity'

@@ -1,7 +1,7 @@
 <div class="page">
   <div class="scroll-content">
     <div class="greeting">
-      <p class="greeting-sub">Hello, glad to see you.</p>
+      <p class="greeting-sub">Hi, glad to see you again</p>
       <h1 class="greeting-name">{{ userName }}</h1>
     </div>
 
@@ -24,20 +24,9 @@
         }
       </div>
       <div class="region-wrapper">
-        <button class="filter-btn" (click)="toggleRegionMenu()">
-          {{ selectedRegion }}
-          <mat-icon>expand_more</mat-icon>
+        <button class="filter-btn" type="button">
+          Choose Region
         </button>
-        <!-- DROPDOWN -->
-        @if (showRegionMenu) {
-          <div class="filter-dropdown">
-            @for (r of regions; track $index) {
-              <div (click)="setRegion(r)" class="dropdown-item">
-                {{ r }}
-              </div>
-            }
-          </div>
-        }
       </div>
       @if (showSuggestions && searchResults.length > 0) {
         <div class="suggestions">

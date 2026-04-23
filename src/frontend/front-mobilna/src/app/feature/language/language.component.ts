@@ -18,7 +18,7 @@ interface LanguageOption {
   templateUrl: './language.component.html',
   styleUrl: './language.component.scss',
 })
-export class RegionComponent implements OnInit {
+export class LanguageComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly translationService = inject(TranslationService);

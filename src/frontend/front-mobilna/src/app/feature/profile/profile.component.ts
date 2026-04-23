@@ -11,8 +11,9 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 interface ProfileStat {
   labelKey: string;
-  value: string | number;
+  value: number;
   icon: string;
+  hideWhenZero?: boolean;
 }
 
 interface ProfileAction {
@@ -44,7 +45,7 @@ export class ProfileComponent implements OnInit {
 
   protected user: UserDto | null = null;
   protected stats: ProfileStat[] = [
-    { labelKey: 'profile.stats.favorites', value: 0, icon: 'heart' },
+    { labelKey: 'profile.stats.favorites', value: 0, icon: 'heart', hideWhenZero: true },
     { labelKey: 'profile.stats.reviews', value: 0, icon: 'star' },
   ];
 
@@ -59,7 +60,7 @@ export class ProfileComponent implements OnInit {
     {
       titleKey: 'profile.section.settings',
       items: [
-        { titleKey: 'profile.region', icon: 'region', accent: 'green', route: '/region' },
+        { titleKey: 'profile.language', icon: 'language', accent: 'green', route: '/language' },
         { titleKey: 'profile.support', icon: 'help', accent: 'gray', route: '/support' },
       ],
     },
@@ -161,6 +162,10 @@ export class ProfileComponent implements OnInit {
     return stat.labelKey;
   }
 
+  protected shouldShowStatValue(stat: ProfileStat): boolean {
+    return !(stat.hideWhenZero && stat.value === 0);
+  }
+
   private loadStats(currentUserId: number): void {
     if (!this.authService.isLoggedIn()) {
       return;
@@ -177,7 +182,12 @@ export class ProfileComponent implements OnInit {
       ),
     }).subscribe(({ favorites, reviews }) => {
       this.stats = [
-        { labelKey: 'profile.stats.favorites', value: favorites, icon: 'heart' },
+        {
+          labelKey: 'profile.stats.favorites',
+          value: favorites,
+          icon: 'heart',
+          hideWhenZero: true,
+        },
         { labelKey: 'profile.stats.reviews', value: reviews, icon: 'star' },
       ];
     });
