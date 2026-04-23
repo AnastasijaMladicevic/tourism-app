@@ -7,6 +7,7 @@ import { TranslationService } from './translation.service';
 export interface LoginDto {
   email: string;
   password: string;
+  rememberMe: boolean;
 }
 
 export interface ChangePasswordDto {
@@ -182,8 +183,17 @@ export class AuthService {
     return this.http.post(`${this.url}/forgot-password`, { email });
   }
 
-  resetPassword(email: string, code: string, newPassword: string): Observable<any> {
-    return this.http.post(`${this.url}/reset-password`, { email, code, newPassword });
+  verifyResetCode(data: any): Observable<any> {
+    return this.http.post(`${this.url}/verify-reset-code`, data);
+  }
+  resetPassword(email: string, code: string, newPassword: string, confirmPassword: string, resetSessionToken: string): Observable<any> {
+    return this.http.post(`${this.url}/reset-password`, { 
+      email, 
+      code, 
+      newPassword,
+      confirmPassword,
+      resetSessionToken
+    });
   }
 
   updateMyLocation(latitude: number, longitude: number): Observable<any> {

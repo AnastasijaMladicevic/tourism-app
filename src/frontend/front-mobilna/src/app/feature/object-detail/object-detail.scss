@@ -1,9 +1,6 @@
 h1 {
   font-size: 32px;
 }
-.section {
-  margin-bottom: 40px;
-}
 button:hover {
   transform: translateY(-2px);
 }
@@ -148,7 +145,6 @@ button:hover {
 .header-section {
   display: flex;
   flex-direction: column;
-  // gap: 15px;
   max-width: 600px;
 }
 .title-row {
@@ -239,7 +235,6 @@ button:hover {
   display: flex;
   gap: 12px;
   margin-top: 15px;
-  // margin: 24px 0;
 }
 .btn {
   flex: 1;

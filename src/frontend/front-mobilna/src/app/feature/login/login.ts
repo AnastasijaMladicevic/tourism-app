@@ -11,6 +11,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LogoComponent } from '../../shared/components/logo/logo';
 import { AuthService } from '../../services/auth';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-login',
@@ -29,6 +30,7 @@ export class LoginComponent {
     private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -36,6 +38,7 @@ export class LoginComponent {
         '',
         [Validators.required, Validators.minLength(6), this.passwordStrengthValidator],
       ],
+      rememberMe: [false]
     });
   }
 
@@ -54,7 +57,9 @@ export class LoginComponent {
   get password() {
     return this.form.get('password');
   }
-
+  get rememberMe(){
+    return this.form.get('rememberMe');
+  }
   togglePassword(): void {
     this.hidePassword = !this.hidePassword;
   }
@@ -80,20 +85,25 @@ export class LoginComponent {
       .login({
         email: this.form.value.email,
         password: this.form.value.password,
+        rememberMe: this.form.value.rememberMe,
       })
       .subscribe({
         next: () => {
           this.isLoading = false;
+          this.cdr.detectChanges();
           if (this.authService.isAdmin()) {
             this.errorMessage = 'Admin access is not available here.';
-            // this.authService.logout().subscribe();
+            this.authService.logout().subscribe();
+            this.cdr.detectChanges();
             return;
           }
+          
           this.router.navigate(['/home']);
         },
         error: (err) => {
           this.isLoading = false;
           this.errorMessage = err?.error?.message ?? 'Invalid email or password.';
+          this.cdr.detectChanges();
         },
       });
   }

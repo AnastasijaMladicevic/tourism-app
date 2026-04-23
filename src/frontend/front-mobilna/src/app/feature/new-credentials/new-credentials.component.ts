@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -8,7 +8,7 @@ import {
   ValidatorFn,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import { AuthService, ChangePasswordDto } from '../../services/auth';
 import { HeaderComponent } from '../header/header.component';
@@ -35,13 +35,27 @@ export class NewCredentialsComponent {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
-
+  private readonly route = inject(ActivatedRoute);
+  private readonly cdr = inject(ChangeDetectorRef);
+  email = '';
+  code = '';
+  isForgotFlow = false;
   isLoading = false;
   errorMessage = '';
   hideCurrentPassword = true;
   hideNewPassword = true;
   hideConfirmPassword = true;
-
+  resetSessionToken = '';
+  ngOnInit(): void {
+    this.email = this.route.snapshot.queryParams['email'] ?? '';
+    this.code = history.state?.code ?? '';
+    this.isForgotFlow = !!this.email;
+    this.resetSessionToken = history.state?.resetSessionToken ?? '';
+    if (this.isForgotFlow) {
+      this.form.get('currentPassword')?.clearValidators();
+      this.form.get('currentPassword')?.updateValueAndValidity();
+    }
+  }
   readonly form = this.fb.group(
     {
       currentPassword: ['', [Validators.required]],
@@ -67,14 +81,42 @@ export class NewCredentialsComponent {
     return /[\d\W]/.test(this.newPasswordValue);
   }
 
-  submit(): void {
+    submit(): void {
+      this.errorMessage = '';
+      if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+
+      // Forgot password flow
+      if (this.isForgotFlow) {
+        this.isLoading = true;
+        this.authService.resetPassword(
+        this.email,
+        this.code,
+        this.form.controls.newPassword.value ?? '',
+        this.form.controls.confirmPassword.value ?? '',
+        this.resetSessionToken
+      ).pipe(
+          catchError(err => {
+            this.errorMessage = err?.error?.message ?? 'Reset nije uspeo.';
+            setTimeout(() => this.cdr.detectChanges());
+            return of(null);
+          }),
+          finalize(() => {this.isLoading = false;
+        setTimeout(() => this.cdr.detectChanges())})
+        ).subscribe(res => {
+          if (!res) return;
+          this.router.navigate(['/password-updated']);
+        });
+        return;
+      }
+
+  // Postojeći change password flow...
+    const user = this.authService.getCurrentUser();
     this.errorMessage = '';
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
-    const user = this.authService.getCurrentUser();
     if (!user?.id) {
       this.errorMessage = 'Niste ulogovani. Prijavite se pa promenite lozinku.';
       return;
