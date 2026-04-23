@@ -56,6 +56,8 @@ export class ContentCreatorEventsComponent implements OnInit {
   categoryFilter = 'all';
   sortBy = 'startDate';
   sortOrder: 'asc' | 'desc' = 'asc';
+  rangeStartDate = '';
+  rangeEndDate = '';
 
   readonly stats: EventInsightCard[] = [
     { label: 'Upcoming this week', value: '12', hint: 'Events published in the next 7 days', tone: 'blue' },
@@ -105,7 +107,9 @@ export class ContentCreatorEventsComponent implements OnInit {
       statusFilter: this.statusFilter,
       categoryFilter: this.categoryFilter,
       sortBy: this.sortBy,
-      sortOrder: this.sortOrder
+      sortOrder: this.sortOrder,
+      startDate: this.rangeStartDate || null,
+      endDate: this.rangeEndDate || null
     };
 
     const query: EventQueryDto = buildEventQueryDto(filterState, {
@@ -113,7 +117,7 @@ export class ContentCreatorEventsComponent implements OnInit {
       pageSize: this.pageSize,
       includeStatus: true,
       includeCategoryAsType: true,
-      includeDateFilters: false
+      includeDateFilters: true
     });
 
     this.eventService.getMy(query).subscribe({
@@ -158,6 +162,23 @@ export class ContentCreatorEventsComponent implements OnInit {
     this.draftSearchQuery = '';
     this.statusFilter = 'all';
     this.categoryFilter = 'all';
+    this.rangeStartDate = '';
+    this.rangeEndDate = '';
+    this.currentPage = 1;
+    this.loadEvents();
+  }
+
+  onDateRangeChange(): void {
+    if (!this.rangeStartDate || !this.rangeEndDate) {
+      return;
+    }
+
+    if (this.rangeStartDate > this.rangeEndDate) {
+      const originalStart = this.rangeStartDate;
+      this.rangeStartDate = this.rangeEndDate;
+      this.rangeEndDate = originalStart;
+    }
+
     this.currentPage = 1;
     this.loadEvents();
   }

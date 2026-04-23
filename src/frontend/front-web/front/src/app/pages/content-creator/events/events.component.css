@@ -122,27 +122,6 @@
 .toolbar-input,
 .toolbar-pill input,
 .filters-row select {
-
-.date-pill {
-  min-width: 220px;
-  max-width: 100%;
-  justify-content: flex-start;
-  gap: 10px;
-  color: #374151;
-  white-space: nowrap;
-}
-
-.date-pill .material-symbols-outlined {
-  font-size: 19px;
-  color: #475569;
-}
-
-.date-pill-text {
-  font-size: 14px;
-  font-weight: 500;
-  color: #374151;
-  white-space: nowrap;
-}
   width: 100%;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -150,6 +129,51 @@
   color: #111827;
   font: inherit;
   outline: none;
+}
+
+.date-range-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #dbe1ea;
+  border-radius: 12px;
+  background: #fff;
+  color: #374151;
+}
+
+.date-range-pill .material-symbols-outlined {
+  font-size: 19px;
+  color: #475569;
+}
+
+.date-range-inputs {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-range-input {
+  width: 138px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #111827;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.date-range-input:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.3);
+}
+
+.date-range-separator {
+  color: #64748b;
+  font-weight: 600;
 }
 
 .toolbar-input {
@@ -784,13 +808,23 @@ tbody tr:hover,
   }
 
   .toolbar-search,
-  .date-pill,
+  .date-range-pill,
   .toolbar .ghost-btn.slim-btn {
     width: 100%;
   }
 
-  .date-pill {
+  .date-range-pill {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .date-range-inputs {
     width: 100%;
+  }
+
+  .date-range-input {
+    flex: 1 1 0;
+    min-width: 0;
   }
 
   .pager {
