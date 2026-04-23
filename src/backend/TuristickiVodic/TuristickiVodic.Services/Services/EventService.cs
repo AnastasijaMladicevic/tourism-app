@@ -66,13 +66,7 @@ namespace TuristickiVodic.Services.Services
                     e.Destination.Name.ToLower().Contains(destination));
             }
 
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
-                eventsQuery = eventsQuery.Where(e =>
-                    e.Name.ToLower().Contains(search) ||
-                    (e.Description != null && e.Description.ToLower().Contains(search)));
-            }
+            var search = NormalizeSearchTerm(query.Search);
 
             var hasDate = query.Date.HasValue;
             var hasNextDays = query.NextDays.HasValue;
@@ -118,7 +112,11 @@ namespace TuristickiVodic.Services.Services
                     (!e.EndDate.HasValue || e.EndDate.Value >= periodStart.Value));
             }
 
-            eventsQuery = ApplySorting(eventsQuery, query.SortBy, query.SortOrder);
+            if (search != null)
+                eventsQuery = ApplyEventSearch(eventsQuery, search);
+
+            if (search == null)
+                eventsQuery = ApplySorting(eventsQuery, query.SortBy, query.SortOrder);
 
             var totalCount = await eventsQuery.CountAsync();
 
@@ -179,13 +177,9 @@ namespace TuristickiVodic.Services.Services
                     e.Destination.Name.ToLower().Contains(destination));
             }
 
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
-                eventsQuery = eventsQuery.Where(e =>
-                    e.Name.ToLower().Contains(search) ||
-                    (e.Description != null && e.Description.ToLower().Contains(search)));
-            }
+            var search = NormalizeSearchTerm(query.Search);
+            if (search != null)
+                eventsQuery = ApplyEventSearchFilter(eventsQuery, search);
 
             var hasDate = query.Date.HasValue;
             var hasNextDays = query.NextDays.HasValue;
@@ -312,15 +306,10 @@ namespace TuristickiVodic.Services.Services
                     e.Destination.Name.ToLower().Contains(destination));
             }
 
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
-                eventsQuery = eventsQuery.Where(e =>
-                    e.Name.ToLower().Contains(search) ||
-                    (e.Description != null && e.Description.ToLower().Contains(search)));
-            }
-
             eventsQuery = ApplyStatusFilter(eventsQuery, query.Status);
+            var search = NormalizeSearchTerm(query.Search);
+            if (search != null)
+                eventsQuery = ApplyEventSearchFilter(eventsQuery, search);
             eventsQuery = ApplySorting(eventsQuery, query.SortBy, query.SortOrder);
 
             var totalCount = await eventsQuery.CountAsync();
@@ -396,13 +385,7 @@ namespace TuristickiVodic.Services.Services
                      (e.Destination == null && e.Locality != null && e.Locality.Destination != null && e.Locality.Destination.Name.ToLower().Contains(destination))));
             }
 
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
-                eventsQuery = eventsQuery.Where(e =>
-                    e.Name.ToLower().Contains(search) ||
-                    (e.Description != null && e.Description.ToLower().Contains(search)));
-            }
+            var search = NormalizeSearchTerm(query.Search);
 
             var hasDate = query.Date.HasValue;
             var hasNextDays = query.NextDays.HasValue;
@@ -449,6 +432,8 @@ namespace TuristickiVodic.Services.Services
             }
 
             eventsQuery = ApplyStatusFilter(eventsQuery, query.Status);
+            if (search != null)
+                eventsQuery = ApplyEventSearchFilter(eventsQuery, search);
             eventsQuery = ApplySorting(eventsQuery, query.SortBy, query.SortOrder);
 
             var totalCount = await eventsQuery.CountAsync();
@@ -904,69 +889,7 @@ namespace TuristickiVodic.Services.Services
 
         public async Task<PagedResultDto<EventDto>> SearchAsync(EventQueryDto query)
         {
-            if (query.Page < 1)
-                query.Page = 1;
-
-            if (query.PageSize < 1)
-                query.PageSize = 10;
-
-            if (query.PageSize > 100)
-                query.PageSize = 100;
-
-            var eventsQuery = _context.Events
-                .Include(e => e.EventType)
-                .Include(e => e.Destination)
-                .Include(e => e.Locality)
-                .Include(e => e.Images)
-                .Where(e => e.Status == ContentStatus.Approved)
-                .Where(e => e.IsActive)
-                .Where(e => e.Images.Any(i => i.IsMain))
-                .AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(query.Type))
-            {
-                var type = query.Type.Trim().ToLower();
-                eventsQuery = eventsQuery.Where(e =>
-                    e.EventType != null &&
-                    e.EventType.Name.ToLower().Contains(type));
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.Destination))
-            {
-                var destination = query.Destination.Trim().ToLower();
-                eventsQuery = eventsQuery.Where(e =>
-                    e.Destination != null &&
-                    e.Destination.Name.ToLower().Contains(destination));
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
-                eventsQuery = eventsQuery.Where(e =>
-                    e.Name.ToLower().Contains(search) ||
-                    (e.Description != null && e.Description.ToLower().Contains(search)));
-            }
-
-            eventsQuery = ApplySorting(eventsQuery, query.SortBy, query.SortOrder);
-
-            var totalCount = await eventsQuery.CountAsync();
-
-            var items = await eventsQuery
-                .Skip((query.Page - 1) * query.PageSize)
-                .Take(query.PageSize)
-                .ToListAsync();
-
-            var mappedItems = _mapper.Map<List<EventDto>>(items);
-            await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
-
-            return new PagedResultDto<EventDto>
-            {
-                Items = mappedItems,
-                Page = query.Page,
-                PageSize = query.PageSize,
-                TotalCount = totalCount,
-                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
-            };
+            return await GetAllAsync(query);
         }
 
         private static IQueryable<Event> ApplyStatusFilter(IQueryable<Event> query, string? status)
@@ -978,6 +901,30 @@ namespace TuristickiVodic.Services.Services
                 return query.Where(_ => false);
 
             return query.Where(e => e.Status == parsedStatus);
+        }
+
+        private static string? NormalizeSearchTerm(string? search)
+        {
+            return string.IsNullOrWhiteSpace(search)
+                ? null
+                : search.Trim().ToLower();
+        }
+
+        private static IQueryable<Event> ApplyEventSearch(IQueryable<Event> query, string search)
+        {
+            return ApplyEventSearchFilter(query, search)
+                .OrderBy(e => e.Name.ToLower().Contains(search) ? 0 :
+                    (e.EventType != null && e.EventType.Name.ToLower().Contains(search) ? 1 :
+                    (e.Description != null && e.Description.ToLower().Contains(search) ? 2 : 3)))
+                .ThenBy(e => e.Name);
+        }
+
+        private static IQueryable<Event> ApplyEventSearchFilter(IQueryable<Event> query, string search)
+        {
+            return query.Where(e =>
+                e.Name.ToLower().Contains(search) ||
+                (e.EventType != null && e.EventType.Name.ToLower().Contains(search)) ||
+                (e.Description != null && e.Description.ToLower().Contains(search)));
         }
 
         private static IQueryable<Event> ApplySorting(IQueryable<Event> query, string? sortBy, string? sortOrder)

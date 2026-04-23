@@ -295,16 +295,12 @@ namespace TuristickiVodic.Services
                     l.LocalityType.Name.ToLower().Contains(type));
             }
 
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
+            var search = NormalizeSearchTerm(query.Search);
+            if (search != null)
+                localitiesQuery = ApplyLocalitySearch(localitiesQuery, search);
 
-                localitiesQuery = localitiesQuery.Where(l =>
-                    l.Name.ToLower().Contains(search) ||
-                    (l.Description != null && l.Description.ToLower().Contains(search)));
-            }
-
-            localitiesQuery = ApplyLocalitySorting(localitiesQuery, query.SortBy, query.SortOrder);
+            if (search == null)
+                localitiesQuery = ApplyLocalitySorting(localitiesQuery, query.SortBy, query.SortOrder);
 
             var totalCount = await localitiesQuery.CountAsync();
 
@@ -363,14 +359,9 @@ namespace TuristickiVodic.Services
                     l.LocalityType.Name.ToLower().Contains(type));
             }
 
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
-
-                localitiesQuery = localitiesQuery.Where(l =>
-                    l.Name.ToLower().Contains(search) ||
-                    (l.Description != null && l.Description.ToLower().Contains(search)));
-            }
+            var search = NormalizeSearchTerm(query.Search);
+            if (search != null)
+                localitiesQuery = ApplyLocalitySearchFilter(localitiesQuery, search);
 
             var localities = await localitiesQuery.ToListAsync();
 
@@ -413,6 +404,30 @@ namespace TuristickiVodic.Services
                 TotalCount = totalCount,
                 TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
             };
+        }
+
+        private static string? NormalizeSearchTerm(string? search)
+        {
+            return string.IsNullOrWhiteSpace(search)
+                ? null
+                : search.Trim().ToLower();
+        }
+
+        private static IQueryable<Locality> ApplyLocalitySearch(IQueryable<Locality> query, string search)
+        {
+            return ApplyLocalitySearchFilter(query, search)
+                .OrderBy(l => l.Name.ToLower().Contains(search) ? 0 :
+                    (l.LocalityType != null && l.LocalityType.Name.ToLower().Contains(search) ? 1 :
+                    (l.Description != null && l.Description.ToLower().Contains(search) ? 2 : 3)))
+                .ThenBy(l => l.Name);
+        }
+
+        private static IQueryable<Locality> ApplyLocalitySearchFilter(IQueryable<Locality> query, string search)
+        {
+            return query.Where(l =>
+                l.Name.ToLower().Contains(search) ||
+                (l.LocalityType != null && l.LocalityType.Name.ToLower().Contains(search)) ||
+                (l.Description != null && l.Description.ToLower().Contains(search)));
         }
 
         private static IQueryable<Locality> ApplyLocalitySorting(IQueryable<Locality> query, string? sortBy, string? sortOrder)

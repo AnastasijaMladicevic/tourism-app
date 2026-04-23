@@ -64,16 +64,12 @@ namespace TuristickiVodic.Services
                     d.DestinationType.Name.ToLower().Contains(type));
             }
 
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
+            var search = NormalizeSearchTerm(query.Search);
+            if (search != null)
+                destinationsQuery = ApplyDestinationSearch(destinationsQuery, search);
 
-                destinationsQuery = destinationsQuery.Where(d =>
-                    d.Name.ToLower().Contains(search) ||
-                    (d.Description != null && d.Description.ToLower().Contains(search)));
-            }
-
-            destinationsQuery = ApplyDestinationSorting(destinationsQuery, query.SortBy, query.SortOrder);
+            if (search == null)
+                destinationsQuery = ApplyDestinationSorting(destinationsQuery, query.SortBy, query.SortOrder);
 
             var totalCount = await destinationsQuery.CountAsync();
 
@@ -289,6 +285,26 @@ namespace TuristickiVodic.Services
                 return null;
 
             return new Point(longitude.Value, latitude.Value) { SRID = 4326 };
+        }
+
+        private static string? NormalizeSearchTerm(string? search)
+        {
+            return string.IsNullOrWhiteSpace(search)
+                ? null
+                : search.Trim().ToLower();
+        }
+
+        private static IQueryable<Destination> ApplyDestinationSearch(IQueryable<Destination> query, string search)
+        {
+            return query
+                .Where(d =>
+                    d.Name.ToLower().Contains(search) ||
+                    (d.DestinationType != null && d.DestinationType.Name.ToLower().Contains(search)) ||
+                    (d.Description != null && d.Description.ToLower().Contains(search)))
+                .OrderBy(d => d.Name.ToLower().Contains(search) ? 0 :
+                    (d.DestinationType != null && d.DestinationType.Name.ToLower().Contains(search) ? 1 :
+                    (d.Description != null && d.Description.ToLower().Contains(search) ? 2 : 3)))
+                .ThenBy(d => d.Name);
         }
 
         private static IQueryable<Destination> ApplyDestinationSorting(IQueryable<Destination> query, string? sortBy, string? sortOrder)

@@ -91,14 +91,7 @@ namespace TuristickiVodic.Services.Services
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
-
-                objectsQuery = objectsQuery.Where(o =>
-                    o.Name.ToLower().Contains(search) ||
-                    (o.Description != null && o.Description.ToLower().Contains(search)));
-            }
+            var search = NormalizeSearchTerm(query.Search);
 
             var requestedAmenities = NormalizeAmenities(query.Amenities);
             if (requestedAmenities.Length > 0)
@@ -137,14 +130,27 @@ namespace TuristickiVodic.Services.Services
                     o.AverageRating <= query.MaxRating.Value);
             }
 
-            objectsQuery = ApplyObjectSorting(objectsQuery, query.SortBy, query.SortOrder);
+            int totalCount;
+            List<TouristObject> items;
 
-            var totalCount = await objectsQuery.CountAsync();
-
-            var items = await objectsQuery
-                .Skip((query.Page - 1) * query.PageSize)
-                .Take(query.PageSize)
-                .ToListAsync();
+            if (search != null)
+            {
+                var searchedObjects = ApplyObjectSearch(await objectsQuery.ToListAsync(), search);
+                totalCount = searchedObjects.Count;
+                items = searchedObjects
+                    .Skip((query.Page - 1) * query.PageSize)
+                    .Take(query.PageSize)
+                    .ToList();
+            }
+            else
+            {
+                objectsQuery = ApplyObjectSorting(objectsQuery, query.SortBy, query.SortOrder);
+                totalCount = await objectsQuery.CountAsync();
+                items = await objectsQuery
+                    .Skip((query.Page - 1) * query.PageSize)
+                    .Take(query.PageSize)
+                    .ToListAsync();
+            }
 
             var mappedItems = _mapper.Map<List<TouristObjectDto>>(items);
             await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
@@ -230,14 +236,7 @@ namespace TuristickiVodic.Services.Services
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
-
-                objectsQuery = objectsQuery.Where(o =>
-                    o.Name.ToLower().Contains(search) ||
-                    (o.Description != null && o.Description.ToLower().Contains(search)));
-            }
+            var search = NormalizeSearchTerm(query.Search);
 
             var requestedAmenities = NormalizeAmenities(query.Amenities);
             if (requestedAmenities.Length > 0)
@@ -275,6 +274,8 @@ namespace TuristickiVodic.Services.Services
             }
 
             var objects = await objectsQuery.ToListAsync();
+            if (search != null)
+                objects = ApplyObjectSearchFilter(objects, search).ToList();
 
             var nearbyObjects = objects
                 .Select(obj => new
@@ -368,15 +369,8 @@ namespace TuristickiVodic.Services.Services
                     o.Locality.Name.ToLower().Contains(locality));
             }
 
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
-                objectsQuery = objectsQuery.Where(o =>
-                    o.Name.ToLower().Contains(search) ||
-                    (o.Description != null && o.Description.ToLower().Contains(search)));
-            }
-
             objectsQuery = ApplyStatusFilter(objectsQuery, query.Status);
+            var search = NormalizeSearchTerm(query.Search);
 
             var requestedAmenities = NormalizeAmenities(query.Amenities);
             if (requestedAmenities.Length > 0)
@@ -413,14 +407,32 @@ namespace TuristickiVodic.Services.Services
                 objectsQuery = objectsQuery.Where(o => o.AverageRating <= query.MaxRating.Value);
             }
 
-            objectsQuery = ApplyObjectSorting(objectsQuery, query.SortBy, query.SortOrder);
+            int totalCount;
+            List<TouristObject> items;
 
-            var totalCount = await objectsQuery.CountAsync();
+            if (search != null)
+            {
+                var searchedObjects = ApplyObjectSorting(
+                        ApplyObjectSearchFilter(await objectsQuery.ToListAsync(), search).AsQueryable(),
+                        query.SortBy,
+                        query.SortOrder)
+                    .ToList();
 
-            var items = await objectsQuery
-                .Skip((query.Page - 1) * query.PageSize)
-                .Take(query.PageSize)
-                .ToListAsync();
+                totalCount = searchedObjects.Count;
+                items = searchedObjects
+                    .Skip((query.Page - 1) * query.PageSize)
+                    .Take(query.PageSize)
+                    .ToList();
+            }
+            else
+            {
+                objectsQuery = ApplyObjectSorting(objectsQuery, query.SortBy, query.SortOrder);
+                totalCount = await objectsQuery.CountAsync();
+                items = await objectsQuery
+                    .Skip((query.Page - 1) * query.PageSize)
+                    .Take(query.PageSize)
+                    .ToListAsync();
+            }
 
             var mappedItems = _mapper.Map<List<TouristObjectDto>>(items);
             await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
@@ -491,16 +503,8 @@ namespace TuristickiVodic.Services.Services
                     o.Locality.Name.ToLower().Contains(locality));
             }
 
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
-
-                objectsQuery = objectsQuery.Where(o =>
-                    o.Name.ToLower().Contains(search) ||
-                    (o.Description != null && o.Description.ToLower().Contains(search)));
-            }
-
             objectsQuery = ApplyStatusFilter(objectsQuery, query.Status);
+            var search = NormalizeSearchTerm(query.Search);
 
             var requestedAmenities = NormalizeAmenities(query.Amenities);
             if (requestedAmenities.Length > 0)
@@ -537,14 +541,32 @@ namespace TuristickiVodic.Services.Services
                 objectsQuery = objectsQuery.Where(o => o.AverageRating <= query.MaxRating.Value);
             }
 
-            objectsQuery = ApplyObjectSorting(objectsQuery, query.SortBy, query.SortOrder);
+            int totalCount;
+            List<TouristObject> items;
 
-            var totalCount = await objectsQuery.CountAsync();
+            if (search != null)
+            {
+                var searchedObjects = ApplyObjectSorting(
+                        ApplyObjectSearchFilter(await objectsQuery.ToListAsync(), search).AsQueryable(),
+                        query.SortBy,
+                        query.SortOrder)
+                    .ToList();
 
-            var items = await objectsQuery
-                .Skip((query.Page - 1) * query.PageSize)
-                .Take(query.PageSize)
-                .ToListAsync();
+                totalCount = searchedObjects.Count;
+                items = searchedObjects
+                    .Skip((query.Page - 1) * query.PageSize)
+                    .Take(query.PageSize)
+                    .ToList();
+            }
+            else
+            {
+                objectsQuery = ApplyObjectSorting(objectsQuery, query.SortBy, query.SortOrder);
+                totalCount = await objectsQuery.CountAsync();
+                items = await objectsQuery
+                    .Skip((query.Page - 1) * query.PageSize)
+                    .Take(query.PageSize)
+                    .ToListAsync();
+            }
 
             var mappedItems = _mapper.Map<List<TouristObjectDto>>(items);
             await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
@@ -903,6 +925,57 @@ namespace TuristickiVodic.Services.Services
                 return query.Where(_ => false);
 
             return query.Where(o => o.Status == parsedStatus);
+        }
+
+        private static string? NormalizeSearchTerm(string? search)
+        {
+            return string.IsNullOrWhiteSpace(search)
+                ? null
+                : search.Trim().ToLower();
+        }
+
+        private static List<TouristObject> ApplyObjectSearch(IEnumerable<TouristObject> objects, string search)
+        {
+            return ApplyObjectSearchFilter(objects, search)
+                .OrderBy(o => GetObjectSearchRank(o, search))
+                .ThenBy(o => o.Name)
+                .ToList();
+        }
+
+        private static IEnumerable<TouristObject> ApplyObjectSearchFilter(IEnumerable<TouristObject> objects, string search)
+        {
+            return objects.Where(o => MatchesObjectSearch(o, search));
+        }
+
+        private static bool MatchesObjectSearch(TouristObject obj, string search)
+        {
+            return obj.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                (obj.ObjectType != null &&
+                    obj.ObjectType.Name.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+                (!string.IsNullOrWhiteSpace(obj.Description) &&
+                    obj.Description.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+                (obj.Amenities != null &&
+                    obj.Amenities.Any(a => a.Contains(search, StringComparison.OrdinalIgnoreCase)));
+        }
+
+        private static int GetObjectSearchRank(TouristObject obj, string search)
+        {
+            if (obj.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+                return 0;
+
+            if (obj.ObjectType != null &&
+                obj.ObjectType.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+                return 1;
+
+            if (!string.IsNullOrWhiteSpace(obj.Description) &&
+                obj.Description.Contains(search, StringComparison.OrdinalIgnoreCase))
+                return 2;
+
+            if (obj.Amenities != null &&
+                obj.Amenities.Any(a => a.Contains(search, StringComparison.OrdinalIgnoreCase)))
+                return 3;
+
+            return 4;
         }
 
         private static IQueryable<TouristObject> ApplyObjectSorting(IQueryable<TouristObject> query, string? sortBy, string? sortOrder)

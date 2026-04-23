@@ -368,6 +368,68 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task GetAllAsync_SaSearchParametrom_PrioritizujeNazivPreOpisa()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_SaSearchParametrom_PrioritizujeNazivPreOpisa));
+            var (_, manager, _, tip) = SeedBase(ctx);
+
+            var mgr = CreateManager(61, "mgr61@test.com", manager);
+            ctx.Users.Add(mgr);
+
+            var typeMatchType = new DestinationType { Id = 2, Name = "Sea resort" };
+            ctx.DestinationTypes.Add(typeMatchType);
+
+            var nameMatch = new Destination
+            {
+                Id = 11,
+                Name = "Zeta Sea Coast",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                ManagedByUserId = mgr.Id,
+                CreatedByUserId = 99,
+                Status = ContentStatus.Approved
+            };
+
+            var typeMatch = new Destination
+            {
+                Id = 13,
+                Name = "Beta Bay",
+                DestinationTypeId = typeMatchType.Id,
+                DestinationType = typeMatchType,
+                ManagedByUserId = mgr.Id,
+                CreatedByUserId = 99,
+                Status = ContentStatus.Approved
+            };
+
+            var descriptionMatch = new Destination
+            {
+                Id = 12,
+                Name = "Alpha Bay",
+                Description = "Popular sea getaway destination",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                ManagedByUserId = mgr.Id,
+                CreatedByUserId = 99,
+                Status = ContentStatus.Approved
+            };
+
+            ctx.Destinations.AddRange(nameMatch, typeMatch, descriptionMatch);
+            ctx.SaveChanges();
+
+            ctx.Images.AddRange(
+                new Image { Id = 1011, DestinationId = 11, Url = "dest-11.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 1013, DestinationId = 13, Url = "dest-13.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 1012, DestinationId = 12, Url = "dest-12.jpg", IsMain = true, CreatedAt = DateTime.UtcNow });
+            ctx.SaveChanges();
+
+            var svc = new DestinationService(ctx, CreateMapper());
+            var result = await svc.GetAllAsync(null, null, new DestinationQueryDto { Search = "sea" });
+
+            result.TotalCount.Should().Be(3);
+            result.Items.Select(x => x.Name).Should().Equal("Zeta Sea Coast", "Beta Bay", "Alpha Bay");
+        }
+
+        [Fact]
         public async Task GetAllAsync_Manager_VracaSamoSvojuDestinaciju()
         {
             using var ctx = CreateInMemoryContext(nameof(GetAllAsync_Manager_VracaSamoSvojuDestinaciju));

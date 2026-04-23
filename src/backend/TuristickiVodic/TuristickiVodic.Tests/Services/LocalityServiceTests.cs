@@ -211,6 +211,36 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task GetAllAsync_SaSearchParametrom_PrioritizujeNazivPreOpisa()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_SaSearchParametrom_PrioritizujeNazivPreOpisa));
+            var (_, _, lt, mgr, dest, _) = SeedBase(ctx);
+
+            var typeMatchType = new LocalityType { Id = 2, Name = "Sea promenade" };
+            ctx.LocalityTypes.Add(typeMatchType);
+
+            var nameMatch = MakeLocality(11, "Zeta Sea Point", dest, lt, mgr.Id);
+            var typeMatch = MakeLocality(13, "Beta Quarter", dest, typeMatchType, mgr.Id);
+            var descriptionMatch = MakeLocality(12, "Alpha Quarter", dest, lt, mgr.Id);
+            descriptionMatch.Description = "Mirni sea pogled i setaliste";
+
+            ctx.Localities.AddRange(nameMatch, typeMatch, descriptionMatch);
+            ctx.SaveChanges();
+
+            ctx.Images.AddRange(
+                new Image { Id = 111, LocalityId = 11, Url = "loc-11.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 113, LocalityId = 13, Url = "loc-13.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 112, LocalityId = 12, Url = "loc-12.jpg", IsMain = true, CreatedAt = DateTime.UtcNow });
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetAllAsync(new LocalityQueryDto { Search = "sea" });
+
+            result.TotalCount.Should().Be(3);
+            result.Items.Select(x => x.Name).Should().Equal("Zeta Sea Point", "Beta Quarter", "Alpha Quarter");
+        }
+
+        [Fact]
         public async Task GetNearbyAsync_VracaSamoLokaliteteUnutarRadijusaSortiranePoUdaljenosti()
         {
             using var ctx = CreateInMemoryContext(nameof(GetNearbyAsync_VracaSamoLokaliteteUnutarRadijusaSortiranePoUdaljenosti));

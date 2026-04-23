@@ -60,16 +60,12 @@ namespace TuristickiVodic.Services.Services
                     a.Destination.Name.ToLower().Contains(destination));
             }
 
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
+            var search = NormalizeSearchTerm(query.Search);
+            if (search != null)
+                activitiesQuery = ApplyActivitySearch(activitiesQuery, search);
 
-                activitiesQuery = activitiesQuery.Where(a =>
-                    a.Name.ToLower().Contains(search) ||
-                    (a.Description != null && a.Description.ToLower().Contains(search)));
-            }
-
-            activitiesQuery = ApplyActivitySorting(activitiesQuery, query.SortBy, query.SortOrder);
+            if (search == null)
+                activitiesQuery = ApplyActivitySorting(activitiesQuery, query.SortBy, query.SortOrder);
 
             var totalCount = await activitiesQuery.CountAsync();
 
@@ -132,14 +128,9 @@ namespace TuristickiVodic.Services.Services
                     a.Destination.Name.ToLower().Contains(destination));
             }
 
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
-
-                activitiesQuery = activitiesQuery.Where(a =>
-                    a.Name.ToLower().Contains(search) ||
-                    (a.Description != null && a.Description.ToLower().Contains(search)));
-            }
+            var search = NormalizeSearchTerm(query.Search);
+            if (search != null)
+                activitiesQuery = ApplyActivitySearchFilter(activitiesQuery, search);
 
             var activities = await activitiesQuery.ToListAsync();
 
@@ -222,15 +213,10 @@ namespace TuristickiVodic.Services.Services
                     a.Destination.Name.ToLower().Contains(destination));
             }
 
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
-                activitiesQuery = activitiesQuery.Where(a =>
-                    a.Name.ToLower().Contains(search) ||
-                    (a.Description != null && a.Description.ToLower().Contains(search)));
-            }
-
             activitiesQuery = ApplyStatusFilter(activitiesQuery, query.Status);
+            var search = NormalizeSearchTerm(query.Search);
+            if (search != null)
+                activitiesQuery = ApplyActivitySearchFilter(activitiesQuery, search);
             activitiesQuery = ApplyActivitySorting(activitiesQuery, query.SortBy, query.SortOrder);
 
             var totalCount = await activitiesQuery.CountAsync();
@@ -296,16 +282,10 @@ namespace TuristickiVodic.Services.Services
                      (a.Destination == null && a.Locality != null && a.Locality.Destination != null && a.Locality.Destination.Name.ToLower().Contains(destination))));
             }
 
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
-
-                activitiesQuery = activitiesQuery.Where(a =>
-                    a.Name.ToLower().Contains(search) ||
-                    (a.Description != null && a.Description.ToLower().Contains(search)));
-            }
-
             activitiesQuery = ApplyStatusFilter(activitiesQuery, query.Status);
+            var search = NormalizeSearchTerm(query.Search);
+            if (search != null)
+                activitiesQuery = ApplyActivitySearchFilter(activitiesQuery, search);
             activitiesQuery = ApplyActivitySorting(activitiesQuery, query.SortBy, query.SortOrder);
 
             var totalCount = await activitiesQuery.CountAsync();
@@ -767,6 +747,30 @@ namespace TuristickiVodic.Services.Services
             var result = _mapper.Map<ActivityDto>(updated);
             await ApplyPendingDeletionRequestFlagsAsync(result);
             return result;
+        }
+
+        private static string? NormalizeSearchTerm(string? search)
+        {
+            return string.IsNullOrWhiteSpace(search)
+                ? null
+                : search.Trim().ToLower();
+        }
+
+        private static IQueryable<Activity> ApplyActivitySearch(IQueryable<Activity> query, string search)
+        {
+            return ApplyActivitySearchFilter(query, search)
+                .OrderBy(a => a.Name.ToLower().Contains(search) ? 0 :
+                    (a.ActivityType != null && a.ActivityType.Name.ToLower().Contains(search) ? 1 :
+                    (a.Description != null && a.Description.ToLower().Contains(search) ? 2 : 3)))
+                .ThenBy(a => a.Name);
+        }
+
+        private static IQueryable<Activity> ApplyActivitySearchFilter(IQueryable<Activity> query, string search)
+        {
+            return query.Where(a =>
+                a.Name.ToLower().Contains(search) ||
+                (a.ActivityType != null && a.ActivityType.Name.ToLower().Contains(search)) ||
+                (a.Description != null && a.Description.ToLower().Contains(search)));
         }
 
         private static IQueryable<Activity> ApplyActivitySorting(IQueryable<Activity> query, string? sortBy, string? sortOrder)
