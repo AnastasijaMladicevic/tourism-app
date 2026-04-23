@@ -2,7 +2,6 @@ import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { catchError, finalize, forkJoin, of } from 'rxjs';
-import { NavbarComponent } from '../navbar/navbar.component';
 import { BottomNavComponent } from '../bottom-nav/bottom-nav.component';
 import { DestinationDto, DestinationService } from '../../services/destination';
 import { EventDto, EventService } from '../../services/event';
@@ -12,6 +11,7 @@ import { ImageDto } from '../../services/image';
 import { environment } from '../../../environment/environment';
 import { AuthService } from '../../services/auth';
 import { ObjectDto, ObjectService } from '../../services/object';
+import { MatIcon } from "@angular/material/icon";
 
 interface PlaceCard {
   title: string;
@@ -23,6 +23,7 @@ interface PlaceCard {
   itemType: 'destination' | 'object' | 'activity';
   targetUrl: string;
   favoriteId?: number;
+  showRating: boolean;
 }
 
 interface EventCard {
@@ -35,55 +36,60 @@ interface EventCard {
   timeText: string;
   imageUrl?: string;
 }
-
+interface SearchResult {
+  id: number;
+  name: string;
+  typeName: string;
+  location: string;
+  image?: string;
+  icon: string;
+  lat?: number;
+  lng?: number;
+  raw: any;
+  category: 'destination' | 'object' | 'event';
+  markerType: string;
+}
 interface HomeCategory {
   label: string;
   route: string;
-  icon:
-    | 'hotel'
-    | 'restaurant'
-    | 'cafe'
-    | 'mountain'
-    | 'home'
-    | 'sparkles'
-    | 'monument'
-    | 'museum'
-    | 'gallery'
-    | 'bar'
-    | 'church'
-    | 'sport';
+  key: 'object' | 'locality' | 'event' | 'activity' | 'attraction'
 }
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [NavbarComponent, BottomNavComponent, FormsModule],
+  imports: [BottomNavComponent, FormsModule, MatIcon],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
 export class HomeComponent implements OnInit {
-  userName = 'Alex Taylor';
+  userName = '';
   searchQuery = '';
   readonly categories: HomeCategory[] = [
-    { label: 'Attractions', route: '/attractions', icon: 'monument' },
-    { label: 'Restorani', route: '/objects/restaurants', icon: 'restaurant' },
-    { label: 'Apartmani', route: '/objects/apartments', icon: 'home' },
-    { label: 'Hoteli', route: '/objects/hotels', icon: 'hotel' },
-    { label: 'Kafici', route: '/objects/cafes', icon: 'cafe' },
-    { label: 'Barovi', route: '/objects/bars', icon: 'bar' },
+    { label: 'Attractions', route: '/attractions', key: 'attraction' },
+    { label: 'Objects', route: '/objects', key: 'object' },
+    { label: 'Localities', route: '/localities', key: 'locality' },
+    { label: 'Activities', route: '/activities', key: 'activity' },
+    { label: 'Events', route: '/events', key: 'event' },
   ];
-
+  featuredDestinations: any[] = [];
+  currentFeatured: any = null;
   recommended: PlaceCard[] = [];
   popular: PlaceCard[] = [];
+  events: any[] = [];
   upcomingEvents: EventCard[] = [];
-
+  searchResults: SearchResult[] = [];
+  private allItems: SearchResult[] = [];
+  rotationInterval: any;
+  currentIndex = 0;
+  showSuggestions = false;
   isLoadingPlaces = true;
   isLoadingEvents = true;
 
   private favoriteMap = new Map<string, number>();
 
   constructor(
-    private router: Router,
+    public router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private destinationService: DestinationService,
@@ -93,14 +99,188 @@ export class HomeComponent implements OnInit {
     private eventService: EventService,
     private authService: AuthService,
   ) {}
+  onSearchInput(): void {
+    const query = this.searchQuery.trim();
+    if (!query) {
+      this.searchResults = [];
+      this.showSuggestions = false;
+      return;
+    }
 
-  ngOnInit(): void {
-    this.loadUserName();
-    this.loadPlaceCards();
-    this.loadEventCards();
-    this.loadFavorites();
+    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+    const scored = this.allItems
+      .map((item) => ({
+        item,
+        score: this.scoreItem(item, terms),
+      }))
+      .filter((x) => this.matchesAllTerms(x.item, terms))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 8);
+
+    this.searchResults = scored.map((x) => x.item);
+    this.showSuggestions = this.searchResults.length > 0;
+    this.cdr.detectChanges();
+  }
+  onSearchBlur(): void {
+    setTimeout(() => {
+      this.showSuggestions = false;
+    }, 150);
+  }
+  private matchesAllTerms(item: SearchResult, terms: string[]): boolean {
+    const name = item.name.toLowerCase();
+    const desc = (item.raw.description ?? '').toLowerCase();
+    const amenities = this.getAmenityText(item).toLowerCase();
+
+    return terms.every(
+      (term) => name.includes(term) || desc.includes(term) || amenities.includes(term),
+    );
+  }
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.searchResults = [];
+    this.showSuggestions = false;
+  }
+  private scoreItem(item: SearchResult, terms: string[]): number {
+    let score = 0;
+    const name = item.name.toLowerCase();
+    const desc = (item.raw.description ?? '').toLowerCase();
+    const amenities = this.getAmenityText(item).toLowerCase();
+
+    for (const term of terms) {
+      if (name.includes(term)) score += 3;
+      if (desc.includes(term)) score += 1;
+      if (amenities.includes(term)) score += 0.5;
+    }
+    return score;
+  }
+  private getAmenityText(item: SearchResult): string {
+    const type = item.markerType.toLowerCase();
+    const amenityMap: Record<string, string> = {
+      hotel: 'wifi parking gym bazen pool breakfast spa',
+      restaurant: 'hrana food dine takeout wifi',
+      kafana: 'bar music live terrace',
+    };
+    return amenityMap[type] ?? '';
+  }
+  nextFeatured(): void {
+    if (!this.featuredDestinations.length) return;
+
+    this.currentIndex =
+      (this.currentIndex + 1) % this.featuredDestinations.length;
+
+    this.currentFeatured =
+      this.featuredDestinations[this.currentIndex];
   }
 
+  prevFeatured(): void {
+    if (!this.featuredDestinations.length) return;
+
+    this.currentIndex =
+      (this.currentIndex - 1 + this.featuredDestinations.length) %
+      this.featuredDestinations.length;
+
+    this.currentFeatured =
+      this.featuredDestinations[this.currentIndex];
+  }
+  goToFeatured(index: number): void {
+    this.currentIndex = index;
+    this.currentFeatured = this.featuredDestinations[index];
+  }
+  ngOnInit(): void {
+    this.loadFeatured();
+    this.loadUserName();
+    this.loadPlaceCards();
+    
+    this.loadEventCards();
+    this.loadFavorites();
+    this.loadEvents();
+  }
+  ngOnDestroy(): void {
+    if (this.rotationInterval) {
+      clearInterval(this.rotationInterval);
+    }
+  }
+  selectSuggestion(result: SearchResult): void {
+    this.searchQuery = result.name;
+    this.showSuggestions = false;
+
+    switch (result.category) {
+      case 'destination':
+        this.router.navigate(['/destination', result.id]);
+        break;
+      case 'object':
+        this.router.navigate(['/object', result.id]);
+        break;
+      case 'event':
+        this.router.navigate(['/event', result.id]);
+        break;
+    }
+  }
+  loadEvents(): void {
+  this.eventService.getAll().subscribe({
+    next: (res) => {
+      const list = this.toArray<any>(res);
+
+      this.events = list.map(e => ({
+        id: e.id,
+        title: e.name,
+        location: e.localityName ?? e.destinationName ?? 'Montenegro',
+        imageUrl: e.mainImageUrl ?? e.images?.[0]?.url ?? '',
+        dateText: e.date ?? '',
+        timeText: this.eventTime(e.startDate, e.endDate),
+        priceText: e.price ? `${e.price}€` : 'Free',
+        isFree: !e.price
+      }));
+    },
+    error: err => console.error('Events error:', err)
+  });
+}
+  loadFeatured(): void {
+    this.destinationService.getAll().subscribe((data: any[]) => {
+
+      const list = this.toArray(data);
+      if (list.length < 5) return;
+
+      const now = new Date();
+
+      const shuffled = [...list].sort(() => 0.5 - Math.random());
+      
+      this.featuredDestinations = shuffled.slice(0, 5);
+      this.currentFeatured = this.featuredDestinations[0];
+      this.startRotation();
+    });
+  }
+  startRotation(): void {
+  if (!this.featuredDestinations.length) return;
+
+  if (this.rotationInterval) {
+    clearInterval(this.rotationInterval);
+  }
+
+  this.rotationInterval = setInterval(() => {
+    this.currentIndex =
+      (this.currentIndex + 1) % this.featuredDestinations.length;
+
+    this.currentFeatured =
+      this.featuredDestinations[this.currentIndex];
+      this.cdr.detectChanges();
+  }, 10000);
+}
+  
+  selectedRegion = 'Montenegro';
+
+  regions = ['Montenegro', 'Spain'];
+
+  showRegionMenu = false;
+
+  toggleRegionMenu(): void {
+    this.showRegionMenu = !this.showRegionMenu;
+  }
+
+  setRegion(region: string): void {
+    this.selectedRegion = region;
+    this.showRegionMenu = false;
+  }
   get isLoadingHome(): boolean {
     return this.isLoadingPlaces || this.isLoadingEvents;
   }
@@ -162,6 +342,18 @@ export class HomeComponent implements OnInit {
         this.recommended = this.mixRecommendedCards(destinationCards, activityCards, objectCards);
         this.popular = destinationCards;
         this.flushUi();
+        this.allItems = [
+        ...this.toArray<DestinationDto>(destinations).map(d => this.normalizeDestination(d)).map(d => ({
+          id: d.id, name: d.name, typeName: d.destinationTypeName,
+          location: 'Montenegro', image: d.mainImageUrl, icon: 'place',
+          raw: d, category: 'destination' as const, markerType: 'destination'
+        })),
+        ...this.toArray<ObjectDto>(objects).map(o => this.normalizeObject(o)).map(o => ({
+          id: o.id, name: o.name, typeName: o.objectTypeName,
+          location: o.localityName ?? '', image: o.mainImageUrl, icon: 'apartment',
+          raw: o, category: 'object' as const, markerType: o.objectTypeName?.toLowerCase().includes('hotel') ? 'hotel' : 'restaurant'
+        })),
+      ];
       });
   }
 
@@ -363,12 +555,13 @@ export class HomeComponent implements OnInit {
     const card: PlaceCard = {
       title: destination.name,
       location: destination.destinationTypeName || 'Montenegro',
-      ratingText: this.ratingText(destination),
       imageUrl: this.pickDestinationImage(destination),
       isFavorite: false,
       itemId: destination.id,
       itemType: 'destination',
       targetUrl: '/attractions',
+      showRating: false,
+      ratingText: ""
     };
 
     this.applyFavoriteState([card]);
@@ -385,6 +578,7 @@ export class HomeComponent implements OnInit {
       itemId: object.id,
       itemType: 'object',
       targetUrl: `/object/${object.id}`,
+      showRating: (object.averageRating ?? 0) > 0,
     };
 
     this.applyFavoriteState([card]);
@@ -401,6 +595,7 @@ export class HomeComponent implements OnInit {
       itemId: activity.id,
       itemType: 'activity',
       targetUrl: '/map',
+      showRating: false,
     };
 
     this.applyFavoriteState([card]);
@@ -568,30 +763,6 @@ export class HomeComponent implements OnInit {
     return this.searchQuery.trim().toLowerCase();
   }
 
-  get filteredRecommended(): PlaceCard[] {
-    return this.filterPlaces(this.recommended);
-  }
-
-  get filteredPopular(): PlaceCard[] {
-    return this.filterPlaces(this.popular);
-  }
-
-  get filteredEvents(): EventCard[] {
-    const q = this.normalizedQuery;
-    if (!q) return this.upcomingEvents;
-    return this.upcomingEvents.filter(
-      (e) => e.title.toLowerCase().includes(q) || e.location.toLowerCase().includes(q),
-    );
-  }
-
-  private filterPlaces(list: PlaceCard[]): PlaceCard[] {
-    const q = this.normalizedQuery;
-    if (!q) return list;
-    return list.filter(
-      (p) => p.title.toLowerCase().includes(q) || p.location.toLowerCase().includes(q),
-    );
-  }
-
   toggleFavorite(card: PlaceCard, event: Event): void {
     event.stopPropagation();
 
@@ -679,51 +850,59 @@ export class HomeComponent implements OnInit {
     const safeUrl = imageUrl.replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/"/g, '%22');
     return `url("${safeUrl}")`;
   }
+  openPlace(card: any): void {
+    const type = card.itemType.toLowerCase();
 
-  openPlace(card: PlaceCard): void {
-    this.router.navigateByUrl(card.targetUrl);
+    let route = '';
+
+    switch (type) {
+      case 'object':
+        route = 'object';
+        break;
+      case 'attraction':
+        route = 'attraction';
+        break;
+      case 'activity':
+        route = 'activity'
+        break;
+      default:
+        return;
+    }
+
+    this.router.navigate([`/${route}`, card.itemId]);
   }
-
   openAttractions(): void {
-    this.router.navigate(['/attractions']);
-  }
+    if (!this.currentFeatured) return;
 
-  openEvents(): void {
-    this.router.navigate(['/events']);
+  this.router.navigate(['/attraction', this.currentFeatured.id]);
+  }
+  openEvent(event: any): void {
+    this.router.navigate([`/event`, event.id]);
   }
 
   openCategory(category: HomeCategory): void {
     this.router.navigateByUrl(category.route);
   }
+  
+  getCategoryIcon(type: string): string {
+    switch (type?.toLowerCase()) {
+      case 'attraction':
+        return 'explore';
 
-  categoryIconPath(icon: HomeCategory['icon']): string {
-    switch (icon) {
-      case 'hotel':
-        return 'M4.5 19V6.75A1.75 1.75 0 0 1 6.25 5h11.5A1.75 1.75 0 0 1 19.5 6.75V19M2.75 19h18.5M8 9.25h3M13 9.25h3M8 12.75h3M13 12.75h3';
-      case 'restaurant':
-        return 'M7.25 4.5v7.25M5 4.5v4.25a2.25 2.25 0 0 0 4.5 0V4.5M14.5 4.5v14.75M14.5 9.25h3.75c.41 0 .75-.34.75-.75V6.75A2.25 2.25 0 0 0 16.75 4.5H14.5';
-      case 'cafe':
-        return 'M6 10.5h9.5a0 0 0 0 1 0 0v2.25A3.75 3.75 0 0 1 11.75 16.5H9.75A3.75 3.75 0 0 1 6 12.75V10.5A0 0 0 0 1 6 10.5Zm9.5.5h1A2.5 2.5 0 0 1 19 13.5h0A2.5 2.5 0 0 1 16.5 16h-1M8 5.5c0 1-1 1.5-1 2.5M11 5.5c0 1-1 1.5-1 2.5M14 5.5c0 1-1 1.5-1 2.5M6 19h11';
-      case 'mountain':
-        return 'M3.75 18.5 9.5 8.25l2.75 4.25 2-2.75 5 8.75M8.75 18.5h10.5';
-      case 'home':
-        return 'M4.75 10.25 12 4.5l7.25 5.75V18a1 1 0 0 1-1 1h-3.5v-5.25h-5.5V19h-3.5a1 1 0 0 1-1-1v-7.75Z';
-      case 'sparkles':
-        return 'M12 4.5 13.2 8.1 16.8 9.3 13.2 10.5 12 14.1 10.8 10.5 7.2 9.3 10.8 8.1 12 4.5Zm5 8 0.7 2.1 2.1 0.7-2.1 0.7-.7 2.1-.7-2.1-2.1-.7 2.1-.7.7-2.1ZM6.5 13.5l0.8 2.3 2.2 0.8-2.2 0.7-.8 2.3-.7-2.3-2.3-.7 2.3-.8.7-2.3Z';
-      case 'monument':
-        return 'M6 19h12M8 19V9.25h8V19M7 9.25h10L12 5 7 9.25Zm2.5 3v4.5M12 12.25v4.5M14.5 12.25v4.5';
-      case 'museum':
-        return 'M4.5 8.75 12 5l7.5 3.75M5.75 10.25h12.5M6.5 10.25V18M10 10.25V18M14 10.25V18M17.5 10.25V18M4.5 19h15';
-      case 'gallery':
-        return 'M5.25 6.25h13.5a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1H5.25a1 1 0 0 1-1-1v-9.5a1 1 0 0 1 1-1Zm2.5 2.5a1.25 1.25 0 1 0 0 2.5 1.25 1.25 0 0 0 0-2.5Zm10 6.5-3.25-3.25-3 3-1.5-1.5-3 3';
-      case 'bar':
-        return 'M7 5.5h10l-3.25 5v3.75a1 1 0 0 0 .3.7l1.2 1.2V18.5h-6.5v-1.35l1.2-1.2a1 1 0 0 0 .3-.7V10.5L7 5.5Z';
-      case 'church':
-        return 'M12 4.25v3.5M10.25 6h3.5M6.5 19v-7.25h11V19M8.5 11.75V8.5L12 6l3.5 2.5v3.25M10.25 19v-3.75h3.5V19';
-      case 'sport':
-        return 'M7 18.5 10 12l2.25 3.25L17 5.5M6 8.5h3.25M13.5 18.5h4.5';
+      case 'locality':
+        return 'map';
+
+      case 'object':
+        return 'apartment';
+
+      case 'event':
+        return 'event';
+
+      case 'activity':
+        return 'hiking';
+
       default:
-        return '';
+        return 'place';
     }
   }
 

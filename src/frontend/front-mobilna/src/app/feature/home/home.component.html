@@ -1,32 +1,65 @@
 <div class="page">
-  <app-navbar />
-
   <div class="scroll-content">
     <div class="greeting">
-      <p class="greeting-sub">Good morning</p>
+      <p class="greeting-sub">Hello, glad to see you.</p>
       <h1 class="greeting-name">{{ userName }}</h1>
     </div>
 
-    <div class="search-bar">
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <circle cx="11" cy="11" r="8" />
-        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-      </svg>
-      <input
-        type="text"
-        [(ngModel)]="searchQuery"
-        placeholder="Search places, routes, food..."
-        aria-label="Search places"
-      />
+    <div class="search-row">
+      <div class="search-bar">
+        <mat-icon>search</mat-icon>
+        <input
+          type="text"
+          placeholder="Search places, routes..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearchInput()"
+          (focus)="showSuggestions = searchResults.length > 0"
+          (blur)="onSearchBlur()"
+          autocomplete="off"
+        />
+        @if (searchQuery) {
+          <button class="clear-btn" (click)="clearSearch()">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+      <div class="region-wrapper">
+        <button class="filter-btn" (click)="toggleRegionMenu()">
+          {{ selectedRegion }}
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <!-- DROPDOWN -->
+        @if (showRegionMenu) {
+          <div class="filter-dropdown">
+            @for (r of regions; track $index) {
+              <div (click)="setRegion(r)" class="dropdown-item">
+                {{ r }}
+              </div>
+            }
+          </div>
+        }
+      </div>
+      @if (showSuggestions && searchResults.length > 0) {
+        <div class="suggestions">
+          @for (result of searchResults; track result.id) {
+            <div class="suggestion-item" (mousedown)="selectSuggestion(result)">
+              <div class="suggestion-item__image">
+                @if (result.image) {
+                  <img [src]="result.image" [alt]="result.name" />
+                } @else {
+                  <mat-icon>{{ result.icon }}</mat-icon>
+                }
+              </div>
+              <div class="suggestion-item__body">
+                <span class="suggestion-item__name">{{ result.name }}</span>
+                <span class="suggestion-item__meta"
+                  >{{ result.typeName }} · {{ result.location }}</span
+                >
+              </div>
+            </div>
+          }
+        </div>
+      }
     </div>
 
     <div class="section">
@@ -35,34 +68,52 @@
         @for (category of categories; track category.route) {
           <button class="category" type="button" (click)="openCategory(category)">
             <div class="cat-icon">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.9"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path [attr.d]="categoryIconPath(category.icon)" />
-              </svg>
+              <mat-icon>
+                {{ getCategoryIcon(category.key) }}
+              </mat-icon>
             </div>
+
             <span class="category-label">{{ category.label }}</span>
           </button>
         }
       </div>
     </div>
 
-    <div class="featured-banner">
+    <div
+      class="featured-banner"
+      [style.background-image]="'url(' + currentFeatured?.mainImageUrl + ')'"
+    >
+      <!-- LEFT -->
+      <button class="nav left" (click)="prevFeatured()">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+
+      <!-- CONTENT -->
       <div class="featured-overlay">
         <div class="featured-tag">Featured Destination</div>
+
         <div class="featured-text">
-          <h2>Discover Kotor<br />this week</h2>
-          <p>Experience the magic of the Adriatic's most stunning fjord.</p>
+          <h2>{{ currentFeatured?.name }}</h2>
+          <p>{{ currentFeatured?.description }}</p>
         </div>
+
         <button class="explore-btn" type="button" (click)="openAttractions()">Explore</button>
+      </div>
+
+      <!-- RIGHT -->
+      <button class="nav right" (click)="nextFeatured()">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+      <!-- DOTS -->
+      <div class="dots">
+        @for (item of featuredDestinations; track item.id) {
+          <span
+            class="dot"
+            [class.active]="featuredDestinations[currentIndex]?.id === item.id"
+            (click)="goToFeatured($index)"
+          >
+          </span>
+        }
       </div>
     </div>
 
@@ -72,7 +123,7 @@
         <button class="see-all" type="button">See all ></button>
       </div>
       <div class="cards-row">
-        @for (card of filteredRecommended; track card.itemType + '-' + card.itemId) {
+        @for (card of recommended; track card.itemType + '-' + card.itemId) {
           <div class="place-card" (click)="openPlace(card)">
             <div
               class="place-img place-img--dynamic"
@@ -114,25 +165,27 @@
                 {{ card.location }}
               </p>
               <p class="place-rating">
-                <svg
-                  width="11"
-                  height="11"
-                  viewBox="0 0 24 24"
-                  fill="#f1c40f"
-                  stroke="#f1c40f"
-                  stroke-width="1"
-                >
-                  <polygon
-                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-                  />
-                </svg>
+                @if (card.showRating) {
+                  <svg
+                    width="11"
+                    height="11"
+                    viewBox="0 0 24 24"
+                    fill="#f1c40f"
+                    stroke="#f1c40f"
+                    stroke-width="1"
+                  >
+                    <polygon
+                      points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                    />
+                  </svg>
+                }
                 {{ card.ratingText }}
               </p>
             </div>
           </div>
         }
       </div>
-      @if (!isLoadingHome && !filteredRecommended.length) {
+      @if (!isLoadingHome && !recommended.length) {
         <p class="place-location">No recommendations for this search.</p>
       }
     </div>
@@ -143,7 +196,7 @@
         <button class="see-all" type="button">See all ></button>
       </div>
       <div class="cards-row">
-        @for (card of filteredPopular; track card.itemType + '-' + card.itemId) {
+        @for (card of popular; track card.itemType + '-' + card.itemId) {
           <div class="place-card" (click)="openPlace(card)">
             <div
               class="place-img place-img--dynamic"
@@ -185,25 +238,27 @@
                 {{ card.location }}
               </p>
               <p class="place-rating">
-                <svg
-                  width="11"
-                  height="11"
-                  viewBox="0 0 24 24"
-                  fill="#f1c40f"
-                  stroke="#f1c40f"
-                  stroke-width="1"
-                >
-                  <polygon
-                    points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-                  />
-                </svg>
+                @if (card.showRating) {
+                  <svg
+                    width="11"
+                    height="11"
+                    viewBox="0 0 24 24"
+                    fill="#f1c40f"
+                    stroke="#f1c40f"
+                    stroke-width="1"
+                  >
+                    <polygon
+                      points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                    />
+                  </svg>
+                }
                 {{ card.ratingText }}
               </p>
             </div>
           </div>
         }
       </div>
-      @if (!isLoadingHome && !filteredPopular.length) {
+      @if (!isLoadingHome && !popular.length) {
         <p class="place-location">No popular places for this search.</p>
       }
     </div>
@@ -211,11 +266,13 @@
     <div class="section">
       <div class="section-header">
         <h2 class="section-title">Upcoming events</h2>
-        <button class="see-all" type="button">See all ></button>
+        <button class="see-all" type="button" (click)="router.navigate(['/events'])">
+          See all >
+        </button>
       </div>
       <div class="cards-row">
-        @for (event of filteredEvents; track event.id) {
-          <div class="event-card" (click)="openEvents()">
+        @for (event of events; track event.id) {
+          <div class="event-card" (click)="openEvent(event)">
             <div
               class="event-img event-img--dynamic"
               [style.background-image]="cardBackground(event.imageUrl)"
@@ -248,7 +305,7 @@
           </div>
         }
       </div>
-      @if (!isLoadingHome && !filteredEvents.length) {
+      @if (!isLoadingHome && !events.length) {
         <p class="place-location">No upcoming events for this search.</p>
       }
     </div>
