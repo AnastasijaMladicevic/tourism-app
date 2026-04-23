@@ -22,7 +22,7 @@ namespace TuristickiVodic.Core.DTO
         public int DestinationTypeId { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "RegionId is required.")]
-        public int RegionId { get; set; }
+        public int RegionId { get; set; } = 1;
 
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "ManagedByUserId mora biti validan ID menadžera (vrednost >= 1).")]

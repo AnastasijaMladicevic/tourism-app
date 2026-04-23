@@ -669,6 +669,9 @@ namespace TuristickiVodic.Services.Services
         // Objekat mora imati destinaciju; lokalitet je opcioni, ali ako postoji mora pripadati toj destinaciji
         public async Task<TouristObjectDto> CreateAsync(CreateTouristObjectDto dto, int userId, string roleName)
         {
+            if (roleName != "ContentCreator")
+                throw new UnauthorizedAccessException("Only content creators can create objects.");
+
             if ((dto.Longitude.HasValue && !dto.Latitude.HasValue) || (!dto.Longitude.HasValue && dto.Latitude.HasValue))
                 throw new InvalidOperationException("Both longitude and latitude must be provided together.");
 

@@ -23,7 +23,7 @@ namespace TuristickiVodic.Core.Models
         public DestinationType DestinationType { get; set; }
 
         [Required]
-        public int RegionId { get; set; }
+        public int RegionId { get; set; } = 1;
         public Region Region { get; set; }
 
         [Required]

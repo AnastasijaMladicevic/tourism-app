@@ -39,6 +39,17 @@ public class AppDbContext : DbContext
     public DbSet<RevokedToken> RevokedTokens { get; set; }
     public DbSet<UserLocationHistory> UserLocationHistories { get; set; }
 
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        PrepareRegionDefaults();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+    {
+        PrepareRegionDefaults();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+    }
 
     protected override void OnModelCreating(ModelBuilder mb)
     {
@@ -616,5 +627,83 @@ public class AppDbContext : DbContext
         mb.Entity<RevokedToken>()
             .HasIndex(rt => rt.ExpiresAt);
 
+    }
+
+    private void PrepareRegionDefaults()
+    {
+        foreach (var entry in ChangeTracker.Entries<Destination>())
+        {
+            if ((entry.State == EntityState.Added || entry.State == EntityState.Modified) &&
+                entry.Entity.RegionId <= 0)
+            {
+                entry.Entity.RegionId = 1;
+            }
+        }
+
+        var hasPendingRegionChanges = ChangeTracker.Entries<Region>()
+            .Any(entry => entry.State != EntityState.Unchanged && entry.State != EntityState.Detached);
+
+        if (hasPendingRegionChanges || Regions.AsNoTracking().Any())
+            return;
+
+        var now = new DateTime(2026, 4, 23, 17, 45, 0, DateTimeKind.Utc);
+
+        Regions.AddRange(
+            new Region
+            {
+                Id = 1,
+                Name = "Crna Gora",
+                Code = "ME",
+                Description = "Podrazumevani region aplikacije.",
+                CenterLongitude = 19.3744,
+                CenterLatitude = 42.7087,
+                DefaultMapZoom = 8.0,
+                IsDefault = true,
+                IsActive = true,
+                CreatedAt = now,
+                UpdatedAt = now
+            },
+            new Region
+            {
+                Id = 2,
+                Name = "Srbija",
+                Code = "RS",
+                Description = "Region za sadrzaj iz Srbije.",
+                CenterLongitude = 21.0059,
+                CenterLatitude = 44.0165,
+                DefaultMapZoom = 7.0,
+                IsDefault = false,
+                IsActive = true,
+                CreatedAt = now,
+                UpdatedAt = now
+            },
+            new Region
+            {
+                Id = 3,
+                Name = "Spanija",
+                Code = "ES",
+                Description = "Region za sadrzaj iz Spanije.",
+                CenterLongitude = -3.7492,
+                CenterLatitude = 40.4637,
+                DefaultMapZoom = 6.0,
+                IsDefault = false,
+                IsActive = true,
+                CreatedAt = now,
+                UpdatedAt = now
+            },
+            new Region
+            {
+                Id = 4,
+                Name = "Italija",
+                Code = "IT",
+                Description = "Region za sadrzaj iz Italije.",
+                CenterLongitude = 12.5674,
+                CenterLatitude = 41.8719,
+                DefaultMapZoom = 6.0,
+                IsDefault = false,
+                IsActive = true,
+                CreatedAt = now,
+                UpdatedAt = now
+            });
     }
 }
