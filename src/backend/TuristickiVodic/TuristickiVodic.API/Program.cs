@@ -188,9 +188,17 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate();
 
-    var runSeedOnStartup = app.Configuration.GetValue<bool>("SeedData:RunOnStartup");
+    var resetAndSeedOnStartup =
+        app.Configuration.GetValue<bool>("SeedData:ResetAndSeedOnStartup") ||
+        app.Configuration.GetValue<bool>("SeedData:RunOnStartup");
+    var seedIfDatabaseEmpty = app.Configuration.GetValue<bool?>("SeedData:SeedIfDatabaseEmpty")
+        ?? app.Environment.IsDevelopment();
+    var databaseIsEffectivelyEmpty =
+        !db.Users.Any() &&
+        !db.Destinations.Any() &&
+        !db.Objects.Any();
 
-    if ((app.Environment.IsDevelopment() || runSeedOnStartup) && !db.Roles.Any())
+    if (resetAndSeedOnStartup || (seedIfDatabaseEmpty && databaseIsEffectivelyEmpty))
     {
         var configuredSeedFilePath = app.Configuration["SeedData:FilePath"];
 
@@ -206,7 +214,11 @@ using (var scope = app.Services.CreateScope())
 
         if (File.Exists(seedFilePath))
         {
-            Console.WriteLine("seed.sql found, executing...");
+            Console.WriteLine(
+                resetAndSeedOnStartup
+                    ? "seed.sql found, executing destructive reset + seed..."
+                    : "Database is empty, executing initial seed.sql bootstrap..."
+            );
 
             var sql = File.ReadAllText(seedFilePath);
 
@@ -226,9 +238,9 @@ using (var scope = app.Services.CreateScope())
             Console.WriteLine("seed.sql NOT FOUND.");
         }
     }
-    else if (app.Environment.IsDevelopment() || runSeedOnStartup)
+    else if (app.Environment.IsDevelopment())
     {
-        Console.WriteLine("Seed skipped because data already exists.");
+        Console.WriteLine("Automatic reset/seed is disabled. Existing database data will be preserved.");
     }
 }
 

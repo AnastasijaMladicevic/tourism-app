@@ -808,7 +808,23 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
- 4, 'Topla preporuka za ljubitelje prirode i planine.', 'Approved', NOW());
+ 4, 'Topla preporuka za ljubitelje prirode i planine.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolasin'),
+ 3, 'Sobe su udobne i lokacija je dobra za skijanje, ali spa zona je bila prevelika guzva tokom vikenda.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolasin'),
+ 4, 'Dobar dorucak i prijatan ambijent, osoblje brzo reaguje na zahteve.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
+ 5, 'Riba je bila sveza, a terasa uz jezero je najlepsi deo vecere pred zalazak sunca.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
+ 4, 'Pogled i hrana su odlicni, ali se na uslugu cekalo malo duze nego sto sam ocekivala.', 'Approved', NOW());
 
 
 -- ============================================
@@ -1378,7 +1394,7 @@ VALUES
 (
     'https://skijalista.me/wp-content/uploads/DJI_0765.jpg',
     'Kolasin',
-    true,
+    false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
     NOW()),
     
@@ -2144,9 +2160,27 @@ VALUES
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Nikole Bar'),
     NOW()),
 (
-    'https://wevotravel.com/wp-content/uploads/2023/04/IMG_5019-1920x711-1.jpg',
+    'https://images.openai.com/static-rsc-4/cg0pAy_gi4jJAH0p6vW6roIhN_4p01jmxGgbEq4g6KOxn6RB36KVyBQGDD_z9GweIyWAeEv8MvlJjQ-x9ebwT-jBpcKxzaa4PIshjLIl-CMmyg1rOB0DnrVpA6yKvul7P-qGmypBs4HGbl6YbnQ9SXiikdvuYh_WFHtraGVBI24q3nf8GbRqFPqTIfRgf19o?purpose=fullsize',
     'Restoran Jezero',
     true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
+    NOW()),
+(
+    'https://images.openai.com/static-rsc-4/FGCGeHTOEhn7iRz5Zf3zduzGyRpI3oWMpmGMB9MLowZQVPXvaZxyapywMCj0fspxIIm1czG5MUMOWY6LNEUPFgWkcwTPgSkDc5LuTm9RQz_WVxPQ6qEYL_Az2XeKMWDbOWbfUTMV2oX1lvBUKnC5DQwl_xJ-4kUV-NBMKJ_xhmPCOogx7tIkalv0VVfFXdIL?purpose=fullsize',
+    'Restoran Jezero',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
+    NOW()), 
+(
+    'https://images.openai.com/static-rsc-4/4xXo4sv034rWBeC3wyhiApeBGI1zjC9sWok5uw-zc00W9G9sf8iuOBHyX_Syym1HD9U_XFEqm5UpAeMUsPky8TL4CCgjidreQEBspAmefiK8JfJ9x212eIYkHOzeqIkcVeeexLqjAYD1r27G4_v5yBFtxjPlXF8PlajszCVRq12zAXV1Nyh4hyIuUNjPKitW?purpose=fullsize',
+    'Restoran Jezero',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
+    NOW()),
+    (
+    'https://images.openai.com/static-rsc-4/Dw0azf0HD_TmcThiY9gyKsWWwVyDcf14vwjtPPDlmIeME56axW2iPuYn9a6qs4hmvK9D_T8hlTQ4e744sBbg3MRmhmALtYPsU0hqYj-jM7Gyw5Flhahs1Ifk4CZiZuIhLEle2WGs1Bv4OHb9bTiCfPdYBqSa2XNTDnaR3LCgWIk9Zjfg0EtTiYt6dNjzlXc3?purpose=fullsize',
+    'Restoran Jezero',
+    false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
     NOW()),
 (
@@ -2427,26 +2461,51 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_images_main_locality ON "Images"("Locality
 -- TRIGGERS
 -- ============================================
 
+CREATE OR REPLACE FUNCTION refresh_object_rating(object_id integer)
+RETURNS void AS $$
+BEGIN
+    IF object_id IS NULL THEN
+        RETURN;
+    END IF;
+
+    UPDATE "Objects" o
+    SET
+        "AverageRating" = COALESCE((
+            SELECT ROUND(AVG(r."Rating")::numeric, 2)
+            FROM "Reviews" r
+            WHERE r."ObjectId" = object_id
+              AND r."Status" = 'Approved'
+        ), 0),
+        "ReviewCount" = (
+            SELECT COUNT(*)
+            FROM "Reviews" r
+            WHERE r."ObjectId" = object_id
+              AND r."Status" = 'Approved'
+        )
+    WHERE o."Id" = object_id;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION update_object_rating()
 RETURNS TRIGGER AS $$
 BEGIN
-    UPDATE "Objects"
-    SET
-        "AverageRating" = (
-            SELECT COALESCE(ROUND(AVG("Rating")::numeric, 2), 0)
-            FROM "Reviews"
-            WHERE "ObjectId" = COALESCE(NEW."ObjectId", OLD."ObjectId")
-              AND "Status" = 'Approved'
-        ),
-        "ReviewCount" = (
-            SELECT COUNT(*)
-            FROM "Reviews"
-            WHERE "ObjectId" = COALESCE(NEW."ObjectId", OLD."ObjectId")
-              AND "Status" = 'Approved'
-        )
-    WHERE "Id" = COALESCE(NEW."ObjectId", OLD."ObjectId");
+    IF TG_OP = 'DELETE' THEN
+        PERFORM refresh_object_rating(OLD."ObjectId");
+        RETURN OLD;
+    END IF;
 
-    RETURN COALESCE(NEW, OLD);
+    IF TG_OP = 'UPDATE' THEN
+        PERFORM refresh_object_rating(OLD."ObjectId");
+
+        IF NEW."ObjectId" IS DISTINCT FROM OLD."ObjectId" THEN
+            PERFORM refresh_object_rating(NEW."ObjectId");
+        END IF;
+
+        RETURN NEW;
+    END IF;
+
+    PERFORM refresh_object_rating(NEW."ObjectId");
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 

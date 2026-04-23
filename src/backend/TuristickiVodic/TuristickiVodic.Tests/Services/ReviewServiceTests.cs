@@ -450,5 +450,43 @@ namespace TuristickiVodic.Tests.Services
             savedObject.ReviewCount.Should().Be(2);
             savedObject.AverageRating.Should().Be(4.5m);
         }
+
+        [Fact]
+        public async Task UpdateAsync_AzuriraAverageRatingKadaSePromeniOcena()
+        {
+            using var ctx = CreateInMemoryContext(nameof(UpdateAsync_AzuriraAverageRatingKadaSePromeniOcena));
+            var (tourist, otherTourist, _, _, approvedObject, _) = SeedBase(ctx);
+            var review = new Review { UserId = tourist.Id, ObjectId = approvedObject.Id, Rating = 5, Text = "Stara ocena", Status = ContentStatus.Approved, CreatedAt = DateTime.UtcNow };
+            ctx.Reviews.AddRange(
+                review,
+                new Review { UserId = otherTourist.Id, ObjectId = approvedObject.Id, Rating = 5, Text = "Druga ocena", Status = ContentStatus.Approved, CreatedAt = DateTime.UtcNow });
+            ctx.SaveChanges();
+            var svc = new ReviewService(ctx, CreateMapper());
+
+            await svc.UpdateAsync(review.Id, new UpdateReviewDto { Rating = 2 }, tourist.Id, "Tourist");
+
+            var savedObject = ctx.Objects.Single(x => x.Id == approvedObject.Id);
+            savedObject.ReviewCount.Should().Be(2);
+            savedObject.AverageRating.Should().Be(3.5m);
+        }
+
+        [Fact]
+        public async Task DeleteAsync_AzuriraAverageRatingKadaSeObriseRecenzija()
+        {
+            using var ctx = CreateInMemoryContext(nameof(DeleteAsync_AzuriraAverageRatingKadaSeObriseRecenzija));
+            var (tourist, otherTourist, _, _, approvedObject, _) = SeedBase(ctx);
+            var review = new Review { UserId = tourist.Id, ObjectId = approvedObject.Id, Rating = 2, Text = "Za brisanje", Status = ContentStatus.Approved, CreatedAt = DateTime.UtcNow };
+            ctx.Reviews.AddRange(
+                review,
+                new Review { UserId = otherTourist.Id, ObjectId = approvedObject.Id, Rating = 5, Text = "Ostaje", Status = ContentStatus.Approved, CreatedAt = DateTime.UtcNow });
+            ctx.SaveChanges();
+            var svc = new ReviewService(ctx, CreateMapper());
+
+            await svc.DeleteAsync(review.Id, tourist.Id, "Tourist");
+
+            var savedObject = ctx.Objects.Single(x => x.Id == approvedObject.Id);
+            savedObject.ReviewCount.Should().Be(1);
+            savedObject.AverageRating.Should().Be(5m);
+        }
     }
 }
