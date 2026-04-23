@@ -30,6 +30,7 @@ namespace TuristickiVodic.Services
                 query.PageSize = 100;
 
             var destinationsQuery = _context.Destinations
+                .Include(d => d.Region)
                 .Include(d => d.DestinationType)
                 .Include(d => d.Images)
                 .Where(d => d.Images.Any(i => i.IsMain))
@@ -64,6 +65,11 @@ namespace TuristickiVodic.Services
                     d.DestinationType.Name.ToLower().Contains(type));
             }
 
+            if (query.RegionId.HasValue)
+            {
+                destinationsQuery = destinationsQuery.Where(d => d.RegionId == query.RegionId.Value);
+            }
+
             var search = NormalizeSearchTerm(query.Search);
             if (search != null)
                 destinationsQuery = ApplyDestinationSearch(destinationsQuery, search);
@@ -93,6 +99,7 @@ namespace TuristickiVodic.Services
         public async Task<DestinationDto?> GetByIdAsync(int id, int? userId, string role)
         {
             var destination = await _context.Destinations
+                .Include(d => d.Region)
                 .Include(d => d.DestinationType)
                 .Include(d => d.Images)
                 .FirstOrDefaultAsync(d => d.Id == id);
@@ -123,6 +130,12 @@ namespace TuristickiVodic.Services
             if (!destinationTypeExists)
                 throw new InvalidOperationException("Destination type not found");
 
+            var regionExists = await _context.Regions
+                .AnyAsync(r => r.Id == dto.RegionId && r.IsActive);
+
+            if (!regionExists)
+                throw new InvalidOperationException("Region not found.");
+
             if (dto.ManagedByUserId == null)
                 throw new InvalidOperationException("Destination must have a manager.");
 
@@ -146,6 +159,7 @@ namespace TuristickiVodic.Services
                 Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
                 Status = ContentStatus.Approved,
                 DestinationTypeId = dto.DestinationTypeId,
+                RegionId = dto.RegionId,
                 ManagedByUserId = dto.ManagedByUserId.Value,
                 CreatedByUserId = userId,
                 CreatedAt = DateTime.UtcNow,
@@ -159,6 +173,7 @@ namespace TuristickiVodic.Services
             await _context.SaveChangesAsync();
 
             var created = await _context.Destinations
+                .Include(d => d.Region)
                 .Include(d => d.DestinationType)
                 .Include(d => d.Images)
                 .FirstAsync(d => d.Id == destination.Id);
@@ -171,6 +186,7 @@ namespace TuristickiVodic.Services
         public async Task<DestinationDto?> UpdateAsync(int id, UpdateDestinationDto dto, int requestingUserId, string roleName)
         {
             var destination = await _context.Destinations
+                .Include(d => d.Region)
                 .Include(d => d.DestinationType)
                 .FirstOrDefaultAsync(d => d.Id == id);
 
@@ -188,6 +204,17 @@ namespace TuristickiVodic.Services
                 destination.DestinationTypeId = dto.DestinationTypeId.Value;
             }
 
+            if (dto.RegionId.HasValue)
+            {
+                var regionExists = await _context.Regions
+                    .AnyAsync(r => r.Id == dto.RegionId.Value && r.IsActive);
+
+                if (!regionExists)
+                    throw new InvalidOperationException("Region not found.");
+
+                destination.RegionId = dto.RegionId.Value;
+            }
+
             if (!string.IsNullOrWhiteSpace(dto.Name))
                 destination.Name = dto.Name;
 
@@ -202,6 +229,7 @@ namespace TuristickiVodic.Services
             await _context.SaveChangesAsync();
 
             var updated = await _context.Destinations
+                .Include(d => d.Region)
                 .Include(d => d.DestinationType)
                 .Include(d => d.Images)
                 .FirstAsync(d => d.Id == destination.Id);
@@ -215,6 +243,7 @@ namespace TuristickiVodic.Services
         public async Task<DestinationDto?> AssignManagerAsync(int destinationId, int newManagerUserId)
         {
             var destination = await _context.Destinations
+                .Include(d => d.Region)
                 .Include(d => d.DestinationType)
                 .FirstOrDefaultAsync(d => d.Id == destinationId);
 
@@ -257,6 +286,7 @@ namespace TuristickiVodic.Services
             await _context.SaveChangesAsync();
 
             var updated = await _context.Destinations
+                .Include(d => d.Region)
                 .Include(d => d.DestinationType)
                 .Include(d => d.Images)
                 .FirstAsync(d => d.Id == destinationId);

@@ -59,6 +59,36 @@ namespace TuristickiVodic.API.Controllers
             return Ok(location);
         }
 
+        [HttpGet("me/preferred-region")]
+        public async Task<IActionResult> GetMyPreferredRegion()
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var region = await _userService.GetPreferredRegionAsync(currentUserId);
+
+            if (region == null)
+                return NotFound();
+
+            return Ok(region);
+        }
+
+        [HttpPut("me/preferred-region")]
+        public async Task<IActionResult> UpdateMyPreferredRegion([FromBody] UpdateUserPreferredRegionDto dto)
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            try
+            {
+                var region = await _userService.UpdatePreferredRegionAsync(currentUserId, dto);
+                if (region == null)
+                    return NotFound();
+
+                return Ok(region);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpPut("me/location")]
         public async Task<IActionResult> UpdateMyLocation([FromBody] UpdateUserLocationDto dto)
         {

@@ -7,6 +7,7 @@ namespace TuristickiVodic.Core.DTO
     public class DestinationQueryDto
     {
         public string? Type { get; set; }
+        public int? RegionId { get; set; }
 
         public int Page { get; set; } = 1;
         public int PageSize { get; set; } = 10;

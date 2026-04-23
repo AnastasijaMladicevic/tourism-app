@@ -14,6 +14,9 @@ namespace TuristickiVodic.Core.DTO
         public bool IsVerified { get; set; }
         public bool IsActive { get; set; }
         public string RoleName { get; set; } = string.Empty;
+        public int? PreferredRegionId { get; set; }
+        public string? PreferredRegionName { get; set; }
+        public string? PreferredRegionCode { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? ProfileImageUrl { get; set; }
     }

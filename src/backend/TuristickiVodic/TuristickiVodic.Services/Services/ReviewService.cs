@@ -31,6 +31,12 @@ namespace TuristickiVodic.Services.Services
             var reviewsQuery = _context.Reviews
                 .Include(r => r.User)
                 .Include(r => r.Object)
+                    .ThenInclude(o => o.Destination)
+                        .ThenInclude(d => d.Region)
+                .Include(r => r.Object)
+                    .ThenInclude(o => o.Locality)
+                        .ThenInclude(l => l.Destination)
+                            .ThenInclude(d => d.Region)
                 .Include(r => r.ReviewedBy)
                 .AsQueryable();
 
@@ -66,6 +72,14 @@ namespace TuristickiVodic.Services.Services
                         r.User.FirstName.ToLower().Contains(userValue) ||
                         r.User.LastName.ToLower().Contains(userValue) ||
                         (r.User.FirstName + " " + r.User.LastName).ToLower().Contains(userValue)));
+            }
+
+            if (query.RegionId.HasValue)
+            {
+                reviewsQuery = reviewsQuery.Where(r =>
+                    r.Object != null &&
+                    ((r.Object.Destination != null && r.Object.Destination.RegionId == query.RegionId.Value) ||
+                     (r.Object.Destination == null && r.Object.Locality != null && r.Object.Locality.Destination != null && r.Object.Locality.Destination.RegionId == query.RegionId.Value)));
             }
 
             if (query.MinRating.HasValue)
@@ -123,6 +137,12 @@ namespace TuristickiVodic.Services.Services
             var review = await _context.Reviews
                 .Include(r => r.User)
                 .Include(r => r.Object)
+                    .ThenInclude(o => o.Destination)
+                        .ThenInclude(d => d.Region)
+                .Include(r => r.Object)
+                    .ThenInclude(o => o.Locality)
+                        .ThenInclude(l => l.Destination)
+                            .ThenInclude(d => d.Region)
                 .Include(r => r.ReviewedBy)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
@@ -303,6 +323,12 @@ namespace TuristickiVodic.Services.Services
             return await _context.Reviews
                 .Include(r => r.User)
                 .Include(r => r.Object)
+                    .ThenInclude(o => o.Destination)
+                        .ThenInclude(d => d.Region)
+                .Include(r => r.Object)
+                    .ThenInclude(o => o.Locality)
+                        .ThenInclude(l => l.Destination)
+                            .ThenInclude(d => d.Region)
                 .Include(r => r.ReviewedBy)
                 .FirstAsync(r => r.Id == id);
         }

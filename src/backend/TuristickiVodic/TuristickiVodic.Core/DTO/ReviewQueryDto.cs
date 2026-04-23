@@ -8,6 +8,7 @@ namespace TuristickiVodic.Core.DTO
         public string? Search { get; set; }
         public string? Object { get; set; }
         public string? User { get; set; }
+        public int? RegionId { get; set; }
         public int? MinRating { get; set; }
         public int? MaxRating { get; set; }
         public bool? HasResponse { get; set; }

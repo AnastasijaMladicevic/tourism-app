@@ -63,6 +63,7 @@ builder.Services.AddAutoMapper(typeof(TuristickiVodic.Services.Mappings.MappingP
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
+builder.Services.AddScoped<IRegionService, RegionService>();
 builder.Services.AddScoped<ILocalityService, LocalityService>();
 builder.Services.AddScoped<IDestinationService, DestinationService>();
 builder.Services.AddScoped<IActivityService, ActivityService>();

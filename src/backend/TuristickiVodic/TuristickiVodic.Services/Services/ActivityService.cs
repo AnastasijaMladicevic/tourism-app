@@ -35,7 +35,10 @@ namespace TuristickiVodic.Services.Services
             var activitiesQuery = _context.Activities
                 .Include(a => a.ActivityType)
                 .Include(a => a.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(a => a.Locality)
+                    .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(a => a.Images)
                 .Where(a => a.Status == ContentStatus.Approved)
                 .Where(a => a.IsActive)
@@ -56,8 +59,15 @@ namespace TuristickiVodic.Services.Services
                 var destination = query.Destination.Trim().ToLower();
 
                 activitiesQuery = activitiesQuery.Where(a =>
-                    a.Destination != null &&
-                    a.Destination.Name.ToLower().Contains(destination));
+                    ((a.Destination != null && a.Destination.Name.ToLower().Contains(destination)) ||
+                     (a.Destination == null && a.Locality != null && a.Locality.Destination != null && a.Locality.Destination.Name.ToLower().Contains(destination))));
+            }
+
+            if (query.RegionId.HasValue)
+            {
+                activitiesQuery = activitiesQuery.Where(a =>
+                    (a.Destination != null && a.Destination.RegionId == query.RegionId.Value) ||
+                    (a.Destination == null && a.Locality != null && a.Locality.Destination != null && a.Locality.Destination.RegionId == query.RegionId.Value));
             }
 
             var search = NormalizeSearchTerm(query.Search);
@@ -101,7 +111,10 @@ namespace TuristickiVodic.Services.Services
             var activitiesQuery = _context.Activities
                 .Include(a => a.ActivityType)
                 .Include(a => a.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(a => a.Locality)
+                    .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(a => a.Object)
                 .Include(a => a.Images)
                 .Where(a => a.Status == ContentStatus.Approved)
@@ -124,8 +137,15 @@ namespace TuristickiVodic.Services.Services
                 var destination = query.Destination.Trim().ToLower();
 
                 activitiesQuery = activitiesQuery.Where(a =>
-                    a.Destination != null &&
-                    a.Destination.Name.ToLower().Contains(destination));
+                    ((a.Destination != null && a.Destination.Name.ToLower().Contains(destination)) ||
+                     (a.Destination == null && a.Locality != null && a.Locality.Destination != null && a.Locality.Destination.Name.ToLower().Contains(destination))));
+            }
+
+            if (query.RegionId.HasValue)
+            {
+                activitiesQuery = activitiesQuery.Where(a =>
+                    (a.Destination != null && a.Destination.RegionId == query.RegionId.Value) ||
+                    (a.Destination == null && a.Locality != null && a.Locality.Destination != null && a.Locality.Destination.RegionId == query.RegionId.Value));
             }
 
             var search = NormalizeSearchTerm(query.Search);
@@ -191,7 +211,10 @@ namespace TuristickiVodic.Services.Services
             var activitiesQuery = _context.Activities
                 .Include(a => a.ActivityType)
                 .Include(a => a.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(a => a.Locality)
+                    .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(a => a.Object)
                 .Include(a => a.Images)
                 .Where(a => a.CreatedByUserId == userId)
@@ -209,8 +232,15 @@ namespace TuristickiVodic.Services.Services
             {
                 var destination = query.Destination.Trim().ToLower();
                 activitiesQuery = activitiesQuery.Where(a =>
-                    a.Destination != null &&
-                    a.Destination.Name.ToLower().Contains(destination));
+                    ((a.Destination != null && a.Destination.Name.ToLower().Contains(destination)) ||
+                     (a.Destination == null && a.Locality != null && a.Locality.Destination != null && a.Locality.Destination.Name.ToLower().Contains(destination))));
+            }
+
+            if (query.RegionId.HasValue)
+            {
+                activitiesQuery = activitiesQuery.Where(a =>
+                    (a.Destination != null && a.Destination.RegionId == query.RegionId.Value) ||
+                    (a.Destination == null && a.Locality != null && a.Locality.Destination != null && a.Locality.Destination.RegionId == query.RegionId.Value));
             }
 
             activitiesQuery = ApplyStatusFilter(activitiesQuery, query.Status);
@@ -255,8 +285,10 @@ namespace TuristickiVodic.Services.Services
             var activitiesQuery = _context.Activities
                 .Include(a => a.ActivityType)
                 .Include(a => a.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(a => a.Locality)
                     .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(a => a.Object)
                 .Include(a => a.Images)
                 .Where(a =>
@@ -280,6 +312,13 @@ namespace TuristickiVodic.Services.Services
                 activitiesQuery = activitiesQuery.Where(a =>
                     ((a.Destination != null && a.Destination.Name.ToLower().Contains(destination)) ||
                      (a.Destination == null && a.Locality != null && a.Locality.Destination != null && a.Locality.Destination.Name.ToLower().Contains(destination))));
+            }
+
+            if (query.RegionId.HasValue)
+            {
+                activitiesQuery = activitiesQuery.Where(a =>
+                    (a.Destination != null && a.Destination.RegionId == query.RegionId.Value) ||
+                    (a.Destination == null && a.Locality != null && a.Locality.Destination != null && a.Locality.Destination.RegionId == query.RegionId.Value));
             }
 
             activitiesQuery = ApplyStatusFilter(activitiesQuery, query.Status);
@@ -313,7 +352,10 @@ namespace TuristickiVodic.Services.Services
             var activity = await _context.Activities
                 .Include(a => a.ActivityType)
                 .Include(a => a.Locality)
+                    .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(a => a.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(a => a.Object)
                 .Include(a => a.Images)
                 .FirstOrDefaultAsync(a => a.Id == id);
@@ -339,7 +381,9 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.ActivityType)
                 .Include(a => a.Locality)
                     .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(a => a.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(a => a.Object)
                 .Include(a => a.Images)
                 .FirstOrDefaultAsync(a => a.Id == id && a.CreatedByUserId == userId);
@@ -358,7 +402,9 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.ActivityType)
                 .Include(a => a.Locality)
                     .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(a => a.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(a => a.Object)
                 .Include(a => a.Images)
                 .FirstOrDefaultAsync(a => a.Id == id);
@@ -444,7 +490,10 @@ namespace TuristickiVodic.Services.Services
             var created = await _context.Activities
                 .Include(a => a.ActivityType)
                 .Include(a => a.Locality)
+                    .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(a => a.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(a => a.Object)
                 .Include(a => a.Images)
                 .FirstAsync(a => a.Id == activity.Id);
@@ -465,7 +514,10 @@ namespace TuristickiVodic.Services.Services
             var activity = await _context.Activities
                 .Include(a => a.ActivityType)
                 .Include(a => a.Locality)
+                    .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(a => a.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(a => a.Object)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
@@ -544,7 +596,10 @@ namespace TuristickiVodic.Services.Services
             var updated = await _context.Activities
                 .Include(a => a.ActivityType)
                 .Include(a => a.Locality)
+                    .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(a => a.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(a => a.Object)
                 .Include(a => a.Images)
                 .FirstAsync(a => a.Id == activity.Id);
@@ -561,7 +616,9 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.ActivityType)
                 .Include(a => a.Locality)
                     .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(a => a.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(a => a.Object)
                 .Include(a => a.Images)
                 .FirstOrDefaultAsync(a => a.Id == id);
@@ -601,7 +658,10 @@ namespace TuristickiVodic.Services.Services
             var updated = await _context.Activities
                 .Include(a => a.ActivityType)
                 .Include(a => a.Locality)
+                    .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(a => a.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(a => a.Object)
                 .Include(a => a.Images)
                 .FirstAsync(a => a.Id == activity.Id);
@@ -709,7 +769,9 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.ActivityType)
                 .Include(a => a.Locality)
                     .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(a => a.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(a => a.Object)
                 .Include(a => a.Images)
                 .FirstOrDefaultAsync(a => a.Id == id);
@@ -739,7 +801,10 @@ namespace TuristickiVodic.Services.Services
             var updated = await _context.Activities
                 .Include(a => a.ActivityType)
                 .Include(a => a.Locality)
+                    .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(a => a.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(a => a.Object)
                 .Include(a => a.Images)
                 .FirstAsync(a => a.Id == activity.Id);

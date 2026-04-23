@@ -34,8 +34,10 @@ namespace TuristickiVodic.Services.Services
             var objectsQuery = _context.Objects
                 .Include(o => o.ObjectType)
                 .Include(o => o.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(o => o.Images)
                 .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
                     .ThenInclude(r => r.User)
@@ -89,6 +91,13 @@ namespace TuristickiVodic.Services.Services
                 {
                     throw new InvalidOperationException("The selected locality does not belong to the selected destination.");
                 }
+            }
+
+            if (query.RegionId.HasValue)
+            {
+                objectsQuery = objectsQuery.Where(o =>
+                    (o.Destination != null && o.Destination.RegionId == query.RegionId.Value) ||
+                    (o.Destination == null && o.Locality != null && o.Locality.Destination != null && o.Locality.Destination.RegionId == query.RegionId.Value));
             }
 
             var search = NormalizeSearchTerm(query.Search);
@@ -179,8 +188,10 @@ namespace TuristickiVodic.Services.Services
             var objectsQuery = _context.Objects
                 .Include(o => o.ObjectType)
                 .Include(o => o.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(o => o.Images)
                 .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
                     .ThenInclude(r => r.User)
@@ -234,6 +245,13 @@ namespace TuristickiVodic.Services.Services
                 {
                     throw new InvalidOperationException("The selected locality does not belong to the selected destination.");
                 }
+            }
+
+            if (query.RegionId.HasValue)
+            {
+                objectsQuery = objectsQuery.Where(o =>
+                    (o.Destination != null && o.Destination.RegionId == query.RegionId.Value) ||
+                    (o.Destination == null && o.Locality != null && o.Locality.Destination != null && o.Locality.Destination.RegionId == query.RegionId.Value));
             }
 
             var search = NormalizeSearchTerm(query.Search);
@@ -334,8 +352,10 @@ namespace TuristickiVodic.Services.Services
             var objectsQuery = _context.Objects
                 .Include(o => o.ObjectType)
                 .Include(o => o.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(o => o.Images)
                 .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
                     .ThenInclude(r => r.User)
@@ -367,6 +387,13 @@ namespace TuristickiVodic.Services.Services
                 objectsQuery = objectsQuery.Where(o =>
                     o.Locality != null &&
                     o.Locality.Name.ToLower().Contains(locality));
+            }
+
+            if (query.RegionId.HasValue)
+            {
+                objectsQuery = objectsQuery.Where(o =>
+                    (o.Destination != null && o.Destination.RegionId == query.RegionId.Value) ||
+                    (o.Destination == null && o.Locality != null && o.Locality.Destination != null && o.Locality.Destination.RegionId == query.RegionId.Value));
             }
 
             objectsQuery = ApplyStatusFilter(objectsQuery, query.Status);
@@ -463,8 +490,10 @@ namespace TuristickiVodic.Services.Services
             var objectsQuery = _context.Objects
                 .Include(o => o.ObjectType)
                 .Include(o => o.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(o => o.Images)
                 .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
                     .ThenInclude(r => r.User)
@@ -501,6 +530,13 @@ namespace TuristickiVodic.Services.Services
                 objectsQuery = objectsQuery.Where(o =>
                     o.Locality != null &&
                     o.Locality.Name.ToLower().Contains(locality));
+            }
+
+            if (query.RegionId.HasValue)
+            {
+                objectsQuery = objectsQuery.Where(o =>
+                    (o.Destination != null && o.Destination.RegionId == query.RegionId.Value) ||
+                    (o.Destination == null && o.Locality != null && o.Locality.Destination != null && o.Locality.Destination.RegionId == query.RegionId.Value));
             }
 
             objectsQuery = ApplyStatusFilter(objectsQuery, query.Status);
@@ -863,8 +899,10 @@ namespace TuristickiVodic.Services.Services
             return await _context.Objects
                 .Include(o => o.ObjectType)
                 .Include(o => o.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .Include(o => o.Images)
                 .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
                     .ThenInclude(r => r.User)
@@ -884,8 +922,10 @@ namespace TuristickiVodic.Services.Services
         {
             var obj = await _context.Objects
                 .Include(o => o.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(o => o.Locality)
                     .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
                 .FirstOrDefaultAsync(o => o.Id == id);
 
             if (obj == null)

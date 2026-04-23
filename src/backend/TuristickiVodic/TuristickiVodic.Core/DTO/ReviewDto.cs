@@ -16,6 +16,12 @@ namespace TuristickiVodic.Core.DTO
 
         public string ObjectName { get; set; } = string.Empty;
 
+        public int RegionId { get; set; }
+
+        public string RegionName { get; set; } = string.Empty;
+
+        public string RegionCode { get; set; } = string.Empty;
+
         public int Rating { get; set; }
 
         public string Text { get; set; } = string.Empty;

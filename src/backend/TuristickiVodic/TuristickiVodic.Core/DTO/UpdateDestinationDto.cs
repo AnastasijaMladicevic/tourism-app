@@ -20,6 +20,9 @@ namespace TuristickiVodic.Core.DTO
         [Range(1, int.MaxValue, ErrorMessage = "DestinationTypeId must be greater than 0.")]
         public int? DestinationTypeId { get; set; }
 
+        [Range(1, int.MaxValue, ErrorMessage = "RegionId must be greater than 0.")]
+        public int? RegionId { get; set; }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if ((Longitude.HasValue && !Latitude.HasValue) || (!Longitude.HasValue && Latitude.HasValue))

@@ -51,6 +51,7 @@ namespace TuristickiVodic.Services
 
             var usersQuery = _context.Users
                 .Include(u => u.Role)
+                .Include(u => u.PreferredRegion)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.Search))
@@ -104,6 +105,7 @@ namespace TuristickiVodic.Services
         {
             var user = await _context.Users
                 .Include(u => u.Role)
+                .Include(u => u.PreferredRegion)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             return user == null ? null : _mapper.Map<UserDto>(user);
@@ -113,6 +115,7 @@ namespace TuristickiVodic.Services
         {
             var user = await _context.Users
                 .Include(u => u.Role)
+                .Include(u => u.PreferredRegion)
                 .FirstOrDefaultAsync(u => u.Email == email);
 
             return user == null ? null : _mapper.Map<UserDto>(user);
@@ -133,6 +136,69 @@ namespace TuristickiVodic.Services
                 AccuracyMeters = user.LastLocationAccuracyMeters,
                 UpdatedAt = user.LastLocationUpdatedAt.Value
             };
+        }
+
+        public async Task<UserPreferredRegionDto?> GetPreferredRegionAsync(int userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.PreferredRegion)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return null;
+
+            var defaultRegion = await _context.Regions
+                .AsNoTracking()
+                .Where(r => r.IsActive)
+                .OrderByDescending(r => r.IsDefault)
+                .ThenBy(r => r.Name)
+                .FirstOrDefaultAsync();
+
+            var effectiveRegion = user.PreferredRegion != null && user.PreferredRegion.IsActive
+                ? user.PreferredRegion
+                : defaultRegion;
+
+            return new UserPreferredRegionDto
+            {
+                PreferredRegionId = user.PreferredRegionId,
+                EffectiveRegionId = effectiveRegion?.Id,
+                EffectiveRegionName = effectiveRegion?.Name,
+                EffectiveRegionCode = effectiveRegion?.Code,
+                CenterLongitude = effectiveRegion?.CenterLongitude,
+                CenterLatitude = effectiveRegion?.CenterLatitude,
+                DefaultMapZoom = effectiveRegion?.DefaultMapZoom,
+                IsDefaultFallback = user.PreferredRegionId == null || user.PreferredRegion == null || !user.PreferredRegion.IsActive
+            };
+        }
+
+        public async Task<UserPreferredRegionDto?> UpdatePreferredRegionAsync(int userId, UpdateUserPreferredRegionDto dto)
+        {
+            var user = await _context.Users
+                .Include(u => u.PreferredRegion)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return null;
+
+            if (dto.RegionId.HasValue)
+            {
+                var region = await _context.Regions
+                    .FirstOrDefaultAsync(r => r.Id == dto.RegionId.Value && r.IsActive);
+
+                if (region == null)
+                    throw new InvalidOperationException("Selected region not found.");
+
+                user.PreferredRegionId = region.Id;
+            }
+            else
+            {
+                user.PreferredRegionId = null;
+            }
+
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return await GetPreferredRegionAsync(userId);
         }
 
         public async Task<UserLocationDto?> UpdateCurrentLocationAsync(int userId, UpdateUserLocationDto dto)
@@ -303,6 +369,7 @@ namespace TuristickiVodic.Services
         {
             var user = await _context.Users
                 .Include(u => u.Role)
+                .Include(u => u.PreferredRegion)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
@@ -391,6 +458,7 @@ namespace TuristickiVodic.Services
         {
             var user = await _context.Users
                 .Include(u => u.Role)
+                .Include(u => u.PreferredRegion)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
@@ -537,6 +605,7 @@ namespace TuristickiVodic.Services
         {
             var user = await _context.Users
                 .Include(u => u.Role)
+                .Include(u => u.PreferredRegion)
                 .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
@@ -566,6 +635,7 @@ namespace TuristickiVodic.Services
 
             var user = await _context.Users
                 .Include(u => u.Role)
+                .Include(u => u.PreferredRegion)
                 .FirstOrDefaultAsync(u => u.Id == storedRefreshToken.UserId);
 
             if (user == null)
@@ -1036,6 +1106,7 @@ namespace TuristickiVodic.Services
         {
             var user = await _context.Users
                 .Include(u => u.Role)
+                .Include(u => u.PreferredRegion)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)

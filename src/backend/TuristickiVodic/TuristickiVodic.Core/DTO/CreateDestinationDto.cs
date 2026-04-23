@@ -21,6 +21,9 @@ namespace TuristickiVodic.Core.DTO
         [Range(1, int.MaxValue, ErrorMessage = "DestinationTypeId is required.")]
         public int DestinationTypeId { get; set; }
 
+        [Range(1, int.MaxValue, ErrorMessage = "RegionId is required.")]
+        public int RegionId { get; set; }
+
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "ManagedByUserId mora biti validan ID menadžera (vrednost >= 1).")]
         public int? ManagedByUserId { get; set; }

@@ -23,6 +23,7 @@ namespace TuristickiVodic.Services
         {
             var localities = await _context.Localities
                 .Include(l => l.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(l => l.LocalityType)
                 .Include(l => l.Images)
                 .Where(l => l.IsActive && l.Images.Any(i => i.IsMain))
@@ -36,6 +37,7 @@ namespace TuristickiVodic.Services
         {
             var locality = await _context.Localities
                 .Include(l => l.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(l => l.LocalityType)
                 .Include(l => l.Images)
                 .FirstOrDefaultAsync(l => l.Id == id);
@@ -97,6 +99,7 @@ namespace TuristickiVodic.Services
 
             var created = await _context.Localities
                 .Include(l => l.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(l => l.LocalityType)
                 .Include(l => l.Images)
                 .FirstAsync(l => l.Id == locality.Id);
@@ -176,6 +179,7 @@ namespace TuristickiVodic.Services
 
             var updated = await _context.Localities
                 .Include(l => l.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(l => l.LocalityType)
                 .Include(l => l.Images)
                 .FirstAsync(l => l.Id == locality.Id);
@@ -227,6 +231,7 @@ namespace TuristickiVodic.Services
         {
             var locality = await _context.Localities
                 .Include(l => l.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(l => l.LocalityType)
                 .Include(l => l.Images)
                 .FirstOrDefaultAsync(l => l.Id == id);
@@ -271,6 +276,7 @@ namespace TuristickiVodic.Services
 
             var localitiesQuery = _context.Localities
                 .Include(l => l.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(l => l.LocalityType)
                 .Include(l => l.Images)
                 .Where(l => l.IsActive)
@@ -293,6 +299,13 @@ namespace TuristickiVodic.Services
                 localitiesQuery = localitiesQuery.Where(l =>
                     l.LocalityType != null &&
                     l.LocalityType.Name.ToLower().Contains(type));
+            }
+
+            if (query.RegionId.HasValue)
+            {
+                localitiesQuery = localitiesQuery.Where(l =>
+                    l.Destination != null &&
+                    l.Destination.RegionId == query.RegionId.Value);
             }
 
             var search = NormalizeSearchTerm(query.Search);
@@ -334,6 +347,7 @@ namespace TuristickiVodic.Services
 
             var localitiesQuery = _context.Localities
                 .Include(l => l.Destination)
+                    .ThenInclude(d => d.Region)
                 .Include(l => l.LocalityType)
                 .Include(l => l.Images)
                 .Where(l => l.IsActive)
@@ -357,6 +371,13 @@ namespace TuristickiVodic.Services
                 localitiesQuery = localitiesQuery.Where(l =>
                     l.LocalityType != null &&
                     l.LocalityType.Name.ToLower().Contains(type));
+            }
+
+            if (query.RegionId.HasValue)
+            {
+                localitiesQuery = localitiesQuery.Where(l =>
+                    l.Destination != null &&
+                    l.Destination.RegionId == query.RegionId.Value);
             }
 
             var search = NormalizeSearchTerm(query.Search);

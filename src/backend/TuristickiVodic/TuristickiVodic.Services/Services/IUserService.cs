@@ -27,6 +27,8 @@ namespace TuristickiVodic.Services
         Task<UserDto?> UpdateProfileImageAsync(int id, IFormFile file);
         Task<UserDto?> RemoveProfileImageAsync(int id);
         Task<UserLocationDto?> GetCurrentLocationAsync(int userId);
+        Task<UserPreferredRegionDto?> GetPreferredRegionAsync(int userId);
+        Task<UserPreferredRegionDto?> UpdatePreferredRegionAsync(int userId, UpdateUserPreferredRegionDto dto);
         Task<UserLocationDto?> UpdateCurrentLocationAsync(int userId, UpdateUserLocationDto dto);
         Task<bool> ClearCurrentLocationAsync(int userId);
         Task<PagedResultDto<UserLocationHistoryPointDto>> GetLocationHistoryAsync(int userId, UserLocationHistoryQueryDto query);

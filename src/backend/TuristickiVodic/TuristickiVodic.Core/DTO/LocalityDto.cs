@@ -16,6 +16,9 @@ namespace TuristickiVodic.Core.DTO
         public double? DistanceMeters { get; set; }
         public int DestinationId { get; set; }
         public string DestinationName { get; set; } = string.Empty;
+        public int RegionId { get; set; }
+        public string RegionName { get; set; } = string.Empty;
+        public string RegionCode { get; set; } = string.Empty;
         public int LocalityTypeId { get; set; }
         public string LocalityTypeName { get; set; } = string.Empty;
         public int? CreatedByUserId { get; set; }

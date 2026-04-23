@@ -60,6 +60,11 @@ namespace TuristickiVodic.Core.Models
         [ForeignKey("ManagedDestinationId")]
         public Destination? ManagedDestination { get; set; }
 
+        public int? PreferredRegionId { get; set; }
+
+        [ForeignKey("PreferredRegionId")]
+        public Region? PreferredRegion { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 

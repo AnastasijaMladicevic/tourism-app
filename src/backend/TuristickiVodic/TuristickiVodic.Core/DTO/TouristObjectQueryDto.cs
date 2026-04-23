@@ -10,6 +10,7 @@ namespace TuristickiVodic.Core.DTO
         public string? Destination { get; set; }
         public string? Locality { get; set; }
         public string? Status { get; set; }
+        public int? RegionId { get; set; }
         public string[]? Amenities { get; set; }
         public decimal? MinPrice { get; set; }
         public decimal? MaxPrice { get; set; }

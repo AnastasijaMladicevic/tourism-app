@@ -14,6 +14,9 @@ namespace TuristickiVodic.Core.DTO
         public string Status { get; set; } = string.Empty;
         public int DestinationTypeId { get; set; }
         public string DestinationTypeName { get; set; } = string.Empty;
+        public int RegionId { get; set; }
+        public string RegionName { get; set; } = string.Empty;
+        public string RegionCode { get; set; } = string.Empty;
         public int CreatedByUserId { get; set; }
         public int? ManagedByUserId { get; set; }
         public DateTime CreatedAt { get; set; }

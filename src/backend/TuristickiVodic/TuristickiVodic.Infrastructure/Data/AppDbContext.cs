@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
         : base(options) { }
 
     public DbSet<Role> Roles { get; set; }
+    public DbSet<Region> Regions { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<LocalityType> LocalityTypes { get; set; }
     public DbSet<Locality> Localities { get; set; }
@@ -47,6 +48,12 @@ public class AppDbContext : DbContext
             .IsUnique();
 
         mb.Entity<User>()
+            .HasOne(u => u.PreferredRegion)
+            .WithMany(r => r.PreferredByUsers)
+            .HasForeignKey(u => u.PreferredRegionId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        mb.Entity<User>()
             .HasIndex(u => u.LastKnownLocation)
             .HasMethod("GIST");
 
@@ -75,10 +82,28 @@ public class AppDbContext : DbContext
             .HasForeignKey<Destination>(d => d.ManagedByUserId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // ==================== REGION ====================
+        mb.Entity<Region>()
+            .HasIndex(r => r.Name)
+            .IsUnique();
+
+        mb.Entity<Region>()
+            .HasIndex(r => r.Code)
+            .IsUnique();
+
+        mb.Entity<Region>()
+            .HasIndex(r => r.IsDefault)
+            .HasFilter("\"IsDefault\" = TRUE")
+            .IsUnique();
+
         // ==================== DESTINATION ====================
         mb.Entity<Destination>()
             .Property(d => d.Status)
             .HasConversion<string>();
+
+        mb.Entity<Destination>()
+            .Property(d => d.RegionId)
+            .HasDefaultValue(1);
 
         mb.Entity<Destination>()
             .HasIndex(d => d.Geolocation)
@@ -95,6 +120,12 @@ public class AppDbContext : DbContext
             .WithMany(dt => dt.Destinations)
             .HasForeignKey(d => d.DestinationTypeId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Destination>()
+            .HasOne(d => d.Region)
+            .WithMany(r => r.Destinations)
+            .HasForeignKey(d => d.RegionId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // ==================== LOCATION ====================
         mb.Entity<Locality>()

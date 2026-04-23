@@ -23,6 +23,10 @@ namespace TuristickiVodic.Core.Models
         public DestinationType DestinationType { get; set; }
 
         [Required]
+        public int RegionId { get; set; }
+        public Region Region { get; set; }
+
+        [Required]
         public int CreatedByUserId { get; set; }
 
         [ForeignKey("CreatedByUserId")]
