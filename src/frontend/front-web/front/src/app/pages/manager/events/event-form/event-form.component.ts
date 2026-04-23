@@ -192,7 +192,7 @@ export class ManagerEventFormComponent implements OnInit {
   }
 
   approveEvent(): void {
-    if (!this.eventId || this.isSubmitting) {
+    if (!this.eventId || this.isSubmitting || this.reviewStatus === 'Approved') {
       return;
     }
 
