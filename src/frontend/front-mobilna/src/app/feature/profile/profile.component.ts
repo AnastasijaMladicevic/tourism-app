@@ -59,7 +59,7 @@ export class ProfileComponent implements OnInit {
     {
       titleKey: 'profile.section.settings',
       items: [
-        { titleKey: 'profile.language', icon: 'language', accent: 'green', route: '/language' },
+        { titleKey: 'profile.region', icon: 'region', accent: 'green', route: '/region' },
         { titleKey: 'profile.support', icon: 'help', accent: 'gray', route: '/support' },
       ],
     },
