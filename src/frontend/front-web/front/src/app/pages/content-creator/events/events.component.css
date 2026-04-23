@@ -37,7 +37,7 @@
 
 .header-actions,
 .toolbar,
-.filters-row,
+.filters-panel,
 .table-footer,
 .detail-metrics,
 .section-head,
@@ -122,27 +122,6 @@
 .toolbar-input,
 .toolbar-pill input,
 .filters-row select {
-
-.date-pill {
-  min-width: 220px;
-  max-width: 100%;
-  justify-content: flex-start;
-  gap: 10px;
-  color: #374151;
-  white-space: nowrap;
-}
-
-.date-pill .material-symbols-outlined {
-  font-size: 19px;
-  color: #475569;
-}
-
-.date-pill-text {
-  font-size: 14px;
-  font-weight: 500;
-  color: #374151;
-  white-space: nowrap;
-}
   width: 100%;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -152,9 +131,102 @@
   outline: none;
 }
 
+.date-range-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #dbe1ea;
+  border-radius: 12px;
+  background: #fff;
+  color: #374151;
+}
+
+.date-range-pill .material-symbols-outlined {
+  font-size: 19px;
+  color: #475569;
+}
+
+.date-range-inputs {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.date-range-input {
+  width: 138px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #111827;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.date-range-input:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.3);
+}
+
+.date-range-separator {
+  color: #64748b;
+  font-weight: 600;
+}
+
 .toolbar-input {
   padding: 11px 14px 11px 38px;
   min-width: 0;
+}
+
+.filters-panel {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto auto;
+  gap: 12px;
+  padding: 14px;
+  align-items: end;
+}
+
+.filters-panel label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.filters-panel select {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  color: #111827;
+  font: inherit;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  align-self: end;
+  justify-self: end;
+  white-space: nowrap;
+}
+
+.filter-btn {
+  padding-inline: 16px;
+}
+
+.filter-btn.secondary {
+  color: #334155;
+  border-color: #dbe1ea;
+  background: #fff;
 }
 
 .toolbar-pill {
@@ -359,6 +431,40 @@ tbody tr:hover,
 .pager {
   display: flex;
   gap: 8px;
+}
+
+.page-size-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: 1px solid #dbe1ea;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.page-size-control span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.page-size-select {
+  min-width: 74px;
+  padding: 6px 28px 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.page-size-select:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.3);
 }
 
 .insights-grid {
@@ -727,7 +833,7 @@ tbody tr:hover,
   .page-header,
   .table-footer,
   .section-head,
-  .filters-row,
+  .filters-panel,
   .toolbar {
     align-items: stretch;
   }
@@ -749,13 +855,54 @@ tbody tr:hover,
     grid-template-columns: 1fr;
   }
 
-  .toolbar-search,
-  .date-pill,
-  .toolbar .ghost-btn.slim-btn {
+  .filters-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-actions {
+    justify-content: stretch;
+    justify-self: stretch;
+  }
+
+  .filter-actions .filter-btn {
     width: 100%;
   }
 
-  .date-pill {
+  .toolbar-search,
+  .date-range-pill,
+  .toolbar .ghost-btn.slim-btn {
     width: 100%;
+
+  .pager {
+    flex-wrap: wrap;
+  }
+
+  .page-size-control {
+    width: 100%;
+    justify-content: space-between;
+  }
+  }
+
+  .date-range-pill {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .date-range-inputs {
+    width: 100%;
+  }
+
+  .date-range-input {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .pager {
+    flex-wrap: wrap;
+  }
+
+  .page-size-control {
+    width: 100%;
+    justify-content: space-between;
   }
 }

@@ -203,6 +203,7 @@ label {
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
+  justify-content: center;
   box-shadow: 0 10px 22px rgba(44, 147, 255, 0.22);
 }
 

@@ -15,7 +15,14 @@
         <span class="material-symbols-outlined">thumb_down</span>
         Decline
       </button>
-      <button type="button" class="primary-btn" (click)="approveEvent()" [disabled]="isSubmitting">
+      <button
+        type="button"
+        class="primary-btn"
+        [class.approved-locked]="reviewStatus === 'Approved'"
+        [attr.title]="reviewStatus === 'Approved' ? 'Event is already approved.' : null"
+        (click)="approveEvent()"
+        [disabled]="isSubmitting || reviewStatus === 'Approved'"
+      >
         <span class="material-symbols-outlined">thumb_up</span>
         Approve
       </button>

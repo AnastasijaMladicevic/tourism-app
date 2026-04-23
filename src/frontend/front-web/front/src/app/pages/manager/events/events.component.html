@@ -12,15 +12,16 @@
       <span class="material-symbols-outlined">search</span>
       <input
         type="text"
-        [(ngModel)]="searchQuery"
+        [(ngModel)]="draftSearchQuery"
         (ngModelChange)="onSearchChange()"
+        (keydown.enter)="onSearchEnter($event)"
         placeholder="Search events, venues, or organizers..."
       />
     </label>
 
     <button type="button" class="ghost-btn date-pill" aria-label="Date range filter">
       <span class="material-symbols-outlined">calendar_month</span>
-      Oct 1, 2024 - Dec 31, 2024
+      Filters ready
     </button>
 
     <button type="button" class="ghost-btn" (click)="onMoreFilters()">
@@ -28,6 +29,60 @@
       More Filters
     </button>
   </div>
+
+  @if (filterPanelOpen) {
+    <div class="filters-panel card">
+      <label>
+        <span>Status</span>
+        <select [(ngModel)]="statusFilter">
+          <option value="all">All Statuses</option>
+          <option value="approved">Approved</option>
+          <option value="pending">Pending</option>
+          <option value="rejected">Rejected</option>
+          <option value="draft">Draft</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Category</span>
+        <select [(ngModel)]="categoryFilter">
+          <option value="all">All Categories</option>
+          <option value="Festival">Festival</option>
+          <option value="Workshop">Workshop</option>
+          <option value="Sports">Sports</option>
+          <option value="Cultural">Cultural</option>
+          <option value="Exhibition">Exhibition</option>
+          <option value="Concert">Concert</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Sort by</span>
+        <select [(ngModel)]="sortBy">
+          <option value="startDate">Start date</option>
+          <option value="name">Name</option>
+          <option value="status">Status</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Order</span>
+        <select [(ngModel)]="sortOrder">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </label>
+
+      <div class="filter-actions">
+        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
+          Apply Filters
+        </button>
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  }
 
   <div class="event-content-grid">
     <div class="event-main-column">
@@ -120,24 +175,23 @@
           </div>
 
           <footer class="table-footer">
-            <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ filteredEvents.length }} events</p>
+            <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ totalCount }} events</p>
             <div class="pager">
-              <button
-                type="button"
-                class="ghost-btn small-btn"
-                (click)="onPreviousPage()"
-                [disabled]="currentPage === 1"
-              >
-                Previous
-              </button>
-              <button
-                type="button"
-                class="ghost-btn small-btn"
-                (click)="onNextPage()"
-                [disabled]="currentPage * pageSize >= totalCount"
-              >
-                Next
-              </button>
+              <label class="page-size-control">
+                <span>Page size</span>
+                <select
+                  class="page-size-select"
+                  [(ngModel)]="pageSize"
+                  (ngModelChange)="onPageSizeChange($event)"
+                >
+                  <option *ngFor="let option of pageSizeOptions" [ngValue]="option">
+                    {{ option }}
+                  </option>
+                </select>
+              </label>
+
+              <button type="button" class="ghost-btn small-btn" (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
+              <button type="button" class="ghost-btn small-btn" (click)="onNextPage()" [disabled]="currentPage >= totalPages">Next</button>
             </div>
           </footer>
         }

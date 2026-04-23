@@ -28,62 +28,90 @@
       <input
         type="text"
         class="toolbar-input"
-        [(ngModel)]="searchQuery"
+        [(ngModel)]="draftSearchQuery"
         (ngModelChange)="onSearch()"
+        (keydown.enter)="onSearchEnter($event)"
         placeholder="Search events, venues, or organizers..."
       />
     </div>
 
-    <button type="button" class="ghost-btn date-pill" aria-label="Date range filter">
+    <div class="date-range-pill" aria-label="Date range filter">
       <span class="material-symbols-outlined">calendar_month</span>
-      <span class="date-pill-text">Oct 1, 2024 - Dec 31, 2024</span>
-    </button>
+      <div class="date-range-inputs">
+        <input
+          type="date"
+          class="date-range-input"
+          [(ngModel)]="rangeStartDate"
+          (ngModelChange)="onDateRangeChange()"
+          aria-label="From date"
+        />
+        <span class="date-range-separator">-</span>
+        <input
+          type="date"
+          class="date-range-input"
+          [(ngModel)]="rangeEndDate"
+          (ngModelChange)="onDateRangeChange()"
+          aria-label="To date"
+        />
+      </div>
+    </div>
 
-    <button type="button" class="ghost-btn slim-btn" (click)="onClearSearch()">
+    <button type="button" class="ghost-btn slim-btn" (click)="onMoreFilters()">
       <span class="material-symbols-outlined"> filter_alt </span>
       More Filters
     </button>
   </div>
 
+  @if (filterPanelOpen) {
+    <div class="filters-panel card">
+      <label>
+        <span>Status</span>
+        <select [(ngModel)]="statusFilter">
+          <option *ngFor="let option of statusOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>Category</span>
+        <select [(ngModel)]="categoryFilter">
+          <option *ngFor="let option of categoryOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>Sort by</span>
+        <select [(ngModel)]="sortBy">
+          <option value="startDate">Start date</option>
+          <option value="name">Name</option>
+          <option value="status">Status</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Order</span>
+        <select [(ngModel)]="sortOrder">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </label>
+
+      <div class="filter-actions">
+        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
+          Apply Filters
+        </button>
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  }
+
   <div class="events-layout">
     <div class="main-column">
-      <div class="filters-row card">
-        <label>
-          <span>Status</span>
-          <select [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()">
-            <option *ngFor="let option of statusOptions" [value]="option.value">
-              {{ option.label }}
-            </option>
-          </select>
-        </label>
-
-        <label>
-          <span>Category</span>
-          <select [(ngModel)]="categoryFilter" (ngModelChange)="onFilterChange()">
-            <option *ngFor="let option of categoryOptions" [value]="option.value">
-              {{ option.label }}
-            </option>
-          </select>
-        </label>
-
-        <label>
-          <span>Sort by</span>
-          <select [(ngModel)]="sortBy" (ngModelChange)="onChangeSortBy($event)">
-            <option value="startDate">Start date</option>
-            <option value="name">Name</option>
-            <option value="status">Status</option>
-          </select>
-        </label>
-
-        <label>
-          <span>Order</span>
-          <select [(ngModel)]="sortOrder" (ngModelChange)="onChangeSortOrder($event)">
-            <option value="asc">Ascending</option>
-            <option value="desc">Descending</option>
-          </select>
-        </label>
-      </div>
-
       <div class="card table-card">
         @if (isLoading) {
           <div class="state state-loading">Loading events...</div>
@@ -154,8 +182,15 @@
           </div>
 
           <div class="table-footer">
-            <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ filteredEvents.length }} events</p>
+            <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ totalCount }} events</p>
             <div class="pager">
+              <label class="page-size-control">
+                <span>Page size</span>
+                <select class="page-size-select" [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+                  <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
+                </select>
+              </label>
+
               <button
                 type="button"
                 class="ghost-btn slim-btn"
@@ -168,7 +203,7 @@
                 type="button"
                 class="ghost-btn slim-btn"
                 (click)="onNextPage()"
-                [disabled]="currentPage * pageSize >= totalCount"
+                [disabled]="currentPage >= totalPages"
               >
                 Next
               </button>
@@ -258,7 +293,7 @@
           <h3>Description</h3>
           <p class="description-copy">{{ getSelectedSummary(selectedEvent) }}</p>
         </section>
-<!-- TBD DA LI CEMO OVO DA IMAMO -->
+        <!-- TBD DA LI CEMO OVO DA IMAMO -->
         <!-- <section class="detail-section">
           <div class="section-head">
             <h3>Staff &amp; Organizers</h3>
