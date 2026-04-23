@@ -120,10 +120,10 @@ export const routes: Routes = [
       import('./feature/about/about.component').then((m) => m.AboutComponent),
   },
   {
-    path: 'language',
+    path: 'region',
     canActivate: [profileAuthGuard],
     loadComponent: () =>
-      import('./feature/language/language.component').then((m) => m.LanguageComponent),
+      import('./feature/language/language.component').then((m) => m.RegionComponent),
   },
   {
     path: 'support',

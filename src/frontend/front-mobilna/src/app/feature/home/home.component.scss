@@ -5,12 +5,12 @@
   flex-direction: column;
   max-width: 430px;
   margin: 0 auto;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .scroll-content {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: visible ;
   animation: fadeUp 0.4s ease;
   padding-bottom: 96px;
 }
@@ -34,7 +34,7 @@
     font-size: 13px;
     font-weight: 600;
     color: var(--text-gray);
-    margin-bottom: 2px;
+    margin-bottom: 5px;
   }
 
   .greeting-name {
@@ -47,7 +47,10 @@
 
 /* Search */
 .search-bar {
-  margin: 0 20px 20px;
+  position: relative;
+  height: 44px;
+  flex: 7;
+  margin-left: 20px;
   background: var(--athens-gray);
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -89,6 +92,7 @@
 }
 
 .section-title {
+  padding-top: 5px;
   font-size: 16px;
   font-weight: 800;
   color: var(--text-dark);
@@ -188,16 +192,16 @@
 
 /* Featured banner */
 .featured-banner {
+  background-size: cover;      
+  background-position: center;  
+  background-repeat: no-repeat;
   margin: 0 20px 24px;
   height: 170px;
   border-radius: 18px;
   overflow: hidden;
   position: relative;
   box-shadow: 0 14px 32px rgba(22, 138, 173, 0.18);
-  background:
-    linear-gradient(rgba(22, 138, 173, 0.3), rgba(26, 122, 138, 0.5)),
-    url('/assets/izlet-boko-kotorski-zaliv-1.jpg') center/cover no-repeat;
-}
+  }
 
 .featured-overlay {
   position: absolute;
@@ -209,9 +213,9 @@
 }
 
 .featured-tag {
+  color: var(--emperor);
   display: inline-block;
   background: rgba(255, 255, 255, 0.18);
-  color: var(--white);
   font-size: 10px;
   font-weight: 800;
   padding: 4px 10px;
@@ -224,13 +228,13 @@
   h2 {
     font-size: 20px;
     font-weight: 800;
-    color: white;
+    color: var(--emperor);
     line-height: 1.2;
     margin-bottom: 4px;
   }
   p {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.82);
+    color: var(--emperor);
     font-weight: 500;
     max-width: 60%;
     line-height: 1.4;
@@ -464,10 +468,12 @@
 
   .greeting {
     padding: 12px 28px 20px;
-
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
     .greeting-sub {
+      display: block;
       font-size: 15px;
-      margin-bottom: 4px;
     }
 
     .greeting-name {
@@ -477,7 +483,7 @@
   }
 
   .search-bar {
-    margin: 0 28px 28px;
+    margin-left: 28px;
     padding: 16px 20px;
     border-radius: 18px;
 
@@ -636,4 +642,182 @@
       font-size: 46px;
     }
   }
+}
+.search-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-right: 24px;
+  gap: 10px;
+  width: 100%;
+}
+.region-wrapper {
+  flex: 2;
+  position: relative;
+}
+.filter-btn {
+  width: 100%;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 12px;
+  border-radius: 14px;
+  border: none;
+  background: var(--white);
+  cursor: pointer;
+  background: var(--athens-gray);
+  border: 1px solid var(--border);
+}
+.filter-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  overflow: hidden;
+  z-index: 100;
+}
+
+.dropdown-item {
+  padding: 10px 14px;
+  cursor: pointer;
+
+  &:hover {
+    background: #f3f4f6;
+  }
+}
+.nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+
+  background: rgba(0,0,0,0.5);
+  border: none;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+}
+.nav mat-icon {
+  color: white;
+  font-size: 26px; 
+  width: 26px;
+  height: 26px;
+
+  line-height: 1;    
+  display: block;     
+}
+.nav.left { left: 10px; }
+.nav.right { right: 10px; }
+
+.dots {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.5);
+  cursor: pointer;
+}
+
+.dot.active {
+  background: white;
+  transform: scale(1.3);
+}
+.suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  z-index: 1000;
+}
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover { background: var(--athens-gray); }
+  & + & { border-top: 1px solid var(--border); }
+}
+
+.suggestion-item__image {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--athens-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-gray);
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+  mat-icon { font-size: 20px; }
+}
+
+.suggestion-item__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.suggestion-item__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--emperor);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.suggestion-item__meta {
+  font-size: 12px;
+  color: var(--text-gray);
+}
+.clear-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-gray);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover {
+    background: var(--border);
+    color: var(--emperor);
+  }
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
 }
