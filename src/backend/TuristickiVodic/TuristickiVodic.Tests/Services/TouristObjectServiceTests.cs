@@ -458,6 +458,86 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task GetAllAsync_SaSearchParametrom_PrioritizujeNazivPaOpisPaAmenities()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_SaSearchParametrom_PrioritizujeNazivPaOpisPaAmenities));
+            var (objectType, destination, _, locality, _, creator, _, _, _) = SeedBase(ctx);
+
+            var typeMatchType = new ObjectType { Id = 2, Name = "WiFi resort" };
+            ctx.ObjectTypes.Add(typeMatchType);
+
+            ctx.Objects.AddRange(
+                new TouristObject
+                {
+                    Id = 1,
+                    Name = "Zeta WiFi Palace",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new TouristObject
+                {
+                    Id = 4,
+                    Name = "Gamma Stay",
+                    ObjectTypeId = typeMatchType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new TouristObject
+                {
+                    Id = 2,
+                    Name = "Alpha Relax",
+                    Description = "Savrsen hotel sa jakim wifi signalom",
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new TouristObject
+                {
+                    Id = 3,
+                    Name = "Beta Comfort",
+                    Amenities = new[] { "WiFi", "Parking" },
+                    ObjectTypeId = objectType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+            ctx.Images.AddRange(
+                new Image { Id = 1, ObjectId = 1, Url = "search-1.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 4, ObjectId = 4, Url = "search-4.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 2, ObjectId = 2, Url = "search-2.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 3, ObjectId = 3, Url = "search-3.jpg", IsMain = true, CreatedAt = DateTime.UtcNow });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetAllAsync(new TouristObjectQueryDto { Search = "wifi" });
+
+            result.TotalCount.Should().Be(4);
+            result.Items.Select(x => x.Name).Should().Equal("Zeta WiFi Palace", "Gamma Stay", "Alpha Relax", "Beta Comfort");
+        }
+
+        [Fact]
         public async Task GetNearbyAsync_UKruguVracaSamoJavneObjekteSortiranePoUdaljenosti()
         {
             using var ctx = CreateInMemoryContext(nameof(GetNearbyAsync_UKruguVracaSamoJavneObjekteSortiranePoUdaljenosti));

@@ -1122,6 +1122,65 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task GetAllAsync_SaSearchParametrom_PrioritizujeNazivPreOpisa()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_SaSearchParametrom_PrioritizujeNazivPreOpisa));
+            SeedBase(ctx);
+
+            var typeMatchType = new EventType { Id = 2, Name = "Sea party" };
+            ctx.EventTypes.Add(typeMatchType);
+
+            ctx.Events.AddRange(
+                new Event
+                {
+                    Id = 1,
+                    Name = "Zeta Sea Festival",
+                    EventTypeId = 1,
+                    DestinationId = 1,
+                    CreatedByUserId = 99,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    StartDate = DateTime.UtcNow.AddDays(10)
+                },
+                new Event
+                {
+                    Id = 3,
+                    Name = "Beta Celebration",
+                    EventTypeId = typeMatchType.Id,
+                    DestinationId = 1,
+                    CreatedByUserId = 99,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    StartDate = DateTime.UtcNow.AddDays(5)
+                },
+                new Event
+                {
+                    Id = 2,
+                    Name = "Alpha Festival",
+                    Description = "Veliki sea spektakl u luci",
+                    EventTypeId = 1,
+                    DestinationId = 1,
+                    CreatedByUserId = 99,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    StartDate = DateTime.UtcNow.AddDays(1)
+                });
+
+            ctx.Images.AddRange(
+                new Image { Id = 11, EventId = 1, Url = "search-event-1.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 13, EventId = 3, Url = "search-event-3.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 12, EventId = 2, Url = "search-event-2.jpg", IsMain = true, CreatedAt = DateTime.UtcNow });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetAllAsync(new EventQueryDto { Search = "sea" });
+
+            result.TotalCount.Should().Be(3);
+            result.Items.Select(x => x.Name).Should().Equal("Zeta Sea Festival", "Beta Celebration", "Alpha Festival");
+        }
+
+        [Fact]
         public async Task GetNearbyAsync_UKruguVracaSamoJavneEventoveSortiranePoUdaljenosti()
         {
             using var ctx = CreateInMemoryContext(nameof(GetNearbyAsync_UKruguVracaSamoJavneEventoveSortiranePoUdaljenosti));

@@ -774,6 +774,71 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task GetAllAsync_SaSearchParametrom_PrioritizujeNazivPreOpisa()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_SaSearchParametrom_PrioritizujeNazivPreOpisa));
+            var (_, _, _, activityType, destination, _, locality, _, creator, _, _, _, _) = SeedBase(ctx);
+
+            var typeMatchType = new ActivityType { Id = 2, Name = "Hiking tour" };
+            ctx.ActivityTypes.Add(typeMatchType);
+
+            ctx.Activities.AddRange(
+                new Activity
+                {
+                    Id = 1,
+                    Name = "Zeta Hiking Adventure",
+                    ActivityTypeId = activityType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new Activity
+                {
+                    Id = 3,
+                    Name = "Beta Trail",
+                    ActivityTypeId = typeMatchType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new Activity
+                {
+                    Id = 2,
+                    Name = "Alpha Trail",
+                    Description = "Opustajuci hiking program za pocetnike",
+                    ActivityTypeId = activityType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Approved,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+            ctx.Images.AddRange(
+                new Image { Id = 21, ActivityId = 1, Url = "search-activity-1.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 23, ActivityId = 3, Url = "search-activity-3.jpg", IsMain = true, CreatedAt = DateTime.UtcNow },
+                new Image { Id = 22, ActivityId = 2, Url = "search-activity-2.jpg", IsMain = true, CreatedAt = DateTime.UtcNow });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetAllAsync(new ActivityQueryDto { Search = "hiking" });
+
+            result.TotalCount.Should().Be(3);
+            result.Items.Select(x => x.Name).Should().Equal("Zeta Hiking Adventure", "Beta Trail", "Alpha Trail");
+        }
+
+        [Fact]
         public async Task GetMyAsync_ContentCreator_VidiSamoSvojeAktivnostiNezavisnoOdStatusa()
         {
             using var ctx = CreateInMemoryContext(nameof(GetMyAsync_ContentCreator_VidiSamoSvojeAktivnostiNezavisnoOdStatusa));

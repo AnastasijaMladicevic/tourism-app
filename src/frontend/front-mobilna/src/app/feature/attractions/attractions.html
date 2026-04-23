@@ -4,7 +4,7 @@
     <button class="icon-btn" (click)="goBack()" aria-label="Go back">
       <mat-icon>arrow_back_ios</mat-icon>
     </button>
-    <h1 class="header__title">Attractions</h1>
+    <h1 class="header__title">Atrakcije</h1>
   </div>
 
   <!-- Filters -->
@@ -15,7 +15,7 @@
         <input type="text" placeholder="Search attractions..." [(ngModel)]="searchQuery" />
       </div>
 
-      <div
+`      <div
         class="sort-anchor sort-trigger"
         (click)="$event.stopPropagation(); showSortMenu = !showSortMenu"
       >
