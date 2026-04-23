@@ -25,6 +25,9 @@ namespace TuristickiVodic.Core.Models
         [MaxLength(2000)]
         public string? MenuUrl { get; set; }
 
+        [MaxLength(100)]
+        public string? CuisineType { get; set; }
+
         public string? WorkingHours { get; set; }
         public decimal? Price { get; set; }
         public string[]? Amenities { get; set; }

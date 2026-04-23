@@ -674,6 +674,7 @@ namespace TuristickiVodic.Services.Services
                 PhoneNumber = dto.PhoneNumber,
                 Website = dto.Website,
                 MenuUrl = NormalizeOptionalText(dto.MenuUrl),
+                CuisineType = NormalizeOptionalText(dto.CuisineType),
                 WorkingHours = dto.WorkingHours,
                 Price = dto.Price,
                 Amenities = NormalizeAmenities(dto.Amenities),
@@ -750,6 +751,7 @@ namespace TuristickiVodic.Services.Services
             if (dto.PhoneNumber != null) obj.PhoneNumber = dto.PhoneNumber;
             if (dto.Website != null) obj.Website = dto.Website;
             if (dto.MenuUrl != null) obj.MenuUrl = NormalizeOptionalText(dto.MenuUrl);
+            if (dto.CuisineType != null) obj.CuisineType = NormalizeOptionalText(dto.CuisineType);
             if (dto.WorkingHours != null) obj.WorkingHours = dto.WorkingHours;
 
             if (dto.Price.HasValue)

@@ -229,6 +229,8 @@ namespace TuristickiVodic.Services.Mappings
                     opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
                 .ForMember(dest => dest.Latitude,
                     opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.Y : (double?)null))
+                .ForMember(dest => dest.CuisineType,
+                    opt => opt.MapFrom(src => src.CuisineType))
                 .ForMember(dest => dest.Amenities,
                     opt => opt.MapFrom(src => src.Amenities ?? Array.Empty<string>()))
                 .ForMember(dest => dest.Reviews,

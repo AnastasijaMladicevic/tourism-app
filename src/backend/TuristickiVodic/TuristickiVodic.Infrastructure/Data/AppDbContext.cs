@@ -133,6 +133,10 @@ public class AppDbContext : DbContext
             .HasMaxLength(2000);
 
         mb.Entity<TouristObject>()
+            .Property(o => o.CuisineType)
+            .HasMaxLength(100);
+
+        mb.Entity<TouristObject>()
             .HasIndex(o => o.Geolocation)
             .HasMethod("GIST");
 

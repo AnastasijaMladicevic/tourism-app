@@ -495,11 +495,11 @@ WHERE l."DestinationId" = d."Id"
 -- 6. OBJECTS
 -- ============================================
 INSERT INTO "Objects"
-("Name", "Description", "Address", "PhoneNumber", "Website", "MenuUrl", "WorkingHours", "Price", "Amenities", "Geolocation", "AverageRating", "ReviewCount",
+("Name", "Description", "Address", "PhoneNumber", "Website", "MenuUrl", "CuisineType", "WorkingHours", "Price", "Amenities", "Geolocation", "AverageRating", "ReviewCount",
  "Status", "IsActive", "ObjectTypeId", "LocalityId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
 VALUES
 ('Hotel Vardar', 'Hotel u srcu starog grada Kotora', 'Stari grad Kotor', '+38232345678', 'https://hotelvardar.com',
- NULL, '{"pon":"00:00-24:00"}', 145.00, ARRAY['WiFi', 'Parking', 'Spa', 'Dorucak'], ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 145.00, ARRAY['WiFi', 'Parking', 'Spa', 'Dorucak'], ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -508,7 +508,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Restoran Galion', 'Restoran sa pogledom na zaliv', 'Skaljari bb, Kotor', '+38232345679', 'https://galion.me',
- 'https://galion.me/menu/', '{"pon":"10:00-23:00"}', 35.00, ARRAY['WiFi', 'Terasa', 'Pogled na more', 'Rezervacije'], ST_SetSRID(ST_MakePoint(18.768, 42.427), 4326), 0, 0, 'Approved', true,
+ 'https://galion.me/menu/', 'Mediteranska i morski plodovi', '{"pon":"10:00-23:00"}', 35.00, ARRAY['WiFi', 'Terasa', 'Pogled na more', 'Rezervacije'], ST_SetSRID(ST_MakePoint(18.768, 42.427), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -517,7 +517,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Hotel Avala', 'Luksuzni hotel pored mora', 'Budva centar', '+38233456789', 'https://avala.me',
- 'https://www.avalaresort.com/explore', '{"pon":"00:00-24:00"}', 180.00, ARRAY['WiFi', 'Bazen', 'Spa', 'Parking', 'Dorucak'], ST_SetSRID(ST_MakePoint(18.838, 42.279), 4326), 0, 0, 'Approved', true,
+ 'https://www.avalaresort.com/explore', NULL, '{"pon":"00:00-24:00"}', 180.00, ARRAY['WiFi', 'Bazen', 'Spa', 'Parking', 'Dorucak'], ST_SetSRID(ST_MakePoint(18.838, 42.279), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -526,7 +526,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Mogren Beach Bar', 'Bar na plazi', 'Plaza Mogren', '+38233456780', 'https://mogren2.me/en',
- 'https://www.dotyourspot.com/EfQ3u4/', '{"pon":"08:00-02:00"}', 12.00, ARRAY['Terasa', 'Pogled na more', 'Kokteli', 'Muzika'], ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), 0, 0, 'Approved', true,
+ 'https://www.dotyourspot.com/EfQ3u4/', 'Mediteranska i bar food', '{"pon":"08:00-02:00"}', 12.00, ARRAY['Terasa', 'Pogled na more', 'Kokteli', 'Muzika'], ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaza Mogren'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -535,7 +535,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Planinarski dom Durmitor', 'Dom za planinare na Durmitoru', 'Durmitor bb', '+38233456781', NULL,
- NULL, '{"pon":"00:00-24:00"}', 55.00, ARRAY['Parking', 'Restoran', 'Grejanje', 'Pogled na planinu'], ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 55.00, ARRAY['Parking', 'Restoran', 'Grejanje', 'Pogled na planinu'], ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Planinarski dom'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
@@ -544,7 +544,7 @@ VALUES
  NOW(), NOW(), NOW()),
  
  ('Biblioteka Niksic', 'Gradska biblioteka u Nikšiću', 'Trg Slobode, Nikšić',  '+38220000001', NULL,
- NULL, '{"pon":"08:00-20:00"}', NULL, ARRAY['WiFi', 'Citaonica', 'Klimatizovano'], ST_SetSRID(ST_MakePoint(18.956, 42.774), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"08:00-20:00"}', NULL, ARRAY['WiFi', 'Citaonica', 'Klimatizovano'], ST_SetSRID(ST_MakePoint(18.956, 42.774), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Biblioteka'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
@@ -553,7 +553,7 @@ VALUES
  NOW(), NOW(), NOW()),
  
  ('Crkva Svetog Nikole Bar', 'Pravoslavna crkva u Starom Baru', 'Stari Bar', '+38220000002', NULL,
- NULL, '{"pon":"06:00-18:00"}', NULL, ARRAY['Vodic', 'Mirno okruzenje'], ST_SetSRID(ST_MakePoint(19.142, 42.097), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"06:00-18:00"}', NULL, ARRAY['Vodic', 'Mirno okruzenje'], ST_SetSRID(ST_MakePoint(19.142, 42.097), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Crkva'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari Bar'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
@@ -562,7 +562,7 @@ VALUES
  NOW(), NOW(), NOW()),
  
  ('Restoran Jezero', 'Restoran sa pogledom na Skadarsko jezero',  'Virpazar bb', '+38220000003', 'https://www.plantaze.com/restoran-jezero/',
- 'https://www.plantaze.com/restoran-jezero/', '{"pon":"09:00-22:00"}', 22.00, ARRAY['Terasa', 'Pogled na jezero', 'Parking', 'Rezervacije'], ST_SetSRID(ST_MakePoint(19.091, 42.246), 4326), 0, 0, 'Approved', true,
+ 'https://www.plantaze.com/restoran-jezero/', 'Crnogorska i riblji specijaliteti', '{"pon":"09:00-22:00"}', 22.00, ARRAY['Terasa', 'Pogled na jezero', 'Parking', 'Rezervacije'], ST_SetSRID(ST_MakePoint(19.091, 42.246), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
@@ -571,7 +571,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Hotel Bianca Kolasin', 'Popularan hotel u Kolasinu',  'Kolasin centar', '+38220000004', 'https://www.biancaresort.com/',
- 'https://www.biancaresort.com/explore', '{"pon":"00:00-24:00"}', 130.00, ARRAY['WiFi', 'Spa', 'Parking', 'Dorucak', 'Ski ostava'], ST_SetSRID(ST_MakePoint(19.522, 42.822), 4326), 0, 0, 'Approved', true,
+ 'https://www.biancaresort.com/explore', NULL, '{"pon":"00:00-24:00"}', 130.00, ARRAY['WiFi', 'Spa', 'Parking', 'Dorucak', 'Ski ostava'], ST_SetSRID(ST_MakePoint(19.522, 42.822), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Biogradsko jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
