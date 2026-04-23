@@ -37,7 +37,7 @@
 
 .header-actions,
 .toolbar,
-.filters-row,
+.filters-panel,
 .table-footer,
 .detail-metrics,
 .section-head,
@@ -179,6 +179,54 @@
 .toolbar-input {
   padding: 11px 14px 11px 38px;
   min-width: 0;
+}
+
+.filters-panel {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto auto;
+  gap: 12px;
+  padding: 14px;
+  align-items: end;
+}
+
+.filters-panel label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.filters-panel select {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+  color: #111827;
+  font: inherit;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  align-self: end;
+  justify-self: end;
+  white-space: nowrap;
+}
+
+.filter-btn {
+  padding-inline: 16px;
+}
+
+.filter-btn.secondary {
+  color: #334155;
+  border-color: #dbe1ea;
+  background: #fff;
 }
 
 .toolbar-pill {
@@ -785,7 +833,7 @@ tbody tr:hover,
   .page-header,
   .table-footer,
   .section-head,
-  .filters-row,
+  .filters-panel,
   .toolbar {
     align-items: stretch;
   }
@@ -807,10 +855,32 @@ tbody tr:hover,
     grid-template-columns: 1fr;
   }
 
+  .filters-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-actions {
+    justify-content: stretch;
+    justify-self: stretch;
+  }
+
+  .filter-actions .filter-btn {
+    width: 100%;
+  }
+
   .toolbar-search,
   .date-range-pill,
   .toolbar .ghost-btn.slim-btn {
     width: 100%;
+
+  .pager {
+    flex-wrap: wrap;
+  }
+
+  .page-size-control {
+    width: 100%;
+    justify-content: space-between;
+  }
   }
 
   .date-range-pill {

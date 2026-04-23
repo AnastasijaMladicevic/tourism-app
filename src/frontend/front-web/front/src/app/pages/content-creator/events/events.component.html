@@ -56,60 +56,62 @@
       </div>
     </div>
 
-    <button type="button" class="ghost-btn slim-btn" (click)="onClearSearch()">
-      <span class="material-symbols-outlined"> clear_all </span>
-      Clear Filters
-    </button>
-
-    <button
-      type="button"
-      class="primary-btn slim-btn"
-      style="display: none"
-      (click)="onApplyFilters()"
-    >
-      Apply
+    <button type="button" class="ghost-btn slim-btn" (click)="onMoreFilters()">
+      <span class="material-symbols-outlined"> filter_alt </span>
+      More Filters
     </button>
   </div>
 
+  @if (filterPanelOpen) {
+    <div class="filters-panel card">
+      <label>
+        <span>Status</span>
+        <select [(ngModel)]="statusFilter">
+          <option *ngFor="let option of statusOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>Category</span>
+        <select [(ngModel)]="categoryFilter">
+          <option *ngFor="let option of categoryOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>Sort by</span>
+        <select [(ngModel)]="sortBy">
+          <option value="startDate">Start date</option>
+          <option value="name">Name</option>
+          <option value="status">Status</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Order</span>
+        <select [(ngModel)]="sortOrder">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </label>
+
+      <div class="filter-actions">
+        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
+          Apply Filters
+        </button>
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  }
+
   <div class="events-layout">
     <div class="main-column">
-      <div class="filters-row card">
-        <label>
-          <span>Status</span>
-          <select [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()">
-            <option *ngFor="let option of statusOptions" [value]="option.value">
-              {{ option.label }}
-            </option>
-          </select>
-        </label>
-
-        <label>
-          <span>Category</span>
-          <select [(ngModel)]="categoryFilter" (ngModelChange)="onFilterChange()">
-            <option *ngFor="let option of categoryOptions" [value]="option.value">
-              {{ option.label }}
-            </option>
-          </select>
-        </label>
-
-        <label>
-          <span>Sort by</span>
-          <select [(ngModel)]="sortBy" (ngModelChange)="onChangeSortBy($event)">
-            <option value="startDate">Start date</option>
-            <option value="name">Name</option>
-            <option value="status">Status</option>
-          </select>
-        </label>
-
-        <label>
-          <span>Order</span>
-          <select [(ngModel)]="sortOrder" (ngModelChange)="onChangeSortOrder($event)">
-            <option value="asc">Ascending</option>
-            <option value="desc">Descending</option>
-          </select>
-        </label>
-      </div>
-
       <div class="card table-card">
         @if (isLoading) {
           <div class="state state-loading">Loading events...</div>

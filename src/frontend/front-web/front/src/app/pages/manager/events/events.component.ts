@@ -44,8 +44,16 @@ export class ManagerEventsComponent implements OnInit {
   errorMessage = '';
 
   searchQuery = '';
-  currentPage = 1;
+  draftSearchQuery = '';
+  statusFilter = 'all';
+  categoryFilter = 'all';
+  sortBy = 'startDate';
+  sortOrder: 'asc' | 'desc' = 'asc';
   pageSize = 5;
+  readonly pageSizeOptions = [5, 10, 20, 50];
+  filterPanelOpen = false;
+
+  currentPage = 1;
   totalCount = 0;
 
   readonly stats: EventInsightCard[] = [
@@ -76,35 +84,32 @@ export class ManagerEventsComponent implements OnInit {
 
     const filterState: EventFilterState = {
       searchQuery: this.searchQuery,
-      statusFilter: 'all',
-      categoryFilter: 'all',
-      sortBy: 'startDate',
-      sortOrder: 'asc'
+      statusFilter: this.statusFilter,
+      categoryFilter: this.categoryFilter,
+      sortBy: this.sortBy,
+      sortOrder: this.sortOrder
     };
 
     const query: EventQueryDto = buildEventQueryDto(filterState, {
-      page: 1,
-      pageSize: 100,
-      includeStatus: false,
-      includeCategoryAsType: false,
+      page: this.currentPage,
+      pageSize: this.pageSize,
+      includeStatus: true,
+      includeCategoryAsType: true,
       includeDateFilters: false
     });
 
-    this.loadManagerEventsPage(query, 1, []);
-  }
-
-  private loadManagerEventsPage(baseQuery: EventQueryDto, page: number, accumulatedEvents: EventDto[]): void {
-    this.eventService.getForManager({ ...baseQuery, page }).subscribe({
+    this.eventService.getForManager(query).subscribe({
       next: (response) => {
-        const nextEvents = accumulatedEvents.concat(response.items);
+        this.events = response.items;
+        this.filteredEvents = response.items;
+        this.pagedEvents = response.items;
+        this.totalCount = response.totalCount;
+        this.currentPage = response.page;
 
-        if (page < response.totalPages) {
-          this.loadManagerEventsPage(baseQuery, page + 1, nextEvents);
-          return;
+        if (!this.selectedEvent || !this.pagedEvents.some((event) => event.id === this.selectedEvent?.id)) {
+          this.selectedEvent = this.pagedEvents[0] ?? null;
         }
 
-        this.events = nextEvents;
-        this.applyLocalFilters();
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -116,41 +121,35 @@ export class ManagerEventsComponent implements OnInit {
     });
   }
 
-  applyLocalFilters(): void {
-    const search = this.searchQuery.trim().toLowerCase();
-
-    this.filteredEvents = this.events.filter((event) => {
-      const eventText = [event.name, event.description, event.eventTypeName, event.status]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase();
-
-      return !search || eventText.includes(search);
-    });
-
-    this.totalCount = this.filteredEvents.length;
-    const maxPage = Math.max(1, Math.ceil(this.totalCount / this.pageSize));
-    if (this.currentPage > maxPage) {
-      this.currentPage = maxPage;
-    }
-
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    this.pagedEvents = this.filteredEvents.slice(startIndex, startIndex + this.pageSize);
-
-    if (!this.selectedEvent || !this.filteredEvents.some((event) => event.id === this.selectedEvent?.id)) {
-      this.selectedEvent = this.pagedEvents[0] ?? this.filteredEvents[0] ?? null;
-    }
+  onSearchChange(): void {
+    // Intentionally no-op: search is applied on Enter or when filters are applied.
   }
 
-  onSearchChange(): void {
-    this.currentPage = 1;
-    this.applyLocalFilters();
+  onSearchEnter(event: Event): void {
+    event.preventDefault();
+    this.applySearch();
   }
 
   onMoreFilters(): void {
-    this.searchQuery = '';
+    this.filterPanelOpen = !this.filterPanelOpen;
+  }
+
+  onApplyFilters(): void {
     this.currentPage = 1;
-    this.applyLocalFilters();
+    this.searchQuery = this.draftSearchQuery.trim();
+    this.loadEvents();
+  }
+
+  onResetFilters(): void {
+    this.searchQuery = '';
+    this.draftSearchQuery = '';
+    this.statusFilter = 'all';
+    this.categoryFilter = 'all';
+    this.sortBy = 'startDate';
+    this.sortOrder = 'asc';
+    this.pageSize = 5;
+    this.currentPage = 1;
+    this.loadEvents();
   }
 
   onEditEvent(event: EventDto): void {
@@ -163,17 +162,23 @@ export class ManagerEventsComponent implements OnInit {
   }
 
   onNextPage(): void {
-    if (this.currentPage * this.pageSize < this.totalCount) {
+    if (this.currentPage < this.totalPages) {
       this.currentPage++;
-      this.applyLocalFilters();
+      this.loadEvents();
     }
   }
 
   onPreviousPage(): void {
     if (this.currentPage > 1) {
       this.currentPage--;
-      this.applyLocalFilters();
+      this.loadEvents();
     }
+  }
+
+  onPageSizeChange(value: number | string): void {
+    this.pageSize = Number(value);
+    this.currentPage = 1;
+    this.loadEvents();
   }
 
   trackByEventId(_: number, event: EventDto): number {
@@ -344,6 +349,20 @@ export class ManagerEventsComponent implements OnInit {
   }
 
   get pageEnd(): number {
-    return Math.min(this.currentPage * this.pageSize, this.totalCount);
+    return this.pageStart + this.pagedEvents.length - 1;
+  }
+
+  get totalPages(): number {
+    if (!this.totalCount || this.pageSize < 1) {
+      return 1;
+    }
+
+    return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
+  }
+
+  private applySearch(): void {
+    this.searchQuery = this.draftSearchQuery.trim();
+    this.currentPage = 1;
+    this.loadEvents();
   }
 }

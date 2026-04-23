@@ -56,6 +56,7 @@ export class ContentCreatorEventsComponent implements OnInit {
   categoryFilter = 'all';
   sortBy = 'startDate';
   sortOrder: 'asc' | 'desc' = 'asc';
+  filterPanelOpen = false;
   rangeStartDate = '';
   rangeEndDate = '';
 
@@ -153,19 +154,29 @@ export class ContentCreatorEventsComponent implements OnInit {
     this.onApplyFilters();
   }
 
+  onMoreFilters(): void {
+    this.filterPanelOpen = !this.filterPanelOpen;
+  }
+
   onApplyFilters(): void {
     this.applySearchAndReload();
   }
 
-  onClearSearch(): void {
+  onResetFilters(): void {
     this.searchQuery = '';
     this.draftSearchQuery = '';
     this.statusFilter = 'all';
     this.categoryFilter = 'all';
+    this.sortBy = 'startDate';
+    this.sortOrder = 'asc';
     this.rangeStartDate = '';
     this.rangeEndDate = '';
     this.currentPage = 1;
     this.loadEvents();
+  }
+
+  onClearSearch(): void {
+    this.onResetFilters();
   }
 
   onDateRangeChange(): void {
@@ -196,8 +207,7 @@ export class ContentCreatorEventsComponent implements OnInit {
   }
 
   onFilterChange(): void {
-    this.currentPage = 1;
-    this.loadEvents();
+    // Filter changes are applied explicitly via the panel's Apply button.
   }
 
   onPageSizeChange(value: number | string): void {
