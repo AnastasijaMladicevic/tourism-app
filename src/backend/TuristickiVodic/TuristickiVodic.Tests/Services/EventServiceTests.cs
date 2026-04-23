@@ -1322,6 +1322,60 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task GetMyAsync_SaDateFilterom_VracaSamoMojeEventoveZaTajDan()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetMyAsync_SaDateFilterom_VracaSamoMojeEventoveZaTajDan));
+            var (_, _, _, eventType, destination, _, locality, _, creator, otherCreator, _, _, _) = SeedBase(ctx);
+            var targetDate = DateTime.UtcNow.Date.AddDays(5);
+
+            ctx.Events.AddRange(
+                new Event
+                {
+                    Id = 1,
+                    Name = "Moj event za datum",
+                    EventTypeId = eventType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = false,
+                    StartDate = targetDate.AddHours(12)
+                },
+                new Event
+                {
+                    Id = 2,
+                    Name = "Moj event drugi dan",
+                    EventTypeId = eventType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = creator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = false,
+                    StartDate = targetDate.AddDays(1).AddHours(12)
+                },
+                new Event
+                {
+                    Id = 3,
+                    Name = "Tudji event za datum",
+                    EventTypeId = eventType.Id,
+                    DestinationId = destination.Id,
+                    LocalityId = locality.Id,
+                    CreatedByUserId = otherCreator.Id,
+                    Status = ContentStatus.Pending,
+                    IsActive = false,
+                    StartDate = targetDate.AddHours(13)
+                });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx);
+            var result = await svc.GetMyAsync(creator.Id, new EventQueryDto { Date = targetDate });
+
+            result.TotalCount.Should().Be(1);
+            result.Items.Single().Name.Should().Be("Moj event za datum");
+        }
+
+        [Fact]
         public async Task GetMineByIdAsync_VlasnikMozeDaDobijeIPendingEvent()
         {
             using var ctx = CreateInMemoryContext(nameof(GetMineByIdAsync_VlasnikMozeDaDobijeIPendingEvent));
