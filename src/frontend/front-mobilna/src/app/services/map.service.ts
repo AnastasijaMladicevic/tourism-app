@@ -3,9 +3,12 @@ import * as L from 'leaflet';
 
 @Injectable({ providedIn: 'root' })
 export class MapService {
-  private markers: any[] = [];
-  private markerMap = new Map<string, any>();
-  // Nova metoda samo za glavnu map stranicu
+  private markers: Array<{ marker: L.Marker; data: any; type: string; lat: number; lng: number }> = [];
+  private markerMap = new Map<string, { marker: L.Marker; data: any; type: string; lat: number; lng: number }>();
+  private activeMarkerKey: string | null = null;
+  private activeRegularMarker: L.Marker | null = null;
+  private map: L.Map | null = null;
+
   addMainMapMarker(lat: number, lng: number, popupText: string = ''): L.Marker | null {
     if (!this.map) {
       console.error('Mapa nije inicijalizovana');
@@ -19,7 +22,7 @@ export class MapService {
       iconSize: [25, 41],
       iconAnchor: [12, 41],
       popupAnchor: [1, -34],
-      shadowSize: [41, 41]
+      shadowSize: [41, 41],
     });
 
     const marker = L.marker([lat, lng], { icon }).addTo(this.map);
@@ -28,66 +31,53 @@ export class MapService {
       marker.bindPopup(`<b>${popupText}</b>`, { closeButton: false });
     }
 
-    console.log(`📍 Dodat marker: ${popupText}`);
     return marker;
   }
-  private map: L.Map | null = null;
 
   initMap(containerId: string, lat: number = 42.424, lng: number = 18.771, zoom: number = 13): L.Map | null {
-  if (this.map) {
-    this.destroyMap();
+    if (this.map) {
+      this.destroyMap();
+    }
+
+    try {
+      this.map = L.map(containerId, {
+        zoomControl: false,
+        attributionControl: false,
+      }).setView([lat, lng], zoom);
+
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        maxZoom: 19,
+        attribution: '',
+      }).addTo(this.map);
+
+      return this.map;
+    } catch (error) {
+      console.error('Greska pri kreiranju mape:', error);
+      return null;
+    }
   }
 
-  try {
-    this.map = L.map(containerId, {
-      zoomControl: false,        // već onemogućavamo ovde
-      attributionControl: false
-    }).setView([lat, lng], zoom);
-
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-
-      maxZoom: 19,
-      attribution: ''   // prazno jer ćemo ukloniti kontrolu
-    }).addTo(this.map);
-
-    console.log(`🗺️ Mapa kreirana na koordinatama: ${lat}, ${lng}`);
-    return this.map;
-
-  } catch (error) {
-    console.error('❌ Greška pri kreiranju mape:', error);
-    return null;
-  }
-}
-
-  addMarker(
-    lat: number, 
-    lng: number, 
-    popupText: string = '', 
-    onClick?: () => void
-  ): L.Marker | null {
-    
+  addMarker(lat: number, lng: number, popupText: string = '', onClick?: () => void): L.Marker | null {
     if (!this.map) {
-      console.warn('Mapa nije inicijalizovana - addMarker nije izvršen');
+      console.warn('Mapa nije inicijalizovana - addMarker nije izvrsen');
       return null;
     }
 
     const customIcon = L.icon({
       iconUrl: 'assets/marker-icon.png',
       iconRetinaUrl: 'assets/marker-icon-2x.png',
-      shadowUrl: '',                    
+      shadowUrl: '',
       iconSize: [25, 41],
       iconAnchor: [12, 41],
       popupAnchor: [1, -34],
     });
 
-    const marker = L.marker([lat, lng], { 
-      icon: customIcon 
-    }).addTo(this.map);
+    const marker = L.marker([lat, lng], { icon: customIcon }).addTo(this.map);
 
     if (popupText) {
-      marker.bindPopup(popupText, { 
+      marker.bindPopup(popupText, {
         closeButton: false,
-        offset: [0, -10]
+        offset: [0, -10],
       });
     }
 
@@ -103,123 +93,150 @@ export class MapService {
       this.map.remove();
       this.map = null;
     }
+
+    this.markers = [];
+    this.markerMap.clear();
+    this.activeMarkerKey = null;
+    this.activeRegularMarker = null;
   }
 
   flyTo(lat: number, lng: number, zoom: number = 16): void {
     if (this.map) {
-      this.map.flyTo([lat, lng], zoom, {
-        duration: 1.5
-      });
+      this.map.flyTo([lat, lng], zoom, { duration: 1.5 });
     }
   }
-  /**
- * Univerzalna metoda za dodavanje markera sa tipom
- */
+
   addMarkerWithType(
-  lat: number,
-  lng: number,
-  type: string,
-  data: any,
-  onClick?: () => void
-): L.Marker | null {
+    lat: number,
+    lng: number,
+    type: string,
+    data: any,
+    onClick?: () => void,
+  ): L.Marker | null {
+    if (!this.map) return null;
 
-  if (!this.map) return null;
+    const iconHtml = this.getMarkerIconHtml(type);
+    const customIcon = L.divIcon({
+      className: 'custom-type-marker',
+      html: iconHtml,
+      iconSize: [46, 46],
+      iconAnchor: [23, 46],
+      popupAnchor: [0, -40],
+    });
 
-  const iconHtml = this.getMarkerIconHtml(type);
-  const customIcon = L.divIcon({
-    className: 'custom-type-marker',
-    html: iconHtml,
-    iconSize: [46, 46],
-    iconAnchor: [23, 46],
-    popupAnchor: [0, -40]
-  });
+    const marker = L.marker([lat, lng], { icon: customIcon }).addTo(this.map);
+    this.markers.push({ marker, data, type, lat, lng });
 
-  const marker = L.marker([lat, lng], { icon: customIcon }).addTo(this.map);
-  this.markers.push({ marker, data, type, lat, lng });
+    const key = `${type}:${data.id}`;
+    this.markerMap.set(key, { marker, data, type, lat, lng });
 
-  const key = `${type}:${data.id}`;
-  this.markerMap.set(key, { marker, data, type, lat, lng });
+    marker.on('click', () => {
+      this.activateMarker(key);
+      if (onClick) onClick();
+    });
 
-  marker.on('click', () => {
+    return marker;
+  }
+
+  activateMarker(key: string): void {
+    const found = this.markerMap.get(key);
+    if (!found) {
+      console.warn('Marker not found:', key);
+      return;
+    }
+
+    const { marker, data, type, lat, lng } = found;
+
+    const prevKey = (window as any).activeMarkerKey;
+    if (prevKey && prevKey !== key) {
+      const prev = this.markerMap.get(prevKey);
+      if (prev && this.map && !this.map.hasLayer(prev.marker)) {
+        prev.marker.addTo(this.map);
+      }
+    }
+
+    const prevRegular = (window as any).currentRegularMarker as L.Marker | null;
+    if (prevRegular) {
+      prevRegular.remove();
+    }
+
+    marker.remove();
+    const regularMarker = this.addMarker(lat, lng, data.name);
+    this.decorateSelectedRegularMarker(regularMarker);
+
+    (window as any).activeMarkerKey = key;
+    (window as any).currentRegularMarker = regularMarker;
+    this.activeMarkerKey = key;
+    this.activeRegularMarker = regularMarker;
+    this.updateMarkerFocus(key);
+
+    window.dispatchEvent(
+      new CustomEvent('map-marker-clicked', {
+        detail: { data, type },
+      }),
+    );
+  }
+
+  triggerMarkerClick(type: string, id: number, zoom: number = 16): void {
+    const key = `${type}:${id}`;
+    const found = this.markerMap.get(key);
+
+    if (!found) {
+      console.warn('Marker not found:', key);
+      return;
+    }
+
     this.activateMarker(key);
-    if (onClick) onClick();
-  });
+    this.map?.flyTo([found.lat, found.lng], zoom);
+  }
 
-  return marker;
-}
+  clearMarkerFocus(): void {
+    this.activeMarkerKey = null;
+    this.activeRegularMarker = null;
+    this.updateMarkerFocus(null);
+  }
 
-// Centralna metoda za aktivaciju markera — koriste je i klik i triggerMarkerClick
-activateMarker(key: string): void {
-  const found = this.markerMap.get(key);
-  if (!found) { console.warn('Marker not found:', key); return; }
+  private updateMarkerFocus(activeKey: string | null): void {
+    this.markerMap.forEach((entry, key) => {
+      const element = entry.marker.getElement();
+      if (!element) return;
 
-  const { marker, data, type, lat, lng } = found;
+      element.classList.toggle('marker-dimmed', !!activeKey && key !== activeKey);
+      element.classList.toggle('marker-focused', !!activeKey && key === activeKey);
+    });
 
-  // Vrati prethodni custom marker
-  const prevKey = (window as any).activeMarkerKey;
-  if (prevKey && prevKey !== key) {
-    const prev = this.markerMap.get(prevKey);
-    if (prev && !this.map?.hasLayer(prev.marker)) {
-      prev.marker.addTo(this.map!);
+    const regularElement = this.activeRegularMarker?.getElement();
+    if (regularElement) {
+      regularElement.classList.toggle('marker-selected-pin', !!activeKey);
     }
   }
 
-  // Ukloni regularni pin ako postoji
-  const prevRegular = (window as any).currentRegularMarker;
-  if (prevRegular) { prevRegular.remove(); }
+  private decorateSelectedRegularMarker(marker: L.Marker | null): void {
+    if (!marker) return;
 
-  // Sakrij custom pin i dodaj regularni
-  marker.remove();
-  const regularMarker = this.addMarker(lat, lng, data.name);
+    const applyClass = () => marker.getElement()?.classList.add('marker-selected-pin');
+    applyClass();
+    marker.once('add', applyClass);
+  }
 
-  // Sačuvaj state
-  (window as any).activeMarkerKey = key;
-  (window as any).currentRegularMarker = regularMarker;
-
-  window.dispatchEvent(new CustomEvent('map-marker-clicked', {
-    detail: { data, type }
-  }));
-}
-
-triggerMarkerClick(type: string, id: number, zoom: number = 16): void {
-  console.log('triggerMarkerClick called:', type, id);
-  console.log('markerMap size:', this.markerMap.size);
-  console.log('markerMap keys:', Array.from(this.markerMap.keys()));
-
-  const key = `${type}:${id}`;
-  const found = this.markerMap.get(key);
-  console.log('found:', found);
-
-  if (!found) { console.warn('Marker not found:', key); return; }
-
-  this.activateMarker(key);
-  this.map?.flyTo([found.lat, found.lng], zoom);
-}
-  
   private getMarkerIconHtml(type: string): string {
-    const map: any = {
-      destination: `<div style="background:#2563eb;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">📍</div>`,
-      hotel: `<div style="background:#10b981;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🏨</div>`,
-      restaurant: `<div style="background:#f59e0b;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🍽️</div>`,
-      kafana: `<div style="background:#db2777;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🍷</div>`,
-      event: `<div style="background:#8b5cf6;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🎉</div>`,
-      locality: `<div style="background:#64748b;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🏙️</div>`,
-      activity: `<div style="background:#14b8a6;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🏃</div>`
+    const icons: Record<string, string> = {
+      destination:
+        '<div style="background:#2563eb;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">📍</div>',
+      hotel:
+        '<div style="background:#10b981;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🏨</div>',
+      restaurant:
+        '<div style="background:#f59e0b;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🍽️</div>',
+      kafana:
+        '<div style="background:#db2777;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🍷</div>',
+      event:
+        '<div style="background:#8b5cf6;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🎉</div>',
+      locality:
+        '<div style="background:#64748b;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🏙️</div>',
+      activity:
+        '<div style="background:#14b8a6;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🏃</div>',
     };
 
-    return map[type] || map.destination;
+    return icons[type] || icons['destination'];
   }
-
-  private getTypeLabel(type: string): string {
-    const labels: any = {
-      hotel: 'Hotel',
-      restaurant: 'Restoran',
-      kafana: 'Kafana',
-      event: 'Događaj',
-      destination: 'Destinacija',
-      locality: 'Lokalitet',
-      activity: 'Aktivnost'
-    };
-    return labels[type] || type;
-  }
-  }
+}

@@ -101,13 +101,13 @@
 
           @if (nearbyObjects.length > 0) {
             <div class="nearby-list">
-              @for (nearbyObjects of nearbyObjects; track nearbyObjects.id) {
-                <article class="nearby-item" (click)="openNearbyObjects(nearbyObjects.id)">
+              @for (nearbyObject of nearbyObjects; track nearbyObject.id) {
+                <article class="nearby-item" (click)="openNearbyObjects(nearbyObject.id)">
                   <div class="nearby-item__image">
-                    @if (nearbyObjects.images) {
+                    @if (getNearbyObjectImage(nearbyObject); as nearbyImage) {
                       <img
-                        [src]="nearbyObjects.images"
-                        [alt]="nearbyObjects.name"
+                        [src]="nearbyImage"
+                        [alt]="nearbyObject.name"
                         (error)="onImageError($event)"
                       />
                     } @else {
@@ -118,20 +118,25 @@
                   </div>
 
                   <div class="nearby-item__body">
-                    <h3>{{ nearbyObjects.name }}</h3>
+                    <h3>{{ nearbyObject.name }}</h3>
                     <p class="nearby-item__location">
                       <mat-icon>location_on</mat-icon>
-                      <span>{{ nearbyObjects.address }}</span>
+                      <span>{{
+                        nearbyObject.address ||
+                          nearbyObject.localityName ||
+                          nearbyObject.destinationName ||
+                          'Lokacija nije dostupna'
+                      }}</span>
                     </p>
                     <p class="nearby-item__rating">
                       <mat-icon>star</mat-icon>
                       <span>
                         {{
-                          nearbyObjects.averageRating
-                            ? (nearbyObjects.averageRating | number: '1.1-1')
+                          nearbyObject.averageRating
+                            ? (nearbyObject.averageRating | number: '1.1-1')
                             : 'New'
                         }}
-                        ({{ nearbyObjects.reviews }} reviews)
+                        ({{ nearbyObject.reviewCount || 0 }} reviews)
                       </span>
                     </p>
                   </div>
@@ -150,10 +155,7 @@
       <div class="right">
         <div class="card">
           <h2>Lokacija</h2>
-          <div
-            class="location-image"
-            [attr.data-name]="object.address || object.objectName || 'N/A'"
-          >
+          <div class="location-image" [attr.data-name]="object.address || object.name || 'N/A'">
             <app-map
               [lat]="object.latitude || 42.424"
               [lng]="object.longitude || 18.771"
@@ -306,13 +308,13 @@
       <!-- Prosečna ocena + grafik -->
       <div class="rating-summary">
         <div class="average">
-          <span class="big-rating">{{ object.averageRating?.toFixed(1) || '0.0' }}</span>
+          <span class="big-rating">{{ object?.averageRating?.toFixed(1) || '0.0' }}</span>
           <div class="stars">
             @for (star of [1, 2, 3, 4, 5]; track star) {
-              <mat-icon [class.filled]="star <= (object.averageRating || 0)">star</mat-icon>
+              <mat-icon [class.filled]="star <= (object?.averageRating || 0)">star</mat-icon>
             }
           </div>
-          <span class="total-reviews">{{ object.reviewCount || 0 }} Reviews</span>
+          <span class="total-reviews">{{ object?.reviewCount || 0 }} Reviews</span>
         </div>
 
         <div class="rating-bars">

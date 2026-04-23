@@ -1,15 +1,21 @@
-import { Component, OnInit, ViewEncapsulation, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { forkJoin } from 'rxjs';
-import { EventService, EventDto } from '../../services/event';
-import { ImageService, ImageDto } from '../../services/image';
+
+import {
+  EventDto,
+  EventService,
+  PagedEventResultDto,
+} from '../../services/event';
+import { ImageDto, ImageService } from '../../services/image';
 import { AuthService } from '../../services/auth';
 import { MapComponent } from '../../shared/components/map/map';
 import { TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { environment } from '../../../environment/environment';
 
 @Component({
   selector: 'app-event-detail',
@@ -22,6 +28,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 export class EventDetailComponent implements OnInit {
   event: EventDto | null = null;
   images: ImageDto[] = [];
+  nearbyEvents: EventDto[] = [];
   mainImage = '';
   isLoading = true;
   errorMessage = '';
@@ -51,11 +58,13 @@ export class EventDetailComponent implements OnInit {
       images: this.imageService.getForEvent(id),
     }).subscribe({
       next: ({ event, images }) => {
-        this.event = event;
+        const normalizedEvent = this.normalizeEvent(event);
+
+        this.event = normalizedEvent;
         this.images = images || [];
-        this.mainImage = this.getMainImage(this.images);
-        this.isLoading = false;
-        this.cdr.detectChanges();
+        this.mainImage = this.getMainImage(this.images, normalizedEvent);
+
+        this.loadNearbyEvents(normalizedEvent);
       },
       error: (err) => {
         console.error('Failed to load event details:', err);
@@ -66,10 +75,129 @@ export class EventDetailComponent implements OnInit {
     });
   }
 
-  private getMainImage(images: ImageDto[]): string {
-    if (!images.length) return '';
-    const main = images.find((image) => image.isMain);
-    return main?.url ?? images[0].url;
+  private loadNearbyEvents(currentEvent: EventDto): void {
+    if (currentEvent.latitude == null || currentEvent.longitude == null) {
+      this.nearbyEvents = [];
+      this.isLoading = false;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.eventService
+      .getNearby({
+        latitude: currentEvent.latitude,
+        longitude: currentEvent.longitude,
+        radiusMeters: 5000,
+        page: 1,
+        pageSize: 6,
+        sortOrder: 'asc',
+      })
+      .subscribe({
+        next: (result) => {
+          this.nearbyEvents = this.extractItems(result)
+            .map((item) => this.normalizeEvent(item))
+            .filter((item) => item.id !== currentEvent.id)
+            .slice(0, 3);
+
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Failed to load nearby events:', err);
+          this.nearbyEvents = [];
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  private extractItems(result: PagedEventResultDto<EventDto> | Record<string, unknown> | null | undefined): EventDto[] {
+    if (!result || typeof result !== 'object') {
+      return [];
+    }
+
+    const raw = result as Record<string, unknown>;
+    const candidates = [raw['items'], raw['Items'], raw['data'], raw['Data'], raw['results'], raw['Results']];
+
+    for (const candidate of candidates) {
+      if (Array.isArray(candidate)) {
+        return candidate as EventDto[];
+      }
+    }
+
+    return [];
+  }
+
+  private normalizeEvent(raw: EventDto): EventDto {
+    const dto = raw as unknown as Record<string, unknown>;
+
+    return {
+      id: Number(dto['id'] ?? dto['Id'] ?? 0),
+      name: String(dto['name'] ?? dto['Name'] ?? ''),
+      description: (dto['description'] ?? dto['Description'] ?? undefined) as string | undefined,
+      mainImageUrl: (dto['mainImageUrl'] ?? dto['MainImageUrl'] ?? undefined) as string | undefined,
+      longitude: this.readOptionalNumber(dto, ['longitude', 'Longitude']),
+      latitude: this.readOptionalNumber(dto, ['latitude', 'Latitude']),
+      distanceMeters: this.readOptionalNumber(dto, ['distanceMeters', 'DistanceMeters']),
+      startDate: String(dto['startDate'] ?? dto['StartDate'] ?? ''),
+      endDate: String(dto['endDate'] ?? dto['EndDate'] ?? ''),
+      price: this.readOptionalNumber(dto, ['price', 'Price']),
+      maxVisitors: this.readOptionalNumber(dto, ['maxVisitors', 'MaxVisitors']),
+      isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
+      status: String(dto['status'] ?? dto['Status'] ?? ''),
+      eventTypeId: Number(dto['eventTypeId'] ?? dto['EventTypeId'] ?? 0),
+      eventTypeName: String(dto['eventTypeName'] ?? dto['EventTypeName'] ?? ''),
+      localityName: (dto['localityName'] ?? dto['LocalityName'] ?? undefined) as string | undefined,
+      destinationName: (dto['destinationName'] ?? dto['DestinationName'] ?? undefined) as string | undefined,
+      objectId: this.readOptionalNumber(dto, ['objectId', 'ObjectId']),
+      objectName: (dto['objectName'] ?? dto['ObjectName'] ?? undefined) as string | undefined,
+      images: ((dto['images'] ?? dto['Images'] ?? []) as EventDto['images']) || [],
+    };
+  }
+
+  private readOptionalNumber(obj: Record<string, unknown>, keys: string[]): number | undefined {
+    for (const key of keys) {
+      const value = obj[key];
+      if (value == null) {
+        continue;
+      }
+
+      const parsed = Number(value);
+      if (!Number.isNaN(parsed)) {
+        return parsed;
+      }
+    }
+
+    return undefined;
+  }
+
+  private getMainImage(images: ImageDto[], event: EventDto): string {
+    if (images.length) {
+      const main = images.find((image) => image.isMain);
+      return this.resolveMediaUrl(main?.url ?? images[0].url) ?? '';
+    }
+
+    return this.resolveMediaUrl(event.mainImageUrl) ?? '';
+  }
+
+  getNearbyEventImage(event: EventDto): string | undefined {
+    return this.resolveMediaUrl(event.mainImageUrl);
+  }
+
+  private resolveMediaUrl(raw?: string): string | undefined {
+    if (!raw) return undefined;
+
+    const trimmed = raw.trim();
+    if (!trimmed) return undefined;
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+
+    const apiBase = environment.apiUrl.replace(/\/api\/?$/, '');
+    if (trimmed.startsWith('/')) return `${apiBase}${trimmed}`;
+    return `${apiBase}/${trimmed}`;
+  }
+
+  openNearbyEvent(eventId: number): void {
+    this.router.navigate(['/event', eventId]);
   }
 
   toggleFavorite(): void {
@@ -112,7 +240,9 @@ export class EventDetailComponent implements OnInit {
   }
 
   getTicketPrice(): string {
-    return this.event?.price ? `${this.event.price} €` : this.translationService.translate('event.free');
+    return this.event?.price
+      ? `${this.event.price} €`
+      : this.translationService.translate('event.free');
   }
 
   viewOnMap(): void {
@@ -150,7 +280,7 @@ export class EventDetailComponent implements OnInit {
     this.currentImageIndex = (this.currentImageIndex - 1 + this.images.length) % this.images.length;
   }
 
-  onSwipe(event: any): void {
+  onSwipe(event: { direction: string }): void {
     if (event.direction === 'left') this.nextImage();
     if (event.direction === 'right') this.prevImage();
   }

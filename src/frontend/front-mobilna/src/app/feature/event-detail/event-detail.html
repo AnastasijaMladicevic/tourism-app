@@ -119,6 +119,54 @@
             <button class="btn-small" (click)="buyTicket()">{{ 'event.select' | translate }}</button>
           </div>
         </div>
+        <div class="card nearby-card">
+          <div class="nearby-header">
+            <h2>{{ 'event.nearbyTitle' | translate }}</h2>
+          </div>
+
+          @if (nearbyEvents.length > 0) {
+            <div class="nearby-list">
+              @for (nearbyEvent of nearbyEvents; track nearbyEvent.id) {
+                <article class="nearby-item" (click)="openNearbyEvent(nearbyEvent.id)">
+                  <div class="nearby-item__image">
+                    @if (getNearbyEventImage(nearbyEvent); as nearbyImage) {
+                      <img
+                        [src]="nearbyImage"
+                        [alt]="nearbyEvent.name"
+                        (error)="onImageError($event)"
+                      />
+                    } @else {
+                      <div class="nearby-item__placeholder">
+                        <mat-icon>celebration</mat-icon>
+                      </div>
+                    }
+                  </div>
+
+                  <div class="nearby-item__body">
+                    <h3>{{ nearbyEvent.name }}</h3>
+                    <p class="nearby-item__location">
+                      <mat-icon>location_on</mat-icon>
+                      <span>{{
+                        nearbyEvent.objectName ||
+                        nearbyEvent.localityName ||
+                        nearbyEvent.destinationName ||
+                        'Lokacija nije dostupna'
+                      }}</span>
+                    </p>
+                    <p class="nearby-item__date">
+                      <mat-icon>calendar_today</mat-icon>
+                      <span>{{ formatDate(nearbyEvent.startDate) }}</span>
+                    </p>
+                  </div>
+                </article>
+              }
+            </div>
+          } @else {
+            <div class="nearby-empty">
+              {{ 'event.nearbyEmpty' | translate }}
+            </div>
+          }
+        </div>
       </div>
     </div>
   }

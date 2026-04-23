@@ -1,5 +1,4 @@
 <div class="screen">
-  <!-- Header -->
   <div class="header">
     <button class="icon-btn" (click)="goBack()" aria-label="Go back">
       <mat-icon>arrow_back_ios</mat-icon>
@@ -7,12 +6,16 @@
     <h1 class="header__title">{{ pageTitle }}</h1>
   </div>
 
-  <!-- Filters -->
   <div class="filters-row">
     <div class="filters-right">
       <div class="search-inline">
         <mat-icon>search</mat-icon>
-        <input type="text" placeholder="Search..." [(ngModel)]="searchQuery" />
+        <input
+          type="text"
+          placeholder="Search..."
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearchChange()"
+        />
       </div>
 
       <div
@@ -43,21 +46,20 @@
               [class.sort-menu__item--active]="sortOption === 'az'"
               (click)="setSort('az')"
             >
-              <mat-icon>sort_by_alpha</mat-icon> A → Z
+              <mat-icon>sort_by_alpha</mat-icon> A -> Z
             </button>
             <button
               class="sort-menu__item"
               [class.sort-menu__item--active]="sortOption === 'za'"
               (click)="setSort('za')"
             >
-              <mat-icon>sort_by_alpha</mat-icon> Z → A
+              <mat-icon>sort_by_alpha</mat-icon> Z -> A
             </button>
           </div>
         }
       </div>
     </div>
 
-    <!-- Type filters - sakrij ako je specifičan tip (Hotels, Restaurants...) -->
     @if (!hideTypeFilters) {
       <div class="filters-scroll">
         <button
@@ -79,7 +81,6 @@
       </div>
     }
 
-    <!-- Rating filters - uvek vidljivi -->
     <div class="filters-scroll">
       <button
         class="filter-btn"
@@ -112,9 +113,8 @@
     </div>
   </div>
 
-  <!-- Results -->
   <div class="results-bar">
-    <span class="results-bar__count">{{ filtered.length }} places found</span>
+    <span class="results-bar__count">{{ totalCount }} places found</span>
   </div>
 
   @if (isLoading) {
@@ -125,6 +125,7 @@
       </div>
     </div>
   }
+
   @if (errorMessage) {
     <div class="error-state">
       <mat-icon>error_outline</mat-icon>
@@ -133,9 +134,8 @@
     </div>
   }
 
-  <!-- Grid -->
   <div class="grid">
-    @for (obj of filtered; track obj.id) {
+    @for (obj of visibleObjects; track obj.id) {
       <div class="card">
         <div class="card__image-wrap">
           @if (getMainImage(obj)) {
@@ -151,7 +151,6 @@
             </div>
           }
 
-          <!-- Open badge -->
           @if (isOpenNow(obj)) {
             <span class="card__open-badge">Open</span>
           }
@@ -193,11 +192,17 @@
       </div>
     }
 
-    @if (filtered.length === 0 && !isLoading) {
+    @if (totalCount === 0 && !isLoading) {
       <div class="empty">
         <mat-icon>search_off</mat-icon>
         <p>No places found.</p>
       </div>
     }
+  </div>
+
+  <div class="pagination">
+    <button mat-button (click)="prevPage()" [disabled]="currentPage === 1">Prev</button>
+    <span>Page {{ currentPage }} of {{ totalPages }}</span>
+    <button mat-button (click)="nextPage()" [disabled]="!hasNextPage">Next</button>
   </div>
 </div>

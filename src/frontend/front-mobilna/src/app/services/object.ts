@@ -15,6 +15,7 @@ export interface ObjectDto {
   id: number;
   name: string;
   description?: string;
+  mainImageUrl?: string;
   address?: string;
   phoneNumber?: string;
   website?: string;
@@ -26,6 +27,7 @@ export interface ObjectDto {
   averageRating?: number;
   reviewCount?: number;
   distanceKm?: number;
+  distanceMeters?: number;
   isActive: boolean;
   objectTypeId: number;
   objectTypeName: string;
@@ -34,6 +36,7 @@ export interface ObjectDto {
   images?: ObjectImageDto[];
   reviews?: ReviewDto[];
 }
+
 export interface ObjectView extends ObjectDto {
   isFavorite: boolean;
   favoriteId?: number;
@@ -49,6 +52,32 @@ export interface ObjectQueryParams {
   search?: string;
   sortBy?: string;
   sortOrder?: string;
+}
+
+export interface NearbyObjectQueryParams {
+  latitude: number;
+  longitude: number;
+  radiusMeters?: number;
+  type?: string;
+  destination?: string;
+  locality?: string;
+  search?: string;
+  amenities?: string[];
+  minPrice?: number;
+  maxPrice?: number;
+  minRating?: number;
+  maxRating?: number;
+  page?: number;
+  pageSize?: number;
+  sortOrder?: string;
+}
+
+export interface PagedResultDto<T> {
+  items: T[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -75,7 +104,29 @@ export class ObjectService {
     return this.http.get<ObjectDto>(`${this.url}/${id}`);
   }
 
-  // ako kasnije budeš filtrirao po tipu na backendu
+  getNearby(query: NearbyObjectQueryParams): Observable<PagedResultDto<ObjectDto>> {
+    let params = new HttpParams();
+
+    Object.entries(query).forEach(([key, value]) => {
+      if (value == null || value === '') {
+        return;
+      }
+
+      if (Array.isArray(value)) {
+        value.forEach((item) => {
+          if (item != null && item !== '') {
+            params = params.append(key, String(item));
+          }
+        });
+        return;
+      }
+
+      params = params.set(key, String(value));
+    });
+
+    return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/nearby`, { params });
+  }
+
   getByType(typeName: string): Observable<ObjectDto[]> {
     return this.http.get<ObjectDto[]>(`${this.url}?type=${typeName}`);
   }

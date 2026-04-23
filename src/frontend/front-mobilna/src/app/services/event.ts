@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
 
@@ -10,6 +10,7 @@ export interface EventDto {
   mainImageUrl?: string;
   longitude?: number;
   latitude?: number;
+  distanceMeters?: number;
   startDate: string;
   endDate: string;
   price?: number;
@@ -32,6 +33,30 @@ export interface EventImageDto {
   isMain: boolean;
 }
 
+export interface NearbyEventQueryParams {
+  latitude: number;
+  longitude: number;
+  radiusMeters: number;
+  type?: string;
+  destination?: string;
+  search?: string;
+  date?: string;
+  nextDays?: number;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  pageSize?: number;
+  sortOrder?: string;
+}
+
+export interface PagedEventResultDto<T> {
+  items: T[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class EventService {
   private url = `${environment.apiUrl}/events`;
@@ -42,8 +67,19 @@ export class EventService {
     return this.http.get<EventDto>(`${this.url}/${id}`);
   }
 
-  // za listu festivala kasnije
   getAll(): Observable<EventDto[]> {
     return this.http.get<EventDto[]>(this.url);
+  }
+
+  getNearby(query: NearbyEventQueryParams): Observable<PagedEventResultDto<EventDto>> {
+    let params = new HttpParams();
+
+    Object.entries(query).forEach(([key, value]) => {
+      if (value != null && value !== '') {
+        params = params.set(key, String(value));
+      }
+    });
+
+    return this.http.get<PagedEventResultDto<EventDto>>(`${this.url}/nearby`, { params });
   }
 }
