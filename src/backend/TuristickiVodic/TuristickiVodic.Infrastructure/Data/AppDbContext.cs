@@ -129,6 +129,10 @@ public class AppDbContext : DbContext
             .HasColumnType("text[]");
 
         mb.Entity<TouristObject>()
+            .Property(o => o.MenuUrl)
+            .HasMaxLength(2000);
+
+        mb.Entity<TouristObject>()
             .HasIndex(o => o.Geolocation)
             .HasMethod("GIST");
 

@@ -81,6 +81,7 @@ namespace TuristickiVodic.Tests.Services
                 Name = "Pomorski muzej",
                 ObjectTypeId = objectType.Id,
                 LocalityId = locality.Id,
+                MenuUrl = " https://example.com/menu ",
                 Price = 150m,
                 Amenities = new[] { "WiFi", "Parking", "wifi" },
                 Longitude = 18.77,
@@ -88,10 +89,12 @@ namespace TuristickiVodic.Tests.Services
             }, creator.Id, "ContentCreator");
 
             result.Name.Should().Be("Pomorski muzej");
+            result.MenuUrl.Should().Be("https://example.com/menu");
             result.Price.Should().Be(150m);
             result.Amenities.Should().Equal("WiFi", "Parking");
             ctx.Objects.Single().DestinationId.Should().Be(destination.Id);
             ctx.Objects.Single().LocalityId.Should().Be(locality.Id);
+            ctx.Objects.Single().MenuUrl.Should().Be("https://example.com/menu");
             ctx.Objects.Single().Price.Should().Be(150m);
             ctx.Objects.Single().Amenities.Should().Equal("WiFi", "Parking");
             ctx.Objects.Single().Status.Should().Be(ContentStatus.Pending);
@@ -253,11 +256,13 @@ namespace TuristickiVodic.Tests.Services
 
             var result = await svc.UpdateAsync(1, new UpdateTouristObjectDto
             {
+                MenuUrl = " https://example.com/new-menu ",
                 Price = 125m,
                 Amenities = new[] { "Parking", "WiFi", "parking" }
             }, creator.Id, "ContentCreator");
 
             result.Should().NotBeNull();
+            result!.MenuUrl.Should().Be("https://example.com/new-menu");
             result!.Price.Should().Be(125m);
             result.Amenities.Should().Equal("Parking", "WiFi");
         }

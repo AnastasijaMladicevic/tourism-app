@@ -12,6 +12,7 @@ namespace TuristickiVodic.Core.DTO
         public string? Address { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Website { get; set; }
+        public string? MenuUrl { get; set; }
         public string? WorkingHours { get; set; }
         public decimal? Price { get; set; }
         public string[] Amenities { get; set; } = Array.Empty<string>();

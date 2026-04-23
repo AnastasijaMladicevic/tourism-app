@@ -19,6 +19,9 @@ namespace TuristickiVodic.Core.DTO
         [MaxLength(300)]
         public string? Website { get; set; }
 
+        [MaxLength(2000)]
+        public string? MenuUrl { get; set; }
+
         public string? WorkingHours { get; set; }
         public decimal? Price { get; set; }
         public string[]? Amenities { get; set; }

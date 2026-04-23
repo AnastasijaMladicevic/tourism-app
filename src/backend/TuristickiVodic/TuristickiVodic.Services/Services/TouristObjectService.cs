@@ -673,6 +673,7 @@ namespace TuristickiVodic.Services.Services
                 Address = dto.Address,
                 PhoneNumber = dto.PhoneNumber,
                 Website = dto.Website,
+                MenuUrl = NormalizeOptionalText(dto.MenuUrl),
                 WorkingHours = dto.WorkingHours,
                 Price = dto.Price,
                 Amenities = NormalizeAmenities(dto.Amenities),
@@ -748,6 +749,7 @@ namespace TuristickiVodic.Services.Services
             if (dto.Address != null) obj.Address = dto.Address;
             if (dto.PhoneNumber != null) obj.PhoneNumber = dto.PhoneNumber;
             if (dto.Website != null) obj.Website = dto.Website;
+            if (dto.MenuUrl != null) obj.MenuUrl = NormalizeOptionalText(dto.MenuUrl);
             if (dto.WorkingHours != null) obj.WorkingHours = dto.WorkingHours;
 
             if (dto.Price.HasValue)
@@ -1047,6 +1049,11 @@ namespace TuristickiVodic.Services.Services
                 .Select(a => a.Trim())
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToArray();
+        }
+
+        private static string? NormalizeOptionalText(string? value)
+        {
+            return string.IsNullOrWhiteSpace(value) ? null : value.Trim();
         }
 
         private static double CalculateDistanceMeters(double latitude1, double longitude1, double latitude2, double longitude2)
