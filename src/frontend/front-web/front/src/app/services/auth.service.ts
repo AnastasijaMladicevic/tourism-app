@@ -13,14 +13,10 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(dto: LoginDto): Observable<AuthResponseDto> {
-      return this.http.post<AuthResponseDto>(`${this.apiUrl}/login`, dto).pipe(
-        tap((response) => {
-          localStorage.setItem(this.tokenKey, response.token);
-          localStorage.setItem(this.refreshTokenKey, response.refreshToken);
-          localStorage.setItem(this.userKey, JSON.stringify(response.user));
-        })
-      );
-    }
+    return this.http.post<AuthResponseDto>(`${this.apiUrl}/login`, dto).pipe(
+      tap((response) => this.persistSession(response))
+    );
+  }
 
   register(data: CreateUserDto): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, data);
@@ -32,6 +28,18 @@ export class AuthService {
 
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
+  }
+
+  getRefreshToken(): string | null {
+    return localStorage.getItem(this.refreshTokenKey);
+  }
+
+  refresh(): Observable<AuthResponseDto> {
+    return this.http
+      .post<AuthResponseDto>(`${this.apiUrl}/refresh`, {
+        refreshToken: this.getRefreshToken(),
+      })
+      .pipe(tap((response) => this.persistSession(response)));
   }
 
   logout(): void {
@@ -176,6 +184,12 @@ export class AuthService {
       default:
         return role;
     }
+  }
+
+  private persistSession(response: AuthResponseDto): void {
+    localStorage.setItem(this.tokenKey, response.token);
+    localStorage.setItem(this.refreshTokenKey, response.refreshToken);
+    localStorage.setItem(this.userKey, JSON.stringify(response.user));
   }
 
   getDashboardRouteForRole(role: string | null): string {
