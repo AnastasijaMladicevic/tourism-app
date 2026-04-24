@@ -69,13 +69,14 @@ export class ManagerEventsComponent implements OnInit {
 
   loadManagedDestinationLabel(): void {
     this.destinationService.getAll({ page: 1, pageSize: 100, sortBy: 'name', sortOrder: 'asc' }).subscribe({
-      next: (response) => {
-        this.managedDestinationLabel = response.items.map((destination) => destination.name).join(', ') || 'Manager Events';
-      },
-      error: () => {
-        this.managedDestinationLabel = 'Manager Events';
-      }
-    });
+    next: (response: any) => {
+      const list = Array.isArray(response) ? response : (response?.items ?? []);
+      this.managedDestinationLabel = list.map((d: any) => d.name).join(', ') || 'Manager Events';
+    },
+    error: () => {
+      this.managedDestinationLabel = 'Manager Events';
+    }
+  });
   }
 
   loadEvents(): void {

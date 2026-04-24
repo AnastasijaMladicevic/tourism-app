@@ -1,0 +1,193 @@
+<div class="map-page">
+  <div class="search-bar">
+    <div class="search-input">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        placeholder="Search objects, routes..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput()"
+        (focus)="showSuggestions = searchResults.length > 0"
+        (blur)="onSearchBlur()"
+        autocomplete="off"
+      />
+      @if (searchQuery) {
+        <button class="clear-btn" (click)="clearSearch()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </div>
+
+    @if (showSuggestions && searchResults.length > 0) {
+      <div class="suggestions">
+        @for (result of searchResults; track result.id) {
+          <div class="suggestion-item" (mousedown)="selectSuggestion(result)">
+            <div class="suggestion-item__image">
+              @if (result.image) {
+                <img [src]="result.image" [alt]="result.name" />
+              } @else {
+                <mat-icon>{{ result.icon }}</mat-icon>
+              }
+            </div>
+            <div class="suggestion-item__body">
+              <span class="suggestion-item__name">{{ result.name }}</span>
+              <span class="suggestion-item__meta"
+                >{{ result.typeName }} · {{ result.location }}</span
+              >
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="filter-chips">
+    @for (chip of filterChips; track chip.key) {
+      <button
+        class="chip"
+        [class.chip--active]="activeFilters.includes(chip.key)"
+        (click)="toggleFilter(chip.key)"
+      >
+        <span>{{ chip.icon }}</span>
+        {{ chip.label }}
+      </button>
+    }
+  </div>
+
+  @if (routeStart || routeEnd) {
+    <div class="route-planner">
+      <div class="route-planner__row">
+        <span class="route-planner__label">Start</span>
+        <span class="route-planner__value">{{ routeSummary(routeStart) }}</span>
+      </div>
+      <div class="route-planner__row">
+        <span class="route-planner__label">End</span>
+        <span class="route-planner__value">{{ routeSummary(routeEnd) }}</span>
+      </div>
+      <div class="route-planner__actions">
+        <button
+          class="route-planner__btn"
+          (click)="showRouteBetweenPins()"
+          [disabled]="!routeStart || !routeEnd"
+        >
+          <mat-icon>alt_route</mat-icon>
+          Show route
+        </button>
+        <button class="route-planner__btn route-planner__btn--ghost" (click)="clearPlannedRoute()">
+          <mat-icon>close</mat-icon>
+          Clear
+        </button>
+      </div>
+    </div>
+  }
+
+  <div id="main-map" class="main-map"></div>
+
+  <div class="map-controls">
+    <button
+      class="control-btn gps-btn"
+      (click)="toggleGpsTracking()"
+      [class.gps-btn--active]="isTracking"
+      aria-label="My location"
+    >
+      <mat-icon>{{ isTracking ? 'gps_fixed' : 'my_location' }}</mat-icon>
+    </button>
+    <button class="control-btn" (click)="zoomIn()"><mat-icon>add</mat-icon></button>
+    <button class="control-btn" (click)="zoomOut()"><mat-icon>remove</mat-icon></button>
+  </div>
+
+  @if (selectedItem) {
+    <div class="bottom-card" (click)="$event.stopPropagation()">
+      <button class="bottom-card__close" (click)="closeCard()">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <div class="bottom-card__image-wrap">
+        @if (getItemImage()) {
+          <img [src]="getItemImage()" [alt]="selectedItem.name" class="bottom-card__image" />
+        } @else {
+          <div class="bottom-card__image bottom-card__image--empty">
+            <mat-icon>landscape</mat-icon>
+          </div>
+        }
+      </div>
+
+      <div class="bottom-card__body">
+        <div class="bottom-card__top">
+          <div class="bottom-card__info">
+            <h3 class="bottom-card__name">{{ selectedItem.name }}</h3>
+            <p class="bottom-card__meta">
+              @if (getItemLocation()) {
+                <mat-icon>place</mat-icon>
+                {{ getItemLocation() }}
+              }
+            </p>
+          </div>
+          @if (selectedItem.averageRating > 0) {
+            <div class="bottom-card__rating">
+              <mat-icon>star</mat-icon>
+              {{ selectedItem.averageRating.toFixed(1) }}
+            </div>
+          }
+        </div>
+
+        <div class="bottom-card__badges">
+          @if (getWorkingStatus() !== null) {
+            <span
+              class="badge"
+              [class.badge--open]="getWorkingStatus()"
+              [class.badge--closed]="!getWorkingStatus()"
+            >
+              {{ getWorkingStatus() ? 'OPEN NOW' : 'CLOSED' }}
+            </span>
+          }
+          @if (selectedItem.distanceKm != null) {
+            <span class="badge badge--distance">
+              <mat-icon>near_me</mat-icon>{{ formatDistance(selectedItem.distanceKm) }}
+            </span>
+          }
+        </div>
+
+        @if (canUseSelectedForRoute()) {
+          <div class="route-assign">
+            <button
+              class="route-assign__btn"
+              [class.route-assign__btn--active]="isSelectedAsStart()"
+              (click)="setRoutePoint('start')"
+            >
+              <mat-icon>trip_origin</mat-icon>
+              Set start
+            </button>
+            <button
+              class="route-assign__btn"
+              [class.route-assign__btn--active]="isSelectedAsEnd()"
+              (click)="setRoutePoint('end')"
+            >
+              <mat-icon>location_on</mat-icon>
+              Set end
+            </button>
+          </div>
+        }
+
+        <div class="bottom-card__actions">
+          <button class="bottom-card__btn" (click)="openDetails()">Details</button>
+          @if (userLocation) {
+            <button class="bottom-card__btn bottom-card__btn--outline" (click)="getDirections()">
+              <mat-icon>directions</mat-icon>
+              From GPS
+            </button>
+          }
+          @if (routeStart && routeEnd) {
+            <button
+              class="bottom-card__btn bottom-card__btn--outline"
+              (click)="showRouteBetweenPins()"
+            >
+              <mat-icon>alt_route</mat-icon>
+              Between pins
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>
