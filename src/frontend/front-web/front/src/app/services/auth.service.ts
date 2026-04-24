@@ -2,15 +2,162 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { CreateUserDto, LoginDto, AuthResponseDto, UserDto } from '../models/user.model';
-
+import { TranslationService } from './translation.service';
+import { environment } from '../../environment/environment';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private apiUrl = 'https://localhost:7047/api/users';
+  private apiUrl = `${environment.apiUrl}/users`;
   private tokenKey = 'token';
   private refreshTokenKey = 'refreshToken';
   private userKey = 'user';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,private translationService: TranslationService,) {
+    this.syncStoredUserWithAuthenticatedRole();
+
+    const currentUser = this.readStoredUser();
+    if (currentUser?.language) {
+      this.translationService.setLanguage(currentUser.language);
+    }
+  }
+
+
+  getById(userId: number): Observable<UserDto> {
+    return this.http
+      .get<UserDto>(`${this.apiUrl}/${userId}`)
+      .pipe(tap((user) => this.setCurrentUser(user)));
+  }
+
+  update(userId: number, dto: UpdateUserDto): Observable<UserDto> {
+    return this.http
+      .put<UserDto>(`${this.apiUrl}/${userId}`, dto)
+      .pipe(tap((user) => this.setCurrentUser(user)));
+  }
+
+  updateProfileImage(userId: number, file: File): Observable<UserDto> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http
+      .put<UserDto>(`${this.apiUrl}/${userId}/profile-image`, formData)
+      .pipe(tap((user) => this.setCurrentUser(user)));
+  }
+
+  removeProfileImage(userId: number): Observable<UserDto> {
+    return this.http
+      .delete<UserDto>(`${this.apiUrl}/${userId}/profile-image`)
+      .pipe(tap((user) => this.setCurrentUser(user)));
+  }
+
+  changePassword(userId: number, dto: ChangePasswordDto): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/${userId}/change-password`, dto);
+  }
+
+  requestCreatorRole(userId: number, creatorType: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${this.apiUrl}/${userId}/request-creator`,
+      JSON.stringify(creatorType),
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+  }
+
+
+  getCurrentUser(): UserDto | null {
+    const raw = localStorage.getItem('user');
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      return this.normalizeUser(JSON.parse(raw) as UserDto);
+    } catch {
+      return null;
+    }
+  }
+
+  setCurrentUser(user: UserDto): void {
+    localStorage.setItem('user', JSON.stringify(user));
+    this.translationService.setLanguage(user.language);
+  }
+  isAdmin(): boolean {
+    return this.getAuthenticatedRole() === 'admin';
+  }
+
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/forgot-password`, { email });
+  }
+
+  verifyResetCode(data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/verify-reset-code`, data);
+  }
+  resetPassword(email: string, code: string, newPassword: string, confirmPassword: string, resetSessionToken: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password`, { 
+      email, 
+      code, 
+      newPassword,
+      confirmPassword,
+      resetSessionToken
+    });
+  }
+
+  updateMyLocation(latitude: number, longitude: number): Observable<any> {
+    return this.http.put(`${this.apiUrl}/me/location`, { latitude, longitude });
+  }
+
+  getMyPreferredRegion(): Observable<UserPreferredRegionDto> {
+    return this.http.get<UserPreferredRegionDto>(`${this.apiUrl}/me/preferred-region`);
+  }
+
+  updateMyPreferredRegion(dto: UpdateUserPreferredRegionDto): Observable<UserPreferredRegionDto> {
+    return this.http.put<UserPreferredRegionDto>(`${this.apiUrl}/me/preferred-region`, dto);
+  }
+
+  private syncStoredUserWithAuthenticatedRole(): void {
+    const storedUser = this.readStoredUser();
+    if (!storedUser) {
+      return;
+    }
+
+    try {
+      this.normalizeUser(storedUser);
+    } catch {
+      localStorage.removeItem('user');
+    }
+  }
+
+  private normalizeUser(user: UserDto): UserDto {
+    const authenticatedRole = this.getAuthenticatedRole();
+
+    if (!authenticatedRole) {
+      return user;
+    }
+
+    const normalizedUser = {
+      ...user,
+      roleName: this.mapNormalizedRoleToBackendRole(authenticatedRole),
+    };
+
+    if (normalizedUser.roleName !== user.roleName) {
+      this.setCurrentUser(normalizedUser);
+    }
+
+    return normalizedUser;
+  }
+
+  private readStoredUser(): UserDto | null {
+    const raw = localStorage.getItem('user');
+    if (!raw) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(raw) as UserDto;
+    } catch {
+      return null;
+    }
+  }
 
   login(dto: LoginDto): Observable<AuthResponseDto> {
     return this.http.post<AuthResponseDto>(`${this.apiUrl}/login`, dto).pipe(
@@ -224,3 +371,38 @@ export class AuthService {
     return normalizedAllowedRoles.includes(normalizedCurrentRole);
   }
 }
+
+
+export interface ChangePasswordDto {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface RefreshTokenDto {
+  refreshToken: string;
+}
+
+export interface UpdateUserDto {
+  firstName?: string | null;
+  lastName?: string | null;
+  phoneNumber?: string | null;
+  country?: string | null;
+  language?: string | null;
+}
+
+export interface UserPreferredRegionDto {
+  preferredRegionId?: number | null;
+  effectiveRegionId?: number | null;
+  effectiveRegionName?: string | null;
+  effectiveRegionCode?: string | null;
+  centerLongitude?: number | null;
+  centerLatitude?: number | null;
+  defaultMapZoom?: number | null;
+  isDefaultFallback: boolean;
+}
+
+export interface UpdateUserPreferredRegionDto {
+  regionId?: number | null;
+}
+

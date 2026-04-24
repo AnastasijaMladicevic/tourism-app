@@ -182,8 +182,15 @@ export class EventFormComponent implements OnInit {
       eventTypes: this.eventService.getEventTypes().pipe(
         catchError(() => of(this.fallbackEventTypes))
       ),
-      destinations: this.destinationService.getAll({ page: 1, pageSize: 200, sortBy: 'name', sortOrder: 'asc' }).pipe(
-        map((response) => response.items.map((destination) => ({ id: destination.id, name: destination.name }))),
+      destinations: this.destinationService
+      .getAll({ page: 1, pageSize: 200, sortBy: 'name', sortOrder: 'asc' })
+      .pipe(
+        map((response: any) => {
+          const list = Array.isArray(response) 
+            ? response 
+            : (response?.items ?? []);
+          return list.map((d: any) => ({ id: d.id, name: d.name }));
+        }),
         catchError(() => of(this.fallbackDestinations))
       ),
       venues: this.eventService.getObjectOptions({ page: 1, pageSize: 200, sortBy: 'name', sortOrder: 'asc' }).pipe(
