@@ -3363,6 +3363,549 @@ VALUES
 ('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Madrid Architecture Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Madrid Architecture Walk'), NOW()),
 ('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Valencia Paella Experience', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Valencia Paella Experience'), NOW());
 
+-- 14.13 REGION FOCUS + CUISINE BACKFILL
+UPDATE "Regions"
+SET "CenterLongitude" = 12.4964,
+    "CenterLatitude" = 42.4279,
+    "DefaultMapZoom" = 6.4,
+    "UpdatedAt" = NOW()
+WHERE "Code" = 'IT';
+
+UPDATE "Regions"
+SET "CenterLongitude" = 20.7505,
+    "CenterLatitude" = 43.8914,
+    "DefaultMapZoom" = 7.2,
+    "UpdatedAt" = NOW()
+WHERE "Code" = 'RS';
+
+UPDATE "Objects"
+SET "CuisineType" = CASE "Name"
+    WHEN 'Restoran Galion' THEN 'Mediteranska i morski plodovi'
+    WHEN 'Hotel Avala' THEN 'Internacionalna i mediteranska'
+    WHEN 'Hotel Vardar' THEN 'Mediteranska i internacionalna'
+    WHEN 'Hotel Bianca Kolasin' THEN 'Planinska i internacionalna'
+    ELSE "CuisineType"
+END,
+    "UpdatedAt" = NOW()
+WHERE "Name" IN ('Restoran Galion', 'Hotel Avala', 'Hotel Vardar', 'Hotel Bianca Kolasin')
+  AND COALESCE("CuisineType", '') = '';
+
+-- 15. ITALIJA + SRBIJA DEMO KORISNICI
+INSERT INTO "Users"
+("FirstName", "LastName", "DateOfBirth", "Email", "PasswordHash", "PhoneNumber", "Country", "Language", "IsVerified", "IsActive", "IsBlacklisted", "HasRequestedCreatorRole",
+ "RoleId", "ManagedDestinationId", "CreatedAt", "UpdatedAt", "ProfileImageUrl")
+VALUES
+('Giulia', 'Bianchi', '1988-06-14', 'giulia.admin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000001', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Lorenzo', 'Conti', '1991-04-03', 'lorenzo.creator@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000002', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'ContentCreator'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Alessandro', 'Ricci', '1989-08-27', 'manager.rome@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000003', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Martina', 'Greco', '1990-11-19', 'manager.venice@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000004', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Sara', 'Galli', '1992-01-08', 'manager.florence@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000005', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Chiara', 'Rossi', '1997-07-12', 'chiara.italy.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Marco', 'Esposito', '1995-03-30', 'marco.italy.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Bianca', 'Ferri', '1998-10-21', 'bianca.italy.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Milica', 'Petrovic', '1987-02-11', 'milica.admin.serbia@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000001', 'Srbija', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Jelena', 'Nikolic', '1992-05-18', 'jelena.creator@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000002', 'Srbija', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'ContentCreator'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Stefan', 'Jovanovic', '1989-09-02', 'manager.belgrade@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000003', 'Srbija', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Ana', 'Markovic', '1990-12-14', 'manager.novisad@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000004', 'Srbija', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Nikola', 'Savic', '1988-04-25', 'manager.zlatibor@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000005', 'Srbija', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Tamara', 'Ilic', '1997-01-17', 'tamara.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Andrija', 'Stojanovic', '1996-08-09', 'andrija.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Teodora', 'Pavlovic', '1998-06-06', 'teodora.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
+
+-- 15.1 ITALIJA + SRBIJA DESTINACIJE
+INSERT INTO "Destinations"
+("Name", "DisplayTitle", "Description", "Geolocation", "Status", "IsActive", "DestinationTypeId", "RegionId", "CreatedByUserId", "ManagedByUserId", "CreatedAt", "UpdatedAt")
+VALUES
+('Rome', 'Rimske ulice, fontane i vecere u Trastevereu',
+ 'Rim je grad u kojem se svakodnevni ritam mesa sa antickim slojevima istorije, trgovima, fontanama i dugim vecerama. Putnik u jednom danu moze da obidje Koloseum, da sedne na kafu u malom baru i da zavrsi vece uz testeninu i vino u Trastevereu.',
+ ST_SetSRID(ST_MakePoint(12.4964, 41.9028), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.rome@spirego.com'),
+ NOW(), NOW()),
+('Venice', 'Kanali, kameni prolazi i veceri oko San Marka',
+ 'Venecija nudi sporiji ritam obilaska, setnje preko mostova i male gastronomske pauze uz poglede na kanale. Grad je posebno zanimljiv putnicima koji vole atmosferu, umetnost i osecaj da je gotovo svaka ulica scenografija.',
+ ST_SetSRID(ST_MakePoint(12.3155, 45.4408), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.venice@spirego.com'),
+ NOW(), NOW()),
+('Florence', 'Renesansa, mostovi i toskanski ritam grada',
+ 'Firenca spaja umetnost, zanatstvo i toskansku gastronomiju na malom prostoru koji je lako obici peske. Grad je odlican za putnike koji zele da kombinuju muzeje, panoramske poglede, lagan gradski tempo i ozbiljno dobru hranu.',
+ ST_SetSRID(ST_MakePoint(11.2558, 43.7696), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.florence@spirego.com'),
+ NOW(), NOW()),
+('Belgrade', 'Tvrdjava, gradske ulice i nocni ritam prestonice',
+ 'Beograd je grad sirokih bulevara, tvrdjave iznad usca i kafana koje zive do kasno. Posetioci ovde lako kombinuju istorijske tacke, moderni gradski ritam, dobru kafu i vecere koje se cesto produze vise nego sto je planirano.',
+ ST_SetSRID(ST_MakePoint(20.4573, 44.8176), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'RS'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
+ NOW(), NOW()),
+('Novi Sad', 'Trgovi, tvrdjava i lagani tempo uz Dunav',
+ 'Novi Sad ima mirniji ritam, ali bogat gradski sadrzaj, uredjene trgove, dobru gastronomsku scenu i jak kulturni identitet. Posebno je prijatan za putnike koji vole setnju, dobru hranu i pogled sa Petrovaradina prema Dunavu i gradu.',
+ ST_SetSRID(ST_MakePoint(19.8335, 45.2671), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'RS'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.novisad@spirego.com'),
+ NOW(), NOW()),
+('Zlatibor', 'Planinski vazduh, vidikovci i opusten ritam dana',
+ 'Zlatibor je destinacija za sporiji planinski ritam, panoramske poglede, duge setnje i odmor uz lokalne specijalitete. Pogodan je i za kratke vikend odmore i za duze boravke kada neko zeli da kombinuje prirodu, wellness i lakse aktivnosti napolju.',
+ ST_SetSRID(ST_MakePoint(19.7023, 43.7299), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Planina'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'RS'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.zlatibor@spirego.com'),
+ NOW(), NOW());
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rome')
+WHERE "Email" = 'manager.rome@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Venice')
+WHERE "Email" = 'manager.venice@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Florence')
+WHERE "Email" = 'manager.florence@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Belgrade')
+WHERE "Email" = 'manager.belgrade@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Novi Sad')
+WHERE "Email" = 'manager.novisad@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor')
+WHERE "Email" = 'manager.zlatibor@spirego.com';
+
+-- 15.2 ITALIJA + SRBIJA LOKALITETI
+INSERT INTO "Localities"
+("Name", "Description", "Geolocation", "IsActive", "DestinationId", "LocalityTypeId", "CreatedByUserId", "CreatedAt")
+VALUES
+('Trastevere Rome', 'Kvart sa uskim ulicama, restoranima, vinskim barovima i vecernjom atmosferom po kojoj je Rim prepoznatljiv.',
+ ST_SetSRID(ST_MakePoint(12.4712, 41.8895), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rome'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Stari Grad'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Colosseum District', 'Istorijski deo Rima oko Koloseuma i okolnih arheoloskih tacaka, pogodan za prve obilaske grada.',
+ ST_SetSRID(ST_MakePoint(12.4922, 41.8902), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rome'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('San Marco Venice', 'Najpoznatiji centralni prostor Venecije sa trgovima, bazilikom i stalnim tokom posetilaca tokom celog dana.',
+ ST_SetSRID(ST_MakePoint(12.3378, 45.4340), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Venice'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Stari Grad'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Grand Canal Venice', 'Glavna gradska vodena osa sa pogledima na palate, mostove i neprekidno kretanje vodenog saobracaja.',
+ ST_SetSRID(ST_MakePoint(12.3310, 45.4380), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Venice'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Duomo Florence', 'Istorijsko jezgro oko katedrale koje je uvek puno setaca, manjih prodavnica i lokala za kratku pauzu izmedju obilazaka.',
+ ST_SetSRID(ST_MakePoint(11.2558, 43.7731), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Florence'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Stari Grad'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Ponte Vecchio Florence', 'Zona oko najpoznatijeg firentinskog mosta, popularna za setnje u kasno popodne i panoramske fotografije.',
+ ST_SetSRID(ST_MakePoint(11.2531, 43.7679), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Florence'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Terazije Belgrade', 'Siri centar Beograda sa hotelima, starim gradskim fasadama i lakim pristupom pesackim zonama.',
+ ST_SetSRID(ST_MakePoint(20.4623, 44.8141), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Belgrade'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'), NOW()),
+('Kalemegdan Belgrade', 'Tvrdjava i park iznad usca, omiljena tacka za setnju, pogled i krace predah pauze.',
+ ST_SetSRID(ST_MakePoint(20.4489, 44.8230), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Belgrade'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Tvrdjava'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'), NOW()),
+('Trg Slobode Novi Sad', 'Glavni gradski trg Novog Sada, pregledan i prijatan za obilazak peske sa mnogo kafica u neposrednoj blizini.',
+ ST_SetSRID(ST_MakePoint(19.8423, 45.2554), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Novi Sad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'), NOW()),
+('Petrovaradin Fortress', 'Petrovaradinska tvrdjava sa vidikovcima, tunelima i jednim od najlepsih pogleda na grad i Dunav.',
+ ST_SetSRID(ST_MakePoint(19.8644, 45.2528), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Novi Sad'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Tvrdjava'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'), NOW()),
+('Kraljev Trg Zlatibor', 'Centralni plato Zlatibora sa hotelima, setalistem i lakim pristupom glavnim sadrzajima planinskog centra.',
+ ST_SetSRID(ST_MakePoint(19.7005, 43.7287), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'), NOW()),
+('Tornik Viewpoint', 'Vidikovac i siri prostor Tornika, odlican za panorame, kratke pauze i aktivnosti na otvorenom.',
+ ST_SetSRID(ST_MakePoint(19.6409, 43.6945), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Vidikovac'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'), NOW());
+
+UPDATE "Localities" l
+SET "CreatedByUserId" = d."ManagedByUserId",
+    "UpdatedAt" = NOW()
+FROM "Destinations" d
+WHERE l."DestinationId" = d."Id"
+  AND d."Name" IN ('Rome', 'Venice', 'Florence', 'Belgrade', 'Novi Sad', 'Zlatibor')
+  AND d."ManagedByUserId" IS NOT NULL;
+
+-- 15.3 ITALIJA + SRBIJA OBJEKTI
+INSERT INTO "Objects"
+("Name", "Description", "Address", "PhoneNumber", "Website", "MenuUrl", "CuisineType", "WorkingHours", "Price", "Amenities", "Geolocation", "AverageRating", "ReviewCount",
+ "Status", "IsActive", "ObjectTypeId", "LocalityId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
+VALUES
+('Hotel Artemide Rome', 'Hotel u centralnom delu Rima sa komfornim sobama, krovnim barom i lokacijom pogodnom za obilazak glavnih znamenitosti peske.', 'Via Nazionale 22, Rome', '+3906499911', 'https://www.hotelartemide.it/',
+ NULL, NULL, '{"pon":"00:00-24:00"}', 240.00, ARRAY['WiFi', 'Spa', 'Dorucak', 'Rooftop'], ST_SetSRID(ST_MakePoint(12.4938, 41.9017), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Colosseum District'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rome'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.rome@spirego.com'),
+ NOW(), NOW(), NOW()),
+('Rione 13 Trastevere', 'Restoran u Trastevereu fokusiran na rimske klasike, pizzu i opustenu vecernju atmosferu. Dobar je izbor kada neko zeli da spoji kvartovsku setnju i konkretnu veceru.', 'Via Roma Libera 19, Rome', '+39065817418', 'https://www.rione13ristorante.com/en',
+ 'https://www.rione13ristorante.com/en/menu', 'Rimska i italijanska', '{"pon":"12:00-23:30"}', 32.00, ARRAY['Rezervacije', 'Terasa', 'Vegetarijanske opcije', 'Vinska karta'], ST_SetSRID(ST_MakePoint(12.4707, 41.8898), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trastevere Rome'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rome'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.rome@spirego.com'),
+ NOW(), NOW(), NOW()),
+('Hotel Canaletto Venice', 'Miran hotel u istorijskom jezgru Venecije sa tradicionalnim enterijerom i lakim pristupom mostovima i trgovima.', 'Castello 5487, Venice', '+390415220518', 'https://www.hotelcanaletto.com/',
+ NULL, NULL, '{"pon":"00:00-24:00"}', 265.00, ARRAY['WiFi', 'Dorucak', 'Concierge', 'Bar'], ST_SetSRID(ST_MakePoint(12.3391, 45.4364), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'San Marco Venice'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Venice'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.venice@spirego.com'),
+ NOW(), NOW(), NOW()),
+('Bistrot de Venise', 'Restoran koji naglasak stavlja na istorijsku venecijansku kuhinju, ribu i pazljivo uparivanje jela i vina. Ambijent je formalniji, ali usluga i lokacija opravdavaju sporiji, duzi obrok.', 'San Marco 4685, Venice', '+390415236651', 'https://www.bistrotdevenise.com/en/',
+ 'https://www.bistrotdevenise.com/en/menu/', 'Venecijanska i morski plodovi', '{"pon":"12:00-22:30"}', 48.00, ARRAY['Rezervacije', 'Vinska karta', 'Morski plodovi', 'Fine dining'], ST_SetSRID(ST_MakePoint(12.3369, 45.4375), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'San Marco Venice'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Venice'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.venice@spirego.com'),
+ NOW(), NOW(), NOW()),
+('Hotel Davanzati Florence', 'Manji hotel u srcu Firence, miran i praktican za obilazak starog jezgra bez oslanjanja na prevoz. Dobro funkcionise za parove i za kratke gradske boravke.', 'Via Porta Rossa 5, Florence', '+39055286666', 'https://www.hoteldavanzati.it/?lang=eng',
+ NULL, NULL, '{"pon":"00:00-24:00"}', 230.00, ARRAY['WiFi', 'Dorucak', 'Happy hour', 'Transfer'], ST_SetSRID(ST_MakePoint(11.2529, 43.7697), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ponte Vecchio Florence'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Florence'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.florence@spirego.com'),
+ NOW(), NOW(), NOW()),
+('La Loggia Firenze', 'Panoramski restoran sa pogledom na Firencu, jelima koja spajaju toskansku bazu i moderniji pristup servisu. Posebno je dobar za duzi rucak ili veceru sa pogledom.', 'Piazzale Michelangelo 1, Florence', '+390552342832', 'https://ristorantelaloggia.it/en/menus/',
+ 'https://ristorantelaloggia.it/en/menus/', 'Toskanska i moderna italijanska', '{"pon":"11:00-23:00"}', 55.00, ARRAY['Pogled na grad', 'Rezervacije', 'Vinska karta', 'Terasa'], ST_SetSRID(ST_MakePoint(11.2552, 43.7635), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ponte Vecchio Florence'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Florence'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.florence@spirego.com'),
+ NOW(), NOW(), NOW()),
+('Hotel Moskva Belgrade', 'Istorijski hotel u centru Beograda koji je dobar izbor za goste kojima je bitna lokacija i prepoznatljiv gradski ambijent. Koristan je i za poslovna putovanja i za kratke gradske vikende.', 'Terazije 20, Belgrade', '+381113648999', 'https://hotelmoskva.rs/',
+ NULL, NULL, '{"pon":"00:00-24:00"}', 185.00, ARRAY['WiFi', 'Spa', 'Dorucak', 'Poslasticarnica'], ST_SetSRID(ST_MakePoint(20.4613, 44.8135), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Terazije Belgrade'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Belgrade'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
+ NOW(), NOW(), NOW()),
+('Restoran Frans Beograd', 'Veliki gradski restoran sa sirokim jelovnikom, bastom i ponudom koja pokriva i klasicna domaca jela i internacionalnije izbore. Dobro radi i za porodicne ruckove i za duza vecernja sedenja.', 'Bulevar oslobodjenja 18G, Belgrade', '+381652641944', 'https://frans.rs/',
+ 'https://frans.rs/menu/jelovnik/', 'Srpska i internacionalna', '{"pon":"09:00-23:30"}', 27.00, ARRAY['Basta', 'Rezervacije', 'Parking', 'Vegetarijanske opcije'], ST_SetSRID(ST_MakePoint(20.4691, 44.7976), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Terazije Belgrade'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Belgrade'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
+ NOW(), NOW(), NOW()),
+('Hotel Pupin Novi Sad', 'Moderan gradski hotel sa centralnom pozicijom i lakim pristupom trgovima, pesackoj zoni i obali Dunava. Cesto je dobar kompromis izmedju komfora, lokacije i urednog servisa.', 'Narodnih Heroja 3, Novi Sad', '+381212156000', 'https://hotelpupin.rs/en/',
+ NULL, NULL, '{"pon":"00:00-24:00"}', 170.00, ARRAY['WiFi', 'Parking', 'Dorucak', 'Fitness'], ST_SetSRID(ST_MakePoint(19.8414, 45.2559), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode Novi Sad'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Novi Sad'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.novisad@spirego.com'),
+ NOW(), NOW(), NOW()),
+('Kalem by Zak Novi Sad', 'Restoran i gradski lounge sa savremenijom ponudom, koktelima i urbanim ambijentom. Praktican je za goste koji hoce ozbiljniji rucak, ali i opusteniji vecernji izlazak bez napustanja centra.', 'Narodnih Heroja 3, Novi Sad', '+381668888021', 'https://hotelpupin.rs/en/dining/kalem-by-zak/',
+ 'https://hotelpupin.rs/en/dining/kalem-by-zak/menu-kalem/', 'Moderna evropska i lokalna', '{"pon":"08:00-23:30"}', 24.00, ARRAY['Terasa', 'Kokteli', 'Rezervacije', 'Dorucak'], ST_SetSRID(ST_MakePoint(19.8417, 45.2560), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode Novi Sad'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Novi Sad'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.novisad@spirego.com'),
+ NOW(), NOW(), NOW()),
+('Hotel Zlatibor Mountain Resort', 'Veliki planinski hotel sa wellness ponudom i lakim pristupom centralnom delu Zlatibora. Dobar je izbor za goste koji hoce da kombinuju smestaj, pogled i usluge u okviru jednog kompleksa.', 'Miladina Pecinara 31a, Zlatibor', '+381318450000', 'https://www.hotelzlatibor-resort.com/en/',
+ NULL, NULL, '{"pon":"00:00-24:00"}', 160.00, ARRAY['WiFi', 'Spa', 'Parking', 'Bazen'], ST_SetSRID(ST_MakePoint(19.7014, 43.7284), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kraljev Trg Zlatibor'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.zlatibor@spirego.com'),
+ NOW(), NOW(), NOW()),
+('Lobby Bar Zlatibor', 'Bar i neformalni gastro kutak u centru Zlatibora sa laganijim jelima, koktelima i prijatnim mestom za pauzu tokom dana. Dobar je za opusten tempo, kafu i kasniji vecernji izlazak bez velike organizacije.', 'Miladina Pecinara 31a, Zlatibor', '+381318450001', 'https://www.hotelzlatibor-resort.com/en/lobby-bar/',
+ 'https://www.hotelzlatibor-resort.com/en/menu-lobby-bar/', 'Bar food i internacionalna', '{"pon":"09:00-00:30"}', 16.00, ARRAY['Kokteli', 'Pogled', 'Terasa', 'Dessert menu'], ST_SetSRID(ST_MakePoint(19.7011, 43.7282), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kraljev Trg Zlatibor'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.zlatibor@spirego.com'),
+ NOW(), NOW(), NOW());
+
+-- 15.4 ITALIJA + SRBIJA AKTIVNOSTI
+INSERT INTO "Activities"
+("Name", "Description", "Geolocation", "Price", "DurationMinutes", "IsActive", "ActivityTypeId", "LocalityId", "DestinationId", "ObjectId", "Status", "CreatedByUserId", "CreatedAt", "UpdatedAt")
+VALUES
+('Trastevere Food Walk', 'Lagani gastronomski obilazak Trasteverea sa fokusom na rimske klasike, male ulice i mesta gde se najlepse vidi kako kvart zivi uvece.',
+ ST_SetSRID(ST_MakePoint(12.4709, 41.8899), 4326), 29.00, 120, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Degustacija hrane'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trastevere Rome'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rome'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rione 13 Trastevere'),
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ NOW(), NOW()),
+('Grand Canal Evening Walk', 'Setnja uz kanal i okolne prolaze, sa kratkim stajanjima na tackama odakle se najbolje vidi promena svetla predvece.',
+ ST_SetSRID(ST_MakePoint(12.3312, 45.4382), 4326), 0.00, 90, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Razgledanje'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Grand Canal Venice'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Venice'),
+ NULL,
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ NOW(), NOW()),
+('Florence Sunset View Walk', 'Kraca ruta za posetioce koji zele da predvece prodju kroz istorijski centar i zavrse setnju na mestu odakle grad izgleda najfotogenicnije.',
+ ST_SetSRID(ST_MakePoint(11.2538, 43.7682), 4326), 0.00, 100, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Razgledanje'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ponte Vecchio Florence'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Florence'),
+ NULL,
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ NOW(), NOW()),
+('Belgrade Fortress Sunset Walk', 'Setnja kroz Kalemegdan sa naglaskom na pogled ka uscu, kratke istorijske price i preporuke za nastavak veceri u centru.',
+ ST_SetSRID(ST_MakePoint(20.4487, 44.8233), 4326), 0.00, 105, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Razgledanje'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kalemegdan Belgrade'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Belgrade'),
+ NULL,
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ NOW(), NOW()),
+('Petrovaradin Fortress Walk', 'Obilazak tvrdjave i njenih glavnih tacaka sa dovoljno vremena za pogled na Novi Sad i krace fotografske pauze.',
+ ST_SetSRID(ST_MakePoint(19.8641, 45.2529), 4326), 0.00, 95, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Razgledanje'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Petrovaradin Fortress'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Novi Sad'),
+ NULL,
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ NOW(), NOW()),
+('Zlatibor Panorama Ride', 'Lagano iskustvo kretanja kroz centralni deo Zlatibora i dalje prema vidikovcima, namenjeno gostima koji zele mirniji tempo i dobar pogled.',
+ ST_SetSRID(ST_MakePoint(19.6660, 43.7030), 4326), 18.00, 130, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Razgledanje'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik Viewpoint'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
+ NULL,
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ NOW(), NOW());
+
+-- 15.5 ITALIJA + SRBIJA EVENTI
+INSERT INTO "Events"
+("Name", "Description", "Geolocation", "StartDate", "EndDate", "Price", "MaxVisitors", "IsActive", "Status", "EventTypeId", "LocalityId", "DestinationId", "ObjectId", "CreatedByUserId", "CreatedAt", "UpdatedAt")
+VALUES
+('Rome Piazza Music Evening', 'Vecernji koncert manjeg formata namenjen posetiocima koji posle obilaska grada zele mirniji kulturni program i dobru lokaciju za nastavak setnje. Atmosfera je opustena, bez prevelike guzve, sa fokusom na muziku i ambijent kvarta.',
+ ST_SetSRID(ST_MakePoint(12.4711, 41.8897), 4326), '2026-09-11 18:30', '2026-09-11 22:30', 14.00, 300, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Koncert'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trastevere Rome'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rome'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rione 13 Trastevere'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ NOW(), NOW()),
+('Venice Lagoon Taste Week', 'Program degustacija i manjih kulinarskih prezentacija inspirisan venecijanskim jelima i sastojcima iz lagune. Dogadjaj je zamisljen kao sporiji gradski festival za goste koji uz razgledanje zele i ozbiljniji gastronomski sadrzaj.',
+ ST_SetSRID(ST_MakePoint(12.3369, 45.4374), 4326), '2026-10-07 12:00', '2026-10-11 21:00', 20.00, 450, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'San Marco Venice'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Venice'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Bistrot de Venise'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ NOW(), NOW()),
+('Florence Artisan Evenings', 'Serija vecernjih okupljanja sa manjim radionicama, muzikom i fokusom na detalje koji Firencu cine gradom zanata i umetnosti. Dobra je opcija za posetioce koji zele sadrzaj izmedju klasicnog obilaska i formalnog koncerta.',
+ ST_SetSRID(ST_MakePoint(11.2540, 43.7684), 4326), '2026-09-25 17:00', '2026-09-27 22:00', 12.00, 350, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ponte Vecchio Florence'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Florence'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'La Loggia Firenze'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ NOW(), NOW()),
+('Belgrade Coffee and Jazz Night', 'Manji vecernji program sa jazz nastupom i toplijom lounge atmosferom, namenjen gostima koji vole centar grada i laganiji izlazak. Uslovljen je sedecim formatom i nije preglasan, pa dobro odgovara i turistima koji sutradan nastavljaju obilazak.',
+ ST_SetSRID(ST_MakePoint(20.4612, 44.8134), 4326), '2026-11-05 18:00', '2026-11-05 23:00', 9.00, 220, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Nastup'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Terazije Belgrade'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Belgrade'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Moskva Belgrade'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ NOW(), NOW()),
+('Novi Sad Gourmet Weekend', 'Dvodevni gradski gastro program sa degustacijama, koktelima i manjim live cooking segmentima. Ideja je da posetioci spoje vikend u centru Novog Sada, setnju do tvrdjave i nekoliko kvalitetnih obroka na maloj udaljenosti.',
+ ST_SetSRID(ST_MakePoint(19.8418, 45.2559), 4326), '2026-10-16 14:00', '2026-10-18 22:00', 11.00, 400, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Sajam'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode Novi Sad'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Novi Sad'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kalem by Zak Novi Sad'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ NOW(), NOW()),
+('Zlatibor Mountain Taste Days', 'Planinski vikend program sa laganijim gastro ponudama, toplim napicima i muzikom prikladnom za opusten kraj dana. Koncept je prilagodjen gostima koji zele da posle setnje ili spa dana imaju jednostavan, prijatan vecernji sadrzaj.',
+ ST_SetSRID(ST_MakePoint(19.7010, 43.7283), 4326), '2026-12-12 15:00', '2026-12-13 22:00', 8.00, 260, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kraljev Trg Zlatibor'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lobby Bar Zlatibor'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ NOW(), NOW());
+
+-- 15.6 ITALIJA + SRBIJA RECENZIJE
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Artemide Rome'),
+ 5, 'Lokacija je bila odlicna za prvi obilazak Rima, a osoblje je brzo resavalo sitne zahteve oko kasnog check-ina. Soba nije bila ogromna, ali je sve delovalo uredno i kvalitetno odrzavano.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Artemide Rome'),
+ 4, 'Dopao mi se rooftop i cinjenica da se vecina znamenitosti moze obici peske. Jedino je dorucak bio jaci prvi dan nego drugog jutra, ali ukupni utisak je i dalje vrlo dobar.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rione 13 Trastevere'),
+ 5, 'Hrana je stigla brzo i nijedno jelo nije delovalo genericki, sto mi je bilo vazno jer sam htela bas rimski fazon vecere. Konobari su lepo objasnili sta je jace, a sta lakse za deljenje.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rione 13 Trastevere'),
+ 3, 'Pasta je bila dobra, ali je terasa bila dosta bucna i cekali smo duze na drugo pice nego sto bih voleo. Vratio bih se zbog hrane, ali ne u najudarnijem terminu.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Canaletto Venice'),
+ 4, 'Hotel ima lep, starinski karakter i osoblje je dalo korisne savete za kretanje kroz manje prometne ulice. Soba je bila tiha, mada bi kupatilo moglo da se osvezi.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Canaletto Venice'),
+ 3, 'Boravak je bio prijatan i lokacija je vrlo dobra za pesacke obilaske, ali je prostor delovao malo skuplje nego sto realno nudi. Ako je cilj centar Venecije bez mnogo komplikacija, hotel i dalje radi posao.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Bistrot de Venise'),
+ 5, 'Ovde se stvarno oseca da kuhinja ima identitet i da neko vodi racuna o detaljima, ne samo o prezentaciji. Usluga je bila mirna i profesionalna, bez onog osecaja da te ubrzavaju da oslobodis sto.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Bistrot de Venise'),
+ 4, 'Jela su bila vrlo dobra, posebno riba i vino uz veceru, ali cene su vise i to treba imati u vidu. Za jedno vece u Veneciji kada zelis ozbiljniji obrok, izbor je opravdan.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Davanzati Florence'),
+ 4, 'Hotel je prijatan i deluje toplije od klasicnih gradskih hotela, sto mi je posebno prijalo posle dugog dana po muzeju. Lokacija je jaka strana, a dorucak je bio sasvim korektan.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Davanzati Florence'),
+ 5, 'Osoblje je bilo zaista gostoljubivo i nekoliko sitnih preporuka za veceru nam je znacilo vise nego bilo koji turisticki vodic. Sve je bilo cisto, mirno i bez neprijatnih iznenadjenja.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'La Loggia Firenze'),
+ 3, 'Pogled je sjajan i vredan dolaska, ali su neka jela vise igrala na utisak nego na dubinu ukusa. Nije lose, samo treba ici sa idejom da placas i lokaciju i atmosferu.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'La Loggia Firenze'),
+ 5, 'Vece ovde je bilo jedno od najboljih u Firenci jer se dobar pogled uklopio sa opustenom uslugom i finim ritmom posluzenja. Nije mesto za brz obrok, ali za duzu veceru radi odlicno.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Moskva Belgrade'),
+ 5, 'Svidelo mi se sto hotel ima prepoznatljiv karakter i ne deluje kao bilo koji moderan lanac bez identiteta. Lokacija je odlicna za peske i za dnevni obilazak i za vecernji povratak.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Moskva Belgrade'),
+ 4, 'Soba je bila uredna i mirna, a osoblje profesionalno, ali je ceo dozivljaj vise klasicno gradski nego luksuzan. Ipak, zbog lokacije i atmosfere bih ga opet uzeo za kraci boravak.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Frans Beograd'),
+ 4, 'Jelovnik je sirok i lako je naci nesto i za ljude koji vole klasiku i za one koji hoce laksi obrok. Usluga je bila dobra, samo je terasa bila dosta puna pa je ritam malo usporio.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Frans Beograd'),
+ 3, 'Hrana je korektna i porcije su ozbiljne, ali mesto vise volim za duze sedenje i drustvo nego za nesto posebno gastronomsko. Ako neko ocekuje mirniji restoran, guzva moze malo da zasmeta.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Pupin Novi Sad'),
+ 5, 'Hotel je uredan, moderan i vrlo praktican kada hoces da budes blizu glavnog trga i pesacke zone. Posebno mi je znacilo sto sve deluje novo i dobro organizovano bez nepotrebne pompe.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Pupin Novi Sad'),
+ 4, 'Lokacija je jaka strana, a dorucak i prijava su prosli bez problema. Jedino je pogled iz sobe bio manje zanimljiv nego sto sam ocekivala po fotografijama.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kalem by Zak Novi Sad'),
+ 5, 'Mesto ima fin balans izmedju ozbiljnog rucka i opustenije gradske energije, pa je lako ostati duze nego sto planiras. Hrana nije bila teska, a kokteli su bili iznad ocekivanja.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kalem by Zak Novi Sad'),
+ 4, 'Ambijent je vrlo prijatan i lokacija zgodna kada si vec u centru, a meni ima dovoljno izbora da grupa lako nadje zajednicki termin. Cene nisu najnize, ali servis je bio uredan i brz.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Zlatibor Mountain Resort'),
+ 3, 'Hotel ima dosta sadrzaja i dobra je baza za kraci odmor, ali u spicu se oseca da kroz zajednicke prostore prolazi veliki broj gostiju. Kada je cilj prakticnost i spa, to ne mora da bude problem.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Zlatibor Mountain Resort'),
+ 4, 'Spa i lokacija u centru su mi bili najveci plus, a osoblje je bilo vrlo korektno kada smo trazili kasniji check-out. Dobar je izbor ako zelis da sve bude na jednom mestu.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lobby Bar Zlatibor'),
+ 2, 'Pice je bilo okej, ali je usluga tog dana bila sporija nego sto sam ocekivao, a muzika je bila glasnija nego sto prija kada hoces samo kratku pauzu. Za opusten razgovor nisam uhvatio pravi termin.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lobby Bar Zlatibor'),
+ 4, 'Kad smo svratili ranije popodne atmosfera je bila dosta prijatnija i mesto je lepo leglo za kratki predah posle setnje. Karta pica je solidna, a prostor deluje moderno i uredno.', 'Approved', NOW());
+
+-- 15.7 ITALIJA + SRBIJA IMAGES - DESTINACIJE
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
+VALUES
+('https://commons.wikimedia.org/wiki/Special:FilePath/Rome%20Montage%202017.png', 'Rome', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rome'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Venice', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Venice'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'Florence', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Florence'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Belgrade', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Belgrade'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Novi Sad', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Novi Sad'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Zlatibor', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'), NOW());
+
+-- 15.8 ITALIJA + SRBIJA IMAGES - LOKALITETI
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
+VALUES
+('https://commons.wikimedia.org/wiki/Special:FilePath/Roma%20Trastevere.jpg', 'Trastevere Rome', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trastevere Rome'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Colosseum%20%28Rome%29.jpg', 'Colosseum District', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Colosseum District'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Piazza%20San%20Marco%2C%20Venice.jpg', 'San Marco Venice', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'San Marco Venice'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Grand Canal Venice', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Grand Canal Venice'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'Duomo Florence', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Duomo Florence'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Ponte%20vecchio.jpg', 'Ponte Vecchio Florence', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ponte Vecchio Florence'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Terazije Belgrade', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Terazije Belgrade'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Kalemegdan Belgrade', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kalemegdan Belgrade'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Trg Slobode Novi Sad', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode Novi Sad'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Petrovaradin.jpg', 'Petrovaradin Fortress', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Petrovaradin Fortress'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Kraljev Trg Zlatibor', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kraljev Trg Zlatibor'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Planina%20Zlatibor.JPG', 'Tornik Viewpoint', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik Viewpoint'), NOW());
+
+-- 15.9 ITALIJA + SRBIJA IMAGES - OBJEKTI
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
+VALUES
+('https://commons.wikimedia.org/wiki/Special:FilePath/Colosseum%20%28Rome%29.jpg', 'Hotel Artemide Rome', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Artemide Rome'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Roma%20Trastevere.jpg', 'Rione 13 Trastevere', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rione 13 Trastevere'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Piazza%20San%20Marco%2C%20Venice.jpg', 'Hotel Canaletto Venice', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Canaletto Venice'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Bistrot de Venise', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Bistrot de Venise'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Ponte%20vecchio.jpg', 'Hotel Davanzati Florence', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Davanzati Florence'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'La Loggia Firenze', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'La Loggia Firenze'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Hotel Moskva Belgrade', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Moskva Belgrade'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Restoran Frans Beograd', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Frans Beograd'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Hotel Pupin Novi Sad', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Pupin Novi Sad'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Kalem by Zak Novi Sad', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kalem by Zak Novi Sad'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Hotel Zlatibor Mountain Resort', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Zlatibor Mountain Resort'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Lobby Bar Zlatibor', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lobby Bar Zlatibor'), NOW());
+
+-- 15.10 ITALIJA + SRBIJA IMAGES - EVENTI
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
+VALUES
+('https://commons.wikimedia.org/wiki/Special:FilePath/Roma%20Trastevere.jpg', 'Rome Piazza Music Evening', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Rome Piazza Music Evening'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Venice Lagoon Taste Week', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Venice Lagoon Taste Week'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'Florence Artisan Evenings', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Florence Artisan Evenings'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Belgrade Coffee and Jazz Night', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Belgrade Coffee and Jazz Night'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Novi Sad Gourmet Weekend', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Novi Sad Gourmet Weekend'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Zlatibor Mountain Taste Days', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Zlatibor Mountain Taste Days'), NOW());
+
+-- 15.11 ITALIJA + SRBIJA IMAGES - AKTIVNOSTI
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
+VALUES
+('https://commons.wikimedia.org/wiki/Special:FilePath/Roma%20Trastevere.jpg', 'Trastevere Food Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Trastevere Food Walk'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Grand Canal Evening Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Grand Canal Evening Walk'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Ponte%20vecchio.jpg', 'Florence Sunset View Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Florence Sunset View Walk'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Belgrade Fortress Sunset Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Belgrade Fortress Sunset Walk'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Petrovaradin.jpg', 'Petrovaradin Fortress Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Petrovaradin Fortress Walk'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Planina%20Zlatibor.JPG', 'Zlatibor Panorama Ride', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Zlatibor Panorama Ride'), NOW());
+
 
     
 -- ============================================
