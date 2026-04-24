@@ -3847,7 +3847,7 @@ VALUES
 -- 15.7 ITALIJA + SRBIJA IMAGES - DESTINACIJE
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 VALUES
-('https://commons.wikimedia.org/wiki/Special:FilePath/Rome%20Montage%202017.png', 'Rome', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rome'), NOW()),
+('https://i0.wp.com/media1.lepojeziveti.com/2018/04/vitorrio-emanuelle-panorama.jpg', 'Rome', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rome'), NOW()),
 ('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Venice', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Venice'), NOW()),
 ('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'Florence', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Florence'), NOW()),
 ('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Belgrade', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Belgrade'), NOW()),

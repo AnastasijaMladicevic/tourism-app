@@ -1,0 +1,317 @@
+using System.Data;
+using System.Data.Common;
+using System.Security.Cryptography;
+using System.Text;
+
+namespace TuristickiVodic.API.Infrastructure;
+
+public static class SeedSqlExecutor
+{
+    public static bool HasHistory(DbConnection connection)
+    {
+        EnsureHistoryTable(connection);
+
+        using var command = connection.CreateCommand();
+        command.CommandText = """SELECT EXISTS (SELECT 1 FROM "__SeedStatementHistory" LIMIT 1);""";
+        var result = command.ExecuteScalar();
+        return result is bool value && value;
+    }
+
+    public static void SyncHistory(DbConnection connection, string sql, string sourceFile)
+    {
+        EnsureHistoryTable(connection);
+
+        foreach (var statement in SplitStatements(sql))
+        {
+            InsertHistory(connection, ComputeHash(statement), sourceFile);
+        }
+    }
+
+    public static int ApplyNewStatements(DbConnection connection, string sql, string sourceFile)
+    {
+        EnsureHistoryTable(connection);
+
+        var appliedCount = 0;
+        var knownHashes = LoadKnownHashes(connection);
+
+        foreach (var statement in SplitStatements(sql))
+        {
+            var hash = ComputeHash(statement);
+            if (knownHashes.Contains(hash))
+            {
+                continue;
+            }
+
+            using var command = connection.CreateCommand();
+            command.CommandText = statement;
+            command.ExecuteNonQuery();
+
+            InsertHistory(connection, hash, sourceFile);
+            knownHashes.Add(hash);
+            appliedCount++;
+        }
+
+        return appliedCount;
+    }
+
+    private static void EnsureHistoryTable(DbConnection connection)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText =
+            """
+            CREATE TABLE IF NOT EXISTS "__SeedStatementHistory" (
+                "Hash" text PRIMARY KEY,
+                "SourceFile" text NOT NULL,
+                "ExecutedAt" timestamp with time zone NOT NULL DEFAULT NOW()
+            );
+            """;
+        command.ExecuteNonQuery();
+    }
+
+    private static HashSet<string> LoadKnownHashes(DbConnection connection)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText = """SELECT "Hash" FROM "__SeedStatementHistory";""";
+
+        using var reader = command.ExecuteReader();
+        var hashes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        while (reader.Read())
+        {
+            hashes.Add(reader.GetString(0));
+        }
+
+        return hashes;
+    }
+
+    private static void InsertHistory(DbConnection connection, string hash, string sourceFile)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText =
+            """
+            INSERT INTO "__SeedStatementHistory" ("Hash", "SourceFile")
+            VALUES (@hash, @sourceFile)
+            ON CONFLICT ("Hash") DO NOTHING;
+            """;
+
+        var hashParam = command.CreateParameter();
+        hashParam.ParameterName = "@hash";
+        hashParam.DbType = DbType.String;
+        hashParam.Value = hash;
+        command.Parameters.Add(hashParam);
+
+        var sourceParam = command.CreateParameter();
+        sourceParam.ParameterName = "@sourceFile";
+        sourceParam.DbType = DbType.String;
+        sourceParam.Value = sourceFile;
+        command.Parameters.Add(sourceParam);
+
+        command.ExecuteNonQuery();
+    }
+
+    private static string ComputeHash(string statement)
+    {
+        var normalized = statement.Trim();
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(normalized));
+        return Convert.ToHexString(bytes);
+    }
+
+    private static IReadOnlyList<string> SplitStatements(string sql)
+    {
+        var statements = new List<string>();
+        var current = new StringBuilder();
+
+        var inSingleQuote = false;
+        var inDoubleQuote = false;
+        var inLineComment = false;
+        var inBlockComment = false;
+        string? dollarQuoteTag = null;
+
+        for (var i = 0; i < sql.Length; i++)
+        {
+            var c = sql[i];
+            var next = i + 1 < sql.Length ? sql[i + 1] : '\0';
+
+            if (inLineComment)
+            {
+                current.Append(c);
+                if (c == '\n')
+                {
+                    inLineComment = false;
+                }
+
+                continue;
+            }
+
+            if (inBlockComment)
+            {
+                current.Append(c);
+                if (c == '*' && next == '/')
+                {
+                    current.Append(next);
+                    i++;
+                    inBlockComment = false;
+                }
+
+                continue;
+            }
+
+            if (dollarQuoteTag is not null)
+            {
+                if (StartsWith(sql, i, dollarQuoteTag))
+                {
+                    current.Append(dollarQuoteTag);
+                    i += dollarQuoteTag.Length - 1;
+                    dollarQuoteTag = null;
+                }
+                else
+                {
+                    current.Append(c);
+                }
+
+                continue;
+            }
+
+            if (inSingleQuote)
+            {
+                current.Append(c);
+                if (c == '\'')
+                {
+                    if (next == '\'')
+                    {
+                        current.Append(next);
+                        i++;
+                    }
+                    else
+                    {
+                        inSingleQuote = false;
+                    }
+                }
+
+                continue;
+            }
+
+            if (inDoubleQuote)
+            {
+                current.Append(c);
+                if (c == '"')
+                {
+                    inDoubleQuote = false;
+                }
+
+                continue;
+            }
+
+            if (c == '-' && next == '-')
+            {
+                current.Append(c);
+                current.Append(next);
+                i++;
+                inLineComment = true;
+                continue;
+            }
+
+            if (c == '/' && next == '*')
+            {
+                current.Append(c);
+                current.Append(next);
+                i++;
+                inBlockComment = true;
+                continue;
+            }
+
+            if (c == '\'')
+            {
+                current.Append(c);
+                inSingleQuote = true;
+                continue;
+            }
+
+            if (c == '"')
+            {
+                current.Append(c);
+                inDoubleQuote = true;
+                continue;
+            }
+
+            if (c == '$')
+            {
+                var tag = TryReadDollarQuoteTag(sql, i);
+                if (tag is not null)
+                {
+                    current.Append(tag);
+                    i += tag.Length - 1;
+                    dollarQuoteTag = tag;
+                    continue;
+                }
+            }
+
+            if (c == ';')
+            {
+                var statement = current.ToString().Trim();
+                if (!string.IsNullOrWhiteSpace(statement))
+                {
+                    statements.Add(statement);
+                }
+
+                current.Clear();
+                continue;
+            }
+
+            current.Append(c);
+        }
+
+        var trailingStatement = current.ToString().Trim();
+        if (!string.IsNullOrWhiteSpace(trailingStatement))
+        {
+            statements.Add(trailingStatement);
+        }
+
+        return statements;
+    }
+
+    private static bool StartsWith(string value, int startIndex, string token)
+    {
+        if (startIndex + token.Length > value.Length)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < token.Length; i++)
+        {
+            if (value[startIndex + i] != token[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static string? TryReadDollarQuoteTag(string sql, int startIndex)
+    {
+        if (sql[startIndex] != '$')
+        {
+            return null;
+        }
+
+        var endIndex = startIndex + 1;
+        while (endIndex < sql.Length)
+        {
+            var c = sql[endIndex];
+            if (c == '$')
+            {
+                return sql[startIndex..(endIndex + 1)];
+            }
+
+            if (!(char.IsLetterOrDigit(c) || c == '_'))
+            {
+                return null;
+            }
+
+            endIndex++;
+        }
+
+        return null;
+    }
+}

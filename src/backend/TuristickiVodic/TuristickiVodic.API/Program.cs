@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Claims;
 using System.Text;
+using TuristickiVodic.API.Infrastructure;
 using TuristickiVodic.Infrastructure.Data;
 using TuristickiVodic.Services;
 using TuristickiVodic.Services.Services;
@@ -194,6 +195,8 @@ using (var scope = app.Services.CreateScope())
         app.Configuration.GetValue<bool>("SeedData:RunOnStartup");
     var seedIfDatabaseEmpty = app.Configuration.GetValue<bool?>("SeedData:SeedIfDatabaseEmpty")
         ?? app.Environment.IsDevelopment();
+    var applyIncrementalSeedOnStartup = app.Configuration.GetValue<bool?>("SeedData:ApplyIncrementalSeedOnStartup")
+        ?? app.Environment.IsDevelopment();
     // Earlier data-only migrations can insert support users even on a fresh database.
     // Treat the database as empty until actual tourism content exists, so seed.sql still runs.
     var databaseIsEffectivelyEmpty =
@@ -236,7 +239,46 @@ using (var scope = app.Services.CreateScope())
             command.CommandText = sql;
             command.ExecuteNonQuery();
 
+            SeedSqlExecutor.SyncHistory(connection, sql, seedFilePath);
             Console.WriteLine("seed.sql executed successfully.");
+        }
+        else
+        {
+            Console.WriteLine("seed.sql NOT FOUND.");
+        }
+    }
+    else if (applyIncrementalSeedOnStartup)
+    {
+        var configuredSeedFilePath = app.Configuration["SeedData:FilePath"];
+
+        var solutionRoot = Path.GetFullPath(
+            Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..")
+        );
+
+        var seedFilePath = !string.IsNullOrWhiteSpace(configuredSeedFilePath)
+            ? configuredSeedFilePath
+            : Path.Combine(solutionRoot, "baza", "seed.sql");
+
+        if (File.Exists(seedFilePath))
+        {
+            var sql = File.ReadAllText(seedFilePath);
+            var connection = db.Database.GetDbConnection();
+
+            if (connection.State != System.Data.ConnectionState.Open)
+                connection.Open();
+
+            if (!SeedSqlExecutor.HasHistory(connection))
+            {
+                SeedSqlExecutor.SyncHistory(connection, sql, seedFilePath);
+                Console.WriteLine("Seed history initialized from current seed.sql. Future appended SQL blocks will apply automatically.");
+            }
+            else
+            {
+                var appliedStatements = SeedSqlExecutor.ApplyNewStatements(connection, sql, seedFilePath);
+                Console.WriteLine(appliedStatements > 0
+                    ? $"Applied {appliedStatements} new seed.sql statement(s) to the existing database."
+                    : "No new seed.sql statements detected for the existing database.");
+            }
         }
         else
         {
