@@ -7,6 +7,7 @@ import { ActiveRegionService, RegionRequestOptions } from './active-region';
 export interface DestinationDto {
   id: number;
   name: string;
+  displayTitle?: string;
   description?: string;
   mainImageUrl?: string;
   latitude?: number;
@@ -45,6 +46,7 @@ export interface DestinationQueryParams {
 
 export interface CreateDestinationDto {
   name: string;
+  displayTitle?: string;
   description?: string;
   latitude?: number;
   longitude?: number;
@@ -55,6 +57,7 @@ export interface CreateDestinationDto {
 
 export interface UpdateDestinationDto {
   name?: string;
+  displayTitle?: string;
   description?: string;
   latitude?: number;
   longitude?: number;

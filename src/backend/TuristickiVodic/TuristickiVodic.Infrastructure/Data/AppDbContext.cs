@@ -117,6 +117,10 @@ public class AppDbContext : DbContext
             .HasDefaultValue(1);
 
         mb.Entity<Destination>()
+            .Property(d => d.DisplayTitle)
+            .HasMaxLength(250);
+
+        mb.Entity<Destination>()
             .HasIndex(d => d.Geolocation)
             .HasMethod("GIST");
 

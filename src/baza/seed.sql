@@ -231,7 +231,7 @@ VALUES
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 ('Anastasia', 'Georgiou', '1998-05-11', 'anastasia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Grcka', 'el', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Luka', 'Petrovic', '1995-11-22', 'luka.greece.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+('Luka', 'Petrovic', '1995-11-22', 'luka.greece.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Grcka', 'el', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
  ('Lucia', 'Romero', '1988-05-14', 'lucia.admin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000001', 'Spanija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
@@ -409,34 +409,34 @@ FROM manager_assignments m
 WHERE u."Id" = m.manager_id;
 
 INSERT INTO "Destinations"
-("Name", "Description", "Geolocation", "Status", "IsActive", "DestinationTypeId", "RegionId", "CreatedByUserId", "ManagedByUserId", "CreatedAt", "UpdatedAt")
+("Name", "DisplayTitle", "Description", "Geolocation", "Status", "IsActive", "DestinationTypeId", "RegionId", "CreatedByUserId", "ManagedByUserId", "CreatedAt", "UpdatedAt")
 VALUES
 
-('Athens', 'Atina je glavni grad Grcke i jedno od najvaznijih istorijskih sredista Evrope. Grad spaja anticke hramove, zive trgove, muzeje, moderne restorane i kvartove pune malih kafica i galerija. Najpoznatija je po Akropolju, ali pravi dozivljaj Atine nalazi se i u setnji kroz Plaku, Monastiraki i u vecernjem pogledu na osvetljene anticke spomenike. Atina je idealna za putnike koji vole istoriju, kulturu, hranu i urbani ritam grada koji se ne zaustavlja ni nocu.',
+('Athens', 'Anticka istorija, gradski ritam i pogled na Akropolj', 'Atina je glavni grad Grcke i jedno od najvaznijih istorijskih sredista Evrope. Grad spaja anticke hramove, zive trgove, muzeje, moderne restorane i kvartove pune malih kafica i galerija. Najpoznatija je po Akropolju, ali pravi dozivljaj Atine nalazi se i u setnji kroz Plaku, Monastiraki i u vecernjem pogledu na osvetljene anticke spomenike. Atina je idealna za putnike koji vole istoriju, kulturu, hranu i urbani ritam grada koji se ne zaustavlja ni nocu.',
  ST_SetSRID(ST_MakePoint(23.7275, 37.9838), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NULL, NOW(), NOW()),
 
-('Santorini', 'Santorini je ostrvo poznato po belim kucama, plavim kupolama, vulkanskim liticama i zalascima sunca koji privlace posetioce iz celog sveta. Pored popularnih vidikovaca u Oiji i Firi, ostrvo nudi vinarije, male luke, plaze tamnog peska i mirnije delove idealne za duze setnje. Santorini je posebno zanimljiv za parove, fotografe i sve koji zele kombinaciju luksuza, prirode i tradicionalne kikladske arhitekture.',
+('Santorini', 'Bela sela, kaldera i zalasci sunca iznad mora', 'Santorini je ostrvo poznato po belim kucama, plavim kupolama, vulkanskim liticama i zalascima sunca koji privlace posetioce iz celog sveta. Pored popularnih vidikovaca u Oiji i Firi, ostrvo nudi vinarije, male luke, plaze tamnog peska i mirnije delove idealne za duze setnje. Santorini je posebno zanimljiv za parove, fotografe i sve koji zele kombinaciju luksuza, prirode i tradicionalne kikladske arhitekture.',
  ST_SetSRID(ST_MakePoint(25.4615, 36.3932), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ostrvo'),
  (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NULL, NOW(), NOW()),
 
-('Crete', 'Krit je najvece grcko ostrvo i destinacija koja nudi mnogo vise od klasicnog letovanja. Na ostrvu se smenjuju venecijanski stari gradovi, planinska sela, arheoloska nalazista, tirkizne plaze i restorani sa jednom od najpoznatijih mediteranskih kuhinja. Krit je dobar izbor za porodice, avanturiste i putnike koji zele da istovremeno obidju gradove, prirodu i tradicionalna mesta sa lokalnom atmosferom.',
+('Crete', 'Veliko ostrvo sa plazama, lukama i lokalnim ukusima', 'Krit je najvece grcko ostrvo i destinacija koja nudi mnogo vise od klasicnog letovanja. Na ostrvu se smenjuju venecijanski stari gradovi, planinska sela, arheoloska nalazista, tirkizne plaze i restorani sa jednom od najpoznatijih mediteranskih kuhinja. Krit je dobar izbor za porodice, avanturiste i putnike koji zele da istovremeno obidju gradove, prirodu i tradicionalna mesta sa lokalnom atmosferom.',
  ST_SetSRID(ST_MakePoint(24.8093, 35.2401), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ostrvo'),
  (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NULL, NOW(), NOW()),
 
-('Rhodes', 'Rodos je ostrvo sa izuzetno bogatom istorijom, srednjovekovnim zidinama, starim ulicama i obalom koja nudi veliki izbor plaza. Stari grad Rodosa ima atmosferu muzeja na otvorenom, dok Lindos pruza prepoznatljiv spoj belih kuca, akropolja i zaliva. Destinacija je pogodna za one koji zele da kombinuju kulturu, kupanje, izlete brodom i opustene veceri u tavernama.',
+('Rhodes', 'Srednjovekovne ulice, tvrdjave i svetle uvale', 'Rodos je ostrvo sa izuzetno bogatom istorijom, srednjovekovnim zidinama, starim ulicama i obalom koja nudi veliki izbor plaza. Stari grad Rodosa ima atmosferu muzeja na otvorenom, dok Lindos pruza prepoznatljiv spoj belih kuca, akropolja i zaliva. Destinacija je pogodna za one koji zele da kombinuju kulturu, kupanje, izlete brodom i opustene veceri u tavernama.',
  ST_SetSRID(ST_MakePoint(28.2278, 36.4341), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ostrvo'),
  (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NULL, NOW(), NOW()),
 
-('Corfu', 'Krf je zeleno jonsko ostrvo poznato po venecijanskom uticaju, starom gradu, maslinjacima i uvalama koje menjaju boju tokom dana. Ostrvo ima mirnije plaze, zivlje turisticke zone i kulturne tacke koje podsecaju na dugu istoriju susreta razlicitih civilizacija. Krf je lep izbor za putnike koji vole kombinaciju prirode, arhitekture, setalista i opustenih restorana uz more.',
+('Corfu', 'Venecijanske fasade, zelenilo i jonske uvale', 'Krf je zeleno jonsko ostrvo poznato po venecijanskom uticaju, starom gradu, maslinjacima i uvalama koje menjaju boju tokom dana. Ostrvo ima mirnije plaze, zivlje turisticke zone i kulturne tacke koje podsecaju na dugu istoriju susreta razlicitih civilizacija. Krf je lep izbor za putnike koji vole kombinaciju prirode, arhitekture, setalista i opustenih restorana uz more.',
  ST_SetSRID(ST_MakePoint(19.9217, 39.6243), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ostrvo'),
  (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
@@ -1419,71 +1419,71 @@ VALUES
 -- ============================================
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 VALUES
-('https://source.unsplash.com/1200x800/?athens,greece,acropolis', 'Athens', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'), NOW()),
-('https://source.unsplash.com/1200x800/?athens,plaka,greece', 'Athens', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'), NOW()),
-('https://source.unsplash.com/1200x800/?santorini,oia,greece', 'Santorini', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'), NOW()),
-('https://source.unsplash.com/1200x800/?santorini,caldera', 'Santorini', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'), NOW()),
-('https://source.unsplash.com/1200x800/?crete,chania,greece', 'Crete', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'), NOW()),
-('https://source.unsplash.com/1200x800/?crete,beach,greece', 'Crete', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'), NOW()),
-('https://source.unsplash.com/1200x800/?rhodes,greece,old-town', 'Rhodes', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'), NOW()),
-('https://source.unsplash.com/1200x800/?rhodes,lindos,greece', 'Rhodes', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'), NOW()),
-('https://source.unsplash.com/1200x800/?corfu,greece,old-town', 'Corfu', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'), NOW()),
-('https://source.unsplash.com/1200x800/?corfu,paleokastritsa', 'Corfu', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'), NOW());
+('https://images.unsplash.com/photo-QEG8VZiL6ZY?auto=format&fit=crop&w=1200&q=80', 'Athens', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'), NOW()),
+('https://images.unsplash.com/photo-Zg6ONyndHUs?auto=format&fit=crop&w=1200&q=80', 'Athens', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'), NOW()),
+('https://images.unsplash.com/photo-ReKxstaml64?auto=format&fit=crop&w=1200&q=80', 'Santorini', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'), NOW()),
+('https://images.unsplash.com/photo-43xyqHpv-wo?auto=format&fit=crop&w=1200&q=80', 'Santorini', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'), NOW()),
+('https://images.unsplash.com/photo-3MYSN2Rmsy8?auto=format&fit=crop&w=1200&q=80', 'Crete', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'), NOW()),
+('https://images.unsplash.com/photo-Kpvlf_5LH2g?auto=format&fit=crop&w=1200&q=80', 'Crete', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'), NOW()),
+('https://images.unsplash.com/photo-ekHPI4AasQ4?auto=format&fit=crop&w=1200&q=80', 'Rhodes', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'), NOW()),
+('https://images.unsplash.com/photo-aMf02DjwvHk?auto=format&fit=crop&w=1200&q=80', 'Rhodes', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'), NOW()),
+('https://images.unsplash.com/photo-TPINQdPbxSw?auto=format&fit=crop&w=1200&q=80', 'Corfu', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'), NOW()),
+('https://images.unsplash.com/photo-9l5c5GEUkmM?auto=format&fit=crop&w=1200&q=80', 'Corfu', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'), NOW());
 
 -- 15.9 IMAGES - LOCALITIES
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 VALUES
-('https://source.unsplash.com/1200x800/?plaka,athens', 'Plaka Athens', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaka Athens'), NOW()),
-('https://source.unsplash.com/1200x800/?acropolis,athens', 'Acropolis Hill', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Acropolis Hill'), NOW()),
-('https://source.unsplash.com/1200x800/?oia,santorini', 'Oia Santorini', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Oia Santorini'), NOW()),
-('https://source.unsplash.com/1200x800/?fira,santorini', 'Fira Santorini', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Fira Santorini'), NOW()),
-('https://source.unsplash.com/1200x800/?chania,crete,old-town', 'Chania Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Chania Old Town'), NOW()),
-('https://source.unsplash.com/1200x800/?elafonisi,crete', 'Elafonisi Beach', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Elafonisi Beach'), NOW()),
-('https://source.unsplash.com/1200x800/?rhodes,old-town', 'Rhodes Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rhodes Old Town'), NOW()),
-('https://source.unsplash.com/1200x800/?lindos,rhodes,bay', 'Lindos Bay', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Lindos Bay'), NOW()),
-('https://source.unsplash.com/1200x800/?corfu,old-town', 'Corfu Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Corfu Old Town'), NOW()),
-('https://source.unsplash.com/1200x800/?paleokastritsa,corfu', 'Paleokastritsa', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Paleokastritsa'), NOW());
+('https://images.unsplash.com/photo-v4kApMw3gRg?auto=format&fit=crop&w=1200&q=80', 'Plaka Athens', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaka Athens'), NOW()),
+('https://images.unsplash.com/photo-QEG8VZiL6ZY?auto=format&fit=crop&w=1200&q=80', 'Acropolis Hill', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Acropolis Hill'), NOW()),
+('https://images.unsplash.com/photo-D_RunLbrt4M?auto=format&fit=crop&w=1200&q=80', 'Oia Santorini', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Oia Santorini'), NOW()),
+('https://images.unsplash.com/photo-yfU0jIj-VQI?auto=format&fit=crop&w=1200&q=80', 'Fira Santorini', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Fira Santorini'), NOW()),
+('https://images.unsplash.com/photo-OEEGwOM5oMI?auto=format&fit=crop&w=1200&q=80', 'Chania Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Chania Old Town'), NOW()),
+('https://images.unsplash.com/photo-5zlWuHjPREo?auto=format&fit=crop&w=1200&q=80', 'Elafonisi Beach', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Elafonisi Beach'), NOW()),
+('https://images.unsplash.com/photo-Ad-Zb6nS4j8?auto=format&fit=crop&w=1200&q=80', 'Rhodes Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rhodes Old Town'), NOW()),
+('https://images.unsplash.com/photo-pSYOjfuAQDg?auto=format&fit=crop&w=1200&q=80', 'Lindos Bay', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Lindos Bay'), NOW()),
+('https://images.unsplash.com/photo-9l5c5GEUkmM?auto=format&fit=crop&w=1200&q=80', 'Corfu Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Corfu Old Town'), NOW()),
+('https://images.unsplash.com/photo-3ttu3CB1-WE?auto=format&fit=crop&w=1200&q=80', 'Paleokastritsa', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Paleokastritsa'), NOW());
 
 -- 15.10 IMAGES - OBJECTS
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 VALUES
-('https://source.unsplash.com/1200x800/?athens,hotel,rooftop', 'Hotel Acropolis View Athens', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Acropolis View Athens'), NOW()),
-('https://source.unsplash.com/1200x800/?hotel,room,athens', 'Hotel Acropolis View Athens', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Acropolis View Athens'), NOW()),
-('https://source.unsplash.com/1200x800/?greek,taverna,athens', 'Plaka Garden Taverna', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaka Garden Taverna'), NOW()),
-('https://source.unsplash.com/1200x800/?greek,food,taverna', 'Plaka Garden Taverna', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaka Garden Taverna'), NOW()),
-('https://source.unsplash.com/1200x800/?museum,greece,art', 'Museum of Cycladic Culture Athens', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Museum of Cycladic Culture Athens'), NOW()),
-('https://source.unsplash.com/1200x800/?santorini,hotel,caldera', 'Oia Caldera Suites', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oia Caldera Suites'), NOW()),
-('https://source.unsplash.com/1200x800/?santorini,suite,terrace', 'Oia Caldera Suites', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oia Caldera Suites'), NOW()),
-('https://source.unsplash.com/1200x800/?santorini,wine,bar', 'Fira Sunset Wine Bar', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Fira Sunset Wine Bar'), NOW()),
-('https://source.unsplash.com/1200x800/?santorini,restaurant,seafood', 'Aegean Blue Restaurant', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aegean Blue Restaurant'), NOW()),
-('https://source.unsplash.com/1200x800/?chania,hotel,crete', 'Chania Harbor Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Chania Harbor Hotel'), NOW()),
-('https://source.unsplash.com/1200x800/?beach,cafe,crete', 'Elafonisi Beach Canteen', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Elafonisi Beach Canteen'), NOW()),
-('https://source.unsplash.com/1200x800/?rhodes,hotel,old-town', 'Rhodes Knight Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rhodes Knight Hotel'), NOW()),
-('https://source.unsplash.com/1200x800/?lindos,seafood,restaurant', 'Lindos Bay Seafood', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lindos Bay Seafood'), NOW()),
-('https://source.unsplash.com/1200x800/?corfu,boutique,hotel', 'Corfu Venetian Boutique Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Corfu Venetian Boutique Hotel'), NOW()),
-('https://source.unsplash.com/1200x800/?corfu,cafe,sea', 'Paleokastritsa View Cafe', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Paleokastritsa View Cafe'), NOW());
+('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80', 'Hotel Acropolis View Athens', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Acropolis View Athens'), NOW()),
+('https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=1200&q=80', 'Hotel Acropolis View Athens', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Acropolis View Athens'), NOW()),
+('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80', 'Plaka Garden Taverna', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaka Garden Taverna'), NOW()),
+('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1200&q=80', 'Plaka Garden Taverna', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaka Garden Taverna'), NOW()),
+('https://images.unsplash.com/photo-QEG8VZiL6ZY?auto=format&fit=crop&w=1200&q=80', 'Museum of Cycladic Culture Athens', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Museum of Cycladic Culture Athens'), NOW()),
+('https://images.unsplash.com/photo-ReKxstaml64?auto=format&fit=crop&w=1200&q=80', 'Oia Caldera Suites', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oia Caldera Suites'), NOW()),
+('https://images.unsplash.com/photo-43xyqHpv-wo?auto=format&fit=crop&w=1200&q=80', 'Oia Caldera Suites', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oia Caldera Suites'), NOW()),
+('https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1200&q=80', 'Fira Sunset Wine Bar', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Fira Sunset Wine Bar'), NOW()),
+('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80', 'Aegean Blue Restaurant', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aegean Blue Restaurant'), NOW()),
+('https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80', 'Chania Harbor Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Chania Harbor Hotel'), NOW()),
+('https://images.unsplash.com/photo-Kpvlf_5LH2g?auto=format&fit=crop&w=1200&q=80', 'Elafonisi Beach Canteen', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Elafonisi Beach Canteen'), NOW()),
+('https://images.unsplash.com/photo-1496417263034-38ec4f0b665a?auto=format&fit=crop&w=1200&q=80', 'Rhodes Knight Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rhodes Knight Hotel'), NOW()),
+('https://images.unsplash.com/photo-pSYOjfuAQDg?auto=format&fit=crop&w=1200&q=80', 'Lindos Bay Seafood', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lindos Bay Seafood'), NOW()),
+('https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80', 'Corfu Venetian Boutique Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Corfu Venetian Boutique Hotel'), NOW()),
+('https://images.unsplash.com/photo-n86ho7hWyJ8?auto=format&fit=crop&w=1200&q=80', 'Paleokastritsa View Cafe', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Paleokastritsa View Cafe'), NOW());
 
 -- 15.11 IMAGES - EVENTS
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 VALUES
-('https://source.unsplash.com/1200x800/?classical,music,concert', 'Athens Open Air Classics', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Athens Open Air Classics'), NOW()),
-('https://source.unsplash.com/1200x800/?wine,festival,santorini', 'Santorini Sunset Wine Festival', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Santorini Sunset Wine Festival'), NOW()),
-('https://source.unsplash.com/1200x800/?santorini,night,lights', 'Oia Summer Lights', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Oia Summer Lights'), NOW()),
-('https://source.unsplash.com/1200x800/?food,festival,crete', 'Chania Harbor Food Week', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Chania Harbor Food Week'), NOW()),
-('https://source.unsplash.com/1200x800/?medieval,festival,rhodes', 'Rhodes Medieval Night', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Rhodes Medieval Night'), NOW()),
-('https://source.unsplash.com/1200x800/?jazz,concert,old-town', 'Corfu Old Town Jazz Evening', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Corfu Old Town Jazz Evening'), NOW());
+('https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1200&q=80', 'Athens Open Air Classics', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Athens Open Air Classics'), NOW()),
+('https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80', 'Santorini Sunset Wine Festival', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Santorini Sunset Wine Festival'), NOW()),
+('https://images.unsplash.com/photo-43xyqHpv-wo?auto=format&fit=crop&w=1200&q=80', 'Oia Summer Lights', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Oia Summer Lights'), NOW()),
+('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80', 'Chania Harbor Food Week', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Chania Harbor Food Week'), NOW()),
+('https://images.unsplash.com/photo-Ad-Zb6nS4j8?auto=format&fit=crop&w=1200&q=80', 'Rhodes Medieval Night', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Rhodes Medieval Night'), NOW()),
+('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=80', 'Corfu Old Town Jazz Evening', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Corfu Old Town Jazz Evening'), NOW());
 
 -- 15.12 IMAGES - ACTIVITIES
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 VALUES
-('https://source.unsplash.com/1200x800/?athens,walking,tour', 'Athens History Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Athens History Walk'), NOW()),
-('https://source.unsplash.com/1200x800/?greek,dinner,taverna', 'Traditional Greek Dinner Plaka', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Traditional Greek Dinner Plaka'), NOW()),
-('https://source.unsplash.com/1200x800/?santorini,photography', 'Santorini Caldera Photo Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Santorini Caldera Photo Walk'), NOW()),
-('https://source.unsplash.com/1200x800/?santorini,wine,tasting', 'Santorini Wine Tasting', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Santorini Wine Tasting'), NOW()),
-('https://source.unsplash.com/1200x800/?chania,harbor,walk', 'Chania Old Harbor Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Chania Old Harbor Walk'), NOW()),
-('https://source.unsplash.com/1200x800/?elafonisi,beach,crete', 'Elafonisi Beach Day', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Elafonisi Beach Day'), NOW()),
-('https://source.unsplash.com/1200x800/?rhodes,medieval,street', 'Rhodes Medieval Tour', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Rhodes Medieval Tour'), NOW()),
-('https://source.unsplash.com/1200x800/?corfu,boat,sea', 'Paleokastritsa Boat Ride', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Paleokastritsa Boat Ride'), NOW());
+('https://images.unsplash.com/photo-v4kApMw3gRg?auto=format&fit=crop&w=1200&q=80', 'Athens History Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Athens History Walk'), NOW()),
+('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80', 'Traditional Greek Dinner Plaka', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Traditional Greek Dinner Plaka'), NOW()),
+('https://images.unsplash.com/photo-D_RunLbrt4M?auto=format&fit=crop&w=1200&q=80', 'Santorini Caldera Photo Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Santorini Caldera Photo Walk'), NOW()),
+('https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80', 'Santorini Wine Tasting', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Santorini Wine Tasting'), NOW()),
+('https://images.unsplash.com/photo-OEEGwOM5oMI?auto=format&fit=crop&w=1200&q=80', 'Chania Old Harbor Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Chania Old Harbor Walk'), NOW()),
+('https://images.unsplash.com/photo-Kpvlf_5LH2g?auto=format&fit=crop&w=1200&q=80', 'Elafonisi Beach Day', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Elafonisi Beach Day'), NOW()),
+('https://images.unsplash.com/photo-Ad-Zb6nS4j8?auto=format&fit=crop&w=1200&q=80', 'Rhodes Medieval Tour', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Rhodes Medieval Tour'), NOW()),
+('https://images.unsplash.com/photo-3ttu3CB1-WE?auto=format&fit=crop&w=1200&q=80', 'Paleokastritsa Boat Ride', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Paleokastritsa Boat Ride'), NOW());
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 VALUES

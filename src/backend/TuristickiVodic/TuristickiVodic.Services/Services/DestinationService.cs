@@ -155,6 +155,7 @@ namespace TuristickiVodic.Services
             var destination = new Destination
             {
                 Name = dto.Name,
+                DisplayTitle = string.IsNullOrWhiteSpace(dto.DisplayTitle) ? null : dto.DisplayTitle.Trim(),
                 Description = dto.Description,
                 Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
                 Status = ContentStatus.Approved,
@@ -217,6 +218,9 @@ namespace TuristickiVodic.Services
 
             if (!string.IsNullOrWhiteSpace(dto.Name))
                 destination.Name = dto.Name;
+
+            if (dto.DisplayTitle != null)
+                destination.DisplayTitle = string.IsNullOrWhiteSpace(dto.DisplayTitle) ? null : dto.DisplayTitle.Trim();
 
             if (dto.Description != null)
                 destination.Description = dto.Description;

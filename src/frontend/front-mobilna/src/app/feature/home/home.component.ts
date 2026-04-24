@@ -445,6 +445,7 @@ export class HomeComponent implements OnInit {
   private normalizeDestination(raw: DestinationDto): {
     id: number;
     name: string;
+    displayTitle?: string;
     description?: string;
     destinationTypeName: string;
     regionName?: string;
@@ -458,6 +459,7 @@ export class HomeComponent implements OnInit {
     return {
       id: Number(dto['id'] ?? dto['Id'] ?? 0),
       name: String(dto['name'] ?? dto['Name'] ?? ''),
+      displayTitle: (dto['displayTitle'] ?? dto['DisplayTitle'] ?? undefined) as string | undefined,
       description: (dto['description'] ?? dto['Description'] ?? undefined) as string | undefined,
       destinationTypeName: String(dto['destinationTypeName'] ?? dto['DestinationTypeName'] ?? ''),
       regionName: (dto['regionName'] ?? dto['RegionName'] ?? undefined) as string | undefined,
@@ -589,7 +591,10 @@ export class HomeComponent implements OnInit {
     return {
       id: destination.id,
       name: destination.name,
-      description: destination.description?.trim() || destination.destinationTypeName,
+      description:
+        destination.displayTitle?.trim() ||
+        destination.description?.trim() ||
+        destination.destinationTypeName,
       imageUrl: this.pickDestinationImage(destination),
     };
   }
