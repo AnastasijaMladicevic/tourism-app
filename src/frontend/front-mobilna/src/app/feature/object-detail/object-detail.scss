@@ -428,14 +428,14 @@ button:hover {
 }
 /* ====================== GALERIJA ====================== */
 .gallery-card {
-  padding: 20px 16px;
+  padding: 0px 16px 10px 16px;
 }
 
 .gallery-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .see-all-btn {
@@ -616,15 +616,22 @@ button:hover {
 }
 
 .nearby-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.nearby-list::-webkit-scrollbar {
+  display: none;
 }
 
 .nearby-item {
+  flex: 0 0 auto;
+  width: 320px;
   max-width: 320px;
-  width: 100%;
-  justify-self: start;
   overflow: hidden;
   background: transparent;
   box-shadow: none;
@@ -637,18 +644,19 @@ button:hover {
 }
 
 .nearby-item__image {
+  width: 320px;
   height: 146px;
   border-radius: 18px;
   overflow: hidden;
   background: linear-gradient(135deg, #dbeafe, #bfdbfe);
   margin-bottom: 10px;
+}
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+.nearby-item__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .nearby-item__placeholder {
@@ -658,50 +666,54 @@ button:hover {
   align-items: center;
   justify-content: center;
   color: rgba(255, 255, 255, 0.92);
+}
 
-  mat-icon {
-    width: 44px;
-    height: 44px;
-    font-size: 44px;
-  }
+.nearby-item__placeholder mat-icon {
+  width: 44px;
+  height: 44px;
+  font-size: 44px;
 }
 
 .nearby-item__body {
   padding: 0 2px;
+}
 
-  h3 {
-    margin: 0 0 4px;
-    font-size: 15px;
-    line-height: 1.2;
-    color: var(--emperor);
-    font-weight: 800;
-  }
+.nearby-item__body h3 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  line-height: 1.2;
+  color: var(--emperor);
+  font-weight: 800;
 }
 
 .nearby-item__location,
 .nearby-item__rating {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 6px;
   margin: 0;
   color: #7a7f89;
   font-size: 13px;
   line-height: 1.35;
-
-  mat-icon {
-    width: 14px;
-    height: 14px;
-    font-size: 14px;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
 }
 
 .nearby-item__location {
   margin-bottom: 4px;
 }
 
+.nearby-item__location mat-icon {
+  width: 14px;
+  height: 14px;
+  font-size: 14px;
+  flex-shrink: 0;
+  color: #e74c3c;
+}
+
 .nearby-item__rating mat-icon {
+  width: 14px;
+  height: 14px;
+  font-size: 14px;
+  flex-shrink: 0;
   color: #fbbf24;
 }
 

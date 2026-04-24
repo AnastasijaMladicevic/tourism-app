@@ -29,12 +29,14 @@
 /* Greeting */
 .greeting {
   padding: 4px 20px 16px;
+  display: flex;
 
   .greeting-sub {
     font-size: 13px;
     font-weight: 600;
     color: var(--text-gray);
     margin-bottom: 5px;
+    display: inline-block;
   }
 
   .greeting-name {
@@ -42,6 +44,7 @@
     font-weight: 800;
     color: var(--text-dark);
     letter-spacing: -0.3px;
+    display: inline-block;
   }
 }
 
