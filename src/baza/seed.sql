@@ -167,26 +167,16 @@ INSERT INTO "Users"
 VALUES
 ('Nikola', 'Nikolic', '1990-01-01', 'admin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-
 ('Marko', 'Jovanovic', '1992-05-15', 'marko@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269123456', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-
 ('Ana', 'Petrovic', '1995-03-20', 'ana@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269234567', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'ContentCreator'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-
 ('Ana', 'Anic', '1998-07-10', 'ana@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-
 ('Mila', 'Milic', '1997-04-12', 'mila@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-
 ('Ivan', 'Ivanic', '1996-09-03', 'ivan@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Crna Gora', 'sr', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
-
-INSERT INTO "Users"
-("FirstName", "LastName", "DateOfBirth", "Email", "PasswordHash", "PhoneNumber", "Country", "Language",
- "IsVerified", "IsActive", "IsBlacklisted", "HasRequestedCreatorRole", "RoleId", "ManagedDestinationId", "CreatedAt", "UpdatedAt", "ProfileImageUrl")
-VALUES
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 ('Jelena', 'Bokic', '1991-02-11', 'manager.kotorskizaliv@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000001', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 ('Ivana', 'Budimir', '1993-06-14', 'manager.budva@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000002', 'Crna Gora', 'sr', true, true, false, false,
@@ -220,7 +210,46 @@ VALUES
 ('Dusan', 'Miladinovic', '1988-01-08', 'manager.kolasin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000016', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 ('Andjela', 'Petrovic', '1994-03-13', 'manager.zabljak@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000017', 'Crna Gora', 'sr', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+ ('Maria', 'Papadopoulou', '1987-04-19', 'maria.admin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000001', 'Grcka', 'el', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Eleni', 'Nikolaou', '1991-08-12', 'eleni.creator@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000002', 'Grcka', 'el', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'ContentCreator'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Nikos', 'Andreou', '1989-01-23', 'manager.athens@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000003', 'Grcka', 'el', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Katerina', 'Vasiliou', '1990-06-17', 'manager.santorini@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000004', 'Grcka', 'el', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Giorgos', 'Dimitriou', '1988-10-05', 'manager.crete@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000005', 'Grcka', 'el', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Sofia', 'Markou', '1992-03-28', 'manager.rhodes@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000006', 'Grcka', 'el', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Andreas', 'Pappas', '1991-12-14', 'manager.corfu@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000007', 'Grcka', 'el', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Ioanna', 'Petrou', '1997-09-09', 'ioanna.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Grcka', 'el', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Dimitris', 'Kostas', '1996-02-20', 'dimitris.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Grcka', 'el', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Anastasia', 'Georgiou', '1998-05-11', 'anastasia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Grcka', 'el', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Luka', 'Petrovic', '1995-11-22', 'luka.greece.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+ ('Lucia', 'Romero', '1988-05-14', 'lucia.admin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000001', 'Spanija', 'es', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Carmen', 'Alvarez', '1992-09-08', 'carmen.creator@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000002', 'Spanija', 'es', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'ContentCreator'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Mateo', 'Garcia', '1990-02-11', 'manager.barcelona@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000003', 'Spanija', 'es', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Javier', 'Ortega', '1989-11-03', 'manager.madrid@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000004', 'Spanija', 'es', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Paula', 'Moreno', '1991-07-22', 'manager.valencia@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000005', 'Spanija', 'es', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Diego', 'Santos', '1996-04-18', 'diego.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Spanija', 'es', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Sofia', 'Marin', '1997-01-26', 'sofia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Spanija', 'es', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Elena', 'Ruiz', '1995-10-10', 'elena.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Spanija', 'es', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
+
 
 -- ============================================
 -- 4. DESTINATIONS
@@ -379,6 +408,74 @@ SET "ManagedDestinationId" = m.destination_id
 FROM manager_assignments m
 WHERE u."Id" = m.manager_id;
 
+INSERT INTO "Destinations"
+("Name", "Description", "Geolocation", "Status", "IsActive", "DestinationTypeId", "RegionId", "CreatedByUserId", "ManagedByUserId", "CreatedAt", "UpdatedAt")
+VALUES
+
+('Athens', 'Atina je glavni grad Grcke i jedno od najvaznijih istorijskih sredista Evrope. Grad spaja anticke hramove, zive trgove, muzeje, moderne restorane i kvartove pune malih kafica i galerija. Najpoznatija je po Akropolju, ali pravi dozivljaj Atine nalazi se i u setnji kroz Plaku, Monastiraki i u vecernjem pogledu na osvetljene anticke spomenike. Atina je idealna za putnike koji vole istoriju, kulturu, hranu i urbani ritam grada koji se ne zaustavlja ni nocu.',
+ ST_SetSRID(ST_MakePoint(23.7275, 37.9838), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NULL, NOW(), NOW()),
+
+('Santorini', 'Santorini je ostrvo poznato po belim kucama, plavim kupolama, vulkanskim liticama i zalascima sunca koji privlace posetioce iz celog sveta. Pored popularnih vidikovaca u Oiji i Firi, ostrvo nudi vinarije, male luke, plaze tamnog peska i mirnije delove idealne za duze setnje. Santorini je posebno zanimljiv za parove, fotografe i sve koji zele kombinaciju luksuza, prirode i tradicionalne kikladske arhitekture.',
+ ST_SetSRID(ST_MakePoint(25.4615, 36.3932), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ostrvo'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NULL, NOW(), NOW()),
+
+('Crete', 'Krit je najvece grcko ostrvo i destinacija koja nudi mnogo vise od klasicnog letovanja. Na ostrvu se smenjuju venecijanski stari gradovi, planinska sela, arheoloska nalazista, tirkizne plaze i restorani sa jednom od najpoznatijih mediteranskih kuhinja. Krit je dobar izbor za porodice, avanturiste i putnike koji zele da istovremeno obidju gradove, prirodu i tradicionalna mesta sa lokalnom atmosferom.',
+ ST_SetSRID(ST_MakePoint(24.8093, 35.2401), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ostrvo'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NULL, NOW(), NOW()),
+
+('Rhodes', 'Rodos je ostrvo sa izuzetno bogatom istorijom, srednjovekovnim zidinama, starim ulicama i obalom koja nudi veliki izbor plaza. Stari grad Rodosa ima atmosferu muzeja na otvorenom, dok Lindos pruza prepoznatljiv spoj belih kuca, akropolja i zaliva. Destinacija je pogodna za one koji zele da kombinuju kulturu, kupanje, izlete brodom i opustene veceri u tavernama.',
+ ST_SetSRID(ST_MakePoint(28.2278, 36.4341), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ostrvo'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NULL, NOW(), NOW()),
+
+('Corfu', 'Krf je zeleno jonsko ostrvo poznato po venecijanskom uticaju, starom gradu, maslinjacima i uvalama koje menjaju boju tokom dana. Ostrvo ima mirnije plaze, zivlje turisticke zone i kulturne tacke koje podsecaju na dugu istoriju susreta razlicitih civilizacija. Krf je lep izbor za putnike koji vole kombinaciju prirode, arhitekture, setalista i opustenih restorana uz more.',
+ ST_SetSRID(ST_MakePoint(19.9217, 39.6243), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ostrvo'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NULL, NOW(), NOW());
+
+WITH greece_manager_assignments AS (
+    SELECT d."Id" AS destination_id, u."Id" AS manager_id
+    FROM (VALUES
+        ('Athens', 'manager.athens@spirego.com'),
+        ('Santorini', 'manager.santorini@spirego.com'),
+        ('Crete', 'manager.crete@spirego.com'),
+        ('Rhodes', 'manager.rhodes@spirego.com'),
+        ('Corfu', 'manager.corfu@spirego.com')
+    ) AS map(destination_name, manager_email)
+    JOIN "Destinations" d ON d."Name" = map.destination_name
+    JOIN "Users" u ON u."Email" = map.manager_email
+)
+UPDATE "Destinations" d
+SET "ManagedByUserId" = m.manager_id
+FROM greece_manager_assignments m
+WHERE d."Id" = m.destination_id;
+
+WITH greece_manager_assignments AS (
+    SELECT d."Id" AS destination_id, u."Id" AS manager_id
+    FROM (VALUES
+        ('Athens', 'manager.athens@spirego.com'),
+        ('Santorini', 'manager.santorini@spirego.com'),
+        ('Crete', 'manager.crete@spirego.com'),
+        ('Rhodes', 'manager.rhodes@spirego.com'),
+        ('Corfu', 'manager.corfu@spirego.com')
+    ) AS map(destination_name, manager_email)
+    JOIN "Destinations" d ON d."Name" = map.destination_name
+    JOIN "Users" u ON u."Email" = map.manager_email
+)
+UPDATE "Users" u
+SET "ManagedDestinationId" = m.destination_id
+FROM greece_manager_assignments m
+WHERE u."Id" = m.manager_id;
+
 -- ============================================
 -- 5. LOCALITIES
 -- ============================================
@@ -491,6 +588,77 @@ WHERE l."DestinationId" = d."Id"
   AND d."ManagedByUserId" IS NOT NULL;
 
 
+INSERT INTO "Localities"
+("Name", "Description", "Geolocation", "IsActive", "DestinationId", "LocalityTypeId", "CreatedByUserId", "CreatedAt")
+VALUES
+('Plaka Athens', 'Plaka je jedan od najstarijih i najlepših kvartova Atine, smesten ispod Akropolja. Ulice su uske, pune taverni, malih radnji, stepenista, cvetnih balkona i mesta gde se istorija grada oseca u svakodnevnom ritmu.',
+ ST_SetSRID(ST_MakePoint(23.7294, 37.9715), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Stari Grad'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NOW()),
+
+('Acropolis Hill', 'Akropoljski brezuljak je najpoznatiji simbol Atine i mesto sa kojeg se pruza pogled na grad, antičke hramove i okolna brda. Ovaj lokalitet je posebno posecen ujutru i pred zalazak sunca kada svetlo naglasava mermerne stubove.',
+ ST_SetSRID(ST_MakePoint(23.7265, 37.9715), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NOW()),
+
+('Oia Santorini', 'Oia je najpoznatije mesto na Santoriniju, prepoznatljivo po belim kucama, plavim kupolama i uskim ulicama koje vode do vidikovaca nad kalderom. Najveca guzva je pred zalazak sunca, ali jutarnje setnje daju potpuno drugaciji i mirniji dozivljaj.',
+ ST_SetSRID(ST_MakePoint(25.3753, 36.4618), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Vidikovac'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NOW()),
+
+('Fira Santorini', 'Fira je zivo srediste Santorinija sa restoranima, kaficima, prodavnicama i pogledom na vulkansku kalderu. Odavde se lako organizuju izleti, obilasci vinarija i vecernje setnje uz ivicu litice.',
+ ST_SetSRID(ST_MakePoint(25.4300, 36.4167), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Turisticka Zona'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NOW()),
+
+('Chania Old Town', 'Stari grad Hanije na Kritu spaja venecijansku luku, uske ulice, trznice i male restorane uz more. Lokalitet je prijatan za setnju tokom celog dana, ali je najlepši uvece kada se svetla luke reflektuju u vodi.',
+ ST_SetSRID(ST_MakePoint(24.0170, 35.5170), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Stari Grad'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NOW()),
+
+('Elafonisi Beach', 'Elafonisi je plaza na zapadu Krita poznata po plitkoj vodi, svetlom pesku i ruzicastim nijansama obale. Najbolji dozivljaj je rano ujutru ili kasnije popodne, kada je manje guzve i kada boje mora dolaze do izrazaja.',
+ ST_SetSRID(ST_MakePoint(23.5407, 35.2716), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Plaza'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NOW()),
+
+('Rhodes Old Town', 'Stari grad Rodosa je utvrdjeno srednjovekovno jezgro sa kamenim ulicama, kapijama, trgovima i palatama. Prostor je veoma fotogenican i pogodan za obilazak peske, posebno za putnike koji vole istoriju i arhitekturu.',
+ ST_SetSRID(ST_MakePoint(28.2240, 36.4430), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Stari Grad'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NOW()),
+
+('Lindos Bay', 'Lindos Bay je obalna zona ispod belog sela Lindos, poznata po mirnijoj vodi, lepom pogledu na akropolj i restoranima u kojima se dan lako pretvara u lagano vecernje druzenje.',
+ ST_SetSRID(ST_MakePoint(28.0850, 36.0917), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Uvala'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NOW()),
+
+('Corfu Old Town', 'Stari grad Krfa je elegantna mesavina venecijanskih zgrada, trgova, arkada i uskih ulica. Lokalitet je odlican za setnju, kupovinu suvenira, kratke pauze u kaficima i obilazak kulturnih znamenitosti.',
+ ST_SetSRID(ST_MakePoint(19.9245, 39.6249), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Stari Grad'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NOW()),
+
+('Paleokastritsa', 'Paleokastritsa je jedna od najpoznatijih obalnih zona Krfa, sa zelenim brdima, uvalama i prozirnom vodom. Pogodna je za kupanje, voznju camcem i mirniji dan van guzve starog grada.',
+ ST_SetSRID(ST_MakePoint(19.7097, 39.6725), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Uvala'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'), NOW());
+
+UPDATE "Localities" l
+SET "CreatedByUserId" = d."ManagedByUserId",
+    "UpdatedAt" = NOW()
+FROM "Destinations" d
+WHERE l."DestinationId" = d."Id"
+  AND d."Name" IN ('Athens', 'Santorini', 'Crete', 'Rhodes', 'Corfu');
+
+
 -- ============================================
 -- 6. OBJECTS
 -- ============================================
@@ -598,6 +766,137 @@ FROM "Destinations" d,
      (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com') cc
 WHERE o."DestinationId" = d."Id";
 
+INSERT INTO "Objects"
+("Name", "Description", "Address", "PhoneNumber", "Website", "MenuUrl", "CuisineType", "WorkingHours", "Price", "Amenities", "Geolocation", "AverageRating", "ReviewCount",
+ "Status", "IsActive", "ObjectTypeId", "LocalityId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
+VALUES
+('Hotel Acropolis View Athens', 'Udoban gradski hotel u blizini istorijskog centra Atine, pogodan za putnike koji zele da vecinu obilazaka obave peske. Sobe su moderne, terasa ima pogled ka Akropolju, a lokacija omogucava brz pristup Plaki, muzejima i vecernjim restoranima.', 'Rovertou Galli 10, Athens', '+302100000001', 'https://www.visitgreece.gr',
+ NULL, NULL, '{"pon":"00:00-24:00"}', 165.00, ARRAY['WiFi', 'Rooftop', 'Dorucak', 'Transfer', 'Klimatizovano'], ST_SetSRID(ST_MakePoint(23.7258, 37.9698), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Acropolis Hill'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.athens@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Plaka Garden Taverna', 'Tradicionalna taverna u Plaki sa grckim jelima, domacim vinom i malom bastom u mirnijoj ulici. Mesto je pogodno za veceru posle obilaska Akropolja, a meni kombinuje klasike poput musake, suvlakija i sveze salate sa sezonskim specijalitetima.', 'Adrianou 45, Athens', '+302100000002', 'https://www.visitgreece.gr',
+ NULL, 'Grcka tradicionalna kuhinja', '{"pon":"11:00-23:30"}', 28.00, ARRAY['Basta', 'Rezervacije', 'Veganske opcije', 'Lokalno vino'], ST_SetSRID(ST_MakePoint(23.7301, 37.9721), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaka Athens'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.athens@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Museum of Cycladic Culture Athens', 'Muzej posvecen kikladskoj umetnosti, antickim predmetima i kulturnoj istoriji Egeja. Prostor je pregledan, miran i dobar za posetioce koji zele pauzu od guzve, a zbirke lepo objasnjavaju vezu izmedju ostrvske kulture i sire grcke civilizacije.', 'Neofitou Douka 4, Athens', '+302100000003', 'https://cycladic.gr',
+ NULL, NULL, '{"pon":"10:00-17:00"}', 12.00, ARRAY['Vodic', 'Suvenirnica', 'Klimatizovano', 'Izlozbe'], ST_SetSRID(ST_MakePoint(23.7414, 37.9763), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Muzej'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaka Athens'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.athens@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Oia Caldera Suites', 'Manji hotel na Santoriniju sa apartmanima uklesanim u belu arhitekturu ostrva i terasama okrenutim ka kalderi. Mesto je namenjeno gostima koji traze mir, pogled i romanticnu atmosferu, ali i lak pristup vidikovcima i restoranima u Oiji.', 'Oia Caldera, Santorini', '+302286000001', 'https://www.visitgreece.gr',
+ NULL, NULL, '{"pon":"00:00-24:00"}', 320.00, ARRAY['WiFi', 'Bazen', 'Pogled na more', 'Dorucak', 'Transfer'], ST_SetSRID(ST_MakePoint(25.3760, 36.4625), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Oia Santorini'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.santorini@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Fira Sunset Wine Bar', 'Bar u Firi sa pogledom na kalderu, lokalnim vinima i laganim zalogajima. Posebno je popularan pred zalazak sunca, ali je prijatan i kasnije uvece kada je atmosfera opustenija i kada se ostrvo vidi pod svetlima.', 'Fira Cliffside, Santorini', '+302286000002', 'https://www.visitgreece.gr',
+ NULL, 'Vina i meze', '{"pon":"16:00-01:00"}', 24.00, ARRAY['Pogled na more', 'Kokteli', 'Lokalno vino', 'Terasa'], ST_SetSRID(ST_MakePoint(25.4307, 36.4171), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Fira Santorini'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.santorini@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Aegean Blue Restaurant', 'Restoran u Oiji koji kombinuje svezu ribu, lokalne sireve, povrce sa ostrva i poznata santorinska vina. Ambijent je elegantan ali opusten, sa terasom koja je najbolja za ranu veceru kada boje neba pocinju da se menjaju.', 'Oia Main Street, Santorini', '+302286000003', 'https://www.visitgreece.gr',
+ NULL, 'Mediteranska i morski plodovi', '{"pon":"12:00-23:00"}', 42.00, ARRAY['Terasa', 'Pogled na more', 'Rezervacije', 'Riblji specijaliteti'], ST_SetSRID(ST_MakePoint(25.3757, 36.4615), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Oia Santorini'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.santorini@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Chania Harbor Hotel', 'Hotel u blizini stare luke Hanije, pogodan za goste koji zele da budu blizu setalista, restorana i polaznih tacaka za izlete po zapadnom Kritu. Enterijer kombinuje lokalni kamen, svetle sobe i malu krovnu terasu za dorucak.', 'Old Harbor, Chania', '+302821000001', 'https://www.visitgreece.gr',
+ NULL, NULL, '{"pon":"00:00-24:00"}', 150.00, ARRAY['WiFi', 'Dorucak', 'Krovna terasa', 'Transfer'], ST_SetSRID(ST_MakePoint(24.0165, 35.5174), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Chania Old Town'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.crete@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Elafonisi Beach Canteen', 'Jednostavan objekat blizu plaze Elafonisi sa hladnim picima, kafom, sendvicima i osnovnim jelima za posetioce koji ceo dan provode na obali. Nije luksuzno mesto, ali je prakticno za porodice i putnike koji zele brzu pauzu bez napustanja plaze.', 'Elafonisi Beach, Crete', '+302821000002', NULL,
+ NULL, 'Brza hrana i kafa', '{"pon":"09:00-19:00"}', 10.00, ARRAY['Kafa', 'Brza hrana', 'Blizu plaze', 'Porodicno'], ST_SetSRID(ST_MakePoint(23.5411, 35.2713), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafic'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Elafonisi Beach'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.crete@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Rhodes Knight Hotel', 'Hotel smesten blizu zidina starog grada Rodosa, sa ambijentom koji podseca na srednjovekovne ulice i mirnim sobama pogodnim za kraci gradski odmor. Lokacija je dobra za obilazak muzeja, kapija i vecernjih taverni.', 'Old Town, Rhodes', '+302241000001', 'https://www.visitgreece.gr',
+ NULL, NULL, '{"pon":"00:00-24:00"}', 135.00, ARRAY['WiFi', 'Dorucak', 'Klimatizovano', 'Blizu centra'], ST_SetSRID(ST_MakePoint(28.2248, 36.4435), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rhodes Old Town'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.rhodes@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Lindos Bay Seafood', 'Restoran u blizini zaliva Lindos sa morskim plodovima, grckim salatama i pogledom na vodu. Najbolji je za rucak posle kupanja ili mirnu veceru kada se guzva oko plaze smanji.', 'Lindos Bay, Rhodes', '+302241000002', 'https://www.visitgreece.gr',
+ NULL, 'Morski plodovi', '{"pon":"11:00-23:00"}', 34.00, ARRAY['Terasa', 'Pogled na more', 'Rezervacije', 'Riblji specijaliteti'], ST_SetSRID(ST_MakePoint(28.0853, 36.0915), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Lindos Bay'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.rhodes@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Corfu Venetian Boutique Hotel', 'Boutique hotel u starom gradu Krfa, u zgradi inspirisanoj venecijanskom arhitekturom. Pogodan je za goste koji zele atmosferu starog grada, blizinu setalista i laku vezu sa lukom i kulturnim znamenitostima.', 'Corfu Old Town, Corfu', '+302661000001', 'https://www.visitgreece.gr',
+ NULL, NULL, '{"pon":"00:00-24:00"}', 175.00, ARRAY['WiFi', 'Dorucak', 'Klimatizovano', 'Transfer'], ST_SetSRID(ST_MakePoint(19.9248, 39.6252), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Corfu Old Town'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.corfu@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Paleokastritsa View Cafe', 'Kafic na obali Paleokastritse sa hladnim picima, kafom, laganim obrocima i pogledom na jednu od najlepših uvala Krfa. Posebno je prijatan posle voznje camcem ili kupanja, kada prija mirnija pauza uz more.', 'Paleokastritsa Bay, Corfu', '+302661000002', NULL,
+ NULL, 'Kafa i lagani obroci', '{"pon":"08:00-22:00"}', 14.00, ARRAY['Pogled na more', 'Kafa', 'Terasa', 'Brunch'], ST_SetSRID(ST_MakePoint(19.7099, 39.6723), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafic'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Paleokastritsa'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.corfu@spirego.com'),
+ NOW(), NOW(), NOW());
+
+UPDATE "Objects" o
+SET "DestinationId" = l."DestinationId"
+FROM "Localities" l
+WHERE o."LocalityId" = l."Id"
+  AND o."DestinationId" IS DISTINCT FROM l."DestinationId";
+
+UPDATE "Objects" o
+SET "CreatedByUserId" = cc."Id",
+    "ApprovedByUserId" = d."ManagedByUserId",
+    "ApprovedAt" = CASE
+        WHEN o."Status" = 'Approved' THEN COALESCE(o."ApprovedAt", NOW())
+        ELSE o."ApprovedAt"
+    END
+FROM "Destinations" d,
+     (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com') cc
+WHERE o."DestinationId" = d."Id"
+  AND d."Name" IN ('Athens', 'Santorini', 'Crete', 'Rhodes', 'Corfu');
+
+
 -- ============================================
 -- 7. ACTIVITIES
 -- ============================================
@@ -662,8 +961,8 @@ VALUES
  NULL,
  1,
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
- NOW(), NOW())
- ;
+ NOW(), NOW());
+
 
 -- Aktivnosti kreira ContentCreator, a odobrava menadzer nadlezan za destinaciju.
 UPDATE "Activities" a
@@ -682,6 +981,108 @@ SET "CreatedByUserId" = cc."Id",
 FROM "Destinations" d,
      (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com') cc
 WHERE a."DestinationId" = d."Id";
+
+
+INSERT INTO "Activities"
+("Name", "Description", "Geolocation", "Price", "DurationMinutes", "IsActive", "ActivityTypeId", "LocalityId", "DestinationId", "ObjectId", "Status", "CreatedByUserId", "CreatedAt", "UpdatedAt")
+VALUES
+('Athens History Walk', 'Vodjena setnja kroz Plaku i prostor oko Akropolja sa pricama o antickoj Atini, svakodnevnom zivotu u starim kvartovima i najvaznijim tackama koje turisti cesto promase kada obilaze sami.',
+ ST_SetSRID(ST_MakePoint(23.7291, 37.9720), 4326), 18.00, 150, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Razgledanje'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaka Athens'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'),
+ NULL,
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'),
+ NOW(), NOW()),
+
+('Traditional Greek Dinner Plaka', 'Vecera u taverni sa nekoliko lokalnih jela, kratkim objasnjenjem sastojaka i preporukom grckih vina. Aktivnost je namenjena putnicima koji zele da upoznaju hranu kroz opusten razgovor i prijatnu atmosferu.',
+ ST_SetSRID(ST_MakePoint(23.7301, 37.9721), 4326), 35.00, 120, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Degustacija hrane'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaka Athens'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaka Garden Taverna'),
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'),
+ NOW(), NOW()),
+
+('Santorini Caldera Photo Walk', 'Lagana fotografska setnja kroz Oiju i vidikovce iznad kaldere. Program je prilagodjen zalasku sunca, ali obuhvata i savete za pronalazenje mirnijih ulica i lepih kadrova bez velike guzve.',
+ ST_SetSRID(ST_MakePoint(25.3753, 36.4618), 4326), 22.00, 120, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Fotografisanje'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Oia Santorini'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'),
+ NULL,
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'),
+ NOW(), NOW()),
+
+('Santorini Wine Tasting', 'Degustacija lokalnih vina sa Santorinija uz male zalogaje i pricu o vulkanskom tlu koje ostrvskim vinima daje poseban karakter. Aktivnost je dobra za parove i manje grupe koje zele mirniji vecernji program.',
+ ST_SetSRID(ST_MakePoint(25.4307, 36.4171), 4326), 48.00, 100, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Degustacija vina'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Fira Santorini'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Fira Sunset Wine Bar'),
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'),
+ NOW(), NOW()),
+
+('Chania Old Harbor Walk', 'Pesacka tura kroz staru luku Hanije, venecijanske ulice, trznicu i mesta koja najbolje pokazuju spoj kritske, otomanske i venecijanske istorije. Tura se zavrsava preporukama za lokalne restorane.',
+ ST_SetSRID(ST_MakePoint(24.0170, 35.5170), 4326), 16.00, 120, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Pesacenje'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Chania Old Town'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'),
+ NULL,
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'),
+ NOW(), NOW()),
+
+('Elafonisi Beach Day', 'Organizovan dan na plazi Elafonisi sa pauzama za kupanje, fotografisanje i lagani obrok. Aktivnost je posebno pogodna za porodice i putnike koji zele opusten raspored bez zurbe.',
+ ST_SetSRID(ST_MakePoint(23.5407, 35.2716), 4326), 25.00, 360, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Plivanje'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Elafonisi Beach'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Elafonisi Beach Canteen'),
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'),
+ NOW(), NOW()),
+
+('Rhodes Medieval Tour', 'Obilazak starog grada Rodosa sa fokusom na zidine, kapije, vitesku ulicu i najvaznije istorijske price ostrva. Tura je sadrzajna, ali tempom pogodna i za putnike koji prvi put dolaze na Rodos.',
+ ST_SetSRID(ST_MakePoint(28.2240, 36.4430), 4326), 20.00, 140, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Obilazak'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rhodes Old Town'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'),
+ NULL,
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'),
+ NOW(), NOW()),
+
+('Paleokastritsa Boat Ride', 'Voznja camcem oko uvala Paleokastritse, sa kratkim pauzama za kupanje i fotografisanje. Najlepsi deo ture je pogled na zelena brda i svetlu boju mora izmedju stena.',
+ ST_SetSRID(ST_MakePoint(19.7097, 39.6725), 4326), 30.00, 90, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Voznja camcem'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Paleokastritsa'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Paleokastritsa View Cafe'),
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'maria.admin@spirego.com'),
+ NOW(), NOW());
+
+UPDATE "Activities" a
+SET "DestinationId" = l."DestinationId"
+FROM "Localities" l
+WHERE a."LocalityId" = l."Id"
+  AND a."DestinationId" IS DISTINCT FROM l."DestinationId";
+
+UPDATE "Activities" a
+SET "CreatedByUserId" = cc."Id",
+    "ApprovedByUserId" = d."ManagedByUserId",
+    "ApprovedAt" = CASE
+        WHEN a."Status" = 1 THEN COALESCE(a."ApprovedAt", NOW())
+        ELSE a."ApprovedAt"
+    END
+FROM "Destinations" d,
+     (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com') cc
+WHERE a."DestinationId" = d."Id"
+  AND d."Name" IN ('Athens', 'Santorini', 'Crete', 'Rhodes', 'Corfu');
 
 -- ============================================
 -- 8. EVENTS
@@ -760,6 +1161,82 @@ FROM "Destinations" d,
      (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com') cc
 WHERE e."DestinationId" = d."Id";
 
+INSERT INTO "Events"
+("Name", "Description", "Geolocation", "StartDate", "EndDate", "Price", "MaxVisitors", "IsActive", "Status", "EventTypeId", "LocalityId", "DestinationId", "ObjectId", "CreatedByUserId", "CreatedAt", "UpdatedAt")
+VALUES
+('Athens Open Air Classics', 'Athens Open Air Classics donosi vece klasicne muzike u ambijentu istorijskog centra Atine. Program je zamisljen kao miran kulturni dogadjaj za posetioce koji zele da spoje muziku, vecernju setnju i pogled na osvetljene delove grada. Repertoar obuhvata poznate kompozicije u izvodjenju manjeg ansambla, pa atmosfera ostaje intimna i prijatna. Dogadjaj je dobar izbor za turiste koji zele kulturni sadrzaj posle obilaska muzeja i znamenitosti tokom dana.',
+ ST_SetSRID(ST_MakePoint(23.7294, 37.9715), 4326), '2026-06-18 20:30', '2026-06-18 23:00', 18.00, 350, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Koncert'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaka Athens'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Acropolis View Athens'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ NOW(), NOW()),
+
+('Santorini Sunset Wine Festival', 'Santorini Sunset Wine Festival okuplja lokalne vinarije, male proizvodjace hrane i posetioce koji zele da upoznaju ukus ostrva kroz opusten vecernji program. Festival je smesten u Firi, sa pogledom na kalderu i atmosferom koja se menja kako zalazak sunca prelazi u noc. Posetioci mogu da probaju razlicita vina, meze zalogaje i da razgovaraju sa domacinima o tradiciji proizvodnje vina na vulkanskom tlu. Dogadjaj je posebno pogodan za parove i manje grupe koje traze sporiji, ali sadrzajan provod.',
+ ST_SetSRID(ST_MakePoint(25.4300, 36.4167), 4326), '2026-07-12 18:00', '2026-07-12 23:30', 35.00, 600, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Fira Santorini'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Fira Sunset Wine Bar'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ NOW(), NOW()),
+
+('Oia Summer Lights', 'Oia Summer Lights je letnji vecernji program kroz najpoznatije ulice Oije. Dogadjaj kombinuje male nastupe, svetlosne instalacije, lokalne zanatske proizvode i laganu muziku na vise tacaka u mestu. Ideja je da posetioci dozive Oiju i posle zalaska sunca, kada se guzva smanji i kada belo-plava arhitektura dobije potpuno drugaciji karakter. Program je pogodan za fotografisanje, setnju i opusten izlazak bez klasicne festivalske buke.',
+ ST_SetSRID(ST_MakePoint(25.3753, 36.4618), 4326), '2026-08-03 20:00', '2026-08-04 00:30', 12.00, 800, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Nastup'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Oia Santorini'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oia Caldera Suites'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ NOW(), NOW()),
+
+('Chania Harbor Food Week', 'Chania Harbor Food Week je program posvecen kritskoj kuhinji, lokalnim proizvodima i restoranima stare luke. Tokom nekoliko dana organizuju se degustacije, kratke radionice, razgovori sa kuvarima i vecernji meni programi u manjim lokalima. Posetioci imaju priliku da probaju sireve, maslinovo ulje, morsku hranu i tradicionalne slatkise, ali i da saznaju vise o nacinu na koji se kritska kuhinja razvijala kroz istoriju. Dogadjaj je idealan za putnike koji zele da upoznaju destinaciju kroz hranu, a ne samo kroz plaze.',
+ ST_SetSRID(ST_MakePoint(24.0170, 35.5170), 4326), '2026-09-05 12:00', '2026-09-11 22:00', 10.00, 1000, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Chania Old Town'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Chania Harbor Hotel'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ NOW(), NOW()),
+
+('Rhodes Medieval Night', 'Rhodes Medieval Night je tematsko vece u starom gradu Rodosa, osmisljeno tako da posetioce vrati u atmosferu srednjovekovnih ulica, zanata i muzike. Program ukljucuje vodjene price, manje nastupe, ulicne izvodjace i setnju kroz najlepse delove utvrdjenog jezgra. Dogadjaj nije samo zabavan, vec i edukativan, jer na pristupacan nacin priblizava istoriju ostrva. Posebno je zanimljiv porodicama, parovima i putnicima koji vole nocne obilaske sa jakim vizuelnim dozivljajem.',
+ ST_SetSRID(ST_MakePoint(28.2240, 36.4430), 4326), '2026-08-20 19:30', '2026-08-20 23:30', 16.00, 700, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Organizovana Tura'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rhodes Old Town'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rhodes Knight Hotel'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ NOW(), NOW()),
+
+('Corfu Old Town Jazz Evening', 'Corfu Old Town Jazz Evening donosi opusteno muzicko vece na trgovima starog grada Krfa. Program je namenjen posetiocima koji zele mirniji izlazak, dobru muziku i ambijent venecijanskih fasada. Nastupi se odrzavaju u manjim formacijama, pa dogadjaj zadrzava lokalni i prijatan karakter. U kombinaciji sa setnjom, vecerom i pogledom na stare ulice, ovo je lep izbor za turiste koji zele kulturni sadrzaj bez velike guzve.',
+ ST_SetSRID(ST_MakePoint(19.9245, 39.6249), 4326), '2026-07-25 21:00', '2026-07-25 23:30', 14.00, 400, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Koncert'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Corfu Old Town'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Corfu Venetian Boutique Hotel'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com'),
+ NOW(), NOW());
+
+UPDATE "Events" e
+SET "DestinationId" = l."DestinationId"
+FROM "Localities" l
+WHERE e."LocalityId" = l."Id"
+  AND e."DestinationId" IS DISTINCT FROM l."DestinationId";
+
+UPDATE "Events" e
+SET "CreatedByUserId" = cc."Id",
+    "ApprovedByUserId" = d."ManagedByUserId",
+    "ApprovedAt" = CASE
+        WHEN e."Status" = 'Approved' THEN COALESCE(e."ApprovedAt", NOW())
+        ELSE e."ApprovedAt"
+    END
+FROM "Destinations" d,
+     (SELECT "Id" FROM "Users" WHERE "Email" = 'eleni.creator@spirego.com') cc
+WHERE e."DestinationId" = d."Id"
+  AND d."Name" IN ('Athens', 'Santorini', 'Crete', 'Rhodes', 'Corfu');
+
+
 -- ============================================
 -- 9. REVIEWS
 -- ============================================
@@ -825,11 +1302,189 @@ VALUES
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
  4, 'Pogled i hrana su odlicni, ali se na uslugu cekalo malo duze nego sto sam ocekivala.', 'Approved', NOW());
+INSERT INTO "Reviews"
+("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ioanna.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Acropolis View Athens'),
+ 5, 'Hotel je bio odlican izbor za prvi dolazak u Atinu. Najvise mi se dopala terasa sa pogledom na Akropolj, posebno uvece kada je sve osvetljeno. Soba nije bila ogromna, ali je bila uredna, tiha i dovoljno blizu glavnih znamenitosti da nismo morali stalno da koristimo prevoz.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'dimitris.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Acropolis View Athens'),
+ 4, 'Lokacija je stvarno velika prednost jer se do Plake i Akropolja stize veoma brzo. Dorucak je bio korektan, ali bih voleo malo vise lokalnih proizvoda umesto standardne hotelske ponude. Osoblje je bilo ljubazno i pomoglo nam je oko preporuka za veceru.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'luka.greece.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Acropolis View Athens'),
+ 3, 'Pogled je lep i lokacija je dobra, ali je cena ipak malo jaca za ono sto se dobije. Lift je bio spor, a soba okrenuta ka ulici imala je vise buke nego sto sam ocekivao. Nije lose, ali bih sledeci put proverio i druge opcije u istom delu grada.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'anastasia.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaka Garden Taverna'),
+ 5, 'Vecera u basti je bila jedno od najlepsih iskustava u Atini. Hrana je bila sveza, porcije dovoljno velike, a konobar nam je objasnio razliku izmedju nekoliko lokalnih jela. Atmosfera je opustena i nije delovalo kao tipicno turisticko mesto iako se nalazi u popularnom delu grada.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'dimitris.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaka Garden Taverna'),
+ 4, 'Taverna ima prijatan ambijent i dobra tradicionalna jela. Musaka je bila odlicna, ali se na sto cekalo duze nego sto nam je receno prilikom dolaska. Ipak, osoblje se izvinilo i ponudilo desert, pa je utisak na kraju bio pozitivan.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'luka.greece.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaka Garden Taverna'),
+ 2, 'Hrana nije bila losa, ali je guzva bila prevelika i usluga je bila dosta spora. Dobili smo glavno jelo skoro hladno, a racun smo morali da trazimo dva puta. Lokacija je dobra, ali za tu cenu sam ocekivao mnogo organizovaniji servis.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ioanna.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Museum of Cycladic Culture Athens'),
+ 4, 'Muzej je miran, lepo uredjen i odlican za pauzu od gradske guzve. Posebno su mi se dopali eksponati sa ostrva i kratka objasnjenja koja nisu predugacka. Volela bih da ima malo vise interaktivnog sadrzaja, ali za ljubitelje istorije svakako vredi posete.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'anastasia.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Museum of Cycladic Culture Athens'),
+ 3, 'Zbirka je zanimljiva, ali obilazak nije trajao dugo koliko sam ocekivala. Prostor je prijatan i klimatizovan, sto je leti velika prednost. Preporucila bih ga onima koje zaista zanima umetnost i istorija, ali mozda nije najzabavniji izbor za decu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'dimitris.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oia Caldera Suites'),
+ 5, 'Smestaj je prelep i pogled sa terase je zaista poseban. Najlepse je bilo jutro, pre nego sto ulice postanu pune turista. Osoblje je diskretno i veoma ljubazno, dorucak je donesen na terasu i sve je delovalo pazljivo organizovano.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ioanna.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oia Caldera Suites'),
+ 4, 'Apartman je bio cist, svetao i vrlo fotogenican, sa prelepim pogledom na kalderu. Jedina mana je sto ima dosta stepenica, pa nije najprakticnije ako nosite vise kofera. Za romantican odmor je stvarno odlican izbor.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'luka.greece.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oia Caldera Suites'),
+ 3, 'Pogled je fenomenalan, ali cena je visoka i ocekuje se savrsenstvo. Klima je jedne noci slabije radila, a zbog konfiguracije mesta nije bas lako doci do smestaja sa prtljagom. Lepo iskustvo, ali treba znati sta vas ceka.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'anastasia.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Fira Sunset Wine Bar'),
+ 5, 'Najbolji deo veceri bio je pogled na zalazak sunca uz casu lokalnog vina. Osoblje je znalo da preporuci vino prema ukusu, a meze tanjir je bio mnogo bolji nego sto sam ocekivala za bar. Mesto jeste popularno, ali atmosfera nije bila naporna.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'dimitris.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Fira Sunset Wine Bar'),
+ 4, 'Vina su odlicna i pogled je zaista vredan dolaska. Rezervacija je skoro obavezna ako zelite dobar sto. Cene su vise, ali to je donekle ocekivano za Firu i ovakav pogled.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ioanna.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aegean Blue Restaurant'),
+ 4, 'Hrana je bila vrlo dobra, posebno riba i salata sa lokalnim sirom. Terasa je prelepa i osoblje je prijatno, ali porcije nisu velike u odnosu na cenu. Za posebnu veceru svakako preporucujem, samo ne bih dosla potpuno gladna.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'luka.greece.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aegean Blue Restaurant'),
+ 2, 'Pogled je odlican, ali restoran nas nije odusevio. Hrana je bila korektna, ali nista posebno za cenu koja je prilicno visoka. Usluga je bila hladna i delovalo je kao da zele sto brze da oslobode sto.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'anastasia.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Chania Harbor Hotel'),
+ 5, 'Hotel je na sjajnoj lokaciji za obilazak Hanije. Ujutru smo brzo stizali do luke, a uvece je bilo lako vratiti se posle vecere. Soba je bila uredna, kupatilo novo, a dorucak na terasi je bio lep pocetak dana.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'dimitris.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Chania Harbor Hotel'),
+ 4, 'Vrlo prijatan hotel, posebno ako planirate dosta setnje po starom gradu. Nije idealan za dolazak autom jer je parkiranje komplikovano u okolini, ali osoblje nam je pomoglo da nadjemo najblizu opciju. Sve ostalo je bilo na dobrom nivou.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ioanna.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Elafonisi Beach Canteen'),
+ 3, 'Korisno mesto ako provedete ceo dan na plazi, ali ne treba ocekivati nista posebno. Kafa je bila dobra, sendvic prosecan, a cene malo vise nego sto bih volela. Ipak, blizina plaze mnogo znaci kada ste sa decom.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'luka.greece.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Elafonisi Beach Canteen'),
+ 2, 'Lokacija je prakticna, ali red je bio dug i ponuda je ogranicena. Razumem da je plaza popularna, ali usluga bi mogla da bude brza i organizovanija. Sledeci put bih poneo svoju hranu i vodu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'dimitris.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rhodes Knight Hotel'),
+ 4, 'Hotel ima lepu atmosferu i stvarno se uklapa u stari grad Rodosa. Soba je bila manja, ali cista i tiha. Najvise mi se dopalo sto se uvece moze peske do svih glavnih ulica i restorana.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'anastasia.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rhodes Knight Hotel'),
+ 3, 'Ambijent je lep, ali dorucak je bio skroman i soba nije imala dovoljno prirodnog svetla. Lokacija je odlicna za obilazak starog grada, pa bih ga preporucila za kraci boravak, ali ne i za duzi odmor.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ioanna.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lindos Bay Seafood'),
+ 5, 'Rucak posle kupanja bio je savrsen. Riba je bila sveza, salata jednostavna i ukusna, a pogled na zaliv prelep. Osoblje je bilo brzo i nenametljivo, sto je bas prijalo posle guzve na plazi.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'luka.greece.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lindos Bay Seafood'),
+ 4, 'Dobar restoran sa lepim pogledom i korektnim cenama za lokaciju. Morski plodovi su bili dobro spremljeni, ali desert nije bio nista posebno. Sve u svemu, vrlo prijatno mesto za rucak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'anastasia.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Corfu Venetian Boutique Hotel'),
+ 5, 'Prelep mali hotel sa mnogo karaktera. Stari grad Krfa je odmah ispred vas, ali je soba bila dovoljno tiha za odmor. Osoblje je dalo odlicne preporuke za restorane i manje poznate ulice za setnju.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'dimitris.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Corfu Venetian Boutique Hotel'),
+ 4, 'Dobar izbor za boravak u starom gradu. Enterijer je zanimljiv, krevet udoban, a lokacija odlicna. Mana je sto nema mnogo prostora za parkiranje u blizini, ali to je generalno problem u ovom delu Krfa.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ioanna.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Paleokastritsa View Cafe'),
+ 4, 'Kafic ima divan pogled i prijatan izbor pica posle voznje camcem. Hrana je jednostavna, ali korektna, a terasa je najbolji deo mesta. Volela bih samo malo brzu uslugu u periodu najvece guzve.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'luka.greece.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Paleokastritsa View Cafe'),
+ 3, 'Pogled je lep i kafa je bila dobra, ali cene su turisticke i izbor hrane nije veliki. Za kratku pauzu je sasvim u redu, posebno zbog lokacije, ali ne bih planirao duzi obrok ovde.', 'Approved', NOW());
 
 
 -- ============================================
 -- 10. IMAGES - DESTINATIONS
 -- ============================================
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
+VALUES
+('https://source.unsplash.com/1200x800/?athens,greece,acropolis', 'Athens', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'), NOW()),
+('https://source.unsplash.com/1200x800/?athens,plaka,greece', 'Athens', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'), NOW()),
+('https://source.unsplash.com/1200x800/?santorini,oia,greece', 'Santorini', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'), NOW()),
+('https://source.unsplash.com/1200x800/?santorini,caldera', 'Santorini', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'), NOW()),
+('https://source.unsplash.com/1200x800/?crete,chania,greece', 'Crete', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'), NOW()),
+('https://source.unsplash.com/1200x800/?crete,beach,greece', 'Crete', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'), NOW()),
+('https://source.unsplash.com/1200x800/?rhodes,greece,old-town', 'Rhodes', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'), NOW()),
+('https://source.unsplash.com/1200x800/?rhodes,lindos,greece', 'Rhodes', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'), NOW()),
+('https://source.unsplash.com/1200x800/?corfu,greece,old-town', 'Corfu', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'), NOW()),
+('https://source.unsplash.com/1200x800/?corfu,paleokastritsa', 'Corfu', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'), NOW());
+
+-- 15.9 IMAGES - LOCALITIES
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
+VALUES
+('https://source.unsplash.com/1200x800/?plaka,athens', 'Plaka Athens', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaka Athens'), NOW()),
+('https://source.unsplash.com/1200x800/?acropolis,athens', 'Acropolis Hill', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Acropolis Hill'), NOW()),
+('https://source.unsplash.com/1200x800/?oia,santorini', 'Oia Santorini', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Oia Santorini'), NOW()),
+('https://source.unsplash.com/1200x800/?fira,santorini', 'Fira Santorini', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Fira Santorini'), NOW()),
+('https://source.unsplash.com/1200x800/?chania,crete,old-town', 'Chania Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Chania Old Town'), NOW()),
+('https://source.unsplash.com/1200x800/?elafonisi,crete', 'Elafonisi Beach', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Elafonisi Beach'), NOW()),
+('https://source.unsplash.com/1200x800/?rhodes,old-town', 'Rhodes Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rhodes Old Town'), NOW()),
+('https://source.unsplash.com/1200x800/?lindos,rhodes,bay', 'Lindos Bay', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Lindos Bay'), NOW()),
+('https://source.unsplash.com/1200x800/?corfu,old-town', 'Corfu Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Corfu Old Town'), NOW()),
+('https://source.unsplash.com/1200x800/?paleokastritsa,corfu', 'Paleokastritsa', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Paleokastritsa'), NOW());
+
+-- 15.10 IMAGES - OBJECTS
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
+VALUES
+('https://source.unsplash.com/1200x800/?athens,hotel,rooftop', 'Hotel Acropolis View Athens', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Acropolis View Athens'), NOW()),
+('https://source.unsplash.com/1200x800/?hotel,room,athens', 'Hotel Acropolis View Athens', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Acropolis View Athens'), NOW()),
+('https://source.unsplash.com/1200x800/?greek,taverna,athens', 'Plaka Garden Taverna', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaka Garden Taverna'), NOW()),
+('https://source.unsplash.com/1200x800/?greek,food,taverna', 'Plaka Garden Taverna', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaka Garden Taverna'), NOW()),
+('https://source.unsplash.com/1200x800/?museum,greece,art', 'Museum of Cycladic Culture Athens', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Museum of Cycladic Culture Athens'), NOW()),
+('https://source.unsplash.com/1200x800/?santorini,hotel,caldera', 'Oia Caldera Suites', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oia Caldera Suites'), NOW()),
+('https://source.unsplash.com/1200x800/?santorini,suite,terrace', 'Oia Caldera Suites', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oia Caldera Suites'), NOW()),
+('https://source.unsplash.com/1200x800/?santorini,wine,bar', 'Fira Sunset Wine Bar', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Fira Sunset Wine Bar'), NOW()),
+('https://source.unsplash.com/1200x800/?santorini,restaurant,seafood', 'Aegean Blue Restaurant', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aegean Blue Restaurant'), NOW()),
+('https://source.unsplash.com/1200x800/?chania,hotel,crete', 'Chania Harbor Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Chania Harbor Hotel'), NOW()),
+('https://source.unsplash.com/1200x800/?beach,cafe,crete', 'Elafonisi Beach Canteen', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Elafonisi Beach Canteen'), NOW()),
+('https://source.unsplash.com/1200x800/?rhodes,hotel,old-town', 'Rhodes Knight Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rhodes Knight Hotel'), NOW()),
+('https://source.unsplash.com/1200x800/?lindos,seafood,restaurant', 'Lindos Bay Seafood', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lindos Bay Seafood'), NOW()),
+('https://source.unsplash.com/1200x800/?corfu,boutique,hotel', 'Corfu Venetian Boutique Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Corfu Venetian Boutique Hotel'), NOW()),
+('https://source.unsplash.com/1200x800/?corfu,cafe,sea', 'Paleokastritsa View Cafe', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Paleokastritsa View Cafe'), NOW());
+
+-- 15.11 IMAGES - EVENTS
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
+VALUES
+('https://source.unsplash.com/1200x800/?classical,music,concert', 'Athens Open Air Classics', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Athens Open Air Classics'), NOW()),
+('https://source.unsplash.com/1200x800/?wine,festival,santorini', 'Santorini Sunset Wine Festival', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Santorini Sunset Wine Festival'), NOW()),
+('https://source.unsplash.com/1200x800/?santorini,night,lights', 'Oia Summer Lights', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Oia Summer Lights'), NOW()),
+('https://source.unsplash.com/1200x800/?food,festival,crete', 'Chania Harbor Food Week', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Chania Harbor Food Week'), NOW()),
+('https://source.unsplash.com/1200x800/?medieval,festival,rhodes', 'Rhodes Medieval Night', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Rhodes Medieval Night'), NOW()),
+('https://source.unsplash.com/1200x800/?jazz,concert,old-town', 'Corfu Old Town Jazz Evening', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Corfu Old Town Jazz Evening'), NOW());
+
+-- 15.12 IMAGES - ACTIVITIES
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
+VALUES
+('https://source.unsplash.com/1200x800/?athens,walking,tour', 'Athens History Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Athens History Walk'), NOW()),
+('https://source.unsplash.com/1200x800/?greek,dinner,taverna', 'Traditional Greek Dinner Plaka', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Traditional Greek Dinner Plaka'), NOW()),
+('https://source.unsplash.com/1200x800/?santorini,photography', 'Santorini Caldera Photo Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Santorini Caldera Photo Walk'), NOW()),
+('https://source.unsplash.com/1200x800/?santorini,wine,tasting', 'Santorini Wine Tasting', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Santorini Wine Tasting'), NOW()),
+('https://source.unsplash.com/1200x800/?chania,harbor,walk', 'Chania Old Harbor Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Chania Old Harbor Walk'), NOW()),
+('https://source.unsplash.com/1200x800/?elafonisi,beach,crete', 'Elafonisi Beach Day', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Elafonisi Beach Day'), NOW()),
+('https://source.unsplash.com/1200x800/?rhodes,medieval,street', 'Rhodes Medieval Tour', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Rhodes Medieval Tour'), NOW()),
+('https://source.unsplash.com/1200x800/?corfu,boat,sea', 'Paleokastritsa Boat Ride', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Paleokastritsa Boat Ride'), NOW());
+
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 VALUES
 (
@@ -2394,28 +3049,6 @@ VALUES
 -- ============================================
 -- 14. SPAIN DEMO CONTENT
 -- ============================================
-
--- 14.1 USERS
-INSERT INTO "Users"
-("FirstName", "LastName", "DateOfBirth", "Email", "PasswordHash", "PhoneNumber", "Country", "Language",
- "IsVerified", "IsActive", "IsBlacklisted", "HasRequestedCreatorRole", "RoleId", "ManagedDestinationId", "CreatedAt", "UpdatedAt", "ProfileImageUrl")
-VALUES
-('Lucia', 'Romero', '1988-05-14', 'lucia.admin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000001', 'Spanija', 'es', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Carmen', 'Alvarez', '1992-09-08', 'carmen.creator@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000002', 'Spanija', 'es', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'ContentCreator'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Mateo', 'Garcia', '1990-02-11', 'manager.barcelona@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000003', 'Spanija', 'es', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Javier', 'Ortega', '1989-11-03', 'manager.madrid@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000004', 'Spanija', 'es', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Paula', 'Moreno', '1991-07-22', 'manager.valencia@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000005', 'Spanija', 'es', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Diego', 'Santos', '1996-04-18', 'diego.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Spanija', 'es', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Sofia', 'Marin', '1997-01-26', 'sofia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Spanija', 'es', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Elena', 'Ruiz', '1995-10-10', 'elena.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Spanija', 'es', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
 
 -- 14.2 DESTINATIONS
 INSERT INTO "Destinations"
