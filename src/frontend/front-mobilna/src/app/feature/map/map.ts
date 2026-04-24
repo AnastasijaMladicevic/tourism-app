@@ -13,7 +13,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import * as L from 'leaflet';
-import 'leaflet-routing-machine';
 
 import { MapService } from '../../services/map.service';
 import { DestinationService } from '../../services/destination';
@@ -85,6 +84,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   private userCircle: L.Circle | null = null;
 
   private routingControl: any = null;
+  private routingMachineLoaded = false;
 
   private allItems: SearchResult[] = [];
 
@@ -239,13 +239,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!destination) return;
 
     this.routeEnd = destination;
-    this.drawRoute(this.userLocation, L.latLng(destination.lat, destination.lng));
+    void this.drawRoute(this.userLocation, L.latLng(destination.lat, destination.lng));
   }
 
   showRouteBetweenPins(): void {
     if (!this.routeStart || !this.routeEnd) return;
 
-    this.drawRoute(
+    void this.drawRoute(
       L.latLng(this.routeStart.lat, this.routeStart.lng),
       L.latLng(this.routeEnd.lat, this.routeEnd.lng),
     );
@@ -291,10 +291,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private drawRoute(from: L.LatLng, to: L.LatLng): void {
+  private async drawRoute(from: L.LatLng, to: L.LatLng): Promise<void> {
     const map = this.mapService['map'];
     if (!map) return;
 
+    await this.ensureRoutingMachineLoaded();
     this.clearDirections();
 
     this.routingControl = (L as any).Routing.control({
@@ -308,6 +309,15 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       createMarker: () => null,
     }).addTo(map);
+  }
+
+  private async ensureRoutingMachineLoaded(): Promise<void> {
+    if (this.routingMachineLoaded) {
+      return;
+    }
+
+    await import('leaflet-routing-machine');
+    this.routingMachineLoaded = true;
   }
 
   private matchesAllTerms(item: SearchResult, terms: string[]): boolean {

@@ -25,8 +25,7 @@
               "src/styles.css",
               "node_modules/leaflet/dist/leaflet.css"
             ],
-            "scripts": ["node_modules/leaflet/dist/leaflet.js"],
-            "allowedCommonJsDependencies": ["leaflet"]
+            "allowedCommonJsDependencies": ["leaflet", "leaflet-routing-machine"]
           },
           "configurations": {
             "production": {
