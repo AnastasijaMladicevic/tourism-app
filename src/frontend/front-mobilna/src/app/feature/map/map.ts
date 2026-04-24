@@ -419,9 +419,18 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.allItems = [];
 
     forkJoin({
-      destinations: this.destinationService.getAll(undefined, { bypassRegion: true }),
-      objects: this.objectService.getAll(undefined, { bypassRegion: true }),
-      events: this.eventService.getAll(undefined, { bypassRegion: true }),
+      destinations: this.destinationService.getAll(
+        { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
+        { bypassRegion: true },
+      ),
+      objects: this.objectService.getAll(
+        { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
+        { bypassRegion: true },
+      ),
+      events: this.eventService.getAll(
+        { page: 1, pageSize: 500, sortBy: 'startDate', sortOrder: 'asc' },
+        { bypassRegion: true },
+      ),
     }).subscribe({
       next: ({ destinations, objects, events }) => {
         const destList = this.toArray<any>(destinations);
