@@ -12,21 +12,42 @@
   <div class="region-shell">
     <section class="region-section">
       <h2>{{ 'region.available' | translate }}</h2>
-      <div class="region-card">
-        @for (option of options; track option.code) {
-          <button class="region-option" type="button" (click)="selectRegion(option.code)">
-            <div class="region-option__content">
-              <strong>{{ option.labelKey | translate }}</strong>
-            </div>
+      @if (isLoading()) {
+        <p class="region-feedback">{{ 'common.loading' | translate }}</p>
+      } @else if (loadError()) {
+        <div class="region-feedback region-feedback--error">{{ loadError() }}</div>
+        <button class="retry-btn" type="button" (click)="retry()">
+          {{ 'common.retry' | translate }}
+        </button>
+      } @else {
+        <div class="region-card">
+          @for (option of options(); track option.id) {
+            <button class="region-option" type="button" (click)="selectRegion(option.id)">
+              <div class="region-option__content">
+                <strong>{{ option.name }}</strong>
+                <span>
+                  {{ option.code }}
+                  @if (option.isDefault) {
+                    · {{ 'region.defaultBadge' | translate }}
+                  }
+                </span>
+                @if (option.description) {
+                  <small>{{ option.description }}</small>
+                }
+              </div>
 
-            <span class="region-option__radio" [class.region-option__radio--active]="isSelected(option.code)">
-              @if (isSelected(option.code)) {
-                <span></span>
-              }
-            </span>
-          </button>
-        }
-      </div>
+              <span
+                class="region-option__radio"
+                [class.region-option__radio--active]="isSelected(option.id)"
+              >
+                @if (isSelected(option.id)) {
+                  <span></span>
+                }
+              </span>
+            </button>
+          }
+        </div>
+      }
     </section>
 
     <section class="region-note">

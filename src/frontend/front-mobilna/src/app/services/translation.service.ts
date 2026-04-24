@@ -68,9 +68,12 @@ const TRANSLATIONS: Record<string, Record<AppLanguage, string>> = {
   },
   'region.montenegro': { sr: 'Crna Gora', en: 'Montenegro' },
   'region.spain': { sr: 'Spanija', en: 'Spain' },
+  'region.defaultBadge': { sr: 'Podrazumevano', en: 'Default' },
   'region.active': { sr: 'Region je vec aktivan.', en: 'This region is already active.' },
   'region.saved': { sr: 'Region je uspesno azuriran.', en: 'Region was updated successfully.' },
   'region.saveFailed': { sr: 'Promena regiona nije sacuvana.', en: 'Region change was not saved.' },
+  'region.loadFailed': { sr: 'Regioni trenutno nisu dostupni.', en: 'Regions are currently unavailable.' },
+  'region.noneAvailable': { sr: 'Nema dostupnih regiona.', en: 'No regions are available.' },
   'language.title': { sr: 'Jezik', en: 'Language' },
   'language.available': { sr: 'Dostupni jezici', en: 'Available languages' },
   'language.infoTitle': {

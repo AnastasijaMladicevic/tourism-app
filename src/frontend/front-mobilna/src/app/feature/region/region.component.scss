@@ -101,7 +101,7 @@
 .region-option__content {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 
   strong {
     font-size: 17px;
@@ -115,6 +115,12 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: #98a7ae;
+  }
+
+  small {
+    font-size: 12px;
+    line-height: 1.5;
+    color: #6f8088;
   }
 }
 
@@ -187,6 +193,22 @@
   color: #4d6169;
   font-size: 13px;
   font-weight: 700;
+
+  &--error {
+    color: #b34f4f;
+  }
+}
+
+.retry-btn {
+  display: block;
+  margin: 12px auto 0;
+  border: 1px solid rgba(33, 149, 195, 0.25);
+  border-radius: 999px;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #1e87b1;
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .region-footer {

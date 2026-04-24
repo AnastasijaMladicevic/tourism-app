@@ -60,6 +60,21 @@ export interface UpdateUserDto {
   language?: string | null;
 }
 
+export interface UserPreferredRegionDto {
+  preferredRegionId?: number | null;
+  effectiveRegionId?: number | null;
+  effectiveRegionName?: string | null;
+  effectiveRegionCode?: string | null;
+  centerLongitude?: number | null;
+  centerLatitude?: number | null;
+  defaultMapZoom?: number | null;
+  isDefaultFallback: boolean;
+}
+
+export interface UpdateUserPreferredRegionDto {
+  regionId?: number | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private url = `${environment.apiUrl}/users`;
@@ -198,6 +213,14 @@ export class AuthService {
 
   updateMyLocation(latitude: number, longitude: number): Observable<any> {
     return this.http.put(`${this.url}/me/location`, { latitude, longitude });
+  }
+
+  getMyPreferredRegion(): Observable<UserPreferredRegionDto> {
+    return this.http.get<UserPreferredRegionDto>(`${this.url}/me/preferred-region`);
+  }
+
+  updateMyPreferredRegion(dto: UpdateUserPreferredRegionDto): Observable<UserPreferredRegionDto> {
+    return this.http.put<UserPreferredRegionDto>(`${this.url}/me/preferred-region`, dto);
   }
 
   private syncStoredUserWithAuthenticatedRole(): void {
