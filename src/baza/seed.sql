@@ -1419,71 +1419,71 @@ VALUES
 -- ============================================
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 VALUES
-('https://images.unsplash.com/photo-1543783207-ec64e4d95325?auto=format&fit=crop&w=1200&q=80', 'Athens', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'), NOW()),
-('https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1200&q=80', 'Athens', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'), NOW()),
-('https://images.unsplash.com/photo-1509840841025-9088ba78a826?auto=format&fit=crop&w=1200&q=80', 'Santorini', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'), NOW()),
-('https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=1200&q=80', 'Santorini', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'), NOW()),
-('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', 'Crete', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'), NOW()),
-('https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=1200&q=80', 'Crete', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'), NOW()),
-('https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?auto=format&fit=crop&w=1200&q=80', 'Rhodes', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'), NOW()),
-('https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1200&q=80', 'Rhodes', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'), NOW()),
-('https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=1200&q=80', 'Corfu', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'), NOW()),
-('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', 'Corfu', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'), NOW());
+('https://commons.wikimedia.org/wiki/Special:FilePath/Athens%20Acropolis%20%2828359594671%29.jpg', 'Athens', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka,%20Athens%20%283340582775%29.jpg', 'Athens', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Santorini', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%288302758240%29.jpg', 'Santorini', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Street%20detail%20in%20Chania%20old%20town.jpg', 'Crete', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Elafonisi%20Beach.jpg', 'Crete', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Rhodes%27%20old%20town.jpg', 'Rhodes', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Lindos%20Bay.jpg', 'Rhodes', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Corfu%20old%20town%20%26%20Old%20Fortress.jpg', 'Corfu', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Paleokastritsa.jpg', 'Corfu', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'), NOW());
 
 -- 15.9 IMAGES - LOCALITIES
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 VALUES
-('https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?auto=format&fit=crop&w=1200&q=80', 'Plaka Athens', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaka Athens'), NOW()),
-('https://images.unsplash.com/photo-1543783207-ec64e4d95325?auto=format&fit=crop&w=1200&q=80', 'Acropolis Hill', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Acropolis Hill'), NOW()),
-('https://images.unsplash.com/photo-1509840841025-9088ba78a826?auto=format&fit=crop&w=1200&q=80', 'Oia Santorini', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Oia Santorini'), NOW()),
-('https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=1200&q=80', 'Fira Santorini', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Fira Santorini'), NOW()),
-('https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?auto=format&fit=crop&w=1200&q=80', 'Chania Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Chania Old Town'), NOW()),
-('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', 'Elafonisi Beach', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Elafonisi Beach'), NOW()),
-('https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1200&q=80', 'Rhodes Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rhodes Old Town'), NOW()),
-('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', 'Lindos Bay', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Lindos Bay'), NOW()),
-('https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?auto=format&fit=crop&w=1200&q=80', 'Corfu Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Corfu Old Town'), NOW()),
-('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', 'Paleokastritsa', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Paleokastritsa'), NOW());
+('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%2C%20Athens%20%283340582775%29.jpg', 'Plaka Athens', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaka Athens'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Athens%20Acropolis%20%2828359594671%29.jpg', 'Acropolis Hill', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Acropolis Hill'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Oia Santorini', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Oia Santorini'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%282602792772%29.jpg', 'Fira Santorini', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Fira Santorini'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Street%20detail%20in%20Chania%20old%20town.jpg', 'Chania Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Chania Old Town'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Elafonisi%20Beach.jpg', 'Elafonisi Beach', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Elafonisi Beach'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Rhodes%27%20old%20town.jpg', 'Rhodes Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rhodes Old Town'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Lindos%20Bay.jpg', 'Lindos Bay', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Lindos Bay'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Corfu%20old%20town%20%28May%202017%29.jpg', 'Corfu Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Corfu Old Town'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Paleokastritsa.jpg', 'Paleokastritsa', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Paleokastritsa'), NOW());
 
 -- 15.10 IMAGES - OBJECTS
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 VALUES
-('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80', 'Hotel Acropolis View Athens', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Acropolis View Athens'), NOW()),
-('https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=1200&q=80', 'Hotel Acropolis View Athens', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Acropolis View Athens'), NOW()),
-('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80', 'Plaka Garden Taverna', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaka Garden Taverna'), NOW()),
-('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1200&q=80', 'Plaka Garden Taverna', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaka Garden Taverna'), NOW()),
-('https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1200&q=80', 'Museum of Cycladic Culture Athens', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Museum of Cycladic Culture Athens'), NOW()),
-('https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80', 'Oia Caldera Suites', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oia Caldera Suites'), NOW()),
-('https://images.unsplash.com/photo-1496417263034-38ec4f0b665a?auto=format&fit=crop&w=1200&q=80', 'Oia Caldera Suites', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oia Caldera Suites'), NOW()),
-('https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1200&q=80', 'Fira Sunset Wine Bar', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Fira Sunset Wine Bar'), NOW()),
-('https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=80', 'Aegean Blue Restaurant', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aegean Blue Restaurant'), NOW()),
-('https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80', 'Chania Harbor Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Chania Harbor Hotel'), NOW()),
-('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80', 'Elafonisi Beach Canteen', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Elafonisi Beach Canteen'), NOW()),
-('https://images.unsplash.com/photo-1496417263034-38ec4f0b665a?auto=format&fit=crop&w=1200&q=80', 'Rhodes Knight Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rhodes Knight Hotel'), NOW()),
-('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80', 'Lindos Bay Seafood', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lindos Bay Seafood'), NOW()),
-('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80', 'Corfu Venetian Boutique Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Corfu Venetian Boutique Hotel'), NOW()),
-('https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1200&q=80', 'Paleokastritsa View Cafe', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Paleokastritsa View Cafe'), NOW());
+('https://commons.wikimedia.org/wiki/Special:FilePath/Athens%20Acropolis%20%2828359594671%29.jpg', 'Hotel Acropolis View Athens', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Acropolis View Athens'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%2C%20Athens%20%283340582775%29.jpg', 'Hotel Acropolis View Athens', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Acropolis View Athens'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%2C%20Athens%20%283340582775%29.jpg', 'Plaka Garden Taverna', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaka Garden Taverna'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%20Athens%20%28February%202019%29.jpg', 'Plaka Garden Taverna', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaka Garden Taverna'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Athens%20Acropolis%20%2827821980944%29.jpg', 'Museum of Cycladic Culture Athens', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Museum of Cycladic Culture Athens'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Oia Caldera Suites', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oia Caldera Suites'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%282602792772%29.jpg', 'Oia Caldera Suites', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oia Caldera Suites'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%288302758240%29.jpg', 'Fira Sunset Wine Bar', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Fira Sunset Wine Bar'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Aegean Blue Restaurant', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aegean Blue Restaurant'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Street%20detail%20in%20Chania%20old%20town.jpg', 'Chania Harbor Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Chania Harbor Hotel'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Elafonisi%20Beach.jpg', 'Elafonisi Beach Canteen', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Elafonisi Beach Canteen'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Rhodes%27%20old%20town.jpg', 'Rhodes Knight Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rhodes Knight Hotel'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Lindos%20Bay.jpg', 'Lindos Bay Seafood', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lindos Bay Seafood'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Corfu%20old%20town%20%26%20Old%20Fortress.jpg', 'Corfu Venetian Boutique Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Corfu Venetian Boutique Hotel'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Paleokastritsa.jpg', 'Paleokastritsa View Cafe', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Paleokastritsa View Cafe'), NOW());
 
 -- 15.11 IMAGES - EVENTS
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 VALUES
-('https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1200&q=80', 'Athens Open Air Classics', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Athens Open Air Classics'), NOW()),
-('https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80', 'Santorini Sunset Wine Festival', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Santorini Sunset Wine Festival'), NOW()),
-('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=80', 'Oia Summer Lights', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Oia Summer Lights'), NOW()),
-('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80', 'Chania Harbor Food Week', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Chania Harbor Food Week'), NOW()),
-('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=80', 'Rhodes Medieval Night', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Rhodes Medieval Night'), NOW()),
-('https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1200&q=80', 'Corfu Old Town Jazz Evening', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Corfu Old Town Jazz Evening'), NOW());
+('https://commons.wikimedia.org/wiki/Special:FilePath/Athens%20Acropolis%20%2827821980944%29.jpg', 'Athens Open Air Classics', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Athens Open Air Classics'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%288302758240%29.jpg', 'Santorini Sunset Wine Festival', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Santorini Sunset Wine Festival'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Oia Summer Lights', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Oia Summer Lights'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Street%20detail%20in%20Chania%20old%20town.jpg', 'Chania Harbor Food Week', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Chania Harbor Food Week'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Rhodes%27%20old%20town.jpg', 'Rhodes Medieval Night', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Rhodes Medieval Night'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Corfu%20old%20town%20%28May%202017%29.jpg', 'Corfu Old Town Jazz Evening', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Corfu Old Town Jazz Evening'), NOW());
 
 -- 15.12 IMAGES - ACTIVITIES
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 VALUES
-('https://images.unsplash.com/photo-1527631746610-bca00a040d60?auto=format&fit=crop&w=1200&q=80', 'Athens History Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Athens History Walk'), NOW()),
-('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80', 'Traditional Greek Dinner Plaka', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Traditional Greek Dinner Plaka'), NOW()),
-('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1200&q=80', 'Santorini Caldera Photo Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Santorini Caldera Photo Walk'), NOW()),
-('https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80', 'Santorini Wine Tasting', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Santorini Wine Tasting'), NOW()),
-('https://images.unsplash.com/photo-1527631746610-bca00a040d60?auto=format&fit=crop&w=1200&q=80', 'Chania Old Harbor Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Chania Old Harbor Walk'), NOW()),
-('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', 'Elafonisi Beach Day', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Elafonisi Beach Day'), NOW()),
-('https://images.unsplash.com/photo-1527631746610-bca00a040d60?auto=format&fit=crop&w=1200&q=80', 'Rhodes Medieval Tour', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Rhodes Medieval Tour'), NOW()),
-('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1200&q=80', 'Paleokastritsa Boat Ride', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Paleokastritsa Boat Ride'), NOW());
+('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%20Athens%20%28February%202019%29.jpg', 'Athens History Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Athens History Walk'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%2C%20Athens%20%283340582775%29.jpg', 'Traditional Greek Dinner Plaka', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Traditional Greek Dinner Plaka'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Santorini Caldera Photo Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Santorini Caldera Photo Walk'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%288302758240%29.jpg', 'Santorini Wine Tasting', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Santorini Wine Tasting'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Street%20detail%20in%20Chania%20old%20town.jpg', 'Chania Old Harbor Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Chania Old Harbor Walk'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Elafonisi%20Beach.jpg', 'Elafonisi Beach Day', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Elafonisi Beach Day'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Rhodes%27%20old%20town.jpg', 'Rhodes Medieval Tour', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Rhodes Medieval Tour'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Paleokastritsa.jpg', 'Paleokastritsa Boat Ride', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Paleokastritsa Boat Ride'), NOW());
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 VALUES
@@ -3318,50 +3318,50 @@ VALUES
 -- 14.8 IMAGES - DESTINATIONS
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 VALUES
-('https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=1200&q=80', 'Barcelona', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'), NOW()),
-('https://images.unsplash.com/photo-1511527661048-7fe73d85e9a4?auto=format&fit=crop&w=1200&q=80', 'Barcelona', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'), NOW()),
-('https://images.unsplash.com/photo-1543783207-ec64e4d95325?auto=format&fit=crop&w=1200&q=80', 'Madrid', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Madrid'), NOW()),
-('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80', 'Madrid', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Madrid'), NOW()),
-('https://images.unsplash.com/photo-1509840841025-9088ba78a826?auto=format&fit=crop&w=1200&q=80', 'Valencia', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Valencia'), NOW()),
-('https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=1200&q=80', 'Valencia', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Valencia'), NOW());
+('https://commons.wikimedia.org/wiki/Special:FilePath/Barcelona%20Skyline.jpg', 'Barcelona', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barcelona', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Madrid', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Madrid'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid%20-%20007.jpg', 'Madrid', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Madrid'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Valencia', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Valencia'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Valencia%20skyline%20sunset%20%284262234180%29.jpg', 'Valencia', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Valencia'), NOW());
 
 -- 14.9 IMAGES - LOCALITIES
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 VALUES
-('https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?auto=format&fit=crop&w=1200&q=80', 'Gothic Quarter Barcelona', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gothic Quarter Barcelona'), NOW()),
-('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', 'Barceloneta Beach', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Barceloneta Beach'), NOW()),
-('https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1200&q=80', 'Gran Via Madrid', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gran Via Madrid'), NOW()),
-('https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=1200&q=80', 'Ciudad de las Artes Valencia', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ciudad de las Artes Valencia'), NOW());
+('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Gothic Quarter Barcelona', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gothic Quarter Barcelona'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Beach', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Barceloneta Beach'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Gran Via Madrid', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gran Via Madrid'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Ciudad de las Artes Valencia', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ciudad de las Artes Valencia'), NOW());
 
 -- 14.10 IMAGES - OBJECTS
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 VALUES
-('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80', 'Hotel Casa Batllo Suites', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Casa Batllo Suites'), NOW()),
-('https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=1200&q=80', 'Hotel Casa Batllo Suites', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Casa Batllo Suites'), NOW()),
-('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1200&q=80', 'Tapas House Gothic', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tapas House Gothic'), NOW()),
-('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80', 'Tapas House Gothic', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tapas House Gothic'), NOW()),
-('https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1200&q=80', 'Barceloneta Sunset Bar', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Barceloneta Sunset Bar'), NOW()),
-('https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=1200&q=80', 'Barceloneta Sunset Bar', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Barceloneta Sunset Bar'), NOW()),
-('https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80', 'Hotel Gran Via Palace', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Gran Via Palace'), NOW()),
-('https://images.unsplash.com/photo-1496417263034-38ec4f0b665a?auto=format&fit=crop&w=1200&q=80', 'Hotel Gran Via Palace', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Gran Via Palace'), NOW()),
-('https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=80', 'Oceanic Bistro Valencia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oceanic Bistro Valencia'), NOW()),
-('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80', 'Oceanic Bistro Valencia', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oceanic Bistro Valencia'), NOW());
+('https://commons.wikimedia.org/wiki/Special:FilePath/Barcelona%20Skyline.jpg', 'Hotel Casa Batllo Suites', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Casa Batllo Suites'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Hotel Casa Batllo Suites', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Casa Batllo Suites'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Tapas House Gothic', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tapas House Gothic'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona%20%2821%29%20%2830446599463%29.jpg', 'Tapas House Gothic', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tapas House Gothic'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Sunset Bar', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Barceloneta Sunset Bar'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Sunset Bar', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Barceloneta Sunset Bar'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Hotel Gran Via Palace', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Gran Via Palace'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid%20-%20007.jpg', 'Hotel Gran Via Palace', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Gran Via Palace'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Oceanic Bistro Valencia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oceanic Bistro Valencia'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Valencia%20skyline%20sunset%20%284262234180%29.jpg', 'Oceanic Bistro Valencia', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oceanic Bistro Valencia'), NOW());
 
 -- 14.11 IMAGES - EVENTS
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 VALUES
-('https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1200&q=80', 'Barcelona Summer Lights', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Barcelona Summer Lights'), NOW()),
-('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=80', 'Barceloneta Sunset Session', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Barceloneta Sunset Session'), NOW()),
-('https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80', 'Madrid Culture Week', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Madrid Culture Week'), NOW()),
-('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80', 'Valencia Paella Fest', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Valencia Paella Fest'), NOW());
+('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Barcelona Summer Lights', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Barcelona Summer Lights'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Sunset Session', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Barceloneta Sunset Session'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Madrid Culture Week', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Madrid Culture Week'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Valencia Paella Fest', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Valencia Paella Fest'), NOW());
 
 -- 14.12 IMAGES - ACTIVITIES
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 VALUES
-('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80', 'Gothic Tapas Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Gothic Tapas Walk'), NOW()),
-('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1200&q=80', 'Barceloneta Sunset Ride', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Barceloneta Sunset Ride'), NOW()),
-('https://images.unsplash.com/photo-1527631746610-bca00a040d60?auto=format&fit=crop&w=1200&q=80', 'Madrid Architecture Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Madrid Architecture Walk'), NOW()),
-('https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1200&q=80', 'Valencia Paella Experience', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Valencia Paella Experience'), NOW());
+('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Gothic Tapas Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Gothic Tapas Walk'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Sunset Ride', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Barceloneta Sunset Ride'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Madrid Architecture Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Madrid Architecture Walk'), NOW()),
+('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Valencia Paella Experience', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Valencia Paella Experience'), NOW());
 
 
     
