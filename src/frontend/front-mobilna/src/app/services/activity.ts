@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
+import { ActiveRegionService, RegionRequestOptions } from './active-region';
 
 export interface ActivityDto {
   id: number;
@@ -20,6 +21,9 @@ export interface ActivityDto {
   localityName?: string;
   destinationId?: number;
   destinationName?: string;
+  regionId?: number;
+  regionName?: string;
+  regionCode?: string;
   objectId?: number;
   objectName?: string;
   createdByUserId: number;
@@ -35,6 +39,7 @@ export interface ActivityQueryParams {
   type?: string;
   destination?: string;
   status?: string;
+  regionId?: number;
   page?: number;
   pageSize?: number;
   search?: string;
@@ -44,15 +49,22 @@ export interface ActivityQueryParams {
 
 @Injectable({ providedIn: 'root' })
 export class ActivityService {
-  private url = `${environment.apiUrl}/activities`;
+  private readonly url = `${environment.apiUrl}/activities`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly activeRegionService: ActiveRegionService,
+  ) {}
 
-  getAll(query?: ActivityQueryParams): Observable<ActivityDto[]> {
+  getAll(
+    query?: ActivityQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<ActivityDto[]> {
+    const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options);
     let params = new HttpParams();
 
-    if (query) {
-      Object.entries(query).forEach(([key, value]) => {
+    if (effectiveQuery) {
+      Object.entries(effectiveQuery).forEach(([key, value]) => {
         if (value != null && value !== '') {
           params = params.set(key, String(value));
         }

@@ -232,7 +232,7 @@ export class HomeComponent implements OnInit {
       this.events = list.map(e => ({
         id: e.id,
         title: e.name,
-        location: e.localityName ?? e.destinationName ?? 'Montenegro',
+        location: e.localityName ?? e.destinationName ?? e.regionName ?? '',
         imageUrl: e.mainImageUrl ?? e.images?.[0]?.url ?? '',
         dateText: e.date ?? '',
         timeText: this.eventTime(e.startDate, e.endDate),
@@ -350,7 +350,7 @@ export class HomeComponent implements OnInit {
         this.allItems = [
         ...this.toArray<DestinationDto>(destinations).map(d => this.normalizeDestination(d)).map(d => ({
           id: d.id, name: d.name, typeName: d.destinationTypeName,
-          location: 'Montenegro', image: d.mainImageUrl, icon: 'place',
+          location: d.regionName ?? d.destinationTypeName ?? '', image: d.mainImageUrl, icon: 'place',
           raw: d, category: 'destination' as const, markerType: 'destination'
         })),
         ...this.toArray<ObjectDto>(objects).map(o => this.normalizeObject(o)).map(o => ({
@@ -386,7 +386,7 @@ export class HomeComponent implements OnInit {
           (e): EventCard => ({
             id: e.id,
             title: e.name,
-            location: e.localityName ?? e.destinationName ?? 'Montenegro',
+            location: e.localityName ?? e.destinationName ?? e.regionName ?? '',
             dateText: this.eventDate(e.startDate),
             priceText: this.eventPrice(e.price),
             isFree: !e.price || e.price <= 0,
@@ -447,6 +447,7 @@ export class HomeComponent implements OnInit {
     name: string;
     description?: string;
     destinationTypeName: string;
+    regionName?: string;
     isActive: boolean;
     averageRating?: number;
     reviewCount?: number;
@@ -459,6 +460,7 @@ export class HomeComponent implements OnInit {
       name: String(dto['name'] ?? dto['Name'] ?? ''),
       description: (dto['description'] ?? dto['Description'] ?? undefined) as string | undefined,
       destinationTypeName: String(dto['destinationTypeName'] ?? dto['DestinationTypeName'] ?? ''),
+      regionName: (dto['regionName'] ?? dto['RegionName'] ?? undefined) as string | undefined,
       isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
       averageRating: this.readOptionalNumber(dto, ['averageRating', 'AverageRating']),
       reviewCount: this.readOptionalNumber(dto, ['reviewCount', 'ReviewCount']),
@@ -474,6 +476,7 @@ export class HomeComponent implements OnInit {
     objectTypeName: string;
     localityName?: string;
     destinationName?: string;
+    regionName?: string;
     averageRating?: number;
     reviewCount?: number;
     isActive: boolean;
@@ -489,6 +492,7 @@ export class HomeComponent implements OnInit {
       localityName: (dto['localityName'] ?? dto['LocalityName'] ?? undefined) as string | undefined,
       destinationName:
         (dto['destinationName'] ?? dto['DestinationName'] ?? undefined) as string | undefined,
+      regionName: (dto['regionName'] ?? dto['RegionName'] ?? undefined) as string | undefined,
       averageRating: this.readOptionalNumber(dto, ['averageRating', 'AverageRating']),
       reviewCount: this.readOptionalNumber(dto, ['reviewCount', 'ReviewCount']),
       isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
@@ -503,6 +507,7 @@ export class HomeComponent implements OnInit {
     activityTypeName: string;
     localityName?: string;
     destinationName?: string;
+    regionName?: string;
     price?: number;
     durationMinutes?: number;
     isActive: boolean;
@@ -516,6 +521,7 @@ export class HomeComponent implements OnInit {
       localityName: (dto['localityName'] ?? dto['LocalityName'] ?? undefined) as string | undefined,
       destinationName:
         (dto['destinationName'] ?? dto['DestinationName'] ?? undefined) as string | undefined,
+      regionName: (dto['regionName'] ?? dto['RegionName'] ?? undefined) as string | undefined,
       price: this.readOptionalNumber(dto, ['price', 'Price']),
       durationMinutes: this.readOptionalNumber(dto, ['durationMinutes', 'DurationMinutes']),
       isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
@@ -532,6 +538,7 @@ export class HomeComponent implements OnInit {
     isActive: boolean;
     localityName?: string | null;
     destinationName?: string | null;
+    regionName?: string | null;
     mainImageUrl?: string;
     images?: unknown[];
   } {
@@ -553,6 +560,7 @@ export class HomeComponent implements OnInit {
       isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
       localityName: (dto['localityName'] ?? dto['LocalityName'] ?? null) as string | null,
       destinationName: (dto['destinationName'] ?? dto['DestinationName'] ?? null) as string | null,
+      regionName: (dto['regionName'] ?? dto['RegionName'] ?? null) as string | null,
       mainImageUrl: this.readString(dto, ['mainImageUrl', 'MainImageUrl']),
       images: (dto['images'] ?? dto['Images']) as unknown[] | undefined,
     };
@@ -561,7 +569,7 @@ export class HomeComponent implements OnInit {
   private toDestinationCard(destination: ReturnType<HomeComponent['normalizeDestination']>): PlaceCard {
     const card: PlaceCard = {
       title: destination.name,
-      location: destination.destinationTypeName || 'Montenegro',
+      location: destination.regionName ?? destination.destinationTypeName,
       imageUrl: this.pickDestinationImage(destination),
       isFavorite: false,
       itemId: destination.id,
@@ -606,7 +614,11 @@ export class HomeComponent implements OnInit {
   private toActivityCard(activity: ReturnType<HomeComponent['normalizeActivity']>): PlaceCard {
     const card: PlaceCard = {
       title: activity.name,
-      location: activity.localityName ?? activity.destinationName ?? activity.activityTypeName,
+      location:
+        activity.localityName ??
+        activity.destinationName ??
+        activity.regionName ??
+        activity.activityTypeName,
       ratingText: this.activityMetaText(activity),
       imageUrl: this.resolveMediaUrl(activity.mainImageUrl),
       isFavorite: false,

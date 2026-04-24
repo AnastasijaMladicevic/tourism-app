@@ -2,10 +2,8 @@ import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, finalize, map, of, switchMap } from 'rxjs';
-import {
-  AuthService,
-  UserPreferredRegionDto,
-} from '../../services/auth';
+import { AuthService, UserPreferredRegionDto } from '../../services/auth';
+import { ActiveRegionService } from '../../services/active-region';
 import { RegionDto, RegionService } from '../../services/region';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
@@ -20,16 +18,16 @@ type RegionOption = RegionDto;
   styleUrl: './region.component.scss',
 })
 export class RegionComponent implements OnInit {
-  private readonly storageKey = 'spirego-region-id';
   private readonly location = inject(Location);
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
   private readonly regionService = inject(RegionService);
+  private readonly activeRegionService = inject(ActiveRegionService);
   private readonly translationService = inject(TranslationService);
 
   protected readonly options = signal<RegionOption[]>([]);
-  protected readonly selectedId = signal<number | null>(this.readStoredRegionId());
-  protected readonly appliedId = signal<number | null>(this.readStoredRegionId());
+  protected readonly selectedId = signal<number | null>(this.activeRegionService.getActiveRegionId());
+  protected readonly appliedId = signal<number | null>(this.activeRegionService.getActiveRegionId());
   protected readonly feedback = signal('');
   protected readonly loadError = signal('');
   protected readonly isLoading = signal(true);
@@ -69,9 +67,10 @@ export class RegionComponent implements OnInit {
     }
 
     if (!this.authService.isLoggedIn()) {
-      this.persistSelectedRegion(selected);
+      this.activeRegionService.setActiveRegionId(selected);
       this.appliedId.set(selected);
       this.feedback.set(this.translationService.translate('region.saved'));
+      this.router.navigate(['/home']);
       return;
     }
 
@@ -84,11 +83,11 @@ export class RegionComponent implements OnInit {
       .subscribe({
         next: (response) => {
           const appliedRegionId = this.resolvePreferredRegionId(response, this.options()) ?? selected;
-
-          this.persistSelectedRegion(appliedRegionId);
+          this.activeRegionService.setActiveRegionId(appliedRegionId);
           this.selectedId.set(appliedRegionId);
           this.appliedId.set(appliedRegionId);
           this.feedback.set(this.translationService.translate('region.saved'));
+          this.router.navigate(['/home']);
         },
         error: () => {
           this.feedback.set(this.translationService.translate('region.saveFailed'));
@@ -151,7 +150,7 @@ export class RegionComponent implements OnInit {
 
           const initialSelection =
             this.resolvePreferredRegionId(preferredRegion, regions) ??
-            this.readStoredRegionId() ??
+            this.activeRegionService.getActiveRegionId() ??
             regions.find((region) => region.isDefault)?.id ??
             regions[0]?.id ??
             null;
@@ -160,7 +159,7 @@ export class RegionComponent implements OnInit {
           this.appliedId.set(initialSelection);
 
           if (initialSelection != null) {
-            this.persistSelectedRegion(initialSelection);
+            this.activeRegionService.setActiveRegionId(initialSelection);
           }
         },
         error: () => {
@@ -189,27 +188,5 @@ export class RegionComponent implements OnInit {
     }
 
     return null;
-  }
-
-  private persistSelectedRegion(regionId: number): void {
-    if (typeof localStorage === 'undefined') {
-      return;
-    }
-
-    localStorage.setItem(this.storageKey, String(regionId));
-  }
-
-  private readStoredRegionId(): number | null {
-    if (typeof localStorage === 'undefined') {
-      return null;
-    }
-
-    const raw = localStorage.getItem(this.storageKey);
-    if (!raw) {
-      return null;
-    }
-
-    const parsed = Number(raw);
-    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
   }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
+import { ActiveRegionService, RegionRequestOptions } from './active-region';
 
 export interface ReviewDto {
   id: number;
@@ -16,10 +17,14 @@ export interface ReviewDto {
   status: string;
   reviewedByUserId?: number | null;
   reviewedByFullName?: string | null;
+  regionId?: number;
+  regionName?: string;
+  regionCode?: string;
   createdAt: string;
 }
 
 export interface ReviewQueryParams {
+  regionId?: number;
   page?: number;
   pageSize?: number;
   search?: string;
@@ -29,22 +34,26 @@ export interface ReviewQueryParams {
 
 @Injectable({ providedIn: 'root' })
 export class ReviewService {
+  private readonly baseUrl = `${environment.apiUrl}/reviews`;
 
-  private baseUrl = `${environment.apiUrl}/reviews`;
+  constructor(
+    private readonly http: HttpClient,
+    private readonly activeRegionService: ActiveRegionService,
+  ) {}
 
-  constructor(private http: HttpClient) {}
-
-  // Sve recenzije za određeni objekat
   getForObject(objectId: number): Observable<ReviewDto[]> {
     return this.http.get<ReviewDto[]>(`${this.baseUrl}/object/${objectId}`);
   }
 
-  // Sve recenzije (za "See All" stranicu)
-  getAll(query?: ReviewQueryParams): Observable<ReviewDto[]> {
+  getAll(
+    query?: ReviewQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<ReviewDto[]> {
+    const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options);
     let params = new HttpParams();
 
-    if (query) {
-      Object.entries(query).forEach(([key, value]) => {
+    if (effectiveQuery) {
+      Object.entries(effectiveQuery).forEach(([key, value]) => {
         if (value != null && value !== '') {
           params = params.set(key, String(value));
         }
@@ -54,12 +63,10 @@ export class ReviewService {
     return this.http.get<ReviewDto[]>(this.baseUrl, { params });
   }
 
-  // Jedna recenzija po ID
   getById(id: number): Observable<ReviewDto> {
     return this.http.get<ReviewDto>(`${this.baseUrl}/${id}`);
   }
 
-  // Kreiranje nove recenzije (samo Tourist)
   create(dto: any): Observable<ReviewDto> {
     return this.http.post<ReviewDto>(this.baseUrl, dto);
   }

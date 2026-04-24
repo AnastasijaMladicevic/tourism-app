@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ReviewDto } from './review';
+import { ActiveRegionService, RegionRequestOptions } from './active-region';
 
 export interface ObjectImageDto {
   id: number;
@@ -19,6 +20,8 @@ export interface ObjectDto {
   address?: string;
   phoneNumber?: string;
   website?: string;
+  menuUrl?: string;
+  cuisineType?: string;
   workingHours?: string;
   price?: Int16Array;
   amenities?: [];
@@ -31,8 +34,13 @@ export interface ObjectDto {
   isActive: boolean;
   objectTypeId: number;
   objectTypeName: string;
+  localityId?: number;
   localityName?: string;
+  destinationId?: number;
   destinationName?: string;
+  regionId?: number;
+  regionName?: string;
+  regionCode?: string;
   images?: ObjectImageDto[];
   reviews?: ReviewDto[];
 }
@@ -47,6 +55,7 @@ export interface ObjectQueryParams {
   destination?: string;
   locality?: string;
   status?: string;
+  regionId?: number;
   page?: number;
   pageSize?: number;
   search?: string;
@@ -58,6 +67,7 @@ export interface NearbyObjectQueryParams {
   latitude: number;
   longitude: number;
   radiusMeters?: number;
+  regionId?: number;
   type?: string;
   destination?: string;
   locality?: string;
@@ -82,15 +92,22 @@ export interface PagedResultDto<T> {
 
 @Injectable({ providedIn: 'root' })
 export class ObjectService {
-  private url = `${environment.apiUrl}/objects`;
+  private readonly url = `${environment.apiUrl}/objects`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly activeRegionService: ActiveRegionService,
+  ) {}
 
-  getAll(query?: ObjectQueryParams): Observable<ObjectDto[]> {
+  getAll(
+    query?: ObjectQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<ObjectDto[]> {
+    const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options);
     let params = new HttpParams();
 
-    if (query) {
-      Object.entries(query).forEach(([key, value]) => {
+    if (effectiveQuery) {
+      Object.entries(effectiveQuery).forEach(([key, value]) => {
         if (value != null && value !== '') {
           params = params.set(key, String(value));
         }
@@ -104,10 +121,14 @@ export class ObjectService {
     return this.http.get<ObjectDto>(`${this.url}/${id}`);
   }
 
-  getNearby(query: NearbyObjectQueryParams): Observable<PagedResultDto<ObjectDto>> {
+  getNearby(
+    query: NearbyObjectQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<PagedResultDto<ObjectDto>> {
+    const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options) ?? query;
     let params = new HttpParams();
 
-    Object.entries(query).forEach(([key, value]) => {
+    Object.entries(effectiveQuery).forEach(([key, value]) => {
       if (value == null || value === '') {
         return;
       }

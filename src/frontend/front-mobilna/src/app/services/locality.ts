@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
+import { ActiveRegionService, RegionRequestOptions } from './active-region';
 
 export interface LocalityDto {
   id: number;
@@ -14,20 +15,51 @@ export interface LocalityDto {
   distanceMeters?: number;
   destinationId: number;
   destinationName: string;
+  regionId?: number;
+  regionName?: string;
+  regionCode?: string;
   localityTypeId: number;
   localityTypeName: string;
   createdByUserId?: number;
   createdAt: string;
 }
 
+export interface LocalityQueryParams {
+  type?: string;
+  destination?: string;
+  regionId?: number;
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  sortBy?: string;
+  sortOrder?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class LocalityService {
-  private url = `${environment.apiUrl}/Localities`;
+  private readonly url = `${environment.apiUrl}/Localities`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly activeRegionService: ActiveRegionService,
+  ) {}
 
-  getAll(): Observable<LocalityDto[]> {
-    return this.http.get<LocalityDto[]>(this.url);
+  getAll(
+    query?: LocalityQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<LocalityDto[]> {
+    const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options);
+    let params = new HttpParams();
+
+    if (effectiveQuery) {
+      Object.entries(effectiveQuery).forEach(([key, value]) => {
+        if (value != null && value !== '') {
+          params = params.set(key, String(value));
+        }
+      });
+    }
+
+    return this.http.get<LocalityDto[]>(this.url, { params });
   }
 
   getById(id: number): Observable<LocalityDto> {

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
+import { ActiveRegionService, RegionRequestOptions } from './active-region';
 
 export interface EventDto {
   id: number;
@@ -19,8 +20,13 @@ export interface EventDto {
   status: string;
   eventTypeId: number;
   eventTypeName: string;
+  localityId?: number;
   localityName?: string;
+  destinationId?: number;
   destinationName?: string;
+  regionId?: number;
+  regionName?: string;
+  regionCode?: string;
   objectId?: number;
   objectName?: string;
   images?: EventImageDto[];
@@ -33,10 +39,27 @@ export interface EventImageDto {
   isMain: boolean;
 }
 
+export interface EventQueryParams {
+  type?: string;
+  destination?: string;
+  status?: string;
+  regionId?: number;
+  page?: number;
+  pageSize?: number;
+  search?: string;
+  date?: string;
+  nextDays?: number;
+  startDate?: string;
+  endDate?: string;
+  sortBy?: string;
+  sortOrder?: string;
+}
+
 export interface NearbyEventQueryParams {
   latitude: number;
   longitude: number;
   radiusMeters: number;
+  regionId?: number;
   type?: string;
   destination?: string;
   search?: string;
@@ -59,22 +82,43 @@ export interface PagedEventResultDto<T> {
 
 @Injectable({ providedIn: 'root' })
 export class EventService {
-  private url = `${environment.apiUrl}/events`;
+  private readonly url = `${environment.apiUrl}/events`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly activeRegionService: ActiveRegionService,
+  ) {}
 
   getById(id: number): Observable<EventDto> {
     return this.http.get<EventDto>(`${this.url}/${id}`);
   }
 
-  getAll(): Observable<EventDto[]> {
-    return this.http.get<EventDto[]>(this.url);
-  }
-
-  getNearby(query: NearbyEventQueryParams): Observable<PagedEventResultDto<EventDto>> {
+  getAll(
+    query?: EventQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<EventDto[]> {
+    const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options);
     let params = new HttpParams();
 
-    Object.entries(query).forEach(([key, value]) => {
+    if (effectiveQuery) {
+      Object.entries(effectiveQuery).forEach(([key, value]) => {
+        if (value != null && value !== '') {
+          params = params.set(key, String(value));
+        }
+      });
+    }
+
+    return this.http.get<EventDto[]>(this.url, { params });
+  }
+
+  getNearby(
+    query: NearbyEventQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<PagedEventResultDto<EventDto>> {
+    const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options) ?? query;
+    let params = new HttpParams();
+
+    Object.entries(effectiveQuery).forEach(([key, value]) => {
       if (value != null && value !== '') {
         params = params.set(key, String(value));
       }

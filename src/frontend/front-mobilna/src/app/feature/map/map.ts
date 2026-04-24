@@ -20,6 +20,8 @@ import { DestinationService } from '../../services/destination';
 import { ObjectService } from '../../services/object';
 import { EventService } from '../../services/event';
 import { AuthService } from '../../services/auth';
+import { RegionService } from '../../services/region';
+import { ActiveRegionService } from '../../services/active-region';
 
 interface SearchResult {
   id: number;
@@ -95,6 +97,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     private destinationService: DestinationService,
     private objectService: ObjectService,
     private eventService: EventService,
+    private regionService: RegionService,
+    private activeRegionService: ActiveRegionService,
   ) {}
 
   ngOnInit(): void {
@@ -114,6 +118,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const zoom = state?.zoom ?? 13;
 
     this.mapService.initMap('main-map', lat, lng, zoom);
+    if (!state?.lat || !state?.lng) {
+      this.focusActiveRegion();
+    }
     this.loadAllData(state);
 
     const map = this.mapService['map'];
@@ -409,10 +416,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private loadAllData(state?: any): void {
+    this.allItems = [];
+
     forkJoin({
-      destinations: this.destinationService.getAll(),
-      objects: this.objectService.getAll(),
-      events: this.eventService.getAll(),
+      destinations: this.destinationService.getAll(undefined, { bypassRegion: true }),
+      objects: this.objectService.getAll(undefined, { bypassRegion: true }),
+      events: this.eventService.getAll(undefined, { bypassRegion: true }),
     }).subscribe({
       next: ({ destinations, objects, events }) => {
         const destList = this.toArray<any>(destinations);
@@ -478,7 +487,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       id: raw.id,
       name: raw.name,
       typeName: raw.objectTypeName ?? raw.destinationTypeName ?? raw.eventTypeName ?? markerType,
-      location: raw.localityName ?? raw.destinationName ?? '',
+      location: raw.localityName ?? raw.destinationName ?? raw.regionName ?? '',
       image: raw.mainImageUrl ?? raw.images?.[0]?.url ?? '',
       icon: iconMap[markerType] ?? iconMap['default'],
       lat: raw.latitude,
@@ -514,11 +523,35 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   getItemLocation(): string {
     if (!this.selectedItem) return '';
     if (this.selectedType === 'destination') {
-      return this.selectedItem.destinationTypeName ?? '';
+      return this.selectedItem.regionName ?? this.selectedItem.destinationTypeName ?? '';
     }
-    return [this.selectedItem.localityName, this.selectedItem.destinationName]
+    return [this.selectedItem.localityName, this.selectedItem.destinationName, this.selectedItem.regionName]
       .filter(Boolean)
       .join(', ');
+  }
+
+  private focusActiveRegion(): void {
+    const activeRegionId = this.activeRegionService.getActiveRegionId();
+    const regionRequest = activeRegionId
+      ? this.regionService.getById(activeRegionId)
+      : this.regionService.getDefault();
+
+    regionRequest.subscribe({
+      next: (region) => {
+        if (region.centerLatitude == null || region.centerLongitude == null) {
+          return;
+        }
+
+        this.mapService.flyTo(
+          region.centerLatitude,
+          region.centerLongitude,
+          Math.round(region.defaultMapZoom ?? 8),
+        );
+      },
+      error: () => {
+        // keep the existing default center if region lookup fails
+      },
+    });
   }
 
   getWorkingStatus(): boolean | null {

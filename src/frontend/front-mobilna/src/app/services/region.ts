@@ -26,4 +26,12 @@ export class RegionService {
       params: { includeInactive },
     });
   }
+
+  getDefault(): Observable<RegionDto> {
+    return this.http.get<RegionDto>(`${this.url}/default`);
+  }
+
+  getById(id: number): Observable<RegionDto> {
+    return this.http.get<RegionDto>(`${this.url}/${id}`);
+  }
 }
