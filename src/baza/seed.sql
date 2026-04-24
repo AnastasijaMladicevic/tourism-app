@@ -2391,6 +2391,345 @@ VALUES
     NOW())
     ;
 
+-- ============================================
+-- 14. SPAIN DEMO CONTENT
+-- ============================================
+
+-- 14.1 USERS
+INSERT INTO "Users"
+("FirstName", "LastName", "DateOfBirth", "Email", "PasswordHash", "PhoneNumber", "Country", "Language",
+ "IsVerified", "IsActive", "IsBlacklisted", "HasRequestedCreatorRole", "RoleId", "ManagedDestinationId", "CreatedAt", "UpdatedAt", "ProfileImageUrl")
+VALUES
+('Lucia', 'Romero', '1988-05-14', 'lucia.admin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000001', 'Spanija', 'es', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Carmen', 'Alvarez', '1992-09-08', 'carmen.creator@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000002', 'Spanija', 'es', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'ContentCreator'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Mateo', 'Garcia', '1990-02-11', 'manager.barcelona@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000003', 'Spanija', 'es', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Javier', 'Ortega', '1989-11-03', 'manager.madrid@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000004', 'Spanija', 'es', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Paula', 'Moreno', '1991-07-22', 'manager.valencia@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000005', 'Spanija', 'es', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Diego', 'Santos', '1996-04-18', 'diego.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Spanija', 'es', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Sofia', 'Marin', '1997-01-26', 'sofia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Spanija', 'es', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Elena', 'Ruiz', '1995-10-10', 'elena.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Spanija', 'es', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
+
+-- 14.2 DESTINATIONS
+INSERT INTO "Destinations"
+("Name", "Description", "Geolocation", "Status", "IsActive", "DestinationTypeId", "RegionId", "CreatedByUserId", "ManagedByUserId", "CreatedAt", "UpdatedAt")
+VALUES
+('Barcelona', 'Katalonski grad poznat po arhitekturi, plazama i energicnom gradskom zivotu',
+ ST_SetSRID(ST_MakePoint(2.1734, 41.3851), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'ES'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NULL, NOW(), NOW()),
+
+('Madrid', 'Glavni grad Spanije sa bogatom kulturnom scenom, galerijama i gradskim trgovima',
+ ST_SetSRID(ST_MakePoint(-3.7038, 40.4168), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'ES'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NULL, NOW(), NOW()),
+
+('Valencia', 'Mediteranski grad poznat po paelji, modernoj arhitekturi i opustenoj obali',
+ ST_SetSRID(ST_MakePoint(-0.3763, 39.4699), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'ES'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NULL, NOW(), NOW());
+
+WITH spain_manager_assignments AS (
+    SELECT d."Id" AS destination_id, u."Id" AS manager_id
+    FROM (VALUES
+        ('Barcelona', 'manager.barcelona@spirego.com'),
+        ('Madrid', 'manager.madrid@spirego.com'),
+        ('Valencia', 'manager.valencia@spirego.com')
+    ) AS map(destination_name, manager_email)
+    JOIN "Destinations" d ON d."Name" = map.destination_name
+    JOIN "Users" u ON u."Email" = map.manager_email
+)
+UPDATE "Destinations" d
+SET "ManagedByUserId" = m.manager_id
+FROM spain_manager_assignments m
+WHERE d."Id" = m.destination_id;
+
+WITH spain_manager_assignments AS (
+    SELECT d."Id" AS destination_id, u."Id" AS manager_id
+    FROM (VALUES
+        ('Barcelona', 'manager.barcelona@spirego.com'),
+        ('Madrid', 'manager.madrid@spirego.com'),
+        ('Valencia', 'manager.valencia@spirego.com')
+    ) AS map(destination_name, manager_email)
+    JOIN "Destinations" d ON d."Name" = map.destination_name
+    JOIN "Users" u ON u."Email" = map.manager_email
+)
+UPDATE "Users" u
+SET "ManagedDestinationId" = m.destination_id
+FROM spain_manager_assignments m
+WHERE u."Id" = m.manager_id;
+
+-- 14.3 LOCALITIES
+INSERT INTO "Localities"
+("Name", "Description", "Geolocation", "IsActive", "DestinationId", "LocalityTypeId", "CreatedByUserId", "CreatedAt")
+VALUES
+('Gothic Quarter Barcelona', 'Istorijsko jezgro Barselone sa uskim ulicama, trgovima i bogatom gastronomijom',
+ ST_SetSRID(ST_MakePoint(2.1760, 41.3839), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Stari Grad'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NOW()),
+
+('Barceloneta Beach', 'Zivopisna barselonska plaza poznata po setalistu, sportovima i zalascima sunca',
+ ST_SetSRID(ST_MakePoint(2.1966, 41.3780), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Plaza'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NOW()),
+
+('Gran Via Madrid', 'Centralna gradska osa Madrida sa pozoristima, prodavnicama i istorijskim zgradama',
+ ST_SetSRID(ST_MakePoint(-3.7058, 40.4202), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Madrid'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NOW()),
+
+('Ciudad de las Artes Valencia', 'Savremeni kulturni kvart Valensije sa futuristickom arhitekturom i velikim javnim prostorima',
+ ST_SetSRID(ST_MakePoint(-0.3516, 39.4553), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Valencia'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Kulturna cetvrt'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NOW());
+
+UPDATE "Localities" l
+SET "CreatedByUserId" = d."ManagedByUserId",
+    "UpdatedAt" = NOW()
+FROM "Destinations" d
+WHERE l."DestinationId" = d."Id"
+  AND d."Name" IN ('Barcelona', 'Madrid', 'Valencia');
+
+-- 14.4 OBJECTS
+INSERT INTO "Objects"
+("Name", "Description", "Address", "PhoneNumber", "Website", "MenuUrl", "CuisineType", "WorkingHours", "Price", "Amenities", "Geolocation", "AverageRating", "ReviewCount",
+ "Status", "IsActive", "ObjectTypeId", "LocalityId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
+VALUES
+('Hotel Casa Batllo Suites', 'Boutique hotel u istorijskom jezgru Barselone sa pogledom na gradske krovove', 'Gothic Quarter, Barcelona', '+34930000001', 'https://www.barcelonaturisme.com',
+ NULL, NULL, '{"pon":"00:00-24:00"}', 210.00, ARRAY['WiFi', 'Rooftop', 'Dorucak', 'Transfer'], ST_SetSRID(ST_MakePoint(2.1746, 41.3856), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gothic Quarter Barcelona'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'carmen.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.barcelona@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Tapas House Gothic', 'Moderan restoran sa tapas jelima, lokalnim vinima i kasnim vecernjim servisom', 'Carrer del Bisbe, Barcelona', '+34930000002', 'https://www.barcelonaturisme.com',
+ NULL, 'Tapas i mediteranska', '{"pon":"12:00-23:30"}', 38.00, ARRAY['WiFi', 'Terasa', 'Rezervacije', 'Veganske opcije'], ST_SetSRID(ST_MakePoint(2.1758, 41.3835), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gothic Quarter Barcelona'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'carmen.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.barcelona@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Barceloneta Sunset Bar', 'Bar uz plazu sa koktelima, muzikom i otvorenom terasom prema moru', 'Passeig Maritim, Barcelona', '+34930000003', 'https://www.barcelonaturisme.com',
+ NULL, 'Kokteli i bar food', '{"pon":"10:00-02:00"}', 18.00, ARRAY['Kokteli', 'Muzika', 'Pogled na more', 'Terasa'], ST_SetSRID(ST_MakePoint(2.1955, 41.3783), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Barceloneta Beach'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'carmen.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.barcelona@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Hotel Gran Via Palace', 'Elegantni gradski hotel u centru Madrida, pogodan za obilaske i poslovna putovanja', 'Gran Via 42, Madrid', '+34910000001', 'https://www.esmadrid.com',
+ NULL, NULL, '{"pon":"00:00-24:00"}', 195.00, ARRAY['WiFi', 'Spa', 'Parking', 'Dorucak'], ST_SetSRID(ST_MakePoint(-3.7049, 40.4205), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gran Via Madrid'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Madrid'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'carmen.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.madrid@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Oceanic Bistro Valencia', 'Restoran inspirisan mediteranskom kuhinjom u modernom delu Valensije', 'Avinguda del Professor Lopez Pinero, Valencia', '+34960000001', 'https://www.visitvalencia.com',
+ NULL, 'Mediteranska i spanjolska', '{"pon":"11:00-23:00"}', 34.00, ARRAY['Terasa', 'Pogled na vodu', 'Porodicno', 'Rezervacije'], ST_SetSRID(ST_MakePoint(-0.3508, 39.4557), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ciudad de las Artes Valencia'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Valencia'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'carmen.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.valencia@spirego.com'),
+ NOW(), NOW(), NOW());
+
+-- 14.5 ACTIVITIES
+INSERT INTO "Activities"
+("Name", "Description", "Geolocation", "Price", "DurationMinutes", "IsActive", "ActivityTypeId", "LocalityId", "DestinationId", "ObjectId", "Status", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
+VALUES
+('Gothic Tapas Walk', 'Vecernja setnja kroz istorijski deo Barselone uz tapas degustaciju i lokalna vina',
+ ST_SetSRID(ST_MakePoint(2.1759, 41.3836), 4326), 28.00, 120, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Degustacija hrane'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gothic Quarter Barcelona'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tapas House Gothic'),
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'carmen.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.barcelona@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Barceloneta Sunset Ride', 'Lagani biciklisticki obilazak obale uz zavrsetak na plazi tokom zalaska sunca',
+ ST_SetSRID(ST_MakePoint(2.1959, 41.3781), 4326), 18.00, 90, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Biciklizam'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Barceloneta Beach'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'),
+ NULL,
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'carmen.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.barcelona@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Madrid Architecture Walk', 'Pesacka tura kroz centar Madrida sa fokusom na fasade, trgove i gradske price',
+ ST_SetSRID(ST_MakePoint(-3.7052, 40.4204), 4326), 0.00, 150, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Razgledanje'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gran Via Madrid'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Madrid'),
+ NULL,
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'carmen.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.madrid@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Valencia Paella Experience', 'Gastronomsko iskustvo uz mediteranske ukuse i prezentaciju pripreme paelje',
+ ST_SetSRID(ST_MakePoint(-0.3510, 39.4556), 4326), 32.00, 110, true,
+ (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Degustacija hrane'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ciudad de las Artes Valencia'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Valencia'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oceanic Bistro Valencia'),
+ 1,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'carmen.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.valencia@spirego.com'),
+ NOW(), NOW(), NOW());
+
+-- 14.6 EVENTS
+INSERT INTO "Events"
+("Name", "Description", "Geolocation", "StartDate", "EndDate", "Price", "MaxVisitors", "IsActive", "Status", "EventTypeId", "LocalityId", "DestinationId", "ObjectId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
+VALUES
+('Barcelona Summer Lights', 'Letnji festivalski program sa muzikom, ulicnim performansima i nocnim obilascima istorijskog centra',
+ ST_SetSRID(ST_MakePoint(2.1756, 41.3840), 4326), '2026-07-18 19:30', '2026-07-20 23:30', 18.00, 1200, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gothic Quarter Barcelona'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Casa Batllo Suites'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'carmen.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.barcelona@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Barceloneta Sunset Session', 'Vecernji nastup na otvorenom sa DJ setovima i plaznim ambijentom',
+ ST_SetSRID(ST_MakePoint(2.1961, 41.3782), 4326), '2026-08-09 20:00', '2026-08-10 00:30', 12.00, 500, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Nastup'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Barceloneta Beach'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Barceloneta Sunset Bar'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'carmen.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.barcelona@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Madrid Culture Week', 'Nedeljni gradski program sa manjim izlozbama, muzikom i vodjenim setnjama kroz centar',
+ ST_SetSRID(ST_MakePoint(-3.7056, 40.4201), 4326), '2026-09-10 17:00', '2026-09-14 22:00', 15.00, 900, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gran Via Madrid'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Madrid'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Gran Via Palace'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'carmen.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.madrid@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Valencia Paella Fest', 'Gastronomski sajam sa degustacijama, live cooking segmentima i lokalnim proizvodjacima',
+ ST_SetSRID(ST_MakePoint(-0.3513, 39.4555), 4326), '2026-10-03 12:00', '2026-10-03 21:00', 10.00, 700, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Sajam'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ciudad de las Artes Valencia'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Valencia'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oceanic Bistro Valencia'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'carmen.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.valencia@spirego.com'),
+ NOW(), NOW(), NOW());
+
+-- 14.7 REVIEWS
+INSERT INTO "Reviews"
+("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'diego.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Casa Batllo Suites'),
+ 5, 'Sjajna lokacija i odlican dorucak, hotel je idealan za obilazak Barselone.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'sofia.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Casa Batllo Suites'),
+ 4, 'Veoma prijatan smestaj i lep pogled sa krova, recepcija je bila brza i ljubazna.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'elena.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tapas House Gothic'),
+ 5, 'Tapasi su bili fantasticni, a osoblje je davalo odlicne preporuke za vino.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'diego.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tapas House Gothic'),
+ 4, 'Odlicna hrana i fina atmosfera, samo je bilo malo guzve u vecernjem terminu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'sofia.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Barceloneta Sunset Bar'),
+ 5, 'Savrsen zalazak sunca, muzika taman koliko treba i super kokteli.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'elena.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Gran Via Palace'),
+ 4, 'Hotel je tih i uredan, a Gran Via je odlicna baza za gradske obilaske.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'diego.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oceanic Bistro Valencia'),
+ 5, 'Paelja je bila odlicna, a ambijent moderan i opusten.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'sofia.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oceanic Bistro Valencia'),
+ 4, 'Dobra usluga i lep pogled na moderni deo grada, preporuka za veceru.', 'Approved', NOW());
+
+-- 14.8 IMAGES - DESTINATIONS
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
+VALUES
+('https://images.unsplash.com/photo-1539037116277-4db20889f2d4?auto=format&fit=crop&w=1200&q=80', 'Barcelona', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'), NOW()),
+('https://images.unsplash.com/photo-1511527661048-7fe73d85e9a4?auto=format&fit=crop&w=1200&q=80', 'Barcelona', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'), NOW()),
+('https://images.unsplash.com/photo-1543783207-ec64e4d95325?auto=format&fit=crop&w=1200&q=80', 'Madrid', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Madrid'), NOW()),
+('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80', 'Madrid', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Madrid'), NOW()),
+('https://images.unsplash.com/photo-1509840841025-9088ba78a826?auto=format&fit=crop&w=1200&q=80', 'Valencia', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Valencia'), NOW()),
+('https://images.unsplash.com/photo-1505761671935-60b3a7427bad?auto=format&fit=crop&w=1200&q=80', 'Valencia', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Valencia'), NOW());
+
+-- 14.9 IMAGES - LOCALITIES
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
+VALUES
+('https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?auto=format&fit=crop&w=1200&q=80', 'Gothic Quarter Barcelona', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gothic Quarter Barcelona'), NOW()),
+('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80', 'Barceloneta Beach', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Barceloneta Beach'), NOW()),
+('https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1200&q=80', 'Gran Via Madrid', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gran Via Madrid'), NOW()),
+('https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=1200&q=80', 'Ciudad de las Artes Valencia', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ciudad de las Artes Valencia'), NOW());
+
+-- 14.10 IMAGES - OBJECTS
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
+VALUES
+('https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1200&q=80', 'Hotel Casa Batllo Suites', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Casa Batllo Suites'), NOW()),
+('https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=1200&q=80', 'Hotel Casa Batllo Suites', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Casa Batllo Suites'), NOW()),
+('https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1200&q=80', 'Tapas House Gothic', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tapas House Gothic'), NOW()),
+('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80', 'Tapas House Gothic', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tapas House Gothic'), NOW()),
+('https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1200&q=80', 'Barceloneta Sunset Bar', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Barceloneta Sunset Bar'), NOW()),
+('https://images.unsplash.com/photo-1470337458703-46ad1756a187?auto=format&fit=crop&w=1200&q=80', 'Barceloneta Sunset Bar', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Barceloneta Sunset Bar'), NOW()),
+('https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80', 'Hotel Gran Via Palace', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Gran Via Palace'), NOW()),
+('https://images.unsplash.com/photo-1496417263034-38ec4f0b665a?auto=format&fit=crop&w=1200&q=80', 'Hotel Gran Via Palace', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Gran Via Palace'), NOW()),
+('https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=1200&q=80', 'Oceanic Bistro Valencia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oceanic Bistro Valencia'), NOW()),
+('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80', 'Oceanic Bistro Valencia', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oceanic Bistro Valencia'), NOW());
+
+-- 14.11 IMAGES - EVENTS
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
+VALUES
+('https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1200&q=80', 'Barcelona Summer Lights', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Barcelona Summer Lights'), NOW()),
+('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=80', 'Barceloneta Sunset Session', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Barceloneta Sunset Session'), NOW()),
+('https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80', 'Madrid Culture Week', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Madrid Culture Week'), NOW()),
+('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1200&q=80', 'Valencia Paella Fest', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Valencia Paella Fest'), NOW());
+
+-- 14.12 IMAGES - ACTIVITIES
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
+VALUES
+('https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80', 'Gothic Tapas Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Gothic Tapas Walk'), NOW()),
+('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1200&q=80', 'Barceloneta Sunset Ride', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Barceloneta Sunset Ride'), NOW()),
+('https://images.unsplash.com/photo-1527631746610-bca00a040d60?auto=format&fit=crop&w=1200&q=80', 'Madrid Architecture Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Madrid Architecture Walk'), NOW()),
+('https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=1200&q=80', 'Valencia Paella Experience', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Valencia Paella Experience'), NOW());
+
 
     
 -- ============================================

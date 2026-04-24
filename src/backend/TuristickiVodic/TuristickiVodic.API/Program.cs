@@ -194,10 +194,14 @@ using (var scope = app.Services.CreateScope())
         app.Configuration.GetValue<bool>("SeedData:RunOnStartup");
     var seedIfDatabaseEmpty = app.Configuration.GetValue<bool?>("SeedData:SeedIfDatabaseEmpty")
         ?? app.Environment.IsDevelopment();
+    // Earlier data-only migrations can insert support users even on a fresh database.
+    // Treat the database as empty until actual tourism content exists, so seed.sql still runs.
     var databaseIsEffectivelyEmpty =
-        !db.Users.Any() &&
         !db.Destinations.Any() &&
-        !db.Objects.Any();
+        !db.Localities.Any() &&
+        !db.Objects.Any() &&
+        !db.Activities.Any() &&
+        !db.Events.Any();
 
     if (resetAndSeedOnStartup || (seedIfDatabaseEmpty && databaseIsEffectivelyEmpty))
     {

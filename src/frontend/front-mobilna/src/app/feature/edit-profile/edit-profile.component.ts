@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import { environment } from '../../../environment/environment';
 import { AuthService, UpdateUserDto, UserDto } from '../../services/auth';
-import { TranslationService } from '../../services/translation.service';
+import { AppLanguage, TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 interface InterestOption {
@@ -45,7 +45,7 @@ export class EditProfileComponent implements OnInit {
   protected readonly country = signal('');
   protected readonly email = signal('');
   protected readonly phone = signal('');
-  protected readonly appLanguageCode = signal<'sr' | 'en'>('sr');
+  protected readonly appLanguageCode = signal<AppLanguage>('sr');
   protected readonly isSaving = signal(false);
   protected readonly isLanguageMenuOpen = signal(false);
   protected readonly feedbackMessage = signal('');
@@ -58,8 +58,12 @@ export class EditProfileComponent implements OnInit {
     photo: '',
   });
   protected readonly languageOptions = [
+    { code: 'me', labelKey: 'language.montenegrin' },
     { code: 'sr', labelKey: 'language.serbian' },
     { code: 'en', labelKey: 'language.english' },
+    { code: 'es', labelKey: 'language.spanish' },
+    { code: 'it', labelKey: 'language.italian' },
+    { code: 'el', labelKey: 'language.greek' },
   ];
 
   protected readonly imageUrl = computed(() => {
@@ -262,7 +266,7 @@ export class EditProfileComponent implements OnInit {
   }
 
   protected languageLabel(code = this.appLanguageCode()): string {
-    return this.translationService.translate(code === 'en' ? 'language.english' : 'language.serbian');
+    return this.translationService.translate(this.translationService.labelKeyForLanguage(code));
   }
 
   private patchFromUser(user: UserDto): void {
@@ -274,8 +278,8 @@ export class EditProfileComponent implements OnInit {
     this.appLanguageCode.set(this.normalizeLanguage(user.language));
   }
 
-  private normalizeLanguage(language?: string | null): 'sr' | 'en' {
-    return language?.toLowerCase() === 'en' ? 'en' : 'sr';
+  private normalizeLanguage(language?: string | null): AppLanguage {
+    return this.translationService.normalizeLanguageCode(language);
   }
 
   private setFeedback(message: string, tone: 'success' | 'error' | 'neutral'): void {

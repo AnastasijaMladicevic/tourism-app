@@ -1,8 +1,18 @@
 import { Injectable, effect, signal } from '@angular/core';
 
-export type AppLanguage = 'sr' | 'en';
+export type AppLanguage = 'me' | 'sr' | 'en' | 'es' | 'it' | 'el';
+type TranslationLocale = 'sr' | 'en';
 
-const TRANSLATIONS: Record<string, Record<AppLanguage, string>> = {
+const LANGUAGE_LABEL_KEYS: Record<AppLanguage, string> = {
+  me: 'language.montenegrin',
+  sr: 'language.serbian',
+  en: 'language.english',
+  es: 'language.spanish',
+  it: 'language.italian',
+  el: 'language.greek',
+};
+
+const TRANSLATIONS: Record<string, Record<TranslationLocale, string>> = {
   'common.back': { sr: 'Nazad', en: 'Back' },
   'common.loading': { sr: 'Ucitavanje...', en: 'Loading...' },
   'common.save': { sr: 'Sacuvaj', en: 'Save' },
@@ -98,8 +108,12 @@ const TRANSLATIONS: Record<string, Record<AppLanguage, string>> = {
     sr: 'Klikom na dugme potvrdujete promenu regiona aplikacije na {{language}}.',
     en: 'By tapping the button you confirm switching the app region to {{language}}.',
   },
-  'language.serbian': { sr: 'Crnogorski / Srpski', en: 'Montenegrin / Serbian' },
+  'language.montenegrin': { sr: 'Crnogorski', en: 'Montenegrin' },
+  'language.serbian': { sr: 'Srpski', en: 'Serbian' },
   'language.english': { sr: 'English', en: 'English' },
+  'language.spanish': { sr: 'Spanski', en: 'Spanish' },
+  'language.italian': { sr: 'Italijanski', en: 'Italian' },
+  'language.greek': { sr: 'Grcki', en: 'Greek' },
 
   'favorites.heroEyebrow': { sr: 'FAVORITI', en: 'FAVORITES' },
   'favorites.heroTitle': {
@@ -408,7 +422,21 @@ export class TranslationService {
   }
 
   currentLocale(): string {
-    return this.activeLanguage() === 'en' ? 'en-US' : 'sr-Latn-RS';
+    switch (this.activeLanguage()) {
+      case 'en':
+        return 'en-US';
+      case 'es':
+        return 'es-ES';
+      case 'it':
+        return 'it-IT';
+      case 'el':
+        return 'el-GR';
+      case 'me':
+        return 'sr-Latn-ME';
+      case 'sr':
+      default:
+        return 'sr-Latn-RS';
+    }
   }
 
   setLanguage(language?: string | null): AppLanguage {
@@ -417,8 +445,16 @@ export class TranslationService {
     return normalized;
   }
 
+  normalizeLanguageCode(language?: string | null): AppLanguage {
+    return this.normalizeLanguage(language);
+  }
+
+  labelKeyForLanguage(language?: string | null): string {
+    return LANGUAGE_LABEL_KEYS[this.normalizeLanguage(language)];
+  }
+
   translate(key: string, params?: Record<string, string | number>): string {
-    const language = this.activeLanguage();
+    const language = this.resolveTranslationLocale(this.activeLanguage());
     const template = TRANSLATIONS[key]?.[language] ?? TRANSLATIONS[key]?.sr ?? key;
 
     if (!params) {
@@ -439,6 +475,26 @@ export class TranslationService {
   }
 
   private normalizeLanguage(language?: string | null): AppLanguage {
-    return language?.toLowerCase() === 'en' ? 'en' : 'sr';
+    switch (language?.trim().toLowerCase()) {
+      case 'me':
+      case 'cnr':
+        return 'me';
+      case 'en':
+        return 'en';
+      case 'es':
+        return 'es';
+      case 'it':
+        return 'it';
+      case 'el':
+      case 'gr':
+        return 'el';
+      case 'sr':
+      default:
+        return 'sr';
+    }
+  }
+
+  private resolveTranslationLocale(language: AppLanguage): TranslationLocale {
+    return language === 'me' || language === 'sr' ? 'sr' : 'en';
   }
 }

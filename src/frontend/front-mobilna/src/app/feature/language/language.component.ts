@@ -3,11 +3,11 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import { AuthService, UserDto } from '../../services/auth';
-import { TranslationService } from '../../services/translation.service';
+import { AppLanguage, TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 interface LanguageOption {
-  code: string;
+  code: AppLanguage;
   labelKey: string;
 }
 
@@ -24,12 +24,16 @@ export class LanguageComponent implements OnInit {
   private readonly translationService = inject(TranslationService);
 
   protected readonly options: LanguageOption[] = [
-    { code: 'en', labelKey: 'language.english' },
+    { code: 'me', labelKey: 'language.montenegrin' },
     { code: 'sr', labelKey: 'language.serbian' },
+    { code: 'en', labelKey: 'language.english' },
+    { code: 'es', labelKey: 'language.spanish' },
+    { code: 'it', labelKey: 'language.italian' },
+    { code: 'el', labelKey: 'language.greek' },
   ];
 
-  protected readonly selectedCode = signal('sr');
-  protected readonly appliedCode = signal('sr');
+  protected readonly selectedCode = signal<AppLanguage>('sr');
+  protected readonly appliedCode = signal<AppLanguage>('sr');
   protected readonly isSaving = signal(false);
   protected readonly feedback = signal('');
 
@@ -63,7 +67,7 @@ export class LanguageComponent implements OnInit {
     this.router.navigate(['/profile']);
   }
 
-  protected selectLanguage(code: string): void {
+  protected selectLanguage(code: AppLanguage): void {
     this.selectedCode.set(code);
     this.feedback.set('');
   }
@@ -112,12 +116,10 @@ export class LanguageComponent implements OnInit {
   }
 
   protected getSelectedLanguageLabel(): string {
-    return this.translationService.translate(
-      this.selectedCode() === 'en' ? 'language.english' : 'language.serbian',
-    );
+    return this.translationService.translate(this.translationService.labelKeyForLanguage(this.selectedCode()));
   }
 
-  private normalizeLanguage(language?: string | null): string {
-    return language?.toLowerCase() === 'en' ? 'en' : 'sr';
+  private normalizeLanguage(language?: string | null): AppLanguage {
+    return this.translationService.normalizeLanguageCode(language);
   }
 }
