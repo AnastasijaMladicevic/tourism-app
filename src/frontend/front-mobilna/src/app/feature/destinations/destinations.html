@@ -3,7 +3,7 @@
     <button class="icon-btn" (click)="goBack()" aria-label="Go back">
       <mat-icon>arrow_back_ios</mat-icon>
     </button>
-    <h1 class="header__title">Atrakcije</h1>
+    <h1 class="header__title">Destinations</h1>
   </div>
 
   <div class="filters-row">
@@ -12,7 +12,7 @@
         <mat-icon>search</mat-icon>
         <input
           type="text"
-          placeholder="Search attractions..."
+          placeholder="Search destinations..."
           [(ngModel)]="searchQuery"
           (ngModelChange)="onSearchChange()"
         />
@@ -74,7 +74,7 @@
   </div>
 
   <div class="results-bar">
-    <span class="results-bar__count">{{ totalCount }} places found</span>
+    <span class="results-bar__count">{{ totalCount }} objects found</span>
   </div>
 
   @if (isLoading) {
@@ -145,7 +145,7 @@
     @if (totalCount === 0 && !isLoading) {
       <div class="empty">
         <mat-icon>search_off</mat-icon>
-        <p>No attractions found.</p>
+        <p>No destinations found.</p>
       </div>
     }
   </div>

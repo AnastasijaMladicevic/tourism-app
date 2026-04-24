@@ -66,6 +66,11 @@ const TRANSLATIONS: Record<string, Record<AppLanguage, string>> = {
     sr: 'Nakon cuvanja, kompletan mobilni interfejs ce odmah biti prikazan na izabranom regionu.',
     en: 'After saving, the entire mobile interface will switch to the selected region immediately.',
   },
+  'region.montenegro': { sr: 'Crna Gora', en: 'Montenegro' },
+  'region.spain': { sr: 'Spanija', en: 'Spain' },
+  'region.active': { sr: 'Region je vec aktivan.', en: 'This region is already active.' },
+  'region.saved': { sr: 'Region je uspesno azuriran.', en: 'Region was updated successfully.' },
+  'region.saveFailed': { sr: 'Promena regiona nije sacuvana.', en: 'Region change was not saved.' },
   'language.title': { sr: 'Jezik', en: 'Language' },
   'language.available': { sr: 'Dostupni jezici', en: 'Available languages' },
   'language.infoTitle': {
@@ -96,7 +101,7 @@ const TRANSLATIONS: Record<string, Record<AppLanguage, string>> = {
   'favorites.heroEyebrow': { sr: 'FAVORITI', en: 'FAVORITES' },
   'favorites.heroTitle': {
     sr: 'Tvoje omiljene stavke su na jednom mestu.',
-    en: 'All of your favorite places are in one place.',
+    en: 'All of your favorite objects are in one place.',
   },
   'favorites.heroBody': {
     sr: 'Pregledaj sve sto si dodao u favorite i brzo ukloni stavke koje vise ne zelis da cuvas.',
@@ -314,7 +319,7 @@ const TRANSLATIONS: Record<string, Record<AppLanguage, string>> = {
   'terms.note.2': { sr: 'Lokalno sacuvani planer radi samo na uredjaju na kom je kreiran.', en: 'The locally stored planner works only on the device where it was created.' },
   'terms.note.3': { sr: 'Za pravne i produkcione verzije uslova potrebno je uskladjivanje sa timom i backend specifikacijom.', en: 'Legal and production versions of the terms still need to be aligned with the team and the backend specification.' },
 
-  'map.searchPlaceholder': { sr: 'Pretrazi mesta, rute...', en: 'Search places, routes...' },
+  'map.searchPlaceholder': { sr: 'Pretrazi objekte, rute...', en: 'Search objects, routes...' },
   'map.geoUnsupported': { sr: 'Geolokacija nije podrzana u ovom browseru.', en: 'Geolocation is not supported in this browser.' },
   'map.geoDenied': { sr: 'Dozvolite pristup lokaciji u podesavanjima browsera.', en: 'Please allow location access in your browser settings.' },
   'map.geoUnavailable': { sr: 'Lokacija trenutno nije dostupna.', en: 'Location is currently unavailable.' },

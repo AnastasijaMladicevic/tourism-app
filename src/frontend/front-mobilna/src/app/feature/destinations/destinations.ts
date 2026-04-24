@@ -22,14 +22,14 @@ export interface DestinationView extends DestinationDto {
 }
 
 @Component({
-  selector: 'app-attractions',
+  selector: 'app-destinations',
   standalone: true,
   imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
-  templateUrl: './attractions.html',
-  styleUrls: ['./attractions.scss'],
+  templateUrl: './destinations.html',
+  styleUrls: ['./destinations.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class AttractionsComponent implements OnInit {
+export class DestinationsComponent implements OnInit {
   searchQuery = '';
   activeFilter = 'All';
   sortOption: 'az' | 'za' | 'distance' = 'az';
@@ -85,7 +85,7 @@ export class AttractionsComponent implements OnInit {
       this.visibleDestinations = [];
       this.totalCount = 0;
       this.hasNextPage = false;
-      this.errorMessage = 'Failed to load attractions.';
+      this.errorMessage = 'Failed to load destinations.';
       this.isLoading = false;
       this.cdr.detectChanges();
     }

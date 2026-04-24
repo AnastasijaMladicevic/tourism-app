@@ -120,6 +120,11 @@ export const routes: Routes = [
       import('./feature/about/about.component').then((m) => m.AboutComponent),
   },
   {
+    path: 'region',
+    loadComponent: () =>
+      import('./feature/region/region.component').then((m) => m.RegionComponent),
+  },
+  {
     path: 'language',
     canActivate: [profileAuthGuard],
     loadComponent: () =>
@@ -167,9 +172,9 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'attractions',
+    path: 'destinations',
     loadComponent: () =>
-      import('./feature/attractions/attractions').then((m) => m.AttractionsComponent),
+      import('./feature/destinations/destinations').then((m) => m.DestinationsComponent),
   },
   {
     path: 'hotels',
@@ -193,7 +198,7 @@ export const routes: Routes = [
   {
     path: 'objects',
     loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
-    data: { type: null, title: 'Places' },
+    data: { type: null, title: 'Objects' },
   },
   ...objectTypeRoutes,
   {

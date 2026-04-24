@@ -1,0 +1,51 @@
+<div class="region-page">
+  <header class="region-topbar">
+    <button class="back-btn" type="button" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m15 18-6-6 6-6" />
+      </svg>
+    </button>
+    <h1>{{ 'region.title' | translate }}</h1>
+    <div class="topbar-spacer" aria-hidden="true"></div>
+  </header>
+
+  <div class="region-shell">
+    <section class="region-section">
+      <h2>{{ 'region.available' | translate }}</h2>
+      <div class="region-card">
+        @for (option of options; track option.code) {
+          <button class="region-option" type="button" (click)="selectRegion(option.code)">
+            <div class="region-option__content">
+              <strong>{{ option.labelKey | translate }}</strong>
+            </div>
+
+            <span class="region-option__radio" [class.region-option__radio--active]="isSelected(option.code)">
+              @if (isSelected(option.code)) {
+                <span></span>
+              }
+            </span>
+          </button>
+        }
+      </div>
+    </section>
+
+    <section class="region-note">
+      <div class="region-note__icon">i</div>
+      <div class="region-note__content">
+        <strong>{{ 'region.infoTitle' | translate }}</strong>
+        <p>{{ 'region.infoBody' | translate }}</p>
+      </div>
+    </section>
+
+    @if (feedback()) {
+      <p class="region-feedback">{{ feedback() }}</p>
+    }
+  </div>
+
+  <footer class="region-footer">
+    <button class="apply-btn" type="button" [disabled]="!canApply()" (click)="applyRegion()">
+      {{ 'region.apply' | translate }}
+    </button>
+    <p>{{ 'region.confirm' | translate: { language: getSelectedRegionLabel() } }}</p>
+  </footer>
+</div>

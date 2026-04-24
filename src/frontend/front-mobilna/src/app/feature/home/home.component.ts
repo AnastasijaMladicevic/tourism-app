@@ -36,6 +36,14 @@ interface EventCard {
   timeText: string;
   imageUrl?: string;
 }
+
+interface FeaturedDestination {
+  id: number;
+  name: string;
+  description?: string;
+  imageUrl?: string;
+}
+
 interface SearchResult {
   id: number;
   name: string;
@@ -72,8 +80,8 @@ export class HomeComponent implements OnInit {
     { label: 'Activities', route: '/activities', key: 'activity' },
     { label: 'Events', route: '/events', key: 'event' },
   ];
-  featuredDestinations: any[] = [];
-  currentFeatured: any = null;
+  featuredDestinations: FeaturedDestination[] = [];
+  currentFeatured: FeaturedDestination | null = null;
   recommended: PlaceCard[] = [];
   popular: PlaceCard[] = [];
   events: any[] = [];
@@ -236,19 +244,30 @@ export class HomeComponent implements OnInit {
   });
 }
   loadFeatured(): void {
-    this.destinationService.getAll().subscribe((data: any[]) => {
+    this.destinationService
+      .getAll({ page: 1, pageSize: 24, sortBy: 'name', sortOrder: 'asc' })
+      .pipe(catchError(() => of([] as unknown[])))
+      .subscribe((data) => {
+        const featured = this.toArray<DestinationDto>(data)
+          .map((destination) => this.normalizeDestination(destination))
+          .filter((destination) => destination.id > 0 && destination.isActive !== false)
+          .map((destination) => this.toFeaturedDestination(destination))
+          .filter((destination) => !!destination.imageUrl);
 
-      const list = this.toArray(data);
-      if (list.length < 5) return;
+        if (!featured.length) {
+          this.featuredDestinations = [];
+          this.currentFeatured = null;
+          return;
+        }
 
-      const now = new Date();
+        const shuffled = [...featured].sort(() => Math.random() - 0.5);
 
-      const shuffled = [...list].sort(() => 0.5 - Math.random());
-      
-      this.featuredDestinations = shuffled.slice(0, 5);
-      this.currentFeatured = this.featuredDestinations[0];
-      this.startRotation();
-    });
+        this.featuredDestinations = shuffled.slice(0, Math.min(5, shuffled.length));
+        this.currentIndex = 0;
+        this.currentFeatured = this.featuredDestinations[0];
+        this.startRotation();
+        this.flushUi();
+      });
   }
   startRotation(): void {
   if (!this.featuredDestinations.length) return;
@@ -426,6 +445,7 @@ export class HomeComponent implements OnInit {
   private normalizeDestination(raw: DestinationDto): {
     id: number;
     name: string;
+    description?: string;
     destinationTypeName: string;
     isActive: boolean;
     averageRating?: number;
@@ -437,6 +457,7 @@ export class HomeComponent implements OnInit {
     return {
       id: Number(dto['id'] ?? dto['Id'] ?? 0),
       name: String(dto['name'] ?? dto['Name'] ?? ''),
+      description: (dto['description'] ?? dto['Description'] ?? undefined) as string | undefined,
       destinationTypeName: String(dto['destinationTypeName'] ?? dto['DestinationTypeName'] ?? ''),
       isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
       averageRating: this.readOptionalNumber(dto, ['averageRating', 'AverageRating']),
@@ -545,13 +566,24 @@ export class HomeComponent implements OnInit {
       isFavorite: false,
       itemId: destination.id,
       itemType: 'destination',
-      targetUrl: '/attractions',
+      targetUrl: '/destinations',
       showRating: false,
       ratingText: ""
     };
 
     this.applyFavoriteState([card]);
     return card;
+  }
+
+  private toFeaturedDestination(
+    destination: ReturnType<HomeComponent['normalizeDestination']>,
+  ): FeaturedDestination {
+    return {
+      id: destination.id,
+      name: destination.name,
+      description: destination.description?.trim() || destination.destinationTypeName,
+      imageUrl: this.pickDestinationImage(destination),
+    };
   }
 
   private toObjectCard(object: ReturnType<HomeComponent['normalizeObject']>): PlaceCard {
@@ -857,10 +889,10 @@ export class HomeComponent implements OnInit {
 
     this.router.navigate([`/${route}`, card.itemId]);
   }
-  openAttractions(): void {
+  openDestinations(): void {
     if (!this.currentFeatured) return;
 
-  this.router.navigate(['/attraction', this.currentFeatured.id]);
+  this.router.navigate(['/destination', this.currentFeatured.id]);
   }
   openEvent(event: any): void {
     this.router.navigate([`/event`, event.id]);
@@ -869,10 +901,14 @@ export class HomeComponent implements OnInit {
   openCategory(category: HomeCategory): void {
     this.router.navigateByUrl(category.route);
   }
+
+  openRegionPicker(): void {
+    this.router.navigate(['/region']);
+  }
   
   getCategoryIcon(type: string): string {
     switch (type?.toLowerCase()) {
-      case 'attraction':
+      case 'destination':
         return 'explore';
 
       case 'locality':

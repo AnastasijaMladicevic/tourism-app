@@ -30,7 +30,7 @@ export class ObjectsComponent implements OnInit {
   showSortMenu = false;
   isLoading = true;
   errorMessage = '';
-  pageTitle = 'Places';
+  pageTitle = 'Objects';
   hideTypeFilters = false;
   currentPage = 1;
   pageSize = 8;
@@ -54,7 +54,7 @@ export class ObjectsComponent implements OnInit {
       const type = routeData['type'] as string | null;
       const title = routeData['title'] as string | undefined;
 
-      this.pageTitle = title || 'Places';
+      this.pageTitle = title || 'Objects';
       this.hideTypeFilters = Boolean(type);
       this.activeFilter = type ?? 'All';
       this.currentPage = 1;
@@ -88,7 +88,7 @@ export class ObjectsComponent implements OnInit {
         this.totalCount = 0;
         this.hasNextPage = false;
         this.isLoading = false;
-        this.errorMessage = 'Failed to load places.';
+        this.errorMessage = 'Failed to load objects.';
         this.cdr.detectChanges();
       },
     });

@@ -24,7 +24,7 @@
         }
       </div>
       <div class="region-wrapper">
-        <button class="filter-btn" type="button">
+        <button class="filter-btn" type="button" (click)="openRegionPicker()">
           Choose Region
         </button>
       </div>
@@ -70,10 +70,10 @@
 
     <div
       class="featured-banner"
-      [style.background-image]="'url(' + currentFeatured?.mainImageUrl + ')'"
+      [style.background-image]="cardBackground(currentFeatured?.imageUrl)"
     >
       <!-- LEFT -->
-      <button class="nav left" (click)="prevFeatured()">
+      <button class="nav left" type="button" aria-label="Previous featured destination" (click)="prevFeatured()">
         <mat-icon>chevron_left</mat-icon>
       </button>
 
@@ -86,11 +86,11 @@
           <p>{{ currentFeatured?.description }}</p>
         </div>
 
-        <button class="explore-btn" type="button" (click)="openAttractions()">Explore</button>
+        <button class="explore-btn" type="button" (click)="openDestinations()">Explore</button>
       </div>
 
       <!-- RIGHT -->
-      <button class="nav right" (click)="nextFeatured()">
+      <button class="nav right" type="button" aria-label="Next featured destination" (click)="nextFeatured()">
         <mat-icon>chevron_right</mat-icon>
       </button>
       <!-- DOTS -->
@@ -266,9 +266,10 @@
               class="event-img event-img--dynamic"
               [style.background-image]="cardBackground(event.imageUrl)"
             >
-              <span class="event-price" [class.event-price--free]="event.isFree">{{
-                event.priceText
-              }}</span>
+              <span class="event-price" 
+                  [class.event-price--free]="event.isFree">
+              Price: {{ event.priceText }}
+            </span>
               <span class="event-time">{{ event.timeText }}</span>
             </div>
             <div class="event-info">
