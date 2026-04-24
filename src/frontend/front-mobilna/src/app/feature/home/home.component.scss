@@ -96,6 +96,7 @@
   font-size: 16px;
   font-weight: 800;
   color: var(--text-dark);
+  gap: 10px;
 }
 
 .section-header {
@@ -118,7 +119,7 @@
 /* Categories */
 .categories {
   display: flex;
-  gap: 10px;
+  gap: 5px;
   margin-top: 14px;
   overflow-x: auto;
   overflow-y: hidden;
@@ -302,6 +303,8 @@
 
 .place-card {
   flex: 0 0 168px;
+  display: flex;
+  flex-direction: column;
   border-radius: 14px;
   overflow: hidden;
   background: var(--white);
@@ -347,14 +350,32 @@
 }
 
 .place-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
   padding: 10px 10px 12px;
 
   h3 {
     font-size: 13px;
     font-weight: 800;
     color: var(--text-dark);
-    margin-bottom: 4px;
+    margin-bottom: 8px;
+    min-height: 34px;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
+}
+
+.place-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 16px;
 }
 
 .place-location,
@@ -365,7 +386,14 @@
   font-size: 11px;
   color: var(--text-gray);
   font-weight: 600;
-  margin-bottom: 3px;
+  margin: 0;
+  min-width: 0;
+  flex: 1;
+
+  svg {
+    color: #e74c3c;
+    flex-shrink: 0;
+  }
 }
 
 .place-rating {
@@ -375,6 +403,16 @@
   font-size: 11px;
   color: var(--text-gray);
   font-weight: 600;
+  margin: 0;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.place-location__text,
+.place-rating__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Trending badge */
@@ -524,6 +562,7 @@
   .section-title {
     font-size: 24px;
     letter-spacing: -0.4px;
+    margin-top: 18px;
   }
 
   .section-header {

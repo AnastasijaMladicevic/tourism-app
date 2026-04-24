@@ -13,6 +13,7 @@
         type="text"
         placeholder="Search events..."
         [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange()"
       />
       <button class="icon-btn" (click)="toggleSearch()" aria-label="Close search">
         <mat-icon>close</mat-icon>
@@ -74,6 +75,7 @@
         type="text"
         placeholder="Search events..."
         [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange()"
         class="search-bar__input"
         autofocus
       />
@@ -101,7 +103,7 @@
   </div>
 
   <div class="results-bar">
-    <span class="results-bar__count">{{ filteredEvents.length }} events found</span>
+    <span class="results-bar__count">{{ totalCount }} events found</span>
     <span class="results-bar__sort">
       <mat-icon>swap_vert</mat-icon>
       {{ sortLabel() }}
@@ -116,7 +118,7 @@
   }
 
   <div class="events-list">
-    @for (event of filteredEvents; track event.id) {
+    @for (event of visibleEvents; track event.id) {
       <article class="event-card">
         <div
           class="event-image"
@@ -156,12 +158,18 @@
       </article>
     }
 
-    @if (!isLoading && filteredEvents.length === 0) {
+    @if (!isLoading && totalCount === 0) {
       <article class="event-card">
         <div class="event-body">
           <p class="event-location">No events found.</p>
         </div>
       </article>
     }
+  </div>
+
+  <div class="pagination">
+    <button mat-button type="button" (click)="prevPage()" [disabled]="currentPage === 1">Prev</button>
+    <span>Page {{ currentPage }} of {{ totalPages }}</span>
+    <button mat-button type="button" (click)="nextPage()" [disabled]="!hasNextPage">Next</button>
   </div>
 </div>

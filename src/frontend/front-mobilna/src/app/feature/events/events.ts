@@ -45,6 +45,11 @@ export class EventsComponent implements OnInit {
   searchQuery = '';
   sortOption: 'date' | 'az' | 'za' | 'price' = 'date';
   events: EventCard[] = [];
+  visibleEvents: EventCard[] = [];
+  currentPage = 1;
+  pageSize = 8;
+  hasNextPage = false;
+  totalCount = 0;
 
   ngOnInit(): void {
     this.loadEvents();
@@ -99,11 +104,15 @@ export class EventsComponent implements OnInit {
 
   setCategory(category: EventCategory): void {
     this.activeCategory = category;
+    this.currentPage = 1;
+    this.refreshVisibleEvents();
   }
 
   setSort(option: 'date' | 'az' | 'za' | 'price'): void {
     this.sortOption = option;
     this.showSortMenu = false;
+    this.currentPage = 1;
+    this.refreshVisibleEvents();
   }
 
   sortLabel(): string {
@@ -113,7 +122,34 @@ export class EventsComponent implements OnInit {
 
   toggleSearch(): void {
     this.showSearch = !this.showSearch;
-    if (!this.showSearch) this.searchQuery = '';
+    if (!this.showSearch) {
+      this.searchQuery = '';
+      this.currentPage = 1;
+      this.refreshVisibleEvents();
+    }
+  }
+
+  onSearchChange(): void {
+    this.currentPage = 1;
+    this.refreshVisibleEvents();
+  }
+
+  prevPage(): void {
+    if (this.currentPage === 1) return;
+
+    this.currentPage--;
+    this.refreshVisibleEvents();
+  }
+
+  nextPage(): void {
+    if (!this.hasNextPage) return;
+
+    this.currentPage++;
+    this.refreshVisibleEvents();
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
   }
 
   goBack(): void {
@@ -175,8 +211,12 @@ export class EventsComponent implements OnInit {
             };
           })
         );
+        this.refreshVisibleEvents();
       } catch {
         this.events = [];
+        this.visibleEvents = [];
+        this.totalCount = 0;
+        this.hasNextPage = false;
       }
 
       this.isLoading = false;
@@ -184,11 +224,35 @@ export class EventsComponent implements OnInit {
     },
     error: () => {
       this.events = [];
+      this.visibleEvents = [];
+      this.totalCount = 0;
+      this.hasNextPage = false;
       this.isLoading = false;
       this.flushUi();
     },
   });
 }
+
+  private refreshVisibleEvents(): void {
+    const filteredEvents = this.filteredEvents;
+    this.totalCount = filteredEvents.length;
+
+    if (this.totalCount === 0) {
+      this.currentPage = 1;
+      this.hasNextPage = false;
+      this.visibleEvents = [];
+      this.flushUi();
+      return;
+    }
+
+    const totalPages = Math.ceil(this.totalCount / this.pageSize);
+    this.currentPage = Math.min(this.currentPage, totalPages);
+    this.hasNextPage = this.currentPage < totalPages;
+
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    this.visibleEvents = filteredEvents.slice(startIndex, startIndex + this.pageSize);
+    this.flushUi();
+  }
 
   private normalizeEvent(raw: EventDto): {
     id: number;
