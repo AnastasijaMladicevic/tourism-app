@@ -21,26 +21,64 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpGet("smart")]
         [AllowAnonymous]
-        public async Task<IActionResult> Search([FromQuery] SmartSearchQueryDto query)
-        {
-            _logger.LogWarning("SEARCH DEBUG: Query='{Query}' Mode='{Mode}'", query.Query, query.Mode);
-            var userId = TryGetCurrentUserId();
-            var results = await _smartSearchService.SearchAsync(userId, query);
-            _logger.LogWarning("SEARCH DEBUG: Returned {Count} results", results.Count);
-            return Ok(results);
-        }
+        public async Task<IActionResult> Search(
+        [FromQuery(Name = "query")] string query,
+        [FromQuery] string mode = "smart",
+        [FromQuery] int pageSize = 8,
+        [FromQuery] int? regionId = null,
+        [FromQuery] double? latitude = null,
+        [FromQuery] double? longitude = null)
+            {
+                var dto = new SmartSearchQueryDto
+                {
+                    Query = query ?? string.Empty,
+                    Mode = mode,
+                    PageSize = pageSize,
+                    RegionId = regionId,
+                    Latitude = latitude,
+                    Longitude = longitude
+                };
+
+                _logger.LogWarning("SEARCH DEBUG: Query='{Query}' Mode='{Mode}'", dto.Query, dto.Mode);
+
+                var userId = TryGetCurrentUserId();
+
+                var results = await _smartSearchService.SearchAsync(userId, dto);
+
+                _logger.LogWarning("SEARCH DEBUG: Returned {Count} results", results.Count);
+
+                return Ok(results);
+            }
 
         [HttpGet("mcp")]
         [AllowAnonymous]
-        public async Task<IActionResult> SearchMcp([FromQuery] SmartSearchQueryDto query)
-        {
-            query.Mode = "mcp";
-            _logger.LogWarning("MCP DEBUG: Query='{Query}' Mode='{Mode}'", query.Query, query.Mode);
-            var userId = TryGetCurrentUserId();
-            var results = await _smartSearchService.SearchAsync(userId, query);
-            _logger.LogWarning("MCP DEBUG: Returned {Count} results", results.Count);
-            return Ok(results);
-        }
+        public async Task<IActionResult> SearchMcp(
+        [FromQuery(Name = "query")] string query,
+        [FromQuery] int pageSize = 8,
+        [FromQuery] int? regionId = null,
+        [FromQuery] double? latitude = null,
+        [FromQuery] double? longitude = null)
+            {
+                var dto = new SmartSearchQueryDto
+                {
+                    Query = query ?? string.Empty,
+                    Mode = "mcp",
+                    PageSize = pageSize,
+                    RegionId = regionId,
+                    Latitude = latitude,
+                    Longitude = longitude
+                };
+
+                _logger.LogWarning("MCP DEBUG: Query='{Query}' Mode='{Mode}'", dto.Query, dto.Mode);
+
+                var userId = TryGetCurrentUserId();
+
+                var results = await _smartSearchService.SearchAsync(userId, dto);
+
+                _logger.LogWarning("MCP DEBUG: Returned {Count} results", results.Count);
+
+                return Ok(results);
+            }
 
         private int? TryGetCurrentUserId()
         {

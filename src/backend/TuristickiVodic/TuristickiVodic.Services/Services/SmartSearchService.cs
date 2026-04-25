@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -30,15 +31,19 @@ namespace TuristickiVodic.Services.Services
             "nikad", "skupa", "skupo", "skup", "skupu", "skupoj", "skupim", "hrana", "hranu", "hrane"];
 
         private readonly AppDbContext _context;
-
-        public SmartSearchService(AppDbContext context)
+        private readonly ILogger<SmartSearchService> _logger;
+        public SmartSearchService(
+        AppDbContext _context,
+        ILogger<SmartSearchService> logger)
         {
-            _context = context;
+            this._context = _context;
+            _logger = logger;
         }
 
         public async Task<List<SmartSearchResultDto>> SearchAsync(int? userId, SmartSearchQueryDto query)
         {
             var normalizedQuery = NormalizeText(query.Query);
+
             if (string.IsNullOrWhiteSpace(normalizedQuery) || normalizedQuery.Length < 2)
             {
                 return [];
@@ -47,6 +52,7 @@ namespace TuristickiVodic.Services.Services
             var searchMode = NormalizeText(query.Mode);
             var strictMode = searchMode == "strict" || searchMode == "map";
             var pageSize = Math.Clamp(query.PageSize <= 0 ? 8 : query.PageSize, 1, 50);
+
             var context = await BuildContextAsync(userId, query, normalizedQuery);
             var intent = BuildIntent(normalizedQuery, context.EffectiveRegionId);
 
@@ -68,9 +74,8 @@ namespace TuristickiVodic.Services.Services
                         .ThenInclude(d => d.Region)
                 .Include(o => o.Images)
                 .Where(o =>
-                        o.IsActive &&
-                        o.Status == ContentStatus.Approved &&
-                        o.Images.Any(i => i.IsMain))
+                    o.IsActive &&
+                    o.Status == ContentStatus.Approved)
                 .AsQueryable();
 
             var eventQuery = _context.Events
@@ -89,18 +94,41 @@ namespace TuristickiVodic.Services.Services
             if (context.EffectiveRegionId.HasValue)
             {
                 var regionId = context.EffectiveRegionId.Value;
+
                 destinationQuery = destinationQuery.Where(d => d.RegionId == regionId);
+
                 objectQuery = objectQuery.Where(o =>
                     o.Destination.RegionId == regionId ||
-                    (o.Locality != null && o.Locality.Destination != null && o.Locality.Destination.RegionId == regionId));
+                    (o.Locality != null &&
+                     o.Locality.Destination != null &&
+                     o.Locality.Destination.RegionId == regionId));
+
                 eventQuery = eventQuery.Where(e =>
                     (e.Destination != null && e.Destination.RegionId == regionId) ||
-                    (e.Destination == null && e.Locality != null && e.Locality.Destination != null && e.Locality.Destination.RegionId == regionId));
+                    (e.Destination == null &&
+                     e.Locality != null &&
+                     e.Locality.Destination != null &&
+                     e.Locality.Destination.RegionId == regionId));
             }
 
             var destinations = await destinationQuery.ToListAsync();
             var objects = await objectQuery.ToListAsync();
             var events = await eventQuery.ToListAsync();
+
+            _logger.LogWarning(
+                "SERVICE DEBUG: Query='{Query}' Mode='{Mode}' Normalized='{Normalized}' Tokens='{Tokens}'",
+                query.Query,
+                query.Mode,
+                normalizedQuery,
+                string.Join(", ", intent.Tokens)
+            );
+
+            _logger.LogWarning(
+                "SERVICE DEBUG: Loaded counts destinations={Destinations}, objects={Objects}, events={Events}",
+                destinations.Count,
+                objects.Count,
+                events.Count
+            );
 
             var destinationFavoriteCounts = await _context.Favorites.AsNoTracking()
                 .Where(f => f.DestinationId.HasValue)
@@ -128,8 +156,14 @@ namespace TuristickiVodic.Services.Services
                     continue;
                 }
 
-                var score = ScoreDestination(destination, intent, context, destinationFavoriteCounts.GetValueOrDefault(destination.Id), out var reason);
-                // U strict/mapa modu filtriramo rezultate bez match-a; u MCP modu svi prolaze (fallback na popularnost)
+                var score = ScoreDestination(
+                    destination,
+                    intent,
+                    context,
+                    destinationFavoriteCounts.GetValueOrDefault(destination.Id),
+                    out var reason
+                );
+
                 if (strictMode && score <= 0)
                 {
                     continue;
@@ -164,9 +198,9 @@ namespace TuristickiVodic.Services.Services
                     intent,
                     context,
                     objectFavoriteCounts.GetValueOrDefault(obj.Id),
-                    out var reason);
+                    out var reason
+                );
 
-                // U strict/mapa modu filtriramo rezultate bez match-a; u MCP modu svi prolaze
                 if (strictMode && score <= 0)
                 {
                     continue;
@@ -196,7 +230,14 @@ namespace TuristickiVodic.Services.Services
                     continue;
                 }
 
-                var score = ScoreEvent(evt, intent, context, eventPlannerCounts.GetValueOrDefault(evt.Id), out var reason);
+                var score = ScoreEvent(
+                    evt,
+                    intent,
+                    context,
+                    eventPlannerCounts.GetValueOrDefault(evt.Id),
+                    out var reason
+                );
+
                 if (strictMode && score <= 0)
                 {
                     continue;
