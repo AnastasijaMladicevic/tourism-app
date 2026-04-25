@@ -163,8 +163,13 @@
               <td>{{ formatDuration(activity.durationMinutes) }}</td>
               <td>
                 <div class="row-actions">
-                  <button type="button" class="icon-btn plain" title="More options">
-                    <span class="material-symbols-outlined">more_horiz</span>
+                  <button
+                    type="button"
+                    class="icon-btn plain"
+                    title="Edit activity"
+                    [routerLink]="['/content-creator/activities/edit', activity.id]"
+                  >
+                    <span class="material-symbols-outlined">edit</span>
                   </button>
                 </div>
               </td>

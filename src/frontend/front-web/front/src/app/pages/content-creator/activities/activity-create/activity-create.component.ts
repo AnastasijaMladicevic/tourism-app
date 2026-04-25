@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, forkJoin, map, of, switchMap } from 'rxjs';
 import {
   ActivitiesService,
   ActivityTypeOption,
   CreateActivityDto,
+  UpdateActivityDto,
   LocalityOption,
   ActivityDto
 } from '../../../../services/activities';
@@ -51,6 +52,7 @@ export class ActivityCreateComponent implements OnInit {
   private readonly destinationService = inject(DestinationService);
   private readonly eventService = inject(EventService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   private readonly draftKey = 'content-creator:add-activity-draft';
 
@@ -79,7 +81,11 @@ export class ActivityCreateComponent implements OnInit {
   );
 
   isSubmitting = false;
+  isDeleting = false;
   isLoadingOptions = true;
+  isLoadingActivity = false;
+  isEditMode = false;
+  activityId: number | null = null;
   errorMessage = '';
   successMessage = '';
 
@@ -92,12 +98,29 @@ export class ActivityCreateComponent implements OnInit {
   imageUrls: string[] = [];
 
   ngOnInit(): void {
-    this.loadDraft();
+    const idFromRoute = Number(this.route.snapshot.paramMap.get('id'));
+    if (Number.isFinite(idFromRoute) && idFromRoute > 0) {
+      this.isEditMode = true;
+      this.activityId = idFromRoute;
+    }
+
+    if (!this.isEditMode) {
+      this.loadDraft();
+    }
+
     this.loadOptions();
+
+    if (this.isEditMode) {
+      this.loadActivity();
+    }
 
     this.form.controls.destinationId.valueChanges.subscribe(() => {
       this.syncDependentSelections();
     });
+  }
+
+  get pageTitle(): string {
+    return this.isEditMode ? 'Edit Activity' : 'Create Activity';
   }
 
   get hasTypeOptions(): boolean {
@@ -183,6 +206,10 @@ export class ActivityCreateComponent implements OnInit {
   }
 
   saveDraft(): void {
+    if (this.isEditMode) {
+      return;
+    }
+
     const payload: DraftPayload = {
       values: this.form.getRawValue(),
       images: [...this.imageUrls]
@@ -216,7 +243,7 @@ export class ActivityCreateComponent implements OnInit {
       return;
     }
 
-    const dto: CreateActivityDto = {
+    const dto: CreateActivityDto | UpdateActivityDto = {
       name: values.name.trim(),
       description: values.description.trim() || undefined,
       activityTypeId,
@@ -229,7 +256,11 @@ export class ActivityCreateComponent implements OnInit {
       longitude: values.longitude ?? undefined
     };
 
-    this.activitiesService.create(dto)
+    const request = this.isEditMode && this.activityId
+      ? this.activitiesService.update(this.activityId, dto as UpdateActivityDto)
+      : this.activitiesService.create(dto as CreateActivityDto);
+
+    request
       .pipe(
         switchMap((createdActivity) => this.attachImagesAfterCreate(createdActivity)),
         finalize(() => {
@@ -237,11 +268,11 @@ export class ActivityCreateComponent implements OnInit {
         })
       )
       .subscribe({
-        next: ({ createdActivity, imageUploadFailed }) => {
+        next: ({ imageUploadFailed }) => {
           localStorage.removeItem(this.draftKey);
           this.successMessage = imageUploadFailed
-            ? 'Activity created, but some images could not be attached.'
-            : 'Activity created successfully.';
+            ? `Activity ${this.isEditMode ? 'updated' : 'created'}, but some images could not be attached.`
+            : `Activity ${this.isEditMode ? 'updated' : 'created'} successfully.`;
 
           setTimeout(() => {
             this.router.navigate(['/content-creator/activities']);
@@ -250,9 +281,40 @@ export class ActivityCreateComponent implements OnInit {
           this.errorMessage = '';
         },
         error: (error: unknown) => {
-          const message = this.extractErrorMessage(error) ?? 'Failed to create activity.';
+          const message = this.extractErrorMessage(error) ?? `Failed to ${this.isEditMode ? 'update' : 'create'} activity.`;
           this.errorMessage = message;
           this.successMessage = '';
+        }
+      });
+  }
+
+  deleteActivity(): void {
+    if (!this.isEditMode || !this.activityId || this.isSubmitting || this.isDeleting) {
+      return;
+    }
+
+    const confirmed = window.confirm('Delete this activity? This action cannot be undone.');
+    if (!confirmed) {
+      return;
+    }
+
+    this.isDeleting = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    this.activitiesService.delete(this.activityId)
+      .pipe(finalize(() => {
+        this.isDeleting = false;
+      }))
+      .subscribe({
+        next: () => {
+          this.successMessage = 'Activity deleted successfully.';
+          setTimeout(() => {
+            this.router.navigate(['/content-creator/activities']);
+          }, 700);
+        },
+        error: (error: unknown) => {
+          this.errorMessage = this.extractErrorMessage(error) ?? 'Failed to delete activity.';
         }
       });
   }
@@ -307,6 +369,42 @@ export class ActivityCreateComponent implements OnInit {
       map(() => ({ createdActivity, imageUploadFailed: false })),
       catchError(() => of({ createdActivity, imageUploadFailed: true }))
     );
+  }
+
+  private loadActivity(): void {
+    if (!this.activityId) {
+      return;
+    }
+
+    this.isLoadingActivity = true;
+    this.errorMessage = '';
+
+    this.activitiesService.getById(this.activityId)
+      .pipe(finalize(() => {
+        this.isLoadingActivity = false;
+      }))
+      .subscribe({
+        next: (activity) => {
+          this.form.patchValue({
+            name: activity.name,
+            description: activity.description ?? '',
+            activityTypeId: activity.activityTypeId,
+            fallbackActivityTypeId: activity.activityTypeId,
+            destinationId: activity.destinationId ?? null,
+            localityId: activity.localityId ?? null,
+            objectId: activity.objectId ?? null,
+            price: activity.price ?? null,
+            durationMinutes: activity.durationMinutes ?? null,
+            latitude: activity.latitude ?? null,
+            longitude: activity.longitude ?? null,
+            isVisible: activity.isActive
+          });
+
+        },
+        error: (error: unknown) => {
+          this.errorMessage = this.extractErrorMessage(error) ?? 'Failed to load activity for editing.';
+        }
+      });
   }
 
   private syncDependentSelections(): void {

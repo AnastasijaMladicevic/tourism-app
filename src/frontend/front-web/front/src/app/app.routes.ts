@@ -103,6 +103,11 @@ export const routes: Routes = [
             path: 'create',
             loadComponent: () =>
               import('./pages/content-creator/activities/activity-create/activity-create.component').then(m => m.ActivityCreateComponent)
+          },
+          {
+            path: 'edit/:id',
+            loadComponent: () =>
+              import('./pages/content-creator/activities/activity-create/activity-create.component').then(m => m.ActivityCreateComponent)
           }
         ]
       },

@@ -2,17 +2,26 @@
   <header class="page-header">
     <div>
       <p class="eyebrow">Global marketplace v2</p>
-      <h1>Create Activity</h1>
+      <h1>{{ pageTitle }}</h1>
       <p class="intro">
-        Build an activity listing with location, logistics, and gallery details.
+        Build and manage activity listings with location, logistics, and gallery details.
       </p>
     </div>
 
     <div class="header-actions">
+      @if (isEditMode) {
+        <button type="button" class="danger-btn" (click)="deleteActivity()" [disabled]="isSubmitting || isDeleting">
+          <span class="material-symbols-outlined">delete</span>
+          {{ isDeleting ? 'Deleting...' : 'Delete' }}
+        </button>
+      }
+
       <button type="button" class="ghost-btn" (click)="cancel()">Cancel</button>
-      <button type="button" class="ghost-btn" (click)="saveDraft()">Save Draft</button>
+      @if (!isEditMode) {
+        <button type="button" class="ghost-btn" (click)="saveDraft()">Save Draft</button>
+      }
       <button type="button" class="primary-btn" [disabled]="isSubmitting" (click)="submit()">
-        {{ isSubmitting ? 'Creating...' : 'Create Activity' }}
+        {{ isSubmitting ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Activity' : 'Create Activity') }}
       </button>
     </div>
   </header>

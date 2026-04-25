@@ -221,6 +221,10 @@
 }
 
 .table-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
     padding: 0;
     overflow: hidden;
 }
@@ -352,8 +356,7 @@ tbody tr:hover {
 }
 
 .icon-btn:hover,
-.ghost-btn:hover,
-.primary-btn:hover {
+.ghost-btn:hover {
     color: #111827;
 }
 

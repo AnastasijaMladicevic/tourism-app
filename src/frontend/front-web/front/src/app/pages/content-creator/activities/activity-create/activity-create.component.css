@@ -352,7 +352,8 @@ select:focus {
 }
 
 .primary-btn,
-.ghost-btn {
+.ghost-btn,
+.danger-btn {
   border: 0;
   background: transparent;
   font: inherit;
@@ -389,6 +390,29 @@ select:focus {
   border: 1px solid #dbe1ea;
   color: #334155;
   background: #fff;
+}
+
+.danger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  background: #fff5f5;
+}
+
+.danger-btn:hover:not(:disabled) {
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
+.danger-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 .ghost-btn.small {

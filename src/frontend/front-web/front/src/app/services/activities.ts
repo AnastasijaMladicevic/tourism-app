@@ -81,6 +81,19 @@ export interface CreateActivityDto {
   objectId?: number;
 }
 
+export interface UpdateActivityDto {
+  name?: string;
+  description?: string;
+  longitude?: number;
+  latitude?: number;
+  price?: number;
+  durationMinutes?: number;
+  activityTypeId?: number;
+  localityId?: number;
+  destinationId?: number;
+  objectId?: number;
+}
+
 interface AddImageDto {
   url: string;
   altText?: string;
@@ -116,6 +129,18 @@ export class ActivitiesService {
 
   create(dto: CreateActivityDto): Observable<ActivityDto> {
     return this.http.post<ActivityDto>(this.apiUrl, dto);
+  }
+
+  getById(id: number): Observable<ActivityDto> {
+    return this.http.get<ActivityDto>(`${this.apiUrl}/${id}`);
+  }
+
+  update(id: number, dto: UpdateActivityDto): Observable<ActivityDto> {
+    return this.http.put<ActivityDto>(`${this.apiUrl}/${id}`, dto);
+  }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
   attachImages(activityId: number, imageUrls: string[]): Observable<unknown[]> {
