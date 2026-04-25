@@ -143,6 +143,8 @@
               class="card__image"
               [src]="getMainImage(obj)"
               [alt]="obj.name"
+              loading="lazy"
+              decoding="async"
               (error)="onImageError($event)"
             />
           } @else {

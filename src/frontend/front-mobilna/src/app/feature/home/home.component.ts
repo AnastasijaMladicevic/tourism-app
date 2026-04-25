@@ -12,6 +12,7 @@ import { environment } from '../../../environment/environment';
 import { AuthService } from '../../services/auth';
 import { ObjectDto, ObjectService } from '../../services/object';
 import { MatIcon } from "@angular/material/icon";
+import { LazyBackgroundDirective } from '../../shared/directives/lazy-background.directive';
 
 interface PlaceCard {
   title: string;
@@ -66,7 +67,7 @@ interface HomeCategory {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [BottomNavComponent, FormsModule, MatIcon],
+  imports: [BottomNavComponent, FormsModule, MatIcon, LazyBackgroundDirective],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
@@ -877,14 +878,6 @@ export class HomeComponent implements OnInit {
     return `${itemType}:${itemId}`;
   }
 
-  cardBackground(imageUrl?: string): string | null {
-    if (!imageUrl) {
-      return null;
-    }
-
-    const safeUrl = imageUrl.replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/"/g, '%22');
-    return `url("${safeUrl}")`;
-  }
   openPlace(card: any): void {
     const type = card.itemType.toLowerCase();
 

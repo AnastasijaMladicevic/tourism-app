@@ -24,7 +24,7 @@
           <div class="suggestion-item" (mousedown)="selectSuggestion(result)">
             <div class="suggestion-item__image">
               @if (result.image) {
-                <img [src]="result.image" [alt]="result.name" />
+                <img [src]="result.image" [alt]="result.name" loading="lazy" decoding="async" />
               } @else {
                 <mat-icon>{{ result.icon }}</mat-icon>
               }
@@ -104,7 +104,13 @@
 
       <div class="bottom-card__image-wrap">
         @if (getItemImage()) {
-          <img [src]="getItemImage()" [alt]="selectedItem.name" class="bottom-card__image" />
+          <img
+            [src]="getItemImage()"
+            [alt]="selectedItem.name"
+            class="bottom-card__image"
+            loading="lazy"
+            decoding="async"
+          />
         } @else {
           <div class="bottom-card__image bottom-card__image--empty">
             <mat-icon>landscape</mat-icon>
