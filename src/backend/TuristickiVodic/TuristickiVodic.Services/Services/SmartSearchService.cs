@@ -1,0 +1,770 @@
+using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
+using System.Text;
+using System.Text.RegularExpressions;
+using TuristickiVodic.Core.DTO;
+using TuristickiVodic.Core.Models;
+using TuristickiVodic.Infrastructure.Data;
+
+namespace TuristickiVodic.Services.Services
+{
+    public class SmartSearchService : ISmartSearchService
+    {
+        private static readonly string[] NearbyHints = ["blizu", "blizini", "near", "nearby", "close", "oko mene", "u blizini", "near me"];
+        private static readonly string[] CheapHints = ["jeftin", "cheap", "budget", "povoljno", "affordable"];
+        private static readonly string[] FreeHints = ["free", "besplatno", "without ticket", "bez karte"];
+        private static readonly string[] PremiumHints = ["luxury", "luksuz", "premium", "romantic", "exclusive"];
+        private static readonly string[] TopRatedHints = ["best", "najbolje", "top", "popular", "preporuci", "preporuka", "recommended"];
+        private static readonly string[] EventHints = ["event", "dogadjaj", "događaj", "festival", "concert", "koncert", "party", "zur", "music"];
+        private static readonly string[] DestinationHints = ["destination", "destinacija", "city", "grad", "island", "ostrvo", "beach", "plaza", "plaža", "mountain", "planina"];
+        private static readonly string[] ObjectHints = ["hotel", "restoran", "restaurant", "kafic", "kafić", "bar", "kafana", "museum", "muzej", "spa", "apartment", "apartman"];
+
+        private readonly AppDbContext _context;
+
+        public SmartSearchService(AppDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<List<SmartSearchResultDto>> SearchAsync(int? userId, SmartSearchQueryDto query)
+        {
+            var normalizedQuery = NormalizeText(query.Query);
+            if (string.IsNullOrWhiteSpace(normalizedQuery) || normalizedQuery.Length < 2)
+            {
+                return [];
+            }
+
+            var pageSize = Math.Clamp(query.PageSize <= 0 ? 8 : query.PageSize, 1, 12);
+            var context = await BuildContextAsync(userId, query, normalizedQuery);
+            var intent = BuildIntent(normalizedQuery, context.EffectiveRegionId);
+
+            var destinationQuery = _context.Destinations
+                .AsNoTracking()
+                .Include(d => d.Region)
+                .Include(d => d.DestinationType)
+                .Include(d => d.Images)
+                .Where(d => d.IsActive && d.Status == ContentStatus.Approved && d.Images.Any(i => i.IsMain))
+                .AsQueryable();
+
+            var objectQuery = _context.Objects
+                .AsNoTracking()
+                .Include(o => o.ObjectType)
+                .Include(o => o.Destination)
+                    .ThenInclude(d => d.Region)
+                .Include(o => o.Locality)
+                    .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
+                .Include(o => o.Images)
+                .Where(o => o.IsActive && o.Status == ContentStatus.Approved && o.Images.Any(i => i.IsMain))
+                .AsQueryable();
+
+            var eventQuery = _context.Events
+                .AsNoTracking()
+                .Include(e => e.EventType)
+                .Include(e => e.Destination)
+                    .ThenInclude(d => d.Region)
+                .Include(e => e.Locality)
+                    .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
+                .Include(e => e.Object)
+                .Include(e => e.Images)
+                .Where(e => e.IsActive && e.Status == ContentStatus.Approved && e.Images.Any(i => i.IsMain))
+                .AsQueryable();
+
+            if (context.EffectiveRegionId.HasValue)
+            {
+                var regionId = context.EffectiveRegionId.Value;
+                destinationQuery = destinationQuery.Where(d => d.RegionId == regionId);
+                objectQuery = objectQuery.Where(o =>
+                    o.Destination.RegionId == regionId ||
+                    (o.Locality != null && o.Locality.Destination != null && o.Locality.Destination.RegionId == regionId));
+                eventQuery = eventQuery.Where(e =>
+                    (e.Destination != null && e.Destination.RegionId == regionId) ||
+                    (e.Destination == null && e.Locality != null && e.Locality.Destination != null && e.Locality.Destination.RegionId == regionId));
+            }
+
+            var destinations = await destinationQuery.ToListAsync();
+            var objects = await objectQuery.ToListAsync();
+            var events = await eventQuery.ToListAsync();
+
+            var destinationFavoriteCounts = await _context.Favorites.AsNoTracking()
+                .Where(f => f.DestinationId.HasValue)
+                .GroupBy(f => f.DestinationId!.Value)
+                .Select(g => new { Id = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.Id, x => x.Count);
+
+            var objectFavoriteCounts = await _context.Favorites.AsNoTracking()
+                .Where(f => f.ObjectId.HasValue)
+                .GroupBy(f => f.ObjectId!.Value)
+                .Select(g => new { Id = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.Id, x => x.Count);
+
+            var eventPlannerCounts = await _context.EventPlannerItems.AsNoTracking()
+                .GroupBy(x => x.EventId)
+                .Select(g => new { Id = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.Id, x => x.Count);
+
+            var results = new List<SmartSearchCandidate>();
+
+            foreach (var destination in destinations)
+            {
+                var score = ScoreDestination(destination, intent, context, destinationFavoriteCounts.GetValueOrDefault(destination.Id), out var reason);
+                if (score <= 0)
+                {
+                    continue;
+                }
+
+                results.Add(new SmartSearchCandidate
+                {
+                    Id = destination.Id,
+                    Name = destination.Name,
+                    TypeName = destination.DestinationType?.Name ?? "Destination",
+                    Location = destination.Region?.Name ?? string.Empty,
+                    Category = "destination",
+                    MarkerType = "destination",
+                    Icon = "place",
+                    ImageUrl = GetMainImageUrl(destination.Images),
+                    Latitude = destination.Geolocation?.Y,
+                    Longitude = destination.Geolocation?.X,
+                    Score = score,
+                    MatchReason = reason,
+                });
+            }
+
+            foreach (var obj in objects)
+            {
+                var score = ScoreObject(
+                    obj,
+                    intent,
+                    context,
+                    objectFavoriteCounts.GetValueOrDefault(obj.Id),
+                    out var reason);
+
+                if (score <= 0)
+                {
+                    continue;
+                }
+
+                results.Add(new SmartSearchCandidate
+                {
+                    Id = obj.Id,
+                    Name = obj.Name,
+                    TypeName = obj.ObjectType?.Name ?? "Object",
+                    Location = ResolveObjectLocation(obj),
+                    Category = "object",
+                    MarkerType = ResolveObjectMarkerType(obj.ObjectType?.Name),
+                    Icon = ResolveObjectIcon(obj.ObjectType?.Name),
+                    ImageUrl = GetMainImageUrl(obj.Images),
+                    Latitude = obj.Geolocation?.Y,
+                    Longitude = obj.Geolocation?.X,
+                    Score = score,
+                    MatchReason = reason,
+                });
+            }
+
+            foreach (var evt in events)
+            {
+                var score = ScoreEvent(evt, intent, context, eventPlannerCounts.GetValueOrDefault(evt.Id), out var reason);
+                if (score <= 0)
+                {
+                    continue;
+                }
+
+                results.Add(new SmartSearchCandidate
+                {
+                    Id = evt.Id,
+                    Name = evt.Name,
+                    TypeName = evt.EventType?.Name ?? "Event",
+                    Location = ResolveEventLocation(evt),
+                    Category = "event",
+                    MarkerType = "event",
+                    Icon = "event",
+                    ImageUrl = GetMainImageUrl(evt.Images),
+                    Latitude = evt.Geolocation?.Y,
+                    Longitude = evt.Geolocation?.X,
+                    Score = score,
+                    MatchReason = reason,
+                });
+            }
+
+            return results
+                .OrderByDescending(x => x.Score)
+                .ThenBy(x => x.Name)
+                .Take(pageSize)
+                .Select(x => new SmartSearchResultDto
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    TypeName = x.TypeName,
+                    Location = x.Location,
+                    Category = x.Category,
+                    MarkerType = x.MarkerType,
+                    Icon = x.Icon,
+                    ImageUrl = x.ImageUrl,
+                    Latitude = x.Latitude,
+                    Longitude = x.Longitude,
+                    MatchReason = x.MatchReason,
+                    Score = Math.Round(x.Score, 2),
+                })
+                .ToList();
+        }
+
+        private async Task<SearchContext> BuildContextAsync(int? userId, SmartSearchQueryDto query, string normalizedQuery)
+        {
+            var context = new SearchContext
+            {
+                EffectiveRegionId = query.RegionId,
+            };
+
+            User? user = null;
+            if (userId.HasValue)
+            {
+                user = await _context.Users
+                    .AsNoTracking()
+                    .Include(u => u.PreferredRegion)
+                    .FirstOrDefaultAsync(u => u.Id == userId.Value);
+            }
+
+            var regions = await _context.Regions
+                .AsNoTracking()
+                .Where(r => r.IsActive)
+                .ToListAsync();
+
+            var explicitRegion = ResolveRegionIdFromQuery(normalizedQuery, regions);
+            context.EffectiveRegionId = explicitRegion ?? context.EffectiveRegionId ?? user?.PreferredRegionId;
+
+            if (query.Latitude.HasValue && query.Longitude.HasValue)
+            {
+                context.Origin = new GeoPoint(query.Latitude.Value, query.Longitude.Value);
+            }
+            else if (user?.LastKnownLocation != null)
+            {
+                context.Origin = new GeoPoint(user.LastKnownLocation.Y, user.LastKnownLocation.X);
+            }
+            else if (context.EffectiveRegionId.HasValue)
+            {
+                var region = regions.FirstOrDefault(r => r.Id == context.EffectiveRegionId.Value);
+                if (region?.CenterLatitude != null && region.CenterLongitude != null)
+                {
+                    context.Origin = new GeoPoint(region.CenterLatitude.Value, region.CenterLongitude.Value);
+                }
+            }
+
+            if (!userId.HasValue)
+            {
+                return context;
+            }
+
+            var favoriteObjects = await _context.Favorites
+                .AsNoTracking()
+                .Include(f => f.Object)
+                .Where(f => f.UserId == userId.Value && f.ObjectId.HasValue && f.Object != null)
+                .Select(f => f.Object!)
+                .ToListAsync();
+
+            foreach (var obj in favoriteObjects)
+            {
+                context.FavoriteObjectTypeWeights[obj.ObjectTypeId] =
+                    context.FavoriteObjectTypeWeights.GetValueOrDefault(obj.ObjectTypeId) + 1;
+            }
+
+            var reviews = await _context.Reviews
+                .AsNoTracking()
+                .Include(r => r.Object)
+                    .ThenInclude(o => o.ObjectType)
+                .Where(r => r.UserId == userId.Value && r.Status == ContentStatus.Approved && r.Object != null)
+                .ToListAsync();
+
+            context.ObjectTypeAverageRatings = reviews
+                .Where(r => r.Object != null)
+                .GroupBy(r => r.Object!.ObjectTypeId)
+                .ToDictionary(g => g.Key, g => g.Average(r => (double)r.Rating));
+
+            return context;
+        }
+
+        private static SearchIntent BuildIntent(string normalizedQuery, int? effectiveRegionId)
+        {
+            var intent = new SearchIntent
+            {
+                NormalizedQuery = normalizedQuery,
+                Tokens = SplitTokens(normalizedQuery),
+                WantsNearby = ContainsAny(normalizedQuery, NearbyHints),
+                WantsCheap = ContainsAny(normalizedQuery, CheapHints),
+                WantsFree = ContainsAny(normalizedQuery, FreeHints),
+                WantsPremium = ContainsAny(normalizedQuery, PremiumHints),
+                WantsTopRated = ContainsAny(normalizedQuery, TopRatedHints),
+                EventFocused = ContainsAny(normalizedQuery, EventHints),
+                DestinationFocused = ContainsAny(normalizedQuery, DestinationHints),
+                ObjectFocused = ContainsAny(normalizedQuery, ObjectHints),
+                EffectiveRegionId = effectiveRegionId,
+            };
+
+            intent.TodayPreferred = normalizedQuery.Contains("today") || normalizedQuery.Contains("danas");
+            intent.TonightPreferred = normalizedQuery.Contains("tonight") || normalizedQuery.Contains("veceras") || normalizedQuery.Contains("večeras");
+            intent.TomorrowPreferred = normalizedQuery.Contains("tomorrow") || normalizedQuery.Contains("sutra");
+            intent.WeekendPreferred = normalizedQuery.Contains("weekend") || normalizedQuery.Contains("vikend");
+
+            return intent;
+        }
+
+        private double ScoreDestination(Destination destination, SearchIntent intent, SearchContext context, int favoriteCount, out string reason)
+        {
+            var score = 0d;
+            reason = "Smart match";
+
+            var name = NormalizeText(destination.Name);
+            var title = NormalizeText(destination.DisplayTitle);
+            var description = NormalizeText(destination.Description);
+            var type = NormalizeText(destination.DestinationType?.Name);
+            var region = NormalizeText(destination.Region?.Name);
+
+            score += FieldScore(name, intent, 110, 20, ref reason, "Matches destination name");
+            score += FieldScore(type, intent, 70, 16, ref reason, "Matches destination type");
+            score += FieldScore(title, intent, 60, 12, ref reason, "Matches destination title");
+            score += FieldScore(description, intent, 40, 6, ref reason, "Matches destination description");
+            score += FieldScore(region, intent, 40, 8, ref reason, "Matches selected region");
+
+            if (intent.DestinationFocused)
+            {
+                score += 18;
+            }
+
+            score += favoriteCount * 4;
+
+            if (context.EffectiveRegionId.HasValue && destination.RegionId == context.EffectiveRegionId.Value)
+            {
+                score += 24;
+            }
+
+            if (intent.WantsTopRated)
+            {
+                score += favoriteCount * 2;
+            }
+
+            score += DistanceBoost(
+                CalculateDistanceFromContext(context.Origin, destination.Geolocation),
+                intent.WantsNearby ? 140_000d : 220_000d,
+                intent.WantsNearby ? 36d : 12d);
+
+            return score;
+        }
+
+        private double ScoreObject(
+            TouristObject obj,
+            SearchIntent intent,
+            SearchContext context,
+            int favoriteCount,
+            out string reason)
+        {
+            var score = 0d;
+            reason = "Smart match";
+
+            var name = NormalizeText(obj.Name);
+            var description = NormalizeText(obj.Description);
+            var type = NormalizeText(obj.ObjectType?.Name);
+            var cuisine = NormalizeText(obj.CuisineType);
+            var amenities = NormalizeText(obj.Amenities == null ? null : string.Join(' ', obj.Amenities));
+            var locality = NormalizeText(obj.Locality?.Name);
+            var destination = NormalizeText(obj.Destination?.Name);
+            var region = NormalizeText(obj.Destination?.Region?.Name ?? obj.Locality?.Destination?.Region?.Name);
+
+            score += FieldScore(name, intent, 120, 20, ref reason, "Matches object name");
+            score += FieldScore(type, intent, 85, 22, ref reason, "Matches object type");
+            score += FieldScore(cuisine, intent, 80, 18, ref reason, "Matches cuisine");
+            score += FieldScore(amenities, intent, 70, 18, ref reason, "Matches amenities");
+            score += FieldScore(description, intent, 45, 7, ref reason, "Matches description");
+            score += FieldScore(locality, intent, 35, 6, ref reason, "Matches locality");
+            score += FieldScore(destination, intent, 35, 6, ref reason, "Matches destination");
+            score += FieldScore(region, intent, 35, 6, ref reason, "Matches region");
+
+            if (intent.ObjectFocused)
+            {
+                score += 20;
+            }
+
+            if (intent.WantsCheap)
+            {
+                score += PricePreferenceScore(obj.Price, 0, 25, 10, 0);
+            }
+
+            if (intent.WantsPremium)
+            {
+                score += PricePreferenceScore(obj.Price, 80, 0, 10, 26);
+            }
+
+            if (intent.WantsFree)
+            {
+                score += obj.Price == null || obj.Price <= 0 ? 18 : 0;
+            }
+
+            score += (double)obj.AverageRating * (intent.WantsTopRated ? 12d : 8d);
+            score += Math.Log(obj.ReviewCount + 1, 2) * 5d;
+            score += favoriteCount * 3d;
+
+            if (context.FavoriteObjectTypeWeights.TryGetValue(obj.ObjectTypeId, out var favoriteTypeCount))
+            {
+                score += Math.Min(10, favoriteTypeCount * 4);
+            }
+
+            if (context.ObjectTypeAverageRatings.TryGetValue(obj.ObjectTypeId, out var avgUserRating))
+            {
+                score += (avgUserRating - 3d) * 12d;
+            }
+
+            score += DistanceBoost(
+                CalculateDistanceFromContext(context.Origin, obj.Geolocation),
+                intent.WantsNearby ? 80_000d : 140_000d,
+                intent.WantsNearby ? 34d : 8d);
+
+            return score;
+        }
+
+        private double ScoreEvent(
+            Event evt,
+            SearchIntent intent,
+            SearchContext context,
+            int plannerCount,
+            out string reason)
+        {
+            var score = 0d;
+            reason = "Smart match";
+
+            var name = NormalizeText(evt.Name);
+            var description = NormalizeText(evt.Description);
+            var type = NormalizeText(evt.EventType?.Name);
+            var locality = NormalizeText(evt.Locality?.Name);
+            var destination = NormalizeText(evt.Destination?.Name ?? evt.Locality?.Destination?.Name);
+            var region = NormalizeText(evt.Destination?.Region?.Name ?? evt.Locality?.Destination?.Region?.Name);
+            var linkedObject = NormalizeText(evt.Object?.Name);
+
+            score += FieldScore(name, intent, 120, 20, ref reason, "Matches event name");
+            score += FieldScore(type, intent, 90, 20, ref reason, "Matches event type");
+            score += FieldScore(description, intent, 45, 7, ref reason, "Matches event description");
+            score += FieldScore(locality, intent, 35, 6, ref reason, "Matches locality");
+            score += FieldScore(destination, intent, 35, 6, ref reason, "Matches destination");
+            score += FieldScore(region, intent, 35, 6, ref reason, "Matches region");
+            score += FieldScore(linkedObject, intent, 25, 5, ref reason, "Matches place");
+
+            if (intent.EventFocused)
+            {
+                score += 24;
+            }
+
+            score += plannerCount * 4;
+
+            if (intent.WantsCheap)
+            {
+                score += PricePreferenceScore(evt.Price, 0, 24, 8, 0);
+            }
+
+            if (intent.WantsPremium)
+            {
+                score += PricePreferenceScore(evt.Price, 50, 0, 10, 20);
+            }
+
+            if (intent.WantsFree)
+            {
+                score += evt.Price == null || evt.Price <= 0 ? 20 : 0;
+            }
+
+            score += DateIntentBoost(evt, intent, ref reason);
+
+            score += DistanceBoost(
+                CalculateDistanceFromContext(context.Origin, evt.Geolocation),
+                intent.WantsNearby ? 90_000d : 160_000d,
+                intent.WantsNearby ? 30d : 6d);
+
+            return score;
+        }
+
+        private static int? ResolveRegionIdFromQuery(string normalizedQuery, List<Region> regions)
+        {
+            foreach (var region in regions)
+            {
+                var normalizedName = NormalizeText(region.Name);
+                var normalizedCode = NormalizeText(region.Code);
+                if ((!string.IsNullOrWhiteSpace(normalizedName) && normalizedQuery.Contains(normalizedName)) ||
+                    (!string.IsNullOrWhiteSpace(normalizedCode) && normalizedQuery.Contains(normalizedCode)))
+                {
+                    return region.Id;
+                }
+
+                foreach (var alias in GetRegionAliases(normalizedName))
+                {
+                    if (normalizedQuery.Contains(alias))
+                    {
+                        return region.Id;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static IEnumerable<string> GetRegionAliases(string normalizedRegionName)
+        {
+            return normalizedRegionName switch
+            {
+                "crna gora" => ["montenegro", "cg"],
+                "srbija" => ["serbia", "rs"],
+                "grcka" => ["greece", "gr"],
+                "spanija" => ["spain", "es"],
+                "italija" => ["italy", "it"],
+                _ => [],
+            };
+        }
+
+        private static double FieldScore(
+            string field,
+            SearchIntent intent,
+            double fullMatchScore,
+            double tokenMatchScore,
+            ref string reason,
+            string reasonText)
+        {
+            if (string.IsNullOrWhiteSpace(field))
+            {
+                return 0;
+            }
+
+            var score = 0d;
+            if (field.Contains(intent.NormalizedQuery))
+            {
+                reason = reasonText;
+                score += fullMatchScore;
+            }
+
+            foreach (var token in intent.Tokens)
+            {
+                if (field.Contains(token))
+                {
+                    score += tokenMatchScore;
+                }
+            }
+
+            return score;
+        }
+
+        private static double PricePreferenceScore(decimal? price, decimal premiumThreshold, double cheapBoost, double midBoost, double premiumBoost)
+        {
+            if (!price.HasValue)
+            {
+                return cheapBoost > 0 ? cheapBoost * 0.4d : 0;
+            }
+
+            if (cheapBoost > 0)
+            {
+                if (price.Value <= 20) return cheapBoost;
+                if (price.Value <= 50) return midBoost;
+                return 0;
+            }
+
+            return price.Value >= premiumThreshold ? premiumBoost : 0;
+        }
+
+        private static double DateIntentBoost(Event evt, SearchIntent intent, ref string reason)
+        {
+            var score = 0d;
+            var today = DateTime.UtcNow.Date;
+            var eventDate = evt.StartDate.Date;
+
+            if (intent.TodayPreferred && eventDate == today)
+            {
+                reason = "Matches requested date";
+                score += 60;
+            }
+
+            if (intent.TomorrowPreferred && eventDate == today.AddDays(1))
+            {
+                reason = "Matches requested date";
+                score += 58;
+            }
+
+            if (intent.TonightPreferred && eventDate == today && evt.StartDate.Hour >= 17)
+            {
+                reason = "Matches tonight";
+                score += 56;
+            }
+
+            if (intent.WeekendPreferred &&
+                (eventDate.DayOfWeek == DayOfWeek.Saturday || eventDate.DayOfWeek == DayOfWeek.Sunday))
+            {
+                reason = "Matches weekend";
+                score += 52;
+            }
+
+            return score;
+        }
+
+        private static double DistanceBoost(double? distanceMeters, double maxDistanceMeters, double maxBoost)
+        {
+            if (!distanceMeters.HasValue)
+            {
+                return 0d;
+            }
+
+            var normalized = 1d - Math.Min(distanceMeters.Value, maxDistanceMeters) / maxDistanceMeters;
+            return Math.Max(0d, normalized * maxBoost);
+        }
+
+        private static double? CalculateDistanceFromContext(GeoPoint? origin, Point? point)
+        {
+            if (origin == null || point == null)
+            {
+                return null;
+            }
+
+            return CalculateDistanceMeters(origin.Latitude, origin.Longitude, point.Y, point.X);
+        }
+
+        private static double CalculateDistanceMeters(double latitude1, double longitude1, double latitude2, double longitude2)
+        {
+            const double earthRadiusMeters = 6371000d;
+
+            var deltaLatitude = DegreesToRadians(latitude2 - latitude1);
+            var deltaLongitude = DegreesToRadians(longitude2 - longitude1);
+            var normalizedLatitude1 = DegreesToRadians(latitude1);
+            var normalizedLatitude2 = DegreesToRadians(latitude2);
+
+            var a =
+                Math.Sin(deltaLatitude / 2) * Math.Sin(deltaLatitude / 2) +
+                Math.Cos(normalizedLatitude1) * Math.Cos(normalizedLatitude2) *
+                Math.Sin(deltaLongitude / 2) * Math.Sin(deltaLongitude / 2);
+
+            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+            return earthRadiusMeters * c;
+        }
+
+        private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180d;
+
+        private static bool ContainsAny(string source, IEnumerable<string> hints)
+        {
+            return hints.Any(source.Contains);
+        }
+
+        private static List<string> SplitTokens(string normalizedQuery)
+        {
+            return normalizedQuery
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(token => token.Length >= 2)
+                .Distinct()
+                .ToList();
+        }
+
+        private static string NormalizeText(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return string.Empty;
+            }
+
+            var builder = new StringBuilder(value.Trim().ToLowerInvariant());
+            builder.Replace('č', 'c')
+                .Replace('ć', 'c')
+                .Replace('š', 's')
+                .Replace('ž', 'z')
+                .Replace('đ', 'd');
+
+            var cleaned = Regex.Replace(builder.ToString(), @"[^\p{L}\p{Nd}\s]", " ");
+            return Regex.Replace(cleaned, @"\s+", " ").Trim();
+        }
+
+        private static string? GetMainImageUrl(IEnumerable<Image>? images)
+        {
+            return images?
+                .OrderByDescending(i => i.IsMain)
+                .Select(i => i.Url)
+                .FirstOrDefault();
+        }
+
+        private static string ResolveObjectLocation(TouristObject obj)
+        {
+            return obj.Locality?.Name
+                ?? obj.Destination?.Name
+                ?? obj.Destination?.Region?.Name
+                ?? obj.ObjectType?.Name
+                ?? string.Empty;
+        }
+
+        private static string ResolveEventLocation(Event evt)
+        {
+            return evt.Locality?.Name
+                ?? evt.Destination?.Name
+                ?? evt.Destination?.Region?.Name
+                ?? evt.EventType?.Name
+                ?? string.Empty;
+        }
+
+        private static string ResolveObjectMarkerType(string? objectTypeName)
+        {
+            var normalized = NormalizeText(objectTypeName);
+            if (normalized.Contains("hotel") || normalized.Contains("apartman") || normalized.Contains("pansion"))
+            {
+                return "hotel";
+            }
+
+            if (normalized.Contains("kafana") || normalized.Contains("bar") || normalized.Contains("kafic") || normalized.Contains("kafic"))
+            {
+                return "kafana";
+            }
+
+            return "restaurant";
+        }
+
+        private static string ResolveObjectIcon(string? objectTypeName)
+        {
+            return ResolveObjectMarkerType(objectTypeName) switch
+            {
+                "hotel" => "hotel",
+                "kafana" => "local_bar",
+                _ => "restaurant",
+            };
+        }
+
+        private sealed class SearchContext
+        {
+            public int? EffectiveRegionId { get; set; }
+            public GeoPoint? Origin { get; set; }
+            public Dictionary<int, int> FavoriteObjectTypeWeights { get; set; } = new();
+            public Dictionary<int, double> ObjectTypeAverageRatings { get; set; } = new();
+        }
+
+        private sealed class SearchIntent
+        {
+            public string NormalizedQuery { get; set; } = string.Empty;
+            public List<string> Tokens { get; set; } = [];
+            public bool WantsNearby { get; set; }
+            public bool WantsCheap { get; set; }
+            public bool WantsFree { get; set; }
+            public bool WantsPremium { get; set; }
+            public bool WantsTopRated { get; set; }
+            public bool EventFocused { get; set; }
+            public bool DestinationFocused { get; set; }
+            public bool ObjectFocused { get; set; }
+            public bool TodayPreferred { get; set; }
+            public bool TonightPreferred { get; set; }
+            public bool TomorrowPreferred { get; set; }
+            public bool WeekendPreferred { get; set; }
+            public int? EffectiveRegionId { get; set; }
+        }
+
+        private sealed class SmartSearchCandidate
+        {
+            public int Id { get; set; }
+            public string Name { get; set; } = string.Empty;
+            public string TypeName { get; set; } = string.Empty;
+            public string Location { get; set; } = string.Empty;
+            public string Category { get; set; } = string.Empty;
+            public string MarkerType { get; set; } = string.Empty;
+            public string Icon { get; set; } = string.Empty;
+            public string? ImageUrl { get; set; }
+            public double? Latitude { get; set; }
+            public double? Longitude { get; set; }
+            public string MatchReason { get; set; } = string.Empty;
+            public double Score { get; set; }
+        }
+
+        private sealed record GeoPoint(double Latitude, double Longitude);
+    }
+}

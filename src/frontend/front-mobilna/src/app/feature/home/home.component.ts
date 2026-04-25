@@ -15,6 +15,7 @@ import { MatIcon } from "@angular/material/icon";
 import { LazyBackgroundDirective } from '../../shared/directives/lazy-background.directive';
 import { RecommendationItemDto, RecommendationService } from '../../services/recommendation';
 import { LocationTrackingService } from '../../services/location-tracking';
+import { SmartSearchResultDto, SmartSearchService } from '../../services/smart-search';
 
 interface PlaceCard {
   title: string;
@@ -101,6 +102,7 @@ export class HomeComponent implements OnInit {
   private favoriteMap = new Map<string, number>();
   private fallbackRecommended: PlaceCard[] = [];
   private hasRecommendationResponse = false;
+  private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     public router: Router,
@@ -114,6 +116,7 @@ export class HomeComponent implements OnInit {
     private authService: AuthService,
     private recommendationService: RecommendationService,
     private locationTrackingService: LocationTrackingService,
+    private smartSearchService: SmartSearchService,
   ) {}
   onSearchInput(): void {
     const query = this.searchQuery.trim();
@@ -123,19 +126,39 @@ export class HomeComponent implements OnInit {
       return;
     }
 
-    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-    const scored = this.allItems
-      .map((item) => ({
-        item,
-        score: this.scoreItem(item, terms),
-      }))
-      .filter((x) => this.matchesAllTerms(x.item, terms))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 8);
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
 
-    this.searchResults = scored.map((x) => x.item);
-    this.showSuggestions = this.searchResults.length > 0;
-    this.cdr.detectChanges();
+    this.searchDebounceTimer = setTimeout(() => {
+      const currentLocation = this.locationTrackingService.getCurrentLocation();
+      const includeLocation =
+        this.locationTrackingService.isTrackingEnabled() && currentLocation != null;
+
+      this.smartSearchService
+        .search({
+          query,
+          pageSize: 8,
+          latitude: includeLocation ? currentLocation?.latitude : undefined,
+          longitude: includeLocation ? currentLocation?.longitude : undefined,
+        })
+        .pipe(catchError(() => of([] as SmartSearchResultDto[])))
+        .subscribe((results) => {
+          if (this.searchQuery.trim() !== query) {
+            return;
+          }
+
+          const mapped = results.map((result) => this.toSmartSearchResult(result));
+          if (mapped.length > 0) {
+            this.searchResults = mapped;
+            this.showSuggestions = true;
+          } else {
+            this.applyFallbackSearch(query);
+          }
+
+          this.cdr.detectChanges();
+        });
+    }, 260);
   }
   onSearchBlur(): void {
     setTimeout(() => {
@@ -153,6 +176,10 @@ export class HomeComponent implements OnInit {
   }
   clearSearch(): void {
     this.searchQuery = '';
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = null;
+    }
     this.searchResults = [];
     this.showSuggestions = false;
   }
@@ -168,6 +195,40 @@ export class HomeComponent implements OnInit {
       if (amenities.includes(term)) score += 0.5;
     }
     return score;
+  }
+
+  private applyFallbackSearch(query: string): void {
+    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+    const scored = this.allItems
+      .map((item) => ({
+        item,
+        score: this.scoreItem(item, terms),
+      }))
+      .filter((x) => this.matchesAllTerms(x.item, terms))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 8);
+
+    this.searchResults = scored.map((x) => x.item);
+    this.showSuggestions = this.searchResults.length > 0;
+  }
+
+  private toSmartSearchResult(result: SmartSearchResultDto): SearchResult {
+    return {
+      id: result.id,
+      name: result.name,
+      typeName: result.typeName,
+      location: result.location,
+      image: this.resolveMediaUrl(result.imageUrl),
+      icon: result.icon || this.getCategoryIcon(result.category),
+      lat: result.latitude,
+      lng: result.longitude,
+      raw: {
+        matchReason: result.matchReason,
+        score: result.score,
+      },
+      category: result.category,
+      markerType: result.markerType,
+    };
   }
   private getAmenityText(item: SearchResult): string {
     const type = item.markerType.toLowerCase();
@@ -214,6 +275,10 @@ export class HomeComponent implements OnInit {
   ngOnDestroy(): void {
     if (this.rotationInterval) {
       clearInterval(this.rotationInterval);
+    }
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = null;
     }
   }
   selectSuggestion(result: SearchResult): void {
@@ -438,6 +503,23 @@ export class HomeComponent implements OnInit {
             imageUrl: this.pickEventImage(e),
           }),
         );
+
+        const mappedEvents = future.map((e) => ({
+          id: e.id,
+          name: e.name,
+          typeName: 'Event',
+          location: e.localityName ?? e.destinationName ?? e.regionName ?? '',
+          image: this.pickEventImage(e),
+          icon: 'event',
+          raw: e,
+          category: 'event' as const,
+          markerType: 'event',
+        }));
+
+        this.allItems = [
+          ...this.allItems.filter((item) => item.category !== 'event'),
+          ...mappedEvents,
+        ];
 
         this.flushUi();
       });

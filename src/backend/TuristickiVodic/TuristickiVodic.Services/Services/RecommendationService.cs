@@ -134,7 +134,9 @@ namespace TuristickiVodic.Services.Services
                 var regionId = ResolveObjectRegionId(obj);
                 var distanceMeters = CalculateDistanceFromContext(context.Origin, obj.Geolocation);
                 var favoriteCount = objectFavoriteCounts.GetValueOrDefault(obj.Id);
-                var typePreference = context.ObjectTypeAverageRatings.GetValueOrDefault(obj.ObjectTypeId);
+                double? typePreference = context.ObjectTypeAverageRatings.TryGetValue(obj.ObjectTypeId, out var objectTypeAverage)
+                    ? objectTypeAverage
+                    : null;
                 var score = 30d
                     + (double)obj.AverageRating * 12d
                     + Math.Log(obj.ReviewCount + 1, 2) * 6d
@@ -175,9 +177,11 @@ namespace TuristickiVodic.Services.Services
                 var regionId = ResolveActivityRegionId(activity);
                 var distanceMeters = CalculateDistanceFromContext(context.Origin, activity.Geolocation);
                 var favoriteCount = activityFavoriteCounts.GetValueOrDefault(activity.Id);
-                double? linkedObjectTypePreference = activity.Object != null
-                    ? context.ObjectTypeAverageRatings.GetValueOrDefault(activity.Object.ObjectTypeId)
-                    : null;
+                double? linkedObjectTypePreference =
+                    activity.Object != null &&
+                    context.ObjectTypeAverageRatings.TryGetValue(activity.Object.ObjectTypeId, out var linkedTypeAverage)
+                        ? linkedTypeAverage
+                        : null;
 
                 var score = 24d
                     + favoriteCount * 6d
