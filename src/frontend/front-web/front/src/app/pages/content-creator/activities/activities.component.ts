@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -13,10 +13,14 @@ import { ActivitiesService, ActivityDto } from '../../../services/activities';
 })
 export class ContentCreatorActivitiesComponent implements OnInit {
   private readonly activitiesService = inject(ActivitiesService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   activities: ActivityDto[] = [];
   isLoading = true;
   errorMessage = '';
+  selectedActivity: ActivityDto | null = null;
+  selectedActivityDetails: ActivityDto | null = null;
+  isDetailsLoading = false;
 
   currentPage = 1;
   pageSize = 5;
@@ -78,6 +82,17 @@ export class ContentCreatorActivitiesComponent implements OnInit {
         this.currentPage = response.page ?? this.currentPage;
         this.pageSize = response.pageSize ?? this.pageSize;
         this.totalPages = response.totalPages ?? Math.max(1, Math.ceil(this.totalCount / this.pageSize));
+
+        if (!this.selectedActivity || !this.activities.some((activity) => activity.id === this.selectedActivity?.id)) {
+          this.selectedActivity = this.activities[0] ?? null;
+        }
+
+        if (this.selectedActivity) {
+          this.loadSelectedActivityDetails(this.selectedActivity.id);
+        } else {
+          this.selectedActivityDetails = null;
+        }
+
         this.isLoading = false;
       },
       error: (error) => {
@@ -85,6 +100,8 @@ export class ContentCreatorActivitiesComponent implements OnInit {
         this.activities = [];
         this.totalCount = 0;
         this.totalPages = 1;
+        this.selectedActivity = null;
+        this.selectedActivityDetails = null;
         this.isLoading = false;
       }
     });
@@ -166,6 +183,12 @@ export class ContentCreatorActivitiesComponent implements OnInit {
     this.loadActivities();
   }
 
+  onSelectActivity(activity: ActivityDto): void {
+    this.selectedActivity = activity;
+    this.selectedActivityDetails = activity;
+    this.loadSelectedActivityDetails(activity.id);
+  }
+
   trackByActivityId(_: number, activity: ActivityDto): number {
     return activity.id;
   }
@@ -220,5 +243,53 @@ export class ContentCreatorActivitiesComponent implements OnInit {
 
   get pageEnd(): number {
     return this.pageStart + this.activities.length - 1;
+  }
+
+  get selectedSummary(): string {
+    const activity = this.selectedActivityDetails ?? this.selectedActivity;
+
+    if (!activity?.description) {
+      return 'A featured activity selected from the creator workspace. Use this panel to inspect the location, logistics, and metadata for the activity.';
+    }
+
+    return activity.description;
+  }
+
+  get selectedCategory(): string {
+    const activity = this.selectedActivityDetails ?? this.selectedActivity;
+    return activity?.activityTypeName || 'Activity';
+  }
+
+  get selectedLocation(): string {
+    const activity = this.selectedActivityDetails ?? this.selectedActivity;
+
+    if (!activity) {
+      return '-';
+    }
+
+    return activity.destinationName || activity.localityName || activity.objectName || activity.regionName || '-';
+  }
+
+  get selectedBanner(): string {
+    const activity = this.selectedActivityDetails ?? this.selectedActivity;
+    return activity?.mainImageUrl || '/assets/pozadina.png';
+  }
+
+  private loadSelectedActivityDetails(activityId: number): void {
+    this.isDetailsLoading = true;
+    this.selectedActivityDetails = this.selectedActivity;
+
+    this.activitiesService.getById(activityId).subscribe({
+      next: (activity) => {
+        this.selectedActivityDetails = activity;
+        this.isDetailsLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.selectedActivityDetails = this.selectedActivity;
+        this.isDetailsLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 }
