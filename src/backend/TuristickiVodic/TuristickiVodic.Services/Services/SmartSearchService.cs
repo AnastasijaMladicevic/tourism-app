@@ -10,7 +10,7 @@ namespace TuristickiVodic.Services.Services
 {
     public class SmartSearchService : ISmartSearchService
     {
-        private static readonly string[] NearbyHints = ["blizu", "blizini", "near", "nearby", "close", "oko mene", "u blizini", "near me"];
+        private static readonly string[] NearbyHints = ["blizu", "blizini", "near", "nearby", "close", "oko mene", "u blizini", "near me", "nije daleko", "ne daleko", "nedaleko", "blizu mene"];
         private static readonly string[] CheapHints = ["jeftin", "cheap", "budget", "povoljno", "affordable"];
         private static readonly string[] FreeHints = ["free", "besplatno", "without ticket", "bez karte"];
         private static readonly string[] PremiumHints = ["luxury", "luksuz", "premium", "romantic", "exclusive"];
@@ -24,7 +24,10 @@ namespace TuristickiVodic.Services.Services
         private static readonly string[] FamilyFriendlyFeatureHints = ["kids", "family", "deca", "child", "children", "playground", "igraliste", "parking", "terasa", "terrace", "garden", "basta", "mirno", "quiet", "porodicno", "porodican", "porodicni"];
         private static readonly string[] HikingHints = ["staza", "staze", "hiking", "planinar", "setnja", "setnje", "setnju", "setalistem", "seta", "trail", "priroda", "park", "pecanje", "ribolov", "fishing", "bicikl", "outdoor", "sport", "pesacka", "pesacki", "peske", "pesacenje", "strma", "strme", "strmo", "lagana", "lagane", "lagano", "laka", "lake"];
         private static readonly string[] FoodTypeHints = ["kineska", "kineski", "japanese", "japanska", "italijanska", "italian", "grcka", "greek", "srpska", "balkan", "meksicka", "mexican"];
-        private static readonly HashSet<string> SearchStopWords = ["gde", "mogu", "moze", "mozete", "da", "na", "sa", "u", "uz", "za", "od", "do", "i", "ili", "the", "a", "an", "to", "for", "with", "nisu", "nije", "je", "su", "koje", "koji", "koja", "nesto", "ima", "imaju", "blizu", "oko", "hteo", "bih", "zelim", "trazim", "imate", "mi", "me", "ne", "li", "bi", "manje", "vise", "bez", "dobro", "lepo", "kako", "sta", "kada", "zasto", "neka", "neko", "neku", "one", "oni", "ona", "ovo", "ova", "ove", "ovaj", "ovde", "can", "in", "of", "on", "at", "by", "is", "are", "was", "be", "some", "any", "not", "mnogo", "jako", "previse", "malo", "malom", "mala", "male", "mali", "malu", "maloj", "nikakve", "nikako", "tacno", "bas", "mozda", "uvek", "nikad", "skupa", "skupo", "skup", "skupu", "skupoj", "skupim", "hrana", "hranu", "hrane"];
+        private static readonly HashSet<string> SearchStopWords = ["gde", "mogu", "moze", "mozete", "da", "na", "sa", "u", "uz", "za", "od", "do", "i", "ili", "daleko", "daleka", "daleki", "udaljeno", "udaljena",
+"izadjem", "izadjem", "izaci", "izaći","the", "a", "an", "to", "for", "with", "nisu", "nije", "je", "su", "koje", "koji", "koja", "nesto", "ima", "imaju", "blizu", "oko", "hteo", "bih", "zelim", "trazim", "imate", "mi", "me", "ne", "li", "bi", "manje", "vise", "bez", "dobro", "lepo", "kako", "sta", "kada", "zasto", 
+            "neka", "neko", "neku", "one", "oni", "ona", "ovo", "ova", "ove", "ovaj", "ovde", "can", "in", "of", "on", "at", "by", "is", "are", "was", "be", "some", "any", "not", "mnogo", "jako", "previse", "malo", "malom", "mala", "male", "mali", "malu", "maloj", "nikakve", "nikako", "tacno", "bas", "mozda", "uvek", 
+            "nikad", "skupa", "skupo", "skup", "skupu", "skupoj", "skupim", "hrana", "hranu", "hrane"];
 
         private readonly AppDbContext _context;
 
@@ -64,7 +67,10 @@ namespace TuristickiVodic.Services.Services
                     .ThenInclude(l => l.Destination)
                         .ThenInclude(d => d.Region)
                 .Include(o => o.Images)
-                .Where(o => o.IsActive && o.Status == ContentStatus.Approved)
+                .Where(o =>
+                        o.IsActive &&
+                        o.Status == ContentStatus.Approved &&
+                        o.Images.Any(i => i.IsMain))
                 .AsQueryable();
 
             var eventQuery = _context.Events
@@ -1060,7 +1066,10 @@ namespace TuristickiVodic.Services.Services
                     .ThenInclude(d => d.Region)
                 .Include(o => o.Locality)
                 .Include(o => o.Images)
-                .Where(o => o.IsActive && o.Status == ContentStatus.Approved);
+                .Where(o =>
+                        o.IsActive &&
+                        o.Status == ContentStatus.Approved &&
+                        o.Images.Any(i => i.IsMain));
 
             if (context.EffectiveRegionId.HasValue)
             {
