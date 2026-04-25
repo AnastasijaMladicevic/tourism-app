@@ -93,8 +93,18 @@ export const routes: Routes = [
       },
       {
         path: 'activities',
-        loadComponent: () =>
-          import('./pages/content-creator/activities/activities.component').then(m => m.ContentCreatorActivitiesComponent)
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./pages/content-creator/activities/activities.component').then(m => m.ContentCreatorActivitiesComponent)
+          },
+          {
+            path: 'create',
+            loadComponent: () =>
+              import('./pages/content-creator/activities/activity-create/activity-create.component').then(m => m.ActivityCreateComponent)
+          }
+        ]
       },
       {
         path: 'events',

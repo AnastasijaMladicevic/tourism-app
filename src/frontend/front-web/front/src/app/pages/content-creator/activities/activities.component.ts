@@ -1,12 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { ActivitiesService, ActivityDto } from '../../../services/activities';
 
 @Component({
   selector: 'app-content-creator-activities',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './activities.component.html',
   styleUrls: ['./activities.component.css']
 })
