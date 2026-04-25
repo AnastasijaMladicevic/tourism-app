@@ -67,6 +67,12 @@ interface HomeCategory {
   key: 'object' | 'locality' | 'event' | 'activity' | 'destination'
 }
 
+const SEARCH_STOP_WORDS = new Set([
+  'gde', 'mogu', 'moze', 'da', 'na', 'sa', 'u', 'uz', 'za', 'od', 'do', 'i', 'ili',
+  'nije', 'nisu', 'je', 'su', 'koji', 'koja', 'koje', 'mnogo', 'malo', 'malom',
+  'mala', 'male', 'mali', 'skupa', 'skupo', 'skup', 'skupu', 'hrana', 'hranu',
+]);
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -210,7 +216,7 @@ export class HomeComponent implements OnInit {
   }
 
   private applyFallbackSearch(query: string): void {
-    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+    const terms = this.tokenizeSearchQuery(query);
     const scored = this.allItems
       .map((item) => ({
         item,
@@ -222,6 +228,16 @@ export class HomeComponent implements OnInit {
 
     this.searchResults = scored.map((x) => x.item);
     this.showSuggestions = this.searchResults.length > 0;
+  }
+
+  private tokenizeSearchQuery(query: string): string[] {
+    return query
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .split(/\s+/)
+      .filter((token) => token.length >= 2 && !SEARCH_STOP_WORDS.has(token));
   }
 
   private toSmartSearchResult(result: SmartSearchResultDto): SearchResult {
@@ -251,17 +267,7 @@ export class HomeComponent implements OnInit {
     const rawDescription = item.raw?.description ?? '';
 
     const realText = `${rawAmenities} ${rawCuisine} ${rawType} ${rawDescription}`.trim();
-    if (realText) {
-      return realText;
-    }
-
-    const type = item.markerType.toLowerCase();
-    const amenityMap: Record<string, string> = {
-      hotel: 'wifi parking gym bazen pool breakfast spa',
-      restaurant: 'hrana food dine takeout wifi',
-      kafana: 'bar music live terrace',
-    };
-    return amenityMap[type] ?? '';
+    return realText;
   }
   nextFeatured(): void {
     if (!this.featuredDestinations.length) return;

@@ -11,18 +11,22 @@ namespace TuristickiVodic.API.Controllers
     public class SmartSearchController : ControllerBase
     {
         private readonly ISmartSearchService _smartSearchService;
+        private readonly ILogger<SmartSearchController> _logger;
 
-        public SmartSearchController(ISmartSearchService smartSearchService)
+        public SmartSearchController(ISmartSearchService smartSearchService, ILogger<SmartSearchController> logger)
         {
             _smartSearchService = smartSearchService;
+            _logger = logger;
         }
 
         [HttpGet("smart")]
         [AllowAnonymous]
         public async Task<IActionResult> Search([FromQuery] SmartSearchQueryDto query)
         {
+            _logger.LogWarning("SEARCH DEBUG: Query='{Query}' Mode='{Mode}'", query.Query, query.Mode);
             var userId = TryGetCurrentUserId();
             var results = await _smartSearchService.SearchAsync(userId, query);
+            _logger.LogWarning("SEARCH DEBUG: Returned {Count} results", results.Count);
             return Ok(results);
         }
 
@@ -31,8 +35,10 @@ namespace TuristickiVodic.API.Controllers
         public async Task<IActionResult> SearchMcp([FromQuery] SmartSearchQueryDto query)
         {
             query.Mode = "mcp";
+            _logger.LogWarning("MCP DEBUG: Query='{Query}' Mode='{Mode}'", query.Query, query.Mode);
             var userId = TryGetCurrentUserId();
             var results = await _smartSearchService.SearchAsync(userId, query);
+            _logger.LogWarning("MCP DEBUG: Returned {Count} results", results.Count);
             return Ok(results);
         }
 

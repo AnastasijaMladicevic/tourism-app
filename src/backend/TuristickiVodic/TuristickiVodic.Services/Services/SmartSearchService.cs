@@ -15,14 +15,16 @@ namespace TuristickiVodic.Services.Services
         private static readonly string[] FreeHints = ["free", "besplatno", "without ticket", "bez karte"];
         private static readonly string[] PremiumHints = ["luxury", "luksuz", "premium", "romantic", "exclusive"];
         private static readonly string[] TopRatedHints = ["best", "najbolje", "top", "popular", "preporuci", "preporuka", "recommended"];
-        private static readonly string[] FamilyHints = ["deca", "decom", "decu", "dete", "kids", "kid", "children", "child", "family", "porodicno", "porodicni", "porodicna"];
+        private static readonly string[] FamilyHints = ["deca", "decom", "decu", "dete", "kids", "kid", "children", "child", "family", "porodicno", "porodicni", "porodicna", "porodica", "porodican"];
         private static readonly string[] DinnerHints = ["vecera", "veceru", "dinner", "supper", "dine", "izadjem", "izaci", "izlazak"];
         private static readonly string[] PoolHints = ["bazen", "pool", "swimming"];
         private static readonly string[] EventHints = ["event", "dogadjaj", "događaj", "festival", "concert", "koncert", "party", "zur", "music"];
         private static readonly string[] DestinationHints = ["destination", "destinacija", "city", "grad", "island", "ostrvo", "beach", "plaza", "plaža", "mountain", "planina"];
         private static readonly string[] ObjectHints = ["hotel", "restoran", "restaurant", "kafic", "kafić", "bar", "kafana", "museum", "muzej", "spa", "apartment", "apartman"];
-        private static readonly string[] FamilyFriendlyFeatureHints = ["kids", "family", "deca", "child", "children", "playground", "igraliste", "parking", "terasa", "terrace", "garden", "basta", "mirno", "quiet"];
-        private static readonly HashSet<string> SearchStopWords = ["gde", "mogu", "moze", "mozete", "da", "na", "sa", "u", "uz", "za", "od", "do", "i", "ili", "the", "a", "an", "to", "for", "with"];
+        private static readonly string[] FamilyFriendlyFeatureHints = ["kids", "family", "deca", "child", "children", "playground", "igraliste", "parking", "terasa", "terrace", "garden", "basta", "mirno", "quiet", "porodicno", "porodican", "porodicni"];
+        private static readonly string[] HikingHints = ["staza", "staze", "hiking", "planinar", "setnja", "setnje", "setnju", "setalistem", "seta", "trail", "priroda", "park", "pecanje", "ribolov", "fishing", "bicikl", "outdoor", "sport", "pesacka", "pesacki", "peske", "pesacenje", "strma", "strme", "strmo", "lagana", "lagane", "lagano", "laka", "lake"];
+        private static readonly string[] FoodTypeHints = ["kineska", "kineski", "japanese", "japanska", "italijanska", "italian", "grcka", "greek", "srpska", "balkan", "meksicka", "mexican"];
+        private static readonly HashSet<string> SearchStopWords = ["gde", "mogu", "moze", "mozete", "da", "na", "sa", "u", "uz", "za", "od", "do", "i", "ili", "the", "a", "an", "to", "for", "with", "nisu", "nije", "je", "su", "koje", "koji", "koja", "nesto", "ima", "imaju", "blizu", "oko", "hteo", "bih", "zelim", "trazim", "imate", "mi", "me", "ne", "li", "bi", "manje", "vise", "bez", "dobro", "lepo", "kako", "sta", "kada", "zasto", "neka", "neko", "neku", "one", "oni", "ona", "ovo", "ova", "ove", "ovaj", "ovde", "can", "in", "of", "on", "at", "by", "is", "are", "was", "be", "some", "any", "not", "mnogo", "jako", "previse", "malo", "malom", "mala", "male", "mali", "malu", "maloj", "nikakve", "nikako", "tacno", "bas", "mozda", "uvek", "nikad", "skupa", "skupo", "skup", "skupu", "skupoj", "skupim", "hrana", "hranu", "hrane"];
 
         private readonly AppDbContext _context;
 
@@ -50,7 +52,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(d => d.Region)
                 .Include(d => d.DestinationType)
                 .Include(d => d.Images)
-                .Where(d => d.IsActive && d.Status == ContentStatus.Approved && d.Images.Any(i => i.IsMain))
+                .Where(d => d.IsActive && d.Status == ContentStatus.Approved)
                 .AsQueryable();
 
             var objectQuery = _context.Objects
@@ -62,7 +64,7 @@ namespace TuristickiVodic.Services.Services
                     .ThenInclude(l => l.Destination)
                         .ThenInclude(d => d.Region)
                 .Include(o => o.Images)
-                .Where(o => o.IsActive && o.Status == ContentStatus.Approved && o.Images.Any(i => i.IsMain))
+                .Where(o => o.IsActive && o.Status == ContentStatus.Approved)
                 .AsQueryable();
 
             var eventQuery = _context.Events
@@ -75,7 +77,7 @@ namespace TuristickiVodic.Services.Services
                         .ThenInclude(d => d.Region)
                 .Include(e => e.Object)
                 .Include(e => e.Images)
-                .Where(e => e.IsActive && e.Status == ContentStatus.Approved && e.Images.Any(i => i.IsMain))
+                .Where(e => e.IsActive && e.Status == ContentStatus.Approved)
                 .AsQueryable();
 
             if (context.EffectiveRegionId.HasValue)
@@ -121,7 +123,8 @@ namespace TuristickiVodic.Services.Services
                 }
 
                 var score = ScoreDestination(destination, intent, context, destinationFavoriteCounts.GetValueOrDefault(destination.Id), out var reason);
-                if (score <= 0)
+                // U strict/mapa modu filtriramo rezultate bez match-a; u MCP modu svi prolaze (fallback na popularnost)
+                if (strictMode && score <= 0)
                 {
                     continue;
                 }
@@ -157,7 +160,8 @@ namespace TuristickiVodic.Services.Services
                     objectFavoriteCounts.GetValueOrDefault(obj.Id),
                     out var reason);
 
-                if (score <= 0)
+                // U strict/mapa modu filtriramo rezultate bez match-a; u MCP modu svi prolaze
+                if (strictMode && score <= 0)
                 {
                     continue;
                 }
@@ -187,7 +191,7 @@ namespace TuristickiVodic.Services.Services
                 }
 
                 var score = ScoreEvent(evt, intent, context, eventPlannerCounts.GetValueOrDefault(evt.Id), out var reason);
-                if (score <= 0)
+                if (strictMode && score <= 0)
                 {
                     continue;
                 }
@@ -209,7 +213,7 @@ namespace TuristickiVodic.Services.Services
                 });
             }
 
-            return results
+            var rankedResults = results
                 .OrderByDescending(x => x.Score)
                 .ThenBy(x => x.Name)
                 .Take(pageSize)
@@ -229,6 +233,15 @@ namespace TuristickiVodic.Services.Services
                     Score = Math.Round(x.Score, 2),
                 })
                 .ToList();
+
+            if (rankedResults.Count > 0)
+            {
+                return rankedResults;
+            }
+
+            return strictMode
+                ? await BuildStrictObjectFallbackAsync(context, intent, pageSize)
+                : await BuildMcpObjectFallbackAsync(context, intent, pageSize);
         }
 
         private async Task<SearchContext> BuildContextAsync(int? userId, SmartSearchQueryDto query, string normalizedQuery)
@@ -325,6 +338,25 @@ namespace TuristickiVodic.Services.Services
                 EffectiveRegionId = effectiveRegionId,
             };
 
+            intent.WantsOutdoor = ContainsAny(normalizedQuery, HikingHints);
+            intent.FoodTypeFocused = ContainsAny(normalizedQuery, FoodTypeHints);
+
+            // Negation cheap: "nije skupa/skupo/skup" -> treat as cheap intent
+            if (!intent.WantsCheap)
+            {
+                var negationCheapPatterns = new[] { "nije skup", "nisu skup", "ne skup", "ne mora biti skup", "nije preskup", "nije skupo", "nije skupа" };
+                if (negationCheapPatterns.Any(normalizedQuery.Contains))
+                {
+                    intent.WantsCheap = true;
+                }
+            }
+            if (!intent.WantsCheap &&
+                (Regex.IsMatch(normalizedQuery, @"\bnije\b.*\bskup\w*\b") ||
+                 Regex.IsMatch(normalizedQuery, @"\bne\b.*\bskup\w*\b")))
+            {
+                intent.WantsCheap = true;
+            }
+
             intent.TodayPreferred = normalizedQuery.Contains("today") || normalizedQuery.Contains("danas");
             intent.TonightPreferred = normalizedQuery.Contains("tonight") || normalizedQuery.Contains("veceras") || normalizedQuery.Contains("večeras");
             intent.TomorrowPreferred = normalizedQuery.Contains("tomorrow") || normalizedQuery.Contains("sutra");
@@ -415,15 +447,81 @@ namespace TuristickiVodic.Services.Services
 
             return token switch
             {
-                "bazen" => ["bazen", "pool", "swimming"],
+                // Voda / sport
+                "bazen" => ["bazen", "bazena", "bazeni", "bazenom", "pool", "swimming"],
+                "bazena" => ["bazena", "bazen", "bazeni", "bazenom", "pool", "swimming"],
+                "bazeni" => ["bazeni", "bazena", "bazen", "bazenom", "pool", "swimming"],
+                "bazenom" => ["bazenom", "bazen", "bazena", "bazeni", "pool", "swimming"],
                 "pool" => ["pool", "bazen", "swimming"],
-                "hotel" => ["hotel", "hotels"],
-                "restoran" => ["restoran", "restaurant"],
-                "restaurant" => ["restaurant", "restoran"],
-                "kafana" => ["kafana", "bar", "kafic", "kafic"],
-                "bar" => ["bar", "kafana", "kafic", "kafic"],
+                "pecanje" => ["pecanje", "ribolov", "fishing", "riba"],
+                "fishing" => ["fishing", "pecanje", "ribolov"],
+                "ribolov" => ["ribolov", "pecanje", "fishing"],
+                // Staze / priroda
+                "staza" => ["staza", "staze", "trail", "hiking", "planinar", "setnja", "setnje", "setalistem", "seta"],
+                "staze" => ["staze", "staza", "trail", "hiking", "planinar", "setnja"],
+                "trail" => ["trail", "staza", "staze", "hiking"],
+                "hiking" => ["hiking", "staza", "staze", "planinar"],
+                "setnja" => ["setnja", "setnje", "setnju", "setalistem", "seta", "staza", "staze", "park", "priroda", "pesacka", "peske"],
+                "setnju" => ["setnju", "setnja", "setnje", "setalistem", "seta", "pesacki", "peske", "park"],
+                "setnje" => ["setnje", "setnja", "park", "staza", "priroda"],
+                "planinar" => ["planinar", "planina", "staza", "staze", "hiking"],
+                "planina" => ["planina", "planinar", "hiking", "staza"],
+                // Kineska / etnicka hrana
+                "kineska" => ["kineska", "kineski", "kineskа", "chinese", "kina", "wok", "sushi"],
+                "kineski" => ["kineski", "kineska", "chinese", "kina"],
+                "chinese" => ["chinese", "kineska", "kineski"],
+                "japanska" => ["japanska", "japanese", "sushi", "ramen"],
+                "italijanska" => ["italijanska", "italian", "pizza", "pasta"],
+                "grcka" => ["grcka", "greek", "meze"],
+                // Deca / porodica
+                "deca" => ["deca", "decom", "decu", "dete", "kids", "children", "family", "porodicno", "porodican", "playground", "igraliste"],
+                "decom" => ["decom", "deca", "decu", "kids", "family", "porodicno", "children", "playground"],
+                "kids" => ["kids", "deca", "children", "family", "playground"],
+                // Smestaj
+                "hotel" => ["hotel", "hotels", "hotelu", "hotela", "hoteli", "smestaj"],
+                "hotelu" => ["hotelu", "hotel", "hotela", "hoteli", "smestaj"],
+                "hotela" => ["hotela", "hotel", "hotelu", "hoteli", "smestaj"],
+                "hoteli" => ["hoteli", "hotel", "hotela", "hotelu", "smestaj"],
+                "apartman" => ["apartman", "apartmana", "apartmani", "apartment", "smestaj"],
+                "apartmana" => ["apartmana", "apartman", "apartmani", "apartment", "smestaj"],
+                // Hrana/pice
+                "hrana" => ["hrana", "food", "restoran", "restaurant", "kitchen", "cuisine", "vecera", "dinner"],
+                "food" => ["food", "hrana", "restoran", "restaurant", "cuisine", "dinner"],
+                "vecera" => ["vecera", "veceru", "dinner", "restoran", "restaurant", "food"],
+                "veceru" => ["veceru", "vecera", "dinner", "restoran", "restaurant", "food"],
+                "restoran" => ["restoran", "restoranu", "restorana", "restorani", "restaurant"],
+                "restoranu" => ["restoranu", "restoran", "restorana", "restorani", "restaurant"],
+                "restorana" => ["restorana", "restoran", "restoranu", "restorani", "restaurant"],
+                "restaurant" => ["restaurant", "restoran", "restoranu", "restorana"],
+                "kafana" => ["kafana", "kafane", "bar", "kafic"],
+                "bar" => ["bar", "baru", "barovi", "kafana", "kafic"],
+                "baru" => ["baru", "bar", "barovi", "kafana", "kafic"],
+                "kafa" => ["kafa", "kafic", "cafe", "coffee"],
+                "kafic" => ["kafic", "kaficu", "kafa", "cafe", "coffee"],
+                "kaficu" => ["kaficu", "kafic", "kafa", "cafe", "coffee"],
+                // Sport
+                "tenis" => ["tenis", "tennis", "teren"],
+                "fitnes" => ["fitnes", "fitness", "gym", "teretana"],
+                "teretana" => ["teretana", "gym", "fitness", "fitnes"],
+                "bicikl" => ["bicikl", "bicikli", "cycling", "bike"],
+                // Ostalo
                 "parking" => ["parking", "garage", "garaza"],
-                "spa" => ["spa", "wellness"],
+                "spa" => ["spa", "wellness", "relaksacija"],
+                "wellness" => ["wellness", "spa", "relaksacija"],
+                "muzej" => ["muzej", "museum", "galerija", "kultura"],
+                "museum" => ["museum", "muzej", "galerija"],
+                // Staze tezina
+                "strme" => ["strma", "strme", "strmo", "steep"],
+                "strma" => ["strma", "strme", "strmo", "steep"],
+                "lagane" => ["lagana", "lagane", "lagano", "laka", "lake", "easy", "gentle"],
+                "lagana" => ["lagana", "lagane", "lagano", "laka", "lake", "easy"],
+                // Pecanje
+                "pecanjem" => ["pecanje", "ribolov", "fishing"],
+                "pecanja" => ["pecanje", "ribolov", "fishing"],
+                // Hrana ethnic
+                "kinesku" => ["kineska", "kineski", "chinese", "kina"],
+                "japansku" => ["japanska", "japanese", "sushi"],
+                "italijansku" => ["italijanska", "italian", "pizza", "pasta"],
                 _ => [token],
             };
         }
@@ -524,7 +622,13 @@ namespace TuristickiVodic.Services.Services
 
             if (intent.WantsFamilyFriendly)
             {
-                if (ContainsAny(combinedFeatures, FamilyFriendlyFeatureHints))
+                var amenitiesRaw = obj.Amenities == null ? "" : string.Join(' ', obj.Amenities).ToLowerInvariant();
+                if (amenitiesRaw.Contains("porodicno") || amenitiesRaw.Contains("porodican") || amenitiesRaw.Contains("family"))
+                {
+                    score += 40;
+                    reason = "Porodicno prikladno";
+                }
+                else if (ContainsAny(combinedFeatures, FamilyFriendlyFeatureHints))
                 {
                     score += 24;
                     reason = "Matches family-friendly search";
@@ -550,6 +654,21 @@ namespace TuristickiVodic.Services.Services
                 else if (type.Contains("hotel") || type.Contains("spa") || type.Contains("wellness"))
                 {
                     score += 10;
+                }
+            }
+
+            if (intent.WantsOutdoor)
+            {
+                var outdoorFields = $"{type} {amenities} {description} {name}";
+                if (ContainsAny(outdoorFields, HikingHints))
+                {
+                    score += 30;
+                    reason = "Matches outdoor/activity search";
+                }
+                if (type.Contains("planinar") || type.Contains("nacionalni") || type.Contains("park"))
+                {
+                    score += 20;
+                    reason = "Outdoor lokacija";
                 }
             }
 
@@ -707,9 +826,12 @@ namespace TuristickiVodic.Services.Services
 
             foreach (var token in intent.Tokens)
             {
-                if (field.Contains(token))
+                // Expand token to synonyms so MCP mode also matches e.g. "setnju" -> "setnja","staza","park"...
+                var expandedTokens = ExpandToken(token);
+                if (expandedTokens.Any(field.Contains))
                 {
                     score += tokenMatchScore;
+                    reason = reasonText;
                 }
             }
 
@@ -892,6 +1014,198 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
+        private async Task<List<SmartSearchResultDto>> BuildStrictObjectFallbackAsync(SearchContext context, SearchIntent intent, int pageSize)
+        {
+            var objects = await BuildFallbackObjectQuery(context).ToListAsync();
+
+            return objects
+                .Select(obj => new
+                {
+                    Object = obj,
+                    Score = ScoreStrictFallbackObject(obj, intent),
+                })
+                .Where(x => x.Score > 0)
+                .OrderByDescending(x => x.Score)
+                .ThenBy(x => x.Object.Name)
+                .Take(pageSize)
+                .Select(x => MapFallbackObject(x.Object, x.Score, "Matches object fields"))
+                .ToList();
+        }
+
+        private async Task<List<SmartSearchResultDto>> BuildMcpObjectFallbackAsync(SearchContext context, SearchIntent intent, int pageSize)
+        {
+            var objects = await BuildFallbackObjectQuery(context).ToListAsync();
+
+            return objects
+                .Select(obj => new
+                {
+                    Object = obj,
+                    Score = ScoreMcpFallbackObject(obj, intent, context),
+                    Reason = ResolveMcpFallbackReason(obj, intent),
+                })
+                .Where(x => x.Score > 0)
+                .OrderByDescending(x => x.Score)
+                .ThenBy(x => x.Object.Name)
+                .Take(pageSize)
+                .Select(x => MapFallbackObject(x.Object, x.Score, x.Reason))
+                .ToList();
+        }
+
+        private IQueryable<TouristObject> BuildFallbackObjectQuery(SearchContext context)
+        {
+            var query = _context.Objects
+                .AsNoTracking()
+                .Include(o => o.ObjectType)
+                .Include(o => o.Destination)
+                    .ThenInclude(d => d.Region)
+                .Include(o => o.Locality)
+                .Include(o => o.Images)
+                .Where(o => o.IsActive && o.Status == ContentStatus.Approved);
+
+            if (context.EffectiveRegionId.HasValue)
+            {
+                var regionId = context.EffectiveRegionId.Value;
+                query = query.Where(o => o.Destination.RegionId == regionId);
+            }
+
+            return query;
+        }
+
+        private double ScoreStrictFallbackObject(TouristObject obj, SearchIntent intent)
+        {
+            var name = NormalizeText(obj.Name);
+            var type = NormalizeText(obj.ObjectType?.Name);
+            var description = NormalizeText(obj.Description);
+            var cuisine = NormalizeText(obj.CuisineType);
+            var amenities = NormalizeText(obj.Amenities == null ? null : string.Join(' ', obj.Amenities));
+
+            double score = 0d;
+            foreach (var token in intent.Tokens)
+            {
+                var expandedTokens = ExpandToken(token);
+                if (expandedTokens.Any(name.Contains)) score += 12d;
+                if (expandedTokens.Any(type.Contains)) score += 10d;
+                if (expandedTokens.Any(cuisine.Contains)) score += 8d;
+                if (expandedTokens.Any(amenities.Contains)) score += 8d;
+                if (expandedTokens.Any(description.Contains)) score += 5d;
+            }
+
+            return score;
+        }
+
+        private double ScoreMcpFallbackObject(TouristObject obj, SearchIntent intent, SearchContext context)
+        {
+            var type = NormalizeText(obj.ObjectType?.Name);
+            var description = NormalizeText(obj.Description);
+            var cuisine = NormalizeText(obj.CuisineType);
+            var amenities = NormalizeText(obj.Amenities == null ? null : string.Join(' ', obj.Amenities));
+            var name = NormalizeText(obj.Name);
+            var combined = $"{name} {type} {description} {cuisine} {amenities}";
+
+            var score = (double)obj.AverageRating * 8d + Math.Log(obj.ReviewCount + 1, 2) * 5d;
+
+            foreach (var token in intent.Tokens)
+            {
+                var expandedTokens = ExpandToken(token);
+                if (expandedTokens.Any(combined.Contains))
+                {
+                    score += 10d;
+                }
+            }
+
+            if (intent.WantsDinner)
+            {
+                if (type.Contains("restoran") || type.Contains("restaurant"))
+                {
+                    score += 32d;
+                }
+                else if (type.Contains("kafana") || type.Contains("bar") || type.Contains("kafic"))
+                {
+                    score += 20d;
+                }
+                else if (type.Contains("hotel"))
+                {
+                    score += 8d;
+                }
+            }
+
+            if (intent.WantsFamilyFriendly)
+            {
+                if (ContainsAny(combined, FamilyFriendlyFeatureHints))
+                {
+                    score += 28d;
+                }
+                else if (type.Contains("restoran") || type.Contains("restaurant") || type.Contains("hotel"))
+                {
+                    score += 10d;
+                }
+            }
+
+            if (intent.WantsPool && (amenities.Contains("bazen") || amenities.Contains("pool")))
+            {
+                score += 30d;
+            }
+
+            if (intent.WantsCheap)
+            {
+                score += PricePreferenceScore(obj.Price, 0, 25, 10, 0);
+            }
+
+            score += DistanceBoost(
+                CalculateDistanceFromContext(context.Origin, obj.Geolocation),
+                intent.WantsNearby ? 80_000d : 180_000d,
+                intent.WantsNearby ? 30d : 8d);
+
+            return score;
+        }
+
+        private static string ResolveMcpFallbackReason(TouristObject obj, SearchIntent intent)
+        {
+            var type = NormalizeText(obj.ObjectType?.Name);
+            var amenities = NormalizeText(obj.Amenities == null ? null : string.Join(' ', obj.Amenities));
+
+            if (intent.WantsPool && (amenities.Contains("bazen") || amenities.Contains("pool")))
+            {
+                return "Matches amenities";
+            }
+
+            if (intent.WantsFamilyFriendly && ContainsAny($"{type} {amenities}", FamilyFriendlyFeatureHints))
+            {
+                return "Matches family-friendly search";
+            }
+
+            if (intent.WantsDinner && (type.Contains("restoran") || type.Contains("restaurant") || type.Contains("bar") || type.Contains("kafana") || type.Contains("kafic")))
+            {
+                return "Matches dinner intent";
+            }
+
+            if (intent.WantsCheap)
+            {
+                return "Matches budget preference";
+            }
+
+            return "Popular choice";
+        }
+
+        private static SmartSearchResultDto MapFallbackObject(TouristObject obj, double score, string reason)
+        {
+            return new SmartSearchResultDto
+            {
+                Id = obj.Id,
+                Name = obj.Name,
+                TypeName = obj.ObjectType?.Name ?? "Object",
+                Location = ResolveObjectLocation(obj),
+                Category = "object",
+                MarkerType = ResolveObjectMarkerType(obj.ObjectType?.Name),
+                Icon = ResolveObjectIcon(obj.ObjectType?.Name),
+                ImageUrl = GetMainImageUrl(obj.Images),
+                Latitude = obj.Geolocation?.Y,
+                Longitude = obj.Geolocation?.X,
+                MatchReason = reason,
+                Score = Math.Round(score, 2),
+            };
+        }
+
         private sealed class SearchContext
         {
             public int? EffectiveRegionId { get; set; }
@@ -919,6 +1233,8 @@ namespace TuristickiVodic.Services.Services
             public bool TonightPreferred { get; set; }
             public bool TomorrowPreferred { get; set; }
             public bool WeekendPreferred { get; set; }
+            public bool WantsOutdoor { get; set; }
+            public bool FoodTypeFocused { get; set; }
             public int? EffectiveRegionId { get; set; }
         }
 
