@@ -103,6 +103,13 @@ export const routes: Routes = [
     loadComponent: () => import('./feature/home/home.component').then((m) => m.HomeComponent),
   },
   {
+    path: 'search',
+    loadComponent: () =>
+      import('./feature/search-results/search-results.component').then(
+        (m) => m.SearchResultsComponent,
+      ),
+  },
+  {
     path: 'forgot-password',
     loadComponent: () =>
       import('./feature/auth/forgot-password/forgot-password').then(

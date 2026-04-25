@@ -11,16 +11,17 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of, Subscription } from 'rxjs';
 import * as L from 'leaflet';
 
 import { MapService } from '../../services/map.service';
 import { DestinationService } from '../../services/destination';
 import { ObjectService } from '../../services/object';
 import { EventService } from '../../services/event';
-import { AuthService } from '../../services/auth';
 import { RegionService } from '../../services/region';
 import { ActiveRegionService } from '../../services/active-region';
+import { LocationTrackingService, TrackedLocation } from '../../services/location-tracking';
+import { SmartSearchResultDto, SmartSearchService } from '../../services/smart-search';
 
 interface SearchResult {
   id: number;
@@ -49,6 +50,12 @@ interface RoutePoint {
   lat: number;
   lng: number;
 }
+
+const SEARCH_STOP_WORDS = new Set([
+  'gde', 'mogu', 'moze', 'da', 'na', 'sa', 'u', 'uz', 'za', 'od', 'do', 'i', 'ili',
+  'nije', 'nisu', 'je', 'su', 'koji', 'koja', 'koje', 'mnogo', 'malo', 'malom',
+  'mala', 'male', 'mali', 'skupa', 'skupo', 'skup', 'skupu', 'hrana', 'hranu',
+]);
 
 @Component({
   selector: 'app-map',
@@ -79,26 +86,28 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   routeEnd: RoutePoint | null = null;
 
   isTracking = false;
-  private watchId: number | null = null;
   private userMarker: L.Marker | null = null;
   private userCircle: L.Circle | null = null;
 
-  private routingControl: any = null;
-  private routingMachineLoaded = false;
+  private routeLine: L.Polyline | null = null;
 
   private allItems: SearchResult[] = [];
+  private readonly subscriptions = new Subscription();
+  private shouldCenterOnNextLocation = false;
+  private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private mapService: MapService,
     private router: Router,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
-    private authService: AuthService,
     private destinationService: DestinationService,
     private objectService: ObjectService,
     private eventService: EventService,
     private regionService: RegionService,
     private activeRegionService: ActiveRegionService,
+    private locationTrackingService: LocationTrackingService,
+    private smartSearchService: SmartSearchService,
   ) {}
 
   ngOnInit(): void {
@@ -109,6 +118,24 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cdr.detectChanges();
       });
     });
+
+    this.subscriptions.add(
+      this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
+        this.ngZone.run(() => {
+          this.isTracking = enabled;
+          this.cdr.detectChanges();
+        });
+      }),
+    );
+
+    this.subscriptions.add(
+      this.locationTrackingService.location$.subscribe((location) => {
+        this.ngZone.run(() => {
+          this.applyTrackedLocation(location);
+          this.cdr.detectChanges();
+        });
+      }),
+    );
   }
 
   ngAfterViewInit(): void {
@@ -118,6 +145,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const zoom = state?.zoom ?? 13;
 
     this.mapService.initMap('main-map', lat, lng, zoom);
+    this.isTracking = this.locationTrackingService.isTrackingEnabled();
+    this.applyTrackedLocation(this.locationTrackingService.getCurrentLocation());
     if (!state?.lat || !state?.lng) {
       this.focusActiveRegion();
     }
@@ -130,75 +159,29 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.stopTracking();
+    this.subscriptions.unsubscribe();
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = null;
+    }
     this.mapService.destroyMap();
   }
 
   toggleGpsTracking(): void {
     if (this.isTracking) {
-      this.stopTracking();
+      this.locationTrackingService.stopTracking();
     } else {
-      this.startTracking();
-    }
-  }
+      if (!this.locationTrackingService.startTracking()) {
+        alert('Geolocation nije podrzana.');
+        return;
+      }
 
-  private startTracking(): void {
-    if (!navigator.geolocation) {
-      alert('Geolocation nije podrzana.');
-      return;
-    }
-
-    this.isTracking = true;
-
-    this.watchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        this.ngZone.run(() => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          const accuracy = pos.coords.accuracy;
-          const latlng = L.latLng(lat, lng);
-          this.userLocation = latlng;
-
-          this.updateUserMarker(latlng, accuracy);
-
-          if (this.authService.isLoggedIn()) {
-            this.authService.updateMyLocation(lat, lng).subscribe();
-          }
-
-          this.cdr.detectChanges();
-        });
-      },
-      (err) => {
-        this.ngZone.run(() => {
-          this.isTracking = false;
-          if (err.code === err.PERMISSION_DENIED) {
-            alert('Dozvolite pristup lokaciji.');
-          }
-          this.cdr.detectChanges();
-        });
-      },
-      { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 },
-    );
-
-    navigator.geolocation.getCurrentPosition((pos) => {
-      this.mapService.flyTo(pos.coords.latitude, pos.coords.longitude, 16);
-    });
-  }
-
-  private stopTracking(): void {
-    if (this.watchId !== null) {
-      navigator.geolocation.clearWatch(this.watchId);
-      this.watchId = null;
-    }
-    this.isTracking = false;
-
-    if (this.userMarker) {
-      this.userMarker.remove();
-      this.userMarker = null;
-    }
-    if (this.userCircle) {
-      this.userCircle.remove();
-      this.userCircle = null;
+      this.shouldCenterOnNextLocation = true;
+      const currentLocation = this.locationTrackingService.getCurrentLocation();
+      if (currentLocation) {
+        this.mapService.flyTo(currentLocation.latitude, currentLocation.longitude, 16);
+        this.shouldCenterOnNextLocation = false;
+      }
     }
   }
 
@@ -229,6 +212,35 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         fillOpacity: 0.1,
         weight: 1,
       }).addTo(map);
+    }
+  }
+
+  private clearUserMarker(): void {
+    if (this.userMarker) {
+      this.userMarker.remove();
+      this.userMarker = null;
+    }
+
+    if (this.userCircle) {
+      this.userCircle.remove();
+      this.userCircle = null;
+    }
+  }
+
+  private applyTrackedLocation(location: TrackedLocation | null): void {
+    if (!location) {
+      this.userLocation = null;
+      this.clearUserMarker();
+      return;
+    }
+
+    const latlng = L.latLng(location.latitude, location.longitude);
+    this.userLocation = latlng;
+    this.updateUserMarker(latlng, location.accuracy);
+
+    if (this.shouldCenterOnNextLocation) {
+      this.mapService.flyTo(location.latitude, location.longitude, 16);
+      this.shouldCenterOnNextLocation = false;
     }
   }
 
@@ -284,10 +296,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   clearDirections(): void {
-    const map = this.mapService['map'];
-    if (this.routingControl && map) {
-      map.removeControl(this.routingControl);
-      this.routingControl = null;
+    if (this.routeLine) {
+      this.routeLine.remove();
+      this.routeLine = null;
     }
   }
 
@@ -295,29 +306,21 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const map = this.mapService['map'];
     if (!map) return;
 
-    await this.ensureRoutingMachineLoaded();
     this.clearDirections();
 
-    this.routingControl = (L as any).Routing.control({
-      waypoints: [from, to],
-      routeWhileDragging: false,
-      show: false,
-      addWaypoints: false,
-      fitSelectedRoutes: true,
-      lineOptions: {
-        styles: [{ color: '#168AAD', weight: 5, opacity: 0.8 }],
-      },
-      createMarker: () => null,
+    const routePoints = await this.fetchRoutePoints(from, to);
+    this.routeLine = L.polyline(routePoints, {
+      color: '#168AAD',
+      weight: 5,
+      opacity: 0.85,
+      lineCap: 'round',
+      lineJoin: 'round',
     }).addTo(map);
-  }
 
-  private async ensureRoutingMachineLoaded(): Promise<void> {
-    if (this.routingMachineLoaded) {
-      return;
-    }
-
-    await import('leaflet-routing-machine');
-    this.routingMachineLoaded = true;
+    map.fitBounds(this.routeLine.getBounds(), {
+      padding: [48, 48],
+      maxZoom: 16,
+    });
   }
 
   private matchesAllTerms(item: SearchResult, terms: string[]): boolean {
@@ -333,23 +336,49 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   onSearchInput(): void {
     const query = this.searchQuery.trim();
     if (!query) {
+      if (this.searchDebounceTimer) {
+        clearTimeout(this.searchDebounceTimer);
+        this.searchDebounceTimer = null;
+      }
       this.searchResults = [];
       this.showSuggestions = false;
       return;
     }
 
-    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-    const scored = this.allItems
-      .map((item) => ({
-        item,
-        score: this.scoreItem(item, terms),
-      }))
-      .filter((x) => this.matchesAllTerms(x.item, terms))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 8);
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
 
-    this.searchResults = scored.map((x) => x.item);
-    this.showSuggestions = this.searchResults.length > 0;
+    this.searchDebounceTimer = setTimeout(() => {
+      const currentLocation = this.locationTrackingService.getCurrentLocation();
+      const includeLocation =
+        this.locationTrackingService.isTrackingEnabled() && currentLocation != null;
+
+      this.smartSearchService
+        .search({
+          query,
+          pageSize: 8,
+          mode: 'strict',
+          latitude: includeLocation ? currentLocation?.latitude : undefined,
+          longitude: includeLocation ? currentLocation?.longitude : undefined,
+        })
+        .pipe(catchError(() => of([] as SmartSearchResultDto[])))
+        .subscribe((results) => {
+          if (this.searchQuery.trim() !== query) {
+            return;
+          }
+
+          const mapped = results.map((result) => this.toSmartSearchResult(result));
+          if (mapped.length > 0) {
+            this.searchResults = mapped;
+            this.showSuggestions = true;
+          } else {
+            this.applyFallbackSearch(query);
+          }
+
+          this.cdr.detectChanges();
+        });
+    }, 260);
   }
 
   private scoreItem(item: SearchResult, terms: string[]): number {
@@ -367,13 +396,15 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getAmenityText(item: SearchResult): string {
-    const type = item.markerType.toLowerCase();
-    const amenityMap: Record<string, string> = {
-      hotel: 'wifi parking gym bazen pool breakfast spa',
-      restaurant: 'hrana food dine takeout wifi',
-      kafana: 'bar music live terrace',
-    };
-    return amenityMap[type] ?? '';
+    const rawAmenities = Array.isArray(item.raw?.amenities)
+      ? item.raw.amenities.join(' ')
+      : '';
+    const rawCuisine = item.raw?.cuisineType ?? '';
+    const rawType = item.raw?.objectTypeName ?? item.raw?.eventTypeName ?? item.raw?.destinationTypeName ?? '';
+    const rawDescription = item.raw?.description ?? '';
+
+    const realText = `${rawAmenities} ${rawCuisine} ${rawType} ${rawDescription}`.trim();
+    return realText;
   }
 
   onSearchBlur(): void {
@@ -384,8 +415,24 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   clearSearch(): void {
     this.searchQuery = '';
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = null;
+    }
     this.searchResults = [];
     this.showSuggestions = false;
+  }
+
+  submitSearch(): void {
+    const query = this.searchQuery.trim();
+    if (!query) {
+      return;
+    }
+
+    this.showSuggestions = false;
+    this.router.navigate(['/search'], {
+      queryParams: { q: query, source: 'map' },
+    });
   }
 
   selectSuggestion(result: SearchResult): void {
@@ -400,6 +447,50 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  private applyFallbackSearch(query: string): void {
+    const terms = this.tokenizeSearchQuery(query);
+    const scored = this.allItems
+      .map((item) => ({
+        item,
+        score: this.scoreItem(item, terms),
+      }))
+      .filter((x) => this.matchesAllTerms(x.item, terms))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 8);
+
+    this.searchResults = scored.map((x) => x.item);
+    this.showSuggestions = this.searchResults.length > 0;
+  }
+
+  private tokenizeSearchQuery(query: string): string[] {
+    return query
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .split(/\s+/)
+      .filter((token) => token.length >= 2 && !SEARCH_STOP_WORDS.has(token));
+  }
+
+  private toSmartSearchResult(result: SmartSearchResultDto): SearchResult {
+    return {
+      id: result.id,
+      name: result.name,
+      typeName: result.typeName,
+      location: result.location,
+      image: result.imageUrl,
+      icon: result.icon || 'place',
+      lat: result.latitude,
+      lng: result.longitude,
+      raw: {
+        matchReason: result.matchReason,
+        score: result.score,
+      },
+      category: result.category,
+      markerType: result.markerType,
+    };
+  }
+
   toggleFilter(key: string): void {
     if (this.activeFilters.includes(key)) {
       this.activeFilters = this.activeFilters.filter((filter) => filter !== key);
@@ -410,19 +501,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private applyFilters(): void {
-    const map = this.mapService['map'];
-    if (!map) return;
-
-    this.mapService['markerMap'].forEach((value: any, key: string) => {
-      const type = key.split(':')[0];
-      const marker = value.marker;
-
-      if (this.activeFilters.length === 0 || this.activeFilters.includes(type)) {
-        if (!map.hasLayer(marker)) marker.addTo(map);
-      } else if (map.hasLayer(marker)) {
-        marker.remove();
-      }
-    });
+    this.mapService.setActiveFilters(this.activeFilters);
   }
 
   private loadAllData(state?: any): void {
@@ -454,6 +533,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
               destination.longitude,
               'destination',
               destination,
+              undefined,
+              false,
             );
             this.allItems.push(this.toSearchResult(destination, 'destination', 'destination'));
           }
@@ -462,17 +543,26 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         objList.forEach((obj) => {
           if (obj.latitude && obj.longitude) {
             const type = this.getObjectType(obj.objectTypeName || '');
-            this.mapService.addMarkerWithType(obj.latitude, obj.longitude, type, obj);
+            this.mapService.addMarkerWithType(obj.latitude, obj.longitude, type, obj, undefined, false);
             this.allItems.push(this.toSearchResult(obj, type, 'object'));
           }
         });
 
         evtList.forEach((event) => {
           if (event.latitude && event.longitude) {
-            this.mapService.addMarkerWithType(event.latitude, event.longitude, 'event', event);
+            this.mapService.addMarkerWithType(
+              event.latitude,
+              event.longitude,
+              'event',
+              event,
+              undefined,
+              false,
+            );
             this.allItems.push(this.toSearchResult(event, 'event', 'event'));
           }
         });
+
+        this.mapService.syncVisibleMarkers();
 
         if (state?.selectedItem) {
           setTimeout(() => {
@@ -687,5 +777,35 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       lat,
       lng,
     };
+  }
+
+  private async fetchRoutePoints(from: L.LatLng, to: L.LatLng): Promise<L.LatLngExpression[]> {
+    const url =
+      `https://router.project-osrm.org/route/v1/driving/` +
+      `${from.lng},${from.lat};${to.lng},${to.lat}` +
+      `?overview=full&geometries=geojson`;
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Route request failed with ${response.status}`);
+      }
+
+      const payload = await response.json();
+      const coordinates = payload?.routes?.[0]?.geometry?.coordinates;
+      if (!Array.isArray(coordinates) || coordinates.length < 2) {
+        throw new Error('Route geometry missing');
+      }
+
+      return coordinates.map(
+        ([lng, lat]: [number, number]) => [lat, lng] as [number, number],
+      );
+    } catch (error) {
+      console.warn('Using straight-line fallback route.', error);
+      return [
+        [from.lat, from.lng],
+        [to.lat, to.lng],
+      ];
+    }
   }
 }

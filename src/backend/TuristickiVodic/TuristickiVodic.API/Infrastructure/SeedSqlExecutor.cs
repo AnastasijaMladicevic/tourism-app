@@ -2,11 +2,20 @@ using System.Data;
 using System.Data.Common;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace TuristickiVodic.API.Infrastructure;
 
 public static class SeedSqlExecutor
 {
+    private static readonly Regex LegacyImageInsertRegex = new(
+        "^INSERT INTO \"Images\"\\s*\\(\"Url\",\\s*\"AltText\",\\s*\"IsMain\",\\s*\"(?<fkColumn>[^\"]+)\",\\s*\"CreatedAt\"\\)\\s*VALUES\\s*(?<rows>.+)$",
+        RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.Compiled);
+
+    private static readonly Regex LegacyImageRowRegex = new(
+        "\\(\\s*'(?<url>(?:''|[^'])*)'\\s*,\\s*'(?<alt>(?:''|[^'])*)'\\s*,\\s*(?<isMain>true|false)\\s*,\\s*\\(SELECT\\s+\"Id\"\\s+FROM\\s+\"(?<table>[^\"]+)\"\\s+WHERE\\s+\"Name\"\\s*=\\s*'(?<name>(?:''|[^'])*)'\\)\\s*,\\s*NOW\\(\\)\\s*\\)",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
     public static bool HasHistory(DbConnection connection)
     {
         EnsureHistoryTable(connection);
@@ -44,7 +53,17 @@ public static class SeedSqlExecutor
 
             using var command = connection.CreateCommand();
             command.CommandText = statement;
-            command.ExecuteNonQuery();
+
+            try
+            {
+                command.ExecuteNonQuery();
+            }
+            catch (DbException ex) when (TryExecuteLegacyImageInsertFallback(connection, statement, ex))
+            {
+                // Legacy seed image blocks can contain subqueries that resolve to NULL.
+                // In that case we retry row-by-row through INSERT ... SELECT so only
+                // rows with an existing linked entity are inserted.
+            }
 
             InsertHistory(connection, hash, sourceFile);
             knownHashes.Add(hash);
@@ -114,6 +133,56 @@ public static class SeedSqlExecutor
         var normalized = statement.Trim();
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(normalized));
         return Convert.ToHexString(bytes);
+    }
+
+    private static bool TryExecuteLegacyImageInsertFallback(DbConnection connection, string statement, DbException ex)
+    {
+        if (!IsImageOnlyOneConstraintViolation(ex))
+        {
+            return false;
+        }
+
+        var headerMatch = LegacyImageInsertRegex.Match(statement.Trim());
+        if (!headerMatch.Success)
+        {
+            return false;
+        }
+
+        var fkColumn = headerMatch.Groups["fkColumn"].Value;
+        var rows = headerMatch.Groups["rows"].Value;
+        var rowMatches = LegacyImageRowRegex.Matches(rows);
+
+        if (rowMatches.Count == 0)
+        {
+            return false;
+        }
+
+        foreach (Match rowMatch in rowMatches)
+        {
+            var url = rowMatch.Groups["url"].Value;
+            var alt = rowMatch.Groups["alt"].Value;
+            var isMain = rowMatch.Groups["isMain"].Value.ToUpperInvariant();
+            var table = rowMatch.Groups["table"].Value;
+            var name = rowMatch.Groups["name"].Value;
+
+            using var rowCommand = connection.CreateCommand();
+            rowCommand.CommandText =
+                $"""
+                INSERT INTO "Images" ("Url", "AltText", "IsMain", "{fkColumn}", "CreatedAt")
+                SELECT '{url}', '{alt}', {isMain}, entity."Id", NOW()
+                FROM "{table}" entity
+                WHERE entity."Name" = '{name}';
+                """;
+            rowCommand.ExecuteNonQuery();
+        }
+
+        return true;
+    }
+
+    private static bool IsImageOnlyOneConstraintViolation(DbException ex)
+    {
+        return ex.Message.Contains("CK_Image_OnlyOne", StringComparison.OrdinalIgnoreCase)
+            || ex.Message.Contains("new row for relation \"Images\" violates check constraint", StringComparison.OrdinalIgnoreCase);
     }
 
     private static IReadOnlyList<string> SplitStatements(string sql)

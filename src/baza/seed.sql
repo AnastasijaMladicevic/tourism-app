@@ -1417,73 +1417,98 @@ VALUES
 -- ============================================
 -- 10. IMAGES - DESTINATIONS
 -- ============================================
+WITH source("Url", "AltText", "IsMain", "DestinationName") AS (
+    VALUES
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Athens%20Acropolis%20%2828359594671%29.jpg', 'Athens', true, 'Athens'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka,%20Athens%20%283340582775%29.jpg', 'Athens', false, 'Athens'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Santorini', true, 'Santorini'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%288302758240%29.jpg', 'Santorini', false, 'Santorini'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Street%20detail%20in%20Chania%20old%20town.jpg', 'Crete', true, 'Crete'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Elafonisi%20Beach.jpg', 'Crete', false, 'Crete'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Rhodes%27%20old%20town.jpg', 'Rhodes', true, 'Rhodes'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Lindos%20Bay.jpg', 'Rhodes', false, 'Rhodes'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Corfu%20old%20town%20%26%20Old%20Fortress.jpg', 'Corfu', true, 'Corfu'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Paleokastritsa.jpg', 'Corfu', false, 'Corfu')
+)
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
-VALUES
-('https://commons.wikimedia.org/wiki/Special:FilePath/Athens%20Acropolis%20%2828359594671%29.jpg', 'Athens', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka,%20Athens%20%283340582775%29.jpg', 'Athens', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Athens'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Santorini', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%288302758240%29.jpg', 'Santorini', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santorini'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Street%20detail%20in%20Chania%20old%20town.jpg', 'Crete', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Elafonisi%20Beach.jpg', 'Crete', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Crete'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Rhodes%27%20old%20town.jpg', 'Rhodes', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Lindos%20Bay.jpg', 'Rhodes', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rhodes'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Corfu%20old%20town%20%26%20Old%20Fortress.jpg', 'Corfu', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Paleokastritsa.jpg', 'Corfu', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Corfu'), NOW());
+SELECT s."Url", s."AltText", s."IsMain", d."Id", NOW()
+FROM source s
+JOIN "Destinations" d ON d."Name" = s."DestinationName";
 
 -- 15.9 IMAGES - LOCALITIES
+WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
+    VALUES
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%2C%20Athens%20%283340582775%29.jpg', 'Plaka Athens', true, 'Plaka Athens'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Athens%20Acropolis%20%2828359594671%29.jpg', 'Acropolis Hill', true, 'Acropolis Hill'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Oia Santorini', true, 'Oia Santorini'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%282602792772%29.jpg', 'Fira Santorini', true, 'Fira Santorini'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Street%20detail%20in%20Chania%20old%20town.jpg', 'Chania Old Town', true, 'Chania Old Town'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Elafonisi%20Beach.jpg', 'Elafonisi Beach', true, 'Elafonisi Beach'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Rhodes%27%20old%20town.jpg', 'Rhodes Old Town', true, 'Rhodes Old Town'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Lindos%20Bay.jpg', 'Lindos Bay', true, 'Lindos Bay'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Corfu%20old%20town%20%28May%202017%29.jpg', 'Corfu Old Town', true, 'Corfu Old Town'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Paleokastritsa.jpg', 'Paleokastritsa', true, 'Paleokastritsa')
+)
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
-VALUES
-('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%2C%20Athens%20%283340582775%29.jpg', 'Plaka Athens', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaka Athens'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Athens%20Acropolis%20%2828359594671%29.jpg', 'Acropolis Hill', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Acropolis Hill'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Oia Santorini', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Oia Santorini'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%282602792772%29.jpg', 'Fira Santorini', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Fira Santorini'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Street%20detail%20in%20Chania%20old%20town.jpg', 'Chania Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Chania Old Town'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Elafonisi%20Beach.jpg', 'Elafonisi Beach', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Elafonisi Beach'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Rhodes%27%20old%20town.jpg', 'Rhodes Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rhodes Old Town'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Lindos%20Bay.jpg', 'Lindos Bay', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Lindos Bay'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Corfu%20old%20town%20%28May%202017%29.jpg', 'Corfu Old Town', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Corfu Old Town'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Paleokastritsa.jpg', 'Paleokastritsa', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Paleokastritsa'), NOW());
+SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
+FROM source s
+JOIN "Localities" l ON l."Name" = s."LocalityName";
 
 -- 15.10 IMAGES - OBJECTS
+WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
+    VALUES
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Athens%20Acropolis%20%2828359594671%29.jpg', 'Hotel Acropolis View Athens', true, 'Hotel Acropolis View Athens'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%2C%20Athens%20%283340582775%29.jpg', 'Hotel Acropolis View Athens', false, 'Hotel Acropolis View Athens'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%2C%20Athens%20%283340582775%29.jpg', 'Plaka Garden Taverna', true, 'Plaka Garden Taverna'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%20Athens%20%28February%202019%29.jpg', 'Plaka Garden Taverna', false, 'Plaka Garden Taverna'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Athens%20Acropolis%20%2827821980944%29.jpg', 'Museum of Cycladic Culture Athens', true, 'Museum of Cycladic Culture Athens'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Oia Caldera Suites', true, 'Oia Caldera Suites'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%282602792772%29.jpg', 'Oia Caldera Suites', false, 'Oia Caldera Suites'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%288302758240%29.jpg', 'Fira Sunset Wine Bar', true, 'Fira Sunset Wine Bar'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Aegean Blue Restaurant', true, 'Aegean Blue Restaurant'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Street%20detail%20in%20Chania%20old%20town.jpg', 'Chania Harbor Hotel', true, 'Chania Harbor Hotel'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Elafonisi%20Beach.jpg', 'Elafonisi Beach Canteen', true, 'Elafonisi Beach Canteen'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Rhodes%27%20old%20town.jpg', 'Rhodes Knight Hotel', true, 'Rhodes Knight Hotel'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Lindos%20Bay.jpg', 'Lindos Bay Seafood', true, 'Lindos Bay Seafood'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Corfu%20old%20town%20%26%20Old%20Fortress.jpg', 'Corfu Venetian Boutique Hotel', true, 'Corfu Venetian Boutique Hotel'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Paleokastritsa.jpg', 'Paleokastritsa View Cafe', true, 'Paleokastritsa View Cafe')
+)
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
-VALUES
-('https://commons.wikimedia.org/wiki/Special:FilePath/Athens%20Acropolis%20%2828359594671%29.jpg', 'Hotel Acropolis View Athens', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Acropolis View Athens'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%2C%20Athens%20%283340582775%29.jpg', 'Hotel Acropolis View Athens', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Acropolis View Athens'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%2C%20Athens%20%283340582775%29.jpg', 'Plaka Garden Taverna', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaka Garden Taverna'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%20Athens%20%28February%202019%29.jpg', 'Plaka Garden Taverna', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaka Garden Taverna'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Athens%20Acropolis%20%2827821980944%29.jpg', 'Museum of Cycladic Culture Athens', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Museum of Cycladic Culture Athens'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Oia Caldera Suites', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oia Caldera Suites'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%282602792772%29.jpg', 'Oia Caldera Suites', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oia Caldera Suites'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%288302758240%29.jpg', 'Fira Sunset Wine Bar', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Fira Sunset Wine Bar'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Aegean Blue Restaurant', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aegean Blue Restaurant'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Street%20detail%20in%20Chania%20old%20town.jpg', 'Chania Harbor Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Chania Harbor Hotel'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Elafonisi%20Beach.jpg', 'Elafonisi Beach Canteen', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Elafonisi Beach Canteen'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Rhodes%27%20old%20town.jpg', 'Rhodes Knight Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rhodes Knight Hotel'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Lindos%20Bay.jpg', 'Lindos Bay Seafood', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lindos Bay Seafood'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Corfu%20old%20town%20%26%20Old%20Fortress.jpg', 'Corfu Venetian Boutique Hotel', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Corfu Venetian Boutique Hotel'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Paleokastritsa.jpg', 'Paleokastritsa View Cafe', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Paleokastritsa View Cafe'), NOW());
+SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
+FROM source s
+JOIN "Objects" o ON o."Name" = s."ObjectName";
 
 -- 15.11 IMAGES - EVENTS
+WITH source("Url", "AltText", "IsMain", "EventName") AS (
+    VALUES
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Athens%20Acropolis%20%2827821980944%29.jpg', 'Athens Open Air Classics', true, 'Athens Open Air Classics'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%288302758240%29.jpg', 'Santorini Sunset Wine Festival', true, 'Santorini Sunset Wine Festival'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Oia Summer Lights', true, 'Oia Summer Lights'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Street%20detail%20in%20Chania%20old%20town.jpg', 'Chania Harbor Food Week', true, 'Chania Harbor Food Week'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Rhodes%27%20old%20town.jpg', 'Rhodes Medieval Night', true, 'Rhodes Medieval Night'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Corfu%20old%20town%20%28May%202017%29.jpg', 'Corfu Old Town Jazz Evening', true, 'Corfu Old Town Jazz Evening')
+)
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
-VALUES
-('https://commons.wikimedia.org/wiki/Special:FilePath/Athens%20Acropolis%20%2827821980944%29.jpg', 'Athens Open Air Classics', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Athens Open Air Classics'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%288302758240%29.jpg', 'Santorini Sunset Wine Festival', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Santorini Sunset Wine Festival'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Oia Summer Lights', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Oia Summer Lights'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Street%20detail%20in%20Chania%20old%20town.jpg', 'Chania Harbor Food Week', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Chania Harbor Food Week'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Rhodes%27%20old%20town.jpg', 'Rhodes Medieval Night', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Rhodes Medieval Night'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Corfu%20old%20town%20%28May%202017%29.jpg', 'Corfu Old Town Jazz Evening', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Corfu Old Town Jazz Evening'), NOW());
+SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
+FROM source s
+JOIN "Events" e ON e."Name" = s."EventName";
 
 -- 15.12 IMAGES - ACTIVITIES
+WITH source("Url", "AltText", "IsMain", "ActivityName") AS (
+    VALUES
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%20Athens%20%28February%202019%29.jpg', 'Athens History Walk', true, 'Athens History Walk'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%2C%20Athens%20%283340582775%29.jpg', 'Traditional Greek Dinner Plaka', true, 'Traditional Greek Dinner Plaka'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Santorini Caldera Photo Walk', true, 'Santorini Caldera Photo Walk'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%288302758240%29.jpg', 'Santorini Wine Tasting', true, 'Santorini Wine Tasting'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Street%20detail%20in%20Chania%20old%20town.jpg', 'Chania Old Harbor Walk', true, 'Chania Old Harbor Walk'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Elafonisi%20Beach.jpg', 'Elafonisi Beach Day', true, 'Elafonisi Beach Day'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Rhodes%27%20old%20town.jpg', 'Rhodes Medieval Tour', true, 'Rhodes Medieval Tour'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Paleokastritsa.jpg', 'Paleokastritsa Boat Ride', true, 'Paleokastritsa Boat Ride')
+)
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
-VALUES
-('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%20Athens%20%28February%202019%29.jpg', 'Athens History Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Athens History Walk'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Plaka%2C%20Athens%20%283340582775%29.jpg', 'Traditional Greek Dinner Plaka', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Traditional Greek Dinner Plaka'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Oia%2C%20Santorini.jpg', 'Santorini Caldera Photo Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Santorini Caldera Photo Walk'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Fira%2C%20Santorini%20%288302758240%29.jpg', 'Santorini Wine Tasting', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Santorini Wine Tasting'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Street%20detail%20in%20Chania%20old%20town.jpg', 'Chania Old Harbor Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Chania Old Harbor Walk'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Elafonisi%20Beach.jpg', 'Elafonisi Beach Day', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Elafonisi Beach Day'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Rhodes%27%20old%20town.jpg', 'Rhodes Medieval Tour', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Rhodes Medieval Tour'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Paleokastritsa.jpg', 'Paleokastritsa Boat Ride', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Paleokastritsa Boat Ride'), NOW());
+SELECT s."Url", s."AltText", s."IsMain", a."Id", NOW()
+FROM source s
+JOIN "Activities" a ON a."Name" = s."ActivityName";
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 VALUES
@@ -3316,52 +3341,77 @@ VALUES
  4, 'Dobra usluga i lep pogled na moderni deo grada, preporuka za veceru.', 'Approved', NOW());
 
 -- 14.8 IMAGES - DESTINATIONS
+WITH source("Url", "AltText", "IsMain", "DestinationName") AS (
+    VALUES
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Barcelona%20Skyline.jpg', 'Barcelona', true, 'Barcelona'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barcelona', false, 'Barcelona'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Madrid', true, 'Madrid'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid%20-%20007.jpg', 'Madrid', false, 'Madrid'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Valencia', true, 'Valencia'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Valencia%20skyline%20sunset%20%284262234180%29.jpg', 'Valencia', false, 'Valencia')
+)
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
-VALUES
-('https://commons.wikimedia.org/wiki/Special:FilePath/Barcelona%20Skyline.jpg', 'Barcelona', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barcelona', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Madrid', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Madrid'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid%20-%20007.jpg', 'Madrid', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Madrid'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Valencia', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Valencia'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Valencia%20skyline%20sunset%20%284262234180%29.jpg', 'Valencia', false, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Valencia'), NOW());
+SELECT s."Url", s."AltText", s."IsMain", d."Id", NOW()
+FROM source s
+JOIN "Destinations" d ON d."Name" = s."DestinationName";
 
 -- 14.9 IMAGES - LOCALITIES
+WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
+    VALUES
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Gothic Quarter Barcelona', true, 'Gothic Quarter Barcelona'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Beach', true, 'Barceloneta Beach'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Gran Via Madrid', true, 'Gran Via Madrid'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Ciudad de las Artes Valencia', true, 'Ciudad de las Artes Valencia')
+)
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
-VALUES
-('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Gothic Quarter Barcelona', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gothic Quarter Barcelona'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Beach', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Barceloneta Beach'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Gran Via Madrid', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gran Via Madrid'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Ciudad de las Artes Valencia', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ciudad de las Artes Valencia'), NOW());
+SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
+FROM source s
+JOIN "Localities" l ON l."Name" = s."LocalityName";
 
 -- 14.10 IMAGES - OBJECTS
+WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
+    VALUES
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Barcelona%20Skyline.jpg', 'Hotel Casa Batllo Suites', true, 'Hotel Casa Batllo Suites'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Hotel Casa Batllo Suites', false, 'Hotel Casa Batllo Suites'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Tapas House Gothic', true, 'Tapas House Gothic'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona%20%2821%29%20%2830446599463%29.jpg', 'Tapas House Gothic', false, 'Tapas House Gothic'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Sunset Bar', true, 'Barceloneta Sunset Bar'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Sunset Bar', false, 'Barceloneta Sunset Bar'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Hotel Gran Via Palace', true, 'Hotel Gran Via Palace'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid%20-%20007.jpg', 'Hotel Gran Via Palace', false, 'Hotel Gran Via Palace'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Oceanic Bistro Valencia', true, 'Oceanic Bistro Valencia'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Valencia%20skyline%20sunset%20%284262234180%29.jpg', 'Oceanic Bistro Valencia', false, 'Oceanic Bistro Valencia')
+)
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
-VALUES
-('https://commons.wikimedia.org/wiki/Special:FilePath/Barcelona%20Skyline.jpg', 'Hotel Casa Batllo Suites', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Casa Batllo Suites'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Hotel Casa Batllo Suites', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Casa Batllo Suites'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Tapas House Gothic', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tapas House Gothic'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona%20%2821%29%20%2830446599463%29.jpg', 'Tapas House Gothic', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tapas House Gothic'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Sunset Bar', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Barceloneta Sunset Bar'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Sunset Bar', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Barceloneta Sunset Bar'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Hotel Gran Via Palace', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Gran Via Palace'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid%20-%20007.jpg', 'Hotel Gran Via Palace', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Gran Via Palace'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Oceanic Bistro Valencia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oceanic Bistro Valencia'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Valencia%20skyline%20sunset%20%284262234180%29.jpg', 'Oceanic Bistro Valencia', false, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oceanic Bistro Valencia'), NOW());
+SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
+FROM source s
+JOIN "Objects" o ON o."Name" = s."ObjectName";
 
 -- 14.11 IMAGES - EVENTS
+WITH source("Url", "AltText", "IsMain", "EventName") AS (
+    VALUES
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Barcelona Summer Lights', true, 'Barcelona Summer Lights'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Sunset Session', true, 'Barceloneta Sunset Session'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Madrid Culture Week', true, 'Madrid Culture Week'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Valencia Paella Fest', true, 'Valencia Paella Fest')
+)
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
-VALUES
-('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Barcelona Summer Lights', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Barcelona Summer Lights'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Sunset Session', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Barceloneta Sunset Session'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Madrid Culture Week', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Madrid Culture Week'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Valencia Paella Fest', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Valencia Paella Fest'), NOW());
+SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
+FROM source s
+JOIN "Events" e ON e."Name" = s."EventName";
 
 -- 14.12 IMAGES - ACTIVITIES
+WITH source("Url", "AltText", "IsMain", "ActivityName") AS (
+    VALUES
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Gothic Tapas Walk', true, 'Gothic Tapas Walk'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Sunset Ride', true, 'Barceloneta Sunset Ride'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Madrid Architecture Walk', true, 'Madrid Architecture Walk'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Valencia Paella Experience', true, 'Valencia Paella Experience')
+)
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
-VALUES
-('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Gothic Tapas Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Gothic Tapas Walk'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Sunset Ride', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Barceloneta Sunset Ride'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Madrid Architecture Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Madrid Architecture Walk'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Valencia Paella Experience', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Valencia Paella Experience'), NOW());
+SELECT s."Url", s."AltText", s."IsMain", a."Id", NOW()
+FROM source s
+JOIN "Activities" a ON a."Name" = s."ActivityName";
 
 -- 14.13 REGION FOCUS + CUISINE BACKFILL
 UPDATE "Regions"
@@ -3845,66 +3895,91 @@ VALUES
  4, 'Kad smo svratili ranije popodne atmosfera je bila dosta prijatnija i mesto je lepo leglo za kratki predah posle setnje. Karta pica je solidna, a prostor deluje moderno i uredno.', 'Approved', NOW());
 
 -- 15.7 ITALIJA + SRBIJA IMAGES - DESTINACIJE
+WITH source("Url", "AltText", "IsMain", "DestinationName") AS (
+    VALUES
+    ('https://i0.wp.com/media1.lepojeziveti.com/2018/04/vitorrio-emanuelle-panorama.jpg', 'Rome', true, 'Rome'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Venice', true, 'Venice'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'Florence', true, 'Florence'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Belgrade', true, 'Belgrade'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Novi Sad', true, 'Novi Sad'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Zlatibor', true, 'Zlatibor')
+)
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
-VALUES
-('https://i0.wp.com/media1.lepojeziveti.com/2018/04/vitorrio-emanuelle-panorama.jpg', 'Rome', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rome'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Venice', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Venice'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'Florence', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Florence'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Belgrade', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Belgrade'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Novi Sad', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Novi Sad'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Zlatibor', true, (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'), NOW());
+SELECT s."Url", s."AltText", s."IsMain", d."Id", NOW()
+FROM source s
+JOIN "Destinations" d ON d."Name" = s."DestinationName";
 
 -- 15.8 ITALIJA + SRBIJA IMAGES - LOKALITETI
+WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
+    VALUES
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Roma%20Trastevere.jpg', 'Trastevere Rome', true, 'Trastevere Rome'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Colosseum%20%28Rome%29.jpg', 'Colosseum District', true, 'Colosseum District'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Piazza%20San%20Marco%2C%20Venice.jpg', 'San Marco Venice', true, 'San Marco Venice'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Grand Canal Venice', true, 'Grand Canal Venice'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'Duomo Florence', true, 'Duomo Florence'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Ponte%20vecchio.jpg', 'Ponte Vecchio Florence', true, 'Ponte Vecchio Florence'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Terazije Belgrade', true, 'Terazije Belgrade'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Kalemegdan Belgrade', true, 'Kalemegdan Belgrade'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Trg Slobode Novi Sad', true, 'Trg Slobode Novi Sad'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Petrovaradin.jpg', 'Petrovaradin Fortress', true, 'Petrovaradin Fortress'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Kraljev Trg Zlatibor', true, 'Kraljev Trg Zlatibor'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Planina%20Zlatibor.JPG', 'Tornik Viewpoint', true, 'Tornik Viewpoint')
+)
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
-VALUES
-('https://commons.wikimedia.org/wiki/Special:FilePath/Roma%20Trastevere.jpg', 'Trastevere Rome', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trastevere Rome'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Colosseum%20%28Rome%29.jpg', 'Colosseum District', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Colosseum District'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Piazza%20San%20Marco%2C%20Venice.jpg', 'San Marco Venice', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'San Marco Venice'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Grand Canal Venice', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Grand Canal Venice'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'Duomo Florence', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Duomo Florence'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Ponte%20vecchio.jpg', 'Ponte Vecchio Florence', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ponte Vecchio Florence'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Terazije Belgrade', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Terazije Belgrade'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Kalemegdan Belgrade', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kalemegdan Belgrade'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Trg Slobode Novi Sad', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode Novi Sad'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Petrovaradin.jpg', 'Petrovaradin Fortress', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Petrovaradin Fortress'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Kraljev Trg Zlatibor', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kraljev Trg Zlatibor'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Planina%20Zlatibor.JPG', 'Tornik Viewpoint', true, (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik Viewpoint'), NOW());
+SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
+FROM source s
+JOIN "Localities" l ON l."Name" = s."LocalityName";
 
 -- 15.9 ITALIJA + SRBIJA IMAGES - OBJEKTI
+WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
+    VALUES
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Colosseum%20%28Rome%29.jpg', 'Hotel Artemide Rome', true, 'Hotel Artemide Rome'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Roma%20Trastevere.jpg', 'Rione 13 Trastevere', true, 'Rione 13 Trastevere'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Piazza%20San%20Marco%2C%20Venice.jpg', 'Hotel Canaletto Venice', true, 'Hotel Canaletto Venice'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Bistrot de Venise', true, 'Bistrot de Venise'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Ponte%20vecchio.jpg', 'Hotel Davanzati Florence', true, 'Hotel Davanzati Florence'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'La Loggia Firenze', true, 'La Loggia Firenze'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Hotel Moskva Belgrade', true, 'Hotel Moskva Belgrade'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Restoran Frans Beograd', true, 'Restoran Frans Beograd'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Hotel Pupin Novi Sad', true, 'Hotel Pupin Novi Sad'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Kalem by Zak Novi Sad', true, 'Kalem by Zak Novi Sad'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Hotel Zlatibor Mountain Resort', true, 'Hotel Zlatibor Mountain Resort'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Lobby Bar Zlatibor', true, 'Lobby Bar Zlatibor')
+)
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
-VALUES
-('https://commons.wikimedia.org/wiki/Special:FilePath/Colosseum%20%28Rome%29.jpg', 'Hotel Artemide Rome', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Artemide Rome'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Roma%20Trastevere.jpg', 'Rione 13 Trastevere', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rione 13 Trastevere'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Piazza%20San%20Marco%2C%20Venice.jpg', 'Hotel Canaletto Venice', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Canaletto Venice'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Bistrot de Venise', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Bistrot de Venise'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Ponte%20vecchio.jpg', 'Hotel Davanzati Florence', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Davanzati Florence'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'La Loggia Firenze', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'La Loggia Firenze'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Hotel Moskva Belgrade', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Moskva Belgrade'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Restoran Frans Beograd', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Frans Beograd'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Hotel Pupin Novi Sad', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Pupin Novi Sad'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Kalem by Zak Novi Sad', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kalem by Zak Novi Sad'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Hotel Zlatibor Mountain Resort', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Zlatibor Mountain Resort'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Lobby Bar Zlatibor', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lobby Bar Zlatibor'), NOW());
+SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
+FROM source s
+JOIN "Objects" o ON o."Name" = s."ObjectName";
 
 -- 15.10 ITALIJA + SRBIJA IMAGES - EVENTI
+WITH source("Url", "AltText", "IsMain", "EventName") AS (
+    VALUES
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Roma%20Trastevere.jpg', 'Rome Piazza Music Evening', true, 'Rome Piazza Music Evening'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Venice Lagoon Taste Week', true, 'Venice Lagoon Taste Week'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'Florence Artisan Evenings', true, 'Florence Artisan Evenings'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Belgrade Coffee and Jazz Night', true, 'Belgrade Coffee and Jazz Night'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Novi Sad Gourmet Weekend', true, 'Novi Sad Gourmet Weekend'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Zlatibor Mountain Taste Days', true, 'Zlatibor Mountain Taste Days')
+)
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
-VALUES
-('https://commons.wikimedia.org/wiki/Special:FilePath/Roma%20Trastevere.jpg', 'Rome Piazza Music Evening', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Rome Piazza Music Evening'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Venice Lagoon Taste Week', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Venice Lagoon Taste Week'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'Florence Artisan Evenings', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Florence Artisan Evenings'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Belgrade Coffee and Jazz Night', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Belgrade Coffee and Jazz Night'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Novi Sad Gourmet Weekend', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Novi Sad Gourmet Weekend'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Zlatibor Mountain Taste Days', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Zlatibor Mountain Taste Days'), NOW());
+SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
+FROM source s
+JOIN "Events" e ON e."Name" = s."EventName";
 
 -- 15.11 ITALIJA + SRBIJA IMAGES - AKTIVNOSTI
+WITH source("Url", "AltText", "IsMain", "ActivityName") AS (
+    VALUES
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Roma%20Trastevere.jpg', 'Trastevere Food Walk', true, 'Trastevere Food Walk'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Grand Canal Evening Walk', true, 'Grand Canal Evening Walk'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Ponte%20vecchio.jpg', 'Florence Sunset View Walk', true, 'Florence Sunset View Walk'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Belgrade Fortress Sunset Walk', true, 'Belgrade Fortress Sunset Walk'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Petrovaradin.jpg', 'Petrovaradin Fortress Walk', true, 'Petrovaradin Fortress Walk'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Planina%20Zlatibor.JPG', 'Zlatibor Panorama Ride', true, 'Zlatibor Panorama Ride')
+)
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
-VALUES
-('https://commons.wikimedia.org/wiki/Special:FilePath/Roma%20Trastevere.jpg', 'Trastevere Food Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Trastevere Food Walk'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Grand Canal Evening Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Grand Canal Evening Walk'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Ponte%20vecchio.jpg', 'Florence Sunset View Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Florence Sunset View Walk'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Belgrade Fortress Sunset Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Belgrade Fortress Sunset Walk'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Petrovaradin.jpg', 'Petrovaradin Fortress Walk', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Petrovaradin Fortress Walk'), NOW()),
-('https://commons.wikimedia.org/wiki/Special:FilePath/Planina%20Zlatibor.JPG', 'Zlatibor Panorama Ride', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Zlatibor Panorama Ride'), NOW());
+SELECT s."Url", s."AltText", s."IsMain", a."Id", NOW()
+FROM source s
+JOIN "Activities" a ON a."Name" = s."ActivityName";
 
 
     

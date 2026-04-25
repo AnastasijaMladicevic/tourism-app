@@ -92,7 +92,13 @@
       <div class="card">
         <div class="card__image-wrap">
           @if (hotel.image) {
-            <img class="card__image" [src]="hotel.image" [alt]="hotel.name" />
+            <img
+              class="card__image"
+              [src]="hotel.image"
+              [alt]="hotel.name"
+              loading="lazy"
+              decoding="async"
+            />
           } @else {
             <div class="card__image card__image--empty">
               <mat-icon>hotel</mat-icon>

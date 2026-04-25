@@ -13,6 +13,7 @@
           placeholder="Search places, routes..."
           [(ngModel)]="searchQuery"
           (input)="onSearchInput()"
+          (keydown.enter)="submitSearch()"
           (focus)="showSuggestions = searchResults.length > 0"
           (blur)="onSearchBlur()"
           autocomplete="off"
@@ -34,7 +35,7 @@
             <div class="suggestion-item" (mousedown)="selectSuggestion(result)">
               <div class="suggestion-item__image">
                 @if (result.image) {
-                  <img [src]="result.image" [alt]="result.name" />
+                  <img [src]="result.image" [alt]="result.name" loading="lazy" decoding="async" />
                 } @else {
                   <mat-icon>{{ result.icon }}</mat-icon>
                 }
@@ -70,7 +71,8 @@
 
     <div
       class="featured-banner"
-      [style.background-image]="cardBackground(currentFeatured?.imageUrl)"
+      [appLazyBackground]="currentFeatured?.imageUrl ?? null"
+      [lazyBackgroundImmediate]="true"
     >
       <!-- LEFT -->
       <button class="nav left" type="button" aria-label="Previous featured destination" (click)="prevFeatured()">
@@ -116,7 +118,7 @@
           <div class="place-card" (click)="openPlace(card)">
             <div
               class="place-img place-img--dynamic"
-              [style.background-image]="cardBackground(card.imageUrl)"
+              [appLazyBackground]="card.imageUrl ?? null"
             >
               <button class="heart-btn" type="button" (click)="toggleFavorite(card, $event)">
                 <svg
@@ -193,7 +195,7 @@
           <div class="place-card" (click)="openPlace(card)">
             <div
               class="place-img place-img--dynamic"
-              [style.background-image]="cardBackground(card.imageUrl)"
+              [appLazyBackground]="card.imageUrl ?? null"
             >
               <button class="heart-btn" type="button" (click)="toggleFavorite(card, $event)">
                 <svg
@@ -272,7 +274,7 @@
           <div class="event-card" (click)="openEvent(event)">
             <div
               class="event-img event-img--dynamic"
-              [style.background-image]="cardBackground(event.imageUrl)"
+              [appLazyBackground]="event.imageUrl ?? null"
             >
               <span class="event-price" 
                   [class.event-price--free]="event.isFree">

@@ -1,0 +1,74 @@
+<div class="search-page">
+  <div class="search-page__header">
+    <button class="icon-btn" type="button" (click)="goBack()" aria-label="Back">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+
+    <div class="search-bar">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        placeholder="Pretrazi recenicom, tipom ili amenity-jem..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput()"
+        (keydown.enter)="submitSearch()"
+        autocomplete="off"
+      />
+      @if (searchQuery) {
+        <button class="icon-btn icon-btn--ghost" type="button" (click)="clearSearch()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="search-page__meta">
+    @if (isLoading) {
+      <span>Pretraga u toku...</span>
+    } @else if (hasSearched) {
+      <span>{{ results.length }} rezultata</span>
+    } @else {
+      <span>Ukucaj sta trazis</span>
+    }
+  </div>
+
+  <div class="search-page__list">
+    @if (!isLoading && hasSearched && !results.length) {
+      <div class="empty-state">
+        <mat-icon>travel_explore</mat-icon>
+        <h2>Nema rezultata</h2>
+        <p>Pokusaj drugi upit ili kljucne reci kao sto su hotel, bazen, restoran, parking ili vecera.</p>
+      </div>
+    }
+
+    @for (result of results; track result.category + '-' + result.id) {
+      <button class="result-card" type="button" (click)="openResult(result)">
+        <div class="result-card__image">
+          @if (result.imageUrl) {
+            <img [src]="result.imageUrl" [alt]="result.name" loading="lazy" decoding="async" />
+          } @else {
+            <mat-icon>{{ result.icon || 'place' }}</mat-icon>
+          }
+        </div>
+
+        <div class="result-card__body">
+          <div class="result-card__top">
+            <h3>{{ result.name }}</h3>
+            <span class="result-card__type">{{ result.typeName }}</span>
+          </div>
+
+          <p class="result-card__location">
+            <mat-icon>place</mat-icon>
+            <span>{{ result.location }}</span>
+          </p>
+
+          @if (result.matchReason) {
+            <p class="result-card__reason">{{ result.matchReason }}</p>
+          }
+        </div>
+
+        <mat-icon class="result-card__chevron">chevron_right</mat-icon>
+      </button>
+    }
+  </div>
+</div>

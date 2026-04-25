@@ -8,6 +8,7 @@ import { environment } from '../../../environment/environment';
 import { EventDto, EventService } from '../../services/event';
 import { ImageDto, ImageService } from '../../services/image';
 import { Router } from '@angular/router';
+import { LazyBackgroundDirective } from '../../shared/directives/lazy-background.directive';
 
 type EventCategory = 'All' | string;
 
@@ -26,7 +27,7 @@ interface EventCard {
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, LazyBackgroundDirective],
   templateUrl: './events.html',
   styleUrl: './events.scss',
 })
@@ -158,10 +159,6 @@ export class EventsComponent implements OnInit {
 
   openEvent(id: number): void {
     this.router.navigate(['/event', id]);
-  }
-
-  imageStyle(imageUrl?: string): string | null {
-    return imageUrl ? `url(${imageUrl})` : null;
   }
 
   private loadEvents(): void {
