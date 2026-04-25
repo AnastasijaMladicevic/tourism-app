@@ -23,6 +23,32 @@ export class ContentCreatorActivitiesComponent implements OnInit {
   totalPages = 1;
   readonly pageSizeOptions = [5, 10, 20, 50];
 
+  searchQuery = '';
+  draftSearchQuery = '';
+  statusFilter = 'all';
+  typeFilter = 'all';
+  destinationFilter = 'all';
+  sortBy = 'name';
+  sortOrder: 'asc' | 'desc' = 'asc';
+  filterPanelOpen = false;
+
+  readonly statusOptions = [
+    { value: 'all', label: 'All Statuses' },
+    { value: 'published', label: 'Published' },
+    { value: 'draft', label: 'Draft' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'archived', label: 'Archived' }
+  ];
+
+  readonly sortByOptions = [
+    { value: 'name', label: 'Name' },
+    { value: 'activityTypeName', label: 'Type' },
+    { value: 'durationMinutes', label: 'Duration' },
+    { value: 'status', label: 'Status' },
+    { value: 'createdAt', label: 'Created date' }
+  ];
+
   ngOnInit(): void {
     this.loadActivities();
   }
@@ -34,8 +60,12 @@ export class ContentCreatorActivitiesComponent implements OnInit {
     this.activitiesService.getMyActivities({
       page: this.currentPage,
       pageSize: this.pageSize,
-      sortBy: 'name',
-      sortOrder: 'asc'
+      search: this.searchQuery || undefined,
+      status: this.statusFilter !== 'all' ? this.statusFilter : undefined,
+      type: this.typeFilter !== 'all' ? this.typeFilter : undefined,
+      destination: this.destinationFilter !== 'all' ? this.destinationFilter : undefined,
+      sortBy: this.sortBy,
+      sortOrder: this.sortOrder
     }).subscribe({
       next: (response) => {
         this.activities = response.items ?? [];
@@ -53,6 +83,41 @@ export class ContentCreatorActivitiesComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  onSearch(): void {
+    // Search is applied explicitly on Enter or via the filter panel's Apply button.
+  }
+
+  onSearchEnter(event: Event): void {
+    event.preventDefault();
+    this.onApplyFilters();
+  }
+
+  onMoreFilters(): void {
+    this.filterPanelOpen = !this.filterPanelOpen;
+  }
+
+  onApplyFilters(): void {
+    this.searchQuery = this.draftSearchQuery.trim();
+    this.currentPage = 1;
+    this.loadActivities();
+  }
+
+  onResetFilters(): void {
+    this.searchQuery = '';
+    this.draftSearchQuery = '';
+    this.statusFilter = 'all';
+    this.typeFilter = 'all';
+    this.destinationFilter = 'all';
+    this.sortBy = 'name';
+    this.sortOrder = 'asc';
+    this.currentPage = 1;
+    this.loadActivities();
+  }
+
+  onFilterChange(): void {
+    // Filters are applied explicitly via the panel's Apply button.
   }
 
   onNextPage(): void {

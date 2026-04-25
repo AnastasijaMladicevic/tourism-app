@@ -1,88 +1,159 @@
 <section class="activities-page">
-  <header class="activities-header">
+  <header class="page-header">
     <div>
+      <p class="eyebrow">Activities management</p>
       <h1>Activities</h1>
-      <p>Manage difficulty levels, durations, and logistics for regional activities.</p>
+      <p class="page-intro">
+        Manage regional activities, review their status, and keep the creator catalog organized.
+      </p>
     </div>
 
     <div class="header-actions">
-      <button type="button" class="btn btn-muted">Filter</button>
-      <button type="button" class="btn btn-primary">+ Add Activity</button>
+      <button type="button" class="primary-btn">
+        <span class="material-symbols-outlined">add</span>
+        Add Activity
+      </button>
     </div>
   </header>
 
-  <div class="toolbar-row">
-    <input
-      type="text"
-      class="search-input"
-      placeholder="Search by activity name, type, or destination..."
-      aria-label="Search activities"
-    />
-    <input
-      type="text"
-      class="filter-input"
-      placeholder="Type"
-      aria-label="Filter by type"
-    />
-    <input
-      type="text"
-      class="filter-input"
-      placeholder="Difficulty"
-      aria-label="Filter by difficulty"
-    />
-    <input
-      type="text"
-      class="filter-input"
-      placeholder="Status"
-      aria-label="Filter by status"
-    />
-  </div>
-
-  <div class="table-card">
-    <div class="table-scroll" *ngIf="!isLoading && !errorMessage; else tableState">
-      <table class="activities-table">
-        <thead>
-          <tr>
-            <th class="col-check"><input type="checkbox" /></th>
-            <th>Activity Name</th>
-            <th>Type</th>
-            <th>Duration</th>
-            <th>Location</th>
-            <th>Status</th>
-            <th class="col-actions">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let activity of activities; trackBy: trackByActivityId">
-            <td class="col-check"><input type="checkbox" /></td>
-            <td>
-              <div class="name-cell">
-                <span class="thumb" [style.background-image]="activity.mainImageUrl ? 'url(' + activity.mainImageUrl + ')' : ''" [class.thumb-image]="!!activity.mainImageUrl"></span>
-                <div>
-                  <p class="name-title">{{ activity.name }}</p>
-                  <p class="name-code">ACT-{{ activity.id | number:'3.0-0' }}</p>
-                </div>
-              </div>
-            </td>
-            <td>{{ activity.activityTypeName }}</td>
-            <td>{{ formatDuration(activity.durationMinutes) }}</td>
-            <td>{{ getActivityLocation(activity) }}</td>
-            <td><span class="status" [ngClass]="getStatusClass(activity.status)">{{ activity.status || 'Draft' }}</span></td>
-            <td class="col-actions">...</td>
-          </tr>
-        </tbody>
-      </table>
+  <div class="toolbar card">
+    <div class="toolbar-search">
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input
+        type="text"
+        class="toolbar-input"
+        [(ngModel)]="draftSearchQuery"
+        (ngModelChange)="onSearch()"
+        (keydown.enter)="onSearchEnter($event)"
+        placeholder="Search activities, types, or destinations..."
+      />
     </div>
 
-    <ng-template #tableState>
-      <div class="table-state" *ngIf="isLoading; else errorOrEmpty">Loading activities...</div>
-      <ng-template #errorOrEmpty>
-        <div class="table-state error" *ngIf="errorMessage; else emptyState">{{ errorMessage }}</div>
-      </ng-template>
-      <ng-template #emptyState>
-        <div class="table-state">No activities found.</div>
-      </ng-template>
-    </ng-template>
+    <button type="button" class="ghost-btn slim-btn" (click)="onMoreFilters()">
+      <span class="material-symbols-outlined">filter_alt</span>
+      More Filters
+    </button>
+  </div>
+
+  @if (filterPanelOpen) {
+    <div class="filters-panel card">
+      <label>
+        <span>Status</span>
+        <select [(ngModel)]="statusFilter">
+          <option *ngFor="let option of statusOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>Type</span>
+        <input
+          type="text"
+          [(ngModel)]="typeFilter"
+          (ngModelChange)="onFilterChange()"
+          placeholder="Activity type"
+        />
+      </label>
+
+      <label>
+        <span>Destination</span>
+        <input
+          type="text"
+          [(ngModel)]="destinationFilter"
+          (ngModelChange)="onFilterChange()"
+          placeholder="Destination"
+        />
+      </label>
+
+      <label>
+        <span>Sort by</span>
+        <select [(ngModel)]="sortBy">
+          <option *ngFor="let option of sortByOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>Order</span>
+        <select [(ngModel)]="sortOrder">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </label>
+
+      <div class="filter-actions">
+        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
+          Apply Filters
+        </button>
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  }
+
+  <div class="table-card">
+    @if (isLoading) {
+      <div class="state state-loading">Loading activities...</div>
+    } @else if (errorMessage) {
+      <div class="state state-error">{{ errorMessage }}</div>
+    } @else {
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-check"><input type="checkbox" /></th>
+              <th>Activity Details</th>
+              <th>Type</th>
+              <th>Location</th>
+              <th>Duration</th>
+              <th>Status</th>
+              <th class="col-actions">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let activity of activities; trackBy: trackByActivityId">
+              <td class="col-check"><input type="checkbox" /></td>
+              <td>
+                <div class="activity-cell">
+                  <span
+                    class="activity-thumb"
+                    [style.background-image]="activity.mainImageUrl ? 'url(' + activity.mainImageUrl + ')' : ''"
+                  ></span>
+                  <div>
+                    <strong>{{ activity.name }}</strong>
+                    <span>ACT-{{ activity.id | number:'3.0-0' }}</span>
+                  </div>
+                </div>
+              </td>
+              <td>{{ activity.activityTypeName }}</td>
+              <td>
+                <div class="table-activity-cell">
+                  <strong>{{ getActivityLocation(activity) }}</strong>
+                  <span>{{ activity.regionName || '—' }}</span>
+                </div>
+              </td>
+              <td>{{ formatDuration(activity.durationMinutes) }}</td>
+              <td>
+                <span class="status-chip" [ngClass]="getStatusClass(activity.status)">
+                  <span class="chip-dot">●</span>
+                  {{ activity.status || 'Draft' }}
+                </span>
+              </td>
+              <td>
+                <div class="row-actions">
+                  <button type="button" class="icon-btn plain" title="More options">
+                    <span class="material-symbols-outlined">more_horiz</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    }
   </div>
 
   <footer class="table-footer">
@@ -99,8 +170,12 @@
         </select>
       </label>
 
-      <button type="button" class="pager-btn" (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
-      <button type="button" class="pager-btn" (click)="onNextPage()" [disabled]="currentPage >= totalPages">Next</button>
+      <button type="button" class="ghost-btn slim-btn" (click)="onPreviousPage()" [disabled]="currentPage === 1">
+        Previous
+      </button>
+      <button type="button" class="ghost-btn slim-btn" (click)="onNextPage()" [disabled]="currentPage >= totalPages">
+        Next
+      </button>
     </div>
   </footer>
 </section>
