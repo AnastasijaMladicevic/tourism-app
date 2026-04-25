@@ -1,12 +1,11 @@
 <section class="activities-page">
   <header class="activities-header">
     <div>
-      <h1>Activities Management</h1>
+      <h1>Activities</h1>
       <p>Manage difficulty levels, durations, and logistics for regional activities.</p>
     </div>
 
     <div class="header-actions">
-      <button type="button" class="btn btn-danger">Delete</button>
       <button type="button" class="btn btn-muted">Filter</button>
       <button type="button" class="btn btn-primary">+ Add Activity</button>
     </div>
@@ -40,123 +39,68 @@
   </div>
 
   <div class="table-card">
-    <table class="activities-table">
-      <thead>
-        <tr>
-          <th class="col-check"><input type="checkbox" /></th>
-          <th>Activity Name</th>
-          <th>Type</th>
-          <th>Difficulty</th>
-          <th>Duration</th>
-          <th>Seasonality</th>
-          <th>Status</th>
-          <th class="col-actions">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td class="col-check"><input type="checkbox" /></td>
-          <td>
-            <div class="name-cell">
-              <span class="thumb thumb-hike"></span>
-              <div>
-                <p class="name-title">Eagle Peak Summit Hike</p>
-                <p class="name-code">ACT-001</p>
+    <div class="table-scroll" *ngIf="!isLoading && !errorMessage; else tableState">
+      <table class="activities-table">
+        <thead>
+          <tr>
+            <th class="col-check"><input type="checkbox" /></th>
+            <th>Activity Name</th>
+            <th>Type</th>
+            <th>Duration</th>
+            <th>Location</th>
+            <th>Status</th>
+            <th class="col-actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let activity of activities; trackBy: trackByActivityId">
+            <td class="col-check"><input type="checkbox" /></td>
+            <td>
+              <div class="name-cell">
+                <span class="thumb" [style.background-image]="activity.mainImageUrl ? 'url(' + activity.mainImageUrl + ')' : ''" [class.thumb-image]="!!activity.mainImageUrl"></span>
+                <div>
+                  <p class="name-title">{{ activity.name }}</p>
+                  <p class="name-code">ACT-{{ activity.id | number:'3.0-0' }}</p>
+                </div>
               </div>
-            </div>
-          </td>
-          <td>Hiking</td>
-          <td><span class="badge badge-hard">Hard</span></td>
-          <td>6-8 Hours</td>
-          <td>Summer, Autumn</td>
-          <td><span class="status status-published">Published</span></td>
-          <td class="col-actions">...</td>
-        </tr>
+            </td>
+            <td>{{ activity.activityTypeName }}</td>
+            <td>{{ formatDuration(activity.durationMinutes) }}</td>
+            <td>{{ getActivityLocation(activity) }}</td>
+            <td><span class="status" [ngClass]="getStatusClass(activity.status)">{{ activity.status || 'Draft' }}</span></td>
+            <td class="col-actions">...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-        <tr>
-          <td class="col-check"><input type="checkbox" /></td>
-          <td>
-            <div class="name-cell">
-              <span class="thumb thumb-water"></span>
-              <div>
-                <p class="name-title">Crystal Lake Kayaking</p>
-                <p class="name-code">ACT-002</p>
-              </div>
-            </div>
-          </td>
-          <td>Water Sports</td>
-          <td><span class="badge badge-easy">Easy</span></td>
-          <td>2 Hours</td>
-          <td>Summer</td>
-          <td><span class="status status-published">Published</span></td>
-          <td class="col-actions">...</td>
-        </tr>
-
-        <tr>
-          <td class="col-check"><input type="checkbox" /></td>
-          <td>
-            <div class="name-cell">
-              <span class="thumb thumb-bike"></span>
-              <div>
-                <p class="name-title">Pine Ridge Mountain Biking</p>
-                <p class="name-code">ACT-003</p>
-              </div>
-            </div>
-          </td>
-          <td>Cycling</td>
-          <td><span class="badge badge-medium">Medium</span></td>
-          <td>3-4 Hours</td>
-          <td>Spring, Summer, Autumn</td>
-          <td><span class="status status-draft">Draft</span></td>
-          <td class="col-actions">...</td>
-        </tr>
-
-        <tr>
-          <td class="col-check"><input type="checkbox" /></td>
-          <td>
-            <div class="name-cell">
-              <span class="thumb thumb-air"></span>
-              <div>
-                <p class="name-title">Valley Paragliding</p>
-                <p class="name-code">ACT-004</p>
-              </div>
-            </div>
-          </td>
-          <td>Air Sports</td>
-          <td><span class="badge badge-hard">Hard</span></td>
-          <td>1 Hour</td>
-          <td>Summer</td>
-          <td><span class="status status-archived">Archived</span></td>
-          <td class="col-actions">...</td>
-        </tr>
-
-        <tr>
-          <td class="col-check"><input type="checkbox" /></td>
-          <td>
-            <div class="name-cell">
-              <span class="thumb thumb-canyon"></span>
-              <div>
-                <p class="name-title">River Gorge Canyoning</p>
-                <p class="name-code">ACT-005</p>
-              </div>
-            </div>
-          </td>
-          <td>Adventure</td>
-          <td><span class="badge badge-hard">Hard</span></td>
-          <td>5 Hours</td>
-          <td>Summer</td>
-          <td><span class="status status-published">Published</span></td>
-          <td class="col-actions">...</td>
-        </tr>
-      </tbody>
-    </table>
+    <ng-template #tableState>
+      <div class="table-state" *ngIf="isLoading; else errorOrEmpty">Loading activities...</div>
+      <ng-template #errorOrEmpty>
+        <div class="table-state error" *ngIf="errorMessage; else emptyState">{{ errorMessage }}</div>
+      </ng-template>
+      <ng-template #emptyState>
+        <div class="table-state">No activities found.</div>
+      </ng-template>
+    </ng-template>
   </div>
 
   <footer class="table-footer">
-    <p>Showing 1 to 5 of 24 activities</p>
+    <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ totalCount }} activities</p>
     <div class="pagination-buttons">
-      <button type="button" class="pager">Previous</button>
-      <button type="button" class="pager">Next</button>
+      <label class="page-size-control">
+        <span>Page size</span>
+        <select
+          class="page-size-select"
+          [(ngModel)]="pageSize"
+          (ngModelChange)="onPageSizeChange($event)"
+        >
+          <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
+        </select>
+      </label>
+
+      <button type="button" class="pager-btn" (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
+      <button type="button" class="pager-btn" (click)="onNextPage()" [disabled]="currentPage >= totalPages">Next</button>
     </div>
   </footer>
 </section>
