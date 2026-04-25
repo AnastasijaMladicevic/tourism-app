@@ -78,6 +78,7 @@ builder.Services.AddScoped<IRoutePointService, RoutePointService>();
 builder.Services.AddScoped<IEventPlannerService, EventPlannerService>();
 builder.Services.AddScoped<IManagerReportService, ManagerReportService>();
 builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

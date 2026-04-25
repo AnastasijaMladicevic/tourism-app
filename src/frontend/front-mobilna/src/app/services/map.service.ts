@@ -216,12 +216,23 @@ export class MapService {
     }
 
     const bounds = this.map.getBounds().pad(0.35);
+    const visibleEntries = new Map<string, { marker: L.Marker; data: any; type: string; lat: number; lng: number }>();
+
+    this.markerMap.forEach((entry, key) => {
+      const shouldConsider =
+        this.matchesCurrentFilters(entry.type) &&
+        (key === this.activeMarkerKey || bounds.contains([entry.lat, entry.lng]));
+
+      if (shouldConsider) {
+        visibleEntries.set(key, entry);
+      }
+    });
+
+    const representativeKeys = this.selectRepresentativeMarkerKeys(visibleEntries);
 
     this.markerMap.forEach((entry, key) => {
       const marker = entry.marker;
-      const shouldShow =
-        this.matchesCurrentFilters(entry.type) &&
-        (key === this.activeMarkerKey || bounds.contains([entry.lat, entry.lng]));
+      const shouldShow = representativeKeys.has(key);
 
       if (shouldShow) {
         if (!this.map!.hasLayer(marker)) {
@@ -258,6 +269,57 @@ export class MapService {
 
   private matchesCurrentFilters(type: string): boolean {
     return this.activeFilters.length === 0 || this.activeFilters.includes(type);
+  }
+
+  private selectRepresentativeMarkerKeys(
+    visibleEntries: Map<string, { marker: L.Marker; data: any; type: string; lat: number; lng: number }>,
+  ): Set<string> {
+    const selectedKeys = new Set<string>();
+
+    if (!this.map) {
+      return selectedKeys;
+    }
+
+    const zoom = this.map.getZoom();
+    const cellSize = this.getGroupingCellSize(zoom);
+
+    if (cellSize == null) {
+      visibleEntries.forEach((_, key) => selectedKeys.add(key));
+      return selectedKeys;
+    }
+
+    const occupiedCells = new Set<string>();
+
+    visibleEntries.forEach((entry, key) => {
+      if (key === this.activeMarkerKey) {
+        selectedKeys.add(key);
+        return;
+      }
+
+      const cellKey = this.toCellKey(entry.type, entry.lat, entry.lng, cellSize);
+      if (occupiedCells.has(cellKey)) {
+        return;
+      }
+
+      occupiedCells.add(cellKey);
+      selectedKeys.add(key);
+    });
+
+    return selectedKeys;
+  }
+
+  private getGroupingCellSize(zoom: number): number | null {
+    if (zoom <= 6) return 2.2;
+    if (zoom <= 7) return 1.2;
+    if (zoom <= 8) return 0.7;
+    if (zoom <= 9) return 0.35;
+    return null;
+  }
+
+  private toCellKey(type: string, lat: number, lng: number, cellSize: number): string {
+    const latBucket = Math.floor(lat / cellSize);
+    const lngBucket = Math.floor(lng / cellSize);
+    return `${type}:${latBucket}:${lngBucket}`;
   }
 
   private getMarkerIconHtml(type: string): string {

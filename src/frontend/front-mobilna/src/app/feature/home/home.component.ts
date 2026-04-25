@@ -13,6 +13,7 @@ import { AuthService } from '../../services/auth';
 import { ObjectDto, ObjectService } from '../../services/object';
 import { MatIcon } from "@angular/material/icon";
 import { LazyBackgroundDirective } from '../../shared/directives/lazy-background.directive';
+import { RecommendationItemDto, RecommendationService } from '../../services/recommendation';
 
 interface PlaceCard {
   title: string;
@@ -94,8 +95,11 @@ export class HomeComponent implements OnInit {
   showSuggestions = false;
   isLoadingPlaces = true;
   isLoadingEvents = true;
+  isLoadingRecommendations = true;
 
   private favoriteMap = new Map<string, number>();
+  private fallbackRecommended: PlaceCard[] = [];
+  private hasRecommendationResponse = false;
 
   constructor(
     public router: Router,
@@ -107,6 +111,7 @@ export class HomeComponent implements OnInit {
     private favoriteService: FavoriteService,
     private eventService: EventService,
     private authService: AuthService,
+    private recommendationService: RecommendationService,
   ) {}
   onSearchInput(): void {
     const query = this.searchQuery.trim();
@@ -199,7 +204,7 @@ export class HomeComponent implements OnInit {
     this.loadFeatured();
     this.loadUserName();
     this.loadPlaceCards();
-    
+    this.loadRecommendedCards();
     this.loadEventCards();
     this.loadFavorites();
     this.loadEvents();
@@ -288,7 +293,7 @@ export class HomeComponent implements OnInit {
 }
   
   get isLoadingHome(): boolean {
-    return this.isLoadingPlaces || this.isLoadingEvents;
+    return this.isLoadingPlaces || this.isLoadingEvents || this.isLoadingRecommendations;
   }
 
   private get isLoggedIn(): boolean {
@@ -345,7 +350,11 @@ export class HomeComponent implements OnInit {
           .filter((a) => a.id > 0 && a.isActive !== false)
           .map((a) => this.toActivityCard(a));
 
-        this.recommended = this.mixRecommendedCards(destinationCards, activityCards, objectCards);
+        this.fallbackRecommended = this.mixRecommendedCards(destinationCards, activityCards, objectCards);
+        if (!this.hasRecommendationResponse || !this.recommended.length) {
+          this.recommended = [...this.fallbackRecommended];
+          this.applyFavoriteState(this.recommended);
+        }
         this.popular = destinationCards;
         this.flushUi();
         this.allItems = [
@@ -360,6 +369,31 @@ export class HomeComponent implements OnInit {
           raw: o, category: 'object' as const, markerType: o.objectTypeName?.toLowerCase().includes('hotel') ? 'hotel' : 'restaurant'
         })),
       ];
+      });
+  }
+
+  private loadRecommendedCards(): void {
+    this.isLoadingRecommendations = true;
+
+    this.recommendationService
+      .getHomeRecommendations({ pageSize: 12 })
+      .pipe(
+        catchError(() => of([] as RecommendationItemDto[])),
+        finalize(() => {
+          this.isLoadingRecommendations = false;
+          this.flushUi();
+        }),
+      )
+      .subscribe((items) => {
+        this.hasRecommendationResponse = true;
+
+        const cards = items
+          .map((item) => this.toRecommendationCard(item))
+          .filter((card): card is PlaceCard => !!card);
+
+        this.recommended = cards.length ? cards : [...this.fallbackRecommended];
+        this.applyFavoriteState(this.recommended);
+        this.flushUi();
       });
   }
 
@@ -638,6 +672,32 @@ export class HomeComponent implements OnInit {
     return card;
   }
 
+  private toRecommendationCard(item: RecommendationItemDto): PlaceCard | null {
+    const normalizedType = item.itemType?.toLowerCase();
+    if (normalizedType !== 'destination' && normalizedType !== 'object' && normalizedType !== 'activity') {
+      return null;
+    }
+
+    const imageUrl = this.resolveMediaUrl(item.imageUrl);
+    const metaText = this.recommendationMetaText(item);
+
+    const card: PlaceCard = {
+      title: item.title,
+      location: item.location || item.categoryName || normalizedType,
+      ratingText: metaText,
+      imageUrl,
+      isFavorite: false,
+      itemId: item.itemId,
+      itemType: normalizedType,
+      targetUrl: `/${normalizedType}/${item.itemId}`,
+      favoriteId: undefined,
+      showRating: item.averageRating != null && (item.reviewCount ?? 0) > 0,
+    };
+
+    this.applyFavoriteState([card]);
+    return card;
+  }
+
   private mixRecommendedCards(
     destinations: PlaceCard[],
     activities: PlaceCard[],
@@ -659,6 +719,41 @@ export class HomeComponent implements OnInit {
     }
 
     return result;
+  }
+
+  private recommendationMetaText(item: RecommendationItemDto): string {
+    if (item.averageRating != null && (item.reviewCount ?? 0) > 0) {
+      return `${item.averageRating.toFixed(1)} (${item.reviewCount} reviews)`;
+    }
+
+    if (item.distanceMeters != null && item.distanceMeters > 0) {
+      const distanceText =
+        item.distanceMeters >= 1000
+          ? `${(item.distanceMeters / 1000).toFixed(1)} km away`
+          : `${Math.round(item.distanceMeters)} m away`;
+
+      if (item.itemType === 'activity') {
+        const details = [item.price != null && item.price > 0 ? `EUR ${Math.round(item.price)}` : 'Free'];
+        if (item.durationMinutes != null && item.durationMinutes > 0) {
+          details.push(`${item.durationMinutes} min`);
+        }
+
+        return `${distanceText} - ${details.join(' - ')}`;
+      }
+
+      return distanceText;
+    }
+
+    if (item.itemType === 'activity') {
+      const details = [item.price != null && item.price > 0 ? `EUR ${Math.round(item.price)}` : 'Free'];
+      if (item.durationMinutes != null && item.durationMinutes > 0) {
+        details.push(`${item.durationMinutes} min`);
+      }
+
+      return details.join(' - ');
+    }
+
+    return item.categoryName || '';
   }
 
   private readOptionalNumber(obj: Record<string, unknown>, keys: string[]): number | undefined {
