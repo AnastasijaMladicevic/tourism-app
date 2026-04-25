@@ -13,6 +13,7 @@
           placeholder="Search places, routes..."
           [(ngModel)]="searchQuery"
           (input)="onSearchInput()"
+          (keydown.enter)="submitSearch()"
           (focus)="showSuggestions = searchResults.length > 0"
           (blur)="onSearchBlur()"
           autocomplete="off"

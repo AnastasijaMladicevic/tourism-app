@@ -26,6 +26,16 @@ namespace TuristickiVodic.API.Controllers
             return Ok(results);
         }
 
+        [HttpGet("mcp")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SearchMcp([FromQuery] SmartSearchQueryDto query)
+        {
+            query.Mode = "mcp";
+            var userId = TryGetCurrentUserId();
+            var results = await _smartSearchService.SearchAsync(userId, query);
+            return Ok(results);
+        }
+
         private int? TryGetCurrentUserId()
         {
             var raw = User.FindFirstValue(ClaimTypes.NameIdentifier);

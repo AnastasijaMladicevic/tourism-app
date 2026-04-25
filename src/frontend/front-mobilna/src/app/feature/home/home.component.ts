@@ -136,7 +136,7 @@ export class HomeComponent implements OnInit {
         this.locationTrackingService.isTrackingEnabled() && currentLocation != null;
 
       this.smartSearchService
-        .search({
+        .searchMcp({
           query,
           pageSize: 8,
           latitude: includeLocation ? currentLocation?.latitude : undefined,
@@ -182,6 +182,18 @@ export class HomeComponent implements OnInit {
     }
     this.searchResults = [];
     this.showSuggestions = false;
+  }
+
+  submitSearch(): void {
+    const query = this.searchQuery.trim();
+    if (!query) {
+      return;
+    }
+
+    this.showSuggestions = false;
+    this.router.navigate(['/search'], {
+      queryParams: { q: query, source: 'home' },
+    });
   }
   private scoreItem(item: SearchResult, terms: string[]): number {
     let score = 0;
@@ -231,6 +243,18 @@ export class HomeComponent implements OnInit {
     };
   }
   private getAmenityText(item: SearchResult): string {
+    const rawAmenities = Array.isArray(item.raw?.amenities)
+      ? item.raw.amenities.join(' ')
+      : '';
+    const rawCuisine = item.raw?.cuisineType ?? '';
+    const rawType = item.raw?.objectTypeName ?? item.raw?.eventTypeName ?? item.raw?.destinationTypeName ?? '';
+    const rawDescription = item.raw?.description ?? '';
+
+    const realText = `${rawAmenities} ${rawCuisine} ${rawType} ${rawDescription}`.trim();
+    if (realText) {
+      return realText;
+    }
+
     const type = item.markerType.toLowerCase();
     const amenityMap: Record<string, string> = {
       hotel: 'wifi parking gym bazen pool breakfast spa',
@@ -284,10 +308,21 @@ export class HomeComponent implements OnInit {
   selectSuggestion(result: SearchResult): void {
     this.searchQuery = result.name;
     this.showSuggestions = false;
+    this.openSearchResult(result);
+  }
 
+  private openSearchResult(result: SearchResult): void {
     switch (result.category) {
       case 'destination':
-        this.router.navigate(['/destination', result.id]);
+        this.router.navigate(['/map'], {
+          state: {
+            lat: result.lat,
+            lng: result.lng,
+            zoom: 14,
+            selectedItem: { id: result.id },
+            selectedType: 'destination',
+          },
+        });
         break;
       case 'object':
         this.router.navigate(['/object', result.id]);

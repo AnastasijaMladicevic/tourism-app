@@ -7,6 +7,7 @@ import { ActiveRegionService } from './active-region';
 export interface SmartSearchQueryParams {
   query: string;
   pageSize?: number;
+  mode?: 'mcp' | 'strict';
   regionId?: number;
   latitude?: number;
   longitude?: number;
@@ -30,6 +31,7 @@ export interface SmartSearchResultDto {
 @Injectable({ providedIn: 'root' })
 export class SmartSearchService {
   private readonly url = `${environment.apiUrl}/search/smart`;
+  private readonly mcpUrl = `${environment.apiUrl}/search/mcp`;
 
   constructor(
     private readonly http: HttpClient,
@@ -47,5 +49,21 @@ export class SmartSearchService {
     });
 
     return this.http.get<SmartSearchResultDto[]>(this.url, { params });
+  }
+
+  searchMcp(query: SmartSearchQueryParams): Observable<SmartSearchResultDto[]> {
+    const effectiveQuery = this.activeRegionService.applySelectedRegion({
+      ...query,
+      mode: 'mcp',
+    });
+    let params = new HttpParams();
+
+    Object.entries(effectiveQuery ?? query).forEach(([key, value]) => {
+      if (value != null && value !== '') {
+        params = params.set(key, String(value));
+      }
+    });
+
+    return this.http.get<SmartSearchResultDto[]>(this.mcpUrl, { params });
   }
 }

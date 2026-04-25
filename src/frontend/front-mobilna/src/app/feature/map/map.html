@@ -7,6 +7,7 @@
         placeholder="Search objects, routes..."
         [(ngModel)]="searchQuery"
         (input)="onSearchInput()"
+        (keydown.enter)="submitSearch()"
         (focus)="showSuggestions = searchResults.length > 0"
         (blur)="onSearchBlur()"
         autocomplete="off"

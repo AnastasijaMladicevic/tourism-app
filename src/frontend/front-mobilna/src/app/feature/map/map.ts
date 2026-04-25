@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-import { forkJoin, Subscription } from 'rxjs';
+import { catchError, forkJoin, of, Subscription } from 'rxjs';
 import * as L from 'leaflet';
 
 import { MapService } from '../../services/map.service';
@@ -21,6 +21,7 @@ import { EventService } from '../../services/event';
 import { RegionService } from '../../services/region';
 import { ActiveRegionService } from '../../services/active-region';
 import { LocationTrackingService, TrackedLocation } from '../../services/location-tracking';
+import { SmartSearchResultDto, SmartSearchService } from '../../services/smart-search';
 
 interface SearchResult {
   id: number;
@@ -87,6 +88,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   private allItems: SearchResult[] = [];
   private readonly subscriptions = new Subscription();
   private shouldCenterOnNextLocation = false;
+  private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private mapService: MapService,
@@ -99,6 +101,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     private regionService: RegionService,
     private activeRegionService: ActiveRegionService,
     private locationTrackingService: LocationTrackingService,
+    private smartSearchService: SmartSearchService,
   ) {}
 
   ngOnInit(): void {
@@ -151,6 +154,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = null;
+    }
     this.mapService.destroyMap();
   }
 
@@ -323,23 +330,49 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   onSearchInput(): void {
     const query = this.searchQuery.trim();
     if (!query) {
+      if (this.searchDebounceTimer) {
+        clearTimeout(this.searchDebounceTimer);
+        this.searchDebounceTimer = null;
+      }
       this.searchResults = [];
       this.showSuggestions = false;
       return;
     }
 
-    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-    const scored = this.allItems
-      .map((item) => ({
-        item,
-        score: this.scoreItem(item, terms),
-      }))
-      .filter((x) => this.matchesAllTerms(x.item, terms))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 8);
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+    }
 
-    this.searchResults = scored.map((x) => x.item);
-    this.showSuggestions = this.searchResults.length > 0;
+    this.searchDebounceTimer = setTimeout(() => {
+      const currentLocation = this.locationTrackingService.getCurrentLocation();
+      const includeLocation =
+        this.locationTrackingService.isTrackingEnabled() && currentLocation != null;
+
+      this.smartSearchService
+        .search({
+          query,
+          pageSize: 8,
+          mode: 'strict',
+          latitude: includeLocation ? currentLocation?.latitude : undefined,
+          longitude: includeLocation ? currentLocation?.longitude : undefined,
+        })
+        .pipe(catchError(() => of([] as SmartSearchResultDto[])))
+        .subscribe((results) => {
+          if (this.searchQuery.trim() !== query) {
+            return;
+          }
+
+          const mapped = results.map((result) => this.toSmartSearchResult(result));
+          if (mapped.length > 0) {
+            this.searchResults = mapped;
+            this.showSuggestions = true;
+          } else {
+            this.applyFallbackSearch(query);
+          }
+
+          this.cdr.detectChanges();
+        });
+    }, 260);
   }
 
   private scoreItem(item: SearchResult, terms: string[]): number {
@@ -357,6 +390,18 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getAmenityText(item: SearchResult): string {
+    const rawAmenities = Array.isArray(item.raw?.amenities)
+      ? item.raw.amenities.join(' ')
+      : '';
+    const rawCuisine = item.raw?.cuisineType ?? '';
+    const rawType = item.raw?.objectTypeName ?? item.raw?.eventTypeName ?? item.raw?.destinationTypeName ?? '';
+    const rawDescription = item.raw?.description ?? '';
+
+    const realText = `${rawAmenities} ${rawCuisine} ${rawType} ${rawDescription}`.trim();
+    if (realText) {
+      return realText;
+    }
+
     const type = item.markerType.toLowerCase();
     const amenityMap: Record<string, string> = {
       hotel: 'wifi parking gym bazen pool breakfast spa',
@@ -374,8 +419,24 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   clearSearch(): void {
     this.searchQuery = '';
+    if (this.searchDebounceTimer) {
+      clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = null;
+    }
     this.searchResults = [];
     this.showSuggestions = false;
+  }
+
+  submitSearch(): void {
+    const query = this.searchQuery.trim();
+    if (!query) {
+      return;
+    }
+
+    this.showSuggestions = false;
+    this.router.navigate(['/search'], {
+      queryParams: { q: query, source: 'map' },
+    });
   }
 
   selectSuggestion(result: SearchResult): void {
@@ -388,6 +449,40 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.mapService.triggerMarkerClick(result.markerType, result.id);
       }, 600);
     }
+  }
+
+  private applyFallbackSearch(query: string): void {
+    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+    const scored = this.allItems
+      .map((item) => ({
+        item,
+        score: this.scoreItem(item, terms),
+      }))
+      .filter((x) => this.matchesAllTerms(x.item, terms))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 8);
+
+    this.searchResults = scored.map((x) => x.item);
+    this.showSuggestions = this.searchResults.length > 0;
+  }
+
+  private toSmartSearchResult(result: SmartSearchResultDto): SearchResult {
+    return {
+      id: result.id,
+      name: result.name,
+      typeName: result.typeName,
+      location: result.location,
+      image: result.imageUrl,
+      icon: result.icon || 'place',
+      lat: result.latitude,
+      lng: result.longitude,
+      raw: {
+        matchReason: result.matchReason,
+        score: result.score,
+      },
+      category: result.category,
+      markerType: result.markerType,
+    };
   }
 
   toggleFilter(key: string): void {
