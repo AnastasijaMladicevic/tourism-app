@@ -14,6 +14,7 @@ import { ObjectDto, ObjectService } from '../../services/object';
 import { MatIcon } from "@angular/material/icon";
 import { LazyBackgroundDirective } from '../../shared/directives/lazy-background.directive';
 import { RecommendationItemDto, RecommendationService } from '../../services/recommendation';
+import { LocationTrackingService } from '../../services/location-tracking';
 
 interface PlaceCard {
   title: string;
@@ -112,6 +113,7 @@ export class HomeComponent implements OnInit {
     private eventService: EventService,
     private authService: AuthService,
     private recommendationService: RecommendationService,
+    private locationTrackingService: LocationTrackingService,
   ) {}
   onSearchInput(): void {
     const query = this.searchQuery.trim();
@@ -375,8 +377,15 @@ export class HomeComponent implements OnInit {
   private loadRecommendedCards(): void {
     this.isLoadingRecommendations = true;
 
+    const currentLocation = this.locationTrackingService.getCurrentLocation();
+    const canUseLocation = this.shouldShowLiveDistance();
+
     this.recommendationService
-      .getHomeRecommendations({ pageSize: 12 })
+      .getHomeRecommendations({
+        pageSize: 12,
+        latitude: canUseLocation ? currentLocation?.latitude : undefined,
+        longitude: canUseLocation ? currentLocation?.longitude : undefined,
+      })
       .pipe(
         catchError(() => of([] as RecommendationItemDto[])),
         finalize(() => {
@@ -726,7 +735,7 @@ export class HomeComponent implements OnInit {
       return `${item.averageRating.toFixed(1)} (${item.reviewCount} reviews)`;
     }
 
-    if (item.distanceMeters != null && item.distanceMeters > 0) {
+    if (this.shouldShowLiveDistance() && item.distanceMeters != null && item.distanceMeters > 0) {
       const distanceText =
         item.distanceMeters >= 1000
           ? `${(item.distanceMeters / 1000).toFixed(1)} km away`
@@ -754,6 +763,13 @@ export class HomeComponent implements OnInit {
     }
 
     return item.categoryName || '';
+  }
+
+  private shouldShowLiveDistance(): boolean {
+    return (
+      this.locationTrackingService.isTrackingEnabled() &&
+      this.locationTrackingService.getCurrentLocation() != null
+    );
   }
 
   private readOptionalNumber(obj: Record<string, unknown>, keys: string[]): number | undefined {

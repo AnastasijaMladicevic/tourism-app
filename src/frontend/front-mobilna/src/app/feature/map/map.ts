@@ -11,16 +11,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subscription } from 'rxjs';
 import * as L from 'leaflet';
 
 import { MapService } from '../../services/map.service';
 import { DestinationService } from '../../services/destination';
 import { ObjectService } from '../../services/object';
 import { EventService } from '../../services/event';
-import { AuthService } from '../../services/auth';
 import { RegionService } from '../../services/region';
 import { ActiveRegionService } from '../../services/active-region';
+import { LocationTrackingService, TrackedLocation } from '../../services/location-tracking';
 
 interface SearchResult {
   id: number;
@@ -79,25 +79,26 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   routeEnd: RoutePoint | null = null;
 
   isTracking = false;
-  private watchId: number | null = null;
   private userMarker: L.Marker | null = null;
   private userCircle: L.Circle | null = null;
 
   private routeLine: L.Polyline | null = null;
 
   private allItems: SearchResult[] = [];
+  private readonly subscriptions = new Subscription();
+  private shouldCenterOnNextLocation = false;
 
   constructor(
     private mapService: MapService,
     private router: Router,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
-    private authService: AuthService,
     private destinationService: DestinationService,
     private objectService: ObjectService,
     private eventService: EventService,
     private regionService: RegionService,
     private activeRegionService: ActiveRegionService,
+    private locationTrackingService: LocationTrackingService,
   ) {}
 
   ngOnInit(): void {
@@ -108,6 +109,24 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cdr.detectChanges();
       });
     });
+
+    this.subscriptions.add(
+      this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
+        this.ngZone.run(() => {
+          this.isTracking = enabled;
+          this.cdr.detectChanges();
+        });
+      }),
+    );
+
+    this.subscriptions.add(
+      this.locationTrackingService.location$.subscribe((location) => {
+        this.ngZone.run(() => {
+          this.applyTrackedLocation(location);
+          this.cdr.detectChanges();
+        });
+      }),
+    );
   }
 
   ngAfterViewInit(): void {
@@ -117,6 +136,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const zoom = state?.zoom ?? 13;
 
     this.mapService.initMap('main-map', lat, lng, zoom);
+    this.isTracking = this.locationTrackingService.isTrackingEnabled();
+    this.applyTrackedLocation(this.locationTrackingService.getCurrentLocation());
     if (!state?.lat || !state?.lng) {
       this.focusActiveRegion();
     }
@@ -129,75 +150,25 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.stopTracking();
+    this.subscriptions.unsubscribe();
     this.mapService.destroyMap();
   }
 
   toggleGpsTracking(): void {
     if (this.isTracking) {
-      this.stopTracking();
+      this.locationTrackingService.stopTracking();
     } else {
-      this.startTracking();
-    }
-  }
+      if (!this.locationTrackingService.startTracking()) {
+        alert('Geolocation nije podrzana.');
+        return;
+      }
 
-  private startTracking(): void {
-    if (!navigator.geolocation) {
-      alert('Geolocation nije podrzana.');
-      return;
-    }
-
-    this.isTracking = true;
-
-    this.watchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        this.ngZone.run(() => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          const accuracy = pos.coords.accuracy;
-          const latlng = L.latLng(lat, lng);
-          this.userLocation = latlng;
-
-          this.updateUserMarker(latlng, accuracy);
-
-          if (this.authService.isLoggedIn()) {
-            this.authService.updateMyLocation(lat, lng).subscribe();
-          }
-
-          this.cdr.detectChanges();
-        });
-      },
-      (err) => {
-        this.ngZone.run(() => {
-          this.isTracking = false;
-          if (err.code === err.PERMISSION_DENIED) {
-            alert('Dozvolite pristup lokaciji.');
-          }
-          this.cdr.detectChanges();
-        });
-      },
-      { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 },
-    );
-
-    navigator.geolocation.getCurrentPosition((pos) => {
-      this.mapService.flyTo(pos.coords.latitude, pos.coords.longitude, 16);
-    });
-  }
-
-  private stopTracking(): void {
-    if (this.watchId !== null) {
-      navigator.geolocation.clearWatch(this.watchId);
-      this.watchId = null;
-    }
-    this.isTracking = false;
-
-    if (this.userMarker) {
-      this.userMarker.remove();
-      this.userMarker = null;
-    }
-    if (this.userCircle) {
-      this.userCircle.remove();
-      this.userCircle = null;
+      this.shouldCenterOnNextLocation = true;
+      const currentLocation = this.locationTrackingService.getCurrentLocation();
+      if (currentLocation) {
+        this.mapService.flyTo(currentLocation.latitude, currentLocation.longitude, 16);
+        this.shouldCenterOnNextLocation = false;
+      }
     }
   }
 
@@ -228,6 +199,35 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         fillOpacity: 0.1,
         weight: 1,
       }).addTo(map);
+    }
+  }
+
+  private clearUserMarker(): void {
+    if (this.userMarker) {
+      this.userMarker.remove();
+      this.userMarker = null;
+    }
+
+    if (this.userCircle) {
+      this.userCircle.remove();
+      this.userCircle = null;
+    }
+  }
+
+  private applyTrackedLocation(location: TrackedLocation | null): void {
+    if (!location) {
+      this.userLocation = null;
+      this.clearUserMarker();
+      return;
+    }
+
+    const latlng = L.latLng(location.latitude, location.longitude);
+    this.userLocation = latlng;
+    this.updateUserMarker(latlng, location.accuracy);
+
+    if (this.shouldCenterOnNextLocation) {
+      this.mapService.flyTo(location.latitude, location.longitude, 16);
+      this.shouldCenterOnNextLocation = false;
     }
   }
 
