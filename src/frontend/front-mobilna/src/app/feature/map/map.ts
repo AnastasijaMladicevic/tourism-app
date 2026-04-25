@@ -83,8 +83,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   private userMarker: L.Marker | null = null;
   private userCircle: L.Circle | null = null;
 
-  private routingControl: any = null;
-  private routingMachineLoaded = false;
+  private routeLine: L.Polyline | null = null;
 
   private allItems: SearchResult[] = [];
 
@@ -284,10 +283,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   clearDirections(): void {
-    const map = this.mapService['map'];
-    if (this.routingControl && map) {
-      map.removeControl(this.routingControl);
-      this.routingControl = null;
+    if (this.routeLine) {
+      this.routeLine.remove();
+      this.routeLine = null;
     }
   }
 
@@ -295,29 +293,21 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const map = this.mapService['map'];
     if (!map) return;
 
-    await this.ensureRoutingMachineLoaded();
     this.clearDirections();
 
-    this.routingControl = (L as any).Routing.control({
-      waypoints: [from, to],
-      routeWhileDragging: false,
-      show: false,
-      addWaypoints: false,
-      fitSelectedRoutes: true,
-      lineOptions: {
-        styles: [{ color: '#168AAD', weight: 5, opacity: 0.8 }],
-      },
-      createMarker: () => null,
+    const routePoints = await this.fetchRoutePoints(from, to);
+    this.routeLine = L.polyline(routePoints, {
+      color: '#168AAD',
+      weight: 5,
+      opacity: 0.85,
+      lineCap: 'round',
+      lineJoin: 'round',
     }).addTo(map);
-  }
 
-  private async ensureRoutingMachineLoaded(): Promise<void> {
-    if (this.routingMachineLoaded) {
-      return;
-    }
-
-    await import('leaflet-routing-machine');
-    this.routingMachineLoaded = true;
+    map.fitBounds(this.routeLine.getBounds(), {
+      padding: [48, 48],
+      maxZoom: 16,
+    });
   }
 
   private matchesAllTerms(item: SearchResult, terms: string[]): boolean {
@@ -410,19 +400,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private applyFilters(): void {
-    const map = this.mapService['map'];
-    if (!map) return;
-
-    this.mapService['markerMap'].forEach((value: any, key: string) => {
-      const type = key.split(':')[0];
-      const marker = value.marker;
-
-      if (this.activeFilters.length === 0 || this.activeFilters.includes(type)) {
-        if (!map.hasLayer(marker)) marker.addTo(map);
-      } else if (map.hasLayer(marker)) {
-        marker.remove();
-      }
-    });
+    this.mapService.setActiveFilters(this.activeFilters);
   }
 
   private loadAllData(state?: any): void {
@@ -454,6 +432,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
               destination.longitude,
               'destination',
               destination,
+              undefined,
+              false,
             );
             this.allItems.push(this.toSearchResult(destination, 'destination', 'destination'));
           }
@@ -462,17 +442,26 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         objList.forEach((obj) => {
           if (obj.latitude && obj.longitude) {
             const type = this.getObjectType(obj.objectTypeName || '');
-            this.mapService.addMarkerWithType(obj.latitude, obj.longitude, type, obj);
+            this.mapService.addMarkerWithType(obj.latitude, obj.longitude, type, obj, undefined, false);
             this.allItems.push(this.toSearchResult(obj, type, 'object'));
           }
         });
 
         evtList.forEach((event) => {
           if (event.latitude && event.longitude) {
-            this.mapService.addMarkerWithType(event.latitude, event.longitude, 'event', event);
+            this.mapService.addMarkerWithType(
+              event.latitude,
+              event.longitude,
+              'event',
+              event,
+              undefined,
+              false,
+            );
             this.allItems.push(this.toSearchResult(event, 'event', 'event'));
           }
         });
+
+        this.mapService.syncVisibleMarkers();
 
         if (state?.selectedItem) {
           setTimeout(() => {
@@ -687,5 +676,35 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       lat,
       lng,
     };
+  }
+
+  private async fetchRoutePoints(from: L.LatLng, to: L.LatLng): Promise<L.LatLngExpression[]> {
+    const url =
+      `https://router.project-osrm.org/route/v1/driving/` +
+      `${from.lng},${from.lat};${to.lng},${to.lat}` +
+      `?overview=full&geometries=geojson`;
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Route request failed with ${response.status}`);
+      }
+
+      const payload = await response.json();
+      const coordinates = payload?.routes?.[0]?.geometry?.coordinates;
+      if (!Array.isArray(coordinates) || coordinates.length < 2) {
+        throw new Error('Route geometry missing');
+      }
+
+      return coordinates.map(
+        ([lng, lat]: [number, number]) => [lat, lng] as [number, number],
+      );
+    } catch (error) {
+      console.warn('Using straight-line fallback route.', error);
+      return [
+        [from.lat, from.lng],
+        [to.lat, to.lng],
+      ];
+    }
   }
 }

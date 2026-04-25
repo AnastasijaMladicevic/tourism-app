@@ -8,6 +8,7 @@ export class MapService {
   private activeMarkerKey: string | null = null;
   private activeRegularMarker: L.Marker | null = null;
   private map: L.Map | null = null;
+  private activeFilters: string[] = [];
 
   addMainMapMarker(lat: number, lng: number, popupText: string = ''): L.Marker | null {
     if (!this.map) {
@@ -49,6 +50,8 @@ export class MapService {
         maxZoom: 19,
         attribution: '',
       }).addTo(this.map);
+
+      this.map.on('moveend zoomend', () => this.syncVisibleMarkers());
 
       return this.map;
     } catch (error) {
@@ -112,6 +115,7 @@ export class MapService {
     type: string,
     data: any,
     onClick?: () => void,
+    autoSync: boolean = true,
   ): L.Marker | null {
     if (!this.map) return null;
 
@@ -124,7 +128,7 @@ export class MapService {
       popupAnchor: [0, -40],
     });
 
-    const marker = L.marker([lat, lng], { icon: customIcon }).addTo(this.map);
+    const marker = L.marker([lat, lng], { icon: customIcon });
     this.markers.push({ marker, data, type, lat, lng });
 
     const key = `${type}:${data.id}`;
@@ -134,6 +138,10 @@ export class MapService {
       this.activateMarker(key);
       if (onClick) onClick();
     });
+
+    if (autoSync) {
+      this.syncVisibleMarkers();
+    }
 
     return marker;
   }
@@ -194,6 +202,35 @@ export class MapService {
     this.activeMarkerKey = null;
     this.activeRegularMarker = null;
     this.updateMarkerFocus(null);
+    this.syncVisibleMarkers();
+  }
+
+  setActiveFilters(filters: string[]): void {
+    this.activeFilters = [...filters];
+    this.syncVisibleMarkers();
+  }
+
+  syncVisibleMarkers(): void {
+    if (!this.map) {
+      return;
+    }
+
+    const bounds = this.map.getBounds().pad(0.35);
+
+    this.markerMap.forEach((entry, key) => {
+      const marker = entry.marker;
+      const shouldShow =
+        this.matchesCurrentFilters(entry.type) &&
+        (key === this.activeMarkerKey || bounds.contains([entry.lat, entry.lng]));
+
+      if (shouldShow) {
+        if (!this.map!.hasLayer(marker)) {
+          marker.addTo(this.map!);
+        }
+      } else if (this.map!.hasLayer(marker)) {
+        marker.remove();
+      }
+    });
   }
 
   private updateMarkerFocus(activeKey: string | null): void {
@@ -217,6 +254,10 @@ export class MapService {
     const applyClass = () => marker.getElement()?.classList.add('marker-selected-pin');
     applyClass();
     marker.once('add', applyClass);
+  }
+
+  private matchesCurrentFilters(type: string): boolean {
+    return this.activeFilters.length === 0 || this.activeFilters.includes(type);
   }
 
   private getMarkerIconHtml(type: string): string {
