@@ -44,6 +44,8 @@ export interface ActivityQueryDto {
   search?: string;
   sortBy?: string;
   sortOrder?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 export interface ActivityQueryResponse {

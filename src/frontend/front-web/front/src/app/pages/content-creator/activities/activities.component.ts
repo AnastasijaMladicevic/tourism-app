@@ -25,6 +25,8 @@ export class ContentCreatorActivitiesComponent implements OnInit {
 
   searchQuery = '';
   draftSearchQuery = '';
+  rangeStartDate = '';
+  rangeEndDate = '';
   statusFilter = 'all';
   typeFilter = 'all';
   destinationFilter = 'all';
@@ -65,7 +67,9 @@ export class ContentCreatorActivitiesComponent implements OnInit {
       type: this.typeFilter !== 'all' ? this.typeFilter : undefined,
       destination: this.destinationFilter !== 'all' ? this.destinationFilter : undefined,
       sortBy: this.sortBy,
-      sortOrder: this.sortOrder
+      sortOrder: this.sortOrder,
+      startDate: this.rangeStartDate || undefined,
+      endDate: this.rangeEndDate || undefined
     }).subscribe({
       next: (response) => {
         this.activities = response.items ?? [];
@@ -98,6 +102,21 @@ export class ContentCreatorActivitiesComponent implements OnInit {
     this.filterPanelOpen = !this.filterPanelOpen;
   }
 
+  onDateRangeChange(): void {
+    if (!this.rangeStartDate || !this.rangeEndDate) {
+      return;
+    }
+
+    if (this.rangeStartDate > this.rangeEndDate) {
+      const originalStart = this.rangeStartDate;
+      this.rangeStartDate = this.rangeEndDate;
+      this.rangeEndDate = originalStart;
+    }
+
+    this.currentPage = 1;
+    this.loadActivities();
+  }
+
   onApplyFilters(): void {
     this.searchQuery = this.draftSearchQuery.trim();
     this.currentPage = 1;
@@ -107,6 +126,8 @@ export class ContentCreatorActivitiesComponent implements OnInit {
   onResetFilters(): void {
     this.searchQuery = '';
     this.draftSearchQuery = '';
+    this.rangeStartDate = '';
+    this.rangeEndDate = '';
     this.statusFilter = 'all';
     this.typeFilter = 'all';
     this.destinationFilter = 'all';

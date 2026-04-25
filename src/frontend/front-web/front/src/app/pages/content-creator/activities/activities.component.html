@@ -29,6 +29,27 @@
       />
     </div>
 
+    <div class="date-range-pill" aria-label="Date range filter">
+      <span class="material-symbols-outlined">calendar_month</span>
+      <div class="date-range-inputs">
+        <input
+          type="date"
+          class="date-range-input"
+          [(ngModel)]="rangeStartDate"
+          (ngModelChange)="onDateRangeChange()"
+          aria-label="From date"
+        />
+        <span class="date-range-separator">-</span>
+        <input
+          type="date"
+          class="date-range-input"
+          [(ngModel)]="rangeEndDate"
+          (ngModelChange)="onDateRangeChange()"
+          aria-label="To date"
+        />
+      </div>
+    </div>
+
     <button type="button" class="ghost-btn slim-btn" (click)="onMoreFilters()">
       <span class="material-symbols-outlined">filter_alt</span>
       More Filters
@@ -104,18 +125,22 @@
         <table>
           <thead>
             <tr>
-              <th class="col-check"><input type="checkbox" /></th>
+              <th>Status</th>
               <th>Activity Details</th>
               <th>Type</th>
               <th>Location</th>
               <th>Duration</th>
-              <th>Status</th>
               <th class="col-actions">Action</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let activity of activities; trackBy: trackByActivityId">
-              <td class="col-check"><input type="checkbox" /></td>
+              <td>
+                <span class="status-chip" [ngClass]="getStatusClass(activity.status)">
+                  <span class="chip-dot">●</span>
+                  {{ activity.status || 'Draft' }}
+                </span>
+              </td>
               <td>
                 <div class="activity-cell">
                   <span
@@ -136,12 +161,6 @@
                 </div>
               </td>
               <td>{{ formatDuration(activity.durationMinutes) }}</td>
-              <td>
-                <span class="status-chip" [ngClass]="getStatusClass(activity.status)">
-                  <span class="chip-dot">●</span>
-                  {{ activity.status || 'Draft' }}
-                </span>
-              </td>
               <td>
                 <div class="row-actions">
                   <button type="button" class="icon-btn plain" title="More options">
