@@ -36,7 +36,7 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(int id, [FromQuery] string lang = "sr")
         {
             if (User.Identity?.IsAuthenticated == true)
             {
@@ -45,17 +45,17 @@ namespace TuristickiVodic.API.Controllers
 
                 if (string.Equals(roleName, "ContentCreator", StringComparison.OrdinalIgnoreCase))
                 {
-                    var ownActivity = await _activityService.GetMineByIdAsync(id, userId);
+                    var ownActivity = await _activityService.GetMineByIdAsync(id, userId, lang);
                     if (ownActivity != null) return Ok(ownActivity);
                 }
                 else if (string.Equals(roleName, "Manager", StringComparison.OrdinalIgnoreCase))
                 {
-                    var managedActivity = await _activityService.GetForManagerByIdAsync(id, userId);
+                    var managedActivity = await _activityService.GetForManagerByIdAsync(id, userId, lang);
                     if (managedActivity != null) return Ok(managedActivity);
                 }
             }
 
-            var activity = await _activityService.GetByIdAsync(id);
+            var activity = await _activityService.GetByIdAsync(id, lang);
             if (activity == null) return NotFound();
             return Ok(activity);
         }

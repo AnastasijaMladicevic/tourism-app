@@ -16,11 +16,11 @@ namespace TuristickiVodic.Services.Services
         private readonly IMapper _mapper;
         private readonly ITranslationService _translationService;
 
-        public TouristObjectService(AppDbContext context, IMapper mapper, ITranslationService translationService)
+        public TouristObjectService(AppDbContext context, IMapper mapper, ITranslationService? translationService = null)
         {
             _context = context;
             _mapper = mapper;
-            _translationService = translationService;
+            _translationService = translationService ?? NullTranslationService.Instance;
         }
 
         public async Task<PagedResultDto<TouristObjectDto>> GetAllAsync(TouristObjectQueryDto query)
@@ -42,13 +42,10 @@ namespace TuristickiVodic.Services.Services
                     .ThenInclude(l => l.Destination)
                         .ThenInclude(d => d.Region)
                 .Include(o => o.Images)
-                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
-                    .ThenInclude(r => r.User)
-                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
-                    .ThenInclude(r => r.ReviewedBy)
                 .Where(o => o.Status == ContentStatus.Approved)
                 .Where(o => o.IsActive)
                 .Where(o => o.Images.Any(i => i.IsMain))
+                .AsNoTracking()
                 .AsSplitQuery()
                 .AsQueryable();
 
@@ -197,14 +194,11 @@ namespace TuristickiVodic.Services.Services
                     .ThenInclude(l => l.Destination)
                         .ThenInclude(d => d.Region)
                 .Include(o => o.Images)
-                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
-                    .ThenInclude(r => r.User)
-                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
-                    .ThenInclude(r => r.ReviewedBy)
                 .Where(o => o.Status == ContentStatus.Approved)
                 .Where(o => o.IsActive)
                 .Where(o => o.Geolocation != null)
                 .Where(o => o.Images.Any(i => i.IsMain))
+                .AsNoTracking()
                 .AsSplitQuery()
                 .AsQueryable();
 
@@ -365,11 +359,8 @@ namespace TuristickiVodic.Services.Services
                     .ThenInclude(l => l.Destination)
                         .ThenInclude(d => d.Region)
                 .Include(o => o.Images)
-                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
-                    .ThenInclude(r => r.User)
-                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
-                    .ThenInclude(r => r.ReviewedBy)
                 .Where(o => o.CreatedByUserId == userId)
+                .AsNoTracking()
                 .AsSplitQuery()
                 .AsQueryable();
 
@@ -504,13 +495,10 @@ namespace TuristickiVodic.Services.Services
                     .ThenInclude(l => l.Destination)
                         .ThenInclude(d => d.Region)
                 .Include(o => o.Images)
-                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
-                    .ThenInclude(r => r.User)
-                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
-                    .ThenInclude(r => r.ReviewedBy)
                 .Where(o =>
                     destinationIds.Contains(o.DestinationId) ||
                     (o.Locality != null && destinationIds.Contains(o.Locality.DestinationId)))
+                .AsNoTracking()
                 .AsSplitQuery()
                 .AsQueryable();
 
@@ -629,7 +617,7 @@ namespace TuristickiVodic.Services.Services
 
         public async Task<TouristObjectDto?> GetByIdAsync(int id, string lang = "sr")
         {
-            var obj = await LoadObjectAsync(id);
+            var obj = await LoadObjectReadOnlyAsync(id);
             if (obj == null)
                 return null;
 
@@ -642,25 +630,27 @@ namespace TuristickiVodic.Services.Services
 
             var dto = _mapper.Map<TouristObjectDto>(obj);
             await ApplyTranslationsAsync(dto, obj, lang);
+            await ApplyReviewTranslationsAsync(dto.Reviews, lang, true);
             await ApplyPendingDeletionRequestFlagsAsync(dto);
             return dto;
         }
 
         public async Task<TouristObjectDto?> GetMineByIdAsync(int id, int userId, string lang = "sr")
         {
-            var obj = await LoadObjectAsync(id);
+            var obj = await LoadObjectReadOnlyAsync(id);
             if (obj == null || obj.CreatedByUserId != userId)
                 return null;
 
             var dto = _mapper.Map<TouristObjectDto>(obj);
             await ApplyTranslationsAsync(dto, obj, lang);
+            await ApplyReviewTranslationsAsync(dto.Reviews, lang, true);
             await ApplyPendingDeletionRequestFlagsAsync(dto);
             return dto;
         }
 
         public async Task<TouristObjectDto?> GetForManagerByIdAsync(int id, int userId, string lang = "sr")
         {
-            var obj = await LoadObjectAsync(id);
+            var obj = await LoadObjectReadOnlyAsync(id);
             if (obj == null)
                 return null;
 
@@ -674,6 +664,7 @@ namespace TuristickiVodic.Services.Services
 
             var dto = _mapper.Map<TouristObjectDto>(obj);
             await ApplyTranslationsAsync(dto, obj, lang);
+            await ApplyReviewTranslationsAsync(dto.Reviews, lang, true);
             await ApplyPendingDeletionRequestFlagsAsync(dto);
             return dto;
         }
@@ -928,6 +919,25 @@ namespace TuristickiVodic.Services.Services
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
+        private async Task<TouristObject> LoadObjectReadOnlyAsync(int id)
+        {
+            return await _context.Objects
+                .AsNoTracking()
+                .Include(o => o.ObjectType)
+                .Include(o => o.Destination)
+                    .ThenInclude(d => d.Region)
+                .Include(o => o.Locality)
+                    .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
+                .Include(o => o.Images)
+                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
+                    .ThenInclude(r => r.User)
+                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
+                    .ThenInclude(r => r.ReviewedBy)
+                .AsSplitQuery()
+                .FirstOrDefaultAsync(o => o.Id == id);
+        }
+
         private static Point? CreatePoint(double? longitude, double? latitude)
         {
             if (!longitude.HasValue || !latitude.HasValue) return null;
@@ -1150,23 +1160,69 @@ namespace TuristickiVodic.Services.Services
                 if (!objectsById.TryGetValue(dto.Id, out var obj))
                     continue;
 
-                await ApplyTranslationsAsync(dto, obj, normalizedLang);
+                await ApplyTranslationsAsync(dto, obj, normalizedLang, false);
             }
         }
 
-        private async Task ApplyTranslationsAsync(TouristObjectDto dto, TouristObject obj, string? lang)
+        private async Task ApplyTranslationsAsync(TouristObjectDto dto, TouristObject obj, string? lang, bool createMissing = true)
         {
             var normalizedLang = NormalizeLanguage(lang);
 
             if (normalizedLang == "sr" || normalizedLang == "me")
                 return;
 
-            dto.Description = await _translationService.GetTextAsync(
+            dto.Description = createMissing
+                ? await _translationService.GetOrCreateTextAsync(
                 "Object",
                 obj.Id,
                 "Description",
-                obj.Description,
+                obj.Description ?? string.Empty,
+                normalizedLang)
+                : await _translationService.GetTextAsync(
+                "Object",
+                obj.Id,
+                "Description",
+                obj.Description ?? string.Empty,
                 normalizedLang);
+
+            if (!string.IsNullOrWhiteSpace(obj.CuisineType))
+            {
+                dto.CuisineType = createMissing
+                    ? await _translationService.GetOrCreateTextAsync(
+                    "Object",
+                    obj.Id,
+                    "CuisineType",
+                    obj.CuisineType,
+                    normalizedLang)
+                    : await _translationService.GetTextAsync(
+                    "Object",
+                    obj.Id,
+                    "CuisineType",
+                    obj.CuisineType,
+                    normalizedLang);
+            }
+
+            if (obj.ObjectType != null && !string.IsNullOrWhiteSpace(obj.ObjectType.Name))
+            {
+                dto.ObjectTypeName = createMissing
+                    ? await _translationService.GetOrCreateTextAsync(
+                    "ObjectType",
+                    obj.ObjectType.Id,
+                    "Name",
+                    obj.ObjectType.Name,
+                    normalizedLang)
+                    : await _translationService.GetTextAsync(
+                    "ObjectType",
+                    obj.ObjectType.Id,
+                    "Name",
+                    obj.ObjectType.Name,
+                    normalizedLang);
+            }
+
+            if (obj.Amenities != null && obj.Amenities.Length > 0)
+            {
+                dto.Amenities = await TranslateAmenityValuesAsync(obj.Id, obj.Amenities, normalizedLang, createMissing);
+            }
 
             // Nazive realnih objekata najčešće ne prevodimo.
             // Ako ipak želiš da prevodiš Name, odkomentariši ovo:
@@ -1185,6 +1241,55 @@ namespace TuristickiVodic.Services.Services
             return string.IsNullOrWhiteSpace(lang)
                 ? "sr"
                 : lang.Trim().ToLower();
+        }
+
+        private async Task<string[]> TranslateAmenityValuesAsync(int objectId, string[] amenities, string lang, bool createMissing)
+        {
+            var translated = new List<string>(amenities.Length);
+
+            for (var index = 0; index < amenities.Length; index++)
+            {
+                var value = amenities[index];
+                if (string.IsNullOrWhiteSpace(value))
+                    continue;
+
+                translated.Add(createMissing
+                    ? await _translationService.GetOrCreateTextAsync(
+                        "Object",
+                        objectId,
+                        $"Amenity:{index}",
+                        value,
+                        lang)
+                    : await _translationService.GetTextAsync(
+                        "Object",
+                        objectId,
+                        $"Amenity:{index}",
+                        value,
+                        lang));
+            }
+
+            return translated.ToArray();
+        }
+
+        private async Task ApplyReviewTranslationsAsync(List<TouristObjectReviewDto> reviews, string? lang, bool createMissing)
+        {
+            var normalizedLang = NormalizeLanguage(lang);
+            if (normalizedLang == "sr" || normalizedLang == "me" || reviews.Count == 0)
+                return;
+
+            foreach (var review in reviews)
+            {
+                review.Text = createMissing
+                    ? await _translationService.GetOrCreateTextAsync("Review", review.Id, "Text", review.Text, normalizedLang)
+                    : await _translationService.GetTextAsync("Review", review.Id, "Text", review.Text, normalizedLang);
+
+                if (!string.IsNullOrWhiteSpace(review.CreatorResponse))
+                {
+                    review.CreatorResponse = createMissing
+                        ? await _translationService.GetOrCreateTextAsync("Review", review.Id, "CreatorResponse", review.CreatorResponse, normalizedLang)
+                        : await _translationService.GetTextAsync("Review", review.Id, "CreatorResponse", review.CreatorResponse, normalizedLang);
+                }
+            }
         }
 
         private async Task ApplyPendingDeletionRequestFlagsAsync(List<TouristObjectDto> items)

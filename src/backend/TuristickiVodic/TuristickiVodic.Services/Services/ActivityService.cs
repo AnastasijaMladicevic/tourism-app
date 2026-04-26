@@ -13,11 +13,13 @@ namespace TuristickiVodic.Services.Services
     {
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
+        private readonly ITranslationService _translationService;
 
-        public ActivityService(AppDbContext context, IMapper mapper)
+        public ActivityService(AppDbContext context, IMapper mapper, ITranslationService? translationService = null)
         {
             _context = context;
             _mapper = mapper;
+            _translationService = translationService ?? NullTranslationService.Instance;
         }
 
 
@@ -43,6 +45,7 @@ namespace TuristickiVodic.Services.Services
                 .Where(a => a.Status == ContentStatus.Approved)
                 .Where(a => a.IsActive)
                 .Where(a => a.Images.Any(i => i.IsMain))
+                .AsNoTracking()
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.Type))
@@ -85,6 +88,7 @@ namespace TuristickiVodic.Services.Services
                 .ToListAsync();
 
             var mappedItems = _mapper.Map<List<ActivityDto>>(items);
+            await ApplyTranslationsAsync(mappedItems, items, query.Lang);
             await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
 
             return new PagedResultDto<ActivityDto>
@@ -121,6 +125,7 @@ namespace TuristickiVodic.Services.Services
                 .Where(a => a.IsActive)
                 .Where(a => a.Geolocation != null)
                 .Where(a => a.Images.Any(i => i.IsMain))
+                .AsNoTracking()
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.Type))
@@ -185,6 +190,11 @@ namespace TuristickiVodic.Services.Services
                 })
                 .ToList();
 
+            await ApplyTranslationsAsync(items, nearbyActivities
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .Select(x => x.Activity)
+                .ToList(), query.Lang);
             await ApplyPendingDeletionRequestFlagsAsync(items);
 
             return new PagedResultDto<ActivityDto>
@@ -218,6 +228,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.Object)
                 .Include(a => a.Images)
                 .Where(a => a.CreatedByUserId == userId)
+                .AsNoTracking()
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.Type))
@@ -257,6 +268,7 @@ namespace TuristickiVodic.Services.Services
                 .ToListAsync();
 
             var mappedItems = _mapper.Map<List<ActivityDto>>(items);
+            await ApplyTranslationsAsync(mappedItems, items, query.Lang);
             await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
 
             return new PagedResultDto<ActivityDto>
@@ -294,6 +306,7 @@ namespace TuristickiVodic.Services.Services
                 .Where(a =>
                     (a.DestinationId.HasValue && destinationIds.Contains(a.DestinationId.Value)) ||
                     (!a.DestinationId.HasValue && a.Locality != null && destinationIds.Contains(a.Locality.DestinationId)))
+                .AsNoTracking()
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.Type))
@@ -335,6 +348,7 @@ namespace TuristickiVodic.Services.Services
                 .ToListAsync();
 
             var mappedItems = _mapper.Map<List<ActivityDto>>(items);
+            await ApplyTranslationsAsync(mappedItems, items, query.Lang);
             await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
 
             return new PagedResultDto<ActivityDto>
@@ -347,7 +361,7 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
-        public async Task<ActivityDto?> GetByIdAsync(int id)
+        public async Task<ActivityDto?> GetByIdAsync(int id, string lang = "sr")
         {
             var activity = await _context.Activities
                 .Include(a => a.ActivityType)
@@ -371,11 +385,12 @@ namespace TuristickiVodic.Services.Services
                 return null;
 
             var dto = _mapper.Map<ActivityDto>(activity);
+            await ApplyTranslationsAsync(dto, activity, lang);
             await ApplyPendingDeletionRequestFlagsAsync(dto);
             return dto;
         }
 
-        public async Task<ActivityDto?> GetMineByIdAsync(int id, int userId)
+        public async Task<ActivityDto?> GetMineByIdAsync(int id, int userId, string lang = "sr")
         {
             var activity = await _context.Activities
                 .Include(a => a.ActivityType)
@@ -392,11 +407,12 @@ namespace TuristickiVodic.Services.Services
                 return null;
 
             var dto = _mapper.Map<ActivityDto>(activity);
+            await ApplyTranslationsAsync(dto, activity, lang);
             await ApplyPendingDeletionRequestFlagsAsync(dto);
             return dto;
         }
 
-        public async Task<ActivityDto?> GetForManagerByIdAsync(int id, int userId)
+        public async Task<ActivityDto?> GetForManagerByIdAsync(int id, int userId, string lang = "sr")
         {
             var activity = await _context.Activities
                 .Include(a => a.ActivityType)
@@ -421,6 +437,7 @@ namespace TuristickiVodic.Services.Services
                 return null;
 
             var dto = _mapper.Map<ActivityDto>(activity);
+            await ApplyTranslationsAsync(dto, activity, lang);
             await ApplyPendingDeletionRequestFlagsAsync(dto);
             return dto;
         }
@@ -892,6 +909,68 @@ namespace TuristickiVodic.Services.Services
                 return query.Where(_ => false);
 
             return query.Where(a => a.Status == parsedStatus);
+        }
+
+        private async Task ApplyTranslationsAsync(List<ActivityDto> dtos, List<Activity> activities, string? lang)
+        {
+            if (dtos.Count == 0 || activities.Count == 0)
+                return;
+
+            var normalizedLang = NormalizeLanguage(lang);
+            if (normalizedLang == "sr" || normalizedLang == "me")
+                return;
+
+            var activitiesById = activities.ToDictionary(a => a.Id);
+            foreach (var dto in dtos)
+            {
+                if (activitiesById.TryGetValue(dto.Id, out var activity))
+                    await ApplyTranslationsAsync(dto, activity, normalizedLang, false);
+            }
+        }
+
+        private async Task ApplyTranslationsAsync(ActivityDto dto, Activity activity, string? lang, bool createMissing = true)
+        {
+            var normalizedLang = NormalizeLanguage(lang);
+            if (normalizedLang == "sr" || normalizedLang == "me")
+                return;
+
+            dto.Description = createMissing
+                ? await _translationService.GetOrCreateTextAsync(
+                "Activity",
+                activity.Id,
+                "Description",
+                activity.Description ?? string.Empty,
+                normalizedLang)
+                : await _translationService.GetTextAsync(
+                "Activity",
+                activity.Id,
+                "Description",
+                activity.Description ?? string.Empty,
+                normalizedLang);
+
+            if (activity.ActivityType != null && !string.IsNullOrWhiteSpace(activity.ActivityType.Name))
+            {
+                dto.ActivityTypeName = createMissing
+                    ? await _translationService.GetOrCreateTextAsync(
+                    "ActivityType",
+                    activity.ActivityType.Id,
+                    "Name",
+                    activity.ActivityType.Name,
+                    normalizedLang)
+                    : await _translationService.GetTextAsync(
+                    "ActivityType",
+                    activity.ActivityType.Id,
+                    "Name",
+                    activity.ActivityType.Name,
+                    normalizedLang);
+            }
+        }
+
+        private static string NormalizeLanguage(string? lang)
+        {
+            return string.IsNullOrWhiteSpace(lang)
+                ? "sr"
+                : lang.Trim().ToLowerInvariant();
         }
     }
 }

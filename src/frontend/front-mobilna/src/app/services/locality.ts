@@ -44,6 +44,11 @@ export class LocalityService {
     private readonly activeRegionService: ActiveRegionService,
   ) {}
 
+  private addLang(params: HttpParams): HttpParams {
+    const lang = localStorage.getItem('appLanguage') || 'sr';
+    return params.set('Lang', lang);
+  }
+
   getAll(
     query?: LocalityQueryParams,
     options?: RegionRequestOptions,
@@ -59,10 +64,13 @@ export class LocalityService {
       });
     }
 
+    params = this.addLang(params);
     return this.http.get<LocalityDto[]>(this.url, { params });
   }
 
   getById(id: number): Observable<LocalityDto> {
-    return this.http.get<LocalityDto>(`${this.url}/${id}`);
+    let params = new HttpParams();
+    params = this.addLang(params);
+    return this.http.get<LocalityDto>(`${this.url}/${id}`, { params });
   }
 }

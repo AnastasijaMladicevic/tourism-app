@@ -12,16 +12,19 @@ namespace TuristickiVodic.Services
     {
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
+        private readonly ITranslationService _translationService;
 
-        public LocalityService(AppDbContext context, IMapper mapper)
+        public LocalityService(AppDbContext context, IMapper mapper, ITranslationService? translationService = null)
         {
             _context = context;
             _mapper = mapper;
+            _translationService = translationService ?? NullTranslationService.Instance;
         }
 
         public async Task<IEnumerable<LocalityDto>> GetAllAsync()
         {
             var localities = await _context.Localities
+                .AsNoTracking()
                 .Include(l => l.Destination)
                     .ThenInclude(d => d.Region)
                 .Include(l => l.LocalityType)
@@ -33,9 +36,10 @@ namespace TuristickiVodic.Services
             return _mapper.Map<IEnumerable<LocalityDto>>(localities);
         }
 
-        public async Task<LocalityDto?> GetByIdAsync(int id)
+        public async Task<LocalityDto?> GetByIdAsync(int id, string lang = "sr")
         {
             var locality = await _context.Localities
+                .AsNoTracking()
                 .Include(l => l.Destination)
                     .ThenInclude(d => d.Region)
                 .Include(l => l.LocalityType)
@@ -51,7 +55,9 @@ namespace TuristickiVodic.Services
             if (!locality.Images.Any(i => i.IsMain))
                 return null;
 
-            return _mapper.Map<LocalityDto>(locality);
+            var dto = _mapper.Map<LocalityDto>(locality);
+            await ApplyTranslationsAsync(dto, locality, lang);
+            return dto;
         }
 
         public async Task<LocalityDto> CreateAsync(CreateLocalityDto dto, int userId, string roleName)
@@ -281,6 +287,7 @@ namespace TuristickiVodic.Services
                 .Include(l => l.Images)
                 .Where(l => l.IsActive)
                 .Where(l => l.Images.Any(i => i.IsMain))
+                .AsNoTracking()
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.Destination))
@@ -323,6 +330,7 @@ namespace TuristickiVodic.Services
                 .ToListAsync();
 
             var mappedItems = _mapper.Map<List<LocalityDto>>(items);
+            await ApplyTranslationsAsync(mappedItems, items, query.Lang);
 
             return new PagedResultDto<LocalityDto>
             {
@@ -353,6 +361,7 @@ namespace TuristickiVodic.Services
                 .Where(l => l.IsActive)
                 .Where(l => l.Geolocation != null)
                 .Where(l => l.Images.Any(i => i.IsMain))
+                .AsNoTracking()
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.Destination))
@@ -417,6 +426,11 @@ namespace TuristickiVodic.Services
                 })
                 .ToList();
 
+            await ApplyTranslationsAsync(items, nearbyLocalities
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .Select(x => x.Locality)
+                .ToList(), query.Lang);
             return new PagedResultDto<LocalityDto>
             {
                 Items = items,
@@ -501,5 +515,67 @@ namespace TuristickiVodic.Services
         }
 
         private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180d;
+
+        private async Task ApplyTranslationsAsync(List<LocalityDto> dtos, List<Locality> localities, string? lang)
+        {
+            if (dtos.Count == 0 || localities.Count == 0)
+                return;
+
+            var normalizedLang = NormalizeLanguage(lang);
+            if (normalizedLang == "sr" || normalizedLang == "me")
+                return;
+
+            var localitiesById = localities.ToDictionary(l => l.Id);
+            foreach (var dto in dtos)
+            {
+                if (localitiesById.TryGetValue(dto.Id, out var locality))
+                    await ApplyTranslationsAsync(dto, locality, normalizedLang, false);
+            }
+        }
+
+        private async Task ApplyTranslationsAsync(LocalityDto dto, Locality locality, string? lang, bool createMissing = true)
+        {
+            var normalizedLang = NormalizeLanguage(lang);
+            if (normalizedLang == "sr" || normalizedLang == "me")
+                return;
+
+            dto.Description = createMissing
+                ? await _translationService.GetOrCreateTextAsync(
+                "Locality",
+                locality.Id,
+                "Description",
+                locality.Description ?? string.Empty,
+                normalizedLang)
+                : await _translationService.GetTextAsync(
+                "Locality",
+                locality.Id,
+                "Description",
+                locality.Description ?? string.Empty,
+                normalizedLang);
+
+            if (locality.LocalityType != null && !string.IsNullOrWhiteSpace(locality.LocalityType.Name))
+            {
+                dto.LocalityTypeName = createMissing
+                    ? await _translationService.GetOrCreateTextAsync(
+                    "LocalityType",
+                    locality.LocalityType.Id,
+                    "Name",
+                    locality.LocalityType.Name,
+                    normalizedLang)
+                    : await _translationService.GetTextAsync(
+                    "LocalityType",
+                    locality.LocalityType.Id,
+                    "Name",
+                    locality.LocalityType.Name,
+                    normalizedLang);
+            }
+        }
+
+        private static string NormalizeLanguage(string? lang)
+        {
+            return string.IsNullOrWhiteSpace(lang)
+                ? "sr"
+                : lang.Trim().ToLowerInvariant();
+        }
     }
 }

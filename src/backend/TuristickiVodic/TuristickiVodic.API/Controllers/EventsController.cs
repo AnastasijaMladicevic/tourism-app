@@ -58,7 +58,7 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(int id, [FromQuery] string lang = "sr")
         {
             if (User.Identity?.IsAuthenticated == true)
             {
@@ -67,19 +67,19 @@ namespace TuristickiVodic.API.Controllers
 
                 if (string.Equals(roleName, "ContentCreator", StringComparison.OrdinalIgnoreCase))
                 {
-                    var ownEvent = await _eventService.GetMineByIdAsync(id, userId);
+                    var ownEvent = await _eventService.GetMineByIdAsync(id, userId, lang);
                     if (ownEvent != null)
                         return Ok(ownEvent);
                 }
                 else if (string.Equals(roleName, "Manager", StringComparison.OrdinalIgnoreCase))
                 {
-                    var managedEvent = await _eventService.GetForManagerByIdAsync(id, userId);
+                    var managedEvent = await _eventService.GetForManagerByIdAsync(id, userId, lang);
                     if (managedEvent != null)
                         return Ok(managedEvent);
                 }
             }
 
-            var ev = await _eventService.GetByIdAsync(id);
+            var ev = await _eventService.GetByIdAsync(id, lang);
             if (ev == null) return NotFound();
             return Ok(ev);
         }

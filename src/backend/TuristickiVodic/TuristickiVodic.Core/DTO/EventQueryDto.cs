@@ -12,6 +12,8 @@
 
         public string? Search { get; set; }
 
+        public string Lang { get; set; } = "sr";
+
         public string? SortBy { get; set; } = "startDate";
         public string? SortOrder { get; set; } = "asc";
 

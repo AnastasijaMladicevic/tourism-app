@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { forkJoin } from 'rxjs';
 
 import { AuthService } from '../../services/auth';
-import { ImageDto, ImageService } from '../../services/image';
+import { ImageDto } from '../../services/image';
 import { ObjectDto, ObjectImageDto, ObjectService, PagedResultDto } from '../../services/object';
 import { ReviewDto } from '../../services/review';
 import { MapComponent } from '../../shared/components/map/map';
@@ -40,7 +40,6 @@ export class ObjectDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private objectService: ObjectService,
-    private imageService: ImageService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -50,15 +49,14 @@ export class ObjectDetailComponent implements OnInit {
 
     forkJoin({
       object: this.objectService.getById(id),
-      images: this.imageService.getForObject(id),
     }).subscribe({
-      next: ({ object, images }) => {
+      next: ({ object }) => {
         const normalizedObject = this.normalizeObject(object);
 
         this.object = normalizedObject;
-        this.images = images || [];
+        this.images = ((normalizedObject.images as unknown) as ImageDto[]) || [];
         this.reviews = normalizedObject.reviews || [];
-        this.mainImage = this.getMainImage(images);
+        this.mainImage = this.getMainImage(this.images);
 
         this.loadNearbyObjects(normalizedObject);
       },
@@ -135,6 +133,8 @@ export class ObjectDetailComponent implements OnInit {
       address: (dto['address'] ?? dto['Address'] ?? undefined) as string | undefined,
       phoneNumber: (dto['phoneNumber'] ?? dto['PhoneNumber'] ?? undefined) as string | undefined,
       website: (dto['website'] ?? dto['Website'] ?? undefined) as string | undefined,
+      menuUrl: (dto['menuUrl'] ?? dto['MenuUrl'] ?? undefined) as string | undefined,
+      cuisineType: (dto['cuisineType'] ?? dto['CuisineType'] ?? undefined) as string | undefined,
       workingHours: (dto['workingHours'] ?? dto['WorkingHours'] ?? undefined) as string | undefined,
       price: (dto['price'] ?? dto['Price'] ?? undefined) as Int16Array | undefined,
       amenities: ((dto['amenities'] ?? dto['Amenities'] ?? []) as []) || [],

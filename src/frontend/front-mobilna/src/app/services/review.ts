@@ -10,6 +10,10 @@ export interface ReviewDto {
   userFullName: string;
   objectId: number;
   objectName: string;
+  objectTypeName?: string;
+  localityName?: string | null;
+  destinationName?: string | null;
+  address?: string | null;
   rating: number;
   text: string;
   creatorResponse?: string | null;
@@ -32,6 +36,14 @@ export interface ReviewQueryParams {
   sortOrder?: string;
 }
 
+export interface PagedReviewResultDto<T> {
+  items: T[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ReviewService {
   private readonly baseUrl = `${environment.apiUrl}/reviews`;
@@ -41,14 +53,21 @@ export class ReviewService {
     private readonly activeRegionService: ActiveRegionService,
   ) {}
 
+  private addLanguage(params: HttpParams): HttpParams {
+    const lang = localStorage.getItem('appLanguage') || 'sr';
+    return params.set('LanguageCode', lang);
+  }
+
   getForObject(objectId: number): Observable<ReviewDto[]> {
-    return this.http.get<ReviewDto[]>(`${this.baseUrl}/object/${objectId}`);
+    let params = new HttpParams();
+    params = this.addLanguage(params);
+    return this.http.get<ReviewDto[]>(`${this.baseUrl}/object/${objectId}`, { params });
   }
 
   getAll(
     query?: ReviewQueryParams,
     options?: RegionRequestOptions,
-  ): Observable<ReviewDto[]> {
+  ): Observable<PagedReviewResultDto<ReviewDto>> {
     const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options);
     let params = new HttpParams();
 
@@ -60,11 +79,33 @@ export class ReviewService {
       });
     }
 
-    return this.http.get<ReviewDto[]>(this.baseUrl, { params });
+    params = this.addLanguage(params);
+    return this.http.get<PagedReviewResultDto<ReviewDto>>(this.baseUrl, { params });
+  }
+
+  getMine(
+    query?: ReviewQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<PagedReviewResultDto<ReviewDto>> {
+    const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options);
+    let params = new HttpParams();
+
+    if (effectiveQuery) {
+      Object.entries(effectiveQuery).forEach(([key, value]) => {
+        if (value != null && value !== '') {
+          params = params.set(key, String(value));
+        }
+      });
+    }
+
+    params = this.addLanguage(params);
+    return this.http.get<PagedReviewResultDto<ReviewDto>>(`${this.baseUrl}/my`, { params });
   }
 
   getById(id: number): Observable<ReviewDto> {
-    return this.http.get<ReviewDto>(`${this.baseUrl}/${id}`);
+    let params = new HttpParams();
+    params = this.addLanguage(params);
+    return this.http.get<ReviewDto>(`${this.baseUrl}/${id}`, { params });
   }
 
   create(dto: any): Observable<ReviewDto> {

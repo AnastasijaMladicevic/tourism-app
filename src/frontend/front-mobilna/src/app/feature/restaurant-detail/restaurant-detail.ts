@@ -5,10 +5,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 import { ObjectService } from '../../services/object';
-import { ImageService, ImageDto } from '../../services/image';
+import { ImageDto } from '../../services/image';
 import { AuthService } from '../../services/auth';
 import { forkJoin } from 'rxjs';
-import { ReviewService, ReviewDto } from '../../services/review';
+import { ReviewDto } from '../../services/review';
 import { MapComponent } from '../../shared/components/map/map';
 
 @Component({
@@ -34,8 +34,6 @@ export class RestaurantDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private objectService: ObjectService,
-    private imageService: ImageService,
-    private reviewService: ReviewService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -45,13 +43,12 @@ export class RestaurantDetailComponent implements OnInit {
 
   forkJoin({
     object: this.objectService.getById(id),
-    images: this.imageService.getForObject(id),   
   }).subscribe({
-    next: ({ object, images, /*reviews*/ }) => {
+    next: ({ object }) => {
       this.object = object;
-      this.images = images || [];
+      this.images = (object.images as ImageDto[]) || [];
       this.reviews = object.reviews || [];               
-      this.mainImage = this.getMainImage(images);
+      this.mainImage = this.getMainImage(this.images);
       this.isLoading = false;
       this.cdr.detectChanges();
     },

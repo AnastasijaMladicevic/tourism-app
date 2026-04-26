@@ -13,7 +13,7 @@ namespace TuristickiVodic.Core.DTO
         public int? MaxRating { get; set; }
         public bool? HasResponse { get; set; }
         public string? Status { get; set; }
-
+        public string? LanguageCode { get; set; }
         public string? SortBy { get; set; } = "createdAt";
         public string? SortOrder { get; set; } = "desc";
     }

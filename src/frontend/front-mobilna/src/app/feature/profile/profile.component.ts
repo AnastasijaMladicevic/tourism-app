@@ -176,8 +176,8 @@ export class ProfileComponent implements OnInit {
         map((items) => items.length),
         catchError(() => of(0)),
       ),
-      reviews: this.reviewService.getAll().pipe(
-        map((items) => this.countOwnReviews(items, currentUserId)),
+      reviews: this.reviewService.getMine({ page: 1, pageSize: 1 }).pipe(
+        map((items) => this.readTotalCount(items)),
         catchError(() => of(0)),
       ),
     }).subscribe(({ favorites, reviews }) => {
@@ -193,7 +193,21 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  private countOwnReviews(items: ReviewDto[], currentUserId: number): number {
-    return items.filter((item) => Number(item.userId) === currentUserId).length;
+  private readTotalCount(raw: unknown): number {
+    if (!raw || typeof raw !== 'object') {
+      return 0;
+    }
+
+    const obj = raw as Record<string, unknown>;
+    const totalCount = obj['totalCount'] ?? obj['TotalCount'];
+    if (typeof totalCount === 'number') {
+      return totalCount;
+    }
+
+    if (Array.isArray(raw)) {
+      return (raw as ReviewDto[]).length;
+    }
+
+    return 0;
   }
 }

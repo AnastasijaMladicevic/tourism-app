@@ -39,7 +39,7 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(int id, [FromQuery] string lang = "sr")
         {
             int? userId = null;
             string? role = null;
@@ -53,7 +53,7 @@ namespace TuristickiVodic.API.Controllers
                 role = User.FindFirst(ClaimTypes.Role)?.Value;
             }
 
-            var destination = await _service.GetByIdAsync(id, userId, role);
+            var destination = await _service.GetByIdAsync(id, userId, role, lang);
             if (destination == null)
                 return NotFound();
 
