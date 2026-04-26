@@ -35,6 +35,15 @@ export interface ActivityDto {
   updatedAt: string;
 }
 
+export interface ActivityImageDto {
+  id: number;
+  url: string;
+  altText?: string;
+  isMain: boolean;
+  activityId?: number;
+  createdAt: string;
+}
+
 export interface ActivityQueryDto {
   type?: string;
   destination?: string;
@@ -133,6 +142,10 @@ export class ActivitiesService {
 
   getById(id: number): Observable<ActivityDto> {
     return this.http.get<ActivityDto>(`${this.apiUrl}/${id}`);
+  }
+
+  getImages(id: number): Observable<ActivityImageDto[]> {
+    return this.http.get<ActivityImageDto[]>(`${this.apiUrl}/${id}/images`);
   }
 
   update(id: number, dto: UpdateActivityDto): Observable<ActivityDto> {

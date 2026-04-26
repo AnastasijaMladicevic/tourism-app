@@ -1,11 +1,24 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  DestroyRef,
+  ElementRef,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  inject,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, forkJoin, map, of, switchMap } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import * as L from 'leaflet';
 import {
   ActivitiesService,
   ActivityTypeOption,
+  ActivityImageDto,
   CreateActivityDto,
   UpdateActivityDto,
   LocalityOption,
@@ -19,6 +32,26 @@ interface ObjectOption {
   name: string;
   destinationId?: number;
   destinationName?: string;
+}
+
+interface NominatimAddress {
+  city?: string;
+  town?: string;
+  village?: string;
+  municipality?: string;
+  county?: string;
+  state?: string;
+  road?: string;
+  pedestrian?: string;
+  footway?: string;
+  residential?: string;
+  path?: string;
+  neighbourhood?: string;
+}
+
+interface NominatimReverseResponse {
+  address?: NominatimAddress;
+  display_name?: string;
 }
 
 interface DraftPayload {
@@ -46,15 +79,25 @@ interface DraftPayload {
   templateUrl: './activity-create.component.html',
   styleUrl: './activity-create.component.css'
 })
-export class ActivityCreateComponent implements OnInit {
+export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly activitiesService = inject(ActivitiesService);
   private readonly destinationService = inject(DestinationService);
   private readonly eventService = inject(EventService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly ngZone = inject(NgZone);
+
+  @ViewChild('activityMap') private activityMap?: ElementRef<HTMLDivElement>;
 
   private readonly draftKey = 'content-creator:add-activity-draft';
+  private readonly defaultMapCenter: L.LatLngExpression = [42.424, 18.771];
+  private readonly defaultMapZoom = 13;
+
+  private map: L.Map | null = null;
+  private mapMarker: L.Marker | null = null;
+  private geocodeRequestId = 0;
 
   form = this.fb.group(
     {
@@ -93,6 +136,14 @@ export class ActivityCreateComponent implements OnInit {
   destinations: DestinationDto[] = [];
   localities: LocalityOption[] = [];
   objects: ObjectOption[] = [];
+  private loadedActivity: ActivityDto | null = null;
+
+  locationDetails = {
+    city: '-',
+    street: '-',
+    fullAddress: '-',
+    loading: false
+  };
 
   pendingImageUrl = '';
   imageUrls: string[] = [];
@@ -117,6 +168,25 @@ export class ActivityCreateComponent implements OnInit {
     this.form.controls.destinationId.valueChanges.subscribe(() => {
       this.syncDependentSelections();
     });
+
+    this.form.controls.latitude.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.syncMapFromForm());
+
+    this.form.controls.longitude.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.syncMapFromForm());
+  }
+
+  ngAfterViewInit(): void {
+    this.initializeMap();
+    this.syncMapFromForm();
+  }
+
+  ngOnDestroy(): void {
+    this.map?.remove();
+    this.map = null;
+    this.mapMarker = null;
   }
 
   get pageTitle(): string {
@@ -143,28 +213,6 @@ export class ActivityCreateComponent implements OnInit {
     }
 
     return this.objects.filter((objectItem) => !objectItem.destinationId || objectItem.destinationId === destinationId);
-  }
-
-  get mapPinLeft(): string {
-    const longitude = this.form.controls.longitude.value;
-    if (longitude == null) {
-      return '55%';
-    }
-
-    const normalized = ((longitude + 180) / 360) * 100;
-    const clamped = Math.min(94, Math.max(6, normalized));
-    return `${clamped.toFixed(2)}%`;
-  }
-
-  get mapPinTop(): string {
-    const latitude = this.form.controls.latitude.value;
-    if (latitude == null) {
-      return '48%';
-    }
-
-    const normalized = ((90 - latitude) / 180) * 100;
-    const clamped = Math.min(94, Math.max(6, normalized));
-    return `${clamped.toFixed(2)}%`;
   }
 
   addImageUrl(): void {
@@ -355,6 +403,7 @@ export class ActivityCreateComponent implements OnInit {
       this.destinations = destinations;
       this.localities = localities;
       this.objects = objects;
+      this.syncEditModeOptions();
       this.syncDependentSelections();
       this.isLoadingOptions = false;
     });
@@ -385,6 +434,7 @@ export class ActivityCreateComponent implements OnInit {
       }))
       .subscribe({
         next: (activity) => {
+          this.loadedActivity = activity;
           this.form.patchValue({
             name: activity.name,
             description: activity.description ?? '',
@@ -399,6 +449,10 @@ export class ActivityCreateComponent implements OnInit {
             longitude: activity.longitude ?? null,
             isVisible: activity.isActive
           });
+
+          this.syncEditModeOptions();
+
+          this.loadActivityImages(activity.id);
 
         },
         error: (error: unknown) => {
@@ -454,6 +508,76 @@ export class ActivityCreateComponent implements OnInit {
     }
   }
 
+  private loadActivityImages(activityId: number): void {
+    this.activitiesService.getImages(activityId)
+      .pipe(catchError(() => of([] as ActivityImageDto[])))
+      .subscribe((images) => {
+        this.imageUrls = images
+          .slice()
+          .sort((first, second) => Number(second.isMain) - Number(first.isMain) || first.id - second.id)
+          .map((image) => image.url)
+          .filter((url) => typeof url === 'string' && url.length > 0);
+      });
+  }
+
+  private syncEditModeOptions(): void {
+    if (!this.loadedActivity) {
+      return;
+    }
+
+    const activity = this.loadedActivity;
+
+    if (activity.destinationId && activity.destinationName) {
+      const hasDestination = this.destinations.some((destination) => destination.id === activity.destinationId);
+      if (!hasDestination) {
+        this.destinations = [
+          {
+            id: activity.destinationId,
+            name: activity.destinationName,
+            description: activity.destinationName,
+            isActive: true,
+            destinationTypeId: 0,
+            destinationTypeName: '',
+            regionId: activity.regionId,
+            regionName: activity.regionName,
+            regionCode: activity.regionCode
+          },
+          ...this.destinations
+        ];
+      }
+    }
+
+    if (activity.localityId && activity.localityName) {
+      const hasLocality = this.localities.some((locality) => locality.id === activity.localityId);
+      if (!hasLocality) {
+        this.localities = [
+          {
+            id: activity.localityId,
+            name: activity.localityName,
+            destinationId: activity.destinationId ?? 0,
+            destinationName: activity.destinationName ?? ''
+          },
+          ...this.localities
+        ];
+      }
+    }
+
+    if (activity.objectId && activity.objectName) {
+      const hasObject = this.objects.some((objectItem) => objectItem.id === activity.objectId);
+      if (!hasObject) {
+        this.objects = [
+          {
+            id: activity.objectId,
+            name: activity.objectName,
+            destinationId: activity.destinationId ?? undefined,
+            destinationName: activity.destinationName ?? undefined
+          },
+          ...this.objects
+        ];
+      }
+    }
+  }
+
   private isValidHttpUrl(value: string): boolean {
     try {
       const parsed = new URL(value);
@@ -497,5 +621,181 @@ export class ActivityCreateComponent implements OnInit {
     const manualTypeId = group.get('fallbackActivityTypeId')?.value as number | null | undefined;
 
     return (selectTypeId ?? manualTypeId) ? null : { activityTypeRequired: true };
+  }
+
+  private initializeMap(): void {
+    if (!this.activityMap || this.map) {
+      return;
+    }
+
+    const initialLat = this.toNumber(this.form.controls.latitude.value);
+    const initialLng = this.toNumber(this.form.controls.longitude.value);
+    const center: L.LatLngExpression = initialLat != null && initialLng != null
+      ? [initialLat, initialLng]
+      : this.defaultMapCenter;
+    const zoom = initialLat != null && initialLng != null ? 15 : this.defaultMapZoom;
+
+    this.map = L.map(this.activityMap.nativeElement, {
+      zoomControl: true,
+      scrollWheelZoom: true,
+      doubleClickZoom: true,
+      dragging: true,
+      touchZoom: true,
+      boxZoom: true,
+      keyboard: true
+    }).setView(center, zoom);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(this.map);
+
+    this.map.on('click', (event: L.LeafletMouseEvent) => {
+      this.ngZone.run(() => this.selectLocation(event.latlng.lat, event.latlng.lng));
+    });
+  }
+
+  private syncMapFromForm(): void {
+    const latitude = this.toNumber(this.form.controls.latitude.value);
+    const longitude = this.toNumber(this.form.controls.longitude.value);
+
+    if (latitude == null || longitude == null) {
+      this.resetLocationDetails();
+      return;
+    }
+
+    this.updateMapMarker(latitude, longitude);
+    this.reverseGeocode(latitude, longitude);
+  }
+
+  private selectLocation(latitude: number, longitude: number): void {
+    this.form.patchValue(
+      {
+        latitude,
+        longitude
+      },
+      { emitEvent: false }
+    );
+
+    this.form.controls.latitude.markAsDirty();
+    this.form.controls.longitude.markAsDirty();
+    this.form.controls.latitude.markAsTouched();
+    this.form.controls.longitude.markAsTouched();
+
+    this.updateMapMarker(latitude, longitude);
+    this.reverseGeocode(latitude, longitude);
+  }
+
+  private updateMapMarker(latitude: number, longitude: number): void {
+    if (!this.map) {
+      return;
+    }
+
+    if (!this.mapMarker) {
+      const markerIcon = L.icon({
+        iconUrl: 'assets/marker-icon.png',
+        iconRetinaUrl: 'assets/marker-icon-2x.png',
+        shadowUrl: 'assets/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      });
+
+      this.mapMarker = L.marker([latitude, longitude], { icon: markerIcon, draggable: false }).addTo(this.map);
+    } else {
+      this.mapMarker.setLatLng([latitude, longitude]);
+    }
+
+    const targetZoom = Math.max(this.map.getZoom(), 15);
+    this.map.flyTo([latitude, longitude], targetZoom, { duration: 0.8 });
+  }
+
+  private reverseGeocode(latitude: number, longitude: number): void {
+    const requestId = ++this.geocodeRequestId;
+    this.locationDetails = {
+      ...this.locationDetails,
+      loading: true
+    };
+
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(latitude)}&lon=${encodeURIComponent(longitude)}&addressdetails=1`;
+
+    fetch(url, {
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error('Reverse geocoding failed')))
+      .then((payload: NominatimReverseResponse) => {
+        if (requestId !== this.geocodeRequestId) {
+          return;
+        }
+
+        const address = payload?.address ?? {};
+        const city = this.pickCity(address);
+        const street = this.pickStreet(address);
+        const fullAddress = payload?.display_name?.trim() || [street, city].filter((part) => part && part !== '-').join(', ') || '-';
+
+        this.locationDetails = {
+          city,
+          street,
+          fullAddress,
+          loading: false
+        };
+      })
+      .catch(() => {
+        if (requestId !== this.geocodeRequestId) {
+          return;
+        }
+
+        this.locationDetails = {
+          city: '-',
+          street: '-',
+          fullAddress: '-',
+          loading: false
+        };
+      });
+  }
+
+  private resetLocationDetails(): void {
+    this.locationDetails = {
+      city: '-',
+      street: '-',
+      fullAddress: '-',
+      loading: false
+    };
+  }
+
+  private pickCity(address: NominatimAddress): string {
+    return (
+      address.city ||
+      address.town ||
+      address.village ||
+      address.municipality ||
+      address.county ||
+      address.state ||
+      '-'
+    );
+  }
+
+  private pickStreet(address: NominatimAddress): string {
+    return (
+      address.road ||
+      address.pedestrian ||
+      address.footway ||
+      address.residential ||
+      address.path ||
+      address.neighbourhood ||
+      '-'
+    );
+  }
+
+  private toNumber(value: number | string | null | undefined): number | null {
+    if (value == null || value === '') {
+      return null;
+    }
+
+    const parsed = typeof value === 'number' ? value : Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
   }
 }
