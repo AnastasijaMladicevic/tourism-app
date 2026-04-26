@@ -100,10 +100,15 @@ export class LanguageComponent implements OnInit {
         if (!user) return;
         this.user = user;
         const applied = this.normalizeLanguage(user.language);
+
         this.translationService.setLanguage(applied);
+        localStorage.setItem('appLanguage', applied);
+
         this.selectedCode.set(applied);
         this.appliedCode.set(applied);
         this.feedback.set(this.translationService.translate('language.saved'));
+
+        window.location.reload();
       });
   }
 

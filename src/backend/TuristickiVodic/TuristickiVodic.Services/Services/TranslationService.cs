@@ -30,7 +30,7 @@ namespace TuristickiVodic.Services.Services
                 return originalText;
 
             // Crnogorski fallback: ako nema posebnog prevoda, koristi srpski/original.
-            if (languageCode == "me")
+            if (string.IsNullOrWhiteSpace(languageCode) || languageCode == "sr")
                 return originalText;
 
             var translation = await _context.Translations

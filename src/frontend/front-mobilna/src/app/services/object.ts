@@ -99,6 +99,11 @@ export class ObjectService {
     private readonly activeRegionService: ActiveRegionService,
   ) {}
 
+  private addLang(params: HttpParams): HttpParams {
+    const lang = localStorage.getItem('appLanguage') || 'sr';
+    return params.set('Lang', lang);
+}
+
   getAll(
     query?: ObjectQueryParams,
     options?: RegionRequestOptions,
@@ -114,12 +119,19 @@ export class ObjectService {
       });
     }
 
+    // 👉 DODAJ OVO
+    const lang = localStorage.getItem('appLanguage') || 'sr';
+    params = params.set('Lang', lang);
+
     return this.http.get<ObjectDto[]>(this.url, { params });
   }
 
   getById(id: number): Observable<ObjectDto> {
-    return this.http.get<ObjectDto>(`${this.url}/${id}`);
-  }
+    let params = new HttpParams();
+    params = this.addLang(params);
+
+    return this.http.get<ObjectDto>(`${this.url}/${id}`, { params });
+}
 
   getNearby(
     query: NearbyObjectQueryParams,
@@ -144,11 +156,16 @@ export class ObjectService {
 
       params = params.set(key, String(value));
     });
-
+    params = this.addLang(params);
     return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/nearby`, { params });
   }
 
   getByType(typeName: string): Observable<ObjectDto[]> {
-    return this.http.get<ObjectDto[]>(`${this.url}?type=${typeName}`);
-  }
+    let params = new HttpParams()
+      .set('type', typeName);
+
+    params = this.addLang(params);
+
+    return this.http.get<ObjectDto[]>(this.url, { params });
+}
 }
