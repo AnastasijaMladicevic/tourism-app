@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   ElementRef,
@@ -32,6 +33,8 @@ interface ObjectOption {
   name: string;
   destinationId?: number;
   destinationName?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface NominatimAddress {
@@ -88,6 +91,7 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly ngZone = inject(NgZone);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   @ViewChild('activityMap') private activityMap?: ElementRef<HTMLDivElement>;
 
@@ -167,6 +171,15 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
 
     this.form.controls.destinationId.valueChanges.subscribe(() => {
       this.syncDependentSelections();
+      this.applyLocationFromSelection();
+    });
+
+    this.form.controls.localityId.valueChanges.subscribe(() => {
+      this.applyLocationFromSelection();
+    });
+
+    this.form.controls.objectId.valueChanges.subscribe(() => {
+      this.applyLocationFromSelection();
     });
 
     this.form.controls.latitude.valueChanges
@@ -394,7 +407,9 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
           id: item.id,
           name: item.name,
           destinationId: item.destinationId,
-          destinationName: item.destinationName
+          destinationName: item.destinationName,
+          latitude: (item as unknown as { latitude?: number }).latitude,
+          longitude: (item as unknown as { longitude?: number }).longitude
         }))),
         catchError(() => of([]))
       )
@@ -405,8 +420,58 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
       this.objects = objects;
       this.syncEditModeOptions();
       this.syncDependentSelections();
+      this.applyLocationFromSelection();
       this.isLoadingOptions = false;
     });
+  }
+
+  private applyLocationFromSelection(): void {
+    const selectedObjectId = this.form.controls.objectId.value;
+    const selectedLocalityId = this.form.controls.localityId.value;
+    const selectedDestinationId = this.form.controls.destinationId.value;
+
+    const selectedObject = selectedObjectId
+      ? this.objects.find((objectItem) => objectItem.id === selectedObjectId)
+      : undefined;
+
+    const objectLat = this.toNumber(selectedObject?.latitude);
+    const objectLng = this.toNumber(selectedObject?.longitude);
+    if (objectLat != null && objectLng != null) {
+      this.setLocationFromSelection(objectLat, objectLng);
+      return;
+    }
+
+    const selectedLocality = selectedLocalityId
+      ? this.localities.find((locality) => locality.id === selectedLocalityId)
+      : undefined;
+    const localityLat = this.toNumber((selectedLocality as unknown as { latitude?: number })?.latitude);
+    const localityLng = this.toNumber((selectedLocality as unknown as { longitude?: number })?.longitude);
+    if (localityLat != null && localityLng != null) {
+      this.setLocationFromSelection(localityLat, localityLng);
+      return;
+    }
+
+    const selectedDestination = selectedDestinationId
+      ? this.destinations.find((destination) => destination.id === selectedDestinationId)
+      : undefined;
+    const destinationLat = this.toNumber(selectedDestination?.latitude);
+    const destinationLng = this.toNumber(selectedDestination?.longitude);
+    if (destinationLat != null && destinationLng != null) {
+      this.setLocationFromSelection(destinationLat, destinationLng);
+    }
+  }
+
+  private setLocationFromSelection(latitude: number, longitude: number): void {
+    this.form.patchValue(
+      {
+        latitude,
+        longitude
+      },
+      { emitEvent: false }
+    );
+
+    this.updateMapMarker(latitude, longitude);
+    this.reverseGeocode(latitude, longitude);
   }
 
   private attachImagesAfterCreate(createdActivity: ActivityDto) {
@@ -453,6 +518,7 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
           this.syncEditModeOptions();
 
           this.loadActivityImages(activity.id);
+          this.cdr.detectChanges();
 
         },
         error: (error: unknown) => {
@@ -517,6 +583,8 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
           .sort((first, second) => Number(second.isMain) - Number(first.isMain) || first.id - second.id)
           .map((image) => image.url)
           .filter((url) => typeof url === 'string' && url.length > 0);
+
+        this.cdr.detectChanges();
       });
   }
 
