@@ -56,6 +56,11 @@ export class ActivityService {
     private readonly activeRegionService: ActiveRegionService,
   ) {}
 
+  private addLang(params: HttpParams): HttpParams {
+    const lang = localStorage.getItem('appLanguage') || 'sr';
+    return params.set('Lang', lang);
+  }
+
   getAll(
     query?: ActivityQueryParams,
     options?: RegionRequestOptions,
@@ -71,10 +76,13 @@ export class ActivityService {
       });
     }
 
+    params = this.addLang(params);
     return this.http.get<ActivityDto[]>(this.url, { params });
   }
 
   getById(id: number): Observable<ActivityDto> {
-    return this.http.get<ActivityDto>(`${this.url}/${id}`);
+    let params = new HttpParams();
+    params = this.addLang(params);
+    return this.http.get<ActivityDto>(`${this.url}/${id}`, { params });
   }
 }

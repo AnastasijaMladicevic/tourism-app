@@ -38,9 +38,9 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(int id, [FromQuery] string lang = "sr")
         {
-            var locality = await _localityService.GetByIdAsync(id);
+            var locality = await _localityService.GetByIdAsync(id, lang);
 
             if (locality == null)
                 return NotFound();

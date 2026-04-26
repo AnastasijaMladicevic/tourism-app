@@ -44,6 +44,59 @@ namespace TuristickiVodic.Services.Services
             return translation?.TranslatedText ?? originalText;
         }
 
+        public async Task<string> GetOrCreateTextAsync(
+            string entityType,
+            int entityId,
+            string fieldName,
+            string originalText,
+            string languageCode)
+        {
+            if (string.IsNullOrWhiteSpace(originalText))
+                return originalText;
+
+            var normalizedLanguage = NormalizeLanguage(languageCode);
+            if (normalizedLanguage == "sr" || normalizedLanguage == "me")
+                return originalText;
+
+            var translation = await _context.Translations
+                .FirstOrDefaultAsync(t =>
+                    t.EntityType == entityType &&
+                    t.EntityId == entityId &&
+                    t.FieldName == fieldName &&
+                    t.LanguageCode == normalizedLanguage);
+
+            if (translation != null)
+                return translation.TranslatedText;
+
+            try
+            {
+                var translated = await _translationProvider.TranslateAsync(originalText, normalizedLanguage, "sr");
+
+                if (string.IsNullOrWhiteSpace(translated))
+                    return originalText;
+
+                _context.Translations.Add(new Translation
+                {
+                    EntityType = entityType,
+                    EntityId = entityId,
+                    FieldName = fieldName,
+                    LanguageCode = normalizedLanguage,
+                    OriginalTextHash = HashText(originalText),
+                    TranslatedText = translated,
+                    IsAutoTranslated = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+                await _context.SaveChangesAsync();
+                return translated;
+            }
+            catch
+            {
+                return originalText;
+            }
+        }
+
         public async Task GenerateIfMissingAsync(
             string entityType,
             int entityId,
@@ -92,6 +145,13 @@ namespace TuristickiVodic.Services.Services
             using var sha = SHA256.Create();
             var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(text));
             return Convert.ToHexString(bytes);
+        }
+
+        private static string NormalizeLanguage(string? languageCode)
+        {
+            return string.IsNullOrWhiteSpace(languageCode)
+                ? "sr"
+                : languageCode.Trim().ToLowerInvariant();
         }
     }
 }

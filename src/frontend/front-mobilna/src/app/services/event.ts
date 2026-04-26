@@ -89,8 +89,15 @@ export class EventService {
     private readonly activeRegionService: ActiveRegionService,
   ) {}
 
+  private addLang(params: HttpParams): HttpParams {
+    const lang = localStorage.getItem('appLanguage') || 'sr';
+    return params.set('Lang', lang);
+  }
+
   getById(id: number): Observable<EventDto> {
-    return this.http.get<EventDto>(`${this.url}/${id}`);
+    let params = new HttpParams();
+    params = this.addLang(params);
+    return this.http.get<EventDto>(`${this.url}/${id}`, { params });
   }
 
   getAll(
@@ -108,6 +115,7 @@ export class EventService {
       });
     }
 
+    params = this.addLang(params);
     return this.http.get<EventDto[]>(this.url, { params });
   }
 
@@ -124,6 +132,7 @@ export class EventService {
       }
     });
 
+    params = this.addLang(params);
     return this.http.get<PagedEventResultDto<EventDto>>(`${this.url}/nearby`, { params });
   }
 }

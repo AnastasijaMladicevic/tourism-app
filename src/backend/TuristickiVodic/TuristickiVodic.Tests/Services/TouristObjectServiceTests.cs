@@ -871,6 +871,16 @@ namespace TuristickiVodic.Tests.Services
                 return Task.FromResult(originalText);
             }
 
+            public Task<string> GetOrCreateTextAsync(
+                string entityType,
+                int entityId,
+                string fieldName,
+                string originalText,
+                string languageCode)
+            {
+                return Task.FromResult(originalText);
+            }
+
             public Task GenerateIfMissingAsync(
                 string entityType,
                 int entityId,

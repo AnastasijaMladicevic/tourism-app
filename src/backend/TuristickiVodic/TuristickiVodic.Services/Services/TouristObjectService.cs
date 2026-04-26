@@ -1161,12 +1161,37 @@ namespace TuristickiVodic.Services.Services
             if (normalizedLang == "sr" || normalizedLang == "me")
                 return;
 
-            dto.Description = await _translationService.GetTextAsync(
+            dto.Description = await _translationService.GetOrCreateTextAsync(
                 "Object",
                 obj.Id,
                 "Description",
-                obj.Description,
+                obj.Description ?? string.Empty,
                 normalizedLang);
+
+            if (!string.IsNullOrWhiteSpace(obj.CuisineType))
+            {
+                dto.CuisineType = await _translationService.GetOrCreateTextAsync(
+                    "Object",
+                    obj.Id,
+                    "CuisineType",
+                    obj.CuisineType,
+                    normalizedLang);
+            }
+
+            if (obj.ObjectType != null && !string.IsNullOrWhiteSpace(obj.ObjectType.Name))
+            {
+                dto.ObjectTypeName = await _translationService.GetOrCreateTextAsync(
+                    "ObjectType",
+                    obj.ObjectType.Id,
+                    "Name",
+                    obj.ObjectType.Name,
+                    normalizedLang);
+            }
+
+            if (obj.Amenities != null && obj.Amenities.Length > 0)
+            {
+                dto.Amenities = await TranslateAmenityValuesAsync(obj.Id, obj.Amenities, normalizedLang);
+            }
 
             // Nazive realnih objekata najčešće ne prevodimo.
             // Ako ipak želiš da prevodiš Name, odkomentariši ovo:
@@ -1185,6 +1210,27 @@ namespace TuristickiVodic.Services.Services
             return string.IsNullOrWhiteSpace(lang)
                 ? "sr"
                 : lang.Trim().ToLower();
+        }
+
+        private async Task<string[]> TranslateAmenityValuesAsync(int objectId, string[] amenities, string lang)
+        {
+            var translated = new List<string>(amenities.Length);
+
+            for (var index = 0; index < amenities.Length; index++)
+            {
+                var value = amenities[index];
+                if (string.IsNullOrWhiteSpace(value))
+                    continue;
+
+                translated.Add(await _translationService.GetOrCreateTextAsync(
+                    "Object",
+                    objectId,
+                    $"Amenity:{index}",
+                    value,
+                    lang));
+            }
+
+            return translated.ToArray();
         }
 
         private async Task ApplyPendingDeletionRequestFlagsAsync(List<TouristObjectDto> items)

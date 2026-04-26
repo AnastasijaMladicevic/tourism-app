@@ -4,6 +4,7 @@ using NetTopologySuite.Geometries;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
+using TuristickiVodic.Services.Services;
 
 namespace TuristickiVodic.Services
 {
@@ -11,11 +12,13 @@ namespace TuristickiVodic.Services
     {
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
+        private readonly ITranslationService _translationService;
 
-        public DestinationService(AppDbContext context, IMapper mapper)
+        public DestinationService(AppDbContext context, IMapper mapper, ITranslationService? translationService = null)
         {
             _context = context;
             _mapper = mapper;
+            _translationService = translationService ?? NullTranslationService.Instance;
         }
 
         public async Task<PagedResultDto<DestinationDto>> GetAllAsync(int? userId, string? role, DestinationQueryDto query)
@@ -85,6 +88,7 @@ namespace TuristickiVodic.Services
                 .ToListAsync();
 
             var mappedItems = _mapper.Map<List<DestinationDto>>(destinations);
+            await ApplyTranslationsAsync(mappedItems, destinations, query.Lang);
 
             return new PagedResultDto<DestinationDto>
             {
@@ -96,7 +100,7 @@ namespace TuristickiVodic.Services
             };
         }
 
-        public async Task<DestinationDto?> GetByIdAsync(int id, int? userId, string role)
+        public async Task<DestinationDto?> GetByIdAsync(int id, int? userId, string? role, string lang = "sr")
         {
             var destination = await _context.Destinations
                 .Include(d => d.Region)
@@ -119,7 +123,9 @@ namespace TuristickiVodic.Services
                     throw new UnauthorizedAccessException();
             }
 
-            return _mapper.Map<DestinationDto>(destination);
+            var dto = _mapper.Map<DestinationDto>(destination);
+            await ApplyTranslationsAsync(dto, destination, lang);
+            return dto;
         }
 
         public async Task<DestinationDto> CreateAsync(CreateDestinationDto dto, int userId)
@@ -363,6 +369,64 @@ namespace TuristickiVodic.Services
             return isDesc
                 ? query.OrderByDescending(d => d.Name)
                 : query.OrderBy(d => d.Name);
+        }
+
+        private async Task ApplyTranslationsAsync(List<DestinationDto> dtos, List<Destination> destinations, string? lang)
+        {
+            if (dtos.Count == 0 || destinations.Count == 0)
+                return;
+
+            var normalizedLang = NormalizeLanguage(lang);
+            if (normalizedLang == "sr" || normalizedLang == "me")
+                return;
+
+            var destinationsById = destinations.ToDictionary(d => d.Id);
+            foreach (var dto in dtos)
+            {
+                if (destinationsById.TryGetValue(dto.Id, out var destination))
+                    await ApplyTranslationsAsync(dto, destination, normalizedLang);
+            }
+        }
+
+        private async Task ApplyTranslationsAsync(DestinationDto dto, Destination destination, string? lang)
+        {
+            var normalizedLang = NormalizeLanguage(lang);
+            if (normalizedLang == "sr" || normalizedLang == "me")
+                return;
+
+            if (!string.IsNullOrWhiteSpace(destination.DisplayTitle))
+            {
+                dto.DisplayTitle = await _translationService.GetOrCreateTextAsync(
+                    "Destination",
+                    destination.Id,
+                    "DisplayTitle",
+                    destination.DisplayTitle,
+                    normalizedLang);
+            }
+
+            dto.Description = await _translationService.GetOrCreateTextAsync(
+                "Destination",
+                destination.Id,
+                "Description",
+                destination.Description ?? string.Empty,
+                normalizedLang);
+
+            if (destination.DestinationType != null && !string.IsNullOrWhiteSpace(destination.DestinationType.Name))
+            {
+                dto.DestinationTypeName = await _translationService.GetOrCreateTextAsync(
+                    "DestinationType",
+                    destination.DestinationType.Id,
+                    "Name",
+                    destination.DestinationType.Name,
+                    normalizedLang);
+            }
+        }
+
+        private static string NormalizeLanguage(string? lang)
+        {
+            return string.IsNullOrWhiteSpace(lang)
+                ? "sr"
+                : lang.Trim().ToLowerInvariant();
         }
     }
 }

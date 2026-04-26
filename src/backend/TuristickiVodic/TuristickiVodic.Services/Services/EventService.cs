@@ -12,11 +12,13 @@ namespace TuristickiVodic.Services.Services
     {
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
+        private readonly ITranslationService _translationService;
 
-        public EventService(AppDbContext context, IMapper mapper)
+        public EventService(AppDbContext context, IMapper mapper, ITranslationService? translationService = null)
         {
             _context = context;
             _mapper = mapper;
+            _translationService = translationService ?? NullTranslationService.Instance;
         }
 
         private static DateTime EnsureUtc(DateTime value)
@@ -147,6 +149,7 @@ namespace TuristickiVodic.Services.Services
                 .ToListAsync();
 
             var mappedItems = _mapper.Map<List<EventDto>>(items);
+            await ApplyTranslationsAsync(mappedItems, items, query.Lang);
             await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
 
             return new PagedResultDto<EventDto>
@@ -247,6 +250,11 @@ namespace TuristickiVodic.Services.Services
                 })
                 .ToList();
 
+            await ApplyTranslationsAsync(items, nearbyEvents
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .Select(x => x.Event)
+                .ToList(), query.Lang);
             await ApplyPendingDeletionRequestFlagsAsync(items);
 
             return new PagedResultDto<EventDto>
@@ -320,6 +328,7 @@ namespace TuristickiVodic.Services.Services
                 .ToListAsync();
 
             var mappedItems = _mapper.Map<List<EventDto>>(items);
+            await ApplyTranslationsAsync(mappedItems, items, query.Lang);
             await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
 
             return new PagedResultDto<EventDto>
@@ -411,6 +420,7 @@ namespace TuristickiVodic.Services.Services
                 .ToListAsync();
 
             var mappedItems = _mapper.Map<List<EventDto>>(items);
+            await ApplyTranslationsAsync(mappedItems, items, query.Lang);
             await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
 
             return new PagedResultDto<EventDto>
@@ -423,7 +433,7 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
-        public async Task<EventDto?> GetByIdAsync(int id)
+        public async Task<EventDto?> GetByIdAsync(int id, string lang = "sr")
         {
             var ev = await _context.Events
                 .Include(e => e.EventType)
@@ -447,11 +457,12 @@ namespace TuristickiVodic.Services.Services
                 return null;
 
             var dto = _mapper.Map<EventDto>(ev);
+            await ApplyTranslationsAsync(dto, ev, lang);
             await ApplyPendingDeletionRequestFlagsAsync(dto);
             return dto;
         }
 
-        public async Task<EventDto?> GetMineByIdAsync(int id, int userId)
+        public async Task<EventDto?> GetMineByIdAsync(int id, int userId, string lang = "sr")
         {
             var ev = await _context.Events
                 .Include(e => e.EventType)
@@ -468,11 +479,12 @@ namespace TuristickiVodic.Services.Services
                 return null;
 
             var dto = _mapper.Map<EventDto>(ev);
+            await ApplyTranslationsAsync(dto, ev, lang);
             await ApplyPendingDeletionRequestFlagsAsync(dto);
             return dto;
         }
 
-        public async Task<EventDto?> GetForManagerByIdAsync(int id, int userId)
+        public async Task<EventDto?> GetForManagerByIdAsync(int id, int userId, string lang = "sr")
         {
             var ev = await _context.Events
                 .Include(e => e.EventType)
@@ -497,6 +509,7 @@ namespace TuristickiVodic.Services.Services
                 return null;
 
             var dto = _mapper.Map<EventDto>(ev);
+            await ApplyTranslationsAsync(dto, ev, lang);
             await ApplyPendingDeletionRequestFlagsAsync(dto);
             return dto;
         }
@@ -970,6 +983,54 @@ namespace TuristickiVodic.Services.Services
         private Task ApplyPendingDeletionRequestFlagsAsync(EventDto item)
         {
             return ApplyPendingDeletionRequestFlagsAsync(new List<EventDto> { item });
+        }
+
+        private async Task ApplyTranslationsAsync(List<EventDto> dtos, List<Event> events, string? lang)
+        {
+            if (dtos.Count == 0 || events.Count == 0)
+                return;
+
+            var normalizedLang = NormalizeLanguage(lang);
+            if (normalizedLang == "sr" || normalizedLang == "me")
+                return;
+
+            var eventsById = events.ToDictionary(e => e.Id);
+            foreach (var dto in dtos)
+            {
+                if (eventsById.TryGetValue(dto.Id, out var ev))
+                    await ApplyTranslationsAsync(dto, ev, normalizedLang);
+            }
+        }
+
+        private async Task ApplyTranslationsAsync(EventDto dto, Event ev, string? lang)
+        {
+            var normalizedLang = NormalizeLanguage(lang);
+            if (normalizedLang == "sr" || normalizedLang == "me")
+                return;
+
+            dto.Description = await _translationService.GetOrCreateTextAsync(
+                "Event",
+                ev.Id,
+                "Description",
+                ev.Description ?? string.Empty,
+                normalizedLang);
+
+            if (ev.EventType != null && !string.IsNullOrWhiteSpace(ev.EventType.Name))
+            {
+                dto.EventTypeName = await _translationService.GetOrCreateTextAsync(
+                    "EventType",
+                    ev.EventType.Id,
+                    "Name",
+                    ev.EventType.Name,
+                    normalizedLang);
+            }
+        }
+
+        private static string NormalizeLanguage(string? lang)
+        {
+            return string.IsNullOrWhiteSpace(lang)
+                ? "sr"
+                : lang.Trim().ToLowerInvariant();
         }
     }
 }

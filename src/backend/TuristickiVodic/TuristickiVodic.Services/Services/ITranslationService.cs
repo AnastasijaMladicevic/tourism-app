@@ -9,6 +9,13 @@ namespace TuristickiVodic.Services.Services
             string originalText,
             string languageCode);
 
+        Task<string> GetOrCreateTextAsync(
+            string entityType,
+            int entityId,
+            string fieldName,
+            string originalText,
+            string languageCode);
+
         Task GenerateIfMissingAsync(
             string entityType,
             int entityId,

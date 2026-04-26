@@ -29,6 +29,8 @@ namespace TuristickiVodic.Core.DTO
         [Range(1, 100)]
         public int PageSize { get; set; } = 10;
 
+        public string Lang { get; set; } = "sr";
+
         public string? SortOrder { get; set; } = "asc";
     }
 }

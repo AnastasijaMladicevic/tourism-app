@@ -135,6 +135,8 @@ export class ObjectDetailComponent implements OnInit {
       address: (dto['address'] ?? dto['Address'] ?? undefined) as string | undefined,
       phoneNumber: (dto['phoneNumber'] ?? dto['PhoneNumber'] ?? undefined) as string | undefined,
       website: (dto['website'] ?? dto['Website'] ?? undefined) as string | undefined,
+      menuUrl: (dto['menuUrl'] ?? dto['MenuUrl'] ?? undefined) as string | undefined,
+      cuisineType: (dto['cuisineType'] ?? dto['CuisineType'] ?? undefined) as string | undefined,
       workingHours: (dto['workingHours'] ?? dto['WorkingHours'] ?? undefined) as string | undefined,
       price: (dto['price'] ?? dto['Price'] ?? undefined) as Int16Array | undefined,
       amenities: ((dto['amenities'] ?? dto['Amenities'] ?? []) as []) || [],

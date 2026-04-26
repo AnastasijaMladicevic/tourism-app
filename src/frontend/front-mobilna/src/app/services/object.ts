@@ -102,7 +102,7 @@ export class ObjectService {
   private addLang(params: HttpParams): HttpParams {
     const lang = localStorage.getItem('appLanguage') || 'sr';
     return params.set('Lang', lang);
-}
+  }
 
   getAll(
     query?: ObjectQueryParams,
@@ -119,10 +119,7 @@ export class ObjectService {
       });
     }
 
-    // 👉 DODAJ OVO
-    const lang = localStorage.getItem('appLanguage') || 'sr';
-    params = params.set('Lang', lang);
-
+    params = this.addLang(params);
     return this.http.get<ObjectDto[]>(this.url, { params });
   }
 
@@ -131,7 +128,7 @@ export class ObjectService {
     params = this.addLang(params);
 
     return this.http.get<ObjectDto>(`${this.url}/${id}`, { params });
-}
+  }
 
   getNearby(
     query: NearbyObjectQueryParams,
@@ -156,16 +153,15 @@ export class ObjectService {
 
       params = params.set(key, String(value));
     });
+
     params = this.addLang(params);
     return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/nearby`, { params });
   }
 
   getByType(typeName: string): Observable<ObjectDto[]> {
-    let params = new HttpParams()
-      .set('type', typeName);
-
+    let params = new HttpParams().set('type', typeName);
     params = this.addLang(params);
 
     return this.http.get<ObjectDto[]>(this.url, { params });
-}
+  }
 }
