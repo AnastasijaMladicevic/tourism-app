@@ -13,11 +13,11 @@ namespace TuristickiVodic.Services.Services
         private readonly IMapper _mapper;
         private readonly ITranslationService _translationService;
 
-        public ReviewService(AppDbContext context, IMapper mapper, ITranslationService translationService)
+        public ReviewService(AppDbContext context, IMapper mapper, ITranslationService? translationService = null)
         {
             _context = context;
             _mapper = mapper;
-            _translationService = translationService;
+            _translationService = translationService ?? NullTranslationService.Instance;
         }
 
         public async Task<PagedResultDto<ReviewDto>> GetAllAsync(ReviewQueryDto query)
@@ -31,91 +31,7 @@ namespace TuristickiVodic.Services.Services
             if (query.PageSize > 100)
                 query.PageSize = 100;
 
-            var reviewsQuery = _context.Reviews
-                .Include(r => r.User)
-                .Include(r => r.Object)
-                    .ThenInclude(o => o.Destination)
-                        .ThenInclude(d => d.Region)
-                .Include(r => r.Object)
-                    .ThenInclude(o => o.Locality)
-                        .ThenInclude(l => l.Destination)
-                            .ThenInclude(d => d.Region)
-                .Include(r => r.ReviewedBy)
-                .AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(query.Search))
-            {
-                var search = query.Search.Trim().ToLower();
-
-                reviewsQuery = reviewsQuery.Where(r =>
-                    r.Text.ToLower().Contains(search) ||
-                    (r.CreatorResponse != null && r.CreatorResponse.ToLower().Contains(search)) ||
-                    (r.Object != null && r.Object.Name.ToLower().Contains(search)) ||
-                    (r.User != null && (
-                        r.User.FirstName.ToLower().Contains(search) ||
-                        r.User.LastName.ToLower().Contains(search) ||
-                        (r.User.FirstName + " " + r.User.LastName).ToLower().Contains(search))));
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.Object))
-            {
-                var objectValue = query.Object.Trim().ToLower();
-
-                reviewsQuery = reviewsQuery.Where(r =>
-                    r.Object != null &&
-                    r.Object.Name.ToLower().Contains(objectValue));
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.User))
-            {
-                var userValue = query.User.Trim().ToLower();
-
-                reviewsQuery = reviewsQuery.Where(r =>
-                    r.User != null && (
-                        r.User.FirstName.ToLower().Contains(userValue) ||
-                        r.User.LastName.ToLower().Contains(userValue) ||
-                        (r.User.FirstName + " " + r.User.LastName).ToLower().Contains(userValue)));
-            }
-
-            if (query.RegionId.HasValue)
-            {
-                reviewsQuery = reviewsQuery.Where(r =>
-                    r.Object != null &&
-                    ((r.Object.Destination != null && r.Object.Destination.RegionId == query.RegionId.Value) ||
-                     (r.Object.Destination == null && r.Object.Locality != null && r.Object.Locality.Destination != null && r.Object.Locality.Destination.RegionId == query.RegionId.Value)));
-            }
-
-            if (query.MinRating.HasValue)
-            {
-                reviewsQuery = reviewsQuery.Where(r => r.Rating >= query.MinRating.Value);
-            }
-
-            if (query.MaxRating.HasValue)
-            {
-                reviewsQuery = reviewsQuery.Where(r => r.Rating <= query.MaxRating.Value);
-            }
-
-            if (query.HasResponse.HasValue)
-            {
-                reviewsQuery = query.HasResponse.Value
-                    ? reviewsQuery.Where(r => r.CreatorResponse != null)
-                    : reviewsQuery.Where(r => r.CreatorResponse == null);
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.Status))
-            {
-                var statusFilter = query.Status.Trim();
-
-                if (Enum.TryParse<ContentStatus>(statusFilter, true, out var parsedStatus))
-                {
-                    reviewsQuery = reviewsQuery.Where(r => r.Status == parsedStatus);
-                }
-                else
-                {
-                    reviewsQuery = reviewsQuery.Where(_ => false);
-                }
-            }
-
+            var reviewsQuery = ApplyReviewFilters(BuildReviewsQuery(), query);
             reviewsQuery = ApplyReviewSorting(reviewsQuery, query.SortBy, query.SortOrder);
 
             var totalCount = await reviewsQuery.CountAsync();
@@ -126,21 +42,41 @@ namespace TuristickiVodic.Services.Services
                 .ToListAsync();
 
             var items = _mapper.Map<List<ReviewDto>>(reviews);
+            await ApplyTranslationsAsync(items, query.LanguageCode, createMissing: false);
 
-            if (!string.IsNullOrWhiteSpace(query.LanguageCode) && query.LanguageCode != "sr")
+            return new PagedResultDto<ReviewDto>
             {
-                foreach (var item in items)
-                {
-                    item.Text = await _translationService.GetOrCreateTextAsync(
-                        "Review", item.Id, "Text", item.Text, query.LanguageCode);
+                Items = items,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
 
-                    if (!string.IsNullOrWhiteSpace(item.CreatorResponse))
-                    {
-                        item.CreatorResponse = await _translationService.GetOrCreateTextAsync(
-                            "Review", item.Id, "CreatorResponse", item.CreatorResponse, query.LanguageCode);
-                    }
-                }
-            }
+        public async Task<PagedResultDto<ReviewDto>> GetMineAsync(int userId, ReviewQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var reviewsQuery = ApplyReviewFilters(BuildReviewsQuery().Where(r => r.UserId == userId), query);
+            reviewsQuery = ApplyReviewSorting(reviewsQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await reviewsQuery.CountAsync();
+
+            var reviews = await reviewsQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToListAsync();
+
+            var items = _mapper.Map<List<ReviewDto>>(reviews);
+            await ApplyTranslationsAsync(items, query.LanguageCode, createMissing: true);
 
             return new PagedResultDto<ReviewDto>
             {
@@ -155,10 +91,13 @@ namespace TuristickiVodic.Services.Services
         public async Task<ReviewDto?> GetByIdAsync(int id, string? languageCode = null)
         {
             var review = await _context.Reviews
+                .AsNoTracking()
                 .Include(r => r.User)
                 .Include(r => r.Object)
                     .ThenInclude(o => o.Destination)
                         .ThenInclude(d => d.Region)
+                .Include(r => r.Object)
+                    .ThenInclude(o => o.ObjectType)
                 .Include(r => r.Object)
                     .ThenInclude(o => o.Locality)
                         .ThenInclude(l => l.Destination)
@@ -169,18 +108,7 @@ namespace TuristickiVodic.Services.Services
             if (review == null) return null;
 
             var dto = _mapper.Map<ReviewDto>(review);
-
-            if (!string.IsNullOrWhiteSpace(languageCode) && languageCode != "sr")
-            {
-                dto.Text = await _translationService.GetOrCreateTextAsync(
-                    "Review", dto.Id, "Text", dto.Text, languageCode);
-
-                if (!string.IsNullOrWhiteSpace(dto.CreatorResponse))
-                {
-                    dto.CreatorResponse = await _translationService.GetOrCreateTextAsync(
-                        "Review", dto.Id, "CreatorResponse", dto.CreatorResponse, languageCode);
-                }
-            }
+            await ApplyTranslationsAsync(new List<ReviewDto> { dto }, languageCode, createMissing: true);
 
             return dto;
         }
@@ -357,10 +285,13 @@ namespace TuristickiVodic.Services.Services
         private async Task<Review> LoadReviewAsync(int id)
         {
             return await _context.Reviews
+                .AsNoTracking()
                 .Include(r => r.User)
                 .Include(r => r.Object)
                     .ThenInclude(o => o.Destination)
                         .ThenInclude(d => d.Region)
+                .Include(r => r.Object)
+                    .ThenInclude(o => o.ObjectType)
                 .Include(r => r.Object)
                     .ThenInclude(o => o.Locality)
                         .ThenInclude(l => l.Destination)
@@ -385,6 +316,138 @@ namespace TuristickiVodic.Services.Services
             touristObject.AverageRating = ratings.Count == 0 ? 0 : Math.Round((decimal)ratings.Average(), 2);
 
             await _context.SaveChangesAsync();
+        }
+
+        private IQueryable<Review> BuildReviewsQuery()
+        {
+            return _context.Reviews
+                .AsNoTracking()
+                .Include(r => r.User)
+                .Include(r => r.Object)
+                    .ThenInclude(o => o.Destination)
+                        .ThenInclude(d => d.Region)
+                .Include(r => r.Object)
+                    .ThenInclude(o => o.ObjectType)
+                .Include(r => r.Object)
+                    .ThenInclude(o => o.Locality)
+                        .ThenInclude(l => l.Destination)
+                            .ThenInclude(d => d.Region)
+                .Include(r => r.ReviewedBy)
+                .AsQueryable();
+        }
+
+        private static IQueryable<Review> ApplyReviewFilters(IQueryable<Review> reviewsQuery, ReviewQueryDto query)
+        {
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                var search = query.Search.Trim().ToLower();
+
+                reviewsQuery = reviewsQuery.Where(r =>
+                    r.Text.ToLower().Contains(search) ||
+                    (r.CreatorResponse != null && r.CreatorResponse.ToLower().Contains(search)) ||
+                    (r.Object != null && r.Object.Name.ToLower().Contains(search)) ||
+                    (r.User != null && (
+                        r.User.FirstName.ToLower().Contains(search) ||
+                        r.User.LastName.ToLower().Contains(search) ||
+                        (r.User.FirstName + " " + r.User.LastName).ToLower().Contains(search))));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Object))
+            {
+                var objectValue = query.Object.Trim().ToLower();
+
+                reviewsQuery = reviewsQuery.Where(r =>
+                    r.Object != null &&
+                    r.Object.Name.ToLower().Contains(objectValue));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.User))
+            {
+                var userValue = query.User.Trim().ToLower();
+
+                reviewsQuery = reviewsQuery.Where(r =>
+                    r.User != null && (
+                        r.User.FirstName.ToLower().Contains(userValue) ||
+                        r.User.LastName.ToLower().Contains(userValue) ||
+                        (r.User.FirstName + " " + r.User.LastName).ToLower().Contains(userValue)));
+            }
+
+            if (query.RegionId.HasValue)
+            {
+                reviewsQuery = reviewsQuery.Where(r =>
+                    r.Object != null &&
+                    ((r.Object.Destination != null && r.Object.Destination.RegionId == query.RegionId.Value) ||
+                     (r.Object.Destination == null && r.Object.Locality != null && r.Object.Locality.Destination != null && r.Object.Locality.Destination.RegionId == query.RegionId.Value)));
+            }
+
+            if (query.MinRating.HasValue)
+            {
+                reviewsQuery = reviewsQuery.Where(r => r.Rating >= query.MinRating.Value);
+            }
+
+            if (query.MaxRating.HasValue)
+            {
+                reviewsQuery = reviewsQuery.Where(r => r.Rating <= query.MaxRating.Value);
+            }
+
+            if (query.HasResponse.HasValue)
+            {
+                reviewsQuery = query.HasResponse.Value
+                    ? reviewsQuery.Where(r => r.CreatorResponse != null)
+                    : reviewsQuery.Where(r => r.CreatorResponse == null);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Status))
+            {
+                var statusFilter = query.Status.Trim();
+
+                if (Enum.TryParse<ContentStatus>(statusFilter, true, out var parsedStatus))
+                {
+                    reviewsQuery = reviewsQuery.Where(r => r.Status == parsedStatus);
+                }
+                else
+                {
+                    reviewsQuery = reviewsQuery.Where(_ => false);
+                }
+            }
+
+            return reviewsQuery;
+        }
+
+        private async Task ApplyTranslationsAsync(List<ReviewDto> items, string? languageCode, bool createMissing)
+        {
+            var normalizedLanguage = NormalizeLanguage(languageCode);
+            if (normalizedLanguage == "sr" || normalizedLanguage == "me" || items.Count == 0)
+                return;
+
+            foreach (var item in items)
+            {
+                item.Text = await TranslateFieldAsync(item.Id, "Text", item.Text, normalizedLanguage, createMissing);
+
+                if (!string.IsNullOrWhiteSpace(item.CreatorResponse))
+                {
+                    item.CreatorResponse = await TranslateFieldAsync(
+                        item.Id,
+                        "CreatorResponse",
+                        item.CreatorResponse,
+                        normalizedLanguage,
+                        createMissing);
+                }
+            }
+        }
+
+        private async Task<string> TranslateFieldAsync(int reviewId, string fieldName, string originalText, string languageCode, bool createMissing)
+        {
+            return createMissing
+                ? await _translationService.GetOrCreateTextAsync("Review", reviewId, fieldName, originalText, languageCode)
+                : await _translationService.GetTextAsync("Review", reviewId, fieldName, originalText, languageCode);
+        }
+
+        private static string NormalizeLanguage(string? languageCode)
+        {
+            return string.IsNullOrWhiteSpace(languageCode)
+                ? "sr"
+                : languageCode.Trim().ToLowerInvariant();
         }
 
         private static IQueryable<Review> ApplyReviewSorting(IQueryable<Review> query, string? sortBy, string? sortOrder)

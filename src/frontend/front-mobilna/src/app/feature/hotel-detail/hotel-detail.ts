@@ -3,12 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { firstValueFrom, forkJoin } from 'rxjs';
+import { forkJoin } from 'rxjs';
 
 import { AuthService } from '../../services/auth';
-import { ImageDto, ImageService } from '../../services/image';
+import { ImageDto } from '../../services/image';
 import { ObjectDto, ObjectImageDto, ObjectService } from '../../services/object';
-import { ReviewDto, ReviewService } from '../../services/review';
+import { ReviewDto } from '../../services/review';
 import { environment } from '../../../environment/environment';
 
 interface ReviewCard {
@@ -61,9 +61,7 @@ export class HotelDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private objectService: ObjectService,
-    private imageService: ImageService,
     private authService: AuthService,
-    private reviewService: ReviewService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -72,11 +70,8 @@ export class HotelDetailComponent implements OnInit {
 
     forkJoin({
       object: this.objectService.getById(id),
-      images: this.imageService.getForObject(id),
-      reviews: this.reviewService.getAll(),
-      allObjects: this.objectService.getAll(),
     }).subscribe({
-      next: async ({ object, images, reviews, allObjects }) => {
+      next: ({ object }) => {
         const normalizedObject = this.normalizeObject(object);
 
         this.hotel = normalizedObject;
@@ -84,11 +79,10 @@ export class HotelDetailComponent implements OnInit {
           ? this.formatWorkingHours(normalizedObject.workingHours)
           : '';
 
-        const embeddedImages = normalizedObject.images || [];
-        this.images = [...embeddedImages, ...images];
+        this.images = normalizedObject.images || [];
         this.mainImage = this.getMainImage(this.images);
-        this.reviews = this.toReviewCards(reviews, normalizedObject.id);
-        this.nearbyHotels = await this.buildNearbyHotels(allObjects, normalizedObject);
+        this.reviews = this.toReviewCards(normalizedObject.reviews || [], normalizedObject.id);
+        this.loadNearbyHotels(normalizedObject);
 
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -263,44 +257,47 @@ export class HotelDetailComponent implements OnInit {
       }));
   }
 
-  private async buildNearbyHotels(rawObjects: ObjectDto[], currentHotel: ObjectDto): Promise<NearbyHotelCard[]> {
-    const allHotels = this.toArray<ObjectDto>(rawObjects)
-      .map((object) => this.normalizeObject(object))
-      .filter((object) => this.isHotel(object.objectTypeName))
-      .filter((object) => object.id !== currentHotel.id);
-
-    const currentLocality = this.normalizeLocation(currentHotel.localityName);
-
-    const candidates = currentLocality
-      ? allHotels.filter((object) => this.normalizeLocation(object.localityName) === currentLocality)
-      : [];
-
-    const selected = candidates.slice(0, 2);
-
-    return Promise.all(
-      selected.map(async (object) => ({
-        id: object.id,
-        name: object.name,
-        image: await this.getNearbyHotelImage(object),
-        location: object.localityName ?? object.destinationName ?? 'Montenegro',
-        rating: object.averageRating,
-        reviews: object.reviewCount ?? 0,
-      }))
-    );
-  }
-
-  private async getNearbyHotelImage(object: ObjectDto): Promise<string | undefined> {
-    const mainEmbedded = object.images?.find((image) => image.isMain) ?? object.images?.[0];
-    const embeddedUrl = this.resolveMediaUrl(mainEmbedded?.url);
-    if (embeddedUrl) return embeddedUrl;
-
-    try {
-      const images = await firstValueFrom(this.imageService.getForObject(object.id));
-      const mainImage = images?.find((image) => image.isMain) ?? images?.[0];
-      return this.resolveMediaUrl(mainImage?.url);
-    } catch {
-      return undefined;
+  private loadNearbyHotels(currentHotel: ObjectDto): void {
+    if (currentHotel.latitude == null || currentHotel.longitude == null) {
+      this.nearbyHotels = [];
+      return;
     }
+
+    this.objectService
+      .getNearby({
+        latitude: currentHotel.latitude,
+        longitude: currentHotel.longitude,
+        radiusMeters: 15000,
+        type: 'Hotel',
+        page: 1,
+        pageSize: 8,
+        sortOrder: 'asc',
+      })
+      .subscribe({
+        next: (result) => {
+          this.nearbyHotels = this.toArray<ObjectDto>(result)
+            .map((item) => this.normalizeObject(item))
+            .filter((item) => item.id !== currentHotel.id)
+            .slice(0, 2)
+            .map((object) => ({
+              id: object.id,
+              name: object.name,
+              image: this.resolveMediaUrl(
+                (object.images?.find((image) => image.isMain) ?? object.images?.[0])?.url ??
+                  object.mainImageUrl,
+              ),
+              location: object.localityName ?? object.destinationName ?? 'Montenegro',
+              rating: object.averageRating,
+              reviews: object.reviewCount ?? 0,
+            }));
+
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.nearbyHotels = [];
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   private normalizeReview(raw: ReviewDto): ReviewDto {
@@ -360,6 +357,7 @@ export class HotelDetailComponent implements OnInit {
       destinationName:
         (dto['destinationName'] ?? dto['DestinationName'] ?? undefined) as string | undefined,
       images: ((dto['images'] ?? dto['Images'] ?? []) as ObjectDto['images']) || [],
+      reviews: ((dto['reviews'] ?? dto['Reviews'] ?? []) as ReviewDto[]) || [],
     };
   }
 

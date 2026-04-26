@@ -224,6 +224,19 @@ namespace TuristickiVodic.Services.Mappings
                         src.User != null ? (src.User.FirstName + " " + src.User.LastName) : string.Empty))
                 .ForMember(dest => dest.ObjectName,
                     opt => opt.MapFrom(src => src.Object != null ? src.Object.Name : string.Empty))
+                .ForMember(dest => dest.ObjectTypeName,
+                    opt => opt.MapFrom(src =>
+                        src.Object != null && src.Object.ObjectType != null ? src.Object.ObjectType.Name : string.Empty))
+                .ForMember(dest => dest.LocalityName,
+                    opt => opt.MapFrom(src =>
+                        src.Object != null && src.Object.Locality != null ? src.Object.Locality.Name : null))
+                .ForMember(dest => dest.DestinationName,
+                    opt => opt.MapFrom(src =>
+                        src.Object != null && src.Object.Destination != null ? src.Object.Destination.Name :
+                        src.Object != null && src.Object.Locality != null && src.Object.Locality.Destination != null ? src.Object.Locality.Destination.Name :
+                        null))
+                .ForMember(dest => dest.Address,
+                    opt => opt.MapFrom(src => src.Object != null ? src.Object.Address : null))
                 .ForMember(dest => dest.RegionId,
                     opt => opt.MapFrom(src =>
                         src.Object != null && src.Object.Destination != null ? src.Object.Destination.RegionId :

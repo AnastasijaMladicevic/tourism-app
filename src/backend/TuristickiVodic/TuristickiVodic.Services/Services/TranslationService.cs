@@ -26,11 +26,8 @@ namespace TuristickiVodic.Services.Services
             string originalText,
             string languageCode)
         {
-            if (string.IsNullOrWhiteSpace(languageCode) || languageCode == "sr")
-                return originalText;
-
-            // Crnogorski fallback: ako nema posebnog prevoda, koristi srpski/original.
-            if (string.IsNullOrWhiteSpace(languageCode) || languageCode == "sr")
+            var normalizedLanguage = NormalizeLanguage(languageCode);
+            if (normalizedLanguage == "sr" || normalizedLanguage == "me")
                 return originalText;
 
             var translation = await _context.Translations
@@ -39,7 +36,7 @@ namespace TuristickiVodic.Services.Services
                     t.EntityType == entityType &&
                     t.EntityId == entityId &&
                     t.FieldName == fieldName &&
-                    t.LanguageCode == languageCode);
+                    t.LanguageCode == normalizedLanguage);
 
             return translation?.TranslatedText ?? originalText;
         }
@@ -59,6 +56,7 @@ namespace TuristickiVodic.Services.Services
                 return originalText;
 
             var translation = await _context.Translations
+                .AsNoTracking()
                 .FirstOrDefaultAsync(t =>
                     t.EntityType == entityType &&
                     t.EntityId == entityId &&

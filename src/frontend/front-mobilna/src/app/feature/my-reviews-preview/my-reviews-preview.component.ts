@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { catchError, forkJoin, map, of } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 import { environment } from '../../../environment/environment';
 import { AuthService, UserDto } from '../../services/auth';
-import { ObjectDto, ObjectService } from '../../services/object';
 import { ReviewDto, ReviewService } from '../../services/review';
 import { TranslationService } from '../../services/translation.service';
 
@@ -44,7 +43,6 @@ interface RatingRow {
 export class MyReviewsPreviewComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly reviewService = inject(ReviewService);
-  private readonly objectService = inject(ObjectService);
   private readonly translationService = inject(TranslationService);
   private readonly router = inject(Router);
 
@@ -148,20 +146,15 @@ export class MyReviewsPreviewComponent implements OnInit {
 
     forkJoin({
       user: this.authService.getById(currentUser.id).pipe(catchError(() => of(currentUser))),
-      reviews: this.reviewService.getAll({ page: 1, pageSize: 200 }).pipe(
-        map((raw) => this.toArray<ReviewDto>(raw)),
+      reviews: this.reviewService.getMine({ page: 1, pageSize: 200 }).pipe(
         catchError(() => {
           this.errorMessage.set('Utisci trenutno nisu dostupni.');
-          return of([] as ReviewDto[]);
+          return of({ items: [] as ReviewDto[] });
         }),
       ),
-      objects: this.objectService.getAll({ page: 1, pageSize: 200 }).pipe(
-        map((raw) => this.toArray<ObjectDto>(raw)),
-        catchError(() => of([] as ObjectDto[])),
-      ),
-    }).subscribe(({ user, reviews, objects }) => {
+    }).subscribe(({ user, reviews }) => {
       this.currentUser.set(user);
-      this.reviews.set(this.mapReviewsForUser(reviews, objects, currentUser.id));
+      this.reviews.set(this.mapReviewsForUser(this.toArray<ReviewDto>(reviews)));
       this.isLoading.set(false);
     });
   }
@@ -248,20 +241,16 @@ export class MyReviewsPreviewComponent implements OnInit {
     return item.value;
   }
 
-  private mapReviewsForUser(reviews: ReviewDto[], objects: ObjectDto[], userId: number): ReviewPreviewCard[] {
-    const objectMap = new Map<number, ObjectDto>(objects.map((item) => [item.id, item]));
-
+  private mapReviewsForUser(reviews: ReviewDto[]): ReviewPreviewCard[] {
     return reviews
-      .filter((item) => Number(item.userId) === userId)
       .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
       .map((item) => {
-        const object = objectMap.get(item.objectId);
-        const objectType = object?.objectTypeName?.trim() || 'Objekat';
+        const objectType = item.objectTypeName?.trim() || 'Objekat';
         return {
           id: item.id,
           objectId: item.objectId,
           title: item.objectName?.trim() || 'Objekat bez naziva',
-          location: this.buildLocationLabel(object),
+          location: this.buildLocationLabel(item),
           createdLabel: this.formatDate(item.createdAt),
           timeAgo: this.formatRelativeDate(item.createdAt),
           text: item.text?.trim() || 'Recenzija nema dodatni komentar.',
@@ -274,19 +263,15 @@ export class MyReviewsPreviewComponent implements OnInit {
       });
   }
 
-  private buildLocationLabel(object?: ObjectDto): string {
-    if (!object) {
-      return 'Lokacija nije dostupna';
-    }
-
-    const locality = object.localityName?.trim();
-    const destination = object.destinationName?.trim();
+  private buildLocationLabel(review: ReviewDto): string {
+    const locality = review.localityName?.trim();
+    const destination = review.destinationName?.trim();
 
     if (locality && destination) {
       return `${locality}, ${destination}`;
     }
 
-    return locality || destination || object.address?.trim() || 'Lokacija nije dostupna';
+    return locality || destination || review.address?.trim() || 'Lokacija nije dostupna';
   }
 
   private buildTypeShortLabel(type: string): string {

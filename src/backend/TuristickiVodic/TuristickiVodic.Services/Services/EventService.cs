@@ -106,6 +106,7 @@ namespace TuristickiVodic.Services.Services
                 .Where(e => e.Status == ContentStatus.Approved)
                 .Where(e => e.IsActive)
                 .Where(e => e.Images.Any(i => i.IsMain))
+                .AsNoTracking()
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.Type))
@@ -186,6 +187,7 @@ namespace TuristickiVodic.Services.Services
                 .Where(e => e.IsActive)
                 .Where(e => e.Geolocation != null)
                 .Where(e => e.Images.Any(i => i.IsMain))
+                .AsNoTracking()
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.Type))
@@ -288,6 +290,7 @@ namespace TuristickiVodic.Services.Services
                 .Include(e => e.Object)
                 .Include(e => e.Images)
                 .Where(e => e.CreatedByUserId == userId)
+                .AsNoTracking()
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.Type))
@@ -378,6 +381,7 @@ namespace TuristickiVodic.Services.Services
                 .Where(e =>
                     (e.DestinationId.HasValue && destinationIds.Contains(e.DestinationId.Value)) ||
                     (!e.DestinationId.HasValue && e.Locality != null && destinationIds.Contains(e.Locality.DestinationId)))
+                .AsNoTracking()
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.Type))
@@ -998,17 +1002,24 @@ namespace TuristickiVodic.Services.Services
             foreach (var dto in dtos)
             {
                 if (eventsById.TryGetValue(dto.Id, out var ev))
-                    await ApplyTranslationsAsync(dto, ev, normalizedLang);
+                    await ApplyTranslationsAsync(dto, ev, normalizedLang, false);
             }
         }
 
-        private async Task ApplyTranslationsAsync(EventDto dto, Event ev, string? lang)
+        private async Task ApplyTranslationsAsync(EventDto dto, Event ev, string? lang, bool createMissing = true)
         {
             var normalizedLang = NormalizeLanguage(lang);
             if (normalizedLang == "sr" || normalizedLang == "me")
                 return;
 
-            dto.Description = await _translationService.GetOrCreateTextAsync(
+            dto.Description = createMissing
+                ? await _translationService.GetOrCreateTextAsync(
+                "Event",
+                ev.Id,
+                "Description",
+                ev.Description ?? string.Empty,
+                normalizedLang)
+                : await _translationService.GetTextAsync(
                 "Event",
                 ev.Id,
                 "Description",
@@ -1017,7 +1028,14 @@ namespace TuristickiVodic.Services.Services
 
             if (ev.EventType != null && !string.IsNullOrWhiteSpace(ev.EventType.Name))
             {
-                dto.EventTypeName = await _translationService.GetOrCreateTextAsync(
+                dto.EventTypeName = createMissing
+                    ? await _translationService.GetOrCreateTextAsync(
+                    "EventType",
+                    ev.EventType.Id,
+                    "Name",
+                    ev.EventType.Name,
+                    normalizedLang)
+                    : await _translationService.GetTextAsync(
                     "EventType",
                     ev.EventType.Id,
                     "Name",

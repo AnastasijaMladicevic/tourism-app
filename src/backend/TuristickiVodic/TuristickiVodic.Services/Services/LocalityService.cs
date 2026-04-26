@@ -24,6 +24,7 @@ namespace TuristickiVodic.Services
         public async Task<IEnumerable<LocalityDto>> GetAllAsync()
         {
             var localities = await _context.Localities
+                .AsNoTracking()
                 .Include(l => l.Destination)
                     .ThenInclude(d => d.Region)
                 .Include(l => l.LocalityType)
@@ -38,6 +39,7 @@ namespace TuristickiVodic.Services
         public async Task<LocalityDto?> GetByIdAsync(int id, string lang = "sr")
         {
             var locality = await _context.Localities
+                .AsNoTracking()
                 .Include(l => l.Destination)
                     .ThenInclude(d => d.Region)
                 .Include(l => l.LocalityType)
@@ -285,6 +287,7 @@ namespace TuristickiVodic.Services
                 .Include(l => l.Images)
                 .Where(l => l.IsActive)
                 .Where(l => l.Images.Any(i => i.IsMain))
+                .AsNoTracking()
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.Destination))
@@ -358,6 +361,7 @@ namespace TuristickiVodic.Services
                 .Where(l => l.IsActive)
                 .Where(l => l.Geolocation != null)
                 .Where(l => l.Images.Any(i => i.IsMain))
+                .AsNoTracking()
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.Destination))
@@ -525,17 +529,24 @@ namespace TuristickiVodic.Services
             foreach (var dto in dtos)
             {
                 if (localitiesById.TryGetValue(dto.Id, out var locality))
-                    await ApplyTranslationsAsync(dto, locality, normalizedLang);
+                    await ApplyTranslationsAsync(dto, locality, normalizedLang, false);
             }
         }
 
-        private async Task ApplyTranslationsAsync(LocalityDto dto, Locality locality, string? lang)
+        private async Task ApplyTranslationsAsync(LocalityDto dto, Locality locality, string? lang, bool createMissing = true)
         {
             var normalizedLang = NormalizeLanguage(lang);
             if (normalizedLang == "sr" || normalizedLang == "me")
                 return;
 
-            dto.Description = await _translationService.GetOrCreateTextAsync(
+            dto.Description = createMissing
+                ? await _translationService.GetOrCreateTextAsync(
+                "Locality",
+                locality.Id,
+                "Description",
+                locality.Description ?? string.Empty,
+                normalizedLang)
+                : await _translationService.GetTextAsync(
                 "Locality",
                 locality.Id,
                 "Description",
@@ -544,7 +555,14 @@ namespace TuristickiVodic.Services
 
             if (locality.LocalityType != null && !string.IsNullOrWhiteSpace(locality.LocalityType.Name))
             {
-                dto.LocalityTypeName = await _translationService.GetOrCreateTextAsync(
+                dto.LocalityTypeName = createMissing
+                    ? await _translationService.GetOrCreateTextAsync(
+                    "LocalityType",
+                    locality.LocalityType.Id,
+                    "Name",
+                    locality.LocalityType.Name,
+                    normalizedLang)
+                    : await _translationService.GetTextAsync(
                     "LocalityType",
                     locality.LocalityType.Id,
                     "Name",

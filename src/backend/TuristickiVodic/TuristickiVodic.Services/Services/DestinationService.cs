@@ -37,6 +37,7 @@ namespace TuristickiVodic.Services
                 .Include(d => d.DestinationType)
                 .Include(d => d.Images)
                 .Where(d => d.Images.Any(i => i.IsMain))
+                .AsNoTracking()
                 .AsQueryable();
 
             if (role != null && role == RoleType.Manager.ToString())
@@ -103,6 +104,7 @@ namespace TuristickiVodic.Services
         public async Task<DestinationDto?> GetByIdAsync(int id, int? userId, string? role, string lang = "sr")
         {
             var destination = await _context.Destinations
+                .AsNoTracking()
                 .Include(d => d.Region)
                 .Include(d => d.DestinationType)
                 .Include(d => d.Images)
@@ -384,11 +386,11 @@ namespace TuristickiVodic.Services
             foreach (var dto in dtos)
             {
                 if (destinationsById.TryGetValue(dto.Id, out var destination))
-                    await ApplyTranslationsAsync(dto, destination, normalizedLang);
+                    await ApplyTranslationsAsync(dto, destination, normalizedLang, false);
             }
         }
 
-        private async Task ApplyTranslationsAsync(DestinationDto dto, Destination destination, string? lang)
+        private async Task ApplyTranslationsAsync(DestinationDto dto, Destination destination, string? lang, bool createMissing = true)
         {
             var normalizedLang = NormalizeLanguage(lang);
             if (normalizedLang == "sr" || normalizedLang == "me")
@@ -396,7 +398,14 @@ namespace TuristickiVodic.Services
 
             if (!string.IsNullOrWhiteSpace(destination.DisplayTitle))
             {
-                dto.DisplayTitle = await _translationService.GetOrCreateTextAsync(
+                dto.DisplayTitle = createMissing
+                    ? await _translationService.GetOrCreateTextAsync(
+                    "Destination",
+                    destination.Id,
+                    "DisplayTitle",
+                    destination.DisplayTitle,
+                    normalizedLang)
+                    : await _translationService.GetTextAsync(
                     "Destination",
                     destination.Id,
                     "DisplayTitle",
@@ -404,7 +413,14 @@ namespace TuristickiVodic.Services
                     normalizedLang);
             }
 
-            dto.Description = await _translationService.GetOrCreateTextAsync(
+            dto.Description = createMissing
+                ? await _translationService.GetOrCreateTextAsync(
+                "Destination",
+                destination.Id,
+                "Description",
+                destination.Description ?? string.Empty,
+                normalizedLang)
+                : await _translationService.GetTextAsync(
                 "Destination",
                 destination.Id,
                 "Description",
@@ -413,7 +429,14 @@ namespace TuristickiVodic.Services
 
             if (destination.DestinationType != null && !string.IsNullOrWhiteSpace(destination.DestinationType.Name))
             {
-                dto.DestinationTypeName = await _translationService.GetOrCreateTextAsync(
+                dto.DestinationTypeName = createMissing
+                    ? await _translationService.GetOrCreateTextAsync(
+                    "DestinationType",
+                    destination.DestinationType.Id,
+                    "Name",
+                    destination.DestinationType.Name,
+                    normalizedLang)
+                    : await _translationService.GetTextAsync(
                     "DestinationType",
                     destination.DestinationType.Id,
                     "Name",

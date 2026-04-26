@@ -44,7 +44,7 @@ export class MyReviewsComponent implements OnInit {
     }
 
     this.reviewService
-      .getAll()
+      .getMine({ page: 1, pageSize: 200 })
       .pipe(
         catchError(() => {
           this.errorMessage.set(this.translationService.translate('reviews.loadError'));
@@ -54,7 +54,6 @@ export class MyReviewsComponent implements OnInit {
       )
       .subscribe((items) => {
         const ownReviews = this.toArray(items)
-          .filter((item) => Number(item.userId) === currentUser.id)
           .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
           .map((item) => this.mapReview(item));
 
