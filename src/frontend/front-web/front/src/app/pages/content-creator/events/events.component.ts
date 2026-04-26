@@ -2,6 +2,7 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { EventService } from '../../../services/event.service';
 import { EventDto, EventQueryDto } from '../../../models/event.model';
 import { buildEventQueryDto, EventFilterState } from '../../../models/event-filters.model';
@@ -11,12 +12,6 @@ interface EventInsightCard {
   value: string;
   hint: string;
   tone: 'blue' | 'green' | 'amber';
-}
-
-interface EventCrewMember {
-  name: string;
-  role: string;
-  initials: string;
 }
 
 interface EventScheduleRow {
@@ -62,14 +57,8 @@ export class ContentCreatorEventsComponent implements OnInit {
 
   stats: EventInsightCard[] = [
     { label: 'Upcoming this week', value: '-', hint: 'Events published in the next 7 days', tone: 'blue' },
-    { label: 'Active staff', value: '48', hint: 'Content creators and coordinators online', tone: 'green' },
-    { label: 'Total capacity filled', value: '64%', hint: 'Average occupancy across published events', tone: 'amber' }
-  ];
-
-  readonly crew: EventCrewMember[] = [
-    { name: 'Marcus Chen', role: 'Content Creator', initials: 'MC' },
-    { name: 'Elena Rodriguez', role: 'Content Creator', initials: 'ER' },
-    { name: 'Ana Petrovic', role: 'Event Support', initials: 'AP' }
+    { label: 'Published on page', value: '-', hint: 'Published/approved events in current table page', tone: 'green' },
+    { label: 'Capacity configured', value: '-', hint: 'Share of visible events with max visitors set', tone: 'amber' }
   ];
 
   private readonly fallbackCategoryOptions = [
@@ -101,36 +90,53 @@ export class ContentCreatorEventsComponent implements OnInit {
   }
 
   private loadUpcomingThisWeekStat(): void {
-    this.eventService.getMy({
-      page: 1,
-      pageSize: 1,
-      nextDays: 7,
-      sortBy: 'startDate',
-      sortOrder: 'asc'
+    forkJoin({
+      approved: this.eventService.getMy({
+        page: 1,
+        pageSize: 1,
+        nextDays: 7,
+        status: 'approved',
+        sortBy: 'startDate',
+        sortOrder: 'asc'
+      }),
+      published: this.eventService.getMy({
+        page: 1,
+        pageSize: 1,
+        nextDays: 7,
+        status: 'published',
+        sortBy: 'startDate',
+        sortOrder: 'asc'
+      })
     }).subscribe({
-      next: (response) => {
+      next: ({ approved, published }) => {
+        const upcomingVisibleCount = (approved.totalCount ?? 0) + (published.totalCount ?? 0);
         this.stats[0] = {
           ...this.stats[0],
-          value: String(response.totalCount ?? 0)
+          value: String(upcomingVisibleCount)
         };
         this.cdr.detectChanges();
       },
       error: () => {
         this.stats[0] = {
           ...this.stats[0],
-          value: String(this.countUpcomingInEvents(this.events))
+          value: String(this.countUpcomingNonDeclinedInEvents(this.events))
         };
       }
     });
   }
 
-  private countUpcomingInEvents(events: EventDto[]): number {
+  private countUpcomingNonDeclinedInEvents(events: EventDto[]): number {
     const now = new Date();
     const weekAhead = new Date();
     weekAhead.setDate(now.getDate() + 7);
 
     return events.filter((event) => {
       if (!event.startDate) {
+        return false;
+      }
+
+      const normalizedStatus = (event.status ?? '').toLowerCase();
+      if (normalizedStatus === 'declined' || normalizedStatus === 'rejected') {
         return false;
       }
 
@@ -169,6 +175,7 @@ export class ContentCreatorEventsComponent implements OnInit {
         this.totalCount = response.totalCount;
         this.currentPage = response.page;
         this.syncStatusOptionsFromEvents();
+        this.refreshPageInsightCards(response.items ?? []);
 
         if (!this.selectedEvent || !this.pagedEvents.some((event) => event.id === this.selectedEvent?.id)) {
           this.selectedEvent = this.pagedEvents[0] ?? null;
@@ -335,25 +342,11 @@ export class ContentCreatorEventsComponent implements OnInit {
   }
 
   getCategoryLabel(event: EventDto): string {
-    if (event.eventTypeName) {
-      return event.eventTypeName;
-    }
-
-    const categories = ['Festival', 'Workshop', 'Sports', 'Cultural', 'Exhibition', 'Concert'];
-    return categories[(event.id - 1) % categories.length] ?? 'Festival';
+    return event.eventTypeName?.trim() || 'Uncategorized';
   }
 
   getLocationLabel(event: EventDto): string {
-    const locations = [
-      'Grand Highland Park',
-      'Clay & Co. Studio',
-      'Azure Bay Waterfront',
-      'The Blue Note Lounge',
-      'Central Exhibition Hall',
-      'Riverside Open Arena'
-    ];
-
-    return locations[(event.id - 1) % locations.length] ?? 'Central Venue';
+    return event.objectName || event.localityName || event.destinationName || '-';
   }
 
   getCapacityLabel(event: EventDto): string {
@@ -483,6 +476,28 @@ export class ContentCreatorEventsComponent implements OnInit {
     if (!this.statusOptions.some((option) => option.value === this.statusFilter)) {
       this.statusFilter = 'all';
     }
+  }
+
+  private refreshPageInsightCards(items: EventDto[]): void {
+    const publishedCount = items.filter((event) => {
+      const normalized = (event.status ?? '').toLowerCase();
+      return normalized === 'published' || normalized === 'approved';
+    }).length;
+
+    const configuredCapacityCount = items.filter((event) => (event.maxVisitors ?? 0) > 0).length;
+    const capacityConfiguredRate = items.length > 0
+      ? Math.round((configuredCapacityCount / items.length) * 100)
+      : 0;
+
+    this.stats[1] = {
+      ...this.stats[1],
+      value: String(publishedCount)
+    };
+
+    this.stats[2] = {
+      ...this.stats[2],
+      value: `${capacityConfiguredRate}%`
+    };
   }
 
   private toTitleCase(value: string): string {
