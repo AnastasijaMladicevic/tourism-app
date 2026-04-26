@@ -529,7 +529,7 @@ namespace TuristickiVodic.Services
             foreach (var dto in dtos)
             {
                 if (localitiesById.TryGetValue(dto.Id, out var locality))
-                    await ApplyTranslationsAsync(dto, locality, normalizedLang, false);
+                    await ApplyTranslationsAsync(dto, locality, normalizedLang, true);
             }
         }
 

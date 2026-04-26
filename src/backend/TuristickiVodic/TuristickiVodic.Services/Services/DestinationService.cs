@@ -385,8 +385,18 @@ namespace TuristickiVodic.Services
             var destinationsById = destinations.ToDictionary(d => d.Id);
             foreach (var dto in dtos)
             {
-                if (destinationsById.TryGetValue(dto.Id, out var destination))
-                    await ApplyTranslationsAsync(dto, destination, normalizedLang, false);
+                if (!destinationsById.TryGetValue(dto.Id, out var destination))
+                    continue;
+
+                if (!string.IsNullOrWhiteSpace(destination.DisplayTitle))
+                {
+                    dto.DisplayTitle = await _translationService.GetOrCreateTextAsync(
+                        "Destination",
+                        destination.Id,
+                        "DisplayTitle",
+                        destination.DisplayTitle,
+                        normalizedLang);
+                }
             }
         }
 

@@ -30,9 +30,13 @@ public static class SeedSqlExecutor
     {
         EnsureHistoryTable(connection);
 
-        foreach (var statement in SplitStatements(sql))
+        DeleteHistoryForSource(connection, sourceFile);
+
+        var statements = SplitStatements(sql);
+        for (var i = 0; i < statements.Count; i++)
         {
-            InsertHistory(connection, ComputeHash(statement), sourceFile);
+            var statement = statements[i];
+            InsertHistory(connection, ComputeHash(statement, sourceFile, i), sourceFile, i);
         }
     }
 
@@ -40,16 +44,25 @@ public static class SeedSqlExecutor
     {
         EnsureHistoryTable(connection);
 
-        var appliedCount = 0;
-        var knownHashes = LoadKnownHashes(connection);
-
-        foreach (var statement in SplitStatements(sql))
+        if (!HasIndexedHistoryForSource(connection, sourceFile))
         {
-            var hash = ComputeHash(statement);
-            if (knownHashes.Contains(hash))
+            SyncHistory(connection, sql, sourceFile);
+            return 0;
+        }
+
+        var appliedCount = 0;
+        var statements = SplitStatements(sql);
+        var maxAppliedIndex = LoadMaxAppliedIndex(connection, sourceFile);
+
+        for (var i = 0; i < statements.Count; i++)
+        {
+            if (i <= maxAppliedIndex)
             {
                 continue;
             }
+
+            var statement = statements[i];
+            var hash = ComputeHash(statement, sourceFile, i);
 
             using var command = connection.CreateCommand();
             command.CommandText = statement;
@@ -65,8 +78,7 @@ public static class SeedSqlExecutor
                 // rows with an existing linked entity are inserted.
             }
 
-            InsertHistory(connection, hash, sourceFile);
-            knownHashes.Add(hash);
+            InsertHistory(connection, hash, sourceFile, i);
             appliedCount++;
         }
 
@@ -81,36 +93,101 @@ public static class SeedSqlExecutor
             CREATE TABLE IF NOT EXISTS "__SeedStatementHistory" (
                 "Hash" text PRIMARY KEY,
                 "SourceFile" text NOT NULL,
+                "StatementIndex" integer NULL,
                 "ExecutedAt" timestamp with time zone NOT NULL DEFAULT NOW()
             );
             """;
         command.ExecuteNonQuery();
+
+        using var alterCommand = connection.CreateCommand();
+        alterCommand.CommandText =
+            """
+            ALTER TABLE "__SeedStatementHistory"
+            ADD COLUMN IF NOT EXISTS "StatementIndex" integer NULL;
+            """;
+        alterCommand.ExecuteNonQuery();
+
+        using var indexCommand = connection.CreateCommand();
+        indexCommand.CommandText =
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS "IX___SeedStatementHistory_SourceFile_StatementIndex"
+            ON "__SeedStatementHistory" ("SourceFile", "StatementIndex")
+            WHERE "StatementIndex" IS NOT NULL;
+            """;
+        indexCommand.ExecuteNonQuery();
     }
 
-    private static HashSet<string> LoadKnownHashes(DbConnection connection)
-    {
-        using var command = connection.CreateCommand();
-        command.CommandText = """SELECT "Hash" FROM "__SeedStatementHistory";""";
-
-        using var reader = command.ExecuteReader();
-        var hashes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
-        while (reader.Read())
-        {
-            hashes.Add(reader.GetString(0));
-        }
-
-        return hashes;
-    }
-
-    private static void InsertHistory(DbConnection connection, string hash, string sourceFile)
+    private static bool HasIndexedHistoryForSource(DbConnection connection, string sourceFile)
     {
         using var command = connection.CreateCommand();
         command.CommandText =
             """
-            INSERT INTO "__SeedStatementHistory" ("Hash", "SourceFile")
-            VALUES (@hash, @sourceFile)
-            ON CONFLICT ("Hash") DO NOTHING;
+            SELECT EXISTS (
+                SELECT 1
+                FROM "__SeedStatementHistory"
+                WHERE "SourceFile" = @sourceFile
+                  AND "StatementIndex" IS NOT NULL
+            );
+            """;
+
+        var sourceParam = command.CreateParameter();
+        sourceParam.ParameterName = "@sourceFile";
+        sourceParam.DbType = DbType.String;
+        sourceParam.Value = sourceFile;
+        command.Parameters.Add(sourceParam);
+
+        var result = command.ExecuteScalar();
+        return result is bool value && value;
+    }
+
+    private static int LoadMaxAppliedIndex(DbConnection connection, string sourceFile)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText =
+            """
+            SELECT COALESCE(MAX("StatementIndex"), -1)
+            FROM "__SeedStatementHistory"
+            WHERE "SourceFile" = @sourceFile
+              AND "StatementIndex" IS NOT NULL;
+            """;
+
+        var sourceParam = command.CreateParameter();
+        sourceParam.ParameterName = "@sourceFile";
+        sourceParam.DbType = DbType.String;
+        sourceParam.Value = sourceFile;
+        command.Parameters.Add(sourceParam);
+
+        var result = command.ExecuteScalar();
+        return Convert.ToInt32(result);
+    }
+
+    private static void DeleteHistoryForSource(DbConnection connection, string sourceFile)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText =
+            """
+            DELETE FROM "__SeedStatementHistory"
+            WHERE "SourceFile" = @sourceFile;
+            """;
+
+        var sourceParam = command.CreateParameter();
+        sourceParam.ParameterName = "@sourceFile";
+        sourceParam.DbType = DbType.String;
+        sourceParam.Value = sourceFile;
+        command.Parameters.Add(sourceParam);
+
+        command.ExecuteNonQuery();
+    }
+
+    private static void InsertHistory(DbConnection connection, string hash, string sourceFile, int statementIndex)
+    {
+        using var command = connection.CreateCommand();
+        command.CommandText =
+            """
+            INSERT INTO "__SeedStatementHistory" ("Hash", "SourceFile", "StatementIndex")
+            VALUES (@hash, @sourceFile, @statementIndex)
+            ON CONFLICT ("SourceFile", "StatementIndex") WHERE "StatementIndex" IS NOT NULL
+            DO UPDATE SET "Hash" = EXCLUDED."Hash", "ExecutedAt" = NOW();
             """;
 
         var hashParam = command.CreateParameter();
@@ -125,12 +202,18 @@ public static class SeedSqlExecutor
         sourceParam.Value = sourceFile;
         command.Parameters.Add(sourceParam);
 
+        var statementIndexParam = command.CreateParameter();
+        statementIndexParam.ParameterName = "@statementIndex";
+        statementIndexParam.DbType = DbType.Int32;
+        statementIndexParam.Value = statementIndex;
+        command.Parameters.Add(statementIndexParam);
+
         command.ExecuteNonQuery();
     }
 
-    private static string ComputeHash(string statement)
+    private static string ComputeHash(string statement, string sourceFile, int statementIndex)
     {
-        var normalized = statement.Trim();
+        var normalized = $"{sourceFile}:{statementIndex}:{statement.Trim()}";
         var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(normalized));
         return Convert.ToHexString(bytes);
     }

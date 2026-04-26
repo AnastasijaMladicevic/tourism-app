@@ -51,7 +51,7 @@ namespace TuristickiVodic.API.Controllers
                 .Where(o => !string.IsNullOrWhiteSpace(o.Description))
                 .ToListAsync();
 
-            var languages = new[] { "it", "es", "el" };
+            var languages = new[] { "it", "es" };
 
             foreach (var obj in objects)
             {
@@ -92,7 +92,7 @@ namespace TuristickiVodic.API.Controllers
             if (obj == null)
                 return NotFound();
 
-            var languages = new[] { "es", "it", "el" };
+            var languages = new[] { "es", "it" };
 
             await _translationService.GenerateIfMissingAsync(
                 "Object",

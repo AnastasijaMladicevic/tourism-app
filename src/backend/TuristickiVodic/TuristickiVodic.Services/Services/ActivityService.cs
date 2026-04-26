@@ -924,7 +924,7 @@ namespace TuristickiVodic.Services.Services
             foreach (var dto in dtos)
             {
                 if (activitiesById.TryGetValue(dto.Id, out var activity))
-                    await ApplyTranslationsAsync(dto, activity, normalizedLang, false);
+                    await ApplyTranslationsAsync(dto, activity, normalizedLang, true);
             }
         }
 

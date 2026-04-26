@@ -343,7 +343,7 @@ namespace TuristickiVodic.Services.Services
                 TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
             };
         }
-        
+
         public async Task<List<EventTypeOptionDto>> GetEventTypesAsync()
         {
             return await _context.EventTypes
@@ -756,7 +756,7 @@ namespace TuristickiVodic.Services.Services
                 .FirstAsync(e => e.Id == id);
         }
 
-       private async Task ValidateReferences(int eventTypeId, int? localityId, int? destinationId, int? objectId)
+        private async Task ValidateReferences(int eventTypeId, int? localityId, int? destinationId, int? objectId)
         {
             if (!await _context.EventTypes.AnyAsync(x => x.Id == eventTypeId))
                 throw new InvalidOperationException("Event type not found.");
@@ -781,7 +781,7 @@ namespace TuristickiVodic.Services.Services
 
             if (destinationId.HasValue && !await _context.Destinations.AnyAsync(x => x.Id == destinationId.Value))
                 throw new InvalidOperationException("Destination not found.");
-                if (objectId.HasValue)
+            if (objectId.HasValue)
             {
                 var touristObject = await _context.Objects
                     .AsNoTracking()
@@ -1002,7 +1002,7 @@ namespace TuristickiVodic.Services.Services
             foreach (var dto in dtos)
             {
                 if (eventsById.TryGetValue(dto.Id, out var ev))
-                    await ApplyTranslationsAsync(dto, ev, normalizedLang, false);
+                    await ApplyTranslationsAsync(dto, ev, normalizedLang, true);
             }
         }
 
