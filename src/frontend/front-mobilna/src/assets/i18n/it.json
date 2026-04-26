@@ -1,0 +1,378 @@
+{
+  "common": {
+    "back": "Indietro",
+    "loading": "Caricamento...",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "remove": "Rimuovi",
+    "close": "Chiudi",
+    "details": "Dettagli",
+    "retry": "Riprova",
+    "notAvailable": "Non disponibile",
+    "dateNotAvailable": "Data non disponibile",
+    "emailNotAvailable": "Email non disponibile",
+    "savedOn": "Salvato",
+    "publishedOn": "Pubblicato",
+    "openNow": "APERTO",
+    "closed": "CHIUSO",
+    "new": "Nuovo",
+    "reviews": "recensioni",
+    "reviewsTitle": "Recensioni",
+    "seeAll": "Vedi tutto >",
+    "viewAll": "Visualizza tutto >",
+    "gallery": "Galleria",
+    "location": "Posizione",
+    "viewOnMap": "Visualizza sulla mappa",
+    "bookNow": "Prenota ora",
+    "addReview": "Aggiungi recensione",
+    "contactInfo": "Informazioni di contatto",
+    "price": "Prezzo",
+    "startingFrom": "A partire da",
+    "about": "Chi siamo"
+  },
+  "nav": {
+    "home": "Home",
+    "map": "Mappa",
+    "favorites": "Preferiti",
+    "planner": "Pianificatore",
+    "profile": "Profilo"
+  },
+  "profile": {
+    "title": "Profilo",
+    "edit": "Modifica",
+    "activeAccount": "Account attivo",
+    "defaultUser": "Utente SpireGO",
+    "stats": {
+      "favorites": "PREFERITI",
+      "reviews": "RECENSIONI"
+    },
+    "section": {
+      "trips": "I MIEI VIAGGI",
+      "settings": "IMPOSTAZIONI",
+      "account": "ACCOUNT"
+    },
+    "favorites": "Preferiti",
+    "myReviews": "Le mie recensioni",
+    "language": "Lingua",
+    "region": "Regione",
+    "support": "Aiuto e supporto",
+    "privacy": "Privacy e dati",
+    "terms": "Termini di utilizzo",
+    "moderator": "Richiedi accesso moderatore",
+    "about": "Chi siamo",
+    "logout": "Esci"
+  },
+  "region": {
+    "title": "Regione",
+    "available": "Regioni disponibili",
+    "infoTitle": "Le modifiche alla regione si applicano immediatamente",
+    "infoBody": "Dopo il salvataggio, l'intera interfaccia mobile passerà immediatamente alla regione selezionata.",
+    "montenegro": "Montenegro",
+    "spain": "Spagna",
+    "defaultBadge": "Predefinito",
+    "active": "Questa regione è già attiva.",
+    "saved": "Regione aggiornata con successo.",
+    "saveFailed": "La modifica della regione non è stata salvata.",
+    "loadFailed": "Le regioni non sono attualmente disponibili.",
+    "noneAvailable": "Nessuna regione disponibile.",
+    "apply": "Applica regione",
+    "confirm": "Toccando il pulsante confermi di voler passare alla regione {{language}}."
+  },
+  "language": {
+    "title": "Lingua",
+    "available": "Lingue disponibili",
+    "infoTitle": "Le modifiche alla lingua si applicano immediatamente",
+    "infoBody": "Dopo il salvataggio, l'interfaccia mobile passerà immediatamente alla lingua selezionata.",
+    "active": "Questa lingua è già attiva.",
+    "saveFailed": "La modifica della lingua non è stata salvata.",
+    "saved": "Lingua aggiornata con successo.",
+    "saving": "Salvataggio...",
+    "apply": "Applica lingua",
+    "confirm": "Toccando il pulsante confermi di voler cambiare la lingua dell'app in {{language}}.",
+    "serbianMontenegrin": "Serbo/Montenegrino",
+    "english": "Inglese",
+    "spanish": "Spagnolo",
+    "italian": "Italiano"
+  },
+  "favorites": {
+    "heroEyebrow": "PREFERITI",
+    "heroTitle": "Tutti i tuoi oggetti preferiti sono in un unico posto.",
+    "heroBody": "Sfoglia tutto ciò che hai aggiunto ai preferiti e rimuovi rapidamente gli elementi che non vuoi più conservare.",
+    "loadError": "I preferiti non sono attualmente disponibili.",
+    "removeError": "L'elemento preferito non ha potuto essere rimosso. Riprova.",
+    "loadingBody": "Stiamo preparando i tuoi preferiti.",
+    "emptyTitle": "Non hai ancora preferiti",
+    "emptyBody": "Quando aggiungi una destinazione o un oggetto ai preferiti, apparirà qui.",
+    "removing": "Rimozione...",
+    "type": {
+      "default": "Preferito",
+      "destination": "Destinazione",
+      "object": "Oggetto",
+      "activity": "Attività",
+      "route": "Percorso",
+      "locality": "Luogo"
+    },
+    "fallbackTitle": "Preferito #{{id}}"
+  },
+  "reviews": {
+    "title": "Le mie recensioni",
+    "heroEyebrow": "IL TUO FEEDBACK",
+    "heroTitle": "Tutte le recensioni che hai lasciato sono mostrate qui.",
+    "heroBody": "Rivedi cosa hai valutato, quando è stato lasciato il commento e se c'è una risposta.",
+    "loadError": "Le tue recensioni non sono attualmente disponibili.",
+    "loadingBody": "Stiamo preparando le tue recensioni.",
+    "emptyTitle": "Non hai ancora nessuna recensione",
+    "emptyBody": "Quando lasci un commento su un oggetto o una destinazione, apparirà qui.",
+    "objectFallback": "Luogo senza nome",
+    "textFallback": "Questa recensione non ha commenti aggiuntivi.",
+    "statusFallback": "Nessuno stato",
+    "ratingAria": "Valutazione {{rating}}",
+    "creatorResponse": "Risposta del creatore"
+  },
+  "moderator": {
+    "title": "Accesso moderatore",
+    "eyebrow": "RUOLO SPECIALE",
+    "heroTitle": "Invia una richiesta di accesso come moderatore",
+    "heroBody": "Se desideri un ruolo più ampio nel mantenimento della qualità dei contenuti, puoi inviare qui una richiesta che il team di amministrazione esaminerà e approverà.",
+    "currentStatus": "Stato attuale",
+    "currentRole": "Il tuo ruolo attuale: {{role}}",
+    "whatYouGet": "Cosa ottieni",
+    "requirements": "Requisiti",
+    "sendRequestTitle": "Invia richiesta",
+    "sendRequestBody": "Toccando il pulsante invii una richiesta al team di revisione. Dopo la valutazione, l'accesso sarà approvato o rifiutato in base alle regole della piattaforma.",
+    "submitting": "Invio richiesta...",
+    "sendRequest": "Invia richiesta",
+    "requestFailed": "La richiesta non può essere inviata al momento.",
+    "requestSent": "La tua richiesta di accesso come moderatore è stata inviata con successo.",
+    "role": {
+      "tourist": "Turista",
+      "moderator": "Moderatore",
+      "admin": "Amministratore",
+      "manager": "Manager"
+    },
+    "badge": {
+      "approved": "Accesso approvato",
+      "activeRole": "Ruolo speciale attivo",
+      "available": "Richiesta disponibile"
+    },
+    "req": {
+      "1": "Il tuo account deve essere attivo e in buono stato.",
+      "2": "È preferibile avere esperienza con le segnalazioni di contenuti e le linee guida della community.",
+      "3": "Dopo l'invio, il team di amministrazione esamina la richiesta e lo stato dell'account."
+    },
+    "resp": {
+      "1": "Esaminare i contenuti segnalati ed eseguire la moderazione di base.",
+      "2": "Comunicazione più rapida con il supporto quando è necessaria un'azione.",
+      "3": "Contribuire alla qualità e alla sicurezza dei contenuti all'interno dell'app."
+    }
+  },
+  "editProfile": {
+    "title": "Modifica profilo",
+    "photoAlt": "Foto profilo",
+    "changePhoto": "Cambia foto",
+    "removePhoto": "Rimuovi foto",
+    "firstName": "Nome",
+    "lastName": "Cognome",
+    "country": "Paese",
+    "email": "Indirizzo email",
+    "phone": "Numero di telefono",
+    "interests": "I tuoi interessi",
+    "selectedCount": "Selezionati: {{count}}",
+    "appLanguage": "Lingua dell'app",
+    "currentLanguage": "Attuale: {{language}}",
+    "saving": "Salvataggio...",
+    "saveChanges": "Salva modifiche",
+    "cancelChanges": "Annulla modifiche",
+    "refreshFallback": "Il profilo non è stato aggiornato dal server. Vengono mostrati i dati locali.",
+    "saveFailed": "Le modifiche non sono state salvate.",
+    "saved": "Le modifiche sono state salvate con successo.",
+    "photoRemoveFailed": "La foto non è stata rimossa.",
+    "photoRemoved": "La foto è stata rimossa.",
+    "photoFormats": "I formati consentiti sono PNG, JPG e WEBP.",
+    "photoSize": "La foto non deve essere più grande di 5MB.",
+    "photoSaveFailed": "La foto non è stata salvata.",
+    "photoSaved": "La foto è stata aggiornata con successo.",
+    "languageSelected": "Lingua selezionata: {{language}}.",
+    "nameError": "Il nome deve contenere almeno 2 caratteri.",
+    "lastNameError": "Il cognome deve contenere almeno 2 caratteri.",
+    "countryError": "Il paese può avere al massimo 40 caratteri.",
+    "phoneError": "Inserisci il numero di telefono nel formato +382 67 000 000.",
+    "validationError": "Controlla i campi evidenziati prima di salvare.",
+    "interest": {
+      "beaches": "Spiagge",
+      "hiking": "Escursionismo",
+      "history": "Storia",
+      "gastronomy": "Gastronomia",
+      "nightlife": "Vita notturna",
+      "culture": "Cultura",
+      "parks": "Parchi nazionali"
+    }
+  },
+  "support": {
+    "title": "Aiuto e supporto",
+    "heroTitle": "Aiuto per profilo e impostazioni mobile",
+    "searchAria": "Cerca domande",
+    "searchPlaceholder": "Cerca domande frequenti...",
+    "faqTitle": "Domande frequenti",
+    "contactTitle": "Contatto diretto",
+    "contactUsers": "Supporto clienti",
+    "contactUsersBody": "Chiamaci per domande rapide sul tuo account e sull'app",
+    "reportProblem": "Segnala un problema",
+    "reportProblemBody": "Invia i dettagli se una funzione del profilo non funziona come previsto",
+    "hoursTitle": "Orari di supporto",
+    "weekdays": "Lunedì - Venerdì",
+    "weekend": "Sabato - Domenica",
+    "chatNote": "* Il tempo medio di risposta in chat è inferiore a 5 minuti.",
+    "ticketNote": "* Le risposte ai problemi segnalati arrivano entro 24 ore.",
+    "faq": {
+      "1": {
+        "q": "Come aggiorno le informazioni del profilo?",
+        "a": "Nella schermata Modifica profilo puoi cambiare nome, cognome, numero di telefono, paese e foto del profilo usando le opzioni account esistenti."
+      },
+      "2": {
+        "q": "Dove posso vedere i miei preferiti?",
+        "a": "La schermata Preferiti mostra tutti gli elementi salvati tramite l'API corrente e ti consente di rimuovere rapidamente tutto ciò di cui non hai più bisogno."
+      },
+      "3": {
+        "q": "Come funziona il pianificatore di viaggio?",
+        "a": "Il pianificatore attualmente funziona localmente sul dispositivo e non richiede modifiche al backend. Puoi salvare una destinazione, una data, note e una checklist."
+      },
+      "4": {
+        "q": "Come cambio la lingua dell'app?",
+        "a": "Nella schermata Lingua puoi scegliere una lingua supportata e salvare la modifica tramite il percorso utente. La modifica si riflette immediatamente nell'interfaccia mobile."
+      }
+    }
+  },
+  "about": {
+    "supportTitle": "Informazioni e supporto",
+    "version": "Versione 2.4.0",
+    "quote": "\"La nostra missione è offrire ad ogni viaggiatore un'esperienza autentica del Montenegro, dalle spiagge nascoste del sud alle vette incontaminate del nord.\"",
+    "privacy": "Politica sulla privacy",
+    "privacyBody": "Come proteggiamo i tuoi dati",
+    "terms": "Termini di utilizzo",
+    "termsBody": "Regole per l'utilizzo dell'app",
+    "contact": "Contattaci",
+    "contactBody": "Domande, suggerimenti o problemi",
+    "footerMade": "Fatto con il cuore in Montenegro",
+    "footerRights": "Tutti i diritti riservati."
+  },
+  "privacy": {
+    "title": "Privacy e dati",
+    "eyebrow": "TRASPARENTE",
+    "heroTitle": "Cosa l'app mobile archivia e mostra attualmente.",
+    "heroBody": "Questa schermata fornisce una chiara panoramica dei dati utilizzati dal frontend e delle attuali limitazioni fino a quando il backend non riceverà funzionalità aggiuntive.",
+    "notesTitle": "Note importanti",
+    "section": {
+      "1": {
+        "title": "Dati dell'account",
+        "body": "Il frontend mobile mostra attualmente i dati di base dell'account come nome, cognome, email, numero di telefono, paese e foto del profilo."
+      },
+      "2": {
+        "title": "Dati archiviati localmente",
+        "body": "I dati del pianificatore di viaggio e gli interessi possono essere archiviati localmente sul dispositivo senza inviare nuovi dati al backend."
+      },
+      "3": {
+        "title": "Come richiedere una modifica",
+        "body": "Se desideri una correzione dei dati o una spiegazione aggiuntiva, usa la schermata Aiuto e supporto o l'indirizzo di contatto indicato nell'app."
+      }
+    },
+    "note": {
+      "1": "Il frontend non gestisce l'eliminazione dell'account o l'esportazione dei dati senza supporto backend.",
+      "2": "Gli aggiornamenti della foto del profilo e le modifiche di base al profilo utilizzano le rotte API esistenti già disponibili.",
+      "3": "Le azioni sensibili dell'account richiedono supporto backend aggiuntivo e autorizzazioni."
+    }
+  },
+  "terms": {
+    "title": "Termini di utilizzo",
+    "eyebrow": "PANORAMICA TERMINI",
+    "heroTitle": "Un chiaro riepilogo delle regole per l'app mobile.",
+    "heroBody": "Questa schermata fornisce una panoramica frontend delle regole di utilizzo più importanti fino a quando la versione legale completa non viene allineata nell'intero sistema.",
+    "notesTitle": "Note",
+    "section": {
+      "1": {
+        "title": "Utilizzo dell'app",
+        "body": "Il frontend mobile ti consente di sfogliare destinazioni, oggetti, preferiti e impostazioni personali. L'utente è responsabile dell'accuratezza dei dati inseriti nell'account."
+      },
+      "2": {
+        "title": "Contenuti e informazioni",
+        "body": "I dati visualizzati dipendono dalle risposte API disponibili. Il frontend mostra ciò che il backend restituisce attualmente e non garantisce funzionalità aggiuntive non supportate dalle rotte di sistema."
+      },
+      "3": {
+        "title": "Account e sicurezza",
+        "body": "Logout, modifiche di base al profilo e cambi di foto utilizzano i meccanismi account esistenti. Le azioni account aggiuntive richiedono supporto backend dedicato."
+      }
+    },
+    "note": {
+      "1": "Preferiti, recensioni e dati del profilo sono collegati all'account attualmente connesso.",
+      "2": "Il pianificatore archiviato localmente funziona solo sul dispositivo in cui è stato creato.",
+      "3": "Le versioni legali e di produzione dei termini devono ancora essere allineate con il team e le specifiche del backend."
+    }
+  },
+  "map": {
+    "searchPlaceholder": "Cerca oggetti, percorsi...",
+    "geoUnsupported": "La geolocalizzazione non è supportata in questo browser.",
+    "geoDenied": "Consenti l'accesso alla posizione nelle impostazioni del browser.",
+    "geoUnavailable": "La posizione non è attualmente disponibile.",
+    "geoFailed": "Impossibile ottenere la tua posizione."
+  },
+  "event": {
+    "title": "Evento",
+    "loadingError": "Impossibile caricare l'evento.",
+    "addedToPlanner": "L'evento è stato aggiunto al Pianificatore",
+    "free": "Gratuito",
+    "buyTicket": "Acquista biglietto",
+    "ticketAlert": "Acquisto biglietto - Prezzo: {{price}}",
+    "addToPlanner": "Aggiungi al Pianificatore",
+    "about": "Sull'evento",
+    "descriptionFallback": "Descrizione non disponibile.",
+    "availableTickets": "Biglietti disponibili",
+    "standardTicket": "Biglietto standard",
+    "select": "Seleziona"
+  },
+  "object": {
+    "titleFallback": "Oggetto",
+    "loadingError": "Impossibile caricare l'oggetto.",
+    "about": "Su {{name}}",
+    "amenitiesSoon": "I servizi saranno disponibili a breve.",
+    "writeReviewSoon": "Il modulo per la nuova recensione è ancora in costruzione.",
+    "workingHoursMissing": "Orari di apertura non disponibili",
+    "nearbyNone": "Non ci sono altri elementi {{name}} nelle vicinanze nella stessa posizione.",
+    "allReviews": "Tutte le recensioni",
+    "totalReviews": "{{count}} recensioni"
+  },
+  "restaurant": {
+    "title": "Ristorante",
+    "loadingError": "Impossibile caricare il ristorante.",
+    "about": "Sul ristorante",
+    "writeReviewSoon": "Il modulo per la nuova recensione è ancora in costruzione."
+  },
+  "hotel": {
+    "loadingError": "Impossibile caricare l'hotel.",
+    "bookingSoon": "Il flusso di prenotazione verrà integrato in seguito.",
+    "addedToPlanner": "L'hotel è stato aggiunto al Pianificatore",
+    "phoneMissing": "Numero di telefono non disponibile",
+    "galleryEmpty": "Nessuna immagine disponibile",
+    "reviewTitle": "Recensioni",
+    "showLess": "Mostra meno >",
+    "reviewAria": "Valutazione recensione",
+    "responseLabel": "Risposta dell'hotel",
+    "reviewsPending": "Le recensioni appariranno non appena arrivano dal backend.",
+    "nearbyTitle": "Hotel nelle vicinanze",
+    "nearbyEmpty": "Non ci sono altri hotel nella stessa posizione.",
+    "visitWebsite": "Visita il sito",
+    "aboutTitle": "Sull'hotel",
+    "aboutFallback": "Informazioni dettagliate su questo hotel verranno visualizzate qui.",
+    "locationMontenegro": "Montenegro"
+  },
+  "time": {
+    "today": "OGGI",
+    "dayAgo": "1 GIORNO FA",
+    "daysAgo": "{{count}} GIORNI FA",
+    "weekAgo": "1 SETTIMANA FA",
+    "weeksAgo": "{{count}} SETTIMANE FA",
+    "monthAgo": "1 MESE FA",
+    "monthsAgo": "{{count}} MESI FA",
+    "yearAgo": "1 ANNO FA",
+    "yearsAgo": "{{count}} ANNI FA"
+  }
+}
