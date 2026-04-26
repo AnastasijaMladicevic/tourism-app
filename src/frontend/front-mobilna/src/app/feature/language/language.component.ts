@@ -24,11 +24,10 @@ export class LanguageComponent implements OnInit {
   private readonly translationService = inject(TranslationService);
 
   protected readonly options: LanguageOption[] = [
-    { code: 'me', labelKey: 'language.montenegrin' },
-    { code: 'sr', labelKey: 'language.serbian' },
-    { code: 'en', labelKey: 'language.english' },
-    { code: 'es', labelKey: 'language.spanish' },
-    { code: 'it', labelKey: 'language.italian' },
+  { code: 'sr', labelKey: 'language.serbianMontenegrin' },
+  { code: 'en', labelKey: 'language.english' },
+  { code: 'es', labelKey: 'language.spanish' },
+  { code: 'it', labelKey: 'language.italian' },
   ];
 
   protected readonly selectedCode = signal<AppLanguage>('sr');
@@ -124,6 +123,7 @@ export class LanguageComponent implements OnInit {
   }
 
   private normalizeLanguage(language?: string | null): AppLanguage {
-    return this.translationService.normalizeLanguageCode(language);
+    const code = this.translationService.normalizeLanguageCode(language);
+    return code;
   }
 }

@@ -1,3 +1,4 @@
+using TuristickiVodic.Core.Helpers;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
@@ -378,8 +379,8 @@ namespace TuristickiVodic.Services
             if (dtos.Count == 0 || destinations.Count == 0)
                 return;
 
-            var normalizedLang = NormalizeLanguage(lang);
-            if (normalizedLang == "sr" || normalizedLang == "me")
+            var normalizedLang = LanguageHelper.Normalize(lang);
+            if (normalizedLang == "sr")
                 return;
 
             var destinationsById = destinations.ToDictionary(d => d.Id);
@@ -402,8 +403,8 @@ namespace TuristickiVodic.Services
 
         private async Task ApplyTranslationsAsync(DestinationDto dto, Destination destination, string? lang, bool createMissing = true)
         {
-            var normalizedLang = NormalizeLanguage(lang);
-            if (normalizedLang == "sr" || normalizedLang == "me")
+            var normalizedLang = LanguageHelper.Normalize(lang);
+            if (normalizedLang == "sr")
                 return;
 
             if (!string.IsNullOrWhiteSpace(destination.DisplayTitle))
@@ -453,13 +454,6 @@ namespace TuristickiVodic.Services
                     destination.DestinationType.Name,
                     normalizedLang);
             }
-        }
-
-        private static string NormalizeLanguage(string? lang)
-        {
-            return string.IsNullOrWhiteSpace(lang)
-                ? "sr"
-                : lang.Trim().ToLowerInvariant();
         }
     }
 }

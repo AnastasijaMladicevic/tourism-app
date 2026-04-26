@@ -1,3 +1,4 @@
+using TuristickiVodic.Core.Helpers;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
@@ -1148,9 +1149,9 @@ namespace TuristickiVodic.Services.Services
             if (dtos.Count == 0 || objects.Count == 0)
                 return;
 
-            var normalizedLang = NormalizeLanguage(lang);
+            var normalizedLang = LanguageHelper.Normalize(lang);
 
-            if (normalizedLang == "sr" || normalizedLang == "me")
+            if (normalizedLang == "sr")
                 return;
 
             var objectsById = objects.ToDictionary(o => o.Id);
@@ -1166,9 +1167,9 @@ namespace TuristickiVodic.Services.Services
 
         private async Task ApplyTranslationsAsync(TouristObjectDto dto, TouristObject obj, string? lang, bool createMissing = true)
         {
-            var normalizedLang = NormalizeLanguage(lang);
+            var normalizedLang = LanguageHelper.Normalize(lang);
 
-            if (normalizedLang == "sr" || normalizedLang == "me")
+            if (normalizedLang == "sr")
                 return;
 
             dto.Description = createMissing
@@ -1236,13 +1237,6 @@ namespace TuristickiVodic.Services.Services
             */
         }
 
-        private static string NormalizeLanguage(string? lang)
-        {
-            return string.IsNullOrWhiteSpace(lang)
-                ? "sr"
-                : lang.Trim().ToLower();
-        }
-
         private async Task<string[]> TranslateAmenityValuesAsync(int objectId, string[] amenities, string lang, bool createMissing)
         {
             var translated = new List<string>(amenities.Length);
@@ -1273,8 +1267,8 @@ namespace TuristickiVodic.Services.Services
 
         private async Task ApplyReviewTranslationsAsync(List<TouristObjectReviewDto> reviews, string? lang, bool createMissing)
         {
-            var normalizedLang = NormalizeLanguage(lang);
-            if (normalizedLang == "sr" || normalizedLang == "me" || reviews.Count == 0)
+            var normalizedLang = LanguageHelper.Normalize(lang);
+            if (normalizedLang == "sr" || reviews.Count == 0)
                 return;
 
             foreach (var review in reviews)

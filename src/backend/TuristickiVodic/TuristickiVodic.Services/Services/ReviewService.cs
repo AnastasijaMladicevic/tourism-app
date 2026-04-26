@@ -1,3 +1,4 @@
+using TuristickiVodic.Core.Helpers;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -416,8 +417,8 @@ namespace TuristickiVodic.Services.Services
 
         private async Task ApplyTranslationsAsync(List<ReviewDto> items, string? languageCode, bool createMissing)
         {
-            var normalizedLanguage = NormalizeLanguage(languageCode);
-            if (normalizedLanguage == "sr" || normalizedLanguage == "me" || items.Count == 0)
+            var normalizedLanguage = LanguageHelper.Normalize(languageCode);
+            if (normalizedLanguage == "sr" || items.Count == 0)
                 return;
 
             foreach (var item in items)
@@ -441,13 +442,6 @@ namespace TuristickiVodic.Services.Services
             return createMissing
                 ? await _translationService.GetOrCreateTextAsync("Review", reviewId, fieldName, originalText, languageCode)
                 : await _translationService.GetTextAsync("Review", reviewId, fieldName, originalText, languageCode);
-        }
-
-        private static string NormalizeLanguage(string? languageCode)
-        {
-            return string.IsNullOrWhiteSpace(languageCode)
-                ? "sr"
-                : languageCode.Trim().ToLowerInvariant();
         }
 
         private static IQueryable<Review> ApplyReviewSorting(IQueryable<Review> query, string? sortBy, string? sortOrder)

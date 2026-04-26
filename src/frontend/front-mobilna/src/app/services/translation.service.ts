@@ -1,10 +1,9 @@
 import { Injectable, effect, signal } from '@angular/core';
 
-export type AppLanguage = 'me' | 'sr' | 'en' | 'es' | 'it';
+export type AppLanguage = 'sr' | 'en' | 'es' | 'it';
 type TranslationLocale = 'sr' | 'en';
 
 const LANGUAGE_LABEL_KEYS: Record<AppLanguage, string> = {
-  me: 'language.montenegrin',
   sr: 'language.serbian',
   en: 'language.english',
   es: 'language.spanish',
@@ -107,8 +106,7 @@ const TRANSLATIONS: Record<string, Record<TranslationLocale, string>> = {
     sr: 'Klikom na dugme potvrdujete promenu regiona aplikacije na {{language}}.',
     en: 'By tapping the button you confirm switching the app region to {{language}}.',
   },
-  'language.montenegrin': { sr: 'Crnogorski', en: 'Montenegrin' },
-  'language.serbian': { sr: 'Srpski', en: 'Serbian' },
+  'language.serbianMontenegrin': { sr: 'Srpski/Crnogorski', en: 'Serbian/Montenegrin' },
   'language.english': { sr: 'English', en: 'English' },
   'language.spanish': { sr: 'Spanski', en: 'Spanish' },
   'language.italian': { sr: 'Italijanski', en: 'Italian' },
@@ -420,20 +418,14 @@ export class TranslationService {
   }
 
   currentLocale(): string {
-    switch (this.activeLanguage()) {
-      case 'en':
-        return 'en-US';
-      case 'es':
-        return 'es-ES';
-      case 'it':
-        return 'it-IT';
-      case 'me':
-        return 'sr-Latn-ME';
-      case 'sr':
-      default:
-        return 'sr-Latn-RS';
-    }
+  switch (this.activeLanguage()) {
+    case 'en': return 'en-US';
+    case 'es': return 'es-ES';
+    case 'it': return 'it-IT';
+    case 'sr':
+    default:   return 'sr-Latn-RS';
   }
+}
 
   setLanguage(language?: string | null): AppLanguage {
     const normalized = this.normalizeLanguage(language);
@@ -474,23 +466,16 @@ export class TranslationService {
     switch (language?.trim().toLowerCase()) {
       case 'me':
       case 'cnr':
-        return 'me';
-      case 'en':
-        return 'en';
-      case 'es':
-        return 'es';
-      case 'it':
-        return 'it';
-      case 'el':
-      case 'gr':
-        return 'sr';
+        return 'sr';   // ← crnogorski → srpski
+      case 'en': return 'en';
+      case 'es': return 'es';
+      case 'it': return 'it';
       case 'sr':
-      default:
-        return 'sr';
+      default:   return 'sr';
     }
   }
 
   private resolveTranslationLocale(language: AppLanguage): TranslationLocale {
-    return language === 'me' || language === 'sr' ? 'sr' : 'en';
+    return language === 'sr' ? 'sr' : 'en';
   }
 }

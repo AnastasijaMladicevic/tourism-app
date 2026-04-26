@@ -1,3 +1,4 @@
+using TuristickiVodic.Core.Helpers;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
@@ -26,8 +27,8 @@ namespace TuristickiVodic.Services.Services
             string originalText,
             string languageCode)
         {
-            var normalizedLanguage = NormalizeLanguage(languageCode);
-            if (normalizedLanguage == "sr" || normalizedLanguage == "me")
+            var normalizedLanguage = LanguageHelper.Normalize(languageCode);
+            if (normalizedLanguage == "sr")
                 return originalText;
 
             var translation = await _context.Translations
@@ -51,8 +52,8 @@ namespace TuristickiVodic.Services.Services
             if (string.IsNullOrWhiteSpace(originalText))
                 return originalText;
 
-            var normalizedLanguage = NormalizeLanguage(languageCode);
-            if (normalizedLanguage == "sr" || normalizedLanguage == "me")
+            var normalizedLanguage = LanguageHelper.Normalize(languageCode);
+            if (normalizedLanguage == "sr")
                 return originalText;
 
             var translation = await _context.Translations
@@ -105,11 +106,15 @@ namespace TuristickiVodic.Services.Services
             if (string.IsNullOrWhiteSpace(originalText))
                 return;
 
-            foreach (var lang in targetLanguages.Distinct())
-            {
-                if (lang == "sr" || lang == "me")
-                    continue;
+            var normalizedLanguages = targetLanguages
+                .Where(lang => !string.IsNullOrWhiteSpace(lang))
+                .Select(LanguageHelper.Normalize)
+                .Where(lang => lang != "sr")
+                .Distinct()
+                .ToList();
 
+            foreach (var lang in normalizedLanguages)
+            {
                 var exists = await _context.Translations.AnyAsync(t =>
                     t.EntityType == entityType &&
                     t.EntityId == entityId &&
@@ -143,13 +148,6 @@ namespace TuristickiVodic.Services.Services
             using var sha = SHA256.Create();
             var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(text));
             return Convert.ToHexString(bytes);
-        }
-
-        private static string NormalizeLanguage(string? languageCode)
-        {
-            return string.IsNullOrWhiteSpace(languageCode)
-                ? "sr"
-                : languageCode.Trim().ToLowerInvariant();
         }
     }
 }
