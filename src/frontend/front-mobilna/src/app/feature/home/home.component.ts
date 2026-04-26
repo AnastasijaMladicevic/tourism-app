@@ -1,7 +1,8 @@
 import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { catchError, finalize, forkJoin, map, of } from 'rxjs';
 import { BottomNavComponent } from '../bottom-nav/bottom-nav.component';
 import { DestinationDto, DestinationService } from '../../services/destination';
 import { EventDto, EventService } from '../../services/event';
@@ -46,6 +47,16 @@ interface FeaturedDestination {
   name: string;
   description?: string;
   imageUrl?: string;
+}
+
+interface ApiTranslationDto {
+  id: number;
+  entityType: string;
+  entityId: number;
+  fieldName: string;
+  languageCode: string;
+  translatedText: string;
+  isAutoTranslated: boolean;
 }
 
 interface SearchResult {
@@ -112,6 +123,7 @@ export class HomeComponent implements OnInit {
 
   constructor(
     public router: Router,
+    private http: HttpClient,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone,
     private destinationService: DestinationService,
@@ -294,13 +306,11 @@ export class HomeComponent implements OnInit {
     this.currentFeatured = this.featuredDestinations[index];
   }
   ngOnInit(): void {
-    this.loadFeatured();
     this.loadUserName();
     this.loadPlaceCards();
     this.loadRecommendedCards();
     this.loadEventCards();
     this.loadFavorites();
-    this.loadEvents();
   }
   ngOnDestroy(): void {
     if (this.rotationInterval) {
@@ -423,13 +433,19 @@ export class HomeComponent implements OnInit {
 
     forkJoin({
       destinations: this.destinationService
-        .getAll({ page: 1, pageSize: 24, sortBy: 'name', sortOrder: 'asc' })
+        .getAll({ page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc' })
         .pipe(catchError(() => of([] as unknown[]))),
       objects: this.objectService
-        .getAll({ page: 1, pageSize: 24, sortBy: 'name', sortOrder: 'asc' })
+        .getAll(
+          { page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc' },
+          { bypassLanguage: true },
+        )
         .pipe(catchError(() => of([] as unknown[]))),
       activities: this.activityService
-        .getAll({ page: 1, pageSize: 24, sortBy: 'name', sortOrder: 'asc' })
+        .getAll(
+          { page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc' },
+          { bypassLanguage: true },
+        )
         .pipe(catchError(() => of([] as unknown[]))),
     })
       .pipe(
@@ -443,6 +459,12 @@ export class HomeComponent implements OnInit {
           .map((d) => this.normalizeDestination(d))
           .filter((d) => d.id > 0 && d.isActive !== false)
           .map((d) => this.toDestinationCard(d));
+
+        const featured = this.toArray<DestinationDto>(destinations)
+          .map((destination) => this.normalizeDestination(destination))
+          .filter((destination) => destination.id > 0 && destination.isActive !== false)
+          .map((destination) => this.toFeaturedDestination(destination))
+          .filter((destination) => !!destination.imageUrl);
 
         const objectCards = this.toArray<ObjectDto>(objects)
           .map((o) => this.normalizeObject(o))
@@ -464,6 +486,22 @@ export class HomeComponent implements OnInit {
           this.applyFavoriteState(this.recommended);
         }
         this.popular = destinationCards;
+
+        if (featured.length) {
+          const shuffled = [...featured].sort(() => Math.random() - 0.5);
+          const selectedFeatured = shuffled.slice(0, Math.min(5, shuffled.length));
+          this.translateFeaturedDisplayTitles(selectedFeatured).subscribe((translatedFeatured) => {
+            this.featuredDestinations = translatedFeatured;
+            this.currentIndex = 0;
+            this.currentFeatured = this.featuredDestinations[0];
+            this.startRotation();
+            this.flushUi();
+          });
+        } else {
+          this.featuredDestinations = [];
+          this.currentFeatured = null;
+        }
+
         this.flushUi();
         this.allItems = [
         ...this.toArray<DestinationDto>(destinations).map(d => this.normalizeDestination(d)).map(d => ({
@@ -478,6 +516,39 @@ export class HomeComponent implements OnInit {
         })),
       ];
       });
+  }
+
+  private translateFeaturedDisplayTitles(featured: FeaturedDestination[]) {
+    const lang = (localStorage.getItem('appLanguage') || 'sr').trim().toLowerCase();
+
+    if (!featured.length || lang === 'sr' || lang === 'me') {
+      return of(featured);
+    }
+
+    return forkJoin(
+      featured.map((item) =>
+        this.http
+          .get<ApiTranslationDto[]>(
+            `${environment.apiUrl}/translations?entityType=Destination&entityId=${item.id}`,
+          )
+          .pipe(
+            map((translations) => {
+              const translatedDisplayTitle = translations
+                .find(
+                  (translation) =>
+                    translation.fieldName?.toLowerCase() === 'displaytitle' &&
+                    translation.languageCode?.toLowerCase() === lang,
+                )
+                ?.translatedText?.trim();
+
+              return translatedDisplayTitle
+                ? { ...item, description: translatedDisplayTitle }
+                : item;
+            }),
+            catchError(() => of(item)),
+          ),
+      ),
+    );
   }
 
   private loadRecommendedCards(): void {
@@ -516,7 +587,10 @@ export class HomeComponent implements OnInit {
     this.isLoadingEvents = true;
 
     this.eventService
-      .getAll()
+      .getAll(
+        { page: 1, pageSize: 12, sortBy: 'startDate', sortOrder: 'asc' },
+        { bypassLanguage: true },
+      )
       .pipe(
         catchError(() => of([] as unknown[])),
         finalize(() => {
@@ -532,7 +606,7 @@ export class HomeComponent implements OnInit {
           .filter((e) => e.id > 0 && e.isActive !== false && new Date(e.startDate) >= new Date())
           .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
 
-        this.upcomingEvents = future.slice(0, 8).map(
+        const eventCards = future.slice(0, 8).map(
           (e): EventCard => ({
             id: e.id,
             title: e.name,
@@ -544,6 +618,9 @@ export class HomeComponent implements OnInit {
             imageUrl: this.pickEventImage(e),
           }),
         );
+
+        this.upcomingEvents = eventCards;
+        this.events = eventCards;
 
         const mappedEvents = future.map((e) => ({
           id: e.id,

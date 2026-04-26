@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 
 import { AuthService } from '../../services/auth';
-import { ImageDto } from '../../services/image';
+import { ImageDto, ImageService } from '../../services/image';
 import { ObjectDto, ObjectImageDto, ObjectService, PagedResultDto } from '../../services/object';
 import { ReviewDto } from '../../services/review';
 import { MapComponent } from '../../shared/components/map/map';
@@ -40,6 +40,7 @@ export class ObjectDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private objectService: ObjectService,
+    private imageService: ImageService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -49,14 +50,22 @@ export class ObjectDetailComponent implements OnInit {
 
     forkJoin({
       object: this.objectService.getById(id),
+      images: this.imageService.getForObject(id).pipe(catchError(() => of([] as ImageDto[]))),
     }).subscribe({
-      next: ({ object }) => {
+      next: ({ object, images }) => {
         const normalizedObject = this.normalizeObject(object);
+        const normalizedImages = this.normalizeImages(images);
 
         this.object = normalizedObject;
-        this.images = ((normalizedObject.images as unknown) as ImageDto[]) || [];
+        this.images = normalizedImages;
         this.reviews = normalizedObject.reviews || [];
-        this.mainImage = this.getMainImage(this.images);
+        this.mainImage =
+          this.getMainImage(normalizedImages) ||
+          this.resolveMediaUrl(normalizedObject.mainImageUrl) ||
+          this.getMainImage(this.normalizeImages(((normalizedObject.images as unknown) as ImageDto[]) || []));
+
+        this.isLoading = false;
+        this.cdr.detectChanges();
 
         this.loadNearbyObjects(normalizedObject);
       },
@@ -85,7 +94,7 @@ export class ObjectDetailComponent implements OnInit {
         page: 1,
         pageSize: 6,
         sortOrder: 'asc',
-      })
+      }, { bypassLanguage: true })
       .subscribe({
         next: (result) => {
           this.nearbyObjects = this.extractItems(result)
@@ -93,13 +102,11 @@ export class ObjectDetailComponent implements OnInit {
             .filter((item) => item.id !== currentObject.id)
             .slice(0, 3);
 
-          this.isLoading = false;
           this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('Failed to load nearby objects:', err);
           this.nearbyObjects = [];
-          this.isLoading = false;
           this.cdr.detectChanges();
         },
       });
@@ -174,6 +181,15 @@ export class ObjectDetailComponent implements OnInit {
     if (!images || images.length === 0) return '';
     const main = images.find((image) => image.isMain);
     return this.resolveMediaUrl(main?.url ?? images[0].url) ?? '';
+  }
+
+  private normalizeImages(images: ImageDto[]): ImageDto[] {
+    return images
+      .map((image) => ({
+        ...image,
+        url: this.resolveMediaUrl(image.url) ?? '',
+      }))
+      .filter((image) => !!image.url);
   }
 
   getNearbyObjectImage(object: ObjectDto): string | undefined {

@@ -29,7 +29,6 @@ export class LanguageComponent implements OnInit {
     { code: 'en', labelKey: 'language.english' },
     { code: 'es', labelKey: 'language.spanish' },
     { code: 'it', labelKey: 'language.italian' },
-    { code: 'el', labelKey: 'language.greek' },
   ];
 
   protected readonly selectedCode = signal<AppLanguage>('sr');

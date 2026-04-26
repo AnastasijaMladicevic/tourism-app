@@ -89,7 +89,11 @@ export class EventService {
     private readonly activeRegionService: ActiveRegionService,
   ) {}
 
-  private addLang(params: HttpParams): HttpParams {
+  private addLang(params: HttpParams, options?: RegionRequestOptions): HttpParams {
+    if (options?.bypassLanguage) {
+      return params;
+    }
+
     const lang = localStorage.getItem('appLanguage') || 'sr';
     return params.set('Lang', lang);
   }
@@ -115,7 +119,7 @@ export class EventService {
       });
     }
 
-    params = this.addLang(params);
+    params = this.addLang(params, options);
     return this.http.get<EventDto[]>(this.url, { params });
   }
 
@@ -132,7 +136,7 @@ export class EventService {
       }
     });
 
-    params = this.addLang(params);
+    params = this.addLang(params, options);
     return this.http.get<PagedEventResultDto<EventDto>>(`${this.url}/nearby`, { params });
   }
 }

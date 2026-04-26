@@ -22,6 +22,7 @@ import { RegionService } from '../../services/region';
 import { ActiveRegionService } from '../../services/active-region';
 import { LocationTrackingService, TrackedLocation } from '../../services/location-tracking';
 import { SmartSearchResultDto, SmartSearchService } from '../../services/smart-search';
+import { environment } from '../../../environment/environment';
 
 interface SearchResult {
   id: number;
@@ -478,7 +479,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       name: result.name,
       typeName: result.typeName,
       location: result.location,
-      image: result.imageUrl,
+      image: this.resolveMediaUrl(result.imageUrl),
       icon: result.icon || 'place',
       lat: result.latitude,
       lng: result.longitude,
@@ -510,15 +511,15 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     forkJoin({
       destinations: this.destinationService.getAll(
         { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
-        { bypassRegion: true },
+        { bypassRegion: true, bypassLanguage: true },
       ),
       objects: this.objectService.getAll(
         { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
-        { bypassRegion: true },
+        { bypassRegion: true, bypassLanguage: true },
       ),
       events: this.eventService.getAll(
         { page: 1, pageSize: 500, sortBy: 'startDate', sortOrder: 'asc' },
-        { bypassRegion: true },
+        { bypassRegion: true, bypassLanguage: true },
       ),
     }).subscribe({
       next: ({ destinations, objects, events }) => {
@@ -597,7 +598,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       name: raw.name,
       typeName: raw.objectTypeName ?? raw.destinationTypeName ?? raw.eventTypeName ?? markerType,
       location: raw.localityName ?? raw.destinationName ?? raw.regionName ?? '',
-      image: raw.mainImageUrl ?? raw.images?.[0]?.url ?? '',
+      image: this.resolveMediaUrl(raw.mainImageUrl ?? raw.images?.[0]?.url ?? ''),
       icon: iconMap[markerType] ?? iconMap['default'],
       lat: raw.latitude,
       lng: raw.longitude,
@@ -618,15 +619,24 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getObjectType(name: string): string {
     const normalized = name.toLowerCase();
-    if (normalized.includes('hotel')) return 'hotel';
-    if (normalized.includes('restoran')) return 'restaurant';
-    if (normalized.includes('kafana')) return 'kafana';
+    if (normalized.includes('hotel') || normalized.includes('albergo')) return 'hotel';
+    if (
+      normalized.includes('restoran') ||
+      normalized.includes('restaurant') ||
+      normalized.includes('ristorante')
+    ) return 'restaurant';
+    if (
+      normalized.includes('kafana') ||
+      normalized.includes('bar') ||
+      normalized.includes('cafe') ||
+      normalized.includes('kafic')
+    ) return 'kafana';
     return 'restaurant';
   }
 
   getItemImage(): string {
     if (!this.selectedItem) return '';
-    return this.selectedItem.mainImageUrl || this.selectedItem.images?.[0]?.url || '';
+    return this.resolveMediaUrl(this.selectedItem.mainImageUrl || this.selectedItem.images?.[0]?.url) || '';
   }
 
   getItemLocation(): string {
@@ -658,9 +668,34 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       },
       error: () => {
-        // keep the existing default center if region lookup fails
+        this.activeRegionService.setActiveRegionId(null);
+        this.regionService.getDefault().subscribe({
+          next: (fallbackRegion) => {
+            if (fallbackRegion.centerLatitude == null || fallbackRegion.centerLongitude == null) {
+              return;
+            }
+
+            this.mapService.flyTo(
+              fallbackRegion.centerLatitude,
+              fallbackRegion.centerLongitude,
+              Math.round(fallbackRegion.defaultMapZoom ?? 8),
+            );
+          },
+        });
       },
     });
+  }
+
+  private resolveMediaUrl(raw?: string): string | undefined {
+    if (!raw) return undefined;
+
+    const trimmed = raw.trim();
+    if (!trimmed) return undefined;
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+
+    const apiBase = environment.apiUrl.replace(/\/api\/?$/, '');
+    if (trimmed.startsWith('/')) return `${apiBase}${trimmed}`;
+    return `${apiBase}/${trimmed}`;
   }
 
   getWorkingStatus(): boolean | null {

@@ -1,6 +1,6 @@
 import { Injectable, effect, signal } from '@angular/core';
 
-export type AppLanguage = 'me' | 'sr' | 'en' | 'es' | 'it' | 'el';
+export type AppLanguage = 'me' | 'sr' | 'en' | 'es' | 'it';
 type TranslationLocale = 'sr' | 'en';
 
 const LANGUAGE_LABEL_KEYS: Record<AppLanguage, string> = {
@@ -9,7 +9,6 @@ const LANGUAGE_LABEL_KEYS: Record<AppLanguage, string> = {
   en: 'language.english',
   es: 'language.spanish',
   it: 'language.italian',
-  el: 'language.greek',
 };
 
 const TRANSLATIONS: Record<string, Record<TranslationLocale, string>> = {
@@ -113,7 +112,6 @@ const TRANSLATIONS: Record<string, Record<TranslationLocale, string>> = {
   'language.english': { sr: 'English', en: 'English' },
   'language.spanish': { sr: 'Spanski', en: 'Spanish' },
   'language.italian': { sr: 'Italijanski', en: 'Italian' },
-  'language.greek': { sr: 'Grcki', en: 'Greek' },
 
   'favorites.heroEyebrow': { sr: 'FAVORITI', en: 'FAVORITES' },
   'favorites.heroTitle': {
@@ -429,8 +427,6 @@ export class TranslationService {
         return 'es-ES';
       case 'it':
         return 'it-IT';
-      case 'el':
-        return 'el-GR';
       case 'me':
         return 'sr-Latn-ME';
       case 'sr':
@@ -487,7 +483,7 @@ export class TranslationService {
         return 'it';
       case 'el':
       case 'gr':
-        return 'el';
+        return 'sr';
       case 'sr':
       default:
         return 'sr';

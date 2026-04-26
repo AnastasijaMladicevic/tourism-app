@@ -44,7 +44,7 @@ export class MyReviewsComponent implements OnInit {
     }
 
     this.reviewService
-      .getMine({ page: 1, pageSize: 200 })
+      .getMine({ page: 1, pageSize: 50 })
       .pipe(
         catchError(() => {
           this.errorMessage.set(this.translationService.translate('reviews.loadError'));

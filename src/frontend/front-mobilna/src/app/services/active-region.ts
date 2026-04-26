@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 
 export interface RegionRequestOptions {
   bypassRegion?: boolean;
+  bypassLanguage?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -57,6 +58,13 @@ export class ActiveRegionService {
     }
 
     const parsed = Number(raw);
-    return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
+    if (!Number.isInteger(parsed) || parsed <= 0 || parsed === 5) {
+      if (typeof localStorage !== 'undefined' && raw) {
+        localStorage.removeItem(this.storageKey);
+      }
+      return null;
+    }
+
+    return parsed;
   }
 }

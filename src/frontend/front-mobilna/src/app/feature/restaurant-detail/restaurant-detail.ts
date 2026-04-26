@@ -5,11 +5,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 import { ObjectService } from '../../services/object';
-import { ImageDto } from '../../services/image';
+import { ImageDto, ImageService } from '../../services/image';
 import { AuthService } from '../../services/auth';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 import { ReviewDto } from '../../services/review';
 import { MapComponent } from '../../shared/components/map/map';
+import { environment } from '../../../environment/environment';
 
 @Component({
   selector: 'app-restaurant-detail',
@@ -34,6 +35,7 @@ export class RestaurantDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private objectService: ObjectService,
+    private imageService: ImageService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -43,12 +45,17 @@ export class RestaurantDetailComponent implements OnInit {
 
   forkJoin({
     object: this.objectService.getById(id),
+    images: this.imageService.getForObject(id).pipe(catchError(() => of([] as ImageDto[]))),
   }).subscribe({
-    next: ({ object }) => {
+    next: ({ object, images }) => {
       this.object = object;
-      this.images = (object.images as ImageDto[]) || [];
+      const normalizedImages = this.normalizeImages(images);
+      this.images = normalizedImages;
       this.reviews = object.reviews || [];               
-      this.mainImage = this.getMainImage(this.images);
+      this.mainImage =
+        this.getMainImage(normalizedImages) ||
+        this.resolveMediaUrl(object.mainImageUrl) ||
+        this.getMainImage(this.normalizeImages((object.images as ImageDto[]) || []));
       this.isLoading = false;
       this.cdr.detectChanges();
     },
@@ -64,7 +71,28 @@ export class RestaurantDetailComponent implements OnInit {
   private getMainImage(images: ImageDto[]): string {
     if (!images || images.length === 0) return '';
     const main = images.find(i => i.isMain);
-    return main?.url ?? images[0].url;
+    return this.resolveMediaUrl(main?.url ?? images[0].url) ?? '';
+  }
+
+  private normalizeImages(images: ImageDto[]): ImageDto[] {
+    return images
+      .map((image) => ({
+        ...image,
+        url: this.resolveMediaUrl(image.url) ?? '',
+      }))
+      .filter((image) => !!image.url);
+  }
+
+  private resolveMediaUrl(raw?: string): string | undefined {
+    if (!raw) return undefined;
+
+    const trimmed = raw.trim();
+    if (!trimmed) return undefined;
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+
+    const apiBase = environment.apiUrl.replace(/\/api\/?$/, '');
+    if (trimmed.startsWith('/')) return `${apiBase}${trimmed}`;
+    return `${apiBase}/${trimmed}`;
   }
 
   toggleFavorite(): void {

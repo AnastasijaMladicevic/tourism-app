@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 
 import { AuthService } from '../../services/auth';
-import { ImageDto } from '../../services/image';
+import { ImageDto, ImageService } from '../../services/image';
 import { ObjectDto, ObjectImageDto, ObjectService } from '../../services/object';
 import { ReviewDto } from '../../services/review';
 import { environment } from '../../../environment/environment';
@@ -61,6 +61,7 @@ export class HotelDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private objectService: ObjectService,
+    private imageService: ImageService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
@@ -70,17 +71,22 @@ export class HotelDetailComponent implements OnInit {
 
     forkJoin({
       object: this.objectService.getById(id),
+      images: this.imageService.getForObject(id).pipe(catchError(() => of([] as ImageDto[]))),
     }).subscribe({
-      next: ({ object }) => {
+      next: ({ object, images }) => {
         const normalizedObject = this.normalizeObject(object);
+        const normalizedImages = this.normalizeImages(images);
 
         this.hotel = normalizedObject;
         this.workingHoursText = normalizedObject.workingHours
           ? this.formatWorkingHours(normalizedObject.workingHours)
           : '';
 
-        this.images = normalizedObject.images || [];
-        this.mainImage = this.getMainImage(this.images);
+        this.images = normalizedImages;
+        this.mainImage =
+          this.getMainImage(normalizedImages) ||
+          this.resolveMediaUrl(normalizedObject.mainImageUrl) ||
+          this.getMainImage(this.normalizeImages((normalizedObject.images || []) as (ImageDto | ObjectImageDto)[]));
         this.reviews = this.toReviewCards(normalizedObject.reviews || [], normalizedObject.id);
         this.loadNearbyHotels(normalizedObject);
 
@@ -189,7 +195,16 @@ export class HotelDetailComponent implements OnInit {
   private getMainImage(images: (ImageDto | ObjectImageDto)[]): string {
     if (!images.length) return '';
     const main = images.find((image) => image.isMain);
-    return main?.url ?? images[0].url;
+    return this.resolveMediaUrl(main?.url ?? images[0].url) ?? '';
+  }
+
+  private normalizeImages(images: (ImageDto | ObjectImageDto)[]): (ImageDto | ObjectImageDto)[] {
+    return images
+      .map((image) => ({
+        ...image,
+        url: this.resolveMediaUrl(image.url) ?? '',
+      }))
+      .filter((image) => !!image.url);
   }
 
   private formatWorkingHours(workingHours: string): string {
@@ -272,7 +287,7 @@ export class HotelDetailComponent implements OnInit {
         page: 1,
         pageSize: 8,
         sortOrder: 'asc',
-      })
+      }, { bypassLanguage: true })
       .subscribe({
         next: (result) => {
           this.nearbyHotels = this.toArray<ObjectDto>(result)

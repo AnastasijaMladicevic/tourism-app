@@ -146,7 +146,7 @@ export class MyReviewsPreviewComponent implements OnInit {
 
     forkJoin({
       user: this.authService.getById(currentUser.id).pipe(catchError(() => of(currentUser))),
-      reviews: this.reviewService.getMine({ page: 1, pageSize: 200 }).pipe(
+      reviews: this.reviewService.getMine({ page: 1, pageSize: 30 }).pipe(
         catchError(() => {
           this.errorMessage.set('Utisci trenutno nisu dostupni.');
           return of({ items: [] as ReviewDto[] });

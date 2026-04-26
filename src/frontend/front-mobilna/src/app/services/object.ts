@@ -99,7 +99,11 @@ export class ObjectService {
     private readonly activeRegionService: ActiveRegionService,
   ) {}
 
-  private addLang(params: HttpParams): HttpParams {
+  private addLang(params: HttpParams, options?: RegionRequestOptions): HttpParams {
+    if (options?.bypassLanguage) {
+      return params;
+    }
+
     const lang = localStorage.getItem('appLanguage') || 'sr';
     return params.set('Lang', lang);
   }
@@ -119,7 +123,7 @@ export class ObjectService {
       });
     }
 
-    params = this.addLang(params);
+    params = this.addLang(params, options);
     return this.http.get<ObjectDto[]>(this.url, { params });
   }
 
@@ -154,7 +158,7 @@ export class ObjectService {
       params = params.set(key, String(value));
     });
 
-    params = this.addLang(params);
+    params = this.addLang(params, options);
     return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/nearby`, { params });
   }
 
