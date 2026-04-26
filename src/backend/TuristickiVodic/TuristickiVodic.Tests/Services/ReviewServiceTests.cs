@@ -160,7 +160,7 @@ namespace TuristickiVodic.Tests.Services
                 });
             ctx.SaveChanges();
 
-            var svc = new ReviewService(ctx, CreateMapper());
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
 
             var result = await svc.GetAllAsync(new ReviewQueryDto
             {
@@ -222,7 +222,7 @@ namespace TuristickiVodic.Tests.Services
                 });
             ctx.SaveChanges();
 
-            var svc = new ReviewService(ctx, CreateMapper());
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
 
             var result = await svc.GetAllAsync(new ReviewQueryDto
             {
@@ -243,7 +243,7 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(CreateAsync_Tourist_KreiraApprovedRecenziju));
             var (tourist, _, _, _, approvedObject, _) = SeedBase(ctx);
-            var svc = new ReviewService(ctx, CreateMapper());
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
 
             var result = await svc.CreateAsync(new CreateReviewDto
             {
@@ -262,7 +262,7 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(CreateAsync_NijeTourist_BacaUnauthorized));
             var (_, _, creator, _, approvedObject, _) = SeedBase(ctx);
-            var svc = new ReviewService(ctx, CreateMapper());
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
 
             await svc.Invoking(s => s.CreateAsync(new CreateReviewDto
             {
@@ -279,7 +279,7 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(CreateAsync_MozeSamoZaApprovedObjekat));
             var (tourist, _, _, _, _, pendingObject) = SeedBase(ctx);
-            var svc = new ReviewService(ctx, CreateMapper());
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
 
             await svc.Invoking(s => s.CreateAsync(new CreateReviewDto
             {
@@ -298,7 +298,7 @@ namespace TuristickiVodic.Tests.Services
             var (tourist, _, _, _, approvedObject, _) = SeedBase(ctx);
             ctx.Reviews.Add(new Review { UserId = tourist.Id, ObjectId = approvedObject.Id, Rating = 5, Text = "Prva", Status = ContentStatus.Approved, CreatedAt = DateTime.UtcNow });
             ctx.SaveChanges();
-            var svc = new ReviewService(ctx, CreateMapper());
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
 
             await svc.Invoking(s => s.CreateAsync(new CreateReviewDto
             {
@@ -318,7 +318,7 @@ namespace TuristickiVodic.Tests.Services
             var review = new Review { UserId = tourist.Id, ObjectId = approvedObject.Id, Rating = 3, Text = "Staro", Status = ContentStatus.Approved, CreatedAt = DateTime.UtcNow };
             ctx.Reviews.Add(review);
             ctx.SaveChanges();
-            var svc = new ReviewService(ctx, CreateMapper());
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
 
             var result = await svc.UpdateAsync(review.Id, new UpdateReviewDto { Rating = 5, Text = "Novo" }, tourist.Id, "Tourist");
 
@@ -335,7 +335,7 @@ namespace TuristickiVodic.Tests.Services
             var review = new Review { UserId = otherTourist.Id, ObjectId = approvedObject.Id, Rating = 3, Text = "Staro", Status = ContentStatus.Approved, CreatedAt = DateTime.UtcNow };
             ctx.Reviews.Add(review);
             ctx.SaveChanges();
-            var svc = new ReviewService(ctx, CreateMapper());
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
 
             await svc.Invoking(s => s.UpdateAsync(review.Id, new UpdateReviewDto { Text = "Novo" }, 999, "Tourist"))
                 .Should().ThrowAsync<UnauthorizedAccessException>()
@@ -350,7 +350,7 @@ namespace TuristickiVodic.Tests.Services
             var review = new Review { UserId = tourist.Id, ObjectId = approvedObject.Id, Rating = 5, Text = "Komentar", Status = ContentStatus.Approved, CreatedAt = DateTime.UtcNow };
             ctx.Reviews.Add(review);
             ctx.SaveChanges();
-            var svc = new ReviewService(ctx, CreateMapper());
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
 
             await svc.Invoking(s => s.RespondAsync(review.Id, new RespondToReviewDto { CreatorResponse = "Hvala" }, otherCreator.Id, "ContentCreator"))
                 .Should().ThrowAsync<UnauthorizedAccessException>()
@@ -365,7 +365,7 @@ namespace TuristickiVodic.Tests.Services
             var review = new Review { UserId = tourist.Id, ObjectId = approvedObject.Id, Rating = 5, Text = "Komentar", Status = ContentStatus.Approved, CreatedAt = DateTime.UtcNow };
             ctx.Reviews.Add(review);
             ctx.SaveChanges();
-            var svc = new ReviewService(ctx, CreateMapper());
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
 
             var result = await svc.RespondAsync(review.Id, new RespondToReviewDto { CreatorResponse = "Hvala vam" }, creator.Id, "ContentCreator");
 
@@ -381,7 +381,7 @@ namespace TuristickiVodic.Tests.Services
             var review = new Review { UserId = tourist.Id, ObjectId = approvedObject.Id, Rating = 5, Text = "Komentar", Status = ContentStatus.Approved, CreatedAt = DateTime.UtcNow };
             ctx.Reviews.Add(review);
             ctx.SaveChanges();
-            var svc = new ReviewService(ctx, CreateMapper());
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
 
             await svc.Invoking(s => s.UpdateResponseAsync(review.Id, new RespondToReviewDto { CreatorResponse = "Novo" }, creator.Id, "ContentCreator"))
                 .Should().ThrowAsync<InvalidOperationException>()
@@ -396,7 +396,7 @@ namespace TuristickiVodic.Tests.Services
             var review = new Review { UserId = tourist.Id, ObjectId = approvedObject.Id, Rating = 5, Text = "Komentar", CreatorResponse = "Odgovor", CreatorResponseAt = DateTime.UtcNow, Status = ContentStatus.Approved, CreatedAt = DateTime.UtcNow };
             ctx.Reviews.Add(review);
             ctx.SaveChanges();
-            var svc = new ReviewService(ctx, CreateMapper());
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
 
             var result = await svc.DeleteResponseAsync(review.Id, creator.Id, "ContentCreator");
 
@@ -412,7 +412,7 @@ namespace TuristickiVodic.Tests.Services
             var review = new Review { UserId = tourist.Id, ObjectId = approvedObject.Id, Rating = 4, Text = "Moja", Status = ContentStatus.Approved, CreatedAt = DateTime.UtcNow };
             ctx.Reviews.Add(review);
             ctx.SaveChanges();
-            var svc = new ReviewService(ctx, CreateMapper());
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
 
             var deleted = await svc.DeleteAsync(review.Id, tourist.Id, "Tourist");
 
@@ -428,7 +428,7 @@ namespace TuristickiVodic.Tests.Services
             var review = new Review { UserId = tourist.Id, ObjectId = approvedObject.Id, Rating = 4, Text = "Moja", Status = ContentStatus.Approved, CreatedAt = DateTime.UtcNow };
             ctx.Reviews.Add(review);
             ctx.SaveChanges();
-            var svc = new ReviewService(ctx, CreateMapper());
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
 
             await svc.Invoking(s => s.DeleteAsync(review.Id, creator.Id, "ContentCreator"))
                 .Should().ThrowAsync<UnauthorizedAccessException>()
@@ -442,7 +442,7 @@ namespace TuristickiVodic.Tests.Services
             var (tourist, otherTourist, _, _, approvedObject, _) = SeedBase(ctx);
             ctx.Reviews.Add(new Review { UserId = otherTourist.Id, ObjectId = approvedObject.Id, Rating = 4, Text = "Postojeca", Status = ContentStatus.Approved, CreatedAt = DateTime.UtcNow });
             ctx.SaveChanges();
-            var svc = new ReviewService(ctx, CreateMapper());
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
 
             await svc.CreateAsync(new CreateReviewDto { ObjectId = approvedObject.Id, Rating = 5, Text = "Nova" }, tourist.Id, "Tourist");
 
@@ -461,7 +461,7 @@ namespace TuristickiVodic.Tests.Services
                 review,
                 new Review { UserId = otherTourist.Id, ObjectId = approvedObject.Id, Rating = 5, Text = "Druga ocena", Status = ContentStatus.Approved, CreatedAt = DateTime.UtcNow });
             ctx.SaveChanges();
-            var svc = new ReviewService(ctx, CreateMapper());
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
 
             await svc.UpdateAsync(review.Id, new UpdateReviewDto { Rating = 2 }, tourist.Id, "Tourist");
 
@@ -480,13 +480,27 @@ namespace TuristickiVodic.Tests.Services
                 review,
                 new Review { UserId = otherTourist.Id, ObjectId = approvedObject.Id, Rating = 5, Text = "Ostaje", Status = ContentStatus.Approved, CreatedAt = DateTime.UtcNow });
             ctx.SaveChanges();
-            var svc = new ReviewService(ctx, CreateMapper());
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
 
             await svc.DeleteAsync(review.Id, tourist.Id, "Tourist");
 
             var savedObject = ctx.Objects.Single(x => x.Id == approvedObject.Id);
             savedObject.ReviewCount.Should().Be(1);
             savedObject.AverageRating.Should().Be(5m);
+        }
+
+
+
+        private class FakeTranslationService : ITranslationService
+        {
+            public Task<string> GetTextAsync(string entityType, int entityId, string fieldName, string originalText, string languageCode)
+                => Task.FromResult(originalText);
+
+            public Task<string> GetOrCreateTextAsync(string entityType, int entityId, string fieldName, string originalText, string languageCode)
+                => Task.FromResult(originalText);
+
+            public Task GenerateIfMissingAsync(string entityType, int entityId, string fieldName, string originalText, IEnumerable<string> targetLanguages)
+                => Task.CompletedTask;
         }
     }
 }

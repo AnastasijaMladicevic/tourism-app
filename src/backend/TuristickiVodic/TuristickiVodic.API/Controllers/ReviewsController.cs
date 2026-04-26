@@ -27,9 +27,9 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(int id, [FromQuery] string? languageCode)
         {
-            var review = await _reviewService.GetByIdAsync(id);
+            var review = await _reviewService.GetByIdAsync(id, languageCode);
             if (review == null) return NotFound();
             return Ok(review);
         }

@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
@@ -10,11 +11,13 @@ namespace TuristickiVodic.Services.Services
     {
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
+        private readonly ITranslationService _translationService;
 
-        public ReviewService(AppDbContext context, IMapper mapper)
+        public ReviewService(AppDbContext context, IMapper mapper, ITranslationService translationService)
         {
             _context = context;
             _mapper = mapper;
+            _translationService = translationService;
         }
 
         public async Task<PagedResultDto<ReviewDto>> GetAllAsync(ReviewQueryDto query)
@@ -122,9 +125,26 @@ namespace TuristickiVodic.Services.Services
                 .Take(query.PageSize)
                 .ToListAsync();
 
+            var items = _mapper.Map<List<ReviewDto>>(reviews);
+
+            if (!string.IsNullOrWhiteSpace(query.LanguageCode) && query.LanguageCode != "sr")
+            {
+                foreach (var item in items)
+                {
+                    item.Text = await _translationService.GetOrCreateTextAsync(
+                        "Review", item.Id, "Text", item.Text, query.LanguageCode);
+
+                    if (!string.IsNullOrWhiteSpace(item.CreatorResponse))
+                    {
+                        item.CreatorResponse = await _translationService.GetOrCreateTextAsync(
+                            "Review", item.Id, "CreatorResponse", item.CreatorResponse, query.LanguageCode);
+                    }
+                }
+            }
+
             return new PagedResultDto<ReviewDto>
             {
-                Items = _mapper.Map<List<ReviewDto>>(reviews),
+                Items = items,
                 Page = query.Page,
                 PageSize = query.PageSize,
                 TotalCount = totalCount,
@@ -132,7 +152,7 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
-        public async Task<ReviewDto?> GetByIdAsync(int id)
+        public async Task<ReviewDto?> GetByIdAsync(int id, string? languageCode = null)
         {
             var review = await _context.Reviews
                 .Include(r => r.User)
@@ -146,7 +166,23 @@ namespace TuristickiVodic.Services.Services
                 .Include(r => r.ReviewedBy)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
-            return review == null ? null : _mapper.Map<ReviewDto>(review);
+            if (review == null) return null;
+
+            var dto = _mapper.Map<ReviewDto>(review);
+
+            if (!string.IsNullOrWhiteSpace(languageCode) && languageCode != "sr")
+            {
+                dto.Text = await _translationService.GetOrCreateTextAsync(
+                    "Review", dto.Id, "Text", dto.Text, languageCode);
+
+                if (!string.IsNullOrWhiteSpace(dto.CreatorResponse))
+                {
+                    dto.CreatorResponse = await _translationService.GetOrCreateTextAsync(
+                        "Review", dto.Id, "CreatorResponse", dto.CreatorResponse, languageCode);
+                }
+            }
+
+            return dto;
         }
 
         // Samo Tourist može da piše recenziju

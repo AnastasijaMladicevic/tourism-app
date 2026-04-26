@@ -54,10 +54,10 @@ namespace TuristickiVodic.Tests.Controllers
         {
             var mockService = new Mock<IReviewService>();
             var dto = new ReviewDto { Id = 5, Text = "Komentar", Status = "Approved" };
-            mockService.Setup(s => s.GetByIdAsync(5)).ReturnsAsync(dto);
+            mockService.Setup(s => s.GetByIdAsync(5, null)).ReturnsAsync(dto);
 
             var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
-            var result = await controller.GetById(5);
+            var result = await controller.GetById(5, null);
 
             result.Should().BeOfType<OkObjectResult>()
                 .Which.Value.Should().BeEquivalentTo(dto);
