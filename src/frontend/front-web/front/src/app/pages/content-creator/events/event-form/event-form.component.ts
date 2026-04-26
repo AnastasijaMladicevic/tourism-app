@@ -1,11 +1,23 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  inject
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, forkJoin, map, of } from 'rxjs';
+import * as L from 'leaflet';
 import { AuthService } from '../../../../services/auth.service';
-import { DestinationService } from '../../../../services/destination.service';
+import { DestinationDto, DestinationService } from '../../../../services/destination.service';
 import { EventService } from '../../../../services/event.service';
+import { ActivitiesService } from '../../../../services/activities';
 import { CreateEventDto, EventDto, UpdateEventDto } from '../../../../models/event.model';
 
 interface VenueOption {
@@ -13,6 +25,8 @@ interface VenueOption {
   name: string;
   address: string;
   destinationId: number;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface RelatedActivity {
@@ -28,14 +42,24 @@ interface RelatedActivity {
   templateUrl: './event-form.component.html',
   styleUrls: ['./event-form.component.css']
 })
-export class EventFormComponent implements OnInit {
+export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly destinationService = inject(DestinationService);
   private readonly eventService = inject(EventService);
+  private readonly activitiesService = inject(ActivitiesService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly ngZone = inject(NgZone);
+
+  @ViewChild('eventMap') private eventMap?: ElementRef<HTMLDivElement>;
+
+  private readonly defaultMapCenter: L.LatLngExpression = [42.424, 18.771];
+  private readonly defaultMapZoom = 13;
+
+  private map: L.Map | null = null;
+  private mapMarker: L.Marker | null = null;
 
   form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(200)]],
@@ -73,8 +97,11 @@ export class EventFormComponent implements OnInit {
   isImagePreviewBroken = false;
   eventStatus = '';
   organizerName = 'Current Content Creator';
-  venueSearchTerm = 'Grand Horizon Resort';
-  selectedActivityIds = new Set<number>([2]);
+  selectedActivityIds = new Set<number>();
+  isLoadingRelatedActivities = false;
+  showAllRelatedActivities = false;
+  activitySearchTerm = '';
+  showTipsModal = false;
 
   private readonly fallbackEventTypes = [
     { id: 1, name: 'Festival' },
@@ -85,28 +112,24 @@ export class EventFormComponent implements OnInit {
     { id: 6, name: 'Concert' }
   ];
 
-  private readonly fallbackDestinations = [
-    { id: 1, name: 'Belgrade' },
-    { id: 2, name: 'Novi Sad' },
-    { id: 3, name: 'Kopaonik' },
-    { id: 4, name: 'Nis' }
+  private readonly fallbackDestinations: DestinationDto[] = [
+    { id: 1, name: 'Belgrade', isActive: true, destinationTypeId: 0, destinationTypeName: '', latitude: 44.8176, longitude: 20.4633 },
+    { id: 2, name: 'Novi Sad', isActive: true, destinationTypeId: 0, destinationTypeName: '', latitude: 45.2671, longitude: 19.8335 },
+    { id: 3, name: 'Kopaonik', isActive: true, destinationTypeId: 0, destinationTypeName: '', latitude: 43.2853, longitude: 20.8080 },
+    { id: 4, name: 'Nis', isActive: true, destinationTypeId: 0, destinationTypeName: '', latitude: 43.3209, longitude: 21.8958 }
   ];
 
   private readonly fallbackVenueOptions: VenueOption[] = [
-    { id: 1, name: 'Grand Horizon Resort', address: 'Azure Coast Drive 15, Belgrade, Serbia', destinationId: 1 },
-    { id: 2, name: 'Sunset Pavilion', address: 'Riverside Promenade 8, Novi Sad, Serbia', destinationId: 2 },
-    { id: 3, name: 'City Museum Courtyard', address: 'Old Town Square 3, Nis, Serbia', destinationId: 4 }
+    { id: 1, name: 'Grand Horizon Resort', address: 'Azure Coast Drive 15, Belgrade, Serbia', destinationId: 1, latitude: 44.8176, longitude: 20.4633 },
+    { id: 2, name: 'Sunset Pavilion', address: 'Riverside Promenade 8, Novi Sad, Serbia', destinationId: 2, latitude: 45.2671, longitude: 19.8335 },
+    { id: 3, name: 'City Museum Courtyard', address: 'Old Town Square 3, Nis, Serbia', destinationId: 4, latitude: 43.3209, longitude: 21.8958 }
   ];
 
   eventTypes = [...this.fallbackEventTypes];
-  destinations = [...this.fallbackDestinations];
+  destinations: DestinationDto[] = [...this.fallbackDestinations];
   venueOptions: VenueOption[] = [...this.fallbackVenueOptions];
 
-  readonly relatedActivities: RelatedActivity[] = [
-    { id: 1, name: 'Sunset Boat Tour', meta: 'Activity · 2 hrs' },
-    { id: 2, name: 'Vineyard Tasting', meta: 'Activity · 3 hrs' },
-    { id: 3, name: 'Local Food Walk', meta: 'Activity · 90 mins' }
-  ];
+  relatedActivities: RelatedActivity[] = [];
 
   readonly timezoneOptions = [
     'Europe/Belgrade',
@@ -146,7 +169,7 @@ export class EventFormComponent implements OnInit {
   }
 
   get selectedVenue(): VenueOption {
-    if (this.filteredVenueOptions.length === 0) {
+    if (this.venueOptions.length === 0) {
       return {
         id: 0,
         name: 'No venue available',
@@ -155,8 +178,25 @@ export class EventFormComponent implements OnInit {
       };
     }
 
-    const term = this.venueSearchTerm.trim().toLowerCase();
-    return this.filteredVenueOptions.find((venue) => venue.name.toLowerCase().includes(term)) ?? this.filteredVenueOptions[0];
+    const selectedObjectId = this.parseOptionalNumber(this.form.get('objectId')?.value);
+    if (!selectedObjectId) {
+      return this.filteredVenueOptions[0] ?? this.venueOptions[0];
+    }
+
+    return this.venueOptions.find((venue) => venue.id === selectedObjectId) ?? (this.filteredVenueOptions[0] ?? this.venueOptions[0]);
+  }
+
+  get visibleRelatedActivities(): RelatedActivity[] {
+    const query = this.activitySearchTerm.trim().toLowerCase();
+    const filtered = query
+      ? this.relatedActivities.filter((activity) => activity.name.toLowerCase().includes(query))
+      : this.relatedActivities;
+
+    return this.showAllRelatedActivities ? filtered : filtered.slice(0, 4);
+  }
+
+  get hiddenActivitiesCount(): number {
+    return Math.max(0, this.relatedActivities.length - 4);
   }
 
   ngOnInit(): void {
@@ -166,6 +206,7 @@ export class EventFormComponent implements OnInit {
     }
 
     this.loadDropdownOptions();
+    this.loadRelatedActivities();
     this.setupDestinationObjectSync();
 
     this.route.params.subscribe((params) => {
@@ -175,6 +216,20 @@ export class EventFormComponent implements OnInit {
         this.loadEvent();
       }
     });
+
+    this.form.get('latitude')?.valueChanges.subscribe(() => this.syncMapFromForm());
+    this.form.get('longitude')?.valueChanges.subscribe(() => this.syncMapFromForm());
+  }
+
+  ngAfterViewInit(): void {
+    this.initializeMap();
+    this.syncMapFromForm();
+  }
+
+  ngOnDestroy(): void {
+    this.map?.remove();
+    this.map = null;
+    this.mapMarker = null;
   }
 
   private loadDropdownOptions(): void {
@@ -189,7 +244,15 @@ export class EventFormComponent implements OnInit {
           const list = Array.isArray(response) 
             ? response 
             : (response?.items ?? []);
-          return list.map((d: any) => ({ id: d.id, name: d.name }));
+          return list.map((d: any) => ({
+            id: d.id,
+            name: d.name,
+            isActive: d.isActive ?? true,
+            destinationTypeId: d.destinationTypeId ?? 0,
+            destinationTypeName: d.destinationTypeName ?? '',
+            latitude: d.latitude,
+            longitude: d.longitude
+          } as DestinationDto));
         }),
         catchError(() => of(this.fallbackDestinations))
       ),
@@ -198,7 +261,9 @@ export class EventFormComponent implements OnInit {
           id: item.id,
           name: item.name,
           address: item.address ?? 'No address available',
-          destinationId: item.destinationId
+          destinationId: item.destinationId,
+          latitude: (item as unknown as { latitude?: number }).latitude,
+          longitude: (item as unknown as { longitude?: number }).longitude
         }))),
         catchError(() => of(this.fallbackVenueOptions))
       )
@@ -208,27 +273,58 @@ export class EventFormComponent implements OnInit {
       this.venueOptions = venues.length > 0 ? venues : [...this.fallbackVenueOptions];
 
       this.syncObjectSelectionWithDestination();
+      this.syncMapFromForm();
 
       this.cdr.detectChanges();
     });
   }
 
+  private loadRelatedActivities(): void {
+    this.isLoadingRelatedActivities = true;
+
+    this.activitiesService.getMyActivities({
+      page: 1,
+      pageSize: 200,
+      sortBy: 'name',
+      sortOrder: 'asc'
+    }).pipe(
+      map((response) => response.items.map((activity) => ({
+        id: activity.id,
+        name: activity.name,
+        meta: this.buildActivityMeta(activity)
+      }))),
+      catchError(() => of([] as RelatedActivity[])),
+      finalize(() => {
+        this.isLoadingRelatedActivities = false;
+      })
+    ).subscribe((activities) => {
+      this.relatedActivities = activities;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private buildActivityMeta(activity: { durationMinutes?: number; price?: number }): string {
+    const duration = activity.durationMinutes ? `${activity.durationMinutes} mins` : 'Duration n/a';
+    const price = activity.price != null ? `$${Number(activity.price).toFixed(0)}` : 'Price n/a';
+    return `Activity · ${duration} · ${price}`;
+  }
+
   private setupDestinationObjectSync(): void {
     this.form.get('destinationId')?.valueChanges.subscribe(() => {
       this.syncObjectSelectionWithDestination();
+      this.applyLocationFromSelection();
       this.cdr.detectChanges();
     });
 
     this.form.get('objectId')?.valueChanges.subscribe((value) => {
       const objectId = this.parseOptionalNumber(value);
       if (!objectId) {
+        this.applyLocationFromSelection();
         return;
       }
 
-      const selected = this.filteredVenueOptions.find((venue) => venue.id === objectId);
-      if (selected) {
-        this.venueSearchTerm = selected.name;
-      }
+      this.applyLocationFromSelection();
+      this.syncMapFromForm();
     });
   }
 
@@ -241,16 +337,40 @@ export class EventFormComponent implements OnInit {
       this.form.patchValue({ objectId: '' }, { emitEvent: false });
     }
 
-    const activeObjectId = this.parseOptionalNumber(this.form.get('objectId')?.value);
-    if (activeObjectId) {
-      const selected = this.filteredVenueOptions.find((venue) => venue.id === activeObjectId);
-      if (selected) {
-        this.venueSearchTerm = selected.name;
-        return;
-      }
+    this.syncMapFromForm();
+  }
+
+  private applyLocationFromSelection(): void {
+    const selectedObjectId = this.parseOptionalNumber(this.form.get('objectId')?.value);
+    const selectedDestinationId = this.parseOptionalNumber(this.form.get('destinationId')?.value);
+
+    const selectedVenue = selectedObjectId
+      ? this.venueOptions.find((venue) => venue.id === selectedObjectId)
+      : undefined;
+    const venueLat = this.parseOptionalNumber(String(selectedVenue?.latitude ?? ''));
+    const venueLng = this.parseOptionalNumber(String(selectedVenue?.longitude ?? ''));
+    if (venueLat != null && venueLng != null) {
+      this.setLocationFromSelection(venueLat, venueLng);
+      return;
     }
 
-    this.venueSearchTerm = this.filteredVenueOptions[0]?.name ?? '';
+    const selectedDestination = selectedDestinationId
+      ? this.destinations.find((destination) => destination.id === selectedDestinationId)
+      : undefined;
+    const destinationLat = selectedDestination?.latitude;
+    const destinationLng = selectedDestination?.longitude;
+    if (destinationLat != null && destinationLng != null) {
+      this.setLocationFromSelection(destinationLat, destinationLng);
+    }
+  }
+
+  private setLocationFromSelection(latitude: number, longitude: number): void {
+    this.form.patchValue({
+      latitude: latitude.toFixed(6),
+      longitude: longitude.toFixed(6)
+    }, { emitEvent: false });
+
+    this.updateMapMarker(latitude, longitude);
   }
 
   private updateObjectControlState(): void {
@@ -319,6 +439,7 @@ export class EventFormComponent implements OnInit {
     });
 
     this.syncObjectSelectionWithDestination();
+    this.syncMapFromForm();
   }
 
   submit(): void {
@@ -558,6 +679,18 @@ export class EventFormComponent implements OnInit {
     this.selectedActivityIds.add(activityId);
   }
 
+  toggleMoreActivities(): void {
+    this.showAllRelatedActivities = !this.showAllRelatedActivities;
+  }
+
+  openTipsModal(): void {
+    this.showTipsModal = true;
+  }
+
+  closeTipsModal(): void {
+    this.showTipsModal = false;
+  }
+
   addTag(): void {
     const tag = this.pendingTag.trim();
     if (!tag) {
@@ -699,5 +832,87 @@ export class EventFormComponent implements OnInit {
     } catch {
       return false;
     }
+  }
+
+  private initializeMap(): void {
+    if (!this.eventMap || this.map) {
+      return;
+    }
+
+    const latitude = this.parseOptionalNumber(this.form.get('latitude')?.value);
+    const longitude = this.parseOptionalNumber(this.form.get('longitude')?.value);
+    const center: L.LatLngExpression = latitude != null && longitude != null
+      ? [latitude, longitude]
+      : this.defaultMapCenter;
+    const zoom = latitude != null && longitude != null ? 15 : this.defaultMapZoom;
+
+    this.map = L.map(this.eventMap.nativeElement, {
+      zoomControl: true,
+      scrollWheelZoom: true,
+      doubleClickZoom: true,
+      dragging: true,
+      touchZoom: true,
+      boxZoom: true,
+      keyboard: true
+    }).setView(center, zoom);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(this.map);
+
+    this.map.on('click', (event: L.LeafletMouseEvent) => {
+      this.ngZone.run(() => this.selectLocation(event.latlng.lat, event.latlng.lng));
+    });
+  }
+
+  private syncMapFromForm(): void {
+    const latitude = this.parseOptionalNumber(this.form.get('latitude')?.value);
+    const longitude = this.parseOptionalNumber(this.form.get('longitude')?.value);
+
+    if (latitude == null || longitude == null) {
+      return;
+    }
+
+    this.updateMapMarker(latitude, longitude);
+  }
+
+  private selectLocation(latitude: number, longitude: number): void {
+    this.form.patchValue({
+      latitude: latitude.toFixed(6),
+      longitude: longitude.toFixed(6)
+    }, { emitEvent: false });
+
+    this.form.get('latitude')?.markAsDirty();
+    this.form.get('longitude')?.markAsDirty();
+    this.form.get('latitude')?.markAsTouched();
+    this.form.get('longitude')?.markAsTouched();
+
+    this.updateMapMarker(latitude, longitude);
+  }
+
+  private updateMapMarker(latitude: number, longitude: number): void {
+    if (!this.map) {
+      return;
+    }
+
+    if (!this.mapMarker) {
+      const markerIcon = L.icon({
+        iconUrl: 'assets/marker-icon.png',
+        iconRetinaUrl: 'assets/marker-icon-2x.png',
+        shadowUrl: 'assets/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      });
+
+      this.mapMarker = L.marker([latitude, longitude], { icon: markerIcon, draggable: false }).addTo(this.map);
+    } else {
+      this.mapMarker.setLatLng([latitude, longitude]);
+    }
+
+    const targetZoom = Math.max(this.map.getZoom(), 15);
+    this.map.flyTo([latitude, longitude], targetZoom, { duration: 0.8 });
   }
 }

@@ -75,6 +75,8 @@ export interface LocalityOption {
   name: string;
   destinationId: number;
   destinationName: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface CreateActivityDto {

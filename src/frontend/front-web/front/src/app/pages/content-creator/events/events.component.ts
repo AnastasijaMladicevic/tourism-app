@@ -60,8 +60,8 @@ export class ContentCreatorEventsComponent implements OnInit {
   rangeStartDate = '';
   rangeEndDate = '';
 
-  readonly stats: EventInsightCard[] = [
-    { label: 'Upcoming this week', value: '12', hint: 'Events published in the next 7 days', tone: 'blue' },
+  stats: EventInsightCard[] = [
+    { label: 'Upcoming this week', value: '-', hint: 'Events published in the next 7 days', tone: 'blue' },
     { label: 'Active staff', value: '48', hint: 'Content creators and coordinators online', tone: 'green' },
     { label: 'Total capacity filled', value: '64%', hint: 'Average occupancy across published events', tone: 'amber' }
   ];
@@ -97,6 +97,46 @@ export class ContentCreatorEventsComponent implements OnInit {
   ngOnInit(): void {
     this.loadCategoryOptions();
     this.loadEvents();
+    this.loadUpcomingThisWeekStat();
+  }
+
+  private loadUpcomingThisWeekStat(): void {
+    this.eventService.getMy({
+      page: 1,
+      pageSize: 1,
+      nextDays: 7,
+      sortBy: 'startDate',
+      sortOrder: 'asc'
+    }).subscribe({
+      next: (response) => {
+        this.stats[0] = {
+          ...this.stats[0],
+          value: String(response.totalCount ?? 0)
+        };
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.stats[0] = {
+          ...this.stats[0],
+          value: String(this.countUpcomingInEvents(this.events))
+        };
+      }
+    });
+  }
+
+  private countUpcomingInEvents(events: EventDto[]): number {
+    const now = new Date();
+    const weekAhead = new Date();
+    weekAhead.setDate(now.getDate() + 7);
+
+    return events.filter((event) => {
+      if (!event.startDate) {
+        return false;
+      }
+
+      const start = new Date(event.startDate);
+      return start >= now && start <= weekAhead;
+    }).length;
   }
 
   loadEvents(): void {
