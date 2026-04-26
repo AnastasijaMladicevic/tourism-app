@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Claims;
@@ -11,8 +13,6 @@ using TuristickiVodic.API.Infrastructure;
 using TuristickiVodic.Infrastructure.Data;
 using TuristickiVodic.Services;
 using TuristickiVodic.Services.Services;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,6 +80,8 @@ builder.Services.AddScoped<IManagerReportService, ManagerReportService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<ISmartSearchService, SmartSearchService>();
+builder.Services.AddScoped<ITranslationService, TranslationService>();
+builder.Services.AddScoped<IExternalTranslationProvider, ArgosTranslateProvider>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

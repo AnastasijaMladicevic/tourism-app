@@ -38,6 +38,8 @@ public class AppDbContext : DbContext
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<RevokedToken> RevokedTokens { get; set; }
     public DbSet<UserLocationHistory> UserLocationHistories { get; set; }
+    public DbSet<Language> Languages { get; set; }
+    public DbSet<Translation> Translations { get; set; }
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
@@ -630,6 +632,30 @@ public class AppDbContext : DbContext
             .IsUnique();
         mb.Entity<RevokedToken>()
             .HasIndex(rt => rt.ExpiresAt);
+
+        // ==================== TRANSLATIONS ====================
+
+        mb.Entity<Language>(entity =>
+        {
+            entity.HasKey(e => e.Code);
+        });
+
+        mb.Entity<Translation>(entity =>
+        {
+            entity.HasIndex(e => new
+            {
+                e.EntityType,
+                e.EntityId,
+                e.FieldName,
+                e.LanguageCode
+            }).IsUnique();
+
+            entity.HasIndex(e => new
+            {
+                e.EntityType,
+                e.EntityId
+            });
+        });
 
     }
 
