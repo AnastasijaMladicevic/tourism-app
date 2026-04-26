@@ -42,6 +42,7 @@ export interface DestinationQueryParams {
   regionId?: number;
   sortBy?: string;
   sortOrder?: string;
+  lang?: string; 
 }
 
 export interface CreateDestinationDto {

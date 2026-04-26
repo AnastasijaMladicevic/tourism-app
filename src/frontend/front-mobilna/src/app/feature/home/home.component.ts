@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { catchError, finalize, forkJoin, map, of } from 'rxjs';
+import { catchError, finalize, forkJoin, map, Observable, of } from 'rxjs';
 import { BottomNavComponent } from '../bottom-nav/bottom-nav.component';
 import { DestinationDto, DestinationService } from '../../services/destination';
 import { EventDto, EventService } from '../../services/event';
@@ -387,8 +387,13 @@ export class HomeComponent implements OnInit {
         const shuffled = [...featured].sort(() => Math.random() - 0.5);
 
         this.featuredDestinations = shuffled.slice(0, Math.min(5, shuffled.length));
+        this.translateFeaturedDisplayTitles(this.featuredDestinations).pipe().subscribe((res) => {
+            this.featuredDestinations = res;
+          });
         this.currentIndex = 0;
         this.currentFeatured = this.featuredDestinations[0];
+        console.log("🚀 ~ HomeComponent ~ loadFeatured ~ this.currentFeatured :", this.currentFeatured )
+        
         this.startRotation();
         this.flushUi();
       });
@@ -431,9 +436,11 @@ export class HomeComponent implements OnInit {
   private loadPlaceCards(): void {
     this.isLoadingPlaces = true;
 
+    const lang = (localStorage.getItem('appLanguage') || 'sr').trim().toLowerCase();
+
     forkJoin({
       destinations: this.destinationService
-        .getAll({ page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc' })
+        .getAll({ page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc', lang })
         .pipe(catchError(() => of([] as unknown[]))),
       objects: this.objectService
         .getAll(
@@ -490,13 +497,15 @@ export class HomeComponent implements OnInit {
         if (featured.length) {
           const shuffled = [...featured].sort(() => Math.random() - 0.5);
           const selectedFeatured = shuffled.slice(0, Math.min(5, shuffled.length));
-          this.translateFeaturedDisplayTitles(selectedFeatured).subscribe((translatedFeatured) => {
-            this.featuredDestinations = translatedFeatured;
-            this.currentIndex = 0;
-            this.currentFeatured = this.featuredDestinations[0];
-            this.startRotation();
-            this.flushUi();
+          this.featuredDestinations = selectedFeatured;
+          this.translateFeaturedDisplayTitles(this.featuredDestinations).pipe().subscribe((res) => {
+            this.featuredDestinations = res;
           });
+          this.currentIndex = 0;
+          this.currentFeatured = this.featuredDestinations[0];
+          console.log("🚀 ~ HomeComponent ~ loadPlaceCards ~ this.currentFeatured:", this.currentFeatured)
+          this.startRotation();
+          this.flushUi();
         } else {
           this.featuredDestinations = [];
           this.currentFeatured = null;
@@ -518,38 +527,57 @@ export class HomeComponent implements OnInit {
       });
   }
 
-  private translateFeaturedDisplayTitles(featured: FeaturedDestination[]) {
-    const lang = (localStorage.getItem('appLanguage') || 'sr').trim().toLowerCase();
+private translateFeaturedDisplayTitles(
+    featured: FeaturedDestination[]
+  ): Observable<FeaturedDestination[]> {
+    const lang = (localStorage.getItem('appLanguage') || 'sr')
+      .trim()
+      .toLowerCase();
 
-    if (!featured.length || lang === 'sr' || lang === 'me') {
-      return of(featured);
-    }
+  console.log('translateFeaturedDisplayTitles lang:', lang);
+  console.log('featured:', featured);
 
-    return forkJoin(
-      featured.map((item) =>
-        this.http
-          .get<ApiTranslationDto[]>(
-            `${environment.apiUrl}/translations?entityType=Destination&entityId=${item.id}`,
-          )
-          .pipe(
-            map((translations) => {
-              const translatedDisplayTitle = translations
-                .find(
-                  (translation) =>
-                    translation.fieldName?.toLowerCase() === 'displaytitle' &&
-                    translation.languageCode?.toLowerCase() === lang,
-                )
-                ?.translatedText?.trim();
-
-              return translatedDisplayTitle
-                ? { ...item, description: translatedDisplayTitle }
-                : item;
-            }),
-            catchError(() => of(item)),
-          ),
-      ),
-    );
+  if (!featured.length || lang === 'sr' || lang === 'me') {
+    return of(featured);
   }
+
+  return forkJoin(
+    featured.map((item) => {
+      console.log('pozivam translations za destination:', item.id);
+
+      return this.http
+      .get<ApiTranslationDto[]>(
+        `${environment.apiUrl}/translations?entityType=Destination&entityId=${item.id}`
+      )
+      .pipe(
+        map((translations) => {
+          const translatedDescription = translations
+            .find(
+              (translation) =>
+                translation.fieldName?.toLowerCase() === 'description' &&
+                translation.languageCode?.toLowerCase() === lang
+            )
+            ?.translatedText?.trim();
+
+          return translatedDescription
+            ? {
+                ...item,
+                description: translatedDescription,
+              }
+            : item;
+        }),
+          catchError((error) => {
+            console.error(
+              `Greška pri prevodu featured destination ${item.id}:`,
+              error
+            );
+
+            return of(item);
+          })
+        );
+    })
+  );
+}
 
   private loadRecommendedCards(): void {
     this.isLoadingRecommendations = true;
