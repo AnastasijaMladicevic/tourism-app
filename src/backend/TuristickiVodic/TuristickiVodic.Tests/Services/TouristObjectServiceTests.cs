@@ -31,8 +31,9 @@ namespace TuristickiVodic.Tests.Services
             return config.CreateMapper();
         }
 
-        private static TouristObjectService CreateService(AppDbContext ctx) => new(ctx, CreateMapper());
-
+        private static TouristObjectService CreateService(AppDbContext ctx) =>
+        new(ctx, CreateMapper(), new FakeTranslationService());
+        
         private static (ObjectType objectType, Destination destination, Destination otherDestination, Locality locality, Locality otherLocality, User creator, User otherCreator, User manager, User admin)
             SeedBase(AppDbContext ctx)
         {
@@ -856,6 +857,29 @@ namespace TuristickiVodic.Tests.Services
             result.Should().NotBeNull();
             result!.Status.Should().Be("Pending");
             result.Name.Should().Be("Manager pending objekat");
+        }
+
+        private class FakeTranslationService : ITranslationService
+        {
+            public Task<string> GetTextAsync(
+                string entityType,
+                int entityId,
+                string fieldName,
+                string originalText,
+                string languageCode)
+            {
+                return Task.FromResult(originalText);
+            }
+
+            public Task GenerateIfMissingAsync(
+                string entityType,
+                int entityId,
+                string fieldName,
+                string originalText,
+                IEnumerable<string> targetLanguages)
+            {
+                return Task.CompletedTask;
+            }
         }
     }
 }

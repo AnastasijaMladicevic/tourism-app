@@ -5,6 +5,7 @@ using System;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
+using TuristickiVodic.Services.Services;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TuristickiVodic.Services.Services
@@ -13,11 +14,13 @@ namespace TuristickiVodic.Services.Services
     {
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
+        private readonly ITranslationService _translationService;
 
-        public TouristObjectService(AppDbContext context, IMapper mapper)
+        public TouristObjectService(AppDbContext context, IMapper mapper, ITranslationService translationService)
         {
             _context = context;
             _mapper = mapper;
+            _translationService = translationService;
         }
 
         public async Task<PagedResultDto<TouristObjectDto>> GetAllAsync(TouristObjectQueryDto query)
@@ -162,6 +165,7 @@ namespace TuristickiVodic.Services.Services
             }
 
             var mappedItems = _mapper.Map<List<TouristObjectDto>>(items);
+            await ApplyTranslationsAsync(mappedItems, items, query.Lang);
             await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
 
             return new PagedResultDto<TouristObjectDto>
@@ -315,9 +319,12 @@ namespace TuristickiVodic.Services.Services
 
             var totalCount = nearbyObjects.Count;
 
-            var items = nearbyObjects
+            var pagedNearbyObjects = nearbyObjects
                 .Skip((query.Page - 1) * query.PageSize)
                 .Take(query.PageSize)
+                .ToList();
+
+            var items = pagedNearbyObjects
                 .Select(x =>
                 {
                     var dto = _mapper.Map<TouristObjectDto>(x.Object);
@@ -326,6 +333,7 @@ namespace TuristickiVodic.Services.Services
                 })
                 .ToList();
 
+            await ApplyTranslationsAsync(items, pagedNearbyObjects.Select(x => x.Object).ToList(), query.Lang);
             await ApplyPendingDeletionRequestFlagsAsync(items);
 
             return new PagedResultDto<TouristObjectDto>
@@ -462,6 +470,7 @@ namespace TuristickiVodic.Services.Services
             }
 
             var mappedItems = _mapper.Map<List<TouristObjectDto>>(items);
+            await ApplyTranslationsAsync(mappedItems, items, query.Lang);
             await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
 
             return new PagedResultDto<TouristObjectDto>
@@ -605,6 +614,7 @@ namespace TuristickiVodic.Services.Services
             }
 
             var mappedItems = _mapper.Map<List<TouristObjectDto>>(items);
+            await ApplyTranslationsAsync(mappedItems, items, query.Lang);
             await ApplyPendingDeletionRequestFlagsAsync(mappedItems);
 
             return new PagedResultDto<TouristObjectDto>
@@ -617,7 +627,7 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
-        public async Task<TouristObjectDto?> GetByIdAsync(int id)
+        public async Task<TouristObjectDto?> GetByIdAsync(int id, string lang = "sr")
         {
             var obj = await LoadObjectAsync(id);
             if (obj == null)
@@ -631,22 +641,24 @@ namespace TuristickiVodic.Services.Services
                 return null;
 
             var dto = _mapper.Map<TouristObjectDto>(obj);
+            await ApplyTranslationsAsync(dto, obj, lang);
             await ApplyPendingDeletionRequestFlagsAsync(dto);
             return dto;
         }
 
-        public async Task<TouristObjectDto?> GetMineByIdAsync(int id, int userId)
+        public async Task<TouristObjectDto?> GetMineByIdAsync(int id, int userId, string lang = "sr")
         {
             var obj = await LoadObjectAsync(id);
             if (obj == null || obj.CreatedByUserId != userId)
                 return null;
 
             var dto = _mapper.Map<TouristObjectDto>(obj);
+            await ApplyTranslationsAsync(dto, obj, lang);
             await ApplyPendingDeletionRequestFlagsAsync(dto);
             return dto;
         }
 
-        public async Task<TouristObjectDto?> GetForManagerByIdAsync(int id, int userId)
+        public async Task<TouristObjectDto?> GetForManagerByIdAsync(int id, int userId, string lang = "sr")
         {
             var obj = await LoadObjectAsync(id);
             if (obj == null)
@@ -661,6 +673,7 @@ namespace TuristickiVodic.Services.Services
                 return null;
 
             var dto = _mapper.Map<TouristObjectDto>(obj);
+            await ApplyTranslationsAsync(dto, obj, lang);
             await ApplyPendingDeletionRequestFlagsAsync(dto);
             return dto;
         }
@@ -1117,6 +1130,61 @@ namespace TuristickiVodic.Services.Services
 
             var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
             return earthRadiusMeters * c;
+        }
+
+
+        private async Task ApplyTranslationsAsync(List<TouristObjectDto> dtos, List<TouristObject> objects, string? lang)
+        {
+            if (dtos.Count == 0 || objects.Count == 0)
+                return;
+
+            var normalizedLang = NormalizeLanguage(lang);
+
+            if (normalizedLang == "sr" || normalizedLang == "me")
+                return;
+
+            var objectsById = objects.ToDictionary(o => o.Id);
+
+            foreach (var dto in dtos)
+            {
+                if (!objectsById.TryGetValue(dto.Id, out var obj))
+                    continue;
+
+                await ApplyTranslationsAsync(dto, obj, normalizedLang);
+            }
+        }
+
+        private async Task ApplyTranslationsAsync(TouristObjectDto dto, TouristObject obj, string? lang)
+        {
+            var normalizedLang = NormalizeLanguage(lang);
+
+            if (normalizedLang == "sr" || normalizedLang == "me")
+                return;
+
+            dto.Description = await _translationService.GetTextAsync(
+                "Object",
+                obj.Id,
+                "Description",
+                obj.Description,
+                normalizedLang);
+
+            // Nazive realnih objekata najčešće ne prevodimo.
+            // Ako ipak želiš da prevodiš Name, odkomentariši ovo:
+            /*
+            dto.Name = await _translationService.GetTextAsync(
+                "Object",
+                obj.Id,
+                "Name",
+                obj.Name,
+                normalizedLang);
+            */
+        }
+
+        private static string NormalizeLanguage(string? lang)
+        {
+            return string.IsNullOrWhiteSpace(lang)
+                ? "sr"
+                : lang.Trim().ToLower();
         }
 
         private async Task ApplyPendingDeletionRequestFlagsAsync(List<TouristObjectDto> items)

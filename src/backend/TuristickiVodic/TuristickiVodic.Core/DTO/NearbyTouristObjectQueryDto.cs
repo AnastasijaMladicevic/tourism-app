@@ -23,6 +23,7 @@ namespace TuristickiVodic.Core.DTO
         public decimal? MaxPrice { get; set; }
         public decimal? MinRating { get; set; }
         public decimal? MaxRating { get; set; }
+        public string Lang { get; set; } = "sr";
 
         [Range(1, int.MaxValue)]
         public int Page { get; set; } = 1;

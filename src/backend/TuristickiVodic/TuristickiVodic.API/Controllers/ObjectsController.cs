@@ -50,7 +50,7 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(int id, [FromQuery] string lang = "sr")
         {
             if (User.Identity?.IsAuthenticated == true)
             {
@@ -59,17 +59,17 @@ namespace TuristickiVodic.API.Controllers
 
                 if (string.Equals(roleName, "ContentCreator", StringComparison.OrdinalIgnoreCase))
                 {
-                    var ownObject = await _objectService.GetMineByIdAsync(id, userId);
+                    var ownObject = await _objectService.GetMineByIdAsync(id, userId, lang);
                     if (ownObject != null) return Ok(ownObject);
                 }
                 else if (string.Equals(roleName, "Manager", StringComparison.OrdinalIgnoreCase))
                 {
-                    var managedObject = await _objectService.GetForManagerByIdAsync(id, userId);
+                    var managedObject = await _objectService.GetForManagerByIdAsync(id, userId, lang);
                     if (managedObject != null) return Ok(managedObject);
                 }
             }
 
-            var obj = await _objectService.GetByIdAsync(id);
+            var obj = await _objectService.GetByIdAsync(id, lang);
             if (obj == null) return NotFound();
             return Ok(obj);
         }
@@ -91,21 +91,6 @@ namespace TuristickiVodic.API.Controllers
             var result = await _objectService.GetForManagerAsync(userId, query);
             return Ok(result);
         }
-
-        /*[HttpGet("search")]
-        [AllowAnonymous]
-        public async Task<IActionResult> Search([FromQuery] TouristObjectQueryDto query)
-        {
-            try
-            {
-                var result = await _objectService.SearchAsync(query);
-                return Ok(result);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }*/
 
         [HttpPost]
         [Authorize(Roles = "ContentCreator")]
