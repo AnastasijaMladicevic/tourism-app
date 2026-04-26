@@ -631,7 +631,7 @@ namespace TuristickiVodic.Services.Services
 
             var dto = _mapper.Map<TouristObjectDto>(obj);
             await ApplyTranslationsAsync(dto, obj, lang);
-            await ApplyReviewTranslationsAsync(dto.Reviews, lang, false);
+            await ApplyReviewTranslationsAsync(dto.Reviews, lang, true);
             await ApplyPendingDeletionRequestFlagsAsync(dto);
             return dto;
         }
@@ -644,7 +644,7 @@ namespace TuristickiVodic.Services.Services
 
             var dto = _mapper.Map<TouristObjectDto>(obj);
             await ApplyTranslationsAsync(dto, obj, lang);
-            await ApplyReviewTranslationsAsync(dto.Reviews, lang, false);
+            await ApplyReviewTranslationsAsync(dto.Reviews, lang, true);
             await ApplyPendingDeletionRequestFlagsAsync(dto);
             return dto;
         }
@@ -665,7 +665,7 @@ namespace TuristickiVodic.Services.Services
 
             var dto = _mapper.Map<TouristObjectDto>(obj);
             await ApplyTranslationsAsync(dto, obj, lang);
-            await ApplyReviewTranslationsAsync(dto.Reviews, lang, false);
+            await ApplyReviewTranslationsAsync(dto.Reviews, lang, true);
             await ApplyPendingDeletionRequestFlagsAsync(dto);
             return dto;
         }

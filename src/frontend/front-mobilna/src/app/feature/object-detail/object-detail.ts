@@ -59,6 +59,7 @@ export class ObjectDetailComponent implements OnInit {
         this.object = normalizedObject;
         this.images = normalizedImages;
         this.reviews = normalizedObject.reviews || [];
+
         this.mainImage =
           this.getMainImage(normalizedImages) ||
           this.resolveMediaUrl(normalizedObject.mainImageUrl) ||
