@@ -1,0 +1,249 @@
+<section class="create-activity-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Global marketplace v2</p>
+      <h1>{{ pageTitle }}</h1>
+      <p class="intro">
+        Build and manage activity listings with location, logistics, and gallery details.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      @if (isEditMode) {
+        <button type="button" class="danger-btn" (click)="deleteActivity()" [disabled]="isSubmitting || isDeleting">
+          <span class="material-symbols-outlined">delete</span>
+          {{ isDeleting ? 'Deleting...' : 'Delete' }}
+        </button>
+      }
+
+      <button type="button" class="ghost-btn" (click)="cancel()">Cancel</button>
+      @if (!isEditMode) {
+        <button type="button" class="ghost-btn" (click)="saveDraft()">Save Draft</button>
+      }
+      <button type="button" class="primary-btn" [disabled]="isSubmitting" (click)="submit()">
+        {{ isSubmitting ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Activity' : 'Create Activity') }}
+      </button>
+    </div>
+  </header>
+
+  @if (errorMessage) {
+    <p class="feedback error">{{ errorMessage }}</p>
+  }
+
+  @if (successMessage) {
+    <p class="feedback success">{{ successMessage }}</p>
+  }
+
+  <div class="layout-grid" [formGroup]="form">
+    <div class="main-column">
+      <article class="card">
+        <div class="card-head">
+          <span class="step-tag">STEP 1</span>
+          <h2>Core Details</h2>
+          <p>Establish the basic identity of your experience.</p>
+        </div>
+
+        <div class="field">
+          <label for="activity-name">Activity Name</label>
+          <input id="activity-name" type="text" formControlName="name" placeholder="e.g. Sunrise Hot Air Balloon over Cappadocia" />
+        </div>
+
+        <div class="field">
+          <label for="activity-description">Description</label>
+          <textarea
+            id="activity-description"
+            rows="8"
+            formControlName="description"
+            placeholder="Describe the experience in detail. Highlight what makes it unique, what's included, and what travelers should expect."
+          ></textarea>
+        </div>
+
+        @if (form.controls.name.invalid && form.controls.name.touched) {
+          <p class="field-error">Activity name is required and must have at most 150 characters.</p>
+        }
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <span class="step-tag">STEP 2</span>
+          <h2>Logistics & Classification</h2>
+          <p>Define where, when, and how much.</p>
+        </div>
+
+        <div class="fields-grid">
+          <div class="field">
+            <label for="type-select">Activity Type</label>
+            @if (hasTypeOptions) {
+              <select id="type-select" formControlName="activityTypeId">
+                <option [ngValue]="null">Select activity type</option>
+                <option *ngFor="let type of activityTypes" [ngValue]="type.id">{{ type.name }}</option>
+              </select>
+            } @else {
+              <input
+                id="type-select"
+                type="number"
+                min="1"
+                formControlName="fallbackActivityTypeId"
+                placeholder="Enter Activity Type ID"
+              />
+            }
+          </div>
+
+          <div class="field">
+            <label for="destination-select">Destination</label>
+            <select id="destination-select" formControlName="destinationId">
+              <option [ngValue]="null">Select destination</option>
+              <option *ngFor="let destination of destinations" [ngValue]="destination.id">{{ destination.name }}</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="locality-select">Specific City</label>
+            <select id="locality-select" formControlName="localityId">
+              <option [ngValue]="null">Optional locality</option>
+              <option *ngFor="let locality of filteredLocalities" [ngValue]="locality.id">{{ locality.name }}</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="object-select">Tourist Object</label>
+            <select id="object-select" formControlName="objectId">
+              <option [ngValue]="null">Optional object</option>
+              <option *ngFor="let objectItem of filteredObjects" [ngValue]="objectItem.id">{{ objectItem.name }}</option>
+            </select>
+          </div>
+
+          <div class="field compact-prefix">
+            <label for="price-input">Base Price</label>
+            <div class="inline-input">
+              <span class="prefix">USD</span>
+              <input id="price-input" type="number" min="0" formControlName="price" placeholder="0.00" />
+            </div>
+          </div>
+
+          <div class="field compact-suffix">
+            <label for="duration-input">Duration</label>
+            <div class="inline-input">
+              <input id="duration-input" type="number" min="1" formControlName="durationMinutes" placeholder="120" />
+              <span class="suffix">MIN</span>
+            </div>
+          </div>
+
+          <div class="field toggle-field">
+            <label for="visibility-toggle">Visible & Active</label>
+            <label class="switch">
+              <input id="visibility-toggle" type="checkbox" formControlName="isVisible" />
+              <span class="slider"></span>
+              <span class="switch-copy">Listed for guests when approved by manager.</span>
+            </label>
+          </div>
+        </div>
+
+        @if (form.errors?.['locationRequired'] && (form.controls.destinationId.touched || form.controls.localityId.touched)) {
+          <p class="field-error">Select at least destination or locality.</p>
+        }
+
+        @if (form.errors?.['activityTypeRequired'] && (form.controls.activityTypeId.touched || form.controls.fallbackActivityTypeId.touched)) {
+          <p class="field-error">Activity type is required.</p>
+        }
+      </article>
+
+      <article class="card">
+        <div class="card-head card-head-inline">
+          <div>
+            <span class="step-tag">STEP 3</span>
+            <h2>Media Gallery</h2>
+            <p>Paste public image URLs and choose a primary cover image.</p>
+          </div>
+        </div>
+
+        <div class="gallery-dropzone">
+          <p class="dropzone-title">Add Photo URL</p>
+          <p class="dropzone-copy">Images are attached after activity creation via the image endpoint.</p>
+
+          <div class="dropzone-input-row">
+            <input
+              type="url"
+              [(ngModel)]="pendingImageUrl"
+              [ngModelOptions]="{ standalone: true }"
+              placeholder="https://example.com/image.jpg"
+            />
+            <button type="button" class="primary-btn" (click)="addImageUrl()">Add Photo</button>
+          </div>
+        </div>
+
+        @if (imageUrls.length > 0) {
+          <div class="gallery-grid">
+            <article class="gallery-item" *ngFor="let imageUrl of imageUrls; let index = index">
+              <img [src]="imageUrl" alt="Activity image preview" />
+              <div class="gallery-actions">
+                @if (index === 0) {
+                  <span class="primary-badge">Primary</span>
+                } @else {
+                  <button type="button" class="ghost-btn small" (click)="setPrimaryImage(index)">Set Primary</button>
+                }
+                <button type="button" class="ghost-btn small danger" (click)="removeImage(index)">Remove</button>
+              </div>
+            </article>
+          </div>
+        }
+      </article>
+    </div>
+
+    <aside class="side-column">
+      <article class="card location-card">
+        <div class="card-head">
+          <h3>Location Intelligence</h3>
+          <p>Click on the map to place a pin. Coordinates are optional, but both values must be set together.</p>
+        </div>
+
+        <div #activityMap class="location-map" aria-label="Activity location map"></div>
+
+        <div class="map-help-row">
+          <span class="map-help-pill">Zoom in/out with the map controls</span>
+          <span class="map-help-pill map-help-pill--accent">Tap or click to select a location</span>
+        </div>
+
+        <div class="coordinates-grid">
+          <div class="field">
+            <label for="latitude-input">Latitude</label>
+            <input id="latitude-input" type="number" step="0.000001" formControlName="latitude" placeholder="44.8584" />
+          </div>
+          <div class="field">
+            <label for="longitude-input">Longitude</label>
+            <input id="longitude-input" type="number" step="0.000001" formControlName="longitude" placeholder="2.2945" />
+          </div>
+        </div>
+
+        <div class="location-details">
+          <div class="location-detail-row">
+            <span>City</span>
+            <strong>{{ locationDetails.city }}</strong>
+          </div>
+          <div class="location-detail-row">
+            <span>Street</span>
+            <strong>{{ locationDetails.street }}</strong>
+          </div>
+          <div class="location-detail-row location-detail-row--full">
+            <span>Selected address</span>
+            <strong>{{ locationDetails.fullAddress }}</strong>
+          </div>
+        </div>
+
+        @if (locationDetails.loading) {
+          <p class="field-hint">Resolving address details from the selected point...</p>
+        }
+
+        @if (form.errors?.['coordinatePairRequired'] && (form.controls.latitude.touched || form.controls.longitude.touched)) {
+          <p class="field-error">Latitude and longitude must be provided together.</p>
+        }
+      </article>
+
+      @if (isLoadingOptions) {
+        <p class="side-hint">Loading options...</p>
+      } @else if (!hasTypeOptions) {
+        <p class="side-hint warning">No activity types were discovered from existing catalog entries. Use Activity Type ID input.</p>
+      }
+    </aside>
+  </div>
+</section>

@@ -53,6 +53,7 @@
         (drop)="onImageDrop($event)"
       >
         <div class="section-title compact">
+          <span class="step-tag">STEP 1</span>
           <h2>Event Image</h2>
           <p>Paste a public image URL and preview it before saving.</p>
         </div>
@@ -92,6 +93,7 @@
       <form class="editor-grid" [formGroup]="form" (ngSubmit)="submit()">
         <section class="card section-card">
           <div class="section-title">
+            <span class="step-tag">STEP 2</span>
             <h2>General Information</h2>
             <p>Essential details about your upcoming event.</p>
           </div>
@@ -143,6 +145,7 @@
 
         <section class="card section-card schedule-card">
           <div class="section-title">
+            <span class="step-tag">STEP 3</span>
             <h2>Schedule</h2>
             <p>When and how often this event takes place.</p>
           </div>
@@ -186,6 +189,7 @@
 
         <section class="card section-card">
           <div class="section-title">
+            <span class="step-tag">STEP 4</span>
             <h2>Ticketing &amp; Capacity</h2>
             <p>Manage ticket prices and attendee limits.</p>
           </div>
@@ -219,6 +223,7 @@
 
         <section class="card section-card highlighted-card">
           <div class="section-title">
+            <span class="step-tag">STEP 5</span>
             <h2>Categorization &amp; Restrictions</h2>
             <p>Tags and access controls for the event listing.</p>
           </div>
@@ -255,25 +260,30 @@
     <aside class="form-side">
       <section class="card side-card">
         <div class="section-title compact">
-          <h2>Venue &amp; Location</h2>
-          <p>Select venue data for the linked object.</p>
+          <h2>Venue &amp; Location Intelligence</h2>
+          <p>Choose a linked venue and pin the exact event spot on the map.</p>
         </div>
 
-        <label class="form-field">
-          <span>Select Venue (Linked Object)</span>
-          <input class="form-control" type="text" [(ngModel)]="venueSearchTerm" [ngModelOptions]="{ standalone: true }" placeholder="Grand Horizon Resort" />
-        </label>
+        <div #eventMap class="location-map" aria-label="Event location map"></div>
 
-        <div class="mini-map">
-          <div class="map-grid"></div>
-          <div class="map-pin"></div>
-          <div class="map-meta">
-            <strong>{{ selectedVenue.name }}</strong>
-            <span>{{ selectedVenue.address }}</span>
-          </div>
+        <div class="map-help-row">
+          <span class="map-help-pill">Zoom in/out with map controls</span>
+          <span class="map-help-pill map-help-pill--accent">Tap or click map to set coordinates</span>
+        </div>
+
+        <div class="coordinates-grid">
+          <label class="form-field">
+            <span>Latitude</span>
+            <input class="form-control" type="number" step="0.000001" formControlName="latitude" placeholder="44.8176" />
+          </label>
+          <label class="form-field">
+            <span>Longitude</span>
+            <input class="form-control" type="number" step="0.000001" formControlName="longitude" placeholder="20.4633" />
+          </label>
         </div>
 
         <div class="venue-card">
+          <small>Linked venue object</small>
           <strong>{{ selectedVenue.name }}</strong>
           <p>{{ selectedVenue.address }}</p>
         </div>
@@ -285,17 +295,34 @@
           <p>Attach the activities that should appear alongside this event.</p>
         </div>
 
+        <label class="form-field">
+          <span>Search activities</span>
+          <input class="form-control" type="text" [(ngModel)]="activitySearchTerm" [ngModelOptions]="{ standalone: true }" placeholder="Search by activity name" />
+        </label>
+
+        @if (isLoadingRelatedActivities) {
+          <p class="side-note">Loading your activities...</p>
+        }
+
         <div class="activity-list">
-          <label class="activity-row" *ngFor="let activity of relatedActivities">
+          <label class="activity-row" *ngFor="let activity of visibleRelatedActivities">
             <div class="activity-meta">
               <strong>{{ activity.name }}</strong>
               <span>{{ activity.meta }}</span>
             </div>
             <input type="checkbox" [checked]="selectedActivityIds.has(activity.id)" (change)="toggleActivity(activity.id)" />
           </label>
+
+          @if (!isLoadingRelatedActivities && visibleRelatedActivities.length === 0) {
+            <p class="side-note">No matching activities found.</p>
+          }
         </div>
 
-        <button type="button" class="link-btn">+ Link more activities</button>
+        @if (hiddenActivitiesCount > 0) {
+          <button type="button" class="link-btn" (click)="toggleMoreActivities()">
+            {{ showAllRelatedActivities ? 'Show fewer activities' : '+ Link more activities (' + hiddenActivitiesCount + ')' }}
+          </button>
+        }
       </section>
 
       <section class="card side-card tips-card">
@@ -309,10 +336,37 @@
           <li>Clear start and end times help with exported calendars.</li>
         </ul>
 
-        <a class="link-btn" href="javascript:void(0)">Learn more about events</a>
+        <button type="button" class="link-btn" (click)="openTipsModal()">Learn more about events</button>
       </section>
     </aside>
   </div>
+
+  @if (showTipsModal) {
+    <div class="event-delete-backdrop" (click)="closeTipsModal()">
+      <section
+        class="card event-delete-modal tips-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tips-modal-title"
+        (click)="$event.stopPropagation()"
+      >
+        <h3 id="tips-modal-title">Event Creator Playbook</h3>
+        <p>
+          Use venue-linked events with precise map coordinates so guests can navigate directly to the event pin.
+          Keep title, schedule, and ticketing data aligned with your related activities to improve discovery.
+        </p>
+        <ul class="tips-modal-list">
+          <li>Use the same destination/object pairing as related activities whenever possible.</li>
+          <li>Drop a map pin close to the real entrance location, not just city center.</li>
+          <li>Add at least one related activity to create a complete day-plan suggestion.</li>
+        </ul>
+
+        <div class="event-delete-modal-actions">
+          <button type="button" class="primary-btn" (click)="closeTipsModal()">Close</button>
+        </div>
+      </section>
+    </div>
+  }
 
   @if (showDeleteModal) {
     <div class="event-delete-backdrop" (click)="closeDeleteModal()">
