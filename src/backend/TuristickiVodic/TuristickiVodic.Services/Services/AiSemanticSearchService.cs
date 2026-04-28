@@ -139,6 +139,22 @@ namespace TuristickiVodic.Services.Services
                 .OrderBy(r => r.Name)
                 .ToListAsync(cancellationToken);
 
+            var knownDestinations = await _context.Destinations
+                .AsNoTracking()
+                .Where(d => d.IsActive && d.Status == ContentStatus.Approved)
+                .Select(d => d.Name)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToListAsync(cancellationToken);
+
+            var knownLocalities = await _context.Localities
+                .AsNoTracking()
+                .Where(l => l.IsActive)
+                .Select(l => l.Name)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToListAsync(cancellationToken);
+
             User? user = null;
             if (userId.HasValue)
             {
@@ -169,6 +185,11 @@ namespace TuristickiVodic.Services.Services
             {
                 Request = request,
                 AvailableRegions = activeRegions,
+                AvailablePlaceNames = activeRegions.Select(r => r.Name)
+                    .Concat(knownDestinations)
+                    .Concat(knownLocalities)
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToList(),
                 EffectiveRegion = effectiveRegion,
                 Origin = origin,
             };
@@ -234,6 +255,8 @@ namespace TuristickiVodic.Services.Services
                           "categories": ["destination","locality","object","event","activity"],
                           "regionName": "jedan od dostupnih regiona ili null",
                           "searchStyle": "specific|exploratory",
+                          "locationAnchors": ["kanonski nazivi mesta iz aplikacije, npr Valencia ili Kotor"],
+                          "preferredObjectTypes": ["bar","club","restaurant"],
                           "mustTerms": ["bitni pojmovi koji moraju ili bi skoro morali da se poklope"],
                           "shouldTerms": ["dodatni pojmovi, sinonimi i feature-i koji pomazu pretrazi"],
                           "nearMe": true,
@@ -245,6 +268,8 @@ namespace TuristickiVodic.Services.Services
                         - regionName koristi SAMO ako korisnik eksplicitno navede region/drzavu, ili ako iz konteksta aktivnog regiona jasno treba ostati u tom regionu.
                         - searchStyle = "specific" kada korisnik trazi konkretnu stvar, pogodnost, kuhinju ili tip mesta.
                         - searchStyle = "exploratory" kada korisnik trazi opstu preporuku, izlazak, sta da vidi, sta je zanimljivo ili gde da ode bez mnogo ogranicenja.
+                        - Ako korisnik navede konkretno mesto, grad, destinaciju ili lokalitet, vrati ga u locationAnchors koristeci kanonski naziv iz aplikacije ako mozes da ga prepoznas.
+                        - preferredObjectTypes koristi kada korisnik implicitno ili eksplicitno trazi odredjen tip mesta; za genericne upite moze ostati prazno.
                         - Ako korisnik pita za setnju sa decom, kategorije ce najcesce biti activity, locality i destination.
                         - Ako korisnik pita za bazen, kategorije ce najcesce biti object, locality ili activity, ali ne genericni spomenici.
                         - Ako korisnik pita za vecernji izlazak, kategorije ce najcesce biti object, event i locality.
@@ -258,19 +283,29 @@ namespace TuristickiVodic.Services.Services
                         Primeri:
                         - "gde mogu da prosetam sa decom u Kotoru" ->
                           categories: ["activity","locality"],
+                          locationAnchors: ["Kotor"],
                           mustTerms: ["kotor"],
                           shouldTerms: ["setnja","deca","porodicno","park","priroda"]
                         - "bazen" ->
                           categories: ["object","locality","activity"],
+                          preferredObjectTypes: ["hotel","spa","resort","aquapark"],
                           mustTerms: ["bazen"],
                           shouldTerms: ["pool","swimming","aquapark","spa","wellness"]
                         - "jel imas neki dobar predlog gde da izadjem uvece u provod sa drugaricama" ->
                           searchStyle: "exploratory",
                           categories: ["object","event","locality"],
+                          preferredObjectTypes: ["bar","club","restaurant","winery"],
                           mustTerms: [],
                           shouldTerms: ["bar","cocktail","music","party","night","wine"]
+                        - "sta turisticki da vidim u Valensiji" ->
+                          searchStyle: "exploratory",
+                          categories: ["destination","locality","activity","event","object"],
+                          locationAnchors: ["Valencia"],
+                          mustTerms: [],
+                          shouldTerms: ["turisticki","zanimljivo","razgledanje","landmark","food","culture"]
                         - "gde u vecernji izlazak" ->
                           categories: ["object","event","locality"],
+                          preferredObjectTypes: ["bar","club","restaurant","winery"],
                           mustTerms: [],
                           shouldTerms: ["bar","cocktail","music","party","wine","night"]
                         """,
@@ -300,6 +335,11 @@ namespace TuristickiVodic.Services.Services
             var plannerMustTerms = NormalizeTerms(plan.MustTerms);
             var shouldTerms = NormalizeTerms(plan.ShouldTerms);
             var searchStyle = NormalizeSearchStyle(plan.SearchStyle);
+            var locationAnchors = NormalizeTerms(plan.LocationAnchors);
+            if (locationAnchors.Count == 0)
+            {
+                locationAnchors = DetectLocationAnchors(request.Query, context);
+            }
             if (searchStyle == "specific" && plannerMustTerms.Count == 0 && shouldTerms.Count > 0)
             {
                 searchStyle = "exploratory";
@@ -322,6 +362,8 @@ namespace TuristickiVodic.Services.Services
                 Categories = normalizedCategories,
                 RegionName = region?.Name,
                 SearchStyle = searchStyle,
+                LocationAnchors = locationAnchors,
+                PreferredObjectTypes = NormalizeTerms(plan.PreferredObjectTypes),
                 MustTerms = mustTerms,
                 ShouldTerms = shouldTerms
                     .Where(term => !mustTerms.Contains(term, StringComparer.Ordinal))
@@ -377,6 +419,8 @@ namespace TuristickiVodic.Services.Services
                     Categories = [.. plan.Categories],
                     RegionName = plan.RegionName,
                     SearchStyle = plan.SearchStyle,
+                    LocationAnchors = [.. plan.LocationAnchors],
+                    PreferredObjectTypes = [.. plan.PreferredObjectTypes],
                     MustTerms = [],
                     ShouldTerms = mergedSemanticTerms,
                     NearMe = plan.NearMe,
@@ -389,6 +433,8 @@ namespace TuristickiVodic.Services.Services
                     Categories = [.. plan.Categories],
                     RegionName = plan.RegionName,
                     SearchStyle = plan.SearchStyle,
+                    LocationAnchors = [.. plan.LocationAnchors],
+                    PreferredObjectTypes = [.. plan.PreferredObjectTypes],
                     MustTerms = [],
                     ShouldTerms = fallbackTerms,
                     NearMe = plan.NearMe,
@@ -401,6 +447,8 @@ namespace TuristickiVodic.Services.Services
                     Categories = allCategories,
                     RegionName = plan.RegionName,
                     SearchStyle = plan.SearchStyle,
+                    LocationAnchors = [.. plan.LocationAnchors],
+                    PreferredObjectTypes = [.. plan.PreferredObjectTypes],
                     MustTerms = [],
                     ShouldTerms = mergedSemanticTerms,
                     NearMe = plan.NearMe,
@@ -413,6 +461,8 @@ namespace TuristickiVodic.Services.Services
                     Categories = allCategories,
                     RegionName = plan.RegionName,
                     SearchStyle = plan.SearchStyle,
+                    LocationAnchors = [.. plan.LocationAnchors],
+                    PreferredObjectTypes = [.. plan.PreferredObjectTypes],
                     MustTerms = [],
                     ShouldTerms = fallbackTerms,
                     NearMe = plan.NearMe,
@@ -429,6 +479,8 @@ namespace TuristickiVodic.Services.Services
                     Categories = [.. plan.Categories],
                     RegionName = plan.RegionName,
                     SearchStyle = plan.SearchStyle,
+                    LocationAnchors = [.. plan.LocationAnchors],
+                    PreferredObjectTypes = [.. plan.PreferredObjectTypes],
                     MustTerms = [],
                     ShouldTerms = [],
                     NearMe = plan.NearMe,
@@ -442,6 +494,8 @@ namespace TuristickiVodic.Services.Services
                     Categories = allCategories,
                     RegionName = plan.RegionName,
                     SearchStyle = plan.SearchStyle,
+                    LocationAnchors = [.. plan.LocationAnchors],
+                    PreferredObjectTypes = [.. plan.PreferredObjectTypes],
                     MustTerms = [],
                     ShouldTerms = [],
                     NearMe = plan.NearMe,
@@ -653,6 +707,11 @@ namespace TuristickiVodic.Services.Services
                 [destination.Region?.Name],
                 [destination.DisplayTitle]);
 
+            if (plan.LocationAnchors.Count > 0 && !MatchesLocationAnchors(text, plan.LocationAnchors))
+            {
+                return null;
+            }
+
             var score = ScoreText(text, plan);
             if (score < 0)
             {
@@ -688,6 +747,11 @@ namespace TuristickiVodic.Services.Services
                 [locality.Destination?.Name, locality.Destination?.Region?.Name],
                 []);
 
+            if (plan.LocationAnchors.Count > 0 && !MatchesLocationAnchors(text, plan.LocationAnchors))
+            {
+                return null;
+            }
+
             var score = ScoreText(text, plan);
             if (score < 0)
             {
@@ -722,6 +786,16 @@ namespace TuristickiVodic.Services.Services
                 obj.ObjectType?.Name,
                 [obj.Locality?.Name, obj.Destination?.Name, obj.Destination?.Region?.Name ?? obj.Locality?.Destination?.Region?.Name],
                 [obj.CuisineType, obj.Amenities == null ? null : string.Join(' ', obj.Amenities)]);
+
+            if (plan.LocationAnchors.Count > 0 && !MatchesLocationAnchors(text, plan.LocationAnchors))
+            {
+                return null;
+            }
+
+            if (plan.PreferredObjectTypes.Count > 0 && !MatchesPreferredObjectType(text, plan.PreferredObjectTypes))
+            {
+                return null;
+            }
 
             var score = ScoreText(text, plan);
             if (score < 0)
@@ -760,6 +834,11 @@ namespace TuristickiVodic.Services.Services
                 [evt.Locality?.Name, evt.Destination?.Name ?? evt.Locality?.Destination?.Name, evt.Destination?.Region?.Name ?? evt.Locality?.Destination?.Region?.Name],
                 [evt.Object?.Name]);
 
+            if (plan.LocationAnchors.Count > 0 && !MatchesLocationAnchors(text, plan.LocationAnchors))
+            {
+                return null;
+            }
+
             var score = ScoreText(text, plan);
             if (score < 0)
             {
@@ -795,6 +874,11 @@ namespace TuristickiVodic.Services.Services
                 activity.ActivityType?.Name,
                 [activity.Locality?.Name, activity.Destination?.Name ?? activity.Locality?.Destination?.Name, activity.Destination?.Region?.Name ?? activity.Locality?.Destination?.Region?.Name],
                 [activity.Object?.Name]);
+
+            if (plan.LocationAnchors.Count > 0 && !MatchesLocationAnchors(text, plan.LocationAnchors))
+            {
+                return null;
+            }
 
             var score = ScoreText(text, plan);
             if (score < 0)
@@ -866,6 +950,64 @@ namespace TuristickiVodic.Services.Services
             }
 
             return score;
+        }
+
+        private static bool MatchesPreferredObjectType(SearchableText text, IReadOnlyCollection<string> preferredTypes)
+        {
+            if (preferredTypes.Count == 0)
+            {
+                return true;
+            }
+
+            foreach (var type in preferredTypes)
+            {
+                foreach (var variant in ExpandTerm(type))
+                {
+                    if (text.Type.Contains(variant, StringComparison.Ordinal) ||
+                        text.Name.Contains(variant, StringComparison.Ordinal) ||
+                        text.Extra.Contains(variant, StringComparison.Ordinal))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool MatchesLocationAnchors(SearchableText text, IReadOnlyCollection<string> locationAnchors)
+        {
+            if (locationAnchors.Count == 0)
+            {
+                return true;
+            }
+
+            foreach (var anchor in locationAnchors)
+            {
+                var normalizedAnchor = NormalizeText(anchor);
+                if (string.IsNullOrWhiteSpace(normalizedAnchor))
+                {
+                    continue;
+                }
+
+                if (text.Name.Contains(normalizedAnchor, StringComparison.Ordinal) ||
+                    text.Location.Contains(normalizedAnchor, StringComparison.Ordinal) ||
+                    text.All.Contains(normalizedAnchor, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+
+                var anchorWords = normalizedAnchor.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                if (anchorWords.Length > 1 && anchorWords.All(word =>
+                    text.Name.Contains(word, StringComparison.Ordinal) ||
+                    text.Location.Contains(word, StringComparison.Ordinal) ||
+                    text.All.Contains(word, StringComparison.Ordinal)))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static int RequiredMustMatches(int mustTermCount)
@@ -1114,6 +1256,90 @@ namespace TuristickiVodic.Services.Services
                 .ToList();
         }
 
+        private static List<string> DetectLocationAnchors(string query, SearchExecutionContext context)
+        {
+            var tokens = NormalizeText(query)
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(token => token.Length >= 4 && !FallbackStopWords.Contains(token))
+                .Distinct(StringComparer.Ordinal)
+                .ToList();
+
+            if (tokens.Count == 0 || context.AvailablePlaceNames.Count == 0)
+            {
+                return [];
+            }
+
+            var matches = new List<string>();
+            foreach (var placeName in context.AvailablePlaceNames)
+            {
+                var normalizedPlace = NormalizeText(placeName);
+                var placeWords = normalizedPlace.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+                foreach (var token in tokens)
+                {
+                    if (placeWords.Any(word => LooksLikeSamePlace(token, word)))
+                    {
+                        matches.Add(placeName);
+                        break;
+                    }
+                }
+            }
+
+            return matches
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Take(3)
+                .ToList();
+        }
+
+        private static bool LooksLikeSamePlace(string token, string candidateWord)
+        {
+            if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(candidateWord))
+            {
+                return false;
+            }
+
+            if (token.Equals(candidateWord, StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            var tokenStem = StripCommonEnding(token);
+            var candidateStem = StripCommonEnding(candidateWord);
+            if (tokenStem.Equals(candidateStem, StringComparison.Ordinal))
+            {
+                return true;
+            }
+
+            var prefix = CommonPrefixLength(tokenStem, candidateStem);
+            var minLength = Math.Min(tokenStem.Length, candidateStem.Length);
+            return prefix >= 4 && minLength >= 5 && (double)prefix / minLength >= 0.65d;
+        }
+
+        private static string StripCommonEnding(string value)
+        {
+            foreach (var suffix in new[] { "ovima", "evima", "anju", "enju", "ima", "ama", "skom", "ckom", "ciji", "siji", "iji", "ju", "om", "em", "im", "oj", "og", "eg", "am", "u", "a", "e", "i" })
+            {
+                if (value.Length > suffix.Length + 2 && value.EndsWith(suffix, StringComparison.Ordinal))
+                {
+                    return value[..^suffix.Length];
+                }
+            }
+
+            return value;
+        }
+
+        private static int CommonPrefixLength(string left, string right)
+        {
+            var limit = Math.Min(left.Length, right.Length);
+            var count = 0;
+            while (count < limit && left[count] == right[count])
+            {
+                count++;
+            }
+
+            return count;
+        }
+
         private static SemanticSearchPlan BuildFallbackPlan(string query, SearchExecutionContext context)
         {
             return new SemanticSearchPlan
@@ -1122,6 +1348,8 @@ namespace TuristickiVodic.Services.Services
                 Categories = ["destination", "locality", "object", "event", "activity"],
                 RegionName = context.EffectiveRegion?.Name,
                 SearchStyle = "specific",
+                LocationAnchors = [],
+                PreferredObjectTypes = [],
                 MustTerms = BuildFallbackTerms(query),
                 ShouldTerms = [],
                 NearMe = context.Origin != null,
@@ -1283,7 +1511,7 @@ namespace TuristickiVodic.Services.Services
                 return "hotel";
             }
 
-            if (normalized.Contains("kafana") || normalized.Contains("bar") || normalized.Contains("kafic"))
+            if (normalized.Contains("kafana") || normalized.Contains("bar") || normalized.Contains("kafic") || normalized.Contains("klub") || normalized.Contains("club") || normalized.Contains("wine") || normalized.Contains("vinar"))
             {
                 return "kafana";
             }
@@ -1305,6 +1533,7 @@ namespace TuristickiVodic.Services.Services
         {
             public required AiSemanticSearchQueryDto Request { get; set; }
             public required List<Region> AvailableRegions { get; set; }
+            public required List<string> AvailablePlaceNames { get; set; }
             public Region? EffectiveRegion { get; set; }
             public GeoPoint? Origin { get; set; }
         }
@@ -1315,6 +1544,8 @@ namespace TuristickiVodic.Services.Services
             public List<string> Categories { get; set; } = [];
             public string? RegionName { get; set; }
             public string SearchStyle { get; set; } = "specific";
+            public List<string> LocationAnchors { get; set; } = [];
+            public List<string> PreferredObjectTypes { get; set; } = [];
             public List<string> MustTerms { get; set; } = [];
             public List<string> ShouldTerms { get; set; } = [];
             public bool NearMe { get; set; }
