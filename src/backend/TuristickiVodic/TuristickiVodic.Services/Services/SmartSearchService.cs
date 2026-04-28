@@ -23,7 +23,7 @@ namespace TuristickiVodic.Services.Services
         private static readonly string[] DestinationHints = ["destination", "destinacija", "city", "grad", "island", "ostrvo", "beach", "plaza", "plaža", "mountain", "planina"];
         private static readonly string[] ObjectHints = ["hotel", "restoran", "restaurant", "kafic", "kafić", "bar", "kafana", "museum", "muzej", "spa", "apartment", "apartman"];
         private static readonly string[] FamilyFriendlyFeatureHints = ["kids", "family", "deca", "child", "children", "playground", "igraliste", "parking", "terasa", "terrace", "garden", "basta", "mirno", "quiet", "porodicno", "porodican", "porodicni"];
-        private static readonly string[] HikingHints = ["staza", "staze", "hiking", "planinar", "setnja", "setnje", "setnju", "setalistem", "seta", "trail", "priroda", "park", "pecanje", "ribolov", "fishing", "bicikl", "outdoor", "sport", "pesacka", "pesacki", "peske", "pesacenje", "strma", "strme", "strmo", "lagana", "lagane", "lagano", "laka", "lake"];
+        private static readonly string[] HikingHints = ["staza", "staze", "hiking", "planinar", "setnja", "setnje", "setnju", "setnjom", "setalistem", "seta", "prosetam", "proseta", "prosetati", "trail", "priroda", "park", "pecanje", "ribolov", "fishing", "bicikl", "outdoor", "sport", "pesacka", "pesacki", "peske", "pesacenje", "strma", "strme", "strmo", "lagana", "lagane", "lagano", "laka", "lake"];
         private static readonly string[] FoodTypeHints = ["kineska", "kineski", "japanese", "japanska", "italijanska", "italian", "grcka", "greek", "srpska", "balkan", "meksicka", "mexican"];
         private static readonly HashSet<string> SearchStopWords = ["gde", "mogu", "moze", "mozete", "da", "na", "sa", "u", "uz", "za", "od", "do", "i", "ili", "daleko", "daleka", "daleki", "udaljeno", "udaljena",
 "izadjem", "izadjem", "izaci", "izaći","the", "a", "an", "to", "for", "with", "nisu", "nije", "je", "su", "koje", "koji", "koja", "nesto", "ima", "imaju", "blizu", "oko", "hteo", "bih", "zelim", "trazim", "imate", "mi", "me", "ne", "li", "bi", "manje", "vise", "bez", "dobro", "lepo", "kako", "sta", "kada", "zasto", 
@@ -589,9 +589,13 @@ namespace TuristickiVodic.Services.Services
                 "staze" => ["staze", "staza", "trail", "hiking", "planinar", "setnja"],
                 "trail" => ["trail", "staza", "staze", "hiking"],
                 "hiking" => ["hiking", "staza", "staze", "planinar"],
-                "setnja" => ["setnja", "setnje", "setnju", "setalistem", "seta", "staza", "staze", "park", "priroda", "pesacka", "peske"],
-                "setnju" => ["setnju", "setnja", "setnje", "setalistem", "seta", "pesacki", "peske", "park"],
-                "setnje" => ["setnje", "setnja", "park", "staza", "priroda"],
+                "setnja" => ["setnja", "setnje", "setnju", "setnjom", "setalistem", "seta", "prosetam", "prosetati", "staza", "staze", "park", "priroda", "pesacka", "peske"],
+                "setnju" => ["setnju", "setnja", "setnje", "setnjom", "setalistem", "seta", "prosetam", "pesacki", "peske", "park"],
+                "setnje" => ["setnje", "setnja", "setnjom", "prosetam", "park", "staza", "priroda"],
+                "setnjom" => ["setnjom", "setnja", "setnju", "setnje", "prosetam", "park", "staza", "priroda"],
+                "prosetam" => ["prosetam", "prosetati", "setnja", "setnje", "setnju", "setnjom", "park", "staza", "priroda", "pesacka"],
+                "proseta" => ["proseta", "prosetam", "prosetati", "setnja", "setnje", "park", "priroda"],
+                "prosetati" => ["prosetati", "prosetam", "proseta", "setnja", "setnje", "setnju", "park", "staza", "priroda"],
                 "planinar" => ["planinar", "planina", "staza", "staze", "hiking"],
                 "planina" => ["planina", "planinar", "hiking", "staza"],
                 // Kineska / etnicka hrana

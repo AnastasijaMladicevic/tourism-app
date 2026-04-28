@@ -189,6 +189,7 @@ namespace TuristickiVodic.Services.Services
                         - U query posalji kratku i korisnu pretragu bez suvisnih reci.
                         - Ako korisnik navede region ili drzavu, prosledi regionName kad koristis explore_region.
                         - regionName sme da bude popunjen SAMO ako je korisnik eksplicitno naveo mesto, drzavu ili region.
+                        - Ako korisnik nije naveo mesto, ali postoji aktivan regionId iz konteksta, smes da koristis explore_region sa tim regionId.
                         - Ako nema eksplicitnog mesta u poruci, ostavi regionName prazno i koristi search_places.
                         - Nemoj da izmisljas alat koji nije ponudjen.
                         """,
@@ -207,7 +208,7 @@ namespace TuristickiVodic.Services.Services
             messages.Add(new OllamaMessage
             {
                 Role = "user",
-                Content = request.Message,
+                Content = BuildPlannerUserPrompt(request),
             });
 
             return messages;
@@ -238,6 +239,7 @@ namespace TuristickiVodic.Services.Services
                         - Za siroka pitanja tipa sta videti, sta zanimljivo, sta raditi, gde prosetati u regionu ili drzavi koristi explore_region.
                         - Za konkretne zahteve poput restorana, hotela, bazena, parkinga, kuhinje ili cene koristi search_places.
                         - regionName popuni samo kada je korisnik zaista napisao konkretno mesto, drzavu ili region.
+                        - Ako korisnik nije napisao mesto, ali postoji aktivan regionId iz konteksta, smes da koristis explore_region sa tim regionId.
                         - Ako korisnik nije napisao mesto, regionName ostavi prazno i koristi search_places.
                         - Ako nisi siguran, koristi search_places sa kratkim query stringom.
                         """,
@@ -256,7 +258,7 @@ namespace TuristickiVodic.Services.Services
             messages.Add(new OllamaMessage
             {
                 Role = "user",
-                Content = request.Message,
+                Content = BuildPlannerUserPrompt(request),
             });
 
             return messages;
@@ -272,6 +274,15 @@ namespace TuristickiVodic.Services.Services
                 "system" => "system",
                 _ => null,
             };
+        }
+
+        private static string BuildPlannerUserPrompt(AiChatRequestDto request)
+        {
+            var region = request.RegionId?.ToString() ?? "none";
+            var latitude = request.Latitude?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "none";
+            var longitude = request.Longitude?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "none";
+
+            return $"Korisnicko pitanje: {request.Message}\nKontekst: regionId={region}, latitude={latitude}, longitude={longitude}";
         }
 
         private static List<OllamaToolDefinition> BuildTools()
@@ -394,7 +405,7 @@ namespace TuristickiVodic.Services.Services
                     return new AiToolSelection
                     {
                         ToolName = SearchPlacesToolName,
-                        SearchArguments = MergeSearchArgs(parsed, request, "strict"),
+                        SearchArguments = MergeSearchArgs(parsed, request, "mcp"),
                     };
                 }
 
@@ -463,7 +474,7 @@ namespace TuristickiVodic.Services.Services
                         RegionId = request.RegionId,
                         Latitude = request.Latitude,
                         Longitude = request.Longitude,
-                    }, request, "strict"),
+                    }, request, "mcp"),
                 };
             }
 
@@ -568,7 +579,7 @@ namespace TuristickiVodic.Services.Services
                     return exploreExecution;
                 }
 
-                var fallbackSearchResults = await ExecuteSearchToolAsync(userId, BuildDefaultSearchArgs(request, "strict"), cancellationToken);
+                var fallbackSearchResults = await ExecuteSearchToolAsync(userId, BuildDefaultSearchArgs(request, "mcp"), cancellationToken);
                 return new AiToolExecution
                 {
                     ToolName = SearchPlacesToolName,
@@ -577,7 +588,7 @@ namespace TuristickiVodic.Services.Services
                 };
             }
 
-            var searchArguments = selection.SearchArguments ?? BuildDefaultSearchArgs(request, "strict");
+            var searchArguments = selection.SearchArguments ?? BuildDefaultSearchArgs(request, "mcp");
             var searchResults = await ExecuteSearchToolAsync(userId, searchArguments, cancellationToken);
 
             if (searchResults.Count == 0)
@@ -619,7 +630,7 @@ namespace TuristickiVodic.Services.Services
             var query = new SmartSearchQueryDto
             {
                 Query = args.Query?.Trim() ?? string.Empty,
-                Mode = string.IsNullOrWhiteSpace(args.Mode) ? "strict" : args.Mode.Trim(),
+                Mode = string.IsNullOrWhiteSpace(args.Mode) ? "mcp" : args.Mode.Trim(),
                 PageSize = Math.Clamp(args.PageSize ?? 6, 1, 8),
                 RegionId = args.RegionId,
                 Latitude = args.Latitude,
@@ -627,7 +638,69 @@ namespace TuristickiVodic.Services.Services
             };
 
             var results = await _smartSearchService.SearchAsync(userId, query);
-            return results.Take(6).ToList();
+            var localityResults = await SearchLocalitiesForAiAsync(args, cancellationToken);
+
+            return results
+                .Concat(localityResults)
+                .GroupBy(x => $"{x.Category}:{x.Id}")
+                .Select(g => g.OrderByDescending(x => x.Score).First())
+                .OrderByDescending(x => x.Score)
+                .ThenBy(x => x.Name)
+                .Take(6)
+                .ToList();
+        }
+
+        private async Task<List<SmartSearchResultDto>> SearchLocalitiesForAiAsync(SearchPlacesToolArguments args, CancellationToken cancellationToken)
+        {
+            var normalizedQuery = NormalizeText(args.Query);
+            var tokens = SplitTokens(normalizedQuery);
+            if (tokens.Count == 0)
+            {
+                return [];
+            }
+
+            var localitiesQuery = _context.Localities
+                .AsNoTracking()
+                .Include(l => l.LocalityType)
+                .Include(l => l.Destination)
+                    .ThenInclude(d => d.Region)
+                .Include(l => l.Images)
+                .Where(l => l.IsActive)
+                .AsQueryable();
+
+            if (args.RegionId is > 0)
+            {
+                localitiesQuery = localitiesQuery.Where(l => l.Destination.RegionId == args.RegionId.Value);
+            }
+
+            var localities = await localitiesQuery.ToListAsync(cancellationToken);
+
+            return localities
+                .Select(locality => new
+                {
+                    Locality = locality,
+                    Score = ScoreLocalitySearch(locality, normalizedQuery, tokens),
+                })
+                .Where(x => x.Score > 0)
+                .OrderByDescending(x => x.Score)
+                .ThenBy(x => x.Locality.Name)
+                .Take(4)
+                .Select(x => new SmartSearchResultDto
+                {
+                    Id = x.Locality.Id,
+                    Name = x.Locality.Name,
+                    TypeName = x.Locality.LocalityType?.Name ?? "Lokalitet",
+                    Location = ResolveLocalityLocation(x.Locality),
+                    Category = "locality",
+                    MarkerType = "destination",
+                    Icon = "place",
+                    ImageUrl = GetMainImageUrl(x.Locality.Images),
+                    Latitude = x.Locality.Geolocation?.Y,
+                    Longitude = x.Locality.Geolocation?.X,
+                    MatchReason = "Matches locality",
+                    Score = Math.Round(x.Score, 2),
+                })
+                .ToList();
         }
 
         private async Task<AiToolExecution> ExecuteExploreRegionToolAsync(ExploreRegionToolArguments args, string originalMessage, CancellationToken cancellationToken)
@@ -695,7 +768,19 @@ namespace TuristickiVodic.Services.Services
                      (a.Destination == null &&
                       a.Locality != null &&
                       a.Locality.Destination != null &&
-                      a.Locality.Destination.RegionId == region.Id)))
+                     a.Locality.Destination.RegionId == region.Id)))
+                .ToListAsync(cancellationToken);
+
+            var localities = await _context.Localities
+                .AsNoTracking()
+                .Include(l => l.LocalityType)
+                .Include(l => l.Destination)
+                    .ThenInclude(d => d.Region)
+                .Include(l => l.Images)
+                .Include(l => l.Objects)
+                .Include(l => l.Events)
+                .Include(l => l.Activities)
+                .Where(l => l.IsActive && l.Destination.RegionId == region.Id)
                 .ToListAsync(cancellationToken);
 
             var events = await _context.Events
@@ -768,6 +853,29 @@ namespace TuristickiVodic.Services.Services
                         Longitude = activity.Geolocation?.X,
                         MatchReason = ResolveActivityReason(theme),
                         Score = Math.Round(ScoreActivity(activity, theme, activityFavoriteCounts.GetValueOrDefault(activity.Id)), 2),
+                    }
+                });
+            }
+
+            foreach (var locality in localities.Where(l => ShouldIncludeLocality(theme, l)))
+            {
+                candidates.Add(new ExploreCandidate
+                {
+                    Category = "locality",
+                    Result = new SmartSearchResultDto
+                    {
+                        Id = locality.Id,
+                        Name = locality.Name,
+                        TypeName = locality.LocalityType?.Name ?? "Lokalitet",
+                        Location = ResolveLocalityLocation(locality),
+                        Category = "locality",
+                        MarkerType = "destination",
+                        Icon = "place",
+                        ImageUrl = GetMainImageUrl(locality.Images),
+                        Latitude = locality.Geolocation?.Y,
+                        Longitude = locality.Geolocation?.X,
+                        MatchReason = ResolveLocalityReason(theme),
+                        Score = Math.Round(ScoreLocality(locality, theme), 2),
                     }
                 });
             }
@@ -888,6 +996,7 @@ namespace TuristickiVodic.Services.Services
 
             var normalizedName = NormalizeText(region.Name);
             var normalizedCode = NormalizeText(region.Code);
+            var aliases = GetRegionAliases(normalizedName).ToList();
 
             if (normalizedCandidate == normalizedName || normalizedCandidate == normalizedCode)
             {
@@ -897,6 +1006,11 @@ namespace TuristickiVodic.Services.Services
             if (normalizedCandidate.Contains(normalizedName, StringComparison.Ordinal))
             {
                 return 100;
+            }
+
+             if (aliases.Any(alias => normalizedCandidate.Contains(alias, StringComparison.Ordinal)))
+            {
+                return 95;
             }
 
             if (!string.IsNullOrWhiteSpace(normalizedCode) && candidateTokens.Contains(normalizedCode))
@@ -930,6 +1044,18 @@ namespace TuristickiVodic.Services.Services
             }
 
             return 0;
+        }
+
+        private static IEnumerable<string> GetRegionAliases(string normalizedRegionName)
+        {
+            return normalizedRegionName switch
+            {
+                "crna gora" => ["montenegro", "crnoj gori", "crne gore", "cg"],
+                "srbija" => ["serbia", "srbiji", "srbije", "rs"],
+                "spanija" => ["spain", "spaniji", "spanije", "es"],
+                "italija" => ["italy", "italiji", "italije", "it"],
+                _ => [],
+            };
         }
 
         private static bool SharesStem(string left, string right)
@@ -987,6 +1113,31 @@ namespace TuristickiVodic.Services.Services
             }
 
             return destination.IsActive;
+        }
+
+        private static bool ShouldIncludeLocality(string theme, Locality locality)
+        {
+            if (theme == "food")
+            {
+                return locality.Objects.Any(IsFoodObjectCandidate);
+            }
+
+            if (theme == "events")
+            {
+                return locality.Events.Count > 0;
+            }
+
+            if (theme == "family")
+            {
+                return locality.Activities.Count > 0 || locality.Objects.Any(IsFamilyFriendlyObjectCandidate);
+            }
+
+            if (theme == "walk")
+            {
+                return locality.Activities.Count > 0 || ContainsThemeToken($"{locality.Name} {locality.Description} {locality.LocalityType?.Name}", "walk");
+            }
+
+            return true;
         }
 
         private static bool ShouldIncludeActivity(string theme, Activity activity)
@@ -1048,6 +1199,81 @@ namespace TuristickiVodic.Services.Services
             if (theme is "sightseeing" or "walk" or "family" or "mixed")
             {
                 score += 10d;
+            }
+
+            return score;
+        }
+
+        private static double ScoreLocality(Locality locality, string theme)
+        {
+            var score = 50d;
+            score += locality.Objects.Count * 2d;
+            score += locality.Activities.Count * 2.5d;
+            score += locality.Events.Count * 2d;
+
+            if (locality.Images.Any())
+            {
+                score += 4d;
+            }
+
+            if (theme is "walk" or "family" or "sightseeing" or "mixed")
+            {
+                score += 10d;
+            }
+
+            if (theme == "food" && locality.Objects.Any(IsFoodObjectCandidate))
+            {
+                score += 8d;
+            }
+
+            return score;
+        }
+
+        private static double ScoreLocalitySearch(Locality locality, string normalizedQuery, List<string> tokens)
+        {
+            var score = 0d;
+            var name = NormalizeText(locality.Name);
+            var description = NormalizeText(locality.Description);
+            var type = NormalizeText(locality.LocalityType?.Name);
+            var destination = NormalizeText(locality.Destination?.Name);
+            var region = NormalizeText(locality.Destination?.Region?.Name);
+
+            if (name.Contains(normalizedQuery, StringComparison.Ordinal))
+            {
+                score += 80d;
+            }
+
+            if (description.Contains(normalizedQuery, StringComparison.Ordinal))
+            {
+                score += 40d;
+            }
+
+            if (destination.Contains(normalizedQuery, StringComparison.Ordinal) || region.Contains(normalizedQuery, StringComparison.Ordinal))
+            {
+                score += 35d;
+            }
+
+            foreach (var token in tokens)
+            {
+                if (name.Contains(token, StringComparison.Ordinal))
+                {
+                    score += 20d;
+                }
+
+                if (type.Contains(token, StringComparison.Ordinal))
+                {
+                    score += 12d;
+                }
+
+                if (description.Contains(token, StringComparison.Ordinal))
+                {
+                    score += 8d;
+                }
+
+                if (destination.Contains(token, StringComparison.Ordinal) || region.Contains(token, StringComparison.Ordinal))
+                {
+                    score += 6d;
+                }
             }
 
             return score;
@@ -1197,12 +1423,14 @@ namespace TuristickiVodic.Services.Services
                 "family" => new Dictionary<string, int>
                 {
                     ["destination"] = 2,
+                    ["locality"] = 1,
                     ["activity"] = 2,
                     ["object"] = 2,
                 },
                 _ => new Dictionary<string, int>
                 {
                     ["destination"] = 2,
+                    ["locality"] = 1,
                     ["activity"] = 2,
                     ["event"] = 1,
                     ["object"] = 1,
@@ -1261,6 +1489,11 @@ namespace TuristickiVodic.Services.Services
                    normalized.Contains("cafe");
         }
 
+        private static bool IsFoodObjectCandidate(TouristObject obj)
+        {
+            return IsFoodObjectType(obj.ObjectType?.Name);
+        }
+
         private static bool IsStayObjectType(string? typeName)
         {
             var normalized = NormalizeText(typeName);
@@ -1302,6 +1535,11 @@ namespace TuristickiVodic.Services.Services
                    combined.Contains("igral");
         }
 
+        private static bool IsFamilyFriendlyObjectCandidate(TouristObject obj)
+        {
+            return IsFamilyFriendlyObject(obj);
+        }
+
         private static bool IsOutdoorObject(TouristObject obj)
         {
             var combined = NormalizeText($"{obj.ObjectType?.Name} {obj.Description} {(obj.Amenities == null ? string.Empty : string.Join(' ', obj.Amenities))}");
@@ -1325,6 +1563,18 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
+        private static string ResolveLocalityReason(string theme)
+        {
+            return theme switch
+            {
+                "walk" => "Lep deo regiona za setnju i obilazak",
+                "family" => "Prijatan lokalitet za porodicni plan",
+                "food" => "Dobar kraj ako trazis hranu i mesta za predah",
+                "events" => "Lokalitet koji ima zanimljiva desavanja ili sadrzaje",
+                _ => "Jedan od zanimljivijih lokaliteta u regionu",
+            };
+        }
+
         private static string ResolveActivityReason(string theme)
         {
             return theme switch
@@ -1334,6 +1584,14 @@ namespace TuristickiVodic.Services.Services
                 "food" => "Aktivnost koja lepo dopunjuje gastro plan",
                 _ => "Zanimljiva aktivnost u regionu",
             };
+        }
+
+        private static string ResolveLocalityLocation(Locality locality)
+        {
+            return locality.Destination?.Name
+                ?? locality.Destination?.Region?.Name
+                ?? locality.LocalityType?.Name
+                ?? string.Empty;
         }
 
         private static string ResolveEventReason(string theme)
