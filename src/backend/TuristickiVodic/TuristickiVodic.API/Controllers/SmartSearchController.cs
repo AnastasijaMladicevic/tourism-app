@@ -11,11 +11,16 @@ namespace TuristickiVodic.API.Controllers
     public class SmartSearchController : ControllerBase
     {
         private readonly ISmartSearchService _smartSearchService;
+        private readonly IAiSemanticSearchService _aiSemanticSearchService;
         private readonly ILogger<SmartSearchController> _logger;
 
-        public SmartSearchController(ISmartSearchService smartSearchService, ILogger<SmartSearchController> logger)
+        public SmartSearchController(
+            ISmartSearchService smartSearchService,
+            IAiSemanticSearchService aiSemanticSearchService,
+            ILogger<SmartSearchController> logger)
         {
             _smartSearchService = smartSearchService;
+            _aiSemanticSearchService = aiSemanticSearchService;
             _logger = logger;
         }
 
@@ -72,12 +77,18 @@ namespace TuristickiVodic.API.Controllers
                 _logger.LogWarning("MCP DEBUG: Query='{Query}' Mode='{Mode}'", dto.Query, dto.Mode);
 
                 var userId = TryGetCurrentUserId();
+                var semanticResponse = await _aiSemanticSearchService.SearchAsync(userId, new AiSemanticSearchQueryDto
+                {
+                    Query = dto.Query,
+                    PageSize = dto.PageSize,
+                    RegionId = dto.RegionId,
+                    Latitude = dto.Latitude,
+                    Longitude = dto.Longitude,
+                });
 
-                var results = await _smartSearchService.SearchAsync(userId, dto);
+                _logger.LogWarning("MCP DEBUG: Provider='{Provider}' Returned {Count} results", semanticResponse.Provider, semanticResponse.Results.Count);
 
-                _logger.LogWarning("MCP DEBUG: Returned {Count} results", results.Count);
-
-                return Ok(results);
+                return Ok(semanticResponse.Results);
             }
 
         private int? TryGetCurrentUserId()

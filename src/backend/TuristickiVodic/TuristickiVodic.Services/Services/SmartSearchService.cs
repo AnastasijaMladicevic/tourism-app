@@ -17,8 +17,9 @@ namespace TuristickiVodic.Services.Services
         private static readonly string[] PremiumHints = ["luxury", "luksuz", "premium", "romantic", "exclusive"];
         private static readonly string[] TopRatedHints = ["best", "najbolje", "top", "popular", "preporuci", "preporuka", "recommended"];
         private static readonly string[] FamilyHints = ["deca", "decom", "decu", "dete", "kids", "kid", "children", "child", "family", "porodicno", "porodicni", "porodicna", "porodica", "porodican"];
-        private static readonly string[] DinnerHints = ["vecera", "veceru", "dinner", "supper", "dine", "izadjem", "izaci", "izlazak"];
-        private static readonly string[] PoolHints = ["bazen", "pool", "swimming"];
+        private static readonly string[] DinnerHints = ["vecera", "veceru", "dinner", "supper", "dine", "rucak", "rucku", "lunch"];
+        private static readonly string[] PoolHints = ["bazen", "pool", "swimming", "aquapark", "aqua park", "water park"];
+        private static readonly string[] NightlifeHints = ["uvece", "vecernji", "vecernje", "vecernji izlazak", "veceras", "night", "nightlife", "izlazak", "izlasci", "izlaskom", "izadjem", "izaci", "bar", "kafana", "kafic", "koktel", "cocktail", "music", "muzika", "party", "jazz", "vino", "wine", "pub", "lounge", "klub", "club"];
         private static readonly string[] EventHints = ["event", "dogadjaj", "događaj", "festival", "concert", "koncert", "party", "zur", "music"];
         private static readonly string[] DestinationHints = ["destination", "destinacija", "city", "grad", "island", "ostrvo", "beach", "plaza", "plaža", "mountain", "planina"];
         private static readonly string[] ObjectHints = ["hotel", "restoran", "restaurant", "kafic", "kafić", "bar", "kafana", "museum", "muzej", "spa", "apartment", "apartman"];
@@ -62,6 +63,15 @@ namespace TuristickiVodic.Services.Services
                 .Include(d => d.DestinationType)
                 .Include(d => d.Images)
                 .Where(d => d.IsActive && d.Status == ContentStatus.Approved)
+                .AsQueryable();
+
+            var localityQuery = _context.Localities
+                .AsNoTracking()
+                .Include(l => l.LocalityType)
+                .Include(l => l.Destination)
+                    .ThenInclude(d => d.Region)
+                .Include(l => l.Images)
+                .Where(l => l.IsActive)
                 .AsQueryable();
 
             var objectQuery = _context.Objects
@@ -109,6 +119,7 @@ namespace TuristickiVodic.Services.Services
                 var regionId = context.EffectiveRegionId.Value;
 
                 destinationQuery = destinationQuery.Where(d => d.RegionId == regionId);
+                localityQuery = localityQuery.Where(l => l.Destination.RegionId == regionId);
 
                 objectQuery = objectQuery.Where(o =>
                     o.Destination.RegionId == regionId ||
@@ -132,6 +143,7 @@ namespace TuristickiVodic.Services.Services
             }
 
             var destinations = await destinationQuery.ToListAsync();
+            var localities = await localityQuery.ToListAsync();
             var objects = await objectQuery.ToListAsync();
             var events = await eventQuery.ToListAsync();
             var activities = await activityQuery.ToListAsync();
@@ -145,8 +157,9 @@ namespace TuristickiVodic.Services.Services
             );
 
             _logger.LogWarning(
-                "SERVICE DEBUG: Loaded counts destinations={Destinations}, objects={Objects}, events={Events}, activities={Activities}",
+                "SERVICE DEBUG: Loaded counts destinations={Destinations}, localities={Localities}, objects={Objects}, events={Events}, activities={Activities}",
                 destinations.Count,
+                localities.Count,
                 objects.Count,
                 events.Count,
                 activities.Count
@@ -161,6 +174,12 @@ namespace TuristickiVodic.Services.Services
             var objectFavoriteCounts = await _context.Favorites.AsNoTracking()
                 .Where(f => f.ObjectId.HasValue)
                 .GroupBy(f => f.ObjectId!.Value)
+                .Select(g => new { Id = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.Id, x => x.Count);
+
+            var localityFavoriteCounts = await _context.Favorites.AsNoTracking()
+                .Where(f => f.LocalityId.HasValue)
+                .GroupBy(f => f.LocalityId!.Value)
                 .Select(g => new { Id = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(x => x.Id, x => x.Count);
 
@@ -180,6 +199,11 @@ namespace TuristickiVodic.Services.Services
             foreach (var destination in destinations)
             {
                 if (strictMode && !MatchesStrictDestination(destination, intent))
+                {
+                    continue;
+                }
+
+                if (!strictMode && !IsSoftRelevantDestination(destination, intent))
                 {
                     continue;
                 }
@@ -214,9 +238,56 @@ namespace TuristickiVodic.Services.Services
                 });
             }
 
+            foreach (var locality in localities)
+            {
+                if (strictMode && !MatchesStrictLocality(locality, intent))
+                {
+                    continue;
+                }
+
+                if (!strictMode && !IsSoftRelevantLocality(locality, intent))
+                {
+                    continue;
+                }
+
+                var score = ScoreLocality(
+                    locality,
+                    intent,
+                    context,
+                    localityFavoriteCounts.GetValueOrDefault(locality.Id),
+                    out var reason
+                );
+
+                if (strictMode && score <= 0)
+                {
+                    continue;
+                }
+
+                results.Add(new SmartSearchCandidate
+                {
+                    Id = locality.Id,
+                    Name = locality.Name,
+                    TypeName = locality.LocalityType?.Name ?? "Lokalitet",
+                    Location = ResolveLocalityLocation(locality),
+                    Category = "locality",
+                    MarkerType = "destination",
+                    Icon = "place",
+                    ImageUrl = GetMainImageUrl(locality.Images),
+                    Latitude = locality.Geolocation?.Y,
+                    Longitude = locality.Geolocation?.X,
+                    Score = score,
+                    MatchReason = reason,
+                });
+            }
+
             foreach (var obj in objects)
             {
                 if (strictMode && !MatchesStrictObject(obj, intent))
+                {
+                    continue;
+                }
+
+                if (!strictMode && !IsSoftRelevantObject(obj, intent))
                 {
                     continue;
                 }
@@ -258,6 +329,11 @@ namespace TuristickiVodic.Services.Services
                     continue;
                 }
 
+                if (!strictMode && !IsSoftRelevantEvent(evt, intent))
+                {
+                    continue;
+                }
+
                 var score = ScoreEvent(
                     evt,
                     intent,
@@ -291,6 +367,11 @@ namespace TuristickiVodic.Services.Services
             foreach (var activity in activities)
             {
                 if (strictMode && !MatchesStrictActivity(activity, intent))
+                {
+                    continue;
+                }
+
+                if (!strictMode && !IsSoftRelevantActivity(activity, intent))
                 {
                     continue;
                 }
@@ -444,6 +525,7 @@ namespace TuristickiVodic.Services.Services
                 WantsFamilyFriendly = ContainsAny(normalizedQuery, FamilyHints),
                 WantsDinner = ContainsAny(normalizedQuery, DinnerHints),
                 WantsPool = ContainsAny(normalizedQuery, PoolHints),
+                WantsNightlife = ContainsAny(normalizedQuery, NightlifeHints),
                 EventFocused = ContainsAny(normalizedQuery, EventHints),
                 DestinationFocused = ContainsAny(normalizedQuery, DestinationHints),
                 ObjectFocused = ContainsAny(normalizedQuery, ObjectHints),
@@ -486,6 +568,20 @@ namespace TuristickiVodic.Services.Services
                 NormalizeText(destination.Description),
                 NormalizeText(destination.DestinationType?.Name),
                 NormalizeText(destination.Region?.Name),
+            };
+
+            return MatchesStrictFields(fields, intent.Tokens);
+        }
+
+        private static bool MatchesStrictLocality(Locality locality, SearchIntent intent)
+        {
+            var fields = new[]
+            {
+                NormalizeText(locality.Name),
+                NormalizeText(locality.Description),
+                NormalizeText(locality.LocalityType?.Name),
+                NormalizeText(locality.Destination?.Name),
+                NormalizeText(locality.Destination?.Region?.Name),
             };
 
             return MatchesStrictFields(fields, intent.Tokens);
@@ -566,6 +662,212 @@ namespace TuristickiVodic.Services.Services
             return true;
         }
 
+        private static bool IsSoftRelevantDestination(Destination destination, SearchIntent intent)
+        {
+            var combined = NormalizeText($"{destination.Name} {destination.DisplayTitle} {destination.Description} {destination.DestinationType?.Name} {destination.Region?.Name}");
+
+            if (HasExpandedTokenMatch(combined, intent))
+            {
+                return true;
+            }
+
+            if (intent.WantsPool)
+            {
+                return HasPoolFeature(combined);
+            }
+
+            if (intent.WantsNightlife)
+            {
+                return HasNightlifeFeature(combined);
+            }
+
+            if (intent.WantsOutdoor)
+            {
+                return ContainsAny(combined, HikingHints);
+            }
+
+            if (intent.WantsFamilyFriendly)
+            {
+                return ContainsAny(combined, FamilyHints) || ContainsAny(combined, HikingHints);
+            }
+
+            if (intent.WantsDinner || intent.FoodTypeFocused)
+            {
+                return ContainsAny(combined, DinnerHints) || ContainsAny(combined, FoodTypeHints);
+            }
+
+            return combined.Contains(intent.NormalizedQuery);
+        }
+
+        private static bool IsSoftRelevantLocality(Locality locality, SearchIntent intent)
+        {
+            var combined = NormalizeText($"{locality.Name} {locality.Description} {locality.LocalityType?.Name} {locality.Destination?.Name} {locality.Destination?.Region?.Name}");
+
+            if (HasExpandedTokenMatch(combined, intent))
+            {
+                return true;
+            }
+
+            if (intent.WantsPool)
+            {
+                return HasPoolFeature(combined);
+            }
+
+            if (intent.WantsNightlife)
+            {
+                return HasNightlifeFeature(combined);
+            }
+
+            if (intent.WantsOutdoor)
+            {
+                return ContainsAny(combined, HikingHints);
+            }
+
+            if (intent.WantsFamilyFriendly)
+            {
+                return ContainsAny(combined, FamilyHints) || ContainsAny(combined, HikingHints);
+            }
+
+            if (intent.WantsDinner || intent.FoodTypeFocused)
+            {
+                return ContainsAny(combined, DinnerHints) || ContainsAny(combined, FoodTypeHints);
+            }
+
+            return combined.Contains(intent.NormalizedQuery);
+        }
+
+        private static bool IsSoftRelevantObject(TouristObject obj, SearchIntent intent)
+        {
+            var combined = NormalizeText($"{obj.Name} {obj.Description} {obj.ObjectType?.Name} {obj.CuisineType} {(obj.Amenities == null ? string.Empty : string.Join(' ', obj.Amenities))} {obj.Locality?.Name} {obj.Destination?.Name} {obj.Destination?.Region?.Name ?? obj.Locality?.Destination?.Region?.Name}");
+
+            if (HasExpandedTokenMatch(combined, intent))
+            {
+                return true;
+            }
+
+            if (intent.WantsPool)
+            {
+                return HasPoolFeature(combined);
+            }
+
+            if (intent.WantsNightlife)
+            {
+                return IsNightlifeObjectType(obj.ObjectType?.Name) || HasNightlifeFeature(combined);
+            }
+
+            if (intent.WantsDinner || intent.FoodTypeFocused)
+            {
+                return IsFoodObjectType(obj.ObjectType?.Name) || HasNightlifeFeature(combined);
+            }
+
+            if (intent.WantsOutdoor)
+            {
+                return ContainsAny(combined, HikingHints) || IsOutdoorObject(obj);
+            }
+
+            if (intent.WantsFamilyFriendly)
+            {
+                return IsFamilyFriendlyObject(obj) || ContainsAny(combined, HikingHints);
+            }
+
+            return combined.Contains(intent.NormalizedQuery);
+        }
+
+        private static bool IsSoftRelevantEvent(Event evt, SearchIntent intent)
+        {
+            var combined = NormalizeText($"{evt.Name} {evt.Description} {evt.EventType?.Name} {evt.Locality?.Name} {evt.Destination?.Name ?? evt.Locality?.Destination?.Name} {evt.Destination?.Region?.Name ?? evt.Locality?.Destination?.Region?.Name} {evt.Object?.Name}");
+
+            if (HasExpandedTokenMatch(combined, intent))
+            {
+                return true;
+            }
+
+            if (intent.WantsPool)
+            {
+                return HasPoolFeature(combined);
+            }
+
+            if (intent.WantsNightlife)
+            {
+                return HasNightlifeFeature(combined);
+            }
+
+            if (intent.WantsOutdoor)
+            {
+                return ContainsAny(combined, HikingHints);
+            }
+
+            if (intent.WantsDinner || intent.FoodTypeFocused)
+            {
+                return ContainsAny(combined, DinnerHints) || ContainsAny(combined, FoodTypeHints);
+            }
+
+            return combined.Contains(intent.NormalizedQuery);
+        }
+
+        private static bool IsSoftRelevantActivity(Activity activity, SearchIntent intent)
+        {
+            var combined = NormalizeText($"{activity.Name} {activity.Description} {activity.ActivityType?.Name} {activity.Locality?.Name} {activity.Destination?.Name ?? activity.Locality?.Destination?.Name} {activity.Destination?.Region?.Name ?? activity.Locality?.Destination?.Region?.Name} {activity.Object?.Name}");
+
+            if (HasExpandedTokenMatch(combined, intent))
+            {
+                return true;
+            }
+
+            if (intent.WantsPool)
+            {
+                return HasPoolFeature(combined);
+            }
+
+            if (intent.WantsNightlife)
+            {
+                return HasNightlifeFeature(combined);
+            }
+
+            if (intent.WantsOutdoor)
+            {
+                return ContainsAny(combined, HikingHints);
+            }
+
+            if (intent.WantsFamilyFriendly)
+            {
+                return ContainsAny(combined, FamilyHints) || ContainsAny(combined, HikingHints);
+            }
+
+            if (intent.WantsDinner || intent.FoodTypeFocused)
+            {
+                return ContainsAny(combined, DinnerHints) || ContainsAny(combined, FoodTypeHints);
+            }
+
+            return combined.Contains(intent.NormalizedQuery);
+        }
+
+        private static bool HasExpandedTokenMatch(string combined, SearchIntent intent)
+        {
+            foreach (var token in intent.Tokens)
+            {
+                if (ExpandToken(token).Any(combined.Contains))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool HasPoolFeature(string combined)
+        {
+            return ContainsAny(combined, PoolHints) ||
+                   combined.Contains("aquapark", StringComparison.Ordinal) ||
+                   combined.Contains("aqua park", StringComparison.Ordinal) ||
+                   combined.Contains("water park", StringComparison.Ordinal);
+        }
+
+        private static bool HasNightlifeFeature(string combined)
+        {
+            return ContainsAny(combined, NightlifeHints);
+        }
+
         private static IEnumerable<string> ExpandToken(string token)
         {
             if (string.IsNullOrWhiteSpace(token))
@@ -581,6 +883,8 @@ namespace TuristickiVodic.Services.Services
                 "bazeni" => ["bazeni", "bazena", "bazen", "bazenom", "pool", "swimming"],
                 "bazenom" => ["bazenom", "bazen", "bazena", "bazeni", "pool", "swimming"],
                 "pool" => ["pool", "bazen", "swimming"],
+                "aquapark" => ["aquapark", "aqua park", "water park", "bazen", "pool"],
+                "aqua" => ["aqua", "aquapark", "aqua park", "water park", "bazen", "pool"],
                 "pecanje" => ["pecanje", "ribolov", "fishing", "riba"],
                 "fishing" => ["fishing", "pecanje", "ribolov"],
                 "ribolov" => ["ribolov", "pecanje", "fishing"],
@@ -621,6 +925,13 @@ namespace TuristickiVodic.Services.Services
                 "food" => ["food", "hrana", "restoran", "restaurant", "cuisine", "dinner"],
                 "vecera" => ["vecera", "veceru", "dinner", "restoran", "restaurant", "food"],
                 "veceru" => ["veceru", "vecera", "dinner", "restoran", "restaurant", "food"],
+                "vecernji" => ["vecernji", "vecernje", "uvece", "veceras", "night", "nightlife", "bar", "kafana", "kafic", "izlazak", "cocktail", "jazz", "party"],
+                "vecernje" => ["vecernje", "vecernji", "uvece", "veceras", "night", "nightlife", "bar", "kafana", "kafic", "izlazak", "cocktail", "jazz", "party"],
+                "veceras" => ["veceras", "uvece", "vecernji", "night", "nightlife", "bar", "cocktail", "party", "jazz"],
+                "uvece" => ["uvece", "veceras", "vecernji", "night", "nightlife", "bar", "cocktail", "party", "jazz"],
+                "izlazak" => ["izlazak", "izlasci", "izlaskom", "nightlife", "night", "bar", "kafana", "kafic", "cocktail", "party", "club", "pub"],
+                "izlasci" => ["izlasci", "izlazak", "nightlife", "night", "bar", "kafana", "kafic", "cocktail", "party", "club", "pub"],
+                "izlaskom" => ["izlaskom", "izlazak", "nightlife", "night", "bar", "kafana", "kafic", "cocktail", "party", "club", "pub"],
                 "restoran" => ["restoran", "restoranu", "restorana", "restorani", "restaurant"],
                 "restoranu" => ["restoranu", "restoran", "restorana", "restorani", "restaurant"],
                 "restorana" => ["restorana", "restoran", "restoranu", "restorani", "restaurant"],
@@ -654,8 +965,26 @@ namespace TuristickiVodic.Services.Services
                 "kinesku" => ["kineska", "kineski", "chinese", "kina"],
                 "japansku" => ["japanska", "japanese", "sushi"],
                 "italijansku" => ["italijanska", "italian", "pizza", "pasta"],
-                _ => [token],
+                _ => ExpandFallbackToken(token),
             };
+        }
+
+        private static IEnumerable<string> ExpandFallbackToken(string token)
+        {
+            var variants = new HashSet<string>(StringComparer.Ordinal)
+            {
+                token,
+            };
+
+            foreach (var suffix in new[] { "ovima", "evima", "ima", "ama", "ovima", "anje", "enje", "njem", "om", "em", "im", "og", "eg", "oj", "ju", "u", "a", "e", "i", "o" })
+            {
+                if (token.Length > suffix.Length + 2 && token.EndsWith(suffix, StringComparison.Ordinal))
+                {
+                    variants.Add(token[..^suffix.Length]);
+                }
+            }
+
+            return variants.Where(x => x.Length >= 3);
         }
 
         private double ScoreDestination(Destination destination, SearchIntent intent, SearchContext context, int favoriteCount, out string reason)
@@ -678,6 +1007,24 @@ namespace TuristickiVodic.Services.Services
             if (intent.FoodTypeFocused)
             {
                 score -= 45d;
+            }
+
+            if (intent.WantsPool && !HasPoolFeature($"{name} {title} {description} {type}"))
+            {
+                score -= 70d;
+            }
+
+            if (intent.WantsNightlife)
+            {
+                if (HasNightlifeFeature($"{name} {title} {description} {type}"))
+                {
+                    score += 10d;
+                    reason = "Matches nightlife intent";
+                }
+                else
+                {
+                    score -= 55d;
+                }
             }
 
             if (intent.WantsOutdoor && ContainsAny($"{name} {title} {description} {type}", HikingHints))
@@ -707,6 +1054,78 @@ namespace TuristickiVodic.Services.Services
                 CalculateDistanceFromContext(context.Origin, destination.Geolocation),
                 intent.WantsNearby ? 140_000d : 220_000d,
                 intent.WantsNearby ? 36d : 12d);
+
+            return score;
+        }
+
+        private double ScoreLocality(
+            Locality locality,
+            SearchIntent intent,
+            SearchContext context,
+            int favoriteCount,
+            out string reason)
+        {
+            var score = 0d;
+            reason = "Smart match";
+
+            var name = NormalizeText(locality.Name);
+            var description = NormalizeText(locality.Description);
+            var type = NormalizeText(locality.LocalityType?.Name);
+            var destination = NormalizeText(locality.Destination?.Name);
+            var region = NormalizeText(locality.Destination?.Region?.Name);
+            var combined = $"{name} {description} {type} {destination} {region}";
+
+            score += FieldScore(name, intent, 115, 20, ref reason, "Matches locality name");
+            score += FieldScore(type, intent, 70, 14, ref reason, "Matches locality type");
+            score += FieldScore(description, intent, 42, 8, ref reason, "Matches locality description");
+            score += FieldScore(destination, intent, 40, 7, ref reason, "Matches destination");
+            score += FieldScore(region, intent, 40, 7, ref reason, "Matches region");
+
+            if (intent.DestinationFocused)
+            {
+                score += 14d;
+            }
+
+            if (intent.WantsOutdoor && ContainsAny(combined, HikingHints))
+            {
+                score += 18d;
+                reason = "Matches outdoor/activity search";
+            }
+
+            if (intent.WantsFamilyFriendly && ContainsAny(combined, FamilyHints))
+            {
+                score += 12d;
+                reason = "Matches family-friendly search";
+            }
+
+            if (intent.WantsPool && !HasPoolFeature(combined))
+            {
+                score -= 65d;
+            }
+
+            if (intent.WantsNightlife)
+            {
+                if (HasNightlifeFeature(combined))
+                {
+                    score += 12d;
+                    reason = "Matches nightlife intent";
+                }
+                else
+                {
+                    score -= 45d;
+                }
+            }
+
+            if (context.EffectiveRegionId.HasValue && locality.DestinationId > 0 && locality.Destination?.RegionId == context.EffectiveRegionId.Value)
+            {
+                score += 20d;
+            }
+
+            score += favoriteCount * 4d;
+            score += DistanceBoost(
+                CalculateDistanceFromContext(context.Origin, locality.Geolocation),
+                intent.WantsNearby ? 120_000d : 200_000d,
+                intent.WantsNearby ? 34d : 10d);
 
             return score;
         }
@@ -813,14 +1232,39 @@ namespace TuristickiVodic.Services.Services
 
             if (intent.WantsPool)
             {
-                if (amenities.Contains("bazen") || amenities.Contains("pool"))
+                if (HasPoolFeature(foodSpecificFields))
                 {
-                    score += 36;
+                    score += 44d;
                     reason = "Matches amenities";
                 }
-                else if (type.Contains("hotel") || type.Contains("spa") || type.Contains("wellness"))
+                else
                 {
-                    score += 10;
+                    score -= type.Contains("hotel") || type.Contains("spa") || type.Contains("wellness")
+                        ? 28d
+                        : 60d;
+                }
+            }
+
+            if (intent.WantsNightlife)
+            {
+                if (type.Contains("bar") || type.Contains("kafana") || type.Contains("kafic"))
+                {
+                    score += 34d;
+                    reason = "Matches nightlife intent";
+                }
+                else if (type.Contains("restoran") || type.Contains("restaurant"))
+                {
+                    score += 18d;
+                    reason = "Matches nightlife intent";
+                }
+                else if (HasNightlifeFeature(foodSpecificFields))
+                {
+                    score += 14d;
+                    reason = "Matches nightlife intent";
+                }
+                else
+                {
+                    score -= 40d;
                 }
             }
 
@@ -912,6 +1356,24 @@ namespace TuristickiVodic.Services.Services
                 score += 24;
             }
 
+            if (intent.WantsPool && !HasPoolFeature($"{name} {description} {type} {linkedObject}"))
+            {
+                score -= 70d;
+            }
+
+            if (intent.WantsNightlife)
+            {
+                if (HasNightlifeFeature($"{name} {description} {type} {linkedObject}"))
+                {
+                    score += 26d;
+                    reason = "Matches nightlife intent";
+                }
+                else
+                {
+                    score -= 24d;
+                }
+            }
+
             score += plannerCount * 4;
 
             if (intent.WantsCheap)
@@ -995,6 +1457,24 @@ namespace TuristickiVodic.Services.Services
                 {
                     score += 18d;
                     reason = "Porodicna setnja ili aktivnost";
+                }
+            }
+
+            if (intent.WantsPool && !HasPoolFeature(combined))
+            {
+                score -= 60d;
+            }
+
+            if (intent.WantsNightlife)
+            {
+                if (HasNightlifeFeature(combined))
+                {
+                    score += 18d;
+                    reason = "Matches nightlife intent";
+                }
+                else
+                {
+                    score -= 28d;
                 }
             }
 
@@ -1230,6 +1710,14 @@ namespace TuristickiVodic.Services.Services
                 ?? string.Empty;
         }
 
+        private static string ResolveLocalityLocation(Locality locality)
+        {
+            return locality.Destination?.Name
+                ?? locality.Destination?.Region?.Name
+                ?? locality.LocalityType?.Name
+                ?? string.Empty;
+        }
+
         private static string ResolveEventLocation(Event evt)
         {
             return evt.Locality?.Name
@@ -1272,6 +1760,59 @@ namespace TuristickiVodic.Services.Services
                 "kafana" => "local_bar",
                 _ => "restaurant",
             };
+        }
+
+        private static bool IsFoodObjectType(string? typeName)
+        {
+            var normalized = NormalizeText(typeName);
+            return normalized.Contains("restoran") ||
+                   normalized.Contains("restaurant") ||
+                   normalized.Contains("bar") ||
+                   normalized.Contains("kafana") ||
+                   normalized.Contains("kafic") ||
+                   normalized.Contains("bistro") ||
+                   normalized.Contains("fast food") ||
+                   normalized.Contains("brza hrana") ||
+                   normalized.Contains("cafe");
+        }
+
+        private static bool IsNightlifeObjectType(string? typeName)
+        {
+            var normalized = NormalizeText(typeName);
+            return normalized.Contains("bar") ||
+                   normalized.Contains("kafana") ||
+                   normalized.Contains("kafic") ||
+                   normalized.Contains("restaurant") ||
+                   normalized.Contains("restoran") ||
+                   normalized.Contains("restoran") ||
+                   normalized.Contains("party") ||
+                   normalized.Contains("wine");
+        }
+
+        private static bool IsFamilyFriendlyObject(TouristObject obj)
+        {
+            var combined = NormalizeText($"{obj.ObjectType?.Name} {obj.CuisineType} {obj.Description} {(obj.Amenities == null ? string.Empty : string.Join(' ', obj.Amenities))}");
+            return combined.Contains("family") ||
+                   combined.Contains("porod") ||
+                   combined.Contains("kids") ||
+                   combined.Contains("deca") ||
+                   combined.Contains("parking") ||
+                   combined.Contains("garden") ||
+                   combined.Contains("basta") ||
+                   combined.Contains("playground") ||
+                   combined.Contains("igral");
+        }
+
+        private static bool IsOutdoorObject(TouristObject obj)
+        {
+            var combined = NormalizeText($"{obj.ObjectType?.Name} {obj.Description} {(obj.Amenities == null ? string.Empty : string.Join(' ', obj.Amenities))}");
+            return combined.Contains("terrace") ||
+                   combined.Contains("terasa") ||
+                   combined.Contains("garden") ||
+                   combined.Contains("basta") ||
+                   combined.Contains("view") ||
+                   combined.Contains("plaza") ||
+                   combined.Contains("beach");
         }
 
         private async Task<List<SmartSearchResultDto>> BuildStrictObjectFallbackAsync(SearchContext context, SearchIntent intent, int pageSize)
@@ -1437,9 +1978,33 @@ namespace TuristickiVodic.Services.Services
                 }
             }
 
-            if (intent.WantsPool && (amenities.Contains("bazen") || amenities.Contains("pool")))
+            if (intent.WantsPool && HasPoolFeature(combined))
             {
                 score += 30d;
+            }
+            else if (intent.WantsPool)
+            {
+                score -= 55d;
+            }
+
+            if (intent.WantsNightlife)
+            {
+                if (type.Contains("bar") || type.Contains("kafana") || type.Contains("kafic"))
+                {
+                    score += 26d;
+                }
+                else if (type.Contains("restoran") || type.Contains("restaurant"))
+                {
+                    score += 14d;
+                }
+                else if (HasNightlifeFeature(combined))
+                {
+                    score += 12d;
+                }
+                else
+                {
+                    score -= 30d;
+                }
             }
 
             if (intent.WantsOutdoor &&
@@ -1466,9 +2031,14 @@ namespace TuristickiVodic.Services.Services
             var type = NormalizeText(obj.ObjectType?.Name);
             var amenities = NormalizeText(obj.Amenities == null ? null : string.Join(' ', obj.Amenities));
 
-            if (intent.WantsPool && (amenities.Contains("bazen") || amenities.Contains("pool")))
+            if (intent.WantsPool && HasPoolFeature($"{type} {amenities}"))
             {
                 return "Matches amenities";
+            }
+
+            if (intent.WantsNightlife && (type.Contains("bar") || type.Contains("kafana") || type.Contains("kafic") || type.Contains("restoran") || type.Contains("restaurant")))
+            {
+                return "Matches nightlife intent";
             }
 
             if (intent.WantsFamilyFriendly && ContainsAny($"{type} {amenities}", FamilyFriendlyFeatureHints))
@@ -1528,6 +2098,7 @@ namespace TuristickiVodic.Services.Services
             public bool WantsFamilyFriendly { get; set; }
             public bool WantsDinner { get; set; }
             public bool WantsPool { get; set; }
+            public bool WantsNightlife { get; set; }
             public bool EventFocused { get; set; }
             public bool DestinationFocused { get; set; }
             public bool ObjectFocused { get; set; }

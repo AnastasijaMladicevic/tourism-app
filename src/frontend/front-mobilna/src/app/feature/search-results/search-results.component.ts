@@ -101,13 +101,15 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   openResult(result: SmartSearchResultDto): void {
     switch (result.category) {
       case 'destination':
+      case 'locality':
+      case 'activity':
         this.router.navigate(['/map'], {
           state: {
             lat: result.latitude,
             lng: result.longitude,
             zoom: 14,
             selectedItem: { id: result.id },
-            selectedType: 'destination',
+            selectedType: result.category,
           },
         });
         break;
@@ -128,27 +130,15 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
     const currentLocation = this.locationTrackingService.getCurrentLocation();
     const includeLocation =
       this.locationTrackingService.isTrackingEnabled() && currentLocation != null;
-    const source = this.route.snapshot.queryParamMap.get('source');
-    const mode = source === 'map' ? 'strict' : 'mcp';
-
     this.isLoading = true;
     this.hasSearched = true;
 
-    const request$ =
-      mode === 'mcp'
-        ? this.smartSearchService.searchMcp({
-            query,
-            pageSize: 40,
-            latitude: includeLocation ? currentLocation?.latitude : undefined,
-            longitude: includeLocation ? currentLocation?.longitude : undefined,
-          })
-        : this.smartSearchService.search({
-            query,
-            pageSize: 40,
-            mode: 'strict',
-            latitude: includeLocation ? currentLocation?.latitude : undefined,
-            longitude: includeLocation ? currentLocation?.longitude : undefined,
-          });
+    const request$ = this.smartSearchService.searchMcp({
+      query,
+      pageSize: 40,
+      latitude: includeLocation ? currentLocation?.latitude : undefined,
+      longitude: includeLocation ? currentLocation?.longitude : undefined,
+    });
 
     request$
       .pipe(catchError(() => of([] as SmartSearchResultDto[])))

@@ -24,6 +24,7 @@ namespace TuristickiVodic.Services.Services
 
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ISmartSearchService _smartSearchService;
+        private readonly IAiSemanticSearchService _aiSemanticSearchService;
         private readonly AppDbContext _context;
         private readonly ILogger<AiChatService> _logger;
         private readonly OllamaOptions _options;
@@ -31,12 +32,14 @@ namespace TuristickiVodic.Services.Services
         public AiChatService(
             IHttpClientFactory httpClientFactory,
             ISmartSearchService smartSearchService,
+            IAiSemanticSearchService aiSemanticSearchService,
             AppDbContext context,
             IOptions<OllamaOptions> options,
             ILogger<AiChatService> logger)
         {
             _httpClientFactory = httpClientFactory;
             _smartSearchService = smartSearchService;
+            _aiSemanticSearchService = aiSemanticSearchService;
             _context = context;
             _logger = logger;
             _options = options.Value ?? new OllamaOptions();
@@ -57,51 +60,129 @@ namespace TuristickiVodic.Services.Services
                 };
             }
 
-            if (!_options.Enabled)
+            var semanticResponse = await _aiSemanticSearchService.SearchAsync(userId, new AiSemanticSearchQueryDto
             {
-                var fallbackResults = await ExecuteSearchToolAsync(userId, BuildDefaultSearchArgs(sanitizedRequest, "mcp"), cancellationToken);
-                return BuildFallbackResponse(
-                    fallbackResults,
-                    sanitizedRequest,
-                    usedTool: true,
-                    warning: "AI chat je trenutno iskljucen u konfiguraciji. Prikazan je fallback odgovor iz pretrage.");
+                Query = sanitizedRequest.Message,
+                PageSize = 6,
+                RegionId = sanitizedRequest.RegionId,
+                Latitude = sanitizedRequest.Latitude,
+                Longitude = sanitizedRequest.Longitude,
+            }, cancellationToken);
+
+            var answer = await BuildSemanticAnswerAsync(sanitizedRequest, semanticResponse, cancellationToken);
+
+            return new AiChatResponseDto
+            {
+                Answer = answer,
+                Provider = semanticResponse.Provider,
+                UsedTool = true,
+                UsedFallback = semanticResponse.UsedFallback,
+                Warning = semanticResponse.Warning,
+                Results = semanticResponse.Results,
+            };
+        }
+
+        private async Task<string> BuildSemanticAnswerAsync(
+            AiChatRequestDto request,
+            AiSemanticSearchResponseDto semanticResponse,
+            CancellationToken cancellationToken)
+        {
+            if (semanticResponse.Results.Count == 0)
+            {
+                return BuildSemanticNoMatchAnswer(request, semanticResponse);
             }
 
-            Exception? lastModelException = null;
-
-            foreach (var model in GetCandidateModels())
+            if (semanticResponse.Provider.StartsWith("ollama:", StringComparison.OrdinalIgnoreCase))
             {
                 try
                 {
+                    var model = semanticResponse.Provider["ollama:".Length..];
                     var client = BuildOllamaClient();
-                    var selection = await TrySelectToolAsync(client, model, sanitizedRequest, cancellationToken);
-                    if (selection == null)
+                    var promptResults = JsonSerializer.Serialize(
+                        semanticResponse.Results.Take(5).Select(r => new
+                        {
+                            r.Name,
+                            r.TypeName,
+                            r.Location,
+                            r.Category,
+                            r.MatchReason,
+                        }),
+                        JsonOptions);
+
+                    var response = await SendChatAsync(client, new OllamaChatRequest
                     {
-                        _logger.LogWarning("AI planner did not return a usable tool selection for message '{Message}' using model '{Model}'", message, model);
-                        continue;
+                        Model = model,
+                        Stream = false,
+                        Messages =
+                        [
+                            new OllamaMessage
+                            {
+                                Role = "system",
+                                Content =
+                                    """
+                                    Ti si turisticki asistent.
+                                    Odgovori prirodno, kratko i korisno na srpskom latinicom.
+                                    Koristi samo rezultate koje si dobio.
+                                    Nemoj da izmisljas mesta, tip kuhinje, pogodnosti ili detalje kojih nema u rezultatima.
+                                    Ako nema dovoljno dobrog poklapanja, to jasno reci.
+                                    """,
+                            },
+                            new OllamaMessage
+                            {
+                                Role = "user",
+                                Content = $"Pitanje korisnika: {request.Message}\nRegion: {semanticResponse.RegionName ?? "nije zadat"}\nKategorije: {string.Join(", ", semanticResponse.Categories)}\nRezultati: {promptResults}",
+                            }
+                        ],
+                        Options = new OllamaChatOptions
+                        {
+                            Temperature = 0.3,
+                            TopP = 0.9,
+                            NumPredict = 180,
+                        },
+                    }, cancellationToken);
+
+                    var content = response.Message?.Content?.Trim();
+                    if (!string.IsNullOrWhiteSpace(content))
+                    {
+                        return content;
                     }
-
-                    var execution = await ExecuteToolAsync(userId, sanitizedRequest, selection, cancellationToken);
-                    var answer = BuildHumanAnswer(sanitizedRequest, execution);
-
-                    return new AiChatResponseDto
-                    {
-                        Answer = answer,
-                        Provider = $"ollama:{model}",
-                        UsedTool = true,
-                        UsedFallback = false,
-                        Results = execution.Results,
-                    };
                 }
                 catch (Exception ex)
                 {
-                    lastModelException = ex;
-                    _logger.LogWarning(ex, "AI planner failed for message '{Message}' using model '{Model}'", message, model);
+                    _logger.LogWarning(ex, "AI answer generation failed for query '{Query}'", request.Message);
                 }
             }
 
-            var safeFallbackResults = await ExecuteSearchToolAsync(userId, BuildDefaultSearchArgs(sanitizedRequest, "mcp"), cancellationToken);
-            return BuildFallbackResponse(safeFallbackResults, sanitizedRequest, usedTool: true, warning: BuildOllamaFallbackWarning(lastModelException));
+            return BuildSemanticFallbackAnswer(request, semanticResponse);
+        }
+
+        private static string BuildSemanticFallbackAnswer(AiChatRequestDto request, AiSemanticSearchResponseDto semanticResponse)
+        {
+            var top = semanticResponse.Results.Take(3).ToList();
+            var regionPart = !string.IsNullOrWhiteSpace(semanticResponse.RegionName)
+                ? $" u {semanticResponse.RegionName}"
+                : string.Empty;
+
+            if (top.Count == 1)
+            {
+                var first = top[0];
+                return $"Za pitanje \"{request.Message}\" najbolji pogodak{regionPart} je {first.Name} ({first.TypeName}) u {first.Location}.";
+            }
+
+            var formatted = string.Join(", ", top.Take(2).Select(r => $"{r.Name} ({r.TypeName})")) +
+                (top.Count > 2 ? $" i {top[2].Name} ({top[2].TypeName})" : string.Empty);
+
+            return $"Za pitanje \"{request.Message}\" najvise smisla{regionPart} imaju {formatted}.";
+        }
+
+        private static string BuildSemanticNoMatchAnswer(AiChatRequestDto request, AiSemanticSearchResponseDto semanticResponse)
+        {
+            if (!string.IsNullOrWhiteSpace(semanticResponse.RegionName))
+            {
+                return $"Trenutno nemam dovoljno preciznih rezultata za pitanje \"{request.Message}\" u regionu {semanticResponse.RegionName}. Probaj da navedes tip mesta ili neku konkretnu pogodnost.";
+            }
+
+            return $"Trenutno nemam dovoljno preciznih rezultata za pitanje \"{request.Message}\". Probaj da navedes region, tip mesta ili neku konkretnu pogodnost.";
         }
 
         private HttpClient BuildOllamaClient()
@@ -231,7 +312,7 @@ namespace TuristickiVodic.Services.Services
                           "tool": "search_places" ili "explore_region",
                           "query": "kratka korisna pretraga za search_places",
                           "regionName": "naziv regiona ili drzave ako postoji",
-                          "theme": "sightseeing|walk|food|family|events|mixed",
+                          "theme": "sightseeing|walk|food|family|events|nightlife|mixed",
                           "pageSize": 5
                         }
 
@@ -1082,6 +1163,11 @@ namespace TuristickiVodic.Services.Services
                 return "food";
             }
 
+            if (normalized.Contains("uvece") || normalized.Contains("veceras") || normalized.Contains("night") || normalized.Contains("izadj") || normalized.Contains("izlazak") || normalized.Contains("bar") || normalized.Contains("kafana"))
+            {
+                return "nightlife";
+            }
+
             if (normalized.Contains("family") || normalized.Contains("deca") || normalized.Contains("decom") || normalized.Contains("kids") || normalized.Contains("porod"))
             {
                 return "family";
@@ -1107,7 +1193,7 @@ namespace TuristickiVodic.Services.Services
 
         private static bool ShouldIncludeDestination(string theme, Destination destination)
         {
-            if (theme == "food")
+            if (theme == "food" || theme == "nightlife")
             {
                 return false;
             }
@@ -1120,6 +1206,11 @@ namespace TuristickiVodic.Services.Services
             if (theme == "food")
             {
                 return locality.Objects.Any(IsFoodObjectCandidate);
+            }
+
+            if (theme == "nightlife")
+            {
+                return locality.Events.Count > 0 || locality.Objects.Any(IsNightlifeObjectCandidate);
             }
 
             if (theme == "events")
@@ -1147,6 +1238,11 @@ namespace TuristickiVodic.Services.Services
                 return ContainsThemeToken($"{activity.Name} {activity.Description} {activity.ActivityType?.Name}", "food");
             }
 
+            if (theme == "nightlife")
+            {
+                return ContainsThemeToken($"{activity.Name} {activity.Description} {activity.ActivityType?.Name}", "nightlife");
+            }
+
             if (theme == "events")
             {
                 return false;
@@ -1167,6 +1263,11 @@ namespace TuristickiVodic.Services.Services
                 return ContainsThemeToken($"{evt.Name} {evt.Description} {evt.EventType?.Name}", "food");
             }
 
+            if (theme == "nightlife")
+            {
+                return true;
+            }
+
             return true;
         }
 
@@ -1175,6 +1276,7 @@ namespace TuristickiVodic.Services.Services
             return theme switch
             {
                 "food" => IsFoodObjectType(obj.ObjectType?.Name),
+                "nightlife" => IsNightlifeObjectType(obj.ObjectType?.Name),
                 "sightseeing" => IsSightseeingObjectType(obj.ObjectType?.Name),
                 "walk" => IsSightseeingObjectType(obj.ObjectType?.Name) || IsOutdoorObject(obj),
                 "family" => IsFamilyFriendlyObject(obj) || IsSightseeingObjectType(obj.ObjectType?.Name),
@@ -1224,6 +1326,11 @@ namespace TuristickiVodic.Services.Services
             if (theme == "food" && locality.Objects.Any(IsFoodObjectCandidate))
             {
                 score += 8d;
+            }
+
+            if (theme == "nightlife" && locality.Objects.Any(IsNightlifeObjectCandidate))
+            {
+                score += 14d;
             }
 
             return score;
@@ -1303,6 +1410,11 @@ namespace TuristickiVodic.Services.Services
                 }
             }
 
+            if (theme == "nightlife" && ContainsThemeToken(combined, "nightlife"))
+            {
+                score += 14d;
+            }
+
             if (theme == "sightseeing")
             {
                 score += 12d;
@@ -1339,6 +1451,11 @@ namespace TuristickiVodic.Services.Services
             if (theme == "events")
             {
                 score += 24d;
+            }
+
+            if (theme == "nightlife")
+            {
+                score += 18d;
             }
 
             if (theme == "food" && ContainsThemeToken(combined, "food"))
@@ -1390,6 +1507,11 @@ namespace TuristickiVodic.Services.Services
                 score += 8d;
             }
 
+            if (theme == "nightlife" && IsNightlifeObjectType(obj.ObjectType?.Name))
+            {
+                score += 18d;
+            }
+
             return score;
         }
 
@@ -1419,6 +1541,12 @@ namespace TuristickiVodic.Services.Services
                     ["object"] = 4,
                     ["destination"] = 1,
                     ["activity"] = 1,
+                },
+                "nightlife" => new Dictionary<string, int>
+                {
+                    ["object"] = 3,
+                    ["event"] = 2,
+                    ["locality"] = 1,
                 },
                 "family" => new Dictionary<string, int>
                 {
@@ -1473,6 +1601,7 @@ namespace TuristickiVodic.Services.Services
             {
                 "food" => normalized.Contains("restoran") || normalized.Contains("restaurant") || normalized.Contains("food") || normalized.Contains("vino") || normalized.Contains("wine") || normalized.Contains("tapas") || normalized.Contains("dinner") || normalized.Contains("lunch") || normalized.Contains("cafe") || normalized.Contains("kafic"),
                 "walk" => normalized.Contains("walk") || normalized.Contains("set") || normalized.Contains("trail") || normalized.Contains("park") || normalized.Contains("prirod") || normalized.Contains("bike") || normalized.Contains("boat"),
+                "nightlife" => normalized.Contains("night") || normalized.Contains("bar") || normalized.Contains("kafana") || normalized.Contains("music") || normalized.Contains("party") || normalized.Contains("cocktail") || normalized.Contains("wine") || normalized.Contains("jazz") || normalized.Contains("sunset"),
                 _ => false,
             };
         }
@@ -1492,6 +1621,22 @@ namespace TuristickiVodic.Services.Services
         private static bool IsFoodObjectCandidate(TouristObject obj)
         {
             return IsFoodObjectType(obj.ObjectType?.Name);
+        }
+
+        private static bool IsNightlifeObjectType(string? typeName)
+        {
+            var normalized = NormalizeText(typeName);
+            return normalized.Contains("bar") ||
+                   normalized.Contains("kafana") ||
+                   normalized.Contains("kafic") ||
+                   normalized.Contains("restaurant") ||
+                   normalized.Contains("restoran") ||
+                   normalized.Contains("wine");
+        }
+
+        private static bool IsNightlifeObjectCandidate(TouristObject obj)
+        {
+            return IsNightlifeObjectType(obj.ObjectType?.Name);
         }
 
         private static bool IsStayObjectType(string? typeName)
@@ -1559,6 +1704,7 @@ namespace TuristickiVodic.Services.Services
                 "walk" => "Dobar izbor za lagano istrazivanje regiona",
                 "family" => "Zanimljivo za porodicni obilazak",
                 "events" => "Vredi pogledati kao bazu za dogadjaje",
+                "nightlife" => "Vredi pogledati za vecernji izlazak",
                 _ => "Jedno od zanimljivijih mesta u regionu",
             };
         }
@@ -1570,6 +1716,7 @@ namespace TuristickiVodic.Services.Services
                 "walk" => "Lep deo regiona za setnju i obilazak",
                 "family" => "Prijatan lokalitet za porodicni plan",
                 "food" => "Dobar kraj ako trazis hranu i mesta za predah",
+                "nightlife" => "Dobar kraj ako trazis vecernji izlazak",
                 "events" => "Lokalitet koji ima zanimljiva desavanja ili sadrzaje",
                 _ => "Jedan od zanimljivijih lokaliteta u regionu",
             };
@@ -1582,6 +1729,7 @@ namespace TuristickiVodic.Services.Services
                 "walk" => "Dobra opcija za setnju ili laganu aktivnost",
                 "family" => "Prikladno za laganiji porodicni plan",
                 "food" => "Aktivnost koja lepo dopunjuje gastro plan",
+                "nightlife" => "Moze lepo da dopuni vecernji plan",
                 _ => "Zanimljiva aktivnost u regionu",
             };
         }
@@ -1600,6 +1748,7 @@ namespace TuristickiVodic.Services.Services
             {
                 "events" => "Aktuelan dogadjaj u regionu",
                 "food" => "Dogadjaj koji se uklapa u gastro plan",
+                "nightlife" => "Dobar izbor za vecernji izlazak",
                 _ => "Vredi ispratiti ako si u tom periodu u regionu",
             };
         }
@@ -1609,6 +1758,11 @@ namespace TuristickiVodic.Services.Services
             if (theme == "food" && IsFoodObjectType(obj.ObjectType?.Name))
             {
                 return "Jedna od boljih gastro opcija";
+            }
+
+            if (theme == "nightlife" && IsNightlifeObjectType(obj.ObjectType?.Name))
+            {
+                return "Dobra opcija za vecernji izlazak";
             }
 
             if (theme == "family" && IsFamilyFriendlyObject(obj))
@@ -1639,6 +1793,7 @@ namespace TuristickiVodic.Services.Services
                 {
                     "walk" when !string.IsNullOrWhiteSpace(execution.RegionName) => $"Ako hoces prijatnu setnju ili lagano istrazivanje u {execution.RegionName}, pogledaj",
                     "food" when !string.IsNullOrWhiteSpace(execution.RegionName) => $"Ako trazis dobar gastro plan u {execution.RegionName}, izdvojila bih",
+                    "nightlife" when !string.IsNullOrWhiteSpace(execution.RegionName) => $"Ako trazis gde da izadjes uvece u {execution.RegionName}, pogledaj",
                     "family" when !string.IsNullOrWhiteSpace(execution.RegionName) => $"Ako planiras nesto zanimljivo za porodicni obilazak u {execution.RegionName}, pogledaj",
                     "events" when !string.IsNullOrWhiteSpace(execution.RegionName) => $"Ako te zanimaju aktuelna mesta i desavanja u {execution.RegionName}, izdvojila bih",
                     _ when !string.IsNullOrWhiteSpace(execution.RegionName) => $"Ako trazis sta je zanimljivo u {execution.RegionName}, vredi da pogledas",

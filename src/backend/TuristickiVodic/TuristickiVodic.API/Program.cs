@@ -82,6 +82,7 @@ builder.Services.AddScoped<IManagerReportService, ManagerReportService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<ISmartSearchService, SmartSearchService>();
+builder.Services.AddScoped<IAiSemanticSearchService, AiSemanticSearchService>();
 builder.Services.AddScoped<IAiChatService, AiChatService>();
 builder.Services.AddScoped<ITranslationService, TranslationService>();
 builder.Services.AddScoped<IExternalTranslationProvider, ArgosTranslateProvider>();

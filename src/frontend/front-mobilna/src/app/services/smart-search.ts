@@ -18,7 +18,7 @@ export interface SmartSearchResultDto {
   name: string;
   typeName: string;
   location: string;
-  category: 'destination' | 'object' | 'event';
+  category: 'destination' | 'locality' | 'object' | 'event' | 'activity';
   markerType: string;
   icon: string;
   imageUrl?: string;

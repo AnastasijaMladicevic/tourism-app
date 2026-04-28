@@ -145,13 +145,15 @@ export class SupportComponent {
   protected openResult(result: SmartSearchResultDto): void {
     switch (result.category) {
       case 'destination':
+      case 'locality':
+      case 'activity':
         this.router.navigate(['/map'], {
           state: {
             lat: result.latitude,
             lng: result.longitude,
             zoom: 14,
             selectedItem: { id: result.id },
-            selectedType: 'destination',
+            selectedType: result.category,
           },
         });
         break;

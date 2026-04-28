@@ -69,7 +69,7 @@ interface SearchResult {
   lat?: number;
   lng?: number;
   raw: any;
-  category: 'destination' | 'object' | 'event';
+  category: 'destination' | 'locality' | 'object' | 'event' | 'activity';
   markerType: string;
 }
 interface HomeCategory {
@@ -171,7 +171,8 @@ export class HomeComponent implements OnInit {
             this.searchResults = mapped;
             this.showSuggestions = true;
           } else {
-            this.applyFallbackSearch(query);
+            this.searchResults = [];
+            this.showSuggestions = false;
           }
 
           this.cdr.detectChanges();
@@ -330,13 +331,15 @@ export class HomeComponent implements OnInit {
   private openSearchResult(result: SearchResult): void {
     switch (result.category) {
       case 'destination':
+      case 'locality':
+      case 'activity':
         this.router.navigate(['/map'], {
           state: {
             lat: result.lat,
             lng: result.lng,
             zoom: 14,
             selectedItem: { id: result.id },
-            selectedType: 'destination',
+            selectedType: result.category,
           },
         });
         break;

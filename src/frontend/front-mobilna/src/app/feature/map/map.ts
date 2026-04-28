@@ -34,7 +34,7 @@ interface SearchResult {
   lat?: number;
   lng?: number;
   raw: any;
-  category: 'destination' | 'object' | 'event';
+  category: 'destination' | 'locality' | 'object' | 'event' | 'activity';
   markerType: string;
 }
 
@@ -356,10 +356,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.locationTrackingService.isTrackingEnabled() && currentLocation != null;
 
       this.smartSearchService
-        .search({
+        .searchMcp({
           query,
           pageSize: 8,
-          mode: 'strict',
           latitude: includeLocation ? currentLocation?.latitude : undefined,
           longitude: includeLocation ? currentLocation?.longitude : undefined,
         })
@@ -374,7 +373,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
             this.searchResults = mapped;
             this.showSuggestions = true;
           } else {
-            this.applyFallbackSearch(query);
+            this.searchResults = [];
+            this.showSuggestions = false;
           }
 
           this.cdr.detectChanges();
@@ -442,9 +442,18 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (result.lat && result.lng) {
       this.mapService.flyTo(result.lat, result.lng, 16);
-      setTimeout(() => {
-        this.mapService.triggerMarkerClick(result.markerType, result.id);
-      }, 600);
+      if (
+        result.category === 'destination' ||
+        result.category === 'locality' ||
+        result.category === 'activity' ||
+        result.category === 'object' ||
+        result.category === 'event'
+      ) {
+        setTimeout(() => {
+          const markerType = result.category === 'object' ? result.markerType : result.category;
+          this.mapService.triggerMarkerClick(markerType, result.id);
+        }, 600);
+      }
     }
   }
 
