@@ -18,7 +18,7 @@ export class ImageService {
 
   private apiUrl = `${environment.apiUrl}/images`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // === EVENT IMAGES ===
   getForEvent(eventId: number): Observable<ImageDto[]> {
@@ -45,6 +45,22 @@ export class ImageService {
 
   getMainForObject(objectId: number): Observable<ImageDto> {
     return this.http.get<ImageDto>(`${environment.apiUrl}/objects/${objectId}/images/main`);
+  }
+  // === LOCALITY IMAGES ===
+  getForLocality(localityId: number): Observable<ImageDto[]> {
+    return this.http.get<ImageDto[]>(`${environment.apiUrl}/localities/${localityId}/images`);
+  }
+
+  getMainForLocality(localityId: number): Observable<ImageDto> {
+    return this.http.get<ImageDto>(`${environment.apiUrl}/localities/${localityId}/images/main`);
+  }
+  // === ACTIVITY IMAGES ===
+  getForActivity(activityId: number): Observable<ImageDto[]> {
+    return this.http.get<ImageDto[]>(`${environment.apiUrl}/localities/${activityId}/images`);
+  }
+
+  getMainForActivity(activityId: number): Observable<ImageDto> {
+    return this.http.get<ImageDto>(`${environment.apiUrl}/localities/${activityId}/images/main`);
   }
 
   getAll(): Observable<ImageDto[]> {

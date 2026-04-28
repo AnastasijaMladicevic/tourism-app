@@ -18,11 +18,15 @@ import { MapService } from '../../services/map.service';
 import { DestinationService } from '../../services/destination';
 import { ObjectService } from '../../services/object';
 import { EventService } from '../../services/event';
+import { ActivityService } from '../../services/activity';
+import { LocalityService } from '../../services/locality';
 import { RegionService } from '../../services/region';
 import { ActiveRegionService } from '../../services/active-region';
 import { LocationTrackingService, TrackedLocation } from '../../services/location-tracking';
 import { SmartSearchResultDto, SmartSearchService } from '../../services/smart-search';
+
 import { environment } from '../../../environment/environment';
+import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 
 interface SearchResult {
   id: number;
@@ -34,7 +38,7 @@ interface SearchResult {
   lat?: number;
   lng?: number;
   raw: any;
-  category: 'destination' | 'locality' | 'object' | 'event' | 'activity';
+  category: 'destination' | 'object' | 'event' | 'activity' | 'locality';
   markerType: string;
 }
 
@@ -61,7 +65,7 @@ const SEARCH_STOP_WORDS = new Set([
 @Component({
   selector: 'app-map',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, DragDropModule],
   templateUrl: './map.html',
   styleUrls: ['./map.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -70,14 +74,20 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   searchQuery = '';
   searchResults: SearchResult[] = [];
   showSuggestions = false;
-
+  showDirectionsModal = false;
+  routePoints: RoutePoint[] = [];
+  routeSearchQuery = '';
+  routeSearchResults: SearchResult[] = [];
+  isRoutePlannerOpen = false;
+  totalDistance = 0;
+  totalDuration = 0;
   activeFilters: string[] = [];
   filterChips: FilterChip[] = [
-    { key: 'destination', label: 'Destinations', icon: '📍' },
-    { key: 'hotel', label: 'Hotels', icon: '🏨' },
-    { key: 'restaurant', label: 'Restaurants', icon: '🍽️' },
-    { key: 'kafana', label: 'Bars', icon: '🍷' },
-    { key: 'event', label: 'Events', icon: '🎉' },
+    { key: 'food', label: 'Hrana i piće', icon: '🍽️' },
+    { key: 'fuel', label: 'Pumpe', icon: '⛽' },
+    { key: 'accommodation', label: 'Smeštaj', icon: '🏨' },
+    { key: 'shopping', label: 'Šoping', icon: '🛍️' },
+    { key: 'health', label: 'Bolnice', icon: '🏥' }
   ];
 
   selectedItem: any = null;
@@ -105,11 +115,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     private destinationService: DestinationService,
     private objectService: ObjectService,
     private eventService: EventService,
+    private activityService: ActivityService,
+    private localityService: LocalityService,
     private regionService: RegionService,
     private activeRegionService: ActiveRegionService,
     private locationTrackingService: LocationTrackingService,
     private smartSearchService: SmartSearchService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     window.addEventListener('map-marker-clicked', (event: any) => {
@@ -119,7 +131,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cdr.detectChanges();
       });
     });
-
     this.subscriptions.add(
       this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
         this.ngZone.run(() => {
@@ -153,9 +164,15 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.loadAllData(state);
 
-    const map = this.mapService['map'];
+    const map = this.mapService.getMap();
+    if (!map) return;
     if (map) {
-      map.on('click', () => this.closeCard());
+      map.on('click', () => {
+        this.routeSearchResults = [];
+        this.routeSearchQuery = '';
+        this.showSuggestions = false;
+        this.closeCard();
+      });
     }
   }
 
@@ -187,7 +204,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private updateUserMarker(latlng: L.LatLng, accuracy: number): void {
-    const map = this.mapService['map'];
+    const map = this.mapService.getMap();
     if (!map) return;
 
     const userIcon = L.divIcon({
@@ -244,7 +261,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.shouldCenterOnNextLocation = false;
     }
   }
+  openDirections(): void {
+    const point = this.getRoutePointFromItem(this.selectedItem, this.selectedType);
+    if (!point) return;
 
+    this.routePoints = [point];
+    this.isRoutePlannerOpen = true;
+  }
   getDirections(): void {
     if (!this.userLocation || !this.selectedItem) return;
 
@@ -252,16 +275,14 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!destination) return;
 
     this.routeEnd = destination;
-    void this.drawRoute(this.userLocation, L.latLng(destination.lat, destination.lng));
+    this.closeCard();
+    void this.calculateRoute();
   }
 
   showRouteBetweenPins(): void {
     if (!this.routeStart || !this.routeEnd) return;
 
-    void this.drawRoute(
-      L.latLng(this.routeStart.lat, this.routeStart.lng),
-      L.latLng(this.routeEnd.lat, this.routeEnd.lng),
-    );
+    void this.calculateRoute();
   }
 
   setRoutePoint(mode: 'start' | 'end'): void {
@@ -290,12 +311,16 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   clearPlannedRoute(): void {
-    this.routeStart = null;
-    this.routeEnd = null;
-    this.clearDirections();
-    this.cdr.detectChanges();
-  }
+    this.routePoints = [];
 
+    if (this.routeLine) {
+      this.routeLine.remove();
+      this.routeLine = null;
+    }
+
+    this.routeSearchResults = [];
+    this.routeSearchQuery = '';
+  }
   clearDirections(): void {
     if (this.routeLine) {
       this.routeLine.remove();
@@ -303,25 +328,55 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private async drawRoute(from: L.LatLng, to: L.LatLng): Promise<void> {
-    const map = this.mapService['map'];
-    if (!map) return;
+  async calculateRoute(): Promise<void> {
+    if (this.routePoints.length < 2) return;
 
-    this.clearDirections();
+    const coords = this.routePoints
+      .map(p => `${p.lng},${p.lat}`)
+      .join(';');
 
-    const routePoints = await this.fetchRoutePoints(from, to);
-    this.routeLine = L.polyline(routePoints, {
-      color: '#168AAD',
-      weight: 5,
-      opacity: 0.85,
-      lineCap: 'round',
-      lineJoin: 'round',
-    }).addTo(map);
+    const url =
+      `https://router.project-osrm.org/route/v1/driving/` +
+      `${coords}?overview=full&geometries=geojson`;
 
-    map.fitBounds(this.routeLine.getBounds(), {
-      padding: [48, 48],
-      maxZoom: 16,
-    });
+    try {
+
+      const res = await fetch(url);
+      const data = await res.json();
+
+      const geometry = data?.routes?.[0]?.geometry?.coordinates;
+      if (!geometry) return;
+      const route = data?.routes?.[0];
+      if (!route) return;
+
+      const distanceKm = route.distance / 1000;
+      const durationMin = route.duration / 60;
+      this.totalDistance = distanceKm;
+      this.totalDuration = durationMin;
+      const latlngs = geometry.map(
+        ([lng, lat]: [number, number]) => L.latLng(lat, lng)
+      );
+
+      const map = this.mapService.getMap();
+      if (!map) return;
+
+      if (this.routeLine) {
+        this.routeLine.remove();
+      }
+
+      this.routeLine = L.polyline(latlngs, {
+        color: '#168AAD',
+        weight: 5,
+      }).addTo(map);
+
+      map.fitBounds(L.latLngBounds(latlngs), {
+        padding: [50, 50],
+        maxZoom: 16,
+      });
+
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   private matchesAllTerms(item: SearchResult, terms: string[]): boolean {
@@ -435,10 +490,21 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       queryParams: { q: query, source: 'map' },
     });
   }
+  private toRoutePoint(result: SearchResult): RoutePoint | null {
+    if (!result.lat || !result.lng) return null;
 
+    return {
+      id: result.id,
+      name: result.name,
+      type: result.markerType || result.category || 'point',
+      lat: result.lat,
+      lng: result.lng
+    };
+  }
   selectSuggestion(result: SearchResult): void {
-    this.searchQuery = result.name;
+    this.searchQuery = '';
     this.showSuggestions = false;
+    this.searchResults = [];
 
     if (result.lat && result.lng) {
       this.mapService.flyTo(result.lat, result.lng, 16);
@@ -454,6 +520,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
           this.mapService.triggerMarkerClick(markerType, result.id);
         }, 600);
       }
+
+      this.addRoutePoint(result);
     }
   }
 
@@ -530,11 +598,21 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         { page: 1, pageSize: 500, sortBy: 'startDate', sortOrder: 'asc' },
         { bypassRegion: true, bypassLanguage: true },
       ),
+      activities: this.activityService.getAll(
+        { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
+        { bypassRegion: true },
+      ),
+      localities: this.localityService.getAll(
+        { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
+        { bypassRegion: true },
+      ),
     }).subscribe({
-      next: ({ destinations, objects, events }) => {
+      next: ({ destinations, objects, events, activities, localities }) => {
         const destList = this.toArray<any>(destinations);
         const objList = this.toArray<any>(objects);
         const evtList = this.toArray<any>(events);
+        const actList = this.toArray<any>(activities);
+        const locList = this.toArray<any>(localities);
 
         destList.forEach((destination) => {
           if (destination.latitude && destination.longitude) {
@@ -571,6 +649,35 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
             this.allItems.push(this.toSearchResult(event, 'event', 'event'));
           }
         });
+        actList.forEach((activity) => {
+          if (activity.latitude && activity.longitude) {
+            this.mapService.addMarkerWithType(
+              activity.latitude,
+              activity.longitude,
+              'activity',
+              activity,
+              undefined,
+              false
+            );
+
+            this.allItems.push(this.toSearchResult(activity, 'activity', 'activity'));
+          }
+        });
+
+        locList.forEach((locality) => {
+          if (locality.latitude && locality.longitude) {
+            this.mapService.addMarkerWithType(
+              locality.latitude,
+              locality.longitude,
+              'locality',
+              locality,
+              undefined,
+              false
+            );
+
+            this.allItems.push(this.toSearchResult(locality, 'locality', 'locality'));
+          }
+        });
 
         this.mapService.syncVisibleMarkers();
 
@@ -591,7 +698,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   private toSearchResult(
     raw: any,
     markerType: string,
-    category: 'destination' | 'object' | 'event',
+    category: 'destination' | 'object' | 'event' | 'activity' | 'locality',
   ): SearchResult {
     const iconMap: Record<string, string> = {
       destination: 'place',
@@ -599,6 +706,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       restaurant: 'restaurant',
       kafana: 'local_bar',
       event: 'event',
+      activity: 'directions_run',
+      locality: 'location_city',
       default: 'place',
     };
 
@@ -733,7 +842,15 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   formatDistance(km: number): string {
     return km < 1 ? `${Math.round(km * 1000)} m` : `${km} km`;
   }
+  openDirectionsModal(): void {
+    if (!this.selectedItem) return;
 
+    const point = this.getRoutePointFromItem(this.selectedItem, this.selectedType);
+    if (!point) return;
+    this.routePoints = [point];
+
+    this.showDirectionsModal = true;
+  }
   openDetails(): void {
     if (!this.selectedItem) return;
 
@@ -744,6 +861,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       case 'event':
         this.router.navigate(['/event', this.selectedItem.id]);
         break;
+      case 'locality':
+        this.router.navigate(['/locality', this.selectedItem.id]);
+        break;
+      case 'activity':
+        this.router.navigate(['/activity', this.selectedItem.id]);
+        break;
       default:
         this.router.navigate(['/object', this.selectedItem.id]);
         break;
@@ -751,17 +874,21 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   closeCard(): void {
+    this.routeSearchResults = [];
+    this.showSuggestions = false;
     this.selectedItem = null;
     this.selectedType = '';
-    this.clearDirections();
 
     const activeKey = (window as any).activeMarkerKey;
     if (activeKey) {
       const found = this.mapService['markerMap']?.get(activeKey);
-      const map = this.mapService['map'];
-      if (found && map && !map.hasLayer(found.marker)) {
+      const map = this.mapService.getMap();
+      if (!map) return;
+
+      if (found && !map.hasLayer(found.marker)) {
         found.marker.addTo(map);
       }
+
       (window as any).activeMarkerKey = null;
     }
 
@@ -851,5 +978,101 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         [to.lat, to.lng],
       ];
     }
+  }
+  closeDirectionsModal(): void {
+    this.showDirectionsModal = false;
+  }
+
+  addRoutePoint(result: SearchResult): void {
+    if (!result.lat || !result.lng) return;
+
+    this.routePoints.push({
+      id: result.id,
+      name: result.name,
+      type: result.typeName,
+      lat: result.lat,
+      lng: result.lng
+    });
+
+    this.routeSearchQuery = '';
+    this.routeSearchResults = [];
+
+    this.calculateRoute();
+  }
+  showRouteSuggestions(): void {
+    if (!this.routeSearchQuery.trim()) {
+      this.routeSearchResults = [];
+      return;
+    }
+    this.routeSearchResults = this.allItems.slice(0, 5);
+  }
+  drop(event: CdkDragDrop<RoutePoint[]>): void {
+    moveItemInArray(
+      this.routePoints,
+      event.previousIndex,
+      event.currentIndex
+    );
+
+    this.calculateRoute();
+  }
+  closeRoutePlanner(): void {
+    this.isRoutePlannerOpen = false;
+    this.clearPlannedRoute();
+  }
+  removeRoutePoint(index: number): void {
+    this.routePoints.splice(index, 1);
+    this.calculateRoute();
+  }
+  onRouteSearchBlur(): void {
+    setTimeout(() => {
+      this.routeSearchResults = [];
+      this.cdr.detectChanges();
+    }, 150);
+  }
+  routeSuggestionsTop = '0px';
+  routeSuggestionsLeft = '16px';
+  routeSuggestionsRight = '16px';
+  onRouteSearch(): void {
+    const query = this.routeSearchQuery.trim();
+
+    if (!query) {
+      this.routeSearchResults = [];
+      return;
+    }
+    const input = document.querySelector('.route-add input') as HTMLElement;
+    if (input) {
+      const rect = input.getBoundingClientRect();
+      this.routeSuggestionsTop = `${rect.bottom + 6}px`;
+      this.routeSuggestionsLeft = `${rect.left}px`;
+      this.routeSuggestionsRight = `${window.innerWidth - rect.right}px`;
+    }
+
+    this.smartSearchService
+      .search({
+        query,
+        pageSize: 6,
+        mode: 'strict'
+      })
+    this.smartSearchService.search({ query, pageSize: 6, mode: 'strict' })
+      .subscribe(results => {
+        this.routeSearchResults = results.map(r => this.toSmartSearchResult(r));
+        this.cdr.detectChanges();
+      });
+  }
+  addMyLocationAsStart(): void {
+    if (!this.userLocation) return;
+
+    const exists = this.routePoints.some(p => p.id === -1);
+    if (exists) return;
+
+    this.routePoints.unshift({
+      id: -1,
+      name: 'My Location',
+      type: 'gps',
+      lat: this.userLocation.lat,
+      lng: this.userLocation.lng
+    });
+
+    this.calculateRoute();
   }
 }

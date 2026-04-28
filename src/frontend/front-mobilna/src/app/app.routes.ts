@@ -184,6 +184,31 @@ export const routes: Routes = [
       import('./feature/destinations/destinations').then((m) => m.DestinationsComponent),
   },
   {
+    path: 'destination/:id',
+    loadComponent: () =>
+      import('./feature/destination-detail/destination-detail').then((m) => m.DestinationDetailComponent),
+  },
+  {
+    path: 'localities',
+    loadComponent: () =>
+      import('./feature/localities/localities').then((m) => m.LocalitiesComponent),
+  },
+  {
+    path: 'locality/:id',
+    loadComponent: () =>
+      import('./feature/locality-detail/locality-detail').then((m) => m.LocalityDetailComponent),
+  },
+  {
+    path: 'activities',
+    loadComponent: () =>
+      import('./feature/activities/activities').then((m) => m.ActivitiesComponent),
+  },
+  {
+    path: 'activity/:id',
+    loadComponent: () =>
+      import('./feature/activity-detail/activity-detail').then((m) => m.ActivityDetailComponent),
+  },
+  {
     path: 'hotels',
     loadComponent: () => import('./feature/hotels/hotels').then((m) => m.HotelsComponent),
   },
@@ -233,6 +258,18 @@ export const routes: Routes = [
       import('./feature/favorites/favorites.component').then((m) => m.FavoritesComponent),
   },
   {
+    path: 'planner',
+    loadComponent: () =>
+      import('./feature/planner/planner.component').then((m) => m.PlannerComponent),
+  },
+  {
+    path: 'planner/add',
+    loadComponent: () =>
+      import('./feature/add-to-planner/add-to-planner.component').then(
+        (m) => m.AddToPlannerComponent,
+      ),
+  },
+  {
     path: 'my-reviews',
     canActivate: [profileAuthGuard],
     loadComponent: () =>
@@ -265,18 +302,24 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./feature/hotel-detail/hotel-detail').then((m) => m.HotelDetailComponent),
   },
-  { 
-    path: 'restaurant/:id', 
-    loadComponent: () => 
-      import('./feature/restaurant-detail/restaurant-detail').then(m => m.RestaurantDetailComponent) 
+  {
+    path: 'restaurant/:id',
+    loadComponent: () =>
+      import('./feature/restaurant-detail/restaurant-detail').then(m => m.RestaurantDetailComponent)
   },
-  { 
-    path: 'map', 
-    loadComponent: () => 
-      import('./feature/map/map').then(m => m.MapComponent) 
+  {
+    path: 'map',
+    loadComponent: () =>
+      import('./feature/map/map').then(m => m.MapComponent)
   },
-  { path: 'object/:id', 
-    loadComponent: () => 
-      import('./feature/object-detail/object-detail').then(m => m.ObjectDetailComponent) 
+  {
+    path: 'object/:id',
+    loadComponent: () =>
+      import('./feature/object-detail/object-detail').then(m => m.ObjectDetailComponent)
+  },
+  {
+    path: 'results',
+    loadComponent: () =>
+      import('./feature/results/results').then(m => m.ResultsComponent)
   },
 ];

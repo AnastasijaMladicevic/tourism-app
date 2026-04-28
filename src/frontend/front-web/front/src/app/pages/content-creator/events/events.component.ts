@@ -39,7 +39,7 @@ export class ContentCreatorEventsComponent implements OnInit {
   isLoading = true;
   errorMessage = '';
   selectedEvent: EventDto | null = null;
-  
+
   currentPage = 1;
   pageSize = 5;
   totalCount = 0;
@@ -332,9 +332,9 @@ export class ContentCreatorEventsComponent implements OnInit {
   formatDate(date: string | Date | undefined): string {
     if (!date) return '-';
     const d = new Date(date);
-    return d.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short', 
+    return d.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'

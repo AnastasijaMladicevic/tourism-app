@@ -11,9 +11,10 @@ import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { firstValueFrom } from 'rxjs';
-
+import { LocationTrackingService } from '../../services/location-tracking';
 import { DestinationDto, DestinationService } from '../../services/destination';
 import { AuthService } from '../../services/auth';
+import { FavoriteStateService } from '../../services/favorite-state';
 import { ImageService } from '../../services/image';
 
 export interface DestinationView extends DestinationDto {
@@ -43,7 +44,10 @@ export class DestinationsComponent implements OnInit {
   destinationTypes: { id: number; name: string }[] = [];
   destinations: DestinationView[] = [];
   visibleDestinations: DestinationView[] = [];
-
+  private readonly favoritePendingIds = new Set<number>();
+  pageSizeOptions = [8, 12, 16, 24, 32];
+  userLocation: { lat: number; lng: number } | null = null;
+  isTracking = false;
   private readonly fetchPageSize = 100;
   private readonly maxFetchPages = 50;
   private readonly imageCache = new Map<number, DestinationDto['images']>();
@@ -52,11 +56,36 @@ export class DestinationsComponent implements OnInit {
     private router: Router,
     private destinationService: DestinationService,
     private authService: AuthService,
+    private favoriteStateService: FavoriteStateService,
     private cdr: ChangeDetectorRef,
     private imageService: ImageService,
-  ) {}
+    private locationTrackingService: LocationTrackingService
+  ) { }
 
   ngOnInit(): void {
+    this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
+      this.isTracking = enabled;
+
+      if (!enabled) {
+        this.clearDistances();
+      } else {
+        this.updateDistances();
+        this.cdr.detectChanges();
+      }
+    });
+
+    this.locationTrackingService.location$.subscribe(loc => {
+      this.userLocation = loc
+        ? { lat: loc.latitude, lng: loc.longitude }
+        : null;
+
+      if (this.userLocation) {
+        this.updateDistances();
+      } else {
+        this.clearDistances();
+      }
+      this.cdr.detectChanges();
+    });
     void this.loadData();
   }
 
@@ -65,13 +94,21 @@ export class DestinationsComponent implements OnInit {
     this.errorMessage = '';
 
     try {
+      if (this.authService.isLoggedIn()) {
+        await firstValueFrom(this.favoriteStateService.loadFavorites(true));
+      }
+
       const destinations = await this.fetchAllDestinations();
 
       this.destinations = destinations.map((destination) => ({
         ...destination,
         images: this.imageCache.get(destination.id) ?? [],
-        isFavorite: false,
-        favoriteId: undefined,
+        isFavorite: Boolean(destination.isFavorite),
+        favoriteId: destination.favoriteId,
+      }));
+      this.favoriteStateService.applyToList(this.destinations, (destination) => ({
+        type: 'destination',
+        entityId: destination.id,
       }));
       this.destinationTypes = this.extractUniqueTypes(this.destinations);
 
@@ -90,7 +127,65 @@ export class DestinationsComponent implements OnInit {
       this.cdr.detectChanges();
     }
   }
+  private updateDistances(): void {
+    if (!this.userLocation) return;
 
+    this.destinations = this.destinations.map(a => {
+      if (a.latitude == null || a.longitude == null) {
+        return { ...a, distanceMeters: undefined };
+      }
+
+      return {
+        ...a,
+        distanceMeters: this.getDistanceKm(
+          this.userLocation!.lat,
+          this.userLocation!.lng,
+          a.latitude,
+          a.longitude
+        )
+      };
+    });
+  }
+  private clearDistances(): void {
+    this.destinations = this.destinations.map(a => ({
+      ...a,
+      distanceMeters: undefined
+    }));
+  }
+  getDistanceText(item: any): string | null {
+    if (!this.isTracking || !this.userLocation) return null;
+    if (!item.latitude || !item.longitude) return null;
+
+    const km = this.getDistanceKm(
+      this.userLocation.lat,
+      this.userLocation.lng,
+      item.latitude,
+      item.longitude
+    );
+
+    return km < 1
+      ? `${Math.round(km * 1000)} m`
+      : `${km.toFixed(1)} km`;
+  }
+  private getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371; // km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) *
+      Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.currentPage = 1;
+    void this.refreshVisibleDestinations();
+  }
   setFilter(filter: string): void {
     this.activeFilter = filter;
     this.currentPage = 1;
@@ -169,16 +264,38 @@ export class DestinationsComponent implements OnInit {
   }
 
   toggleFavorite(destination: DestinationView, event: Event): void {
+    event.preventDefault();
     event.stopPropagation();
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login']);
       return;
     }
 
-    destination.isFavorite = !destination.isFavorite;
-    this.destinations = this.destinations.map((item) =>
-      item.id === destination.id ? { ...item, isFavorite: destination.isFavorite } : item,
-    );
+    if (this.favoritePendingIds.has(destination.id)) {
+      return;
+    }
+
+    this.favoritePendingIds.add(destination.id);
+
+    this.favoriteStateService
+      .toggle({ type: 'destination', entityId: destination.id }, destination.favoriteId)
+      .subscribe({
+        next: (state) => {
+          this.patchFavoriteState(destination.id, state.isFavorite, state.favoriteId);
+        },
+        error: () => {
+          this.favoritePendingIds.delete(destination.id);
+          this.cdr.detectChanges();
+        },
+        complete: () => {
+          this.favoritePendingIds.delete(destination.id);
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  isFavoritePending(destinationId: number): boolean {
+    return this.favoritePendingIds.has(destinationId);
   }
 
   getMainImage(destination: DestinationView): string {
@@ -200,7 +317,7 @@ export class DestinationsComponent implements OnInit {
   }
 
   viewDetails(destination: DestinationView): void {
-    this.router.navigate(['/object', destination.id]);
+    this.router.navigate(['/destination', destination.id]);
   }
 
   goBack(): void {
@@ -270,8 +387,26 @@ export class DestinationsComponent implements OnInit {
         images: await this.getDestinationImages(destination.id),
       })),
     );
+    this.favoriteStateService.applyToList(this.visibleDestinations, (destination) => ({
+      type: 'destination',
+      entityId: destination.id,
+    }));
 
     this.cdr.detectChanges();
+  }
+
+  private patchFavoriteState(destinationId: number, isFavorite: boolean, favoriteId?: number): void {
+    const applyPatch = (list: DestinationView[]) => {
+      list.forEach((destination) => {
+        if (destination.id === destinationId) {
+          destination.isFavorite = isFavorite;
+          destination.favoriteId = favoriteId;
+        }
+      });
+    };
+
+    applyPatch(this.destinations);
+    applyPatch(this.visibleDestinations);
   }
 
   private async getDestinationImages(destinationId: number): Promise<DestinationDto['images']> {

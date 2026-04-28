@@ -713,9 +713,10 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
       keyboard: true
     }).setView(center, zoom);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors'
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+      subdomains: 'abcd',
+      maxZoom: 19
     }).addTo(this.map);
 
     this.map.on('click', (event: L.LeafletMouseEvent) => {

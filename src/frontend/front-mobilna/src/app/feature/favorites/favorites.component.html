@@ -1,56 +1,338 @@
 <div class="favorites-page">
-  <header class="favorites-topbar">
-    <a class="back-btn" routerLink="/profile" [attr.aria-label]="'common.back' | translate">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="m15 18-6-6 6-6" />
-      </svg>
-    </a>
-    <h1>{{ 'nav.favorites' | translate }}</h1>
-    <div class="topbar-spacer" aria-hidden="true"></div>
-  </header>
+  <div class="favorites-stage">
+    <header class="favorites-mobile-topbar">
+      <a class="favorites-icon-btn" routerLink="/profile" [attr.aria-label]="translate('common.back')">
+        <svg viewBox="0 0 24 24">
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+      </a>
 
-  <div class="favorites-shell">
-    <section class="hero-card">
-      <span class="eyebrow">{{ 'favorites.heroEyebrow' | translate }}</span>
-      <h2>{{ 'favorites.heroTitle' | translate }}</h2>
-      <p>{{ 'favorites.heroBody' | translate }}</p>
-    </section>
+      <h1>{{ translate('favorites.screenTitle') }}</h1>
 
-    @if (errorMessage()) {
-      <p class="feedback feedback--error">{{ errorMessage() }}</p>
-    }
+      <a
+        class="favorites-icon-btn"
+        href="#favorites-search"
+        [attr.aria-label]="translate('favorites.searchPlaceholder')"
+      >
+        <svg viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="6.5" />
+          <path d="m16 16 4 4" />
+        </svg>
+      </a>
+    </header>
 
-    @if (isLoading()) {
-      <section class="state-card">
-        <strong>{{ 'common.loading' | translate }}</strong>
-        <p>{{ 'favorites.loadingBody' | translate }}</p>
-      </section>
-    } @else if (!favorites().length) {
-      <section class="state-card">
-        <strong>{{ 'favorites.emptyTitle' | translate }}</strong>
-        <p>{{ 'favorites.emptyBody' | translate }}</p>
-      </section>
-    } @else {
-      <section class="favorites-list">
-        @for (item of favorites(); track trackFavorite($index, item)) {
-          <article class="favorite-card">
-            <div class="favorite-card__content">
-              <span class="type-badge">{{ item.typeLabel }}</span>
-              <h3>{{ item.title }}</h3>
-              <p>{{ 'common.savedOn' | translate }}: {{ item.createdLabel }}</p>
+    <header class="favorites-desktop-toolbar">
+      <label class="search-field search-field--desktop">
+        <span class="search-field__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="6.5" />
+            <path d="m16 16 4 4" />
+          </svg>
+        </span>
+        <input
+          id="favorites-search-desktop"
+          type="search"
+          [placeholder]="translate('favorites.searchPlaceholder')"
+          [value]="searchTerm()"
+          (input)="updateSearchTerm(($any($event.target)).value)"
+        />
+      </label>
+
+      <div class="favorites-profile-chip">
+        <div>
+          <strong>{{ translate('favorites.screenTitle') }}</strong>
+          <span>{{ translate('favorites.totalFavorites', { count: favorites().length }) }}</span>
+        </div>
+        <span class="favorites-profile-chip__avatar" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21a8 8 0 0 1 16 0" />
+          </svg>
+        </span>
+      </div>
+    </header>
+
+    <section class="favorites-content-shell">
+      <main class="favorites-main">
+        <section class="favorites-mobile-search-wrap">
+          <label class="search-field search-field--mobile">
+            <span class="search-field__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="6.5" />
+                <path d="m16 16 4 4" />
+              </svg>
+            </span>
+            <input
+              id="favorites-search"
+              type="search"
+              [placeholder]="translate('favorites.searchPlaceholder')"
+              [value]="searchTerm()"
+              (input)="updateSearchTerm(($any($event.target)).value)"
+            />
+          </label>
+
+          @if (categoryChips().length) {
+            <div class="favorites-chip-row" aria-label="Saved place highlights">
+              <span class="favorites-chip favorites-chip--primary">{{ translate('favorites.allSaved') }}</span>
+              @for (chip of categoryChips(); track trackChip($index, chip)) {
+                <span class="favorites-chip">{{ chip.label }}</span>
+              }
             </div>
+          }
+        </section>
 
-            <button
-              class="remove-btn"
-              type="button"
-              [disabled]="isRemoving() === item.id"
-              (click)="removeFavorite(item.id)"
-            >
-              {{ isRemoving() === item.id ? ('favorites.removing' | translate) : ('common.remove' | translate) }}
+        <section class="favorites-hero">
+          <div class="favorites-hero__copy">
+            <span class="favorites-hero__eyebrow">{{ translate('favorites.screenTitle') }}</span>
+            <h2>{{ translate('favorites.heroTitleModern') }}</h2>
+            <p>{{ translate('favorites.heroBodyModern') }}</p>
+          </div>
+
+          <div class="favorites-hero__controls">
+            <button type="button" class="sort-btn" (click)="toggleSort()">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M8 7h10M8 12h7M8 17h4" />
+                <path d="m5 6-2 2 2 2" />
+              </svg>
+              <span>{{ sortLabel() }}</span>
             </button>
+          </div>
+        </section>
+
+        <a class="planner-banner planner-banner--mobile" routerLink="/planner">
+          <div>
+            <strong>{{ translate('favorites.plannerBannerTitle') }}</strong>
+            <p>{{ translate('favorites.plannerBannerBody') }}</p>
+          </div>
+          <span>{{ translate('favorites.goToPlanner') }}</span>
+        </a>
+
+        <div class="favorites-status-row">
+          <span>{{ savedCountLabel() }}</span>
+          <button type="button" class="sort-link" (click)="toggleSort()">{{ sortLabel() }}</button>
+        </div>
+
+        @if (errorMessage()) {
+          <p class="feedback">{{ errorMessage() }}</p>
+        }
+
+        @if (isLoading()) {
+          <article class="favorites-empty">
+            <strong>{{ translate('favorites.loadingTitle') }}</strong>
+            <p>{{ translate('favorites.loadingBodyModern') }}</p>
+          </article>
+        } @else if (displayedFavorites().length) {
+          <div class="favorites-grid">
+            @for (item of displayedFavorites(); track trackFavorite($index, item)) {
+              <article
+                class="favorite-card"
+                [class.favorite-card--clickable]="item.canOpenDetails"
+                (click)="openFavorite(item)"
+              >
+                <button
+                  type="button"
+                  class="favorite-heart"
+                  [disabled]="removingFavoriteId() === item.id"
+                  (click)="requestRemoveFavorite(item, $event)"
+                  [attr.aria-label]="translate('common.remove')"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M12 20.2 4.95 13.2a4.94 4.94 0 0 1 0-7 4.95 4.95 0 0 1 7 0L12 7.25l.05-.05a4.95 4.95 0 0 1 7 7z"
+                    />
+                  </svg>
+                </button>
+
+                <div class="favorite-card__media">
+                  <img [src]="item.imageUrl" [alt]="item.title" />
+                  <div class="favorite-card__chips">
+                    <span class="card-chip">{{ item.categoryLabel }}</span>
+                    @if (item.rating && item.rating >= 4.8) {
+                      <span class="card-chip">Must-See</span>
+                    }
+                  </div>
+                </div>
+
+                <div class="favorite-card__content">
+                  <div class="favorite-card__heading">
+                    <h3>{{ item.title }}</h3>
+
+                    @if (item.canOpenDetails) {
+                      <span class="favorite-card__arrow" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                          <path d="m9 6 6 6-6 6" />
+                        </svg>
+                      </span>
+                    }
+                  </div>
+
+                  <p class="favorite-card__location">
+                    <span class="location-pin" aria-hidden="true"></span>
+                    <span>{{ item.location }}</span>
+                  </p>
+
+                  <p class="favorite-card__quote">"{{ item.quote }}"</p>
+
+                  <div class="favorite-card__meta">
+                    @if (item.rating) {
+                      <span class="favorite-card__rating">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path
+                            d="m12 3.9 2.47 5 5.53.8-4 3.9.94 5.5L12 16.5l-4.94 2.6.94-5.5-4-3.9 5.53-.8z"
+                          />
+                        </svg>
+                        <strong>{{ item.rating.toFixed(1) }}</strong>
+                        @if (item.reviewCount) {
+                          <span>({{ item.reviewCount }} {{ translate('common.reviews') }})</span>
+                        }
+                      </span>
+                    } @else {
+                      <span class="favorite-card__meta-tag">{{ item.categoryLabel }}</span>
+                    }
+
+                    <span class="favorite-card__saved">{{ item.note }}</span>
+                  </div>
+                </div>
+
+                <div class="favorite-card__footer">
+                  @if (item.canOpenDetails) {
+                    <button
+                      type="button"
+                      class="card-action-btn"
+                      (click)="openFavoriteAction(item, $event)"
+                    >
+                      <span>{{ translate('favorites.openDetails') }}</span>
+                    </button>
+                  } @else {
+                    <span class="favorite-card__helper">{{ translate('favorites.plannerEventsOnly') }}</span>
+                  }
+
+                  <button
+                    type="button"
+                    class="remove-text-btn"
+                    [disabled]="removingFavoriteId() === item.id"
+                    (click)="requestRemoveFavorite(item, $event)"
+                  >
+                    {{ removingFavoriteId() === item.id ? translate('favorites.removing') : translate('common.remove') }}
+                  </button>
+                </div>
+              </article>
+            }
+          </div>
+
+          <footer class="favorites-footer-note">
+            {{ translate('favorites.footerShowingAll', { count: displayedFavorites().length }) }}
+          </footer>
+        } @else {
+          <article class="favorites-empty">
+            <strong>{{ translate('favorites.emptyTitleModern') }}</strong>
+            <p>{{ translate('favorites.emptyBodyModern') }}</p>
           </article>
         }
-      </section>
-    }
+      </main>
+
+      <aside class="favorites-panel">
+        <a class="planner-banner planner-banner--desktop" routerLink="/planner">
+          <strong>{{ translate('favorites.readyTitle') }}</strong>
+          <p>{{ translate('favorites.readyBody') }}</p>
+
+          <div class="planner-banner__feature">
+            <span aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 3 4 7v5c0 5 3.4 9.6 8 11 4.6-1.4 8-6 8-11V7z" />
+                <path d="m9.5 12 1.8 1.8 3.7-3.8" />
+              </svg>
+            </span>
+            <span>{{ translate('favorites.smartRoutes') }}</span>
+          </div>
+
+          <span class="planner-banner__cta">{{ translate('favorites.goToPlanner') }}</span>
+        </a>
+
+        <section class="panel-card">
+          <div class="panel-card__head">
+            <h3>{{ translate('favorites.summaryTitle') }}</h3>
+            <span>{{ favorites().length }} {{ translate('common.total') }}</span>
+          </div>
+
+          @if (savedBreakdown().length) {
+            <div class="summary-list">
+              @for (item of savedBreakdown(); track trackBreakdown($index, item)) {
+                <div class="summary-row">
+                  <span>{{ item.label }}</span>
+                  <strong>{{ item.count }}</strong>
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="panel-empty">{{ translate('favorites.panelEmpty') }}</p>
+          }
+        </section>
+
+        <section class="panel-card">
+          <div class="panel-card__head">
+            <h3>{{ translate('favorites.recentTitle') }}</h3>
+            <span>{{ sortLabel() }}</span>
+          </div>
+
+          <p class="panel-note">{{ latestSavedLabel() }}</p>
+        </section>
+      </aside>
+    </section>
   </div>
+
+  @if (pendingRemovalFavorite(); as item) {
+    <div class="favorites-remove-overlay" (click)="cancelRemoveFavorite()">
+      <div class="favorites-remove-dialog" (click)="$event.stopPropagation()">
+        <div class="favorites-remove-dialog__mobile-handle" aria-hidden="true"></div>
+
+        <div class="favorites-remove-dialog__icon-wrap">
+          <span class="favorites-remove-dialog__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 7h16" />
+              <path d="M9 7V4h6v3" />
+              <path d="M8 7v13h8V7" />
+              <path d="M10.5 11v5" />
+              <path d="M13.5 11v5" />
+            </svg>
+          </span>
+        </div>
+
+        <h3>{{ translate('favorites.removeConfirmTitle') }}</h3>
+        <p>{{ translate('favorites.removeConfirmBody', { title: item.title }) }}</p>
+
+        <div class="favorites-remove-dialog__actions">
+          <button
+            type="button"
+            class="favorites-remove-btn"
+            [disabled]="removingFavoriteId() === item.id"
+            (click)="confirmRemoveFavorite()"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 7h16" />
+              <path d="M9 7V4h6v3" />
+              <path d="M8 7v13h8V7" />
+              <path d="M10.5 11v5" />
+              <path d="M13.5 11v5" />
+            </svg>
+            <span>{{ removingFavoriteId() === item.id ? translate('favorites.removing') : translate('common.remove') }}</span>
+          </button>
+
+          <button
+            type="button"
+            class="favorites-cancel-remove-btn"
+            [disabled]="removingFavoriteId() === item.id"
+            (click)="cancelRemoveFavorite()"
+          >
+            {{ translate('common.cancel') }}
+          </button>
+        </div>
+
+        <div class="favorites-remove-dialog__footer">
+          <span class="favorites-remove-dialog__footer-dot" aria-hidden="true"></span>
+          <span>{{ translate('favorites.removeConfirmFooter', { title: item.title }) }}</span>
+        </div>
+      </div>
+    </div>
+  }
 </div>

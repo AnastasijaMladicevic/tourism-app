@@ -1,0 +1,393 @@
+<div class="planner-page">
+  <header class="planner-desktop-topbar">
+    <h1>{{ translate('planner.title') }}</h1>
+
+    <div class="planner-desktop-topbar__actions">
+      <button
+        type="button"
+        class="planner-icon-btn"
+        [attr.aria-label]="translate('planner.notifications')"
+      >
+        <svg viewBox="0 0 24 24">
+          <path d="M15 17h5l-1.4-1.4a2 2 0 0 1-.6-1.4V11a6 6 0 1 0-12 0v3.2c0 .53-.21 1.04-.59 1.41L4 17h5" />
+          <path d="M10 20a2 2 0 0 0 4 0" />
+        </svg>
+      </button>
+
+      <span class="planner-avatar" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4 21a8 8 0 0 1 16 0" />
+        </svg>
+      </span>
+    </div>
+  </header>
+
+  <section class="planner-shell">
+    <header class="planner-mobile-topbar">
+      <div class="planner-mobile-topbar__brand">
+        <span class="planner-brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M13 2 5 14h5l-1 8 8-12h-5z" />
+          </svg>
+        </span>
+        <h1>{{ translate('planner.title') }}</h1>
+      </div>
+
+      <div class="planner-mobile-topbar__actions">
+        <button
+          type="button"
+          class="planner-icon-btn"
+          [attr.aria-label]="translate('planner.notifications')"
+        >
+          <svg viewBox="0 0 24 24">
+            <path d="M15 17h5l-1.4-1.4a2 2 0 0 1-.6-1.4V11a6 6 0 1 0-12 0v3.2c0 .53-.21 1.04-.59 1.41L4 17h5" />
+            <path d="M10 20a2 2 0 0 0 4 0" />
+          </svg>
+        </button>
+        <span class="planner-avatar planner-avatar--mobile" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21a8 8 0 0 1 16 0" />
+          </svg>
+        </span>
+      </div>
+    </header>
+
+    @if (errorMessage()) {
+      <p class="planner-feedback planner-feedback--error">{{ errorMessage() }}</p>
+    }
+
+    @if (isLoading()) {
+      <section class="planner-empty-state">
+        <strong>{{ translate('planner.loadingTitle') }}</strong>
+        <p>{{ translate('planner.loadingBody') }}</p>
+      </section>
+    } @else if (!plannerItems().length) {
+      <section class="planner-empty-state">
+        <strong>{{ translate('planner.emptyTitle') }}</strong>
+        <p>{{ translate('planner.emptyBody') }}</p>
+        <button type="button" class="planner-primary-btn" (click)="openEvents()">
+          {{ translate('planner.browseEvents') }}
+        </button>
+      </section>
+    } @else {
+      <section class="planner-mobile-hero">
+        <img [src]="tripHeroImage()" [alt]="tripTitle()" />
+        <div class="planner-mobile-hero__overlay">
+          <h2>{{ tripTitle() }}</h2>
+          <p>{{ tripDateRange() }}</p>
+        </div>
+      </section>
+
+      <section class="planner-desktop-overview">
+        <div class="planner-desktop-overview__copy">
+          <div class="planner-desktop-overview__meta">
+            <span>{{ selectedDay()!.monthLabel }}</span>
+            <span>&bull;</span>
+            <span>{{ translate('planner.daysPlanned', { count: days().length }) }}</span>
+          </div>
+
+          <h2>{{ tripTitle() }}</h2>
+          <p>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10Z" />
+              <circle cx="12" cy="11" r="2.5" />
+            </svg>
+            <span>{{ tripLocation() }}</span>
+          </p>
+        </div>
+
+        <div class="planner-day-strip planner-day-strip--desktop">
+          @for (day of days(); track trackDay($index, day)) {
+            <button
+              type="button"
+              class="planner-day-pill"
+              [class.planner-day-pill--active]="selectedDay()!.key === day.key"
+              (click)="selectDay(day.key)"
+            >
+              <span>{{ day.weekday }}</span>
+              <strong>{{ day.dateLabel }}</strong>
+            </button>
+          }
+        </div>
+      </section>
+
+      <div class="planner-day-strip planner-day-strip--mobile">
+        @for (day of days(); track trackDay($index, day)) {
+          <button
+            type="button"
+            class="planner-day-pill"
+            [class.planner-day-pill--active]="selectedDay()!.key === day.key"
+            (click)="selectDay(day.key)"
+          >
+            <span>{{ day.weekday }}</span>
+            <strong>{{ day.dateLabel }}</strong>
+          </button>
+        }
+      </div>
+
+      <section class="planner-content-shell">
+        <main class="planner-main">
+          <div class="planner-schedule-head">
+            <h3>{{ translate('planner.scheduleTitle') }}</h3>
+            <span class="planner-schedule-pill">
+              {{
+                selectedStops().length
+              }}
+              {{
+                selectedStops().length === 1
+                  ? translate('planner.eventSingular')
+                  : translate('planner.eventPlural')
+              }}
+            </span>
+          </div>
+
+          <span class="planner-schedule-date">{{ selectedDay()!.shortDateLabel }}</span>
+
+          <div class="planner-timeline">
+            @for (stop of selectedStops(); track trackStop($index, stop)) {
+              <div class="planner-timeline-row">
+                <span class="planner-timeline-dot" aria-hidden="true"></span>
+
+                <article class="planner-stop-card" (click)="openEvent(stop)">
+                  <div class="planner-stop-card__media">
+                    <img [src]="stop.imageUrl" [alt]="stop.title" />
+                    <span class="planner-stop-card__badge">{{ stop.category }}</span>
+                  </div>
+
+                  <div class="planner-stop-card__content">
+                    <div class="planner-stop-card__top">
+                      <h4>{{ stop.title }}</h4>
+
+                      <div class="planner-stop-card__actions">
+                        <button
+                          type="button"
+                          class="planner-card-icon-btn"
+                          (click)="openEvent(stop); $event.stopPropagation()"
+                          [attr.aria-label]="translate('planner.openEventDetails')"
+                        >
+                          <svg viewBox="0 0 24 24">
+                            <path d="m4 20 4.5-1 9.6-9.6a1.8 1.8 0 0 0 0-2.5l-1-1a1.8 1.8 0 0 0-2.5 0L5 15.5 4 20Z" />
+                          </svg>
+                        </button>
+
+                        <button
+                          type="button"
+                          class="planner-card-icon-btn planner-card-icon-btn--danger"
+                          [disabled]="removingPlannerId() === stop.plannerId"
+                          (click)="requestRemoveStop(stop, $event)"
+                          [attr.aria-label]="translate('planner.removeFromPlanner')"
+                        >
+                          <svg viewBox="0 0 24 24">
+                            <path d="M4 7h16" />
+                            <path d="M9 7V4h6v3" />
+                            <path d="M8 7v13h8V7" />
+                            <path d="M10.5 11v5" />
+                            <path d="M13.5 11v5" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="planner-stop-card__meta">
+                      <span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <circle cx="12" cy="12" r="8" />
+                          <path d="M12 8v4l3 2" />
+                        </svg>
+                        {{ stop.timeLabel }} &bull; {{ stop.durationLabel }}
+                      </span>
+
+                      <span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10Z" />
+                          <circle cx="12" cy="11" r="2.5" />
+                        </svg>
+                        {{ stop.location }}
+                      </span>
+                    </div>
+
+                    <p class="planner-stop-card__quote">"{{ stop.quote }}"</p>
+                  </div>
+                </article>
+              </div>
+            }
+          </div>
+        </main>
+
+        <aside class="planner-side-panel">
+          <section class="planner-cta-card">
+            <h3>{{ translate('planner.planningNextTitle') }}</h3>
+            <p>{{ translate('planner.planningNextBody') }}</p>
+            <button type="button" class="planner-primary-btn" (click)="openEvents()">
+              <span>+</span>
+              <span>{{ translate('planner.addEventCta') }}</span>
+            </button>
+          </section>
+
+          <div class="planner-stats-grid">
+            <article class="planner-stat-card">
+              <span class="planner-stat-card__icon planner-stat-card__icon--events">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M3 12h4l2-6 4 12 2-6h6" />
+                </svg>
+              </span>
+              <div>
+                <small>{{ translate('planner.totalEvents') }}</small>
+                <strong>{{ totalEvents() }}</strong>
+              </div>
+            </article>
+
+            <article class="planner-stat-card">
+              <span class="planner-stat-card__icon planner-stat-card__icon--hours">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="8" />
+                  <path d="M12 8v4l3 2" />
+                </svg>
+              </span>
+              <div>
+                <small>{{ translate('planner.plannedHours') }}</small>
+                <strong>{{ plannedHours() }}</strong>
+              </div>
+            </article>
+          </div>
+
+          <section class="planner-highlight-card">
+            <div class="planner-highlight-card__head">
+              <h3>{{ translate('planner.priorityHighlights') }}</h3>
+              <span>{{ translate('planner.itemsCount', { count: highlightStops().length }) }}</span>
+            </div>
+
+            @for (stop of highlightStops(); track trackStop($index, stop)) {
+              <article class="planner-highlight-row" (click)="openEvent(stop)">
+                <img [src]="stop.imageUrl" [alt]="stop.title" />
+                <div>
+                  <strong>{{ stop.title }}</strong>
+                  <span>{{ stop.timeLabel }}</span>
+                </div>
+              </article>
+            }
+          </section>
+
+          <section class="planner-tip-card">
+            <strong>{{ translate('planner.proTipLabel') }}</strong>
+            <span>{{ translate('planner.proTipBody') }}</span>
+          </section>
+        </aside>
+      </section>
+
+      <button
+        type="button"
+        class="planner-fab"
+        (click)="openEvents()"
+        [attr.aria-label]="translate('planner.addEventCta')"
+      >
+        +
+      </button>
+
+      <nav class="planner-mobile-nav">
+        <a routerLink="/home">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 10.5 12 3l9 7.5V21H3z" />
+          </svg>
+          <span>{{ translate('nav.home') }}</span>
+        </a>
+        <a routerLink="/map">
+          <svg viewBox="0 0 24 24">
+            <path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z" />
+            <path d="M9 4v13.5" />
+            <path d="M15 6.5V20" />
+          </svg>
+          <span>{{ translate('nav.map') }}</span>
+        </a>
+        <a routerLink="/planner" class="planner-mobile-nav__active">
+          <svg viewBox="0 0 24 24">
+            <rect x="4" y="5" width="16" height="15" rx="2" />
+            <path d="M8 3v4" />
+            <path d="M16 3v4" />
+            <path d="M4 10h16" />
+          </svg>
+          <span>{{ translate('nav.planner') }}</span>
+        </a>
+        <a routerLink="/favorites">
+          <svg viewBox="0 0 24 24">
+            <path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1Z" />
+          </svg>
+          <span>{{ translate('planner.savedNav') }}</span>
+        </a>
+        <a routerLink="/profile">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M4 21a8 8 0 0 1 16 0" />
+          </svg>
+          <span>{{ translate('nav.profile') }}</span>
+        </a>
+      </nav>
+    }
+  </section>
+
+  @if (pendingRemovalStop(); as stop) {
+    <div class="planner-remove-overlay" (click)="cancelRemoveStop()">
+      <div class="planner-remove-dialog" (click)="$event.stopPropagation()">
+        <div class="planner-remove-dialog__mobile-handle" aria-hidden="true"></div>
+
+        <div class="planner-remove-dialog__icon-wrap">
+          <span class="planner-remove-dialog__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 7h16" />
+              <path d="M9 7V4h6v3" />
+              <path d="M8 7v13h8V7" />
+              <path d="M10.5 11v5" />
+              <path d="M13.5 11v5" />
+            </svg>
+          </span>
+        </div>
+
+        <h3>{{ translate('planner.removeConfirmTitle') }}</h3>
+        <p>{{ translate('planner.removeConfirmBody', { title: stop.title }) }}</p>
+
+        <div class="planner-remove-dialog__actions">
+          <button
+            type="button"
+            class="planner-remove-btn"
+            [disabled]="removingPlannerId() === stop.plannerId"
+            (click)="confirmRemoveStop()"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 7h16" />
+              <path d="M9 7V4h6v3" />
+              <path d="M8 7v13h8V7" />
+              <path d="M10.5 11v5" />
+              <path d="M13.5 11v5" />
+            </svg>
+            <span>{{ removingPlannerId() === stop.plannerId ? translate('favorites.removing') : translate('planner.removeEvent') }}</span>
+          </button>
+
+          <button
+            type="button"
+            class="planner-cancel-remove-btn"
+            [disabled]="removingPlannerId() === stop.plannerId"
+            (click)="cancelRemoveStop()"
+          >
+            {{ translate('common.cancel') }}
+          </button>
+        </div>
+
+        <div class="planner-remove-dialog__footer">
+          <span class="planner-remove-dialog__footer-dot" aria-hidden="true"></span>
+          <span>{{ translate('planner.removeFooter', { title: stop.title }) }}</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <footer class="planner-desktop-footer">
+    <span>SpireGO Planner &#169; 2024</span>
+    <div>
+      <a routerLink="/support">{{ translate('support.title') }}</a>
+      <a routerLink="/terms">{{ translate('terms.title') }}</a>
+      <a routerLink="/privacy-data">{{ translate('privacy.title') }}</a>
+    </div>
+  </footer>
+</div>

@@ -17,7 +17,15 @@
           (ngModelChange)="onSearchChange()"
         />
       </div>
-
+      <div class="list-controls">
+      <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+          @for (size of pageSizeOptions; track $index) {
+            <option [value]="size">
+              {{ size }}
+            </option>
+          }
+        </select>
+      </div>
 `      <div
         class="sort-anchor sort-trigger"
         (click)="$event.stopPropagation(); showSortMenu = !showSortMenu"
@@ -116,13 +124,18 @@
             </div>
           }
 
-          <span class="card__distance">
-            <mat-icon>radio_button_checked</mat-icon> {{ formatDistance(destination.distanceKm) }}
-          </span>
+          @if (getDistanceText(destination)) {
+            <span class="card__distance">
+              <mat-icon>radio_button_checked</mat-icon>
+              {{ getDistanceText(destination) }}
+            </span>
+          }
 
           <button
+            type="button"
             class="card__fav"
             [class.card__fav--active]="destination.isFavorite"
+            [disabled]="isFavoritePending(destination.id)"
             (click)="toggleFavorite(destination, $event)"
           >
             <mat-icon>{{ destination.isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>

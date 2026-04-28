@@ -32,7 +32,15 @@
       >
         <mat-icon>swap_vert</mat-icon>
       </button>
-
+      <div class="list-controls">
+      <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+          @for (size of pageSizeOptions; track $index) {
+            <option [value]="size">
+              {{ size }}
+            </option>
+          }
+        </select>
+      </div>
       @if (showSortMenu) {
         <div class="sort-menu sort-anchor">
           <button
@@ -111,9 +119,11 @@
   </div>
 
   @if (isLoading) {
-    <div class="loading">
-      <mat-icon>hourglass_empty</mat-icon>
-      <p>Loading events...</p>
+    <div class="loading-screen">
+      <div class="loading-content">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+      </div>
     </div>
   }
 
@@ -168,7 +178,9 @@
   </div>
 
   <div class="pagination">
-    <button mat-button type="button" (click)="prevPage()" [disabled]="currentPage === 1">Prev</button>
+    <button mat-button type="button" (click)="prevPage()" [disabled]="currentPage === 1">
+      Prev
+    </button>
     <span>Page {{ currentPage }} of {{ totalPages }}</span>
     <button mat-button type="button" (click)="nextPage()" [disabled]="!hasNextPage">Next</button>
   </div>

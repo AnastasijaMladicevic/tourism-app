@@ -105,6 +105,11 @@ export interface UpdateActivityDto {
   objectId?: number;
 }
 
+export interface ApproveActivityDto {
+  approve: boolean;
+  rejectionReason?: string;
+}
+
 interface AddImageDto {
   url: string;
   altText?: string;
@@ -124,18 +129,20 @@ export class ActivitiesService {
 
   constructor(private readonly http: HttpClient) {}
 
+  /**
+   * Get activities created by the current content creator
+   */
   getMyActivities(query?: ActivityQueryDto): Observable<ActivityQueryResponse> {
-    let params = new HttpParams();
-
-    if (query) {
-      Object.entries(query).forEach(([key, value]) => {
-        if (value != null && value !== '') {
-          params = params.set(key, String(value));
-        }
-      });
-    }
-
+    const params = this.buildActivityQueryParams(query);
     return this.http.get<ActivityQueryResponse>(`${this.apiUrl}/my`, { params });
+  }
+
+  /**
+   * Get activities visible to the current manager for approval/rejection
+   */
+  getForManager(query?: ActivityQueryDto): Observable<ActivityQueryResponse> {
+    const params = this.buildActivityQueryParams(query);
+    return this.http.get<ActivityQueryResponse>(`${this.apiUrl}/manager`, { params });
   }
 
   create(dto: CreateActivityDto): Observable<ActivityDto> {
@@ -156,6 +163,10 @@ export class ActivitiesService {
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  approve(id: number, dto: ApproveActivityDto): Observable<ActivityDto> {
+    return this.http.post<ActivityDto>(`${this.apiUrl}/${id}/approve`, dto);
   }
 
   attachImages(activityId: number, imageUrls: string[]): Observable<unknown[]> {
@@ -218,5 +229,19 @@ export class ActivitiesService {
 
   private extractItems<T>(response: PagedResponse<T> | T[]): T[] {
     return Array.isArray(response) ? response : (response.items ?? []);
+  }
+
+  private buildActivityQueryParams(query?: ActivityQueryDto): HttpParams {
+    let params = new HttpParams();
+
+    if (query) {
+      Object.entries(query).forEach(([key, value]) => {
+        if (value != null && value !== '') {
+          params = params.set(key, String(value));
+        }
+      });
+    }
+
+    return params;
   }
 }

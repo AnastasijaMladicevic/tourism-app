@@ -4,7 +4,7 @@ import { ContentCreatorLayoutComponent } from './layout/contentcreatorlayout/con
 import { ManagerLayoutComponent } from './layout/managerlayout/managerlayout.component';
 import { authGuard } from './guards/auth.guard';
 import { roleGuard } from './guards/role.guard';
- 
+
 export const routes: Routes = [
   // Root redirect
   {
@@ -12,14 +12,14 @@ export const routes: Routes = [
     redirectTo: 'login',
     pathMatch: 'full'
   },
- 
+
   // Login
   {
     path: 'login',
     loadComponent: () =>
       import('./pages/login/login').then(m => m.Login)
   },
- 
+
   // Signout
   {
     path: 'signout',
@@ -29,11 +29,11 @@ export const routes: Routes = [
   },
   //Signin
   {
-      path:'signup',
-      loadComponent:() =>
-        import('./pages/signup/signup.component').then(m=>m.SignupComponent)
+    path: 'signup',
+    loadComponent: () =>
+      import('./pages/signup/signup.component').then(m => m.SignupComponent)
   },
- 
+
   // === ADMIN ===
   {
     path: 'admin',
@@ -42,10 +42,10 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
-  path: 'profile',
-  loadComponent: () =>
-    import('./pages/admin/profile/profile.component').then(m => m.ProfileComponent)
-  },
+        path: 'profile',
+        loadComponent: () =>
+          import('./pages/admin/profile/profile.component').then(m => m.ProfileComponent)
+      },
       {
         path: 'dashboard',
         loadComponent: () =>
@@ -73,7 +73,7 @@ export const routes: Routes = [
       }
     ]
   },
- 
+
   // === CONTENT CREATOR ===
   {
     path: 'content-creator',
@@ -168,8 +168,18 @@ export const routes: Routes = [
       },
       {
         path: 'activities',
-        loadComponent: () =>
-          import('./pages/manager/activities/activities.component').then(m => m.ManagerActivitiesComponent)
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./pages/manager/activities/activities.component').then(m => m.ManagerActivitiesComponent)
+          },
+          {
+            path: 'edit/:id',
+            loadComponent: () =>
+              import('./pages/manager/activities/activity-details/activity-details.component').then(m => m.ManagerActivityDetailsComponent)
+          }
+        ]
       },
       {
         path: 'events',
@@ -203,7 +213,7 @@ export const routes: Routes = [
       }
     ]
   },
- 
+
   // Fallback
   {
     path: '**',

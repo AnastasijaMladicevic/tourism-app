@@ -7,9 +7,11 @@
   </div>
 
   @if (isLoading) {
-    <div class="loading">
-      <mat-icon>hourglass_empty</mat-icon>
-      <p>{{ 'common.loading' | translate }}</p>
+    <div class="loading-screen">
+      <div class="loading-content">
+        <div class="spinner"></div>
+        <p>{{ 'common.loading' | translate }}</p>
+      </div>
     </div>
   }
 
@@ -30,7 +32,7 @@
           <mat-icon>celebration</mat-icon>
         </div>
       }
-      <button class="fav-btn" (click)="toggleFavorite()" [class.fav-btn--active]="isFavorite">
+      <button class="fav-btn" [disabled]="isFavoriteBusy" (click)="toggleFavorite()" [class.fav-btn--active]="isFavorite">
         <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
       </button>
     </div>
@@ -42,6 +44,7 @@
             <h1 class="title">{{ event.name }}</h1>
             <button
               class="fav-btn fav-btn--desktop"
+              [disabled]="isFavoriteBusy"
               (click)="toggleFavorite()"
               [class.fav-btn--active]="isFavorite"
             >
@@ -65,20 +68,26 @@
               {{ 'event.addToPlanner' | translate }}
             </button>
 
-            <button class="btn btn-primary" (click)="buyTicket()">{{ 'event.buyTicket' | translate }}</button>
+            <button class="btn btn-primary" (click)="buyTicket()">
+              {{ 'event.buyTicket' | translate }}
+            </button>
           </div>
         </div>
 
         <div class="card">
           <h2>{{ 'event.about' | translate }}</h2>
-          <p class="description">{{ event.description || ('event.descriptionFallback' | translate) }}</p>
+          <p class="description">
+            {{ event.description || ('event.descriptionFallback' | translate) }}
+          </p>
         </div>
 
         <div class="section">
           <div class="card gallery-card">
             <div class="gallery-header">
               <h2>{{ 'common.gallery' | translate }}</h2>
-              <button class="see-all-btn" (click)="openGallery(0)">{{ 'common.seeAll' | translate }}</button>
+              <button class="see-all-btn" (click)="openGallery(0)">
+                {{ 'common.seeAll' | translate }}
+              </button>
             </div>
 
             <div class="gallery-scroll">
@@ -104,7 +113,9 @@
               [interactive]="false"
             >
             </app-map>
-            <button class="map-btn-overlay" (click)="viewOnMap()">{{ 'common.viewOnMap' | translate }}</button>
+            <button class="map-btn-overlay" (click)="viewOnMap()">
+              {{ 'common.viewOnMap' | translate }}
+            </button>
           </div>
         </div>
         <div class="card">
@@ -116,7 +127,9 @@
               <span class="ticket-price">{{ getTicketPrice() }}</span>
             </div>
 
-            <button class="btn-small" (click)="buyTicket()">{{ 'event.select' | translate }}</button>
+            <button class="btn-small" (click)="buyTicket()">
+              {{ 'event.select' | translate }}
+            </button>
           </div>
         </div>
         <div class="card nearby-card">
@@ -148,9 +161,9 @@
                       <mat-icon>location_on</mat-icon>
                       <span>{{
                         nearbyEvent.objectName ||
-                        nearbyEvent.localityName ||
-                        nearbyEvent.destinationName ||
-                        'Lokacija nije dostupna'
+                          nearbyEvent.localityName ||
+                          nearbyEvent.destinationName ||
+                          'Lokacija nije dostupna'
                       }}</span>
                     </p>
                     <p class="nearby-item__date">

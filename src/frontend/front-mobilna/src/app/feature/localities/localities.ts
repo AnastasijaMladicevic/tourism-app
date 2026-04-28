@@ -1,0 +1,406 @@
+import {
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { firstValueFrom } from 'rxjs';
+import { LocalityDto, LocalityService } from '../../services/locality';
+import { AuthService } from '../../services/auth';
+import { ImageDto, ImageService } from '../../services/image';
+import { LocationTrackingService } from '../../services/location-tracking';
+
+export interface LocalityView extends LocalityDto {
+  isFavorite: boolean;
+  favoriteId?: number;
+}
+
+@Component({
+  selector: 'app-localities',
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
+  templateUrl: './localities.html',
+  styleUrl: './localities.scss',
+})
+export class LocalitiesComponent implements OnInit {
+  searchQuery = '';
+  currentPage = 1;
+  isLoading = true;
+  errorMessage = '';
+  activeFilter = 'All';
+  sortOption: 'az' | 'za' | 'distance' = 'az';
+  totalCount = 0;
+  hasNextPage = false;
+  pageSize = 8;
+  localities: LocalityView[] = [];
+  visibleLocalities: LocalityView[] = [];
+  localityTypes: { id: number; name: string }[] = [];
+  showSortMenu = false;
+  images: ImageDto[] = [];
+  locality: LocalityDto | null = null;
+  pageSizeOptions = [8, 12, 16, 24, 32];
+  userLocation: { lat: number; lng: number } | null = null;
+  isTracking = false;
+  private readonly fetchPageSize = 100;
+  private readonly maxFetchPages = 50;
+  private readonly imageCache = new Map<number, LocalityDto['images']>();
+  constructor(
+    private router: Router,
+    private localityService: LocalityService,
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef,
+    private imageService: ImageService,
+    private locationTrackingService: LocationTrackingService
+  ) { }
+  ngOnInit(): void {
+    this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
+      this.isTracking = enabled;
+
+      if (!enabled) {
+        this.clearDistances();
+      } else {
+        this.updateDistances();
+        this.cdr.detectChanges();
+      }
+    });
+
+    this.locationTrackingService.location$.subscribe(loc => {
+      this.userLocation = loc
+        ? { lat: loc.latitude, lng: loc.longitude }
+        : null;
+
+      if (this.userLocation) {
+        this.updateDistances();
+      } else {
+        this.clearDistances();
+      }
+      this.cdr.detectChanges();
+    });
+    void this.loadData();
+  }
+  get filtered(): LocalityView[] {
+    let list = [...this.localities];
+
+    if (this.searchQuery.trim()) {
+      const query = this.searchQuery.trim().toLowerCase();
+      list = list.filter((locality) => locality.name.toLowerCase().includes(query));
+    }
+
+    if (this.activeFilter !== 'All') {
+      const activeType = this.activeFilter.trim().toLowerCase();
+      list = list.filter(
+        (locality) => locality.localityTypeName?.trim().toLowerCase() === activeType,
+      );
+    }
+
+    switch (this.sortOption) {
+      case 'az':
+        list.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'za':
+        list.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'distance':
+        list.sort((a, b) => (a.distanceMeters ?? Number.MAX_SAFE_INTEGER) - (b.distanceMeters ?? Number.MAX_SAFE_INTEGER));
+        break;
+    }
+
+    return list;
+  }
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
+  }
+  private updateDistances(): void {
+    if (!this.userLocation) return;
+
+    this.localities = this.localities.map(a => {
+      if (a.latitude == null || a.longitude == null) {
+        return { ...a, distanceMeters: undefined };
+      }
+
+      return {
+        ...a,
+        distanceMeters: this.getDistanceKm(
+          this.userLocation!.lat,
+          this.userLocation!.lng,
+          a.latitude,
+          a.longitude
+        )
+      };
+    });
+  }
+  private clearDistances(): void {
+    this.localities = this.localities.map(a => ({
+      ...a,
+      distanceMeters: undefined
+    }));
+  }
+  getDistanceText(item: any): string | null {
+    if (!this.isTracking || !this.userLocation) return null;
+    if (!item.latitude || !item.longitude) return null;
+
+    const km = this.getDistanceKm(
+      this.userLocation.lat,
+      this.userLocation.lng,
+      item.latitude,
+      item.longitude
+    );
+
+    return km < 1
+      ? `${Math.round(km * 1000)} m`
+      : `${km.toFixed(1)} km`;
+  }
+  private getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371; // km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) *
+      Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.currentPage = 1;
+    void this.refreshVisibleLocalities();
+  }
+  toggleFavorite(locality: LocalityView, event: Event): void {
+    event.stopPropagation();
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    locality.isFavorite = !locality.isFavorite;
+    this.localities = this.localities.map((item) =>
+      item.id === locality.id ? { ...item, isFavorite: locality.isFavorite } : item,
+    );
+  }
+  prevPage(): void {
+    if (this.currentPage === 1) return;
+
+    this.currentPage--;
+    void this.refreshVisibleLocalities();
+  }
+
+  nextPage(): void {
+    if (!this.hasNextPage) return;
+
+    this.currentPage++;
+    void this.refreshVisibleLocalities();
+  }
+  viewDetails(locality: LocalityView): void {
+    this.router.navigate(['/locality', locality.id]);
+  }
+  getMainImage(locality: LocalityView): string {
+    if (locality.images && locality.images.length > 0) {
+      const mainImage = locality.images.find((image) => image.isMain);
+      return mainImage?.url || locality.images[0].url;
+    }
+
+    return this.locality?.mainImageUrl || '';
+  }
+  onImageError(event: Event): void {
+    (event.target as HTMLImageElement).style.display = 'none';
+  }
+  private extractUniqueTypes(localities: LocalityView[]): { id: number; name: string }[] {
+    const map = new Map<string, { id: number; name: string }>();
+
+    localities.forEach((locality) => {
+      if (locality.localityTypeName) {
+        map.set(locality.localityTypeName, {
+          id: locality.localityTypeId,
+          name: locality.localityTypeName,
+        });
+      }
+    });
+
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }
+  async loadData(): Promise<void> {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    try {
+      const localities = await this.fetchAllLocalities();
+
+      this.localities = localities.map((locality) => ({
+        ...locality,
+        images: this.imageCache.get(locality.id) ?? [],
+        isFavorite: false,
+        favoriteId: undefined,
+      }));
+      this.localityTypes = this.extractUniqueTypes(this.localities);
+      await this.refreshVisibleLocalities();
+
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    } catch (err) {
+      console.error(err);
+      this.localities = [];
+      this.visibleLocalities = [];
+      this.totalCount = 0;
+      this.hasNextPage = false;
+      this.errorMessage = 'Failed to load localities.';
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+  private normalizeLocality(raw: LocalityDto): LocalityDto {
+    const dto = raw as unknown as Record<string, unknown>;
+
+    return {
+      id: Number(dto['id'] ?? dto['Id'] ?? 0),
+      name: String(dto['name'] ?? dto['Name'] ?? ''),
+      description: (dto['description'] ?? dto['Description'] ?? undefined) as string | undefined,
+      mainImageUrl: (dto['mainImageUrl'] ?? dto['MainImageUrl'] ?? undefined) as string | undefined,
+      longitude: this.readOptionalNumber(dto, ['longitude', 'Longitude']),
+      latitude: this.readOptionalNumber(dto, ['latitude', 'Latitude']),
+      distanceMeters: this.readOptionalNumber(dto, ['distanceMeters', 'DistanceMeters']),
+      isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
+      localityTypeId: Number(dto['localityTypeId'] ?? dto['LocalityTypeId'] ?? 0),
+      localityTypeName: String(dto['localityTypeName'] ?? dto['LocalityTypeName'] ?? ''),
+      destinationName: String(dto['destinationName'] ?? dto['DestinationName'] ?? ''),
+      images: ((dto['images'] ?? dto['Images'] ?? []) as LocalityDto['images']) || [],
+      createdByUserId: Number(dto['createdByUserId'] ?? 0),
+      createdAt: String(dto['createdAt'] ?? ''),
+      destinationId: Number(dto['destinationId'] ?? 0),
+    };
+  }
+  private readOptionalNumber(obj: Record<string, unknown>, keys: string[]): number | undefined {
+    for (const key of keys) {
+      const value = obj[key];
+      if (value == null) {
+        continue;
+      }
+      const parsed = Number(value);
+      if (!Number.isNaN(parsed)) {
+        return parsed;
+      }
+    }
+    return undefined;
+  }
+  private async fetchAllLocalities(): Promise<LocalityDto[]> {
+    const allLocalities: LocalityDto[] = [];
+    const seenIds = new Set<number>();
+
+    for (let page = 1; page <= this.maxFetchPages; page++) {
+      const response = await firstValueFrom(
+        this.localityService.getAll({
+          page,
+          pageSize: this.fetchPageSize,
+        }),
+      );
+      const items = this.toArray<LocalityDto>(response).map((locality) =>
+        this.normalizeLocality(locality),
+      );
+
+      const newItems = items.filter((item) => {
+        if (seenIds.has(item.id)) {
+          return false;
+        }
+
+        seenIds.add(item.id);
+        return true;
+      });
+
+      if (!newItems.length) {
+        break;
+      }
+
+      allLocalities.push(...newItems);
+
+      if (items.length < this.fetchPageSize) {
+        break;
+      }
+    }
+
+    return allLocalities;
+  }
+  private toArray<T>(raw: unknown): T[] {
+    if (Array.isArray(raw)) return raw as T[];
+    if (!raw || typeof raw !== 'object') return [];
+
+    const obj = raw as Record<string, unknown>;
+    const listKeys = ['items', 'Items', 'data', 'Data', 'results', 'Results', 'value', 'Value'];
+
+    for (const key of listKeys) {
+      const candidate = obj[key];
+      if (Array.isArray(candidate)) return candidate as T[];
+    }
+
+    return [];
+  }
+  sortLabel(): string {
+    const map = { az: 'A -> Z', za: 'Z -> A', distance: 'Nearest' };
+    return map[this.sortOption];
+  }
+  setSort(option: 'az' | 'za' | 'distance'): void {
+    this.sortOption = option;
+    this.showSortMenu = false;
+    void this.refreshVisibleLocalities();
+  }
+  setFilter(filter: string): void {
+    this.activeFilter = filter;
+    this.currentPage = 1;
+    void this.refreshVisibleLocalities();
+  }
+  private async refreshVisibleLocalities(): Promise<void> {
+    const filteredLocalities = this.filtered;
+    this.totalCount = filteredLocalities.length;
+
+    if (this.totalCount === 0) {
+      this.currentPage = 1;
+      this.hasNextPage = false;
+      this.visibleLocalities = [];
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const totalPages = Math.ceil(this.totalCount / this.pageSize);
+    this.currentPage = Math.min(this.currentPage, totalPages);
+    this.hasNextPage = this.currentPage < totalPages;
+
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const pageItems = filteredLocalities.slice(startIndex, startIndex + this.pageSize);
+
+    this.visibleLocalities = await Promise.all(
+      pageItems.map(async (locality) => ({
+        ...locality,
+        images: await this.getLocalityImages(locality.id),
+      })),
+    );
+
+    this.cdr.detectChanges();
+  }
+  private async getLocalityImages(localityId: number): Promise<LocalityDto['images']> {
+    const cachedImages = this.imageCache.get(localityId);
+    if (cachedImages) {
+      return cachedImages;
+    }
+
+    try {
+      const images = (await firstValueFrom(this.imageService.getForLocality(localityId))) ?? [];
+      this.imageCache.set(localityId, images);
+      return images;
+    } catch {
+      this.imageCache.set(localityId, []);
+      return [];
+    }
+  }
+  onSearchChange(): void {
+    this.currentPage = 1;
+    void this.refreshVisibleLocalities();
+  }
+  goBack(): void {
+    this.router.navigate(['/home']);
+  }
+}

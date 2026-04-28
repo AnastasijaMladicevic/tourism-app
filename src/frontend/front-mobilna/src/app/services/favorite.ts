@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
 
 export interface FavoriteDto {
@@ -35,7 +35,25 @@ export class FavoriteService {
 
   // GET /api/favorites — vraća sve favorite ulogovanog korisnika
   getMyFavorites(): Observable<FavoriteDto[]> {
-    return this.http.get<FavoriteDto[]>(this.url);
+    return this.http
+      .get<FavoriteDto[] | { items?: FavoriteDto[]; data?: FavoriteDto[] }>(this.url)
+      .pipe(
+        map((response) => {
+          if (Array.isArray(response)) {
+            return response;
+          }
+
+          if (Array.isArray(response?.items)) {
+            return response.items;
+          }
+
+          if (Array.isArray(response?.data)) {
+            return response.data;
+          }
+
+          return [];
+        }),
+      );
   }
 
   // POST /api/favorites

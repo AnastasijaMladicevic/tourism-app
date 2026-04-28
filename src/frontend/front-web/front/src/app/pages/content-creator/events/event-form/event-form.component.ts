@@ -2,6 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
+  DestroyRef,
   ElementRef,
   NgZone,
   OnDestroy,
@@ -13,6 +14,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, forkJoin, map, of } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import * as L from 'leaflet';
 import { AuthService } from '../../../../services/auth.service';
 import { DestinationDto, DestinationService } from '../../../../services/destination.service';
@@ -52,6 +54,7 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly ngZone = inject(NgZone);
+  private readonly destroyRef = inject(DestroyRef);
 
   @ViewChild('eventMap') private eventMap?: ElementRef<HTMLDivElement>;
 
@@ -155,8 +158,8 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly tags = ['Outdoor', 'Live Music', 'Summer'];
   pendingTag = '';
 
-  get selectedDestinationId(): number | undefined {
-    return this.parseOptionalNumber(this.form.get('destinationId')?.value);
+  get selectedDestinationId(): number | null {
+    return this.toNumber(this.form.controls.destinationId.value);
   }
 
   get filteredVenueOptions(): VenueOption[] {
@@ -217,8 +220,14 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
 
-    this.form.get('latitude')?.valueChanges.subscribe(() => this.syncMapFromForm());
-    this.form.get('longitude')?.valueChanges.subscribe(() => this.syncMapFromForm());
+    // Use takeUntilDestroyed for cleaner subscription management
+    this.form.controls.latitude.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.syncMapFromForm());
+
+    this.form.controls.longitude.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.syncMapFromForm());
   }
 
   ngAfterViewInit(): void {
@@ -238,24 +247,24 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
         catchError(() => of(this.fallbackEventTypes))
       ),
       destinations: this.destinationService
-      .getAll({ page: 1, pageSize: 200, sortBy: 'name', sortOrder: 'asc' })
-      .pipe(
-        map((response: any) => {
-          const list = Array.isArray(response) 
-            ? response 
-            : (response?.items ?? []);
-          return list.map((d: any) => ({
-            id: d.id,
-            name: d.name,
-            isActive: d.isActive ?? true,
-            destinationTypeId: d.destinationTypeId ?? 0,
-            destinationTypeName: d.destinationTypeName ?? '',
-            latitude: d.latitude,
-            longitude: d.longitude
-          } as DestinationDto));
-        }),
-        catchError(() => of(this.fallbackDestinations))
-      ),
+        .getAll({ page: 1, pageSize: 200, sortBy: 'name', sortOrder: 'asc' })
+        .pipe(
+          map((response: any) => {
+            const list = Array.isArray(response)
+              ? response
+              : (response?.items ?? []);
+            return list.map((d: any) => ({
+              id: d.id,
+              name: d.name,
+              isActive: d.isActive ?? true,
+              destinationTypeId: d.destinationTypeId ?? 0,
+              destinationTypeName: d.destinationTypeName ?? '',
+              latitude: d.latitude,
+              longitude: d.longitude
+            } as DestinationDto));
+          }),
+          catchError(() => of(this.fallbackDestinations))
+        ),
       venues: this.eventService.getObjectOptions({ page: 1, pageSize: 200, sortBy: 'name', sortOrder: 'asc' }).pipe(
         map((response) => response.items.map((item) => ({
           id: item.id,
@@ -272,7 +281,9 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
       this.destinations = destinations.length > 0 ? destinations : [...this.fallbackDestinations];
       this.venueOptions = venues.length > 0 ? venues : [...this.fallbackVenueOptions];
 
+      // Sync any existing selection with new data
       this.syncObjectSelectionWithDestination();
+      this.applyLocationFromSelection();
       this.syncMapFromForm();
 
       this.cdr.detectChanges();
@@ -310,28 +321,27 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private setupDestinationObjectSync(): void {
-    this.form.get('destinationId')?.valueChanges.subscribe(() => {
-      this.syncObjectSelectionWithDestination();
-      this.applyLocationFromSelection();
-      this.cdr.detectChanges();
-    });
-
-    this.form.get('objectId')?.valueChanges.subscribe((value) => {
-      const objectId = this.parseOptionalNumber(value);
-      if (!objectId) {
+    this.form.controls.destinationId.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.syncObjectSelectionWithDestination();
         this.applyLocationFromSelection();
-        return;
-      }
+        this.cdr.detectChanges();
+      });
 
-      this.applyLocationFromSelection();
-      this.syncMapFromForm();
-    });
+    this.form.controls.objectId.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.applyLocationFromSelection();
+        this.syncMapFromForm();
+        this.cdr.detectChanges();
+      });
   }
 
   private syncObjectSelectionWithDestination(): void {
     this.updateObjectControlState();
 
-    const selectedObjectId = this.parseOptionalNumber(this.form.get('objectId')?.value);
+    const selectedObjectId = this.toNumber(this.form.controls.objectId.value);
 
     if (selectedObjectId && !this.filteredVenueOptions.some((venue) => venue.id === selectedObjectId)) {
       this.form.patchValue({ objectId: '' }, { emitEvent: false });
@@ -341,36 +351,46 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private applyLocationFromSelection(): void {
-    const selectedObjectId = this.parseOptionalNumber(this.form.get('objectId')?.value);
-    const selectedDestinationId = this.parseOptionalNumber(this.form.get('destinationId')?.value);
+    const selectedObjectId = this.toNumber(this.form.controls.objectId.value);
+    const selectedDestinationId = this.toNumber(this.form.controls.destinationId.value);
 
-    const selectedVenue = selectedObjectId
-      ? this.venueOptions.find((venue) => venue.id === selectedObjectId)
-      : undefined;
-    const venueLat = this.parseOptionalNumber(String(selectedVenue?.latitude ?? ''));
-    const venueLng = this.parseOptionalNumber(String(selectedVenue?.longitude ?? ''));
-    if (venueLat != null && venueLng != null) {
-      this.setLocationFromSelection(venueLat, venueLng);
-      return;
+    // First priority: use venue coordinates if a venue object is selected
+    if (selectedObjectId) {
+      const selectedVenue = this.venueOptions.find((venue) => venue.id === selectedObjectId);
+      const venueLat = this.toNumber(selectedVenue?.latitude);
+      const venueLng = this.toNumber(selectedVenue?.longitude);
+      
+      if (venueLat != null && venueLng != null) {
+        this.setLocationFromSelection(venueLat, venueLng);
+        return;
+      }
     }
 
-    const selectedDestination = selectedDestinationId
-      ? this.destinations.find((destination) => destination.id === selectedDestinationId)
-      : undefined;
-    const destinationLat = selectedDestination?.latitude;
-    const destinationLng = selectedDestination?.longitude;
-    if (destinationLat != null && destinationLng != null) {
-      this.setLocationFromSelection(destinationLat, destinationLng);
+    // Second priority: use destination coordinates if a destination is selected
+    if (selectedDestinationId) {
+      const selectedDestination = this.destinations.find(
+        (destination) => destination.id === selectedDestinationId
+      );
+      const destinationLat = this.toNumber(selectedDestination?.latitude);
+      const destinationLng = this.toNumber(selectedDestination?.longitude);
+      
+      if (destinationLat != null && destinationLng != null) {
+        this.setLocationFromSelection(destinationLat, destinationLng);
+      }
     }
   }
 
   private setLocationFromSelection(latitude: number, longitude: number): void {
+    const latValue = latitude.toFixed(6);
+    const lngValue = longitude.toFixed(6);
+    
     this.form.patchValue({
-      latitude: latitude.toFixed(6),
-      longitude: longitude.toFixed(6)
+      latitude: latValue,
+      longitude: lngValue
     }, { emitEvent: false });
 
     this.updateMapMarker(latitude, longitude);
+    this.cdr.detectChanges();
   }
 
   private updateObjectControlState(): void {
@@ -438,8 +458,11 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
       tagsInput: ''
     });
 
+    // Sync the selection and map display
     this.syncObjectSelectionWithDestination();
+    this.applyLocationFromSelection();
     this.syncMapFromForm();
+    this.cdr.detectChanges();
   }
 
   submit(): void {
@@ -457,7 +480,7 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
     // Combine startDate + startTime into ISO 8601 UTC datetime
     const startDateTime = this.combineDateAndTime(formValue.startDate, formValue.startTime);
     // Combine endDate + endTime into ISO 8601 UTC datetime
-    const endDateTime = formValue.endDate 
+    const endDateTime = formValue.endDate
       ? this.combineDateAndTime(formValue.endDate, formValue.endTime)
       : undefined;
 
@@ -662,10 +685,10 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const time = timeStr || '00:00';
     const combined = `${dateStr}T${time}:00`;
-    
+
     // Parse as local time, then convert to UTC ISO string
     const date = new Date(combined);
-    
+
     // Return ISO string with Z suffix to indicate UTC
     return date.toISOString();
   }
@@ -712,17 +735,12 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private parseRequiredNumber(value: string | null | undefined): number {
-    const parsed = Number.parseInt(value ?? '', 10);
-    return Number.isNaN(parsed) ? 0 : parsed;
+    const parsed = this.toNumber(value);
+    return parsed ?? 0;
   }
 
   private parseOptionalNumber(value: string | null | undefined): number | undefined {
-    if (!value) {
-      return undefined;
-    }
-
-    const parsed = Number(value);
-    return Number.isNaN(parsed) ? undefined : parsed;
+    return this.toNumber(value) ?? undefined;
   }
 
   private formatDateOnlyForInput(date: string | Date | undefined): string {
@@ -839,8 +857,8 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    const latitude = this.parseOptionalNumber(this.form.get('latitude')?.value);
-    const longitude = this.parseOptionalNumber(this.form.get('longitude')?.value);
+    const latitude = this.toNumber(this.form.controls.latitude.value);
+    const longitude = this.toNumber(this.form.controls.longitude.value);
     const center: L.LatLngExpression = latitude != null && longitude != null
       ? [latitude, longitude]
       : this.defaultMapCenter;
@@ -856,9 +874,10 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
       keyboard: true
     }).setView(center, zoom);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; OpenStreetMap contributors'
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+      subdomains: 'abcd',
+      maxZoom: 19
     }).addTo(this.map);
 
     this.map.on('click', (event: L.LeafletMouseEvent) => {
@@ -867,8 +886,8 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private syncMapFromForm(): void {
-    const latitude = this.parseOptionalNumber(this.form.get('latitude')?.value);
-    const longitude = this.parseOptionalNumber(this.form.get('longitude')?.value);
+    const latitude = this.toNumber(this.form.controls.latitude.value);
+    const longitude = this.toNumber(this.form.controls.longitude.value);
 
     if (latitude == null || longitude == null) {
       return;
@@ -914,5 +933,13 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const targetZoom = Math.max(this.map.getZoom(), 15);
     this.map.flyTo([latitude, longitude], targetZoom, { duration: 0.8 });
+  }
+  private toNumber(value: number | string | null | undefined): number | null {
+    if (value == null || value === '') {
+      return null;
+    }
+
+    const parsed = typeof value === 'number' ? value : Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
   }
 }

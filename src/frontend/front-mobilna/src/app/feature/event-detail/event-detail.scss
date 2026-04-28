@@ -78,9 +78,30 @@ button:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   color: var(--emperor);
   z-index: 10;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    color 0.2s,
+    background-color 0.2s,
+    box-shadow 0.2s;
+
+  &:hover {
+    transform: scale(1.08);
+  }
+
+  &:disabled {
+    opacity: 0.75;
+    cursor: default;
+  }
 }
 .fav-btn--active {
   color: #e74c3c;
+  background: #fff1f1;
+  box-shadow: 0 8px 18px rgba(231, 76, 60, 0.18);
+
+  mat-icon {
+    animation: heart-pop 0.35s ease;
+  }
 }
 /* desktop verzija sakrivena po defaultu */
 .fav-btn--desktop {
@@ -105,6 +126,12 @@ button:hover {
     margin-top: -10px;
     margin-bottom: 5px;
   }
+}
+
+@keyframes heart-pop {
+  0% { transform: scale(0.8); }
+  45% { transform: scale(1.2); }
+  100% { transform: scale(1); }
 }
 .content {
   display: flex;
@@ -734,4 +761,40 @@ button:hover {
   .title {
     font-size: 32px;
   }
+}
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 0;
+}
+
+
+.loading-content p {
+  margin: 0;
+  font-size: 16px;
+  color: var(--text-gray);
+  font-weight: 500;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }

@@ -97,7 +97,7 @@ export class ObjectService {
   constructor(
     private readonly http: HttpClient,
     private readonly activeRegionService: ActiveRegionService,
-  ) {}
+  ) { }
 
   private addLang(params: HttpParams, options?: RegionRequestOptions): HttpParams {
     if (options?.bypassLanguage) {

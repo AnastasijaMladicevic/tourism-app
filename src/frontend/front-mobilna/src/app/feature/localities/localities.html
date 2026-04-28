@@ -1,0 +1,172 @@
+<div class="screen">
+  <div class="header">
+    <button class="icon-btn" (click)="goBack()" aria-label="Go back">
+      <mat-icon>arrow_back_ios</mat-icon>
+    </button>
+    <h1 class="header__title">Localities</h1>
+  </div>
+
+  <div class="filters-row">
+    <div class="filters-right">
+      <div class="search-inline">
+        <mat-icon>search</mat-icon>
+        <input
+          type="text"
+          placeholder="Search localities..."
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearchChange()"
+        />
+      </div>
+      <div class="list-controls">
+      <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+          @for (size of pageSizeOptions; track $index) {
+            <option [value]="size">
+              {{ size }}
+            </option>
+          }
+        </select>
+      </div>
+      
+      <div
+        class="sort-anchor sort-trigger"
+        (click)="$event.stopPropagation(); showSortMenu = !showSortMenu"
+      >
+        <span>{{ sortLabel() }}</span>
+        <mat-icon>expand_more</mat-icon>
+
+        @if (showSortMenu) {
+          <div class="sort-menu sort-anchor">
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'distance'"
+              (click)="setSort('distance')"
+            >
+              <mat-icon>near_me</mat-icon> Nearest
+            </button>
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'az'"
+              (click)="setSort('az')"
+            >
+              <mat-icon>sort_by_alpha</mat-icon> A -> Z
+            </button>
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'za'"
+              (click)="setSort('za')"
+            >
+              <mat-icon>sort_by_alpha</mat-icon> Z -> A
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="filters-scroll">
+      <button
+        class="filter-btn"
+        [class.filter-btn--active]="activeFilter === 'All'"
+        (click)="setFilter('All')"
+      >
+        All
+      </button>
+      @for (type of localityTypes; track type.id) {
+        <button
+          class="filter-btn"
+          [class.filter-btn--active]="activeFilter === type.name"
+          (click)="setFilter(type.name)"
+        >
+          {{ type.name }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="results-bar">
+    <span class="results-bar__count">{{ totalCount }} objects found</span>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-screen">
+      <div class="loading-content">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+      </div>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="error-state">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ errorMessage }}</p>
+      <button (click)="loadData()">Retry</button>
+    </div>
+  }
+
+  <div class="grid">
+    @for (locality of visibleLocalities; track locality.id) {
+      <div class="card">
+        <div class="card__image-wrap">
+          @if (getMainImage(locality)) {
+            <img
+              class="card__image"
+              [src]="getMainImage(locality)"
+              [alt]="locality.name"
+              loading="lazy"
+              decoding="async"
+              (error)="onImageError($event)"
+              title="Image URL: {{ getMainImage(locality) }}"
+            />
+          }
+
+          @if (!getMainImage(locality)) {
+            <div class="card__image card__image--empty">
+              <mat-icon>landscape</mat-icon>
+            </div>
+          }
+
+          @if (getDistanceText(locality)) {
+            <span class="card__distance">
+              <mat-icon>radio_button_checked</mat-icon>
+              {{ getDistanceText(locality) }}
+            </span>
+          }
+
+          <button
+            class="card__fav"
+            [class.card__fav--active]="locality.isFavorite"
+            (click)="toggleFavorite(locality, $event)"
+          >
+            <mat-icon>{{ locality.isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
+          </button>
+        </div>
+
+        <div class="card__body">
+          <h2 class="card__name">{{ locality.name }}</h2>
+
+          <p class="card__type"><mat-icon>place</mat-icon> {{ locality.localityTypeName }}</p>
+
+          <p class="card__desc">{{ locality.description }}</p>
+
+          <div class="card__footer">
+            <span></span>
+            <button class="card__details" (click)="viewDetails(locality)">VIEW DETAILS</button>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (totalCount === 0 && !isLoading) {
+      <div class="empty">
+        <mat-icon>search_off</mat-icon>
+        <p>No localities found.</p>
+      </div>
+    }
+  </div>
+
+  <div class="pagination">
+    <button mat-button (click)="prevPage()" [disabled]="currentPage === 1">Prev</button>
+    <span>Page {{ currentPage }} of {{ totalPages }}</span>
+    <button mat-button (click)="nextPage()" [disabled]="!hasNextPage">Next</button>
+  </div>
+</div>

@@ -51,7 +51,7 @@ export class EventsComponent implements OnInit {
   pageSize = 8;
   hasNextPage = false;
   totalCount = 0;
-
+  pageSizeOptions = [8, 12, 16, 24, 32];
   ngOnInit(): void {
     this.loadEvents();
   }
@@ -102,7 +102,11 @@ export class EventsComponent implements OnInit {
 
     return list;
   }
-
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.currentPage = 1;
+    void this.refreshVisibleEvents();
+  }
   setCategory(category: EventCategory): void {
     this.activeCategory = category;
     this.currentPage = 1;
@@ -162,73 +166,73 @@ export class EventsComponent implements OnInit {
   }
 
   private loadEvents(): void {
-  this.isLoading = true;
+    this.isLoading = true;
 
-  this.eventService.getAll().subscribe({
-    next: async (events) => {
-      try {
-        const eventList = this.toArray<EventDto>(events).map((event) =>
-          this.normalizeEvent(event),
-        );
+    this.eventService.getAll().subscribe({
+      next: async (events) => {
+        try {
+          const eventList = this.toArray<EventDto>(events).map((event) =>
+            this.normalizeEvent(event),
+          );
 
-        const active = eventList
-          .filter((event) => event.id > 0 && event.isActive !== false)
-          .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+          const active = eventList
+            .filter((event) => event.id > 0 && event.isActive !== false)
+            .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
 
-        const now = new Date();
-        const futureOnly = active.filter((event) => new Date(event.startDate) >= now);
-        const source = futureOnly.length ? futureOnly : active;
+          const now = new Date();
+          const futureOnly = active.filter((event) => new Date(event.startDate) >= now);
+          const source = futureOnly.length ? futureOnly : active;
 
-        this.events = await Promise.all(
-          source.map(async (event) => {
-            let imageUrl: string | undefined = undefined;
+          this.events = await Promise.all(
+            source.map(async (event) => {
+              let imageUrl: string | undefined = undefined;
 
-            try {
-              const images = await this.imageService.getForEvent(event.id).toPromise();
-              if (images && images.length > 0) {
-                const main = images.find((i) => i.isMain) ?? images[0];
-                imageUrl = this.resolveMediaUrl(main.url);
+              try {
+                const images = await this.imageService.getForEvent(event.id).toPromise();
+                if (images && images.length > 0) {
+                  const main = images.find((i) => i.isMain) ?? images[0];
+                  imageUrl = this.resolveMediaUrl(main.url);
+                }
+              } catch {
+                imageUrl = undefined;
               }
-            } catch {
-              imageUrl = undefined;
-            }
 
-            return {
-              id: event.id,
-              title: event.name,
-              category: this.normalizeCategory(event.eventTypeName),
-              dateText: this.formatDate(event.startDate),
-              timeText: this.formatTimeRange(event.startDate, event.endDate),
-              location: event.localityName ?? event.destinationName ?? 'Montenegro',
-              priceText: this.formatPrice(event.price),
-              imageUrl,
-              attendeesText: event.maxVisitors
-                ? `Max ${event.maxVisitors} visitors`
-                : 'No attendee data',
-            };
-          })
-        );
-        this.refreshVisibleEvents();
-      } catch {
+              return {
+                id: event.id,
+                title: event.name,
+                category: this.normalizeCategory(event.eventTypeName),
+                dateText: this.formatDate(event.startDate),
+                timeText: this.formatTimeRange(event.startDate, event.endDate),
+                location: event.localityName ?? event.destinationName ?? 'Montenegro',
+                priceText: this.formatPrice(event.price),
+                imageUrl,
+                attendeesText: event.maxVisitors
+                  ? `Max ${event.maxVisitors} visitors`
+                  : 'No attendee data',
+              };
+            })
+          );
+          this.refreshVisibleEvents();
+        } catch {
+          this.events = [];
+          this.visibleEvents = [];
+          this.totalCount = 0;
+          this.hasNextPage = false;
+        }
+
+        this.isLoading = false;
+        this.flushUi();
+      },
+      error: () => {
         this.events = [];
         this.visibleEvents = [];
         this.totalCount = 0;
         this.hasNextPage = false;
-      }
-
-      this.isLoading = false;
-      this.flushUi();
-    },
-    error: () => {
-      this.events = [];
-      this.visibleEvents = [];
-      this.totalCount = 0;
-      this.hasNextPage = false;
-      this.isLoading = false;
-      this.flushUi();
-    },
-  });
-}
+        this.isLoading = false;
+        this.flushUi();
+      },
+    });
+  }
 
   private refreshVisibleEvents(): void {
     const filteredEvents = this.filteredEvents;

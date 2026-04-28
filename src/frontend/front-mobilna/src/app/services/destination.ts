@@ -42,7 +42,7 @@ export interface DestinationQueryParams {
   regionId?: number;
   sortBy?: string;
   sortOrder?: string;
-  lang?: string; 
+  lang?: string;
 }
 
 export interface CreateDestinationDto {
@@ -74,7 +74,7 @@ export class DestinationService {
   constructor(
     private readonly http: HttpClient,
     private readonly activeRegionService: ActiveRegionService,
-  ) {}
+  ) { }
 
   private addLang(params: HttpParams, options?: RegionRequestOptions): HttpParams {
     if (options?.bypassLanguage) {

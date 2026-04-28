@@ -2,7 +2,7 @@
   position: relative;
   width: 100%;
   height: 100vh;
-  overflow: hidden;
+  overflow: auto;
   font-family: 'DM Sans', sans-serif;
 }
 
@@ -33,10 +33,16 @@
   background: var(--white);
   border-radius: 14px;
   padding: 10px 14px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
   position: relative;
 
-  mat-icon { color: var(--text-gray); font-size: 18px; width: 18px; height: 18px; flex-shrink: 0; }
+  mat-icon {
+    color: var(--text-gray);
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
 
   input {
     flex: 1;
@@ -46,7 +52,10 @@
     font-family: 'DM Sans', sans-serif;
     font-size: 14px;
     color: var(--text-dark);
-    &::placeholder { color: var(--text-light); }
+
+    &::placeholder {
+      color: var(--text-light);
+    }
   }
 }
 
@@ -58,7 +67,12 @@
   display: flex;
   align-items: center;
   padding: 0;
-  mat-icon { font-size: 18px; width: 18px; height: 18px; }
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
 }
 
 .filter-icon-btn {
@@ -72,9 +86,13 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
   flex-shrink: 0;
-  &:hover { background: var(--primary-light); color: var(--primary); }
+
+  &:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+  }
 }
 
 // ─── Suggestions dropdown ──────────────────────────────────────────────────────
@@ -85,8 +103,8 @@
   right: 52px; // account for filter button
   background: var(--white);
   border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.14);
-  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  overflow: auto;
   z-index: 100;
   max-height: 320px;
   overflow-y: auto;
@@ -100,15 +118,20 @@
   cursor: pointer;
   transition: background 0.15s;
 
-  &:hover { background: var(--athens-gray); }
-  & + & { border-top: 1px solid var(--border); }
+  &:hover {
+    background: var(--athens-gray);
+  }
+
+  &+& {
+    border-top: 1px solid var(--border);
+  }
 }
 
 .suggestion-item__image {
   width: 44px;
   height: 44px;
   border-radius: 10px;
-  overflow: hidden;
+  overflow: auto;
   flex-shrink: 0;
   background: var(--athens-gray);
   display: flex;
@@ -116,8 +139,15 @@
   justify-content: center;
   color: var(--text-gray);
 
-  img { width: 100%; height: 100%; object-fit: cover; }
-  mat-icon { font-size: 20px; }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  mat-icon {
+    font-size: 20px;
+  }
 }
 
 .suggestion-item__body {
@@ -132,7 +162,7 @@
   font-weight: 600;
   color: var(--emperor);
   white-space: nowrap;
-  overflow: hidden;
+  overflow: auto;
   text-overflow: ellipsis;
 }
 
@@ -152,7 +182,10 @@
   gap: 8px;
   overflow-x: auto;
   padding-bottom: 4px;
-  &::-webkit-scrollbar { display: none; }
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .chip {
@@ -169,17 +202,24 @@
   font-weight: 500;
   color: var(--emperor);
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: background 0.2s, color 0.2s;
   white-space: nowrap;
 
-  &:hover { background: var(--primary-light); color: var(--primary); }
+  &:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+  }
 }
 
 .chip--active {
   background: var(--primary);
   color: var(--white);
-  &:hover { background: var(--primary-dark); color: var(--white); }
+
+  &:hover {
+    background: var(--primary-dark);
+    color: var(--white);
+  }
 }
 
 .route-planner {
@@ -188,16 +228,158 @@
   left: 16px;
   right: 16px;
   z-index: 10;
-  background: rgba(255,255,255,0.96);
+  background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(10px);
   border-radius: 18px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
   padding: 12px 14px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  overflow: visible;
 }
 
+.drag-handle {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+
+.route-planner__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cdk-drop-list {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.route-planner__actions-top {
+  display: flex;
+  gap: 6px;
+}
+
+.route-list {
+  display: flex;
+  overscroll-behavior: contain;
+  max-height: 60vh;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--athens-gray);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.route-item {
+  min-width: 140px;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.remove-btn {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.route-add {
+  position: relative;
+  z-index: 500;
+}
+
+.route-search-anchor {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.route-suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  z-index: 1200;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.route-suggestions>div {
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--emperor);
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: var(--athens-gray);
+  }
+}
+
+.route-controls {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .route-controls {
+    flex-direction: column;
+  }
+}
+
+/* DESKTOP */
+@media (min-width: 769px) {
+  .route-search-anchor {
+    flex: 1;
+  }
+
+  .route-controls button {
+    white-space: nowrap;
+  }
+}
+
+.route-add input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 10px;
+}
+
+.route-gps {
+  padding: 8px;
+  border-radius: 10px;
+  background: #e0f2fe;
+  cursor: pointer;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
 .route-planner__row {
   display: flex;
   align-items: center;
@@ -220,7 +402,7 @@
   font-weight: 600;
   color: var(--emperor);
   white-space: nowrap;
-  overflow: hidden;
+  overflow: auto;
   text-overflow: ellipsis;
 }
 
@@ -269,7 +451,9 @@
   flex-direction: column;
   gap: 8px;
 
-  @media (min-width: 768px) { top: 50%; }
+  @media (min-width: 768px) {
+    top: 50%;
+  }
 }
 
 .control-btn {
@@ -283,17 +467,30 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
   transition: background 0.2s, color 0.2s;
-  mat-icon { font-size: 20px; width: 20px; height: 20px; }
-  &:hover { background: var(--primary-light); color: var(--primary); }
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: var(--primary-light);
+    color: var(--primary);
+  }
 }
 
 .gps-btn {
   background: var(--primary);
   color: var(--white);
   margin-bottom: 8px;
-  &:hover { background: var(--primary-dark); color: var(--white); }
+
+  &:hover {
+    background: var(--primary-dark);
+    color: var(--white);
+  }
 }
 
 .gps-btn--active {
@@ -318,7 +515,7 @@
   background: #168AAD;
   border: 3px solid white;
   border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   position: absolute;
   z-index: 2;
 }
@@ -333,8 +530,15 @@
 }
 
 @keyframes pulse {
-  0%   { transform: scale(0.5); opacity: 1; }
-  100% { transform: scale(1.5); opacity: 0; }
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
 }
 
 // ─── Bottom card ───────────────────────────────────────────────────────────────
@@ -346,8 +550,8 @@
   z-index: 10;
   background: var(--white);
   border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  overflow: auto;
   animation: slideUp 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 
   @media (min-width: 600px) and (max-width: 1023px) {
@@ -368,8 +572,15 @@
 }
 
 @keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .bottom-card__close {
@@ -380,21 +591,32 @@
   height: 30px;
   border-radius: 50%;
   border: none;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 2;
-  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
 }
 
 .bottom-card__image-wrap {
   height: 120px;
   width: 100%;
-  @media (min-width: 600px) and (max-width: 1023px) { height: 160px; }
-  @media (min-width: 1024px) { height: 200px; }
+
+  @media (min-width: 600px) and (max-width: 1023px) {
+    height: 160px;
+  }
+
+  @media (min-width: 1024px) {
+    height: 200px;
+  }
 }
 
 .bottom-card__image {
@@ -409,11 +631,18 @@
     justify-content: center;
     background: var(--athens-gray);
     color: var(--text-light);
-    mat-icon { font-size: 40px; width: 40px; height: 40px; }
+
+    mat-icon {
+      font-size: 40px;
+      width: 40px;
+      height: 40px;
+    }
   }
 }
 
-.bottom-card__body { padding: 14px 16px 16px; }
+.bottom-card__body {
+  padding: 14px 16px 16px;
+}
 
 .bottom-card__top {
   display: flex;
@@ -423,7 +652,9 @@
   margin-bottom: 8px;
 }
 
-.bottom-card__info { flex: 1; }
+.bottom-card__info {
+  flex: 1;
+}
 
 .bottom-card__name {
   font-size: 16px;
@@ -439,7 +670,12 @@
   font-size: 12px;
   color: var(--text-gray);
   margin: 0;
-  mat-icon { font-size: 13px; width: 13px; height: 13px; }
+
+  mat-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+  }
 }
 
 .bottom-card__rating {
@@ -450,7 +686,13 @@
   font-weight: 700;
   color: var(--emperor);
   flex-shrink: 0;
-  mat-icon { font-size: 15px; width: 15px; height: 15px; color: #F5A623; }
+
+  mat-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+    color: #F5A623;
+  }
 }
 
 .bottom-card__badges {
@@ -467,10 +709,27 @@
   border-radius: 20px;
   font-size: 11.5px;
   font-weight: 700;
-  mat-icon { font-size: 12px; width: 12px; height: 12px; }
-  &--open    { background: rgba(16,185,129,0.12); color: #10b981; }
-  &--closed  { background: rgba(239,68,68,0.12);  color: #ef4444; }
-  &--distance { background: var(--athens-gray); color: var(--text-gray); }
+
+  mat-icon {
+    font-size: 12px;
+    width: 12px;
+    height: 12px;
+  }
+
+  &--open {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10b981;
+  }
+
+  &--closed {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+  }
+
+  &--distance {
+    background: var(--athens-gray);
+    color: var(--text-gray);
+  }
 }
 
 .bottom-card__actions {
@@ -525,7 +784,10 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-  &:hover { opacity: 0.9; }
+
+  &:hover {
+    opacity: 0.9;
+  }
 
   &--outline {
     background: transparent !important;
@@ -535,7 +797,10 @@
 }
 
 // ─── Leaflet routing - sakrij defaultni panel ──────────────────────────────────
-.leaflet-routing-container { display: none !important; }
+.leaflet-routing-container {
+  display: none !important;
+}
+
 .custom-type-marker {
   background: transparent !important;
   border: none !important;
@@ -562,4 +827,21 @@
   z-index: 500 !important;
 }
 
-.leaflet-popup { display: none !important; }
+.leaflet-popup {
+  display: none !important;
+}
+.directions-modal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70%;
+  background: white;
+  border-radius: 20px 20px 0 0;
+  z-index: 9999;
+}
+.route-summary {
+  font-weight: 600;
+  padding: 8px 16px;
+  border-bottom: 1px solid #eee;
+}

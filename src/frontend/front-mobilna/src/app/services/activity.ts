@@ -33,8 +33,14 @@ export interface ActivityDto {
   rejectionReason?: string;
   createdAt: string;
   updatedAt: string;
+  images?: ActivityImageDto[];
 }
-
+export interface ActivityImageDto {
+  id: number;
+  url: string;
+  altText?: string;
+  isMain: boolean;
+}
 export interface ActivityQueryParams {
   type?: string;
   destination?: string;
@@ -46,7 +52,25 @@ export interface ActivityQueryParams {
   sortBy?: string;
   sortOrder?: string;
 }
-
+export interface NearbyActivityQueryParams {
+  latitude: number;
+  longitude: number;
+  radiusMeters: number;
+  regionId?: number;
+  type?: string;
+  destination?: string;
+  search?: string;
+  page?: number;
+  pageSize?: number;
+  sortOrder?: string;
+}
+export interface PagedActivityResultDto<T> {
+  items: T[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
 @Injectable({ providedIn: 'root' })
 export class ActivityService {
   private readonly url = `${environment.apiUrl}/activities`;
@@ -54,7 +78,23 @@ export class ActivityService {
   constructor(
     private readonly http: HttpClient,
     private readonly activeRegionService: ActiveRegionService,
-  ) {}
+  ) { }
+  getNearby(
+    query: NearbyActivityQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<PagedActivityResultDto<ActivityDto>> {
+    const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options) ?? query;
+    let params = new HttpParams();
+
+    Object.entries(effectiveQuery).forEach(([key, value]) => {
+      if (value != null && value !== '') {
+        params = params.set(key, String(value));
+      }
+    });
+
+    params = this.addLang(params);
+    return this.http.get<PagedActivityResultDto<ActivityDto>>(`${this.url}/nearby`, { params });
+  }
 
   private addLang(params: HttpParams, options?: RegionRequestOptions): HttpParams {
     if (options?.bypassLanguage) {

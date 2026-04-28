@@ -1,3 +1,249 @@
-<section class="manager-page">
-  <h1>Activities</h1>
+<section class="manager-activities-page">
+  <div class="page-head">
+    <div>
+      <p class="breadcrumbs">Dashboard <span>></span> Activities</p>
+      <h1>Activities</h1>
+      <p class="subtle-text">{{ managedDestinationLabel }}</p>
+    </div>
+  </div>
+
+  <div class="toolbar card">
+    <label class="search-field" aria-label="Search activities">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        [(ngModel)]="draftSearchQuery"
+        (ngModelChange)="onSearchChange()"
+        (keydown.enter)="onSearchEnter($event)"
+        placeholder="Search activities, locations, or organizers..."
+      />
+    </label>
+
+    <!-- <button type="button" class="ghost-btn date-pill" aria-label="Status filter">
+      <span class="material-symbols-outlined">filter_alt</span>
+      Filters ready
+    </button> -->
+
+    <button type="button" class="ghost-btn" (click)="onMoreFilters()">
+      <span class="material-symbols-outlined">filter_alt</span>
+      More Filters
+    </button>
+  </div>
+
+  @if (filterPanelOpen) {
+    <div class="filters-panel card">
+      <label>
+        <span>Status</span>
+        <select [(ngModel)]="statusFilter">
+          <option value="all">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Activity Type</span>
+        <select [(ngModel)]="typeFilter" [disabled]="isLoadingFilters">
+          <option value="all">All Types</option>
+          <option *ngFor="let type of activityTypeOptions" [value]="type.id">
+            {{ type.name }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>Sort by</span>
+        <select [(ngModel)]="sortBy">
+          <option value="name">Name</option>
+          <option value="price">Price</option>
+          <option value="durationMinutes">Duration</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Order</span>
+        <select [(ngModel)]="sortOrder">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </label>
+
+      <div class="filter-actions">
+        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
+          Apply Filters
+        </button>
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  }
+
+  <div class="activity-content-grid">
+    <div class="activity-main-column">
+      <div class="stats-row">
+        <article class="stat-card" *ngFor="let stat of stats" [attr.data-tone]="stat.tone">
+          <p>{{ stat.label }}</p>
+          <strong>{{ stat.value }}</strong>
+          <span>{{ stat.hint }}</span>
+        </article>
+      </div>
+
+      <section class="activity-table-wrap card">
+        <header class="table-header">
+          <h2>{{ managedDestinationLabel }}</h2>
+        </header>
+
+        @if (isLoading) {
+          <div class="state">Loading activities...</div>
+        } @else if (errorMessage) {
+          <div class="state state-error">{{ errorMessage }}</div>
+        } @else {
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Activity Details</th>
+                  <th>Location</th>
+                  <th>Type</th>
+                  <th>Duration</th>
+                  <th>Price</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let activity of pagedActivities; trackBy: trackByActivityId"
+                  [class.active-row]="selectedActivity?.id === activity.id"
+                  (click)="onViewActivity(activity)"
+                >
+                  <td>
+                    <span class="status-chip" [ngClass]="getActivityStatusBadgeClass(activity.status)">
+                      <span class="chip-dot">●</span>
+                      {{ getActivityStatusLabel(activity.status) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="table-activity-cell">
+                      <strong>{{ activity.name }}</strong>
+                      <span>
+                        <span class="material-symbols-outlined tiny-icon">calendar_month</span>
+                        Created on {{ formatDate(activity.createdAt) }}
+                      </span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="table-activity-cell">
+                      <strong>{{ getActivityLocation(activity) }}</strong>
+                      <span>{{ getActivityLocationSub(activity) }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="category-pill">
+                      <span class="material-symbols-outlined tiny-icon">{{
+                        getActivityIcon(activity)
+                      }}</span>
+                      {{ getActivityTypeLabel(activity) }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="duration-badge">{{ getDurationLabel(activity) }}</span>
+                  </td>
+                  <td>
+                    <span class="price-badge">{{ getPriceLabel(activity) }}</span>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      title="Review activity"
+                      (click)="onEditActivity(activity); $event.stopPropagation()"
+                    >
+                      <span class="material-symbols-outlined">open_in_new</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="table-footer">
+            <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ totalCount }} activities</p>
+            <div class="pager">
+              <label class="page-size-control">
+                <span>Page size</span>
+                <select
+                  class="page-size-select"
+                  [(ngModel)]="pageSize"
+                  (ngModelChange)="onPageSizeChange($event)"
+                >
+                  <option *ngFor="let option of pageSizeOptions" [ngValue]="option">
+                    {{ option }}
+                  </option>
+                </select>
+              </label>
+
+              <button type="button" class="ghost-btn small-btn" (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
+              <button type="button" class="ghost-btn small-btn" (click)="onNextPage()" [disabled]="currentPage >= totalPages">Next</button>
+            </div>
+          </footer>
+        }
+      </section>
+    </div>
+
+    <aside class="activity-side-column card">
+      @if (selectedActivity) {
+        <div
+          class="featured-media"
+          [style.background-image]="'url(' + getDetailBanner(selectedActivity) + ')'"
+        ></div>
+        <div class="featured-copy">
+          <p class="featured-type">{{ getActivityTypeLabel(selectedActivity) }}</p>
+          <h3>{{ selectedActivity.name }}</h3>
+          <p class="featured-meta">
+            {{ getActivityLocation(selectedActivity) }} · {{ getDurationLabel(selectedActivity) }}
+          </p>
+
+          <div class="status-tooltip-wrap">
+            <span class="publish-badge" [ngClass]="getActivityStatusBadgeClass(selectedActivity.status)">
+              {{ getActivityStatusLabel(selectedActivity.status) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="detail-metrics">
+          <div>
+            <span>Duration</span>
+            <strong>{{ getDurationLabel(selectedActivity) }}</strong>
+          </div>
+          <div>
+            <span>Price</span>
+            <strong>{{ getPriceLabel(selectedActivity) }}</strong>
+          </div>
+        </div>
+
+        <!-- <section class="detail-section">
+          <div class="section-head">
+            <h4>Details</h4>
+          </div>
+
+          <div class="detail-list">
+            <article class="detail-row" *ngFor="let row of selectedMetrics">
+              <strong>{{ row.label }}</strong>
+              <span>{{ row.value }}</span>
+            </article>
+          </div>
+        </section> -->
+
+        <section class="detail-section">
+          <h4>Description</h4>
+          <p>{{ getSelectedSummary(selectedActivity) }}</p>
+        </section>
+      } @else {
+        <div class="state">No activities available.</div>
+      }
+    </aside>
+  </div>
 </section>

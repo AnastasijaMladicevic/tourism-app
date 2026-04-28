@@ -1,0 +1,260 @@
+<div class="add-planner-page">
+  <header class="add-planner-topbar">
+    <button type="button" class="back-btn" (click)="goBack()" aria-label="Back to planner">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m15 18-6-6 6-6" />
+      </svg>
+    </button>
+
+    <h1>Add Event to Planner</h1>
+
+    <div class="topbar-actions">
+      <button type="button" class="topbar-icon-btn" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 17h5l-1.4-1.4a2 2 0 0 1-.6-1.4V11a6 6 0 1 0-12 0v3.2c0 .53-.21 1.04-.59 1.41L4 17h5" />
+          <path d="M10 20a2 2 0 0 0 4 0" />
+        </svg>
+      </button>
+
+      <span class="topbar-avatar" aria-hidden="true">A</span>
+    </div>
+  </header>
+
+  <section class="add-planner-shell">
+    <div class="add-planner-layout">
+      <article class="event-preview-card">
+        <div class="event-preview-card__image-wrap">
+          <img [src]="preview.imageUrl" [alt]="preview.title" />
+
+          <div class="event-preview-card__mobile-meta">
+            <span class="event-chip">{{ preview.type }}</span>
+            <span class="rating-pill">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m12 3.6 2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 16l-4.8 2.5.9-5.4-3.9-3.8 5.4-.8Z" />
+              </svg>
+              {{ preview.rating }}
+            </span>
+          </div>
+
+          <div class="event-preview-card__desktop-overlay">
+            <div class="event-preview-card__desktop-badges">
+              <span class="event-chip event-chip--dark">{{ preview.type }}</span>
+              <span class="rating-pill rating-pill--dark">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="m12 3.6 2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 16l-4.8 2.5.9-5.4-3.9-3.8 5.4-.8Z" />
+                </svg>
+                {{ preview.rating }}
+              </span>
+            </div>
+
+            <h2>{{ preview.title }}</h2>
+            <p class="event-preview-card__desktop-location">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10Z" />
+                <circle cx="12" cy="11" r="2.5" />
+              </svg>
+              <span>{{ preview.location }}</span>
+            </p>
+            <p class="event-preview-card__desktop-description">{{ preview.description }}</p>
+          </div>
+        </div>
+
+        <div class="event-preview-card__body">
+          <h2>{{ preview.title }}</h2>
+          <p class="event-preview-card__location">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10Z" />
+              <circle cx="12" cy="11" r="2.5" />
+            </svg>
+            <span>{{ preview.location }}</span>
+          </p>
+        </div>
+      </article>
+
+      <section class="schedule-card">
+        <div class="schedule-card__header">
+          <h3>Schedule Your Event</h3>
+          <p>Fill in the details to add this event to your trip plan.</p>
+        </div>
+
+        @if (!eventId) {
+          <p class="support-hint">
+            Ovaj preview trenutno nije event. Planner za sada podrzava samo dodavanje eventova.
+          </p>
+        }
+
+        <div class="field-grid">
+          <label class="field-card field-card--full">
+            <span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="4" y="5" width="16" height="15" rx="2" />
+                <path d="M8 3v4" />
+                <path d="M16 3v4" />
+                <path d="M4 10h16" />
+              </svg>
+              Travel Date
+            </span>
+
+            <div class="field-card__surface">
+              <input
+                type="date"
+                [ngModel]="travelDate()"
+                (ngModelChange)="onTravelDateChange($event)"
+              />
+            </div>
+
+            <small>{{ selectedDateLabel() }}</small>
+          </label>
+        </div>
+
+        <div class="calendar-strip">
+          @for (day of days(); track day.id) {
+            <button
+              type="button"
+              class="calendar-pill"
+              [class.calendar-pill--active]="selectedDayId() === day.id"
+              (click)="selectDay(day)"
+            >
+              <span>{{ day.label }}</span>
+              <strong>{{ day.date }}</strong>
+            </button>
+          }
+        </div>
+
+        <div class="field-grid field-grid--split">
+          <label class="field-card">
+            <span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="8" />
+                <path d="M12 8v4l3 2" />
+              </svg>
+              Start Time
+            </span>
+
+            <div class="field-card__surface">
+              <input type="time" [ngModel]="startTime()" (ngModelChange)="startTime.set($event)" />
+            </div>
+          </label>
+
+          <div class="field-card field-card--muted">
+            <span>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="8" />
+                <path d="M12 8v4l3 2" />
+              </svg>
+              End Time
+            </span>
+
+            <div class="field-card__surface field-card__surface--readonly">
+              <strong>{{ estimatedEndLabel() }}</strong>
+            </div>
+          </div>
+        </div>
+
+        @if (conflictMessage()) {
+          <article class="warning-card">
+            <div class="warning-card__icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 9v4" />
+                <path d="M12 17h.01" />
+                <path d="M10.3 3.8 1.8 18.2A2 2 0 0 0 3.5 21h17a2 2 0 0 0 1.7-2.8L13.7 3.8a2 2 0 0 0-3.4 0Z" />
+              </svg>
+            </div>
+            <div>
+              <strong>Time Conflict Detected</strong>
+              <p>{{ conflictMessage() }}</p>
+            </div>
+          </article>
+        }
+
+        <div class="duration-block">
+          <div class="duration-block__head">
+            <h4>Estimated Duration</h4>
+            <span>{{ durationLabel() }}</span>
+          </div>
+
+          <input
+            type="range"
+            min="30"
+            max="300"
+            step="30"
+            class="duration-slider"
+            [ngModel]="durationMinutes()"
+            (ngModelChange)="durationMinutes.set(+$event)"
+          />
+
+          <div class="duration-marks">
+            <span>30m</span>
+            <span>1h</span>
+            <span>2h</span>
+            <span>3h</span>
+            <span>4h+</span>
+          </div>
+
+          <label class="field-card field-card--full field-card--desktop-select">
+            <span>Duration</span>
+            <div class="field-card__surface">
+              <select [ngModel]="durationMinutes()" (ngModelChange)="durationMinutes.set(+$event)">
+                @for (minutes of durationOptions; track minutes) {
+                  <option [ngValue]="minutes">{{ formatDuration(minutes) }}</option>
+                }
+              </select>
+            </div>
+          </label>
+        </div>
+
+        <article class="priority-card">
+          <div class="priority-card__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m12 3.6 2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 16l-4.8 2.5.9-5.4-3.9-3.8 5.4-.8Z" />
+            </svg>
+          </div>
+
+          <div class="priority-card__copy">
+            <strong>Mark as Priority</strong>
+            <p>Highlight it in your planner overview and schedule.</p>
+          </div>
+
+          <button
+            type="button"
+            class="toggle-btn"
+            [class.toggle-btn--active]="isPriority()"
+            (click)="togglePriority()"
+            aria-label="Toggle priority"
+          >
+            <span></span>
+          </button>
+        </article>
+
+        <label class="notes-field">
+          <span>Additional Notes</span>
+          <textarea
+            rows="4"
+            placeholder="e.g. Bring extra camera batteries, meet at the North Gate..."
+            [ngModel]="notes()"
+            (ngModelChange)="notes.set($event)"
+          ></textarea>
+        </label>
+
+        <div class="schedule-actions">
+          <button type="button" class="save-btn" [disabled]="isSaving()" (click)="save()">
+            {{ isSaving() ? 'Saving...' : 'Save to Planner' }}
+          </button>
+          <button type="button" class="cancel-btn" (click)="goBack()">Cancel</button>
+        </div>
+
+        @if (feedback()) {
+          <p class="form-feedback">{{ feedback() }}</p>
+        }
+      </section>
+    </div>
+  </section>
+
+  <footer class="add-planner-footer">
+    <span>SpireGO Planner &#169; 2024</span>
+    <div>
+      <a routerLink="/support">Help Center</a>
+      <a routerLink="/terms">Terms of Service</a>
+    </div>
+  </footer>
+</div>

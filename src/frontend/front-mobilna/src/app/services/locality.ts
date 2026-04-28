@@ -22,8 +22,14 @@ export interface LocalityDto {
   localityTypeName: string;
   createdByUserId?: number;
   createdAt: string;
+  images?: LocalityImageDto[];
 }
-
+export interface LocalityImageDto {
+  id: number;
+  url: string;
+  altText?: string;
+  isMain: boolean;
+}
 export interface LocalityQueryParams {
   type?: string;
   destination?: string;
@@ -34,6 +40,25 @@ export interface LocalityQueryParams {
   sortBy?: string;
   sortOrder?: string;
 }
+export interface NearbyLocalityQueryParams {
+  latitude: number;
+  longitude: number;
+  radiusMeters: number;
+  regionId?: number;
+  type?: string;
+  destination?: string;
+  search?: string;
+  page?: number;
+  pageSize?: number;
+  sortOrder?: string;
+}
+export interface PagedLocalityResultDto<T> {
+  items: T[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
 
 @Injectable({ providedIn: 'root' })
 export class LocalityService {
@@ -42,8 +67,23 @@ export class LocalityService {
   constructor(
     private readonly http: HttpClient,
     private readonly activeRegionService: ActiveRegionService,
-  ) {}
+  ) { }
+  getNearby(
+    query: NearbyLocalityQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<PagedLocalityResultDto<LocalityDto>> {
+    const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options) ?? query;
+    let params = new HttpParams();
 
+    Object.entries(effectiveQuery).forEach(([key, value]) => {
+      if (value != null && value !== '') {
+        params = params.set(key, String(value));
+      }
+    });
+
+    params = this.addLang(params);
+    return this.http.get<PagedLocalityResultDto<LocalityDto>>(`${this.url}/nearby`, { params });
+  }
   private addLang(params: HttpParams): HttpParams {
     const lang = localStorage.getItem('appLanguage') || 'sr';
     return params.set('Lang', lang);

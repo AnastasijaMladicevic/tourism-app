@@ -1,0 +1,202 @@
+<div class="screen">
+  <div class="header">
+    <button class="icon-btn" (click)="goBack()">
+      <mat-icon>arrow_back_ios</mat-icon>
+    </button>
+    <h1 class="header__title">Activity</h1>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-screen">
+      <div class="loading-content">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+      </div>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="error-state">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ errorMessage }}</p>
+      <button (click)="goBack()">Back</button>
+    </div>
+  }
+
+  @if (activity) {
+    <div class="hero">
+      @if (mainImage) {
+        <img [src]="mainImage" [alt]="activity.name" />
+      } @else {
+        <div class="hero-placeholder">
+          <mat-icon>place</mat-icon>
+        </div>
+      }
+
+      <button class="fav-btn" (click)="toggleFavorite()">
+        <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
+      </button>
+    </div>
+  }
+
+  <div class="content">
+    <div class="left">
+      <div class="card">
+        <div class="title-row">
+          <h1 class="title">{{ activity?.name }}</h1>
+          <button
+            class="fav-btn fav-btn--desktop"
+            (click)="toggleFavorite()"
+            [class.fav-btn--active]="isFavorite"
+          >
+            <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
+          </button>
+        </div>
+        @if (activity?.regionName && activity?.destinationName) {
+          <p class="location-bold">{{ activity?.destinationName }}, {{ activity?.regionName }}</p>
+        } @else if (activity?.destinationName) {
+          <p class="location-bold">{{ activity?.destinationName }}</p>
+        } @else if (activity?.regionName) {
+          <p class="location-bold">{{ activity?.regionName }}</p>
+        }
+
+        @if (activity?.localityName) {
+          <p class="venue"><mat-icon>location_on</mat-icon>{{ activity?.localityName }}</p>
+        }
+      </div>
+
+      <div class="card">
+        <h2>About</h2>
+        <p class="description">
+          {{ activity?.description || 'No description available' }}
+        </p>
+      </div>
+
+      <div class="section">
+        <div class="card gallery-card">
+          <div class="gallery-header">
+            <h2>Gallery</h2>
+            <button class="see-all-btn" (click)="openGallery(0)">See all ></button>
+          </div>
+
+          <div class="gallery-scroll">
+            @for (img of images; track img.id; let i = $index) {
+              <div class="gallery-item" (click)="openGallery(i)">
+                <img [src]="img.url" [alt]="img.altText || ''" (error)="onImageError($event)" />
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="card">
+        <h2>Location</h2>
+
+        <div class="location-image" [attr.data-name]="activity?.localityName || 'N/A'">
+          <app-map
+            [lat]="activity?.latitude || 42.424"
+            [lng]="activity?.longitude || 18.771"
+            [interactive]="false"
+          >
+          </app-map>
+          <button class="map-btn-overlay" (click)="viewOnMap()">View on map</button>
+        </div>
+      </div>
+      <div class="card nearby-card">
+        <div class="nearby-header">
+          <h2>Nearby activities</h2>
+        </div>
+
+        @if (nearbyActivities.length > 0) {
+          <div class="nearby-list">
+            @for (nearbyActivity of nearbyActivities; track nearbyActivity.id) {
+              <article class="nearby-item" (click)="openNearbyActivity(nearbyActivity.id)">
+                <div class="nearby-item__image">
+                  @if (getNearbyActivityImage(nearbyActivity); as nearbyImage) {
+                    <img
+                      [src]="nearbyImage"
+                      [alt]="nearbyActivity.name"
+                      (error)="onImageError($event)"
+                    />
+                  } @else {
+                    <div class="nearby-item__placeholder">
+                      <mat-icon>celebration</mat-icon>
+                    </div>
+                  }
+                </div>
+
+                <div class="nearby-item__body">
+                  <h3>{{ nearbyActivity.name }}</h3>
+                  <p class="nearby-item__location">
+                    <mat-icon>location_on</mat-icon>
+                    <span>{{
+                      nearbyActivity.objectName ||
+                        nearbyActivity.localityName ||
+                        nearbyActivity.destinationName ||
+                        'Lokacija nije dostupna'
+                    }}</span>
+                  </p>
+                </div>
+              </article>
+            }
+          </div>
+        } @else {
+          <div class="nearby-empty">No activities nearby</div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+@if (showGalleryModal && images.length > 0) {
+  <div class="gallery-modal" (click)="closeGallery()">
+    <div class="modal-content" (click)="$event.stopImmediatePropagation()">
+      <button class="modal-close" (click)="closeGallery()">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <div
+        class="modal-image-container"
+        (touchstart)="onTouchStart($event)"
+        (touchend)="onTouchEnd($event)"
+      >
+        @if (images[currentImageIndex]) {
+          <img
+            [src]="images[currentImageIndex]?.url"
+            [alt]="images[currentImageIndex]?.altText || ''"
+          />
+        }
+      </div>
+
+      <button class="modal-nav modal-nav-left" (click)="prevImage()">
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <button class="modal-nav modal-nav-right" (click)="nextImage()">
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+
+      <div class="modal-thumbnails">
+        @for (img of images; track img.id; let i = $index) {
+          <img
+            [src]="img.url"
+            [class.active]="i === currentImageIndex"
+            (click)="currentImageIndex = i; $event.stopImmediatePropagation()"
+          />
+        }
+      </div>
+
+      <div class="modal-dots">
+        @for (img of images; track img.id; let i = $index) {
+          <span
+            class="dot"
+            [class.active]="i === currentImageIndex"
+            (click)="currentImageIndex = i; $event.stopImmediatePropagation()"
+          >
+          </span>
+        }
+      </div>
+    </div>
+  </div>
+}

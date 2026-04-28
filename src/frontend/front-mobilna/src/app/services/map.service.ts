@@ -9,7 +9,9 @@ export class MapService {
   private activeRegularMarker: L.Marker | null = null;
   private map: L.Map | null = null;
   private activeFilters: string[] = [];
-
+  getMap(): L.Map | null {
+    return this.map;
+  }
   addMainMapMarker(lat: number, lng: number, popupText: string = ''): L.Marker | null {
     if (!this.map) {
       console.error('Mapa nije inicijalizovana');
@@ -204,26 +206,39 @@ export class MapService {
     this.updateMarkerFocus(null);
     this.syncVisibleMarkers();
   }
-
+  private filterMap: Record<string, string[]> = {
+    food: ['restaurant', 'kafana', 'fast_food', 'bar', 'cafe', 'winery'],
+    accommodation: ['hotel', 'apartment', 'motel'],
+    fuel: ['gas_station'],
+    shopping: ['shop', 'mall'],
+    health: ['hospital', 'clinic'],
+    activity: ['activity'],
+  locality: ['locality']
+  };
   setActiveFilters(filters: string[]): void {
     this.activeFilters = [...filters];
     this.syncVisibleMarkers();
   }
 
-  syncVisibleMarkers(): void {
+    syncVisibleMarkers(): void {
     if (!this.map) {
       return;
     }
 
     const bounds = this.map.getBounds().pad(0.35);
-    const visibleEntries = new Map<string, { marker: L.Marker; data: any; type: string; lat: number; lng: number }>();
+
+    const visibleEntries = new Map<
+      string,
+      { marker: L.Marker; data: any; type: string; lat: number; lng: number }
+    >();
 
     this.markerMap.forEach((entry, key) => {
-      const shouldConsider =
-        this.matchesCurrentFilters(entry.type) &&
-        (key === this.activeMarkerKey || bounds.contains([entry.lat, entry.lng]));
 
-      if (shouldConsider) {
+      const inFilter = this.matchesCurrentFilters(entry.type);
+      const inBounds = bounds.contains([entry.lat, entry.lng]);
+      const isActive = key === this.activeMarkerKey;
+
+      if (inFilter && (isActive || inBounds)) {
         visibleEntries.set(key, entry);
       }
     });
@@ -238,8 +253,10 @@ export class MapService {
         if (!this.map!.hasLayer(marker)) {
           marker.addTo(this.map!);
         }
-      } else if (this.map!.hasLayer(marker)) {
-        marker.remove();
+      } else {
+        if (this.map!.hasLayer(marker)) {
+          marker.remove();
+        }
       }
     });
   }
@@ -268,9 +285,16 @@ export class MapService {
   }
 
   private matchesCurrentFilters(type: string): boolean {
-    return this.activeFilters.length === 0 || this.activeFilters.includes(type);
-  }
 
+  // ako nema filtera → sve prolazi
+  if (!this.activeFilters || this.activeFilters.length === 0) {
+    return true;
+  }
+  // proveri da li marker type pripada nekom aktivnom filteru
+  return this.activeFilters.some(filter =>
+    this.filterMap[filter]?.includes(type)
+  );
+}
   private selectRepresentativeMarkerKeys(
     visibleEntries: Map<string, { marker: L.Marker; data: any; type: string; lat: number; lng: number }>,
   ): Set<string> {

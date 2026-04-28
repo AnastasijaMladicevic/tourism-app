@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 
 import {
   EventDto,
@@ -12,6 +12,7 @@ import {
 } from '../../services/event';
 import { ImageDto, ImageService } from '../../services/image';
 import { AuthService } from '../../services/auth';
+import { FavoriteStateService, FavoriteTarget } from '../../services/favorite-state';
 import { MapComponent } from '../../shared/components/map/map';
 import { TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -33,6 +34,8 @@ export class EventDetailComponent implements OnInit {
   isLoading = true;
   errorMessage = '';
   isFavorite = false;
+  favoriteId?: number;
+  isFavoriteBusy = false;
 
   showGalleryModal = false;
   currentImageIndex = 0;
@@ -46,6 +49,7 @@ export class EventDetailComponent implements OnInit {
     private eventService: EventService,
     private imageService: ImageService,
     private authService: AuthService,
+    private favoriteStateService: FavoriteStateService,
     private cdr: ChangeDetectorRef,
     private translationService: TranslationService,
   ) {}
@@ -63,6 +67,7 @@ export class EventDetailComponent implements OnInit {
         this.event = normalizedEvent;
         this.images = images || [];
         this.mainImage = this.getMainImage(this.images, normalizedEvent);
+        this.syncFavoriteState();
 
         this.loadNearbyEvents(normalizedEvent);
       },
@@ -149,6 +154,7 @@ export class EventDetailComponent implements OnInit {
       eventTypeName: String(dto['eventTypeName'] ?? dto['EventTypeName'] ?? ''),
       localityName: (dto['localityName'] ?? dto['LocalityName'] ?? undefined) as string | undefined,
       destinationName: (dto['destinationName'] ?? dto['DestinationName'] ?? undefined) as string | undefined,
+      destinationId: this.readOptionalNumber(dto, ['destinationId', 'DestinationId']),
       objectId: this.readOptionalNumber(dto, ['objectId', 'ObjectId']),
       objectName: (dto['objectName'] ?? dto['ObjectName'] ?? undefined) as string | undefined,
       images: ((dto['images'] ?? dto['Images'] ?? []) as EventDto['images']) || [],
@@ -205,7 +211,54 @@ export class EventDetailComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-    this.isFavorite = !this.isFavorite;
+
+    const target = this.getFavoriteTarget();
+    if (!target || this.isFavoriteBusy) {
+      return;
+    }
+
+    this.isFavoriteBusy = true;
+    this.favoriteStateService.toggle(target, this.favoriteId).subscribe({
+      next: (state) => {
+        this.isFavorite = state.isFavorite;
+        this.favoriteId = state.favoriteId;
+      },
+      error: () => {
+        this.isFavoriteBusy = false;
+        this.cdr.detectChanges();
+      },
+      complete: () => {
+        this.isFavoriteBusy = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  private syncFavoriteState(): void {
+    const target = this.getFavoriteTarget();
+    if (!target || !this.authService.isLoggedIn()) {
+      return;
+    }
+
+    this.favoriteStateService.loadFavorites(true).pipe(catchError(() => of(new Map<string, number>()))).subscribe(() => {
+      const stateful = { isFavorite: this.isFavorite, favoriteId: this.favoriteId };
+      this.favoriteStateService.applyToItem(stateful, target);
+      this.isFavorite = stateful.isFavorite;
+      this.favoriteId = stateful.favoriteId;
+      this.cdr.detectChanges();
+    });
+  }
+
+  private getFavoriteTarget(): FavoriteTarget | null {
+    if (this.event?.objectId) {
+      return { type: 'object', entityId: this.event.objectId };
+    }
+
+    if (this.event?.destinationId) {
+      return { type: 'destination', entityId: this.event.destinationId };
+    }
+
+    return null;
   }
 
   onImageError(event: Event): void {
@@ -229,7 +282,21 @@ export class EventDetailComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-    alert(this.translationService.translate('event.addedToPlanner'));
+    this.router.navigate(['/planner/add'], {
+      state: {
+        eventId: this.event?.id,
+        title: this.event?.name || 'Event',
+        location:
+          [this.event?.localityName, this.event?.destinationName].filter(Boolean).join(', ') ||
+          this.event?.objectName ||
+          'Montenegro',
+        type: this.event?.eventTypeName || 'Dogadjaj',
+        imageUrl: this.mainImage || this.resolveMediaUrl(this.event?.mainImageUrl),
+        description: this.event?.description,
+        startDate: this.event?.startDate,
+        endDate: this.event?.endDate,
+      },
+    });
   }
 
   buyTicket(): void {
