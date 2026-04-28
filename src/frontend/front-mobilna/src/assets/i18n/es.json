@@ -224,6 +224,16 @@
     "weekend": "Sábado - Domingo",
     "chatNote": "* El tiempo medio de respuesta en chat es inferior a 5 minutos.",
     "ticketNote": "* Las respuestas a los problemas reportados llegan en 24 horas.",
+    "aiTitle": "Asistente turistico con IA",
+    "aiBody": "Haz una pregunta en lenguaje natural y el asistente buscara primero en el contenido de la aplicacion antes de responder.",
+    "aiPlaceholder": "Por ejemplo: donde puedo ir a pasear con ninos?",
+    "aiSend": "Enviar pregunta",
+    "aiThinking": "La IA esta buscando las mejores sugerencias...",
+    "aiEmpty": "Todavia no hay mensajes. Prueba con un restaurante, hotel, paseo o evento.",
+    "aiError": "La respuesta de la IA no esta disponible ahora mismo. Intentalo de nuevo en unos segundos.",
+    "aiPromptWalk": "Paseo con ninos",
+    "aiPromptLunch": "Restaurante para almorzar",
+    "aiPromptHotel": "Hotel con piscina",
     "faq": {
       "1": {
         "q": "¿Cómo actualizo la información de mi perfil?",

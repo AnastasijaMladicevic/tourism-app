@@ -18,6 +18,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.Configure<OllamaOptions>(builder.Configuration.GetSection("Ollama"));
+builder.Services.AddHttpClient();
 builder.Services.Configure<FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 5 * 1024 * 1024;
@@ -80,6 +82,7 @@ builder.Services.AddScoped<IManagerReportService, ManagerReportService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<ISmartSearchService, SmartSearchService>();
+builder.Services.AddScoped<IAiChatService, AiChatService>();
 builder.Services.AddScoped<ITranslationService, TranslationService>();
 builder.Services.AddScoped<IExternalTranslationProvider, ArgosTranslateProvider>();
 
@@ -201,6 +204,8 @@ using (var scope = app.Services.CreateScope())
         ?? app.Environment.IsDevelopment();
     var applyIncrementalSeedOnStartup = app.Configuration.GetValue<bool?>("SeedData:ApplyIncrementalSeedOnStartup")
         ?? app.Environment.IsDevelopment();
+    var failStartupOnSeedError = app.Configuration.GetValue<bool?>("SeedData:FailStartupOnError")
+        ?? false;
     // Earlier data-only migrations can insert support users even on a fresh database.
     // Treat the database as empty until actual tourism content exists, so seed.sql still runs.
     var databaseIsEffectivelyEmpty =
@@ -210,88 +215,100 @@ using (var scope = app.Services.CreateScope())
         !db.Activities.Any() &&
         !db.Events.Any();
 
-    if (resetAndSeedOnStartup || (seedIfDatabaseEmpty && databaseIsEffectivelyEmpty))
+    try
     {
-        var configuredSeedFilePath = app.Configuration["SeedData:FilePath"];
-
-        var solutionRoot = Path.GetFullPath(
-            Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..")
-        );
-
-        var seedFilePath = !string.IsNullOrWhiteSpace(configuredSeedFilePath)
-            ? configuredSeedFilePath
-            : Path.Combine(solutionRoot, "baza", "seed.sql");
-
-        Console.WriteLine($"Seed path: {seedFilePath}");
-
-        if (File.Exists(seedFilePath))
+        if (resetAndSeedOnStartup || (seedIfDatabaseEmpty && databaseIsEffectivelyEmpty))
         {
-            Console.WriteLine(
-                resetAndSeedOnStartup
-                    ? "seed.sql found, executing destructive reset + seed..."
-                    : "Database is empty, executing initial seed.sql bootstrap..."
+            var configuredSeedFilePath = app.Configuration["SeedData:FilePath"];
+
+            var solutionRoot = Path.GetFullPath(
+                Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..")
             );
 
-            var sql = File.ReadAllText(seedFilePath);
+            var seedFilePath = !string.IsNullOrWhiteSpace(configuredSeedFilePath)
+                ? configuredSeedFilePath
+                : Path.Combine(solutionRoot, "baza", "seed.sql");
 
-            var connection = db.Database.GetDbConnection();
+            Console.WriteLine($"Seed path: {seedFilePath}");
 
-            if (connection.State != System.Data.ConnectionState.Open)
-                connection.Open();
-
-            using var command = connection.CreateCommand();
-            command.CommandText = sql;
-            command.ExecuteNonQuery();
-
-            SeedSqlExecutor.SyncHistory(connection, sql, seedFilePath);
-            Console.WriteLine("seed.sql executed successfully.");
-        }
-        else
-        {
-            Console.WriteLine("seed.sql NOT FOUND.");
-        }
-    }
-    else if (applyIncrementalSeedOnStartup)
-    {
-        var configuredSeedFilePath = app.Configuration["SeedData:FilePath"];
-
-        var solutionRoot = Path.GetFullPath(
-            Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..")
-        );
-
-        var seedFilePath = !string.IsNullOrWhiteSpace(configuredSeedFilePath)
-            ? configuredSeedFilePath
-            : Path.Combine(solutionRoot, "baza", "seed.sql");
-
-        if (File.Exists(seedFilePath))
-        {
-            var sql = File.ReadAllText(seedFilePath);
-            var connection = db.Database.GetDbConnection();
-
-            if (connection.State != System.Data.ConnectionState.Open)
-                connection.Open();
-
-            if (!SeedSqlExecutor.HasHistory(connection))
+            if (File.Exists(seedFilePath))
             {
+                Console.WriteLine(
+                    resetAndSeedOnStartup
+                        ? "seed.sql found, executing destructive reset + seed..."
+                        : "Database is empty, executing initial seed.sql bootstrap..."
+                );
+
+                var sql = File.ReadAllText(seedFilePath);
+
+                var connection = db.Database.GetDbConnection();
+
+                if (connection.State != System.Data.ConnectionState.Open)
+                    connection.Open();
+
+                using var command = connection.CreateCommand();
+                command.CommandText = sql;
+                command.ExecuteNonQuery();
+
                 SeedSqlExecutor.SyncHistory(connection, sql, seedFilePath);
-                Console.WriteLine("Seed history initialized from current seed.sql. Future appended SQL blocks will apply automatically.");
+                Console.WriteLine("seed.sql executed successfully.");
             }
             else
             {
-                var appliedStatements = SeedSqlExecutor.ApplyNewStatements(connection, sql, seedFilePath);
-                Console.WriteLine(appliedStatements > 0
-                    ? $"Applied {appliedStatements} new seed.sql statement(s) to the existing database."
-                    : "No new seed.sql statements detected for the existing database.");
+                Console.WriteLine("seed.sql NOT FOUND.");
             }
         }
-        else
+        else if (applyIncrementalSeedOnStartup)
         {
-            Console.WriteLine("seed.sql NOT FOUND.");
+            var configuredSeedFilePath = app.Configuration["SeedData:FilePath"];
+
+            var solutionRoot = Path.GetFullPath(
+                Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "..")
+            );
+
+            var seedFilePath = !string.IsNullOrWhiteSpace(configuredSeedFilePath)
+                ? configuredSeedFilePath
+                : Path.Combine(solutionRoot, "baza", "seed.sql");
+
+            if (File.Exists(seedFilePath))
+            {
+                var sql = File.ReadAllText(seedFilePath);
+                var connection = db.Database.GetDbConnection();
+
+                if (connection.State != System.Data.ConnectionState.Open)
+                    connection.Open();
+
+                if (!SeedSqlExecutor.HasHistory(connection))
+                {
+                    SeedSqlExecutor.SyncHistory(connection, sql, seedFilePath);
+                    Console.WriteLine("Seed history initialized from current seed.sql. Future appended SQL blocks will apply automatically.");
+                }
+                else
+                {
+                    var appliedStatements = SeedSqlExecutor.ApplyNewStatements(connection, sql, seedFilePath);
+                    Console.WriteLine(appliedStatements > 0
+                        ? $"Applied {appliedStatements} new seed.sql statement(s) to the existing database."
+                        : "No new seed.sql statements detected for the existing database.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("seed.sql NOT FOUND.");
+            }
+        }
+        else if (app.Environment.IsDevelopment())
+        {
+            Console.WriteLine("Automatic reset/seed is disabled. Existing database data will be preserved.");
         }
     }
-    else if (app.Environment.IsDevelopment())
+    catch (Exception ex)
     {
-        Console.WriteLine("Automatic reset/seed is disabled. Existing database data will be preserved.");
+        app.Logger.LogError(ex, "SeedData startup step failed. API will {Mode}.", failStartupOnSeedError ? "stop" : "continue");
+
+        if (failStartupOnSeedError)
+        {
+            throw;
+        }
     }
 }
 

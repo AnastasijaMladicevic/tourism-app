@@ -224,6 +224,16 @@
     "weekend": "Subota - Nedelja",
     "chatNote": "* Prosecno vreme odgovora na chat je manje od 5 minuta.",
     "ticketNote": "* Odgovori na prijave problema stizu u roku od 24h.",
+    "aiTitle": "AI turisticki asistent",
+    "aiBody": "Postavi pitanje prirodnim jezikom i asistent ce prvo pretraziti sadrzaj aplikacije, pa onda odgovoriti ljudskim jezikom.",
+    "aiPlaceholder": "Na primer: gde mogu da idem sa decom u setnju?",
+    "aiSend": "Posalji pitanje",
+    "aiThinking": "AI upravo trazi najbolje predloge...",
+    "aiEmpty": "Jos nema poruka. Probaj da pitas za restoran, hotel, setnju ili dogadjaj.",
+    "aiError": "AI odgovor trenutno nije dostupan. Pokusaj ponovo za nekoliko sekundi.",
+    "aiPromptWalk": "Setnja sa decom",
+    "aiPromptLunch": "Restoran za rucak",
+    "aiPromptHotel": "Hotel sa bazenom",
     "faq": {
       "1": {
         "q": "Kako da azuriram podatke na profilu?",

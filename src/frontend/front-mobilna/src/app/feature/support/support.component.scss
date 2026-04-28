@@ -108,6 +108,154 @@
   }
 }
 
+.ai-card {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(215, 229, 236, 0.95);
+  box-shadow: 0 14px 34px rgba(23, 110, 134, 0.06);
+  border-radius: 24px;
+  padding: 16px;
+}
+
+.ai-card__intro {
+  margin: 0 0 14px;
+  color: #63757d;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.ai-prompts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+
+  button {
+    border: 1px solid rgba(199, 223, 230, 0.95);
+    background: #f4fbfd;
+    color: #215568;
+    border-radius: 999px;
+    padding: 8px 12px;
+    font: inherit;
+    font-size: 12px;
+  }
+}
+
+.ai-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 120px;
+  margin-bottom: 14px;
+}
+
+.ai-thread__empty,
+.ai-thinking {
+  margin: 0;
+  color: #73848b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.ai-message {
+  max-width: 92%;
+  padding: 12px 14px;
+  border-radius: 18px;
+
+  p {
+    margin: 0;
+    line-height: 1.6;
+    font-size: 13px;
+  }
+
+  small {
+    display: block;
+    margin-top: 8px;
+    color: #6d7f87;
+    font-size: 11px;
+    line-height: 1.5;
+  }
+}
+
+.ai-message--user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #1f9ec3, #167e9d);
+  color: #fff;
+  border-bottom-right-radius: 8px;
+}
+
+.ai-message--assistant {
+  align-self: flex-start;
+  background: #f5fafc;
+  color: #273740;
+  border: 1px solid rgba(217, 228, 233, 0.95);
+  border-bottom-left-radius: 8px;
+}
+
+.ai-results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ai-result-chip {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(209, 225, 231, 0.95);
+  background: rgba(255, 255, 255, 0.92);
+  text-align: left;
+
+  strong {
+    display: block;
+    color: #20343e;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  span {
+    display: block;
+    margin-top: 3px;
+    color: #6c7d85;
+    font-size: 11px;
+  }
+}
+
+.ai-compose {
+  display: block;
+
+  textarea {
+    width: 100%;
+    min-height: 96px;
+    resize: vertical;
+    border: 1px solid rgba(214, 227, 233, 0.95);
+    border-radius: 18px;
+    padding: 12px 14px;
+    font: inherit;
+    font-size: 13px;
+    color: #273740;
+    background: #fbfeff;
+    outline: none;
+  }
+}
+
+.ai-send {
+  margin-top: 12px;
+  width: 100%;
+  min-height: 46px;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #1f9ec3, #1785a7);
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+
+  &:disabled {
+    opacity: 0.65;
+  }
+}
+
 .faq-card,
 .contact-card,
 .hours-card {
