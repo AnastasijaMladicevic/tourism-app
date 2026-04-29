@@ -35,6 +35,7 @@ export class FavoriteService {
 
   // GET /api/favorites — vraća sve favorite ulogovanog korisnika
   getMyFavorites(): Observable<FavoriteDto[]> {
+    return this.http.get<FavoriteDto[]>(this.url);
     return this.http
       .get<FavoriteDto[] | { items?: FavoriteDto[]; data?: FavoriteDto[] }>(this.url)
       .pipe(

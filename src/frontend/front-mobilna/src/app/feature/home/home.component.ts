@@ -47,6 +47,7 @@ interface FeaturedDestination {
   name: string;
   description?: string;
   imageUrl?: string;
+  displayTitle?: string;
 }
 
 interface ApiTranslationDto {
@@ -395,8 +396,7 @@ export class HomeComponent implements OnInit {
         });
         this.currentIndex = 0;
         this.currentFeatured = this.featuredDestinations[0];
-        console.log("🚀 ~ HomeComponent ~ loadFeatured ~ this.currentFeatured :", this.currentFeatured)
-
+        
         this.startRotation();
         this.flushUi();
       });
@@ -505,9 +505,12 @@ export class HomeComponent implements OnInit {
             this.featuredDestinations = res;
           });
           this.currentIndex = 0;
+          this.translateFeaturedDisplayTitles(selectedFeatured).subscribe((res) => {
+          this.featuredDestinations = res;
           this.currentFeatured = this.featuredDestinations[0];
-          console.log("🚀 ~ HomeComponent ~ loadPlaceCards ~ this.currentFeatured:", this.currentFeatured)
           this.startRotation();
+          this.flushUi();
+        });
           this.flushUi();
         } else {
           this.featuredDestinations = [];
@@ -537,50 +540,46 @@ export class HomeComponent implements OnInit {
       .trim()
       .toLowerCase();
 
-    console.log('translateFeaturedDisplayTitles lang:', lang);
-    console.log('featured:', featured);
-
-    if (!featured.length || lang === 'sr' || lang === 'me') {
-      return of(featured);
-    }
-
-    return forkJoin(
-      featured.map((item) => {
-        console.log('pozivam translations za destination:', item.id);
-
-        return this.http
-          .get<ApiTranslationDto[]>(
-            `${environment.apiUrl}/translations?entityType=Destination&entityId=${item.id}`
-          )
-          .pipe(
-            map((translations) => {
-              const translatedDescription = translations
-                .find(
-                  (translation) =>
-                    translation.fieldName?.toLowerCase() === 'description' &&
-                    translation.languageCode?.toLowerCase() === lang
-                )
-                ?.translatedText?.trim();
-
-              return translatedDescription
-                ? {
-                  ...item,
-                  description: translatedDescription,
-                }
-                : item;
-            }),
-            catchError((error) => {
-              console.error(
-                `Greška pri prevodu featured destination ${item.id}:`,
-                error
-              );
-
-              return of(item);
-            })
-          );
-      })
-    );
+  if (!featured.length || lang === 'sr' || lang === 'me') {
+    return of(featured);
   }
+
+  return forkJoin(
+    featured.map((item) => {
+
+      return this.http
+      .get<ApiTranslationDto[]>(
+        `${environment.apiUrl}/translations?entityType=Destination&entityId=${item.id}`
+      )
+      .pipe(
+        map((translations) => {
+          const translatedDescription = translations
+            .find(
+              (translation) =>
+                translation.fieldName?.toLowerCase() === 'displayTitle' &&
+                translation.languageCode?.toLowerCase() === lang
+            )
+            ?.translatedText?.trim();
+
+          return translatedDescription
+            ? {
+                ...item,
+                displayTitle: translatedDescription,
+              }
+            : item;
+        }),
+          catchError((error) => {
+            console.error(
+              `Greška pri prevodu featured destination ${item.id}:`,
+              error
+            );
+
+            return of(item);
+          })
+        );
+    })
+  );
+}
 
   private loadRecommendedCards(): void {
     this.isLoadingRecommendations = true;
@@ -866,10 +865,11 @@ export class HomeComponent implements OnInit {
     return {
       id: destination.id,
       name: destination.name,
-      description:
+      displayTitle:
         destination.displayTitle?.trim() ||
         destination.description?.trim() ||
         destination.destinationTypeName,
+      description: destination.description,
       imageUrl: this.pickDestinationImage(destination),
     };
   }

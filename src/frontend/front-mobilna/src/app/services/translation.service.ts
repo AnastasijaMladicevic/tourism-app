@@ -15,6 +15,7 @@ const LANGUAGE_LABEL_KEYS: Record<AppLanguage, string> = {
 export class TranslationService {
   private readonly http = inject(HttpClient);
   private readonly storageKey = 'spirego-language';
+  private readonly translationAssetVersion = '2026-04-29-favorites-planner';
   private readonly activeLanguage = signal<AppLanguage>(this.readStoredLanguage());
   private translations: Record<string, string> = {};
 
@@ -34,7 +35,7 @@ export class TranslationService {
         document.documentElement.setAttribute('lang', lang);
       }
 
-      this.http.get<Record<string, any>>(`/assets/i18n/${lang}.json`)
+      this.http.get<Record<string, any>>(this.buildTranslationUrl(lang))
         .subscribe(data => {
           this.translations = this.flatten(data);
           // Povećaj verziju → TranslatePipe detektuje promenu i ponovo renderuje
@@ -47,7 +48,7 @@ export class TranslationService {
   async loadInitialTranslations(): Promise<void> {
     const lang = this.activeLanguage();
     const data = await firstValueFrom(
-      this.http.get<Record<string, any>>(`/assets/i18n/${lang}.json`)
+      this.http.get<Record<string, any>>(this.buildTranslationUrl(lang))
     );
     this.translations = this.flatten(data);
     this.translationsVersion.update(v => v + 1);
@@ -102,6 +103,10 @@ export class TranslationService {
       }
       return acc;
     }, {} as Record<string, string>);
+  }
+
+  private buildTranslationUrl(language: AppLanguage): string {
+    return `/assets/i18n/${language}.json?v=${this.translationAssetVersion}`;
   }
 
   private readStoredLanguage(): AppLanguage {

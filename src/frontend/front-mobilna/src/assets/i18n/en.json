@@ -1,388 +1,510 @@
-{
-  "common": {
-    "back": "Back",
-    "loading": "Loading...",
-    "save": "Save",
-    "cancel": "Cancel",
-    "remove": "Remove",
-    "close": "Close",
-    "details": "Details",
-    "retry": "Try again",
-    "notAvailable": "Not available",
-    "dateNotAvailable": "Date not available",
-    "emailNotAvailable": "Email not available",
-    "savedOn": "Saved",
-    "publishedOn": "Published",
-    "openNow": "OPEN NOW",
-    "closed": "CLOSED",
-    "new": "New",
-    "reviews": "reviews",
-    "reviewsTitle": "Reviews",
-    "seeAll": "See All >",
-    "viewAll": "View All >",
-    "gallery": "Gallery",
-    "location": "Location",
-    "viewOnMap": "View on Map",
-    "bookNow": "Book Now",
-    "addReview": "Add review",
-    "contactInfo": "Contact info",
-    "price": "Price",
-    "startingFrom": "Starting from",
-    "about": "About"
-  },
-  "nav": {
-    "home": "Home",
-    "map": "Map",
-    "favorites": "Favorites",
-    "planner": "Planner",
-    "profile": "Profile"
-  },
-  "profile": {
-    "title": "Profile",
-    "edit": "Edit",
-    "activeAccount": "Active account",
-    "defaultUser": "SpireGO user",
-    "stats": {
-      "favorites": "FAVORITES",
-      "reviews": "REVIEWS"
-    },
-    "section": {
-      "trips": "MY TRIPS",
-      "settings": "SETTINGS",
-      "account": "ACCOUNT"
-    },
-    "favorites": "Favorites",
-    "myReviews": "My reviews",
-    "language": "Language",
-    "region": "Region",
-    "support": "Help and support",
-    "privacy": "Privacy and data",
-    "terms": "Terms of use",
-    "moderator": "Request moderator access",
-    "about": "About us",
-    "logout": "Log out"
-  },
-  "region": {
-    "title": "Region",
-    "available": "Available regions",
-    "infoTitle": "Region changes apply instantly",
-    "infoBody": "After saving, the entire mobile interface will switch to the selected region immediately.",
-    "montenegro": "Montenegro",
-    "spain": "Spain",
-    "defaultBadge": "Default",
-    "active": "This region is already active.",
-    "saved": "Region was updated successfully.",
-    "saveFailed": "Region change was not saved.",
-    "loadFailed": "Regions are currently unavailable.",
-    "noneAvailable": "No regions are available.",
-    "apply": "Apply region",
-    "confirm": "By tapping the button you confirm switching the app region to {{language}}."
-  },
-  "language": {
-    "title": "Language",
-    "available": "Available languages",
-    "infoTitle": "Language changes apply instantly",
-    "infoBody": "After saving, the mobile interface will immediately switch to the selected language.",
-    "active": "This language is already active.",
-    "saveFailed": "Language change was not saved.",
-    "saved": "Language was updated successfully.",
-    "saving": "Saving...",
-    "apply": "Apply language",
-    "confirm": "By tapping the button you confirm switching the app language to {{language}}.",
-    "serbianMontenegrin": "Serbian/Montenegrin",
-    "english": "English",
-    "spanish": "Spanish",
-    "italian": "Italian"
-  },
-  "favorites": {
-    "heroEyebrow": "FAVORITES",
-    "heroTitle": "All of your favorite objects are in one place.",
-    "heroBody": "Browse everything you added to favorites and quickly remove items you no longer want to keep.",
-    "loadError": "Favorites are currently unavailable.",
-    "removeError": "The favorite item could not be removed. Please try again.",
-    "loadingBody": "We are preparing your favorites.",
-    "emptyTitle": "You do not have any favorites yet",
-    "emptyBody": "When you add a destination or object to favorites, it will appear here.",
-    "removing": "Removing...",
-    "type": {
-      "default": "Favorite",
-      "destination": "Destination",
-      "object": "Object",
-      "activity": "Activity",
-      "route": "Route",
-      "locality": "Place"
-    },
-    "fallbackTitle": "Favorite #{{id}}"
-  },
-  "reviews": {
-    "title": "My reviews",
-    "heroEyebrow": "YOUR FEEDBACK",
-    "heroTitle": "All reviews you have left are shown here.",
-    "heroBody": "Review what you rated, when the comment was left, and whether there is a response.",
-    "loadError": "Your reviews are currently unavailable.",
-    "loadingBody": "We are preparing your reviews.",
-    "emptyTitle": "You do not have any reviews yet",
-    "emptyBody": "When you leave a comment on an object or destination, it will appear here.",
-    "objectFallback": "Unnamed place",
-    "textFallback": "This review has no additional comment.",
-    "statusFallback": "No status",
-    "ratingAria": "Rating {{rating}}",
-    "creatorResponse": "Creator response"
-  },
-  "moderator": {
-    "title": "Moderator access",
-    "eyebrow": "SPECIAL ROLE",
-    "heroTitle": "Send a request for moderator access",
-    "heroBody": "If you want a larger role in maintaining content quality, you can send a request here for the admin team to review and approve.",
-    "currentStatus": "Current status",
-    "currentRole": "Your current role: {{role}}",
-    "whatYouGet": "What you get",
-    "requirements": "Requirements",
-    "sendRequestTitle": "Send request",
-    "sendRequestBody": "By tapping the button you send a request to the review team. After evaluation, access will be approved or declined according to platform rules.",
-    "submitting": "Sending request...",
-    "sendRequest": "Send request",
-    "requestFailed": "The request cannot be sent right now.",
-    "requestSent": "Your moderator access request was sent successfully.",
-    "role": {
-      "tourist": "Tourist",
-      "moderator": "Moderator",
-      "admin": "Administrator",
-      "manager": "Manager"
-    },
-    "badge": {
-      "approved": "Access approved",
-      "activeRole": "Special role active",
-      "available": "Request available"
-    },
-    "req": {
-      "1": "Your account should be active and in good standing.",
-      "2": "Experience with content reports and community guidelines is preferred.",
-      "3": "After submission, the admin team reviews the request and account status."
-    },
-    "resp": {
-      "1": "Review reported content and perform basic moderation.",
-      "2": "Faster communication with support when action is needed.",
-      "3": "Contribute to content quality and safety inside the app."
-    }
-  },
-  "editProfile": {
-    "title": "Edit profile",
-    "photoAlt": "Profile photo",
-    "changePhoto": "Change photo",
-    "removePhoto": "Remove photo",
-    "firstName": "First name",
-    "lastName": "Last name",
-    "country": "Country",
-    "email": "Email address",
-    "phone": "Phone number",
-    "interests": "Your interests",
-    "selectedCount": "Selected: {{count}}",
-    "appLanguage": "App language",
-    "currentLanguage": "Current: {{language}}",
-    "saving": "Saving...",
-    "saveChanges": "Save changes",
-    "cancelChanges": "Cancel changes",
-    "refreshFallback": "Profile was not refreshed from the server. Local data is shown.",
-    "saveFailed": "Changes were not saved.",
-    "saved": "Changes were saved successfully.",
-    "photoRemoveFailed": "The photo was not removed.",
-    "photoRemoved": "The photo was removed.",
-    "photoFormats": "Allowed formats are PNG, JPG and WEBP.",
-    "photoSize": "The photo must not be larger than 5MB.",
-    "photoSaveFailed": "The photo was not saved.",
-    "photoSaved": "The photo was updated successfully.",
-    "languageSelected": "Selected language: {{language}}.",
-    "nameError": "First name must contain at least 2 characters.",
-    "lastNameError": "Last name must contain at least 2 characters.",
-    "countryError": "Country can have at most 40 characters.",
-    "phoneError": "Enter the phone number in a format such as +382 67 000 000.",
-    "validationError": "Check the highlighted fields before saving.",
-    "interest": {
-      "beaches": "Beaches",
-      "hiking": "Hiking",
-      "history": "History",
-      "gastronomy": "Gastronomy",
-      "nightlife": "Nightlife",
-      "culture": "Culture",
-      "parks": "National parks"
-    }
-  },
-  "support": {
-    "title": "Help and support",
-    "heroTitle": "Help for profile and mobile settings",
-    "searchAria": "Search questions",
-    "searchPlaceholder": "Search frequently asked questions...",
-    "faqTitle": "Frequently asked questions",
-    "contactTitle": "Direct contact",
-    "contactUsers": "Customer support",
-    "contactUsersBody": "Call us for quick questions about your account and the app",
-    "reportProblem": "Report an issue",
-    "reportProblemBody": "Send details if a profile feature is not working as expected",
-    "hoursTitle": "Support hours",
-    "weekdays": "Monday - Friday",
-    "weekend": "Saturday - Sunday",
-    "chatNote": "* Average chat response time is under 5 minutes.",
-    "ticketNote": "* Replies to reported issues arrive within 24 hours.",
-    "aiTitle": "AI travel assistant",
-    "aiBody": "Ask in natural language and the assistant will search the app content before replying in a friendly way.",
-    "aiPlaceholder": "For example: where can I go for a walk with kids?",
-    "aiSend": "Send question",
-    "aiThinking": "The AI is looking for the best suggestions...",
-    "aiEmpty": "No messages yet. Try asking about a restaurant, hotel, walk, or event.",
-    "aiError": "The AI answer is not available right now. Please try again in a few seconds.",
-    "aiPromptWalk": "Walk with kids",
-    "aiPromptLunch": "Restaurant for lunch",
-    "aiPromptHotel": "Hotel with pool",
-    "faq": {
-      "1": {
-        "q": "How do I update profile information?",
-        "a": "On the Edit profile screen you can change your first name, last name, phone number, country and profile photo using the existing account options."
-      },
-      "2": {
-        "q": "Where can I see my favorites?",
-        "a": "The Favorites screen shows every item saved through the current API and lets you quickly remove anything you no longer need."
-      },
-      "3": {
-        "q": "How does the trip planner work?",
-        "a": "The planner currently works locally on the device and does not require backend changes. You can save a destination, date, notes and a checklist."
-      },
-      "4": {
-        "q": "How do I change the app language?",
-        "a": "On the Language screen you can choose a supported language and save the change through the user route. The change is reflected immediately in the mobile interface."
-      }
-    }
-  },
-  "about": {
-    "supportTitle": "Information and support",
-    "version": "Version 2.4.0",
-    "quote": "\"Our mission is to give every traveler an authentic experience of Montenegro, from hidden southern beaches to untouched mountain peaks in the north.\"",
-    "privacy": "Privacy policy",
-    "privacyBody": "How we protect your data",
-    "terms": "Terms of use",
-    "termsBody": "Rules for using the app",
-    "contact": "Contact us",
-    "contactBody": "Questions, suggestions or issues",
-    "footerMade": "Made with heart in Montenegro",
-    "footerRights": "All rights reserved."
-  },
-  "privacy": {
-    "title": "Privacy and data",
-    "eyebrow": "TRANSPARENT",
-    "heroTitle": "What the mobile app currently stores and shows.",
-    "heroBody": "This screen gives a clear overview of the data used by the frontend and the current limitations until the backend gets additional functionality.",
-    "notesTitle": "Important notes",
-    "section": {
-      "1": {
-        "title": "Account data",
-        "body": "The mobile frontend currently shows basic account data such as first name, last name, email, phone number, country and profile photo."
-      },
-      "2": {
-        "title": "Locally stored data",
-        "body": "Trip planner data and interests can be stored locally on the device without sending new data to the backend."
-      },
-      "3": {
-        "title": "How to request a change",
-        "body": "If you want a data correction or additional explanation, use the Help and support screen or the contact address listed in the app."
-      }
-    },
-    "note": {
-      "1": "The frontend does not manage account deletion or data export without backend support.",
-      "2": "Profile photo updates and basic profile edits use the existing API routes that are already available.",
-      "3": "Sensitive account actions require additional backend support and permissions."
-    }
-  },
-  "terms": {
-    "title": "Terms of use",
-    "eyebrow": "TERMS OVERVIEW",
-    "heroTitle": "A clear summary of the rules for the mobile app.",
-    "heroBody": "This screen gives a frontend overview of the most important usage rules until the full legal version is aligned across the system.",
-    "notesTitle": "Notes",
-    "section": {
-      "1": {
-        "title": "Using the app",
-        "body": "The mobile frontend lets you browse destinations, objects, favorites and personal settings. The user is responsible for the accuracy of the data entered on the account."
-      },
-      "2": {
-        "title": "Content and information",
-        "body": "Displayed data depends on available API responses. The frontend shows what the backend currently returns and does not guarantee additional features that are not supported by system routes."
-      },
-      "3": {
-        "title": "Account and security",
-        "body": "Logout, basic profile edits and photo changes use existing account mechanisms. Additional account actions require dedicated backend support."
-      }
-    },
-    "note": {
-      "1": "Favorites, reviews and profile data are tied to the currently signed-in account.",
-      "2": "The locally stored planner works only on the device where it was created.",
-      "3": "Legal and production versions of the terms still need to be aligned with the team and the backend specification."
-    }
-  },
-  "map": {
-    "searchPlaceholder": "Search objects, routes...",
-    "geoUnsupported": "Geolocation is not supported in this browser.",
-    "geoDenied": "Please allow location access in your browser settings.",
-    "geoUnavailable": "Location is currently unavailable.",
-    "geoFailed": "Unable to get your location."
-  },
-  "event": {
-    "title": "Event",
-    "loadingError": "Failed to load the event.",
-    "addedToPlanner": "The event was added to Planner",
-    "free": "Free",
-    "buyTicket": "Buy ticket",
-    "ticketAlert": "Ticket purchase - Price: {{price}}",
-    "addToPlanner": "Add to Planner",
-    "about": "About the event",
-    "descriptionFallback": "Description is not available.",
-    "availableTickets": "Available tickets",
-    "standardTicket": "Standard ticket",
-    "select": "Select"
-  },
-  "object": {
-    "titleFallback": "Object",
-    "loadingError": "Failed to load the object.",
-    "about": "About {{name}}",
-    "amenitiesSoon": "Amenities will be available soon.",
-    "writeReviewSoon": "The new review form is still being built.",
-    "workingHoursMissing": "Working hours are not available",
-    "nearbyNone": "There are no other nearby {{name}} items in the same location.",
-    "allReviews": "All reviews",
-    "totalReviews": "{{count}} reviews"
-  },
-  "restaurant": {
-    "title": "Restaurant",
-    "loadingError": "Failed to load the restaurant.",
-    "about": "About the restaurant",
-    "writeReviewSoon": "The new review form is still being built."
-  },
-  "hotel": {
-    "loadingError": "Failed to load the hotel.",
-    "bookingSoon": "The booking flow will be integrated later.",
-    "addedToPlanner": "The hotel was added to Planner",
-    "phoneMissing": "Phone number is not available",
-    "galleryEmpty": "No images available",
-    "reviewTitle": "Reviews",
-    "showLess": "Show Less >",
-    "reviewAria": "Review rating",
-    "responseLabel": "Hotel response",
-    "reviewsPending": "Reviews will appear once they arrive from the backend.",
-    "nearbyTitle": "Nearby hotels",
-    "nearbyEmpty": "There are no other hotels in the same location.",
-    "visitWebsite": "Visit website",
-    "aboutTitle": "About",
-    "aboutFallback": "Detailed information about this hotel will be displayed here.",
-    "locationMontenegro": "Montenegro"
-  },
-  "time": {
-    "today": "TODAY",
-    "dayAgo": "1 DAY AGO",
-    "daysAgo": "{{count}} DAYS AGO",
-    "weekAgo": "1 WEEK AGO",
-    "weeksAgo": "{{count}} WEEKS AGO",
-    "monthAgo": "1 MONTH AGO",
-    "monthsAgo": "{{count}} MONTHS AGO",
-    "yearAgo": "1 YEAR AGO",
-    "yearsAgo": "{{count}} YEARS AGO"
-  }
+﻿{
+    "common":  {
+                   "back":  "Back",
+                   "loading":  "Loading...",
+                   "save":  "Save",
+                   "cancel":  "Cancel",
+                   "remove":  "Remove",
+                   "close":  "Close",
+                   "details":  "Details",
+                   "retry":  "Try again",
+                   "notAvailable":  "Not available",
+                   "dateNotAvailable":  "Date not available",
+                   "emailNotAvailable":  "Email not available",
+                   "savedOn":  "Saved",
+                   "publishedOn":  "Published",
+                   "openNow":  "OPEN NOW",
+                   "closed":  "CLOSED",
+                   "new":  "New",
+                   "reviews":  "reviews",
+                   "reviewsTitle":  "Reviews",
+                   "seeAll":  "See All \u003e",
+                   "viewAll":  "View All \u003e",
+                   "gallery":  "Gallery",
+                   "location":  "Location",
+                   "viewOnMap":  "View on Map",
+                   "bookNow":  "Book Now",
+                   "addReview":  "Add review",
+                   "contactInfo":  "Contact info",
+                   "price":  "Price",
+                   "startingFrom":  "Starting from",
+                   "about":  "About",
+                   "total":  "total"
+               },
+    "nav":  {
+                "home":  "Home",
+                "map":  "Map",
+                "favorites":  "Favorites",
+                "planner":  "Planner",
+                "profile":  "Profile"
+            },
+    "profile":  {
+                    "title":  "Profile",
+                    "edit":  "Edit",
+                    "activeAccount":  "Active account",
+                    "defaultUser":  "SpireGO user",
+                    "stats":  {
+                                  "favorites":  "FAVORITES",
+                                  "reviews":  "REVIEWS"
+                              },
+                    "section":  {
+                                    "trips":  "MY TRIPS",
+                                    "settings":  "SETTINGS",
+                                    "account":  "ACCOUNT"
+                                },
+                    "favorites":  "Favorites",
+                    "myReviews":  "My reviews",
+                    "language":  "Language",
+                    "region":  "Region",
+                    "support":  "Help and support",
+                    "privacy":  "Privacy and data",
+                    "terms":  "Terms of use",
+                    "moderator":  "Request moderator access",
+                    "about":  "About us",
+                    "logout":  "Log out"
+                },
+    "region":  {
+                   "title":  "Region",
+                   "available":  "Available regions",
+                   "infoTitle":  "Region changes apply instantly",
+                   "infoBody":  "After saving, the entire mobile interface will switch to the selected region immediately.",
+                   "montenegro":  "Montenegro",
+                   "spain":  "Spain",
+                   "defaultBadge":  "Default",
+                   "active":  "This region is already active.",
+                   "saved":  "Region was updated successfully.",
+                   "saveFailed":  "Region change was not saved.",
+                   "loadFailed":  "Regions are currently unavailable.",
+                   "noneAvailable":  "No regions are available.",
+                   "apply":  "Apply region",
+                   "confirm":  "By tapping the button you confirm switching the app region to {{language}}."
+               },
+    "language":  {
+                     "title":  "Language",
+                     "available":  "Available languages",
+                     "infoTitle":  "Language changes apply instantly",
+                     "infoBody":  "After saving, the mobile interface will immediately switch to the selected language.",
+                     "active":  "This language is already active.",
+                     "saveFailed":  "Language change was not saved.",
+                     "saved":  "Language was updated successfully.",
+                     "saving":  "Saving...",
+                     "apply":  "Apply language",
+                     "confirm":  "By tapping the button you confirm switching the app language to {{language}}.",
+                     "serbianMontenegrin":  "Serbian/Montenegrin",
+                     "english":  "English",
+                     "spanish":  "Spanish",
+                     "italian":  "Italian"
+                 },
+    "favorites":  {
+                      "heroEyebrow":  "FAVORITES",
+                      "heroTitle":  "All of your favorite objects are in one place.",
+                      "heroBody":  "Browse everything you added to favorites and quickly remove items you no longer want to keep.",
+                      "loadError":  "Favorites are currently unavailable.",
+                      "removeError":  "The favorite item could not be removed. Please try again.",
+                      "loadingBody":  "We are preparing your favorites.",
+                      "emptyTitle":  "You do not have any favorites yet",
+                      "emptyBody":  "When you add a destination or object to favorites, it will appear here.",
+                      "removing":  "Removing...",
+                      "type":  {
+                                   "default":  "Favorite",
+                                   "destination":  "Destination",
+                                   "object":  "Object",
+                                   "activity":  "Activity",
+                                   "route":  "Route",
+                                   "locality":  "Place"
+                               },
+                      "fallbackTitle":  "Favorite #{{id}}",
+                      "plannerBannerBody":  "Turn saved events into a clear travel schedule.",
+                      "allSaved":  "All saved",
+                      "removeConfirmFooter":  "You can always add \"{{title}}\" again later.",
+                      "latestEmpty":  "No recently saved items.",
+                      "heroBodyModern":  "Quickly review everything you saved, open details, and move the best ideas into your planner.",
+                      "loadingTitle":  "Loading favorites",
+                      "readyTitle":  "Ready for the next step?",
+                      "screenTitle":  "Favorites",
+                      "plannerBannerTitle":  "Keep planning",
+                      "plannerEventsOnly":  "Events from favorites are managed through the planner.",
+                      "totalFavorites":  "{{count}} saved items",
+                      "openDetails":  "Open details",
+                      "smartRoutes":  "Smart suggestions and day overview",
+                      "summaryTitle":  "Favorites summary",
+                      "searchPlaceholder":  "Search saved places...",
+                      "goToPlanner":  "Go to planner",
+                      "readyBody":  "Turn open favorites into a real day plan and event schedule.",
+                      "emptyBodyModern":  "Add destinations, objects, activities, or localities and they will appear here in one place.",
+                      "emptyTitleModern":  "You do not have saved favorites yet",
+                      "recentTitle":  "Recently saved",
+                      "heroTitleModern":  "Your favorite places are ready for the next plan.",
+                      "removeConfirmTitle":  "Remove from favorites",
+                      "loadingBodyModern":  "We are preparing your saved items and recent highlights.",
+                      "removeConfirmBody":  "Do you want to remove \"{{title}}\" from favorites?",
+                      "footerShowingAll":  "Showing {{count}} saved items",
+                      "panelEmpty":  "There is not enough data for a summary yet.",
+                      "routeLabel":  "Route",
+                      "addedOneDayAgo":  "Added 1 day ago",
+                      "savedItemsCount":  "{{count}} saved items",
+                      "routeQuote":  "This saved route is waiting for your next trip.",
+                      "activityDurationQuote":  "{{count}} min experience saved for later.",
+                      "addedOneWeekAgo":  "Added 1 week ago",
+                      "sortDateAdded":  "Date added",
+                      "addedWeeksAgo":  "Added {{count}} weeks ago",
+                      "fallbackQuote":  "Saved for later.",
+                      "savedItemCount":  "{{count}} saved item",
+                      "savedItemLabel":  "Saved place",
+                      "locationFallback":  "Location not available",
+                      "addedToday":  "Added today",
+                      "savedRecently":  "Saved recently",
+                      "routeLocation":  "Planned route",
+                      "sortName":  "By name",
+                      "addedDaysAgo":  "Added {{count}} days ago",
+                      "mustSee":  "Must-see",
+                      "breakdown":  {
+                                        "destination":  "Destinations",
+                                        "object":  "Objects",
+                                        "activity":  "Activities",
+                                        "locality":  "Localities",
+                                        "route":  "Routes"
+                                    }
+                  },
+    "reviews":  {
+                    "title":  "My reviews",
+                    "heroEyebrow":  "YOUR FEEDBACK",
+                    "heroTitle":  "All reviews you have left are shown here.",
+                    "heroBody":  "Review what you rated, when the comment was left, and whether there is a response.",
+                    "loadError":  "Your reviews are currently unavailable.",
+                    "loadingBody":  "We are preparing your reviews.",
+                    "emptyTitle":  "You do not have any reviews yet",
+                    "emptyBody":  "When you leave a comment on an object or destination, it will appear here.",
+                    "objectFallback":  "Unnamed place",
+                    "textFallback":  "This review has no additional comment.",
+                    "statusFallback":  "No status",
+                    "ratingAria":  "Rating {{rating}}",
+                    "creatorResponse":  "Creator response"
+                },
+    "moderator":  {
+                      "title":  "Moderator access",
+                      "eyebrow":  "SPECIAL ROLE",
+                      "heroTitle":  "Send a request for moderator access",
+                      "heroBody":  "If you want a larger role in maintaining content quality, you can send a request here for the admin team to review and approve.",
+                      "currentStatus":  "Current status",
+                      "currentRole":  "Your current role: {{role}}",
+                      "whatYouGet":  "What you get",
+                      "requirements":  "Requirements",
+                      "sendRequestTitle":  "Send request",
+                      "sendRequestBody":  "By tapping the button you send a request to the review team. After evaluation, access will be approved or declined according to platform rules.",
+                      "submitting":  "Sending request...",
+                      "sendRequest":  "Send request",
+                      "requestFailed":  "The request cannot be sent right now.",
+                      "requestSent":  "Your moderator access request was sent successfully.",
+                      "role":  {
+                                   "tourist":  "Tourist",
+                                   "moderator":  "Moderator",
+                                   "admin":  "Administrator",
+                                   "manager":  "Manager"
+                               },
+                      "badge":  {
+                                    "approved":  "Access approved",
+                                    "activeRole":  "Special role active",
+                                    "available":  "Request available"
+                                },
+                      "req":  {
+                                  "1":  "Your account should be active and in good standing.",
+                                  "2":  "Experience with content reports and community guidelines is preferred.",
+                                  "3":  "After submission, the admin team reviews the request and account status."
+                              },
+                      "resp":  {
+                                   "1":  "Review reported content and perform basic moderation.",
+                                   "2":  "Faster communication with support when action is needed.",
+                                   "3":  "Contribute to content quality and safety inside the app."
+                               }
+                  },
+    "editProfile":  {
+                        "title":  "Edit profile",
+                        "photoAlt":  "Profile photo",
+                        "changePhoto":  "Change photo",
+                        "removePhoto":  "Remove photo",
+                        "firstName":  "First name",
+                        "lastName":  "Last name",
+                        "country":  "Country",
+                        "email":  "Email address",
+                        "phone":  "Phone number",
+                        "interests":  "Your interests",
+                        "selectedCount":  "Selected: {{count}}",
+                        "appLanguage":  "App language",
+                        "currentLanguage":  "Current: {{language}}",
+                        "saving":  "Saving...",
+                        "saveChanges":  "Save changes",
+                        "cancelChanges":  "Cancel changes",
+                        "refreshFallback":  "Profile was not refreshed from the server. Local data is shown.",
+                        "saveFailed":  "Changes were not saved.",
+                        "saved":  "Changes were saved successfully.",
+                        "photoRemoveFailed":  "The photo was not removed.",
+                        "photoRemoved":  "The photo was removed.",
+                        "photoFormats":  "Allowed formats are PNG, JPG and WEBP.",
+                        "photoSize":  "The photo must not be larger than 5MB.",
+                        "photoSaveFailed":  "The photo was not saved.",
+                        "photoSaved":  "The photo was updated successfully.",
+                        "languageSelected":  "Selected language: {{language}}.",
+                        "nameError":  "First name must contain at least 2 characters.",
+                        "lastNameError":  "Last name must contain at least 2 characters.",
+                        "countryError":  "Country can have at most 40 characters.",
+                        "phoneError":  "Enter the phone number in a format such as +382 67 000 000.",
+                        "validationError":  "Check the highlighted fields before saving.",
+                        "interest":  {
+                                         "beaches":  "Beaches",
+                                         "hiking":  "Hiking",
+                                         "history":  "History",
+                                         "gastronomy":  "Gastronomy",
+                                         "nightlife":  "Nightlife",
+                                         "culture":  "Culture",
+                                         "parks":  "National parks"
+                                     }
+                    },
+    "support":  {
+                    "title":  "Help and support",
+                    "heroTitle":  "Help for profile and mobile settings",
+                    "searchAria":  "Search questions",
+                    "searchPlaceholder":  "Search frequently asked questions...",
+                    "faqTitle":  "Frequently asked questions",
+                    "contactTitle":  "Direct contact",
+                    "contactUsers":  "Customer support",
+                    "contactUsersBody":  "Call us for quick questions about your account and the app",
+                    "reportProblem":  "Report an issue",
+                    "reportProblemBody":  "Send details if a profile feature is not working as expected",
+                    "hoursTitle":  "Support hours",
+                    "weekdays":  "Monday - Friday",
+                    "weekend":  "Saturday - Sunday",
+                    "chatNote":  "* Average chat response time is under 5 minutes.",
+                    "ticketNote":  "* Replies to reported issues arrive within 24 hours.",
+                    "aiTitle":  "AI travel assistant",
+                    "aiBody":  "Ask in natural language and the assistant will search the app content before replying in a friendly way.",
+                    "aiPlaceholder":  "For example: where can I go for a walk with kids?",
+                    "aiSend":  "Send question",
+                    "aiThinking":  "The AI is looking for the best suggestions...",
+                    "aiEmpty":  "No messages yet. Try asking about a restaurant, hotel, walk, or event.",
+                    "aiError":  "The AI answer is not available right now. Please try again in a few seconds.",
+                    "aiPromptWalk":  "Walk with kids",
+                    "aiPromptLunch":  "Restaurant for lunch",
+                    "aiPromptHotel":  "Hotel with pool",
+                    "faq":  {
+                                "1":  {
+                                          "q":  "How do I update profile information?",
+                                          "a":  "On the Edit profile screen you can change your first name, last name, phone number, country and profile photo using the existing account options."
+                                      },
+                                "2":  {
+                                          "q":  "Where can I see my favorites?",
+                                          "a":  "The Favorites screen shows every item saved through the current API and lets you quickly remove anything you no longer need."
+                                      },
+                                "3":  {
+                                          "q":  "How does the trip planner work?",
+                                          "a":  "The planner currently works locally on the device and does not require backend changes. You can save a destination, date, notes and a checklist."
+                                      },
+                                "4":  {
+                                          "q":  "How do I change the app language?",
+                                          "a":  "On the Language screen you can choose a supported language and save the change through the user route. The change is reflected immediately in the mobile interface."
+                                      }
+                            }
+                },
+    "about":  {
+                  "supportTitle":  "Information and support",
+                  "version":  "Version 2.4.0",
+                  "quote":  "\"Our mission is to give every traveler an authentic experience of Montenegro, from hidden southern beaches to untouched mountain peaks in the north.\"",
+                  "privacy":  "Privacy policy",
+                  "privacyBody":  "How we protect your data",
+                  "terms":  "Terms of use",
+                  "termsBody":  "Rules for using the app",
+                  "contact":  "Contact us",
+                  "contactBody":  "Questions, suggestions or issues",
+                  "footerMade":  "Made with heart in Montenegro",
+                  "footerRights":  "All rights reserved."
+              },
+    "privacy":  {
+                    "title":  "Privacy and data",
+                    "eyebrow":  "TRANSPARENT",
+                    "heroTitle":  "What the mobile app currently stores and shows.",
+                    "heroBody":  "This screen gives a clear overview of the data used by the frontend and the current limitations until the backend gets additional functionality.",
+                    "notesTitle":  "Important notes",
+                    "section":  {
+                                    "1":  {
+                                              "title":  "Account data",
+                                              "body":  "The mobile frontend currently shows basic account data such as first name, last name, email, phone number, country and profile photo."
+                                          },
+                                    "2":  {
+                                              "title":  "Locally stored data",
+                                              "body":  "Trip planner data and interests can be stored locally on the device without sending new data to the backend."
+                                          },
+                                    "3":  {
+                                              "title":  "How to request a change",
+                                              "body":  "If you want a data correction or additional explanation, use the Help and support screen or the contact address listed in the app."
+                                          }
+                                },
+                    "note":  {
+                                 "1":  "The frontend does not manage account deletion or data export without backend support.",
+                                 "2":  "Profile photo updates and basic profile edits use the existing API routes that are already available.",
+                                 "3":  "Sensitive account actions require additional backend support and permissions."
+                             }
+                },
+    "terms":  {
+                  "title":  "Terms of use",
+                  "eyebrow":  "TERMS OVERVIEW",
+                  "heroTitle":  "A clear summary of the rules for the mobile app.",
+                  "heroBody":  "This screen gives a frontend overview of the most important usage rules until the full legal version is aligned across the system.",
+                  "notesTitle":  "Notes",
+                  "section":  {
+                                  "1":  {
+                                            "title":  "Using the app",
+                                            "body":  "The mobile frontend lets you browse destinations, objects, favorites and personal settings. The user is responsible for the accuracy of the data entered on the account."
+                                        },
+                                  "2":  {
+                                            "title":  "Content and information",
+                                            "body":  "Displayed data depends on available API responses. The frontend shows what the backend currently returns and does not guarantee additional features that are not supported by system routes."
+                                        },
+                                  "3":  {
+                                            "title":  "Account and security",
+                                            "body":  "Logout, basic profile edits and photo changes use existing account mechanisms. Additional account actions require dedicated backend support."
+                                        }
+                              },
+                  "note":  {
+                               "1":  "Favorites, reviews and profile data are tied to the currently signed-in account.",
+                               "2":  "The locally stored planner works only on the device where it was created.",
+                               "3":  "Legal and production versions of the terms still need to be aligned with the team and the backend specification."
+                           }
+              },
+    "map":  {
+                "searchPlaceholder":  "Search objects, routes...",
+                "geoUnsupported":  "Geolocation is not supported in this browser.",
+                "geoDenied":  "Please allow location access in your browser settings.",
+                "geoUnavailable":  "Location is currently unavailable.",
+                "geoFailed":  "Unable to get your location."
+            },
+    "event":  {
+                  "title":  "Event",
+                  "loadingError":  "Failed to load the event.",
+                  "addedToPlanner":  "The event was added to Planner",
+                  "free":  "Free",
+                  "buyTicket":  "Buy ticket",
+                  "ticketAlert":  "Ticket purchase - Price: {{price}}",
+                  "addToPlanner":  "Add to Planner",
+                  "about":  "About the event",
+                  "descriptionFallback":  "Description is not available.",
+                  "availableTickets":  "Available tickets",
+                  "standardTicket":  "Standard ticket",
+                  "select":  "Select"
+              },
+    "object":  {
+                   "titleFallback":  "Object",
+                   "loadingError":  "Failed to load the object.",
+                   "about":  "About {{name}}",
+                   "amenitiesSoon":  "Amenities will be available soon.",
+                   "writeReviewSoon":  "The new review form is still being built.",
+                   "workingHoursMissing":  "Working hours are not available",
+                   "nearbyNone":  "There are no other nearby {{name}} items in the same location.",
+                   "allReviews":  "All reviews",
+                   "totalReviews":  "{{count}} reviews"
+               },
+    "restaurant":  {
+                       "title":  "Restaurant",
+                       "loadingError":  "Failed to load the restaurant.",
+                       "about":  "About the restaurant",
+                       "writeReviewSoon":  "The new review form is still being built."
+                   },
+    "hotel":  {
+                  "loadingError":  "Failed to load the hotel.",
+                  "bookingSoon":  "The booking flow will be integrated later.",
+                  "addedToPlanner":  "The hotel was added to Planner",
+                  "phoneMissing":  "Phone number is not available",
+                  "galleryEmpty":  "No images available",
+                  "reviewTitle":  "Reviews",
+                  "showLess":  "Show Less \u003e",
+                  "reviewAria":  "Review rating",
+                  "responseLabel":  "Hotel response",
+                  "reviewsPending":  "Reviews will appear once they arrive from the backend.",
+                  "nearbyTitle":  "Nearby hotels",
+                  "nearbyEmpty":  "There are no other hotels in the same location.",
+                  "visitWebsite":  "Visit website",
+                  "aboutTitle":  "About",
+                  "aboutFallback":  "Detailed information about this hotel will be displayed here.",
+                  "locationMontenegro":  "Montenegro"
+              },
+    "time":  {
+                 "today":  "TODAY",
+                 "dayAgo":  "1 DAY AGO",
+                 "daysAgo":  "{{count}} DAYS AGO",
+                 "weekAgo":  "1 WEEK AGO",
+                 "weeksAgo":  "{{count}} WEEKS AGO",
+                 "monthAgo":  "1 MONTH AGO",
+                 "monthsAgo":  "{{count}} MONTHS AGO",
+                 "yearAgo":  "1 YEAR AGO",
+                 "yearsAgo":  "{{count}} YEARS AGO"
+             },
+    "planner":  {
+                    "addEventCta":  "Add event",
+                    "quotePlanned":  "Planned around {{name}}.",
+                    "tripEventWeekSuffix":  "{{name}} plan",
+                    "tripDateFallback":  "Dates are not defined yet",
+                    "savedNav":  "Favorites",
+                    "browseEvents":  "Browse events",
+                    "quoteHosted":  "This event is hosted at {{name}}.",
+                    "loadingBody":  "We are preparing your schedule and saved events.",
+                    "removeError":  "The event was not removed from the planner. Please try again.",
+                    "quoteFallback":  "Saved as part of your plan.",
+                    "itemsCount":  "{{count}} items",
+                    "totalEvents":  "Total events",
+                    "emptyBody":  "Add events and build a travel schedule by day.",
+                    "scheduleTitle":  "Day schedule",
+                    "loadError":  "Planner is currently unavailable.",
+                    "removeFooter":  "You can add \"{{title}}\" again from the event details.",
+                    "emptyTitle":  "Your planner is still empty",
+                    "eventSingular":  "event",
+                    "title":  "Planner",
+                    "removeConfirmTitle":  "Remove from planner",
+                    "eventPlural":  "events",
+                    "loadingTitle":  "Loading planner",
+                    "planningNextTitle":  "What do you want to plan next?",
+                    "priorityHighlights":  "Priority highlights",
+                    "daysPlanned":  "{{count}} planned days",
+                    "removeConfirmBody":  "Do you want to remove \"{{title}}\" from the planner?",
+                    "proTipLabel":  "Pro tip",
+                    "plannedHours":  "Planned hours",
+                    "tripLocationFallback":  "Location not available",
+                    "planningNextBody":  "Add one more event and make the day flow clearer.",
+                    "openEventDetails":  "Open event details",
+                    "removeEvent":  "Remove event",
+                    "proTipBody":  "Mark the most important events as priority so they stand out in your plan.",
+                    "removeFromPlanner":  "Remove from planner",
+                    "notifications":  "Notifications",
+                    "tripTitleFallback":  "Your trip plan",
+                    "tripWeekSuffix":  "{{name}} week"
+                },
+    "addToPlanner":  {
+                         "termsLink":  "Terms of service",
+                         "timeConflictTitle":  "Time conflict detected",
+                         "scheduleBody":  "Fill in the details to add this event to your trip plan.",
+                         "previewFallbackTitle":  "Selected event",
+                         "startTime":  "Start time",
+                         "nonEventHint":  "This preview is not an event right now. The planner currently supports event items only.",
+                         "feedbackCannotAdd":  "This event cannot be added to the planner right now.",
+                         "duration":  "Duration",
+                         "feedbackOnlyEvents":  "The planner currently supports saving events only.",
+                         "cancel":  "Cancel",
+                         "priorityBody":  "Highlight it in your planner overview and daily schedule.",
+                         "endTime":  "End time",
+                         "priorityTitle":  "Mark as priority",
+                         "conflictMessage":  "This time overlaps with \"{{title}}\" at {{time}}.",
+                         "scheduleTitle":  "Schedule your event",
+                         "backAria":  "Back to planner",
+                         "saving":  "Saving...",
+                         "notesLabel":  "Additional notes",
+                         "estimatedDuration":  "Estimated duration",
+                         "previewFallbackLocation":  "Event location",
+                         "previewFallbackType":  "Event",
+                         "feedbackAlreadyAdded":  "This event is already in your planner.",
+                         "travelDate":  "Travel date",
+                         "previewFallbackDescription":  "Add this event to your planner and organize the day around your favorite moments.",
+                         "helpCenter":  "Help center",
+                         "notesPlaceholder":  "For example: bring a camera, arrive 15 minutes early...",
+                         "title":  "Add event to planner",
+                         "togglePriority":  "Toggle priority",
+                         "save":  "Save to planner"
+                     }
 }

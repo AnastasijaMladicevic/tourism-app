@@ -72,7 +72,7 @@
           </label>
 
           @if (categoryChips().length) {
-            <div class="favorites-chip-row" aria-label="Saved place highlights">
+            <div class="favorites-chip-row" [attr.aria-label]="translate('favorites.summaryTitle')">
               <span class="favorites-chip favorites-chip--primary">{{ translate('favorites.allSaved') }}</span>
               @for (chip of categoryChips(); track trackChip($index, chip)) {
                 <span class="favorites-chip">{{ chip.label }}</span>
@@ -148,7 +148,7 @@
                   <div class="favorite-card__chips">
                     <span class="card-chip">{{ item.categoryLabel }}</span>
                     @if (item.rating && item.rating >= 4.8) {
-                      <span class="card-chip">Must-See</span>
+                      <span class="card-chip">{{ translate('favorites.mustSee') }}</span>
                     }
                   </div>
                 </div>

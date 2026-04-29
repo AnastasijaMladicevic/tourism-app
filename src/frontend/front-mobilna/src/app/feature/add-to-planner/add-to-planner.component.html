@@ -1,15 +1,15 @@
 <div class="add-planner-page">
   <header class="add-planner-topbar">
-    <button type="button" class="back-btn" (click)="goBack()" aria-label="Back to planner">
+    <button type="button" class="back-btn" (click)="goBack()" [attr.aria-label]="translate('addToPlanner.backAria')">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="m15 18-6-6 6-6" />
       </svg>
     </button>
 
-    <h1>Add Event to Planner</h1>
+    <h1>{{ translate('addToPlanner.title') }}</h1>
 
     <div class="topbar-actions">
-      <button type="button" class="topbar-icon-btn" aria-label="Notifications">
+      <button type="button" class="topbar-icon-btn" [attr.aria-label]="translate('planner.notifications')">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M15 17h5l-1.4-1.4a2 2 0 0 1-.6-1.4V11a6 6 0 1 0-12 0v3.2c0 .53-.21 1.04-.59 1.41L4 17h5" />
           <path d="M10 20a2 2 0 0 0 4 0" />
@@ -73,13 +73,13 @@
 
       <section class="schedule-card">
         <div class="schedule-card__header">
-          <h3>Schedule Your Event</h3>
-          <p>Fill in the details to add this event to your trip plan.</p>
+          <h3>{{ translate('addToPlanner.scheduleTitle') }}</h3>
+          <p>{{ translate('addToPlanner.scheduleBody') }}</p>
         </div>
 
         @if (!eventId) {
           <p class="support-hint">
-            Ovaj preview trenutno nije event. Planner za sada podrzava samo dodavanje eventova.
+            {{ translate('addToPlanner.nonEventHint') }}
           </p>
         }
 
@@ -92,7 +92,7 @@
                 <path d="M16 3v4" />
                 <path d="M4 10h16" />
               </svg>
-              Travel Date
+              {{ translate('addToPlanner.travelDate') }}
             </span>
 
             <div class="field-card__surface">
@@ -128,7 +128,7 @@
                 <circle cx="12" cy="12" r="8" />
                 <path d="M12 8v4l3 2" />
               </svg>
-              Start Time
+              {{ translate('addToPlanner.startTime') }}
             </span>
 
             <div class="field-card__surface">
@@ -142,7 +142,7 @@
                 <circle cx="12" cy="12" r="8" />
                 <path d="M12 8v4l3 2" />
               </svg>
-              End Time
+              {{ translate('addToPlanner.endTime') }}
             </span>
 
             <div class="field-card__surface field-card__surface--readonly">
@@ -161,7 +161,7 @@
               </svg>
             </div>
             <div>
-              <strong>Time Conflict Detected</strong>
+              <strong>{{ translate('addToPlanner.timeConflictTitle') }}</strong>
               <p>{{ conflictMessage() }}</p>
             </div>
           </article>
@@ -169,7 +169,7 @@
 
         <div class="duration-block">
           <div class="duration-block__head">
-            <h4>Estimated Duration</h4>
+            <h4>{{ translate('addToPlanner.estimatedDuration') }}</h4>
             <span>{{ durationLabel() }}</span>
           </div>
 
@@ -192,7 +192,7 @@
           </div>
 
           <label class="field-card field-card--full field-card--desktop-select">
-            <span>Duration</span>
+            <span>{{ translate('addToPlanner.duration') }}</span>
             <div class="field-card__surface">
               <select [ngModel]="durationMinutes()" (ngModelChange)="durationMinutes.set(+$event)">
                 @for (minutes of durationOptions; track minutes) {
@@ -211,8 +211,8 @@
           </div>
 
           <div class="priority-card__copy">
-            <strong>Mark as Priority</strong>
-            <p>Highlight it in your planner overview and schedule.</p>
+            <strong>{{ translate('addToPlanner.priorityTitle') }}</strong>
+            <p>{{ translate('addToPlanner.priorityBody') }}</p>
           </div>
 
           <button
@@ -220,17 +220,17 @@
             class="toggle-btn"
             [class.toggle-btn--active]="isPriority()"
             (click)="togglePriority()"
-            aria-label="Toggle priority"
+            [attr.aria-label]="translate('addToPlanner.togglePriority')"
           >
             <span></span>
           </button>
         </article>
 
         <label class="notes-field">
-          <span>Additional Notes</span>
+          <span>{{ translate('addToPlanner.notesLabel') }}</span>
           <textarea
             rows="4"
-            placeholder="e.g. Bring extra camera batteries, meet at the North Gate..."
+            [placeholder]="translate('addToPlanner.notesPlaceholder')"
             [ngModel]="notes()"
             (ngModelChange)="notes.set($event)"
           ></textarea>
@@ -238,9 +238,9 @@
 
         <div class="schedule-actions">
           <button type="button" class="save-btn" [disabled]="isSaving()" (click)="save()">
-            {{ isSaving() ? 'Saving...' : 'Save to Planner' }}
+            {{ isSaving() ? translate('addToPlanner.saving') : translate('addToPlanner.save') }}
           </button>
-          <button type="button" class="cancel-btn" (click)="goBack()">Cancel</button>
+          <button type="button" class="cancel-btn" (click)="goBack()">{{ translate('addToPlanner.cancel') }}</button>
         </div>
 
         @if (feedback()) {
@@ -253,8 +253,8 @@
   <footer class="add-planner-footer">
     <span>SpireGO Planner &#169; 2024</span>
     <div>
-      <a routerLink="/support">Help Center</a>
-      <a routerLink="/terms">Terms of Service</a>
+      <a routerLink="/support">{{ translate('addToPlanner.helpCenter') }}</a>
+      <a routerLink="/terms">{{ translate('addToPlanner.termsLink') }}</a>
     </div>
   </footer>
 </div>
