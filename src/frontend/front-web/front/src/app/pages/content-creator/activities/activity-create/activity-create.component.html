@@ -198,11 +198,6 @@
 
         <div #activityMap class="location-map" aria-label="Activity location map"></div>
 
-        <div class="map-help-row">
-          <span class="map-help-pill">Zoom in/out with the map controls</span>
-          <span class="map-help-pill map-help-pill--accent">Tap or click to select a location</span>
-        </div>
-
         <div class="coordinates-grid">
           <div class="field">
             <label for="latitude-input">Latitude</label>
@@ -228,14 +223,6 @@
             <strong>{{ locationDetails.fullAddress }}</strong>
           </div>
         </div>
-
-        @if (locationDetails.loading) {
-          <p class="field-hint">Resolving address details from the selected point...</p>
-        }
-
-        @if (form.errors?.['coordinatePairRequired'] && (form.controls.latitude.touched || form.controls.longitude.touched)) {
-          <p class="field-error">Latitude and longitude must be provided together.</p>
-        }
       </article>
 
       @if (isLoadingOptions) {

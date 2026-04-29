@@ -265,11 +265,6 @@
 
         <div #eventMap class="location-map" aria-label="Event location map"></div>
 
-        <div class="map-help-row">
-          <span class="map-help-pill">Zoom in/out with map controls</span>
-          <span class="map-help-pill map-help-pill--accent">Tap or click map to set coordinates</span>
-        </div>
-
         <div class="coordinates-grid" [formGroup]="form">
           <label class="form-field">
             <span>Latitude</span>
@@ -287,42 +282,6 @@
           <p>{{ selectedVenue.address }}</p>
         </div>
       </section>
-
-      <!-- <section class="card side-card">
-        <div class="section-title compact">
-          <h2>Related Activities</h2>
-          <p>Attach the activities that should appear alongside this event.</p>
-        </div>
-
-        <label class="form-field">
-          <span>Search activities</span>
-          <input class="form-control" type="text" [(ngModel)]="activitySearchTerm" [ngModelOptions]="{ standalone: true }" placeholder="Search by activity name" />
-        </label>
-
-        @if (isLoadingRelatedActivities) {
-          <p class="side-note">Loading your activities...</p>
-        }
-
-        <div class="activity-list">
-          <label class="activity-row" *ngFor="let activity of visibleRelatedActivities">
-            <div class="activity-meta">
-              <strong>{{ activity.name }}</strong>
-              <span>{{ activity.meta }}</span>
-            </div>
-            <input type="checkbox" [checked]="selectedActivityIds.has(activity.id)" (change)="toggleActivity(activity.id)" />
-          </label>
-
-          @if (!isLoadingRelatedActivities && visibleRelatedActivities.length === 0) {
-            <p class="side-note">No matching activities found.</p>
-          }
-        </div>
-
-        @if (hiddenActivitiesCount > 0) {
-          <button type="button" class="link-btn" (click)="toggleMoreActivities()">
-            {{ showAllRelatedActivities ? 'Show fewer activities' : '+ Link more activities (' + hiddenActivitiesCount + ')' }}
-          </button>
-        }
-      </section> -->
 
       <section class="card side-card tips-card">
         <div class="section-title compact">
