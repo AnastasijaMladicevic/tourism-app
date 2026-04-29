@@ -1,47 +1,35 @@
 import { Component, OnInit, inject, ChangeDetectorRef, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivitiesService, ActivityDto, ActivityTypeOption } from '../../../services/activities';
-import { DestinationService } from '../../../services/destination.service';
-
-interface ActivityInsightCard {
-  label: string;
-  value: string;
-  hint: string;
-  tone: 'blue' | 'green' | 'neutral';
-}
-
-interface ActivityDetailRow {
-  label: string;
-  value: string;
-}
 
 @Component({
   selector: 'app-manager-activities',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './activities.component.html',
   styleUrls: ['./activities.component.css']
 })
 export class ManagerActivitiesComponent implements OnInit {
   private readonly activitiesService = inject(ActivitiesService);
-  private readonly destinationService = inject(DestinationService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
 
-  Math = Math;
-
   activities: ActivityDto[] = [];
-  filteredActivities: ActivityDto[] = [];
-  pagedActivities: ActivityDto[] = [];
-  selectedActivity: ActivityDto | null = null;
-  managedDestinationLabel = 'Manager Activities';
-
   isLoading = true;
   errorMessage = '';
+  selectedActivity: ActivityDto | null = null;
+  selectedActivityDetails: ActivityDto | null = null;
+  isDetailsLoading = false;
+
+  currentPage = 1;
+  pageSize = 5;
+  totalCount = 0;
+  totalPages = 1;
+  readonly pageSizeOptions = [5, 10, 20, 50];
 
   searchQuery = '';
   draftSearchQuery = '';
@@ -49,54 +37,42 @@ export class ManagerActivitiesComponent implements OnInit {
   typeFilter = 'all';
   sortBy = 'name';
   sortOrder: 'asc' | 'desc' = 'asc';
-  pageSize = 5;
-  readonly pageSizeOptions = [5, 10, 20, 50];
   filterPanelOpen = false;
 
-  currentPage = 1;
-  totalCount = 0;
+  activityTypeOptions: ActivityTypeOption[] = [];
+  isLoadingTypes = true;
 
-  readonly stats: ActivityInsightCard[] = [
-    { label: 'Active activities', value: '34', hint: '+5 pending review', tone: 'blue' },
-    { label: 'Total bookings', value: '892', hint: 'This month', tone: 'green' },
-    { label: 'Avg. rating', value: '4.7/5', hint: 'From 156 reviews', tone: 'neutral' }
+  readonly statusOptions = [
+    { value: 'all', label: 'All Statuses' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'rejected', label: 'Rejected' }
   ];
 
-  activityTypeOptions: ActivityTypeOption[] = [];
-  isLoadingFilters = true;
+  readonly sortByOptions = [
+    { value: 'name', label: 'Name' },
+    { value: 'price', label: 'Price' },
+    { value: 'durationMinutes', label: 'Duration' },
+    { value: 'createdAt', label: 'Created date' }
+  ];
 
   ngOnInit(): void {
-    this.loadManagedDestinationLabel();
-    this.loadFilterOptions();
+    this.loadActivityTypes();
     this.loadActivities();
   }
 
-  loadManagedDestinationLabel(): void {
-    this.destinationService.getAll({ page: 1, pageSize: 100, sortBy: 'name', sortOrder: 'asc' })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (response: any) => {
-          const list = Array.isArray(response) ? response : (response?.items ?? []);
-          this.managedDestinationLabel = list.map((d: any) => d.name).join(', ') || 'Manager Activities';
-        },
-        error: () => {
-          this.managedDestinationLabel = 'Manager Activities';
-        }
-      });
-  }
-
-  loadFilterOptions(): void {
+  private loadActivityTypes(): void {
     this.activitiesService.getActivityTypeOptions()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (types) => {
           this.activityTypeOptions = types;
-          this.isLoadingFilters = false;
+          this.isLoadingTypes = false;
           this.cdr.detectChanges();
         },
         error: () => {
           this.activityTypeOptions = [];
-          this.isLoadingFilters = false;
+          this.isLoadingTypes = false;
           this.cdr.detectChanges();
         }
       });
@@ -109,75 +85,62 @@ export class ManagerActivitiesComponent implements OnInit {
     this.activitiesService.getForManager({
       page: this.currentPage,
       pageSize: this.pageSize,
+      search: this.searchQuery || undefined,
+      status: this.statusFilter !== 'all' ? this.statusFilter : undefined,
       sortBy: this.sortBy,
       sortOrder: this.sortOrder
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-      next: (response) => {
-        this.activities = response.items;
-        this.filteredActivities = this.applyFilters(response.items);
-        this.pagedActivities = this.filteredActivities;
-        this.totalCount = response.totalCount;
-        this.currentPage = response.page;
+        next: (response) => {
+          let items = response.items ?? [];
 
-        if (!this.selectedActivity || !this.pagedActivities.some((activity) => activity.id === this.selectedActivity?.id)) {
-          this.selectedActivity = this.pagedActivities[0] ?? null;
+          if (this.typeFilter !== 'all') {
+            const typeId = Number(this.typeFilter);
+            if (Number.isFinite(typeId)) {
+              items = items.filter((activity) => activity.activityTypeId === typeId);
+            }
+          }
+
+          this.activities = items;
+          this.totalCount = response.totalCount ?? items.length;
+          this.currentPage = response.page ?? this.currentPage;
+          this.pageSize = response.pageSize ?? this.pageSize;
+          this.totalPages = response.totalPages ?? Math.max(1, Math.ceil(this.totalCount / this.pageSize));
+
+          if (!this.selectedActivity || !this.activities.some((activity) => activity.id === this.selectedActivity?.id)) {
+            this.selectedActivity = this.activities[0] ?? null;
+          }
+
+          if (this.selectedActivity) {
+            this.loadSelectedActivityDetails(this.selectedActivity.id);
+          } else {
+            this.selectedActivityDetails = null;
+          }
+
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          this.errorMessage = error?.error?.message ?? 'Failed to load activities';
+          this.activities = [];
+          this.totalCount = 0;
+          this.totalPages = 1;
+          this.selectedActivity = null;
+          this.selectedActivityDetails = null;
+          this.isLoading = false;
+          this.cdr.detectChanges();
         }
-
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      },
-      error: (error) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to load activities';
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      }
-    });
+      });
   }
 
-  private applyFilters(activities: ActivityDto[]): ActivityDto[] {
-    let result = activities;
-
-    // Apply status filter
-    if (this.statusFilter !== 'all') {
-      result = result.filter((activity) => this.getActivityStatusKey(activity.status) === this.statusFilter.toLowerCase());
-    }
-
-    // Apply type filter
-    if (this.typeFilter !== 'all' && this.typeFilter) {
-      const typeId = Number(this.typeFilter);
-      result = result.filter((activity) => activity.activityTypeId === typeId);
-    }
-
-    // Apply search query
-    if (this.searchQuery.trim()) {
-      const query = this.searchQuery.toLowerCase();
-      result = result.filter((activity) =>
-        activity.name.toLowerCase().includes(query) ||
-        activity.description?.toLowerCase().includes(query)
-      );
-    }
-
-    return result;
-  }
-
-  onSearchChange(): void {
-    // Intentionally no-op: search is applied on Enter or when filters are applied.
+  onSearch(): void {
+    // Search is applied explicitly on Enter or via the filter panel's Apply button.
   }
 
   onSearchEnter(event: Event): void {
     event.preventDefault();
-    this.applySearch();
-  }
-
-  applySearch(): void {
-    this.currentPage = 1;
-    this.searchQuery = this.draftSearchQuery.trim();
-    this.filteredActivities = this.applyFilters(this.activities);
-    this.pagedActivities = this.filteredActivities;
-    this.totalCount = this.filteredActivities.length;
-    this.cdr.detectChanges();
+    this.onApplyFilters();
   }
 
   onMoreFilters(): void {
@@ -185,8 +148,8 @@ export class ManagerActivitiesComponent implements OnInit {
   }
 
   onApplyFilters(): void {
-    this.currentPage = 1;
     this.searchQuery = this.draftSearchQuery.trim();
+    this.currentPage = 1;
     this.loadActivities();
   }
 
@@ -197,32 +160,30 @@ export class ManagerActivitiesComponent implements OnInit {
     this.typeFilter = 'all';
     this.sortBy = 'name';
     this.sortOrder = 'asc';
-    this.pageSize = 5;
     this.currentPage = 1;
     this.loadActivities();
   }
 
-  onEditActivity(activity: ActivityDto): void {
-    this.router.navigate(['/manager/activities/edit', activity.id]);
-  }
-
-  onViewActivity(activity: ActivityDto): void {
-    this.selectedActivity = activity;
-    this.cdr.detectChanges();
+  onFilterChange(): void {
+    // Filters are applied explicitly via the panel's Apply button.
   }
 
   onNextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.loadActivities();
+    if (this.currentPage >= this.totalPages) {
+      return;
     }
+
+    this.currentPage += 1;
+    this.loadActivities();
   }
 
   onPreviousPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.loadActivities();
+    if (this.currentPage <= 1) {
+      return;
     }
+
+    this.currentPage -= 1;
+    this.loadActivities();
   }
 
   onPageSizeChange(value: number | string): void {
@@ -231,154 +192,59 @@ export class ManagerActivitiesComponent implements OnInit {
     this.loadActivities();
   }
 
+  onSelectActivity(activity: ActivityDto): void {
+    this.selectedActivity = activity;
+    this.selectedActivityDetails = activity;
+    this.loadSelectedActivityDetails(activity.id);
+  }
+
+  onReviewActivity(activity: ActivityDto): void {
+    this.router.navigate(['/manager/activities/review', activity.id]);
+  }
+
   trackByActivityId(_: number, activity: ActivityDto): number {
     return activity.id;
   }
 
-  getStatusBadgeClass(isActive: boolean | undefined): string {
-    return isActive ? 'badge-approved' : 'badge-pending';
-  }
-
-  getActivityStatusKey(status: string | undefined): string {
-    return (status || 'pending').trim().toLowerCase();
-  }
-
-  getActivityStatusLabel(status: string | undefined): string {
-    const normalized = this.getActivityStatusKey(status);
-
-    if (normalized === 'approved') {
-      return 'Approved';
-    }
-
-    if (normalized === 'rejected') {
-      return 'Rejected';
-    }
-
-    return 'Pending';
-  }
-
-  getActivityStatusBadgeClass(status: string | undefined): string {
-    const normalized = this.getActivityStatusKey(status);
-
-    if (normalized === 'approved') {
-      return 'badge-approved';
-    }
-
-    if (normalized === 'rejected') {
-      return 'badge-rejected';
-    }
-
-    return 'badge-pending';
-  }
-
-  formatDate(date: string | Date | undefined): string {
-    if (!date) {
+  formatDuration(minutes?: number): string {
+    if (!minutes || minutes <= 0) {
       return '-';
     }
 
-    const d = new Date(date);
-    return d.toLocaleDateString('en-GB', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    });
-  }
+    if (minutes < 60) {
+      return `${minutes} min`;
+    }
 
-  getActivityTypeLabel(activity: ActivityDto): string {
-    return activity.activityTypeName || 'Activity';
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+
+    if (remainingMinutes === 0) {
+      return hours === 1 ? '1 Hour' : `${hours} Hours`;
+    }
+
+    return `${hours}h ${remainingMinutes}m`;
   }
 
   getActivityLocation(activity: ActivityDto): string {
-    return activity.destinationName || activity.localityName || 'Location TBD';
+    return activity.destinationName || activity.localityName || activity.objectName || activity.regionName || '-';
   }
 
-  getActivityLocationSub(activity: ActivityDto): string {
-    if (activity.localityName && activity.destinationName) {
-      return activity.destinationName;
-    }
-    return '';
+  getStatusLabel(status?: string): string {
+    const normalized = (status ?? '').trim().toLowerCase();
+    if (normalized === 'approved') return 'Approved';
+    if (normalized === 'rejected') return 'Rejected';
+    return 'Pending';
   }
 
-  getDurationLabel(activity: ActivityDto): string {
-    if (!activity.durationMinutes) {
-      return '—';
-    }
-
-    const hours = Math.floor(activity.durationMinutes / 60);
-    const minutes = activity.durationMinutes % 60;
-
-    if (hours > 0 && minutes > 0) {
-      return `${hours}h ${minutes}m`;
-    } else if (hours > 0) {
-      return `${hours}h`;
-    } else {
-      return `${minutes}m`;
-    }
-  }
-
-  getPriceLabel(activity: ActivityDto): string {
-    if (!activity.price) {
-      return 'Free';
-    }
-
-    return `$${activity.price.toFixed(2)}`;
-  }
-
-  getActivityIcon(activity: ActivityDto): string {
-    const type = this.getActivityTypeLabel(activity).toLowerCase();
-    switch (type) {
-      case 'tour':
-        return 'map';
-      case 'workshop':
-        return 'school';
-      case 'sport':
-        return 'sports_soccer';
-      case 'cultural':
-        return 'museum';
-      case 'dining':
-        return 'restaurant';
-      case 'wellness':
-        return 'spa';
-      default:
-        return 'location_on';
-    }
-  }
-
-  getDetailBanner(activity: ActivityDto | null): string {
-    if (activity?.mainImageUrl) {
-      return activity.mainImageUrl;
-    }
-
-    return 'assets/pozadina.png';
-  }
-
-  getSelectedSummary(activity: ActivityDto | null): string {
-    if (!activity?.description) {
-      return 'An exciting activity curated for your experience.';
-    }
-
-    return activity.description;
-  }
-
-  get selectedMetrics(): ActivityDetailRow[] {
-    if (!this.selectedActivity) {
-      return [];
-    }
-
-    return [
-      {
-        label: 'Duration',
-        value: this.getDurationLabel(this.selectedActivity)
-      },
-      {
-        label: 'Price',
-        value: this.getPriceLabel(this.selectedActivity)
-      }
-    ];
+  getStatusClass(status?: string): string {
+    const normalized = (status ?? '').trim().toLowerCase();
+    if (normalized === 'approved') return 'status-published';
+    if (normalized === 'rejected') return 'status-archived';
+    return 'status-pending';
   }
 
   get pageStart(): number {
-    if (!this.totalCount || !this.pagedActivities.length) {
+    if (!this.totalCount || this.activities.length === 0) {
       return 0;
     }
 
@@ -386,11 +252,71 @@ export class ManagerActivitiesComponent implements OnInit {
   }
 
   get pageEnd(): number {
-    const end = this.pageStart + this.pagedActivities.length - 1;
-    return end > 0 ? end : 0;
+    return this.pageStart + this.activities.length - 1;
   }
 
-  get totalPages(): number {
-    return Math.ceil(this.totalCount / this.pageSize);
+  get selectedSummary(): string {
+    const activity = this.selectedActivityDetails ?? this.selectedActivity;
+
+    if (!activity?.description) {
+      return 'A submitted activity awaiting your oversight. Review the details, location, and metadata before approving or declining.';
+    }
+
+    return activity.description;
+  }
+
+  get selectedCategory(): string {
+    const activity = this.selectedActivityDetails ?? this.selectedActivity;
+    return activity?.activityTypeName || 'Activity';
+  }
+
+  get selectedLocation(): string {
+    const activity = this.selectedActivityDetails ?? this.selectedActivity;
+
+    if (!activity) {
+      return '-';
+    }
+
+    return activity.destinationName || activity.localityName || activity.objectName || activity.regionName || '-';
+  }
+
+  get selectedBanner(): string {
+    const activity = this.selectedActivityDetails ?? this.selectedActivity;
+    return activity?.mainImageUrl || '/assets/pozadina.png';
+  }
+
+  get hasSelectedRejection(): boolean {
+    const activity = this.selectedActivityDetails ?? this.selectedActivity;
+    if (!activity) {
+      return false;
+    }
+
+    return (activity.status ?? '').trim().toLowerCase() === 'rejected'
+      && !!activity.rejectionReason?.trim();
+  }
+
+  get selectedRejectionReason(): string {
+    const activity = this.selectedActivityDetails ?? this.selectedActivity;
+    return activity?.rejectionReason?.trim() ?? '';
+  }
+
+  private loadSelectedActivityDetails(activityId: number): void {
+    this.isDetailsLoading = true;
+    this.selectedActivityDetails = this.selectedActivity;
+
+    this.activitiesService.getById(activityId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (activity) => {
+          this.selectedActivityDetails = activity;
+          this.isDetailsLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.selectedActivityDetails = this.selectedActivity;
+          this.isDetailsLoading = false;
+          this.cdr.detectChanges();
+        }
+      });
   }
 }

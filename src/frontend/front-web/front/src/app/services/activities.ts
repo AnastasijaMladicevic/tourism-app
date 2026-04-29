@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, forkJoin, map } from 'rxjs';
+import { Observable, from, map, of } from 'rxjs';
+import { concatMap, toArray } from 'rxjs/operators';
 import { environment } from '../../environment/environment';
 
 export interface ActivityDto {
@@ -170,19 +171,28 @@ export class ActivitiesService {
   }
 
   attachImages(activityId: number, imageUrls: string[]): Observable<unknown[]> {
-    const requests = imageUrls
+    const cleanUrls = imageUrls
       .map((url) => url.trim())
-      .filter((url) => url.length > 0)
-      .map((url, index) => {
+      .filter((url) => url.length > 0);
+
+    if (cleanUrls.length === 0) {
+      return of([]);
+    }
+
+    // Backend rejects subsequent images while the activity has zero stored images
+    // (the first image must be marked main). Send them sequentially so each request
+    // observes the previously-saved row.
+    return from(cleanUrls).pipe(
+      concatMap((url, index) => {
         const payload: AddImageDto = {
           url,
           isMain: index === 0
         };
 
         return this.http.post(`${this.apiUrl}/${activityId}/images`, payload);
-      });
-
-    return requests.length > 0 ? forkJoin(requests) : forkJoin([]);
+      }),
+      toArray()
+    );
   }
 
   getActivityTypeOptions(): Observable<ActivityTypeOption[]> {

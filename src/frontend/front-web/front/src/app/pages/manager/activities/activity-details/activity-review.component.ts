@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
 import {
   AfterViewInit,
+  ChangeDetectorRef,
   Component,
   ElementRef,
+  NgZone,
   OnDestroy,
   OnInit,
   ViewChild,
@@ -26,6 +28,8 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
   private readonly activitiesService = inject(ActivitiesService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly ngZone = inject(NgZone);
 
   @ViewChild('activityMap') private activityMap?: ElementRef<HTMLDivElement>;
 
@@ -102,13 +106,19 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
+    this.cdr.detectChanges();
 
     this.activitiesService.getById(this.activityId).pipe(
       finalize(() => {
         this.isLoading = false;
-        setTimeout(() => {
-          this.initializeMap();
-          this.syncMapFromActivity();
+        this.cdr.detectChanges();
+        this.ngZone.runOutsideAngular(() => {
+          setTimeout(() => {
+            this.ngZone.run(() => {
+              this.initializeMap();
+              this.syncMapFromActivity();
+            });
+          });
         });
       })
     ).subscribe({
@@ -116,6 +126,7 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
         if (!activity) {
           this.activity = null;
           this.errorMessage = 'Activity details are unavailable.';
+          this.cdr.detectChanges();
           return;
         }
 
@@ -125,11 +136,13 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
         this.patchForm(activity);
         this.form.disable({ emitEvent: false });
         this.rejectionReason = activity.rejectionReason?.trim() ?? '';
+        this.cdr.detectChanges();
         this.syncMapFromActivity();
         this.loadActivityImages(activity.id, activity.mainImageUrl);
       },
       error: (error: any) => {
         this.errorMessage = error?.error?.message ?? 'Failed to load activity';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -149,6 +162,7 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
           ?? this.selectedImageUrl;
 
         this.patchImageFieldsFromSelection();
+        this.cdr.detectChanges();
       });
   }
 
@@ -196,6 +210,7 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
     this.activitiesService.approve(this.activityId, dto).pipe(
       finalize(() => {
         this.isSubmitting = false;
+        this.cdr.detectChanges();
       })
     ).subscribe({
       next: (activity) => {
@@ -204,10 +219,12 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
         this.patchForm(activity);
         this.form.disable({ emitEvent: false });
         this.successMessage = 'Activity approved successfully.';
+        this.cdr.detectChanges();
         setTimeout(() => this.router.navigate(['/manager/activities']), 1000);
       },
       error: (error: any) => {
         this.errorMessage = error?.error?.message ?? 'Failed to approve activity';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -253,6 +270,7 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
     this.activitiesService.approve(this.activityId, dto).pipe(
       finalize(() => {
         this.isSubmitting = false;
+        this.cdr.detectChanges();
       })
     ).subscribe({
       next: (activity) => {
@@ -262,10 +280,12 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
         this.patchForm(activity);
         this.form.disable({ emitEvent: false });
         this.successMessage = 'Activity declined successfully.';
+        this.cdr.detectChanges();
         setTimeout(() => this.router.navigate(['/manager/activities']), 1000);
       },
       error: (error: any) => {
         this.errorMessage = error?.error?.message ?? 'Failed to decline activity';
+        this.cdr.detectChanges();
       }
     });
   }

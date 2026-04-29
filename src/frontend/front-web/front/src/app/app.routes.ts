@@ -175,7 +175,7 @@ export const routes: Routes = [
               import('./pages/manager/activities/activities.component').then(m => m.ManagerActivitiesComponent)
           },
           {
-            path: 'edit/:id',
+            path: 'review/:id',
             loadComponent: () =>
               import('./pages/manager/activities/activity-details/activity-review.component').then(m => m.ManagerActivityReviewComponent)
           }
