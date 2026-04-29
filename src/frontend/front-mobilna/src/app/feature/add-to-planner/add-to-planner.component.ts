@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import { EventPlannerDto, EventPlannerService } from '../../services/event-planner';
 import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
+import { TranslationService } from '../../services/translation.service';
 
 interface PlannerCalendarDay {
   id: string;
@@ -46,6 +47,7 @@ export class AddToPlannerComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly plannerService = inject(EventPlannerService);
   private readonly plannerLocalPreferences = inject(PlannerLocalPreferencesService);
+  private readonly translationService = inject(TranslationService);
 
   protected readonly selectedDayId = signal('');
   protected readonly travelDate = signal('');
@@ -75,7 +77,7 @@ export class AddToPlannerComponent implements OnInit {
       return {
         id: this.toDateInputValue(nextDate),
         isoDate: this.toDateInputValue(nextDate),
-        label: new Intl.DateTimeFormat('sr-Latn-RS', { weekday: 'short' })
+        label: new Intl.DateTimeFormat(this.translationService.currentLocale(), { weekday: 'short' })
           .format(nextDate)
           .replace('.', '')
           .slice(0, 3)
@@ -103,13 +105,13 @@ export class AddToPlannerComponent implements OnInit {
     this.selectedDayId.set(this.toDateInputValue(startDate));
 
     this.preview = {
-      title: state.title || 'Stari grad Kotor',
-      location: state.location || 'Boka Kotorska, Crna Gora',
-      type: state.type || 'Dogadjaj',
+      title: state.title || this.translate('addToPlanner.previewFallbackTitle'),
+      location: state.location || this.translate('addToPlanner.previewFallbackLocation'),
+      type: state.type || this.translate('addToPlanner.previewFallbackType'),
       rating: state.rating || '4.9',
       imageUrl: state.imageUrl || '/assets/izlet-boko-kotorski-zaliv-1.jpg',
       description:
-        state.description || 'Highlight your night with music, atmosphere and a memorable crowd.',
+        state.description || this.translate('addToPlanner.previewFallbackDescription'),
     };
   }
 
@@ -135,6 +137,10 @@ export class AddToPlannerComponent implements OnInit {
     this.router.navigate(['/planner']);
   }
 
+  protected translate(key: string, params?: Record<string, string | number>): string {
+    return this.translationService.translate(key, params);
+  }
+
   protected selectDay(day: PlannerCalendarDay): void {
     this.selectedDayId.set(day.id);
     this.travelDate.set(day.isoDate);
@@ -154,12 +160,12 @@ export class AddToPlannerComponent implements OnInit {
 
   protected save(): void {
     if (!this.eventId || this.isSaving()) {
-      this.feedback.set('Planner trenutno podrzava samo cuvanje eventova.');
+      this.feedback.set(this.translate('addToPlanner.feedbackOnlyEvents'));
       return;
     }
 
     if (this.existingPlannerItems().some((item) => item.eventId === this.eventId)) {
-      this.feedback.set('Ovaj event je vec dodat u planner.');
+      this.feedback.set(this.translate('addToPlanner.feedbackAlreadyAdded'));
       return;
     }
 
@@ -172,7 +178,7 @@ export class AddToPlannerComponent implements OnInit {
         catchError((error) => {
           const message =
             (error as { error?: { message?: string } })?.error?.message ||
-            'Event trenutno nije moguce dodati u planer.';
+            this.translate('addToPlanner.feedbackCannotAdd');
           this.feedback.set(message);
           return of(null);
         }),
@@ -225,7 +231,10 @@ export class AddToPlannerComponent implements OnInit {
       return '';
     }
 
-    return `Ovaj termin se preklapa sa "${conflict.title}" u ${this.formatTimeLabel(conflict.startDate)}.`;
+    return this.translate('addToPlanner.conflictMessage', {
+      title: conflict.title,
+      time: this.formatTimeLabel(conflict.startDate),
+    });
   }
 
   private buildSelectedStartDate(): Date {
@@ -281,7 +290,7 @@ export class AddToPlannerComponent implements OnInit {
 
   private formatFriendlyDate(value: string): string {
     const date = this.parseDate(value) ?? new Date();
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(this.translationService.currentLocale(), {
       weekday: 'long',
       month: 'short',
       day: 'numeric',
@@ -290,7 +299,7 @@ export class AddToPlannerComponent implements OnInit {
   }
 
   private formatTimeLabel(date: Date): string {
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(this.translationService.currentLocale(), {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,

@@ -116,11 +116,11 @@ export class FavoritesComponent implements OnInit {
     }
 
     return [
-      { label: 'Destinations', count: counts.destination },
-      { label: 'Objects', count: counts.object },
-      { label: 'Activities', count: counts.activity },
-      { label: 'Localities', count: counts.locality },
-      { label: 'Routes', count: counts.route },
+      { label: this.translate('favorites.breakdown.destination'), count: counts.destination },
+      { label: this.translate('favorites.breakdown.object'), count: counts.object },
+      { label: this.translate('favorites.breakdown.activity'), count: counts.activity },
+      { label: this.translate('favorites.breakdown.locality'), count: counts.locality },
+      { label: this.translate('favorites.breakdown.route'), count: counts.route },
     ].filter((item) => item.count > 0);
   });
 
@@ -343,7 +343,7 @@ export class FavoritesComponent implements OnInit {
       categoryLabel,
       location,
       quote: activity?.durationMinutes
-        ? `${activity.durationMinutes} min experience saved for later.`
+        ? this.translate('favorites.activityDurationQuote', { count: activity.durationMinutes })
         : this.translate('favorites.fallbackQuote'),
       note: this.buildRelativeNote(item.createdAt),
       imageUrl: this.resolveMediaUrl(activity?.mainImageUrl) || this.defaultImages.activity,

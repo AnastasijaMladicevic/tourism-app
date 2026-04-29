@@ -47,6 +47,7 @@ interface FeaturedDestination {
   name: string;
   description?: string;
   imageUrl?: string;
+  displayTitle?: string;
 }
 
 interface ApiTranslationDto {
@@ -395,7 +396,6 @@ export class HomeComponent implements OnInit {
           });
         this.currentIndex = 0;
         this.currentFeatured = this.featuredDestinations[0];
-        console.log("🚀 ~ HomeComponent ~ loadFeatured ~ this.currentFeatured :", this.currentFeatured )
         
         this.startRotation();
         this.flushUi();
@@ -505,9 +505,12 @@ export class HomeComponent implements OnInit {
             this.featuredDestinations = res;
           });
           this.currentIndex = 0;
+          this.translateFeaturedDisplayTitles(selectedFeatured).subscribe((res) => {
+          this.featuredDestinations = res;
           this.currentFeatured = this.featuredDestinations[0];
-          console.log("🚀 ~ HomeComponent ~ loadPlaceCards ~ this.currentFeatured:", this.currentFeatured)
           this.startRotation();
+          this.flushUi();
+        });
           this.flushUi();
         } else {
           this.featuredDestinations = [];
@@ -537,16 +540,12 @@ private translateFeaturedDisplayTitles(
       .trim()
       .toLowerCase();
 
-  console.log('translateFeaturedDisplayTitles lang:', lang);
-  console.log('featured:', featured);
-
   if (!featured.length || lang === 'sr' || lang === 'me') {
     return of(featured);
   }
 
   return forkJoin(
     featured.map((item) => {
-      console.log('pozivam translations za destination:', item.id);
 
       return this.http
       .get<ApiTranslationDto[]>(
@@ -557,7 +556,7 @@ private translateFeaturedDisplayTitles(
           const translatedDescription = translations
             .find(
               (translation) =>
-                translation.fieldName?.toLowerCase() === 'description' &&
+                translation.fieldName?.toLowerCase() === 'displayTitle' &&
                 translation.languageCode?.toLowerCase() === lang
             )
             ?.translatedText?.trim();
@@ -565,7 +564,7 @@ private translateFeaturedDisplayTitles(
           return translatedDescription
             ? {
                 ...item,
-                description: translatedDescription,
+                displayTitle: translatedDescription,
               }
             : item;
         }),
@@ -866,10 +865,11 @@ private translateFeaturedDisplayTitles(
     return {
       id: destination.id,
       name: destination.name,
-      description:
+      displayTitle:
         destination.displayTitle?.trim() ||
         destination.description?.trim() ||
         destination.destinationTypeName,
+      description: destination.description,
       imageUrl: this.pickDestinationImage(destination),
     };
   }
