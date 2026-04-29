@@ -7,11 +7,10 @@
     <div class="form">
       <form [formGroup]="form" (keydown.enter)="submit()">
         <!-- EMAIL -->
-        <label for="email">EMAIL</label>
 
         <div class="input-group">
           <span class="icon">mail</span>
-          <input type="email" placeholder="tourist@gmail.com" formControlName="email" />
+          <input type="email" placeholder="Email" formControlName="email" />
         </div>
         @if (email?.touched && email?.invalid) {
           <div class="error">
@@ -24,14 +23,13 @@
           </div>
         }
         <!-- PASSWORD -->
-        <label for="password">PASSWORD</label>
 
         <div class="input-group">
           <span class="icon">lock</span>
 
           <input
             [type]="hidePassword ? 'password' : 'text'"
-            placeholder="••••••••••••"
+            placeholder="Password"
             formControlName="password"
           />
 

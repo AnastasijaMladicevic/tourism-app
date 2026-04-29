@@ -9,6 +9,7 @@ import { EventDto, EventService } from '../../services/event';
 import { ImageDto, ImageService } from '../../services/image';
 import { Router } from '@angular/router';
 import { LazyBackgroundDirective } from '../../shared/directives/lazy-background.directive';
+import { LocationTrackingService } from '../../services/location-tracking';
 
 type EventCategory = 'All' | string;
 
@@ -22,6 +23,11 @@ interface EventCard {
   priceText: string;
   imageUrl?: string;
   attendeesText: string;
+  latitude?: number;
+  longitude?: number;
+  distanceMeters?: number;
+  eventTypeName?: string;
+  eventTypeId?: number;
 }
 
 @Component({
@@ -38,13 +44,14 @@ export class EventsComponent implements OnInit {
   private readonly eventService = inject(EventService);
   private readonly imageService = inject(ImageService);
   private readonly router = inject(Router);
-
+  private readonly locationTrackingService = inject(LocationTrackingService);
+  activeFilter = 'All';
   activeCategory: EventCategory = 'All';
   isLoading = true;
   showSearch = false;
   showSortMenu = false;
   searchQuery = '';
-  sortOption: 'date' | 'az' | 'za' | 'price' = 'date';
+  sortOption: 'date' | 'az' | 'za' | 'distance' | 'price' = 'date';
   events: EventCard[] = [];
   visibleEvents: EventCard[] = [];
   currentPage = 1;
@@ -52,7 +59,34 @@ export class EventsComponent implements OnInit {
   hasNextPage = false;
   totalCount = 0;
   pageSizeOptions = [8, 12, 16, 24, 32];
+  userLocation: { lat: number; lng: number } | null = null;
+  isTracking = false;
+  eventTypes: { id: number; name: string }[] = [];
   ngOnInit(): void {
+    this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
+      this.isTracking = enabled;
+
+      if (!enabled) {
+        this.clearDistances();
+      } else {
+        this.updateDistances();
+        this.cdr.detectChanges();
+      }
+    });
+
+    this.locationTrackingService.location$.subscribe(loc => {
+      this.userLocation = loc
+        ? { lat: loc.latitude, lng: loc.longitude }
+        : null;
+
+      if (this.userLocation) {
+        this.updateDistances();
+      } else {
+        this.clearDistances();
+      }
+      this.refreshVisibleEvents();
+      this.cdr.detectChanges();
+    });
     this.loadEvents();
   }
 
@@ -81,8 +115,8 @@ export class EventsComponent implements OnInit {
       );
     }
 
-    if (this.activeCategory !== 'All') {
-      list = list.filter((event) => event.category === this.activeCategory);
+    if (this.activeFilter !== 'All') {
+      list = list.filter((event) => event.category === this.activeFilter);
     }
 
     switch (this.sortOption) {
@@ -97,6 +131,11 @@ export class EventsComponent implements OnInit {
         break;
       case 'price':
         list.sort((a, b) => this.priceToNumber(a.priceText) - this.priceToNumber(b.priceText));
+        break;
+      case 'distance':
+        list.sort((a, b) =>
+          (a.distanceMeters ?? 999999) - (b.distanceMeters ?? 999999)
+        );
         break;
     }
 
@@ -113,7 +152,7 @@ export class EventsComponent implements OnInit {
     this.refreshVisibleEvents();
   }
 
-  setSort(option: 'date' | 'az' | 'za' | 'price'): void {
+  setSort(option: 'date' | 'az' | 'za' | 'price' | 'distance'): void {
     this.sortOption = option;
     this.showSortMenu = false;
     this.currentPage = 1;
@@ -121,7 +160,7 @@ export class EventsComponent implements OnInit {
   }
 
   sortLabel(): string {
-    const map = { date: 'Soonest', az: 'A -> Z', za: 'Z -> A', price: 'Lowest Price' };
+    const map = { date: 'Soonest', az: 'A -> Z', za: 'Z -> A', price: 'Lowest Price', distance: 'Closest' };
     return map[this.sortOption];
   }
 
@@ -209,9 +248,15 @@ export class EventsComponent implements OnInit {
                 attendeesText: event.maxVisitors
                   ? `Max ${event.maxVisitors} visitors`
                   : 'No attendee data',
+                latitude: event.latitude,
+                longitude: event.longitude,
+                eventTypeName: event.eventTypeName ?? '',
+                eventTypeId: event.eventTypeId ?? 0,
               };
             })
           );
+          this.updateDistances();
+          this.eventTypes = this.extractUniqueTypes(this.events);
           this.refreshVisibleEvents();
         } catch {
           this.events = [];
@@ -233,7 +278,20 @@ export class EventsComponent implements OnInit {
       },
     });
   }
+  private extractUniqueTypes(events: EventCard[]): { id: number; name: string }[] {
+    const map = new Map<string, { id: number; name: string }>();
 
+    events.forEach((event) => {
+      if (event.eventTypeName) {
+        map.set(event.eventTypeName, {
+          id: event.eventTypeId ?? 0,
+          name: event.eventTypeName,
+        });
+      }
+    });
+
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }
   private refreshVisibleEvents(): void {
     const filteredEvents = this.filteredEvents;
     this.totalCount = filteredEvents.length;
@@ -254,8 +312,16 @@ export class EventsComponent implements OnInit {
     this.visibleEvents = filteredEvents.slice(startIndex, startIndex + this.pageSize);
     this.flushUi();
   }
+  setFilter(filter: string): void {
+    this.activeFilter = filter;
+    this.currentPage = 1;
+    void this.refreshVisibleEvents();
+  }
 
   private normalizeEvent(raw: EventDto): {
+    eventTypeId?: number | null;
+    latitude?: number;
+    longitude?: number;
     id: number;
     name: string;
     eventTypeName?: string | null;
@@ -275,19 +341,20 @@ export class EventsComponent implements OnInit {
       id: Number(dto['id'] ?? dto['Id'] ?? 0),
       name: String(dto['name'] ?? dto['Name'] ?? ''),
       eventTypeName: (dto['eventTypeName'] ?? dto['EventTypeName'] ?? null) as string | null,
-      startDate:
-        typeof startDate === 'string'
-          ? startDate
-          : new Date(startDate as string | number | Date).toISOString(),
-      endDate:
-        typeof endDate === 'string' || endDate == null
-          ? (endDate as string | null | undefined)
-          : new Date(endDate as string | number | Date).toISOString(),
+      startDate: typeof startDate === 'string'
+        ? startDate
+        : new Date(startDate as string | number | Date).toISOString(),
+      endDate: typeof endDate === 'string' || endDate == null
+        ? (endDate as string | null | undefined)
+        : new Date(endDate as string | number | Date).toISOString(),
       price: this.readOptionalNumber(dto, ['price', 'Price']),
       maxVisitors: this.readOptionalNumber(dto, ['maxVisitors', 'MaxVisitors']),
       isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
       localityName: (dto['localityName'] ?? dto['LocalityName'] ?? null) as string | null,
       destinationName: (dto['destinationName'] ?? dto['DestinationName'] ?? null) as string | null,
+      latitude: this.readOptionalNumber(dto, ['latitude', 'Latitude']),
+      longitude: this.readOptionalNumber(dto, ['longitude', 'Longitude']),
+      eventTypeId: this.readOptionalNumber(dto, ['eventTypeId', 'EventTypeId']),
     };
   }
 
@@ -393,7 +460,10 @@ export class EventsComponent implements OnInit {
   }
 
   private priceToNumber(text: string): number {
-    if (text.toLowerCase() === 'free') return 0;
+    if (!text) return 0;
+
+    if (text.toLowerCase().includes('free')) return 0;
+
     const parsed = Number(text.replace(/[^\d.]/g, ''));
     return Number.isNaN(parsed) ? 0 : parsed;
   }
@@ -402,5 +472,59 @@ export class EventsComponent implements OnInit {
     this.ngZone.run(() => {
       this.cdr.detectChanges();
     });
+  }
+  getDistanceText(item: any): string | null {
+    if (!this.isTracking || !this.userLocation) return null;
+    if (!item.latitude || !item.longitude) return null;
+
+    const km = this.getDistanceKm(
+      this.userLocation.lat,
+      this.userLocation.lng,
+      item.latitude,
+      item.longitude
+    );
+
+    return km < 1
+      ? `${Math.round(km * 1000)} m`
+      : `${km.toFixed(1)} km`;
+  }
+  private getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371; // km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) *
+      Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+  private updateDistances(): void {
+    if (!this.userLocation) return;
+
+    this.events = this.events.map(a => {
+      if (a.latitude == null || a.longitude == null) {
+        return { ...a, distanceMeters: undefined };
+      }
+
+      return {
+        ...a,
+        distanceMeters: this.getDistanceKm(
+          this.userLocation!.lat,
+          this.userLocation!.lng,
+          a.latitude,
+          a.longitude
+        )
+      };
+    });
+  }
+  private clearDistances(): void {
+    this.events = this.events.map(a => ({
+      ...a,
+      distanceMeters: undefined
+    }));
   }
 }

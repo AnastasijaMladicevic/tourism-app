@@ -5,7 +5,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { firstValueFrom } from 'rxjs';
@@ -16,20 +16,26 @@ import { DestinationService } from '../../services/destination';
 import { ActivityService } from '../../services/activity';
 import { EventService } from '../../services/event';
 import { ObjectService } from '../../services/object';
+import { LocalityService } from '../../services/locality';
 
 interface UnifiedSearchItem {
   id: number;
   name: string;
-  typeId: number;
-  type: 'destination' | 'activity' | 'event' | 'object' | string;
-  typeName?: string;
+  description?: string;
   mainImageUrl?: string;
-  images?: ImageDto[];
   latitude?: number;
   longitude?: number;
   distanceMeters?: number;
-  description?: string;
   isActive?: boolean;
+  averageRating?: number;
+  reviewCount?: number;
+  typeId: number;
+  type: 'destination' | 'activity' | 'event' | 'object' | 'locality' | string;
+  typeName?: string;
+  location?: string;
+  date?: string;
+  time?: string;
+  attending?: string;
 }
 
 export interface View extends UnifiedSearchItem {
@@ -66,99 +72,150 @@ export class ResultsComponent implements OnInit {
   searchResults: UnifiedSearchItem[] = [];
 
   mode: 'recommended' | 'popular' | 'search' = 'recommended';
-  private readonly fetchPageSize = 100;
-  private readonly maxFetchPages = 50;
   private imageCache = new Map<string, ImageDto[]>();
   constructor(
     private destinationService: DestinationService,
     private activityService: ActivityService,
     private eventService: EventService,
     private objectService: ObjectService,
+    private localityService: LocalityService,
     private router: Router,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private imageService: ImageService,
     private locationTrackingService: LocationTrackingService,
-    private route: ActivatedRoute,
   ) { }
 
   ngOnInit(): void {
     const state = history.state as any;
 
     this.mode = state?.mode ?? 'recommended';
+    const rawItems = state?.items ?? [];
 
-    const items = state?.items ?? [];
+    const normalized = rawItems.map((x: any) => this.normalizeFromHome(x));
+    this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
+      this.isTracking = enabled;
 
-    this.items = items.map((x: any) => this.mapHomeCardToView(x));
+      if (!enabled) {
+        this.clearDistances();
+      } else {
+        this.updateDistances();
+        this.cdr.detectChanges();
+      }
+    });
 
-    void this.refreshVisibleItems();
+    this.locationTrackingService.location$.subscribe(loc => {
+      this.userLocation = loc
+        ? { lat: loc.latitude, lng: loc.longitude }
+        : null;
 
-    this.isLoading = false;
+      if (this.userLocation) {
+        this.updateDistances();
+      } else {
+        this.clearDistances();
+      }
+      this.refreshVisibleItems();
+      this.cdr.detectChanges();
+    });
+    this.loadResolvedItems(normalized);
   }
-  private mapHomeCardToView(card: any): View {
+  private async loadResolvedItems(items: UnifiedSearchItem[]): Promise<void> {
+    this.isLoading = true;
+
+    try {
+      const resolved = await Promise.all(
+        items.map(item => this.resolveItem(item))
+      );
+      this.items = resolved;
+      this.itemTypes = this.extractUniqueTypes(this.items);
+      this.updateDistances();
+      await this.refreshVisibleItems();
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+  private normalizeFromHome(x: any): UnifiedSearchItem {
     return {
-      id: card.itemId,
-      name: card.title,
-      type: card.itemType,
-      typeName: card.typeName,
-      typeId: 0,
-      mainImageUrl: card.imageUrl,
-      description: card.description ?? '',
-      latitude: undefined,
-      longitude: undefined,
-      distanceMeters: undefined,
-      isActive: true,
-      isFavorite: card.isFavorite,
-      favoriteId: card.favoriteId
+      id: x.itemId ?? x.id ?? 0,
+
+      name: x.name ?? x.title ?? '',
+
+      description: x.description ?? '',
+
+      mainImageUrl: x.mainImageUrl ?? x.imageUrl,
+
+      type: x.type ?? x.itemType ?? 'object',
+
+      typeId: x.typeId ?? x.destinationTypeId ?? x.activityTypeId ?? x.eventTypeId ?? x.objectTypeId ?? 0,
+
+      typeName: (x.destinationTypeName ??
+        x.activityTypeName ??
+        x.eventTypeName ??
+        x.objectTypeName ??
+        x.localityTypeName ??
+        x.typeName ??
+        '').trim(),
+
+      location: x.location ?? x.localityName ?? x.destinationName,
+      latitude: x.latitude,
+      longitude: x.longitude,
+
+      averageRating: this.parseRating(x.ratingText),
+      reviewCount: this.parseReviewCount(x.reviewCount),
+
+      isActive: x.isActive ?? true
     };
   }
-  private async loadFullItems(items: UnifiedSearchItem[]): Promise<void> {
-    const resolved = await Promise.all(
-      items.map(item => this.resolveItem(item))
-    );
+  private parseRating(text?: string): number | undefined {
+    if (!text) return undefined;
+    const match = text.match(/([0-9.]+)/);
+    return match ? Number(match[1]) : undefined;
+  }
 
-    this.items = resolved.map(x => ({
-      ...x,
-      isFavorite: false
-    }));
-
-    await this.refreshVisibleItems();
-
-    this.isLoading = false;
-    this.cdr.detectChanges();
+  private parseReviewCount(text?: string): number | undefined {
+    if (!text) return undefined;
+    const match = text.match(/\((\d+)/);
+    return match ? Number(match[1]) : undefined;
   }
   get filtered(): View[] {
     let list = [...this.items];
 
     if (this.searchQuery.trim()) {
-      const q = this.searchQuery.toLowerCase();
-      list = list.filter(x => x.name?.toLowerCase().includes(q));
+      const q = this.searchQuery.toLowerCase().trim();
+      list = list.filter(x =>
+        (x.name || '').toLowerCase().includes(q) ||
+        (x.description || '').toLowerCase().includes(q)
+      );
     }
 
     if (this.activeFilter !== 'All') {
-      const f = this.activeFilter.toLowerCase();
-      list = list.filter(x => (x.type ?? '').toLowerCase() === f);
+      const filter = this.activeFilter.toLowerCase().trim();
+
+      list = list.filter(x => {
+        const candidates = [
+          x.typeName,
+          (x as any).destinationTypeName,
+          (x as any).activityTypeName,
+          (x as any).eventTypeName,
+          (x as any).objectTypeName,
+          (x as any).localityTypeName,
+          x.type,
+        ]
+          .filter(Boolean)
+          .map((v: any) => v.toString().toLowerCase().trim());
+
+        return candidates.some(c => c === filter || c.includes(filter) || filter.includes(c));
+      });
     }
 
     switch (this.sortOption) {
-      case 'az':
-        list.sort((a, b) =>
-          (a.name ?? '').localeCompare(b.name ?? '')
-        );
-        break;
-
-      case 'za':
-        list.sort((a, b) =>
-          (b.name ?? '').localeCompare(a.name ?? '')
-        );
-        break;
-
-      case 'distance':
-        list.sort((a, b) =>
-          (a.distanceMeters ?? 999999) - (b.distanceMeters ?? 999999)
-        );
-        break;
-
+      case 'az': list.sort((a, b) => (a.name || '').localeCompare(b.name || '')); break;
+      case 'za': list.sort((a, b) => (b.name || '').localeCompare(a.name || '')); break;
+      case 'distance': list.sort((a, b) => (a.distanceMeters || 999999) - (b.distanceMeters || 999999)); break;
     }
 
     return list;
@@ -181,34 +238,50 @@ export class ResultsComponent implements OnInit {
         case 'destination':
           full = await firstValueFrom(this.destinationService.getById(item.id));
           break;
-
         case 'activity':
           full = await firstValueFrom(this.activityService.getById(item.id));
           break;
-
         case 'event':
           full = await firstValueFrom(this.eventService.getById(item.id));
           break;
-
         case 'object':
           full = await firstValueFrom(this.objectService.getById(item.id));
           break;
-
+        case 'locality':
+          full = await firstValueFrom(this.localityService.getById(item.id));
+          break;
         default:
           full = item;
       }
 
+      const typeName = this.resolveTypeName(item.type, full);
+
       return {
         ...item,
         ...full,
+        typeName,
         isFavorite: false
       };
 
     } catch {
-      return {
-        ...item,
-        isFavorite: false
-      };
+      return { ...item, isFavorite: false };
+    }
+  }
+
+  private resolveTypeName(type: string, full: any): string {
+    switch (type) {
+      case 'destination':
+        return full?.destinationTypeName ?? full?.typeName ?? 'Destinacija';
+      case 'activity':
+        return full?.activityTypeName ?? full?.typeName ?? 'Aktivnost';
+      case 'event':
+        return full?.eventTypeName ?? full?.typeName ?? 'Događaj';
+      case 'object':
+        return full?.objectTypeName ?? full?.typeName ?? 'Objekat';
+      case 'locality':
+        return full?.localityTypeName ?? full?.typeName ?? 'Lokalitet';
+      default:
+        return full?.typeName ?? type;
     }
   }
   private updateDistances(): void {
@@ -250,9 +323,6 @@ export class ResultsComponent implements OnInit {
     return km < 1
       ? `${Math.round(km * 1000)} m`
       : `${km.toFixed(1)} km`;
-  }
-  private getImageKey(item: View): string {
-    return `${item.type}-${item.id}`;
   }
   private getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
     const R = 6371;
@@ -301,15 +371,22 @@ export class ResultsComponent implements OnInit {
     void this.refreshVisibleItems();
   }
   viewDetails(item: View): void {
-    this.router.navigate(['/locality', item.id]);
-  }
-  getMainImage(item: View): string {
-    if (item.images && item.images.length > 0) {
-      const mainImage = item.images.find((image) => image.isMain);
-      return mainImage?.url || item.images[0].url;
+    const routes: Record<string, string> = {
+      destination: '/destination',
+      activity: '/activity',
+      event: '/event',
+      object: '/object',
+      locality: '/locality'
+    };
+
+    const baseRoute = routes[item.type];
+
+    if (!baseRoute) {
+      console.warn('Unknown route type:', item.type);
+      return;
     }
 
-    return this.item?.mainImageUrl || '';
+    this.router.navigate([baseRoute, item.id]);
   }
   onImageError(event: Event): void {
     (event.target as HTMLImageElement).style.display = 'none';
@@ -317,16 +394,37 @@ export class ResultsComponent implements OnInit {
   private extractUniqueTypes(items: View[]): { id: number; name: string }[] {
     const map = new Map<string, { id: number; name: string }>();
 
-    items.forEach((item) => {
-      if (item.type) {
-        map.set(item.type, {
-          id: item.typeId,
-          name: item.type,
+    items.forEach((item, index) => {
+      let typeName =
+        item.typeName ||
+        (item as any).destinationTypeName ||
+        (item as any).activityTypeName ||
+        (item as any).eventTypeName ||
+        (item as any).objectTypeName ||
+        (item as any).localityTypeName ||
+        item.type ||
+        '';
+
+      typeName = typeName.toString().trim();
+
+      if (!typeName || typeName === 'undefined' || typeName === 'null' || typeName.length < 2) {
+        console.log(`Item ${index} (${item.name}) - nema typeName`);
+        return;
+      }
+
+      const displayName = typeName;
+
+      if (!map.has(displayName)) {
+        map.set(displayName, {
+          id: item.typeId || index + 1000,
+          name: displayName
         });
       }
     });
 
-    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+    const result = Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+
+    return result;
   }
   async loadData(): Promise<void> {
     this.isLoading = true;
@@ -354,6 +452,7 @@ export class ResultsComponent implements OnInit {
         isFavorite: false
       }));
 
+      this.updateDistances();
       await this.refreshVisibleItems();
 
     } finally {
@@ -370,11 +469,12 @@ export class ResultsComponent implements OnInit {
     return [...dest, ...act];
   }
   private async fetchPopular(): Promise<UnifiedSearchItem[]> {
-    const [dest, act, evt, obj] = await Promise.all([
+    const [dest, act, evt, obj, loc] = await Promise.all([
       firstValueFrom(this.destinationService.getAll()),
       firstValueFrom(this.activityService.getAll()),
       firstValueFrom(this.eventService.getAll()),
       firstValueFrom(this.objectService.getAll()),
+      firstValueFrom(this.localityService.getAll())
     ]);
 
     const all = [
@@ -382,9 +482,9 @@ export class ResultsComponent implements OnInit {
       ...act.map(x => this.mapActivity(x)),
       ...evt.map(x => this.mapEvent(x)),
       ...obj.map(x => this.mapObject(x)),
+      ...loc.map(x => this.mapLocality(x)),
     ];
 
-    // "popular" logika -> nema backend, pa simulacija
     return all
       .sort((a: any, b: any) => (b.averageRating ?? 0) - (a.averageRating ?? 0))
       .slice(0, 20);
@@ -393,11 +493,12 @@ export class ResultsComponent implements OnInit {
     const q = query?.trim().toLowerCase();
     if (!q) return [];
 
-    const [dest, act, evt, obj] = await Promise.all([
+    const [dest, act, evt, obj, loc] = await Promise.all([
       firstValueFrom(this.destinationService.getAll()),
       firstValueFrom(this.activityService.getAll()),
       firstValueFrom(this.eventService.getAll()),
       firstValueFrom(this.objectService.getAll()),
+      firstValueFrom(this.localityService.getAll())
     ]);
 
     const all = [
@@ -405,6 +506,7 @@ export class ResultsComponent implements OnInit {
       ...act.map(x => this.mapActivity(x)),
       ...evt.map(x => this.mapEvent(x)),
       ...obj.map(x => this.mapObject(x)),
+      ...loc.map(x => this.mapLocality(x))
     ];
 
     return all.filter(x =>
@@ -412,51 +514,6 @@ export class ResultsComponent implements OnInit {
       (x.description?.toLowerCase().includes(q)) ||
       (x.type?.toLowerCase().includes(q))
     );
-  }
-  private normalizeItem(raw: any): UnifiedSearchItem {
-    return {
-      id: Number(raw.id ?? raw.Id ?? 0),
-      name: String(raw.name ?? raw.Name ?? ''),
-      typeId: Number(raw.typeId ?? raw.TypeId ?? 0),
-      type: String(raw.type ?? 'object'),
-      mainImageUrl: raw.mainImageUrl ?? raw.MainImageUrl,
-      latitude: raw.latitude ?? raw.Latitude,
-      longitude: raw.longitude ?? raw.Longitude,
-      distanceMeters: raw.distanceMeters ?? raw.DistanceMeters,
-      description: raw.description ?? raw.Description,
-      isActive: raw.isActive ?? true,
-      images: raw.images ?? raw.Images ?? []
-    };
-  }
-  private readOptionalNumber(obj: Record<string, unknown>, keys: string[]): number | undefined {
-    for (const key of keys) {
-      const value = obj[key];
-      if (value == null) {
-        continue;
-      }
-      const parsed = Number(value);
-      if (!Number.isNaN(parsed)) {
-        return parsed;
-      }
-    }
-    return undefined;
-  }
-  private async fetchAllItems(): Promise<UnifiedSearchItem[]> {
-    const [dest, act, ev, obj] = await Promise.all([
-      firstValueFrom(this.destinationService.getAll()),
-      firstValueFrom(this.activityService.getAll()),
-      firstValueFrom(this.eventService.getAll()),
-      firstValueFrom(this.objectService.getAll()),
-    ]);
-
-    const normalized: UnifiedSearchItem[] = [
-      ...dest.map(x => this.mapDestination(x)),
-      ...act.map(x => this.mapActivity(x)),
-      ...ev.map(x => this.mapEvent(x)),
-      ...obj.map(x => this.mapObject(x)),
-    ];
-
-    return normalized;
   }
   private toArray<T>(raw: unknown): T[] {
     if (Array.isArray(raw)) return raw as T[];
@@ -543,6 +600,9 @@ export class ResultsComponent implements OnInit {
         case 'object':
           images = await firstValueFrom(this.imageService.getForObject(item.id));
           break;
+        case 'locality':
+          images = await firstValueFrom(this.imageService.getForLocality(item.id));
+          break;
       }
     } catch {
       images = [];
@@ -568,61 +628,69 @@ export class ResultsComponent implements OnInit {
     return this.toArray(res).map(x => this.mapActivity(x));
   }
 
-  private async fetchEvents(): Promise<UnifiedSearchItem[]> {
-    const res = await firstValueFrom(this.eventService.getAll());
-    return this.toArray(res).map(x => this.mapEvent(x));
-  }
   private mapDestination(x: any): UnifiedSearchItem {
     return {
       id: x.id,
       name: x.name,
       type: 'destination',
-      typeName: x.destinationTypeName,
-      description: x.description ?? x.destinationTypeName,
       typeId: x.destinationTypeId,
+      typeName: x.destinationTypeName || 'Destinacija',
+      description: x.description,
       latitude: x.latitude,
       longitude: x.longitude,
-      images: x.images,
     };
   }
+
   private mapActivity(x: any): UnifiedSearchItem {
     return {
       id: x.id,
       name: x.name,
       type: 'activity',
       typeId: x.activityTypeId,
-      typeName: x.activityTypeName,
-      description: x.description ?? '',
+      typeName: x.activityTypeName || 'Aktivnost',
+      description: x.description,
       latitude: x.latitude,
       longitude: x.longitude,
-      images: x.images,
     };
   }
+
   private mapEvent(x: any): UnifiedSearchItem {
     return {
       id: x.id,
       name: x.name,
       type: 'event',
       typeId: x.eventTypeId,
+      typeName: x.eventTypeName || 'Događaj',
+      description: x.description,
       latitude: x.latitude,
       longitude: x.longitude,
-      typeName: x.activityTypeName,
-      description: x.description ?? '',
-      images: x.images,
     };
   }
+
   private mapObject(x: any): UnifiedSearchItem {
     return {
       id: x.id,
       name: x.name,
       type: 'object',
       typeId: x.objectTypeId,
+      typeName: x.objectTypeName || 'Objekat',
+      description: x.description,
       latitude: x.latitude,
-      typeName: x.objectTypeName,
       longitude: x.longitude,
-      images: x.images,
-      mainImageUrl: x.mainImageUrl,
-      description: x.description
+      averageRating: x.averageRating,
+    };
+  }
+  private mapLocality(x: any): UnifiedSearchItem {
+    return {
+      id: x.id,
+      name: x.name,
+      type: 'locality',
+      typeId: x.localityTypeId,
+      typeName: x.localityTypeName || 'Locality',
+      description: x.description,
+      latitude: x.latitude,
+      longitude: x.longitude,
+      averageRating: x.averageRating,
     };
   }
 }
