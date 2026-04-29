@@ -174,11 +174,7 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./pages/manager/activities/activities.component').then(m => m.ManagerActivitiesComponent)
           },
-          {
-            path: 'edit/:id',
-            loadComponent: () =>
-              import('./pages/manager/activities/activity-details/activity-details.component').then(m => m.ManagerActivityDetailsComponent)
-          }
+          // 'edit/:id' route removed: manager activity review page deleted
         ]
       },
       {
