@@ -77,6 +77,7 @@ export class LocalitiesComponent implements OnInit {
       } else {
         this.clearDistances();
       }
+      this.refreshVisibleLocalities();
       this.cdr.detectChanges();
     });
     void this.loadData();
@@ -238,6 +239,7 @@ export class LocalitiesComponent implements OnInit {
         isFavorite: false,
         favoriteId: undefined,
       }));
+      this.updateDistances();
       this.localityTypes = this.extractUniqueTypes(this.localities);
       await this.refreshVisibleLocalities();
 

@@ -77,6 +77,7 @@ export class ActivitiesComponent implements OnInit {
       } else {
         this.clearDistances();
       }
+      this.refreshVisibleActivities();
       this.cdr.detectChanges();
     });
     void this.loadData();
@@ -239,6 +240,7 @@ export class ActivitiesComponent implements OnInit {
         favoriteId: undefined,
       }));
       this.activityTypes = this.extractUniqueTypes(this.activities);
+      this.updateDistances();
       await this.refreshVisibleActivities();
 
       this.isLoading = false;

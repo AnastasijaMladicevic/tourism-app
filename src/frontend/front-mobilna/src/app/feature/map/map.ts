@@ -95,7 +95,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   userLocation: L.LatLng | null = null;
   routeStart: RoutePoint | null = null;
   routeEnd: RoutePoint | null = null;
-
+  isRoutePickingMode = false;
+  routePickingType: 'start' | 'end' | 'add' = 'add';
   isTracking = false;
   private userMarker: L.Marker | null = null;
   private userCircle: L.Circle | null = null;
@@ -128,6 +129,14 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.ngZone.run(() => {
         this.selectedItem = event.detail.data;
         this.selectedType = event.detail.type;
+
+        if (this.isRoutePickingMode) {
+          const point = this.getRoutePointFromItem(this.selectedItem, this.selectedType);
+          if (point) {
+            this.routePoints.push(point);
+            this.calculateRoute();
+          }
+        }
         this.cdr.detectChanges();
       });
     });
@@ -267,6 +276,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.routePoints = [point];
     this.isRoutePlannerOpen = true;
+    this.isRoutePickingMode = true;
+    this.routePickingType = 'add';
   }
   getDirections(): void {
     if (!this.userLocation || !this.selectedItem) return;
@@ -1017,6 +1028,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   closeRoutePlanner(): void {
     this.isRoutePlannerOpen = false;
+    this.isRoutePickingMode = false;
     this.clearPlannedRoute();
   }
   removeRoutePoint(index: number): void {
