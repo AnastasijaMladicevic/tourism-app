@@ -18,6 +18,7 @@ import { FavoriteStateService } from '../../services/favorite-state';
 import { ImageService } from '../../services/image';
 
 export interface DestinationView extends DestinationDto {
+  distanceMeters?: number;
   isFavorite: boolean;
   favoriteId?: number;
 }
@@ -84,6 +85,7 @@ export class DestinationsComponent implements OnInit {
       } else {
         this.clearDistances();
       }
+      this.refreshVisibleDestinations();
       this.cdr.detectChanges();
     });
     void this.loadData();
@@ -111,8 +113,9 @@ export class DestinationsComponent implements OnInit {
         entityId: destination.id,
       }));
       this.destinationTypes = this.extractUniqueTypes(this.destinations);
-
+      this.updateDistances();
       await this.refreshVisibleDestinations();
+
 
       this.isLoading = false;
       this.cdr.detectChanges();
@@ -241,7 +244,7 @@ export class DestinationsComponent implements OnInit {
         list.sort((a, b) => b.name.localeCompare(a.name));
         break;
       case 'distance':
-        list.sort((a, b) => (a.distanceKm ?? Number.MAX_SAFE_INTEGER) - (b.distanceKm ?? Number.MAX_SAFE_INTEGER));
+        list.sort((a, b) => (a.distanceMeters ?? Number.MAX_SAFE_INTEGER) - (b.distanceMeters ?? Number.MAX_SAFE_INTEGER));
         break;
     }
 
@@ -449,7 +452,6 @@ export class DestinationsComponent implements OnInit {
       description: (dto['description'] ?? dto['Description'] ?? undefined) as string | undefined,
       latitude: this.readOptionalNumber(dto, ['latitude', 'Latitude']),
       longitude: this.readOptionalNumber(dto, ['longitude', 'Longitude']),
-      distanceKm: this.readOptionalNumber(dto, ['distanceKm', 'DistanceKm']),
       averageRating: this.readOptionalNumber(dto, ['averageRating', 'AverageRating']),
       reviewCount: this.readOptionalNumber(dto, ['reviewCount', 'ReviewCount']),
       isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),

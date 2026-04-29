@@ -135,7 +135,7 @@ export class HomeComponent implements OnInit {
     private recommendationService: RecommendationService,
     private locationTrackingService: LocationTrackingService,
     private smartSearchService: SmartSearchService,
-  ) {}
+  ) { }
   onSearchInput(): void {
     const query = this.searchQuery.trim();
     if (!query) {
@@ -352,24 +352,24 @@ export class HomeComponent implements OnInit {
     }
   }
   loadEvents(): void {
-  this.eventService.getAll().subscribe({
-    next: (res) => {
-      const list = this.toArray<any>(res);
+    this.eventService.getAll().subscribe({
+      next: (res) => {
+        const list = this.toArray<any>(res);
 
-      this.events = list.map(e => ({
-        id: e.id,
-        title: e.name,
-        location: e.localityName ?? e.destinationName ?? e.regionName ?? '',
-        imageUrl: e.mainImageUrl ?? e.images?.[0]?.url ?? '',
-        dateText: e.date ?? '',
-        timeText: this.eventTime(e.startDate, e.endDate),
-        priceText: e.price ? `${e.price}€` : 'Free',
-        isFree: !e.price
-      }));
-    },
-    error: err => console.error('Events error:', err)
-  });
-}
+        this.events = list.map(e => ({
+          id: e.id,
+          title: e.name,
+          location: e.localityName ?? e.destinationName ?? e.regionName ?? '',
+          imageUrl: e.mainImageUrl ?? e.images?.[0]?.url ?? '',
+          dateText: e.date ?? '',
+          timeText: this.eventTime(e.startDate, e.endDate),
+          priceText: e.price ? `${e.price}€` : 'Free',
+          isFree: !e.price
+        }));
+      },
+      error: err => console.error('Events error:', err)
+    });
+  }
   loadFeatured(): void {
     this.destinationService
       .getAll({ page: 1, pageSize: 24, sortBy: 'name', sortOrder: 'asc' })
@@ -391,33 +391,33 @@ export class HomeComponent implements OnInit {
 
         this.featuredDestinations = shuffled.slice(0, Math.min(5, shuffled.length));
         this.translateFeaturedDisplayTitles(this.featuredDestinations).pipe().subscribe((res) => {
-            this.featuredDestinations = res;
-          });
+          this.featuredDestinations = res;
+        });
         this.currentIndex = 0;
         this.currentFeatured = this.featuredDestinations[0];
-        console.log("🚀 ~ HomeComponent ~ loadFeatured ~ this.currentFeatured :", this.currentFeatured )
-        
+        console.log("🚀 ~ HomeComponent ~ loadFeatured ~ this.currentFeatured :", this.currentFeatured)
+
         this.startRotation();
         this.flushUi();
       });
   }
   startRotation(): void {
-  if (!this.featuredDestinations.length) return;
+    if (!this.featuredDestinations.length) return;
 
-  if (this.rotationInterval) {
-    clearInterval(this.rotationInterval);
+    if (this.rotationInterval) {
+      clearInterval(this.rotationInterval);
+    }
+
+    this.rotationInterval = setInterval(() => {
+      this.currentIndex =
+        (this.currentIndex + 1) % this.featuredDestinations.length;
+
+      this.currentFeatured =
+        this.featuredDestinations[this.currentIndex];
+      this.cdr.detectChanges();
+    }, 10000);
   }
 
-  this.rotationInterval = setInterval(() => {
-    this.currentIndex =
-      (this.currentIndex + 1) % this.featuredDestinations.length;
-
-    this.currentFeatured =
-      this.featuredDestinations[this.currentIndex];
-      this.cdr.detectChanges();
-  }, 10000);
-}
-  
   get isLoadingHome(): boolean {
     return this.isLoadingPlaces || this.isLoadingEvents || this.isLoadingRecommendations;
   }
@@ -516,71 +516,71 @@ export class HomeComponent implements OnInit {
 
         this.flushUi();
         this.allItems = [
-        ...this.toArray<DestinationDto>(destinations).map(d => this.normalizeDestination(d)).map(d => ({
-          id: d.id, name: d.name, typeName: d.destinationTypeName,
-          location: d.regionName ?? d.destinationTypeName ?? '', image: d.mainImageUrl, icon: 'place',
-          raw: d, category: 'destination' as const, markerType: 'destination'
-        })),
-        ...this.toArray<ObjectDto>(objects).map(o => this.normalizeObject(o)).map(o => ({
-          id: o.id, name: o.name, typeName: o.objectTypeName,
-          location: o.localityName ?? '', image: o.mainImageUrl, icon: 'apartment',
-          raw: o, category: 'object' as const, markerType: o.objectTypeName?.toLowerCase().includes('hotel') ? 'hotel' : 'restaurant'
-        })),
-      ];
+          ...this.toArray<DestinationDto>(destinations).map(d => this.normalizeDestination(d)).map(d => ({
+            id: d.id, name: d.name, typeName: d.destinationTypeName,
+            location: d.regionName ?? d.destinationTypeName ?? '', image: d.mainImageUrl, icon: 'place',
+            raw: d, category: 'destination' as const, markerType: 'destination'
+          })),
+          ...this.toArray<ObjectDto>(objects).map(o => this.normalizeObject(o)).map(o => ({
+            id: o.id, name: o.name, typeName: o.objectTypeName,
+            location: o.localityName ?? '', image: o.mainImageUrl, icon: 'apartment',
+            raw: o, category: 'object' as const, markerType: o.objectTypeName?.toLowerCase().includes('hotel') ? 'hotel' : 'restaurant'
+          })),
+        ];
       });
   }
 
-private translateFeaturedDisplayTitles(
+  private translateFeaturedDisplayTitles(
     featured: FeaturedDestination[]
   ): Observable<FeaturedDestination[]> {
     const lang = (localStorage.getItem('appLanguage') || 'sr')
       .trim()
       .toLowerCase();
 
-  console.log('translateFeaturedDisplayTitles lang:', lang);
-  console.log('featured:', featured);
+    console.log('translateFeaturedDisplayTitles lang:', lang);
+    console.log('featured:', featured);
 
-  if (!featured.length || lang === 'sr' || lang === 'me') {
-    return of(featured);
+    if (!featured.length || lang === 'sr' || lang === 'me') {
+      return of(featured);
+    }
+
+    return forkJoin(
+      featured.map((item) => {
+        console.log('pozivam translations za destination:', item.id);
+
+        return this.http
+          .get<ApiTranslationDto[]>(
+            `${environment.apiUrl}/translations?entityType=Destination&entityId=${item.id}`
+          )
+          .pipe(
+            map((translations) => {
+              const translatedDescription = translations
+                .find(
+                  (translation) =>
+                    translation.fieldName?.toLowerCase() === 'description' &&
+                    translation.languageCode?.toLowerCase() === lang
+                )
+                ?.translatedText?.trim();
+
+              return translatedDescription
+                ? {
+                  ...item,
+                  description: translatedDescription,
+                }
+                : item;
+            }),
+            catchError((error) => {
+              console.error(
+                `Greška pri prevodu featured destination ${item.id}:`,
+                error
+              );
+
+              return of(item);
+            })
+          );
+      })
+    );
   }
-
-  return forkJoin(
-    featured.map((item) => {
-      console.log('pozivam translations za destination:', item.id);
-
-      return this.http
-      .get<ApiTranslationDto[]>(
-        `${environment.apiUrl}/translations?entityType=Destination&entityId=${item.id}`
-      )
-      .pipe(
-        map((translations) => {
-          const translatedDescription = translations
-            .find(
-              (translation) =>
-                translation.fieldName?.toLowerCase() === 'description' &&
-                translation.languageCode?.toLowerCase() === lang
-            )
-            ?.translatedText?.trim();
-
-          return translatedDescription
-            ? {
-                ...item,
-                description: translatedDescription,
-              }
-            : item;
-        }),
-          catchError((error) => {
-            console.error(
-              `Greška pri prevodu featured destination ${item.id}:`,
-              error
-            );
-
-            return of(item);
-          })
-        );
-    })
-  );
-}
 
   private loadRecommendedCards(): void {
     this.isLoadingRecommendations = true;
@@ -1244,7 +1244,7 @@ private translateFeaturedDisplayTitles(
   openDestinations(): void {
     if (!this.currentFeatured) return;
 
-  this.router.navigate(['/destination', this.currentFeatured.id]);
+    this.router.navigate(['/destination', this.currentFeatured.id]);
   }
   openEvent(event: any): void {
     this.router.navigate([`/event`, event.id]);
@@ -1257,7 +1257,7 @@ private translateFeaturedDisplayTitles(
   openRegionPicker(): void {
     this.router.navigate(['/region']);
   }
-  
+
   getCategoryIcon(type: string): string {
     switch (type?.toLowerCase()) {
       case 'destination':
@@ -1283,6 +1283,18 @@ private translateFeaturedDisplayTitles(
   private flushUi(): void {
     this.ngZone.run(() => {
       this.cdr.detectChanges();
+    });
+  }
+  openSeeAll(type: 'recommended' | 'popular'): void {
+    const items = type === 'recommended'
+      ? this.recommended
+      : this.popular;
+
+    this.router.navigate(['/results'], {
+      state: {
+        mode: type,
+        items: items
+      }
     });
   }
 }

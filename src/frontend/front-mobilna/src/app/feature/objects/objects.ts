@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { ObjectDto, ObjectService, ObjectView } from '../../services/object';
 import { AuthService } from '../../services/auth';
+import { LocationTrackingService } from '../../services/location-tracking';
 
 @Component({
   selector: 'app-objects',
@@ -40,16 +41,42 @@ export class ObjectsComponent implements OnInit {
   objectTypes: { id: number; name: string }[] = [];
   objects: ObjectView[] = [];
   visibleObjects: ObjectView[] = [];
-
+  userLocation: { lat: number; lng: number } | null = null;
+  isTracking = false;
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private objectService: ObjectService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
-  ) {}
+    private locationTrackingService: LocationTrackingService
+  ) { }
 
   ngOnInit(): void {
+    this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
+      this.isTracking = enabled;
+
+      if (!enabled) {
+        this.clearDistances();
+      } else {
+        this.updateDistances();
+        this.cdr.detectChanges();
+      }
+    });
+
+    this.locationTrackingService.location$.subscribe(loc => {
+      this.userLocation = loc
+        ? { lat: loc.latitude, lng: loc.longitude }
+        : null;
+
+      if (this.userLocation) {
+        this.updateDistances();
+      } else {
+        this.clearDistances();
+      }
+      this.refreshVisibleObjects();
+      this.cdr.detectChanges();
+    });
     this.route.data.subscribe((routeData) => {
       const type = routeData['type'] as string | null;
       const title = routeData['title'] as string | undefined;
@@ -77,6 +104,7 @@ export class ObjectsComponent implements OnInit {
           favoriteId: undefined,
         }));
         this.objectTypes = this.extractUniqueTypes(this.objects);
+        this.updateDistances();
         this.refreshVisibleObjects();
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -93,7 +121,60 @@ export class ObjectsComponent implements OnInit {
       },
     });
   }
+  private updateDistances(): void {
+    if (!this.userLocation) return;
 
+    this.objects = this.objects.map(a => {
+      if (a.latitude == null || a.longitude == null) {
+        return { ...a, distanceMeters: undefined };
+      }
+
+      return {
+        ...a,
+        distanceMeters: this.getDistanceKm(
+          this.userLocation!.lat,
+          this.userLocation!.lng,
+          a.latitude,
+          a.longitude
+        )
+      };
+    });
+  }
+  private clearDistances(): void {
+    this.objects = this.objects.map(a => ({
+      ...a,
+      distanceMeters: undefined
+    }));
+  }
+  getDistanceText(item: any): string | null {
+    if (!this.isTracking || !this.userLocation) return null;
+    if (!item.latitude || !item.longitude) return null;
+
+    const km = this.getDistanceKm(
+      this.userLocation.lat,
+      this.userLocation.lng,
+      item.latitude,
+      item.longitude
+    );
+
+    return km < 1
+      ? `${Math.round(km * 1000)} m`
+      : `${km.toFixed(1)} km`;
+  }
+  private getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371; // km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) *
+      Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
   setFilter(filter: string): void {
     this.activeFilter = filter;
     this.currentPage = 1;
@@ -162,7 +243,7 @@ export class ObjectsComponent implements OnInit {
       case 'distance':
         list.sort(
           (a, b) =>
-            (a.distanceKm ?? Number.MAX_SAFE_INTEGER) - (b.distanceKm ?? Number.MAX_SAFE_INTEGER),
+            (a.distanceMeters ?? Number.MAX_SAFE_INTEGER) - (b.distanceMeters ?? Number.MAX_SAFE_INTEGER),
         );
         break;
     }
@@ -216,7 +297,7 @@ export class ObjectsComponent implements OnInit {
 
   formatDistance(km?: number): string {
     if (km == null) return '';
-    return km < 1 ? `${Math.round(km * 1000)} m` : `${km} km`;
+    return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
   }
 
   isOpenNow(obj: ObjectView): boolean {

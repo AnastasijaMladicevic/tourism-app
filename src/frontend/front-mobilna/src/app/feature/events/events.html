@@ -3,35 +3,20 @@
     <button class="icon-btn" (click)="goBack()" aria-label="Go back">
       <mat-icon>arrow_back_ios</mat-icon>
     </button>
+    <h1 class="header__title">Events</h1>
+  </div>
 
-    <h1 class="header__title" [class.header__title--hidden]="showSearch">Events</h1>
-
-    <div class="header__search-inline" [class.header__search-inline--open]="showSearch">
-      <mat-icon class="search-inline__icon">search</mat-icon>
-      <input
-        class="search-inline__input"
-        type="text"
-        placeholder="Search events..."
-        [(ngModel)]="searchQuery"
-        (ngModelChange)="onSearchChange()"
-      />
-      <button class="icon-btn" (click)="toggleSearch()" aria-label="Close search">
-        <mat-icon>close</mat-icon>
-      </button>
-    </div>
-
-    <div class="header__actions">
-      <button class="icon-btn" (click)="toggleSearch()" aria-label="Search">
+  <div class="filters-row">
+    <div class="filters-right">
+      <div class="search-inline">
         <mat-icon>search</mat-icon>
-      </button>
-
-      <button
-        class="sort-anchor icon-btn sort-btn"
-        (click)="$event.stopPropagation(); showSortMenu = !showSortMenu"
-        aria-label="Sort"
-      >
-        <mat-icon>swap_vert</mat-icon>
-      </button>
+        <input
+          type="text"
+          placeholder="Search events..."
+          [(ngModel)]="searchQuery"
+          (ngModelChange)="onSearchChange()"
+        />
+      </div>
       <div class="list-controls">
       <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
           @for (size of pageSizeOptions; track $index) {
@@ -41,81 +26,77 @@
           }
         </select>
       </div>
-      @if (showSortMenu) {
-        <div class="sort-menu sort-anchor">
-          <button
-            class="sort-menu__item"
-            [class.sort-menu__item--active]="sortOption === 'date'"
-            (click)="setSort('date')"
-          >
-            <mat-icon>schedule</mat-icon> Soonest
-          </button>
-          <button
-            class="sort-menu__item"
-            [class.sort-menu__item--active]="sortOption === 'price'"
-            (click)="setSort('price')"
-          >
-            <mat-icon>sell</mat-icon> Lowest Price
-          </button>
-          <button
-            class="sort-menu__item"
-            [class.sort-menu__item--active]="sortOption === 'az'"
-            (click)="setSort('az')"
-          >
-            <mat-icon>sort_by_alpha</mat-icon> A -> Z
-          </button>
-          <button
-            class="sort-menu__item"
-            [class.sort-menu__item--active]="sortOption === 'za'"
-            (click)="setSort('za')"
-          >
-            <mat-icon>sort_by_alpha</mat-icon> Z -> A
-          </button>
-        </div>
-      }
-    </div>
-  </div>
+      <div
+        class="sort-anchor sort-trigger"
+        (click)="$event.stopPropagation(); showSortMenu = !showSortMenu"
+      >
+        <span>{{ sortLabel() }}</span>
+        <mat-icon>expand_more</mat-icon>
 
-  @if (showSearch) {
-    <div class="search-bar mobile-only">
-      <mat-icon>search</mat-icon>
-      <input
-        type="text"
-        placeholder="Search events..."
-        [(ngModel)]="searchQuery"
-        (ngModelChange)="onSearchChange()"
-        class="search-bar__input"
-        autofocus
-      />
-      @if (searchQuery) {
-        <button class="icon-btn" (click)="searchQuery = ''" aria-label="Clear">
-          <mat-icon>close</mat-icon>
+        @if (showSortMenu) {
+          <div class="sort-menu sort-anchor">
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'date'"
+              (click)="setSort('date')"
+            >
+              <mat-icon>schedule</mat-icon> Soonest
+            </button>
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'price'"
+              (click)="setSort('price')"
+            >
+              <mat-icon>euro</mat-icon> Cheapest
+            </button>
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'distance'"
+              (click)="setSort('distance')"
+            >
+              <mat-icon>near_me</mat-icon> Nearest
+            </button>
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'az'"
+              (click)="setSort('az')"
+            >
+              <mat-icon>sort_by_alpha</mat-icon> A -> Z
+            </button>
+            <button
+              class="sort-menu__item"
+              [class.sort-menu__item--active]="sortOption === 'za'"
+              (click)="setSort('za')"
+            >
+              <mat-icon>sort_by_alpha</mat-icon> Z -> A
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="filters-scroll">
+      <button
+        class="filter-btn"
+        [class.filter-btn--active]="activeFilter === 'All'"
+        (click)="setFilter('All')"
+      >
+        All
+      </button>
+      @for (type of eventTypes; track type.id) {
+        <button
+          class="filter-btn"
+          [class.filter-btn--active]="activeFilter === type.name"
+          (click)="setFilter(type.name)"
+        >
+          {{ type.name }}
         </button>
       }
     </div>
-  }
-
-  <div class="filters">
-    @for (category of categories; track category.key) {
-      <button
-        class="filter-btn"
-        [class.filter-btn--active]="activeCategory === category.key"
-        (click)="setCategory(category.key)"
-      >
-        @if (category.icon) {
-          <span class="filter-chip-icon">{{ category.icon }}</span>
-        }
-        {{ category.label }}
-      </button>
-    }
   </div>
 
   <div class="results-bar">
-    <span class="results-bar__count">{{ totalCount }} events found</span>
-    <span class="results-bar__sort">
-      <mat-icon>swap_vert</mat-icon>
-      {{ sortLabel() }}
-    </span>
+    <span class="results-bar__count">{{ totalCount }} objects found</span>
   </div>
 
   @if (isLoading) {
@@ -139,10 +120,17 @@
           <span class="event-price" [class.event-price--free]="event.priceText === 'Free'">{{
             event.priceText
           }}</span>
-          <h3>{{ event.title }}</h3>
+          @if (getDistanceText(event)) {
+            <span class="card__distance">
+              <mat-icon>radio_button_checked</mat-icon>
+              {{ getDistanceText(event) }}
+            </span>
+          }
         </div>
 
         <div class="event-body">
+          <h3>{{ event.title }}</h3>
+
           <div class="event-meta">
             <p>
               <span class="meta-icon">Date</span>

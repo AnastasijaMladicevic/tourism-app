@@ -111,7 +111,7 @@
     <div class="section">
       <div class="section-header">
         <h2 class="section-title">Recommended for you</h2>
-        <button class="see-all" type="button">See all ></button>
+        <button class="see-all" type="button" (click)="openSeeAll('recommended')">See all ></button>
       </div>
       <div class="cards-row">
         @for (card of recommended; track card.itemType + '-' + card.itemId) {
@@ -188,7 +188,7 @@
     <div class="section">
       <div class="section-header">
         <h2 class="section-title">Popular places</h2>
-        <button class="see-all" type="button">See all ></button>
+        <button class="see-all" type="button" (click)="openSeeAll('popular')">See all ></button>
       </div>
       <div class="cards-row">
         @for (card of popular; track card.itemType + '-' + card.itemId) {

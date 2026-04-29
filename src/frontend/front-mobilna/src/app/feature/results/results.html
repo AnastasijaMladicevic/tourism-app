@@ -107,19 +107,19 @@
     @for (item of visibleItems; track item.id) {
       <div class="card">
         <div class="card__image-wrap">
-          @if (getMainImage(item)) {
+          @if (item.mainImageUrl) {
             <img
               class="card__image"
-              [src]="getMainImage(item)"
+              [src]="item.mainImageUrl"
               [alt]="item.name"
               loading="lazy"
               decoding="async"
               (error)="onImageError($event)"
-              title="Image URL: {{ getMainImage(item) }}"
+              title="Image URL: {{ item.mainImageUrl }}"
             />
           }
 
-          @if (!getMainImage(item)) {
+          @if (!item.mainImageUrl) {
             <div class="card__image card__image--empty">
               <mat-icon>landscape</mat-icon>
             </div>
@@ -142,9 +142,21 @@
         </div>
 
         <div class="card__body">
-          <h2 class="card__name">{{ item.name }}</h2>
-
-          <p class="card__type"><mat-icon>place</mat-icon> {{ item.type }}</p>
+          <div class="card__title-row">
+            <h2 class="card__name">{{ item.name }}</h2>
+            @if (item.type == 'object' && item.averageRating !== undefined && item.averageRating > 0) {
+              <span class="card__rating">
+                <mat-icon>star</mat-icon>
+                {{ item.averageRating.toFixed(1) }}
+                <small>({{ item.reviewCount }})</small>
+              </span>
+            }
+          </div>
+          @if(item.type == 'destination' || item.type == 'activity') {
+            <p class="card__type"><mat-icon>place</mat-icon> {{ item.typeName }}</p>
+          } @else {
+          <p class="card__type"><mat-icon>place</mat-icon> {{ item.location }}</p>
+          }
 
           <p class="card__desc">{{ item.description }}</p>
 
