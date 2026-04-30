@@ -16,6 +16,7 @@ import { MatIcon } from "@angular/material/icon";
 import { LazyBackgroundDirective } from '../../shared/directives/lazy-background.directive';
 import { RecommendationItemDto, RecommendationService } from '../../services/recommendation';
 import { LocationTrackingService } from '../../services/location-tracking';
+import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
 
 interface PlaceCard {
   title: string;
@@ -29,6 +30,8 @@ interface PlaceCard {
   favoriteId?: number;
   showRating: boolean;
   distanceText?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface EventCard {
@@ -41,6 +44,10 @@ interface EventCard {
   timeText: string;
   imageUrl?: string;
   distanceText?: string;
+  latitude?: number;
+  longitude?: number;
+  isPlanned?: boolean;
+  plannerId?: number;
 }
 
 interface FeaturedDestination {
@@ -96,7 +103,8 @@ export class HomeComponent implements OnInit {
   isLoadingPlaces = true;
   isLoadingEvents = true;
   isLoadingRecommendations = true;
-
+  userLocation: { lat: number; lng: number } | null = null;
+  isTracking = false;
   private favoriteMap = new Map<string, number>();
   private fallbackRecommended: PlaceCard[] = [];
   private hasRecommendationResponse = false;
@@ -115,7 +123,56 @@ export class HomeComponent implements OnInit {
     private authService: AuthService,
     private recommendationService: RecommendationService,
     private locationTrackingService: LocationTrackingService,
+    private plannerService: PlannerLocalPreferencesService,
   ) { }
+  private applyPlannerState(): void {
+    const prefs = this.plannerService.list();
+
+    this.events = this.events.map(event => {
+      const found = prefs.find(p => p.eventId === event.id);
+
+      return {
+        ...event,
+        isPlanned: !!found,
+        plannerId: found?.plannerId
+      };
+    });
+  }
+  togglePlanner(eventCard: EventCard, event: Event): void {
+    event.stopPropagation();
+
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    eventCard.isPlanned = !eventCard.isPlanned;
+
+    if (eventCard.isPlanned) {
+      const plannerId = Date.now(); // simple unique id
+
+      this.plannerService.upsert({
+        plannerId,
+        eventId: eventCard.id,
+        plannedDate: new Date().toISOString().split('T')[0],
+        startTime: '12:00',
+        durationMinutes: 90,
+        notes: '',
+        isPriority: false
+      });
+
+      eventCard.plannerId = plannerId;
+    } else {
+      if (eventCard.plannerId) {
+        this.plannerService.remove(eventCard.plannerId);
+      }
+      eventCard.plannerId = undefined;
+    }
+
+    this.events = this.events.map(e =>
+      e.id === eventCard.id ? { ...eventCard } : e
+    );
+  }
   onSearchInput(): void {
     if (this.searchDebounceTimer) {
       clearTimeout(this.searchDebounceTimer);
@@ -131,41 +188,41 @@ export class HomeComponent implements OnInit {
   }
 
   private distanceTextFromCoords(latitude?: number | null, longitude?: number | null): string {
-  if (!this.shouldShowLiveDistance() || latitude == null || longitude == null) {
-    return '';
+    if (!this.shouldShowLiveDistance() || latitude == null || longitude == null) {
+      return '';
+    }
+
+    const currentLocation = this.locationTrackingService.getCurrentLocation();
+    if (!currentLocation) return '';
+
+    const distanceMeters = this.calculateDistanceMeters(
+      currentLocation.latitude,
+      currentLocation.longitude,
+      latitude,
+      longitude
+    );
+
+    return distanceMeters >= 1000
+      ? `${(distanceMeters / 1000).toFixed(1)} km away`
+      : `${Math.round(distanceMeters)} m away`;
   }
 
-  const currentLocation = this.locationTrackingService.getCurrentLocation();
-  if (!currentLocation) return '';
+  private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const r = 6371000;
+    const toRad = (value: number) => (value * Math.PI) / 180;
 
-  const distanceMeters = this.calculateDistanceMeters(
-    currentLocation.latitude,
-    currentLocation.longitude,
-    latitude,
-    longitude
-  );
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
 
-  return distanceMeters >= 1000
-    ? `${(distanceMeters / 1000).toFixed(1)} km away`
-    : `${Math.round(distanceMeters)} m away`;
-}
-
-private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const r = 6371000;
-  const toRad = (value: number) => (value * Math.PI) / 180;
-
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) *
       Math.cos(toRad(lat2)) *
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2);
 
-  return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
+    return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
 
   submitSearch(): void {
     const query = this.searchQuery.trim();
@@ -202,11 +259,107 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
     this.currentFeatured = this.featuredDestinations[index];
   }
   ngOnInit(): void {
+    this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
+      this.isTracking = enabled;
+
+      if (!enabled) {
+        this.clearDistances();
+      } else {
+        this.updateDistances();
+        this.cdr.detectChanges();
+      }
+    });
+
+    this.locationTrackingService.location$.subscribe(loc => {
+      this.userLocation = loc
+        ? { lat: loc.latitude, lng: loc.longitude }
+        : null;
+
+      if (this.userLocation) {
+        this.updateDistances();
+      } else {
+        this.clearDistances();
+      }
+      this.cdr.detectChanges();
+    });
     this.loadUserName();
     this.loadPlaceCards();
     this.loadRecommendedCards();
     this.loadEventCards();
+    this.applyPlannerState();
     this.loadFavorites();
+  }
+  private updateDistances(): void {
+    if (!this.userLocation) return;
+
+    const updateList = (list: any[]) => {
+      return list.map(item => {
+        if (item.latitude == null || item.longitude == null) {
+          return { ...item, distanceText: undefined };
+        }
+
+        const km = this.getDistanceKm(
+          this.userLocation!.lat,
+          this.userLocation!.lng,
+          item.latitude,
+          item.longitude
+        );
+
+        const text =
+          km < 1
+            ? `${Math.round(km * 1000)} m`
+            : `${km.toFixed(1)} km`;
+
+        return {
+          ...item,
+          distanceText: text
+        };
+      });
+    };
+
+    this.popular = updateList(this.popular);
+    this.recommended = updateList(this.recommended);
+    this.events = updateList(this.events);
+  }
+  private clearDistances(): void {
+    const clearList = (list: any[]) =>
+      list.map(item => ({
+        ...item,
+        distanceText: undefined
+      }));
+
+    this.popular = clearList(this.popular);
+    this.recommended = clearList(this.recommended);
+    this.events = clearList(this.events);
+  }
+  private getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371; // km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) *
+      Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+  getDistanceText(item: any): string | null {
+    if (!this.isTracking || !this.userLocation) return null;
+    if (!item.latitude || !item.longitude) return null;
+
+    const km = this.getDistanceKm(
+      this.userLocation.lat,
+      this.userLocation.lng,
+      item.latitude,
+      item.longitude
+    );
+
+    return km < 1
+      ? `${Math.round(km * 1000)} m`
+      : `${km.toFixed(1)} km`;
   }
   ngOnDestroy(): void {
     if (this.rotationInterval) {
@@ -264,7 +417,7 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
         });
         this.currentIndex = 0;
         this.currentFeatured = this.featuredDestinations[0];
-        
+
         this.startRotation();
         this.flushUi();
       });
@@ -374,11 +527,11 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
           });
           this.currentIndex = 0;
           this.translateFeaturedDisplayTitles(selectedFeatured).subscribe((res) => {
-          this.featuredDestinations = res;
-          this.currentFeatured = this.featuredDestinations[0];
-          this.startRotation();
-          this.flushUi();
-        });
+            this.featuredDestinations = res;
+            this.currentFeatured = this.featuredDestinations[0];
+            this.startRotation();
+            this.flushUi();
+          });
           this.flushUi();
         } else {
           this.featuredDestinations = [];
@@ -396,46 +549,46 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
       .trim()
       .toLowerCase();
 
-  if (!featured.length || lang === 'sr' || lang === 'me') {
-    return of(featured);
+    if (!featured.length || lang === 'sr' || lang === 'me') {
+      return of(featured);
+    }
+
+    return forkJoin(
+      featured.map((item) => {
+
+        return this.http
+          .get<ApiTranslationDto[]>(
+            `${environment.apiUrl}/translations?entityType=Destination&entityId=${item.id}`
+          )
+          .pipe(
+            map((translations) => {
+              const translatedDescription = translations
+                .find(
+                  (translation) =>
+                    translation.fieldName?.toLowerCase() === 'displayTitle' &&
+                    translation.languageCode?.toLowerCase() === lang
+                )
+                ?.translatedText?.trim();
+
+              return translatedDescription
+                ? {
+                  ...item,
+                  displayTitle: translatedDescription,
+                }
+                : item;
+            }),
+            catchError((error) => {
+              console.error(
+                `Greška pri prevodu featured destination ${item.id}:`,
+                error
+              );
+
+              return of(item);
+            })
+          );
+      })
+    );
   }
-
-  return forkJoin(
-    featured.map((item) => {
-
-      return this.http
-      .get<ApiTranslationDto[]>(
-        `${environment.apiUrl}/translations?entityType=Destination&entityId=${item.id}`
-      )
-      .pipe(
-        map((translations) => {
-          const translatedDescription = translations
-            .find(
-              (translation) =>
-                translation.fieldName?.toLowerCase() === 'displayTitle' &&
-                translation.languageCode?.toLowerCase() === lang
-            )
-            ?.translatedText?.trim();
-
-          return translatedDescription
-            ? {
-                ...item,
-                displayTitle: translatedDescription,
-              }
-            : item;
-        }),
-          catchError((error) => {
-            console.error(
-              `Greška pri prevodu featured destination ${item.id}:`,
-              error
-            );
-
-            return of(item);
-          })
-        );
-    })
-  );
-}
 
   private loadRecommendedCards(): void {
     this.isLoadingRecommendations = true;
@@ -503,6 +656,8 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
             timeText: this.eventTime(e.startDate, e.endDate),
             imageUrl: this.pickEventImage(e),
             distanceText: this.distanceTextFromCoords(e.latitude, e.longitude),
+            latitude: e.latitude,
+            longitude: e.longitude,
           }),
         );
 
@@ -710,6 +865,8 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
       showRating: false,
       ratingText: "",
       distanceText: this.distanceTextFromCoords(destination.latitude, destination.longitude),
+      latitude: destination.latitude,
+      longitude: destination.longitude,
     };
 
     this.applyFavoriteState([card]);
@@ -743,6 +900,8 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
       targetUrl: `/object/${object.id}`,
       showRating: (object.averageRating ?? 0) > 0,
       distanceText: this.distanceTextFromCoords(object.latitude, object.longitude),
+      latitude: object.latitude,
+      longitude: object.longitude,
     };
 
     this.applyFavoriteState([card]);
@@ -765,6 +924,8 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
       targetUrl: '/map',
       showRating: false,
       distanceText: this.distanceTextFromCoords(activity.latitude, activity.longitude),
+      latitude: activity.latitude,
+      longitude: activity.longitude,
     };
 
     this.applyFavoriteState([card]);
@@ -839,27 +1000,27 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
         item.distanceMeters >= 1000
           ? `${(item.distanceMeters / 1000).toFixed(1)} km away`
           : `${Math.round(item.distanceMeters)} m away`;
-/*
-      if (item.itemType === 'activity') {
-        const details = [item.price != null && item.price > 0 ? `EUR ${Math.round(item.price)}` : 'Free'];
-        if (item.durationMinutes != null && item.durationMinutes > 0) {
-          details.push(`${item.durationMinutes} min`);
-        }
-
-        return `${distanceText} - ${details.join(' - ')}`;
-      } */
+      /*
+            if (item.itemType === 'activity') {
+              const details = [item.price != null && item.price > 0 ? `EUR ${Math.round(item.price)}` : 'Free'];
+              if (item.durationMinutes != null && item.durationMinutes > 0) {
+                details.push(`${item.durationMinutes} min`);
+              }
+      
+              return `${distanceText} - ${details.join(' - ')}`;
+            } */
 
       return distanceText;
     }
-/*
-    if (item.itemType === 'activity') {
-      const details = [item.price != null && item.price > 0 ? `EUR ${Math.round(item.price)}` : 'Free'];
-      if (item.durationMinutes != null && item.durationMinutes > 0) {
-        details.push(`${item.durationMinutes} min`);
-      }
-
-      return details.join(' - ');
-    } */
+    /*
+        if (item.itemType === 'activity') {
+          const details = [item.price != null && item.price > 0 ? `EUR ${Math.round(item.price)}` : 'Free'];
+          if (item.durationMinutes != null && item.durationMinutes > 0) {
+            details.push(`${item.durationMinutes} min`);
+          }
+    
+          return details.join(' - ');
+        } */
 
     return item.categoryName || '';
   }
@@ -977,8 +1138,7 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
 
   private activityMetaText(activity: {
     activityTypeName: string;
-  })
-  {
+  }) {
     return activity.activityTypeName;
   }
 

@@ -133,6 +133,7 @@
           <button
             class="card__fav"
             [class.card__fav--active]="activity.isFavorite"
+            [disabled]="isFavoritePending(activity.id)"
             (click)="toggleFavorite(activity, $event)"
           >
             <mat-icon>{{ activity.isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>

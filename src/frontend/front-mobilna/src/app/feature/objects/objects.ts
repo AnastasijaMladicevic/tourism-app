@@ -223,7 +223,9 @@ export class ObjectsComponent implements OnInit {
 
     if (this.activeFilter !== 'All') {
       const active = this.activeFilter.trim().toLowerCase();
-      list = list.filter((obj) => obj.objectTypeName?.trim().toLowerCase() === active);
+      list = list.filter((obj) =>
+        obj.objectTypeName?.toLowerCase().includes(active)
+      );
     }
 
     if (this.minRatingFilter > 0) {

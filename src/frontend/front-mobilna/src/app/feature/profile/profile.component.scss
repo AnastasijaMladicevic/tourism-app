@@ -76,6 +76,8 @@
 }
 
 .avatar-wrap {
+  grid-column: 2;
+  justify-self: center;
   position: relative;
 }
 
@@ -131,6 +133,8 @@
 }
 
 .edit-chip {
+  grid-column: 3;
+  justify-self: end;
   border: none;
   background: #ffffff;
   color: #53abd2;
@@ -415,4 +419,10 @@
   .menu-title {
     font-size: 17px;
   }
+}
+
+.hero-card__top {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
 }

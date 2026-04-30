@@ -8,11 +8,12 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { firstValueFrom } from 'rxjs';
+import { catchError, firstValueFrom, of } from 'rxjs';
 import { ActivityDto, ActivityService } from '../../services/activity';
 import { AuthService } from '../../services/auth';
 import { ImageDto, ImageService } from '../../services/image';
 import { LocationTrackingService } from '../../services/location-tracking';
+import { FavoriteStateService } from '../../services/favorite-state';
 
 export interface ActivityView extends ActivityDto {
   isFavorite: boolean;
@@ -47,12 +48,14 @@ export class ActivitiesComponent implements OnInit {
   private readonly fetchPageSize = 100;
   private readonly maxFetchPages = 50;
   private readonly imageCache = new Map<number, ActivityDto['images']>();
+  private readonly favoritePendingIds = new Set<number>();
   constructor(
     private router: Router,
     private activityService: ActivityService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private imageService: ImageService,
+    private favoriteStateService: FavoriteStateService,
     private locationTrackingService: LocationTrackingService
   ) { }
   ngOnInit(): void {
@@ -173,17 +176,51 @@ export class ActivitiesComponent implements OnInit {
     this.currentPage = 1;
     void this.refreshVisibleActivities();
   }
+  isFavoritePending(activityId: number): boolean {
+    return this.favoritePendingIds.has(activityId);
+  }
+  private patchFavoriteState(activityId: number, isFavorite: boolean, favoriteId?: number): void {
+    const applyPatch = (list: ActivityView[]) => {
+      list.forEach((activity) => {
+        if (activity.id === activityId) {
+          activity.isFavorite = isFavorite;
+          activity.favoriteId = favoriteId;
+        }
+      });
+    };
+
+    applyPatch(this.activities);
+    applyPatch(this.visibleActivities);
+  }
   toggleFavorite(activity: ActivityView, event: Event): void {
+    event.preventDefault();
     event.stopPropagation();
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login']);
       return;
     }
 
-    activity.isFavorite = !activity.isFavorite;
-    this.activities = this.activities.map((item) =>
-      item.id === activity.id ? { ...item, isFavorite: activity.isFavorite } : item,
-    );
+    if (this.favoritePendingIds.has(activity.id)) {
+      return;
+    }
+
+    this.favoritePendingIds.add(activity.id);
+
+    this.favoriteStateService
+      .toggle({ type: 'activity', entityId: activity.id }, activity.favoriteId)
+      .subscribe({
+        next: (state) => {
+          this.patchFavoriteState(activity.id, state.isFavorite, state.favoriteId);
+        },
+        error: () => {
+          this.favoritePendingIds.delete(activity.id);
+          this.cdr.detectChanges();
+        },
+        complete: () => {
+          this.favoritePendingIds.delete(activity.id);
+          this.cdr.detectChanges();
+        },
+      });
   }
   prevPage(): void {
     if (this.currentPage === 1) return;
@@ -231,6 +268,13 @@ export class ActivitiesComponent implements OnInit {
     this.errorMessage = '';
 
     try {
+      if (this.authService.isLoggedIn()) {
+        await firstValueFrom(
+          this.favoriteStateService
+            .loadFavorites(true)
+            .pipe(catchError(() => of(new Map<string, number>()))),
+        );
+      }
       const activities = await this.fetchAllActivities();
 
       this.activities = activities.map((activity) => ({
@@ -238,6 +282,10 @@ export class ActivitiesComponent implements OnInit {
         images: this.imageCache.get(activity.id) ?? [],
         isFavorite: false,
         favoriteId: undefined,
+      }));
+      this.favoriteStateService.applyToList(this.activities, (activity) => ({
+        type: 'activity',
+        entityId: activity.id,
       }));
       this.activityTypes = this.extractUniqueTypes(this.activities);
       this.updateDistances();
@@ -407,7 +455,10 @@ export class ActivitiesComponent implements OnInit {
         images: await this.getActivityImages(activity.id),
       })),
     );
-
+    this.favoriteStateService.applyToList(this.visibleActivities, (activity) => ({
+      type: 'activity',
+      entityId: activity.id,
+    }));
     this.cdr.detectChanges();
   }
   private async getActivityImages(activityId: number): Promise<ActivityDto['images']> {
