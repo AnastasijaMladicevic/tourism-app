@@ -45,6 +45,7 @@
                     "defaultUser":  "Usuario SpireGO",
                     "stats":  {
                                   "favorites":  "FAVORITOS",
+                                  "plans":  "PLANES",
                                   "reviews":  "RESEÑAS"
                               },
                     "section":  {

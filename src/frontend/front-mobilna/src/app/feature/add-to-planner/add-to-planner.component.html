@@ -8,16 +8,7 @@
 
     <h1>{{ translate('addToPlanner.title') }}</h1>
 
-    <div class="topbar-actions">
-      <button type="button" class="topbar-icon-btn" [attr.aria-label]="translate('planner.notifications')">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M15 17h5l-1.4-1.4a2 2 0 0 1-.6-1.4V11a6 6 0 1 0-12 0v3.2c0 .53-.21 1.04-.59 1.41L4 17h5" />
-          <path d="M10 20a2 2 0 0 0 4 0" />
-        </svg>
-      </button>
-
-      <span class="topbar-avatar" aria-hidden="true">A</span>
-    </div>
+    <span class="topbar-spacer" aria-hidden="true"></span>
   </header>
 
   <section class="add-planner-shell">
@@ -81,6 +72,10 @@
           <p class="support-hint">
             {{ translate('addToPlanner.nonEventHint') }}
           </p>
+        } @else if (isEventScheduleLocked) {
+          <p class="support-hint">
+            Event moze da se planira samo u okviru svog datuma i originalnog trajanja.
+          </p>
         }
 
         <div class="field-grid">
@@ -100,6 +95,8 @@
                 type="date"
                 [ngModel]="travelDate()"
                 (ngModelChange)="onTravelDateChange($event)"
+                [attr.min]="minSelectableDate"
+                [attr.max]="maxSelectableDate"
               />
             </div>
 
@@ -132,7 +129,13 @@
             </span>
 
             <div class="field-card__surface">
-              <input type="time" [ngModel]="startTime()" (ngModelChange)="startTime.set($event)" />
+              <input
+                type="time"
+                [ngModel]="startTime()"
+                (ngModelChange)="startTime.set($event)"
+                [readonly]="isEventScheduleLocked"
+                [disabled]="isEventScheduleLocked"
+              />
             </div>
           </label>
 
@@ -172,35 +175,13 @@
             <h4>{{ translate('addToPlanner.estimatedDuration') }}</h4>
             <span>{{ durationLabel() }}</span>
           </div>
-
-          <input
-            type="range"
-            min="30"
-            max="300"
-            step="30"
-            class="duration-slider"
-            [ngModel]="durationMinutes()"
-            (ngModelChange)="durationMinutes.set(+$event)"
-          />
-
-          <div class="duration-marks">
-            <span>30m</span>
-            <span>1h</span>
-            <span>2h</span>
-            <span>3h</span>
-            <span>4h+</span>
-          </div>
-
-          <label class="field-card field-card--full field-card--desktop-select">
+          <div class="field-card field-card--full">
             <span>{{ translate('addToPlanner.duration') }}</span>
-            <div class="field-card__surface">
-              <select [ngModel]="durationMinutes()" (ngModelChange)="durationMinutes.set(+$event)">
-                @for (minutes of durationOptions; track minutes) {
-                  <option [ngValue]="minutes">{{ formatDuration(minutes) }}</option>
-                }
-              </select>
+            <div class="field-card__surface field-card__surface--readonly">
+              <strong>{{ durationLabel() }}</strong>
             </div>
-          </label>
+            <small>Trajanje eventa je fiksno i ne moze da se menja.</small>
+          </div>
         </div>
 
         <article class="priority-card">

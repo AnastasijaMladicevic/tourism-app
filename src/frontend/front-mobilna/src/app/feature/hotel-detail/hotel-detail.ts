@@ -1,9 +1,9 @@
-import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { catchError, forkJoin, of } from 'rxjs';
+import { Subscription, catchError, forkJoin, of } from 'rxjs';
 
 import { AuthService } from '../../services/auth';
 import { ImageDto, ImageService } from '../../services/image';
@@ -39,7 +39,7 @@ interface NearbyHotelCard {
   styleUrls: ['./hotel-detail.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class HotelDetailComponent implements OnInit {
+export class HotelDetailComponent implements OnInit, OnDestroy {
   hotel: ObjectDto | null = null;
   images: (ImageDto | ObjectImageDto)[] = [];
   reviews: ReviewCard[] = [];
@@ -56,6 +56,7 @@ export class HotelDetailComponent implements OnInit {
 
   private touchStartX = 0;
   private touchEndX = 0;
+  private readonly subscriptions = new Subscription();
 
   constructor(
     private route: ActivatedRoute,
@@ -63,11 +64,37 @@ export class HotelDetailComponent implements OnInit {
     private objectService: ObjectService,
     private imageService: ImageService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.subscriptions.add(
+      this.route.paramMap.subscribe((params) => {
+        const id = Number(params.get('id'));
+        if (!id) {
+          this.isLoading = false;
+          this.errorMessage = 'Greska pri ucitavanju hotela.';
+          this.cdr.detectChanges();
+          return;
+        }
+
+        this.loadHotel(id);
+      }),
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+    document.body.style.overflow = 'visible';
+  }
+
+  private loadHotel(id: number): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.hotel = null;
+    this.images = [];
+    this.reviews = [];
+    this.nearbyHotels = [];
 
     forkJoin({
       object: this.objectService.getById(id),
@@ -81,22 +108,20 @@ export class HotelDetailComponent implements OnInit {
         this.workingHoursText = normalizedObject.workingHours
           ? this.formatWorkingHours(normalizedObject.workingHours)
           : '';
-
         this.images = normalizedImages;
         this.mainImage =
           this.getMainImage(normalizedImages) ||
           this.resolveMediaUrl(normalizedObject.mainImageUrl) ||
           this.getMainImage(this.normalizeImages((normalizedObject.images || []) as (ImageDto | ObjectImageDto)[]));
         this.reviews = this.toReviewCards(normalizedObject.reviews || [], normalizedObject.id);
-        this.loadNearbyHotels(normalizedObject);
 
-        this.isLoading = false;
         this.cdr.detectChanges();
+        this.loadNearbyHotels(normalizedObject);
       },
       error: (err) => {
         console.error('Failed to load hotel details:', err);
         this.isLoading = false;
-        this.errorMessage = 'Greška pri učitavanju hotela.';
+        this.errorMessage = 'Greska pri ucitavanju hotela.';
         this.cdr.detectChanges();
       },
     });
@@ -135,7 +160,7 @@ export class HotelDetailComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-    alert('Book Now - Booking sistem će biti integrisan kasnije');
+    alert('Book Now - Booking sistem ce biti integrisan kasnije');
   }
 
   addToPlanner(): void {
@@ -275,41 +300,48 @@ export class HotelDetailComponent implements OnInit {
   private loadNearbyHotels(currentHotel: ObjectDto): void {
     if (currentHotel.latitude == null || currentHotel.longitude == null) {
       this.nearbyHotels = [];
+      this.isLoading = false;
+      this.cdr.detectChanges();
       return;
     }
 
     this.objectService
-      .getNearby({
-        latitude: currentHotel.latitude,
-        longitude: currentHotel.longitude,
-        radiusMeters: 15000,
-        type: 'Hotel',
-        page: 1,
-        pageSize: 8,
-        sortOrder: 'asc',
-      }, { bypassLanguage: true })
+      .getNearby(
+        {
+          latitude: currentHotel.latitude,
+          longitude: currentHotel.longitude,
+          radiusMeters: 15000,
+          type: 'Hotel',
+          page: 1,
+          pageSize: 8,
+          sortOrder: 'asc',
+        },
+        { bypassLanguage: true },
+      )
       .subscribe({
         next: (result) => {
           this.nearbyHotels = this.toArray<ObjectDto>(result)
             .map((item) => this.normalizeObject(item))
             .filter((item) => item.id !== currentHotel.id)
+            .filter((item) => this.isHotel(item.objectTypeName))
             .slice(0, 2)
             .map((object) => ({
               id: object.id,
               name: object.name,
               image: this.resolveMediaUrl(
-                (object.images?.find((image) => image.isMain) ?? object.images?.[0])?.url ??
-                  object.mainImageUrl,
+                (object.images?.find((image) => image.isMain) ?? object.images?.[0])?.url ?? object.mainImageUrl,
               ),
               location: object.localityName ?? object.destinationName ?? 'Montenegro',
               rating: object.averageRating,
               reviews: object.reviewCount ?? 0,
             }));
 
+          this.isLoading = false;
           this.cdr.detectChanges();
         },
         error: () => {
           this.nearbyHotels = [];
+          this.isLoading = false;
           this.cdr.detectChanges();
         },
       });
@@ -360,6 +392,7 @@ export class HotelDetailComponent implements OnInit {
       phoneNumber: (dto['phoneNumber'] ?? dto['PhoneNumber'] ?? undefined) as string | undefined,
       website: (dto['website'] ?? dto['Website'] ?? undefined) as string | undefined,
       workingHours: (dto['workingHours'] ?? dto['WorkingHours'] ?? undefined) as string | undefined,
+      mainImageUrl: (dto['mainImageUrl'] ?? dto['MainImageUrl'] ?? undefined) as string | undefined,
       longitude: this.readOptionalNumber(dto, ['longitude', 'Longitude']),
       latitude: this.readOptionalNumber(dto, ['latitude', 'Latitude']),
       averageRating: this.readOptionalNumber(dto, ['averageRating', 'AverageRating']),
@@ -369,8 +402,7 @@ export class HotelDetailComponent implements OnInit {
       objectTypeId: Number(dto['objectTypeId'] ?? dto['ObjectTypeId'] ?? 0),
       objectTypeName: String(dto['objectTypeName'] ?? dto['ObjectTypeName'] ?? ''),
       localityName: (dto['localityName'] ?? dto['LocalityName'] ?? undefined) as string | undefined,
-      destinationName:
-        (dto['destinationName'] ?? dto['DestinationName'] ?? undefined) as string | undefined,
+      destinationName: (dto['destinationName'] ?? dto['DestinationName'] ?? undefined) as string | undefined,
       images: ((dto['images'] ?? dto['Images'] ?? []) as ObjectDto['images']) || [],
       reviews: ((dto['reviews'] ?? dto['Reviews'] ?? []) as ReviewDto[]) || [],
     };
@@ -389,10 +421,6 @@ export class HotelDetailComponent implements OnInit {
   private isHotel(typeName?: string): boolean {
     if (!typeName) return false;
     return typeName.trim().toLowerCase().includes('hotel');
-  }
-
-  private normalizeLocation(value?: string): string {
-    return (value ?? '').trim().toLowerCase();
   }
 
   private resolveMediaUrl(raw?: string): string | undefined {

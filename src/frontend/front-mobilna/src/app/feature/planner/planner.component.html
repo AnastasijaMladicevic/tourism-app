@@ -1,57 +1,11 @@
 <div class="planner-page">
   <header class="planner-desktop-topbar">
     <h1>{{ translate('planner.title') }}</h1>
-
-    <div class="planner-desktop-topbar__actions">
-      <button
-        type="button"
-        class="planner-icon-btn"
-        [attr.aria-label]="translate('planner.notifications')"
-      >
-        <svg viewBox="0 0 24 24">
-          <path d="M15 17h5l-1.4-1.4a2 2 0 0 1-.6-1.4V11a6 6 0 1 0-12 0v3.2c0 .53-.21 1.04-.59 1.41L4 17h5" />
-          <path d="M10 20a2 2 0 0 0 4 0" />
-        </svg>
-      </button>
-
-      <span class="planner-avatar" aria-hidden="true">
-        <svg viewBox="0 0 24 24">
-          <circle cx="12" cy="8" r="4" />
-          <path d="M4 21a8 8 0 0 1 16 0" />
-        </svg>
-      </span>
-    </div>
   </header>
 
   <section class="planner-shell">
     <header class="planner-mobile-topbar">
-      <div class="planner-mobile-topbar__brand">
-        <span class="planner-brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="M13 2 5 14h5l-1 8 8-12h-5z" />
-          </svg>
-        </span>
-        <h1>{{ translate('planner.title') }}</h1>
-      </div>
-
-      <div class="planner-mobile-topbar__actions">
-        <button
-          type="button"
-          class="planner-icon-btn"
-          [attr.aria-label]="translate('planner.notifications')"
-        >
-          <svg viewBox="0 0 24 24">
-            <path d="M15 17h5l-1.4-1.4a2 2 0 0 1-.6-1.4V11a6 6 0 1 0-12 0v3.2c0 .53-.21 1.04-.59 1.41L4 17h5" />
-            <path d="M10 20a2 2 0 0 0 4 0" />
-          </svg>
-        </button>
-        <span class="planner-avatar planner-avatar--mobile" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <circle cx="12" cy="8" r="4" />
-            <path d="M4 21a8 8 0 0 1 16 0" />
-          </svg>
-        </span>
-      </div>
+      <h1>{{ translate('planner.title') }}</h1>
     </header>
 
     @if (errorMessage()) {

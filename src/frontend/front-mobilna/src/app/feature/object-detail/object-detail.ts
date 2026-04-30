@@ -1,9 +1,9 @@
-import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { catchError, forkJoin, of } from 'rxjs';
+import { Subscription, catchError, forkJoin, of } from 'rxjs';
 
 import { AuthService } from '../../services/auth';
 import { ImageDto, ImageService } from '../../services/image';
@@ -20,7 +20,7 @@ import { environment } from '../../../environment/environment';
   styleUrls: ['./object-detail.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class ObjectDetailComponent implements OnInit {
+export class ObjectDetailComponent implements OnInit, OnDestroy {
   object: ObjectDto | null = null;
   images: ImageDto[] = [];
   mainImage = '';
@@ -32,9 +32,11 @@ export class ObjectDetailComponent implements OnInit {
 
   showGalleryModal = false;
   currentImageIndex = 0;
+  showAllReviewsModal = false;
 
   private touchStartX = 0;
   private touchEndX = 0;
+  private readonly subscriptions = new Subscription();
 
   constructor(
     private route: ActivatedRoute,
@@ -42,11 +44,38 @@ export class ObjectDetailComponent implements OnInit {
     private objectService: ObjectService,
     private imageService: ImageService,
     private authService: AuthService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.subscriptions.add(
+      this.route.paramMap.subscribe((params) => {
+        const id = Number(params.get('id'));
+        if (!id) {
+          this.isLoading = false;
+          this.errorMessage = 'Greska pri ucitavanju objekta.';
+          this.cdr.detectChanges();
+          return;
+        }
+
+        this.loadObject(id);
+      }),
+    );
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+    document.body.style.overflow = 'visible';
+  }
+
+  private loadObject(id: number): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.object = null;
+    this.images = [];
+    this.mainImage = '';
+    this.reviews = [];
+    this.nearbyObjects = [];
 
     forkJoin({
       object: this.objectService.getById(id),
@@ -59,21 +88,18 @@ export class ObjectDetailComponent implements OnInit {
         this.object = normalizedObject;
         this.images = normalizedImages;
         this.reviews = normalizedObject.reviews || [];
-
         this.mainImage =
           this.getMainImage(normalizedImages) ||
           this.resolveMediaUrl(normalizedObject.mainImageUrl) ||
-          this.getMainImage(this.normalizeImages(((normalizedObject.images as unknown) as ImageDto[]) || []));
+          this.getMainImage(this.normalizeImages((normalizedObject.images || []) as ImageDto[]));
 
-        this.isLoading = false;
         this.cdr.detectChanges();
-
         this.loadNearbyObjects(normalizedObject);
       },
       error: (err) => {
         console.error(err);
         this.isLoading = false;
-        this.errorMessage = 'Greška pri učitavanju objekta.';
+        this.errorMessage = 'Greska pri ucitavanju objekta.';
         this.cdr.detectChanges();
       },
     });
@@ -87,33 +113,82 @@ export class ObjectDetailComponent implements OnInit {
       return;
     }
 
+    const currentTypeGroup = this.getObjectFamily(currentObject.objectTypeName);
+
     this.objectService
-      .getNearby({
-        latitude: currentObject.latitude,
-        longitude: currentObject.longitude,
-        radiusMeters: 5000,
-        page: 1,
-        pageSize: 6,
-        sortOrder: 'asc',
-      }, { bypassLanguage: true })
+      .getNearby(
+        {
+          latitude: currentObject.latitude,
+          longitude: currentObject.longitude,
+          radiusMeters: 5000,
+          type: currentObject.objectTypeName || undefined,
+          page: 1,
+          pageSize: 8,
+          sortOrder: 'asc',
+        },
+        { bypassLanguage: true },
+      )
       .subscribe({
         next: (result) => {
           this.nearbyObjects = this.extractItems(result)
             .map((item) => this.normalizeObject(item))
             .filter((item) => item.id !== currentObject.id)
+            .filter((item) => this.getObjectFamily(item.objectTypeName) === currentTypeGroup)
             .slice(0, 3);
 
+          this.isLoading = false;
           this.cdr.detectChanges();
         },
         error: (err) => {
           console.error('Failed to load nearby objects:', err);
           this.nearbyObjects = [];
+          this.isLoading = false;
           this.cdr.detectChanges();
         },
       });
   }
 
-  private extractItems(result: PagedResultDto<ObjectDto> | Record<string, unknown> | null | undefined): ObjectDto[] {
+  private getObjectFamily(typeName?: string): string {
+    const normalized = (typeName ?? '').trim().toLowerCase();
+    if (
+      normalized.includes('hotel') ||
+      normalized.includes('resort') ||
+      normalized.includes('motel') ||
+      normalized.includes('apartman') ||
+      normalized.includes('apartment')
+    ) {
+      return 'accommodation';
+    }
+
+    if (
+      normalized.includes('restoran') ||
+      normalized.includes('restaurant') ||
+      normalized.includes('bistro') ||
+      normalized.includes('konoba') ||
+      normalized.includes('taverna') ||
+      normalized.includes('pizzeria') ||
+      normalized.includes('kafana') ||
+      normalized.includes('bar') ||
+      normalized.includes('cafe') ||
+      normalized.includes('kafic') ||
+      normalized.includes('club') ||
+      normalized.includes('klub') ||
+      normalized.includes('winery') ||
+      normalized.includes('vinarija')
+    ) {
+      return 'dining';
+    }
+
+    if (normalized.includes('pump') || normalized.includes('gas') || normalized.includes('fuel')) {
+      return 'fuel';
+    }
+
+    return normalized || 'other';
+  }
+
+  private extractItems(
+    result: PagedResultDto<ObjectDto> | Record<string, unknown> | null | undefined,
+  ): ObjectDto[] {
     if (!result || typeof result !== 'object') {
       return [];
     }
@@ -144,8 +219,8 @@ export class ObjectDetailComponent implements OnInit {
       menuUrl: (dto['menuUrl'] ?? dto['MenuUrl'] ?? undefined) as string | undefined,
       cuisineType: (dto['cuisineType'] ?? dto['CuisineType'] ?? undefined) as string | undefined,
       workingHours: (dto['workingHours'] ?? dto['WorkingHours'] ?? undefined) as string | undefined,
-      price: (dto['price'] ?? dto['Price'] ?? undefined) as Int16Array | undefined,
-      amenities: ((dto['amenities'] ?? dto['Amenities'] ?? []) as []) || [],
+      price: this.readOptionalNumber(dto, ['price', 'Price']) as unknown as Int16Array | undefined,
+      amenities: (((dto['amenities'] ?? dto['Amenities'] ?? []) as string[]) || []) as [],
       longitude: this.readOptionalNumber(dto, ['longitude', 'Longitude']),
       latitude: this.readOptionalNumber(dto, ['latitude', 'Latitude']),
       averageRating: this.readOptionalNumber(dto, ['averageRating', 'AverageRating']),
@@ -322,8 +397,6 @@ export class ObjectDetailComponent implements OnInit {
     const date = new Date(dateStr);
     return date.toLocaleDateString('sr-RS', { day: 'numeric', month: 'short', year: 'numeric' });
   }
-
-  showAllReviewsModal = false;
 
   getRatingPercentage(rating: number): number {
     if (!this.reviews || this.reviews.length === 0) return 0;

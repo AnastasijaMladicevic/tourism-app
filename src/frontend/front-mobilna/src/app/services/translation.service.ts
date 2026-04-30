@@ -15,7 +15,7 @@ const LANGUAGE_LABEL_KEYS: Record<AppLanguage, string> = {
 export class TranslationService {
   private readonly http = inject(HttpClient);
   private readonly storageKey = 'spirego-language';
-  private readonly translationAssetVersion = '2026-04-29-favorites-planner';
+  private readonly translationAssetVersion = '2026-04-30-profile-planner-signup';
   private readonly activeLanguage = signal<AppLanguage>(this.readStoredLanguage());
   private translations: Record<string, string> = {};
 

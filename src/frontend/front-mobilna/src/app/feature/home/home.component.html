@@ -276,11 +276,6 @@
               class="event-img event-img--dynamic"
               [appLazyBackground]="event.imageUrl ?? null"
             >
-              <span class="event-price" 
-                  [class.event-price--free]="event.isFree">
-              Price: {{ event.priceText }}
-            </span>
-              <span class="event-time">{{ event.timeText }}</span>
             </div>
             <div class="event-info">
               <h3>{{ event.title }}</h3>

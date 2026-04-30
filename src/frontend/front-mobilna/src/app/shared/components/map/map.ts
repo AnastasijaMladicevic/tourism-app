@@ -30,22 +30,28 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   }
 
   private initMap(): void {
-    console.log('MAP INIT:', this.mapId, this.lat, this.lng);
-    if (!this.lat || !this.lng) return;
+    if (
+      this.lat == null ||
+      this.lng == null ||
+      Number.isNaN(Number(this.lat)) ||
+      Number.isNaN(Number(this.lng))
+    ) {
+      return;
+    }
 
-    this.mapService.initMap(this.mapId, this.lat, this.lng, this.zoom);
+    const map = this.mapService.initMap(this.mapId, this.lat, this.lng, this.zoom);
+    if (!map) {
+      return;
+    }
 
     if (!this.interactive) {
-      const map = this.mapService['map'];
-      if (map) {
-        map.dragging.disable();
-        map.touchZoom.disable();
-        map.doubleClickZoom.disable();
-        map.scrollWheelZoom.disable();
-        map.boxZoom.disable();
-        map.keyboard.disable();
-        map.zoomControl?.remove();
-      }
+      map.dragging.disable();
+      map.touchZoom.disable();
+      map.doubleClickZoom.disable();
+      map.scrollWheelZoom.disable();
+      map.boxZoom.disable();
+      map.keyboard.disable();
+      map.zoomControl?.remove();
     }
 
     this.mapService.addMarker(this.lat, this.lng, this.popupText);

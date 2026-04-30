@@ -45,6 +45,7 @@
                     "defaultUser":  "SpireGO user",
                     "stats":  {
                                   "favorites":  "FAVORITES",
+                                  "plans":  "PLANS",
                                   "reviews":  "REVIEWS"
                               },
                     "section":  {

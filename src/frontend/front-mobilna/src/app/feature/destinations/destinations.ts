@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { firstValueFrom } from 'rxjs';
+import { catchError, firstValueFrom, of } from 'rxjs';
 import { LocationTrackingService } from '../../services/location-tracking';
 import { DestinationDto, DestinationService } from '../../services/destination';
 import { AuthService } from '../../services/auth';
@@ -97,7 +97,11 @@ export class DestinationsComponent implements OnInit {
 
     try {
       if (this.authService.isLoggedIn()) {
-        await firstValueFrom(this.favoriteStateService.loadFavorites(true));
+        await firstValueFrom(
+          this.favoriteStateService
+            .loadFavorites(true)
+            .pipe(catchError(() => of(new Map<string, number>()))),
+        );
       }
 
       const destinations = await this.fetchAllDestinations();

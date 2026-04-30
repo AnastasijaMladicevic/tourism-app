@@ -183,7 +183,7 @@
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 14px;
 }
@@ -192,7 +192,7 @@
   border-radius: 16px;
   padding: 14px 10px 12px;
   text-align: center;
-  min-height: 98px;
+  min-height: 108px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -204,14 +204,7 @@
     font-weight: var(--font-weight-extrabold);
     color: #223642;
     letter-spacing: -0.04em;
-    margin-bottom: 5px;
-  }
-
-  span {
-    font-size: 10px;
-    font-weight: var(--font-weight-extrabold);
-    letter-spacing: 0.08em;
-    color: #7f959e;
+    margin-bottom: 8px;
   }
 }
 
@@ -233,16 +226,27 @@
 }
 
 .stat-icon {
-  width: 24px;
-  height: 24px;
+  width: 16px;
+  height: 16px;
   color: #69b7dc;
-  margin-bottom: 6px;
 
   svg {
-    width: 15px;
-    height: 15px;
+    width: 14px;
+    height: 14px;
     stroke-width: 1.9;
   }
+}
+
+.stat-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #7f959e;
+  font-size: 10px;
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .menu-section {
@@ -393,10 +397,10 @@
     strong {
       font-size: 36px;
     }
+  }
 
-    span {
-      font-size: 11px;
-    }
+  .stat-label {
+    font-size: 11px;
   }
 
   .menu-section h3 {

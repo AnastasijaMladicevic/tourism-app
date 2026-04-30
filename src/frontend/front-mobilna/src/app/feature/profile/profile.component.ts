@@ -5,6 +5,7 @@ import { catchError, forkJoin, map, of } from 'rxjs';
 import { environment } from '../../../environment/environment';
 import { AuthService, UserDto } from '../../services/auth';
 import { FavoriteService } from '../../services/favorite';
+import { EventPlannerService } from '../../services/event-planner';
 import { ReviewDto, ReviewService } from '../../services/review';
 import { TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -12,8 +13,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 interface ProfileStat {
   labelKey: string;
   value: number;
-  icon: string;
-  hideWhenZero?: boolean;
+  icon: 'heart' | 'calendar' | 'star';
 }
 
 interface ProfileAction {
@@ -39,13 +39,15 @@ interface ProfileSection {
 export class ProfileComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly favoriteService = inject(FavoriteService);
+  private readonly eventPlannerService = inject(EventPlannerService);
   private readonly reviewService = inject(ReviewService);
   private readonly router = inject(Router);
   private readonly translationService = inject(TranslationService);
 
   protected user: UserDto | null = null;
   protected stats: ProfileStat[] = [
-    { labelKey: 'profile.stats.favorites', value: 0, icon: 'heart', hideWhenZero: true },
+    { labelKey: 'profile.stats.favorites', value: 0, icon: 'heart' },
+    { labelKey: 'profile.stats.plans', value: 0, icon: 'calendar' },
     { labelKey: 'profile.stats.reviews', value: 0, icon: 'star' },
   ];
 
@@ -90,7 +92,7 @@ export class ProfileComponent implements OnInit {
     }
 
     this.user = currentUser;
-    this.loadStats(currentUser.id);
+    this.loadStats();
 
     this.authService
       .getById(currentUser.id)
@@ -98,6 +100,7 @@ export class ProfileComponent implements OnInit {
       .subscribe((user) => {
         if (!user) return;
         this.user = user;
+        this.loadStats();
       });
   }
 
@@ -162,11 +165,7 @@ export class ProfileComponent implements OnInit {
     return stat.labelKey;
   }
 
-  protected shouldShowStatValue(stat: ProfileStat): boolean {
-    return !(stat.hideWhenZero && stat.value === 0);
-  }
-
-  private loadStats(currentUserId: number): void {
+  private loadStats(): void {
     if (!this.authService.isLoggedIn()) {
       return;
     }
@@ -176,24 +175,27 @@ export class ProfileComponent implements OnInit {
         map((items) => items.length),
         catchError(() => of(0)),
       ),
-      reviews: this.reviewService.getMine({ page: 1, pageSize: 1 }).pipe(
-        map((items) => this.readTotalCount(items)),
+      planner: this.eventPlannerService
+        .getMyPlanner({ page: 1, pageSize: 200 })
+        .pipe(map((items) => this.readCollectionCount(items)), catchError(() => of(0))),
+      reviews: this.reviewService.getMine({ page: 1, pageSize: 200 }, { bypassRegion: true }).pipe(
+        map((items) => this.readCollectionCount(items)),
         catchError(() => of(0)),
       ),
-    }).subscribe(({ favorites, reviews }) => {
+    }).subscribe(({ favorites, planner, reviews }) => {
       this.stats = [
-        {
-          labelKey: 'profile.stats.favorites',
-          value: favorites,
-          icon: 'heart',
-          hideWhenZero: true,
-        },
+        { labelKey: 'profile.stats.favorites', value: favorites, icon: 'heart' },
+        { labelKey: 'profile.stats.plans', value: planner, icon: 'calendar' },
         { labelKey: 'profile.stats.reviews', value: reviews, icon: 'star' },
       ];
     });
   }
 
-  private readTotalCount(raw: unknown): number {
+  private readCollectionCount(raw: unknown): number {
+    if (Array.isArray(raw)) {
+      return raw.length;
+    }
+
     if (!raw || typeof raw !== 'object') {
       return 0;
     }
@@ -204,8 +206,21 @@ export class ProfileComponent implements OnInit {
       return totalCount;
     }
 
-    if (Array.isArray(raw)) {
-      return (raw as ReviewDto[]).length;
+    if (typeof totalCount === 'string') {
+      const parsed = Number(totalCount);
+      if (!Number.isNaN(parsed)) {
+        return parsed;
+      }
+    }
+
+    const items = obj['items'] ?? obj['Items'] ?? obj['data'] ?? obj['Data'] ?? obj['results'] ?? obj['Results'];
+    if (Array.isArray(items)) {
+      return items.length;
+    }
+
+    const value = obj['value'] ?? obj['Value'];
+    if (Array.isArray(value)) {
+      return value.length;
     }
 
     return 0;

@@ -45,6 +45,7 @@
                     "defaultUser":  "SpireGO korisnik",
                     "stats":  {
                                   "favorites":  "FAVORITI",
+                                  "plans":  "PLANOVI",
                                   "reviews":  "RECENZIJE"
                               },
                     "section":  {

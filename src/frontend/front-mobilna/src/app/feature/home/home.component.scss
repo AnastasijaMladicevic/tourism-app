@@ -464,33 +464,6 @@
   background-position: center;
 }
 
-.event-price {
-  display: inline-block;
-  background: var(--primary);
-  color: white;
-  font-size: 10px;
-  font-weight: 800;
-  padding: 3px 8px;
-  border-radius: 20px;
-  align-self: flex-start;
-
-  &--free {
-    background: var(--primary-dark);
-  }
-}
-
-.event-time {
-  display: inline-block;
-  background: #d6e9ef;
-  color: var(--primary-deep);
-  font-size: 10px;
-  font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 20px;
-  align-self: flex-end;
-  backdrop-filter: blur(4px);
-}
-
 .event-info {
   padding: 10px 10px 12px;
 
@@ -681,13 +654,6 @@
   .event-img {
     height: 200px;
     padding: 16px;
-  }
-
-  .event-price,
-  .event-time,
-  .trending-badge {
-    font-size: 11px;
-    padding: 6px 10px;
   }
 }
 
