@@ -36,7 +36,19 @@ export class FavoriteService {
   // GET /api/favorites — vraća sve favorite ulogovanog korisnika
   getMyFavorites(): Observable<FavoriteDto[]> {
     return this.http
-      .get<FavoriteDto[] | { items?: FavoriteDto[]; data?: FavoriteDto[] }>(this.url)
+      .get<
+        | FavoriteDto[]
+        | {
+            items?: FavoriteDto[];
+            Items?: FavoriteDto[];
+            data?: FavoriteDto[];
+            Data?: FavoriteDto[];
+            results?: FavoriteDto[];
+            Results?: FavoriteDto[];
+            value?: FavoriteDto[];
+            Value?: FavoriteDto[];
+          }
+      >(this.url)
       .pipe(
         map((response) => {
           if (Array.isArray(response)) {
@@ -47,8 +59,32 @@ export class FavoriteService {
             return response.items;
           }
 
+          if (Array.isArray(response?.Items)) {
+            return response.Items;
+          }
+
           if (Array.isArray(response?.data)) {
             return response.data;
+          }
+
+          if (Array.isArray(response?.Data)) {
+            return response.Data;
+          }
+
+          if (Array.isArray(response?.results)) {
+            return response.results;
+          }
+
+          if (Array.isArray(response?.Results)) {
+            return response.Results;
+          }
+
+          if (Array.isArray(response?.value)) {
+            return response.value;
+          }
+
+          if (Array.isArray(response?.Value)) {
+            return response.Value;
           }
 
           return [];

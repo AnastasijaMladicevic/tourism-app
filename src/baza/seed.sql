@@ -5394,7 +5394,7 @@ VALUES
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotorski zaliv'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/0/00/Budva_(26871774051).jpg',
+    'https://cdn.getyourguide.com/img/tour/d0e7aad0b9468ab05df7bfe45c64e847fb78b5169d162c26cfd2a925689c7eda.jpeg/99.jpg',
     'Budva',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),

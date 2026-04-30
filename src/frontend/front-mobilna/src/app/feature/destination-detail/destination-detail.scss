@@ -520,16 +520,20 @@ button:hover {
   display: flex;
   flex-direction: column;
   gap: 25px;
+  min-width: 0;
 }
 
 .right {
   display: flex;
   flex-direction: column;
   gap: 25px;
+  min-width: 0;
 }
 /* ====================== GALERIJA ====================== */
 .gallery-card {
   padding: 0px 16px 10px 16px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .gallery-header {
@@ -553,6 +557,8 @@ button:hover {
   display: flex;
   gap: 12px;
   overflow-x: auto;
+  max-width: 100%;
+  min-width: 0;
   padding-bottom: 10px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;           /* Firefox */
@@ -714,10 +720,11 @@ button:hover {
 @media (min-width: 900px) {
   .content {
     display: grid;
-    grid-template-columns: 1.6fr 1fr;
+    grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr);
     gap: 40px;
     padding: 30px 20px 60px;
     background: #f5f7fa;
+    align-items: start;
   }
 
   .right {

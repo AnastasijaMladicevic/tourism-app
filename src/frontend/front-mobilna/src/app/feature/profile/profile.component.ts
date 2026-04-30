@@ -92,7 +92,7 @@ export class ProfileComponent implements OnInit {
     }
 
     this.user = currentUser;
-    this.loadStats(currentUser.id);
+    this.loadStats();
 
     this.authService
       .getById(currentUser.id)
@@ -100,6 +100,7 @@ export class ProfileComponent implements OnInit {
       .subscribe((user) => {
         if (!user) return;
         this.user = user;
+        this.loadStats();
       });
   }
 
@@ -164,7 +165,7 @@ export class ProfileComponent implements OnInit {
     return stat.labelKey;
   }
 
-  private loadStats(currentUserId: number): void {
+  private loadStats(): void {
     if (!this.authService.isLoggedIn()) {
       return;
     }
@@ -175,10 +176,10 @@ export class ProfileComponent implements OnInit {
         catchError(() => of(0)),
       ),
       planner: this.eventPlannerService
-        .getMyPlanner({ page: 1, pageSize: 1 })
-        .pipe(map((items) => this.readTotalCount(items)), catchError(() => of(0))),
-      reviews: this.reviewService.getMine({ page: 1, pageSize: 1 }).pipe(
-        map((items) => this.readTotalCount(items)),
+        .getMyPlanner({ page: 1, pageSize: 200 })
+        .pipe(map((items) => this.readCollectionCount(items)), catchError(() => of(0))),
+      reviews: this.reviewService.getMine({ page: 1, pageSize: 200 }, { bypassRegion: true }).pipe(
+        map((items) => this.readCollectionCount(items)),
         catchError(() => of(0)),
       ),
     }).subscribe(({ favorites, planner, reviews }) => {
@@ -190,7 +191,11 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  private readTotalCount(raw: unknown): number {
+  private readCollectionCount(raw: unknown): number {
+    if (Array.isArray(raw)) {
+      return raw.length;
+    }
+
     if (!raw || typeof raw !== 'object') {
       return 0;
     }
@@ -201,8 +206,21 @@ export class ProfileComponent implements OnInit {
       return totalCount;
     }
 
-    if (Array.isArray(raw)) {
-      return (raw as ReviewDto[]).length;
+    if (typeof totalCount === 'string') {
+      const parsed = Number(totalCount);
+      if (!Number.isNaN(parsed)) {
+        return parsed;
+      }
+    }
+
+    const items = obj['items'] ?? obj['Items'] ?? obj['data'] ?? obj['Data'] ?? obj['results'] ?? obj['Results'];
+    if (Array.isArray(items)) {
+      return items.length;
+    }
+
+    const value = obj['value'] ?? obj['Value'];
+    if (Array.isArray(value)) {
+      return value.length;
     }
 
     return 0;

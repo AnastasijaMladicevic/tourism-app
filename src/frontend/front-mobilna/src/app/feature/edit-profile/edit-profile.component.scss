@@ -66,7 +66,6 @@
   flex-direction: column;
   align-items: center;
   margin-bottom: 16px;
-  justify-content: center;
 }
 
 .photo-avatar-wrap {
@@ -241,12 +240,6 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-
-  span {
-    font-size: 14px;
-    font-weight: 700;
-    color: #465861;
-  }
 }
 
 .field-error {
