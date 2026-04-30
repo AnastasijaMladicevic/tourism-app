@@ -1,0 +1,301 @@
+<section class="event-form-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">Activities &gt; Review Activity</p>
+      <h1>Activity Review</h1>
+      <p class="review-subtitle">Inspect the submitted activity and approve or decline it for your managed destination.</p>
+
+      @if (activity) {
+        <div class="review-status-wrap">
+          <span class="review-status-pill" [ngClass]="getStatusBadgeClass(activity.status)">
+            {{ reviewStatusLabel }}
+          </span>
+        </div>
+      }
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="ghost-btn" (click)="cancel()">
+        <span class="material-symbols-outlined">close</span>
+        Back
+      </button>
+      <button type="button" class="danger-btn" (click)="openDeclineModal()" [disabled]="isSubmitting || !activity">
+        <span class="material-symbols-outlined">thumb_down</span>
+        Decline
+      </button>
+      <button
+        type="button"
+        class="primary-btn"
+        [class.approved-locked]="reviewStatusKey === 'approved'"
+        [attr.title]="reviewStatusKey === 'approved' ? 'Activity is already approved.' : null"
+        (click)="approveActivity()"
+        [disabled]="isSubmitting || reviewStatusKey === 'approved' || !activity"
+      >
+        <span class="material-symbols-outlined">thumb_up</span>
+        Approve
+      </button>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <div class="alert alert-error">{{ errorMessage }}</div>
+  }
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+
+  @if (activity) {
+    <section class="review-shell">
+      <section class="card media-card">
+        <div class="section-title">
+          <h2>Activity Images</h2>
+          <p>Read-only gallery shown before the review details.</p>
+        </div>
+
+        <div class="media-layout" aria-label="Activity image gallery">
+          <div class="media-preview" aria-label="Main activity image preview">
+            @if (imagePreviewUrl && !isImagePreviewBroken) {
+              <img [src]="imagePreviewUrl" alt="Activity preview" (error)="onImagePreviewError()" />
+            } @else {
+              <div class="upload-placeholder">
+                <span class="material-symbols-outlined">image</span>
+                <strong>No usable image preview yet</strong>
+                <p>The activity does not have a valid main image URL, or the image could not be loaded.</p>
+                <small>{{ mainImageCountLabel }}</small>
+              </div>
+            }
+          </div>
+
+          <div class="media-strip">
+            @if (sideGalleryImages.length > 0) {
+              <div class="media-thumbnails">
+                @for (image of sideGalleryImages; track image.url) {
+                  <button type="button" class="media-thumb" (click)="selectImage(image.url)">
+                    <img [src]="image.url" [alt]="image.altText || 'Activity image thumbnail'" />
+                  </button>
+                }
+              </div>
+            } @else {
+              <div class="media-empty">No additional gallery images are available.</div>
+            }
+          </div>
+        </div>
+      </section>
+
+      <form class="review-layout" [formGroup]="form">
+        <fieldset class="review-fieldset">
+          <div class="review-main">
+            <section class="card section-card">
+              <div class="section-title">
+                <h2>Core Details</h2>
+                <p>Basic information from the submitted activity.</p>
+              </div>
+
+              <div class="field-grid two-columns">
+                <label class="form-field full-width">
+                  <span>Activity Name</span>
+                  <input class="form-control" type="text" formControlName="name" readonly />
+                </label>
+
+                <label class="form-field">
+                  <span>Activity Type</span>
+                  <input class="form-control" type="text" formControlName="activityTypeName" readonly />
+                </label>
+
+                <label class="form-field">
+                  <span>Status</span>
+                  <input class="form-control" type="text" formControlName="status" readonly />
+                </label>
+
+                <label class="form-field">
+                  <span>Created By</span>
+                  <input class="form-control" type="text" formControlName="createdByUserId" readonly />
+                </label>
+              </div>
+
+              <label class="form-field full-width description-field">
+                <span>Description</span>
+                <textarea class="form-control text-area" formControlName="description" rows="8" readonly></textarea>
+              </label>
+            </section>
+
+            <section class="card section-card schedule-card">
+              <div class="section-title">
+                <h2>Logistics &amp; Classification</h2>
+                <p>Commercial and destination details used by the listing.</p>
+              </div>
+
+              <div class="field-grid schedule-grid">
+                <label class="form-field half-width">
+                  <span>Destination</span>
+                  <input class="form-control" type="text" formControlName="destinationName" readonly />
+                </label>
+
+                <label class="form-field half-width">
+                  <span>Locality</span>
+                  <input class="form-control" type="text" formControlName="localityName" readonly />
+                </label>
+
+                <label class="form-field half-width">
+                  <span>Tourist Object</span>
+                  <input class="form-control" type="text" formControlName="objectName" readonly />
+                </label>
+
+                <label class="form-field half-width">
+                  <span>Listing State</span>
+                  <input class="form-control" type="text" formControlName="isActive" readonly />
+                </label>
+
+                <label class="form-field half-width">
+                  <span>Price</span>
+                  <input class="form-control" type="text" formControlName="price" readonly />
+                </label>
+
+                <label class="form-field half-width">
+                  <span>Duration</span>
+                  <input class="form-control" type="text" formControlName="durationMinutes" readonly />
+                </label>
+              </div>
+            </section>
+          </div>
+
+          <aside class="review-side">
+            <section class="card section-card highlighted-card">
+              <div class="section-title compact">
+                <h2>Location Intelligence</h2>
+                <p>Map preview and coordinates for the linked location.</p>
+              </div>
+
+              <div #activityMap class="location-map mini-map" aria-label="Activity location map"></div>
+
+              <div class="field-grid schedule-grid">
+                <label class="form-field half-width">
+                  <span>Latitude</span>
+                  <input class="form-control" type="text" formControlName="latitude" readonly />
+                </label>
+
+                <label class="form-field half-width">
+                  <span>Longitude</span>
+                  <input class="form-control" type="text" formControlName="longitude" readonly />
+                </label>
+              </div>
+
+              <div class="map-meta">
+                <strong>{{ activityLocationLabel }}</strong>
+                <span>{{ locationSubtitle }}</span>
+              </div>
+            </section>
+
+            <section class="card side-card">
+              <div class="section-title compact">
+                <h2>Review Summary</h2>
+              </div>
+
+              <div class="summary-grid">
+                <div class="summary-row">
+                  <span>Created</span>
+                  <strong>{{ form.controls.createdAt.value }}</strong>
+                </div>
+                <div class="summary-row">
+                  <span>Updated</span>
+                  <strong>{{ form.controls.updatedAt.value }}</strong>
+                </div>
+                <div class="summary-row">
+                  <span>Approved at</span>
+                  <strong>{{ form.controls.approvedAt.value }}</strong>
+                </div>
+                @if (reviewStatusKey === 'approved') {
+                  <div class="summary-row">
+                    <span>Approved by</span>
+                    <strong>{{ form.controls.approvedByUserId.value }}</strong>
+                  </div>
+                } @else if (reviewStatusKey === 'rejected') {
+                  <div class="summary-row summary-row--full">
+                    <span>Rejection reason</span>
+                    <strong>{{ form.controls.rejectionReason.value }}</strong>
+                  </div>
+                }
+              </div>
+            </section>
+
+            <section class="card side-card tips-card">
+              <div class="section-title compact">
+                <h2>Manager Notes</h2>
+              </div>
+
+              <ul>
+                <li>Confirm the activity name, destination, and linked object before approving.</li>
+                <li>Use decline when the activity needs corrections or a different location.</li>
+                <li>Check the image gallery and coordinates for obvious mismatches with the listing.</li>
+              </ul>
+            </section>
+          </aside>
+        </fieldset>
+      </form>
+    </section>
+  } @else if (isLoading) {
+    <section class="card loading-shell" aria-label="Loading activity review skeleton">
+      <div class="loading-surface loading-surface-lg"></div>
+      <div class="loading-row">
+        <div class="loading-surface"></div>
+        <div class="loading-surface"></div>
+      </div>
+      <div class="loading-surface loading-surface-md"></div>
+    </section>
+  } @else {
+    <section class="card empty-shell">
+      <h2>Activity review is unavailable</h2>
+      <p>{{ errorMessage || 'No activity data was returned for this page.' }}</p>
+    </section>
+  }
+
+  @if (showDeclineModal) {
+    <div class="event-delete-backdrop" (click)="closeDeclineModal()">
+      <section
+        class="card event-delete-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="decline-modal-title"
+        aria-describedby="decline-modal-description"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="event-delete-modal-icon" aria-hidden="true">
+          <span class="material-symbols-outlined">thumb_down</span>
+        </div>
+
+        <h3 id="decline-modal-title">Decline activity</h3>
+        <p id="decline-modal-description">
+          Provide a clear reason so the content creator can address required changes.
+        </p>
+
+        <textarea
+          class="decline-reason-input"
+          [(ngModel)]="rejectionReason"
+          [ngModelOptions]="{ standalone: true }"
+          rows="4"
+          placeholder="Example: The linked object does not belong to your managed destination."
+        ></textarea>
+
+        <div class="event-delete-modal-actions">
+          <button
+            type="button"
+            class="ghost-btn"
+            (click)="closeDeclineModal()"
+            [disabled]="isSubmitting"
+          >
+            Keep pending
+          </button>
+          <button
+            type="button"
+            class="confirm-delete-btn"
+            (click)="declineActivity()"
+            [disabled]="isSubmitting"
+          >
+            {{ isSubmitting ? 'Declining...' : 'Decline activity' }}
+          </button>
+        </div>
+      </section>
+    </div>
+  }
+</section>

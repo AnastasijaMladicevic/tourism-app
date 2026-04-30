@@ -244,13 +244,10 @@
           <input class="form-control" type="text" [value]="selectedVenue.name" readonly />
         </label>
 
-        <div class="mini-map">
-          <div class="map-grid"></div>
-          <div class="map-pin"></div>
-          <div class="map-meta">
-            <strong>{{ selectedVenue.name }}</strong>
-            <span>{{ selectedVenue.address }}</span>
-          </div>
+        <div #eventMap class="location-map mini-map" aria-label="Event location map"></div>
+        <div class="map-meta">
+          <strong>{{ selectedVenue.name }}</strong>
+          <span>{{ selectedVenue.address }}</span>
         </div>
 
         <div class="venue-card">
@@ -259,23 +256,7 @@
         </div>
       </section>
 
-      <section class="card side-card">
-        <div class="section-title compact">
-          <h2>Related Activities</h2>
-        </div>
-
-        <div class="activity-list">
-          <label class="activity-row" *ngFor="let activity of relatedActivities">
-            <div class="activity-meta">
-              <strong>{{ activity.name }}</strong>
-              <span>{{ activity.meta }}</span>
-            </div>
-            <input type="checkbox" [checked]="selectedActivityIds.has(activity.id)" disabled />
-          </label>
-        </div>
-
-        <button type="button" class="link-btn" [disabled]="true">+ Link more activities</button>
-      </section>
+   
 
       <section class="card side-card tips-card">
         <div class="section-title compact">

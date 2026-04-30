@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, AfterViewInit, OnDestroy, ViewChild, ElementRef, NgZone } from '@angular/core';
+import * as L from 'leaflet';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -26,13 +27,14 @@ interface RelatedActivity {
   templateUrl: './event-form.component.html',
   styleUrls: ['./event-form.component.css']
 })
-export class ManagerEventFormComponent implements OnInit {
+export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly eventService = inject(EventService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly ngZone = inject(NgZone);
 
   form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(200)]],
@@ -142,6 +144,25 @@ export class ManagerEventFormComponent implements OnInit {
     });
   }
 
+  @ViewChild('eventMap') private eventMap?: ElementRef<HTMLDivElement>;
+
+  private readonly defaultMapCenter: [number, number] = [42.424, 18.771];
+  private readonly defaultMapZoom = 13;
+
+  private map: L.Map | null = null;
+  private mapMarker: L.Marker | null = null;
+
+  ngAfterViewInit(): void {
+    this.initializeMap();
+    this.syncMapFromForm();
+  }
+
+  ngOnDestroy(): void {
+    this.map?.remove();
+    this.map = null;
+    this.mapMarker = null;
+  }
+
   loadEvent(): void {
     if (!this.eventId) {
       return;
@@ -189,6 +210,81 @@ export class ManagerEventFormComponent implements OnInit {
       ageRestriction: '',
       tagsInput: ''
     });
+    this.syncMapFromForm();
+  }
+
+  private initializeMap(): void {
+    if (!this.eventMap || this.map) {
+      return;
+    }
+
+    const latitude = this.toNumber(this.form.controls.latitude.value);
+    const longitude = this.toNumber(this.form.controls.longitude.value);
+    const center: L.LatLngExpression = latitude != null && longitude != null
+      ? [latitude, longitude]
+      : this.defaultMapCenter;
+    const zoom = latitude != null && longitude != null ? 15 : this.defaultMapZoom;
+
+    this.map = L.map(this.eventMap.nativeElement, {
+      zoomControl: true,
+      scrollWheelZoom: false,
+      doubleClickZoom: false,
+      dragging: false,
+      touchZoom: false,
+      boxZoom: false,
+      keyboard: false
+    }).setView(center, zoom);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+      subdomains: 'abcd',
+      maxZoom: 19
+    }).addTo(this.map);
+  }
+
+  private syncMapFromForm(): void {
+    const latitude = this.toNumber(this.form.controls.latitude.value);
+    const longitude = this.toNumber(this.form.controls.longitude.value);
+
+    if (latitude == null || longitude == null) {
+      return;
+    }
+
+    this.updateMapMarker(latitude, longitude);
+  }
+
+  private updateMapMarker(latitude: number, longitude: number): void {
+    if (!this.map) {
+      return;
+    }
+
+    if (!this.mapMarker) {
+      const markerIcon = L.icon({
+        iconUrl: 'assets/marker-icon.png',
+        iconRetinaUrl: 'assets/marker-icon-2x.png',
+        shadowUrl: 'assets/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      });
+
+      this.mapMarker = L.marker([latitude, longitude], { icon: markerIcon, draggable: false }).addTo(this.map);
+    } else {
+      this.mapMarker.setLatLng([latitude, longitude]);
+    }
+
+    const targetZoom = Math.max(this.map.getZoom(), 15);
+    this.map.flyTo([latitude, longitude], targetZoom, { duration: 0.8 });
+  }
+
+  private toNumber(value: number | string | null | undefined): number | null {
+    if (value == null || value === '') {
+      return null;
+    }
+
+    const parsed = typeof value === 'number' ? value : Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
   }
 
   approveEvent(): void {
