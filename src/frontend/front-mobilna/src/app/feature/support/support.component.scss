@@ -413,6 +413,11 @@
   }
 }
 
+.hours-grid > div:last-child {
+  justify-self: end;
+  text-align: right;
+}
+
 .hours-divider {
   height: 1px;
   margin: 18px 0 14px;

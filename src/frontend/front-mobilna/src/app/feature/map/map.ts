@@ -91,7 +91,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   selectedItem: any = null;
-  selectedType = '';
+      selectedType = '';
   userLocation: L.LatLng | null = null;
   routeStart: RoutePoint | null = null;
   routeEnd: RoutePoint | null = null;
@@ -527,12 +527,15 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         result.category === 'event'
       ) {
         setTimeout(() => {
-          const markerType = result.category === 'object' ? result.markerType : result.category;
+          const markerType = result.category === 'object'
+            ? this.normalizeMarkerType(result.markerType)
+            : result.category;
           this.mapService.triggerMarkerClick(markerType, result.id);
         }, 600);
       }
-
-      this.addRoutePoint(result);
+      if (this.isRoutePlannerOpen) {
+        this.addRoutePoint(result);
+      }
     }
   }
 
@@ -716,6 +719,14 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       hotel: 'hotel',
       restaurant: 'restaurant',
       kafana: 'local_bar',
+      gas_station: 'local_gas_station',
+      shop: 'shopping_bag',
+      mall: 'shopping_bag',
+      market: 'storefront',
+      hospital: 'local_hospital',
+      clinic: 'local_hospital',
+      pharmacy: 'medication',
+      attraction: 'place',
       event: 'event',
       activity: 'directions_run',
       locality: 'location_city',
@@ -725,7 +736,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     return {
       id: raw.id,
       name: raw.name,
-      typeName: raw.objectTypeName ?? raw.destinationTypeName ?? raw.eventTypeName ?? markerType,
+      typeName:
+        raw.objectTypeName ??
+        raw.destinationTypeName ??
+        raw.eventTypeName ??
+        raw.activityTypeName ??
+        raw.localityTypeName ??
+        markerType,
       location: raw.localityName ?? raw.destinationName ?? raw.regionName ?? '',
       image: this.resolveMediaUrl(raw.mainImageUrl ?? raw.images?.[0]?.url ?? ''),
       icon: iconMap[markerType] ?? iconMap['default'],
@@ -748,19 +765,98 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getObjectType(name: string): string {
     const normalized = name.toLowerCase();
-    if (normalized.includes('hotel') || normalized.includes('albergo')) return 'hotel';
+    if (
+      normalized.includes('hotel') ||
+      normalized.includes('albergo') ||
+      normalized.includes('resort') ||
+      normalized.includes('hostel') ||
+      normalized.includes('motel')
+    ) {
+      return 'hotel';
+    }
+    if (normalized.includes('apartman') || normalized.includes('apartment') || normalized.includes('villa')) {
+      return 'apartment';
+    }
+    if (
+      normalized.includes('pump') ||
+      normalized.includes('gas') ||
+      normalized.includes('fuel') ||
+      normalized.includes('petrol')
+    ) {
+      return 'gas_station';
+    }
+    if (
+      normalized.includes('apoteka') ||
+      normalized.includes('pharmacy')
+    ) {
+      return 'pharmacy';
+    }
+    if (
+      normalized.includes('bolnica') ||
+      normalized.includes('hospital')
+    ) {
+      return 'hospital';
+    }
+    if (
+      normalized.includes('klinika') ||
+      normalized.includes('clinic') ||
+      normalized.includes('dom zdravlja')
+    ) {
+      return 'clinic';
+    }
+    if (
+      normalized.includes('prodavnica') ||
+      normalized.includes('shop') ||
+      normalized.includes('butik') ||
+      normalized.includes('market')
+    ) {
+      return 'shop';
+    }
+    if (normalized.includes('mall') || normalized.includes('shopping')) {
+      return 'mall';
+    }
     if (
       normalized.includes('restoran') ||
       normalized.includes('restaurant') ||
-      normalized.includes('ristorante')
+      normalized.includes('ristorante') ||
+      normalized.includes('konoba') ||
+      normalized.includes('bistro') ||
+      normalized.includes('pizzeria') ||
+      normalized.includes('taverna')
     ) return 'restaurant';
     if (
       normalized.includes('kafana') ||
       normalized.includes('bar') ||
       normalized.includes('cafe') ||
-      normalized.includes('kafic')
+      normalized.includes('kafic') ||
+      normalized.includes('pub') ||
+      normalized.includes('club') ||
+      normalized.includes('klub') ||
+      normalized.includes('winery') ||
+      normalized.includes('vinarija')
     ) return 'kafana';
-    return 'restaurant';
+    return 'attraction';
+  }
+
+  private normalizeMarkerType(type: string): string {
+    const normalized = (type ?? '').trim().toLowerCase();
+    if (
+      normalized === 'bar' ||
+      normalized === 'club' ||
+      normalized === 'cafe' ||
+      normalized === 'winery'
+    ) {
+      return 'kafana';
+    }
+    if (
+      normalized === 'resort' ||
+      normalized === 'hostel' ||
+      normalized === 'motel' ||
+      normalized === 'apartment'
+    ) {
+      return normalized === 'apartment' ? 'apartment' : 'hotel';
+    }
+    return normalized || 'destination';
   }
 
   getItemImage(): string {
@@ -833,7 +929,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     try {
       const parsed = typeof workingHours === 'string' ? JSON.parse(workingHours) : workingHours;
-      const days = ['ned', 'pon', 'uto', 'sri', 'cet', 'pet', 'sub'];
+      const days = ['ned', 'pon', 'uto', 'sre', 'cet', 'pet', 'sub'];
       const hours = parsed[days[new Date().getDay()]] || parsed['pon'];
       if (!hours || hours === '00:00-24:00') return true;
 
@@ -878,6 +974,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       case 'activity':
         this.router.navigate(['/activity', this.selectedItem.id]);
         break;
+      case 'hotel':
+        this.router.navigate(['/hotel', this.selectedItem.id]);
+        break;
       default:
         this.router.navigate(['/object', this.selectedItem.id]);
         break;
@@ -889,25 +988,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showSuggestions = false;
     this.selectedItem = null;
     this.selectedType = '';
-
-    const activeKey = (window as any).activeMarkerKey;
-    if (activeKey) {
-      const found = this.mapService['markerMap']?.get(activeKey);
-      const map = this.mapService.getMap();
-      if (!map) return;
-
-      if (found && !map.hasLayer(found.marker)) {
-        found.marker.addTo(map);
-      }
-
-      (window as any).activeMarkerKey = null;
-    }
-
-    const regularMarker = (window as any).currentRegularMarker;
-    if (regularMarker) {
-      regularMarker.remove();
-      (window as any).currentRegularMarker = null;
-    }
 
     this.mapService.clearMarkerFocus();
 
@@ -938,11 +1018,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   zoomIn(): void {
-    (this.mapService as any)['map']?.zoomIn();
+    this.mapService.getMap()?.zoomIn();
   }
 
   zoomOut(): void {
-    (this.mapService as any)['map']?.zoomOut();
+    this.mapService.getMap()?.zoomOut();
   }
 
   private getRoutePointFromItem(item: any, type: string): RoutePoint | null {
@@ -1060,14 +1140,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.smartSearchService
-      .search({
+      .searchMcp({
         query,
         pageSize: 6,
-        mode: 'strict'
       })
-    this.smartSearchService.search({ query, pageSize: 6, mode: 'strict' })
-      .subscribe(results => {
-        this.routeSearchResults = results.map(r => this.toSmartSearchResult(r));
+      .pipe(catchError(() => of([] as SmartSearchResultDto[])))
+      .subscribe((results) => {
+        this.routeSearchResults = results.map((result) => this.toSmartSearchResult(result));
         this.cdr.detectChanges();
       });
   }

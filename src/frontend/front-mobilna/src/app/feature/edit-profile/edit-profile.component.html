@@ -20,27 +20,82 @@
 
     <section class="photo-panel">
       <div class="photo-avatar-wrap">
-        <img class="photo-avatar" [src]="imageUrl()" [alt]="'editProfile.photoAlt' | translate" />
+        <!-- Preview of cropped image before upload, or current profile image -->
+        @if (cropPreviewUrl()) {
+          <img class="photo-avatar" [src]="cropPreviewUrl()!" [alt]="'editProfile.photoAlt' | translate" />
+        } @else {
+          <img class="photo-avatar" [src]="imageUrl()" [alt]="'editProfile.photoAlt' | translate" />
+        }
+
+        <!-- Edit chip / pencil icon — same style as profile "uredi" button -->
         <button
-          class="photo-edit-button"
+          class="photo-edit-chip"
           type="button"
           (click)="changePhoto()"
           [attr.aria-label]="'editProfile.changePhoto' | translate"
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="m9.2 12.8 1.9 1.9 4.7-4.7" />
+            <path
+              d="M4 15.5V20h4.5L19 9.5 14.5 5 4 15.5Zm13.7-8.8a1 1 0 0 0 0-1.4l-1.9-1.9a1 1 0 0 0-1.4 0l-1.4 1.4 4.5 4.5 1.2-1.2Z"
+            />
           </svg>
+          <span>{{ 'editProfile.changePhoto' | translate }}</span>
         </button>
       </div>
-      <button class="remove-photo-button" type="button" (click)="removePhoto()">
-        {{ 'editProfile.removePhoto' | translate }}
-      </button>
+
+      <!-- Remove photo button — only shown when user has a custom (non-default) photo and crop is NOT active -->
+      @if (!isDefaultPhoto() && !pendingCropFile()) {
+        <button class="remove-photo-button" type="button" (click)="removePhoto()">
+          {{ 'editProfile.removePhoto' | translate }}
+        </button>
+      }
     </section>
+
+    <!-- Crop modal — fullscreen popup, shown after file is picked -->
+    @if (pendingCropFile()) {
+      <div class="crop-modal-backdrop" (click)="cancelCrop()">
+        <div class="crop-modal" (click)="$event.stopPropagation()">
+          <div class="crop-modal__header">
+            <span>Opseci fotografiju</span>
+            <button class="crop-modal__close" type="button" (click)="cancelCrop()" aria-label="Zatvori">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 6 6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div class="crop-modal__body">
+            <image-cropper
+              [imageFile]="pendingCropFile()!"
+              [roundCropper]="true"
+              [resizeToWidth]="256"
+              [resizeToHeight]="256"
+              (imageCropped)="onImageCropped($event)"
+            ></image-cropper>
+          </div>
+          <div class="crop-modal__footer">
+            <button class="crop-confirm-button" type="button" (click)="confirmCrop()">
+              Postavi fotografiju
+            </button>
+            <button class="crop-cancel-button" type="button" (click)="cancelCrop()">
+              Odustani
+            </button>
+          </div>
+        </div>
+      </div>
+    }
 
     <section class="form-section">
       <label class="field">
         <span>{{ 'editProfile.firstName' | translate }}</span>
-        <div class="field-box">
+        <div class="input-wrapper">
+          <span class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </span>
           <input [ngModel]="name()" (ngModelChange)="updateName($event)" type="text" />
         </div>
         @if (fieldErrors().name) {
@@ -50,7 +105,14 @@
 
       <label class="field">
         <span>{{ 'editProfile.lastName' | translate }}</span>
-        <div class="field-box">
+        <div class="input-wrapper">
+          <span class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </span>
           <input [ngModel]="lastName()" (ngModelChange)="updateLastName($event)" type="text" />
         </div>
         @if (fieldErrors().lastName) {
@@ -60,18 +122,15 @@
 
       <label class="field">
         <span>{{ 'editProfile.country' | translate }}</span>
-        <div class="field-box field-box--select">
-          <div class="field-prefix">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.9 9h-3.1a15.9 15.9 0 0 0-1.5-5A8 8 0 0 1 18.9 11ZM12 4c1.2 1.5 2.1 4 2.4 7H9.6c.3-3 1.2-5.5 2.4-7ZM6.7 6a15.9 15.9 0 0 0-1.5 5H2.1A8 8 0 0 1 6.7 6ZM4.1 13h3.1a15.9 15.9 0 0 0 1.5 5A8 8 0 0 1 4.1 13Zm5.5 0h4.8c-.3 3-1.2 5.5-2.4 7-1.2-1.5-2.1-4-2.4-7Zm4.7 5a15.9 15.9 0 0 0 1.5-5h3.1a8 8 0 0 1-4.6 5Z"
-              />
+        <div class="input-wrapper">
+          <span class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10z" />
+              <circle cx="12" cy="11" r="2" />
             </svg>
-          </div>
+          </span>
           <input [ngModel]="country()" (ngModelChange)="updateCountry($event)" type="text" />
-          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="m9 6 6 6-6 6" />
-          </svg>
         </div>
         @if (fieldErrors().country) {
           <small class="field-error">{{ fieldErrors().country }}</small>
@@ -80,58 +139,35 @@
 
       <label class="field">
         <span>{{ 'editProfile.email' | translate }}</span>
-        <div class="field-box field-box--icon">
-          <div class="field-prefix">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4 6h16v12H4z" />
-              <path d="m4 7 8 6 8-6" />
+        <div class="input-wrapper input-wrapper--readonly">
+          <span class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+              <polyline points="22,6 12,13 2,6" />
             </svg>
-          </div>
+          </span>
           <input [ngModel]="email()" type="email" readonly />
         </div>
       </label>
 
       <label class="field">
         <span>{{ 'editProfile.phone' | translate }}</span>
-        <div class="field-box field-box--icon">
-          <div class="field-prefix">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
+        <div class="input-wrapper">
+          <span class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path
-                d="M6.6 10.8a15.5 15.5 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.24 11.4 11.4 0 0 0 3.6.58 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.4a1 1 0 0 1 1 1 11.4 11.4 0 0 0 .58 3.6 1 1 0 0 1-.24 1l-2.18 2.2Z"
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.63 2.63a2 2 0 0 1-.45 2.11L8 9.91a16 16 0 0 0 6.09 6.09l1.45-1.29a2 2 0 0 1 2.11-.45c.85.3 1.73.51 2.63.63A2 2 0 0 1 22 16.92z"
               />
             </svg>
-          </div>
+          </span>
           <input [ngModel]="phone()" (ngModelChange)="updatePhone($event)" type="tel" />
         </div>
         @if (fieldErrors().phone) {
           <small class="field-error">{{ fieldErrors().phone }}</small>
         }
       </label>
-    </section>
-
-    <section class="interests-section">
-      <div class="interests-header">
-        <div>
-          <h2>{{ 'editProfile.interests' | translate }}</h2>
-        </div>
-        <span>{{ 'editProfile.selectedCount' | translate: { count: selectedInterestCount() } }}</span>
-      </div>
-
-      <div class="interest-chips">
-        @for (interest of interests(); track interest.key) {
-          <button
-            class="interest-chip"
-            type="button"
-            [class.interest-chip--active]="interest.selected"
-            (click)="toggleInterest(interest.key)"
-          >
-            @if (interest.selected) {
-              <span class="checkmark">✓</span>
-            }
-            {{ interest.labelKey | translate }}
-          </button>
-        }
-      </div>
     </section>
 
     <button class="language-card" type="button" (click)="toggleLanguageMenu()">

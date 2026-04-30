@@ -5,6 +5,7 @@ import { catchError, forkJoin, map, of } from 'rxjs';
 import { environment } from '../../../environment/environment';
 import { AuthService, UserDto } from '../../services/auth';
 import { FavoriteService } from '../../services/favorite';
+import { EventPlannerService } from '../../services/event-planner';
 import { ReviewDto, ReviewService } from '../../services/review';
 import { TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -12,8 +13,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 interface ProfileStat {
   labelKey: string;
   value: number;
-  icon: string;
-  hideWhenZero?: boolean;
+  icon: 'heart' | 'calendar' | 'star';
 }
 
 interface ProfileAction {
@@ -39,13 +39,15 @@ interface ProfileSection {
 export class ProfileComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly favoriteService = inject(FavoriteService);
+  private readonly eventPlannerService = inject(EventPlannerService);
   private readonly reviewService = inject(ReviewService);
   private readonly router = inject(Router);
   private readonly translationService = inject(TranslationService);
 
   protected user: UserDto | null = null;
   protected stats: ProfileStat[] = [
-    { labelKey: 'profile.stats.favorites', value: 0, icon: 'heart', hideWhenZero: true },
+    { labelKey: 'profile.stats.favorites', value: 0, icon: 'heart' },
+    { labelKey: 'profile.stats.plans', value: 0, icon: 'calendar' },
     { labelKey: 'profile.stats.reviews', value: 0, icon: 'star' },
   ];
 
@@ -162,10 +164,6 @@ export class ProfileComponent implements OnInit {
     return stat.labelKey;
   }
 
-  protected shouldShowStatValue(stat: ProfileStat): boolean {
-    return !(stat.hideWhenZero && stat.value === 0);
-  }
-
   private loadStats(currentUserId: number): void {
     if (!this.authService.isLoggedIn()) {
       return;
@@ -176,18 +174,17 @@ export class ProfileComponent implements OnInit {
         map((items) => items.length),
         catchError(() => of(0)),
       ),
+      planner: this.eventPlannerService
+        .getMyPlanner({ page: 1, pageSize: 1 })
+        .pipe(map((items) => this.readTotalCount(items)), catchError(() => of(0))),
       reviews: this.reviewService.getMine({ page: 1, pageSize: 1 }).pipe(
         map((items) => this.readTotalCount(items)),
         catchError(() => of(0)),
       ),
-    }).subscribe(({ favorites, reviews }) => {
+    }).subscribe(({ favorites, planner, reviews }) => {
       this.stats = [
-        {
-          labelKey: 'profile.stats.favorites',
-          value: favorites,
-          icon: 'heart',
-          hideWhenZero: true,
-        },
+        { labelKey: 'profile.stats.favorites', value: favorites, icon: 'heart' },
+        { labelKey: 'profile.stats.plans', value: planner, icon: 'calendar' },
         { labelKey: 'profile.stats.reviews', value: reviews, icon: 'star' },
       ];
     });

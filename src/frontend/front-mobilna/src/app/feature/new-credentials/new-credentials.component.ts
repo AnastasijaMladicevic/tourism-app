@@ -42,7 +42,6 @@ export class NewCredentialsComponent {
   isForgotFlow = false;
   isLoading = false;
   errorMessage = '';
-  hideCurrentPassword = true;
   hideNewPassword = true;
   hideConfirmPassword = true;
   resetSessionToken = '';
@@ -51,14 +50,9 @@ export class NewCredentialsComponent {
     this.code = history.state?.code ?? '';
     this.isForgotFlow = !!this.email;
     this.resetSessionToken = history.state?.resetSessionToken ?? '';
-    if (this.isForgotFlow) {
-      this.form.get('currentPassword')?.clearValidators();
-      this.form.get('currentPassword')?.updateValueAndValidity();
-    }
   }
   readonly form = this.fb.group(
     {
-      currentPassword: ['', [Validators.required]],
       newPassword: ['', [Validators.required, Validators.pattern(passwordStrengthRegex)]],
       confirmPassword: ['', [Validators.required]],
     },
@@ -123,7 +117,7 @@ export class NewCredentialsComponent {
     }
 
     const dto: ChangePasswordDto = {
-      currentPassword: this.form.controls.currentPassword.value ?? '',
+      currentPassword: '',
       newPassword: this.form.controls.newPassword.value ?? '',
       confirmPassword: this.form.controls.confirmPassword.value ?? '',
     };
@@ -147,10 +141,6 @@ export class NewCredentialsComponent {
         if (!res) return;
         this.router.navigate(['/password-updated']);
       });
-  }
-
-  toggleCurrentPassword(): void {
-    this.hideCurrentPassword = !this.hideCurrentPassword;
   }
 
   toggleNewPassword(): void {

@@ -3,6 +3,7 @@ import { Component, ElementRef, OnInit, ViewChild, computed, inject, signal } fr
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
+import { ImageCroppedEvent, ImageCropperComponent } from 'ngx-image-cropper';
 import { environment } from '../../../environment/environment';
 import { AuthService, UpdateUserDto, UserDto } from '../../services/auth';
 import { AppLanguage, TranslationService } from '../../services/translation.service';
@@ -23,11 +24,12 @@ interface ProfileFieldErrors {
 }
 
 const INTERESTS_STORAGE_KEY = 'spirego-mobile-profile-interests';
+const DEFAULT_PHOTO_PATH = '/images/profiles/default_icon.png';
 
 @Component({
   selector: 'app-edit-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe, ImageCropperComponent],
   templateUrl: './edit-profile.component.html',
   styleUrl: './edit-profile.component.scss',
 })
@@ -38,7 +40,9 @@ export class EditProfileComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly translationService = inject(TranslationService);
 
-  private user: UserDto | null = null;
+  private readonly userSignal = signal<UserDto | null>(null);
+  private get user(): UserDto | null { return this.userSignal(); }
+  private set user(value: UserDto | null) { this.userSignal.set(value); }
 
   protected readonly name = signal('');
   protected readonly lastName = signal('');
@@ -57,6 +61,16 @@ export class EditProfileComponent implements OnInit {
     phone: '',
     photo: '',
   });
+
+  /** File waiting to be cropped — drives the crop overlay */
+  protected readonly pendingCropFile = signal<File | null>(null);
+
+  /** Blob from the cropper, to be uploaded on confirm */
+  private pendingCroppedBlob: Blob | null = null;
+
+  /** Object URL for the cropped preview shown above the avatar */
+  protected readonly cropPreviewUrl = signal<string | null>(null);
+
   protected readonly languageOptions = [
     { code: 'me', labelKey: 'language.montenegrin' },
     { code: 'sr', labelKey: 'language.serbian' },
@@ -67,10 +81,19 @@ export class EditProfileComponent implements OnInit {
   ];
 
   protected readonly imageUrl = computed(() => {
-    const raw = this.user?.profileImageUrl?.trim() || '/images/profiles/default_icon.png';
+    const raw = this.userSignal()?.profileImageUrl?.trim() || DEFAULT_PHOTO_PATH;
     const apiBase = environment.apiUrl.replace(/\/api\/?$/, '');
     if (/^https?:\/\//i.test(raw)) return raw;
     return `${apiBase}${raw.startsWith('/') ? raw : `/${raw}`}`;
+  });
+
+  /**
+   * Returns true when the user currently has the default profile image,
+   * meaning the "Remove photo" button should be hidden.
+   */
+  protected readonly isDefaultPhoto = computed(() => {
+    const raw = this.userSignal()?.profileImageUrl?.trim() || DEFAULT_PHOTO_PATH;
+    return raw === DEFAULT_PHOTO_PATH || raw === '';
   });
 
   protected readonly interests = signal<InterestOption[]>([
@@ -137,6 +160,130 @@ export class EditProfileComponent implements OnInit {
     this.clearFieldError('phone');
   }
 
+  /* ── Photo / crop flow ─────────────────────────────────────────────── */
+
+  protected changePhoto(): void {
+    if (this.isSaving()) return;
+    this.photoInput?.nativeElement.click();
+  }
+
+  /**
+   * Called when the user picks a file.  Instead of uploading immediately,
+   * we stash the File and show the crop overlay.
+   */
+  protected onPhotoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
+    if (!file || !this.user?.id) return;
+
+    this.clearFieldError('photo');
+
+    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
+      this.setFieldError('photo', this.translationService.translate('editProfile.photoFormats'));
+      if (input) input.value = '';
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      this.setFieldError('photo', this.translationService.translate('editProfile.photoSize'));
+      if (input) input.value = '';
+      return;
+    }
+
+    // Show the cropper — reset any previous crop state first
+    this.pendingCroppedBlob = null;
+    this.pendingCropFile.set(file);
+    if (input) input.value = '';
+  }
+
+  /** Called by the image-cropper on every crop change */
+  protected onImageCropped(event: ImageCroppedEvent): void {
+    this.pendingCroppedBlob = event.blob ?? null;
+
+    // Show a local preview of the cropped circle
+    if (event.blob) {
+      const prevUrl = this.cropPreviewUrl();
+      if (prevUrl) URL.revokeObjectURL(prevUrl);
+      this.cropPreviewUrl.set(URL.createObjectURL(event.blob));
+    }
+  }
+
+  /** User clicked "Upload" in the crop overlay → upload the blob */
+  protected confirmCrop(): void {
+    if (!this.pendingCroppedBlob || !this.user?.id || this.isSaving()) return;
+
+    const blob = this.pendingCroppedBlob;
+    const file = new File([blob], 'avatar.png', { type: 'image/png' });
+
+    // Hide the cropper
+    this.pendingCropFile.set(null);
+    this.pendingCroppedBlob = null;
+
+    this.isSaving.set(true);
+    this.authService
+      .updateProfileImage(this.user.id, file)
+      .pipe(
+        catchError((error) => {
+          this.setFeedback(this.readErrorMessage(error, 'editProfile.photoSaveFailed'), 'error');
+          // Revert preview on failure
+          this.cropPreviewUrl.set(null);
+          return of(null);
+        }),
+        finalize(() => {
+          this.isSaving.set(false);
+        }),
+      )
+      .subscribe((user) => {
+        if (!user) return;
+        this.user = user;
+        this.patchFromUser(user);
+        // Clear the local object-URL preview — the real URL is now in imageUrl()
+        const prev = this.cropPreviewUrl();
+        if (prev) URL.revokeObjectURL(prev);
+        this.cropPreviewUrl.set(null);
+        this.setFeedback(this.translationService.translate('editProfile.photoSaved'), 'success');
+      });
+  }
+
+  /** User cancelled cropping — discard everything */
+  protected cancelCrop(): void {
+    this.pendingCropFile.set(null);
+    this.pendingCroppedBlob = null;
+    const prev = this.cropPreviewUrl();
+    if (prev) URL.revokeObjectURL(prev);
+    this.cropPreviewUrl.set(null);
+  }
+
+  /**
+   * Remove the custom photo.
+   * Guard: only callable when the user has a custom photo (isDefaultPhoto() is false),
+   * so this will never delete the default image.
+   */
+  protected removePhoto(): void {
+    if (!this.user?.id || this.isSaving() || this.isDefaultPhoto()) return;
+
+    this.isSaving.set(true);
+    this.authService
+      .removeProfileImage(this.user.id)
+      .pipe(
+        catchError((error) => {
+          this.setFeedback(this.readErrorMessage(error, 'editProfile.photoRemoveFailed'), 'error');
+          return of(null);
+        }),
+        finalize(() => {
+          this.isSaving.set(false);
+        }),
+      )
+      .subscribe((user) => {
+        if (!user) return;
+        this.user = user;
+        this.patchFromUser(user);
+        this.setFeedback(this.translationService.translate('editProfile.photoRemoved'), 'success');
+      });
+  }
+
+  /* ── Save / cancel ─────────────────────────────────────────────────── */
+
   protected saveChanges(): void {
     if (!this.user?.id || this.isSaving()) return;
     if (!this.validateForm()) return;
@@ -168,79 +315,14 @@ export class EditProfileComponent implements OnInit {
         this.persistInterests();
         this.setFeedback(this.translationService.translate('editProfile.saved'), 'success');
       });
+      this.router.navigate(['/profile']);
   }
 
   protected cancelChanges(): void {
     this.router.navigate(['/profile']);
   }
 
-  protected removePhoto(): void {
-    if (!this.user?.id || this.isSaving()) return;
-
-    this.isSaving.set(true);
-    this.authService
-      .removeProfileImage(this.user.id)
-      .pipe(
-        catchError((error) => {
-          this.setFeedback(this.readErrorMessage(error, 'editProfile.photoRemoveFailed'), 'error');
-          return of(null);
-        }),
-        finalize(() => {
-          this.isSaving.set(false);
-        }),
-      )
-      .subscribe((user) => {
-        if (!user) return;
-        this.user = user;
-        this.patchFromUser(user);
-        this.setFeedback(this.translationService.translate('editProfile.photoRemoved'), 'success');
-      });
-  }
-
-  protected changePhoto(): void {
-    if (this.isSaving()) return;
-    this.photoInput?.nativeElement.click();
-  }
-
-  protected onPhotoSelected(event: Event): void {
-    const input = event.target as HTMLInputElement | null;
-    const file = input?.files?.[0];
-    if (!file || !this.user?.id) return;
-
-    this.clearFieldError('photo');
-
-    if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) {
-      this.setFieldError('photo', this.translationService.translate('editProfile.photoFormats'));
-      if (input) input.value = '';
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      this.setFieldError('photo', this.translationService.translate('editProfile.photoSize'));
-      if (input) input.value = '';
-      return;
-    }
-
-    this.isSaving.set(true);
-    this.authService
-      .updateProfileImage(this.user.id, file)
-      .pipe(
-        catchError((error) => {
-          this.setFeedback(this.readErrorMessage(error, 'editProfile.photoSaveFailed'), 'error');
-          return of(null);
-        }),
-        finalize(() => {
-          this.isSaving.set(false);
-          if (input) input.value = '';
-        }),
-      )
-      .subscribe((user) => {
-        if (!user) return;
-        this.user = user;
-        this.patchFromUser(user);
-        this.setFeedback(this.translationService.translate('editProfile.photoSaved'), 'success');
-      });
-  }
+  /* ── Language ──────────────────────────────────────────────────────── */
 
   protected toggleLanguageMenu(): void {
     this.isLanguageMenuOpen.update((current) => !current);
@@ -258,6 +340,8 @@ export class EditProfileComponent implements OnInit {
     );
   }
 
+  /* ── Interests ─────────────────────────────────────────────────────── */
+
   protected toggleInterest(key: string): void {
     this.interests.update((items) =>
       items.map((item) => (item.key === key ? { ...item, selected: !item.selected } : item)),
@@ -268,6 +352,8 @@ export class EditProfileComponent implements OnInit {
   protected languageLabel(code = this.appLanguageCode()): string {
     return this.translationService.translate(this.translationService.labelKeyForLanguage(code));
   }
+
+  /* ── Private helpers ───────────────────────────────────────────────── */
 
   private patchFromUser(user: UserDto): void {
     this.name.set(user.firstName ?? '');

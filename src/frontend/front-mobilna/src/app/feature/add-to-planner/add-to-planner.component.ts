@@ -52,7 +52,6 @@ export class AddToPlannerComponent implements OnInit {
   protected readonly selectedDayId = signal('');
   protected readonly travelDate = signal('');
   protected readonly startTime = signal('19:00');
-  protected readonly durationMinutes = signal(90);
   protected readonly notes = signal('');
   protected readonly isPriority = signal(false);
   protected readonly isSaving = signal(false);
@@ -60,49 +59,47 @@ export class AddToPlannerComponent implements OnInit {
   protected readonly existingPlannerItems = signal<EventPlannerDto[]>([]);
   protected readonly eventId: number | null;
   protected readonly preview: PlannerPreviewViewModel;
+  protected readonly eventStartDate: Date | null;
+  protected readonly eventEndDate: Date | null;
+  protected readonly minSelectableDate: string | null;
+  protected readonly maxSelectableDate: string | null;
+  protected readonly isEventScheduleLocked: boolean;
+  protected readonly fixedDurationMinutes: number;
   protected readonly estimatedEndLabel = computed(() =>
-    this.formatTimeLabel(this.addMinutes(this.buildSelectedStartDate(), this.durationMinutes())),
+    this.formatTimeLabel(this.addMinutes(this.buildSelectedStartDate(), this.fixedDurationMinutes)),
   );
-  protected readonly durationLabel = computed(() => this.formatDuration(this.durationMinutes()));
+  protected readonly durationLabel = computed(() => this.formatDuration(this.fixedDurationMinutes));
   protected readonly selectedDateLabel = computed(() => this.formatFriendlyDate(this.travelDate()));
   protected readonly conflictMessage = computed(() => this.buildConflictMessage());
-  protected readonly durationOptions = [30, 60, 90, 120, 150, 180, 240, 300];
   protected readonly days = computed<PlannerCalendarDay[]>(() => {
-    const anchorDate = this.parseDate(this.travelDate()) ?? new Date();
+    if (this.isEventScheduleLocked && this.eventStartDate && this.eventEndDate) {
+      return this.buildEventDays(this.eventStartDate, this.eventEndDate);
+    }
 
+    const anchorDate = this.parseDate(this.travelDate()) ?? new Date();
     return Array.from({ length: 5 }, (_, index) => {
       const nextDate = new Date(anchorDate);
       nextDate.setDate(anchorDate.getDate() + index - 2);
-
-      return {
-        id: this.toDateInputValue(nextDate),
-        isoDate: this.toDateInputValue(nextDate),
-        label: new Intl.DateTimeFormat(this.translationService.currentLocale(), { weekday: 'short' })
-          .format(nextDate)
-          .replace('.', '')
-          .slice(0, 3)
-          .toUpperCase(),
-        date: nextDate.getDate(),
-      };
+      return this.toCalendarDay(nextDate);
     });
   });
 
   constructor() {
     const state = (window.history.state ?? {}) as PlannerPreviewState;
     this.eventId = typeof state.eventId === 'number' && state.eventId > 0 ? state.eventId : null;
-    const startDate = this.parseDate(state.startDate) ?? new Date();
-    const endDate = this.parseDate(state.endDate);
-    const fallbackEndDate = this.addMinutes(startDate, 90);
-    const initialEndDate = endDate ?? fallbackEndDate;
-    const initialDuration = Math.max(
-      30,
-      Math.round((initialEndDate.getTime() - startDate.getTime()) / 60000) || 90,
-    );
+    this.eventStartDate = this.parseDate(state.startDate);
+    const parsedEndDate = this.parseDate(state.endDate);
+    const fallbackEndDate = this.eventStartDate ? this.addMinutes(this.eventStartDate, 90) : null;
+    this.eventEndDate = parsedEndDate ?? fallbackEndDate;
+    this.fixedDurationMinutes = this.computeDurationMinutes(this.eventStartDate, this.eventEndDate);
+    this.isEventScheduleLocked = !!(this.eventId && this.eventStartDate && this.eventEndDate);
+    this.minSelectableDate = this.eventStartDate ? this.toDateInputValue(this.eventStartDate) : null;
+    this.maxSelectableDate = this.eventEndDate ? this.toDateInputValue(this.eventEndDate) : null;
 
-    this.travelDate.set(this.toDateInputValue(startDate));
-    this.startTime.set(this.toTimeInputValue(startDate));
-    this.durationMinutes.set(initialDuration);
-    this.selectedDayId.set(this.toDateInputValue(startDate));
+    const initialDate = this.eventStartDate ?? new Date();
+    this.travelDate.set(this.toDateInputValue(initialDate));
+    this.selectedDayId.set(this.toDateInputValue(initialDate));
+    this.startTime.set(this.eventStartDate ? this.toTimeInputValue(this.eventStartDate) : '19:00');
 
     this.preview = {
       title: state.title || this.translate('addToPlanner.previewFallbackTitle'),
@@ -110,8 +107,7 @@ export class AddToPlannerComponent implements OnInit {
       type: state.type || this.translate('addToPlanner.previewFallbackType'),
       rating: state.rating || '4.9',
       imageUrl: state.imageUrl || '/assets/izlet-boko-kotorski-zaliv-1.jpg',
-      description:
-        state.description || this.translate('addToPlanner.previewFallbackDescription'),
+      description: state.description || this.translate('addToPlanner.previewFallbackDescription'),
     };
   }
 
@@ -151,8 +147,9 @@ export class AddToPlannerComponent implements OnInit {
   }
 
   protected onTravelDateChange(value: string): void {
-    this.travelDate.set(value);
-    const parsedDate = this.parseDate(value);
+    const nextValue = this.clampSelectableDate(value);
+    this.travelDate.set(nextValue);
+    const parsedDate = this.parseDate(nextValue);
     if (parsedDate) {
       this.selectedDayId.set(this.toDateInputValue(parsedDate));
     }
@@ -194,7 +191,7 @@ export class AddToPlannerComponent implements OnInit {
           eventId: result.eventId,
           plannedDate: this.travelDate(),
           startTime: this.startTime(),
-          durationMinutes: this.durationMinutes(),
+          durationMinutes: this.fixedDurationMinutes,
           notes: this.notes().trim(),
           isPriority: this.isPriority(),
         });
@@ -209,16 +206,11 @@ export class AddToPlannerComponent implements OnInit {
     }
 
     const selectedStart = this.buildSelectedStartDate();
-    const selectedEnd = this.addMinutes(selectedStart, this.durationMinutes());
+    const selectedEnd = this.addMinutes(selectedStart, this.fixedDurationMinutes);
 
     const conflict = this.existingPlannerItems()
       .map((item) => {
-        const resolved = this.plannerLocalPreferences.resolveSchedule(
-          item.id,
-          item.startDate,
-          item.endDate,
-        );
-
+        const resolved = this.plannerLocalPreferences.resolveSchedule(item.id, item.startDate, item.endDate);
         return {
           title: item.eventName,
           startDate: resolved.startDate,
@@ -269,6 +261,68 @@ export class AddToPlannerComponent implements OnInit {
 
     const parsed = new Date(value);
     return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+
+  private clampSelectableDate(value: string): string {
+    if (!this.isEventScheduleLocked || !this.eventStartDate || !this.eventEndDate) {
+      return value;
+    }
+
+    const parsed = this.parseDate(value);
+    if (!parsed) {
+      return this.toDateInputValue(this.eventStartDate);
+    }
+
+    if (parsed < this.startOfDay(this.eventStartDate)) {
+      return this.toDateInputValue(this.eventStartDate);
+    }
+
+    if (parsed > this.startOfDay(this.eventEndDate)) {
+      return this.toDateInputValue(this.eventEndDate);
+    }
+
+    return this.toDateInputValue(parsed);
+  }
+
+  private buildEventDays(startDate: Date, endDate: Date): PlannerCalendarDay[] {
+    const days: PlannerCalendarDay[] = [];
+    const cursor = this.startOfDay(startDate);
+    const lastDay = this.startOfDay(endDate);
+
+    while (cursor <= lastDay) {
+      days.push(this.toCalendarDay(cursor));
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    return days;
+  }
+
+  private toCalendarDay(date: Date): PlannerCalendarDay {
+    return {
+      id: this.toDateInputValue(date),
+      isoDate: this.toDateInputValue(date),
+      label: new Intl.DateTimeFormat(this.translationService.currentLocale(), { weekday: 'short' })
+        .format(date)
+        .replace('.', '')
+        .slice(0, 3)
+        .toUpperCase(),
+      date: date.getDate(),
+    };
+  }
+
+  private computeDurationMinutes(startDate: Date | null, endDate: Date | null): number {
+    if (!startDate || !endDate) {
+      return 90;
+    }
+
+    const minutes = Math.round((endDate.getTime() - startDate.getTime()) / 60000);
+    return Math.max(30, minutes || 90);
+  }
+
+  private startOfDay(date: Date): Date {
+    const next = new Date(date);
+    next.setHours(0, 0, 0, 0);
+    return next;
   }
 
   private addMinutes(date: Date, minutes: number): Date {

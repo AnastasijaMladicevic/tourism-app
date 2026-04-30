@@ -69,16 +69,20 @@
       }
     }
 
-    .icon {
-      margin-right: 10px;
-      font-size: 20px;
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      flex-shrink: 0;
-      font-family: 'Material Symbols Outlined';
-    }
+    
+  input,
+  select {
+    padding: 17px 0;
+    font-size: 15px;
+  }
 
+  .input-icon {
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-right: 10px;
+}
     .icon.eye {
       display: flex;
       align-items: center;
@@ -190,10 +194,10 @@ label {
   display: flex;
   align-items: center;
 
+
   label {
     margin-bottom: 0px;
   }
 
   gap: 8px;
-  /* razmak između checkbox i teksta */
 }

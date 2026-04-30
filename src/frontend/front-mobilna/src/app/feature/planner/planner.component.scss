@@ -19,42 +19,15 @@
 .planner-mobile-topbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  justify-content: center;
   padding: 22px 0 18px;
-}
 
-.planner-mobile-topbar__brand,
-.planner-mobile-topbar__actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.planner-mobile-topbar__brand {
   h1 {
     margin: 0;
     color: #1f2937;
     font-size: 18px;
     font-weight: 800;
     letter-spacing: -0.03em;
-  }
-}
-
-.planner-brand-mark {
-  width: 32px;
-  height: 32px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #1b9ac2 0%, #168aad 100%);
-  color: #fff;
-
-  svg {
-    width: 16px;
-    height: 16px;
-    fill: currentColor;
   }
 }
 
@@ -78,35 +51,6 @@
     stroke-linecap: round;
     stroke-linejoin: round;
   }
-}
-
-.planner-avatar {
-  width: 36px;
-  height: 36px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #f59e0b, #fde68a);
-  color: #1f2937;
-  font-size: 14px;
-  font-weight: 800;
-
-  svg {
-    width: 18px;
-    height: 18px;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-}
-
-.planner-avatar--mobile {
-  width: 32px;
-  height: 32px;
-  font-size: 13px;
 }
 
 .planner-feedback {
@@ -621,7 +565,7 @@
   .planner-desktop-topbar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     max-width: 1600px;
     width: 100%;
     margin: 0 auto;
@@ -635,12 +579,6 @@
       font-size: 18px;
       font-weight: 800;
     }
-  }
-
-  .planner-desktop-topbar__actions {
-    display: flex;
-    align-items: center;
-    gap: 14px;
   }
 
   .planner-shell {
