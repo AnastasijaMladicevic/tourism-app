@@ -300,6 +300,24 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
     this.patchImageFieldsFromSelection();
   }
 
+  get sideGalleryImages(): ActivityImageDto[] {
+    const selectedUrl = this.imagePreviewUrl;
+    if (!selectedUrl) {
+      return this.activityImages;
+    }
+
+    let removedSelectedOnce = false;
+    return this.activityImages.filter((image) => {
+      const isSelected = image.url === selectedUrl;
+      if (isSelected && !removedSelectedOnce) {
+        removedSelectedOnce = true;
+        return false;
+      }
+
+      return true;
+    });
+  }
+
   onImagePreviewError(): void {
     this.isImagePreviewBroken = true;
   }
@@ -424,9 +442,11 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
       return;
     }
 
-    const center: L.LatLngExpression = this.hasCoordinates
-      ? [this.latitudeNumber as number, this.longitudeNumber as number]
+    const selectedCoordinates = this.selectedCoordinates;
+    const center: L.LatLngExpression = selectedCoordinates
+      ? [selectedCoordinates.latitude, selectedCoordinates.longitude]
       : this.defaultMapCenter;
+    const zoom = selectedCoordinates ? 15 : this.defaultMapZoom;
 
     this.map = L.map(this.activityMap.nativeElement, {
       zoomControl: true,
@@ -436,21 +456,41 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
       touchZoom: false,
       boxZoom: false,
       keyboard: false
-    }).setView(center, this.hasCoordinates ? 15 : this.defaultMapZoom);
+    }).setView(center, zoom);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
       subdomains: 'abcd',
       maxZoom: 19
     }).addTo(this.map);
+
+    // Keep the same real map renderer as create page, but make it strictly view-only.
+    this.map.dragging.disable();
+    this.map.touchZoom.disable();
+    this.map.doubleClickZoom.disable();
+    this.map.scrollWheelZoom.disable();
+    this.map.boxZoom.disable();
+    this.map.keyboard.disable();
+
+    this.map.whenReady(() => {
+      setTimeout(() => {
+        this.map?.invalidateSize();
+      }, 0);
+    });
   }
 
   private syncMapFromActivity(): void {
-    if (!this.map || !this.hasCoordinates) {
+    if (!this.map) {
       return;
     }
 
-    this.updateMapMarker(this.latitudeNumber as number, this.longitudeNumber as number);
+    const selectedCoordinates = this.selectedCoordinates;
+    if (!selectedCoordinates) {
+      this.map.setView(this.defaultMapCenter, this.defaultMapZoom);
+      return;
+    }
+
+    this.updateMapMarker(selectedCoordinates.latitude, selectedCoordinates.longitude);
   }
 
   private updateMapMarker(latitude: number, longitude: number): void {
@@ -485,5 +525,15 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
 
     const parsed = typeof value === 'number' ? value : Number(value);
     return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  private get selectedCoordinates(): { latitude: number; longitude: number } | null {
+    const latitude = this.latitudeNumber;
+    const longitude = this.longitudeNumber;
+    if (latitude == null || longitude == null) {
+      return null;
+    }
+
+    return { latitude, longitude };
   }
 }

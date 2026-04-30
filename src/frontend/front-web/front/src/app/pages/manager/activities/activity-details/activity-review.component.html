@@ -73,20 +73,16 @@
           </div>
 
           <div class="media-strip">
-            @if (activityImages.length > 0) {
+            @if (sideGalleryImages.length > 0) {
               <div class="media-thumbnails">
-                @for (image of activityImages; track image.url) {
-                  <figure class="media-thumb">
+                @for (image of sideGalleryImages; track image.url) {
+                  <button type="button" class="media-thumb" (click)="selectImage(image.url)">
                     <img [src]="image.url" [alt]="image.altText || 'Activity image thumbnail'" />
-                    <figcaption>
-                      <strong>{{ image.isMain ? 'Main' : 'Gallery' }}</strong>
-                      <span>{{ image.altText || 'Preview' }}</span>
-                    </figcaption>
-                  </figure>
+                  </button>
                 }
               </div>
             } @else {
-              <div class="media-empty">No gallery images were submitted for this activity.</div>
+              <div class="media-empty">No additional gallery images are available.</div>
             }
           </div>
         </div>
