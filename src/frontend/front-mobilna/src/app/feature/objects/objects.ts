@@ -94,18 +94,26 @@ export class ObjectsComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.objectService.getAll().subscribe({
+    // ISPRAVNO:
+    this.objectService.getAll({
+      type: this.activeFilter !== 'All' ? this.activeFilter : undefined,
+      page: this.currentPage,
+      pageSize: this.pageSize,
+    }).subscribe({
       next: (response: unknown) => {
         const data = this.toArray<ObjectDto>(response);
+        const pagedResponse = response as { totalCount?: number; items?: unknown[] };
 
         this.objects = data.map((obj) => ({
           ...obj,
           isFavorite: false,
           favoriteId: undefined,
         }));
+        this.totalCount = pagedResponse.totalCount ?? data.length;
+        this.hasNextPage = this.currentPage * this.pageSize < this.totalCount;
         this.objectTypes = this.extractUniqueTypes(this.objects);
         this.updateDistances();
-        this.refreshVisibleObjects();
+        this.visibleObjects = [...this.objects];
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -194,16 +202,14 @@ export class ObjectsComponent implements OnInit {
 
   prevPage(): void {
     if (this.currentPage === 1) return;
-
     this.currentPage--;
-    this.refreshVisibleObjects();
+    this.loadData();
   }
 
   nextPage(): void {
     if (!this.hasNextPage) return;
-
     this.currentPage++;
-    this.refreshVisibleObjects();
+    this.loadData();
   }
 
   @HostListener('document:click', ['$event'])

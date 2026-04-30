@@ -92,7 +92,6 @@ INSERT INTO "ObjectTypes" ("Name") VALUES
 ('Kafic'),
 ('Bar'),
 ('Pansion'),
-('Hostel'),
 ('Etno selo'),
 ('Vinarija'),
 ('Akva park'),
@@ -619,7 +618,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
  ('Centar Tivta', 'Glavna gradska zona Tivta sa šetalištem, trgovima, marinom i turističkim sadržajem',
- ST_SetSRID(ST_MakePoint(18.695, 42.430), 4326), true,
+ ST_SetSRID(ST_MakePoint(18.712, 42.440), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
@@ -5718,7 +5717,7 @@ VALUES
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
     NOW()),
 (
-    'https://www.montenegro.travel/imagine_cache/og/uploads/banners/1_unique_montengro/1.Cetinje.webp',
+    'https://www.unesco.org/sites/default/files/structured_data/cce001/7874280_cetinje-3.jpg',
     'Cetinje',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),

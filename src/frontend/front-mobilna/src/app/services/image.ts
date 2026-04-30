@@ -56,11 +56,11 @@ export class ImageService {
   }
   // === ACTIVITY IMAGES ===
   getForActivity(activityId: number): Observable<ImageDto[]> {
-    return this.http.get<ImageDto[]>(`${environment.apiUrl}/localities/${activityId}/images`);
+    return this.http.get<ImageDto[]>(`${environment.apiUrl}/activities/${activityId}/images`);
   }
 
   getMainForActivity(activityId: number): Observable<ImageDto> {
-    return this.http.get<ImageDto>(`${environment.apiUrl}/localities/${activityId}/images/main`);
+    return this.http.get<ImageDto>(`${environment.apiUrl}/activities/${activityId}/images/main`);
   }
 
   getAll(): Observable<ImageDto[]> {

@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-import { catchError, forkJoin, of, Subscription } from 'rxjs';
+import { catchError, firstValueFrom, forkJoin, of, Subscription } from 'rxjs';
 import * as L from 'leaflet';
 
 import { MapService } from '../../services/map.service';
@@ -90,7 +90,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   selectedItem: any = null;
-      selectedType = '';
+  selectedType = '';
   userLocation: L.LatLng | null = null;
   routeStart: RoutePoint | null = null;
   routeEnd: RoutePoint | null = null;
@@ -268,6 +268,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.shouldCenterOnNextLocation = false;
     }
   }
+
   openDirections(): void {
     const point = this.getRoutePointFromItem(this.selectedItem, this.selectedType);
     if (!point) return;
@@ -277,6 +278,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isRoutePickingMode = true;
     this.routePickingType = 'add';
   }
+
   getDirections(): void {
     if (!this.userLocation || !this.selectedItem) return;
 
@@ -330,6 +332,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.routeSearchResults = [];
     this.routeSearchQuery = '';
   }
+
   clearDirections(): void {
     if (this.routeLine) {
       this.routeLine.remove();
@@ -349,7 +352,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       `${coords}?overview=full&geometries=geojson`;
 
     try {
-
       const res = await fetch(url);
       const data = await res.json();
 
@@ -477,6 +479,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       queryParams: { q: query, source: 'map' },
     });
   }
+
   private toRoutePoint(result: SearchResult): RoutePoint | null {
     if (!result.lat || !result.lng) return null;
 
@@ -488,6 +491,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       lng: result.lng
     };
   }
+
   selectSuggestion(result: SearchResult): void {
     this.searchQuery = '';
     this.showSuggestions = false;
@@ -543,15 +547,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.mapService.setActiveFilters(this.activeFilters);
   }
 
-  private loadAllData(state?: any): void {
+  private async loadAllData(state?: any): Promise<void> {
     this.allItems = [];
+
+    const allObjects = await this.fetchAllObjects();
 
     forkJoin({
       destinations: this.destinationService.getAll(
-        { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
-        { bypassRegion: true, bypassLanguage: true },
-      ),
-      objects: this.objectService.getAll(
         { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
         { bypassRegion: true, bypassLanguage: true },
       ),
@@ -568,9 +570,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         { bypassRegion: true },
       ),
     }).subscribe({
-      next: ({ destinations, objects, events, activities, localities }) => {
+      next: ({ destinations, events, activities, localities }) => {
         const destList = this.toArray<any>(destinations);
-        const objList = this.toArray<any>(objects);
+        const objList = allObjects;
         const evtList = this.toArray<any>(events);
         const actList = this.toArray<any>(activities);
         const locList = this.toArray<any>(localities);
@@ -610,6 +612,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
             this.allItems.push(this.toSearchResult(event, 'event', 'event'));
           }
         });
+
         actList.forEach((activity) => {
           if (activity.latitude && activity.longitude) {
             this.mapService.addMarkerWithType(
@@ -620,7 +623,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
               undefined,
               false
             );
-
             this.allItems.push(this.toSearchResult(activity, 'activity', 'activity'));
           }
         });
@@ -635,7 +637,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
               undefined,
               false
             );
-
             this.allItems.push(this.toSearchResult(locality, 'locality', 'locality'));
           }
         });
@@ -654,6 +655,36 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (err) => console.error('Greska:', err),
     });
+  }
+
+  private async fetchAllObjects(): Promise<any[]> {
+    const all: any[] = [];
+    let page = 1;
+
+    while (true) {
+      try {
+        const response = await firstValueFrom(
+          this.objectService.getAll(
+            { page, pageSize: 100, sortBy: 'name', sortOrder: 'asc' },
+            { bypassRegion: true, bypassLanguage: true },
+          )
+        );
+        const items = this.toArray<any>(response);
+        if (!items.length) break;
+
+        all.push(...items);
+
+        const paged = response as any;
+        const totalPages = paged?.totalPages ?? 1;
+        if (page >= totalPages) break;
+        page++;
+      } catch (err) {
+        console.error('Greška pri učitavanju objekata, stranica', page, err);
+        break;
+      }
+    }
+
+    return all;
   }
 
   private toSearchResult(
@@ -752,15 +783,20 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       return 'clinic';
     }
     if (
+      normalized.includes('trzni') ||
+      normalized.includes('trznica') ||
+      normalized.includes('mall') ||
+      normalized.includes('shopping')
+    ) {
+      return 'mall';
+    }
+    if (
       normalized.includes('prodavnica') ||
       normalized.includes('shop') ||
       normalized.includes('butik') ||
       normalized.includes('market')
     ) {
       return 'shop';
-    }
-    if (normalized.includes('mall') || normalized.includes('shopping')) {
-      return 'mall';
     }
     if (
       normalized.includes('restoran') ||
@@ -770,7 +806,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       normalized.includes('bistro') ||
       normalized.includes('pizzeria') ||
       normalized.includes('taverna')
-    ) return 'restaurant';
+    ) {
+      return 'restaurant';
+    }
     if (
       normalized.includes('kafana') ||
       normalized.includes('bar') ||
@@ -781,7 +819,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       normalized.includes('klub') ||
       normalized.includes('winery') ||
       normalized.includes('vinarija')
-    ) return 'kafana';
+    ) {
+      return 'kafana';
+    }
     return 'attraction';
   }
 
@@ -896,6 +936,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   formatDistance(km: number): string {
     return km < 1 ? `${Math.round(km * 1000)} m` : `${km} km`;
   }
+
   openDirectionsModal(): void {
     if (!this.selectedItem) return;
 
@@ -905,6 +946,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.showDirectionsModal = true;
   }
+
   openDetails(): void {
     if (!this.selectedItem) return;
 
@@ -1015,6 +1057,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       ];
     }
   }
+
   closeDirectionsModal(): void {
     this.showDirectionsModal = false;
   }
@@ -1035,6 +1078,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.calculateRoute();
   }
+
   showRouteSuggestions(): void {
     if (!this.routeSearchQuery.trim()) {
       this.routeSearchResults = [];
@@ -1042,6 +1086,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.routeSearchResults = this.allItems.slice(0, 5);
   }
+
   drop(event: CdkDragDrop<RoutePoint[]>): void {
     moveItemInArray(
       this.routePoints,
@@ -1051,24 +1096,29 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.calculateRoute();
   }
+
   closeRoutePlanner(): void {
     this.isRoutePlannerOpen = false;
     this.isRoutePickingMode = false;
     this.clearPlannedRoute();
   }
+
   removeRoutePoint(index: number): void {
     this.routePoints.splice(index, 1);
     this.calculateRoute();
   }
+
   onRouteSearchBlur(): void {
     setTimeout(() => {
       this.routeSearchResults = [];
       this.cdr.detectChanges();
     }, 150);
   }
+
   routeSuggestionsTop = '0px';
   routeSuggestionsLeft = '16px';
   routeSuggestionsRight = '16px';
+
   onRouteSearch(): void {
     const query = this.routeSearchQuery.trim();
 
@@ -1087,6 +1137,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.routeSearchResults = this.runLocalSearch(query, 6);
     this.cdr.detectChanges();
   }
+
   addMyLocationAsStart(): void {
     if (!this.userLocation) return;
 
