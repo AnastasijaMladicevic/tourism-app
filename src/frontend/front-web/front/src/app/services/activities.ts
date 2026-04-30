@@ -28,8 +28,10 @@ export interface ActivityDto {
   objectId?: number;
   objectName?: string;
   createdByUserId: number;
+  createdByFullName?: string;
   status: string;
   approvedByUserId?: number;
+  approvedByFullName?: string;
   approvedAt?: string;
   rejectionReason?: string;
   createdAt: string;

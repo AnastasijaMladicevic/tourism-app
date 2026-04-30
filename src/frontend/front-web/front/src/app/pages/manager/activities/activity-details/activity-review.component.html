@@ -6,15 +6,10 @@
       <p class="review-subtitle">Inspect the submitted activity and approve or decline it for your managed destination.</p>
 
       @if (activity) {
-        <div class="review-status-wrap has-tooltip">
+        <div class="review-status-wrap">
           <span class="review-status-pill" [ngClass]="getStatusBadgeClass(activity.status)">
             {{ reviewStatusLabel }}
           </span>
-
-          <div class="review-status-tooltip">
-            <strong>Review status</strong>
-            <p>{{ statusTooltip }}</p>
-          </div>
         </div>
       }
     </div>
@@ -172,6 +167,8 @@
                 <p>Map preview and coordinates for the linked location.</p>
               </div>
 
+              <div #activityMap class="location-map mini-map" aria-label="Activity location map"></div>
+
               <div class="field-grid schedule-grid">
                 <label class="form-field half-width">
                   <span>Latitude</span>
@@ -183,8 +180,6 @@
                   <input class="form-control" type="text" formControlName="longitude" readonly />
                 </label>
               </div>
-
-              <div #activityMap class="location-map mini-map" aria-label="Activity location map"></div>
 
               <div class="map-meta">
                 <strong>{{ activityLocationLabel }}</strong>
@@ -210,14 +205,17 @@
                   <span>Approved at</span>
                   <strong>{{ form.controls.approvedAt.value }}</strong>
                 </div>
-                <div class="summary-row">
-                  <span>Approved by</span>
-                  <strong>{{ form.controls.approvedByUserId.value }}</strong>
-                </div>
-                <div class="summary-row summary-row--full">
-                  <span>Rejection reason</span>
-                  <strong>{{ form.controls.rejectionReason.value }}</strong>
-                </div>
+                @if (reviewStatusKey === 'approved') {
+                  <div class="summary-row">
+                    <span>Approved by</span>
+                    <strong>{{ form.controls.approvedByUserId.value }}</strong>
+                  </div>
+                } @else if (reviewStatusKey === 'rejected') {
+                  <div class="summary-row summary-row--full">
+                    <span>Rejection reason</span>
+                    <strong>{{ form.controls.rejectionReason.value }}</strong>
+                  </div>
+                }
               </div>
             </section>
 

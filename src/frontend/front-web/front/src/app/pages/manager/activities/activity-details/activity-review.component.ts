@@ -167,6 +167,9 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
   }
 
   patchForm(activity: ActivityDto): void {
+    const creatorFullName = activity.createdByFullName?.trim();
+    const approverFullName = activity.approvedByFullName?.trim();
+
     this.form.patchValue({
       name: activity.name ?? '',
       description: activity.description ?? '',
@@ -178,11 +181,11 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
       price: activity.price != null ? this.formatPrice(activity.price) : '',
       durationMinutes: activity.durationMinutes != null ? this.formatDuration(activity.durationMinutes) : '',
       isActive: activity.isActive ? 'Active' : 'Inactive',
-      createdByUserId: activity.createdByUserId ? `User #${activity.createdByUserId}` : '—',
+      createdByUserId: creatorFullName || 'Unknown content creator',
       createdAt: this.formatDateTime(activity.createdAt),
       updatedAt: this.formatDateTime(activity.updatedAt),
       approvedAt: this.formatDateTime(activity.approvedAt),
-      approvedByUserId: activity.approvedByUserId ? `User #${activity.approvedByUserId}` : '—',
+      approvedByUserId: approverFullName || '—',
       rejectionReason: activity.rejectionReason?.trim() ?? 'No rejection reason recorded.',
       mainImageUrl: activity.mainImageUrl ?? this.selectedImageUrl,
       latitude: activity.latitude != null ? String(activity.latitude) : '',
@@ -361,14 +364,6 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
     }
 
     return `${this.activityImages.length} image${this.activityImages.length === 1 ? '' : 's'}`;
-  }
-
-  get statusTooltip(): string {
-    if (this.reviewStatusKey === 'rejected' && this.rejectionReason.trim()) {
-      return this.rejectionReason.trim();
-    }
-
-    return `Submitted by user #${this.activity?.createdByUserId ?? '-'}`;
   }
 
   formatDateTime(value: string | Date | undefined): string {
