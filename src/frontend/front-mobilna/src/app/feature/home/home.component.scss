@@ -5,7 +5,7 @@
   flex-direction: column;
   max-width: 430px;
   margin: 0 auto;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .scroll-content {
@@ -51,17 +51,18 @@
 /* Search */
 .search-bar {
   position: relative;
-  height: 44px;
+  min-height: 48px;
   flex: 7;
   margin-left: 20px;
-  background: var(--athens-gray);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 13px 16px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(215, 229, 236, 0.95);
+  border-radius: 18px;
+  padding: 0 15px;
   display: flex;
   align-items: center;
   gap: 10px;
-  color: var(--text-gray);
+  color: #6b7c84;
+  box-shadow: 0 14px 34px rgba(23, 110, 134, 0.05);
 
   span {
     font-size: 14px;
@@ -74,7 +75,7 @@
     border: none;
     outline: none;
     background: transparent;
-    color: var(--text-dark);
+    color: #263945;
     font-family: 'Nunito', sans-serif;
     font-size: 14px;
     font-weight: 600;
@@ -492,14 +493,14 @@
     max-width: none;
     height: auto;
     min-height: 100dvh;
-    overflow: visible;
+    overflow: auto;
     background:
       radial-gradient(circle at top left, rgba(22, 138, 173, 0.08), transparent 24%),
       linear-gradient(180deg, #f8fdff 0%, var(--bg) 28%);
   }
 
   .scroll-content {
-    overflow-y: visible;
+    overflow-y: auto;
     padding: 8px 0 28px;
     width: min(1180px, calc(100% - 48px));
     margin: 0 auto;
@@ -690,20 +691,19 @@
 }
 .filter-btn {
   width: 100%;
-  height: 44px;
+  min-height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0 12px;
-  border-radius: 14px;
-  border: none;
-  background: var(--white);
+  border-radius: 18px;
   cursor: pointer;
-  background: var(--athens-gray);
-  border: 1px solid var(--border);
-  color: var(--text-dark);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(215, 229, 236, 0.95);
+  color: #263945;
   font-size: 13px;
   font-weight: 700;
+  box-shadow: 0 14px 34px rgba(23, 110, 134, 0.05);
 }
 .nav {
   position: absolute;

@@ -45,7 +45,7 @@
                     "defaultUser":  "SpireGO korisnik",
                     "stats":  {
                                   "favorites":  "FAVORITI",
-                                  "plans":  "PLANOVI",
+                                  "plans":  "Planovi",
                                   "reviews":  "RECENZIJE"
                               },
                     "section":  {
@@ -233,6 +233,8 @@
                         "selectedCount":  "Izabrano: {{count}}",
                         "appLanguage":  "Jezik aplikacije",
                         "currentLanguage":  "Trenutno: {{language}}",
+                        "changePassword":  "Promeni sifru",
+                        "changePasswordBody":  "Azuriraj lozinku svog naloga",
                         "saving":  "Cuvanje...",
                         "saveChanges":  "Sacuvaj promene",
                         "cancelChanges":  "Otkazi izmene",

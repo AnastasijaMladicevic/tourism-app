@@ -10,12 +10,10 @@
         <mat-icon>search</mat-icon>
         <input
           type="text"
-          placeholder="Search places, routes..."
+          placeholder="Ask where to go, what to see or where to eat..."
           [(ngModel)]="searchQuery"
           (input)="onSearchInput()"
           (keydown.enter)="submitSearch()"
-          (focus)="showSuggestions = searchResults.length > 0"
-          (blur)="onSearchBlur()"
           autocomplete="off"
         />
         @if (searchQuery) {
@@ -120,22 +118,24 @@
               class="place-img place-img--dynamic"
               [appLazyBackground]="card.imageUrl ?? null"
             >
-              <button class="heart-btn" type="button" (click)="toggleFavorite(card, $event)">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  [attr.fill]="card.isFavorite ? '#e74c3c' : 'none'"
-                  stroke="#e74c3c"
-                  stroke-width="2.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path
-                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
-                  />
-                </svg>
-              </button>
+              @if (card.itemType !== 'event') {
+                <button class="heart-btn" type="button" (click)="toggleFavorite(card, $event)">
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    [attr.fill]="card.isFavorite ? '#e74c3c' : 'none'"
+                    stroke="#e74c3c"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path
+                      d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                    />
+                  </svg>
+                </button>
+              }
             </div>
             <div class="place-info">
               <h3>{{ card.title }}</h3>
@@ -156,7 +156,11 @@
                   </svg>
                   <span class="place-location__text">{{ card.location }}</span>
                 </p>
-                @if (card.ratingText) {
+                @if (card.distanceText) {
+                  <p class="place-rating">
+                    <span class="place-rating__text">{{ card.distanceText }}</span>
+                  </p>
+                } @else if (card.ratingText) {
                   <p class="place-rating">
                     @if (card.showRating) {
                       <svg
@@ -233,7 +237,11 @@
                   </svg>
                   <span class="place-location__text">{{ card.location }}</span>
                 </p>
-                @if (card.ratingText) {
+                @if (card.distanceText) {
+                  <p class="place-rating">
+                    <span class="place-rating__text">{{ card.distanceText }}</span>
+                  </p>
+                } @else if (card.ratingText) {
                   <p class="place-rating">
                     @if (card.showRating) {
                       <svg
@@ -279,23 +287,30 @@
             </div>
             <div class="event-info">
               <h3>{{ event.title }}</h3>
-              <p class="event-location">
-                <svg
-                  width="11"
-                  height="11"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
-                {{ event.location }}
-              </p>
-              <p class="event-date">{{ event.dateText }}</p>
+              <div class="place-meta">
+                <p class="event-location">
+                  <svg
+                    width="11"
+                    height="11"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  <span class="place-location__text">{{ event.location }}</span>
+                </p>
+                @if (event.distanceText) {
+                  <p class="place-rating">
+                    <span class="place-rating__text">{{ event.distanceText }}</span>
+                  </p>
+                }
+              </div>
+              <!-- <p class="event-date">{{ event.dateText }}</p> -->
             </div>
           </div>
         }

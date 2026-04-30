@@ -19,5 +19,8 @@ namespace TuristickiVodic.Core.DTO
         public string? PreferredRegionCode { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? ProfileImageUrl { get; set; }
+        public int FavoritesCount { get; set; }
+        public int PlansCount { get; set; }
+        public int ReviewsCount { get; set; }
     }
 }

@@ -32,6 +32,19 @@
     }
   </div>
 
+  @if (!isLoading && answer) {
+    <section class="answer-card">
+      <div class="answer-card__badge">
+        <mat-icon>auto_awesome</mat-icon>
+        <span>SpireGO Assistant</span>
+      </div>
+      <p class="answer-card__text">{{ answer }}</p>
+      @if (warning) {
+        <p class="answer-card__warning">{{ warning }}</p>
+      }
+    </section>
+  }
+
   <div class="search-page__list">
     @if (!isLoading && hasSearched && !results.length) {
       <div class="empty-state">

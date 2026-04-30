@@ -37,19 +37,6 @@
           (input)="updateSearchTerm(($any($event.target)).value)"
         />
       </label>
-
-      <div class="favorites-profile-chip">
-        <div>
-          <strong>{{ translate('favorites.screenTitle') }}</strong>
-          <span>{{ translate('favorites.totalFavorites', { count: favorites().length }) }}</span>
-        </div>
-        <span class="favorites-profile-chip__avatar" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <circle cx="12" cy="8" r="4" />
-            <path d="M4 21a8 8 0 0 1 16 0" />
-          </svg>
-        </span>
-      </div>
     </header>
 
     <section class="favorites-content-shell">
@@ -81,6 +68,8 @@
           }
         </section>
 
+        <!-- Hero sekcija sa opisom uklonjena — ne prikazujemo opis niti sort dugme ovde -->
+        <!--
         <section class="favorites-hero">
           <div class="favorites-hero__copy">
             <span class="favorites-hero__eyebrow">{{ translate('favorites.screenTitle') }}</span>
@@ -98,7 +87,10 @@
             </button>
           </div>
         </section>
+        -->
 
+        <!-- Planer baner (mobilni) uklonjen — plavi pozivni blok sklonjen -->
+        <!--
         <a class="planner-banner planner-banner--mobile" routerLink="/planner">
           <div>
             <strong>{{ translate('favorites.plannerBannerTitle') }}</strong>
@@ -106,6 +98,7 @@
           </div>
           <span>{{ translate('favorites.goToPlanner') }}</span>
         </a>
+        -->
 
         <div class="favorites-status-row">
           <span>{{ savedCountLabel() }}</span>
@@ -232,6 +225,8 @@
       </main>
 
       <aside class="favorites-panel">
+        <!-- Planer baner (desktop aside) uklonjen — plavi pozivni blok sklonjen -->
+        <!--
         <a class="planner-banner planner-banner--desktop" routerLink="/planner">
           <strong>{{ translate('favorites.readyTitle') }}</strong>
           <p>{{ translate('favorites.readyBody') }}</p>
@@ -248,6 +243,7 @@
 
           <span class="planner-banner__cta">{{ translate('favorites.goToPlanner') }}</span>
         </a>
+        -->
 
         <section class="panel-card">
           <div class="panel-card__head">
@@ -275,7 +271,16 @@
             <span>{{ sortLabel() }}</span>
           </div>
 
-          <p class="panel-note">{{ latestSavedLabel() }}</p>
+          @if (latestSavedItem(); as latest) {
+            <div class="panel-recent">
+              <strong>{{ latest.title }}</strong>
+              <span>{{ latest.categoryLabel }}</span>
+              <p class="panel-note">{{ latest.location }}</p>
+              <p class="panel-note panel-note--muted">{{ latest.note }}</p>
+            </div>
+          } @else {
+            <p class="panel-note">{{ translate('favorites.latestEmpty') }}</p>
+          }
         </section>
       </aside>
     </section>

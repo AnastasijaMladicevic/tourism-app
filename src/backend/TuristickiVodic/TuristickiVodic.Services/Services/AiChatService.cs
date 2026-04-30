@@ -121,7 +121,10 @@ namespace TuristickiVodic.Services.Services
                                 Content =
                                     """
                                     Ti si turisticki asistent.
-                                    Odgovori prirodno, kratko i korisno na srpskom latinicom.
+                                    Odgovori prirodno, kratko i korisno na standardnom srpskom latinicom.
+                                    Pisi jednostavno i toplo, kao preporuku u aplikaciji.
+                                    Nemoj da mesas hrvatske ili bosanske oblike, arhaicne izraze, niti cudne konstrukcije.
+                                    Koristi prirodne fraze kao: "preporucujem", "mozes da probas", "vredi obici", "ako zelis".
                                     Koristi samo rezultate koje si dobio.
                                     Nemoj da izmisljas mesta, tip kuhinje, pogodnosti ili detalje kojih nema u rezultatima.
                                     Ako nema dovoljno dobrog poklapanja, to jasno reci.
@@ -1089,7 +1092,7 @@ namespace TuristickiVodic.Services.Services
                 return 100;
             }
 
-             if (aliases.Any(alias => normalizedCandidate.Contains(alias, StringComparison.Ordinal)))
+            if (aliases.Any(alias => normalizedCandidate.Contains(alias, StringComparison.Ordinal)))
             {
                 return 95;
             }
@@ -1163,7 +1166,13 @@ namespace TuristickiVodic.Services.Services
                 return "food";
             }
 
-            if (normalized.Contains("uvece") || normalized.Contains("veceras") || normalized.Contains("night") || normalized.Contains("izadj") || normalized.Contains("izlazak") || normalized.Contains("bar") || normalized.Contains("kafana"))
+            if (normalized.Contains("uvece") || normalized.Contains("veceras") || normalized.Contains("night") ||
+                normalized.Contains("izadj") || normalized.Contains("izlazak") || normalized.Contains("kafana") ||
+                normalized.Contains("provod") || normalized.Contains("nocni") || normalized.Contains("club") ||
+                normalized.Contains("cocktail") || normalized.Contains("zabava") ||
+                // "bar" je validan signal SAMO ako se kombinuje sa kontekstom izlaska, inace je to ime grada
+                (normalized.Contains("bar") && (normalized.Contains("uvece") || normalized.Contains("nocni") ||
+                 normalized.Contains("izlaz") || normalized.Contains("provod") || normalized.Contains("druzenje"))))
             {
                 return "nightlife";
             }
@@ -1171,6 +1180,16 @@ namespace TuristickiVodic.Services.Services
             if (normalized.Contains("family") || normalized.Contains("deca") || normalized.Contains("decom") || normalized.Contains("kids") || normalized.Contains("porod"))
             {
                 return "family";
+            }
+
+            if (normalized.Contains("staza") || normalized.Contains("staze") ||
+                normalized.Contains("planinar") || normalized.Contains("trekking") ||
+                normalized.Contains("hiking") || normalized.Contains("uspon") ||
+                normalized.Contains("nije strma") || normalized.Contains("nisu strme") ||
+                normalized.Contains("blaga") || normalized.Contains("laka staza"))
+            {
+                // Planinarenje i staze -> tema "walk" sa naglaskom na aktivnosti
+                return "walk";
             }
 
             if (normalized.Contains("walk") || normalized.Contains("set") || normalized.Contains("trail") || normalized.Contains("hike") || normalized.Contains("park") || normalized.Contains("prirod"))

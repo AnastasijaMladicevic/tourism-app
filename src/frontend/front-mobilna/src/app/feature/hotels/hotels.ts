@@ -121,7 +121,7 @@ export class HotelsComponent implements OnInit {
   }
 
   viewDetails(hotelId: number): void {
-    this.router.navigate(['/hotel', hotelId]);
+    this.router.navigate(['/object', hotelId]);
   }
 
   goBack(): void {

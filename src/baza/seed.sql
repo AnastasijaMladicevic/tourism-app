@@ -12289,3 +12289,149 @@ WHERE "Name" IN (
     'Barcelona', 'Madrid', 'Valencia', 'Rome', 'Venice', 'Florence', 'Belgrade',
     'Novi Sad', 'Zlatibor'
 );
+
+-- ============================================
+-- 20. CREATOR OWNERSHIP NORMALIZATION
+-- ============================================
+WITH role_assignments AS (
+    SELECT *
+    FROM (VALUES
+        ('ME', 'admin@spirego.com', 'ana@spirego.com'),
+        ('ES', 'lucia.admin@spirego.com', 'carmen.creator@spirego.com'),
+        ('IT', 'giulia.admin@spirego.com', 'lorenzo.creator@spirego.com'),
+        ('RS', 'milica.admin.serbia@spirego.com', 'jelena.creator@spirego.com')
+    ) AS map(region_code, admin_email, creator_email)
+),
+destination_ownership AS (
+    SELECT
+        d."Id" AS destination_id,
+        d."ManagedByUserId" AS manager_user_id,
+        admin_user."Id" AS admin_user_id,
+        creator_user."Id" AS creator_user_id
+    FROM "Destinations" d
+    JOIN "Regions" r ON r."Id" = d."RegionId"
+    JOIN role_assignments ra ON ra.region_code = r."Code"
+    JOIN "Users" admin_user ON admin_user."Email" = ra.admin_email
+    JOIN "Users" creator_user ON creator_user."Email" = ra.creator_email
+)
+UPDATE "Destinations" d
+SET "CreatedByUserId" = ownership.admin_user_id,
+    "UpdatedAt" = NOW()
+FROM destination_ownership ownership
+WHERE d."Id" = ownership.destination_id;
+
+WITH destination_ownership AS (
+    SELECT d."Id" AS destination_id, d."ManagedByUserId" AS manager_user_id
+    FROM "Destinations" d
+    WHERE d."ManagedByUserId" IS NOT NULL
+)
+UPDATE "Localities" l
+SET "CreatedByUserId" = ownership.manager_user_id,
+    "UpdatedAt" = NOW()
+FROM destination_ownership ownership
+WHERE l."DestinationId" = ownership.destination_id;
+
+UPDATE "Objects" o
+SET "DestinationId" = l."DestinationId"
+FROM "Localities" l
+WHERE o."LocalityId" = l."Id";
+
+UPDATE "Activities" a
+SET "DestinationId" = l."DestinationId"
+FROM "Localities" l
+WHERE a."LocalityId" = l."Id";
+
+UPDATE "Events" e
+SET "DestinationId" = l."DestinationId"
+FROM "Localities" l
+WHERE e."LocalityId" = l."Id";
+
+WITH role_assignments AS (
+    SELECT *
+    FROM (VALUES
+        ('ME', 'ana@spirego.com'),
+        ('ES', 'carmen.creator@spirego.com'),
+        ('IT', 'lorenzo.creator@spirego.com'),
+        ('RS', 'jelena.creator@spirego.com')
+    ) AS map(region_code, creator_email)
+),
+destination_content AS (
+    SELECT
+        d."Id" AS destination_id,
+        d."ManagedByUserId" AS manager_user_id,
+        creator_user."Id" AS creator_user_id
+    FROM "Destinations" d
+    JOIN "Regions" r ON r."Id" = d."RegionId"
+    JOIN role_assignments ra ON ra.region_code = r."Code"
+    JOIN "Users" creator_user ON creator_user."Email" = ra.creator_email
+)
+UPDATE "Objects" o
+SET "CreatedByUserId" = content.creator_user_id,
+    "ApprovedByUserId" = content.manager_user_id,
+    "ApprovedAt" = CASE
+        WHEN o."Status"::text IN ('Approved', '1') THEN COALESCE(o."ApprovedAt", NOW())
+        ELSE o."ApprovedAt"
+    END,
+    "UpdatedAt" = NOW()
+FROM destination_content content
+WHERE o."DestinationId" = content.destination_id;
+
+WITH role_assignments AS (
+    SELECT *
+    FROM (VALUES
+        ('ME', 'ana@spirego.com'),
+        ('ES', 'carmen.creator@spirego.com'),
+        ('IT', 'lorenzo.creator@spirego.com'),
+        ('RS', 'jelena.creator@spirego.com')
+    ) AS map(region_code, creator_email)
+),
+destination_content AS (
+    SELECT
+        d."Id" AS destination_id,
+        d."ManagedByUserId" AS manager_user_id,
+        creator_user."Id" AS creator_user_id
+    FROM "Destinations" d
+    JOIN "Regions" r ON r."Id" = d."RegionId"
+    JOIN role_assignments ra ON ra.region_code = r."Code"
+    JOIN "Users" creator_user ON creator_user."Email" = ra.creator_email
+)
+UPDATE "Activities" a
+SET "CreatedByUserId" = content.creator_user_id,
+    "ApprovedByUserId" = content.manager_user_id,
+    "ApprovedAt" = CASE
+        WHEN a."Status"::text IN ('Approved', '1') THEN COALESCE(a."ApprovedAt", NOW())
+        ELSE a."ApprovedAt"
+    END,
+    "UpdatedAt" = NOW()
+FROM destination_content content
+WHERE a."DestinationId" = content.destination_id;
+
+WITH role_assignments AS (
+    SELECT *
+    FROM (VALUES
+        ('ME', 'ana@spirego.com'),
+        ('ES', 'carmen.creator@spirego.com'),
+        ('IT', 'lorenzo.creator@spirego.com'),
+        ('RS', 'jelena.creator@spirego.com')
+    ) AS map(region_code, creator_email)
+),
+destination_content AS (
+    SELECT
+        d."Id" AS destination_id,
+        d."ManagedByUserId" AS manager_user_id,
+        creator_user."Id" AS creator_user_id
+    FROM "Destinations" d
+    JOIN "Regions" r ON r."Id" = d."RegionId"
+    JOIN role_assignments ra ON ra.region_code = r."Code"
+    JOIN "Users" creator_user ON creator_user."Email" = ra.creator_email
+)
+UPDATE "Events" e
+SET "CreatedByUserId" = content.creator_user_id,
+    "ApprovedByUserId" = content.manager_user_id,
+    "ApprovedAt" = CASE
+        WHEN e."Status"::text IN ('Approved', '1') THEN COALESCE(e."ApprovedAt", NOW())
+        ELSE e."ApprovedAt"
+    END,
+    "UpdatedAt" = NOW()
+FROM destination_content content
+WHERE e."DestinationId" = content.destination_id;

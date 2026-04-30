@@ -38,9 +38,9 @@
     </section>
 
     <section class="stats-grid">
-      @for (stat of stats; track trackStat($index, stat)) {
+      @for (stat of stats(); track trackStat($index, stat)) {
         <article class="stat-card">
-          <strong>{{ stat.value }}</strong>
+          <strong>{{ stat.value ?? '...' }}</strong>
           <div class="stat-label">
             <span class="stat-icon" [attr.data-icon]="stat.icon">
               @switch (stat.icon) {

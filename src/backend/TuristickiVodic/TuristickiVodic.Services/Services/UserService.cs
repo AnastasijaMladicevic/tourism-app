@@ -108,7 +108,7 @@ namespace TuristickiVodic.Services
                 .Include(u => u.PreferredRegion)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
-            return user == null ? null : _mapper.Map<UserDto>(user);
+            return await MapUserDtoWithMetricsAsync(user);
         }
 
         public async Task<UserDto?> GetByEmailAsync(string email)
@@ -118,7 +118,7 @@ namespace TuristickiVodic.Services
                 .Include(u => u.PreferredRegion)
                 .FirstOrDefaultAsync(u => u.Email == email);
 
-            return user == null ? null : _mapper.Map<UserDto>(user);
+            return await MapUserDtoWithMetricsAsync(user);
         }
 
         public async Task<UserLocationDto?> GetCurrentLocationAsync(int userId)
@@ -410,7 +410,7 @@ namespace TuristickiVodic.Services
 
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<UserDto>(user);
+            return await MapExistingUserDtoWithMetricsAsync(user);
         }
 
         public async Task<UserDto> CreateManagerAsync(CreateUserDto createUserDto)
@@ -451,7 +451,7 @@ namespace TuristickiVodic.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<UserDto>(user);
+            return await MapExistingUserDtoWithMetricsAsync(user);
         }
 
         public async Task<UserDto?> UpdateAsync(int id, UpdateUserDto updateUserDto)
@@ -469,7 +469,7 @@ namespace TuristickiVodic.Services
 
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<UserDto>(user);
+            return await MapExistingUserDtoWithMetricsAsync(user);
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -758,7 +758,7 @@ namespace TuristickiVodic.Services
             {
                 Token = token,
                 RefreshToken = refreshToken,
-                User = _mapper.Map<UserDto>(user),
+                User = await MapExistingUserDtoWithMetricsAsync(user),
                 ExpiresAt = DateTime.UtcNow.AddMinutes(15)
             };
         }
@@ -1127,7 +1127,29 @@ namespace TuristickiVodic.Services
 
             await _context.SaveChangesAsync();
 
-            return _mapper.Map<UserDto>(user);
+            return await MapExistingUserDtoWithMetricsAsync(user);
+        }
+
+        private async Task<UserDto?> MapUserDtoWithMetricsAsync(User? user)
+        {
+            if (user == null)
+                return null;
+
+            return await MapExistingUserDtoWithMetricsAsync(user);
+        }
+
+        private async Task<UserDto> MapExistingUserDtoWithMetricsAsync(User user)
+        {
+            var dto = _mapper.Map<UserDto>(user);
+            await PopulateUserMetricsAsync(dto, user.Id);
+            return dto;
+        }
+
+        private async Task PopulateUserMetricsAsync(UserDto dto, int userId)
+        {
+            dto.FavoritesCount = await _context.Favorites.CountAsync(f => f.UserId == userId);
+            dto.PlansCount = await _context.EventPlannerItems.CountAsync(item => item.UserId == userId);
+            dto.ReviewsCount = await _context.Reviews.CountAsync(review => review.UserId == userId);
         }
     }
 }

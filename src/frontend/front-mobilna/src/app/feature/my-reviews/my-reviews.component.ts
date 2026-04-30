@@ -3,6 +3,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import { AuthService } from '../../services/auth';
+import { ProfileStatsCacheService } from '../../services/profile-stats-cache';
 import { ReviewDto, ReviewService } from '../../services/review';
 import { TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -28,6 +29,7 @@ interface ReviewCard {
 export class MyReviewsComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly reviewService = inject(ReviewService);
+  private readonly profileStatsCache = inject(ProfileStatsCacheService);
   private readonly router = inject(Router);
   private readonly translationService = inject(TranslationService);
 
@@ -58,6 +60,7 @@ export class MyReviewsComponent implements OnInit {
           .map((item) => this.mapReview(item));
 
         this.reviews.set(ownReviews);
+        this.profileStatsCache.write({ reviews: ownReviews.length });
       });
   }
 

@@ -39,6 +39,9 @@ export interface UserDto {
   roleName: string;
   isActive: boolean;
   isVerified: boolean;
+  favoritesCount?: number;
+  plansCount?: number;
+  reviewsCount?: number;
 }
 
 export interface AuthResponseDto {

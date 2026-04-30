@@ -20,14 +20,12 @@
 
     <section class="photo-panel">
       <div class="photo-avatar-wrap">
-        <!-- Preview of cropped image before upload, or current profile image -->
         @if (cropPreviewUrl()) {
           <img class="photo-avatar" [src]="cropPreviewUrl()!" [alt]="'editProfile.photoAlt' | translate" />
         } @else {
           <img class="photo-avatar" [src]="imageUrl()" [alt]="'editProfile.photoAlt' | translate" />
         }
 
-        <!-- Edit chip / pencil icon — same style as profile "uredi" button -->
         <button
           class="photo-edit-chip"
           type="button"
@@ -43,7 +41,6 @@
         </button>
       </div>
 
-      <!-- Remove photo button — only shown when user has a custom (non-default) photo and crop is NOT active -->
       @if (!isDefaultPhoto() && !pendingCropFile()) {
         <button class="remove-photo-button" type="button" (click)="removePhoto()">
           {{ 'editProfile.removePhoto' | translate }}
@@ -51,15 +48,20 @@
       }
     </section>
 
-    <!-- Crop modal — fullscreen popup, shown after file is picked -->
     @if (pendingCropFile()) {
       <div class="crop-modal-backdrop" (click)="cancelCrop()">
         <div class="crop-modal" (click)="$event.stopPropagation()">
           <div class="crop-modal__header">
             <span>Opseci fotografiju</span>
             <button class="crop-modal__close" type="button" (click)="cancelCrop()" aria-label="Zatvori">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-                stroke-linecap="round" stroke-linejoin="round">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
                 <path d="M18 6 6 18M6 6l12 12" />
               </svg>
             </button>
@@ -89,14 +91,26 @@
       <div class="field">
         <div class="input-wrapper">
           <span class="input-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
           </span>
-          <input [ngModel]="name()" (ngModelChange)="updateName($event)" type="text"
-            placeholder="{{ 'editProfile.firstName' | translate }}" />
+          <input
+            [ngModel]="name()"
+            (ngModelChange)="updateName($event)"
+            type="text"
+            placeholder="{{ 'editProfile.firstName' | translate }}"
+          />
         </div>
         @if (fieldErrors().name) {
           <small class="field-error">{{ fieldErrors().name }}</small>
@@ -106,14 +120,26 @@
       <div class="field">
         <div class="input-wrapper">
           <span class="input-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
           </span>
-          <input [ngModel]="lastName()" (ngModelChange)="updateLastName($event)" type="text"
-            placeholder="{{ 'editProfile.lastName' | translate }}" />
+          <input
+            [ngModel]="lastName()"
+            (ngModelChange)="updateLastName($event)"
+            type="text"
+            placeholder="{{ 'editProfile.lastName' | translate }}"
+          />
         </div>
         @if (fieldErrors().lastName) {
           <small class="field-error">{{ fieldErrors().lastName }}</small>
@@ -123,14 +149,26 @@
       <div class="field">
         <div class="input-wrapper">
           <span class="input-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10z" />
               <circle cx="12" cy="11" r="2" />
             </svg>
           </span>
-          <input [ngModel]="country()" (ngModelChange)="updateCountry($event)" type="text"
-            placeholder="{{ 'editProfile.country' | translate }}" />
+          <input
+            [ngModel]="country()"
+            (ngModelChange)="updateCountry($event)"
+            type="text"
+            placeholder="{{ 'editProfile.country' | translate }}"
+          />
         </div>
         @if (fieldErrors().country) {
           <small class="field-error">{{ fieldErrors().country }}</small>
@@ -140,29 +178,48 @@
       <div class="field">
         <div class="input-wrapper input-wrapper--readonly">
           <span class="input-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
               <polyline points="22,6 12,13 2,6" />
             </svg>
           </span>
-          <input [ngModel]="email()" type="email" readonly
-            placeholder="{{ 'editProfile.email' | translate }}" />
+          <input [ngModel]="email()" type="email" readonly placeholder="{{ 'editProfile.email' | translate }}" />
         </div>
       </div>
 
       <div class="field">
         <div class="input-wrapper">
           <span class="input-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
               <path
                 d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.33 1.78.63 2.63a2 2 0 0 1-.45 2.11L8 9.91a16 16 0 0 0 6.09 6.09l1.45-1.29a2 2 0 0 1 2.11-.45c.85.3 1.73.51 2.63.63A2 2 0 0 1 22 16.92z"
               />
             </svg>
           </span>
-          <input [ngModel]="phone()" (ngModelChange)="updatePhone($event)" type="tel"
-            placeholder="{{ 'editProfile.phone' | translate }}" />
+          <input
+            [ngModel]="phone()"
+            (ngModelChange)="updatePhone($event)"
+            type="tel"
+            placeholder="{{ 'editProfile.phone' | translate }}"
+          />
         </div>
         @if (fieldErrors().phone) {
           <small class="field-error">{{ fieldErrors().phone }}</small>
@@ -190,20 +247,40 @@
     @if (isLanguageMenuOpen()) {
       <div class="language-picker">
         @for (option of languageOptions; track option.code) {
-          <button
-            class="language-option"
-            type="button"
-            [class.language-option--active]="appLanguageCode() === option.code"
-            (click)="selectLanguageOption(option.code)"
-          >
-            <span>{{ option.labelKey | translate }}</span>
-            @if (appLanguageCode() === option.code) {
-              <span class="language-option__check">✓</span>
-            }
+          <button class="language-option" type="button" (click)="selectLanguageOption(option.code)">
+            <div class="language-option__content">
+              <strong>{{ option.labelKey | translate }}</strong>
+            </div>
+
+            <span
+              class="language-option__radio"
+              [class.language-option__radio--active]="appLanguageCode() === option.code"
+            >
+              @if (appLanguageCode() === option.code) {
+                <span></span>
+              }
+            </span>
           </button>
         }
       </div>
     }
+
+    <button class="language-card password-card" type="button" (click)="openChangePassword()">
+      <div class="language-card__icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 11V8a5 5 0 0 1 10 0v3" />
+          <rect x="5" y="11" width="14" height="10" rx="2" />
+          <path d="M12 15v2" />
+        </svg>
+      </div>
+      <div class="language-card__content">
+        <strong>{{ 'editProfile.changePassword' | translate }}</strong>
+        <span>{{ 'editProfile.changePasswordBody' | translate }}</span>
+      </div>
+      <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m9 6 6 6-6 6" />
+      </svg>
+    </button>
 
     @if (fieldErrors().photo) {
       <p class="field-error field-error--standalone">{{ fieldErrors().photo }}</p>

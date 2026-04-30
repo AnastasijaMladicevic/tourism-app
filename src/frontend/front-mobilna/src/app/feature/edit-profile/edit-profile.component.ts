@@ -71,14 +71,11 @@ export class EditProfileComponent implements OnInit {
   /** Object URL for the cropped preview shown above the avatar */
   protected readonly cropPreviewUrl = signal<string | null>(null);
 
-  protected readonly languageOptions = [
-    { code: 'me', labelKey: 'language.montenegrin' },
-    { code: 'sr', labelKey: 'language.serbian' },
-    { code: 'en', labelKey: 'language.english' },
-    { code: 'es', labelKey: 'language.spanish' },
-    { code: 'it', labelKey: 'language.italian' },
-    { code: 'el', labelKey: 'language.greek' },
-  ];
+  protected readonly languageOptions: ReadonlyArray<{ code: AppLanguage; labelKey: string }> =
+    (['sr', 'en', 'es', 'it'] as const).map((code) => ({
+      code,
+      labelKey: this.translationService.labelKeyForLanguage(code),
+    }));
 
   protected readonly imageUrl = computed(() => {
     const raw = this.userSignal()?.profileImageUrl?.trim() || DEFAULT_PHOTO_PATH;
@@ -314,8 +311,8 @@ export class EditProfileComponent implements OnInit {
         this.patchFromUser(user);
         this.persistInterests();
         this.setFeedback(this.translationService.translate('editProfile.saved'), 'success');
+        this.router.navigate(['/profile']);
       });
-      this.router.navigate(['/profile']);
   }
 
   protected cancelChanges(): void {
@@ -328,7 +325,7 @@ export class EditProfileComponent implements OnInit {
     this.isLanguageMenuOpen.update((current) => !current);
   }
 
-  protected selectLanguageOption(code: string): void {
+  protected selectLanguageOption(code: AppLanguage): void {
     const normalizedCode = this.normalizeLanguage(code);
     this.appLanguageCode.set(normalizedCode);
     this.isLanguageMenuOpen.set(false);
@@ -351,6 +348,10 @@ export class EditProfileComponent implements OnInit {
 
   protected languageLabel(code = this.appLanguageCode()): string {
     return this.translationService.translate(this.translationService.labelKeyForLanguage(code));
+  }
+
+  protected openChangePassword(): void {
+    this.router.navigate(['/new-credentials']);
   }
 
   /* ── Private helpers ───────────────────────────────────────────────── */

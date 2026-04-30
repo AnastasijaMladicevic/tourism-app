@@ -60,6 +60,28 @@ namespace TuristickiVodic.Services.Services
                 .Where(a => a.Images.Any(i => i.IsMain))
                 .AsQueryable();
 
+            var eventQuery = _context.Events
+                .AsNoTracking()
+                .Include(e => e.EventType)
+                .Include(e => e.Destination)
+                    .ThenInclude(d => d.Region)
+                .Include(e => e.Locality)
+                    .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
+                .Include(e => e.Object)
+                    .ThenInclude(o => o.Destination)
+                        .ThenInclude(d => d.Region)
+                .Include(e => e.Object)
+                    .ThenInclude(o => o.Locality)
+                        .ThenInclude(l => l.Destination)
+                            .ThenInclude(d => d.Region)
+                .Include(e => e.Images)
+                .Where(e => e.IsActive)
+                .Where(e => e.Status == ContentStatus.Approved)
+                .Where(e => e.Images.Any(i => i.IsMain))
+                .Where(e => (e.EndDate ?? e.StartDate) >= DateTime.UtcNow)
+                .AsQueryable();
+
             if (context.EffectiveRegionId.HasValue)
             {
                 var regionId = context.EffectiveRegionId.Value;
@@ -70,11 +92,22 @@ namespace TuristickiVodic.Services.Services
                 activityQuery = activityQuery.Where(a =>
                     (a.Destination != null && a.Destination.RegionId == regionId) ||
                     (a.Destination == null && a.Locality != null && a.Locality.Destination != null && a.Locality.Destination.RegionId == regionId));
+                eventQuery = eventQuery.Where(e =>
+                    (e.Destination != null && e.Destination.RegionId == regionId) ||
+                    (e.Destination == null && e.Locality != null && e.Locality.Destination != null && e.Locality.Destination.RegionId == regionId) ||
+                    (e.Destination == null &&
+                     e.Locality == null &&
+                     e.Object != null &&
+                     ((e.Object.Destination != null && e.Object.Destination.RegionId == regionId) ||
+                      (e.Object.Locality != null &&
+                       e.Object.Locality.Destination != null &&
+                       e.Object.Locality.Destination.RegionId == regionId))));
             }
 
             var destinations = await destinationQuery.ToListAsync();
             var objects = await objectQuery.ToListAsync();
             var activities = await activityQuery.ToListAsync();
+            var events = await eventQuery.ToListAsync();
 
             var destinationFavoriteCounts = await _context.Favorites.AsNoTracking()
                 .Where(f => f.DestinationId.HasValue)
@@ -212,6 +245,44 @@ namespace TuristickiVodic.Services.Services
                     RegionId = regionId,
                     ActivityTypeId = activity.ActivityTypeId,
                     GlobalFavoriteCount = favoriteCount,
+                });
+            }
+
+            foreach (var eventItem in events)
+            {
+                var destinationId = ResolveEventDestinationId(eventItem);
+                var regionId = ResolveEventRegionId(eventItem);
+                var point = ResolveEventPoint(eventItem);
+                var distanceMeters = CalculateDistanceFromContext(context.Origin, point);
+                var durationMinutes = eventItem.EndDate.HasValue
+                        ? (int?)Math.Max(0, (int)Math.Round((eventItem.EndDate.Value - eventItem.StartDate).TotalMinutes))
+                        : null;
+
+                var score = 26d
+                    + RegionBoost(context, regionId, 18d)
+                    + FavoriteDestinationBoost(context, destinationId, 10d)
+                    + FavoriteRegionBoost(context, regionId, 6d)
+                    + ReviewedDestinationBoost(context, destinationId, 6d)
+                    + DistanceBoost(distanceMeters, 120_000d, 24d)
+                    + UpcomingEventBoost(eventItem.StartDate, eventItem.EndDate, 18d);
+
+                candidates.Add(new RecommendationCandidate
+                {
+                    ItemType = "event",
+                    ItemId = eventItem.Id,
+                    Title = eventItem.Name,
+                    Location = ResolveEventLocation(eventItem),
+                    CategoryName = eventItem.EventType?.Name ?? string.Empty,
+                    ImageUrl = GetMainImageUrl(eventItem.Images),
+                    AverageRating = null,
+                    ReviewCount = 0,
+                    Price = eventItem.Price,
+                    DurationMinutes = durationMinutes,
+                    DistanceMeters = distanceMeters,
+                    Score = score,
+                    DestinationId = destinationId,
+                    RegionId = regionId,
+                    GlobalFavoriteCount = 0,
                 });
             }
 
@@ -380,6 +451,7 @@ namespace TuristickiVodic.Services.Services
                 ["object"] = Math.Max(4, pageSize / 2),
                 ["destination"] = Math.Max(3, (int)Math.Ceiling(pageSize / 3d)),
                 ["activity"] = Math.Max(3, (int)Math.Ceiling(pageSize / 3d)),
+                ["event"] = Math.Max(3, (int)Math.Ceiling(pageSize / 3d)),
             };
 
             var selected = new List<RecommendationCandidate>();
@@ -446,6 +518,17 @@ namespace TuristickiVodic.Services.Services
                 ?? string.Empty;
         }
 
+        private static string ResolveEventLocation(Event eventItem)
+        {
+            return eventItem.Locality?.Name
+                ?? eventItem.Destination?.Name
+                ?? eventItem.Object?.Locality?.Name
+                ?? eventItem.Object?.Destination?.Name
+                ?? eventItem.Destination?.Region?.Name
+                ?? eventItem.EventType?.Name
+                ?? string.Empty;
+        }
+
         private static int ResolveObjectDestinationId(TouristObject obj)
         {
             return obj.DestinationId != 0
@@ -469,6 +552,30 @@ namespace TuristickiVodic.Services.Services
         {
             return activity.Destination?.RegionId
                 ?? activity.Locality?.Destination?.RegionId;
+        }
+
+        private static int? ResolveEventDestinationId(Event eventItem)
+        {
+            return eventItem.DestinationId
+                ?? eventItem.Locality?.DestinationId
+                ?? eventItem.Object?.DestinationId
+                ?? eventItem.Object?.Locality?.DestinationId;
+        }
+
+        private static int? ResolveEventRegionId(Event eventItem)
+        {
+            return eventItem.Destination?.RegionId
+                ?? eventItem.Locality?.Destination?.RegionId
+                ?? eventItem.Object?.Destination?.RegionId
+                ?? eventItem.Object?.Locality?.Destination?.RegionId;
+        }
+
+        private static Point? ResolveEventPoint(Event eventItem)
+        {
+            return eventItem.Geolocation
+                ?? eventItem.Object?.Geolocation
+                ?? eventItem.Locality?.Geolocation
+                ?? eventItem.Destination?.Geolocation;
         }
 
         private static int? ResolveReviewDestinationId(Review review)
@@ -552,6 +659,21 @@ namespace TuristickiVodic.Services.Services
             }
 
             var normalized = 1d - Math.Min(distanceMeters.Value, maxDistanceMeters) / maxDistanceMeters;
+            return Math.Max(0d, normalized * maxBoost);
+        }
+
+        private static double UpcomingEventBoost(DateTime startDate, DateTime? endDate, double maxBoost)
+        {
+            var now = DateTime.UtcNow;
+            var effectiveEnd = endDate ?? startDate;
+            if (effectiveEnd < now)
+            {
+                return 0d;
+            }
+
+            var daysUntilStart = Math.Max(0d, (startDate - now).TotalDays);
+            const double boostWindowDays = 21d;
+            var normalized = 1d - Math.Min(daysUntilStart, boostWindowDays) / boostWindowDays;
             return Math.Max(0d, normalized * maxBoost);
         }
 

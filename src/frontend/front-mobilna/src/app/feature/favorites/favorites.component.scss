@@ -711,7 +711,7 @@
   .favorites-desktop-toolbar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: 18px;
     max-width: 1680px;
     margin: 0 auto;
@@ -725,52 +725,10 @@
     max-width: none;
   }
 
-  .favorites-profile-chip {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-
-    strong {
-      display: block;
-      color: #111827;
-      font-size: 16px;
-      font-weight: 700;
-      text-align: right;
-    }
-
-    span {
-      color: #6b7280;
-      font-size: 13px;
-    }
-  }
-
-  .favorites-profile-chip__avatar {
-    width: 44px;
-    height: 44px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #fde68a, #f59e0b);
-    color: #111827;
-    font-size: 16px;
-    font-weight: 800;
-
-    svg {
-      width: 20px;
-      height: 20px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-  }
-
   .favorites-content-shell {
     width: min(100%, 1680px);
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-columns: minmax(0, 1fr) 300px;
     gap: 28px;
     margin: 0 auto;
     padding: 28px 32px 36px;
@@ -840,7 +798,7 @@
   }
 
   .favorites-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 22px;
   }
 
@@ -1027,6 +985,30 @@
     line-height: 1.55;
   }
 
+  .panel-recent {
+    display: grid;
+    gap: 4px;
+
+    strong {
+      color: #111827;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    span {
+      color: #0f82aa;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+  }
+
+  .panel-note--muted {
+    color: #94a3b8;
+    font-size: 13px;
+  }
+
   .favorites-remove-overlay {
     align-items: center;
     padding: 24px;
@@ -1074,6 +1056,6 @@
   }
 
   .favorites-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }

@@ -148,11 +148,11 @@ export class HotelDetailComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.router.navigate(['/hotels']);
+    this.router.navigate(['/objects']);
   }
 
   openNearbyHotel(hotelId: number): void {
-    this.router.navigate(['/hotel', hotelId]);
+    this.router.navigate(['/object', hotelId]);
   }
 
   bookNow(): void {

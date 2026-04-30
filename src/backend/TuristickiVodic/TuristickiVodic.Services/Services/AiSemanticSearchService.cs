@@ -1248,12 +1248,105 @@ namespace TuristickiVodic.Services.Services
 
         private static List<string> BuildFallbackTerms(string query)
         {
+            // Najpre detektujemo temu — ako je tema nocni zivot ili planinarenje, koristimo semanticke terme
+            // umesto sirovih tokena koji mogu da se poklapaju sa imenima mesta (npr. "Bar" = grad).
+            var theme = DetectQueryTheme(query);
+
+            if (theme == "nightlife")
+            {
+                // Koristimo konkretne feature termine koji postoje u tipovima objekata,
+                // ne tokene poput "bar" (= grad Bar) ili "drugarice" (nema znacenja u bazi).
+                return ["kafana", "klub", "cocktail", "music", "wine", "party"];
+            }
+
+            if (theme == "hiking")
+            {
+                return ["staza", "planinar", "trail", "trekking", "pesacenje", "setnja", "park", "priroda"];
+            }
+
+            if (theme == "food")
+            {
+                return ["restoran", "restaurant", "hrana", "rucak", "vecera", "kafic", "bistro"];
+            }
+
+            if (theme == "walk")
+            {
+                return ["setnja", "promenada", "park", "setaliste", "prirod", "staza"];
+            }
+
+            if (theme == "family")
+            {
+                return ["deca", "porodica", "park", "playground", "setnja", "prirod"];
+            }
+
+            // Generalni fallback — uzimamo tokene iz upita, ali filtriramo
+            // jednorecne geografske nazive koji bi mogli da zavedu (min 4 slova).
             return NormalizeText(query)
                 .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Where(token => token.Length >= 3 && !FallbackStopWords.Contains(token))
+                .Where(token => token.Length >= 4 && !FallbackStopWords.Contains(token))
                 .Distinct(StringComparer.Ordinal)
                 .Take(5)
                 .ToList();
+        }
+
+        /// <summary>
+        /// Detektuje opstu temu upita pre semanticke obrade, kako bi fallback plan
+        /// koristio smislene termine umesto sirovih tokena koji mogu zbuniti pretragu.
+        /// Na primer, "nocni provod sa drugaricama" sadrzi rec "bar" koja moze
+        /// da pogodi grad ili crkvu, a ne nocni klub.
+        /// </summary>
+        private static string DetectQueryTheme(string query)
+        {
+            var normalized = NormalizeText(query);
+
+            // Nocni provod — detektujemo eksplicitne i implicitne signale
+            if (normalized.Contains("nocni") || normalized.Contains("provod") ||
+                normalized.Contains("izlazak") || normalized.Contains("izadjemo") ||
+                normalized.Contains("izadjete") || normalized.Contains("izadjim") ||
+                normalized.Contains("kafana") || normalized.Contains("klub") ||
+                normalized.Contains("cocktail") || normalized.Contains("nightlife") ||
+                (normalized.Contains("uvece") && !normalized.Contains("restoran")) ||
+                normalized.Contains("veceras") || normalized.Contains("zabava"))
+            {
+                return "nightlife";
+            }
+
+            // Planinarenje i staze — korisnik pita za rute/staze/aktivnosti, ne za objekte
+            if (normalized.Contains("staza") || normalized.Contains("staze") ||
+                normalized.Contains("planinar") || normalized.Contains("trekking") ||
+                normalized.Contains("hiking") || normalized.Contains("uspon") ||
+                normalized.Contains("vrh") || normalized.Contains("planina") ||
+                normalized.Contains("nije strma") || normalized.Contains("nisu strme") ||
+                normalized.Contains("blaga") || normalized.Contains("laka staza"))
+            {
+                return "hiking";
+            }
+
+            // Hrana i restorani
+            if (normalized.Contains("restoran") || normalized.Contains("rucak") ||
+                normalized.Contains("vecera") || normalized.Contains("jelo") ||
+                normalized.Contains("hrana") || normalized.Contains("kuhinja"))
+            {
+                return "food";
+            }
+
+            // Setnja i setaliste
+            if (normalized.Contains("setnja") || normalized.Contains("setaliste") ||
+                normalized.Contains("promenada") || normalized.Contains("walk") ||
+                normalized.Contains("park"))
+            {
+                return "walk";
+            }
+
+            // Porodica i deca
+            if (normalized.Contains("deca") || normalized.Contains("decom") ||
+                normalized.Contains("porodica") || normalized.Contains("family") ||
+                normalized.Contains("kids"))
+            {
+                return "family";
+            }
+
+            return "general";
         }
 
         private static List<string> DetectLocationAnchors(string query, SearchExecutionContext context)
@@ -1342,16 +1435,38 @@ namespace TuristickiVodic.Services.Services
 
         private static SemanticSearchPlan BuildFallbackPlan(string query, SearchExecutionContext context)
         {
+            var theme = DetectQueryTheme(query);
+
+            // Biramo kategorije na osnovu teme — nocni provod ne trazi destinacije i crkve,
+            // planinarenje ne trazi hotele i restorane.
+            var categories = theme switch
+            {
+                "nightlife" => new List<string> { "object", "event", "locality" },
+                "hiking" => new List<string> { "activity", "locality", "destination" },
+                "food" => new List<string> { "object", "locality" },
+                "walk" => new List<string> { "activity", "locality", "destination" },
+                "family" => new List<string> { "activity", "locality", "destination", "object" },
+                _ => new List<string> { "destination", "locality", "object", "event", "activity" },
+            };
+
+            // Za nocni provod preferujemo konkretne tipove objekata (bar, klub, kafana)
+            var preferredObjectTypes = theme switch
+            {
+                "nightlife" => new List<string> { "bar", "kafana", "club", "klub", "wine", "winery", "restaurant", "restoran" },
+                "food" => new List<string> { "restoran", "restaurant", "kafic", "bistro" },
+                _ => new List<string>(),
+            };
+
             return new SemanticSearchPlan
             {
                 QuerySummary = query,
-                Categories = ["destination", "locality", "object", "event", "activity"],
+                Categories = categories,
                 RegionName = context.EffectiveRegion?.Name,
-                SearchStyle = "specific",
+                SearchStyle = theme == "nightlife" || theme == "food" ? "specific" : "exploratory",
                 LocationAnchors = [],
-                PreferredObjectTypes = [],
-                MustTerms = BuildFallbackTerms(query),
-                ShouldTerms = [],
+                PreferredObjectTypes = preferredObjectTypes,
+                MustTerms = [],
+                ShouldTerms = BuildFallbackTerms(query),
                 NearMe = context.Origin != null,
                 SortBy = context.Origin != null ? "distance" : "relevance",
                 PageSize = context.Request.PageSize,

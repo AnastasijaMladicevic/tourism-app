@@ -23,7 +23,6 @@ import { LocalityService } from '../../services/locality';
 import { RegionService } from '../../services/region';
 import { ActiveRegionService } from '../../services/active-region';
 import { LocationTrackingService, TrackedLocation } from '../../services/location-tracking';
-import { SmartSearchResultDto, SmartSearchService } from '../../services/smart-search';
 
 import { environment } from '../../../environment/environment';
 import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
@@ -121,7 +120,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     private regionService: RegionService,
     private activeRegionService: ActiveRegionService,
     private locationTrackingService: LocationTrackingService,
-    private smartSearchService: SmartSearchService,
   ) { }
 
   ngOnInit(): void {
@@ -417,34 +415,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.searchDebounceTimer = setTimeout(() => {
-      const currentLocation = this.locationTrackingService.getCurrentLocation();
-      const includeLocation =
-        this.locationTrackingService.isTrackingEnabled() && currentLocation != null;
+      if (this.searchQuery.trim() !== query) {
+        return;
+      }
 
-      this.smartSearchService
-        .searchMcp({
-          query,
-          pageSize: 8,
-          latitude: includeLocation ? currentLocation?.latitude : undefined,
-          longitude: includeLocation ? currentLocation?.longitude : undefined,
-        })
-        .pipe(catchError(() => of([] as SmartSearchResultDto[])))
-        .subscribe((results) => {
-          if (this.searchQuery.trim() !== query) {
-            return;
-          }
-
-          const mapped = results.map((result) => this.toSmartSearchResult(result));
-          if (mapped.length > 0) {
-            this.searchResults = mapped;
-            this.showSuggestions = true;
-          } else {
-            this.searchResults = [];
-            this.showSuggestions = false;
-          }
-
-          this.cdr.detectChanges();
-        });
+      this.applyFallbackSearch(query);
+      this.cdr.detectChanges();
     }, 260);
   }
 
@@ -540,17 +516,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private applyFallbackSearch(query: string): void {
-    const terms = this.tokenizeSearchQuery(query);
-    const scored = this.allItems
-      .map((item) => ({
-        item,
-        score: this.scoreItem(item, terms),
-      }))
-      .filter((x) => this.matchesAllTerms(x.item, terms))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 8);
-
-    this.searchResults = scored.map((x) => x.item);
+    this.searchResults = this.runLocalSearch(query, 8);
     this.showSuggestions = this.searchResults.length > 0;
   }
 
@@ -562,25 +528,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       .replace(/[\u0300-\u036f]/g, '')
       .split(/\s+/)
       .filter((token) => token.length >= 2 && !SEARCH_STOP_WORDS.has(token));
-  }
-
-  private toSmartSearchResult(result: SmartSearchResultDto): SearchResult {
-    return {
-      id: result.id,
-      name: result.name,
-      typeName: result.typeName,
-      location: result.location,
-      image: this.resolveMediaUrl(result.imageUrl),
-      icon: result.icon || 'place',
-      lat: result.latitude,
-      lng: result.longitude,
-      raw: {
-        matchReason: result.matchReason,
-        score: result.score,
-      },
-      category: result.category,
-      markerType: result.markerType,
-    };
   }
 
   toggleFilter(key: string): void {
@@ -975,8 +922,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.router.navigate(['/activity', this.selectedItem.id]);
         break;
       case 'hotel':
-        this.router.navigate(['/hotel', this.selectedItem.id]);
-        break;
       default:
         this.router.navigate(['/object', this.selectedItem.id]);
         break;
@@ -1139,16 +1084,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.routeSuggestionsRight = `${window.innerWidth - rect.right}px`;
     }
 
-    this.smartSearchService
-      .searchMcp({
-        query,
-        pageSize: 6,
-      })
-      .pipe(catchError(() => of([] as SmartSearchResultDto[])))
-      .subscribe((results) => {
-        this.routeSearchResults = results.map((result) => this.toSmartSearchResult(result));
-        this.cdr.detectChanges();
-      });
+    this.routeSearchResults = this.runLocalSearch(query, 6);
+    this.cdr.detectChanges();
   }
   addMyLocationAsStart(): void {
     if (!this.userLocation) return;
@@ -1165,5 +1102,18 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     this.calculateRoute();
+  }
+
+  private runLocalSearch(query: string, limit: number): SearchResult[] {
+    const terms = this.tokenizeSearchQuery(query);
+    return this.allItems
+      .map((item) => ({
+        item,
+        score: this.scoreItem(item, terms),
+      }))
+      .filter((entry) => this.matchesAllTerms(entry.item, terms))
+      .sort((left, right) => right.score - left.score)
+      .slice(0, limit)
+      .map((entry) => entry.item);
   }
 }

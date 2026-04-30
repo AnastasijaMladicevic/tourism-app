@@ -45,7 +45,7 @@
                     "defaultUser":  "SpireGO user",
                     "stats":  {
                                   "favorites":  "FAVORITES",
-                                  "plans":  "PLANS",
+                                  "plans":  "Plans",
                                   "reviews":  "REVIEWS"
                               },
                     "section":  {
@@ -233,6 +233,8 @@
                         "selectedCount":  "Selected: {{count}}",
                         "appLanguage":  "App language",
                         "currentLanguage":  "Current: {{language}}",
+                        "changePassword":  "Change password",
+                        "changePasswordBody":  "Update your account password",
                         "saving":  "Saving...",
                         "saveChanges":  "Save changes",
                         "cancelChanges":  "Cancel changes",

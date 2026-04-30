@@ -1,18 +1,19 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, forkJoin, map, of } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 import { environment } from '../../../environment/environment';
 import { AuthService, UserDto } from '../../services/auth';
 import { FavoriteService } from '../../services/favorite';
 import { EventPlannerService } from '../../services/event-planner';
-import { ReviewDto, ReviewService } from '../../services/review';
+import { ReviewService } from '../../services/review';
+import { ProfileStatsCacheService, ProfileStatsSnapshot } from '../../services/profile-stats-cache';
 import { TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 interface ProfileStat {
   labelKey: string;
-  value: number;
+  value: number | null;
   icon: 'heart' | 'calendar' | 'star';
 }
 
@@ -41,21 +42,19 @@ export class ProfileComponent implements OnInit {
   private readonly favoriteService = inject(FavoriteService);
   private readonly eventPlannerService = inject(EventPlannerService);
   private readonly reviewService = inject(ReviewService);
+  private readonly profileStatsCache = inject(ProfileStatsCacheService);
   private readonly router = inject(Router);
   private readonly translationService = inject(TranslationService);
 
   protected user: UserDto | null = null;
-  protected stats: ProfileStat[] = [
-    { labelKey: 'profile.stats.favorites', value: 0, icon: 'heart' },
-    { labelKey: 'profile.stats.plans', value: 0, icon: 'calendar' },
-    { labelKey: 'profile.stats.reviews', value: 0, icon: 'star' },
-  ];
+  protected readonly stats = signal<ProfileStat[]>(this.buildStats());
 
   protected readonly sections: ProfileSection[] = [
     {
       titleKey: 'profile.section.trips',
       items: [
         { titleKey: 'profile.favorites', icon: 'heart', accent: 'teal', route: '/favorites' },
+        { titleKey: 'profile.stats.plans', icon: 'calendar', accent: 'green', route: '/planner' },
         { titleKey: 'profile.myReviews', icon: 'star', accent: 'blue', route: '/my-reviews' },
       ],
     },
@@ -92,6 +91,7 @@ export class ProfileComponent implements OnInit {
     }
 
     this.user = currentUser;
+    this.applyStatsSnapshot(this.resolveInitialStats(currentUser));
     this.loadStats();
 
     this.authService
@@ -100,6 +100,7 @@ export class ProfileComponent implements OnInit {
       .subscribe((user) => {
         if (!user) return;
         this.user = user;
+        this.applyStatsSnapshot(this.resolveInitialStats(user));
         this.loadStats();
       });
   }
@@ -171,24 +172,58 @@ export class ProfileComponent implements OnInit {
     }
 
     forkJoin({
-      favorites: this.favoriteService.getMyFavorites().pipe(
-        map((items) => items.length),
-        catchError(() => of(0)),
-      ),
+      favorites: this.favoriteService
+        .getMyFavoritesPaged({ page: 1, pageSize: 1 })
+        .pipe(catchError(() => of({ items: [], page: 1, pageSize: 1, totalCount: 0, totalPages: 0 }))),
       planner: this.eventPlannerService
-        .getMyPlanner({ page: 1, pageSize: 200 })
-        .pipe(map((items) => this.readCollectionCount(items)), catchError(() => of(0))),
-      reviews: this.reviewService.getMine({ page: 1, pageSize: 200 }, { bypassRegion: true }).pipe(
-        map((items) => this.readCollectionCount(items)),
-        catchError(() => of(0)),
-      ),
+        .getMyPlanner({ page: 1, pageSize: 1 })
+        .pipe(catchError(() => of({ items: [], page: 1, pageSize: 1, totalCount: 0, totalPages: 0 }))),
+      reviews: this.reviewService
+        .getMine({ page: 1, pageSize: 1 }, { bypassRegion: true })
+        .pipe(catchError(() => of({ items: [], page: 1, pageSize: 1, totalCount: 0, totalPages: 0 }))),
     }).subscribe(({ favorites, planner, reviews }) => {
-      this.stats = [
-        { labelKey: 'profile.stats.favorites', value: favorites, icon: 'heart' },
-        { labelKey: 'profile.stats.plans', value: planner, icon: 'calendar' },
-        { labelKey: 'profile.stats.reviews', value: reviews, icon: 'star' },
-      ];
+      const snapshot = this.profileStatsCache.write({
+        favorites: this.readCollectionCount(favorites),
+        plans: this.readCollectionCount(planner),
+        reviews: this.readCollectionCount(reviews),
+      });
+
+      if (this.user) {
+        const updatedUser: UserDto = {
+          ...this.user,
+          favoritesCount: snapshot.favorites,
+          plansCount: snapshot.plans,
+          reviewsCount: snapshot.reviews,
+        };
+
+        this.user = updatedUser;
+        this.authService.setCurrentUser(updatedUser);
+      }
+
+      this.applyStatsSnapshot(snapshot);
     });
+  }
+
+  private resolveInitialStats(user: UserDto): Partial<ProfileStatsSnapshot> {
+    const cached = this.profileStatsCache.read();
+
+    return {
+      favorites: this.readPreferredCount(user.favoritesCount, cached?.favorites),
+      plans: this.readPreferredCount(user.plansCount, cached?.plans),
+      reviews: this.readPreferredCount(user.reviewsCount, cached?.reviews),
+    };
+  }
+
+  private applyStatsSnapshot(snapshot: Partial<ProfileStatsSnapshot>): void {
+    this.stats.set(this.buildStats(snapshot));
+  }
+
+  private buildStats(snapshot: Partial<ProfileStatsSnapshot> = {}): ProfileStat[] {
+    return [
+      { labelKey: 'profile.stats.favorites', value: this.toDisplayCount(snapshot.favorites), icon: 'heart' },
+      { labelKey: 'profile.stats.plans', value: this.toDisplayCount(snapshot.plans), icon: 'calendar' },
+      { labelKey: 'profile.stats.reviews', value: this.toDisplayCount(snapshot.reviews), icon: 'star' },
+    ];
   }
 
   private readCollectionCount(raw: unknown): number {
@@ -201,7 +236,16 @@ export class ProfileComponent implements OnInit {
     }
 
     const obj = raw as Record<string, unknown>;
-    const totalCount = obj['totalCount'] ?? obj['TotalCount'];
+
+    // Proba sve poznate varijante totalCount polja
+    const totalCount =
+      obj['totalCount'] ??
+      obj['TotalCount'] ??
+      obj['total'] ??
+      obj['Total'] ??
+      obj['count'] ??
+      obj['Count'];
+
     if (typeof totalCount === 'number') {
       return totalCount;
     }
@@ -213,7 +257,15 @@ export class ProfileComponent implements OnInit {
       }
     }
 
-    const items = obj['items'] ?? obj['Items'] ?? obj['data'] ?? obj['Data'] ?? obj['results'] ?? obj['Results'];
+    // Proba array polja
+    const items =
+      obj['items'] ??
+      obj['Items'] ??
+      obj['data'] ??
+      obj['Data'] ??
+      obj['results'] ??
+      obj['Results'];
+
     if (Array.isArray(items)) {
       return items.length;
     }
@@ -224,5 +276,56 @@ export class ProfileComponent implements OnInit {
     }
 
     return 0;
+  }
+
+  private readPreferredCount(primary: unknown, fallback: unknown): number | undefined {
+    const fallbackCount = this.toStoredCount(fallback);
+
+    if (typeof primary === 'number' && Number.isFinite(primary) && primary > 0) {
+      return primary;
+    }
+
+    if (typeof primary === 'string') {
+      const parsed = Number(primary);
+      if (Number.isFinite(parsed) && parsed > 0) {
+        return parsed;
+      }
+    }
+
+    if (fallbackCount != null) {
+      return fallbackCount;
+    }
+
+    return undefined;
+  }
+
+  private toDisplayCount(value: unknown): number | null {
+    if (typeof value === 'number' && Number.isFinite(value) && value >= 0) {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      const parsed = Number(value);
+      if (Number.isFinite(parsed) && parsed >= 0) {
+        return parsed;
+      }
+    }
+
+    return null;
+  }
+
+  private toStoredCount(value: unknown): number | undefined {
+    if (typeof value === 'number' && Number.isFinite(value) && value >= 0) {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      const parsed = Number(value);
+      if (Number.isFinite(parsed) && parsed >= 0) {
+        return parsed;
+      }
+    }
+
+    return undefined;
   }
 }

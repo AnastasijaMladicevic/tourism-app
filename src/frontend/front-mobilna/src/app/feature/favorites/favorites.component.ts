@@ -8,6 +8,7 @@ import { DestinationDto, DestinationService } from '../../services/destination';
 import { FavoriteDto, FavoriteService } from '../../services/favorite';
 import { LocalityDto, LocalityService } from '../../services/locality';
 import { ObjectDto, ObjectService } from '../../services/object';
+import { ProfileStatsCacheService } from '../../services/profile-stats-cache';
 import { TranslationService } from '../../services/translation.service';
 
 type FavoriteKind = 'destination' | 'activity' | 'object' | 'locality' | 'route' | 'other';
@@ -59,6 +60,7 @@ export class FavoritesComponent implements OnInit {
   private readonly objectService = inject(ObjectService);
   private readonly activityService = inject(ActivityService);
   private readonly localityService = inject(LocalityService);
+  private readonly profileStatsCache = inject(ProfileStatsCacheService);
   private readonly router = inject(Router);
 
   protected readonly favorites = signal<FavoriteCard[]>([]);
@@ -124,12 +126,8 @@ export class FavoritesComponent implements OnInit {
     ].filter((item) => item.count > 0);
   });
 
-  protected readonly latestSavedLabel = computed(() => {
-    const newest = [...this.favorites()].sort(
-      (left, right) => right.createdAtTimestamp - left.createdAtTimestamp,
-    )[0];
-
-    return newest?.note ?? this.translate('favorites.latestEmpty');
+  protected readonly latestSavedItem = computed(() => {
+    return [...this.favorites()].sort((left, right) => right.createdAtTimestamp - left.createdAtTimestamp)[0] ?? null;
   });
 
   protected readonly sortLabel = computed(() =>
@@ -207,6 +205,7 @@ export class FavoritesComponent implements OnInit {
     }
 
     this.favorites.set(nextFavorites);
+    this.profileStatsCache.write({ favorites: nextFavorites.length });
     this.removingFavoriteId.set(favoriteId);
     this.errorMessage.set('');
     this.pendingRemovalFavorite.set(null);
@@ -259,7 +258,9 @@ export class FavoritesComponent implements OnInit {
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe((items) => {
-        this.favorites.set(items.filter(Boolean));
+        const nextItems = items.filter(Boolean);
+        this.favorites.set(nextItems);
+        this.profileStatsCache.write({ favorites: nextItems.length });
       });
   }
 

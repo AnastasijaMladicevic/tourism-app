@@ -62,6 +62,47 @@
   font-weight: 600;
 }
 
+.answer-card {
+  margin-bottom: 18px;
+  border: 1px solid #d8edf7;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.94);
+  padding: 16px 18px;
+  box-shadow: 0 12px 32px rgba(20, 103, 132, 0.08);
+}
+
+.answer-card__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #edf8fc;
+  color: #17779b;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.answer-card__badge mat-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+}
+
+.answer-card__text {
+  margin: 14px 0 0;
+  color: #1f3340;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.answer-card__warning {
+  margin: 12px 0 0;
+  color: #5f7b89;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
 .search-page__list {
   display: flex;
   flex-direction: column;

@@ -486,7 +486,25 @@ button:hover {
   margin: 0;
 }
 
+.nearby-list {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 10px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex-wrap: nowrap;
+}
+
+.nearby-list::-webkit-scrollbar {
+  display: none;
+}
+
 .nearby-item {
+  flex: 0 0 178px;
+  width: 178px;
+  max-width: 178px;
   overflow: hidden;
   background: transparent;
   box-shadow: none;
@@ -499,7 +517,8 @@ button:hover {
 }
 
 .nearby-item__image {
-  height: 146px;
+  width: 178px;
+  height: 118px;
   border-radius: 18px;
   overflow: hidden;
   background: linear-gradient(135deg, #dbeafe, #bfdbfe);
@@ -841,8 +860,6 @@ button:hover {
   }
 
   .nearby-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 5px;
+    gap: 14px;
   }
 }

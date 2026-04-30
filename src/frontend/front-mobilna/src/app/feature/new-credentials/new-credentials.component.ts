@@ -42,6 +42,7 @@ export class NewCredentialsComponent {
   isForgotFlow = false;
   isLoading = false;
   errorMessage = '';
+  hideCurrentPassword = true;
   hideNewPassword = true;
   hideConfirmPassword = true;
   resetSessionToken = '';
@@ -50,14 +51,27 @@ export class NewCredentialsComponent {
     this.code = history.state?.code ?? '';
     this.isForgotFlow = !!this.email;
     this.resetSessionToken = history.state?.resetSessionToken ?? '';
+    this.updateCurrentPasswordValidator();
   }
   readonly form = this.fb.group(
     {
+      currentPassword: [''],
       newPassword: ['', [Validators.required, Validators.pattern(passwordStrengthRegex)]],
       confirmPassword: ['', [Validators.required]],
     },
     { validators: passwordMatchValidator },
   );
+
+  private updateCurrentPasswordValidator(): void {
+    const currentPasswordControl = this.form.controls.currentPassword;
+    if (this.isForgotFlow) {
+      currentPasswordControl.clearValidators();
+    } else {
+      currentPasswordControl.setValidators([Validators.required]);
+    }
+
+    currentPasswordControl.updateValueAndValidity({ emitEvent: false });
+  }
 
   get newPasswordValue(): string {
     return this.form.controls.newPassword.value ?? '';
@@ -117,7 +131,7 @@ export class NewCredentialsComponent {
     }
 
     const dto: ChangePasswordDto = {
-      currentPassword: '',
+      currentPassword: this.form.controls.currentPassword.value ?? '',
       newPassword: this.form.controls.newPassword.value ?? '',
       confirmPassword: this.form.controls.confirmPassword.value ?? '',
     };
@@ -147,11 +161,19 @@ export class NewCredentialsComponent {
     this.hideNewPassword = !this.hideNewPassword;
   }
 
+  toggleCurrentPassword(): void {
+    this.hideCurrentPassword = !this.hideCurrentPassword;
+  }
+
   toggleConfirmPassword(): void {
     this.hideConfirmPassword = !this.hideConfirmPassword;
   }
 
   cancel(): void {
     this.location.back();
+  }
+
+  openForgotPassword(): void {
+    this.router.navigate(['/forgot-password']);
   }
 }

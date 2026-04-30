@@ -45,7 +45,7 @@
                     "defaultUser":  "Utente SpireGO",
                     "stats":  {
                                   "favorites":  "PREFERITI",
-                                  "plans":  "PIANI",
+                                  "plans":  "Piani",
                                   "reviews":  "RECENSIONI"
                               },
                     "section":  {
@@ -233,6 +233,8 @@
                         "selectedCount":  "Selezionati: {{count}}",
                         "appLanguage":  "Lingua dell\u0027app",
                         "currentLanguage":  "Attuale: {{language}}",
+                        "changePassword":  "Cambia password",
+                        "changePasswordBody":  "Aggiorna la password del tuo account",
                         "saving":  "Salvataggio...",
                         "saveChanges":  "Salva modifiche",
                         "cancelChanges":  "Annulla modifiche",

@@ -210,7 +210,8 @@ export const routes: Routes = [
   },
   {
     path: 'hotels',
-    loadComponent: () => import('./feature/hotels/hotels').then((m) => m.HotelsComponent),
+    loadComponent: () => import('./feature/objects/objects').then((m) => m.ObjectsComponent),
+    data: { type: 'Hotel', title: 'Hotels' },
   },
   {
     path: 'restaurants',
@@ -301,12 +302,12 @@ export const routes: Routes = [
   {
     path: 'hotel/:id',
     loadComponent: () =>
-      import('./feature/hotel-detail/hotel-detail').then((m) => m.HotelDetailComponent),
+      import('./feature/object-detail/object-detail').then((m) => m.ObjectDetailComponent),
   },
   {
     path: 'restaurant/:id',
     loadComponent: () =>
-      import('./feature/restaurant-detail/restaurant-detail').then(m => m.RestaurantDetailComponent)
+      import('./feature/object-detail/object-detail').then((m) => m.ObjectDetailComponent)
   },
   {
     path: 'map',

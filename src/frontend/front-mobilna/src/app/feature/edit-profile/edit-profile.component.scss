@@ -345,14 +345,11 @@
   border: none;
   border-bottom: 1px solid rgba(227, 235, 239, 0.95);
   background: transparent;
-  padding: 14px 16px;
+  padding: 16px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  color: #42545c;
-  font-size: 14px;
-  font-weight: 700;
   text-align: left;
   cursor: pointer;
 
@@ -361,14 +358,35 @@
   }
 }
 
-.language-option--active {
-  background: #f2fbfe;
-  color: #1b8bb7;
+.language-option__content {
+  strong {
+    color: #2c3f49;
+    font-size: 15px;
+    font-weight: 800;
+  }
 }
 
-.language-option__check {
-  font-size: 14px;
-  font-weight: 900;
+.language-option__radio {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.8px solid #d9e4ea;
+  border-radius: 50%;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #1493bc;
+  }
+}
+
+.language-option__radio--active {
+  border-color: #1493bc;
+  box-shadow: 0 0 0 3px rgba(20, 147, 188, 0.12);
 }
 
 .language-card__icon {
@@ -418,6 +436,10 @@
   stroke-width: 2.2;
   fill: none;
   flex-shrink: 0;
+}
+
+.password-card {
+  margin-top: -2px;
 }
 
 /* ── Actions ── */

@@ -617,11 +617,12 @@ button:hover {
 
 .nearby-list {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   overflow-x: auto;
   padding-bottom: 10px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  flex-wrap: nowrap;
 }
 
 .nearby-list::-webkit-scrollbar {
@@ -629,9 +630,9 @@ button:hover {
 }
 
 .nearby-item {
-  flex: 0 0 auto;
-  width: 320px;
-  max-width: 320px;
+  flex: 0 0 178px;
+  width: 178px;
+  max-width: 178px;
   overflow: hidden;
   background: transparent;
   box-shadow: none;
@@ -644,8 +645,8 @@ button:hover {
 }
 
 .nearby-item__image {
-  width: 320px;
-  height: 146px;
+  width: 178px;
+  height: 118px;
   border-radius: 18px;
   overflow: hidden;
   background: linear-gradient(135deg, #dbeafe, #bfdbfe);

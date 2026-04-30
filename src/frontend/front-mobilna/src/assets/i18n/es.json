@@ -45,7 +45,7 @@
                     "defaultUser":  "Usuario SpireGO",
                     "stats":  {
                                   "favorites":  "FAVORITOS",
-                                  "plans":  "PLANES",
+                                  "plans":  "Planes",
                                   "reviews":  "RESEÑAS"
                               },
                     "section":  {
@@ -233,6 +233,8 @@
                         "selectedCount":  "Seleccionados: {{count}}",
                         "appLanguage":  "Idioma de la app",
                         "currentLanguage":  "Actual: {{language}}",
+                        "changePassword":  "Cambiar contrasena",
+                        "changePasswordBody":  "Actualiza la contrasena de tu cuenta",
                         "saving":  "Guardando...",
                         "saveChanges":  "Guardar cambios",
                         "cancelChanges":  "Cancelar cambios",

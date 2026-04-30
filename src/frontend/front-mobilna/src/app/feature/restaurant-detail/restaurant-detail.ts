@@ -116,7 +116,7 @@ export class RestaurantDetailComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/restaurants']);   // ili /objects
+    this.router.navigate(['/objects']);
   }
 
   viewOnMap(): void {

@@ -16,7 +16,6 @@ import { MatIcon } from "@angular/material/icon";
 import { LazyBackgroundDirective } from '../../shared/directives/lazy-background.directive';
 import { RecommendationItemDto, RecommendationService } from '../../services/recommendation';
 import { LocationTrackingService } from '../../services/location-tracking';
-import { SmartSearchResultDto, SmartSearchService } from '../../services/smart-search';
 
 interface PlaceCard {
   title: string;
@@ -25,10 +24,11 @@ interface PlaceCard {
   imageUrl?: string;
   isFavorite: boolean;
   itemId: number;
-  itemType: 'destination' | 'object' | 'activity';
+  itemType: 'destination' | 'object' | 'activity' | 'event';
   targetUrl: string;
   favoriteId?: number;
   showRating: boolean;
+  distanceText?: string;
 }
 
 interface EventCard {
@@ -40,6 +40,7 @@ interface EventCard {
   isFree: boolean;
   timeText: string;
   imageUrl?: string;
+  distanceText?: string;
 }
 
 interface FeaturedDestination {
@@ -59,31 +60,11 @@ interface ApiTranslationDto {
   translatedText: string;
   isAutoTranslated: boolean;
 }
-
-interface SearchResult {
-  id: number;
-  name: string;
-  typeName: string;
-  location: string;
-  image?: string;
-  icon: string;
-  lat?: number;
-  lng?: number;
-  raw: any;
-  category: 'destination' | 'locality' | 'object' | 'event' | 'activity';
-  markerType: string;
-}
 interface HomeCategory {
   label: string;
   route: string;
   key: 'object' | 'locality' | 'event' | 'activity' | 'destination'
 }
-
-const SEARCH_STOP_WORDS = new Set([
-  'gde', 'mogu', 'moze', 'da', 'na', 'sa', 'u', 'uz', 'za', 'od', 'do', 'i', 'ili',
-  'nije', 'nisu', 'je', 'su', 'koji', 'koja', 'koje', 'mnogo', 'malo', 'malom',
-  'mala', 'male', 'mali', 'skupa', 'skupo', 'skup', 'skupu', 'hrana', 'hranu',
-]);
 
 @Component({
   selector: 'app-home',
@@ -108,8 +89,7 @@ export class HomeComponent implements OnInit {
   popular: PlaceCard[] = [];
   events: any[] = [];
   upcomingEvents: EventCard[] = [];
-  searchResults: SearchResult[] = [];
-  private allItems: SearchResult[] = [];
+  searchResults: Array<{ id: number; name: string; typeName: string; location: string; image?: string; icon?: string }> = [];
   rotationInterval: any;
   currentIndex = 0;
   showSuggestions = false;
@@ -135,64 +115,12 @@ export class HomeComponent implements OnInit {
     private authService: AuthService,
     private recommendationService: RecommendationService,
     private locationTrackingService: LocationTrackingService,
-    private smartSearchService: SmartSearchService,
   ) { }
   onSearchInput(): void {
-    const query = this.searchQuery.trim();
-    if (!query) {
-      this.searchResults = [];
-      this.showSuggestions = false;
-      return;
-    }
-
     if (this.searchDebounceTimer) {
       clearTimeout(this.searchDebounceTimer);
+      this.searchDebounceTimer = null;
     }
-
-    this.searchDebounceTimer = setTimeout(() => {
-      const currentLocation = this.locationTrackingService.getCurrentLocation();
-      const includeLocation =
-        this.locationTrackingService.isTrackingEnabled() && currentLocation != null;
-
-      this.smartSearchService
-        .searchMcp({
-          query,
-          pageSize: 8,
-          latitude: includeLocation ? currentLocation?.latitude : undefined,
-          longitude: includeLocation ? currentLocation?.longitude : undefined,
-        })
-        .pipe(catchError(() => of([] as SmartSearchResultDto[])))
-        .subscribe((results) => {
-          if (this.searchQuery.trim() !== query) {
-            return;
-          }
-
-          const mapped = results.map((result) => this.toSmartSearchResult(result));
-          if (mapped.length > 0) {
-            this.searchResults = mapped;
-            this.showSuggestions = true;
-          } else {
-            this.searchResults = [];
-            this.showSuggestions = false;
-          }
-
-          this.cdr.detectChanges();
-        });
-    }, 260);
-  }
-  onSearchBlur(): void {
-    setTimeout(() => {
-      this.showSuggestions = false;
-    }, 150);
-  }
-  private matchesAllTerms(item: SearchResult, terms: string[]): boolean {
-    const name = item.name.toLowerCase();
-    const desc = (item.raw.description ?? '').toLowerCase();
-    const amenities = this.getAmenityText(item).toLowerCase();
-
-    return terms.every(
-      (term) => name.includes(term) || desc.includes(term) || amenities.includes(term),
-    );
   }
   clearSearch(): void {
     this.searchQuery = '';
@@ -200,9 +128,44 @@ export class HomeComponent implements OnInit {
       clearTimeout(this.searchDebounceTimer);
       this.searchDebounceTimer = null;
     }
-    this.searchResults = [];
-    this.showSuggestions = false;
   }
+
+  private distanceTextFromCoords(latitude?: number | null, longitude?: number | null): string {
+  if (!this.shouldShowLiveDistance() || latitude == null || longitude == null) {
+    return '';
+  }
+
+  const currentLocation = this.locationTrackingService.getCurrentLocation();
+  if (!currentLocation) return '';
+
+  const distanceMeters = this.calculateDistanceMeters(
+    currentLocation.latitude,
+    currentLocation.longitude,
+    latitude,
+    longitude
+  );
+
+  return distanceMeters >= 1000
+    ? `${(distanceMeters / 1000).toFixed(1)} km away`
+    : `${Math.round(distanceMeters)} m away`;
+}
+
+private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const r = 6371000;
+  const toRad = (value: number) => (value * Math.PI) / 180;
+
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+  return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 
   submitSearch(): void {
     const query = this.searchQuery.trim();
@@ -210,78 +173,9 @@ export class HomeComponent implements OnInit {
       return;
     }
 
-    this.showSuggestions = false;
     this.router.navigate(['/search'], {
       queryParams: { q: query, source: 'home' },
     });
-  }
-  private scoreItem(item: SearchResult, terms: string[]): number {
-    let score = 0;
-    const name = item.name.toLowerCase();
-    const desc = (item.raw.description ?? '').toLowerCase();
-    const amenities = this.getAmenityText(item).toLowerCase();
-
-    for (const term of terms) {
-      if (name.includes(term)) score += 3;
-      if (desc.includes(term)) score += 1;
-      if (amenities.includes(term)) score += 0.5;
-    }
-    return score;
-  }
-
-  private applyFallbackSearch(query: string): void {
-    const terms = this.tokenizeSearchQuery(query);
-    const scored = this.allItems
-      .map((item) => ({
-        item,
-        score: this.scoreItem(item, terms),
-      }))
-      .filter((x) => this.matchesAllTerms(x.item, terms))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 8);
-
-    this.searchResults = scored.map((x) => x.item);
-    this.showSuggestions = this.searchResults.length > 0;
-  }
-
-  private tokenizeSearchQuery(query: string): string[] {
-    return query
-      .trim()
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .split(/\s+/)
-      .filter((token) => token.length >= 2 && !SEARCH_STOP_WORDS.has(token));
-  }
-
-  private toSmartSearchResult(result: SmartSearchResultDto): SearchResult {
-    return {
-      id: result.id,
-      name: result.name,
-      typeName: result.typeName,
-      location: result.location,
-      image: this.resolveMediaUrl(result.imageUrl),
-      icon: result.icon || this.getCategoryIcon(result.category),
-      lat: result.latitude,
-      lng: result.longitude,
-      raw: {
-        matchReason: result.matchReason,
-        score: result.score,
-      },
-      category: result.category,
-      markerType: result.markerType,
-    };
-  }
-  private getAmenityText(item: SearchResult): string {
-    const rawAmenities = Array.isArray(item.raw?.amenities)
-      ? item.raw.amenities.join(' ')
-      : '';
-    const rawCuisine = item.raw?.cuisineType ?? '';
-    const rawType = item.raw?.objectTypeName ?? item.raw?.eventTypeName ?? item.raw?.destinationTypeName ?? '';
-    const rawDescription = item.raw?.description ?? '';
-
-    const realText = `${rawAmenities} ${rawCuisine} ${rawType} ${rawDescription}`.trim();
-    return realText;
   }
   nextFeatured(): void {
     if (!this.featuredDestinations.length) return;
@@ -323,34 +217,8 @@ export class HomeComponent implements OnInit {
       this.searchDebounceTimer = null;
     }
   }
-  selectSuggestion(result: SearchResult): void {
-    this.searchQuery = result.name;
+  selectSuggestion(_result?: { id: number }): void {
     this.showSuggestions = false;
-    this.openSearchResult(result);
-  }
-
-  private openSearchResult(result: SearchResult): void {
-    switch (result.category) {
-      case 'destination':
-      case 'locality':
-      case 'activity':
-        this.router.navigate(['/map'], {
-          state: {
-            lat: result.lat,
-            lng: result.lng,
-            zoom: 14,
-            selectedItem: { id: result.id },
-            selectedType: result.category,
-          },
-        });
-        break;
-      case 'object':
-        this.router.navigate(['/object', result.id]);
-        break;
-      case 'event':
-        this.router.navigate(['/event', result.id]);
-        break;
-    }
   }
   loadEvents(): void {
     this.eventService.getAll().subscribe({
@@ -518,18 +386,6 @@ export class HomeComponent implements OnInit {
         }
 
         this.flushUi();
-        this.allItems = [
-          ...this.toArray<DestinationDto>(destinations).map(d => this.normalizeDestination(d)).map(d => ({
-            id: d.id, name: d.name, typeName: d.destinationTypeName,
-            location: d.regionName ?? d.destinationTypeName ?? '', image: d.mainImageUrl, icon: 'place',
-            raw: d, category: 'destination' as const, markerType: 'destination'
-          })),
-          ...this.toArray<ObjectDto>(objects).map(o => this.normalizeObject(o)).map(o => ({
-            id: o.id, name: o.name, typeName: o.objectTypeName,
-            location: o.localityName ?? '', image: o.mainImageUrl, icon: 'apartment',
-            raw: o, category: 'object' as const, markerType: o.objectTypeName?.toLowerCase().includes('hotel') ? 'hotel' : 'restaurant'
-          })),
-        ];
       });
   }
 
@@ -646,28 +502,12 @@ export class HomeComponent implements OnInit {
             isFree: !e.price || e.price <= 0,
             timeText: this.eventTime(e.startDate, e.endDate),
             imageUrl: this.pickEventImage(e),
+            distanceText: this.distanceTextFromCoords(e.latitude, e.longitude),
           }),
         );
 
         this.upcomingEvents = eventCards;
         this.events = eventCards;
-
-        const mappedEvents = future.map((e) => ({
-          id: e.id,
-          name: e.name,
-          typeName: 'Event',
-          location: e.localityName ?? e.destinationName ?? e.regionName ?? '',
-          image: this.pickEventImage(e),
-          icon: 'event',
-          raw: e,
-          category: 'event' as const,
-          markerType: 'event',
-        }));
-
-        this.allItems = [
-          ...this.allItems.filter((item) => item.category !== 'event'),
-          ...mappedEvents,
-        ];
 
         this.flushUi();
       });
@@ -726,6 +566,8 @@ export class HomeComponent implements OnInit {
     isActive: boolean;
     averageRating?: number;
     reviewCount?: number;
+    latitude?: number;
+    longitude?: number;
     mainImageUrl?: string;
     images?: unknown[];
   } {
@@ -740,6 +582,8 @@ export class HomeComponent implements OnInit {
       isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
       averageRating: this.readOptionalNumber(dto, ['averageRating', 'AverageRating']),
       reviewCount: this.readOptionalNumber(dto, ['reviewCount', 'ReviewCount']),
+      latitude: this.readOptionalNumber(dto, ['latitude', 'Latitude']),
+      longitude: this.readOptionalNumber(dto, ['longitude', 'Longitude']),
       mainImageUrl: this.readString(dto, ['mainImageUrl', 'MainImageUrl']),
       images: (dto['images'] ?? dto['Images']) as unknown[] | undefined,
     };
@@ -756,6 +600,8 @@ export class HomeComponent implements OnInit {
     averageRating?: number;
     reviewCount?: number;
     isActive: boolean;
+    latitude?: number;
+    longitude?: number;
     mainImageUrl?: string;
     images?: unknown[];
   } {
@@ -772,6 +618,8 @@ export class HomeComponent implements OnInit {
       averageRating: this.readOptionalNumber(dto, ['averageRating', 'AverageRating']),
       reviewCount: this.readOptionalNumber(dto, ['reviewCount', 'ReviewCount']),
       isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
+      latitude: this.readOptionalNumber(dto, ['latitude', 'Latitude']),
+      longitude: this.readOptionalNumber(dto, ['longitude', 'Longitude']),
       mainImageUrl: this.readString(dto, ['mainImageUrl', 'MainImageUrl']),
       images: (dto['images'] ?? dto['Images']) as unknown[] | undefined,
     };
@@ -787,6 +635,8 @@ export class HomeComponent implements OnInit {
     price?: number;
     durationMinutes?: number;
     isActive: boolean;
+    latitude?: number;
+    longitude?: number;
     mainImageUrl?: string;
   } {
     const dto = raw as unknown as Record<string, unknown>;
@@ -801,6 +651,8 @@ export class HomeComponent implements OnInit {
       price: this.readOptionalNumber(dto, ['price', 'Price']),
       durationMinutes: this.readOptionalNumber(dto, ['durationMinutes', 'DurationMinutes']),
       isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
+      latitude: this.readOptionalNumber(dto, ['latitude', 'Latitude']),
+      longitude: this.readOptionalNumber(dto, ['longitude', 'Longitude']),
       mainImageUrl: this.readString(dto, ['mainImageUrl', 'MainImageUrl']),
     };
   }
@@ -815,6 +667,8 @@ export class HomeComponent implements OnInit {
     localityName?: string | null;
     destinationName?: string | null;
     regionName?: string | null;
+    latitude?: number;
+    longitude?: number;
     mainImageUrl?: string;
     images?: unknown[];
   } {
@@ -837,6 +691,8 @@ export class HomeComponent implements OnInit {
       localityName: (dto['localityName'] ?? dto['LocalityName'] ?? null) as string | null,
       destinationName: (dto['destinationName'] ?? dto['DestinationName'] ?? null) as string | null,
       regionName: (dto['regionName'] ?? dto['RegionName'] ?? null) as string | null,
+      latitude: this.readOptionalNumber(dto, ['latitude', 'Latitude']),
+      longitude: this.readOptionalNumber(dto, ['longitude', 'Longitude']),
       mainImageUrl: this.readString(dto, ['mainImageUrl', 'MainImageUrl']),
       images: (dto['images'] ?? dto['Images']) as unknown[] | undefined,
     };
@@ -852,7 +708,8 @@ export class HomeComponent implements OnInit {
       itemType: 'destination',
       targetUrl: '/destinations',
       showRating: false,
-      ratingText: ""
+      ratingText: "",
+      distanceText: this.distanceTextFromCoords(destination.latitude, destination.longitude),
     };
 
     this.applyFavoriteState([card]);
@@ -885,6 +742,7 @@ export class HomeComponent implements OnInit {
       itemType: 'object',
       targetUrl: `/object/${object.id}`,
       showRating: (object.averageRating ?? 0) > 0,
+      distanceText: this.distanceTextFromCoords(object.latitude, object.longitude),
     };
 
     this.applyFavoriteState([card]);
@@ -906,6 +764,7 @@ export class HomeComponent implements OnInit {
       itemType: 'activity',
       targetUrl: '/map',
       showRating: false,
+      distanceText: this.distanceTextFromCoords(activity.latitude, activity.longitude),
     };
 
     this.applyFavoriteState([card]);
@@ -914,7 +773,12 @@ export class HomeComponent implements OnInit {
 
   private toRecommendationCard(item: RecommendationItemDto): PlaceCard | null {
     const normalizedType = item.itemType?.toLowerCase();
-    if (normalizedType !== 'destination' && normalizedType !== 'object' && normalizedType !== 'activity') {
+    if (
+      normalizedType !== 'destination' &&
+      normalizedType !== 'object' &&
+      normalizedType !== 'activity' &&
+      normalizedType !== 'event'
+    ) {
       return null;
     }
 
@@ -932,6 +796,10 @@ export class HomeComponent implements OnInit {
       targetUrl: `/${normalizedType}/${item.itemId}`,
       favoriteId: undefined,
       showRating: item.averageRating != null && (item.reviewCount ?? 0) > 0,
+      distanceText:
+        item.distanceMeters != null
+          ? this.distanceTextFromCoordsFromMeters(item.distanceMeters)
+          : undefined,
     };
 
     this.applyFavoriteState([card]);
@@ -971,7 +839,7 @@ export class HomeComponent implements OnInit {
         item.distanceMeters >= 1000
           ? `${(item.distanceMeters / 1000).toFixed(1)} km away`
           : `${Math.round(item.distanceMeters)} m away`;
-
+/*
       if (item.itemType === 'activity') {
         const details = [item.price != null && item.price > 0 ? `EUR ${Math.round(item.price)}` : 'Free'];
         if (item.durationMinutes != null && item.durationMinutes > 0) {
@@ -979,11 +847,11 @@ export class HomeComponent implements OnInit {
         }
 
         return `${distanceText} - ${details.join(' - ')}`;
-      }
+      } */
 
       return distanceText;
     }
-
+/*
     if (item.itemType === 'activity') {
       const details = [item.price != null && item.price > 0 ? `EUR ${Math.round(item.price)}` : 'Free'];
       if (item.durationMinutes != null && item.durationMinutes > 0) {
@@ -991,9 +859,15 @@ export class HomeComponent implements OnInit {
       }
 
       return details.join(' - ');
-    }
+    } */
 
     return item.categoryName || '';
+  }
+
+  private distanceTextFromCoordsFromMeters(distanceMeters: number): string {
+    return distanceMeters >= 1000
+      ? `${(distanceMeters / 1000).toFixed(1)} km away`
+      : `${Math.round(distanceMeters)} m away`;
   }
 
   private shouldShowLiveDistance(): boolean {
@@ -1102,20 +976,27 @@ export class HomeComponent implements OnInit {
   }
 
   private activityMetaText(activity: {
-    price?: number;
+    activityTypeName: string;
+  })
+  {
+    return activity.activityTypeName;
+  }
+
+  /* private activityMetaText(activity: {
+     price?: number;
     durationMinutes?: number;
     activityTypeName: string;
-  }): string {
-    const priceText =
+  }):  string {
+     const priceText =
       activity.price == null || activity.price <= 0 ? 'Free' : `EUR ${Math.round(activity.price)}`;
-    const durationText = activity.durationMinutes ? `${activity.durationMinutes} min` : null;
+    const durationText = activity.durationMinutes ? `${activity.durationMinutes} min` : null; 
 
-    if (durationText) {
+     if (durationText) {
       return `${priceText} • ${durationText}`;
-    }
+    } 
 
     return `${priceText} • ${activity.activityTypeName}`;
-  }
+  } */
 
   private eventDate(startDate: string): string {
     const date = new Date(startDate);
@@ -1234,6 +1115,9 @@ export class HomeComponent implements OnInit {
         break;
       case 'activity':
         route = 'activity'
+        break;
+      case 'event':
+        route = 'event';
         break;
       default:
         return;

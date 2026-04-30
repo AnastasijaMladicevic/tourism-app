@@ -6,6 +6,7 @@ import { environment } from '../../../environment/environment';
 import { EventDto, EventService } from '../../services/event';
 import { EventPlannerDto, EventPlannerService } from '../../services/event-planner';
 import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
+import { ProfileStatsCacheService } from '../../services/profile-stats-cache';
 import { TranslationService } from '../../services/translation.service';
 
 interface PlannerDay {
@@ -50,6 +51,7 @@ export class PlannerComponent implements OnInit {
   private readonly plannerService = inject(EventPlannerService);
   private readonly eventService = inject(EventService);
   private readonly plannerLocalPreferences = inject(PlannerLocalPreferencesService);
+  private readonly profileStatsCache = inject(ProfileStatsCacheService);
   private readonly translationService = inject(TranslationService);
   private readonly router = inject(Router);
 
@@ -180,6 +182,7 @@ export class PlannerComponent implements OnInit {
     }
 
     this.plannerItems.set(nextItems);
+    this.profileStatsCache.write({ plans: nextItems.length });
     this.ensureSelectedDayAfterRemoval();
     this.removingPlannerId.set(plannerId);
     this.errorMessage.set('');
@@ -190,6 +193,7 @@ export class PlannerComponent implements OnInit {
       .pipe(
         catchError(() => {
           this.plannerItems.set(previousItems);
+          this.profileStatsCache.write({ plans: previousItems.length });
           this.ensureSelectedDay();
           this.errorMessage.set(this.translate('planner.removeError'));
           return of(false);
@@ -230,6 +234,7 @@ export class PlannerComponent implements OnInit {
       )
       .subscribe((items) => {
         this.plannerItems.set(items);
+        this.profileStatsCache.write({ plans: items.length });
         this.ensureSelectedDay();
       });
   }
