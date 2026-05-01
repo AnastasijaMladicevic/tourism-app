@@ -113,7 +113,6 @@
             <thead>
               <tr>
                 <th>Status</th>
-                <th>Media</th>
                 <th>Object Details</th>
                 <th>Type</th>
                 <th>Destination</th>
@@ -129,12 +128,9 @@
               >
                 <td><span class="status-chip" [ngClass]="getStatusBadgeClass(object.status)">{{ formatStatus(object.status) }}</span></td>
                 <td>
-                  <div class="media-thumb" [ngStyle]="getMediaStyle(object)"></div>
-                </td>
-                <td>
-                  <div class="item-cell">
+                  <div class="item-cell item-cell-with-media">
+                    <div class="media-thumb" [ngStyle]="getMediaStyle(object)"></div>
                     <strong>{{ object.name }}</strong>
-                    <span>OBJ-{{ object.id }}</span>
                   </div>
                 </td>
                 <td><span class="type-pill">{{ object.objectTypeName || 'N/A' }}</span></td>
@@ -199,8 +195,19 @@
             <strong>{{ selectedObject.localityName || 'N/A' }}</strong>
           </div>
           <div class="schedule-item">
-            <span>Working Hours</span>
-            <strong>{{ selectedObject.workingHours || 'N/A' }}</strong>
+            <ng-container *ngIf="getWorkingHoursRows(selectedObject.workingHours) as workingHoursRows">
+              <div class="working-hours" *ngIf="workingHoursRows.length; else noWorkingHours">
+                <div class="working-hours-row" *ngFor="let row of workingHoursRows">
+                  <span class="working-day">{{ row.day }}</span>
+                  <span class="working-time">{{ row.open }}</span>
+                  <span class="working-separator">-</span>
+                  <span class="working-time">{{ row.close }}</span>
+                </div>
+              </div>
+            </ng-container>
+            <ng-template #noWorkingHours>
+              <strong class="working-hours-fallback">N/A</strong>
+            </ng-template>
           </div>
         </section>
 

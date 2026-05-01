@@ -3,6 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ObjectDto, ObjectService } from '../../../services/object';
 
+interface WorkingHoursRow {
+  day: string;
+  open: string;
+  close: string;
+}
+
 @Component({
   selector: 'app-content-creator-objects',
   standalone: true,
@@ -220,6 +226,62 @@ export class ContentCreatorObjectsComponent implements OnInit {
     }
 
     return `$${Number(price).toFixed(2)}`;
+  }
+
+  getWorkingHoursRows(workingHours?: string | null): WorkingHoursRow[] {
+    const raw = workingHours?.trim();
+    if (!raw) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      if (!parsed || typeof parsed !== 'object') {
+        return [];
+      }
+
+      const dayOrder = ['pon', 'uto', 'sre', 'cet', 'čet', 'pet', 'sub', 'ned'] as const;
+      const dayLabels: Record<string, string> = {
+        pon: 'Mon',
+        uto: 'Tue',
+        sre: 'Wed',
+        cet: 'Thu',
+        'čet': 'Thu',
+        pet: 'Fri',
+        sub: 'Sat',
+        ned: 'Sun'
+      };
+
+      return dayOrder
+        .map((dayKey) => {
+          const value = parsed[dayKey];
+          if (typeof value !== 'string' || !value.trim()) {
+            return null;
+          }
+
+          const normalized = value.replace(/\s+/g, '');
+          const splitIndex = normalized.indexOf('-');
+          if (splitIndex < 0) {
+            return null;
+          }
+
+          const open = normalized.slice(0, splitIndex);
+          const close = normalized.slice(splitIndex + 1);
+
+          if (!open || !close) {
+            return null;
+          }
+
+          return {
+            day: dayLabels[dayKey],
+            open,
+            close
+          };
+        })
+        .filter((row): row is WorkingHoursRow => !!row);
+    } catch {
+      return [];
+    }
   }
 
   get averageRatingDisplay(): string {
