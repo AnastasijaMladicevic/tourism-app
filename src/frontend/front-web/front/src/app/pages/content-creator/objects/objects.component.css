@@ -75,8 +75,27 @@
   cursor: pointer;
 }
 
+.ghost-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .ghost-btn.slim-btn {
   min-height: 36px;
+}
+
+.select-btn {
+  padding-right: 8px;
+}
+
+.select-btn select {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  min-width: 88px;
+  outline: none;
+  cursor: pointer;
 }
 
 .objects-layout {
@@ -178,6 +197,8 @@ tbody tr:hover,
   height: 30px;
   border-radius: 8px;
   background: linear-gradient(135deg, #dbeafe, #93c5fd);
+  background-size: cover;
+  background-position: center;
 }
 
 .thumb-1 {
@@ -292,6 +313,8 @@ tbody tr:hover,
   position: relative;
   overflow: hidden;
   background: linear-gradient(150deg, #9ca3af, #374151);
+  background-size: cover;
+  background-position: center;
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -419,6 +442,20 @@ tbody tr:hover,
   color: #4b5563;
   font-size: 13px;
   line-height: 1.55;
+}
+
+.state {
+  padding: 22px 14px;
+  text-align: center;
+  color: #64748b;
+}
+
+.state-loading {
+  color: #1d4ed8;
+}
+
+.state-error {
+  color: #991b1b;
 }
 
 .map-card {

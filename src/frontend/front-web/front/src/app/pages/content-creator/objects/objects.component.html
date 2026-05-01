@@ -7,19 +7,31 @@
   <div class="toolbar card">
     <div class="toolbar-search">
       <span class="material-symbols-outlined search-icon">search</span>
-      <input type="text" placeholder="Search by name, category or region..." />
+      <input
+        type="text"
+        [(ngModel)]="draftSearchQuery"
+        (keydown.enter)="onSearchEnter($event)"
+        placeholder="Search by name, category or region..."
+      />
     </div>
-    <button type="button" class="ghost-btn">
+    <label class="ghost-btn select-btn">
       <span class="material-symbols-outlined">filter_list</span>
-      Type
-    </button>
-    <button type="button" class="ghost-btn">
+      <select [(ngModel)]="typeFilter" (ngModelChange)="onFilterValueChange()">
+        <option value="all">All Types</option>
+        <option *ngFor="let type of getTypeOptions()" [value]="type">{{ type }}</option>
+      </select>
+    </label>
+    <label class="ghost-btn select-btn">
       <span class="material-symbols-outlined">grade</span>
-      Rating
-    </button>
-    <button type="button" class="ghost-btn">
+      <select [(ngModel)]="ratingFilter" (ngModelChange)="onFilterValueChange()">
+        <option value="all">Any Rating</option>
+        <option value="4">4.0+</option>
+        <option value="4.5">4.5+</option>
+      </select>
+    </label>
+    <button type="button" class="ghost-btn" (click)="onApplyFilters()">
       <span class="material-symbols-outlined">add</span>
-      More Filters
+      Apply
     </button>
   </div>
 
@@ -28,22 +40,29 @@
       <div class="stats-grid">
         <article class="stat-card card blue">
           <p>Total Number of Objects</p>
-          <strong>175</strong>
-          <span>+2 from last month</span>
+          <strong>{{ totalCount }}</strong>
+          <span>Total visible items</span>
         </article>
         <article class="stat-card card green">
           <p>Total Published</p>
-          <strong>48</strong>
-          <span>98% availability</span>
+          <strong>{{ pagedObjects.length }}</strong>
+          <span>On current page</span>
         </article>
         <article class="stat-card card amber">
-          <p>Total Capacity Filled</p>
-          <strong>64%</strong>
-          <span>Across all published events</span>
+          <p>Average Rating</p>
+          <strong>{{ averageRatingDisplay }}</strong>
+          <span>Across current page</span>
         </article>
       </div>
 
       <div class="table-card card">
+        @if (isLoading) {
+          <div class="state state-loading">Loading objects...</div>
+        } @else if (errorMessage) {
+          <div class="state state-error">{{ errorMessage }}</div>
+        } @else if (!pagedObjects.length) {
+          <div class="state">No objects found for the selected filters.</div>
+        } @else {
         <div class="table-scroll">
           <table>
             <thead>
@@ -58,104 +77,24 @@
               </tr>
             </thead>
             <tbody>
-              <tr class="active-row">
+              <tr
+                *ngFor="let object of pagedObjects; trackBy: trackByObjectId"
+                [class.active-row]="selectedObject?.id === object.id"
+                (click)="selectObject(object)"
+              >
                 <td>
-                  <div class="media-thumb thumb-1"></div>
+                  <div class="media-thumb" [ngStyle]="getMediaStyle(object)"></div>
                 </td>
                 <td>
                   <div class="item-cell">
-                    <strong>Grand Horizon Resort</strong>
-                    <span>OBJ-001</span>
+                    <strong>{{ object.name }}</strong>
+                    <span>OBJ-{{ object.id }}</span>
                   </div>
                 </td>
-                <td><span class="type-pill">Hotel</span></td>
-                <td>Azure Coast</td>
-                <td class="rating-cell">4.8</td>
-                <td><span class="status-chip published">Published</span></td>
-                <td>
-                  <button type="button" class="icon-btn" title="Edit">
-                    <span class="material-symbols-outlined">edit</span>
-                  </button>
-                </td>
-              </tr>
-
-              <tr>
-                <td>
-                  <div class="media-thumb thumb-2"></div>
-                </td>
-                <td>
-                  <div class="item-cell">
-                    <strong>The Rustic Bistro</strong>
-                    <span>OBJ-002</span>
-                  </div>
-                </td>
-                <td><span class="type-pill">Restaurant</span></td>
-                <td>Pine Valley</td>
-                <td class="rating-cell">4.5</td>
-                <td><span class="status-chip published">Published</span></td>
-                <td>
-                  <button type="button" class="icon-btn" title="Edit">
-                    <span class="material-symbols-outlined">edit</span>
-                  </button>
-                </td>
-              </tr>
-
-              <tr>
-                <td>
-                  <div class="media-thumb thumb-3"></div>
-                </td>
-                <td>
-                  <div class="item-cell">
-                    <strong>Old Town Antiques</strong>
-                    <span>OBJ-003</span>
-                  </div>
-                </td>
-                <td><span class="type-pill">Shop</span></td>
-                <td>Heritage Square</td>
-                <td class="rating-cell">4.2</td>
-                <td><span class="status-chip draft">Draft</span></td>
-                <td>
-                  <button type="button" class="icon-btn" title="Edit">
-                    <span class="material-symbols-outlined">edit</span>
-                  </button>
-                </td>
-              </tr>
-
-              <tr>
-                <td>
-                  <div class="media-thumb thumb-4"></div>
-                </td>
-                <td>
-                  <div class="item-cell">
-                    <strong>Silver Peak Lodge</strong>
-                    <span>OBJ-004</span>
-                  </div>
-                </td>
-                <td><span class="type-pill">Hotel</span></td>
-                <td>Alpine Heights</td>
-                <td class="rating-cell">4.6</td>
-                <td><span class="status-chip published">Published</span></td>
-                <td>
-                  <button type="button" class="icon-btn" title="Edit">
-                    <span class="material-symbols-outlined">edit</span>
-                  </button>
-                </td>
-              </tr>
-
-              <tr>
-                <td>
-                  <div class="media-thumb thumb-5"></div>
-                </td>
-                <td>
-                  <div class="item-cell">
-                    <strong>Harbor Grill &amp; Bar</strong>
-                    <span>OBJ-005</span>
-                  </div>
-                </td>
-                <td><span class="type-pill">Restaurant</span></td>
-                <td>Azure Coast</td>
-                <td class="rating-cell">4.0</td>
-                <td><span class="status-chip published">Published</span></td>
+                <td><span class="type-pill">{{ object.objectTypeName || 'N/A' }}</span></td>
+                <td>{{ object.destinationName || object.localityName || 'N/A' }}</td>
+                <td class="rating-cell">{{ (object.averageRating ?? 0).toFixed(1) }}</td>
+                <td><span class="status-chip" [ngClass]="getStatusBadgeClass(object.status)">{{ formatStatus(object.status) }}</span></td>
                 <td>
                   <button type="button" class="icon-btn" title="Edit">
                     <span class="material-symbols-outlined">edit</span>
@@ -167,61 +106,71 @@
         </div>
 
         <div class="table-footer">
-          <p>Showing 5 of 24 objects</p>
+          <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ totalCount }} objects</p>
           <div class="pager">
-            <button type="button" class="ghost-btn slim-btn">Previous</button>
-            <button type="button" class="ghost-btn slim-btn">Next</button>
+            <button type="button" class="ghost-btn slim-btn" (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
+            <button type="button" class="ghost-btn slim-btn" (click)="onNextPage()" [disabled]="currentPage >= totalPages">Next</button>
           </div>
         </div>
+        }
       </div>
     </div>
 
     <aside class="detail-column card">
-      <div class="hero-media">
-        <span class="hero-badge">Hotel</span>
-        <span class="publish-badge">Published</span>
-        <h2>Grand Horizon Resort</h2>
-      </div>
+      @if (selectedObject) {
+        <div class="hero-media" [ngStyle]="getHeroStyle()">
+          <span class="hero-badge">{{ selectedObject.objectTypeName || 'Object' }}</span>
+          <span class="publish-badge">{{ formatStatus(selectedObject.status) }}</span>
+          <h2>{{ selectedObject.name }}</h2>
+        </div>
 
-      <div class="detail-metrics">
-        <div class="metric-card">
-          <span>Pricing</span>
-          <strong>$45.00</strong>
+        <div class="detail-metrics">
+          <div class="metric-card">
+            <span>Pricing</span>
+            <strong>{{ formatPrice(selectedObject.price) }}</strong>
+          </div>
+          <div class="metric-card">
+            <span>Reviews</span>
+            <strong>{{ selectedObject.reviewCount ?? 0 }}</strong>
+          </div>
         </div>
-        <div class="metric-card">
-          <span>Capacity</span>
-          <strong>5,000</strong>
-        </div>
-      </div>
 
-      <section class="detail-section">
-        <div class="section-head">
-          <h3>Schedule</h3>
-          <button type="button" class="text-btn">Edit Schedule</button>
-        </div>
-        <div class="schedule-item">
-          <span>Starts</span>
-          <strong>2024-12-21<br />09:00 Local Time</strong>
-        </div>
-        <div class="schedule-item">
-          <span>Ends</span>
-          <strong>2024-12-23<br />23:00 Local Time</strong>
-        </div>
-      </section>
+        <section class="detail-section">
+          <div class="section-head">
+            <h3>Details</h3>
+          </div>
+          <div class="schedule-item">
+            <span>Destination</span>
+            <strong>{{ selectedObject.destinationName || 'N/A' }}</strong>
+          </div>
+          <div class="schedule-item">
+            <span>Locality</span>
+            <strong>{{ selectedObject.localityName || 'N/A' }}</strong>
+          </div>
+          <div class="schedule-item">
+            <span>Working Hours</span>
+            <strong>{{ selectedObject.workingHours || 'N/A' }}</strong>
+          </div>
+        </section>
 
-      <section class="detail-section">
-        <h3>Description</h3>
-        <p class="description-copy">
-          A grand celebration of the longest night with light installations, traditional food, and
-          live folk music across the Highland Park.
-        </p>
-      </section>
+        <section class="detail-section">
+          <h3>Description</h3>
+          <p class="description-copy">
+            {{
+              selectedObject.description ||
+                'No description provided for this object.'
+            }}
+          </p>
+        </section>
 
-      <section class="detail-section">
-        <div class="map-card">
-          <span class="map-pin material-symbols-outlined">location_on</span>
-        </div>
-      </section>
+        <section class="detail-section">
+          <div class="map-card">
+            <span class="map-pin material-symbols-outlined">location_on</span>
+          </div>
+        </section>
+      } @else {
+        <div class="state">Select an object from the table to view details.</div>
+      }
     </aside>
   </div>
 </section>

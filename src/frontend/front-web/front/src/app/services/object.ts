@@ -23,12 +23,13 @@ export interface ObjectDto {
   menuUrl?: string;
   cuisineType?: string;
   workingHours?: string;
-  price?: Int16Array;
-  amenities?: [];
+  price?: number;
+  amenities?: string[];
   longitude?: number;
   latitude?: number;
   averageRating?: number;
   reviewCount?: number;
+  status?: string;
   distanceKm?: number;
   distanceMeters?: number;
   isActive: boolean;
@@ -55,6 +56,8 @@ export interface ObjectQueryParams {
   destination?: string;
   locality?: string;
   status?: string;
+  minRating?: number;
+  maxRating?: number;
   regionId?: number;
   page?: number;
   pageSize?: number;
@@ -150,5 +153,23 @@ export class ObjectService {
 
   getByType(typeName: string): Observable<ObjectDto[]> {
     return this.http.get<ObjectDto[]>(`${this.url}?type=${typeName}`);
+  }
+
+  getMy(
+    query?: ObjectQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<PagedResultDto<ObjectDto>> {
+    const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options);
+    let params = new HttpParams();
+
+    if (effectiveQuery) {
+      Object.entries(effectiveQuery).forEach(([key, value]) => {
+        if (value != null && value !== '') {
+          params = params.set(key, String(value));
+        }
+      });
+    }
+
+    return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/my`, { params });
   }
 }
