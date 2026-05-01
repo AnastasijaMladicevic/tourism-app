@@ -3,7 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
-import { catchError, finalize } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import {
   CreateObjectDto,
   ObjectService,
@@ -103,6 +103,29 @@ export class ObjectCreateComponent implements OnInit {
     return this.form.controls.latitude.value != null && this.form.controls.longitude.value != null;
   }
 
+  get locationSummary(): string {
+    const localityId = this.form.controls.localityId.value;
+    const destinationId = this.form.controls.destinationId.value;
+    const localityName = localityId ? this.localities.find((item) => item.id === localityId)?.name : '';
+    const destinationName = destinationId ? this.destinations.find((item) => item.id === destinationId)?.name : '';
+
+    if (localityName && destinationName) {
+      return `${localityName}, ${destinationName}`;
+    }
+
+    return localityName || destinationName || 'Set destination/locality for location context';
+  }
+
+  get latitudeLabel(): string {
+    const value = this.form.controls.latitude.value;
+    return value == null ? '-' : Number(value).toFixed(6);
+  }
+
+  get longitudeLabel(): string {
+    const value = this.form.controls.longitude.value;
+    return value == null ? '-' : Number(value).toFixed(6);
+  }
+
   getWorkingOpenControl(day: WorkingDayKey) {
     switch (day) {
       case 'pon': return this.workingHoursForm.controls.ponOpen;
@@ -185,7 +208,17 @@ export class ObjectCreateComponent implements OnInit {
 
     forkJoin({
       objectTypes: this.objectService.getObjectTypeOptions().pipe(catchError(() => of([]))),
-      destinations: this.destinationService.getAll().pipe(catchError(() => of([]))),
+      destinations: this.destinationService.getAll({
+        page: 1,
+        pageSize: 300,
+        sortBy: 'name',
+        sortOrder: 'asc'
+      }).pipe(
+        map((response: DestinationDto[] | { items?: DestinationDto[] }) => {
+          return Array.isArray(response) ? response : (response.items ?? []);
+        }),
+        catchError(() => of([]))
+      ),
       localities: this.activitiesService.getLocalityOptions().pipe(catchError(() => of([])))
     }).pipe(
       finalize(() => {

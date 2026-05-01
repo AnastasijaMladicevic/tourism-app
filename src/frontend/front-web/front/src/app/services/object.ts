@@ -234,14 +234,16 @@ export class ObjectService {
   }
 
   getObjectTypeOptions(): Observable<ObjectTypeOption[]> {
-    return this.getMy({
+    return this.getAll({
       page: 1,
       pageSize: 500,
       sortBy: 'objectTypeName',
       sortOrder: 'asc'
-    }).pipe(
+    }, { bypassRegion: true }).pipe(
       map((response) => {
-        const items = response?.items ?? [];
+        const items = Array.isArray(response)
+          ? response
+          : ((response as unknown as { items?: ObjectDto[] })?.items ?? []);
         const unique = new Map<number, ObjectTypeOption>();
 
         for (const item of items) {
