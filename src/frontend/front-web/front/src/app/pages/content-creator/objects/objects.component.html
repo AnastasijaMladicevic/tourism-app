@@ -9,31 +9,76 @@
       <span class="material-symbols-outlined search-icon">search</span>
       <input
         type="text"
+        class="toolbar-input"
         [(ngModel)]="draftSearchQuery"
         (keydown.enter)="onSearchEnter($event)"
         placeholder="Search by name, category or region..."
       />
     </div>
-    <label class="ghost-btn select-btn">
-      <span class="material-symbols-outlined">filter_list</span>
-      <select [(ngModel)]="typeFilter" (ngModelChange)="onFilterValueChange()">
-        <option value="all">All Types</option>
-        <option *ngFor="let type of getTypeOptions()" [value]="type">{{ type }}</option>
-      </select>
-    </label>
-    <label class="ghost-btn select-btn">
-      <span class="material-symbols-outlined">grade</span>
-      <select [(ngModel)]="ratingFilter" (ngModelChange)="onFilterValueChange()">
-        <option value="all">Any Rating</option>
-        <option value="4">4.0+</option>
-        <option value="4.5">4.5+</option>
-      </select>
-    </label>
-    <button type="button" class="ghost-btn" (click)="onApplyFilters()">
-      <span class="material-symbols-outlined">add</span>
-      Apply
+    <button type="button" class="ghost-btn slim-btn" (click)="onMoreFilters()">
+      <span class="material-symbols-outlined">filter_alt</span>
+      More Filters
     </button>
   </div>
+
+  @if (filterPanelOpen) {
+    <div class="filters-panel card">
+      <label>
+        <span>Status</span>
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()">
+          <option value="all">All Statuses</option>
+          <option value="published">Published</option>
+          <option value="approved">Approved</option>
+          <option value="pending">Pending</option>
+          <option value="draft">Draft</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Type</span>
+        <select [(ngModel)]="typeFilter" (ngModelChange)="onFilterChange()">
+          <option value="all">All Types</option>
+          <option *ngFor="let type of getTypeOptions()" [value]="type">{{ type }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Rating</span>
+        <select [(ngModel)]="ratingFilter" (ngModelChange)="onFilterChange()">
+          <option value="all">Any Rating</option>
+          <option value="4">4.0+</option>
+          <option value="4.5">4.5+</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Sort by</span>
+        <select [(ngModel)]="sortBy" (ngModelChange)="onFilterChange()">
+          <option *ngFor="let option of sortByOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>Order</span>
+        <select [(ngModel)]="sortOrder" (ngModelChange)="onFilterChange()">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </label>
+
+      <div class="filter-actions">
+        <button type="button" class="ghost-btn filter-btn" (click)="onApplyFilters()">
+          Apply Filters
+        </button>
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  }
 
   <div class="objects-layout">
     <div class="main-column">
@@ -67,12 +112,12 @@
           <table>
             <thead>
               <tr>
+                <th>Status</th>
                 <th>Media</th>
                 <th>Object Details</th>
                 <th>Type</th>
                 <th>Destination</th>
                 <th>Rating</th>
-                <th>Status</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -82,6 +127,7 @@
                 [class.active-row]="selectedObject?.id === object.id"
                 (click)="selectObject(object)"
               >
+                <td><span class="status-chip" [ngClass]="getStatusBadgeClass(object.status)">{{ formatStatus(object.status) }}</span></td>
                 <td>
                   <div class="media-thumb" [ngStyle]="getMediaStyle(object)"></div>
                 </td>
@@ -94,7 +140,6 @@
                 <td><span class="type-pill">{{ object.objectTypeName || 'N/A' }}</span></td>
                 <td>{{ object.destinationName || object.localityName || 'N/A' }}</td>
                 <td class="rating-cell">{{ (object.averageRating ?? 0).toFixed(1) }}</td>
-                <td><span class="status-chip" [ngClass]="getStatusBadgeClass(object.status)">{{ formatStatus(object.status) }}</span></td>
                 <td>
                   <button type="button" class="icon-btn" title="Edit">
                     <span class="material-symbols-outlined">edit</span>
@@ -108,6 +153,12 @@
         <div class="table-footer">
           <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ totalCount }} objects</p>
           <div class="pager">
+            <label class="page-size-control">
+              <span>Page size</span>
+              <select class="page-size-select" [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+                <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
+              </select>
+            </label>
             <button type="button" class="ghost-btn slim-btn" (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
             <button type="button" class="ghost-btn slim-btn" (click)="onNextPage()" [disabled]="currentPage >= totalPages">Next</button>
           </div>

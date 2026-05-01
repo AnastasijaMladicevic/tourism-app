@@ -23,13 +23,25 @@ export class ContentCreatorObjectsComponent implements OnInit {
 
   draftSearchQuery = '';
   searchQuery = '';
+  statusFilter = 'all';
   typeFilter = 'all';
   ratingFilter = 'all';
+  sortBy = 'name';
+  sortOrder: 'asc' | 'desc' = 'asc';
+  filterPanelOpen = false;
 
   currentPage = 1;
   pageSize = 5;
   totalCount = 0;
   totalPages = 1;
+  readonly pageSizeOptions = [5, 10, 20, 50];
+
+  readonly sortByOptions = [
+    { value: 'name', label: 'Name' },
+    { value: 'averageRating', label: 'Rating' },
+    { value: 'status', label: 'Status' },
+    { value: 'createdAt', label: 'Created date' }
+  ];
 
   ngOnInit(): void {
     this.loadObjects();
@@ -43,10 +55,11 @@ export class ContentCreatorObjectsComponent implements OnInit {
       page: this.currentPage,
       pageSize: this.pageSize,
       search: this.searchQuery || undefined,
+      status: this.statusFilter !== 'all' ? this.statusFilter : undefined,
       type: this.typeFilter !== 'all' ? this.typeFilter : undefined,
       minRating: this.getMinRatingFromFilter(this.ratingFilter),
-      sortBy: 'name',
-      sortOrder: 'asc'
+      sortBy: this.sortBy,
+      sortOrder: this.sortOrder
     }).subscribe({
       next: (response) => {
         const items = response?.items ?? [];
@@ -54,7 +67,8 @@ export class ContentCreatorObjectsComponent implements OnInit {
         this.pagedObjects = items;
         this.totalCount = response?.totalCount ?? 0;
         this.currentPage = response?.page ?? this.currentPage;
-        this.totalPages = Math.max(1, response?.totalPages ?? 1);
+        this.pageSize = response?.pageSize ?? this.pageSize;
+        this.totalPages = response?.totalPages ?? Math.max(1, Math.ceil(this.totalCount / this.pageSize));
 
         if (!this.selectedObject || !items.some((item) => item.id === this.selectedObject?.id)) {
           this.selectedObject = items[0] ?? null;
@@ -82,7 +96,22 @@ export class ContentCreatorObjectsComponent implements OnInit {
     this.loadObjects();
   }
 
-  onFilterValueChange(): void {
+  onFilterChange(): void {
+    // Filters are applied explicitly through Apply Filters.
+  }
+
+  onMoreFilters(): void {
+    this.filterPanelOpen = !this.filterPanelOpen;
+  }
+
+  onResetFilters(): void {
+    this.searchQuery = '';
+    this.draftSearchQuery = '';
+    this.statusFilter = 'all';
+    this.typeFilter = 'all';
+    this.ratingFilter = 'all';
+    this.sortBy = 'name';
+    this.sortOrder = 'asc';
     this.currentPage = 1;
     this.loadObjects();
   }
@@ -107,6 +136,12 @@ export class ContentCreatorObjectsComponent implements OnInit {
     }
 
     this.currentPage--;
+    this.loadObjects();
+  }
+
+  onPageSizeChange(value: number | string): void {
+    this.pageSize = Number(value);
+    this.currentPage = 1;
     this.loadObjects();
   }
 

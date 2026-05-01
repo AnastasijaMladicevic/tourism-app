@@ -26,7 +26,7 @@
 
 .toolbar {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 10px;
   align-items: center;
   padding: 10px;
@@ -84,18 +84,50 @@
   min-height: 36px;
 }
 
-.select-btn {
-  padding-right: 8px;
+.toolbar-input,
+.filters-panel select {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 11px;
+  background: #fff;
+  color: #111827;
+  font: inherit;
 }
 
-.select-btn select {
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  min-width: 88px;
-  outline: none;
-  cursor: pointer;
+.filters-panel {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) auto;
+  gap: 10px;
+  padding: 12px;
+  align-items: end;
+}
+
+.filters-panel label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.filters-panel select {
+  min-height: 40px;
+  padding: 8px 10px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+  justify-self: end;
+}
+
+.filter-btn {
+  min-height: 40px;
+}
+
+.filter-btn.secondary {
+  color: #334155;
 }
 
 .objects-layout {
@@ -295,6 +327,34 @@ tbody tr:hover,
 .pager {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
+}
+
+.page-size-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 9px;
+  border: 1px solid #dbe1ea;
+  border-radius: 11px;
+  background: #fff;
+}
+
+.page-size-control span {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.page-size-select {
+  min-width: 70px;
+  padding: 5px 24px 5px 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+  background: #f8fafc;
+  color: #0f172a;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .detail-column {
@@ -492,6 +552,10 @@ tbody tr:hover,
   }
 
   .toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .filters-panel {
     grid-template-columns: 1fr;
   }
 
