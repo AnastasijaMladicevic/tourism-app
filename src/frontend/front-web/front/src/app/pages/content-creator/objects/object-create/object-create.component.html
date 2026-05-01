@@ -1,0 +1,170 @@
+<section class="object-create-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Objects management</p>
+      <h1>{{ pageTitle }}</h1>
+      <p class="page-intro">Add a new object with location, details, amenities, and opening hours.</p>
+    </div>
+    <div class="top-actions">
+      <button type="submit" class="primary-btn" [disabled]="isSubmitting || isLoadingOptions" form="create-object-form">
+        {{ isSubmitting ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save changes' : 'Create object') }}
+      </button>
+      <button type="button" class="ghost-btn" routerLink="/content-creator/objects">Cancel</button>
+    </div>
+  </header>
+
+  <div class="create-layout">
+    <form id="create-object-form" class="form-column card" [formGroup]="form" (ngSubmit)="submit()">
+      <section class="section-block">
+        <h2>Image Gallery</h2>
+        <label>
+          <span>Main image URL</span>
+          <input type="url" formControlName="imageUrl" placeholder="https://example.com/image.jpg" />
+        </label>
+        <div class="image-preview-box">
+          @if (imagePreviewUrl) {
+            <img [src]="imagePreviewUrl" alt="Object image preview" class="image-preview" />
+          } @else {
+            <div class="image-preview-empty">
+              <span class="material-symbols-outlined">image</span>
+              <p>Paste an image URL to preview it here.</p>
+            </div>
+          }
+        </div>
+      </section>
+
+      <section class="section-block">
+        <h2>General Information</h2>
+        <div class="grid-2">
+          <label>
+            <span>Object Name *</span>
+            <input type="text" formControlName="name" placeholder="Object name" />
+          </label>
+          <label>
+            <span>Address</span>
+            <input type="text" formControlName="address" placeholder="Address" />
+          </label>
+          <label>
+            <span>Object Type *</span>
+            <select formControlName="objectTypeId">
+              <option [ngValue]="null">Select type</option>
+              <option *ngFor="let type of objectTypes" [ngValue]="type.id">{{ type.name }}</option>
+            </select>
+          </label>
+          <label>
+            <span>Price</span>
+            <input type="number" formControlName="price" min="0" step="0.01" placeholder="0.00" />
+          </label>
+          <label>
+            <span>Destination</span>
+            <select formControlName="destinationId">
+              <option [ngValue]="null">Select destination</option>
+              <option *ngFor="let destination of destinations" [ngValue]="destination.id">{{ destination.name }}</option>
+            </select>
+          </label>
+          <label>
+            <span>Locality</span>
+            <select formControlName="localityId">
+              <option [ngValue]="null">Select locality</option>
+              <option *ngFor="let locality of filteredLocalities" [ngValue]="locality.id">{{ locality.name }}</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <h2>Custom &amp; Story</h2>
+        <label>
+          <span>Full object description</span>
+          <textarea rows="5" formControlName="description" placeholder="Describe this object..."></textarea>
+        </label>
+      </section>
+
+      <section class="section-block">
+        <h2>Amenities &amp; Contact</h2>
+        <label>
+          <span>Amenities (comma separated)</span>
+          <input type="text" formControlName="amenitiesInput" placeholder="WiFi, Parking, Outdoor Seating" />
+        </label>
+      </section>
+
+      <section class="section-block">
+        <h2>Opening Hours</h2>
+        <div class="hours-grid">
+          <div class="hour-row" *ngFor="let day of workingDays">
+            <span>{{ day.label }}</span>
+            <input type="time" [formControl]="getWorkingOpenControl(day.key)" />
+            <span>-</span>
+            <input type="time" [formControl]="getWorkingCloseControl(day.key)" />
+          </div>
+        </div>
+      </section>
+
+      @if (errorMessage) {
+        <p class="error-msg">{{ errorMessage }}</p>
+      }
+
+    </form>
+
+    <aside class="side-column card" [formGroup]="form">
+      <header class="side-header">
+        <span class="material-symbols-outlined">my_location</span>
+        <h3>Location Intelligence</h3>
+      </header>
+
+      <div class="map-shell">
+        <app-map
+          [lat]="mapLat"
+          [lng]="mapLng"
+          [zoom]="14"
+          [popupText]="form.controls.name.value || 'New object'"
+          [interactive]="false"
+          [showMarker]="hasMapCoordinates"
+          mapId="create-object-map"
+        ></app-map>
+      </div>
+
+      <div class="location-line">
+        <span class="material-symbols-outlined">search</span>
+        <p>{{ locationSummary }}</p>
+      </div>
+
+      <div class="location-inputs">
+        <label class="mini-field">
+          <span>Latitude</span>
+          <input type="number" formControlName="latitude" min="-90" max="90" step="0.000001" placeholder="42.424000" />
+        </label>
+        <label class="mini-field">
+          <span>Longitude</span>
+          <input type="number" formControlName="longitude" min="-180" max="180" step="0.000001" placeholder="18.771000" />
+        </label>
+      </div>
+
+      <div class="review-snapshot">
+        <span>Review Snapshot</span>
+        <div class="review-row">
+          <strong>4.8</strong>
+          <span class="stars">★★★★★</span>
+          <a href="javascript:void(0)">42,980 reviews</a>
+        </div>
+      </div>
+
+      <article class="creator-card">
+        <div class="creator-avatar">AJ</div>
+        <div>
+          <strong>Created by Sarah Jenkin</strong>
+          <p>Oct 2024, edited Jul 2025</p>
+        </div>
+      </article>
+
+      <p class="sidebar-note">
+        You have super admin write access to this object. Changes will be instantly reflected across all SpireGO platforms.
+      </p>
+
+      <a class="history-link" href="javascript:void(0)">
+        <span class="material-symbols-outlined">history</span>
+        View Full Change History
+      </a>
+    </aside>
+  </div>
+</section>

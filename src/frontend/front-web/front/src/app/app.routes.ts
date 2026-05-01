@@ -92,6 +92,16 @@ export const routes: Routes = [
           import('./pages/content-creator/objects/objects.component').then(m => m.ContentCreatorObjectsComponent)
       },
       {
+        path: 'objects/create',
+        loadComponent: () =>
+          import('./pages/content-creator/objects/object-create/object-create.component').then(m => m.ObjectCreateComponent)
+      },
+      {
+        path: 'objects/edit/:id',
+        loadComponent: () =>
+          import('./pages/content-creator/objects/object-create/object-create.component').then(m => m.ObjectCreateComponent)
+      },
+      {
         path: 'activities',
         children: [
           {
