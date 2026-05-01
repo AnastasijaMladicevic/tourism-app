@@ -8650,7 +8650,7 @@ VALUES
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Omnia Nightclub'),
     NOW()),
 (
-    'https://wevotravel.com/wp-content/uploads/2023/04/135417_163930216984962_3042154_o.jpg',
+    'https://grazia.hr/wp-content/uploads/2022/06/Diamond-Club-cover.jpg',
     'Diamond Night Club',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Diamond Night Club'),
@@ -8686,19 +8686,19 @@ VALUES
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Miami Club Budva'),
     NOW()),
 (
-    'https://scontent.fbeg7-2.fna.fbcdn.net/v/t39.30808-6/480416479_970808901810427_3522504208557274127_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=13d280&_nc_ohc=N-tC0qp7SIEQ7kNvwGkjKU3&_nc_oc=Ado3jz2q0xGabIiaMSHnBGsZZZPiK7dnpRUsfVcLvRT0bAvcfghHHMJsVRpUOL0F3Hs&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=-LDN7wFE8L2UDzZl7eOgqA&oh=00_Af2F5W5LmfrRSrgE1c8g3XxC-bBk-GW0ls32jZhxDxLfJg&oe=69F188BF',
+    'https://www.madamamsterdam.nl/wp-content/uploads/2024/06/bg-skybar-scaled.jpg',
     'Madam Open Bar',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Madam Open Bar'),
     NOW()),
 (
-    'https://scontent.fbeg7-2.fna.fbcdn.net/v/t39.30808-6/480398041_970808775143773_6149607492545125953_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=13d280&_nc_ohc=lmToZQD3i-cQ7kNvwEidjq3&_nc_oc=AdpkwkHoLc6yuTS-d9Mgl2a6TSOswQI4sbAsnw5QKcpnvaJb0TMbNiqqp0cwF4koQ08&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=eKQ04XgK7h35PR6JVRWtmQ&oh=00_Af0GWsRWdV2J9wJHd5qfNptzfAt3v7eye0eIAQADGlwkng&oe=69F1817A',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHukJXF7MY3klo5pF7f2jkG5aJoxZHwndimw&s',
     'Madam Open Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Madam Open Bar'),
     NOW()),
 (
-    'https://scontent.fbeg7-2.fna.fbcdn.net/v/t39.30808-6/480324360_970807941810523_5435562649897362962_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=13d280&_nc_ohc=526ASsfNqjAQ7kNvwGjJj4L&_nc_oc=AdrT0F45UT0A13avlA0H7JUUuKIgmAA7nH4Ma16s7fckuhrliWuUbmVDEa2MOlosKIg&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=NilY12Ml6OSBu0M2DlM2TA&oh=00_Af2qLc2BUnHPyUI6208jVLoqXmOnG_D5hf_XJogUahcgFA&oe=69F1917F',
+    'https://travelinamsterdam.com/wp-content/uploads/2023/03/Madam-skybar-Amsterdam.jpg',
     'Madam Open Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Madam Open Bar'),
@@ -9082,19 +9082,19 @@ VALUES
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Astoria Cafe Lustica'),
     NOW()),
 (
-    'https://wevotravel.com/wp-content/uploads/2023/05/292946171_3888417964716930_5172081791445716981_n.jpg',
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQitI7jmXWhXI9BjwB1FTj1hQdZhKq8hxf64g&s',
     'HEIST Bar Ulcinj',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'HEIST Bar Ulcinj'),
     NOW()),
 (
-    'https://img.restaurantguru.com/rbd6-Opium-Bar-interior-2020-08.jpg',
+    'https://media.evendo.com/locations-resized/BarImages/360x263/bb2f4aa1-4c04-49fc-a21d-a93f63f303f9',
     'HEIST Bar Ulcinj',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'HEIST Bar Ulcinj'),
     NOW()),
 (
-    'https://www.moja-delatnost.rs/Image/IndexFile?name=NajboljinargilabarUlcinj3.PNG',
+    'https://wevotravel.com/wp-content/uploads/2023/05/287971475_570707484664331_4376306791416374200_n.jpg',
     'HEIST Bar Ulcinj',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'HEIST Bar Ulcinj'),
@@ -9550,7 +9550,7 @@ VALUES
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Butiko Shopping Center'),
     NOW()),
 (
-    'https://wevotravel.com/wp-content/uploads/2023/04/IMG_5975.jpg',
+    'https://wevotravel.com/wp-content/uploads/2023/04/1214071_20190204150248_5c5850cdb7896801fa7a72ecjpeg_ls.jpg',
     'HDL Novi Mall',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'HDL Novi Mall'),
