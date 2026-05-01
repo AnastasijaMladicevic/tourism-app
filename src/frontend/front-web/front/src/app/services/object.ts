@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../environment/environment';
 import { ReviewDto } from './review';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
@@ -93,6 +94,11 @@ export interface PagedResultDto<T> {
   totalPages: number;
 }
 
+export interface FilterOption {
+  value: string;
+  label: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ObjectService {
   private readonly url = `${environment.apiUrl}/objects`;
@@ -171,5 +177,52 @@ export class ObjectService {
     }
 
     return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/my`, { params });
+  }
+
+  getMyFilterOptions(): Observable<{ typeOptions: FilterOption[]; statusOptions: FilterOption[] }> {
+    return this.getMy({
+      page: 1,
+      pageSize: 500,
+      sortBy: 'name',
+      sortOrder: 'asc'
+    }).pipe(
+      map((response) => {
+        const items = response?.items ?? [];
+
+        const typeOptions = this.toUniqueOptions(
+          items.map((item) => item.objectTypeName),
+          (value) => value
+        );
+
+        const statusOptions = this.toUniqueOptions(
+          items.map((item) => item.status),
+          (value) => this.toTitleCase(value)
+        );
+
+        return { typeOptions, statusOptions };
+      })
+    );
+  }
+
+  private toUniqueOptions(values: Array<string | undefined>, mapLabel: (value: string) => string): FilterOption[] {
+    const unique = values
+      .map((value) => value?.trim())
+      .filter((value): value is string => !!value)
+      .filter((value, index, all) => all.findIndex((x) => x.toLowerCase() === value.toLowerCase()) === index)
+      .sort((a, b) => a.localeCompare(b));
+
+    return unique.map((value) => ({
+      value,
+      label: mapLabel(value)
+    }));
+  }
+
+  private toTitleCase(value: string): string {
+    return value
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 }

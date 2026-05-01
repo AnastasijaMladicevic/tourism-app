@@ -27,11 +27,9 @@
         <span>Status</span>
         <select [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()">
           <option value="all">All Statuses</option>
-          <option value="published">Published</option>
-          <option value="approved">Approved</option>
-          <option value="pending">Pending</option>
-          <option value="draft">Draft</option>
-          <option value="rejected">Rejected</option>
+          <option *ngFor="let option of statusOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
         </select>
       </label>
 
@@ -39,16 +37,14 @@
         <span>Type</span>
         <select [(ngModel)]="typeFilter" (ngModelChange)="onFilterChange()">
           <option value="all">All Types</option>
-          <option *ngFor="let type of getTypeOptions()" [value]="type">{{ type }}</option>
+          <option *ngFor="let option of typeOptions" [value]="option.value">{{ option.label }}</option>
         </select>
       </label>
 
       <label>
         <span>Rating</span>
         <select [(ngModel)]="ratingFilter" (ngModelChange)="onFilterChange()">
-          <option value="all">Any Rating</option>
-          <option value="4">4.0+</option>
-          <option value="4.5">4.5+</option>
+          <option *ngFor="let option of ratingOptions" [value]="option.value">{{ option.label }}</option>
         </select>
       </label>
 
@@ -167,8 +163,12 @@
       @if (selectedObject) {
         <div class="hero-media" [ngStyle]="getHeroStyle()">
           <span class="hero-badge">{{ selectedObject.objectTypeName || 'Object' }}</span>
-          <span class="publish-badge">{{ formatStatus(selectedObject.status) }}</span>
           <h2>{{ selectedObject.name }}</h2>
+        </div>
+        <div class="hero-status-row">
+          <span class="publish-badge" [ngClass]="'status-' + getStatusBadgeClass(selectedObject.status)">
+            {{ formatStatus(selectedObject.status) }}
+          </span>
         </div>
 
         <div class="detail-metrics">
@@ -223,7 +223,21 @@
 
         <section class="detail-section">
           <div class="map-card">
-            <span class="map-pin material-symbols-outlined">location_on</span>
+            @if (hasSelectedObjectCoordinates) {
+              <app-map
+                [lat]="selectedObjectLat"
+                [lng]="selectedObjectLng"
+                [zoom]="14"
+                [popupText]="selectedObjectLocationLabel"
+                [interactive]="false"
+                mapId="object-details-map"
+              ></app-map>
+            } @else {
+              <div class="map-empty-state">
+                <span class="material-symbols-outlined">location_off</span>
+                <p>Coordinates are not available for this object.</p>
+              </div>
+            }
           </div>
         </section>
       } @else {

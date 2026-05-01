@@ -1,7 +1,8 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ObjectDto, ObjectService } from '../../../services/object';
+import { FilterOption, ObjectDto, ObjectService } from '../../../services/object';
+import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 
 interface WorkingHoursRow {
   day: string;
@@ -12,7 +13,7 @@ interface WorkingHoursRow {
 @Component({
   selector: 'app-content-creator-objects',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SharedMapComponent],
   templateUrl: './objects.component.html',
   styleUrls: ['./objects.component.css']
 })
@@ -49,7 +50,29 @@ export class ContentCreatorObjectsComponent implements OnInit {
     { value: 'createdAt', label: 'Created date' }
   ];
 
+  readonly ratingOptions = [
+    { value: 'all', label: 'Any Rating' },
+    { value: '1', label: '1.0+' },
+    { value: '2', label: '2.0+' },
+    { value: '3', label: '3.0+' },
+    { value: '3.5', label: '3.5+' },
+    { value: '4', label: '4.0+' },
+    { value: '4.5', label: '4.5+' }
+  ];
+
+  private readonly fallbackStatusOptions: FilterOption[] = [
+    { value: 'published', label: 'Published' },
+    { value: 'approved', label: 'Approved' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'draft', label: 'Draft' },
+    { value: 'rejected', label: 'Rejected' }
+  ];
+
+  statusOptions: FilterOption[] = [...this.fallbackStatusOptions];
+  typeOptions: FilterOption[] = [];
+
   ngOnInit(): void {
+    this.loadFilterOptions();
     this.loadObjects();
   }
 
@@ -164,6 +187,9 @@ export class ContentCreatorObjectsComponent implements OnInit {
       case 'published':
       case 'approved':
         return 'published';
+      case 'rejected':
+      case 'cancelled':
+        return 'rejected';
       case 'draft':
       case 'pending':
         return 'draft';
@@ -188,16 +214,6 @@ export class ContentCreatorObjectsComponent implements OnInit {
     }
 
     return { 'background-image': `url("${image}")` };
-  }
-
-  getTypeOptions(): string[] {
-    const unique = this.objects
-      .map((item) => item.objectTypeName?.trim())
-      .filter((name): name is string => !!name)
-      .filter((name, index, all) => all.findIndex((x) => x.toLowerCase() === name.toLowerCase()) === index)
-      .sort((a, b) => a.localeCompare(b));
-
-    return unique;
   }
 
   get pageStart(): number {
@@ -293,6 +309,27 @@ export class ContentCreatorObjectsComponent implements OnInit {
     return (total / this.pagedObjects.length).toFixed(1);
   }
 
+  get hasSelectedObjectCoordinates(): boolean {
+    return this.selectedObject?.latitude != null && this.selectedObject?.longitude != null;
+  }
+
+  get selectedObjectLat(): number {
+    return this.selectedObject?.latitude ?? 42.424;
+  }
+
+  get selectedObjectLng(): number {
+    return this.selectedObject?.longitude ?? 18.771;
+  }
+
+  get selectedObjectLocationLabel(): string {
+    if (!this.selectedObject) {
+      return 'Selected object';
+    }
+
+    const location = this.selectedObject.localityName || this.selectedObject.destinationName || this.selectedObject.regionName;
+    return location ? `${this.selectedObject.name} · ${location}` : this.selectedObject.name;
+  }
+
   private getMinRatingFromFilter(value: string): number | undefined {
     if (value === 'all') {
       return undefined;
@@ -317,5 +354,28 @@ export class ContentCreatorObjectsComponent implements OnInit {
     } catch {
       return encodeURI(trimmed);
     }
+  }
+
+  private loadFilterOptions(): void {
+    this.objectService.getMyFilterOptions().subscribe({
+      next: ({ typeOptions, statusOptions }) => {
+        this.typeOptions = typeOptions;
+        this.statusOptions = statusOptions.length > 0 ? statusOptions : [...this.fallbackStatusOptions];
+
+        if (this.typeFilter !== 'all' && !this.typeOptions.some((option) => option.value === this.typeFilter)) {
+          this.typeFilter = 'all';
+        }
+
+        if (this.statusFilter !== 'all' && !this.statusOptions.some((option) => option.value === this.statusFilter)) {
+          this.statusFilter = 'all';
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.typeOptions = [];
+        this.statusOptions = [...this.fallbackStatusOptions];
+      }
+    });
   }
 }
