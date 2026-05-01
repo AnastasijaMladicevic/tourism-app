@@ -99,6 +99,35 @@ export interface FilterOption {
   label: string;
 }
 
+export interface ObjectTypeOption {
+  id: number;
+  name: string;
+}
+
+export interface CreateObjectDto {
+  name: string;
+  description?: string;
+  address?: string;
+  phoneNumber?: string;
+  website?: string;
+  menuUrl?: string;
+  cuisineType?: string;
+  workingHours?: string;
+  price?: number;
+  amenities?: string[];
+  longitude?: number;
+  latitude?: number;
+  objectTypeId: number;
+  destinationId?: number;
+  localityId?: number;
+}
+
+export interface AddObjectImageDto {
+  url: string;
+  altText?: string;
+  isMain: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ObjectService {
   private readonly url = `${environment.apiUrl}/objects`;
@@ -202,6 +231,43 @@ export class ObjectService {
         return { typeOptions, statusOptions };
       })
     );
+  }
+
+  getObjectTypeOptions(): Observable<ObjectTypeOption[]> {
+    return this.getMy({
+      page: 1,
+      pageSize: 500,
+      sortBy: 'objectTypeName',
+      sortOrder: 'asc'
+    }).pipe(
+      map((response) => {
+        const items = response?.items ?? [];
+        const unique = new Map<number, ObjectTypeOption>();
+
+        for (const item of items) {
+          if (!item.objectTypeId) {
+            continue;
+          }
+
+          if (!unique.has(item.objectTypeId)) {
+            unique.set(item.objectTypeId, {
+              id: item.objectTypeId,
+              name: item.objectTypeName || `Type #${item.objectTypeId}`
+            });
+          }
+        }
+
+        return Array.from(unique.values()).sort((a, b) => a.name.localeCompare(b.name));
+      })
+    );
+  }
+
+  create(dto: CreateObjectDto): Observable<ObjectDto> {
+    return this.http.post<ObjectDto>(this.url, dto);
+  }
+
+  addImage(objectId: number, dto: AddObjectImageDto): Observable<ObjectImageDto> {
+    return this.http.post<ObjectImageDto>(`${this.url}/${objectId}/images`, dto);
   }
 
   private toUniqueOptions(values: Array<string | undefined>, mapLabel: (value: string) => string): FilterOption[] {

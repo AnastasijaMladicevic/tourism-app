@@ -1,0 +1,124 @@
+<section class="object-create-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Objects management</p>
+      <h1>Create Object</h1>
+      <p class="page-intro">Add a new object with location, details, amenities, and opening hours.</p>
+    </div>
+    <a class="ghost-link" routerLink="/content-creator/objects">Back to Objects</a>
+  </header>
+
+  <div class="create-layout">
+    <form class="form-column card" [formGroup]="form" (ngSubmit)="submit()">
+      <section class="section-block">
+        <h2>Image Gallery</h2>
+        <label>
+          <span>Main image URL</span>
+          <input type="url" formControlName="imageUrl" placeholder="https://example.com/image.jpg" />
+        </label>
+      </section>
+
+      <section class="section-block">
+        <h2>General Information</h2>
+        <div class="grid-2">
+          <label>
+            <span>Object Name *</span>
+            <input type="text" formControlName="name" placeholder="Object name" />
+          </label>
+          <label>
+            <span>Address</span>
+            <input type="text" formControlName="address" placeholder="Address" />
+          </label>
+          <label>
+            <span>Object Type *</span>
+            <select formControlName="objectTypeId">
+              <option [ngValue]="null">Select type</option>
+              <option *ngFor="let type of objectTypes" [ngValue]="type.id">{{ type.name }}</option>
+            </select>
+          </label>
+          <label>
+            <span>Price</span>
+            <input type="number" formControlName="price" min="0" step="0.01" placeholder="0.00" />
+          </label>
+          <label>
+            <span>Destination</span>
+            <select formControlName="destinationId">
+              <option [ngValue]="null">Select destination</option>
+              <option *ngFor="let destination of destinations" [ngValue]="destination.id">{{ destination.name }}</option>
+            </select>
+          </label>
+          <label>
+            <span>Locality</span>
+            <select formControlName="localityId">
+              <option [ngValue]="null">Select locality</option>
+              <option *ngFor="let locality of filteredLocalities" [ngValue]="locality.id">{{ locality.name }}</option>
+            </select>
+          </label>
+          <label>
+            <span>Latitude</span>
+            <input type="number" formControlName="latitude" min="-90" max="90" step="0.000001" placeholder="42.424000" />
+          </label>
+          <label>
+            <span>Longitude</span>
+            <input type="number" formControlName="longitude" min="-180" max="180" step="0.000001" placeholder="18.771000" />
+          </label>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <h2>Custom &amp; Story</h2>
+        <label>
+          <span>Full object description</span>
+          <textarea rows="5" formControlName="description" placeholder="Describe this object..."></textarea>
+        </label>
+      </section>
+
+      <section class="section-block">
+        <h2>Amenities &amp; Contact</h2>
+        <label>
+          <span>Amenities (comma separated)</span>
+          <input type="text" formControlName="amenitiesInput" placeholder="WiFi, Parking, Outdoor Seating" />
+        </label>
+      </section>
+
+      <section class="section-block">
+        <h2>Opening Hours</h2>
+        <div class="hours-grid">
+          <div class="hour-row" *ngFor="let day of workingDays">
+            <span>{{ day.label }}</span>
+            <input type="time" [formControl]="getWorkingOpenControl(day.key)" />
+            <span>-</span>
+            <input type="time" [formControl]="getWorkingCloseControl(day.key)" />
+          </div>
+        </div>
+      </section>
+
+      @if (errorMessage) {
+        <p class="error-msg">{{ errorMessage }}</p>
+      }
+
+      <footer class="form-actions">
+        <button type="button" class="ghost-btn" routerLink="/content-creator/objects">Discard</button>
+        <button type="submit" class="primary-btn" [disabled]="isSubmitting || isLoadingOptions">
+          {{ isSubmitting ? 'Creating...' : 'Create this object' }}
+        </button>
+      </footer>
+    </form>
+
+    <aside class="side-column card">
+      <h3>Location Preview</h3>
+      @if (hasMapCoordinates) {
+        <app-map
+          [lat]="mapLat"
+          [lng]="mapLng"
+          [zoom]="14"
+          [popupText]="form.controls.name.value || 'New object'"
+          [interactive]="false"
+          mapId="create-object-map"
+        ></app-map>
+      } @else {
+        <div class="empty-map-state">Set latitude and longitude to preview location.</div>
+      }
+    </aside>
+  </div>
+</section>

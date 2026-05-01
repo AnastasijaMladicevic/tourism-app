@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { FilterOption, ObjectDto, ObjectService } from '../../../services/object';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 
@@ -20,6 +21,7 @@ interface WorkingHoursRow {
 export class ContentCreatorObjectsComponent implements OnInit {
   private readonly objectService = inject(ObjectService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly router = inject(Router);
 
   objects: ObjectDto[] = [];
   pagedObjects: ObjectDto[] = [];
@@ -172,6 +174,10 @@ export class ContentCreatorObjectsComponent implements OnInit {
     this.pageSize = Number(value);
     this.currentPage = 1;
     this.loadObjects();
+  }
+
+  onCreateObject(): void {
+    this.router.navigate(['/content-creator/objects/create']);
   }
 
   selectObject(object: ObjectDto): void {
