@@ -14,6 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { ObjectDto, ObjectService, ObjectView } from '../../services/object';
 import { AuthService } from '../../services/auth';
 import { LocationTrackingService } from '../../services/location-tracking';
+import { FavoriteStateService } from '../../services/favorite-state';
 
 @Component({
   selector: 'app-objects',
@@ -43,13 +44,15 @@ export class ObjectsComponent implements OnInit {
   visibleObjects: ObjectView[] = [];
   userLocation: { lat: number; lng: number } | null = null;
   isTracking = false;
+  private readonly favoritePendingIds = new Set<number>();
   constructor(
     private router: Router,
     private route: ActivatedRoute,
     private objectService: ObjectService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
-    private locationTrackingService: LocationTrackingService
+    private locationTrackingService: LocationTrackingService,
+    private favoriteStateService: FavoriteStateService,
   ) { }
 
   ngOnInit(): void {
@@ -268,17 +271,51 @@ export class ObjectsComponent implements OnInit {
     return map[this.sortOption];
   }
 
-  toggleFavorite(obj: ObjectView, event: Event): void {
+  isFavoritePending(objectId: number): boolean {
+    return this.favoritePendingIds.has(objectId);
+  }
+  private patchFavoriteState(objectId: number, isFavorite: boolean, favoriteId?: number): void {
+    const applyPatch = (list: ObjectView[]) => {
+      list.forEach((object) => {
+        if (object.id === objectId) {
+          object.isFavorite = isFavorite;
+          object.favoriteId = favoriteId;
+        }
+      });
+    };
+
+    applyPatch(this.objects);
+    applyPatch(this.visibleObjects);
+  }
+  toggleFavorite(object: ObjectView, event: Event): void {
+    event.preventDefault();
     event.stopPropagation();
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login']);
       return;
     }
 
-    obj.isFavorite = !obj.isFavorite;
-    this.objects = this.objects.map((item) =>
-      item.id === obj.id ? { ...item, isFavorite: obj.isFavorite } : item,
-    );
+    if (this.favoritePendingIds.has(object.id)) {
+      return;
+    }
+
+    this.favoritePendingIds.add(object.id);
+
+    this.favoriteStateService
+      .toggle({ type: 'object', entityId: object.id }, object.favoriteId)
+      .subscribe({
+        next: (state) => {
+          this.patchFavoriteState(object.id, state.isFavorite, state.favoriteId);
+        },
+        error: () => {
+          this.favoritePendingIds.delete(object.id);
+          this.cdr.detectChanges();
+        },
+        complete: () => {
+          this.favoritePendingIds.delete(object.id);
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   getMainImage(obj: ObjectView): string {
@@ -356,6 +393,10 @@ export class ObjectsComponent implements OnInit {
 
     const startIndex = (this.currentPage - 1) * this.pageSize;
     this.visibleObjects = filteredObjects.slice(startIndex, startIndex + this.pageSize);
+    this.favoriteStateService.applyToList(this.visibleObjects, (object) => ({
+      type: 'object',
+      entityId: object.id,
+    }));
     this.cdr.detectChanges();
   }
 

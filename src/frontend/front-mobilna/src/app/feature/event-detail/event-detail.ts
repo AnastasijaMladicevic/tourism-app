@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,11 +12,12 @@ import {
 } from '../../services/event';
 import { ImageDto, ImageService } from '../../services/image';
 import { AuthService } from '../../services/auth';
-import { FavoriteStateService, FavoriteTarget } from '../../services/favorite-state';
 import { MapComponent } from '../../shared/components/map/map';
 import { TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { environment } from '../../../environment/environment';
+import { EventPlannerService } from '../../services/event-planner';
+import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
 
 @Component({
   selector: 'app-event-detail',
@@ -26,16 +27,16 @@ import { environment } from '../../../environment/environment';
   styleUrls: ['./event-detail.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class EventDetailComponent implements OnInit {
+export class EventDetailComponent implements OnInit, OnDestroy {
   event: EventDto | null = null;
   images: ImageDto[] = [];
   nearbyEvents: EventDto[] = [];
   mainImage = '';
   isLoading = true;
   errorMessage = '';
-  isFavorite = false;
-  favoriteId?: number;
-  isFavoriteBusy = false;
+  isInPlanner = false;
+  plannerId?: number;
+  isPlannerBusy = false;
 
   showGalleryModal = false;
   currentImageIndex = 0;
@@ -49,10 +50,11 @@ export class EventDetailComponent implements OnInit {
     private eventService: EventService,
     private imageService: ImageService,
     private authService: AuthService,
-    private favoriteStateService: FavoriteStateService,
+    private eventPlannerService: EventPlannerService,
+    private plannerLocalPreferences: PlannerLocalPreferencesService,
     private cdr: ChangeDetectorRef,
     private translationService: TranslationService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
@@ -67,8 +69,7 @@ export class EventDetailComponent implements OnInit {
         this.event = normalizedEvent;
         this.images = images || [];
         this.mainImage = this.getMainImage(this.images, normalizedEvent);
-        this.syncFavoriteState();
-
+        this.syncPlannerState();
         this.loadNearbyEvents(normalizedEvent);
       },
       error: (err) => {
@@ -78,6 +79,65 @@ export class EventDetailComponent implements OnInit {
         this.cdr.detectChanges();
       },
     });
+
+    window.addEventListener('focus', this.handleWindowFocus);
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('focus', this.handleWindowFocus);
+  }
+
+  removeFromPlanner(): void {
+    if (!this.plannerId) return;
+
+    const plannerId = this.plannerId;
+    this.isPlannerBusy = true;
+
+    this.eventPlannerService.remove(plannerId).subscribe({
+      next: () => {
+        this.plannerLocalPreferences.remove(plannerId);
+        this.isInPlanner = false;
+        this.plannerId = undefined;
+        this.isPlannerBusy = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Greška pri uklanjanju iz plana', err);
+        this.isPlannerBusy = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private syncPlannerState(): void {
+    if (!this.authService.isLoggedIn() || !this.event?.id) {
+      this.isInPlanner = false;
+      this.plannerId = undefined;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.eventPlannerService
+      .getMyPlanner({
+        page: 1,
+        pageSize: 100,
+        sortBy: 'startDate',
+        sortOrder: 'asc',
+      })
+      .pipe(
+        catchError((err) => {
+          console.error('Failed to sync planner state:', err);
+          return of({ items: [] });
+        }),
+      )
+      .subscribe((result) => {
+        const plannerItem =
+          result.items?.find((item) => Number(item.eventId) === Number(this.event?.id)) ?? null;
+
+        this.isInPlanner = !!plannerItem;
+        this.plannerId = plannerItem?.id;
+        this.cdr.detectChanges();
+      });
   }
 
   private loadNearbyEvents(currentEvent: EventDto): void {
@@ -206,71 +266,36 @@ export class EventDetailComponent implements OnInit {
     this.router.navigate(['/event', eventId]);
   }
 
-  toggleFavorite(): void {
-    if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
-      return;
-    }
-
-    const target = this.getFavoriteTarget();
-    if (!target || this.isFavoriteBusy) {
-      return;
-    }
-
-    this.isFavoriteBusy = true;
-    this.favoriteStateService.toggle(target, this.favoriteId).subscribe({
-      next: (state) => {
-        this.isFavorite = state.isFavorite;
-        this.favoriteId = state.favoriteId;
-      },
-      error: () => {
-        this.isFavoriteBusy = false;
-        this.cdr.detectChanges();
-      },
-      complete: () => {
-        this.isFavoriteBusy = false;
-        this.cdr.detectChanges();
-      },
-    });
-  }
-
-  private syncFavoriteState(): void {
-    const target = this.getFavoriteTarget();
-    if (!target || !this.authService.isLoggedIn()) {
-      return;
-    }
-
-    this.favoriteStateService.loadFavorites(true).pipe(catchError(() => of(new Map<string, number>()))).subscribe(() => {
-      const stateful = { isFavorite: this.isFavorite, favoriteId: this.favoriteId };
-      this.favoriteStateService.applyToItem(stateful, target);
-      this.isFavorite = stateful.isFavorite;
-      this.favoriteId = stateful.favoriteId;
-      this.cdr.detectChanges();
-    });
-  }
-
-  private getFavoriteTarget(): FavoriteTarget | null {
-    if (this.event?.objectId) {
-      return { type: 'object', entityId: this.event.objectId };
-    }
-
-    if (this.event?.destinationId) {
-      return { type: 'destination', entityId: this.event.destinationId };
-    }
-
-    return null;
-  }
-
   onImageError(event: Event): void {
     (event.target as HTMLImageElement).style.display = 'none';
   }
 
-  formatDate(dateStr: string): string {
-    return new Date(dateStr).toLocaleDateString(this.translationService.currentLocale(), {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
+  formatDate(dateStr: string, endDateStr?: string): string {
+    const start = new Date(dateStr);
+
+    const baseFormat = (d: Date) =>
+      d.toLocaleDateString(this.translationService.currentLocale(), {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+
+    if (!endDateStr) {
+      return baseFormat(start);
+    }
+
+    const end = new Date(endDateStr);
+
+    const sameDay =
+      start.getDate() === end.getDate() &&
+      start.getMonth() === end.getMonth() &&
+      start.getFullYear() === end.getFullYear();
+
+    if (sameDay) {
+      return baseFormat(start);
+    }
+
+    return `${baseFormat(start)} - ${baseFormat(end)}`;
   }
 
   goBack(): void {
@@ -282,6 +307,16 @@ export class EventDetailComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
+
+    if (this.isPlannerBusy) {
+      return;
+    }
+
+    if (this.isInPlanner && this.plannerId) {
+      this.removeFromPlanner();
+      return;
+    }
+
     this.router.navigate(['/planner/add'], {
       state: {
         eventId: this.event?.id,
@@ -319,8 +354,8 @@ export class EventDetailComponent implements OnInit {
         lat: this.event.latitude,
         lng: this.event.longitude,
         zoom: 19,
-        selectedItem: this.event,         
-      selectedType: 'event'
+        selectedItem: this.event,
+        selectedType: 'event'
       }
     });
   }
@@ -371,4 +406,8 @@ export class EventDetailComponent implements OnInit {
       this.prevImage();
     }
   }
+
+  private readonly handleWindowFocus = (): void => {
+    this.syncPlannerState();
+  };
 }

@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -17,6 +17,7 @@ import { LazyBackgroundDirective } from '../../shared/directives/lazy-background
 import { RecommendationItemDto, RecommendationService } from '../../services/recommendation';
 import { LocationTrackingService } from '../../services/location-tracking';
 import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
+import { EventPlannerService } from '../../services/event-planner';
 
 interface PlaceCard {
   title: string;
@@ -32,6 +33,12 @@ interface PlaceCard {
   distanceText?: string;
   latitude?: number;
   longitude?: number;
+  isPlanned?: boolean;
+  plannerId?: number;
+  description?: string;
+  eventTypeName?: string;
+  startDate?: string;
+  endDate?: string | null;
 }
 
 interface EventCard {
@@ -48,6 +55,10 @@ interface EventCard {
   longitude?: number;
   isPlanned?: boolean;
   plannerId?: number;
+  description?: string;
+  eventTypeName?: string;
+  startDate?: string;
+  endDate?: string | null;
 }
 
 interface FeaturedDestination {
@@ -80,7 +91,7 @@ interface HomeCategory {
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   userName = '';
   searchQuery = '';
   readonly categories: HomeCategory[] = [
@@ -105,11 +116,12 @@ export class HomeComponent implements OnInit {
   isLoadingRecommendations = true;
   userLocation: { lat: number; lng: number } | null = null;
   isTracking = false;
+  isPlannerBusy = false;
   private favoriteMap = new Map<string, number>();
   private fallbackRecommended: PlaceCard[] = [];
   private hasRecommendationResponse = false;
   private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
-
+  private plannerMap = new Map<number, number>();
   constructor(
     public router: Router,
     private http: HttpClient,
@@ -124,53 +136,133 @@ export class HomeComponent implements OnInit {
     private recommendationService: RecommendationService,
     private locationTrackingService: LocationTrackingService,
     private plannerService: PlannerLocalPreferencesService,
+    private eventPlannerService: EventPlannerService
   ) { }
-  private applyPlannerState(): void {
-    const prefs = this.plannerService.list();
 
-    this.events = this.events.map(event => {
-      const found = prefs.find(p => p.eventId === event.id);
+  private applyPlannerState(list: EventCard[]): void {
+    for (const item of list) {
+      item.isPlanned = this.plannerMap.has(item.id);
+      item.plannerId = this.plannerMap.get(item.id);
+    }
+  }
 
-      return {
-        ...event,
-        isPlanned: !!found,
-        plannerId: found?.plannerId
-      };
+  private applyPlannerStateToPlaceCards(list: PlaceCard[]): void {
+    for (const item of list) {
+      if (item.itemType !== 'event') {
+        continue;
+      }
+
+      item.isPlanned = this.plannerMap.has(item.itemId);
+      item.plannerId = this.plannerMap.get(item.itemId);
+    }
+  }
+
+  private syncPlannerStateAcrossLists(): void {
+    this.applyPlannerState(this.upcomingEvents);
+    this.applyPlannerState(this.events as EventCard[]);
+    this.applyPlannerStateToPlaceCards(this.recommended);
+  }
+
+  private loadPlanner(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.plannerMap.clear();
+      this.syncPlannerStateAcrossLists();
+      this.flushUi();
+      return;
+    }
+
+    this.eventPlannerService.getMyPlanner({
+      page: 1,
+      pageSize: 200
+    }).subscribe(res => {
+      this.plannerMap.clear();
+
+      res.items.forEach(item => {
+        this.plannerMap.set(Number(item.eventId), item.id);
+      });
+
+      this.syncPlannerStateAcrossLists();
+      this.flushUi();
     });
   }
-  togglePlanner(eventCard: EventCard, event: Event): void {
-    event.stopPropagation();
+  togglePlanner(eventItem: EventCard, e?: Event): void {
+    e?.stopPropagation();
 
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login']);
       return;
     }
 
-    eventCard.isPlanned = !eventCard.isPlanned;
+    if (this.isPlannerBusy) return;
 
-    if (eventCard.isPlanned) {
-      const plannerId = Date.now(); // simple unique id
+    this.isPlannerBusy = true;
 
-      this.plannerService.upsert({
-        plannerId,
-        eventId: eventCard.id,
-        plannedDate: new Date().toISOString().split('T')[0],
-        startTime: '12:00',
-        durationMinutes: 90,
-        notes: '',
-        isPriority: false
+    const existingId = this.plannerMap.get(eventItem.id);
+
+    // REMOVE
+    if (existingId) {
+      this.eventPlannerService.remove(existingId).subscribe({
+        next: () => {
+          this.plannerService.remove(existingId);
+          this.plannerMap.delete(eventItem.id);
+          eventItem.isPlanned = false;
+          eventItem.plannerId = undefined;
+          this.syncPlannerStateAcrossLists();
+          this.isPlannerBusy = false;
+          this.flushUi();
+        },
+        error: () => {
+          this.isPlannerBusy = false;
+          this.flushUi();
+        }
       });
 
-      eventCard.plannerId = plannerId;
-    } else {
-      if (eventCard.plannerId) {
-        this.plannerService.remove(eventCard.plannerId);
+      return;
+    }
+    this.router.navigate(['/planner/add'], {
+      state: {
+        eventId: eventItem.id,
+        title: eventItem.title,
+        location: eventItem.location,
+        startDate: eventItem.startDate,
+        endDate: eventItem.endDate,
+        type: eventItem?.eventTypeName || 'Dogadjaj',
+        imageUrl: eventItem.imageUrl || this.resolveMediaUrl(eventItem?.imageUrl),
+        description: eventItem?.description,
       }
-      eventCard.plannerId = undefined;
+    });
+
+    this.isPlannerBusy = false;
+  }
+
+  togglePlannerForRecommended(card: PlaceCard, event?: Event): void {
+    event?.stopPropagation();
+
+    if (card.itemType !== 'event') {
+      return;
     }
 
-    this.events = this.events.map(e =>
-      e.id === eventCard.id ? { ...eventCard } : e
+    this.togglePlanner(
+      {
+        id: card.itemId,
+        title: card.title,
+        location: card.location,
+        dateText: '',
+        priceText: '',
+        isFree: false,
+        timeText: '',
+        imageUrl: card.imageUrl,
+        distanceText: card.distanceText,
+        latitude: card.latitude,
+        longitude: card.longitude,
+        isPlanned: card.isPlanned,
+        plannerId: card.plannerId,
+        description: card.description,
+        eventTypeName: card.eventTypeName,
+        startDate: card.startDate,
+        endDate: card.endDate,
+      },
+      event,
     );
   }
   onSearchInput(): void {
@@ -286,9 +378,9 @@ export class HomeComponent implements OnInit {
     this.loadPlaceCards();
     this.loadRecommendedCards();
     this.loadEventCards();
-    this.applyPlannerState();
     this.loadFavorites();
   }
+
   private updateDistances(): void {
     if (!this.userLocation) return;
 
@@ -618,6 +710,7 @@ export class HomeComponent implements OnInit {
 
         this.recommended = cards.length ? cards : [...this.fallbackRecommended];
         this.applyFavoriteState(this.recommended);
+        this.applyPlannerStateToPlaceCards(this.recommended);
         this.flushUi();
       });
   }
@@ -658,14 +751,18 @@ export class HomeComponent implements OnInit {
             distanceText: this.distanceTextFromCoords(e.latitude, e.longitude),
             latitude: e.latitude,
             longitude: e.longitude,
+            startDate: e.startDate,
+            endDate: e.endDate,
           }),
         );
 
         this.upcomingEvents = eventCards;
         this.events = eventCards;
+        this.syncPlannerStateAcrossLists();
 
         this.flushUi();
       });
+    this.loadPlanner();
   }
 
   private loadFavorites(): void {
@@ -961,9 +1058,11 @@ export class HomeComponent implements OnInit {
         item.distanceMeters != null
           ? this.distanceTextFromCoordsFromMeters(item.distanceMeters)
           : undefined,
+      eventTypeName: normalizedType === 'event' ? item.categoryName || 'Dogadjaj' : undefined,
     };
 
     this.applyFavoriteState([card]);
+    this.applyPlannerStateToPlaceCards([card]);
     return card;
   }
 

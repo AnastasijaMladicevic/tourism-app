@@ -8,11 +8,12 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { firstValueFrom } from 'rxjs';
+import { catchError, firstValueFrom, of } from 'rxjs';
 import { LocalityDto, LocalityService } from '../../services/locality';
 import { AuthService } from '../../services/auth';
 import { ImageDto, ImageService } from '../../services/image';
 import { LocationTrackingService } from '../../services/location-tracking';
+import { FavoriteStateService } from '../../services/favorite-state';
 
 export interface LocalityView extends LocalityDto {
   isFavorite: boolean;
@@ -47,12 +48,14 @@ export class LocalitiesComponent implements OnInit {
   private readonly fetchPageSize = 100;
   private readonly maxFetchPages = 50;
   private readonly imageCache = new Map<number, LocalityDto['images']>();
+  private readonly favoritePendingIds = new Set<number>();
   constructor(
     private router: Router,
     private localityService: LocalityService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private imageService: ImageService,
+    private favoriteStateService: FavoriteStateService,
     private locationTrackingService: LocationTrackingService
   ) { }
   ngOnInit(): void {
@@ -173,17 +176,51 @@ export class LocalitiesComponent implements OnInit {
     this.currentPage = 1;
     void this.refreshVisibleLocalities();
   }
+  isFavoritePending(localityId: number): boolean {
+    return this.favoritePendingIds.has(localityId);
+  }
+  private patchFavoriteState(localityId: number, isFavorite: boolean, favoriteId?: number): void {
+    const applyPatch = (list: LocalityView[]) => {
+      list.forEach((locality) => {
+        if (locality.id === localityId) {
+          locality.isFavorite = isFavorite;
+          locality.favoriteId = favoriteId;
+        }
+      });
+    };
+
+    applyPatch(this.localities);
+    applyPatch(this.visibleLocalities);
+  }
   toggleFavorite(locality: LocalityView, event: Event): void {
+    event.preventDefault();
     event.stopPropagation();
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login']);
       return;
     }
 
-    locality.isFavorite = !locality.isFavorite;
-    this.localities = this.localities.map((item) =>
-      item.id === locality.id ? { ...item, isFavorite: locality.isFavorite } : item,
-    );
+    if (this.favoritePendingIds.has(locality.id)) {
+      return;
+    }
+
+    this.favoritePendingIds.add(locality.id);
+
+    this.favoriteStateService
+      .toggle({ type: 'locality', entityId: locality.id }, locality.favoriteId)
+      .subscribe({
+        next: (state) => {
+          this.patchFavoriteState(locality.id, state.isFavorite, state.favoriteId);
+        },
+        error: () => {
+          this.favoritePendingIds.delete(locality.id);
+          this.cdr.detectChanges();
+        },
+        complete: () => {
+          this.favoritePendingIds.delete(locality.id);
+          this.cdr.detectChanges();
+        },
+      });
   }
   prevPage(): void {
     if (this.currentPage === 1) return;
@@ -226,11 +263,19 @@ export class LocalitiesComponent implements OnInit {
 
     return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
   }
+
   async loadData(): Promise<void> {
     this.isLoading = true;
     this.errorMessage = '';
 
     try {
+      if (this.authService.isLoggedIn()) {
+        await firstValueFrom(
+          this.favoriteStateService
+            .loadFavorites(true)
+            .pipe(catchError(() => of(new Map<string, number>()))),
+        );
+      }
       const localities = await this.fetchAllLocalities();
 
       this.localities = localities.map((locality) => ({
@@ -238,6 +283,10 @@ export class LocalitiesComponent implements OnInit {
         images: this.imageCache.get(locality.id) ?? [],
         isFavorite: false,
         favoriteId: undefined,
+      }));
+      this.favoriteStateService.applyToList(this.localities, (locality) => ({
+        type: 'locality',
+        entityId: locality.id,
       }));
       this.updateDistances();
       this.localityTypes = this.extractUniqueTypes(this.localities);
@@ -380,7 +429,10 @@ export class LocalitiesComponent implements OnInit {
         images: await this.getLocalityImages(locality.id),
       })),
     );
-
+    this.favoriteStateService.applyToList(this.visibleLocalities, (locality) => ({
+      type: 'locality',
+      entityId: locality.id,
+    }));
     this.cdr.detectChanges();
   }
   private async getLocalityImages(localityId: number): Promise<LocalityDto['images']> {

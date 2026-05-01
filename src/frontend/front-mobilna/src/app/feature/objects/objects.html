@@ -164,6 +164,7 @@
           <button
             class="card__fav"
             [class.card__fav--active]="obj.isFavorite"
+            [disabled]="isFavoritePending(obj.id)"
             (click)="toggleFavorite(obj, $event)"
           >
             <mat-icon>{{ obj.isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
@@ -182,7 +183,7 @@
             }
           </div>
 
-          <p class="card__type"><mat-icon>place</mat-icon> {{ obj.objectTypeName }}</p>
+          <p class="card__type"><mat-icon>place</mat-icon> {{ obj.destinationName }}</p>
 
           <p class="card__desc">{{ obj.description }}</p>
 

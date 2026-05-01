@@ -118,7 +118,16 @@
               class="place-img place-img--dynamic"
               [appLazyBackground]="card.imageUrl ?? null"
             >
-              @if (card.itemType !== 'event') {
+              @if (card.itemType === 'event') {
+                <button
+                  class="planner-btn"
+                  [disabled]="isPlannerBusy"
+                  (click)="togglePlannerForRecommended(card, $event)"
+                  [class.planner-btn--active]="card.isPlanned"
+                >
+                  <mat-icon>{{ card.isPlanned ? 'event_available' : 'event' }}</mat-icon>
+                </button>
+              } @else {
                 <button class="heart-btn" type="button" (click)="toggleFavorite(card, $event)">
                   <svg
                     width="14"
@@ -292,12 +301,11 @@
             >
             <button
               class="planner-btn"
-              type="button"
+              [disabled]="isPlannerBusy"
               (click)="togglePlanner(event, $event)"
+              [class.planner-btn--active]="event.isPlanned"
             >
-              <mat-icon>
-                {{ event.isPlanned ? 'event_available' : 'event' }}
-              </mat-icon>
+              <mat-icon>{{ event.isPlanned ? 'event_available' : 'event' }}</mat-icon>
             </button>
             @if (getDistanceText(event)) {
                     <span class="card__distance">

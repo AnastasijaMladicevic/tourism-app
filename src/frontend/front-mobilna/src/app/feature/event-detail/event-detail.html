@@ -32,8 +32,13 @@
           <mat-icon>celebration</mat-icon>
         </div>
       }
-      <button class="fav-btn" [disabled]="isFavoriteBusy" (click)="toggleFavorite()" [class.fav-btn--active]="isFavorite">
-        <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
+      <button
+        class="planner-btn"
+        [disabled]="isPlannerBusy"
+        (click)="addToPlanner()"
+        [class.planner-btn--active]="isInPlanner"
+      >
+        <mat-icon>{{ isInPlanner ? 'event_available' : 'event' }}</mat-icon>
       </button>
     </div>
 
@@ -43,12 +48,12 @@
           <div class="title-row">
             <h1 class="title">{{ event.name }}</h1>
             <button
-              class="fav-btn fav-btn--desktop"
-              [disabled]="isFavoriteBusy"
-              (click)="toggleFavorite()"
-              [class.fav-btn--active]="isFavorite"
+              class="planner-btn planner-btn--desktop"
+              [disabled]="isPlannerBusy"
+              (click)="addToPlanner()"
+              [class.planner-btn--active]="isInPlanner"
             >
-              <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
+              <mat-icon>{{ isInPlanner ? 'event_available' : 'event' }}</mat-icon>
             </button>
           </div>
           @if (event.localityName && event.destinationName) {
@@ -60,18 +65,7 @@
           }
           <p class="venue"><mat-icon>location_on</mat-icon>{{ event.objectName || 'N/A' }}</p>
 
-          <p class="date">{{ formatDate(event.startDate) }} – {{ formatDate(event.endDate) }}</p>
-
-          <div class="actions">
-            <button class="btn btn-outline" (click)="addToPlanner()">
-              <mat-icon>add_circle</mat-icon>
-              {{ 'event.addToPlanner' | translate }}
-            </button>
-
-            <button class="btn btn-primary" (click)="buyTicket()">
-              {{ 'event.buyTicket' | translate }}
-            </button>
-          </div>
+          <p class="date">{{ formatDate(event.startDate, event.endDate) }}</p>
         </div>
 
         <div class="card">
@@ -119,17 +113,12 @@
           </div>
         </div>
         <div class="card">
-          <h2>{{ 'event.availableTickets' | translate }}</h2>
+          <h2>Cena</h2>
 
           <div class="ticket-card">
             <div>
-              <span class="ticket-type">{{ 'event.standardTicket' | translate }}</span>
-              <span class="ticket-price">{{ getTicketPrice() }}</span>
+              <span class="ticket-type">{{ 'event.standardTicket' | translate }}</span><span class="ticket-price">{{ getTicketPrice() }}</span>
             </div>
-
-            <button class="btn-small" (click)="buyTicket()">
-              {{ 'event.select' | translate }}
-            </button>
           </div>
         </div>
         <div class="card nearby-card">
