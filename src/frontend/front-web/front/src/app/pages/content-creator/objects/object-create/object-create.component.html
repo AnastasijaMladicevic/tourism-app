@@ -5,17 +5,32 @@
       <h1>Create Object</h1>
       <p class="page-intro">Add a new object with location, details, amenities, and opening hours.</p>
     </div>
-    <a class="ghost-link" routerLink="/content-creator/objects">Back to Objects</a>
+    <div class="top-actions">
+      <button type="submit" class="primary-btn" [disabled]="isSubmitting || isLoadingOptions" form="create-object-form">
+        {{ isSubmitting ? 'Creating...' : 'Create object' }}
+      </button>
+      <button type="button" class="ghost-btn" routerLink="/content-creator/objects">Cancel</button>
+    </div>
   </header>
 
   <div class="create-layout">
-    <form class="form-column card" [formGroup]="form" (ngSubmit)="submit()">
+    <form id="create-object-form" class="form-column card" [formGroup]="form" (ngSubmit)="submit()">
       <section class="section-block">
         <h2>Image Gallery</h2>
         <label>
           <span>Main image URL</span>
           <input type="url" formControlName="imageUrl" placeholder="https://example.com/image.jpg" />
         </label>
+        <div class="image-preview-box">
+          @if (imagePreviewUrl) {
+            <img [src]="imagePreviewUrl" alt="Object image preview" class="image-preview" />
+          } @else {
+            <div class="image-preview-empty">
+              <span class="material-symbols-outlined">image</span>
+              <p>Paste an image URL to preview it here.</p>
+            </div>
+          }
+        </div>
       </section>
 
       <section class="section-block">
@@ -89,12 +104,6 @@
         <p class="error-msg">{{ errorMessage }}</p>
       }
 
-      <footer class="form-actions">
-        <button type="button" class="ghost-btn" routerLink="/content-creator/objects">Discard</button>
-        <button type="submit" class="primary-btn" [disabled]="isSubmitting || isLoadingOptions">
-          {{ isSubmitting ? 'Creating...' : 'Create this object' }}
-        </button>
-      </footer>
     </form>
 
     <aside class="side-column card" [formGroup]="form">
@@ -104,18 +113,15 @@
       </header>
 
       <div class="map-shell">
-        @if (hasMapCoordinates) {
-          <app-map
-            [lat]="mapLat"
-            [lng]="mapLng"
-            [zoom]="14"
-            [popupText]="form.controls.name.value || 'New object'"
-            [interactive]="false"
-            mapId="create-object-map"
-          ></app-map>
-        } @else {
-          <div class="empty-map-state">Set latitude and longitude to preview location.</div>
-        }
+        <app-map
+          [lat]="mapLat"
+          [lng]="mapLng"
+          [zoom]="14"
+          [popupText]="form.controls.name.value || 'New object'"
+          [interactive]="false"
+          [showMarker]="hasMapCoordinates"
+          mapId="create-object-map"
+        ></app-map>
       </div>
 
       <div class="location-line">

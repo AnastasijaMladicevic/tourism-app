@@ -80,6 +80,14 @@ export class ObjectCreateComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadOptions();
+
+    this.form.controls.destinationId.valueChanges.subscribe(() => {
+      this.applyLocationFromSelection();
+    });
+
+    this.form.controls.localityId.valueChanges.subscribe(() => {
+      this.applyLocationFromSelection();
+    });
   }
 
   get filteredLocalities(): LocalityOption[] {
@@ -101,6 +109,19 @@ export class ObjectCreateComponent implements OnInit {
 
   get hasMapCoordinates(): boolean {
     return this.form.controls.latitude.value != null && this.form.controls.longitude.value != null;
+  }
+
+  get imagePreviewUrl(): string {
+    const raw = this.form.controls.imageUrl.value.trim();
+    if (!raw) {
+      return '';
+    }
+
+    if (/^https?:\/\//i.test(raw)) {
+      return raw;
+    }
+
+    return '';
   }
 
   get locationSummary(): string {
@@ -228,7 +249,44 @@ export class ObjectCreateComponent implements OnInit {
       this.objectTypes = objectTypes;
       this.destinations = destinations;
       this.localities = localities;
+      this.applyLocationFromSelection();
     });
+  }
+
+  private applyLocationFromSelection(): void {
+    const selectedLocalityId = this.form.controls.localityId.value;
+    const selectedDestinationId = this.form.controls.destinationId.value;
+
+    const selectedLocality = selectedLocalityId
+      ? this.localities.find((locality) => locality.id === selectedLocalityId)
+      : undefined;
+    const localityLat = this.toNumber(selectedLocality?.latitude);
+    const localityLng = this.toNumber(selectedLocality?.longitude);
+    if (localityLat != null && localityLng != null) {
+      this.form.patchValue(
+        {
+          latitude: localityLat,
+          longitude: localityLng
+        },
+        { emitEvent: false }
+      );
+      return;
+    }
+
+    const selectedDestination = selectedDestinationId
+      ? this.destinations.find((destination) => destination.id === selectedDestinationId)
+      : undefined;
+    const destinationLat = this.toNumber(selectedDestination?.latitude);
+    const destinationLng = this.toNumber(selectedDestination?.longitude);
+    if (destinationLat != null && destinationLng != null) {
+      this.form.patchValue(
+        {
+          latitude: destinationLat,
+          longitude: destinationLng
+        },
+        { emitEvent: false }
+      );
+    }
   }
 
   private buildWorkingHoursPayload(): string | undefined {
@@ -256,5 +314,14 @@ export class ObjectCreateComponent implements OnInit {
   private optionalTrimmed(value: string | null | undefined): string | undefined {
     const trimmed = value?.trim();
     return trimmed ? trimmed : undefined;
+  }
+
+  private toNumber(value: unknown): number | null {
+    if (value == null || value === '') {
+      return null;
+    }
+
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
   }
 }
