@@ -139,7 +139,7 @@
                 <td>{{ object.destinationName || object.localityName || 'N/A' }}</td>
                 <td class="rating-cell">{{ (object.averageRating ?? 0).toFixed(1) }}</td>
                 <td>
-                  <button type="button" class="icon-btn" title="Edit">
+                  <button type="button" class="icon-btn" title="Edit" (click)="onEditObject(object); $event.stopPropagation()">
                     <span class="material-symbols-outlined">edit</span>
                   </button>
                 </td>

@@ -180,6 +180,10 @@ export class ContentCreatorObjectsComponent implements OnInit {
     this.router.navigate(['/content-creator/objects/create']);
   }
 
+  onEditObject(object: ObjectDto): void {
+    this.router.navigate(['/content-creator/objects/edit', object.id]);
+  }
+
   selectObject(object: ObjectDto): void {
     this.selectedObject = object;
   }

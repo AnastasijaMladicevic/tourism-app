@@ -2,12 +2,12 @@
   <header class="page-header">
     <div>
       <p class="eyebrow">Objects management</p>
-      <h1>Create Object</h1>
+      <h1>{{ pageTitle }}</h1>
       <p class="page-intro">Add a new object with location, details, amenities, and opening hours.</p>
     </div>
     <div class="top-actions">
       <button type="submit" class="primary-btn" [disabled]="isSubmitting || isLoadingOptions" form="create-object-form">
-        {{ isSubmitting ? 'Creating...' : 'Create object' }}
+        {{ isSubmitting ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save changes' : 'Create object') }}
       </button>
       <button type="button" class="ghost-btn" routerLink="/content-creator/objects">Cancel</button>
     </div>

@@ -128,6 +128,24 @@ export interface AddObjectImageDto {
   isMain: boolean;
 }
 
+export interface UpdateObjectDto {
+  name?: string;
+  description?: string;
+  address?: string;
+  phoneNumber?: string;
+  website?: string;
+  menuUrl?: string;
+  cuisineType?: string;
+  workingHours?: string;
+  price?: number;
+  amenities?: string[];
+  longitude?: number;
+  latitude?: number;
+  objectTypeId?: number;
+  destinationId?: number;
+  localityId?: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ObjectService {
   private readonly url = `${environment.apiUrl}/objects`;
@@ -270,6 +288,10 @@ export class ObjectService {
 
   addImage(objectId: number, dto: AddObjectImageDto): Observable<ObjectImageDto> {
     return this.http.post<ObjectImageDto>(`${this.url}/${objectId}/images`, dto);
+  }
+
+  update(id: number, dto: UpdateObjectDto): Observable<ObjectDto> {
+    return this.http.put<ObjectDto>(`${this.url}/${id}`, dto);
   }
 
   private toUniqueOptions(values: Array<string | undefined>, mapLabel: (value: string) => string): FilterOption[] {

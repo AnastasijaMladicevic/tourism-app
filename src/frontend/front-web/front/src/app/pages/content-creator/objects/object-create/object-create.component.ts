@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import {
   CreateObjectDto,
   ObjectService,
-  ObjectTypeOption
+  ObjectTypeOption,
+  UpdateObjectDto
 } from '../../../../services/object';
 import { ActivitiesService, LocalityOption } from '../../../../services/activities';
 import { DestinationDto, DestinationService } from '../../../../services/destination.service';
@@ -25,6 +26,7 @@ type WorkingDayKey = 'pon' | 'uto' | 'sre' | 'cet' | 'pet' | 'sub' | 'ned';
 export class ObjectCreateComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly objectService = inject(ObjectService);
   private readonly destinationService = inject(DestinationService);
   private readonly activitiesService = inject(ActivitiesService);
@@ -44,8 +46,11 @@ export class ObjectCreateComponent implements OnInit {
   localities: LocalityOption[] = [];
 
   isLoadingOptions = true;
+  isLoadingObject = false;
   isSubmitting = false;
   errorMessage = '';
+  isEditMode = false;
+  objectId: number | null = null;
 
   form = this.fb.group({
     name: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(200)]),
@@ -79,6 +84,12 @@ export class ObjectCreateComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    const idFromRoute = Number(this.route.snapshot.paramMap.get('id'));
+    if (Number.isFinite(idFromRoute) && idFromRoute > 0) {
+      this.isEditMode = true;
+      this.objectId = idFromRoute;
+    }
+
     this.loadOptions();
 
     this.form.controls.destinationId.valueChanges.subscribe(() => {
@@ -88,6 +99,14 @@ export class ObjectCreateComponent implements OnInit {
     this.form.controls.localityId.valueChanges.subscribe(() => {
       this.applyLocationFromSelection();
     });
+
+    if (this.isEditMode && this.objectId) {
+      this.loadObject(this.objectId);
+    }
+  }
+
+  get pageTitle(): string {
+    return this.isEditMode ? 'Edit Object' : 'Create Object';
   }
 
   get filteredLocalities(): LocalityOption[] {
@@ -187,7 +206,7 @@ export class ObjectCreateComponent implements OnInit {
     this.isSubmitting = true;
     this.errorMessage = '';
 
-    const payload: CreateObjectDto = {
+    const payload: CreateObjectDto | UpdateObjectDto = {
       name: this.form.controls.name.value?.trim() || '',
       address: this.optionalTrimmed(this.form.controls.address.value),
       description: this.optionalTrimmed(this.form.controls.description.value),
@@ -201,12 +220,21 @@ export class ObjectCreateComponent implements OnInit {
       amenities: this.parseAmenities(this.form.controls.amenitiesInput.value)
     };
 
-    this.objectService.create(payload).pipe(
+    const request$ = this.isEditMode && this.objectId
+      ? this.objectService.update(this.objectId, payload as UpdateObjectDto)
+      : this.objectService.create(payload as CreateObjectDto);
+
+    request$.pipe(
       finalize(() => {
         this.isSubmitting = false;
       })
     ).subscribe({
       next: (created) => {
+        if (this.isEditMode) {
+          this.router.navigate(['/content-creator/objects']);
+          return;
+        }
+
         const imageUrl = this.optionalTrimmed(this.form.controls.imageUrl.value);
         if (!imageUrl) {
           this.router.navigate(['/content-creator/objects']);
@@ -250,6 +278,38 @@ export class ObjectCreateComponent implements OnInit {
       this.destinations = destinations;
       this.localities = localities;
       this.applyLocationFromSelection();
+    });
+  }
+
+  private loadObject(id: number): void {
+    this.isLoadingObject = true;
+    this.errorMessage = '';
+
+    this.objectService.getById(id).pipe(
+      finalize(() => {
+        this.isLoadingObject = false;
+      })
+    ).subscribe({
+      next: (objectItem) => {
+        this.form.patchValue({
+          name: objectItem.name ?? '',
+          address: objectItem.address ?? '',
+          description: objectItem.description ?? '',
+          objectTypeId: objectItem.objectTypeId ?? null,
+          destinationId: objectItem.destinationId ?? null,
+          localityId: objectItem.localityId ?? null,
+          price: objectItem.price ?? null,
+          latitude: objectItem.latitude ?? null,
+          longitude: objectItem.longitude ?? null,
+          imageUrl: objectItem.mainImageUrl ?? '',
+          amenitiesInput: (objectItem.amenities ?? []).join(', ')
+        }, { emitEvent: false });
+
+        this.patchWorkingHours(objectItem.workingHours);
+      },
+      error: (error) => {
+        this.errorMessage = error?.error?.message ?? 'Failed to load object details.';
+      }
     });
   }
 
@@ -314,6 +374,45 @@ export class ObjectCreateComponent implements OnInit {
   private optionalTrimmed(value: string | null | undefined): string | undefined {
     const trimmed = value?.trim();
     return trimmed ? trimmed : undefined;
+  }
+
+  private patchWorkingHours(workingHours?: string): void {
+    const resetValues = {
+      ponOpen: '', ponClose: '',
+      utoOpen: '', utoClose: '',
+      sreOpen: '', sreClose: '',
+      cetOpen: '', cetClose: '',
+      petOpen: '', petClose: '',
+      subOpen: '', subClose: '',
+      nedOpen: '', nedClose: ''
+    };
+    this.workingHoursForm.patchValue(resetValues, { emitEvent: false });
+
+    if (!workingHours?.trim()) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(workingHours) as Record<string, string>;
+      for (const day of this.workingDays) {
+        const value = parsed[day.key];
+        if (!value || !value.includes('-')) {
+          continue;
+        }
+
+        const [open, close] = value.split('-');
+        if (!open || !close) {
+          continue;
+        }
+
+        this.workingHoursForm.patchValue({
+          [`${day.key}Open`]: open.trim(),
+          [`${day.key}Close`]: close.trim()
+        }, { emitEvent: false });
+      }
+    } catch {
+      // ignore malformed working hours payload
+    }
   }
 
   private toNumber(value: unknown): number | null {
