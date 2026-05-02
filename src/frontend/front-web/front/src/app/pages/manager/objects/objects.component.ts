@@ -26,7 +26,8 @@ export class ManagerObjectsComponent implements OnInit {
   pagedObjects: ObjectDto[] = [];
   selectedObject: ObjectDto | null = null;
 
-  managedRegionLabel = '';
+  /** Destination name(s) the manager oversees — cities/towns (not region/country). */
+  managedCityLabel = '';
 
   isLoading = true;
   errorMessage = '';
@@ -72,38 +73,32 @@ export class ManagerObjectsComponent implements OnInit {
   typeOptions: FilterOption[] = [];
 
   ngOnInit(): void {
-    this.loadManagedRegionLabel();
+    this.loadManagedCityLabel();
     this.loadFilterOptions();
     this.loadObjects();
   }
 
-  loadManagedRegionLabel(): void {
+  loadManagedCityLabel(): void {
     this.destinationService
       .getAll({ page: 1, pageSize: 100, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
       .subscribe({
         next: (response: unknown) => {
           const list = Array.isArray(response) ? response : (response as { items?: unknown[] })?.items ?? [];
-          const destinations = list as Array<{ name?: string; regionName?: string }>;
+          const destinations = list as Array<{ name?: string }>;
 
-          const regionNames = [
+          const cityNames = [
             ...new Set(
               destinations
-                .map((d) => d.regionName?.trim())
-                .filter((r): r is string => !!r)
+                .map((d) => d.name?.trim())
+                .filter((n): n is string => !!n)
             )
           ].sort((a, b) => a.localeCompare(b));
 
-          if (regionNames.length > 0) {
-            this.managedRegionLabel = regionNames.join(', ');
-          } else {
-            const names = destinations.map((d) => d.name?.trim()).filter((n): n is string => !!n);
-            this.managedRegionLabel = names.join(', ') || '—';
-          }
-
+          this.managedCityLabel = cityNames.join(', ') || '—';
           this.cdr.detectChanges();
         },
         error: () => {
-          this.managedRegionLabel = '—';
+          this.managedCityLabel = '—';
           this.cdr.detectChanges();
         }
       });
