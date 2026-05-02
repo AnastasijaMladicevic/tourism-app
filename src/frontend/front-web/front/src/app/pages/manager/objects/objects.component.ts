@@ -37,8 +37,9 @@ export class ManagerObjectsComponent implements OnInit {
   statusFilter = 'all';
   typeFilter = 'all';
   ratingFilter = 'all';
-  sortBy = 'name';
-  sortOrder: 'asc' | 'desc' = 'asc';
+  /** Secondary column for ordering within the same status group (pending is always listed first). */
+  sortBy = 'status';
+  sortOrder: 'asc' | 'desc' = 'desc';
   filterPanelOpen = false;
 
   currentPage = 1;
@@ -122,14 +123,15 @@ export class ManagerObjectsComponent implements OnInit {
       .subscribe({
         next: (response) => {
           const items = response?.items ?? [];
-          this.pagedObjects = items;
+          const sorted = this.sortManagerTableRows(items);
+          this.pagedObjects = sorted;
           this.totalCount = response?.totalCount ?? 0;
           this.currentPage = response?.page ?? this.currentPage;
           this.pageSize = response?.pageSize ?? this.pageSize;
           this.totalPages = response?.totalPages ?? Math.max(1, Math.ceil(this.totalCount / this.pageSize));
 
-          if (!this.selectedObject || !items.some((item) => item.id === this.selectedObject?.id)) {
-            this.selectedObject = items[0] ?? null;
+          if (!this.selectedObject || !sorted.some((item) => item.id === this.selectedObject?.id)) {
+            this.selectedObject = sorted[0] ?? null;
           }
 
           this.isLoading = false;
@@ -207,10 +209,66 @@ export class ManagerObjectsComponent implements OnInit {
     this.statusFilter = 'all';
     this.typeFilter = 'all';
     this.ratingFilter = 'all';
-    this.sortBy = 'name';
-    this.sortOrder = 'asc';
+    this.sortBy = 'status';
+    this.sortOrder = 'desc';
     this.currentPage = 1;
     this.loadObjects();
+  }
+
+  /** Pending first, then approved, then rejected — then user's secondary sort (within each status group). */
+  private sortManagerTableRows(items: ObjectDto[]): ObjectDto[] {
+    return [...items].sort((a, b) => {
+      const primary = this.managerStatusRank(a.status) - this.managerStatusRank(b.status);
+      if (primary !== 0) {
+        return primary;
+      }
+      return this.compareManagerSecondarySort(a, b);
+    });
+  }
+
+  private managerStatusRank(status?: string): number {
+    switch ((status ?? '').toLowerCase()) {
+      case 'pending':
+        return 0;
+      case 'approved':
+        return 1;
+      case 'rejected':
+        return 2;
+      default:
+        return 3;
+    }
+  }
+
+  private compareManagerSecondarySort(a: ObjectDto, b: ObjectDto): number {
+    const dir = this.sortOrder === 'desc' ? -1 : 1;
+
+    switch (this.sortBy) {
+      case 'averageRating': {
+        const diff = (a.averageRating ?? 0) - (b.averageRating ?? 0);
+        if (diff !== 0) {
+          return diff * dir;
+        }
+        break;
+      }
+      case 'status': {
+        const diff =
+          (a.status ?? '').localeCompare(b.status ?? '', undefined, { sensitivity: 'base' }) * dir;
+        if (diff !== 0) {
+          return diff;
+        }
+        break;
+      }
+      case 'name':
+      default: {
+        const diff = (a.name ?? '').localeCompare(b.name ?? '', undefined, { sensitivity: 'base' });
+        if (diff !== 0) {
+          return diff * dir;
+        }
+        break;
+      }
+    }
+
+    return a.id - b.id;
   }
 
   onSearchEnter(event: Event): void {
