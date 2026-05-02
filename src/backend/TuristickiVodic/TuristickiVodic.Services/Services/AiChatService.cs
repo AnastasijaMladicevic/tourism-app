@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Json;
@@ -25,6 +26,7 @@ namespace TuristickiVodic.Services.Services
         };
 
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IMemoryCache _cache;
         private readonly ISmartSearchService _smartSearchService;
         private readonly IAiSemanticSearchService _aiSemanticSearchService;
         private readonly AppDbContext _context;
@@ -33,6 +35,7 @@ namespace TuristickiVodic.Services.Services
 
         public AiChatService(
             IHttpClientFactory httpClientFactory,
+            IMemoryCache cache,
             ISmartSearchService smartSearchService,
             IAiSemanticSearchService aiSemanticSearchService,
             AppDbContext context,
@@ -40,6 +43,7 @@ namespace TuristickiVodic.Services.Services
             ILogger<AiChatService> logger)
         {
             _httpClientFactory = httpClientFactory;
+            _cache = cache;
             _smartSearchService = smartSearchService;
             _aiSemanticSearchService = aiSemanticSearchService;
             _context = context;
@@ -62,6 +66,12 @@ namespace TuristickiVodic.Services.Services
                 };
             }
 
+            var cacheKey = BuildChatCacheKey(sanitizedRequest);
+            if (_cache.TryGetValue(cacheKey, out AiChatResponseDto? cached) && cached != null)
+            {
+                return CloneResponse(cached);
+            }
+
             var semanticResponse = await _aiSemanticSearchService.SearchAsync(userId, new AiSemanticSearchQueryDto
             {
                 Query = sanitizedRequest.Message,
@@ -73,7 +83,7 @@ namespace TuristickiVodic.Services.Services
 
             var answer = await BuildSemanticAnswerAsync(sanitizedRequest, semanticResponse, cancellationToken);
 
-            return new AiChatResponseDto
+            var response = new AiChatResponseDto
             {
                 Answer = answer,
                 Provider = semanticResponse.Provider,
@@ -82,6 +92,9 @@ namespace TuristickiVodic.Services.Services
                 Warning = semanticResponse.Warning,
                 Results = semanticResponse.Results,
             };
+
+            _cache.Set(cacheKey, CloneResponse(response), TimeSpan.FromMinutes(2));
+            return response;
         }
 
         private async Task<string> BuildSemanticAnswerAsync(
@@ -222,7 +235,12 @@ namespace TuristickiVodic.Services.Services
             }
 
             var wordCount = normalized.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Length;
-            if (wordCount <= 3)
+            if (wordCount < 8)
+            {
+                return false;
+            }
+
+            if ((request.History?.Count ?? 0) == 0)
             {
                 return false;
             }
@@ -232,8 +250,7 @@ namespace TuristickiVodic.Services.Services
                    normalized.Contains("prepor", StringComparison.Ordinal) ||
                    normalized.Contains("savet", StringComparison.Ordinal) ||
                    normalized.Contains("izadj", StringComparison.Ordinal) ||
-                   normalized.Contains("vidim", StringComparison.Ordinal) ||
-                   wordCount >= 6;
+                   normalized.Contains("vidim", StringComparison.Ordinal);
         }
 
         private static bool IsAcceptableGeneratedAnswer(string answer, IReadOnlyList<SmartSearchResultDto> results)
@@ -414,6 +431,49 @@ namespace TuristickiVodic.Services.Services
             }
 
             return value;
+        }
+
+        private static string BuildChatCacheKey(AiChatRequestDto request)
+        {
+            var normalizedHistory = request.History == null || request.History.Count == 0
+                ? "no-history"
+                : string.Join('|', request.History
+                    .TakeLast(4)
+                    .Select(item => $"{item.Role}:{NormalizeText(item.Content)}"));
+
+            var lat = request.Latitude.HasValue ? Math.Round(request.Latitude.Value, 3).ToString(System.Globalization.CultureInfo.InvariantCulture) : "none";
+            var lng = request.Longitude.HasValue ? Math.Round(request.Longitude.Value, 3).ToString(System.Globalization.CultureInfo.InvariantCulture) : "none";
+
+            return $"ai-chat:{NormalizeText(request.Message)}:{request.RegionId?.ToString() ?? "none"}:{lat}:{lng}:{normalizedHistory}";
+        }
+
+        private static AiChatResponseDto CloneResponse(AiChatResponseDto response)
+        {
+            return new AiChatResponseDto
+            {
+                Answer = response.Answer,
+                Provider = response.Provider,
+                UsedTool = response.UsedTool,
+                UsedFallback = response.UsedFallback,
+                Warning = response.Warning,
+                Results = response.Results
+                    .Select(result => new SmartSearchResultDto
+                    {
+                        Id = result.Id,
+                        Name = result.Name,
+                        TypeName = result.TypeName,
+                        Location = result.Location,
+                        Category = result.Category,
+                        MarkerType = result.MarkerType,
+                        Icon = result.Icon,
+                        ImageUrl = result.ImageUrl,
+                        Latitude = result.Latitude,
+                        Longitude = result.Longitude,
+                        MatchReason = result.MatchReason,
+                        Score = result.Score,
+                    })
+                    .ToList(),
+            };
         }
 
         private AiChatRequestDto SanitizeRequest(AiChatRequestDto request)
@@ -2130,10 +2190,12 @@ namespace TuristickiVodic.Services.Services
                 return "Lokalni AI model nema dovoljno slobodne memorije. Zatvori teze programe ili koristi manji Ollama model. Prikazan je fallback odgovor zasnovan na pretrazi.";
             }
 
-            if (message.Contains("not found", StringComparison.OrdinalIgnoreCase) ||
-                message.Contains("pull", StringComparison.OrdinalIgnoreCase))
+            if (message.Contains("no configured ollama model", StringComparison.OrdinalIgnoreCase) ||
+                ((message.Contains("not found", StringComparison.OrdinalIgnoreCase) ||
+                  message.Contains("pull", StringComparison.OrdinalIgnoreCase)) &&
+                 message.Contains("model", StringComparison.OrdinalIgnoreCase)))
             {
-                return "Podeseni Ollama model nije instaliran lokalno. Prikazan je fallback odgovor zasnovan na pretrazi.";
+                return "Nijedan od podesenih Ollama modela nije instaliran lokalno. Prikazan je fallback odgovor zasnovan na pretrazi.";
             }
 
             return "Lokalni AI model trenutno nije dostupan. Prikazan je fallback odgovor zasnovan na pretrazi.";

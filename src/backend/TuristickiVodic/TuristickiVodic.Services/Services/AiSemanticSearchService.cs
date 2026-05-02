@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NetTopologySuite.Geometries;
@@ -33,17 +34,20 @@ namespace TuristickiVodic.Services.Services
         ];
 
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IMemoryCache _cache;
         private readonly AppDbContext _context;
         private readonly ILogger<AiSemanticSearchService> _logger;
         private readonly OllamaOptions _options;
 
         public AiSemanticSearchService(
             IHttpClientFactory httpClientFactory,
+            IMemoryCache cache,
             AppDbContext context,
             IOptions<OllamaOptions> options,
             ILogger<AiSemanticSearchService> logger)
         {
             _httpClientFactory = httpClientFactory;
+            _cache = cache;
             _context = context;
             _logger = logger;
             _options = options.Value ?? new OllamaOptions();
@@ -66,18 +70,48 @@ namespace TuristickiVodic.Services.Services
                 };
             }
 
+            var cacheKey = BuildCacheKey(sanitized);
+            if (_cache.TryGetValue(cacheKey, out AiSemanticSearchResponseDto? cached) && cached != null)
+            {
+                return CloneResponse(cached);
+            }
+
             var context = await BuildContextAsync(userId, sanitized, cancellationToken);
+            var fastLaneExecution = await TryExecuteFastLaneAsync(sanitized, context, cancellationToken);
+            if (fastLaneExecution != null)
+            {
+                var fastLaneResponse = new AiSemanticSearchResponseDto
+                {
+                    Provider = "fast-lane",
+                    UsedFallback = false,
+                    Warning = null,
+                    QuerySummary = fastLaneExecution.Plan.QuerySummary,
+                    RegionName = context.EffectiveRegion?.Name,
+                    Categories = fastLaneExecution.Plan.Categories,
+                    Results = fastLaneExecution.Results,
+                };
+
+                _cache.Set(cacheKey, CloneResponse(fastLaneResponse), TimeSpan.FromMinutes(2));
+                return fastLaneResponse;
+            }
+
             SemanticSearchPlan plan = BuildFallbackPlan(sanitized.Query, context);
             Exception? lastException = null;
             var provider = "fallback";
 
             if (_options.Enabled)
             {
-                foreach (var model in GetCandidateModels())
+                var client = BuildOllamaClient();
+                var candidateModels = await GetAvailableCandidateModelsAsync(client, cancellationToken);
+                if (candidateModels.Count == 0)
+                {
+                    lastException = new InvalidOperationException("No configured Ollama model is installed locally.");
+                }
+
+                foreach (var model in candidateModels)
                 {
                     try
                     {
-                        var client = BuildOllamaClient();
                         plan = await CreatePlanAsync(client, model, sanitized, context, cancellationToken);
                         provider = $"ollama:{model}";
                         lastException = null;
@@ -98,7 +132,7 @@ namespace TuristickiVodic.Services.Services
             plan = execution.Plan;
             var results = execution.Results;
 
-            return new AiSemanticSearchResponseDto
+            var response = new AiSemanticSearchResponseDto
             {
                 Provider = provider,
                 UsedFallback = provider == "fallback",
@@ -108,6 +142,36 @@ namespace TuristickiVodic.Services.Services
                 Categories = plan.Categories,
                 Results = results,
             };
+
+            _cache.Set(cacheKey, CloneResponse(response), TimeSpan.FromMinutes(2));
+            return response;
+        }
+
+        private async Task<PlanExecutionResult?> TryExecuteFastLaneAsync(
+            AiSemanticSearchQueryDto request,
+            SearchExecutionContext context,
+            CancellationToken cancellationToken)
+        {
+            var queryWordCount = GetQueryWordCount(request.Query);
+            if (!IsFastLaneEligible(request.Query, queryWordCount))
+            {
+                return null;
+            }
+
+            var plan = FinalizePlan(BuildFallbackPlan(request.Query, context), request, context);
+            var candidates = queryWordCount <= 2
+                ? BuildUltraFastLanePlans(plan, request)
+                : BuildFastLanePlans(plan, request);
+            if (candidates.Count == 0)
+            {
+                return null;
+            }
+
+            var snapshot = await BuildSnapshotAsync(candidates, context, cancellationToken);
+            var execution = ExecuteWithBroadening(candidates, context, snapshot);
+            return HasAcceptableFastLaneResults(execution.Results)
+                ? execution
+                : null;
         }
 
         private HttpClient BuildOllamaClient()
@@ -128,6 +192,37 @@ namespace TuristickiVodic.Services.Services
                 Latitude = request.Latitude is 0 ? null : request.Latitude,
                 Longitude = request.Longitude is 0 ? null : request.Longitude,
             };
+        }
+
+        private static int GetQueryWordCount(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return 0;
+            }
+
+            return Regex.Matches(NormalizeText(query), @"\p{L}[\p{L}\p{Nd}-]*").Count;
+        }
+
+        private static bool IsFastLaneEligible(string query, int queryWordCount)
+        {
+            if (queryWordCount is >= 1 and <= 4)
+            {
+                return true;
+            }
+
+            if (queryWordCount > 12)
+            {
+                return false;
+            }
+
+            var theme = DetectQueryTheme(query);
+            return theme is "food" or "drink" or "nightlife" or "walk" or "family" or "hiking";
+        }
+
+        private static bool HasAcceptableFastLaneResults(IReadOnlyCollection<SmartSearchResultDto> results)
+        {
+            return results.Count > 0 && results.Max(result => result.Score) >= 12d;
         }
 
         private async Task<SearchExecutionContext> BuildContextAsync(
@@ -328,7 +423,12 @@ namespace TuristickiVodic.Services.Services
             AiSemanticSearchQueryDto request,
             SearchExecutionContext context)
         {
+            var fallbackPlan = BuildFallbackPlan(request.Query, context);
             var normalizedCategories = NormalizeCategories(plan.Categories);
+            if (normalizedCategories.Count == 0)
+            {
+                normalizedCategories = NormalizeCategories(fallbackPlan.Categories);
+            }
             if (normalizedCategories.Count == 0)
             {
                 normalizedCategories = ["destination", "locality", "object", "event", "activity"];
@@ -340,7 +440,11 @@ namespace TuristickiVodic.Services.Services
             var plannerMustTerms = NormalizeTerms(plan.MustTerms);
             var shouldTerms = NormalizeTerms(plan.ShouldTerms);
             var searchStyle = NormalizeSearchStyle(plan.SearchStyle);
+            var fallbackStyle = NormalizeSearchStyle(fallbackPlan.SearchStyle);
             var locationAnchors = NormalizeTerms(plan.LocationAnchors);
+            var fallbackPreferredObjectTypes = NormalizeTerms(fallbackPlan.PreferredObjectTypes);
+            var preferredObjectTypes = NormalizeTerms(plan.PreferredObjectTypes);
+            var fallbackShouldTerms = NormalizeTerms(fallbackPlan.ShouldTerms);
             if (locationAnchors.Count == 0)
             {
                 locationAnchors = DetectLocationAnchors(request.Query, context);
@@ -356,6 +460,24 @@ namespace TuristickiVodic.Services.Services
                 mustTerms = BuildFallbackTerms(request.Query);
             }
 
+            if (preferredObjectTypes.Count == 0 && fallbackPreferredObjectTypes.Count > 0)
+            {
+                preferredObjectTypes = fallbackPreferredObjectTypes;
+            }
+
+            if (shouldTerms.Count == 0 && fallbackShouldTerms.Count > 0)
+            {
+                shouldTerms = fallbackShouldTerms;
+            }
+
+            if (fallbackStyle == "specific" &&
+                preferredObjectTypes.Count > 0 &&
+                normalizedCategories.Contains("object", StringComparer.OrdinalIgnoreCase))
+            {
+                normalizedCategories = NormalizeCategories(fallbackPlan.Categories);
+                searchStyle = "specific";
+            }
+
             if (string.IsNullOrWhiteSpace(plan.QuerySummary))
             {
                 plan.QuerySummary = request.Query;
@@ -368,7 +490,7 @@ namespace TuristickiVodic.Services.Services
                 RegionName = region?.Name,
                 SearchStyle = searchStyle,
                 LocationAnchors = locationAnchors,
-                PreferredObjectTypes = NormalizeTerms(plan.PreferredObjectTypes),
+                PreferredObjectTypes = preferredObjectTypes,
                 MustTerms = mustTerms,
                 ShouldTerms = shouldTerms
                     .Where(term => !mustTerms.Contains(term, StringComparer.Ordinal))
@@ -511,11 +633,93 @@ namespace TuristickiVodic.Services.Services
             return candidates;
         }
 
+        private static List<SemanticSearchPlan> BuildFastLanePlans(
+            SemanticSearchPlan plan,
+            AiSemanticSearchQueryDto request)
+        {
+            return BuildBroadeningPlans(plan, request)
+                .Where(candidate => candidate.MustTerms.Count > 0 || candidate.ShouldTerms.Count > 0)
+                .Take(5)
+                .ToList();
+        }
+
+        private static List<SemanticSearchPlan> BuildUltraFastLanePlans(
+            SemanticSearchPlan plan,
+            AiSemanticSearchQueryDto request)
+        {
+            var mergedSemanticTerms = plan.MustTerms
+                .Concat(plan.ShouldTerms)
+                .Distinct(StringComparer.Ordinal)
+                .ToList();
+            var fallbackTerms = BuildFallbackTerms(request.Query);
+
+            List<string> focusedCategories;
+            if (plan.LocationAnchors.Count > 0)
+            {
+                focusedCategories = ["destination", "locality"];
+            }
+            else if (plan.PreferredObjectTypes.Count > 0)
+            {
+                focusedCategories = ["object", "event", "activity"];
+            }
+            else
+            {
+                focusedCategories = ["object", "activity", "event"];
+            }
+
+            var candidates = new List<SemanticSearchPlan>
+            {
+                new()
+                {
+                    QuerySummary = plan.QuerySummary,
+                    Categories = focusedCategories,
+                    RegionName = plan.RegionName,
+                    SearchStyle = plan.SearchStyle,
+                    LocationAnchors = [.. plan.LocationAnchors],
+                    PreferredObjectTypes = [.. plan.PreferredObjectTypes],
+                    MustTerms = [.. plan.MustTerms],
+                    ShouldTerms = [.. plan.ShouldTerms],
+                    NearMe = plan.NearMe,
+                    SortBy = plan.SortBy,
+                    PageSize = plan.PageSize,
+                },
+                new()
+                {
+                    QuerySummary = plan.QuerySummary,
+                    Categories = focusedCategories,
+                    RegionName = plan.RegionName,
+                    SearchStyle = plan.SearchStyle,
+                    LocationAnchors = [.. plan.LocationAnchors],
+                    PreferredObjectTypes = [.. plan.PreferredObjectTypes],
+                    MustTerms = [],
+                    ShouldTerms = mergedSemanticTerms.Count > 0 ? mergedSemanticTerms : fallbackTerms,
+                    NearMe = plan.NearMe,
+                    SortBy = plan.SortBy,
+                    PageSize = plan.PageSize,
+                }
+            };
+
+            candidates.AddRange(BuildFastLanePlans(plan, request));
+
+            return candidates
+                .Where(candidate => candidate.MustTerms.Count > 0 || candidate.ShouldTerms.Count > 0)
+                .GroupBy(candidate => BuildPlanFingerprint(candidate), StringComparer.Ordinal)
+                .Select(group => group.First())
+                .Take(5)
+                .ToList();
+        }
+
         private async Task<SearchDataSnapshot> BuildSnapshotAsync(
             IReadOnlyCollection<SemanticSearchPlan> plans,
             SearchExecutionContext context,
             CancellationToken cancellationToken)
         {
+            var snapshotCacheKey = BuildSnapshotCacheKey(plans, context);
+            if (_cache.TryGetValue(snapshotCacheKey, out SearchDataSnapshot? cachedSnapshot) && cachedSnapshot != null)
+            {
+                return cachedSnapshot;
+            }
+
             var categories = plans
                 .SelectMany(plan => plan.Categories)
                 .ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -670,6 +874,7 @@ namespace TuristickiVodic.Services.Services
                 snapshot.Activities = await activityQuery.ToListAsync(cancellationToken);
             }
 
+            _cache.Set(snapshotCacheKey, snapshot, TimeSpan.FromMinutes(1));
             return snapshot;
         }
 
@@ -1301,6 +1506,11 @@ namespace TuristickiVodic.Services.Services
                 return ["restoran", "restaurant", "hrana", "rucak", "vecera", "kafic", "bistro"];
             }
 
+            if (theme == "drink")
+            {
+                return ["kafic", "cafe", "coffee", "bar", "cocktail", "vino", "wine", "pice", "piće"];
+            }
+
             if (theme == "walk")
             {
                 return ["setnja", "promenada", "park", "setaliste", "prirod", "staza"];
@@ -1343,6 +1553,17 @@ namespace TuristickiVodic.Services.Services
                 return "nightlife";
             }
 
+            if (normalized.Contains("popij") || normalized.Contains("pijem") ||
+                normalized.Contains("pice") || normalized.Contains("kafa") ||
+                normalized.Contains("cafe") || normalized.Contains("coffee") ||
+                normalized.Contains("kapucino") || normalized.Contains("espresso") ||
+                normalized.Contains("koktel") || normalized.Contains("cocktail") ||
+                normalized.Contains("vino") || normalized.Contains("wine") ||
+                normalized.Contains("sok") || normalized.Contains("caj"))
+            {
+                return "drink";
+            }
+
             // Planinarenje i staze — korisnik pita za rute/staze/aktivnosti, ne za objekte
             if (normalized.Contains("staza") || normalized.Contains("staze") ||
                 normalized.Contains("planinar") || normalized.Contains("trekking") ||
@@ -1357,7 +1578,11 @@ namespace TuristickiVodic.Services.Services
             // Hrana i restorani
             if (normalized.Contains("restoran") || normalized.Contains("rucak") ||
                 normalized.Contains("vecera") || normalized.Contains("jelo") ||
-                normalized.Contains("hrana") || normalized.Contains("kuhinja"))
+                normalized.Contains("hrana") || normalized.Contains("kuhinja") ||
+                normalized.Contains("pojed") || normalized.Contains("jedem") ||
+                normalized.Contains("jesti") || normalized.Contains("jedemo") ||
+                normalized.Contains("gladna") || normalized.Contains("gladan") ||
+                normalized.Contains("gladni") || normalized.Contains("gladne"))
             {
                 return "food";
             }
@@ -1474,6 +1699,7 @@ namespace TuristickiVodic.Services.Services
             var categories = theme switch
             {
                 "nightlife" => new List<string> { "object", "event", "locality" },
+                "drink" => new List<string> { "object", "locality" },
                 "hiking" => new List<string> { "activity", "locality", "destination" },
                 "food" => new List<string> { "object", "locality" },
                 "walk" => new List<string> { "activity", "locality", "destination" },
@@ -1485,6 +1711,7 @@ namespace TuristickiVodic.Services.Services
             var preferredObjectTypes = theme switch
             {
                 "nightlife" => new List<string> { "bar", "kafana", "club", "klub", "wine", "winery", "restaurant", "restoran" },
+                "drink" => new List<string> { "bar", "kafic", "cafe", "coffee", "club", "klub", "wine", "winery", "cocktail", "pub", "restoran", "restaurant" },
                 "food" => new List<string> { "restoran", "restaurant", "kafic", "bistro" },
                 _ => new List<string>(),
             };
@@ -1494,7 +1721,7 @@ namespace TuristickiVodic.Services.Services
                 QuerySummary = query,
                 Categories = categories,
                 RegionName = context.EffectiveRegion?.Name,
-                SearchStyle = theme == "nightlife" || theme == "food" ? "specific" : "exploratory",
+                SearchStyle = theme == "nightlife" || theme == "drink" || theme == "food" ? "specific" : "exploratory",
                 LocationAnchors = [],
                 PreferredObjectTypes = preferredObjectTypes,
                 MustTerms = [],
@@ -1516,6 +1743,42 @@ namespace TuristickiVodic.Services.Services
 
             var payload = await response.Content.ReadFromJsonAsync<OllamaChatResponse>(JsonOptions, cancellationToken);
             return payload ?? new OllamaChatResponse();
+        }
+
+        private async Task<List<string>> GetAvailableCandidateModelsAsync(HttpClient client, CancellationToken cancellationToken)
+        {
+            var configuredModels = GetCandidateModels().ToList();
+
+            try
+            {
+                using var response = await client.GetAsync("api/tags", cancellationToken);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return configuredModels;
+                }
+
+                var payload = await response.Content.ReadFromJsonAsync<OllamaTagsResponse>(JsonOptions, cancellationToken);
+                var installedModels = payload?.Models?
+                    .Select(model => model.Name?.Trim())
+                    .Where(name => !string.IsNullOrWhiteSpace(name))
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase)
+                    ?? [];
+
+                if (installedModels.Count == 0)
+                {
+                    return configuredModels;
+                }
+
+                return configuredModels
+                    .Where(model => installedModels.Contains(model))
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "Unable to fetch installed Ollama models, using configured model list.");
+                return configuredModels;
+            }
         }
 
         private IEnumerable<string> GetCandidateModels()
@@ -1564,10 +1827,12 @@ namespace TuristickiVodic.Services.Services
                 return "Lokalni AI model nema dovoljno slobodne memorije. Prikazana je fallback semanticka pretraga.";
             }
 
-            if (message.Contains("not found", StringComparison.OrdinalIgnoreCase) ||
-                message.Contains("pull", StringComparison.OrdinalIgnoreCase))
+            if (message.Contains("no configured ollama model", StringComparison.OrdinalIgnoreCase) ||
+                ((message.Contains("not found", StringComparison.OrdinalIgnoreCase) ||
+                  message.Contains("pull", StringComparison.OrdinalIgnoreCase)) &&
+                 message.Contains("model", StringComparison.OrdinalIgnoreCase)))
             {
-                return "Podeseni Ollama model nije instaliran lokalno. Prikazana je fallback semanticka pretraga.";
+                return "Nijedan od podesenih Ollama modela nije instaliran lokalno. Prikazana je fallback semanticka pretraga.";
             }
 
             return "Lokalni AI model trenutno nije dostupan. Prikazana je fallback semanticka pretraga.";
@@ -1704,6 +1969,81 @@ namespace TuristickiVodic.Services.Services
         {
             public SemanticSearchPlan Plan { get; set; } = new();
             public List<SmartSearchResultDto> Results { get; set; } = [];
+        }
+
+        private sealed class OllamaTagsResponse
+        {
+            public List<OllamaTagModel> Models { get; set; } = [];
+        }
+
+        private sealed class OllamaTagModel
+        {
+            public string? Name { get; set; }
+        }
+
+        private static string BuildCacheKey(AiSemanticSearchQueryDto request)
+        {
+            var lat = request.Latitude.HasValue ? Math.Round(request.Latitude.Value, 3).ToString(CultureInfo.InvariantCulture) : "none";
+            var lng = request.Longitude.HasValue ? Math.Round(request.Longitude.Value, 3).ToString(CultureInfo.InvariantCulture) : "none";
+            return $"ai-semantic:{NormalizeText(request.Query)}:{request.RegionId?.ToString() ?? "none"}:{lat}:{lng}:{request.PageSize}";
+        }
+
+        private static string BuildSnapshotCacheKey(
+            IReadOnlyCollection<SemanticSearchPlan> plans,
+            SearchExecutionContext context)
+        {
+            var categories = plans
+                .SelectMany(plan => plan.Categories)
+                .Select(NormalizeText)
+                .Where(category => !string.IsNullOrWhiteSpace(category))
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(category => category, StringComparer.Ordinal)
+                .ToList();
+
+            return $"ai-semantic:snapshot:{context.EffectiveRegion?.Id.ToString() ?? "all"}:{string.Join('|', categories)}";
+        }
+
+        private static string BuildPlanFingerprint(SemanticSearchPlan plan)
+        {
+            return string.Join("::",
+                string.Join("|", plan.Categories.Select(NormalizeText).OrderBy(x => x, StringComparer.Ordinal)),
+                string.Join("|", plan.MustTerms.Select(NormalizeText).OrderBy(x => x, StringComparer.Ordinal)),
+                string.Join("|", plan.ShouldTerms.Select(NormalizeText).OrderBy(x => x, StringComparer.Ordinal)),
+                string.Join("|", plan.LocationAnchors.Select(NormalizeText).OrderBy(x => x, StringComparer.Ordinal)),
+                string.Join("|", plan.PreferredObjectTypes.Select(NormalizeText).OrderBy(x => x, StringComparer.Ordinal)),
+                NormalizeText(plan.RegionName),
+                NormalizeText(plan.SearchStyle),
+                NormalizeText(plan.SortBy));
+        }
+
+        private static AiSemanticSearchResponseDto CloneResponse(AiSemanticSearchResponseDto response)
+        {
+            return new AiSemanticSearchResponseDto
+            {
+                Provider = response.Provider,
+                UsedFallback = response.UsedFallback,
+                Warning = response.Warning,
+                QuerySummary = response.QuerySummary,
+                RegionName = response.RegionName,
+                Categories = [.. response.Categories],
+                Results = response.Results
+                    .Select(result => new SmartSearchResultDto
+                    {
+                        Id = result.Id,
+                        Name = result.Name,
+                        TypeName = result.TypeName,
+                        Location = result.Location,
+                        Category = result.Category,
+                        MarkerType = result.MarkerType,
+                        Icon = result.Icon,
+                        ImageUrl = result.ImageUrl,
+                        Latitude = result.Latitude,
+                        Longitude = result.Longitude,
+                        MatchReason = result.MatchReason,
+                        Score = result.Score,
+                    })
+                    .ToList(),
+            };
         }
 
         private sealed class SearchDataSnapshot

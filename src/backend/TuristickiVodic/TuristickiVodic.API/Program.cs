@@ -18,6 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddMemoryCache();
 builder.Services.Configure<OllamaOptions>(builder.Configuration.GetSection("Ollama"));
 builder.Services.AddHttpClient();
 builder.Services.Configure<FormOptions>(options =>
