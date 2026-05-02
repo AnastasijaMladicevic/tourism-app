@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivitiesService, ActivityDto, ActivityTypeOption } from '../../../services/activities';
+import { DestinationService } from '../../../services/destination.service';
 
 @Component({
   selector: 'app-manager-activities',
@@ -14,11 +15,14 @@ import { ActivitiesService, ActivityDto, ActivityTypeOption } from '../../../ser
 })
 export class ManagerActivitiesComponent implements OnInit {
   private readonly activitiesService = inject(ActivitiesService);
+  private readonly destinationService = inject(DestinationService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
 
   activities: ActivityDto[] = [];
+  /** Destination name(s) the manager oversees — same source as manager Objects page. */
+  managedCityLabel = '';
   isLoading = true;
   errorMessage = '';
   selectedActivity: ActivityDto | null = null;
@@ -57,8 +61,35 @@ export class ManagerActivitiesComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    this.loadManagedCityLabel();
     this.loadActivityTypes();
     this.loadActivities();
+  }
+
+  private loadManagedCityLabel(): void {
+    this.destinationService
+      .getAll({ page: 1, pageSize: 100, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
+      .subscribe({
+        next: (response: unknown) => {
+          const list = Array.isArray(response) ? response : (response as { items?: unknown[] })?.items ?? [];
+          const destinations = list as Array<{ name?: string }>;
+
+          const cityNames = [
+            ...new Set(
+              destinations
+                .map((d) => d.name?.trim())
+                .filter((n): n is string => !!n)
+            )
+          ].sort((a, b) => a.localeCompare(b));
+
+          this.managedCityLabel = cityNames.join(', ') || '—';
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.managedCityLabel = '—';
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   private loadActivityTypes(): void {

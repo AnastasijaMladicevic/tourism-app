@@ -81,6 +81,9 @@
   <div class="activities-layout">
     <div class="main-column">
       <div class="table-card">
+        <header class="table-header">
+          <h2>{{ managedCityLabel || 'Activities' }}</h2>
+        </header>
         @if (isLoading) {
           <div class="state state-loading">Loading activities...</div>
         } @else if (errorMessage) {
@@ -135,7 +138,7 @@
                     <div class="row-actions">
                       <button
                         type="button"
-                        class="icon-btn plain"
+                        class="icon-btn"
                         title="Review activity"
                         (click)="onReviewActivity(activity); $event.stopPropagation()"
                       >
