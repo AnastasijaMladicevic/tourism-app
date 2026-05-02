@@ -353,21 +353,14 @@ tbody tr:hover,
 }
 
 .icon-btn {
-	width: 32px;
-	height: 32px;
-	border: 1px solid #e5e7eb;
-	border-radius: 9px;
+	width: 30px;
+	height: 30px;
+	border: 1px solid #dbe1ea;
+	border-radius: 8px;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	background: #fff;
 	color: #475569;
-	cursor: pointer;
-}
-
-.table-action-btn {
-	border-radius: 6px;
-	border: 1px solid #94a3b8;
 }
 
 .table-footer {
