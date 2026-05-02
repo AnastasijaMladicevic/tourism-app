@@ -1,3 +1,244 @@
-<section class="manager-page">
-  <h1>Objects</h1>
+<section class="manager-objects-page">
+  <div class="page-head">
+    <div>
+      <p class="breadcrumbs">Dashboard <span>></span> Objects</p>
+      <h1>Objects</h1>
+      <p class="subtle-text">{{ managedDestinationLabel }}</p>
+    </div>
+  </div>
+
+  <div class="toolbar card">
+    <label class="search-field" aria-label="Search objects">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        [(ngModel)]="draftSearchQuery"
+        (ngModelChange)="onSearchChange()"
+        (keydown.enter)="onSearchEnter($event)"
+        placeholder="Search objects, venues, or locations..."
+      />
+    </label>
+
+    <button type="button" class="ghost-btn date-pill" aria-label="Date range filter">
+      <span class="material-symbols-outlined">calendar_month</span>
+      Filters ready
+    </button>
+
+    <button type="button" class="ghost-btn" (click)="onMoreFilters()">
+      <span class="material-symbols-outlined">filter_alt</span>
+      More Filters
+    </button>
+  </div>
+
+  @if (filterPanelOpen) {
+    <div class="filters-panel card">
+      <label>
+        <span>Status</span>
+        <select [(ngModel)]="statusFilter">
+          <option value="all">All statuses</option>
+          <option value="approved">Approved</option>
+          <option value="pending">Pending</option>
+          <option value="rejected">Rejected</option>
+          <option value="draft">Draft</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Category</span>
+        <select [(ngModel)]="categoryFilter">
+          <option value="all">All categories</option>
+          <option value="museum">Museum</option>
+          <option value="market">Market</option>
+          <option value="nature">Nature</option>
+          <option value="heritage">Heritage</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Sort by</span>
+        <select [(ngModel)]="sortBy">
+          <option value="name">Name</option>
+          <option value="status">Status</option>
+          <option value="updated">Last updated</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Order</span>
+        <select [(ngModel)]="sortOrder">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </label>
+
+      <div class="filter-actions">
+        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">Apply Filters</button>
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  }
+
+  <div class="object-content-grid">
+    <div class="object-main-column">
+      <div class="stats-row">
+        <article class="stat-card" *ngFor="let stat of stats" [attr.data-tone]="stat.tone">
+          <p>{{ stat.label }}</p>
+          <strong>{{ stat.value }}</strong>
+          <span>{{ stat.hint }}</span>
+        </article>
+      </div>
+
+      <section class="object-table-wrap card">
+        <header class="table-header">
+          <h2>{{ managedDestinationLabel }}</h2>
+        </header>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Object details</th>
+                <th>Location</th>
+                <th>Category</th>
+                <th>Utilization</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let row of pagedRows; trackBy: trackByObjectId"
+                [class.active-row]="selectedObject?.id === row.id"
+                (click)="onViewObject(row)"
+              >
+                <td>
+                  <span class="status-chip" [ngClass]="getStatusBadgeClass(row.status)">
+                    <span class="chip-dot">●</span>
+                    {{ row.status }}
+                  </span>
+                </td>
+                <td>
+                  <div class="table-object-cell">
+                    <strong>{{ row.name }}</strong>
+                    <span>
+                      <span class="material-symbols-outlined tiny-icon">schedule</span>
+                      {{ row.detailLine }}
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <div class="table-object-cell">
+                    <strong>{{ row.locationPrimary }}</strong>
+                    <span>{{ row.locationSecondary }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="category-pill">
+                    <span class="material-symbols-outlined tiny-icon">{{ row.categoryIcon }}</span>
+                    {{ row.categoryLabel }}
+                  </span>
+                </td>
+                <td>
+                  <div class="capacity-cell">
+                    <div class="capacity-bar">
+                      <span [style.width.%]="row.capacityProgress"></span>
+                    </div>
+                    <small>{{ row.capacityLabel }}</small>
+                  </div>
+                </td>
+                <td>
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    title="Open object"
+                    (click)="onOpenObjectLink(row, $event)"
+                  >
+                    <span class="material-symbols-outlined">open_in_new</span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <footer class="table-footer">
+          <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ totalCount }} objects</p>
+          <div class="pager">
+            <label class="page-size-control">
+              <span>Page size</span>
+              <select class="page-size-select" [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+                <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
+              </select>
+            </label>
+
+            <button type="button" class="ghost-btn small-btn" (click)="onPreviousPage()" [disabled]="currentPage === 1">
+              Previous
+            </button>
+            <button
+              type="button"
+              class="ghost-btn small-btn"
+              (click)="onNextPage()"
+              [disabled]="currentPage >= totalPages"
+            >
+              Next
+            </button>
+          </div>
+        </footer>
+      </section>
+    </div>
+
+    <aside class="object-side-column card">
+      @if (selectedObject) {
+        <div class="featured-media" [style.background-image]="'url(' + selectedObject.bannerUrl + ')'"></div>
+        <div class="featured-copy">
+          <p class="featured-type">{{ selectedObject.categoryLabel }}</p>
+          <h3>{{ selectedObject.name }}</h3>
+          <p class="featured-meta">
+            {{ selectedObject.locationPrimary }} · {{ selectedObject.detailLine }}
+          </p>
+
+          <span class="publish-badge" [ngClass]="getStatusBadgeClass(selectedObject.status)">
+            {{ selectedObject.status }}
+          </span>
+        </div>
+
+        <div class="detail-metrics">
+          <div>
+            <span>{{ selectedObject.metricLeftLabel }}</span>
+            <strong>{{ selectedObject.metricLeftValue }}</strong>
+          </div>
+          <div>
+            <span>{{ selectedObject.metricRightLabel }}</span>
+            <strong>{{ selectedObject.metricRightValue }}</strong>
+          </div>
+        </div>
+
+        <section class="detail-section">
+          <div class="section-head">
+            <h4>Hours</h4>
+          </div>
+
+          <div class="schedule-list">
+            <article class="schedule-row">
+              <strong>{{ selectedObject.hoursOpenLabel }}: {{ selectedObject.hoursOpenValue }}</strong>
+              <span>Local schedule</span>
+            </article>
+            <article class="schedule-row">
+              <strong>{{ selectedObject.hoursCloseLabel }}: {{ selectedObject.hoursCloseValue }}</strong>
+              <span>Local schedule</span>
+            </article>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h4>Description</h4>
+          <p>{{ selectedObject.description }}</p>
+        </section>
+      } @else {
+        <div class="state">Select an object to preview details.</div>
+      }
+    </aside>
+  </div>
 </section>
