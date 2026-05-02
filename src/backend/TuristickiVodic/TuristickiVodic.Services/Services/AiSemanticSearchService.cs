@@ -92,7 +92,9 @@ namespace TuristickiVodic.Services.Services
             }
 
             plan = FinalizePlan(plan, sanitized, context);
-            var execution = await ExecuteWithBroadeningAsync(plan, sanitized, context, cancellationToken);
+            var candidatePlans = BuildBroadeningPlans(plan, sanitized);
+            var snapshot = await BuildSnapshotAsync(candidatePlans, context, cancellationToken);
+            var execution = ExecuteWithBroadening(candidatePlans, context, snapshot);
             plan = execution.Plan;
             var results = execution.Results;
 
@@ -112,7 +114,7 @@ namespace TuristickiVodic.Services.Services
         {
             var client = _httpClientFactory.CreateClient();
             client.BaseAddress = new Uri(_options.BaseUrl.TrimEnd('/') + "/");
-            client.Timeout = TimeSpan.FromSeconds(Math.Max(15, _options.TimeoutSeconds));
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(4, Math.Min(_options.TimeoutSeconds, 8)));
             return client;
         }
 
@@ -202,6 +204,9 @@ namespace TuristickiVodic.Services.Services
             SearchExecutionContext context,
             CancellationToken cancellationToken)
         {
+            using var plannerCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            plannerCts.CancelAfter(TimeSpan.FromSeconds(Math.Max(3, Math.Min(_options.TimeoutSeconds, 6))));
+
             var response = await SendChatAsync(client, new OllamaChatRequest
             {
                 Model = model,
@@ -209,7 +214,7 @@ namespace TuristickiVodic.Services.Services
                 Format = "json",
                 Messages = BuildPlannerConversation(request, context),
                 Options = OllamaChatOptions.ForPlanning(),
-            }, cancellationToken);
+            }, plannerCts.Token);
 
             var raw = ExtractJsonPayload(response.Message?.Content);
             if (string.IsNullOrWhiteSpace(raw))
@@ -374,15 +379,14 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
-        private async Task<PlanExecutionResult> ExecuteWithBroadeningAsync(
-            SemanticSearchPlan plan,
-            AiSemanticSearchQueryDto request,
+        private PlanExecutionResult ExecuteWithBroadening(
+            IReadOnlyList<SemanticSearchPlan> candidates,
             SearchExecutionContext context,
-            CancellationToken cancellationToken)
+            SearchDataSnapshot snapshot)
         {
-            foreach (var candidate in BuildBroadeningPlans(plan, request))
+            foreach (var candidate in candidates)
             {
-                var results = await ExecutePlanAsync(candidate, context, cancellationToken);
+                var results = ExecutePlan(candidate, context, snapshot);
                 if (results.Count > 0)
                 {
                     return new PlanExecutionResult
@@ -395,7 +399,7 @@ namespace TuristickiVodic.Services.Services
 
             return new PlanExecutionResult
             {
-                Plan = plan,
+                Plan = candidates.FirstOrDefault() ?? new SemanticSearchPlan(),
                 Results = [],
             };
         }
@@ -507,23 +511,20 @@ namespace TuristickiVodic.Services.Services
             return candidates;
         }
 
-        private async Task<List<SmartSearchResultDto>> ExecutePlanAsync(
-            SemanticSearchPlan plan,
+        private async Task<SearchDataSnapshot> BuildSnapshotAsync(
+            IReadOnlyCollection<SemanticSearchPlan> plans,
             SearchExecutionContext context,
             CancellationToken cancellationToken)
         {
-            var categories = plan.Categories.ToHashSet(StringComparer.OrdinalIgnoreCase);
-            var results = new List<SmartSearchResultDto>();
+            var categories = plans
+                .SelectMany(plan => plan.Categories)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-            Dictionary<int, int> destinationFavoriteCounts = [];
-            Dictionary<int, int> objectFavoriteCounts = [];
-            Dictionary<int, int> localityFavoriteCounts = [];
-            Dictionary<int, int> activityFavoriteCounts = [];
-            Dictionary<int, int> eventPlannerCounts = [];
+            var snapshot = new SearchDataSnapshot();
 
             if (categories.Contains("destination"))
             {
-                destinationFavoriteCounts = await _context.Favorites.AsNoTracking()
+                snapshot.DestinationFavoriteCounts = await _context.Favorites.AsNoTracking()
                     .Where(f => f.DestinationId.HasValue)
                     .GroupBy(f => f.DestinationId!.Value)
                     .Select(g => new { Id = g.Key, Count = g.Count() })
@@ -542,16 +543,12 @@ namespace TuristickiVodic.Services.Services
                     destinationQuery = destinationQuery.Where(d => d.RegionId == context.EffectiveRegion.Id);
                 }
 
-                var destinations = await destinationQuery.ToListAsync(cancellationToken);
-                results.AddRange(destinations
-                    .Select(destination => ScoreDestination(destination, plan, context, destinationFavoriteCounts.GetValueOrDefault(destination.Id)))
-                    .Where(x => x != null)
-                    .Select(x => x!));
+                snapshot.Destinations = await destinationQuery.ToListAsync(cancellationToken);
             }
 
             if (categories.Contains("locality"))
             {
-                localityFavoriteCounts = await _context.Favorites.AsNoTracking()
+                snapshot.LocalityFavoriteCounts = await _context.Favorites.AsNoTracking()
                     .Where(f => f.LocalityId.HasValue)
                     .GroupBy(f => f.LocalityId!.Value)
                     .Select(g => new { Id = g.Key, Count = g.Count() })
@@ -571,16 +568,12 @@ namespace TuristickiVodic.Services.Services
                     localityQuery = localityQuery.Where(l => l.Destination.RegionId == context.EffectiveRegion.Id);
                 }
 
-                var localities = await localityQuery.ToListAsync(cancellationToken);
-                results.AddRange(localities
-                    .Select(locality => ScoreLocality(locality, plan, context, localityFavoriteCounts.GetValueOrDefault(locality.Id)))
-                    .Where(x => x != null)
-                    .Select(x => x!));
+                snapshot.Localities = await localityQuery.ToListAsync(cancellationToken);
             }
 
             if (categories.Contains("object"))
             {
-                objectFavoriteCounts = await _context.Favorites.AsNoTracking()
+                snapshot.ObjectFavoriteCounts = await _context.Favorites.AsNoTracking()
                     .Where(f => f.ObjectId.HasValue)
                     .GroupBy(f => f.ObjectId!.Value)
                     .Select(g => new { Id = g.Key, Count = g.Count() })
@@ -607,16 +600,12 @@ namespace TuristickiVodic.Services.Services
                          o.Locality.Destination.RegionId == context.EffectiveRegion.Id));
                 }
 
-                var objects = await objectQuery.ToListAsync(cancellationToken);
-                results.AddRange(objects
-                    .Select(obj => ScoreObject(obj, plan, context, objectFavoriteCounts.GetValueOrDefault(obj.Id)))
-                    .Where(x => x != null)
-                    .Select(x => x!));
+                snapshot.Objects = await objectQuery.ToListAsync(cancellationToken);
             }
 
             if (categories.Contains("event"))
             {
-                eventPlannerCounts = await _context.EventPlannerItems.AsNoTracking()
+                snapshot.EventPlannerCounts = await _context.EventPlannerItems.AsNoTracking()
                     .GroupBy(x => x.EventId)
                     .Select(g => new { Id = g.Key, Count = g.Count() })
                     .ToDictionaryAsync(x => x.Id, x => x.Count, cancellationToken);
@@ -644,16 +633,12 @@ namespace TuristickiVodic.Services.Services
                          e.Locality.Destination.RegionId == context.EffectiveRegion.Id));
                 }
 
-                var events = await eventQuery.ToListAsync(cancellationToken);
-                results.AddRange(events
-                    .Select(evt => ScoreEvent(evt, plan, context, eventPlannerCounts.GetValueOrDefault(evt.Id)))
-                    .Where(x => x != null)
-                    .Select(x => x!));
+                snapshot.Events = await eventQuery.ToListAsync(cancellationToken);
             }
 
             if (categories.Contains("activity"))
             {
-                activityFavoriteCounts = await _context.Favorites.AsNoTracking()
+                snapshot.ActivityFavoriteCounts = await _context.Favorites.AsNoTracking()
                     .Where(f => f.ActivityId.HasValue)
                     .GroupBy(f => f.ActivityId!.Value)
                     .Select(g => new { Id = g.Key, Count = g.Count() })
@@ -682,9 +667,56 @@ namespace TuristickiVodic.Services.Services
                          a.Locality.Destination.RegionId == context.EffectiveRegion.Id));
                 }
 
-                var activities = await activityQuery.ToListAsync(cancellationToken);
-                results.AddRange(activities
-                    .Select(activity => ScoreActivity(activity, plan, context, activityFavoriteCounts.GetValueOrDefault(activity.Id)))
+                snapshot.Activities = await activityQuery.ToListAsync(cancellationToken);
+            }
+
+            return snapshot;
+        }
+
+        private List<SmartSearchResultDto> ExecutePlan(
+            SemanticSearchPlan plan,
+            SearchExecutionContext context,
+            SearchDataSnapshot snapshot)
+        {
+            var categories = plan.Categories.ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var results = new List<SmartSearchResultDto>();
+
+            if (categories.Contains("destination"))
+            {
+                results.AddRange(snapshot.Destinations
+                    .Select(destination => ScoreDestination(destination, plan, context, snapshot.DestinationFavoriteCounts.GetValueOrDefault(destination.Id)))
+                    .Where(x => x != null)
+                    .Select(x => x!));
+            }
+
+            if (categories.Contains("locality"))
+            {
+                results.AddRange(snapshot.Localities
+                    .Select(locality => ScoreLocality(locality, plan, context, snapshot.LocalityFavoriteCounts.GetValueOrDefault(locality.Id)))
+                    .Where(x => x != null)
+                    .Select(x => x!));
+            }
+
+            if (categories.Contains("object"))
+            {
+                results.AddRange(snapshot.Objects
+                    .Select(obj => ScoreObject(obj, plan, context, snapshot.ObjectFavoriteCounts.GetValueOrDefault(obj.Id)))
+                    .Where(x => x != null)
+                    .Select(x => x!));
+            }
+
+            if (categories.Contains("event"))
+            {
+                results.AddRange(snapshot.Events
+                    .Select(evt => ScoreEvent(evt, plan, context, snapshot.EventPlannerCounts.GetValueOrDefault(evt.Id)))
+                    .Where(x => x != null)
+                    .Select(x => x!));
+            }
+
+            if (categories.Contains("activity"))
+            {
+                results.AddRange(snapshot.Activities
+                    .Select(activity => ScoreActivity(activity, plan, context, snapshot.ActivityFavoriteCounts.GetValueOrDefault(activity.Id)))
                     .Where(x => x != null)
                     .Select(x => x!));
             }
@@ -1674,6 +1706,20 @@ namespace TuristickiVodic.Services.Services
             public List<SmartSearchResultDto> Results { get; set; } = [];
         }
 
+        private sealed class SearchDataSnapshot
+        {
+            public List<Destination> Destinations { get; set; } = [];
+            public List<Locality> Localities { get; set; } = [];
+            public List<TouristObject> Objects { get; set; } = [];
+            public List<Event> Events { get; set; } = [];
+            public List<Activity> Activities { get; set; } = [];
+            public Dictionary<int, int> DestinationFavoriteCounts { get; set; } = [];
+            public Dictionary<int, int> LocalityFavoriteCounts { get; set; } = [];
+            public Dictionary<int, int> ObjectFavoriteCounts { get; set; } = [];
+            public Dictionary<int, int> ActivityFavoriteCounts { get; set; } = [];
+            public Dictionary<int, int> EventPlannerCounts { get; set; } = [];
+        }
+
         private sealed class SearchableText
         {
             public string Name { get; set; } = string.Empty;
@@ -1721,9 +1767,9 @@ namespace TuristickiVodic.Services.Services
             {
                 return new OllamaChatOptions
                 {
-                    Temperature = 0.1,
+                    Temperature = 0.05,
                     TopP = 0.9,
-                    NumPredict = 220,
+                    NumPredict = 80,
                 };
             }
         }
