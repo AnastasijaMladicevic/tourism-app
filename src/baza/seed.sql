@@ -3039,6 +3039,16 @@ UPDATE "Events"
 SET "LocalityId" = (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero')
 WHERE "Name" = 'Planinarski susret';
 
+UPDATE "Events"
+SET "ObjectId" = (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor')
+WHERE "Name" = 'Durmitor Trail Run';
+
+UPDATE "Events"
+SET "LocalityId" = (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
+    "ObjectId" = (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Polar Star'),
+    "Geolocation" = ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326)
+WHERE "Name" = 'Wild Beauty Art Festival';
+
 -- Evente kreira ContentCreator, a odobrava menadzer nadlezan za destinaciju.
 UPDATE "Events" e
 SET "DestinationId" = l."DestinationId"
