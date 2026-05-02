@@ -226,6 +226,46 @@ export class ObjectService {
     return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/my`, { params });
   }
 
+  /** Objects assigned to the signed-in manager's destinations (server-scoped; do not apply client region filter). */
+  getForManager(query?: ObjectQueryParams): Observable<PagedResultDto<ObjectDto>> {
+    let params = new HttpParams();
+
+    if (query) {
+      Object.entries(query).forEach(([key, value]) => {
+        if (value != null && value !== '') {
+          params = params.set(key, String(value));
+        }
+      });
+    }
+
+    return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/manager`, { params });
+  }
+
+  getManagerFilterOptions(): Observable<{ typeOptions: FilterOption[]; statusOptions: FilterOption[] }> {
+    return this.getForManager({
+      page: 1,
+      pageSize: 500,
+      sortBy: 'name',
+      sortOrder: 'asc'
+    }).pipe(
+      map((response) => {
+        const items = response?.items ?? [];
+
+        const typeOptions = this.toUniqueOptions(
+          items.map((item) => item.objectTypeName),
+          (value) => value
+        );
+
+        const statusOptions = this.toUniqueOptions(
+          items.map((item) => item.status),
+          (value) => this.toTitleCase(value ?? '')
+        );
+
+        return { typeOptions, statusOptions };
+      })
+    );
+  }
+
   getMyFilterOptions(): Observable<{ typeOptions: FilterOption[]; statusOptions: FilterOption[] }> {
     return this.getMy({
       page: 1,

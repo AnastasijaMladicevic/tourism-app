@@ -1,231 +1,424 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DestinationService } from '../../../services/destination.service';
+import { FilterOption, ObjectDto, ObjectService } from '../../../services/object';
+import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 
-interface ObjectInsightCard {
-  label: string;
-  value: string;
-  hint: string;
-  tone: 'blue' | 'green' | 'neutral';
-}
-
-interface ManagerObjectRow {
-  id: number;
-  status: string;
-  name: string;
-  detailLine: string;
-  locationPrimary: string;
-  locationSecondary: string;
-  categoryLabel: string;
-  categoryIcon: string;
-  capacityProgress: number;
-  capacityLabel: string;
-  bannerUrl: string;
-  metricLeftLabel: string;
-  metricLeftValue: string;
-  metricRightLabel: string;
-  metricRightValue: string;
-  hoursOpenLabel: string;
-  hoursOpenValue: string;
-  hoursCloseLabel: string;
-  hoursCloseValue: string;
-  description: string;
+interface WorkingHoursRow {
+  day: string;
+  open: string;
+  close: string;
 }
 
 @Component({
   selector: 'app-manager-objects',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SharedMapComponent],
   templateUrl: './objects.component.html',
   styleUrls: ['./objects.component.css']
 })
-export class ManagerObjectsComponent {
-  readonly managedDestinationLabel = 'Kotor';
+export class ManagerObjectsComponent implements OnInit {
+  private readonly objectService = inject(ObjectService);
+  private readonly destinationService = inject(DestinationService);
+  private readonly cdr = inject(ChangeDetectorRef);
+
+  pagedObjects: ObjectDto[] = [];
+  selectedObject: ObjectDto | null = null;
+
+  managedRegionLabel = '';
+
+  isLoading = true;
+  errorMessage = '';
 
   draftSearchQuery = '';
-  filterPanelOpen = false;
+  searchQuery = '';
   statusFilter = 'all';
-  categoryFilter = 'all';
+  typeFilter = 'all';
+  ratingFilter = 'all';
   sortBy = 'name';
   sortOrder: 'asc' | 'desc' = 'asc';
+  filterPanelOpen = false;
 
-  pageSize = 5;
-  readonly pageSizeOptions = [5, 10, 20, 50];
   currentPage = 1;
+  pageSize = 5;
+  totalCount = 0;
+  totalPages = 1;
+  readonly pageSizeOptions = [5, 10, 20, 50];
 
-  readonly stats: ObjectInsightCard[] = [
-    { label: 'New this week', value: '12', hint: '+2 from last month', tone: 'blue' },
-    { label: 'Verified listings', value: '48', hint: '98% profile complete', tone: 'green' },
-    { label: 'Visitor engagement', value: '64%', hint: 'Across all published objects', tone: 'neutral' }
+  readonly sortByOptions = [
+    { value: 'name', label: 'Name' },
+    { value: 'averageRating', label: 'Rating' },
+    { value: 'status', label: 'Status' }
   ];
 
-  readonly mockRows: ManagerObjectRow[] = [
-    {
-      id: 1,
-      status: 'Rejected',
-      name: 'Maritime Heritage Pavilion',
-      detailLine: 'Exhibition space · Updated 12 Apr 2026',
-      locationPrimary: 'Old Town Harbor',
-      locationSecondary: 'Waterfront District',
-      categoryLabel: 'Museum',
-      categoryIcon: 'museum',
-      capacityProgress: 72,
-      capacityLabel: '720 / 1,000 peak',
-      bannerUrl: 'assets/pozadina.png',
-      metricLeftLabel: 'Avg. dwell',
-      metricLeftValue: '24 min',
-      metricRightLabel: 'Daily cap.',
-      metricRightValue: '1,000',
-      hoursOpenLabel: 'Opens',
-      hoursOpenValue: '09:00 · Mon–Sun',
-      hoursCloseLabel: 'Closes',
-      hoursCloseValue: '20:00 · Mon–Sun',
-      description:
-        'Interactive exhibits on local seafaring history, seasonal maritime festivals, and guided tours along the bay promenade.'
-    },
-    {
-      id: 2,
-      status: 'Approved',
-      name: 'Cathedral Square Market Hall',
-      detailLine: 'Retail & dining · Peak Sat–Sun',
-      locationPrimary: 'St. Tryphon Square',
-      locationSecondary: 'Historic Core',
-      categoryLabel: 'Market',
-      categoryIcon: 'storefront',
-      capacityProgress: 45,
-      capacityLabel: '450 / 1,000 peak',
-      bannerUrl: 'assets/pozadina.png',
-      metricLeftLabel: 'Avg. dwell',
-      metricLeftValue: '18 min',
-      metricRightLabel: 'Daily cap.',
-      metricRightValue: '1,000',
-      hoursOpenLabel: 'Opens',
-      hoursOpenValue: '08:00 · Mon–Sun',
-      hoursCloseLabel: 'Closes',
-      hoursCloseValue: '23:00 · Fri–Sat',
-      description:
-        'Open-air stalls and indoor artisan boutiques framing the cathedral, with evening concerts during summer.'
-    },
-    {
-      id: 3,
-      status: 'Pending',
-      name: 'Lovćen Viewpoint Trailhead',
-      detailLine: 'Outdoor · Seasonal access',
-      locationPrimary: 'Njegoš Road North',
-      locationSecondary: 'Mountain access',
-      categoryLabel: 'Nature',
-      categoryIcon: 'forest',
-      capacityProgress: 88,
-      capacityLabel: '220 / 250 trail',
-      bannerUrl: 'assets/pozadina.png',
-      metricLeftLabel: 'Avg. dwell',
-      metricLeftValue: '41 min',
-      metricRightLabel: 'Trail cap.',
-      metricRightValue: '250',
-      hoursOpenLabel: 'Opens',
-      hoursOpenValue: '06:00 · Apr–Oct',
-      hoursCloseLabel: 'Closes',
-      hoursCloseValue: 'Sunset · varies',
-      description:
-        'Gateway hikes and panoramic decks overlooking the bay; rangers monitor capacity on busy weekends.'
-    }
+  readonly ratingOptions = [
+    { value: 'all', label: 'Any Rating' },
+    { value: '1', label: '1.0+' },
+    { value: '2', label: '2.0+' },
+    { value: '3', label: '3.0+' },
+    { value: '3.5', label: '3.5+' },
+    { value: '4', label: '4.0+' },
+    { value: '4.5', label: '4.5+' }
   ];
 
-  selectedObject: ManagerObjectRow = this.mockRows[0];
+  private readonly fallbackStatusOptions: FilterOption[] = [
+    { value: 'Approved', label: 'Approved' },
+    { value: 'Pending', label: 'Pending' },
+    { value: 'Rejected', label: 'Rejected' }
+  ];
 
-  get pagedRows(): ManagerObjectRow[] {
-    return this.mockRows;
+  statusOptions: FilterOption[] = [...this.fallbackStatusOptions];
+  typeOptions: FilterOption[] = [];
+
+  ngOnInit(): void {
+    this.loadManagedRegionLabel();
+    this.loadFilterOptions();
+    this.loadObjects();
   }
 
-  get totalCount(): number {
-    return this.mockRows.length;
+  loadManagedRegionLabel(): void {
+    this.destinationService
+      .getAll({ page: 1, pageSize: 100, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
+      .subscribe({
+        next: (response: unknown) => {
+          const list = Array.isArray(response) ? response : (response as { items?: unknown[] })?.items ?? [];
+          const destinations = list as Array<{ name?: string; regionName?: string }>;
+
+          const regionNames = [
+            ...new Set(
+              destinations
+                .map((d) => d.regionName?.trim())
+                .filter((r): r is string => !!r)
+            )
+          ].sort((a, b) => a.localeCompare(b));
+
+          if (regionNames.length > 0) {
+            this.managedRegionLabel = regionNames.join(', ');
+          } else {
+            const names = destinations.map((d) => d.name?.trim()).filter((n): n is string => !!n);
+            this.managedRegionLabel = names.join(', ') || '—';
+          }
+
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.managedRegionLabel = '—';
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  loadObjects(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.objectService
+      .getForManager({
+        page: this.currentPage,
+        pageSize: this.pageSize,
+        search: this.searchQuery || undefined,
+        status: this.statusFilter !== 'all' ? this.statusFilter : undefined,
+        type: this.typeFilter !== 'all' ? this.typeFilter : undefined,
+        minRating: this.getMinRatingFromFilter(this.ratingFilter),
+        sortBy: this.sortBy,
+        sortOrder: this.sortOrder
+      })
+      .subscribe({
+        next: (response) => {
+          const items = response?.items ?? [];
+          this.pagedObjects = items;
+          this.totalCount = response?.totalCount ?? 0;
+          this.currentPage = response?.page ?? this.currentPage;
+          this.pageSize = response?.pageSize ?? this.pageSize;
+          this.totalPages = response?.totalPages ?? Math.max(1, Math.ceil(this.totalCount / this.pageSize));
+
+          if (!this.selectedObject || !items.some((item) => item.id === this.selectedObject?.id)) {
+            this.selectedObject = items[0] ?? null;
+          }
+
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          this.errorMessage = error?.error?.message ?? 'Failed to load objects';
+          this.pagedObjects = [];
+          this.selectedObject = null;
+          this.totalCount = 0;
+          this.totalPages = 1;
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  loadFilterOptions(): void {
+    this.objectService.getManagerFilterOptions().subscribe({
+      next: ({ typeOptions, statusOptions }) => {
+        this.typeOptions = typeOptions;
+        this.statusOptions = statusOptions.length > 0 ? statusOptions : [...this.fallbackStatusOptions];
+
+        if (this.typeFilter !== 'all' && !this.typeOptions.some((option) => option.value === this.typeFilter)) {
+          this.typeFilter = 'all';
+        }
+
+        if (this.statusFilter !== 'all' && !this.statusOptions.some((option) => option.value === this.statusFilter)) {
+          this.statusFilter = 'all';
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.typeOptions = [];
+        this.statusOptions = [...this.fallbackStatusOptions];
+      }
+    });
+  }
+
+  get averageRatingDisplay(): string {
+    if (!this.pagedObjects.length) {
+      return '0.0';
+    }
+
+    const total = this.pagedObjects.reduce((sum, item) => sum + (item.averageRating ?? 0), 0);
+    return (total / this.pagedObjects.length).toFixed(1);
   }
 
   get pageStart(): number {
-    if (!this.totalCount || !this.pagedRows.length) {
+    if (!this.totalCount || !this.pagedObjects.length) {
       return 0;
     }
+
     return (this.currentPage - 1) * this.pageSize + 1;
   }
 
   get pageEnd(): number {
-    return this.pageStart + this.pagedRows.length - 1;
+    return this.pageStart + this.pagedObjects.length - 1;
   }
 
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
+  onApplyFilters(): void {
+    this.searchQuery = this.draftSearchQuery.trim();
+    this.currentPage = 1;
+    this.loadObjects();
   }
 
-  onSearchChange(): void {
-    // Search wiring deferred until backend is available.
-  }
-
-  onSearchEnter(event: Event): void {
-    event.preventDefault();
+  onFilterChange(): void {
+    // Filters apply via Apply / search enter (same as CC).
   }
 
   onMoreFilters(): void {
     this.filterPanelOpen = !this.filterPanelOpen;
   }
 
-  onApplyFilters(): void {
-    this.currentPage = 1;
-  }
-
   onResetFilters(): void {
+    this.searchQuery = '';
+    this.draftSearchQuery = '';
     this.statusFilter = 'all';
-    this.categoryFilter = 'all';
+    this.typeFilter = 'all';
+    this.ratingFilter = 'all';
     this.sortBy = 'name';
     this.sortOrder = 'asc';
-    this.pageSize = 5;
     this.currentPage = 1;
+    this.loadObjects();
   }
 
-  onViewObject(row: ManagerObjectRow): void {
-    this.selectedObject = row;
-  }
-
-  onOpenObjectLink(row: ManagerObjectRow, event: Event): void {
-    event.stopPropagation();
-    // Navigation deferred.
-    void row;
+  onSearchEnter(event: Event): void {
+    event.preventDefault();
+    this.onApplyFilters();
   }
 
   onNextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
+    if (this.currentPage >= this.totalPages) {
+      return;
     }
+
+    this.currentPage++;
+    this.loadObjects();
   }
 
   onPreviousPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
+    if (this.currentPage <= 1) {
+      return;
     }
+
+    this.currentPage--;
+    this.loadObjects();
   }
 
   onPageSizeChange(value: number | string): void {
     this.pageSize = Number(value);
     this.currentPage = 1;
+    this.loadObjects();
   }
 
-  trackByObjectId(_: number, row: ManagerObjectRow): number {
-    return row.id;
+  selectObject(obj: ObjectDto): void {
+    this.selectedObject = obj;
   }
 
-  getStatusBadgeClass(status: string): string {
-    switch (status?.toLowerCase()) {
-      case 'approved':
+  trackByObjectId(_: number, obj: ObjectDto): number {
+    return obj.id;
+  }
+
+  getStatusBadgeClass(status?: string): string {
+    switch ((status ?? '').toLowerCase()) {
       case 'published':
-        return 'badge-approved';
-      case 'pending':
-        return 'badge-pending';
-      case 'cancelled':
+      case 'approved':
+        return 'published';
       case 'rejected':
-        return 'badge-cancelled';
+      case 'cancelled':
+        return 'rejected';
       case 'draft':
-        return 'badge-draft';
+      case 'pending':
+        return 'draft';
       default:
-        return 'badge-draft';
+        return 'draft';
+    }
+  }
+
+  formatStatus(status?: string): string {
+    if (!status) {
+      return 'Pending';
+    }
+
+    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+  }
+
+  getMediaStyle(object: ObjectDto): Record<string, string> {
+    const image = this.normalizeImageUrl(object.mainImageUrl);
+    if (!image) {
+      return {};
+    }
+
+    return { 'background-image': `url("${image}")` };
+  }
+
+  getHeroStyle(): Record<string, string> {
+    const image = this.normalizeImageUrl(this.selectedObject?.mainImageUrl);
+    if (!image) {
+      return {};
+    }
+
+    return { 'background-image': `url("${image}")` };
+  }
+
+  formatPrice(price?: number | null): string {
+    if (price == null) {
+      return 'N/A';
+    }
+
+    return `$${Number(price).toFixed(2)}`;
+  }
+
+  getWorkingHoursRows(workingHours?: string | null): WorkingHoursRow[] {
+    const raw = workingHours?.trim();
+    if (!raw) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      if (!parsed || typeof parsed !== 'object') {
+        return [];
+      }
+
+      const dayOrder = ['pon', 'uto', 'sre', 'cet', 'čet', 'pet', 'sub', 'ned'] as const;
+      const dayLabels: Record<string, string> = {
+        pon: 'Mon',
+        uto: 'Tue',
+        sre: 'Wed',
+        cet: 'Thu',
+        'čet': 'Thu',
+        pet: 'Fri',
+        sub: 'Sat',
+        ned: 'Sun'
+      };
+
+      return dayOrder
+        .map((dayKey) => {
+          const value = parsed[dayKey];
+          if (typeof value !== 'string' || !value.trim()) {
+            return null;
+          }
+
+          const normalized = value.replace(/\s+/g, '');
+          const splitIndex = normalized.indexOf('-');
+          if (splitIndex < 0) {
+            return null;
+          }
+
+          const open = normalized.slice(0, splitIndex);
+          const close = normalized.slice(splitIndex + 1);
+
+          if (!open || !close) {
+            return null;
+          }
+
+          return {
+            day: dayLabels[dayKey],
+            open,
+            close
+          };
+        })
+        .filter((row): row is WorkingHoursRow => !!row);
+    } catch {
+      return [];
+    }
+  }
+
+  get hasSelectedObjectCoordinates(): boolean {
+    return this.selectedObject?.latitude != null && this.selectedObject?.longitude != null;
+  }
+
+  get selectedObjectLat(): number {
+    return this.selectedObject?.latitude ?? 42.424;
+  }
+
+  get selectedObjectLng(): number {
+    return this.selectedObject?.longitude ?? 18.771;
+  }
+
+  get selectedObjectLocationLabel(): string {
+    if (!this.selectedObject) {
+      return 'Selected object';
+    }
+
+    const location =
+      this.selectedObject.localityName || this.selectedObject.destinationName || this.selectedObject.regionName;
+    return location ? `${this.selectedObject.name} · ${location}` : this.selectedObject.name;
+  }
+
+  destinationCellText(obj: ObjectDto): string {
+    return obj.destinationName || obj.localityName || '—';
+  }
+
+  onRowAction(obj: ObjectDto, event: Event): void {
+    event.stopPropagation();
+    void obj;
+  }
+
+  private getMinRatingFromFilter(value: string): number | undefined {
+    if (value === 'all') {
+      return undefined;
+    }
+
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : undefined;
+  }
+
+  private normalizeImageUrl(value?: string): string {
+    const trimmed = value?.trim();
+    if (!trimmed) {
+      return '';
+    }
+
+    if (/^(data:|blob:|https?:\/\/|\/\/)/i.test(trimmed)) {
+      return trimmed;
+    }
+
+    try {
+      return encodeURI(new URL(trimmed, document.baseURI).href);
+    } catch {
+      return encodeURI(trimmed);
     }
   }
 }
