@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { environment } from '../../environment/environment';
 import { ReviewDto } from './review';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
+import { ApproveContentDto } from '../models/event.model';
 
 export interface ObjectImageDto {
   id: number;
@@ -332,6 +333,10 @@ export class ObjectService {
 
   update(id: number, dto: UpdateObjectDto): Observable<ObjectDto> {
     return this.http.put<ObjectDto>(`${this.url}/${id}`, dto);
+  }
+
+  approve(id: number, dto: ApproveContentDto): Observable<ObjectDto> {
+    return this.http.post<ObjectDto>(`${this.url}/${id}/approve`, dto);
   }
 
   private toUniqueOptions(values: Array<string | undefined>, mapLabel: (value: string) => string): FilterOption[] {

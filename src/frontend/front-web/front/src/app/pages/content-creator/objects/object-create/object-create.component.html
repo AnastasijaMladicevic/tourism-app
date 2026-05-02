@@ -11,9 +11,30 @@
           {{ isSubmitting ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save changes' : 'Create object') }}
         </button>
       }
-      <button type="button" class="ghost-btn" [routerLink]="objectsListPath">
-        {{ isManagerReview ? 'Back to list' : 'Cancel' }}
-      </button>
+      @if (isManagerReview) {
+        <button type="button" class="ghost-btn" [routerLink]="objectsListPath">Back to list</button>
+        <button
+          type="button"
+          class="danger-btn"
+          (click)="openDeclineModal()"
+          [disabled]="declineActionDisabled"
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">thumb_down</span>
+          Decline
+        </button>
+        <button
+          type="button"
+          class="primary-btn review-approve-btn"
+          (click)="approveObject()"
+          [disabled]="approveActionDisabled"
+          [class.approved-locked]="reviewStatusKey === 'approved'"
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">thumb_up</span>
+          Approve
+        </button>
+      } @else {
+        <button type="button" class="ghost-btn" [routerLink]="objectsListPath">Cancel</button>
+      }
     </div>
   </header>
 
@@ -175,4 +196,47 @@
       </a>
     </aside>
   </div>
+
+  @if (showDeclineModal) {
+    <div class="object-decline-backdrop" (click)="closeDeclineModal()">
+      <section
+        class="card object-decline-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="object-decline-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="object-decline-modal-icon" aria-hidden="true">
+          <span class="material-symbols-outlined">thumb_down</span>
+        </div>
+
+        <h3 id="object-decline-title">Decline object</h3>
+        <p class="object-decline-description">
+          Provide a clear reason so the content creator can address required changes.
+        </p>
+
+        <textarea
+          class="decline-reason-input"
+          [(ngModel)]="rejectionReason"
+          [ngModelOptions]="{ standalone: true }"
+          rows="4"
+          placeholder="Example: Details do not match the managed destination guidelines."
+        ></textarea>
+
+        <div class="object-decline-modal-actions">
+          <button type="button" class="ghost-btn" (click)="closeDeclineModal()" [disabled]="isReviewSubmitting">
+            Keep pending
+          </button>
+          <button
+            type="button"
+            class="confirm-decline-btn"
+            (click)="declineObject()"
+            [disabled]="isReviewSubmitting"
+          >
+            {{ isReviewSubmitting ? 'Declining...' : 'Decline object' }}
+          </button>
+        </div>
+      </section>
+    </div>
+  }
 </section>

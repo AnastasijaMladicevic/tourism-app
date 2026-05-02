@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
+import { ApproveContentDto } from '../../../../models/event.model';
 import {
   CreateObjectDto,
   ObjectService,
@@ -19,7 +21,7 @@ type WorkingDayKey = 'pon' | 'uto' | 'sre' | 'cet' | 'pet' | 'sub' | 'ned';
 @Component({
   selector: 'app-object-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, SharedMapComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, SharedMapComponent],
   templateUrl: './object-create.component.html',
   styleUrl: './object-create.component.css'
 })
@@ -33,6 +35,13 @@ export class ObjectCreateComponent implements OnInit {
 
   /** Manager opens this page read-only via `/manager/objects/review/:id` (route data). */
   isManagerReview = false;
+
+  /** Latest content status from API (for approve/decline availability). */
+  reviewObjectStatus = '';
+
+  isReviewSubmitting = false;
+  showDeclineModal = false;
+  rejectionReason = '';
 
   readonly workingDays: Array<{ key: WorkingDayKey; label: string }> = [
     { key: 'pon', label: 'Monday' },
@@ -135,6 +144,102 @@ export class ObjectCreateComponent implements OnInit {
 
   get eyebrowLabel(): string {
     return this.isManagerReview ? 'Objects review' : 'Objects management';
+  }
+
+  get reviewStatusKey(): string {
+    return (this.reviewObjectStatus ?? '').toLowerCase();
+  }
+
+  get approveActionDisabled(): boolean {
+    const s = this.reviewStatusKey;
+    return (
+      this.isReviewSubmitting ||
+      !this.objectId ||
+      s === 'approved' ||
+      s === 'rejected'
+    );
+  }
+
+  get declineActionDisabled(): boolean {
+    const s = this.reviewStatusKey;
+    return (
+      this.isReviewSubmitting ||
+      !this.objectId ||
+      s === 'approved' ||
+      s === 'rejected'
+    );
+  }
+
+  approveObject(): void {
+    if (!this.isManagerReview || !this.objectId || this.approveActionDisabled) {
+      return;
+    }
+
+    this.isReviewSubmitting = true;
+    this.errorMessage = '';
+
+    const dto: ApproveContentDto = { approve: true };
+
+    this.objectService
+      .approve(this.objectId, dto)
+      .pipe(finalize(() => (this.isReviewSubmitting = false)))
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/manager/objects']);
+        },
+        error: (error) => {
+          this.errorMessage = error?.error?.message ?? 'Failed to approve object.';
+        }
+      });
+  }
+
+  openDeclineModal(): void {
+    if (!this.objectId || this.isReviewSubmitting || this.declineActionDisabled) {
+      return;
+    }
+
+    this.rejectionReason = '';
+    this.errorMessage = '';
+    this.showDeclineModal = true;
+  }
+
+  closeDeclineModal(): void {
+    if (this.isReviewSubmitting) {
+      return;
+    }
+    this.showDeclineModal = false;
+  }
+
+  declineObject(): void {
+    if (!this.objectId || this.isReviewSubmitting) {
+      return;
+    }
+
+    if (!this.rejectionReason.trim()) {
+      this.errorMessage = 'Please provide a reason for decline.';
+      return;
+    }
+
+    this.isReviewSubmitting = true;
+    this.errorMessage = '';
+
+    const dto: ApproveContentDto = {
+      approve: false,
+      rejectionReason: this.rejectionReason.trim()
+    };
+
+    this.objectService
+      .approve(this.objectId, dto)
+      .pipe(finalize(() => (this.isReviewSubmitting = false)))
+      .subscribe({
+        next: () => {
+          this.showDeclineModal = false;
+          this.router.navigate(['/manager/objects']);
+        },
+        error: (error) => {
+          this.errorMessage = error?.error?.message ?? 'Failed to decline object.';
+        }
+      });
   }
 
   get filteredLocalities(): LocalityOption[] {
@@ -338,6 +443,7 @@ export class ObjectCreateComponent implements OnInit {
         }, { emitEvent: false });
 
         this.patchWorkingHours(objectItem.workingHours);
+        this.reviewObjectStatus = (objectItem.status ?? '').trim();
         this.applyManagerReadOnlyState();
       },
       error: (error) => {
