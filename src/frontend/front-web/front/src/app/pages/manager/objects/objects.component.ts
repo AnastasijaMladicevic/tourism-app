@@ -197,10 +197,6 @@ export class ManagerObjectsComponent implements OnInit {
     this.loadObjects();
   }
 
-  onFilterChange(): void {
-    // Filters apply via Apply / search enter (same as CC).
-  }
-
   onMoreFilters(): void {
     this.filterPanelOpen = !this.filterPanelOpen;
   }

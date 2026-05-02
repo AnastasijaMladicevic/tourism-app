@@ -76,7 +76,7 @@
 .toolbar {
 	padding: 10px;
 	display: grid;
-	grid-template-columns: minmax(0, 1fr) auto auto;
+	grid-template-columns: minmax(0, 1fr) auto;
 	gap: 10px;
 	align-items: center;
 }
@@ -103,10 +103,6 @@
 
 .search-field input::placeholder {
 	color: #9ca3af;
-}
-
-.date-pill {
-	white-space: nowrap;
 }
 
 .filters-panel {
@@ -369,8 +365,9 @@ tbody tr:hover,
 	cursor: pointer;
 }
 
-.icon-btn-round {
-	border-radius: 50%;
+.table-action-btn {
+	border-radius: 6px;
+	border: 1px solid #94a3b8;
 }
 
 .table-footer {

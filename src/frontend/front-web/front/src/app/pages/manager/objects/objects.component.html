@@ -13,16 +13,10 @@
       <input
         type="text"
         [(ngModel)]="draftSearchQuery"
-        (ngModelChange)="onFilterChange()"
         (keydown.enter)="onSearchEnter($event)"
         placeholder="Search by name, category or region..."
       />
     </label>
-
-    <button type="button" class="ghost-btn date-pill" aria-label="Date range filter">
-      <span class="material-symbols-outlined">calendar_month</span>
-      Filters ready
-    </button>
 
     <button type="button" class="ghost-btn" (click)="onMoreFilters()">
       <span class="material-symbols-outlined">filter_alt</span>
@@ -34,7 +28,7 @@
     <div class="filters-panel card">
       <label>
         <span>Status</span>
-        <select [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()">
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onApplyFilters()">
           <option value="all">All Statuses</option>
           <option *ngFor="let option of statusOptions" [value]="option.value">{{ option.label }}</option>
         </select>
@@ -42,7 +36,7 @@
 
       <label>
         <span>Type</span>
-        <select [(ngModel)]="typeFilter" (ngModelChange)="onFilterChange()">
+        <select [(ngModel)]="typeFilter" (ngModelChange)="onApplyFilters()">
           <option value="all">All Types</option>
           <option *ngFor="let option of typeOptions" [value]="option.value">{{ option.label }}</option>
         </select>
@@ -50,21 +44,21 @@
 
       <label>
         <span>Rating</span>
-        <select [(ngModel)]="ratingFilter" (ngModelChange)="onFilterChange()">
+        <select [(ngModel)]="ratingFilter" (ngModelChange)="onApplyFilters()">
           <option *ngFor="let option of ratingOptions" [value]="option.value">{{ option.label }}</option>
         </select>
       </label>
 
       <label>
         <span>Sort by</span>
-        <select [(ngModel)]="sortBy" (ngModelChange)="onFilterChange()">
+        <select [(ngModel)]="sortBy" (ngModelChange)="onApplyFilters()">
           <option *ngFor="let option of sortByOptions" [value]="option.value">{{ option.label }}</option>
         </select>
       </label>
 
       <label>
         <span>Order</span>
-        <select [(ngModel)]="sortOrder" (ngModelChange)="onFilterChange()">
+        <select [(ngModel)]="sortOrder" (ngModelChange)="onApplyFilters()">
           <option value="asc">Ascending</option>
           <option value="desc">Descending</option>
         </select>
@@ -146,7 +140,7 @@
                   <td>
                     <button
                       type="button"
-                      class="icon-btn icon-btn-round"
+                      class="icon-btn table-action-btn"
                       title="Edit"
                       (click)="onRowAction(object, $event)"
                     >
