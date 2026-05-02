@@ -65,6 +65,8 @@ export class AddToPlannerComponent implements OnInit {
   protected readonly maxSelectableDate: string | null;
   protected readonly isEventScheduleLocked: boolean;
   protected readonly fixedDurationMinutes: number;
+  protected readonly isEditMode = signal(false);
+  protected readonly editingPlannerId = signal<number | null>(null);
   protected readonly estimatedEndLabel = computed(() =>
     this.formatTimeLabel(this.addMinutes(this.buildSelectedStartDate(), this.fixedDurationMinutes)),
   );
@@ -112,6 +114,17 @@ export class AddToPlannerComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const state = (window.history.state ?? {}) as any;
+
+    if (state?.plannerId) {
+      this.isEditMode.set(true);
+      this.editingPlannerId.set(state.plannerId);
+
+      this.travelDate.set(state.plannedDate);
+      this.startTime.set(state.startTime ?? '19:00');
+      this.notes.set(state.notes ?? '');
+      this.isPriority.set(state.isPriority ?? false);
+    }
     if (!this.eventId) {
       return;
     }
@@ -161,13 +174,33 @@ export class AddToPlannerComponent implements OnInit {
       return;
     }
 
-    if (this.existingPlannerItems().some((item) => item.eventId === this.eventId)) {
-      this.feedback.set(this.translate('addToPlanner.feedbackAlreadyAdded'));
+    this.isSaving.set(true);
+    this.feedback.set('');
+
+    // 🔥 EDIT MODE
+    if (this.isEditMode() && this.editingPlannerId()) {
+      this.plannerLocalPreferences.upsert({
+        plannerId: this.editingPlannerId()!,
+        eventId: this.eventId,
+        plannedDate: this.travelDate(),
+        startTime: this.startTime(),
+        durationMinutes: this.fixedDurationMinutes,
+        notes: this.notes().trim(),
+        isPriority: this.isPriority(),
+      });
+
+      this.isSaving.set(false);
+      void this.router.navigate(['/planner']);
       return;
     }
 
-    this.isSaving.set(true);
-    this.feedback.set('');
+    // 🔴 ADD MODE (postojeće)
+    if (!this.isEditMode() &&
+      this.existingPlannerItems().some((item) => item.eventId === this.eventId)) {
+      this.feedback.set(this.translate('addToPlanner.feedbackAlreadyAdded'));
+      this.isSaving.set(false);
+      return;
+    }
 
     this.plannerService
       .add({ eventId: this.eventId })
@@ -182,9 +215,7 @@ export class AddToPlannerComponent implements OnInit {
         finalize(() => this.isSaving.set(false)),
       )
       .subscribe((result) => {
-        if (!result) {
-          return;
-        }
+        if (!result) return;
 
         this.plannerLocalPreferences.upsert({
           plannerId: result.id,

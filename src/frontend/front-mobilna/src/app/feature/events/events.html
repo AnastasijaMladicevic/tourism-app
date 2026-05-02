@@ -133,10 +133,9 @@
             <mat-icon>place</mat-icon>
             {{ event.location }}
           </p>
-
+          <p class="card__desc">{{ event.description }}</p>
           <div class="event-footer">
-            <p class="card__desc">{{ event.description }}</p>
-            <button type="button" class="view-btn" (click)="openEvent(event.id)">View Event</button>
+            <button type="button" class="view-btn" (click)="openEvent(event.id)">VIEW DETAILS</button>
           </div>
         </div>
       </article>

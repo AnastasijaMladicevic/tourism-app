@@ -476,4 +476,20 @@ export class PlannerComponent implements OnInit {
   private truncate(value: string, maxLength: number): string {
     return value.length <= maxLength ? value : `${value.slice(0, maxLength - 1)}...`;
   }
+  editPlanner(eventItem: PlannerStop, event?: Event): void {
+    event?.stopPropagation();
+    this.router.navigate(['/planner/add'], {
+      state: {
+        plannerId: eventItem.plannerId,
+        eventId: eventItem.eventId,
+        title: eventItem.title,
+        location: eventItem.location,
+        startDate: eventItem.startDate,
+        endDate: eventItem.endDate,
+        type: eventItem.category || 'Dogadjaj',
+        imageUrl: eventItem.imageUrl || this.resolveMediaUrl(eventItem.imageUrl),
+        description: eventItem.quote,
+      },
+    });
+  }
 }

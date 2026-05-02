@@ -19,23 +19,11 @@
 
           <div class="event-preview-card__mobile-meta">
             <span class="event-chip">{{ preview.type }}</span>
-            <span class="rating-pill">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="m12 3.6 2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 16l-4.8 2.5.9-5.4-3.9-3.8 5.4-.8Z" />
-              </svg>
-              {{ preview.rating }}
-            </span>
           </div>
 
           <div class="event-preview-card__desktop-overlay">
             <div class="event-preview-card__desktop-badges">
               <span class="event-chip event-chip--dark">{{ preview.type }}</span>
-              <span class="rating-pill rating-pill--dark">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="m12 3.6 2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 16l-4.8 2.5.9-5.4-3.9-3.8 5.4-.8Z" />
-                </svg>
-                {{ preview.rating }}
-              </span>
             </div>
 
             <h2>{{ preview.title }}</h2>
@@ -118,72 +106,6 @@
           }
         </div>
 
-        <div class="field-grid field-grid--split">
-          <label class="field-card">
-            <span>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="12" r="8" />
-                <path d="M12 8v4l3 2" />
-              </svg>
-              {{ translate('addToPlanner.startTime') }}
-            </span>
-
-            <div class="field-card__surface">
-              <input
-                type="time"
-                [ngModel]="startTime()"
-                (ngModelChange)="startTime.set($event)"
-                [readonly]="isEventScheduleLocked"
-                [disabled]="isEventScheduleLocked"
-              />
-            </div>
-          </label>
-
-          <div class="field-card field-card--muted">
-            <span>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="12" cy="12" r="8" />
-                <path d="M12 8v4l3 2" />
-              </svg>
-              {{ translate('addToPlanner.endTime') }}
-            </span>
-
-            <div class="field-card__surface field-card__surface--readonly">
-              <strong>{{ estimatedEndLabel() }}</strong>
-            </div>
-          </div>
-        </div>
-
-        @if (conflictMessage()) {
-          <article class="warning-card">
-            <div class="warning-card__icon">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 9v4" />
-                <path d="M12 17h.01" />
-                <path d="M10.3 3.8 1.8 18.2A2 2 0 0 0 3.5 21h17a2 2 0 0 0 1.7-2.8L13.7 3.8a2 2 0 0 0-3.4 0Z" />
-              </svg>
-            </div>
-            <div>
-              <strong>{{ translate('addToPlanner.timeConflictTitle') }}</strong>
-              <p>{{ conflictMessage() }}</p>
-            </div>
-          </article>
-        }
-
-        <div class="duration-block">
-          <div class="duration-block__head">
-            <h4>{{ translate('addToPlanner.estimatedDuration') }}</h4>
-            <span>{{ durationLabel() }}</span>
-          </div>
-          <div class="field-card field-card--full">
-            <span>{{ translate('addToPlanner.duration') }}</span>
-            <div class="field-card__surface field-card__surface--readonly">
-              <strong>{{ durationLabel() }}</strong>
-            </div>
-            <small>Trajanje eventa je fiksno i ne moze da se menja.</small>
-          </div>
-        </div>
-
         <article class="priority-card">
           <div class="priority-card__icon">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -219,7 +141,13 @@
 
         <div class="schedule-actions">
           <button type="button" class="save-btn" [disabled]="isSaving()" (click)="save()">
-            {{ isSaving() ? translate('addToPlanner.saving') : translate('addToPlanner.save') }}
+            {{
+              isSaving()
+                ? translate('addToPlanner.saving')
+                : (isEditMode()
+                    ? 'Sačuvaj izmene'
+                    : translate('addToPlanner.save'))
+            }}
           </button>
           <button type="button" class="cancel-btn" (click)="goBack()">{{ translate('addToPlanner.cancel') }}</button>
         </div>

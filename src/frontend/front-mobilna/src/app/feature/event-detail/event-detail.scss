@@ -418,13 +418,24 @@ button:hover {
 }
 
 .nearby-list {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 5px;
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 10px;
+  padding-bottom: 6px;
+
+  scroll-behavior: smooth;
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+  }
 }
 
 .nearby-item {
-  max-width: 230px;
+  flex: 0 0 auto;
+  max-width: 130px;
   width: 100%;
   justify-self: start;
   overflow: hidden;
