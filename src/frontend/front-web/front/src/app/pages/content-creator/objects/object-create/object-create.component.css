@@ -6,6 +6,12 @@
   color: #1f2937;
 }
 
+.object-create-page--read-only .form-column :is(input, select, textarea):disabled {
+  opacity: 1;
+  color: #374151;
+  -webkit-text-fill-color: #374151;
+}
+
 .page-header {
   display: flex;
   align-items: flex-start;

@@ -1,15 +1,19 @@
-<section class="object-create-page">
+<section class="object-create-page" [class.object-create-page--read-only]="isManagerReview">
   <header class="page-header">
     <div>
-      <p class="eyebrow">Objects management</p>
+      <p class="eyebrow">{{ eyebrowLabel }}</p>
       <h1>{{ pageTitle }}</h1>
-      <p class="page-intro">Add a new object with location, details, amenities, and opening hours.</p>
+      <p class="page-intro">{{ pageIntro }}</p>
     </div>
     <div class="top-actions">
-      <button type="submit" class="primary-btn" [disabled]="isSubmitting || isLoadingOptions" form="create-object-form">
-        {{ isSubmitting ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save changes' : 'Create object') }}
+      @if (!isManagerReview) {
+        <button type="submit" class="primary-btn" [disabled]="isSubmitting || isLoadingOptions" form="create-object-form">
+          {{ isSubmitting ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save changes' : 'Create object') }}
+        </button>
+      }
+      <button type="button" class="ghost-btn" [routerLink]="objectsListPath">
+        {{ isManagerReview ? 'Back to list' : 'Cancel' }}
       </button>
-      <button type="button" class="ghost-btn" routerLink="/content-creator/objects">Cancel</button>
     </div>
   </header>
 
@@ -157,9 +161,13 @@
         </div>
       </article>
 
-      <p class="sidebar-note">
-        You have super admin write access to this object. Changes will be instantly reflected across all SpireGO platforms.
-      </p>
+      @if (isManagerReview) {
+        <p class="sidebar-note">You are viewing this submission as a destination manager. Editing is disabled on this page.</p>
+      } @else {
+        <p class="sidebar-note">
+          You have super admin write access to this object. Changes will be instantly reflected across all SpireGO platforms.
+        </p>
+      }
 
       <a class="history-link" href="javascript:void(0)">
         <span class="material-symbols-outlined">history</span>

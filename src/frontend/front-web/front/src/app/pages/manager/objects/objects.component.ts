@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { DestinationService } from '../../../services/destination.service';
 import { FilterOption, ObjectDto, ObjectService } from '../../../services/object';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
@@ -21,6 +22,7 @@ interface WorkingHoursRow {
 export class ManagerObjectsComponent implements OnInit {
   private readonly objectService = inject(ObjectService);
   private readonly destinationService = inject(DestinationService);
+  private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
 
   pagedObjects: ObjectDto[] = [];
@@ -442,7 +444,7 @@ export class ManagerObjectsComponent implements OnInit {
 
   onRowAction(obj: ObjectDto, event: Event): void {
     event.stopPropagation();
-    void obj;
+    this.router.navigate(['/manager/objects/review', obj.id]);
   }
 
   private getMinRatingFromFilter(value: string): number | undefined {

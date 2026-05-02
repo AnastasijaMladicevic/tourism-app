@@ -31,6 +31,9 @@ export class ObjectCreateComponent implements OnInit {
   private readonly destinationService = inject(DestinationService);
   private readonly activitiesService = inject(ActivitiesService);
 
+  /** Manager opens this page read-only via `/manager/objects/review/:id` (route data). */
+  isManagerReview = false;
+
   readonly workingDays: Array<{ key: WorkingDayKey; label: string }> = [
     { key: 'pon', label: 'Monday' },
     { key: 'uto', label: 'Tuesday' },
@@ -84,8 +87,15 @@ export class ObjectCreateComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.isManagerReview = this.route.snapshot.data['managerReview'] === true;
+
     const idFromRoute = Number(this.route.snapshot.paramMap.get('id'));
-    if (Number.isFinite(idFromRoute) && idFromRoute > 0) {
+    if (this.isManagerReview) {
+      if (Number.isFinite(idFromRoute) && idFromRoute > 0) {
+        this.isEditMode = true;
+        this.objectId = idFromRoute;
+      }
+    } else if (Number.isFinite(idFromRoute) && idFromRoute > 0) {
       this.isEditMode = true;
       this.objectId = idFromRoute;
     }
@@ -106,7 +116,25 @@ export class ObjectCreateComponent implements OnInit {
   }
 
   get pageTitle(): string {
+    if (this.isManagerReview) {
+      return 'Review object';
+    }
     return this.isEditMode ? 'Edit Object' : 'Create Object';
+  }
+
+  get pageIntro(): string {
+    if (this.isManagerReview) {
+      return 'View object details submitted for approval. Editing is disabled.';
+    }
+    return 'Add a new object with location, details, amenities, and opening hours.';
+  }
+
+  get objectsListPath(): string {
+    return this.isManagerReview ? '/manager/objects' : '/content-creator/objects';
+  }
+
+  get eyebrowLabel(): string {
+    return this.isManagerReview ? 'Objects review' : 'Objects management';
   }
 
   get filteredLocalities(): LocalityOption[] {
@@ -191,6 +219,10 @@ export class ObjectCreateComponent implements OnInit {
   }
 
   submit(): void {
+    if (this.isManagerReview) {
+      return;
+    }
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -306,6 +338,7 @@ export class ObjectCreateComponent implements OnInit {
         }, { emitEvent: false });
 
         this.patchWorkingHours(objectItem.workingHours);
+        this.applyManagerReadOnlyState();
       },
       error: (error) => {
         this.errorMessage = error?.error?.message ?? 'Failed to load object details.';
@@ -374,6 +407,15 @@ export class ObjectCreateComponent implements OnInit {
   private optionalTrimmed(value: string | null | undefined): string | undefined {
     const trimmed = value?.trim();
     return trimmed ? trimmed : undefined;
+  }
+
+  private applyManagerReadOnlyState(): void {
+    if (!this.isManagerReview) {
+      return;
+    }
+
+    this.form.disable({ emitEvent: false });
+    this.workingHoursForm.disable({ emitEvent: false });
   }
 
   private patchWorkingHours(workingHours?: string): void {
