@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -16,6 +16,8 @@ import { MatIcon } from "@angular/material/icon";
 import { LazyBackgroundDirective } from '../../shared/directives/lazy-background.directive';
 import { RecommendationItemDto, RecommendationService } from '../../services/recommendation';
 import { LocationTrackingService } from '../../services/location-tracking';
+import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
+import { EventPlannerService } from '../../services/event-planner';
 
 interface PlaceCard {
   title: string;
@@ -29,6 +31,14 @@ interface PlaceCard {
   favoriteId?: number;
   showRating: boolean;
   distanceText?: string;
+  latitude?: number;
+  longitude?: number;
+  isPlanned?: boolean;
+  plannerId?: number;
+  description?: string;
+  eventTypeName?: string;
+  startDate?: string;
+  endDate?: string | null;
 }
 
 interface EventCard {
@@ -41,6 +51,14 @@ interface EventCard {
   timeText: string;
   imageUrl?: string;
   distanceText?: string;
+  latitude?: number;
+  longitude?: number;
+  isPlanned?: boolean;
+  plannerId?: number;
+  description?: string;
+  eventTypeName?: string;
+  startDate?: string;
+  endDate?: string | null;
 }
 
 interface FeaturedDestination {
@@ -73,7 +91,7 @@ interface HomeCategory {
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   userName = '';
   searchQuery = '';
   readonly categories: HomeCategory[] = [
@@ -96,12 +114,14 @@ export class HomeComponent implements OnInit {
   isLoadingPlaces = true;
   isLoadingEvents = true;
   isLoadingRecommendations = true;
-
+  userLocation: { lat: number; lng: number } | null = null;
+  isTracking = false;
+  isPlannerBusy = false;
   private favoriteMap = new Map<string, number>();
   private fallbackRecommended: PlaceCard[] = [];
   private hasRecommendationResponse = false;
   private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
-
+  private plannerMap = new Map<number, number>();
   constructor(
     public router: Router,
     private http: HttpClient,
@@ -115,7 +135,136 @@ export class HomeComponent implements OnInit {
     private authService: AuthService,
     private recommendationService: RecommendationService,
     private locationTrackingService: LocationTrackingService,
+    private plannerService: PlannerLocalPreferencesService,
+    private eventPlannerService: EventPlannerService
   ) { }
+
+  private applyPlannerState(list: EventCard[]): void {
+    for (const item of list) {
+      item.isPlanned = this.plannerMap.has(item.id);
+      item.plannerId = this.plannerMap.get(item.id);
+    }
+  }
+
+  private applyPlannerStateToPlaceCards(list: PlaceCard[]): void {
+    for (const item of list) {
+      if (item.itemType !== 'event') {
+        continue;
+      }
+
+      item.isPlanned = this.plannerMap.has(item.itemId);
+      item.plannerId = this.plannerMap.get(item.itemId);
+    }
+  }
+
+  private syncPlannerStateAcrossLists(): void {
+    this.applyPlannerState(this.upcomingEvents);
+    this.applyPlannerState(this.events as EventCard[]);
+    this.applyPlannerStateToPlaceCards(this.recommended);
+  }
+
+  private loadPlanner(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.plannerMap.clear();
+      this.syncPlannerStateAcrossLists();
+      this.flushUi();
+      return;
+    }
+
+    this.eventPlannerService.getMyPlanner({
+      page: 1,
+      pageSize: 200
+    }).subscribe(res => {
+      this.plannerMap.clear();
+
+      res.items.forEach(item => {
+        this.plannerMap.set(Number(item.eventId), item.id);
+      });
+
+      this.syncPlannerStateAcrossLists();
+      this.flushUi();
+    });
+  }
+  togglePlanner(eventItem: EventCard, e?: Event): void {
+    e?.stopPropagation();
+
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    if (this.isPlannerBusy) return;
+
+    this.isPlannerBusy = true;
+
+    const existingId = this.plannerMap.get(eventItem.id);
+
+    // REMOVE
+    if (existingId) {
+      this.eventPlannerService.remove(existingId).subscribe({
+        next: () => {
+          this.plannerService.remove(existingId);
+          this.plannerMap.delete(eventItem.id);
+          eventItem.isPlanned = false;
+          eventItem.plannerId = undefined;
+          this.syncPlannerStateAcrossLists();
+          this.isPlannerBusy = false;
+          this.flushUi();
+        },
+        error: () => {
+          this.isPlannerBusy = false;
+          this.flushUi();
+        }
+      });
+
+      return;
+    }
+    this.router.navigate(['/planner/add'], {
+      state: {
+        eventId: eventItem.id,
+        title: eventItem.title,
+        location: eventItem.location,
+        startDate: eventItem.startDate,
+        endDate: eventItem.endDate,
+        type: eventItem?.eventTypeName || 'Dogadjaj',
+        imageUrl: eventItem.imageUrl || this.resolveMediaUrl(eventItem?.imageUrl),
+        description: eventItem?.description,
+      }
+    });
+
+    this.isPlannerBusy = false;
+  }
+
+  togglePlannerForRecommended(card: PlaceCard, event?: Event): void {
+    event?.stopPropagation();
+
+    if (card.itemType !== 'event') {
+      return;
+    }
+
+    this.togglePlanner(
+      {
+        id: card.itemId,
+        title: card.title,
+        location: card.location,
+        dateText: '',
+        priceText: '',
+        isFree: false,
+        timeText: '',
+        imageUrl: card.imageUrl,
+        distanceText: card.distanceText,
+        latitude: card.latitude,
+        longitude: card.longitude,
+        isPlanned: card.isPlanned,
+        plannerId: card.plannerId,
+        description: card.description,
+        eventTypeName: card.eventTypeName,
+        startDate: card.startDate,
+        endDate: card.endDate,
+      },
+      event,
+    );
+  }
   onSearchInput(): void {
     if (this.searchDebounceTimer) {
       clearTimeout(this.searchDebounceTimer);
@@ -131,41 +280,41 @@ export class HomeComponent implements OnInit {
   }
 
   private distanceTextFromCoords(latitude?: number | null, longitude?: number | null): string {
-  if (!this.shouldShowLiveDistance() || latitude == null || longitude == null) {
-    return '';
+    if (!this.shouldShowLiveDistance() || latitude == null || longitude == null) {
+      return '';
+    }
+
+    const currentLocation = this.locationTrackingService.getCurrentLocation();
+    if (!currentLocation) return '';
+
+    const distanceMeters = this.calculateDistanceMeters(
+      currentLocation.latitude,
+      currentLocation.longitude,
+      latitude,
+      longitude
+    );
+
+    return distanceMeters >= 1000
+      ? `${(distanceMeters / 1000).toFixed(1)} km away`
+      : `${Math.round(distanceMeters)} m away`;
   }
 
-  const currentLocation = this.locationTrackingService.getCurrentLocation();
-  if (!currentLocation) return '';
+  private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const r = 6371000;
+    const toRad = (value: number) => (value * Math.PI) / 180;
 
-  const distanceMeters = this.calculateDistanceMeters(
-    currentLocation.latitude,
-    currentLocation.longitude,
-    latitude,
-    longitude
-  );
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
 
-  return distanceMeters >= 1000
-    ? `${(distanceMeters / 1000).toFixed(1)} km away`
-    : `${Math.round(distanceMeters)} m away`;
-}
-
-private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const r = 6371000;
-  const toRad = (value: number) => (value * Math.PI) / 180;
-
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) *
       Math.cos(toRad(lat2)) *
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2);
 
-  return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
+    return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
 
   submitSearch(): void {
     const query = this.searchQuery.trim();
@@ -202,11 +351,107 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
     this.currentFeatured = this.featuredDestinations[index];
   }
   ngOnInit(): void {
+    this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
+      this.isTracking = enabled;
+
+      if (!enabled) {
+        this.clearDistances();
+      } else {
+        this.updateDistances();
+        this.cdr.detectChanges();
+      }
+    });
+
+    this.locationTrackingService.location$.subscribe(loc => {
+      this.userLocation = loc
+        ? { lat: loc.latitude, lng: loc.longitude }
+        : null;
+
+      if (this.userLocation) {
+        this.updateDistances();
+      } else {
+        this.clearDistances();
+      }
+      this.cdr.detectChanges();
+    });
     this.loadUserName();
     this.loadPlaceCards();
     this.loadRecommendedCards();
     this.loadEventCards();
     this.loadFavorites();
+  }
+
+  private updateDistances(): void {
+    if (!this.userLocation) return;
+
+    const updateList = (list: any[]) => {
+      return list.map(item => {
+        if (item.latitude == null || item.longitude == null) {
+          return { ...item, distanceText: undefined };
+        }
+
+        const km = this.getDistanceKm(
+          this.userLocation!.lat,
+          this.userLocation!.lng,
+          item.latitude,
+          item.longitude
+        );
+
+        const text =
+          km < 1
+            ? `${Math.round(km * 1000)} m`
+            : `${km.toFixed(1)} km`;
+
+        return {
+          ...item,
+          distanceText: text
+        };
+      });
+    };
+
+    this.popular = updateList(this.popular);
+    this.recommended = updateList(this.recommended);
+    this.events = updateList(this.events);
+  }
+  private clearDistances(): void {
+    const clearList = (list: any[]) =>
+      list.map(item => ({
+        ...item,
+        distanceText: undefined
+      }));
+
+    this.popular = clearList(this.popular);
+    this.recommended = clearList(this.recommended);
+    this.events = clearList(this.events);
+  }
+  private getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371; // km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) *
+      Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
+
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+  getDistanceText(item: any): string | null {
+    if (!this.isTracking || !this.userLocation) return null;
+    if (!item.latitude || !item.longitude) return null;
+
+    const km = this.getDistanceKm(
+      this.userLocation.lat,
+      this.userLocation.lng,
+      item.latitude,
+      item.longitude
+    );
+
+    return km < 1
+      ? `${Math.round(km * 1000)} m`
+      : `${km.toFixed(1)} km`;
   }
   ngOnDestroy(): void {
     if (this.rotationInterval) {
@@ -264,7 +509,7 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
         });
         this.currentIndex = 0;
         this.currentFeatured = this.featuredDestinations[0];
-        
+
         this.startRotation();
         this.flushUi();
       });
@@ -374,11 +619,11 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
           });
           this.currentIndex = 0;
           this.translateFeaturedDisplayTitles(selectedFeatured).subscribe((res) => {
-          this.featuredDestinations = res;
-          this.currentFeatured = this.featuredDestinations[0];
-          this.startRotation();
-          this.flushUi();
-        });
+            this.featuredDestinations = res;
+            this.currentFeatured = this.featuredDestinations[0];
+            this.startRotation();
+            this.flushUi();
+          });
           this.flushUi();
         } else {
           this.featuredDestinations = [];
@@ -396,46 +641,46 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
       .trim()
       .toLowerCase();
 
-  if (!featured.length || lang === 'sr' || lang === 'me') {
-    return of(featured);
+    if (!featured.length || lang === 'sr' || lang === 'me') {
+      return of(featured);
+    }
+
+    return forkJoin(
+      featured.map((item) => {
+
+        return this.http
+          .get<ApiTranslationDto[]>(
+            `${environment.apiUrl}/translations?entityType=Destination&entityId=${item.id}`
+          )
+          .pipe(
+            map((translations) => {
+              const translatedDescription = translations
+                .find(
+                  (translation) =>
+                    translation.fieldName?.toLowerCase() === 'displayTitle' &&
+                    translation.languageCode?.toLowerCase() === lang
+                )
+                ?.translatedText?.trim();
+
+              return translatedDescription
+                ? {
+                  ...item,
+                  displayTitle: translatedDescription,
+                }
+                : item;
+            }),
+            catchError((error) => {
+              console.error(
+                `Greška pri prevodu featured destination ${item.id}:`,
+                error
+              );
+
+              return of(item);
+            })
+          );
+      })
+    );
   }
-
-  return forkJoin(
-    featured.map((item) => {
-
-      return this.http
-      .get<ApiTranslationDto[]>(
-        `${environment.apiUrl}/translations?entityType=Destination&entityId=${item.id}`
-      )
-      .pipe(
-        map((translations) => {
-          const translatedDescription = translations
-            .find(
-              (translation) =>
-                translation.fieldName?.toLowerCase() === 'displayTitle' &&
-                translation.languageCode?.toLowerCase() === lang
-            )
-            ?.translatedText?.trim();
-
-          return translatedDescription
-            ? {
-                ...item,
-                displayTitle: translatedDescription,
-              }
-            : item;
-        }),
-          catchError((error) => {
-            console.error(
-              `Greška pri prevodu featured destination ${item.id}:`,
-              error
-            );
-
-            return of(item);
-          })
-        );
-    })
-  );
-}
 
   private loadRecommendedCards(): void {
     this.isLoadingRecommendations = true;
@@ -465,6 +710,7 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
 
         this.recommended = cards.length ? cards : [...this.fallbackRecommended];
         this.applyFavoriteState(this.recommended);
+        this.applyPlannerStateToPlaceCards(this.recommended);
         this.flushUi();
       });
   }
@@ -503,14 +749,20 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
             timeText: this.eventTime(e.startDate, e.endDate),
             imageUrl: this.pickEventImage(e),
             distanceText: this.distanceTextFromCoords(e.latitude, e.longitude),
+            latitude: e.latitude,
+            longitude: e.longitude,
+            startDate: e.startDate,
+            endDate: e.endDate,
           }),
         );
 
         this.upcomingEvents = eventCards;
         this.events = eventCards;
+        this.syncPlannerStateAcrossLists();
 
         this.flushUi();
       });
+    this.loadPlanner();
   }
 
   private loadFavorites(): void {
@@ -710,6 +962,8 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
       showRating: false,
       ratingText: "",
       distanceText: this.distanceTextFromCoords(destination.latitude, destination.longitude),
+      latitude: destination.latitude,
+      longitude: destination.longitude,
     };
 
     this.applyFavoriteState([card]);
@@ -743,6 +997,8 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
       targetUrl: `/object/${object.id}`,
       showRating: (object.averageRating ?? 0) > 0,
       distanceText: this.distanceTextFromCoords(object.latitude, object.longitude),
+      latitude: object.latitude,
+      longitude: object.longitude,
     };
 
     this.applyFavoriteState([card]);
@@ -765,6 +1021,8 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
       targetUrl: '/map',
       showRating: false,
       distanceText: this.distanceTextFromCoords(activity.latitude, activity.longitude),
+      latitude: activity.latitude,
+      longitude: activity.longitude,
     };
 
     this.applyFavoriteState([card]);
@@ -800,9 +1058,11 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
         item.distanceMeters != null
           ? this.distanceTextFromCoordsFromMeters(item.distanceMeters)
           : undefined,
+      eventTypeName: normalizedType === 'event' ? item.categoryName || 'Dogadjaj' : undefined,
     };
 
     this.applyFavoriteState([card]);
+    this.applyPlannerStateToPlaceCards([card]);
     return card;
   }
 
@@ -839,27 +1099,27 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
         item.distanceMeters >= 1000
           ? `${(item.distanceMeters / 1000).toFixed(1)} km away`
           : `${Math.round(item.distanceMeters)} m away`;
-/*
-      if (item.itemType === 'activity') {
-        const details = [item.price != null && item.price > 0 ? `EUR ${Math.round(item.price)}` : 'Free'];
-        if (item.durationMinutes != null && item.durationMinutes > 0) {
-          details.push(`${item.durationMinutes} min`);
-        }
-
-        return `${distanceText} - ${details.join(' - ')}`;
-      } */
+      /*
+            if (item.itemType === 'activity') {
+              const details = [item.price != null && item.price > 0 ? `EUR ${Math.round(item.price)}` : 'Free'];
+              if (item.durationMinutes != null && item.durationMinutes > 0) {
+                details.push(`${item.durationMinutes} min`);
+              }
+      
+              return `${distanceText} - ${details.join(' - ')}`;
+            } */
 
       return distanceText;
     }
-/*
-    if (item.itemType === 'activity') {
-      const details = [item.price != null && item.price > 0 ? `EUR ${Math.round(item.price)}` : 'Free'];
-      if (item.durationMinutes != null && item.durationMinutes > 0) {
-        details.push(`${item.durationMinutes} min`);
-      }
-
-      return details.join(' - ');
-    } */
+    /*
+        if (item.itemType === 'activity') {
+          const details = [item.price != null && item.price > 0 ? `EUR ${Math.round(item.price)}` : 'Free'];
+          if (item.durationMinutes != null && item.durationMinutes > 0) {
+            details.push(`${item.durationMinutes} min`);
+          }
+    
+          return details.join(' - ');
+        } */
 
     return item.categoryName || '';
   }
@@ -977,8 +1237,7 @@ private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: 
 
   private activityMetaText(activity: {
     activityTypeName: string;
-  })
-  {
+  }) {
     return activity.activityTypeName;
   }
 

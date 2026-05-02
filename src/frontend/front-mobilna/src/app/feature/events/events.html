@@ -44,13 +44,6 @@
             </button>
             <button
               class="sort-menu__item"
-              [class.sort-menu__item--active]="sortOption === 'price'"
-              (click)="setSort('price')"
-            >
-              <mat-icon>euro</mat-icon> Cheapest
-            </button>
-            <button
-              class="sort-menu__item"
               [class.sort-menu__item--active]="sortOption === 'distance'"
               (click)="setSort('distance')"
             >
@@ -96,7 +89,7 @@
   </div>
 
   <div class="results-bar">
-    <span class="results-bar__count">{{ totalCount }} objects found</span>
+    <span class="results-bar__count">{{ totalCount }} events found</span>
   </div>
 
   @if (isLoading) {
@@ -117,9 +110,15 @@
           [class.event-image--empty]="!event.imageUrl"
         >
           <span class="event-tag">{{ event.category === 'Rute' ? 'Nature' : event.category }}</span>
-          <span class="event-price" [class.event-price--free]="event.priceText === 'Free'">{{
-            event.priceText
-          }}</span>
+          <button
+            class="planner-btn"
+            [disabled]="isPlannerBusy"
+            (click)="togglePlanner(event, $event)"
+            [class.planner-btn--active]="event.isPlanned"
+          >
+            <mat-icon>{{ event.isPlanned ? 'event_available' : 'event' }}</mat-icon>
+          </button>
+          
           @if (getDistanceText(event)) {
             <span class="card__distance">
               <mat-icon>radio_button_checked</mat-icon>
@@ -130,26 +129,13 @@
 
         <div class="event-body">
           <h3>{{ event.title }}</h3>
-
-          <div class="event-meta">
-            <p>
-              <span class="meta-icon">Date</span>
-              {{ event.dateText }}
-            </p>
-            <p>
-              <span class="meta-icon">Time</span>
-              {{ event.timeText }}
-            </p>
-          </div>
           <p class="event-location">
-            <span class="meta-icon">Place</span>
+            <mat-icon>place</mat-icon>
             {{ event.location }}
           </p>
 
           <div class="event-footer">
-            <div class="attendees">
-              <span class="attending-text">{{ event.attendeesText }}</span>
-            </div>
+            <p class="card__desc">{{ event.description }}</p>
             <button type="button" class="view-btn" (click)="openEvent(event.id)">View Event</button>
           </div>
         </div>

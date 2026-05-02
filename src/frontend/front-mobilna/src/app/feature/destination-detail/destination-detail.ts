@@ -1,12 +1,14 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { catchError, forkJoin, of } from 'rxjs';
 
 import { DestinationService, DestinationDto } from '../../services/destination';
 import { ImageService, ImageDto } from '../../services/image';
 import { MatIconModule } from "@angular/material/icon";
 import { MapComponent } from "../../shared/components/map/map";
 import { environment } from '../../../environment/environment';
+import { AuthService } from '../../services/auth';
+import { FavoriteStateService } from '../../services/favorite-state';
 
 @Component({
   selector: 'app-destination-detail',
@@ -14,7 +16,7 @@ import { environment } from '../../../environment/environment';
   styleUrls: ['./destination-detail.scss'],
   imports: [MatIconModule, MapComponent]
 })
-export class DestinationDetailComponent implements OnInit {
+export class DestinationDetailComponent implements OnInit, OnDestroy {
   showGalleryModal = false;
   currentImageIndex = 0;
   destination: DestinationDto | null = null;
@@ -25,6 +27,8 @@ export class DestinationDetailComponent implements OnInit {
   errorMessage = '';
 
   isFavorite = false;
+  favoriteId: number | null = null;
+  private favoritePendingIds = new Set<number>();
   private touchStartX = 0;
   private touchEndX = 0;
   constructor(
@@ -32,13 +36,14 @@ export class DestinationDetailComponent implements OnInit {
     private router: Router,
     private destinationService: DestinationService,
     private cdr: ChangeDetectorRef,
-    private imageService: ImageService
-    
-  ) {}
+    private imageService: ImageService,
+    private authService: AuthService,
+    private favoriteStateService: FavoriteStateService,
+  ) { }
 
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    
+
     forkJoin({
       destination: this.destinationService.getById(id),
       images: this.imageService.getForDestination?.(id)
@@ -51,6 +56,7 @@ export class DestinationDetailComponent implements OnInit {
           url: this.resolveMediaUrl(image.url) ?? image.url,
         }));
         this.mainImage = this.getMainImage();
+        this.syncFavoriteState();
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -60,8 +66,11 @@ export class DestinationDetailComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
+    window.addEventListener('focus', this.handleWindowFocus);
   }
-
+  ngOnDestroy(): void {
+    window.removeEventListener('focus', this.handleWindowFocus);
+  }
   private getMainImage(): string {
     if (this.images?.length) {
       const main = this.images.find(i => i.isMain);
@@ -71,8 +80,83 @@ export class DestinationDetailComponent implements OnInit {
     return this.resolveMediaUrl(this.destination?.mainImageUrl) || '';
   }
 
-  toggleFavorite(): void {
-    this.isFavorite = !this.isFavorite;
+  isFavoritePending(destinationId?: number | null): boolean {
+    if (destinationId == null) return false;
+    return this.favoritePendingIds.has(destinationId);
+  }
+  toggleFavorite(destination: DestinationDto | null, event: Event): void {
+    if (!destination?.id) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    if (this.favoritePendingIds.has(destination.id)) return;
+
+    this.favoritePendingIds.add(destination.id);
+
+    this.favoriteStateService
+      .toggle({
+        type: 'destination',
+        entityId: destination.id
+      }, this.favoriteId ?? undefined)
+      .subscribe({
+        next: (state) => {
+          this.isFavorite = state.isFavorite;
+          this.favoriteId = state.favoriteId ?? null;
+
+          if (this.destination) {
+            (this.destination as any).isFavorite = state.isFavorite;
+            (this.destination as any).favoriteId = state.favoriteId;
+          }
+
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Favorite toggle failed:', err);
+        },
+        complete: () => {
+          this.favoritePendingIds.delete(destination.id);
+          this.cdr.detectChanges();
+        }
+      });
+  }
+  private readonly handleWindowFocus = (): void => {
+    this.syncFavoriteState();
+  };
+  private syncFavoriteState(): void {
+    if (!this.destination?.id || !this.authService.isLoggedIn()) {
+      this.isFavorite = false;
+      this.favoriteId = null;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.favoriteStateService
+      .loadFavorites(true)
+      .pipe(catchError((err) => {
+        console.error('Failed to sync destination favorite state:', err);
+        return of(new Map<string, number>());
+      }))
+      .subscribe(() => {
+        const stateful = {
+          isFavorite: this.isFavorite,
+          favoriteId: this.favoriteId ?? undefined,
+        };
+
+        this.favoriteStateService.applyToItem(stateful, {
+          type: 'destination',
+          entityId: this.destination!.id,
+        });
+
+        this.isFavorite = stateful.isFavorite;
+        this.favoriteId = stateful.favoriteId ?? null;
+        this.cdr.detectChanges();
+      });
   }
 
   goBack(): void {

@@ -10,6 +10,9 @@ import { ImageDto, ImageService } from '../../services/image';
 import { Router } from '@angular/router';
 import { LazyBackgroundDirective } from '../../shared/directives/lazy-background.directive';
 import { LocationTrackingService } from '../../services/location-tracking';
+import { AuthService } from '../../services/auth';
+import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
+import { EventPlannerService } from '../../services/event-planner';
 
 type EventCategory = 'All' | string;
 
@@ -28,6 +31,11 @@ interface EventCard {
   distanceMeters?: number;
   eventTypeName?: string;
   eventTypeId?: number;
+  description?: string;
+  startDate?: string;
+  endDate?: string | null;
+  isPlanned?: boolean;
+  plannerId?: number;
 }
 
 @Component({
@@ -45,6 +53,9 @@ export class EventsComponent implements OnInit {
   private readonly imageService = inject(ImageService);
   private readonly router = inject(Router);
   private readonly locationTrackingService = inject(LocationTrackingService);
+  private readonly authService = inject(AuthService);
+  private readonly plannerService = inject(PlannerLocalPreferencesService);
+  private readonly eventPlannerService = inject(EventPlannerService);
   activeFilter = 'All';
   activeCategory: EventCategory = 'All';
   isLoading = true;
@@ -62,6 +73,8 @@ export class EventsComponent implements OnInit {
   userLocation: { lat: number; lng: number } | null = null;
   isTracking = false;
   eventTypes: { id: number; name: string }[] = [];
+  isPlannerBusy = false;
+  private plannerMap = new Map<number, number>();
   ngOnInit(): void {
     this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
       this.isTracking = enabled;
@@ -88,6 +101,58 @@ export class EventsComponent implements OnInit {
       this.cdr.detectChanges();
     });
     this.loadEvents();
+  }
+
+  togglePlanner(eventItem: EventCard, event?: Event): void {
+    event?.stopPropagation();
+
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    if (this.isPlannerBusy) {
+      return;
+    }
+
+    this.isPlannerBusy = true;
+    const existingId = this.plannerMap.get(eventItem.id);
+
+    if (existingId) {
+      this.eventPlannerService.remove(existingId).subscribe({
+        next: () => {
+          this.plannerService.remove(existingId);
+          this.plannerMap.delete(eventItem.id);
+          eventItem.isPlanned = false;
+          eventItem.plannerId = undefined;
+          this.applyPlannerState(this.events);
+          this.applyPlannerState(this.visibleEvents);
+          this.isPlannerBusy = false;
+          this.flushUi();
+        },
+        error: () => {
+          this.isPlannerBusy = false;
+          this.flushUi();
+        },
+      });
+
+      return;
+    }
+
+    this.router.navigate(['/planner/add'], {
+      state: {
+        eventId: eventItem.id,
+        title: eventItem.title,
+        location: eventItem.location,
+        startDate: eventItem.startDate,
+        endDate: eventItem.endDate,
+        type: eventItem.eventTypeName || 'Dogadjaj',
+        imageUrl: eventItem.imageUrl || this.resolveMediaUrl(eventItem.imageUrl),
+        description: eventItem.description,
+      },
+    });
+
+    this.isPlannerBusy = false;
   }
 
   @HostListener('document:click', ['$event'])
@@ -204,6 +269,38 @@ export class EventsComponent implements OnInit {
     this.router.navigate(['/event', id]);
   }
 
+  private applyPlannerState(list: EventCard[]): void {
+    for (const item of list) {
+      item.isPlanned = this.plannerMap.has(item.id);
+      item.plannerId = this.plannerMap.get(item.id);
+    }
+  }
+
+  private loadPlanner(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.plannerMap.clear();
+      this.applyPlannerState(this.events);
+      this.applyPlannerState(this.visibleEvents);
+      this.flushUi();
+      return;
+    }
+
+    this.eventPlannerService.getMyPlanner({
+      page: 1,
+      pageSize: 200,
+    }).subscribe((res) => {
+      this.plannerMap.clear();
+
+      res.items.forEach((item) => {
+        this.plannerMap.set(Number(item.eventId), item.id);
+      });
+
+      this.applyPlannerState(this.events);
+      this.applyPlannerState(this.visibleEvents);
+      this.flushUi();
+    });
+  }
+
   private loadEvents(): void {
     this.isLoading = true;
 
@@ -252,12 +349,17 @@ export class EventsComponent implements OnInit {
                 longitude: event.longitude,
                 eventTypeName: event.eventTypeName ?? '',
                 eventTypeId: event.eventTypeId ?? 0,
+                description: this.getShortDescription(event.description, 1),
+                startDate: event.startDate,
+                endDate: event.endDate,
               };
             })
           );
           this.updateDistances();
+          this.applyPlannerState(this.events);
           this.eventTypes = this.extractUniqueTypes(this.events);
           this.refreshVisibleEvents();
+          this.loadPlanner();
         } catch {
           this.events = [];
           this.visibleEvents = [];
@@ -277,6 +379,17 @@ export class EventsComponent implements OnInit {
         this.flushUi();
       },
     });
+  }
+  private getShortDescription(text?: string, maxSentences = 2): string {
+    if (!text) return '';
+
+    const sentences = text
+      .replace(/\s+/g, ' ')
+      .match(/[^.!?]+[.!?]+/g);
+
+    if (!sentences) return text;
+
+    return sentences.slice(0, maxSentences).join(' ').trim();
   }
   private extractUniqueTypes(events: EventCard[]): { id: number; name: string }[] {
     const map = new Map<string, { id: number; name: string }>();
@@ -310,6 +423,7 @@ export class EventsComponent implements OnInit {
 
     const startIndex = (this.currentPage - 1) * this.pageSize;
     this.visibleEvents = filteredEvents.slice(startIndex, startIndex + this.pageSize);
+    this.applyPlannerState(this.visibleEvents);
     this.flushUi();
   }
   setFilter(filter: string): void {
@@ -332,6 +446,7 @@ export class EventsComponent implements OnInit {
     isActive: boolean;
     localityName?: string | null;
     destinationName?: string | null;
+    description?: string;
   } {
     const dto = raw as unknown as Record<string, unknown>;
     const startDate = dto['startDate'] ?? dto['StartDate'];
@@ -355,6 +470,7 @@ export class EventsComponent implements OnInit {
       latitude: this.readOptionalNumber(dto, ['latitude', 'Latitude']),
       longitude: this.readOptionalNumber(dto, ['longitude', 'Longitude']),
       eventTypeId: this.readOptionalNumber(dto, ['eventTypeId', 'EventTypeId']),
+      description: String(dto['description'] ?? dto['Description'] ?? ''),
     };
   }
 

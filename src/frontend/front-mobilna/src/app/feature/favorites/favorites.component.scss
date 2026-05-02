@@ -307,6 +307,7 @@
   border-radius: 22px;
   background: #fff;
   box-shadow: 0 14px 24px rgba(15, 23, 42, 0.07);
+  height: 100%;
 }
 
 .favorite-card--clickable {
@@ -419,6 +420,13 @@
   color: #6b7280;
   font-size: 13px;
   line-height: 1.4;
+
+  mat-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+    color: #e74c3c;
+  }
 }
 
 .location-pin {
@@ -438,31 +446,80 @@
 }
 
 .favorite-card__meta {
+  grid-column: 2;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: nowrap;
+  min-width: 0;
+  margin-top: 5px;
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+.favorite-card__meta:has(.favorite-card__rating) {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 14px;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.favorite-card__meta:has(.favorite-card__meta-tag) {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 14px;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .favorite-card__rating {
+  grid-column: 1;
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  min-width: max-content;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  overflow: visible;
   color: #4b5563;
   font-size: 13px;
 
   svg {
     width: 14px;
     height: 14px;
+    flex: 0 0 auto;
     fill: #facc15;
     stroke: #eab308;
     stroke-width: 1;
   }
 
   strong {
+    flex: 0 0 auto;
     color: #1f2937;
     font-weight: 800;
   }
+
+  span {
+    overflow: visible;
+    white-space: nowrap;
+  }
+}
+
+.favorite-card__meta:has(.favorite-card__rating) .favorite-card__saved {
+  grid-column: 2;
+  justify-self: end;
+}
+
+.favorite-card__meta:has(.favorite-card__meta-tag) .favorite-card__saved {
+  grid-column: 2;
+  justify-self: end;
 }
 
 .favorite-card__meta-tag,
@@ -472,6 +529,10 @@
 }
 
 .favorite-card__meta-tag {
+  grid-column: 1;
+  justify-self: start;
+  flex: 0 1 auto;
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   min-height: 24px;
@@ -482,7 +543,12 @@
 }
 
 .favorite-card__saved {
+  flex: 0 1 auto;
   font-weight: 600;
+  white-space: nowrap;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .favorite-card__footer {
@@ -491,7 +557,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding-top: 2px;
+  margin-top: 10px;
+  padding-top: 0;
 }
 
 .card-action-btn {
@@ -679,6 +746,14 @@
     height: 84px;
   }
 
+  .favorite-card__meta:has(.favorite-card__rating) {
+    grid-template-columns: 84px minmax(0, 1fr);
+  }
+
+  .favorite-card__meta:has(.favorite-card__meta-tag) {
+    grid-template-columns: 84px minmax(0, 1fr);
+  }
+
   .favorite-card__footer {
     flex-direction: column;
     align-items: stretch;
@@ -803,6 +878,8 @@
   }
 
   .favorite-card {
+    display: flex;
+    flex-direction: column;
     grid-template-columns: minmax(0, 1fr);
     gap: 0;
     padding: 0 0 18px;
@@ -812,7 +889,7 @@
   .favorite-card__media {
     width: 100%;
     height: 190px;
-    margin-bottom: 16px;
+    margin-bottom: 6px;
 
     img {
       border-radius: 0;
@@ -833,6 +910,14 @@
     padding: 0 16px;
   }
 
+  .favorite-card__content {
+    margin-top: 5px;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+  }
+
   .favorite-card__heading {
     padding-right: 52px;
 
@@ -851,11 +936,29 @@
   }
 
   .favorite-card__meta {
+    grid-column: auto;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 14px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  .favorite-card__meta:has(.favorite-card__rating) {
+    display: flex;
+    grid-template-columns: none;
+    column-gap: 0;
+    margin-left: 15px;
+    margin-right: 15px;
+  }
+
+  .favorite-card__meta:has(.favorite-card__meta-tag) {
+    display: flex;
+    grid-template-columns: none;
+    column-gap: 0;
+    margin-left: 15px;
+    margin-right: 15px;
   }
 
   .favorite-card__saved {
@@ -863,8 +966,10 @@
   }
 
   .favorite-card__footer {
+    margin-top: auto;
     justify-content: space-between;
     align-items: center;
+    padding-top: 10px;
   }
 
   .card-action-btn {

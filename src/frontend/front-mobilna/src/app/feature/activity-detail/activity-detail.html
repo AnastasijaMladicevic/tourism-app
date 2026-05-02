@@ -33,7 +33,7 @@
         </div>
       }
 
-      <button class="fav-btn" (click)="toggleFavorite()">
+      <button class="fav-btn" [class.card__fav--active]="isFavorite" [disabled]="isFavoritePending(activity.id)"(click)="toggleFavorite(activity, $event)">
         <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
       </button>
     </div>
@@ -46,8 +46,9 @@
           <h1 class="title">{{ activity?.name }}</h1>
           <button
             class="fav-btn fav-btn--desktop"
-            (click)="toggleFavorite()"
+            (click)="toggleFavorite(activity, $event)"
             [class.fav-btn--active]="isFavorite"
+            [disabled]="isFavoritePending(activity?.id)"
           >
             <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
           </button>

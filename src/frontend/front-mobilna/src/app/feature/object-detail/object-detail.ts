@@ -11,6 +11,7 @@ import { ObjectDto, ObjectImageDto, ObjectService, PagedResultDto } from '../../
 import { ReviewDto } from '../../services/review';
 import { MapComponent } from '../../shared/components/map/map';
 import { environment } from '../../../environment/environment';
+import { FavoriteStateService } from '../../services/favorite-state';
 
 @Component({
   selector: 'app-restaurant-detail',
@@ -26,14 +27,16 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
   mainImage = '';
   isLoading = true;
   errorMessage = '';
-  isFavorite = false;
+
   reviews: ReviewDto[] = [];
   nearbyObjects: ObjectDto[] = [];
 
   showGalleryModal = false;
   currentImageIndex = 0;
   showAllReviewsModal = false;
-
+  isFavorite = false;
+  favoriteId: number | null = null;
+  private favoritePendingIds = new Set<number>();
   private touchStartX = 0;
   private touchEndX = 0;
   private readonly subscriptions = new Subscription();
@@ -45,7 +48,8 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     private imageService: ImageService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
-  ) {}
+    private favoriteStateService: FavoriteStateService,
+  ) { }
 
   ngOnInit(): void {
     this.subscriptions.add(
@@ -57,15 +61,16 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
           return;
         }
-
         this.loadObject(id);
       }),
     );
+    window.addEventListener('focus', this.handleWindowFocus);
   }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
     document.body.style.overflow = 'visible';
+    window.removeEventListener('focus', this.handleWindowFocus);
   }
 
   private loadObject(id: number): void {
@@ -92,7 +97,7 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
           this.getMainImage(normalizedImages) ||
           this.resolveMediaUrl(normalizedObject.mainImageUrl) ||
           this.getMainImage(this.normalizeImages((normalizedObject.images || []) as ImageDto[]));
-
+        this.syncFavoriteState();
         this.cdr.detectChanges();
         this.loadNearbyObjects(normalizedObject);
       },
@@ -204,7 +209,23 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
 
     return [];
   }
+  reserveNow(item: any): void {
+    const website = item?.website?.trim();
+    const phone = item?.phoneNumber?.trim();
 
+    if (website) {
+      const url = /^https?:\/\//i.test(website) ? website : `https://${website}`;
+      window.open(url, '_blank');
+      return;
+    }
+
+    if (phone) {
+      window.location.href = `tel:${phone}`;
+      return;
+    }
+
+    console.warn('No website or phone available');
+  }
   private normalizeObject(raw: ObjectDto): ObjectDto {
     const dto = raw as unknown as Record<string, unknown>;
 
@@ -285,12 +306,83 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     return `${apiBase}/${trimmed}`;
   }
 
-  toggleFavorite(): void {
+  isFavoritePending(objectId?: number | null): boolean {
+    if (objectId == null) return false;
+    return this.favoritePendingIds.has(objectId);
+  }
+  toggleFavorite(object: ObjectDto | null, event: Event): void {
+    if (!object?.id) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login']);
       return;
     }
-    this.isFavorite = !this.isFavorite;
+
+    if (this.favoritePendingIds.has(object.id)) return;
+
+    this.favoritePendingIds.add(object.id);
+
+    this.favoriteStateService
+      .toggle({
+        type: 'object',
+        entityId: object.id
+      }, this.favoriteId ?? undefined)
+      .subscribe({
+        next: (state) => {
+          this.isFavorite = state.isFavorite;
+          this.favoriteId = state.favoriteId ?? null;
+
+          if (this.object) {
+            (this.object as any).isFavorite = state.isFavorite;
+            (this.object as any).favoriteId = state.favoriteId;
+          }
+
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error('Favorite toggle failed:', err);
+        },
+        complete: () => {
+          this.favoritePendingIds.delete(object.id);
+          this.cdr.detectChanges();
+        }
+      });
+  }
+  private readonly handleWindowFocus = (): void => {
+    this.syncFavoriteState();
+  };
+  private syncFavoriteState(): void {
+    if (!this.object?.id || !this.authService.isLoggedIn()) {
+      this.isFavorite = false;
+      this.favoriteId = null;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.favoriteStateService
+      .loadFavorites(true)
+      .pipe(catchError((err) => {
+        console.error('Failed to sync object favorite state:', err);
+        return of(new Map<string, number>());
+      }))
+      .subscribe(() => {
+        const stateful = {
+          isFavorite: this.isFavorite,
+          favoriteId: this.favoriteId ?? undefined,
+        };
+
+        this.favoriteStateService.applyToItem(stateful, {
+          type: 'object',
+          entityId: this.object!.id,
+        });
+
+        this.isFavorite = stateful.isFavorite;
+        this.favoriteId = stateful.favoriteId ?? null;
+        this.cdr.detectChanges();
+      });
   }
 
   onImageError(event: Event): void {

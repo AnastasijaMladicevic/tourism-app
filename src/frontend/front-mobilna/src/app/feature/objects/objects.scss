@@ -169,6 +169,7 @@
 .sort-menu__item--active {
   color: var(--primary);
   font-weight: 600;
+
   mat-icon {
     color: var(--primary);
   }
@@ -265,6 +266,7 @@
     font-size: 13.5px;
     color: var(--text-dark);
     width: 100%;
+
     &::placeholder {
       color: var(--text-light);
     }
@@ -276,6 +278,7 @@
   gap: 8px;
   overflow-x: auto;
   flex: 1;
+
   &::-webkit-scrollbar {
     display: none;
   }
@@ -307,6 +310,7 @@
     background: var(--primary-light);
   }
 }
+
 .filter-btn {
   flex-shrink: 0;
   padding: 7px 18px;
@@ -325,10 +329,12 @@
     border-color: var(--primary);
     color: var(--primary);
   }
+
   &:active,
   &:focus {
     outline: none;
   }
+
   &--active {
     background: var(--primary);
     border-color: var(--primary);
@@ -587,10 +593,12 @@
     height: 40px;
     margin-bottom: 8px;
   }
+
   p {
     font-size: 14px;
   }
 }
+
 .card__open-badge {
   position: absolute;
   top: 12px;
@@ -604,6 +612,7 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   z-index: 2;
 }
+
 /* Loading Screen - centrirano na sredini ekrana */
 .loading-screen {
   position: fixed;
@@ -643,8 +652,13 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .pagination {
