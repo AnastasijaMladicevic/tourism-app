@@ -450,8 +450,14 @@ tbody tr:hover,
   gap: 14px;
 }
 
+.object-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 .hero-media {
-  min-height: 140px;
+  min-height: 180px;
   border-radius: 14px;
   padding: 14px;
   position: relative;
@@ -459,41 +465,53 @@ tbody tr:hover,
   background: linear-gradient(150deg, #9ca3af, #374151);
   background-size: cover;
   background-position: center;
-  color: #fff;
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-}
-
-.hero-media::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(17, 24, 39, 0.1), rgba(17, 24, 39, 0.68));
-}
-
-.hero-media h2,
-.hero-badge {
-  position: relative;
-  z-index: 1;
-}
-
-.hero-media h2 {
-  font-size: 27px;
-  line-height: 1.05;
-  max-width: 240px;
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 
 .hero-badge {
-  position: absolute;
-  top: 12px;
-  left: 12px;
+  display: inline-flex;
+  align-items: center;
   border-radius: 999px;
-  padding: 5px 10px;
-  background: rgba(255, 255, 255, 0.9);
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.95);
   color: #111827;
   font-size: 11px;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.hero-eyebrow {
+  margin: 0 0 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+}
+
+.hero-copy h2 {
+  margin: 0 0 8px;
+  font-size: 26px;
+  line-height: 1.1;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.hero-meta {
+  margin: 0 0 12px;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .publish-badge {
@@ -502,16 +520,10 @@ tbody tr:hover,
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  padding: 5px 11px;
+  padding: 6px 12px;
   border: 1px solid transparent;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-}
-
-.hero-status-row {
-  display: flex;
-  justify-content: flex-start;
-  margin-top: -2px;
 }
 
 .publish-badge.status-published {

@@ -177,14 +177,18 @@
 
     <aside class="detail-column card">
       @if (selectedObject) {
-        <div class="hero-media" [ngStyle]="getHeroStyle()">
-          <span class="hero-badge">{{ selectedObject.objectTypeName || 'Object' }}</span>
-          <h2>{{ selectedObject.name }}</h2>
-        </div>
-        <div class="hero-status-row">
-          <span class="publish-badge" [ngClass]="'status-' + getStatusBadgeClass(selectedObject.status)">
-            {{ formatStatus(selectedObject.status) }}
-          </span>
+        <div class="object-hero">
+          <div class="hero-media" [ngStyle]="getHeroStyle()">
+            <span class="hero-badge">{{ selectedObject.objectTypeName || 'Object' }}</span>
+          </div>
+          <div class="hero-copy">
+            <p class="hero-eyebrow">Featured object</p>
+            <h2>{{ selectedObject.name }}</h2>
+            <p class="hero-meta">{{ getSidebarMetaLine(selectedObject) }}</p>
+            <span class="publish-badge" [ngClass]="'status-' + getStatusBadgeClass(selectedObject.status)">
+              {{ formatStatus(selectedObject.status) }}
+            </span>
+          </div>
         </div>
 
         <div class="detail-metrics">
