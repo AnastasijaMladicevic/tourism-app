@@ -598,6 +598,23 @@ tbody tr:hover,
 	line-height: 1.55;
 }
 
+.detail-cta {
+	display: flex;
+	margin-top: auto;
+}
+
+.full-cta {
+	width: 100%;
+	justify-content: center;
+}
+
+.sidebar-cta-btn {
+	padding: 11px 16px;
+	background: linear-gradient(135deg, #60a5fa, #3b82f6);
+	box-shadow: 0 10px 22px rgba(59, 130, 246, 0.2);
+	color: #ffffff;
+}
+
 .map-card {
 	min-height: 180px;
 	border: 1px solid #e5e7eb;

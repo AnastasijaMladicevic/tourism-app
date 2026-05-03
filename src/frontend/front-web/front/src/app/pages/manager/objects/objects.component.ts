@@ -447,6 +447,14 @@ export class ManagerObjectsComponent implements OnInit {
     this.router.navigate(['/manager/objects/review', obj.id]);
   }
 
+  onOpenSelectedObjectReview(): void {
+    if (!this.selectedObject) {
+      return;
+    }
+
+    this.router.navigate(['/manager/objects/review', this.selectedObject.id]);
+  }
+
   private getMinRatingFromFilter(value: string): number | undefined {
     if (value === 'all') {
       return undefined;

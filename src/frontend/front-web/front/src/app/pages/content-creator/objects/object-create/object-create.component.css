@@ -907,6 +907,7 @@ textarea:focus {
 }
 
 .creator-card {
+  margin-top: 12px;
   display: grid;
   grid-template-columns: 30px 1fr;
   gap: 8px;
