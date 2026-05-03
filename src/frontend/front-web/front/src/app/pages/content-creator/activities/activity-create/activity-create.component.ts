@@ -102,6 +102,7 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
   private map: L.Map | null = null;
   private mapMarker: L.Marker | null = null;
   private geocodeRequestId = 0;
+  private forwardGeocodeRequestId = 0;
 
   form = this.fb.group(
     {
@@ -148,6 +149,9 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
     fullAddress: '-',
     loading: false
   };
+
+  locationContextQuery = '';
+  isLocationContextSearching = false;
 
   pendingImageUrl = '';
   imageUrls: string[] = [];
@@ -264,6 +268,54 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
 
     const [selected] = this.imageUrls.splice(index, 1);
     this.imageUrls.unshift(selected);
+  }
+
+  onLocationContextSearch(): void {
+    const query = this.locationContextQuery.trim();
+    if (!query || this.isLocationContextSearching) {
+      return;
+    }
+
+    this.isLocationContextSearching = true;
+    const requestId = ++this.forwardGeocodeRequestId;
+    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(query)}&limit=1`;
+
+    fetch(url, {
+      headers: {
+        Accept: 'application/json'
+      }
+    })
+      .then((response) => (response.ok ? response.json() : Promise.reject(new Error('Location search failed'))))
+      .then((results: { lat?: string; lon?: string }[]) => {
+        this.ngZone.run(() => {
+          if (requestId !== this.forwardGeocodeRequestId) {
+            return;
+          }
+
+          this.isLocationContextSearching = false;
+          const hit = Array.isArray(results) ? results[0] : undefined;
+          if (!hit?.lat || !hit?.lon) {
+            return;
+          }
+
+          const lat = Number(hit.lat);
+          const lon = Number(hit.lon);
+          if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+            return;
+          }
+
+          this.selectLocation(lat, lon);
+        });
+      })
+      .catch(() => {
+        this.ngZone.run(() => {
+          if (requestId !== this.forwardGeocodeRequestId) {
+            return;
+          }
+
+          this.isLocationContextSearching = false;
+        });
+      });
   }
 
   saveDraft(): void {
@@ -721,6 +773,12 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
 
     this.map.on('click', (event: L.LeafletMouseEvent) => {
       this.ngZone.run(() => this.selectLocation(event.latlng.lat, event.latlng.lng));
+    });
+
+    this.map.whenReady(() => {
+      setTimeout(() => {
+        this.map?.invalidateSize();
+      }, 0);
     });
   }
 

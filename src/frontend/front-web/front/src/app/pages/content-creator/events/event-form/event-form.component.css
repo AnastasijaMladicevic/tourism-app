@@ -39,7 +39,6 @@
 .field-grid,
 .activity-row,
 .section-title,
-.form-layout,
 .format-pills,
 .alert {
   display: flex;
@@ -211,12 +210,13 @@
 }
 
 .form-layout {
-  gap: 18px;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(300px, 0.9fr);
+  gap: 16px;
+  align-items: start;
 }
 
 .form-main {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -224,7 +224,7 @@
 }
 
 .form-side {
-  width: min(390px, 100%);
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -636,11 +636,13 @@
 
 
 .location-map {
-  margin-top: 8px;
-  height: 220px;
-  border-radius: 14px;
-  border: 1px solid #dbe1ea;
+  margin-top: 0;
+  height: min(42vh, 320px);
+  min-height: 220px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
   overflow: hidden;
+  background: #f1f5f9;
 }
 
 .map-help-row {
@@ -766,7 +768,7 @@
 
 @media (max-width: 1180px) {
   .form-layout {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .form-side {

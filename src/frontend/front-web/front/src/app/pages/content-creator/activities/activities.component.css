@@ -231,8 +231,8 @@
 
 .activities-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1.7fr) minmax(320px, 0.95fr);
-    gap: 18px;
+    grid-template-columns: minmax(0, 1.8fr) minmax(300px, 0.9fr);
+    gap: 16px;
     align-items: start;
 }
 

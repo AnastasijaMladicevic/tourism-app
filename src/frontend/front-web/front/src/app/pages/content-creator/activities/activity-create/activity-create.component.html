@@ -191,21 +191,40 @@
 
     <aside class="side-column">
       <article class="card location-card">
-        <div class="card-head">
-          <h3>Location Intelligence</h3>
-          <p>Click on the map to place a pin. Coordinates are optional, but both values must be set together.</p>
+        <div class="location-card__head">
+          <span class="location-card__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+            </svg>
+          </span>
+          <h3 class="location-card__title">Location Intelligence</h3>
         </div>
 
         <div #activityMap class="location-map" aria-label="Activity location map"></div>
 
+        <div class="location-context-search">
+          <span class="material-symbols-outlined location-context-search__icon" aria-hidden="true">search</span>
+          <input
+            type="search"
+            class="location-context-search__input"
+            [(ngModel)]="locationContextQuery"
+            [ngModelOptions]="{ standalone: true }"
+            (keydown.enter)="$event.preventDefault(); onLocationContextSearch()"
+            placeholder="Set destination/locality for location context"
+            aria-label="Search for a place to set map context"
+            [disabled]="isLocationContextSearching"
+          />
+        </div>
+
         <div class="coordinates-grid">
-          <div class="field">
-            <label for="latitude-input">Latitude</label>
-            <input id="latitude-input" type="number" step="0.000001" formControlName="latitude" placeholder="44.8584" />
+          <div class="field field--coord">
+            <label for="latitude-input" class="coord-label">Latitude</label>
+            <input id="latitude-input" type="number" step="0.000001" formControlName="latitude" placeholder="42.424000" />
           </div>
-          <div class="field">
-            <label for="longitude-input">Longitude</label>
-            <input id="longitude-input" type="number" step="0.000001" formControlName="longitude" placeholder="2.2945" />
+          <div class="field field--coord">
+            <label for="longitude-input" class="coord-label">Longitude</label>
+            <input id="longitude-input" type="number" step="0.000001" formControlName="longitude" placeholder="18.771000" />
           </div>
         </div>
 
@@ -225,11 +244,11 @@
         </div>
       </article>
 
-      @if (isLoadingOptions) {
+      <!-- @if (isLoadingOptions) {
         <p class="side-hint">Loading options...</p>
       } @else if (!hasTypeOptions) {
         <p class="side-hint warning">No activity types were discovered from existing catalog entries. Use Activity Type ID input.</p>
-      }
+      } -->
     </aside>
   </div>
 </section>

@@ -86,7 +86,7 @@
 
 .layout-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-columns: minmax(0, 1.8fr) minmax(300px, 0.9fr);
   gap: 16px;
   align-items: start;
 }
@@ -247,16 +247,84 @@ select:focus {
 }
 
 .location-card {
-  padding-bottom: 16px;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.location-card__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.location-card__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  color: #2563eb;
+}
+
+.location-card__icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.location-card__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #1f2937;
+  letter-spacing: -0.02em;
 }
 
 .location-map {
-  margin-top: 14px;
-  height: 190px;
-  border-radius: 14px;
-  border: 1px solid #dbe1ea;
+  margin-top: 0;
+  height: min(42vh, 320px);
+  min-height: 220px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
   overflow: hidden;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  background: #f1f5f9;
+}
+
+.location-context-search {
+  position: relative;
+  margin-top: 12px;
+}
+
+.location-context-search__icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.location-context-search__input {
+  width: 100%;
+  margin: 0;
+  padding: 10px 12px 10px 42px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1f2937;
+  background: #fff;
+}
+
+.location-context-search__input::placeholder {
+  color: #94a3b8;
+}
+
+.location-context-search__input:focus {
+  border-color: #cbd5e1;
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.2);
+  outline: none;
 }
 
 .map-help-row {
@@ -285,9 +353,17 @@ select:focus {
 }
 
 .location-details {
-  margin-top: 12px;
+  margin-top: 14px;
   display: grid;
   gap: 10px;
+}
+
+.field.field--coord > label.coord-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #64748b;
 }
 
 .location-detail-row {
@@ -328,7 +404,11 @@ select:focus {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
-  margin-top: 10px;
+  margin-top: 12px;
+}
+
+.field--coord {
+  margin-top: 0;
 }
 
 .gallery-dropzone {
