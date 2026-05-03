@@ -2,6 +2,7 @@ import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { ActivitiesService, ActivityDto } from '../../../services/activities';
 
 @Component({
@@ -38,6 +39,8 @@ export class ContentCreatorActivitiesComponent implements OnInit {
   sortBy = 'status';
   sortOrder: 'asc' | 'desc' = 'desc';
   filterPanelOpen = false;
+  statsTotalCount: number | null = null;
+  statsPendingCount: number | null = null;
 
   readonly statusOptions = [
     { value: 'all', label: 'All Statuses' },
@@ -63,6 +66,7 @@ export class ContentCreatorActivitiesComponent implements OnInit {
   loadActivities(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    this.loadActivityStats();
 
     this.activitiesService.getMyActivities({
       page: this.currentPage,
@@ -102,7 +106,45 @@ export class ContentCreatorActivitiesComponent implements OnInit {
         this.totalPages = 1;
         this.selectedActivity = null;
         this.selectedActivityDetails = null;
+        this.statsTotalCount = null;
+        this.statsPendingCount = null;
         this.isLoading = false;
+      }
+    });
+  }
+
+  private loadActivityStats(): void {
+    const baseQuery = {
+      search: this.searchQuery || undefined,
+      type: this.typeFilter !== 'all' ? this.typeFilter : undefined,
+      destination: this.destinationFilter !== 'all' ? this.destinationFilter : undefined,
+      sortBy: this.sortBy,
+      sortOrder: this.sortOrder,
+      startDate: this.rangeStartDate || undefined,
+      endDate: this.rangeEndDate || undefined,
+      page: 1,
+      pageSize: 1
+    };
+
+    forkJoin({
+      all: this.activitiesService.getMyActivities({
+        ...baseQuery,
+        status: undefined
+      }),
+      pending: this.activitiesService.getMyActivities({
+        ...baseQuery,
+        status: 'pending'
+      })
+    }).subscribe({
+      next: ({ all, pending }) => {
+        this.statsTotalCount = all.totalCount ?? 0;
+        this.statsPendingCount = pending.totalCount ?? 0;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.statsTotalCount = null;
+        this.statsPendingCount = null;
+        this.cdr.detectChanges();
       }
     });
   }

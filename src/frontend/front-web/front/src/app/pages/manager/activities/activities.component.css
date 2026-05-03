@@ -1,8 +1,8 @@
 .activities-page {
     display: flex;
     flex-direction: column;
-    gap: 18px;
-    padding: 22px;
+    gap: 14px;
+    padding: 20px 20px 24px;
     min-height: calc(100vh - 62px);
     color: #1f2937;
 }
@@ -192,15 +192,15 @@
 
 .activities-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1.7fr) minmax(320px, 0.95fr);
-    gap: 18px;
+    grid-template-columns: minmax(0, 1.75fr) minmax(280px, 0.95fr);
+    gap: 14px;
     align-items: start;
 }
 
 .main-column {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 14px;
 }
 
 .stats-row {
@@ -725,7 +725,9 @@ tbody tr:hover,
     .filters-panel :last-child {
         grid-column: 1 / -1;
     }
+}
 
+@media (max-width: 1140px) {
     .activities-layout {
         grid-template-columns: 1fr;
     }
