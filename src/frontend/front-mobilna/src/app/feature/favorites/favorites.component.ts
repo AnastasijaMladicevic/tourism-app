@@ -10,6 +10,7 @@ import { LocalityDto, LocalityService } from '../../services/locality';
 import { ObjectDto, ObjectService } from '../../services/object';
 import { ProfileStatsCacheService } from '../../services/profile-stats-cache';
 import { TranslationService } from '../../services/translation.service';
+import { MatIcon } from "@angular/material/icon";
 
 type FavoriteKind = 'destination' | 'activity' | 'object' | 'locality' | 'route' | 'other';
 type FavoriteSortOption = 'newest' | 'title';
@@ -44,7 +45,7 @@ interface FavoriteBreakdownItem {
 @Component({
   selector: 'app-favorites',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, MatIcon],
   templateUrl: './favorites.component.html',
   styleUrl: './favorites.component.scss',
 })
@@ -318,7 +319,8 @@ export class FavoritesComponent implements OnInit {
       quote: this.translate('favorites.fallbackQuote'),
       note: this.buildRelativeNote(item.createdAt),
       imageUrl: this.resolveDestinationImage(destination),
-      canOpenDetails: false,
+      canOpenDetails: Boolean(destination?.id),
+      routeCommands: destination?.id ? ['/destination', destination.id] : undefined,
       kind: 'destination',
       rating: destination?.averageRating,
       reviewCount: destination?.reviewCount,
@@ -348,7 +350,8 @@ export class FavoritesComponent implements OnInit {
         : this.translate('favorites.fallbackQuote'),
       note: this.buildRelativeNote(item.createdAt),
       imageUrl: this.resolveMediaUrl(activity?.mainImageUrl) || this.defaultImages.activity,
-      canOpenDetails: false,
+      canOpenDetails: Boolean(activity?.id),
+      routeCommands: activity?.id ? ['/activity', activity.id] : undefined,
       kind: 'activity',
       createdAt: item.createdAt,
     });
@@ -401,7 +404,8 @@ export class FavoritesComponent implements OnInit {
       quote: this.translate('favorites.fallbackQuote'),
       note: this.buildRelativeNote(item.createdAt),
       imageUrl: this.resolveMediaUrl(locality?.mainImageUrl) || this.defaultImages.standard,
-      canOpenDetails: false,
+      canOpenDetails: Boolean(locality?.id),
+      routeCommands: locality?.id ? ['/locality', locality.id] : undefined,
       kind: 'locality',
       createdAt: item.createdAt,
     });

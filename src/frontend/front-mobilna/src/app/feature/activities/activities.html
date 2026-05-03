@@ -82,7 +82,7 @@
   </div>
 
   <div class="results-bar">
-    <span class="results-bar__count">{{ totalCount }} objects found</span>
+    <span class="results-bar__count">{{ totalCount }} activities found</span>
   </div>
 
   @if (isLoading) {
@@ -133,6 +133,7 @@
           <button
             class="card__fav"
             [class.card__fav--active]="activity.isFavorite"
+            [disabled]="isFavoritePending(activity.id)"
             (click)="toggleFavorite(activity, $event)"
           >
             <mat-icon>{{ activity.isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>

@@ -118,7 +118,16 @@
               class="place-img place-img--dynamic"
               [appLazyBackground]="card.imageUrl ?? null"
             >
-              @if (card.itemType !== 'event') {
+              @if (card.itemType === 'event') {
+                <button
+                  class="planner-btn"
+                  [disabled]="isPlannerBusy"
+                  (click)="togglePlannerForRecommended(card, $event)"
+                  [class.planner-btn--active]="card.isPlanned"
+                >
+                  <mat-icon>{{ card.isPlanned ? 'event_available' : 'event' }}</mat-icon>
+                </button>
+              } @else {
                 <button class="heart-btn" type="button" (click)="toggleFavorite(card, $event)">
                   <svg
                     width="14"
@@ -201,6 +210,12 @@
               class="place-img place-img--dynamic"
               [appLazyBackground]="card.imageUrl ?? null"
             >
+              @if (getDistanceText(card)) {
+                <span class="card__distance">
+                  <mat-icon>radio_button_checked</mat-icon>
+                  {{ getDistanceText(card) }}
+                </span>
+              }
               <button class="heart-btn" type="button" (click)="toggleFavorite(card, $event)">
                 <svg
                   width="14"
@@ -284,6 +299,20 @@
               class="event-img event-img--dynamic"
               [appLazyBackground]="event.imageUrl ?? null"
             >
+            <button
+              class="planner-btn"
+              [disabled]="isPlannerBusy"
+              (click)="togglePlanner(event, $event)"
+              [class.planner-btn--active]="event.isPlanned"
+            >
+              <mat-icon>{{ event.isPlanned ? 'event_available' : 'event' }}</mat-icon>
+            </button>
+            @if (getDistanceText(event)) {
+                    <span class="card__distance">
+                      <mat-icon>radio_button_checked</mat-icon>
+                      {{ getDistanceText(event) }}
+                    </span>
+                  }
             </div>
             <div class="event-info">
               <h3>{{ event.title }}</h3>

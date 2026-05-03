@@ -160,13 +160,13 @@
                   </div>
 
                   <p class="favorite-card__location">
-                    <span class="location-pin" aria-hidden="true"></span>
+                    <mat-icon>place</mat-icon>
                     <span>{{ item.location }}</span>
                   </p>
 
-                  <p class="favorite-card__quote">"{{ item.quote }}"</p>
-
-                  <div class="favorite-card__meta">
+                  
+                </div>
+                <div class="favorite-card__meta">
                     @if (item.rating) {
                       <span class="favorite-card__rating">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -185,8 +185,6 @@
 
                     <span class="favorite-card__saved">{{ item.note }}</span>
                   </div>
-                </div>
-
                 <div class="favorite-card__footer">
                   @if (item.canOpenDetails) {
                     <button

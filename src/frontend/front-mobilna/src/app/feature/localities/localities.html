@@ -83,7 +83,7 @@
   </div>
 
   <div class="results-bar">
-    <span class="results-bar__count">{{ totalCount }} objects found</span>
+    <span class="results-bar__count">{{ totalCount }} localities found</span>
   </div>
 
   @if (isLoading) {
@@ -135,6 +135,7 @@
           <button
             class="card__fav"
             [class.card__fav--active]="locality.isFavorite"
+            [disabled]="isFavoritePending(locality.id)"
             (click)="toggleFavorite(locality, $event)"
           >
             <mat-icon>{{ locality.isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>

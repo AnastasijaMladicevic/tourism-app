@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { map, Observable, of, tap } from 'rxjs';
 import { CreateFavoriteDto, FavoriteDto, FavoriteService } from './favorite';
 
-export type FavoriteEntityType = 'destination' | 'object' | 'activity';
+export type FavoriteEntityType = 'destination' | 'object' | 'activity' | 'locality';
 
 export interface FavoriteTarget {
   type: FavoriteEntityType;
@@ -19,7 +19,7 @@ export class FavoriteStateService {
   private favoriteMap = new Map<string, number>();
   private hasLoaded = false;
 
-  constructor(private readonly favoriteService: FavoriteService) {}
+  constructor(private readonly favoriteService: FavoriteService) { }
 
   loadFavorites(force = false): Observable<Map<string, number>> {
     if (this.hasLoaded && !force) {
@@ -93,6 +93,10 @@ export class FavoriteStateService {
       if (favorite.activityId) {
         mapResult.set(this.key('activity', favorite.activityId), favorite.id);
       }
+
+      if (favorite.localityId) {
+        mapResult.set(this.key('locality', favorite.localityId), favorite.id);
+      }
     }
 
     return mapResult;
@@ -106,6 +110,8 @@ export class FavoriteStateService {
         return { objectId: target.entityId };
       case 'activity':
         return { activityId: target.entityId };
+      case 'locality':
+        return { localityId: target.entityId };
     }
   }
 

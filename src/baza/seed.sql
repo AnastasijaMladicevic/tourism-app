@@ -789,6 +789,12 @@ VALUES
  ST_SetSRID(ST_MakePoint(18.5442, 42.4621), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
+ 
+ ('Tvrdjava Onogost', 'Istorijska tvrđava u Nikšiću poznata kao Bedem, mesto održavanja kulturnih i muzičkih događaja.',
+ ST_SetSRID(ST_MakePoint(18.9417, 42.7748), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Tvrdjava'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW());
 
 -- Lokalitetima upravlja menadzer dodeljen destinaciji kojoj pripadaju.
@@ -2950,7 +2956,80 @@ VALUES
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ NOW(), NOW()),
+
+('Praznik mimoze',  'Praznik mimoze je jedna od najpoznatijih zimskih manifestacija na crnogorskom primorju. Obeležava dolazak proleća uz karnevalske povorke, muziku i tradicionalne gastronomske događaje. Grad Herceg Novi tada postaje centar zabave i okupljanja posetilaca iz regiona.',
+ ST_SetSRID(ST_MakePoint(18.5368, 42.4517), 4326), '2026-02-13 18:00', '2026-02-28 23:00', 0.00, 1000, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Herceg Novog'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
+ NULL,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ NOW(), NOW()),
+ 
+('Herceg Novi Film Festival', 'Herceg Novi Film Festival okuplja ljubitelje filmske umetnosti iz zemlje i inostranstva. Program obuhvata projekcije igranih, dokumentarnih i autorskih filmova. Poseban doživljaj pružaju projekcije na otvorenom uz more.',
+ ST_SetSRID(ST_MakePoint(18.53231, 42.45222), 4326), '2026-08-22 20:00', '2026-08-28 23:30', 8.00, 500, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dvorana Park Herceg Novi'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ NOW(), NOW()),
+
+('Durmitor Trail Run', 'Durmitor Trail Run je planinska trka koja vodi kroz najlepše predele Nacionalnog parka Durmitor. Učesnici prolaze kroz šume, planinske staze i oko jezera. Događaj privlači sportiste i avanturiste iz celog sveta.',
+ ST_SetSRID(ST_MakePoint(19.091, 43.146), 4326), '2026-07-10 08:00', '2026-07-12 18:00', 25.00, 600, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Takmicenje'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
+ NULL,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ NOW(), NOW()),
+
+('Wild Beauty Art Festival', 'Wild Beauty Art Festival spaja umetnost, prirodu i muziku u jedinstvenom ambijentu Durmitora. Tokom festivala organizuju se koncerti, performansi i umetničke instalacije. Poseban akcenat stavlja se na očuvanje prirode i ekološku svest.',
+ ST_SetSRID(ST_MakePoint(19.091, 43.146), 4326), '2026-07-05 20:00', '2026-08-11 23:00', 10.00, 300, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
+ NULL,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ NOW(), NOW()),
+
+('Bedem Fest', 'Bedem Fest je muzički festival koji se održava na istorijskoj tvrđavi u Nikšiću. Poznat je po nastupima regionalnih i domaćih izvođača različitih žanrova. Autentična lokacija daje posebnu atmosferu svakom koncertu.',
+ ST_SetSRID(ST_MakePoint(18.9417, 42.7748), 4326), '2026-07-30 20:00', '2026-08-01 23:30', 15.00, 1200, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tvrdjava Onogost'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ NULL,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ NOW(), NOW()),
+
+('Petrovac Jazz Fest', 'Petrovac Jazz Fest okuplja renomirane jazz i blues muzičare iz zemlje i sveta. Koncerti se održavaju u prijatnom primorskom ambijentu. Festival pruža opuštenu atmosferu uz vrhunsku muziku.',
+ ST_SetSRID(ST_MakePoint(18.942, 42.206), 4326), '2026-08-28 20:00', '2026-08-30 23:30', 12.00, 400, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Koncert'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Petrovac'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Palas'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ NOW(), NOW()),
+
+('Dani muzike Herceg Novi', 'Dani muzike Herceg Novi predstavljaju prestižni festival klasične muzike. Nastupaju domaći i međunarodni umetnici visokog renomea. Program obuhvata koncerte različitih muzičkih stilova i epoha.',
+ ST_SetSRID(ST_MakePoint(18.53231, 42.45222), 4326), '2026-07-10 20:00', '2026-07-20 23:00', 10.00, 300, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Koncert'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dvorana Park Herceg Novi'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ NOW(), NOW()),
+
+('Biser Jadrana Tivat', 'Biser Jadrana Tivat je popularan letnji muzički događaj na obali mora. Okuplja izvođače zabavne i pop muzike iz regiona. Publika uživa u koncertima u opuštenoj i svečanoj atmosferi.',
+ ST_SetSRID(ST_MakePoint(18.69581, 42.43125), 4326), '2026-07-17 20:00', '2026-07-18 23:30', 15.00, 700, true, 'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Koncert'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Tivta'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Ljetnja Pozornica Tivat'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW());
+ 
 
 UPDATE "Events"
 SET "LocalityId" = (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva')
@@ -2959,6 +3038,16 @@ WHERE "Name" = 'Budva Summer Festival';
 UPDATE "Events"
 SET "LocalityId" = (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero')
 WHERE "Name" = 'Planinarski susret';
+
+UPDATE "Events"
+SET "ObjectId" = (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor')
+WHERE "Name" = 'Durmitor Trail Run';
+
+UPDATE "Events"
+SET "LocalityId" = (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
+    "ObjectId" = (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Polar Star'),
+    "Geolocation" = ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326)
+WHERE "Name" = 'Wild Beauty Art Festival';
 
 -- Evente kreira ContentCreator, a odobrava menadzer nadlezan za destinaciju.
 UPDATE "Events" e
@@ -6164,7 +6253,152 @@ VALUES
     'Grupna slika',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Planinarski susret'),
+    NOW()),
+(
+    'https://rtnk.me/wp-content/uploads/2025/02/praznik-mimoze-mediabiro.jpg',
+    'Praznik mimoze',
+    true,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Praznik mimoze'),
+    NOW()),
+(
+    'https://kofer.info/wp-content/uploads/2025/11/Praznik-mimoze-1.jpg',
+    'Praznik mimoze',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Praznik mimoze'),
+    NOW()),
+(
+    'https://bokanews.me/wp-content/uploads/2019/02/Praznik-mimoze.jpg',
+    'Praznik mimoze',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Praznik mimoze'),
+    NOW()),
+(
+    'https://tvpljevlja.me/wp-content/uploads/2024/08/Naslovna-HN-scaled.jpg',
+    'Herceg Novi Film Festival',
+    true,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Herceg Novi Film Festival'),
+    NOW()),
+(
+    'https://ocdn.eu/pulscms/MDA_/73620fb78a50a240022ca7880a8dbbf6.jpg',
+    'Herceg Novi Film Festival',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Herceg Novi Film Festival'),
+    NOW()),
+(
+    'https://rthn.co.me/wp-content/uploads/2025/08/Stevan-Katic-Svecano-otvaranje-Filmskog-festivala-avgust-2025.jpg',
+    'Herceg Novi Film Festival',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Herceg Novi Film Festival'),
+    NOW()),
+(
+    'https://i0.wp.com/primorski.me/wp-content/uploads/2025/07/Borbelj.jpg?fit=1920%2C1080&ssl=1',
+    'Durmitor Trail Run',
+    true,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Durmitor Trail Run'),
+    NOW()),
+(
+    'https://cdn.prod.website-files.com/690e0151e8414f731febec7b/690f31b494e729b06fdfdcf5_2_DTR_Predrag_Vuckovic_0232-OPT.jpg',
+    'Durmitor Trail Run',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Durmitor Trail Run'),
+    NOW()),
+(
+    'https://tvpljevlja.me/wp-content/uploads/2025/07/517425959_122148161768761130_2327081083293456390_n.jpg',
+    'Durmitor Trail Run',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Durmitor Trail Run'),
+    NOW()),
+(
+    'https://wildbeautyart.me/wp-content/uploads/2025/08/Otvaranje-WBA1.jpg',
+    'Wild Beauty Art Festival',
+    true,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Wild Beauty Art Festival'),
+    NOW()),
+(
+    'https://www.standard.co.me/wp-content/uploads/2022/07/Foto-Media-biro-2-scaled.jpg',
+    'Wild Beauty Art Festival',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Wild Beauty Art Festival'),
+    NOW()),
+(
+    'https://wildbeautyart.me/wp-content/uploads/2024/04/WBA-001-084.jpg',
+    'Wild Beauty Art Festival',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Wild Beauty Art Festival'),
+    NOW()),
+(
+    'https://www.vijesti.me/data/images/2024/08/19/09/5586859_bedem-fest_share.jpg',
+    'Bedem Fest',
+    true,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Bedem Fest'),
+    NOW()),
+(
+    'https://seerural.org/wp-content/uploads/2018/08/2-3.jpg',
+    'Bedem Fest',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Bedem Fest'),
+    NOW()),
+(
+    'https://rtnk.me/wp-content/uploads/2025/08/tvrdjava-bedem-foto-bedem-fest.jpg-1.webp',
+    'Bedem Fest',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Bedem Fest'),
+    NOW()),
+(
+    'https://feral.bar/posts/feral-bar-1757362607_545546734_1314459850682048_5282717821817942881_n.jpg',
+    'Petrovac Jazz Fest',
+    true,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Petrovac Jazz Fest'),
+    NOW()),
+(
+    'https://rtnk.me/wp-content/uploads/2023/10/petrovac-jazz-festival-foto-organizatori.jpg',
+    'Petrovac Jazz Fest',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Petrovac Jazz Fest'),
+    NOW()),
+(
+    'https://urbanikult.com/wp-content/uploads/2025/07/file2.jpeg',
+    'Petrovac Jazz Fest',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Petrovac Jazz Fest'),
+    NOW()),
+(
+    'https://rtnk.me/wp-content/uploads/2024/07/1720724699491333-scaled.jpg',
+    'Dani muzike Herceg Novi',
+    true,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Dani muzike Herceg Novi'),
+    NOW()),
+(
+    'https://hercegnovi.cool/wp-content/uploads/2025/07/dani-muzike-2025-otvaranje.jpg',
+    'Dani muzike Herceg Novi',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Dani muzike Herceg Novi'),
+    NOW()),
+(
+    'https://www.vijesti.me/data/images/2025/07/11/10/5658673_dani-muzike-hn-2_share.jpg',
+    'Dani muzike Herceg Novi',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Dani muzike Herceg Novi'),
+    NOW()),
+(
+    'https://sharemontenegro.me/wp-content/uploads/2025/02/Biser-Jadrana-festival-tivat.jpg',
+    'Biser Jadrana Tivat',
+    true,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Biser Jadrana Tivat'),
+    NOW()),
+(
+    'https://radiotivat.com/wp-content/uploads/2024/07/unnamed-16-2500x1875.jpg',
+    'Biser Jadrana Tivat',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Biser Jadrana Tivat'),
+    NOW()),
+(
+    'https://eurovoix-world.com/wp-content/uploads/2025/07/Biser-Jadrana-2025.jpg',
+    'Biser Jadrana Tivat',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Biser Jadrana Tivat'),
     NOW());
+
 
 -- ============================================
 -- 11. IMAGES - LOCALITIES
@@ -7388,6 +7622,24 @@ VALUES
     'Podi',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Podi'),
+    NOW()),
+(
+    'https://onogost.me/wp-content/uploads/2023/12/tvrdjava-onogost-nasa-slika.jpg',
+    'Tvrdjava Onogost',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tvrdjava Onogost'),
+    NOW()),
+(
+    'https://www.vijesti.me/data/images/2019/03/31/00/4355293_20190331200328_505cdd0bc5d93f91405c69c3bf1364fc2a58fc8e384cf6288526dc7f64d8f17c_share.jpg',
+    'Tvrdjava Onogost',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tvrdjava Onogost'),
+    NOW()),
+(
+    'https://adria.fun/wp-content/uploads/2023/09/Onogost-Nikisic-Photo-Adria.fun_.JPG-2-ok.jpg',
+    'Tvrdjava Onogost',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tvrdjava Onogost'),
     NOW());
 
 -- ============================================

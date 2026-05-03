@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Json;
@@ -15,6 +16,8 @@ namespace TuristickiVodic.Services.Services
     {
         private const string SearchPlacesToolName = "search_places";
         private const string ExploreRegionToolName = "explore_region";
+        private const int MaxAnswerCharacters = 420;
+        private const int MaxGenerativeResults = 3;
 
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
@@ -23,6 +26,7 @@ namespace TuristickiVodic.Services.Services
         };
 
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IMemoryCache _cache;
         private readonly ISmartSearchService _smartSearchService;
         private readonly IAiSemanticSearchService _aiSemanticSearchService;
         private readonly AppDbContext _context;
@@ -31,6 +35,7 @@ namespace TuristickiVodic.Services.Services
 
         public AiChatService(
             IHttpClientFactory httpClientFactory,
+            IMemoryCache cache,
             ISmartSearchService smartSearchService,
             IAiSemanticSearchService aiSemanticSearchService,
             AppDbContext context,
@@ -38,6 +43,7 @@ namespace TuristickiVodic.Services.Services
             ILogger<AiChatService> logger)
         {
             _httpClientFactory = httpClientFactory;
+            _cache = cache;
             _smartSearchService = smartSearchService;
             _aiSemanticSearchService = aiSemanticSearchService;
             _context = context;
@@ -60,6 +66,12 @@ namespace TuristickiVodic.Services.Services
                 };
             }
 
+            var cacheKey = BuildChatCacheKey(sanitizedRequest);
+            if (_cache.TryGetValue(cacheKey, out AiChatResponseDto? cached) && cached != null)
+            {
+                return CloneResponse(cached);
+            }
+
             var semanticResponse = await _aiSemanticSearchService.SearchAsync(userId, new AiSemanticSearchQueryDto
             {
                 Query = sanitizedRequest.Message,
@@ -71,7 +83,7 @@ namespace TuristickiVodic.Services.Services
 
             var answer = await BuildSemanticAnswerAsync(sanitizedRequest, semanticResponse, cancellationToken);
 
-            return new AiChatResponseDto
+            var response = new AiChatResponseDto
             {
                 Answer = answer,
                 Provider = semanticResponse.Provider,
@@ -80,6 +92,9 @@ namespace TuristickiVodic.Services.Services
                 Warning = semanticResponse.Warning,
                 Results = semanticResponse.Results,
             };
+
+            _cache.Set(cacheKey, CloneResponse(response), TimeSpan.FromMinutes(2));
+            return response;
         }
 
         private async Task<string> BuildSemanticAnswerAsync(
@@ -87,76 +102,86 @@ namespace TuristickiVodic.Services.Services
             AiSemanticSearchResponseDto semanticResponse,
             CancellationToken cancellationToken)
         {
+            var fallbackAnswer = semanticResponse.Results.Count == 0
+                ? BuildSemanticNoMatchAnswer(request, semanticResponse)
+                : BuildSemanticFallbackAnswer(request, semanticResponse);
+
             if (semanticResponse.Results.Count == 0)
             {
-                return BuildSemanticNoMatchAnswer(request, semanticResponse);
+                return PostProcessAnswer(fallbackAnswer, semanticResponse.Results);
             }
 
-            if (semanticResponse.Provider.StartsWith("ollama:", StringComparison.OrdinalIgnoreCase))
+            if (!semanticResponse.Provider.StartsWith("ollama:", StringComparison.OrdinalIgnoreCase) ||
+                !ShouldUseGenerativeAnswer(request, semanticResponse))
             {
-                try
-                {
-                    var model = semanticResponse.Provider["ollama:".Length..];
-                    var client = BuildOllamaClient();
-                    var promptResults = JsonSerializer.Serialize(
-                        semanticResponse.Results.Take(5).Select(r => new
-                        {
-                            r.Name,
-                            r.TypeName,
-                            r.Location,
-                            r.Category,
-                            r.MatchReason,
-                        }),
-                        JsonOptions);
-
-                    var response = await SendChatAsync(client, new OllamaChatRequest
-                    {
-                        Model = model,
-                        Stream = false,
-                        Messages =
-                        [
-                            new OllamaMessage
-                            {
-                                Role = "system",
-                                Content =
-                                    """
-                                    Ti si turisticki asistent.
-                                    Odgovori prirodno, kratko i korisno na standardnom srpskom latinicom.
-                                    Pisi jednostavno i toplo, kao preporuku u aplikaciji.
-                                    Nemoj da mesas hrvatske ili bosanske oblike, arhaicne izraze, niti cudne konstrukcije.
-                                    Koristi prirodne fraze kao: "preporucujem", "mozes da probas", "vredi obici", "ako zelis".
-                                    Koristi samo rezultate koje si dobio.
-                                    Nemoj da izmisljas mesta, tip kuhinje, pogodnosti ili detalje kojih nema u rezultatima.
-                                    Ako nema dovoljno dobrog poklapanja, to jasno reci.
-                                    """,
-                            },
-                            new OllamaMessage
-                            {
-                                Role = "user",
-                                Content = $"Pitanje korisnika: {request.Message}\nRegion: {semanticResponse.RegionName ?? "nije zadat"}\nKategorije: {string.Join(", ", semanticResponse.Categories)}\nRezultati: {promptResults}",
-                            }
-                        ],
-                        Options = new OllamaChatOptions
-                        {
-                            Temperature = 0.3,
-                            TopP = 0.9,
-                            NumPredict = 180,
-                        },
-                    }, cancellationToken);
-
-                    var content = response.Message?.Content?.Trim();
-                    if (!string.IsNullOrWhiteSpace(content))
-                    {
-                        return content;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "AI answer generation failed for query '{Query}'", request.Message);
-                }
+                return PostProcessAnswer(fallbackAnswer, semanticResponse.Results);
             }
 
-            return BuildSemanticFallbackAnswer(request, semanticResponse);
+            try
+            {
+                var model = semanticResponse.Provider["ollama:".Length..];
+                var client = BuildOllamaClient();
+                var promptResults = JsonSerializer.Serialize(
+                    semanticResponse.Results.Take(MaxGenerativeResults).Select(r => new
+                    {
+                        r.Name,
+                        r.TypeName,
+                        r.Location,
+                        r.Category,
+                        r.MatchReason,
+                    }),
+                    JsonOptions);
+
+                using var answerCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                answerCts.CancelAfter(TimeSpan.FromSeconds(Math.Max(2, Math.Min(_options.TimeoutSeconds, 4))));
+
+                var response = await SendChatAsync(client, new OllamaChatRequest
+                {
+                    Model = model,
+                    Stream = false,
+                    Messages =
+                    [
+                        new OllamaMessage
+                        {
+                            Role = "system",
+                            Content =
+                                """
+                                Ti si turisticki asistent u aplikaciji.
+                                Napisaces samo kratak, prirodan odgovor na standardnom srpskom latinicom.
+                                Najvise 2 kratka pasusa ili 3 kratke stavke.
+                                Koristi iskljucivo mesta iz prosledjenih rezultata.
+                                Ne izmisljaj tip kuhinje, pogodnosti, cene, lokacije ni atmosferu ako to nije eksplicitno dato.
+                                Ako su rezultati ograniceni, reci to kratko i iskreno.
+                                Obavezno pomenuj bar jedno konkretno ime iz rezultata.
+                                Nemoj da mesas hrvatske/bosanske oblike niti cudne konstrukcije.
+                                """,
+                        },
+                        new OllamaMessage
+                        {
+                            Role = "user",
+                            Content = $"Pitanje korisnika: {request.Message}\nRegion: {semanticResponse.RegionName ?? "nije zadat"}\nKategorije: {string.Join(", ", semanticResponse.Categories)}\nRezultati: {promptResults}",
+                        },
+                    ],
+                    Options = new OllamaChatOptions
+                    {
+                        Temperature = 0.2,
+                        TopP = 0.85,
+                        NumPredict = 72,
+                    },
+                }, answerCts.Token);
+
+                var generated = PostProcessAnswer(response.Message?.Content, semanticResponse.Results);
+                if (IsAcceptableGeneratedAnswer(generated, semanticResponse.Results))
+                {
+                    return generated;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "AI answer generation failed for query '{Query}'", request.Message);
+            }
+
+            return PostProcessAnswer(fallbackAnswer, semanticResponse.Results);
         }
 
         private static string BuildSemanticFallbackAnswer(AiChatRequestDto request, AiSemanticSearchResponseDto semanticResponse)
@@ -169,11 +194,11 @@ namespace TuristickiVodic.Services.Services
             if (top.Count == 1)
             {
                 var first = top[0];
-                return $"Za pitanje \"{request.Message}\" najbolji pogodak{regionPart} je {first.Name} ({first.TypeName}) u {first.Location}.";
+                return $"Za pitanje \"{request.Message}\" najbolji pogodak{regionPart} deluje {first.Name} ({first.TypeName}) u {first.Location}.";
             }
 
-            var formatted = string.Join(", ", top.Take(2).Select(r => $"{r.Name} ({r.TypeName})")) +
-                (top.Count > 2 ? $" i {top[2].Name} ({top[2].TypeName})" : string.Empty);
+            var formatted = string.Join(", ", top.Take(2).Select(r => $"{r.Name} ({r.TypeName}) u {r.Location}")) +
+                (top.Count > 2 ? $" i {top[2].Name} ({top[2].TypeName}) u {top[2].Location}" : string.Empty);
 
             return $"Za pitanje \"{request.Message}\" najvise smisla{regionPart} imaju {formatted}.";
         }
@@ -192,8 +217,263 @@ namespace TuristickiVodic.Services.Services
         {
             var client = _httpClientFactory.CreateClient();
             client.BaseAddress = new Uri(_options.BaseUrl.TrimEnd('/') + "/");
-            client.Timeout = TimeSpan.FromSeconds(Math.Max(15, _options.TimeoutSeconds));
+            client.Timeout = TimeSpan.FromSeconds(Math.Max(3, Math.Min(_options.TimeoutSeconds, 8)));
             return client;
+        }
+
+        private static bool ShouldUseGenerativeAnswer(AiChatRequestDto request, AiSemanticSearchResponseDto semanticResponse)
+        {
+            if (semanticResponse.Results.Count == 0)
+            {
+                return false;
+            }
+
+            var normalized = NormalizeText(request.Message);
+            if (string.IsNullOrWhiteSpace(normalized))
+            {
+                return false;
+            }
+
+            var wordCount = normalized.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Length;
+            if (wordCount < 8)
+            {
+                return false;
+            }
+
+            if ((request.History?.Count ?? 0) == 0)
+            {
+                return false;
+            }
+
+            return normalized.Contains("gde", StringComparison.Ordinal) ||
+                   normalized.Contains("sta", StringComparison.Ordinal) ||
+                   normalized.Contains("prepor", StringComparison.Ordinal) ||
+                   normalized.Contains("savet", StringComparison.Ordinal) ||
+                   normalized.Contains("izadj", StringComparison.Ordinal) ||
+                   normalized.Contains("vidim", StringComparison.Ordinal);
+        }
+
+        private static bool IsAcceptableGeneratedAnswer(string answer, IReadOnlyList<SmartSearchResultDto> results)
+        {
+            if (string.IsNullOrWhiteSpace(answer))
+            {
+                return false;
+            }
+
+            var normalizedAnswer = NormalizeText(answer);
+            if (string.IsNullOrWhiteSpace(normalizedAnswer))
+            {
+                return false;
+            }
+
+            if (results.Count > 0 &&
+                (normalizedAnswer.Contains("nemam dovoljno", StringComparison.Ordinal) ||
+                 normalizedAnswer.Contains("nisam nasao", StringComparison.Ordinal)))
+            {
+                return false;
+            }
+
+            return MentionsKnownResult(answer, results.Take(3).ToList());
+        }
+
+        private static bool MentionsKnownResult(string answer, IReadOnlyList<SmartSearchResultDto> results)
+        {
+            var normalizedAnswer = NormalizeText(answer);
+
+            foreach (var result in results)
+            {
+                var normalizedName = NormalizeText(result.Name);
+                var normalizedLocation = NormalizeText(result.Location);
+
+                if (!string.IsNullOrWhiteSpace(normalizedName) &&
+                    normalizedAnswer.Contains(normalizedName, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+
+                if (!string.IsNullOrWhiteSpace(normalizedLocation) &&
+                    normalizedAnswer.Contains(normalizedLocation, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static string PostProcessAnswer(string? rawAnswer, IReadOnlyList<SmartSearchResultDto> results)
+        {
+            var answer = (rawAnswer ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(answer))
+            {
+                return string.Empty;
+            }
+
+            answer = NormalizeWhitespace(answer);
+            answer = NormalizeLanguageVariants(answer);
+            answer = TrimAnswer(answer, MaxAnswerCharacters);
+
+            if (results.Count > 0)
+            {
+                answer = EnsureConcreteEnding(answer, results);
+            }
+
+            return answer;
+        }
+
+        private static string NormalizeWhitespace(string value)
+        {
+            var normalized = value
+                .Replace("\r\n", "\n", StringComparison.Ordinal)
+                .Replace('\r', '\n')
+                .Trim();
+
+            while (normalized.Contains("\n\n\n", StringComparison.Ordinal))
+            {
+                normalized = normalized.Replace("\n\n\n", "\n\n", StringComparison.Ordinal);
+            }
+
+            return string.Join('\n',
+                normalized.Split('\n')
+                    .Select(line => string.Join(' ', line.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))));
+        }
+
+        private static string NormalizeLanguageVariants(string value)
+        {
+            var replacements = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["gdje"] = "gde",
+                ["uvijek"] = "uvek",
+                ["preporucam"] = "preporucujem",
+                ["preporučam"] = "preporucujem",
+                ["takoder"] = "takodje",
+                ["također"] = "takodje",
+                ["svidjeti"] = "dopasti",
+                ["posjeti"] = "obidji",
+                ["posjetiti"] = "obici",
+                ["ukoliko zelis"] = "ako zelis",
+                ["ukoliko želite"] = "ako zelis",
+                ["gdje mozes"] = "gde mozes",
+            };
+
+            var normalized = value;
+            foreach (var replacement in replacements)
+            {
+                normalized = normalized.Replace(replacement.Key, replacement.Value, StringComparison.OrdinalIgnoreCase);
+            }
+
+            return normalized;
+        }
+
+        private static string TrimAnswer(string value, int maxCharacters)
+        {
+            if (value.Length <= maxCharacters)
+            {
+                return value;
+            }
+
+            var sentences = value
+                .Split(['.', '!', '?'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(sentence => !string.IsNullOrWhiteSpace(sentence))
+                .ToList();
+
+            if (sentences.Count == 0)
+            {
+                return value[..Math.Min(value.Length, maxCharacters)].TrimEnd() + "...";
+            }
+
+            var builder = new StringBuilder();
+            foreach (var sentence in sentences)
+            {
+                var candidate = builder.Length == 0 ? sentence : $"{builder} {sentence}";
+                if (candidate.Length > maxCharacters)
+                {
+                    break;
+                }
+
+                if (builder.Length > 0)
+                {
+                    builder.Append(' ');
+                }
+
+                builder.Append(sentence.Trim());
+                if (!sentence.TrimEnd().EndsWith('.'))
+                {
+                    builder.Append('.');
+                }
+            }
+
+            if (builder.Length == 0)
+            {
+                return value[..Math.Min(value.Length, maxCharacters)].TrimEnd() + "...";
+            }
+
+            return builder.ToString().Trim();
+        }
+
+        private static string EnsureConcreteEnding(string value, IReadOnlyList<SmartSearchResultDto> results)
+        {
+            if (MentionsKnownResult(value, results))
+            {
+                return value;
+            }
+
+            var first = results.FirstOrDefault();
+            if (first == null)
+            {
+                return value;
+            }
+
+            var suffix = $" Najpre bih krenula od {first.Name} u {first.Location}.";
+            if (value.Length + suffix.Length <= MaxAnswerCharacters)
+            {
+                return value.TrimEnd('.', '!', '?') + "." + suffix;
+            }
+
+            return value;
+        }
+
+        private static string BuildChatCacheKey(AiChatRequestDto request)
+        {
+            var normalizedHistory = request.History == null || request.History.Count == 0
+                ? "no-history"
+                : string.Join('|', request.History
+                    .TakeLast(4)
+                    .Select(item => $"{item.Role}:{NormalizeText(item.Content)}"));
+
+            var lat = request.Latitude.HasValue ? Math.Round(request.Latitude.Value, 3).ToString(System.Globalization.CultureInfo.InvariantCulture) : "none";
+            var lng = request.Longitude.HasValue ? Math.Round(request.Longitude.Value, 3).ToString(System.Globalization.CultureInfo.InvariantCulture) : "none";
+
+            return $"ai-chat:{NormalizeText(request.Message)}:{request.RegionId?.ToString() ?? "none"}:{lat}:{lng}:{normalizedHistory}";
+        }
+
+        private static AiChatResponseDto CloneResponse(AiChatResponseDto response)
+        {
+            return new AiChatResponseDto
+            {
+                Answer = response.Answer,
+                Provider = response.Provider,
+                UsedTool = response.UsedTool,
+                UsedFallback = response.UsedFallback,
+                Warning = response.Warning,
+                Results = response.Results
+                    .Select(result => new SmartSearchResultDto
+                    {
+                        Id = result.Id,
+                        Name = result.Name,
+                        TypeName = result.TypeName,
+                        Location = result.Location,
+                        Category = result.Category,
+                        MarkerType = result.MarkerType,
+                        Icon = result.Icon,
+                        ImageUrl = result.ImageUrl,
+                        Latitude = result.Latitude,
+                        Longitude = result.Longitude,
+                        MatchReason = result.MatchReason,
+                        Score = result.Score,
+                    })
+                    .ToList(),
+            };
         }
 
         private AiChatRequestDto SanitizeRequest(AiChatRequestDto request)
@@ -1910,10 +2190,12 @@ namespace TuristickiVodic.Services.Services
                 return "Lokalni AI model nema dovoljno slobodne memorije. Zatvori teze programe ili koristi manji Ollama model. Prikazan je fallback odgovor zasnovan na pretrazi.";
             }
 
-            if (message.Contains("not found", StringComparison.OrdinalIgnoreCase) ||
-                message.Contains("pull", StringComparison.OrdinalIgnoreCase))
+            if (message.Contains("no configured ollama model", StringComparison.OrdinalIgnoreCase) ||
+                ((message.Contains("not found", StringComparison.OrdinalIgnoreCase) ||
+                  message.Contains("pull", StringComparison.OrdinalIgnoreCase)) &&
+                 message.Contains("model", StringComparison.OrdinalIgnoreCase)))
             {
-                return "Podeseni Ollama model nije instaliran lokalno. Prikazan je fallback odgovor zasnovan na pretrazi.";
+                return "Nijedan od podesenih Ollama modela nije instaliran lokalno. Prikazan je fallback odgovor zasnovan na pretrazi.";
             }
 
             return "Lokalni AI model trenutno nije dostupan. Prikazan je fallback odgovor zasnovan na pretrazi.";

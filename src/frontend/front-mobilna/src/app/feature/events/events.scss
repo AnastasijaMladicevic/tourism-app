@@ -435,6 +435,13 @@
   font-size: 13px;
   color: #5a5e65;
   font-weight: 600;
+
+  mat-icon {
+    font-size: 13px;
+    width: 13px;
+    height: 13px;
+    color: #e74c3c;
+  }
 }
 
 .meta-icon {
@@ -701,4 +708,46 @@
   background: var(--primary);
   border-color: var(--primary);
   color: var(--white);
+}
+
+.planner-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  color: var(--emperor);
+  z-index: 10;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    color 0.2s,
+    background-color 0.2s,
+    box-shadow 0.2s;
+
+  &:hover {
+    transform: scale(1.08);
+  }
+
+  &:disabled {
+    opacity: 0.75;
+    cursor: default;
+  }
+}
+
+.planner-btn--active {
+  color: #e74c3c;
+  background: #fff1f1;
+  box-shadow: 0 8px 18px rgba(231, 76, 60, 0.18);
+
+  mat-icon {
+    animation: heart-pop 0.35s ease;
+  }
 }
