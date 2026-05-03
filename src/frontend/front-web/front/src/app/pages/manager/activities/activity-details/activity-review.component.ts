@@ -54,6 +54,7 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
   showDeclineModal = false;
   rejectionReason = '';
   isImagePreviewBroken = false;
+  createdByName = '';
 
   form = this.fb.group({
     name: [''],
@@ -139,6 +140,7 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
         this.patchForm(activity);
         this.form.disable({ emitEvent: false });
         this.rejectionReason = activity.rejectionReason?.trim() ?? '';
+        this.resolveCreatorName(activity);
         this.resolveApproverName(activity);
         this.cdr.detectChanges();
         this.syncMapFromActivity();
@@ -231,6 +233,42 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
       });
   }
 
+  private resolveCreatorName(activity: ActivityDto): void {
+    const directName = activity.createdByFullName?.trim();
+    if (directName) {
+      this.createdByName = directName;
+      return;
+    }
+
+    if (!activity.createdByUserId) {
+      this.createdByName = '';
+      return;
+    }
+
+    this.http
+      .get<{ firstName?: string; lastName?: string }>(`${environment.apiUrl}/users/${activity.createdByUserId}`)
+      .pipe(catchError(() => of(null)))
+      .subscribe((user) => {
+        const first = user?.firstName?.trim() ?? '';
+        const last = user?.lastName?.trim() ?? '';
+        this.createdByName = `${first} ${last}`.trim();
+        this.cdr.detectChanges();
+      });
+  }
+
+  private formatMonthYear(value?: string | Date): string {
+    if (!value) {
+      return '';
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return '';
+    }
+
+    return date.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+  }
+
   approveActivity(): void {
     if (!this.activityId || this.isSubmitting || this.reviewStatusKey === 'approved') {
       return;
@@ -253,6 +291,7 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
         this.rejectionReason = activity.rejectionReason?.trim() ?? '';
         this.patchForm(activity);
         this.form.disable({ emitEvent: false });
+        this.resolveCreatorName(activity);
         this.successMessage = 'Activity approved successfully.';
         this.cdr.detectChanges();
         setTimeout(() => this.router.navigate(['/manager/activities']), 1000);
@@ -314,6 +353,7 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
         this.rejectionReason = activity.rejectionReason?.trim() ?? this.rejectionReason.trim();
         this.patchForm(activity);
         this.form.disable({ emitEvent: false });
+        this.resolveCreatorName(activity);
         this.successMessage = 'Activity declined successfully.';
         this.cdr.detectChanges();
         setTimeout(() => this.router.navigate(['/manager/activities']), 1000);
@@ -376,6 +416,52 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
   get locationSubtitle(): string {
     const parts = [this.activity?.localityName, this.activity?.objectName].filter((value) => Boolean(value && value.trim()));
     return parts.length > 0 ? parts.join(' · ') : 'No locality or object has been linked.';
+  }
+
+  get locationContextValue(): string {
+    const parts = [
+      this.activity?.localityName?.trim(),
+      this.activity?.destinationName?.trim()
+    ].filter((value): value is string => !!value);
+
+    if (parts.length > 0) {
+      return parts.join(', ');
+    }
+
+    return this.activityLocationLabel;
+  }
+
+  get creatorDisplayName(): string {
+    return this.createdByName.trim() || 'Name not available in this view.';
+  }
+
+  get creatorInitials(): string {
+    const fullName = this.createdByName.trim();
+    if (!fullName) {
+      return '?';
+    }
+
+    const parts = fullName.split(/\s+/).filter(Boolean);
+    if (parts.length === 1) {
+      return parts[0].slice(0, 2).toUpperCase();
+    }
+
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  get creatorTimeline(): string {
+    if (!this.activity) {
+      return '';
+    }
+
+    const created = this.formatMonthYear(this.activity.createdAt);
+    const updated = this.formatMonthYear(this.activity.updatedAt);
+
+    if (created && updated && created !== updated) {
+      return `${created}, edited ${updated}`;
+    }
+
+    return created || updated || '';
   }
 
   get hasCoordinates(): boolean {

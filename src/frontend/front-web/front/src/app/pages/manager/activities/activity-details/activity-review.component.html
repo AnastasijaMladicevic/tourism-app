@@ -169,13 +169,18 @@
 
               <div #activityMap class="location-map mini-map" aria-label="Activity location map"></div>
 
-              <div class="field-grid schedule-grid">
-                <label class="form-field half-width">
+              <div class="location-line">
+                <span class="material-symbols-outlined">search</span>
+                <p>{{ locationContextValue }}</p>
+              </div>
+
+              <div class="location-inputs">
+                <label class="mini-field">
                   <span>Latitude</span>
                   <input class="form-control" type="text" formControlName="latitude" readonly />
                 </label>
 
-                <label class="form-field half-width">
+                <label class="mini-field">
                   <span>Longitude</span>
                   <input class="form-control" type="text" formControlName="longitude" readonly />
                 </label>
@@ -185,6 +190,16 @@
                 <strong>{{ activityLocationLabel }}</strong>
                 <span>{{ locationSubtitle }}</span>
               </div>
+              <article class="creator-card">
+                <div class="creator-avatar">{{ creatorInitials }}</div>
+                <div>
+                  <strong>Creator</strong>
+                  <p class="sidebar-muted">{{ creatorDisplayName }}</p>
+                  @if (creatorTimeline) {
+                    <p>{{ creatorTimeline }}</p>
+                  }
+                </div>
+              </article>
             </section>
 
             <section class="card side-card">
