@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
 
@@ -83,6 +83,7 @@ export interface PagedEventResultDto<T> {
 @Injectable({ providedIn: 'root' })
 export class EventService {
   private readonly url = `${environment.apiUrl}/events`;
+  private readonly fetchBatchSize = 100;
 
   constructor(
     private readonly http: HttpClient,
@@ -104,10 +105,10 @@ export class EventService {
     return this.http.get<EventDto>(`${this.url}/${id}`, { params });
   }
 
-  getAll(
-    query?: EventQueryParams,
+  private buildParams(
+    query?: EventQueryParams | NearbyEventQueryParams,
     options?: RegionRequestOptions,
-  ): Observable<EventDto[]> {
+  ): HttpParams {
     const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options);
     let params = new HttpParams();
 
@@ -119,24 +120,71 @@ export class EventService {
       });
     }
 
-    params = this.addLang(params, options);
-    return this.http.get<EventDto[]>(this.url, { params });
+    return this.addLang(params, options);
+  }
+
+  getPage(
+    query?: EventQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<PagedEventResultDto<EventDto>> {
+    const params = this.buildParams(query, options);
+    return this.http.get<PagedEventResultDto<EventDto>>(this.url, { params });
+  }
+
+  getAll(
+    query?: EventQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<EventDto[]> {
+    return this.getPage(query, options).pipe(
+      map((result) => result.items ?? []),
+    );
+  }
+
+  getAllItems(
+    query?: EventQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<EventDto[]> {
+    const firstQuery: EventQueryParams = {
+      ...query,
+      page: 1,
+      pageSize: this.fetchBatchSize,
+    };
+
+    return this.getPage(firstQuery, options).pipe(
+      switchMap((firstPage) => {
+        const firstItems = firstPage.items ?? [];
+        const totalPages = Math.max(1, Number(firstPage.totalPages ?? 1));
+
+        if (totalPages <= 1) {
+          return of(firstItems);
+        }
+
+        const requests = Array.from({ length: totalPages - 1 }, (_, index) =>
+          this.getPage(
+            {
+              ...query,
+              page: index + 2,
+              pageSize: this.fetchBatchSize,
+            },
+            options,
+          ),
+        );
+
+        return forkJoin(requests).pipe(
+          map((pages) => [
+            ...firstItems,
+            ...pages.flatMap((page) => page.items ?? []),
+          ]),
+        );
+      }),
+    );
   }
 
   getNearby(
     query: NearbyEventQueryParams,
     options?: RegionRequestOptions,
   ): Observable<PagedEventResultDto<EventDto>> {
-    const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options) ?? query;
-    let params = new HttpParams();
-
-    Object.entries(effectiveQuery).forEach(([key, value]) => {
-      if (value != null && value !== '') {
-        params = params.set(key, String(value));
-      }
-    });
-
-    params = this.addLang(params, options);
+    const params = this.buildParams(query, options);
     return this.http.get<PagedEventResultDto<EventDto>>(`${this.url}/nearby`, { params });
   }
 }
