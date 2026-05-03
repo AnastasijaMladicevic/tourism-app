@@ -7,6 +7,17 @@
     </div>
     <div class="top-actions">
       @if (!isManagerReview) {
+        @if (isEditMode) {
+          <button
+            type="button"
+            class="danger-btn"
+            (click)="openDeleteModal()"
+            [disabled]="isSubmitting || isDeletingObject || isLoadingOptions"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+            {{ isApprovedObject ? 'Request Deletion' : 'Delete' }}
+          </button>
+        }
         <button type="submit" class="primary-btn" [disabled]="isSubmitting || isLoadingOptions" form="create-object-form">
           {{ isSubmitting ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save changes' : 'Create object') }}
         </button>
@@ -289,6 +300,51 @@
             [disabled]="isReviewSubmitting"
           >
             {{ isReviewSubmitting ? 'Declining...' : 'Decline object' }}
+          </button>
+        </div>
+      </section>
+    </div>
+  }
+
+  @if (showDeleteModal) {
+    <div class="object-delete-backdrop" (click)="closeDeleteModal()">
+      <section
+        class="card object-delete-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="object-delete-title"
+        aria-describedby="object-delete-description"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="object-delete-modal-icon" aria-hidden="true">
+          <span class="material-symbols-outlined">delete</span>
+        </div>
+
+        <h3 id="object-delete-title">{{ deleteModalTitle }}</h3>
+        <p id="object-delete-description">
+          {{ deleteModalDescription }}<br />
+          {{
+            isApprovedObject
+              ? 'A manager will review the request before the object is removed.'
+              : 'This action cannot be undone.'
+          }}
+        </p>
+
+        <div class="object-delete-modal-actions">
+          <button type="button" class="ghost-btn" (click)="closeDeleteModal()" [disabled]="isDeletingObject">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="confirm-delete-btn"
+            (click)="deleteObject()"
+            [disabled]="isDeletingObject"
+          >
+            {{
+              isDeletingObject
+                ? (isApprovedObject ? 'Submitting...' : 'Deleting...')
+                : (isApprovedObject ? 'Request deletion' : 'Delete')
+            }}
           </button>
         </div>
       </section>

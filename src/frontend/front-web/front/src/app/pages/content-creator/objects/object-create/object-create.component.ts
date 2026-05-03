@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -37,6 +37,7 @@ export class ObjectCreateComponent implements OnInit {
   private readonly destinationService = inject(DestinationService);
   private readonly activitiesService = inject(ActivitiesService);
   private readonly authService = inject(AuthService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   /** Manager opens this page read-only via `/manager/objects/review/:id` (route data). */
   isManagerReview = false;
@@ -47,6 +48,10 @@ export class ObjectCreateComponent implements OnInit {
   isReviewSubmitting = false;
   showDeclineModal = false;
   rejectionReason = '';
+
+  /** CC edit: delete vs manager deletion request (approved objects). */
+  showDeleteModal = false;
+  isDeletingObject = false;
 
   readonly workingDays: Array<{ key: WorkingDayKey; label: string }> = [
     { key: 'pon', label: 'Monday' },
@@ -192,6 +197,114 @@ export class ObjectCreateComponent implements OnInit {
       s === 'approved' ||
       s === 'rejected'
     );
+  }
+
+  /** CC edit only: approved tourist objects require a manager-reviewed deletion request. */
+  get isApprovedObject(): boolean {
+    if (this.isManagerReview) {
+      return false;
+    }
+    return this.reviewObjectStatus.toLowerCase() === 'approved';
+  }
+
+  get deleteModalTitle(): string {
+    return this.isApprovedObject ? 'Request deletion' : 'Confirm deletion';
+  }
+
+  get deleteModalDescription(): string {
+    return this.isApprovedObject
+      ? 'This object is approved, so removal requires a manager deletion request.'
+      : 'This object is still pending, so it can be removed immediately.';
+  }
+
+  openDeleteModal(): void {
+    if (!this.isEditMode || !this.objectId || this.isSubmitting || this.isDeletingObject || this.isManagerReview) {
+      return;
+    }
+    this.showDeleteModal = true;
+    this.errorMessage = '';
+  }
+
+  closeDeleteModal(): void {
+    if (this.isDeletingObject) {
+      return;
+    }
+    this.showDeleteModal = false;
+  }
+
+  deleteObject(): void {
+    if (!this.isEditMode || !this.objectId || this.isSubmitting || this.isDeletingObject || this.isManagerReview) {
+      return;
+    }
+
+    if (this.isApprovedObject) {
+      this.submitObjectDeletionRequest();
+      return;
+    }
+
+    this.submitObjectDirectDeletion();
+  }
+
+  private submitObjectDeletionRequest(): void {
+    if (!this.objectId || this.isDeletingObject) {
+      return;
+    }
+
+    this.isDeletingObject = true;
+    this.errorMessage = '';
+
+    this.objectService
+      .requestDeletion(this.objectId)
+      .pipe(
+        finalize(() => {
+          this.isDeletingObject = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.showDeleteModal = false;
+          this.router.navigate(['/content-creator/objects']);
+        },
+        error: (error: unknown) => {
+          const message =
+            error && typeof error === 'object' && 'error' in error
+              ? (error as { error?: { message?: string } }).error?.message
+              : undefined;
+          this.errorMessage = message ?? 'Failed to submit deletion request';
+        }
+      });
+  }
+
+  private submitObjectDirectDeletion(): void {
+    if (!this.objectId || this.isDeletingObject) {
+      return;
+    }
+
+    this.isDeletingObject = true;
+    this.errorMessage = '';
+
+    this.objectService
+      .delete(this.objectId)
+      .pipe(
+        finalize(() => {
+          this.isDeletingObject = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.showDeleteModal = false;
+          this.router.navigate(['/content-creator/objects']);
+        },
+        error: (error: unknown) => {
+          const message =
+            error && typeof error === 'object' && 'error' in error
+              ? (error as { error?: { message?: string } }).error?.message
+              : undefined;
+          this.errorMessage = message ?? 'Failed to delete object';
+        }
+      });
   }
 
   approveObject(): void {

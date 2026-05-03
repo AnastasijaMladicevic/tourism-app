@@ -246,6 +246,17 @@ export class ContentCreatorObjectsComponent implements OnInit {
     return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
   }
 
+  /** Secondary line under destination (matches activities location column). */
+  getObjectTableSubline(object: ObjectDto): string {
+    if (object.destinationName && object.localityName) {
+      return object.localityName;
+    }
+    if (object.regionName) {
+      return object.regionName;
+    }
+    return '—';
+  }
+
   formatPrice(price?: number | null): string {
     if (price == null) {
       return 'N/A';

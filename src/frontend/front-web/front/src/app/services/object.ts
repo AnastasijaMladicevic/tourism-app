@@ -374,6 +374,17 @@ export class ObjectService {
     return this.http.post<ObjectDto>(`${this.url}/${id}/approve`, dto);
   }
 
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${id}`);
+  }
+
+  /** Content creator requests removal of an approved object (manager review). */
+  requestDeletion(id: number, reason?: string): Observable<unknown> {
+    return this.http.post(`${this.url}/${id}/deletion-request`, {
+      reason: reason || undefined
+    });
+  }
+
   private toUniqueOptions(values: Array<string | undefined>, mapLabel: (value: string) => string): FilterOption[] {
     const unique = values
       .map((value) => value?.trim())
