@@ -6,7 +6,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { catchError, finalize, forkJoin, of } from 'rxjs';
 import { environment } from '../../../environment/environment';
 import { EventDto, EventService } from '../../services/event';
-import { ImageDto, ImageService } from '../../services/image';
 import { Router } from '@angular/router';
 import { LazyBackgroundDirective } from '../../shared/directives/lazy-background.directive';
 import { LocationTrackingService } from '../../services/location-tracking';
@@ -50,7 +49,6 @@ export class EventsComponent implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly ngZone = inject(NgZone);
   private readonly eventService = inject(EventService);
-  private readonly imageService = inject(ImageService);
   private readonly router = inject(Router);
   private readonly locationTrackingService = inject(LocationTrackingService);
   private readonly authService = inject(AuthService);
@@ -304,8 +302,8 @@ export class EventsComponent implements OnInit {
   private loadEvents(): void {
     this.isLoading = true;
 
-    this.eventService.getAll().subscribe({
-      next: async (events) => {
+    this.eventService.getAllItems({ sortBy: 'startDate', sortOrder: 'asc' }).subscribe({
+      next: (events) => {
         try {
           const eventList = this.toArray<EventDto>(events).map((event) =>
             this.normalizeEvent(event),
@@ -319,42 +317,26 @@ export class EventsComponent implements OnInit {
           const futureOnly = active.filter((event) => new Date(event.startDate) >= now);
           const source = futureOnly.length ? futureOnly : active;
 
-          this.events = await Promise.all(
-            source.map(async (event) => {
-              let imageUrl: string | undefined = undefined;
-
-              try {
-                const images = await this.imageService.getForEvent(event.id).toPromise();
-                if (images && images.length > 0) {
-                  const main = images.find((i) => i.isMain) ?? images[0];
-                  imageUrl = this.resolveMediaUrl(main.url);
-                }
-              } catch {
-                imageUrl = undefined;
-              }
-
-              return {
-                id: event.id,
-                title: event.name,
-                category: this.normalizeCategory(event.eventTypeName),
-                dateText: this.formatDate(event.startDate),
-                timeText: this.formatTimeRange(event.startDate, event.endDate),
-                location: event.localityName ?? event.destinationName ?? 'Montenegro',
-                priceText: this.formatPrice(event.price),
-                imageUrl,
-                attendeesText: event.maxVisitors
-                  ? `Max ${event.maxVisitors} visitors`
-                  : 'No attendee data',
-                latitude: event.latitude,
-                longitude: event.longitude,
-                eventTypeName: event.eventTypeName ?? '',
-                eventTypeId: event.eventTypeId ?? 0,
-                description: this.getShortDescription(event.description, 1),
-                startDate: event.startDate,
-                endDate: event.endDate,
-              };
-            })
-          );
+          this.events = source.map((event) => ({
+            id: event.id,
+            title: event.name,
+            category: this.normalizeCategory(event.eventTypeName),
+            dateText: this.formatDate(event.startDate),
+            timeText: this.formatTimeRange(event.startDate, event.endDate),
+            location: event.localityName ?? event.destinationName ?? 'Montenegro',
+            priceText: this.formatPrice(event.price),
+            imageUrl: this.resolveMediaUrl(event.mainImageUrl),
+            attendeesText: event.maxVisitors
+              ? `Max ${event.maxVisitors} visitors`
+              : 'No attendee data',
+            latitude: event.latitude,
+            longitude: event.longitude,
+            eventTypeName: event.eventTypeName ?? '',
+            eventTypeId: event.eventTypeId ?? 0,
+            description: this.getShortDescription(event.description, 1),
+            startDate: event.startDate,
+            endDate: event.endDate,
+          }));
           this.updateDistances();
           this.applyPlannerState(this.events);
           this.eventTypes = this.extractUniqueTypes(this.events);
@@ -436,6 +418,7 @@ export class EventsComponent implements OnInit {
     eventTypeId?: number | null;
     latitude?: number;
     longitude?: number;
+    mainImageUrl?: string;
     id: number;
     name: string;
     eventTypeName?: string | null;
@@ -451,10 +434,12 @@ export class EventsComponent implements OnInit {
     const dto = raw as unknown as Record<string, unknown>;
     const startDate = dto['startDate'] ?? dto['StartDate'];
     const endDate = dto['endDate'] ?? dto['EndDate'];
+    const mainImageUrl = dto['mainImageUrl'] ?? dto['MainImageUrl'];
 
     return {
       id: Number(dto['id'] ?? dto['Id'] ?? 0),
       name: String(dto['name'] ?? dto['Name'] ?? ''),
+      mainImageUrl: typeof mainImageUrl === 'string' ? mainImageUrl : undefined,
       eventTypeName: (dto['eventTypeName'] ?? dto['EventTypeName'] ?? null) as string | null,
       startDate: typeof startDate === 'string'
         ? startDate
@@ -494,41 +479,6 @@ export class EventsComponent implements OnInit {
       if (!Number.isNaN(num)) return num;
     }
     return undefined;
-  }
-
-  private pickMainImageMap(images: ImageDto[], key: 'eventId'): Map<number, string> {
-    const grouped = new Map<number, ImageDto[]>();
-
-    for (const image of images ?? []) {
-      const raw = image as unknown as Record<string, unknown>;
-      const refId = Number(raw[key] ?? raw['EventId']);
-      if (!refId) continue;
-      const list = grouped.get(refId) ?? [];
-      list.push(image);
-      grouped.set(refId, list);
-    }
-
-    const result = new Map<number, string>();
-    for (const [id, list] of grouped.entries()) {
-      const main = list.find((i) => this.isMainImage(i)) ?? list[0];
-      const resolved = this.resolveMediaUrl(this.readImageUrl(main));
-      if (resolved) result.set(id, resolved);
-    }
-    return result;
-  }
-
-  private readImageUrl(image?: ImageDto): string | undefined {
-    if (!image) return undefined;
-    const raw = image as unknown as Record<string, unknown>;
-    const value = raw['url'] ?? raw['Url'];
-    return typeof value === 'string' ? value : undefined;
-  }
-
-  private isMainImage(image?: ImageDto): boolean {
-    if (!image) return false;
-    const raw = image as unknown as Record<string, unknown>;
-    const value = raw['isMain'] ?? raw['IsMain'];
-    return Boolean(value);
   }
 
   private resolveMediaUrl(raw?: string): string | undefined {

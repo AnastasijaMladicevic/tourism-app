@@ -9,6 +9,7 @@
 - Samo `Admin` može da aktivira/deaktivira korisnike.
 - Deaktiviran korisnik ne može da se prijavi niti da koristi refresh token dok ga `Admin` ponovo ne aktivira.
 - `Admin` ne može da obriše sam sebe.
+- Manager koji je dodeljen destinaciji ne može biti obrisan dok se toj destinaciji ne dodeli drugi manager.
 - Samo `Tourist` može da pošalje zahtev za `ContentCreator` ulogu, i to samo za sebe.
 - Samo `Admin` može da odobri `ContentCreator` ulogu.
 - Uloga `ContentCreator`-a se odobrava samo ako je turista poslao zahtev za nju.
@@ -21,8 +22,10 @@
 - Ako email ne postoji, vraća se greška da korisnik sa tom email adresom još uvek nije registrovan.
 - Ako nalog nije aktivan, vraća se greška da korisnički nalog nije aktivan.
 - Ako je nalog blacklistovan, reset lozinke nije dostupan za taj nalog.
-- Kod za reset lozinke važi `5` minuta.
-- Lozinka može biti resetovana samo uz validan i neistekao kod.
+- Kod za reset lozinke važi 5 minuta.
+- Posle uspešne provere koda izdaje se privremeni `reset session token`.
+- Lozinka može biti resetovana samo uz validan i neistekao `reset session token`.
+- `Reset session token` takođe važi 5 minuta.
 
 
 **DESTINACIJE**
@@ -35,6 +38,7 @@
 - `Manager` koji upravlja destinacijom ne može biti obrisan dok se toj destinaciji ne dodeli drugi `Manager`.
 - `Admin` može obrisati destinaciju. Brisanje je nepovratno i zahteva eksplicitnu potvrdu korisnika na frontu.
 
+
 **LOKALITETI**
 
 - Lokalitet može da kreira `Manager` samo za svoju destinaciju.
@@ -43,48 +47,64 @@
 - Pri premeštanju lokaliteta proveravaju se i trenutna i ciljna destinacija.
 - Samo `Manager` može da upravlja lokalitetima.
 
+
 **TURISTIČKI OBJEKTI**
 
 - Samo `ContentCreator` može da kreira objekat.
 - Kada `ContentCreator` kreira objekat, status se postavlja na `Pending`.
 - Jednom odobren objekat više ne mora da dobije dozvolu da bi bio izmenjen.
-- `DestinationId` se automatski preuzima iz `LocalityId`.
+- Objekat mora imati `DestinationId` ili `LocalityId`.
+- Ako je zadat `LocalityId`, `DestinationId` se usklađuje prema tom lokalitetu.
+- Ako su zadati i `LocalityId` i `DestinationId`, moraju biti konzistentni.
 - Samo `ContentCreator` može da menja sadržaj objekta.
 - `ContentCreator` može da menja samo svoje objekte.
-- `Manager` ne menja sadržaj objekta, već samo odobrava ili odbija status za objekte u svojoj destinaciji.
+- `Manager` ne menja sadržaj objekta, već samo odobrava ili odbija status objekta u svojoj destinaciji.
+- Samo odgovorni `Manager` može da odobri ili odbije objekat.
+- Objekat ne može biti odobren dok nema glavnu sliku.
 - Samo `ContentCreator` može direktno da obriše objekat.
 - `ContentCreator` može direktno da obriše samo svoj objekat koji nije `Approved`.
 - `Approved` objekti se ne brišu direktno, već kroz `DeletionRequest`.
 - Objekat koji ima recenzije može da se obriše; recenzije se tada brišu kaskadno.
+- Samo `Manager` može da menja `IsActive` za odobren objekat u svojoj destinaciji.
 
-**EVENTI**
+
+**EVENTOVI**
 
 - Samo `ContentCreator` može da kreira evente.
 - Kada `ContentCreator` kreira event, status se postavlja na `Pending`.
-- Jednom odobren event više ne mora da dobije dozvolu da bi bio izmenjen.
+- Jednom odobren event više ne mora da dobije novo odobrenje da bi bio izmenjen.
 - Event mora imati `LocalityId` ili `DestinationId`.
 - `LocalityId` i `DestinationId` moraju biti konzistentni.
+- Ako je event vezan i za objekat, objekat mora pripadati istoj destinaciji.
 - Samo `ContentCreator` može da menja sadržaj eventa.
 - `ContentCreator` može da menja samo svoje evente.
-- `Manager` ne menja sadržaj eventa, već samo odobrava ili odbija status za evente u svojoj destinaciji.
+- `Manager` ne menja sadržaj eventa, već samo odobrava ili odbija status eventa u svojoj destinaciji.
+- Samo odgovorni `Manager` može da odobri ili odbije event.
+- Event ne može biti odobren dok nema glavnu sliku.
 - Samo `ContentCreator` može direktno da obriše event.
 - `ContentCreator` može direktno da obriše samo svoj event koji nije `Approved`.
 - `Approved` event se ne briše direktno, već kroz `DeletionRequest`.
-- Moguće je izlistati sve eventove, eventove za određeni dan, za 7 ili 30 dana unapred i od-do datuma.
+- Samo `Manager` može da menja `IsActive` za odobren event u svojoj destinaciji.
+- Moguće je izlistati eventove po raznim datumskim filterima.
+
 
 **AKTIVNOSTI**
 
 - Samo `ContentCreator` može da kreira aktivnosti.
 - Kada `ContentCreator` kreira aktivnost, status se postavlja na `Pending`.
-- Jednom odobrena aktivnost više ne mora da dobije dozvolu da bi bila izmenjena.
+- Jednom odobrena aktivnost više ne mora da dobije novo odobrenje da bi bila izmenjena.
 - Aktivnost mora imati `LocalityId` ili `DestinationId`.
 - `LocalityId` i `DestinationId` moraju biti konzistentni.
 - Samo `ContentCreator` može da menja sadržaj aktivnosti.
 - `ContentCreator` može da menja samo svoje aktivnosti.
-- `Manager` ne menja sadržaj aktivnosti, već samo odobrava ili odbija status za aktivnosti u svojoj destinaciji.
+- `Manager` ne menja sadržaj aktivnosti, već samo odobrava ili odbija status aktivnosti u svojoj destinaciji.
+- Samo odgovorni `Manager` može da odobri ili odbije aktivnost.
+- Aktivnost ne može biti odobrena dok nema glavnu sliku.
 - Samo `ContentCreator` može direktno da obriše aktivnost.
 - `ContentCreator` može direktno da obriše samo svoju aktivnost koja nije `Approved`.
 - `Approved` aktivnosti se ne brišu direktno, već kroz `DeletionRequest`.
+- Samo `Manager` može da menja `IsActive` za odobrenu aktivnost u svojoj destinaciji.
+
 
 **RECENZIJE**
 
@@ -95,13 +115,16 @@
 - `ContentCreator` može da odgovori samo na recenzije svojih objekata.
 - `ContentCreator` može da menja i briše svoj odgovor na recenziju.
 
+
 **OMILJENI (FAVORITES)**
 
 - Samo `Tourist` može da dodaje favorite.
 - Samo `Tourist` može da briše favorite.
 - U jednom zahtevu može biti dodat tačno jedan od sledećih entiteta: objekat, lokalitet, destinacija, aktivnost ili ruta.
+- Eventovi se ne dodaju u favorite.
 - Duplikat favorita je blokiran.
 - Korisnik može da vidi samo svoje favorite.
+
 
 **RUTE**
 
@@ -112,6 +135,7 @@
 - Samo vlasnik rute može da menja rutu.
 - Samo vlasnik rute može da briše rutu.
 - Ruta ne može da se obriše ako je u nečijim favoritima.
+
 
 **DELETION REQUESTS**
 
@@ -128,6 +152,7 @@
 - Kada je zahtev odobren, briše se objekat, event ili aktivnost na koju se zahtev odnosi.
 - `DeletionRequest` zapis ostaje u sistemu kao evidencija odluke.
 
+
 **EVENT PLANNER**
 
 - Eventovi se ne dodaju u favorites, već u `Event Planner`.
@@ -138,6 +163,7 @@
 - Korisnik može da ukloni samo svoje stavke iz planner-a.
 - U planner mogu da se dodaju samo aktivni i odobreni eventovi.
 - Prošli eventovi ne mogu da se dodaju u planner.
+
 
 **PRIJAVE (MANAGER REPORTS)**
 
@@ -150,6 +176,7 @@
 - Samo `Admin` može da odobri ili odbije prijavu.
 - `Manager` može da povuče samo svoju `Pending` prijavu.
 - Kada `Admin` odobri prijavu, korisnik gubi `ContentCreator` ulogu, postaje `Tourist` i stavlja se na blacklist, pa više ne može ponovo postati `ContentCreator`.
+
 
 **ROUTE POINTS**
 
@@ -165,12 +192,13 @@
 - Brisanje tačke je zabranjeno ako bi ruta ostala sa manje od 2 tačke.
 - Svaka promena tačke, uključujući dodavanje, izmenu i brisanje, ažurira `Route.UpdatedAt`.
 
+
 **IMAGES**
 
 - Entitet može imati više slika.
 - Entitet može biti kreiran bez slika.
 - Entitet se ne prikazuje javno dok nema glavnu sliku.
-- Kada entitet ima slike, mora postojati tačno jedna glavna slika (`IsMain = true`).
+- Kada entitet ima slike, mora postojati tačno jedna glavna slika.
 - Nije dozvoljeno imati više od jedne glavne slike.
 - Nije dozvoljeno da entitet koji ima slike ostane bez glavne slike.
 - Slike se mogu dodavati samo za postojeće entitete.
@@ -183,10 +211,12 @@
 - Nije dozvoljeno premeštanje slike na drugi entitet.
 - Promena glavne slike vrši se kroz posebnu operaciju `SetMainImage`.
 - Kada se nova slika postavi kao glavna, prethodna glavna slika automatski prestaje da bude glavna.
-- Dozvoljeno je brisanje slika koje nisu glavne.
+- Dozvoljeno je brisanje slika koje nisu jedina glavna slika entiteta.
 - Sadržaj koji podleže odobravanju ne može biti odobren dok nema glavnu sliku.
-- Nije dozvoljeno obrisati glavnu sliku ako time entitet ostaje bez glavne slike.
+- Nije dozvoljeno obrisati jedinu glavnu sliku entiteta.
 - Ako entitet ima više slika, pre brisanja glavne slike druga slika mora biti postavljena kao glavna.
-- Jedina glavna slika entiteta ne može se obrisati direktno.
 - Brisanjem roditeljskog entiteta brišu se i njegove slike kaskadno.
-- `Destination` i `Locality` se prikazuju samo ako imaju glavnu sliku; to se ne čuva u bazi, već se rešava kroz query u servisu.
+- Slikama destinacije upravlja `Admin`.
+- Slikama lokaliteta upravlja odgovorni `Manager`.
+- Slikama objekata, aktivnosti i eventova upravlja njihov `ContentCreator`.
+- `Destination` i `Locality` se javno prikazuju samo ako imaju glavnu sliku; to se rešava kroz query u servisu, ne posebnom kolonom u bazi.
