@@ -5,11 +5,12 @@ import { Router, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivitiesService, ActivityDto, ActivityTypeOption } from '../../../services/activities';
 import { DestinationService } from '../../../services/destination.service';
+import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 
 @Component({
   selector: 'app-manager-activities',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, SharedMapComponent],
   templateUrl: './activities.component.html',
   styleUrls: ['./activities.component.css']
 })
@@ -344,6 +345,31 @@ export class ManagerActivitiesComponent implements OnInit {
   get selectedBanner(): string {
     const activity = this.selectedActivityDetails ?? this.selectedActivity;
     return activity?.mainImageUrl || '/assets/pozadina.png';
+  }
+
+  get hasSelectedActivityCoordinates(): boolean {
+    const activity = this.selectedActivityDetails ?? this.selectedActivity;
+    return activity?.latitude != null && activity?.longitude != null;
+  }
+
+  get selectedActivityLat(): number {
+    const activity = this.selectedActivityDetails ?? this.selectedActivity;
+    return activity?.latitude ?? 42.424;
+  }
+
+  get selectedActivityLng(): number {
+    const activity = this.selectedActivityDetails ?? this.selectedActivity;
+    return activity?.longitude ?? 18.771;
+  }
+
+  get selectedActivityLocationLabel(): string {
+    const activity = this.selectedActivityDetails ?? this.selectedActivity;
+    if (!activity) {
+      return 'Selected activity';
+    }
+
+    const location = activity.localityName || activity.destinationName || activity.regionName;
+    return location ? `${activity.name} · ${location}` : activity.name;
   }
 
   get hasSelectedRejection(): boolean {

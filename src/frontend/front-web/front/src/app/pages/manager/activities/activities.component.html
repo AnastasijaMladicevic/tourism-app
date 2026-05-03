@@ -276,10 +276,30 @@
           <p class="description-copy">{{ selectedSummary }}</p>
         </section>
 
+        <section class="detail-section">
+          <div class="map-card">
+            @if (hasSelectedActivityCoordinates) {
+              <app-map
+                [lat]="selectedActivityLat"
+                [lng]="selectedActivityLng"
+                [zoom]="14"
+                [popupText]="selectedActivityLocationLabel"
+                [interactive]="false"
+                mapId="manager-activity-details-map"
+              ></app-map>
+            } @else {
+              <div class="map-empty-state">
+                <span class="material-symbols-outlined">location_off</span>
+                <p>Coordinates are not available for this activity.</p>
+              </div>
+            }
+          </div>
+        </section>
+
         <div class="detail-cta">
           <button
             type="button"
-            class="primary-btn full-cta"
+            class="primary-btn full-cta sidebar-cta-btn"
             (click)="onReviewActivity((selectedActivityDetails ?? selectedActivity)!)"
           >
             <span class="material-symbols-outlined">rate_review</span>
