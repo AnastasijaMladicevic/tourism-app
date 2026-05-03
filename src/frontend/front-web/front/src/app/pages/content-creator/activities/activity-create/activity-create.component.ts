@@ -130,6 +130,7 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
 
   isSubmitting = false;
   isDeleting = false;
+  showDeleteModal = false;
   isLoadingOptions = true;
   isLoadingActivity = false;
   isEditMode = false;
@@ -208,6 +209,37 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
 
   get pageTitle(): string {
     return this.isEditMode ? 'Edit Activity' : 'Create Activity';
+  }
+
+  get isApprovedActivity(): boolean {
+    return (this.loadedActivity?.status ?? '').toLowerCase() === 'approved';
+  }
+
+  get deleteModalTitle(): string {
+    return this.isApprovedActivity ? 'Request deletion' : 'Confirm deletion';
+  }
+
+  get deleteModalDescription(): string {
+    return this.isApprovedActivity
+      ? 'This activity is approved, so removal requires a manager deletion request.'
+      : 'This activity is still pending, so it can be removed immediately.';
+  }
+
+  openDeleteModal(): void {
+    if (!this.isEditMode || !this.activityId || this.isSubmitting || this.isDeleting) {
+      return;
+    }
+
+    this.showDeleteModal = true;
+    this.errorMessage = '';
+  }
+
+  closeDeleteModal(): void {
+    if (this.isDeleting) {
+      return;
+    }
+
+    this.showDeleteModal = false;
   }
 
   get hasTypeOptions(): boolean {
@@ -406,8 +438,16 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
       return;
     }
 
-    const confirmed = window.confirm('Delete this activity? This action cannot be undone.');
-    if (!confirmed) {
+    if (this.isApprovedActivity) {
+      this.submitActivityDeletionRequest();
+      return;
+    }
+
+    this.submitActivityDirectDeletion();
+  }
+
+  private submitActivityDeletionRequest(): void {
+    if (!this.activityId || this.isDeleting) {
       return;
     }
 
@@ -415,12 +455,48 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
     this.errorMessage = '';
     this.successMessage = '';
 
-    this.activitiesService.delete(this.activityId)
-      .pipe(finalize(() => {
-        this.isDeleting = false;
-      }))
+    this.activitiesService
+      .requestDeletion(this.activityId)
+      .pipe(
+        finalize(() => {
+          this.isDeleting = false;
+          this.cdr.detectChanges();
+        })
+      )
       .subscribe({
         next: () => {
+          this.showDeleteModal = false;
+          this.successMessage = 'Deletion request submitted. A manager must review it before activity removal.';
+          setTimeout(() => {
+            this.router.navigate(['/content-creator/activities']);
+          }, 1200);
+        },
+        error: (error: unknown) => {
+          this.errorMessage = this.extractErrorMessage(error) ?? 'Failed to submit deletion request';
+        }
+      });
+  }
+
+  private submitActivityDirectDeletion(): void {
+    if (!this.activityId || this.isDeleting) {
+      return;
+    }
+
+    this.isDeleting = true;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    this.activitiesService
+      .delete(this.activityId)
+      .pipe(
+        finalize(() => {
+          this.isDeleting = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.showDeleteModal = false;
           this.successMessage = 'Activity deleted successfully.';
           setTimeout(() => {
             this.router.navigate(['/content-creator/activities']);

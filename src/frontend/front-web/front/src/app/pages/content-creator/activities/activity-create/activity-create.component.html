@@ -9,9 +9,9 @@
 
     <div class="header-actions">
       @if (isEditMode) {
-        <button type="button" class="danger-btn" (click)="deleteActivity()" [disabled]="isSubmitting || isDeleting">
+        <button type="button" class="danger-btn" (click)="openDeleteModal()" [disabled]="isSubmitting || isDeleting">
           <span class="material-symbols-outlined">delete</span>
-          {{ isDeleting ? 'Deleting...' : 'Delete' }}
+          {{ isApprovedActivity ? 'Request Deletion' : 'Delete' }}
         </button>
       }
 
@@ -251,4 +251,45 @@
       } -->
     </aside>
   </div>
+
+  @if (showDeleteModal) {
+    <div class="activity-delete-backdrop" (click)="closeDeleteModal()">
+      <section
+        class="card activity-delete-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="activity-delete-title"
+        aria-describedby="activity-delete-description"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="activity-delete-modal-icon" aria-hidden="true">
+          <span class="material-symbols-outlined">delete</span>
+        </div>
+
+        <h3 id="activity-delete-title">{{ deleteModalTitle }}</h3>
+        <p id="activity-delete-description">
+          {{ deleteModalDescription }}<br />
+          {{
+            isApprovedActivity
+              ? 'A manager will review the request before the activity is removed.'
+              : 'This action cannot be undone.'
+          }}
+        </p>
+
+        <div class="activity-delete-modal-actions">
+          <button type="button" class="ghost-btn" (click)="closeDeleteModal()" [disabled]="isDeleting">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="confirm-delete-btn"
+            (click)="deleteActivity()"
+            [disabled]="isDeleting"
+          >
+            {{ isDeleting ? (isApprovedActivity ? 'Submitting...' : 'Deleting...') : (isApprovedActivity ? 'Request deletion' : 'Delete') }}
+          </button>
+        </div>
+      </section>
+    </div>
+  }
 </section>

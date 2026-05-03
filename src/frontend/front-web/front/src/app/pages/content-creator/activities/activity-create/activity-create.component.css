@@ -597,6 +597,90 @@ select:focus {
   }
 }
 
+.activity-delete-backdrop {
+  position: fixed !important;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(15, 23, 42, 0.42);
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.activity-delete-modal {
+  width: min(100%, 440px);
+  max-width: 440px;
+  padding: 22px;
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.26);
+  text-align: center;
+}
+
+.activity-delete-modal-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.activity-delete-modal-icon .material-symbols-outlined {
+  font-size: 32px;
+}
+
+.activity-delete-modal h3 {
+  font-size: 22px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+.activity-delete-modal p {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+.activity-delete-modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.activity-delete-modal-actions .ghost-btn,
+.activity-delete-modal-actions .confirm-delete-btn {
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.activity-delete-modal-actions .confirm-delete-btn {
+  border: 1px solid #ef4444;
+  background: #ef4444;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+}
+
+.activity-delete-modal-actions .confirm-delete-btn:hover:not(:disabled) {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.activity-delete-modal-actions .confirm-delete-btn:disabled,
+.activity-delete-modal-actions .ghost-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 @media (max-width: 640px) {
   .create-activity-page {
     padding: 14px;

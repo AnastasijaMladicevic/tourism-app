@@ -168,6 +168,13 @@ export class ActivitiesService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
+  /** Content creator requests removal of an approved activity (manager review). */
+  requestDeletion(id: number, reason?: string): Observable<unknown> {
+    return this.http.post(`${this.apiUrl}/${id}/deletion-request`, {
+      reason: reason || undefined
+    });
+  }
+
   approve(id: number, dto: ApproveActivityDto): Observable<ActivityDto> {
     return this.http.post<ActivityDto>(`${this.apiUrl}/${id}/approve`, dto);
   }
