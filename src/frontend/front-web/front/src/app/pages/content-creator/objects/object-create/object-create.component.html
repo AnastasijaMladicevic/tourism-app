@@ -86,10 +86,30 @@
         }
 
         @if (imageUrls.length > 0) {
-          <div class="gallery-grid">
-            <article class="gallery-item" *ngFor="let imageUrl of imageUrls; let index = index">
-              <img [src]="imageUrl" alt="Object image preview" />
-              @if (!isManagerReview) {
+          @if (isManagerReview) {
+            <div class="media-layout" aria-label="Object image gallery">
+              <div class="media-preview" aria-label="Main object image preview">
+                <img [src]="reviewImagePreviewUrl" alt="Object preview" />
+              </div>
+
+              <div class="media-strip">
+                @if (sideReviewImages.length > 0) {
+                  <div class="media-thumbnails">
+                    @for (imageUrl of sideReviewImages; track imageUrl) {
+                      <button type="button" class="media-thumb" (click)="selectReviewImage(imageUrl)">
+                        <img [src]="imageUrl" alt="Object image thumbnail" />
+                      </button>
+                    }
+                  </div>
+                } @else {
+                  <div class="media-empty">No additional gallery images are available.</div>
+                }
+              </div>
+            </div>
+          } @else {
+            <div class="gallery-grid">
+              <article class="gallery-item" *ngFor="let imageUrl of imageUrls; let index = index">
+                <img [src]="imageUrl" alt="Object image preview" />
                 <div class="gallery-actions">
                   @if (index === 0) {
                     <span class="primary-badge">Primary</span>
@@ -98,9 +118,9 @@
                   }
                   <button type="button" class="ghost-btn small danger" (click)="removeImage(index)">Remove</button>
                 </div>
-              }
-            </article>
-          </div>
+              </article>
+            </div>
+          }
         } @else {
           <div class="image-preview-empty">
             <span class="material-symbols-outlined">image</span>

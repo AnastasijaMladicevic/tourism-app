@@ -79,6 +79,7 @@ export class ObjectCreateComponent implements OnInit {
 
   /** Ordered gallery URLs; index 0 is the primary cover image. */
   imageUrls: string[] = [];
+  selectedReviewImageUrl = '';
 
   /** Last-known server image rows for this object (used to delete/update on save). */
   imagesSnapshot: ObjectImageDto[] = [];
@@ -448,6 +449,36 @@ export class ObjectCreateComponent implements OnInit {
     this.imageUrls.unshift(selected);
   }
 
+  selectReviewImage(url: string): void {
+    this.selectedReviewImageUrl = url?.trim() ?? '';
+  }
+
+  get reviewImagePreviewUrl(): string {
+    if (this.selectedReviewImageUrl) {
+      return this.selectedReviewImageUrl;
+    }
+
+    return this.imageUrls[0] ?? '';
+  }
+
+  get sideReviewImages(): string[] {
+    const selectedUrl = this.reviewImagePreviewUrl;
+    if (!selectedUrl) {
+      return this.imageUrls;
+    }
+
+    let removedSelectedOnce = false;
+    return this.imageUrls.filter((url) => {
+      const isSelected = url === selectedUrl;
+      if (isSelected && !removedSelectedOnce) {
+        removedSelectedOnce = true;
+        return false;
+      }
+
+      return true;
+    });
+  }
+
   goBack(): void {
     this.location.back();
   }
@@ -792,6 +823,7 @@ export class ObjectCreateComponent implements OnInit {
     const imgs = objectItem.images ?? [];
     this.imagesSnapshot = imgs.map((i) => ({ ...i }));
     this.imageUrls = this.buildOrderedImageUrls(objectItem);
+    this.selectedReviewImageUrl = this.imageUrls[0] ?? '';
 
     this.form.patchValue(
       {
