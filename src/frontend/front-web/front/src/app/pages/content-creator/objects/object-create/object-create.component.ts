@@ -1,14 +1,15 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { forkJoin, Observable, of } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { forkJoin, from, Observable, of } from 'rxjs';
+import { catchError, concatMap, finalize, map, switchMap, tap, toArray } from 'rxjs/operators';
 import { ApproveContentDto } from '../../../../models/event.model';
 import {
   CreateObjectDto,
   ObjectDto,
+  ObjectImageDto,
   ObjectService,
   ObjectTypeOption,
   UpdateObjectDto
@@ -31,6 +32,7 @@ export class ObjectCreateComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly location = inject(Location);
   private readonly objectService = inject(ObjectService);
   private readonly destinationService = inject(DestinationService);
   private readonly activitiesService = inject(ActivitiesService);
@@ -67,6 +69,15 @@ export class ObjectCreateComponent implements OnInit {
   isEditMode = false;
   objectId: number | null = null;
 
+  /** Pending URL input (same pattern as Add Activity). */
+  pendingImageUrl = '';
+
+  /** Ordered gallery URLs; index 0 is the primary cover image. */
+  imageUrls: string[] = [];
+
+  /** Last-known server image rows for this object (used to delete/update on save). */
+  imagesSnapshot: ObjectImageDto[] = [];
+
   /** Server-backed sidebar row when editing / reviewing an existing object. */
   editSidebar: {
     averageRating: number | null;
@@ -86,7 +97,6 @@ export class ObjectCreateComponent implements OnInit {
     price: this.fb.control<number | null>(null, [Validators.min(0)]),
     latitude: this.fb.control<number | null>(null, [Validators.min(-90), Validators.max(90)]),
     longitude: this.fb.control<number | null>(null, [Validators.min(-180), Validators.max(180)]),
-    imageUrl: this.fb.nonNullable.control(''),
     amenitiesInput: this.fb.nonNullable.control('')
   });
 
@@ -277,17 +287,56 @@ export class ObjectCreateComponent implements OnInit {
     return this.form.controls.latitude.value != null && this.form.controls.longitude.value != null;
   }
 
-  get imagePreviewUrl(): string {
-    const raw = this.form.controls.imageUrl.value.trim();
-    if (!raw) {
-      return '';
+  addImageUrl(): void {
+    if (this.isManagerReview) {
+      return;
     }
 
-    if (/^https?:\/\//i.test(raw)) {
-      return raw;
+    const url = this.pendingImageUrl.trim();
+    if (!url) {
+      return;
     }
 
-    return '';
+    if (!this.isValidHttpUrl(url)) {
+      this.errorMessage = 'Please enter a valid image URL (http or https).';
+      return;
+    }
+
+    if (this.imageUrls.includes(url)) {
+      this.pendingImageUrl = '';
+      return;
+    }
+
+    this.imageUrls.push(url);
+    this.pendingImageUrl = '';
+    this.errorMessage = '';
+  }
+
+  removeImage(index: number): void {
+    if (this.isManagerReview) {
+      return;
+    }
+    if (index < 0 || index >= this.imageUrls.length) {
+      return;
+    }
+
+    this.imageUrls.splice(index, 1);
+  }
+
+  setPrimaryImage(index: number): void {
+    if (this.isManagerReview) {
+      return;
+    }
+    if (index <= 0 || index >= this.imageUrls.length) {
+      return;
+    }
+
+    const [selected] = this.imageUrls.splice(index, 1);
+    this.imageUrls.unshift(selected);
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 
   get locationSummary(): string {
@@ -375,32 +424,116 @@ export class ObjectCreateComponent implements OnInit {
       ? this.objectService.update(this.objectId, payload as UpdateObjectDto)
       : this.objectService.create(payload as CreateObjectDto);
 
-    request$.pipe(
-      finalize(() => {
-        this.isSubmitting = false;
+    request$
+      .pipe(
+        switchMap((obj) => {
+          if (this.isEditMode && this.objectId) {
+            return this.syncImagesAfterSave(this.objectId, this.imageUrls, this.imagesSnapshot).pipe(map(() => obj));
+          }
+          return this.attachImagesAfterCreate(obj as ObjectDto);
+        }),
+        finalize(() => {
+          this.isSubmitting = false;
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/content-creator/objects']);
+        },
+        error: (error) => {
+          this.errorMessage = error?.error?.message ?? 'Failed to save object.';
+        }
+      });
+  }
+
+  private attachImagesAfterCreate(created: ObjectDto): Observable<ObjectDto> {
+    if (this.imageUrls.length === 0) {
+      return of(created);
+    }
+
+    return this.objectService.attachImages(created.id, this.imageUrls).pipe(
+      map(() => created),
+      catchError(() => of(created))
+    );
+  }
+
+  /**
+   * Applies gallery changes on edit: deletes removed rows, adds new URLs, then aligns main image with order.
+   */
+  private syncImagesAfterSave(
+    objectId: number,
+    desiredOrdered: string[],
+    snapshot: ObjectImageDto[]
+  ): Observable<void> {
+    const desired = desiredOrdered.map((u) => u.trim()).filter((u) => u.length > 0);
+    const desiredSet = new Set(desired);
+
+    const toDelete = snapshot.filter((img) => !desiredSet.has(img.url.trim()));
+    const surviving = snapshot.filter((img) => desiredSet.has(img.url.trim()));
+
+    const urlToId = new Map<string, number>();
+    for (const img of surviving) {
+      urlToId.set(img.url.trim(), img.id);
+    }
+
+    const toAddOrdered = desired.filter((u) => !urlToId.has(u));
+
+    const delete$ =
+      toDelete.length === 0
+        ? of(undefined)
+        : forkJoin(toDelete.map((d) => this.objectService.deleteImageById(d.id))).pipe(
+            map(() => undefined),
+            catchError(() => of(undefined))
+          );
+
+    return delete$.pipe(
+      switchMap(() => {
+        let pendingCount = surviving.length;
+
+        if (toAddOrdered.length === 0) {
+          return this.ensureMainImage(desired, urlToId);
+        }
+
+        return from(toAddOrdered).pipe(
+          concatMap((url) => {
+            const isMain = pendingCount === 0;
+            pendingCount++;
+            return this.objectService.addImage(objectId, { url, isMain }).pipe(
+              tap((dto) => {
+                urlToId.set(url.trim(), dto.id);
+              })
+            );
+          }),
+          toArray(),
+          switchMap(() => this.ensureMainImage(desired, urlToId))
+        );
       })
-    ).subscribe({
-      next: (created) => {
-        if (this.isEditMode) {
-          this.router.navigate(['/content-creator/objects']);
-          return;
-        }
+    );
+  }
 
-        const imageUrl = this.optionalTrimmed(this.form.controls.imageUrl.value);
-        if (!imageUrl) {
-          this.router.navigate(['/content-creator/objects']);
-          return;
-        }
+  private ensureMainImage(desired: string[], urlToId: Map<string, number>): Observable<void> {
+    if (desired.length === 0) {
+      return of(undefined);
+    }
 
-        this.objectService.addImage(created.id, { url: imageUrl, isMain: true }).subscribe({
-          next: () => this.router.navigate(['/content-creator/objects']),
-          error: () => this.router.navigate(['/content-creator/objects'])
-        });
-      },
-      error: (error) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to create object.';
-      }
-    });
+    const mainId = urlToId.get(desired[0]);
+    if (!mainId) {
+      return of(undefined);
+    }
+
+    return this.objectService.setMainImage(mainId).pipe(
+      map(() => undefined),
+      catchError(() => of(undefined))
+    );
+  }
+
+  private isValidHttpUrl(value: string): boolean {
+    try {
+      const parsed = new URL(value);
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch {
+      return false;
+    }
   }
 
   private loadOptions(): void {
@@ -431,19 +564,24 @@ export class ObjectCreateComponent implements OnInit {
 
     forkJoin({
       lists: this.fetchOptionLists(),
-      objectItem: this.objectService.getById(id)
+      objectItem: this.objectService.getById(id),
+      images: this.objectService.getImages(id).pipe(catchError(() => of([] as ObjectImageDto[])))
     }).pipe(
       finalize(() => {
         this.isLoadingObject = false;
         this.isLoadingOptions = false;
       })
     ).subscribe({
-      next: ({ lists, objectItem }) => {
+      next: ({ lists, objectItem, images }) => {
         this.objectTypes = lists.objectTypes;
         this.destinations = lists.destinations;
         this.localities = lists.localities;
-        this.mergeOptionsFromLoadedObject(objectItem);
-        this.applyFormFromObject(objectItem);
+        const merged: ObjectDto = {
+          ...objectItem,
+          images: images.length > 0 ? images : objectItem.images ?? []
+        };
+        this.mergeOptionsFromLoadedObject(merged);
+        this.applyFormFromObject(merged);
       },
       error: (error) => {
         this.errorMessage = error?.error?.message ?? 'Failed to load object details.';
@@ -477,6 +615,33 @@ export class ObjectCreateComponent implements OnInit {
   }
 
   /** Ensures current IDs always appear in selects (region filter, pagination, or type derivation gaps). */
+  private buildOrderedImageUrls(o: ObjectDto): string[] {
+    const imgs = o.images ?? [];
+    if (imgs.length > 0) {
+      const sorted = [...imgs].sort((a, b) => {
+        if (a.isMain === b.isMain) {
+          return 0;
+        }
+        return a.isMain ? -1 : 1;
+      });
+      const urls = sorted.map((i) => i.url?.trim()).filter((u): u is string => !!u);
+      const seen = new Set<string>();
+      return urls.filter((u) => {
+        if (seen.has(u)) {
+          return false;
+        }
+        seen.add(u);
+        return true;
+      });
+    }
+
+    const main = o.mainImageUrl?.trim();
+    if (main && /^https?:\/\//i.test(main)) {
+      return [main];
+    }
+    return [];
+  }
+
   private mergeOptionsFromLoadedObject(o: ObjectDto): void {
     const typeId = this.normalizeOptionalId(o.objectTypeId);
     if (typeId != null && !this.objectTypes.some((t) => t.id === typeId)) {
@@ -511,6 +676,10 @@ export class ObjectCreateComponent implements OnInit {
   }
 
   private applyFormFromObject(objectItem: ObjectDto): void {
+    const imgs = objectItem.images ?? [];
+    this.imagesSnapshot = imgs.map((i) => ({ ...i }));
+    this.imageUrls = this.buildOrderedImageUrls(objectItem);
+
     this.form.patchValue(
       {
         name: objectItem.name ?? '',
@@ -522,7 +691,6 @@ export class ObjectCreateComponent implements OnInit {
         price: objectItem.price ?? null,
         latitude: objectItem.latitude ?? null,
         longitude: objectItem.longitude ?? null,
-        imageUrl: objectItem.mainImageUrl ?? '',
         amenitiesInput: (objectItem.amenities ?? []).join(', ')
       },
       { emitEvent: false }

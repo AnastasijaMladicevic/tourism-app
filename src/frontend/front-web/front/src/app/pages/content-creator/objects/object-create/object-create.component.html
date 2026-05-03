@@ -12,7 +12,10 @@
         </button>
       }
       @if (isManagerReview) {
-        <button type="button" class="ghost-btn" [routerLink]="objectsListPath">Back to list</button>
+        <button type="button" class="ghost-btn ghost-btn--back" (click)="goBack()">
+          <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+          Back
+        </button>
         <button
           type="button"
           class="danger-btn"
@@ -40,22 +43,65 @@
 
   <div class="create-layout">
     <form id="create-object-form" class="form-column card" [formGroup]="form" (ngSubmit)="submit()">
-      <section class="section-block">
-        <h2>Image Gallery</h2>
-        <label>
-          <span>Main image URL</span>
-          <input type="url" formControlName="imageUrl" placeholder="https://example.com/image.jpg" />
-        </label>
-        <div class="image-preview-box">
-          @if (imagePreviewUrl) {
-            <img [src]="imagePreviewUrl" alt="Object image preview" class="image-preview" />
-          } @else {
-            <div class="image-preview-empty">
-              <span class="material-symbols-outlined">image</span>
-              <p>Paste an image URL to preview it here.</p>
-            </div>
-          }
+      <section class="section-block section-block--gallery">
+        <div class="gallery-card-head">
+          <span class="step-tag">STEP 1</span>
+          <h2>Media Gallery</h2>
+          <p class="gallery-intro">
+            @if (isManagerReview) {
+              Read-only gallery shown before the review details.
+            } @else {
+              Paste public image URLs and choose a primary cover image.
+            }
+          </p>
         </div>
+
+        @if (!isManagerReview) {
+          <div class="gallery-dropzone">
+            <p class="dropzone-title">Add Photo URL</p>
+            <p class="dropzone-copy">Images are attached after the object is saved via the image endpoint.</p>
+
+            <div class="dropzone-input-row">
+              <input
+                type="url"
+                [(ngModel)]="pendingImageUrl"
+                [ngModelOptions]="{ standalone: true }"
+                placeholder="https://example.com/image.jpg"
+                (keydown.enter)="$event.preventDefault(); addImageUrl()"
+              />
+              <button type="button" class="primary-btn" (click)="addImageUrl()">Add Photo</button>
+            </div>
+          </div>
+        }
+
+        @if (imageUrls.length > 0) {
+          <div class="gallery-grid">
+            <article class="gallery-item" *ngFor="let imageUrl of imageUrls; let index = index">
+              <img [src]="imageUrl" alt="Object image preview" />
+              @if (!isManagerReview) {
+                <div class="gallery-actions">
+                  @if (index === 0) {
+                    <span class="primary-badge">Primary</span>
+                  } @else {
+                    <button type="button" class="ghost-btn small" (click)="setPrimaryImage(index)">Set Primary</button>
+                  }
+                  <button type="button" class="ghost-btn small danger" (click)="removeImage(index)">Remove</button>
+                </div>
+              }
+            </article>
+          </div>
+        } @else {
+          <div class="image-preview-empty">
+            <span class="material-symbols-outlined">image</span>
+            <p>
+              @if (isManagerReview) {
+                No images submitted for this object.
+              } @else {
+                Add at least one image URL above. Images are saved when you create or update the object.
+              }
+            </p>
+          </div>
+        }
       </section>
 
       <section class="section-block">
