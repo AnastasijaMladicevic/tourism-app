@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, ChangeDetectorRef, AfterViewInit, OnDestroy, ViewChild, ElementRef, NgZone } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import * as L from 'leaflet';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
@@ -7,6 +8,7 @@ import { catchError, finalize, of } from 'rxjs';
 import { AuthService } from '../../../../services/auth.service';
 import { EventImageDto, EventService } from '../../../../services/event.service';
 import { ApproveContentDto, EventDto } from '../../../../models/event.model';
+import { environment } from '../../../../../environment/environment';
 
 interface VenueOption {
   id: number;
@@ -35,6 +37,7 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly ngZone = inject(NgZone);
+  private readonly http = inject(HttpClient);
 
   form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(200)]],
@@ -76,8 +79,9 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
   eventImages: EventImageDto[] = [];
   selectedReviewImageUrl = '';
   organizerName = 'Current Manager';
-  venueSearchTerm = 'Grand Horizon Resort';
   selectedActivityIds = new Set<number>([2]);
+  loadedEvent: EventDto | null = null;
+  createdByName = '';
 
   readonly eventTypes = [
     { id: 1, name: 'Festival' },
@@ -125,8 +129,54 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
   pendingTag = '';
 
   get selectedVenue(): VenueOption {
-    const term = this.venueSearchTerm.trim().toLowerCase();
-    return this.venueOptions.find((venue) => venue.name.toLowerCase().includes(term)) ?? this.venueOptions[0];
+    if (this.loadedEvent) {
+      return {
+        id: this.loadedEvent.objectId ?? 0,
+        name: this.loadedEvent.objectName || this.loadedEvent.localityName || this.loadedEvent.destinationName || 'Linked location',
+        address: [
+          this.loadedEvent.localityName,
+          this.loadedEvent.destinationName
+        ].filter((value): value is string => !!value && value.trim().length > 0).join(', ') || 'No address available'
+      };
+    }
+
+    return this.venueOptions[0];
+  }
+
+  get locationContextValue(): string {
+    return this.selectedVenue.address || this.selectedVenue.name;
+  }
+
+  get creatorDisplayName(): string {
+    return this.createdByName.trim() || 'Name not available in this view.';
+  }
+
+  get creatorInitials(): string {
+    const fullName = this.createdByName.trim();
+    if (!fullName) {
+      return '?';
+    }
+
+    const parts = fullName.split(/\s+/).filter(Boolean);
+    if (parts.length === 1) {
+      return parts[0].slice(0, 2).toUpperCase();
+    }
+
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  get creatorTimeline(): string {
+    if (!this.loadedEvent) {
+      return '';
+    }
+
+    const created = this.formatMonthYear(this.loadedEvent.createdAt);
+    const updated = this.formatMonthYear(this.loadedEvent.updatedAt);
+    if (created && updated && created !== updated) {
+      return `${created}, edited ${updated}`;
+    }
+
+    return created || updated || '';
   }
 
   ngOnInit(): void {
@@ -175,6 +225,7 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
       next: (event: EventDto) => {
         this.populateForm(event);
         this.loadEventImages(event.id, event.mainImageUrl);
+        this.resolveCreatorName(event);
         this.reviewTargetName = event.name;
         this.reviewStatus = event.status;
         this.form.disable({ emitEvent: false });
@@ -190,6 +241,7 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   populateForm(event: EventDto): void {
+    this.loadedEvent = event;
     this.form.patchValue({
       name: event.name,
       description: event.description,
@@ -208,13 +260,30 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
       latitude: event.latitude?.toString() || '',
       localityId: '',
       destinationId: '',
-      objectId: this.selectedVenue.id.toString(),
+      objectId: event.objectId?.toString() || '',
       imageUrl: event.mainImageUrl ?? '',
       ageRestriction: '',
       tagsInput: ''
     });
     this.selectedReviewImageUrl = event.mainImageUrl ?? '';
     this.syncMapFromForm();
+  }
+
+  private resolveCreatorName(event: EventDto): void {
+    if (!event.createdByUserId) {
+      this.createdByName = '';
+      return;
+    }
+
+    this.http
+      .get<{ firstName?: string; lastName?: string }>(`${environment.apiUrl}/users/${event.createdByUserId}`)
+      .pipe(catchError(() => of(null)))
+      .subscribe((user) => {
+        const first = user?.firstName?.trim() ?? '';
+        const last = user?.lastName?.trim() ?? '';
+        this.createdByName = `${first} ${last}`.trim();
+        this.cdr.detectChanges();
+      });
   }
 
   private loadEventImages(eventId: number, fallbackImageUrl?: string): void {
@@ -553,6 +622,19 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
     const hours = String(parsed.getHours()).padStart(2, '0');
     const minutes = String(parsed.getMinutes()).padStart(2, '0');
     return `${hours}:${minutes}`;
+  }
+
+  private formatMonthYear(value?: string | Date): string {
+    if (!value) {
+      return '';
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return '';
+    }
+
+    return date.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
   }
 
   private getDroppedImageUrl(event: DragEvent): string {

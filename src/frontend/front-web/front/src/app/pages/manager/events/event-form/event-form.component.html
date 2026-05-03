@@ -241,46 +241,42 @@
     <aside class="form-side">
       <section class="card side-card">
         <div class="section-title compact">
-          <h2>Venue &amp; Location</h2>
+          <h2>Location Intelligence</h2>
+          <p>Map preview and coordinates for the linked location.</p>
         </div>
 
-        <label class="form-field">
-          <span>Select Venue (Linked Object)</span>
-          <input class="form-control" type="text" [value]="selectedVenue.name" readonly />
-        </label>
-
         <div #eventMap class="location-map mini-map" aria-label="Event location map"></div>
+
+        <div class="location-line">
+          <span class="material-symbols-outlined">search</span>
+          <p>{{ locationContextValue }}</p>
+        </div>
+
+        <div class="location-inputs">
+          <label class="mini-field">
+            <span>Latitude</span>
+            <input class="form-control" type="text" formControlName="latitude" readonly />
+          </label>
+          <label class="mini-field">
+            <span>Longitude</span>
+            <input class="form-control" type="text" formControlName="longitude" readonly />
+          </label>
+        </div>
+
         <div class="map-meta">
           <strong>{{ selectedVenue.name }}</strong>
           <span>{{ selectedVenue.address }}</span>
         </div>
-
-        <div class="venue-card">
-          <strong>{{ selectedVenue.name }}</strong>
-          <p>{{ selectedVenue.address }}</p>
-        </div>
-      </section>
-
-   
-
-      <section class="card side-card tips-card">
-        <div class="section-title compact">
-          <h2>Creator Tips</h2>
-        </div>
-
-        <ul>
-          <li>Events with high-resolution banners get 40% more engagement.</li>
-          <li>Link your event to a specific venue object to show automated directions.</li>
-          <li>Clear start and end times help with automated calendar exports for users.</li>
-        </ul>
-
-        <a class="link-btn" href="javascript:void(0)">Learn more about events</a>
-      </section>
-
-      <section class="card side-card meta-card">
-        <p class="meta-label">Last Modified</p>
-        <strong>{{ organizerName }}</strong>
-        <span>2 mins ago</span>
+        <article class="creator-card">
+          <div class="creator-avatar">{{ creatorInitials }}</div>
+          <div>
+            <strong>Creator</strong>
+            <p class="sidebar-muted">{{ creatorDisplayName }}</p>
+            @if (creatorTimeline) {
+              <p>{{ creatorTimeline }}</p>
+            }
+          </div>
+        </article>
       </section>
     </aside>
     </fieldset>
