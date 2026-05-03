@@ -133,9 +133,19 @@
               <option *ngFor="let type of objectTypes" [ngValue]="type.id">{{ type.name }}</option>
             </select>
           </label>
-          <label>
+          <label class="price-field">
             <span>Price</span>
-            <input type="number" formControlName="price" min="0" step="0.01" placeholder="0.00" />
+            <div class="price-input-group">
+              <span class="price-input-prefix" aria-hidden="true">€</span>
+              <input
+                type="number"
+                formControlName="price"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                inputmode="decimal"
+              />
+            </div>
           </label>
           <label>
             <span>Destination</span>

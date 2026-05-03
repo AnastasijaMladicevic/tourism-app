@@ -157,6 +157,11 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
   pendingImageUrl = '';
   imageUrls: string[] = [];
 
+  /** Normalized URLs already persisted for this activity when the edit form loaded (skip on save). */
+  private initialStoredImageUrlKeys = new Set<string>();
+  /** True if GET /activities/:id/images returned at least one row — activity already has a main image in DB. */
+  private hadStoredImagesWhenLoaded = false;
+
   ngOnInit(): void {
     const idFromRoute = Number(this.route.snapshot.paramMap.get('id'));
     if (Number.isFinite(idFromRoute) && idFromRoute > 0) {
@@ -165,6 +170,8 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     if (!this.isEditMode) {
+      this.initialStoredImageUrlKeys.clear();
+      this.hadStoredImagesWhenLoaded = false;
       this.loadDraft();
     }
 
@@ -586,7 +593,16 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
     const destinationLng = this.toNumber(selectedDestination?.longitude);
     if (destinationLat != null && destinationLng != null) {
       this.setLocationFromSelection(destinationLat, destinationLng);
+      return;
     }
+
+    // No coordinates available in selected destination/locality/object:
+    // still show meaningful location details in the side panel.
+    const fallback = this.buildSelectionLocationDetails();
+    this.locationDetails = {
+      ...fallback,
+      loading: false
+    };
   }
 
   private setLocationFromSelection(latitude: number, longitude: number): void {
@@ -603,14 +619,27 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   private attachImagesAfterCreate(createdActivity: ActivityDto) {
-    if (this.imageUrls.length === 0) {
+    const trimmedGallery = this.imageUrls.map((u) => u.trim()).filter((u) => u.length > 0);
+
+    let urlsToAttach: string[];
+    if (this.isEditMode) {
+      urlsToAttach = trimmedGallery.filter((url) => !this.initialStoredImageUrlKeys.has(this.normalizeImageUrlKey(url)));
+    } else {
+      urlsToAttach = trimmedGallery;
+    }
+
+    if (urlsToAttach.length === 0) {
       return of({ createdActivity, imageUploadFailed: false });
     }
 
-    return this.activitiesService.attachImages(createdActivity.id, this.imageUrls).pipe(
-      map(() => ({ createdActivity, imageUploadFailed: false })),
-      catchError(() => of({ createdActivity, imageUploadFailed: true }))
-    );
+    const treatAsAppend = this.isEditMode && this.hadStoredImagesWhenLoaded;
+
+    return this.activitiesService
+      .attachImages(createdActivity.id, urlsToAttach, { treatAsAppend })
+      .pipe(
+        map(() => ({ createdActivity, imageUploadFailed: false })),
+        catchError(() => of({ createdActivity, imageUploadFailed: true }))
+      );
   }
 
   private loadActivity(): void {
@@ -706,14 +735,38 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
     this.activitiesService.getImages(activityId)
       .pipe(catchError(() => of([] as ActivityImageDto[])))
       .subscribe((images) => {
-        this.imageUrls = images
+        this.initialStoredImageUrlKeys.clear();
+        this.hadStoredImagesWhenLoaded = images.length > 0;
+
+        for (const image of images) {
+          const key = this.normalizeImageUrlKey(image.url);
+          if (key) {
+            this.initialStoredImageUrlKeys.add(key);
+          }
+        }
+
+        const orderedUrls = images
           .slice()
           .sort((first, second) => Number(second.isMain) - Number(first.isMain) || first.id - second.id)
           .map((image) => image.url)
           .filter((url) => typeof url === 'string' && url.length > 0);
 
+        if (orderedUrls.length > 0) {
+          this.imageUrls = Array.from(new Set(orderedUrls));
+        } else {
+          const fallbackMain = this.loadedActivity?.mainImageUrl?.trim();
+          this.imageUrls = fallbackMain ? [fallbackMain] : [];
+          if (fallbackMain) {
+            this.initialStoredImageUrlKeys.add(this.normalizeImageUrlKey(fallbackMain));
+          }
+        }
+
         this.cdr.detectChanges();
       });
+  }
+
+  private normalizeImageUrlKey(url: string): string {
+    return url.trim().toLowerCase();
   }
 
   private syncEditModeOptions(): void {
@@ -951,10 +1004,9 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
           return;
         }
 
+        const fallback = this.buildSelectionLocationDetails();
         this.locationDetails = {
-          city: '-',
-          street: '-',
-          fullAddress: '-',
+          ...fallback,
           loading: false
         };
       });
@@ -991,6 +1043,34 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
       address.neighbourhood ||
       '-'
     );
+  }
+
+  private buildSelectionLocationDetails(): { city: string; street: string; fullAddress: string } {
+    const selectedDestinationId = this.form.controls.destinationId.value;
+    const selectedLocalityId = this.form.controls.localityId.value;
+    const selectedObjectId = this.form.controls.objectId.value;
+
+    const selectedDestination = selectedDestinationId
+      ? this.destinations.find((destination) => destination.id === selectedDestinationId)
+      : undefined;
+    const selectedLocality = selectedLocalityId
+      ? this.localities.find((locality) => locality.id === selectedLocalityId)
+      : undefined;
+    const selectedObject = selectedObjectId
+      ? this.objects.find((objectItem) => objectItem.id === selectedObjectId)
+      : undefined;
+
+    const city = selectedLocality?.name || selectedDestination?.name || '-';
+    const street = selectedObject?.name || '-';
+
+    const fullAddressParts = [selectedObject?.name, selectedLocality?.name, selectedDestination?.name]
+      .filter((value): value is string => !!value && value.trim().length > 0);
+
+    return {
+      city,
+      street,
+      fullAddress: fullAddressParts.length > 0 ? fullAddressParts.join(', ') : '-'
+    };
   }
 
   private toNumber(value: number | string | null | undefined): number | null {
