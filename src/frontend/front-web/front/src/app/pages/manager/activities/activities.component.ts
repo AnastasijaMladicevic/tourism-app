@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { forkJoin } from 'rxjs';
 import { ActivitiesService, ActivityDto, ActivityTypeOption } from '../../../services/activities';
 import { DestinationService } from '../../../services/destination.service';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
@@ -46,6 +47,10 @@ export class ManagerActivitiesComponent implements OnInit {
 
   activityTypeOptions: ActivityTypeOption[] = [];
   isLoadingTypes = true;
+
+  /** From dedicated lightweight manager queries (pageSize 1); not derived from mocks. */
+  statsTotalAllStatuses: number | null = null;
+  statsPendingCount: number | null = null;
 
   readonly statusOptions = [
     { value: 'all', label: 'All Statuses' },
@@ -114,6 +119,7 @@ export class ManagerActivitiesComponent implements OnInit {
   loadActivities(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    this.loadActivityStats();
 
     this.activitiesService.getForManager({
       page: this.currentPage,
@@ -121,19 +127,13 @@ export class ManagerActivitiesComponent implements OnInit {
       search: this.searchQuery || undefined,
       status: this.statusFilter !== 'all' ? this.statusFilter : undefined,
       sortBy: this.sortBy,
-      sortOrder: this.sortOrder
+      sortOrder: this.sortOrder,
+      type: this.getManagerActivityTypeSearchToken()
     })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
           let items = response.items ?? [];
-
-          if (this.typeFilter !== 'all') {
-            const typeId = Number(this.typeFilter);
-            if (Number.isFinite(typeId)) {
-              items = items.filter((activity) => activity.activityTypeId === typeId);
-            }
-          }
 
           items = this.sortActivitiesLocally(items);
 
@@ -163,10 +163,69 @@ export class ManagerActivitiesComponent implements OnInit {
           this.totalPages = 1;
           this.selectedActivity = null;
           this.selectedActivityDetails = null;
+          this.statsTotalAllStatuses = null;
+          this.statsPendingCount = null;
           this.isLoading = false;
           this.cdr.detectChanges();
         }
       });
+  }
+
+  /** Totals for stat cards: same search/sort as the table, but status breakdown from BE counts. */
+  private loadActivityStats(): void {
+    const search = this.searchQuery.trim() || undefined;
+    const type = this.getManagerActivityTypeSearchToken();
+
+    forkJoin({
+      all: this.activitiesService.getForManager({
+        page: 1,
+        pageSize: 1,
+        search,
+        sortBy: this.sortBy,
+        sortOrder: this.sortOrder,
+        type
+      }),
+      pending: this.activitiesService.getForManager({
+        page: 1,
+        pageSize: 1,
+        search,
+        sortBy: this.sortBy,
+        sortOrder: this.sortOrder,
+        status: 'pending',
+        type
+      })
+    })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: ({ all, pending }) => {
+          this.statsTotalAllStatuses = all.totalCount ?? 0;
+          this.statsPendingCount = pending.totalCount ?? 0;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.statsTotalAllStatuses = null;
+          this.statsPendingCount = null;
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  /**
+   * Backend filters by activity type name (case-insensitive substring). Uses the selected filter option name when set.
+   */
+  private getManagerActivityTypeSearchToken(): string | undefined {
+    if (this.typeFilter === 'all') {
+      return undefined;
+    }
+
+    const typeId = Number(this.typeFilter);
+    if (!Number.isFinite(typeId)) {
+      return undefined;
+    }
+
+    const option = this.activityTypeOptions.find((t) => t.id === typeId);
+    const name = option?.name?.trim();
+    return name || undefined;
   }
 
   private sortActivitiesLocally(items: ActivityDto[]): ActivityDto[] {

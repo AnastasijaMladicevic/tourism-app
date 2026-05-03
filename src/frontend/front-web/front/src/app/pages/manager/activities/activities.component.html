@@ -80,6 +80,26 @@
 
   <div class="activities-layout">
     <div class="main-column">
+      @if (!errorMessage) {
+        <div class="stats-row">
+          <article class="stat-card" data-tone="blue">
+            <p>Total activities</p>
+            <strong>{{ statsTotalAllStatuses != null ? statsTotalAllStatuses : '—' }}</strong>
+            <span>All statuses · same search &amp; type filter as the table</span>
+          </article>
+          <article class="stat-card" data-tone="green">
+            <p>On this page</p>
+            <strong>{{ isLoading ? '—' : activities.length }}</strong>
+            <span>Visible rows</span>
+          </article>
+          <article class="stat-card" data-tone="neutral">
+            <p>Pending review</p>
+            <strong>{{ statsPendingCount != null ? statsPendingCount : '—' }}</strong>
+            <span>Same search &amp; type filter as the table</span>
+          </article>
+        </div>
+      }
+
       <div class="table-card">
         <header class="table-header">
           <h2>{{ managedCityLabel || 'Activities' }}</h2>
