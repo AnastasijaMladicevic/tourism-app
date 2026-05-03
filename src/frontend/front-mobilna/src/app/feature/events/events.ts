@@ -304,7 +304,7 @@ export class EventsComponent implements OnInit {
   private loadEvents(): void {
     this.isLoading = true;
 
-    this.eventService.getAll().subscribe({
+    this.eventService.getAll({ page: 1, pageSize: 50 }).subscribe({
       next: async (events) => {
         try {
           const eventList = this.toArray<EventDto>(events).map((event) =>
