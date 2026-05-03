@@ -795,6 +795,12 @@ VALUES
  ST_SetSRID(ST_MakePoint(18.9417, 42.7748), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Tvrdjava'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
+ 
+ ('Krupacko jezero', 'Poznato izletiste i kupaliste u blizini Niksica, omiljeno mesto za festivale, kampovanje i odmor u prirodi.',
+ ST_SetSRID(ST_MakePoint(18.892, 42.783), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Prirodni lokalitet'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW());
 
 -- Lokalitetima upravlja menadzer dodeljen destinaciji kojoj pripadaju.
@@ -2802,6 +2808,16 @@ VALUES
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.cetinje@spirego.com'),
+ NOW(), NOW(), NOW()),
+ 
+('Promenada Krupac', 'Uredjena promenada oko Krupackog jezera, popularno mesto za setnju, odmor i organizaciju festivala poput Lake Festa', 'Krupacko jezero, Niksic', NULL, NULL,
+ NULL, NULL, '{"pon":"00:00-23:59","uto":"00:00-23:59","sre":"00:00-23:59","cet":"00:00-23:59","pet":"00:00-23:59","sub":"00:00-23:59","ned":"00:00-23:59"}',
+ NULL, ARRAY['Setnja', 'Priroda', 'Festival', 'Rekreacija'], ST_SetSRID(ST_MakePoint(18.892, 42.783), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Sportski centar'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupacko jezero'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.niksic@spirego.com'),
  NOW(), NOW(), NOW());
 
 -- Objekte kreira ContentCreator, a odobrava menadzer nadlezan za destinaciju.
@@ -3027,6 +3043,15 @@ VALUES
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Tivta'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Ljetnja Pozornica Tivat'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ NOW(), NOW()),
+ 
+('Lake Fest 2026', 'Lake Fest je jedan od najvećih crnogorskih muzičkih festivala, poznat po rok i alternativnoj muzici, kampovanju i atmosferi pored Krupačkog jezera kod Nikšića. Festival okuplja ljubitelje muzike iz regiona i pruža višednevni program koncerata na otvorenom.',
+ ST_SetSRID(ST_MakePoint(18.892, 42.783), 4326),  '2026-08-07 20:00',  '2026-08-09 23:30',  20.00,  2000,  true,  'Approved',
+ (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupacko jezero'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW());
  
@@ -5473,7 +5498,19 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mnemories'),
- 3, 'Zanimljivo, ali izbor bi mogao biti veći.', 'Approved', NOW());
+ 3, 'Zanimljivo, ali izbor bi mogao biti veći.', 'Approved', NOW()),
+ 
+ ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
+ 5, 'Prelepo mesto za setnju i opustanje, posebno uvece uz zalazak sunca.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
+ 4, 'Lepa priroda i prijatna atmosfera, idealno za vikend izlet sa drustvom.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
+ 5, 'Odlicno uredjeno setaliste, cisto i mirno, savrseno za beg od gradske guzve.', 'Approved', NOW());
 
 
 -- ============================================
@@ -6397,6 +6434,24 @@ VALUES
     'Biser Jadrana Tivat',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Biser Jadrana Tivat'),
+    NOW()),
+(
+    'https://vqngfgxokvygyrxfsmyj.supabase.co/storage/v1/object/public/uploads/events/1773349783420-7rjbva4lqxt.jpg',
+    'Lake Fest 2026',
+    true,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Lake Fest 2026'),
+    NOW()),
+(
+    'https://zguzirvtfputyttwfaab.supabase.co/storage/v1/object/public/media/festivals/festival-1767857257771-qok2ci6uce7.webp',
+    'Lake Fest 2026',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Lake Fest 2026'),
+    NOW()),
+(
+    'https://gradski.me/wp-content/uploads/2026/03/lake-fest-scaled-1.webp',
+    'Lake Fest 2026',
+    false,
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Lake Fest 2026'),
     NOW());
 
 
@@ -7640,6 +7695,24 @@ VALUES
     'Tvrdjava Onogost',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tvrdjava Onogost'),
+    NOW()),
+(
+    'https://upload.wikimedia.org/wikipedia/commons/e/ec/%D0%A1%D0%B2%D1%98%D0%B5%D1%82%D0%BB%D0%BE%D0%BF%D0%B8%D1%81_%D1%98%D0%B5%D0%B7%D0%B5%D1%80%D0%B0_%D0%9A%D1%80%D1%83%D0%BF%D0%B0%D1%86_%D0%BA%D0%BE%D0%B4_%D0%9D%D0%B8%D0%BA%D1%88%D0%B8%D1%9B%D0%B03.jpg',
+    'Krupacko jezero',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupacko jezero'),
+    NOW()),
+(
+    'https://wevotravel.com/wp-content/uploads/2023/04/1_1-5-1536x1151-1.jpg',
+    'Krupacko jezero',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupacko jezero'),
+    NOW()),
+(
+    'https://wevotravel.com/wp-content/uploads/2023/04/3_1-3.jpg',
+    'Krupacko jezero',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupacko jezero'),
     NOW());
 
 -- ============================================
@@ -11120,9 +11193,25 @@ VALUES
     'Mnemories',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mnemories'),
-    NOW())
-
-    ;
+    NOW()),
+(
+    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0c/c3/66/ab/20160830-113357-hdr-largejpg.jpg?w=1200&h=-1&s=1',
+    'Promenada Krupac',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
+    NOW()),
+(
+    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1d/34/45/93/krupac-lake.jpg?w=1100&h=1100&s=1',
+    'Promenada Krupac',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
+    NOW()),
+(
+    'https://www.vijesti.me/data/images/2022/06/16/18/5418202_plaza-sve-veca-jezero-sve-manje-krupac_share.jpg',
+    'Promenada Krupac',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
+    NOW());
 
 -- ============================================
 -- 13. IMAGES - ACTIVITIES
