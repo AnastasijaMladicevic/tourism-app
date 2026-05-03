@@ -47,32 +47,37 @@
         (dragleave)="onImageDragLeave($event)"
         (drop)="onImageDrop($event)"
       >
-        <label class="form-field full-width">
-          <span>Image URL</span>
-          <input
-            class="form-control"
-            type="url"
-            formControlName="imageUrl"
-            placeholder="https://example.com/event-banner.jpg"
-            readonly
-          />
-        </label>
+        <div class="section-title">
+          <h2>Event Images</h2>
+          <p>Read-only gallery shown before the review details.</p>
+        </div>
 
-        <div class="upload-area preview-only" aria-label="Event image preview">
-          @if (imagePreviewUrl && !isImagePreviewBroken) {
-            <button type="button" class="preview-clear-btn" (click)="clearImage()" aria-label="Remove image" [disabled]="true">
-              <span class="material-symbols-outlined">close</span>
-              Remove
-            </button>
-            <img [src]="imagePreviewUrl" alt="Event banner preview" (error)="onImagePreviewError()" />
-          } @else {
-            <div class="upload-placeholder">
-              <span class="material-symbols-outlined">image</span>
-              <strong>No usable image preview yet</strong>
-              <p>Paste or drag a direct image URL here. If the URL points to a page instead of the image file, the preview will stay blank.</p>
-              <small>The URL must resolve directly to an image.</small>
-            </div>
-          }
+        <div class="media-layout" aria-label="Event image gallery">
+          <div class="media-preview" aria-label="Main event image preview">
+            @if (imagePreviewUrl && !isImagePreviewBroken) {
+              <img [src]="imagePreviewUrl" alt="Event banner preview" (error)="onImagePreviewError()" />
+            } @else {
+              <div class="upload-placeholder">
+                <span class="material-symbols-outlined">image</span>
+                <strong>No usable image preview yet</strong>
+                <p>The event does not have a valid main image URL, or the image could not be loaded.</p>
+              </div>
+            }
+          </div>
+
+          <div class="media-strip">
+            @if (sideReviewImages.length > 0) {
+              <div class="media-thumbnails">
+                @for (image of sideReviewImages; track image.id) {
+                  <button type="button" class="media-thumb" (click)="selectReviewImage(image.url)">
+                    <img [src]="image.url" [alt]="image.altText || 'Event image thumbnail'" />
+                  </button>
+                }
+              </div>
+            } @else {
+              <div class="media-empty">No additional gallery images are available.</div>
+            }
+          </div>
         </div>
       </div>
 

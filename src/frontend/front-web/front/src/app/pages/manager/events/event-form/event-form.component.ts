@@ -3,9 +3,9 @@ import * as L from 'leaflet';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { catchError, finalize, of } from 'rxjs';
 import { AuthService } from '../../../../services/auth.service';
-import { EventService } from '../../../../services/event.service';
+import { EventImageDto, EventService } from '../../../../services/event.service';
 import { ApproveContentDto, EventDto } from '../../../../models/event.model';
 
 interface VenueOption {
@@ -73,6 +73,8 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
   showDeclineModal = false;
   isImageDropActive = false;
   isImagePreviewBroken = false;
+  eventImages: EventImageDto[] = [];
+  selectedReviewImageUrl = '';
   organizerName = 'Current Manager';
   venueSearchTerm = 'Grand Horizon Resort';
   selectedActivityIds = new Set<number>([2]);
@@ -172,6 +174,7 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
     this.eventService.getById(this.eventId).subscribe({
       next: (event: EventDto) => {
         this.populateForm(event);
+        this.loadEventImages(event.id, event.mainImageUrl);
         this.reviewTargetName = event.name;
         this.reviewStatus = event.status;
         this.form.disable({ emitEvent: false });
@@ -210,7 +213,29 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
       ageRestriction: '',
       tagsInput: ''
     });
+    this.selectedReviewImageUrl = event.mainImageUrl ?? '';
     this.syncMapFromForm();
+  }
+
+  private loadEventImages(eventId: number, fallbackImageUrl?: string): void {
+    this.eventService
+      .getImages(eventId)
+      .pipe(catchError(() => of([] as EventImageDto[])))
+      .subscribe((images) => {
+        const normalizedImages = Array.isArray(images) ? images : [];
+        this.eventImages = normalizedImages
+          .slice()
+          .sort((left, right) => Number(right.isMain) - Number(left.isMain));
+
+        this.selectedReviewImageUrl =
+          this.eventImages.find((image) => image.isMain)?.url ??
+          this.eventImages[0]?.url ??
+          fallbackImageUrl ??
+          '';
+
+        this.form.patchValue({ imageUrl: this.selectedReviewImageUrl }, { emitEvent: false });
+        this.cdr.detectChanges();
+      });
   }
 
   private initializeMap(): void {
@@ -387,7 +412,31 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   get imagePreviewUrl(): string {
-    return (this.form.get('imageUrl')?.value ?? '').trim();
+    return this.selectedReviewImageUrl.trim() || (this.form.get('imageUrl')?.value ?? '').trim();
+  }
+
+  selectReviewImage(url: string): void {
+    this.selectedReviewImageUrl = url?.trim() ?? '';
+    this.isImagePreviewBroken = false;
+    this.form.patchValue({ imageUrl: this.selectedReviewImageUrl }, { emitEvent: false });
+  }
+
+  get sideReviewImages(): EventImageDto[] {
+    const selectedUrl = this.imagePreviewUrl;
+    if (!selectedUrl) {
+      return this.eventImages;
+    }
+
+    let removedSelectedOnce = false;
+    return this.eventImages.filter((image) => {
+      const isSelected = image.url === selectedUrl;
+      if (isSelected && !removedSelectedOnce) {
+        removedSelectedOnce = true;
+        return false;
+      }
+
+      return true;
+    });
   }
 
   onImageDrop(event: DragEvent): void {
