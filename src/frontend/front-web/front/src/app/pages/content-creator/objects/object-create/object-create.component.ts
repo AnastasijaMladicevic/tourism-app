@@ -3,11 +3,12 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { forkJoin, of } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, map } from 'rxjs/operators';
 import { ApproveContentDto } from '../../../../models/event.model';
 import {
   CreateObjectDto,
+  ObjectDto,
   ObjectService,
   ObjectTypeOption,
   UpdateObjectDto
@@ -120,7 +121,7 @@ export class ObjectCreateComponent implements OnInit {
     });
 
     if (this.isEditMode && this.objectId) {
-      this.loadObject(this.objectId);
+      this.loadObjectForEdit(this.objectId);
     }
   }
 
@@ -392,64 +393,140 @@ export class ObjectCreateComponent implements OnInit {
   private loadOptions(): void {
     this.isLoadingOptions = true;
 
+    this.fetchOptionLists().pipe(
+      finalize(() => {
+        this.isLoadingOptions = false;
+      })
+    ).subscribe({
+      next: ({ objectTypes, destinations, localities }) => {
+        this.objectTypes = objectTypes;
+        this.destinations = destinations;
+        this.localities = localities;
+        this.applyLocationFromSelection();
+      }
+    });
+  }
+
+  /**
+   * Loads dropdown options and the object together so selects always have matching options
+   * before patchValue (avoids blank selects when options arrive after the object payload).
+   */
+  private loadObjectForEdit(id: number): void {
+    this.isLoadingObject = true;
+    this.isLoadingOptions = true;
+    this.errorMessage = '';
+
     forkJoin({
+      lists: this.fetchOptionLists(),
+      objectItem: this.objectService.getById(id)
+    }).pipe(
+      finalize(() => {
+        this.isLoadingObject = false;
+        this.isLoadingOptions = false;
+      })
+    ).subscribe({
+      next: ({ lists, objectItem }) => {
+        this.objectTypes = lists.objectTypes;
+        this.destinations = lists.destinations;
+        this.localities = lists.localities;
+        this.mergeOptionsFromLoadedObject(objectItem);
+        this.applyFormFromObject(objectItem);
+      },
+      error: (error) => {
+        this.errorMessage = error?.error?.message ?? 'Failed to load object details.';
+      }
+    });
+  }
+
+  private fetchOptionLists(): Observable<{
+    objectTypes: ObjectTypeOption[];
+    destinations: DestinationDto[];
+    localities: LocalityOption[];
+  }> {
+    return forkJoin({
       objectTypes: this.objectService.getObjectTypeOptions().pipe(catchError(() => of([]))),
-      destinations: this.destinationService.getAll({
-        page: 1,
-        pageSize: 300,
-        sortBy: 'name',
-        sortOrder: 'asc'
-      }).pipe(
+      destinations: this.destinationService.getAll(
+        {
+          page: 1,
+          pageSize: 300,
+          sortBy: 'name',
+          sortOrder: 'asc'
+        },
+        { bypassRegion: true }
+      ).pipe(
         map((response: DestinationDto[] | { items?: DestinationDto[] }) => {
           return Array.isArray(response) ? response : (response.items ?? []);
         }),
         catchError(() => of([]))
       ),
       localities: this.activitiesService.getLocalityOptions().pipe(catchError(() => of([])))
-    }).pipe(
-      finalize(() => {
-        this.isLoadingOptions = false;
-      })
-    ).subscribe(({ objectTypes, destinations, localities }) => {
-      this.objectTypes = objectTypes;
-      this.destinations = destinations;
-      this.localities = localities;
-      this.applyLocationFromSelection();
     });
   }
 
-  private loadObject(id: number): void {
-    this.isLoadingObject = true;
-    this.errorMessage = '';
+  /** Ensures current IDs always appear in selects (region filter, pagination, or type derivation gaps). */
+  private mergeOptionsFromLoadedObject(o: ObjectDto): void {
+    const typeId = this.normalizeOptionalId(o.objectTypeId);
+    if (typeId != null && !this.objectTypes.some((t) => t.id === typeId)) {
+      this.objectTypes = [
+        ...this.objectTypes,
+        { id: typeId, name: o.objectTypeName?.trim() || `Type #${typeId}` }
+      ].sort((a, b) => a.name.localeCompare(b.name));
+    }
 
-    this.objectService.getById(id).pipe(
-      finalize(() => {
-        this.isLoadingObject = false;
-      })
-    ).subscribe({
-      next: (objectItem) => {
-        this.form.patchValue({
-          name: objectItem.name ?? '',
-          address: objectItem.address ?? '',
-          description: objectItem.description ?? '',
-          objectTypeId: objectItem.objectTypeId ?? null,
-          destinationId: objectItem.destinationId ?? null,
-          localityId: objectItem.localityId ?? null,
-          price: objectItem.price ?? null,
-          latitude: objectItem.latitude ?? null,
-          longitude: objectItem.longitude ?? null,
-          imageUrl: objectItem.mainImageUrl ?? '',
-          amenitiesInput: (objectItem.amenities ?? []).join(', ')
-        }, { emitEvent: false });
+    const destId = this.normalizeOptionalId(o.destinationId);
+    if (destId != null && !this.destinations.some((d) => d.id === destId)) {
+      const synthetic: DestinationDto = {
+        id: destId,
+        name: o.destinationName?.trim() || `Destination #${destId}`,
+        isActive: true,
+        destinationTypeId: 0,
+        destinationTypeName: ''
+      };
+      this.destinations = [...this.destinations, synthetic].sort((a, b) => a.name.localeCompare(b.name));
+    }
 
-        this.patchWorkingHours(objectItem.workingHours);
-        this.reviewObjectStatus = (objectItem.status ?? '').trim();
-        this.applyManagerReadOnlyState();
+    const locId = this.normalizeOptionalId(o.localityId);
+    if (locId != null && !this.localities.some((l) => l.id === locId)) {
+      const synthetic: LocalityOption = {
+        id: locId,
+        name: o.localityName?.trim() || `Locality #${locId}`,
+        destinationId: this.normalizeOptionalId(o.destinationId) ?? 0,
+        destinationName: o.destinationName?.trim() || ''
+      };
+      this.localities = [...this.localities, synthetic].sort((a, b) => a.name.localeCompare(b.name));
+    }
+  }
+
+  private applyFormFromObject(objectItem: ObjectDto): void {
+    this.form.patchValue(
+      {
+        name: objectItem.name ?? '',
+        address: objectItem.address ?? '',
+        description: objectItem.description ?? '',
+        objectTypeId: this.normalizeOptionalId(objectItem.objectTypeId),
+        destinationId: this.normalizeOptionalId(objectItem.destinationId),
+        localityId: this.normalizeOptionalId(objectItem.localityId),
+        price: objectItem.price ?? null,
+        latitude: objectItem.latitude ?? null,
+        longitude: objectItem.longitude ?? null,
+        imageUrl: objectItem.mainImageUrl ?? '',
+        amenitiesInput: (objectItem.amenities ?? []).join(', ')
       },
-      error: (error) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to load object details.';
-      }
-    });
+      { emitEvent: false }
+    );
+
+    this.patchWorkingHours(objectItem.workingHours);
+    this.reviewObjectStatus = (objectItem.status ?? '').trim();
+    this.applyLocationFromSelection();
+    this.applyManagerReadOnlyState();
+  }
+
+  private normalizeOptionalId(value: unknown): number | null {
+    if (value == null || value === '') {
+      return null;
+    }
+    const n = Number(value);
+    return Number.isFinite(n) ? n : null;
   }
 
   private applyLocationFromSelection(): void {
