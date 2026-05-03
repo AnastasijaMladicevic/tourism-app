@@ -10,11 +10,13 @@ import {
   ViewChild,
   inject
 } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import * as L from 'leaflet';
 import { ActivitiesService, ActivityDto, ActivityImageDto, ApproveActivityDto } from '../../../../services/activities';
+import { environment } from '../../../../../environment/environment';
 
 @Component({
   selector: 'app-manager-activity-review',
@@ -30,6 +32,7 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly ngZone = inject(NgZone);
+  private readonly http = inject(HttpClient);
 
   @ViewChild('activityMap') private activityMap?: ElementRef<HTMLDivElement>;
 
@@ -67,7 +70,7 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
     createdAt: [''],
     updatedAt: [''],
     approvedAt: [''],
-    approvedByUserId: [''],
+    approvedByName: [''],
     rejectionReason: [''],
     mainImageUrl: [''],
     latitude: [''],
@@ -136,6 +139,7 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
         this.patchForm(activity);
         this.form.disable({ emitEvent: false });
         this.rejectionReason = activity.rejectionReason?.trim() ?? '';
+        this.resolveApproverName(activity);
         this.cdr.detectChanges();
         this.syncMapFromActivity();
         this.loadActivityImages(activity.id, activity.mainImageUrl);
@@ -185,7 +189,7 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
       createdAt: this.formatDateTime(activity.createdAt),
       updatedAt: this.formatDateTime(activity.updatedAt),
       approvedAt: this.formatDateTime(activity.approvedAt),
-      approvedByUserId: approverFullName || '—',
+      approvedByName: approverFullName || '',
       rejectionReason: activity.rejectionReason?.trim() ?? 'No rejection reason recorded.',
       mainImageUrl: activity.mainImageUrl ?? this.selectedImageUrl,
       latitude: activity.latitude != null ? String(activity.latitude) : '',
@@ -197,6 +201,34 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
     this.form.patchValue({
       mainImageUrl: this.imagePreviewUrl
     }, { emitEvent: false });
+  }
+
+  private resolveApproverName(activity: ActivityDto): void {
+    const directName = activity.approvedByFullName?.trim();
+    if (directName) {
+      this.form.patchValue({ approvedByName: directName }, { emitEvent: false });
+      return;
+    }
+
+    const approverId = activity.approvedByUserId;
+    if (!approverId) {
+      return;
+    }
+
+    this.http
+      .get<{ firstName?: string; lastName?: string }>(`${environment.apiUrl}/users/${approverId}`)
+      .pipe(catchError(() => of(null)))
+      .subscribe((user) => {
+        const first = user?.firstName?.trim() ?? '';
+        const last = user?.lastName?.trim() ?? '';
+        const fullName = `${first} ${last}`.trim();
+        if (!fullName) {
+          return;
+        }
+
+        this.form.patchValue({ approvedByName: fullName }, { emitEvent: false });
+        this.cdr.detectChanges();
+      });
   }
 
   approveActivity(): void {
