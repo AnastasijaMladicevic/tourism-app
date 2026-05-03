@@ -35,8 +35,8 @@ export class ContentCreatorObjectsComponent implements OnInit {
   statusFilter = 'all';
   typeFilter = 'all';
   ratingFilter = 'all';
-  sortBy = 'name';
-  sortOrder: 'asc' | 'desc' = 'asc';
+  sortBy = 'status';
+  sortOrder: 'asc' | 'desc' = 'desc';
   filterPanelOpen = false;
 
   currentPage = 1;
@@ -141,8 +141,8 @@ export class ContentCreatorObjectsComponent implements OnInit {
     this.statusFilter = 'all';
     this.typeFilter = 'all';
     this.ratingFilter = 'all';
-    this.sortBy = 'name';
-    this.sortOrder = 'asc';
+    this.sortBy = 'status';
+    this.sortOrder = 'desc';
     this.currentPage = 1;
     this.loadObjects();
   }

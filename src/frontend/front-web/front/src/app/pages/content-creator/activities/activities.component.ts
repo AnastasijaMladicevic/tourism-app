@@ -35,8 +35,8 @@ export class ContentCreatorActivitiesComponent implements OnInit {
   statusFilter = 'all';
   typeFilter = 'all';
   destinationFilter = 'all';
-  sortBy = 'name';
-  sortOrder: 'asc' | 'desc' = 'asc';
+  sortBy = 'status';
+  sortOrder: 'asc' | 'desc' = 'desc';
   filterPanelOpen = false;
 
   readonly statusOptions = [
@@ -77,7 +77,7 @@ export class ContentCreatorActivitiesComponent implements OnInit {
       endDate: this.rangeEndDate || undefined
     }).subscribe({
       next: (response) => {
-        this.activities = response.items ?? [];
+        this.activities = this.sortActivitiesLocally(response.items ?? []);
         this.totalCount = response.totalCount ?? 0;
         this.currentPage = response.page ?? this.currentPage;
         this.pageSize = response.pageSize ?? this.pageSize;
@@ -104,6 +104,33 @@ export class ContentCreatorActivitiesComponent implements OnInit {
         this.selectedActivityDetails = null;
         this.isLoading = false;
       }
+    });
+  }
+
+  private sortActivitiesLocally(items: ActivityDto[]): ActivityDto[] {
+    const direction = this.sortOrder === 'desc' ? -1 : 1;
+    const normalizedSortBy = (this.sortBy ?? '').trim().toLowerCase();
+
+    return [...items].sort((a, b) => {
+      let result = 0;
+
+      if (normalizedSortBy === 'status') {
+        result = (a.status ?? '').localeCompare(b.status ?? '', undefined, { sensitivity: 'base' });
+      } else if (normalizedSortBy === 'name') {
+        result = (a.name ?? '').localeCompare(b.name ?? '', undefined, { sensitivity: 'base' });
+      } else if (normalizedSortBy === 'activitytypename') {
+        result = (a.activityTypeName ?? '').localeCompare(b.activityTypeName ?? '', undefined, { sensitivity: 'base' });
+      } else if (normalizedSortBy === 'durationminutes') {
+        result = (a.durationMinutes ?? 0) - (b.durationMinutes ?? 0);
+      } else if (normalizedSortBy === 'createdat') {
+        result = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      }
+
+      if (result !== 0) {
+        return result * direction;
+      }
+
+      return a.id - b.id;
     });
   }
 
@@ -149,8 +176,8 @@ export class ContentCreatorActivitiesComponent implements OnInit {
     this.statusFilter = 'all';
     this.typeFilter = 'all';
     this.destinationFilter = 'all';
-    this.sortBy = 'name';
-    this.sortOrder = 'asc';
+    this.sortBy = 'status';
+    this.sortOrder = 'desc';
     this.currentPage = 1;
     this.loadActivities();
   }

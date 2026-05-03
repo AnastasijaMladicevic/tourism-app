@@ -47,8 +47,8 @@ export class ManagerEventsComponent implements OnInit {
   draftSearchQuery = '';
   statusFilter = 'all';
   categoryFilter = 'all';
-  sortBy = 'startDate';
-  sortOrder: 'asc' | 'desc' = 'asc';
+  sortBy = 'status';
+  sortOrder: 'asc' | 'desc' = 'desc';
   pageSize = 5;
   readonly pageSizeOptions = [5, 10, 20, 50];
   filterPanelOpen = false;
@@ -146,8 +146,8 @@ export class ManagerEventsComponent implements OnInit {
     this.draftSearchQuery = '';
     this.statusFilter = 'all';
     this.categoryFilter = 'all';
-    this.sortBy = 'startDate';
-    this.sortOrder = 'asc';
+    this.sortBy = 'status';
+    this.sortOrder = 'desc';
     this.pageSize = 5;
     this.currentPage = 1;
     this.loadEvents();

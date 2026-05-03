@@ -39,8 +39,8 @@ export class ManagerActivitiesComponent implements OnInit {
   draftSearchQuery = '';
   statusFilter = 'all';
   typeFilter = 'all';
-  sortBy = 'name';
-  sortOrder: 'asc' | 'desc' = 'asc';
+  sortBy = 'status';
+  sortOrder: 'asc' | 'desc' = 'desc';
   filterPanelOpen = false;
 
   activityTypeOptions: ActivityTypeOption[] = [];
@@ -57,6 +57,7 @@ export class ManagerActivitiesComponent implements OnInit {
     { value: 'name', label: 'Name' },
     { value: 'price', label: 'Price' },
     { value: 'durationMinutes', label: 'Duration' },
+    { value: 'status', label: 'Status' },
     { value: 'createdAt', label: 'Created date' }
   ];
 
@@ -133,6 +134,8 @@ export class ManagerActivitiesComponent implements OnInit {
             }
           }
 
+          items = this.sortActivitiesLocally(items);
+
           this.activities = items;
           this.totalCount = response.totalCount ?? items.length;
           this.currentPage = response.page ?? this.currentPage;
@@ -165,6 +168,33 @@ export class ManagerActivitiesComponent implements OnInit {
       });
   }
 
+  private sortActivitiesLocally(items: ActivityDto[]): ActivityDto[] {
+    const direction = this.sortOrder === 'desc' ? -1 : 1;
+    const normalizedSortBy = (this.sortBy ?? '').trim().toLowerCase();
+
+    return [...items].sort((a, b) => {
+      let result = 0;
+
+      if (normalizedSortBy === 'status') {
+        result = (a.status ?? '').localeCompare(b.status ?? '', undefined, { sensitivity: 'base' });
+      } else if (normalizedSortBy === 'name') {
+        result = (a.name ?? '').localeCompare(b.name ?? '', undefined, { sensitivity: 'base' });
+      } else if (normalizedSortBy === 'price') {
+        result = (a.price ?? 0) - (b.price ?? 0);
+      } else if (normalizedSortBy === 'durationminutes') {
+        result = (a.durationMinutes ?? 0) - (b.durationMinutes ?? 0);
+      } else if (normalizedSortBy === 'createdat') {
+        result = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      }
+
+      if (result !== 0) {
+        return result * direction;
+      }
+
+      return a.id - b.id;
+    });
+  }
+
   onSearch(): void {
     // Search is applied explicitly on Enter or via the filter panel's Apply button.
   }
@@ -189,8 +219,8 @@ export class ManagerActivitiesComponent implements OnInit {
     this.draftSearchQuery = '';
     this.statusFilter = 'all';
     this.typeFilter = 'all';
-    this.sortBy = 'name';
-    this.sortOrder = 'asc';
+    this.sortBy = 'status';
+    this.sortOrder = 'desc';
     this.currentPage = 1;
     this.loadActivities();
   }
