@@ -121,6 +121,10 @@ interface AddImageDto {
 
 interface PagedResponse<T> {
   items?: T[];
+  page?: number;
+  pageSize?: number;
+  totalCount?: number;
+  totalPages?: number;
 }
 
 @Injectable({
@@ -157,7 +161,23 @@ export class ActivitiesService {
   }
 
   getImages(id: number): Observable<ActivityImageDto[]> {
-    return this.http.get<ActivityImageDto[]>(`${this.apiUrl}/${id}/images`);
+    const params = new HttpParams()
+      .set('page', '1')
+      .set('pageSize', '200');
+
+    return this.http
+      .get<ActivityImageDto[] | PagedResponse<ActivityImageDto>>(`${this.apiUrl}/${id}/images`, { params })
+      .pipe(
+        map((response) => {
+          const items = this.extractItems(response);
+          return items
+            .map((image) => ({
+              ...image,
+              url: image.url?.trim() ?? ''
+            }))
+            .filter((image) => !!image.url);
+        })
+      );
   }
 
   update(id: number, dto: UpdateActivityDto): Observable<ActivityDto> {
@@ -179,7 +199,15 @@ export class ActivitiesService {
     return this.http.post<ActivityDto>(`${this.apiUrl}/${id}/approve`, dto);
   }
 
-  attachImages(activityId: number, imageUrls: string[]): Observable<unknown[]> {
+  /**
+   * Posts image URLs one-by-one (backend rule: first image must be main only when the entity has none).
+   * @param treatAsAppend When true, every image is added with isMain false (use after load when the activity already has a main row).
+   */
+  attachImages(
+    activityId: number,
+    imageUrls: string[],
+    options?: { treatAsAppend?: boolean }
+  ): Observable<unknown[]> {
     const cleanUrls = imageUrls
       .map((url) => url.trim())
       .filter((url) => url.length > 0);
@@ -188,14 +216,19 @@ export class ActivitiesService {
       return of([]);
     }
 
+    const treatAsAppend = options?.treatAsAppend === true;
+
     // Backend rejects subsequent images while the activity has zero stored images
     // (the first image must be marked main). Send them sequentially so each request
     // observes the previously-saved row.
+    //
+    // If the activity already has a main image, posting with isMain true fails with 400
+    // ("Entity already has a main image") — use treatAsAppend for edit-mode additions.
     return from(cleanUrls).pipe(
       concatMap((url, index) => {
         const payload: AddImageDto = {
           url,
-          isMain: index === 0
+          isMain: treatAsAppend ? false : index === 0
         };
 
         return this.http.post(`${this.apiUrl}/${activityId}/images`, payload);

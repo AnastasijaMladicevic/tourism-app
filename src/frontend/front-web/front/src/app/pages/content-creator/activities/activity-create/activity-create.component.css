@@ -188,6 +188,22 @@ select:focus {
   white-space: nowrap;
 }
 
+.inline-input .prefix {
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  background: #f1f5f9;
+  border-right: 1px solid #e5e7eb;
+}
+
+.inline-input .suffix {
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  background: #f1f5f9;
+  border-left: 1px solid #e5e7eb;
+}
+
 .toggle-field {
   grid-column: span 1;
 }

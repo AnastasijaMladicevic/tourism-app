@@ -13,6 +13,12 @@
   --color-primary-light:  #eff6ff;
   --color-primary-border: #bfdbfe;
 
+  /* Slightly lighter blue for “Apply filters” (distinct from main primary CTAs) */
+  --color-filter-apply-from: #3b82f6;
+  --color-filter-apply-to:   #2563eb;
+  --color-filter-apply-hover-from: #2563eb;
+  --color-filter-apply-hover-to:   #1d4ed8;
+
   --color-danger:         #e53e3e;
   --color-danger-hover:   #c53030;
   --color-danger-light:   #fff5f5;
@@ -128,6 +134,36 @@ a:hover {
 button {
   font-family: var(--font-base);
   cursor: pointer;
+}
+
+/* Filter panels — Apply Filters (primary-btn + filter-btn, not Reset with .secondary) */
+button.primary-btn.filter-btn:not(.secondary) {
+  background: linear-gradient(
+    135deg,
+    var(--color-filter-apply-from),
+    var(--color-filter-apply-to)
+  );
+  color: #fff;
+  border: 0;
+  box-shadow: 0 10px 22px rgba(59, 130, 246, 0.26);
+}
+
+button.primary-btn.filter-btn:not(.secondary):hover:not(:disabled) {
+  background: linear-gradient(
+    135deg,
+    var(--color-filter-apply-hover-from),
+    var(--color-filter-apply-hover-to)
+  );
+}
+
+button.primary-btn.filter-btn:not(.secondary):focus-visible {
+  outline: 2px solid var(--color-filter-apply-from);
+  outline-offset: 2px;
+}
+
+button.primary-btn.filter-btn:not(.secondary):disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 input, textarea, select {
