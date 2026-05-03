@@ -18,6 +18,8 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { environment } from '../../../environment/environment';
 import { EventPlannerService } from '../../services/event-planner';
 import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
+import { PendingActionService } from '../../services/pending-action';
+import { RouterHistoryService } from '../../services/router-history';
 
 @Component({
   selector: 'app-event-detail',
@@ -54,6 +56,8 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     private plannerLocalPreferences: PlannerLocalPreferencesService,
     private cdr: ChangeDetectorRef,
     private translationService: TranslationService,
+    private pendingActionService: PendingActionService,
+    private routerHistory: RouterHistoryService
   ) { }
 
   ngOnInit(): void {
@@ -81,6 +85,13 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     });
 
     window.addEventListener('focus', this.handleWindowFocus);
+    window.addEventListener('add-to-planner', (event: any) => {
+      const obj = event.detail;
+      if (obj) {
+        this.addToPlanner();
+      }
+    });
+    this.cdr.detectChanges();
   }
 
   ngOnDestroy(): void {
@@ -299,12 +310,20 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.router.navigate(['/events']);
+    this.routerHistory.goBack();
   }
 
   addToPlanner(): void {
     if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
+      this.pendingActionService.setAction({
+        type: 'add-to-planner',
+        payload: this.event
+      });
+
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url }
+      });
+
       return;
     }
 

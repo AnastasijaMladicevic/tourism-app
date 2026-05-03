@@ -7,11 +7,13 @@ import {
   ValidationErrors,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LogoComponent } from '../../shared/components/logo/logo';
 import { AuthService } from '../../services/auth';
 import { ChangeDetectorRef } from '@angular/core';
+import { PendingActionService } from '../../services/pending-action';
+import { RouterHistoryService } from '../../services/router-history';
 
 @Component({
   selector: 'app-login',
@@ -25,13 +27,17 @@ export class LoginComponent {
   hidePassword = true;
   isLoading = false;
   errorMessage = '';
-
+  returnUrl = '/home';
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute,
+    private pendingActionService: PendingActionService,
+    private routerHistory: RouterHistoryService
   ) {
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: [
@@ -57,7 +63,7 @@ export class LoginComponent {
   get password() {
     return this.form.get('password');
   }
-  get rememberMe(){
+  get rememberMe() {
     return this.form.get('rememberMe');
   }
   togglePassword(): void {
@@ -91,14 +97,35 @@ export class LoginComponent {
         next: () => {
           this.isLoading = false;
           this.cdr.detectChanges();
-          if (this.authService.isAdmin()) {
-            this.errorMessage = 'Admin access is not available here.';
-            this.authService.logout().subscribe();
+          const role = this.authService.getAuthenticatedRole();
+
+          if (role !== 'tourist') {
+            this.errorMessage = 'Only tourists can log in here.';
+
+            this.authService.logout().subscribe({
+              complete: () => {
+                this.cdr.detectChanges();
+              }
+            });
             this.cdr.detectChanges();
             return;
           }
-          
-          this.router.navigate(['/home']);
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
+
+          const pending = this.pendingActionService.consumeAction();
+
+          if (pending) {
+            this.router.navigateByUrl(returnUrl).then(() => {
+              setTimeout(() => {
+                this.executePendingAction(pending);
+              }, 100);
+              window.location.reload();
+            });
+            return;
+          }
+          this.router.navigateByUrl(returnUrl).then(() => {
+            window.location.reload();
+          });
         },
         error: (err) => {
           this.isLoading = false;
@@ -107,9 +134,23 @@ export class LoginComponent {
         },
       });
   }
+  private executePendingAction(action: any): void {
+    switch (action.type) {
+      case 'favorite-object':
+        window.dispatchEvent(
+          new CustomEvent('favorite-object', { detail: action.payload })
+        );
+        break;
 
-  goHome(): void {
-    this.router.navigate(['/home']);
+      case 'add-to-planner':
+        window.dispatchEvent(
+          new CustomEvent('add-to-planner', { detail: action.payload })
+        );
+        break;
+    }
+  }
+  goBack(): void {
+    this.routerHistory.goBack();
   }
   goRegister(): void {
     this.router.navigate(['/register']);

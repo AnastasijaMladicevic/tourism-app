@@ -18,6 +18,7 @@ import { RecommendationItemDto, RecommendationService } from '../../services/rec
 import { LocationTrackingService } from '../../services/location-tracking';
 import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
 import { EventPlannerService } from '../../services/event-planner';
+import { PendingActionService } from '../../services/pending-action';
 
 interface PlaceCard {
   title: string;
@@ -136,7 +137,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     private recommendationService: RecommendationService,
     private locationTrackingService: LocationTrackingService,
     private plannerService: PlannerLocalPreferencesService,
-    private eventPlannerService: EventPlannerService
+    private eventPlannerService: EventPlannerService,
+    private pendingActionService: PendingActionService
   ) { }
 
   private applyPlannerState(list: EventCard[]): void {
@@ -189,7 +191,15 @@ export class HomeComponent implements OnInit, OnDestroy {
     e?.stopPropagation();
 
     if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
+      this.pendingActionService.setAction({
+        type: 'add-to-planner',
+        payload: eventItem
+      });
+
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url }
+      });
+
       return;
     }
 
@@ -379,6 +389,19 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.loadRecommendedCards();
     this.loadEventCards();
     this.loadFavorites();
+    window.addEventListener('favorite-object', (event: any) => {
+      const obj = event.detail;
+      if (obj) {
+        this.toggleFavorite(obj, new Event('click'));
+      }
+    });
+    window.addEventListener('add-to-planner', (event: any) => {
+      const obj = event.detail;
+      if (obj) {
+        this.togglePlanner(obj, new Event('click'));
+      }
+    });
+    this.cdr.detectChanges();
   }
 
   private updateDistances(): void {
@@ -1284,8 +1307,16 @@ export class HomeComponent implements OnInit, OnDestroy {
   toggleFavorite(card: PlaceCard, event: Event): void {
     event.stopPropagation();
 
-    if (!this.isLoggedIn) {
-      this.router.navigate(['/login']);
+    if (!this.authService.isLoggedIn()) {
+      this.pendingActionService.setAction({
+        type: 'favorite-object',
+        payload: card
+      });
+
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url }
+      });
+
       return;
     }
 

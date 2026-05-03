@@ -140,7 +140,9 @@ export class ProfileComponent implements OnInit {
           localStorage.removeItem('token');
           localStorage.removeItem('refreshToken');
           localStorage.removeItem('user');
-          this.router.navigate(['/login']);
+          this.router.navigate(['/home']).then(() => {
+            window.location.reload();
+          });
         });
       return;
     }

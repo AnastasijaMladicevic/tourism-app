@@ -6,6 +6,7 @@ import { catchError, finalize, of } from 'rxjs';
 import { EventPlannerDto, EventPlannerService } from '../../services/event-planner';
 import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
 import { TranslationService } from '../../services/translation.service';
+import { RouterHistoryService } from '../../services/router-history';
 
 interface PlannerCalendarDay {
   id: string;
@@ -48,7 +49,7 @@ export class AddToPlannerComponent implements OnInit {
   private readonly plannerService = inject(EventPlannerService);
   private readonly plannerLocalPreferences = inject(PlannerLocalPreferencesService);
   private readonly translationService = inject(TranslationService);
-
+  private readonly routerHistory = inject(RouterHistoryService);
   protected readonly selectedDayId = signal('');
   protected readonly travelDate = signal('');
   protected readonly startTime = signal('19:00');
@@ -143,7 +144,7 @@ export class AddToPlannerComponent implements OnInit {
   }
 
   protected goBack(): void {
-    this.router.navigate(['/planner']);
+    this.routerHistory.goBack();
   }
 
   protected translate(key: string, params?: Record<string, string | number>): string {

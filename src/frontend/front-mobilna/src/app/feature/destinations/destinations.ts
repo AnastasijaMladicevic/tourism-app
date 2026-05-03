@@ -16,6 +16,7 @@ import { DestinationDto, DestinationService } from '../../services/destination';
 import { AuthService } from '../../services/auth';
 import { FavoriteStateService } from '../../services/favorite-state';
 import { ImageService } from '../../services/image';
+import { PendingActionService } from '../../services/pending-action';
 
 export interface DestinationView extends DestinationDto {
   distanceMeters?: number;
@@ -60,7 +61,8 @@ export class DestinationsComponent implements OnInit {
     private favoriteStateService: FavoriteStateService,
     private cdr: ChangeDetectorRef,
     private imageService: ImageService,
-    private locationTrackingService: LocationTrackingService
+    private locationTrackingService: LocationTrackingService,
+    private pendingActionService: PendingActionService
   ) { }
 
   ngOnInit(): void {
@@ -89,6 +91,13 @@ export class DestinationsComponent implements OnInit {
       this.cdr.detectChanges();
     });
     void this.loadData();
+    window.addEventListener('favorite-object', (event: any) => {
+      const obj = event.detail;
+      if (obj) {
+        this.toggleFavorite(obj, new Event('click'));
+      }
+    });
+    this.cdr.detectChanges();
   }
 
   async loadData(): Promise<void> {
@@ -274,7 +283,15 @@ export class DestinationsComponent implements OnInit {
     event.preventDefault();
     event.stopPropagation();
     if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
+      this.pendingActionService.setAction({
+        type: 'favorite-object',
+        payload: destination
+      });
+
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url }
+      });
+
       return;
     }
 

@@ -3,20 +3,23 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Subscription, catchError, forkJoin, of } from 'rxjs';
+import { Subscription, catchError, finalize, forkJoin, of } from 'rxjs';
 
 import { AuthService } from '../../services/auth';
 import { ImageDto, ImageService } from '../../services/image';
 import { ObjectDto, ObjectImageDto, ObjectService, PagedResultDto } from '../../services/object';
-import { ReviewDto } from '../../services/review';
+import { ReviewDto, ReviewService } from '../../services/review';
 import { MapComponent } from '../../shared/components/map/map';
 import { environment } from '../../../environment/environment';
 import { FavoriteStateService } from '../../services/favorite-state';
+import { FormsModule } from '@angular/forms';
+import { RouterHistoryService } from '../../services/router-history';
+import { PendingActionService } from '../../services/pending-action';
 
 @Component({
   selector: 'app-restaurant-detail',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, MapComponent],
+  imports: [CommonModule, MatIconModule, MatButtonModule, MapComponent, FormsModule],
   templateUrl: './object-detail.html',
   styleUrls: ['./object-detail.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -36,11 +39,19 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
   showAllReviewsModal = false;
   isFavorite = false;
   favoriteId: number | null = null;
+  showWriteReviewModal = false;
+  newReview = {
+    rating: 0,
+    text: '',
+    images: [] as File[]
+  };
+  isSubmittingReview = false;
+  userReview: ReviewDto | null = null;
   private favoritePendingIds = new Set<number>();
   private touchStartX = 0;
   private touchEndX = 0;
   private readonly subscriptions = new Subscription();
-
+  private pendingOpenReviewId: number | null = null;
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -49,22 +60,40 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private favoriteStateService: FavoriteStateService,
+    private reviewService: ReviewService,
+    private routerHistory: RouterHistoryService,
+    private pendingActionService: PendingActionService
   ) { }
 
   ngOnInit(): void {
     this.subscriptions.add(
       this.route.paramMap.subscribe((params) => {
         const id = Number(params.get('id'));
-        if (!id) {
-          this.isLoading = false;
-          this.errorMessage = 'Greska pri ucitavanju objekta.';
-          this.cdr.detectChanges();
-          return;
+        if (id) this.loadObject(id);
+      })
+    );
+
+    // Obrada dolaska sa My Reviews (edit mode)
+    this.subscriptions.add(
+      this.route.queryParams.subscribe((params) => {
+        const reviewId = Number(params['reviewId']);
+        const mode = params['mode'];
+
+        if (reviewId && mode === 'edit-review') {
+          this.pendingOpenReviewId = reviewId;
+          // Sačekaj da se objekat i recenzije učitaju
+          this.tryOpenPendingReview();
         }
-        this.loadObject(id);
-      }),
+      })
     );
     window.addEventListener('focus', this.handleWindowFocus);
+    window.addEventListener('favorite-object', (event: any) => {
+      const obj = event.detail;
+      if (obj) {
+        this.toggleFavorite(obj, new Event('click'));
+      }
+    });
+    this.cdr.detectChanges();
   }
 
   ngOnDestroy(): void {
@@ -93,6 +122,10 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
         this.object = normalizedObject;
         this.images = normalizedImages;
         this.reviews = normalizedObject.reviews || [];
+        const currentUserId = this.authService.getCurrentUser()?.id;
+
+        this.userReview =
+          this.reviews.find(r => r.userId === currentUserId) ?? null;
         this.mainImage =
           this.getMainImage(normalizedImages) ||
           this.resolveMediaUrl(normalizedObject.mainImageUrl) ||
@@ -100,6 +133,11 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
         this.syncFavoriteState();
         this.cdr.detectChanges();
         this.loadNearbyObjects(normalizedObject);
+        const review = this.reviews.find(r => r.id === this.pendingOpenReviewId);
+
+        if (this.pendingOpenReviewId) {
+          setTimeout(() => this.tryOpenPendingReview(), 300);
+        }
       },
       error: (err) => {
         console.error(err);
@@ -109,7 +147,29 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
       },
     });
   }
+  private tryOpenPendingReview(): void {
+    if (!this.pendingOpenReviewId || !this.reviews.length) return;
 
+    const review = this.reviews.find(r => r.id === this.pendingOpenReviewId);
+    if (review) {
+      this.openWriteReviewFromExisting(review);
+      this.pendingOpenReviewId = null;
+    } else {
+      // Ako još nije učitano - pokušaj ponovo za 600ms
+      setTimeout(() => this.tryOpenPendingReview(), 600);
+    }
+  }
+  private openWriteReviewFromExisting(review: ReviewDto): void {
+    this.newReview = {
+      rating: review.rating,
+      text: review.text || '',
+      images: []
+    };
+
+    this.showWriteReviewModal = true;
+    document.body.style.overflow = 'hidden';
+    this.cdr.detectChanges();
+  }
   private loadNearbyObjects(currentObject: ObjectDto): void {
     if (currentObject.latitude == null || currentObject.longitude == null) {
       this.nearbyObjects = [];
@@ -317,7 +377,15 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     event.stopPropagation();
 
     if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
+      this.pendingActionService.setAction({
+        type: 'favorite-object',
+        payload: object
+      });
+
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url }
+      });
+
       return;
     }
 
@@ -398,7 +466,7 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.router.navigate(['/objects']);
+    this.routerHistory.goBack();
   }
 
   private getType(): string {
@@ -507,15 +575,111 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     document.body.style.overflow = 'visible';
   }
 
-  openWriteReview(): void {
-    if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
-      return;
-    }
-    alert('Otvaram formu za novu recenziju (u izradi)');
-  }
-
   openNearbyObjects(objectId: number): void {
     this.router.navigate(['/object', objectId]);
+  }
+  openWriteReview(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url }
+      });
+      return;
+    }
+
+    if (this.userReview) {
+      this.newReview = {
+        rating: this.userReview.rating,
+        text: this.userReview.text,
+        images: []
+      };
+    } else {
+      this.resetNewReview();
+    }
+
+    // Forsirano otvaranje modala
+    setTimeout(() => {
+      this.showWriteReviewModal = true;
+      document.body.style.overflow = 'hidden';
+      this.cdr.detectChanges();
+    }, 50);
+  }
+
+  closeWriteReview(): void {
+    this.showWriteReviewModal = false;
+    document.body.style.overflow = 'visible';
+    this.resetNewReview();
+    this.isSubmittingReview = false;
+  }
+
+  private resetNewReview(): void {
+    this.newReview = { rating: 0, text: '', images: [] as File[] };
+  }
+
+  setReviewRating(stars: number): void {
+    this.newReview.rating = stars;
+  }
+
+  onReviewImagesSelected(event: any): void {
+    const files: FileList = event.target.files;
+    if (files?.length) {
+      const selected = Array.from(files).slice(0, 5);
+      this.newReview.images = [...this.newReview.images, ...selected].slice(0, 5);
+    }
+    event.target.value = '';
+  }
+
+  submitReview(): void {
+    if (this.newReview.rating === 0 || !this.newReview.text.trim() || !this.object?.id) {
+      alert('Molimo unesite ocenu (1-5) i komentar.');
+      return;
+    }
+
+    this.isSubmittingReview = true;
+
+    const payload = {
+      objectId: this.object.id,
+      rating: this.newReview.rating,
+      text: this.newReview.text.trim(),
+    };
+
+    const request$ = this.userReview
+      ? this.reviewService.update(this.userReview.id, payload)
+      : this.reviewService.create(payload);
+
+    request$.pipe(
+      finalize(() => {
+        this.isSubmittingReview = false;
+        this.cdr.detectChanges();
+      })
+    ).subscribe({
+      next: (newReview) => {
+        alert(this.userReview ? 'Recenzija uspešno ažurirana!' : 'Recenzija uspešno poslata!');
+
+        if (this.userReview) {
+          // UPDATE
+          this.reviews = this.reviews.map(r => r.id === newReview.id ? newReview : r);
+          this.userReview = newReview;
+        } else {
+          // CREATE
+          this.reviews = [newReview, ...this.reviews];
+          if (this.object) {
+            this.object.reviewCount = (this.object.reviewCount || 0) + 1;
+            if (this.object.averageRating !== undefined) {
+              const total = (this.object.averageRating * (this.reviews.length - 1)) + newReview.rating;
+              this.object.averageRating = Number((total / this.reviews.length).toFixed(1));
+            } else {
+              this.object.averageRating = newReview.rating;
+            }
+          }
+        }
+        this.userReview = newReview;
+        this.closeWriteReview();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Došlo je do greške. Molimo pokušajte ponovo.');
+      }
+    });
   }
 }

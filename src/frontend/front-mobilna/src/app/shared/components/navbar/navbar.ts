@@ -7,6 +7,7 @@ import { filter } from 'rxjs/operators';
 import { AuthService } from '../../../services/auth';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
+
 interface NavItem {
   labelKey: string;
   icon: string;
@@ -64,7 +65,10 @@ export class NavbarComponent {
   goTo(route: string): void {
     const protectedRoutes = ['/favorites', '/profile'];
     if (protectedRoutes.includes(route) && !this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: route }
+      });
+
       return;
     }
     this.router.navigate([route]);

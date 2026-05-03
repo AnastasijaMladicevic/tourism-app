@@ -13,6 +13,7 @@ import { LocationTrackingService } from '../../services/location-tracking';
 import { AuthService } from '../../services/auth';
 import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
 import { EventPlannerService } from '../../services/event-planner';
+import { PendingActionService } from '../../services/pending-action';
 
 type EventCategory = 'All' | string;
 
@@ -56,6 +57,7 @@ export class EventsComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly plannerService = inject(PlannerLocalPreferencesService);
   private readonly eventPlannerService = inject(EventPlannerService);
+  private readonly pendingActionService = inject(PendingActionService);
   activeFilter = 'All';
   activeCategory: EventCategory = 'All';
   isLoading = true;
@@ -101,13 +103,28 @@ export class EventsComponent implements OnInit {
       this.cdr.detectChanges();
     });
     this.loadEvents();
+    window.addEventListener('add-to-planner', (event: any) => {
+      const obj = event.detail;
+      if (obj) {
+        this.togglePlanner(obj, new Event('click'));
+      }
+    });
+    this.cdr.detectChanges();
   }
 
   togglePlanner(eventItem: EventCard, event?: Event): void {
     event?.stopPropagation();
 
     if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
+      this.pendingActionService.setAction({
+        type: 'add-to-planner',
+        payload: event
+      });
+
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url }
+      });
+
       return;
     }
 

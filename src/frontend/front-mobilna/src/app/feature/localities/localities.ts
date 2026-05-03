@@ -14,6 +14,7 @@ import { AuthService } from '../../services/auth';
 import { ImageDto, ImageService } from '../../services/image';
 import { LocationTrackingService } from '../../services/location-tracking';
 import { FavoriteStateService } from '../../services/favorite-state';
+import { PendingActionService } from '../../services/pending-action';
 
 export interface LocalityView extends LocalityDto {
   isFavorite: boolean;
@@ -56,7 +57,8 @@ export class LocalitiesComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private imageService: ImageService,
     private favoriteStateService: FavoriteStateService,
-    private locationTrackingService: LocationTrackingService
+    private locationTrackingService: LocationTrackingService,
+    private pendingActionService: PendingActionService
   ) { }
   ngOnInit(): void {
     this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
@@ -84,6 +86,13 @@ export class LocalitiesComponent implements OnInit {
       this.cdr.detectChanges();
     });
     void this.loadData();
+    window.addEventListener('favorite-object', (event: any) => {
+      const obj = event.detail;
+      if (obj) {
+        this.toggleFavorite(obj, new Event('click'));
+      }
+    });
+    this.cdr.detectChanges();
   }
   get filtered(): LocalityView[] {
     let list = [...this.localities];
@@ -196,7 +205,15 @@ export class LocalitiesComponent implements OnInit {
     event.preventDefault();
     event.stopPropagation();
     if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
+      this.pendingActionService.setAction({
+        type: 'favorite-object',
+        payload: locality
+      });
+
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url }
+      });
+
       return;
     }
 

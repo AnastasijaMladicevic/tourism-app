@@ -10,11 +10,13 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { catchError, firstValueFrom, of } from 'rxjs';
 
 import { ObjectDto, ObjectService, ObjectView } from '../../services/object';
 import { AuthService } from '../../services/auth';
 import { LocationTrackingService } from '../../services/location-tracking';
 import { FavoriteStateService } from '../../services/favorite-state';
+import { PendingActionService } from '../../services/pending-action';
 
 @Component({
   selector: 'app-objects',
@@ -38,13 +40,20 @@ export class ObjectsComponent implements OnInit {
   pageSize = 8;
   hasNextPage = false;
   totalCount = 0;
-
-  objectTypes: { id: number; name: string }[] = [];
+  pageSizeOptions = [8, 12, 16, 24, 32];
+  objectTypes = [
+    { id: 1, name: 'Hrana i pice' },
+    { id: 2, name: 'Pumpe' },
+    { id: 3, name: 'Smestaj' },
+    { id: 4, name: 'Soping' },
+    { id: 5, name: 'Bolnice' },
+  ];
   objects: ObjectView[] = [];
   visibleObjects: ObjectView[] = [];
   userLocation: { lat: number; lng: number } | null = null;
   isTracking = false;
   private readonly favoritePendingIds = new Set<number>();
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -53,30 +62,31 @@ export class ObjectsComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private locationTrackingService: LocationTrackingService,
     private favoriteStateService: FavoriteStateService,
+    private pendingActionService: PendingActionService
   ) { }
 
   ngOnInit(): void {
-    this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
+    this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
       this.isTracking = enabled;
 
       if (!enabled) {
         this.clearDistances();
       } else {
         this.updateDistances();
-        this.cdr.detectChanges();
       }
+
+      this.cdr.detectChanges();
     });
 
-    this.locationTrackingService.location$.subscribe(loc => {
-      this.userLocation = loc
-        ? { lat: loc.latitude, lng: loc.longitude }
-        : null;
+    this.locationTrackingService.location$.subscribe((loc) => {
+      this.userLocation = loc ? { lat: loc.latitude, lng: loc.longitude } : null;
 
       if (this.userLocation) {
         this.updateDistances();
       } else {
         this.clearDistances();
       }
+
       this.refreshVisibleObjects();
       this.cdr.detectChanges();
     });
@@ -90,37 +100,46 @@ export class ObjectsComponent implements OnInit {
       this.currentPage = 1;
 
       this.loadData();
+      window.addEventListener('favorite-object', (event: any) => {
+        const obj = event.detail;
+        if (obj) {
+          this.toggleFavorite(obj, new Event('click'));
+        }
+      });
     });
+  }
+
+  onPageSizeChange(size: number): void {
+    this.pageSize = size;
+    this.currentPage = 1;
+    this.refreshVisibleObjects();
   }
 
   loadData(): void {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // ISPRAVNO:
-    this.objectService.getAll({
-      type: this.activeFilter !== 'All' ? this.activeFilter : undefined,
-      page: this.currentPage,
-      pageSize: this.pageSize,
-    }).subscribe({
-      next: (response: unknown) => {
-        const data = this.toArray<ObjectDto>(response);
-        const pagedResponse = response as { totalCount?: number; items?: unknown[] };
+    const scopedType = this.hideTypeFilters && this.activeFilter !== 'All' ? this.activeFilter : undefined;
 
+    this.loadAllObjects(scopedType)
+      .then((data) => {
         this.objects = data.map((obj) => ({
           ...obj,
           isFavorite: false,
           favoriteId: undefined,
         }));
-        this.totalCount = pagedResponse.totalCount ?? data.length;
-        this.hasNextPage = this.currentPage * this.pageSize < this.totalCount;
-        this.objectTypes = this.extractUniqueTypes(this.objects);
+
+        return firstValueFrom(
+          this.favoriteStateService.loadFavorites(true).pipe(catchError(() => of(new Map<string, number>()))),
+        );
+      })
+      .then(() => {
         this.updateDistances();
-        this.visibleObjects = [...this.objects];
+        this.refreshVisibleObjects();
         this.isLoading = false;
         this.cdr.detectChanges();
-      },
-      error: (err) => {
+      })
+      .catch((err) => {
         console.error(err);
         this.objects = [];
         this.visibleObjects = [];
@@ -129,35 +148,39 @@ export class ObjectsComponent implements OnInit {
         this.isLoading = false;
         this.errorMessage = 'Failed to load objects.';
         this.cdr.detectChanges();
-      },
-    });
+      });
   }
-  private updateDistances(): void {
-    if (!this.userLocation) return;
 
-    this.objects = this.objects.map(a => {
-      if (a.latitude == null || a.longitude == null) {
-        return { ...a, distanceMeters: undefined };
+  private updateDistances(): void {
+    if (!this.userLocation) {
+      return;
+    }
+
+    this.objects = this.objects.map((item) => {
+      if (item.latitude == null || item.longitude == null) {
+        return { ...item, distanceMeters: undefined };
       }
 
       return {
-        ...a,
+        ...item,
         distanceMeters: this.getDistanceKm(
           this.userLocation!.lat,
           this.userLocation!.lng,
-          a.latitude,
-          a.longitude
-        )
+          item.latitude,
+          item.longitude,
+        ),
       };
     });
   }
+
   private clearDistances(): void {
-    this.objects = this.objects.map(a => ({
-      ...a,
-      distanceMeters: undefined
+    this.objects = this.objects.map((item) => ({
+      ...item,
+      distanceMeters: undefined,
     }));
   }
-  getDistanceText(item: any): string | null {
+
+  getDistanceText(item: ObjectView): string | null {
     if (!this.isTracking || !this.userLocation) return null;
     if (!item.latitude || !item.longitude) return null;
 
@@ -165,27 +188,27 @@ export class ObjectsComponent implements OnInit {
       this.userLocation.lat,
       this.userLocation.lng,
       item.latitude,
-      item.longitude
+      item.longitude,
     );
 
-    return km < 1
-      ? `${Math.round(km * 1000)} m`
-      : `${km.toFixed(1)} km`;
+    return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
   }
+
   private getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
-    const R = 6371; // km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const r = 6371;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLng = ((lng2 - lng1) * Math.PI) / 180;
 
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1 * Math.PI / 180) *
-      Math.cos(lat2 * Math.PI / 180) *
+      Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
       Math.sin(dLng / 2) *
       Math.sin(dLng / 2);
 
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
+
   setFilter(filter: string): void {
     this.activeFilter = filter;
     this.currentPage = 1;
@@ -206,13 +229,13 @@ export class ObjectsComponent implements OnInit {
   prevPage(): void {
     if (this.currentPage === 1) return;
     this.currentPage--;
-    this.loadData();
+    this.refreshVisibleObjects();
   }
 
   nextPage(): void {
     if (!this.hasNextPage) return;
     this.currentPage++;
-    this.loadData();
+    this.refreshVisibleObjects();
   }
 
   @HostListener('document:click', ['$event'])
@@ -230,11 +253,13 @@ export class ObjectsComponent implements OnInit {
       list = list.filter((obj) => obj.name.toLowerCase().includes(query));
     }
 
-    if (this.activeFilter !== 'All') {
-      const active = this.activeFilter.trim().toLowerCase();
-      list = list.filter((obj) =>
-        obj.objectTypeName?.toLowerCase().includes(active)
-      );
+    if (!this.hideTypeFilters && this.activeFilter !== 'All') {
+      const allowedTypes = this.mapFilterToTypes(this.activeFilter);
+      if (allowedTypes?.length) {
+        list = list.filter((obj) =>
+          allowedTypes.includes(this.normalizeTypeToken(obj.objectTypeName)),
+        );
+      }
     }
 
     if (this.minRatingFilter > 0) {
@@ -254,7 +279,8 @@ export class ObjectsComponent implements OnInit {
       case 'distance':
         list.sort(
           (a, b) =>
-            (a.distanceMeters ?? Number.MAX_SAFE_INTEGER) - (b.distanceMeters ?? Number.MAX_SAFE_INTEGER),
+            (a.distanceMeters ?? Number.MAX_SAFE_INTEGER) -
+            (b.distanceMeters ?? Number.MAX_SAFE_INTEGER),
         );
         break;
     }
@@ -280,6 +306,7 @@ export class ObjectsComponent implements OnInit {
   isFavoritePending(objectId: number): boolean {
     return this.favoritePendingIds.has(objectId);
   }
+
   private patchFavoriteState(objectId: number, isFavorite: boolean, favoriteId?: number): void {
     const applyPatch = (list: ObjectView[]) => {
       list.forEach((object) => {
@@ -293,11 +320,21 @@ export class ObjectsComponent implements OnInit {
     applyPatch(this.objects);
     applyPatch(this.visibleObjects);
   }
+
   toggleFavorite(object: ObjectView, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
+
     if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
+      this.pendingActionService.setAction({
+        type: 'favorite-object',
+        payload: object
+      });
+
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url }
+      });
+
       return;
     }
 
@@ -307,21 +344,19 @@ export class ObjectsComponent implements OnInit {
 
     this.favoritePendingIds.add(object.id);
 
-    this.favoriteStateService
-      .toggle({ type: 'object', entityId: object.id }, object.favoriteId)
-      .subscribe({
-        next: (state) => {
-          this.patchFavoriteState(object.id, state.isFavorite, state.favoriteId);
-        },
-        error: () => {
-          this.favoritePendingIds.delete(object.id);
-          this.cdr.detectChanges();
-        },
-        complete: () => {
-          this.favoritePendingIds.delete(object.id);
-          this.cdr.detectChanges();
-        },
-      });
+    this.favoriteStateService.toggle({ type: 'object', entityId: object.id }, object.favoriteId).subscribe({
+      next: (state) => {
+        this.patchFavoriteState(object.id, state.isFavorite, state.favoriteId);
+      },
+      error: () => {
+        this.favoritePendingIds.delete(object.id);
+        this.cdr.detectChanges();
+      },
+      complete: () => {
+        this.favoritePendingIds.delete(object.id);
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   getMainImage(obj: ObjectView): string {
@@ -421,16 +456,78 @@ export class ObjectsComponent implements OnInit {
     return [];
   }
 
-  private extractUniqueTypes(data: ObjectDto[]): { id: number; name: string }[] {
-    const map = new Map<string, { id: number; name: string }>();
+  private mapFilterToTypes(filter: string): string[] | undefined {
+    switch (filter) {
+      case 'Hrana i pice':
+        return ['restoran', 'kafana', 'bar', 'kafic', 'fast food', 'fast_food', 'vinarija', 'club'];
+      case 'Pumpe':
+        return ['pumpa', 'benzinska pumpa', 'gas_station'];
+      case 'Smestaj':
+        return ['hotel', 'apartman', 'motel', 'resort', 'hostel', 'pansion'];
+      case 'Soping':
+        return ['shop', 'shopping centar', 'trzni centar', 'market', 'prodavnica'];
+      case 'Bolnice':
+        return ['bolnica', 'klinika', 'apoteka', 'hospital', 'clinic', 'pharmacy'];
+      default:
+        return undefined;
+    }
+  }
 
-    data.forEach((obj) => {
-      if (obj.objectTypeName) {
-        map.set(obj.objectTypeName, { id: obj.objectTypeId, name: obj.objectTypeName });
+  private normalizeTypeToken(value?: string | null): string {
+    return (value ?? '')
+      .trim()
+      .toLowerCase()
+      .replace(/š/g, 's')
+      .replace(/đ/g, 'dj')
+      .replace(/ž/g, 'z')
+      .replace(/č/g, 'c')
+      .replace(/ć/g, 'c');
+  }
+
+  private async loadAllObjects(scopedType?: string): Promise<ObjectDto[]> {
+    const allItems: ObjectDto[] = [];
+    const seenIds = new Set<number>();
+    const pageSize = 100;
+    let page = 1;
+
+    while (true) {
+      const response = (await firstValueFrom(
+        this.objectService.getAll({
+          type: scopedType,
+          page,
+          pageSize,
+        }),
+      )) as unknown;
+
+      const items = this.toArray<ObjectDto>(response);
+      if (!items.length) {
+        break;
       }
-    });
 
-    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+      let newItemsCount = 0;
+
+      for (const item of items) {
+        if (!item?.id || seenIds.has(item.id)) {
+          continue;
+        }
+
+        seenIds.add(item.id);
+        allItems.push(item);
+        newItemsCount += 1;
+      }
+
+      if (newItemsCount === 0) {
+        break;
+      }
+
+      if (items.length < pageSize) {
+        break;
+      }
+
+      page += 1;
+    }
+
+    return allItems;
   }
 
   private timeToMinutes(time: string): number {
