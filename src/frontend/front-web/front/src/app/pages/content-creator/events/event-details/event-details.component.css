@@ -141,6 +141,8 @@
 .hero-tag {
   left: 16px;
   top: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .hero-status {

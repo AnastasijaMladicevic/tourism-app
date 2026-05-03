@@ -558,6 +558,8 @@ tbody tr:hover,
   color: #0f172a;
   font-size: 12px;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .hero-edit {

@@ -36,8 +36,49 @@
   <div class="layout-grid" [formGroup]="form">
     <div class="main-column">
       <article class="card">
+        <div class="card-head card-head-inline">
+          <div>
+            <span class="step-tag">STEP 1</span>
+            <h2>Media Gallery</h2>
+            <p>Paste public image URLs and choose a primary cover image.</p>
+          </div>
+        </div>
+
+        <div class="gallery-dropzone">
+          <p class="dropzone-title">Add Photo URL</p>
+          <p class="dropzone-copy">Images are attached after activity creation via the image endpoint.</p>
+
+          <div class="dropzone-input-row">
+            <input
+              type="url"
+              [(ngModel)]="pendingImageUrl"
+              [ngModelOptions]="{ standalone: true }"
+              placeholder="https://example.com/image.jpg"
+            />
+            <button type="button" class="primary-btn" (click)="addImageUrl()">Add Photo</button>
+          </div>
+        </div>
+
+        @if (imageUrls.length > 0) {
+          <div class="gallery-grid">
+            <article class="gallery-item" *ngFor="let imageUrl of imageUrls; let index = index">
+              <img [src]="imageUrl" alt="Activity image preview" />
+              <div class="gallery-actions">
+                @if (index === 0) {
+                  <span class="primary-badge">Primary</span>
+                } @else {
+                  <button type="button" class="ghost-btn small" (click)="setPrimaryImage(index)">Set Primary</button>
+                }
+                <button type="button" class="ghost-btn small danger" (click)="removeImage(index)">Remove</button>
+              </div>
+            </article>
+          </div>
+        }
+      </article>
+
+      <article class="card">
         <div class="card-head">
-          <span class="step-tag">STEP 1</span>
+          <span class="step-tag">STEP 2</span>
           <h2>Core Details</h2>
           <p>Establish the basic identity of your experience.</p>
         </div>
@@ -64,7 +105,7 @@
 
       <article class="card">
         <div class="card-head">
-          <span class="step-tag">STEP 2</span>
+          <span class="step-tag">STEP 3</span>
           <h2>Logistics & Classification</h2>
           <p>Define where, when, and how much.</p>
         </div>
@@ -128,14 +169,14 @@
             </div>
           </div>
 
-          <div class="field toggle-field">
+          <!-- <div class="field toggle-field">
             <label for="visibility-toggle">Visible & Active</label>
             <label class="switch">
               <input id="visibility-toggle" type="checkbox" formControlName="isVisible" />
               <span class="slider"></span>
               <span class="switch-copy">Listed for guests when approved by manager.</span>
             </label>
-          </div>
+          </div> -->
         </div>
 
         @if (form.errors?.['locationRequired'] && (form.controls.destinationId.touched || form.controls.localityId.touched)) {
@@ -144,47 +185,6 @@
 
         @if (form.errors?.['activityTypeRequired'] && (form.controls.activityTypeId.touched || form.controls.fallbackActivityTypeId.touched)) {
           <p class="field-error">Activity type is required.</p>
-        }
-      </article>
-
-      <article class="card">
-        <div class="card-head card-head-inline">
-          <div>
-            <span class="step-tag">STEP 3</span>
-            <h2>Media Gallery</h2>
-            <p>Paste public image URLs and choose a primary cover image.</p>
-          </div>
-        </div>
-
-        <div class="gallery-dropzone">
-          <p class="dropzone-title">Add Photo URL</p>
-          <p class="dropzone-copy">Images are attached after activity creation via the image endpoint.</p>
-
-          <div class="dropzone-input-row">
-            <input
-              type="url"
-              [(ngModel)]="pendingImageUrl"
-              [ngModelOptions]="{ standalone: true }"
-              placeholder="https://example.com/image.jpg"
-            />
-            <button type="button" class="primary-btn" (click)="addImageUrl()">Add Photo</button>
-          </div>
-        </div>
-
-        @if (imageUrls.length > 0) {
-          <div class="gallery-grid">
-            <article class="gallery-item" *ngFor="let imageUrl of imageUrls; let index = index">
-              <img [src]="imageUrl" alt="Activity image preview" />
-              <div class="gallery-actions">
-                @if (index === 0) {
-                  <span class="primary-badge">Primary</span>
-                } @else {
-                  <button type="button" class="ghost-btn small" (click)="setPrimaryImage(index)">Set Primary</button>
-                }
-                <button type="button" class="ghost-btn small danger" (click)="removeImage(index)">Remove</button>
-              </div>
-            </article>
-          </div>
         }
       </article>
     </div>
