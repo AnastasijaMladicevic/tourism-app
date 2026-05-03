@@ -15,6 +15,7 @@ import {
 } from '../../../../services/object';
 import { ActivitiesService, LocalityOption } from '../../../../services/activities';
 import { DestinationDto, DestinationService } from '../../../../services/destination.service';
+import { AuthService } from '../../../../services/auth.service';
 import { MapComponent as SharedMapComponent } from '../../../../shared/components/map/map';
 
 type WorkingDayKey = 'pon' | 'uto' | 'sre' | 'cet' | 'pet' | 'sub' | 'ned';
@@ -33,6 +34,7 @@ export class ObjectCreateComponent implements OnInit {
   private readonly objectService = inject(ObjectService);
   private readonly destinationService = inject(DestinationService);
   private readonly activitiesService = inject(ActivitiesService);
+  private readonly authService = inject(AuthService);
 
   /** Manager opens this page read-only via `/manager/objects/review/:id` (route data). */
   isManagerReview = false;
@@ -64,6 +66,15 @@ export class ObjectCreateComponent implements OnInit {
   errorMessage = '';
   isEditMode = false;
   objectId: number | null = null;
+
+  /** Server-backed sidebar row when editing / reviewing an existing object. */
+  editSidebar: {
+    averageRating: number | null;
+    reviewCount: number;
+    creatorFullName: string;
+    creatorInitials: string;
+    createdUpdatedLine: string;
+  } | null = null;
 
   form = this.fb.group({
     name: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(200)]),
@@ -110,7 +121,9 @@ export class ObjectCreateComponent implements OnInit {
       this.objectId = idFromRoute;
     }
 
-    this.loadOptions();
+    if (!(this.isEditMode && this.objectId)) {
+      this.loadOptions();
+    }
 
     this.form.controls.destinationId.valueChanges.subscribe(() => {
       this.applyLocationFromSelection();
@@ -515,9 +528,23 @@ export class ObjectCreateComponent implements OnInit {
       { emitEvent: false }
     );
 
+    const creatorName = this.resolveCreatorDisplayName(objectItem);
+    this.editSidebar = {
+      averageRating: this.normalizeOptionalNumber(objectItem.averageRating),
+      reviewCount: Number.isFinite(Number(objectItem.reviewCount)) ? Number(objectItem.reviewCount) : 0,
+      creatorFullName: creatorName,
+      creatorInitials: this.initialsFromFullName(creatorName),
+      createdUpdatedLine: this.formatCreatedUpdatedLine(objectItem.createdAt, objectItem.updatedAt)
+    };
+
+    const lat = this.form.controls.latitude.value;
+    const lng = this.form.controls.longitude.value;
+    if (lat == null || lng == null) {
+      this.applyLocationFromSelection();
+    }
+
     this.patchWorkingHours(objectItem.workingHours);
     this.reviewObjectStatus = (objectItem.status ?? '').trim();
-    this.applyLocationFromSelection();
     this.applyManagerReadOnlyState();
   }
 
@@ -527,6 +554,80 @@ export class ObjectCreateComponent implements OnInit {
     }
     const n = Number(value);
     return Number.isFinite(n) ? n : null;
+  }
+
+  private normalizeOptionalNumber(value: unknown): number | null {
+    if (value == null || value === '') {
+      return null;
+    }
+    const n = Number(value);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  /**
+   * Full name is not returned on object DTOs. When the signed-in user owns the object,
+   * use profile from session; otherwise we cannot resolve another user's name without a BE field or admin API.
+   */
+  private resolveCreatorDisplayName(o: ObjectDto): string {
+    const uid = this.normalizeOptionalId(o.createdByUserId);
+    const me = this.authService.getCurrentUser();
+    if (uid != null && me?.id != null && Number(me.id) === uid) {
+      return `${me.firstName} ${me.lastName}`.trim();
+    }
+    return '';
+  }
+
+  private initialsFromFullName(fullName: string): string {
+    const parts = fullName.split(/\s+/).filter(Boolean);
+    if (parts.length === 0) {
+      return '?';
+    }
+    if (parts.length === 1) {
+      return parts[0].slice(0, 2).toUpperCase();
+    }
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  private formatCreatedUpdatedLine(createdIso?: string, updatedIso?: string): string {
+    const created = createdIso ? this.formatSidebarMonthYear(createdIso) : '';
+    const updated = updatedIso ? this.formatSidebarMonthYear(updatedIso) : '';
+    if (created && updated && created !== updated) {
+      return `${created}, edited ${updated}`;
+    }
+    if (created) {
+      return created;
+    }
+    if (updated) {
+      return `Updated ${updated}`;
+    }
+    return '';
+  }
+
+  private formatSidebarMonthYear(iso: string): string {
+    try {
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) {
+        return '';
+      }
+      return new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' }).format(d);
+    } catch {
+      return '';
+    }
+  }
+
+  ratingStarsVisual(rating: number | null): string {
+    if (rating == null || !Number.isFinite(rating)) {
+      return '☆☆☆☆☆';
+    }
+    const rounded = Math.max(0, Math.min(5, Math.round(Number(rating))));
+    return '★'.repeat(rounded) + '☆'.repeat(5 - rounded);
+  }
+
+  ratingAverageDisplay(rating: number | null): string {
+    if (rating == null || !Number.isFinite(rating)) {
+      return '—';
+    }
+    return Number(rating).toFixed(1);
   }
 
   private applyLocationFromSelection(): void {

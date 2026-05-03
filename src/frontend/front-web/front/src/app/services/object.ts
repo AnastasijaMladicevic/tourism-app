@@ -31,6 +31,10 @@ export interface ObjectDto {
   latitude?: number;
   averageRating?: number;
   reviewCount?: number;
+  /** Present on API responses for tourist objects (ownership / audit). */
+  createdByUserId?: number;
+  createdAt?: string;
+  updatedAt?: string;
   status?: string;
   distanceKm?: number;
   distanceMeters?: number;

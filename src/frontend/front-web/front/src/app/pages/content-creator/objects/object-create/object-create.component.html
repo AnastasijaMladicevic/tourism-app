@@ -165,28 +165,37 @@
         </label>
       </div>
 
-      <div class="review-snapshot">
-        <span>Review Snapshot</span>
-        <div class="review-row">
-          <strong>4.8</strong>
-          <span class="stars">★★★★★</span>
-          <a href="javascript:void(0)">42,980 reviews</a>
+      @if (editSidebar) {
+        <div class="review-snapshot">
+          <span>Review Snapshot</span>
+          <div class="review-row">
+            <strong>{{ ratingAverageDisplay(editSidebar.averageRating) }}</strong>
+            <span class="stars" aria-hidden="true">{{ ratingStarsVisual(editSidebar.averageRating) }}</span>
+            <span class="review-count">{{ editSidebar.reviewCount | number }} reviews</span>
+          </div>
         </div>
-      </div>
 
-      <article class="creator-card">
-        <div class="creator-avatar">AJ</div>
-        <div>
-          <strong>Created by Sarah Jenkin</strong>
-          <p>Oct 2024, edited Jul 2025</p>
-        </div>
-      </article>
+        <article class="creator-card">
+          <div class="creator-avatar">{{ editSidebar.creatorInitials }}</div>
+          <div>
+            @if (editSidebar.creatorFullName) {
+              <strong>Created by {{ editSidebar.creatorFullName }}</strong>
+            } @else {
+              <strong>Creator</strong>
+              <p class="sidebar-muted">Name not available in this view.</p>
+            }
+            @if (editSidebar.createdUpdatedLine) {
+              <p>{{ editSidebar.createdUpdatedLine }}</p>
+            }
+          </div>
+        </article>
+      }
 
       @if (isManagerReview) {
         <p class="sidebar-note">You are viewing this submission as a destination manager. Editing is disabled on this page.</p>
       } @else {
         <p class="sidebar-note">
-          You have super admin write access to this object. Changes will be instantly reflected across all SpireGO platforms.
+          Save changes to update this object. Ratings and review counts reflect approved guest reviews.
         </p>
       }
 
