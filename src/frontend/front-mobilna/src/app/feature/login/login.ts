@@ -119,13 +119,10 @@ export class LoginComponent {
               setTimeout(() => {
                 this.executePendingAction(pending);
               }, 100);
-              window.location.reload();
             });
             return;
           }
-          this.router.navigateByUrl(returnUrl).then(() => {
-            window.location.reload();
-          });
+          this.router.navigateByUrl(returnUrl);
         },
         error: (err) => {
           this.isLoading = false;
