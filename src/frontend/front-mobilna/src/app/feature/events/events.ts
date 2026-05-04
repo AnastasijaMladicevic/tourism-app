@@ -290,30 +290,22 @@ export class EventsComponent implements OnInit {
   private loadEvents(): void {
     this.isLoading = true;
 
-    this.eventService.getAll().subscribe({
-      next: async (res) => {
-        const eventList = this.toArray<EventDto>(res).map(e => this.normalizeEvent(e));
+    this.eventService.getAllItems({ sortBy: 'startDate', sortOrder: 'asc' }).subscribe({
+      next: (events) => {
+        try {
+          const eventList = this.toArray<EventDto>(events).map((event) =>
+            this.normalizeEvent(event),
+          );
 
-        const active = eventList.filter(e => e.id > 0 && e.isActive !== false)
-          .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+          const active = eventList
+            .filter((event) => event.id > 0 && event.isActive !== false)
+            .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
 
-        const futureOnly = active.filter(e => new Date(e.startDate) >= new Date());
-        const source = futureOnly.length ? futureOnly : active;
+          const now = new Date();
+          const futureOnly = active.filter((event) => new Date(event.startDate) >= now);
+          const source = futureOnly.length ? futureOnly : active;
 
-        // Učitavamo slike za sve eventove
-        const imagePromises = source.map(event =>
-          this.imageService.getForEvent(event.id).pipe(
-            catchError(() => of([] as ImageDto[]))
-          ).toPromise()
-        );
-
-        const allImages = await Promise.all(imagePromises);
-
-        this.events = source.map((event, index) => {
-          const images = allImages[index] || [];
-          const mainImage = images.find(i => i.isMain) ?? images[0];
-
-          return {
+          this.events = source.map((event) => ({
             id: event.id,
             title: event.name,
             category: this.normalizeCategory(event.eventTypeName),
@@ -321,8 +313,10 @@ export class EventsComponent implements OnInit {
             timeText: this.formatTimeRange(event.startDate, event.endDate),
             location: event.localityName ?? event.destinationName ?? 'Montenegro',
             priceText: this.formatPrice(event.price),
-            imageUrl: this.resolveMediaUrl(mainImage?.url ?? event.mainImageUrl),
-            attendeesText: event.maxVisitors ? `Max ${event.maxVisitors} visitors` : 'No attendee data',
+            imageUrl: this.resolveMediaUrl(event.mainImageUrl),
+            attendeesText: event.maxVisitors
+              ? `Max ${event.maxVisitors} visitors`
+              : 'No attendee data',
             latitude: event.latitude,
             longitude: event.longitude,
             eventTypeName: event.eventTypeName ?? '',
@@ -330,24 +324,33 @@ export class EventsComponent implements OnInit {
             description: this.getShortDescription(event.description, 1),
             startDate: event.startDate,
             endDate: event.endDate,
-          };
-        });
+          }));
+          this.updateDistances();
+          this.applyPlannerState(this.events);
+          this.eventTypes = this.extractUniqueTypes(this.events);
+          this.refreshVisibleEvents();
+          this.loadPlanner();
+        } catch {
+          this.events = [];
+          this.visibleEvents = [];
+          this.totalCount = 0;
+          this.hasNextPage = false;
+        }
 
-        this.updateDistances();
-        this.applyPlannerState(this.events);
-        this.eventTypes = this.extractUniqueTypes(this.events);
-        this.refreshVisibleEvents();
         this.isLoading = false;
         this.flushUi();
       },
       error: () => {
         this.events = [];
         this.visibleEvents = [];
+        this.totalCount = 0;
+        this.hasNextPage = false;
         this.isLoading = false;
         this.flushUi();
-      }
+      },
     });
   }
+
   private getShortDescription(text?: string, maxSentences = 2): string {
     if (!text) return '';
 
