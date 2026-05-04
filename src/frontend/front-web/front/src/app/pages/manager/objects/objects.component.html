@@ -179,16 +179,22 @@
       </section>
     </div>
 
-    <aside class="object-side-column card">
+    <aside class="detail-column card">
       @if (selectedObject) {
-        <div class="hero-media" [ngStyle]="getHeroStyle()">
-          <span class="hero-badge">{{ selectedObject.objectTypeName || 'Object' }}</span>
-          <h2>{{ selectedObject.name }}</h2>
-        </div>
-        <div class="hero-status-row">
-          <span class="publish-badge" [ngClass]="'status-' + getStatusBadgeClass(selectedObject.status)">
-            {{ formatStatus(selectedObject.status) }}
-          </span>
+        <div class="activity-hero">
+          <div class="hero-media" [ngStyle]="getHeroStyle()">
+            <span class="hero-badge">{{ selectedObject.objectTypeName || 'Object' }}</span>
+          </div>
+          <div class="hero-copy">
+            <p class="eyebrow">Featured object</p>
+            <h2>{{ selectedObject.name }}</h2>
+            <p class="hero-meta">
+              {{ selectedObject.destinationName || '—' }} · {{ selectedObject.localityName || '—' }}
+            </p>
+            <span class="detail-status" [ngClass]="getObjectDetailStatusClass(selectedObject.status)">
+              {{ formatStatus(selectedObject.status) }}
+            </span>
+          </div>
         </div>
 
         <div class="detail-metrics">
@@ -233,9 +239,7 @@
 
         <section class="detail-section">
           <h3>Description</h3>
-          <p class="description-copy">
-            {{ selectedObject.description || 'No description provided for this object.' }}
-          </p>
+          <p class="description-copy">{{ selectedObject.description || 'No description provided for this object.' }}</p>
         </section>
 
         <section class="detail-section">
@@ -265,7 +269,11 @@
           </button>
         </div>
       } @else {
-        <div class="state">Select an object from the table to view details.</div>
+        <div class="empty-state">
+          <p class="eyebrow">No object selected</p>
+          <h2>Pick an object from the table</h2>
+          <p>Select a row to preview media, location, and approval status before opening the full review.</p>
+        </div>
       }
     </aside>
   </div>

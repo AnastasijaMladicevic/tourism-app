@@ -10,17 +10,21 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { forkJoin, Observable, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import * as L from 'leaflet';
 
 import { MatIconModule } from '@angular/material/icon';
 import { MapService } from '../../../services/map.service';
-import { DestinationService } from '../../../services/destination.service';
+import { DestinationDto, DestinationService } from '../../../services/destination.service';
 import { ObjectService } from '../../../services/object';
 import { EventService } from '../../../services/event.service';
 import { AuthService } from '../../../services/auth.service';
 import { RegionService } from '../../../services/region';
 import { ActiveRegionService } from '../../../services/active-region';
+import { ActivitiesService } from '../../../services/activities';
+import { environment } from '../../../../environment/environment';
 
 interface SearchResult {
   id: number;
@@ -32,7 +36,7 @@ interface SearchResult {
   lat?: number;
   lng?: number;
   raw: any;
-  category: 'destination' | 'object' | 'event';
+  category: 'destination' | 'object' | 'event' | 'activity' | 'locality';
   markerType: string;
 }
 
@@ -66,10 +70,12 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
   activeFilters: string[] = [];
   filterChips: FilterChip[] = [
     { key: 'destination', label: 'Destinations', icon: '📍' },
+    { key: 'locality', label: 'Localities', icon: '🏙️' },
     { key: 'hotel', label: 'Hotels', icon: '🏨' },
     { key: 'restaurant', label: 'Restaurants', icon: '🍽️' },
     { key: 'kafana', label: 'Bars', icon: '🍷' },
     { key: 'event', label: 'Events', icon: '🎉' },
+    { key: 'activity', label: 'Activities', icon: '🏃' },
   ];
 
   selectedItem: any = null;
@@ -96,6 +102,8 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
     private destinationService: DestinationService,
     private objectService: ObjectService,
     private eventService: EventService,
+    private activitiesService: ActivitiesService,
+    private http: HttpClient,
     private regionService: RegionService,
     private activeRegionService: ActiveRegionService,
   ) {}
@@ -414,64 +422,170 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  /**
+   * Loads only data the signed-in manager is responsible for (server /manager and scoped destination APIs).
+   */
   private loadAllData(state?: any): void {
     this.allItems = [];
+    const pageSize = 100;
 
     forkJoin({
-      destinations: this.destinationService.getAll(undefined, { bypassRegion: true }),
-      objects: this.objectService.getAll(undefined, { bypassRegion: true }),
-      events: this.eventService.getAll(undefined, { bypassRegion: true }),
-    }).subscribe({
-      next: ({ destinations, objects, events }) => {
-        const destList = this.toArray<any>(destinations);
-        const objList = this.toArray<any>(objects);
-        const evtList = this.toArray<any>(events);
+      destinations: this.fetchAllPages<DestinationDto>((page) =>
+        this.destinationService.getAll({ page, pageSize }, { bypassRegion: true }).pipe(
+          map((response: any) => {
+            if (Array.isArray(response)) {
+              return { items: response, totalPages: 1 };
+            }
+            return {
+              items: response?.items ?? [],
+              totalPages: response?.totalPages ?? 0,
+            };
+          }),
+        ),
+      ),
+      objects: this.fetchAllPages((page) => this.objectService.getForManager({ page, pageSize })),
+      events: this.fetchAllPages((page) => this.eventService.getForManager({ page, pageSize })),
+      activities: this.fetchAllPages((page) =>
+        this.activitiesService.getForManager({ page, pageSize }),
+      ),
+    })
+      .pipe(
+        switchMap(({ destinations, objects, events, activities }) =>
+          this.loadLocalitiesForManagedDestinations(destinations).pipe(
+            map((localities) => ({
+              destinations,
+              objects,
+              events,
+              activities,
+              localities,
+            })),
+          ),
+        ),
+      )
+      .subscribe({
+        next: ({ destinations, objects, events, activities, localities }) => {
+          destinations.forEach((destination) => {
+            if (destination.latitude != null && destination.longitude != null) {
+              this.mapService.addMarkerWithType(
+                destination.latitude,
+                destination.longitude,
+                'destination',
+                destination,
+              );
+              this.allItems.push(this.toSearchResult(destination, 'destination', 'destination'));
+            }
+          });
 
-        destList.forEach((destination) => {
-          if (destination.latitude && destination.longitude) {
-            this.mapService.addMarkerWithType(
-              destination.latitude,
-              destination.longitude,
-              'destination',
-              destination,
-            );
-            this.allItems.push(this.toSearchResult(destination, 'destination', 'destination'));
+          localities.forEach((loc) => {
+            if (loc.latitude != null && loc.longitude != null) {
+              this.mapService.addMarkerWithType(
+                loc.latitude,
+                loc.longitude,
+                'locality',
+                loc,
+              );
+              this.allItems.push(this.toSearchResult(loc, 'locality', 'locality'));
+            }
+          });
+
+          objects.forEach((obj) => {
+            if (obj.latitude != null && obj.longitude != null) {
+              const type = this.getObjectType(obj.objectTypeName || '');
+              this.mapService.addMarkerWithType(obj.latitude, obj.longitude, type, obj);
+              this.allItems.push(this.toSearchResult(obj, type, 'object'));
+            }
+          });
+
+          events.forEach((event) => {
+            if (event.latitude != null && event.longitude != null) {
+              this.mapService.addMarkerWithType(event.latitude, event.longitude, 'event', event);
+              this.allItems.push(this.toSearchResult(event, 'event', 'event'));
+            }
+          });
+
+          activities.forEach((activity) => {
+            if (activity.latitude != null && activity.longitude != null) {
+              this.mapService.addMarkerWithType(
+                activity.latitude,
+                activity.longitude,
+                'activity',
+                activity,
+              );
+              this.allItems.push(this.toSearchResult(activity, 'activity', 'activity'));
+            }
+          });
+
+          if (state?.selectedItem) {
+            setTimeout(() => {
+              this.ngZone.run(() => {
+                const type = state.selectedType || 'object';
+                this.mapService.triggerMarkerClick(type, state.selectedItem.id, state.zoom ?? 16);
+                this.cdr.detectChanges();
+              });
+            }, 100);
           }
-        });
+        },
+        error: (err) => console.error('Greska:', err),
+      });
+  }
 
-        objList.forEach((obj) => {
-          if (obj.latitude && obj.longitude) {
-            const type = this.getObjectType(obj.objectTypeName || '');
-            this.mapService.addMarkerWithType(obj.latitude, obj.longitude, type, obj);
-            this.allItems.push(this.toSearchResult(obj, type, 'object'));
-          }
-        });
-
-        evtList.forEach((event) => {
-          if (event.latitude && event.longitude) {
-            this.mapService.addMarkerWithType(event.latitude, event.longitude, 'event', event);
-            this.allItems.push(this.toSearchResult(event, 'event', 'event'));
-          }
-        });
-
-        if (state?.selectedItem) {
-          setTimeout(() => {
-            this.ngZone.run(() => {
-              const type = state.selectedType || 'object';
-              this.mapService.triggerMarkerClick(type, state.selectedItem.id, state.zoom ?? 16);
-              this.cdr.detectChanges();
-            });
-          }, 100);
+  private fetchAllPages<TItem>(
+    load: (page: number) => Observable<{ items?: TItem[]; totalPages?: number }>,
+  ): Observable<TItem[]> {
+    return load(1).pipe(
+      switchMap((first) => {
+        const totalPages = first.totalPages ?? 0;
+        if (totalPages <= 1) {
+          return of(first.items ?? []);
         }
-      },
-      error: (err) => console.error('Greska:', err),
-    });
+        const rest = Array.from({ length: totalPages - 1 }, (_, i) => load(i + 2));
+        return forkJoin(rest).pipe(
+          map((pages) => [...(first.items ?? []), ...pages.flatMap((p) => p.items ?? [])]),
+        );
+      }),
+    );
+  }
+
+  /** Localities in the API are filtered by destination name; managers are scoped to their destination(s). */
+  private loadLocalitiesForManagedDestinations(destinations: DestinationDto[]): Observable<any[]> {
+    if (!destinations.length) {
+      return of([]);
+    }
+
+    return forkJoin(
+      destinations.map((d) =>
+        this.fetchAllPages((page) => {
+          const params = new HttpParams()
+            .set('page', String(page))
+            .set('pageSize', String(100))
+            .set('destination', d.name);
+          return this.http.get<{ items?: any[]; totalPages?: number }>(
+            `${environment.apiUrl}/localities`,
+            { params },
+          );
+        }),
+      ),
+    ).pipe(
+      map((lists) => {
+        const seen = new Set<number>();
+        const out: any[] = [];
+        for (const list of lists) {
+          for (const loc of list) {
+            if (loc?.id != null && !seen.has(loc.id)) {
+              seen.add(loc.id);
+              out.push(loc);
+            }
+          }
+        }
+        return out;
+      }),
+    );
   }
 
   private toSearchResult(
     raw: any,
     markerType: string,
-    category: 'destination' | 'object' | 'event',
+    category: 'destination' | 'object' | 'event' | 'activity' | 'locality',
   ): SearchResult {
     const iconMap: Record<string, string> = {
       destination: 'place',
@@ -479,13 +593,21 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
       restaurant: 'restaurant',
       kafana: 'local_bar',
       event: 'event',
+      activity: 'directions_run',
+      locality: 'location_city',
       default: 'place',
     };
 
     return {
       id: raw.id,
       name: raw.name,
-      typeName: raw.objectTypeName ?? raw.destinationTypeName ?? raw.eventTypeName ?? markerType,
+      typeName:
+        raw.objectTypeName ??
+        raw.destinationTypeName ??
+        raw.eventTypeName ??
+        raw.activityTypeName ??
+        raw.localityTypeName ??
+        markerType,
       location: raw.localityName ?? raw.destinationName ?? raw.regionName ?? '',
       image: raw.mainImageUrl ?? raw.images?.[0]?.url ?? '',
       icon: iconMap[markerType] ?? iconMap['default'],
@@ -495,15 +617,6 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
       category,
       markerType,
     };
-  }
-
-  private toArray<T>(response: any): T[] {
-    if (Array.isArray(response)) return response;
-    if (response?.items) return response.items;
-    if (response?.data) return response.data;
-    if (response?.results) return response.results;
-    if (response?.value) return response.value;
-    return [];
   }
 
   private getObjectType(name: string): string {
@@ -523,6 +636,9 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!this.selectedItem) return '';
     if (this.selectedType === 'destination') {
       return this.selectedItem.regionName ?? this.selectedItem.destinationTypeName ?? '';
+    }
+    if (this.selectedType === 'locality') {
+      return [this.selectedItem.destinationName, this.selectedItem.regionName].filter(Boolean).join(', ');
     }
     return [this.selectedItem.localityName, this.selectedItem.destinationName, this.selectedItem.regionName]
       .filter(Boolean)
@@ -585,13 +701,17 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     switch (this.selectedType) {
       case 'destination':
-        this.router.navigate(['/destination', this.selectedItem.id]);
+      case 'locality':
+        this.router.navigate(['/manager/localities']);
         break;
       case 'event':
-        this.router.navigate(['/event', this.selectedItem.id]);
+        this.router.navigate(['/manager/events/edit', this.selectedItem.id]);
+        break;
+      case 'activity':
+        this.router.navigate(['/manager/activities/review', this.selectedItem.id]);
         break;
       default:
-        this.router.navigate(['/object', this.selectedItem.id]);
+        this.router.navigate(['/manager/objects/review', this.selectedItem.id]);
         break;
     }
   }
@@ -663,7 +783,14 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
     return {
       id: Number(item.id),
       name: String(item.name ?? 'Point'),
-      type: String(item.objectTypeName ?? item.destinationTypeName ?? item.eventTypeName ?? type),
+      type: String(
+        item.objectTypeName ??
+          item.destinationTypeName ??
+          item.eventTypeName ??
+          item.activityTypeName ??
+          item.localityTypeName ??
+          type,
+      ),
       lat,
       lng,
     };

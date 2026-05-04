@@ -326,6 +326,24 @@ export class ManagerObjectsComponent implements OnInit {
     }
   }
 
+  /** Sidebar pill styles — matches manager Activities `.detail-status` palette. */
+  getObjectDetailStatusClass(status?: string): string {
+    switch ((status ?? '').toLowerCase()) {
+      case 'published':
+      case 'approved':
+        return 'status-published';
+      case 'pending':
+        return 'status-pending';
+      case 'rejected':
+      case 'cancelled':
+        return 'status-archived';
+      case 'draft':
+        return 'status-draft';
+      default:
+        return 'status-pending';
+    }
+  }
+
   formatStatus(status?: string): string {
     if (!status) {
       return 'Pending';

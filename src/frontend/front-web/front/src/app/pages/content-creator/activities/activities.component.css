@@ -242,48 +242,46 @@
     gap: 18px;
 }
 
-.stats-row {
+/* Scoped to main column (matches content-creator events layout — not full page width). */
+.insights-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
+    gap: 14px;
 }
 
-.stat-card {
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 14px;
-    background: #f8fafc;
+.insight-card {
+    padding: 16px;
 }
 
-.stat-card p {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    color: #64748b;
+.insight-card p {
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 600;
     margin: 0;
 }
 
-.stat-card strong {
+.insight-card strong {
     display: block;
-    margin-top: 6px;
-    font-size: 34px;
+    margin: 8px 0 4px;
+    font-size: 28px;
     line-height: 1;
 }
 
-.stat-card span {
-    display: block;
-    margin-top: 6px;
+.insight-card span {
+    color: #6b7280;
     font-size: 12px;
-    color: #64748b;
 }
 
-.stat-card[data-tone='blue'] {
-    background: #eef5ff;
+.insight-card[data-tone='blue'] strong {
+    color: #2563eb;
 }
 
-.stat-card[data-tone='green'] {
-    background: #eefbf1;
+.insight-card[data-tone='green'] strong {
+    color: #16a34a;
+}
+
+.insight-card[data-tone='amber'] strong {
+    color: #d97706;
 }
 
 .detail-column {
@@ -754,7 +752,7 @@ tbody tr:hover,
 
     .schedule-list,
     .detail-metrics,
-    .stats-row {
+    .insights-grid {
         grid-template-columns: 1fr;
     }
 }

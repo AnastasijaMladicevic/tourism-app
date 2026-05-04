@@ -5,6 +5,13 @@ import { RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ActivitiesService, ActivityDto } from '../../../services/activities';
 
+interface ActivityInsightCard {
+  label: string;
+  value: string;
+  hint: string;
+  tone: 'blue' | 'green' | 'amber';
+}
+
 @Component({
   selector: 'app-content-creator-activities',
   standalone: true,
@@ -61,6 +68,32 @@ export class ContentCreatorActivitiesComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadActivities();
+  }
+
+  /**
+   * Same structure as content-creator events: summary KPI → current page → pipeline insight (blue → green → amber).
+   */
+  get insightCards(): ActivityInsightCard[] {
+    return [
+      {
+        label: 'Total activities',
+        value: this.statsTotalCount != null ? String(this.statsTotalCount) : '—',
+        hint: 'Matching active filters',
+        tone: 'blue',
+      },
+      {
+        label: 'On this page',
+        value: this.isLoading ? '—' : String(this.activities.length),
+        hint: 'Visible rows',
+        tone: 'green',
+      },
+      {
+        label: 'Pending review',
+        value: this.statsPendingCount != null ? String(this.statsPendingCount) : '—',
+        hint: 'Matching active filters',
+        tone: 'amber',
+      },
+    ];
   }
 
   loadActivities(): void {

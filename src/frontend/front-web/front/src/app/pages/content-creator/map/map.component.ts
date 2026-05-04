@@ -11,17 +11,18 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 import * as L from 'leaflet';
 
 import { MatIconModule } from '@angular/material/icon';
 import { MapService } from '../../../services/map.service';
-import { DestinationService } from '../../../services/destination.service';
 import { ObjectService } from '../../../services/object';
 import { EventService } from '../../../services/event.service';
 import { AuthService } from '../../../services/auth.service';
 import { RegionService } from '../../../services/region';
 import { ActiveRegionService } from '../../../services/active-region';
+import { ActivitiesService } from '../../../services/activities';
 
 interface SearchResult {
   id: number;
@@ -33,7 +34,7 @@ interface SearchResult {
   lat?: number;
   lng?: number;
   raw: any;
-  category: 'destination' | 'object' | 'event';
+  category: 'destination' | 'object' | 'event' | 'activity';
   markerType: string;
 }
 
@@ -65,11 +66,11 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
 
   activeFilters: string[] = [];
   filterChips: FilterChip[] = [
-    { key: 'destination', label: 'Destinations', icon: '📍' },
     { key: 'hotel', label: 'Hotels', icon: '🏨' },
     { key: 'restaurant', label: 'Restaurants', icon: '🍽️' },
     { key: 'kafana', label: 'Bars', icon: '🍷' },
     { key: 'event', label: 'Events', icon: '🎉' },
+    { key: 'activity', label: 'Activities', icon: '🏃' },
   ];
 
   selectedItem: any = null;
@@ -93,9 +94,9 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     private authService: AuthService,
-    private destinationService: DestinationService,
     private objectService: ObjectService,
     private eventService: EventService,
+    private activitiesService: ActivitiesService,
     private regionService: RegionService,
     private activeRegionService: ActiveRegionService,
   ) {}
@@ -414,43 +415,49 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
     });
   }
 
+  /**
+   * Loads only content created by the signed-in content creator (server-side /my endpoints).
+   * API caps page size at 100; this follows all pages when needed.
+   */
   private loadAllData(state?: any): void {
     this.allItems = [];
 
+    const pageSize = 100;
+
     forkJoin({
-      destinations: this.destinationService.getAll(undefined, { bypassRegion: true }),
-      objects: this.objectService.getAll(undefined, { bypassRegion: true }),
-      events: this.eventService.getAll(undefined, { bypassRegion: true }),
+      objects: this.fetchAllPages((page) =>
+        this.objectService.getMy({ page, pageSize }, { bypassRegion: true }),
+      ),
+      events: this.fetchAllPages((page) => this.eventService.getMy({ page, pageSize })),
+      activities: this.fetchAllPages((page) =>
+        this.activitiesService.getMyActivities({ page, pageSize }),
+      ),
     }).subscribe({
-      next: ({ destinations, objects, events }) => {
-        const destList = this.toArray<any>(destinations);
-        const objList = this.toArray<any>(objects);
-        const evtList = this.toArray<any>(events);
-
-        destList.forEach((destination) => {
-          if (destination.latitude && destination.longitude) {
-            this.mapService.addMarkerWithType(
-              destination.latitude,
-              destination.longitude,
-              'destination',
-              destination,
-            );
-            this.allItems.push(this.toSearchResult(destination, 'destination', 'destination'));
-          }
-        });
-
-        objList.forEach((obj) => {
-          if (obj.latitude && obj.longitude) {
+      next: ({ objects, events, activities }) => {
+        objects.forEach((obj) => {
+          if (obj.latitude != null && obj.longitude != null) {
             const type = this.getObjectType(obj.objectTypeName || '');
             this.mapService.addMarkerWithType(obj.latitude, obj.longitude, type, obj);
             this.allItems.push(this.toSearchResult(obj, type, 'object'));
           }
         });
 
-        evtList.forEach((event) => {
-          if (event.latitude && event.longitude) {
+        events.forEach((event) => {
+          if (event.latitude != null && event.longitude != null) {
             this.mapService.addMarkerWithType(event.latitude, event.longitude, 'event', event);
             this.allItems.push(this.toSearchResult(event, 'event', 'event'));
+          }
+        });
+
+        activities.forEach((activity) => {
+          if (activity.latitude != null && activity.longitude != null) {
+            this.mapService.addMarkerWithType(
+              activity.latitude,
+              activity.longitude,
+              'activity',
+              activity,
+            );
+            this.allItems.push(this.toSearchResult(activity, 'activity', 'activity'));
           }
         });
 
@@ -468,10 +475,27 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
     });
   }
 
+  private fetchAllPages<TItem>(
+    load: (page: number) => Observable<{ items?: TItem[]; totalPages?: number }>,
+  ): Observable<TItem[]> {
+    return load(1).pipe(
+      switchMap((first) => {
+        const totalPages = first.totalPages ?? 0;
+        if (totalPages <= 1) {
+          return of(first.items ?? []);
+        }
+        const rest = Array.from({ length: totalPages - 1 }, (_, i) => load(i + 2));
+        return forkJoin(rest).pipe(
+          map((pages) => [...(first.items ?? []), ...pages.flatMap((p) => p.items ?? [])]),
+        );
+      }),
+    );
+  }
+
   private toSearchResult(
     raw: any,
     markerType: string,
-    category: 'destination' | 'object' | 'event',
+    category: 'destination' | 'object' | 'event' | 'activity',
   ): SearchResult {
     const iconMap: Record<string, string> = {
       destination: 'place',
@@ -479,13 +503,19 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
       restaurant: 'restaurant',
       kafana: 'local_bar',
       event: 'event',
+      activity: 'directions_run',
       default: 'place',
     };
 
     return {
       id: raw.id,
       name: raw.name,
-      typeName: raw.objectTypeName ?? raw.destinationTypeName ?? raw.eventTypeName ?? markerType,
+      typeName:
+        raw.objectTypeName ??
+        raw.destinationTypeName ??
+        raw.eventTypeName ??
+        raw.activityTypeName ??
+        markerType,
       location: raw.localityName ?? raw.destinationName ?? raw.regionName ?? '',
       image: raw.mainImageUrl ?? raw.images?.[0]?.url ?? '',
       icon: iconMap[markerType] ?? iconMap['default'],
@@ -495,15 +525,6 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
       category,
       markerType,
     };
-  }
-
-  private toArray<T>(response: any): T[] {
-    if (Array.isArray(response)) return response;
-    if (response?.items) return response.items;
-    if (response?.data) return response.data;
-    if (response?.results) return response.results;
-    if (response?.value) return response.value;
-    return [];
   }
 
   private getObjectType(name: string): string {
@@ -584,14 +605,14 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
     if (!this.selectedItem) return;
 
     switch (this.selectedType) {
-      case 'destination':
-        this.router.navigate(['/destination', this.selectedItem.id]);
-        break;
       case 'event':
-        this.router.navigate(['/event', this.selectedItem.id]);
+        this.router.navigate(['/content-creator/events/view', this.selectedItem.id]);
+        break;
+      case 'activity':
+        this.router.navigate(['/content-creator/activities/edit', this.selectedItem.id]);
         break;
       default:
-        this.router.navigate(['/object', this.selectedItem.id]);
+        this.router.navigate(['/content-creator/objects/edit', this.selectedItem.id]);
         break;
     }
   }
@@ -663,7 +684,9 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
     return {
       id: Number(item.id),
       name: String(item.name ?? 'Point'),
-      type: String(item.objectTypeName ?? item.destinationTypeName ?? item.eventTypeName ?? type),
+      type: String(
+        item.objectTypeName ?? item.destinationTypeName ?? item.eventTypeName ?? item.activityTypeName ?? type,
+      ),
       lat,
       lng,
     };

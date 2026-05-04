@@ -198,70 +198,73 @@
       </section>
     </div>
 
-    <aside class="event-side-column card">
+    <aside class="detail-column card">
       @if (selectedEvent) {
-        <div
-          class="featured-media"
-          [style.background-image]="'url(' + getDetailBanner(selectedEvent) + ')'"
-        ></div>
-        <div class="featured-copy">
-          <p class="featured-type">{{ getCategoryLabel(selectedEvent) }}</p>
-          <h3>{{ selectedEvent.name }}</h3>
-          <p class="featured-meta">
-            {{ getLocationLabel(selectedEvent) }} · {{ formatDate(selectedEvent.startDate) }}
-          </p>
-
+        <div class="activity-hero">
           <div
-            class="status-tooltip-wrap"
-            [class.has-tooltip]="hasSelectedEventRejectionReason(selectedEvent)"
-            tabindex="0"
+            class="hero-media"
+            [style.background-image]="'url(' + getDetailBanner(selectedEvent) + ')'"
           >
-            <span class="publish-badge" [ngClass]="getStatusBadgeClass(selectedEvent.status)">
-              {{ selectedEvent.status || 'Published' }}
-            </span>
+            <span class="hero-badge">{{ getCategoryLabel(selectedEvent) }}</span>
+          </div>
 
-            @if (hasSelectedEventRejectionReason(selectedEvent)) {
-              <div class="status-tooltip" role="tooltip">
-                <strong>Rejection reason</strong>
-                <p>{{ getSelectedEventRejectionReason(selectedEvent) }}</p>
-              </div>
-            }
+          <div class="hero-copy">
+            <p class="eyebrow">Featured event</p>
+            <h2>{{ selectedEvent.name }}</h2>
+            <p class="hero-meta">
+              {{ getLocationLabel(selectedEvent) }} · {{ formatDate(selectedEvent.startDate) }}
+            </p>
+
+            <div
+              class="status-tooltip-wrap"
+              [class.has-tooltip]="hasSelectedEventRejectionReason(selectedEvent)"
+              tabindex="0"
+            >
+              <span class="detail-status" [ngClass]="getStatusBadgeClass(selectedEvent.status)">
+                {{ selectedEvent.status || 'Draft' }}
+              </span>
+
+              @if (hasSelectedEventRejectionReason(selectedEvent)) {
+                <div class="status-tooltip" role="tooltip">
+                  <strong>Rejection reason</strong>
+                  <p>{{ getSelectedEventRejectionReason(selectedEvent) }}</p>
+                </div>
+              }
+            </div>
           </div>
         </div>
 
         <div class="detail-metrics">
-          <div>
+          <div class="metric-card">
             <span>Pricing</span>
-            <strong>{{
-              selectedEvent.price ? '$' + selectedEvent.price.toFixed(2) : '$45.00'
-            }}</strong>
+            <strong>{{ selectedEvent.price != null ? '$' + selectedEvent.price.toFixed(2) : '—' }}</strong>
           </div>
-          <div>
+          <div class="metric-card">
             <span>Capacity</span>
             <strong>{{
-              selectedEvent.maxVisitors
+              selectedEvent.maxVisitors != null
                 ? selectedEvent.maxVisitors.toLocaleString('en-US')
-                : '5,000'
+                : '—'
             }}</strong>
           </div>
         </div>
 
         <section class="detail-section">
           <div class="section-head">
-            <h4>Schedule</h4>
+            <h3>Schedule</h3>
           </div>
 
           <div class="schedule-list">
-            <article class="schedule-row" *ngFor="let row of selectedSchedule">
-              <strong>{{ row.label }}</strong>
-              <span>{{ row.value }}</span>
-            </article>
+            <div class="schedule-item" *ngFor="let row of selectedSchedule">
+              <span>{{ row.label }}</span>
+              <strong>{{ row.value }}</strong>
+            </div>
           </div>
         </section>
 
         <section class="detail-section">
-          <h4>Description</h4>
-          <p>{{ getSelectedSummary(selectedEvent) }}</p>
+          <h3>Description</h3>
+          <p class="description-copy">{{ getSelectedSummary(selectedEvent) }}</p>
         </section>
 
         <section class="detail-section">
@@ -291,7 +294,11 @@
           </button>
         </div>
       } @else {
-        <div class="state">No events available.</div>
+        <div class="empty-state">
+          <p class="eyebrow">No event selected</p>
+          <h2>Pick an event from the table</h2>
+          <p>Select a row to preview schedule, pricing, and capacity before opening the full review.</p>
+        </div>
       }
     </aside>
   </div>

@@ -4,7 +4,7 @@
       <mat-icon>search</mat-icon>
       <input
         type="text"
-        placeholder="Search objects, routes..."
+        placeholder="Search your destinations, localities, reviews…"
         [(ngModel)]="searchQuery"
         (input)="onSearchInput()"
         (focus)="showSuggestions = searchResults.length > 0"
@@ -20,7 +20,7 @@
 
     @if (showSuggestions && searchResults.length > 0) {
       <div class="suggestions">
-        @for (result of searchResults; track result.id) {
+        @for (result of searchResults; track `${result.markerType}-${result.id}`) {
           <div class="suggestion-item" (mousedown)="selectSuggestion(result)">
             <div class="suggestion-item__image">
               @if (result.image) {
