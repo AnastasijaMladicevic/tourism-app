@@ -105,7 +105,39 @@
             </button>
           }
         </div>
+        <div class="field-grid field-grid--split">
 
+          <!-- START TIME -->
+          <div class="field-card field-card--muted">
+            <span>
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="8" />
+                <path d="M12 8v4l3 2" />
+              </svg>
+              {{ translate('addToPlanner.startTime') }}
+            </span>
+
+            <div class="field-card__surface field-card__surface--readonly">
+              <strong>{{ eventStartLabel() }}</strong>
+            </div>
+          </div>
+
+          <!-- END TIME -->
+          <div class="field-card field-card--muted">
+            <span>
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="8" />
+                <path d="M12 8v4l3 2" />
+              </svg>
+              {{ translate('addToPlanner.endTime') }}
+            </span>
+
+            <div class="field-card__surface field-card__surface--readonly">
+              <strong>{{ eventEndLabel() }}</strong>
+            </div>
+          </div>
+
+        </div>
         <article class="priority-card">
           <div class="priority-card__icon">
             <svg viewBox="0 0 24 24" aria-hidden="true">

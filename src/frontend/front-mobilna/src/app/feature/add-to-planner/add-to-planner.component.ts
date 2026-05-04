@@ -86,7 +86,13 @@ export class AddToPlannerComponent implements OnInit {
       return this.toCalendarDay(nextDate);
     });
   });
+  protected readonly eventStartLabel = computed(() =>
+    this.eventStartDate ? this.formatTimeLabel(this.eventStartDate) : '--:--'
+  );
 
+  protected readonly eventEndLabel = computed(() =>
+    this.eventEndDate ? this.formatTimeLabel(this.eventEndDate) : '--:--'
+  );
   constructor() {
     const state = (window.history.state ?? {}) as PlannerPreviewState;
     this.eventId = typeof state.eventId === 'number' && state.eventId > 0 ? state.eventId : null;
@@ -112,6 +118,7 @@ export class AddToPlannerComponent implements OnInit {
       imageUrl: state.imageUrl || '/assets/izlet-boko-kotorski-zaliv-1.jpg',
       description: state.description || this.translate('addToPlanner.previewFallbackDescription'),
     };
+    console.log('STATE:', state);
   }
 
   ngOnInit(): void {
@@ -184,7 +191,7 @@ export class AddToPlannerComponent implements OnInit {
         plannerId: this.editingPlannerId()!,
         eventId: this.eventId,
         plannedDate: this.travelDate(),
-        startTime: this.startTime(),
+        startTime: this.toTimeInputValue(this.eventStartDate!),
         durationMinutes: this.fixedDurationMinutes,
         notes: this.notes().trim(),
         isPriority: this.isPriority(),
@@ -262,14 +269,7 @@ export class AddToPlannerComponent implements OnInit {
   }
 
   private buildSelectedStartDate(): Date {
-    const parsedDate = this.parseDate(this.travelDate()) ?? new Date();
-    const [hoursRaw, minutesRaw] = this.startTime().split(':');
-    const hours = Number(hoursRaw);
-    const minutes = Number(minutesRaw);
-    const nextDate = new Date(parsedDate);
-
-    nextDate.setHours(Number.isNaN(hours) ? 19 : hours, Number.isNaN(minutes) ? 0 : minutes, 0, 0);
-    return nextDate;
+    return this.eventStartDate ?? new Date();
   }
 
   private parseDate(value?: string): Date | null {

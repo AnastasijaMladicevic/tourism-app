@@ -280,7 +280,25 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   onImageError(event: Event): void {
     (event.target as HTMLImageElement).style.display = 'none';
   }
+  formatTime(startDateStr: string, endDateStr?: string): string {
+    if (!startDateStr) return '';
 
+    const start = new Date(startDateStr);
+
+    const format = (d: Date) =>
+      d.toLocaleTimeString(this.translationService.currentLocale(), {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+    if (!endDateStr) {
+      return format(start);
+    }
+
+    const end = new Date(endDateStr);
+
+    return `${format(start)} - ${format(end)}`;
+  }
   formatDate(dateStr: string, endDateStr?: string): string {
     const start = new Date(dateStr);
 

@@ -32,6 +32,7 @@ interface PlaceCard {
   favoriteId?: number;
   showRating: boolean;
   distanceText?: string;
+  distanceMeters?: number;
   latitude?: number;
   longitude?: number;
   isPlanned?: boolean;
@@ -123,6 +124,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private hasRecommendationResponse = false;
   private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private plannerMap = new Map<number, number>();
+  private lastRecommendationLocationKey: string | null = null;
   constructor(
     public router: Router,
     private http: HttpClient,
@@ -164,6 +166,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.applyPlannerState(this.events as EventCard[]);
     this.applyPlannerStateToPlaceCards(this.recommended);
   }
+
+  private readonly handleWindowFocus = (): void => {
+    this.tryRefreshRecommendedCardsWithLocation();
+  };
+
+  private readonly handleVisibilityChange = (): void => {
+    if (document.visibilityState === 'visible') {
+      this.tryRefreshRecommendedCardsWithLocation();
+    }
+  };
 
   private loadPlanner(): void {
     if (!this.authService.isLoggedIn()) {
@@ -241,7 +253,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         description: eventItem?.description,
       }
     });
-
     this.isPlannerBusy = false;
   }
 
@@ -368,6 +379,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.clearDistances();
       } else {
         this.updateDistances();
+        this.tryRefreshRecommendedCardsWithLocation();
         this.cdr.detectChanges();
       }
     });
@@ -379,6 +391,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
       if (this.userLocation) {
         this.updateDistances();
+        this.tryRefreshRecommendedCardsWithLocation();
       } else {
         this.clearDistances();
       }
@@ -401,6 +414,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.togglePlanner(obj, new Event('click'));
       }
     });
+    window.addEventListener('focus', this.handleWindowFocus);
+    document.addEventListener('visibilitychange', this.handleVisibilityChange);
     this.cdr.detectChanges();
   }
 
@@ -410,7 +425,13 @@ export class HomeComponent implements OnInit, OnDestroy {
     const updateList = (list: any[]) => {
       return list.map(item => {
         if (item.latitude == null || item.longitude == null) {
-          return { ...item, distanceText: undefined };
+          return {
+            ...item,
+            distanceText:
+              this.shouldShowLiveDistance() && item.distanceMeters != null
+                ? this.distanceTextFromCoordsFromMeters(item.distanceMeters)
+                : undefined
+          };
         }
 
         const km = this.getDistanceKm(
@@ -447,6 +468,33 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.recommended = clearList(this.recommended);
     this.events = clearList(this.events);
   }
+
+  private getRecommendationLocationKey(): string | null {
+    const currentLocation = this.locationTrackingService.getCurrentLocation();
+    if (!this.locationTrackingService.isTrackingEnabled() || !currentLocation) {
+      return null;
+    }
+
+    return `${currentLocation.latitude.toFixed(4)}:${currentLocation.longitude.toFixed(4)}`;
+  }
+
+  private tryRefreshRecommendedCardsWithLocation(): void {
+    const locationKey = this.getRecommendationLocationKey();
+    if (!locationKey || this.isLoadingRecommendations) {
+      return;
+    }
+
+    if (!this.hasRecommendationResponse && !this.recommended.length) {
+      return;
+    }
+
+    if (this.lastRecommendationLocationKey === locationKey) {
+      return;
+    }
+
+    this.loadRecommendedCards();
+  }
+
   private getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
     const R = 6371; // km
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -484,6 +532,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       clearTimeout(this.searchDebounceTimer);
       this.searchDebounceTimer = null;
     }
+    window.removeEventListener('focus', this.handleWindowFocus);
+    document.removeEventListener('visibilitychange', this.handleVisibilityChange);
   }
   selectSuggestion(_result?: { id: number }): void {
     this.showSuggestions = false;
@@ -710,6 +760,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     const currentLocation = this.locationTrackingService.getCurrentLocation();
     const canUseLocation = this.shouldShowLiveDistance();
+    const requestedLocationKey =
+      canUseLocation && currentLocation
+        ? `${currentLocation.latitude.toFixed(4)}:${currentLocation.longitude.toFixed(4)}`
+        : null;
 
     this.recommendationService
       .getHomeRecommendations({
@@ -726,6 +780,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       )
       .subscribe((items) => {
         this.hasRecommendationResponse = true;
+        this.lastRecommendationLocationKey = requestedLocationKey;
 
         const cards = items
           .map((item) => this.toRecommendationCard(item))
@@ -1077,8 +1132,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       targetUrl: `/${normalizedType}/${item.itemId}`,
       favoriteId: undefined,
       showRating: item.averageRating != null && (item.reviewCount ?? 0) > 0,
+      distanceMeters: item.distanceMeters ?? undefined,
       distanceText:
-        item.distanceMeters != null
+        this.shouldShowLiveDistance() && item.distanceMeters != null
           ? this.distanceTextFromCoordsFromMeters(item.distanceMeters)
           : undefined,
       eventTypeName: normalizedType === 'event' ? item.categoryName || 'Dogadjaj' : undefined,
@@ -1292,12 +1348,30 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private eventTime(startDate: string, endDate?: string | null): string {
     const start = new Date(startDate);
-    const startText = `${start.getHours().toString().padStart(2, '0')}:${start.getMinutes().toString().padStart(2, '0')}`;
+
+    const startText = start.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
     if (!endDate) return startText;
 
     const end = new Date(endDate);
-    const endText = `${end.getHours().toString().padStart(2, '0')}:${end.getMinutes().toString().padStart(2, '0')}`;
-    return `${startText}-${endText}`;
+    const endText = end.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    return `${startText} - ${endText}`;
+  }
+
+  private extractTime(dateStr: string): string {
+    if (!dateStr) return '--:--';
+
+    const timePart = dateStr.split('T')[1];
+    if (!timePart) return '--:--';
+
+    return timePart.substring(0, 5); // HH:mm
   }
 
   get normalizedQuery(): string {

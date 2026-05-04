@@ -586,16 +586,11 @@
     align-items: stretch;
   }
 
-  .event-preview-card {
-    min-height: 940px;
-  }
-
   .event-preview-card__image-wrap {
     height: 100%;
 
     img {
       height: 100%;
-      min-height: 940px;
     }
   }
 

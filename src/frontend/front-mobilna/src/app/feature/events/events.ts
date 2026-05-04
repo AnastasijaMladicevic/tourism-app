@@ -80,57 +80,37 @@ export class EventsComponent implements OnInit {
   ngOnInit(): void {
     this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
       this.isTracking = enabled;
-
-      if (!enabled) {
-        this.clearDistances();
-      } else {
-        this.updateDistances();
-        this.cdr.detectChanges();
-      }
+      if (!enabled) this.clearDistances();
+      else this.updateDistances();
     });
 
     this.locationTrackingService.location$.subscribe(loc => {
-      this.userLocation = loc
-        ? { lat: loc.latitude, lng: loc.longitude }
-        : null;
-
-      if (this.userLocation) {
-        this.updateDistances();
-      } else {
-        this.clearDistances();
-      }
+      this.userLocation = loc ? { lat: loc.latitude, lng: loc.longitude } : null;
+      if (this.userLocation) this.updateDistances();
+      else this.clearDistances();
       this.refreshVisibleEvents();
       this.cdr.detectChanges();
     });
+
     this.loadEvents();
+    this.loadPlanner();
+
     window.addEventListener('add-to-planner', (event: any) => {
       const obj = event.detail;
-      if (obj) {
-        this.togglePlanner(obj, new Event('click'));
-      }
+      if (obj) this.togglePlanner(obj, new Event('click'));
     });
-    this.cdr.detectChanges();
   }
 
-  togglePlanner(eventItem: EventCard, event?: Event): void {
-    event?.stopPropagation();
+  togglePlanner(eventItem: EventCard, e?: Event): void {
+    e?.stopPropagation();
 
     if (!this.authService.isLoggedIn()) {
-      this.pendingActionService.setAction({
-        type: 'add-to-planner',
-        payload: event
-      });
-
-      this.router.navigate(['/login'], {
-        queryParams: { returnUrl: this.router.url }
-      });
-
+      this.pendingActionService.setAction({ type: 'add-to-planner', payload: eventItem });
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
       return;
     }
 
-    if (this.isPlannerBusy) {
-      return;
-    }
+    if (this.isPlannerBusy) return;
 
     this.isPlannerBusy = true;
     const existingId = this.plannerMap.get(eventItem.id);
@@ -147,12 +127,8 @@ export class EventsComponent implements OnInit {
           this.isPlannerBusy = false;
           this.flushUi();
         },
-        error: () => {
-          this.isPlannerBusy = false;
-          this.flushUi();
-        },
+        error: () => { this.isPlannerBusy = false; this.flushUi(); }
       });
-
       return;
     }
 
@@ -164,9 +140,9 @@ export class EventsComponent implements OnInit {
         startDate: eventItem.startDate,
         endDate: eventItem.endDate,
         type: eventItem.eventTypeName || 'Dogadjaj',
-        imageUrl: eventItem.imageUrl || this.resolveMediaUrl(eventItem.imageUrl),
+        imageUrl: eventItem.imageUrl,
         description: eventItem.description,
-      },
+      }
     });
 
     this.isPlannerBusy = false;
@@ -302,16 +278,9 @@ export class EventsComponent implements OnInit {
       return;
     }
 
-    this.eventPlannerService.getMyPlanner({
-      page: 1,
-      pageSize: 200,
-    }).subscribe((res) => {
+    this.eventPlannerService.getMyPlanner({ page: 1, pageSize: 200 }).subscribe(res => {
       this.plannerMap.clear();
-
-      res.items.forEach((item) => {
-        this.plannerMap.set(Number(item.eventId), item.id);
-      });
-
+      res.items.forEach(item => this.plannerMap.set(Number(item.eventId), item.id));
       this.applyPlannerState(this.events);
       this.applyPlannerState(this.visibleEvents);
       this.flushUi();
@@ -322,79 +291,61 @@ export class EventsComponent implements OnInit {
     this.isLoading = true;
 
     this.eventService.getAll().subscribe({
-      next: async (events) => {
-        try {
-          const eventList = this.toArray<EventDto>(events).map((event) =>
-            this.normalizeEvent(event),
-          );
+      next: async (res) => {
+        const eventList = this.toArray<EventDto>(res).map(e => this.normalizeEvent(e));
 
-          const active = eventList
-            .filter((event) => event.id > 0 && event.isActive !== false)
-            .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+        const active = eventList.filter(e => e.id > 0 && e.isActive !== false)
+          .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
 
-          const now = new Date();
-          const futureOnly = active.filter((event) => new Date(event.startDate) >= now);
-          const source = futureOnly.length ? futureOnly : active;
+        const futureOnly = active.filter(e => new Date(e.startDate) >= new Date());
+        const source = futureOnly.length ? futureOnly : active;
 
-          this.events = await Promise.all(
-            source.map(async (event) => {
-              let imageUrl: string | undefined = undefined;
+        // Učitavamo slike za sve eventove
+        const imagePromises = source.map(event =>
+          this.imageService.getForEvent(event.id).pipe(
+            catchError(() => of([] as ImageDto[]))
+          ).toPromise()
+        );
 
-              try {
-                const images = await this.imageService.getForEvent(event.id).toPromise();
-                if (images && images.length > 0) {
-                  const main = images.find((i) => i.isMain) ?? images[0];
-                  imageUrl = this.resolveMediaUrl(main.url);
-                }
-              } catch {
-                imageUrl = undefined;
-              }
+        const allImages = await Promise.all(imagePromises);
 
-              return {
-                id: event.id,
-                title: event.name,
-                category: this.normalizeCategory(event.eventTypeName),
-                dateText: this.formatDate(event.startDate),
-                timeText: this.formatTimeRange(event.startDate, event.endDate),
-                location: event.localityName ?? event.destinationName ?? 'Montenegro',
-                priceText: this.formatPrice(event.price),
-                imageUrl,
-                attendeesText: event.maxVisitors
-                  ? `Max ${event.maxVisitors} visitors`
-                  : 'No attendee data',
-                latitude: event.latitude,
-                longitude: event.longitude,
-                eventTypeName: event.eventTypeName ?? '',
-                eventTypeId: event.eventTypeId ?? 0,
-                description: this.getShortDescription(event.description, 1),
-                startDate: event.startDate,
-                endDate: event.endDate,
-              };
-            })
-          );
-          this.updateDistances();
-          this.applyPlannerState(this.events);
-          this.eventTypes = this.extractUniqueTypes(this.events);
-          this.refreshVisibleEvents();
-          this.loadPlanner();
-        } catch {
-          this.events = [];
-          this.visibleEvents = [];
-          this.totalCount = 0;
-          this.hasNextPage = false;
-        }
+        this.events = source.map((event, index) => {
+          const images = allImages[index] || [];
+          const mainImage = images.find(i => i.isMain) ?? images[0];
 
+          return {
+            id: event.id,
+            title: event.name,
+            category: this.normalizeCategory(event.eventTypeName),
+            dateText: this.formatDate(event.startDate),
+            timeText: this.formatTimeRange(event.startDate, event.endDate),
+            location: event.localityName ?? event.destinationName ?? 'Montenegro',
+            priceText: this.formatPrice(event.price),
+            imageUrl: this.resolveMediaUrl(mainImage?.url ?? event.mainImageUrl),
+            attendeesText: event.maxVisitors ? `Max ${event.maxVisitors} visitors` : 'No attendee data',
+            latitude: event.latitude,
+            longitude: event.longitude,
+            eventTypeName: event.eventTypeName ?? '',
+            eventTypeId: event.eventTypeId ?? 0,
+            description: this.getShortDescription(event.description, 1),
+            startDate: event.startDate,
+            endDate: event.endDate,
+          };
+        });
+
+        this.updateDistances();
+        this.applyPlannerState(this.events);
+        this.eventTypes = this.extractUniqueTypes(this.events);
+        this.refreshVisibleEvents();
         this.isLoading = false;
         this.flushUi();
       },
       error: () => {
         this.events = [];
         this.visibleEvents = [];
-        this.totalCount = 0;
-        this.hasNextPage = false;
         this.isLoading = false;
         this.flushUi();
-      },
+      }
     });
   }
   private getShortDescription(text?: string, maxSentences = 2): string {
@@ -449,58 +400,33 @@ export class EventsComponent implements OnInit {
     void this.refreshVisibleEvents();
   }
 
-  private normalizeEvent(raw: EventDto): {
-    eventTypeId?: number | null;
-    latitude?: number;
-    longitude?: number;
-    id: number;
-    name: string;
-    eventTypeName?: string | null;
-    startDate: string;
-    endDate?: string | null;
-    price?: number | null;
-    maxVisitors?: number | null;
-    isActive: boolean;
-    localityName?: string | null;
-    destinationName?: string | null;
-    description?: string;
-  } {
-    const dto = raw as unknown as Record<string, unknown>;
-    const startDate = dto['startDate'] ?? dto['StartDate'];
-    const endDate = dto['endDate'] ?? dto['EndDate'];
-
+  private normalizeEvent(raw: EventDto): any {
+    const dto = raw as any;
     return {
-      id: Number(dto['id'] ?? dto['Id'] ?? 0),
-      name: String(dto['name'] ?? dto['Name'] ?? ''),
-      eventTypeName: (dto['eventTypeName'] ?? dto['EventTypeName'] ?? null) as string | null,
-      startDate: typeof startDate === 'string'
-        ? startDate
-        : new Date(startDate as string | number | Date).toISOString(),
-      endDate: typeof endDate === 'string' || endDate == null
-        ? (endDate as string | null | undefined)
-        : new Date(endDate as string | number | Date).toISOString(),
-      price: this.readOptionalNumber(dto, ['price', 'Price']),
-      maxVisitors: this.readOptionalNumber(dto, ['maxVisitors', 'MaxVisitors']),
-      isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
-      localityName: (dto['localityName'] ?? dto['LocalityName'] ?? null) as string | null,
-      destinationName: (dto['destinationName'] ?? dto['DestinationName'] ?? null) as string | null,
-      latitude: this.readOptionalNumber(dto, ['latitude', 'Latitude']),
-      longitude: this.readOptionalNumber(dto, ['longitude', 'Longitude']),
-      eventTypeId: this.readOptionalNumber(dto, ['eventTypeId', 'EventTypeId']),
-      description: String(dto['description'] ?? dto['Description'] ?? ''),
+      id: Number(dto.id ?? dto.Id ?? 0),
+      name: String(dto.name ?? dto.Name ?? ''),
+      eventTypeName: dto.eventTypeName ?? dto.EventTypeName ?? null,
+      startDate: dto.startDate,
+      endDate: dto.endDate,
+      price: dto.price,
+      maxVisitors: dto.maxVisitors,
+      isActive: Boolean(dto.isActive ?? true),
+      localityName: dto.localityName,
+      destinationName: dto.destinationName,
+      latitude: dto.latitude,
+      longitude: dto.longitude,
+      eventTypeId: dto.eventTypeId,
+      description: dto.description,
+      mainImageUrl: dto.mainImageUrl,
     };
   }
+
 
   private toArray<T>(raw: unknown): T[] {
     if (Array.isArray(raw)) return raw as T[];
     if (!raw || typeof raw !== 'object') return [];
-    const obj = raw as Record<string, unknown>;
-    const keys = ['items', 'data', 'results', 'value'];
-    for (const key of keys) {
-      const candidate = obj[key];
-      if (Array.isArray(candidate)) return candidate as T[];
-    }
-    return [];
+    const obj = raw as any;
+    return obj.items || obj.data || obj.results || obj.value || [];
   }
 
   private readOptionalNumber(obj: Record<string, unknown>, keys: string[]): number | undefined {
@@ -602,10 +528,9 @@ export class EventsComponent implements OnInit {
   }
 
   private flushUi(): void {
-    this.ngZone.run(() => {
-      this.cdr.detectChanges();
-    });
+    this.ngZone.run(() => this.cdr.detectChanges());
   }
+
   getDistanceText(item: any): string | null {
     if (!this.isTracking || !this.userLocation) return null;
     if (!item.latitude || !item.longitude) return null;
