@@ -19,6 +19,9 @@
   margin-bottom: 10px;
 
   h1 {
+    grid-column: 2;
+    justify-self: center;
+    text-align: center;
     font-size: var(--font-size-title-md);
     font-weight: var(--font-weight-extrabold);
     color: #263945;
@@ -140,6 +143,7 @@
   color: #53abd2;
   display: inline-flex;
   align-items: center;
+  align-self: flex-start;
   gap: 6px;
   padding: 8px 14px;
   border-radius: 999px;
@@ -156,6 +160,8 @@
 }
 
 .hero-card__content {
+  text-align: center;
+
   h2 {
     font-size: var(--font-size-title-lg);
     line-height: 1.1;

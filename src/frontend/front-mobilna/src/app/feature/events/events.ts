@@ -12,6 +12,7 @@ import { LocationTrackingService } from '../../services/location-tracking';
 import { AuthService } from '../../services/auth';
 import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
 import { EventPlannerService } from '../../services/event-planner';
+import { PendingActionService } from '../../services/pending-action';
 
 type EventCategory = 'All' | string;
 
@@ -54,6 +55,7 @@ export class EventsComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly plannerService = inject(PlannerLocalPreferencesService);
   private readonly eventPlannerService = inject(EventPlannerService);
+  private readonly pendingActionService = inject(PendingActionService);
   activeFilter = 'All';
   activeCategory: EventCategory = 'All';
   isLoading = true;
@@ -76,42 +78,37 @@ export class EventsComponent implements OnInit {
   ngOnInit(): void {
     this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
       this.isTracking = enabled;
-
-      if (!enabled) {
-        this.clearDistances();
-      } else {
-        this.updateDistances();
-        this.cdr.detectChanges();
-      }
+      if (!enabled) this.clearDistances();
+      else this.updateDistances();
     });
 
     this.locationTrackingService.location$.subscribe(loc => {
-      this.userLocation = loc
-        ? { lat: loc.latitude, lng: loc.longitude }
-        : null;
-
-      if (this.userLocation) {
-        this.updateDistances();
-      } else {
-        this.clearDistances();
-      }
+      this.userLocation = loc ? { lat: loc.latitude, lng: loc.longitude } : null;
+      if (this.userLocation) this.updateDistances();
+      else this.clearDistances();
       this.refreshVisibleEvents();
       this.cdr.detectChanges();
     });
+
     this.loadEvents();
+    this.loadPlanner();
+
+    window.addEventListener('add-to-planner', (event: any) => {
+      const obj = event.detail;
+      if (obj) this.togglePlanner(obj, new Event('click'));
+    });
   }
 
-  togglePlanner(eventItem: EventCard, event?: Event): void {
-    event?.stopPropagation();
+  togglePlanner(eventItem: EventCard, e?: Event): void {
+    e?.stopPropagation();
 
     if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
+      this.pendingActionService.setAction({ type: 'add-to-planner', payload: eventItem });
+      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
       return;
     }
 
-    if (this.isPlannerBusy) {
-      return;
-    }
+    if (this.isPlannerBusy) return;
 
     this.isPlannerBusy = true;
     const existingId = this.plannerMap.get(eventItem.id);
@@ -128,12 +125,8 @@ export class EventsComponent implements OnInit {
           this.isPlannerBusy = false;
           this.flushUi();
         },
-        error: () => {
-          this.isPlannerBusy = false;
-          this.flushUi();
-        },
+        error: () => { this.isPlannerBusy = false; this.flushUi(); }
       });
-
       return;
     }
 
@@ -145,9 +138,9 @@ export class EventsComponent implements OnInit {
         startDate: eventItem.startDate,
         endDate: eventItem.endDate,
         type: eventItem.eventTypeName || 'Dogadjaj',
-        imageUrl: eventItem.imageUrl || this.resolveMediaUrl(eventItem.imageUrl),
+        imageUrl: eventItem.imageUrl,
         description: eventItem.description,
-      },
+      }
     });
 
     this.isPlannerBusy = false;
@@ -283,16 +276,9 @@ export class EventsComponent implements OnInit {
       return;
     }
 
-    this.eventPlannerService.getMyPlanner({
-      page: 1,
-      pageSize: 200,
-    }).subscribe((res) => {
+    this.eventPlannerService.getMyPlanner({ page: 1, pageSize: 200 }).subscribe(res => {
       this.plannerMap.clear();
-
-      res.items.forEach((item) => {
-        this.plannerMap.set(Number(item.eventId), item.id);
-      });
-
+      res.items.forEach(item => this.plannerMap.set(Number(item.eventId), item.id));
       this.applyPlannerState(this.events);
       this.applyPlannerState(this.visibleEvents);
       this.flushUi();
@@ -362,6 +348,7 @@ export class EventsComponent implements OnInit {
       },
     });
   }
+
   private getShortDescription(text?: string, maxSentences = 2): string {
     if (!text) return '';
 
@@ -459,16 +446,12 @@ export class EventsComponent implements OnInit {
     };
   }
 
+
   private toArray<T>(raw: unknown): T[] {
     if (Array.isArray(raw)) return raw as T[];
     if (!raw || typeof raw !== 'object') return [];
-    const obj = raw as Record<string, unknown>;
-    const keys = ['items', 'data', 'results', 'value'];
-    for (const key of keys) {
-      const candidate = obj[key];
-      if (Array.isArray(candidate)) return candidate as T[];
-    }
-    return [];
+    const obj = raw as any;
+    return obj.items || obj.data || obj.results || obj.value || [];
   }
 
   private readOptionalNumber(obj: Record<string, unknown>, keys: string[]): number | undefined {
@@ -535,10 +518,9 @@ export class EventsComponent implements OnInit {
   }
 
   private flushUi(): void {
-    this.ngZone.run(() => {
-      this.cdr.detectChanges();
-    });
+    this.ngZone.run(() => this.cdr.detectChanges());
   }
+
   getDistanceText(item: any): string | null {
     if (!this.isTracking || !this.userLocation) return null;
     if (!item.latitude || !item.longitude) return null;

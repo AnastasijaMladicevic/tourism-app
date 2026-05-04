@@ -1,8 +1,14 @@
 <div class="login-container">
   <div class="overlay">
-    <div class="logo">
-      <app-logo size="lg"></app-logo>
+    <div class="auth-topbar">
+      <button class="back-btn" (click)="goBack()" aria-label="Go back">
+        <span class="material-icons">arrow_back_ios</span>
+      </button>
+      <div class="logo">
+        <app-logo size="lg"></app-logo>
+      </div>
     </div>
+    
 
     <div class="form">
       <form [formGroup]="form" (keydown.enter)="submit()">

@@ -17,7 +17,15 @@
           (ngModelChange)="onSearchChange()"
         />
       </div>
-
+      <div class="list-controls">
+      <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+          @for (size of pageSizeOptions; track $index) {
+            <option [value]="size">
+              {{ size }}
+            </option>
+          }
+        </select>
+      </div>
       <div
         class="sort-anchor sort-trigger"
         (click)="$event.stopPropagation(); showSortMenu = !showSortMenu"

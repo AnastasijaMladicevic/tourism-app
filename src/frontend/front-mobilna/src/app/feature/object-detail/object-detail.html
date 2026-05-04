@@ -7,9 +7,11 @@
   </div>
 
   @if (isLoading) {
-    <div class="loading">
-      <mat-icon>hourglass_empty</mat-icon>
-      <p>Učitavanje...</p>
+    <div class="loading-screen">
+      <div class="loading-content">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+      </div>
     </div>
   }
 
@@ -201,6 +203,7 @@
             
           </div>
         </div>
+        @if(object.price) {
         <div class="section">
           <div class="card price-card">
             <div class="price-header">
@@ -213,6 +216,7 @@
             </div>
           </div>
         </div>
+      }
 
         <!-- Recenzije -->
         <div class="card reviews-card">
@@ -356,6 +360,59 @@
           </div>
         }
       </div>
+    </div>
+  </div>
+}
+<!-- WRITE REVIEW MODAL -->
+@if (showWriteReviewModal) {
+  <div class="review-modal" (click)="closeWriteReview()">
+    <div class="modal-content-review" (click)="$event.stopImmediatePropagation()">
+      <button class="modal-close" (click)="closeWriteReview()">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <h2>Napiši recenziju</h2>
+      <p class="review-for">{{ object?.name }}</p>
+
+      <!-- Zvezdice -->
+      <div class="rating-stars">
+        @for (star of [1,2,3,4,5]; track star) {
+          <mat-icon 
+            (click)="setReviewRating(star)"
+            [class.filled]="star <= newReview.rating">
+            star
+          </mat-icon>
+        }
+      </div>
+
+      <textarea 
+        [(ngModel)]="newReview.text" 
+        placeholder="Kako je bilo vaše iskustvo? Šta biste preporučili drugim putnicima?"
+        rows="5"
+        maxlength="500"
+      ></textarea>
+
+      <!-- Upload slika -->
+      <div class="photo-upload">
+        <label class="upload-label">
+          <mat-icon>add_a_photo</mat-icon>
+          Dodaj fotografije (max 5)
+          <input 
+            type="file" 
+            multiple 
+            accept="image/*" 
+            (change)="onReviewImagesSelected($event)" 
+            hidden>
+        </label>
+        <small>{{ newReview.images.length }}/5 slika</small>
+      </div>
+
+      <button 
+        class="submit-review-btn" 
+        [disabled]="isSubmittingReview || newReview.rating === 0 || !newReview.text.trim()"
+        (click)="submitReview()">
+        {{ isSubmittingReview ? 'Šaljem...' : 'Pošalji recenziju' }}
+      </button>
     </div>
   </div>
 }

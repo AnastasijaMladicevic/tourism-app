@@ -9,6 +9,8 @@ import { MapComponent } from "../../shared/components/map/map";
 import { environment } from '../../../environment/environment';
 import { AuthService } from '../../services/auth';
 import { FavoriteStateService } from '../../services/favorite-state';
+import { PendingActionService } from '../../services/pending-action';
+import { RouterHistoryService } from '../../services/router-history';
 
 @Component({
   selector: 'app-activity-detail',
@@ -39,6 +41,8 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
     private imageService: ImageService,
     private authService: AuthService,
     private favoriteStateService: FavoriteStateService,
+    private pendingActionService: PendingActionService,
+    private routerHistory: RouterHistoryService
   ) { }
 
   ngOnInit(): void {
@@ -66,6 +70,13 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
     });
 
     window.addEventListener('focus', this.handleWindowFocus);
+    window.addEventListener('favorite-object', (event: any) => {
+      const obj = event.detail;
+      if (obj) {
+        this.toggleFavorite(obj, new Event('click'));
+      }
+    });
+    this.cdr.detectChanges();
   }
 
   ngOnDestroy(): void {
@@ -200,7 +211,15 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
     event.stopPropagation();
 
     if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
+      this.pendingActionService.setAction({
+        type: 'favorite-object',
+        payload: activity
+      });
+
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url }
+      });
+
       return;
     }
 
@@ -267,7 +286,7 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.router.navigate(['/activities']);
+    this.routerHistory.goBack();
   }
 
   viewOnMap(): void {

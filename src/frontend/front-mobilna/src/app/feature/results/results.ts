@@ -17,6 +17,7 @@ import { ActivityService } from '../../services/activity';
 import { EventService } from '../../services/event';
 import { ObjectService } from '../../services/object';
 import { LocalityService } from '../../services/locality';
+import { PendingActionService } from '../../services/pending-action';
 
 interface UnifiedSearchItem {
   id: number;
@@ -84,6 +85,7 @@ export class ResultsComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private imageService: ImageService,
     private locationTrackingService: LocationTrackingService,
+    private pendingActionService: PendingActionService
   ) { }
 
   ngOnInit(): void {
@@ -118,6 +120,13 @@ export class ResultsComponent implements OnInit {
       this.cdr.detectChanges();
     });
     this.loadResolvedItems(normalized);
+    window.addEventListener('favorite-object', (event: any) => {
+      const obj = event.detail;
+      if (obj) {
+        this.toggleFavorite(obj, new Event('click'));
+      }
+    });
+    this.cdr.detectChanges();
   }
   private async loadResolvedItems(items: UnifiedSearchItem[]): Promise<void> {
     this.isLoading = true;
@@ -347,7 +356,15 @@ export class ResultsComponent implements OnInit {
     event.stopPropagation();
 
     if (!this.authService.isLoggedIn()) {
-      this.router.navigate(['/login']);
+      this.pendingActionService.setAction({
+        type: 'favorite-object',
+        payload: item
+      });
+
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url }
+      });
+
       return;
     }
 

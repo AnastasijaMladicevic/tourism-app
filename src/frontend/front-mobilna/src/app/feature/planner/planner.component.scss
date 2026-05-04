@@ -317,7 +317,7 @@
   border: none;
   border-radius: 50%;
   background: #f7f8fb;
-  color: #cbd5e1;
+  color: var(--emperor);
 
   svg {
     width: 16px;
@@ -809,14 +809,9 @@
     }
   }
 
-  .planner-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 14px;
-  }
-
   .planner-stat-card {
     display: flex;
+    width: 100%;
     align-items: center;
     gap: 14px;
     padding: 16px 18px;
@@ -826,20 +821,28 @@
     box-shadow: 0 12px 24px rgba(15, 23, 42, 0.05);
 
     small {
+      flex: 1;
       display: block;
-      margin-bottom: 4px;
       color: #6b7280;
-      font-size: 12px;
+      font-size: 18px;
       font-weight: 700;
       letter-spacing: 0.1em;
       text-transform: uppercase;
     }
 
     strong {
+      flex-shrink: 0;
       color: #1f2937;
       font-size: 18px;
       font-weight: 800;
     }
+  }
+
+  .planner-stat-text {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
   }
 
   .planner-stat-card__icon {

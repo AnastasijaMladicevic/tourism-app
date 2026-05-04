@@ -51,7 +51,7 @@ export class ReviewService {
   constructor(
     private readonly http: HttpClient,
     private readonly activeRegionService: ActiveRegionService,
-  ) {}
+  ) { }
 
   private addLanguage(params: HttpParams): HttpParams {
     const lang = localStorage.getItem('appLanguage') || 'sr';
@@ -114,5 +114,8 @@ export class ReviewService {
 
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+  update(id: number, dto: any): Observable<any> {
+    return this.http.put(`${environment.apiUrl}/reviews/${id}`, dto);
   }
 }

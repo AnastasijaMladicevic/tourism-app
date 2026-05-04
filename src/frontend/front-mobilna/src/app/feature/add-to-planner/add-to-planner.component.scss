@@ -140,8 +140,7 @@
   }
 }
 
-.event-chip,
-.rating-pill {
+.event-chip {
   min-height: 30px;
   padding: 0 12px;
   border-radius: 999px;
@@ -159,24 +158,6 @@
 
 .event-chip--dark {
   background: rgba(17, 24, 39, 0.88);
-}
-
-.rating-pill {
-  background: rgba(255, 255, 255, 0.96);
-  color: #111827;
-
-  svg {
-    width: 14px;
-    height: 14px;
-    fill: #fbbf24;
-    stroke: #fbbf24;
-    stroke-width: 1.2;
-  }
-}
-
-.rating-pill--dark {
-  background: rgba(17, 24, 39, 0.74);
-  color: #fff;
 }
 
 .schedule-card {
@@ -605,16 +586,11 @@
     align-items: stretch;
   }
 
-  .event-preview-card {
-    min-height: 940px;
-  }
-
   .event-preview-card__image-wrap {
     height: 100%;
 
     img {
       height: 100%;
-      min-height: 940px;
     }
   }
 

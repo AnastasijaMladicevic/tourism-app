@@ -118,7 +118,7 @@
                         <button
                           type="button"
                           class="planner-card-icon-btn"
-                          (click)="openEvent(stop); $event.stopPropagation()"
+                          (click)="editPlanner(stop, $event); $event.stopPropagation()"
                           [attr.aria-label]="translate('planner.openEventDetails')"
                         >
                           <svg viewBox="0 0 24 24">
@@ -150,7 +150,7 @@
                           <circle cx="12" cy="12" r="8" />
                           <path d="M12 8v4l3 2" />
                         </svg>
-                        {{ stop.timeLabel }} &bull; {{ stop.durationLabel }}
+                        {{ stop.timeLabel }}
                       </span>
 
                       <span>
@@ -187,22 +187,9 @@
                   <path d="M3 12h4l2-6 4 12 2-6h6" />
                 </svg>
               </span>
-              <div>
+              <div class="planner-stat-text">
                 <small>{{ translate('planner.totalEvents') }}</small>
                 <strong>{{ totalEvents() }}</strong>
-              </div>
-            </article>
-
-            <article class="planner-stat-card">
-              <span class="planner-stat-card__icon planner-stat-card__icon--hours">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <circle cx="12" cy="12" r="8" />
-                  <path d="M12 8v4l3 2" />
-                </svg>
-              </span>
-              <div>
-                <small>{{ translate('planner.plannedHours') }}</small>
-                <strong>{{ plannedHours() }}</strong>
               </div>
             </article>
           </div>

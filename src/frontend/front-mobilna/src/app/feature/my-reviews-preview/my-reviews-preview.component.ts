@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
 import { environment } from '../../../environment/environment';
@@ -45,7 +45,7 @@ export class MyReviewsPreviewComponent implements OnInit {
   private readonly reviewService = inject(ReviewService);
   private readonly translationService = inject(TranslationService);
   private readonly router = inject(Router);
-
+  private readonly cdr = inject(ChangeDetectorRef);
   protected readonly currentUser = signal<UserDto | null>(null);
   protected readonly reviews = signal<ReviewPreviewCard[]>([]);
   protected readonly isLoading = signal(true);
@@ -147,7 +147,8 @@ export class MyReviewsPreviewComponent implements OnInit {
     forkJoin({
       user: this.authService.getById(currentUser.id).pipe(catchError(() => of(currentUser))),
       reviews: this.reviewService.getMine({ page: 1, pageSize: 30 }).pipe(
-        catchError(() => {
+        catchError((err) => {
+          console.error(err);
           this.errorMessage.set('Utisci trenutno nisu dostupni.');
           return of({ items: [] as ReviewDto[] });
         }),
@@ -156,6 +157,7 @@ export class MyReviewsPreviewComponent implements OnInit {
       this.currentUser.set(user);
       this.reviews.set(this.mapReviewsForUser(this.toArray<ReviewDto>(reviews)));
       this.isLoading.set(false);
+      this.cdr.detectChanges();
     });
   }
 
@@ -198,39 +200,37 @@ export class MyReviewsPreviewComponent implements OnInit {
   }
 
   protected openObject(card: ReviewPreviewCard): void {
-    this.router.navigate(['/object', card.objectId]);
+    this.router.navigate(['/object', card.objectId], {
+      queryParams: {
+        reviewId: card.id,
+        mode: 'edit-review'
+      }
+    });
   }
 
   protected deleteReview(card: ReviewPreviewCard): void {
-    if (this.deletingId() === card.id) {
-      return;
-    }
+    if (this.deletingId() === card.id) return;
 
-    const confirmed = window.confirm(`Da li zelis da obrises utisak za "${card.title}"?`);
-    if (!confirmed) {
-      return;
-    }
+    const confirmed = window.confirm(`Da li sigurno želite da obrišete utisak za "${card.title}"?`);
+    if (!confirmed) return;
 
     this.deletingId.set(card.id);
-    this.errorMessage.set('');
 
-    this.reviewService
-      .delete(card.id)
-      .pipe(
-        catchError(() => {
-          this.errorMessage.set('Utisak nije obrisan. Pokusaj ponovo.');
-          return of(null);
-        }),
-      )
-      .subscribe((result) => {
+    this.reviewService.delete(card.id).subscribe({
+      next: () => {
+        // Ukloni iz liste
+        this.reviews.update(items => items.filter(item => item.id !== card.id));
+
         this.deletingId.set(null);
-
-        if (result === null) {
-          return;
-        }
-
-        this.reviews.update((items) => items.filter((item) => item.id !== card.id));
-      });
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Delete review error:', err);
+        alert('Došlo je do greške prilikom brisanja recenzije. Pokušajte ponovo.');
+        this.deletingId.set(null);
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   protected trackReview(_: number, item: ReviewPreviewCard): number {

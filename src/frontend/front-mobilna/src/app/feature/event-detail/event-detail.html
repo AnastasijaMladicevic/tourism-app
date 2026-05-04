@@ -66,6 +66,7 @@
           <p class="venue"><mat-icon>location_on</mat-icon>{{ event.objectName || 'N/A' }}</p>
 
           <p class="date">{{ formatDate(event.startDate, event.endDate) }}</p>
+          <p class="date">{{ formatTime(event.startDate, event.endDate) }}</p>
         </div>
 
         <div class="card">
