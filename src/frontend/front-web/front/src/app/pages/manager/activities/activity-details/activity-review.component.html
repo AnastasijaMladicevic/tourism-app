@@ -169,13 +169,18 @@
 
               <div #activityMap class="location-map mini-map" aria-label="Activity location map"></div>
 
-              <div class="field-grid schedule-grid">
-                <label class="form-field half-width">
+              <div class="location-line">
+                <span class="material-symbols-outlined">search</span>
+                <p>{{ locationContextValue }}</p>
+              </div>
+
+              <div class="location-inputs">
+                <label class="mini-field">
                   <span>Latitude</span>
                   <input class="form-control" type="text" formControlName="latitude" readonly />
                 </label>
 
-                <label class="form-field half-width">
+                <label class="mini-field">
                   <span>Longitude</span>
                   <input class="form-control" type="text" formControlName="longitude" readonly />
                 </label>
@@ -185,6 +190,16 @@
                 <strong>{{ activityLocationLabel }}</strong>
                 <span>{{ locationSubtitle }}</span>
               </div>
+              <article class="creator-card">
+                <div class="creator-avatar">{{ creatorInitials }}</div>
+                <div>
+                  <strong>Creator</strong>
+                  <p class="sidebar-muted">{{ creatorDisplayName }}</p>
+                  @if (creatorTimeline) {
+                    <p>{{ creatorTimeline }}</p>
+                  }
+                </div>
+              </article>
             </section>
 
             <section class="card side-card">
@@ -208,7 +223,7 @@
                 @if (reviewStatusKey === 'approved') {
                   <div class="summary-row">
                     <span>Approved by</span>
-                    <strong>{{ form.controls.approvedByUserId.value }}</strong>
+                    <strong>{{ form.controls.approvedByName.value || '—' }}</strong>
                   </div>
                 } @else if (reviewStatusKey === 'rejected') {
                   <div class="summary-row summary-row--full">
@@ -219,17 +234,6 @@
               </div>
             </section>
 
-            <section class="card side-card tips-card">
-              <div class="section-title compact">
-                <h2>Manager Notes</h2>
-              </div>
-
-              <ul>
-                <li>Confirm the activity name, destination, and linked object before approving.</li>
-                <li>Use decline when the activity needs corrections or a different location.</li>
-                <li>Check the image gallery and coordinates for obvious mismatches with the listing.</li>
-              </ul>
-            </section>
           </aside>
         </fieldset>
       </form>

@@ -13,12 +13,13 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, finalize, forkJoin, map, of } from 'rxjs';
+import { forkJoin, from, Observable, of } from 'rxjs';
+import { catchError, concatMap, finalize, map, switchMap, tap, toArray } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import * as L from 'leaflet';
 import { AuthService } from '../../../../services/auth.service';
 import { DestinationDto, DestinationService } from '../../../../services/destination.service';
-import { EventService } from '../../../../services/event.service';
+import { EventImageDto, EventService } from '../../../../services/event.service';
 import { ActivitiesService } from '../../../../services/activities';
 import { CreateEventDto, EventDto, UpdateEventDto } from '../../../../models/event.model';
 
@@ -78,7 +79,6 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
     price: [''],
     maxVisitors: [''],
     externalLink: [''],
-    imageUrl: [''],
     longitude: [''],
     latitude: [''],
     localityId: [''],
@@ -97,7 +97,10 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
   isDeleting = false;
   showDeleteModal = false;
   isImageDropActive = false;
-  isImagePreviewBroken = false;
+
+  pendingImageUrl = '';
+  imageUrls: string[] = [];
+  imagesSnapshot: EventImageDto[] = [];
   eventStatus = '';
   organizerName = 'Current Content Creator';
   selectedActivityIds = new Set<number>();
@@ -417,9 +420,12 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.isLoading = true;
-    this.eventService.getMyById(this.eventId).subscribe({
-      next: (event: EventDto) => {
-        this.populateForm(event);
+    forkJoin({
+      event: this.eventService.getMyById(this.eventId),
+      images: this.eventService.getImages(this.eventId).pipe(catchError(() => of([] as EventImageDto[])))
+    }).subscribe({
+      next: ({ event, images }) => {
+        this.populateForm(event, images);
         this.eventStatus = event.status ?? '';
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -432,8 +438,11 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  populateForm(event: EventDto): void {
+  populateForm(event: EventDto, images: EventImageDto[] = []): void {
     this.eventStatus = event.status ?? '';
+    this.imagesSnapshot = images.map((i) => ({ ...i }));
+    this.imageUrls = this.buildOrderedImageUrls(event, images);
+
     this.form.patchValue({
       name: event.name,
       description: event.description,
@@ -453,7 +462,6 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
       localityId: '',
       destinationId: event.destinationId?.toString() || '',
       objectId: event.objectId?.toString() || '',
-      imageUrl: event.mainImageUrl ?? '',
       ageRestriction: '',
       tagsInput: ''
     });
@@ -463,6 +471,71 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
     this.applyLocationFromSelection();
     this.syncMapFromForm();
     this.cdr.detectChanges();
+  }
+
+  private buildOrderedImageUrls(event: EventDto, images: EventImageDto[]): string[] {
+    if (images.length > 0) {
+      const sorted = [...images].sort((a, b) => {
+        if (a.isMain === b.isMain) {
+          return 0;
+        }
+        return a.isMain ? -1 : 1;
+      });
+      const urls = sorted.map((i) => i.url?.trim()).filter((u): u is string => !!u);
+      const seen = new Set<string>();
+      return urls.filter((u) => {
+        if (seen.has(u)) {
+          return false;
+        }
+        seen.add(u);
+        return true;
+      });
+    }
+
+    const main = event.mainImageUrl?.trim();
+    if (main && /^https?:\/\//i.test(main)) {
+      return [main];
+    }
+    return [];
+  }
+
+  addImageUrl(): void {
+    const raw = this.pendingImageUrl.trim();
+    if (!raw) {
+      return;
+    }
+
+    if (!this.isValidImageUrl(raw)) {
+      this.errorMessage = 'Please enter a valid image URL (http or https).';
+      return;
+    }
+
+    const normalized = this.normalizeImageUrl(raw);
+    if (!normalized || this.imageUrls.includes(normalized)) {
+      this.pendingImageUrl = '';
+      return;
+    }
+
+    this.imageUrls.push(normalized);
+    this.pendingImageUrl = '';
+    this.errorMessage = '';
+  }
+
+  removeImage(index: number): void {
+    if (index < 0 || index >= this.imageUrls.length) {
+      return;
+    }
+
+    this.imageUrls.splice(index, 1);
+  }
+
+  setPrimaryImage(index: number): void {
+    if (index <= 0 || index >= this.imageUrls.length) {
+      return;
+    }
+
+    const [selected] = this.imageUrls.splice(index, 1);
+    this.imageUrls.unshift(selected);
   }
 
   submit(): void {
@@ -497,28 +570,114 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
       localityId: this.parseOptionalNumber(formValue.localityId),
       destinationId: this.parseOptionalNumber(formValue.destinationId),
       objectId: this.parseOptionalNumber(formValue.objectId),
-      imageUrl: this.getPersistentImageUrl(formValue.imageUrl)
+      imageUrl: this.imageUrls.length > 0 ? this.getPersistentImageUrl(this.imageUrls[0]) : undefined
     };
 
-    const request = this.isEditMode && this.eventId
+    const request$ = this.isEditMode && this.eventId
       ? this.eventService.update(this.eventId, dto as UpdateEventDto)
       : this.eventService.create(dto as CreateEventDto);
 
-    request.pipe(
-      finalize(() => {
-        this.isSubmitting = false;
-        this.cdr.detectChanges();
+    request$
+      .pipe(
+        switchMap((eventDto) => {
+          if (this.isEditMode && this.eventId) {
+            return this.syncImagesAfterSave(this.eventId, this.imageUrls, this.imagesSnapshot).pipe(map(() => eventDto));
+          }
+          return this.attachImagesAfterCreate(eventDto as EventDto);
+        }),
+        finalize(() => {
+          this.isSubmitting = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.successMessage = this.isEditMode ? 'Event updated successfully!' : 'Event created successfully!';
+          setTimeout(() => this.router.navigate(['/content-creator/events']), 1200);
+        },
+        error: (error: any) => {
+          this.errorMessage = error?.error?.message ?? 'Failed to save event';
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  private attachImagesAfterCreate(created: EventDto): Observable<EventDto> {
+    if (this.imageUrls.length === 0) {
+      return of(created);
+    }
+
+    return this.eventService.attachImages(created.id, this.imageUrls).pipe(
+      map(() => created),
+      catchError(() => of(created))
+    );
+  }
+
+  private syncImagesAfterSave(
+    eventId: number,
+    desiredOrdered: string[],
+    snapshot: EventImageDto[]
+  ): Observable<void> {
+    const desired = desiredOrdered.map((u) => u.trim()).filter((u) => u.length > 0);
+    const desiredSet = new Set(desired);
+
+    const toDelete = snapshot.filter((img) => !desiredSet.has(img.url.trim()));
+    const surviving = snapshot.filter((img) => desiredSet.has(img.url.trim()));
+
+    const urlToId = new Map<string, number>();
+    for (const img of surviving) {
+      urlToId.set(img.url.trim(), img.id);
+    }
+
+    const toAddOrdered = desired.filter((u) => !urlToId.has(u));
+
+    const delete$ =
+      toDelete.length === 0
+        ? of(undefined)
+        : forkJoin(toDelete.map((d) => this.eventService.deleteImageById(d.id))).pipe(
+            map(() => undefined),
+            catchError(() => of(undefined))
+          );
+
+    return delete$.pipe(
+      switchMap(() => {
+        let pendingCount = surviving.length;
+
+        if (toAddOrdered.length === 0) {
+          return this.ensureMainImage(desired, urlToId);
+        }
+
+        return from(toAddOrdered).pipe(
+          concatMap((url) => {
+            const isMain = pendingCount === 0;
+            pendingCount++;
+            return this.eventService.addImage(eventId, { url, isMain }).pipe(
+              tap((dto) => {
+                urlToId.set(url.trim(), dto.id);
+              })
+            );
+          }),
+          toArray(),
+          switchMap(() => this.ensureMainImage(desired, urlToId))
+        );
       })
-    ).subscribe({
-      next: () => {
-        this.successMessage = this.isEditMode ? 'Event updated successfully!' : 'Event created successfully!';
-        setTimeout(() => this.router.navigate(['/content-creator/events']), 1200);
-      },
-      error: (error: any) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to save event';
-        this.cdr.detectChanges();
-      }
-    });
+    );
+  }
+
+  private ensureMainImage(desired: string[], urlToId: Map<string, number>): Observable<void> {
+    if (desired.length === 0) {
+      return of(undefined);
+    }
+
+    const mainId = urlToId.get(desired[0]);
+    if (!mainId) {
+      return of(undefined);
+    }
+
+    return this.eventService.setMainImage(mainId).pipe(
+      map(() => undefined),
+      catchError(() => of(undefined))
+    );
   }
 
   saveDraft(): void {
@@ -630,48 +789,33 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  onImageUrlChange(value: string): void {
-    this.isImagePreviewBroken = false;
-    this.form.patchValue({ imageUrl: value.trim() }, { emitEvent: false });
-  }
-
-  get imagePreviewUrl(): string {
-    return this.normalizeImageUrl(this.form.get('imageUrl')?.value ?? '');
-  }
-
-  onImageDrop(event: DragEvent): void {
+  onGalleryDrop(event: DragEvent): void {
     event.preventDefault();
     this.isImageDropActive = false;
 
     const droppedUrl = this.getDroppedImageUrl(event);
-    if (!droppedUrl) {
+    if (!droppedUrl || !this.isValidImageUrl(droppedUrl)) {
       return;
     }
 
-    this.form.patchValue({ imageUrl: droppedUrl });
-    this.isImagePreviewBroken = false;
+    const normalized = this.normalizeImageUrl(droppedUrl);
+    if (!normalized || this.imageUrls.includes(normalized)) {
+      return;
+    }
+
+    this.imageUrls.push(normalized);
+    this.errorMessage = '';
     this.cdr.detectChanges();
   }
 
-  onImageDragOver(event: DragEvent): void {
+  onGalleryDragOver(event: DragEvent): void {
     event.preventDefault();
     this.isImageDropActive = true;
   }
 
-  onImageDragLeave(event: DragEvent): void {
+  onGalleryDragLeave(event: DragEvent): void {
     event.preventDefault();
     this.isImageDropActive = false;
-  }
-
-  onImagePreviewError(): void {
-    this.isImagePreviewBroken = true;
-  }
-
-  clearImage(): void {
-    this.form.patchValue({ imageUrl: '' });
-    this.isImagePreviewBroken = false;
-    this.isImageDropActive = false;
-    this.cdr.detectChanges();
   }
 
   /**

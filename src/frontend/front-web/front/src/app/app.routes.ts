@@ -172,6 +172,14 @@ export const routes: Routes = [
           import('./pages/manager/dashboard/dashboard.component').then(m => m.ManagerDashboardComponent)
       },
       {
+        path: 'objects/review/:id',
+        loadComponent: () =>
+          import('./pages/content-creator/objects/object-create/object-create.component').then(
+            m => m.ObjectCreateComponent
+          ),
+        data: { managerReview: true }
+      },
+      {
         path: 'objects',
         loadComponent: () =>
           import('./pages/manager/objects/objects.component').then(m => m.ManagerObjectsComponent)

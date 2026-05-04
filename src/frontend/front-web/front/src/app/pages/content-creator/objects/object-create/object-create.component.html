@@ -1,36 +1,138 @@
-<section class="object-create-page">
+<section class="object-create-page" [class.object-create-page--read-only]="isManagerReview">
   <header class="page-header">
     <div>
-      <p class="eyebrow">Objects management</p>
+      <p class="eyebrow">{{ eyebrowLabel }}</p>
       <h1>{{ pageTitle }}</h1>
-      <p class="page-intro">Add a new object with location, details, amenities, and opening hours.</p>
+      <p class="page-intro">{{ pageIntro }}</p>
     </div>
     <div class="top-actions">
-      <button type="submit" class="primary-btn" [disabled]="isSubmitting || isLoadingOptions" form="create-object-form">
-        {{ isSubmitting ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save changes' : 'Create object') }}
-      </button>
-      <button type="button" class="ghost-btn" routerLink="/content-creator/objects">Cancel</button>
+      @if (!isManagerReview) {
+        @if (isEditMode) {
+          <button
+            type="button"
+            class="danger-btn"
+            (click)="openDeleteModal()"
+            [disabled]="isSubmitting || isDeletingObject || isLoadingOptions"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+            {{ isApprovedObject ? 'Request Deletion' : 'Delete' }}
+          </button>
+        }
+        <button type="submit" class="primary-btn" [disabled]="isSubmitting || isLoadingOptions" form="create-object-form">
+          {{ isSubmitting ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save changes' : 'Create object') }}
+        </button>
+      }
+      @if (isManagerReview) {
+        <button type="button" class="ghost-btn ghost-btn--back" (click)="goBack()">
+          <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+          Back
+        </button>
+        <button
+          type="button"
+          class="danger-btn"
+          (click)="openDeclineModal()"
+          [disabled]="declineActionDisabled"
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">thumb_down</span>
+          Decline
+        </button>
+        <button
+          type="button"
+          class="primary-btn review-approve-btn"
+          (click)="approveObject()"
+          [disabled]="approveActionDisabled"
+          [class.approved-locked]="reviewStatusKey === 'approved'"
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">thumb_up</span>
+          Approve
+        </button>
+      } @else {
+        <button type="button" class="ghost-btn" [routerLink]="objectsListPath">Cancel</button>
+      }
     </div>
   </header>
 
   <div class="create-layout">
     <form id="create-object-form" class="form-column card" [formGroup]="form" (ngSubmit)="submit()">
-      <section class="section-block">
-        <h2>Image Gallery</h2>
-        <label>
-          <span>Main image URL</span>
-          <input type="url" formControlName="imageUrl" placeholder="https://example.com/image.jpg" />
-        </label>
-        <div class="image-preview-box">
-          @if (imagePreviewUrl) {
-            <img [src]="imagePreviewUrl" alt="Object image preview" class="image-preview" />
+      <section class="section-block section-block--gallery">
+        <div class="gallery-card-head">
+          <span class="step-tag">STEP 1</span>
+          <h2>Media Gallery</h2>
+          <p class="gallery-intro">
+            @if (isManagerReview) {
+              Read-only gallery shown before the review details.
+            } @else {
+              Paste public image URLs and choose a primary cover image.
+            }
+          </p>
+        </div>
+
+        @if (!isManagerReview) {
+          <div class="gallery-dropzone">
+            <p class="dropzone-title">Add Photo URL</p>
+            <p class="dropzone-copy">Images are attached after the object is saved via the image endpoint.</p>
+
+            <div class="dropzone-input-row">
+              <input
+                type="url"
+                [(ngModel)]="pendingImageUrl"
+                [ngModelOptions]="{ standalone: true }"
+                placeholder="https://example.com/image.jpg"
+                (keydown.enter)="$event.preventDefault(); addImageUrl()"
+              />
+              <button type="button" class="primary-btn" (click)="addImageUrl()">Add Photo</button>
+            </div>
+          </div>
+        }
+
+        @if (imageUrls.length > 0) {
+          @if (isManagerReview) {
+            <div class="media-layout" aria-label="Object image gallery">
+              <div class="media-preview" aria-label="Main object image preview">
+                <img [src]="reviewImagePreviewUrl" alt="Object preview" />
+              </div>
+
+              <div class="media-strip">
+                @if (sideReviewImages.length > 0) {
+                  <div class="media-thumbnails">
+                    @for (imageUrl of sideReviewImages; track imageUrl) {
+                      <button type="button" class="media-thumb" (click)="selectReviewImage(imageUrl)">
+                        <img [src]="imageUrl" alt="Object image thumbnail" />
+                      </button>
+                    }
+                  </div>
+                } @else {
+                  <div class="media-empty">No additional gallery images are available.</div>
+                }
+              </div>
+            </div>
           } @else {
-            <div class="image-preview-empty">
-              <span class="material-symbols-outlined">image</span>
-              <p>Paste an image URL to preview it here.</p>
+            <div class="gallery-grid">
+              <article class="gallery-item" *ngFor="let imageUrl of imageUrls; let index = index">
+                <img [src]="imageUrl" alt="Object image preview" />
+                <div class="gallery-actions">
+                  @if (index === 0) {
+                    <span class="primary-badge">Primary</span>
+                  } @else {
+                    <button type="button" class="ghost-btn small" (click)="setPrimaryImage(index)">Set Primary</button>
+                  }
+                  <button type="button" class="ghost-btn small danger" (click)="removeImage(index)">Remove</button>
+                </div>
+              </article>
             </div>
           }
-        </div>
+        } @else {
+          <div class="image-preview-empty">
+            <span class="material-symbols-outlined">image</span>
+            <p>
+              @if (isManagerReview) {
+                No images submitted for this object.
+              } @else {
+                Add at least one image URL above. Images are saved when you create or update the object.
+              }
+            </p>
+          </div>
+        }
       </section>
 
       <section class="section-block">
@@ -51,9 +153,19 @@
               <option *ngFor="let type of objectTypes" [ngValue]="type.id">{{ type.name }}</option>
             </select>
           </label>
-          <label>
+          <label class="price-field">
             <span>Price</span>
-            <input type="number" formControlName="price" min="0" step="0.01" placeholder="0.00" />
+            <div class="price-input-group">
+              <span class="price-input-prefix" aria-hidden="true">€</span>
+              <input
+                type="number"
+                formControlName="price"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                inputmode="decimal"
+              />
+            </div>
           </label>
           <label>
             <span>Destination</span>
@@ -140,26 +252,39 @@
         </label>
       </div>
 
-      <div class="review-snapshot">
-        <span>Review Snapshot</span>
-        <div class="review-row">
-          <strong>4.8</strong>
-          <span class="stars">★★★★★</span>
-          <a href="javascript:void(0)">42,980 reviews</a>
+      @if (editSidebar) {
+        <div class="review-snapshot">
+          <span>Review Snapshot</span>
+          <div class="review-row">
+            <strong>{{ ratingAverageDisplay(editSidebar.averageRating) }}</strong>
+            <span class="stars" aria-hidden="true">{{ ratingStarsVisual(editSidebar.averageRating) }}</span>
+            <span class="review-count">{{ editSidebar.reviewCount | number }} reviews</span>
+          </div>
         </div>
-      </div>
 
-      <article class="creator-card">
-        <div class="creator-avatar">AJ</div>
-        <div>
-          <strong>Created by Sarah Jenkin</strong>
-          <p>Oct 2024, edited Jul 2025</p>
-        </div>
-      </article>
+        <article class="creator-card">
+          <div class="creator-avatar">{{ editSidebar.creatorInitials }}</div>
+          <div>
+            @if (editSidebar.creatorFullName) {
+              <strong>Created by {{ editSidebar.creatorFullName }}</strong>
+            } @else {
+              <strong>Creator</strong>
+              <p class="sidebar-muted">Name not available in this view.</p>
+            }
+            @if (editSidebar.createdUpdatedLine) {
+              <p>{{ editSidebar.createdUpdatedLine }}</p>
+            }
+          </div>
+        </article>
+      }
 
-      <p class="sidebar-note">
-        You have super admin write access to this object. Changes will be instantly reflected across all SpireGO platforms.
-      </p>
+      @if (isManagerReview) {
+        <p class="sidebar-note">You are viewing this submission as a destination manager. Editing is disabled on this page.</p>
+      } @else {
+        <p class="sidebar-note">
+          Save changes to update this object. Ratings and review counts reflect approved guest reviews.
+        </p>
+      }
 
       <a class="history-link" href="javascript:void(0)">
         <span class="material-symbols-outlined">history</span>
@@ -167,4 +292,92 @@
       </a>
     </aside>
   </div>
+
+  @if (showDeclineModal) {
+    <div class="object-decline-backdrop" (click)="closeDeclineModal()">
+      <section
+        class="card object-decline-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="object-decline-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="object-decline-modal-icon" aria-hidden="true">
+          <span class="material-symbols-outlined">thumb_down</span>
+        </div>
+
+        <h3 id="object-decline-title">Decline object</h3>
+        <p class="object-decline-description">
+          Provide a clear reason so the content creator can address required changes.
+        </p>
+
+        <textarea
+          class="decline-reason-input"
+          [(ngModel)]="rejectionReason"
+          [ngModelOptions]="{ standalone: true }"
+          rows="4"
+          placeholder="Example: Details do not match the managed destination guidelines."
+        ></textarea>
+
+        <div class="object-decline-modal-actions">
+          <button type="button" class="ghost-btn" (click)="closeDeclineModal()" [disabled]="isReviewSubmitting">
+            Keep pending
+          </button>
+          <button
+            type="button"
+            class="confirm-decline-btn"
+            (click)="declineObject()"
+            [disabled]="isReviewSubmitting"
+          >
+            {{ isReviewSubmitting ? 'Declining...' : 'Decline object' }}
+          </button>
+        </div>
+      </section>
+    </div>
+  }
+
+  @if (showDeleteModal) {
+    <div class="object-delete-backdrop" (click)="closeDeleteModal()">
+      <section
+        class="card object-delete-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="object-delete-title"
+        aria-describedby="object-delete-description"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="object-delete-modal-icon" aria-hidden="true">
+          <span class="material-symbols-outlined">delete</span>
+        </div>
+
+        <h3 id="object-delete-title">{{ deleteModalTitle }}</h3>
+        <p id="object-delete-description">
+          {{ deleteModalDescription }}<br />
+          {{
+            isApprovedObject
+              ? 'A manager will review the request before the object is removed.'
+              : 'This action cannot be undone.'
+          }}
+        </p>
+
+        <div class="object-delete-modal-actions">
+          <button type="button" class="ghost-btn" (click)="closeDeleteModal()" [disabled]="isDeletingObject">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="confirm-delete-btn"
+            (click)="deleteObject()"
+            [disabled]="isDeletingObject"
+          >
+            {{
+              isDeletingObject
+                ? (isApprovedObject ? 'Submitting...' : 'Deleting...')
+                : (isApprovedObject ? 'Request deletion' : 'Delete')
+            }}
+          </button>
+        </div>
+      </section>
+    </div>
+  }
 </section>

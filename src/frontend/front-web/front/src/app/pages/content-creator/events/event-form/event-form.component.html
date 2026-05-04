@@ -45,48 +45,55 @@
   <div class="form-layout">
     <div class="form-main" [formGroup]="form">
       <div
-        class="upload-card card"
+        class="upload-card card event-media-gallery"
         [class.image-drop-active]="isImageDropActive"
-        (dragover)="onImageDragOver($event)"
-        (dragleave)="onImageDragLeave($event)"
-        (drop)="onImageDrop($event)"
+        (dragover)="onGalleryDragOver($event)"
+        (dragleave)="onGalleryDragLeave($event)"
+        (drop)="onGalleryDrop($event)"
       >
-        <div class="section-title compact">
+        <div class="gallery-card-head">
           <span class="step-tag">STEP 1</span>
-          <h2>Event Image</h2>
-          <p>Paste a public image URL and preview it before saving.</p>
+          <h2>Media Gallery</h2>
+          <p class="gallery-intro">Paste public image URLs and choose a primary cover image.</p>
         </div>
 
-        <label class="form-field full-width">
-          <span>Image URL</span>
-          <input
-            class="form-control"
-            type="url"
-            formControlName="imageUrl"
-            placeholder="https://example.com/event-banner.jpg"
-            (input)="onImageUrlChange($any($event.target).value)"
-            (dragover)="onImageDragOver($event)"
-            (dragleave)="onImageDragLeave($event)"
-            (drop)="onImageDrop($event)"
-          />
-        </label>
+        <div class="gallery-dropzone">
+          <p class="dropzone-title">Add Photo URL</p>
+          <p class="dropzone-copy">Images are attached after the event is saved via the image endpoint.</p>
 
-        <div class="upload-area preview-only" aria-label="Event image preview">
-          @if (imagePreviewUrl && !isImagePreviewBroken) {
-            <button type="button" class="preview-clear-btn" (click)="clearImage()" aria-label="Remove image">
-              <span class="material-symbols-outlined">close</span>
-              Remove
-            </button>
-            <img [src]="imagePreviewUrl" alt="Event banner preview" (error)="onImagePreviewError()" />
-          } @else {
-            <div class="upload-placeholder">
-              <span class="material-symbols-outlined">image</span>
-              <strong>No usable image preview yet</strong>
-              <p>Paste or drag a direct image URL here. If the URL points to a page instead of the image file, the preview will stay blank.</p>
-              <small>The URL must resolve directly to an image.</small>
-            </div>
-          }
+          <div class="dropzone-input-row">
+            <input
+              type="url"
+              class="form-control"
+              [(ngModel)]="pendingImageUrl"
+              [ngModelOptions]="{ standalone: true }"
+              placeholder="https://example.com/event-banner.jpg"
+              (keydown.enter)="$event.preventDefault(); addImageUrl()"
+            />
+            <button type="button" class="primary-btn" (click)="addImageUrl()">Add Photo</button>
+          </div>
         </div>
+
+        @if (imageUrls.length > 0) {
+          <div class="gallery-grid">
+            <article class="gallery-item" *ngFor="let url of imageUrls; let index = index">
+              <img [src]="url" alt="Event image preview" />
+              <div class="gallery-actions">
+                @if (index === 0) {
+                  <span class="primary-badge">Primary</span>
+                } @else {
+                  <button type="button" class="ghost-btn small" (click)="setPrimaryImage(index)">Set Primary</button>
+                }
+                <button type="button" class="ghost-btn small danger" (click)="removeImage(index)">Remove</button>
+              </div>
+            </article>
+          </div>
+        } @else {
+          <div class="image-preview-empty">
+            <span class="material-symbols-outlined">image</span>
+            <p>Add at least one image URL above. Images are saved when you create or update the event.</p>
+          </div>
+        }
       </div>
 
       <form class="editor-grid" [formGroup]="form" (ngSubmit)="submit()">
@@ -277,7 +284,7 @@
         </div>
 
         <div class="venue-card">
-          <small>Linked venue object</small>
+          <small>Linked venue object: </small>
           <strong>{{ selectedVenue.name }}</strong>
           <p>{{ selectedVenue.address }}</p>
         </div>

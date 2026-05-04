@@ -80,7 +80,30 @@
 
   <div class="activities-layout">
     <div class="main-column">
+      @if (!errorMessage) {
+        <div class="stats-row">
+          <article class="stat-card" data-tone="blue">
+            <p>Total activities</p>
+            <strong>{{ statsTotalAllStatuses != null ? statsTotalAllStatuses : '—' }}</strong>
+            <span>All statuses · same search &amp; type filter as the table</span>
+          </article>
+          <article class="stat-card" data-tone="green">
+            <p>On this page</p>
+            <strong>{{ isLoading ? '—' : activities.length }}</strong>
+            <span>Visible rows</span>
+          </article>
+          <article class="stat-card" data-tone="neutral">
+            <p>Pending review</p>
+            <strong>{{ statsPendingCount != null ? statsPendingCount : '—' }}</strong>
+            <span>Same search &amp; type filter as the table</span>
+          </article>
+        </div>
+      }
+
       <div class="table-card">
+        <header class="table-header">
+          <h2>{{ managedCityLabel || 'Activities' }}</h2>
+        </header>
         @if (isLoading) {
           <div class="state state-loading">Loading activities...</div>
         } @else if (errorMessage) {
@@ -135,7 +158,7 @@
                     <div class="row-actions">
                       <button
                         type="button"
-                        class="icon-btn plain"
+                        class="icon-btn"
                         title="Review activity"
                         (click)="onReviewActivity(activity); $event.stopPropagation()"
                       >
@@ -273,10 +296,30 @@
           <p class="description-copy">{{ selectedSummary }}</p>
         </section>
 
+        <section class="detail-section">
+          <div class="map-card">
+            @if (hasSelectedActivityCoordinates) {
+              <app-map
+                [lat]="selectedActivityLat"
+                [lng]="selectedActivityLng"
+                [zoom]="14"
+                [popupText]="selectedActivityLocationLabel"
+                [interactive]="false"
+                mapId="manager-activity-details-map"
+              ></app-map>
+            } @else {
+              <div class="map-empty-state">
+                <span class="material-symbols-outlined">location_off</span>
+                <p>Coordinates are not available for this activity.</p>
+              </div>
+            }
+          </div>
+        </section>
+
         <div class="detail-cta">
           <button
             type="button"
-            class="primary-btn full-cta"
+            class="primary-btn full-cta sidebar-cta-btn"
             (click)="onReviewActivity((selectedActivityDetails ?? selectedActivity)!)"
           >
             <span class="material-symbols-outlined">rate_review</span>

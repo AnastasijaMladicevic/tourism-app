@@ -49,8 +49,8 @@ export class ContentCreatorEventsComponent implements OnInit {
   draftSearchQuery = '';
   statusFilter = 'all';
   categoryFilter = 'all';
-  sortBy = 'startDate';
-  sortOrder: 'asc' | 'desc' = 'asc';
+  sortBy = 'status';
+  sortOrder: 'asc' | 'desc' = 'desc';
   filterPanelOpen = false;
   rangeStartDate = '';
   rangeEndDate = '';
@@ -214,8 +214,8 @@ export class ContentCreatorEventsComponent implements OnInit {
     this.draftSearchQuery = '';
     this.statusFilter = 'all';
     this.categoryFilter = 'all';
-    this.sortBy = 'startDate';
-    this.sortOrder = 'asc';
+    this.sortBy = 'status';
+    this.sortOrder = 'desc';
     this.rangeStartDate = '';
     this.rangeEndDate = '';
     this.currentPage = 1;

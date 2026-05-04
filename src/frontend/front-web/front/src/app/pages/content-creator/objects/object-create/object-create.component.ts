@@ -1,17 +1,22 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { forkJoin, of } from 'rxjs';
-import { catchError, finalize, map } from 'rxjs/operators';
+import { forkJoin, from, Observable, of } from 'rxjs';
+import { catchError, concatMap, finalize, map, switchMap, tap, toArray } from 'rxjs/operators';
+import { ApproveContentDto } from '../../../../models/event.model';
 import {
   CreateObjectDto,
+  ObjectDto,
+  ObjectImageDto,
   ObjectService,
   ObjectTypeOption,
   UpdateObjectDto
 } from '../../../../services/object';
 import { ActivitiesService, LocalityOption } from '../../../../services/activities';
 import { DestinationDto, DestinationService } from '../../../../services/destination.service';
+import { AuthService } from '../../../../services/auth.service';
 import { MapComponent as SharedMapComponent } from '../../../../shared/components/map/map';
 
 type WorkingDayKey = 'pon' | 'uto' | 'sre' | 'cet' | 'pet' | 'sub' | 'ned';
@@ -19,7 +24,7 @@ type WorkingDayKey = 'pon' | 'uto' | 'sre' | 'cet' | 'pet' | 'sub' | 'ned';
 @Component({
   selector: 'app-object-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, SharedMapComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, SharedMapComponent],
   templateUrl: './object-create.component.html',
   styleUrl: './object-create.component.css'
 })
@@ -27,9 +32,26 @@ export class ObjectCreateComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly location = inject(Location);
   private readonly objectService = inject(ObjectService);
   private readonly destinationService = inject(DestinationService);
   private readonly activitiesService = inject(ActivitiesService);
+  private readonly authService = inject(AuthService);
+  private readonly cdr = inject(ChangeDetectorRef);
+
+  /** Manager opens this page read-only via `/manager/objects/review/:id` (route data). */
+  isManagerReview = false;
+
+  /** Latest content status from API (for approve/decline availability). */
+  reviewObjectStatus = '';
+
+  isReviewSubmitting = false;
+  showDeclineModal = false;
+  rejectionReason = '';
+
+  /** CC edit: delete vs manager deletion request (approved objects). */
+  showDeleteModal = false;
+  isDeletingObject = false;
 
   readonly workingDays: Array<{ key: WorkingDayKey; label: string }> = [
     { key: 'pon', label: 'Monday' },
@@ -52,6 +74,25 @@ export class ObjectCreateComponent implements OnInit {
   isEditMode = false;
   objectId: number | null = null;
 
+  /** Pending URL input (same pattern as Add Activity). */
+  pendingImageUrl = '';
+
+  /** Ordered gallery URLs; index 0 is the primary cover image. */
+  imageUrls: string[] = [];
+  selectedReviewImageUrl = '';
+
+  /** Last-known server image rows for this object (used to delete/update on save). */
+  imagesSnapshot: ObjectImageDto[] = [];
+
+  /** Server-backed sidebar row when editing / reviewing an existing object. */
+  editSidebar: {
+    averageRating: number | null;
+    reviewCount: number;
+    creatorFullName: string;
+    creatorInitials: string;
+    createdUpdatedLine: string;
+  } | null = null;
+
   form = this.fb.group({
     name: this.fb.nonNullable.control('', [Validators.required, Validators.maxLength(200)]),
     address: this.fb.nonNullable.control('', [Validators.maxLength(300)]),
@@ -62,7 +103,6 @@ export class ObjectCreateComponent implements OnInit {
     price: this.fb.control<number | null>(null, [Validators.min(0)]),
     latitude: this.fb.control<number | null>(null, [Validators.min(-90), Validators.max(90)]),
     longitude: this.fb.control<number | null>(null, [Validators.min(-180), Validators.max(180)]),
-    imageUrl: this.fb.nonNullable.control(''),
     amenitiesInput: this.fb.nonNullable.control('')
   });
 
@@ -84,13 +124,22 @@ export class ObjectCreateComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.isManagerReview = this.route.snapshot.data['managerReview'] === true;
+
     const idFromRoute = Number(this.route.snapshot.paramMap.get('id'));
-    if (Number.isFinite(idFromRoute) && idFromRoute > 0) {
+    if (this.isManagerReview) {
+      if (Number.isFinite(idFromRoute) && idFromRoute > 0) {
+        this.isEditMode = true;
+        this.objectId = idFromRoute;
+      }
+    } else if (Number.isFinite(idFromRoute) && idFromRoute > 0) {
       this.isEditMode = true;
       this.objectId = idFromRoute;
     }
 
-    this.loadOptions();
+    if (!(this.isEditMode && this.objectId)) {
+      this.loadOptions();
+    }
 
     this.form.controls.destinationId.valueChanges.subscribe(() => {
       this.applyLocationFromSelection();
@@ -101,12 +150,234 @@ export class ObjectCreateComponent implements OnInit {
     });
 
     if (this.isEditMode && this.objectId) {
-      this.loadObject(this.objectId);
+      this.loadObjectForEdit(this.objectId);
     }
   }
 
   get pageTitle(): string {
+    if (this.isManagerReview) {
+      return 'Review object';
+    }
     return this.isEditMode ? 'Edit Object' : 'Create Object';
+  }
+
+  get pageIntro(): string {
+    if (this.isManagerReview) {
+      return 'View object details submitted for approval. Editing is disabled.';
+    }
+    return 'Add a new object with location, details, amenities, and opening hours.';
+  }
+
+  get objectsListPath(): string {
+    return this.isManagerReview ? '/manager/objects' : '/content-creator/objects';
+  }
+
+  get eyebrowLabel(): string {
+    return this.isManagerReview ? 'Objects review' : 'Objects management';
+  }
+
+  get reviewStatusKey(): string {
+    return (this.reviewObjectStatus ?? '').toLowerCase();
+  }
+
+  get approveActionDisabled(): boolean {
+    const s = this.reviewStatusKey;
+    return (
+      this.isReviewSubmitting ||
+      !this.objectId ||
+      s === 'approved' ||
+      s === 'rejected'
+    );
+  }
+
+  get declineActionDisabled(): boolean {
+    const s = this.reviewStatusKey;
+    return (
+      this.isReviewSubmitting ||
+      !this.objectId ||
+      s === 'approved' ||
+      s === 'rejected'
+    );
+  }
+
+  /** CC edit only: approved tourist objects require a manager-reviewed deletion request. */
+  get isApprovedObject(): boolean {
+    if (this.isManagerReview) {
+      return false;
+    }
+    return this.reviewObjectStatus.toLowerCase() === 'approved';
+  }
+
+  get deleteModalTitle(): string {
+    return this.isApprovedObject ? 'Request deletion' : 'Confirm deletion';
+  }
+
+  get deleteModalDescription(): string {
+    return this.isApprovedObject
+      ? 'This object is approved, so removal requires a manager deletion request.'
+      : 'This object is still pending, so it can be removed immediately.';
+  }
+
+  openDeleteModal(): void {
+    if (!this.isEditMode || !this.objectId || this.isSubmitting || this.isDeletingObject || this.isManagerReview) {
+      return;
+    }
+    this.showDeleteModal = true;
+    this.errorMessage = '';
+  }
+
+  closeDeleteModal(): void {
+    if (this.isDeletingObject) {
+      return;
+    }
+    this.showDeleteModal = false;
+  }
+
+  deleteObject(): void {
+    if (!this.isEditMode || !this.objectId || this.isSubmitting || this.isDeletingObject || this.isManagerReview) {
+      return;
+    }
+
+    if (this.isApprovedObject) {
+      this.submitObjectDeletionRequest();
+      return;
+    }
+
+    this.submitObjectDirectDeletion();
+  }
+
+  private submitObjectDeletionRequest(): void {
+    if (!this.objectId || this.isDeletingObject) {
+      return;
+    }
+
+    this.isDeletingObject = true;
+    this.errorMessage = '';
+
+    this.objectService
+      .requestDeletion(this.objectId)
+      .pipe(
+        finalize(() => {
+          this.isDeletingObject = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.showDeleteModal = false;
+          this.router.navigate(['/content-creator/objects']);
+        },
+        error: (error: unknown) => {
+          const message =
+            error && typeof error === 'object' && 'error' in error
+              ? (error as { error?: { message?: string } }).error?.message
+              : undefined;
+          this.errorMessage = message ?? 'Failed to submit deletion request';
+        }
+      });
+  }
+
+  private submitObjectDirectDeletion(): void {
+    if (!this.objectId || this.isDeletingObject) {
+      return;
+    }
+
+    this.isDeletingObject = true;
+    this.errorMessage = '';
+
+    this.objectService
+      .delete(this.objectId)
+      .pipe(
+        finalize(() => {
+          this.isDeletingObject = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.showDeleteModal = false;
+          this.router.navigate(['/content-creator/objects']);
+        },
+        error: (error: unknown) => {
+          const message =
+            error && typeof error === 'object' && 'error' in error
+              ? (error as { error?: { message?: string } }).error?.message
+              : undefined;
+          this.errorMessage = message ?? 'Failed to delete object';
+        }
+      });
+  }
+
+  approveObject(): void {
+    if (!this.isManagerReview || !this.objectId || this.approveActionDisabled) {
+      return;
+    }
+
+    this.isReviewSubmitting = true;
+    this.errorMessage = '';
+
+    const dto: ApproveContentDto = { approve: true };
+
+    this.objectService
+      .approve(this.objectId, dto)
+      .pipe(finalize(() => (this.isReviewSubmitting = false)))
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/manager/objects']);
+        },
+        error: (error) => {
+          this.errorMessage = error?.error?.message ?? 'Failed to approve object.';
+        }
+      });
+  }
+
+  openDeclineModal(): void {
+    if (!this.objectId || this.isReviewSubmitting || this.declineActionDisabled) {
+      return;
+    }
+
+    this.rejectionReason = '';
+    this.errorMessage = '';
+    this.showDeclineModal = true;
+  }
+
+  closeDeclineModal(): void {
+    if (this.isReviewSubmitting) {
+      return;
+    }
+    this.showDeclineModal = false;
+  }
+
+  declineObject(): void {
+    if (!this.objectId || this.isReviewSubmitting) {
+      return;
+    }
+
+    if (!this.rejectionReason.trim()) {
+      this.errorMessage = 'Please provide a reason for decline.';
+      return;
+    }
+
+    this.isReviewSubmitting = true;
+    this.errorMessage = '';
+
+    const dto: ApproveContentDto = {
+      approve: false,
+      rejectionReason: this.rejectionReason.trim()
+    };
+
+    this.objectService
+      .approve(this.objectId, dto)
+      .pipe(finalize(() => (this.isReviewSubmitting = false)))
+      .subscribe({
+        next: () => {
+          this.showDeclineModal = false;
+          this.router.navigate(['/manager/objects']);
+        },
+        error: (error) => {
+          this.errorMessage = error?.error?.message ?? 'Failed to decline object.';
+        }
+      });
   }
 
   get filteredLocalities(): LocalityOption[] {
@@ -130,17 +401,86 @@ export class ObjectCreateComponent implements OnInit {
     return this.form.controls.latitude.value != null && this.form.controls.longitude.value != null;
   }
 
-  get imagePreviewUrl(): string {
-    const raw = this.form.controls.imageUrl.value.trim();
-    if (!raw) {
-      return '';
+  addImageUrl(): void {
+    if (this.isManagerReview) {
+      return;
     }
 
-    if (/^https?:\/\//i.test(raw)) {
-      return raw;
+    const url = this.pendingImageUrl.trim();
+    if (!url) {
+      return;
     }
 
-    return '';
+    if (!this.isValidHttpUrl(url)) {
+      this.errorMessage = 'Please enter a valid image URL (http or https).';
+      return;
+    }
+
+    if (this.imageUrls.includes(url)) {
+      this.pendingImageUrl = '';
+      return;
+    }
+
+    this.imageUrls.push(url);
+    this.pendingImageUrl = '';
+    this.errorMessage = '';
+  }
+
+  removeImage(index: number): void {
+    if (this.isManagerReview) {
+      return;
+    }
+    if (index < 0 || index >= this.imageUrls.length) {
+      return;
+    }
+
+    this.imageUrls.splice(index, 1);
+  }
+
+  setPrimaryImage(index: number): void {
+    if (this.isManagerReview) {
+      return;
+    }
+    if (index <= 0 || index >= this.imageUrls.length) {
+      return;
+    }
+
+    const [selected] = this.imageUrls.splice(index, 1);
+    this.imageUrls.unshift(selected);
+  }
+
+  selectReviewImage(url: string): void {
+    this.selectedReviewImageUrl = url?.trim() ?? '';
+  }
+
+  get reviewImagePreviewUrl(): string {
+    if (this.selectedReviewImageUrl) {
+      return this.selectedReviewImageUrl;
+    }
+
+    return this.imageUrls[0] ?? '';
+  }
+
+  get sideReviewImages(): string[] {
+    const selectedUrl = this.reviewImagePreviewUrl;
+    if (!selectedUrl) {
+      return this.imageUrls;
+    }
+
+    let removedSelectedOnce = false;
+    return this.imageUrls.filter((url) => {
+      const isSelected = url === selectedUrl;
+      if (isSelected && !removedSelectedOnce) {
+        removedSelectedOnce = true;
+        return false;
+      }
+
+      return true;
+    });
+  }
+
+  goBack(): void {
+    this.location.back();
   }
 
   get locationSummary(): string {
@@ -191,6 +531,10 @@ export class ObjectCreateComponent implements OnInit {
   }
 
   submit(): void {
+    if (this.isManagerReview) {
+      return;
+    }
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -224,93 +568,379 @@ export class ObjectCreateComponent implements OnInit {
       ? this.objectService.update(this.objectId, payload as UpdateObjectDto)
       : this.objectService.create(payload as CreateObjectDto);
 
-    request$.pipe(
-      finalize(() => {
-        this.isSubmitting = false;
+    request$
+      .pipe(
+        switchMap((obj) => {
+          if (this.isEditMode && this.objectId) {
+            return this.syncImagesAfterSave(this.objectId, this.imageUrls, this.imagesSnapshot).pipe(map(() => obj));
+          }
+          return this.attachImagesAfterCreate(obj as ObjectDto);
+        }),
+        finalize(() => {
+          this.isSubmitting = false;
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/content-creator/objects']);
+        },
+        error: (error) => {
+          this.errorMessage = error?.error?.message ?? 'Failed to save object.';
+        }
+      });
+  }
+
+  private attachImagesAfterCreate(created: ObjectDto): Observable<ObjectDto> {
+    if (this.imageUrls.length === 0) {
+      return of(created);
+    }
+
+    return this.objectService.attachImages(created.id, this.imageUrls).pipe(
+      map(() => created),
+      catchError(() => of(created))
+    );
+  }
+
+  /**
+   * Applies gallery changes on edit: deletes removed rows, adds new URLs, then aligns main image with order.
+   */
+  private syncImagesAfterSave(
+    objectId: number,
+    desiredOrdered: string[],
+    snapshot: ObjectImageDto[]
+  ): Observable<void> {
+    const desired = desiredOrdered.map((u) => u.trim()).filter((u) => u.length > 0);
+    const desiredSet = new Set(desired);
+
+    const toDelete = snapshot.filter((img) => !desiredSet.has(img.url.trim()));
+    const surviving = snapshot.filter((img) => desiredSet.has(img.url.trim()));
+
+    const urlToId = new Map<string, number>();
+    for (const img of surviving) {
+      urlToId.set(img.url.trim(), img.id);
+    }
+
+    const toAddOrdered = desired.filter((u) => !urlToId.has(u));
+
+    const delete$ =
+      toDelete.length === 0
+        ? of(undefined)
+        : forkJoin(toDelete.map((d) => this.objectService.deleteImageById(d.id))).pipe(
+            map(() => undefined),
+            catchError(() => of(undefined))
+          );
+
+    return delete$.pipe(
+      switchMap(() => {
+        let pendingCount = surviving.length;
+
+        if (toAddOrdered.length === 0) {
+          return this.ensureMainImage(desired, urlToId);
+        }
+
+        return from(toAddOrdered).pipe(
+          concatMap((url) => {
+            const isMain = pendingCount === 0;
+            pendingCount++;
+            return this.objectService.addImage(objectId, { url, isMain }).pipe(
+              tap((dto) => {
+                urlToId.set(url.trim(), dto.id);
+              })
+            );
+          }),
+          toArray(),
+          switchMap(() => this.ensureMainImage(desired, urlToId))
+        );
       })
-    ).subscribe({
-      next: (created) => {
-        if (this.isEditMode) {
-          this.router.navigate(['/content-creator/objects']);
-          return;
-        }
+    );
+  }
 
-        const imageUrl = this.optionalTrimmed(this.form.controls.imageUrl.value);
-        if (!imageUrl) {
-          this.router.navigate(['/content-creator/objects']);
-          return;
-        }
+  private ensureMainImage(desired: string[], urlToId: Map<string, number>): Observable<void> {
+    if (desired.length === 0) {
+      return of(undefined);
+    }
 
-        this.objectService.addImage(created.id, { url: imageUrl, isMain: true }).subscribe({
-          next: () => this.router.navigate(['/content-creator/objects']),
-          error: () => this.router.navigate(['/content-creator/objects'])
-        });
-      },
-      error: (error) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to create object.';
-      }
-    });
+    const mainId = urlToId.get(desired[0]);
+    if (!mainId) {
+      return of(undefined);
+    }
+
+    return this.objectService.setMainImage(mainId).pipe(
+      map(() => undefined),
+      catchError(() => of(undefined))
+    );
+  }
+
+  private isValidHttpUrl(value: string): boolean {
+    try {
+      const parsed = new URL(value);
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch {
+      return false;
+    }
   }
 
   private loadOptions(): void {
     this.isLoadingOptions = true;
 
+    this.fetchOptionLists().pipe(
+      finalize(() => {
+        this.isLoadingOptions = false;
+      })
+    ).subscribe({
+      next: ({ objectTypes, destinations, localities }) => {
+        this.objectTypes = objectTypes;
+        this.destinations = destinations;
+        this.localities = localities;
+        this.applyLocationFromSelection();
+      }
+    });
+  }
+
+  /**
+   * Loads dropdown options and the object together so selects always have matching options
+   * before patchValue (avoids blank selects when options arrive after the object payload).
+   */
+  private loadObjectForEdit(id: number): void {
+    this.isLoadingObject = true;
+    this.isLoadingOptions = true;
+    this.errorMessage = '';
+
     forkJoin({
+      lists: this.fetchOptionLists(),
+      objectItem: this.objectService.getById(id),
+      images: this.objectService.getImages(id).pipe(catchError(() => of([] as ObjectImageDto[])))
+    }).pipe(
+      finalize(() => {
+        this.isLoadingObject = false;
+        this.isLoadingOptions = false;
+      })
+    ).subscribe({
+      next: ({ lists, objectItem, images }) => {
+        this.objectTypes = lists.objectTypes;
+        this.destinations = lists.destinations;
+        this.localities = lists.localities;
+        const merged: ObjectDto = {
+          ...objectItem,
+          images: images.length > 0 ? images : objectItem.images ?? []
+        };
+        this.mergeOptionsFromLoadedObject(merged);
+        this.applyFormFromObject(merged);
+      },
+      error: (error) => {
+        this.errorMessage = error?.error?.message ?? 'Failed to load object details.';
+      }
+    });
+  }
+
+  private fetchOptionLists(): Observable<{
+    objectTypes: ObjectTypeOption[];
+    destinations: DestinationDto[];
+    localities: LocalityOption[];
+  }> {
+    return forkJoin({
       objectTypes: this.objectService.getObjectTypeOptions().pipe(catchError(() => of([]))),
-      destinations: this.destinationService.getAll({
-        page: 1,
-        pageSize: 300,
-        sortBy: 'name',
-        sortOrder: 'asc'
-      }).pipe(
+      destinations: this.destinationService.getAll(
+        {
+          page: 1,
+          pageSize: 300,
+          sortBy: 'name',
+          sortOrder: 'asc'
+        },
+        { bypassRegion: true }
+      ).pipe(
         map((response: DestinationDto[] | { items?: DestinationDto[] }) => {
           return Array.isArray(response) ? response : (response.items ?? []);
         }),
         catchError(() => of([]))
       ),
       localities: this.activitiesService.getLocalityOptions().pipe(catchError(() => of([])))
-    }).pipe(
-      finalize(() => {
-        this.isLoadingOptions = false;
-      })
-    ).subscribe(({ objectTypes, destinations, localities }) => {
-      this.objectTypes = objectTypes;
-      this.destinations = destinations;
-      this.localities = localities;
-      this.applyLocationFromSelection();
     });
   }
 
-  private loadObject(id: number): void {
-    this.isLoadingObject = true;
-    this.errorMessage = '';
+  /** Ensures current IDs always appear in selects (region filter, pagination, or type derivation gaps). */
+  private buildOrderedImageUrls(o: ObjectDto): string[] {
+    const imgs = o.images ?? [];
+    if (imgs.length > 0) {
+      const sorted = [...imgs].sort((a, b) => {
+        if (a.isMain === b.isMain) {
+          return 0;
+        }
+        return a.isMain ? -1 : 1;
+      });
+      const urls = sorted.map((i) => i.url?.trim()).filter((u): u is string => !!u);
+      const seen = new Set<string>();
+      return urls.filter((u) => {
+        if (seen.has(u)) {
+          return false;
+        }
+        seen.add(u);
+        return true;
+      });
+    }
 
-    this.objectService.getById(id).pipe(
-      finalize(() => {
-        this.isLoadingObject = false;
-      })
-    ).subscribe({
-      next: (objectItem) => {
-        this.form.patchValue({
-          name: objectItem.name ?? '',
-          address: objectItem.address ?? '',
-          description: objectItem.description ?? '',
-          objectTypeId: objectItem.objectTypeId ?? null,
-          destinationId: objectItem.destinationId ?? null,
-          localityId: objectItem.localityId ?? null,
-          price: objectItem.price ?? null,
-          latitude: objectItem.latitude ?? null,
-          longitude: objectItem.longitude ?? null,
-          imageUrl: objectItem.mainImageUrl ?? '',
-          amenitiesInput: (objectItem.amenities ?? []).join(', ')
-        }, { emitEvent: false });
+    const main = o.mainImageUrl?.trim();
+    if (main && /^https?:\/\//i.test(main)) {
+      return [main];
+    }
+    return [];
+  }
 
-        this.patchWorkingHours(objectItem.workingHours);
+  private mergeOptionsFromLoadedObject(o: ObjectDto): void {
+    const typeId = this.normalizeOptionalId(o.objectTypeId);
+    if (typeId != null && !this.objectTypes.some((t) => t.id === typeId)) {
+      this.objectTypes = [
+        ...this.objectTypes,
+        { id: typeId, name: o.objectTypeName?.trim() || `Type #${typeId}` }
+      ].sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    const destId = this.normalizeOptionalId(o.destinationId);
+    if (destId != null && !this.destinations.some((d) => d.id === destId)) {
+      const synthetic: DestinationDto = {
+        id: destId,
+        name: o.destinationName?.trim() || `Destination #${destId}`,
+        isActive: true,
+        destinationTypeId: 0,
+        destinationTypeName: ''
+      };
+      this.destinations = [...this.destinations, synthetic].sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    const locId = this.normalizeOptionalId(o.localityId);
+    if (locId != null && !this.localities.some((l) => l.id === locId)) {
+      const synthetic: LocalityOption = {
+        id: locId,
+        name: o.localityName?.trim() || `Locality #${locId}`,
+        destinationId: this.normalizeOptionalId(o.destinationId) ?? 0,
+        destinationName: o.destinationName?.trim() || ''
+      };
+      this.localities = [...this.localities, synthetic].sort((a, b) => a.name.localeCompare(b.name));
+    }
+  }
+
+  private applyFormFromObject(objectItem: ObjectDto): void {
+    const imgs = objectItem.images ?? [];
+    this.imagesSnapshot = imgs.map((i) => ({ ...i }));
+    this.imageUrls = this.buildOrderedImageUrls(objectItem);
+    this.selectedReviewImageUrl = this.imageUrls[0] ?? '';
+
+    this.form.patchValue(
+      {
+        name: objectItem.name ?? '',
+        address: objectItem.address ?? '',
+        description: objectItem.description ?? '',
+        objectTypeId: this.normalizeOptionalId(objectItem.objectTypeId),
+        destinationId: this.normalizeOptionalId(objectItem.destinationId),
+        localityId: this.normalizeOptionalId(objectItem.localityId),
+        price: objectItem.price ?? null,
+        latitude: objectItem.latitude ?? null,
+        longitude: objectItem.longitude ?? null,
+        amenitiesInput: (objectItem.amenities ?? []).join(', ')
       },
-      error: (error) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to load object details.';
+      { emitEvent: false }
+    );
+
+    const creatorName = this.resolveCreatorDisplayName(objectItem);
+    this.editSidebar = {
+      averageRating: this.normalizeOptionalNumber(objectItem.averageRating),
+      reviewCount: Number.isFinite(Number(objectItem.reviewCount)) ? Number(objectItem.reviewCount) : 0,
+      creatorFullName: creatorName,
+      creatorInitials: this.initialsFromFullName(creatorName),
+      createdUpdatedLine: this.formatCreatedUpdatedLine(objectItem.createdAt, objectItem.updatedAt)
+    };
+
+    const lat = this.form.controls.latitude.value;
+    const lng = this.form.controls.longitude.value;
+    if (lat == null || lng == null) {
+      this.applyLocationFromSelection();
+    }
+
+    this.patchWorkingHours(objectItem.workingHours);
+    this.reviewObjectStatus = (objectItem.status ?? '').trim();
+    this.applyManagerReadOnlyState();
+  }
+
+  private normalizeOptionalId(value: unknown): number | null {
+    if (value == null || value === '') {
+      return null;
+    }
+    const n = Number(value);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  private normalizeOptionalNumber(value: unknown): number | null {
+    if (value == null || value === '') {
+      return null;
+    }
+    const n = Number(value);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  /**
+   * Full name is not returned on object DTOs. When the signed-in user owns the object,
+   * use profile from session; otherwise we cannot resolve another user's name without a BE field or admin API.
+   */
+  private resolveCreatorDisplayName(o: ObjectDto): string {
+    const uid = this.normalizeOptionalId(o.createdByUserId);
+    const me = this.authService.getCurrentUser();
+    if (uid != null && me?.id != null && Number(me.id) === uid) {
+      return `${me.firstName} ${me.lastName}`.trim();
+    }
+    return '';
+  }
+
+  private initialsFromFullName(fullName: string): string {
+    const parts = fullName.split(/\s+/).filter(Boolean);
+    if (parts.length === 0) {
+      return '?';
+    }
+    if (parts.length === 1) {
+      return parts[0].slice(0, 2).toUpperCase();
+    }
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  private formatCreatedUpdatedLine(createdIso?: string, updatedIso?: string): string {
+    const created = createdIso ? this.formatSidebarMonthYear(createdIso) : '';
+    const updated = updatedIso ? this.formatSidebarMonthYear(updatedIso) : '';
+    if (created && updated && created !== updated) {
+      return `${created}, edited ${updated}`;
+    }
+    if (created) {
+      return created;
+    }
+    if (updated) {
+      return `Updated ${updated}`;
+    }
+    return '';
+  }
+
+  private formatSidebarMonthYear(iso: string): string {
+    try {
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) {
+        return '';
       }
-    });
+      return new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' }).format(d);
+    } catch {
+      return '';
+    }
+  }
+
+  ratingStarsVisual(rating: number | null): string {
+    if (rating == null || !Number.isFinite(rating)) {
+      return '☆☆☆☆☆';
+    }
+    const rounded = Math.max(0, Math.min(5, Math.round(Number(rating))));
+    return '★'.repeat(rounded) + '☆'.repeat(5 - rounded);
+  }
+
+  ratingAverageDisplay(rating: number | null): string {
+    if (rating == null || !Number.isFinite(rating)) {
+      return '—';
+    }
+    return Number(rating).toFixed(1);
   }
 
   private applyLocationFromSelection(): void {
@@ -374,6 +1004,15 @@ export class ObjectCreateComponent implements OnInit {
   private optionalTrimmed(value: string | null | undefined): string | undefined {
     const trimmed = value?.trim();
     return trimmed ? trimmed : undefined;
+  }
+
+  private applyManagerReadOnlyState(): void {
+    if (!this.isManagerReview) {
+      return;
+    }
+
+    this.form.disable({ emitEvent: false });
+    this.workingHoursForm.disable({ emitEvent: false });
   }
 
   private patchWorkingHours(workingHours?: string): void {
