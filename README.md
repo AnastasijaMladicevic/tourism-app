@@ -22,7 +22,8 @@ techspire/
 |   |       |-- TuristickiVodic.Services/
 |   |       `-- global.json
 |   |-- frontend/
-|   |   `-- front-mobilna/
+|   |    |-- front-mobilna/
+|   |    |-- front-web/front/
 |   `-- baza/
 |       `-- seed.sql
 `-- README.md
