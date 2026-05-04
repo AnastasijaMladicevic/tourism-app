@@ -35,8 +35,8 @@ export class ContentCreatorObjectsComponent implements OnInit {
   statusFilter = 'all';
   typeFilter = 'all';
   ratingFilter = 'all';
-  sortBy = 'name';
-  sortOrder: 'asc' | 'desc' = 'asc';
+  sortBy = 'status';
+  sortOrder: 'asc' | 'desc' = 'desc';
   filterPanelOpen = false;
 
   currentPage = 1;
@@ -141,8 +141,8 @@ export class ContentCreatorObjectsComponent implements OnInit {
     this.statusFilter = 'all';
     this.typeFilter = 'all';
     this.ratingFilter = 'all';
-    this.sortBy = 'name';
-    this.sortOrder = 'asc';
+    this.sortBy = 'status';
+    this.sortOrder = 'desc';
     this.currentPage = 1;
     this.loadObjects();
   }
@@ -218,12 +218,39 @@ export class ContentCreatorObjectsComponent implements OnInit {
   }
 
   getHeroStyle(): Record<string, string> {
+    const overlay =
+      'linear-gradient(180deg, rgba(15, 23, 42, 0.06), rgba(15, 23, 42, 0.28))';
+    const placeholder = 'linear-gradient(135deg, #dbeafe, #bfdbfe)';
     const image = this.normalizeImageUrl(this.selectedObject?.mainImageUrl);
+
     if (!image) {
-      return {};
+      return { 'background-image': `${overlay}, ${placeholder}` };
     }
 
-    return { 'background-image': `url("${image}")` };
+    return { 'background-image': `${overlay}, url("${image}")` };
+  }
+
+  /** Location line below the title (venue/locality · destination). */
+  getSidebarMetaLine(object: ObjectDto): string {
+    const addr = object.address?.trim();
+    const locality = object.localityName?.trim();
+    const destination = object.destinationName?.trim();
+    const region = object.regionName?.trim();
+
+    if (addr && destination) {
+      return `${addr} · ${destination}`;
+    }
+    if (addr && locality) {
+      return `${addr} · ${locality}`;
+    }
+    if (locality && destination && locality !== destination) {
+      return `${locality} · ${destination}`;
+    }
+    if (destination && region && destination !== region) {
+      return `${destination} · ${region}`;
+    }
+
+    return addr || locality || destination || region || '—';
   }
 
   get pageStart(): number {
@@ -244,6 +271,17 @@ export class ContentCreatorObjectsComponent implements OnInit {
     }
 
     return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+  }
+
+  /** Secondary line under destination (matches activities location column). */
+  getObjectTableSubline(object: ObjectDto): string {
+    if (object.destinationName && object.localityName) {
+      return object.localityName;
+    }
+    if (object.regionName) {
+      return object.regionName;
+    }
+    return '—';
   }
 
   formatPrice(price?: number | null): string {

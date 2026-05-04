@@ -6,6 +6,7 @@ import { EventService } from '../../../services/event.service';
 import { DestinationService } from '../../../services/destination.service';
 import { EventDto, EventQueryDto } from '../../../models/event.model';
 import { buildEventQueryDto, EventFilterState } from '../../../models/event-filters.model';
+import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 
 interface EventInsightCard {
   label: string;
@@ -22,7 +23,7 @@ interface EventScheduleRow {
 @Component({
   selector: 'app-manager-events',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SharedMapComponent],
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.css']
 })
@@ -47,8 +48,8 @@ export class ManagerEventsComponent implements OnInit {
   draftSearchQuery = '';
   statusFilter = 'all';
   categoryFilter = 'all';
-  sortBy = 'startDate';
-  sortOrder: 'asc' | 'desc' = 'asc';
+  sortBy = 'status';
+  sortOrder: 'asc' | 'desc' = 'desc';
   pageSize = 5;
   readonly pageSizeOptions = [5, 10, 20, 50];
   filterPanelOpen = false;
@@ -146,8 +147,8 @@ export class ManagerEventsComponent implements OnInit {
     this.draftSearchQuery = '';
     this.statusFilter = 'all';
     this.categoryFilter = 'all';
-    this.sortBy = 'startDate';
-    this.sortOrder = 'asc';
+    this.sortBy = 'status';
+    this.sortOrder = 'desc';
     this.pageSize = 5;
     this.currentPage = 1;
     this.loadEvents();
@@ -339,6 +340,27 @@ export class ManagerEventsComponent implements OnInit {
         value: `${this.formatTime(this.selectedEvent.endDate ?? this.selectedEvent.startDate)} Local Time`
       }
     ];
+  }
+
+  get hasSelectedEventCoordinates(): boolean {
+    return this.selectedEvent?.latitude != null && this.selectedEvent?.longitude != null;
+  }
+
+  get selectedEventLat(): number {
+    return this.selectedEvent?.latitude ?? 42.424;
+  }
+
+  get selectedEventLng(): number {
+    return this.selectedEvent?.longitude ?? 18.771;
+  }
+
+  get selectedEventLocationLabel(): string {
+    if (!this.selectedEvent) {
+      return 'Selected event';
+    }
+
+    const location = this.selectedEvent.objectName || this.selectedEvent.localityName || this.selectedEvent.destinationName;
+    return location ? `${this.selectedEvent.name} · ${location}` : this.selectedEvent.name;
   }
 
   get pageStart(): number {

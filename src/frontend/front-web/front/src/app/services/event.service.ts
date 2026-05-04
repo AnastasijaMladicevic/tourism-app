@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { from, map, Observable, of } from 'rxjs';
+import { concatMap, toArray } from 'rxjs/operators';
 import {
   EventDto,
   CreateEventDto,
@@ -16,6 +17,12 @@ import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
 export interface EventImageDto {
   id: number;
+  url: string;
+  altText?: string;
+  isMain: boolean;
+}
+
+export interface AddEventImageDto {
   url: string;
   altText?: string;
   isMain: boolean;
@@ -229,5 +236,34 @@ export class EventService {
     return this.http.post(`${this.apiUrl}/${id}/deletion-request`, {
       reason: reason || undefined
     });
+  }
+
+  addImage(eventId: number, dto: AddEventImageDto): Observable<EventImageDto> {
+    return this.http.post<EventImageDto>(`${this.apiUrl}/${eventId}/images`, dto);
+  }
+
+  getImages(eventId: number): Observable<EventImageDto[]> {
+    return this.http.get<EventImageDto[]>(`${this.apiUrl}/${eventId}/images`);
+  }
+
+  deleteImageById(imageId: number): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/images/${imageId}`);
+  }
+
+  setMainImage(imageId: number): Observable<EventImageDto> {
+    return this.http.patch<EventImageDto>(`${environment.apiUrl}/images/${imageId}/set-main`, {});
+  }
+
+  /** Sequential attach after event creation; first URL becomes main. */
+  attachImages(eventId: number, imageUrls: string[]): Observable<EventImageDto[]> {
+    const cleanUrls = imageUrls.map((u) => u.trim()).filter((u) => u.length > 0);
+    if (cleanUrls.length === 0) {
+      return of([]);
+    }
+
+    return from(cleanUrls).pipe(
+      concatMap((url, index) => this.addImage(eventId, { url, isMain: index === 0 })),
+      toArray()
+    );
   }
 }

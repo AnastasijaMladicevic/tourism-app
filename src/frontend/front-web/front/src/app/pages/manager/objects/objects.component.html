@@ -1,3 +1,272 @@
-<section class="manager-page">
-  <h1>Objects</h1>
+<section class="manager-objects-page">
+  <div class="page-head">
+    <div>
+      <p class="breadcrumbs">Dashboard <span>></span> Objects</p>
+      <h1>Objects</h1>
+      <p class="subtle-text">{{ managedCityLabel }}</p>
+    </div>
+  </div>
+
+  <div class="toolbar card">
+    <label class="search-field" aria-label="Search objects">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        [(ngModel)]="draftSearchQuery"
+        (keydown.enter)="onSearchEnter($event)"
+        placeholder="Search by name, category or region..."
+      />
+    </label>
+
+    <button type="button" class="ghost-btn" (click)="onMoreFilters()">
+      <span class="material-symbols-outlined">filter_alt</span>
+      More Filters
+    </button>
+  </div>
+
+  @if (filterPanelOpen) {
+    <div class="filters-panel card">
+      <label>
+        <span>Status</span>
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onApplyFilters()">
+          <option value="all">All Statuses</option>
+          <option *ngFor="let option of statusOptions" [value]="option.value">{{ option.label }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Type</span>
+        <select [(ngModel)]="typeFilter" (ngModelChange)="onApplyFilters()">
+          <option value="all">All Types</option>
+          <option *ngFor="let option of typeOptions" [value]="option.value">{{ option.label }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Rating</span>
+        <select [(ngModel)]="ratingFilter" (ngModelChange)="onApplyFilters()">
+          <option *ngFor="let option of ratingOptions" [value]="option.value">{{ option.label }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Sort by</span>
+        <select [(ngModel)]="sortBy" (ngModelChange)="onApplyFilters()">
+          <option *ngFor="let option of sortByOptions" [value]="option.value">{{ option.label }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Order</span>
+        <select [(ngModel)]="sortOrder" (ngModelChange)="onApplyFilters()">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </label>
+
+      <div class="filter-actions">
+        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">Apply Filters</button>
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">Reset Filters</button>
+      </div>
+    </div>
+  }
+
+  <div class="object-content-grid">
+    <div class="object-main-column">
+      <div class="stats-row">
+        <article class="stat-card" data-tone="blue">
+          <p>Total number of objects</p>
+          <strong>{{ totalCount }}</strong>
+          <span>Across your managed destinations</span>
+        </article>
+        <article class="stat-card" data-tone="green">
+          <p>On this page</p>
+          <strong>{{ pagedObjects.length }}</strong>
+          <span>Visible rows</span>
+        </article>
+        <article class="stat-card" data-tone="neutral">
+          <p>Average rating</p>
+          <strong>{{ averageRatingDisplay }}</strong>
+          <span>Across current page</span>
+        </article>
+      </div>
+
+      <section class="object-table-wrap card">
+        <header class="table-header">
+          <h2>{{ managedCityLabel || 'Objects' }}</h2>
+        </header>
+
+        @if (isLoading) {
+          <div class="state state-loading">Loading objects...</div>
+        } @else if (errorMessage) {
+          <div class="state state-error">{{ errorMessage }}</div>
+        } @else if (!pagedObjects.length) {
+          <div class="state">No objects found for the selected filters.</div>
+        } @else {
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Object details</th>
+                  <th>Type</th>
+                  <th>Destination</th>
+                  <th>Rating</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let object of pagedObjects; trackBy: trackByObjectId"
+                  [class.active-row]="selectedObject?.id === object.id"
+                  (click)="selectObject(object)"
+                >
+                  <td>
+                    <span class="status-chip" [ngClass]="getStatusBadgeClass(object.status)">
+                      {{ formatStatus(object.status) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="item-cell item-cell-with-media">
+                      <div class="media-thumb" [ngStyle]="getMediaStyle(object)"></div>
+                      <strong>{{ object.name }}</strong>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="type-pill">{{ object.objectTypeName || 'N/A' }}</span>
+                  </td>
+                  <td>{{ destinationCellText(object) }}</td>
+                  <td class="rating-cell">{{ (object.averageRating ?? 0).toFixed(1) }}</td>
+                  <td>
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      title="Review object"
+                      (click)="onRowAction(object, $event)"
+                    >
+                      <span class="material-symbols-outlined">open_in_new</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="table-footer">
+            <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ totalCount }} objects</p>
+            <div class="pager">
+              <label class="page-size-control">
+                <span>Page size</span>
+                <select class="page-size-select" [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+                  <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
+                </select>
+              </label>
+
+              <button type="button" class="ghost-btn small-btn" (click)="onPreviousPage()" [disabled]="currentPage === 1">
+                Previous
+              </button>
+              <button
+                type="button"
+                class="ghost-btn small-btn"
+                (click)="onNextPage()"
+                [disabled]="currentPage >= totalPages"
+              >
+                Next
+              </button>
+            </div>
+          </footer>
+        }
+      </section>
+    </div>
+
+    <aside class="object-side-column card">
+      @if (selectedObject) {
+        <div class="hero-media" [ngStyle]="getHeroStyle()">
+          <span class="hero-badge">{{ selectedObject.objectTypeName || 'Object' }}</span>
+          <h2>{{ selectedObject.name }}</h2>
+        </div>
+        <div class="hero-status-row">
+          <span class="publish-badge" [ngClass]="'status-' + getStatusBadgeClass(selectedObject.status)">
+            {{ formatStatus(selectedObject.status) }}
+          </span>
+        </div>
+
+        <div class="detail-metrics">
+          <div class="metric-card">
+            <span>Pricing</span>
+            <strong>{{ formatPrice(selectedObject.price) }}</strong>
+          </div>
+          <div class="metric-card">
+            <span>Reviews</span>
+            <strong>{{ selectedObject.reviewCount ?? 0 }}</strong>
+          </div>
+        </div>
+
+        <section class="detail-section">
+          <div class="section-head">
+            <h3>Details</h3>
+          </div>
+          <div class="schedule-item">
+            <span>Destination</span>
+            <strong>{{ selectedObject.destinationName || 'N/A' }}</strong>
+          </div>
+          <div class="schedule-item">
+            <span>Locality</span>
+            <strong>{{ selectedObject.localityName || 'N/A' }}</strong>
+          </div>
+          <div class="schedule-item schedule-item-block">
+            <ng-container *ngIf="getWorkingHoursRows(selectedObject.workingHours) as workingHoursRows">
+              <div class="working-hours" *ngIf="workingHoursRows.length; else noWorkingHours">
+                <div class="working-hours-row" *ngFor="let row of workingHoursRows">
+                  <span class="working-day">{{ row.day }}</span>
+                  <span class="working-time">{{ row.open }}</span>
+                  <span class="working-separator">-</span>
+                  <span class="working-time">{{ row.close }}</span>
+                </div>
+              </div>
+            </ng-container>
+            <ng-template #noWorkingHours>
+              <strong class="working-hours-fallback">N/A</strong>
+            </ng-template>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h3>Description</h3>
+          <p class="description-copy">
+            {{ selectedObject.description || 'No description provided for this object.' }}
+          </p>
+        </section>
+
+        <section class="detail-section">
+          <div class="map-card">
+            @if (hasSelectedObjectCoordinates) {
+              <app-map
+                [lat]="selectedObjectLat"
+                [lng]="selectedObjectLng"
+                [zoom]="14"
+                [popupText]="selectedObjectLocationLabel"
+                [interactive]="false"
+                mapId="manager-object-details-map"
+              ></app-map>
+            } @else {
+              <div class="map-empty-state">
+                <span class="material-symbols-outlined">location_off</span>
+                <p>Coordinates are not available for this object.</p>
+              </div>
+            }
+          </div>
+        </section>
+
+        <div class="detail-cta">
+          <button type="button" class="primary-btn full-cta sidebar-cta-btn" (click)="onOpenSelectedObjectReview()">
+            <span class="material-symbols-outlined">rate_review</span>
+            Open full review
+          </button>
+        </div>
+      } @else {
+        <div class="state">Select an object from the table to view details.</div>
+      }
+    </aside>
+  </div>
 </section>

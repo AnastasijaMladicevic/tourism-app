@@ -263,6 +263,33 @@
           <h4>Description</h4>
           <p>{{ getSelectedSummary(selectedEvent) }}</p>
         </section>
+
+        <section class="detail-section">
+          <div class="map-card">
+            @if (hasSelectedEventCoordinates) {
+              <app-map
+                [lat]="selectedEventLat"
+                [lng]="selectedEventLng"
+                [zoom]="14"
+                [popupText]="selectedEventLocationLabel"
+                [interactive]="false"
+                mapId="manager-event-details-map"
+              ></app-map>
+            } @else {
+              <div class="map-empty-state">
+                <span class="material-symbols-outlined">location_off</span>
+                <p>Coordinates are not available for this event.</p>
+              </div>
+            }
+          </div>
+        </section>
+
+        <div class="detail-cta">
+          <button type="button" class="primary-btn full-cta sidebar-cta-btn" (click)="onEditEvent(selectedEvent)">
+            <span class="material-symbols-outlined">rate_review</span>
+            Open full review
+          </button>
+        </div>
       } @else {
         <div class="state">No events available.</div>
       }

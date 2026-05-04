@@ -47,32 +47,37 @@
         (dragleave)="onImageDragLeave($event)"
         (drop)="onImageDrop($event)"
       >
-        <label class="form-field full-width">
-          <span>Image URL</span>
-          <input
-            class="form-control"
-            type="url"
-            formControlName="imageUrl"
-            placeholder="https://example.com/event-banner.jpg"
-            readonly
-          />
-        </label>
+        <div class="section-title">
+          <h2>Event Images</h2>
+          <p>Read-only gallery shown before the review details.</p>
+        </div>
 
-        <div class="upload-area preview-only" aria-label="Event image preview">
-          @if (imagePreviewUrl && !isImagePreviewBroken) {
-            <button type="button" class="preview-clear-btn" (click)="clearImage()" aria-label="Remove image" [disabled]="true">
-              <span class="material-symbols-outlined">close</span>
-              Remove
-            </button>
-            <img [src]="imagePreviewUrl" alt="Event banner preview" (error)="onImagePreviewError()" />
-          } @else {
-            <div class="upload-placeholder">
-              <span class="material-symbols-outlined">image</span>
-              <strong>No usable image preview yet</strong>
-              <p>Paste or drag a direct image URL here. If the URL points to a page instead of the image file, the preview will stay blank.</p>
-              <small>The URL must resolve directly to an image.</small>
-            </div>
-          }
+        <div class="media-layout" aria-label="Event image gallery">
+          <div class="media-preview" aria-label="Main event image preview">
+            @if (imagePreviewUrl && !isImagePreviewBroken) {
+              <img [src]="imagePreviewUrl" alt="Event banner preview" (error)="onImagePreviewError()" />
+            } @else {
+              <div class="upload-placeholder">
+                <span class="material-symbols-outlined">image</span>
+                <strong>No usable image preview yet</strong>
+                <p>The event does not have a valid main image URL, or the image could not be loaded.</p>
+              </div>
+            }
+          </div>
+
+          <div class="media-strip">
+            @if (sideReviewImages.length > 0) {
+              <div class="media-thumbnails">
+                @for (image of sideReviewImages; track image.id) {
+                  <button type="button" class="media-thumb" (click)="selectReviewImage(image.url)">
+                    <img [src]="image.url" [alt]="image.altText || 'Event image thumbnail'" />
+                  </button>
+                }
+              </div>
+            } @else {
+              <div class="media-empty">No additional gallery images are available.</div>
+            }
+          </div>
         </div>
       </div>
 
@@ -236,46 +241,42 @@
     <aside class="form-side">
       <section class="card side-card">
         <div class="section-title compact">
-          <h2>Venue &amp; Location</h2>
+          <h2>Location Intelligence</h2>
+          <p>Map preview and coordinates for the linked location.</p>
         </div>
 
-        <label class="form-field">
-          <span>Select Venue (Linked Object)</span>
-          <input class="form-control" type="text" [value]="selectedVenue.name" readonly />
-        </label>
-
         <div #eventMap class="location-map mini-map" aria-label="Event location map"></div>
+
+        <div class="location-line">
+          <span class="material-symbols-outlined">search</span>
+          <p>{{ locationContextValue }}</p>
+        </div>
+
+        <div class="location-inputs">
+          <label class="mini-field">
+            <span>Latitude</span>
+            <input class="form-control" type="text" formControlName="latitude" readonly />
+          </label>
+          <label class="mini-field">
+            <span>Longitude</span>
+            <input class="form-control" type="text" formControlName="longitude" readonly />
+          </label>
+        </div>
+
         <div class="map-meta">
           <strong>{{ selectedVenue.name }}</strong>
           <span>{{ selectedVenue.address }}</span>
         </div>
-
-        <div class="venue-card">
-          <strong>{{ selectedVenue.name }}</strong>
-          <p>{{ selectedVenue.address }}</p>
-        </div>
-      </section>
-
-   
-
-      <section class="card side-card tips-card">
-        <div class="section-title compact">
-          <h2>Creator Tips</h2>
-        </div>
-
-        <ul>
-          <li>Events with high-resolution banners get 40% more engagement.</li>
-          <li>Link your event to a specific venue object to show automated directions.</li>
-          <li>Clear start and end times help with automated calendar exports for users.</li>
-        </ul>
-
-        <a class="link-btn" href="javascript:void(0)">Learn more about events</a>
-      </section>
-
-      <section class="card side-card meta-card">
-        <p class="meta-label">Last Modified</p>
-        <strong>{{ organizerName }}</strong>
-        <span>2 mins ago</span>
+        <article class="creator-card">
+          <div class="creator-avatar">{{ creatorInitials }}</div>
+          <div>
+            <strong>Creator</strong>
+            <p class="sidebar-muted">{{ creatorDisplayName }}</p>
+            @if (creatorTimeline) {
+              <p>{{ creatorTimeline }}</p>
+            }
+          </div>
+        </article>
       </section>
     </aside>
     </fieldset>

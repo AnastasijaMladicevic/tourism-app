@@ -72,7 +72,7 @@
       </label>
 
       <div class="filter-actions">
-        <button type="button" class="ghost-btn filter-btn" (click)="onApplyFilters()">
+        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
           Apply Filters
         </button>
         <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
@@ -102,7 +102,7 @@
         </article>
       </div>
 
-      <div class="table-card card">
+      <div class="table-card">
         @if (isLoading) {
           <div class="state state-loading">Loading objects...</div>
         } @else if (errorMessage) {
@@ -119,7 +119,7 @@
                 <th>Type</th>
                 <th>Destination</th>
                 <th>Rating</th>
-                <th>Actions</th>
+                <th class="col-actions">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -128,18 +128,28 @@
                 [class.active-row]="selectedObject?.id === object.id"
                 (click)="selectObject(object)"
               >
-                <td><span class="status-chip" [ngClass]="getStatusBadgeClass(object.status)">{{ formatStatus(object.status) }}</span></td>
+                <td>
+                  <span class="status-chip" [ngClass]="getStatusBadgeClass(object.status)">
+                    <span class="chip-dot">●</span>
+                    {{ formatStatus(object.status) }}
+                  </span>
+                </td>
                 <td>
                   <div class="item-cell item-cell-with-media">
                     <div class="media-thumb" [ngStyle]="getMediaStyle(object)"></div>
                     <strong>{{ object.name }}</strong>
                   </div>
                 </td>
-                <td><span class="type-pill">{{ object.objectTypeName || 'N/A' }}</span></td>
-                <td>{{ object.destinationName || object.localityName || 'N/A' }}</td>
+                <td class="type-cell">{{ object.objectTypeName || 'N/A' }}</td>
+                <td>
+                  <div class="table-activity-cell">
+                    <strong>{{ object.destinationName || object.localityName || 'N/A' }}</strong>
+                    <span>{{ getObjectTableSubline(object) }}</span>
+                  </div>
+                </td>
                 <td class="rating-cell">{{ (object.averageRating ?? 0).toFixed(1) }}</td>
                 <td>
-                  <button type="button" class="icon-btn" title="Edit" (click)="onEditObject(object); $event.stopPropagation()">
+                  <button type="button" class="icon-btn plain" title="Edit" (click)="onEditObject(object); $event.stopPropagation()">
                     <span class="material-symbols-outlined">edit</span>
                   </button>
                 </td>
@@ -148,9 +158,9 @@
           </table>
         </div>
 
-        <div class="table-footer">
+        <footer class="table-footer">
           <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ totalCount }} objects</p>
-          <div class="pager">
+          <div class="pagination-buttons">
             <label class="page-size-control">
               <span>Page size</span>
               <select class="page-size-select" [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
@@ -160,21 +170,25 @@
             <button type="button" class="ghost-btn slim-btn" (click)="onPreviousPage()" [disabled]="currentPage === 1">Previous</button>
             <button type="button" class="ghost-btn slim-btn" (click)="onNextPage()" [disabled]="currentPage >= totalPages">Next</button>
           </div>
-        </div>
+        </footer>
         }
       </div>
     </div>
 
     <aside class="detail-column card">
       @if (selectedObject) {
-        <div class="hero-media" [ngStyle]="getHeroStyle()">
-          <span class="hero-badge">{{ selectedObject.objectTypeName || 'Object' }}</span>
-          <h2>{{ selectedObject.name }}</h2>
-        </div>
-        <div class="hero-status-row">
-          <span class="publish-badge" [ngClass]="'status-' + getStatusBadgeClass(selectedObject.status)">
-            {{ formatStatus(selectedObject.status) }}
-          </span>
+        <div class="object-hero">
+          <div class="hero-media" [ngStyle]="getHeroStyle()">
+            <span class="hero-badge">{{ selectedObject.objectTypeName || 'Object' }}</span>
+          </div>
+          <div class="hero-copy">
+            <p class="hero-eyebrow">Featured object</p>
+            <h2>{{ selectedObject.name }}</h2>
+            <p class="hero-meta">{{ getSidebarMetaLine(selectedObject) }}</p>
+            <span class="publish-badge" [ngClass]="'status-' + getStatusBadgeClass(selectedObject.status)">
+              {{ formatStatus(selectedObject.status) }}
+            </span>
+          </div>
         </div>
 
         <div class="detail-metrics">

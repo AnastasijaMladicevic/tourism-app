@@ -112,6 +112,18 @@
 
   <div class="events-layout">
     <div class="main-column">
+      <div class="insights-grid">
+        <article
+          class="insight-card card"
+          *ngFor="let insight of selectedInsightCards"
+          [attr.data-tone]="insight.tone"
+        >
+          <p>{{ insight.label }}</p>
+          <strong>{{ insight.value }}</strong>
+          <span>{{ insight.hint }}</span>
+        </article>
+      </div>
+
       <div class="card table-card">
         @if (isLoading) {
           <div class="state state-loading">Loading events...</div>
@@ -168,7 +180,7 @@
                     <div class="row-actions">
                       <button
                         type="button"
-                        class="icon-btn"
+                        class="icon-btn plain"
                         (click)="onEditEvent(event); $event.stopPropagation()"
                         title="Edit"
                       >
@@ -210,18 +222,6 @@
             </div>
           </div>
         }
-      </div>
-
-      <div class="insights-grid">
-        <article
-          class="insight-card card"
-          *ngFor="let insight of selectedInsightCards"
-          [attr.data-tone]="insight.tone"
-        >
-          <p>{{ insight.label }}</p>
-          <strong>{{ insight.value }}</strong>
-          <span>{{ insight.hint }}</span>
-        </article>
       </div>
     </div>
 

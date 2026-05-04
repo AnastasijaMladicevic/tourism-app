@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, from, of } from 'rxjs';
+import { map, concatMap, toArray } from 'rxjs/operators';
 import { environment } from '../../environment/environment';
 import { ReviewDto } from './review';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
+import { ApproveContentDto } from '../models/event.model';
 
 export interface ObjectImageDto {
   id: number;
@@ -30,6 +31,10 @@ export interface ObjectDto {
   latitude?: number;
   averageRating?: number;
   reviewCount?: number;
+  /** Present on API responses for tourist objects (ownership / audit). */
+  createdByUserId?: number;
+  createdAt?: string;
+  updatedAt?: string;
   status?: string;
   distanceKm?: number;
   distanceMeters?: number;
@@ -226,6 +231,46 @@ export class ObjectService {
     return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/my`, { params });
   }
 
+  /** Objects assigned to the signed-in manager's destinations (server-scoped; do not apply client region filter). */
+  getForManager(query?: ObjectQueryParams): Observable<PagedResultDto<ObjectDto>> {
+    let params = new HttpParams();
+
+    if (query) {
+      Object.entries(query).forEach(([key, value]) => {
+        if (value != null && value !== '') {
+          params = params.set(key, String(value));
+        }
+      });
+    }
+
+    return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/manager`, { params });
+  }
+
+  getManagerFilterOptions(): Observable<{ typeOptions: FilterOption[]; statusOptions: FilterOption[] }> {
+    return this.getForManager({
+      page: 1,
+      pageSize: 500,
+      sortBy: 'name',
+      sortOrder: 'asc'
+    }).pipe(
+      map((response) => {
+        const items = response?.items ?? [];
+
+        const typeOptions = this.toUniqueOptions(
+          items.map((item) => item.objectTypeName),
+          (value) => value
+        );
+
+        const statusOptions = this.toUniqueOptions(
+          items.map((item) => item.status),
+          (value) => this.toTitleCase(value ?? '')
+        );
+
+        return { typeOptions, statusOptions };
+      })
+    );
+  }
+
   getMyFilterOptions(): Observable<{ typeOptions: FilterOption[]; statusOptions: FilterOption[] }> {
     return this.getMy({
       page: 1,
@@ -290,8 +335,54 @@ export class ObjectService {
     return this.http.post<ObjectImageDto>(`${this.url}/${objectId}/images`, dto);
   }
 
+  /** Lists images linked to a tourist object (same payload as `ObjectDto.images` when populated). */
+  getImages(objectId: number): Observable<ObjectImageDto[]> {
+    return this.http.get<ObjectImageDto[]>(`${this.url}/${objectId}/images`);
+  }
+
+  /** Deletes a stored image row by global image id (`api/images/{id}`). */
+  deleteImageById(imageId: number): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/images/${imageId}`);
+  }
+
+  /** Marks an image as the main image for its entity. */
+  setMainImage(imageId: number): Observable<ObjectImageDto> {
+    return this.http.patch<ObjectImageDto>(`${environment.apiUrl}/images/${imageId}/set-main`, {});
+  }
+
+  /**
+   * Attaches URLs sequentially after object creation. First URL is stored as main (backend rule).
+   * Use only when the object has no images yet.
+   */
+  attachImages(objectId: number, imageUrls: string[]): Observable<ObjectImageDto[]> {
+    const cleanUrls = imageUrls.map((u) => u.trim()).filter((u) => u.length > 0);
+    if (cleanUrls.length === 0) {
+      return of([]);
+    }
+
+    return from(cleanUrls).pipe(
+      concatMap((url, index) => this.addImage(objectId, { url, isMain: index === 0 })),
+      toArray()
+    );
+  }
+
   update(id: number, dto: UpdateObjectDto): Observable<ObjectDto> {
     return this.http.put<ObjectDto>(`${this.url}/${id}`, dto);
+  }
+
+  approve(id: number, dto: ApproveContentDto): Observable<ObjectDto> {
+    return this.http.post<ObjectDto>(`${this.url}/${id}/approve`, dto);
+  }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${id}`);
+  }
+
+  /** Content creator requests removal of an approved object (manager review). */
+  requestDeletion(id: number, reason?: string): Observable<unknown> {
+    return this.http.post(`${this.url}/${id}/deletion-request`, {
+      reason: reason || undefined
+    });
   }
 
   private toUniqueOptions(values: Array<string | undefined>, mapLabel: (value: string) => string): FilterOption[] {
