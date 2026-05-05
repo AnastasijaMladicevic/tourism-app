@@ -9,12 +9,16 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Observable, forkJoin, map, of, switchMap } from 'rxjs';
 import * as L from 'leaflet';
 
 import { MatIconModule } from '@angular/material/icon';
-import { MapService } from '../../../services/map.service';
-import { DestinationService } from '../../../services/destination.service';
+import {
+  DestinationDto,
+  DestinationService,
+} from '../../../services/destination.service';
 import { AuthService } from '../../../services/auth.service';
+import { MapService } from '../../../services/map.service';
 import { RegionService } from '../../../services/region';
 import { ActiveRegionService } from '../../../services/active-region';
 
@@ -27,15 +31,20 @@ interface SearchResult {
   icon: string;
   lat?: number;
   lng?: number;
-  raw: any;
+  raw: AdminMapDestination;
   markerType: 'destination';
 }
 
-interface RoutePoint {
-  id: number;
-  name: string;
-  lat: number;
-  lng: number;
+interface PagedDestinationResponse {
+  items: AdminMapDestination[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+
+interface AdminMapDestination extends DestinationDto {
+  workingHours?: string | Record<string, string>;
 }
 
 @Component({
@@ -50,11 +59,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   searchResults: SearchResult[] = [];
   showSuggestions = false;
 
-  selectedItem: any = null;
+  selectedItem: AdminMapDestination | null = null;
   selectedType: 'destination' | '' = '';
   userLocation: L.LatLng | null = null;
-
   isTracking = false;
+
   private watchId: number | null = null;
   private userMarker: L.Marker | null = null;
   private userCircle: L.Circle | null = null;
@@ -66,8 +75,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     private router: Router,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
-    private authService: AuthService,
     private destinationService: DestinationService,
+    private authService: AuthService,
     private regionService: RegionService,
     private activeRegionService: ActiveRegionService,
   ) {}
@@ -204,12 +213,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getDirections(): void {
-    if (!this.userLocation || !this.selectedItem) return;
+    if (!this.userLocation || !this.selectedItem?.latitude || !this.selectedItem?.longitude) return;
 
-    const destination = this.getRoutePointFromItem(this.selectedItem);
-    if (!destination) return;
-
-    this.drawRoute(this.userLocation, L.latLng(destination.lat, destination.lng));
+    this.drawRoute(
+      this.userLocation,
+      L.latLng(this.selectedItem.latitude, this.selectedItem.longitude),
+    );
   }
 
   clearDirections(): void {
@@ -277,6 +286,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       if (name.includes(term)) score += 3;
       if (desc.includes(term)) score += 1;
     }
+
     return score;
   }
 
@@ -296,7 +306,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.searchQuery = result.name;
     this.showSuggestions = false;
 
-    if (result.lat && result.lng) {
+    if (result.lat != null && result.lng != null) {
       this.mapService.flyTo(result.lat, result.lng, 16);
       setTimeout(() => {
         this.mapService.triggerMarkerClick(result.markerType, result.id);
@@ -307,21 +317,19 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   private loadAllData(state?: any): void {
     this.allItems = [];
 
-    this.destinationService.getAll(undefined, { bypassRegion: true }).subscribe({
+    this.getAllDestinations().subscribe({
       next: (destinations) => {
-        const destList = this.toArray<any>(destinations);
-
-        destList.forEach((destination) => {
-          if (destination.latitude && destination.longitude) {
+        destinations
+          .filter((destination) => destination.latitude != null && destination.longitude != null)
+          .forEach((destination) => {
             this.mapService.addMarkerWithType(
-              destination.latitude,
-              destination.longitude,
+              destination.latitude!,
+              destination.longitude!,
               'destination',
               destination,
             );
             this.allItems.push(this.toSearchResult(destination));
-          }
-        });
+          });
 
         if (state?.selectedItem) {
           setTimeout(() => {
@@ -340,7 +348,62 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private toSearchResult(raw: any): SearchResult {
+  private getAllDestinations(): Observable<AdminMapDestination[]> {
+    const pageSize = 100;
+
+    return this.destinationService
+      .getAll({ page: 1, pageSize }, { bypassRegion: true })
+      .pipe(
+        map((response) => this.toPagedResponse(response)),
+        switchMap((firstPage) => {
+          if (firstPage.totalPages <= 1) {
+            return of(firstPage.items);
+          }
+
+          const nextPageRequests = Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
+            this.destinationService
+              .getAll({ page: index + 2, pageSize }, { bypassRegion: true })
+              .pipe(map((response) => this.toPagedResponse(response).items)),
+          );
+
+          return forkJoin([of(firstPage.items), ...nextPageRequests]).pipe(
+            map((pages) => pages.flat()),
+          );
+        }),
+      );
+  }
+
+  private toPagedResponse(response: any): PagedDestinationResponse {
+    if (Array.isArray(response)) {
+      return {
+        items: response,
+        page: 1,
+        pageSize: response.length,
+        totalCount: response.length,
+        totalPages: 1,
+      };
+    }
+
+    if (Array.isArray(response?.items)) {
+      return {
+        items: response.items,
+        page: response.page ?? 1,
+        pageSize: response.pageSize ?? response.items.length,
+        totalCount: response.totalCount ?? response.items.length,
+        totalPages: response.totalPages ?? 1,
+      };
+    }
+
+    return {
+      items: [],
+      page: 1,
+      pageSize: 0,
+      totalCount: 0,
+      totalPages: 0,
+    };
+  }
+
+  private toSearchResult(raw: AdminMapDestination): SearchResult {
     return {
       id: raw.id,
       name: raw.name,
@@ -353,15 +416,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       raw,
       markerType: 'destination',
     };
-  }
-
-  private toArray<T>(response: any): T[] {
-    if (Array.isArray(response)) return response;
-    if (response?.items) return response.items;
-    if (response?.data) return response.data;
-    if (response?.results) return response.results;
-    if (response?.value) return response.value;
-    return [];
   }
 
   getItemImage(): string {
@@ -463,20 +517,5 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   zoomOut(): void {
     (this.mapService as any)['map']?.zoomOut();
-  }
-
-  private getRoutePointFromItem(item: any): RoutePoint | null {
-    if (!item) return null;
-
-    const lat = Number(item.latitude);
-    const lng = Number(item.longitude);
-    if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
-
-    return {
-      id: Number(item.id),
-      name: String(item.name ?? 'Point'),
-      lat,
-      lng,
-    };
   }
 }

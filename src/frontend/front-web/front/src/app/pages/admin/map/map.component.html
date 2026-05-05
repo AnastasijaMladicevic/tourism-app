@@ -83,10 +83,10 @@
               }
             </p>
           </div>
-          @if (selectedItem.averageRating > 0) {
+          @if ((selectedItem!.averageRating ?? 0) > 0) {
             <div class="bottom-card__rating">
               <mat-icon>star</mat-icon>
-              {{ selectedItem.averageRating.toFixed(1) }}
+              {{ selectedItem!.averageRating!.toFixed(1) }}
             </div>
           }
         </div>
