@@ -481,6 +481,7 @@
 .leaflet-routing-container {
   display: none !important;
 }
+
 .custom-type-marker {
   background: transparent !important;
   border: none !important;
