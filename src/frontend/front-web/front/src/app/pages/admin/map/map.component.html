@@ -44,14 +44,6 @@
   <div id="main-map" class="main-map"></div>
 
   <div class="map-controls">
-    <button
-      class="control-btn gps-btn"
-      (click)="toggleGpsTracking()"
-      [class.gps-btn--active]="isTracking"
-      aria-label="My location"
-    >
-      <mat-icon>{{ isTracking ? 'gps_fixed' : 'my_location' }}</mat-icon>
-    </button>
     <button class="control-btn" (click)="zoomIn()"><mat-icon>add</mat-icon></button>
     <button class="control-btn" (click)="zoomOut()"><mat-icon>remove</mat-icon></button>
   </div>
@@ -110,12 +102,6 @@
 
         <div class="bottom-card__actions">
           <button class="bottom-card__btn" (click)="openDetails()">Details</button>
-          @if (userLocation) {
-            <button class="bottom-card__btn bottom-card__btn--outline" (click)="getDirections()">
-              <mat-icon>directions</mat-icon>
-              From GPS
-            </button>
-          }
         </div>
       </div>
     </div>
