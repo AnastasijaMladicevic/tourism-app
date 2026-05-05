@@ -5,6 +5,7 @@ import {
   NgZone,
   OnDestroy,
   OnInit,
+  ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -51,6 +52,7 @@ interface AdminMapDestination extends DestinationDto {
   imports: [CommonModule, FormsModule, MatIconModule],
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   searchQuery = '';
