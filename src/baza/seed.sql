@@ -9145,7 +9145,7 @@ VALUES
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegosu na Lovcenu'),
     NOW()),
 (
-    'https://wevotravel.com/wp-content/uploads/2023/04/p1dr50spf6199eq21qprr1maco4.jpg',
+    'https://apartments-sofija.com/wp-content/uploads/top-hill-budva.jpg',
     'Top Hill Club',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Top Hill Club'),
