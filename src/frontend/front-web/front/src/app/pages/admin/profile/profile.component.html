@@ -178,22 +178,29 @@
   </div>
 </div>
 @if (pendingCropFile) {
-  <div class="crop-overlay">
-    @if (pendingCropFile) {
-      <image-cropper
-      [imageFile]="pendingCropFile"
-      [maintainAspectRatio]="true"
-      [aspectRatio]="1"
-      format="png"
-      (imageCropped)="onImageCropped($event)">
-    </image-cropper>
-  }
-    
+  <div class="crop-modal-backdrop" (click)="cancelCrop()">
+    <div class="crop-modal" (click)="$event.stopPropagation()">
+      <div class="crop-modal__header">
+        <span>Crop photo</span>
+        <button class="crop-modal__close" type="button" (click)="cancelCrop()" aria-label="Close">
+          <mat-icon fontSet="material-icons-outlined">close</mat-icon>
+        </button>
+      </div>
 
-    <div class="crop-actions">
-      <button class="btn btn-secondary" (click)="cancelCrop()">Cancel</button>
-      <button class="btn btn-primary" (click)="confirmCrop()">Save</button>
+      <div class="crop-modal__body">
+        <image-cropper
+          [imageFile]="pendingCropFile"
+          [roundCropper]="true"
+          [resizeToWidth]="256"
+          [resizeToHeight]="256"
+          (imageCropped)="onImageCropped($event)"
+        ></image-cropper>
+      </div>
+
+      <div class="crop-modal__footer">
+        <button class="crop-confirm-button" type="button" (click)="confirmCrop()">Set photo</button>
+        <button class="crop-cancel-button" type="button" (click)="cancelCrop()">Cancel</button>
+      </div>
     </div>
-
   </div>
 }
