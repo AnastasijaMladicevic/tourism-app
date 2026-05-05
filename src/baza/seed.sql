@@ -107,7 +107,10 @@ INSERT INTO "ObjectTypes" ("Name") VALUES
 ('Wellness centar'),
 ('Trznica'),
 ('Suvenirnica'),
-('Bolnica');
+('Bolnica'),
+('Klinika'),
+('Poliklinika'),
+('Dom zdravlja');
 
 INSERT INTO "ActivityTypes" ("Name") VALUES
 ('Plivanje'),
@@ -1592,7 +1595,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.bar@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Lukoil Kolasin', 'Lukoil pumpa u Kolasinu', '2, Bakovići', NULL, 'http://www.lukoil.co.me/',
+ ('Lukoil Kolasin', 'Lukoil benzinska pumpa u Kolasinu', '2, Bakovići', NULL, 'http://www.lukoil.co.me/',
  NULL, NULL, '{"pon":"00:00-24:00"}', 0.00, ARRAY['Gorivo', 'Market'],
  ST_SetSRID(ST_MakePoint(19.526, 42.849), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Benzinska Pumpa'),
@@ -1602,7 +1605,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.kolasin@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Eko Igalo Banja', 'EKO Jugopetrol stanica u Igalo Banji', 'br. 56 II Dalmatinske, Igalo', '+38231330080', 'http://www.jugopetrol.co.me/',
+ ('Eko Igalo Banja', 'EKO Jugopetrol benzinska pumpa u Igalo Banji', 'br. 56 II Dalmatinske, Igalo', '+38231330080', 'http://www.jugopetrol.co.me/',
  NULL, NULL, '{"pon":"00:00-24:00"}', 0.00, ARRAY['Gorivo', 'Market', 'WC'],
  ST_SetSRID(ST_MakePoint(18.504, 42.456), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Benzinska Pumpa'),
@@ -2832,8 +2835,8 @@ VALUES
 
 ('Klinicki centar Crne Gore', 'Najveća državna zdravstvena ustanova u Crnoj Gori, centralna bolnička institucija sa urgentnim centrom i specijalističkim klinikama.', 'Ljubljanska bb, Podgorica', '+38220412412', 'https://www.kccg.me',
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
- NULL, ARRAY['Urgentni centar', 'Specijalističke klinike', 'Bolničko lečenje', 'Dijagnostika'], ST_SetSRID(ST_MakePoint(19.2460, 42.4374), 4326), 0, 0, 'Approved', true,
- (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
+ NULL, ARRAY['Urgentni centar', 'Specijalističke klinike', 'Bolničko lečenje', 'Dijagnostika'], ST_SetSRID(ST_MakePoint(19.2459, 42.4374), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Klinika'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
@@ -2842,7 +2845,7 @@ VALUES
 
  ('Opsta bolnica Niksic', 'Državna opšta bolnica koja pruža usluge sekundarne zdravstvene zaštite za Nikšić i okolne opštine.', 'Dr Nika Miljanića, Nikšić', '+38240231204', 'https://domzdravljaniksic.me/',
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
- NULL, ARRAY['Interna medicina', 'Hirurgija', 'Dijagnostika', 'Bolničko lečenje'], ST_SetSRID(ST_MakePoint(18.9452, 42.7773), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Interna medicina', 'Hirurgija', 'Dijagnostika', 'Bolničko lečenje'], ST_SetSRID(ST_MakePoint(18.9350, 42.7774), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Niksica'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
@@ -2852,7 +2855,7 @@ VALUES
 
  ('Opsta bolnica Bar', 'Državna opšta bolnica u Baru, važna zdravstvena ustanova za južni deo crnogorskog primorja.', 'Podgrad bb, Stari Bar', '+38230342333', 'https://bolnicabar.me',
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
- NULL, ARRAY['Urgentni prijem', 'Bolničko lečenje', 'Dijagnostika', 'Specijalističke službe'], ST_SetSRID(ST_MakePoint(19.1311, 42.0895), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Urgentni prijem', 'Bolničko lečenje', 'Dijagnostika', 'Specijalističke službe'], ST_SetSRID(ST_MakePoint(19.1285, 42.0895), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari Bar'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
@@ -2862,7 +2865,7 @@ VALUES
 
  ('Opsta bolnica Kotor', 'Državna opšta bolnica u Kotoru, namenjena bolničkoj i specijalističkoj zdravstvenoj zaštiti stanovnika Boke Kotorske.', 'Škaljari bb, Kotor', '+38232325602', 'https://www.kbckotor.me',
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
- NULL, ARRAY['Bolničko lečenje', 'Specijalističke službe', 'Dijagnostika'], ST_SetSRID(ST_MakePoint(18.7635, 42.4209), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Bolničko lečenje', 'Specijalističke službe', 'Dijagnostika'], ST_SetSRID(ST_MakePoint(18.7610, 42.4207), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kotora'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -2872,7 +2875,7 @@ VALUES
 
  ('Opsta bolnica Danilo Prvi Cetinje', 'Jedna od najstarijih državnih bolnica u Crnoj Gori, smeštena u istorijskoj prestonici Cetinju.', 'Vuka Mićunovića 1, Cetinje', '+38241230441', 'http://daniloprvi.me/kontakt/',
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
- NULL, ARRAY['Hirurgija', 'Interna medicina', 'Pedijatrija', 'Ginekologija'], ST_SetSRID(ST_MakePoint(18.9285, 42.3889), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Hirurgija', 'Interna medicina', 'Pedijatrija', 'Ginekologija'], ST_SetSRID(ST_MakePoint(18.9237, 42.3889), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Cetinja'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
@@ -2882,8 +2885,8 @@ VALUES
 
  ('Dom zdravlja Tivat', 'Javna ustanova primarne zdravstvene zaštite u Tivtu.', 'Istarska, Tivat', '+38268672859', 'https://dztivat.com/',
  NULL, NULL, '{"pon":"07:00-21:00","uto":"07:00-21:00","sre":"07:00-21:00","cet":"07:00-21:00","pet":"07:00-21:00","sub":"07:00-14:00","ned":"07:00-14:00"}',
- NULL, ARRAY['Izabrani doktor', 'Pedijatrija', 'Primarna zaštita', 'Preventivni pregledi'], ST_SetSRID(ST_MakePoint(18.6978, 42.4336), 4326), 0, 0, 'Approved', true,
- (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
+ NULL, ARRAY['Izabrani doktor', 'Pedijatrija', 'Primarna zaštita', 'Preventivni pregledi'], ST_SetSRID(ST_MakePoint(18.6952, 42.4337), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Dom zdravlja'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Tivta'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
@@ -2892,8 +2895,8 @@ VALUES
 
  ('Dom zdravlja Herceg Novi', 'Javna ustanova primarne zdravstvene zaštite u Herceg Novom.', 'Nikole Ljubibratića 1, Herceg Novi', '+38231343111', 'http://domzdravljahn.me/',
  NULL, NULL, '{"pon":"07:00-21:00","uto":"07:00-21:00","sre":"07:00-21:00","cet":"07:00-21:00","pet":"07:00-21:00","sub":"07:00-21:00","ned":"07:00-14:00"}',
- NULL, ARRAY['Izabrani doktor', 'Pedijatrija', 'Primarna zaštita', 'Info pult'], ST_SetSRID(ST_MakePoint(18.5276, 42.4586), 4326), 0, 0, 'Approved', true,
- (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
+ NULL, ARRAY['Izabrani doktor', 'Pedijatrija', 'Primarna zaštita', 'Info pult'], ST_SetSRID(ST_MakePoint(18.5250, 42.4586), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Dom zdravlja'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Herceg Novog'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
@@ -2902,8 +2905,8 @@ VALUES
 
  ('Dom zdravlja Bar', 'Javna ustanova primarne zdravstvene zaštite u Baru.', 'Jovana Tomaševića 42, Bar', '+38230311001', 'http://www.domzdravljabar.com/',
  NULL, NULL, '{"pon":"07:00-21:00","uto":"07:00-21:00","sre":"07:00-21:00","cet":"07:00-21:00","pet":"07:00-21:00","sub":"07:00-14:00","ned":"neradni dan"}',
- NULL, ARRAY['Izabrani doktor', 'Pedijatrija', 'Primarna zaštita', 'Preventivni pregledi'], ST_SetSRID(ST_MakePoint(19.0942, 42.0998), 4326), 0, 0, 'Approved', true,
- (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
+ NULL, ARRAY['Izabrani doktor', 'Pedijatrija', 'Primarna zaštita', 'Preventivni pregledi'], ST_SetSRID(ST_MakePoint(19.0916, 42.0999), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Dom zdravlja'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Bara'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
@@ -2912,8 +2915,8 @@ VALUES
 
  ('Zdravstvena stanica Pluzine', 'Zdravstvena stanica u Plužinama, deo sistema primarne zdravstvene zaštite.', 'Ulica Jelene Mitrić, Pluzine', '+38240271135', NULL,
  NULL, NULL, '{"pon":"07:00-15:00","uto":"07:00-15:00","sre":"07:00-15:00","cet":"07:00-15:00","pet":"07:00-15:00","sub":"neradni dan","ned":"neradni dan"}',
- NULL, ARRAY['Primarna zaštita', 'Ambulanta', 'Osnovne zdravstvene usluge'], ST_SetSRID(ST_MakePoint(18.8453, 43.1548), 4326), 0, 0, 'Approved', true,
- (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
+ NULL, ARRAY['Primarna zaštita', 'Ambulanta', 'Osnovne zdravstvene usluge'], ST_SetSRID(ST_MakePoint(18.8427, 43.1548), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Poliklinika'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Pluzina'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Pluzine'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
@@ -2922,8 +2925,8 @@ VALUES
 
  ('Dom zdravlja Plav', 'Javna ustanova primarne zdravstvene zaštite u Plavu.', 'Hridska bb, Plav', '+38251251103', 'https://www.dzplav.me',
  NULL, NULL, '{"pon":"07:00-15:00","uto":"07:00-15:00","sre":"07:00-15:00","cet":"07:00-15:00","pet":"07:00-15:00","sub":"neradni dan","ned":"neradni dan"}',
- NULL, ARRAY['Izabrani doktor', 'Primarna zaštita', 'Zdravstvena stanica'], ST_SetSRID(ST_MakePoint(19.9398, 42.5998), 4326), 0, 0, 'Approved', true,
- (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
+ NULL, ARRAY['Izabrani doktor', 'Primarna zaštita', 'Zdravstvena stanica'], ST_SetSRID(ST_MakePoint(19.9372, 42.5999), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Dom zdravlja'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Plava'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plav'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
