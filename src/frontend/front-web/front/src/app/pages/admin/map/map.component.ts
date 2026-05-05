@@ -5,19 +5,15 @@ import {
   NgZone,
   OnDestroy,
   OnInit,
-  ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { forkJoin } from 'rxjs';
 import * as L from 'leaflet';
 
 import { MatIconModule } from '@angular/material/icon';
 import { MapService } from '../../../services/map.service';
 import { DestinationService } from '../../../services/destination.service';
-import { ObjectService } from '../../../services/object';
-import { EventService } from '../../../services/event.service';
 import { AuthService } from '../../../services/auth.service';
 import { RegionService } from '../../../services/region';
 import { ActiveRegionService } from '../../../services/active-region';
@@ -32,14 +28,7 @@ interface SearchResult {
   lat?: number;
   lng?: number;
   raw: any;
-  category: 'destination' | 'object' | 'event';
-  markerType: string;
-}
-
-interface FilterChip {
-  key: string;
-  label: string;
-  icon: string;
+  markerType: 'destination';
 }
 
 interface RoutePoint {
@@ -49,29 +38,21 @@ interface RoutePoint {
   lat: number;
   lng: number;
 }
- 
+
 @Component({
   selector: 'app-map',
   standalone: true,
   imports: [CommonModule, FormsModule, MatIconModule],
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css']
+  styleUrls: ['./map.component.css'],
 })
-export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuery = '';
+export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
+  searchQuery = '';
   searchResults: SearchResult[] = [];
   showSuggestions = false;
 
-  activeFilters: string[] = [];
-  filterChips: FilterChip[] = [
-    { key: 'destination', label: 'Destinations', icon: '📍' },
-    { key: 'hotel', label: 'Hotels', icon: '🏨' },
-    { key: 'restaurant', label: 'Restaurants', icon: '🍽️' },
-    { key: 'kafana', label: 'Bars', icon: '🍷' },
-    { key: 'event', label: 'Events', icon: '🎉' },
-  ];
-
   selectedItem: any = null;
-  selectedType = '';
+  selectedType: 'destination' | '' = '';
   userLocation: L.LatLng | null = null;
   routeStart: RoutePoint | null = null;
   routeEnd: RoutePoint | null = null;
@@ -80,9 +61,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuer
   private watchId: number | null = null;
   private userMarker: L.Marker | null = null;
   private userCircle: L.Circle | null = null;
-
   private routingControl: any = null;
-
   private allItems: SearchResult[] = [];
 
   constructor(
@@ -92,8 +71,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuer
     private cdr: ChangeDetectorRef,
     private authService: AuthService,
     private destinationService: DestinationService,
-    private objectService: ObjectService,
-    private eventService: EventService,
     private regionService: RegionService,
     private activeRegionService: ActiveRegionService,
   ) {}
@@ -102,7 +79,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuer
     window.addEventListener('map-marker-clicked', (event: any) => {
       this.ngZone.run(() => {
         this.selectedItem = event.detail.data;
-        this.selectedType = event.detail.type;
+        this.selectedType = 'destination';
         this.cdr.detectChanges();
       });
     });
@@ -232,7 +209,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuer
   getDirections(): void {
     if (!this.userLocation || !this.selectedItem) return;
 
-    const destination = this.getRoutePointFromItem(this.selectedItem, this.selectedType);
+    const destination = this.getRoutePointFromItem(this.selectedItem);
     if (!destination) return;
 
     this.routeEnd = destination;
@@ -249,7 +226,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuer
   }
 
   setRoutePoint(mode: 'start' | 'end'): void {
-    const point = this.getRoutePointFromItem(this.selectedItem, this.selectedType);
+    const point = this.getRoutePointFromItem(this.selectedItem);
     if (!point) return;
 
     if (mode === 'start') {
@@ -310,11 +287,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuer
   private matchesAllTerms(item: SearchResult, terms: string[]): boolean {
     const name = item.name.toLowerCase();
     const desc = (item.raw.description ?? '').toLowerCase();
-    const amenities = this.getAmenityText(item).toLowerCase();
 
-    return terms.every(
-      (term) => name.includes(term) || desc.includes(term) || amenities.includes(term),
-    );
+    return terms.every((term) => name.includes(term) || desc.includes(term));
   }
 
   onSearchInput(): void {
@@ -343,24 +317,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuer
     let score = 0;
     const name = item.name.toLowerCase();
     const desc = (item.raw.description ?? '').toLowerCase();
-    const amenities = this.getAmenityText(item).toLowerCase();
 
     for (const term of terms) {
       if (name.includes(term)) score += 3;
       if (desc.includes(term)) score += 1;
-      if (amenities.includes(term)) score += 0.5;
     }
     return score;
-  }
-
-  private getAmenityText(item: SearchResult): string {
-    const type = item.markerType.toLowerCase();
-    const amenityMap: Record<string, string> = {
-      hotel: 'wifi parking gym bazen pool breakfast spa',
-      restaurant: 'hrana food dine takeout wifi',
-      kafana: 'bar music live terrace',
-    };
-    return amenityMap[type] ?? '';
   }
 
   onSearchBlur(): void {
@@ -387,43 +349,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuer
     }
   }
 
-  toggleFilter(key: string): void {
-    if (this.activeFilters.includes(key)) {
-      this.activeFilters = this.activeFilters.filter((filter) => filter !== key);
-    } else {
-      this.activeFilters.push(key);
-    }
-    this.applyFilters();
-  }
-
-  private applyFilters(): void {
-    const map = this.mapService['map'];
-    if (!map) return;
-
-    this.mapService['markerMap'].forEach((value: any, key: string) => {
-      const type = key.split(':')[0];
-      const marker = value.marker;
-
-      if (this.activeFilters.length === 0 || this.activeFilters.includes(type)) {
-        if (!map.hasLayer(marker)) marker.addTo(map);
-      } else if (map.hasLayer(marker)) {
-        marker.remove();
-      }
-    });
-  }
-
   private loadAllData(state?: any): void {
     this.allItems = [];
 
-    forkJoin({
-      destinations: this.destinationService.getAll(undefined, { bypassRegion: true }),
-      objects: this.objectService.getAll(undefined, { bypassRegion: true }),
-      events: this.eventService.getAll(undefined, { bypassRegion: true }),
-    }).subscribe({
-      next: ({ destinations, objects, events }) => {
+    this.destinationService.getAll(undefined, { bypassRegion: true }).subscribe({
+      next: (destinations) => {
         const destList = this.toArray<any>(destinations);
-        const objList = this.toArray<any>(objects);
-        const evtList = this.toArray<any>(events);
 
         destList.forEach((destination) => {
           if (destination.latitude && destination.longitude) {
@@ -433,30 +364,18 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuer
               'destination',
               destination,
             );
-            this.allItems.push(this.toSearchResult(destination, 'destination', 'destination'));
-          }
-        });
-
-        objList.forEach((obj) => {
-          if (obj.latitude && obj.longitude) {
-            const type = this.getObjectType(obj.objectTypeName || '');
-            this.mapService.addMarkerWithType(obj.latitude, obj.longitude, type, obj);
-            this.allItems.push(this.toSearchResult(obj, type, 'object'));
-          }
-        });
-
-        evtList.forEach((event) => {
-          if (event.latitude && event.longitude) {
-            this.mapService.addMarkerWithType(event.latitude, event.longitude, 'event', event);
-            this.allItems.push(this.toSearchResult(event, 'event', 'event'));
+            this.allItems.push(this.toSearchResult(destination));
           }
         });
 
         if (state?.selectedItem) {
           setTimeout(() => {
             this.ngZone.run(() => {
-              const type = state.selectedType || 'object';
-              this.mapService.triggerMarkerClick(type, state.selectedItem.id, state.zoom ?? 16);
+              this.mapService.triggerMarkerClick(
+                'destination',
+                state.selectedItem.id,
+                state.zoom ?? 16,
+              );
               this.cdr.detectChanges();
             });
           }, 100);
@@ -466,32 +385,18 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuer
     });
   }
 
-  private toSearchResult(
-    raw: any,
-    markerType: string,
-    category: 'destination' | 'object' | 'event',
-  ): SearchResult {
-    const iconMap: Record<string, string> = {
-      destination: 'place',
-      hotel: 'hotel',
-      restaurant: 'restaurant',
-      kafana: 'local_bar',
-      event: 'event',
-      default: 'place',
-    };
-
+  private toSearchResult(raw: any): SearchResult {
     return {
       id: raw.id,
       name: raw.name,
-      typeName: raw.objectTypeName ?? raw.destinationTypeName ?? raw.eventTypeName ?? markerType,
-      location: raw.localityName ?? raw.destinationName ?? raw.regionName ?? '',
+      typeName: raw.destinationTypeName ?? 'Destination',
+      location: raw.regionName ?? '',
       image: raw.mainImageUrl ?? raw.images?.[0]?.url ?? '',
-      icon: iconMap[markerType] ?? iconMap['default'],
+      icon: 'place',
       lat: raw.latitude,
       lng: raw.longitude,
       raw,
-      category,
-      markerType,
+      markerType: 'destination',
     };
   }
 
@@ -504,14 +409,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuer
     return [];
   }
 
-  private getObjectType(name: string): string {
-    const normalized = name.toLowerCase();
-    if (normalized.includes('hotel')) return 'hotel';
-    if (normalized.includes('restoran')) return 'restaurant';
-    if (normalized.includes('kafana')) return 'kafana';
-    return 'restaurant';
-  }
-
   getItemImage(): string {
     if (!this.selectedItem) return '';
     return this.selectedItem.mainImageUrl || this.selectedItem.images?.[0]?.url || '';
@@ -519,12 +416,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuer
 
   getItemLocation(): string {
     if (!this.selectedItem) return '';
-    if (this.selectedType === 'destination') {
-      return this.selectedItem.regionName ?? this.selectedItem.destinationTypeName ?? '';
-    }
-    return [this.selectedItem.localityName, this.selectedItem.destinationName, this.selectedItem.regionName]
-      .filter(Boolean)
-      .join(', ');
+    return this.selectedItem.regionName ?? this.selectedItem.destinationTypeName ?? '';
   }
 
   private focusActiveRegion(): void {
@@ -581,17 +473,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuer
   openDetails(): void {
     if (!this.selectedItem) return;
 
-    switch (this.selectedType) {
-      case 'destination':
-        this.router.navigate(['/destination', this.selectedItem.id]);
-        break;
-      case 'event':
-        this.router.navigate(['/event', this.selectedItem.id]);
-        break;
-      default:
-        this.router.navigate(['/object', this.selectedItem.id]);
-        break;
-    }
+    this.router.navigate(['/destination', this.selectedItem.id]);
   }
 
   closeCard(): void {
@@ -621,7 +503,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuer
   }
 
   get selectedRoutePoint(): RoutePoint | null {
-    return this.getRoutePointFromItem(this.selectedItem, this.selectedType);
+    return this.getRoutePointFromItem(this.selectedItem);
   }
 
   canUseSelectedForRoute(): boolean {
@@ -630,12 +512,22 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuer
 
   isSelectedAsStart(): boolean {
     const point = this.selectedRoutePoint;
-    return !!point && !!this.routeStart && point.id === this.routeStart.id && point.type === this.routeStart.type;
+    return (
+      !!point &&
+      !!this.routeStart &&
+      point.id === this.routeStart.id &&
+      point.type === this.routeStart.type
+    );
   }
 
   isSelectedAsEnd(): boolean {
     const point = this.selectedRoutePoint;
-    return !!point && !!this.routeEnd && point.id === this.routeEnd.id && point.type === this.routeEnd.type;
+    return (
+      !!point &&
+      !!this.routeEnd &&
+      point.id === this.routeEnd.id &&
+      point.type === this.routeEnd.type
+    );
   }
 
   routeSummary(point: RoutePoint | null): string {
@@ -651,7 +543,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuer
     (this.mapService as any)['map']?.zoomOut();
   }
 
-  private getRoutePointFromItem(item: any, type: string): RoutePoint | null {
+  private getRoutePointFromItem(item: any): RoutePoint | null {
     if (!item) return null;
 
     const lat = Number(item.latitude);
@@ -661,9 +553,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy{searchQuer
     return {
       id: Number(item.id),
       name: String(item.name ?? 'Point'),
-      type: String(item.objectTypeName ?? item.destinationTypeName ?? item.eventTypeName ?? type),
+      type: String(item.destinationTypeName ?? 'Destination'),
       lat,
       lng,
     };
-  }}
- 
+  }
+}
