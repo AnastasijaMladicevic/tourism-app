@@ -467,7 +467,7 @@ export class ObjectsComponent implements OnInit {
       case 'Soping':
         return ['shop', 'shopping centar', 'trzni centar', 'market', 'prodavnica'];
       case 'Bolnice':
-        return ['bolnica', 'klinika', 'apoteka', 'hospital', 'clinic', 'pharmacy'];
+        return ['bolnica', 'klinika', 'Poliklinika', 'Dom zdravlja', 'hospital', 'clinic'];
       default:
         return undefined;
     }

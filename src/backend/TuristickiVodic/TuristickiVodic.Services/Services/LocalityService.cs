@@ -104,6 +104,20 @@ namespace TuristickiVodic.Services
             _context.Localities.Add(locality);
             await _context.SaveChangesAsync();
 
+            // Save image if provided
+            if (!string.IsNullOrWhiteSpace(dto.ImageUrl))
+            {
+                var image = new Image
+                {
+                    LocalityId = locality.Id,
+                    Url = dto.ImageUrl,
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Images.Add(image);
+                await _context.SaveChangesAsync();
+            }
+
             var created = await _context.Localities
                 .Include(l => l.Destination)
                     .ThenInclude(d => d.Region)

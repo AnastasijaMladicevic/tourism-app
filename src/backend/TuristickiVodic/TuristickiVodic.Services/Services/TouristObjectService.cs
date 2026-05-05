@@ -735,6 +735,20 @@ namespace TuristickiVodic.Services.Services
             _context.Objects.Add(obj);
             await _context.SaveChangesAsync();
 
+            // Save image if provided
+            if (!string.IsNullOrWhiteSpace(dto.ImageUrl))
+            {
+                var image = new Image
+                {
+                    ObjectId = obj.Id,
+                    Url = dto.ImageUrl,
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Images.Add(image);
+                await _context.SaveChangesAsync();
+            }
+
             var result = _mapper.Map<TouristObjectDto>(await LoadObjectAsync(obj.Id));
             await ApplyPendingDeletionRequestFlagsAsync(result);
             return result;

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using TuristickiVodic.Core.Validation;
 
 namespace TuristickiVodic.Core.DTO
 {
@@ -32,6 +33,9 @@ namespace TuristickiVodic.Core.DTO
 
         [Range(1, int.MaxValue, ErrorMessage = "ObjectId must be greater than 0.")]
         public int? ObjectId { get; set; }
+
+        [MaxLength(ValidationLengths.ImageUrl)]
+        public string? ImageUrl { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {

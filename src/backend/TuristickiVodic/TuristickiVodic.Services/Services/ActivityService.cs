@@ -505,6 +505,20 @@ namespace TuristickiVodic.Services.Services
             _context.Activities.Add(activity);
             await _context.SaveChangesAsync();
 
+            // Save image if provided
+            if (!string.IsNullOrWhiteSpace(dto.ImageUrl))
+            {
+                var image = new Image
+                {
+                    ActivityId = activity.Id,
+                    Url = dto.ImageUrl,
+                    IsMain = true,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Images.Add(image);
+                await _context.SaveChangesAsync();
+            }
+
             var created = await _context.Activities
                 .Include(a => a.ActivityType)
                 .Include(a => a.Locality)

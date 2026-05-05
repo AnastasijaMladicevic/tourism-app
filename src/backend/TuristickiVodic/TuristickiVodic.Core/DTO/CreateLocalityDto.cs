@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using TuristickiVodic.Core.Validation;
 
 namespace TuristickiVodic.Core.DTO
 {
@@ -25,6 +26,9 @@ namespace TuristickiVodic.Core.DTO
 
         [Range(1, int.MaxValue, ErrorMessage = "LocalityTypeId is required.")]
         public int LocalityTypeId { get; set; }
+
+        [MaxLength(ValidationLengths.ImageUrl)]
+        public string? ImageUrl { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
