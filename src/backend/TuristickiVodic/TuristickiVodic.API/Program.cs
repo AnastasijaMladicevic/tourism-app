@@ -79,6 +79,7 @@ builder.Services.AddScoped<IDeletionRequestService, DeletionRequestService>();
 builder.Services.AddScoped<IRouteService, RouteService>();
 builder.Services.AddScoped<IRoutePointService, RoutePointService>();
 builder.Services.AddScoped<IEventPlannerService, EventPlannerService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IManagerReportService, ManagerReportService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();

@@ -683,6 +683,68 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.ToTable("ManagerReports");
                 });
 
+            modelBuilder.Entity("TuristickiVodic.Core.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ActionUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("EventId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("EventPlannerItemId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime?>("TriggerAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("EventPlannerItemId");
+
+                    b.HasIndex("UserId", "IsRead", "CreatedAt");
+
+                    b.HasIndex("UserId", "Type", "EventPlannerItemId", "TriggerAtUtc")
+                        .IsUnique()
+                        .HasFilter("\"EventPlannerItemId\" IS NOT NULL AND \"TriggerAtUtc\" IS NOT NULL");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("TuristickiVodic.Core.Models.ObjectType", b =>
                 {
                     b.Property<int>("Id")
@@ -1493,6 +1555,31 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TuristickiVodic.Core.Models.Notification", b =>
+                {
+                    b.HasOne("TuristickiVodic.Core.Models.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TuristickiVodic.Core.Models.EventPlannerItem", "EventPlannerItem")
+                        .WithMany()
+                        .HasForeignKey("EventPlannerItemId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TuristickiVodic.Core.Models.User", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("EventPlannerItem");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TuristickiVodic.Core.Models.Favorite", b =>
                 {
                     b.HasOne("TuristickiVodic.Core.Models.Activity", "Activity")
@@ -1886,6 +1973,8 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("Favorites");
 
                     b.Navigation("LocationHistory");
+
+                    b.Navigation("Notifications");
 
                     b.Navigation("ManagedDestination");
 

@@ -35,6 +35,7 @@ public class AppDbContext : DbContext
     public DbSet<ManagerReport> ManagerReports { get; set; }
     public DbSet<DeletionRequest> DeletionRequests { get; set; }
     public DbSet<EventPlannerItem> EventPlannerItems { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<RevokedToken> RevokedTokens { get; set; }
     public DbSet<UserLocationHistory> UserLocationHistories { get; set; }
@@ -503,6 +504,37 @@ public class AppDbContext : DbContext
             .WithMany(e => e.EventPlannerItems)
             .HasForeignKey(x => x.EventId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // ==================== NOTIFICATION ====================
+        mb.Entity<Notification>()
+            .Property(n => n.Type)
+            .HasConversion<string>();
+
+        mb.Entity<Notification>()
+            .HasOne(n => n.User)
+            .WithMany(u => u.Notifications)
+            .HasForeignKey(n => n.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Notification>()
+            .HasOne(n => n.Event)
+            .WithMany()
+            .HasForeignKey(n => n.EventId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        mb.Entity<Notification>()
+            .HasOne(n => n.EventPlannerItem)
+            .WithMany()
+            .HasForeignKey(n => n.EventPlannerItemId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Notification>()
+            .HasIndex(n => new { n.UserId, n.IsRead, n.CreatedAt });
+
+        mb.Entity<Notification>()
+            .HasIndex(n => new { n.UserId, n.Type, n.EventPlannerItemId, n.TriggerAtUtc })
+            .IsUnique()
+            .HasFilter("\"EventPlannerItemId\" IS NOT NULL AND \"TriggerAtUtc\" IS NOT NULL");
 
         // ==================== USER LOG ====================
         mb.Entity<UserLog>()
