@@ -209,6 +209,7 @@ namespace TuristickiVodic.Services.Services
                 IsRead = notification.IsRead,
                 ReadAt = notification.ReadAt,
                 EventId = notification.EventId,
+                ReviewId = notification.ReviewId,
                 EventPlannerItemId = notification.EventPlannerItemId,
                 TriggerAtUtc = notification.TriggerAtUtc,
                 CreatedAt = notification.CreatedAt

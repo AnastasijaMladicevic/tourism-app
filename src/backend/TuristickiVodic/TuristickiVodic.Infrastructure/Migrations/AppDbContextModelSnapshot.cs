@@ -715,6 +715,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<DateTime?>("ReadAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int?>("ReviewId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -735,6 +738,8 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.HasIndex("EventId");
 
                     b.HasIndex("EventPlannerItemId");
+
+                    b.HasIndex("ReviewId");
 
                     b.HasIndex("UserId", "IsRead", "CreatedAt");
 
@@ -1567,6 +1572,11 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .HasForeignKey("EventPlannerItemId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("TuristickiVodic.Core.Models.Review", "Review")
+                        .WithMany()
+                        .HasForeignKey("ReviewId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("TuristickiVodic.Core.Models.User", "User")
                         .WithMany("Notifications")
                         .HasForeignKey("UserId")
@@ -1576,6 +1586,8 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("Event");
 
                     b.Navigation("EventPlannerItem");
+
+                    b.Navigation("Review");
 
                     b.Navigation("User");
                 });

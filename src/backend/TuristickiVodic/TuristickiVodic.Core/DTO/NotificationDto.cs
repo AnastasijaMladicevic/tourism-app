@@ -10,6 +10,7 @@ namespace TuristickiVodic.Core.DTO
         public bool IsRead { get; set; }
         public DateTime? ReadAt { get; set; }
         public int? EventId { get; set; }
+        public int? ReviewId { get; set; }
         public int? EventPlannerItemId { get; set; }
         public DateTime? TriggerAtUtc { get; set; }
         public DateTime CreatedAt { get; set; }

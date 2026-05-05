@@ -200,6 +200,17 @@ namespace TuristickiVodic.Services.Services
             review.CreatorResponse = dto.CreatorResponse;
             review.CreatorResponseAt = DateTime.UtcNow;
 
+            _context.Notifications.Add(new Notification
+            {
+                UserId = review.UserId,
+                Type = NotificationType.ReviewReply,
+                Title = "Stigao je odgovor na tvoju recenziju",
+                Message = $"Dobio/la si odgovor na recenziju za objekat \"{review.Object.Name}\".",
+                ActionUrl = $"/object/{review.ObjectId}",
+                ReviewId = review.Id,
+                CreatedAt = DateTime.UtcNow
+            });
+
             await _context.SaveChangesAsync();
 
             return _mapper.Map<ReviewDto>(await LoadReviewAsync(review.Id));

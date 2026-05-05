@@ -523,6 +523,12 @@ public class AppDbContext : DbContext
             .OnDelete(DeleteBehavior.SetNull);
 
         mb.Entity<Notification>()
+            .HasOne(n => n.Review)
+            .WithMany()
+            .HasForeignKey(n => n.ReviewId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<Notification>()
             .HasOne(n => n.EventPlannerItem)
             .WithMany()
             .HasForeignKey(n => n.EventPlannerItemId)
@@ -530,6 +536,9 @@ public class AppDbContext : DbContext
 
         mb.Entity<Notification>()
             .HasIndex(n => new { n.UserId, n.IsRead, n.CreatedAt });
+
+        mb.Entity<Notification>()
+            .HasIndex(n => n.ReviewId);
 
         mb.Entity<Notification>()
             .HasIndex(n => new { n.UserId, n.Type, n.EventPlannerItemId, n.TriggerAtUtc })

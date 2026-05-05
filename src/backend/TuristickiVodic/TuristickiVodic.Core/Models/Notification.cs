@@ -28,6 +28,9 @@ namespace TuristickiVodic.Core.Models
         public int? EventId { get; set; }
         public Event? Event { get; set; }
 
+        public int? ReviewId { get; set; }
+        public Review? Review { get; set; }
+
         public int? EventPlannerItemId { get; set; }
         public EventPlannerItem? EventPlannerItem { get; set; }
 
