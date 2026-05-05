@@ -10,14 +10,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, forkJoin, map, of, switchMap } from 'rxjs';
-import * as L from 'leaflet';
 
 import { MatIconModule } from '@angular/material/icon';
 import {
   DestinationDto,
   DestinationService,
 } from '../../../services/destination.service';
-import { AuthService } from '../../../services/auth.service';
 import { MapService } from '../../../services/map.service';
 import { RegionService } from '../../../services/region';
 import { ActiveRegionService } from '../../../services/active-region';
@@ -61,13 +59,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectedItem: AdminMapDestination | null = null;
   selectedType: 'destination' | '' = '';
-  userLocation: L.LatLng | null = null;
-  isTracking = false;
-
-  private watchId: number | null = null;
-  private userMarker: L.Marker | null = null;
-  private userCircle: L.Circle | null = null;
-  private routingControl: any = null;
   private allItems: SearchResult[] = [];
 
   constructor(
@@ -76,7 +67,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     private destinationService: DestinationService,
-    private authService: AuthService,
     private regionService: RegionService,
     private activeRegionService: ActiveRegionService,
   ) {}
@@ -110,142 +100,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.stopTracking();
     this.mapService.destroyMap();
-  }
-
-  toggleGpsTracking(): void {
-    if (this.isTracking) {
-      this.stopTracking();
-    } else {
-      this.startTracking();
-    }
-  }
-
-  private startTracking(): void {
-    if (!navigator.geolocation) {
-      alert('Geolocation nije podrzana.');
-      return;
-    }
-
-    this.isTracking = true;
-
-    this.watchId = navigator.geolocation.watchPosition(
-      (pos) => {
-        this.ngZone.run(() => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          const accuracy = pos.coords.accuracy;
-          const latlng = L.latLng(lat, lng);
-          this.userLocation = latlng;
-
-          this.updateUserMarker(latlng, accuracy);
-
-          if (this.authService.isLoggedIn()) {
-            this.authService.updateMyLocation(lat, lng).subscribe();
-          }
-
-          this.cdr.detectChanges();
-        });
-      },
-      (err) => {
-        this.ngZone.run(() => {
-          this.isTracking = false;
-          if (err.code === err.PERMISSION_DENIED) {
-            alert('Dozvolite pristup lokaciji.');
-          }
-          this.cdr.detectChanges();
-        });
-      },
-      { enableHighAccuracy: true, maximumAge: 3000, timeout: 10000 },
-    );
-
-    navigator.geolocation.getCurrentPosition((pos) => {
-      this.mapService.flyTo(pos.coords.latitude, pos.coords.longitude, 16);
-    });
-  }
-
-  private stopTracking(): void {
-    if (this.watchId !== null) {
-      navigator.geolocation.clearWatch(this.watchId);
-      this.watchId = null;
-    }
-    this.isTracking = false;
-
-    if (this.userMarker) {
-      this.userMarker.remove();
-      this.userMarker = null;
-    }
-    if (this.userCircle) {
-      this.userCircle.remove();
-      this.userCircle = null;
-    }
-  }
-
-  private updateUserMarker(latlng: L.LatLng, accuracy: number): void {
-    const map = this.mapService['map'];
-    if (!map) return;
-
-    const userIcon = L.divIcon({
-      className: 'user-location-marker',
-      html: `<div class="user-dot"><div class="user-dot__pulse"></div></div>`,
-      iconSize: [20, 20],
-      iconAnchor: [10, 10],
-    });
-
-    if (this.userMarker) {
-      this.userMarker.setLatLng(latlng);
-    } else {
-      this.userMarker = L.marker(latlng, { icon: userIcon, zIndexOffset: 1000 }).addTo(map);
-    }
-
-    if (this.userCircle) {
-      this.userCircle.setLatLng(latlng).setRadius(accuracy);
-    } else {
-      this.userCircle = L.circle(latlng, {
-        radius: accuracy,
-        color: '#168AAD',
-        fillColor: '#168AAD',
-        fillOpacity: 0.1,
-        weight: 1,
-      }).addTo(map);
-    }
-  }
-
-  getDirections(): void {
-    if (!this.userLocation || !this.selectedItem?.latitude || !this.selectedItem?.longitude) return;
-
-    this.drawRoute(
-      this.userLocation,
-      L.latLng(this.selectedItem.latitude, this.selectedItem.longitude),
-    );
-  }
-
-  clearDirections(): void {
-    const map = this.mapService['map'];
-    if (this.routingControl && map) {
-      map.removeControl(this.routingControl);
-      this.routingControl = null;
-    }
-  }
-
-  private drawRoute(from: L.LatLng, to: L.LatLng): void {
-    const map = this.mapService['map'];
-    if (!map) return;
-
-    this.clearDirections();
-
-    this.routingControl = (L as any).Routing.control({
-      waypoints: [from, to],
-      routeWhileDragging: false,
-      show: false,
-      addWaypoints: false,
-      fitSelectedRoutes: true,
-      lineOptions: {
-        styles: [{ color: '#168AAD', weight: 5, opacity: 0.8 }],
-      },
-      createMarker: () => null,
-    }).addTo(map);
   }
 
   private matchesAllTerms(item: SearchResult, terms: string[]): boolean {
@@ -488,7 +343,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   closeCard(): void {
     this.selectedItem = null;
     this.selectedType = '';
-    this.clearDirections();
 
     const activeKey = (window as any).activeMarkerKey;
     if (activeKey) {

@@ -115,13 +115,12 @@ export class MapService {
   ): L.Marker | null {
     if (!this.map) return null;
 
-    const iconHtml = this.getMarkerIconHtml(type);
     const customIcon = L.divIcon({
       className: 'custom-type-marker',
-      html: iconHtml,
-      iconSize: [46, 46],
-      iconAnchor: [23, 46],
-      popupAnchor: [0, -40],
+      html: this.getMarkerIconHtml(),
+      iconSize: [38, 46],
+      iconAnchor: [19, 44],
+      popupAnchor: [0, -38],
     });
 
     const marker = L.marker([lat, lng], { icon: customIcon }).addTo(this.map);
@@ -219,24 +218,11 @@ export class MapService {
     marker.once('add', applyClass);
   }
 
-  private getMarkerIconHtml(type: string): string {
-    const icons: Record<string, string> = {
-      destination:
-        '<div style="background:#2563eb;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">📍</div>',
-      hotel:
-        '<div style="background:#10b981;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🏨</div>',
-      restaurant:
-        '<div style="background:#f59e0b;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🍽️</div>',
-      kafana:
-        '<div style="background:#db2777;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🍷</div>',
-      event:
-        '<div style="background:#8b5cf6;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🎉</div>',
-      locality:
-        '<div style="background:#64748b;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🏙️</div>',
-      activity:
-        '<div style="background:#14b8a6;color:white;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,0.3);">🏃</div>',
-    };
-
-    return icons[type] || icons['destination'];
+  private getMarkerIconHtml(): string {
+    return `
+      <div style="width:32px;height:32px;border:2px solid #fff;border-radius:50% 50% 50% 0;background:#168aad;box-shadow:0 8px 18px rgba(15,23,42,0.26);transform:rotate(-45deg);display:flex;align-items:center;justify-content:center;">
+        <span style="transform:rotate(45deg);font-size:14px;line-height:1;">📍</span>
+      </div>
+    `;
   }
 }
