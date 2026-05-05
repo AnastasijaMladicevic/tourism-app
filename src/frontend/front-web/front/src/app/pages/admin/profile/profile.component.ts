@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
 import { ImageCropperComponent, ImageCroppedEvent } from 'ngx-image-cropper';
-
+import { environment } from '../../../../environment/environment';
 import { AuthService, UpdateUserDto } from '../../../services/auth.service';
 import { UserDto } from '../../../models/user.model';
 
@@ -17,7 +17,7 @@ import { UserDto } from '../../../models/user.model';
 })
 export class ProfileComponent implements OnInit, OnDestroy {
   private static readonly DEFAULT_PROFILE_IMAGE_URL =
-    'http://localhost:5047/images/profiles/default_icon.png';
+    `${environment.apiUrl.replace('/api', '')}/images/profiles/default_icon.png`;
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
