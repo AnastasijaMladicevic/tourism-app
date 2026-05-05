@@ -45,7 +45,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const userData = this.authService.getUser();
@@ -146,6 +146,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.syncUserState(mergedUser);
         this.clearCropState(true);
         this.showSaveSuccess();
+        window.dispatchEvent(new Event('storage'));
       },
       error: (err) => {
         console.error('Avatar upload failed', err);
@@ -174,8 +175,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
         });
         this.authService.setCurrentUser(mergedUser);
         this.syncUserState(mergedUser);
+        this.cdr.detectChanges();
         this.clearCropState(true);
         this.showSaveSuccess();
+        window.dispatchEvent(new Event('storage'));
       },
       error: (err) => {
         console.error('Remove photo failed', err);
@@ -205,14 +208,16 @@ export class ProfileComponent implements OnInit, OnDestroy {
         this.syncUserState(mergedUser);
         this.authService.setCurrentUser(mergedUser);
         this.showSaveSuccess();
+        window.dispatchEvent(new Event('storage'));
       },
       error: (err) => {
         console.error('Save failed', err);
       },
     }).add(() => {
-        this.isSaving = false;
-        this.cdr.detectChanges();
+      this.isSaving = false;
+      this.cdr.detectChanges();
     });
+
   }
 
   resetPassword(): void {
