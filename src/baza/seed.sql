@@ -106,7 +106,11 @@ INSERT INTO "ObjectTypes" ("Name") VALUES
 ('Sportski centar'),
 ('Wellness centar'),
 ('Trznica'),
-('Suvenirnica');
+('Suvenirnica'),
+('Bolnica'),
+('Klinika'),
+('Poliklinika'),
+('Dom zdravlja');
 
 INSERT INTO "ActivityTypes" ("Name") VALUES
 ('Plivanje'),
@@ -801,7 +805,14 @@ VALUES
  ST_SetSRID(ST_MakePoint(18.892, 42.783), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Prirodni lokalitet'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW());
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
+ 
+ ('Centar Plava', 'Glavna gradska zona Plava sa institucijama, prodavnicama i svakodnevnim sadržajem',
+ ST_SetSRID(ST_MakePoint(19.9445, 42.5967), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plav'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
+ NOW());
 
 -- Lokalitetima upravlja menadzer dodeljen destinaciji kojoj pripadaju.
 UPDATE "Localities" l
@@ -1584,7 +1595,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.bar@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Lukoil Kolasin', 'Lukoil pumpa u Kolasinu', '2, Bakovići', NULL, 'http://www.lukoil.co.me/',
+ ('Lukoil Kolasin', 'Lukoil benzinska pumpa u Kolasinu', '2, Bakovići', NULL, 'http://www.lukoil.co.me/',
  NULL, NULL, '{"pon":"00:00-24:00"}', 0.00, ARRAY['Gorivo', 'Market'],
  ST_SetSRID(ST_MakePoint(19.526, 42.849), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Benzinska Pumpa'),
@@ -1594,7 +1605,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.kolasin@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Eko Igalo Banja', 'EKO Jugopetrol stanica u Igalo Banji', 'br. 56 II Dalmatinske, Igalo', '+38231330080', 'http://www.jugopetrol.co.me/',
+ ('Eko Igalo Banja', 'EKO Jugopetrol benzinska pumpa u Igalo Banji', 'br. 56 II Dalmatinske, Igalo', '+38231330080', 'http://www.jugopetrol.co.me/',
  NULL, NULL, '{"pon":"00:00-24:00"}', 0.00, ARRAY['Gorivo', 'Market', 'WC'],
  ST_SetSRID(ST_MakePoint(18.504, 42.456), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Benzinska Pumpa'),
@@ -2818,6 +2829,108 @@ VALUES
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.niksic@spirego.com'),
+ NOW(), NOW(), NOW()),
+ 
+---- BOLNICE ----
+
+('Klinicki centar Crne Gore', 'Najveća državna zdravstvena ustanova u Crnoj Gori, centralna bolnička institucija sa urgentnim centrom i specijalističkim klinikama.', 'Ljubljanska bb, Podgorica', '+38220412412', 'https://www.kccg.me',
+ NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
+ NULL, ARRAY['Urgentni centar', 'Specijalističke klinike', 'Bolničko lečenje', 'Dijagnostika'], ST_SetSRID(ST_MakePoint(19.2459, 42.4374), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Klinika'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+ ('Opsta bolnica Niksic', 'Državna opšta bolnica koja pruža usluge sekundarne zdravstvene zaštite za Nikšić i okolne opštine.', 'Dr Nika Miljanića, Nikšić', '+38240231204', 'https://domzdravljaniksic.me/',
+ NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
+ NULL, ARRAY['Interna medicina', 'Hirurgija', 'Dijagnostika', 'Bolničko lečenje'], ST_SetSRID(ST_MakePoint(18.9350, 42.7774), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Niksica'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.niksic@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+ ('Opsta bolnica Bar', 'Državna opšta bolnica u Baru, važna zdravstvena ustanova za južni deo crnogorskog primorja.', 'Podgrad bb, Stari Bar', '+38230342333', 'https://bolnicabar.me',
+ NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
+ NULL, ARRAY['Urgentni prijem', 'Bolničko lečenje', 'Dijagnostika', 'Specijalističke službe'], ST_SetSRID(ST_MakePoint(19.1285, 42.0895), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari Bar'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.bar@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+ ('Opsta bolnica Kotor', 'Državna opšta bolnica u Kotoru, namenjena bolničkoj i specijalističkoj zdravstvenoj zaštiti stanovnika Boke Kotorske.', 'Škaljari bb, Kotor', '+38232325602', 'https://www.kbckotor.me',
+ NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
+ NULL, ARRAY['Bolničko lečenje', 'Specijalističke službe', 'Dijagnostika'], ST_SetSRID(ST_MakePoint(18.7610, 42.4207), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kotora'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+ ('Opsta bolnica Danilo Prvi Cetinje', 'Jedna od najstarijih državnih bolnica u Crnoj Gori, smeštena u istorijskoj prestonici Cetinju.', 'Vuka Mićunovića 1, Cetinje', '+38241230441', 'http://daniloprvi.me/kontakt/',
+ NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
+ NULL, ARRAY['Hirurgija', 'Interna medicina', 'Pedijatrija', 'Ginekologija'], ST_SetSRID(ST_MakePoint(18.9237, 42.3889), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Cetinja'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.cetinje@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+ ('Dom zdravlja Tivat', 'Javna ustanova primarne zdravstvene zaštite u Tivtu.', 'Istarska, Tivat', '+38268672859', 'https://dztivat.com/',
+ NULL, NULL, '{"pon":"07:00-21:00","uto":"07:00-21:00","sre":"07:00-21:00","cet":"07:00-21:00","pet":"07:00-21:00","sub":"07:00-14:00","ned":"07:00-14:00"}',
+ NULL, ARRAY['Izabrani doktor', 'Pedijatrija', 'Primarna zaštita', 'Preventivni pregledi'], ST_SetSRID(ST_MakePoint(18.6952, 42.4337), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Dom zdravlja'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Tivta'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.tivat@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+ ('Dom zdravlja Herceg Novi', 'Javna ustanova primarne zdravstvene zaštite u Herceg Novom.', 'Nikole Ljubibratića 1, Herceg Novi', '+38231343111', 'http://domzdravljahn.me/',
+ NULL, NULL, '{"pon":"07:00-21:00","uto":"07:00-21:00","sre":"07:00-21:00","cet":"07:00-21:00","pet":"07:00-21:00","sub":"07:00-21:00","ned":"07:00-14:00"}',
+ NULL, ARRAY['Izabrani doktor', 'Pedijatrija', 'Primarna zaštita', 'Info pult'], ST_SetSRID(ST_MakePoint(18.5250, 42.4586), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Dom zdravlja'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Herceg Novog'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.hercegnovi@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+ ('Dom zdravlja Bar', 'Javna ustanova primarne zdravstvene zaštite u Baru.', 'Jovana Tomaševića 42, Bar', '+38230311001', 'http://www.domzdravljabar.com/',
+ NULL, NULL, '{"pon":"07:00-21:00","uto":"07:00-21:00","sre":"07:00-21:00","cet":"07:00-21:00","pet":"07:00-21:00","sub":"07:00-14:00","ned":"neradni dan"}',
+ NULL, ARRAY['Izabrani doktor', 'Pedijatrija', 'Primarna zaštita', 'Preventivni pregledi'], ST_SetSRID(ST_MakePoint(19.0916, 42.0999), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Dom zdravlja'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Bara'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.bar@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+ ('Zdravstvena stanica Pluzine', 'Zdravstvena stanica u Plužinama, deo sistema primarne zdravstvene zaštite.', 'Ulica Jelene Mitrić, Pluzine', '+38240271135', NULL,
+ NULL, NULL, '{"pon":"07:00-15:00","uto":"07:00-15:00","sre":"07:00-15:00","cet":"07:00-15:00","pet":"07:00-15:00","sub":"neradni dan","ned":"neradni dan"}',
+ NULL, ARRAY['Primarna zaštita', 'Ambulanta', 'Osnovne zdravstvene usluge'], ST_SetSRID(ST_MakePoint(18.8427, 43.1548), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Poliklinika'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Pluzina'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Pluzine'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.pluzine@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+ ('Dom zdravlja Plav', 'Javna ustanova primarne zdravstvene zaštite u Plavu.', 'Hridska bb, Plav', '+38251251103', 'https://www.dzplav.me',
+ NULL, NULL, '{"pon":"07:00-15:00","uto":"07:00-15:00","sre":"07:00-15:00","cet":"07:00-15:00","pet":"07:00-15:00","sub":"neradni dan","ned":"neradni dan"}',
+ NULL, ARRAY['Izabrani doktor', 'Primarna zaštita', 'Zdravstvena stanica'], ST_SetSRID(ST_MakePoint(19.9372, 42.5999), 4326), 0, 0, 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Dom zdravlja'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Plava'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plav'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.plav@spirego.com'),
  NOW(), NOW(), NOW());
 
 -- Objekte kreira ContentCreator, a odobrava menadzer nadlezan za destinaciju.
@@ -5510,7 +5623,118 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
- 5, 'Odlicno uredjeno setaliste, cisto i mirno, savrseno za beg od gradske guzve.', 'Approved', NOW());
+ 5, 'Odlicno uredjeno setaliste, cisto i mirno, savrseno za beg od gradske guzve.', 'Approved', NOW()),
+ 
+ 
+-- Klinicki centar Crne Gore
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinicki centar Crne Gore'),
+ 5, 'Brza reakcija i ljubazno osoblje, veoma profesionalno.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinicki centar Crne Gore'),
+ 4, 'Dobra usluga, ali se ceka na pregled.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinicki centar Crne Gore'),
+ 3, 'Osoblje ok, ali organizacija bi mogla biti bolja.', 'Approved', NOW()),
+ 
+ -- Opsta bolnica Niksic
+((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Niksic'),
+ 4, 'Korektna usluga i doktori.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Niksic'),
+ 2, 'Predugo cekanje na pregled.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Niksic'),
+ 5, 'Odlicna briga i profesionalnost.', 'Approved', NOW()),
+
+-- Opsta bolnica Bar
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Bar'),
+ 4, 'Dobri uslovi i ljubazno osoblje.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Bar'),
+ 3, 'Usluga solidna, ali guzva velika.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Bar'),
+ 5, 'Veoma zadovoljna tretmanom.', 'Approved', NOW()),
+
+-- Opsta bolnica Kotor
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Kotor'),
+ 5, 'Sve pohvale za medicinsko osoblje.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Kotor'),
+ 4, 'Dobra usluga, prijatno iskustvo.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Kotor'),
+ 3, 'Moze bolje, ali nije lose.', 'Approved', NOW()),
+
+-- Opsta bolnica Danilo Prvi Cetinje
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Danilo Prvi Cetinje'),
+ 4, 'Doktori strucni i posveceni.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Danilo Prvi Cetinje'),
+ 2, 'Dugo cekanje i losa organizacija.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Danilo Prvi Cetinje'),
+ 5, 'Odlicno iskustvo, sve preporuke.', 'Approved', NOW()),
+
+-- Dom zdravlja Tivat
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Tivat'),
+ 4, 'Brza i efikasna usluga.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Tivat'),
+ 3, 'Osrednje iskustvo.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Tivat'),
+ 5, 'Vrlo ljubazni i profesionalni.', 'Approved', NOW()),
+
+-- Dom zdravlja Herceg Novi
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Herceg Novi'),
+ 4, 'Korektno i brzo.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Herceg Novi'),
+ 2, 'Prevelika guzva.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Herceg Novi'),
+ 5, 'Sve pohvale za osoblje.', 'Approved', NOW()),
+
+-- Dom zdravlja Bar
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Bar'),
+ 3, 'Ok, ali moze bolje.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Bar'),
+ 4, 'Zadovoljna sam uslugom.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Bar'),
+ 5, 'Profesionalno i brzo.', 'Approved', NOW()),
+
+-- Zdravstvena stanica Pluzine
+((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Pluzine'),
+ 4, 'Malo mesto ali dobra usluga.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Pluzine'),
+ 3, 'Osnovne usluge, nista vise.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Pluzine'),
+ 5, 'Vrlo ljubazno osoblje.', 'Approved', NOW()),
+
+-- Dom zdravlja Plav
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Plav'),
+ 4, 'Korektna usluga.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Plav'),
+ 2, 'Dugo cekanje.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Plav'),
+ 5, 'Sve preporuke, jako ljubazni.', 'Approved', NOW());
 
 
 -- ============================================
@@ -7713,6 +7937,24 @@ VALUES
     'Krupacko jezero',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupacko jezero'),
+    NOW()),
+(
+    'https://www.ekapija.com/thumbs/grad_plav_060323_tw1024.jpg',
+    'Centar Plava',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Plava'),
+    NOW()),
+(
+    'https://montenegrina.net/wp-content/uploads/2018/12/Plav-1.jpg',
+    'Centar Plava',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Plava'),
+    NOW()),    
+(
+    'https://montenegrina.net/wp-content/uploads/2018/12/Plav-2.jpg',
+    'Centar Plava',
+    false,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Plava'),
     NOW());
 
 -- ============================================
@@ -11211,6 +11453,186 @@ VALUES
     'Promenada Krupac',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
+    NOW()),
+(
+    'https://www.kccg.me/wp-content/uploads/2025/04/DJI-0139.jpg',
+    'Klinicki centar Crne Gore',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinicki centar Crne Gore'),
+    NOW()),
+(
+    'https://www.kccg.me/wp-content/uploads/2021/03/Zastave-na-pola-koplja-na-ulazu-KCCG.jpg',
+    'Klinicki centar Crne Gore',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinicki centar Crne Gore'),
+    NOW()),
+(
+    'https://www.ekapija.com/thumbs169/klinicki_centar_crne_gore_190223_tw1024.jpg',
+    'Klinicki centar Crne Gore',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinicki centar Crne Gore'),
+    NOW()),
+(
+    'https://bolnica-nk.com/wp-content/uploads/2022/11/glavni-2.jpg',
+    'Opsta bolnica Niksic',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Niksic'),
+    NOW()),
+(
+    'https://rtnk.me/wp-content/uploads/2023/05/bolnica-1.jpg',
+    'Opsta bolnica Niksic',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Niksic'),
+    NOW()),
+(
+    'https://onogost.me/wp-content/uploads/2024/04/opsta-bolnica.jpg',
+    'Opsta bolnica Niksic',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Niksic'),
+    NOW()),
+(
+    'https://www.vijesti.me/data/images/2021/03/27/07/5311543_opsta-bolnica-bar_share.jpg',
+    'Opsta bolnica Bar',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Bar'),
+    NOW()),
+(
+    'https://www.bolnicabar.me/images/2023/IMG-1d0accf27a0bf0e0bc553cac09fc0698-V_1.jpg',
+    'Opsta bolnica Bar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Bar'),
+    NOW()),
+(
+    'https://rtnk.me/wp-content/uploads/2023/09/bolnica-bar-pr-centar.jpg',
+    'Opsta bolnica Bar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Bar'),
+    NOW()),
+(
+    'https://me.ekapija.com/thumbs169/opsta_bolnica_kotor_190820_tw1024.jpg',
+    'Opsta bolnica Kotor',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Kotor'),
+    NOW()),
+(
+    'https://bokanews.me/wp-content/uploads/2016/09/ulaz-u-novu-polikliniku_resize.jpg',
+    'Opsta bolnica Kotor',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Kotor'),
+    NOW()),
+(
+    'https://bokanews.me/wp-content/uploads/2016/09/detalj-iz-nove-poliklinike-2_resize.jpg',
+    'Opsta bolnica Kotor',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Kotor'),
+    NOW()),
+(
+    'https://media.pobjeda.me/media/2026/04/24/1777052914-bolnica-danilo-prvi-cetinje-0904-2026-dragan-mijatovic-1-i_1280x800.jpeg?cacheControl=1777052915',
+    'Opsta bolnica Danilo Prvi Cetinje',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Danilo Prvi Cetinje'),
+    NOW()),
+(
+    'https://me.ekapija.com/thumbs169/bolnica_danilo_prvi_cetinje_050323_tw1024.jpg',
+    'Opsta bolnica Danilo Prvi Cetinje',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Danilo Prvi Cetinje'),
+    NOW()),
+(
+    'https://www.gradnja.rs/wp-content/uploads/2023/11/bolnica-danilo-1-cetinje.jpg',
+    'Opsta bolnica Danilo Prvi Cetinje',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Danilo Prvi Cetinje'),
+    NOW()),
+(
+    'https://radiotivat.com/wp-content/uploads/2021/11/DOM-ZDRAVLJA.webp',
+    'Dom zdravlja Tivat',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Tivat'),
+    NOW()),
+(
+    'https://www.vijesti.me/data/images/2021/11/10/10/5371993_dom-zdravlja-tivat_share.jpg',
+    'Dom zdravlja Tivat',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Tivat'),
+    NOW()),
+(
+    'https://mondo.me/Picture/669405/Social/jpeg/358331684_187231180850040_6288158882867065455_n.jpg?ts=2023-07-31T13:06:31',
+    'Dom zdravlja Tivat',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Tivat'),
+    NOW()),
+(
+    'https://domzdravljahn.me/wp-content/uploads/2016/06/dom-zdravlja-hn.jpg',
+    'Dom zdravlja Herceg Novi',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Herceg Novi'),
+    NOW()),
+(
+    'https://domzdravljahn.me/wp-content/uploads/2016/06/dom-zdravlja-obavjestenja.jpg',
+    'Dom zdravlja Herceg Novi',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Herceg Novi'),
+    NOW()),
+(
+    'https://domzdravljahn.me/wp-content/uploads/2017/10/Dom-Zdravlja-Herceg-Novi-06.jpg',
+    'Dom zdravlja Herceg Novi',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Herceg Novi'),
+    NOW()),
+(
+    'https://ba.ekapija.com/thumbs169/dom_zdravlja_bar_070624_tw1024.jpg',
+    'Dom zdravlja Bar',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Bar'),
+    NOW()),
+(
+    'https://i0.wp.com/primorski.me/wp-content/uploads/2022/07/dom-zdravlja-bar-foto-dz-bar.jpg',
+    'Dom zdravlja Bar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Bar'),
+    NOW()),
+(
+    'https://i0.wp.com/primorski.me/wp-content/uploads/2022/09/dom-zdravlja-bar-4.jpg?fit=1600%2C1200&ssl=1',
+    'Dom zdravlja Bar',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Bar'),
+    NOW()),
+(
+    'https://www.vijesti.me/data/images/2021/07/22/08/5351161_zdravstvena-stanica-u-pluzinama_share.jpg',
+    'Zdravstvena stanica Pluzine',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Pluzine'),
+    NOW()),
+(
+    'https://www.antenam.net/uploads/0/9/3/0937dd1305acef12ed6bf380eea2160a.JPG',
+    'Zdravstvena stanica Pluzine',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Pluzine'),
+    NOW()),
+(
+    'https://radiotitograd.me/wp-content/uploads/2021/07/pluzine.jpg',
+    'Zdravstvena stanica Pluzine',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Pluzine'),
+    NOW()),
+(
+    'https://www.ekapija.com/thumbs169/dom_zdravlja_plav_190220_tw1024.jpg',
+    'Dom zdravlja Plav',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Plav'),
+    NOW()),
+(
+    'https://www.dzplav.me/slike%20plav/4a%20Snijeg%202012%20god/Slika%205.JPG',
+    'Dom zdravlja Plav',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Plav'),
+    NOW()),
+(
+    'https://www.vijesti.me/data/images/2019/02/02/00/833466_20190202040240_5c551168b7896801fa6e65c1jpeg_ls.jpg',
+    'Dom zdravlja Plav',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Plav'),
     NOW());
 
 -- ============================================
