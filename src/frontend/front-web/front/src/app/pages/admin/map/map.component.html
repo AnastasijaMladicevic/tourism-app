@@ -4,7 +4,7 @@
       <mat-icon>search</mat-icon>
       <input
         type="text"
-        placeholder="Search objects, routes..."
+        placeholder="Search destinations..."
         [(ngModel)]="searchQuery"
         (input)="onSearchInput()"
         (focus)="showSuggestions = searchResults.length > 0"
@@ -38,19 +38,6 @@
           </div>
         }
       </div>
-    }
-  </div>
-
-  <div class="filter-chips">
-    @for (chip of filterChips; track chip.key) {
-      <button
-        class="chip"
-        [class.chip--active]="activeFilters.includes(chip.key)"
-        (click)="toggleFilter(chip.key)"
-      >
-        <span>{{ chip.icon }}</span>
-        {{ chip.label }}
-      </button>
     }
   </div>
 
