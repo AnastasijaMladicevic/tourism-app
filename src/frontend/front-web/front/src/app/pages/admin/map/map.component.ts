@@ -34,7 +34,6 @@ interface SearchResult {
 interface RoutePoint {
   id: number;
   name: string;
-  type: string;
   lat: number;
   lng: number;
 }
@@ -54,8 +53,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedItem: any = null;
   selectedType: 'destination' | '' = '';
   userLocation: L.LatLng | null = null;
-  routeStart: RoutePoint | null = null;
-  routeEnd: RoutePoint | null = null;
 
   isTracking = false;
   private watchId: number | null = null;
@@ -212,49 +209,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const destination = this.getRoutePointFromItem(this.selectedItem);
     if (!destination) return;
 
-    this.routeEnd = destination;
     this.drawRoute(this.userLocation, L.latLng(destination.lat, destination.lng));
-  }
-
-  showRouteBetweenPins(): void {
-    if (!this.routeStart || !this.routeEnd) return;
-
-    this.drawRoute(
-      L.latLng(this.routeStart.lat, this.routeStart.lng),
-      L.latLng(this.routeEnd.lat, this.routeEnd.lng),
-    );
-  }
-
-  setRoutePoint(mode: 'start' | 'end'): void {
-    const point = this.getRoutePointFromItem(this.selectedItem);
-    if (!point) return;
-
-    if (mode === 'start') {
-      this.routeStart = point;
-      if (this.routeEnd?.id === point.id && this.routeEnd.type === point.type) {
-        this.routeEnd = null;
-      }
-    } else {
-      this.routeEnd = point;
-      if (this.routeStart?.id === point.id && this.routeStart.type === point.type) {
-        this.routeStart = null;
-      }
-    }
-
-    if (this.routeStart && this.routeEnd) {
-      this.showRouteBetweenPins();
-    } else {
-      this.clearDirections();
-    }
-
-    this.cdr.detectChanges();
-  }
-
-  clearPlannedRoute(): void {
-    this.routeStart = null;
-    this.routeEnd = null;
-    this.clearDirections();
-    this.cdr.detectChanges();
   }
 
   clearDirections(): void {
@@ -502,39 +457,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  get selectedRoutePoint(): RoutePoint | null {
-    return this.getRoutePointFromItem(this.selectedItem);
-  }
-
-  canUseSelectedForRoute(): boolean {
-    return this.selectedRoutePoint !== null;
-  }
-
-  isSelectedAsStart(): boolean {
-    const point = this.selectedRoutePoint;
-    return (
-      !!point &&
-      !!this.routeStart &&
-      point.id === this.routeStart.id &&
-      point.type === this.routeStart.type
-    );
-  }
-
-  isSelectedAsEnd(): boolean {
-    const point = this.selectedRoutePoint;
-    return (
-      !!point &&
-      !!this.routeEnd &&
-      point.id === this.routeEnd.id &&
-      point.type === this.routeEnd.type
-    );
-  }
-
-  routeSummary(point: RoutePoint | null): string {
-    if (!point) return 'Not selected';
-    return `${point.name} (${point.type})`;
-  }
-
   zoomIn(): void {
     (this.mapService as any)['map']?.zoomIn();
   }
@@ -553,7 +475,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     return {
       id: Number(item.id),
       name: String(item.name ?? 'Point'),
-      type: String(item.destinationTypeName ?? 'Destination'),
       lat,
       lng,
     };
