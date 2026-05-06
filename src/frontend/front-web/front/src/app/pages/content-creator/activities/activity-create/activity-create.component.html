@@ -9,9 +9,9 @@
 
     <div class="header-actions">
       @if (isEditMode) {
-        <button type="button" class="danger-btn" (click)="openDeleteModal()" [disabled]="isSubmitting || isDeleting">
+        <button type="button" class="danger-btn" (click)="openDeleteModal()" [disabled]="isSubmitting || isDeleting || hasPendingDeletionRequest">
           <span class="material-symbols-outlined">delete</span>
-          {{ isApprovedActivity ? 'Request Deletion' : 'Delete' }}
+          {{ isApprovedActivity ? (hasPendingDeletionRequest ? 'Deletion Requested' : 'Request Deletion') : 'Delete' }}
         </button>
       }
 
@@ -287,9 +287,9 @@
             type="button"
             class="confirm-delete-btn"
             (click)="deleteActivity()"
-            [disabled]="isDeleting"
+            [disabled]="isDeleting || (isApprovedActivity && hasPendingDeletionRequest)"
           >
-            {{ isDeleting ? (isApprovedActivity ? 'Submitting...' : 'Deleting...') : (isApprovedActivity ? 'Request deletion' : 'Delete') }}
+            {{ isDeleting ? (isApprovedActivity ? 'Submitting...' : 'Deleting...') : (isApprovedActivity ? (hasPendingDeletionRequest ? 'Already requested' : 'Request deletion') : 'Delete') }}
           </button>
         </div>
       </section>

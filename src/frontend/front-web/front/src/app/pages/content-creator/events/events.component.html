@@ -293,6 +293,25 @@
           <h3>Description</h3>
           <p class="description-copy">{{ getSelectedSummary(selectedEvent) }}</p>
         </section>
+        <section class="detail-section">
+          <div class="map-card">
+            @if (hasSelectedEventCoordinates) {
+              <app-map
+                [lat]="selectedEventLat"
+                [lng]="selectedEventLng"
+                [zoom]="14"
+                [popupText]="selectedEventLocationLabel"
+                [interactive]="false"
+                mapId="event-details-map"
+              ></app-map>
+            } @else {
+              <div class="map-empty-state">
+                <span class="material-symbols-outlined">location_off</span>
+                <p>Coordinates are not available for this event.</p>
+              </div>
+            }
+          </div>
+        </section>
         <!-- TBD DA LI CEMO OVO DA IMAMO -->
         <!-- <section class="detail-section">
           <div class="section-head">

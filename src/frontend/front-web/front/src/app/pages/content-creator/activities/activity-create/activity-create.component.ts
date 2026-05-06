@@ -143,6 +143,7 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
   localities: LocalityOption[] = [];
   objects: ObjectOption[] = [];
   private loadedActivity: ActivityDto | null = null;
+  private deletionRequestSubmitted = false;
 
   locationDetails = {
     city: '-',
@@ -232,8 +233,21 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
       : 'This activity is still pending, so it can be removed immediately.';
   }
 
+  get hasPendingDeletionRequest(): boolean {
+    if (this.deletionRequestSubmitted) {
+      return true;
+    }
+
+    if (this.loadedActivity?.hasPendingDeletionRequest) {
+      return true;
+    }
+
+    const status = (this.loadedActivity?.status ?? '').toLowerCase();
+    return status.includes('deletion');
+  }
+
   openDeleteModal(): void {
-    if (!this.isEditMode || !this.activityId || this.isSubmitting || this.isDeleting) {
+    if (!this.isEditMode || !this.activityId || this.isSubmitting || this.isDeleting || this.hasPendingDeletionRequest) {
       return;
     }
 
@@ -446,6 +460,10 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
     }
 
     if (this.isApprovedActivity) {
+      if (this.hasPendingDeletionRequest) {
+        this.showDeleteModal = false;
+        return;
+      }
       this.submitActivityDeletionRequest();
       return;
     }
@@ -472,6 +490,10 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
       )
       .subscribe({
         next: () => {
+          this.deletionRequestSubmitted = true;
+          if (this.loadedActivity) {
+            this.loadedActivity.hasPendingDeletionRequest = true;
+          }
           this.showDeleteModal = false;
           this.successMessage = 'Deletion request submitted. A manager must review it before activity removal.';
           setTimeout(() => {
@@ -657,6 +679,7 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
       .subscribe({
         next: (activity) => {
           this.loadedActivity = activity;
+          this.deletionRequestSubmitted = !!activity.hasPendingDeletionRequest;
           this.form.patchValue({
             name: activity.name,
             description: activity.description ?? '',

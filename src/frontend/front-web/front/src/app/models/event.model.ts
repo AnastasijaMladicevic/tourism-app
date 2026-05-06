@@ -11,6 +11,7 @@ export interface EventDto {
   price?: number;
   maxVisitors?: number;
   status: string;
+  hasPendingDeletionRequest?: boolean;
   eventTypeId: number;
   eventTypeName?: string;
   localityId?: number;
