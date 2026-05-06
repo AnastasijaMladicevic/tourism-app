@@ -2,6 +2,11 @@ using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
@@ -72,13 +77,13 @@ namespace TuristickiVodic.Services.Services
                 throw new InvalidOperationException("You can upload at most 5 images per request.");
             }
 
-            var existingCount = review.Images.Count;
-            if (existingCount + fileList.Count > 5)
+            if (review.Images.Count + fileList.Count > 5)
             {
                 throw new InvalidOperationException("A review can have at most 5 images.");
             }
 
-            var reviewFolder = Path.Combine(_environment.WebRootPath, "images", "reviews");
+            var root = _environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            var reviewFolder = Path.Combine(root, "images", "reviews");
             Directory.CreateDirectory(reviewFolder);
 
             var createdImages = new List<ReviewImage>(fileList.Count);

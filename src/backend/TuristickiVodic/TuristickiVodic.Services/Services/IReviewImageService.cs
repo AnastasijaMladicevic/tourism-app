@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using TuristickiVodic.Core.DTO;
 
 namespace TuristickiVodic.Services.Services

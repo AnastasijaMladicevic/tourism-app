@@ -238,12 +238,29 @@
                   }
                 </div>
                 <p class="review-text">{{ review.text }}</p>
+                @if (review.creatorResponse) {
+                  <div class="creator-response">
+                    <div class="creator-response-header">
+                      <mat-icon>reply</mat-icon>
+                      <span>Odgovor vlasnika</span>
+                      @if (review.creatorResponseAt) {
+                        <span class="response-date">
+                          {{ formatReviewDate(review.creatorResponseAt) }}
+                        </span>
+                      }
+                    </div>
+                    <p class="creator-response-text">
+                      {{ review.creatorResponse }}
+                    </p>
+                  </div>
+                }
               </div>
             }
           </div>
 
           <button class="add-review-btn" (click)="openWriteReview()">
-            <mat-icon>add</mat-icon> Dodaj recenziju
+            <mat-icon>{{ userReview ? 'edit' : 'add' }}</mat-icon>
+            {{ userReview ? 'Izmeni recenziju' : 'Dodaj recenziju' }}
           </button>
         </div>
       </div>
@@ -357,6 +374,22 @@
               }
             </div>
             <p class="review-text">{{ review.text }}</p>
+            @if (review.creatorResponse) {
+              <div class="creator-response">
+                <div class="creator-response-header">
+                  <mat-icon>reply</mat-icon>
+                  <span>Odgovor vlasnika</span>
+                  @if (review.creatorResponseAt) {
+                    <span class="response-date">
+                      {{ formatReviewDate(review.creatorResponseAt) }}
+                    </span>
+                  }
+                </div>
+                <p class="creator-response-text">
+                  {{ review.creatorResponse }}
+                </p>
+              </div>
+            }
           </div>
         }
       </div>
@@ -371,7 +404,7 @@
         <mat-icon>close</mat-icon>
       </button>
 
-      <h2>Napiši recenziju</h2>
+      <h2>{{ userReview ? 'Izmeni recenziju' : 'Napiši recenziju' }}</h2>
       <p class="review-for">{{ object?.name }}</p>
 
       <!-- Zvezdice -->

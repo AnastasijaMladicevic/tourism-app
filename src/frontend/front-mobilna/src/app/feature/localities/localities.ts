@@ -11,7 +11,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { catchError, firstValueFrom, of } from 'rxjs';
 import { LocalityDto, LocalityService } from '../../services/locality';
 import { AuthService } from '../../services/auth';
-import { ImageDto, ImageService } from '../../services/image';
 import { LocationTrackingService } from '../../services/location-tracking';
 import { FavoriteStateService } from '../../services/favorite-state';
 import { PendingActionService } from '../../services/pending-action';
@@ -41,21 +40,17 @@ export class LocalitiesComponent implements OnInit {
   visibleLocalities: LocalityView[] = [];
   localityTypes: { id: number; name: string }[] = [];
   showSortMenu = false;
-  images: ImageDto[] = [];
-  locality: LocalityDto | null = null;
   pageSizeOptions = [8, 12, 16, 24, 32];
   userLocation: { lat: number; lng: number } | null = null;
   isTracking = false;
-  private readonly fetchPageSize = 100;
-  private readonly maxFetchPages = 50;
-  private readonly imageCache = new Map<number, LocalityDto['images']>();
+  private readonly fetchPageSize = 500;
+  private readonly maxFetchPages = 10;
   private readonly favoritePendingIds = new Set<number>();
   constructor(
     private router: Router,
     private localityService: LocalityService,
     private authService: AuthService,
     private cdr: ChangeDetectorRef,
-    private imageService: ImageService,
     private favoriteStateService: FavoriteStateService,
     private locationTrackingService: LocationTrackingService,
     private pendingActionService: PendingActionService
@@ -94,12 +89,35 @@ export class LocalitiesComponent implements OnInit {
     });
     this.cdr.detectChanges();
   }
+  private tokenize(text: string): string[] {
+    return text
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .split(/\s+/)
+      .filter(Boolean);
+  }
+
+  private matchesTokens(text: string, query: string): boolean {
+    const textTokens = this.tokenize(text);
+    const queryTokens = this.tokenize(query);
+
+    return queryTokens.every(q =>
+      textTokens.some(t => t.includes(q))
+    );
+  }
   get filtered(): LocalityView[] {
     let list = [...this.localities];
 
     if (this.searchQuery.trim()) {
-      const query = this.searchQuery.trim().toLowerCase();
-      list = list.filter((locality) => locality.name.toLowerCase().includes(query));
+      const query = this.searchQuery.trim();
+
+      list = list.filter((locality) =>
+        this.matchesTokens(
+          `${locality.name} ${locality.description ?? ''} ${locality.destinationName ?? ''}`,
+          query
+        )
+      );
     }
 
     if (this.activeFilter !== 'All') {
@@ -256,12 +274,16 @@ export class LocalitiesComponent implements OnInit {
     this.router.navigate(['/locality', locality.id]);
   }
   getMainImage(locality: LocalityView): string {
+    if (locality.mainImageUrl) {
+      return locality.mainImageUrl;
+    }
+
     if (locality.images && locality.images.length > 0) {
       const mainImage = locality.images.find((image) => image.isMain);
       return mainImage?.url || locality.images[0].url;
     }
 
-    return this.locality?.mainImageUrl || '';
+    return '';
   }
   onImageError(event: Event): void {
     (event.target as HTMLImageElement).style.display = 'none';
@@ -297,7 +319,7 @@ export class LocalitiesComponent implements OnInit {
 
       this.localities = localities.map((locality) => ({
         ...locality,
-        images: this.imageCache.get(locality.id) ?? [],
+        images: locality.images ?? [],
         isFavorite: false,
         favoriteId: undefined,
       }));
@@ -386,7 +408,8 @@ export class LocalitiesComponent implements OnInit {
 
       allLocalities.push(...newItems);
 
-      if (items.length < this.fetchPageSize) {
+      const totalPages = this.readTotalPages(response);
+      if ((totalPages != null && page >= totalPages) || items.length < this.fetchPageSize) {
         break;
       }
     }
@@ -406,6 +429,16 @@ export class LocalitiesComponent implements OnInit {
     }
 
     return [];
+  }
+  private readTotalPages(raw: unknown): number | undefined {
+    if (!raw || typeof raw !== 'object') return undefined;
+
+    const obj = raw as Record<string, unknown>;
+    const value = obj['totalPages'] ?? obj['TotalPages'];
+    if (value == null) return undefined;
+
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
   }
   sortLabel(): string {
     const map = { az: 'A -> Z', za: 'Z -> A', distance: 'Nearest' };
@@ -438,34 +471,12 @@ export class LocalitiesComponent implements OnInit {
     this.hasNextPage = this.currentPage < totalPages;
 
     const startIndex = (this.currentPage - 1) * this.pageSize;
-    const pageItems = filteredLocalities.slice(startIndex, startIndex + this.pageSize);
-
-    this.visibleLocalities = await Promise.all(
-      pageItems.map(async (locality) => ({
-        ...locality,
-        images: await this.getLocalityImages(locality.id),
-      })),
-    );
+    this.visibleLocalities = filteredLocalities.slice(startIndex, startIndex + this.pageSize);
     this.favoriteStateService.applyToList(this.visibleLocalities, (locality) => ({
       type: 'locality',
       entityId: locality.id,
     }));
     this.cdr.detectChanges();
-  }
-  private async getLocalityImages(localityId: number): Promise<LocalityDto['images']> {
-    const cachedImages = this.imageCache.get(localityId);
-    if (cachedImages) {
-      return cachedImages;
-    }
-
-    try {
-      const images = (await firstValueFrom(this.imageService.getForLocality(localityId))) ?? [];
-      this.imageCache.set(localityId, images);
-      return images;
-    } catch {
-      this.imageCache.set(localityId, []);
-      return [];
-    }
   }
   onSearchChange(): void {
     this.currentPage = 1;

@@ -244,13 +244,29 @@ export class ObjectsComponent implements OnInit {
       this.showSortMenu = false;
     }
   }
-
+  private tokenize(query: string): string[] {
+    return query
+      .toLowerCase()
+      .split(' ')
+      .filter((t) => t.length >= 2);
+  }
   get filtered(): ObjectView[] {
     let list = [...this.objects];
 
     if (this.searchQuery.trim()) {
-      const query = this.searchQuery.trim().toLowerCase();
-      list = list.filter((obj) => obj.name.toLowerCase().includes(query));
+      const terms = this.tokenize(this.searchQuery);
+
+      list = list.filter((obj) => {
+        const text = `
+          ${obj.name}
+          ${obj.description}
+          ${obj.cuisineType}
+          ${obj.objectTypeName}
+          ${Array.isArray(obj.amenities) ? obj.amenities.join(' ') : ''}
+        `.toLowerCase();
+
+        return terms.every(term => text.includes(term));
+      });
     }
 
     if (!this.hideTypeFilters && this.activeFilter !== 'All') {
