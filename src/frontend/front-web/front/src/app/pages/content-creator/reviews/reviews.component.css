@@ -118,7 +118,8 @@
   display: grid;
   grid-template-columns: 280px minmax(500px, 1fr) 280px;
   gap: 12px;
-  min-height: calc(100vh - 190px);
+  height: calc(100vh - 190px);
+  min-height: 560px;
 }
 
 .card {
@@ -128,7 +129,14 @@
 }
 
 .queue-panel {
-  overflow: hidden;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.details-panel,
+.insight-panel {
+  height: 100%;
+  overflow-y: auto;
 }
 
 .queue-item {
@@ -450,6 +458,7 @@ textarea {
 @media (max-width: 1280px) {
   .moderation-grid {
     grid-template-columns: 1fr;
+    height: auto;
   }
 
   .chip-divider {

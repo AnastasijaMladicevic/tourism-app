@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   Subject,
+  Observable,
   catchError,
   debounceTime,
   distinctUntilChanged,
@@ -18,6 +19,8 @@ import {
 } from 'rxjs';
 import { ObjectDto, ObjectImageDto, ObjectService } from '../../../services/object';
 import { ReviewDto, ReviewQueryParams, ReviewService } from '../../../services/review';
+import { ActivitiesService } from '../../../services/activities';
+import { EventService } from '../../../services/event.service';
 
 @Component({
   selector: 'app-content-creator-reviews',
@@ -29,6 +32,8 @@ import { ReviewDto, ReviewQueryParams, ReviewService } from '../../../services/r
 export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly reviewService = inject(ReviewService);
   private readonly objectService = inject(ObjectService);
+  private readonly activitiesService = inject(ActivitiesService);
+  private readonly eventService = inject(EventService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
   private readonly searchInput$ = new Subject<string>();
@@ -117,7 +122,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   }
 
   private loadReviewsRequest() {
-    return this.getMyObjectIds();
+    return this.getMyContentIds();
   }
 
   onFilterChange(): void {
@@ -307,12 +312,43 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
       });
   }
 
-  private getMyObjectIds() {
+  private getMyContentIds() {
     const pageSize = 200;
-    return this.objectService.getMy(
-      { page: 1, pageSize, sortBy: 'name', sortOrder: 'asc' },
-      { bypassRegion: true }
-    ).pipe(
+
+    const objectIds$ = this.getAllPagedIds((page) => (
+      this.objectService.getMy(
+        { page, pageSize, sortBy: 'name', sortOrder: 'asc' },
+        { bypassRegion: true }
+      )
+    ));
+
+    const activityIds$ = this.getAllPagedIds((page) => (
+      this.activitiesService.getMyActivities(
+        { page, pageSize, sortBy: 'name', sortOrder: 'asc' }
+      )
+    ));
+
+    const eventIds$ = this.getAllPagedIds((page) => (
+      this.eventService.getMy(
+        { page, pageSize, sortBy: 'name', sortOrder: 'asc' }
+      )
+    ));
+
+    return forkJoin([objectIds$, activityIds$, eventIds$]).pipe(
+      map(([objectIds, activityIds, eventIds]) => ([
+        ...objectIds,
+        ...activityIds,
+        ...eventIds
+      ])),
+      map((ids) => Array.from(new Set(ids))),
+      map((ids) => ids.filter((id) => Number.isFinite(id) && id > 0)),
+    );
+  }
+
+  private getAllPagedIds<T extends { id: number }>(
+    fetchPage: (page: number) => Observable<{ items?: T[]; totalPages?: number }>
+  ) {
+    return fetchPage(1).pipe(
       switchMap((firstPage) => {
         const firstItems = firstPage.items ?? [];
         const totalPages = Math.max(1, firstPage.totalPages ?? 1);
@@ -321,12 +357,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
           return of(firstItems.map((item) => item.id));
         }
 
-        const requests = Array.from({ length: totalPages - 1 }, (_, index) => (
-          this.objectService.getMy(
-            { page: index + 2, pageSize, sortBy: 'name', sortOrder: 'asc' },
-            { bypassRegion: true }
-          )
-        ));
+        const requests = Array.from({ length: totalPages - 1 }, (_, index) => fetchPage(index + 2));
 
         return forkJoin(requests).pipe(
           map((pages) => [
@@ -336,8 +367,6 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
           map((items) => items.map((item) => item.id))
         );
       }),
-      map((ids) => Array.from(new Set(ids))),
-      map((ids) => ids.filter((id) => Number.isFinite(id) && id > 0)),
     );
   }
 
