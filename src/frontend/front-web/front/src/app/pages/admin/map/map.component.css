@@ -218,31 +218,24 @@
 
 .bottom-card {
   position: absolute;
-  bottom: 72px;
-  left: 16px;
-  right: 16px;
   z-index: 10;
   background: var(--bg-white);
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   overflow: hidden;
   animation: slideUp 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  width: min(360px, calc(100% - 32px));
+}
 
-  @media (min-width: 600px) and (max-width: 1023px) {
-    width: 380px;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 72px;
-    right: auto;
-  }
+.bottom-card--anchored {
+  right: auto;
+  bottom: auto;
+}
 
-  @media (min-width: 1024px) {
-    width: 480px;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 40px;
-    right: auto;
-  }
+.bottom-card--hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 @keyframes slideUp {

@@ -2,9 +2,12 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   NgZone,
   OnDestroy,
   OnInit,
+  HostListener,
+  ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -55,13 +58,29 @@ interface AdminMapDestination extends DestinationDto {
   encapsulation: ViewEncapsulation.None,
 })
 export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('cardElement') private cardElementRef?: ElementRef<HTMLElement>;
+  @ViewChild('mapPage') private mapPageRef?: ElementRef<HTMLElement>;
+
   searchQuery = '';
   searchResults: SearchResult[] = [];
   showSuggestions = false;
 
   selectedItem: AdminMapDestination | null = null;
   selectedType: 'destination' | '' = '';
+  isCardVisible = false;
+  cardPosition = { left: 16, top: 16 };
   private allItems: SearchResult[] = [];
+  private readonly markerClickHandler = (event: Event) => {
+    const customEvent = event as CustomEvent<{ data: AdminMapDestination }>;
+
+    this.ngZone.run(() => {
+      this.selectedItem = customEvent.detail.data;
+      this.selectedType = 'destination';
+      this.isCardVisible = false;
+      this.cdr.detectChanges();
+      this.scheduleCardPresentation();
+    });
+  };
 
   constructor(
     private mapService: MapService,
@@ -74,13 +93,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    window.addEventListener('map-marker-clicked', (event: any) => {
-      this.ngZone.run(() => {
-        this.selectedItem = event.detail.data;
-        this.selectedType = 'destination';
-        this.cdr.detectChanges();
-      });
-    });
+    window.addEventListener('map-marker-clicked', this.markerClickHandler as EventListener);
   }
 
   ngAfterViewInit(): void {
@@ -95,14 +108,21 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     this.loadAllData(state);
 
-    const map = this.mapService['map'];
+    const map = this.mapService.getMap();
     if (map) {
       map.on('click', () => this.closeCard());
+      map.on('move zoom resize', () => this.updateCardPosition());
     }
   }
 
   ngOnDestroy(): void {
+    window.removeEventListener('map-marker-clicked', this.markerClickHandler as EventListener);
     this.mapService.destroyMap();
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.scheduleCardPresentation();
   }
 
   private matchesAllTerms(item: SearchResult, terms: string[]): boolean {
@@ -342,36 +362,147 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['/destination', this.selectedItem.id]);
   }
 
+  onCardImageLoad(): void {
+    this.scheduleCardPresentation();
+  }
+
   closeCard(): void {
     this.selectedItem = null;
     this.selectedType = '';
-
-    const activeKey = (window as any).activeMarkerKey;
-    if (activeKey) {
-      const found = this.mapService['markerMap']?.get(activeKey);
-      const map = this.mapService['map'];
-      if (found && map && !map.hasLayer(found.marker)) {
-        found.marker.addTo(map);
-      }
-      (window as any).activeMarkerKey = null;
-    }
-
-    const regularMarker = (window as any).currentRegularMarker;
-    if (regularMarker) {
-      regularMarker.remove();
-      (window as any).currentRegularMarker = null;
-    }
-
+    this.isCardVisible = false;
     this.mapService.clearMarkerFocus();
-
     this.cdr.detectChanges();
   }
 
   zoomIn(): void {
-    (this.mapService as any)['map']?.zoomIn();
+    this.mapService.getMap()?.zoomIn();
   }
 
   zoomOut(): void {
-    (this.mapService as any)['map']?.zoomOut();
+    this.mapService.getMap()?.zoomOut();
+  }
+
+  private scheduleCardPresentation(): void {
+    if (!this.selectedItem) {
+      return;
+    }
+
+    setTimeout(() => this.presentCardForSelection(), 0);
+  }
+
+  private presentCardForSelection(): void {
+    if (!this.selectedItem || !this.mapPageRef) {
+      return;
+    }
+
+    const map = this.mapService.getMap();
+    const cardElement = this.cardElementRef?.nativeElement;
+    if (!map || !cardElement) {
+      return;
+    }
+
+    const latitude = this.selectedItem.latitude;
+    const longitude = this.selectedItem.longitude;
+    if (latitude == null || longitude == null) {
+      return;
+    }
+
+    const cardWidth = cardElement.offsetWidth;
+    const cardHeight = cardElement.offsetHeight;
+    const latLng: [number, number] = [latitude, longitude];
+
+    if (!this.needsMapPanForCard(latLng, cardWidth, cardHeight)) {
+      this.isCardVisible = true;
+      this.updateCardPosition();
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.isCardVisible = false;
+    this.cdr.detectChanges();
+
+    const markerId = this.selectedItem.id;
+    map.once('moveend', () => {
+      if (!this.selectedItem || this.selectedItem.id !== markerId) {
+        return;
+      }
+
+      this.isCardVisible = true;
+      this.updateCardPosition();
+      this.cdr.detectChanges();
+    });
+
+    const horizontalPadding = Math.ceil(cardWidth / 2) + 16;
+    const topPadding = 96;
+    const bottomPadding = cardHeight + 48;
+
+    map.panInside(latLng, {
+      paddingTopLeft: [horizontalPadding, topPadding],
+      paddingBottomRight: [horizontalPadding, bottomPadding],
+      animate: true,
+      duration: 0.35,
+    });
+  }
+
+  private updateCardPosition(): void {
+    if (!this.selectedItem || !this.mapPageRef || !this.isCardVisible) {
+      return;
+    }
+
+    const map = this.mapService.getMap();
+    const cardElement = this.cardElementRef?.nativeElement;
+    if (!map || !cardElement) {
+      return;
+    }
+
+    const latitude = this.selectedItem.latitude;
+    const longitude = this.selectedItem.longitude;
+    if (latitude == null || longitude == null) {
+      return;
+    }
+
+    const mapPage = this.mapPageRef.nativeElement;
+    const mapWidth = mapPage.clientWidth;
+    const mapHeight = mapPage.clientHeight;
+    const cardWidth = cardElement.offsetWidth;
+    const cardHeight = cardElement.offsetHeight;
+    const markerPoint = map.latLngToContainerPoint([latitude, longitude]);
+
+    const horizontalMargin = 16;
+    const verticalMargin = 16;
+    const cardOffset = 18;
+
+    let left = markerPoint.x - cardWidth / 2;
+    left = Math.max(horizontalMargin, Math.min(left, mapWidth - cardWidth - horizontalMargin));
+
+    let top = markerPoint.y + cardOffset;
+    top = Math.max(verticalMargin, Math.min(top, mapHeight - cardHeight - verticalMargin));
+
+    this.cardPosition = { left, top };
+    this.cdr.detectChanges();
+  }
+
+  private needsMapPanForCard(
+    latLng: [number, number],
+    cardWidth: number,
+    cardHeight: number,
+  ): boolean {
+    const map = this.mapService.getMap();
+    const mapPage = this.mapPageRef?.nativeElement;
+    if (!map || !mapPage) {
+      return false;
+    }
+
+    const markerPoint = map.latLngToContainerPoint(latLng);
+    const horizontalPadding = Math.ceil(cardWidth / 2) + 16;
+    const topPadding = 96;
+    const bottomPadding = cardHeight + 48;
+
+    return (
+      markerPoint.x < horizontalPadding ||
+      markerPoint.x > mapPage.clientWidth - horizontalPadding ||
+      markerPoint.y < topPadding ||
+      markerPoint.y > mapPage.clientHeight - bottomPadding
+    );
   }
 }
