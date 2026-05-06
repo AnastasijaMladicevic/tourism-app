@@ -304,7 +304,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         );
       },
       error: () => {
-        // keep the existing default center if region lookup fails
+        // keep the fallback center if region lookup fails
       },
     });
   }
