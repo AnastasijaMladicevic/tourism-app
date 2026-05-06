@@ -36,6 +36,7 @@ export interface ObjectDto {
   createdAt?: string;
   updatedAt?: string;
   status?: string;
+  hasPendingDeletionRequest?: boolean;
   distanceKm?: number;
   distanceMeters?: number;
   isActive: boolean;

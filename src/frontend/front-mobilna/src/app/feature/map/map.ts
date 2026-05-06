@@ -950,25 +950,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   openDetails(): void {
     if (!this.selectedItem) return;
 
-    switch (this.selectedType) {
-      case 'destination':
-        this.router.navigate(['/destination', this.selectedItem.id]);
-        break;
-      case 'event':
-        this.router.navigate(['/event', this.selectedItem.id]);
-        break;
-      case 'locality':
-        this.router.navigate(['/locality', this.selectedItem.id]);
-        break;
-      case 'activity':
-        this.router.navigate(['/activity', this.selectedItem.id]);
-        break;
-      case 'hotel':
-      default:
-        this.router.navigate(['/object', this.selectedItem.id]);
-        break;
-    }
-  }
+    this.router.navigate(['/destination', this.selectedItem.id]);
+}
 
   closeCard(): void {
     this.routeSearchResults = [];

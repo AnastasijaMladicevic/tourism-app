@@ -140,7 +140,6 @@ namespace TuristickiVodic.Services.Services
                 ObjectId = dto.ObjectId,
                 Rating = dto.Rating,
                 Text = dto.Text,
-                Status = ContentStatus.Approved,
                 CreatedAt = DateTime.UtcNow
             };
 

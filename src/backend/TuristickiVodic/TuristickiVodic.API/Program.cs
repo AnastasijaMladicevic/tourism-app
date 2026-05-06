@@ -195,6 +195,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 app.MapControllers();
+app.MapFallbackToFile("index.html");
 
 using (var scope = app.Services.CreateScope())
 {

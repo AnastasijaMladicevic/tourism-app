@@ -386,6 +386,7 @@ export interface RefreshTokenDto {
 export interface UpdateUserDto {
   firstName?: string | null;
   lastName?: string | null;
+  dateOfBirth?: string | null;
   phoneNumber?: string | null;
   country?: string | null;
   language?: string | null;

@@ -25,7 +25,7 @@ namespace TuristickiVodic.Core.Models
         public string? CreatorResponse { get; set; }
         public DateTime? CreatorResponseAt { get; set; }
 
-        public ContentStatus Status { get; set; } = ContentStatus.Pending;
+        public ContentStatus Status { get; set; } = ContentStatus.Approved;
 
         public int? ReviewedByUserId { get; set; }
         public User? ReviewedBy { get; set; }

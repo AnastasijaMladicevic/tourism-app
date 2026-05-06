@@ -644,3 +644,6 @@ input, textarea, select {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+router-outlet {
+  display: contents;
+}
