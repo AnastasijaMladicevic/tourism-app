@@ -2,157 +2,162 @@
   <header class="page-header">
     <div>
       <h1>Review Moderation</h1>
-      <p>Queue: 48 pending</p>
+      <p>Queue: {{ queueCountLabel }}</p>
     </div>
-    <button class="export-btn" type="button">Export Log</button>
+    <button class="export-btn" type="button" (click)="loadReviews()" [disabled]="isLoading">Refresh</button>
   </header>
 
   <div class="filters-row">
-    <button class="chip active" type="button">All Ratings</button>
-    <button class="chip" type="button">Last 30 Days</button>
-    <button class="chip" type="button">All Sources</button>
-    <button class="chip reset" type="button">Reset</button>
+    <button class="chip" type="button" [class.active]="ratingFilter === 'all'" (click)="ratingFilter = 'all'; applyFilters()">All Ratings</button>
+    <button class="chip" type="button" [class.active]="ratingFilter === 5" (click)="ratingFilter = 5; applyFilters()">5 Stars</button>
+    <button class="chip" type="button" [class.active]="responseFilter === 'pending'" (click)="responseFilter = 'pending'; applyFilters()">Needs Response</button>
+    <button class="chip" type="button" [class.active]="responseFilter === 'responded'" (click)="responseFilter = 'responded'; applyFilters()">Responded</button>
+    <button class="chip reset" type="button" (click)="searchTerm = ''; ratingFilter = 'all'; responseFilter = 'all'; sortOrder = 'desc'; applyFilters()">Reset</button>
     <div class="search-wrap">
-      <input type="text" placeholder="Search reviewer or content..." />
+      <input type="text" placeholder="Search reviewer, object, content..." [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()" />
     </div>
   </div>
 
+  @if (errorMessage) {
+    <p class="feedback error">{{ errorMessage }}</p>
+  }
+
+  @if (successMessage) {
+    <p class="feedback success">{{ successMessage }}</p>
+  }
+
   <div class="moderation-grid">
     <aside class="queue-panel card">
-      <article class="queue-item active">
-        <div class="queue-item-head">
-          <div>
-            <h3>Elena Vance</h3>
-            <span>2023-11-20</span>
-          </div>
-          <span class="status pending">Pending</span>
-        </div>
-        <p>The trail markers were incredibly helpful, and the view from the summit is unparalleled...</p>
-        <small>SpireGO Native • 2 Photos</small>
-      </article>
-
-      <article class="queue-item">
-        <div class="queue-item-head">
-          <div>
-            <h3>Marcus Thorne</h3>
-            <span>2023-11-10</span>
-          </div>
-          <span class="status approved">Approved</span>
-        </div>
-        <p>Very disappointed with the current state of the museum. Many exhibits were closed...</p>
-        <small>TripAdvisor</small>
-      </article>
-
-      <article class="queue-item">
-        <div class="queue-item-head">
-          <div>
-            <h3>Sarah Jenkins</h3>
-            <span>2023-11-18</span>
-          </div>
-          <span class="status hidden">Hidden</span>
-        </div>
-        <p>Great experience overall, but there were way too many people. Hard to get a good photo...</p>
-        <small>Google Reviews • 1 Photo</small>
-      </article>
-
-      <article class="queue-item">
-        <div class="queue-item-head">
-          <div>
-            <h3>Liam O'Connell</h3>
-            <span>2023-11-17</span>
-          </div>
-          <span class="status pending">Pending</span>
-        </div>
-        <p>Perfect snow conditions this week! The new lifts are super fast and the staff was friendly...</p>
-        <small>SpireGO Native • 1 Photo</small>
-      </article>
+      @if (isLoading) {
+        <p class="empty-note">Loading reviews...</p>
+      } @else if (filteredReviews.length === 0) {
+        <p class="empty-note">No reviews found for your objects.</p>
+      } @else {
+        @for (review of filteredReviews; track review.id) {
+          <article class="queue-item" [class.active]="selectedReview?.id === review.id" (click)="selectReview(review)">
+            <div class="queue-item-head">
+              <div>
+                <h3>{{ review.userFullName }}</h3>
+                <span>{{ formatDate(review.createdAt) }}</span>
+              </div>
+              <span class="status" [class.approved]="review.creatorResponse" [class.pending]="!review.creatorResponse">
+                {{ review.creatorResponse ? 'Responded' : 'Pending' }}
+              </span>
+            </div>
+            <p>{{ review.text }}</p>
+            <small>{{ review.objectName }} • {{ review.rating }}/5</small>
+          </article>
+        }
+      }
     </aside>
 
     <main class="details-panel card">
-      <div class="case-header">
-        <div>
-          <h2>Moderation Case: REV-001</h2>
-          <p>Status: Pending • Assigned to You</p>
-        </div>
-        <div class="case-actions">
-          <button class="ghost danger" type="button">Flag</button>
-          <button class="ghost" type="button">Hide</button>
-        </div>
-      </div>
-
-      <section class="review-content">
-        <div class="review-author">
-          <div class="avatar">EV</div>
+      @if (selectedReview) {
+        <div class="case-header">
           <div>
-            <h3>Elena Vance</h3>
-            <p>2023-11-20 • SpireGO Native</p>
+            <h2>Review: #{{ selectedReview.id }}</h2>
+            <p>Status: {{ selectedReviewHasResponse ? 'Responded' : 'Waiting for response' }}</p>
+          </div>
+          <div class="case-actions">
+            <button class="ghost" type="button" (click)="restoreDraft()">Restore Draft</button>
+            <button class="ghost danger" type="button" (click)="deleteResponse()" [disabled]="!selectedReviewHasResponse || isSubmitting">
+              Delete Response
+            </button>
           </div>
         </div>
 
-        <div class="reviewed-item">
-          <span>Reviewing item</span>
-          <h4>Emerald Lake National Park</h4>
-        </div>
-
-        <p class="review-text">
-          The trail markers were incredibly helpful, and the view from the summit is unparalleled.
-          We spent 4 hours hiking and felt very safe. The local park rangers were also very
-          friendly and gave us some great tips for bird watching near the north lake area.
-        </p>
-
-        <div class="attachments">
-          <h5>Attachments (2)</h5>
-          <div class="attachment-grid">
-            <div class="attachment-img one"></div>
-            <div class="attachment-img two"></div>
+        <section class="review-content">
+          <div class="review-author">
+            <div class="avatar">{{ selectedReview.userFullName.slice(0, 2).toUpperCase() }}</div>
+            <div>
+              <h3>{{ selectedReview.userFullName }}</h3>
+              <p>{{ formatDate(selectedReview.createdAt) }} • {{ selectedReview.status }}</p>
+            </div>
           </div>
-        </div>
-      </section>
 
-      <section class="response-composer">
-        <div class="composer-tabs">
-          <button class="tab active" type="button">Thank you</button>
-          <button class="tab" type="button">Addressing issues</button>
-          <button class="tab" type="button">Under reservation</button>
-        </div>
-        <textarea placeholder="Write your professional response to the tourist here..."></textarea>
-        <div class="composer-footer">
-          <span>Character count: 0 / 1000</span>
-          <div class="composer-buttons">
-            <button class="secondary" type="button">Save Draft</button>
-            <button class="primary" type="button">Send Response</button>
+          <div class="reviewed-item">
+            <span>Reviewing item</span>
+            <h4>{{ selectedReview.objectName }}</h4>
           </div>
-        </div>
-      </section>
+
+          <p class="review-text">{{ selectedReview.text }}</p>
+
+          <div class="attachments">
+            <h5>Object images ({{ selectedObjectImages.length }})</h5>
+            @if (isLoadingImages) {
+              <p class="empty-note">Loading images...</p>
+            } @else if (selectedObjectImages.length === 0) {
+              <p class="empty-note">No object images available.</p>
+            } @else {
+              <div class="attachment-grid">
+                @for (image of selectedObjectImages.slice(0, 4); track image.id) {
+                  <img class="attachment-real-img" [src]="image.url" [alt]="image.altText || 'Object image'" />
+                }
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="response-composer">
+          <div class="composer-tabs">
+            <button class="tab" type="button" (click)="responseText = 'Thank you for your feedback and for visiting our location.'">Thank you</button>
+            <button class="tab" type="button" (click)="responseText = 'Thank you for your feedback. We are already working on the mentioned issue.'">Addressing issues</button>
+            <button class="tab" type="button" (click)="responseText = 'Thank you for your feedback. We would love to investigate this in more detail.'">Need details</button>
+          </div>
+          <textarea [(ngModel)]="responseText" placeholder="Write your professional response to the tourist here..." maxlength="1000"></textarea>
+          <div class="composer-footer">
+            <span>Character count: {{ responseText.length }} / 1000</span>
+            <div class="composer-buttons">
+              <button class="secondary" type="button" (click)="saveDraft()">Save Draft</button>
+              <button class="primary" type="button" (click)="sendResponse()" [disabled]="isSubmitting">
+                {{ isSubmitting ? 'Sending...' : (selectedReviewHasResponse ? 'Update Response' : 'Send Response') }}
+              </button>
+            </div>
+          </div>
+        </section>
+      } @else {
+        <section class="review-content">
+          <p class="empty-note">Select a review from the queue to see details and respond.</p>
+        </section>
+      }
     </main>
 
     <aside class="insight-panel card">
-      <section>
-        <h3>Moderator Insight</h3>
-        <div class="note-box">
-          <p>"No issues detected. High quality photos provided."</p>
-          <button type="button">+ Add internal note</button>
-        </div>
-      </section>
+      @if (selectedReview) {
+        <section>
+          <h3>Reviewer Insight</h3>
+          <div class="note-box">
+            <p>{{ ratingStars(selectedReview.rating) }} ({{ selectedReview.rating }}/5)</p>
+            <p>Reviewer: {{ selectedReview.userFullName }}</p>
+          </div>
+        </section>
 
-      <section class="metrics">
-        <h4>Reviewer History</h4>
-        <div class="metric-row"><span>Total Reviews</span><strong>12</strong></div>
-        <div class="metric-row"><span>Avg. Rating Given</span><strong>4.2</strong></div>
-        <div class="metric-row"><span>Reports against</span><strong>0</strong></div>
-      </section>
+        <section class="metrics">
+          <h4>Review Details</h4>
+          <div class="metric-row"><span>Review ID</span><strong>#{{ selectedReview.id }}</strong></div>
+          <div class="metric-row"><span>Created</span><strong>{{ formatDate(selectedReview.createdAt) }}</strong></div>
+          <div class="metric-row"><span>Status</span><strong>{{ selectedReview.status }}</strong></div>
+        </section>
 
-      <section class="checks">
-        <h4>System Checks</h4>
-        <p>Unique IP Address</p>
-        <p>Verified Traveler (Booking #221)</p>
-      </section>
+        <section class="checks">
+          <h4>Object</h4>
+          <p>{{ selectedReview.objectName }}</p>
+          @if (selectedObject?.address) {
+            <p>{{ selectedObject?.address }}</p>
+          }
+        </section>
 
-      <section class="decision-log">
-        <h4>Decision Log</h4>
-        <p>Status updated to Pending</p>
-        <p>Assigned to Super Admin</p>
-      </section>
+        <section class="decision-log">
+          <h4>Response Log</h4>
+          @if (selectedReview.creatorResponseAt) {
+            <p>Last response: {{ formatDate(selectedReview.creatorResponseAt) }}</p>
+          } @else {
+            <p>No response submitted yet.</p>
+          }
+        </section>
+      } @else {
+        <p class="empty-note">Reviewer insights will appear after selecting a review.</p>
+      }
     </aside>
   </div>
 </section>
