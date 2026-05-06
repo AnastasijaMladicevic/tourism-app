@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import {
   Subject,
   Observable,
@@ -34,6 +35,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly objectService = inject(ObjectService);
   private readonly activitiesService = inject(ActivitiesService);
   private readonly eventService = inject(EventService);
+  private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
   private readonly searchInput$ = new Subject<string>();
@@ -56,6 +58,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   sortOrder: 'desc' | 'asc' = 'desc';
 
   responseText = '';
+  private selectedObjectIdFilter: number | null = null;
 
   ngOnInit(): void {
     this.searchInput$
@@ -67,7 +70,17 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
       )
       .subscribe(() => this.loadReviews());
 
-    this.loadReviews();
+    this.route.queryParamMap
+      .pipe(
+        map((params) => Number(params.get('objectId'))),
+        map((id) => Number.isFinite(id) && id > 0 ? id : null),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((objectId) => {
+        this.selectedObjectIdFilter = objectId;
+        this.loadReviews();
+      });
   }
 
   ngOnDestroy(): void {
@@ -98,6 +111,9 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
 
           return this.fetchAllReviews().pipe(
             map((reviews) => reviews.filter((review) => objectIds.includes(review.objectId))),
+            map((reviews) => this.selectedObjectIdFilter == null
+              ? reviews
+              : reviews.filter((review) => review.objectId === this.selectedObjectIdFilter)),
             map((reviews) => this.applyRatingFilter(reviews))
           );
         }),
