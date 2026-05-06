@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -29,6 +29,7 @@ import { ReviewDto, ReviewQueryParams, ReviewService } from '../../../services/r
 export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly reviewService = inject(ReviewService);
   private readonly objectService = inject(ObjectService);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
   private readonly searchInput$ = new Subject<string>();
 
@@ -96,6 +97,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
         }),
         finalize(() => {
           this.isLoading = false;
+          this.cdr.detectChanges();
         })
       )
       .subscribe({
@@ -105,9 +107,11 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
           if (!this.selectedReview || !reviews.some((item) => item.id === this.selectedReview?.id)) {
             this.selectReview(reviews[0] ?? null);
           }
+          this.cdr.detectChanges();
         },
         error: (error: any) => {
           this.errorMessage = error?.error?.message ?? 'Failed to load reviews.';
+          this.cdr.detectChanges();
         }
       });
   }
@@ -276,23 +280,29 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
     this.objectService.getById(objectId).subscribe({
       next: (objectDetails) => {
         this.selectedObject = objectDetails;
+        this.cdr.detectChanges();
       },
       error: () => {
         this.selectedObject = null;
+        this.cdr.detectChanges();
       }
     });
 
     this.isLoadingImages = true;
+    this.cdr.detectChanges();
     this.objectService.getImages(objectId)
       .pipe(finalize(() => {
         this.isLoadingImages = false;
+        this.cdr.detectChanges();
       }))
       .subscribe({
         next: (images) => {
           this.selectedObjectImages = images ?? [];
+          this.cdr.detectChanges();
         },
         error: () => {
           this.selectedObjectImages = [];
+          this.cdr.detectChanges();
         }
       });
   }
