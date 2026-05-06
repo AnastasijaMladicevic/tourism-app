@@ -8,13 +8,33 @@
   </header>
 
   <div class="filters-row">
-    <button class="chip" type="button" [class.active]="ratingFilter === 'all'" (click)="ratingFilter = 'all'; applyFilters()">All Ratings</button>
-    <button class="chip" type="button" [class.active]="ratingFilter === 5" (click)="ratingFilter = 5; applyFilters()">5 Stars</button>
-    <button class="chip" type="button" [class.active]="responseFilter === 'pending'" (click)="responseFilter = 'pending'; applyFilters()">Needs Response</button>
-    <button class="chip" type="button" [class.active]="responseFilter === 'responded'" (click)="responseFilter = 'responded'; applyFilters()">Responded</button>
-    <button class="chip reset" type="button" (click)="searchTerm = ''; ratingFilter = 'all'; responseFilter = 'all'; sortOrder = 'desc'; applyFilters()">Reset</button>
+    <div class="chip-group">
+      <button class="chip" type="button" [class.active]="isAllFiltersSelected" (click)="selectAllFilters()">
+        <span class="material-symbols-outlined">
+          language
+          </span>
+        All Ratings
+      </button>
+      <button class="chip" type="button" [class.active]="ratingFilter === 5" (click)="ratingFilter = 5; onFilterChange()">
+        <span class="material-symbols-outlined">grade</span>
+        5 Stars
+      </button>
+      <button class="chip" type="button" [class.active]="responseFilter === 'pending'" (click)="responseFilter = 'pending'; onFilterChange()">
+        <span class="material-symbols-outlined">mark_chat_unread</span>
+        Needs Response
+      </button>
+      <button class="chip" type="button" [class.active]="responseFilter === 'responded'" (click)="responseFilter = 'responded'; onFilterChange()">
+        <span class="material-symbols-outlined">mark_chat_read</span>
+        Responded
+      </button>
+    </div>
+    <div class="chip-divider" aria-hidden="true"></div>
+    <button class="chip reset" type="button" (click)="resetFilters()">
+      <span class="material-symbols-outlined">filter_alt_off</span>
+      Reset
+    </button>
     <div class="search-wrap">
-      <input type="text" placeholder="Search reviewer, object, content..." [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()" />
+      <input type="text" placeholder="Search reviewer, object, content..." [ngModel]="searchTerm" (ngModelChange)="onSearchChange($event)" />
     </div>
   </div>
 

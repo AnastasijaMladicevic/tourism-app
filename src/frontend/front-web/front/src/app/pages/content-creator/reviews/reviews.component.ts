@@ -1,9 +1,23 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { catchError, finalize, forkJoin, map, of, switchMap, throwError, timer, timeout } from 'rxjs';
+import {
+  Subject,
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  finalize,
+  forkJoin,
+  map,
+  of,
+  switchMap,
+  takeUntil,
+  throwError,
+  timer,
+  timeout
+} from 'rxjs';
 import { ObjectDto, ObjectImageDto, ObjectService } from '../../../services/object';
-import { ReviewDto, ReviewService } from '../../../services/review';
+import { ReviewDto, ReviewQueryParams, ReviewService } from '../../../services/review';
 
 @Component({
   selector: 'app-content-creator-reviews',
@@ -12,9 +26,11 @@ import { ReviewDto, ReviewService } from '../../../services/review';
   templateUrl: './reviews.component.html',
   styleUrls: ['./reviews.component.css']
 })
-export class ContentCreatorReviewsComponent implements OnInit {
+export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly reviewService = inject(ReviewService);
   private readonly objectService = inject(ObjectService);
+  private readonly destroy$ = new Subject<void>();
+  private readonly searchInput$ = new Subject<string>();
 
   allReviews: ReviewDto[] = [];
   filteredReviews: ReviewDto[] = [];
@@ -36,7 +52,21 @@ export class ContentCreatorReviewsComponent implements OnInit {
   responseText = '';
 
   ngOnInit(): void {
+    this.searchInput$
+      .pipe(
+        map((value) => value.trim()),
+        debounceTime(300),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => this.loadReviews());
+
     this.loadReviews();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadReviews(): void {
@@ -71,7 +101,10 @@ export class ContentCreatorReviewsComponent implements OnInit {
       .subscribe({
         next: (reviews) => {
           this.allReviews = reviews;
-          this.applyFilters();
+          this.filteredReviews = reviews;
+          if (!this.selectedReview || !reviews.some((item) => item.id === this.selectedReview?.id)) {
+            this.selectReview(reviews[0] ?? null);
+          }
         },
         error: (error: any) => {
           this.errorMessage = error?.error?.message ?? 'Failed to load reviews.';
@@ -83,38 +116,29 @@ export class ContentCreatorReviewsComponent implements OnInit {
     return this.getMyObjectIds();
   }
 
-  applyFilters(): void {
-    const search = this.searchTerm.trim().toLowerCase();
+  onFilterChange(): void {
+    this.loadReviews();
+  }
 
-    this.filteredReviews = this.allReviews
-      .filter((review) => {
-        const hasResponse = !!review.creatorResponse?.trim();
-        const matchesResponseFilter =
-          this.responseFilter === 'all'
-          || (this.responseFilter === 'responded' && hasResponse)
-          || (this.responseFilter === 'pending' && !hasResponse);
+  onSearchChange(value: string): void {
+    this.searchTerm = value;
+    this.searchInput$.next(value);
+  }
 
-        const matchesRatingFilter =
-          this.ratingFilter === 'all' || review.rating === this.ratingFilter;
+  resetFilters(): void {
+    this.searchTerm = '';
+    this.selectAllFilters();
+  }
 
-        const matchesSearch =
-          !search
-          || review.userFullName.toLowerCase().includes(search)
-          || review.objectName.toLowerCase().includes(search)
-          || review.text.toLowerCase().includes(search)
-          || review.creatorResponse?.toLowerCase().includes(search);
+  selectAllFilters(): void {
+    this.ratingFilter = 'all';
+    this.responseFilter = 'all';
+    this.sortOrder = 'desc';
+    this.loadReviews();
+  }
 
-        return matchesResponseFilter && matchesRatingFilter && matchesSearch;
-      })
-      .sort((a, b) => {
-        const left = new Date(a.createdAt).getTime();
-        const right = new Date(b.createdAt).getTime();
-        return this.sortOrder === 'desc' ? right - left : left - right;
-      });
-
-    if (!this.selectedReview || !this.filteredReviews.some((item) => item.id === this.selectedReview?.id)) {
-      this.selectReview(this.filteredReviews[0] ?? null);
-    }
+  get isAllFiltersSelected(): boolean {
+    return this.ratingFilter === 'all' && this.responseFilter === 'all';
   }
 
   selectReview(review: ReviewDto | null): void {
@@ -273,37 +297,6 @@ export class ContentCreatorReviewsComponent implements OnInit {
       });
   }
 
-  private fetchAllReviews() {
-    const pageSize = 100;
-    return this.reviewService.getAll(
-      { page: 1, pageSize, sortBy: 'createdAt', sortOrder: this.sortOrder },
-      { bypassRegion: true }
-    ).pipe(
-      switchMap((firstPage) => {
-        const firstItems = firstPage.items ?? [];
-        const totalPages = Math.max(1, firstPage.totalPages ?? 1);
-
-        if (totalPages === 1) {
-          return of(firstItems);
-        }
-
-        const requests = Array.from({ length: totalPages - 1 }, (_, index) => (
-          this.reviewService.getAll(
-            { page: index + 2, pageSize, sortBy: 'createdAt', sortOrder: this.sortOrder },
-            { bypassRegion: true }
-          )
-        ));
-
-        return forkJoin(requests).pipe(
-          map((pages) => [
-            ...firstItems,
-            ...pages.flatMap((page) => page.items ?? [])
-          ])
-        );
-      })
-    );
-  }
-
   private getMyObjectIds() {
     const pageSize = 200;
     return this.objectService.getMy(
@@ -340,7 +333,7 @@ export class ContentCreatorReviewsComponent implements OnInit {
 
   private updateReviewInCollections(updated: ReviewDto): void {
     this.allReviews = this.allReviews.map((review) => review.id === updated.id ? updated : review);
-    this.applyFilters();
+    this.filteredReviews = this.filteredReviews.map((review) => review.id === updated.id ? updated : review);
     this.selectedReview = this.filteredReviews.find((review) => review.id === updated.id) ?? null;
     if (this.selectedReview) {
       this.responseText = this.selectedReview.creatorResponse?.trim() ?? this.responseText;
@@ -349,5 +342,61 @@ export class ContentCreatorReviewsComponent implements OnInit {
 
   private getDraftKey(reviewId: number): string {
     return `cc-review-draft-${reviewId}`;
+  }
+
+  private getReviewQuery(): ReviewQueryParams {
+    const query: ReviewQueryParams = {
+      page: 1,
+      pageSize: 100,
+      sortBy: 'createdAt',
+      sortOrder: this.sortOrder
+    };
+
+    const trimmedSearch = this.searchTerm.trim();
+    if (trimmedSearch) {
+      query.search = trimmedSearch;
+    }
+
+    if (this.responseFilter === 'responded') {
+      query.hasResponse = true;
+    } else if (this.responseFilter === 'pending') {
+      query.hasResponse = false;
+    }
+
+    if (this.ratingFilter !== 'all') {
+      query.minRating = this.ratingFilter;
+      query.maxRating = this.ratingFilter;
+    }
+
+    return query;
+  }
+
+  private fetchAllReviews() {
+    const query = this.getReviewQuery();
+    const pageSize = query.pageSize ?? 100;
+    return this.reviewService.getAll(query, { bypassRegion: true }).pipe(
+      switchMap((firstPage) => {
+        const firstItems = firstPage.items ?? [];
+        const totalPages = Math.max(1, firstPage.totalPages ?? 1);
+
+        if (totalPages === 1) {
+          return of(firstItems);
+        }
+
+        const requests = Array.from({ length: totalPages - 1 }, (_, index) => (
+          this.reviewService.getAll(
+            { ...query, page: index + 2, pageSize },
+            { bypassRegion: true }
+          )
+        ));
+
+        return forkJoin(requests).pipe(
+          map((pages) => [
+            ...firstItems,
+            ...pages.flatMap((page) => page.items ?? [])
+          ])
+        );
+      })
+    );
   }
 }
