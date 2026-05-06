@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace TuristickiVodic.Core.DTO
 {
@@ -15,5 +16,6 @@ namespace TuristickiVodic.Core.DTO
         public int? ReviewedByUserId { get; set; }
         public string? ReviewedByFullName { get; set; }
         public DateTime CreatedAt { get; set; }
+        public List<ReviewImageDto> Images { get; set; } = new();
     }
 }

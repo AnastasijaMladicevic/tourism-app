@@ -27,6 +27,7 @@ public class AppDbContext : DbContext
     public DbSet<EventType> EventTypes { get; set; }
     public DbSet<Event> Events { get; set; }
     public DbSet<Review> Reviews { get; set; }
+    public DbSet<ReviewImage> ReviewImages { get; set; }
     public DbSet<Image> Images { get; set; }
     public DbSet<Favorite> Favorites { get; set; }
     public DbSet<Route> Routes { get; set; }
@@ -321,6 +322,24 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(r => r.ReviewedByUserId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        // ==================== REVIEW IMAGE ====================
+        mb.Entity<ReviewImage>()
+            .Property(ri => ri.Url)
+            .HasMaxLength(ValidationLengths.ImageUrl);
+
+        mb.Entity<ReviewImage>()
+            .Property(ri => ri.AltText)
+            .HasMaxLength(ValidationLengths.ImageAltText);
+
+        mb.Entity<ReviewImage>()
+            .HasOne(ri => ri.Review)
+            .WithMany(r => r.Images)
+            .HasForeignKey(ri => ri.ReviewId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<ReviewImage>()
+            .HasIndex(ri => ri.ReviewId);
 
         // ==================== FAVORITE ====================
         mb.Entity<Favorite>()

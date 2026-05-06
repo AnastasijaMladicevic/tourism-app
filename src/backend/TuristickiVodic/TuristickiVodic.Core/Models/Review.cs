@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace TuristickiVodic.Core.Models
@@ -24,11 +25,13 @@ namespace TuristickiVodic.Core.Models
         public string? CreatorResponse { get; set; }
         public DateTime? CreatorResponseAt { get; set; }
 
-        public ContentStatus Status { get; set; } = ContentStatus.Pending;
+        public ContentStatus Status { get; set; } = ContentStatus.Approved;
 
         public int? ReviewedByUserId { get; set; }
         public User? ReviewedBy { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        public ICollection<ReviewImage> Images { get; set; } = new List<ReviewImage>();
     }
 }

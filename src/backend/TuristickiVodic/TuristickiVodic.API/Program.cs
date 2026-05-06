@@ -72,6 +72,7 @@ builder.Services.AddScoped<ILocalityService, LocalityService>();
 builder.Services.AddScoped<IDestinationService, DestinationService>();
 builder.Services.AddScoped<IActivityService, ActivityService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IReviewImageService, ReviewImageService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 builder.Services.AddScoped<ITouristObjectService, TouristObjectService>();

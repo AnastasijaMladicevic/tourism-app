@@ -45,5 +45,7 @@ namespace TuristickiVodic.Core.DTO
         public string? ReviewedByFullName { get; set; }
 
         public DateTime CreatedAt { get; set; }
+
+        public List<ReviewImageDto> Images { get; set; } = new();
     }
 }

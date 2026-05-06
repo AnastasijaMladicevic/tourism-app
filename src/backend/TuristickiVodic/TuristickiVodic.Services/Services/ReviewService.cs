@@ -103,6 +103,7 @@ namespace TuristickiVodic.Services.Services
                     .ThenInclude(o => o.Locality)
                         .ThenInclude(l => l.Destination)
                             .ThenInclude(d => d.Region)
+                .Include(r => r.Images)
                 .Include(r => r.ReviewedBy)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
@@ -139,7 +140,6 @@ namespace TuristickiVodic.Services.Services
                 ObjectId = dto.ObjectId,
                 Rating = dto.Rating,
                 Text = dto.Text,
-                Status = ContentStatus.Approved,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -197,19 +197,24 @@ namespace TuristickiVodic.Services.Services
             if (string.IsNullOrWhiteSpace(review.Text))
                 throw new InvalidOperationException("Cannot respond to a review that has no comment.");
 
+            var isFirstResponse = string.IsNullOrWhiteSpace(review.CreatorResponse);
+
             review.CreatorResponse = dto.CreatorResponse;
             review.CreatorResponseAt = DateTime.UtcNow;
 
-            _context.Notifications.Add(new Notification
+            if (isFirstResponse)
             {
-                UserId = review.UserId,
-                Type = NotificationType.ReviewReply,
-                Title = "Stigao je odgovor na tvoju recenziju",
-                Message = $"Dobio/la si odgovor na recenziju za objekat \"{review.Object.Name}\".",
-                ActionUrl = $"/object/{review.ObjectId}",
-                ReviewId = review.Id,
-                CreatedAt = DateTime.UtcNow
-            });
+                _context.Notifications.Add(new Notification
+                {
+                    UserId = review.UserId,
+                    Type = NotificationType.ReviewReply,
+                    Title = "Stigao je odgovor na tvoju recenziju",
+                    Message = $"Dobio/la si odgovor na recenziju za objekat \"{review.Object.Name}\".",
+                    ActionUrl = $"/object/{review.ObjectId}",
+                    ReviewId = review.Id,
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
 
             await _context.SaveChangesAsync();
 
@@ -308,6 +313,7 @@ namespace TuristickiVodic.Services.Services
                     .ThenInclude(o => o.Locality)
                         .ThenInclude(l => l.Destination)
                             .ThenInclude(d => d.Region)
+                .Include(r => r.Images)
                 .Include(r => r.ReviewedBy)
                 .FirstAsync(r => r.Id == id);
         }
@@ -344,6 +350,7 @@ namespace TuristickiVodic.Services.Services
                     .ThenInclude(o => o.Locality)
                         .ThenInclude(l => l.Destination)
                             .ThenInclude(d => d.Region)
+                .Include(r => r.Images)
                 .Include(r => r.ReviewedBy)
                 .AsQueryable();
         }
