@@ -309,26 +309,6 @@
           <h3>Description</h3>
           <p class="description-copy">{{ selectedSummary }}</p>
         </section>
-
-        <section class="detail-section">
-          <div class="map-card">
-            @if (hasSelectedActivityCoordinates) {
-              <app-map
-                [lat]="selectedActivityLat"
-                [lng]="selectedActivityLng"
-                [zoom]="14"
-                [popupText]="selectedActivityLocationLabel"
-                [interactive]="false"
-                mapId="activity-details-map"
-              ></app-map>
-            } @else {
-              <div class="map-empty-state">
-                <span class="material-symbols-outlined">location_off</span>
-                <p>Coordinates are not available for this activity.</p>
-              </div>
-            }
-          </div>
-        </section>
       } @else {
         <div class="empty-state">
           <p class="eyebrow">No activity selected</p>

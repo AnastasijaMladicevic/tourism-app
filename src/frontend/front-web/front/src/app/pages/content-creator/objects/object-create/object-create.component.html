@@ -12,10 +12,10 @@
             type="button"
             class="danger-btn"
             (click)="openDeleteModal()"
-            [disabled]="isSubmitting || isDeletingObject || isLoadingOptions || hasPendingDeletionRequest"
+            [disabled]="isSubmitting || isDeletingObject || isLoadingOptions"
           >
             <span class="material-symbols-outlined" aria-hidden="true">delete</span>
-            {{ isApprovedObject ? (hasPendingDeletionRequest ? 'Deletion Requested' : 'Request Deletion') : 'Delete' }}
+            {{ isApprovedObject ? 'Request Deletion' : 'Delete' }}
           </button>
         }
         <button type="submit" class="primary-btn" [disabled]="isSubmitting || isLoadingOptions" form="create-object-form">
@@ -368,12 +368,12 @@
             type="button"
             class="confirm-delete-btn"
             (click)="deleteObject()"
-            [disabled]="isDeletingObject || (isApprovedObject && hasPendingDeletionRequest)"
+            [disabled]="isDeletingObject"
           >
             {{
               isDeletingObject
                 ? (isApprovedObject ? 'Submitting...' : 'Deleting...')
-                : (isApprovedObject ? (hasPendingDeletionRequest ? 'Already requested' : 'Request deletion') : 'Delete')
+                : (isApprovedObject ? 'Request deletion' : 'Delete')
             }}
           </button>
         </div>

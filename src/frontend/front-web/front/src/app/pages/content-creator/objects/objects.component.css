@@ -197,27 +197,15 @@
 }
 
 .stat-card.blue {
-  background: #ffffff;
+  background: #eff6ff;
 }
 
 .stat-card.green {
-  background: #ffffff;
+  background: #ecfdf3;
 }
 
 .stat-card.amber {
-  background: #ffffff;
-}
-
-.stat-card.blue strong {
-  color: #2563eb;
-}
-
-.stat-card.green strong {
-  color: #16a34a;
-}
-
-.stat-card.amber strong {
-  color: #d97706;
+  background: #fffbeb;
 }
 
 .table-card {
@@ -716,111 +704,6 @@ tbody tr:hover,
 
 .map-empty-state .material-symbols-outlined {
   font-size: 24px;
-}
-
-.reviews-preview-section {
-  gap: 10px;
-}
-
-.reviews-preview-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.reviews-preview-head h3 {
-  margin: 0;
-}
-
-.reviews-count-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  background: #e7f0ff;
-  color: #2563eb;
-  padding: 4px 10px;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-.reviews-preview-list {
-  display: grid;
-  gap: 10px;
-}
-
-.review-preview-card {
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  background: #f8fafc;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.review-preview-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.reviewer-meta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-}
-
-.reviewer-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 1px solid #dbe1ea;
-  background: #ffffff;
-  color: #374151;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 700;
-  flex-shrink: 0;
-}
-
-.reviewer-meta strong {
-  display: block;
-  color: #111827;
-  font-size: 13px;
-  line-height: 1.2;
-}
-
-.reviewer-meta span {
-  color: #6b7280;
-  font-size: 11px;
-}
-
-.review-rating {
-  border: 1px solid #dbe1ea;
-  border-radius: 999px;
-  padding: 3px 8px;
-  color: #334155;
-  font-size: 11px;
-  font-weight: 700;
-  background: #fff;
-  white-space: nowrap;
-}
-
-.review-preview-card p {
-  margin: 0;
-  color: #374151;
-  font-size: 13px;
-  line-height: 1.45;
-  font-style: italic;
-}
-
-.view-more-btn {
-  align-self: center;
 }
 
 @media (max-width: 1180px) {

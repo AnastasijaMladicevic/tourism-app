@@ -1,206 +1,171 @@
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 <div class="profile-page">
+
+  <!-- Breadcrumb -->
   <div class="breadcrumb">
     <span class="breadcrumb-link" routerLink="/admin/dashboard">Settings</span>
-    <mat-icon class="breadcrumb-icon" fontSet="material-icons-outlined">chevron_right</mat-icon>
+    <svg width="14" height="14" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M8 5l6 6-6 6"/>
+    </svg>
     <span class="breadcrumb-current">User Profile</span>
   </div>
 
   <div class="profile-layout">
     <div class="profile-main">
-      <section class="profile-header-card">
+
+      <!-- Profile header card -->
+      <div class="profile-header-card">
         <div class="profile-banner"></div>
-
         <div class="profile-header-content">
-          <div class="profile-identity">
-            <div class="avatar-remove">
-              <div class="avatar-wrapper">
-                <div class="avatar avatar-xl avatar-blue" (click)="triggerFileInput()">
-                  @if (cropPreview) {
-                    <img [src]="cropPreview" class="avatar-img" />
-                  } @else if (avatarUrl) {
-                    <img [src]="avatarUrl" class="avatar-img" />
-                  } @else {
-                    <span>{{ initials }}</span>
-                  }
-                </div>
-
-                <button class="avatar-edit-btn" type="button" title="Change photo" (click)="triggerFileInput()">
-                  <mat-icon fontSet="material-icons-outlined">edit</mat-icon>
-                </button>
-
-                <input
-                  #fileInput
-                  type="file"
-                  (change)="onAvatarFileSelected($event)"
-                  accept="image/*"
-                  hidden
-                />
-              </div>
-              <button class="avatar-remove-btn" type="button" (click)="removePhoto()">
-                  <p>Remove photo</p>
-              </button>
+          <div class="avatar-wrapper">
+            <div class="avatar avatar-xl avatar-blue">
+              {{ initials }}
             </div>
-            <div class="profile-header-info">
-              <div class="profile-title-row">
-                <h2 class="profile-name">{{ displayName }}</h2>
-                <span class="badge badge-blue badge-role">{{ role | titlecase }}</span>
-              </div>
-
-              <div class="profile-org">
-                <mat-icon fontSet="material-icons-outlined">apartment</mat-icon>
-                <span>SpireGO</span>
-              </div>
+            <button class="avatar-edit-btn" title="Change photo">
+              <svg width="13" height="13" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 3a2.83 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="profile-header-info">
+            <h2 class="profile-name">{{ user.firstName }} {{ user.lastName }}</h2>
+            <span class="badge badge-blue badge-role">{{ role | titlecase }}</span>
+            <div class="profile-org">
+              <svg width="13" height="13" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
+                <rect x="2" y="7" width="18" height="13" rx="2"/>
+                <path d="M7 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/>
+              </svg>
+              SpireGO
             </div>
           </div>
-
-          <button class="btn btn-danger profile-reset-btn" type="button" (click)="resetPassword()">
-            <mat-icon fontSet="material-icons-outlined">key</mat-icon>
-            <span>Reset Password</span>
+          <button class="btn btn-danger">
+            <svg width="13" height="13" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+            </svg>
+            Reset Password
           </button>
         </div>
-      </section>
+      </div>
 
-      <section class="card profile-form-card">
+      <!-- Form card -->
+      <div class="card">
         <div class="form-card-header">
           <h3 class="form-card-title">Account Information</h3>
           <p class="form-card-sub">Update your personal details and organizational settings here.</p>
         </div>
 
+        <!-- Personal Details -->
         <div class="form-section">
           <div class="section-label">Personal Details</div>
 
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label" for="firstName">First Name</label>
-              <input id="firstName" class="form-input" type="text" [(ngModel)]="user.firstName" disabled/>
+              <label class="form-label">First Name</label>
+              <input class="form-input" type="text" [(ngModel)]="user.firstName" />
             </div>
-
             <div class="form-group">
-              <label class="form-label" for="lastName">Last Name</label>
-              <input id="lastName" class="form-input" type="text" [(ngModel)]="user.lastName" disabled/>
+              <label class="form-label">Last Name</label>
+              <input class="form-input" type="text" [(ngModel)]="user.lastName" />
             </div>
           </div>
 
-          <div class="form-row form-row--compact">
+          <div class="form-row">
             <div class="form-group">
-              <label class="form-label" for="dateOfBirth">Date of Birth</label>
+              <label class="form-label">Date of Birth</label>
               <div class="input-wrapper">
-                <mat-icon class="input-icon" fontSet="material-icons-outlined">calendar_month</mat-icon>
-                <input id="dateOfBirth" class="form-input" type="date" [(ngModel)]="user.dateOfBirth" disabled=""/>
+                <svg class="input-icon" width="14" height="14" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <rect x="3" y="4" width="16" height="15" rx="2"/><path d="M7 2v3M15 2v3M3 9h16"/>
+                </svg>
+                <input class="form-input" type="date" [(ngModel)]="user.dateOfBirth" />
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Contact & Location -->
         <div class="form-section">
           <div class="section-label">Contact & Location</div>
 
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label" for="email">Email Address</label>
+              <label class="form-label">Email Address</label>
               <div class="input-wrapper">
-                <mat-icon class="input-icon" fontSet="material-icons-outlined">mail</mat-icon>
-                <input id="email" class="form-input" type="email" [(ngModel)]="user.email" />
+                <svg class="input-icon" width="14" height="14" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <rect x="2" y="4" width="18" height="14" rx="2"/><path d="M2 7l9 6 9-6"/>
+                </svg>
+                <input class="form-input" type="email" [(ngModel)]="user.email" />
               </div>
               <span class="form-hint">This email will be used for all system notifications.</span>
             </div>
-
             <div class="form-group">
-              <label class="form-label" for="phoneNumber">Phone Number</label>
+              <label class="form-label">Phone Number</label>
               <div class="input-wrapper">
-                <mat-icon class="input-icon" fontSet="material-icons-outlined">call</mat-icon>
-                <input id="phoneNumber" class="form-input" type="tel" [(ngModel)]="user.phoneNumber" />
+                <svg class="input-icon" width="14" height="14" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M22 16.92v3a2 2 0 01-2.18 2A19.79 19.79 0 012 4.18 2 2 0 014 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
+                </svg>
+                <input class="form-input" type="tel" [(ngModel)]="user.phoneNumber" />
               </div>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label" for="country">Country</label>
+              <label class="form-label">Country</label>
               <div class="input-wrapper">
-                <mat-icon class="input-icon" fontSet="material-icons-outlined">public</mat-icon>
-                <input id="country" class="form-input" type="text" [(ngModel)]="user.country" />
+                <svg class="input-icon" width="14" height="14" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <circle cx="11" cy="11" r="9"/>
+                  <path d="M11 2a15.3 15.3 0 010 18M11 2a15.3 15.3 0 000 18M2 11h18"/>
+                </svg>
+                <input class="form-input" type="text" [(ngModel)]="user.country" />
               </div>
             </div>
-
             <div class="form-group">
-              <label class="form-label" for="language">Language</label>
+              <label class="form-label">Language</label>
               <div class="input-wrapper">
-                <mat-icon class="input-icon" fontSet="material-icons-outlined">translate</mat-icon>
-                <input id="language" class="form-input" type="text" [(ngModel)]="user.language" />
+                <svg class="input-icon" width="14" height="14" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M5 8l4 4-4 4M11 12h6"/>
+                </svg>
+                <input class="form-input" type="text" [(ngModel)]="user.language" />
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Access Control -->
         <div class="form-section">
           <div class="section-label">Access Control</div>
-
-          <div class="form-group form-group--role">
-            <label class="form-label form-label--inline" for="systemRole">
-              <span>System Role</span>
-              <mat-icon fontSet="material-icons-outlined">lock</mat-icon>
+          <div class="form-group" style="max-width: 340px;">
+            <label class="form-label">
+              System Role
+              <svg width="12" height="12" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:4px">
+                <rect x="3" y="11" width="16" height="9" rx="2"/><path d="M7 11V7a4 4 0 018 0v4"/>
+              </svg>
             </label>
-
             <div class="role-row">
-              <div class="role-input-shell">
-                <mat-icon class="input-icon" fontSet="material-icons-outlined">verified_user</mat-icon>
-                <input id="systemRole" class="form-input" type="text" [value]="role | titlecase" disabled />
-              </div>
+              <input class="form-input" type="text" [value]="role | titlecase" disabled style="flex:1" />
               <span class="badge badge-gray">Restricted</span>
             </div>
           </div>
         </div>
 
+        <!-- Actions -->
         <div class="form-actions">
-          <div class="save-feedback" [class.visible]="saveSuccess">
-            <mat-icon fontSet="material-icons-outlined">check_circle</mat-icon>
-            <span>Profile updated</span>
-          </div>
-
-          <button class="btn btn-secondary" type="button" (click)="cancel()">
-            <mat-icon fontSet="material-icons-outlined">close</mat-icon>
-            <span>Cancel</span>
+          <button class="btn btn-secondary" routerLink="/admin/dashboard">
+            <svg width="14" height="14" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="9"/><path d="M14 8l-6 6M8 8l6 6"/>
+            </svg>
+            Cancel
           </button>
-
-          <button class="btn btn-primary" type="button" [disabled]="isSaving" (click)="saveChanges()">
-            @if (isSaving) {
-              <span class="spinner" aria-hidden="true"></span>
-            } @else {
-              <mat-icon fontSet="material-icons-outlined">save</mat-icon>
-            }
-            <span>{{ isSaving ? 'Saving...' : 'Save Changes' }}</span>
+          <button class="btn btn-primary" (click)="saveChanges()">
+            <svg width="14" height="14" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+              <polyline points="17 21 17 13 7 13 7 21"/>
+              <polyline points="7 3 7 8 15 8"/>
+            </svg>
+            Save Changes
           </button>
         </div>
-      </section>
+      </div>
+
     </div>
   </div>
 </div>
-@if (pendingCropFile) {
-  <div class="crop-modal-backdrop" (click)="cancelCrop()">
-    <div class="crop-modal" (click)="$event.stopPropagation()">
-      <div class="crop-modal__header">
-        <span>Crop photo</span>
-        <button class="crop-modal__close" type="button" (click)="cancelCrop()" aria-label="Close">
-          <mat-icon fontSet="material-icons-outlined">close</mat-icon>
-        </button>
-      </div>
-
-      <div class="crop-modal__body">
-        <image-cropper
-          [imageFile]="pendingCropFile"
-          [roundCropper]="true"
-          [resizeToWidth]="256"
-          [resizeToHeight]="256"
-          (imageCropped)="onImageCropped($event)"
-        ></image-cropper>
-      </div>
-
-      <div class="crop-modal__footer">
-        <button class="crop-confirm-button" type="button" (click)="confirmCrop()">Set photo</button>
-        <button class="crop-cancel-button" type="button" (click)="cancelCrop()">Cancel</button>
-      </div>
-    </div>
-  </div>
-}

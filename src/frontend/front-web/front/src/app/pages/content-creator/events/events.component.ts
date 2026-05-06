@@ -6,7 +6,6 @@ import { forkJoin } from 'rxjs';
 import { EventService } from '../../../services/event.service';
 import { EventDto, EventQueryDto } from '../../../models/event.model';
 import { buildEventQueryDto, EventFilterState } from '../../../models/event-filters.model';
-import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 
 interface EventInsightCard {
   label: string;
@@ -23,7 +22,7 @@ interface EventScheduleRow {
 @Component({
   selector: 'app-content-creator-events',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedMapComponent],
+  imports: [CommonModule, FormsModule],
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.css']
 })
@@ -409,27 +408,6 @@ export class ContentCreatorEventsComponent implements OnInit {
       { label: 'Location', value: this.getLocationLabel(this.selectedEvent) },
       { label: 'Category', value: this.getCategoryLabel(this.selectedEvent) }
     ];
-  }
-
-  get hasSelectedEventCoordinates(): boolean {
-    return this.selectedEvent?.latitude != null && this.selectedEvent?.longitude != null;
-  }
-
-  get selectedEventLat(): number {
-    return this.selectedEvent?.latitude ?? 42.424;
-  }
-
-  get selectedEventLng(): number {
-    return this.selectedEvent?.longitude ?? 18.771;
-  }
-
-  get selectedEventLocationLabel(): string {
-    if (!this.selectedEvent) {
-      return 'Selected event';
-    }
-
-    const location = this.selectedEvent.localityName || this.selectedEvent.destinationName || this.selectedEvent.objectName;
-    return location ? `${this.selectedEvent.name} · ${location}` : this.selectedEvent.name;
   }
 
   private normalizeImageUrl(value: string): string {

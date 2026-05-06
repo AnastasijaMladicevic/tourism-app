@@ -11,10 +11,10 @@
           type="button"
           class="danger-btn"
           (click)="openDeleteModal()"
-          [disabled]="isSubmitting || isDeleting || hasPendingDeletionRequest"
+          [disabled]="isSubmitting || isDeleting"
         >
           <span class="material-symbols-outlined">delete</span>
-          {{ isApprovedEvent ? (hasPendingDeletionRequest ? 'Deletion Requested' : 'Request Deletion') : 'Delete' }}
+          {{ isApprovedEvent ? 'Request Deletion' : 'Delete' }}
         </button>
       }
 
@@ -366,9 +366,9 @@
             type="button"
             class="confirm-delete-btn"
             (click)="deleteEvent()"
-            [disabled]="isDeleting || (isApprovedEvent && hasPendingDeletionRequest)"
+            [disabled]="isDeleting"
           >
-            {{ isDeleting ? (isApprovedEvent ? 'Submitting...' : 'Deleting...') : (isApprovedEvent ? (hasPendingDeletionRequest ? 'Already requested' : 'Request deletion') : 'Delete') }}
+            {{ isDeleting ? (isApprovedEvent ? 'Submitting...' : 'Deleting...') : (isApprovedEvent ? 'Request deletion' : 'Delete') }}
           </button>
         </div>
       </section>

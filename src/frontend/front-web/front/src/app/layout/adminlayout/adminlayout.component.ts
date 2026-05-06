@@ -25,20 +25,10 @@ export class AdminLayoutComponent implements OnInit {
   constructor(
     private router: Router,
     private authService: AuthService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    this.loadUser();
-
-    window.addEventListener('storage', this.loadUser);
-  }
-
-  ngOnDestroy(): void {
-    window.removeEventListener('storage', this.loadUser);
-  }
-
-  private loadUser = (): void => {
-    const userData = this.authService.getCurrentUser();
+    const userData = this.authService.getUser();
 
     if (!userData) {
       this.router.navigate(['/login']);
@@ -49,9 +39,9 @@ export class AdminLayoutComponent implements OnInit {
       name: `${userData.firstName} ${userData.lastName}`,
       email: userData.email,
       initials: `${userData.firstName[0]}${userData.lastName[0]}`.toUpperCase(),
-      avatarUrl: userData.profileImageUrl || ''
+      avatarUrl: ''
     };
-  };
+  }
 
   signOut(): void {
     this.authService.logout();

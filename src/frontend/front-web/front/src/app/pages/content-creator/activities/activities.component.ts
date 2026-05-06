@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ActivitiesService, ActivityDto } from '../../../services/activities';
-import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 
 interface ActivityInsightCard {
   label: string;
@@ -16,7 +15,7 @@ interface ActivityInsightCard {
 @Component({
   selector: 'app-content-creator-activities',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SharedMapComponent],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './activities.component.html',
   styleUrls: ['./activities.component.css']
 })
@@ -376,31 +375,6 @@ export class ContentCreatorActivitiesComponent implements OnInit {
   get selectedBanner(): string {
     const activity = this.selectedActivityDetails ?? this.selectedActivity;
     return activity?.mainImageUrl || '/assets/pozadina.png';
-  }
-
-  get hasSelectedActivityCoordinates(): boolean {
-    const activity = this.selectedActivityDetails ?? this.selectedActivity;
-    return activity?.latitude != null && activity?.longitude != null;
-  }
-
-  get selectedActivityLat(): number {
-    const activity = this.selectedActivityDetails ?? this.selectedActivity;
-    return activity?.latitude ?? 42.424;
-  }
-
-  get selectedActivityLng(): number {
-    const activity = this.selectedActivityDetails ?? this.selectedActivity;
-    return activity?.longitude ?? 18.771;
-  }
-
-  get selectedActivityLocationLabel(): string {
-    const activity = this.selectedActivityDetails ?? this.selectedActivity;
-    if (!activity) {
-      return 'Selected activity';
-    }
-
-    const location = activity.localityName || activity.destinationName || activity.regionName || activity.objectName;
-    return location ? `${activity.name} · ${location}` : activity.name;
   }
 
   private loadSelectedActivityDetails(activityId: number): void {

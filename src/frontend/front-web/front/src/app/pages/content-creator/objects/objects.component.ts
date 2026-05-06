@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { FilterOption, ObjectDto, ObjectService } from '../../../services/object';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
-import { ReviewDto, ReviewService } from '../../../services/review';
 
 interface WorkingHoursRow {
   day: string;
@@ -21,15 +20,12 @@ interface WorkingHoursRow {
 })
 export class ContentCreatorObjectsComponent implements OnInit {
   private readonly objectService = inject(ObjectService);
-  private readonly reviewService = inject(ReviewService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
 
   objects: ObjectDto[] = [];
   pagedObjects: ObjectDto[] = [];
   selectedObject: ObjectDto | null = null;
-  previewReviews: ReviewDto[] = [];
-  isLoadingPreviewReviews = false;
 
   isLoading = true;
   errorMessage = '';
@@ -108,7 +104,6 @@ export class ContentCreatorObjectsComponent implements OnInit {
         if (!this.selectedObject || !items.some((item) => item.id === this.selectedObject?.id)) {
           this.selectedObject = items[0] ?? null;
         }
-        this.loadPreviewReviews();
 
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -118,7 +113,6 @@ export class ContentCreatorObjectsComponent implements OnInit {
         this.objects = [];
         this.pagedObjects = [];
         this.selectedObject = null;
-        this.previewReviews = [];
         this.totalCount = 0;
         this.totalPages = 1;
         this.isLoading = false;
@@ -192,15 +186,10 @@ export class ContentCreatorObjectsComponent implements OnInit {
 
   selectObject(object: ObjectDto): void {
     this.selectedObject = object;
-    this.loadPreviewReviews();
   }
 
   trackByObjectId(_: number, object: ObjectDto): number {
     return object.id;
-  }
-
-  trackByReviewId(_: number, review: ReviewDto): number {
-    return review.id;
   }
 
   getStatusBadgeClass(status?: string): string {
@@ -389,81 +378,6 @@ export class ContentCreatorObjectsComponent implements OnInit {
     return location ? `${this.selectedObject.name} · ${location}` : this.selectedObject.name;
   }
 
-  get hasPreviewReviews(): boolean {
-    return this.previewReviews.length > 0;
-  }
-
-  get previewReviewsCountLabel(): string {
-    const count = this.previewReviews.length;
-    return `${count} review${count === 1 ? '' : 's'}`;
-  }
-
-  getReviewInitials(review: ReviewDto): string {
-    const fullName = review.userFullName?.trim();
-    if (!fullName) {
-      return 'U';
-    }
-
-    const parts = fullName.split(/\s+/).filter(Boolean);
-    if (parts.length === 1) {
-      return parts[0].slice(0, 1).toUpperCase();
-    }
-
-    return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
-  }
-
-  getReviewTimeAgo(value?: string): string {
-    if (!value) {
-      return '';
-    }
-
-    const createdAt = new Date(value).getTime();
-    if (!Number.isFinite(createdAt)) {
-      return '';
-    }
-
-    const minutes = Math.max(0, Math.floor((Date.now() - createdAt) / 60000));
-    if (minutes < 1) {
-      return 'just now';
-    }
-    if (minutes < 60) {
-      return `${minutes}m ago`;
-    }
-
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) {
-      return `${hours}h ago`;
-    }
-
-    const days = Math.floor(hours / 24);
-    if (days < 7) {
-      return `${days}d ago`;
-    }
-
-    const weeks = Math.floor(days / 7);
-    if (weeks < 5) {
-      return `${weeks}w ago`;
-    }
-
-    const months = Math.floor(days / 30);
-    if (months < 12) {
-      return `${months}mo ago`;
-    }
-
-    const years = Math.floor(days / 365);
-    return `${years}y ago`;
-  }
-
-  onViewMoreReviews(): void {
-    if (!this.selectedObject) {
-      return;
-    }
-
-    this.router.navigate(['/content-creator/reviews'], {
-      queryParams: { objectId: this.selectedObject.id }
-    });
-  }
-
   private getMinRatingFromFilter(value: string): number | undefined {
     if (value === 'all') {
       return undefined;
@@ -471,36 +385,6 @@ export class ContentCreatorObjectsComponent implements OnInit {
 
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : undefined;
-  }
-
-  private loadPreviewReviews(): void {
-    const objectId = this.selectedObject?.id;
-    if (!objectId) {
-      this.previewReviews = [];
-      return;
-    }
-
-    this.isLoadingPreviewReviews = true;
-    this.reviewService.getAll({
-      page: 1,
-      pageSize: 100,
-      sortBy: 'createdAt',
-      sortOrder: 'desc'
-    }, { bypassRegion: true }).subscribe({
-      next: (response) => {
-        const reviewsForObject = (response.items ?? [])
-          .filter((review) => review.objectId === objectId)
-          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        this.previewReviews = reviewsForObject.slice(0, 3);
-        this.isLoadingPreviewReviews = false;
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.previewReviews = [];
-        this.isLoadingPreviewReviews = false;
-        this.cdr.detectChanges();
-      }
-    });
   }
 
   private normalizeImageUrl(value?: string): string {

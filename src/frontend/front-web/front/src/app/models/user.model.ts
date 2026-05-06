@@ -25,7 +25,6 @@ export interface UserDto {
   roleName?: string;
   userType?: string;
   roles?: string[];
-  profileImageUrl?: string;
 }
 
 export interface LoginDto {
