@@ -233,13 +233,35 @@ export class DestinationsComponent implements OnInit {
       this.showSortMenu = false;
     }
   }
+  private tokenize(text: string): string[] {
+    return text
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/\p{Diacritic}/gu, '')
+      .split(/\s+/)
+      .filter(Boolean);
+  }
 
+  private matchesTokens(text: string, query: string): boolean {
+    const textTokens = this.tokenize(text);
+    const queryTokens = this.tokenize(query);
+
+    return queryTokens.every(q =>
+      textTokens.some(t => t.includes(q))
+    );
+  }
   get filtered(): DestinationView[] {
     let list = [...this.destinations];
 
     if (this.searchQuery.trim()) {
-      const query = this.searchQuery.trim().toLowerCase();
-      list = list.filter((destination) => destination.name.toLowerCase().includes(query));
+      const query = this.searchQuery.trim();
+
+      list = list.filter((destination) =>
+        this.matchesTokens(
+          `${destination.name} ${destination.description ?? ''}`,
+          query
+        )
+      );
     }
 
     if (this.activeFilter !== 'All') {

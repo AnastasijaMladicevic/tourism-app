@@ -159,17 +159,22 @@ export class EventsComponent implements OnInit {
       ...unique.map((name) => ({ key: name, label: name, icon: this.categoryIcon(name) })),
     ];
   }
+  private matchesSearch(event: EventCard): boolean {
+    const q = this.searchQuery.trim().toLowerCase();
+    if (!q) return true;
 
+    return !!(
+      event.title?.toLowerCase().includes(q) ||
+      event.location?.toLowerCase().includes(q) ||
+      event.category?.toLowerCase().includes(q) ||
+      event.eventTypeName?.toLowerCase().includes(q) ||
+      event.description?.toLowerCase().includes(q)
+    );
+  }
   get filteredEvents(): EventCard[] {
     let list = [...this.events];
 
-    const q = this.searchQuery.trim().toLowerCase();
-    if (q) {
-      list = list.filter(
-        (event) =>
-          event.title.toLowerCase().includes(q) || event.location.toLowerCase().includes(q),
-      );
-    }
+    list = list.filter(e => this.matchesSearch(e));
 
     if (this.activeFilter !== 'All') {
       list = list.filter((event) => event.category === this.activeFilter);
