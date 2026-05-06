@@ -29,7 +29,8 @@ namespace TuristickiVodic.Services
                 .Include(l => l.Destination)
                     .ThenInclude(d => d.Region)
                 .Include(l => l.LocalityType)
-                .Include(l => l.Images)
+                .Include(l => l.Images.Where(i => i.IsMain))
+                .AsSplitQuery()
                 .Where(l => l.IsActive && l.Images.Any(i => i.IsMain))
                 .OrderBy(l => l.Id)
                 .ToListAsync();
@@ -44,7 +45,8 @@ namespace TuristickiVodic.Services
                 .Include(l => l.Destination)
                     .ThenInclude(d => d.Region)
                 .Include(l => l.LocalityType)
-                .Include(l => l.Images)
+                .Include(l => l.Images.Where(i => i.IsMain))
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(l => l.Id == id);
 
             if (locality == null)
@@ -292,14 +294,10 @@ namespace TuristickiVodic.Services
             if (query.PageSize < 1)
                 query.PageSize = 10;
 
-            if (query.PageSize > 100)
-                query.PageSize = 100;
+            if (query.PageSize > 500)
+                query.PageSize = 500;
 
             var localitiesQuery = _context.Localities
-                .Include(l => l.Destination)
-                    .ThenInclude(d => d.Region)
-                .Include(l => l.LocalityType)
-                .Include(l => l.Images)
                 .Where(l => l.IsActive)
                 .Where(l => l.Images.Any(i => i.IsMain))
                 .AsNoTracking()
@@ -339,10 +337,13 @@ namespace TuristickiVodic.Services
 
             var totalCount = await localitiesQuery.CountAsync();
 
-            var items = await localitiesQuery
+            var pageIds = await localitiesQuery
                 .Skip((query.Page - 1) * query.PageSize)
                 .Take(query.PageSize)
+                .Select(l => l.Id)
                 .ToListAsync();
+
+            var items = await LoadLocalityPageAsync(pageIds);
 
             var mappedItems = _mapper.Map<List<LocalityDto>>(items);
             await ApplyTranslationsAsync(mappedItems, items, query.Lang);
@@ -365,14 +366,10 @@ namespace TuristickiVodic.Services
             if (query.PageSize < 1)
                 query.PageSize = 10;
 
-            if (query.PageSize > 100)
-                query.PageSize = 100;
+            if (query.PageSize > 500)
+                query.PageSize = 500;
 
             var localitiesQuery = _context.Localities
-                .Include(l => l.Destination)
-                    .ThenInclude(d => d.Region)
-                .Include(l => l.LocalityType)
-                .Include(l => l.Images)
                 .Where(l => l.IsActive)
                 .Where(l => l.Geolocation != null)
                 .Where(l => l.Images.Any(i => i.IsMain))
@@ -408,44 +405,53 @@ namespace TuristickiVodic.Services
             if (search != null)
                 localitiesQuery = ApplyLocalitySearchFilter(localitiesQuery, search);
 
-            var localities = await localitiesQuery.ToListAsync();
+            var localities = await localitiesQuery
+                .Select(locality => new
+                {
+                    locality.Id,
+                    locality.Name,
+                    Latitude = locality.Geolocation!.Y,
+                    Longitude = locality.Geolocation!.X
+                })
+                .ToListAsync();
 
             var nearbyLocalities = localities
                 .Select(locality => new
                 {
-                    Locality = locality,
+                    locality.Id,
+                    locality.Name,
                     DistanceMeters = CalculateDistanceMeters(
                         query.Latitude,
                         query.Longitude,
-                        locality.Geolocation!.Y,
-                        locality.Geolocation.X)
+                        locality.Latitude,
+                        locality.Longitude)
                 })
                 .Where(x => x.DistanceMeters <= query.RadiusMeters)
                 .ToList();
 
             var isDesc = string.Equals(query.SortOrder?.Trim(), "desc", StringComparison.OrdinalIgnoreCase);
             nearbyLocalities = isDesc
-                ? nearbyLocalities.OrderByDescending(x => x.DistanceMeters).ThenBy(x => x.Locality.Name).ToList()
-                : nearbyLocalities.OrderBy(x => x.DistanceMeters).ThenBy(x => x.Locality.Name).ToList();
+                ? nearbyLocalities.OrderByDescending(x => x.DistanceMeters).ThenBy(x => x.Name).ToList()
+                : nearbyLocalities.OrderBy(x => x.DistanceMeters).ThenBy(x => x.Name).ToList();
 
             var totalCount = nearbyLocalities.Count;
 
-            var items = nearbyLocalities
+            var pageIds = nearbyLocalities
                 .Skip((query.Page - 1) * query.PageSize)
                 .Take(query.PageSize)
-                .Select(x =>
-                {
-                    var dto = _mapper.Map<LocalityDto>(x.Locality);
-                    dto.DistanceMeters = Math.Round(x.DistanceMeters, 2);
-                    return dto;
-                })
+                .Select(x => x.Id)
                 .ToList();
 
-            await ApplyTranslationsAsync(items, nearbyLocalities
-                .Skip((query.Page - 1) * query.PageSize)
-                .Take(query.PageSize)
-                .Select(x => x.Locality)
-                .ToList(), query.Lang);
+            var pageLocalities = await LoadLocalityPageAsync(pageIds);
+            var distancesById = nearbyLocalities.ToDictionary(x => x.Id, x => Math.Round(x.DistanceMeters, 2));
+            var items = _mapper.Map<List<LocalityDto>>(pageLocalities);
+            foreach (var item in items)
+            {
+                if (distancesById.TryGetValue(item.Id, out var distance))
+                    item.DistanceMeters = distance;
+            }
+
+            await ApplyTranslationsAsync(items, pageLocalities, query.Lang);
             return new PagedResultDto<LocalityDto>
             {
                 Items = items,
@@ -531,6 +537,30 @@ namespace TuristickiVodic.Services
 
         private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180d;
 
+        private async Task<List<Locality>> LoadLocalityPageAsync(List<int> localityIds)
+        {
+            if (localityIds.Count == 0)
+                return new List<Locality>();
+
+            var localities = await _context.Localities
+                .AsNoTracking()
+                .Where(l => localityIds.Contains(l.Id))
+                .Include(l => l.Destination)
+                    .ThenInclude(d => d.Region)
+                .Include(l => l.LocalityType)
+                .Include(l => l.Images.Where(i => i.IsMain))
+                .AsSplitQuery()
+                .ToListAsync();
+
+            var orderById = localityIds
+                .Select((id, index) => new { id, index })
+                .ToDictionary(x => x.id, x => x.index);
+
+            return localities
+                .OrderBy(l => orderById[l.Id])
+                .ToList();
+        }
+
         private async Task ApplyTranslationsAsync(List<LocalityDto> dtos, List<Locality> localities, string? lang)
         {
             if (dtos.Count == 0 || localities.Count == 0)
@@ -544,7 +574,7 @@ namespace TuristickiVodic.Services
             foreach (var dto in dtos)
             {
                 if (localitiesById.TryGetValue(dto.Id, out var locality))
-                    await ApplyTranslationsAsync(dto, locality, normalizedLang, true);
+                    await ApplyTranslationsAsync(dto, locality, normalizedLang, false);
             }
         }
 

@@ -930,6 +930,8 @@ namespace TuristickiVodic.Services.Services
                     .ThenInclude(r => r.User)
                 .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
                     .ThenInclude(r => r.ReviewedBy)
+                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
+                    .ThenInclude(r => r.Images)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
@@ -949,6 +951,8 @@ namespace TuristickiVodic.Services.Services
                     .ThenInclude(r => r.User)
                 .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
                     .ThenInclude(r => r.ReviewedBy)
+                .Include(o => o.Reviews.Where(r => r.Status == ContentStatus.Approved))
+                    .ThenInclude(r => r.Images)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(o => o.Id == id);
         }

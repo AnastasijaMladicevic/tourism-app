@@ -904,6 +904,36 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.ToTable("Reviews");
                 });
 
+            modelBuilder.Entity("TuristickiVodic.Core.Models.ReviewImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AltText")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("ReviewId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReviewId");
+
+                    b.ToTable("ReviewImages");
+                });
+
             modelBuilder.Entity("TuristickiVodic.Core.Models.RevokedToken", b =>
                 {
                     b.Property<int>("Id")
@@ -1765,6 +1795,17 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TuristickiVodic.Core.Models.ReviewImage", b =>
+                {
+                    b.HasOne("TuristickiVodic.Core.Models.Review", "Review")
+                        .WithMany("Images")
+                        .HasForeignKey("ReviewId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Review");
+                });
+
             modelBuilder.Entity("TuristickiVodic.Core.Models.Route", b =>
                 {
                     b.HasOne("TuristickiVodic.Core.Models.User", "CreatedBy")
@@ -1945,6 +1986,11 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("Destinations");
 
                     b.Navigation("PreferredByUsers");
+                });
+
+            modelBuilder.Entity("TuristickiVodic.Core.Models.Review", b =>
+                {
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("TuristickiVodic.Core.Models.Role", b =>

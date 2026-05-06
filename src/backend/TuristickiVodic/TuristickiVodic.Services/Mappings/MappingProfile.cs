@@ -268,6 +268,8 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.Status,
                     opt => opt.MapFrom(src => src.Status.ToString()));
 
+            CreateMap<ReviewImage, ReviewImageDto>();
+
             CreateMap<RoutePoint, RoutePointDto>()
                 .ForMember(dest => dest.Longitude,
                     opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : 0))
