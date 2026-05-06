@@ -408,21 +408,29 @@ textarea {
 
 .insight-panel {
   padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #f8fafc;
 }
 
-.insight-panel section + section {
-  margin-top: 14px;
+.insight-panel section {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 12px;
 }
 
 .insight-panel h3,
 .insight-panel h4 {
   font-size: 14px;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  color: #0f172a;
 }
 
 .note-box {
-  background: #f8fafc;
-  border: 1px solid #e5e7eb;
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
   border-radius: 8px;
   padding: 10px;
 }
@@ -442,17 +450,39 @@ textarea {
 }
 
 .metric-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 4px 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 10px;
+  padding: 7px 0;
   font-size: 12px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.metric-row:last-child {
+  border-bottom: none;
+}
+
+.metric-row span {
+  color: #64748b;
+}
+
+.metric-row strong {
+  color: #0f172a;
+  font-size: 13px;
 }
 
 .checks p,
 .decision-log p {
   font-size: 12px;
   color: #374151;
-  padding: 3px 0;
+  padding: 2px 0;
+  line-height: 1.45;
+}
+
+.decision-log strong {
+  color: #0f172a;
+  font-weight: 600;
 }
 
 @media (max-width: 1280px) {

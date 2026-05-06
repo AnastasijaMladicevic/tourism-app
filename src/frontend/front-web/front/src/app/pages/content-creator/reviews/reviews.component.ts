@@ -52,7 +52,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
 
   searchTerm = '';
   responseFilter: 'all' | 'responded' | 'pending' = 'all';
-  ratingFilter: 'all' | 1 | 2 | 3 | 4 | 5 = 'all';
+  selectedRatings: number[] = [];
   sortOrder: 'desc' | 'asc' = 'desc';
 
   responseText = '';
@@ -97,7 +97,8 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
           }
 
           return this.fetchAllReviews().pipe(
-            map((reviews) => reviews.filter((review) => objectIds.includes(review.objectId)))
+            map((reviews) => reviews.filter((review) => objectIds.includes(review.objectId))),
+            map((reviews) => this.applyRatingFilter(reviews))
           );
         }),
         finalize(() => {
@@ -140,14 +141,28 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   }
 
   selectAllFilters(): void {
-    this.ratingFilter = 'all';
+    this.selectedRatings = [];
     this.responseFilter = 'all';
     this.sortOrder = 'desc';
     this.loadReviews();
   }
 
   get isAllFiltersSelected(): boolean {
-    return this.ratingFilter === 'all' && this.responseFilter === 'all';
+    return this.selectedRatings.length === 0 && this.responseFilter === 'all';
+  }
+
+  toggleRating(rating: number): void {
+    if (this.selectedRatings.includes(rating)) {
+      this.selectedRatings = this.selectedRatings.filter((item) => item !== rating);
+    } else {
+      this.selectedRatings = [...this.selectedRatings, rating].sort((a, b) => a - b);
+    }
+
+    this.loadReviews();
+  }
+
+  isRatingSelected(rating: number): boolean {
+    return this.selectedRatings.includes(rating);
   }
 
   selectReview(review: ReviewDto | null): void {
@@ -402,12 +417,16 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
       query.hasResponse = false;
     }
 
-    if (this.ratingFilter !== 'all') {
-      query.minRating = this.ratingFilter;
-      query.maxRating = this.ratingFilter;
+    return query;
+  }
+
+  private applyRatingFilter(reviews: ReviewDto[]): ReviewDto[] {
+    if (this.selectedRatings.length === 0) {
+      return reviews;
     }
 
-    return query;
+    const allowedRatings = new Set(this.selectedRatings);
+    return reviews.filter((review) => allowedRatings.has(review.rating));
   }
 
   private fetchAllReviews() {

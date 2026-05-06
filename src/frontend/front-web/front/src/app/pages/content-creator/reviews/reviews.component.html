@@ -15,9 +15,25 @@
           </span>
         All Ratings
       </button>
-      <button class="chip" type="button" [class.active]="ratingFilter === 5" (click)="ratingFilter = 5; onFilterChange()">
+      <button class="chip" type="button" [class.active]="isRatingSelected(5)" (click)="toggleRating(5)">
         <span class="material-symbols-outlined">grade</span>
         5 Stars
+      </button>
+      <button class="chip" type="button" [class.active]="isRatingSelected(4)" (click)="toggleRating(4)">
+        <span class="material-symbols-outlined">grade</span>
+        4 Stars
+      </button>
+      <button class="chip" type="button" [class.active]="isRatingSelected(3)" (click)="toggleRating(3)">
+        <span class="material-symbols-outlined">grade</span>
+        3 Stars
+      </button>
+      <button class="chip" type="button" [class.active]="isRatingSelected(2)" (click)="toggleRating(2)">
+        <span class="material-symbols-outlined">grade</span>
+        2 Stars
+      </button>
+      <button class="chip" type="button" [class.active]="isRatingSelected(1)" (click)="toggleRating(1)">
+        <span class="material-symbols-outlined">grade</span>
+        1 Star
       </button>
       <button class="chip" type="button" [class.active]="responseFilter === 'pending'" (click)="responseFilter = 'pending'; onFilterChange()">
         <span class="material-symbols-outlined">mark_chat_unread</span>
@@ -169,8 +185,12 @@
 
         <section class="decision-log">
           <h4>Response Log</h4>
-          @if (selectedReview.creatorResponseAt) {
-            <p>Last response: {{ formatDate(selectedReview.creatorResponseAt) }}</p>
+          @if (selectedReview.creatorResponse?.trim()) {
+            <p><strong>Response:</strong></p>
+            <p>{{ selectedReview.creatorResponse }}</p>
+            @if (selectedReview.creatorResponseAt) {
+              <p><strong>Sent:</strong> {{ formatDate(selectedReview.creatorResponseAt) }}</p>
+            }
           } @else {
             <p>No response submitted yet.</p>
           }
