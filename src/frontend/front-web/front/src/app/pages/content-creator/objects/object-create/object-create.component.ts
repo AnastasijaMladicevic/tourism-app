@@ -73,6 +73,8 @@ export class ObjectCreateComponent implements OnInit {
   errorMessage = '';
   isEditMode = false;
   objectId: number | null = null;
+  private deletionRequestSubmitted = false;
+  private loadedObject: ObjectDto | null = null;
 
   /** Pending URL input (same pattern as Add Activity). */
   pendingImageUrl = '';
@@ -212,6 +214,19 @@ export class ObjectCreateComponent implements OnInit {
     return this.isApprovedObject ? 'Request deletion' : 'Confirm deletion';
   }
 
+  get hasPendingDeletionRequest(): boolean {
+    if (this.deletionRequestSubmitted) {
+      return true;
+    }
+
+    if (this.loadedObject?.hasPendingDeletionRequest) {
+      return true;
+    }
+
+    const status = this.reviewObjectStatus.toLowerCase();
+    return status.includes('deletion');
+  }
+
   get deleteModalDescription(): string {
     return this.isApprovedObject
       ? 'This object is approved, so removal requires a manager deletion request.'
@@ -219,7 +234,7 @@ export class ObjectCreateComponent implements OnInit {
   }
 
   openDeleteModal(): void {
-    if (!this.isEditMode || !this.objectId || this.isSubmitting || this.isDeletingObject || this.isManagerReview) {
+    if (!this.isEditMode || !this.objectId || this.isSubmitting || this.isDeletingObject || this.isManagerReview || this.hasPendingDeletionRequest) {
       return;
     }
     this.showDeleteModal = true;
@@ -239,6 +254,10 @@ export class ObjectCreateComponent implements OnInit {
     }
 
     if (this.isApprovedObject) {
+      if (this.hasPendingDeletionRequest) {
+        this.showDeleteModal = false;
+        return;
+      }
       this.submitObjectDeletionRequest();
       return;
     }
@@ -264,6 +283,10 @@ export class ObjectCreateComponent implements OnInit {
       )
       .subscribe({
         next: () => {
+          this.deletionRequestSubmitted = true;
+          if (this.loadedObject) {
+            this.loadedObject.hasPendingDeletionRequest = true;
+          }
           this.showDeleteModal = false;
           this.router.navigate(['/content-creator/objects']);
         },
@@ -820,6 +843,8 @@ export class ObjectCreateComponent implements OnInit {
   }
 
   private applyFormFromObject(objectItem: ObjectDto): void {
+    this.loadedObject = objectItem;
+    this.deletionRequestSubmitted = !!objectItem.hasPendingDeletionRequest;
     const imgs = objectItem.images ?? [];
     this.imagesSnapshot = imgs.map((i) => ({ ...i }));
     this.imageUrls = this.buildOrderedImageUrls(objectItem);

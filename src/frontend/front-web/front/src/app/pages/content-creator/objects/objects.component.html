@@ -260,6 +260,43 @@
             }
           </div>
         </section>
+
+        <section class="detail-section reviews-preview-section">
+          <div class="reviews-preview-head">
+            <h3>Reviews</h3>
+            @if (hasPreviewReviews) {
+              <span class="reviews-count-pill">{{ previewReviewsCountLabel }}</span>
+            }
+          </div>
+
+          @if (isLoadingPreviewReviews) {
+            <div class="state">Loading reviews...</div>
+          } @else if (hasPreviewReviews) {
+            <div class="reviews-preview-list">
+              <article class="review-preview-card" *ngFor="let review of previewReviews; trackBy: trackByReviewId">
+                <div class="review-preview-top">
+                  <div class="reviewer-meta">
+                    <span class="reviewer-avatar">{{ getReviewInitials(review) }}</span>
+                    <div>
+                      <strong>{{ review.userFullName }}</strong>
+                      <span>{{ getReviewTimeAgo(review.createdAt) }}</span>
+                    </div>
+                  </div>
+                  <span class="review-rating">{{ review.rating }}/5</span>
+                </div>
+                <p>{{ review.text }}</p>
+              </article>
+            </div>
+            <button type="button" class="text-btn view-more-btn" (click)="onViewMoreReviews()">
+              View more
+            </button>
+          } @else {
+            <div class="state">No reviews available for this object yet.</div>
+            <button type="button" class="text-btn view-more-btn" (click)="onViewMoreReviews()">
+              View more
+            </button>
+          }
+        </section>
       } @else {
         <div class="state">Select an object from the table to view details.</div>
       }

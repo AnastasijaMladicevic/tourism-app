@@ -169,7 +169,7 @@ INSERT INTO "Users"
 ("FirstName", "LastName", "DateOfBirth", "Email", "PasswordHash", "PhoneNumber", "Country", "Language",
  "IsVerified", "IsActive", "IsBlacklisted", "HasRequestedCreatorRole", "RoleId", "ManagedDestinationId", "CreatedAt", "UpdatedAt", "ProfileImageUrl")
 VALUES
-('Nikola', 'Nikolic', '1990-01-01', 'admin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Crna Gora', 'sr', true, true, false, false,
+('Nikola', 'Nikolic', '1990-01-01', 'admin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', 382456123, 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 ('Marko', 'Jovanovic', '1992-05-15', 'marko@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269123456', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
@@ -9145,7 +9145,7 @@ VALUES
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegosu na Lovcenu'),
     NOW()),
 (
-    'https://wevotravel.com/wp-content/uploads/2023/04/p1dr50spf6199eq21qprr1maco4.jpg',
+    'https://apartments-sofija.com/wp-content/uploads/top-hill-budva.jpg',
     'Top Hill Club',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Top Hill Club'),
@@ -9181,19 +9181,19 @@ VALUES
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Emporio Club'),
     NOW()),
 (
-    'https://wevotravel.com/wp-content/uploads/2023/05/80073243_10157797012054812_6306868262508429312_n.jpg',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Nightclub%2020170423.jpg',
     'Maximus Club Kotor',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Maximus Club Kotor'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/02/11/00/2205621_20190211070240_5c611944b789684e9fedffebjpeg_share.jpg',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Old%20Town%20Walls%20and%20Architecture%20at%20Night%20-%20Kotor%20-%20Montenegro.jpg',
     'Maximus Club Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Maximus Club Kotor'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/02/11/00/2207825_2019021108020_5c611dedb789684e9fee178cjpeg_share.jpg',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Nightclub%20%287427599458%29.jpg',
     'Maximus Club Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Maximus Club Kotor'),
@@ -10117,19 +10117,19 @@ VALUES
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Butiko Shopping Center'),
     NOW()),
 (
-    'https://wevotravel.com/wp-content/uploads/2023/04/1214071_20190204150248_5c5850cdb7896801fa7a72ecjpeg_ls.jpg',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Royaloak%20shopping%20mall%20.jpg',
     'HDL Novi Mall',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'HDL Novi Mall'),
     NOW()),
 (
-    'https://www.pvcialustolarija.me/storage/2020/11/HDL-Novi-Mall-1.jpg',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Shopping%20Mall%20%28geograph%202381745%29.jpg',
     'HDL Novi Mall',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'HDL Novi Mall'),
     NOW()),
 (
-    'https://www.pvcialustolarija.me/storage/2020/11/HDL-Novi-Mall-3.jpg',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Shopping%20Mall%20%284472066145%29.jpg',
     'HDL Novi Mall',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'HDL Novi Mall'),
@@ -10771,22 +10771,40 @@ VALUES
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Milocer Park'),
     NOW()),
 (
-    'https://www.ivanovakorita.com/files/images/IMG_Lovcen_Djecije_igraliste_Gallery_04.jpg',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Park%20%28children%27s%20playground%29.jpg',
     'Igraliste Lovcen National Park',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Lovcen National Park'),
     NOW()),
 (
-    'https://www.ivanovakorita.com/files/images/IMG_Lovcen_Djecije_igraliste_Gallery_06.JPG',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Lovcen%20view%20Montenegro%20june%202021%20%289%29.jpg',
     'Igraliste Lovcen National Park',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Lovcen National Park'),
     NOW()),
 (
-    'https://www.ivanovakorita.com/files/images/IMG_Lovcen_Djecije_igraliste_Gallery_03.jpg',
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Lovcen%20view%20Montenegro%20june%202021%20%288%29.jpg',
     'Igraliste Lovcen National Park',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Lovcen National Park'),
+    NOW()),
+(
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Indoor%20playground%20%288129595643%29.jpg',
+    'Djecija igraonica Igalo',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecija igraonica Igalo'),
+    NOW()),
+(
+    'https://commons.wikimedia.org/wiki/Special:FilePath/USSRC%20indoor%20playground.JPG',
+    'Djecija igraonica Igalo',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecija igraonica Igalo'),
+    NOW()),
+(
+    'https://commons.wikimedia.org/wiki/Special:FilePath/Playroom%2C%20Viking%20Grace%2C%2020230604%20-%2016.jpg',
+    'Djecija igraonica Igalo',
+    false,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecija igraonica Igalo'),
     NOW()),
 (
     'https://cnp.me/wp-content/uploads/2019/01/eksterijer-12-18-2.jpg',
@@ -13197,3 +13215,7 @@ SET "CreatedByUserId" = content.creator_user_id,
     "UpdatedAt" = NOW()
 FROM destination_content content
 WHERE e."DestinationId" = content.destination_id;
+
+UPDATE "Objects"
+SET "Price" = 0.00
+WHERE "Price" IS NULL;

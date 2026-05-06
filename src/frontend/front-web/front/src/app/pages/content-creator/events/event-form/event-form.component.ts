@@ -108,6 +108,8 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
   showAllRelatedActivities = false;
   activitySearchTerm = '';
   showTipsModal = false;
+  private loadedEvent: EventDto | null = null;
+  private deletionRequestSubmitted = false;
 
   private readonly fallbackEventTypes = [
     { id: 1, name: 'Festival' },
@@ -439,6 +441,8 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   populateForm(event: EventDto, images: EventImageDto[] = []): void {
+    this.loadedEvent = event;
+    this.deletionRequestSubmitted = !!event.hasPendingDeletionRequest;
     this.eventStatus = event.status ?? '';
     this.imagesSnapshot = images.map((i) => ({ ...i }));
     this.imageUrls = this.buildOrderedImageUrls(event, images);
@@ -689,7 +693,7 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openDeleteModal(): void {
-    if (!this.isEditMode || !this.eventId || this.isSubmitting || this.isDeleting) {
+    if (!this.isEditMode || !this.eventId || this.isSubmitting || this.isDeleting || this.hasPendingDeletionRequest) {
       return;
     }
 
@@ -712,6 +716,10 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     if (this.isApprovedEvent) {
+      if (this.hasPendingDeletionRequest) {
+        this.showDeleteModal = false;
+        return;
+      }
       this.submitDeletionRequest();
       return;
     }
@@ -737,6 +745,18 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
       : 'This event is still pending, so it can be removed immediately.';
   }
 
+  get hasPendingDeletionRequest(): boolean {
+    if (this.deletionRequestSubmitted) {
+      return true;
+    }
+
+    if (this.loadedEvent?.hasPendingDeletionRequest) {
+      return true;
+    }
+
+    return this.eventStatus.toLowerCase().includes('deletion');
+  }
+
   private submitDeletionRequest(): void {
     if (!this.eventId || this.isDeleting) {
       return;
@@ -753,6 +773,10 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
       })
     ).subscribe({
       next: () => {
+        this.deletionRequestSubmitted = true;
+        if (this.loadedEvent) {
+          this.loadedEvent.hasPendingDeletionRequest = true;
+        }
         this.showDeleteModal = false;
         this.successMessage = 'Deletion request submitted. A manager must review it before event removal.';
         setTimeout(() => this.router.navigate(['/content-creator/events']), 1200);
