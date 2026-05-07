@@ -19,6 +19,7 @@ import { LocationTrackingService } from '../../services/location-tracking';
 import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
 import { EventPlannerService } from '../../services/event-planner';
 import { PendingActionService } from '../../services/pending-action';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 interface PlaceCard {
   title: string;
@@ -89,7 +90,7 @@ interface HomeCategory {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [BottomNavComponent, FormsModule, MatIcon, LazyBackgroundDirective],
+  imports: [BottomNavComponent, FormsModule, MatIcon, LazyBackgroundDirective, TranslatePipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
@@ -142,6 +143,19 @@ export class HomeComponent implements OnInit, OnDestroy {
     private eventPlannerService: EventPlannerService,
     private pendingActionService: PendingActionService
   ) { }
+
+  private get activeRegionId(): number {
+    const code = (localStorage.getItem('activeRegionCode') || 'ME').trim().toUpperCase();
+  
+    const regionIds: Record<string, number> = {
+      ME: 1,
+      IT: 2,
+      ES: 3,
+      RS: 4,
+    };
+  
+    return regionIds[code] ?? 1;
+  }
 
   private applyPlannerState(list: EventCard[]): void {
     for (const item of list) {
@@ -623,23 +637,24 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private loadPlaceCards(): void {
+    const regionId = this.activeRegionId;
     this.isLoadingPlaces = true;
 
-    const lang = (localStorage.getItem('appLanguage') || 'sr').trim().toLowerCase();
+    const lang = (localStorage.getItem('spirego-language') || 'sr').trim().toLowerCase();
 
     forkJoin({
       destinations: this.destinationService
-        .getAll({ page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc', lang })
+        .getAll({ page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc', lang, regionId })
         .pipe(catchError(() => of([] as unknown[]))),
       objects: this.objectService
         .getAll(
-          { page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc' },
+          { page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc', regionId },
           { bypassLanguage: true },
         )
         .pipe(catchError(() => of([] as unknown[]))),
       activities: this.activityService
         .getAll(
-          { page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc' },
+          { page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc', regionId },
           { bypassLanguage: true },
         )
         .pipe(catchError(() => of([] as unknown[]))),
@@ -710,7 +725,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private translateFeaturedDisplayTitles(
     featured: FeaturedDestination[]
   ): Observable<FeaturedDestination[]> {
-    const lang = (localStorage.getItem('appLanguage') || 'sr')
+    const lang = (localStorage.getItem('spirego-language') || 'sr')
       .trim()
       .toLowerCase();
 
@@ -718,6 +733,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       return of(featured);
     }
 
+   
     return forkJoin(
       featured.map((item) => {
 
@@ -730,7 +746,7 @@ export class HomeComponent implements OnInit, OnDestroy {
               const translatedDescription = translations
                 .find(
                   (translation) =>
-                    translation.fieldName?.toLowerCase() === 'displayTitle' &&
+                    translation.fieldName?.toLowerCase() === 'displaytitle' &&
                     translation.languageCode?.toLowerCase() === lang
                 )
                 ?.translatedText?.trim();
@@ -756,6 +772,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private loadRecommendedCards(): void {
+    const regionId = this.activeRegionId;
     this.isLoadingRecommendations = true;
 
     const currentLocation = this.locationTrackingService.getCurrentLocation();
@@ -768,6 +785,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.recommendationService
       .getHomeRecommendations({
         pageSize: 12,
+        regionId,
         latitude: canUseLocation ? currentLocation?.latitude : undefined,
         longitude: canUseLocation ? currentLocation?.longitude : undefined,
       })
@@ -794,11 +812,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private loadEventCards(): void {
+    const regionId = this.activeRegionId;
     this.isLoadingEvents = true;
 
     this.eventService
       .getAll(
-        { page: 1, pageSize: 12, sortBy: 'startDate', sortOrder: 'asc' },
+        { page: 1, pageSize: 12, sortBy: 'startDate', sortOrder: 'asc', regionId },
         { bypassLanguage: true },
       )
       .pipe(

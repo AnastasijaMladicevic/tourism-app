@@ -1,7 +1,7 @@
 <div class="page">
   <div class="scroll-content">
     <div class="greeting">
-      <p class="greeting-sub">Hi, glad to see you again</p>
+      <p class="greeting-sub">{{ 'home.greeting' | translate }}</p>
       <h1 class="greeting-name">{{ userName }}</h1>
     </div>
 
@@ -10,7 +10,7 @@
         <mat-icon>search</mat-icon>
         <input
           type="text"
-          placeholder="Ask where to go, what to see or where to eat..."
+          [placeholder]="'home.searchPlaceholder' | translate"
           [(ngModel)]="searchQuery"
           (input)="onSearchInput()"
           (keydown.enter)="submitSearch()"
@@ -24,7 +24,7 @@
       </div>
       <div class="region-wrapper">
         <button class="filter-btn" type="button" (click)="openRegionPicker()">
-          Choose Region
+          {{ 'home.chooseRegion' | translate }}
         </button>
       </div>
       @if (showSuggestions && searchResults.length > 0) {
@@ -51,7 +51,7 @@
     </div>
 
     <div class="section">
-      <h2 class="section-title">Categories</h2>
+      <h2 class="section-title">{{ 'home.categories' | translate }}</h2>
       <div class="categories">
         @for (category of categories; track category.route) {
           <button class="category" type="button" (click)="openCategory(category)">
@@ -61,7 +61,7 @@
               </mat-icon>
             </div>
 
-            <span class="category-label">{{ category.label }}</span>
+            <span class="category-label"> {{ ('home.categoriesList.' + category.key) | translate }}</span>
           </button>
         }
       </div>
@@ -79,14 +79,14 @@
 
       <!-- CONTENT -->
       <div class="featured-overlay">
-        <div class="featured-tag">Featured Destination</div>
+        <div class="featured-tag">{{ 'home.featuredDestination' | translate }}</div>
 
         <div class="featured-text">
           <h2>{{ currentFeatured?.name }}</h2>
           <p>{{ currentFeatured?.displayTitle }}</p>
         </div>
 
-        <button class="explore-btn" type="button" (click)="openDestinations()">Explore</button>
+        <button class="explore-btn" type="button" (click)="openDestinations()">{{ 'home.explore' | translate }}</button>
       </div>
 
       <!-- RIGHT -->
@@ -108,8 +108,8 @@
 
     <div class="section">
       <div class="section-header">
-        <h2 class="section-title">Recommended for you</h2>
-        <button class="see-all" type="button" (click)="openSeeAll('recommended')">See all ></button>
+        <h2 class="section-title">{{ 'home.recommendedForYou' | translate }}</h2>
+        <button class="see-all" type="button" (click)="openSeeAll('recommended')">{{ 'home.seeAll' | translate }} ></button>
       </div>
       <div class="cards-row">
         @for (card of recommended; track card.itemType + '-' + card.itemId) {
@@ -195,14 +195,14 @@
         }
       </div>
       @if (!isLoadingHome && !recommended.length) {
-        <p class="place-location">No recommendations for this search.</p>
+        <p class="place-location">{{ 'home.noRecommendations' | translate }}</p>
       }
     </div>
 
     <div class="section">
       <div class="section-header">
-        <h2 class="section-title">Popular places</h2>
-        <button class="see-all" type="button" (click)="openSeeAll('popular')">See all ></button>
+        <h2 class="section-title"><h2 class="section-title">{{ 'home.popularPlaces' | translate }}</h2></h2>
+        <button class="see-all" type="button" (click)="openSeeAll('popular')">{{ 'home.seeAll' | translate }} ></button>
       </div>
       <div class="cards-row">
         @for (card of popular; track card.itemType + '-' + card.itemId) {
@@ -276,15 +276,15 @@
         }
       </div>
       @if (!isLoadingHome && !popular.length) {
-        <p class="place-location">No popular places for this search.</p>
+        <p class="place-location">{{ 'home.noRecommendations' | translate }}</p>
       }
     </div>
 
     <div class="section">
       <div class="section-header">
-        <h2 class="section-title">Upcoming events</h2>
+        <h2 class="section-title"><h2 class="section-title">{{ 'home.upcomingEvents' | translate }}</h2></h2>
         <button class="see-all" type="button" (click)="router.navigate(['/events'])">
-          See all >
+          {{ 'home.seeAll' | translate }}
         </button>
       </div>
       <div class="cards-row">
@@ -334,7 +334,7 @@
         }
       </div>
       @if (!isLoadingHome && !events.length) {
-        <p class="place-location">No upcoming events for this search.</p>
+        <p class="place-location">{{ 'home.noRecommendations' | translate }}</p>
       }
     </div>
 

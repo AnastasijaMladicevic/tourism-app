@@ -38,6 +38,28 @@
                 "planner":  "Planificador",
                 "profile":  "Perfil"
             },
+
+    "home": {
+        "greeting": "Hola, nos alegra verte de nuevo",
+        "searchPlaceholder": "Pregunta a dónde ir, qué ver o dónde comer...",
+        "chooseRegion": "Elegir región",
+        "categories": "Categorías",
+        "featuredDestination": "Destino destacado",
+        "explore": "Explorar",
+        "recommendedForYou": "Recomendado para ti",
+        "popularPlaces": "Lugares populares",
+        "upcomingEvents": "Próximos eventos",
+        "seeAll": "Ver todo",
+        "noRecommendations": "No hay recomendaciones para esta búsqueda.",
+        "categoriesList": {
+            "destination": "Destinos",
+            "object": "Objetos",
+            "locality": "Localidades",
+            "activity": "Actividades",
+            "event": "Eventos"
+        }
+    },
+    
     "profile":  {
                     "title":  "Perfil",
                     "edit":  "Editar",
