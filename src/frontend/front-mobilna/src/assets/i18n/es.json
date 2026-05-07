@@ -29,7 +29,12 @@
                    "price":  "Precio",
                    "startingFrom":  "Desde",
                    "about":  "Sobre nosotros",
-                   "total":  "total"
+                   "total":  "total",
+                   "all": "Todos",
+                   "nearest": "Más cercanos",
+                   "prev": "Anterior",
+                   "next": "Siguiente",
+                   "pageOf": "Página {{current}} de {{total}}"
                },
     "nav":  {
                 "home":  "Inicio",
@@ -414,7 +419,14 @@
                   "descriptionFallback":  "Descripción no disponible.",
                   "availableTickets":  "Entradas disponibles",
                   "standardTicket":  "Entrada estándar",
-                  "select":  "Seleccionar"
+                  "select":  "Seleccionar",
+                  "nearbyEmpty": "No hay eventos cercanos.",
+                  "nearbyTitle": "Eventos cercanos",
+                  "listTitle": "Eventos",
+                  "searchPlaceholder": "Buscar eventos...",
+                  "foundCount": "{{count}} eventos encontrados",
+                  "empty": "No se encontraron eventos.",
+                  "nature": "Naturaleza"
               },
     "object":  {
                    "titleFallback":  "Objeto",
@@ -425,7 +437,22 @@
                    "workingHoursMissing":  "Horario de atención no disponible",
                    "nearbyNone":  "No hay otros elementos {{name}} cercanos en la misma ubicación.",
                    "allReviews":  "Todas las reseñas",
-                   "totalReviews":  "{{count}} reseñas"
+                   "totalReviews":  "{{count}} reseñas",
+                   "amenities": "Servicios",
+                   "nearbyTitle": "{{name}} cercanos",
+                   "nearbyEmpty": "No hay otros {{name}} en esta ubicación.",
+                   "writeReview": "Escribir una reseña",
+                   "reviewPlaceholder": "¿Cómo fue tu experiencia? ¿Qué recomendarías a otros viajeros?",
+                   "addPhotos": "Agregar fotos (máx. 5)",
+                   "photos": "fotos",
+                   "sending": "Enviando...",
+                   "submitReview": "Enviar reseña",
+                   "listTitle": "Objetos",
+                   "searchPlaceholder": "Buscar objetos...",
+                   "foundCount": "{{count}} objetos encontrados",
+                   "empty": "No se encontraron objetos.",
+                   "open": "Abierto",
+                   "loadError": "No se pudieron cargar los objetos."
                },
     "restaurant":  {
                        "title":  "Restaurante",
@@ -531,5 +558,33 @@
                          "title":  "Agregar evento al planificador",
                          "togglePriority":  "Cambiar prioridad",
                          "save":  "Guardar en el planificador"
-                     }
+                     },
+    "destination": {
+                        "title": "Destino",
+                        "descriptionFallback": "La descripción no está disponible.",
+                        "listTitle": "Destinos",
+                        "searchPlaceholder": "Buscar destinos...",
+                        "foundCount": "{{count}} destinos encontrados",
+                        "empty": "No se encontraron destinos."
+                    },
+    "activity": {
+                        "title": "Actividad",
+                        "descriptionFallback": "La descripción no está disponible.",
+                        "nearbyTitle": "Actividades cercanas",
+                        "nearbyEmpty": "No hay actividades cerca.",
+                        "listTitle": "Actividades",
+                        "searchPlaceholder": "Buscar actividades...",
+                        "resultsFound": "actividades encontradas",
+                        "empty": "No se encontraron actividades."
+                },
+    "locality": {
+                        "title": "Localidad",
+                        "descriptionFallback": "La descripción no está disponible.",
+                        "nearbyTitle": "Localidades cercanas",
+                        "nearbyEmpty": "No hay localidades cercanas.",
+                        "listTitle": "Localidades",
+                        "searchPlaceholder": "Buscar localidades...",
+                        "foundCount": "{{count}} localidades encontradas",
+                        "empty": "No se encontraron localidades."
+                }
 }

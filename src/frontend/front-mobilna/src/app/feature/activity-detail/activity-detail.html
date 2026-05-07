@@ -3,14 +3,14 @@
     <button class="icon-btn" (click)="goBack()">
       <mat-icon>arrow_back_ios</mat-icon>
     </button>
-    <h1 class="header__title">Activity</h1>
+    <h1 class="header__title">{{ 'activity.title' | translate }}</h1>
   </div>
 
   @if (isLoading) {
     <div class="loading-screen">
       <div class="loading-content">
         <div class="spinner"></div>
-        <p>Loading...</p>
+        <p>{{ 'common.loading' | translate }}</p>
       </div>
     </div>
   }
@@ -19,7 +19,7 @@
     <div class="error-state">
       <mat-icon>error_outline</mat-icon>
       <p>{{ errorMessage }}</p>
-      <button (click)="goBack()">Back</button>
+      <button (click)="goBack()">{{ 'common.back' | translate }}</button>
     </div>
   }
 
@@ -67,17 +67,17 @@
       </div>
 
       <div class="card">
-        <h2>About</h2>
+        <h2>{{ 'common.about' | translate }}</h2>
         <p class="description">
-          {{ activity?.description || 'No description available' }}
+          {{ activity?.description || ('activity.descriptionFallback' | translate) }}
         </p>
       </div>
 
       <div class="section">
         <div class="card gallery-card">
           <div class="gallery-header">
-            <h2>Gallery</h2>
-            <button class="see-all-btn" (click)="openGallery(0)">See all ></button>
+            <h2>{{ 'common.gallery' | translate }}</h2>
+            <button class="see-all-btn" (click)="openGallery(0)">{{ 'common.seeAll' | translate }} ></button>
           </div>
 
           <div class="gallery-scroll">
@@ -93,21 +93,21 @@
 
     <div class="right">
       <div class="card">
-        <h2>Location</h2>
+        <h2>{{ 'common.location' | translate }}</h2>
 
-        <div class="location-image" [attr.data-name]="activity?.localityName || 'N/A'">
+        <div class="location-image" [attr.data-name]="activity?.localityName || ('common.notAvailable' | translate)">
           <app-map
             [lat]="activity?.latitude || 42.424"
             [lng]="activity?.longitude || 18.771"
             [interactive]="false"
           >
           </app-map>
-          <button class="map-btn-overlay" (click)="viewOnMap()">View on map</button>
+          <button class="map-btn-overlay" (click)="viewOnMap()">{{ 'common.viewOnMap' | translate }}</button>
         </div>
       </div>
       <div class="card nearby-card">
         <div class="nearby-header">
-          <h2>Nearby activities</h2>
+          <h2>{{ 'activity.nearbyTitle' | translate }}</h2>
         </div>
 
         @if (nearbyActivities.length > 0) {
@@ -136,7 +136,7 @@
                       nearbyActivity.objectName ||
                         nearbyActivity.localityName ||
                         nearbyActivity.destinationName ||
-                        'Lokacija nije dostupna'
+                        ('common.notAvailable' | translate)
                     }}</span>
                   </p>
                 </div>
@@ -144,7 +144,7 @@
             }
           </div>
         } @else {
-          <div class="nearby-empty">No activities nearby</div>
+          <div class="nearby-empty">{{ 'activity.nearbyEmpty' | translate }}</div>
         }
       </div>
     </div>

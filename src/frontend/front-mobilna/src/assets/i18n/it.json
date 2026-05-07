@@ -29,7 +29,12 @@
                    "price":  "Prezzo",
                    "startingFrom":  "A partire da",
                    "about":  "Chi siamo",
-                   "total":  "totale"
+                   "total":  "totale",
+                   "all": "Tutti",
+                   "nearest": "Più vicini",
+                   "prev": "Precedente",
+                   "next": "Successiva",
+                   "pageOf": "Pagina {{current}} di {{total}}"
                },
     "nav":  {
                 "home":  "Home",
@@ -414,7 +419,14 @@
                   "descriptionFallback":  "Descrizione non disponibile.",
                   "availableTickets":  "Biglietti disponibili",
                   "standardTicket":  "Biglietto standard",
-                  "select":  "Seleziona"
+                  "select":  "Seleziona",
+                  "nearbyEmpty": "Non ci sono eventi nelle vicinanze.",
+                  "nearbyTitle": "Eventi vicini",
+                  "listTitle": "Eventi",
+                  "searchPlaceholder": "Cerca eventi...",
+                  "foundCount": "{{count}} eventi trovati",
+                  "empty": "Nessun evento trovato.",
+                  "nature": "Natura"
               },
     "object":  {
                    "titleFallback":  "Oggetto",
@@ -425,8 +437,23 @@
                    "workingHoursMissing":  "Orari di apertura non disponibili",
                    "nearbyNone":  "Non ci sono altri elementi {{name}} nelle vicinanze nella stessa posizione.",
                    "allReviews":  "Tutte le recensioni",
-                   "totalReviews":  "{{count}} recensioni"
-               },
+                   "totalReviews":  "{{count}} recensioni",
+                   "amenities": "Servizi",
+                   "nearbyTitle": "{{name}} vicini",
+                   "nearbyEmpty": "Non ci sono altri {{name}} in questa posizione.",
+                   "writeReview": "Scrivi una recensione",
+                   "reviewPlaceholder": "Com'è stata la tua esperienza? Cosa consiglieresti agli altri viaggiatori?",
+                   "addPhotos": "Aggiungi foto (max 5)",
+                   "photos": "foto",
+                   "sending": "Invio...",
+                   "submitReview": "Invia recensione",
+                   "listTitle": "Oggetti",
+                   "searchPlaceholder": "Cerca oggetti...",
+                   "foundCount": "{{count}} oggetti trovati",
+                   "empty": "Nessun oggetto trovato.",
+                   "open": "Aperto",
+                   "loadError": "Impossibile caricare gli oggetti."
+                 },
     "restaurant":  {
                        "title":  "Ristorante",
                        "loadingError":  "Impossibile caricare il ristorante.",
@@ -531,5 +558,33 @@
                          "title":  "Aggiungi evento al pianificatore",
                          "togglePriority":  "Cambia priorita",
                          "save":  "Salva nel pianificatore"
-                     }
+                     },
+    "destination": {
+                            "title": "Destinazione",
+                            "descriptionFallback": "La descrizione non è disponibile.",
+                            "listTitle": "Destinazioni",
+                            "searchPlaceholder": "Cerca destinazioni...",
+                            "foundCount": "{{count}} destinazioni trovate",
+                            "empty": "Nessuna destinazione trovata."
+                    },
+    "activity": {
+                            "title": "Attività",
+                            "descriptionFallback": "La descrizione non è disponibile.",
+                            "nearbyTitle": "Attività vicine",
+                            "nearbyEmpty": "Nessuna attività nelle vicinanze.",
+                            "listTitle": "Attività",
+                            "searchPlaceholder": "Cerca attività...",
+                            "resultsFound": "attività trovate",
+                            "empty": "Nessuna attività trovata."
+                },
+    "locality": {
+                            "title": "Località",
+                            "descriptionFallback": "La descrizione non è disponibile.",
+                            "nearbyTitle": "Località vicine",
+                            "nearbyEmpty": "Nessuna località nelle vicinanze.",
+                            "listTitle": "Località",
+                            "searchPlaceholder": "Cerca località...",
+                            "foundCount": "{{count}} località trovate",
+                            "empty": "Nessuna località trovata."
+                }
 }

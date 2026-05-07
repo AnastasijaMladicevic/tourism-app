@@ -20,6 +20,7 @@ import { PlannerLocalPreferencesService } from '../../services/planner-local-pre
 import { EventPlannerService } from '../../services/event-planner';
 import { PendingActionService } from '../../services/pending-action';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 
 interface PlaceCard {
   title: string;
@@ -141,7 +142,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     private locationTrackingService: LocationTrackingService,
     private plannerService: PlannerLocalPreferencesService,
     private eventPlannerService: EventPlannerService,
-    private pendingActionService: PendingActionService
+    private pendingActionService: PendingActionService,
+    private translationService: TranslationService
   ) { }
 
   private get activeRegionId(): number {
@@ -1189,7 +1191,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private recommendationMetaText(item: RecommendationItemDto): string {
     if (item.averageRating != null && (item.reviewCount ?? 0) > 0) {
-      return `${item.averageRating.toFixed(1)} (${item.reviewCount} reviews)`;
+      return `${item.averageRating.toFixed(1)} (${item.reviewCount} ${this.translationService.translate('common.reviews')})`;
     }
 
     if (this.shouldShowLiveDistance() && item.distanceMeters != null && item.distanceMeters > 0) {
@@ -1330,7 +1332,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       return 'No ratings yet';
     }
 
-    return `${item.averageRating.toFixed(1)} (${item.reviewCount} reviews)`;
+    return `${item.averageRating.toFixed(1)} (${item.reviewCount} ${this.translationService.translate('common.reviews')})`;
   }
 
   private activityMetaText(activity: {

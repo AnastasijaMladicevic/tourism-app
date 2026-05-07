@@ -11,10 +11,11 @@ import { AuthService } from '../../services/auth';
 import { FavoriteStateService } from '../../services/favorite-state';
 import { PendingActionService } from '../../services/pending-action';
 import { RouterHistoryService } from '../../services/router-history';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-activity-detail',
-  imports: [MatIconModule, MapComponent],
+  imports: [MatIconModule, MapComponent, TranslatePipe],
   templateUrl: './activity-detail.html',
   styleUrl: './activity-detail.scss',
 })

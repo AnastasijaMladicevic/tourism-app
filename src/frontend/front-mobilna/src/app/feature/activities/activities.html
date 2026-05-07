@@ -1,9 +1,9 @@
 <div class="screen">
   <div class="header">
-    <button class="icon-btn" (click)="goBack()" aria-label="Go back">
+    <button class="icon-btn" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
       <mat-icon>arrow_back_ios</mat-icon>
     </button>
-    <h1 class="header__title">Activities</h1>
+    <h1 class="header__title">{{ 'activity.listTitle' | translate }}</h1>
   </div>
 
   <div class="filters-row">
@@ -12,7 +12,7 @@
         <mat-icon>search</mat-icon>
         <input
           type="text"
-          placeholder="Search activities..."
+          [placeholder]="'activity.searchPlaceholder' | translate"
           [(ngModel)]="searchQuery"
           (ngModelChange)="onSearchChange()"
         />
@@ -40,21 +40,21 @@
               [class.sort-menu__item--active]="sortOption === 'distance'"
               (click)="setSort('distance')"
             >
-              <mat-icon>near_me</mat-icon> Nearest
+              <mat-icon>near_me</mat-icon> {{ 'common.nearest' | translate }}
             </button>
             <button
               class="sort-menu__item"
               [class.sort-menu__item--active]="sortOption === 'az'"
               (click)="setSort('az')"
             >
-              <mat-icon>sort_by_alpha</mat-icon> A -> Z
+              <mat-icon>sort_by_alpha</mat-icon> {{ 'common.sortAZ' | translate }}
             </button>
             <button
               class="sort-menu__item"
               [class.sort-menu__item--active]="sortOption === 'za'"
               (click)="setSort('za')"
             >
-              <mat-icon>sort_by_alpha</mat-icon> Z -> A
+              <mat-icon>sort_by_alpha</mat-icon> {{ 'common.sortZA' | translate }}
             </button>
           </div>
         }
@@ -82,14 +82,15 @@
   </div>
 
   <div class="results-bar">
-    <span class="results-bar__count">{{ totalCount }} activities found</span>
+    <span class="results-bar__count">{{ totalCount }}
+      {{ 'activity.resultsFound' | translate }}</span>
   </div>
 
   @if (isLoading) {
     <div class="loading-screen">
       <div class="loading-content">
         <div class="spinner"></div>
-        <p>Loading...</p>
+        <p>{{ 'common.loading' | translate }}</p>
       </div>
     </div>
   }
@@ -98,7 +99,7 @@
     <div class="error-state">
       <mat-icon>error_outline</mat-icon>
       <p>{{ errorMessage }}</p>
-      <button (click)="loadData()">Retry</button>
+      <button (click)="loadData()">{{ 'common.retry' | translate }}</button>
     </div>
   }
 
@@ -149,7 +150,7 @@
 
           <div class="card__footer">
             <span></span>
-            <button class="card__details" (click)="viewDetails(activity)">VIEW DETAILS</button>
+            <button class="card__details" (click)="viewDetails(activity)">{{ 'common.viewDetails' | translate }}</button>
           </div>
         </div>
       </div>
@@ -158,14 +159,14 @@
     @if (totalCount === 0 && !isLoading) {
       <div class="empty">
         <mat-icon>search_off</mat-icon>
-        <p>No localities found.</p>
+        <p>{{ 'activity.empty' | translate }}</p>
       </div>
     }
   </div>
 
   <div class="pagination">
-    <button mat-button (click)="prevPage()" [disabled]="currentPage === 1">Prev</button>
-    <span>Page {{ currentPage }} of {{ totalPages }}</span>
-    <button mat-button (click)="nextPage()" [disabled]="!hasNextPage">Next</button>
+    <button mat-button (click)="prevPage()" [disabled]="currentPage === 1"> {{ 'common.prev' | translate }}</button>
+    <span> {{ 'common.pageOf' | translate:{ current: currentPage, total: totalPages } }}</span>
+    <button mat-button (click)="nextPage()" [disabled]="!hasNextPage">{{ 'common.next' | translate }}</button>
   </div>
 </div>

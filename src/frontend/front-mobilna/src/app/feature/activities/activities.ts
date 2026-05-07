@@ -15,6 +15,8 @@ import { ImageDto, ImageService } from '../../services/image';
 import { LocationTrackingService } from '../../services/location-tracking';
 import { FavoriteStateService } from '../../services/favorite-state';
 import { PendingActionService } from '../../services/pending-action';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 
 export interface ActivityView extends ActivityDto {
   isFavorite: boolean;
@@ -23,7 +25,7 @@ export interface ActivityView extends ActivityDto {
 
 @Component({
   selector: 'app-activities',
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, TranslatePipe],
   templateUrl: './activities.html',
   styleUrl: './activities.scss',
 })
@@ -94,35 +96,12 @@ export class ActivitiesComponent implements OnInit {
     });
     this.cdr.detectChanges();
   }
-  private tokenize(text: string): string[] {
-    return text
-      .toLowerCase()
-      .normalize('NFD')
-      .replace(/\p{Diacritic}/gu, '')
-      .split(/\s+/)
-      .filter(Boolean);
-  }
-
-  private matchesTokens(text: string, query: string): boolean {
-    const textTokens = this.tokenize(text);
-    const queryTokens = this.tokenize(query);
-
-    return queryTokens.every(q =>
-      textTokens.some(t => t.includes(q))
-    );
-  }
   get filtered(): ActivityView[] {
     let list = [...this.activities];
 
     if (this.searchQuery.trim()) {
-      const query = this.searchQuery.trim();
-
-      list = list.filter((activity) =>
-        this.matchesTokens(
-          `${activity.name} ${activity.description ?? ''} ${activity.destinationName ?? ''}`,
-          query
-        )
-      );
+      const query = this.searchQuery.trim().toLowerCase();
+      list = list.filter((activity) => activity.name.toLowerCase().includes(query));
     }
 
     if (this.activeFilter !== 'All') {
