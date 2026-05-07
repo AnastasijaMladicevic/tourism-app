@@ -197,7 +197,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.locationTrackingService.stopTracking();
     } else {
       if (!this.locationTrackingService.startTracking()) {
-        alert('Geolocation nije podrzana.');
         return;
       }
 
