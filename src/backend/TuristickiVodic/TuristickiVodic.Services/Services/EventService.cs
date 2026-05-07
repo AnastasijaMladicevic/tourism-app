@@ -669,6 +669,7 @@ namespace TuristickiVodic.Services.Services
         public async Task<EventDto?> ApproveAsync(int id, ApproveContentDto dto, int userId, string roleName)
         {
             var ev = await _context.Events
+                .Include(e => e.Locality)
                 .Include(e => e.Destination)
                     .ThenInclude(d => d.Region)
                 .FirstOrDefaultAsync(e => e.Id == id);
@@ -715,9 +716,59 @@ namespace TuristickiVodic.Services.Services
 
             await _context.SaveChangesAsync();
 
+            if (dto.Approve)
+            {
+                await CreateFavoritedLocationNotificationsAsync(ev);
+            }
+
             var result = _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
             await ApplyPendingDeletionRequestFlagsAsync(result);
             return result;
+        }
+
+        private async Task CreateFavoritedLocationNotificationsAsync(Event ev)
+        {
+            if (!ev.DestinationId.HasValue && !ev.LocalityId.HasValue)
+                return;
+
+            var userIds = await _context.Favorites
+                .AsNoTracking()
+                .Where(f =>
+                    (ev.LocalityId.HasValue && f.LocalityId == ev.LocalityId.Value) ||
+                    (ev.DestinationId.HasValue && f.DestinationId == ev.DestinationId.Value))
+                .Join(
+                    _context.Users.AsNoTracking().Where(u => u.IsActive && !u.IsBlacklisted),
+                    favorite => favorite.UserId,
+                    user => user.Id,
+                    (favorite, user) => favorite.UserId)
+                .Distinct()
+                .ToListAsync();
+
+            if (userIds.Count == 0)
+                return;
+
+            var locationName = !string.IsNullOrWhiteSpace(ev.Locality?.Name)
+                ? ev.Locality!.Name
+                : !string.IsNullOrWhiteSpace(ev.Destination?.Name)
+                    ? ev.Destination!.Name
+                    : "lokaciju";
+
+            var createdAt = DateTime.UtcNow;
+            var notifications = userIds
+                .Select(userId => new Notification
+                {
+                    UserId = userId,
+                    Type = NotificationType.FavoritedLocationNewEvent,
+                    Title = "Novi dogadjaj na sacuvanoj lokaciji",
+                    Message = $"Dodat je novi dogadjaj \"{ev.Name}\" za lokaciju \"{locationName}\" koja je medju tvojim favoritima.",
+                    ActionUrl = $"/event/{ev.Id}",
+                    EventId = ev.Id,
+                    CreatedAt = createdAt
+                })
+                .ToList();
+
+            _context.Notifications.AddRange(notifications);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<bool> DeleteAsync(int id, int userId, string roleName)
