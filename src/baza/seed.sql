@@ -12959,27 +12959,32 @@ BEGIN
         IF NEW."ObjectId" IS NOT NULL THEN
             UPDATE "Images"
             SET "IsMain" = false
-            WHERE "ObjectId" = NEW."ObjectId";
+            WHERE "ObjectId" = NEW."ObjectId"
+              AND "Id" <> NEW."Id";
 
         ELSIF NEW."ActivityId" IS NOT NULL THEN
             UPDATE "Images"
             SET "IsMain" = false
-            WHERE "ActivityId" = NEW."ActivityId";
+            WHERE "ActivityId" = NEW."ActivityId"
+              AND "Id" <> NEW."Id";
 
         ELSIF NEW."EventId" IS NOT NULL THEN
             UPDATE "Images"
             SET "IsMain" = false
-            WHERE "EventId" = NEW."EventId";
+            WHERE "EventId" = NEW."EventId"
+              AND "Id" <> NEW."Id";
 
         ELSIF NEW."DestinationId" IS NOT NULL THEN
             UPDATE "Images"
             SET "IsMain" = false
-            WHERE "DestinationId" = NEW."DestinationId";
+            WHERE "DestinationId" = NEW."DestinationId"
+              AND "Id" <> NEW."Id";
 
         ELSIF NEW."LocalityId" IS NOT NULL THEN
             UPDATE "Images"
             SET "IsMain" = false
-            WHERE "LocalityId" = NEW."LocalityId";
+            WHERE "LocalityId" = NEW."LocalityId"
+              AND "Id" <> NEW."Id";
         END IF;
     END IF;
 
