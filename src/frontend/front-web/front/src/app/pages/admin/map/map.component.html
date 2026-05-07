@@ -1,144 +1,119 @@
-<div class="map-page">
-  <div class="map-shell">
-    <div class="search-bar">
-      <div class="search-input">
-        <mat-icon>search</mat-icon>
-        <input
-          type="text"
-          placeholder="Search destinations..."
-          [(ngModel)]="searchQuery"
-          (input)="onSearchInput()"
-          (focus)="showSuggestions = searchResults.length > 0"
-          (blur)="onSearchBlur()"
-          autocomplete="off"
-        />
-        @if (searchQuery) {
-          <button class="clear-btn" (click)="clearSearch()">
-            <mat-icon>close</mat-icon>
-          </button>
-        }
-      </div>
-
-      @if (showSuggestions && searchResults.length > 0) {
-        <div class="suggestions">
-          @for (result of searchResults; track result.id) {
-            <div class="suggestion-item" (mousedown)="selectSuggestion(result)">
-              <div class="suggestion-item__image">
-                @if (result.image) {
-                  <img [src]="result.image" [alt]="result.name" />
-                } @else {
-                  <mat-icon>{{ result.icon }}</mat-icon>
-                }
-              </div>
-              <div class="suggestion-item__body">
-                <span class="suggestion-item__name">{{ result.name }}</span>
-                <span class="suggestion-item__meta">{{ result.typeName }} · {{ result.location }}</span>
-              </div>
-            </div>
-          }
-        </div>
+<div #mapPage class="map-page">
+  <div class="search-bar">
+    <div class="search-input">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        placeholder="Search destinations..."
+        [(ngModel)]="searchQuery"
+        (input)="onSearchInput()"
+        (focus)="showSuggestions = searchResults.length > 0"
+        (blur)="onSearchBlur()"
+        autocomplete="off"
+      />
+      @if (searchQuery) {
+        <button class="clear-btn" (click)="clearSearch()">
+          <mat-icon>close</mat-icon>
+        </button>
       }
     </div>
 
-    <div id="main-map" class="main-map"></div>
-
-    <div class="map-controls">
-      <button class="control-btn" (click)="zoomIn()"><mat-icon>add</mat-icon></button>
-      <button class="control-btn" (click)="zoomOut()"><mat-icon>remove</mat-icon></button>
-    </div>
-  </div>
-
-  <section class="cards-panel">
-    <div class="cards-panel__header">
-      <div>
-        <h2 class="cards-panel__title">Destinations</h2>
-        <p class="cards-panel__subtitle">
-          Klik na pin centrira mapu i fokusira odgovarajuću karticu.
-        </p>
-      </div>
-      <span class="cards-panel__count">{{ allItems.length }}</span>
-    </div>
-
-    @if (allItems.length > 0) {
-      <div #cardsRail class="cards-rail">
-        @for (result of allItems; track result.id) {
-          <article
-            #destinationCard
-            class="destination-card"
-            [class.destination-card--selected]="isSelected(result)"
-            [attr.data-destination-id]="result.id"
-            (click)="selectCard(result)"
-          >
-            @if (isSelected(result)) {
-              <button class="destination-card__close" (click)="closeCard($event)">
-                <mat-icon>close</mat-icon>
-              </button>
-            }
-
-            <div class="destination-card__image-wrap">
-              @if (getItemImage(result.raw)) {
-                <img
-                  [src]="getItemImage(result.raw)"
-                  [alt]="result.raw.name"
-                  class="destination-card__image"
-                />
+    @if (showSuggestions && searchResults.length > 0) {
+      <div class="suggestions">
+        @for (result of searchResults; track result.id) {
+          <div class="suggestion-item" (mousedown)="selectSuggestion(result)">
+            <div class="suggestion-item__image">
+              @if (result.image) {
+                <img [src]="result.image" [alt]="result.name" />
               } @else {
-                <div class="destination-card__image destination-card__image--empty">
-                  <mat-icon>landscape</mat-icon>
-                </div>
+                <mat-icon>{{ result.icon }}</mat-icon>
               }
             </div>
-
-            <div class="destination-card__body">
-              <div class="destination-card__top">
-                <div class="destination-card__info">
-                  <h3 class="destination-card__name">{{ result.raw.name }}</h3>
-                  <p class="destination-card__meta">
-                    @if (getItemLocation(result.raw)) {
-                      <mat-icon>place</mat-icon>
-                      {{ getItemLocation(result.raw) }}
-                    }
-                  </p>
-                </div>
-                @if ((result.raw.averageRating ?? 0) > 0) {
-                  <div class="destination-card__rating">
-                    <mat-icon>star</mat-icon>
-                    {{ result.raw.averageRating!.toFixed(1) }}
-                  </div>
-                }
-              </div>
-
-              <div class="destination-card__badges">
-                @if (getWorkingStatus(result.raw) !== null) {
-                  <span
-                    class="badge"
-                    [class.badge--open]="getWorkingStatus(result.raw)"
-                    [class.badge--closed]="!getWorkingStatus(result.raw)"
-                  >
-                    {{ getWorkingStatus(result.raw) ? 'OPEN NOW' : 'CLOSED' }}
-                  </span>
-                }
-                @if (result.raw.distanceKm != null) {
-                  <span class="badge badge--distance">
-                    <mat-icon>near_me</mat-icon>{{ formatDistance(result.raw.distanceKm) }}
-                  </span>
-                }
-              </div>
-
-              <div class="destination-card__actions">
-                <button class="destination-card__btn" (click)="openDetails(result.raw); $event.stopPropagation()">
-                  Details
-                </button>
-              </div>
+            <div class="suggestion-item__body">
+              <span class="suggestion-item__name">{{ result.name }}</span>
+              <span class="suggestion-item__meta">{{ result.typeName }} · {{ result.location }}</span>
             </div>
-          </article>
+          </div>
         }
       </div>
-    } @else {
-      <div class="cards-empty">
-        <mat-icon>travel_explore</mat-icon>
-        <span>No destinations available for the admin map yet.</span>
-      </div>
     }
-  </section>
+  </div>
+
+  <div id="main-map" class="main-map"></div>
+
+  <div class="map-controls">
+    <button class="control-btn" (click)="zoomIn()"><mat-icon>add</mat-icon></button>
+    <button class="control-btn" (click)="zoomOut()"><mat-icon>remove</mat-icon></button>
+  </div>
+
+  @if (selectedItem) {
+    <div
+      #cardElement
+      class="bottom-card bottom-card--anchored"
+      [class.bottom-card--hidden]="!isCardVisible"
+      [style.left.px]="cardPosition.left"
+      [style.top.px]="cardPosition.top"
+      (click)="$event.stopPropagation()"
+    >
+      <button class="bottom-card__close" (click)="closeCard($event)">
+        <mat-icon>close</mat-icon>
+      </button>
+
+      <div class="bottom-card__image-wrap">
+        @if (getItemImage(selectedItem)) {
+          <img
+            [src]="getItemImage(selectedItem)"
+            [alt]="selectedItem.name"
+            class="bottom-card__image"
+            (load)="onCardImageLoad()"
+          />
+        } @else {
+          <div class="bottom-card__image bottom-card__image--empty">
+            <mat-icon>landscape</mat-icon>
+          </div>
+        }
+      </div>
+
+      <div class="bottom-card__body">
+        <div class="bottom-card__top">
+          <div class="bottom-card__info">
+            <h3 class="bottom-card__name">{{ selectedItem.name }}</h3>
+            <p class="bottom-card__meta">
+              @if (getItemLocation(selectedItem)) {
+                <mat-icon>place</mat-icon>
+                {{ getItemLocation(selectedItem) }}
+              }
+            </p>
+          </div>
+          @if ((selectedItem.averageRating ?? 0) > 0) {
+            <div class="bottom-card__rating">
+              <mat-icon>star</mat-icon>
+              {{ selectedItem.averageRating!.toFixed(1) }}
+            </div>
+          }
+        </div>
+
+        <div class="bottom-card__badges">
+          @if (getWorkingStatus(selectedItem) !== null) {
+            <span
+              class="badge"
+              [class.badge--open]="getWorkingStatus(selectedItem)"
+              [class.badge--closed]="!getWorkingStatus(selectedItem)"
+            >
+              {{ getWorkingStatus(selectedItem) ? 'OPEN NOW' : 'CLOSED' }}
+            </span>
+          }
+          @if (selectedItem.distanceKm != null) {
+            <span class="badge badge--distance">
+              <mat-icon>near_me</mat-icon>{{ formatDistance(selectedItem.distanceKm) }}
+            </span>
+          }
+        </div>
+
+        <div class="bottom-card__actions">
+          <button class="bottom-card__btn" (click)="openDetails(selectedItem)">Details</button>
+        </div>
+      </div>
+    </div>
+  }
 </div>
