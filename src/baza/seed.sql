@@ -5886,7 +5886,7 @@ VALUES
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
     NOW()),
 (
-    'https://twopacksandapup.com/wp-content/uploads/2025/06/Durmitor-Feat-scaled.jpg',
+    'https://www.mtlrentacar.com/uploads/5dd410b39156f.jpg',
     'Durmitor',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
