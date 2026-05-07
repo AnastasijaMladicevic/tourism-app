@@ -12274,7 +12274,33 @@ VALUES
 ('Andrija', 'Stojanovic', '1996-08-09', 'andrija.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 ('Teodora', 'Pavlovic', '1998-06-06', 'teodora.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Mina', 'Savic', '1998-02-14', 'mina.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+(SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'), 
+('Filip', 'Kostic', '1997-05-20', 'filip.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+(SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Kristina', 'Vukovic', '1999-09-12', 'kristina.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+(SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+ ('Marko', 'Petrovic', '1988-03-14', 'manager.nis@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001001', 'Srbija', 'sr', true, true, false, false,
+(SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Ivana', 'Jankovic', '1991-07-22', 'manager.kragujevac@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001002', 'Srbija', 'sr', true, true, false, false,
+(SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Nikola', 'Radulovic', '1987-11-09', 'manager.subotica@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001003', 'Srbija', 'sr', true, true, false, false,
+(SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Jovana', 'Maksimovic', '1990-04-17', 'manager.kopaonik@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001004', 'Srbija', 'sr', true, true, false, false,
+(SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Milos', 'Stankovic', '1989-09-28', 'manager.tara@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001005', 'Srbija', 'sr', true, true, false, false,
+(SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(),'/images/profiles/default_icon.png'),
+('Aleksandra', 'Milosevic', '1992-12-03', 'manager.djerdap@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001006', 'Srbija', 'sr', true, true, false, false,
+(SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Sofija', 'Nikolic', '1994-06-30', 'manager.vrnjackabanja@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001007', 'Srbija', 'sr', true, true, false, false,
+(SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Luka', 'Zivkovic', '1986-01-11', 'manager.palic@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001008', 'Srbija', 'sr', true, true, false, false,
+(SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Tamara', 'Ristic', '1993-08-19', 'manager.uvac@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001009', 'Srbija', 'sr', true, true, false, false,
+(SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Stefan', 'Obradovic', '1990-10-08', 'manager.mokragora@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001010', 'Srbija', 'sr', true, true, false, false,
+(SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
 
 -- 15.1 ITALIJA + SRBIJA DESTINACIJE
 INSERT INTO "Destinations"
@@ -12327,7 +12353,77 @@ VALUES
  (SELECT "Id" FROM "Regions" WHERE "Code" = 'RS'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.zlatibor@spirego.com'),
- NOW(), NOW());
+ NOW(), NOW()),
+('Niš', 'Tvrdjava, merak i ukus juga Srbije', 'Nis je jedan od najstarijih gradova Balkana poznat po spoju istorijskih lokaliteta, opustenog juznjackog ritma i veoma jake gastronomske scene. Posetioci ovde mogu da obidju Nisku tvrdjavu, Cuvenu Cele kulu i da veceri provedu uz tradicionalnu hranu, muziku i duza druzenja u centru grada.',
+ST_SetSRID(ST_MakePoint(21.8954, 43.3209), 4326), 'Approved', true,
+(SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+(SELECT "Id" FROM "Regions" WHERE "Code" = 'RS'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'manager.nis@spirego.com'),
+NOW(), NOW()),
+('Kragujevac', 'Istorija, parkovi i energija univerzitetskog grada', 'Kragujevac kombinuje istorijski znacaj prve moderne srpske prestonice sa danasnjim studentskim i urbanim ritmom. Grad je poznat po memorijalnom parku Sumarice, velikim zelenim povrsinama, kaficima i atmosferi koja je dovoljno mirna za odmor, ali i dovoljno ziva za duze gradske vikende.',
+ST_SetSRID(ST_MakePoint(20.9174, 44.0129), 4326), 'Approved', true,
+(SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+(SELECT "Id" FROM "Regions" WHERE "Code" = 'RS'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'manager.kragujevac@spirego.com'),
+NOW(), NOW()),
+('Subotica','Secesija, trgovi i severnjacki ritam grada','Subotica je prepoznatljiva po secesijskoj arhitekturi, sirokim trgovima i opustenijem ritmu severa Srbije. Grad je odlican za setnje, obilazak istorijskog centra i krace izlete ka Palicu, uz bogatu mesavinu kultura, hrane i arhitektonskih detalja.',
+ST_SetSRID(ST_MakePoint(19.6571, 46.0943), 4326),'Approved', true,
+(SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+(SELECT "Id" FROM "Regions" WHERE "Code" = 'RS'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'manager.subotica@spirego.com'),
+NOW(), NOW()),
+('Kopaonik', 'Sneg, wellness i planinski dani bez zurbe', 'Kopaonik je najpoznatiji ski centar Srbije i destinacija koja tokom cele godine okuplja ljubitelje prirode, aktivnog odmora i planinskog vazduha. Zimi dominiraju skijanje i snowboard, dok topliji meseci donose setnje, panoramske poglede i opusteniji wellness odmor.',
+ST_SetSRID(ST_MakePoint(20.8263, 43.2679), 4326),'Approved', true,
+(SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ski centar'),
+(SELECT "Id" FROM "Regions" WHERE "Code" = 'RS'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'manager.kopaonik@spirego.com'),
+NOW(), NOW()),
+('Tara', 'Vidikovci, sume i mir zapadne Srbije', 'Nacionalni park Tara poznat je po gustim sumama, vidikovcima iznad Drine i atmosferi koja odgovara sporijem odmoru u prirodi. Destinacija je pogodna za planinare, porodice i posetioce koji traze tisinu, panoramske poglede i boravak daleko od gradske guzve.',
+ST_SetSRID(ST_MakePoint(19.4596, 43.8481), 4326), 'Approved', true,
+(SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Nacionalni Park'),
+(SELECT "Id" FROM "Regions" WHERE "Code" = 'RS'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'manager.tara@spirego.com'),
+NOW(), NOW()),
+('Đerdap', 'Dunavske klisure i putevi kroz prirodu i istoriju', 'Nacionalni park Djerdap obuhvata neke od najimpresivnijih dunavskih pejzaza u ovom delu Evrope, sa klisurama, tvrdjavama i panoramskim putevima uz reku. Posetioci mogu da kombinuju voznje brodom, obilazak tvrdjave Golubac i duge voznje kroz prirodu.',
+ST_SetSRID(ST_MakePoint(21.9802, 44.5289), 4326), 'Approved', true,
+(SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Nacionalni Park'),
+(SELECT "Id" FROM "Regions" WHERE "Code" = 'RS'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'manager.djerdap@spirego.com'),
+NOW(), NOW()),
+('Vrnjačka Banja', 'Parkovi, izvori i lagani spa vikendi', 'Vrnjacka Banja je jedna od najpoznatijih banjskih destinacija Srbije, poznata po uredjenim parkovima, wellness centrima i mirnijem tempu odmora. Posetioci ovde najcesce dolaze zbog opustanja, setnji i kombinacije spa sadrzaja i prijatne gradske atmosfere.',
+ST_SetSRID(ST_MakePoint(20.8959, 43.6249), 4326), 'Approved', true,
+(SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Banja'),
+(SELECT "Id" FROM "Regions" WHERE "Code" = 'RS'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'manager.vrnjackabanja@spirego.com'),
+NOW(), NOW()),
+('Palić', 'Jezero, setalista i mirniji sever Srbije', 'Palic je poznat po jezeru, dugackim setalistima i arhitekturi koja podseca na stara evropska odmaralista. Destinacija odgovara posetiocima koji zele sporiji ritam, voznju bicikla, vina severa Srbije i vikend odmor bez velike guzve.',
+ST_SetSRID(ST_MakePoint(19.7603, 46.0967), 4326), 'Approved', true,
+(SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Jezero'),
+(SELECT "Id" FROM "Regions" WHERE "Code" = 'RS'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'manager.palic@spirego.com'),
+NOW(), NOW()),
+('Uvac', 'Meandri, vidikovci i netaknuta priroda', 'Uvac je jedna od najfotografisanijih prirodnih destinacija Srbije zahvaljujuci dramaticnim meandrima reke, vidikovcima i bogatom zivotinjskom svetu. Posetioci ovde dolaze zbog voznji camcem, planinarenja i pogleda koji predstavljaju jedan od najprepoznatljivijih pejzaza zemlje.',
+ST_SetSRID(ST_MakePoint(19.9759, 43.2961), 4326), 'Approved', true,
+(SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Rezervat prirode'),
+(SELECT "Id" FROM "Regions" WHERE "Code" = 'RS'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'manager.uvac@spirego.com'),
+NOW(), NOW()),
+('Mokra Gora', 'Drvengrad, Sarganska osmica i planinski mir', 'Mokra Gora je turisticka regija poznata po usporenom planinskom ritmu, uskoj pruzi Sarganske osmice i Drvengradu kao jednoj od najprepoznatljivijih atrakcija zapadne Srbije. Destinacija je pogodna za vikend odmore, voznje prirodom i mirnije obilaske bez gradske guzve.',
+ST_SetSRID(ST_MakePoint(19.5102, 43.7929), 4326), 'Approved', true,
+(SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Turisticka Regija'),
+(SELECT "Id" FROM "Regions" WHERE "Code" = 'RS'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+(SELECT "Id" FROM "Users" WHERE "Email" = 'manager.mokragora@spirego.com'),
+NOW(), NOW());
 
 UPDATE "Users"
 SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rome')
@@ -12352,6 +12448,46 @@ WHERE "Email" = 'manager.novisad@spirego.com';
 UPDATE "Users"
 SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor')
 WHERE "Email" = 'manager.zlatibor@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niš')
+WHERE "Email" = 'manager.nis@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kragujevac')
+WHERE "Email" = 'manager.kragujevac@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Subotica')
+WHERE "Email" = 'manager.subotica@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kopaonik')
+WHERE "Email" = 'manager.kopaonik@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tara')
+WHERE "Email" = 'manager.tara@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Đerdap')
+WHERE "Email" = 'manager.djerdap@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Vrnjačka Banja')
+WHERE "Email" = 'manager.vrnjackabanja@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Palić')
+WHERE "Email" = 'manager.palic@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Uvac')
+WHERE "Email" = 'manager.uvac@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Mokra Gora')
+WHERE "Email" = 'manager.mokragora@spirego.com';
 
 -- 15.2 ITALIJA + SRBIJA LOKALITETI
 INSERT INTO "Localities"
@@ -12700,7 +12836,17 @@ WITH source("Url", "AltText", "IsMain", "DestinationName") AS (
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'Florence', true, 'Florence'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Belgrade', true, 'Belgrade'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Novi Sad', true, 'Novi Sad'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Zlatibor', true, 'Zlatibor')
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Zlatibor', true, 'Zlatibor'),
+    ('https://upload.wikimedia.org/wikipedia/commons/2/24/Panorama_Nisa.JPG', 'Niš', true, 'Niš'),
+    ('https://upload.wikimedia.org/wikipedia/commons/9/92/View_on_the_city_of_Kragujevac.jpg?utm_source=en.wikivoyage.org&utm_campaign=index&utm_content=original', 'Kragujevac', true, 'Kragujevac'),
+    ('https://upload.wikimedia.org/wikipedia/commons/f/fe/View_of_Subotica_2_%282024%29.jpg', 'Subotica', true, 'Subotica'),
+    ('https://upload.wikimedia.org/wikipedia/commons/4/4c/Pan%C4%8Di%C4%87ev_vrh_during_winter.jpg', 'Kopaonik', true, 'Kopaonik'),
+    ('https://upload.wikimedia.org/wikipedia/commons/8/82/Tarski_pejza%C5%BE%2C_jezero_Spaji%C4%87i%2C_Nacionalni_park_Tara.jpg', 'Tara', true, 'Tara'),
+    ('https://upload.wikimedia.org/wikipedia/commons/7/77/Veliki_Kazan.jpg', 'Đerdap', true, 'Đerdap'),
+    ('https://kompaskazesrbija.rs/wp-content/uploads/2020/06/vrnjacka-banja-slike-scaled.jpg', 'Vrnjačka Banja', true, 'Vrnjačka Banja'),
+    ('https://upload.wikimedia.org/wikipedia/commons/6/6e/Palic_panorama.jpg', 'Palić', true, 'Palić'),
+    ('https://upload.wikimedia.org/wikipedia/commons/0/03/Uvac_River_and_Eagle.jpg', 'Uvac', true, 'Uvac'),
+    ('https://upload.wikimedia.org/wikipedia/commons/f/f7/Mokra_Gora%2C_pohled_na_obec_od_Drvengradu.JPG', 'Mokra Gora', true, 'Mokra Gora')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", d."Id", NOW()
