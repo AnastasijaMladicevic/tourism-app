@@ -82,6 +82,11 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {
+        path: 'profile',
+        loadComponent: () =>
+          import('./pages/content-creator/profile/profile').then(m => m.ProfileComponentContentCreator)
+      },
+      {
         path: 'dashboard',
         loadComponent: () =>
           import('./pages/content-creator/dashboard/dashboard.component').then(m => m.ContentCreatorDashboardComponent)
