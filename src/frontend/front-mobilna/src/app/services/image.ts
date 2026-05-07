@@ -66,4 +66,22 @@ export class ImageService {
   getAll(): Observable<ImageDto[]> {
     return this.http.get<ImageDto[]>(this.apiUrl);
   }
+  uploadReviewImages(reviewId: number, files: File[]) {
+    const formData = new FormData();
+
+    files.forEach(file => {
+      formData.append('Files', file);
+    });
+
+    return this.http.post(
+      `${environment.apiUrl}/reviews/${reviewId}/images`,
+      formData
+    );
+  }
+
+  getForReview(reviewId: number) {
+    return this.http.get<ImageDto[]>(
+      `${environment.apiUrl}/reviews/${reviewId}/images`
+    );
+  }
 }

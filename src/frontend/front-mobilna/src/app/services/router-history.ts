@@ -10,7 +10,19 @@ export class RouterHistoryService {
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe((e: any) => {
-        this.history.push(e.urlAfterRedirects);
+        const url = e.urlAfterRedirects;
+
+        // ne cuvaj login u history
+        if (url.startsWith('/login')) {
+          return;
+        }
+
+        // izbegni duplikate
+        const last = this.history[this.history.length - 1];
+
+        if (last !== url) {
+          this.history.push(url);
+        }
       });
   }
 

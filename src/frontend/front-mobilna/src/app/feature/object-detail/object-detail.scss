@@ -78,15 +78,18 @@ button:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   color: var(--emperor);
   z-index: 10;
+  cursor: pointer;
 }
 
 .fav-btn--active {
   color: #e74c3c;
+  cursor: pointer;
 }
 
 /* desktop verzija sakrivena po defaultu */
 .fav-btn--desktop {
   display: none;
+  cursor: pointer;
 }
 
 @media (min-width: 900px) {
@@ -183,6 +186,7 @@ button:hover {
 .planner-btn {
   margin-bottom: 32px;
   width: 100%;
+  cursor: pointer;
 }
 
 .location-info {
@@ -210,6 +214,7 @@ button:hover {
   border: none;
   border-radius: 12px;
   font-weight: 600;
+  cursor: pointer;
 }
 
 /* Da se ::after bolje vidi */
@@ -274,6 +279,7 @@ button:hover {
   border: none;
   font-weight: 600;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
 }
 
 .btn-outline {
@@ -284,6 +290,7 @@ button:hover {
   border: 2px solid var(--primary);
   color: var(--primary);
   background: transparent;
+  cursor: pointer;
 }
 
 .section h2 {
@@ -379,6 +386,7 @@ button:hover {
   border: none;
   border-radius: 20px;
   font-size: 14px;
+  cursor: pointer;
 }
 
 .cuisine {
@@ -430,6 +438,7 @@ button:hover {
   border-radius: 9999px;
   font-size: 13px;
   font-weight: 600;
+  cursor: pointer;
 }
 
 .btn {
@@ -437,6 +446,7 @@ button:hover {
   border-radius: 12px;
   font-weight: 600;
   width: 100%;
+  cursor: pointer;
 }
 
 .btn-map,
@@ -452,6 +462,7 @@ button:hover {
   background: transparent;
   border: 2px solid var(--primary);
   color: var(--primary);
+  cursor: pointer;
 }
 
 .btn-reserve {
@@ -462,6 +473,7 @@ button:hover {
   padding: 16px;
   font-size: 16px;
   font-weight: 700;
+  cursor: pointer;
 }
 
 .left {
@@ -969,6 +981,7 @@ button:hover {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  cursor: pointer;
 }
 
 .modal-title {
@@ -1151,96 +1164,6 @@ button:hover {
   transform: translateY(-3px);
 }
 
-.review-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  z-index: 1100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-}
-
-.modal-content-review {
-  background: white;
-  border-radius: 24px;
-  width: 100%;
-  max-width: 460px;
-  padding: 28px 24px;
-  position: relative;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.rating-stars {
-  font-size: 48px;
-  display: flex;
-  gap: 6px;
-  justify-content: center;
-  margin: 20px 0 24px;
-  color: #ddd;
-  cursor: pointer;
-}
-
-.rating-stars .filled {
-  color: #facc15;
-}
-
-textarea {
-  width: 100%;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 14px;
-  font-size: 15.5px;
-  resize: vertical;
-  min-height: 130px;
-}
-
-.photo-upload {
-  margin: 20px 0;
-  padding: 20px;
-  border: 2px dashed #cbd5e1;
-  border-radius: 16px;
-  background: #f8fafc;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-}
-
-.upload-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-
-  cursor: pointer;
-  color: var(--primary);
-  font-weight: 600;
-
-  mat-icon {
-    margin-bottom: 5px;
-  }
-}
-
-.photo-upload small {
-  color: #64748b;
-  white-space: nowrap;
-}
-
-.submit-review-btn {
-  width: 100%;
-  padding: 16px;
-  margin-top: 16px;
-  background: var(--primary);
-  color: white;
-  border: none;
-  border-radius: 9999px;
-  font-size: 16px;
-  font-weight: 700;
-}
-
 /* Loading Screen - centrirano na sredini ekrana */
 .loading-screen {
   position: fixed;
@@ -1253,6 +1176,7 @@ textarea {
   align-items: center;
   justify-content: center;
   z-index: 9999;
+
 }
 
 
@@ -1315,4 +1239,130 @@ textarea {
 
 .review-for {
   padding-top: 4px;
+}
+
+/* ====================== WRITE REVIEW MODAL ====================== */
+.review-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-content-review {
+  background: white;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 460px;
+  padding: 28px 24px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.rating-stars {
+  font-size: 48px;
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin: 20px 0 24px;
+  color: #ddd;
+  cursor: pointer;
+}
+
+.rating-stars .filled {
+  color: #facc15;
+}
+
+textarea {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 15.5px;
+  resize: vertical;
+  min-height: 130px;
+  margin-bottom: 16px;
+}
+
+.photo-upload {
+  margin: 16px 0 24px;
+  padding: 20px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 16px;
+  background: #f8fafc;
+  text-align: center;
+}
+
+.upload-label {
+  cursor: pointer;
+  color: var(--primary);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.review-preview-grid {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.preview-item {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-preview-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.submit-review-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.upload-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
 }

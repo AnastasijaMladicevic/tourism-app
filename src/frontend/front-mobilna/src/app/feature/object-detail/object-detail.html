@@ -427,17 +427,30 @@
 
       <!-- Upload slika -->
       <div class="photo-upload">
-        <label class="upload-label">
-          <mat-icon>add_a_photo</mat-icon>
-          Dodaj fotografije (max 5)
-          <input 
-            type="file" 
-            multiple 
-            accept="image/*" 
-            (change)="onReviewImagesSelected($event)" 
-            hidden>
-        </label>
-        <small>{{ newReview.images.length }}/5 slika</small>
+        <div class="upload-row">
+          <label class="upload-label">
+            <mat-icon>add_a_photo</mat-icon>
+            Dodaj fotografije (max 5)
+            <input 
+              type="file" 
+              multiple 
+              accept="image/*" 
+              (change)="onReviewImagesSelected($event)" 
+              hidden>
+          </label>
+          <small>{{ selectedReviewImages.length }}/5 slika</small>
+        </div>
+
+        @if (reviewImagePreviews.length > 0) {
+          <div class="review-preview-grid">
+            @for (preview of reviewImagePreviews; track $index; let i = $index) {
+              <div class="preview-item">
+                <img [src]="preview" alt="Preview">
+                <button class="remove-preview-btn" (click)="removeReviewImage(i)">×</button>
+              </div>
+            }
+          </div>
+        }
       </div>
 
       <button 
