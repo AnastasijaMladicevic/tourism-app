@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using TuristickiVodic.Core.Validation;
 
 namespace TuristickiVodic.Core.DTO
 {
     public class UpdateImageDto
     {
-        [MaxLength(ValidationLengths.ImageUrl)]
-        public string? Url { get; set; }
+        // URL se više ne menja direktno - slika se briše i dodaje nova
+        // Ostavljamo samo AltText i IsMain kao editabilna polja
 
         [MaxLength(ValidationLengths.ImageAltText)]
         public string? AltText { get; set; }

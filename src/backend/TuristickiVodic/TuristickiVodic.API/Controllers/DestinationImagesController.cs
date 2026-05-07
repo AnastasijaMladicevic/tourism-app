@@ -39,10 +39,8 @@ namespace TuristickiVodic.API.Controllers
             try
             {
                 var image = await _service.GetMainForDestinationAsync(destinationId);
-
                 if (image == null)
                     return NotFound(new { message = "No main image found for this destination." });
-
                 return Ok(image);
             }
             catch (KeyNotFoundException ex)
@@ -53,17 +51,14 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Add(int destinationId, [FromBody] AddImageDto dto)
+        public async Task<IActionResult> Add(int destinationId, [FromForm] AddImageDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
-                var created = await _service.AddToDestinationAsync(
-                    destinationId,
-                    dto,
-                    GetUserId(),
-                    GetRole()
-                );
-
+                var created = await _service.AddToDestinationAsync(destinationId, dto, GetUserId(), GetRole());
                 return CreatedAtAction(nameof(ImagesController.GetById), "Image", new { id = created.Id }, created);
             }
             catch (UnauthorizedAccessException)

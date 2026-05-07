@@ -41,7 +41,6 @@ namespace TuristickiVodic.API.Controllers
                 var image = await _imageService.GetMainForLocalityAsync(localityId);
                 if (image == null)
                     return NotFound(new { message = "No main image found for this locality." });
-
                 return Ok(image);
             }
             catch (KeyNotFoundException ex)
@@ -52,7 +51,7 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ContentCreator,Manager,Admin")]
-        public async Task<IActionResult> Add(int localityId, [FromBody] AddImageDto dto)
+        public async Task<IActionResult> Add(int localityId, [FromForm] AddImageDto dto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -76,15 +75,7 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
-        private int GetUserId()
-        {
-            var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return int.Parse(value!);
-        }
-
-        private string GetRoleName()
-        {
-            return User.FindFirstValue(ClaimTypes.Role)!;
-        }
+        private int GetUserId() => int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        private string GetRoleName() => User.FindFirstValue(ClaimTypes.Role)!;
     }
 }

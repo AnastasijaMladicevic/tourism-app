@@ -46,8 +46,11 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "ContentCreator")]
-        public async Task<IActionResult> Add(int activityId, [FromBody] AddImageDto dto)
+        public async Task<IActionResult> Add(int activityId, [FromForm] AddImageDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
                 var result = await _service.AddToActivityAsync(activityId, dto, GetUserId(), GetRole());
