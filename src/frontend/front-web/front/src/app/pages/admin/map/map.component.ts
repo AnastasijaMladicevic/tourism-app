@@ -59,6 +59,7 @@ interface AdminMapDestination extends DestinationDto {
   encapsulation: ViewEncapsulation.None,
 })
 export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
+  private static readonly TARGET_DETAIL_ZOOM = 15;
   @ViewChild('cardElement') private cardElementRef?: ElementRef<HTMLElement>;
   @ViewChild('mapPage') private mapPageRef?: ElementRef<HTMLElement>;
 
@@ -387,10 +388,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const targetLatLng = L.latLng(latitude, longitude);
     const currentZoom = map.getZoom();
-    const targetZoom = Math.max(currentZoom, 16);
+    const targetZoom = MapComponent.TARGET_DETAIL_ZOOM;
     const currentCenter = map.getCenter();
-    const isAlreadyFocused =
-      currentZoom >= targetZoom && currentCenter.distanceTo(targetLatLng) < 6;
+    const distanceToTarget = currentCenter.distanceTo(targetLatLng);
+    const isAlreadyFocused = currentZoom >= targetZoom && distanceToTarget < 6;
 
     if (isAlreadyFocused) {
       this.scheduleCardPresentation();
@@ -398,7 +399,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     map.once('moveend', () => this.scheduleCardPresentation());
-    map.flyTo(targetLatLng, targetZoom, { duration: 0.65 });
+
+    if (currentZoom < targetZoom) {
+      map.flyTo(targetLatLng, targetZoom, { duration: 0.75 });
+      return;
+    }
+
+    map.panTo(targetLatLng, { animate: true, duration: 0.45 });
   }
 
   private scheduleCardPresentation(): void {
