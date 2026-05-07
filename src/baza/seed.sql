@@ -12354,7 +12354,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.zlatibor@spirego.com'),
  NOW(), NOW()),
-('Niš', 'Tvrđava, merak i ukus juga Srbije', 'Niš je jedan od najstarijih gradova Balkana poznat po spoju istorijskih lokaliteta, opuštenog južnjackog ritma i veoma jake gastronomske scene. Posetioci ovde mogu da obišu Nišku tvrđavu, Ćuvenu Ćele kulu i da vecčeri provedu uz tradicionalnu hranu, muziku i duža druženja u centru grada.',
+('Niš', 'Tvrđava, merak i ukus juga Srbije', 'Niš je jedan od najstarijih gradova Balkana poznat po spoju istorijskih lokaliteta, opuštenog južnjačkog ritma i veoma jake gastronomske scene. Posetioci ovde mogu da obiđu Nišku tvrđavu, Ćuvenu Ćele kulu i da vecčeri provedu uz tradicionalnu hranu, muziku i duža druženja u centru grada.',
 ST_SetSRID(ST_MakePoint(21.8954, 43.3209), 4326), 'Approved', true,
 (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
 (SELECT "Id" FROM "Regions" WHERE "Code" = 'RS'),
