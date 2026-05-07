@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as L from 'leaflet';
+import 'leaflet.markercluster';
 
 interface MarkerEntry {
   marker: L.Marker;
@@ -9,12 +10,18 @@ interface MarkerEntry {
   lng: number;
 }
 
+interface MapInitOptions {
+  enableClustering?: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class MapService {
   private markers: MarkerEntry[] = [];
   private markerMap = new Map<string, MarkerEntry>();
   private activeMarkerKey: string | null = null;
   private map: L.Map | null = null;
+  private clusterGroup: L.MarkerClusterGroup | null = null;
+  private clusteringEnabled = false;
   private activeFilters: string[] = [];
 
   private readonly filterMap: Record<string, string[]> = {
@@ -52,10 +59,18 @@ export class MapService {
     return marker;
   }
 
-  initMap(containerId: string, lat = 42.424, lng = 18.771, zoom = 13): L.Map | null {
+  initMap(
+    containerId: string,
+    lat = 42.424,
+    lng = 18.771,
+    zoom = 13,
+    options?: MapInitOptions,
+  ): L.Map | null {
     if (this.map) {
       this.destroyMap();
     }
+
+    this.clusteringEnabled = !!options?.enableClustering;
 
     try {
       this.map = L.map(containerId, {
@@ -68,7 +83,17 @@ export class MapService {
         attribution: '',
       }).addTo(this.map);
 
-      this.map.on('moveend zoomend', () => this.syncVisibleMarkers());
+      if (this.clusteringEnabled) {
+        this.clusterGroup = this.createClusterGroup();
+        this.clusterGroup.addTo(this.map);
+        this.map.on('moveend zoomend', () => {
+          this.clusterGroup?.refreshClusters();
+          this.updateMarkerStyles();
+        });
+      } else {
+        this.map.on('moveend zoomend', () => this.syncVisibleMarkers());
+      }
+
       return this.map;
     } catch (error) {
       console.error('Greska pri kreiranju mape:', error);
@@ -113,6 +138,8 @@ export class MapService {
       this.map = null;
     }
 
+    this.clusterGroup = null;
+    this.clusteringEnabled = false;
     this.markers = [];
     this.markerMap.clear();
     this.activeMarkerKey = null;
@@ -120,7 +147,7 @@ export class MapService {
 
   flyTo(lat: number, lng: number, zoom = 16): void {
     if (this.map) {
-      this.map.flyTo([lat, lng], zoom, { duration: 1.5 });
+      this.map.flyTo([lat, lng], zoom, { duration: 1.1 });
     }
   }
 
@@ -151,11 +178,15 @@ export class MapService {
     this.markerMap.set(key, entry);
 
     marker.on('click', () => {
+      this.map?.panTo([lat, lng], { animate: true, duration: 0.6 });
       this.activateMarker(key);
       if (onClick) onClick();
     });
 
-    if (autoSync) {
+    if (this.clusteringEnabled && this.clusterGroup) {
+      this.clusterGroup.addLayer(marker);
+      this.updateMarkerStyles();
+    } else if (autoSync) {
       this.syncVisibleMarkers();
     }
 
@@ -188,8 +219,19 @@ export class MapService {
       return;
     }
 
-    this.activateMarker(key);
-    this.map?.flyTo([found.lat, found.lng], zoom);
+    const revealMarker = () => {
+      if (this.map) {
+        this.map.flyTo([found.lat, found.lng], zoom, { duration: 0.9 });
+      }
+      this.activateMarker(key);
+    };
+
+    if (this.clusteringEnabled && this.clusterGroup) {
+      this.clusterGroup.zoomToShowLayer(found.marker, revealMarker);
+      return;
+    }
+
+    revealMarker();
   }
 
   clearMarkerFocus(): void {
@@ -204,6 +246,12 @@ export class MapService {
 
   syncVisibleMarkers(): void {
     if (!this.map) {
+      return;
+    }
+
+    if (this.clusteringEnabled) {
+      this.clusterGroup?.refreshClusters();
+      this.updateMarkerStyles();
       return;
     }
 
@@ -254,6 +302,26 @@ export class MapService {
     });
   }
 
+  private createClusterGroup(): L.MarkerClusterGroup {
+    return L.markerClusterGroup({
+      showCoverageOnHover: false,
+      spiderfyOnMaxZoom: true,
+      zoomToBoundsOnClick: true,
+      removeOutsideVisibleBounds: false,
+      maxClusterRadius: 54,
+      iconCreateFunction: (cluster) => {
+        const count = cluster.getChildCount();
+        const sizeClass = count < 10 ? 'small' : count < 30 ? 'medium' : 'large';
+
+        return L.divIcon({
+          html: `<span>${count}</span>`,
+          className: `destination-cluster destination-cluster--${sizeClass}`,
+          iconSize: [46, 46],
+        });
+      },
+    });
+  }
+
   private matchesCurrentFilters(type: string): boolean {
     if (!this.activeFilters.length) {
       return true;
@@ -268,27 +336,27 @@ export class MapService {
 
   private getMarkerEmoji(type: string): string {
     const icons: Record<string, string> = {
-      destination: '📍',
-      locality: '🏙',
-      event: '🎉',
-      activity: '🚶',
-      hotel: '🏨',
-      apartment: '🏠',
-      restaurant: '🍽',
-      kafana: '🍷',
-      club: '🎵',
-      winery: '🍇',
-      bar: '🍸',
-      cafe: '☕',
-      gas_station: '⛽',
-      shop: '🛍',
-      mall: '🛒',
-      market: '🛒',
-      hospital: '🏥',
-      clinic: '🏥',
-      pharmacy: '💊',
-      attraction: '📌',
-      default: '📍',
+      destination: '&#128205;',
+      locality: '&#127961;',
+      event: '&#127881;',
+      activity: '&#128694;',
+      hotel: '&#127968;',
+      apartment: '&#127968;',
+      restaurant: '&#127869;',
+      kafana: '&#127863;',
+      club: '&#127925;',
+      winery: '&#127815;',
+      bar: '&#127864;',
+      cafe: '&#9749;',
+      gas_station: '&#9971;',
+      shop: '&#128717;',
+      mall: '&#128722;',
+      market: '&#128722;',
+      hospital: '&#127973;',
+      clinic: '&#127973;',
+      pharmacy: '&#128138;',
+      attraction: '&#128204;',
+      default: '&#128205;',
     };
     return icons[type] ?? icons['default'];
   }
