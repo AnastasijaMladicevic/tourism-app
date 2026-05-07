@@ -21,23 +21,30 @@ export class ManagerLayoutComponent implements OnInit {
     avatarUrl: null,
   };
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(private router: Router, private authService: AuthService) { }
 
   ngOnInit(): void {
-    this.loadUserData();
+    this.loadUser();
+    window.addEventListener('storage', this.loadUser);
   }
+  ngOnDestroy(): void {
+    window.removeEventListener('storage', this.loadUser);
+  }
+  private loadUser = (): void => {
+    const userData = this.authService.getCurrentUser();
 
-  private loadUserData(): void {
-    const userData = this.authService.getUser();
-    if (userData) {
-      this.user = {
-        name: `${userData.firstName} ${userData.lastName}`,
-        email: userData.email,
-        initials: this.getInitials(userData.firstName, userData.lastName),
-        avatarUrl: null,
-      };
+    if (!userData) {
+      this.router.navigate(['/login']);
+      return;
     }
-  }
+
+    this.user = {
+      name: `${userData.firstName} ${userData.lastName}`,
+      email: userData.email,
+      initials: `${userData.firstName[0]}${userData.lastName[0]}`.toUpperCase(),
+      avatarUrl: userData.profileImageUrl || ''
+    };
+  };
 
   private getInitials(firstName: string, lastName: string): string {
     const first = (firstName || '').charAt(0).toUpperCase();
