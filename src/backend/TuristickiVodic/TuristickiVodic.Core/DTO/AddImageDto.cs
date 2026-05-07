@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 using TuristickiVodic.Core.Validation;
 
 namespace TuristickiVodic.Core.DTO

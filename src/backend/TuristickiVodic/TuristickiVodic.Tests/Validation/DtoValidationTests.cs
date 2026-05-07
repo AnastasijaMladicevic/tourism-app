@@ -1507,36 +1507,14 @@ namespace TuristickiVodic.Tests.Validation
         // ═══════════════════════════════════════════
 
         [Fact]
-        public void UpdateImageDto_ValidanUrl_JeValidan()
+        public void UpdateImageDto_SaAltText_UspesnoJeValidan()
         {
             var dto = new UpdateImageDto
             {
-                Url = "test.jpg"
+                AltText = "Opis slike"
             };
 
             IsValid(dto).Should().BeTrue();
-        }
-
-        [Fact]
-        public void UpdateImageDto_UrlMax2000_JeValidan()
-        {
-            var dto = new UpdateImageDto
-            {
-                Url = new string('A', 2000)
-            };
-
-            IsValid(dto).Should().BeTrue();
-        }
-
-        [Fact]
-        public void UpdateImageDto_UrlPreko2000_NijeValidan()
-        {
-            var dto = new UpdateImageDto
-            {
-                Url = new string('A', 2001)
-            };
-
-            IsValid(dto).Should().BeFalse();
         }
 
         [Fact]
@@ -1559,6 +1537,17 @@ namespace TuristickiVodic.Tests.Validation
             };
 
             IsValid(dto).Should().BeFalse();
+        }
+
+        [Fact]
+        public void UpdateImageDto_AltTextNull_JeValidan()
+        {
+            var dto = new UpdateImageDto
+            {
+                AltText = null
+            };
+
+            IsValid(dto).Should().BeTrue();
         }
 
         [Fact]

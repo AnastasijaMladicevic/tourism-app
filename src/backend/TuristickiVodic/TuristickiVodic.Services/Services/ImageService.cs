@@ -8,6 +8,8 @@ using SixLabors.ImageSharp.Processing;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
+using ImageSharpImage = SixLabors.ImageSharp.Image;
+using ImageSharpSize = SixLabors.ImageSharp.Size;
 
 namespace TuristickiVodic.Services.Services
 {
@@ -290,14 +292,14 @@ namespace TuristickiVodic.Services.Services
             var fullPath = Path.Combine(folder, fileName);
 
             using var inputStream = file.OpenReadStream();
-            using var image = await Image.LoadAsync(inputStream);
+            using var image = await ImageSharpImage.LoadAsync(inputStream);
 
             // Smanji samo ako je šira od MaxWidthPx, ne povećavaj male slike
             if (image.Width > MaxWidthPx)
             {
                 image.Mutate(x => x.Resize(new ResizeOptions
                 {
-                    Size = new Size(MaxWidthPx, 0),
+                    Size = new ImageSharpSize(MaxWidthPx, 0),
                     Mode = ResizeMode.Max
                 }));
             }
@@ -332,7 +334,7 @@ namespace TuristickiVodic.Services.Services
 
         // ─── Pomoćne metode (nepromenjene) ──────────────────────────────────────
 
-        private static Image BuildImage(
+        private static TuristickiVodic.Core.Models.Image BuildImage(
             string url,
             AddImageDto dto,
             int? destinationId = null,
@@ -351,7 +353,7 @@ namespace TuristickiVodic.Services.Services
             if (linkedEntityCount != 1)
                 throw new InvalidOperationException("Image must belong to exactly one entity.");
 
-            return new Image
+            return new TuristickiVodic.Core.Models.Image
             {
                 Url = url,
                 AltText = dto.AltText,
@@ -420,7 +422,7 @@ namespace TuristickiVodic.Services.Services
                 ));
         }
 
-        private async Task EnsureCanManageImageAsync(Image image, int userId, string roleName)
+        private async Task EnsureCanManageImageAsync(TuristickiVodic.Core.Models.Image image, int userId, string roleName)
         {
             if (image.DestinationId.HasValue) { await EnsureCanManageDestinationImagesAsync(image.DestinationId.Value, userId, roleName); return; }
             if (image.LocalityId.HasValue) { await EnsureCanManageLocalityImagesAsync(image.LocalityId.Value, userId, roleName); return; }
