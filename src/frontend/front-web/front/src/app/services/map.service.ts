@@ -178,7 +178,6 @@ export class MapService {
     this.markerMap.set(key, entry);
 
     marker.on('click', () => {
-      this.map?.panTo([lat, lng], { animate: true, duration: 0.6 });
       this.activateMarker(key);
       if (onClick) onClick();
     });
@@ -220,9 +219,6 @@ export class MapService {
     }
 
     const revealMarker = () => {
-      if (this.map) {
-        this.map.flyTo([found.lat, found.lng], zoom, { duration: 0.9 });
-      }
       this.activateMarker(key);
     };
 
