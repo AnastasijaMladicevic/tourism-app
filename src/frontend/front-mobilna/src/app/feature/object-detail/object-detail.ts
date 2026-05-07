@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Subscription, catchError, finalize, forkJoin, of } from 'rxjs';
+import { Subscription, catchError, combineLatest, finalize, forkJoin, of } from 'rxjs';
 
 import { AuthService } from '../../services/auth';
 import { ImageDto, ImageService } from '../../services/image';
@@ -33,7 +33,7 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
 
   reviews: ReviewDto[] = [];
   nearbyObjects: ObjectDto[] = [];
-
+  galleryImages: string[] = [];
   showGalleryModal = false;
   currentImageIndex = 0;
   showAllReviewsModal = false;
@@ -47,6 +47,8 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
   };
   isSubmittingReview = false;
   userReview: ReviewDto | null = null;
+  selectedReviewImages: File[] = [];
+  reviewImagePreviews: string[] = [];
   private favoritePendingIds = new Set<number>();
   private touchStartX = 0;
   private touchEndX = 0;
@@ -86,6 +88,27 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
         }
       })
     );
+    this.route.queryParams.subscribe(params => {
+
+      if (
+        params['openReview'] === 'true' &&
+        this.authService.isLoggedIn()
+      ) {
+
+        this.router.navigate([], {
+          relativeTo: this.route,
+          queryParams: {
+            openReview: null
+          },
+          queryParamsHandling: 'merge',
+          replaceUrl: true
+        });
+
+        setTimeout(() => {
+          this.openWriteReview();
+        }, 100);
+      }
+    });
     window.addEventListener('focus', this.handleWindowFocus);
     window.addEventListener('favorite-object', (event: any) => {
       const obj = event.detail;
@@ -122,6 +145,7 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
         this.object = normalizedObject;
         this.images = normalizedImages;
         this.reviews = normalizedObject.reviews || [];
+        this.loadReviewImages();
         const currentUserId = this.authService.getCurrentUser()?.id;
 
         this.userReview =
@@ -581,8 +605,12 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
   openWriteReview(): void {
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login'], {
-        queryParams: { returnUrl: this.router.url }
+        queryParams: {
+          returnUrl: this.router.url,
+          openReview: 'true'
+        }
       });
+
       return;
     }
 
@@ -621,13 +649,47 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
 
   onReviewImagesSelected(event: any): void {
     const files: FileList = event.target.files;
-    if (files?.length) {
-      const selected = Array.from(files).slice(0, 5);
-      this.newReview.images = [...this.newReview.images, ...selected].slice(0, 5);
-    }
+    if (!files?.length) return;
+
+    const newFiles = Array.from(files).slice(0, 5 - this.selectedReviewImages.length);
+
+    newFiles.forEach(file => {
+      this.selectedReviewImages.push(file);
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.reviewImagePreviews.push(reader.result as string);
+        this.cdr.detectChanges();
+      };
+      reader.readAsDataURL(file);
+    });
+
     event.target.value = '';
   }
+  private loadReviewImages(): void {
+    if (!this.reviews.length) return;
 
+    this.reviews.forEach(review => {
+      this.imageService.getForReview(review.id).subscribe({
+        next: images => {
+          review.images = images.map(img => ({
+            ...img,
+            url: this.resolveMediaUrl(img.url) ?? ''
+          }));
+
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          review.images = [];
+        }
+      });
+    });
+  }
+  removeReviewImage(index: number): void {
+    this.reviewImagePreviews.splice(index, 1);
+    this.selectedReviewImages.splice(index, 1);
+    this.cdr.detectChanges();
+  }
   submitReview(): void {
     if (this.newReview.rating === 0 || !this.newReview.text.trim() || !this.object?.id) {
       alert('Molimo unesite ocenu (1-5) i komentar.');
@@ -673,6 +735,38 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
           }
         }
         this.userReview = newReview;
+        // === UPLOAD REVIEW IMAGES I DODAVANJE U GALERIJU ===
+        if (this.selectedReviewImages.length > 0 && newReview?.id) {
+          this.imageService.uploadReviewImages(newReview.id, this.selectedReviewImages)
+            .subscribe({
+              next: (uploaded: any) => {
+                const uploadedImages = Array.isArray(uploaded)
+                  ? uploaded
+                  : (uploaded?.items ?? uploaded?.data ?? []);
+
+                const mapped: ImageDto[] = uploadedImages.map((img: any) => ({
+                  id: img.id ?? 0,
+                  url: this.resolveMediaUrl(img?.url || img) ?? '',
+                  altText: img?.altText || 'Review photo',
+                  isMain: false
+                }));
+
+                // DODAJ U GLAVNU GALERIJU
+                this.images = [...mapped, ...this.images];
+
+                // DODAJ U OBJECT (da se sačuva u modelu)
+                if (this.object) {
+                  this.object.images = [
+                    ...mapped,
+                    ...(this.object.images || [])
+                  ];
+                }
+
+                this.cdr.detectChanges();
+              },
+              error: (err) => console.error('Failed to upload review images', err)
+            });
+        }
         this.closeWriteReview();
         this.cdr.detectChanges();
       },
