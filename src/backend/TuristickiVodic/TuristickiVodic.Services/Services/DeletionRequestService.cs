@@ -242,11 +242,23 @@ namespace TuristickiVodic.Services.Services
             if (dto.Approve)
             {
                 if (request.ObjectId != null)
+                {
                     _context.Objects.Remove(request.Object!);
+                }
                 else if (request.EventId != null)
+                {
+                    await CreatePlannerEventNotificationsAsync(
+                        request.EventId.Value,
+                        NotificationType.PlannerEventUnavailable,
+                        "Dogadjaj iz tvog planera je otkazan",
+                        $"Dogadjaj \"{request.Event?.Name ?? "Dogadjaj"}\" iz tvog planera vise nije dostupan.",
+                        "/planner");
                     _context.Events.Remove(request.Event!);
+                }
                 else if (request.ActivityId != null)
+                {
                     _context.Activities.Remove(request.Activity!);
+                }
             }
 
             await _context.SaveChangesAsync();
@@ -609,5 +621,44 @@ namespace TuristickiVodic.Services.Services
             ReviewedAt = r.ReviewedAt,
             CreatedAt = r.CreatedAt
         };
+
+        private async Task CreatePlannerEventNotificationsAsync(
+            int eventId,
+            NotificationType type,
+            string title,
+            string message,
+            string actionUrl)
+        {
+            var plannerUsers = await _context.EventPlannerItems
+                .AsNoTracking()
+                .Where(item => item.EventId == eventId)
+                .Join(
+                    _context.Users.AsNoTracking().Where(u => u.IsActive && !u.IsBlacklisted),
+                    item => item.UserId,
+                    user => user.Id,
+                    (item, user) => item.UserId)
+                .Distinct()
+                .ToListAsync();
+
+            if (plannerUsers.Count == 0)
+                return;
+
+            var createdAt = DateTime.UtcNow;
+            var notifications = plannerUsers
+                .Select(userId => new Notification
+                {
+                    UserId = userId,
+                    Type = type,
+                    Title = title,
+                    Message = message,
+                    ActionUrl = actionUrl,
+                    EventId = eventId,
+                    CreatedAt = createdAt
+                })
+                .ToList();
+
+            _context.Notifications.AddRange(notifications);
+            await _context.SaveChangesAsync();
+        }
     }
 }

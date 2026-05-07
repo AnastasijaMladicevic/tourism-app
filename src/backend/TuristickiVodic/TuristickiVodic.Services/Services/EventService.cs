@@ -599,6 +599,8 @@ namespace TuristickiVodic.Services.Services
             if (ev.CreatedByUserId != userId)
                 throw new UnauthorizedAccessException("You can update only your own events.");
 
+            var plannerRelevantSnapshot = CreatePlannerRelevantSnapshot(ev);
+
             if ((dto.Longitude.HasValue && !dto.Latitude.HasValue) || (!dto.Longitude.HasValue && dto.Latitude.HasValue))
                 throw new InvalidOperationException("Both longitude and latitude must be provided together.");
 
@@ -660,6 +662,16 @@ namespace TuristickiVodic.Services.Services
             ev.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
+
+            if (HasPlannerRelevantChanges(plannerRelevantSnapshot, ev))
+            {
+                await CreatePlannerEventNotificationsAsync(
+                    ev.Id,
+                    NotificationType.PlannerEventUpdated,
+                    "Dogadjaj iz tvog planera je izmenjen",
+                    $"Dogadjaj \"{ev.Name}\" iz tvog planera je izmenjen. Proveri nove detalje.",
+                    "/planner");
+            }
 
             var result = _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
             await ApplyPendingDeletionRequestFlagsAsync(result);
@@ -924,15 +936,95 @@ namespace TuristickiVodic.Services.Services
             if (!isResponsible)
                 throw new UnauthorizedAccessException("You are not the responsible manager for this destination.");
 
+            var wasActive = ev.IsActive;
             ev.IsActive = isActive;
             ev.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 
+            if (wasActive && !isActive)
+            {
+                await CreatePlannerEventNotificationsAsync(
+                    ev.Id,
+                    NotificationType.PlannerEventUnavailable,
+                    "Dogadjaj iz tvog planera je deaktiviran",
+                    $"Dogadjaj \"{ev.Name}\" iz tvog planera vise nije aktivan.",
+                    "/planner");
+            }
+
             var result = _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
             await ApplyPendingDeletionRequestFlagsAsync(result);
             return result;
         }
+
+        internal async Task CreatePlannerEventNotificationsAsync(
+            int eventId,
+            NotificationType type,
+            string title,
+            string message,
+            string actionUrl)
+        {
+            var plannerItems = await _context.EventPlannerItems
+                .AsNoTracking()
+                .Where(item => item.EventId == eventId)
+                .Join(
+                    _context.Users.AsNoTracking().Where(u => u.IsActive && !u.IsBlacklisted),
+                    item => item.UserId,
+                    user => user.Id,
+                    (item, user) => new { item.UserId, item.EventId })
+                .Distinct()
+                .ToListAsync();
+
+            if (plannerItems.Count == 0)
+                return;
+
+            var createdAt = DateTime.UtcNow;
+            var notifications = plannerItems
+                .Select(item => new Notification
+                {
+                    UserId = item.UserId,
+                    Type = type,
+                    Title = title,
+                    Message = message,
+                    ActionUrl = actionUrl,
+                    EventId = eventId,
+                    CreatedAt = createdAt
+                })
+                .ToList();
+
+            _context.Notifications.AddRange(notifications);
+            await _context.SaveChangesAsync();
+        }
+
+        private static PlannerRelevantSnapshot CreatePlannerRelevantSnapshot(Event ev)
+        {
+            return new PlannerRelevantSnapshot(
+                ev.Name,
+                ev.StartDate,
+                ev.EndDate,
+                ev.LocalityId,
+                ev.DestinationId,
+                ev.ObjectId);
+        }
+
+        private static bool HasPlannerRelevantChanges(PlannerRelevantSnapshot snapshot, Event ev)
+        {
+            return
+                snapshot.Name != ev.Name ||
+                snapshot.StartDate != ev.StartDate ||
+                snapshot.EndDate != ev.EndDate ||
+                snapshot.LocalityId != ev.LocalityId ||
+                snapshot.DestinationId != ev.DestinationId ||
+                snapshot.ObjectId != ev.ObjectId;
+        }
+
+        private readonly record struct PlannerRelevantSnapshot(
+            string Name,
+            DateTime StartDate,
+            DateTime? EndDate,
+            int? LocalityId,
+            int? DestinationId,
+            int? ObjectId);
 
         public async Task<PagedResultDto<EventDto>> SearchAsync(EventQueryDto query)
         {
