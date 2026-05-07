@@ -17,6 +17,11 @@ interface MapInitOptions {
 
 @Injectable({ providedIn: 'root' })
 export class MapService {
+  private static readonly BASE_WORLD_TILE_SIZE = 256;
+  private readonly worldBounds = L.latLngBounds(
+    L.latLng(-90, -180),
+    L.latLng(90, 180),
+  );
   private markers: MarkerEntry[] = [];
   private markerMap = new Map<string, MarkerEntry>();
   private activeMarkerKey: string | null = null;
@@ -77,12 +82,18 @@ export class MapService {
       this.map = L.map(containerId, {
         zoomControl: false,
         attributionControl: false,
+        maxBounds: this.worldBounds,
+        maxBoundsViscosity: 1.0,
       }).setView([lat, lng], zoom);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '',
+        noWrap: true,
       }).addTo(this.map);
+
+      this.map.whenReady(() => this.enforceWorldViewportCoverage());
+      this.map.on('resize', () => this.enforceWorldViewportCoverage());
 
       if (this.clusteringEnabled) {
         this.map.on('moveend zoomend', () => {
@@ -335,6 +346,31 @@ export class MapService {
 
   private refreshAllClusters(): void {
     this.clusterGroups.forEach((group) => group.refreshClusters());
+  }
+
+  private enforceWorldViewportCoverage(): void {
+    if (!this.map) {
+      return;
+    }
+
+    const container = this.map.getContainer();
+    const width = Math.max(container.clientWidth, 1);
+    const height = Math.max(container.clientHeight, 1);
+    const minZoomForWidth = Math.ceil(
+      Math.log2(width / MapService.BASE_WORLD_TILE_SIZE),
+    );
+    const minZoomForHeight = Math.ceil(
+      Math.log2(height / MapService.BASE_WORLD_TILE_SIZE),
+    );
+    const minZoom = Math.max(0, minZoomForWidth, minZoomForHeight);
+
+    this.map.setMinZoom(minZoom);
+
+    if (this.map.getZoom() < minZoom) {
+      this.map.setZoom(minZoom, { animate: false });
+    }
+
+    this.map.panInsideBounds(this.worldBounds, { animate: false });
   }
 
   private getClusterKey(data: any): string {
