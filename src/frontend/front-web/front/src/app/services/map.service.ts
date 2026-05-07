@@ -321,9 +321,13 @@ export class MapService {
         const sizeClass = count < 10 ? 'small' : count < 30 ? 'medium' : 'large';
 
         return L.divIcon({
-          html: `<span>${count}</span>`,
+          html:
+            `<div class="destination-cluster__pin">` +
+            `<span class="destination-cluster__count">${count}</span>` +
+            `</div>`,
           className: `destination-cluster destination-cluster--${sizeClass}`,
-          iconSize: [46, 46],
+          iconSize: [56, 72],
+          iconAnchor: [28, 68],
         });
       },
     });
