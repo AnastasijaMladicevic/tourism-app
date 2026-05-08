@@ -189,9 +189,9 @@ export class MapService {
     const customIcon = L.divIcon({
       className: 'custom-type-marker',
       html: this.getMarkerIconHtml(type),
-      iconSize: [38, 46],
-      iconAnchor: [19, 44],
-      popupAnchor: [0, -38],
+      iconSize: [30, 38],
+      iconAnchor: [15, 36],
+      popupAnchor: [0, -30],
     });
 
     const marker = L.marker([lat, lng], { icon: customIcon });
@@ -352,8 +352,8 @@ export class MapService {
             `<span class="destination-cluster__count">${count}</span>` +
             '</div>',
           className: `destination-cluster destination-cluster--${sizeClass}`,
-          iconSize: [56, 72],
-          iconAnchor: [28, 68],
+          iconSize: [42, 54],
+          iconAnchor: [21, 50],
         });
       },
     });
