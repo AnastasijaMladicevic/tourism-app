@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, concatMap, from, map, of, toArray } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
 
@@ -54,6 +54,13 @@ export interface CreateLocalityDto {
   imageUrl?: string;
 }
 
+export interface LocalityImageDto {
+  id: number;
+  url: string;
+  altText?: string;
+  isMain: boolean;
+}
+
 export interface FilterOption {
   value: string;
   label: string;
@@ -87,6 +94,25 @@ export class LocalityService {
 
   create(dto: CreateLocalityDto): Observable<LocalityDto> {
     return this.http.post<LocalityDto>(this.apiUrl, dto);
+  }
+
+  addImage(localityId: number, file: File, isMain: boolean): Observable<LocalityImageDto> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('isMain', String(isMain));
+    return this.http.post<LocalityImageDto>(`${this.apiUrl}/${localityId}/images`, formData);
+  }
+
+  attachImages(localityId: number, files: File[], primaryIndex = 0): Observable<LocalityImageDto[]> {
+    const cleanFiles = files.filter((file) => file.size > 0);
+    if (cleanFiles.length === 0) {
+      return of([]);
+    }
+
+    return from(cleanFiles).pipe(
+      concatMap((file, index) => this.addImage(localityId, file, index === primaryIndex)),
+      toArray()
+    );
   }
 
   getFilterOptions(

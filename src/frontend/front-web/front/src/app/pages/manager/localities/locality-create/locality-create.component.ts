@@ -1,7 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { finalize } from 'rxjs';
 import { DestinationService } from '../../../../services/destination.service';
 import { CreateLocalityDto, LocalityService } from '../../../../services/locality.service';
 import { MapComponent as SharedMapComponent } from '../../../../shared/components/map/map';
@@ -18,7 +19,7 @@ interface LocalityTypeOption {
   templateUrl: './locality-create.component.html',
   styleUrls: ['./locality-create.component.css']
 })
-export class ManagerLocalityCreateComponent implements OnInit {
+export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
   private readonly localityService = inject(LocalityService);
   private readonly destinationService = inject(DestinationService);
   private readonly router = inject(Router);
@@ -29,6 +30,10 @@ export class ManagerLocalityCreateComponent implements OnInit {
 
   destinationOptions: Array<{ id: number; name: string }> = [];
   localityTypeOptions: LocalityTypeOption[] = [];
+  pendingImageNames = '';
+  imageFiles: File[] = [];
+  imagePreviews: string[] = [];
+  primaryImageIndex = 0;
 
   form: CreateLocalityDto = {
     name: '',
@@ -42,6 +47,10 @@ export class ManagerLocalityCreateComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadOptions();
+  }
+
+  ngOnDestroy(): void {
+    this.imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
   }
 
   get hasMapCoordinates(): boolean {
@@ -86,14 +95,28 @@ export class ManagerLocalityCreateComponent implements OnInit {
       destinationId: Number(this.form.destinationId),
       localityTypeId: Number(this.form.localityTypeId),
       latitude: this.form.latitude != null ? Number(this.form.latitude) : undefined,
-      longitude: this.form.longitude != null ? Number(this.form.longitude) : undefined,
-      imageUrl: this.form.imageUrl?.trim() || undefined
+      longitude: this.form.longitude != null ? Number(this.form.longitude) : undefined
     };
 
     this.localityService.create(payload).subscribe({
-      next: () => {
-        this.isSubmitting = false;
-        this.router.navigate(['/manager/localities']);
+      next: (created) => {
+        if (!this.imageFiles.length) {
+          this.isSubmitting = false;
+          this.router.navigate(['/manager/localities']);
+          return;
+        }
+
+        this.localityService
+          .attachImages(created.id, this.imageFiles, this.primaryImageIndex)
+          .pipe(finalize(() => (this.isSubmitting = false)))
+          .subscribe({
+            next: () => {
+              this.router.navigate(['/manager/localities']);
+            },
+            error: (error) => {
+              this.errorMessage = error?.error?.message ?? 'Location created, but image upload failed.';
+            }
+          });
       },
       error: (error) => {
         this.errorMessage = error?.error?.message ?? 'Failed to create location.';
@@ -104,6 +127,51 @@ export class ManagerLocalityCreateComponent implements OnInit {
 
   onCancel(): void {
     this.router.navigate(['/manager/localities']);
+  }
+
+  onPickImages(input: HTMLInputElement): void {
+    input.click();
+  }
+
+  onFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+    if (!files.length) {
+      return;
+    }
+
+    const imageFiles = files.filter((file) => file.type.startsWith('image/'));
+    if (!imageFiles.length) {
+      return;
+    }
+
+    for (const file of imageFiles) {
+      this.imageFiles.push(file);
+      this.imagePreviews.push(URL.createObjectURL(file));
+    }
+
+    this.pendingImageNames = this.imageFiles.map((file) => file.name).join(', ');
+    input.value = '';
+  }
+
+  removeImage(index: number): void {
+    const preview = this.imagePreviews[index];
+    if (preview) {
+      URL.revokeObjectURL(preview);
+    }
+
+    this.imageFiles.splice(index, 1);
+    this.imagePreviews.splice(index, 1);
+
+    if (this.primaryImageIndex >= this.imageFiles.length) {
+      this.primaryImageIndex = Math.max(0, this.imageFiles.length - 1);
+    }
+
+    this.pendingImageNames = this.imageFiles.map((file) => file.name).join(', ');
+  }
+
+  setPrimaryImage(index: number): void {
+    this.primaryImageIndex = index;
   }
 
   private loadOptions(): void {

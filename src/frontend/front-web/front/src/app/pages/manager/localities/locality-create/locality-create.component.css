@@ -47,6 +47,132 @@
   gap: 14px;
 }
 
+.section-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gallery-card-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gallery-card-head .step-tag {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  width: fit-content;
+}
+
+.gallery-card-head h2 {
+  margin: 0;
+  font-size: 18px;
+  color: #0f172a;
+}
+
+.gallery-intro {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.45;
+}
+
+.gallery-dropzone {
+  margin-top: 4px;
+  border: 1px dashed #bfdbfe;
+  border-radius: 14px;
+  background: #f8fbff;
+  padding: 16px;
+}
+
+.dropzone-title {
+  margin: 0;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.dropzone-copy {
+  margin: 4px 0 0;
+  color: #475569;
+  font-size: 12px;
+}
+
+.dropzone-input-row {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.dropzone-input-row input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.gallery-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.gallery-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  display: block;
+}
+
+.gallery-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+}
+
+.primary-badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+}
+
+.ghost-btn.small {
+  min-height: 30px;
+  padding: 6px 8px;
+  font-size: 11px;
+}
+
+.ghost-btn.small.danger {
+  color: #b91c1c;
+  border-color: #fecaca;
+  background: #fff1f2;
+}
+
 label {
   display: flex;
   flex-direction: column;
@@ -207,5 +333,19 @@ select {
 
   .location-inputs {
     grid-template-columns: 1fr;
+  }
+
+  .gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .gallery-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dropzone-input-row {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

@@ -9,6 +9,52 @@
 
   <div class="create-layout">
     <form class="create-form card" (ngSubmit)="onSubmit()">
+      <section class="section-block section-block--gallery">
+        <div class="gallery-card-head">
+          <span class="step-tag">STEP 1</span>
+          <h2>Media Gallery</h2>
+          <p class="gallery-intro">Upload one or more images and choose a primary cover image.</p>
+        </div>
+
+        <div class="gallery-dropzone">
+          <p class="dropzone-title">Add Photo</p>
+          <p class="dropzone-copy">Images are attached after location creation via the image endpoint.</p>
+          <div class="dropzone-input-row">
+            <input
+              type="text"
+              [value]="pendingImageNames || 'Select one or more image files...'"
+              readonly
+              aria-label="Selected image files"
+            />
+            <button type="button" class="primary-btn" (click)="onPickImages(fileInput)">Add Photo</button>
+            <input
+              #fileInput
+              type="file"
+              accept="image/*"
+              multiple
+              hidden
+              (change)="onFilesSelected($event)"
+            />
+          </div>
+        </div>
+
+        @if (imagePreviews.length > 0) {
+          <div class="gallery-grid">
+            <article class="gallery-item" *ngFor="let preview of imagePreviews; let index = index">
+              <img [src]="preview" alt="Location image preview" />
+              <div class="gallery-actions">
+                @if (index === primaryImageIndex) {
+                  <span class="primary-badge">Primary</span>
+                } @else {
+                  <button type="button" class="ghost-btn small" (click)="setPrimaryImage(index)">Set Primary</button>
+                }
+                <button type="button" class="ghost-btn small danger" (click)="removeImage(index)">Remove</button>
+              </div>
+            </article>
+          </div>
+        }
+      </section>
+
       <label>
         <span>Name *</span>
         <input type="text" [(ngModel)]="form.name" name="name" required />
@@ -34,11 +80,6 @@
           </select>
         </label>
       </div>
-
-      <label>
-        <span>Main image URL</span>
-        <input type="url" [(ngModel)]="form.imageUrl" name="imageUrl" />
-      </label>
 
       <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
