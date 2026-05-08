@@ -1,13 +1,12 @@
-<div class="map-page">
+<div #mapPage class="map-page">
   <div class="search-bar">
     <div class="search-input">
       <mat-icon>search</mat-icon>
       <input
         type="text"
-        placeholder="Search objects, routes..."
+        placeholder="Search places..."
         [(ngModel)]="searchQuery"
         (input)="onSearchInput()"
-        (keydown.enter)="submitSearch()"
         (focus)="showSuggestions = searchResults.length > 0"
         (blur)="onSearchBlur()"
         autocomplete="off"
@@ -25,145 +24,48 @@
           <div class="suggestion-item" (mousedown)="selectSuggestion(result)">
             <div class="suggestion-item__image">
               @if (result.image) {
-                <img [src]="result.image" [alt]="result.name" loading="lazy" decoding="async" />
+                <img [src]="result.image" [alt]="result.name" />
               } @else {
                 <mat-icon>{{ result.icon }}</mat-icon>
               }
             </div>
             <div class="suggestion-item__body">
               <span class="suggestion-item__name">{{ result.name }}</span>
-              <span class="suggestion-item__meta"
-                >{{ result.typeName }} · {{ result.location }}</span
-              >
+              <span class="suggestion-item__meta">{{ result.typeName }} · {{ result.location }}</span>
             </div>
           </div>
         }
       </div>
     }
   </div>
-
-  <div class="filter-chips">
-    @for (chip of filterChips; track chip.key) {
-      <button
-        class="chip"
-        [class.chip--active]="activeFilters.includes(chip.key)"
-        (click)="toggleFilter(chip.key)"
-      >
-        <span>{{ chip.icon }}</span>
-        {{ chip.label }}
-      </button>
-    }
-  </div>
-
-  @if (isRoutePlannerOpen) {
-    <div class="route-planner">
-      <!-- HEADER -->
-      <div class="route-planner__header">
-        <h3>Route</h3>
-        <div class="route-summary">
-          {{ totalDistance | number:'1.1-1' }} km •
-          {{ totalDuration | number:'1.0-0' }} min
-        </div>
-        <div class="route-planner__actions-top">
-          <button class="icon-btn" (click)="clearPlannedRoute()">
-            <mat-icon>delete</mat-icon>
-          </button>
-
-          <button class="icon-btn" (click)="closeRoutePlanner()">
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
-        
-      </div>
-
-      <!-- LISTA PINOVA -->
-      <div
-        cdkDropList
-        cdkDropListOrientation="horizontal"
-        (cdkDropListDropped)="drop($any($event))"
-        class="route-list"
-      >
-        @for (point of routePoints; track point.id; let i = $index) {
-          <div cdkDrag class="route-item">
-            <div class="drag-handle" cdkDragHandle>
-              <mat-icon>drag_indicator</mat-icon>
-            </div>
-
-            <div class="route-content">
-              {{ point.name }}
-            </div>
-            <button class="remove-btn" (click)="removeRoutePoint(i)">
-              <mat-icon>close</mat-icon>
-            </button>
-          </div>
-        }
-      </div>
-
-      <!-- ADD -->
-      <div class="route-add">
-        <div class="route-controls">
-          <div class="route-search-anchor">
-            <input
-              type="text"
-              placeholder="Add stop..."
-              [(ngModel)]="routeSearchQuery"
-              (input)="onRouteSearch()"
-              (blur)="onRouteSearchBlur()"
-            />
-            @if (routeSearchResults.length > 0) {
-              <div class="route-suggestions">
-                @for (r of routeSearchResults; track r.id) {
-                  <div (click)="addRoutePoint(r)">
-                    {{ r.name }}
-                  </div>
-                }
-              </div>
-            }
-          </div>
-          @if (userLocation) {
-            <div class="route-gps" (click)="addMyLocationAsStart()">
-              <mat-icon>my_location</mat-icon>
-              Use my location
-            </div>
-          }
-          <button class="route-planner__btn" (click)="calculateRoute()">
-            <mat-icon>alt_route</mat-icon>
-            Show Route
-          </button>
-        </div>
-      </div>
-    </div>
-  }
 
   <div id="main-map" class="main-map"></div>
 
   <div class="map-controls">
-    <button
-      class="control-btn gps-btn"
-      (click)="toggleGpsTracking()"
-      [class.gps-btn--active]="isTracking"
-      aria-label="My location"
-    >
-      <mat-icon>{{ isTracking ? 'gps_fixed' : 'my_location' }}</mat-icon>
-    </button>
     <button class="control-btn" (click)="zoomIn()"><mat-icon>add</mat-icon></button>
     <button class="control-btn" (click)="zoomOut()"><mat-icon>remove</mat-icon></button>
   </div>
 
   @if (selectedItem) {
-    <div class="bottom-card" (click)="$event.stopPropagation()">
-      <button class="bottom-card__close" (click)="closeCard()">
+    <div
+      #cardElement
+      class="bottom-card bottom-card--anchored"
+      [class.bottom-card--hidden]="!isCardVisible"
+      [style.left.px]="cardPosition.left"
+      [style.top.px]="cardPosition.top"
+      (click)="$event.stopPropagation()"
+    >
+      <button class="bottom-card__close" (click)="closeCard($event)">
         <mat-icon>close</mat-icon>
       </button>
 
       <div class="bottom-card__image-wrap">
-        @if (getItemImage()) {
+        @if (getItemImage(selectedItem)) {
           <img
-            [src]="getItemImage()"
+            [src]="getItemImage(selectedItem)"
             [alt]="selectedItem.name"
             class="bottom-card__image"
-            loading="lazy"
-            decoding="async"
+            (load)="onCardImageLoad()"
           />
         } @else {
           <div class="bottom-card__image bottom-card__image--empty">
@@ -176,29 +78,32 @@
         <div class="bottom-card__top">
           <div class="bottom-card__info">
             <h3 class="bottom-card__name">{{ selectedItem.name }}</h3>
+            @if (selectedCategoryLabel) {
+              <p class="bottom-card__category">{{ selectedCategoryLabel }}</p>
+            }
             <p class="bottom-card__meta">
-              @if (getItemLocation()) {
+              @if (getItemLocation(selectedItem, selectedType)) {
                 <mat-icon>place</mat-icon>
-                {{ getItemLocation() }}
+                {{ getItemLocation(selectedItem, selectedType) }}
               }
             </p>
           </div>
-          @if (selectedItem.averageRating > 0) {
+          @if ((selectedItem.averageRating ?? 0) > 0) {
             <div class="bottom-card__rating">
               <mat-icon>star</mat-icon>
-              {{ selectedItem.averageRating.toFixed(1) }}
+              {{ selectedItem.averageRating!.toFixed(1) }}
             </div>
           }
         </div>
 
         <div class="bottom-card__badges">
-          @if (getWorkingStatus() !== null) {
+          @if (getWorkingStatus(selectedItem) !== null) {
             <span
               class="badge"
-              [class.badge--open]="getWorkingStatus()"
-              [class.badge--closed]="!getWorkingStatus()"
+              [class.badge--open]="getWorkingStatus(selectedItem)"
+              [class.badge--closed]="!getWorkingStatus(selectedItem)"
             >
-              {{ getWorkingStatus() ? 'OPEN NOW' : 'CLOSED' }}
+              {{ getWorkingStatus(selectedItem) ? 'OPEN NOW' : 'CLOSED' }}
             </span>
           }
           @if (selectedItem.distanceKm != null) {
@@ -210,11 +115,6 @@
 
         <div class="bottom-card__actions">
           <button class="bottom-card__btn" (click)="openDetails()">Details</button>
-
-          <button class="bottom-card__btn bottom-card__btn--primary" (click)="openDirections()">
-            <mat-icon>directions</mat-icon>
-            Get Directions
-          </button>
         </div>
       </div>
     </div>
