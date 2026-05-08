@@ -259,7 +259,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
 
 ('Kotor', 'Kotor je istorijski primorski grad smešten u srcu Bokokotorskog zaliva, poznat po očuvanom starom gradu pod zaštitom UNESCO-a. Njegove uske kamene ulice, trgovi i srednjovekovne zidine pričaju bogatu priču o prošlosti i kulturi ovog kraja. Idealan je za istraživanje, šetnje i uživanje u autentičnoj mediteranskoj atmosferi.',
- ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.7710, 42.4250), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
 
@@ -430,7 +430,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
 ('Centar Podgorice', 'Centralna gradska zona Podgorice sa trgovima, kaficima i institucijama',
- ST_SetSRID(ST_MakePoint(19.262, 42.441), 4326), true,
+ ST_SetSRID(ST_MakePoint(19.2634, 42.4381), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
@@ -448,7 +448,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
 ('Setaliste Pet Danica', 'Poznato setaliste uz more u Herceg Novom',
- ST_SetSRID(ST_MakePoint(18.537, 42.451), 4326), true,
+ ST_SetSRID(ST_MakePoint(18.5412, 42.4504), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Setaliste'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
@@ -514,7 +514,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
 ('Centar Zabljaka', 'Glavna turisticka zona Zabljaka',
- ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326), true,
+ ST_SetSRID(ST_MakePoint(19.1550), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
@@ -616,7 +616,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
  ('Centar Kotora', 'Glavna gradska zona Kotora sa starim gradom, trgovima, lukom i turističkim sadržajem',
- ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), true,
+ ST_SetSRID(ST_MakePoint(18.7697, 42.4270), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
@@ -832,7 +832,7 @@ INSERT INTO "Objects"
  "Status", "IsActive", "ObjectTypeId", "LocalityId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
 VALUES
 ('Hotel Vardar', 'Hotel u srcu starog grada Kotora', 'Stari grad Kotor', '+38232345678', 'https://hotelvardar.com',
- NULL, NULL, '{"pon":"00:00-24:00"}', 145.00, ARRAY['WiFi', 'Parking', 'Spa', 'Dorucak'], ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 145.00, ARRAY['WiFi', 'Parking', 'Spa', 'Dorucak'], ST_SetSRID(ST_MakePoint(18.7705, 42.4247), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -868,7 +868,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Planinarski dom Durmitor', 'Dom za planinare na Durmitoru', 'Durmitor bb', '+38233456781', NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', 55.00, ARRAY['Parking', 'Restoran', 'Grejanje', 'Pogled na planinu'], ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 55.00, ARRAY['Parking', 'Restoran', 'Grejanje', 'Pogled na planinu'], ST_SetSRID(ST_MakePoint(19.1131, 43.1446), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Planinarski dom'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
@@ -933,7 +933,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('MayaBay Porto Montenegro', 'Luksuzni azijski restoran u okviru Porto Montenegro marine', 'Porto Montenegro, Tivat', '+38269352221', 'https://mayabay.me/',
- NULL, 'Azijska kuhinja', '{"pon":"12:00-00:00"}', 45.00, ARRAY['Pogled na marinu', 'Luksuzni enterijer', 'Kokteli', 'Terasa'], ST_SetSRID(ST_MakePoint(18.694, 42.434), 4326), 0, 0, 'Approved', true,
+ NULL, 'Azijska kuhinja', '{"pon":"12:00-00:00"}', 45.00, ARRAY['Pogled na marinu', 'Luksuzni enterijer', 'Kokteli', 'Terasa'], ST_SetSRID(ST_MakePoint(18.6933, 42.4340), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Porto Montenegro'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
@@ -960,7 +960,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Restaurant OrO', 'Popularan restoran u centru Zabljaka sa lokalnim i evropskim specijalitetima', 'Njegoševa, Žabljak', '+38269406210', 'http://www.restaurantoro.me/',
- NULL, 'Crnogorska i evropska kuhinja', '{"pon":"08:00-01:00"}', 20.00, ARRAY['WiFi', 'Terasa', 'Rezervacije', 'Porodicno okruzenje'], ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326), 0, 0, 'Approved', true,
+ NULL, 'Crnogorska i evropska kuhinja', '{"pon":"08:00-01:00"}', 20.00, ARRAY['WiFi', 'Terasa', 'Rezervacije', 'Porodicno okruzenje'], ST_SetSRID(ST_MakePoint(19.1202, 43.1550), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
@@ -972,7 +972,7 @@ VALUES
 
 ('Regent Porto Montenegro', 'Luksuzni hotel u marini Porto Montenegro', 'Porto Montenegro, Obala Bb, Tivat', '+382660660', 'https://www.regenthotels.com',
  NULL, NULL, '{"pon":"00:00-24:00"}', 320.00, ARRAY['Spa', 'Bazen', 'Marina pogled', 'Fitness', 'Parking'],
- ST_SetSRID(ST_MakePoint(18.694, 42.434), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.6935, 42.4334), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Porto Montenegro'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
@@ -1012,7 +1012,7 @@ VALUES
 
 ('Lazure Hotel & Marina', 'Boutique hotel u obnovljenoj luci', 'Meljine, Herceg Novi', '+38231333000', 'https://www.lazure.me',
  NULL, NULL, '{"pon":"00:00-24:00"}', 210.00, ARRAY['Marina', 'Spa', 'Bazen', 'Restoran', 'Parking'],
- ST_SetSRID(ST_MakePoint(18.536, 42.451), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.5594, 42.4542), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
@@ -1051,7 +1051,7 @@ VALUES
 
 ('Hotel CentreVille Podgorica', 'Moderan poslovni hotel', 'Podgorica centar', '+38220402500', 'https://www.centerville.me',
  NULL, NULL, '{"pon":"00:00-24:00"}', 110.00, ARRAY['WiFi', 'Parking', 'Restoran', 'Fitness'],
- ST_SetSRID(ST_MakePoint(19.262, 42.441), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(19.2432, 42.4408), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
@@ -1061,7 +1061,7 @@ VALUES
 
 ('Hotel Polar Star', 'Planinski hotel u prirodi', 'Žabljak centar', '+38252230303', 'https://www.polarstar.me',
  NULL, NULL, '{"pon":"00:00-24:00"}', 100.00, ARRAY['Grejanje', 'Parking', 'Restoran', 'Planinski pogled'],
- ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(19.1748, 43.1636), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
