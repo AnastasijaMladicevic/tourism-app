@@ -224,7 +224,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
         this.isDeleting = false;
         this.deleteRedirectTimeoutId = setTimeout(() => {
           this.showDeleteSuccessModal = false;
-          this.router.navigate(['/manager/dashboard']);
+          this.router.navigate(['/manager/localities']);
         }, 1800);
       },
       error: (error) => {

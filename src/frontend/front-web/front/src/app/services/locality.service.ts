@@ -114,6 +114,10 @@ export class LocalityService {
     return this.http.put<LocalityDto>(`${this.apiUrl}/${id}`, dto);
   }
 
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
   getImages(localityId: number): Observable<LocalityImageDto[]> {
     return this.http.get<LocalityImageDto[]>(`${this.apiUrl}/${localityId}/images`);
   }

@@ -266,6 +266,31 @@ select {
   color: #334155;
 }
 
+.danger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #fecaca;
+  background: #fff1f2;
+  color: #b91c1c;
+  font: inherit;
+  cursor: pointer;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 600;
+}
+
+.danger-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
+.danger-btn:disabled,
+.primary-btn:disabled,
+.ghost-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 .error-message {
   color: #b91c1c;
   font-size: 13px;
@@ -453,6 +478,76 @@ select {
   min-height: 42px;
   border-radius: 12px;
   font-weight: 600;
+}
+
+.delete-success-backdrop {
+  z-index: 11000;
+}
+
+.delete-success-modal {
+  width: min(100%, 380px);
+  padding: 28px 24px;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.28);
+  text-align: center;
+}
+
+.delete-success-icon {
+  width: 130px;
+  height: 130px;
+  margin: 0 auto 18px;
+  border-radius: 50%;
+  border: 14px solid #f4b400;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 10px 30px rgba(244, 180, 0, 0.32);
+  animation: success-pop 420ms ease-out;
+}
+
+.delete-success-icon-check {
+  color: #f4b400;
+  font-size: 56px;
+  line-height: 1;
+  font-weight: 700;
+  animation: check-reveal 500ms ease-out 120ms both;
+}
+
+.delete-success-modal h3 {
+  margin: 0;
+  font-size: 24px;
+  color: #0f172a;
+}
+
+.delete-success-modal p {
+  margin: 10px 0 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+@keyframes success-pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes check-reveal {
+  0% {
+    transform: scale(0.6) rotate(-10deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
 }
 
 @media (max-width: 1100px) {
