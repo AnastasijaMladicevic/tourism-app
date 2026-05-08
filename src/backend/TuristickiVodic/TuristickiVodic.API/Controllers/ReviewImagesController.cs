@@ -59,5 +59,23 @@ namespace TuristickiVodic.API.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpDelete("{imageId:int}")]
+        [Authorize(Roles = "Tourist")]
+        public async Task<IActionResult> Delete(int reviewId, int imageId)
+        {
+            try
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var role = User.FindFirstValue(ClaimTypes.Role)!;
+                var deleted = await _reviewImageService.DeleteAsync(reviewId, imageId, userId, role);
+
+                return deleted ? NoContent() : NotFound(new { message = "Review image not found." });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+        }
     }
 }

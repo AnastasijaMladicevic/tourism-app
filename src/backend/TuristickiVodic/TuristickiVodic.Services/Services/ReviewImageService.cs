@@ -116,5 +116,52 @@ namespace TuristickiVodic.Services.Services
 
             return _mapper.Map<List<ReviewImageDto>>(createdImages);
         }
+
+        public async Task<bool> DeleteAsync(int reviewId, int imageId, int userId, string roleName)
+        {
+            if (roleName != "Tourist")
+            {
+                throw new UnauthorizedAccessException("Only tourists can delete review images.");
+            }
+
+            var image = await _context.ReviewImages
+                .Include(ri => ri.Review)
+                .FirstOrDefaultAsync(ri => ri.Id == imageId && ri.ReviewId == reviewId);
+
+            if (image == null)
+            {
+                return false;
+            }
+
+            if (image.Review.UserId != userId)
+            {
+                throw new UnauthorizedAccessException("You can delete images only from your own review.");
+            }
+
+            DeletePhysicalFileIfLocal(image.Url);
+
+            _context.ReviewImages.Remove(image);
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        private void DeletePhysicalFileIfLocal(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url) ||
+                !url.StartsWith("/images/reviews/", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            var root = _environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            var fileName = Path.GetFileName(url);
+            var filePath = Path.Combine(root, "images", "reviews", fileName);
+
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+        }
     }
 }

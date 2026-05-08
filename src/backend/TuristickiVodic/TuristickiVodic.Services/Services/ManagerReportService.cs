@@ -129,7 +129,24 @@ namespace TuristickiVodic.Services.Services
                 Message = $"Manager {managerName} je prijavio ContentCreator-a {reportedUserName}.",
                 ActionUrl = $"/manager-reports/{report.Id}",
                 CreatedAt = DateTime.UtcNow
-            });
+            }).ToList();
+
+            var reportCountForCreator = await _context.ManagerReports
+                .AsNoTracking()
+                .CountAsync(r => r.ReportedUserId == reportedUser.Id);
+
+            if (reportCountForCreator > 1)
+            {
+                notifications.AddRange(adminIds.Select(adminId => new Notification
+                {
+                    UserId = adminId,
+                    Type = NotificationType.AdminRepeatedManagerReports,
+                    Title = "ContentCreator ima vise prijava",
+                    Message = $"ContentCreator {reportedUserName} sada ima {reportCountForCreator} prijava u sistemu.",
+                    ActionUrl = $"/manager-reports/{report.Id}",
+                    CreatedAt = DateTime.UtcNow
+                }));
+            }
 
             _context.Notifications.AddRange(notifications);
             await _context.SaveChangesAsync();

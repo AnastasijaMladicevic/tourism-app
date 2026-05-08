@@ -275,6 +275,17 @@ namespace TuristickiVodic.Services.Services
             review.CreatorResponse = dto.CreatorResponse;
             review.CreatorResponseAt = DateTime.UtcNow;
 
+            _context.Notifications.Add(new Notification
+            {
+                UserId = review.UserId,
+                Type = NotificationType.ReviewReplyUpdated,
+                Title = "Odgovor na tvoju recenziju je izmenjen",
+                Message = $"Odgovor na tvoju recenziju za objekat \"{review.Object.Name}\" je azuriran.",
+                ActionUrl = $"/object/{review.ObjectId}",
+                ReviewId = review.Id,
+                CreatedAt = DateTime.UtcNow
+            });
+
             await _context.SaveChangesAsync();
 
             return _mapper.Map<ReviewDto>(await LoadReviewAsync(review.Id));
@@ -310,6 +321,7 @@ namespace TuristickiVodic.Services.Services
         public async Task<bool> DeleteAsync(int id, int userId, string roleName)
         {
             var review = await _context.Reviews
+                .Include(r => r.Object)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (review == null)
@@ -322,6 +334,10 @@ namespace TuristickiVodic.Services.Services
                 throw new UnauthorizedAccessException("You can delete only your own reviews.");
 
             var objectId = review.ObjectId;
+            await CreateCreatorObjectReviewDeletedNotificationAsync(
+                review.Object.CreatedByUserId,
+                review.Object.Name,
+                objectId);
 
             _context.Reviews.Remove(review);
             await _context.SaveChangesAsync();
@@ -329,6 +345,31 @@ namespace TuristickiVodic.Services.Services
             await UpdateObjectRatingAsync(objectId);
 
             return true;
+        }
+
+        private async Task CreateCreatorObjectReviewDeletedNotificationAsync(
+            int creatorId,
+            string objectName,
+            int objectId)
+        {
+            var creatorCanReceive = await _context.Users
+                .AsNoTracking()
+                .AnyAsync(u => u.Id == creatorId && u.IsActive && !u.IsBlacklisted);
+
+            if (!creatorCanReceive)
+                return;
+
+            _context.Notifications.Add(new Notification
+            {
+                UserId = creatorId,
+                Type = NotificationType.CreatorObjectReviewDeleted,
+                Title = "Recenzija na tvom objektu je obrisana",
+                Message = $"Turista je obrisao/la recenziju za objekat \"{objectName}\".",
+                ActionUrl = $"/objects/{objectId}",
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
         }
 
         private async Task<Review> LoadReviewAsync(int id)

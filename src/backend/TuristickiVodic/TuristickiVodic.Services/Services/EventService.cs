@@ -707,11 +707,16 @@ namespace TuristickiVodic.Services.Services
 
             if (HasPlannerRelevantChanges(plannerRelevantSnapshot, ev))
             {
+                var importantDetailsChanged = HasPlannerImportantDetailsChanges(plannerRelevantSnapshot, ev);
                 await CreatePlannerEventNotificationsAsync(
                     ev.Id,
                     NotificationType.PlannerEventUpdated,
-                    "Dogadjaj iz tvog planera je izmenjen",
-                    $"Dogadjaj \"{ev.Name}\" iz tvog planera je izmenjen. Proveri nove detalje.",
+                    importantDetailsChanged
+                        ? "Datum, vreme ili cena dogadjaja su izmenjeni"
+                        : "Dogadjaj iz tvog planera je izmenjen",
+                    importantDetailsChanged
+                        ? $"Dogadjaj \"{ev.Name}\" iz tvog planera ima izmenjen datum, vreme ili cenu. Proveri detalje pre polaska."
+                        : $"Dogadjaj \"{ev.Name}\" iz tvog planera je izmenjen. Proveri nove detalje.",
                     "/planner");
             }
 
@@ -775,6 +780,10 @@ namespace TuristickiVodic.Services.Services
                 "dogadjaj",
                 ev.Name,
                 $"/events/{ev.Id}");
+            if (!dto.Approve)
+            {
+                await CreateAdminMultipleRejectedContentNotificationsAsync(ev.CreatedByUserId, ev.Name, $"/events/{ev.Id}");
+            }
 
             if (dto.Approve)
             {
@@ -812,6 +821,54 @@ namespace TuristickiVodic.Services.Services
                 CreatedAt = DateTime.UtcNow
             });
 
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task CreateAdminMultipleRejectedContentNotificationsAsync(
+            int creatorId,
+            string latestContentName,
+            string actionUrl)
+        {
+            var rejectedCount =
+                await _context.Objects.AsNoTracking().CountAsync(o => o.CreatedByUserId == creatorId && o.Status == ContentStatus.Rejected) +
+                await _context.Events.AsNoTracking().CountAsync(e => e.CreatedByUserId == creatorId && e.Status == ContentStatus.Rejected) +
+                await _context.Activities.AsNoTracking().CountAsync(a => a.CreatedByUserId == creatorId && a.Status == ContentStatus.Rejected);
+
+            if (rejectedCount < 3)
+                return;
+
+            var creator = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == creatorId);
+
+            if (creator == null)
+                return;
+
+            var adminIds = await _context.Users
+                .AsNoTracking()
+                .Include(u => u.Role)
+                .Where(u => u.Role.Name == RoleType.Admin && u.IsActive && !u.IsBlacklisted)
+                .Select(u => u.Id)
+                .ToListAsync();
+
+            if (adminIds.Count == 0)
+                return;
+
+            var creatorName = $"{creator.FirstName} {creator.LastName}".Trim();
+            if (string.IsNullOrWhiteSpace(creatorName))
+                creatorName = creator.Email;
+
+            var notifications = adminIds.Select(adminId => new Notification
+            {
+                UserId = adminId,
+                Type = NotificationType.AdminCreatorMultipleRejectedContent,
+                Title = "ContentCreator ima vise odbijenih sadrzaja",
+                Message = $"ContentCreator {creatorName} ima {rejectedCount} odbijenih sadrzaja. Poslednje odbijeno: \"{latestContentName}\".",
+                ActionUrl = actionUrl,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            _context.Notifications.AddRange(notifications);
             await _context.SaveChangesAsync();
         }
 
@@ -1079,6 +1136,7 @@ namespace TuristickiVodic.Services.Services
                 ev.Name,
                 ev.StartDate,
                 ev.EndDate,
+                ev.Price,
                 ev.LocalityId,
                 ev.DestinationId,
                 ev.ObjectId);
@@ -1090,15 +1148,25 @@ namespace TuristickiVodic.Services.Services
                 snapshot.Name != ev.Name ||
                 snapshot.StartDate != ev.StartDate ||
                 snapshot.EndDate != ev.EndDate ||
+                snapshot.Price != ev.Price ||
                 snapshot.LocalityId != ev.LocalityId ||
                 snapshot.DestinationId != ev.DestinationId ||
                 snapshot.ObjectId != ev.ObjectId;
+        }
+
+        private static bool HasPlannerImportantDetailsChanges(PlannerRelevantSnapshot snapshot, Event ev)
+        {
+            return
+                snapshot.StartDate != ev.StartDate ||
+                snapshot.EndDate != ev.EndDate ||
+                snapshot.Price != ev.Price;
         }
 
         private readonly record struct PlannerRelevantSnapshot(
             string Name,
             DateTime StartDate,
             DateTime? EndDate,
+            decimal? Price,
             int? LocalityId,
             int? DestinationId,
             int? ObjectId);
