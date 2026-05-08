@@ -10,6 +10,8 @@ namespace TuristickiVodic.Core.Models
         ManagerNewPendingContent = 6,
         ManagerNewDeletionRequest = 7,
         CreatorContentReviewed = 8,
-        CreatorNewObjectReview = 9
+        CreatorNewObjectReview = 9,
+        CreatorDeletionRequestReviewed = 10,
+        AdminNewCreatorRoleRequest = 11
     }
 }

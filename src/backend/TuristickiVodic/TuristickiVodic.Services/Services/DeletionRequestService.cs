@@ -277,6 +277,7 @@ namespace TuristickiVodic.Services.Services
             }
 
             await _context.SaveChangesAsync();
+            await CreateCreatorDeletionRequestReviewedNotificationAsync(request);
 
             return MapToDto(request);
         }
@@ -700,6 +701,35 @@ namespace TuristickiVodic.Services.Services
                 Title = title,
                 Message = message,
                 ActionUrl = actionUrl,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task CreateCreatorDeletionRequestReviewedNotificationAsync(DeletionRequest request)
+        {
+            var creatorCanReceive = await _context.Users
+                .AsNoTracking()
+                .AnyAsync(u => u.Id == request.RequestedByUserId && u.IsActive && !u.IsBlacklisted);
+
+            if (!creatorCanReceive)
+                return;
+
+            var approved = request.Status == ContentStatus.Approved;
+            var statusText = approved ? "odobren" : "odbijen";
+            var contentName = request.Object?.Name
+                ?? request.Event?.Name
+                ?? request.Activity?.Name
+                ?? "sadrzaj";
+
+            _context.Notifications.Add(new Notification
+            {
+                UserId = request.RequestedByUserId,
+                Type = NotificationType.CreatorDeletionRequestReviewed,
+                Title = $"Zahtev za brisanje je {statusText}",
+                Message = $"Tvoj zahtev za brisanje sadrzaja \"{contentName}\" je {statusText}.",
+                ActionUrl = $"/deletion-requests/{request.Id}",
                 CreatedAt = DateTime.UtcNow
             });
 
