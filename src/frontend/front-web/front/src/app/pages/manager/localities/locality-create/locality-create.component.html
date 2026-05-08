@@ -5,11 +5,18 @@
       <h1>Create Location</h1>
       <p class="subtle-text">Add a new location for your managed destination.</p>
     </div>
+    <div class="top-actions">
+      <button type="button" class="ghost-btn" (click)="onCancel()">Cancel</button>
+      <button type="button" class="ghost-btn" (click)="onSaveDraft()">Save Draft</button>
+      <button type="submit" class="primary-btn" form="create-locality-form" [disabled]="isSubmitting || isLoadingOptions">
+        {{ isSubmitting ? 'Creating...' : 'Create Location' }}
+      </button>
+    </div>
   </header>
 
   <div class="create-layout">
-    <form class="create-form card" (ngSubmit)="onSubmit()">
-      <section class="section-block section-block--gallery">
+    <form id="create-locality-form" class="create-form" (ngSubmit)="onSubmit()">
+      <section class="section-block section-block--gallery step-card">
         <div class="gallery-card-head">
           <span class="step-tag">STEP 1</span>
           <h2>Media Gallery</h2>
@@ -55,40 +62,48 @@
         }
       </section>
 
-      <label>
-        <span>Name *</span>
-        <input type="text" [(ngModel)]="form.name" name="name" required />
-      </label>
+      <section class="section-block step-card">
+        <div class="gallery-card-head">
+          <span class="step-tag">STEP 2</span>
+          <h2>General Information</h2>
+          <p class="gallery-intro">Essential details about the location.</p>
+        </div>
 
-      <label>
-        <span>Description</span>
-        <textarea rows="4" [(ngModel)]="form.description" name="description"></textarea>
-      </label>
+        <div class="grid-2">
+          <label class="full-width">
+            <span>Location Name *</span>
+            <input type="text" [(ngModel)]="form.name" name="name" required placeholder="e.g. Barceloneta Beach" />
+          </label>
 
-      <div class="row-2">
-        <label>
-          <span>Destination *</span>
-          <select [(ngModel)]="form.destinationId" name="destinationId" required [disabled]="isLoadingOptions">
-            <option *ngFor="let option of destinationOptions" [ngValue]="option.id">{{ option.name }}</option>
-          </select>
-        </label>
+          <label>
+            <span>Destination *</span>
+            <select [(ngModel)]="form.destinationId" name="destinationId" required [disabled]="isLoadingOptions">
+              <option *ngFor="let option of destinationOptions" [ngValue]="option.id">{{ option.name }}</option>
+            </select>
+          </label>
 
-        <label>
-          <span>Type *</span>
-          <select [(ngModel)]="form.localityTypeId" name="localityTypeId" required [disabled]="isLoadingOptions">
-            <option *ngFor="let option of localityTypeOptions" [ngValue]="option.id">{{ option.name }}</option>
-          </select>
-        </label>
-      </div>
+          <label>
+            <span>Locality Type *</span>
+            <select [(ngModel)]="form.localityTypeId" name="localityTypeId" required [disabled]="isLoadingOptions">
+              <option *ngFor="let option of localityTypeOptions" [ngValue]="option.id">{{ option.name }}</option>
+            </select>
+          </label>
+
+          <label class="full-width">
+            <span>Full Description</span>
+            <textarea
+              rows="6"
+              [(ngModel)]="form.description"
+              name="description"
+              placeholder="Write a detailed description including what guests can expect..."
+            ></textarea>
+          </label>
+        </div>
+      </section>
 
       <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <p class="draft-message" *ngIf="draftSavedMessage">{{ draftSavedMessage }}</p>
 
-      <div class="actions">
-        <button type="button" class="ghost-btn" (click)="onCancel()">Cancel</button>
-        <button type="submit" class="primary-btn" [disabled]="isSubmitting || isLoadingOptions">
-          {{ isSubmitting ? 'Creating...' : 'Create Location' }}
-        </button>
-      </div>
     </form>
 
     <aside class="side-column card">

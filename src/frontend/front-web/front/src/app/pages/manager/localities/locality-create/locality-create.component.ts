@@ -27,6 +27,8 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
   isSubmitting = false;
   isLoadingOptions = true;
   errorMessage = '';
+  draftSavedMessage = '';
+  private readonly draftStorageKey = 'manager-locality-create-draft';
 
   destinationOptions: Array<{ id: number; name: string }> = [];
   localityTypeOptions: LocalityTypeOption[] = [];
@@ -46,6 +48,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
+    this.loadDraft();
     this.loadOptions();
   }
 
@@ -127,6 +130,15 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
 
   onCancel(): void {
     this.router.navigate(['/manager/localities']);
+  }
+
+  onSaveDraft(): void {
+    const draft = {
+      form: this.form,
+      primaryImageIndex: this.primaryImageIndex
+    };
+    localStorage.setItem(this.draftStorageKey, JSON.stringify(draft));
+    this.draftSavedMessage = 'Draft saved.';
   }
 
   onPickImages(input: HTMLInputElement): void {
@@ -226,5 +238,32 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
           this.isLoadingOptions = false;
         }
       });
+  }
+
+  private loadDraft(): void {
+    const raw = localStorage.getItem(this.draftStorageKey);
+    if (!raw) {
+      return;
+    }
+
+    try {
+      const draft = JSON.parse(raw) as {
+        form?: Partial<CreateLocalityDto>;
+        primaryImageIndex?: number;
+      };
+
+      if (draft.form) {
+        this.form = {
+          ...this.form,
+          ...draft.form
+        };
+      }
+
+      if (typeof draft.primaryImageIndex === 'number' && draft.primaryImageIndex >= 0) {
+        this.primaryImageIndex = draft.primaryImageIndex;
+      }
+    } catch {
+      // Ignore corrupted draft payload.
+    }
   }
 }
