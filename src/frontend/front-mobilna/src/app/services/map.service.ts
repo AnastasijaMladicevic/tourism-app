@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import * as L from 'leaflet';
+import 'leaflet.markercluster';
+
+type MarkerFilterKey = 'destination' | 'hotel' | 'restaurant' | 'church' | 'monument';
 
 interface MarkerEntry {
   marker: L.Marker;
@@ -7,22 +10,36 @@ interface MarkerEntry {
   type: string;
   lat: number;
   lng: number;
+  clusterKey: string;
+}
+
+interface MapInitOptions {
+  enableClustering?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
 export class MapService {
+  private static readonly BASE_WORLD_TILE_SIZE = 256;
+
+  private readonly worldBounds = L.latLngBounds(
+    L.latLng(-90, -180),
+    L.latLng(90, 180),
+  );
+
   private markers: MarkerEntry[] = [];
   private markerMap = new Map<string, MarkerEntry>();
   private activeMarkerKey: string | null = null;
   private map: L.Map | null = null;
-  private activeFilters: string[] = [];
+  private clusterGroups = new Map<string, L.MarkerClusterGroup>();
+  private clusteringEnabled = false;
+  private activeFilters: MarkerFilterKey[] = [];
 
-  private readonly filterMap: Record<string, string[]> = {
-    food: ['restaurant', 'kafana', 'bar', 'cafe', 'fast_food', 'winery', 'club'],
-    accommodation: ['hotel', 'apartment', 'motel', 'resort', 'hostel'],
-    fuel: ['gas_station'],
-    shopping: ['shop', 'mall', 'market'],
-    health: ['hospital', 'clinic', 'pharmacy'],
+  private readonly filterMap: Record<MarkerFilterKey, string[]> = {
+    destination: ['destination', 'locality', 'activity', 'event', 'attraction'],
+    hotel: ['hotel', 'apartment'],
+    restaurant: ['restaurant', 'kafana', 'bar', 'cafe', 'fast_food', 'winery', 'club'],
+    church: ['church', 'monastery'],
+    monument: ['monument', 'museum', 'gallery', 'shop', 'mall', 'market', 'gas_station', 'hospital', 'clinic', 'pharmacy'],
   };
 
   getMap(): L.Map | null {
@@ -52,27 +69,77 @@ export class MapService {
     return marker;
   }
 
-  initMap(containerId: string, lat = 42.424, lng = 18.771, zoom = 13): L.Map | null {
+  initMap(
+    containerId: string,
+    lat = 42.424,
+    lng = 18.771,
+    zoom = 13,
+    options?: MapInitOptions,
+  ): L.Map | null {
     if (this.map) {
       this.destroyMap();
     }
+
+    this.clusteringEnabled = !!options?.enableClustering;
 
     try {
       this.map = L.map(containerId, {
         zoomControl: false,
         attributionControl: false,
+        maxBounds: this.worldBounds,
+        maxBoundsViscosity: 1.0,
       }).setView([lat, lng], zoom);
 
       L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
         attribution: '',
+        noWrap: true,
       }).addTo(this.map);
 
-      this.map.on('moveend zoomend', () => this.syncVisibleMarkers());
+      this.map.whenReady(() => this.enforceWorldViewportCoverage());
+      this.map.on('resize', () => this.enforceWorldViewportCoverage());
+
+      if (this.clusteringEnabled) {
+        this.map.on('moveend zoomend', () => {
+          this.refreshAllClusters();
+          this.updateMarkerStyles();
+        });
+      } else {
+        this.map.on('moveend zoomend', () => this.syncVisibleMarkers());
+      }
+
       return this.map;
     } catch (error) {
       console.error('Greska pri kreiranju mape:', error);
       return null;
+    }
+  }
+
+  destroyMap(): void {
+    if (this.map) {
+      this.map.remove();
+      this.map = null;
+    }
+
+    this.clusterGroups.clear();
+    this.clusteringEnabled = false;
+    this.markers = [];
+    this.markerMap.clear();
+    this.activeMarkerKey = null;
+  }
+
+  clearAllMarkers(): void {
+    this.clusterGroups.forEach((group) => group.clearLayers());
+    this.clusterGroups.forEach((group) => group.remove());
+    this.clusterGroups.clear();
+    this.markers = [];
+    this.markerMap.clear();
+    this.activeMarkerKey = null;
+  }
+
+  flyTo(lat: number, lng: number, zoom = 16): void {
+    if (this.map) {
+      this.map.flyTo([lat, lng], zoom, { duration: 1.1 });
     }
   }
 
@@ -107,23 +174,6 @@ export class MapService {
     return marker;
   }
 
-  destroyMap(): void {
-    if (this.map) {
-      this.map.remove();
-      this.map = null;
-    }
-
-    this.markers = [];
-    this.markerMap.clear();
-    this.activeMarkerKey = null;
-  }
-
-  flyTo(lat: number, lng: number, zoom = 16): void {
-    if (this.map) {
-      this.map.flyTo([lat, lng], zoom, { duration: 1.5 });
-    }
-  }
-
   addMarkerWithType(
     lat: number,
     lng: number,
@@ -132,19 +182,21 @@ export class MapService {
     onClick?: () => void,
     autoSync = true,
   ): L.Marker | null {
-    if (!this.map) return null;
+    if (!this.map) {
+      return null;
+    }
 
-    const iconHtml = this.getMarkerIconHtml(type);
     const customIcon = L.divIcon({
       className: 'custom-type-marker',
-      html: iconHtml,
+      html: this.getMarkerIconHtml(type),
       iconSize: [38, 46],
       iconAnchor: [19, 44],
       popupAnchor: [0, -38],
     });
 
     const marker = L.marker([lat, lng], { icon: customIcon });
-    const entry: MarkerEntry = { marker, data, type, lat, lng };
+    const clusterKey = this.getClusterKey(data);
+    const entry: MarkerEntry = { marker, data, type, lat, lng, clusterKey };
     const key = this.toMarkerKey(type, data?.id);
 
     this.markers.push(entry);
@@ -152,10 +204,15 @@ export class MapService {
 
     marker.on('click', () => {
       this.activateMarker(key);
-      if (onClick) onClick();
+      if (onClick) {
+        onClick();
+      }
     });
 
-    if (autoSync) {
+    if (this.clusteringEnabled) {
+      this.getOrCreateClusterGroup(clusterKey).addLayer(marker);
+      this.updateMarkerStyles();
+    } else if (autoSync) {
       this.syncVisibleMarkers();
     }
 
@@ -188,8 +245,19 @@ export class MapService {
       return;
     }
 
-    this.activateMarker(key);
-    this.map?.flyTo([found.lat, found.lng], zoom);
+    const revealMarker = () => {
+      if (this.map && this.map.getZoom() < zoom) {
+        this.map.setZoom(zoom, { animate: true });
+      }
+      this.activateMarker(key);
+    };
+
+    if (this.clusteringEnabled) {
+      this.clusterGroups.get(found.clusterKey)?.zoomToShowLayer(found.marker, revealMarker);
+      return;
+    }
+
+    revealMarker();
   }
 
   clearMarkerFocus(): void {
@@ -197,13 +265,19 @@ export class MapService {
     this.updateMarkerStyles();
   }
 
-  setActiveFilters(filters: string[]): void {
+  setActiveFilters(filters: MarkerFilterKey[]): void {
     this.activeFilters = [...filters];
     this.syncVisibleMarkers();
   }
 
   syncVisibleMarkers(): void {
     if (!this.map) {
+      return;
+    }
+
+    if (this.clusteringEnabled) {
+      this.refreshAllClusters();
+      this.updateMarkerStyles();
       return;
     }
 
@@ -224,34 +298,129 @@ export class MapService {
   }
 
   private updateMarkerStyles(): void {
-  const hasFilters = this.activeFilters.length > 0;
+    const hasFilters = this.activeFilters.length > 0;
 
-  this.markerMap.forEach((entry, key) => {
-    const element = entry.marker.getElement();
-    if (!element) return;
-
-    const matchesFilter = this.matchesCurrentFilters(entry.type);
-    const isSelected = key === this.activeMarkerKey;
-    const shouldDim = (hasFilters && !matchesFilter && !isSelected) || (!!this.activeMarkerKey && !isSelected);
-    const shouldHighlight = hasFilters && matchesFilter && !isSelected && !this.activeMarkerKey;
-
-    element.classList.toggle('marker-dimmed', shouldDim);
-    element.classList.toggle('marker-filter-match', shouldHighlight);
-    element.classList.toggle('marker-selected', isSelected);
-
-    const pin = element.querySelector('.marker-pin');
-    if (pin) {
-      if (isSelected) {
-        pin.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3">
-        </circle></svg>`;
-        pin.classList.add('marker-pin--selected');
-      } else {
-        pin.innerHTML = `<span class="marker-pin__icon">${this.getMarkerEmoji(entry.type)}</span>`;
-        pin.classList.remove('marker-pin--selected');
+    this.markerMap.forEach((entry, key) => {
+      const element = entry.marker.getElement();
+      if (!element) {
+        return;
       }
+
+      const matchesFilter = this.matchesCurrentFilters(entry.type);
+      const isSelected = key === this.activeMarkerKey;
+      const shouldDim =
+        (hasFilters && !matchesFilter && !isSelected) || (!!this.activeMarkerKey && !isSelected);
+      const shouldHighlight = hasFilters && matchesFilter && !isSelected && !this.activeMarkerKey;
+
+      element.classList.toggle('marker-dimmed', shouldDim);
+      element.classList.toggle('marker-filter-match', shouldHighlight);
+      element.classList.toggle('marker-selected', isSelected);
+
+      const pin = element.querySelector('.marker-pin');
+      if (pin) {
+        if (isSelected) {
+          pin.innerHTML =
+            '<span class="marker-pin__glyph">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">' +
+            '<path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10Z"></path>' +
+            '<path d="M12 13.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"></path>' +
+            '</svg>' +
+            '</span>';
+          pin.classList.add('marker-pin--selected');
+        } else {
+          pin.innerHTML = `<span class="marker-pin__glyph">${this.getMarkerSvg(entry.type)}</span>`;
+          pin.classList.remove('marker-pin--selected');
+        }
+      }
+    });
+  }
+
+  private createClusterGroup(): L.MarkerClusterGroup {
+    return L.markerClusterGroup({
+      showCoverageOnHover: false,
+      spiderfyOnMaxZoom: true,
+      zoomToBoundsOnClick: true,
+      removeOutsideVisibleBounds: false,
+      maxClusterRadius: 54,
+      iconCreateFunction: (cluster) => {
+        const count = cluster.getChildCount();
+        const sizeClass = count < 10 ? 'small' : count < 30 ? 'medium' : 'large';
+
+        return L.divIcon({
+          html:
+            '<div class="destination-cluster__pin">' +
+            `<span class="destination-cluster__count">${count}</span>` +
+            '</div>',
+          className: `destination-cluster destination-cluster--${sizeClass}`,
+          iconSize: [56, 72],
+          iconAnchor: [28, 68],
+        });
+      },
+    });
+  }
+
+  private getOrCreateClusterGroup(clusterKey: string): L.MarkerClusterGroup {
+    let group = this.clusterGroups.get(clusterKey);
+    if (group) {
+      return group;
     }
-  });
-}
+
+    group = this.createClusterGroup();
+    this.clusterGroups.set(clusterKey, group);
+    if (this.map) {
+      group.addTo(this.map);
+    }
+
+    return group;
+  }
+
+  private refreshAllClusters(): void {
+    this.clusterGroups.forEach((group) => group.refreshClusters());
+  }
+
+  private enforceWorldViewportCoverage(): void {
+    if (!this.map) {
+      return;
+    }
+
+    const container = this.map.getContainer();
+    const width = Math.max(container.clientWidth, 1);
+    const height = Math.max(container.clientHeight, 1);
+    const minZoomForWidth = Math.ceil(Math.log2(width / MapService.BASE_WORLD_TILE_SIZE));
+    const minZoomForHeight = Math.ceil(Math.log2(height / MapService.BASE_WORLD_TILE_SIZE));
+    const minZoom = Math.max(0, minZoomForWidth, minZoomForHeight);
+
+    this.map.setMinZoom(minZoom);
+
+    if (this.map.getZoom() < minZoom) {
+      this.map.setZoom(minZoom, { animate: false });
+    }
+
+    this.map.panInsideBounds(this.worldBounds, { animate: false });
+  }
+
+  private getClusterKey(data: any): string {
+    if (data?.countryId != null) {
+      return `country:${data.countryId}`;
+    }
+    if (data?.regionId != null) {
+      return `region:${data.regionId}`;
+    }
+    if (typeof data?.countryCode === 'string' && data.countryCode.trim()) {
+      return `country-code:${data.countryCode.trim().toLowerCase()}`;
+    }
+    if (typeof data?.regionCode === 'string' && data.regionCode.trim()) {
+      return `region-code:${data.regionCode.trim().toLowerCase()}`;
+    }
+    if (typeof data?.countryName === 'string' && data.countryName.trim()) {
+      return `country-name:${data.countryName.trim().toLowerCase()}`;
+    }
+    if (typeof data?.regionName === 'string' && data.regionName.trim()) {
+      return `region-name:${data.regionName.trim().toLowerCase()}`;
+    }
+
+    return 'region:unknown';
+  }
 
   private matchesCurrentFilters(type: string): boolean {
     if (!this.activeFilters.length) {
@@ -265,43 +434,72 @@ export class MapService {
     return `${type}:${id}`;
   }
 
-  private getMarkerEmoji(type: string): string {
-  const icons: Record<string, string> = {
-    destination: '📍', locality: '🏙', event: '🎉', activity: '🚶',
-    hotel: '🏨', apartment: '🏠', restaurant: '🍽', kafana: '🍷',
-    club: '🎵', winery: '🍇', bar: '🍸', cafe: '☕', gas_station: '⛽',
-    shop: '🛍', mall: '🛒', market: '🛒', hospital: '🏥', clinic: '🏥',
-    pharmacy: '💊', attraction: '📌', default: '📍',
-  };
-  return icons[type] ?? icons['default'];
-}
-
   private getMarkerIconHtml(type: string): string {
-    const icons: Record<string, string> = {
-      destination: '📍',
-      locality: '🏙',
-      event: '🎉',
-      activity: '🚶',
-      hotel: '🏨',
-      apartment: '🏠',
-      restaurant: '🍽',
-      kafana: '🍷',
-      club: '🎵',
-      winery: '🍇',
-      bar: '🍸',
-      cafe: '☕',
-      gas_station: '⛽',
-      shop: '🛍',
-      mall: '🛒',
-      market: '🛒',
-      hospital: '🏥',
-      clinic: '🏥',
-      pharmacy: '💊',
-      attraction: '📌',
-      default: '📍',
-    };
+    return `<div class="marker-pin"><span class="marker-pin__glyph">${this.getMarkerSvg(type)}</span></div>`;
+  }
 
-    const icon = this.getMarkerEmoji(type);
-    return `<div class="marker-pin"><span class="marker-pin__icon">${icon}</span></div>`;
+  private getMarkerSvg(type: string): string {
+    const normalized = (type ?? '').trim().toLowerCase();
+
+    switch (normalized) {
+      case 'hotel':
+      case 'apartment':
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 18v-8a2 2 0 0 1 2-2h4a3 3 0 0 1 3 3v1h5a2 2 0 0 1 2 2v4M4 14h16M7.5 10.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"></path>
+          </svg>
+        `;
+      case 'restaurant':
+      case 'kafana':
+      case 'bar':
+      case 'cafe':
+      case 'club':
+      case 'winery':
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 3v7M10 3v7M7 7h3M16 3v18M16 10a3 3 0 0 0 3-3V3"></path>
+          </svg>
+        `;
+      case 'church':
+      case 'monastery':
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3v4M10 5h4M6 21V11l6-4 6 4v10M9 21v-4h6v4M8 11h8"></path>
+          </svg>
+        `;
+      case 'monument':
+      case 'museum':
+      case 'gallery':
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 21h14M7 21V9h10v12M9 9V5h6v4M8 13h8M8 17h8"></path>
+          </svg>
+        `;
+      case 'event':
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 3v3M16 3v3M4 9h16M6 6h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"></path>
+          </svg>
+        `;
+      case 'activity':
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M13 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM7 22l2-6 3 2 1 4M10 9l2 2 3-1 2 2-3 2-2 5"></path>
+          </svg>
+        `;
+      case 'locality':
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 20V8l8-4 8 4v12M9 20v-5h6v5M8 11h.01M12 11h.01M16 11h.01"></path>
+          </svg>
+        `;
+      default:
+        return `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10Z"></path>
+            <path d="M12 13.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"></path>
+          </svg>
+        `;
+    }
   }
 }
