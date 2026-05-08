@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DestinationService } from '../../../../services/destination.service';
 import { CreateLocalityDto, LocalityService } from '../../../../services/locality.service';
+import { MapComponent as SharedMapComponent } from '../../../../shared/components/map/map';
 
 interface LocalityTypeOption {
   id: number;
@@ -13,7 +14,7 @@ interface LocalityTypeOption {
 @Component({
   selector: 'app-manager-locality-create',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SharedMapComponent],
   templateUrl: './locality-create.component.html',
   styleUrls: ['./locality-create.component.css']
 })
@@ -41,6 +42,29 @@ export class ManagerLocalityCreateComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadOptions();
+  }
+
+  get hasMapCoordinates(): boolean {
+    return this.form.latitude != null && this.form.longitude != null;
+  }
+
+  get mapLat(): number {
+    const value = Number(this.form.latitude);
+    return Number.isFinite(value) ? value : 42.424;
+  }
+
+  get mapLng(): number {
+    const value = Number(this.form.longitude);
+    return Number.isFinite(value) ? value : 18.771;
+  }
+
+  get locationSummary(): string {
+    const destinationName =
+      this.destinationOptions.find((option) => option.id === Number(this.form.destinationId))?.name ?? '';
+    if (destinationName) {
+      return `Destination: ${destinationName}`;
+    }
+    return 'Set destination/locality for location context';
   }
 
   onSubmit(): void {
