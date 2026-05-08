@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -12,6 +12,13 @@ interface LocalityTypeOption {
   name: string;
 }
 
+interface DestinationOption {
+  id: number;
+  name: string;
+  latitude?: number;
+  longitude?: number;
+}
+
 @Component({
   selector: 'app-manager-locality-create',
   standalone: true,
@@ -23,14 +30,17 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
   private readonly localityService = inject(LocalityService);
   private readonly destinationService = inject(DestinationService);
   private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   isSubmitting = false;
   isLoadingOptions = true;
+  isLoadingDestinations = true;
+  isLoadingLocalityTypes = true;
   errorMessage = '';
   draftSavedMessage = '';
   private readonly draftStorageKey = 'manager-locality-create-draft';
 
-  destinationOptions: Array<{ id: number; name: string }> = [];
+  destinationOptions: DestinationOption[] = [];
   localityTypeOptions: LocalityTypeOption[] = [];
   pendingImageNames = '';
   imageFiles: File[] = [];
@@ -73,10 +83,35 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
   get locationSummary(): string {
     const destinationName =
       this.destinationOptions.find((option) => option.id === Number(this.form.destinationId))?.name ?? '';
+    const typeName =
+      this.localityTypeOptions.find((option) => option.id === Number(this.form.localityTypeId))?.name ?? '';
+
+    if (destinationName && typeName) {
+      return `${typeName} · ${destinationName}`;
+    }
     if (destinationName) {
       return `Destination: ${destinationName}`;
     }
+    if (typeName) {
+      return `Type: ${typeName}`;
+    }
     return 'Set destination/locality for location context';
+  }
+
+  get mapPopupText(): string {
+    const destinationName =
+      this.destinationOptions.find((option) => option.id === Number(this.form.destinationId))?.name ?? '';
+    const typeName =
+      this.localityTypeOptions.find((option) => option.id === Number(this.form.localityTypeId))?.name ?? '';
+    const name = this.form.name?.trim() ?? '';
+
+    if (name && destinationName) {
+      return `${name} · ${destinationName}`;
+    }
+    if (typeName && destinationName) {
+      return `${typeName} · ${destinationName}`;
+    }
+    return name || typeName || destinationName || 'New location';
   }
 
   onSubmit(): void {
@@ -116,8 +151,9 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
             next: () => {
               this.router.navigate(['/manager/localities']);
             },
-            error: (error) => {
-              this.errorMessage = error?.error?.message ?? 'Location created, but image upload failed.';
+            error: () => {
+              // Locality is already created; return to list even if image upload fails.
+              this.router.navigate(['/manager/localities']);
             }
           });
       },
@@ -143,6 +179,24 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
 
   onPickImages(input: HTMLInputElement): void {
     input.click();
+  }
+
+  onDestinationChange(): void {
+    const selectedDestination = this.destinationOptions.find(
+      (option) => option.id === Number(this.form.destinationId)
+    );
+
+    if (!selectedDestination) {
+      return;
+    }
+
+    if (
+      selectedDestination.latitude != null &&
+      selectedDestination.longitude != null
+    ) {
+      this.form.latitude = selectedDestination.latitude;
+      this.form.longitude = selectedDestination.longitude;
+    }
   }
 
   onFilesSelected(event: Event): void {
@@ -188,56 +242,81 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
 
   private loadOptions(): void {
     this.isLoadingOptions = true;
+    this.isLoadingDestinations = true;
+    this.isLoadingLocalityTypes = true;
 
     this.destinationService
-      .getAll({ page: 1, pageSize: 200, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
+      .getAll({ page: 1, pageSize: 50, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
       .subscribe({
         next: (destResponse: unknown) => {
           const destinationsRaw = Array.isArray(destResponse)
             ? destResponse
             : (destResponse as { items?: unknown[] })?.items ?? [];
-          const destinations = destinationsRaw as Array<{ id?: number; name?: string }>;
+          const destinations = destinationsRaw as Array<{ id?: number; name?: string; latitude?: number; longitude?: number }>;
 
           this.destinationOptions = destinations
-            .filter((d): d is { id: number; name: string } => typeof d.id === 'number' && !!d.name)
-            .map((d) => ({ id: d.id, name: d.name }))
+            .filter((d): d is { id: number; name: string; latitude?: number; longitude?: number } => typeof d.id === 'number' && !!d.name)
+            .map((d) => ({
+              id: d.id,
+              name: d.name,
+              latitude: typeof d.latitude === 'number' ? d.latitude : undefined,
+              longitude: typeof d.longitude === 'number' ? d.longitude : undefined
+            }))
             .sort((a, b) => a.name.localeCompare(b.name));
 
           if (this.destinationOptions.length > 0) {
-            this.form.destinationId = this.destinationOptions[0].id;
+            const hasCurrentDestination = this.destinationOptions.some(
+              (option) => option.id === Number(this.form.destinationId)
+            );
+
+            if (!hasCurrentDestination) {
+              this.form.destinationId = this.destinationOptions[0].id;
+            }
+            this.onDestinationChange();
+            this.cdr.detectChanges();
           }
 
-          this.localityService.getAll({ page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' }).subscribe({
-            next: (localityResponse) => {
-              const typeMap = new Map<number, string>();
-              for (const item of localityResponse?.items ?? []) {
-                if (item.localityTypeId && item.localityTypeName) {
-                  typeMap.set(item.localityTypeId, item.localityTypeName);
-                }
-              }
-
-              this.localityTypeOptions = Array.from(typeMap.entries())
-                .map(([id, name]) => ({ id, name }))
-                .sort((a, b) => a.name.localeCompare(b.name));
-
-              if (this.localityTypeOptions.length > 0) {
-                this.form.localityTypeId = this.localityTypeOptions[0].id;
-              }
-
-              this.isLoadingOptions = false;
-            },
-            error: () => {
-              this.localityTypeOptions = [];
-              this.isLoadingOptions = false;
-            }
-          });
+          this.isLoadingDestinations = false;
+          this.isLoadingOptions = this.isLoadingDestinations || this.isLoadingLocalityTypes;
         },
         error: () => {
           this.destinationOptions = [];
-          this.localityTypeOptions = [];
-          this.isLoadingOptions = false;
+          this.isLoadingDestinations = false;
+          this.isLoadingOptions = this.isLoadingDestinations || this.isLoadingLocalityTypes;
         }
       });
+
+    this.localityService.getAll({ page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' }).subscribe({
+      next: (localityResponse) => {
+        const typeMap = new Map<number, string>();
+        for (const item of localityResponse?.items ?? []) {
+          if (item.localityTypeId && item.localityTypeName) {
+            typeMap.set(item.localityTypeId, item.localityTypeName);
+          }
+        }
+
+        this.localityTypeOptions = Array.from(typeMap.entries())
+          .map(([id, name]) => ({ id, name }))
+          .sort((a, b) => a.name.localeCompare(b.name));
+
+        const hasCurrentType = this.localityTypeOptions.some(
+          (option) => option.id === Number(this.form.localityTypeId)
+        );
+        if (!hasCurrentType) {
+          this.form.localityTypeId = 0;
+        }
+
+        this.isLoadingLocalityTypes = false;
+        this.isLoadingOptions = this.isLoadingDestinations || this.isLoadingLocalityTypes;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.localityTypeOptions = [];
+        this.isLoadingLocalityTypes = false;
+        this.isLoadingOptions = this.isLoadingDestinations || this.isLoadingLocalityTypes;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   private loadDraft(): void {
@@ -266,4 +345,5 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
       // Ignore corrupted draft payload.
     }
   }
+
 }

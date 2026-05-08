@@ -77,14 +77,22 @@
 
           <label>
             <span>Destination *</span>
-            <select [(ngModel)]="form.destinationId" name="destinationId" required [disabled]="isLoadingOptions">
+            <select
+              [(ngModel)]="form.destinationId"
+              (ngModelChange)="onDestinationChange()"
+              name="destinationId"
+              required
+              [disabled]="isLoadingDestinations"
+            >
+              <option *ngIf="isLoadingDestinations" [ngValue]="form.destinationId" disabled>Loading destinations...</option>
               <option *ngFor="let option of destinationOptions" [ngValue]="option.id">{{ option.name }}</option>
             </select>
           </label>
 
           <label>
             <span>Locality Type *</span>
-            <select [(ngModel)]="form.localityTypeId" name="localityTypeId" required [disabled]="isLoadingOptions">
+            <select [(ngModel)]="form.localityTypeId" name="localityTypeId" required [disabled]="isLoadingLocalityTypes">
+              <option [ngValue]="0"></option>
               <option *ngFor="let option of localityTypeOptions" [ngValue]="option.id">{{ option.name }}</option>
             </select>
           </label>
@@ -117,7 +125,7 @@
           [lat]="mapLat"
           [lng]="mapLng"
           [zoom]="14"
-          [popupText]="form.name || 'New location'"
+          [popupText]="mapPopupText"
           [interactive]="false"
           [showMarker]="hasMapCoordinates"
           mapId="manager-create-locality-map"
