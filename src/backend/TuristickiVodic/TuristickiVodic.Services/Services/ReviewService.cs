@@ -145,6 +145,11 @@ namespace TuristickiVodic.Services.Services
 
             _context.Reviews.Add(review);
             await _context.SaveChangesAsync();
+            await CreateCreatorNewObjectReviewNotificationAsync(
+                touristObject.CreatedByUserId,
+                touristObject.Name,
+                review.Id,
+                $"/objects/{touristObject.Id}");
 
             await UpdateObjectRatingAsync(dto.ObjectId);
 
@@ -152,6 +157,33 @@ namespace TuristickiVodic.Services.Services
         }
 
         // Samo vlasnik recenzije može da je menja (Rating i Text)
+        private async Task CreateCreatorNewObjectReviewNotificationAsync(
+            int creatorId,
+            string objectName,
+            int reviewId,
+            string actionUrl)
+        {
+            var creatorCanReceive = await _context.Users
+                .AsNoTracking()
+                .AnyAsync(u => u.Id == creatorId && u.IsActive && !u.IsBlacklisted);
+
+            if (!creatorCanReceive)
+                return;
+
+            _context.Notifications.Add(new Notification
+            {
+                UserId = creatorId,
+                Type = NotificationType.CreatorNewObjectReview,
+                Title = "Nova recenzija na tvom objektu",
+                Message = $"Objekat \"{objectName}\" je dobio novu recenziju.",
+                ActionUrl = actionUrl,
+                ReviewId = reviewId,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<ReviewDto?> UpdateAsync(int id, UpdateReviewDto dto, int userId, string roleName)
         {
             var review = await _context.Reviews

@@ -729,6 +729,12 @@ namespace TuristickiVodic.Services.Services
             activity.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
+            await CreateCreatorContentReviewedNotificationAsync(
+                activity.CreatedByUserId,
+                dto.Approve,
+                "aktivnost",
+                activity.Name,
+                $"/activities/{activity.Id}");
 
             var updated = await _context.Activities
                 .Include(a => a.ActivityType)
@@ -748,6 +754,35 @@ namespace TuristickiVodic.Services.Services
 
         // Samo ContentCreator može direktno da obriše svoju aktivnost koja nije Approved.
         // Approved aktivnost se briše isključivo kroz DeletionRequest koji odobrava menadžer.
+        private async Task CreateCreatorContentReviewedNotificationAsync(
+            int creatorId,
+            bool approved,
+            string contentType,
+            string contentName,
+            string actionUrl)
+        {
+            var creatorCanReceive = await _context.Users
+                .AsNoTracking()
+                .AnyAsync(u => u.Id == creatorId && u.IsActive && !u.IsBlacklisted);
+
+            if (!creatorCanReceive)
+                return;
+
+            var statusText = approved ? "odobrena" : "odbijena";
+
+            _context.Notifications.Add(new Notification
+            {
+                UserId = creatorId,
+                Type = NotificationType.CreatorContentReviewed,
+                Title = $"Tvoja {contentType} je {statusText}",
+                Message = $"Sadrzaj \"{contentName}\" je {statusText}.",
+                ActionUrl = actionUrl,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<bool> DeleteAsync(int id, int userId, string roleName)
         {
             if (roleName != "ContentCreator")

@@ -769,6 +769,12 @@ namespace TuristickiVodic.Services.Services
             ev.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
+            await CreateCreatorContentReviewedNotificationAsync(
+                ev.CreatedByUserId,
+                dto.Approve,
+                "dogadjaj",
+                ev.Name,
+                $"/events/{ev.Id}");
 
             if (dto.Approve)
             {
@@ -778,6 +784,35 @@ namespace TuristickiVodic.Services.Services
             var result = _mapper.Map<EventDto>(await LoadEventAsync(ev.Id));
             await ApplyPendingDeletionRequestFlagsAsync(result);
             return result;
+        }
+
+        private async Task CreateCreatorContentReviewedNotificationAsync(
+            int creatorId,
+            bool approved,
+            string contentType,
+            string contentName,
+            string actionUrl)
+        {
+            var creatorCanReceive = await _context.Users
+                .AsNoTracking()
+                .AnyAsync(u => u.Id == creatorId && u.IsActive && !u.IsBlacklisted);
+
+            if (!creatorCanReceive)
+                return;
+
+            var statusText = approved ? "odobren" : "odbijen";
+
+            _context.Notifications.Add(new Notification
+            {
+                UserId = creatorId,
+                Type = NotificationType.CreatorContentReviewed,
+                Title = $"Tvoj {contentType} je {statusText}",
+                Message = $"Sadrzaj \"{contentName}\" je {statusText}.",
+                ActionUrl = actionUrl,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
         }
 
         private async Task CreateFavoritedLocationNotificationsAsync(Event ev)

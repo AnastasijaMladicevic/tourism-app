@@ -923,10 +923,45 @@ namespace TuristickiVodic.Services.Services
             obj.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
+            await CreateCreatorContentReviewedNotificationAsync(
+                obj.CreatedByUserId,
+                dto.Approve,
+                "objekat",
+                obj.Name,
+                $"/objects/{obj.Id}");
 
             var result = _mapper.Map<TouristObjectDto>(await LoadObjectAsync(obj.Id));
             await ApplyPendingDeletionRequestFlagsAsync(result);
             return result;
+        }
+
+        private async Task CreateCreatorContentReviewedNotificationAsync(
+            int creatorId,
+            bool approved,
+            string contentType,
+            string contentName,
+            string actionUrl)
+        {
+            var creatorCanReceive = await _context.Users
+                .AsNoTracking()
+                .AnyAsync(u => u.Id == creatorId && u.IsActive && !u.IsBlacklisted);
+
+            if (!creatorCanReceive)
+                return;
+
+            var statusText = approved ? "odobren" : "odbijen";
+
+            _context.Notifications.Add(new Notification
+            {
+                UserId = creatorId,
+                Type = NotificationType.CreatorContentReviewed,
+                Title = $"Tvoj {contentType} je {statusText}",
+                Message = $"Sadrzaj \"{contentName}\" je {statusText}.",
+                ActionUrl = actionUrl,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task<bool> DeleteAsync(int id, int userId, string roleName)

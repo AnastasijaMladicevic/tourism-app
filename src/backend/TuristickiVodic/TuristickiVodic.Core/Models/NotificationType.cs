@@ -8,6 +8,8 @@ namespace TuristickiVodic.Core.Models
         PlannerEventUpdated = 4,
         PlannerEventUnavailable = 5,
         ManagerNewPendingContent = 6,
-        ManagerNewDeletionRequest = 7
+        ManagerNewDeletionRequest = 7,
+        CreatorContentReviewed = 8,
+        CreatorNewObjectReview = 9
     }
 }
