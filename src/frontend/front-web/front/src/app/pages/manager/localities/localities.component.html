@@ -10,12 +10,17 @@
   <div class="toolbar card">
     <label class="search-field" aria-label="Search localities">
       <span class="material-symbols-outlined">search</span>
-      <input type="text" placeholder="Search by locality, destination or region..." />
+      <input
+        type="text"
+        [(ngModel)]="draftSearchQuery"
+        (keydown.enter)="onSearchEnter($event)"
+        placeholder="Search by locality, destination or region..."
+      />
     </label>
 
-    <button type="button" class="ghost-btn">
+    <button type="button" class="ghost-btn" (click)="onApplyFilters()">
       <span class="material-symbols-outlined">filter_alt</span>
-      More Filters
+      Apply Search
     </button>
   </div>
 
@@ -23,43 +28,45 @@
     <label>
       <span>Status</span>
       <select>
-        <option>All Statuses</option>
-        <option>Published</option>
-        <option>Pending</option>
-        <option>Draft</option>
+        <option>Published only</option>
       </select>
     </label>
 
     <label>
       <span>Destination</span>
-      <select>
-        <option>All Destinations</option>
-        <option>Belgrade</option>
-        <option>Novi Sad</option>
-        <option>Nis</option>
+      <select [(ngModel)]="destinationFilter">
+        <option value="all">All Destinations</option>
+      </select>
+    </label>
+
+    <label>
+      <span>Type</span>
+      <select [(ngModel)]="typeFilter">
+        <option value="all">All Types</option>
       </select>
     </label>
 
     <label>
       <span>Sort by</span>
-      <select>
-        <option>Name</option>
-        <option>Status</option>
-        <option>Objects count</option>
+      <select [(ngModel)]="sortBy">
+        <option value="name">Name</option>
+        <option value="destination">Destination</option>
+        <option value="type">Type</option>
+        <option value="createdAt">Created at</option>
       </select>
     </label>
 
     <label>
       <span>Order</span>
-      <select>
-        <option>Ascending</option>
-        <option>Descending</option>
+      <select [(ngModel)]="sortOrder">
+        <option value="asc">Ascending</option>
+        <option value="desc">Descending</option>
       </select>
     </label>
 
     <div class="filter-actions">
-      <button type="button" class="primary-btn filter-btn">Apply Filters</button>
-      <button type="button" class="ghost-btn filter-btn secondary">Reset Filters</button>
+      <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">Apply Filters</button>
+      <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">Reset Filters</button>
     </div>
   </div>
 
@@ -68,17 +75,17 @@
       <div class="stats-row">
         <article class="stat-card" data-tone="blue">
           <p>Total localities</p>
-          <strong>124</strong>
+          <strong>{{ totalCount }}</strong>
           <span>Across your managed destinations</span>
         </article>
         <article class="stat-card" data-tone="green">
           <p>On this page</p>
-          <strong>10</strong>
+          <strong>{{ totalLocalitiesOnPage }}</strong>
           <span>Visible rows</span>
         </article>
         <article class="stat-card" data-tone="neutral">
-          <p>Published ratio</p>
-          <strong>81%</strong>
+          <p>Active ratio</p>
+          <strong>{{ activePercent }}</strong>
           <span>Current filtered set</span>
         </article>
       </div>
@@ -88,158 +95,141 @@
           <h2>Managed Localities</h2>
         </header>
 
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>Status</th>
-                <th>Locality details</th>
-                <th>Destination</th>
-                <th>Region</th>
-                <th>Objects</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="active-row">
-                <td><span class="status-chip published">Published</span></td>
-                <td>
-                  <div class="item-cell item-cell-with-media">
-                    <div class="media-thumb"></div>
-                    <strong>Skadarlija</strong>
-                  </div>
-                </td>
-                <td>Belgrade</td>
-                <td>Central Serbia</td>
-                <td class="count-cell">38</td>
-                <td>
-                  <button type="button" class="icon-btn" title="Review locality">
-                    <span class="material-symbols-outlined">open_in_new</span>
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td><span class="status-chip pending">Pending</span></td>
-                <td>
-                  <div class="item-cell item-cell-with-media">
-                    <div class="media-thumb"></div>
-                    <strong>Liman</strong>
-                  </div>
-                </td>
-                <td>Novi Sad</td>
-                <td>Vojvodina</td>
-                <td class="count-cell">22</td>
-                <td>
-                  <button type="button" class="icon-btn" title="Review locality">
-                    <span class="material-symbols-outlined">open_in_new</span>
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td><span class="status-chip draft">Draft</span></td>
-                <td>
-                  <div class="item-cell item-cell-with-media">
-                    <div class="media-thumb"></div>
-                    <strong>Bubanj</strong>
-                  </div>
-                </td>
-                <td>Nis</td>
-                <td>Southern Serbia</td>
-                <td class="count-cell">14</td>
-                <td>
-                  <button type="button" class="icon-btn" title="Review locality">
-                    <span class="material-symbols-outlined">open_in_new</span>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        @if (isLoading) {
+          <div class="state state-loading">Loading localities...</div>
+        } @else if (errorMessage) {
+          <div class="state state-error">{{ errorMessage }}</div>
+        } @else if (!localities.length) {
+          <div class="state">No localities found for the selected filters.</div>
+        } @else {
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th>Coordinates</th>
+                  <th>Destinations</th>
+                  <th>Created By</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let locality of localities; trackBy: trackByLocalityId"
+                  [class.active-row]="selectedLocality?.id === locality.id"
+                  (click)="selectLocality(locality)"
+                >
+                  <td>
+                    <div class="item-cell item-cell-with-media">
+                      <div class="media-thumb" [style.background-image]="'url(' + locality.mainImageUrl + ')'"></div>
+                      <div>
+                        <strong>{{ locality.name }}</strong>
+                        <span class="status-line">
+                          <span class="status-chip" [ngClass]="getStatusClass(locality)">
+                            {{ getStatusLabel(locality) }}
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ locality.localityTypeName || 'N/A' }}</td>
+                  <td class="description-col">{{ locality.description || 'N/A' }}</td>
+                  <td>{{ getCoordinatesLabel(locality) }}</td>
+                  <td>{{ locality.destinationName || 'N/A' }}</td>
+                  <td>{{ getCreatedByLabel(locality) }}</td>
+                  <td>
+                    <button type="button" class="icon-btn" title="Select locality" (click)="$event.stopPropagation()">
+                      <span class="material-symbols-outlined">open_in_new</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        }
 
         <footer class="table-footer">
-          <p>Showing 1 to 10 of 124 localities</p>
+          <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ totalCount }} localities</p>
           <div class="pager">
             <label class="page-size-control">
               <span>Page size</span>
-              <select class="page-size-select">
-                <option>10</option>
-                <option>20</option>
-                <option>50</option>
+              <select class="page-size-select" [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+                <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
               </select>
             </label>
 
-            <button type="button" class="ghost-btn small-btn">Previous</button>
-            <button type="button" class="ghost-btn small-btn">Next</button>
+            <button type="button" class="ghost-btn small-btn" (click)="onPreviousPage()" [disabled]="currentPage === 1">
+              Previous
+            </button>
+            <button
+              type="button"
+              class="ghost-btn small-btn"
+              (click)="onNextPage()"
+              [disabled]="currentPage >= totalPages"
+            >
+              Next
+            </button>
           </div>
         </footer>
       </section>
     </div>
 
     <aside class="detail-column card">
-      <div class="activity-hero">
-        <div class="hero-media">
-          <span class="hero-badge">Featured locality</span>
-        </div>
-        <div class="hero-copy">
-          <p class="eyebrow">Preview</p>
-          <h2>Skadarlija</h2>
-          <p class="hero-meta">Belgrade · Central Serbia</p>
-          <span class="detail-status status-published">Published</span>
-        </div>
-      </div>
-
-      <div class="detail-metrics">
-        <div class="metric-card">
-          <span>Objects</span>
-          <strong>38</strong>
-        </div>
-        <div class="metric-card">
-          <span>Activities</span>
-          <strong>17</strong>
-        </div>
-      </div>
-
-      <section class="detail-section">
-        <div class="section-head">
-          <h3>Details</h3>
-        </div>
-        <div class="schedule-item">
-          <span>Destination</span>
-          <strong>Belgrade</strong>
-        </div>
-        <div class="schedule-item">
-          <span>Region</span>
-          <strong>Central Serbia</strong>
-        </div>
-        <div class="schedule-item">
-          <span>Coordinates</span>
-          <strong>44.8176, 20.4633</strong>
-        </div>
-      </section>
-
-      <section class="detail-section">
-        <h3>Description</h3>
-        <p class="description-copy">
-          A historic bohemian quarter with traditional restaurants, cultural venues, and walking
-          streets suitable for all-day city exploration.
-        </p>
-      </section>
-
-      <section class="detail-section">
-        <div class="map-card">
-          <div class="map-empty-state">
-            <span class="material-symbols-outlined">map</span>
-            <p>Map preview placeholder for selected locality.</p>
+      @if (selectedLocality) {
+        <div class="activity-hero">
+          <div class="hero-media" [ngStyle]="getHeroStyle()">
+            <span class="hero-badge">{{ selectedLocality.localityTypeName || 'Locality' }}</span>
+          </div>
+          <div class="hero-copy">
+            <p class="eyebrow">Preview</p>
+            <h2>{{ selectedLocality.name }}</h2>
+            <p class="hero-meta">{{ selectedLocality.destinationName }} · {{ selectedLocality.regionName }}</p>
+            <span class="detail-status status-published">{{ getStatusLabel(selectedLocality) }}</span>
           </div>
         </div>
-      </section>
 
-      <div class="detail-cta">
-        <button type="button" class="primary-btn full-cta sidebar-cta-btn">
-          <span class="material-symbols-outlined">rate_review</span>
-          Open full review
-        </button>
-      </div>
+        <div class="detail-metrics">
+          <div class="metric-card">
+            <span>Type</span>
+            <strong>{{ selectedLocality.localityTypeName || 'N/A' }}</strong>
+          </div>
+          <div class="metric-card">
+            <span>Created</span>
+            <strong>{{ selectedLocality.createdAt | date:'MMM d, y' }}</strong>
+          </div>
+        </div>
+
+        <section class="detail-section">
+          <div class="section-head">
+            <h3>Details</h3>
+          </div>
+          <div class="schedule-item">
+            <span>Destination</span>
+            <strong>{{ selectedLocality.destinationName || 'N/A' }}</strong>
+          </div>
+          <div class="schedule-item">
+            <span>Region</span>
+            <strong>{{ selectedLocality.regionName || 'N/A' }}</strong>
+          </div>
+          <div class="schedule-item">
+            <span>Coordinates</span>
+            <strong>{{ selectedCoordinates }}</strong>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h3>Description</h3>
+          <p class="description-copy">{{ selectedLocality.description || 'No description provided.' }}</p>
+        </section>
+      } @else {
+        <div class="empty-state">
+          <p class="eyebrow">No locality selected</p>
+          <h2>Pick a locality from the table</h2>
+          <p>Select a row to preview details and metadata here.</p>
+        </div>
+      }
     </aside>
   </div>
 </section>

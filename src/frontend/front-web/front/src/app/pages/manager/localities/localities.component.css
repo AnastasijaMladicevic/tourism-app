@@ -310,6 +310,11 @@ tbody tr:hover,
   color: #111827;
 }
 
+.status-line {
+  display: block;
+  margin-top: 4px;
+}
+
 .count-cell {
   font-weight: 700;
   color: #2563eb;
@@ -338,6 +343,13 @@ tbody tr:hover,
 .status-chip.draft {
   color: #475569;
   background: #e2e8f0;
+}
+
+.description-col {
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .icon-btn {
@@ -451,6 +463,11 @@ tbody tr:hover,
 .detail-status.status-published {
   color: #166534;
   background: #dcfce7;
+}
+
+.detail-status.status-draft {
+  color: #475569;
+  background: #e2e8f0;
 }
 
 .detail-metrics {
@@ -567,6 +584,20 @@ tbody tr:hover,
 
 .map-empty-state .material-symbols-outlined {
   font-size: 24px;
+}
+
+.state {
+  padding: 22px 14px;
+  text-align: center;
+  color: #64748b;
+}
+
+.state-loading {
+  color: #1d4ed8;
+}
+
+.state-error {
+  color: #991b1b;
 }
 
 @media (max-width: 1180px) {
