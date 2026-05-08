@@ -263,6 +263,14 @@ export class MapService {
 
   setActiveFilters(filters: string[]): void {
     this.activeFilters = [...filters];
+
+    if (this.activeMarkerKey) {
+      const activeEntry = this.markerMap.get(this.activeMarkerKey);
+      if (activeEntry && !this.matchesCurrentFilters(activeEntry.type)) {
+        this.activeMarkerKey = null;
+      }
+    }
+
     this.syncVisibleMarkers();
   }
 
@@ -272,6 +280,7 @@ export class MapService {
     }
 
     if (this.clusteringEnabled) {
+      this.syncClusteredMarkers();
       this.refreshAllClusters();
       this.updateMarkerStyles();
       return;
@@ -280,7 +289,9 @@ export class MapService {
     const bounds = this.map.getBounds().pad(0.35);
 
     this.markerMap.forEach((entry, key) => {
-      const shouldShow = key === this.activeMarkerKey || bounds.contains([entry.lat, entry.lng]);
+      const shouldShow =
+        this.matchesCurrentFilters(entry.type) &&
+        (key === this.activeMarkerKey || bounds.contains([entry.lat, entry.lng]));
       const hasLayer = this.map?.hasLayer(entry.marker) ?? false;
 
       if (shouldShow && !hasLayer) {
@@ -333,6 +344,24 @@ export class MapService {
 
   private toMarkerKey(type: string, id: number): string {
     return `${type}:${id}`;
+  }
+
+  private syncClusteredMarkers(): void {
+    this.markerMap.forEach((entry) => {
+      const group = this.clusterGroups.get(entry.clusterKey);
+      if (!group) {
+        return;
+      }
+
+      const shouldShow = this.matchesCurrentFilters(entry.type);
+      const hasLayer = group.hasLayer(entry.marker);
+
+      if (shouldShow && !hasLayer) {
+        group.addLayer(entry.marker);
+      } else if (!shouldShow && hasLayer) {
+        group.removeLayer(entry.marker);
+      }
+    });
   }
 
   private createClusterGroup(): L.MarkerClusterGroup {
