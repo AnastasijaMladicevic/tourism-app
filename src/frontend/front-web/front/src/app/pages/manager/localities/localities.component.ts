@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FilterOption, LocalityDto, LocalityService } from '../../../services/locality.service';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
+import { DestinationService } from '../../../services/destination.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-manager-localities',
@@ -13,6 +15,8 @@ import { MapComponent as SharedMapComponent } from '../../../shared/components/m
 })
 export class ManagerLocalitiesComponent implements OnInit {
   private readonly localityService = inject(LocalityService);
+  private readonly destinationService = inject(DestinationService);
+  private readonly authService = inject(AuthService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   localities: LocalityDto[] = [];
@@ -39,10 +43,13 @@ export class ManagerLocalitiesComponent implements OnInit {
   totalCount = 0;
   totalPages = 1;
   readonly pageSizeOptions = [5, 10, 20, 50];
+  private managerUserId: number | null = null;
+  private managedDestinationIds = new Set<number>();
+  private readonly creatorNameById = new Map<number, string>();
 
   ngOnInit(): void {
-    this.loadFilterOptions();
-    this.loadLocalities();
+    this.managerUserId = this.getCurrentUserIdFromToken();
+    this.loadManagedDestinationScope();
   }
 
   get totalLocalitiesOnPage(): number {
@@ -101,8 +108,8 @@ export class ManagerLocalitiesComponent implements OnInit {
 
     this.localityService
       .getAll({
-        page: this.currentPage,
-        pageSize: this.pageSize,
+        page: 1,
+        pageSize: 500,
         search: this.searchQuery || undefined,
         destination: this.destinationFilter !== 'all' ? this.destinationFilter : undefined,
         type: this.typeFilter !== 'all' ? this.typeFilter : undefined,
@@ -111,14 +118,21 @@ export class ManagerLocalitiesComponent implements OnInit {
       })
       .subscribe({
         next: (response) => {
-          const allItems = response?.items ?? [];
-          this.localities = this.statusFilter === 'all'
-            ? allItems
-            : allItems.filter((item) => this.getStatusLabel(item).toLowerCase() === this.statusFilter.toLowerCase());
-          this.totalCount = response?.totalCount ?? 0;
-          this.currentPage = response?.page ?? this.currentPage;
-          this.pageSize = response?.pageSize ?? this.pageSize;
-          this.totalPages = response?.totalPages ?? Math.max(1, Math.ceil(this.totalCount / this.pageSize));
+          const scopedItems = this.applyManagerScopeFilters(response?.items ?? []);
+          const filteredItems = this.statusFilter === 'all'
+            ? scopedItems
+            : scopedItems.filter((item) => this.getStatusLabel(item).toLowerCase() === this.statusFilter.toLowerCase());
+
+          this.totalCount = filteredItems.length;
+          this.totalPages = Math.max(1, Math.ceil(this.totalCount / this.pageSize));
+          if (this.currentPage > this.totalPages) {
+            this.currentPage = this.totalPages;
+          }
+
+          const start = (this.currentPage - 1) * this.pageSize;
+          const end = start + this.pageSize;
+          this.localities = filteredItems.slice(start, end);
+          this.loadCreatorNamesForRows(this.localities);
 
           if (!this.selectedLocality || !this.localities.some((item) => item.id === this.selectedLocality?.id)) {
             this.selectedLocality = this.localities[0] ?? null;
@@ -139,9 +153,46 @@ export class ManagerLocalitiesComponent implements OnInit {
       });
   }
 
+  private loadManagedDestinationScope(): void {
+    this.destinationService
+      .getAll({ page: 1, pageSize: 200, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
+      .subscribe({
+        next: (response: unknown) => {
+          const list = Array.isArray(response) ? response : (response as { items?: unknown[] })?.items ?? [];
+          const destinations = list as Array<{ id?: number }>;
+
+          this.managedDestinationIds = new Set(
+            destinations
+              .map((d) => d.id)
+              .filter((id): id is number => typeof id === 'number' && Number.isFinite(id))
+          );
+
+          this.loadFilterOptions();
+          this.loadLocalities();
+        },
+        error: () => {
+          this.managedDestinationIds.clear();
+          this.loadFilterOptions();
+          this.loadLocalities();
+        }
+      });
+  }
+
   loadFilterOptions(): void {
-    this.localityService.getFilterOptions().subscribe({
-      next: ({ destinationOptions, typeOptions, statusOptions }) => {
+    this.localityService.getAll({
+      page: 1,
+      pageSize: 500,
+      sortBy: 'name',
+      sortOrder: 'asc'
+    }).subscribe({
+      next: (response) => {
+        const scopedItems = this.applyManagerScopeFilters(response?.items ?? []);
+        const destinationOptions = this.toUniqueOptions(scopedItems.map((item) => item.destinationName));
+        const typeOptions = this.toUniqueOptions(scopedItems.map((item) => item.localityTypeName));
+        const statusOptions = this.toUniqueOptions(
+          scopedItems.map((item) => (item.isActive ? 'Published' : 'Archived'))
+        );
+
         this.destinationOptions = destinationOptions;
         this.typeOptions = typeOptions;
         this.statusOptions = statusOptions;
@@ -234,7 +285,12 @@ export class ManagerLocalitiesComponent implements OnInit {
   }
 
   getCreatedByLabel(locality: LocalityDto): string {
-    return locality.createdByUserId != null ? `User #${locality.createdByUserId}` : 'N/A';
+    if (locality.createdByUserId == null) {
+      return 'N/A';
+    }
+
+    const displayName = this.creatorNameById.get(locality.createdByUserId);
+    return displayName || `User #${locality.createdByUserId}`;
   }
 
   getCoordinatesLabel(locality: LocalityDto): string {
@@ -274,6 +330,89 @@ export class ManagerLocalitiesComponent implements OnInit {
       return encodeURI(new URL(trimmed, document.baseURI).href);
     } catch {
       return encodeURI(trimmed);
+    }
+  }
+
+  private applyManagerScopeFilters(items: LocalityDto[]): LocalityDto[] {
+    const filteredByOwner = this.managerUserId == null
+      ? []
+      : items.filter((item) => item.createdByUserId === this.managerUserId);
+
+    if (!this.managedDestinationIds.size) {
+      return filteredByOwner;
+    }
+
+    return filteredByOwner.filter((item) => this.managedDestinationIds.has(item.destinationId));
+  }
+
+  private getCurrentUserIdFromToken(): number | null {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      return null;
+    }
+
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      return null;
+    }
+
+    try {
+      const payloadBase64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const paddedPayload = payloadBase64.padEnd(payloadBase64.length + ((4 - (payloadBase64.length % 4)) % 4), '=');
+      const decodedPayload = decodeURIComponent(
+        atob(paddedPayload)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+
+      const payload = JSON.parse(decodedPayload) as Record<string, unknown>;
+      const rawId = payload['nameid'] ?? payload['sub'] ?? payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+      const parsedId = Number(rawId);
+
+      return Number.isInteger(parsedId) && parsedId > 0 ? parsedId : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private toUniqueOptions(values: Array<string | undefined>): FilterOption[] {
+    const unique = values
+      .map((value) => value?.trim())
+      .filter((value): value is string => !!value)
+      .filter((value, index, all) => all.findIndex((x) => x.toLowerCase() === value.toLowerCase()) === index)
+      .sort((a, b) => a.localeCompare(b));
+
+    return unique.map((value) => ({
+      value,
+      label: value
+    }));
+  }
+
+  private loadCreatorNamesForRows(rows: LocalityDto[]): void {
+    const creatorIds = [
+      ...new Set(
+        rows
+          .map((row) => row.createdByUserId)
+          .filter((id): id is number => typeof id === 'number' && Number.isFinite(id) && id > 0)
+      )
+    ];
+
+    for (const userId of creatorIds) {
+      if (this.creatorNameById.has(userId)) {
+        continue;
+      }
+
+      this.authService.getById(userId).subscribe({
+        next: (user) => {
+          const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+          this.creatorNameById.set(userId, fullName || `User #${userId}`);
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.creatorNameById.set(userId, `User #${userId}`);
+        }
+      });
     }
   }
 }
