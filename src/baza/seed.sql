@@ -12399,11 +12399,37 @@ VALUES
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 ('Sara', 'Galli', '1992-01-08', 'manager.florence@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000005', 'Italija', 'it', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Matteo', 'Rinaldi', '1989-03-22', 'manager.milan@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000006', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Elisa', 'Marchetti', '1991-07-14', 'manager.naples@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000007', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Davide', 'Costa', '1988-11-02', 'manager.turin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000008', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Beatrice', 'Giordano', '1992-02-09', 'manager.verona@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000009', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Simone', 'De Luca', '1987-08-19', 'manager.bologna@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000010', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Chiara', 'Fontana', '1990-05-30', 'manager.pisa@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000011', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Andrea', 'Serra', '1986-09-12', 'manager.genoa@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000012', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Francesca', 'Bellini', '1993-01-16', 'manager.sicily@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000013', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Luca', 'Ferraro', '1988-06-08', 'manager.capri@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000014', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Giada', 'Vitale', '1991-10-27', 'manager.lakedcomo@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000015', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 ('Chiara', 'Rossi', '1997-07-12', 'chiara.italy.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Italija', 'it', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 ('Marco', 'Esposito', '1995-03-30', 'marco.italy.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Italija', 'it', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 ('Bianca', 'Ferri', '1998-10-21', 'bianca.italy.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+ ('Federico', 'Romano', '1996-04-18', 'federico.italy.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Valentina', 'Moretti', '1998-09-07', 'valentina.italy.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Riccardo', 'Lombardi', '1995-12-11', 'riccardo.italy.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Italija', 'it', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 ('Milica', 'Petrovic', '1987-02-11', 'milica.admin.serbia@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000001', 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
@@ -12476,6 +12502,87 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.florence@spirego.com'),
  NOW(), NOW()),
+('Milan', 'Moda, arhitektura i ubrzani ritam severne Italije',
+ 'Milano je centar mode, dizajna i poslovnog života Italije, ali i grad sa impresivnom arhitekturom, restoranima i živim gradskim ritmom.',
+ ST_SetSRID(ST_MakePoint(9.1900, 45.4642), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.milan@spirego.com'),
+ NOW(), NOW()),
+('Naples', 'Pica, obala i energija juga Italije',
+ 'Napulj je grad intenzivne energije, poznat po istorijskom centru, pici, pogledima na Vezuv i živim ulicama punim lokalnog duha.',
+ ST_SetSRID(ST_MakePoint(14.2681, 40.8518), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.naples@spirego.com'),
+ NOW(), NOW()),
+('Turin', 'Elegantni trgovi i alpski duh severa',
+ 'Torino spaja elegantnu arhitekturu, muzeje i mirniji severnjački ritam sa pogledima ka Alpima.',
+ ST_SetSRID(ST_MakePoint(7.6869, 45.0703), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.turin@spirego.com'),
+ NOW(), NOW()),
+('Verona', 'Romeo i Julija, trgovi i sever italije',
+ 'Verona je poznata po romantičnoj atmosferi, istorijskim trgovima i amfiteatru koji leti postaje velika otvorena scena.',
+ ST_SetSRID(ST_MakePoint(10.9916, 45.4384), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.verona@spirego.com'),
+ NOW(), NOW()),
+('Bologna', 'Testenina, arkade i studentski grad',
+ 'Bolonja je poznata po gastronomskoj sceni, univerzitetu i dugim arkadama koje oblikuju ritam grada.',
+ ST_SetSRID(ST_MakePoint(11.3426, 44.4949), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.bologna@spirego.com'),
+ NOW(), NOW()),
+('Pisa', 'Krivi toranj i toskanski gradski ritam',
+ 'Piza je mnogo više od poznatog tornja i nudi prijatne trgove, studentsku atmosferu i lagan tempo obilaska.',
+ ST_SetSRID(ST_MakePoint(10.4017, 43.7228), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.pisa@spirego.com'),
+ NOW(), NOW()),
+('Genoa', 'Luke, uske ulice i mediteranski karakter',
+ 'Đenova kombinuje istorijsku luku, uske gradske prolaze i autentičan obalski karakter severozapadne Italije.',
+ ST_SetSRID(ST_MakePoint(8.9463, 44.4056), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.genoa@spirego.com'),
+ NOW(), NOW()),
+('Sicily', 'Vulkani, more i ukusi juga',
+ 'Sicilija spaja antičku istoriju, vulkanske pejzaže, mediteranske plaže i jednu od najpoznatijih gastronomskih scena Italije.',
+ ST_SetSRID(ST_MakePoint(14.0154, 37.5999), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ostrvo'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.sicily@spirego.com'),
+ NOW(), NOW()),
+('Capri', 'Plavo more, litice i luksuzni ostrvski odmor',
+ 'Kapri je malo ostrvo poznato po luksuznoj atmosferi, plavim pećinama i pogledima na tirensko more.',
+ ST_SetSRID(ST_MakePoint(14.2426, 40.5532), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ostrvo'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.capri@spirego.com'),
+ NOW(), NOW()),
+('Lake Como', 'Jezero, vile i mir severne Italije',
+ 'Komo je destinacija poznata po jezeru, elegantnim vilama i mirnijem odmoru okruženom planinama.',
+ ST_SetSRID(ST_MakePoint(9.2572, 45.8081), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Jezero'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.lakedcomo@spirego.com'),
+ NOW(), NOW()),
+
 ('Belgrade', 'Tvrdjava, gradske ulice i nocni ritam prestonice',
  'Beograd je grad sirokih bulevara, tvrdjave iznad usca i kafana koje zive do kasno. Posetioci ovde lako kombinuju istorijske tacke, moderni gradski ritam, dobru kafu i vecere koje se cesto produze vise nego sto je planirano.',
  ST_SetSRID(ST_MakePoint(20.4573, 44.8176), 4326), 'Approved', true,
@@ -12634,6 +12741,46 @@ WHERE "Email" = 'manager.uvac@spirego.com';
 UPDATE "Users"
 SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Mokra Gora')
 WHERE "Email" = 'manager.mokragora@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Milan')
+WHERE "Email" = 'manager.milan@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Naples')
+WHERE "Email" = 'manager.naples@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Turin')
+WHERE "Email" = 'manager.turin@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Verona')
+WHERE "Email" = 'manager.verona@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bologna')
+WHERE "Email" = 'manager.bologna@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Pisa')
+WHERE "Email" = 'manager.pisa@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Genoa')
+WHERE "Email" = 'manager.genoa@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sicily')
+WHERE "Email" = 'manager.sicily@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Capri')
+WHERE "Email" = 'manager.capri@spirego.com';
+
+UPDATE "Users"
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lake Como')
+WHERE "Email" = 'manager.lakedcomo@spirego.com';
 
 -- 15.2 ITALIJA + SRBIJA LOKALITETI
 INSERT INTO "Localities"
@@ -12980,6 +13127,16 @@ WITH source("Url", "AltText", "IsMain", "DestinationName") AS (
     ('https://i0.wp.com/media1.lepojeziveti.com/2018/04/vitorrio-emanuelle-panorama.jpg', 'Rome', true, 'Rome'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Venice', true, 'Venice'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'Florence', true, 'Florence'),
+    ('https://upload.wikimedia.org/wikipedia/commons/c/c3/Milan_skyline_skyscrapers_of_Porta_Nuova_business_district_%28cropped%29.jpg', 'Milan', true, 'Milan'),
+    ('https://www.christiesrealestate.com/resizer/v2/Q3IJO5D2JNAAXOSSQRAYB7QRMI.jpg?auth=e5a620e3c1801a0cda31a292e7171a8ba7a4e84ccca51beab8a2923d7775e808', 'Naples', true, 'Naples'),
+    ('https://engelsbergideas.com/wp-content/uploads/2025/08/Turin-Italy-1.jpg', 'Turin', true, 'Turin'),
+    ('https://upload.wikimedia.org/wikipedia/commons/b/bb/Panorama_di_Verona.jpg', 'Verona', true, 'Verona'),
+    ('https://upload.wikimedia.org/wikipedia/commons/b/bc/Bologna-SanPetronioPiazzaMaggiore1.jpg', 'Bologna', true, 'Bologna'),
+    ('https://upload.wikimedia.org/wikipedia/commons/d/d3/Italy_-_Pisa.jpg', 'Pisa', true, 'Pisa'),
+    ('https://content.r9cdn.net/rimg/dimg/48/ff/ef42ba47-city-6888-16d17bc986f.jpg?width=1366&height=768&xhint=1739&yhint=1348&crop=true', 'Genoa', true, 'Genoa'),
+    ('https://i.natgeofe.com/n/543132f8-4728-4381-b35b-09bd262f88c1/GettyImages-1427282403.jpg?w=2880&h=1774', 'Sicily', true, 'Sicily'),
+    ('https://cdn.sanity.io/images/nxpteyfv/goguides/f0024f4dacbcd414760aaa445593c84e7b730685-1600x1066.jpg', 'Capri', true, 'Capri'),
+    ('https://hips.hearstapps.com/hmg-prod/images/the-town-of-varenna-on-lake-como-royalty-free-image-1690925689.jpg', 'Lake Como', true, 'Lake Como'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Belgrade', true, 'Belgrade'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Novi Sad', true, 'Novi Sad'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Zlatibor', true, 'Zlatibor'),
@@ -13071,207 +13228,6 @@ SELECT s."Url", s."AltText", s."IsMain", a."Id", NOW()
 FROM source s
 JOIN "Activities" a ON a."Name" = s."ActivityName";
 
-
--- ============================================
--- GRCKA
--- ============================================
-
-
-INSERT INTO "Regions" ("Name", "Code", "IsActive", "IsDefault", "CreatedAt", "UpdatedAt")
-SELECT 'Grcka', 'GR', true, false, NOW(), NOW()
-WHERE NOT EXISTS (
-    SELECT 1 FROM "Regions" WHERE "Code" = 'GR'
-);
-
-INSERT INTO "Users"
-("FirstName", "LastName", "DateOfBirth", "Email", "PasswordHash", "PhoneNumber", "Country", "Language", "IsVerified", "IsActive", "IsBlacklisted", "HasRequestedCreatorRole",
- "RoleId", "ManagedDestinationId", "CreatedAt", "UpdatedAt", "ProfileImageUrl")
-VALUES
-('Alexandra', 'Papadopoulou', '1987-04-16', 'alexandra.admin.greece@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000000', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-
-('Eleni', 'Papadopoulou', '1990-03-12', 'eleni.creator@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000001', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'ContentCreator'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-
-('Nikos', 'Georgiou', '1988-06-18', 'manager.athens@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000002', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Maria', 'Nikolaou', '1991-09-04', 'manager.thessaloniki@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000003', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Kostas', 'Dimitriou', '1987-12-22', 'manager.santorini@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000004', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Sofia', 'Karagianni', '1992-01-15', 'manager.mykonos@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000005', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Dimitris', 'Pappas', '1989-05-29', 'manager.crete@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000006', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Ioanna', 'Andreou', '1993-07-07', 'manager.rhodes@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000007', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Giorgos', 'Vasileiou', '1986-11-11', 'manager.corfu@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000008', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Katerina', 'Anastasiou', '1990-10-03', 'manager.meteora@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000009', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Alexandros', 'Stavrou', '1988-02-27', 'manager.delphi@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000010', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Despina', 'Mavridou', '1991-04-19', 'manager.zakynthos@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000011', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-
-('Petros', 'Ioannidis', '1997-08-14', 'petros.greece.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000012', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Anna', 'Christou', '1998-03-21', 'anna.greece.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000013', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Manolis', 'Kouris', '1996-12-09', 'manolis.greece.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000014', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Eirini', 'Markou', '1999-05-30', 'eirini.greece.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000015', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Stavros', 'Lambrou', '1995-07-18', 'stavros.greece.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000016', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Daphne', 'Samaras', '1998-11-02', 'daphne.greece.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+306900000017', 'Grcka', 'el', true, true, false, false,
- (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
-
--- ============================================
--- 16.1 GRCKA DESTINACIJE
--- ============================================
-
-INSERT INTO "Destinations"
-("Name", "DisplayTitle", "Description", "Geolocation", "Status", "IsActive", "DestinationTypeId", "RegionId", "CreatedByUserId", "ManagedByUserId", "CreatedAt", "UpdatedAt")
-VALUES
-('Athens', 'Akropolj, gradski trgovi i večeri pod svetlima Atine',
- 'Atina je grad u kojem se antička istorija nalazi tik uz savremeni gradski ritam, kafiće, taverne i žive kvartove. Posetioci mogu da obiđu Akropolj, prošetaju kroz Plaku i završe dan uz pogled na osvetljene arheološke lokalitete.',
- ST_SetSRID(ST_MakePoint(23.7275, 37.9838), 4326), 'Approved', true,
- (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
- (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'alexandra.admin.greece@spirego.com'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.athens@spirego.com'),
- NOW(), NOW()),
-
-('Thessaloniki', 'Šetalište, istorija i opušten sever Grčke',
- 'Solun je grad uz more sa jakim kulturnim identitetom, dugim šetalištima i slojevima rimske, vizantijske i moderne istorije. Idealan je za putnike koji vole gradske vikende, dobru hranu, muzeje i večernje šetnje pored obale.',
- ST_SetSRID(ST_MakePoint(22.9444, 40.6401), 4326), 'Approved', true,
- (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
- (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'alexandra.admin.greece@spirego.com'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.thessaloniki@spirego.com'),
- NOW(), NOW()),
-
-('Santorini', 'Bela sela, plave kupole i zalasci nad kalderom',
- 'Santorini je ostrvo poznato po belim kućama, plavim kupolama, vulkanskim pejzažima i dramatičnim zalascima sunca. Destinacija je posebno pogodna za romantična putovanja, panoramske šetnje, degustacije vina i odmor sa pogledom na more.',
- ST_SetSRID(ST_MakePoint(25.4615, 36.3932), 4326), 'Approved', true,
- (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ostrvo'),
- (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'alexandra.admin.greece@spirego.com'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.santorini@spirego.com'),
- NOW(), NOW()),
-
-('Mykonos', 'Plaže, vetrenjače i energičan ostrvski ritam',
- 'Mikonos je ostrvo poznato po plažama, belim ulicama, vetrenjačama i živom noćnom ritmu. Odgovara posetiocima koji žele kombinaciju kupanja, laganih dnevnih obilazaka, restorana i intenzivnijeg večernjeg izlaska.',
- ST_SetSRID(ST_MakePoint(25.3289, 37.4467), 4326), 'Approved', true,
- (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ostrvo'),
- (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'alexandra.admin.greece@spirego.com'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.mykonos@spirego.com'),
- NOW(), NOW()),
-
-('Crete', 'Veliko ostrvo, planine, plaže i minojska istorija',
- 'Krit je najveće grčko ostrvo i nudi spoj dugih plaža, planinskih sela, arheoloških lokaliteta i snažne lokalne kuhinje. Pogodan je za duži boravak jer se lako kombinuju more, priroda, istorija i mirniji lokalni ritam.',
- ST_SetSRID(ST_MakePoint(24.8093, 35.2401), 4326), 'Approved', true,
- (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ostrvo'),
- (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'alexandra.admin.greece@spirego.com'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.crete@spirego.com'),
- NOW(), NOW()),
-
-('Rhodes', 'Srednjovekovni grad, plaže i sunce Dodekaneza',
- 'Rodos spaja srednjovekovne zidine, stare gradske ulice, duga leta i raznovrsne plaže. Destinacija je dobra za putnike koji žele istorijski obilazak, opuštanje uz more i izlete po ostrvu bez previše komplikovane organizacije.',
- ST_SetSRID(ST_MakePoint(28.2278, 36.4341), 4326), 'Approved', true,
- (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ostrvo'),
- (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'alexandra.admin.greece@spirego.com'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.rhodes@spirego.com'),
- NOW(), NOW()),
-
-('Corfu', 'Zeleno ostrvo, venecijanski tragovi i jonsko more',
- 'Krf je ostrvo bogato zelenilom, starim gradom pod venecijanskim uticajem i plažama Jonskog mora. Posebno odgovara posetiocima koji žele malo mirniji ostrvski odmor, kulturni obilazak i lepe vožnje kroz prirodu.',
- ST_SetSRID(ST_MakePoint(19.9217, 39.6243), 4326), 'Approved', true,
- (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ostrvo'),
- (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'alexandra.admin.greece@spirego.com'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.corfu@spirego.com'),
- NOW(), NOW()),
-
-('Meteora', 'Manastiri na stenama i prizori koji deluju nestvarno',
- 'Meteora je jedna od najprepoznatljivijih grčkih regija zbog manastira izgrađenih na visokim stenama i pejzaža koji ostavlja snažan utisak. Destinacija je pogodna za razgledanje, fotografisanje, kraće planinarske rute i mirniji kulturni obilazak.',
- ST_SetSRID(ST_MakePoint(21.6300, 39.7217), 4326), 'Approved', true,
- (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Turisticka Regija'),
- (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'alexandra.admin.greece@spirego.com'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.meteora@spirego.com'),
- NOW(), NOW()),
-
-('Delphi', 'Proročište, planinski pejzaži i tragovi antičke Grčke',
- 'Delfi su istorijska destinacija poznata po antičkom proročištu, arheološkom kompleksu i pogledu na okolne planine. Posetioci ovde dolaze zbog kulture, mitologije, muzeja i mirnijeg obilaska van velikih gradskih gužvi.',
- ST_SetSRID(ST_MakePoint(22.5010, 38.4824), 4326), 'Approved', true,
- (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Turisticka Regija'),
- (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'alexandra.admin.greece@spirego.com'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.delphi@spirego.com'),
- NOW(), NOW()),
-
-('Zakynthos', 'Plave pećine, Navagio plaža i jonski odmor',
- 'Zakintos je ostrvo poznato po tirkiznoj vodi, plavim pećinama, vidikovcima i čuvenoj plaži Navagio. Pogodan je za letnji odmor, vožnje brodom, fotografisanje i kombinaciju plaža sa laganim ostrvskim obilascima.',
- ST_SetSRID(ST_MakePoint(20.7069, 37.7882), 4326), 'Approved', true,
- (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ostrvo'),
- (SELECT "Id" FROM "Regions" WHERE "Code" = 'GR'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'alexandra.admin.greece@spirego.com'),
- (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.zakynthos@spirego.com'),
- NOW(), NOW());
-
--- ============================================
--- 16.2 DODELA DESTINACIJA MENADZERIMA
--- ============================================
-
-WITH greek_manager_assignments AS (
-    SELECT d."Id" AS destination_id, u."Id" AS manager_id
-    FROM (VALUES
-        ('Athens', 'manager.athens@spirego.com'),
-        ('Thessaloniki', 'manager.thessaloniki@spirego.com'),
-        ('Santorini', 'manager.santorini@spirego.com'),
-        ('Mykonos', 'manager.mykonos@spirego.com'),
-        ('Crete', 'manager.crete@spirego.com'),
-        ('Rhodes', 'manager.rhodes@spirego.com'),
-        ('Corfu', 'manager.corfu@spirego.com'),
-        ('Meteora', 'manager.meteora@spirego.com'),
-        ('Delphi', 'manager.delphi@spirego.com'),
-        ('Zakynthos', 'manager.zakynthos@spirego.com')
-    ) AS map(destination_name, manager_email)
-    JOIN "Destinations" d ON d."Name" = map.destination_name
-    JOIN "Users" u ON u."Email" = map.manager_email
-)
-UPDATE "Users" u
-SET "ManagedDestinationId" = m.destination_id,
-    "UpdatedAt" = NOW()
-FROM greek_manager_assignments m
-WHERE u."Id" = m.manager_id;
-
--- ============================================
--- 16.3 SLIKE - DESTINACIJE
--- ============================================
-
-WITH source("Url", "AltText", "IsMain", "DestinationName") AS (
-    VALUES
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/30/93/7e/05/caption.jpg?w=1200&h=-1&s=1&cx=1920&cy=1080&chk=v1_745027d847e18a7e6184', 'Athens', true, 'Athens'),
-    ('https://res.cloudinary.com/enchanting/image/upload/v1/artemis-mdm/181360f0-5dd3-4733-9fa2-a3aa8f1cc4c1.jpg', 'Thessaloniki', true, 'Thessaloniki'),
-    ('https://sothebysrealty.gr/wp-content/uploads/2016/11/Santorini-sunset-at-dawn-Greece-Sothebys-International-Realty.jpg', 'Santorini', true, 'Santorini'),
-    ('https://d3dqioy2sca31t.cloudfront.net/Projects/cms/production/000/037/173/original/d7c0b05af781c34d791d1e9059b504da/article-greece-mykonos-shopping-street.jpg', 'Mykonos', true, 'Mykonos'),
-    ('https://a.storyblok.com/f/306333/1920x1080/16b5493e2c/crete.jpg/m/1920x1080/filters:format(webp):quality(70)', 'Crete', true, 'Crete'),
-    ('https://gotripzi.com/cdn-cgi/image/onerror=redirect,width=3200,height=2400,fit=cover,format=png/_astro/rhodes-gr-beach.SliIurZd.webp', 'Rhodes', true, 'Rhodes'),
-    ('https://www.royalcaribbean.com/media-assets/pmc/content/dam/shore-x/corfu-cfu/cgh1-corfu-hop-on-hop-off-bus/stock-photo-corfu-old-town-aerial_1954735459.jpg?w=1920', 'Corfu', true, 'Corfu'),
-    ('https://cdn-imgix.headout.com/media/images/3a84bd6ad658d460065a6d3fc9d90c27-Meteora-0007-AdobeStock-243581096.jpg', 'Meteora', true, 'Meteora'),
-    ('https://www.greeka.com/photos/sterea/delphi/hero/delphi-1920.jpg', 'Delphi', true, 'Delphi'),
-    ('https://turisttrade.com/wp-content/uploads/nc/images/blog/1-4.jpg', 'Zakynthos', true, 'Zakynthos')
-)
-INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
-SELECT s."Url", s."AltText", s."IsMain", d."Id", NOW()
-FROM source s
-JOIN "Destinations" d ON d."Name" = s."DestinationName";
 
     
 -- ============================================
