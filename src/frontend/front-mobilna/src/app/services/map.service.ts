@@ -63,7 +63,7 @@ export class MapService {
         attributionControl: false,
       }).setView([lat, lng], zoom);
 
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '',
       }).addTo(this.map);
@@ -224,34 +224,34 @@ export class MapService {
   }
 
   private updateMarkerStyles(): void {
-  const hasFilters = this.activeFilters.length > 0;
+    const hasFilters = this.activeFilters.length > 0;
 
-  this.markerMap.forEach((entry, key) => {
-    const element = entry.marker.getElement();
-    if (!element) return;
+    this.markerMap.forEach((entry, key) => {
+      const element = entry.marker.getElement();
+      if (!element) return;
 
-    const matchesFilter = this.matchesCurrentFilters(entry.type);
-    const isSelected = key === this.activeMarkerKey;
-    const shouldDim = (hasFilters && !matchesFilter && !isSelected) || (!!this.activeMarkerKey && !isSelected);
-    const shouldHighlight = hasFilters && matchesFilter && !isSelected && !this.activeMarkerKey;
+      const matchesFilter = this.matchesCurrentFilters(entry.type);
+      const isSelected = key === this.activeMarkerKey;
+      const shouldDim = (hasFilters && !matchesFilter && !isSelected) || (!!this.activeMarkerKey && !isSelected);
+      const shouldHighlight = hasFilters && matchesFilter && !isSelected && !this.activeMarkerKey;
 
-    element.classList.toggle('marker-dimmed', shouldDim);
-    element.classList.toggle('marker-filter-match', shouldHighlight);
-    element.classList.toggle('marker-selected', isSelected);
+      element.classList.toggle('marker-dimmed', shouldDim);
+      element.classList.toggle('marker-filter-match', shouldHighlight);
+      element.classList.toggle('marker-selected', isSelected);
 
-    const pin = element.querySelector('.marker-pin');
-    if (pin) {
-      if (isSelected) {
-        pin.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3">
+      const pin = element.querySelector('.marker-pin');
+      if (pin) {
+        if (isSelected) {
+          pin.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3">
         </circle></svg>`;
-        pin.classList.add('marker-pin--selected');
-      } else {
-        pin.innerHTML = `<span class="marker-pin__icon">${this.getMarkerEmoji(entry.type)}</span>`;
-        pin.classList.remove('marker-pin--selected');
+          pin.classList.add('marker-pin--selected');
+        } else {
+          pin.innerHTML = `<span class="marker-pin__icon">${this.getMarkerEmoji(entry.type)}</span>`;
+          pin.classList.remove('marker-pin--selected');
+        }
       }
-    }
-  });
-}
+    });
+  }
 
   private matchesCurrentFilters(type: string): boolean {
     if (!this.activeFilters.length) {
@@ -266,15 +266,15 @@ export class MapService {
   }
 
   private getMarkerEmoji(type: string): string {
-  const icons: Record<string, string> = {
-    destination: '📍', locality: '🏙', event: '🎉', activity: '🚶',
-    hotel: '🏨', apartment: '🏠', restaurant: '🍽', kafana: '🍷',
-    club: '🎵', winery: '🍇', bar: '🍸', cafe: '☕', gas_station: '⛽',
-    shop: '🛍', mall: '🛒', market: '🛒', hospital: '🏥', clinic: '🏥',
-    pharmacy: '💊', attraction: '📌', default: '📍',
-  };
-  return icons[type] ?? icons['default'];
-}
+    const icons: Record<string, string> = {
+      destination: '📍', locality: '🏙', event: '🎉', activity: '🚶',
+      hotel: '🏨', apartment: '🏠', restaurant: '🍽', kafana: '🍷',
+      club: '🎵', winery: '🍇', bar: '🍸', cafe: '☕', gas_station: '⛽',
+      shop: '🛍', mall: '🛒', market: '🛒', hospital: '🏥', clinic: '🏥',
+      pharmacy: '💊', attraction: '📌', default: '📍',
+    };
+    return icons[type] ?? icons['default'];
+  }
 
   private getMarkerIconHtml(type: string): string {
     const icons: Record<string, string> = {
