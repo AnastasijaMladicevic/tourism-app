@@ -19,6 +19,8 @@ import { LocationTrackingService } from '../../services/location-tracking';
 import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
 import { EventPlannerService } from '../../services/event-planner';
 import { PendingActionService } from '../../services/pending-action';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 
 interface PlaceCard {
   title: string;
@@ -89,7 +91,7 @@ interface HomeCategory {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [BottomNavComponent, FormsModule, MatIcon, LazyBackgroundDirective],
+  imports: [BottomNavComponent, FormsModule, MatIcon, LazyBackgroundDirective, TranslatePipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
@@ -140,14 +142,27 @@ export class HomeComponent implements OnInit, OnDestroy {
     private locationTrackingService: LocationTrackingService,
     private plannerService: PlannerLocalPreferencesService,
     private eventPlannerService: EventPlannerService,
-    private pendingActionService: PendingActionService
+    private pendingActionService: PendingActionService,
+    private translationService: TranslationService
   ) { }
 
+  
   private applyPlannerState(list: EventCard[]): void {
     for (const item of list) {
       item.isPlanned = this.plannerMap.has(item.id);
       item.plannerId = this.plannerMap.get(item.id);
     }
+  }
+
+  private get activeRegionId(): number {
+    const storedRegionId = Number(localStorage.getItem('spirego-region-id'));
+  
+    if (!storedRegionId || Number.isNaN(storedRegionId)) {
+      localStorage.setItem('spirego-region-id', '1');
+      return 1;
+    }
+  
+    return storedRegionId;
   }
 
   private applyPlannerStateToPlaceCards(list: PlaceCard[]): void {
@@ -623,23 +638,24 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private loadPlaceCards(): void {
+    const regionId = this.activeRegionId;
     this.isLoadingPlaces = true;
 
-    const lang = (localStorage.getItem('appLanguage') || 'sr').trim().toLowerCase();
+    const lang = (localStorage.getItem('spirego-language') || 'sr').trim().toLowerCase();
 
     forkJoin({
       destinations: this.destinationService
-        .getAll({ page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc', lang })
+        .getAll({ page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc', lang, regionId })
         .pipe(catchError(() => of([] as unknown[]))),
       objects: this.objectService
         .getAll(
-          { page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc' },
+          { page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc', regionId },
           { bypassLanguage: true },
         )
         .pipe(catchError(() => of([] as unknown[]))),
       activities: this.activityService
         .getAll(
-          { page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc' },
+          { page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc', regionId },
           { bypassLanguage: true },
         )
         .pipe(catchError(() => of([] as unknown[]))),
@@ -710,7 +726,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private translateFeaturedDisplayTitles(
     featured: FeaturedDestination[]
   ): Observable<FeaturedDestination[]> {
-    const lang = (localStorage.getItem('appLanguage') || 'sr')
+    const lang = (localStorage.getItem('spirego-language') || 'sr')
       .trim()
       .toLowerCase();
 
@@ -718,6 +734,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       return of(featured);
     }
 
+   
     return forkJoin(
       featured.map((item) => {
 
@@ -730,7 +747,7 @@ export class HomeComponent implements OnInit, OnDestroy {
               const translatedDescription = translations
                 .find(
                   (translation) =>
-                    translation.fieldName?.toLowerCase() === 'displayTitle' &&
+                    translation.fieldName?.toLowerCase() === 'displaytitle' &&
                     translation.languageCode?.toLowerCase() === lang
                 )
                 ?.translatedText?.trim();
@@ -756,6 +773,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private loadRecommendedCards(): void {
+    const regionId = this.activeRegionId;
     this.isLoadingRecommendations = true;
 
     const currentLocation = this.locationTrackingService.getCurrentLocation();
@@ -768,6 +786,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.recommendationService
       .getHomeRecommendations({
         pageSize: 12,
+        regionId,
         latitude: canUseLocation ? currentLocation?.latitude : undefined,
         longitude: canUseLocation ? currentLocation?.longitude : undefined,
       })
@@ -794,11 +813,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private loadEventCards(): void {
+    const regionId = this.activeRegionId;
     this.isLoadingEvents = true;
 
     this.eventService
       .getAll(
-        { page: 1, pageSize: 12, sortBy: 'startDate', sortOrder: 'asc' },
+        { page: 1, pageSize: 12, sortBy: 'startDate', sortOrder: 'asc', regionId },
         { bypassLanguage: true },
       )
       .pipe(
@@ -1170,7 +1190,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private recommendationMetaText(item: RecommendationItemDto): string {
     if (item.averageRating != null && (item.reviewCount ?? 0) > 0) {
-      return `${item.averageRating.toFixed(1)} (${item.reviewCount} reviews)`;
+      return `${item.averageRating.toFixed(1)} (${item.reviewCount} ${this.translationService.translate('common.reviews')})`;
     }
 
     if (this.shouldShowLiveDistance() && item.distanceMeters != null && item.distanceMeters > 0) {
@@ -1311,7 +1331,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       return 'No ratings yet';
     }
 
-    return `${item.averageRating.toFixed(1)} (${item.reviewCount} reviews)`;
+    return `${item.averageRating.toFixed(1)} (${item.reviewCount} ${this.translationService.translate('common.reviews')})`;
   }
 
   private activityMetaText(activity: {

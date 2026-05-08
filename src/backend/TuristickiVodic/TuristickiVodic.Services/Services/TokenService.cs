@@ -5,7 +5,6 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using TuristickiVodic.Core.Models;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace TuristickiVodic.Services
 {

@@ -29,7 +29,12 @@
                    "price":  "Price",
                    "startingFrom":  "Starting from",
                    "about":  "About",
-                   "total":  "total"
+                   "total":  "total",
+                   "all": "All",
+                   "nearest": "Nearest",
+                   "prev": "Prev",
+                   "next": "Next",
+                   "pageOf": "Page {{current}} of {{total}}"
                },
     "nav":  {
                 "home":  "Home",
@@ -38,6 +43,28 @@
                 "planner":  "Planner",
                 "profile":  "Profile"
             },
+
+    "home": {
+        "greeting": "Hi, glad to see you again",
+        "searchPlaceholder": "Ask where to go, what to see or where to eat...",
+        "chooseRegion": "Choose Region",
+        "categories": "Categories",
+        "featuredDestination": "Featured Destination",
+        "explore": "Explore",
+        "recommendedForYou": "Recommended for you",
+        "popularPlaces": "Popular places",
+        "upcomingEvents": "Upcoming events",
+        "seeAll": "See all",
+        "noRecommendations": "No recommendations for this search.",
+        "categoriesList": {
+            "destination": "Destinations",
+            "object": "Objects",
+            "locality": "Localities",
+            "activity": "Activities",
+            "event": "Events"
+        }
+    },
+
     "profile":  {
                     "title":  "Profile",
                     "edit":  "Edit",
@@ -392,7 +419,14 @@
                   "descriptionFallback":  "Description is not available.",
                   "availableTickets":  "Available tickets",
                   "standardTicket":  "Standard ticket",
-                  "select":  "Select"
+                  "select":  "Select",
+                  "nearbyEmpty": "There are no nearby events.",
+                  "nearbyTitle": "Nearby events",
+                  "listTitle": "Events",
+                  "searchPlaceholder": "Search events...",
+                  "foundCount": "{{count}} events found",
+                  "empty": "No events found.",
+                  "nature": "Nature"
               },
     "object":  {
                    "titleFallback":  "Object",
@@ -403,7 +437,22 @@
                    "workingHoursMissing":  "Working hours are not available",
                    "nearbyNone":  "There are no other nearby {{name}} items in the same location.",
                    "allReviews":  "All reviews",
-                   "totalReviews":  "{{count}} reviews"
+                   "totalReviews":  "{{count}} reviews",
+                   "amenities": "Amenities",
+                   "nearbyTitle": "Nearby {{name}}",
+                   "nearbyEmpty": "There are no other {{name}}s in this location.",
+                   "writeReview": "Write a review",
+                   "reviewPlaceholder": "How was your experience? What would you recommend to other travelers?",
+                   "addPhotos": "Add photos (max 5)",
+                   "photos": "photos",
+                   "sending": "Sending...",
+                   "submitReview": "Submit review",
+                   "listTitle": "Objects",
+                   "searchPlaceholder": "Search objects...",
+                   "foundCount": "{{count}} objects found",
+                   "empty": "No objects found.",
+                   "open": "Open",
+                   "loadError": "Failed to load objects."
                },
     "restaurant":  {
                        "title":  "Restaurant",
@@ -509,5 +558,33 @@
                          "title":  "Add event to planner",
                          "togglePriority":  "Toggle priority",
                          "save":  "Save to planner"
-                     }
+                     },
+    "destination": {
+                    "title": "Destination",
+                    "descriptionFallback": "No description available.",
+                    "listTitle": "Destinations",
+                    "searchPlaceholder": "Search destinations...",
+                    "foundCount": "{{count}} destinations found",
+                    "empty": "No destinations found."
+                    },
+    "activity": {
+                    "title": "Activity",
+                    "descriptionFallback": "No description available.",
+                    "nearbyTitle": "Nearby activities",
+                    "nearbyEmpty": "No activities nearby.",
+                    "listTitle": "Activities",
+                    "searchPlaceholder": "Search activities...",
+                    "resultsFound": "activities found",
+                    "empty": "No activities found."
+                },
+    "locality": {
+                    "title": "Locality",
+                    "descriptionFallback": "No description available.",
+                    "nearbyTitle": "Nearby localities",
+                    "nearbyEmpty": "No localities nearby.",
+                    "listTitle": "Localities",
+                    "searchPlaceholder": "Search localities...",
+                    "foundCount": "{{count}} localities found",
+                    "empty": "No localities found."
+                }
 }

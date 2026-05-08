@@ -1,6 +1,9 @@
 using AutoMapper;
 using FluentAssertions;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
@@ -12,6 +15,9 @@ namespace TuristickiVodic.Tests.Services
 {
     public class ImageServiceTests
     {
+        private static readonly byte[] TinyPngBytes = Convert.FromBase64String(
+            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9WnSUs8AAAAASUVORK5CYII=");
+
         private static AppDbContext CreateContext() =>
             new AppDbContext(new DbContextOptionsBuilder<AppDbContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
@@ -20,6 +26,33 @@ namespace TuristickiVodic.Tests.Services
         private static IMapper CreateMapper() =>
             new MapperConfiguration(cfg => cfg.AddProfile<MappingProfile>())
                 .CreateMapper();
+
+        private static IWebHostEnvironment CreateEnvironment()
+        {
+            var root = Path.Combine(Path.GetTempPath(), "tv-images-tests", Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(root);
+
+            var mock = new Mock<IWebHostEnvironment>();
+            mock.SetupGet(x => x.WebRootPath).Returns(root);
+            return mock.Object;
+        }
+
+        private static AddImageDto BuildAddDto(string fileName = "test.png", bool isMain = true, string? altText = null)
+        {
+            var stream = new MemoryStream(TinyPngBytes);
+            var file = new FormFile(stream, 0, TinyPngBytes.Length, "file", fileName)
+            {
+                Headers = new HeaderDictionary(),
+                ContentType = "image/png"
+            };
+
+            return new AddImageDto
+            {
+                File = file,
+                IsMain = isMain,
+                AltText = altText
+            };
+        }
 
         private static TouristObject SeedObject(AppDbContext ctx, int id = 1, int createdByUserId = 5)
         {
@@ -94,9 +127,14 @@ namespace TuristickiVodic.Tests.Services
             return loc;
         }
 
-        private static Image SeedImage(AppDbContext ctx, bool isMain,
-            int? objectId = null, int? activityId = null, int? eventId = null,
-            int? destinationId = null, int? localityId = null)
+        private static Image SeedImage(
+            AppDbContext ctx,
+            bool isMain,
+            int? objectId = null,
+            int? activityId = null,
+            int? eventId = null,
+            int? destinationId = null,
+            int? localityId = null)
         {
             var img = new Image
             {
@@ -114,12 +152,15 @@ namespace TuristickiVodic.Tests.Services
             return img;
         }
 
+        private static ImageService CreateService(AppDbContext ctx) =>
+            new ImageService(ctx, CreateMapper(), CreateEnvironment());
+
         [Fact]
         public async Task GetByIdAsync_KadSlikaPostoji_VracaDto()
         {
             using var ctx = CreateContext();
             var img = SeedImage(ctx, isMain: true, objectId: 1);
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
             var result = await svc.GetByIdAsync(img.Id);
 
@@ -133,12 +174,13 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateContext();
             SeedObject(ctx, createdByUserId: 5);
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
-            var result = await svc.AddToObjectAsync(1, new AddImageDto { Url = "a.jpg", IsMain = true }, 5, "ContentCreator");
+            var result = await svc.AddToObjectAsync(1, BuildAddDto("a.png", true), 5, "ContentCreator");
 
             result.IsMain.Should().BeTrue();
             result.ObjectId.Should().Be(1);
+            result.Url.Should().StartWith("/images/objects/");
         }
 
         [Fact]
@@ -146,9 +188,9 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateContext();
             SeedObject(ctx, createdByUserId: 99);
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
-            await svc.Invoking(s => s.AddToObjectAsync(1, new AddImageDto { Url = "a.jpg", IsMain = true }, 5, "ContentCreator"))
+            await svc.Invoking(s => s.AddToObjectAsync(1, BuildAddDto("a.png", true), 5, "ContentCreator"))
                 .Should().ThrowAsync<UnauthorizedAccessException>();
         }
 
@@ -157,9 +199,9 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateContext();
             SeedActivity(ctx, createdByUserId: 99);
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
-            await svc.Invoking(s => s.AddToActivityAsync(1, new AddImageDto { Url = "a.jpg", IsMain = true }, 5, "ContentCreator"))
+            await svc.Invoking(s => s.AddToActivityAsync(1, BuildAddDto("a.png", true), 5, "ContentCreator"))
                 .Should().ThrowAsync<UnauthorizedAccessException>();
         }
 
@@ -168,9 +210,9 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateContext();
             SeedEvent(ctx, createdByUserId: 99);
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
-            await svc.Invoking(s => s.AddToEventAsync(1, new AddImageDto { Url = "a.jpg", IsMain = true }, 5, "ContentCreator"))
+            await svc.Invoking(s => s.AddToEventAsync(1, BuildAddDto("a.png", true), 5, "ContentCreator"))
                 .Should().ThrowAsync<UnauthorizedAccessException>();
         }
 
@@ -179,9 +221,9 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateContext();
             SeedDestination(ctx);
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
-            await svc.Invoking(s => s.AddToDestinationAsync(1, new AddImageDto { Url = "a.jpg", IsMain = true }, 5, "Manager"))
+            await svc.Invoking(s => s.AddToDestinationAsync(1, BuildAddDto("a.png", true), 5, "Manager"))
                 .Should().ThrowAsync<UnauthorizedAccessException>();
         }
 
@@ -191,12 +233,13 @@ namespace TuristickiVodic.Tests.Services
             using var ctx = CreateContext();
             SeedDestination(ctx, managedByUserId: 10);
             SeedLocality(ctx, destinationId: 1);
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
-            var result = await svc.AddToLocalityAsync(1, new AddImageDto { Url = "a.jpg", IsMain = true }, 10, "Manager");
+            var result = await svc.AddToLocalityAsync(1, BuildAddDto("a.png", true), 10, "Manager");
 
             result.LocalityId.Should().Be(1);
             result.IsMain.Should().BeTrue();
+            result.Url.Should().StartWith("/images/localities/");
         }
 
         [Fact]
@@ -205,9 +248,9 @@ namespace TuristickiVodic.Tests.Services
             using var ctx = CreateContext();
             SeedDestination(ctx, managedByUserId: 99);
             SeedLocality(ctx, destinationId: 1);
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
-            await svc.Invoking(s => s.AddToLocalityAsync(1, new AddImageDto { Url = "a.jpg", IsMain = true }, 10, "Manager"))
+            await svc.Invoking(s => s.AddToLocalityAsync(1, BuildAddDto("a.png", true), 10, "Manager"))
                 .Should().ThrowAsync<UnauthorizedAccessException>();
         }
 
@@ -216,9 +259,9 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateContext();
             SeedObject(ctx, createdByUserId: 5);
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
-            await svc.Invoking(s => s.AddToObjectAsync(1, new AddImageDto { Url = "a.jpg", IsMain = false }, 5, "ContentCreator"))
+            await svc.Invoking(s => s.AddToObjectAsync(1, BuildAddDto("a.png", false), 5, "ContentCreator"))
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*First image*must be*main*");
         }
@@ -229,9 +272,9 @@ namespace TuristickiVodic.Tests.Services
             using var ctx = CreateContext();
             SeedDestination(ctx);
             SeedImage(ctx, isMain: true, destinationId: 1);
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
-            await svc.Invoking(s => s.AddToDestinationAsync(1, new AddImageDto { Url = "b.jpg", IsMain = true }, 1, "Admin"))
+            await svc.Invoking(s => s.AddToDestinationAsync(1, BuildAddDto("b.png", true), 1, "Admin"))
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*already has a main image*");
         }
@@ -240,7 +283,7 @@ namespace TuristickiVodic.Tests.Services
         public async Task GetForDestinationAsync_NepostojecaDestinacija_BacaKeyNotFoundException()
         {
             using var ctx = CreateContext();
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
             await svc.Invoking(s => s.GetForDestinationAsync(999))
                 .Should().ThrowAsync<KeyNotFoundException>();
@@ -250,36 +293,35 @@ namespace TuristickiVodic.Tests.Services
         public async Task GetMainForLocalityAsync_NepostojeciLokalitet_BacaKeyNotFoundException()
         {
             using var ctx = CreateContext();
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
             await svc.Invoking(s => s.GetMainForLocalityAsync(999))
                 .Should().ThrowAsync<KeyNotFoundException>();
         }
 
         [Fact]
-        public async Task UpdateAsync_MenjaUrlIAltText_UspesnoAzuriraSliku()
+        public async Task UpdateAsync_MenjaAltText_UspesnoAzuriraSliku()
         {
             using var ctx = CreateContext();
             SeedObject(ctx, id: 1, createdByUserId: 5);
             var img = SeedImage(ctx, isMain: true, objectId: 1);
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
             var dto = new UpdateImageDto
             {
-                Url = "https://novo.com/slika.jpg",
                 AltText = "Nova slika"
             };
 
             var result = await svc.UpdateAsync(img.Id, dto, 5, "ContentCreator");
 
             result.Should().NotBeNull();
-            result!.Url.Should().Be("https://novo.com/slika.jpg");
+            result!.Url.Should().Be(img.Url);
             result.AltText.Should().Be("Nova slika");
             result.IsMain.Should().BeTrue();
 
             var updated = await ctx.Images.FindAsync(img.Id);
             updated.Should().NotBeNull();
-            updated!.Url.Should().Be("https://novo.com/slika.jpg");
+            updated!.Url.Should().Be(img.Url);
             updated.AltText.Should().Be("Nova slika");
             updated.IsMain.Should().BeTrue();
         }
@@ -291,7 +333,7 @@ namespace TuristickiVodic.Tests.Services
             SeedObject(ctx, id: 1, createdByUserId: 5);
             SeedImage(ctx, isMain: true, objectId: 1);
             var secondary = SeedImage(ctx, isMain: false, objectId: 1);
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
             await svc.Invoking(s => s.UpdateAsync(secondary.Id, new UpdateImageDto { IsMain = true }, 5, "ContentCreator"))
                 .Should().ThrowAsync<InvalidOperationException>()
@@ -304,9 +346,9 @@ namespace TuristickiVodic.Tests.Services
             using var ctx = CreateContext();
             SeedObject(ctx, id: 1, createdByUserId: 99);
             var img = SeedImage(ctx, isMain: true, objectId: 1);
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
-            await svc.Invoking(s => s.UpdateAsync(img.Id, new UpdateImageDto { Url = "x.jpg" }, 5, "ContentCreator"))
+            await svc.Invoking(s => s.UpdateAsync(img.Id, new UpdateImageDto { AltText = "x" }, 5, "ContentCreator"))
                 .Should().ThrowAsync<UnauthorizedAccessException>();
         }
 
@@ -316,7 +358,7 @@ namespace TuristickiVodic.Tests.Services
             using var ctx = CreateContext();
             SeedObject(ctx, id: 1, createdByUserId: 5);
             var img = SeedImage(ctx, isMain: true, objectId: 1);
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
             await svc.Invoking(s => s.DeleteAsync(img.Id, 5, "ContentCreator"))
                 .Should().ThrowAsync<InvalidOperationException>()
@@ -329,7 +371,7 @@ namespace TuristickiVodic.Tests.Services
             using var ctx = CreateContext();
             SeedObject(ctx, id: 1, createdByUserId: 99);
             var img = SeedImage(ctx, isMain: true, objectId: 1);
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
             await svc.Invoking(s => s.DeleteAsync(img.Id, 5, "ContentCreator"))
                 .Should().ThrowAsync<UnauthorizedAccessException>();
@@ -344,7 +386,7 @@ namespace TuristickiVodic.Tests.Services
             SeedImage(ctx, isMain: false, objectId: 1);
             SeedImage(ctx, isMain: true, objectId: 1);
             SeedImage(ctx, isMain: true, objectId: 2);
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
             var result = (await svc.GetForObjectAsync(1)).ToList();
 
@@ -360,7 +402,7 @@ namespace TuristickiVodic.Tests.Services
             SeedEvent(ctx, id: 1, createdByUserId: 5);
             SeedImage(ctx, isMain: false, eventId: 1);
             var main = SeedImage(ctx, isMain: true, eventId: 1);
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
             var result = await svc.GetMainForEventAsync(1);
 
@@ -378,7 +420,7 @@ namespace TuristickiVodic.Tests.Services
             var oldMain = SeedImage(ctx, isMain: true, objectId: 1);
             var newMain = SeedImage(ctx, isMain: false, objectId: 1);
 
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
             var result = await svc.SetMainImageAsync(newMain.Id, 5, "ContentCreator");
 
@@ -395,10 +437,10 @@ namespace TuristickiVodic.Tests.Services
             using var ctx = CreateContext();
             SeedObject(ctx, id: 1, createdByUserId: 99);
 
-            var main = SeedImage(ctx, isMain: true, objectId: 1);
+            SeedImage(ctx, isMain: true, objectId: 1);
             var other = SeedImage(ctx, isMain: false, objectId: 1);
 
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
             await svc.Invoking(s => s.SetMainImageAsync(other.Id, 5, "ContentCreator"))
                 .Should().ThrowAsync<UnauthorizedAccessException>();
@@ -413,7 +455,7 @@ namespace TuristickiVodic.Tests.Services
             var main = SeedImage(ctx, isMain: true, objectId: 1);
             SeedImage(ctx, isMain: false, objectId: 1);
 
-            var svc = new ImageService(ctx, CreateMapper());
+            var svc = CreateService(ctx);
 
             var result = await svc.SetMainImageAsync(main.Id, 5, "ContentCreator");
 

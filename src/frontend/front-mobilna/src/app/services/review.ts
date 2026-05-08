@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
+import { ImageDto } from './image';
 
 export interface ReviewDto {
   id: number;
@@ -25,6 +26,7 @@ export interface ReviewDto {
   regionName?: string;
   regionCode?: string;
   createdAt: string;
+  images?: ImageDto[];
 }
 
 export interface ReviewQueryParams {

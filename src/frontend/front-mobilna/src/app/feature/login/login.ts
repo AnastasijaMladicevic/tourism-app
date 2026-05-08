@@ -110,19 +110,29 @@ export class LoginComponent {
             this.cdr.detectChanges();
             return;
           }
-          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
+          const returnUrl =
+            this.route.snapshot.queryParams['returnUrl'] || '/home';
+
+          const openReview =
+            this.route.snapshot.queryParams['openReview'];
 
           const pending = this.pendingActionService.consumeAction();
 
+          const finalUrl =
+            openReview === 'true'
+              ? `${returnUrl}${returnUrl.includes('?') ? '&' : '?'}openReview=true`
+              : returnUrl;
+
           if (pending) {
-            this.router.navigateByUrl(returnUrl).then(() => {
+            this.router.navigateByUrl(finalUrl).then(() => {
               setTimeout(() => {
                 this.executePendingAction(pending);
               }, 100);
             });
             return;
           }
-          this.router.navigateByUrl(returnUrl);
+
+          this.router.navigateByUrl(finalUrl);
         },
         error: (err) => {
           this.isLoading = false;

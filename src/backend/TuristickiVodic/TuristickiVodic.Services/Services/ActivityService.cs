@@ -504,6 +504,11 @@ namespace TuristickiVodic.Services.Services
 
             _context.Activities.Add(activity);
             await _context.SaveChangesAsync();
+            await CreateManagerPendingContentNotificationAsync(
+                activity.DestinationId,
+                "Nova aktivnost ceka odobrenje",
+                $"Aktivnost \"{activity.Name}\" je poslata na odobrenje u tvojoj destinaciji.",
+                $"/activities/{activity.Id}");
 
             // Save image if provided
             if (!string.IsNullOrWhiteSpace(dto.ImageUrl))
@@ -538,6 +543,44 @@ namespace TuristickiVodic.Services.Services
         // Samo ContentCreator može da menja svoju aktivnost.
         // Jednom odobrena aktivnost više ne mora biti Pending da bi bila izmenjena –
         // CC može da menja i Pending i Approved aktivnost.
+        private async Task CreateManagerPendingContentNotificationAsync(
+            int? destinationId,
+            string title,
+            string message,
+            string actionUrl)
+        {
+            if (!destinationId.HasValue)
+                return;
+
+            var managerId = await _context.Destinations
+                .AsNoTracking()
+                .Where(d => d.Id == destinationId.Value)
+                .Select(d => d.ManagedByUserId)
+                .FirstOrDefaultAsync();
+
+            if (!managerId.HasValue)
+                return;
+
+            var managerCanReceive = await _context.Users
+                .AsNoTracking()
+                .AnyAsync(u => u.Id == managerId.Value && u.IsActive && !u.IsBlacklisted);
+
+            if (!managerCanReceive)
+                return;
+
+            _context.Notifications.Add(new Notification
+            {
+                UserId = managerId.Value,
+                Type = NotificationType.ManagerNewPendingContent,
+                Title = title,
+                Message = message,
+                ActionUrl = actionUrl,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<ActivityDto?> UpdateAsync(int id, UpdateActivityDto dto, int userId, string roleName)
         {
             if (roleName != "ContentCreator")
@@ -686,6 +729,16 @@ namespace TuristickiVodic.Services.Services
             activity.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
+            await CreateCreatorContentReviewedNotificationAsync(
+                activity.CreatedByUserId,
+                dto.Approve,
+                "aktivnost",
+                activity.Name,
+                $"/activities/{activity.Id}");
+            if (!dto.Approve)
+            {
+                await CreateAdminMultipleRejectedContentNotificationsAsync(activity.CreatedByUserId, activity.Name, $"/activities/{activity.Id}");
+            }
 
             var updated = await _context.Activities
                 .Include(a => a.ActivityType)
@@ -705,6 +758,83 @@ namespace TuristickiVodic.Services.Services
 
         // Samo ContentCreator može direktno da obriše svoju aktivnost koja nije Approved.
         // Approved aktivnost se briše isključivo kroz DeletionRequest koji odobrava menadžer.
+        private async Task CreateCreatorContentReviewedNotificationAsync(
+            int creatorId,
+            bool approved,
+            string contentType,
+            string contentName,
+            string actionUrl)
+        {
+            var creatorCanReceive = await _context.Users
+                .AsNoTracking()
+                .AnyAsync(u => u.Id == creatorId && u.IsActive && !u.IsBlacklisted);
+
+            if (!creatorCanReceive)
+                return;
+
+            var statusText = approved ? "odobrena" : "odbijena";
+
+            _context.Notifications.Add(new Notification
+            {
+                UserId = creatorId,
+                Type = NotificationType.CreatorContentReviewed,
+                Title = $"Tvoja {contentType} je {statusText}",
+                Message = $"Sadrzaj \"{contentName}\" je {statusText}.",
+                ActionUrl = actionUrl,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task CreateAdminMultipleRejectedContentNotificationsAsync(
+            int creatorId,
+            string latestContentName,
+            string actionUrl)
+        {
+            var rejectedCount =
+                await _context.Objects.AsNoTracking().CountAsync(o => o.CreatedByUserId == creatorId && o.Status == ContentStatus.Rejected) +
+                await _context.Events.AsNoTracking().CountAsync(e => e.CreatedByUserId == creatorId && e.Status == ContentStatus.Rejected) +
+                await _context.Activities.AsNoTracking().CountAsync(a => a.CreatedByUserId == creatorId && a.Status == ContentStatus.Rejected);
+
+            if (rejectedCount < 3)
+                return;
+
+            var creator = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == creatorId);
+
+            if (creator == null)
+                return;
+
+            var adminIds = await _context.Users
+                .AsNoTracking()
+                .Include(u => u.Role)
+                .Where(u => u.Role.Name == RoleType.Admin && u.IsActive && !u.IsBlacklisted)
+                .Select(u => u.Id)
+                .ToListAsync();
+
+            if (adminIds.Count == 0)
+                return;
+
+            var creatorName = $"{creator.FirstName} {creator.LastName}".Trim();
+            if (string.IsNullOrWhiteSpace(creatorName))
+                creatorName = creator.Email;
+
+            var notifications = adminIds.Select(adminId => new Notification
+            {
+                UserId = adminId,
+                Type = NotificationType.AdminCreatorMultipleRejectedContent,
+                Title = "ContentCreator ima vise odbijenih sadrzaja",
+                Message = $"ContentCreator {creatorName} ima {rejectedCount} odbijenih sadrzaja. Poslednje odbijeno: \"{latestContentName}\".",
+                ActionUrl = actionUrl,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            _context.Notifications.AddRange(notifications);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<bool> DeleteAsync(int id, int userId, string roleName)
         {
             if (roleName != "ContentCreator")

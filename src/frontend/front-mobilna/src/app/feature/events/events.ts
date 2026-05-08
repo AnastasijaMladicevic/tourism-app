@@ -13,6 +13,7 @@ import { AuthService } from '../../services/auth';
 import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
 import { EventPlannerService } from '../../services/event-planner';
 import { PendingActionService } from '../../services/pending-action';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 type EventCategory = 'All' | string;
 
@@ -41,7 +42,7 @@ interface EventCard {
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, LazyBackgroundDirective],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, LazyBackgroundDirective, TranslatePipe],
   templateUrl: './events.html',
   styleUrl: './events.scss',
 })
@@ -159,22 +160,17 @@ export class EventsComponent implements OnInit {
       ...unique.map((name) => ({ key: name, label: name, icon: this.categoryIcon(name) })),
     ];
   }
-  private matchesSearch(event: EventCard): boolean {
-    const q = this.searchQuery.trim().toLowerCase();
-    if (!q) return true;
 
-    return !!(
-      event.title?.toLowerCase().includes(q) ||
-      event.location?.toLowerCase().includes(q) ||
-      event.category?.toLowerCase().includes(q) ||
-      event.eventTypeName?.toLowerCase().includes(q) ||
-      event.description?.toLowerCase().includes(q)
-    );
-  }
   get filteredEvents(): EventCard[] {
     let list = [...this.events];
 
-    list = list.filter(e => this.matchesSearch(e));
+    const q = this.searchQuery.trim().toLowerCase();
+    if (q) {
+      list = list.filter(
+        (event) =>
+          event.title.toLowerCase().includes(q) || event.location.toLowerCase().includes(q),
+      );
+    }
 
     if (this.activeFilter !== 'All') {
       list = list.filter((event) => event.category === this.activeFilter);

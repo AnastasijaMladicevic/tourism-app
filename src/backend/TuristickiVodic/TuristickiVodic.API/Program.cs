@@ -184,18 +184,34 @@ if (app.Environment.IsDevelopment())
 
 var useHttpsRedirection = app.Configuration.GetValue<bool?>("ReverseProxy:UseHttpsRedirection") ?? true;
 
+// ─── Middleware redosled — VAŽNO, ne menjati ───────────────────────────────
 app.UseForwardedHeaders();
+
 if (useHttpsRedirection)
 {
     app.UseHttpsRedirection();
 }
-app.UseStaticFiles();
+
+// CORS mora biti pre static files i autentifikacije
 app.UseCors("AllowAngular");
+
+// SPA fallback — UseDefaultFiles MORA biti pre UseStaticFiles
+var defaultFileOptions = new DefaultFilesOptions();
+defaultFileOptions.DefaultFileNames.Clear();
+defaultFileOptions.DefaultFileNames.Add("index.html");
+app.UseDefaultFiles(defaultFileOptions);
+
+app.UseStaticFiles();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 app.MapControllers();
+
+// Sve rute koje nisu API vrati index.html (SPA routing)
 app.MapFallbackToFile("index.html");
+// ──────────────────────────────────────────────────────────────────────────
 
 using (var scope = app.Services.CreateScope())
 {
@@ -221,8 +237,7 @@ using (var scope = app.Services.CreateScope())
         ?? app.Environment.IsDevelopment();
     var failStartupOnSeedError = app.Configuration.GetValue<bool?>("SeedData:FailStartupOnError")
         ?? false;
-    // Earlier data-only migrations can insert support users even on a fresh database.
-    // Treat the database as empty until actual tourism content exists, so seed.sql still runs.
+
     var databaseIsEffectivelyEmpty =
         !db.Destinations.Any() &&
         !db.Localities.Any() &&
@@ -255,7 +270,6 @@ using (var scope = app.Services.CreateScope())
                 );
 
                 var sql = File.ReadAllText(seedFilePath);
-
                 var connection = db.Database.GetDbConnection();
 
                 if (connection.State != System.Data.ConnectionState.Open)

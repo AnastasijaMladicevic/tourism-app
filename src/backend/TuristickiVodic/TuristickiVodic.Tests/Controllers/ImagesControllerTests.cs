@@ -13,6 +13,23 @@ namespace TuristickiVodic.Tests.Controllers
     public class ImagesControllerTests
     {
         private static Mock<IImageService> MockSvc() => new Mock<IImageService>();
+        private static AddImageDto BuildAddDto(string fileName = "test.jpg", bool isMain = true, string? altText = null)
+        {
+            var bytes = new byte[] { 1, 2, 3 };
+            var stream = new MemoryStream(bytes);
+            var file = new FormFile(stream, 0, bytes.Length, "file", fileName)
+            {
+                Headers = new HeaderDictionary(),
+                ContentType = "image/jpeg"
+            };
+
+            return new AddImageDto
+            {
+                File = file,
+                IsMain = isMain,
+                AltText = altText
+            };
+        }
 
         private static T AttachUser<T>(T controller, int userId, string role) where T : ControllerBase
         {
@@ -72,8 +89,8 @@ namespace TuristickiVodic.Tests.Controllers
         public async Task Update_KadSlikaPostoji_VracaOk()
         {
             var mock = MockSvc();
-            var dto = new UpdateImageDto { Url = "new.jpg" };
-            var updated = new ImageDto { Id = 1, Url = "new.jpg" };
+            var dto = new UpdateImageDto { AltText = "Nova slika" };
+            var updated = new ImageDto { Id = 1, Url = "old.jpg", AltText = "Nova slika" };
             mock.Setup(s => s.UpdateAsync(1, dto, 1, "Admin")).ReturnsAsync(updated);
 
             var result = await ImageCtrl(mock.Object, 1, "Admin").Update(1, dto);
@@ -97,7 +114,7 @@ namespace TuristickiVodic.Tests.Controllers
         public async Task Update_InvalidModel_VracaBadRequest()
         {
             var ctrl = ImageCtrl(MockSvc().Object);
-            ctrl.ModelState.AddModelError("Url", "Required");
+            ctrl.ModelState.AddModelError("File", "Required");
 
             var result = await ctrl.Update(1, new UpdateImageDto());
 
@@ -111,7 +128,7 @@ namespace TuristickiVodic.Tests.Controllers
             mock.Setup(s => s.UpdateAsync(1, It.IsAny<UpdateImageDto>(), 5, "ContentCreator"))
                 .ThrowsAsync(new UnauthorizedAccessException());
 
-            var result = await ImageCtrl(mock.Object, 5, "ContentCreator").Update(1, new UpdateImageDto { Url = "x.jpg" });
+            var result = await ImageCtrl(mock.Object, 5, "ContentCreator").Update(1, new UpdateImageDto { AltText = "x" });
 
             result.Should().BeOfType<ForbidResult>();
         }
@@ -123,7 +140,7 @@ namespace TuristickiVodic.Tests.Controllers
             mock.Setup(s => s.UpdateAsync(1, It.IsAny<UpdateImageDto>(), 1, "Admin"))
                 .ThrowsAsync(new InvalidOperationException("error"));
 
-            var result = await ImageCtrl(mock.Object, 1, "Admin").Update(1, new UpdateImageDto { Url = "x.jpg" });
+            var result = await ImageCtrl(mock.Object, 1, "Admin").Update(1, new UpdateImageDto { AltText = "x" });
 
             result.Should().BeOfType<BadRequestObjectResult>();
         }
@@ -210,10 +227,21 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
+        public async Task Destination_Add_InvalidModel_VracaBadRequest()
+        {
+            var ctrl = DestCtrl(MockSvc().Object);
+            ctrl.ModelState.AddModelError("File", "Required");
+
+            var result = await ctrl.Add(5, new AddImageDto());
+
+            result.Should().BeOfType<BadRequestObjectResult>();
+        }
+
+        [Fact]
         public async Task Destination_Add_Validan_VracaCreated()
         {
             var mock = MockSvc();
-            var dto = new AddImageDto { Url = "a.jpg", IsMain = true };
+            var dto = BuildAddDto("a.jpg", true);
             var created = new ImageDto { Id = 10, Url = "a.jpg", IsMain = true, DestinationId = 5 };
             mock.Setup(s => s.AddToDestinationAsync(5, dto, 1, "Admin")).ReturnsAsync(created);
 
@@ -231,7 +259,7 @@ namespace TuristickiVodic.Tests.Controllers
             mock.Setup(s => s.AddToDestinationAsync(5, It.IsAny<AddImageDto>(), 2, "Manager"))
                 .ThrowsAsync(new UnauthorizedAccessException());
 
-            var result = await DestCtrl(mock.Object, 2, "Manager").Add(5, new AddImageDto { Url = "a.jpg", IsMain = true });
+            var result = await DestCtrl(mock.Object, 2, "Manager").Add(5, BuildAddDto("a.jpg", true));
 
             result.Should().BeOfType<ForbidResult>();
         }
@@ -252,7 +280,7 @@ namespace TuristickiVodic.Tests.Controllers
         public async Task Locality_Add_ValidnaSlika_VracaCreated()
         {
             var mock = MockSvc();
-            var dto = new AddImageDto { Url = "loc.jpg", IsMain = true };
+            var dto = BuildAddDto("loc.jpg", true);
             var created = new ImageDto { Id = 20, Url = "loc.jpg", LocalityId = 3 };
             mock.Setup(s => s.AddToLocalityAsync(3, dto, 10, "Manager")).ReturnsAsync(created);
 
@@ -268,7 +296,7 @@ namespace TuristickiVodic.Tests.Controllers
             mock.Setup(s => s.AddToLocalityAsync(3, It.IsAny<AddImageDto>(), 11, "Manager"))
                 .ThrowsAsync(new UnauthorizedAccessException());
 
-            var result = await LocCtrl(mock.Object, 11, "Manager").Add(3, new AddImageDto { Url = "a.jpg", IsMain = true });
+            var result = await LocCtrl(mock.Object, 11, "Manager").Add(3, BuildAddDto("a.jpg", true));
 
             result.Should().BeOfType<ForbidResult>();
         }
@@ -277,7 +305,7 @@ namespace TuristickiVodic.Tests.Controllers
         public async Task Object_Add_ValidnaSlika_VracaCreated()
         {
             var mock = MockSvc();
-            var dto = new AddImageDto { Url = "obj.jpg", IsMain = true };
+            var dto = BuildAddDto("obj.jpg", true);
             var created = new ImageDto { Id = 30, Url = "obj.jpg", ObjectId = 7 };
             mock.Setup(s => s.AddToObjectAsync(7, dto, 5, "ContentCreator")).ReturnsAsync(created);
 
@@ -293,7 +321,7 @@ namespace TuristickiVodic.Tests.Controllers
             mock.Setup(s => s.AddToObjectAsync(7, It.IsAny<AddImageDto>(), 6, "ContentCreator"))
                 .ThrowsAsync(new UnauthorizedAccessException());
 
-            var result = await ObjCtrl(mock.Object, 6, "ContentCreator").Add(7, new AddImageDto { Url = "a.jpg", IsMain = true });
+            var result = await ObjCtrl(mock.Object, 6, "ContentCreator").Add(7, BuildAddDto("a.jpg", true));
 
             result.Should().BeOfType<ForbidResult>();
         }
@@ -302,7 +330,7 @@ namespace TuristickiVodic.Tests.Controllers
         public async Task Activity_Add_ValidnaSlika_VracaCreated()
         {
             var mock = MockSvc();
-            var dto = new AddImageDto { Url = "act.jpg", IsMain = true };
+            var dto = BuildAddDto("act.jpg", true);
             var created = new ImageDto { Id = 40, Url = "act.jpg", ActivityId = 4 };
             mock.Setup(s => s.AddToActivityAsync(4, dto, 5, "ContentCreator")).ReturnsAsync(created);
 
@@ -318,7 +346,7 @@ namespace TuristickiVodic.Tests.Controllers
             mock.Setup(s => s.AddToActivityAsync(4, It.IsAny<AddImageDto>(), 6, "ContentCreator"))
                 .ThrowsAsync(new UnauthorizedAccessException());
 
-            var result = await ActCtrl(mock.Object, 6, "ContentCreator").Add(4, new AddImageDto { Url = "a.jpg", IsMain = true });
+            var result = await ActCtrl(mock.Object, 6, "ContentCreator").Add(4, BuildAddDto("a.jpg", true));
 
             result.Should().BeOfType<ForbidResult>();
         }
@@ -327,7 +355,7 @@ namespace TuristickiVodic.Tests.Controllers
         public async Task Event_Add_ValidnaSlika_VracaCreated()
         {
             var mock = MockSvc();
-            var dto = new AddImageDto { Url = "ev.jpg", IsMain = true };
+            var dto = BuildAddDto("ev.jpg", true);
             var created = new ImageDto { Id = 50, Url = "ev.jpg", EventId = 6 };
             mock.Setup(s => s.AddToEventAsync(6, dto, 5, "ContentCreator")).ReturnsAsync(created);
 
@@ -343,7 +371,7 @@ namespace TuristickiVodic.Tests.Controllers
             mock.Setup(s => s.AddToEventAsync(6, It.IsAny<AddImageDto>(), 6, "ContentCreator"))
                 .ThrowsAsync(new UnauthorizedAccessException());
 
-            var result = await EvCtrl(mock.Object, 6, "ContentCreator").Add(6, new AddImageDto { Url = "a.jpg", IsMain = true });
+            var result = await EvCtrl(mock.Object, 6, "ContentCreator").Add(6, BuildAddDto("a.jpg", true));
 
             result.Should().BeOfType<ForbidResult>();
         }

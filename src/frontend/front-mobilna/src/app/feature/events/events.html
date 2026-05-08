@@ -1,9 +1,9 @@
 <div class="screen">
   <div class="header">
-    <button class="icon-btn" (click)="goBack()" aria-label="Go back">
+    <button class="icon-btn" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
       <mat-icon>arrow_back_ios</mat-icon>
     </button>
-    <h1 class="header__title">Events</h1>
+    <h1 class="header__title">{{ 'event.listTitle' | translate }}</h1>
   </div>
 
   <div class="filters-row">
@@ -12,7 +12,7 @@
         <mat-icon>search</mat-icon>
         <input
           type="text"
-          placeholder="Search events..."
+          [placeholder]="'event.searchPlaceholder' | translate"
           [(ngModel)]="searchQuery"
           (ngModelChange)="onSearchChange()"
         />
@@ -40,14 +40,14 @@
               [class.sort-menu__item--active]="sortOption === 'date'"
               (click)="setSort('date')"
             >
-              <mat-icon>schedule</mat-icon> Soonest
+              <mat-icon>schedule</mat-icon> {{ 'common.soonest' | translate }}
             </button>
             <button
               class="sort-menu__item"
               [class.sort-menu__item--active]="sortOption === 'distance'"
               (click)="setSort('distance')"
             >
-              <mat-icon>near_me</mat-icon> Nearest
+              <mat-icon>near_me</mat-icon> {{ 'common.nearest' | translate }}
             </button>
             <button
               class="sort-menu__item"
@@ -89,14 +89,14 @@
   </div>
 
   <div class="results-bar">
-    <span class="results-bar__count">{{ totalCount }} events found</span>
+    <span class="results-bar__count">{{ 'event.foundCount' | translate:{ count: totalCount } }}</span>
   </div>
 
   @if (isLoading) {
     <div class="loading-screen">
       <div class="loading-content">
         <div class="spinner"></div>
-        <p>Loading...</p>
+        <p>{{ 'common.loading' | translate }}</p>
       </div>
     </div>
   }
@@ -109,7 +109,7 @@
           [appLazyBackground]="event.imageUrl ?? null"
           [class.event-image--empty]="!event.imageUrl"
         >
-          <span class="event-tag">{{ event.category === 'Rute' ? 'Nature' : event.category }}</span>
+          <span class="event-tag">{{ event.category === 'Rute' ? ('event.nature' | translate) : event.category }}</span>
           <button
             class="planner-btn"
             [disabled]="isPlannerBusy"
@@ -135,7 +135,7 @@
           </p>
           <p class="card__desc">{{ event.description }}</p>
           <div class="event-footer">
-            <button type="button" class="view-btn" (click)="openEvent(event.id)">VIEW DETAILS</button>
+            <button type="button" class="view-btn" (click)="openEvent(event.id)">{{ 'common.details' | translate }}</button>
           </div>
         </div>
       </article>
@@ -144,17 +144,15 @@
     @if (!isLoading && totalCount === 0) {
       <article class="event-card">
         <div class="event-body">
-          <p class="event-location">No events found.</p>
+          <p class="event-location">{{ 'event.empty' | translate }}</p>
         </div>
       </article>
     }
   </div>
 
   <div class="pagination">
-    <button mat-button type="button" (click)="prevPage()" [disabled]="currentPage === 1">
-      Prev
-    </button>
-    <span>Page {{ currentPage }} of {{ totalPages }}</span>
-    <button mat-button type="button" (click)="nextPage()" [disabled]="!hasNextPage">Next</button>
+    <button mat-button type="button" (click)="prevPage()" [disabled]="currentPage === 1">{{ 'common.prev' | translate }}</button>
+    <span>{{ 'common.pageOf' | translate:{ current: currentPage, total: totalPages } }}</span>
+    <button mat-button type="button" (click)="nextPage()" [disabled]="!hasNextPage">{{ 'common.next' | translate }}</button>
   </div>
 </div>

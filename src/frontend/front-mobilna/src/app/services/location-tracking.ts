@@ -7,6 +7,7 @@ export interface TrackedLocation {
   longitude: number;
   accuracy: number;
   updatedAt: number;
+  source?: 'gps' | 'ip';
 }
 
 @Injectable({ providedIn: 'root' })
@@ -15,6 +16,7 @@ export class LocationTrackingService {
   private readonly snapshotKey = 'spirego-location-tracking-snapshot';
 
   private watchId: number | null = null;
+  private ipFallbackInterval: ReturnType<typeof setInterval> | null = null;
 
   private readonly trackingEnabledSubject = new BehaviorSubject<boolean>(this.readEnabled());
   private readonly locationSubject = new BehaviorSubject<TrackedLocation | null>(this.readSnapshot());
@@ -23,6 +25,11 @@ export class LocationTrackingService {
   readonly location$ = this.locationSubject.asObservable();
 
   constructor(private readonly authService: AuthService) {
+    if (this.trackingEnabledSubject.value && !this.canUseGeolocation() && !this.canUseIpFallback()) {
+      this.stopTracking();
+      return;
+    }
+
     if (this.trackingEnabledSubject.value) {
       this.ensureTracking();
     }
@@ -37,24 +44,50 @@ export class LocationTrackingService {
   }
 
   startTracking(): boolean {
-    if (!this.canUseGeolocation()) {
-      return false;
+    if (this.canUseGeolocation()) {
+      // GPS dostupan (HTTPS ili localhost) — koristi precizni GPS
+      this.setTrackingEnabled(true);
+      this.ensureTracking();
+      return true;
     }
 
-    this.setTrackingEnabled(true);
-    this.ensureTracking();
-    return true;
+    if (this.canUseIpFallback()) {
+      // HTTP bez GPS — koristi IP geolocation kao fallback
+      this.setTrackingEnabled(true);
+      this.ensureIpFallback();
+      return true;
+    }
+
+    return false;
   }
 
   stopTracking(): void {
+    // Zaustavi GPS watch
     if (this.watchId !== null && this.canUseGeolocation()) {
       navigator.geolocation.clearWatch(this.watchId);
     }
-
     this.watchId = null;
+
+    // Zaustavi IP fallback interval
+    if (this.ipFallbackInterval !== null) {
+      clearInterval(this.ipFallbackInterval);
+      this.ipFallbackInterval = null;
+    }
+
     this.setTrackingEnabled(false);
     this.locationSubject.next(null);
     this.removeSnapshot();
+  }
+
+  // ─── GPS (samo na HTTPS / localhost) ───────────────────────────────────────
+
+  private canUseGeolocation(): boolean {
+    return (
+      typeof window !== 'undefined' &&
+      window.isSecureContext &&
+      typeof navigator !== 'undefined' &&
+      !!navigator.geolocation
+    );
   }
 
   private ensureTracking(): void {
@@ -81,16 +114,10 @@ export class LocationTrackingService {
       longitude: position.coords.longitude,
       accuracy: position.coords.accuracy,
       updatedAt: Date.now(),
+      source: 'gps',
     };
 
-    this.locationSubject.next(snapshot);
-    this.persistSnapshot(snapshot);
-
-    if (this.authService.isLoggedIn()) {
-      this.authService
-        .updateMyLocation(snapshot.latitude, snapshot.longitude)
-        .subscribe({ error: () => void 0 });
-    }
+    this.emitLocation(snapshot);
   }
 
   private handleError(error: GeolocationPositionError): void {
@@ -99,8 +126,70 @@ export class LocationTrackingService {
     }
   }
 
-  private canUseGeolocation(): boolean {
-    return typeof navigator !== 'undefined' && !!navigator.geolocation;
+  // ─── IP Geolocation fallback (radi na HTTP) ────────────────────────────────
+
+  private canUseIpFallback(): boolean {
+    return typeof window !== 'undefined' && typeof fetch !== 'undefined';
+  }
+
+  private ensureIpFallback(): void {
+    if (this.ipFallbackInterval !== null) {
+      return; // već radi
+    }
+
+    // Odmah jednom pozovi
+    void this.fetchIpLocation();
+
+    // Osvežavaj svakih 5 minuta (IP lokacija se ne menja često)
+    this.ipFallbackInterval = setInterval(() => {
+      void this.fetchIpLocation();
+    }, 5 * 60 * 1000);
+  }
+
+  private async fetchIpLocation(): Promise<void> {
+    try {
+      // ipapi.co je besplatan, bez API ključa, do 1000 req/dan
+      const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(8000) });
+
+      if (!res.ok) {
+        throw new Error(`ipapi.co HTTP ${res.status}`);
+      }
+
+      const data = await res.json() as {
+        latitude?: number;
+        longitude?: number;
+        error?: boolean;
+      };
+
+      if (data.error || typeof data.latitude !== 'number' || typeof data.longitude !== 'number') {
+        throw new Error('ipapi.co returned invalid data');
+      }
+
+      const snapshot: TrackedLocation = {
+        latitude: data.latitude,
+        longitude: data.longitude,
+        accuracy: 5000, // IP geolocation je ~1-5 km preciznosti
+        updatedAt: Date.now(),
+        source: 'ip',
+      };
+
+      this.emitLocation(snapshot);
+    } catch (err) {
+      console.warn('[LocationTracking] IP geolocation fallback failed:', err);
+    }
+  }
+
+  // ─── Zajednička logika ─────────────────────────────────────────────────────
+
+  private emitLocation(snapshot: TrackedLocation): void {
+    this.locationSubject.next(snapshot);
+    this.persistSnapshot(snapshot);
+
+    if (this.authService.isLoggedIn()) {
+      this.authService
+        .updateMyLocation(snapshot.latitude, snapshot.longitude)
+        .subscribe({ error: () => void 0 });
+    }
   }
 
   private setTrackingEnabled(enabled: boolean): void {
@@ -166,6 +255,7 @@ export class LocationTrackingService {
         longitude: parsed.longitude,
         accuracy: parsed.accuracy,
         updatedAt: typeof parsed.updatedAt === 'number' ? parsed.updatedAt : Date.now(),
+        source: parsed.source ?? 'ip',
       };
     } catch {
       return null;

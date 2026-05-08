@@ -670,7 +670,38 @@ namespace TuristickiVodic.Services
 
             user.HasRequestedCreatorRole = true;
             await _context.SaveChangesAsync();
+            await CreateAdminNewCreatorRoleRequestNotificationsAsync(user);
             return true;
+        }
+
+        private async Task CreateAdminNewCreatorRoleRequestNotificationsAsync(User requester)
+        {
+            var adminIds = await _context.Users
+                .AsNoTracking()
+                .Include(u => u.Role)
+                .Where(u => u.Role.Name == RoleType.Admin && u.IsActive && !u.IsBlacklisted)
+                .Select(u => u.Id)
+                .ToListAsync();
+
+            if (adminIds.Count == 0)
+                return;
+
+            var requesterName = $"{requester.FirstName} {requester.LastName}".Trim();
+            if (string.IsNullOrWhiteSpace(requesterName))
+                requesterName = requester.Email;
+
+            var notifications = adminIds.Select(adminId => new Notification
+            {
+                UserId = adminId,
+                Type = NotificationType.AdminNewCreatorRoleRequest,
+                Title = "Novi zahtev za ContentCreator ulogu",
+                Message = $"Korisnik {requesterName} je poslao zahtev za ContentCreator ulogu.",
+                ActionUrl = "/users/creator-requests",
+                CreatedAt = DateTime.UtcNow
+            });
+
+            _context.Notifications.AddRange(notifications);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<bool> ApproveCreatorRoleAsync(int userId)

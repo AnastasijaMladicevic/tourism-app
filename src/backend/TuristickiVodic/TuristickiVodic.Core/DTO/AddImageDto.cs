@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 using TuristickiVodic.Core.Validation;
 
 namespace TuristickiVodic.Core.DTO
@@ -7,11 +8,12 @@ namespace TuristickiVodic.Core.DTO
     /// Koristi se kada se slika dodaje konkretnom entitetu putem nested rute
     /// (npr. POST /api/destinations/{id}/images). 
     /// Entity ID dolazi iz URL-a, ne iz body-ja.
+    /// Fajl se šalje kao multipart/form-data.
     /// </summary>
     public class AddImageDto
     {
-        [Required, MaxLength(ValidationLengths.ImageUrl)]
-        public string Url { get; set; }
+        [Required]
+        public IFormFile File { get; set; }
 
         [MaxLength(ValidationLengths.ImageAltText)]
         public string? AltText { get; set; }
