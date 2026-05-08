@@ -121,7 +121,7 @@ export class RegionComponent implements OnInit {
       .getAll()
       .pipe(
         map((regions) =>
-          regions.filter((region) => region.isActive !== false && region.code?.toUpperCase() !== 'GR'),
+          regions.filter((region) => region.isActive !== false),
         ),
         switchMap((regions) => {
           this.options.set(regions);
