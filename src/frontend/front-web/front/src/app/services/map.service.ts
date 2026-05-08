@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import * as L from 'leaflet';
-import 'leaflet.markercluster';
 
 interface MarkerEntry {
   marker: L.Marker;
@@ -8,26 +7,14 @@ interface MarkerEntry {
   type: string;
   lat: number;
   lng: number;
-  clusterKey: string;
-}
-
-interface MapInitOptions {
-  enableClustering?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
 export class MapService {
-  private static readonly BASE_WORLD_TILE_SIZE = 256;
-  private readonly worldBounds = L.latLngBounds(
-    L.latLng(-90, -180),
-    L.latLng(90, 180),
-  );
   private markers: MarkerEntry[] = [];
   private markerMap = new Map<string, MarkerEntry>();
   private activeMarkerKey: string | null = null;
   private map: L.Map | null = null;
-  private clusterGroups = new Map<string, L.MarkerClusterGroup>();
-  private clusteringEnabled = false;
   private activeFilters: string[] = [];
 
   private readonly filterMap: Record<string, string[]> = {
@@ -65,45 +52,23 @@ export class MapService {
     return marker;
   }
 
-  initMap(
-    containerId: string,
-    lat = 42.424,
-    lng = 18.771,
-    zoom = 13,
-    options?: MapInitOptions,
-  ): L.Map | null {
+  initMap(containerId: string, lat = 42.424, lng = 18.771, zoom = 13): L.Map | null {
     if (this.map) {
       this.destroyMap();
     }
-
-    this.clusteringEnabled = !!options?.enableClustering;
 
     try {
       this.map = L.map(containerId, {
         zoomControl: false,
         attributionControl: false,
-        maxBounds: this.worldBounds,
-        maxBoundsViscosity: 1.0,
       }).setView([lat, lng], zoom);
 
       L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         maxZoom: 19,
         attribution: '',
-        noWrap: true,
       }).addTo(this.map);
 
-      this.map.whenReady(() => this.enforceWorldViewportCoverage());
-      this.map.on('resize', () => this.enforceWorldViewportCoverage());
-
-      if (this.clusteringEnabled) {
-        this.map.on('moveend zoomend', () => {
-          this.refreshAllClusters();
-          this.updateMarkerStyles();
-        });
-      } else {
-        this.map.on('moveend zoomend', () => this.syncVisibleMarkers());
-      }
-
+      this.map.on('moveend zoomend', () => this.syncVisibleMarkers());
       return this.map;
     } catch (error) {
       console.error('Greska pri kreiranju mape:', error);
@@ -148,8 +113,6 @@ export class MapService {
       this.map = null;
     }
 
-    this.clusterGroups.clear();
-    this.clusteringEnabled = false;
     this.markers = [];
     this.markerMap.clear();
     this.activeMarkerKey = null;
@@ -157,7 +120,7 @@ export class MapService {
 
   flyTo(lat: number, lng: number, zoom = 16): void {
     if (this.map) {
-      this.map.flyTo([lat, lng], zoom, { duration: 1.1 });
+      this.map.flyTo([lat, lng], zoom, { duration: 1.5 });
     }
   }
 
@@ -181,8 +144,7 @@ export class MapService {
     });
 
     const marker = L.marker([lat, lng], { icon: customIcon });
-    const clusterKey = this.getClusterKey(data);
-    const entry: MarkerEntry = { marker, data, type, lat, lng, clusterKey };
+    const entry: MarkerEntry = { marker, data, type, lat, lng };
     const key = this.toMarkerKey(type, data?.id);
 
     this.markers.push(entry);
@@ -193,10 +155,7 @@ export class MapService {
       if (onClick) onClick();
     });
 
-    if (this.clusteringEnabled) {
-      this.getOrCreateClusterGroup(clusterKey).addLayer(marker);
-      this.updateMarkerStyles();
-    } else if (autoSync) {
+    if (autoSync) {
       this.syncVisibleMarkers();
     }
 
@@ -229,16 +188,8 @@ export class MapService {
       return;
     }
 
-    const revealMarker = () => {
-      this.activateMarker(key);
-    };
-
-    if (this.clusteringEnabled) {
-      this.clusterGroups.get(found.clusterKey)?.zoomToShowLayer(found.marker, revealMarker);
-      return;
-    }
-
-    revealMarker();
+    this.activateMarker(key);
+    this.map?.flyTo([found.lat, found.lng], zoom);
   }
 
   clearMarkerFocus(): void {
@@ -253,12 +204,6 @@ export class MapService {
 
   syncVisibleMarkers(): void {
     if (!this.map) {
-      return;
-    }
-
-    if (this.clusteringEnabled) {
-      this.refreshAllClusters();
-      this.updateMarkerStyles();
       return;
     }
 
@@ -309,90 +254,6 @@ export class MapService {
     });
   }
 
-  private createClusterGroup(): L.MarkerClusterGroup {
-    return L.markerClusterGroup({
-      showCoverageOnHover: false,
-      spiderfyOnMaxZoom: true,
-      zoomToBoundsOnClick: true,
-      removeOutsideVisibleBounds: false,
-      maxClusterRadius: 54,
-      iconCreateFunction: (cluster) => {
-        const count = cluster.getChildCount();
-        const sizeClass = count < 10 ? 'small' : count < 30 ? 'medium' : 'large';
-
-        return L.divIcon({
-          html:
-            `<div class="destination-cluster__pin">` +
-            `<span class="destination-cluster__count">${count}</span>` +
-            `</div>`,
-          className: `destination-cluster destination-cluster--${sizeClass}`,
-          iconSize: [56, 72],
-          iconAnchor: [28, 68],
-        });
-      },
-    });
-  }
-
-  private getOrCreateClusterGroup(clusterKey: string): L.MarkerClusterGroup {
-    let group = this.clusterGroups.get(clusterKey);
-    if (group) {
-      return group;
-    }
-
-    group = this.createClusterGroup();
-    this.clusterGroups.set(clusterKey, group);
-    if (this.map) {
-      group.addTo(this.map);
-    }
-
-    return group;
-  }
-
-  private refreshAllClusters(): void {
-    this.clusterGroups.forEach((group) => group.refreshClusters());
-  }
-
-  private enforceWorldViewportCoverage(): void {
-    if (!this.map) {
-      return;
-    }
-
-    const container = this.map.getContainer();
-    const width = Math.max(container.clientWidth, 1);
-    const height = Math.max(container.clientHeight, 1);
-    const minZoomForWidth = Math.ceil(
-      Math.log2(width / MapService.BASE_WORLD_TILE_SIZE),
-    );
-    const minZoomForHeight = Math.ceil(
-      Math.log2(height / MapService.BASE_WORLD_TILE_SIZE),
-    );
-    const minZoom = Math.max(0, minZoomForWidth, minZoomForHeight);
-
-    this.map.setMinZoom(minZoom);
-
-    if (this.map.getZoom() < minZoom) {
-      this.map.setZoom(minZoom, { animate: false });
-    }
-
-    this.map.panInsideBounds(this.worldBounds, { animate: false });
-  }
-
-  private getClusterKey(data: any): string {
-    if (data?.regionId != null) {
-      return `region:${data.regionId}`;
-    }
-
-    if (typeof data?.regionCode === 'string' && data.regionCode.trim()) {
-      return `region-code:${data.regionCode.trim().toLowerCase()}`;
-    }
-
-    if (typeof data?.regionName === 'string' && data.regionName.trim()) {
-      return `region-name:${data.regionName.trim().toLowerCase()}`;
-    }
-
-    return 'region:unknown';
-  }
-
   private matchesCurrentFilters(type: string): boolean {
     if (!this.activeFilters.length) {
       return true;
@@ -407,27 +268,27 @@ export class MapService {
 
   private getMarkerEmoji(type: string): string {
     const icons: Record<string, string> = {
-      destination: '&#128205;',
-      locality: '&#127961;',
-      event: '&#127881;',
-      activity: '&#128694;',
-      hotel: '&#127968;',
-      apartment: '&#127968;',
-      restaurant: '&#127869;',
-      kafana: '&#127863;',
-      club: '&#127925;',
-      winery: '&#127815;',
-      bar: '&#127864;',
-      cafe: '&#9749;',
-      gas_station: '&#9971;',
-      shop: '&#128717;',
-      mall: '&#128722;',
-      market: '&#128722;',
-      hospital: '&#127973;',
-      clinic: '&#127973;',
-      pharmacy: '&#128138;',
-      attraction: '&#128204;',
-      default: '&#128205;',
+      destination: '📍',
+      locality: '🏙',
+      event: '🎉',
+      activity: '🚶',
+      hotel: '🏨',
+      apartment: '🏠',
+      restaurant: '🍽',
+      kafana: '🍷',
+      club: '🎵',
+      winery: '🍇',
+      bar: '🍸',
+      cafe: '☕',
+      gas_station: '⛽',
+      shop: '🛍',
+      mall: '🛒',
+      market: '🛒',
+      hospital: '🏥',
+      clinic: '🏥',
+      pharmacy: '💊',
+      attraction: '📌',
+      default: '📍',
     };
     return icons[type] ?? icons['default'];
   }

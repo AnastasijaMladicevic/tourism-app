@@ -24,7 +24,7 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "allowedCommonJsDependencies": ["leaflet", "leaflet-routing-machine", "leaflet.markercluster"],
+            "allowedCommonJsDependencies": ["leaflet", "leaflet-routing-machine"],
             "assets": [
               "src/assets",
               {
@@ -32,12 +32,8 @@
                 "input": "public"
               }
             ],
-            "styles": [
-              "src/styles.scss",
-              "node_modules/leaflet/dist/leaflet.css",
-              "node_modules/leaflet.markercluster/dist/MarkerCluster.css",
-              "node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css"
-            ]
+            "styles": ["src/styles.scss",
+          "node_modules/leaflet/dist/leaflet.css"]
           },
           "configurations": {
             "production": {

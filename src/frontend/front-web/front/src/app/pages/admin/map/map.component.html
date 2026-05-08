@@ -31,7 +31,9 @@
             </div>
             <div class="suggestion-item__body">
               <span class="suggestion-item__name">{{ result.name }}</span>
-              <span class="suggestion-item__meta">{{ result.typeName }} · {{ result.location }}</span>
+              <span class="suggestion-item__meta"
+                >{{ result.typeName }} · {{ result.location }}</span
+              >
             </div>
           </div>
         }
@@ -55,14 +57,14 @@
       [style.top.px]="cardPosition.top"
       (click)="$event.stopPropagation()"
     >
-      <button class="bottom-card__close" (click)="closeCard($event)">
+      <button class="bottom-card__close" (click)="closeCard()">
         <mat-icon>close</mat-icon>
       </button>
 
       <div class="bottom-card__image-wrap">
-        @if (getItemImage(selectedItem)) {
+        @if (getItemImage()) {
           <img
-            [src]="getItemImage(selectedItem)"
+            [src]="getItemImage()"
             [alt]="selectedItem.name"
             class="bottom-card__image"
             (load)="onCardImageLoad()"
@@ -79,28 +81,28 @@
           <div class="bottom-card__info">
             <h3 class="bottom-card__name">{{ selectedItem.name }}</h3>
             <p class="bottom-card__meta">
-              @if (getItemLocation(selectedItem)) {
+              @if (getItemLocation()) {
                 <mat-icon>place</mat-icon>
-                {{ getItemLocation(selectedItem) }}
+                {{ getItemLocation() }}
               }
             </p>
           </div>
-          @if ((selectedItem.averageRating ?? 0) > 0) {
+          @if ((selectedItem!.averageRating ?? 0) > 0) {
             <div class="bottom-card__rating">
               <mat-icon>star</mat-icon>
-              {{ selectedItem.averageRating!.toFixed(1) }}
+              {{ selectedItem!.averageRating!.toFixed(1) }}
             </div>
           }
         </div>
 
         <div class="bottom-card__badges">
-          @if (getWorkingStatus(selectedItem) !== null) {
+          @if (getWorkingStatus() !== null) {
             <span
               class="badge"
-              [class.badge--open]="getWorkingStatus(selectedItem)"
-              [class.badge--closed]="!getWorkingStatus(selectedItem)"
+              [class.badge--open]="getWorkingStatus()"
+              [class.badge--closed]="!getWorkingStatus()"
             >
-              {{ getWorkingStatus(selectedItem) ? 'OPEN NOW' : 'CLOSED' }}
+              {{ getWorkingStatus() ? 'OPEN NOW' : 'CLOSED' }}
             </span>
           }
           @if (selectedItem.distanceKm != null) {
@@ -111,7 +113,7 @@
         </div>
 
         <div class="bottom-card__actions">
-          <button class="bottom-card__btn" (click)="openDetails(selectedItem)">Details</button>
+          <button class="bottom-card__btn" (click)="openDetails()">Details</button>
         </div>
       </div>
     </div>
