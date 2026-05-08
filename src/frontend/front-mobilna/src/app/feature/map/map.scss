@@ -852,6 +852,60 @@
   filter: saturate(0.65) brightness(0.72);
 }
 
+.destination-cluster {
+  background: transparent !important;
+  border: none !important;
+}
+
+.destination-cluster__pin {
+  position: relative;
+  display: flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px 18px 18px 4px;
+  background: linear-gradient(180deg, #168aad 0%, #0f6c83 100%);
+  box-shadow: 0 12px 28px rgba(15, 118, 110, 0.28);
+  transform: rotate(-45deg);
+}
+
+.destination-cluster__pin::after {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 14px 14px 14px 4px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.destination-cluster__count {
+  position: relative;
+  z-index: 1;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  transform: rotate(45deg);
+}
+
+.destination-cluster--medium .destination-cluster__pin {
+  width: 47px;
+  height: 47px;
+}
+
+.destination-cluster--medium .destination-cluster__count {
+  font-size: 13px;
+}
+
+.destination-cluster--large .destination-cluster__pin {
+  width: 52px;
+  height: 52px;
+}
+
+.destination-cluster--large .destination-cluster__count {
+  font-size: 15px;
+}
+
 .leaflet-popup {
   display: none !important;
 }

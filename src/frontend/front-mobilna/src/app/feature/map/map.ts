@@ -163,7 +163,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const lng = state?.lng ?? 18.771;
     const zoom = state?.zoom ?? 13;
 
-    this.mapService.initMap('main-map', lat, lng, zoom);
+    this.mapService.initMap('main-map', lat, lng, zoom, { enableClustering: true });
     this.isTracking = this.locationTrackingService.isTrackingEnabled();
     this.applyTrackedLocation(this.locationTrackingService.getCurrentLocation());
     if (!state?.lat || !state?.lng) {
