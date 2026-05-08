@@ -1,15 +1,17 @@
 <section class="locality-create-page">
   <header class="page-head">
     <div>
-      <p class="breadcrumbs">Dashboard <span>></span> Localities <span>></span> Create</p>
-      <h1>Create Location</h1>
-      <p class="subtle-text">Add a new location for your managed destination.</p>
+      <p class="breadcrumbs">Dashboard <span>></span> Localities <span>></span> {{ isEditMode ? 'Edit' : 'Create' }}</p>
+      <h1>{{ isEditMode ? 'Edit Location' : 'Create Location' }}</h1>
+      <p class="subtle-text">
+        {{ isEditMode ? 'Update location details for your managed destination.' : 'Add a new location for your managed destination.' }}
+      </p>
     </div>
     <div class="top-actions">
       <button type="button" class="ghost-btn" (click)="onCancel()">Cancel</button>
       <button type="button" class="ghost-btn" (click)="onSaveDraft()">Save Draft</button>
       <button type="submit" class="primary-btn" form="create-locality-form" [disabled]="isSubmitting || isLoadingOptions">
-        {{ isSubmitting ? 'Creating...' : 'Create Location' }}
+        {{ isSubmitting ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save Changes' : 'Create Location') }}
       </button>
     </div>
   </header>
@@ -45,8 +47,19 @@
           </div>
         </div>
 
-        @if (imagePreviews.length > 0) {
+        @if (hasAnyGalleryImages) {
           <div class="gallery-grid">
+            <article class="gallery-item" *ngFor="let image of existingImages">
+              <img [src]="image.url" alt="Location image" />
+              <div class="gallery-actions">
+                @if (image.isMain) {
+                  <span class="primary-badge">Primary</span>
+                } @else {
+                  <span class="ghost-btn small">Saved</span>
+                }
+              </div>
+            </article>
+
             <article class="gallery-item" *ngFor="let preview of imagePreviews; let index = index">
               <img [src]="preview" alt="Location image preview" />
               <div class="gallery-actions">

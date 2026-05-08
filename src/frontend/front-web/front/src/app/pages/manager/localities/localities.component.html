@@ -146,8 +146,13 @@
                   <td>{{ locality.destinationName || 'N/A' }}</td>
                   <td>{{ getCreatedByLabel(locality) }}</td>
                   <td>
-                    <button type="button" class="icon-btn" title="Select locality" (click)="$event.stopPropagation()">
-                      <span class="material-symbols-outlined">open_in_new</span>
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      title="Edit locality"
+                      (click)="$event.stopPropagation(); onEditLocation(locality)"
+                    >
+                      <span class="material-symbols-outlined">edit</span>
                     </button>
                   </td>
                 </tr>

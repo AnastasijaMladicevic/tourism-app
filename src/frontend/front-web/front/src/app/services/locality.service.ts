@@ -54,6 +54,16 @@ export interface CreateLocalityDto {
   imageUrl?: string;
 }
 
+export interface UpdateLocalityDto {
+  name?: string;
+  description?: string;
+  longitude?: number;
+  latitude?: number;
+  destinationId?: number;
+  localityTypeId?: number;
+  imageUrl?: string;
+}
+
 export interface LocalityImageDto {
   id: number;
   url: string;
@@ -94,6 +104,18 @@ export class LocalityService {
 
   create(dto: CreateLocalityDto): Observable<LocalityDto> {
     return this.http.post<LocalityDto>(this.apiUrl, dto);
+  }
+
+  getById(id: number): Observable<LocalityDto> {
+    return this.http.get<LocalityDto>(`${this.apiUrl}/${id}`);
+  }
+
+  update(id: number, dto: UpdateLocalityDto): Observable<LocalityDto> {
+    return this.http.put<LocalityDto>(`${this.apiUrl}/${id}`, dto);
+  }
+
+  getImages(localityId: number): Observable<LocalityImageDto[]> {
+    return this.http.get<LocalityImageDto[]>(`${this.apiUrl}/${localityId}/images`);
   }
 
   addImage(localityId: number, file: File, isMain: boolean): Observable<LocalityImageDto> {

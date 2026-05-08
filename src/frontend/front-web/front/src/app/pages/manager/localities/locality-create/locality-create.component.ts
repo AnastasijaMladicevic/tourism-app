@@ -1,10 +1,10 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { catchError, finalize, of } from 'rxjs';
 import { DestinationService } from '../../../../services/destination.service';
-import { CreateLocalityDto, LocalityService } from '../../../../services/locality.service';
+import { CreateLocalityDto, LocalityImageDto, LocalityService, UpdateLocalityDto } from '../../../../services/locality.service';
 import { MapComponent as SharedMapComponent } from '../../../../shared/components/map/map';
 
 interface LocalityTypeOption {
@@ -30,6 +30,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
   private readonly localityService = inject(LocalityService);
   private readonly destinationService = inject(DestinationService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
 
   isSubmitting = false;
@@ -45,7 +46,10 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
   pendingImageNames = '';
   imageFiles: File[] = [];
   imagePreviews: string[] = [];
+  existingImages: LocalityImageDto[] = [];
   primaryImageIndex = 0;
+  isEditMode = false;
+  private localityId: number | null = null;
 
   form: CreateLocalityDto = {
     name: '',
@@ -58,8 +62,20 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
-    this.loadDraft();
+    const idParam = this.route.snapshot.paramMap.get('id');
+    const parsedId = idParam ? Number(idParam) : NaN;
+    this.isEditMode = Number.isInteger(parsedId) && parsedId > 0;
+    this.localityId = this.isEditMode ? parsedId : null;
+
+    if (!this.isEditMode) {
+      this.loadDraft();
+    }
+
     this.loadOptions();
+
+    if (this.isEditMode && this.localityId) {
+      this.loadLocalityForEdit(this.localityId);
+    }
   }
 
   ngOnDestroy(): void {
@@ -114,6 +130,10 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     return name || typeName || destinationName || 'New location';
   }
 
+  get hasAnyGalleryImages(): boolean {
+    return this.existingImages.length > 0 || this.imagePreviews.length > 0;
+  }
+
   onSubmit(): void {
     if (this.isSubmitting || this.isLoadingOptions) {
       return;
@@ -136,27 +156,40 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
       longitude: this.form.longitude != null ? Number(this.form.longitude) : undefined
     };
 
-    this.localityService.create(payload).subscribe({
-      next: (created) => {
-        if (!this.imageFiles.length) {
-          this.isSubmitting = false;
-          this.router.navigate(['/manager/localities']);
-          return;
-        }
+    const onSuccess = (savedId: number): void => {
+      if (!this.imageFiles.length) {
+        this.isSubmitting = false;
+        this.router.navigate(['/manager/localities']);
+        return;
+      }
 
-        this.localityService
-          .attachImages(created.id, this.imageFiles, this.primaryImageIndex)
-          .pipe(finalize(() => (this.isSubmitting = false)))
-          .subscribe({
-            next: () => {
-              this.router.navigate(['/manager/localities']);
-            },
-            error: () => {
-              // Locality is already created; return to list even if image upload fails.
-              this.router.navigate(['/manager/localities']);
-            }
-          });
-      },
+      this.localityService
+        .attachImages(savedId, this.imageFiles, this.primaryImageIndex)
+        .pipe(finalize(() => (this.isSubmitting = false)))
+        .subscribe({
+          next: () => {
+            this.router.navigate(['/manager/localities']);
+          },
+          error: () => {
+            this.router.navigate(['/manager/localities']);
+          }
+        });
+    };
+
+    if (this.isEditMode && this.localityId) {
+      const updatePayload: UpdateLocalityDto = payload;
+      this.localityService.update(this.localityId, updatePayload).subscribe({
+        next: (updated) => onSuccess(updated.id),
+        error: (error) => {
+          this.errorMessage = error?.error?.message ?? 'Failed to update location.';
+          this.isSubmitting = false;
+        }
+      });
+      return;
+    }
+
+    this.localityService.create(payload).subscribe({
+      next: (created) => onSuccess(created.id),
       error: (error) => {
         this.errorMessage = error?.error?.message ?? 'Failed to create location.';
         this.isSubmitting = false;
@@ -169,6 +202,11 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
   }
 
   onSaveDraft(): void {
+    if (this.isEditMode) {
+      this.draftSavedMessage = 'Draft is only available for new localities.';
+      return;
+    }
+
     const draft = {
       form: this.form,
       primaryImageIndex: this.primaryImageIndex
@@ -317,6 +355,40 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  private loadLocalityForEdit(id: number): void {
+    this.localityService.getById(id).subscribe({
+      next: (locality) => {
+        this.form = {
+          ...this.form,
+          name: locality.name ?? '',
+          description: locality.description ?? '',
+          destinationId: Number(locality.destinationId) || 0,
+          localityTypeId: Number(locality.localityTypeId) || 0,
+          latitude: locality.latitude,
+          longitude: locality.longitude
+        };
+        this.loadExistingImages(id);
+        this.errorMessage = '';
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        this.errorMessage = error?.error?.message ?? 'Failed to load locality for editing.';
+      }
+    });
+  }
+
+  private loadExistingImages(localityId: number): void {
+    this.localityService
+      .getImages(localityId)
+      .pipe(catchError(() => of([])))
+      .subscribe((images) => {
+        this.existingImages = (images ?? [])
+          .filter((image) => !!image?.url)
+          .sort((a, b) => Number(b.isMain) - Number(a.isMain) || a.id - b.id);
+        this.cdr.detectChanges();
+      });
   }
 
   private loadDraft(): void {

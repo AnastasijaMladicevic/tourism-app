@@ -229,6 +229,10 @@ export class ManagerLocalitiesComponent implements OnInit {
     this.router.navigate(['/manager/localities/create']);
   }
 
+  onEditLocation(locality: LocalityDto): void {
+    this.router.navigate(['/manager/localities/edit', locality.id]);
+  }
+
   onApplyFilters(): void {
     this.searchQuery = this.draftSearchQuery.trim();
     this.currentPage = 1;
