@@ -227,7 +227,7 @@ export const routes: Routes = [
       {
         path: 'localities',
         loadComponent: () =>
-          import('./pages/manager/destinations/destinations.component').then(m => m.ManagerDestinationsComponent)
+          import('./pages/manager/localities/localities.component').then(m => m.ManagerLocalitiesComponent)
       },
       {
         path: 'destinations',

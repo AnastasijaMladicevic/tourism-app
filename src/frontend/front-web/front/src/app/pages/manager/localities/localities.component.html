@@ -1,0 +1,245 @@
+<section class="manager-localities-page">
+  <div class="page-head">
+    <div>
+      <p class="breadcrumbs">Dashboard <span>></span> Localities</p>
+      <h1>Localities</h1>
+      <p class="subtle-text">Manage localities and review their visibility data.</p>
+    </div>
+  </div>
+
+  <div class="toolbar card">
+    <label class="search-field" aria-label="Search localities">
+      <span class="material-symbols-outlined">search</span>
+      <input type="text" placeholder="Search by locality, destination or region..." />
+    </label>
+
+    <button type="button" class="ghost-btn">
+      <span class="material-symbols-outlined">filter_alt</span>
+      More Filters
+    </button>
+  </div>
+
+  <div class="filters-panel card">
+    <label>
+      <span>Status</span>
+      <select>
+        <option>All Statuses</option>
+        <option>Published</option>
+        <option>Pending</option>
+        <option>Draft</option>
+      </select>
+    </label>
+
+    <label>
+      <span>Destination</span>
+      <select>
+        <option>All Destinations</option>
+        <option>Belgrade</option>
+        <option>Novi Sad</option>
+        <option>Nis</option>
+      </select>
+    </label>
+
+    <label>
+      <span>Sort by</span>
+      <select>
+        <option>Name</option>
+        <option>Status</option>
+        <option>Objects count</option>
+      </select>
+    </label>
+
+    <label>
+      <span>Order</span>
+      <select>
+        <option>Ascending</option>
+        <option>Descending</option>
+      </select>
+    </label>
+
+    <div class="filter-actions">
+      <button type="button" class="primary-btn filter-btn">Apply Filters</button>
+      <button type="button" class="ghost-btn filter-btn secondary">Reset Filters</button>
+    </div>
+  </div>
+
+  <div class="locality-content-grid">
+    <div class="locality-main-column">
+      <div class="stats-row">
+        <article class="stat-card" data-tone="blue">
+          <p>Total localities</p>
+          <strong>124</strong>
+          <span>Across your managed destinations</span>
+        </article>
+        <article class="stat-card" data-tone="green">
+          <p>On this page</p>
+          <strong>10</strong>
+          <span>Visible rows</span>
+        </article>
+        <article class="stat-card" data-tone="neutral">
+          <p>Published ratio</p>
+          <strong>81%</strong>
+          <span>Current filtered set</span>
+        </article>
+      </div>
+
+      <section class="locality-table-wrap card">
+        <header class="table-header">
+          <h2>Managed Localities</h2>
+        </header>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Locality details</th>
+                <th>Destination</th>
+                <th>Region</th>
+                <th>Objects</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="active-row">
+                <td><span class="status-chip published">Published</span></td>
+                <td>
+                  <div class="item-cell item-cell-with-media">
+                    <div class="media-thumb"></div>
+                    <strong>Skadarlija</strong>
+                  </div>
+                </td>
+                <td>Belgrade</td>
+                <td>Central Serbia</td>
+                <td class="count-cell">38</td>
+                <td>
+                  <button type="button" class="icon-btn" title="Review locality">
+                    <span class="material-symbols-outlined">open_in_new</span>
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="status-chip pending">Pending</span></td>
+                <td>
+                  <div class="item-cell item-cell-with-media">
+                    <div class="media-thumb"></div>
+                    <strong>Liman</strong>
+                  </div>
+                </td>
+                <td>Novi Sad</td>
+                <td>Vojvodina</td>
+                <td class="count-cell">22</td>
+                <td>
+                  <button type="button" class="icon-btn" title="Review locality">
+                    <span class="material-symbols-outlined">open_in_new</span>
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="status-chip draft">Draft</span></td>
+                <td>
+                  <div class="item-cell item-cell-with-media">
+                    <div class="media-thumb"></div>
+                    <strong>Bubanj</strong>
+                  </div>
+                </td>
+                <td>Nis</td>
+                <td>Southern Serbia</td>
+                <td class="count-cell">14</td>
+                <td>
+                  <button type="button" class="icon-btn" title="Review locality">
+                    <span class="material-symbols-outlined">open_in_new</span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <footer class="table-footer">
+          <p>Showing 1 to 10 of 124 localities</p>
+          <div class="pager">
+            <label class="page-size-control">
+              <span>Page size</span>
+              <select class="page-size-select">
+                <option>10</option>
+                <option>20</option>
+                <option>50</option>
+              </select>
+            </label>
+
+            <button type="button" class="ghost-btn small-btn">Previous</button>
+            <button type="button" class="ghost-btn small-btn">Next</button>
+          </div>
+        </footer>
+      </section>
+    </div>
+
+    <aside class="detail-column card">
+      <div class="activity-hero">
+        <div class="hero-media">
+          <span class="hero-badge">Featured locality</span>
+        </div>
+        <div class="hero-copy">
+          <p class="eyebrow">Preview</p>
+          <h2>Skadarlija</h2>
+          <p class="hero-meta">Belgrade · Central Serbia</p>
+          <span class="detail-status status-published">Published</span>
+        </div>
+      </div>
+
+      <div class="detail-metrics">
+        <div class="metric-card">
+          <span>Objects</span>
+          <strong>38</strong>
+        </div>
+        <div class="metric-card">
+          <span>Activities</span>
+          <strong>17</strong>
+        </div>
+      </div>
+
+      <section class="detail-section">
+        <div class="section-head">
+          <h3>Details</h3>
+        </div>
+        <div class="schedule-item">
+          <span>Destination</span>
+          <strong>Belgrade</strong>
+        </div>
+        <div class="schedule-item">
+          <span>Region</span>
+          <strong>Central Serbia</strong>
+        </div>
+        <div class="schedule-item">
+          <span>Coordinates</span>
+          <strong>44.8176, 20.4633</strong>
+        </div>
+      </section>
+
+      <section class="detail-section">
+        <h3>Description</h3>
+        <p class="description-copy">
+          A historic bohemian quarter with traditional restaurants, cultural venues, and walking
+          streets suitable for all-day city exploration.
+        </p>
+      </section>
+
+      <section class="detail-section">
+        <div class="map-card">
+          <div class="map-empty-state">
+            <span class="material-symbols-outlined">map</span>
+            <p>Map preview placeholder for selected locality.</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="detail-cta">
+        <button type="button" class="primary-btn full-cta sidebar-cta-btn">
+          <span class="material-symbols-outlined">rate_review</span>
+          Open full review
+        </button>
+      </div>
+    </aside>
+  </div>
+</section>
