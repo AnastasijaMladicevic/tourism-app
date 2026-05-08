@@ -224,10 +224,35 @@ export class ManagerLocalitiesComponent implements OnInit {
   }
 
   getHeroStyle(): Record<string, string> {
-    const image = this.selectedLocality?.mainImageUrl?.trim();
+    const image = this.normalizeImageUrl(this.selectedLocality?.mainImageUrl);
     if (!image) {
       return {};
     }
     return { 'background-image': `url("${image}")` };
+  }
+
+  getMediaStyle(locality: LocalityDto): Record<string, string> {
+    const image = this.normalizeImageUrl(locality.mainImageUrl);
+    if (!image) {
+      return {};
+    }
+    return { 'background-image': `url("${image}")` };
+  }
+
+  private normalizeImageUrl(value?: string): string {
+    const trimmed = value?.trim();
+    if (!trimmed) {
+      return '';
+    }
+
+    if (/^(data:|blob:|https?:\/\/|\/\/)/i.test(trimmed)) {
+      return trimmed;
+    }
+
+    try {
+      return encodeURI(new URL(trimmed, document.baseURI).href);
+    } catch {
+      return encodeURI(trimmed);
+    }
   }
 }

@@ -132,7 +132,7 @@
                   </td>
                   <td>
                     <div class="item-cell item-cell-with-media">
-                      <div class="media-thumb" [style.background-image]="'url(' + locality.mainImageUrl + ')'"></div>
+                      <div class="media-thumb" [ngStyle]="getMediaStyle(locality)"></div>
                       <div>
                         <strong>{{ locality.name }}</strong>
                       </div>
