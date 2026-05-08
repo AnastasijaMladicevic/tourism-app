@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FilterOption, LocalityDto, LocalityService } from '../../../services/locality.service';
+import { FilterOption, LocalityDto, LocalityImageDto, LocalityService } from '../../../services/locality.service';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { DestinationService } from '../../../services/destination.service';
 import { AuthService } from '../../../services/auth.service';
@@ -14,15 +14,21 @@ import { AuthService } from '../../../services/auth.service';
   templateUrl: './localities.component.html',
   styleUrls: ['./localities.component.css']
 })
-export class ManagerLocalitiesComponent implements OnInit {
+export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
   private readonly localityService = inject(LocalityService);
   private readonly destinationService = inject(DestinationService);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
 
+  private static readonly HERO_ROTATION_INTERVAL_MS = 20000;
+
   localities: LocalityDto[] = [];
   selectedLocality: LocalityDto | null = null;
+
+  heroImageUrls: string[] = [];
+  currentHeroImageIndex = 0;
+  private heroRotationTimerId: ReturnType<typeof setInterval> | null = null;
 
   isLoading = true;
   errorMessage = '';
@@ -52,6 +58,10 @@ export class ManagerLocalitiesComponent implements OnInit {
   ngOnInit(): void {
     this.managerUserId = this.getCurrentUserIdFromToken();
     this.loadManagedDestinationScope();
+  }
+
+  ngOnDestroy(): void {
+    this.stopHeroImageRotation();
   }
 
   get totalLocalitiesOnPage(): number {
@@ -137,7 +147,7 @@ export class ManagerLocalitiesComponent implements OnInit {
           this.loadCreatorNamesForRows(this.localities);
 
           if (!this.selectedLocality || !this.localities.some((item) => item.id === this.selectedLocality?.id)) {
-            this.selectedLocality = this.localities[0] ?? null;
+            this.setSelectedLocality(this.localities[0] ?? null);
           }
 
           this.isLoading = false;
@@ -146,7 +156,7 @@ export class ManagerLocalitiesComponent implements OnInit {
         error: (error) => {
           this.errorMessage = error?.error?.message ?? 'Failed to load localities';
           this.localities = [];
-          this.selectedLocality = null;
+          this.setSelectedLocality(null);
           this.totalCount = 0;
           this.totalPages = 1;
           this.isLoading = false;
@@ -279,7 +289,75 @@ export class ManagerLocalitiesComponent implements OnInit {
   }
 
   selectLocality(locality: LocalityDto): void {
+    this.setSelectedLocality(locality);
+  }
+
+  private setSelectedLocality(locality: LocalityDto | null): void {
+    const previousId = this.selectedLocality?.id ?? null;
     this.selectedLocality = locality;
+
+    if ((locality?.id ?? null) !== previousId) {
+      this.loadHeroImagesForSelectedLocality();
+    }
+  }
+
+  private loadHeroImagesForSelectedLocality(): void {
+    this.stopHeroImageRotation();
+    this.heroImageUrls = [];
+    this.currentHeroImageIndex = 0;
+
+    if (!this.selectedLocality) {
+      return;
+    }
+
+    const fallbackUrl = this.normalizeImageUrl(this.selectedLocality.mainImageUrl);
+
+    this.localityService.getImages(this.selectedLocality.id).subscribe({
+      next: (images: LocalityImageDto[]) => {
+        const orderedUrls = (images ?? [])
+          .slice()
+          .sort((a, b) => Number(b.isMain) - Number(a.isMain))
+          .map((image) => this.normalizeImageUrl(image.url))
+          .filter((url): url is string => !!url);
+
+        this.heroImageUrls = orderedUrls.length > 0
+          ? orderedUrls
+          : (fallbackUrl ? [fallbackUrl] : []);
+        this.currentHeroImageIndex = 0;
+
+        if (this.heroImageUrls.length > 1) {
+          this.startHeroImageRotation();
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.heroImageUrls = fallbackUrl ? [fallbackUrl] : [];
+        this.currentHeroImageIndex = 0;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private startHeroImageRotation(): void {
+    this.stopHeroImageRotation();
+
+    this.heroRotationTimerId = setInterval(() => {
+      if (this.heroImageUrls.length <= 1) {
+        return;
+      }
+
+      this.currentHeroImageIndex =
+        (this.currentHeroImageIndex + 1) % this.heroImageUrls.length;
+      this.cdr.detectChanges();
+    }, ManagerLocalitiesComponent.HERO_ROTATION_INTERVAL_MS);
+  }
+
+  private stopHeroImageRotation(): void {
+    if (this.heroRotationTimerId != null) {
+      clearInterval(this.heroRotationTimerId);
+      this.heroRotationTimerId = null;
+    }
   }
 
   trackByLocalityId(_: number, locality: LocalityDto): number {
@@ -310,12 +388,12 @@ export class ManagerLocalitiesComponent implements OnInit {
     return `${locality.latitude.toFixed(4)}, ${locality.longitude.toFixed(4)}`;
   }
 
-  getHeroStyle(): Record<string, string> {
-    const image = this.normalizeImageUrl(this.selectedLocality?.mainImageUrl);
-    if (!image) {
-      return {};
-    }
-    return { 'background-image': `url("${image}")` };
+  getHeroSlideStyle(url: string): Record<string, string> {
+    return { 'background-image': `url("${url}")` };
+  }
+
+  trackByHeroImage(index: number, url: string): string {
+    return `${index}-${url}`;
   }
 
   getMediaStyle(locality: LocalityDto): Record<string, string> {
