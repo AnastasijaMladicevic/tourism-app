@@ -93,8 +93,46 @@ namespace TuristickiVodic.Services.Services
 
             _context.ManagerReports.Add(report);
             await _context.SaveChangesAsync();
+            await CreateAdminNewManagerReportNotificationsAsync(report, manager, reportedUser);
 
             return await LoadDtoAsync(report.Id);
+        }
+
+        private async Task CreateAdminNewManagerReportNotificationsAsync(
+            ManagerReport report,
+            User manager,
+            User reportedUser)
+        {
+            var adminIds = await _context.Users
+                .AsNoTracking()
+                .Include(u => u.Role)
+                .Where(u => u.Role.Name == RoleType.Admin && u.IsActive && !u.IsBlacklisted)
+                .Select(u => u.Id)
+                .ToListAsync();
+
+            if (adminIds.Count == 0)
+                return;
+
+            var managerName = $"{manager.FirstName} {manager.LastName}".Trim();
+            if (string.IsNullOrWhiteSpace(managerName))
+                managerName = manager.Email;
+
+            var reportedUserName = $"{reportedUser.FirstName} {reportedUser.LastName}".Trim();
+            if (string.IsNullOrWhiteSpace(reportedUserName))
+                reportedUserName = reportedUser.Email;
+
+            var notifications = adminIds.Select(adminId => new Notification
+            {
+                UserId = adminId,
+                Type = NotificationType.AdminNewManagerReport,
+                Title = "Nova prijava managera",
+                Message = $"Manager {managerName} je prijavio ContentCreator-a {reportedUserName}.",
+                ActionUrl = $"/manager-reports/{report.Id}",
+                CreatedAt = DateTime.UtcNow
+            });
+
+            _context.Notifications.AddRange(notifications);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<PagedResultDto<ManagerReportDto>> GetForManagerAsync(int managerUserId, ManagerReportQueryDto query)
@@ -216,8 +254,36 @@ namespace TuristickiVodic.Services.Services
             }
 
             await _context.SaveChangesAsync();
+            await CreateManagerReportReviewedNotificationAsync(report, dto.Approve);
 
             return MapToDto(report);
+        }
+
+        private async Task CreateManagerReportReviewedNotificationAsync(ManagerReport report, bool approved)
+        {
+            var managerCanReceive = await _context.Users
+                .AsNoTracking()
+                .AnyAsync(u => u.Id == report.ManagerId && u.IsActive && !u.IsBlacklisted);
+
+            if (!managerCanReceive)
+                return;
+
+            var statusText = approved ? "odobrena" : "odbijena";
+            var reportedUserName = $"{report.ReportedUser.FirstName} {report.ReportedUser.LastName}".Trim();
+            if (string.IsNullOrWhiteSpace(reportedUserName))
+                reportedUserName = report.ReportedUser.Email;
+
+            _context.Notifications.Add(new Notification
+            {
+                UserId = report.ManagerId,
+                Type = NotificationType.ManagerReportReviewed,
+                Title = $"Tvoja prijava je {statusText}",
+                Message = $"Prijava za korisnika {reportedUserName} je {statusText}.",
+                ActionUrl = $"/manager-reports/{report.Id}",
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task<bool> WithdrawAsync(int id, int managerUserId)
