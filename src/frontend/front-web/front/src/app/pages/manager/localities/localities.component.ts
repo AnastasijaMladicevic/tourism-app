@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { LocalityDto, LocalityService } from '../../../services/locality.service';
+import { FilterOption, LocalityDto, LocalityService } from '../../../services/locality.service';
 
 @Component({
   selector: 'app-manager-localities',
@@ -22,10 +22,16 @@ export class ManagerLocalitiesComponent implements OnInit {
 
   draftSearchQuery = '';
   searchQuery = '';
+  statusFilter = 'all';
   destinationFilter = 'all';
   typeFilter = 'all';
   sortBy = 'name';
   sortOrder: 'asc' | 'desc' = 'asc';
+  filterPanelOpen = false;
+
+  destinationOptions: FilterOption[] = [];
+  typeOptions: FilterOption[] = [];
+  statusOptions: FilterOption[] = [];
 
   currentPage = 1;
   pageSize = 5;
@@ -34,6 +40,7 @@ export class ManagerLocalitiesComponent implements OnInit {
   readonly pageSizeOptions = [5, 10, 20, 50];
 
   ngOnInit(): void {
+    this.loadFilterOptions();
     this.loadLocalities();
   }
 
@@ -83,7 +90,10 @@ export class ManagerLocalitiesComponent implements OnInit {
       })
       .subscribe({
         next: (response) => {
-          this.localities = response?.items ?? [];
+          const allItems = response?.items ?? [];
+          this.localities = this.statusFilter === 'all'
+            ? allItems
+            : allItems.filter((item) => this.getStatusLabel(item).toLowerCase() === this.statusFilter.toLowerCase());
           this.totalCount = response?.totalCount ?? 0;
           this.currentPage = response?.page ?? this.currentPage;
           this.pageSize = response?.pageSize ?? this.pageSize;
@@ -108,6 +118,39 @@ export class ManagerLocalitiesComponent implements OnInit {
       });
   }
 
+  loadFilterOptions(): void {
+    this.localityService.getFilterOptions().subscribe({
+      next: ({ destinationOptions, typeOptions, statusOptions }) => {
+        this.destinationOptions = destinationOptions;
+        this.typeOptions = typeOptions;
+        this.statusOptions = statusOptions;
+
+        if (this.destinationFilter !== 'all' && !destinationOptions.some((o) => o.value === this.destinationFilter)) {
+          this.destinationFilter = 'all';
+        }
+
+        if (this.typeFilter !== 'all' && !typeOptions.some((o) => o.value === this.typeFilter)) {
+          this.typeFilter = 'all';
+        }
+
+        if (this.statusFilter !== 'all' && !statusOptions.some((o) => o.value === this.statusFilter)) {
+          this.statusFilter = 'all';
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.destinationOptions = [];
+        this.typeOptions = [];
+        this.statusOptions = [];
+      }
+    });
+  }
+
+  onMoreFilters(): void {
+    this.filterPanelOpen = !this.filterPanelOpen;
+  }
+
   onApplyFilters(): void {
     this.searchQuery = this.draftSearchQuery.trim();
     this.currentPage = 1;
@@ -117,6 +160,7 @@ export class ManagerLocalitiesComponent implements OnInit {
   onResetFilters(): void {
     this.searchQuery = '';
     this.draftSearchQuery = '';
+    this.statusFilter = 'all';
     this.destinationFilter = 'all';
     this.typeFilter = 'all';
     this.sortBy = 'name';

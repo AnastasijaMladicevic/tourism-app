@@ -106,44 +106,47 @@
 
 .filters-panel {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
-  gap: 10px;
-  padding: 12px;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) auto;
+  gap: 8px;
+  padding: 10px;
   align-items: end;
 }
 
 .filters-panel label {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   color: #64748b;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
 }
 
 .filters-panel select {
   width: 100%;
-  min-height: 42px;
-  padding: 0 12px;
+  min-height: 36px;
+  padding: 0 10px;
   border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  border-radius: 8px;
   background: #fff;
   font: inherit;
+  font-size: 13px;
   color: #111827;
 }
 
 .filter-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   justify-content: flex-end;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-self: end;
   justify-self: end;
   white-space: nowrap;
 }
 
 .filter-btn {
-  padding-inline: 16px;
+  min-height: 36px;
+  padding: 8px 12px;
+  font-size: 13px;
 }
 
 .filter-btn.secondary {

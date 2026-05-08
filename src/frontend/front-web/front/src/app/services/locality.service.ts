@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
 
@@ -44,6 +44,11 @@ export interface PagedResultDto<T> {
   totalPages: number;
 }
 
+export interface FilterOption {
+  value: string;
+  label: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -68,5 +73,50 @@ export class LocalityService {
     }
 
     return this.http.get<PagedResultDto<LocalityDto>>(this.apiUrl, { params });
+  }
+
+  getFilterOptions(
+    options?: RegionRequestOptions
+  ): Observable<{ destinationOptions: FilterOption[]; typeOptions: FilterOption[]; statusOptions: FilterOption[] }> {
+    return this.getAll(
+      {
+        page: 1,
+        pageSize: 500,
+        sortBy: 'name',
+        sortOrder: 'asc'
+      },
+      options
+    ).pipe(
+      map((response) => {
+        const items = response?.items ?? [];
+
+        const destinationOptions = this.toUniqueOptions(
+          items.map((item) => item.destinationName)
+        );
+
+        const typeOptions = this.toUniqueOptions(
+          items.map((item) => item.localityTypeName)
+        );
+
+        const statusOptions = this.toUniqueOptions(
+          items.map((item) => (item.isActive ? 'Published' : 'Archived'))
+        );
+
+        return { destinationOptions, typeOptions, statusOptions };
+      })
+    );
+  }
+
+  private toUniqueOptions(values: Array<string | undefined>): FilterOption[] {
+    const unique = values
+      .map((value) => value?.trim())
+      .filter((value): value is string => !!value)
+      .filter((value, index, all) => all.findIndex((x) => x.toLowerCase() === value.toLowerCase()) === index)
+      .sort((a, b) => a.localeCompare(b));
+
+    return unique.map((value) => ({
+      value,
+      label: value
+    }));
   }
 }

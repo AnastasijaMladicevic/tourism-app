@@ -18,57 +18,62 @@
       />
     </label>
 
-    <button type="button" class="ghost-btn" (click)="onApplyFilters()">
+    <button type="button" class="ghost-btn" (click)="onMoreFilters()">
       <span class="material-symbols-outlined">filter_alt</span>
-      Apply Search
+      More Filters
     </button>
   </div>
 
-  <div class="filters-panel card">
-    <label>
-      <span>Status</span>
-      <select>
-        <option>Published only</option>
-      </select>
-    </label>
+  @if (filterPanelOpen) {
+    <div class="filters-panel card">
+      <label>
+        <span>Status</span>
+        <select [(ngModel)]="statusFilter">
+          <option value="all">All Statuses</option>
+          <option *ngFor="let option of statusOptions" [value]="option.value">{{ option.label }}</option>
+        </select>
+      </label>
 
-    <label>
-      <span>Destination</span>
-      <select [(ngModel)]="destinationFilter">
-        <option value="all">All Destinations</option>
-      </select>
-    </label>
+      <label>
+        <span>Destination</span>
+        <select [(ngModel)]="destinationFilter">
+          <option value="all">All Destinations</option>
+          <option *ngFor="let option of destinationOptions" [value]="option.value">{{ option.label }}</option>
+        </select>
+      </label>
 
-    <label>
-      <span>Type</span>
-      <select [(ngModel)]="typeFilter">
-        <option value="all">All Types</option>
-      </select>
-    </label>
+      <label>
+        <span>Type</span>
+        <select [(ngModel)]="typeFilter">
+          <option value="all">All Types</option>
+          <option *ngFor="let option of typeOptions" [value]="option.value">{{ option.label }}</option>
+        </select>
+      </label>
 
-    <label>
-      <span>Sort by</span>
-      <select [(ngModel)]="sortBy">
-        <option value="name">Name</option>
-        <option value="destination">Destination</option>
-        <option value="type">Type</option>
-        <option value="createdAt">Created at</option>
-      </select>
-    </label>
+      <label>
+        <span>Sort by</span>
+        <select [(ngModel)]="sortBy">
+          <option value="name">Name</option>
+          <option value="destination">Destination</option>
+          <option value="type">Type</option>
+          <option value="createdAt">Created at</option>
+        </select>
+      </label>
 
-    <label>
-      <span>Order</span>
-      <select [(ngModel)]="sortOrder">
-        <option value="asc">Ascending</option>
-        <option value="desc">Descending</option>
-      </select>
-    </label>
+      <label>
+        <span>Order</span>
+        <select [(ngModel)]="sortOrder">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </label>
 
-    <div class="filter-actions">
-      <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">Apply Filters</button>
-      <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">Reset Filters</button>
+      <div class="filter-actions">
+        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">Apply Filters</button>
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">Reset Filters</button>
+      </div>
     </div>
-  </div>
+  }
 
   <div class="locality-content-grid">
     <div class="locality-main-column">
