@@ -146,24 +146,23 @@ export class HomeComponent implements OnInit, OnDestroy {
     private translationService: TranslationService
   ) { }
 
-  private get activeRegionId(): number {
-    const code = (localStorage.getItem('activeRegionCode') || 'ME').trim().toUpperCase();
   
-    const regionIds: Record<string, number> = {
-      ME: 1,
-      IT: 2,
-      ES: 3,
-      RS: 4,
-    };
-  
-    return regionIds[code] ?? 1;
-  }
-
   private applyPlannerState(list: EventCard[]): void {
     for (const item of list) {
       item.isPlanned = this.plannerMap.has(item.id);
       item.plannerId = this.plannerMap.get(item.id);
     }
+  }
+
+  private get activeRegionId(): number {
+    const storedRegionId = Number(localStorage.getItem('spirego-region-id'));
+  
+    if (!storedRegionId || Number.isNaN(storedRegionId)) {
+      localStorage.setItem('spirego-region-id', '1');
+      return 1;
+    }
+  
+    return storedRegionId;
   }
 
   private applyPlannerStateToPlaceCards(list: PlaceCard[]): void {
