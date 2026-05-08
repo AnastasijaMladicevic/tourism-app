@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
@@ -86,6 +87,8 @@ namespace TuristickiVodic.Services.Services
             var reviewFolder = Path.Combine(root, "images", "reviews");
             Directory.CreateDirectory(reviewFolder);
 
+            var existingImageHashes = await GetExistingReviewImageHashesAsync(review.Images, root);
+            var uploadedImageHashes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var createdImages = new List<ReviewImage>(fileList.Count);
 
             foreach (var file in fileList)
@@ -94,6 +97,17 @@ namespace TuristickiVodic.Services.Services
                 if (!AllowedExtensions.Contains(extension))
                 {
                     throw new InvalidOperationException("Only .jpg, .jpeg, .png and .webp files are allowed.");
+                }
+
+                var fileHash = await ComputeSha256HashAsync(file);
+                if (existingImageHashes.Contains(fileHash))
+                {
+                    throw new InvalidOperationException("This image has already been added to this review.");
+                }
+
+                if (!uploadedImageHashes.Add(fileHash))
+                {
+                    throw new InvalidOperationException("You cannot upload the same image more than once in one request.");
                 }
 
                 var fileName = $"review_{reviewId}_{Guid.NewGuid():N}{extension}";
@@ -115,6 +129,40 @@ namespace TuristickiVodic.Services.Services
             await _context.SaveChangesAsync();
 
             return _mapper.Map<List<ReviewImageDto>>(createdImages);
+        }
+
+        private static async Task<HashSet<string>> GetExistingReviewImageHashesAsync(
+            IEnumerable<ReviewImage> images,
+            string webRoot)
+        {
+            var hashes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var image in images)
+            {
+                var filePath = GetLocalReviewImagePath(image.Url, webRoot);
+                if (filePath == null || !File.Exists(filePath))
+                {
+                    continue;
+                }
+
+                await using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var hash = await ComputeSha256HashAsync(stream);
+                hashes.Add(hash);
+            }
+
+            return hashes;
+        }
+
+        private static async Task<string> ComputeSha256HashAsync(IFormFile file)
+        {
+            await using var stream = file.OpenReadStream();
+            return await ComputeSha256HashAsync(stream);
+        }
+
+        private static async Task<string> ComputeSha256HashAsync(Stream stream)
+        {
+            var hash = await SHA256.HashDataAsync(stream);
+            return Convert.ToHexString(hash);
         }
 
         public async Task<bool> DeleteAsync(int reviewId, int imageId, int userId, string roleName)
@@ -155,13 +203,26 @@ namespace TuristickiVodic.Services.Services
             }
 
             var root = _environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-            var fileName = Path.GetFileName(url);
-            var filePath = Path.Combine(root, "images", "reviews", fileName);
+            var filePath = GetLocalReviewImagePath(url, root);
 
-            if (File.Exists(filePath))
+            if (filePath != null && File.Exists(filePath))
             {
                 File.Delete(filePath);
             }
+        }
+
+        private static string? GetLocalReviewImagePath(string url, string webRoot)
+        {
+            if (string.IsNullOrWhiteSpace(url) ||
+                !url.StartsWith("/images/reviews/", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            var fileName = Path.GetFileName(url);
+            return string.IsNullOrWhiteSpace(fileName)
+                ? null
+                : Path.Combine(webRoot, "images", "reviews", fileName);
         }
     }
 }
