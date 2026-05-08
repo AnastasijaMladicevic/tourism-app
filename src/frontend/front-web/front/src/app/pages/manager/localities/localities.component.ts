@@ -28,10 +28,10 @@ export class ManagerLocalitiesComponent implements OnInit {
   sortOrder: 'asc' | 'desc' = 'asc';
 
   currentPage = 1;
-  pageSize = 10;
+  pageSize = 5;
   totalCount = 0;
   totalPages = 1;
-  readonly pageSizeOptions = [10, 20, 50];
+  readonly pageSizeOptions = [5, 10, 20, 50];
 
   ngOnInit(): void {
     this.loadLocalities();

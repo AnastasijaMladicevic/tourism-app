@@ -106,10 +106,9 @@
             <table>
               <thead>
                 <tr>
+                  <th>Status</th>
                   <th>Name</th>
                   <th>Type</th>
-                  <th>Description</th>
-                  <th>Coordinates</th>
                   <th>Destinations</th>
                   <th>Created By</th>
                   <th>Actions</th>
@@ -122,21 +121,19 @@
                   (click)="selectLocality(locality)"
                 >
                   <td>
+                    <span class="status-chip" [ngClass]="getStatusClass(locality)">
+                      {{ getStatusLabel(locality) }}
+                    </span>
+                  </td>
+                  <td>
                     <div class="item-cell item-cell-with-media">
                       <div class="media-thumb" [style.background-image]="'url(' + locality.mainImageUrl + ')'"></div>
                       <div>
                         <strong>{{ locality.name }}</strong>
-                        <span class="status-line">
-                          <span class="status-chip" [ngClass]="getStatusClass(locality)">
-                            {{ getStatusLabel(locality) }}
-                          </span>
-                        </span>
                       </div>
                     </div>
                   </td>
                   <td>{{ locality.localityTypeName || 'N/A' }}</td>
-                  <td class="description-col">{{ locality.description || 'N/A' }}</td>
-                  <td>{{ getCoordinatesLabel(locality) }}</td>
                   <td>{{ locality.destinationName || 'N/A' }}</td>
                   <td>{{ getCreatedByLabel(locality) }}</td>
                   <td>

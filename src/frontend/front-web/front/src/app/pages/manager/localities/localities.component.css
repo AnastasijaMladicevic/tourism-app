@@ -310,11 +310,6 @@ tbody tr:hover,
   color: #111827;
 }
 
-.status-line {
-  display: block;
-  margin-top: 4px;
-}
-
 .count-cell {
   font-weight: 700;
   color: #2563eb;
