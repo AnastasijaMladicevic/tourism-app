@@ -40,6 +40,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
   errorMessage = '';
   draftSavedMessage = '';
   showTipsModal = false;
+  showDeleteConfirmModal = false;
   showDeleteSuccessModal = false;
   isDeleting = false;
   private readonly draftStorageKey = 'manager-locality-create-draft';
@@ -214,9 +215,26 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.showDeleteConfirmModal = true;
+  }
+
+  closeDeleteConfirmModal(): void {
+    if (this.isDeleting) {
+      return;
+    }
+
+    this.showDeleteConfirmModal = false;
+  }
+
+  confirmDeleteLocation(): void {
+    if (!this.isEditMode || !this.localityId || this.isDeleting || this.isSubmitting) {
+      return;
+    }
+
     this.errorMessage = '';
     this.draftSavedMessage = '';
     this.isDeleting = true;
+    this.showDeleteConfirmModal = false;
 
     this.localityService.delete(this.localityId).subscribe({
       next: () => {

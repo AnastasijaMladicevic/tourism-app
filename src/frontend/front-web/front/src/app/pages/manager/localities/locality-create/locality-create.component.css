@@ -280,6 +280,12 @@ select {
   font-weight: 600;
 }
 
+.danger-btn.solid {
+  border-color: #ef4444;
+  background: #ef4444;
+  color: #ffffff;
+}
+
 .danger-btn .material-symbols-outlined {
   font-size: 18px;
 }
@@ -523,6 +529,62 @@ select {
   margin: 10px 0 0;
   color: #64748b;
   font-size: 14px;
+}
+
+.delete-confirm-backdrop {
+  z-index: 10900;
+}
+
+.delete-confirm-modal {
+  width: min(100%, 440px);
+  padding: 24px;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.24);
+  text-align: center;
+}
+
+.delete-confirm-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: #ef4444;
+  display: grid;
+  place-items: center;
+}
+
+.delete-confirm-icon .material-symbols-outlined {
+  font-size: 30px;
+}
+
+.delete-confirm-modal h3 {
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.05;
+  color: #111827;
+}
+
+.delete-confirm-modal p {
+  margin: 12px auto 0;
+  max-width: 320px;
+  color: #6b7280;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.delete-confirm-actions {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.delete-confirm-actions .ghost-btn,
+.delete-confirm-actions .danger-btn {
+  min-height: 44px;
+  justify-content: center;
 }
 
 @keyframes success-pop {

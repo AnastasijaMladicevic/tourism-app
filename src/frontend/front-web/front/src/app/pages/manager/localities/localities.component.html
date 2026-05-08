@@ -273,6 +273,15 @@
             <span class="material-symbols-outlined">rate_review</span>
             Open full review
           </button>
+          <button
+            type="button"
+            class="danger-btn full-cta"
+            (click)="onDeleteLocation(selectedLocality)"
+            [disabled]="isDeleting"
+          >
+            <span class="material-symbols-outlined">delete</span>
+            {{ isDeleting ? 'Deleting...' : 'Delete Location' }}
+          </button>
         </div>
       } @else {
         <div class="empty-state">
@@ -283,4 +292,21 @@
       }
     </aside>
   </div>
+
+  @if (showDeleteSuccessModal) {
+    <div class="delete-success-backdrop">
+      <section
+        class="card delete-success-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="locality-delete-success-title"
+      >
+        <div class="delete-success-icon" aria-hidden="true">
+          <span class="delete-success-icon-check">✓</span>
+        </div>
+        <h3 id="locality-delete-success-title">Location successfully deleted</h3>
+        <p>Deletion was completed successfully.</p>
+      </section>
+    </div>
+  }
 </section>

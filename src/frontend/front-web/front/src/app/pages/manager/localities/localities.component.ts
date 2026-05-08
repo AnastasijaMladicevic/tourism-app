@@ -54,6 +54,9 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
   private managerUserId: number | null = null;
   private managedDestinationIds = new Set<number>();
   private readonly creatorNameById = new Map<number, string>();
+  showDeleteSuccessModal = false;
+  isDeleting = false;
+  private deleteSuccessTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   ngOnInit(): void {
     this.managerUserId = this.getCurrentUserIdFromToken();
@@ -62,6 +65,10 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopHeroImageRotation();
+    if (this.deleteSuccessTimeoutId) {
+      clearTimeout(this.deleteSuccessTimeoutId);
+      this.deleteSuccessTimeoutId = null;
+    }
   }
 
   get totalLocalitiesOnPage(): number {
@@ -241,6 +248,42 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
 
   onEditLocation(locality: LocalityDto): void {
     this.router.navigate(['/manager/localities/edit', locality.id]);
+  }
+
+  onDeleteLocation(locality: LocalityDto | null): void {
+    if (!locality || this.isDeleting) {
+      return;
+    }
+
+    const shouldDelete = window.confirm(`Are you sure you want to delete "${locality.name}"?`);
+    if (!shouldDelete) {
+      return;
+    }
+
+    this.errorMessage = '';
+    this.isDeleting = true;
+
+    this.localityService.delete(locality.id).subscribe({
+      next: () => {
+        this.isDeleting = false;
+        this.showDeleteSuccessModal = true;
+        this.loadFilterOptions();
+        this.loadLocalities();
+
+        if (this.deleteSuccessTimeoutId) {
+          clearTimeout(this.deleteSuccessTimeoutId);
+        }
+
+        this.deleteSuccessTimeoutId = setTimeout(() => {
+          this.showDeleteSuccessModal = false;
+          this.deleteSuccessTimeoutId = null;
+        }, 1800);
+      },
+      error: (error) => {
+        this.errorMessage = error?.error?.message ?? 'Failed to delete locality';
+        this.isDeleting = false;
+      }
+    });
   }
 
   onApplyFilters(): void {
