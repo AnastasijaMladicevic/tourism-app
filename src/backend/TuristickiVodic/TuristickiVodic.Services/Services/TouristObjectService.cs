@@ -734,6 +734,11 @@ namespace TuristickiVodic.Services.Services
 
             _context.Objects.Add(obj);
             await _context.SaveChangesAsync();
+            await CreateManagerPendingContentNotificationAsync(
+                obj.DestinationId,
+                "Novi objekat ceka odobrenje",
+                $"Objekat \"{obj.Name}\" je poslat na odobrenje u tvojoj destinaciji.",
+                $"/objects/{obj.Id}");
 
             // Save image if provided
             if (!string.IsNullOrWhiteSpace(dto.ImageUrl))
@@ -755,6 +760,41 @@ namespace TuristickiVodic.Services.Services
         }
 
         // Samo CC može da menja objekte, i to samo svoje
+        private async Task CreateManagerPendingContentNotificationAsync(
+            int destinationId,
+            string title,
+            string message,
+            string actionUrl)
+        {
+            var managerId = await _context.Destinations
+                .AsNoTracking()
+                .Where(d => d.Id == destinationId)
+                .Select(d => d.ManagedByUserId)
+                .FirstOrDefaultAsync();
+
+            if (!managerId.HasValue)
+                return;
+
+            var managerCanReceive = await _context.Users
+                .AsNoTracking()
+                .AnyAsync(u => u.Id == managerId.Value && u.IsActive && !u.IsBlacklisted);
+
+            if (!managerCanReceive)
+                return;
+
+            _context.Notifications.Add(new Notification
+            {
+                UserId = managerId.Value,
+                Type = NotificationType.ManagerNewPendingContent,
+                Title = title,
+                Message = message,
+                ActionUrl = actionUrl,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<TouristObjectDto?> UpdateAsync(int id, UpdateTouristObjectDto dto, int userId, string roleName)
         {
             var obj = await LoadObjectAsync(id);
@@ -883,10 +923,97 @@ namespace TuristickiVodic.Services.Services
             obj.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
+            await CreateCreatorContentReviewedNotificationAsync(
+                obj.CreatedByUserId,
+                dto.Approve,
+                "objekat",
+                obj.Name,
+                $"/objects/{obj.Id}");
+            if (!dto.Approve)
+            {
+                await CreateAdminMultipleRejectedContentNotificationsAsync(obj.CreatedByUserId, obj.Name, $"/objects/{obj.Id}");
+            }
 
             var result = _mapper.Map<TouristObjectDto>(await LoadObjectAsync(obj.Id));
             await ApplyPendingDeletionRequestFlagsAsync(result);
             return result;
+        }
+
+        private async Task CreateCreatorContentReviewedNotificationAsync(
+            int creatorId,
+            bool approved,
+            string contentType,
+            string contentName,
+            string actionUrl)
+        {
+            var creatorCanReceive = await _context.Users
+                .AsNoTracking()
+                .AnyAsync(u => u.Id == creatorId && u.IsActive && !u.IsBlacklisted);
+
+            if (!creatorCanReceive)
+                return;
+
+            var statusText = approved ? "odobren" : "odbijen";
+
+            _context.Notifications.Add(new Notification
+            {
+                UserId = creatorId,
+                Type = NotificationType.CreatorContentReviewed,
+                Title = $"Tvoj {contentType} je {statusText}",
+                Message = $"Sadrzaj \"{contentName}\" je {statusText}.",
+                ActionUrl = actionUrl,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task CreateAdminMultipleRejectedContentNotificationsAsync(
+            int creatorId,
+            string latestContentName,
+            string actionUrl)
+        {
+            var rejectedCount =
+                await _context.Objects.AsNoTracking().CountAsync(o => o.CreatedByUserId == creatorId && o.Status == ContentStatus.Rejected) +
+                await _context.Events.AsNoTracking().CountAsync(e => e.CreatedByUserId == creatorId && e.Status == ContentStatus.Rejected) +
+                await _context.Activities.AsNoTracking().CountAsync(a => a.CreatedByUserId == creatorId && a.Status == ContentStatus.Rejected);
+
+            if (rejectedCount < 3)
+                return;
+
+            var creator = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == creatorId);
+
+            if (creator == null)
+                return;
+
+            var adminIds = await _context.Users
+                .AsNoTracking()
+                .Include(u => u.Role)
+                .Where(u => u.Role.Name == RoleType.Admin && u.IsActive && !u.IsBlacklisted)
+                .Select(u => u.Id)
+                .ToListAsync();
+
+            if (adminIds.Count == 0)
+                return;
+
+            var creatorName = $"{creator.FirstName} {creator.LastName}".Trim();
+            if (string.IsNullOrWhiteSpace(creatorName))
+                creatorName = creator.Email;
+
+            var notifications = adminIds.Select(adminId => new Notification
+            {
+                UserId = adminId,
+                Type = NotificationType.AdminCreatorMultipleRejectedContent,
+                Title = "ContentCreator ima vise odbijenih sadrzaja",
+                Message = $"ContentCreator {creatorName} ima {rejectedCount} odbijenih sadrzaja. Poslednje odbijeno: \"{latestContentName}\".",
+                ActionUrl = actionUrl,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            _context.Notifications.AddRange(notifications);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<bool> DeleteAsync(int id, int userId, string roleName)
