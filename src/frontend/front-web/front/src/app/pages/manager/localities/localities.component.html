@@ -225,6 +225,26 @@
           <h3>Description</h3>
           <p class="description-copy">{{ selectedLocality.description || 'No description provided.' }}</p>
         </section>
+
+        <section class="detail-section">
+          <div class="map-card">
+            @if (hasSelectedLocalityCoordinates) {
+              <app-map
+                [lat]="selectedLocalityLat"
+                [lng]="selectedLocalityLng"
+                [zoom]="14"
+                [popupText]="selectedLocalityLocationLabel"
+                [interactive]="false"
+                mapId="manager-locality-details-map"
+              ></app-map>
+            } @else {
+              <div class="map-empty-state">
+                <span class="material-symbols-outlined">location_off</span>
+                <p>Coordinates are not available for this locality.</p>
+              </div>
+            }
+          </div>
+        </section>
       } @else {
         <div class="empty-state">
           <p class="eyebrow">No locality selected</p>

@@ -50,9 +50,9 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
 
     this.mapService.initMap(this.mapId, this.lat, this.lng, this.zoom);
     this.mapInitialized = true;
+    const map = this.mapService.getMap();
 
     if (!this.interactive) {
-      const map = this.mapService['map'];
       if (map) {
         map.dragging.disable();
         map.touchZoom.disable();
@@ -65,6 +65,18 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     }
 
     this.renderMarker();
+
+    // When map is mounted inside dynamic/sticky containers, force a re-measure
+    // so tile layers render reliably instead of staying gray.
+    setTimeout(() => {
+      const latestMap = this.mapService.getMap();
+      if (!latestMap) {
+        return;
+      }
+
+      latestMap.invalidateSize();
+      latestMap.setView([this.lat, this.lng], this.zoom);
+    }, 120);
   }
 
   private animateToLocation(): void {
@@ -107,6 +119,9 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     }
 
     this.marker = this.mapService.addMarker(this.lat, this.lng, this.popupText);
+    if (this.marker && this.popupText) {
+      this.marker.openPopup();
+    }
   }
 
   ngOnDestroy(): void {

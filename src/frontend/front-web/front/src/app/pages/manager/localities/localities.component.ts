@@ -2,11 +2,12 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { FilterOption, LocalityDto, LocalityService } from '../../../services/locality.service';
+import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 
 @Component({
   selector: 'app-manager-localities',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, SharedMapComponent],
   templateUrl: './localities.component.html',
   styleUrls: ['./localities.component.css']
 })
@@ -72,6 +73,26 @@ export class ManagerLocalitiesComponent implements OnInit {
       return 'N/A';
     }
     return `${this.selectedLocality.latitude.toFixed(4)}, ${this.selectedLocality.longitude.toFixed(4)}`;
+  }
+
+  get hasSelectedLocalityCoordinates(): boolean {
+    return this.selectedLocality?.latitude != null && this.selectedLocality?.longitude != null;
+  }
+
+  get selectedLocalityLat(): number {
+    return this.selectedLocality?.latitude ?? 42.424;
+  }
+
+  get selectedLocalityLng(): number {
+    return this.selectedLocality?.longitude ?? 18.771;
+  }
+
+  get selectedLocalityLocationLabel(): string {
+    if (!this.selectedLocality) {
+      return 'Selected locality';
+    }
+
+    return `${this.selectedLocality.name} · ${this.selectedLocality.destinationName || this.selectedLocality.regionName}`;
   }
 
   loadLocalities(): void {
