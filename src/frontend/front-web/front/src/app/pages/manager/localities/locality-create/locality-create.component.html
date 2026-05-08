@@ -1,0 +1,62 @@
+<section class="locality-create-page">
+  <header class="page-head">
+    <div>
+      <p class="breadcrumbs">Dashboard <span>></span> Localities <span>></span> Create</p>
+      <h1>Create Location</h1>
+      <p class="subtle-text">Add a new location for your managed destination.</p>
+    </div>
+  </header>
+
+  <form class="create-form card" (ngSubmit)="onSubmit()">
+    <label>
+      <span>Name *</span>
+      <input type="text" [(ngModel)]="form.name" name="name" required />
+    </label>
+
+    <label>
+      <span>Description</span>
+      <textarea rows="4" [(ngModel)]="form.description" name="description"></textarea>
+    </label>
+
+    <div class="row-2">
+      <label>
+        <span>Destination *</span>
+        <select [(ngModel)]="form.destinationId" name="destinationId" required [disabled]="isLoadingOptions">
+          <option *ngFor="let option of destinationOptions" [ngValue]="option.id">{{ option.name }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Type *</span>
+        <select [(ngModel)]="form.localityTypeId" name="localityTypeId" required [disabled]="isLoadingOptions">
+          <option *ngFor="let option of localityTypeOptions" [ngValue]="option.id">{{ option.name }}</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="row-2">
+      <label>
+        <span>Latitude</span>
+        <input type="number" step="any" [(ngModel)]="form.latitude" name="latitude" />
+      </label>
+      <label>
+        <span>Longitude</span>
+        <input type="number" step="any" [(ngModel)]="form.longitude" name="longitude" />
+      </label>
+    </div>
+
+    <label>
+      <span>Main image URL</span>
+      <input type="url" [(ngModel)]="form.imageUrl" name="imageUrl" />
+    </label>
+
+    <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+    <div class="actions">
+      <button type="button" class="ghost-btn" (click)="onCancel()">Cancel</button>
+      <button type="submit" class="primary-btn" [disabled]="isSubmitting || isLoadingOptions">
+        {{ isSubmitting ? 'Creating...' : 'Create Location' }}
+      </button>
+    </div>
+  </form>
+</section>

@@ -44,6 +44,16 @@ export interface PagedResultDto<T> {
   totalPages: number;
 }
 
+export interface CreateLocalityDto {
+  name: string;
+  description?: string;
+  longitude?: number;
+  latitude?: number;
+  destinationId: number;
+  localityTypeId: number;
+  imageUrl?: string;
+}
+
 export interface FilterOption {
   value: string;
   label: string;
@@ -73,6 +83,10 @@ export class LocalityService {
     }
 
     return this.http.get<PagedResultDto<LocalityDto>>(this.apiUrl, { params });
+  }
+
+  create(dto: CreateLocalityDto): Observable<LocalityDto> {
+    return this.http.post<LocalityDto>(this.apiUrl, dto);
   }
 
   getFilterOptions(

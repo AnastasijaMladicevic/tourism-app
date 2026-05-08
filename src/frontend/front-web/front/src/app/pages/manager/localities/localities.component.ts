@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { FilterOption, LocalityDto, LocalityService } from '../../../services/locality.service';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { DestinationService } from '../../../services/destination.service';
@@ -17,6 +18,7 @@ export class ManagerLocalitiesComponent implements OnInit {
   private readonly localityService = inject(LocalityService);
   private readonly destinationService = inject(DestinationService);
   private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
 
   localities: LocalityDto[] = [];
@@ -221,6 +223,10 @@ export class ManagerLocalitiesComponent implements OnInit {
 
   onMoreFilters(): void {
     this.filterPanelOpen = !this.filterPanelOpen;
+  }
+
+  onCreateLocation(): void {
+    this.router.navigate(['/manager/localities/create']);
   }
 
   onApplyFilters(): void {
