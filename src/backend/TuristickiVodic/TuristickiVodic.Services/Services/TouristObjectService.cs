@@ -734,6 +734,11 @@ namespace TuristickiVodic.Services.Services
 
             _context.Objects.Add(obj);
             await _context.SaveChangesAsync();
+            await CreateManagerPendingContentNotificationAsync(
+                obj.DestinationId,
+                "Novi objekat ceka odobrenje",
+                $"Objekat \"{obj.Name}\" je poslat na odobrenje u tvojoj destinaciji.",
+                $"/objects/{obj.Id}");
 
             // Save image if provided
             if (!string.IsNullOrWhiteSpace(dto.ImageUrl))
@@ -755,6 +760,41 @@ namespace TuristickiVodic.Services.Services
         }
 
         // Samo CC može da menja objekte, i to samo svoje
+        private async Task CreateManagerPendingContentNotificationAsync(
+            int destinationId,
+            string title,
+            string message,
+            string actionUrl)
+        {
+            var managerId = await _context.Destinations
+                .AsNoTracking()
+                .Where(d => d.Id == destinationId)
+                .Select(d => d.ManagedByUserId)
+                .FirstOrDefaultAsync();
+
+            if (!managerId.HasValue)
+                return;
+
+            var managerCanReceive = await _context.Users
+                .AsNoTracking()
+                .AnyAsync(u => u.Id == managerId.Value && u.IsActive && !u.IsBlacklisted);
+
+            if (!managerCanReceive)
+                return;
+
+            _context.Notifications.Add(new Notification
+            {
+                UserId = managerId.Value,
+                Type = NotificationType.ManagerNewPendingContent,
+                Title = title,
+                Message = message,
+                ActionUrl = actionUrl,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<TouristObjectDto?> UpdateAsync(int id, UpdateTouristObjectDto dto, int userId, string roleName)
         {
             var obj = await LoadObjectAsync(id);

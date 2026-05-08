@@ -565,6 +565,11 @@ namespace TuristickiVodic.Services.Services
 
             _context.Events.Add(ev);
             await _context.SaveChangesAsync();
+            await CreateManagerPendingContentNotificationAsync(
+                ev.DestinationId,
+                "Novi dogadjaj ceka odobrenje",
+                $"Dogadjaj \"{ev.Name}\" je poslat na odobrenje u tvojoj destinaciji.",
+                $"/events/{ev.Id}");
 
             // Save image if provided
             if (!string.IsNullOrWhiteSpace(dto.ImageUrl))
@@ -585,6 +590,43 @@ namespace TuristickiVodic.Services.Services
             return result;
         }
 
+        private async Task CreateManagerPendingContentNotificationAsync(
+            int? destinationId,
+            string title,
+            string message,
+            string actionUrl)
+        {
+            if (!destinationId.HasValue)
+                return;
+
+            var managerId = await _context.Destinations
+                .AsNoTracking()
+                .Where(d => d.Id == destinationId.Value)
+                .Select(d => d.ManagedByUserId)
+                .FirstOrDefaultAsync();
+
+            if (!managerId.HasValue)
+                return;
+
+            var managerCanReceive = await _context.Users
+                .AsNoTracking()
+                .AnyAsync(u => u.Id == managerId.Value && u.IsActive && !u.IsBlacklisted);
+
+            if (!managerCanReceive)
+                return;
+
+            _context.Notifications.Add(new Notification
+            {
+                UserId = managerId.Value,
+                Type = NotificationType.ManagerNewPendingContent,
+                Title = title,
+                Message = message,
+                ActionUrl = actionUrl,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _context.SaveChangesAsync();
+        }
         public async Task<EventDto?> UpdateAsync(int id, UpdateEventDto dto, int userId, string roleName)
         {
             var ev = await _context.Events

@@ -49,6 +49,11 @@ namespace TuristickiVodic.Services.Services
 
             _context.DeletionRequests.Add(request);
             await _context.SaveChangesAsync();
+            await CreateManagerDeletionRequestNotificationAsync(
+                obj.Destination ?? obj.Locality?.Destination,
+                "Novi zahtev za brisanje",
+                $"Stigao je zahtev za brisanje objekta \"{obj.Name}\".",
+                $"/deletion-requests/{request.Id}");
 
             return await LoadDtoAsync(request.Id);
         }
@@ -93,6 +98,11 @@ namespace TuristickiVodic.Services.Services
 
             _context.DeletionRequests.Add(request);
             await _context.SaveChangesAsync();
+            await CreateManagerDeletionRequestNotificationAsync(
+                ev.Destination ?? ev.Locality?.Destination ?? ev.Object?.Destination ?? ev.Object?.Locality?.Destination,
+                "Novi zahtev za brisanje",
+                $"Stigao je zahtev za brisanje dogadjaja \"{ev.Name}\".",
+                $"/deletion-requests/{request.Id}");
 
             return await LoadDtoAsync(request.Id);
         }
@@ -132,6 +142,11 @@ namespace TuristickiVodic.Services.Services
 
             _context.DeletionRequests.Add(request);
             await _context.SaveChangesAsync();
+            await CreateManagerDeletionRequestNotificationAsync(
+                activity.Destination ?? activity.Locality?.Destination,
+                "Novi zahtev za brisanje",
+                $"Stigao je zahtev za brisanje aktivnosti \"{activity.Name}\".",
+                $"/deletion-requests/{request.Id}");
 
             return await LoadDtoAsync(request.Id);
         }
@@ -658,6 +673,36 @@ namespace TuristickiVodic.Services.Services
                 .ToList();
 
             _context.Notifications.AddRange(notifications);
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task CreateManagerDeletionRequestNotificationAsync(
+            Destination? destination,
+            string title,
+            string message,
+            string actionUrl)
+        {
+            if (destination?.ManagedByUserId == null)
+                return;
+
+            var managerId = destination.ManagedByUserId.Value;
+            var managerCanReceive = await _context.Users
+                .AsNoTracking()
+                .AnyAsync(u => u.Id == managerId && u.IsActive && !u.IsBlacklisted);
+
+            if (!managerCanReceive)
+                return;
+
+            _context.Notifications.Add(new Notification
+            {
+                UserId = managerId,
+                Type = NotificationType.ManagerNewDeletionRequest,
+                Title = title,
+                Message = message,
+                ActionUrl = actionUrl,
+                CreatedAt = DateTime.UtcNow
+            });
+
             await _context.SaveChangesAsync();
         }
     }

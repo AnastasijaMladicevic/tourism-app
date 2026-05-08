@@ -6,6 +6,8 @@ namespace TuristickiVodic.Core.Models
         ReviewReply = 2,
         FavoritedLocationNewEvent = 3,
         PlannerEventUpdated = 4,
-        PlannerEventUnavailable = 5
+        PlannerEventUnavailable = 5,
+        ManagerNewPendingContent = 6,
+        ManagerNewDeletionRequest = 7
     }
 }
