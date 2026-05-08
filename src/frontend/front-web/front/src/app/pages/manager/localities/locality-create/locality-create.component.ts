@@ -39,7 +39,11 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
   isLoadingLocalityTypes = true;
   errorMessage = '';
   draftSavedMessage = '';
+  showTipsModal = false;
+  showDeleteSuccessModal = false;
+  isDeleting = false;
   private readonly draftStorageKey = 'manager-locality-create-draft';
+  private deleteRedirectTimeoutId: ReturnType<typeof setTimeout> | null = null;
 
   destinationOptions: DestinationOption[] = [];
   localityTypeOptions: LocalityTypeOption[] = [];
@@ -80,6 +84,10 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
+    if (this.deleteRedirectTimeoutId) {
+      clearTimeout(this.deleteRedirectTimeoutId);
+      this.deleteRedirectTimeoutId = null;
+    }
   }
 
   get hasMapCoordinates(): boolean {
@@ -199,6 +207,39 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
 
   onCancel(): void {
     this.router.navigate(['/manager/localities']);
+  }
+
+  onDeleteLocation(): void {
+    if (!this.isEditMode || !this.localityId || this.isDeleting || this.isSubmitting) {
+      return;
+    }
+
+    this.errorMessage = '';
+    this.draftSavedMessage = '';
+    this.isDeleting = true;
+
+    this.localityService.delete(this.localityId).subscribe({
+      next: () => {
+        this.showDeleteSuccessModal = true;
+        this.isDeleting = false;
+        this.deleteRedirectTimeoutId = setTimeout(() => {
+          this.showDeleteSuccessModal = false;
+          this.router.navigate(['/manager/dashboard']);
+        }, 1800);
+      },
+      error: (error) => {
+        this.errorMessage = error?.error?.message ?? 'Failed to delete location.';
+        this.isDeleting = false;
+      }
+    });
+  }
+
+  openTipsModal(): void {
+    this.showTipsModal = true;
+  }
+
+  closeTipsModal(): void {
+    this.showTipsModal = false;
   }
 
   onSaveDraft(): void {

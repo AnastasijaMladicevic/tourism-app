@@ -263,6 +263,17 @@
             }
           </div>
         </section>
+
+        <div class="detail-cta">
+          <button
+            type="button"
+            class="primary-btn full-cta sidebar-cta-btn"
+            (click)="onEditLocation(selectedLocality)"
+          >
+            <span class="material-symbols-outlined">rate_review</span>
+            Open full review
+          </button>
+        </div>
       } @else {
         <div class="empty-state">
           <p class="eyebrow">No locality selected</p>

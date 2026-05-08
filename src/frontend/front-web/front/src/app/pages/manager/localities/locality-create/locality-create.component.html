@@ -8,6 +8,17 @@
       </p>
     </div>
     <div class="top-actions">
+      @if (isEditMode) {
+        <button
+          type="button"
+          class="danger-btn"
+          (click)="onDeleteLocation()"
+          [disabled]="isDeleting || isSubmitting"
+        >
+          <span class="material-symbols-outlined">delete</span>
+          {{ isDeleting ? 'Deleting...' : 'Delete Location' }}
+        </button>
+      }
       <button type="button" class="ghost-btn" (click)="onCancel()">Cancel</button>
       <button type="button" class="ghost-btn" (click)="onSaveDraft()">Save Draft</button>
       <button type="submit" class="primary-btn" form="create-locality-form" [disabled]="isSubmitting || isLoadingOptions">
@@ -127,39 +138,100 @@
 
     </form>
 
-    <aside class="side-column card">
-      <header class="side-header">
-        <span class="material-symbols-outlined">my_location</span>
-        <h3>Location Intelligence</h3>
-      </header>
+    <aside class="side-stack">
+      <section class="side-column card">
+        <header class="side-header">
+          <span class="material-symbols-outlined">my_location</span>
+          <h3>Location Intelligence</h3>
+        </header>
 
-      <div class="map-shell">
-        <app-map
-          [lat]="mapLat"
-          [lng]="mapLng"
-          [zoom]="14"
-          [popupText]="mapPopupText"
-          [interactive]="false"
-          [showMarker]="hasMapCoordinates"
-          mapId="manager-create-locality-map"
-        ></app-map>
-      </div>
+        <div class="map-shell">
+          <app-map
+            [lat]="mapLat"
+            [lng]="mapLng"
+            [zoom]="14"
+            [popupText]="mapPopupText"
+            [interactive]="false"
+            [showMarker]="hasMapCoordinates"
+            mapId="manager-create-locality-map"
+          ></app-map>
+        </div>
 
-      <div class="location-line">
-        <span class="material-symbols-outlined">search</span>
-        <p>{{ locationSummary }}</p>
-      </div>
+        <div class="location-line">
+          <span class="material-symbols-outlined">search</span>
+          <p>{{ locationSummary }}</p>
+        </div>
 
-      <div class="location-inputs">
-        <label class="mini-field">
-          <span>Latitude</span>
-          <input type="number" min="-90" max="90" step="0.000001" [(ngModel)]="form.latitude" name="latitude" />
-        </label>
-        <label class="mini-field">
-          <span>Longitude</span>
-          <input type="number" min="-180" max="180" step="0.000001" [(ngModel)]="form.longitude" name="longitude" />
-        </label>
-      </div>
+        <div class="location-inputs">
+          <label class="mini-field">
+            <span>Latitude</span>
+            <input type="number" min="-90" max="90" step="0.000001" [(ngModel)]="form.latitude" name="latitude" />
+          </label>
+          <label class="mini-field">
+            <span>Longitude</span>
+            <input type="number" min="-180" max="180" step="0.000001" [(ngModel)]="form.longitude" name="longitude" />
+          </label>
+        </div>
+      </section>
+
+      <section class="card side-column tips-card">
+        <header class="side-header tips-header">
+          <h3>Create Tips</h3>
+        </header>
+
+        <ul>
+          <li>Use clear location names so visitors can recognize the place quickly.</li>
+          <li>Add precise coordinates to improve map previews and navigation.</li>
+          <li>Upload high-quality images and choose the strongest one as primary.</li>
+        </ul>
+
+        <button type="button" class="link-btn" (click)="openTipsModal()">Learn more about locations</button>
+      </section>
     </aside>
   </div>
+
+  @if (showTipsModal) {
+    <div class="tips-backdrop" (click)="closeTipsModal()">
+      <section
+        class="card tips-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="locality-tips-modal-title"
+        (click)="$event.stopPropagation()"
+      >
+        <h3 id="locality-tips-modal-title">Location Creator Playbook</h3>
+        <p>
+          Build complete locality profiles with sharp imagery and accurate map data so guests know exactly
+          what to expect and how to get there. Consistent destination and type metadata also boosts
+          discovery in search and filters.
+        </p>
+        <ul class="tips-modal-list">
+          <li>Pick the destination and locality type that best matches the place to keep filters clean.</li>
+          <li>Drop the map pin on the actual entrance or center of the locality, not just the city center.</li>
+          <li>Upload at least one high-resolution image and mark the strongest one as primary.</li>
+        </ul>
+
+        <div class="tips-modal-actions">
+          <button type="button" class="primary-btn" (click)="closeTipsModal()">Close</button>
+        </div>
+      </section>
+    </div>
+  }
+
+  @if (showDeleteSuccessModal) {
+    <div class="tips-backdrop delete-success-backdrop">
+      <section
+        class="card delete-success-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="locality-delete-success-title"
+      >
+        <div class="delete-success-icon" aria-hidden="true">
+          <span class="delete-success-icon-check">✓</span>
+        </div>
+        <h3 id="locality-delete-success-title">Location successfully deleted</h3>
+        <p>You will be redirected to the home page.</p>
+      </section>
+    </div>
+  }
 </section>
