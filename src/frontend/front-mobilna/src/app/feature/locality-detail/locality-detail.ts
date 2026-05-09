@@ -12,6 +12,7 @@ import { FavoriteStateService } from '../../services/favorite-state';
 import { PendingActionService } from '../../services/pending-action';
 import { RouterHistoryService } from '../../services/router-history';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { QrLinkDto, QrLinkService } from '../../services/qr-link';
 
 @Component({
   selector: 'app-locality-detail',
@@ -29,6 +30,7 @@ export class LocalityDetailComponent implements OnInit {
 
   isLoading = true;
   errorMessage = '';
+  qrLink: QrLinkDto | null = null;
 
   isFavorite = false;
   favoriteId: number | null = null;
@@ -44,7 +46,8 @@ export class LocalityDetailComponent implements OnInit {
     private authService: AuthService,
     private favoriteStateService: FavoriteStateService,
     private pendingActionService: PendingActionService,
-    private routerHistory: RouterHistoryService
+    private routerHistory: RouterHistoryService,
+    private qrLinkService: QrLinkService
   ) { }
 
   ngOnInit(): void {
@@ -52,11 +55,13 @@ export class LocalityDetailComponent implements OnInit {
 
     forkJoin({
       locality: this.localityService.getById(id),
-      images: this.imageService.getForLocality?.(id)
+      images: this.imageService.getForLocality?.(id),
+      qr: this.qrLinkService.getForEntity('localities', id).pipe(catchError(() => of(null)))
     }).subscribe({
-      next: ({ locality, images }) => {
+      next: ({ locality, images, qr }) => {
         const normalizedLocality = this.normalizeLocality(locality)
         this.locality = locality;
+        this.qrLink = qr;
         this.images = images || [];
         this.mainImage = this.getMainImage();
         this.syncFavoriteState();

@@ -837,3 +837,33 @@ button:hover {
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
+
+.qr-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  p {
+    color: var(--text-gray);
+    margin: 4px 0 0;
+  }
+}
+
+.qr-mini {
+  width: 96px;
+  min-width: 96px;
+  text-decoration: none;
+
+  img {
+    display: block;
+    width: 86px;
+    height: 86px;
+    object-fit: contain;
+    padding: 6px;
+    border-radius: 16px;
+    background: #fff;
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+  }
+}

@@ -11,6 +11,7 @@ import { AuthService } from '../../services/auth';
 import { FavoriteStateService } from '../../services/favorite-state';
 import { PendingActionService } from '../../services/pending-action';
 import { RouterHistoryService } from '../../services/router-history';
+import { QrLinkDto, QrLinkService } from '../../services/qr-link';
 
 @Component({
   selector: 'app-destination-detail',
@@ -27,6 +28,7 @@ export class DestinationDetailComponent implements OnInit, OnDestroy {
 
   isLoading = true;
   errorMessage = '';
+  qrLink: QrLinkDto | null = null;
 
   isFavorite = false;
   favoriteId: number | null = null;
@@ -42,7 +44,8 @@ export class DestinationDetailComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private favoriteStateService: FavoriteStateService,
     private pendingActionService: PendingActionService,
-    private routerHistory: RouterHistoryService
+    private routerHistory: RouterHistoryService,
+    private qrLinkService: QrLinkService
   ) { }
 
   ngOnInit(): void {
@@ -50,11 +53,13 @@ export class DestinationDetailComponent implements OnInit, OnDestroy {
 
     forkJoin({
       destination: this.destinationService.getById(id),
-      images: this.imageService.getForDestination?.(id)
+      images: this.imageService.getForDestination?.(id),
+      qr: this.qrLinkService.getForEntity('destinations', id).pipe(catchError(() => of(null)))
     }).subscribe({
-      next: ({ destination, images }) => {
+      next: ({ destination, images, qr }) => {
         const normalizedDestination = this.normalizeDestination(destination);
         this.destination = normalizedDestination;
+        this.qrLink = qr;
         this.images = (images || []).map((image) => ({
           ...image,
           url: this.resolveMediaUrl(image.url) ?? image.url,

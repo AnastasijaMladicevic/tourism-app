@@ -105,6 +105,17 @@
           <button class="map-btn-overlay" (click)="viewOnMap()">{{ 'common.viewOnMap' | translate }}</button>
         </div>
       </div>
+      @if (qrLink) {
+        <div class="card qr-card">
+          <div>
+            <h2>QR kod</h2>
+            <p>Skeniraj za brzo otvaranje ove aktivnosti.</p>
+          </div>
+          <a class="qr-mini" [href]="qrLink.targetUrl" target="_blank" rel="noopener">
+            <img [src]="qrLink.qrImageUrl" [alt]="qrLink.label" />
+          </a>
+        </div>
+      }
       <div class="card nearby-card">
         <div class="nearby-header">
           <h2>{{ 'activity.nearbyTitle' | translate }}</h2>

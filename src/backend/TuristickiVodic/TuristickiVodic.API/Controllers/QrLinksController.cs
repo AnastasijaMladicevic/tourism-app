@@ -19,6 +19,7 @@ namespace TuristickiVodic.API.Controllers
         private readonly IDestinationService _destinationService;
         private readonly ILocalityService _localityService;
         private readonly IEventService _eventService;
+        private readonly IActivityService _activityService;
         private readonly ITouristObjectService _touristObjectService;
         private readonly IConfiguration _configuration;
 
@@ -26,12 +27,14 @@ namespace TuristickiVodic.API.Controllers
             IDestinationService destinationService,
             ILocalityService localityService,
             IEventService eventService,
+            IActivityService activityService,
             ITouristObjectService touristObjectService,
             IConfiguration configuration)
         {
             _destinationService = destinationService;
             _localityService = localityService;
             _eventService = eventService;
+            _activityService = activityService;
             _touristObjectService = touristObjectService;
             _configuration = configuration;
         }
@@ -51,7 +54,7 @@ namespace TuristickiVodic.API.Controllers
 
             return Ok(BuildQrLink(
                 $"Destinacija: {destination.Name}",
-                $"/map?focusType=destination&focusId={id}"));
+                $"/destination/{id}"));
         }
 
         [HttpGet("localities/{id:int}")]
@@ -63,7 +66,7 @@ namespace TuristickiVodic.API.Controllers
 
             return Ok(BuildQrLink(
                 $"Lokalitet: {locality.Name}",
-                $"/map?focusType=locality&focusId={id}"));
+                $"/locality/{id}"));
         }
 
         [HttpGet("events/{id:int}")]
@@ -84,6 +87,16 @@ namespace TuristickiVodic.API.Controllers
                 return NotFound();
 
             return Ok(BuildQrLink($"Objekat: {obj.Name}", $"/object/{id}"));
+        }
+
+        [HttpGet("activities/{id:int}")]
+        public async Task<ActionResult<QrLinkDto>> GetActivityQr(int id)
+        {
+            var activity = await _activityService.GetByIdAsync(id);
+            if (activity == null)
+                return NotFound();
+
+            return Ok(BuildQrLink($"Aktivnost: {activity.Name}", $"/activity/{id}"));
         }
 
         private QrLinkDto BuildQrLink(string label, string relativePath)

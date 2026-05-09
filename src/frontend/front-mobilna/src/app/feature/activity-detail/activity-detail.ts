@@ -12,6 +12,7 @@ import { FavoriteStateService } from '../../services/favorite-state';
 import { PendingActionService } from '../../services/pending-action';
 import { RouterHistoryService } from '../../services/router-history';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { QrLinkDto, QrLinkService } from '../../services/qr-link';
 
 @Component({
   selector: 'app-activity-detail',
@@ -28,6 +29,7 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
   mainImage = '';
   isLoading = true;
   errorMessage = '';
+  qrLink: QrLinkDto | null = null;
 
   isFavorite = false;
   favoriteId: number | null = null;
@@ -43,7 +45,8 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private favoriteStateService: FavoriteStateService,
     private pendingActionService: PendingActionService,
-    private routerHistory: RouterHistoryService
+    private routerHistory: RouterHistoryService,
+    private qrLinkService: QrLinkService
   ) { }
 
   ngOnInit(): void {
@@ -51,11 +54,13 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
 
     forkJoin({
       activity: this.activityService.getById(id),
-      images: this.imageService.getForActivity?.(id)
+      images: this.imageService.getForActivity?.(id),
+      qr: this.qrLinkService.getForEntity('activities', id).pipe(catchError(() => of(null)))
     }).subscribe({
-      next: ({ activity, images }) => {
+      next: ({ activity, images, qr }) => {
         const normalizedActivity = this.normalizeActivity(activity)
         this.activity = normalizedActivity;
+        this.qrLink = qr;
         this.images = images || [];
         this.mainImage = this.getMainImage();
         this.syncFavoriteState();

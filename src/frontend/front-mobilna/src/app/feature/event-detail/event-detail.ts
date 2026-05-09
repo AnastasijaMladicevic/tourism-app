@@ -20,6 +20,7 @@ import { EventPlannerService } from '../../services/event-planner';
 import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
 import { PendingActionService } from '../../services/pending-action';
 import { RouterHistoryService } from '../../services/router-history';
+import { QrLinkDto, QrLinkService } from '../../services/qr-link';
 
 @Component({
   selector: 'app-event-detail',
@@ -36,6 +37,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   mainImage = '';
   isLoading = true;
   errorMessage = '';
+  qrLink: QrLinkDto | null = null;
   isInPlanner = false;
   plannerId?: number;
   isPlannerBusy = false;
@@ -57,7 +59,8 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef,
     private translationService: TranslationService,
     private pendingActionService: PendingActionService,
-    private routerHistory: RouterHistoryService
+    private routerHistory: RouterHistoryService,
+    private qrLinkService: QrLinkService
   ) { }
 
   ngOnInit(): void {
@@ -66,11 +69,13 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     forkJoin({
       event: this.eventService.getById(id),
       images: this.imageService.getForEvent(id),
+      qr: this.qrLinkService.getForEntity('events', id).pipe(catchError(() => of(null))),
     }).subscribe({
-      next: ({ event, images }) => {
+      next: ({ event, images, qr }) => {
         const normalizedEvent = this.normalizeEvent(event);
 
         this.event = normalizedEvent;
+        this.qrLink = qr;
         this.images = images || [];
         this.mainImage = this.getMainImage(this.images, normalizedEvent);
         this.syncPlannerState();

@@ -892,6 +892,10 @@ button:hover {
 
 .contact-info {
   margin: 20px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
 
   h3 {
     font-size: 15px;
@@ -910,6 +914,59 @@ button:hover {
   a {
     color: var(--primary);
     text-decoration: underline;
+  }
+}
+
+.contact-info__details {
+  min-width: 0;
+}
+
+.qr-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+
+  p {
+    color: var(--text-gray);
+    margin: 4px 0 0;
+  }
+}
+
+.qr-mini {
+  width: 96px;
+  min-width: 96px;
+  text-decoration: none;
+  color: var(--text-gray);
+  text-align: center;
+
+  img {
+    display: block;
+    width: 86px;
+    height: 86px;
+    object-fit: contain;
+    padding: 6px;
+    margin: 0 auto 6px;
+    border-radius: 16px;
+    background: #fff;
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+  }
+
+  span {
+    font-size: 12px;
+    font-weight: 700;
+  }
+}
+
+.qr-mini--contact {
+  margin-left: auto;
+}
+
+@media (max-width: 768px) {
+  .contact-info,
+  .qr-card {
+    align-items: flex-start;
   }
 }
 

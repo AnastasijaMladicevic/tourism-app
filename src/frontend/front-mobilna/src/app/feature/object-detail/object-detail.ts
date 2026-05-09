@@ -9,6 +9,7 @@ import { AuthService } from '../../services/auth';
 import { ImageDto, ImageService } from '../../services/image';
 import { ObjectDto, ObjectImageDto, ObjectService, PagedResultDto } from '../../services/object';
 import { ReviewDto, ReviewService } from '../../services/review';
+import { QrLinkDto, QrLinkService } from '../../services/qr-link';
 import { MapComponent } from '../../shared/components/map/map';
 import { environment } from '../../../environment/environment';
 import { FavoriteStateService } from '../../services/favorite-state';
@@ -30,6 +31,7 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
   mainImage = '';
   isLoading = true;
   errorMessage = '';
+  qrLink: QrLinkDto | null = null;
 
   reviews: ReviewDto[] = [];
   nearbyObjects: ObjectDto[] = [];
@@ -64,7 +66,8 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     private favoriteStateService: FavoriteStateService,
     private reviewService: ReviewService,
     private routerHistory: RouterHistoryService,
-    private pendingActionService: PendingActionService
+    private pendingActionService: PendingActionService,
+    private qrLinkService: QrLinkService
   ) { }
 
   ngOnInit(): void {
@@ -131,18 +134,21 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     this.object = null;
     this.images = [];
     this.mainImage = '';
+    this.qrLink = null;
     this.reviews = [];
     this.nearbyObjects = [];
 
     forkJoin({
       object: this.objectService.getById(id),
       images: this.imageService.getForObject(id).pipe(catchError(() => of([] as ImageDto[]))),
+      qr: this.qrLinkService.getForEntity('objects', id).pipe(catchError(() => of(null))),
     }).subscribe({
-      next: ({ object, images }) => {
+      next: ({ object, images, qr }) => {
         const normalizedObject = this.normalizeObject(object);
         const normalizedImages = this.normalizeImages(images);
 
         this.object = normalizedObject;
+        this.qrLink = qr;
         this.images = normalizedImages;
         this.reviews = normalizedObject.reviews || [];
         this.loadReviewImages();

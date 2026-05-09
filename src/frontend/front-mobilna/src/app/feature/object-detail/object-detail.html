@@ -58,9 +58,6 @@
           @if (object.cuisineType) {
             <p class="cuisine"><mat-icon>restaurant</mat-icon>{{object.cuisineType}}</p>
           }
-          <div class="actions">
-            <button class="btn btn-primary" (click)="reserveNow(object)">Rezerviši odmah</button>
-          </div>
         </div>
         <div class="card">
           <h2>Amenities</h2>
@@ -178,26 +175,34 @@
               <h2>Contact info</h2>
             </div>
             <div class="contact-info">
-              @if (object.phoneNumber) {
-                <p>
-                  <mat-icon>phone</mat-icon>
-                  <a [href]="'tel:' + object.phoneNumber">{{ object.phoneNumber }}</a>
-                </p>
-              }
-              @if (object.website) {
-                <p>
-                  <mat-icon>language</mat-icon>
-                  <a [href]="object.website" target="_blank" rel="noopener">{{ object.website }}</a>
-                </p>
-              }
-              @if (object.menuUrl) {
-                <p>
-                  <mat-icon>menu_book</mat-icon>
-                  <a [href]="object.menuUrl" target="_blank" rel="noopener">{{ object.menuUrl }}</a>
-                </p>
-              }
-              @if (object.workingHours) {
-                <p class="date"><mat-icon>access_time</mat-icon> {{ getWorkingHours() }}</p>
+              <div class="contact-info__details">
+                @if (object.phoneNumber) {
+                  <p>
+                    <mat-icon>phone</mat-icon>
+                    <a [href]="'tel:' + object.phoneNumber">{{ object.phoneNumber }}</a>
+                  </p>
+                }
+                @if (object.website) {
+                  <p>
+                    <mat-icon>language</mat-icon>
+                    <a [href]="object.website" target="_blank" rel="noopener">{{ object.website }}</a>
+                  </p>
+                }
+                @if (object.menuUrl) {
+                  <p>
+                    <mat-icon>menu_book</mat-icon>
+                    <a [href]="object.menuUrl" target="_blank" rel="noopener">{{ object.menuUrl }}</a>
+                  </p>
+                }
+                @if (object.workingHours) {
+                  <p class="date"><mat-icon>access_time</mat-icon> {{ getWorkingHours() }}</p>
+                }
+              </div>
+              @if (qrLink) {
+                <a class="qr-mini qr-mini--contact" [href]="qrLink.targetUrl" target="_blank" rel="noopener">
+                  <img [src]="qrLink.qrImageUrl" [alt]="qrLink.label" />
+                  <span>Otvori QR</span>
+                </a>
               }
             </div>
             
