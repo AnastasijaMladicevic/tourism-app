@@ -13149,7 +13149,7 @@ WITH source("Url", "AltText", "IsMain", "DestinationName") AS (
     ('https://kompaskazesrbija.rs/wp-content/uploads/2020/06/vrnjacka-banja-slike-scaled.jpg', 'Vrnjačka Banja', true, 'Vrnjačka Banja'),
     ('https://upload.wikimedia.org/wikipedia/commons/6/6e/Palic_panorama.jpg', 'Palić', true, 'Palić'),
     ('https://upload.wikimedia.org/wikipedia/commons/0/03/Uvac_River_and_Eagle.jpg', 'Uvac', true, 'Uvac'),
-    ('https://upload.wikimedia.org/wikipedia/commons/f/f7/Mokra_Gora%2C_pohled_na_obec_od_Drvengradu.JPG', 'Mokra Gora', true, 'Mokra Gora')
+    ('https://www.turizamuzica.org.rs/wp-content/uploads/2025/11/mg-sl1.jpg', 'Mokra Gora', true, 'Mokra Gora')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", d."Id", NOW()
