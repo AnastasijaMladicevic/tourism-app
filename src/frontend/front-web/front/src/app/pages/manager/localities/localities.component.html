@@ -1,0 +1,287 @@
+<section class="manager-localities-page">
+  <div class="page-head">
+    <div>
+      <p class="breadcrumbs">Dashboard <span>></span> Localities</p>
+      <h1>Localities</h1>
+      <p class="subtle-text">Manage localities and review their visibility data.</p>
+    </div>
+    <button type="button" class="primary-btn" (click)="onCreateLocation()">
+      <span class="material-symbols-outlined">add</span>
+      Create Locality
+    </button>
+  </div>
+
+  <div class="toolbar card">
+    <label class="search-field" aria-label="Search localities">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        [(ngModel)]="draftSearchQuery"
+        (keydown.enter)="onSearchEnter($event)"
+        placeholder="Search by locality, destination or region..."
+      />
+    </label>
+
+    <button type="button" class="ghost-btn" (click)="onMoreFilters()">
+      <span class="material-symbols-outlined">filter_alt</span>
+      More Filters
+    </button>
+  </div>
+
+  @if (filterPanelOpen) {
+    <div class="filters-panel card">
+      <label>
+        <span>Status</span>
+        <select [(ngModel)]="statusFilter">
+          <option value="all">All Statuses</option>
+          <option *ngFor="let option of statusOptions" [value]="option.value">{{ option.label }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Destination</span>
+        <select [(ngModel)]="destinationFilter">
+          <option value="all">All Destinations</option>
+          <option *ngFor="let option of destinationOptions" [value]="option.value">{{ option.label }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Type</span>
+        <select [(ngModel)]="typeFilter">
+          <option value="all">All Types</option>
+          <option *ngFor="let option of typeOptions" [value]="option.value">{{ option.label }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Sort by</span>
+        <select [(ngModel)]="sortBy">
+          <option value="name">Name</option>
+          <option value="destination">Destination</option>
+          <option value="type">Type</option>
+          <option value="createdAt">Created at</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Order</span>
+        <select [(ngModel)]="sortOrder">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </label>
+
+      <div class="filter-actions">
+        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">Apply Filters</button>
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">Reset Filters</button>
+      </div>
+    </div>
+  }
+
+  <div class="locality-content-grid">
+    <div class="locality-main-column">
+      <div class="stats-row">
+        <article class="stat-card" data-tone="blue">
+          <p>Total localities</p>
+          <strong>{{ totalCount }}</strong>
+          <span>Across your managed destinations</span>
+        </article>
+        <article class="stat-card" data-tone="green">
+          <p>On this page</p>
+          <strong>{{ totalLocalitiesOnPage }}</strong>
+          <span>Visible rows</span>
+        </article>
+        <article class="stat-card" data-tone="neutral">
+          <p>Active ratio</p>
+          <strong>{{ activePercent }}</strong>
+          <span>Current filtered set</span>
+        </article>
+      </div>
+
+      <section class="locality-table-wrap card">
+        <header class="table-header">
+          <h2>Managed Localities</h2>
+        </header>
+
+        @if (isLoading) {
+          <div class="state state-loading">Loading localities...</div>
+        } @else if (errorMessage) {
+          <div class="state state-error">{{ errorMessage }}</div>
+        } @else if (!localities.length) {
+          <div class="state">No localities found for the selected filters.</div>
+        } @else {
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Destinations</th>
+                  <th>Created By</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let locality of localities; trackBy: trackByLocalityId"
+                  [class.active-row]="selectedLocality?.id === locality.id"
+                  (click)="selectLocality(locality)"
+                >
+                  <td>
+                    <span class="status-chip" [ngClass]="getStatusClass(locality)">
+                      {{ getStatusLabel(locality) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="item-cell item-cell-with-media">
+                      <div class="media-thumb" [ngStyle]="getMediaStyle(locality)"></div>
+                      <div>
+                        <strong>{{ locality.name }}</strong>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ locality.localityTypeName || 'N/A' }}</td>
+                  <td>{{ locality.destinationName || 'N/A' }}</td>
+                  <td>{{ getCreatedByLabel(locality) }}</td>
+                  <td>
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      title="Edit locality"
+                      (click)="$event.stopPropagation(); onEditLocation(locality)"
+                    >
+                      <span class="material-symbols-outlined">edit</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <footer class="table-footer">
+          <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ totalCount }} localities</p>
+          <div class="pager">
+            <label class="page-size-control">
+              <span>Page size</span>
+              <select class="page-size-select" [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+                <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
+              </select>
+            </label>
+
+            <button type="button" class="ghost-btn small-btn" (click)="onPreviousPage()" [disabled]="currentPage === 1">
+              Previous
+            </button>
+            <button
+              type="button"
+              class="ghost-btn small-btn"
+              (click)="onNextPage()"
+              [disabled]="currentPage >= totalPages"
+            >
+              Next
+            </button>
+          </div>
+        </footer>
+      </section>
+    </div>
+
+    <aside class="detail-column card">
+      @if (selectedLocality) {
+        <div class="activity-hero">
+          <div class="hero-media" [class.has-slides]="heroImageUrls.length > 0">
+            <div class="hero-media-slides" aria-hidden="true">
+              @for (url of heroImageUrls; track trackByHeroImage($index, url); let i = $index) {
+                <div
+                  class="hero-media-slide"
+                  [class.is-active]="i === currentHeroImageIndex"
+                  [ngStyle]="getHeroSlideStyle(url)"
+                ></div>
+              }
+            </div>
+            <span class="hero-badge">{{ selectedLocality.localityTypeName || 'Locality' }}</span>
+          </div>
+          <div class="hero-copy">
+            <p class="eyebrow">Preview</p>
+            <h2>{{ selectedLocality.name }}</h2>
+            <p class="hero-meta">{{ selectedLocality.destinationName }} · {{ selectedLocality.regionName }}</p>
+            <span class="detail-status status-published">{{ getStatusLabel(selectedLocality) }}</span>
+          </div>
+        </div>
+
+        <div class="detail-metrics">
+          <div class="metric-card">
+            <span>Type</span>
+            <strong>{{ selectedLocality.localityTypeName || 'N/A' }}</strong>
+          </div>
+          <div class="metric-card">
+            <span>Created</span>
+            <strong>{{ selectedLocality.createdAt | date:'MMM d, y' }}</strong>
+          </div>
+        </div>
+
+        <section class="detail-section">
+          <div class="section-head">
+            <h3>Details</h3>
+          </div>
+          <div class="schedule-item">
+            <span>Destination</span>
+            <strong>{{ selectedLocality.destinationName || 'N/A' }}</strong>
+          </div>
+          <div class="schedule-item">
+            <span>Region</span>
+            <strong>{{ selectedLocality.regionName || 'N/A' }}</strong>
+          </div>
+          <div class="schedule-item">
+            <span>Coordinates</span>
+            <strong>{{ selectedCoordinates }}</strong>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h3>Description</h3>
+          <p class="description-copy">{{ selectedLocality.description || 'No description provided.' }}</p>
+        </section>
+
+        <section class="detail-section">
+          <div class="map-card">
+            @if (hasSelectedLocalityCoordinates) {
+              <app-map
+                [lat]="selectedLocalityLat"
+                [lng]="selectedLocalityLng"
+                [zoom]="14"
+                [popupText]="selectedLocalityLocationLabel"
+                [interactive]="false"
+                mapId="manager-locality-details-map"
+              ></app-map>
+            } @else {
+              <div class="map-empty-state">
+                <span class="material-symbols-outlined">location_off</span>
+                <p>Coordinates are not available for this locality.</p>
+              </div>
+            }
+          </div>
+        </section>
+
+        <div class="detail-cta">
+          <button
+            type="button"
+            class="primary-btn full-cta sidebar-cta-btn"
+            (click)="onEditLocation(selectedLocality)"
+          >
+            <span class="material-symbols-outlined">rate_review</span>
+            Open full review
+          </button>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <p class="eyebrow">No locality selected</p>
+          <h2>Pick a locality from the table</h2>
+          <p>Select a row to preview details and metadata here.</p>
+        </div>
+      }
+    </aside>
+  </div>
+
+</section>

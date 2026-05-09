@@ -225,9 +225,19 @@ export const routes: Routes = [
         ]
       },
       {
+        path: 'localities/create',
+        loadComponent: () =>
+          import('./pages/manager/localities/locality-create/locality-create.component').then(m => m.ManagerLocalityCreateComponent)
+      },
+      {
+        path: 'localities/edit/:id',
+        loadComponent: () =>
+          import('./pages/manager/localities/locality-create/locality-create.component').then(m => m.ManagerLocalityCreateComponent)
+      },
+      {
         path: 'localities',
         loadComponent: () =>
-          import('./pages/manager/destinations/destinations.component').then(m => m.ManagerDestinationsComponent)
+          import('./pages/manager/localities/localities.component').then(m => m.ManagerLocalitiesComponent)
       },
       {
         path: 'destinations',
