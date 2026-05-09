@@ -58,10 +58,11 @@ interface RoutePoint {
   standalone: true,
   imports: [CommonModule, FormsModule, MatIconModule],
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css']
+  styleUrls: ['./map.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
-
+  private static readonly MANAGER_DESTINATION_FOCUS_ZOOM = 14;
 
   searchQuery = '';
   searchResults: SearchResult[] = [];
@@ -125,9 +126,6 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
     const zoom = state?.zoom ?? 13;
 
     this.mapService.initMap('main-map', lat, lng, zoom);
-    if (!state?.lat || !state?.lng) {
-      this.focusActiveRegion();
-    }
     this.loadAllData(state);
 
     const map = this.mapService['map'];
@@ -464,6 +462,23 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
       )
       .subscribe({
         next: ({ destinations, objects, events, activities, localities }) => {
+          const managedDestinationIds = new Set(
+            destinations.map((destination) => destination.id).filter((id): id is number => id != null),
+          );
+
+          const filteredLocalities = localities.filter((locality) =>
+            this.belongsToManagedDestination(locality, managedDestinationIds),
+          );
+          const filteredObjects = objects.filter((obj) =>
+            this.belongsToManagedDestination(obj, managedDestinationIds),
+          );
+          const filteredEvents = events.filter((event) =>
+            this.belongsToManagedDestination(event, managedDestinationIds),
+          );
+          const filteredActivities = activities.filter((activity) =>
+            this.belongsToManagedDestination(activity, managedDestinationIds),
+          );
+
           destinations.forEach((destination) => {
             if (destination.latitude != null && destination.longitude != null) {
               this.mapService.addMarkerWithType(
@@ -476,7 +491,7 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
             }
           });
 
-          localities.forEach((loc) => {
+          filteredLocalities.forEach((loc) => {
             if (loc.latitude != null && loc.longitude != null) {
               this.mapService.addMarkerWithType(
                 loc.latitude,
@@ -488,7 +503,7 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
             }
           });
 
-          objects.forEach((obj) => {
+          filteredObjects.forEach((obj) => {
             if (obj.latitude != null && obj.longitude != null) {
               const type = this.getObjectType(obj.objectTypeName || '');
               this.mapService.addMarkerWithType(obj.latitude, obj.longitude, type, obj);
@@ -496,14 +511,14 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
             }
           });
 
-          events.forEach((event) => {
+          filteredEvents.forEach((event) => {
             if (event.latitude != null && event.longitude != null) {
               this.mapService.addMarkerWithType(event.latitude, event.longitude, 'event', event);
               this.allItems.push(this.toSearchResult(event, 'event', 'event'));
             }
           });
 
-          activities.forEach((activity) => {
+          filteredActivities.forEach((activity) => {
             if (activity.latitude != null && activity.longitude != null) {
               this.mapService.addMarkerWithType(
                 activity.latitude,
@@ -514,6 +529,15 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
               this.allItems.push(this.toSearchResult(activity, 'activity', 'activity'));
             }
           });
+
+          this.focusManagedContent(
+            destinations,
+            filteredLocalities,
+            filteredObjects,
+            filteredEvents,
+            filteredActivities,
+            state,
+          );
 
           if (state?.selectedItem) {
             setTimeout(() => {
@@ -527,6 +551,21 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
         },
         error: (err) => console.error('Greska:', err),
       });
+  }
+
+  private belongsToManagedDestination(
+    item: { destinationId?: number | null },
+    managedDestinationIds: Set<number>,
+  ): boolean {
+    if (!managedDestinationIds.size) {
+      return false;
+    }
+
+    if (item.destinationId == null) {
+      return true;
+    }
+
+    return managedDestinationIds.has(item.destinationId);
   }
 
   private fetchAllPages<TItem>(
@@ -667,6 +706,59 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
         // keep the existing default center if region lookup fails
       },
     });
+  }
+
+  private focusManagedContent(
+    destinations: DestinationDto[],
+    localities: any[],
+    objects: any[],
+    events: any[],
+    activities: any[],
+    state?: any,
+  ): void {
+    if (state?.lat != null && state?.lng != null) {
+      return;
+    }
+
+    const map = this.mapService['map'];
+    if (!map) {
+      return;
+    }
+
+    const points = [
+      ...destinations,
+      ...localities,
+      ...objects,
+      ...events,
+      ...activities,
+    ]
+      .map((item) => this.toLatLng(item))
+      .filter((point): point is L.LatLngTuple => point !== null);
+
+    if (!points.length) {
+      this.focusActiveRegion();
+      return;
+    }
+
+    if (points.length === 1) {
+      const [lat, lng] = points[0];
+      this.mapService.flyTo(lat, lng, ManagerMapComponent.MANAGER_DESTINATION_FOCUS_ZOOM);
+      return;
+    }
+
+    const bounds = L.latLngBounds(points);
+    map.fitBounds(bounds.pad(0.2), {
+      padding: [72, 72],
+      maxZoom: ManagerMapComponent.MANAGER_DESTINATION_FOCUS_ZOOM,
+    });
+  }
+
+  private toLatLng(item: { latitude?: number | null; longitude?: number | null }): L.LatLngTuple | null {
+    if (item.latitude == null || item.longitude == null) {
+      return null;
+    }
+
+    return [item.latitude, item.longitude];
   }
 
   getWorkingStatus(): boolean | null {
