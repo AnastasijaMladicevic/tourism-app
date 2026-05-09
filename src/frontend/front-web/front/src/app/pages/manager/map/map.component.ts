@@ -125,7 +125,7 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
     const lng = state?.lng ?? 18.771;
     const zoom = state?.zoom ?? 13;
 
-    this.mapService.initMap('main-map', lat, lng, zoom);
+    this.mapService.initMap('main-map', lat, lng, zoom, { enableClustering: true });
     this.loadAllData(state);
 
     const map = this.mapService['map'];
