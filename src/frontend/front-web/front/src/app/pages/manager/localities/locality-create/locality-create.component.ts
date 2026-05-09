@@ -120,7 +120,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     if (typeName) {
       return `Type: ${typeName}`;
     }
-    return 'Set destination/locality for location context';
+    return 'Set destination and locality type for map context';
   }
 
   get mapPopupText(): string {
@@ -136,7 +136,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     if (typeName && destinationName) {
       return `${typeName} · ${destinationName}`;
     }
-    return name || typeName || destinationName || 'New location';
+    return name || typeName || destinationName || 'New locality';
   }
 
   get hasAnyGalleryImages(): boolean {
@@ -190,7 +190,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
       this.localityService.update(this.localityId, updatePayload).subscribe({
         next: (updated) => onSuccess(updated.id),
         error: (error) => {
-          this.errorMessage = error?.error?.message ?? 'Failed to update location.';
+          this.errorMessage = error?.error?.message ?? 'Failed to update locality.';
           this.isSubmitting = false;
         }
       });
@@ -200,7 +200,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     this.localityService.create(payload).subscribe({
       next: (created) => onSuccess(created.id),
       error: (error) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to create location.';
+        this.errorMessage = error?.error?.message ?? 'Failed to create locality.';
         this.isSubmitting = false;
       }
     });
@@ -246,7 +246,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
         }, 1800);
       },
       error: (error) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to delete location.';
+        this.errorMessage = error?.error?.message ?? 'Failed to delete locality.';
         this.isDeleting = false;
       }
     });

@@ -306,8 +306,7 @@ select {
 .side-stack {
   position: sticky;
   top: calc(var(--app-navbar-height, 72px) + 12px);
-  max-height: calc(100vh - var(--app-navbar-height, 72px) - 24px);
-  overflow: auto;
+  align-self: start;
   display: flex;
   flex-direction: column;
   gap: 16px;

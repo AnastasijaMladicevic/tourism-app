@@ -2,9 +2,9 @@
   <header class="page-head">
     <div>
       <p class="breadcrumbs">Dashboard <span>></span> Localities <span>></span> {{ isEditMode ? 'Edit' : 'Create' }}</p>
-      <h1>{{ isEditMode ? 'Edit Location' : 'Create Location' }}</h1>
+      <h1>{{ isEditMode ? 'Edit Locality' : 'Create Locality' }}</h1>
       <p class="subtle-text">
-        {{ isEditMode ? 'Update location details for your managed destination.' : 'Add a new location for your managed destination.' }}
+        {{ isEditMode ? 'Update locality details for your managed destination.' : 'Add a new locality for your managed destination.' }}
       </p>
     </div>
     <div class="top-actions">
@@ -16,13 +16,13 @@
           [disabled]="isDeleting || isSubmitting"
         >
           <span class="material-symbols-outlined">delete</span>
-          {{ isDeleting ? 'Deleting...' : 'Delete Location' }}
+          {{ isDeleting ? 'Deleting...' : 'Delete Locality' }}
         </button>
       }
       <button type="button" class="ghost-btn" (click)="onCancel()">Cancel</button>
       <button type="button" class="ghost-btn" (click)="onSaveDraft()">Save Draft</button>
       <button type="submit" class="primary-btn" form="create-locality-form" [disabled]="isSubmitting || isLoadingOptions">
-        {{ isSubmitting ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save Changes' : 'Create Location') }}
+        {{ isSubmitting ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save Changes' : 'Create Locality') }}
       </button>
     </div>
   </header>
@@ -38,7 +38,7 @@
 
         <div class="gallery-dropzone">
           <p class="dropzone-title">Add Photo</p>
-          <p class="dropzone-copy">Images are attached after location creation via the image endpoint.</p>
+          <p class="dropzone-copy">Images are attached after locality creation via the image endpoint.</p>
           <div class="dropzone-input-row">
             <input
               type="text"
@@ -61,7 +61,7 @@
         @if (hasAnyGalleryImages) {
           <div class="gallery-grid">
             <article class="gallery-item" *ngFor="let image of existingImages">
-              <img [src]="image.url" alt="Location image" />
+              <img [src]="image.url" alt="Locality image" />
               <div class="gallery-actions">
                 @if (image.isMain) {
                   <span class="primary-badge">Primary</span>
@@ -72,7 +72,7 @@
             </article>
 
             <article class="gallery-item" *ngFor="let preview of imagePreviews; let index = index">
-              <img [src]="preview" alt="Location image preview" />
+              <img [src]="preview" alt="Locality image preview" />
               <div class="gallery-actions">
                 @if (index === primaryImageIndex) {
                   <span class="primary-badge">Primary</span>
@@ -90,12 +90,12 @@
         <div class="gallery-card-head">
           <span class="step-tag">STEP 2</span>
           <h2>General Information</h2>
-          <p class="gallery-intro">Essential details about the location.</p>
+          <p class="gallery-intro">Essential details about the locality.</p>
         </div>
 
         <div class="grid-2">
           <label class="full-width">
-            <span>Location Name *</span>
+            <span>Locality Name *</span>
             <input type="text" [(ngModel)]="form.name" name="name" required placeholder="e.g. Barceloneta Beach" />
           </label>
 
@@ -142,7 +142,7 @@
       <section class="side-column card">
         <header class="side-header">
           <span class="material-symbols-outlined">my_location</span>
-          <h3>Location Intelligence</h3>
+          <h3>Locality Intelligence</h3>
         </header>
 
         <div class="map-shell">
@@ -180,12 +180,12 @@
         </header>
 
         <ul>
-          <li>Use clear location names so visitors can recognize the place quickly.</li>
+          <li>Use clear locality names so visitors can recognize the place quickly.</li>
           <li>Add precise coordinates to improve map previews and navigation.</li>
           <li>Upload high-quality images and choose the strongest one as primary.</li>
         </ul>
 
-        <button type="button" class="link-btn" (click)="openTipsModal()">Learn more about locations</button>
+        <button type="button" class="link-btn" (click)="openTipsModal()">Learn more about localities</button>
       </section>
     </aside>
   </div>
@@ -199,7 +199,7 @@
         aria-labelledby="locality-tips-modal-title"
         (click)="$event.stopPropagation()"
       >
-        <h3 id="locality-tips-modal-title">Location Creator Playbook</h3>
+        <h3 id="locality-tips-modal-title">Locality Creator Playbook</h3>
         <p>
           Build complete locality profiles with sharp imagery and accurate map data so guests know exactly
           what to expect and how to get there. Consistent destination and type metadata also boosts
@@ -229,7 +229,7 @@
         <div class="delete-success-icon" aria-hidden="true">
           <span class="delete-success-icon-check">✓</span>
         </div>
-        <h3 id="locality-delete-success-title">Location successfully deleted</h3>
+        <h3 id="locality-delete-success-title">Locality successfully deleted</h3>
         <p>You will be redirected to the Localities page.</p>
       </section>
     </div>
