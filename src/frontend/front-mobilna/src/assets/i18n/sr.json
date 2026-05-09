@@ -290,55 +290,54 @@
                                          "parks":  "Nacionalni parkovi"
                                      }
                     },
-    "support":  {
-                    "title":  "Pomoć i podrška",
-                    "heroTitle":  "Pomoć za profil i mobilna podesavanja",
-                    "searchAria":  "Pretraga pitanja",
-                    "searchPlaceholder":  "Pretraži cesto postavljana pitanja...",
-                    "faqTitle":  "Često postavljana pitanja",
-                    "contactTitle":  "Direktan kontakt",
-                    "contactUsers":  "Podrška korisnicima",
-                    "contactUsersBody":  "Pozovi nas za brza pitanja u vezi naloga i aplikacije",
-                    "reportProblem":  "Prijavi problem",
-                    "reportProblemBody":  "Pošalji detalje ako neka profile funkcija ne radi kako treba",
-                    "hoursTitle":  "Radno vreme podrške",
-                    "weekdays":  "Ponedeljak - Petak",
-                    "weekend":  "Subota - Nedelja",
-                    "chatNote":  "* Prosečno vreme odgovora na chat je manje od 5 minuta.",
-                    "ticketNote":  "* Odgovori na prijave problema stižu u roku od 24h.",
-                    "aiTitle":  "AI turistički asistent",
-                    "aiBody":  "Postavi pitanje prirodnim jezikom i asistent će prvo pretraziti sadržaj aplikacije, pa onda odgovoriti ljudskim jezikom.",
-                    "aiPlaceholder":  "Na primer: gde mogu da idem sa decom u šetnju?",
-                    "aiSend":  "Pošalji pitanje",
-                    "aiThinking":  "AI upravo traži najbolje predloge...",
-                    "aiEmpty":  "Još nema poruka. Probaj da pitaš za restoran, hotel, šetnju ili dogadjaj.",
-                    "aiError":  "AI odgovor trenutno nije dostupan. Pokušaj ponovo za nekoliko sekundi.",
-                    "aiPromptWalk":  "Šetnja sa decom",
-                    "aiPromptLunch":  "Restoran za ručak",
-                    "aiPromptHotel":  "Hotel sa bazenom",
-                    "faq":  {
-                                "1":  {
-                                          "q":  "Kako da ažuriram podatke na profilu?",
-                                          "a":  "Na ekranu Izmeni profil možeš promeniti ime, prezime, telefon, državu i profilnu fotografiju koristeći postojeće nalog opcije."
-                                      },
-                                "2":  {
-                                          "q":  "Gde vidim favorite?",
-                                          "a":  "Favorites ekran prikazuje sve stavke sačuvane preko postojećeg API-ja i omogućava brzo uklanjanje onoga sto ti više ne treba."
-                                      },
-                                "3":  {
-                                          "q":  "Kako radi planer putovanja?",
-                                          "a":  "Planer trenutno radi lokalno na uređaju i ne traži backend izmene. Možeš sačuvati destinaciju, datum, beleške i checklistu."
-                                      },
-                                "4":  {
-                                          "q":  "Kako da promenim jezik aplikacije?",
-                                          "a":  "Na ekranu Jezik možeš izabrati podržani jezik i sačuvati promenu preko korisničke rute. Promena se odmah vidi u mobilnom interfejsu."
-                                      }
-                            }
+    "support": {
+            "title": "Pomoć i podrška",
+            "heroTitle": "Tu smo da vam pomognemo",
+            "searchAria": "Pretraga pitanja",
+            "searchPlaceholder": "Pretraži često postavljana pitanja...",
+            "faqTitle": "Često postavljana pitanja",
+            "contactTitle": "Direktan kontakt",
+            "contactUsers": "Podrška korisnicima",
+            "contactUsersBody": "Pozovite nas ukoliko vam je potrebna pomoć u vezi naloga, podešavanja ili korišćenja aplikacije.",
+            "reportProblem": "Prijavi problem",
+            "reportProblemBody": "Pošaljite nam opis problema kako bismo mogli što brže da proverimo i pomognemo.",
+            "hoursTitle": "Radno vreme podrške",
+            "weekdays": "Ponedeljak - Petak",
+            "weekend": "Subota - Nedelja",
+            "chatNote": "* Prosečno vreme odgovora na poruku je manje od 5 minuta.",
+            "ticketNote": "* Odgovori na prijave problema stižu u roku od 24h.",
+            "aiTitle": "AI turistički asistent",
+            "aiBody": "Postavite pitanje prirodnim jezikom i asistent će vam pomoći da pronađete destinacije, restorane, hotele, događaje ili aktivnosti koje odgovaraju vašim interesovanjima.",
+            "aiPlaceholder": "Na primer: gde mogu da idem sa decom u šetnju?",
+            "aiSend": "Pošalji pitanje",
+            "aiThinking": "AI upravo traži najbolje predloge...",
+            "aiEmpty": "Još nema poruka. Probajte da pitate za restoran, hotel, šetnju ili događaj.",
+            "aiError": "AI odgovor trenutno nije dostupan. Pokušajte ponovo za nekoliko sekundi.",
+            "aiPromptWalk": "Šetnja sa decom",
+            "aiPromptLunch": "Restoran za ručak",
+            "aiPromptHotel": "Hotel sa bazenom",
+            "faq": {
+                "1": {
+                "q": "Kako da ažuriram podatke na profilu?",
+                "a": "Podatke možete izmeniti na ekranu Profil u delu Izmeni profil ili na ekranu Podešavanja u delu Izmeni profil. Tu možete promeniti ime, prezime, telefon, državu, profilnu fotografiju, kao i svoju lozinku."
                 },
+                "2": {
+                "q": "Gde mogu da vidim omiljene stavke?",
+                "a": "Omiljene destinacije, objekti i drugi sačuvani sadržaji nalaze se na ekranu Favoriti, gde ih možete pregledati ili ukloniti."
+                },
+                "3": {
+                "q": "Kako radi planer putovanja?",
+                "a": "Planer vam omogućava da sačuvate događaje na koje želite da odete tokom putovanja i podseti vas na njih."
+                },
+                "4": {
+                "q": "Kako da promenim jezik aplikacije?",
+                "a": "Jezik aplikacije možete promeniti na ekranu Podešavanja u delu Jezik. Nakon izbora jezika, promena će se odmah prikazati u aplikaciji."
+                }
+            }
+            },
     "about":  {
                   "supportTitle":  "Informacije i podrška",
-                  "version":  "Verzija 2.4.0",
-                  "quote":  "\"Naša misija je da svakom putniku pružimo autentično iskustvo Crne Gore, od skrivenih plaža na jugu do netaknutih planinskih vrhova na severu.\"",
+                  "quote":  "\"Naša misija je da svakom putniku pružimo autentična iskustva i olakšamo otkrivanje najlepših destinacija širom sveta.\"",
                   "privacy":  "Politika privatnosti",
                   "privacyBody":  "Kako štitimo vaše podatke",
                   "terms":  "Uslovi korišćenja",
@@ -351,55 +350,55 @@
     "privacy":  {
                     "title":  "Privatnost i podaci",
                     "eyebrow":  "TRANSPARENTNO",
-                    "heroTitle":  "Šta mobilna aplikacija trenutno čuva i prikazuje.",
-                    "heroBody":  "Ovaj ekran služi kao jasan pregled podataka koje frontend koristi i ogranicenja koja postoje dok backend ne dobije dodatne funkcionalnosti.",
+                    "heroTitle":  "Kako SpireGO koristi vaše podatke",
+                    "heroBody":  "Vaša privatnost i bezbednost podataka su nam važni. Na ovoj stranici možete saznati koje informacije aplikacija prikazuje, kako se koriste i na koji način pomažu u unapređenju vašeg iskustva putovanja.",
                     "notesTitle":  "Bitne napomene",
                     "section":  {
                                     "1":  {
                                               "title":  "Podaci naloga",
-                                              "body":  "Na mobilnom frontendu trenutno prikazujemo osnovne podatke naloga kao što su ime, prezime, email, telefon, država i fotografija profila."
+                                              "body":  "SpireGO može prikazivati osnovne informacije vašeg naloga kao što su ime, email adresa, profilna fotografija i podešavanja profila, kako bismo personalizovali vaše iskustvo u aplikaciji."
                                           },
                                     "2":  {
                                               "title":  "Lokalno sačuvani podaci",
-                                              "body":  "Planer putovanja i interesovanja mogu biti sačuvani lokalno na uređaju, bez slanja novih podataka na backend."
+                                              "body":  "Određeni podaci, poput planova putovanja, omiljenih destinacija ili podešavanja aplikacije, mogu biti privremeno sačuvani na vašem uređaju radi bržeg i jednostavnijeg korišćenja aplikacije."
                                           },
                                     "3":  {
-                                              "title":  "Kako prijaviti izmenu",
-                                              "body":  "Ako želiš ispravku podataka ili dodatna objašnjenja, koristi ekran Pomoć i podrška ili kontakt adresu navedenu u aplikaciji."
+                                              "title":  "Kako nas kontaktirati",
+                                              "body":  "Određeni podaci, poput planova putovanja, omiljenih destinacija ili podešavanja aplikacije, mogu biti privremeno sačuvani na vašem uređaju radi bržeg i jednostavnijeg korišćenja aplikacije."
                                           }
                                 },
                     "note":  {
-                                 "1":  "Frontend deo ne upravlja brisanjem naloga ni eksportom podataka bez backend podrške.",
-                                 "2":  "Profilna fotografija i izmene osnovnih podataka koriste postojeće API rute koje su već dostupne.",
-                                 "3":  "Za osetljive nalog akcije potrebno je dodatno backend rešenje i dozvole."
+                                 "1":  "Vaši podaci koriste se isključivo za funkcionalnosti aplikacije i unapređenje korisničkog iskustva.",
+                                 "2":  "Trudimo se da informacije budu zaštićene i dostupne samo vama.",
+                                 "3":  "Neke funkcionalnosti mogu zahtevati dodatnu potvrdu identiteta radi bezbednosti naloga."
                              }
                 },
-    "terms":  {
-                  "title":  "Uslovi korišćenja",
-                  "eyebrow":  "PREGLED USLOVA",
-                  "heroTitle":  "Jasan sažetak pravila za mobilni deo aplikacije.",
-                  "heroBody":  "Ovaj ekran daje frontend pregled najvažnijih pravila korišćenja dok se puna pravna verzija ne usaglasi na nivou celog sistema.",
-                  "notesTitle":  "Napomene",
-                  "section":  {
-                                  "1":  {
-                                            "title":  "Korišćenje aplikacije",
-                                            "body":  "Mobilni frontend omogućava pregled destinacija, objekata, favorita i ličnih podesavanja. Korisnik je odgovoran za tačnost podataka koje unosi na svom nalogu."
-                                        },
-                                  "2":  {
-                                            "title":  "Sadržaj i informacije",
-                                            "body":  "Prikazani podaci zavise od dostupnih API odgovora. Frontend prikazuje ono što backend trenutno vraća i ne garantuje dodatne funkcionalnosti koje nisu podržane rutama sistema."
-                                        },
-                                  "3":  {
-                                            "title":  "Nalog i bezbednost",
-                                            "body":  "Odjava, izmena osnovnih podataka i promena fotografije koriste postojeće nalog mehanizme. Za dodatne nalog akcije potrebna je posebna backend podrška."
-                                        }
-                              },
-                  "note":  {
-                               "1":  "Favoriti, recenzije i profilni podaci vezani su za trenutno ulogovan nalog.",
-                               "2":  "Lokalno sačuvani planer radi samo na uređaju na kom je kreiran.",
-                               "3":  "Za pravne i produkcione verzije uslova potrebno je usklađivanje sa timom i backend specifikacijom."
-                           }
-              },
+        "terms": {
+            "title": "Uslovi korišćenja",
+            "eyebrow": "USLOVI KORIŠĆENJA",
+            "heroTitle": "Pravila i smernice za korišćenje aplikacije.",
+            "heroBody": "Korišćenjem aplikacije SpireGO prihvatate osnovna pravila korišćenja, zaštite podataka i odgovornog korišćenja dostupnih funkcionalnosti.",
+            "notesTitle": "Važne napomene",
+            "section": {
+                "1": {
+                "title": "Korišćenje aplikacije",
+                "body": "SpireGO omogućava pregled destinacija, objekata, događaja, favorita i personalizovanih sadržaja. Korisnik je odgovoran za tačnost informacija koje unosi i koristi u okviru svog naloga."
+                },
+                "2": {
+                "title": "Sadržaj i informacije",
+                "body": "Trudimo se da informacije u aplikaciji budu tačne i ažurne, ali dostupnost sadržaja može zavisiti od spoljašnjih servisa i izvora podataka. Pojedine informacije mogu biti promenjene ili privremeno nedostupne."
+                },
+                "3": {
+                "title": "Nalog i bezbednost",
+                "body": "Korisnik je odgovoran za bezbednost svog naloga i poverljivost pristupnih podataka. Preporučujemo korišćenje sigurnih lozinki i redovno ažuriranje podataka naloga."
+                }
+            },
+            "note": {
+                "1": "Favoriti, recenzije i podešavanja povezani su sa vašim korisničkim nalogom.",
+                "2": "Određeni podaci mogu biti privremeno sačuvani lokalno na uređaju radi boljeg korisničkog iskustva.",
+                "3": "Korišćenjem aplikacije prihvatate buduća unapređenja i izmene funkcionalnosti sistema."
+            }
+            },
     "map":  {
                 "searchPlaceholder":  "Pretraži objekte, rute...",
                 "geoUnsupported":  "Geolokacija nije podržana u ovom browseru.",
