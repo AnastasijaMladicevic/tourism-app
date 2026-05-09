@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
+import { TranslationService } from './translation.service';
 
 export interface EventDto {
   id: number;
@@ -88,6 +89,7 @@ export class EventService {
   constructor(
     private readonly http: HttpClient,
     private readonly activeRegionService: ActiveRegionService,
+    private readonly translationService: TranslationService,
   ) { }
 
   private addLang(params: HttpParams, options?: RegionRequestOptions): HttpParams {
@@ -95,8 +97,7 @@ export class EventService {
       return params;
     }
 
-    const lang = localStorage.getItem('appLanguage') || 'sr';
-    return params.set('Lang', lang);
+    return params.set('Lang', this.translationService.language());
   }
 
   getById(id: number): Observable<EventDto> {

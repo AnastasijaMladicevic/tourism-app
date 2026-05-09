@@ -15,6 +15,7 @@ const LANGUAGE_LABEL_KEYS: Record<AppLanguage, string> = {
 export class TranslationService {
   private readonly http = inject(HttpClient);
   private readonly storageKey = 'spirego-language';
+  private readonly legacyStorageKey = 'appLanguage';
   private readonly translationAssetVersion = '2026-04-30-profile-favorites-edit';
   private readonly activeLanguage = signal<AppLanguage>(this.readStoredLanguage());
   private translations: Record<string, string> = {};
@@ -29,6 +30,7 @@ export class TranslationService {
 
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(this.storageKey, lang);
+        localStorage.setItem(this.legacyStorageKey, lang);
       }
 
       if (typeof document !== 'undefined') {
@@ -113,7 +115,12 @@ export class TranslationService {
     if (typeof localStorage === 'undefined') {
       return 'sr';
     }
-    return this.normalizeLanguage(localStorage.getItem(this.storageKey));
+
+    const storedLanguage =
+      localStorage.getItem(this.storageKey) ??
+      localStorage.getItem(this.legacyStorageKey);
+
+    return this.normalizeLanguage(storedLanguage);
   }
 
   private normalizeLanguage(language?: string | null): AppLanguage {

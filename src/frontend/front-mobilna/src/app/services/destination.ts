@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
+import { TranslationService } from './translation.service';
 
 export interface DestinationDto {
   id: number;
@@ -74,6 +75,7 @@ export class DestinationService {
   constructor(
     private readonly http: HttpClient,
     private readonly activeRegionService: ActiveRegionService,
+    private readonly translationService: TranslationService,
   ) { }
 
   private addLang(params: HttpParams, options?: RegionRequestOptions): HttpParams {
@@ -81,8 +83,7 @@ export class DestinationService {
       return params;
     }
 
-    const lang = localStorage.getItem('appLanguage') || 'sr';
-    return params.set('Lang', lang);
+    return params.set('Lang', this.translationService.language());
   }
 
   getAll(

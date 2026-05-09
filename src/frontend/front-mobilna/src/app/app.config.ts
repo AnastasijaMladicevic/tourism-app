@@ -4,6 +4,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
 import { authInterceptor } from './interceptors/auth-interceptor';
 import { TranslationService } from './services/translation.service';
+import { ActiveRegionService } from './services/active-region';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -11,10 +12,17 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     {
       provide: APP_INITIALIZER,
-      useFactory: (translationService: TranslationService) => {
-        return () => translationService.loadInitialTranslations();
+      useFactory: (
+        translationService: TranslationService,
+        activeRegionService: ActiveRegionService,
+      ) => {
+        return () =>
+          Promise.all([
+            translationService.loadInitialTranslations(),
+            activeRegionService.loadInitialRegion(),
+          ]).then(() => undefined);
       },
-      deps: [TranslationService],
+      deps: [TranslationService, ActiveRegionService],
       multi: true,
     },
   ],

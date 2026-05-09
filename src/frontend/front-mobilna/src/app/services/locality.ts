@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
+import { TranslationService } from './translation.service';
 
 export interface LocalityDto {
   id: number;
@@ -67,6 +68,7 @@ export class LocalityService {
   constructor(
     private readonly http: HttpClient,
     private readonly activeRegionService: ActiveRegionService,
+    private readonly translationService: TranslationService,
   ) { }
   getNearby(
     query: NearbyLocalityQueryParams,
@@ -81,12 +83,15 @@ export class LocalityService {
       }
     });
 
-    params = this.addLang(params);
+    params = this.addLang(params, options);
     return this.http.get<PagedLocalityResultDto<LocalityDto>>(`${this.url}/nearby`, { params });
   }
-  private addLang(params: HttpParams): HttpParams {
-    const lang = localStorage.getItem('appLanguage') || 'sr';
-    return params.set('Lang', lang);
+  private addLang(params: HttpParams, options?: RegionRequestOptions): HttpParams {
+    if (options?.bypassLanguage) {
+      return params;
+    }
+
+    return params.set('Lang', this.translationService.language());
   }
 
   getAll(
@@ -104,7 +109,7 @@ export class LocalityService {
       });
     }
 
-    params = this.addLang(params);
+    params = this.addLang(params, options);
     return this.http.get<LocalityDto[]>(this.url, { params });
   }
 

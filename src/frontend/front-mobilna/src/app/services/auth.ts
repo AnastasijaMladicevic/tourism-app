@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { TranslationService } from './translation.service';
+import { ActiveRegionService } from './active-region';
 
 export interface LoginDto {
   email: string;
@@ -85,6 +86,7 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private translationService: TranslationService,
+    private activeRegionService: ActiveRegionService,
   ) {
     this.syncStoredUserWithAuthenticatedRole();
 
@@ -110,6 +112,7 @@ export class AuthService {
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
+        void this.activeRegionService.loadInitialRegion();
       }),
     );
   }
@@ -262,6 +265,7 @@ export class AuthService {
     localStorage.setItem('token', response.token);
     localStorage.setItem('refreshToken', response.refreshToken);
     this.setCurrentUser(response.user);
+    void this.activeRegionService.loadInitialRegion();
   }
 
   private readStoredUser(): UserDto | null {

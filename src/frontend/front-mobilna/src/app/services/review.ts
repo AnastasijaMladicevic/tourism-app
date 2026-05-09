@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
 import { ImageDto } from './image';
+import { TranslationService } from './translation.service';
 
 export interface ReviewDto {
   id: number;
@@ -53,11 +54,15 @@ export class ReviewService {
   constructor(
     private readonly http: HttpClient,
     private readonly activeRegionService: ActiveRegionService,
+    private readonly translationService: TranslationService,
   ) { }
 
-  private addLanguage(params: HttpParams): HttpParams {
-    const lang = localStorage.getItem('appLanguage') || 'sr';
-    return params.set('LanguageCode', lang);
+  private addLanguage(params: HttpParams, options?: RegionRequestOptions): HttpParams {
+    if (options?.bypassLanguage) {
+      return params;
+    }
+
+    return params.set('LanguageCode', this.translationService.language());
   }
 
   getForObject(objectId: number): Observable<ReviewDto[]> {
@@ -81,7 +86,7 @@ export class ReviewService {
       });
     }
 
-    params = this.addLanguage(params);
+    params = this.addLanguage(params, options);
     return this.http.get<PagedReviewResultDto<ReviewDto>>(this.baseUrl, { params });
   }
 
@@ -100,7 +105,7 @@ export class ReviewService {
       });
     }
 
-    params = this.addLanguage(params);
+    params = this.addLanguage(params, options);
     return this.http.get<PagedReviewResultDto<ReviewDto>>(`${this.baseUrl}/my`, { params });
   }
 

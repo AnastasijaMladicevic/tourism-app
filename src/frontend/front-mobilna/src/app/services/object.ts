@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ReviewDto } from './review';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
+import { TranslationService } from './translation.service';
 
 export interface ObjectImageDto {
   id: number;
@@ -97,6 +98,7 @@ export class ObjectService {
   constructor(
     private readonly http: HttpClient,
     private readonly activeRegionService: ActiveRegionService,
+    private readonly translationService: TranslationService,
   ) { }
 
   private addLang(params: HttpParams, options?: RegionRequestOptions): HttpParams {
@@ -104,8 +106,7 @@ export class ObjectService {
       return params;
     }
 
-    const lang = localStorage.getItem('appLanguage') || 'sr';
-    return params.set('Lang', lang);
+    return params.set('Lang', this.translationService.language());
   }
 
   getAll(

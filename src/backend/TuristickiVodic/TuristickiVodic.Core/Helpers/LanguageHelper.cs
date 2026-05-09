@@ -12,10 +12,26 @@ namespace TuristickiVodic.Core.Helpers
                 return "sr";
 
             var normalized = lang.Trim().ToLowerInvariant();
+            var dashIndex = normalized.IndexOf('-');
+            if (dashIndex > 0)
+                normalized = normalized[..dashIndex];
+
+            var underscoreIndex = normalized.IndexOf('_');
+            if (underscoreIndex > 0)
+                normalized = normalized[..underscoreIndex];
 
             // Crnogorski i srpski su isti jezik za svrhe prevoda
-            if (normalized == "me")
+            if (normalized == "me" || normalized == "cnr" || normalized == "srp" || normalized == "sr")
                 return "sr";
+
+            if (normalized == "eng")
+                return "en";
+
+            if (normalized == "spa")
+                return "es";
+
+            if (normalized == "ita")
+                return "it";
 
             return normalized;
         }

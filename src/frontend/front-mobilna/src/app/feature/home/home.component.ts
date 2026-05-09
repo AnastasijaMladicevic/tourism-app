@@ -21,6 +21,7 @@ import { EventPlannerService } from '../../services/event-planner';
 import { PendingActionService } from '../../services/pending-action';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
+import { ActiveRegionService } from '../../services/active-region';
 
 interface PlaceCard {
   title: string;
@@ -143,7 +144,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     private plannerService: PlannerLocalPreferencesService,
     private eventPlannerService: EventPlannerService,
     private pendingActionService: PendingActionService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private activeRegionService: ActiveRegionService,
   ) { }
 
   
@@ -155,14 +157,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private get activeRegionId(): number {
-    const storedRegionId = Number(localStorage.getItem('spirego-region-id'));
-  
-    if (!storedRegionId || Number.isNaN(storedRegionId)) {
-      localStorage.setItem('spirego-region-id', '1');
-      return 1;
-    }
-  
-    return storedRegionId;
+    return this.activeRegionService.getActiveRegionId() ?? 1;
   }
 
   private applyPlannerStateToPlaceCards(list: PlaceCard[]): void {

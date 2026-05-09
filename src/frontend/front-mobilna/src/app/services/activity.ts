@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
+import { TranslationService } from './translation.service';
 
 export interface ActivityDto {
   id: number;
@@ -78,6 +79,7 @@ export class ActivityService {
   constructor(
     private readonly http: HttpClient,
     private readonly activeRegionService: ActiveRegionService,
+    private readonly translationService: TranslationService,
   ) { }
   getNearby(
     query: NearbyActivityQueryParams,
@@ -92,7 +94,7 @@ export class ActivityService {
       }
     });
 
-    params = this.addLang(params);
+    params = this.addLang(params, options);
     return this.http.get<PagedActivityResultDto<ActivityDto>>(`${this.url}/nearby`, { params });
   }
 
@@ -101,8 +103,7 @@ export class ActivityService {
       return params;
     }
 
-    const lang = localStorage.getItem('appLanguage') || 'sr';
-    return params.set('Lang', lang);
+    return params.set('Lang', this.translationService.language());
   }
 
   getAll(

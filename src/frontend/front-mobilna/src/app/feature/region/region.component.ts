@@ -67,7 +67,7 @@ export class RegionComponent implements OnInit {
     }
 
     if (!this.authService.isLoggedIn()) {
-      this.activeRegionService.setActiveRegionId(selected);
+      this.activeRegionService.setActiveRegionId(selected, 'guest');
       this.appliedId.set(selected);
       this.feedback.set(this.translationService.translate('region.saved'));
       this.router.navigate(['/home']);
@@ -83,7 +83,7 @@ export class RegionComponent implements OnInit {
       .subscribe({
         next: (response) => {
           const appliedRegionId = this.resolvePreferredRegionId(response, this.options()) ?? selected;
-          this.activeRegionService.setActiveRegionId(appliedRegionId);
+          this.activeRegionService.setActiveRegionId(appliedRegionId, 'user');
           this.selectedId.set(appliedRegionId);
           this.appliedId.set(appliedRegionId);
           this.feedback.set(this.translationService.translate('region.saved'));
@@ -161,7 +161,10 @@ export class RegionComponent implements OnInit {
           this.appliedId.set(initialSelection);
 
           if (initialSelection != null) {
-            this.activeRegionService.setActiveRegionId(initialSelection);
+            this.activeRegionService.setActiveRegionId(
+              initialSelection,
+              this.authService.isLoggedIn() ? 'user' : 'guest',
+            );
           }
         },
         error: () => {
