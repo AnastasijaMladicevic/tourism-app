@@ -401,23 +401,20 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.activeFilters.push(key);
     }
+
+    if (
+      this.selectedItem &&
+      this.activeFilters.length > 0 &&
+      !this.activeFilters.includes(this.selectedType)
+    ) {
+      this.closeCard();
+    }
+
     this.applyFilters();
   }
 
   private applyFilters(): void {
-    const map = this.mapService['map'];
-    if (!map) return;
-
-    this.mapService['markerMap'].forEach((value: any, key: string) => {
-      const type = key.split(':')[0];
-      const marker = value.marker;
-
-      if (this.activeFilters.length === 0 || this.activeFilters.includes(type)) {
-        if (!map.hasLayer(marker)) marker.addTo(map);
-      } else if (map.hasLayer(marker)) {
-        marker.remove();
-      }
-    });
+    this.mapService.setActiveFilters(this.activeFilters);
   }
 
   /**
