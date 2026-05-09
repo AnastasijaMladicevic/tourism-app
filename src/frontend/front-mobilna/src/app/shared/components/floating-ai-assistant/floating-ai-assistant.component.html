@@ -1,0 +1,99 @@
+@if (!isOpen()) {
+  <button
+    class="ai-fab"
+    type="button"
+    (click)="togglePanel()"
+    [attr.aria-label]="'support.aiFloatingOpen' | translate"
+  >
+    <span class="ai-fab__icon">&#10024;</span>
+    <span class="ai-fab__label">{{ 'support.aiFloatingShort' | translate }}</span>
+  </button>
+}
+
+@if (isOpen()) {
+  <div class="ai-overlay" (click)="closePanel()">
+    <section class="ai-panel" (click)="$event.stopPropagation()">
+      <header class="ai-panel__header">
+        <div class="ai-panel__title-wrap">
+          <span class="ai-panel__badge">&#10024;</span>
+          <div>
+            <h2>{{ 'support.aiFloatingTitle' | translate }}</h2>
+            <p>{{ 'support.aiFloatingBody' | translate }}</p>
+          </div>
+        </div>
+
+        <button
+          class="ai-panel__close"
+          type="button"
+          (click)="closePanel()"
+          [attr.aria-label]="'common.close' | translate"
+        >
+          ×
+        </button>
+      </header>
+
+      <div class="ai-prompts">
+        <button type="button" (click)="usePrompt('gde mogu da idem sa decom u setnju')">
+          {{ 'support.aiPromptWalk' | translate }}
+        </button>
+        <button type="button" (click)="usePrompt('preporuci mi restoran za rucak')">
+          {{ 'support.aiPromptLunch' | translate }}
+        </button>
+        <button type="button" (click)="usePrompt('hotel sa bazenom u blizini')">
+          {{ 'support.aiPromptHotel' | translate }}
+        </button>
+      </div>
+
+      <div class="ai-thread" #threadContainer>
+        @if (!chatMessages().length && !aiLoading()) {
+          <div class="ai-thread__welcome">
+            <strong>{{ 'support.aiFloatingWelcomeTitle' | translate }}</strong>
+            <p>{{ 'support.aiEmpty' | translate }}</p>
+          </div>
+        }
+
+        @for (message of chatMessages(); track $index) {
+          <article
+            class="ai-message"
+            [class.ai-message--user]="message.role === 'user'"
+            [class.ai-message--assistant]="message.role === 'assistant'"
+          >
+            <p>{{ message.content }}</p>
+
+            @if (message.warning) {
+              <small>{{ message.warning }}</small>
+            }
+
+            @if (message.role === 'assistant' && message.results?.length) {
+              <div class="ai-results">
+                @for (result of message.results; track trackResult($index, result)) {
+                  <button type="button" class="ai-result-chip" (click)="openResult(result)">
+                    <strong>{{ result.name }}</strong>
+                    <span>{{ result.typeName }} · {{ result.location }}</span>
+                  </button>
+                }
+              </div>
+            }
+          </article>
+        }
+
+        @if (aiLoading()) {
+          <div class="ai-thinking">{{ 'support.aiThinking' | translate }}</div>
+        }
+      </div>
+
+      <div class="ai-compose">
+        <textarea
+          [value]="aiInput()"
+          (input)="onAiInput(($any($event.target)).value)"
+          (keydown)="onAiKeydown($event)"
+          [placeholder]="'support.aiPlaceholder' | translate"
+        ></textarea>
+
+        <button class="ai-send" type="button" (click)="sendAiMessage()" [disabled]="aiLoading()">
+          {{ 'support.aiSend' | translate }}
+        </button>
+      </div>
+    </section>
+  </div>
+}

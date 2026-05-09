@@ -27,74 +27,6 @@
     </section>
 
     <section class="support-section">
-      <h3>{{ 'support.aiTitle' | translate }}</h3>
-
-      <div class="ai-card">
-        <p class="ai-card__intro">{{ 'support.aiBody' | translate }}</p>
-
-        <div class="ai-prompts">
-          <button type="button" (click)="usePrompt('gde mogu da idem sa decom u setnju')">
-            {{ 'support.aiPromptWalk' | translate }}
-          </button>
-          <button type="button" (click)="usePrompt('preporuci mi restoran za rucak')">
-            {{ 'support.aiPromptLunch' | translate }}
-          </button>
-          <button type="button" (click)="usePrompt('hotel sa bazenom u blizini')">
-            {{ 'support.aiPromptHotel' | translate }}
-          </button>
-        </div>
-
-        <div class="ai-thread">
-          @if (!chatMessages().length && !aiLoading()) {
-            <p class="ai-thread__empty">{{ 'support.aiEmpty' | translate }}</p>
-          }
-
-          @for (message of chatMessages(); track $index) {
-            <article
-              class="ai-message"
-              [class.ai-message--user]="message.role === 'user'"
-              [class.ai-message--assistant]="message.role === 'assistant'"
-            >
-              <p>{{ message.content }}</p>
-
-              @if (message.warning) {
-                <small>{{ message.warning }}</small>
-              }
-
-              @if (message.role === 'assistant' && message.results?.length) {
-                <div class="ai-results">
-                  @for (result of message.results; track result.category + '-' + result.id) {
-                    <button type="button" class="ai-result-chip" (click)="openResult(result)">
-                      <strong>{{ result.name }}</strong>
-                      <span>{{ result.typeName }} · {{ result.location }}</span>
-                    </button>
-                  }
-                </div>
-              }
-            </article>
-          }
-
-          @if (aiLoading()) {
-            <div class="ai-thinking">{{ 'support.aiThinking' | translate }}</div>
-          }
-        </div>
-
-        <label class="ai-compose">
-          <textarea
-            [value]="aiInput()"
-            (input)="onAiInput(($any($event.target)).value)"
-            (keydown)="onAiKeydown($event)"
-            [placeholder]="'support.aiPlaceholder' | translate"
-          ></textarea>
-        </label>
-
-        <button class="ai-send" type="button" (click)="sendAiMessage()" [disabled]="aiLoading()">
-          {{ 'support.aiSend' | translate }}
-        </button>
-      </div>
-    </section>
-
-    <section class="support-section">
       <h3>{{ 'support.faqTitle' | translate }}</h3>
 
       <div class="faq-card">
@@ -125,12 +57,12 @@
 
       <div class="contact-list">
         <a class="contact-card" href="tel:+38220123456">
-          <div class="contact-card__icon">☎</div>
+          <div class="contact-card__icon">&#9742;</div>
           <div class="contact-card__content">
             <strong>{{ 'support.contactUsers' | translate }}</strong>
             <span>{{ 'support.contactUsersBody' | translate }}</span>
           </div>
-          <span class="contact-card__arrow">›</span>
+          <span class="contact-card__arrow">&#8250;</span>
         </a>
 
         <a class="contact-card" href="mailto:support@spirego.com">
@@ -139,7 +71,7 @@
             <strong>{{ 'support.reportProblem' | translate }}</strong>
             <span>{{ 'support.reportProblemBody' | translate }}</span>
           </div>
-          <span class="contact-card__arrow">›</span>
+          <span class="contact-card__arrow">&#8250;</span>
         </a>
       </div>
     </section>
