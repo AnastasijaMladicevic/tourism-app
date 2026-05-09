@@ -3,10 +3,10 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  HostListener,
   NgZone,
   OnDestroy,
   OnInit,
-  HostListener,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -14,6 +14,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, forkJoin, map, of, switchMap } from 'rxjs';
+import * as L from 'leaflet';
 
 import { MatIconModule } from '@angular/material/icon';
 import {
@@ -58,6 +59,7 @@ interface AdminMapDestination extends DestinationDto {
   encapsulation: ViewEncapsulation.None,
 })
 export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
+  private static readonly TARGET_DETAIL_ZOOM = 15;
   @ViewChild('cardElement') private cardElementRef?: ElementRef<HTMLElement>;
   @ViewChild('mapPage') private mapPageRef?: ElementRef<HTMLElement>;
 
@@ -66,19 +68,18 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   showSuggestions = false;
 
   selectedItem: AdminMapDestination | null = null;
-  selectedType: 'destination' | '' = '';
   isCardVisible = false;
   cardPosition = { left: 16, top: 16 };
-  private allItems: SearchResult[] = [];
+  allItems: SearchResult[] = [];
+
   private readonly markerClickHandler = (event: Event) => {
     const customEvent = event as CustomEvent<{ data: AdminMapDestination }>;
 
     this.ngZone.run(() => {
       this.selectedItem = customEvent.detail.data;
-      this.selectedType = 'destination';
       this.isCardVisible = false;
       this.cdr.detectChanges();
-      this.scheduleCardPresentation();
+      this.focusSelectedMarker();
     });
   };
 
@@ -102,7 +103,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const lng = state?.lng ?? 18.771;
     const zoom = state?.zoom ?? 13;
 
-    this.mapService.initMap('main-map', lat, lng, zoom);
+    this.mapService.initMap('main-map', lat, lng, zoom, { enableClustering: true });
     if (!state?.lat || !state?.lng) {
       this.focusActiveRegion();
     }
@@ -123,13 +124,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   @HostListener('window:resize')
   onWindowResize(): void {
     this.scheduleCardPresentation();
-  }
-
-  private matchesAllTerms(item: SearchResult, terms: string[]): boolean {
-    const name = item.name.toLowerCase();
-    const desc = (item.raw.description ?? '').toLowerCase();
-
-    return terms.every((term) => name.includes(term) || desc.includes(term));
   }
 
   onSearchInput(): void {
@@ -154,19 +148,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showSuggestions = this.searchResults.length > 0;
   }
 
-  private scoreItem(item: SearchResult, terms: string[]): number {
-    let score = 0;
-    const name = item.name.toLowerCase();
-    const desc = (item.raw.description ?? '').toLowerCase();
-
-    for (const term of terms) {
-      if (name.includes(term)) score += 3;
-      if (desc.includes(term)) score += 1;
-    }
-
-    return score;
-  }
-
   onSearchBlur(): void {
     setTimeout(() => {
       this.showSuggestions = false;
@@ -182,13 +163,87 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   selectSuggestion(result: SearchResult): void {
     this.searchQuery = result.name;
     this.showSuggestions = false;
+    this.mapService.triggerMarkerClick(result.markerType, result.id, 16);
+  }
 
-    if (result.lat != null && result.lng != null) {
-      this.mapService.flyTo(result.lat, result.lng, 16);
-      setTimeout(() => {
-        this.mapService.triggerMarkerClick(result.markerType, result.id);
-      }, 600);
+  getItemImage(item: AdminMapDestination): string {
+    return item.mainImageUrl || item.images?.[0]?.url || '';
+  }
+
+  getItemLocation(item: AdminMapDestination): string {
+    return item.regionName ?? item.destinationTypeName ?? '';
+  }
+
+  getWorkingStatus(item: AdminMapDestination): boolean | null {
+    const workingHours = item.workingHours;
+    if (!workingHours) return null;
+
+    try {
+      const parsed = typeof workingHours === 'string' ? JSON.parse(workingHours) : workingHours;
+      const days = ['ned', 'pon', 'uto', 'sri', 'cet', 'pet', 'sub'];
+      const hours = parsed[days[new Date().getDay()]] || parsed['pon'];
+      if (!hours || hours === '00:00-24:00') return true;
+
+      const [open, close] = hours.split('-');
+      const current = new Date().getHours() * 60 + new Date().getMinutes();
+      const toMinutes = (value: string) => {
+        const [h, m] = value.split(':').map(Number);
+        return h * 60 + m;
+      };
+
+      return current >= toMinutes(open) && current <= toMinutes(close);
+    } catch {
+      return null;
     }
+  }
+
+  formatDistance(km: number): string {
+    return km < 1 ? `${Math.round(km * 1000)} m` : `${km} km`;
+  }
+
+  openDetails(item: AdminMapDestination): void {
+    this.selectedItem = item;
+    this.router.navigate(['/admin/destinations']);
+  }
+
+  onCardImageLoad(): void {
+    this.scheduleCardPresentation();
+  }
+
+  closeCard(event?: Event): void {
+    event?.stopPropagation();
+    this.selectedItem = null;
+    this.isCardVisible = false;
+    this.mapService.clearMarkerFocus();
+    this.cdr.detectChanges();
+  }
+
+  zoomIn(): void {
+    this.mapService.getMap()?.zoomIn();
+  }
+
+  zoomOut(): void {
+    this.mapService.getMap()?.zoomOut();
+  }
+
+  private matchesAllTerms(item: SearchResult, terms: string[]): boolean {
+    const name = item.name.toLowerCase();
+    const desc = (item.raw.description ?? '').toLowerCase();
+
+    return terms.every((term) => name.includes(term) || desc.includes(term));
+  }
+
+  private scoreItem(item: SearchResult, terms: string[]): number {
+    let score = 0;
+    const name = item.name.toLowerCase();
+    const desc = (item.raw.description ?? '').toLowerCase();
+
+    for (const term of terms) {
+      if (name.includes(term)) score += 3;
+      if (desc.includes(term)) score += 1;
+    }
+
+    return score;
   }
 
   private loadAllData(state?: any): void {
@@ -295,16 +350,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     };
   }
 
-  getItemImage(): string {
-    if (!this.selectedItem) return '';
-    return this.selectedItem.mainImageUrl || this.selectedItem.images?.[0]?.url || '';
-  }
-
-  getItemLocation(): string {
-    if (!this.selectedItem) return '';
-    return this.selectedItem.regionName ?? this.selectedItem.destinationTypeName ?? '';
-  }
-
   private focusActiveRegion(): void {
     const activeRegionId = this.activeRegionService.getActiveRegionId();
     const regionRequest = activeRegionId
@@ -329,57 +374,38 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  getWorkingStatus(): boolean | null {
-    const workingHours = this.selectedItem?.workingHours;
-    if (!workingHours) return null;
-
-    try {
-      const parsed = typeof workingHours === 'string' ? JSON.parse(workingHours) : workingHours;
-      const days = ['ned', 'pon', 'uto', 'sri', 'cet', 'pet', 'sub'];
-      const hours = parsed[days[new Date().getDay()]] || parsed['pon'];
-      if (!hours || hours === '00:00-24:00') return true;
-
-      const [open, close] = hours.split('-');
-      const current = new Date().getHours() * 60 + new Date().getMinutes();
-      const toMinutes = (value: string) => {
-        const [h, m] = value.split(':').map(Number);
-        return h * 60 + m;
-      };
-
-      return current >= toMinutes(open) && current <= toMinutes(close);
-    } catch {
-      return null;
+  private focusSelectedMarker(): void {
+    if (!this.selectedItem) {
+      return;
     }
-  }
 
-  formatDistance(km: number): string {
-    return km < 1 ? `${Math.round(km * 1000)} m` : `${km} km`;
-  }
+    const map = this.mapService.getMap();
+    const latitude = this.selectedItem.latitude;
+    const longitude = this.selectedItem.longitude;
+    if (!map || latitude == null || longitude == null) {
+      return;
+    }
 
-  openDetails(): void {
-    if (!this.selectedItem) return;
+    const targetLatLng = L.latLng(latitude, longitude);
+    const currentZoom = map.getZoom();
+    const targetZoom = MapComponent.TARGET_DETAIL_ZOOM;
+    const currentCenter = map.getCenter();
+    const distanceToTarget = currentCenter.distanceTo(targetLatLng);
+    const isAlreadyFocused = currentZoom >= targetZoom && distanceToTarget < 6;
 
-    this.router.navigate(['/admin/destinations']);
-  }
+    if (isAlreadyFocused) {
+      this.scheduleCardPresentation();
+      return;
+    }
 
-  onCardImageLoad(): void {
-    this.scheduleCardPresentation();
-  }
+    map.once('moveend', () => this.scheduleCardPresentation());
 
-  closeCard(): void {
-    this.selectedItem = null;
-    this.selectedType = '';
-    this.isCardVisible = false;
-    this.mapService.clearMarkerFocus();
-    this.cdr.detectChanges();
-  }
+    if (currentZoom < targetZoom) {
+      map.flyTo(targetLatLng, targetZoom, { duration: 0.75 });
+      return;
+    }
 
-  zoomIn(): void {
-    this.mapService.getMap()?.zoomIn();
-  }
-
-  zoomOut(): void {
-    this.mapService.getMap()?.zoomOut();
+    map.panTo(targetLatLng, { animate: true, duration: 0.45 });
   }
 
   private scheduleCardPresentation(): void {
