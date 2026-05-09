@@ -227,44 +227,6 @@
       </div>
     </section>
 
-    <button class="language-card" type="button" (click)="toggleLanguageMenu()">
-      <div class="language-card__icon">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.9 9h-3.1a15.9 15.9 0 0 0-1.5-5A8 8 0 0 1 18.9 11ZM12 4c1.2 1.5 2.1 4 2.4 7H9.6c.3-3 1.2-5.5 2.4-7ZM6.7 6a15.9 15.9 0 0 0-1.5 5H2.1A8 8 0 0 1 6.7 6ZM4.1 13h3.1a15.9 15.9 0 0 0 1.5 5A8 8 0 0 1 4.1 13Zm5.5 0h4.8c-.3 3-1.2 5.5-2.4 7-1.2-1.5-2.1-4-2.4-7Zm4.7 5a15.9 15.9 0 0 0 1.5-5h3.1a8 8 0 0 1-4.6 5Z"
-          />
-        </svg>
-      </div>
-      <div class="language-card__content">
-        <strong>{{ 'editProfile.appLanguage' | translate }}</strong>
-        <span>{{ 'editProfile.currentLanguage' | translate: { language: languageLabel() } }}</span>
-      </div>
-      <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="m9 6 6 6-6 6" />
-      </svg>
-    </button>
-
-    @if (isLanguageMenuOpen()) {
-      <div class="language-picker">
-        @for (option of languageOptions; track option.code) {
-          <button class="language-option" type="button" (click)="selectLanguageOption(option.code)">
-            <div class="language-option__content">
-              <strong>{{ option.labelKey | translate }}</strong>
-            </div>
-
-            <span
-              class="language-option__radio"
-              [class.language-option__radio--active]="appLanguageCode() === option.code"
-            >
-              @if (appLanguageCode() === option.code) {
-                <span></span>
-              }
-            </span>
-          </button>
-        }
-      </div>
-    }
-
     <button class="language-card password-card" type="button" (click)="openChangePassword()">
       <div class="language-card__icon">
         <svg viewBox="0 0 24 24" aria-hidden="true">

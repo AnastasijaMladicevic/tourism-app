@@ -59,24 +59,14 @@ export class ProfileComponent implements OnInit {
       ],
     },
     {
-      titleKey: 'profile.section.settings',
-      items: [
-        { titleKey: 'profile.language', icon: 'language', accent: 'green', route: '/language' },
-        { titleKey: 'profile.support', icon: 'help', accent: 'gray', route: '/support' },
-      ],
-    },
-    {
       titleKey: 'profile.section.account',
       items: [
-        { titleKey: 'profile.privacy', icon: 'shield', accent: 'blue', route: '/privacy-data' },
-        { titleKey: 'profile.terms', icon: 'document', accent: 'gray', route: '/terms' },
         {
           titleKey: 'profile.moderator',
           icon: 'document',
           accent: 'gray',
           route: '/moderator-access',
         },
-        { titleKey: 'profile.about', icon: 'document', accent: 'gray', route: '/about' },
         { titleKey: 'profile.logout', icon: 'logout', accent: 'red', action: 'logout' },
       ],
     },

@@ -56,11 +56,11 @@ export class DashboardComponent implements AfterViewInit {
 
   // ---- Top regions bar chart ----
   topRegions = [
-    { name: 'Budva',       percent: 97, score: '4.9' },
-    { name: 'Kotor',       percent: 83, score: '4.8' },
+    { name: 'Budva', percent: 97, score: '4.9' },
+    { name: 'Kotor', percent: 83, score: '4.8' },
     { name: 'Herceg Novi', percent: 76, score: '4.7' },
     { name: 'Rafailovići', percent: 61, score: '4.6' },
-    { name: 'Bečići',      percent: 38, score: '4.5' }
+    { name: 'Bečići', percent: 38, score: '4.5' }
   ];
 
   // ---- Mapa markeri ----
@@ -94,7 +94,7 @@ export class DashboardComponent implements AfterViewInit {
     });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap'
+      attribution: ''
     }).addTo(map);
 
     this.mapMarkers.forEach(m => {

@@ -41,6 +41,7 @@ export class NavbarComponent {
     { labelKey: 'nav.favorites', icon: 'favorite', route: '/favorites' },
     { labelKey: 'nav.planner', icon: 'calendar_month', route: '/planner' },
     { labelKey: 'nav.profile', icon: 'person_outline', route: '/profile' },
+    { labelKey: 'Podesavanja', icon: 'settings', route: '/settings' },
   ];
 
   constructor(
