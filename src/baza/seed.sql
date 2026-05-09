@@ -11725,13 +11725,13 @@ VALUES
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Nocni provod Budva'),
     NOW()),
 (
-    'https://www.sentandrea.com/images/2018/11/s2.jpg',
+    'https://www.hrana-pice-price.com/wp-content/uploads/2019/04/prawn-2370680_1920.jpg',
     'Degustacija morskih specijaliteta',
     true,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
     NOW()),
 (
-    'https://www.sentandrea.com/images/2018/11/s4.jpg',
+    'https://citymagazine.danas.rs/wp-content/uploads/2024/09/shutterstock_454387750.jpg.webp',
     'Degustacija morskih specijaliteta',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
@@ -11743,7 +11743,7 @@ VALUES
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
     NOW()),
 (
-    'https://www.sentandrea.com/images/2018/11/oh2-650x630.jpg',
+    'https://bonapeti.rs/files/1200x800/midi-skaridi-seafood33.webp',
     'Degustacija morskih specijaliteta',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
@@ -12583,7 +12583,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.lakedcomo@spirego.com'),
  NOW(), NOW()),
 
-('Belgrade', 'Tvrđava, gradske ulice i noćni ritam prestonice',
+('Beograd', 'Tvrđava, gradske ulice i noćni ritam prestonice',
  'Beograd je grad širokih bulevara, tvrđave iznad ušća i kafana koje žive do kasno. Posetioci ovde lako kombinuju istorijske tačke, moderni gradski ritam, dobru kafu i večere koje se često produže više nego što je planirano.',
  ST_SetSRID(ST_MakePoint(20.4573, 44.8176), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
@@ -12691,7 +12691,7 @@ SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Fl
 WHERE "Email" = 'manager.florence@spirego.com';
 
 UPDATE "Users"
-SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Belgrade')
+SET "ManagedDestinationId" = (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd')
 WHERE "Email" = 'manager.belgrade@spirego.com';
 
 UPDATE "Users"
@@ -12816,14 +12816,14 @@ VALUES
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Florence'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
-('Terazije Belgrade', 'Širi centar Beograda sa hotelima, starim gradskim fasadama i lakim pristupom pešačkim zonama.',
+('Terazije Beograd', 'Širi centar Beograda sa hotelima, starim gradskim fasadama i lakim pristupom pešačkim zonama.',
  ST_SetSRID(ST_MakePoint(20.4623, 44.8141), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Belgrade'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'), NOW()),
-('Kalemegdan Belgrade', 'Tvrđava i park iznad ušća, omiljena tačka za šetnju, pogled i kraće predah pauze.',
+('Kalemegdan Beograd', 'Tvrđava i park iznad ušća, omiljena tačka za šetnju, pogled i kraće predah pauze.',
  ST_SetSRID(ST_MakePoint(20.4489, 44.8230), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Belgrade'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Tvrdjava'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'), NOW()),
 ('Trg Slobode Novi Sad', 'Glavni gradski trg Novog Sada, pregledan i prijatan za obilazak peške sa mnogo kafića u neposrednoj blizini.',
@@ -12852,7 +12852,7 @@ SET "CreatedByUserId" = d."ManagedByUserId",
     "UpdatedAt" = NOW()
 FROM "Destinations" d
 WHERE l."DestinationId" = d."Id"
-  AND d."Name" IN ('Rome', 'Venice', 'Florence', 'Belgrade', 'Novi Sad', 'Zlatibor')
+  AND d."Name" IN ('Rome', 'Venice', 'Florence', 'Beograd', 'Novi Sad', 'Zlatibor')
   AND d."ManagedByUserId" IS NOT NULL;
 
 -- 15.3 ITALIJA + SRBIJA OBJEKTI
@@ -12908,19 +12908,19 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.florence@spirego.com'),
  NOW(), NOW(), NOW()),
-('Hotel Moskva Belgrade', 'Istorijski hotel u centru Beograda koji je dobar izbor za goste kojima je bitna lokacija i prepoznatljiv gradski ambijent. Koristan je i za poslovna putovanja i za kratke gradske vikende.', 'Terazije 20, Belgrade', '+381113648999', 'https://hotelmoskva.rs/',
+('Hotel Moskva Beograd', 'Istorijski hotel u centru Beograda koji je dobar izbor za goste kojima je bitna lokacija i prepoznatljiv gradski ambijent. Koristan je i za poslovna putovanja i za kratke gradske vikende.', 'Terazije 20, Belgrade', '+381113648999', 'https://hotelmoskva.rs/',
  NULL, NULL, '{"pon":"00:00-24:00"}', 185.00, ARRAY['WiFi', 'Spa', 'Dorucak', 'Poslasticarnica'], ST_SetSRID(ST_MakePoint(20.4613, 44.8135), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Terazije Belgrade'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Belgrade'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Terazije Beograd'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
  NOW(), NOW(), NOW()),
 ('Restoran Frans Beograd', 'Veliki gradski restoran sa širokim jelovnikom, baštom i ponudom koja pokriva i klasična domaća jela i internacionalnije izbore. Dobro radi i za porodične ručkove i za duža večernja sedenja.', 'Bulevar oslobodjenja 18G, Belgrade', '+381652641944', 'https://frans.rs/',
  'https://frans.rs/menu/jelovnik/', 'Srpska i internacionalna', '{"pon":"09:00-23:30"}', 27.00, ARRAY['Basta', 'Rezervacije', 'Parking', 'Vegetarijanske opcije'], ST_SetSRID(ST_MakePoint(20.4691, 44.7976), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Terazije Belgrade'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Belgrade'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Terazije Beograd'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
  NOW(), NOW(), NOW()),
@@ -12991,8 +12991,8 @@ VALUES
 ('Belgrade Fortress Sunset Walk', 'Šetnja kroz Kalemegdan sa naglaskom na pogled ka ušću, kratke istorijske priče i preporuke za nastavak večeri u centru.',
  ST_SetSRID(ST_MakePoint(20.4487, 44.8233), 4326), 0.00, 105, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Razgledanje'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kalemegdan Belgrade'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Belgrade'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kalemegdan Beograd'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
  NULL,
  1,
  (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
@@ -13047,9 +13047,9 @@ VALUES
 ('Belgrade Coffee and Jazz Night', 'Manji večernji program sa jazz nastupom i toplijom lounge atmosferom, namenjen gostima koji vole centar grada i laganiji izlazak. Uslovljen je sedećim formatom i nije preglasan, pa dobro odgovara i turistima koji sutradan nastavljaju obilazak.',
  ST_SetSRID(ST_MakePoint(20.4612, 44.8134), 4326), '2026-11-05 18:00', '2026-11-05 23:00', 9.00, 220, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Nastup'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Terazije Belgrade'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Belgrade'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Moskva Belgrade'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Terazije Beograd'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Moskva Beograd'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
  NOW(), NOW()),
 ('Novi Sad Gourmet Weekend', 'Dvodevni gradski gastro program sa degustacijama, koktelima i manjim live cooking segmentima. Ideja je da posetioci spoje vikend u centru Novog Sada, šetnju do tvrđave i nekoliko kvalitetnih obroka na maloj udaljenosti.',
@@ -13096,9 +13096,9 @@ VALUES
  3, 'Pogled je sjajan i vredan dolaska, ali su neka jela vise igrala na utisak nego na dubinu ukusa. Nije lose, samo treba ici sa idejom da placas i lokaciju i atmosferu.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'La Loggia Firenze'),
  5, 'Vece ovde je bilo jedno od najboljih u Firenci jer se dobar pogled uklopio sa opustenom uslugom i finim ritmom posluzenja. Nije mesto za brz obrok, ali za duzu veceru radi odlicno.', NOW()),
-((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Moskva Belgrade'),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Moskva Beograd'),
  5, 'Svidelo mi se sto hotel ima prepoznatljiv karakter i ne deluje kao bilo koji moderan lanac bez identiteta. Lokacija je odlicna za peske i za dnevni obilazak i za vecernji povratak.', NOW()),
-((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Moskva Belgrade'),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Moskva Beograd'),
  4, 'Soba je bila uredna i mirna, a osoblje profesionalno, ali je ceo dozivljaj vise klasicno gradski nego luksuzan. Ipak, zbog lokacije i atmosfere bih ga opet uzeo za kraci boravak.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Frans Beograd'),
  4, 'Jelovnik je sirok i lako je naci nesto i za ljude koji vole klasiku i za one koji hoce laksi obrok. Usluga je bila dobra, samo je terasa bila dosta puna pa je ritam malo usporio.', NOW()),
@@ -13137,7 +13137,7 @@ WITH source("Url", "AltText", "IsMain", "DestinationName") AS (
     ('https://i.natgeofe.com/n/543132f8-4728-4381-b35b-09bd262f88c1/GettyImages-1427282403.jpg?w=2880&h=1774', 'Sicily', true, 'Sicily'),
     ('https://cdn.sanity.io/images/nxpteyfv/goguides/f0024f4dacbcd414760aaa445593c84e7b730685-1600x1066.jpg', 'Capri', true, 'Capri'),
     ('https://hips.hearstapps.com/hmg-prod/images/the-town-of-varenna-on-lake-como-royalty-free-image-1690925689.jpg', 'Lake Como', true, 'Lake Como'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Belgrade', true, 'Belgrade'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Beograd', true, 'Beograd'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Novi Sad', true, 'Novi Sad'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Zlatibor', true, 'Zlatibor'),
     ('https://upload.wikimedia.org/wikipedia/commons/2/24/Panorama_Nisa.JPG', 'Niš', true, 'Niš'),
@@ -13165,8 +13165,8 @@ WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Grand Canal Venice', true, 'Grand Canal Venice'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'Duomo Florence', true, 'Duomo Florence'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Ponte%20vecchio.jpg', 'Ponte Vecchio Florence', true, 'Ponte Vecchio Florence'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Terazije Belgrade', true, 'Terazije Belgrade'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Kalemegdan Belgrade', true, 'Kalemegdan Belgrade'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Terazije Beograd', true, 'Terazije Beograd'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Kalemegdan Beograd', true, 'Kalemegdan Beograd'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Trg Slobode Novi Sad', true, 'Trg Slobode Novi Sad'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Petrovaradin.jpg', 'Petrovaradin Fortress', true, 'Petrovaradin Fortress'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Kraljev Trg Zlatibor', true, 'Kraljev Trg Zlatibor'),
@@ -13186,7 +13186,7 @@ WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Bistrot de Venise', true, 'Bistrot de Venise'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Ponte%20vecchio.jpg', 'Hotel Davanzati Florence', true, 'Hotel Davanzati Florence'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'La Loggia Firenze', true, 'La Loggia Firenze'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Hotel Moskva Belgrade', true, 'Hotel Moskva Belgrade'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Hotel Moskva Beograd', true, 'Hotel Moskva Beograd'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Restoran Frans Beograd', true, 'Restoran Frans Beograd'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Hotel Pupin Novi Sad', true, 'Hotel Pupin Novi Sad'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Kalem by Zak Novi Sad', true, 'Kalem by Zak Novi Sad'),
@@ -13471,37 +13471,37 @@ SET
     "DisplayTitle" = CASE "Name"
         WHEN 'Kotorski zaliv' THEN 'Strme planine, mirna obala i gradovi uz samu vodu'
         WHEN 'Kotor' THEN 'Zidine, trgovi i mediteranski ritam starog grada'
-        WHEN 'Budva' THEN 'Plaze, stari grad i energija koja traje do kasno'
+        WHEN 'Budva' THEN 'Plaže, stari grad i energija koja traje do kasno'
         WHEN 'Durmitor' THEN 'Planinski vrhovi, jezera i avantura na sve strane'
-        WHEN 'Sveti Stefan' THEN 'Ikonicno ostrvo, mirne uvale i pogled za pamcenje'
-        WHEN 'Podgorica' THEN 'Gradski ritam, reke i dobra baza za celu zemlju'
-        WHEN 'Herceg Novi' THEN 'Stepenice, tvrdjave i setnje uz more'
-        WHEN 'Bar' THEN 'Luka, Stari Bar i opustena obala za lagan obilazak'
-        WHEN 'Ulcinj' THEN 'Pesak, sunce i jug sa drugacijom energijom'
+        WHEN 'Sveti Stefan' THEN 'Ikonično ostrvo, mirne uvale i pogled za pamćenje'
+        WHEN 'Podgorica' THEN 'Gradski ritam, reke i autentično iskustvo'
+        WHEN 'Herceg Novi' THEN 'Stepenice, tvrđave i šetnje uz more'
+        WHEN 'Bar' THEN 'Luka, Stari Bar i opuštena obala za lagan obilazak'
+        WHEN 'Ulcinj' THEN 'Pesak, sunce i jug sa drugačijom energijom'
         WHEN 'Cetinje' THEN 'Istorija, muzeji i mirniji ritam stare prestonice'
-        WHEN 'Niksic' THEN 'Trgovi, parkovi i gradski zivot okruzen prirodom'
-        WHEN 'Tivat' THEN 'Marina, setalista i moderan ritam zaliva'
-        WHEN 'Igalo' THEN 'More, wellness i lagane setnje uz obalu'
-        WHEN 'Lovcen' THEN 'Vidikovci, Njegos i planina koja cuva identitet zemlje'
-        WHEN 'Skadarsko jezero' THEN 'Camci, ptice i mir koji traje duze od izleta'
+        WHEN 'Niksic' THEN 'Trgovi, parkovi i gradski život okružen prirodom'
+        WHEN 'Tivat' THEN 'Marina, šetalista i moderan ritam zaliva'
+        WHEN 'Igalo' THEN 'More, wellness i lagane šetnje uz obalu'
+        WHEN 'Lovcen' THEN 'Vidikovci, Njegoš i planina koja čuva identitet zemlje'
+        WHEN 'Skadarsko jezero' THEN 'Čamci, ptice i mir koji traje duže od izleta'
         WHEN 'Kolasin' THEN 'Planinski vazduh, ski centri i odmor tokom cele godine'
         WHEN 'Zabljak' THEN 'Crno jezero, Durmitor i dani puni aktivnosti'
         WHEN 'Pluzine' THEN 'Pivsko jezero, kanjoni i mirniji planinski beg'
-        WHEN 'Andrijevica' THEN 'Komovi, reke i autenticni severni ambijent'
+        WHEN 'Andrijevica' THEN 'Komovi, reke i autentični severni ambijent'
         WHEN 'Plav' THEN 'Jezero, Prokletije i miran ritam severa'
-        WHEN 'Barcelona' THEN 'Gaudi, more i veceri u gotickoj cetvrti'
-        WHEN 'Madrid' THEN 'Muzeji, bulevari i gradska energija do kasno u noc'
-        WHEN 'Valencia' THEN 'Paelja, futuristicka arhitektura i mediteranski tempo'
-        WHEN 'Rome' THEN 'Rimske ulice, fontane i vecere u Trastevereu'
-        WHEN 'Venice' THEN 'Kanali, kameni prolazi i veceri oko San Marka'
+        WHEN 'Barcelona' THEN 'Gaudi, more i večeri u gotičkoj četvrti'
+        WHEN 'Madrid' THEN 'Muzeji, bulevari i gradska energija do kasno u noć'
+        WHEN 'Valencia' THEN 'Paelja, futuristička arhitektura i mediteranski tempo'
+        WHEN 'Rome' THEN 'Rimske ulice, fontane i večere u Trastevereu'
+        WHEN 'Venice' THEN 'Kanali, kameni prolazi i večeri oko San Marka'
         WHEN 'Florence' THEN 'Renesansa, mostovi i toskanski ritam grada'
-        WHEN 'Belgrade' THEN 'Tvrdjava, gradske ulice i nocni ritam prestonice'
-        WHEN 'Novi Sad' THEN 'Trgovi, tvrdjava i lagani tempo uz Dunav'
-        WHEN 'Zlatibor' THEN 'Planinski vazduh, vidikovci i opusten ritam dana'
+        WHEN 'Beograd' THEN 'Tvrđava, gradske ulice i noćni ritam prestonice'
+        WHEN 'Novi Sad' THEN 'Trgovi, tvrđava i lagani tempo uz Dunav'
+        WHEN 'Zlatibor' THEN 'Planinski vazduh, vidikovci i opušten ritam dana'
         ELSE "DisplayTitle"
     END,
     "Description" = CASE "Name"
-        WHEN 'Kotorski zaliv' THEN 'Kotorski zaliv spaja mirnu morsku povrsinu, strme planine i niz istorijskih mesta uz samu obalu. Putovanje ovde lako prelazi iz setnje kroz Kotor i Perast u kratke voznje obalom, kafu uz more i sporiji mediteranski ritam. Dobar je izbor za putnike koji vole pejzaze, fotografiju i kombinaciju kulture i odmora.'
+        WHEN 'Kotorski zaliv' THEN 'Kotorski zaliv spaja mirnu morsku površinu, strme planine i niz istorijskih mesta uz samu obalu. Putovanje ovde lako prelazi iz setnje kroz Kotor i Perast u kratke voznje obalom, kafu uz more i sporiji mediteranski ritam. Dobar je izbor za putnike koji vole pejzaze, fotografiju i kombinaciju kulture i odmora.'
         WHEN 'Kotor' THEN 'Kotor je istorijski grad u srcu zaliva, poznat po zidinama, trgovima i starom gradu pod zastitom UNESCO-a. Dan ovde lako krene obilaskom uskih kamenih ulica, nastavi se usponom ka tvrdjavi i zavrsi vecerom uz more. Posebno prija putnicima koji vole istoriju, atmosferu i setnje bez zurbe.'
         WHEN 'Budva' THEN 'Budva kombinuje plaze, stari grad i energicnu turisticku scenu na malom prostoru. Posetioci mogu da provedu jutro uz more, popodne u kamenim ulicama starog grada, a vece u restoranima i barovima uz obalu. Odlicna je za one koji zele i odmor i zivlju atmosferu.'
         WHEN 'Durmitor' THEN 'Durmitor je planinska destinacija za ljude koji traze prirodu, vazduh i aktivan dan napolju. Crno jezero, vidikovci, pesacke staze i blizina kanjona Tare cine ga odlicnim za vise dana istrazivanja. Ovde se lako prelazi iz mirne setnje u ozbiljniju avanturu, zavisno od ritma putovanja.'
@@ -13524,12 +13524,12 @@ SET
         WHEN 'Barcelona' THEN 'Barcelona spaja more, Gaudijevu arhitekturu, kvartove pune detalja i vrlo ziv gradski ritam. U istom danu mozes da obidjes Sagradu Familiju, prosetas kroz Gothic Quarter, sednes na tapas i zavrsis uz obalu. Posebno prija putnicima koji vole kombinaciju kulture, hrane i grada koji dugo ostaje budan.'
         WHEN 'Madrid' THEN 'Madrid je grad sirokih bulevara, velikih muzeja i stalne gradske energije. Putnici ovde lako kombinuju Prado, Retiro, trznice, tapas barove i vecernji izlazak bez potrebe da zure izmedju tacki. Dobar je za city break koji trazi i kulturu i ritam velikog grada.'
         WHEN 'Valencia' THEN 'Valencia spaja mediteranski tempo, modernu arhitekturu i poznatu gastronomsku scenu. Grad je prijatan za setnju i bicikl, a lako kombinuje istorijski centar, more i Ciudad de las Artes. Dobar je za putnike koji zele topliji i opusteniji ritam od vecih evropskih prestonica.'
-        WHEN 'Rome' THEN 'Rim je grad u kojem se svakodnevni ritam mesa sa antickim slojevima istorije, trgovima, fontanama i dugim vecerama. Putnik u jednom danu moze da obidje Koloseum, da sedne na kafu u malom baru i da zavrsi vece uz testeninu i vino u Trastevereu. Zbog tog spoja velikih znamenitosti i malih kvartovskih trenutaka, Rim je dobar i za prvi dolazak i za sporiji povratak.'
-        WHEN 'Venice' THEN 'Venecija nudi sporiji ritam obilaska, setnje preko mostova i male gastronomske pauze uz poglede na kanale. Grad je posebno zanimljiv putnicima koji vole atmosferu, umetnost i osecaj da je gotovo svaka ulica scenografija. Najvise prija kada se obilazi bez velike zurbe, uz vreme za male prolaze, trgove i zalaske sunca.'
-        WHEN 'Florence' THEN 'Firenca spaja umetnost, zanatstvo i toskansku gastronomiju na malom prostoru koji je lako obici peske. Grad je odlican za putnike koji zele da kombinuju muzeje, panoramske poglede, lagan gradski tempo i ozbiljno dobru hranu. Posebno je lepa za one koji vole da im se kultura i svakodnevni zivot preplicu iz ulice u ulicu.'
-        WHEN 'Belgrade' THEN 'Beograd je grad sirokih bulevara, tvrdjave iznad usca i kafana koje zive do kasno. Posetioci ovde lako kombinuju istorijske tacke, moderni gradski ritam, dobru kafu i vecere koje se cesto produze vise nego sto je planirano. Dobar je izbor za putnike koji vole energiju velikog grada, ali i spontane male pauze pored reke.'
-        WHEN 'Novi Sad' THEN 'Novi Sad ima mirniji ritam, ali bogat gradski sadrzaj, uredjene trgove, dobru gastronomsku scenu i jak kulturni identitet. Posebno je prijatan za putnike koji vole setnju, dobru hranu i pogled sa Petrovaradina prema Dunavu i gradu. Grad lako ostavlja utisak mesta u kome mozes i da obilazis i da usporis.'
-        WHEN 'Zlatibor' THEN 'Zlatibor je destinacija za sporiji planinski ritam, panoramske poglede, duge setnje i odmor uz lokalne specijalitete. Pogodan je i za kratke vikend odmore i za duze boravke kada neko zeli da kombinuje prirodu, wellness i lakse aktivnosti napolju. Posebno odgovara putnicima koji hoce uredjenu planinsku bazu bez prevelikog napora oko organizacije.'
+        WHEN 'Rome' THEN 'Rim je grad u kojem se svakodnevni ritam mesa sa antickim slojevima istorije, trgovima, fontanama i dugim vecerama. Putnik u jednom danu moze da obidje Koloseum, da sedne na kafu u malom baru i da završi veče uz testeninu i vino u Trastevereu. Zbog tog spoja velikih znamenitosti i malih kvartovskih trenutaka, Rim je dobar i za prvi dolazak i za sporiji povratak.'
+        WHEN 'Venice' THEN 'Venecija nudi sporiji ritam obilaska, setnje preko mostova i male gastronomske pauze uz poglede na kanale. Grad je posebno zanimljiv putnicima koji vole atmosferu, umetnost i osećaj da je gotovo svaka ulica scenografija. Najviše prija kada se obilazi bez velike žurbe, uz vreme za male prolaze, trgove i zalaske sunca.'
+        WHEN 'Florence' THEN 'Firenca spaja umetnost, zanatstvo i toskansku gastronomiju na malom prostoru koji je lako obici peske. Grad je odličan za putnike koji žele da kombinuju muzeje, panoramske poglede, lagan gradski tempo i ozbiljno dobru hranu. Posebno je lepa za one koji vole da im se kultura i svakodnevni život prepliću iz ulice u ulicu.'
+        WHEN 'Beograd' THEN 'Beograd je grad širokih bulevara, tvrđave iznad ušća i kafana koje žive do kasno. Posetioci ovde lako kombinuju istorijske tačke, moderni gradski ritam, dobru kafu i večere koje se često produže više nego što je planirano. Dobar je izbor za putnike koji vole energiju velikog grada, ali i spontane male pauze pored reke.'
+        WHEN 'Novi Sad' THEN 'Novi Sad ima mirniji ritam, ali bogat gradski sadrzaj, uredjene trgove, dobru gastronomsku scenu i jak kulturni identitet. Posebno je prijatan za putnike koji vole setnju, dobru hranu i pogled sa Petrovaradina prema Dunavu i gradu. Grad lako ostavlja utisak mesta u kome možeš i da obilaziš i da usporiš.'
+        WHEN 'Zlatibor' THEN 'Zlatibor je destinacija za sporiji planinski ritam, panoramske poglede, duge šetnje i odmor uz lokalne specijalitete. Pogodan je i za kratke vikend odmore i za duže boravke kada neko želi da kombinuje prirodu, wellness i lakše aktivnosti napolju. Posebno odgovara putnicima koji hoće uređenu planinsku bazu bez prevelikog napora oko organizacije.'
         ELSE "Description"
     END,
     "UpdatedAt" = NOW()
@@ -13537,7 +13537,7 @@ WHERE "Name" IN (
     'Kotorski zaliv', 'Kotor', 'Budva', 'Durmitor', 'Sveti Stefan', 'Podgorica',
     'Herceg Novi', 'Bar', 'Ulcinj', 'Cetinje', 'Niksic', 'Tivat', 'Igalo', 'Lovcen',
     'Skadarsko jezero', 'Kolasin', 'Zabljak', 'Pluzine', 'Andrijevica', 'Plav',
-    'Barcelona', 'Madrid', 'Valencia', 'Rome', 'Venice', 'Florence', 'Belgrade',
+    'Barcelona', 'Madrid', 'Valencia', 'Rome', 'Venice', 'Florence', 'Beograd',
     'Novi Sad', 'Zlatibor'
 );
 
