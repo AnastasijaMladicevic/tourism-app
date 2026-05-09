@@ -1,0 +1,261 @@
+<section class="locality-create-page">
+  <header class="page-head">
+    <div>
+      <p class="breadcrumbs">Dashboard <span>></span> Localities <span>></span> {{ isEditMode ? 'Edit' : 'Create' }}</p>
+      <h1>{{ isEditMode ? 'Edit Locality' : 'Create Locality' }}</h1>
+      <p class="subtle-text">
+        {{ isEditMode ? 'Update locality details for your managed destination.' : 'Add a new locality for your managed destination.' }}
+      </p>
+    </div>
+    <div class="top-actions">
+      @if (isEditMode) {
+        <button
+          type="button"
+          class="danger-btn"
+          (click)="onDeleteLocation()"
+          [disabled]="isDeleting || isSubmitting"
+        >
+          <span class="material-symbols-outlined">delete</span>
+          {{ isDeleting ? 'Deleting...' : 'Delete Locality' }}
+        </button>
+      }
+      <button type="button" class="ghost-btn" (click)="onCancel()">Cancel</button>
+      <button type="button" class="ghost-btn" (click)="onSaveDraft()">Save Draft</button>
+      <button type="submit" class="primary-btn" form="create-locality-form" [disabled]="isSubmitting || isLoadingOptions">
+        {{ isSubmitting ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save Changes' : 'Create Locality') }}
+      </button>
+    </div>
+  </header>
+
+  <div class="create-layout">
+    <form id="create-locality-form" class="create-form" (ngSubmit)="onSubmit()">
+      <section class="section-block section-block--gallery step-card">
+        <div class="gallery-card-head">
+          <span class="step-tag">STEP 1</span>
+          <h2>Media Gallery</h2>
+          <p class="gallery-intro">Upload one or more images and choose a primary cover image.</p>
+        </div>
+
+        <div class="gallery-dropzone">
+          <p class="dropzone-title">Add Photo</p>
+          <p class="dropzone-copy">Images are attached after locality creation via the image endpoint.</p>
+          <div class="dropzone-input-row">
+            <input
+              type="text"
+              [value]="pendingImageNames || 'Select one or more image files...'"
+              readonly
+              aria-label="Selected image files"
+            />
+            <button type="button" class="primary-btn" (click)="onPickImages(fileInput)">Add Photo</button>
+            <input
+              #fileInput
+              type="file"
+              accept="image/*"
+              multiple
+              hidden
+              (change)="onFilesSelected($event)"
+            />
+          </div>
+        </div>
+
+        @if (hasAnyGalleryImages) {
+          <div class="gallery-grid">
+            <article class="gallery-item" *ngFor="let image of existingImages">
+              <img [src]="image.url" alt="Locality image" />
+              <div class="gallery-actions">
+                @if (image.isMain) {
+                  <span class="primary-badge">Primary</span>
+                } @else {
+                  <span class="ghost-btn small">Saved</span>
+                }
+              </div>
+            </article>
+
+            <article class="gallery-item" *ngFor="let preview of imagePreviews; let index = index">
+              <img [src]="preview" alt="Locality image preview" />
+              <div class="gallery-actions">
+                @if (index === primaryImageIndex) {
+                  <span class="primary-badge">Primary</span>
+                } @else {
+                  <button type="button" class="ghost-btn small" (click)="setPrimaryImage(index)">Set Primary</button>
+                }
+                <button type="button" class="ghost-btn small danger" (click)="removeImage(index)">Remove</button>
+              </div>
+            </article>
+          </div>
+        }
+      </section>
+
+      <section class="section-block step-card">
+        <div class="gallery-card-head">
+          <span class="step-tag">STEP 2</span>
+          <h2>General Information</h2>
+          <p class="gallery-intro">Essential details about the locality.</p>
+        </div>
+
+        <div class="grid-2">
+          <label class="full-width">
+            <span>Locality Name *</span>
+            <input type="text" [(ngModel)]="form.name" name="name" required placeholder="e.g. Barceloneta Beach" />
+          </label>
+
+          <label>
+            <span>Destination *</span>
+            <select
+              [(ngModel)]="form.destinationId"
+              (ngModelChange)="onDestinationChange()"
+              name="destinationId"
+              required
+              [disabled]="isLoadingDestinations"
+            >
+              <option *ngIf="isLoadingDestinations" [ngValue]="form.destinationId" disabled>Loading destinations...</option>
+              <option *ngFor="let option of destinationOptions" [ngValue]="option.id">{{ option.name }}</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Locality Type *</span>
+            <select [(ngModel)]="form.localityTypeId" name="localityTypeId" required [disabled]="isLoadingLocalityTypes">
+              <option [ngValue]="0"></option>
+              <option *ngFor="let option of localityTypeOptions" [ngValue]="option.id">{{ option.name }}</option>
+            </select>
+          </label>
+
+          <label class="full-width">
+            <span>Full Description</span>
+            <textarea
+              rows="6"
+              [(ngModel)]="form.description"
+              name="description"
+              placeholder="Write a detailed description including what guests can expect..."
+            ></textarea>
+          </label>
+        </div>
+      </section>
+
+      <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+      <p class="draft-message" *ngIf="draftSavedMessage">{{ draftSavedMessage }}</p>
+
+    </form>
+
+    <aside class="side-stack">
+      <section class="side-column card">
+        <header class="side-header">
+          <span class="material-symbols-outlined">my_location</span>
+          <h3>Locality Intelligence</h3>
+        </header>
+
+        <div class="map-shell">
+          <app-map
+            [lat]="mapLat"
+            [lng]="mapLng"
+            [zoom]="14"
+            [popupText]="mapPopupText"
+            [interactive]="false"
+            [showMarker]="hasMapCoordinates"
+            mapId="manager-create-locality-map"
+          ></app-map>
+        </div>
+
+        <div class="location-line">
+          <span class="material-symbols-outlined">search</span>
+          <p>{{ locationSummary }}</p>
+        </div>
+
+        <div class="location-inputs">
+          <label class="mini-field">
+            <span>Latitude</span>
+            <input type="number" min="-90" max="90" step="0.000001" [(ngModel)]="form.latitude" name="latitude" />
+          </label>
+          <label class="mini-field">
+            <span>Longitude</span>
+            <input type="number" min="-180" max="180" step="0.000001" [(ngModel)]="form.longitude" name="longitude" />
+          </label>
+        </div>
+      </section>
+
+      <section class="card side-column tips-card">
+        <header class="side-header tips-header">
+          <h3>Create Tips</h3>
+        </header>
+
+        <ul>
+          <li>Use clear locality names so visitors can recognize the place quickly.</li>
+          <li>Add precise coordinates to improve map previews and navigation.</li>
+          <li>Upload high-quality images and choose the strongest one as primary.</li>
+        </ul>
+
+        <button type="button" class="link-btn" (click)="openTipsModal()">Learn more about localities</button>
+      </section>
+    </aside>
+  </div>
+
+  @if (showTipsModal) {
+    <div class="tips-backdrop" (click)="closeTipsModal()">
+      <section
+        class="card tips-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="locality-tips-modal-title"
+        (click)="$event.stopPropagation()"
+      >
+        <h3 id="locality-tips-modal-title">Locality Creator Playbook</h3>
+        <p>
+          Build complete locality profiles with sharp imagery and accurate map data so guests know exactly
+          what to expect and how to get there. Consistent destination and type metadata also boosts
+          discovery in search and filters.
+        </p>
+        <ul class="tips-modal-list">
+          <li>Pick the destination and locality type that best matches the place to keep filters clean.</li>
+          <li>Drop the map pin on the actual entrance or center of the locality, not just the city center.</li>
+          <li>Upload at least one high-resolution image and mark the strongest one as primary.</li>
+        </ul>
+
+        <div class="tips-modal-actions">
+          <button type="button" class="primary-btn" (click)="closeTipsModal()">Close</button>
+        </div>
+      </section>
+    </div>
+  }
+
+  @if (showDeleteSuccessModal) {
+    <div class="tips-backdrop delete-success-backdrop">
+      <section
+        class="card delete-success-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="locality-delete-success-title"
+      >
+        <div class="delete-success-icon" aria-hidden="true">
+          <span class="delete-success-icon-check">✓</span>
+        </div>
+        <h3 id="locality-delete-success-title">Locality successfully deleted</h3>
+        <p>You will be redirected to the Localities page.</p>
+      </section>
+    </div>
+  }
+
+  @if (showDeleteConfirmModal) {
+    <div class="tips-backdrop delete-confirm-backdrop" (click)="closeDeleteConfirmModal()">
+      <section
+        class="card delete-confirm-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="locality-delete-confirm-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="delete-confirm-icon" aria-hidden="true">
+          <span class="material-symbols-outlined">delete</span>
+        </div>
+        <h3 id="locality-delete-confirm-title">Confirm deletion</h3>
+        <p>Are you sure you want to delete this item? This action cannot be undone.</p>
+        <div class="delete-confirm-actions">
+          <button type="button" class="ghost-btn" (click)="closeDeleteConfirmModal()" [disabled]="isDeleting">Cancel</button>
+          <button type="button" class="danger-btn solid" (click)="confirmDeleteLocation()" [disabled]="isDeleting">
+            {{ isDeleting ? 'Deleting...' : 'Delete' }}
+          </button>
+        </div>
+      </section>
+    </div>
+  }
+</section>
