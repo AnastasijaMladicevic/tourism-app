@@ -1,10 +1,12 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { LogoComponent } from '../logo/logo';
 import { filter } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 import { AuthService } from '../../../services/auth';
+import { NotificationService } from '../../../services/notification';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 
 
@@ -22,8 +24,10 @@ interface NavItem {
   styleUrls: ['./navbar.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit, OnDestroy {
   activeRoute = '';
+  notificationsUnreadCount = 0;
+  private unreadSub?: Subscription;
 
   // Rute na kojima se navbar NE prikazuje
   private hiddenRoutes = [
@@ -40,6 +44,7 @@ export class NavbarComponent {
     { labelKey: 'nav.map', icon: 'map', route: '/map' },
     { labelKey: 'nav.favorites', icon: 'favorite', route: '/favorites' },
     { labelKey: 'nav.planner', icon: 'calendar_month', route: '/planner' },
+    { labelKey: 'Notifications', icon: 'notifications', route: '/notifications' },
     { labelKey: 'nav.profile', icon: 'person_outline', route: '/profile' },
     { labelKey: 'Podesavanja', icon: 'settings', route: '/settings' },
   ];
@@ -47,12 +52,30 @@ export class NavbarComponent {
   constructor(
     private router: Router,
     private authService: AuthService,
+    private notificationService: NotificationService,
   ) {
     this.router.events
       .pipe(filter((e) => e instanceof NavigationEnd))
       .subscribe((e: NavigationEnd) => {
         this.activeRoute = e.urlAfterRedirects;
       });
+  }
+
+  ngOnInit(): void {
+    if (!this.authService.isLoggedIn()) {
+      return;
+    }
+
+    this.notificationService.startLiveConnection();
+    this.notificationService.getUnreadCount().subscribe();
+    this.unreadSub = this.notificationService.unreadCount$
+      .subscribe(count => {
+        this.notificationsUnreadCount = count;
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.unreadSub?.unsubscribe();
   }
 
   get isVisible(): boolean {
@@ -64,7 +87,7 @@ export class NavbarComponent {
   }
 
   goTo(route: string): void {
-    const protectedRoutes = ['/favorites', '/profile'];
+    const protectedRoutes = ['/favorites', '/profile', '/notifications'];
     if (protectedRoutes.includes(route) && !this.authService.isLoggedIn()) {
       this.router.navigate(['/login'], {
         queryParams: { returnUrl: route }

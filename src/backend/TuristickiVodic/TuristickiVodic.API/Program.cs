@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Security.Claims;
 using System.Text;
+using TuristickiVodic.API.Hubs;
 using TuristickiVodic.API.Infrastructure;
 using TuristickiVodic.Infrastructure.Data;
 using TuristickiVodic.Services;
@@ -19,6 +20,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddMemoryCache();
+builder.Services.AddSignalR();
+builder.Services.AddHostedService<PlannerReminderBackgroundService>();
 builder.Services.Configure<OllamaOptions>(builder.Configuration.GetSection("Ollama"));
 builder.Services.AddHttpClient();
 builder.Services.Configure<FormOptions>(options =>
@@ -55,11 +58,13 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddScoped<NotificationSaveChangesInterceptor>();
+builder.Services.AddDbContext<AppDbContext>((serviceProvider, options) =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
         npgsql => npgsql.UseNetTopologySuite()
     )
+    .AddInterceptors(serviceProvider.GetRequiredService<NotificationSaveChangesInterceptor>())
 );
 
 builder.Services.AddAutoMapper(typeof(TuristickiVodic.Services.Mappings.MappingProfile));
@@ -114,6 +119,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
         options.Events = new JwtBearerEvents
         {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+
+                if (!string.IsNullOrWhiteSpace(accessToken) &&
+                    path.StartsWithSegments("/hubs/notifications"))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            },
             OnTokenValidated = async context =>
             {
                 var jti = context.Principal?.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
@@ -208,6 +226,7 @@ app.UseAuthorization();
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 app.MapControllers();
+app.MapHub<NotificationsHub>("/hubs/notifications");
 
 // Sve rute koje nisu API vrati index.html (SPA routing)
 app.MapFallbackToFile("index.html");

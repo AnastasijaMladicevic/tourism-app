@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { ChangeDetectorRef } from '@angular/core';
 
@@ -9,6 +9,7 @@ import {
 } from '../../services/notification';
 
 import { RouterHistoryService } from '../../services/router-history';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-notifications',
@@ -17,10 +18,11 @@ import { RouterHistoryService } from '../../services/router-history';
   templateUrl: './notifications.html',
   styleUrls: ['./notifications.scss']
 })
-export class NotificationsComponent implements OnInit {
+export class NotificationsComponent implements OnInit, OnDestroy {
 
   notifications: NotificationDto[] = [];
   isLoading = true;
+  private liveSub?: Subscription;
 
   constructor(
     private notificationService: NotificationService,
@@ -30,6 +32,19 @@ export class NotificationsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadNotifications();
+    this.notificationService.startLiveConnection();
+    this.liveSub = this.notificationService.liveNotification$.subscribe(notification => {
+      if (this.notifications.some(item => item.id === notification.id)) {
+        return;
+      }
+
+      this.notifications = [notification, ...this.notifications];
+      this.cdr.detectChanges();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.liveSub?.unsubscribe();
   }
 
   goBack(): void {

@@ -514,7 +514,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
 ('Centar Zabljaka', 'Glavna turisticka zona Zabljaka',
- ST_SetSRID(ST_MakePoint(19.123), 43.155), true,
+ ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),

@@ -11,7 +11,12 @@
         [class.sidebar__item--active]="isActive(item.route)"
         (click)="goTo(item.route)"
       >
-        <mat-icon>{{ item.icon }}</mat-icon>
+        <span class="nav-icon-wrap">
+          <mat-icon>{{ item.icon }}</mat-icon>
+          @if (item.route === '/notifications' && notificationsUnreadCount > 0) {
+            <span class="nav-badge">{{ notificationsUnreadCount > 9 ? '9+' : notificationsUnreadCount }}</span>
+          }
+        </span>
         <span>{{ item.labelKey | translate }}</span>
       </button>
     }
@@ -25,7 +30,12 @@
         [class.bottom-nav__item--active]="isActive(item.route)"
         (click)="goTo(item.route)"
       >
-        <mat-icon>{{ item.icon }}</mat-icon>
+        <span class="nav-icon-wrap">
+          <mat-icon>{{ item.icon }}</mat-icon>
+          @if (item.route === '/notifications' && notificationsUnreadCount > 0) {
+            <span class="nav-badge">{{ notificationsUnreadCount > 9 ? '9+' : notificationsUnreadCount }}</span>
+          }
+        </span>
         <span>{{ item.labelKey | translate }}</span>
       </button>
     }
