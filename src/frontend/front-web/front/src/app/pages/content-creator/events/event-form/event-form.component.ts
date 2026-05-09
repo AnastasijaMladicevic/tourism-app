@@ -364,7 +364,7 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
       const selectedVenue = this.venueOptions.find((venue) => venue.id === selectedObjectId);
       const venueLat = this.toNumber(selectedVenue?.latitude);
       const venueLng = this.toNumber(selectedVenue?.longitude);
-      
+
       if (venueLat != null && venueLng != null) {
         this.setLocationFromSelection(venueLat, venueLng);
         return;
@@ -378,7 +378,7 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
       );
       const destinationLat = this.toNumber(selectedDestination?.latitude);
       const destinationLng = this.toNumber(selectedDestination?.longitude);
-      
+
       if (destinationLat != null && destinationLng != null) {
         this.setLocationFromSelection(destinationLat, destinationLng);
       }
@@ -388,7 +388,7 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
   private setLocationFromSelection(latitude: number, longitude: number): void {
     const latValue = latitude.toFixed(6);
     const lngValue = longitude.toFixed(6);
-    
+
     this.form.patchValue({
       latitude: latValue,
       longitude: lngValue
@@ -639,9 +639,9 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
       toDelete.length === 0
         ? of(undefined)
         : forkJoin(toDelete.map((d) => this.eventService.deleteImageById(d.id))).pipe(
-            map(() => undefined),
-            catchError(() => of(undefined))
-          );
+          map(() => undefined),
+          catchError(() => of(undefined))
+        );
 
     return delete$.pipe(
       switchMap(() => {
@@ -1042,9 +1042,9 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
       keyboard: true
     }).setView(center, zoom);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-      subdomains: 'abcd',
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '',
+      subdomains: '',
       maxZoom: 19
     }).addTo(this.map);
 

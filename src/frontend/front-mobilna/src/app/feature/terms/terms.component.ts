@@ -13,7 +13,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 export class TermsComponent {
   private readonly route = inject(ActivatedRoute);
 
-  protected readonly backLink = this.route.snapshot.queryParamMap.get('returnTo') || '/profile';
+  protected readonly backLink = this.route.snapshot.queryParamMap.get('returnTo') || '/settings';
   protected readonly sections = [
     { titleKey: 'terms.section.1.title', bodyKey: 'terms.section.1.body' },
     { titleKey: 'terms.section.2.title', bodyKey: 'terms.section.2.body' },

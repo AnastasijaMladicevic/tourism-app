@@ -6,7 +6,7 @@ import { catchError, finalize, of } from 'rxjs';
 import { ImageCroppedEvent, ImageCropperComponent } from 'ngx-image-cropper';
 import { environment } from '../../../environment/environment';
 import { AuthService, UpdateUserDto, UserDto } from '../../services/auth';
-import { AppLanguage, TranslationService } from '../../services/translation.service';
+import { TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 interface InterestOption {
@@ -49,7 +49,6 @@ export class EditProfileComponent implements OnInit {
   protected readonly country = signal('');
   protected readonly email = signal('');
   protected readonly phone = signal('');
-  protected readonly appLanguageCode = signal<AppLanguage>('sr');
   protected readonly isSaving = signal(false);
   protected readonly isLanguageMenuOpen = signal(false);
   protected readonly feedbackMessage = signal('');
@@ -70,12 +69,6 @@ export class EditProfileComponent implements OnInit {
 
   /** Object URL for the cropped preview shown above the avatar */
   protected readonly cropPreviewUrl = signal<string | null>(null);
-
-  protected readonly languageOptions: ReadonlyArray<{ code: AppLanguage; labelKey: string }> =
-    (['sr', 'en', 'es', 'it'] as const).map((code) => ({
-      code,
-      labelKey: this.translationService.labelKeyForLanguage(code),
-    }));
 
   protected readonly imageUrl = computed(() => {
     const raw = this.userSignal()?.profileImageUrl?.trim() || DEFAULT_PHOTO_PATH;
@@ -290,7 +283,6 @@ export class EditProfileComponent implements OnInit {
       lastName: this.lastName().trim(),
       country: this.country().trim() || null,
       phoneNumber: this.phone().trim() || null,
-      language: this.appLanguageCode(),
     };
 
     this.isSaving.set(true);
@@ -319,24 +311,6 @@ export class EditProfileComponent implements OnInit {
     this.router.navigate(['/profile']);
   }
 
-  /* ── Language ──────────────────────────────────────────────────────── */
-
-  protected toggleLanguageMenu(): void {
-    this.isLanguageMenuOpen.update((current) => !current);
-  }
-
-  protected selectLanguageOption(code: AppLanguage): void {
-    const normalizedCode = this.normalizeLanguage(code);
-    this.appLanguageCode.set(normalizedCode);
-    this.isLanguageMenuOpen.set(false);
-    this.setFeedback(
-      this.translationService.translate('editProfile.languageSelected', {
-        language: this.languageLabel(normalizedCode),
-      }),
-      'neutral',
-    );
-  }
-
   /* ── Interests ─────────────────────────────────────────────────────── */
 
   protected toggleInterest(key: string): void {
@@ -344,10 +318,6 @@ export class EditProfileComponent implements OnInit {
       items.map((item) => (item.key === key ? { ...item, selected: !item.selected } : item)),
     );
     this.persistInterests();
-  }
-
-  protected languageLabel(code = this.appLanguageCode()): string {
-    return this.translationService.translate(this.translationService.labelKeyForLanguage(code));
   }
 
   protected openChangePassword(): void {
@@ -362,11 +332,6 @@ export class EditProfileComponent implements OnInit {
     this.country.set(user.country ?? '');
     this.email.set(user.email ?? '');
     this.phone.set(user.phoneNumber ?? '');
-    this.appLanguageCode.set(this.normalizeLanguage(user.language));
-  }
-
-  private normalizeLanguage(language?: string | null): AppLanguage {
-    return this.translationService.normalizeLanguageCode(language);
   }
 
   private setFeedback(message: string, tone: 'success' | 'error' | 'neutral'): void {

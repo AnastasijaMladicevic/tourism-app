@@ -239,6 +239,10 @@ export const routes: Routes = [
     loadComponent: () => import('./feature/events/events').then((m) => m.EventsComponent),
   },
   {
+    path: 'settings',
+    loadComponent: () => import('./feature/settings/settings').then((m) => m.SettingsComponent),
+  },
+  {
     path: 'profile',
     canActivate: [profileAuthGuard],
     loadComponent: () =>
@@ -285,6 +289,12 @@ export const routes: Routes = [
       import('./feature/my-reviews-preview/my-reviews-preview.component').then(
         (m) => m.MyReviewsPreviewComponent,
       ),
+  },
+  {
+    path: 'notifications',
+    loadComponent: () =>
+      import('./feature/notifications/notifications')
+        .then(m => m.NotificationsComponent)
   },
   {
     path: 'privacy-data',

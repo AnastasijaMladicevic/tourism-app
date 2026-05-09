@@ -1,0 +1,90 @@
+<div class="notifications-page">
+
+  <div class="notifications-shell">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+
+      <button
+        class="back-btn"
+        type="button"
+        (click)="goBack()"
+      >
+        <mat-icon>arrow_back_ios_new</mat-icon>
+      </button>
+
+      <h1>Notifications</h1>
+
+      <button
+        class="read-all-btn"
+        type="button"
+        (click)="markAllAsRead()"
+      >
+        Mark all
+      </button>
+
+    </header>
+
+    <!-- EMPTY -->
+    @if (!isLoading && !notifications.length) {
+
+      <div class="empty-state">
+
+        <mat-icon>notifications_off</mat-icon>
+
+        <h2>No notifications</h2>
+
+        <p>
+          You're all caught up.
+        </p>
+
+      </div>
+    }
+
+    <!-- LIST -->
+    <div class="notifications-list">
+
+      @for (item of notifications; track item.id) {
+
+        <button
+          class="notification-card"
+          type="button"
+          [class.notification-card--unread]="!item.isRead"
+          (click)="markAsRead(item)"
+        >
+
+          <div class="notification-icon">
+
+            <mat-icon>
+              notifications
+            </mat-icon>
+
+          </div>
+
+          <div class="notification-content">
+
+            <div class="notification-header">
+
+              <h3>{{ item.title }}</h3>
+
+              @if (!item.isRead) {
+                <span class="unread-dot"></span>
+              }
+
+            </div>
+
+            <p>
+              {{ item.message }}
+            </p>
+
+            <span class="notification-date">
+              {{ formatDate(item.createdAt) }}
+            </span>
+
+          </div>
+
+        </button>
+      }
+    </div>
+  </div>
+</div>

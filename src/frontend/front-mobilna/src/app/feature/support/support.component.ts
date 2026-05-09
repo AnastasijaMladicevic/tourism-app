@@ -35,7 +35,7 @@ export class SupportComponent {
   private readonly aiChatService = inject(AiChatService);
   private readonly locationTrackingService = inject(LocationTrackingService);
 
-  protected readonly backLink = this.route.snapshot.queryParamMap.get('returnTo') || '/profile';
+  protected readonly backLink = this.route.snapshot.queryParamMap.get('returnTo') || '/settings';
   protected readonly query = signal('');
   protected readonly openIndex = signal<number | null>(1);
   protected readonly aiInput = signal('');

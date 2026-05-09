@@ -13,7 +13,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 export class PrivacyDataComponent {
   private readonly route = inject(ActivatedRoute);
 
-  protected readonly backLink = this.route.snapshot.queryParamMap.get('returnTo') || '/profile';
+  protected readonly backLink = this.route.snapshot.queryParamMap.get('returnTo') || '/settings';
   protected readonly sections = [
     { titleKey: 'privacy.section.1.title', bodyKey: 'privacy.section.1.body' },
     { titleKey: 'privacy.section.2.title', bodyKey: 'privacy.section.2.body' },

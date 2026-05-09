@@ -1,0 +1,53 @@
+<div class="settings-page">
+  <div class="settings-shell">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+
+      <button class="back-btn" type="button" (click)="goBack()">
+        <mat-icon>arrow_back_ios_new</mat-icon>
+      </button>
+
+      <h1>Settings</h1>
+
+      <div class="topbar-spacer"></div>
+
+    </header>
+
+    <!-- GENERAL -->
+    <section class="menu-section">
+
+      <div class="menu-card">
+
+        @for (item of generalItems; track item.title) {
+          <button
+            class="menu-item"
+            type="button"
+            (click)="handleItem(item)"
+          >
+
+            <div class="menu-item__left">
+
+              <span
+                class="menu-icon"
+                [attr.data-accent]="item.accent"
+              >
+                <mat-icon>{{ item.icon }}</mat-icon>
+              </span>
+
+              <div class="menu-copy">
+                <span class="menu-title">{{ item.title }}</span>
+              </div>
+
+            </div>
+
+            <mat-icon class="chevron">
+              chevron_right
+            </mat-icon>
+          </button>
+        }
+
+      </div>
+    </section>
+  </div>
+</div>

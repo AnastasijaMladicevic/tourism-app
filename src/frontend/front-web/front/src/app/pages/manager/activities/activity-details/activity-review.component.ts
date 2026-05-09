@@ -571,9 +571,9 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
       keyboard: false
     }).setView(center, zoom);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-      subdomains: 'abcd',
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '',
+      subdomains: '',
       maxZoom: 19
     }).addTo(this.map);
 

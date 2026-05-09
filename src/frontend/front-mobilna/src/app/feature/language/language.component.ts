@@ -24,10 +24,10 @@ export class LanguageComponent implements OnInit {
   private readonly translationService = inject(TranslationService);
 
   protected readonly options: LanguageOption[] = [
-  { code: 'sr', labelKey: 'language.serbianMontenegrin' },
-  { code: 'en', labelKey: 'language.english' },
-  { code: 'es', labelKey: 'language.spanish' },
-  { code: 'it', labelKey: 'language.italian' },
+    { code: 'sr', labelKey: 'language.serbianMontenegrin' },
+    { code: 'en', labelKey: 'language.english' },
+    { code: 'es', labelKey: 'language.spanish' },
+    { code: 'it', labelKey: 'language.italian' },
   ];
 
   protected readonly selectedCode = signal<AppLanguage>('sr');
@@ -62,7 +62,7 @@ export class LanguageComponent implements OnInit {
   }
 
   protected goBack(): void {
-    this.router.navigate(['/profile']);
+    this.router.navigate(['/settings']);
   }
 
   protected selectLanguage(code: AppLanguage): void {
