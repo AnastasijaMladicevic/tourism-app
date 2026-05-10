@@ -1,10 +1,6 @@
 <div class="notifications-page">
-
   <div class="notifications-shell">
-
-    <!-- TOPBAR -->
     <header class="topbar">
-
       <button
         class="back-btn"
         type="button"
@@ -13,64 +9,65 @@
         <mat-icon>arrow_back_ios_new</mat-icon>
       </button>
 
-      <h1>Notifications</h1>
+      <h1>{{ 'notifications.title' | translate }}</h1>
 
-      <button
-        class="read-all-btn"
-        type="button"
-        (click)="markAllAsRead()"
-      >
-        Mark all
-      </button>
+      <div class="topbar-actions">
+        <button
+          class="read-all-btn"
+          type="button"
+          (click)="markAllAsRead()"
+        >
+          {{ 'notifications.markAll' | translate }}
+        </button>
 
+        @if (hasReadNotifications()) {
+          <button
+            class="read-all-btn read-all-btn--danger"
+            type="button"
+            (click)="deleteReadNotifications()"
+          >
+            {{ 'notifications.deleteRead' | translate }}
+          </button>
+        }
+      </div>
     </header>
 
-    <!-- EMPTY -->
     @if (!isLoading && !notifications.length) {
-
       <div class="empty-state">
-
         <mat-icon>notifications_off</mat-icon>
 
-        <h2>No notifications</h2>
+        <h2>{{ 'notifications.emptyTitle' | translate }}</h2>
 
         <p>
-          You're all caught up.
+          {{ 'notifications.emptyBody' | translate }}
         </p>
-
       </div>
     }
 
-    <!-- LIST -->
     <div class="notifications-list">
-
       @for (item of notifications; track item.id) {
-
-        <button
+        <div
           class="notification-card"
-          type="button"
+          role="button"
+          tabindex="0"
           [class.notification-card--unread]="!item.isRead"
           (click)="markAsRead(item)"
+          (keydown.enter)="markAsRead(item)"
+          (keydown.space)="markAsRead(item); $event.preventDefault()"
         >
-
           <div class="notification-icon">
-
             <mat-icon>
               notifications
             </mat-icon>
-
           </div>
 
           <div class="notification-content">
-
             <div class="notification-header">
-
               <h3>{{ item.title }}</h3>
 
               @if (!item.isRead) {
                 <span class="unread-dot"></span>
               }
-
             </div>
 
             <p>
@@ -80,10 +77,19 @@
             <span class="notification-date">
               {{ formatDate(item.createdAt) }}
             </span>
-
           </div>
 
-        </button>
+          @if (item.isRead) {
+            <button
+              class="notification-delete"
+              type="button"
+              [attr.aria-label]="'notifications.deleteSingle' | translate"
+              (click)="deleteNotification(item, $event)"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </div>
       }
     </div>
   </div>

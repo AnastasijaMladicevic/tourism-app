@@ -448,6 +448,14 @@
                                       }
                             }
                 },
+    "notifications": {
+        "title": "Notifiche",
+        "markAll": "Segna tutto",
+        "deleteRead": "Elimina lette",
+        "deleteSingle": "Elimina notifica",
+        "emptyTitle": "Nessuna notifica",
+        "emptyBody": "Hai già visto tutto."
+    },
     "about":  {
                   "supportTitle":  "Informazioni e supporto",
                   "version":  "Versione 2.4.0",

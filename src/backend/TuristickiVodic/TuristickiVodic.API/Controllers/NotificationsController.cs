@@ -59,5 +59,28 @@ namespace TuristickiVodic.API.Controllers
                 updatedCount
             });
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteRead(int id)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var deleted = await _notificationService.DeleteReadAsync(id, userId);
+
+            if (!deleted)
+                return NotFound(new { message = "Read notification not found or does not belong to you." });
+
+            return NoContent();
+        }
+
+        [HttpDelete("read")]
+        public async Task<IActionResult> DeleteAllRead()
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var deletedCount = await _notificationService.DeleteAllReadAsync(userId);
+            return Ok(new
+            {
+                deletedCount
+            });
+        }
     }
 }

@@ -13,6 +13,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   margin-bottom: 24px;
 
   h1 {
@@ -20,6 +21,14 @@
     font-weight: 700;
     color: var(--emperor);
   }
+}
+
+.topbar-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .read-all-btn {
@@ -31,7 +40,12 @@
   cursor: pointer;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
   font-weight: 600;
+}
 
+.read-all-btn--danger {
+  background: #fff5f5;
+  color: #d62839;
+  border: 1px solid rgba(214, 40, 57, 0.14);
 }
 
 .back-btn {
@@ -60,10 +74,37 @@
   text-align: left;
   transition: all 0.2s ease;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  position: relative;
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.notification-delete {
+  align-self: flex-start;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 12px;
+  background: #f4f7fb;
+  color: #7b8794;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:hover {
+    background: #ffecef;
+    color: #d62839;
   }
 }
 
@@ -151,5 +192,20 @@
   p {
     margin: 0;
     color: #6b7280;
+  }
+}
+
+@media (max-width: 720px) {
+  .notifications-page {
+    padding: 18px 14px 90px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+  }
+
+  .topbar-actions {
+    width: 100%;
+    justify-content: flex-start;
   }
 }

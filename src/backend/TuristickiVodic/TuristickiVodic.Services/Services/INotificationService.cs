@@ -8,5 +8,7 @@ namespace TuristickiVodic.Services.Services
         Task<int> GetUnreadCountAsync(int userId);
         Task<bool> MarkAsReadAsync(int id, int userId);
         Task<int> MarkAllAsReadAsync(int userId);
+        Task<bool> DeleteReadAsync(int id, int userId);
+        Task<int> DeleteAllReadAsync(int userId);
     }
 }

@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, NgZone } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
-import { BehaviorSubject, map, Observable, Subject, tap } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, tap } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { AuthService } from './auth';
 import { NotificationPreferencesService } from './notification-preferences';
@@ -67,12 +67,12 @@ export class NotificationService {
 
     this.hubConnection.on('notificationReceived', (notification: NotificationDto) => {
       this.ngZone.run(() => {
-        if (!notification.isRead) {
-          this.unreadCountSubject.next(this.unreadCountSubject.value + 1);
-        }
-
         if (!this.notificationPreferencesService.shouldSurfaceNotification(notification.type)) {
           return;
+        }
+
+        if (!notification.isRead) {
+          this.unreadCountSubject.next(this.unreadCountSubject.value + 1);
         }
 
         this.liveNotificationSubject.next(notification);
@@ -105,9 +105,7 @@ export class NotificationService {
       .set('page', page)
       .set('pageSize', pageSize);
 
-    return this.http.get<any>(this.api, { params }).pipe(
-      map((response) => this.filterNotificationResponse(response)),
-    );
+    return this.http.get<any>(this.api, { params });
   }
 
   getUnreadCount(): Observable<NotificationUnreadCountDto> {
@@ -144,36 +142,11 @@ export class NotificationService {
     this.unreadCountSubject.next(0);
   }
 
-  private filterNotificationResponse(response: any): any {
-    const items = this.extractItems(response);
-    const visibleItems = items.filter((item) =>
-      this.notificationPreferencesService.shouldSurfaceNotification(item.type),
-    );
-
-    if (Array.isArray(response)) {
-      return visibleItems;
-    }
-
-    if (response && Array.isArray(response.items)) {
-      return {
-        ...response,
-        items: visibleItems,
-        totalCount: visibleItems.length,
-      };
-    }
-
-    return response;
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.api}/${id}`);
   }
 
-  private extractItems(response: any): NotificationDto[] {
-    if (Array.isArray(response)) {
-      return response;
-    }
-
-    if (response && Array.isArray(response.items)) {
-      return response.items as NotificationDto[];
-    }
-
-    return [];
+  deleteAllRead(): Observable<{ deletedCount: number }> {
+    return this.http.delete<{ deletedCount: number }>(`${this.api}/read`);
   }
 }

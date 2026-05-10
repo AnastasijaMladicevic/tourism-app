@@ -448,6 +448,14 @@
                                       }
                             }
                 },
+    "notifications": {
+        "title": "Notifications",
+        "markAll": "Mark all",
+        "deleteRead": "Delete read",
+        "deleteSingle": "Delete notification",
+        "emptyTitle": "No notifications",
+        "emptyBody": "You're all caught up."
+    },
     "about":  {
                   "supportTitle":  "Information and support",
                   "version":  "Version 2.4.0",

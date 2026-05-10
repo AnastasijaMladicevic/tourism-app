@@ -10,11 +10,12 @@ import {
 
 import { RouterHistoryService } from '../../services/router-history';
 import { Subscription } from 'rxjs';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-notifications',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, TranslatePipe],
   templateUrl: './notifications.html',
   styleUrls: ['./notifications.scss']
 })
@@ -68,7 +69,6 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   }
 
   markAsRead(notification: NotificationDto): void {
-
     if (notification.isRead) {
       return;
     }
@@ -81,11 +81,9 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   }
 
   markAllAsRead(): void {
-
     this.notificationService
       .markAllAsRead()
       .subscribe(() => {
-
         this.notifications =
           this.notifications.map(n => ({
             ...n,
@@ -94,8 +92,31 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       });
   }
 
-  formatDate(date: string): string {
+  deleteReadNotifications(): void {
+    this.notificationService.deleteAllRead().subscribe(() => {
+      this.notifications = this.notifications.filter((notification) => !notification.isRead);
+      this.cdr.detectChanges();
+    });
+  }
 
+  deleteNotification(notification: NotificationDto, event: Event): void {
+    event.stopPropagation();
+
+    if (!notification.isRead) {
+      return;
+    }
+
+    this.notificationService.delete(notification.id).subscribe(() => {
+      this.notifications = this.notifications.filter((item) => item.id !== notification.id);
+      this.cdr.detectChanges();
+    });
+  }
+
+  hasReadNotifications(): boolean {
+    return this.notifications.some((notification) => notification.isRead);
+  }
+
+  formatDate(date: string): string {
     return new Date(date).toLocaleString('en-GB', {
       day: '2-digit',
       month: 'short',

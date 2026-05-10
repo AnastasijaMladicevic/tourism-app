@@ -448,6 +448,14 @@
                 }
             }
             },
+    "notifications": {
+        "title": "Obaveštenja",
+        "markAll": "Označi sve",
+        "deleteRead": "Obriši pročitana",
+        "deleteSingle": "Obriši obaveštenje",
+        "emptyTitle": "Nema obaveštenja",
+        "emptyBody": "Sve je pregledano."
+    },
     "about":  {
                   "supportTitle":  "Informacije i podrška",
                   "quote":  "\"Naša misija je da svakom putniku pružimo autentična iskustva i olakšamo otkrivanje najlepših destinacija širom sveta.\"",
