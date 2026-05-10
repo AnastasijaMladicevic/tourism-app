@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpParams } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
@@ -52,6 +53,7 @@ export class DestinationsComponent implements OnInit {
   private readonly localityService = inject(LocalityService);
   private readonly http = inject(HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly router = inject(Router);
 
   private readonly objectsUrl = `${environment.apiUrl}/objects`;
 
@@ -237,7 +239,7 @@ export class DestinationsComponent implements OnInit {
   }
 
   onAddDestination(): void {
-    // Wire to create flow when backend is ready.
+    this.router.navigate(['/admin/destinations/create']);
   }
 
   onEditDestination(_row: AdminDestinationRow): void {

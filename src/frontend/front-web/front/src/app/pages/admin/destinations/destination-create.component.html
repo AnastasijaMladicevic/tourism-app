@@ -1,0 +1,275 @@
+<div class="destination-form-page">
+  <header class="form-top">
+    <div class="breadcrumbs">
+      <a routerLink="/admin/destinations" class="crumb-link">Destinations</a>
+      <span class="crumb-sep">›</span>
+      <span class="crumb-current">Create new</span>
+    </div>
+
+    <div class="title-row">
+      <div class="title-block">
+        <h1 class="page-title">{{ form.name.trim() || 'New destination' }}</h1>
+        <span class="status-pill" [class.status-pill--draft]="!form.isActive" [class.status-pill--live]="form.isActive">
+          {{ statusLabel }}
+        </span>
+      </div>
+      <div class="title-actions">
+        <button type="button" class="btn btn-ghost btn-with-icon" (click)="onSaveDraft()" [disabled]="isSubmitting">
+          <span class="material-symbols-outlined">save</span>
+          Save draft
+        </button>
+        <button type="button" class="btn btn-primary btn-with-icon" (click)="onSubmit()" [disabled]="isSubmitting">
+          <span class="material-symbols-outlined">check_circle</span>
+          {{ isSubmitting ? 'Saving…' : 'Create destination' }}
+        </button>
+        <button type="button" class="btn btn-ghost" (click)="onCancel()">Cancel</button>
+      </div>
+    </div>
+  </header>
+
+  @if (errorMessage) {
+    <div class="alert alert-error" role="alert">{{ errorMessage }}</div>
+  }
+
+  <div class="workspace">
+    <div class="workspace-main">
+      <article class="panel">
+        <div class="panel-head">
+          <span class="panel-icon material-symbols-outlined">info</span>
+          <div>
+            <h2 class="panel-title">General information</h2>
+            <p class="panel-sub">Set the core identity and descriptive content for this destination.</p>
+          </div>
+        </div>
+
+        <div class="field-grid">
+          <label class="form-field full">
+            <span class="label">Destination name *</span>
+            <input type="text" [(ngModel)]="form.name" placeholder="e.g. Emerald Valley Park" />
+          </label>
+
+          <label class="form-field">
+            <span class="label">Destination type ID *</span>
+            <input type="number" min="1" [(ngModel)]="form.destinationTypeId" />
+          </label>
+
+          <label class="form-field">
+            <span class="label">Visibility</span>
+            <select [(ngModel)]="form.isActive">
+              <option [ngValue]="true">Published</option>
+              <option [ngValue]="false">Draft</option>
+            </select>
+          </label>
+
+          <label class="form-field full">
+            <span class="label">Short summary</span>
+            <textarea rows="3" [(ngModel)]="shortSummary" placeholder="One or two sentences for listings and cards."></textarea>
+          </label>
+
+          <div class="form-field full richtext-block">
+            <span class="label">Full description</span>
+            <div class="richtext-toolbar" aria-hidden="true">
+              <button type="button" class="tool-btn" disabled title="Bold"><span class="material-symbols-outlined">format_bold</span></button>
+              <button type="button" class="tool-btn" disabled title="Italic"><span class="material-symbols-outlined">format_italic</span></button>
+              <button type="button" class="tool-btn" disabled title="Underline"><span class="material-symbols-outlined">format_underlined</span></button>
+              <button type="button" class="tool-btn" disabled title="Link"><span class="material-symbols-outlined">link</span></button>
+            </div>
+            <textarea
+              rows="10"
+              class="richtext-area"
+              [(ngModel)]="fullDescription"
+              placeholder="Longer story, highlights, and practical visitor information."
+            ></textarea>
+          </div>
+
+          <div class="form-field full categories-block">
+            <span class="label">Categories &amp; tags</span>
+            <div class="category-chips">
+              @for (c of categories; track $index) {
+                <span class="chip">
+                  {{ c }}
+                  <button type="button" class="chip-remove" (click)="removeCategory($index)" aria-label="Remove">×</button>
+                </span>
+              }
+            </div>
+            <div class="category-add-row">
+              <input type="text" [(ngModel)]="categoryInput" (keydown.enter)="addCategory(); $event.preventDefault()" placeholder="Add a category" />
+              <button type="button" class="btn btn-ghost btn-sm" (click)="addCategory()">
+                <span class="material-symbols-outlined">add</span>
+                Add category
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head panel-head--split">
+          <div class="panel-head-left">
+            <span class="panel-icon material-symbols-outlined">imagesmode</span>
+            <div>
+              <h2 class="panel-title">Media gallery</h2>
+              <p class="panel-sub">High-quality images that represent this destination across the platform.</p>
+            </div>
+          </div>
+          <label class="btn btn-ghost btn-sm upload-all-label">
+            <span class="material-symbols-outlined">upload</span>
+            Upload all
+            <input type="file" accept="image/*" multiple class="sr-only" (change)="onGalleryFilesSelected($event)" />
+          </label>
+        </div>
+
+        <label class="drop-zone">
+          <span class="material-symbols-outlined drop-icon">add_photo_alternate</span>
+          <span class="drop-title">Add new image</span>
+          <span class="drop-hint">Click or drag files here</span>
+          <input type="file" accept="image/*" multiple class="sr-only" (change)="onGalleryFilesSelected($event)" />
+        </label>
+        <p class="fine-print">Recommended aspect ratio 16:9. Maximum file size 5MB per image (validated on upload later).</p>
+
+        @if (imagePreviews.length) {
+          <div class="preview-strip">
+            @for (src of imagePreviews; track $index) {
+              <div class="preview-tile">
+                <img [src]="src" alt="" />
+                <button type="button" class="preview-remove" (click)="removeGalleryImage($index)" aria-label="Remove image">×</button>
+              </div>
+            }
+          </div>
+        }
+      </article>
+
+      <article class="panel panel--muted">
+        <div class="panel-head">
+          <span class="panel-icon material-symbols-outlined">history</span>
+          <div>
+            <h2 class="panel-title">Change history &amp; audit log</h2>
+            <p class="panel-sub">Edits and approvals will appear here after the destination is created.</p>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <aside class="workspace-side">
+      <article class="panel">
+        <div class="panel-head">
+          <span class="panel-icon material-symbols-outlined">location_on</span>
+          <div>
+            <h2 class="panel-title">Location &amp; map</h2>
+            <p class="panel-sub">Preview pin placement for this destination.</p>
+          </div>
+        </div>
+
+        <div class="map-shell">
+          <app-map
+            [lat]="mapLat"
+            [lng]="mapLng"
+            [zoom]="9"
+            [popupText]="mapPopupText"
+            [interactive]="false"
+            mapId="admin-destination-create-map"
+          ></app-map>
+          <button type="button" class="map-edit-btn" (click)="togglePinEditor()">
+            {{ showPinEditor ? 'Close editor' : 'Edit pin' }}
+          </button>
+        </div>
+
+        @if (showPinEditor) {
+          <div class="coord-editor">
+            <label class="form-field">
+              <span class="label">Latitude</span>
+              <input type="number" step="any" [(ngModel)]="form.latitude" placeholder="42.424" />
+            </label>
+            <label class="form-field">
+              <span class="label">Longitude</span>
+              <input type="number" step="any" [(ngModel)]="form.longitude" placeholder="18.771" />
+            </label>
+          </div>
+        }
+
+        <label class="form-field">
+          <span class="label">Region</span>
+          <select [(ngModel)]="form.regionId" (ngModelChange)="onRegionChange()" [disabled]="isLoadingRegions">
+            <option [ngValue]="undefined">Select a region</option>
+            <option *ngFor="let region of regions" [ngValue]="region.id">{{ region.name }}</option>
+          </select>
+        </label>
+
+        <div class="readonly-field">
+          <span class="label">Region (preview)</span>
+          <p class="readonly-value">{{ regionDisplayName }}</p>
+        </div>
+
+        <div class="readonly-field">
+          <span class="label">Coordinates</span>
+          <p class="readonly-value">{{ coordinatesDisplay }}</p>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head panel-head--split">
+          <div class="panel-head-left">
+            <span class="panel-icon material-symbols-outlined">hub</span>
+            <h2 class="panel-title">Linked entities</h2>
+          </div>
+          <button type="button" class="link-quiet" disabled>Link more</button>
+        </div>
+        <ul class="entity-list">
+          <li>
+            <span class="material-symbols-outlined entity-ico">apartment</span>
+            <div>
+              <span class="entity-name">Objects</span>
+              <span class="entity-meta">Hotels, shops…</span>
+            </div>
+            <span class="entity-count">0</span>
+          </li>
+          <li>
+            <span class="material-symbols-outlined entity-ico">event</span>
+            <div>
+              <span class="entity-name">Related events</span>
+            </div>
+            <span class="entity-count">0</span>
+          </li>
+          <li>
+            <span class="material-symbols-outlined entity-ico">hiking</span>
+            <div>
+              <span class="entity-name">Featured activities</span>
+            </div>
+            <span class="entity-count">0</span>
+          </li>
+          <li>
+            <span class="material-symbols-outlined entity-ico">map</span>
+            <div>
+              <span class="entity-name">Localities</span>
+            </div>
+            <span class="entity-count">0</span>
+          </li>
+        </ul>
+        <p class="fine-print">Counts will populate after this destination is saved.</p>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head">
+          <span class="panel-icon material-symbols-outlined">group</span>
+          <div>
+            <h2 class="panel-title">Managers</h2>
+            <p class="panel-sub">Managers in charge of the location.</p>
+          </div>
+        </div>
+        <label class="form-field">
+          <span class="label sr-only">Search managers</span>
+          <input type="search" [(ngModel)]="managerSearch" placeholder="Search managers" disabled />
+        </label>
+        <div class="empty-managers">
+          <span class="material-symbols-outlined">person_add</span>
+          <p>No managers assigned yet.</p>
+        </div>
+      </article>
+    </aside>
+  </div>
+
+  <footer class="form-footer">
+    <span class="footer-primary">{{ footerStatus }}</span>
+    <span class="footer-secondary">{{ footerSubline }}</span>
+  </footer>
+</div>
