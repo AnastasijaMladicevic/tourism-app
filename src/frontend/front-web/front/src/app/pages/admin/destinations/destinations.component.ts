@@ -246,7 +246,7 @@ export class DestinationsComponent implements OnInit {
   }
 
   onEditDestination(_row: AdminDestinationRow): void {
-    // Wire to edit route when backend is ready.
+    this.router.navigate(['/admin/destinations/edit', _row.id]);
   }
 
   formatStatus(status: AdminDestinationStatus): string {

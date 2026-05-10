@@ -3,7 +3,7 @@
     <div class="breadcrumbs">
       <a routerLink="/admin/destinations" class="crumb-link">Destinations</a>
       <span class="crumb-sep">›</span>
-      <span class="crumb-current">Create new</span>
+      <span class="crumb-current">{{ isEditMode ? 'Edit destination' : 'Create new' }}</span>
     </div>
 
     <div class="title-row">
@@ -17,7 +17,7 @@
         </button>
         <button type="button" class="btn btn-primary btn-with-icon" (click)="onSubmit()" [disabled]="isSubmitting">
           <span class="material-symbols-outlined">check_circle</span>
-          {{ isSubmitting ? 'Saving…' : 'Create destination' }}
+          {{ isSubmitting ? 'Saving…' : isEditMode ? 'Save changes' : 'Create destination' }}
         </button>
         <button type="button" class="btn btn-ghost" (click)="onCancel()">Cancel</button>
       </div>

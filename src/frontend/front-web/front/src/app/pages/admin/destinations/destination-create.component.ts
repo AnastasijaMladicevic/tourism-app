@@ -9,8 +9,8 @@ import {
   inject
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { Subject, of } from 'rxjs';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Subject, forkJoin, of } from 'rxjs';
 import {
   catchError,
   debounceTime,
@@ -46,6 +46,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   private readonly regionService = inject(RegionService);
   private readonly adminUsersService = inject(AdminUsersService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   @ViewChild('managerCombo') managerComboRef?: ElementRef<HTMLElement>;
 
@@ -58,6 +59,8 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   draftSavedMessage = '';
   showPinEditor = false;
   private savedDestinationId: number | null = null;
+  editDestinationId: number | null = null;
+  isLoadingDestination = false;
 
   regions: RegionDto[] = [];
 
@@ -83,6 +86,10 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     isActive: true
   };
 
+  get isEditMode(): boolean {
+    return this.editDestinationId != null;
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -102,16 +109,45 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.regionService
-      .getAll(true)
-      .pipe(finalize(() => (this.isLoadingRegions = false)))
-      .subscribe({
-        next: (regions: RegionDto[]) => {
-          this.regions = [...regions].sort((a, b) => a.name.localeCompare(b.name));
-        },
-        error: () => {
-          this.errorMessage =
-            'Could not load regions. You can still create a destination without a region.';
+    const rawId = this.route.snapshot.paramMap.get('id');
+    const parsedId = rawId ? Number(rawId) : NaN;
+    if (Number.isInteger(parsedId) && parsedId > 0) {
+      this.editDestinationId = parsedId;
+      this.savedDestinationId = parsedId;
+      this.isLoadingDestination = true;
+      this.isSubmitting = true;
+      this.errorMessage = '';
+    }
+
+    const regionRequest$ = this.regionService.getAll(true).pipe(
+      catchError(() => {
+        this.errorMessage = 'Could not load regions. You can still create a destination without a region.';
+        return of([] as RegionDto[]);
+      })
+    );
+
+    const destinationRequest$ =
+      this.editDestinationId != null
+        ? this.destinationService.getById(this.editDestinationId).pipe(
+            catchError(() => {
+              this.errorMessage = 'Could not load destination for editing.';
+              return of(null);
+            })
+          )
+        : of(null);
+
+    forkJoin({ regions: regionRequest$, destination: destinationRequest$ })
+      .pipe(
+        finalize(() => {
+          this.isLoadingRegions = false;
+          this.isLoadingDestination = false;
+          this.isSubmitting = false;
+        })
+      )
+      .subscribe(({ regions, destination }) => {
+        this.regions = [...regions].sort((a, b) => a.name.localeCompare(b.name));
+        if (destination) {
+          this.applyLoadedDestination(destination);
         }
       });
 
@@ -146,6 +182,28 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         this.managerSuggestions = page.items.filter((u) => u.id !== skipId);
         this.managerSuggestionsOpen = true;
       });
+  }
+
+  private applyLoadedDestination(destination: DestinationDto): void {
+    this.form = {
+      name: destination.name ?? '',
+      description: destination.description,
+      destinationTypeId: destination.destinationTypeId ?? 1,
+      regionId: destination.regionId,
+      latitude: destination.latitude,
+      longitude: destination.longitude,
+      isActive: Boolean(destination.isActive)
+    };
+    this.fullDescription = destination.description ?? '';
+
+    if (destination.managedByUserId) {
+      this.adminUsersService.searchManagers('', 200).subscribe({
+        next: (res) => {
+          const manager = res.items.find((u) => u.id === destination.managedByUserId) ?? null;
+          this.selectedManager = manager;
+        }
+      });
+    }
   }
 
   onManagerSearchInput(value: string): void {
@@ -276,7 +334,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       this.errorMessage = 'Destination name is required.';
       return false;
     }
-    if (!this.selectedManager) {
+    if (!this.selectedManager && this.savedDestinationId == null) {
       this.errorMessage = 'Please select a manager.';
       return false;
     }
@@ -337,7 +395,18 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
             return of({ assigned: true as const });
           }
           if (isCreateRequest) {
-            return of({ assigned: true as const });
+            return this.destinationService.assignManager(saved.id, this.selectedManager.id).pipe(
+              map(() => ({ assigned: true as const })),
+              catchError((err) =>
+                of({
+                  assigned: false as const,
+                  assignError:
+                    typeof err?.error?.message === 'string'
+                      ? err.error.message
+                      : 'Destination was saved, but assigning the manager failed.'
+                })
+              )
+            );
           }
           return this.destinationService.assignManager(saved.id, this.selectedManager.id).pipe(
             map(() => ({ assigned: true as const })),
