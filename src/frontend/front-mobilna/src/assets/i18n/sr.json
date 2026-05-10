@@ -91,6 +91,113 @@
                     "about":  "O nama",
                     "logout":  "Odjavi se"
                 },
+    "settings": {
+        "title": "Podešavanja",
+        "locationSection": "Lokacija",
+        "locationTitle": "Uključi lokaciju",
+        "locationBodyOn": "Lokacija je uključena i aplikacija može da koristi tvoju trenutnu poziciju za preporuke i sadržaj u blizini.",
+        "locationBodyOff": "Lokacija je isključena. Uključi je ako želiš preciznije preporuke i lakše pronalaženje mesta u blizini.",
+        "notificationsSection": "Obaveštenja",
+        "notificationsTitle": "Uključi obaveštenja",
+        "notificationsBodyOn": "Stizaće ti samo obaveštenja koja su uključena, a možeš i da biraš kako će se prikazivati.",
+        "notificationsBodyOff": "Sva obaveštenja su trenutno utišana i neće ti se prikazivati u aplikaciji.",
+        "deliveryTitle": "Način prikaza",
+        "deliveryBody": "Izaberi da li želiš kratku traku na vrhu ekrana ili samo listu obaveštenja.",
+        "deliveryBannerTitle": "Traka na vrhu",
+        "deliveryBannerBody": "Svako novo obaveštenje kratko se prikazuje oko 4 sekunde.",
+        "deliveryInboxTitle": "Samo u obaveštenjima",
+        "deliveryInboxBody": "Nova obaveštenja ostaju samo u listi bez iskačuće trake.",
+        "generalSection": "Opšta podešavanja",
+        "liveBadge": "Novo obaveštenje",
+        "openNotifications": "Otvori",
+        "menu": {
+            "editProfile": "Izmeni profil",
+            "language": "Jezik",
+            "region": "Region",
+            "support": "Pomoć i podrška",
+            "privacy": "Privatnost i podaci",
+            "terms": "Uslovi korišćenja",
+            "about": "O aplikaciji",
+            "appearance": "Izgled"
+        },
+        "notificationGroups": {
+            "travel": "Putovanja i favoriti",
+            "reviews": "Recenzije",
+            "creator": "Sadržaj koji objavljuješ",
+            "manager": "Menadžerska obrada",
+            "admin": "Administracija"
+        },
+        "notificationTypes": {
+            "favoritedLocationNewEvent": {
+                "title": "Novi događaj u omiljenoj destinaciji",
+                "body": "Obavesti me kada se pojavi novi događaj u destinaciji ili lokalitetu koji sam sačuvala."
+            },
+            "plannerEventReminder2Hours": {
+                "title": "Podsetnik 2 sata pre događaja",
+                "body": "Pošalji mi kratki podsetnik kada se događaj iz planera približava."
+            },
+            "plannerEventUpdated": {
+                "title": "Promena događaja u planeru",
+                "body": "Obavesti me kada se promene datum, vreme, cena ili lokacija događaja koji sam dodala u planer."
+            },
+            "plannerEventUnavailable": {
+                "title": "Događaj iz planera više nije dostupan",
+                "body": "Obavesti me kada se događaj otkaže, deaktivira ili više ne može da se prati."
+            },
+            "reviewReply": {
+                "title": "Odgovor na moju recenziju",
+                "body": "Obavesti me kada content creator prvi put odgovori na recenziju koju sam ostavila."
+            },
+            "reviewReplyUpdated": {
+                "title": "Izmena odgovora na moju recenziju",
+                "body": "Obavesti me kada content creator izmeni svoj odgovor na recenziju koju sam ostavila."
+            },
+            "creatorContentReviewed": {
+                "title": "Moj sadržaj je odobren ili odbijen",
+                "body": "Obavesti me kada admin ili menadžer pregleda moj objekat, događaj ili aktivnost."
+            },
+            "creatorNewObjectReview": {
+                "title": "Nova recenzija na mom objektu",
+                "body": "Obavesti me kada turista ostavi novu recenziju na objektu koji sam kreirala."
+            },
+            "creatorDeletionRequestReviewed": {
+                "title": "Rešen zahtev za brisanje sadržaja",
+                "body": "Obavesti me kada moj zahtev za brisanje bude odobren ili odbijen."
+            },
+            "creatorObjectReviewDeleted": {
+                "title": "Recenzija na mom objektu je obrisana",
+                "body": "Obavesti me kada neka recenzija sa mog objekta bude uklonjena iz sistema."
+            },
+            "managerNewPendingContent": {
+                "title": "Novi pending sadržaj u mojoj destinaciji",
+                "body": "Obavesti me kada stigne novi objekat, događaj ili aktivnost za pregled."
+            },
+            "managerNewDeletionRequest": {
+                "title": "Novi zahtev za brisanje u mojoj destinaciji",
+                "body": "Obavesti me kada content creator pošalje zahtev za brisanje sadržaja koji pripada mojoj destinaciji."
+            },
+            "managerReportReviewed": {
+                "title": "Admin je rešio moju prijavu",
+                "body": "Obavesti me kada admin odobri ili odbije prijavu koju sam poslala."
+            },
+            "adminNewCreatorRoleRequest": {
+                "title": "Novi zahtev za Content Creator ulogu",
+                "body": "Obavesti me kada stigne novi zahtev korisnika za dodatnu ulogu."
+            },
+            "adminNewManagerReport": {
+                "title": "Nova ManagerReport prijava",
+                "body": "Obavesti me kada menadžer pošalje novu prijavu protiv content creatora."
+            },
+            "adminRepeatedManagerReports": {
+                "title": "Više prijava za istog content creatora",
+                "body": "Obavesti me kada isti content creator sakupi više menadžerskih prijava."
+            },
+            "adminCreatorMultipleRejectedContent": {
+                "title": "Više odbijenih sadržaja istog kreatora",
+                "body": "Obavesti me kada isti content creator dobije više odbijenih sadržaja."
+            }
+        }
+    },
     "region":  {
                    "title":  "Region",
                    "available":  "Dostupni regioni",
@@ -341,6 +448,14 @@
                 }
             }
             },
+    "notifications": {
+        "title": "Obaveštenja",
+        "markAll": "Označi sve",
+        "deleteRead": "Obriši pročitana",
+        "deleteSingle": "Obriši obaveštenje",
+        "emptyTitle": "Nema obaveštenja",
+        "emptyBody": "Sve je pregledano."
+    },
     "about":  {
                   "supportTitle":  "Informacije i podrška",
                   "quote":  "\"Naša misija je da svakom putniku pružimo autentična iskustva i olakšamo otkrivanje najlepših destinacija širom sveta.\"",

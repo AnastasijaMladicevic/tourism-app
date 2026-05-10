@@ -91,6 +91,113 @@
                     "about":  "Chi siamo",
                     "logout":  "Esci"
                 },
+    "settings": {
+        "title": "Impostazioni",
+        "locationSection": "Posizione",
+        "locationTitle": "Attiva posizione",
+        "locationBodyOn": "La posizione è attiva e l'app può usare la tua posizione corrente per suggerimenti e luoghi vicini.",
+        "locationBodyOff": "La posizione è disattivata. Attivala se vuoi suggerimenti più precisi e risultati migliori nelle vicinanze.",
+        "notificationsSection": "Notifiche",
+        "notificationsTitle": "Attiva notifiche",
+        "notificationsBodyOn": "Saranno mostrate solo le notifiche che lasci attive e puoi scegliere anche come visualizzarle.",
+        "notificationsBodyOff": "Tutte le notifiche sono silenziate e non verranno mostrate nell'app.",
+        "deliveryTitle": "Modalità di visualizzazione",
+        "deliveryBody": "Scegli se vuoi una barra breve in alto sullo schermo oppure solo l'elenco delle notifiche.",
+        "deliveryBannerTitle": "Barra in alto",
+        "deliveryBannerBody": "Ogni nuova notifica appare brevemente per circa 4 secondi.",
+        "deliveryInboxTitle": "Solo notifiche",
+        "deliveryInboxBody": "Le nuove notifiche restano solo nell'elenco, senza barra a comparsa.",
+        "generalSection": "Impostazioni generali",
+        "liveBadge": "Nuova notifica",
+        "openNotifications": "Apri",
+        "menu": {
+            "editProfile": "Modifica profilo",
+            "language": "Lingua",
+            "region": "Regione",
+            "support": "Aiuto e supporto",
+            "privacy": "Privacy e dati",
+            "terms": "Termini di utilizzo",
+            "about": "Informazioni sull'app",
+            "appearance": "Aspetto"
+        },
+        "notificationGroups": {
+            "travel": "Viaggi e preferiti",
+            "reviews": "Recensioni",
+            "creator": "Contenuti che pubblichi",
+            "manager": "Revisione manager",
+            "admin": "Amministrazione"
+        },
+        "notificationTypes": {
+            "favoritedLocationNewEvent": {
+                "title": "Nuovo evento in una destinazione preferita",
+                "body": "Avvisami quando appare un nuovo evento in una destinazione o località che ho salvato."
+            },
+            "plannerEventReminder2Hours": {
+                "title": "Promemoria 2 ore prima dell'evento",
+                "body": "Mandami un breve promemoria quando un evento del planner si sta avvicinando."
+            },
+            "plannerEventUpdated": {
+                "title": "Evento del planner aggiornato",
+                "body": "Avvisami quando cambiano data, orario, prezzo o luogo di un evento salvato."
+            },
+            "plannerEventUnavailable": {
+                "title": "L'evento del planner non è più disponibile",
+                "body": "Avvisami quando un evento salvato viene cancellato, disattivato o non è più disponibile."
+            },
+            "reviewReply": {
+                "title": "Risposta alla mia recensione",
+                "body": "Avvisami quando un content creator risponde a una recensione che ho pubblicato."
+            },
+            "reviewReplyUpdated": {
+                "title": "Risposta aggiornata alla mia recensione",
+                "body": "Avvisami quando un content creator modifica la risposta alla mia recensione."
+            },
+            "creatorContentReviewed": {
+                "title": "Il mio contenuto è stato approvato o rifiutato",
+                "body": "Avvisami quando un admin o un manager controlla il mio oggetto, evento o attività."
+            },
+            "creatorNewObjectReview": {
+                "title": "Nuova recensione sul mio oggetto",
+                "body": "Avvisami quando un turista lascia una nuova recensione su un oggetto che ho creato."
+            },
+            "creatorDeletionRequestReviewed": {
+                "title": "Richiesta di eliminazione risolta",
+                "body": "Avvisami quando la mia richiesta di eliminazione viene approvata o rifiutata."
+            },
+            "creatorObjectReviewDeleted": {
+                "title": "Una recensione sul mio oggetto è stata eliminata",
+                "body": "Avvisami quando una recensione sul mio oggetto viene rimossa dal sistema."
+            },
+            "managerNewPendingContent": {
+                "title": "Nuovo contenuto in attesa nella mia destinazione",
+                "body": "Avvisami quando arriva un nuovo oggetto, evento o attività da controllare."
+            },
+            "managerNewDeletionRequest": {
+                "title": "Nuova richiesta di eliminazione nella mia destinazione",
+                "body": "Avvisami quando un content creator invia una richiesta di eliminazione per contenuti della mia destinazione."
+            },
+            "managerReportReviewed": {
+                "title": "La mia segnalazione è stata esaminata",
+                "body": "Avvisami quando un admin approva o rifiuta una segnalazione che ho inviato."
+            },
+            "adminNewCreatorRoleRequest": {
+                "title": "Nuova richiesta per il ruolo Content Creator",
+                "body": "Avvisami quando un utente richiede un ruolo aggiuntivo."
+            },
+            "adminNewManagerReport": {
+                "title": "Nuova segnalazione manager",
+                "body": "Avvisami quando un manager invia una nuova segnalazione contro un content creator."
+            },
+            "adminRepeatedManagerReports": {
+                "title": "Più segnalazioni per lo stesso creatore",
+                "body": "Avvisami quando lo stesso content creator riceve segnalazioni ripetute dai manager."
+            },
+            "adminCreatorMultipleRejectedContent": {
+                "title": "Più contenuti rifiutati dello stesso creatore",
+                "body": "Avvisami quando lo stesso content creator accumula più contenuti rifiutati."
+            }
+        }
+    },
     "region":  {
                    "title":  "Regione",
                    "available":  "Regioni disponibili",
@@ -341,6 +448,14 @@
                                       }
                             }
                 },
+    "notifications": {
+        "title": "Notifiche",
+        "markAll": "Segna tutto",
+        "deleteRead": "Elimina lette",
+        "deleteSingle": "Elimina notifica",
+        "emptyTitle": "Nessuna notifica",
+        "emptyBody": "Hai già visto tutto."
+    },
     "about":  {
                   "supportTitle":  "Informazioni e supporto",
                   "version":  "Versione 2.4.0",

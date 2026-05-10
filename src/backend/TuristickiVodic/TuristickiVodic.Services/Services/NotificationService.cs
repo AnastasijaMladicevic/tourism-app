@@ -89,6 +89,33 @@ namespace TuristickiVodic.Services.Services
             return notifications.Count;
         }
 
+        public async Task<bool> DeleteReadAsync(int id, int userId)
+        {
+            var notification = await _context.Notifications
+                .FirstOrDefaultAsync(n => n.Id == id && n.UserId == userId);
+
+            if (notification == null || !notification.IsRead)
+                return false;
+
+            _context.Notifications.Remove(notification);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<int> DeleteAllReadAsync(int userId)
+        {
+            var notifications = await _context.Notifications
+                .Where(n => n.UserId == userId && n.IsRead)
+                .ToListAsync();
+
+            if (notifications.Count == 0)
+                return 0;
+
+            _context.Notifications.RemoveRange(notifications);
+            await _context.SaveChangesAsync();
+            return notifications.Count;
+        }
+
         private async Task GeneratePlannerEventRemindersAsync(int userId)
         {
             var now = DateTime.UtcNow;

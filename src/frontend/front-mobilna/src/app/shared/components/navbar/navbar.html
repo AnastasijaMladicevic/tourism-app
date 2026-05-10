@@ -11,13 +11,16 @@
         [class.sidebar__item--active]="isActive(item.route)"
         (click)="goTo(item.route)"
       >
-        <span class="nav-icon-wrap">
-          <mat-icon>{{ item.icon }}</mat-icon>
-          @if (item.route === '/notifications' && notificationsUnreadCount > 0) {
-            <span class="nav-badge">{{ notificationsUnreadCount > 9 ? '9+' : notificationsUnreadCount }}</span>
-          }
+        <span class="sidebar__item-main">
+          <span class="nav-icon-wrap">
+            <mat-icon>{{ item.icon }}</mat-icon>
+          </span>
+          <span>{{ item.labelKey | translate }}</span>
         </span>
-        <span>{{ item.labelKey | translate }}</span>
+
+        @if (item.route === '/notifications' && notificationsUnreadCount > 0) {
+          <span class="sidebar__count-pill">{{ notificationsUnreadCount > 99 ? '99+' : notificationsUnreadCount }}</span>
+        }
       </button>
     }
   </nav>
