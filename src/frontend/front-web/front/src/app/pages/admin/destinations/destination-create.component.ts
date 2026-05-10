@@ -28,6 +28,7 @@ import {
 import {
   CreateDestinationDto,
   DestinationDto,
+  DestinationImageDto,
   DestinationService,
   UpdateDestinationDto
 } from '../../../services/destination.service';
@@ -75,6 +76,8 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
 
   imageFiles: File[] = [];
   imagePreviews: string[] = [];
+  destinationImages: DestinationImageDto[] = [];
+  isUpdatingImages = false;
 
   form: CreateDestinationDto = {
     name: '',
@@ -115,7 +118,6 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       this.editDestinationId = parsedId;
       this.savedDestinationId = parsedId;
       this.isLoadingDestination = true;
-      this.isSubmitting = true;
       this.errorMessage = '';
     }
 
@@ -128,7 +130,12 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
 
     const destinationRequest$ =
       this.editDestinationId != null
-        ? this.destinationService.getById(this.editDestinationId).pipe(
+        ? forkJoin({
+            destination: this.destinationService.getById(this.editDestinationId),
+            images: this.destinationService.getImages(this.editDestinationId).pipe(
+              catchError(() => of([] as DestinationImageDto[]))
+            )
+          }).pipe(
             catchError(() => {
               this.errorMessage = 'Could not load destination for editing.';
               return of(null);
@@ -141,13 +148,12 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         finalize(() => {
           this.isLoadingRegions = false;
           this.isLoadingDestination = false;
-          this.isSubmitting = false;
         })
       )
       .subscribe(({ regions, destination }) => {
         this.regions = [...regions].sort((a, b) => a.name.localeCompare(b.name));
         if (destination) {
-          this.applyLoadedDestination(destination);
+          this.applyLoadedDestination(destination.destination, destination.images);
         }
       });
 
@@ -184,7 +190,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       });
   }
 
-  private applyLoadedDestination(destination: DestinationDto): void {
+  private applyLoadedDestination(destination: DestinationDto, images: DestinationImageDto[]): void {
     this.form = {
       name: destination.name ?? '',
       description: destination.description,
@@ -195,6 +201,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       isActive: Boolean(destination.isActive)
     };
     this.fullDescription = destination.description ?? '';
+    this.destinationImages = [...images].sort((a, b) => (a.isMain === b.isMain ? 0 : a.isMain ? -1 : 1));
 
     if (destination.managedByUserId) {
       this.adminUsersService.searchManagers('', 200).subscribe({
@@ -204,6 +211,46 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         }
       });
     }
+  }
+
+  setPrimaryDestinationImage(image: DestinationImageDto): void {
+    if (!this.isEditMode || this.isUpdatingImages || !image?.id) {
+      return;
+    }
+
+    this.isUpdatingImages = true;
+    this.destinationService
+      .setMainImage(image.id)
+      .pipe(finalize(() => (this.isUpdatingImages = false)))
+      .subscribe({
+        next: () => {
+          this.destinationImages = this.destinationImages
+            .map((img) => ({ ...img, isMain: img.id === image.id }))
+            .sort((a, b) => (a.isMain === b.isMain ? 0 : a.isMain ? -1 : 1));
+        },
+        error: (err) => {
+          this.errorMessage = this.extractApiErrorMessage(err);
+        }
+      });
+  }
+
+  removeDestinationImage(image: DestinationImageDto): void {
+    if (!this.isEditMode || this.isUpdatingImages || !image?.id) {
+      return;
+    }
+
+    this.isUpdatingImages = true;
+    this.destinationService
+      .deleteImageById(image.id)
+      .pipe(finalize(() => (this.isUpdatingImages = false)))
+      .subscribe({
+        next: () => {
+          this.destinationImages = this.destinationImages.filter((img) => img.id !== image.id);
+        },
+        error: (err) => {
+          this.errorMessage = this.extractApiErrorMessage(err);
+        }
+      });
   }
 
   onManagerSearchInput(value: string): void {

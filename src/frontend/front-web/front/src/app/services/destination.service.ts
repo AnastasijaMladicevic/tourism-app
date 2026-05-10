@@ -114,4 +114,29 @@ export class DestinationService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  getImages(destinationId: number): Observable<DestinationImageDto[]> {
+    return this.http.get<DestinationImageDto[]>(`${environment.apiUrl}/destinations/${destinationId}/images`);
+  }
+
+  addImage(destinationId: number, file: File, isMain = false, altText?: string): Observable<DestinationImageDto> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('isMain', String(isMain));
+    if (altText?.trim()) {
+      formData.append('altText', altText.trim());
+    }
+    return this.http.post<DestinationImageDto>(
+      `${environment.apiUrl}/destinations/${destinationId}/images`,
+      formData
+    );
+  }
+
+  deleteImageById(imageId: number): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/images/${imageId}`);
+  }
+
+  setMainImage(imageId: number): Observable<DestinationImageDto> {
+    return this.http.patch<DestinationImageDto>(`${environment.apiUrl}/images/${imageId}/set-main`, {});
+  }
 }

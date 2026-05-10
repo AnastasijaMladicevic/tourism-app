@@ -41,33 +41,77 @@
             <span class="panel-icon material-symbols-outlined">imagesmode</span>
             <div>
               <h2 class="panel-title">Media gallery</h2>
-              <p class="panel-sub">High-quality images that represent this destination across the platform.</p>
+              <p class="panel-sub">
+                @if (isEditMode) {
+                  Existing destination images with primary cover selection.
+                } @else {
+                  High-quality images that represent this destination across the platform.
+                }
+              </p>
             </div>
           </div>
-          <label class="btn btn-ghost btn-sm upload-all-label">
-            <span class="material-symbols-outlined">upload</span>
-            Upload all
-            <input type="file" accept="image/*" multiple class="sr-only" (change)="onGalleryFilesSelected($event)" />
-          </label>
+          @if (!isEditMode) {
+            <label class="btn btn-ghost btn-sm upload-all-label">
+              <span class="material-symbols-outlined">upload</span>
+              Upload all
+              <input type="file" accept="image/*" multiple class="sr-only" (change)="onGalleryFilesSelected($event)" />
+            </label>
+          }
         </div>
 
-        <label class="drop-zone">
-          <span class="material-symbols-outlined drop-icon">add_photo_alternate</span>
-          <span class="drop-title">Add new image</span>
-          <span class="drop-hint">Click or drag files here</span>
-          <input type="file" accept="image/*" multiple class="sr-only" (change)="onGalleryFilesSelected($event)" />
-        </label>
-        <p class="fine-print">Recommended aspect ratio 16:9. Maximum file size 5MB per image (validated on upload later).</p>
+        @if (isEditMode) {
+          @if (!destinationImages.length) {
+            <div class="gallery-empty-state">
+              <span class="material-symbols-outlined">imagesmode</span>
+              <p>No images found for this destination.</p>
+            </div>
+          } @else {
+            <div class="server-gallery-grid">
+              @for (image of destinationImages; track image.id) {
+                <div class="server-gallery-card">
+                  <img [src]="image.url" alt="" />
+                  <div class="server-gallery-actions">
+                    <button
+                      type="button"
+                      class="btn btn-chip"
+                      [class.btn-chip-primary]="image.isMain"
+                      [disabled]="isUpdatingImages || image.isMain"
+                      (click)="setPrimaryDestinationImage(image)"
+                    >
+                      {{ image.isMain ? 'Primary' : 'Set Primary' }}
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-chip btn-chip-danger"
+                      [disabled]="isUpdatingImages"
+                      (click)="removeDestinationImage(image)"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        } @else {
+          <label class="drop-zone">
+            <span class="material-symbols-outlined drop-icon">add_photo_alternate</span>
+            <span class="drop-title">Add new image</span>
+            <span class="drop-hint">Click or drag files here</span>
+            <input type="file" accept="image/*" multiple class="sr-only" (change)="onGalleryFilesSelected($event)" />
+          </label>
+          <p class="fine-print">Recommended aspect ratio 16:9. Maximum file size 5MB per image (validated on upload later).</p>
 
-        @if (imagePreviews.length) {
-          <div class="preview-strip">
-            @for (src of imagePreviews; track $index) {
-              <div class="preview-tile">
-                <img [src]="src" alt="" />
-                <button type="button" class="preview-remove" (click)="removeGalleryImage($index)" aria-label="Remove image">×</button>
-              </div>
-            }
-          </div>
+          @if (imagePreviews.length) {
+            <div class="preview-strip">
+              @for (src of imagePreviews; track $index) {
+                <div class="preview-tile">
+                  <img [src]="src" alt="" />
+                  <button type="button" class="preview-remove" (click)="removeGalleryImage($index)" aria-label="Remove image">×</button>
+                </div>
+              }
+            </div>
+          }
         }
       </article>
 
