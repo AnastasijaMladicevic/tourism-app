@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpParams } from '@angular/common/http';
@@ -51,6 +51,7 @@ export class DestinationsComponent implements OnInit {
   private readonly destinationService = inject(DestinationService);
   private readonly localityService = inject(LocalityService);
   private readonly http = inject(HttpClient);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   private readonly objectsUrl = `${environment.apiUrl}/objects`;
 
@@ -316,6 +317,7 @@ export class DestinationsComponent implements OnInit {
         }),
         finalize(() => {
           this.isLoading = false;
+          this.cdr.detectChanges();
         })
       )
       .subscribe((rows) => {
@@ -325,6 +327,7 @@ export class DestinationsComponent implements OnInit {
         } else {
           this.selectedDestination = null;
         }
+        this.cdr.detectChanges();
       });
   }
 
