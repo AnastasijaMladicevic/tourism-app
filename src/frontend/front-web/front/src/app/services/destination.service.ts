@@ -21,6 +21,7 @@ export interface DestinationDto {
   regionId?: number;
   regionName?: string;
   regionCode?: string;
+  managedByUserId?: number;
   images?: DestinationImageDto[];
   isFavorite?: boolean;
   favoriteId?: number;
@@ -51,6 +52,7 @@ export interface CreateDestinationDto {
   isActive: boolean;
   destinationTypeId: number;
   regionId?: number;
+  managedByUserId?: number;
 }
 
 export interface UpdateDestinationDto {

@@ -276,6 +276,10 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       this.errorMessage = 'Destination name is required.';
       return false;
     }
+    if (!this.selectedManager) {
+      this.errorMessage = 'Please select a manager.';
+      return false;
+    }
     this.errorMessage = '';
     return true;
   }
@@ -305,7 +309,8 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       regionId: this.form.regionId ? Number(this.form.regionId) : undefined,
       latitude: this.form.latitude != null ? Number(this.form.latitude) : undefined,
       longitude: this.form.longitude != null ? Number(this.form.longitude) : undefined,
-      isActive: published
+      isActive: published,
+      managedByUserId: this.selectedManager?.id
     };
 
     const updatePayload: UpdateDestinationDto = {
@@ -318,9 +323,10 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       isActive: createPayload.isActive
     };
 
+    const isCreateRequest = this.savedDestinationId == null;
     const request$ =
-      this.savedDestinationId != null
-        ? this.destinationService.update(this.savedDestinationId, updatePayload)
+      !isCreateRequest
+        ? this.destinationService.update(this.savedDestinationId!, updatePayload)
         : this.destinationService.create(createPayload);
 
     request$
@@ -328,6 +334,9 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         switchMap((saved: DestinationDto) => {
           this.savedDestinationId = saved.id;
           if (!this.selectedManager) {
+            return of({ assigned: true as const });
+          }
+          if (isCreateRequest) {
             return of({ assigned: true as const });
           }
           return this.destinationService.assignManager(saved.id, this.selectedManager.id).pipe(
@@ -348,11 +357,13 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (out) => {
           if (!out.assigned) {
-            this.errorMessage = out.assignError;
-            if (!published) {
-              this.draftSavedMessage =
-                'Draft saved to the server. You can fix manager assignment and save again.';
+            if (published) {
+              this.router.navigate(['/admin/destinations']);
+              return;
             }
+            this.errorMessage = out.assignError;
+            this.draftSavedMessage =
+              'Draft saved to the server. You can fix manager assignment and save again.';
             return;
           }
           if (published) {
@@ -362,10 +373,33 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
           this.form.isActive = false;
           this.draftSavedMessage = 'Draft saved to the server';
         },
-        error: () => {
-          this.errorMessage = 'Save failed. Please check fields and try again.';
+        error: (err) => {
+          this.errorMessage = this.extractApiErrorMessage(err);
         }
       });
+  }
+
+  private extractApiErrorMessage(err: unknown): string {
+    const maybeError = err as {
+      error?: { message?: string; errors?: Record<string, string[]> | string[] };
+    };
+    const direct = maybeError?.error?.message;
+    if (typeof direct === 'string' && direct.trim().length > 0) {
+      return direct;
+    }
+    const validation = maybeError?.error?.errors;
+    if (Array.isArray(validation) && validation.length) {
+      return validation[0];
+    }
+    if (validation && typeof validation === 'object') {
+      const validationMap = validation as Record<string, string[]>;
+      const firstKey = Object.keys(validationMap)[0];
+      const firstValue = firstKey ? validationMap[firstKey] : undefined;
+      if (Array.isArray(firstValue) && firstValue.length) {
+        return firstValue[0];
+      }
+    }
+    return 'Save failed. Please check fields and try again.';
   }
 
   onCancel(): void {

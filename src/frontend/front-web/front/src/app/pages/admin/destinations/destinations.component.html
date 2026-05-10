@@ -106,6 +106,7 @@
                 <th>Destination</th>
                 <th>Type</th>
                 <th>Region</th>
+                <th>Manager</th>
                 <th>Inventory</th>
                 <th class="col-actions">Actions</th>
               </tr>
@@ -113,11 +114,11 @@
             <tbody>
               @if (isLoading) {
                 <tr>
-                  <td colspan="6" class="table-message">Loading destinations…</td>
+                  <td colspan="7" class="table-message">Loading destinations…</td>
                 </tr>
               } @else if (loadError) {
                 <tr>
-                  <td colspan="6" class="table-message table-message--error">
+                  <td colspan="7" class="table-message table-message--error">
                     <p>{{ loadError }}</p>
                     <button type="button" class="ghost-btn slim-btn" (click)="reloadFromApi()">
                       Retry
@@ -126,7 +127,7 @@
                 </tr>
               } @else if (!visibleDestinations.length) {
                 <tr>
-                  <td colspan="6" class="table-message">No destinations match the current filters.</td>
+                  <td colspan="7" class="table-message">No destinations match the current filters.</td>
                 </tr>
               } @else {
                 <tr
@@ -156,6 +157,9 @@
                     <span class="type-pill">{{ row.destinationType }}</span>
                   </td>
                   <td>{{ row.region }}</td>
+                  <td>
+                    <span class="manager-cell">{{ row.managerName }}</span>
+                  </td>
                   <td>
                     <span class="inventory-cell">
                       <span class="material-symbols-outlined inventory-icon">apartment</span>

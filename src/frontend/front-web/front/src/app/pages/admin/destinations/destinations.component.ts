@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
+import { AdminUserListItemDto, AdminUsersService } from '../../../services/admin-users.service';
 import { DestinationService, DestinationDto } from '../../../services/destination.service';
 import { LocalityService, LocalityDto } from '../../../services/locality.service';
 import { ObjectDto } from '../../../services/object';
@@ -28,6 +29,7 @@ export interface AdminDestinationRow {
   objectCount: number;
   featured: boolean;
   summary: string;
+  managerName: string;
   mainImageUrl?: string;
   latitude?: number;
   longitude?: number;
@@ -50,6 +52,7 @@ interface DestinationInsightCard {
 })
 export class DestinationsComponent implements OnInit {
   private readonly destinationService = inject(DestinationService);
+  private readonly adminUsersService = inject(AdminUsersService);
   private readonly localityService = inject(LocalityService);
   private readonly http = inject(HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -301,6 +304,7 @@ export class DestinationsComponent implements OnInit {
 
     forkJoin({
       destinations: this.fetchAllPages((page) => this.loadDestinationsPage(page)),
+      managers: this.fetchAllPages((page) => this.loadManagersPage(page)),
       localities: this.fetchAllPages((page) =>
         this.localityService.getAll(
           { page, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
@@ -310,8 +314,8 @@ export class DestinationsComponent implements OnInit {
       objects: this.fetchAllPages((page) => this.loadObjectsPage(page))
     })
       .pipe(
-        map(({ destinations, localities, objects }) =>
-          this.buildRowsFromApi(destinations, localities, objects)
+        map(({ destinations, managers, localities, objects }) =>
+          this.buildRowsFromApi(destinations, managers, localities, objects)
         ),
         catchError(() => {
           this.loadError = 'Could not load destinations. Check that the API is running and try again.';
@@ -335,9 +339,16 @@ export class DestinationsComponent implements OnInit {
 
   private buildRowsFromApi(
     destinations: DestinationDto[],
+    managers: AdminUserListItemDto[],
     localities: LocalityDto[],
     objects: ObjectDto[]
   ): AdminDestinationRow[] {
+    const managersById = new Map<number, string>();
+    for (const manager of managers) {
+      const fullName = `${manager.firstName ?? ''} ${manager.lastName ?? ''}`.trim();
+      managersById.set(manager.id, fullName || manager.email || '—');
+    }
+
     const localityByDest = new Map<number, number>();
     for (const loc of localities) {
       const id = loc.destinationId;
@@ -357,14 +368,20 @@ export class DestinationsComponent implements OnInit {
     }
 
     return destinations.map((d) =>
-      this.mapDtoToRow(d, localityByDest.get(d.id) ?? 0, objectsByDest.get(d.id) ?? 0)
+      this.mapDtoToRow(
+        d,
+        localityByDest.get(d.id) ?? 0,
+        objectsByDest.get(d.id) ?? 0,
+        managersById.get(d.managedByUserId ?? -1) ?? '—'
+      )
     );
   }
 
   private mapDtoToRow(
     dto: DestinationDto,
     localityCount: number,
-    objectCount: number
+    objectCount: number,
+    managerName: string
   ): AdminDestinationRow {
     const ext = dto as DestinationDto & { updatedAt?: string | Date };
     let updatedAt = '';
@@ -391,6 +408,7 @@ export class DestinationsComponent implements OnInit {
       objectCount,
       featured: false,
       summary: dto.description?.trim() || 'No description yet.',
+      managerName,
       mainImageUrl: dto.mainImageUrl,
       latitude: dto.latitude,
       longitude: dto.longitude,
@@ -452,6 +470,15 @@ export class DestinationsComponent implements OnInit {
     );
   }
 
+  private loadManagersPage(page: number): Observable<{ items?: AdminUserListItemDto[]; totalPages?: number }> {
+    return this.adminUsersService.searchManagers('', 100).pipe(
+      map((res) => ({
+        items: res.items ?? [],
+        totalPages: res.totalPages ?? 0
+      }))
+    );
+  }
+
   private fetchAllPages<T>(
     load: (page: number) => Observable<{ items?: T[]; totalPages?: number }>
   ): Observable<T[]> {
@@ -481,6 +508,7 @@ export class DestinationsComponent implements OnInit {
           d.country.toLowerCase().includes(q) ||
           d.code.toLowerCase().includes(q) ||
           d.publicId.toLowerCase().includes(q) ||
+          d.managerName.toLowerCase().includes(q) ||
           d.destinationType.toLowerCase().includes(q)
       );
     }

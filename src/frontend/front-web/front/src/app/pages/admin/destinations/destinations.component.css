@@ -541,6 +541,17 @@ tbody tr:hover,
   white-space: nowrap;
 }
 
+.manager-cell {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .inventory-cell {
   display: inline-flex;
   align-items: center;
