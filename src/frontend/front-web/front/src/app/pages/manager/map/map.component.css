@@ -1,7 +1,13 @@
+:host {
+  display: block;
+  height: calc(100vh - 62px);
+  overflow: hidden;
+}
+
 .map-page {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 62px);
   overflow: hidden;
   font-family: var(--font-base);
 }
@@ -173,7 +179,7 @@
 
 .filter-chips {
   position: absolute;
-  top: 78px;
+  top: 76px;
   left: 16px;
   right: 16px;
   z-index: 1000;
@@ -191,36 +197,45 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.75);
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(8px);
-  font-family: var(--font-base);
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: none;
+  background: #ffffff;
+  font-family: 'DM Sans', sans-serif;
   font-size: 13px;
-  font-weight: 600;
-  color: var(--text-primary);
+  font-weight: 500;
+  color: var(--emperor);
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition:
     background 0.2s,
-    color 0.2s,
-    border-color 0.2s;
+    color 0.2s;
   white-space: nowrap;
 
   &:hover {
-    background: var(--color-primary-light);
-    color: var(--color-primary);
+    background: var(--primary-light);
+    color: var(--primary);
   }
 }
 
+.chip span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+}
+
 .chip--active {
-  background: linear-gradient(135deg, #168aad 0%, #0f6f8c 100%);
-  border-color: rgba(15, 111, 140, 0.3);
-  color: white;
+  background: #168aad !important;
+  color: #ffffff;
+  opacity: 1 !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(22, 138, 173, 0.28) !important;
+
   &:hover {
-    background: linear-gradient(135deg, #168aad 0%, #0f6f8c 100%);
-    color: white;
+    background: #0f6f8c !important;
+    color: #ffffff;
   }
 }
 
@@ -339,21 +354,6 @@
     background: var(--color-primary-light);
     color: var(--color-primary);
   }
-}
-
-.gps-btn {
-  background: var(--primary);
-  color: var(--white);
-  margin-bottom: 8px;
-  &:hover {
-    background: var(--primary-dark);
-    color: var(--white);
-  }
-}
-
-.gps-btn--active {
-  background: #10b981 !important;
-  color: var(--white) !important;
 }
 
 .user-dot {
