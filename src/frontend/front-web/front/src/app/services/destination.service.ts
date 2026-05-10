@@ -62,6 +62,10 @@ export interface UpdateDestinationDto {
   destinationTypeId?: number;
   regionId?: number;
 }
+
+export interface AssignManagerDto {
+  managerUserId: number;
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -98,6 +102,11 @@ export class DestinationService {
 
   update(id: number, dto: UpdateDestinationDto): Observable<DestinationDto> {
     return this.http.put<DestinationDto>(`${this.apiUrl}/${id}`, dto);
+  }
+
+  assignManager(id: number, managerUserId: number): Observable<DestinationDto> {
+    const body: AssignManagerDto = { managerUserId };
+    return this.http.put<DestinationDto>(`${this.apiUrl}/${id}/assign-manager`, body);
   }
 
   delete(id: number): Observable<void> {

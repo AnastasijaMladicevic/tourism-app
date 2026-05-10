@@ -241,17 +241,99 @@
         <div class="panel-head">
           <span class="panel-icon material-symbols-outlined">group</span>
           <div>
-            <h2 class="panel-title">Managers</h2>
-            <p class="panel-sub">Managers in charge of the location.</p>
+            <h2 class="panel-title">Manager</h2>
+            <p class="panel-sub">Manager in charge of the destination.</p>
           </div>
         </div>
-        <label class="form-field">
-          <span class="label sr-only">Search managers</span>
-          <input type="search" [(ngModel)]="managerSearch" placeholder="Search managers" disabled />
-        </label>
-        <div class="empty-managers">
-          <span class="material-symbols-outlined">person_add</span>
-          <p>No managers assigned yet.</p>
+        <div class="manager-combo" #managerCombo>
+          <div class="manager-search-wrap">
+            <span class="material-symbols-outlined manager-search-ico" aria-hidden="true">search</span>
+            <input
+              type="search"
+              [(ngModel)]="managerSearch"
+              (ngModelChange)="onManagerSearchInput($event)"
+              (focus)="onManagerSearchFocus()"
+              autocomplete="off"
+              placeholder="Search managers"
+              aria-autocomplete="list"
+              [attr.aria-expanded]="managerSuggestionsOpen"
+              aria-controls="manager-suggestion-list"
+            />
+          </div>
+          @if (managerSuggestionsOpen && managerSearch.trim().length > 0) {
+            <ul
+              id="manager-suggestion-list"
+              class="manager-suggestions"
+              role="listbox"
+              aria-label="Manager suggestions"
+            >
+              @if (managerSuggestionsLoading) {
+                <li class="manager-suggestion manager-suggestion--muted" role="presentation">Searching…</li>
+              } @else if (!managerSuggestions.length) {
+                <li class="manager-suggestion manager-suggestion--muted" role="presentation">
+                  No managers match your search.
+                </li>
+              } @else {
+                @for (u of managerSuggestions; track u.id) {
+                  <li role="option">
+                    <button
+                      type="button"
+                      class="manager-suggestion-btn"
+                      (mousedown)="$event.preventDefault()"
+                      (click)="selectManager(u)"
+                    >
+                      @if (u.profileImageUrl) {
+                        <img [src]="u.profileImageUrl" alt="" class="manager-suggestion-avatar" />
+                      } @else {
+                        <span class="manager-suggestion-avatar manager-suggestion-avatar--ph" aria-hidden="true">{{
+                          managerInitials(u)
+                        }}</span>
+                      }
+                      <span class="manager-suggestion-text">
+                        <span class="manager-suggestion-name">{{ displayName(u) }}</span>
+                        <span class="manager-suggestion-email">{{ u.email }}</span>
+                      </span>
+                    </button>
+                  </li>
+                }
+              }
+            </ul>
+          }
+
+          @if (selectedManager) {
+            <div class="selected-managers">
+              <div class="selected-manager-card">
+                @if (selectedManager.profileImageUrl) {
+                  <img
+                    [src]="selectedManager.profileImageUrl"
+                    alt=""
+                    class="selected-manager-avatar"
+                  />
+                } @else {
+                  <span class="selected-manager-avatar selected-manager-avatar--ph" aria-hidden="true">{{
+                    managerInitials(selectedManager)
+                  }}</span>
+                }
+                <div class="selected-manager-info">
+                  <span class="selected-manager-name">{{ displayName(selectedManager) }}</span>
+                  <span class="selected-manager-email">{{ selectedManager.email }}</span>
+                </div>
+                <button
+                  type="button"
+                  class="selected-manager-remove"
+                  (click)="clearSelectedManager()"
+                  aria-label="Remove manager"
+                >
+                  <span class="material-symbols-outlined" aria-hidden="true">close</span>
+                </button>
+              </div>
+            </div>
+          } @else {
+            <div class="empty-managers">
+              <span class="material-symbols-outlined">person_add</span>
+              <p>No managers assigned yet.</p>
+            </div>
+          }
         </div>
       </article>
     </aside>

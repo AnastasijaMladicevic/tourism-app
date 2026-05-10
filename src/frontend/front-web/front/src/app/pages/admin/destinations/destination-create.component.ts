@@ -1,8 +1,30 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  inject
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  finalize,
+  map,
+  switchMap,
+  takeUntil,
+  tap
+} from 'rxjs/operators';
+import {
+  AdminUserListItemDto,
+  AdminUsersService
+} from '../../../services/admin-users.service';
 import {
   CreateDestinationDto,
   DestinationDto,
@@ -22,7 +44,13 @@ import { MapComponent as SharedMapComponent } from '../../../shared/components/m
 export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   private readonly destinationService = inject(DestinationService);
   private readonly regionService = inject(RegionService);
+  private readonly adminUsersService = inject(AdminUsersService);
   private readonly router = inject(Router);
+
+  @ViewChild('managerCombo') managerComboRef?: ElementRef<HTMLElement>;
+
+  private readonly destroy$ = new Subject<void>();
+  private readonly managerSearchInput$ = new Subject<string>();
 
   isSubmitting = false;
   isLoadingRegions = true;
@@ -37,6 +65,10 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   categoryInput = '';
   categories: string[] = [];
   managerSearch = '';
+  managerSuggestions: AdminUserListItemDto[] = [];
+  managerSuggestionsOpen = false;
+  managerSuggestionsLoading = false;
+  selectedManager: AdminUserListItemDto | null = null;
 
   imageFiles: File[] = [];
   imagePreviews: string[] = [];
@@ -52,11 +84,21 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   };
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.imagePreviews.forEach((url) => {
       if (url.startsWith('blob:')) {
         URL.revokeObjectURL(url);
       }
     });
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const root = this.managerComboRef?.nativeElement;
+    if (root && !root.contains(event.target as Node)) {
+      this.managerSuggestionsOpen = false;
+    }
   }
 
   ngOnInit(): void {
@@ -72,6 +114,71 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
             'Could not load regions. You can still create a destination without a region.';
         }
       });
+
+    this.managerSearchInput$
+      .pipe(
+        debounceTime(250),
+        distinctUntilChanged(),
+        tap((term) => {
+          if (!term.trim()) {
+            this.managerSuggestions = [];
+            this.managerSuggestionsLoading = false;
+            this.managerSuggestionsOpen = false;
+          }
+        }),
+        switchMap((term) => {
+          const q = term.trim();
+          if (!q) {
+            return of(null);
+          }
+          this.managerSuggestionsLoading = true;
+          return this.adminUsersService.searchManagers(q).pipe(
+            finalize(() => (this.managerSuggestionsLoading = false))
+          );
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((page) => {
+        if (!page) {
+          return;
+        }
+        const skipId = this.selectedManager?.id;
+        this.managerSuggestions = page.items.filter((u) => u.id !== skipId);
+        this.managerSuggestionsOpen = true;
+      });
+  }
+
+  onManagerSearchInput(value: string): void {
+    this.managerSearchInput$.next(value);
+  }
+
+  onManagerSearchFocus(): void {
+    const q = this.managerSearch.trim();
+    if (q.length > 0) {
+      this.managerSearchInput$.next(this.managerSearch);
+    }
+  }
+
+  selectManager(user: AdminUserListItemDto): void {
+    this.selectedManager = user;
+    this.managerSearch = '';
+    this.managerSuggestions = [];
+    this.managerSuggestionsOpen = false;
+  }
+
+  clearSelectedManager(): void {
+    this.selectedManager = null;
+  }
+
+  displayName(user: AdminUserListItemDto): string {
+    return `${user.firstName} ${user.lastName}`.trim() || user.email;
+  }
+
+  managerInitials(user: AdminUserListItemDto): string {
+    const a = user.firstName?.charAt(0) ?? '';
+    const b = user.lastName?.charAt(0) ?? '';
+    const s = `${a}${b}`.toUpperCase();
+    return s || user.email.charAt(0).toUpperCase();
   }
 
   get mapLat(): number {
@@ -216,20 +323,49 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         ? this.destinationService.update(this.savedDestinationId, updatePayload)
         : this.destinationService.create(createPayload);
 
-    request$.pipe(finalize(() => (this.isSubmitting = false))).subscribe({
-      next: (saved: DestinationDto) => {
-        this.savedDestinationId = saved.id;
-        if (published) {
-          this.router.navigate(['/admin/destinations']);
-          return;
+    request$
+      .pipe(
+        switchMap((saved: DestinationDto) => {
+          this.savedDestinationId = saved.id;
+          if (!this.selectedManager) {
+            return of({ assigned: true as const });
+          }
+          return this.destinationService.assignManager(saved.id, this.selectedManager.id).pipe(
+            map(() => ({ assigned: true as const })),
+            catchError((err) =>
+              of({
+                assigned: false as const,
+                assignError:
+                  typeof err?.error?.message === 'string'
+                    ? err.error.message
+                    : 'Destination was saved, but assigning the manager failed.'
+              })
+            )
+          );
+        }),
+        finalize(() => (this.isSubmitting = false))
+      )
+      .subscribe({
+        next: (out) => {
+          if (!out.assigned) {
+            this.errorMessage = out.assignError;
+            if (!published) {
+              this.draftSavedMessage =
+                'Draft saved to the server. You can fix manager assignment and save again.';
+            }
+            return;
+          }
+          if (published) {
+            this.router.navigate(['/admin/destinations']);
+            return;
+          }
+          this.form.isActive = false;
+          this.draftSavedMessage = 'Draft saved to the server';
+        },
+        error: () => {
+          this.errorMessage = 'Save failed. Please check fields and try again.';
         }
-        this.form.isActive = false;
-        this.draftSavedMessage = 'Draft saved to the server';
-      },
-      error: () => {
-        this.errorMessage = 'Save failed. Please check fields and try again.';
-      }
-    });
+      });
   }
 
   onCancel(): void {
