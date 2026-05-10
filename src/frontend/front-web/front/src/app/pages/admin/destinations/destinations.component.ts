@@ -41,6 +41,7 @@ interface DestinationInsightCard {
   value: string;
   hint: string;
   tone: 'blue' | 'green' | 'amber';
+  icon: string;
 }
 
 @Component({
@@ -114,19 +115,22 @@ export class DestinationsComponent implements OnInit {
         label: 'Total destinations',
         value: String(filtered.length),
         hint: 'Matching current filters',
-        tone: 'blue'
+        tone: 'blue',
+        icon: 'public'
       },
       {
         label: 'On this page',
         value: String(this.visibleDestinations.length),
         hint: 'Visible rows',
-        tone: 'green'
+        tone: 'green',
+        icon: 'view_list'
       },
       {
         label: 'Published',
         value: String(published),
         hint: 'Matching current filters',
-        tone: 'amber'
+        tone: 'amber',
+        icon: 'check_circle'
       }
     ];
   }

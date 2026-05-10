@@ -202,10 +202,16 @@
 }
 
 .insight-card {
+  display: flex;
+  flex-direction: column;
   padding: 16px;
+  min-height: 120px;
 }
 
-.insight-card p {
+.insight-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   color: #6b7280;
   font-size: 12px;
   font-weight: 600;
@@ -219,12 +225,23 @@
   line-height: 1;
 }
 
+.insight-icon--title {
+  font-size: 26px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
 .insight-card span {
   color: #6b7280;
   font-size: 12px;
+  margin-top: auto;
 }
 
 .insight-card[data-tone='blue'] strong {
+  color: #2563eb;
+}
+
+.insight-card[data-tone='blue'] .insight-icon--title {
   color: #2563eb;
 }
 
@@ -232,7 +249,15 @@
   color: #16a34a;
 }
 
+.insight-card[data-tone='green'] .insight-icon--title {
+  color: #16a34a;
+}
+
 .insight-card[data-tone='amber'] strong {
+  color: #d97706;
+}
+
+.insight-card[data-tone='amber'] .insight-icon--title {
   color: #d97706;
 }
 
@@ -344,6 +369,11 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.sidebar-review-btn {
+  width: 100%;
+  justify-content: center;
 }
 
 .section-head {

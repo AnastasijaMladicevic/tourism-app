@@ -91,7 +91,10 @@
           class="insight-card card"
           [attr.data-tone]="insight.tone"
         >
-          <p>{{ insight.label }}</p>
+          <p class="insight-title">
+            <span class="material-symbols-outlined insight-icon--title">{{ insight.icon }}</span>
+            {{ insight.label }}
+          </p>
           <strong>{{ insight.value }}</strong>
           <span>{{ insight.hint }}</span>
         </article>
@@ -257,8 +260,8 @@
 
           <div class="schedule-list">
             <div class="schedule-item">
-              <span>Region code</span>
-              <strong>{{ selectedDestination.code || '—' }}</strong>
+              <span>Manager</span>
+              <strong>{{ selectedDestination.managerName || '—' }}</strong>
             </div>
             <div class="schedule-item">
               <span>Region</span>
@@ -294,6 +297,13 @@
               </div>
             }
           </div>
+        </section>
+
+        <section class="detail-section">
+          <button type="button" class="primary-btn sidebar-review-btn" (click)="onEditDestination(selectedDestination)">
+            <span class="material-symbols-outlined">rate_review</span>
+            Open full review
+          </button>
         </section>
       } @else {
         <div class="empty-state">
