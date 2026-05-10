@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectorRef, AfterViewInit, OnDestroy, ViewChild, ElementRef, NgZone } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import * as L from 'leaflet';
+import { MapService } from '../../../../services/map.service';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -38,6 +38,7 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly ngZone = inject(NgZone);
   private readonly http = inject(HttpClient);
+  private readonly mapService = inject(MapService);
 
   form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(200)]],
@@ -201,18 +202,13 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
   private readonly defaultMapCenter: [number, number] = [42.424, 18.771];
   private readonly defaultMapZoom = 13;
 
-  private map: L.Map | null = null;
-  private mapMarker: L.Marker | null = null;
-
   ngAfterViewInit(): void {
     this.initializeMap();
     this.syncMapFromForm();
   }
 
   ngOnDestroy(): void {
-    this.map?.remove();
-    this.map = null;
-    this.mapMarker = null;
+    this.mapService.destroyMap();
   }
 
   loadEvent(): void {
@@ -308,32 +304,30 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   private initializeMap(): void {
-    if (!this.eventMap || this.map) {
+    if (!this.eventMap) {
       return;
     }
 
     const latitude = this.toNumber(this.form.controls.latitude.value);
     const longitude = this.toNumber(this.form.controls.longitude.value);
-    const center: L.LatLngExpression = latitude != null && longitude != null
-      ? [latitude, longitude]
-      : this.defaultMapCenter;
-    const zoom = latitude != null && longitude != null ? 15 : this.defaultMapZoom;
 
-    this.map = L.map(this.eventMap.nativeElement, {
-      zoomControl: true,
-      scrollWheelZoom: false,
-      doubleClickZoom: false,
-      dragging: false,
-      touchZoom: false,
-      boxZoom: false,
-      keyboard: false
-    }).setView(center, zoom);
+    const lat = latitude ?? this.defaultMapCenter[0];
+    const lng = longitude ?? this.defaultMapCenter[1];
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '',
-      subdomains: '',
-      maxZoom: 19
-    }).addTo(this.map);
+    this.mapService.initMap(
+      this.eventMap.nativeElement.id,
+      lat,
+      lng,
+      latitude != null && longitude != null
+        ? 15
+        : this.defaultMapZoom
+    );
+
+    const map = this.mapService.getMap();
+
+    setTimeout(() => {
+      map?.invalidateSize();
+    }, 0);
   }
 
   private syncMapFromForm(): void {
@@ -344,32 +338,28 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
       return;
     }
 
-    this.updateMapMarker(latitude, longitude);
+    this.mapService.destroyMap();
+
+    setTimeout(() => {
+      this.initializeMap();
+      this.updateMapMarker(latitude, longitude);
+    }, 0);
   }
 
   private updateMapMarker(latitude: number, longitude: number): void {
-    if (!this.map) {
+    const map = this.mapService.getMap();
+
+    if (!map) {
       return;
     }
 
-    if (!this.mapMarker) {
-      const markerIcon = L.icon({
-        iconUrl: 'assets/marker-icon.png',
-        iconRetinaUrl: 'assets/marker-icon-2x.png',
-        shadowUrl: 'assets/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-      });
+    this.mapService.flyTo(latitude, longitude, 15);
 
-      this.mapMarker = L.marker([latitude, longitude], { icon: markerIcon, draggable: false }).addTo(this.map);
-    } else {
-      this.mapMarker.setLatLng([latitude, longitude]);
-    }
-
-    const targetZoom = Math.max(this.map.getZoom(), 15);
-    this.map.flyTo([latitude, longitude], targetZoom, { duration: 0.8 });
+    this.mapService.addMainMapMarker(
+      latitude,
+      longitude,
+      this.form.controls.name.value || 'Event'
+    );
   }
 
   private toNumber(value: number | string | null | undefined): number | null {

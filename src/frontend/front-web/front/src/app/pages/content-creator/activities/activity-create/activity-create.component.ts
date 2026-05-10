@@ -15,7 +15,7 @@ import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, Validati
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, forkJoin, map, of, switchMap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import * as L from 'leaflet';
+import { MapService } from '../../../../services/map.service';
 import {
   ActivitiesService,
   ActivityTypeOption,
@@ -92,15 +92,14 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
   private readonly destroyRef = inject(DestroyRef);
   private readonly ngZone = inject(NgZone);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly mapService = inject(MapService);
 
   @ViewChild('activityMap') private activityMap?: ElementRef<HTMLDivElement>;
 
   private readonly draftKey = 'content-creator:add-activity-draft';
-  private readonly defaultMapCenter: L.LatLngExpression = [42.424, 18.771];
+  private readonly defaultLat = 42.424;
+  private readonly defaultLng = 18.771;
   private readonly defaultMapZoom = 13;
-
-  private map: L.Map | null = null;
-  private mapMarker: L.Marker | null = null;
   private geocodeRequestId = 0;
   private forwardGeocodeRequestId = 0;
 
@@ -210,9 +209,7 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   ngOnDestroy(): void {
-    this.map?.remove();
-    this.map = null;
-    this.mapMarker = null;
+    this.mapService.destroyMap();
   }
 
   get pageTitle(): string {
@@ -896,42 +893,36 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   private initializeMap(): void {
-    if (!this.activityMap || this.map) {
+    if (!this.activityMap) {
       return;
     }
 
     const initialLat = this.toNumber(this.form.controls.latitude.value);
     const initialLng = this.toNumber(this.form.controls.longitude.value);
-    const center: L.LatLngExpression = initialLat != null && initialLng != null
-      ? [initialLat, initialLng]
-      : this.defaultMapCenter;
-    const zoom = initialLat != null && initialLng != null ? 15 : this.defaultMapZoom;
 
-    this.map = L.map(this.activityMap.nativeElement, {
-      zoomControl: true,
-      scrollWheelZoom: true,
-      doubleClickZoom: true,
-      dragging: true,
-      touchZoom: true,
-      boxZoom: true,
-      keyboard: true
-    }).setView(center, zoom);
+    const lat = initialLat ?? this.defaultLat;
+    const lng = initialLng ?? this.defaultLng;
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '',
-      subdomains: '',
-      maxZoom: 19
-    }).addTo(this.map);
+    this.mapService.initMap(
+      this.activityMap.nativeElement.id,
+      lat,
+      lng,
+      initialLat != null && initialLng != null
+        ? 15
+        : this.defaultMapZoom
+    );
 
-    this.map.on('click', (event: L.LeafletMouseEvent) => {
-      this.ngZone.run(() => this.selectLocation(event.latlng.lat, event.latlng.lng));
+    const map = this.mapService.getMap();
+
+    map?.on('click', (event: any) => {
+      this.ngZone.run(() => {
+        this.selectLocation(event.latlng.lat, event.latlng.lng);
+      });
     });
 
-    this.map.whenReady(() => {
-      setTimeout(() => {
-        this.map?.invalidateSize();
-      }, 0);
-    });
+    setTimeout(() => {
+      map?.invalidateSize();
+    }, 0);
   }
 
   private syncMapFromForm(): void {
@@ -943,7 +934,12 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
       return;
     }
 
-    this.updateMapMarker(latitude, longitude);
+    this.mapService.destroyMap();
+
+    setTimeout(() => {
+      this.initializeMap();
+      this.updateMapMarker(latitude, longitude);
+    }, 0);
     this.reverseGeocode(latitude, longitude);
   }
 
@@ -966,28 +962,19 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   private updateMapMarker(latitude: number, longitude: number): void {
-    if (!this.map) {
+    const map = this.mapService.getMap();
+
+    if (!map) {
       return;
     }
 
-    if (!this.mapMarker) {
-      const markerIcon = L.icon({
-        iconUrl: 'assets/marker-icon.png',
-        iconRetinaUrl: 'assets/marker-icon-2x.png',
-        shadowUrl: 'assets/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-      });
+    this.mapService.flyTo(latitude, longitude, 15);
 
-      this.mapMarker = L.marker([latitude, longitude], { icon: markerIcon, draggable: false }).addTo(this.map);
-    } else {
-      this.mapMarker.setLatLng([latitude, longitude]);
-    }
-
-    const targetZoom = Math.max(this.map.getZoom(), 15);
-    this.map.flyTo([latitude, longitude], targetZoom, { duration: 0.8 });
+    this.mapService.addMainMapMarker(
+      latitude,
+      longitude,
+      this.form.controls.name.value || 'Activity'
+    );
   }
 
   private reverseGeocode(latitude: number, longitude: number): void {
