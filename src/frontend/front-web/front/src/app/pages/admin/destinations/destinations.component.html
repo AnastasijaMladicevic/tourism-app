@@ -102,23 +102,22 @@
           <table>
             <thead>
               <tr>
-                <th class="col-thumb">Thumb</th>
-                <th>Destination Name</th>
+                <th>Status</th>
+                <th>Destination</th>
                 <th>Type</th>
                 <th>Region</th>
                 <th>Inventory</th>
-                <th>Status</th>
                 <th class="col-actions">Actions</th>
               </tr>
             </thead>
             <tbody>
               @if (isLoading) {
                 <tr>
-                  <td colspan="7" class="table-message">Loading destinations…</td>
+                  <td colspan="6" class="table-message">Loading destinations…</td>
                 </tr>
               } @else if (loadError) {
                 <tr>
-                  <td colspan="7" class="table-message table-message--error">
+                  <td colspan="6" class="table-message table-message--error">
                     <p>{{ loadError }}</p>
                     <button type="button" class="ghost-btn slim-btn" (click)="reloadFromApi()">
                       Retry
@@ -127,7 +126,7 @@
                 </tr>
               } @else if (!visibleDestinations.length) {
                 <tr>
-                  <td colspan="7" class="table-message">No destinations match the current filters.</td>
+                  <td colspan="6" class="table-message">No destinations match the current filters.</td>
                 </tr>
               } @else {
                 <tr
@@ -135,18 +134,22 @@
                   [class.active-row]="selectedDestination?.id === row.id"
                   (click)="selectDestination(row)"
                 >
-                  <td class="cell-thumb">
-                    <span
-                      class="destination-thumb"
-                      [style.background-image]="row.mainImageUrl ? 'url(' + row.mainImageUrl + ')' : ''"
-                      role="img"
-                      [attr.aria-label]="row.name"
-                    ></span>
+                  <td>
+                    <span class="table-status" [ngClass]="getTableStatusClass(row.status)">
+                      {{ formatTableStatus(row.status) }}
+                    </span>
                   </td>
                   <td>
-                    <div class="name-cell">
-                      <strong>{{ row.name }}</strong>
-                      <span class="name-cell-id">ID: {{ row.publicId }}</span>
+                    <div class="destination-cell">
+                      <span
+                        class="destination-thumb"
+                        [style.background-image]="row.mainImageUrl ? 'url(' + row.mainImageUrl + ')' : ''"
+                        role="img"
+                        [attr.aria-label]="row.name"
+                      ></span>
+                      <div class="name-cell">
+                        <strong>{{ row.name }}</strong>
+                      </div>
                     </div>
                   </td>
                   <td>
@@ -160,11 +163,6 @@
                     </span>
                   </td>
                   <td>
-                    <span class="table-status" [ngClass]="getTableStatusClass(row.status)">
-                      {{ formatTableStatus(row.status) }}
-                    </span>
-                  </td>
-                  <td>
                     <div class="row-actions">
                       <button
                         type="button"
@@ -173,14 +171,6 @@
                         (click)="onEditDestination(row); $event.stopPropagation()"
                       >
                         <span class="material-symbols-outlined">edit</span>
-                      </button>
-                      <button
-                        type="button"
-                        class="icon-btn plain"
-                        title="More actions"
-                        (click)="onRowMoreActions(row, $event)"
-                      >
-                        <span class="material-symbols-outlined">more_vert</span>
                       </button>
                     </div>
                   </td>
@@ -269,10 +259,6 @@
             <div class="schedule-item">
               <span>Region</span>
               <strong>{{ selectedDestination.region }}</strong>
-            </div>
-            <div class="schedule-item">
-              <span>Public ID</span>
-              <strong>{{ selectedDestination.publicId }}</strong>
             </div>
             <div class="schedule-item">
               <span>Last updated</span>

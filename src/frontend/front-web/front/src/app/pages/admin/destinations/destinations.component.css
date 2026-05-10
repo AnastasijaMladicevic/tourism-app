@@ -493,17 +493,15 @@ tbody tr:hover,
   background: #f8fbff;
 }
 
-.col-thumb {
-  width: 72px;
-}
-
 .col-actions {
   width: 96px;
-  text-align: right;
+  text-align: center;
 }
 
-.cell-thumb {
-  vertical-align: middle;
+.destination-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .destination-thumb {
@@ -528,12 +526,6 @@ tbody tr:hover,
   font-size: 14px;
   color: #111827;
   font-weight: 700;
-}
-
-.name-cell-id {
-  font-size: 12px;
-  color: #9ca3af;
-  font-weight: 500;
 }
 
 .type-pill {
@@ -565,20 +557,39 @@ tbody tr:hover,
 }
 
 .table-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.table-status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
 }
 
 .table-status-published {
-  color: #16a34a;
+  color: #166534;
+  background: #dcfce7;
 }
 
 .table-status-draft {
-  color: #1f2937;
+  color: #475569;
+  background: #e2e8f0;
 }
 
 .table-status-archived {
-  color: #64748b;
+  color: #991b1b;
+  background: #fee2e2;
 }
 
 .featured-pill {
@@ -638,7 +649,7 @@ tbody tr:hover,
 
 .row-actions {
   gap: 4px;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .icon-btn {

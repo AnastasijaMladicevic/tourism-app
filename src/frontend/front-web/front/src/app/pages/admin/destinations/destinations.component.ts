@@ -15,7 +15,6 @@ export type AdminDestinationStatus = 'active' | 'draft' | 'archived';
 export interface AdminDestinationRow {
   id: number;
   name: string;
-  /** Shown in the Name column as "ID: …" (e.g. DEST-1001). */
   publicId: string;
   /** Category label in the Type column (pill). */
   destinationType: string;
