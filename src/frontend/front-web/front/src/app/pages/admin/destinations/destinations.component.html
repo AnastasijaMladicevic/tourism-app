@@ -225,7 +225,16 @@
     <aside class="detail-column card">
       @if (selectedDestination) {
         <div class="destination-hero">
-          <div class="hero-media" [style.background-image]="'url(' + selectedBanner + ')'">
+          <div class="hero-media" [class.has-slides]="heroImageUrls.length > 0">
+            <div class="hero-media-slides" aria-hidden="true">
+              @for (url of heroImageUrls; track trackByHeroImage($index, url); let i = $index) {
+                <div
+                  class="hero-media-slide"
+                  [class.is-active]="i === currentHeroImageIndex"
+                  [ngStyle]="getHeroSlideStyle(url)"
+                ></div>
+              }
+            </div>
             <span class="hero-badge">{{ selectedDestination.region }}</span>
           </div>
 

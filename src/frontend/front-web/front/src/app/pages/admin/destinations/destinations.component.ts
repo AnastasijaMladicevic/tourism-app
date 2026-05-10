@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpParams } from '@angular/common/http';
@@ -7,7 +7,11 @@ import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { AdminUserListItemDto, AdminUsersService } from '../../../services/admin-users.service';
-import { DestinationService, DestinationDto } from '../../../services/destination.service';
+import {
+  DestinationDto,
+  DestinationImageDto,
+  DestinationService
+} from '../../../services/destination.service';
 import { LocalityService, LocalityDto } from '../../../services/locality.service';
 import { ObjectDto } from '../../../services/object';
 import { environment } from '../../../../environment/environment';
@@ -51,7 +55,9 @@ interface DestinationInsightCard {
   templateUrl: './destinations.component.html',
   styleUrls: ['./destinations.component.css']
 })
-export class DestinationsComponent implements OnInit {
+export class DestinationsComponent implements OnInit, OnDestroy {
+  private static readonly HERO_ROTATION_INTERVAL_MS = 8000;
+
   private readonly destinationService = inject(DestinationService);
   private readonly adminUsersService = inject(AdminUsersService);
   private readonly localityService = inject(LocalityService);
@@ -80,6 +86,10 @@ export class DestinationsComponent implements OnInit {
 
   selectedDestination: AdminDestinationRow | null = null;
 
+  heroImageUrls: string[] = [];
+  currentHeroImageIndex = 0;
+  private heroRotationTimerId: ReturnType<typeof setInterval> | null = null;
+
   readonly statusOptions = [
     { value: 'all', label: 'All statuses' },
     { value: 'active', label: 'Published' },
@@ -97,6 +107,10 @@ export class DestinationsComponent implements OnInit {
 
   ngOnInit(): void {
     this.reloadFromApi();
+  }
+
+  ngOnDestroy(): void {
+    this.stopHeroImageRotation();
   }
 
   get regionFilterOptions(): { value: string; label: string }[] {
@@ -166,10 +180,6 @@ export class DestinationsComponent implements OnInit {
     return this.pageStart + this.visibleDestinations.length - 1;
   }
 
-  get selectedBanner(): string {
-    return this.selectedDestination?.mainImageUrl || '/assets/pozadina.png';
-  }
-
   get hasSelectedCoordinates(): boolean {
     return (
       this.selectedDestination?.latitude != null && this.selectedDestination?.longitude != null
@@ -196,7 +206,101 @@ export class DestinationsComponent implements OnInit {
   }
 
   selectDestination(row: AdminDestinationRow): void {
+    this.setSelectedDestination(row);
+  }
+
+  getHeroSlideStyle(url: string): Record<string, string> {
+    return { 'background-image': `url("${url}")` };
+  }
+
+  trackByHeroImage(index: number, url: string): string {
+    return `${index}-${url}`;
+  }
+
+  private setSelectedDestination(row: AdminDestinationRow | null): void {
+    const previousId = this.selectedDestination?.id ?? null;
     this.selectedDestination = row;
+
+    if ((row?.id ?? null) !== previousId) {
+      this.loadHeroImagesForSelectedDestination();
+    }
+  }
+
+  private loadHeroImagesForSelectedDestination(): void {
+    this.stopHeroImageRotation();
+    this.heroImageUrls = [];
+    this.currentHeroImageIndex = 0;
+
+    if (!this.selectedDestination) {
+      return;
+    }
+
+    const fallbackUrl =
+      this.normalizeImageUrl(this.selectedDestination.mainImageUrl) ||
+      this.normalizeImageUrl('/assets/pozadina.png');
+
+    this.destinationService.getImages(this.selectedDestination.id).subscribe({
+      next: (images: DestinationImageDto[]) => {
+        const orderedUrls = (images ?? [])
+          .slice()
+          .sort((a, b) => Number(b.isMain) - Number(a.isMain))
+          .map((image) => this.normalizeImageUrl(image.url))
+          .filter((url): url is string => !!url);
+
+        this.heroImageUrls =
+          orderedUrls.length > 0 ? orderedUrls : fallbackUrl ? [fallbackUrl] : [];
+        this.currentHeroImageIndex = 0;
+
+        if (this.heroImageUrls.length > 1) {
+          this.startHeroImageRotation();
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.heroImageUrls = fallbackUrl ? [fallbackUrl] : [];
+        this.currentHeroImageIndex = 0;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private startHeroImageRotation(): void {
+    this.stopHeroImageRotation();
+
+    this.heroRotationTimerId = setInterval(() => {
+      if (this.heroImageUrls.length <= 1) {
+        return;
+      }
+
+      this.currentHeroImageIndex =
+        (this.currentHeroImageIndex + 1) % this.heroImageUrls.length;
+      this.cdr.detectChanges();
+    }, DestinationsComponent.HERO_ROTATION_INTERVAL_MS);
+  }
+
+  private stopHeroImageRotation(): void {
+    if (this.heroRotationTimerId != null) {
+      clearInterval(this.heroRotationTimerId);
+      this.heroRotationTimerId = null;
+    }
+  }
+
+  private normalizeImageUrl(value?: string): string {
+    const trimmed = value?.trim();
+    if (!trimmed) {
+      return '';
+    }
+
+    if (/^(data:|blob:|https?:\/\/|\/\/)/i.test(trimmed)) {
+      return trimmed;
+    }
+
+    try {
+      return encodeURI(new URL(trimmed, document.baseURI).href);
+    } catch {
+      return encodeURI(trimmed);
+    }
   }
 
   onMoreFilters(): void {
@@ -342,7 +446,7 @@ export class DestinationsComponent implements OnInit {
         if (!this.loadError) {
           this.syncSelectionAfterFilter();
         } else {
-          this.selectedDestination = null;
+          this.setSelectedDestination(null);
         }
         this.cdr.detectChanges();
       });
@@ -563,18 +667,18 @@ export class DestinationsComponent implements OnInit {
   private syncSelectionAfterFilter(): void {
     const visible = this.visibleDestinations;
     if (!this.selectedDestination || !visible.some((d) => d.id === this.selectedDestination?.id)) {
-      this.selectedDestination = visible[0] ?? this.filteredSorted[0] ?? null;
+      this.setSelectedDestination(visible[0] ?? this.filteredSorted[0] ?? null);
     }
   }
 
   private syncSelectionToVisiblePage(): void {
     const visible = this.visibleDestinations;
     if (!visible.length) {
-      this.selectedDestination = null;
+      this.setSelectedDestination(null);
       return;
     }
     if (!this.selectedDestination || !visible.some((d) => d.id === this.selectedDestination?.id)) {
-      this.selectedDestination = visible[0];
+      this.setSelectedDestination(visible[0]);
     }
   }
 }
