@@ -87,7 +87,25 @@
     "terms": "Terms of use",
     "moderator": "Request moderator access",
     "about": "About us",
-    "logout": "Log out"
+    "logout": "Log out",
+    "visitedTitle": "I'VE BEEN THERE",
+    "visitedEmpty": "No confirmed visits yet. When you get close to a destination or locality with GPS enabled, it will appear here.",
+    "beenThere": "I've been there",
+    "visitedDestination": "Destination",
+    "visitedLocality": "Locality",
+    "shareLocationTitle": "Share location",
+    "shareLocationBody": "Generate a temporary link to share your current location with a friend.",
+    "shareHours": "{{hours}}h",
+    "shareLoading": "Preparing...",
+    "shareReady": "Your link is ready",
+    "shareExpires": "Valid until {{date}}",
+    "shareCopy": "Copy link",
+    "shareCopied": "Link copied",
+    "shareLocationError": "Location sharing is not available right now. Make sure your location was updated recently.",
+    "shareLocationGuestTitle": "Shared location",
+    "shareLocationGuestBody": "You opened a temporary link to view a location shared with you.",
+    "shareLocationUnavailable": "This shared location is no longer available or has expired.",
+    "shareLocationLive": "Current shared position"
   },
   "settings": {
     "title": "Settings",
@@ -121,6 +139,30 @@
       "appearance": "Appearance",
       "notifications": "Notifications",
       "location": "Location"
+    },
+    "smartLocation": {
+      "autoRegionTitle": "Automatic region by location",
+      "autoRegionBody": "When you move into another region, the app can automatically switch the content to the nearest region.",
+      "quietZoneTitle": "Do not disturb zones",
+      "quietZoneBody": "Save your home and work address so the app can mute destination notifications while you are in that zone.",
+      "zoneActive": "Zone active",
+      "zoneRadius": "{{radius}}m zone",
+      "saveAddress": "Save address",
+      "useCurrentLocation": "Use current location",
+      "clearZone": "Clear zone",
+      "saving": "Saving...",
+      "zoneSaveError": "The address could not be found right now. Check the input and try again.",
+      "zoneLocationError": "Current location is not available. Turn on location and try again.",
+      "zone": {
+        "home": {
+          "title": "Home zone",
+          "placeholder": "Enter your home address"
+        },
+        "work": {
+          "title": "Work zone",
+          "placeholder": "Enter your work address"
+        }
+      }
     },
     "notificationGroups": {
       "travel": "Trips and favorites",

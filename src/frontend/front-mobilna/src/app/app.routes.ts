@@ -348,4 +348,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./feature/results/results').then(m => m.ResultsComponent)
   },
+  {
+    path: 'shared-location',
+    loadComponent: () =>
+      import('./feature/shared-location/shared-location.component').then(
+        (m) => m.SharedLocationComponent,
+      )
+  },
 ];

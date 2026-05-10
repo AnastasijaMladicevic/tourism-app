@@ -87,7 +87,25 @@
     "terms": "Uslovi koriscenja",
     "moderator": "Zatraži dozvolu za moderatora",
     "about": "O nama",
-    "logout": "Odjavi se"
+    "logout": "Odjavi se",
+    "visitedTitle": "BILA SAM TU",
+    "visitedEmpty": "Još nema potvrđenih poseta. Kada se približiš destinaciji ili lokalitetu uz uključen GPS, ovde će se pojaviti.",
+    "beenThere": "Bila sam tu",
+    "visitedDestination": "Destinacija",
+    "visitedLocality": "Lokalitet",
+    "shareLocationTitle": "Podeli lokaciju",
+    "shareLocationBody": "Generiši privremeni link za deljenje tvoje trenutne lokacije sa prijateljem.",
+    "shareHours": "{{hours}}h",
+    "shareLoading": "Pripremam...",
+    "shareReady": "Link je spreman",
+    "shareExpires": "Važi do {{date}}",
+    "shareCopy": "Kopiraj link",
+    "shareCopied": "Link kopiran",
+    "shareLocationError": "Deljenje lokacije trenutno nije dostupno. Proveri da li je lokacija skoro ažurirana.",
+    "shareLocationGuestTitle": "Podeljena lokacija",
+    "shareLocationGuestBody": "Otvorila si privremeni link za pregled lokacije koji je podeljen sa tobom.",
+    "shareLocationUnavailable": "Ova podeljena lokacija više nije dostupna ili je istekla.",
+    "shareLocationLive": "Trenutna deljena pozicija"
   },
   "settings": {
     "title": "Podešavanja",
@@ -121,6 +139,30 @@
       "appearance": "Izgled",
       "notifications": "Obaveštenja",
       "location": "Lokacija"
+    },
+    "smartLocation": {
+      "autoRegionTitle": "Automatski region po lokaciji",
+      "autoRegionBody": "Kada pređeš u drugi region, aplikacija može sama da prebaci prikaz na najbliži region.",
+      "quietZoneTitle": "Ne uznemiravaj zone",
+      "quietZoneBody": "Sačuvaj kućnu i poslovnu adresu kako bi aplikacija utišala destinacijska obaveštenja dok si u toj zoni.",
+      "zoneActive": "Zona aktivna",
+      "zoneRadius": "Zona {{radius}}m",
+      "saveAddress": "Sačuvaj adresu",
+      "useCurrentLocation": "Koristi trenutnu lokaciju",
+      "clearZone": "Obriši zonu",
+      "saving": "Čuvam...",
+      "zoneSaveError": "Adresu trenutno nije moguće pronaći. Proveri unos i pokušaj ponovo.",
+      "zoneLocationError": "Trenutna lokacija nije dostupna. Uključi lokaciju pa pokušaj ponovo.",
+      "zone": {
+        "home": {
+          "title": "Kućna zona",
+          "placeholder": "Unesi adresu doma"
+        },
+        "work": {
+          "title": "Poslovna zona",
+          "placeholder": "Unesi adresu posla"
+        }
+      }
     },
     "notificationGroups": {
       "travel": "Putovanja i favoriti",

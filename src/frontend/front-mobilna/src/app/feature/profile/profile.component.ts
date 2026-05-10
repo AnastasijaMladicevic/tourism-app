@@ -3,7 +3,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
 import { environment } from '../../../environment/environment';
-import { AuthService, UserDto } from '../../services/auth';
+import { AuthService, UserDto, VisitedPlaceDto } from '../../services/auth';
 import { FavoriteService } from '../../services/favorite';
 import { EventPlannerService } from '../../services/event-planner';
 import { ReviewService } from '../../services/review';
@@ -48,6 +48,13 @@ export class ProfileComponent implements OnInit {
 
   protected user: UserDto | null = null;
   protected readonly stats = signal<ProfileStat[]>(this.buildStats());
+  protected visitedPlaces: VisitedPlaceDto[] = [];
+  protected shareUrl = '';
+  protected shareExpiresAt = '';
+  protected shareError = '';
+  protected shareBusyHours: number | null = null;
+  protected copySuccess = false;
+  protected readonly shareDurations = [1, 4, 24];
 
   protected readonly sections: ProfileSection[] = [
     {
@@ -83,6 +90,7 @@ export class ProfileComponent implements OnInit {
     this.user = currentUser;
     this.applyStatsSnapshot(this.resolveInitialStats(currentUser));
     this.loadStats();
+    this.loadVisitedPlaces();
 
     this.authService
       .getById(currentUser.id)
@@ -92,6 +100,7 @@ export class ProfileComponent implements OnInit {
         this.user = user;
         this.applyStatsSnapshot(this.resolveInitialStats(user));
         this.loadStats();
+        this.loadVisitedPlaces();
       });
   }
 
@@ -146,6 +155,46 @@ export class ProfileComponent implements OnInit {
     this.router.navigate(['/profile/edit']);
   }
 
+  protected openVisitedPlace(place: VisitedPlaceDto): void {
+    const route = place.kind === 'destination' ? '/destination' : '/locality';
+    this.router.navigate([route, place.id]);
+  }
+
+  protected async copyShareUrl(): Promise<void> {
+    if (!this.shareUrl || typeof navigator === 'undefined' || !navigator.clipboard) {
+      return;
+    }
+
+    await navigator.clipboard.writeText(this.shareUrl);
+    this.copySuccess = true;
+    setTimeout(() => {
+      this.copySuccess = false;
+    }, 2200);
+  }
+
+  protected generateLocationShare(durationHours: number): void {
+    this.shareError = '';
+    this.copySuccess = false;
+    this.shareUrl = '';
+    this.shareExpiresAt = '';
+    this.shareBusyHours = durationHours;
+
+    this.authService
+      .createLocationShare(durationHours)
+      .pipe(catchError(() => of(null)))
+      .subscribe((share) => {
+        this.shareBusyHours = null;
+
+        if (!share) {
+          this.shareError = 'profile.shareLocationError';
+          return;
+        }
+
+        this.shareUrl = share.shareUrl;
+        this.shareExpiresAt = share.expiresAtUtc;
+      });
+  }
+
   protected trackSection(_: number, section: ProfileSection): string {
     return section.titleKey;
   }
@@ -194,6 +243,20 @@ export class ProfileComponent implements OnInit {
 
       this.applyStatsSnapshot(snapshot);
     });
+  }
+
+  private loadVisitedPlaces(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.visitedPlaces = [];
+      return;
+    }
+
+    this.authService
+      .getVisitedPlaces(6)
+      .pipe(catchError(() => of([])))
+      .subscribe((places) => {
+        this.visitedPlaces = places;
+      });
   }
 
   private resolveInitialStats(user: UserDto): Partial<ProfileStatsSnapshot> {

@@ -122,6 +122,116 @@
   background: rgba(208, 234, 240, 0.72);
 }
 
+.zone-block {
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.zone-block__copy {
+  p {
+    margin: 6px 0 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: rgba(77, 99, 112, 0.88);
+  }
+}
+
+.zone-card {
+  border: 1px solid rgba(208, 234, 240, 0.85);
+  border-radius: 16px;
+  padding: 14px;
+  background: rgba(247, 252, 254, 0.8);
+}
+
+.zone-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+
+  strong {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--emperor);
+  }
+}
+
+.zone-card__badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(22, 138, 173, 0.12);
+  color: #168AAD;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.zone-card__input input {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(188, 225, 235, 0.92);
+  background: #fff;
+  padding: 0 14px;
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--emperor);
+}
+
+.zone-card__summary,
+.zone-card__error {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.zone-card__summary {
+  color: rgba(77, 99, 112, 0.88);
+}
+
+.zone-card__error {
+  color: #d45555;
+}
+
+.zone-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.zone-btn {
+  min-height: 38px;
+  border-radius: 12px;
+  border: none;
+  padding: 0 14px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.zone-btn--primary {
+  background: #168AAD;
+  color: white;
+}
+
+.zone-btn--ghost {
+  background: rgba(22, 138, 173, 0.08);
+  color: #168AAD;
+  border: 1px solid rgba(22, 138, 173, 0.18);
+}
+
+.zone-btn--text {
+  background: transparent;
+  color: #6f7b85;
+}
+
 .menu-title {
   font-size: 15px;
   font-weight: 700;
@@ -206,5 +316,9 @@
 
   .preference-row {
     padding: 18px 20px;
+  }
+
+  .zone-block {
+    padding: 20px;
   }
 }

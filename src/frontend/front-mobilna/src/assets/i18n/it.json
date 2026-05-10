@@ -87,7 +87,25 @@
     "terms": "Termini di utilizzo",
     "moderator": "Richiedi accesso moderatore",
     "about": "Chi siamo",
-    "logout": "Esci"
+    "logout": "Esci",
+    "visitedTitle": "CI SONO STATA",
+    "visitedEmpty": "Non ci sono ancora visite confermate. Quando ti avvicini a una destinazione o località con il GPS attivo, apparirà qui.",
+    "beenThere": "Ci sono stata",
+    "visitedDestination": "Destinazione",
+    "visitedLocality": "Località",
+    "shareLocationTitle": "Condividi posizione",
+    "shareLocationBody": "Genera un link temporaneo per condividere la tua posizione attuale con un amico.",
+    "shareHours": "{{hours}}h",
+    "shareLoading": "Preparazione...",
+    "shareReady": "Il tuo link è pronto",
+    "shareExpires": "Valido fino a {{date}}",
+    "shareCopy": "Copia link",
+    "shareCopied": "Link copiato",
+    "shareLocationError": "La condivisione della posizione non è disponibile in questo momento. Verifica che la tua posizione sia stata aggiornata di recente.",
+    "shareLocationGuestTitle": "Posizione condivisa",
+    "shareLocationGuestBody": "Hai aperto un link temporaneo per vedere una posizione condivisa con te.",
+    "shareLocationUnavailable": "Questa posizione condivisa non è più disponibile oppure è scaduta.",
+    "shareLocationLive": "Posizione condivisa attuale"
   },
   "settings": {
     "title": "Impostazioni",
@@ -121,6 +139,30 @@
       "appearance": "Aspetto",
       "notifications": "Notifiche",
       "location": "Posizione"
+    },
+    "smartLocation": {
+      "autoRegionTitle": "Regione automatica in base alla posizione",
+      "autoRegionBody": "Quando entri in un'altra regione, l'app può cambiare automaticamente il contenuto verso la regione più vicina.",
+      "quietZoneTitle": "Zone non disturbare",
+      "quietZoneBody": "Salva il tuo indirizzo di casa e di lavoro così l'app silenzia le notifiche sulle destinazioni mentre ti trovi in quella zona.",
+      "zoneActive": "Zona attiva",
+      "zoneRadius": "Zona di {{radius}}m",
+      "saveAddress": "Salva indirizzo",
+      "useCurrentLocation": "Usa posizione attuale",
+      "clearZone": "Cancella zona",
+      "saving": "Salvataggio...",
+      "zoneSaveError": "Impossibile trovare l'indirizzo in questo momento. Controlla il testo e riprova.",
+      "zoneLocationError": "La posizione attuale non è disponibile. Attiva la posizione e riprova.",
+      "zone": {
+        "home": {
+          "title": "Zona casa",
+          "placeholder": "Inserisci l'indirizzo di casa"
+        },
+        "work": {
+          "title": "Zona lavoro",
+          "placeholder": "Inserisci l'indirizzo di lavoro"
+        }
+      }
     },
     "notificationGroups": {
       "travel": "Viaggi e preferiti",

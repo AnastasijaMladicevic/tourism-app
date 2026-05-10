@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './shared/components/navbar/navbar';
 import { FloatingAiAssistantComponent } from './shared/components/floating-ai-assistant/floating-ai-assistant.component';
 import { LiveNotificationBannerComponent } from './shared/components/live-notification-banner/live-notification-banner.component';
+import { LocationIntelligenceService } from './services/location-intelligence';
 import { TranslationService } from './services/translation.service';
 @Component({
   selector: 'app-root',
@@ -12,5 +13,6 @@ import { TranslationService } from './services/translation.service';
 })
 export class App {
   private readonly translationService = inject(TranslationService);
+  private readonly locationIntelligenceService = inject(LocationIntelligenceService);
   protected readonly title = signal('front-mobilna');
 }

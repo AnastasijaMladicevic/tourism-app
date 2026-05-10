@@ -187,7 +187,12 @@ export class LocationTrackingService {
 
     if (this.authService.isLoggedIn()) {
       this.authService
-        .updateMyLocation(snapshot.latitude, snapshot.longitude)
+        .updateMyLocation({
+          latitude: snapshot.latitude,
+          longitude: snapshot.longitude,
+          accuracyMeters: snapshot.accuracy,
+          recordedAtUtc: new Date(snapshot.updatedAt).toISOString(),
+        })
         .subscribe({ error: () => void 0 });
     }
   }

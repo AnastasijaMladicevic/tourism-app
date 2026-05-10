@@ -87,7 +87,25 @@
     "terms": "Términos de uso",
     "moderator": "Solicitar acceso de moderador",
     "about": "Sobre nosotros",
-    "logout": "Cerrar sesión"
+    "logout": "Cerrar sesión",
+    "visitedTitle": "YA ESTUVE ALLÍ",
+    "visitedEmpty": "Aún no hay visitas confirmadas. Cuando te acerques a un destino o localidad con el GPS activado, aparecerá aquí.",
+    "beenThere": "Ya estuve allí",
+    "visitedDestination": "Destino",
+    "visitedLocality": "Localidad",
+    "shareLocationTitle": "Compartir ubicación",
+    "shareLocationBody": "Genera un enlace temporal para compartir tu ubicación actual con un amigo.",
+    "shareHours": "{{hours}}h",
+    "shareLoading": "Preparando...",
+    "shareReady": "Tu enlace está listo",
+    "shareExpires": "Válido hasta {{date}}",
+    "shareCopy": "Copiar enlace",
+    "shareCopied": "Enlace copiado",
+    "shareLocationError": "La función para compartir ubicación no está disponible ahora mismo. Verifica que tu ubicación se haya actualizado hace poco.",
+    "shareLocationGuestTitle": "Ubicación compartida",
+    "shareLocationGuestBody": "Has abierto un enlace temporal para ver una ubicación compartida contigo.",
+    "shareLocationUnavailable": "Esta ubicación compartida ya no está disponible o ha expirado.",
+    "shareLocationLive": "Posición compartida actual"
   },
   "settings": {
     "title": "Configuración",
@@ -121,6 +139,30 @@
       "appearance": "Apariencia",
       "notifications": "Notificaciones",
       "location": "Ubicación"
+    },
+    "smartLocation": {
+      "autoRegionTitle": "Región automática por ubicación",
+      "autoRegionBody": "Cuando entres en otra región, la aplicación puede cambiar automáticamente el contenido a la región más cercana.",
+      "quietZoneTitle": "Zonas de no molestar",
+      "quietZoneBody": "Guarda tu dirección de casa y del trabajo para que la aplicación silencie las notificaciones de destinos mientras estás en esa zona.",
+      "zoneActive": "Zona activa",
+      "zoneRadius": "Zona de {{radius}}m",
+      "saveAddress": "Guardar dirección",
+      "useCurrentLocation": "Usar ubicación actual",
+      "clearZone": "Borrar zona",
+      "saving": "Guardando...",
+      "zoneSaveError": "No se pudo encontrar la dirección en este momento. Revisa el texto e inténtalo de nuevo.",
+      "zoneLocationError": "La ubicación actual no está disponible. Activa la ubicación e inténtalo otra vez.",
+      "zone": {
+        "home": {
+          "title": "Zona de casa",
+          "placeholder": "Introduce la dirección de casa"
+        },
+        "work": {
+          "title": "Zona de trabajo",
+          "placeholder": "Introduce la dirección del trabajo"
+        }
+      }
     },
     "notificationGroups": {
       "travel": "Viajes y favoritos",

@@ -43,6 +43,81 @@
             <span class="slider"></span>
           </label>
         </div>
+
+        <div class="preference-divider"></div>
+
+        <div class="preference-row">
+          <div class="preference-copy">
+            <span class="menu-title">{{ 'settings.smartLocation.autoRegionTitle' | translate }}</span>
+            <p>{{ 'settings.smartLocation.autoRegionBody' | translate }}</p>
+          </div>
+
+          <label class="switch" [class.switch--checked]="autoRegionEnabled">
+            <input
+              type="checkbox"
+              [checked]="autoRegionEnabled"
+              (change)="setAutoRegionEnabled($any($event.target).checked)"
+            />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="preference-divider"></div>
+
+        <div class="zone-block">
+          <div class="zone-block__copy">
+            <span class="menu-title">{{ 'settings.smartLocation.quietZoneTitle' | translate }}</span>
+            <p>{{ 'settings.smartLocation.quietZoneBody' | translate }}</p>
+          </div>
+
+          @for (kind of ['home', 'work']; track kind) {
+            <div class="zone-card">
+              <div class="zone-card__header">
+                <strong>{{ ('settings.smartLocation.zone.' + kind + '.title') | translate }}</strong>
+                @if (getQuietZone($any(kind)); as zone) {
+                  <span class="zone-card__badge">{{ 'settings.smartLocation.zoneActive' | translate }}</span>
+                }
+              </div>
+
+              <div class="zone-card__input">
+                <input
+                  type="text"
+                  [placeholder]="('settings.smartLocation.zone.' + kind + '.placeholder') | translate"
+                  [ngModel]="$any(kind) === 'home' ? homeZoneInput : workZoneInput"
+                  (ngModelChange)="$any(kind) === 'home' ? homeZoneInput = $event : workZoneInput = $event"
+                />
+              </div>
+
+              @if (getQuietZone($any(kind)); as zone) {
+                <p class="zone-card__summary">
+                  {{ zone.address }} &middot; {{ 'settings.smartLocation.zoneRadius' | translate:{ radius: zone.radiusMeters } }}
+                </p>
+              }
+
+              @if (getQuietZoneError($any(kind))) {
+                <p class="zone-card__error">{{ getQuietZoneError($any(kind)) | translate }}</p>
+              }
+
+              <div class="zone-card__actions">
+                <button type="button" class="zone-btn zone-btn--primary" (click)="saveQuietZone($any(kind))">
+                  {{
+                    (isQuietZoneSaving($any(kind))
+                      ? 'settings.smartLocation.saving'
+                      : 'settings.smartLocation.saveAddress') | translate
+                  }}
+                </button>
+                <button type="button" class="zone-btn zone-btn--ghost" (click)="useCurrentLocationForZone($any(kind))">
+                  {{ 'settings.smartLocation.useCurrentLocation' | translate }}
+                </button>
+                @if (getQuietZone($any(kind))) {
+                  <button type="button" class="zone-btn zone-btn--text" (click)="clearQuietZone($any(kind))">
+                    {{ 'settings.smartLocation.clearZone' | translate }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
       </div>
     </section>
 
