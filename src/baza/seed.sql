@@ -12067,7 +12067,7 @@ INSERT INTO "Objects"
  "Status", "IsActive", "ObjectTypeId", "LocalityId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
 VALUES
 ('Hotel Casa Batllo Suites', 'Boutique hotel u istorijskom jezgru Barselone sa pogledom na gradske krovove', 'Gothic Quarter, Barcelona', '+34930000001', 'https://www.barcelonaturisme.com',
- NULL, NULL, '{"pon":"00:00-24:00"}', 210.00, ARRAY['WiFi', 'Rooftop', 'Dorucak', 'Transfer'], ST_SetSRID(ST_MakePoint(2.1746, 41.3856), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 210.00, ARRAY['WiFi', 'Rooftop', 'Doručak', 'Transfer'], ST_SetSRID(ST_MakePoint(2.1746, 41.3856), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gothic Quarter Barcelona'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'),
@@ -12094,7 +12094,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Hotel Gran Via Palace', 'Elegantni gradski hotel u centru Madrida, pogodan za obilaske i poslovna putovanja', 'Gran Via 42, Madrid', '+34910000001', 'https://www.esmadrid.com',
- NULL, NULL, '{"pon":"00:00-24:00"}', 195.00, ARRAY['WiFi', 'Spa', 'Parking', 'Dorucak'], ST_SetSRID(ST_MakePoint(-3.7049, 40.4205), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 195.00, ARRAY['WiFi', 'Spa', 'Parking', 'Doručak'], ST_SetSRID(ST_MakePoint(-3.7049, 40.4205), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gran Via Madrid'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Madrid'),
@@ -12103,7 +12103,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Oceanic Bistro Valencia', 'Restoran inspirisan mediteranskom kuhinjom u modernom delu Valensije', 'Avinguda del Professor Lopez Pinero, Valencia', '+34960000001', 'https://www.visitvalencia.com',
- NULL, 'Mediteranska i španjolska', '{"pon":"11:00-23:00"}', 34.00, ARRAY['Terasa', 'Pogled na vodu', 'Porodicno', 'Rezervacije'], ST_SetSRID(ST_MakePoint(-0.3508, 39.4557), 4326), 0, 0, 'Approved', true,
+ NULL, 'Mediteranska i španjolska', '{"pon":"11:00-23:00"}', 34.00, ARRAY['Terasa', 'Pogled na vodu', 'Porodično', 'Rezervacije'], ST_SetSRID(ST_MakePoint(-0.3508, 39.4557), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ciudad de las Artes Valencia'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Valencia'),
@@ -12209,23 +12209,23 @@ INSERT INTO "Reviews"
 VALUES
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'diego.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Casa Batllo Suites'),
- 5, 'Sjajna lokacija i odlican dorucak, hotel je idealan za obilazak Barselone.', NOW()),
+ 5, 'Sjajna lokacija i odličan doručak, hotel je idealan za obilazak Barselone.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'sofia.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Casa Batllo Suites'),
- 4, 'Veoma prijatan smestaj i lep pogled sa krova, recepcija je bila brza i ljubazna.', NOW()),
+ 4, 'Veoma prijatan smeštaj i lep pogled sa krova, recepcija je bila brza i ljubazna.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'elena.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tapas House Gothic'),
- 5, 'Tapasi su bili fantasticni, a osoblje je davalo odlicne preporuke za vino.', NOW()),
+ 5, 'Tapasi su bili fantastični, a osoblje je davalo odlične preporuke za vino.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'diego.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tapas House Gothic'),
- 4, 'Odlicna hrana i fina atmosfera, samo je bilo malo guzve u vecernjem terminu.', NOW()),
+ 4, 'Odlična hrana i fina atmosfera, samo je bilo malo gužve u večernjem terminu.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'sofia.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Barceloneta Sunset Bar'),
- 5, 'Savrsen zalazak sunca, muzika taman koliko treba i super kokteli.', NOW()),
+ 5, 'Savršen zalazak sunca, muzika taman koliko treba i super kokteli.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'elena.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Gran Via Palace'),
@@ -12233,11 +12233,11 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'diego.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oceanic Bistro Valencia'),
- 5, 'Paelja je bila odlicna, a ambijent moderan i opusten.', NOW()),
+ 5, 'Paelja je bila odlična, a ambijent moderan i opušten.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'sofia.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oceanic Bistro Valencia'),
- 4, 'Dobra usluga i lep pogled na moderni deo grada, preporuka za veceru.', NOW());
+ 4, 'Dobra usluga i lep pogled na moderni deo grada, preporuka za večeru.', NOW());
 
 INSERT INTO "Reviews"
 ("UserId", "ObjectId", "Rating", "Text", "CreatedAt")
@@ -12259,13 +12259,13 @@ VALUES
  4, 'Prijatno i tiho mesto za učenje. Mogao bi biti veći izbor novih knjiga.', NOW()),
 
 
--- Djecija igraonica Igalo
+-- Dječija igraonica Igalo
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecija igraonica Igalo'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječija igraonica Igalo'),
  5, 'Odlično mesto za decu, bezbedno i zabavno. Osoblje jako ljubazno.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecija igraonica Igalo'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječija igraonica Igalo'),
  4, 'Deca su uživala, prostor je čist i lepo organizovan.', NOW()),
 
 
@@ -12431,47 +12431,47 @@ VALUES
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 ('Riccardo', 'Lombardi', '1995-12-11', 'riccardo.italy.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Italija', 'it', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Milica', 'Petrovic', '1987-02-11', 'milica.admin.serbia@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000001', 'Srbija', 'sr', true, true, false, false,
+('Milica', 'Petrović', '1987-02-11', 'milica.admin.serbia@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000001', 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 ('Jelena', 'Nikolić', '1992-05-18', 'jelena.creator@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000002', 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'ContentCreator'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Stefan', 'Jovanovic', '1989-09-02', 'manager.belgrade@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000003', 'Srbija', 'sr', true, true, false, false,
+('Stefan', 'Jovanović', '1989-09-02', 'manager.belgrade@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000003', 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Ana', 'Markovic', '1990-12-14', 'manager.novisad@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000004', 'Srbija', 'sr', true, true, false, false,
+('Ana', 'Marković', '1990-12-14', 'manager.novisad@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000004', 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Nikola', 'Savic', '1988-04-25', 'manager.zlatibor@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000005', 'Srbija', 'sr', true, true, false, false,
+('Nikola', 'Savić', '1988-04-25', 'manager.zlatibor@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000005', 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Tamara', 'Ilic', '1997-01-17', 'tamara.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+('Tamara', 'Ilić', '1997-01-17', 'tamara.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Andrija', 'Stojanovic', '1996-08-09', 'andrija.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+('Andrija', 'Stojanović', '1996-08-09', 'andrija.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Teodora', 'Pavlovic', '1998-06-06', 'teodora.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+('Teodora', 'Pavlović', '1998-06-06', 'teodora.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Mina', 'Savic', '1998-02-14', 'mina.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+('Mina', 'Savić', '1998-02-14', 'mina.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'), 
-('Filip', 'Kostic', '1997-05-20', 'filip.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+('Filip', 'Kostić', '1997-05-20', 'filip.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Kristina', 'Vukovic', '1999-09-12', 'kristina.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+('Kristina', 'Vuković', '1999-09-12', 'kristina.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
- ('Marko', 'Petrovic', '1988-03-14', 'manager.nis@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001001', 'Srbija', 'sr', true, true, false, false,
+ ('Marko', 'Petrović', '1988-03-14', 'manager.nis@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001001', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Ivana', 'Jankovic', '1991-07-22', 'manager.kragujevac@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001002', 'Srbija', 'sr', true, true, false, false,
+('Ivana', 'Janković', '1991-07-22', 'manager.kragujevac@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001002', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Nikola', 'Radulovic', '1987-11-09', 'manager.subotica@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001003', 'Srbija', 'sr', true, true, false, false,
+('Nikola', 'Radulović', '1987-11-09', 'manager.subotica@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001003', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Jovana', 'Maksimovic', '1990-04-17', 'manager.kopaonik@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001004', 'Srbija', 'sr', true, true, false, false,
+('Jovana', 'Maksimović', '1990-04-17', 'manager.kopaonik@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001004', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Milos', 'Stankovic', '1989-09-28', 'manager.tara@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001005', 'Srbija', 'sr', true, true, false, false,
+('Miloš', 'Stanković', '1989-09-28', 'manager.tara@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001005', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(),'/images/profiles/default_icon.png'),
-('Aleksandra', 'Milosevic', '1992-12-03', 'manager.djerdap@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001006', 'Srbija', 'sr', true, true, false, false,
+('Aleksandra', 'Milošević', '1992-12-03', 'manager.djerdap@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001006', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Sofija', 'Nikolic', '1994-06-30', 'manager.vrnjackabanja@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001007', 'Srbija', 'sr', true, true, false, false,
+('Sofija', 'Nikolić', '1994-06-30', 'manager.vrnjackabanja@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001007', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Luka', 'Zivkovic', '1986-01-11', 'manager.palic@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001008', 'Srbija', 'sr', true, true, false, false,
+('Luka', 'Živković', '1986-01-11', 'manager.palic@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001008', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Tamara', 'Ristic', '1993-08-19', 'manager.uvac@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001009', 'Srbija', 'sr', true, true, false, false,
+('Tamara', 'Ristić', '1993-08-19', 'manager.uvac@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001009', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Stefan', 'Obradovic', '1990-10-08', 'manager.mokragora@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001010', 'Srbija', 'sr', true, true, false, false,
+('Stefan', 'Obradović', '1990-10-08', 'manager.mokragora@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001010', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
 
 -- 15.1 ITALIJA + SRBIJA DESTINACIJE
@@ -12861,7 +12861,7 @@ INSERT INTO "Objects"
  "Status", "IsActive", "ObjectTypeId", "LocalityId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
 VALUES
 ('Hotel Artemide Rome', 'Hotel u centralnom delu Rima sa komfornim sobama, krovnim barom i lokacijom pogodnom za obilazak glavnih znamenitosti peške.', 'Via Nazionale 22, Rome', '+3906499911', 'https://www.hotelartemide.it/',
- NULL, NULL, '{"pon":"00:00-24:00"}', 240.00, ARRAY['WiFi', 'Spa', 'Dorucak', 'Rooftop'], ST_SetSRID(ST_MakePoint(12.4938, 41.9017), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 240.00, ARRAY['WiFi', 'Spa', 'Doručak', 'Rooftop'], ST_SetSRID(ST_MakePoint(12.4938, 41.9017), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Colosseum District'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rome'),
@@ -12877,7 +12877,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.rome@spirego.com'),
  NOW(), NOW(), NOW()),
 ('Hotel Canaletto Venice', 'Miran hotel u istorijskom jezgru Venecije sa tradicionalnim enterijerom i lakim pristupom mostovima i trgovima.', 'Castello 5487, Venice', '+390415220518', 'https://www.hotelcanaletto.com/',
- NULL, NULL, '{"pon":"00:00-24:00"}', 265.00, ARRAY['WiFi', 'Dorucak', 'Concierge', 'Bar'], ST_SetSRID(ST_MakePoint(12.3391, 45.4364), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 265.00, ARRAY['WiFi', 'Doručak', 'Concierge', 'Bar'], ST_SetSRID(ST_MakePoint(12.3391, 45.4364), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'San Marco Venice'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Venice'),
@@ -12893,7 +12893,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.venice@spirego.com'),
  NOW(), NOW(), NOW()),
 ('Hotel Davanzati Florence', 'Manji hotel u srcu Firence, miran i praktičan za obilazak starog jezgra bez oslanjanja na prevoz. Dobro funkcioniše za parove i za kratke gradske boravke.', 'Via Porta Rossa 5, Florence', '+39055286666', 'https://www.hoteldavanzati.it/?lang=eng',
- NULL, NULL, '{"pon":"00:00-24:00"}', 230.00, ARRAY['WiFi', 'Dorucak', 'Happy hour', 'Transfer'], ST_SetSRID(ST_MakePoint(11.2529, 43.7697), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 230.00, ARRAY['WiFi', 'Doručak', 'Happy hour', 'Transfer'], ST_SetSRID(ST_MakePoint(11.2529, 43.7697), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ponte Vecchio Florence'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Florence'),
@@ -12909,7 +12909,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.florence@spirego.com'),
  NOW(), NOW(), NOW()),
 ('Hotel Moskva Beograd', 'Istorijski hotel u centru Beograda koji je dobar izbor za goste kojima je bitna lokacija i prepoznatljiv gradski ambijent. Koristan je i za poslovna putovanja i za kratke gradske vikende.', 'Terazije 20, Belgrade', '+381113648999', 'https://hotelmoskva.rs/',
- NULL, NULL, '{"pon":"00:00-24:00"}', 185.00, ARRAY['WiFi', 'Spa', 'Dorucak', 'Poslasticarnica'], ST_SetSRID(ST_MakePoint(20.4613, 44.8135), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 185.00, ARRAY['WiFi', 'Spa', 'Doručak', 'Poslastičarnica'], ST_SetSRID(ST_MakePoint(20.4613, 44.8135), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Terazije Beograd'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
@@ -12917,7 +12917,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
  NOW(), NOW(), NOW()),
 ('Restoran Frans Beograd', 'Veliki gradski restoran sa širokim jelovnikom, baštom i ponudom koja pokriva i klasična domaća jela i internacionalnije izbore. Dobro radi i za porodične ručkove i za duža večernja sedenja.', 'Bulevar oslobodjenja 18G, Belgrade', '+381652641944', 'https://frans.rs/',
- 'https://frans.rs/menu/jelovnik/', 'Srpska i internacionalna', '{"pon":"09:00-23:30"}', 27.00, ARRAY['Basta', 'Rezervacije', 'Parking', 'Vegetarijanske opcije'], ST_SetSRID(ST_MakePoint(20.4691, 44.7976), 4326), 0, 0, 'Approved', true,
+ 'https://frans.rs/menu/jelovnik/', 'Srpska i internacionalna', '{"pon":"09:00-23:30"}', 27.00, ARRAY['Bašta', 'Rezervacije', 'Parking', 'Vegetarijanske opcije'], ST_SetSRID(ST_MakePoint(20.4691, 44.7976), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Terazije Beograd'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
@@ -12925,7 +12925,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
  NOW(), NOW(), NOW()),
 ('Hotel Pupin Novi Sad', 'Moderan gradski hotel sa centralnom pozicijom i lakim pristupom trgovima, pešačkoj zoni i obali Dunava. Često je dobar kompromis između komfora, lokacije i urednog servisa.', 'Narodnih Heroja 3, Novi Sad', '+381212156000', 'https://hotelpupin.rs/en/',
- NULL, NULL, '{"pon":"00:00-24:00"}', 170.00, ARRAY['WiFi', 'Parking', 'Dorucak', 'Fitness'], ST_SetSRID(ST_MakePoint(19.8414, 45.2559), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 170.00, ARRAY['WiFi', 'Parking', 'Doručak', 'Fitness'], ST_SetSRID(ST_MakePoint(19.8414, 45.2559), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode Novi Sad'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Novi Sad'),
@@ -12933,7 +12933,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.novisad@spirego.com'),
  NOW(), NOW(), NOW()),
 ('Kalem by Zak Novi Sad', 'Restoran i gradski lounge sa savremenijom ponudom, koktelima i urbanim ambijentom. Praktičan je za goste koji hoće ozbiljniji ručak, ali i opušteniji večernji izlazak bez napuštanja centra.', 'Narodnih Heroja 3, Novi Sad', '+381668888021', 'https://hotelpupin.rs/en/dining/kalem-by-zak/',
- 'https://hotelpupin.rs/en/dining/kalem-by-zak/menu-kalem/', 'Moderna evropska i lokalna', '{"pon":"08:00-23:30"}', 24.00, ARRAY['Terasa', 'Kokteli', 'Rezervacije', 'Dorucak'], ST_SetSRID(ST_MakePoint(19.8417, 45.2560), 4326), 0, 0, 'Approved', true,
+ 'https://hotelpupin.rs/en/dining/kalem-by-zak/menu-kalem/', 'Moderna evropska i lokalna', '{"pon":"08:00-23:30"}', 24.00, ARRAY['Terasa', 'Kokteli', 'Rezervacije', 'Doručak'], ST_SetSRID(ST_MakePoint(19.8417, 45.2560), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode Novi Sad'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Novi Sad'),
@@ -13073,53 +13073,53 @@ VALUES
 INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "CreatedAt")
 VALUES
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Artemide Rome'),
- 5, 'Lokacija je bila odlicna za prvi obilazak Rima, a osoblje je brzo resavalo sitne zahteve oko kasnog check-ina. Soba nije bila ogromna, ali je sve delovalo uredno i kvalitetno odrzavano.', NOW()),
+ 5, 'Lokacija je bila odlična za prvi obilazak Rima, a osoblje je brzo rešavalo sitne zahteve oko kasnog check-ina. Soba nije bila ogromna, ali je sve delovalo uredno i kvalitetno održavano.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Artemide Rome'),
- 4, 'Dopao mi se rooftop i cinjenica da se vecina znamenitosti moze obici peske. Jedino je dorucak bio jaci prvi dan nego drugog jutra, ali ukupni utisak je i dalje vrlo dobar.', NOW()),
+ 4, 'Dopao mi se rooftop i činjenica da se većina znamenitosti može obići peške. Jedino je doručak bio jači prvi dan nego drugog jutra, ali ukupni utisak je i dalje vrlo dobar.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rione 13 Trastevere'),
- 5, 'Hrana je stigla brzo i nijedno jelo nije delovalo genericki, sto mi je bilo vazno jer sam htela bas rimski fazon vecere. Konobari su lepo objasnili sta je jace, a sta lakse za deljenje.', NOW()),
+ 5, 'Hrana je stigla brzo i nijedno jelo nije delovalo generički, što mi je bilo važno jer sam htela baš rimski fazon večere. Konobari su lepo objasnili sta je jače, a sta lakše za deljenje.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rione 13 Trastevere'),
- 3, 'Pasta je bila dobra, ali je terasa bila dosta bucna i cekali smo duze na drugo pice nego sto bih voleo. Vratio bih se zbog hrane, ali ne u najudarnijem terminu.', NOW()),
+ 3, 'Pasta je bila dobra, ali je terasa bila dosta bučna i čekali smo duže na drugo piće nego sto bih voleo. Vratio bih se zbog hrane, ali ne u najudarnijem terminu.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Canaletto Venice'),
- 4, 'Hotel ima lep, starinski karakter i osoblje je dalo korisne savete za kretanje kroz manje prometne ulice. Soba je bila tiha, mada bi kupatilo moglo da se osvezi.', NOW()),
+ 4, 'Hotel ima lep, starinski karakter i osoblje je dalo korisne savete za kretanje kroz manje prometne ulice. Soba je bila tiha, mada bi kupatilo moglo da se osveži.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Canaletto Venice'),
- 3, 'Boravak je bio prijatan i lokacija je vrlo dobra za pesacke obilaske, ali je prostor delovao malo skuplje nego sto realno nudi. Ako je cilj centar Venecije bez mnogo komplikacija, hotel i dalje radi posao.', NOW()),
+ 3, 'Boravak je bio prijatan i lokacija je vrlo dobra za pešačke obilaske, ali je prostor delovao malo skuplje nego sto realno nudi. Ako je cilj centar Venecije bez mnogo komplikacija, hotel i dalje radi posao.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Bistrot de Venise'),
- 5, 'Ovde se stvarno oseca da kuhinja ima identitet i da neko vodi racuna o detaljima, ne samo o prezentaciji. Usluga je bila mirna i profesionalna, bez onog osecaja da te ubrzavaju da oslobodis sto.', NOW()),
+ 5, 'Ovde se stvarno oseća da kuhinja ima identitet i da neko vodi računa o detaljima, ne samo o prezentaciji. Usluga je bila mirna i profesionalna, bez onog osećaja da te ubrzavaju da oslobodiš sto.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Bistrot de Venise'),
- 4, 'Jela su bila vrlo dobra, posebno riba i vino uz veceru, ali cene su vise i to treba imati u vidu. Za jedno vece u Veneciji kada zelis ozbiljniji obrok, izbor je opravdan.', NOW()),
+ 4, 'Jela su bila vrlo dobra, posebno riba i vino uz večeru, ali cene su više i to treba imati u vidu. Za jedno veče u Veneciji kada želiš ozbiljniji obrok, izbor je opravdan.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Davanzati Florence'),
- 4, 'Hotel je prijatan i deluje toplije od klasicnih gradskih hotela, sto mi je posebno prijalo posle dugog dana po muzeju. Lokacija je jaka strana, a dorucak je bio sasvim korektan.', NOW()),
+ 4, 'Hotel je prijatan i deluje toplije od klasičnih gradskih hotela, što mi je posebno prijalo posle dugog dana po muzeju. Lokacija je jaka strana, a doručak je bio sasvim korektan.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Davanzati Florence'),
- 5, 'Osoblje je bilo zaista gostoljubivo i nekoliko sitnih preporuka za veceru nam je znacilo vise nego bilo koji turisticki vodic. Sve je bilo cisto, mirno i bez neprijatnih iznenadjenja.', NOW()),
+ 5, 'Osoblje je bilo zaista gostoljubivo i nekoliko sitnih preporuka za večeru nam je značilo više nego bilo koji turistički vodič. Sve je bilo čisto, mirno i bez neprijatnih iznenađenja.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'La Loggia Firenze'),
- 3, 'Pogled je sjajan i vredan dolaska, ali su neka jela vise igrala na utisak nego na dubinu ukusa. Nije lose, samo treba ici sa idejom da placas i lokaciju i atmosferu.', NOW()),
+ 3, 'Pogled je sjajan i vredan dolaska, ali su neka jela više igrala na utisak nego na dubinu ukusa. Nije loše, samo treba ići sa idejom da plaćaš i lokaciju i atmosferu.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'La Loggia Firenze'),
- 5, 'Vece ovde je bilo jedno od najboljih u Firenci jer se dobar pogled uklopio sa opustenom uslugom i finim ritmom posluzenja. Nije mesto za brz obrok, ali za duzu veceru radi odlicno.', NOW()),
+ 5, 'Veče ovde je bilo jedno od najboljih u Firenci jer se dobar pogled uklopio sa opuštenom uslugom i finim ritmom posluženja. Nije mesto za brz obrok, ali za dužu večeru radi odlično.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Moskva Beograd'),
- 5, 'Svidelo mi se sto hotel ima prepoznatljiv karakter i ne deluje kao bilo koji moderan lanac bez identiteta. Lokacija je odlicna za peske i za dnevni obilazak i za vecernji povratak.', NOW()),
+ 5, 'Svidelo mi se što hotel ima prepoznatljiv karakter i ne deluje kao bilo koji moderan lanac bez identiteta. Lokacija je odlična za peške i za dnevni obilazak i za večernji povratak.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Moskva Beograd'),
- 4, 'Soba je bila uredna i mirna, a osoblje profesionalno, ali je ceo dozivljaj vise klasicno gradski nego luksuzan. Ipak, zbog lokacije i atmosfere bih ga opet uzeo za kraci boravak.', NOW()),
+ 4, 'Soba je bila uredna i mirna, a osoblje profesionalno, ali je ceo dozivljaj vise klasično gradski nego luksuzan. Ipak, zbog lokacije i atmosfere bih ga opet uzeo za kraći boravak.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Frans Beograd'),
- 4, 'Jelovnik je sirok i lako je naci nesto i za ljude koji vole klasiku i za one koji hoce laksi obrok. Usluga je bila dobra, samo je terasa bila dosta puna pa je ritam malo usporio.', NOW()),
+ 4, 'Jelovnik je širok i lako je naći nešto i za ljude koji vole klasiku i za one koji hoće lakši obrok. Usluga je bila dobra, samo je terasa bila dosta puna pa je ritam malo usporio.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Frans Beograd'),
- 3, 'Hrana je korektna i porcije su ozbiljne, ali mesto vise volim za duze sedenje i drustvo nego za nesto posebno gastronomsko. Ako neko ocekuje mirniji restoran, guzva moze malo da zasmeta.', NOW()),
+ 3, 'Hrana je korektna i porcije su ozbiljne, ali mesto vise volim za duže sedenje i društvo nego za nesto posebno gastronomsko. Ako neko očekuje mirniji restoran, gužva može malo da zasmeta.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Pupin Novi Sad'),
- 5, 'Hotel je uredan, moderan i vrlo praktican kada hoces da budes blizu glavnog trga i pesacke zone. Posebno mi je znacilo sto sve deluje novo i dobro organizovano bez nepotrebne pompe.', NOW()),
+ 5, 'Hotel je uredan, moderan i vrlo praktičan kada hoćeš da budes blizu glavnog trga i pešačke zone. Posebno mi je značilo što sve deluje novo i dobro organizovano bez nepotrebne pompe.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Pupin Novi Sad'),
- 4, 'Lokacija je jaka strana, a dorucak i prijava su prosli bez problema. Jedino je pogled iz sobe bio manje zanimljiv nego sto sam ocekivala po fotografijama.', NOW()),
+ 4, 'Lokacija je jaka strana, a doručak i prijava su prosli bez problema. Jedino je pogled iz sobe bio manje zanimljiv nego sto sam očekivala po fotografijama.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kalem by Zak Novi Sad'),
- 5, 'Mesto ima fin balans izmedju ozbiljnog rucka i opustenije gradske energije, pa je lako ostati duze nego sto planiras. Hrana nije bila teska, a kokteli su bili iznad ocekivanja.', NOW()),
+ 5, 'Mesto ima fin balans izmedju ozbiljnog ručka i opuštenije gradske energije, pa je lako ostati duže nego sto planiraš. Hrana nije bila teška, a kokteli su bili iznad očekivanja.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kalem by Zak Novi Sad'),
- 4, 'Ambijent je vrlo prijatan i lokacija zgodna kada si vec u centru, a meni ima dovoljno izbora da grupa lako nadje zajednicki termin. Cene nisu najnize, ali servis je bio uredan i brz.', NOW()),
+ 4, 'Ambijent je vrlo prijatan i lokacija zgodna kada si već u centru, a meni ima dovoljno izbora da grupa lako nađe zajednički termin. Cene nisu najniže, ali servis je bio uredan i brz.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Zlatibor Mountain Resort'),
- 3, 'Hotel ima dosta sadrzaja i dobra je baza za kraci odmor, ali u spicu se oseca da kroz zajednicke prostore prolazi veliki broj gostiju. Kada je cilj prakticnost i spa, to ne mora da bude problem.', NOW()),
+ 3, 'Hotel ima dosta sadržaja i dobra je baza za kraći odmor, ali u špicu se oseca da kroz zajedničke prostore prolazi veliki broj gostiju. Kada je cilj praktičnost i spa, to ne mora da bude problem.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Zlatibor Mountain Resort'),
- 4, 'Spa i lokacija u centru su mi bili najveci plus, a osoblje je bilo vrlo korektno kada smo trazili kasniji check-out. Dobar je izbor ako zelis da sve bude na jednom mestu.', NOW()),
+ 4, 'Spa i lokacija u centru su mi bili najveci plus, a osoblje je bilo vrlo korektno kada smo tražili kasniji check-out. Dobar je izbor ako želiš da sve bude na jednom mestu.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lobby Bar Zlatibor'),
- 2, 'Pice je bilo okej, ali je usluga tog dana bila sporija nego sto sam ocekivao, a muzika je bila glasnija nego sto prija kada hoces samo kratku pauzu. Za opusten razgovor nisam uhvatio pravi termin.', NOW()),
+ 2, 'Piće je bilo okej, ali je usluga tog dana bila sporija nego što sam očekivao, a muzika je bila glasnija nego što prija kada hoćeš samo kratku pauzu. Za opušten razgovor nisam uhvatio pravi termin.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lobby Bar Zlatibor'),
- 4, 'Kad smo svratili ranije popodne atmosfera je bila dosta prijatnija i mesto je lepo leglo za kratki predah posle setnje. Karta pica je solidna, a prostor deluje moderno i uredno.', NOW());
+ 4, 'Kad smo svratili ranije popodne atmosfera je bila dosta prijatnija i mesto je lepo leglo za kratki predah posle šetnje. Karta pića je solidna, a prostor deluje moderno i uredno.', NOW());
 
 -- 15.7 ITALIJA + SRBIJA IMAGES - DESTINACIJE
 WITH source("Url", "AltText", "IsMain", "DestinationName") AS (
@@ -13501,32 +13501,32 @@ SET
         ELSE "DisplayTitle"
     END,
     "Description" = CASE "Name"
-        WHEN 'Kotorski zaliv' THEN 'Kotorski zaliv spaja mirnu morsku površinu, strme planine i niz istorijskih mesta uz samu obalu. Putovanje ovde lako prelazi iz setnje kroz Kotor i Perast u kratke voznje obalom, kafu uz more i sporiji mediteranski ritam. Dobar je izbor za putnike koji vole pejzaze, fotografiju i kombinaciju kulture i odmora.'
-        WHEN 'Kotor' THEN 'Kotor je istorijski grad u srcu zaliva, poznat po zidinama, trgovima i starom gradu pod zastitom UNESCO-a. Dan ovde lako krene obilaskom uskih kamenih ulica, nastavi se usponom ka tvrdjavi i zavrsi vecerom uz more. Posebno prija putnicima koji vole istoriju, atmosferu i setnje bez zurbe.'
-        WHEN 'Budva' THEN 'Budva kombinuje plaze, stari grad i energicnu turisticku scenu na malom prostoru. Posetioci mogu da provedu jutro uz more, popodne u kamenim ulicama starog grada, a vece u restoranima i barovima uz obalu. Odlicna je za one koji zele i odmor i zivlju atmosferu.'
-        WHEN 'Durmitor' THEN 'Durmitor je planinska destinacija za ljude koji traze prirodu, vazduh i aktivan dan napolju. Crno jezero, vidikovci, pesacke staze i blizina kanjona Tare cine ga odlicnim za vise dana istrazivanja. Ovde se lako prelazi iz mirne setnje u ozbiljniju avanturu, zavisno od ritma putovanja.'
-        WHEN 'Sveti Stefan' THEN 'Sveti Stefan je jedna od najupecatljivijih tacki crnogorskog primorja, prepoznatljiv po ostrvu povezanom sa kopnom. Okolina nudi mirnije uvale, panoramske poglede i elegantniji ritam odmora nego veci turisticki centri. Posebno prija putnicima koji traze lepe kadrove, tisinu i more.'
-        WHEN 'Podgorica' THEN 'Podgorica je glavni grad i prakticna baza za istrazivanje razlicitih delova Crne Gore. Grad ima siroke bulevare, reke, restorane, parkove i dovoljno urbanog ritma za kraci city break ili usputni boravak. Dobra je kada neko zeli kombinaciju svakodnevnog gradskog zivota i lakih izleta van centra.'
-        WHEN 'Herceg Novi' THEN 'Herceg Novi je grad stepenica, tvrdjava i dugih setnji uz more na ulazu u Bokokotorski zaliv. Njegovi trgovi i stare ulice daju mu izrazen karakter, dok obala ostavlja prostor za mirnije popodne i duza vecernja setalista. Posebno odgovara putnicima koji vole zeleni mediteranski ambijent i staru primorsku atmosferu.'
-        WHEN 'Bar' THEN 'Bar spaja funkcionalan primorski grad, dugu obalu i istorijski sloj Starog Bara u zaledju. Posetioci mogu da provedu dan na moru, a zatim da obilaze tvrdjavu, maslinjake i starije kamene delove grada. Dobar je za ljude koji vole da kombinuju plazu, istoriju i opusteniji ritam.'
-        WHEN 'Ulcinj' THEN 'Ulcinj nosi drugaciju energiju juga, sa dugim pescanim plazama, vetrom i opustenijom atmosferom. Velika plaža i Ada Bojana su najjaci magnet za ljubitelje sunca, vode i duzih boravaka napolju. Grad prija putnicima koji zele vise prostora, topliji mediteranski ritam i malo drugaciji kulturni ton.'
-        WHEN 'Cetinje' THEN 'Cetinje je istorijska prestonica sa muzejima, manastirima i ulicama koje cuvaju drzavnicku i kulturnu memoriju zemlje. Nije grad za zurbu, vec za sporiji obilazak, kratke pauze i fokus na price, zgrade i institucije. Posebno ce prijati ljubiteljima istorije i mirnijeg gradskog ambijenta.'
-        WHEN 'Nikšić' THEN 'Nikšić je sirok, pregledan grad sa trgovima, parkovima i jakim lokalnim ritmom. Osim urbanog dela, blizu su mu jezera, izletista i versko-istorijske tacke poput Ostroga. Dobar je kada neko zeli gradski boravak uz lak izlaz u prirodu.'
-        WHEN 'Tivat' THEN 'Tivat je moderan primorski grad sa marinom, setalistima i uredjenim delovima obale. Porto Montenegro mu daje elegantniji ton, ali grad ostaje lagan za setnju i prijatan za kraci odmor uz more. Odgovara putnicima koji vole savremeniji izgled obale, restorane i mirniji luksuz.'
-        WHEN 'Igalo' THEN 'Igalo je poznato po banjskom i wellness turizmu, ali i po dugim setnjama uz obalu. U blizini Herceg Novog nudi mirniji boravak, tretmane, more i vise prostora za oporavak i laganiji tempo dana. Dobro odgovara ljudima koji na putovanju zele da spoje zdravlje, odmor i setnju.'
-        WHEN 'Lovćen' THEN 'Lovćen je planina sa jakim simbolickim znacajem i jednim od najimpresivnijih vidikovaca u zemlji. Put do Njegosevog mauzoleja i pogled sa vrha cine ovu destinaciju jednom od najpamtljivijih za prvi obilazak Crne Gore. Prija putnicima koji vole panorame, planinski vazduh i osecaj prostora.'
-        WHEN 'Skadarsko jezero' THEN 'Skadarsko jezero je destinacija za sporiji boravak u prirodi, voznju camcem i posmatranje ptica. Oko jezera se smenjuju mala mesta, vidikovci, vinske tacke i mirniji ritam od morskih gradova. Posebno je dobar izbor za putnike koji traze fotografiju, prirodu i lagan dan van gradske guzve.'
-        WHEN 'Kolašin' THEN 'Kolašin je planinski grad koji dobro radi i zimi i leti. Zimi ga ljudi vezuju za ski centre, a topliji deo godine za setnje, recne doline, sumu i izlazak ka nacionalnim parkovima. Dobar je za one koji hoce uredjenu bazu za aktivan odmor u prirodi.'
-        WHEN 'Žabljak' THEN 'Žabljak je ulaz u Durmitor i jedna od najboljih baza za planinske aktivnosti u zemlji. Crno jezero, vidikovci, biciklisticke i pesacke staze, kao i zimski sadrzaji, daju mu ritam tokom cele godine. Prija putnicima koji zele prirodu na dohvat ruke od jutra do veceri.'
-        WHEN 'Plužine' THEN 'Plužine nude mirniji planinski boravak uz Pivsko jezero, kanjone i siroke pejzaze. Ovo je mesto za sporiji tempo, voznju, poglede i odmore koji vise zavise od prirode nego od gradske ponude. Dobar je izbor za one koji traze tisi sever zemlje.'
-        WHEN 'Andrijevica' THEN 'Andrijevica je severna planinska baza za izlete ka Komovima i Prokletijama. Reke, doline i okolne planine daju joj jednostavan, autentican karakter i dosta mogucnosti za aktivan dan napolju. Posebno prija putnicima koji vole manje sredine i planinski ambijent bez velike guzve.'
-        WHEN 'Plav' THEN 'Plav kombinuje planinsku atmosferu, jezero i blizinu Prokletija. Destinacija je pogodna za one koji vole prirodu, duze voznje, pesacenje i mirniji severni ritam. Dobro radi kao baza za vise dana istrazivanja okoline.'
-        WHEN 'Barcelona' THEN 'Barcelona spaja more, Gaudijevu arhitekturu, kvartove pune detalja i vrlo ziv gradski ritam. U istom danu mozes da obidjes Sagradu Familiju, prosetas kroz Gothic Quarter, sednes na tapas i zavrsis uz obalu. Posebno prija putnicima koji vole kombinaciju kulture, hrane i grada koji dugo ostaje budan.'
-        WHEN 'Madrid' THEN 'Madrid je grad sirokih bulevara, velikih muzeja i stalne gradske energije. Putnici ovde lako kombinuju Prado, Retiro, trznice, tapas barove i vecernji izlazak bez potrebe da zure izmedju tacki. Dobar je za city break koji trazi i kulturu i ritam velikog grada.'
-        WHEN 'Valencia' THEN 'Valencia spaja mediteranski tempo, modernu arhitekturu i poznatu gastronomsku scenu. Grad je prijatan za setnju i bicikl, a lako kombinuje istorijski centar, more i Ciudad de las Artes. Dobar je za putnike koji zele topliji i opusteniji ritam od vecih evropskih prestonica.'
-        WHEN 'Rome' THEN 'Rim je grad u kojem se svakodnevni ritam mesa sa antickim slojevima istorije, trgovima, fontanama i dugim vecerama. Putnik u jednom danu moze da obidje Koloseum, da sedne na kafu u malom baru i da završi veče uz testeninu i vino u Trastevereu. Zbog tog spoja velikih znamenitosti i malih kvartovskih trenutaka, Rim je dobar i za prvi dolazak i za sporiji povratak.'
-        WHEN 'Venice' THEN 'Venecija nudi sporiji ritam obilaska, setnje preko mostova i male gastronomske pauze uz poglede na kanale. Grad je posebno zanimljiv putnicima koji vole atmosferu, umetnost i osećaj da je gotovo svaka ulica scenografija. Najviše prija kada se obilazi bez velike žurbe, uz vreme za male prolaze, trgove i zalaske sunca.'
-        WHEN 'Florence' THEN 'Firenca spaja umetnost, zanatstvo i toskansku gastronomiju na malom prostoru koji je lako obici peske. Grad je odličan za putnike koji žele da kombinuju muzeje, panoramske poglede, lagan gradski tempo i ozbiljno dobru hranu. Posebno je lepa za one koji vole da im se kultura i svakodnevni život prepliću iz ulice u ulicu.'
+        WHEN 'Kotorski zaliv' THEN 'Kotorski zaliv spaja mirnu morsku površinu, strme planine i niz istorijskih mesta uz samu obalu. Putovanje ovde lako prelazi iz šetnje kroz Kotor i Perast u kratke vožnje obalom, kafu uz more i sporiji mediteranski ritam. Dobar je izbor za putnike koji vole pejzaže, fotografiju i kombinaciju kulture i odmora.'
+        WHEN 'Kotor' THEN 'Kotor je istorijski grad u srcu zaliva, poznat po zidinama, trgovima i starom gradu pod zaštitom UNESCO-a. Dan ovde lako krene obilaskom uskih kamenih ulica, nastavi se usponom ka tvrdjavi i završi večerom uz more. Posebno prija putnicima koji vole istoriju, atmosferu i šetnje bez žurbe.'
+        WHEN 'Budva' THEN 'Budva kombinuje plaže, stari grad i energičnu turističku scenu na malom prostoru. Posetioci mogu da provedu jutro uz more, popodne u kamenim ulicama starog grada, a veče u restoranima i barovima uz obalu. Odlična je za one koji žele i odmor i življu atmosferu.'
+        WHEN 'Durmitor' THEN 'Durmitor je planinska destinacija za ljude koji traže prirodu, vazduh i aktivan dan napolju. Crno jezero, vidikovci, pešačke staze i blizina kanjona Tare čine ga odličnim za više dana istraživanja. Ovde se lako prelazi iz mirne šetnje u ozbiljniju avanturu, zavisno od ritma putovanja.'
+        WHEN 'Sveti Stefan' THEN 'Sveti Stefan je jedna od najupečatljivijih tački crnogorskog primorja, prepoznatljiv po ostrvu povezanom sa kopnom. Okolina nudi mirnije uvale, panoramske poglede i elegantniji ritam odmora nego veći turistički centri. Posebno prija putnicima koji traže lepe kadrove, tišinu i more.'
+        WHEN 'Podgorica' THEN 'Podgorica je glavni grad i praktična baza za istraživanje različitih delova Crne Gore. Grad ima široke bulevare, reke, restorane, parkove i dovoljno urbanog ritma za kraći city break ili usputni boravak. Dobra je kada neko želi kombinaciju svakodnevnog gradskog života i lakih izleta van centra.'
+        WHEN 'Herceg Novi' THEN 'Herceg Novi je grad stepenica, tvrđava i dugih šetnji uz more na ulazu u Bokokotorski zaliv. Njegovi trgovi i stare ulice daju mu izražen karakter, dok obala ostavlja prostor za mirnije popodne i duža večernja šetališta. Posebno odgovara putnicima koji vole zeleni mediteranski ambijent i staru primorsku atmosferu.'
+        WHEN 'Bar' THEN 'Bar spaja funkcionalan primorski grad, dugu obalu i istorijski sloj Starog Bara u zaleđu. Posetioci mogu da provedu dan na moru, a zatim da obilaze tvrđavu, maslinjake i starije kamene delove grada. Dobar je za ljude koji vole da kombinuju plažu, istoriju i opušteniji ritam.'
+        WHEN 'Ulcinj' THEN 'Ulcinj nosi drugačiju energiju juga, sa dugim peščanim plažama, vetrom i opuštenijom atmosferom. Velika plaža i Ada Bojana su najjači magnet za ljubitelje sunca, vode i dužih boravaka napolju. Grad prija putnicima koji žele vise prostora, topliji mediteranski ritam i malo drugačiji kulturni ton.'
+        WHEN 'Cetinje' THEN 'Cetinje je istorijska prestonica sa muzejima, manastirima i ulicama koje čuvaju drzavničku i kulturnu memoriju zemlje. Nije grad za žurbu, vec za sporiji obilazak, kratke pauze i fokus na priče, zgrade i institucije. Posebno ce prijati ljubiteljima istorije i mirnijeg gradskog ambijenta.'
+        WHEN 'Nikšić' THEN 'Nikšić je širok, pregledan grad sa trgovima, parkovima i jakim lokalnim ritmom. Osim urbanog dela, blizu su mu jezera, izletišta i versko-istorijske tačke poput Ostroga. Dobar je kada neko želi gradski boravak uz lak izlaz u prirodu.'
+        WHEN 'Tivat' THEN 'Tivat je moderan primorski grad sa marinom, šetalištima i uređenim delovima obale. Porto Montenegro mu daje elegantniji ton, ali grad ostaje lagan za šetnju i prijatan za kraći odmor uz more. Odgovara putnicima koji vole savremeniji izgled obale, restorane i mirniji luksuz.'
+        WHEN 'Igalo' THEN 'Igalo je poznato po banjskom i wellness turizmu, ali i po dugim šetnjama uz obalu. U blizini Herceg Novog nudi mirniji boravak, tretmane, more i više prostora za oporavak i laganiji tempo dana. Dobro odgovara ljudima koji na putovanju žele da spoje zdravlje, odmor i šetnju.'
+        WHEN 'Lovćen' THEN 'Lovćen je planina sa jakim simbolickim značajem i jednim od najimpresivnijih vidikovaca u zemlji. Put do Njegoševog mauzoleja i pogled sa vrha čine ovu destinaciju jednom od najpamtljivijih za prvi obilazak Crne Gore. Prija putnicima koji vole panorame, planinski vazduh i osećaj prostora.'
+        WHEN 'Skadarsko jezero' THEN 'Skadarsko jezero je destinacija za sporiji boravak u prirodi, vožnju čamcem i posmatranje ptica. Oko jezera se smenjuju mala mesta, vidikovci, vinske tacke i mirniji ritam od morskih gradova. Posebno je dobar izbor za putnike koji traže fotografiju, prirodu i lagan dan van gradske gužve.'
+        WHEN 'Kolašin' THEN 'Kolašin je planinski grad koji dobro radi i zimi i leti. Zimi ga ljudi vezuju za ski centre, a topliji deo godine za šetnje, rečne doline, sumu i izlazak ka nacionalnim parkovima. Dobar je za one koji hoće uređenu bazu za aktivan odmor u prirodi.'
+        WHEN 'Žabljak' THEN 'Žabljak je ulaz u Durmitor i jedna od najboljih baza za planinske aktivnosti u zemlji. Crno jezero, vidikovci, biciklističke i pešačke staze, kao i zimski sadrzaji, daju mu ritam tokom cele godine. Prija putnicima koji žele prirodu na dohvat ruke od jutra do večeri.'
+        WHEN 'Plužine' THEN 'Plužine nude mirniji planinski boravak uz Pivsko jezero, kanjone i široke pejzaže. Ovo je mesto za sporiji tempo, vožnju, poglede i odmore koji više zavise od prirode nego od gradske ponude. Dobar je izbor za one koji traže tiši sever zemlje.'
+        WHEN 'Andrijevica' THEN 'Andrijevica je severna planinska baza za izlete ka Komovima i Prokletijama. Reke, doline i okolne planine daju joj jednostavan, autentičan karakter i dosta mogućnosti za aktivan dan napolju. Posebno prija putnicima koji vole manje sredine i planinski ambijent bez velike gužve.'
+        WHEN 'Plav' THEN 'Plav kombinuje planinsku atmosferu, jezero i blizinu Prokletija. Destinacija je pogodna za one koji vole prirodu, duže vožnje, pešačenje i mirniji severni ritam. Dobro radi kao baza za više dana istraživanja okoline.'
+        WHEN 'Barcelona' THEN 'Barcelona spaja more, Gaudijevu arhitekturu, kvartove pune detalja i vrlo živ gradski ritam. U istom danu možeš da obiđes Sagradu Familiju, prošetaš kroz Gothic Quarter, sedneš na tapas i završiš uz obalu. Posebno prija putnicima koji vole kombinaciju kulture, hrane i grada koji dugo ostaje budan.'
+        WHEN 'Madrid' THEN 'Madrid je grad širokih bulevara, velikih muzeja i stalne gradske energije. Putnici ovde lako kombinuju Prado, Retiro, tržnice, tapas barove i večernji izlazak bez potrebe da žure izmedju tački. Dobar je za city break koji traži i kulturu i ritam velikog grada.'
+        WHEN 'Valencia' THEN 'Valencia spaja mediteranski tempo, modernu arhitekturu i poznatu gastronomsku scenu. Grad je prijatan za šetnju i bicikl, a lako kombinuje istorijski centar, more i Ciudad de las Artes. Dobar je za putnike koji žele topliji i opušteniji ritam od vecih evropskih prestonica.'
+        WHEN 'Rome' THEN 'Rim je grad u kojem se svakodnevni ritam meša sa antičkim slojevima istorije, trgovima, fontanama i dugim večerama. Putnik u jednom danu moze da obiđe Koloseum, da sedne na kafu u malom baru i da završi veče uz testeninu i vino u Trastevereu. Zbog tog spoja velikih znamenitosti i malih kvartovskih trenutaka, Rim je dobar i za prvi dolazak i za sporiji povratak.'
+        WHEN 'Venice' THEN 'Venecija nudi sporiji ritam obilaska, šetnje preko mostova i male gastronomske pauze uz poglede na kanale. Grad je posebno zanimljiv putnicima koji vole atmosferu, umetnost i osećaj da je gotovo svaka ulica scenografija. Najviše prija kada se obilazi bez velike žurbe, uz vreme za male prolaze, trgove i zalaske sunca.'
+        WHEN 'Florence' THEN 'Firenca spaja umetnost, zanatstvo i toskansku gastronomiju na malom prostoru koji je lako obići peske. Grad je odličan za putnike koji žele da kombinuju muzeje, panoramske poglede, lagan gradski tempo i ozbiljno dobru hranu. Posebno je lepa za one koji vole da im se kultura i svakodnevni život prepliću iz ulice u ulicu.'
         WHEN 'Beograd' THEN 'Beograd je grad širokih bulevara, tvrđave iznad ušća i kafana koje žive do kasno. Posetioci ovde lako kombinuju istorijske tačke, moderni gradski ritam, dobru kafu i večere koje se često produže više nego što je planirano. Dobar je izbor za putnike koji vole energiju velikog grada, ali i spontane male pauze pored reke.'
         WHEN 'Novi Sad' THEN 'Novi Sad ima mirniji ritam, ali bogat gradski sadrzaj, uredjene trgove, dobru gastronomsku scenu i jak kulturni identitet. Posebno je prijatan za putnike koji vole setnju, dobru hranu i pogled sa Petrovaradina prema Dunavu i gradu. Grad lako ostavlja utisak mesta u kome možeš i da obilaziš i da usporiš.'
         WHEN 'Zlatibor' THEN 'Zlatibor je destinacija za sporiji planinski ritam, panoramske poglede, duge šetnje i odmor uz lokalne specijalitete. Pogodan je i za kratke vikend odmore i za duže boravke kada neko želi da kombinuje prirodu, wellness i lakše aktivnosti napolju. Posebno odgovara putnicima koji hoće uređenu planinsku bazu bez prevelikog napora oko organizacije.'
