@@ -445,22 +445,23 @@ textarea {
 }
 
 .server-gallery-grid {
-  margin-top: 8px;
+  margin-top: 14px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .server-gallery-card {
-  border: 1px solid #e2e8f0;
+  border: 1px solid #dbe4ef;
   border-radius: 12px;
   overflow: hidden;
   background: #fff;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
 }
 
 .server-gallery-card img {
   width: 100%;
-  height: 116px;
+  height: 106px;
   object-fit: cover;
   display: block;
 }
@@ -468,18 +469,20 @@ textarea {
 .server-gallery-actions {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
-  padding: 10px;
+  gap: 10px;
+  padding: 10px 10px 12px;
 }
 
 .btn-chip {
-  border: 1px solid #cbd5e1;
+  border: 1px solid #cfe0f6;
   border-radius: 999px;
   background: #fff;
-  color: #0f172a;
-  padding: 6px 10px;
-  font-size: 13px;
+  color: #1e3a8a;
+  padding: 6px 12px;
+  font-size: 12px;
   font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .btn-chip-primary {
@@ -490,7 +493,20 @@ textarea {
 
 .btn-chip-danger {
   border-color: #fecaca;
+  background: #fff5f5;
   color: #dc2626;
+}
+
+@media (max-width: 960px) {
+  .server-gallery-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .server-gallery-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .map-shell {

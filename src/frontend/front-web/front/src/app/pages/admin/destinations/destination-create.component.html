@@ -103,11 +103,28 @@
           <p class="fine-print">Recommended aspect ratio 16:9. Maximum file size 5MB per image (validated on upload later).</p>
 
           @if (imagePreviews.length) {
-            <div class="preview-strip">
+            <div class="server-gallery-grid">
               @for (src of imagePreviews; track $index) {
-                <div class="preview-tile">
-                  <img [src]="src" alt="" />
-                  <button type="button" class="preview-remove" (click)="removeGalleryImage($index)" aria-label="Remove image">×</button>
+                <div class="server-gallery-card">
+                  <img [src]="src" alt="Destination image preview" />
+                  <div class="server-gallery-actions">
+                    <button
+                      type="button"
+                      class="btn btn-chip"
+                      [class.btn-chip-primary]="$index === primaryPreviewImageIndex"
+                      [disabled]="$index === primaryPreviewImageIndex"
+                      (click)="setPrimaryPreviewImage($index)"
+                    >
+                      {{ $index === primaryPreviewImageIndex ? 'Primary' : 'Set Primary' }}
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-chip btn-chip-danger"
+                      (click)="removeGalleryImage($index)"
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
               }
             </div>

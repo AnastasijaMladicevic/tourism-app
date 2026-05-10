@@ -81,6 +81,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
 
   imageFiles: File[] = [];
   imagePreviews: string[] = [];
+  primaryPreviewImageIndex = 0;
   destinationImages: DestinationImageDto[] = [];
   isUpdatingImages = false;
   isLoadingLinkedEntities = false;
@@ -386,6 +387,9 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       this.imageFiles.push(file);
       this.imagePreviews.push(URL.createObjectURL(file));
     }
+    if (this.primaryPreviewImageIndex >= this.imagePreviews.length) {
+      this.primaryPreviewImageIndex = Math.max(0, this.imagePreviews.length - 1);
+    }
     input.value = '';
   }
 
@@ -396,6 +400,22 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     }
     this.imagePreviews = this.imagePreviews.filter((_, i) => i !== index);
     this.imageFiles = this.imageFiles.filter((_, i) => i !== index);
+    if (this.imagePreviews.length === 0) {
+      this.primaryPreviewImageIndex = 0;
+      return;
+    }
+    if (index < this.primaryPreviewImageIndex) {
+      this.primaryPreviewImageIndex--;
+    } else if (index === this.primaryPreviewImageIndex) {
+      this.primaryPreviewImageIndex = 0;
+    }
+  }
+
+  setPrimaryPreviewImage(index: number): void {
+    if (index < 0 || index >= this.imagePreviews.length) {
+      return;
+    }
+    this.primaryPreviewImageIndex = index;
   }
 
   private buildDescriptionPayload(): string | undefined {
