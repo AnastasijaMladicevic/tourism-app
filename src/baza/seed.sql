@@ -832,7 +832,7 @@ INSERT INTO "Objects"
  "Status", "IsActive", "ObjectTypeId", "LocalityId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
 VALUES
 ('Hotel Vardar', 'Hotel u srcu starog grada Kotora', 'Stari grad Kotor', '+38232345678', 'https://hotelvardar.com',
- NULL, NULL, '{"pon":"00:00-24:00"}', 145.00, ARRAY['WiFi', 'Parking', 'Spa', 'Dorucak'], ST_SetSRID(ST_MakePoint(18.7705, 42.4247), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 145.00, ARRAY['WiFi', 'Parking', 'Spa', 'Doručak'], ST_SetSRID(ST_MakePoint(18.7705, 42.4247), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -840,7 +840,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Restoran Galion', 'Restoran sa pogledom na zaliv', 'Skaljari bb, Kotor', '+38232345679', 'https://galion.me',
+('Restoran Galion', 'Restoran sa pogledom na zaliv', 'Škaljari bb, Kotor', '+38232345679', 'https://galion.me',
  'https://galion.me/menu/', 'Mediteranska i morski plodovi', '{"pon":"10:00-23:00"}', 35.00, ARRAY['WiFi', 'Terasa', 'Pogled na more', 'Rezervacije'], ST_SetSRID(ST_MakePoint(18.768, 42.427), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
@@ -850,7 +850,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Hotel Avala', 'Luksuzni hotel pored mora', 'Budva centar', '+38233456789', 'https://avala.me',
- 'https://www.avalaresort.com/explore', NULL, '{"pon":"00:00-24:00"}', 180.00, ARRAY['WiFi', 'Bazen', 'Spa', 'Parking', 'Dorucak'], ST_SetSRID(ST_MakePoint(18.838, 42.279), 4326), 0, 0, 'Approved', true,
+ 'https://www.avalaresort.com/explore', NULL, '{"pon":"00:00-24:00"}', 180.00, ARRAY['WiFi', 'Bazen', 'Spa', 'Parking', 'Doručak'], ST_SetSRID(ST_MakePoint(18.838, 42.279), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -858,7 +858,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Mogren Beach Bar', 'Bar na plazi', 'Plaža Mogren', '+38233456780', 'https://mogren2.me/en',
+('Mogren Beach Bar', 'Bar na plaži', 'Plaža Mogren', '+38233456780', 'https://mogren2.me/en',
  'https://www.dotyourspot.com/EfQ3u4/', 'Mediteranska i bar food', '{"pon":"08:00-02:00"}', 12.00, ARRAY['Terasa', 'Pogled na more', 'Kokteli', 'Muzika'], ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
@@ -877,7 +877,7 @@ VALUES
  NOW(), NOW(), NOW()),
  
  ('Biblioteka Nikšić', 'Gradska biblioteka u Nikšiću', 'Alekse Backovića, Nikšić',  NULL, 'http://bibliotekank.me/',
- NULL, NULL, '{"pon":"08:00-20:00"}', NULL, ARRAY['WiFi', 'Citaonica', 'Klimatizovano'], ST_SetSRID(ST_MakePoint(18.94548, 42.78035), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"08:00-20:00"}', NULL, ARRAY['WiFi', 'Čitaonica', 'Klimatizovano'], ST_SetSRID(ST_MakePoint(18.94548, 42.78035), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Biblioteka'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
@@ -886,7 +886,7 @@ VALUES
  NOW(), NOW(), NOW()),
  
  ('Crkva Svetog Nikole Bar', 'Pravoslavna crkva u Starom Baru', 'Stari Bar', NULL, NULL,
- NULL, NULL, '{"pon":"06:00-18:00"}', NULL, ARRAY['Vodic', 'Mirno okruzenje'], ST_SetSRID(ST_MakePoint(19.142, 42.097), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"06:00-18:00"}', NULL, ARRAY['Vodič', 'Mirno okruženje'], ST_SetSRID(ST_MakePoint(19.142, 42.097), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Crkva'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari Bar'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
@@ -904,7 +904,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Hotel Bianca Kolašin', 'Popularan hotel u Kolašinu',  'Mirka Vešovića, Kolašin', '+38220863000', 'https://www.biancaresort.com/',
- 'https://www.biancaresort.com/explore', NULL, '{"pon":"00:00-24:00"}', 130.00, ARRAY['WiFi', 'Spa', 'Parking', 'Dorucak', 'Ski ostava'], ST_SetSRID(ST_MakePoint(19.517, 42.824), 4326), 0, 0, 'Approved', true,
+ 'https://www.biancaresort.com/explore', NULL, '{"pon":"00:00-24:00"}', 130.00, ARRAY['WiFi', 'Spa', 'Parking', 'Dorućak', 'Ski ostava'], ST_SetSRID(ST_MakePoint(19.517, 42.824), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolašina'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
@@ -923,8 +923,8 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Restoran Pod Volat', 'Poznat po rostilju i domacoj hrani', '1 Trg Vojvode Bećira Osmanagića, Podgorica', '+38269618633', NULL,
- NULL, 'Balkanska kuhinja', '{"pon":"08:00-22:00"}', 18.00, ARRAY['Rostilj', 'WiFi', 'Brza usluga'], ST_SetSRID(ST_MakePoint(19.260, 42.435), 4326), 0, 0, 'Approved', true,
+('Restoran Pod Volat', 'Poznat po roštilju i domaćoj hrani', '1 Trg Vojvode Bećira Osmanagića, Podgorica', '+38269618633', NULL,
+ NULL, 'Balkanska kuhinja', '{"pon":"08:00-22:00"}', 18.00, ARRAY['Roštilj', 'WiFi', 'Brza usluga'], ST_SetSRID(ST_MakePoint(19.260, 42.435), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
@@ -941,8 +941,8 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Konoba Batricevic Njeguši', 'Domaca hrana i specijaliteti od prsute i sira', 'Selo Njeguši', '+38220000007', NULL,
- NULL, 'Tradicionalna kuhinja', '{"pon":"09:00-21:00"}', 20.00, ARRAY['Domaca hrana', 'Parking', 'Pogled na planinu'], ST_SetSRID(ST_MakePoint(18.82297, 42.43828), 4326), 0, 0, 'Approved', true,
+('Konoba Batričević Njeguši', 'Domaća hrana i specijaliteti od pršute i sira', 'Selo Njeguši', '+38220000007', NULL,
+ NULL, 'Tradicionalna kuhinja', '{"pon":"09:00-21:00"}', 20.00, ARRAY['Domaća hrana', 'Parking', 'Pogled na planinu'], ST_SetSRID(ST_MakePoint(18.82297, 42.43828), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njeguši'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovćen'),
@@ -950,7 +950,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Restoran Ulcinj Sunset', 'Restoran sa pogledom na zalazak sunca na Velikoj plazi', 'Ulcinjskih moreplovaca', '+38269683122', NULL,
+('Restoran Ulcinj Sunset', 'Restoran sa pogledom na zalazak sunca na Velikoj plaži', 'Ulcinjskih moreplovaca', '+38269683122', NULL,
  NULL, 'Mediteranska kuhinja', '{"pon":"10:00-23:00"}', 28.00, ARRAY['Pogled na more', 'Terasa', 'Kokteli'], ST_SetSRID(ST_MakePoint(19.20534, 41.92144), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaža'),
@@ -959,7 +959,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Restaurant OrO', 'Popularan restoran u centru Zabljaka sa lokalnim i evropskim specijalitetima', 'Njegoševa, Žabljak', '+38269406210', 'http://www.restaurantoro.me/',
+('Restaurant OrO', 'Popularan restoran u centru Žabljaka sa lokalnim i evropskim specijalitetima', 'Njegoševa, Žabljak', '+38269406210', 'http://www.restaurantoro.me/',
  NULL, 'Crnogorska i evropska kuhinja', '{"pon":"08:00-01:00"}', 20.00, ARRAY['WiFi', 'Terasa', 'Rezervacije', 'Porodicno okruzenje'], ST_SetSRID(ST_MakePoint(19.1202, 43.1550), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
@@ -981,7 +981,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Hotel Splendid Conference & Spa Resort', 'Luksuzni resort na obali', 'Bečići bb, Budva', '+38233773777', 'https://www.splendid.me',
- NULL, NULL, '{"pon":"00:00-24:00"}', 250.00, ARRAY['Spa', 'Privatna plaza', 'Bazen', 'Fitness', 'Restoran'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', 250.00, ARRAY['Spa', 'Privatna plaža', 'Bazen', 'Fitness', 'Restoran'],
  ST_SetSRID(ST_MakePoint(18.876, 42.284), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Bečići'),
@@ -1001,7 +1001,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Hotel Palmon Bay', 'Spa hotel uz more u Igalu', 'Igalo, Herceg Novi', '+38231777777', 'https://www.palmonbay.com',
- NULL, NULL, '{"pon":"00:00-24:00"}', 160.00, ARRAY['Spa', 'Bazen', 'Plaza', 'Wellness', 'Parking'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', 160.00, ARRAY['Spa', 'Bazen', 'Plaža', 'Wellness', 'Parking'],
  ST_SetSRID(ST_MakePoint(18.514, 42.460), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
@@ -1021,7 +1021,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Hotel Palas', 'Porodični hotel na plaži', 'Petrovac na Moru', '+38233421000', 'https://www.hotelpalas.me',
- NULL, NULL, '{"pon":"00:00-24:00"}', 140.00, ARRAY['Plaza', 'Bazen', 'Restoran', 'Parking', 'WiFi'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', 140.00, ARRAY['Plaža', 'Bazen', 'Restoran', 'Parking', 'WiFi'],
  ST_SetSRID(ST_MakePoint(18.942, 42.206), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Petrovac'),
@@ -1031,7 +1031,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Hotel Forza Mare', 'Luksuzni boutique hotel na obali mora sa tematskim sobama i privatnom plažom', 'Dobrota bb, Kotor', '+38232301100', 'https://forzamare.com/',
- NULL, NULL, '{"pon":"00:00-24:00"}', 260.00, ARRAY['WiFi', 'Privatna plaza', 'Spa', 'Bazen', 'Parking', 'Restoran'], ST_SetSRID(ST_MakePoint(18.762, 42.441), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 260.00, ARRAY['WiFi', 'Privatna plaža', 'Spa', 'Bazen', 'Parking', 'Restoran'], ST_SetSRID(ST_MakePoint(18.762, 42.441), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Dobrota'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -1040,7 +1040,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Hotel Princess', 'Hotel uz more i šetalište', 'Bar centar', '+38230310000', 'https://www.hotelprincess.me',
- NULL, NULL, '{"pon":"00:00-24:00"}', 120.00, ARRAY['Bazen', 'Plaza', 'Restoran', 'Parking'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', 120.00, ARRAY['Bazen', 'Plaža', 'Restoran', 'Parking'],
  ST_SetSRID(ST_MakePoint(19.097, 42.093), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Bara'),
@@ -1071,7 +1071,7 @@ VALUES
 
  ---KAFANE---
  ('Gradska kafanica Žabljak', 'Tradicionalna kafana sa domaćom crnogorskom kuhinjom u rustičnom ambijentu', '3 Vuka Karadžića, Žabljak', '+38268132101', NULL,
- NULL, 'Crnogorska kuhinja', '{"pon":"09:00-23:00"}', 20.00, ARRAY['Parking', 'Domaca hrana', 'Basta', 'Porodicno okruzenje'], ST_SetSRID(ST_MakePoint(19.124, 43.156), 4326), 0, 0, 'Approved', true,
+ NULL, 'Crnogorska kuhinja', '{"pon":"09:00-23:00"}', 20.00, ARRAY['Parking', 'Domaća hrana', 'Bašta', 'Porodično okruženje'], ST_SetSRID(ST_MakePoint(19.124, 43.156), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafana'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
@@ -1080,7 +1080,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Konoba Stari Grad', 'Kafana poznata po roštilju i narodnoj muzici', '12 Njegoševa, Budva', '+38233454443', NULL,
- NULL, 'Balkanska kuhinja', '{"pon":"10:00-02:00"}', 17.00, ARRAY['Ziva muzika', 'Rostilj', 'Kokteli', 'Basta'], ST_SetSRID(ST_MakePoint(18.837, 42.278), 4326), 0, 0, 'Approved', true,
+ NULL, 'Balkanska kuhinja', '{"pon":"10:00-02:00"}', 17.00, ARRAY['Živa muzika', 'Roštilj', 'Kokteli', 'Bašta'], ST_SetSRID(ST_MakePoint(18.837, 42.278), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafana'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -1088,8 +1088,8 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Kafana Markovic', 'Tradicionalna crnogorska kafana poznata po domaćoj hrani i opuštenoj atmosferi', 'Bulevar Svetog Petra Cetinjskog, Podgorica', '+38267266667', NULL,
- NULL, 'Crnogorska kuhinja', '{"pon":"08:00-23:00"}', 16.00, ARRAY['Rostilj', 'Domaca hrana', 'Brza usluga', 'Basta'], ST_SetSRID(ST_MakePoint(19.28571, 42.45234), 4326), 0, 0, 'Approved', true,
+ ('Kafana Marković', 'Tradicionalna crnogorska kafana poznata po domaćoj hrani i opuštenoj atmosferi', 'Bulevar Svetog Petra Cetinjskog, Podgorica', '+38267266667', NULL,
+ NULL, 'Crnogorska kuhinja', '{"pon":"08:00-23:00"}', 16.00, ARRAY['Roštilj', 'Domaća hrana', 'Brza usluga', 'Bašta'], ST_SetSRID(ST_MakePoint(19.28571, 42.45234), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafana'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
@@ -1099,7 +1099,7 @@ VALUES
 
  ---Planinarski domovi---
 
-('Planinarski dom Skrka', 'Planinarski dom u srcu Durmitora, polazna tačka za planinske ture i alpinizam', 'Škrka, Durmitor', NULL, NULL,
+('Planinarski dom Škrka', 'Planinarski dom u srcu Durmitora, polazna tačka za planinske ture i alpinizam', 'Škrka, Durmitor', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00"}', 35.00, ARRAY['Smještaj', 'Grejanje', 'Planinske ture', 'Voda'], ST_SetSRID(ST_MakePoint(19.045, 43.130), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Planinarski dom'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
@@ -1119,7 +1119,7 @@ VALUES
 
  ---Biblioteke---
 
- ('Nacionalna biblioteka Crne Gore Djurdje Crnojevic', 'Centralna nacionalna biblioteka Crne Gore smještena u istorijskom jezgru Cetinja', '163 Bulevar Crnogorskih Junaka, Cetinje', '+38241231143', 'https://nbc-cg.me',
+ ('Nacionalna biblioteka Crne Gore Đurđe Crnojević', 'Centralna nacionalna biblioteka Crne Gore smještena u istorijskom jezgru Cetinja', '163 Bulevar Crnogorskih Junaka, Cetinje', '+38241231143', 'https://nbc-cg.me',
  NULL, NULL, '{"pon":"08:00-20:00"}', NULL, ARRAY['Čitaonica', 'Arhiv', 'Istraživački centar', 'WiFi'], ST_SetSRID(ST_MakePoint(18.915, 42.395), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Biblioteka'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Cetinja'),
@@ -1128,7 +1128,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Narodna biblioteka Radosav Ljumovic', 'Glavna gradska biblioteka u Podgorici sa bogatim fondom knjiga i kulturnim programima', 'Bokeška, Podgorica', '+38220664715', 'http://www.nbpg.me/',
+ ('Narodna biblioteka Radosav Ljumović', 'Glavna gradska biblioteka u Podgorici sa bogatim fondom knjiga i kulturnim programima', 'Bokeška, Podgorica', '+38220664715', 'http://www.nbpg.me/',
  NULL, NULL, '{"pon":"08:00-20:00"}', NULL, ARRAY['Čitaonica', 'WiFi', 'Događaji', 'Knjige'], ST_SetSRID(ST_MakePoint(19.262, 42.442), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Biblioteka'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -1137,7 +1137,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Gradska biblioteka i citaonica Herceg Novi', 'Javna biblioteka sa dugom tradicijom i kulturnim programima u Herceg Novom', 'Trg Herceg Stjepana 6, Herceg Novi', '+38231321900', 'http://www.bibliotekahercegnovi.co.me/',
+('Gradska biblioteka i čitaonica Herceg Novi', 'Javna biblioteka sa dugom tradicijom i kulturnim programima u Herceg Novom', 'Trg Herceg Stjepana 6, Herceg Novi', '+38231321900', 'http://www.bibliotekahercegnovi.co.me/',
  NULL, NULL, '{"pon":"08:00-20:00"}', NULL, ARRAY['Čitaonica', 'Arhiv', 'Kultura', 'WiFi'], ST_SetSRID(ST_MakePoint(18.536, 42.452), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Biblioteka'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Herceg Novog'),
@@ -1167,7 +1167,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Crkva Svetog Nikole', 'Pravoslavna crkva u starom gradu Kotoru poznata po velikoj ikonografskoj zbirci', 'Stari grad Kotor', NULL, 'http://www.mitropolija.com/',
- NULL, NULL, '{"pon":"07:00-19:00"}', NULL, ARRAY['Ikone', 'Mirno okruzenje', 'Religija', 'Istorija'], ST_SetSRID(ST_MakePoint(18.771, 42.426), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"07:00-19:00"}', NULL, ARRAY['Ikone', 'Mirno okruženje', 'Religija', 'Istorija'], ST_SetSRID(ST_MakePoint(18.771, 42.426), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Crkva'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -1186,8 +1186,8 @@ VALUES
 
  --- Apartmani ---
 
-('Apartments Djurovic', 'Apartmani u Petrovcu plaže, pogodni za porodice', 'broj 31 XIII Ulica, Petrovac', NULL, 'https://aptsdurovic.traveleto.com/',
- NULL, NULL, '{"pon":"00:00-24:00"}', 70.00, ARRAY['WiFi', 'Parking', 'Klima', 'Blizina plaze'], ST_SetSRID(ST_MakePoint(18.938, 42.208), 4326), 0, 0, 'Approved', true,
+('Apartments Đurovic', 'Apartmani u Petrovcu plaže, pogodni za porodice', 'broj 31 XIII Ulica, Petrovac', NULL, 'https://aptsdurovic.traveleto.com/',
+ NULL, NULL, '{"pon":"00:00-24:00"}', 70.00, ARRAY['WiFi', 'Parking', 'Klima', 'Blizina plaže'], ST_SetSRID(ST_MakePoint(18.938, 42.208), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Apartman'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Petrovac'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -1195,7 +1195,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Apartments Vukovic', 'Komforni apartmani sa pogledom na Boku Kotorsku', 'Jadranska magistrala, Muo', '+38269687310', NULL,
+ ('Apartments Vuković', 'Komforni apartmani sa pogledom na Boku Kotorsku', 'Jadranska magistrala, Muo', '+38269687310', NULL,
  NULL, NULL, '{"pon":"00:00-24:00"}', 85.00, ARRAY['WiFi', 'Parking', 'Terasa', 'Pogled na more'], ST_SetSRID(ST_MakePoint(18.756, 42.437), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Apartman'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Muo'),
@@ -1223,7 +1223,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Boutique Hotel Casa del Mare - Amfora', 'Boutique apartmani uz Bokokotorski zaliv', 'Orahovac bb, Kotor', '+38232305852', 'https://casadelmare.me',
- NULL, NULL, '{"pon":"00:00-24:00"}', 120.00, ARRAY['Spa', 'Privatna plaza', 'WiFi', 'Parking'], ST_SetSRID(ST_MakePoint(18.760, 42.490), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 120.00, ARRAY['Spa', 'Privatna plaža', 'WiFi', 'Parking'], ST_SetSRID(ST_MakePoint(18.760, 42.490), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Apartman'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Orahovac'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -1231,7 +1231,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Apartments Mijovic', 'Porodični apartmani blizu plaže', '4. Proleterske, Budva', '+38267319039', 'https://mijovic.traveleto.com/',
+ ('Apartments Mijović', 'Porodični apartmani blizu plaže', '4. Proleterske, Budva', '+38267319039', 'https://mijovic.traveleto.com/',
  NULL, NULL, '{"pon":"00:00-24:00"}', 55.00, ARRAY['WiFi', 'Parking', 'Klima'], ST_SetSRID(ST_MakePoint(18.851, 42.293), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Apartman'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Budve'),
@@ -1258,7 +1258,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Villa Ljubanovic Apartments', 'Komforni apartmani u mirnom dijelu Budve', '18 Nikole Tesle, Budva', '+38269931474', 'http://www.ljubanovic.com/',
+ ('Villa Ljubanović Apartments', 'Komforni apartmani u mirnom dijelu Budve', '18 Nikole Tesle, Budva', '+38269931474', 'http://www.ljubanovic.com/',
  NULL, NULL, '{"pon":"00:00-24:00"}', 75.00, ARRAY['WiFi', 'Parking', 'Terasa'], ST_SetSRID(ST_MakePoint(18.834, 42.286), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Apartman'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Budve'),
@@ -1279,7 +1279,7 @@ VALUES
  ---SPA CENTRI---
 
 ('Banya Wellness & Spa', 'Moderan spa centar sa saunama i masažama u Podgorici', '19/2 Šeika Zaida, Podgorica', '+38267134611', 'https://www.banyawellness.com/',
- NULL, NULL, '{"pon":"09:00-22:00"}', 30.00, ARRAY['Spa', 'Sauna', 'Masaze', 'Jacuzzi'],
+ NULL, NULL, '{"pon":"09:00-22:00"}', 30.00, ARRAY['Spa', 'Sauna', 'Masaže', 'Jacuzzi'],
  ST_SetSRID(ST_MakePoint(19.243, 42.440), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spa Centar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -1288,7 +1288,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Wellness Center Simo Milosevic', 'Spa i rehabilitacioni centar sa dugom tradicijom', '5 Sava Ilića, Igalo', '+38263211313', 'https://www.igalospa.com',
+ ('Wellness Center Simo Milošević', 'Spa i rehabilitacioni centar sa dugom tradicijom', '5 Sava Ilića, Igalo', '+38263211313', 'https://www.igalospa.com',
  NULL, NULL, '{"pon":"07:00-21:00"}', 35.00, ARRAY['Spa', 'Bazen', 'Terapije', 'Sauna'],
  ST_SetSRID(ST_MakePoint(18.513, 42.459), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spa Centar'),
@@ -1299,7 +1299,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Perla Residence Spa', 'Samostalni wellness i spa centar sa fokusom na relaksaciju i tretmane tela', '70 Vlada Ćetkovića, Podgorica', '+38220511511', 'http://www.perlaresidence.me/',
- NULL, NULL, '{"pon":"09:00-21:00"}', 35.00, ARRAY['Spa', 'Masaze', 'Sauna', 'Jacuzzi', 'Relax zona'],
+ NULL, NULL, '{"pon":"09:00-21:00"}', 35.00, ARRAY['Spa', 'Masaže', 'Sauna', 'Jacuzzi', 'Relax zona'],
  ST_SetSRID(ST_MakePoint(19.236, 42.453), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spa Centar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -1309,7 +1309,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Huma Bay Spa', 'Ekskluzivni spa centar sa pogledom na Bokokotorski zaliv, fokus na relaksaciji i premium tretmanima', 'Dobrota 175, Kotor', '+38268888884', 'http://www.humahotel.me/',
- NULL, NULL, '{"pon":"09:00-21:00"}', 75.00, ARRAY['Spa', 'Sauna', 'Bazen', 'Masaze', 'Wellness'],
+ NULL, NULL, '{"pon":"09:00-21:00"}', 75.00, ARRAY['Spa', 'Sauna', 'Bazen', 'Masaže', 'Wellness'],
  ST_SetSRID(ST_MakePoint(18.766, 42.448), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spa Centar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Dobrota'),
@@ -1319,7 +1319,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Casa del Mare Spa', 'Boutique wellness centar sa personalizovanim spa tretmanima u mirnom okruženju', 'Kamenari 23, Herceg Novi', '+38269700702', 'https://www.casadelmare.me',
- NULL, NULL, '{"pon":"10:00-20:00"}', 65.00, ARRAY['Spa', 'Masaze', 'Sauna', 'Jacuzzi', 'Relax zona'],
+ NULL, NULL, '{"pon":"10:00-20:00"}', 65.00, ARRAY['Spa', 'Masaže', 'Sauna', 'Jacuzzi', 'Relax zona'],
  ST_SetSRID(ST_MakePoint(18.672, 42.463), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spa Centar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kamenari'),
@@ -1331,7 +1331,7 @@ VALUES
  ---Spomenici---
 
  ('Spomenik Partizanu borcu na Gorici', 'Monument posvećen borcima NOB-a, jedan od simbola Podgorice', 'Brdo Gorica, Podgorica', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj', 'Pogled na grad'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj', 'Pogled na grad'],
  ST_SetSRID(ST_MakePoint(19.266, 42.450), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -1341,7 +1341,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Spomenik Vladimiru i Kosari', 'Spomenik legendarnim istorijskim ličnostima Duklje', 'Ul. Vladimira Rolovića, Bar', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj', 'Turisticka atrakcija'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj', 'Turistička atrakcija'],
  ST_SetSRID(ST_MakePoint(19.100, 42.098), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Bara'),
@@ -1351,7 +1351,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Spomenik kralju Nikoli', 'Spomenik poslednjem kralju Crne Gore', 'Trg kralja Nikole, Podgorica', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj', 'Centar grada'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj', 'Centar grada'],
  ST_SetSRID(ST_MakePoint(19.261, 42.440), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -1360,8 +1360,8 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Spomenik Ljubu Cupicu', 'Spomenik narodnom heroju poznatom po osmehu pred streljanje', 'Trg Slobode, Nikšić', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj'],
+ ('Spomenik Ljubu Čupiću', 'Spomenik narodnom heroju poznatom po osmehu pred streljanje', 'Trg Slobode, Nikšić', NULL, NULL,
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj'],
  ST_SetSRID(ST_MakePoint(18.950, 42.773), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Nikšić'),
@@ -1371,7 +1371,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Spomenik palim borcima na Grahovcu', 'Spomenik posvećen bici na Grahovcu iz 1858. godine', 'Grahovac, Nikšić', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj'],
  ST_SetSRID(ST_MakePoint(18.637, 42.688), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Grahovac'),
@@ -1381,7 +1381,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Spomenik Tuđemilima', 'Spomenik bici kod Tuđemila gde je Duklja izvojevala pobedu', 'Tuđemili, Bar', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj'],
  ST_SetSRID(ST_MakePoint(19.135, 42.141), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tuđemili'),
@@ -1390,8 +1390,8 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Spomenik Punisi Racicu', 'Istorijski spomenik kontroverznoj ličnosti iz perioda Kraljevine Jugoslavije', 'Andrijevica', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj'],
+ ('Spomenik Puniči Račiću', 'Istorijski spomenik kontroverznoj ličnosti iz perioda Kraljevine Jugoslavije', 'Andrijevica', NULL, NULL,
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj'],
  ST_SetSRID(ST_MakePoint(19.787, 42.738), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Andrijevice'),
@@ -1400,8 +1400,8 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Spomenik herojima Bozicnog ustanka', 'Spomenik posvećen učesnicima ustanka iz 1919. godine', 'Cetinje', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj'],
+ ('Spomenik herojima Božićnog ustanka', 'Spomenik posvećen učesnicima ustanka iz 1919. godine', 'Cetinje', NULL, NULL,
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj'],
  ST_SetSRID(ST_MakePoint(18.916, 42.394), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Cetinja'),
@@ -1411,7 +1411,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Spomenik bici na Fundini', 'Spomenik jednoj od najznačajnijih bitaka protiv Osmanskog carstva', 'Fundina, Podgorica', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj'],
  ST_SetSRID(ST_MakePoint(19.360, 42.455), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Fundina'),
@@ -1420,8 +1420,8 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Spomenik Njegosu na Lovćenu', 'Monument posvećen Petru II Petroviću Njegošu, smešten u okviru Mauzoleja na Lovćenu', 'Lovćen, Cetinje', NULL, NULL,
- NULL, NULL, '{"pon":"08:00-18:00"}', NULL, ARRAY['Istorijski znacaj', 'Pogled', 'Kulturna bastina'],
+('Spomenik Njegošu na Lovćenu', 'Monument posvećen Petru II Petroviću Njegošu, smešten u okviru Mauzoleja na Lovćenu', 'Lovćen, Cetinje', NULL, NULL,
+ NULL, NULL, '{"pon":"08:00-18:00"}', NULL, ARRAY['Istorijski značaj', 'Pogled', 'Kulturna baština'],
  ST_SetSRID(ST_MakePoint(18.838, 42.400), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njeguši'),
@@ -1565,7 +1565,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('INA Skaljari Kotor', 'INA benzinska pumpa u Kotoru', 'Skaljari bb, Kotor', '+38267061664', 'https://inacg.me/',
+ ('INA Škaljari Kotor', 'INA benzinska pumpa u Kotoru', 'Škaljari bb, Kotor', '+38267061664', 'https://inacg.me/',
  NULL, NULL, '{"pon":"00:00-24:00"}', 0.00, ARRAY['Gorivo', 'Market'],
  ST_SetSRID(ST_MakePoint(18.765, 42.416), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Benzinska Pumpa'),
@@ -1659,7 +1659,7 @@ VALUES
 
 ('Kafic Marshall’s Gelato & Coffee', 'Popularan kafić i poslastičarnica poznata po gelatu i kafi', 'STARI GRAD 359 A, Kotor', '+38267876875', 'http://www.marshallsgelato.com/',
  NULL, 'Kafeterija i slatkiši', '{"pon":"08:00-17:00"}', 8.00,
- ARRAY['WiFi', 'Basta', 'Deserti', 'Kafa', 'Porodicno okruzenje'],
+ ARRAY['WiFi', 'Basta', 'Deserti', 'Kafa', 'Porodično okruženje'],
  ST_SetSRID(ST_MakePoint(18.771, 42.425), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafic'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
@@ -1742,7 +1742,7 @@ VALUES
 
 ('Beer & Bike Club', 'Poznati bar u centru Budve sa opuštenom atmosferom', 'Slovenska Obala, Budva', '+38268033180', 'http://beerbikeclub.me/',
  NULL, 'Bar i kokteli', '{"pon":"09:00-01:00","uto":"09:00-01:00","sre":"09:00-01:00","cet":"09:00-01:00","pet":"09:00-02:00","sub":"09:00-02:00","ned":"00:00-00:00"}', 10.00,
- ARRAY['Kokteli', 'Basta', 'Muzika', 'WiFi'],
+ ARRAY['Kokteli', 'Bašta', 'Muzika', 'WiFi'],
  ST_SetSRID(ST_MakePoint(18.838, 42.282), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Budve'),
@@ -1765,7 +1765,7 @@ VALUES
 
 ('Havana Beach Bar', 'Plažni bar sa dnevnim žurkama', 'Velika Plaža, Ulcinj', '+38267231034', NULL,
  NULL, 'Bar i kokteli', '{"pon":"08:00-00:00","uto":"08:00-00:00","sre":"08:00-00:00","cet":"08:00-00:00","pet":"08:00-02:00","sub":"08:00-02:00","ned":"00:00-00:00"}', 12.00,
- ARRAY['Plaza', 'Kokteli', 'Muzika', 'Basta'],
+ ARRAY['Plaža', 'Kokteli', 'Muzika', 'Bašta'],
  ST_SetSRID(ST_MakePoint(19.287, 41.895), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaža'),
@@ -1776,7 +1776,7 @@ VALUES
 
  ('Evergreen Jazz Bar', 'Jazz bar sa živom muzikom', 'Kotor Stari Grad', NULL, NULL,
  NULL, 'Jazz i kokteli', '{"pon":"18:00-01:00","uto":"18:00-01:00","sre":"18:00-01:00","cet":"18:00-01:00","pet":"18:00-02:00","sub":"18:00-02:00","ned":"00:00-00:00"}', 14.00,
- ARRAY['Ziva muzika', 'Kokteli', 'Atmosfera'],
+ ARRAY['Živa muzika', 'Kokteli', 'Atmosfera'],
  ST_SetSRID(ST_MakePoint(18.772, 42.425), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
@@ -1787,7 +1787,7 @@ VALUES
 
  ('Itaka Library Bar', 'Alternativni bar poznat po muzici i atmosferi', 'Bulevar Svetog Petra Cetinjskog, Podgorica', '+38267156650', 'https://instagram.com/itaka_library.bar?utm_medium=copy_link',
  'https://itaka.digitalnimeni.me/', 'Bar i pivo', '{"pon":"10:00-00:00","uto":"10:00-00:00","sre":"10:00-00:00","cet":"10:00-00:00","pet":"10:00-02:00","sub":"10:00-02:00","ned":"00:00-00:00"}', 9.00,
- ARRAY['Pivo', 'Muzika', 'Basta'],
+ ARRAY['Pivo', 'Muzika', 'Bašta'],
  ST_SetSRID(ST_MakePoint(19.266, 42.438), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -1820,7 +1820,7 @@ VALUES
 
  ('Medusa', 'Bar na obali mora u Petrovcu', '16 Nika Anđusa, Petrovac', NULL, NULL,
  NULL, 'Bar i kokteli', '{"pon":"08:00-00:00","uto":"08:00-00:00","sre":"08:00-00:00","cet":"08:00-00:00","pet":"08:00-02:00","sub":"08:00-02:00","ned":"00:00-00:00"}', 10.00,
- ARRAY['Plaza', 'Kokteli', 'Pogled na more'],
+ ARRAY['Plaža', 'Kokteli', 'Pogled na more'],
  ST_SetSRID(ST_MakePoint(18.942, 42.205), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Petrovac'),
@@ -1831,7 +1831,7 @@ VALUES
 
  ('Strix Bar', 'Popularan koktel bar u Starom gradu Budve sa živom atmosferom', '2 Ivana Crnojevića, Budva', '+38268134097', NULL,
  'https://menusa.app/11eeb241404891a997d94a12937fd993?fbclid=PAZXh0bgNhZW0CMTEAAabPY1K9rzMSJoDjF1DCR1WLNDi2baRNhV35STTTlg7e_YE-xXM_KPaTJa0_aem_-8tZ2OyXeHInxs0AV-kKwg', 'Kokteli', '{"pon":"10:00-00:00","uto":"10:00-00:00","sre":"10:00-00:00","cet":"10:00-00:00","pet":"10:00-02:00","sub":"10:00-02:00","ned":"00:00-00:00"}', 14.00,
- ARRAY['Kokteli', 'Muzika', 'Basta'],
+ ARRAY['Kokteli', 'Muzika', 'Bašta'],
  ST_SetSRID(ST_MakePoint(18.839, 42.278), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
@@ -1842,7 +1842,7 @@ VALUES
 
 ('Hard Rock Cafe Podgorica', 'Poznati internacionalni bar i restoran u srcu Podgorice sa muzikom i koktelima', 'Trg Nezavisnosti, Podgorica', '+38268076291', 'https://cafe.hardrock.com/podgorica/#utm_source=Google&utm_medium=Yext&utm_campaign=Listings',
  'https://www.hardrockcafe.com/location/podgorica/files/5470/Local_menu.pdf', 'Američki bar i kokteli', '{"pon":"10:00-00:00","uto":"10:00-00:00","sre":"10:00-00:00","cet":"10:00-00:00","pet":"10:00-02:00","sub":"10:00-02:00","ned":"10:00-00:00"}', 18.00,
- ARRAY['Kokteli', 'Muzika', 'Souvenir shop', 'Basta'],
+ ARRAY['Kokteli', 'Muzika', 'Souvenir shop', 'Bašta'],
  ST_SetSRID(ST_MakePoint(19.262, 42.442), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -1886,9 +1886,9 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.cetinje@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Prirodnjacki muzej Crne Gore', 'Muzej prirodne istorije sa fosilima i biodiverzitetom', '74 Oktobarske Revolucije, Podgorica', '+38220633184', 'https://pmcg.co.me/',
+('Prirodnjački muzej Crne Gore', 'Muzej prirodne istorije sa fosilima i biodiverzitetom', '74 Oktobarske Revolucije, Podgorica', '+38220633184', 'https://pmcg.co.me/',
  NULL, 'Prirodne nauke', '{"pon":"08:00-16:00","uto":"08:00-16:00","sre":"08:00-16:00","cet":"08:00-16:00","pet":"08:00-16:00","sub":"10:00-13:00","ned":"00:00-00:00"}', 2.00,
- ARRAY['Edukacija', 'Izlozbe', 'Vodič'],
+ ARRAY['Edukacija', 'Izložbe', 'Vodič'],
  ST_SetSRID(ST_MakePoint(19.262, 42.434), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Muzej'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -1912,7 +1912,7 @@ VALUES
 
 --- TRZNI CENTRI ---
 
-('Big Fesn Podgorica', 'Najveći tržni centar u Crnoj Gori sa brojnim radnjama i bioskopom', 'b.b Cetinjski Put, Podgorica', '+38268878637', 'https://www.bigcenters.rs/podgorica/',
+('Big Fešn Podgorica', 'Najveći tržni centar u Crnoj Gori sa brojnim radnjama i bioskopom', 'b.b Cetinjski Put, Podgorica', '+38268878637', 'https://www.bigcenters.rs/podgorica/',
  NULL, 'Shopping centar', '{"pon":"10:00-22:00","uto":"10:00-22:00","sre":"10:00-22:00","cet":"10:00-22:00","pet":"10:00-22:00","sub":"10:00-22:00","ned":"10:00-22:00"}', 0,
  ARRAY['Parking', 'WiFi', 'Bioskop', 'Restorani'],
  ST_SetSRID(ST_MakePoint(19.236, 42.437), 4326), 0, 0, 'Approved', true,
@@ -1934,9 +1934,9 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Kamelija Shopping Center', 'Glavni tržni centar u Kotoru', 'Square Mata Petrovića, Kotor', '+38232335380', 'http://www.kamelija.me/',
+ ('Kamelija Shopping Center', 'Glavni tržni centar u Kotoru', 'Trg Mata Petrovića, Kotor', '+38232335380', 'http://www.kamelija.me/',
  NULL, 'Shopping centar', '{"pon":"09:00-21:00","uto":"09:00-21:00","sre":"09:00-21:00","cet":"09:00-21:00","pet":"09:00-21:00","sub":"09:00-21:00","ned":"09:00-21:00"}', 0,
- ARRAY['Parking', 'Radnje', 'Kafici'],
+ ARRAY['Parking', 'Radnje', 'Kafići'],
  ST_SetSRID(ST_MakePoint(18.770, 42.428), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trzni Centar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Dobrota'),
@@ -1978,7 +1978,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.budva@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('TC HDL Lakovic Nikšić', 'Veliki retail centar sa supermarketom i radnjama', 'Nikšić ulaz', '+38269568423', NULL,
+('TC HDL Laković Nikšić', 'Veliki retail centar sa supermarketom i radnjama', 'Nikšić ulaz', '+38269568423', NULL,
  NULL, 'Shopping centar', '{"pon":"08:00-22:00","uto":"08:00-22:00","sre":"08:00-22:00","cet":"08:00-22:00","pet":"08:00-22:00","sub":"08:00-22:00","ned":"08:00-22:00"}', 0,
  ARRAY['Supermarket', 'Parking', 'Radnje'],
  ST_SetSRID(ST_MakePoint(18.951, 42.768), 4326), 0, 0, 'Approved', true,
@@ -1989,7 +1989,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.niksic@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Lakovic Kotor', 'Tržni centar i supermarket u Kotoru', 'Radanovići, Kotor', NULL, NULL,
+ ('Laković Kotor', 'Tržni centar i supermarket u Kotoru', 'Radanovići, Kotor', NULL, NULL,
  NULL, 'Shopping centar', '{"pon":"08:00-22:00","uto":"08:00-22:00","sre":"08:00-22:00","cet":"08:00-22:00","pet":"08:00-22:00","sub":"08:00-22:00","ned":"08:00-22:00"}', 0,
  ARRAY['Supermarket', 'Parking'],
  ST_SetSRID(ST_MakePoint(18.746, 42.384), 4326), 0, 0, 'Approved', true,
@@ -2046,7 +2046,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Galerija Velimir A. Lekovic', 'Kulturni centar i galerija sa stalnim i povremenim izložbama', 'Šetalište kralja Nikole 2, Bar', '+38230312431', 'https://instagram.com/galerija_velimir_a_lekovic?igshid=MzRlODBiNWFlZA==',
+ ('Galerija Velimir A. Leković', 'Kulturni centar i galerija sa stalnim i povremenim izložbama', 'Šetalište kralja Nikole 2, Bar', '+38230312431', 'https://instagram.com/galerija_velimir_a_lekovic?igshid=MzRlODBiNWFlZA==',
  NULL, NULL, '{"pon":"08:00-20:00","uto":"08:00-20:00","sre":"08:00-20:00","cet":"08:00-20:00","pet":"08:00-20:00","sub":"09:00-15:00","ned":"neradno"}', NULL,
  ARRAY['Kultura', 'Izložbe', 'Događaji'], ST_SetSRID(ST_MakePoint(19.091, 42.100), 4326),
  0, 0, 'Approved', true,
@@ -2059,7 +2059,7 @@ VALUES
 
  --- PANSIONI ---
 
- ('Villa Ljubanovic', 'Porodični pansion blizu Mogren plaže, poznat po mirnom ambijentu i domaćinskoj atmosferi', '18 Nikole Tesle, Budva', '+38269931474', 'http://www.ljubanovic.com/',
+ ('Villa Ljubanović', 'Porodični pansion blizu Mogren plaže, poznat po mirnom ambijentu i domaćinskoj atmosferi', '18 Nikole Tesle, Budva', '+38269931474', 'http://www.ljubanovic.com/',
  NULL, NULL, '{"pon":"08:00-22:00","uto":"08:00-22:00","sre":"08:00-22:00","cet":"08:00-22:00","pet":"08:00-22:00","sub":"08:00-22:00","ned":"09:00-20:00"}', 65.00,
  ARRAY['WiFi', 'Parking', 'Klima', 'Terasa'], ST_SetSRID(ST_MakePoint(18.83456, 42.28564), 4326),
  0, 0, 'Approved', true,
@@ -2070,7 +2070,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.budva@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Guesthouse Zmukic', 'Autentični porodični pansion u starom dijelu Kotora sa pogledom na zaliv', 'Perast, Kotor', '+38268103559', 'https://instagram.com/guesthouse_zmukic?utm_medium=copy_link',
+ ('Guesthouse Žmukić', 'Autentični porodični pansion u starom dijelu Kotora sa pogledom na zaliv', 'Perast, Kotor', '+38268103559', 'https://instagram.com/guesthouse_zmukic?utm_medium=copy_link',
  NULL, NULL, '{"pon":"07:00-23:00","uto":"07:00-23:00","sre":"07:00-23:00","cet":"07:00-23:00","pet":"07:00-23:00","sub":"08:00-23:00","ned":"neradno"}', 70.00,
  ARRAY['WiFi', 'Parking', 'Pogled na more', 'Doručak'], ST_SetSRID(ST_MakePoint(18.69556, 42.48814), 4326),
  0, 0, 'Approved', true,
@@ -2092,7 +2092,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.budva@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Pansion Vukovic Žabljak', 'Planinski pansion u blizini Durmitora, pogodan za planinare i prirodu', 'Tmajevci b.b, Žabljak', '+38267570242', NULL,
+ ('Pansion Vuković Žabljak', 'Planinski pansion u blizini Durmitora, pogodan za planinare i prirodu', 'Tmajevci b.b, Žabljak', '+38267570242', NULL,
  NULL, NULL, '{"pon":"07:00-22:00","uto":"07:00-22:00","sre":"07:00-22:00","cet":"07:00-22:00","pet":"07:00-22:00","sub":"07:00-22:00","ned":"08:00-20:00"}', 55.00,
  ARRAY['Parking', 'Grejanje', 'WiFi', 'Planinski pogled'], ST_SetSRID(ST_MakePoint(19.13467, 43.158904), 4326),
  0, 0, 'Approved', true,
@@ -2116,7 +2116,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.zabljak@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Etno Selo Izlazak', 'Planinsko etno selo sa pogledom na Bjelasicu, idealno za odmor u prirodi', 'Dubljevici, Plužine', '+38269149323', 'http://www.etno-selo-izlazak.me/',
+ ('Etno Selo Izlazak', 'Planinsko etno selo sa pogledom na Bjelasicu, idealno za odmor u prirodi', 'Dubljevići, Plužine', '+38269149323', 'http://www.etno-selo-izlazak.me/',
  NULL, NULL, '{"pon":"09:00-21:00","uto":"09:00-21:00","sre":"09:00-21:00","cet":"09:00-21:00","pet":"09:00-22:00","sub":"09:00-23:00","ned":"09:00-20:00"}', 52.00,
  ARRAY['WiFi', 'Parking', 'Restoran', 'Planinski pogled', 'Etno smještaj'], ST_SetSRID(ST_MakePoint(18.86401, 43.06553), 4326),
  0, 0, 'Approved', true,
@@ -2140,7 +2140,7 @@ VALUES
 
  --- VINARIJE ---
 
-('Vinarija Plantaze 13 Jul', 'Najveća vinarija u Crnoj Gori, poznata po vinima iz Zete i Skadarskog basena', 'Karabuško polje bb, Tuzi', '+38267099099', 'http://www.plantaze.com/en/#/sipcanik',
+('Vinarija Plantaže 13 Jul', 'Najveća vinarija u Crnoj Gori, poznata po vinima iz Zete i Skadarskog basena', 'Karabuško polje bb, Tuzi', '+38267099099', 'http://www.plantaze.com/en/#/sipcanik',
  NULL, NULL, '{"pon":"08:00-20:00","uto":"08:00-20:00","sre":"08:00-20:00","cet":"08:00-20:00","pet":"08:00-20:00","sub":"09:00-18:00","ned":"neradno"}', NULL,
  ARRAY['Degustacija', 'Prodaja vina', 'Turističke ture'], ST_SetSRID(ST_MakePoint(19.32017, 42.37529), 4326),
  0, 0, 'Approved', true,
@@ -2173,7 +2173,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Winery Masanovic', 'Vinarija iz okoline Bara sa fokusom na mediteranske sorte grožđa', 'Railway station, Virpazar, Bar', '+38268509541', 'http://www.instagram.com/winery.masanovic',
+ ('Winery Mašanović', 'Vinarija iz okoline Bara sa fokusom na mediteranske sorte grožđa', 'Railway station, Virpazar, Bar', '+38268509541', 'http://www.instagram.com/winery.masanovic',
  NULL, NULL, '{"pon":"09:00-20:00","uto":"09:00-20:00","sre":"09:00-20:00","cet":"09:00-20:00","pet":"09:00-20:00","sub":"10:00-18:00","ned":"neradno"}', NULL,
  ARRAY['Degustacija', 'Vino', 'Prodaja'], ST_SetSRID(ST_MakePoint(19.08346, 42.24013), 4326),
  0, 0, 'Approved', true,
@@ -2199,7 +2199,7 @@ VALUES
 
  ('Aqua Park Budva', 'Najveći akva park u Crnoj Gori sa brojnim toboganima i bazenima za sve uzraste', 'Podostrog, Budva', '+38268334433', NULL,
  NULL, NULL, '{"pon":"10:00-18:00","uto":"10:00-18:00","sre":"10:00-18:00","cet":"10:00-18:00","pet":"10:00-18:00","sub":"10:00-19:00","ned":"10:00-19:00"}', 25.00,
- ARRAY['Tobogani', 'Bazen', 'Parking', 'Restoran', 'Porodicno'], ST_SetSRID(ST_MakePoint(18.82242, 42.29189), 4326),
+ ARRAY['Tobogani', 'Bazen', 'Parking', 'Restoran', 'Porodično'], ST_SetSRID(ST_MakePoint(18.82242, 42.29189), 4326),
  0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Akva park'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Podostrog'),
@@ -2210,7 +2210,7 @@ VALUES
 
  ('Aqua Park Mediteran', 'Manji sezonski akva park sa bazenima i zabavnim sadržajem za djecu i odrasle', 'Bečići bb, Boreti', '+38233689000', 'https://www.mediteran.me/en/aqua-park',
  NULL, NULL, '{"pon":"10:00-18:00","uto":"10:00-18:00","sre":"10:00-18:00","cet":"10:00-18:00","pet":"10:00-18:00","sub":"10:00-19:00","ned":"10:00-19:00"}', 15.00,
- ARRAY['Bazen', 'Djeca', 'Tobogani', 'Parking'], ST_SetSRID(ST_MakePoint(18.86364, 42.28353), 4326),
+ ARRAY['Bazen', 'Deca', 'Tobogani', 'Parking'], ST_SetSRID(ST_MakePoint(18.86364, 42.28353), 4326),
  0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Akva park'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Bečići'),
@@ -2221,7 +2221,7 @@ VALUES
 
 ('Aqua Park Imanje Knjaz', 'Vodeni zabavni kompleks u Podgorici', 'Imanje, Podgorica', '+38267995252', 'http://www.imanje-knjaz.me/',
  NULL, NULL, '{"pon":"09:00-19:00","uto":"09:00-19:00","sre":"09:00-19:00","cet":"09:00-19:00","pet":"09:00-19:00","sub":"09:00-19:00","ned":"09:00-19:00"}', 20.00,
- ARRAY['Bazeni', 'Deciji vodeni park', 'Tobogani', 'Bar', 'Lezaljke'],
+ ARRAY['Bazeni', 'Dečiji vodeni park', 'Tobogani', 'Bar', 'Ležaljke'],
  ST_SetSRID(ST_MakePoint(19.18486, 42.47035), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Akva park'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Imanje'),
@@ -2234,7 +2234,7 @@ VALUES
 
 ('Mini Zoo Vrt Podgorica', 'Mali zoološki vrt sa domaćim i egzotičnim životinjama, popularan među porodicama', 'Podgorica bb', '+38268719404', NULL,
  NULL, NULL, '{"pon":"09:00-18:00","uto":"09:00-18:00","sre":"09:00-18:00","cet":"09:00-18:00","pet":"09:00-18:00","sub":"09:00-19:00","ned":"09:00-19:00"}', 5.00,
- ARRAY['Deciji sadrzaj', 'Zivotinje', 'Priroda', 'Parking'],
+ ARRAY['Dečiji sadržaj', 'Životinje', 'Priroda', 'Parking'],
  ST_SetSRID(ST_MakePoint(19.23861, 42.46411), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Zoo vrt'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -2245,7 +2245,7 @@ VALUES
 
  ('Zoo Sad', 'Manji zoo vrt sa domaćim životinjama i edukativnim sadržajem', 'Centar Budve', NULL, NULL,
  NULL, NULL, '{"pon":"10:00-17:00","uto":"10:00-17:00","sre":"10:00-17:00","cet":"10:00-17:00","pet":"10:00-17:00","sub":"10:00-18:00","ned":"10:00-18:00"}', 4.00,
- ARRAY['Zivotinje', 'Priroda', 'Porodicno okruzenje'],
+ ARRAY['Životinje', 'Priroda', 'Porodično okruženje'],
  ST_SetSRID(ST_MakePoint(18.83947, 42.28978), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Zoo vrt'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Budve'),
@@ -2254,9 +2254,9 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.budva@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Park Macaka', 'Park sa mackama u Kotoru', 'Stari grad Kotor', NULL, NULL,
+('Park Mačaka', 'Park sa mačkama u Kotoru', 'Stari grad Kotor', NULL, NULL,
  NULL, NULL, '{"pon":"10:00-17:00","uto":"10:00-17:00","sre":"10:00-17:00","cet":"10:00-17:00","pet":"10:00-17:00","sub":"10:00-18:00","ned":"10:00-18:00"}', 4.00,
- ARRAY['Zivotinje', 'Priroda', 'Porodicno okruzenje'],
+ ARRAY['Životinje', 'Priroda', 'Porodično okruženje'],
  ST_SetSRID(ST_MakePoint(18.77201, 42.42601), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Zoo vrt'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
@@ -2268,7 +2268,7 @@ VALUES
  --- AKVARIJUMI ---
 ('Akvarijum Boka', 'Prvi javni akvarijum u Crnoj Gori sa prikazom jadranskih morskih vrsta', 'Put Bokeljskih Brigada, Dobrota', '+38267946497', 'http://www.aquariumboka.ucg.ac.me/',
  NULL, NULL, '{"pon":"09:00-20:00","uto":"09:00-20:00","sre":"09:00-20:00","cet":"09:00-20:00","pet":"09:00-20:00","sub":"09:00-20:00","ned":"10:00-18:00"}', 8.00,
- ARRAY['Edukacija', 'Morske vrste', 'Turisticka atrakcija', 'Deciji sadrzaj'],
+ ARRAY['Edukacija', 'Morske vrste', 'Turistička atrakcija', 'Dečiji sadržaj'],
  ST_SetSRID(ST_MakePoint(18.76420, 42.43605), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Akvarijum'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Dobrota'),
@@ -2279,7 +2279,7 @@ VALUES
 
  --- IGRALISTA ---
 
- ('Igraliste Njegosev park', 'Dečije igralište u okviru gradskog parka', 'Njegošev park, Podgorica', NULL, NULL,
+ ('Igralište Njegošev park', 'Dečije igralište u okviru gradskog parka', 'Njegošev park, Podgorica', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Klackalice', 'Tobogan', 'Ljuljaške'], ST_SetSRID(ST_MakePoint(19.25889, 42.44212), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2289,7 +2289,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Igraliste Gorica Park', 'Dečije igralište u šumi Gorica', '18 Radomira Vešovića', NULL, NULL,
+ ('Igralište Gorica Park', 'Dečije igralište u šumi Gorica', '18 Radomira Vešovića', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Priroda', 'Klackalice', 'Penjalice'], ST_SetSRID(ST_MakePoint(19.26738, 42.44933), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2299,7 +2299,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Igraliste Slovenska plaža', 'Dečije igralište u turističkom kompleksu', 'Slovenska plaža, Budva', NULL, NULL,
+ ('Igralište Slovenska plaža', 'Dečije igralište u turističkom kompleksu', 'Slovenska plaža, Budva', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['More', 'Tobogan', 'Ljuljaške'], ST_SetSRID(ST_MakePoint(18.83962, 42.28348), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2309,9 +2309,9 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.budva@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Djecije Igraliste Park Nezavisnosti', 'Igralište uz šetalište', 'Park Nezavisnosti, Herceg Novi', NULL, NULL,
+('Dječije Igralište Park Nezavisnosti', 'Igralište uz šetalište', 'Park Nezavisnosti, Herceg Novi', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
- NULL, ARRAY['More', 'Klackalice', 'Biciklisticka zona'], ST_SetSRID(ST_MakePoint(18.53149, 42.45283), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['More', 'Klackalice', 'Biciklistička zona'], ST_SetSRID(ST_MakePoint(18.53149, 42.45283), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Herceg Novog'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
@@ -2319,7 +2319,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.hercegnovi@spirego.com'),
  NOW(), NOW(), NOW()),
  
- ('Igraliste Centar Kotor', 'Malo gradsko igralište u starom gradu', 'Stari grad Kotor', NULL, NULL,
+ ('Igralište Centar Kotor', 'Malo gradsko igralište u starom gradu', 'Stari grad Kotor', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Klackalice', 'Ljuljaške'], ST_SetSRID(ST_MakePoint(18.76836, 42.42676), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2329,7 +2329,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Igraliste Tolosi', 'Gradsko igralište u naselju Tološi', 'Tološi, Podgorica', NULL, NULL,
+ ('Igralište Tološi', 'Gradsko igralište u naselju Tološi', 'Tološi, Podgorica', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Sport', 'Fudbalski teren', 'Ljuljaške'], ST_SetSRID(ST_MakePoint(19.23797, 42.45096), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2339,7 +2339,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Igraliste Kolašin', 'Dečije igralište u centru Kolašina', 'Mirka Vešovića, Kolašin', NULL, NULL,
+ ('Igralište Kolašin', 'Dečije igralište u centru Kolašina', 'Mirka Vešovića, Kolašin', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Priroda', 'Klackalice'], ST_SetSRID(ST_MakePoint(19.51693, 42.82508), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2349,7 +2349,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.kolasin@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Igraliste Igalo', 'Dečije igralište u centru Igalo Banje', '30 Janka Beka, Igalo', NULL, NULL,
+ ('Igralište Igalo', 'Dečije igralište u centru Igalo Banje', '30 Janka Beka, Igalo', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['More', 'Tobogan', 'Klackalice'], ST_SetSRID(ST_MakePoint(18.50755, 42.46072), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2359,7 +2359,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.igalo@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Igraliste Park 13 Jul', 'Dečije igralište u gradskom parku', 'Park 13 Jul, Cetinje', NULL, NULL,
+('Igralište Park 13 Jul', 'Dečije igralište u gradskom parku', 'Park 13 Jul, Cetinje', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Ljuljaške', 'Klackalice', 'Klupice'], ST_SetSRID(ST_MakePoint(18.92777, 42.38661), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2369,7 +2369,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.cetinje@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Igraliste Nikšić', 'Gradsko igraliste', 'Ulica 135, Nikšić', NULL, NULL,
+ ('Igralište Nikšić', 'Gradsko igraliste', 'Ulica 135, Nikšić', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Fudbalski teren', 'Ljuljaške', 'Koš'], ST_SetSRID(ST_MakePoint(18.94318, 42.77990), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2379,7 +2379,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.niksic@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Djecje igraliste kod vozica', 'Djecije igraliste kod vozica', 'Pjesacka staza, Tivat', NULL, NULL,
+('Dječje igralište kod vozića', 'Igralište blizu vozića u pješačkoj zoni', 'Pješačka staza, Tivat', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Klackalice', 'Ljuljaške', 'Zelenilo'], ST_SetSRID(ST_MakePoint(18.69288, 42.44178), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2389,7 +2389,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.tivat@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Igraliste Bar Setaliste', 'Dečije igralište uz obalu mora', 'Šetalište kralja Nikole, Bar', NULL, NULL,
+('Igralište Bar Šetalište', 'Dečije igralište uz obalu mora', 'Šetalište kralja Nikole, Bar', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['More', 'Tobogan', 'Klackalice'], ST_SetSRID(ST_MakePoint(19.08954, 42.10233), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2399,7 +2399,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.bar@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Igraliste Crno jezero', 'Dečije igralište u na putu ka Crnom jezeru', 'Šetalište ka Crnom jezeru', NULL, NULL,
+ ('Igralište Crno jezero', 'Dečije igralište na putu ka Crnom jezeru', 'Šetalište ka Crnom jezeru', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Klackalice', 'Ljuljaške', 'Zelenilo'], ST_SetSRID(ST_MakePoint(19.10032, 43.15027), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2409,7 +2409,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.durmitor@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Igraliste Milocer Park', 'Dečije igralište u okviru parka Miločer', 'Park Miločer, Budva', NULL, NULL,
+('Igralište Miločer Park', 'Dečije igralište u okviru parka Miločer', 'Park Miločer, Budva', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Ljuljaške', 'Klackalice', 'Prirodno okruženje'], ST_SetSRID(ST_MakePoint(18.89628, 42.26102), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2419,7 +2419,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.budva@spirego.com'),
  NOW(), NOW(), NOW()),
  
-('Djecija igraonica Igalo', 'Dečije igralište u naselju Igalo', '43-27 Dr Svetozara Živojinovića, Igalo', NULL, NULL,
+('Dječija igraonica Igalo', 'Dečije igralište u naselju Igalo', '43-27 Dr Svetozara Živojinovića, Igalo', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Ljuljaške', 'Klackalice', 'Penjalice'], ST_SetSRID(ST_MakePoint(18.50343, 42.45191), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2429,7 +2429,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.igalo@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Igraliste Lovćen National Park', 'Dečije igralište u prirodnom ambijentu Nacionalnog parka Lovćen', 'Lovćen National Park, Cetinje', NULL, NULL,
+ ('Igralište Lovćen National Park', 'Dečije igralište u prirodnom ambijentu Nacionalnog parka Lovćen', 'Lovćen National Park, Cetinje', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Drvene sprave', 'Klackalice', 'Ljuljaške', 'Priroda'], ST_SetSRID(ST_MakePoint(18.79377, 42.39303), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2441,7 +2441,7 @@ VALUES
  
 --- POZORISTA ---
 
-('Crnogorsko narodno pozoriste', 'Nacionalno pozorište Crne Gore', '18 Bulevar Stanka Dragojevića, Podgorica', '+38220404120', 'https://www.cnp.me',
+('Crnogorsko narodno pozorište', 'Nacionalno pozorište Crne Gore', '18 Bulevar Stanka Dragojevića, Podgorica', '+38220404120', 'https://www.cnp.me',
  NULL, NULL, '{"pon":"10:00-20:00","uto":"10:00-20:00","sre":"10:00-20:00","cet":"10:00-20:00","pet":"10:00-20:00","sub":"18:00-22:00","ned":"neradni dan"}',
  NULL, ARRAY['Predstave', 'Festival', 'Sala'], ST_SetSRID(ST_MakePoint(19.26037, 42.44206), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Pozoriste'),
@@ -2461,7 +2461,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.cetinje@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Nikšićko pozoriste', 'Gradsko pozorište Nikšića', 'Njegoševa, Nikšić', '+38240213566', NULL,
+ ('Nikšićko pozorište', 'Gradsko pozorište Nikšića', 'Njegoševa, Nikšić', '+38240213566', NULL,
  NULL, NULL, '{"pon":"10:00-20:00","uto":"10:00-20:00","sre":"10:00-20:00","cet":"10:00-20:00","pet":"10:00-20:00","sub":"18:00-22:00","ned":"neradni dan"}',
  NULL, ARRAY['Predstave', 'Koncerti'], ST_SetSRID(ST_MakePoint(18.94666, 42.77143), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Pozoriste'),
@@ -2669,9 +2669,9 @@ VALUES
 
 --- TRZNICE ---
 
- ('Trznica Podgorica', 'Glavna gradska pijaca sa voćem, povrćem i domaćim proizvodima', 'Bratstva i Jedinstva, Podgorica', '+38220625424', 'http://www.pijacepg.me/',
+ ('Tržnica Podgorica', 'Glavna gradska pijaca sa voćem, povrćem i domaćim proizvodima', 'Bratstva i Jedinstva, Podgorica', '+38220625424', 'http://www.pijacepg.me/',
  NULL, NULL, '{"pon":"07:00-15:00","uto":"07:00-15:00","sre":"07:00-15:00","cet":"07:00-15:00","pet":"07:00-15:00","sub":"07:00-14:00","ned":"neradni dan"}',
- NULL, ARRAY['Voce', 'Povrce', 'Domaci proizvodi'], ST_SetSRID(ST_MakePoint(19.26315, 42.43284), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Voće', 'Povrće', 'Domaći proizvodi'], ST_SetSRID(ST_MakePoint(19.26315, 42.43284), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
@@ -2681,7 +2681,7 @@ VALUES
 
 ('Gradska pijaca Kotor', 'Gradska pijaca u starom gradu Kotora', 'Stari grad Kotor', NULL, NULL,
  NULL, NULL, '{"pon":"07:00-14:00","uto":"07:00-14:00","sre":"07:00-14:00","cet":"07:00-14:00","pet":"07:00-14:00","sub":"07:00-13:00","ned":"neradni dan"}',
- NULL, ARRAY['Riba', 'Povrce', 'Voce'], ST_SetSRID(ST_MakePoint(18.77047, 42.42393), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Riba', 'Povrće', 'Voće'], ST_SetSRID(ST_MakePoint(18.77047, 42.42393), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -2691,7 +2691,7 @@ VALUES
 
  ('Pijaca Budva', 'Glavna gradska pijaca Budve sa lokalnim proizvodima', 'Mediteranska, Budva', NULL, NULL,
  NULL, NULL, '{"pon":"07:00-15:00","uto":"07:00-15:00","sre":"07:00-15:00","cet":"07:00-15:00","pet":"07:00-15:00","sub":"07:00-14:00","ned":"neradni dan"}',
- NULL, ARRAY['Voce', 'Povrce', 'Suveniri'], ST_SetSRID(ST_MakePoint(18.83683, 42.28449), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Voće', 'Povrće', 'Suveniri'], ST_SetSRID(ST_MakePoint(18.83683, 42.28449), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Budve'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -2701,7 +2701,7 @@ VALUES
 
  ('Zelena pijaca Nikšić', 'Gradska pijaca u Nikšiću', '5. proleterske brigade, Nikšić', NULL, NULL,
  NULL, NULL, '{"pon":"07:00-14:00","uto":"07:00-14:00","sre":"07:00-14:00","cet":"07:00-14:00","pet":"07:00-14:00","sub":"07:00-13:00","ned":"neradni dan"}',
- NULL, ARRAY['Domaca hrana', 'Meso', 'Povrce'], ST_SetSRID(ST_MakePoint(18.95014, 42.77480), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Domaća hrana', 'Meso', 'Povrće'], ST_SetSRID(ST_MakePoint(18.95014, 42.77480), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Nikšića'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
@@ -2711,7 +2711,7 @@ VALUES
 
 ('Pijaca Bar', 'Gradska pijaca u Baru', 'Bulevar Revolucije, Bar', NULL, NULL,
  NULL, NULL, '{"pon":"07:00-15:00","uto":"07:00-15:00","sre":"07:00-15:00","cet":"07:00-15:00","pet":"07:00-15:00","sub":"07:00-14:00","ned":"neradni dan"}',
- NULL, ARRAY['Voce', 'Riba', 'Povrce'], ST_SetSRID(ST_MakePoint(19.09973, 42.10443), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Voće', 'Riba', 'Povrće'], ST_SetSRID(ST_MakePoint(19.09973, 42.10443), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Bara'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
@@ -2721,7 +2721,7 @@ VALUES
 
  ('Pijaca Herceg Novi', 'Gradska pijaca uz obalu mora', 'Topla, Herceg Novi', '+38231347755', NULL,
  NULL, NULL, '{"pon":"07:00-14:00","uto":"07:00-14:00","sre":"07:00-14:00","cet":"07:00-14:00","pet":"07:00-14:00","sub":"07:00-13:00","ned":"neradni dan"}',
- NULL, ARRAY['Riba', 'Voce', 'Zelena pijaca'], ST_SetSRID(ST_MakePoint(18.53628, 42.45197), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Riba', 'Voće', 'Zelena pijaca'], ST_SetSRID(ST_MakePoint(18.53628, 42.45197), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Herceg Novog'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
@@ -2731,7 +2731,7 @@ VALUES
 
 ('Pijaca Tivat', 'Mala gradska pijaca u Tivtu', '21.Novembra, Tivat', NULL, NULL,
  NULL, NULL, '{"pon":"07:00-14:00","uto":"07:00-14:00","sre":"07:00-14:00","cet":"07:00-14:00","pet":"07:00-14:00","sub":"07:00-13:00","ned":"neradni dan"}',
- NULL, ARRAY['Voce', 'Povrce'], ST_SetSRID(ST_MakePoint(18.69944, 42.42939), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Voće', 'Povrće'], ST_SetSRID(ST_MakePoint(18.69944, 42.42939), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Tivta'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
@@ -2741,7 +2741,7 @@ VALUES
 
 ('Zelena pijaca Cetinje', 'Tradicionalna pijaca u istorijskom gradu', '24 Baja Pivljanina, Cetinje', NULL, NULL,
  NULL, NULL, '{"pon":"07:00-14:00","uto":"07:00-14:00","sre":"07:00-14:00","cet":"07:00-14:00","pet":"07:00-14:00","sub":"07:00-13:00","ned":"neradni dan"}',
- NULL, ARRAY['Domaci proizvodi', 'Voce', 'Povrce'], ST_SetSRID(ST_MakePoint(18.92540, 42.39000), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Domaći proizvodi', 'Voće', 'Povrće'], ST_SetSRID(ST_MakePoint(18.92540, 42.39000), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Cetinja'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
@@ -2751,7 +2751,7 @@ VALUES
 
 ('Pijaca Ulcinj', 'Gradska pijaca sa lokalnim i mediteranskim proizvodima', 'Nikole Đakovića, Ulcinj', NULL, NULL,
  NULL, NULL, '{"pon":"07:00-15:00","uto":"07:00-15:00","sre":"07:00-15:00","cet":"07:00-15:00","pet":"07:00-15:00","sub":"07:00-14:00","ned":"neradni dan"}',
- NULL, ARRAY['Riba', 'Voce', 'Povrce'], ST_SetSRID(ST_MakePoint(19.215, 41.928), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Riba', 'Voće', 'Povrće'], ST_SetSRID(ST_MakePoint(19.215, 41.928), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Ulcinja'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
@@ -2773,7 +2773,7 @@ VALUES
 
  ('Kotorska Suvenirnica', 'Suvenirnica u starom gradu Kotora sa lokalnim rukotvorinama', 'Stari grad Kotor', '+38269177281', NULL,
  NULL, NULL, '{"pon":"09:00-21:00","uto":"09:00-21:00","sre":"09:00-21:00","cet":"09:00-21:00","pet":"09:00-21:00","sub":"09:00-22:00","ned":"09:00-21:00"}',
- NULL, ARRAY['Suveniri', 'Rucni radovi', 'Magneti'], ST_SetSRID(ST_MakePoint(18.77137, 42.42536), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Suveniri', 'Ručni radovi', 'Magneti'], ST_SetSRID(ST_MakePoint(18.77137, 42.42536), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Suvenirnica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -2823,7 +2823,7 @@ VALUES
  
 ('Promenada Krupac', 'Uredjena promenada oko Krupackog jezera, popularno mesto za setnju, odmor i organizaciju festivala poput Lake Festa', 'Krupačko jezero, Nikšić', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-23:59","uto":"00:00-23:59","sre":"00:00-23:59","cet":"00:00-23:59","pet":"00:00-23:59","sub":"00:00-23:59","ned":"00:00-23:59"}',
- NULL, ARRAY['Setnja', 'Priroda', 'Festival', 'Rekreacija'], ST_SetSRID(ST_MakePoint(18.892, 42.783), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Šetnja', 'Priroda', 'Festival', 'Rekreacija'], ST_SetSRID(ST_MakePoint(18.892, 42.783), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Sportski centar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupačko jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
@@ -2833,7 +2833,7 @@ VALUES
  
 ---- BOLNICE ----
 
-('Klinicki centar Crne Gore', 'Najveća državna zdravstvena ustanova u Crnoj Gori, centralna bolnička institucija sa urgentnim centrom i specijalističkim klinikama.', 'Ljubljanska bb, Podgorica', '+38220412412', 'https://www.kccg.me',
+('Klinički centar Crne Gore', 'Najveća državna zdravstvena ustanova u Crnoj Gori, centralna bolnička institucija sa urgentnim centrom i specijalističkim klinikama.', 'Ljubljanska bb, Podgorica', '+38220412412', 'https://www.kccg.me',
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Urgentni centar', 'Specijalističke klinike', 'Bolničko lečenje', 'Dijagnostika'], ST_SetSRID(ST_MakePoint(19.2459, 42.4374), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Klinika'),
@@ -2843,7 +2843,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Opsta bolnica Nikšić', 'Državna opšta bolnica koja pruža usluge sekundarne zdravstvene zaštite za Nikšić i okolne opštine.', 'Dr Nika Miljanića, Nikšić', '+38240231204', 'https://domzdravljaniksic.me/',
+ ('Opšta bolnica Nikšić', 'Državna opšta bolnica koja pruža usluge sekundarne zdravstvene zaštite za Nikšić i okolne opštine.', 'Dr Nika Miljanića, Nikšić', '+38240231204', 'https://domzdravljaniksic.me/',
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Interna medicina', 'Hirurgija', 'Dijagnostika', 'Bolničko lečenje'], ST_SetSRID(ST_MakePoint(18.9350, 42.7774), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
@@ -2853,7 +2853,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.niksic@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Opsta bolnica Bar', 'Državna opšta bolnica u Baru, važna zdravstvena ustanova za južni deo crnogorskog primorja.', 'Podgrad bb, Stari Bar', '+38230342333', 'https://bolnicabar.me',
+ ('Opšta bolnica Bar', 'Državna opšta bolnica u Baru, važna zdravstvena ustanova za južni deo crnogorskog primorja.', 'Podgrad bb, Stari Bar', '+38230342333', 'https://bolnicabar.me',
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Urgentni prijem', 'Bolničko lečenje', 'Dijagnostika', 'Specijalističke službe'], ST_SetSRID(ST_MakePoint(19.1285, 42.0895), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
@@ -2863,7 +2863,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.bar@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Opsta bolnica Kotor', 'Državna opšta bolnica u Kotoru, namenjena bolničkoj i specijalističkoj zdravstvenoj zaštiti stanovnika Boke Kotorske.', 'Škaljari bb, Kotor', '+38232325602', 'https://www.kbckotor.me',
+ ('Opšta bolnica Kotor', 'Državna opšta bolnica u Kotoru, namenjena bolničkoj i specijalističkoj zdravstvenoj zaštiti stanovnika Boke Kotorske.', 'Škaljari bb, Kotor', '+38232325602', 'https://www.kbckotor.me',
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Bolničko lečenje', 'Specijalističke službe', 'Dijagnostika'], ST_SetSRID(ST_MakePoint(18.7610, 42.4207), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
@@ -2873,7 +2873,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Opsta bolnica Danilo Prvi Cetinje', 'Jedna od najstarijih državnih bolnica u Crnoj Gori, smeštena u istorijskoj prestonici Cetinju.', 'Vuka Mićunovića 1, Cetinje', '+38241230441', 'http://daniloprvi.me/kontakt/',
+ ('Opšta bolnica Danilo Prvi Cetinje', 'Jedna od najstarijih državnih bolnica u Crnoj Gori, smeštena u istorijskoj prestonici Cetinju.', 'Vuka Mićunovića 1, Cetinje', '+38241230441', 'http://daniloprvi.me/kontakt/',
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Hirurgija', 'Interna medicina', 'Pedijatrija', 'Ginekologija'], ST_SetSRID(ST_MakePoint(18.9237, 42.3889), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
