@@ -91,6 +91,113 @@
                     "about":  "Sobre nosotros",
                     "logout":  "Cerrar sesión"
                 },
+    "settings": {
+        "title": "Configuración",
+        "locationSection": "Ubicación",
+        "locationTitle": "Activar ubicación",
+        "locationBodyOn": "La ubicación está activada y la aplicación puede usar tu posición actual para recomendaciones y lugares cercanos.",
+        "locationBodyOff": "La ubicación está desactivada. Actívala si quieres sugerencias más precisas y mejores resultados cerca de ti.",
+        "notificationsSection": "Notificaciones",
+        "notificationsTitle": "Activar notificaciones",
+        "notificationsBodyOn": "Solo aparecerán los tipos de notificación que mantengas activados, y puedes elegir cómo se muestran.",
+        "notificationsBodyOff": "Todas las notificaciones están silenciadas y no aparecerán en la aplicación.",
+        "deliveryTitle": "Modo de visualización",
+        "deliveryBody": "Elige si quieres una barra corta arriba de la pantalla o solo la lista de notificaciones.",
+        "deliveryBannerTitle": "Barra superior",
+        "deliveryBannerBody": "Cada nueva notificación aparece brevemente durante unos 4 segundos.",
+        "deliveryInboxTitle": "Solo notificaciones",
+        "deliveryInboxBody": "Las nuevas notificaciones quedan solo en la lista, sin barra emergente.",
+        "generalSection": "Configuración general",
+        "liveBadge": "Nueva notificación",
+        "openNotifications": "Abrir",
+        "menu": {
+            "editProfile": "Editar perfil",
+            "language": "Idioma",
+            "region": "Región",
+            "support": "Ayuda y soporte",
+            "privacy": "Privacidad y datos",
+            "terms": "Términos de uso",
+            "about": "Sobre la aplicación",
+            "appearance": "Apariencia"
+        },
+        "notificationGroups": {
+            "travel": "Viajes y favoritos",
+            "reviews": "Reseñas",
+            "creator": "Contenido que publicas",
+            "manager": "Revisión del manager",
+            "admin": "Administración"
+        },
+        "notificationTypes": {
+            "favoritedLocationNewEvent": {
+                "title": "Nuevo evento en un destino favorito",
+                "body": "Avísame cuando aparezca un nuevo evento en un destino o localidad que guardé."
+            },
+            "plannerEventReminder2Hours": {
+                "title": "Recordatorio 2 horas antes del evento",
+                "body": "Envíame un recordatorio corto cuando un evento del planner se esté acercando."
+            },
+            "plannerEventUpdated": {
+                "title": "Evento del planner actualizado",
+                "body": "Avísame cuando cambien la fecha, hora, precio o ubicación de un evento guardado."
+            },
+            "plannerEventUnavailable": {
+                "title": "El evento del planner ya no está disponible",
+                "body": "Avísame cuando un evento guardado se cancele, se desactive o ya no se pueda seguir."
+            },
+            "reviewReply": {
+                "title": "Respuesta a mi reseña",
+                "body": "Avísame cuando un creador de contenido responda a una reseña que publiqué."
+            },
+            "reviewReplyUpdated": {
+                "title": "Respuesta actualizada a mi reseña",
+                "body": "Avísame cuando un creador de contenido edite la respuesta en mi reseña."
+            },
+            "creatorContentReviewed": {
+                "title": "Mi contenido fue aprobado o rechazado",
+                "body": "Avísame cuando un admin o manager revise mi objeto, evento o actividad."
+            },
+            "creatorNewObjectReview": {
+                "title": "Nueva reseña en mi objeto",
+                "body": "Avísame cuando un turista deje una nueva reseña en un objeto que creé."
+            },
+            "creatorDeletionRequestReviewed": {
+                "title": "Solicitud de eliminación resuelta",
+                "body": "Avísame cuando mi solicitud de eliminación sea aprobada o rechazada."
+            },
+            "creatorObjectReviewDeleted": {
+                "title": "Se eliminó una reseña de mi objeto",
+                "body": "Avísame cuando una reseña de mi objeto sea eliminada del sistema."
+            },
+            "managerNewPendingContent": {
+                "title": "Nuevo contenido pendiente en mi destino",
+                "body": "Avísame cuando llegue un nuevo objeto, evento o actividad para revisar."
+            },
+            "managerNewDeletionRequest": {
+                "title": "Nueva solicitud de eliminación en mi destino",
+                "body": "Avísame cuando un creador de contenido envíe una solicitud de eliminación para contenido de mi destino."
+            },
+            "managerReportReviewed": {
+                "title": "Mi reporte fue revisado",
+                "body": "Avísame cuando un admin apruebe o rechace un reporte que envié."
+            },
+            "adminNewCreatorRoleRequest": {
+                "title": "Nueva solicitud para el rol Content Creator",
+                "body": "Avísame cuando un usuario solicite un rol adicional."
+            },
+            "adminNewManagerReport": {
+                "title": "Nuevo reporte de manager",
+                "body": "Avísame cuando un manager envíe un nuevo reporte contra un creador de contenido."
+            },
+            "adminRepeatedManagerReports": {
+                "title": "Múltiples reportes para el mismo creador",
+                "body": "Avísame cuando el mismo creador reciba reportes repetidos de managers."
+            },
+            "adminCreatorMultipleRejectedContent": {
+                "title": "Múltiples contenidos rechazados del mismo creador",
+                "body": "Avísame cuando el mismo creador acumule varios contenidos rechazados."
+            }
+        }
+    },
     "region":  {
                    "title":  "Región",
                    "available":  "Regiones disponibles",

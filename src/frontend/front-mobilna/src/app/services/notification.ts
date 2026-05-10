@@ -1,9 +1,10 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
-import { BehaviorSubject, Observable, Subject, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, Subject, tap } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { AuthService } from './auth';
+import { NotificationPreferencesService } from './notification-preferences';
 
 export interface NotificationDto {
   id: number;
@@ -33,14 +34,17 @@ export class NotificationService {
   private readonly hubUrl = `${environment.apiUrl.replace(/\/api\/?$/, '')}/hubs/notifications`;
   private hubConnection?: signalR.HubConnection;
   private readonly liveNotificationSubject = new Subject<NotificationDto>();
+  private readonly liveBannerSubject = new Subject<NotificationDto>();
   private readonly unreadCountSubject = new BehaviorSubject<number>(0);
 
   readonly liveNotification$ = this.liveNotificationSubject.asObservable();
+  readonly liveBanner$ = this.liveBannerSubject.asObservable();
   readonly unreadCount$ = this.unreadCountSubject.asObservable();
 
   constructor(
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationPreferencesService: NotificationPreferencesService,
   ) { }
 
   startLiveConnection(): void {
@@ -57,8 +61,23 @@ export class NotificationService {
       .build();
 
     this.hubConnection.on('notificationReceived', (notification: NotificationDto) => {
+      if (!this.notificationPreferencesService.shouldSurfaceNotification(notification.type)) {
+        if (!notification.isRead) {
+          this.markAsReadSilently(notification.id);
+        }
+
+        return;
+      }
+
       this.liveNotificationSubject.next(notification);
-      this.unreadCountSubject.next(this.unreadCountSubject.value + 1);
+
+      if (!notification.isRead) {
+        this.unreadCountSubject.next(this.unreadCountSubject.value + 1);
+      }
+
+      if (this.notificationPreferencesService.shouldShowBanner(notification.type)) {
+        this.liveBannerSubject.next(notification);
+      }
     });
 
     this.hubConnection
@@ -78,19 +97,25 @@ export class NotificationService {
     connection.stop();
   }
 
-  getMy(page = 1, pageSize = 20): Observable<any> {
+  getMy(page = 1, pageSize = 50): Observable<any> {
     const params = new HttpParams()
       .set('page', page)
       .set('pageSize', pageSize);
 
-    return this.http.get(this.api, { params });
+    return this.http.get<any>(this.api, { params }).pipe(
+      map((response) => this.filterNotificationResponse(response)),
+    );
   }
 
   getUnreadCount(): Observable<NotificationUnreadCountDto> {
-    return this.http.get<NotificationUnreadCountDto>(
-      `${this.api}/unread-count`
-    ).pipe(
-      tap(res => this.unreadCountSubject.next(res.unreadCount ?? 0))
+    return this.getMy(1, 200).pipe(
+      map((response) => {
+        const items = this.extractItems(response);
+        const unreadCount = items.filter((item) => !item.isRead).length;
+        const dto = { unreadCount };
+        this.unreadCountSubject.next(unreadCount);
+        return dto;
+      }),
     );
   }
 
@@ -110,5 +135,59 @@ export class NotificationService {
     ).pipe(
       tap(() => this.unreadCountSubject.next(0))
     );
+  }
+
+  refreshUnreadCount(): Observable<NotificationUnreadCountDto> {
+    return this.getUnreadCount();
+  }
+
+  private filterNotificationResponse(response: any): any {
+    const items = this.extractItems(response);
+    const visibleItems = items.filter((item) =>
+      this.notificationPreferencesService.shouldSurfaceNotification(item.type),
+    );
+
+    const hiddenUnreadItems = items.filter(
+      (item) =>
+        !this.notificationPreferencesService.shouldSurfaceNotification(item.type) &&
+        !item.isRead,
+    );
+
+    hiddenUnreadItems.forEach((item) => this.markAsReadSilently(item.id));
+
+    if (Array.isArray(response)) {
+      return visibleItems;
+    }
+
+    if (response && Array.isArray(response.items)) {
+      return {
+        ...response,
+        items: visibleItems,
+        totalCount: visibleItems.length,
+      };
+    }
+
+    return response;
+  }
+
+  private extractItems(response: any): NotificationDto[] {
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    if (response && Array.isArray(response.items)) {
+      return response.items as NotificationDto[];
+    }
+
+    return [];
+  }
+
+  private markAsReadSilently(id: number): void {
+    this.http.post<void>(`${this.api}/${id}/read`, {}).subscribe({
+      next: () => {
+        this.unreadCountSubject.next(Math.max(0, this.unreadCountSubject.value - 1));
+      },
+      error: () => void 0,
+    });
   }
 }

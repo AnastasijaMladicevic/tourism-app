@@ -44,9 +44,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
     { labelKey: 'nav.map', icon: 'map', route: '/map' },
     { labelKey: 'nav.favorites', icon: 'favorite', route: '/favorites' },
     { labelKey: 'nav.planner', icon: 'calendar_month', route: '/planner' },
-    { labelKey: 'Notifications', icon: 'notifications', route: '/notifications' },
+    { labelKey: 'planner.notifications', icon: 'notifications', route: '/notifications' },
     { labelKey: 'nav.profile', icon: 'person_outline', route: '/profile' },
-    { labelKey: 'Podesavanja', icon: 'settings', route: '/settings' },
+    { labelKey: 'settings.title', icon: 'settings', route: '/settings' },
   ];
 
   constructor(

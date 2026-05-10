@@ -1,0 +1,33 @@
+@if (currentNotification(); as notification) {
+  <div
+    class="live-banner"
+    role="button"
+    tabindex="0"
+    (click)="openNotifications()"
+    (keydown.enter)="openNotifications()"
+    (keydown.space)="openNotifications(); $event.preventDefault()"
+  >
+    <div class="live-banner__accent"></div>
+
+    <div class="live-banner__icon">
+      <mat-icon>notifications_active</mat-icon>
+    </div>
+
+    <div class="live-banner__content">
+      <span class="live-banner__eyebrow">{{ 'settings.liveBadge' | translate }}</span>
+      <strong>{{ notification.title }}</strong>
+      <p>{{ notification.message }}</p>
+    </div>
+
+    <span class="live-banner__cta">{{ 'settings.openNotifications' | translate }}</span>
+
+    <button
+      class="live-banner__close"
+      type="button"
+      [attr.aria-label]="'common.close' | translate"
+      (click)="dismiss($event)"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+}

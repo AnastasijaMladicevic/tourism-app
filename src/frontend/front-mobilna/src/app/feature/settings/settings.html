@@ -1,33 +1,137 @@
 <div class="settings-page">
   <div class="settings-shell">
 
-    <!-- TOPBAR -->
     <header class="topbar">
-
       <button class="back-btn" type="button" (click)="goBack()">
         <mat-icon>arrow_back_ios_new</mat-icon>
       </button>
 
-      <h1>Settings</h1>
+      <h1>{{ 'settings.title' | translate }}</h1>
 
       <div class="topbar-spacer"></div>
-
     </header>
 
-    <!-- GENERAL -->
+    <section class="preference-section">
+      <div class="section-heading">
+        <span>{{ 'settings.locationSection' | translate }}</span>
+      </div>
+
+      <div class="preference-card">
+        <div class="preference-row">
+          <div class="preference-copy">
+            <span class="menu-title">{{ 'settings.locationTitle' | translate }}</span>
+            <p>{{ (locationEnabled ? 'settings.locationBodyOn' : 'settings.locationBodyOff') | translate }}</p>
+          </div>
+
+          <label class="switch">
+            <input
+              type="checkbox"
+              [checked]="locationEnabled"
+              (change)="setLocationEnabled($any($event.target).checked)"
+            />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="preference-section">
+      <div class="section-heading">
+        <span>{{ 'settings.notificationsSection' | translate }}</span>
+      </div>
+
+      <div class="preference-card">
+        <div class="preference-row">
+          <div class="preference-copy">
+            <span class="menu-title">{{ 'settings.notificationsTitle' | translate }}</span>
+            <p>{{ (notificationsEnabled ? 'settings.notificationsBodyOn' : 'settings.notificationsBodyOff') | translate }}</p>
+          </div>
+
+          <label class="switch">
+            <input
+              type="checkbox"
+              [checked]="notificationsEnabled"
+              (change)="setNotificationsEnabled($any($event.target).checked)"
+            />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        @if (notificationsEnabled) {
+          <div class="preference-divider"></div>
+
+          <div class="mode-block">
+            <div class="preference-copy preference-copy--compact">
+              <span class="menu-title">{{ 'settings.deliveryTitle' | translate }}</span>
+              <p>{{ 'settings.deliveryBody' | translate }}</p>
+            </div>
+
+            <div class="delivery-toggle">
+              <button
+                class="delivery-toggle__option"
+                type="button"
+                [class.delivery-toggle__option--active]="bannerMode === 'banner'"
+                (click)="setBannerMode('banner')"
+              >
+                <strong>{{ 'settings.deliveryBannerTitle' | translate }}</strong>
+                <span>{{ 'settings.deliveryBannerBody' | translate }}</span>
+              </button>
+
+              <button
+                class="delivery-toggle__option"
+                type="button"
+                [class.delivery-toggle__option--active]="bannerMode === 'inbox'"
+                (click)="setBannerMode('inbox')"
+              >
+                <strong>{{ 'settings.deliveryInboxTitle' | translate }}</strong>
+                <span>{{ 'settings.deliveryInboxBody' | translate }}</span>
+              </button>
+            </div>
+          </div>
+
+          @for (group of notificationGroups; track group.group) {
+            <div class="preference-divider"></div>
+
+            <div class="notification-group">
+              <h3>{{ group.titleKey | translate }}</h3>
+
+              <div class="notification-group__list">
+                @for (item of group.items; track item.type) {
+                  <div class="preference-row preference-row--nested">
+                    <div class="preference-copy">
+                      <span class="menu-title">{{ item.titleKey | translate }}</span>
+                      <p>{{ item.bodyKey | translate }}</p>
+                    </div>
+
+                    <label class="switch">
+                      <input
+                        type="checkbox"
+                        [checked]="isNotificationTypeEnabled(item.type)"
+                        (change)="setNotificationTypeEnabled(item.type, $any($event.target).checked)"
+                      />
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        }
+      </div>
+    </section>
+
     <section class="menu-section">
-
+      <div class="section-heading">
+        <span>{{ 'settings.generalSection' | translate }}</span>
+      </div>
       <div class="menu-card">
-
-        @for (item of generalItems; track item.title) {
+        @for (item of generalItems; track item.titleKey) {
           <button
             class="menu-item"
             type="button"
             (click)="handleItem(item)"
           >
-
             <div class="menu-item__left">
-
               <span
                 class="menu-icon"
                 [attr.data-accent]="item.accent"
@@ -36,9 +140,8 @@
               </span>
 
               <div class="menu-copy">
-                <span class="menu-title">{{ item.title }}</span>
+                <span class="menu-title">{{ item.titleKey | translate }}</span>
               </div>
-
             </div>
 
             <mat-icon class="chevron">
@@ -46,7 +149,6 @@
             </mat-icon>
           </button>
         }
-
       </div>
     </section>
   </div>

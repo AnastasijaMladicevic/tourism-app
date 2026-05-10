@@ -91,6 +91,113 @@
                     "about":  "About us",
                     "logout":  "Log out"
                 },
+    "settings": {
+        "title": "Settings",
+        "locationSection": "Location",
+        "locationTitle": "Turn on location",
+        "locationBodyOn": "Location is enabled and the app can use your current position for recommendations and nearby places.",
+        "locationBodyOff": "Location is turned off. Enable it if you want more precise suggestions and easier nearby discovery.",
+        "notificationsSection": "Notifications",
+        "notificationsTitle": "Turn on notifications",
+        "notificationsBodyOn": "Only the notification types you keep enabled will appear, and you can choose how they are shown.",
+        "notificationsBodyOff": "All notifications are muted right now and will not appear in the app.",
+        "deliveryTitle": "Display mode",
+        "deliveryBody": "Choose whether you want a short banner at the top of the screen or only the notifications list.",
+        "deliveryBannerTitle": "Top banner",
+        "deliveryBannerBody": "Each new notification briefly appears for about 4 seconds.",
+        "deliveryInboxTitle": "Notifications only",
+        "deliveryInboxBody": "New notifications stay only in the list without a top banner.",
+        "generalSection": "General settings",
+        "liveBadge": "New notification",
+        "openNotifications": "Open",
+        "menu": {
+            "editProfile": "Edit profile",
+            "language": "Language",
+            "region": "Region",
+            "support": "Help & Support",
+            "privacy": "Privacy & Data",
+            "terms": "Terms of Use",
+            "about": "About the app",
+            "appearance": "Appearance"
+        },
+        "notificationGroups": {
+            "travel": "Trips and favorites",
+            "reviews": "Reviews",
+            "creator": "Content you publish",
+            "manager": "Manager review flow",
+            "admin": "Administration"
+        },
+        "notificationTypes": {
+            "favoritedLocationNewEvent": {
+                "title": "New event in a favorite destination",
+                "body": "Notify me when a new event appears in a destination or locality I saved."
+            },
+            "plannerEventReminder2Hours": {
+                "title": "Reminder 2 hours before an event",
+                "body": "Send me a short reminder when a planner event is getting close."
+            },
+            "plannerEventUpdated": {
+                "title": "Planner event changed",
+                "body": "Notify me when the date, time, price or location of a saved event changes."
+            },
+            "plannerEventUnavailable": {
+                "title": "Planner event is no longer available",
+                "body": "Notify me when a saved event is canceled, deactivated or can no longer be followed."
+            },
+            "reviewReply": {
+                "title": "Reply to my review",
+                "body": "Notify me when a content creator replies to a review I posted."
+            },
+            "reviewReplyUpdated": {
+                "title": "Updated reply to my review",
+                "body": "Notify me when a content creator edits the reply on my review."
+            },
+            "creatorContentReviewed": {
+                "title": "My content was approved or rejected",
+                "body": "Notify me when an admin or manager reviews my object, event or activity."
+            },
+            "creatorNewObjectReview": {
+                "title": "New review on my object",
+                "body": "Notify me when a tourist leaves a new review on an object I created."
+            },
+            "creatorDeletionRequestReviewed": {
+                "title": "Deletion request resolved",
+                "body": "Notify me when my deletion request is approved or rejected."
+            },
+            "creatorObjectReviewDeleted": {
+                "title": "A review on my object was deleted",
+                "body": "Notify me when a review on my object is removed from the system."
+            },
+            "managerNewPendingContent": {
+                "title": "New pending content in my destination",
+                "body": "Notify me when a new object, event or activity arrives for review."
+            },
+            "managerNewDeletionRequest": {
+                "title": "New deletion request in my destination",
+                "body": "Notify me when a content creator sends a deletion request for content in my destination."
+            },
+            "managerReportReviewed": {
+                "title": "My report was reviewed",
+                "body": "Notify me when an admin approves or rejects a report I submitted."
+            },
+            "adminNewCreatorRoleRequest": {
+                "title": "New Content Creator role request",
+                "body": "Notify me when a user requests an additional role."
+            },
+            "adminNewManagerReport": {
+                "title": "New manager report",
+                "body": "Notify me when a manager submits a new report against a content creator."
+            },
+            "adminRepeatedManagerReports": {
+                "title": "Multiple reports for the same content creator",
+                "body": "Notify me when the same content creator receives repeated manager reports."
+            },
+            "adminCreatorMultipleRejectedContent": {
+                "title": "Multiple rejected items from the same creator",
+                "body": "Notify me when the same content creator accumulates several rejected items."
+            }
+        }
+    },
     "region":  {
                    "title":  "Region",
                    "available":  "Available regions",
