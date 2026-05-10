@@ -88,10 +88,12 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  loadReviews(): void {
+  loadReviews(keepSuccessMessage = false): void {
     this.isLoading = true;
     this.errorMessage = '';
-    this.successMessage = '';
+    if (!keepSuccessMessage) {
+      this.successMessage = '';
+    }
 
     this.loadReviewsRequest()
       .pipe(
@@ -124,11 +126,21 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (reviews) => {
+          const previousSelectedId = this.selectedReview?.id ?? null;
           this.allReviews = reviews;
           this.filteredReviews = reviews;
-          if (!this.selectedReview || !reviews.some((item) => item.id === this.selectedReview?.id)) {
+
+          if (!previousSelectedId) {
             this.selectReview(reviews[0] ?? null);
+          } else {
+            const match = reviews.find((item) => item.id === previousSelectedId);
+            if (match) {
+              this.selectReview(match);
+            } else if (!reviews.length) {
+              this.selectReview(null);
+            }
           }
+
           this.cdr.detectChanges();
         },
         error: (error: any) => {
@@ -231,23 +243,33 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const reviewId = this.selectedReview.id;
     this.isSubmitting = true;
     this.errorMessage = '';
     this.successMessage = '';
 
     const action$ = this.selectedReview.creatorResponse
-      ? this.reviewService.updateResponse(this.selectedReview.id, { creatorResponse: content })
-      : this.reviewService.respond(this.selectedReview.id, { creatorResponse: content });
+      ? this.reviewService.updateResponse(reviewId, { creatorResponse: content })
+      : this.reviewService.respond(reviewId, { creatorResponse: content });
 
     action$
-      .pipe(finalize(() => {
-        this.isSubmitting = false;
-      }))
+      .pipe(
+        switchMap((updated) =>
+          this.reviewService.getById(updated.id).pipe(
+            catchError(() => of(updated))
+          )
+        ),
+        finalize(() => {
+          this.isSubmitting = false;
+        })
+      )
       .subscribe({
-        next: (updated) => {
-          this.updateReviewInCollections(updated);
-          localStorage.removeItem(this.getDraftKey(updated.id));
+        next: (fresh) => {
+          this.updateReviewInCollections(fresh);
+          localStorage.removeItem(this.getDraftKey(fresh.id));
           this.successMessage = 'Response sent successfully.';
+          this.loadReviews(true);
+          this.cdr.detectChanges();
         },
         error: (error: any) => {
           this.errorMessage = error?.error?.message ?? 'Failed to send response.';
