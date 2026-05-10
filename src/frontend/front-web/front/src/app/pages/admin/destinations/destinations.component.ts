@@ -1,18 +1,31 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { forkJoin, Observable, of } from 'rxjs';
+import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
+import { DestinationService, DestinationDto } from '../../../services/destination.service';
+import { LocalityService, LocalityDto } from '../../../services/locality.service';
+import { ObjectDto } from '../../../services/object';
+import { environment } from '../../../../environment/environment';
 
 export type AdminDestinationStatus = 'active' | 'draft' | 'archived';
 
 export interface AdminDestinationRow {
   id: number;
   name: string;
+  /** Shown in the Name column as "ID: …" (e.g. DEST-1001). */
+  publicId: string;
+  /** Category label in the Type column (pill). */
+  destinationType: string;
   region: string;
   country: string;
   code: string;
   status: AdminDestinationStatus;
   localityCount: number;
+  /** Objects count for the Inventory column (building + "N Objects"). */
+  objectCount: number;
   featured: boolean;
   summary: string;
   mainImageUrl?: string;
@@ -35,93 +48,17 @@ interface DestinationInsightCard {
   templateUrl: './destinations.component.html',
   styleUrls: ['./destinations.component.css']
 })
-export class DestinationsComponent {
-  /** Layout-only seed data; replace with API when wired. */
-  private readonly allDestinations: AdminDestinationRow[] = [
-    {
-      id: 1,
-      name: 'Bay of Kotor',
-      region: 'Coastal Montenegro',
-      country: 'Montenegro',
-      code: 'me-kotor-bay',
-      status: 'active',
-      localityCount: 12,
-      featured: true,
-      summary:
-        'UNESCO-listed fjord-like bay with medieval towns, sailing routes, and high seasonal demand.',
-      mainImageUrl: '/assets/pozadina.png',
-      latitude: 42.424,
-      longitude: 18.771,
-      updatedAt: '2026-04-02'
-    },
-    {
-      id: 2,
-      name: 'Durmitor National Park',
-      region: 'Northern Montenegro',
-      country: 'Montenegro',
-      code: 'me-durmitor',
-      status: 'active',
-      localityCount: 8,
-      featured: true,
-      summary: 'Alpine plateau, glacial lakes, and winter sports hub with growing eco-tourism.',
-      latitude: 43.129,
-      longitude: 19.02,
-      updatedAt: '2026-03-18'
-    },
-    {
-      id: 3,
-      name: 'Lake Skadar',
-      region: 'Skadar Lake',
-      country: 'Montenegro / Albania',
-      code: 'me-skadar-lake',
-      status: 'draft',
-      localityCount: 5,
-      featured: false,
-      summary: 'Largest lake in Southern Europe; birdwatching and wine routes pending content review.',
-      updatedAt: '2026-02-28'
-    },
-    {
-      id: 4,
-      name: 'Budva Riviera',
-      region: 'Adriatic coast',
-      country: 'Montenegro',
-      code: 'me-budva',
-      status: 'active',
-      localityCount: 15,
-      featured: true,
-      summary: 'Beach resorts, nightlife, and family-friendly bays with strong summer occupancy.',
-      mainImageUrl: '/assets/pozadina.png',
-      latitude: 42.286,
-      longitude: 18.85,
-      updatedAt: '2026-05-01'
-    },
-    {
-      id: 5,
-      name: 'Prokletije range',
-      region: 'Prokletije',
-      country: 'Montenegro',
-      code: 'me-prokletije',
-      status: 'archived',
-      localityCount: 3,
-      featured: false,
-      summary: 'Remote hiking destination; temporarily hidden while trail data is validated.',
-      updatedAt: '2025-11-10'
-    },
-    {
-      id: 6,
-      name: 'Podgorica capital district',
-      region: 'Central Montenegro',
-      country: 'Montenegro',
-      code: 'me-podgorica',
-      status: 'active',
-      localityCount: 6,
-      featured: false,
-      summary: 'Business travel, airport transfers, and city-break itineraries.',
-      latitude: 42.441,
-      longitude: 19.262,
-      updatedAt: '2026-01-22'
-    }
-  ];
+export class DestinationsComponent implements OnInit {
+  private readonly destinationService = inject(DestinationService);
+  private readonly localityService = inject(LocalityService);
+  private readonly http = inject(HttpClient);
+
+  private readonly objectsUrl = `${environment.apiUrl}/objects`;
+
+  private allDestinations: AdminDestinationRow[] = [];
+
+  isLoading = true;
+  loadError = '';
 
   draftSearchQuery = '';
   searchQuery = '';
@@ -139,19 +76,9 @@ export class DestinationsComponent {
 
   readonly statusOptions = [
     { value: 'all', label: 'All statuses' },
-    { value: 'active', label: 'Active' },
+    { value: 'active', label: 'Published' },
     { value: 'draft', label: 'Draft' },
-    { value: 'archived', label: 'Archived' }
-  ];
-
-  readonly regionOptions = [
-    { value: 'all', label: 'All regions' },
-    { value: 'Coastal Montenegro', label: 'Coastal Montenegro' },
-    { value: 'Northern Montenegro', label: 'Northern Montenegro' },
-    { value: 'Skadar Lake', label: 'Skadar Lake' },
-    { value: 'Adriatic coast', label: 'Adriatic coast' },
-    { value: 'Prokletije', label: 'Prokletije' },
-    { value: 'Central Montenegro', label: 'Central Montenegro' }
+    { value: 'archived', label: 'Rejected' }
   ];
 
   readonly sortByOptions = [
@@ -162,14 +89,21 @@ export class DestinationsComponent {
     { value: 'updatedAt', label: 'Last updated' }
   ];
 
-  constructor() {
-    const first = this.filteredSorted[0] ?? null;
-    this.selectedDestination = first;
+  ngOnInit(): void {
+    this.reloadFromApi();
+  }
+
+  get regionFilterOptions(): { value: string; label: string }[] {
+    const names = new Set(
+      this.allDestinations.map((d) => d.region).filter((r) => r && r.trim())
+    );
+    const sorted = [...names].sort((a, b) => a.localeCompare(b));
+    return [{ value: 'all', label: 'All regions' }, ...sorted.map((r) => ({ value: r, label: r }))];
   }
 
   get insightCards(): DestinationInsightCard[] {
     const filtered = this.applyFiltersToAll();
-    const featured = filtered.filter((d) => d.featured).length;
+    const published = filtered.filter((d) => d.status === 'active').length;
     return [
       {
         label: 'Total destinations',
@@ -184,9 +118,9 @@ export class DestinationsComponent {
         tone: 'green'
       },
       {
-        label: 'Featured',
-        value: String(featured),
-        hint: 'Flagged for discovery',
+        label: 'Published',
+        value: String(published),
+        hint: 'Matching current filters',
         tone: 'amber'
       }
     ];
@@ -314,6 +248,20 @@ export class DestinationsComponent {
     return status.charAt(0).toUpperCase() + status.slice(1);
   }
 
+  /** Table status labels to match the admin destinations design (Published / Draft). */
+  formatTableStatus(status: AdminDestinationStatus): string {
+    switch (status) {
+      case 'active':
+        return 'Published';
+      case 'draft':
+        return 'Draft';
+      case 'archived':
+        return 'Rejected';
+      default:
+        return this.formatStatus(status);
+    }
+  }
+
   getStatusClass(status: AdminDestinationStatus): string {
     switch (status) {
       case 'active':
@@ -327,6 +275,196 @@ export class DestinationsComponent {
     }
   }
 
+  getTableStatusClass(status: AdminDestinationStatus): string {
+    switch (status) {
+      case 'active':
+        return 'table-status-published';
+      case 'draft':
+        return 'table-status-draft';
+      case 'archived':
+        return 'table-status-archived';
+      default:
+        return 'table-status-draft';
+    }
+  }
+
+  onRowMoreActions(_row: AdminDestinationRow, event: Event): void {
+    event.stopPropagation();
+    // Wire to a context menu when flows are ready.
+  }
+
+  reloadFromApi(): void {
+    this.isLoading = true;
+    this.loadError = '';
+
+    forkJoin({
+      destinations: this.fetchAllPages((page) => this.loadDestinationsPage(page)),
+      localities: this.fetchAllPages((page) =>
+        this.localityService.getAll(
+          { page, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
+          { bypassRegion: true }
+        )
+      ),
+      objects: this.fetchAllPages((page) => this.loadObjectsPage(page))
+    })
+      .pipe(
+        map(({ destinations, localities, objects }) =>
+          this.buildRowsFromApi(destinations, localities, objects)
+        ),
+        catchError(() => {
+          this.loadError = 'Could not load destinations. Check that the API is running and try again.';
+          return of([] as AdminDestinationRow[]);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+        })
+      )
+      .subscribe((rows) => {
+        this.allDestinations = rows;
+        if (!this.loadError) {
+          this.syncSelectionAfterFilter();
+        } else {
+          this.selectedDestination = null;
+        }
+      });
+  }
+
+  private buildRowsFromApi(
+    destinations: DestinationDto[],
+    localities: LocalityDto[],
+    objects: ObjectDto[]
+  ): AdminDestinationRow[] {
+    const localityByDest = new Map<number, number>();
+    for (const loc of localities) {
+      const id = loc.destinationId;
+      if (id == null) {
+        continue;
+      }
+      localityByDest.set(id, (localityByDest.get(id) ?? 0) + 1);
+    }
+
+    const objectsByDest = new Map<number, number>();
+    for (const obj of objects) {
+      const id = obj.destinationId;
+      if (id == null) {
+        continue;
+      }
+      objectsByDest.set(id, (objectsByDest.get(id) ?? 0) + 1);
+    }
+
+    return destinations.map((d) =>
+      this.mapDtoToRow(d, localityByDest.get(d.id) ?? 0, objectsByDest.get(d.id) ?? 0)
+    );
+  }
+
+  private mapDtoToRow(
+    dto: DestinationDto,
+    localityCount: number,
+    objectCount: number
+  ): AdminDestinationRow {
+    const ext = dto as DestinationDto & { updatedAt?: string | Date };
+    let updatedAt = '';
+    if (ext.updatedAt != null) {
+      updatedAt =
+        typeof ext.updatedAt === 'string'
+          ? ext.updatedAt.slice(0, 10)
+          : new Date(ext.updatedAt).toISOString().slice(0, 10);
+    }
+    if (!updatedAt) {
+      updatedAt = new Date().toISOString().slice(0, 10);
+    }
+
+    return {
+      id: dto.id,
+      name: dto.name,
+      publicId: `DEST-${String(dto.id).padStart(4, '0')}`,
+      destinationType: dto.destinationTypeName?.trim() || '—',
+      region: dto.regionName?.trim() ?? '',
+      country: '',
+      code: dto.regionCode?.trim() ?? '',
+      status: this.mapApiStatus(dto),
+      localityCount,
+      objectCount,
+      featured: false,
+      summary: dto.description?.trim() || 'No description yet.',
+      mainImageUrl: dto.mainImageUrl,
+      latitude: dto.latitude,
+      longitude: dto.longitude,
+      updatedAt
+    };
+  }
+
+  private mapApiStatus(dto: DestinationDto): AdminDestinationStatus {
+    const raw = (dto.status ?? '').trim().toLowerCase();
+    if (raw === 'rejected') {
+      return 'archived';
+    }
+    if (raw === 'pending') {
+      return 'draft';
+    }
+    if (raw === 'approved') {
+      return dto.isActive ? 'active' : 'draft';
+    }
+    return dto.isActive ? 'active' : 'draft';
+  }
+
+  private loadDestinationsPage(
+    page: number
+  ): Observable<{ items?: DestinationDto[]; totalPages?: number }> {
+    return this.destinationService
+      .getAll({ page, pageSize: 100, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
+      .pipe(
+        map((res: unknown) => {
+          if (Array.isArray(res)) {
+            return { items: res, totalPages: 1 };
+          }
+          const p = res as { items?: DestinationDto[]; totalPages?: number };
+          return {
+            items: p?.items ?? [],
+            totalPages: p?.totalPages ?? 0
+          };
+        })
+      );
+  }
+
+  private loadObjectsPage(page: number): Observable<{ items?: ObjectDto[]; totalPages?: number }> {
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('pageSize', '100')
+      .set('sortBy', 'name')
+      .set('sortOrder', 'asc');
+
+    return this.http.get<unknown>(this.objectsUrl, { params }).pipe(
+      map((res) => {
+        if (Array.isArray(res)) {
+          return { items: res as ObjectDto[], totalPages: 1 };
+        }
+        const p = res as { items?: ObjectDto[]; totalPages?: number };
+        return {
+          items: p?.items ?? [],
+          totalPages: p?.totalPages ?? 0
+        };
+      })
+    );
+  }
+
+  private fetchAllPages<T>(
+    load: (page: number) => Observable<{ items?: T[]; totalPages?: number }>
+  ): Observable<T[]> {
+    return load(1).pipe(
+      switchMap((first) => {
+        const totalPages = first.totalPages ?? 0;
+        if (totalPages <= 1) {
+          return of(first.items ?? []);
+        }
+        const rest = Array.from({ length: totalPages - 1 }, (_, i) => load(i + 2));
+        return forkJoin(rest).pipe(
+          map((pages) => [...(first.items ?? []), ...pages.flatMap((p) => p.items ?? [])])
+        );
+      })
+    );
+  }
+
   private applyFiltersToAll(): AdminDestinationRow[] {
     let rows = [...this.allDestinations];
 
@@ -337,7 +475,9 @@ export class DestinationsComponent {
           d.name.toLowerCase().includes(q) ||
           d.region.toLowerCase().includes(q) ||
           d.country.toLowerCase().includes(q) ||
-          d.code.toLowerCase().includes(q)
+          d.code.toLowerCase().includes(q) ||
+          d.publicId.toLowerCase().includes(q) ||
+          d.destinationType.toLowerCase().includes(q)
       );
     }
 

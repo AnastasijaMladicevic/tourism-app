@@ -49,7 +49,7 @@
       <label>
         <span>Region</span>
         <select [(ngModel)]="regionFilter">
-          <option *ngFor="let option of regionOptions" [value]="option.value">
+          <option *ngFor="let option of regionFilterOptions" [value]="option.value">
             {{ option.label }}
           </option>
         </select>
@@ -102,58 +102,90 @@
           <table>
             <thead>
               <tr>
-                <th>Status</th>
-                <th>Destination</th>
+                <th class="col-thumb">Thumb</th>
+                <th>Destination Name</th>
+                <th>Type</th>
                 <th>Region</th>
-                <th>Localities</th>
-                <th>Featured</th>
-                <th class="col-actions">Action</th>
+                <th>Inventory</th>
+                <th>Status</th>
+                <th class="col-actions">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr
-                *ngFor="let row of visibleDestinations; trackBy: trackByDestinationId"
-                [class.active-row]="selectedDestination?.id === row.id"
-                (click)="selectDestination(row)"
-              >
-                <td>
-                  <span class="status-chip" [ngClass]="getStatusClass(row.status)">
-                    <span class="chip-dot">●</span>
-                    {{ formatStatus(row.status) }}
-                  </span>
-                </td>
-                <td>
-                  <div class="destination-cell">
+              @if (isLoading) {
+                <tr>
+                  <td colspan="7" class="table-message">Loading destinations…</td>
+                </tr>
+              } @else if (loadError) {
+                <tr>
+                  <td colspan="7" class="table-message table-message--error">
+                    <p>{{ loadError }}</p>
+                    <button type="button" class="ghost-btn slim-btn" (click)="reloadFromApi()">
+                      Retry
+                    </button>
+                  </td>
+                </tr>
+              } @else if (!visibleDestinations.length) {
+                <tr>
+                  <td colspan="7" class="table-message">No destinations match the current filters.</td>
+                </tr>
+              } @else {
+                <tr
+                  *ngFor="let row of visibleDestinations; trackBy: trackByDestinationId"
+                  [class.active-row]="selectedDestination?.id === row.id"
+                  (click)="selectDestination(row)"
+                >
+                  <td class="cell-thumb">
                     <span
                       class="destination-thumb"
                       [style.background-image]="row.mainImageUrl ? 'url(' + row.mainImageUrl + ')' : ''"
+                      role="img"
+                      [attr.aria-label]="row.name"
                     ></span>
-                    <div>
+                  </td>
+                  <td>
+                    <div class="name-cell">
                       <strong>{{ row.name }}</strong>
-                      <span>{{ row.country }}</span>
+                      <span class="name-cell-id">ID: {{ row.publicId }}</span>
                     </div>
-                  </div>
-                </td>
-                <td>{{ row.region }}</td>
-                <td>{{ row.localityCount }}</td>
-                <td>
-                  <span class="featured-pill" [class.is-on]="row.featured">
-                    {{ row.featured ? 'Yes' : 'No' }}
-                  </span>
-                </td>
-                <td>
-                  <div class="row-actions">
-                    <button
-                      type="button"
-                      class="icon-btn plain"
-                      title="Edit destination"
-                      (click)="onEditDestination(row); $event.stopPropagation()"
-                    >
-                      <span class="material-symbols-outlined">edit</span>
-                    </button>
-                  </div>
-                </td>
-              </tr>
+                  </td>
+                  <td>
+                    <span class="type-pill">{{ row.destinationType }}</span>
+                  </td>
+                  <td>{{ row.region }}</td>
+                  <td>
+                    <span class="inventory-cell">
+                      <span class="material-symbols-outlined inventory-icon">apartment</span>
+                      {{ row.objectCount }} Objects
+                    </span>
+                  </td>
+                  <td>
+                    <span class="table-status" [ngClass]="getTableStatusClass(row.status)">
+                      {{ formatTableStatus(row.status) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="row-actions">
+                      <button
+                        type="button"
+                        class="icon-btn plain"
+                        title="Edit destination"
+                        (click)="onEditDestination(row); $event.stopPropagation()"
+                      >
+                        <span class="material-symbols-outlined">edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        class="icon-btn plain"
+                        title="More actions"
+                        (click)="onRowMoreActions(row, $event)"
+                      >
+                        <span class="material-symbols-outlined">more_vert</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>
@@ -201,13 +233,14 @@
           </div>
 
           <div class="hero-copy">
-            <p class="eyebrow">Featured destination</p>
+            <p class="eyebrow">Destination preview</p>
             <h2>{{ selectedDestination.name }}</h2>
             <p class="hero-meta">
-              {{ selectedDestination.country }} · {{ selectedDestination.localityCount }} localities
+              {{ selectedDestination.region }} · {{ selectedDestination.localityCount }} localities ·
+              {{ selectedDestination.objectCount }} objects
             </p>
             <span class="detail-status" [ngClass]="getStatusClass(selectedDestination.status)">
-              {{ formatStatus(selectedDestination.status) }}
+              {{ formatTableStatus(selectedDestination.status) }}
             </span>
           </div>
         </div>
@@ -218,8 +251,8 @@
             <strong>{{ selectedDestination.localityCount }}</strong>
           </div>
           <div class="metric-card">
-            <span>Featured</span>
-            <strong>{{ selectedDestination.featured ? 'On' : 'Off' }}</strong>
+            <span>Objects</span>
+            <strong>{{ selectedDestination.objectCount }}</strong>
           </div>
         </div>
 
@@ -230,16 +263,16 @@
 
           <div class="schedule-list">
             <div class="schedule-item">
-              <span>Country</span>
-              <strong>{{ selectedDestination.country }}</strong>
+              <span>Region code</span>
+              <strong>{{ selectedDestination.code || '—' }}</strong>
             </div>
             <div class="schedule-item">
               <span>Region</span>
               <strong>{{ selectedDestination.region }}</strong>
             </div>
             <div class="schedule-item">
-              <span>Slug / code</span>
-              <strong>{{ selectedDestination.code }}</strong>
+              <span>Public ID</span>
+              <strong>{{ selectedDestination.publicId }}</strong>
             </div>
             <div class="schedule-item">
               <span>Last updated</span>

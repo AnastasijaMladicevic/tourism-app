@@ -454,14 +454,33 @@ thead th {
   color: #64748b;
   font-size: 12px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  text-transform: none;
+  letter-spacing: 0.02em;
 }
 
 tbody td {
   padding: 16px 18px;
   border-top: 1px solid #eef2f7;
   vertical-align: middle;
+}
+
+.table-message {
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+  padding: 28px 18px !important;
+}
+
+.table-message--error {
+  color: #991b1b;
+}
+
+.table-message--error p {
+  margin: 0 0 12px;
+}
+
+.table-message--error .ghost-btn {
+  margin-inline: auto;
 }
 
 tbody tr {
@@ -474,35 +493,92 @@ tbody tr:hover,
   background: #f8fbff;
 }
 
+.col-thumb {
+  width: 72px;
+}
+
 .col-actions {
-  width: 68px;
-  text-align: center;
+  width: 96px;
+  text-align: right;
 }
 
-.destination-cell {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.destination-cell strong {
-  font-size: 14px;
-  color: #111827;
-}
-
-.destination-cell span {
-  color: #6b7280;
-  font-size: 12px;
+.cell-thumb {
+  vertical-align: middle;
 }
 
 .destination-thumb {
-  width: 36px;
-  height: 36px;
+  display: inline-block;
+  width: 44px;
+  height: 44px;
   border-radius: 10px;
   background: linear-gradient(135deg, #dbeafe, #bfdbfe);
   background-size: cover;
   background-position: center;
   flex-shrink: 0;
+}
+
+.name-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+.name-cell strong {
+  font-size: 14px;
+  color: #111827;
+  font-weight: 700;
+}
+
+.name-cell-id {
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.type-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+.inventory-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.inventory-icon {
+  font-size: 18px;
+  color: #64748b;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.table-status {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.table-status-published {
+  color: #16a34a;
+}
+
+.table-status-draft {
+  color: #1f2937;
+}
+
+.table-status-archived {
+  color: #64748b;
 }
 
 .featured-pill {
@@ -561,7 +637,8 @@ tbody tr:hover,
 }
 
 .row-actions {
-  gap: 8px;
+  gap: 4px;
+  justify-content: flex-end;
 }
 
 .icon-btn {
