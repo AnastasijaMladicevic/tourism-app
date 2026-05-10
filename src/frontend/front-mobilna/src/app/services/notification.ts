@@ -1,5 +1,5 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { BehaviorSubject, map, Observable, Subject, tap } from 'rxjs';
 import { environment } from '../../environment/environment';
@@ -41,10 +41,15 @@ export class NotificationService {
   readonly liveBanner$ = this.liveBannerSubject.asObservable();
   readonly unreadCount$ = this.unreadCountSubject.asObservable();
 
+  getUnreadCountSnapshot(): number {
+    return this.unreadCountSubject.value;
+  }
+
   constructor(
     private http: HttpClient,
     private authService: AuthService,
     private notificationPreferencesService: NotificationPreferencesService,
+    private ngZone: NgZone,
   ) { }
 
   startLiveConnection(): void {
@@ -61,23 +66,21 @@ export class NotificationService {
       .build();
 
     this.hubConnection.on('notificationReceived', (notification: NotificationDto) => {
-      if (!this.notificationPreferencesService.shouldSurfaceNotification(notification.type)) {
+      this.ngZone.run(() => {
         if (!notification.isRead) {
-          this.markAsReadSilently(notification.id);
+          this.unreadCountSubject.next(this.unreadCountSubject.value + 1);
         }
 
-        return;
-      }
+        if (!this.notificationPreferencesService.shouldSurfaceNotification(notification.type)) {
+          return;
+        }
 
-      this.liveNotificationSubject.next(notification);
+        this.liveNotificationSubject.next(notification);
 
-      if (!notification.isRead) {
-        this.unreadCountSubject.next(this.unreadCountSubject.value + 1);
-      }
-
-      if (this.notificationPreferencesService.shouldShowBanner(notification.type)) {
-        this.liveBannerSubject.next(notification);
-      }
+        if (this.notificationPreferencesService.shouldShowBanner(notification.type)) {
+          this.liveBannerSubject.next(notification);
+        }
+      });
     });
 
     this.hubConnection
@@ -108,14 +111,10 @@ export class NotificationService {
   }
 
   getUnreadCount(): Observable<NotificationUnreadCountDto> {
-    return this.getMy(1, 200).pipe(
-      map((response) => {
-        const items = this.extractItems(response);
-        const unreadCount = items.filter((item) => !item.isRead).length;
-        const dto = { unreadCount };
-        this.unreadCountSubject.next(unreadCount);
-        return dto;
-      }),
+    return this.http.get<NotificationUnreadCountDto>(
+      `${this.api}/unread-count`
+    ).pipe(
+      tap((res) => this.unreadCountSubject.next(res.unreadCount ?? 0)),
     );
   }
 
@@ -141,19 +140,15 @@ export class NotificationService {
     return this.getUnreadCount();
   }
 
+  resetUnreadCount(): void {
+    this.unreadCountSubject.next(0);
+  }
+
   private filterNotificationResponse(response: any): any {
     const items = this.extractItems(response);
     const visibleItems = items.filter((item) =>
       this.notificationPreferencesService.shouldSurfaceNotification(item.type),
     );
-
-    const hiddenUnreadItems = items.filter(
-      (item) =>
-        !this.notificationPreferencesService.shouldSurfaceNotification(item.type) &&
-        !item.isRead,
-    );
-
-    hiddenUnreadItems.forEach((item) => this.markAsReadSilently(item.id));
 
     if (Array.isArray(response)) {
       return visibleItems;
@@ -180,14 +175,5 @@ export class NotificationService {
     }
 
     return [];
-  }
-
-  private markAsReadSilently(id: number): void {
-    this.http.post<void>(`${this.api}/${id}/read`, {}).subscribe({
-      next: () => {
-        this.unreadCountSubject.next(Math.max(0, this.unreadCountSubject.value - 1));
-      },
-      error: () => void 0,
-    });
   }
 }

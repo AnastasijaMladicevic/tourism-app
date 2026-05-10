@@ -23,7 +23,7 @@
             <p>{{ (locationEnabled ? 'settings.locationBodyOn' : 'settings.locationBodyOff') | translate }}</p>
           </div>
 
-          <label class="switch">
+          <label class="switch" [class.switch--checked]="locationEnabled">
             <input
               type="checkbox"
               [checked]="locationEnabled"
@@ -47,7 +47,7 @@
             <p>{{ (notificationsEnabled ? 'settings.notificationsBodyOn' : 'settings.notificationsBodyOff') | translate }}</p>
           </div>
 
-          <label class="switch">
+          <label class="switch" [class.switch--checked]="notificationsEnabled">
             <input
               type="checkbox"
               [checked]="notificationsEnabled"
@@ -103,7 +103,7 @@
                       <p>{{ item.bodyKey | translate }}</p>
                     </div>
 
-                    <label class="switch">
+                    <label class="switch" [class.switch--checked]="isNotificationTypeEnabled(item.type)">
                       <input
                         type="checkbox"
                         [checked]="isNotificationTypeEnabled(item.type)"
