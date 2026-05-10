@@ -70,11 +70,8 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   activeFilters: string[] = [];
   filterChips: FilterChip[] = [
-    { key: 'destination', label: 'Destinations', icon: '📍' },
     { key: 'locality', label: 'Localities', icon: '🏙️' },
-    { key: 'hotel', label: 'Hotels', icon: '🏨' },
-    { key: 'restaurant', label: 'Restaurants', icon: '🍽️' },
-    { key: 'kafana', label: 'Bars', icon: '🍷' },
+    { key: 'object', label: 'Objects', icon: '🏨' },
     { key: 'event', label: 'Events', icon: '🎉' },
     { key: 'activity', label: 'Activities', icon: '🏃' },
   ];
@@ -126,6 +123,9 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
     const zoom = state?.zoom ?? 13;
 
     this.mapService.initMap('main-map', lat, lng, zoom, { enableClustering: true });
+    setTimeout(() => {
+      this.mapService.getMap()?.invalidateSize();
+    }, 0);
     this.loadAllData(state);
 
     const map = this.mapService['map'];
@@ -405,7 +405,7 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (
       this.selectedItem &&
       this.activeFilters.length > 0 &&
-      !this.activeFilters.includes(this.selectedType)
+      !this.matchesActiveFilters(this.selectedType)
     ) {
       this.closeCard();
     }
@@ -415,6 +415,39 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private applyFilters(): void {
     this.mapService.setActiveFilters(this.activeFilters);
+  }
+
+  private matchesActiveFilters(type: string): boolean {
+    if (!this.activeFilters.length) {
+      return true;
+    }
+
+    const objectTypes = new Set([
+      'hotel',
+      'apartment',
+      'motel',
+      'resort',
+      'hostel',
+      'restaurant',
+      'kafana',
+      'bar',
+      'cafe',
+      'fast_food',
+      'winery',
+      'club',
+      'gas_station',
+      'shop',
+      'mall',
+      'market',
+      'hospital',
+      'clinic',
+      'pharmacy',
+      'attraction',
+    ]);
+
+    return this.activeFilters.some(
+      (filter) => filter === type || (filter === 'object' && objectTypes.has(type)),
+    );
   }
 
   /**
@@ -475,18 +508,6 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
           const filteredActivities = activities.filter((activity) =>
             this.belongsToManagedDestination(activity, managedDestinationIds),
           );
-
-          destinations.forEach((destination) => {
-            if (destination.latitude != null && destination.longitude != null) {
-              this.mapService.addMarkerWithType(
-                destination.latitude,
-                destination.longitude,
-                'destination',
-                destination,
-              );
-              this.allItems.push(this.toSearchResult(destination, 'destination', 'destination'));
-            }
-          });
 
           filteredLocalities.forEach((loc) => {
             if (loc.latitude != null && loc.longitude != null) {
@@ -559,7 +580,7 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     if (item.destinationId == null) {
-      return true;
+      return false;
     }
 
     return managedDestinationIds.has(item.destinationId);

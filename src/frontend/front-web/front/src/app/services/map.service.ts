@@ -31,6 +31,28 @@ export class MapService {
   private activeFilters: string[] = [];
 
   private readonly filterMap: Record<string, string[]> = {
+    object: [
+      'hotel',
+      'apartment',
+      'motel',
+      'resort',
+      'hostel',
+      'restaurant',
+      'kafana',
+      'bar',
+      'cafe',
+      'fast_food',
+      'winery',
+      'club',
+      'gas_station',
+      'shop',
+      'mall',
+      'market',
+      'hospital',
+      'clinic',
+      'pharmacy',
+      'attraction',
+    ],
     food: ['restaurant', 'kafana', 'bar', 'cafe', 'fast_food', 'winery', 'club'],
     accommodation: ['hotel', 'apartment', 'motel', 'resort', 'hostel'],
     fuel: ['gas_station'],
