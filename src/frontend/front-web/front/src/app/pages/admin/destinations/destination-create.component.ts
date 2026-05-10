@@ -33,7 +33,6 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
 
   regions: RegionDto[] = [];
 
-  shortSummary = '';
   fullDescription = '';
   categoryInput = '';
   categories: string[] = [];
@@ -108,27 +107,6 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     return `${Math.abs(Number(lat)).toFixed(4)}° ${ns}, ${Math.abs(Number(lng)).toFixed(4)}° ${ew}`;
   }
 
-  get statusLabel(): string {
-    return this.form.isActive ? 'Published' : 'Draft';
-  }
-
-  get footerStatus(): string {
-    if (this.draftSavedMessage) {
-      return this.draftSavedMessage;
-    }
-    if (this.savedDestinationId) {
-      return 'All changes saved';
-    }
-    return 'Unsaved changes';
-  }
-
-  get footerSubline(): string {
-    if (this.savedDestinationId) {
-      return 'Draft is on the server — you can keep editing or publish when ready';
-    }
-    return 'Create mode · changes are not synced until you save';
-  }
-
   get mapPopupText(): string {
     return this.form.name?.trim() || 'New destination';
   }
@@ -182,17 +160,13 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   }
 
   private buildDescriptionPayload(): string | undefined {
-    const parts = [this.shortSummary.trim(), this.fullDescription.trim()].filter(Boolean);
-    if (!parts.length) {
-      return undefined;
-    }
-    return parts.join('\n\n');
+    const text = this.fullDescription.trim();
+    return text || undefined;
   }
 
   private validateBasics(): boolean {
-    this.form.destinationTypeId = Number(this.form.destinationTypeId);
-    if (!this.form.name.trim() || !this.form.destinationTypeId) {
-      this.errorMessage = 'Destination name and destination type are required.';
+    if (!this.form.name.trim()) {
+      this.errorMessage = 'Destination name is required.';
       return false;
     }
     this.errorMessage = '';
@@ -210,7 +184,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     if (!this.validateBasics() || this.isSubmitting) {
       return;
     }
-    this.persist(!!this.form.isActive);
+    this.persist(true);
   }
 
   private persist(published: boolean): void {

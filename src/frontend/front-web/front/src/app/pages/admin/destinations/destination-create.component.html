@@ -9,9 +9,6 @@
     <div class="title-row">
       <div class="title-block">
         <h1 class="page-title">{{ form.name.trim() || 'New destination' }}</h1>
-        <span class="status-pill" [class.status-pill--draft]="!form.isActive" [class.status-pill--live]="form.isActive">
-          {{ statusLabel }}
-        </span>
       </div>
       <div class="title-actions">
         <button type="button" class="btn btn-ghost btn-with-icon" (click)="onSaveDraft()" [disabled]="isSubmitting">
@@ -31,9 +28,51 @@
     <div class="alert alert-error" role="alert">{{ errorMessage }}</div>
   }
 
+  @if (draftSavedMessage) {
+    <div class="alert alert-success" role="status">{{ draftSavedMessage }}</div>
+  }
+
   <div class="workspace">
     <div class="workspace-main">
       <article class="panel">
+        <span class="step-tag">STEP 1</span>
+        <div class="panel-head panel-head--split">
+          <div class="panel-head-left">
+            <span class="panel-icon material-symbols-outlined">imagesmode</span>
+            <div>
+              <h2 class="panel-title">Media gallery</h2>
+              <p class="panel-sub">High-quality images that represent this destination across the platform.</p>
+            </div>
+          </div>
+          <label class="btn btn-ghost btn-sm upload-all-label">
+            <span class="material-symbols-outlined">upload</span>
+            Upload all
+            <input type="file" accept="image/*" multiple class="sr-only" (change)="onGalleryFilesSelected($event)" />
+          </label>
+        </div>
+
+        <label class="drop-zone">
+          <span class="material-symbols-outlined drop-icon">add_photo_alternate</span>
+          <span class="drop-title">Add new image</span>
+          <span class="drop-hint">Click or drag files here</span>
+          <input type="file" accept="image/*" multiple class="sr-only" (change)="onGalleryFilesSelected($event)" />
+        </label>
+        <p class="fine-print">Recommended aspect ratio 16:9. Maximum file size 5MB per image (validated on upload later).</p>
+
+        @if (imagePreviews.length) {
+          <div class="preview-strip">
+            @for (src of imagePreviews; track $index) {
+              <div class="preview-tile">
+                <img [src]="src" alt="" />
+                <button type="button" class="preview-remove" (click)="removeGalleryImage($index)" aria-label="Remove image">×</button>
+              </div>
+            }
+          </div>
+        }
+      </article>
+
+      <article class="panel">
+        <span class="step-tag">STEP 2</span>
         <div class="panel-head">
           <span class="panel-icon material-symbols-outlined">info</span>
           <div>
@@ -48,22 +87,12 @@
             <input type="text" [(ngModel)]="form.name" placeholder="e.g. Emerald Valley Park" />
           </label>
 
-          <label class="form-field">
-            <span class="label">Destination type ID *</span>
-            <input type="number" min="1" [(ngModel)]="form.destinationTypeId" />
-          </label>
-
-          <label class="form-field">
-            <span class="label">Visibility</span>
-            <select [(ngModel)]="form.isActive">
-              <option [ngValue]="true">Published</option>
-              <option [ngValue]="false">Draft</option>
-            </select>
-          </label>
-
           <label class="form-field full">
-            <span class="label">Short summary</span>
-            <textarea rows="3" [(ngModel)]="shortSummary" placeholder="One or two sentences for listings and cards."></textarea>
+            <span class="label">Region</span>
+            <select [(ngModel)]="form.regionId" (ngModelChange)="onRegionChange()" [disabled]="isLoadingRegions">
+              <option [ngValue]="undefined">Select a region</option>
+              <option *ngFor="let region of regions" [ngValue]="region.id">{{ region.name }}</option>
+            </select>
           </label>
 
           <div class="form-field full richtext-block">
@@ -103,43 +132,8 @@
         </div>
       </article>
 
-      <article class="panel">
-        <div class="panel-head panel-head--split">
-          <div class="panel-head-left">
-            <span class="panel-icon material-symbols-outlined">imagesmode</span>
-            <div>
-              <h2 class="panel-title">Media gallery</h2>
-              <p class="panel-sub">High-quality images that represent this destination across the platform.</p>
-            </div>
-          </div>
-          <label class="btn btn-ghost btn-sm upload-all-label">
-            <span class="material-symbols-outlined">upload</span>
-            Upload all
-            <input type="file" accept="image/*" multiple class="sr-only" (change)="onGalleryFilesSelected($event)" />
-          </label>
-        </div>
-
-        <label class="drop-zone">
-          <span class="material-symbols-outlined drop-icon">add_photo_alternate</span>
-          <span class="drop-title">Add new image</span>
-          <span class="drop-hint">Click or drag files here</span>
-          <input type="file" accept="image/*" multiple class="sr-only" (change)="onGalleryFilesSelected($event)" />
-        </label>
-        <p class="fine-print">Recommended aspect ratio 16:9. Maximum file size 5MB per image (validated on upload later).</p>
-
-        @if (imagePreviews.length) {
-          <div class="preview-strip">
-            @for (src of imagePreviews; track $index) {
-              <div class="preview-tile">
-                <img [src]="src" alt="" />
-                <button type="button" class="preview-remove" (click)="removeGalleryImage($index)" aria-label="Remove image">×</button>
-              </div>
-            }
-          </div>
-        }
-      </article>
-
       <article class="panel panel--muted">
+        <span class="step-tag">STEP 3</span>
         <div class="panel-head">
           <span class="panel-icon material-symbols-outlined">history</span>
           <div>
@@ -152,6 +146,7 @@
 
     <aside class="workspace-side">
       <article class="panel">
+        <span class="step-tag">STEP 4</span>
         <div class="panel-head">
           <span class="panel-icon material-symbols-outlined">location_on</span>
           <div>
@@ -187,14 +182,6 @@
           </div>
         }
 
-        <label class="form-field">
-          <span class="label">Region</span>
-          <select [(ngModel)]="form.regionId" (ngModelChange)="onRegionChange()" [disabled]="isLoadingRegions">
-            <option [ngValue]="undefined">Select a region</option>
-            <option *ngFor="let region of regions" [ngValue]="region.id">{{ region.name }}</option>
-          </select>
-        </label>
-
         <div class="readonly-field">
           <span class="label">Region (preview)</span>
           <p class="readonly-value">{{ regionDisplayName }}</p>
@@ -207,6 +194,7 @@
       </article>
 
       <article class="panel">
+        <span class="step-tag">STEP 5</span>
         <div class="panel-head panel-head--split">
           <div class="panel-head-left">
             <span class="panel-icon material-symbols-outlined">hub</span>
@@ -249,6 +237,7 @@
       </article>
 
       <article class="panel">
+        <span class="step-tag">STEP 6</span>
         <div class="panel-head">
           <span class="panel-icon material-symbols-outlined">group</span>
           <div>
@@ -267,9 +256,4 @@
       </article>
     </aside>
   </div>
-
-  <footer class="form-footer">
-    <span class="footer-primary">{{ footerStatus }}</span>
-    <span class="footer-secondary">{{ footerSubline }}</span>
-  </footer>
 </div>
