@@ -2967,7 +2967,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
  NOW(), NOW()),
 
-('Nocni provod Budva', 'Budva je poznata po živahnom noćnom životu, muzici i provodu do kasnih sati. Ova aktivnost je namenjena svima koji žele opušteno veče uz dobru atmosferu, piće i zabavu pored mora.',
+('Noćni provod Budva', 'Budva je poznata po živahnom noćnom životu, muzici i provodu do kasnih sati. Ova aktivnost je namenjena svima koji žele opušteno veče uz dobru atmosferu, piće i zabavu pored mora.',
  ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), 10.00, 240, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Nocni provod'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
@@ -2987,7 +2987,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
  NOW(), NOW()),
 
-('Setnja starim gradom Kotora', 'Šetnja starim gradom Kotora vodi kroz uske kamene ulice, trgove i istorijske znamenitosti ovog primorskog grada. Savršena je za posetioce koji žele da upoznaju kulturu, arhitekturu i duh Kotora.',
+('Šetnja starim gradom Kotora', 'Šetnja starim gradom Kotora vodi kroz uske kamene ulice, trgove i istorijske znamenitosti ovog primorskog grada. Savršena je za posetioce koji žele da upoznaju kulturu, arhitekturu i duh Kotora.',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 0.00, 120, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Razgledanje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
@@ -2997,7 +2997,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), 
  NOW(), NOW()),
  
- ('Voznja camcem Skadarsko jezero', 'Vožnja čamcem po Skadarskom jezeru omogućava uživanje u mirnoj vodi, prirodi i bogatom biljnom i životinjskom svetu. Aktivnost je odlična za opuštanje, fotografisanje i doživljaj jezera iz drugačije perspektive.',
+ ('Vožnja čamcem Skadarsko jezero', 'Vožnja čamcem po Skadarskom jezeru omogućava uživanje u mirnoj vodi, prirodi i bogatom biljnom i životinjskom svetu. Aktivnost je odlična za opuštanje, fotografisanje i doživljaj jezera iz drugačije perspektive.',
  ST_SetSRID(ST_MakePoint(19.091, 42.246), 4326), 15.00, 120, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Voznja camcem'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
@@ -3051,7 +3051,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW()),
 
-('Vece klasicne muzike', 'U čarobnoj atmosferi starog grada Kotora, ovo veče klasične muzike nudi jedinstven spoj umetnosti i istorije. Program obuhvata pažljivo odabrane kompozicije koje izvode talentovani muzičari, stvarajući intimnu i sofisticiranu atmosferu. Idealno za sve ljubitelje kulture, muzike i romantičnih večeri pod otvorenim nebom. Autentični ambijent kamenih trgova i osvetljenih uličica dodatno pojačava doživljaj, pretvarajući svaki ton u posebno emotivno iskustvo. Posetioci će imati priliku da se prepuste zvucima klasične muzike dok uživaju u jedinstvenom spoju tradicije i umetnosti. Ovaj događaj pruža savršenu priliku za opuštanje, inspiraciju i stvaranje nezaboravnih uspomena u jednom od najlepših primorskih gradova.',
+('Veče klasične muzike', 'U čarobnoj atmosferi starog grada Kotora, ovo veče klasične muzike nudi jedinstven spoj umetnosti i istorije. Program obuhvata pažljivo odabrane kompozicije koje izvode talentovani muzičari, stvarajući intimnu i sofisticiranu atmosferu. Idealno za sve ljubitelje kulture, muzike i romantičnih večeri pod otvorenim nebom. Autentični ambijent kamenih trgova i osvetljenih uličica dodatno pojačava doživljaj, pretvarajući svaki ton u posebno emotivno iskustvo. Posetioci će imati priliku da se prepuste zvucima klasične muzike dok uživaju u jedinstvenom spoju tradicije i umetnosti. Ovaj događaj pruža savršenu priliku za opuštanje, inspiraciju i stvaranje nezaboravnih uspomena u jednom od najlepših primorskih gradova.',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), '2026-08-05 21:00', '2026-08-05 23:00', 15.00, 200, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Koncert'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
@@ -3230,43 +3230,43 @@ INSERT INTO "Reviews"
 VALUES
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
- 5, 'Odlican hotel, preporucujem! Lokacija savrsena.', NOW()),
+ 5, 'Odličan hotel, preporučujem! Lokacija savršena.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
- 4, 'Restoran je fantastican, hrana odlicna, pogled prelep! Jedina zamerka je cena ovog restorana.', NOW()),
+ 4, 'Restoran je fantastičan, hrana odlična, pogled prelep! Jedina zamerka je cena ovog restorana.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
- 5, 'Luksuzno i udobno, vredi svake pare. Djakuzi vrhunski.', NOW()),
+ 5, 'Luksuzno i udobno, vredi svake pare. Đakuzi vrhunski.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
- 3, 'Lep hotel i odlicna lokacija, dorucak moze biti bolji, a cena malo jeftinija.', NOW()),
+ 3, 'Lep hotel i odlična lokacija, doručak moze biti bolji, a cena malo jeftinija.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
- 4, 'Vrlo prijatan smestaj i sjajan pogled sa terase.', NOW()),
+ 4, 'Vrlo prijatan smeštaj i sjajan pogled sa terase.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
- 2, 'Hrana je okej i pogled je lep ali je osoblje veoma neljubazno. Ja se sigurno necu vratiti!', NOW()),
+ 2, 'Hrana je okej i pogled je lep ali je osoblje veoma neljubazno. Ja se sigurno neću vratiti!', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
- 4, 'Opustena atmosfera i super muzika predvece. Nije za roditelje sa malom decom.', NOW()),
+ 4, 'Opuštena atmosfera i super muzika predveče. Nije za roditelje sa malom decom.', NOW()),
 
  ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
- 2, 'Lokacija bara je vrlo privlacna, ali nazalost nije za roditelje sa decom :(', NOW()),
+ 2, 'Lokacija bara je vrlo privlačna, ali nažalost nije za roditelje sa decom :(', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
- 5, 'Odlicno mesto za pice posle plaze.', NOW()),
+ 5, 'Odlično mesto za piće posle plaže.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
- 5, 'Savrsena baza za planinarenje, na moje iznenadjenje i veoma cisto! :).', NOW()),
+ 5, 'Savršena baza za planinarenje, na moje iznenađenje i veoma čisto! :).', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
@@ -3274,19 +3274,19 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolašin'),
- 3, 'Sobe su udobne i lokacija je dobra za skijanje, ali spa zona je bila prevelika guzva tokom vikenda.', NOW()),
+ 3, 'Sobe su udobne i lokacija je dobra za skijanje, ali spa zona je bila prevelika gužva tokom vikenda.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolašin'),
- 4, 'Dobar dorucak i prijatan ambijent, osoblje brzo reaguje na zahteve.', NOW()),
+ 4, 'Dobar doručak i prijatan ambijent, osoblje brzo reaguje na zahteve.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
- 5, 'Riba je bila sveza, a terasa uz jezero je najlepsi deo vecere pred zalazak sunca.', NOW()),
+ 5, 'Riba je bila sveža, a terasa uz jezero je najlepsi deo večere pred zalazak sunca.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
- 4, 'Pogled i hrana su odlicni, ali se na uslugu cekalo malo duze nego sto sam ocekivala.', NOW()),
+ 4, 'Pogled i hrana su odlični, ali se na uslugu čekalo malo duže nego što sam očekivala.', NOW()),
 
 -- =========================
 -- Konoba Scala Santa
@@ -3334,18 +3334,18 @@ VALUES
  5, 'Jedan od najboljih restorana uz obalu.', NOW()),
 
 -- =========================
--- Konoba Batricevic Njeguši
+-- Konoba Batričević Njeguši
 -- =========================
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batricevic Njeguši'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batričević Njeguši'),
  4, 'Odličan domaći sir i pršut, prava planinska hrana.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batricevic Njeguši'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batričević Njeguši'),
  5, 'Sve je bilo savršeno, posebno atmosfera sela.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batricevic Njeguši'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batričević Njeguši'),
  5, 'Autentično i domaće, vredi posetiti.', NOW()),
 
 -- =========================
@@ -3534,15 +3534,15 @@ VALUES
 -- Gradska kafanica Žabljak
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Žabljak'),
- 5, 'Prava planinska kafana, hrana domaca i ukusna, porcije velike.', NOW()),
+ 5, 'Prava planinska kafana, hrana domaća i ukusna, porcije velike.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Žabljak'),
- 4, 'Lepa atmosfera i prijatno osoblje, idealno posle setnje po hladnom vremenu.', NOW()),
+ 4, 'Lepa atmosfera i prijatno osoblje, idealno posle šetnje po hladnom vremenu.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Žabljak'),
- 2, 'Hrana je okej ali sam ocekivao vise za tu cenu. Ambijent malo zastareo.', NOW()),
+ 2, 'Hrana je okej ali sam očekivao više za tu cenu. Ambijent malo zastareo.', NOW()),
 
 
 -- Konoba Stari Grad
@@ -3556,41 +3556,41 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Stari Grad'),
- 3, 'Lokacija je top, ali sam ocekivala malo brzu uslugu. Hrana solidna.', NOW()),
+ 3, 'Lokacija je top, ali sam očekivala malo bržu uslugu. Hrana solidna.', NOW()),
 
 
--- Kafana Markovic
+-- Kafana Marković
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Markovic'),
- 5, 'Odlicna kafana za drustvo, muzika i atmosfera vrhunski.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Marković'),
+ 5, 'Odlicna kafana za društvo, muzika i atmosfera vrhunski.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Markovic'),
- 4, 'Super provod, hrana ukusna, ali zna da bude guzva.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Marković'),
+ 4, 'Super provod, hrana ukusna, ali zna da bude gužva.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Markovic'),
- 2, 'Previse buke za moj ukus, jedva smo mogli da pricamo. Hrana nista specijalno.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Marković'),
+ 2, 'Previše buke za moj ukus, jedva smo mogli da pričamo. Hrana ništa specijalno.', NOW()),
 
 
--- Planinarski dom Skrka
+-- Planinarski dom Škrka
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Skrka'),
- 5, 'Savrseno mesto za odmor u prirodi, mir i tisina. Dom je uredan i domacini ljubazni.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Škrka'),
+ 5, 'Savršeno mesto za odmor u prirodi, mir i tišina. Dom je uredan i domaćini ljubazni.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Skrka'),
- 4, 'Prelep pogled i dobra lokacija za planinarenje, uslovi solidni za ovakav tip smestaja.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Škrka'),
+ 4, 'Prelep pogled i dobra lokacija za planinarenje, uslovi solidni za ovakav tip smeštaja.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Skrka'),
- 3, 'Priroda je fantasticna, ali sam ocekivao malo bolje odrzavanje samog doma.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Škrka'),
+ 3, 'Priroda je fantasticna, ali sam očekivao malo bolje održavanje samog doma.', NOW()),
 
 
 -- Planinarski dom Vranjak
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Vranjak'),
- 5, 'Odlican dom za beg iz grada, sve preporuke za ljubitelje planine.', NOW()),
+ 5, 'Odličan dom za beg iz grada, sve preporuke za ljubitelje planine.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Vranjak'),
@@ -3598,49 +3598,49 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Vranjak'),
- 2, 'Lokacija lepa, ali uslovi dosta skromni. Nije bas za svakoga ko ocekuje komfor.', NOW()),
+ 2, 'Lokacija lepa, ali uslovi dosta skromni. Nije baš za svakoga ko očekuje komfor.', NOW()),
 
 
--- Nacionalna biblioteka Crne Gore Djurdje Crnojevic
+-- Nacionalna biblioteka Crne Gore Đurđe Crnojević
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Djurdje Crnojevic'),
- 5, 'Prelepo mesto za ucenje i istrazivanje, bogata zbirka i prijatan ambijent.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Đurđe Crnojević'),
+ 5, 'Prelepo mesto za učenje i istraživanje, bogata zbirka i prijatan ambijent.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Djurdje Crnojevic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Đurđe Crnojević'),
  4, 'Mirno i uredno, idealno za rad. Osoblje ljubazno i spremno da pomogne.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Djurdje Crnojevic'),
- 4, 'Lepa atmosfera i dobar izbor knjiga, ali bi radno vreme moglo biti duze.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Đurđe Crnojević'),
+ 4, 'Lepa atmosfera i dobar izbor knjiga, ali bi radno vreme moglo biti duže.', NOW()),
 
 
--- Narodna biblioteka Radosav Ljumovic
+-- Narodna biblioteka Radosav Ljumović
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumovic'),
- 5, 'Odlicna biblioteka, veliki izbor knjiga i prijatan prostor za citanje.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumović'),
+ 5, 'Odlična biblioteka, veliki izbor knjiga i prijatan prostor za čitanje.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumović'),
  4, 'Sve pohvale za organizaciju i mir koji vlada unutra.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumovic'),
- 3, 'Prostor je okej, ali je nekad tesko naci slobodno mesto za sedenje.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumović'),
+ 3, 'Prostor je okej, ali je nekad teško naći slobodno mesto za sedenje.', NOW()),
 
 
--- Gradska biblioteka i citaonica Herceg Novi
+-- Gradska biblioteka i čitaonica Herceg Novi
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i citaonica Herceg Novi'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i čitaonica Herceg Novi'),
  5, 'Vrlo prijatan ambijent i dobar izbor literature, rado dolazim ovde.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i citaonica Herceg Novi'),
- 4, 'Mirno mesto za citanje, osoblje korektno i usluzno.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i čitaonica Herceg Novi'),
+ 4, 'Mirno mesto za čitanje, osoblje korektno i uslužno.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i citaonica Herceg Novi'),
- 4, 'Lepo uredjeno i prijatno, iako bi moglo biti malo vise novijih naslova.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i čitaonica Herceg Novi'),
+ 4, 'Lepo uređeno i prijatno, iako bi moglo biti malo više novijih naslova.', NOW()),
 
 
 -- Manastir Ostrog
@@ -3650,25 +3650,25 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Ostrog'),
- 5, 'Dolazio sam vise puta i svaki put je isti osecaj mira. Vredi posetiti makar jednom.', NOW()),
+ 5, 'Dolazio sam više puta i svaki put je isti osecaj mira. Vredi posetiti makar jednom.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Ostrog'),
- 4, 'Prelepo i znacajno mesto, ali treba biti spreman na guzvu u sezoni.', NOW()),
+ 4, 'Prelepo i značajno mesto, ali treba biti spreman na gužvu u sezoni.', NOW()),
 
 
 -- Katedrala Svetog Tripuna
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Katedrala Svetog Tripuna'),
- 5, 'Impresivna gradjevina i jako lepo ocuvana. Unutra je posebno zanimljivo.', NOW()),
+ 5, 'Impresivna građevina i jako lepo očuvana. Unutra je posebno zanimljivo.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Katedrala Svetog Tripuna'),
- 4, 'Vredi obici ako ste u Kotoru, istorija i arhitektura su bas zanimljivi.', NOW()),
+ 4, 'Vredi obići ako ste u Kotoru, istorija i arhitektura su baš zanimljivi.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Katedrala Svetog Tripuna'),
- 4, 'Lepo mesto za kratku posetu, nije guzva kao na drugim lokacijama.', NOW()),
+ 4, 'Lepo mesto za kratku posetu, nije gužva kao na drugim lokacijama.', NOW()),
 
 
 -- Crkva Svetog Nikole
@@ -3678,17 +3678,17 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Nikole'),
- 4, 'Mirno mesto, lepo za kratko zadrzavanje i predah od guzve.', NOW()),
+ 4, 'Mirno mesto, lepo za kratko zadržavanje i predah od gužve.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Nikole'),
- 3, 'Lepa crkva, ali nisam nasla mnogo informacija o istoriji na licu mesta.', NOW()),
+ 3, 'Lepa crkva, ali nisam našla mnogo informacija o istoriji na licu mesta.', NOW()),
 
 
 -- Crkva Svetog Jovana Vladimira
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Jovana Vladimira'),
- 5, 'Nova i veoma lepo uredjena crkva, ostavlja bas lep utisak.', NOW()),
+ 5, 'Nova i veoma lepo uređena crkva, ostavlja baš lep utisak.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Jovana Vladimira'),
@@ -3699,42 +3699,42 @@ VALUES
  4, 'Lepo mesto, uredno i mirno. Prijatno za posetu i razgledanje.', NOW()),
 
 
--- Apartments Djurovic
+-- Apartments Djurović
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Djurovic'),
- 5, 'Bas prijatan smestaj, cisto i uredno. Domacini jako ljubazni, osecas se kao kod kuce.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Djurović'),
+ 5, 'Baš prijatan smeštaj, cisto i uredno. Domaćini jako ljubazni, osećaš se kao kod kuće.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Djurovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Djurović'),
  4, 'Dobar odnos cene i kvaliteta, bez nekih velikih zamerki.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Djurovic'),
- 3, 'Solidno, ali nista sto se posebno izdvaja. Za kraci boravak ok.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Djurović'),
+ 3, 'Solidno, ali ništa sto se posebno izdvaja. Za kraći boravak ok.', NOW()),
 
 
--- Apartments Vukovic
+-- Apartments Vuković
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vukovic'),
- 5, 'Cisto, uredno i mirno. Bas sam zadovoljna, opet bih dosla.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vuković'),
+ 5, 'Čisto, uredno i mirno. Baš sam zadovoljna, opet bih došla.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vukovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vuković'),
  4, 'Sve kako treba, bez komplikacija. Lokacija dobra.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vukovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vuković'),
  4, 'Prijatno mesto, iako bi kupatilo moglo biti malo modernije.', NOW()),
 
 
 -- Lux Apartment Budva
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lux Apartment Budva'),
- 5, 'Stvarno luksuzno, sve novo i lepo sredjeno. Blizu svega.', NOW()),
+ 5, 'Stvarno luksuzno, sve novo i lepo sređeno. Blizu svega.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lux Apartment Budva'),
- 4, 'Lep stan, dobra lokacija, ali cena malo jaca nego sto sam ocekivao.', NOW()),
+ 4, 'Lep stan, dobra lokacija, ali cena malo jača nego sto sam očekivao.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lux Apartment Budva'),
@@ -3744,21 +3744,21 @@ VALUES
 -- Apartmani M Herceg Novi
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani M Herceg Novi'),
- 5, 'Divan pogled na more, bas sam uzivala u boravku.', NOW()),
+ 5, 'Divan pogled na more, bas sam uživala u boravku.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani M Herceg Novi'),
- 4, 'Lepa lokacija i korektan smestaj.', NOW()),
+ 4, 'Lepa lokacija i korektan smeštaj.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani M Herceg Novi'),
- 3, 'Ok je, ali ima dosta stepenica do apartmana, nije bas prakticno.', NOW()),
+ 3, 'Ok je, ali ima dosta stepenica do apartmana, nije bas praktično.', NOW()),
 
 
 -- Boutique Hotel Casa del Mare - Amfora
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Boutique Hotel Casa del Mare - Amfora'),
- 5, 'Prelep ambijent i odlicna usluga. Sve deluje jako elegantno.', NOW()),
+ 5, 'Prelep ambijent i odlična usluga. Sve deluje jako elegantno.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Boutique Hotel Casa del Mare - Amfora'),
@@ -3766,31 +3766,31 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Boutique Hotel Casa del Mare - Amfora'),
- 4, 'Stvarno lepo, ali malo skuplje nego sto sam planirala.', NOW()),
+ 4, 'Stvarno lepo, ali malo skuplje nego što sam planirala.', NOW()),
 
 
--- Apartments Mijovic
+-- Apartments Mijović
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijovic'),
- 4, 'Sve korektno, cisto i uredno. Bez velikih zamerki.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijović'),
+ 4, 'Sve korektno, čisto i uredno. Bez velikih zamerki.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijovic'),
- 3, 'Prosecno iskustvo, ali za cenu sasvim okej.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijović'),
+ 3, 'Prosečno iskustvo, ali za cenu sasvim okej.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijovic'),
- 4, 'Mirno mesto, lepo za odmor bez guzve.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijović'),
+ 4, 'Mirno mesto, lepo za odmor bez gužve.', NOW()),
 
 
 -- Durmitor View Apartments
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Durmitor View Apartments'),
- 5, 'Pogled je stvarno brutalan, vredi doci samo zbog toga.', NOW()),
+ 5, 'Pogled je stvarno brutalan, vredi doći samo zbog toga.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Durmitor View Apartments'),
- 5, 'Savrseno za odmor u prirodi, sve preporuke.', NOW()),
+ 5, 'Savršeno za odmor u prirodi, sve preporuke.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Durmitor View Apartments'),
@@ -3800,77 +3800,77 @@ VALUES
 -- Apartments Aleksandar
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Aleksandar'),
- 4, 'Prijatno mesto, sve uredno i cisto.', NOW()),
+ 4, 'Prijatno mesto, sve uredno i čisto.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Aleksandar'),
- 3, 'Nista specijalno, ali zavrsava posao za nocenje.', NOW()),
+ 3, 'Ništa specijalno, ali završava posao za noćenje.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Aleksandar'),
- 4, 'Lepa lokacija i korektan smestaj.', NOW()),
+ 4, 'Lepa lokacija i korektan smeštaj.', NOW()),
 
 
--- Villa Ljubanovic Apartments
+-- Villa Ljubanović Apartments
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic Apartments'),
- 5, 'Odlicno mesto, sve uredno i domacini bas gostoljubivi.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović Apartments'),
+ 5, 'Odlično mesto, sve uredno i domaćini bas gostoljubivi.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic Apartments'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović Apartments'),
  4, 'Prijatno iskustvo, bez ikakvih problema tokom boravka.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic Apartments'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović Apartments'),
  4, 'Sve kako treba, vratio bih se opet.', NOW()),
 
 
 -- Casa Nuova
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa Nuova'),
- 5, 'Bas lepo uredjeno i moderno, dopalo mi se na prvi pogled.', NOW()),
+ 5, 'Baš lepo uređeno i moderno, dopalo mi se na prvi pogled.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa Nuova'),
- 4, 'Lep smestaj, dobra lokacija i sve blizu.', NOW()),
+ 4, 'Lep smeštaj, dobra lokacija i sve blizu.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa Nuova'),
- 3, 'Ok je, ali sam ocekivao malo vise za tu cenu.', NOW()),
+ 3, 'Ok je, ali sam očekivao malo više za tu cenu.', NOW()),
 
 
 -- Banya Wellness & Spa
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Banya Wellness & Spa'),
- 5, 'Bas sam se opustila, sve je cisto i mirise lepo. Masaža odlicna.', NOW()),
+ 5, 'Baš sam se opustila, sve je čisto i miriše lepo. Masaža odlična.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Banya Wellness & Spa'),
- 4, 'Dobar spa, sauna i bazen super. Malo guzve vikendom.', NOW()),
+ 4, 'Dobar spa, sauna i bazen super. Malo gužve vikendom.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Banya Wellness & Spa'),
- 4, 'Prijatna atmosfera, sve uredno. Moglo bi malo vise prostora za lezaljke.', NOW()),
+ 4, 'Prijatna atmosfera, sve uredno. Moglo bi malo više prostora za ležaljke.', NOW()),
 
 
--- Wellness Center Simo Milosevic
+-- Wellness Center Simo Milošević
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milosevic'),
- 5, 'Odlican za oporavak i relaksaciju. Sve preporuke, dolazim opet.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milošević'),
+ 5, 'Odličan za oporavak i relaksaciju. Sve preporuke, dolazim opet.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milosevic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milošević'),
  4, 'Usluga dobra, osoblje ljubazno. Malo stariji objekat ali uredan.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milosevic'),
- 3, 'Ok iskustvo, ali sam ocekivao moderniji prostor.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milošević'),
+ 3, 'Ok iskustvo, ali sam očekivao moderniji prostor.', NOW()),
 
 
 -- Perla Residence Spa
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Perla Residence Spa'),
- 5, 'Prelep prostor, bas luksuzno i tiho. Idealno za opustanje.', NOW()),
+ 5, 'Prelep prostor, baš luksuzno i tiho. Idealno za opuštanje.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Perla Residence Spa'),
@@ -3878,7 +3878,7 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Perla Residence Spa'),
- 4, 'Lepo uredjeno i cisto, samo malo skuplje nego sto sam planirao.', NOW()),
+ 4, 'Lepo uređeno i čisto, samo malo skuplje nego što sam planirao.', NOW()),
 
 
 -- Huma Bay Spa
@@ -3888,11 +3888,11 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Huma Bay Spa'),
- 4, 'Bas lepo mesto, samo je malo vise ljudi nego sto sam ocekivala.', NOW()),
+ 4, 'Bas lepo mesto, samo je malo više ljudi nego sto sam očekivala.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Huma Bay Spa'),
- 4, 'Sve pohvale za ambijent i uslugu. Osecaj bas kao na odmoru.', NOW()),
+ 4, 'Sve pohvale za ambijent i uslugu. Osećaj baš kao na odmoru.', NOW()),
 
 
 -- Casa del Mare Spa
@@ -3902,11 +3902,11 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa del Mare Spa'),
- 5, 'Predivno mesto, mirno i elegantno. Bas sam uzivala.', NOW()),
+ 5, 'Predivno mesto, mirno i elegantno. Baš sam uživala.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa del Mare Spa'),
- 4, 'Vrlo dobro, ali cena je malo jaca.', NOW()),
+ 4, 'Vrlo dobro, ali cena je malo jača.', NOW()),
 
 
 -- Spomenik Partizanu borcu na Gorici
@@ -3950,15 +3950,15 @@ VALUES
 
 -- Spomenik Ljubu Čupiću
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Cupicu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Čupiću'),
  5, 'Veoma emotivan spomenik, ostavlja jak utisak.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Cupicu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Čupiću'),
  4, 'Zanimljivo i simbolično mesto, vredi posetiti.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Cupicu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Čupiću'),
  5, 'Jedan od najpoznatijih spomenika, baš snažna poruka.', NOW()),
 
 -- Spomenik palim borcima na Grahovcu
@@ -3989,28 +3989,28 @@ VALUES
 
 -- Spomenik Punisi Račiću
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Punisi Racicu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Punisi Račiću'),
  5, 'Vrlo značajan istorijski spomenik, ostavlja jak utisak.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Punisi Racicu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Punisi Račiću'),
  4, 'Lepo urađeno, ali malo skromna lokacija.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Punisi Racicu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Punisi Račiću'),
  5, 'Važan deo istorije lepo predstavljen.', NOW()),
 
 -- Spomenik herojima Božićnog ustanka
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Bozicnog ustanka'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Božićnog ustanka'),
  5, 'Veoma snažan i emotivan spomenik.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Bozicnog ustanka'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Božićnog ustanka'),
  4, 'Lepo obeleženo mesto, ali može biti malo sređenije.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Bozicnog ustanka'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Božićnog ustanka'),
  5, 'Vrlo značajan i dostojanstven spomenik.', NOW()),
 
 -- Spomenik bici na Fundini
@@ -4028,15 +4028,15 @@ VALUES
 
 -- Spomenik Njegošu na Lovćenu
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegosu na Lovćenu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegošu na Lovćenu'),
  5, 'Impresivno i veličanstveno mesto, pogled je neverovatan.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegosu na Lovćenu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegošu na Lovćenu'),
  5, 'Jedno od najlepših mesta u Crnoj Gori, vredno svake posete.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegosu na Lovćenu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegošu na Lovćenu'),
  4, 'Prelepa lokacija, ali uspon može biti naporan.', NOW()),
 
 
@@ -4210,17 +4210,17 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Konik Podgorica'),
  2, 'Dosta loš utisak, sporo i neorganizovano.', NOW()),
 
--- INA Skaljari Kotor
+-- INA Škaljari Kotor
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Skaljari Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Škaljari Kotor'),
  5, 'Odlična lokacija i brza usluga.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Skaljari Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Škaljari Kotor'),
  4, 'Sve korektno, pumpa radi kako treba.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Skaljari Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Škaljari Kotor'),
  3, 'Ništa specijalno, ali obavlja posao.', NOW()),
 
 -- EKO Tivat
@@ -4603,17 +4603,17 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej kralja Nikole'),
  4, 'Zanimljiv uvid u istoriju, ali nije za duže zadržavanje.', NOW()),
 
--- Prirodnjacki muzej Crne Gore
+-- Prirodnjački muzej Crne Gore
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjacki muzej Crne Gore'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjački muzej Crne Gore'),
  5, 'Super kolekcija, posebno deo sa životinjama i mineralima.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjacki muzej Crne Gore'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjački muzej Crne Gore'),
  4, 'Vrlo edukativno za decu i odrasle.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjacki muzej Crne Gore'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjački muzej Crne Gore'),
  3, 'Ok, ali prostor bi mogao biti moderniji.', NOW()),
 
 -- Muzej grada Perasta
@@ -4630,17 +4630,17 @@ VALUES
  4, 'Mali, ali jako zanimljiv muzej.', NOW()),
 
 
--- Big Fesn Podgorica
+-- Big Fešn Podgorica
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fesn Podgorica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fešn Podgorica'),
  4, 'Dobar izbor radnji, sve na jednom mestu.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fesn Podgorica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fešn Podgorica'),
  3, 'Ok centar, ali može biti gužva i parking je problem.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fesn Podgorica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fešn Podgorica'),
  4, 'Praktično mesto za kupovinu, solidan izbor.', NOW()),
 
 -- Mall of Montenegro
@@ -4708,30 +4708,30 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mega Mall Budva'),
  4, 'Dobar centar, ali zna da bude gužva.', NOW()),
 
--- TC HDL Lakovic Nikšić
+-- TC HDL Laković Nikšić
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Lakovic Nikšić'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Laković Nikšić'),
  4, 'Povoljne cene i dobar izbor proizvoda.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Lakovic Nikšić'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Laković Nikšić'),
  3, 'Ok market, ali nije baš najmoderniji.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Lakovic Nikšić'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Laković Nikšić'),
  4, 'Praktično mesto za svakodnevnu kupovinu.', NOW()),
 
--- Lakovic Kotor
+-- Laković Kotor
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lakovic Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Laković Kotor'),
  4, 'Dobar supermarket, sve osnovno ima.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lakovic Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Laković Kotor'),
  3, 'Ok, ali zna da bude gužva u sezoni.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lakovic Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Laković Kotor'),
  4, 'Praktično i blizu centra.', NOW()),
 
 -- Butiko Shopping Center
@@ -4787,44 +4787,44 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Pizana'),
  3, 'Zanimljivo, ali malo i brzo se obiđe.', NOW()),
 
--- Galerija Velimir A. Lekovic
+-- Galerija Velimir A. Leković
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Lekovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Leković'),
  5, 'Vrlo kvalitetna postavka, lepo predstavljena umetnost.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Lekovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Leković'),
  4, 'Dobar prostor i zanimljiva dela lokalnih umetnika.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Lekovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Leković'),
  4, 'Mirno i prijatno mesto za ljubitelje umetnosti.', NOW()),
 
 
--- Villa Ljubanovic
+-- Villa Ljubanović
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović'),
  5, 'Veoma prijatan smeštaj, čisto i domaćinski osećaj.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović'),
  4, 'Dobra lokacija i ljubazni domaćini.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović'),
  4, 'Uredno i mirno mesto za boravak.', NOW()),
 
--- Guesthouse Zmukic
+-- Guesthouse Žmukić
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Zmukic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Žmukić'),
  4, 'Solidan smeštaj, korektna usluga.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Zmukic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Žmukić'),
  3, 'Ok za kraći boravak, ali skromnije nego na slikama.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Zmukic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Žmukić'),
  4, 'Prijatno mesto, domaćini ljubazni.', NOW()),
 
 -- Guesthouse Plima
@@ -4840,17 +4840,17 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Plima'),
  4, 'Dobar odnos cene i kvaliteta.', NOW()),
 
--- Pansion Vukovic Žabljak
+-- Pansion Vuković Žabljak
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vukovic Žabljak'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vuković Žabljak'),
  5, 'Savršeno mesto za odmor u prirodi.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vukovic Žabljak'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vuković Žabljak'),
  4, 'Topla atmosfera i dobar smeštaj.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vukovic Žabljak'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vuković Žabljak'),
  4, 'Mirno i lepo, ali malo jednostavno uređeno.', NOW()),
 
 
@@ -4893,17 +4893,17 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Etno Selo Komarnica'),
  4, 'Lepo iskustvo, ali pristup može biti malo nezgodan.', NOW()),
 
--- Vinarija Plantaze 13 Jul
+-- Vinarija Plantaže 13 Jul
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaze 13 Jul'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaže 13 Jul'),
  5, 'Odlična organizacija obilaska i vrhunska vina, posebno crvena.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaze 13 Jul'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaže 13 Jul'),
  4, 'Lep ambijent i zanimljiva degustacija, samo je bilo malo gužve.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaze 13 Jul'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaže 13 Jul'),
  3, 'Dobra vina, ali obilazak je mogao biti bolje organizovan.', NOW()),
 
 -- Vinarija Lipovac
@@ -4932,17 +4932,17 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cem winery and vineyard'),
  5, 'Odlična vina i jako prijatna degustacija.', NOW()),
 
--- Winery Masanovic
+-- Winery Mašanović
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Masanovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Mašanović'),
  5, 'Autentično iskustvo i vrhunska domaća vina.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Masanovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Mašanović'),
  4, 'Lepo uređeno imanje i fina vina za degustaciju.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Masanovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Mašanović'),
  3, 'Solidno, ali očekivao sam malo bogatiju ponudu.', NOW()),
 
 -- Vinarija Savina
@@ -5024,17 +5024,17 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zoo Sad'),
  3, 'Solidan zoo, ali neke kaveze bi trebalo obnoviti.', NOW()),
 
--- Park Macaka
+-- Park Mašanović
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Macaka'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Mašanović'),
  5, 'Neobično i jako simpatično mesto za ljubitelje mačaka.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Macaka'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Mašanović'),
  4, 'Opustajuće i zanimljivo, mačke su baš druželjubive.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Macaka'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Mašanović'),
  3, 'Lepo za kratku posetu, ali brzo se obiđe.', NOW()),
 
 -- Akvarijum Boka
@@ -5051,181 +5051,181 @@ VALUES
  3, 'Zanimljivo, ali očekivao sam više vrsta riba.', NOW()),
 
 
--- Igraliste Njegosev park
+-- Igralište Njegošev park
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Njegosev park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Njegošev park'),
  5, 'Lepo uređeno i čisto, idealno za decu u centru grada.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Njegosev park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Njegošev park'),
  4, 'Dosta sadržaja, ali bi moglo još klupa za roditelje.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Njegosev park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Njegošev park'),
  3, 'Ok za kratko zadržavanje, ništa posebno.', NOW()),
 
--- Igraliste Gorica Park
+-- Igralište Gorica Park
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Gorica Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Gorica Park'),
  5, 'Prelepa priroda oko igrališta, baš prijatno.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Gorica Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Gorica Park'),
  4, 'Dobar prostor za decu, malo strm prilaz.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Gorica Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Gorica Park'),
  3, 'Solidno, ali bi moglo više sprava.', NOW()),
 
--- Igraliste Slovenska plaža
+-- Igralište Slovenska plaža
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Slovenska plaža'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Slovenska plaža'),
  4, 'Odlična lokacija pored mora, deca uživaju.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Slovenska plaža'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Slovenska plaža'),
  5, 'Savršeno za letnji odmor i igru.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Slovenska plaža'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Slovenska plaža'),
  3, 'Lepo, ali previše gužve u sezoni.', NOW()),
 
--- Djecije Igraliste Park Nezavisnosti
+-- Dječije Igralište Park Nezavisnosti
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecije Igraliste Park Nezavisnosti'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječije Igralište Park Nezavisnosti'),
  5, 'Veoma uredno i bezbedno za decu.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecije Igraliste Park Nezavisnosti'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječije Igralište Park Nezavisnosti'),
  4, 'Lepo igralište, ali malo hladovine fali.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecije Igraliste Park Nezavisnosti'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječije Igralište Park Nezavisnosti'),
  3, 'U redu, ali jednostavno.', NOW()),
 
--- Igraliste Centar Kotor
+-- Igralište Centar Kotor
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Centar Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Centar Kotor'),
  4, 'Lepa lokacija u starom gradu, simpatično.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Centar Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Centar Kotor'),
  5, 'Deca su se super provela, baš zanimljivo mesto.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Centar Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Centar Kotor'),
  3, 'Malo skučen prostor, ali ok.', NOW()),
 
--- Igraliste Tolosi
+-- Igralište Tološi
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Tolosi'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Tološi'),
  4, 'Mirno i bezbedno igralište.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Tolosi'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Tološi'),
  3, 'Solidno, ali bi moglo biti bolje održavano.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Tolosi'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Tološi'),
  5, 'Lepo mesto za decu iz kraja.', NOW()),
 
--- Igraliste Kolašin
+-- Igralište Kolašin
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Kolašin'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Kolašin'),
  5, 'Prelepo okruženje u prirodi, super za decu.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Kolašin'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Kolašin'),
  4, 'Lepo i čisto, ali malo manje sprava.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Kolašin'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Kolašin'),
  3, 'Ok, ali jednostavno igralište.', NOW()),
 
--- Igraliste Igalo
+-- Igralište Igalo
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Igalo'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Igalo'),
  4, 'Blizu mora, lepo za popodne sa decom.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Igalo'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Igalo'),
  5, 'Odlično mesto, deca uživaju svaki put.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Igalo'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Igalo'),
  3, 'Dosta osnovno, ali funkcionalno.', NOW()),
 
--- Igraliste Park 13 Jul
+-- Igralište Park 13 Jul
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Park 13 Jul'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Park 13 Jul'),
  5, 'Veliko i lepo uređeno igralište.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Park 13 Jul'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Park 13 Jul'),
  4, 'Dosta prostora, ali može još sadržaja.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Park 13 Jul'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Park 13 Jul'),
  3, 'Solidno, ništa spektakularno.', NOW()),
 
--- Igraliste Nikšić
+-- Igralište Nikšić
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Nikšić'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Nikšić'),
  4, 'Dobar prostor za decu u gradu.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Nikšić'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Nikšić'),
  3, 'Može bolje održavanje.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Nikšić'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Nikšić'),
  5, 'Deca vole da dolaze ovde.', NOW()),
 
--- Djecje igraliste kod vozica
+-- Dječje igralište kod vozica
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecje igraliste kod vozica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječje igralište kod vozica'),
  5, 'Baš simpatično i zanimljivo za malu decu.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecje igraliste kod vozica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječje igralište kod vozica'),
  4, 'Lepo uređeno i bezbedno.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecje igraliste kod vozica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječje igralište kod vozica'),
  3, 'Malo, ali ok za kratku igru.', NOW()),
 
--- Igraliste Bar Setaliste
+-- Igralište Bar Šetalište
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Bar Setaliste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Bar Šetalište'),
  5, 'Prelepa lokacija pored mora.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Bar Setaliste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Bar Šetalište'),
  4, 'Dobar prostor, ali u sezoni gužva.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Bar Setaliste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Bar Šetalište'),
  3, 'Ok, ali ništa posebno.', NOW()),
 
--- Igraliste Crno jezero
+-- Igralište Crno jezero
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Crno jezero'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Crno jezero'),
  5, 'Neverovatna priroda, prelepo za decu i roditelje.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Crno jezero'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Crno jezero'),
  4, 'Jedinstveno mesto, ali malo hladno.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Crno jezero'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Crno jezero'),
  3, 'Lepo, ali ograničeno sadržajem.', NOW()),
 
--- Igraliste Milocer Park
+-- Igralište Miločer Park
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Milocer Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Miločer Park'),
  5, 'Prelepo i uredno, prava oaza.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Milocer Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Miločer Park'),
  4, 'Veoma lepo, ali malo ekskluzivno.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Milocer Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Miločer Park'),
  3, 'Ok, ali više za šetnju nego igru.', NOW()),
 
--- Igraliste Lovćen National Park
+-- Igralište Lovćen National Park
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Lovćen National Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen National Park'),
  5, 'Neverovatan pogled i priroda.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Lovćen National Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen National Park'),
  4, 'Lepo iskustvo, ali vetrovito.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Lovćen National Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen National Park'),
  3, 'Zanimljivo, ali nije klasično igralište.', NOW()),
 
 
--- Crnogorsko narodno pozoriste
+-- Crnogorsko narodno pozorište
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozoriste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozorište'),
  5, 'Odlične predstave i profesionalna atmosfera, pravi kulturni centar.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozoriste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozorište'),
  4, 'Veoma kvalitetan repertoar, ali ponekad karte brzo planu.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozoriste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozorište'),
  3, 'Solidno, ali nisam bio oduševljen poslednjom predstavom.', NOW()),
 
 -- Zetski dom
@@ -5239,15 +5239,15 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zetski dom'),
  3, 'Ok, ali prostor bi mogao biti moderniji.', NOW()),
 
--- Nikšićko pozoriste
+-- Nikšićko pozorište
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nikšićko pozoriste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nikšićko pozorište'),
  4, 'Lep repertoar i prijatan ambijent.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nikšićko pozoriste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nikšićko pozorište'),
  3, 'Dobar sadržaj, ali sala bi mogla biti renovirana.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nikšićko pozoriste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nikšićko pozorište'),
  5, 'Odlične predstave, prijatno iznenađenje.', NOW()),
 
 -- Dvorana Park Herceg Novi
@@ -5463,15 +5463,15 @@ VALUES
  2, 'Očekivala sam više za spa centar ovog tipa, djeluje malo zapušteno.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trznica Podgorica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tržnica Podgorica'),
  4, 'Velik izbor proizvoda, posebno voće i povrće. Cijene korektne.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trznica Podgorica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tržnica Podgorica'),
  3, 'Solidno, ali zna biti gužva i nije uvijek sve svježe u popodnevnim satima.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trznica Podgorica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tržnica Podgorica'),
  5, 'Najbolja pijaca u gradu, uvijek nađem sve što mi treba.', NOW()),
 
  ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
@@ -5632,71 +5632,71 @@ VALUES
  
  ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
- 5, 'Prelepo mesto za setnju i opustanje, posebno uvece uz zalazak sunca.', NOW()),
+ 5, 'Prelepo mesto za šetnju i opuštanje, posebno uveče uz zalazak sunca.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
- 4, 'Lepa priroda i prijatna atmosfera, idealno za vikend izlet sa drustvom.', NOW()),
+ 4, 'Lepa priroda i prijatna atmosfera, idealno za vikend izlet sa društvom.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
- 5, 'Odlicno uredjeno setaliste, cisto i mirno, savrseno za beg od gradske guzve.', NOW()),
+ 5, 'Odlično uređeno šetalište, čisto i mirno, savršeno za beg od gradske gužve.', NOW()),
  
  
--- Klinicki centar Crne Gore
+-- Klinički centar Crne Gore
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinicki centar Crne Gore'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinički centar Crne Gore'),
  5, 'Brza reakcija i ljubazno osoblje, veoma profesionalno.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinicki centar Crne Gore'),
- 4, 'Dobra usluga, ali se ceka na pregled.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinički centar Crne Gore'),
+ 4, 'Dobra usluga, ali se čeka na pregled.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinicki centar Crne Gore'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinički centar Crne Gore'),
  3, 'Osoblje ok, ali organizacija bi mogla biti bolja.', NOW()),
  
- -- Opsta bolnica Nikšić
+ -- Opšta bolnica Nikšić
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Nikšić'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Nikšić'),
  4, 'Korektna usluga i doktori.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Nikšić'),
- 2, 'Predugo cekanje na pregled.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Nikšić'),
+ 2, 'Predugo čekanje na pregled.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Nikšić'),
- 5, 'Odlicna briga i profesionalnost.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Nikšić'),
+ 5, 'Odlična briga i profesionalnost.', NOW()),
 
--- Opsta bolnica Bar
+-- Opšta bolnica Bar
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Bar'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Bar'),
  4, 'Dobri uslovi i ljubazno osoblje.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Bar'),
- 3, 'Usluga solidna, ali guzva velika.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Bar'),
+ 3, 'Usluga solidna, ali gužva velika.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Bar'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Bar'),
  5, 'Veoma zadovoljna tretmanom.', NOW()),
 
--- Opsta bolnica Kotor
+-- Opšta bolnica Kotor
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Kotor'),
  5, 'Sve pohvale za medicinsko osoblje.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Kotor'),
  4, 'Dobra usluga, prijatno iskustvo.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Kotor'),
- 3, 'Moze bolje, ali nije lose.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Kotor'),
+ 3, 'Moze bolje, ali nije loše.', NOW()),
 
--- Opsta bolnica Danilo Prvi Cetinje
+-- Opšta bolnica Danilo Prvi Cetinje
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Danilo Prvi Cetinje'),
- 4, 'Doktori strucni i posveceni.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Danilo Prvi Cetinje'),
+ 4, 'Doktori stručni i posvećeni.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Danilo Prvi Cetinje'),
- 2, 'Dugo cekanje i losa organizacija.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Danilo Prvi Cetinje'),
+ 2, 'Dugo čekanje i loša organizacija.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Danilo Prvi Cetinje'),
- 5, 'Odlicno iskustvo, sve preporuke.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Danilo Prvi Cetinje'),
+ 5, 'Odlično iskustvo, sve preporuke.', NOW()),
 
 -- Dom zdravlja Tivat
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
@@ -5715,7 +5715,7 @@ VALUES
  4, 'Korektno i brzo.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Herceg Novi'),
- 2, 'Prevelika guzva.', NOW()),
+ 2, 'Prevelika gužva.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Herceg Novi'),
  5, 'Sve pohvale za osoblje.', NOW()),
@@ -5723,7 +5723,7 @@ VALUES
 -- Dom zdravlja Bar
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Bar'),
- 3, 'Ok, ali moze bolje.', NOW()),
+ 3, 'Ok, ali može bolje.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Bar'),
  4, 'Zadovoljna sam uslugom.', NOW()),
@@ -5737,7 +5737,7 @@ VALUES
  4, 'Malo mesto ali dobra usluga.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Plužine'),
- 3, 'Osnovne usluge, nista vise.', NOW()),
+ 3, 'Osnovne usluge, nista više.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Plužine'),
  5, 'Vrlo ljubazno osoblje.', NOW()),
@@ -5748,7 +5748,7 @@ VALUES
  4, 'Korektna usluga.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Plav'),
- 2, 'Dugo cekanje.', NOW()),
+ 2, 'Dugo čekanje.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Plav'),
  5, 'Sve preporuke, jako ljubazni.', NOW());
