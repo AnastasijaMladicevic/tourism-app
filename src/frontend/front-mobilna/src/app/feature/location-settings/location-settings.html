@@ -1,0 +1,50 @@
+<div class="settings-page">
+  <div class="settings-shell">
+
+    <header class="topbar">
+      <button class="back-btn" type="button" (click)="goBack()">
+        <mat-icon>arrow_back_ios_new</mat-icon>
+      </button>
+
+      <h1>{{ 'settings.locationSection' | translate }}</h1>
+
+      <div class="topbar-spacer"></div>
+    </header>
+
+    <section class="preference-section">
+      <div class="preference-card">
+        @if (showLocationConsentHint) {
+          <div class="consent-banner">
+            <div class="consent-banner__copy">
+              <strong>{{ 'settings.locationConsentTitle' | translate }}</strong>
+              <p>{{ 'settings.locationConsentBody' | translate }}</p>
+            </div>
+
+            <button type="button" class="consent-banner__dismiss" (click)="dismissLocationConsentHint()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <div class="preference-divider"></div>
+        }
+
+        <div class="preference-row">
+          <div class="preference-copy">
+            <span class="menu-title">{{ 'settings.locationTitle' | translate }}</span>
+            <p>{{ (locationEnabled ? 'settings.locationBodyOn' : 'settings.locationBodyOff') | translate }}</p>
+          </div>
+
+          <label class="switch" [class.switch--checked]="locationEnabled">
+            <input
+              type="checkbox"
+              [checked]="locationEnabled"
+              (change)="setLocationEnabled($any($event.target).checked)"
+            />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>

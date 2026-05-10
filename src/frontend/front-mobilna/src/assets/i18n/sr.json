@@ -1,720 +1,719 @@
-﻿{
-    "common":  {
-                   "back":  "Nazad",
-                   "loading":  "Učitavanje...",
-                   "save":  "Sačuvaj",
-                   "cancel":  "Otkaži",
-                   "remove":  "Ukloni",
-                   "close":  "Zatvori",
-                   "details":  "Detalji",
-                   "retry":  "Pokušaj ponovo",
-                   "notAvailable":  "Nije dostupno",
-                   "dateNotAvailable":  "Datum nije dostupan",
-                   "emailNotAvailable":  "Email nije dostupan",
-                   "savedOn":  "Sačuvano",
-                   "publishedOn":  "Objavljeno",
-                   "openNow":  "OTVORENO",
-                   "closed":  "ZATVORENO",
-                   "new":  "Novo",
-                   "reviews":  "recenzije",
-                   "reviewsTitle":  "Recenzije",
-                   "seeAll":  "Prikaži sve \u003e",
-                   "viewAll":  "Vidi sve \u003e",
-                   "gallery":  "Galerija",
-                   "location":  "Lokacija",
-                   "viewOnMap":  "Pogledaj na mapi",
-                   "bookNow":  "Rezerviši odmah",
-                   "addReview":  "Dodaj recenziju",
-                   "contactInfo":  "Kontakt informacije",
-                   "price":  "Cena",
-                   "startingFrom":  "Od",
-                   "about":  "O nama",
-                   "total":  "ukupno",
-                   "all": "Sve",
-                   "nearest": "Najbliže",
-                   "prev": "Prethodna",
-                   "next": "Sledeća",
-                   "pageOf": "Strana {{current}} od {{total}}"
-               },
-    "nav":  {
-                "home":  "Početna",
-                "map":  "Mapa",
-                "favorites":  "Favoriti",
-                "planner":  "Planer",
-                "profile":  "Profil"
-            },
-
-    "home": {
-        "greeting": "Zdravo, drago nam je što ste ponovo tu",
-        "searchPlaceholder": "Pitaj gde da ideš, šta da vidiš ili gde da jedeš...",
-        "chooseRegion": "Izaberi region",
-        "categories": "Kategorije",
-        "featuredDestination": "Izdvojena destinacija",
-        "explore": "Istraži",
-        "recommendedForYou": "Preporučeno za tebe",
-        "popularPlaces": "Popularna mesta",
-        "upcomingEvents": "Predstojeći događaji",
-        "seeAll": "Vidi sve",
-        "noRecommendations": "Nema preporuka za ovu pretragu.",
-        "categoriesList": {
-            "destination": "Destinacije",
-            "object": "Objekti",
-            "locality": "Lokaliteti",
-            "activity": "Aktivnosti",
-            "event": "Događaji"
-        }
+{
+  "common": {
+    "back": "Nazad",
+    "loading": "Učitavanje...",
+    "save": "Sačuvaj",
+    "cancel": "Otkaži",
+    "remove": "Ukloni",
+    "close": "Zatvori",
+    "details": "Detalji",
+    "retry": "Pokušaj ponovo",
+    "notAvailable": "Nije dostupno",
+    "dateNotAvailable": "Datum nije dostupan",
+    "emailNotAvailable": "Email nije dostupan",
+    "savedOn": "Sačuvano",
+    "publishedOn": "Objavljeno",
+    "openNow": "OTVORENO",
+    "closed": "ZATVORENO",
+    "new": "Novo",
+    "reviews": "recenzije",
+    "reviewsTitle": "Recenzije",
+    "seeAll": "Prikaži sve >",
+    "viewAll": "Vidi sve >",
+    "gallery": "Galerija",
+    "location": "Lokacija",
+    "viewOnMap": "Pogledaj na mapi",
+    "bookNow": "Rezerviši odmah",
+    "addReview": "Dodaj recenziju",
+    "contactInfo": "Kontakt informacije",
+    "price": "Cena",
+    "startingFrom": "Od",
+    "about": "O nama",
+    "total": "ukupno",
+    "all": "Sve",
+    "nearest": "Najbliže",
+    "prev": "Prethodna",
+    "next": "Sledeća",
+    "pageOf": "Strana {{current}} od {{total}}"
+  },
+  "nav": {
+    "home": "Početna",
+    "map": "Mapa",
+    "favorites": "Favoriti",
+    "planner": "Planer",
+    "profile": "Profil"
+  },
+  "home": {
+    "greeting": "Zdravo, drago nam je što ste ponovo tu",
+    "searchPlaceholder": "Pitaj gde da ideš, šta da vidiš ili gde da jedeš...",
+    "chooseRegion": "Izaberi region",
+    "categories": "Kategorije",
+    "featuredDestination": "Izdvojena destinacija",
+    "explore": "Istraži",
+    "recommendedForYou": "Preporučeno za tebe",
+    "popularPlaces": "Popularna mesta",
+    "upcomingEvents": "Predstojeći događaji",
+    "seeAll": "Vidi sve",
+    "noRecommendations": "Nema preporuka za ovu pretragu.",
+    "categoriesList": {
+      "destination": "Destinacije",
+      "object": "Objekti",
+      "locality": "Lokaliteti",
+      "activity": "Aktivnosti",
+      "event": "Događaji"
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "edit": "Uredi",
+    "activeAccount": "Aktivan nalog",
+    "defaultUser": "SpireGO korisnik",
+    "stats": {
+      "favorites": "FAVORITI",
+      "plans": "Planovi",
+      "reviews": "RECENZIJE"
     },
-
-    "profile":  {
-                    "title":  "Profil",
-                    "edit":  "Uredi",
-                    "activeAccount":  "Aktivan nalog",
-                    "defaultUser":  "SpireGO korisnik",
-                    "stats":  {
-                                  "favorites":  "FAVORITI",
-                                  "plans":  "Planovi",
-                                  "reviews":  "RECENZIJE"
-                              },
-                    "section":  {
-                                    "trips":  "MOJA PUTOVANJA",
-                                    "settings":  "PODEŠAVANJA",
-                                    "account":  "NALOG"
-                                },
-                    "favorites":  "Favoriti",
-                    "myReviews":  "Moje recenzije",
-                    "language":  "Jezik",
-                    "region":  "Region",
-                    "support":  "Pomoć i podrška",
-                    "privacy":  "Privatnost i podaci",
-                    "terms":  "Uslovi koriscenja",
-                    "moderator":  "Zatraži dozvolu za moderatora",
-                    "about":  "O nama",
-                    "logout":  "Odjavi se"
-                },
-    "settings": {
-        "title": "Podešavanja",
-        "locationSection": "Lokacija",
-        "locationTitle": "Uključi lokaciju",
-        "locationBodyOn": "Lokacija je uključena i aplikacija može da koristi tvoju trenutnu poziciju za preporuke i sadržaj u blizini.",
-        "locationBodyOff": "Lokacija je isključena. Uključi je ako želiš preciznije preporuke i lakše pronalaženje mesta u blizini.",
-        "locationConsentTitle": "Uključi praćenje lokacije za GPS na mapi",
-        "locationConsentBody": "Da bi GPS na mapi radio, potrebno je da ovde potvrdiš saglasnost za praćenje lokacije. Nakon toga aplikacija može da koristi tvoju trenutnu poziciju za navigaciju i mesta u blizini.",
-        "notificationsSection": "Obaveštenja",
-        "notificationsTitle": "Uključi obaveštenja",
-        "notificationsBodyOn": "Stizaće ti samo obaveštenja koja su uključena, a možeš i da biraš kako će se prikazivati.",
-        "notificationsBodyOff": "Sva obaveštenja su trenutno utišana i neće ti se prikazivati u aplikaciji.",
-        "deliveryTitle": "Način prikaza",
-        "deliveryBody": "Izaberi da li želiš kratku traku na vrhu ekrana ili samo listu obaveštenja.",
-        "deliveryBannerTitle": "Traka na vrhu",
-        "deliveryBannerBody": "Svako novo obaveštenje kratko se prikazuje oko 4 sekunde.",
-        "deliveryInboxTitle": "Samo u obaveštenjima",
-        "deliveryInboxBody": "Nova obaveštenja ostaju samo u listi bez iskačuće trake.",
-        "generalSection": "Opšta podešavanja",
-        "liveBadge": "Novo obaveštenje",
-        "openNotifications": "Otvori",
-        "menu": {
-            "editProfile": "Izmeni profil",
-            "language": "Jezik",
-            "region": "Region",
-            "support": "Pomoć i podrška",
-            "privacy": "Privatnost i podaci",
-            "terms": "Uslovi korišćenja",
-            "about": "O aplikaciji",
-            "appearance": "Izgled"
-        },
-        "notificationGroups": {
-            "travel": "Putovanja i favoriti",
-            "reviews": "Recenzije",
-            "creator": "Sadržaj koji objavljuješ",
-            "manager": "Menadžerska obrada",
-            "admin": "Administracija"
-        },
-        "notificationTypes": {
-            "favoritedLocationNewEvent": {
-                "title": "Novi događaj u omiljenoj destinaciji",
-                "body": "Obavesti me kada se pojavi novi događaj u destinaciji ili lokalitetu koji sam sačuvala."
-            },
-            "plannerEventReminder2Hours": {
-                "title": "Podsetnik 2 sata pre događaja",
-                "body": "Pošalji mi kratki podsetnik kada se događaj iz planera približava."
-            },
-            "plannerEventUpdated": {
-                "title": "Promena događaja u planeru",
-                "body": "Obavesti me kada se promene datum, vreme, cena ili lokacija događaja koji sam dodala u planer."
-            },
-            "plannerEventUnavailable": {
-                "title": "Događaj iz planera više nije dostupan",
-                "body": "Obavesti me kada se događaj otkaže, deaktivira ili više ne može da se prati."
-            },
-            "reviewReply": {
-                "title": "Odgovor na moju recenziju",
-                "body": "Obavesti me kada content creator prvi put odgovori na recenziju koju sam ostavila."
-            },
-            "reviewReplyUpdated": {
-                "title": "Izmena odgovora na moju recenziju",
-                "body": "Obavesti me kada content creator izmeni svoj odgovor na recenziju koju sam ostavila."
-            },
-            "creatorContentReviewed": {
-                "title": "Moj sadržaj je odobren ili odbijen",
-                "body": "Obavesti me kada admin ili menadžer pregleda moj objekat, događaj ili aktivnost."
-            },
-            "creatorNewObjectReview": {
-                "title": "Nova recenzija na mom objektu",
-                "body": "Obavesti me kada turista ostavi novu recenziju na objektu koji sam kreirala."
-            },
-            "creatorDeletionRequestReviewed": {
-                "title": "Rešen zahtev za brisanje sadržaja",
-                "body": "Obavesti me kada moj zahtev za brisanje bude odobren ili odbijen."
-            },
-            "creatorObjectReviewDeleted": {
-                "title": "Recenzija na mom objektu je obrisana",
-                "body": "Obavesti me kada neka recenzija sa mog objekta bude uklonjena iz sistema."
-            },
-            "managerNewPendingContent": {
-                "title": "Novi pending sadržaj u mojoj destinaciji",
-                "body": "Obavesti me kada stigne novi objekat, događaj ili aktivnost za pregled."
-            },
-            "managerNewDeletionRequest": {
-                "title": "Novi zahtev za brisanje u mojoj destinaciji",
-                "body": "Obavesti me kada content creator pošalje zahtev za brisanje sadržaja koji pripada mojoj destinaciji."
-            },
-            "managerReportReviewed": {
-                "title": "Admin je rešio moju prijavu",
-                "body": "Obavesti me kada admin odobri ili odbije prijavu koju sam poslala."
-            },
-            "adminNewCreatorRoleRequest": {
-                "title": "Novi zahtev za Content Creator ulogu",
-                "body": "Obavesti me kada stigne novi zahtev korisnika za dodatnu ulogu."
-            },
-            "adminNewManagerReport": {
-                "title": "Nova ManagerReport prijava",
-                "body": "Obavesti me kada menadžer pošalje novu prijavu protiv content creatora."
-            },
-            "adminRepeatedManagerReports": {
-                "title": "Više prijava za istog content creatora",
-                "body": "Obavesti me kada isti content creator sakupi više menadžerskih prijava."
-            },
-            "adminCreatorMultipleRejectedContent": {
-                "title": "Više odbijenih sadržaja istog kreatora",
-                "body": "Obavesti me kada isti content creator dobije više odbijenih sadržaja."
-            }
-        }
+    "section": {
+      "trips": "MOJA PUTOVANJA",
+      "settings": "PODEŠAVANJA",
+      "account": "NALOG"
     },
-    "region":  {
-                   "title":  "Region",
-                   "available":  "Dostupni regioni",
-                   "infoTitle":  "Promena regiona se primenjuje odmah",
-                   "infoBody":  "Nakon čuvanja, kompletan mobilni interfejs će odmah biti prikazan na izabranom regionu.",
-                   "montenegro":  "Crna Gora",
-                   "spain":  "Španija",
-                   "defaultBadge":  "Podrazumevano",
-                   "active":  "Region je već aktivan.",
-                   "saved":  "Region je uspešno ažuriran.",
-                   "saveFailed":  "Promena regiona nije sačuvana.",
-                   "loadFailed":  "Regioni trenutno nisu dostupni.",
-                   "noneAvailable":  "Nema dostupnih regiona.",
-                   "apply":  "Primeni region",
-                   "confirm":  "Klikom na dugme potvrđujete promenu regiona aplikacije na {{language}}."
-               },
-    "language":  {
-                     "title":  "Jezik",
-                     "available":  "Dostupni jezici",
-                     "infoTitle":  "Promena jezika se primenjuje odmah",
-                     "infoBody":  "Nakon čuvanja, mobilni interfejs će odmah biti prikazan na izabranom jeziku.",
-                     "active":  "Jezik je vec aktivan.",
-                     "saveFailed":  "Promena jezika nije sačuvana.",
-                     "saved":  "Jezik je uspešno azuriran.",
-                     "saving":  "Čuvanje...",
-                     "apply":  "Primeni jezik",
-                     "confirm":  "Klikom na dugme potvrđujete promenu jezika aplikacije na {{language}}.",
-                     "serbianMontenegrin":  "Srpski/Crnogorski",
-                     "english":  "Engleski",
-                     "spanish":  "Španski",
-                     "italian":  "Italijanski"
-                 },
-    "favorites":  {
-                      "heroEyebrow":  "FAVORITI",
-                      "heroTitle":  "Tvoje omiljene stavke su na jednom mestu.",
-                      "heroBody":  "Pregledaj sve što si dodao u favorite i brzo ukloni stavke koje više ne želiš da čuvaš.",
-                      "loadError":  "Favoriti trenutno nisu dostupni.",
-                      "removeError":  "Favorit nije uklonjen. Pokušaj ponovo.",
-                      "loadingBody":  "Pripremamo tvoje favorite.",
-                      "emptyTitle":  "Još nemas favorita",
-                      "emptyBody":  "Kada dodaš destinaciju ili objekat u favorite, ovde će se pojaviti.",
-                      "removing":  "Uklanjanje...",
-                      "type":  {
-                                   "default":  "Favorit",
-                                   "destination":  "Destinacija",
-                                   "object":  "Objekat",
-                                   "activity":  "Aktivnost",
-                                   "route":  "Ruta",
-                                   "locality":  "Mesto"
-                               },
-                      "fallbackTitle":  "Favorit #{{id}}",
-                      "plannerBannerBody":  "Sačuvane eventove lako pretvori u raspored putovanja.",
-                      "allSaved":  "Sve sačuvano",
-                      "removeConfirmFooter":  "\"{{title}}\" možeš ponovo dodati kad god poželiš.",
-                      "latestEmpty":  "Nema skoro sacuvanih stavki.",
-                      "heroBodyModern":  "Brzo pregledaj sve što si sačuvala, otvori detalje i prebaci inspiraciju u planer.",
-                      "loadingTitle":  "Učitavamo favorite",
-                      "readyTitle":  "Spremna za sledeći korak?",
-                      "screenTitle":  "Favoriti",
-                      "plannerBannerTitle":  "Nastavi planiranje",
-                      "plannerEventsOnly":  "Dogadjaji iz favorita se dodaju kroz planer.",
-                      "totalFavorites":  "{{count}} sačuvanih stavki",
-                      "openDetails":  "Otvori detalje",
-                      "smartRoutes":  "Pametni predlozi i pregled dana",
-                      "summaryTitle":  "Pregled favorita",
-                      "searchPlaceholder":  "Pretraži sačuvana mesta...",
-                      "goToPlanner":  "Idi u planer",
-                      "readyBody":  "Otvorene favorite pretvori u konkretan plan dana i raspored dogadjaja.",
-                      "emptyBodyModern":  "Dodaj destinacije, objekte, aktivnosti ili lokalitete i ovde ćeš ih videti na jednom mestu.",
-                      "emptyTitleModern":  "Jos nemaš sačuvanih favorita",
-                      "recentTitle":  "Poslednje sačuvano",
-                      "heroTitleModern":  "Tvoja omiljena mesta su spremna za sledeci plan.",
-                      "removeConfirmTitle":  "Ukloni iz favorita",
-                      "loadingBodyModern":  "Pripremamo sačuvane stavke i najskorije uspomene.",
-                      "removeConfirmBody":  "Da li želiš da ukloniš \"{{title}}\" iz favorita?",
-                      "footerShowingAll":  "Prikazano {{count}} sačuvanih stavki",
-                      "panelEmpty":  "Još nema dovoljno podataka za pregled.",
-                      "routeLabel":  "Ruta",
-                      "addedOneDayAgo":  "Dodato pre 1 dana",
-                      "savedItemsCount":  "{{count}} sačuvanih stavki",
-                      "routeQuote":  "Sačuvana ruta čeka sledeće putovanje.",
-                      "activityDurationQuote":  "{{count}} min iskustvo sačuvano za kasnije.",
-                      "addedOneWeekAgo":  "Dodato pre 1 nedelju",
-                      "sortDateAdded":  "Najskorije dodato",
-                      "addedWeeksAgo":  "Dodato pre {{count}} nedelje",
-                      "fallbackQuote":  "Sacuvano za kasnije.",
-                      "savedItemCount":  "{{count}} sačuvana stavka",
-                      "savedItemLabel":  "Sačuvano mesto",
-                      "locationFallback":  "Lokacija nije dostupna",
-                      "addedToday":  "Dodato danas",
-                      "savedRecently":  "Sačuvano skoro",
-                      "routeLocation":  "Planirana ruta",
-                      "sortName":  "Po nazivu",
-                      "addedDaysAgo":  "Dodato pre {{count}} dana",
-                      "mustSee":  "Top izbor",
-                      "breakdown":  {
-                                        "destination":  "Destinacije",
-                                        "object":  "Objekti",
-                                        "activity":  "Aktivnosti",
-                                        "locality":  "Lokaliteti",
-                                        "route":  "Rute"
-                                    }
-                  },
-    "reviews":  {
-                    "title":  "Moje recenzije",
-                    "heroEyebrow":  "TVOJ UTISAK",
-                    "heroTitle":  "Sve recenzije koje si ostavio nalaze se ovde.",
-                    "heroBody":  "Pregledaj šta si ocenio, kada je komentar ostavljen i da li postoji odgovor.",
-                    "loadError":  "Tvoje recenzije trenutno nisu dostupne.",
-                    "loadingBody":  "Pripremamo tvoje recenzije.",
-                    "emptyTitle":  "Još nemas recenzija",
-                    "emptyBody":  "Kada ostaviš komentar na objekat ili destinaciju, ovde ćeš ga videti.",
-                    "objectFallback":  "Objekat bez naziva",
-                    "textFallback":  "Recenzija nema dodatni komentar.",
-                    "statusFallback":  "Bez statusa",
-                    "ratingAria":  "Ocena {{rating}}",
-                    "creatorResponse":  "Odgovor kreatora"
-                },
-    "moderator":  {
-                      "title":  "Pristup moderatoru",
-                      "eyebrow":  "POSEBNA ULOGA",
-                      "heroTitle":  "Pošaljite zahtev za pristup moderatorskim opcijama",
-                      "heroBody":  "Ako želite veću ulogu u održavanju kvaliteta sadržaja, ovde možete poslati zahtev koji administracija naknadno proverava i odobrava.",
-                      "currentStatus":  "Trenutni status",
-                      "currentRole":  "Vaša aktivna uloga: {{role}}",
-                      "whatYouGet":  "Šta dobijate",
-                      "requirements":  "Uslovi za prijavu",
-                      "sendRequestTitle":  "Pošaljite zahtev",
-                      "sendRequestBody":  "Klikom na dugme šaljete zahtev timu za proveru. Nakon obrade, pristup će biti odobren ili odbijen u skladu sa pravilima platforme.",
-                      "submitting":  "Slanje zahteva...",
-                      "sendRequest":  "Pošalji zahtev",
-                      "requestFailed":  "Zahtev trenutno nije moguće poslati.",
-                      "requestSent":  "Zahtev za pristup moderatoru je uspešno poslat.",
-                      "role":  {
-                                   "tourist":  "Turista",
-                                   "moderator":  "Moderator",
-                                   "admin":  "Administrator",
-                                   "manager":  "Menadžer"
-                               },
-                      "badge":  {
-                                    "approved":  "Pristup odobren",
-                                    "activeRole":  "Posebna uloga aktivna",
-                                    "available":  "Zahtev dostupan"
-                                },
-                      "req":  {
-                                  "1":  "Nalog treba da bude aktivan i uredno korišćen.",
-                                  "2":  "Poželjno je da imate iskustva sa prijavama sadržaja i pravilima zajednice.",
-                                  "3":  "Nakon prijave, administracija proverava zahtev i status naloga."
-                              },
-                      "resp":  {
-                                   "1":  "Pregled prijavljenog sadržaja i osnovna moderacija objava.",
-                                   "2":  "Brza komunikacija sa podrškom kada je potrebno reagovati.",
-                                   "3":  "Doprinos kvalitetu i sigurnosti sadržaja unutar aplikacije."
-                               }
-                  },
-    "editProfile":  {
-                        "title":  "Izmeni profil",
-                        "photoAlt":  "Profilna fotografija",
-                        "changePhoto":  "Promeni fotografiju",
-                        "removePhoto":  "Ukloni fotografiju",
-                        "firstName":  "Ime",
-                        "lastName":  "Prezime",
-                        "country":  "Država",
-                        "email":  "Email adresa",
-                        "phone":  "Broj telefona",
-                        "interests":  "Tvoja interesovanja",
-                        "selectedCount":  "Izabrano: {{count}}",
-                        "appLanguage":  "Jezik aplikacije",
-                        "currentLanguage":  "Trenutno: {{language}}",
-                        "changePassword":  "Promeni šifru",
-                        "changePasswordBody":  "Ažuriraj lozinku svog naloga",
-                        "saving":  "Čuvanje...",
-                        "saveChanges":  "Sačuvaj promene",
-                        "cancelChanges":  "Otkaži izmene",
-                        "refreshFallback":  "Profil nije osvežen sa servera. Prikazani su lokalni podaci.",
-                        "saveFailed":  "Promene nisu sačuvane.",
-                        "saved":  "Promene su uspešno sacuvane.",
-                        "photoRemoveFailed":  "Fotografija nije uklonjena.",
-                        "photoRemoved":  "Fotografija je uklonjena.",
-                        "photoFormats":  "Dozvoljeni formati su PNG, JPG i WEBP.",
-                        "photoSize":  "Fotografija ne sme biti veća od 5MB.",
-                        "photoSaveFailed":  "Fotografija nije sačuvana.",
-                        "photoSaved":  "Fotografija je uspešno azurirana.",
-                        "languageSelected":  "Izabran je jezik: {{language}}.",
-                        "nameError":  "Ime mora imati najmanje 2 karaktera.",
-                        "lastNameError":  "Prezime mora imati najmanje 2 karaktera.",
-                        "countryError":  "Država moze imati najvise 40 karaktera.",
-                        "phoneError":  "Telefon unesi u formatu +382 67 000 000 ili slicno.",
-                        "validationError":  "Proveri označena polja pre cuvanja.",
-                        "interest":  {
-                                         "beaches":  "Plaže",
-                                         "hiking":  "Planinarenje",
-                                         "history":  "Istorija",
-                                         "gastronomy":  "Gastronomija",
-                                         "nightlife":  "Noćni zivot",
-                                         "culture":  "Kultura",
-                                         "parks":  "Nacionalni parkovi"
-                                     }
-                    },
-    "support": {
-            "title": "Pomoć i podrška",
-            "heroTitle": "Tu smo da vam pomognemo",
-            "searchAria": "Pretraga pitanja",
-            "searchPlaceholder": "Pretraži često postavljana pitanja...",
-            "faqTitle": "Često postavljana pitanja",
-            "contactTitle": "Direktan kontakt",
-            "contactUsers": "Podrška korisnicima",
-            "contactUsersBody": "Pozovite nas ukoliko vam je potrebna pomoć u vezi naloga, podešavanja ili korišćenja aplikacije.",
-            "reportProblem": "Prijavi problem",
-            "reportProblemBody": "Pošaljite nam opis problema kako bismo mogli što brže da proverimo i pomognemo.",
-            "hoursTitle": "Radno vreme podrške",
-            "weekdays": "Ponedeljak - Petak",
-            "weekend": "Subota - Nedelja",
-            "chatNote": "* Prosečno vreme odgovora na poruku je manje od 5 minuta.",
-            "ticketNote": "* Odgovori na prijave problema stižu u roku od 24h.",
-            "aiTitle": "AI turistički asistent",
-            "aiFloatingTitle": "Pitajte SpireGO AI",
-            "aiFloatingShort": "AI vodič",
-            "aiFloatingOpen": "Otvori SpireGO AI asistenta",
-            "aiFloatingBody": "Brzo pitajte za mesta, hranu, događaje i ideje za obilazak.",
-            "aiFloatingWelcomeTitle": "Kako mogu da pomognem?",
-            "aiFloatingSupportHint": "AI asistent je sada dostupan preko plutajućeg dugmeta dole desno na svakom ekranu.",
-            "aiBody": "Postavite pitanje prirodnim jezikom i asistent će vam pomoći da pronađete destinacije, restorane, hotele, događaje ili aktivnosti koje odgovaraju vašim interesovanjima.",
-            "aiPlaceholder": "Na primer: gde mogu da idem sa decom u šetnju?",
-            "aiSend": "Pošalji pitanje",
-            "aiThinking": "AI upravo traži najbolje predloge...",
-            "aiEmpty": "Još nema poruka. Probajte da pitate za restoran, hotel, šetnju ili događaj.",
-            "aiError": "AI odgovor trenutno nije dostupan. Pokušajte ponovo za nekoliko sekundi.",
-            "aiPromptWalk": "Šetnja sa decom",
-            "aiPromptLunch": "Restoran za ručak",
-            "aiPromptHotel": "Hotel sa bazenom",
-            "faq": {
-                "1": {
-                "q": "Kako da ažuriram podatke na profilu?",
-                "a": "Podatke možete izmeniti na ekranu Profil u delu Izmeni profil ili na ekranu Podešavanja u delu Izmeni profil. Tu možete promeniti ime, prezime, telefon, državu, profilnu fotografiju, kao i svoju lozinku."
-                },
-                "2": {
-                "q": "Gde mogu da vidim omiljene stavke?",
-                "a": "Omiljene destinacije, objekti i drugi sačuvani sadržaji nalaze se na ekranu Favoriti, gde ih možete pregledati ili ukloniti."
-                },
-                "3": {
-                "q": "Kako radi planer putovanja?",
-                "a": "Planer vam omogućava da sačuvate događaje na koje želite da odete tokom putovanja i podseti vas na njih."
-                },
-                "4": {
-                "q": "Kako da promenim jezik aplikacije?",
-                "a": "Jezik aplikacije možete promeniti na ekranu Podešavanja u delu Jezik. Nakon izbora jezika, promena će se odmah prikazati u aplikaciji."
-                }
-            }
-            },
-    "notifications": {
-        "title": "Obaveštenja",
-        "markAll": "Označi kao pročitano",
-        "deleteRead": "Obriši pročitana",
-        "deleteSingle": "Obriši obaveštenje",
-        "emptyTitle": "Nema obaveštenja",
-        "emptyBody": "Sve je pročitano."
+    "favorites": "Favoriti",
+    "myReviews": "Moje recenzije",
+    "language": "Jezik",
+    "region": "Region",
+    "support": "Pomoć i podrška",
+    "privacy": "Privatnost i podaci",
+    "terms": "Uslovi koriscenja",
+    "moderator": "Zatraži dozvolu za moderatora",
+    "about": "O nama",
+    "logout": "Odjavi se"
+  },
+  "settings": {
+    "title": "Podešavanja",
+    "locationSection": "Lokacija",
+    "locationTitle": "Uključi lokaciju",
+    "locationBodyOn": "Lokacija je uključena i aplikacija može da koristi tvoju trenutnu poziciju za preporuke i sadržaj u blizini.",
+    "locationBodyOff": "Lokacija je isključena. Uključi je ako želiš preciznije preporuke i lakše pronalaženje mesta u blizini.",
+    "locationConsentTitle": "Uključi praćenje lokacije za GPS na mapi",
+    "locationConsentBody": "Da bi GPS na mapi radio, potrebno je da ovde potvrdiš saglasnost za praćenje lokacije. Nakon toga aplikacija može da koristi tvoju trenutnu poziciju za navigaciju i mesta u blizini.",
+    "notificationsSection": "Obaveštenja",
+    "notificationsTitle": "Uključi obaveštenja",
+    "notificationsBodyOn": "Stizaće ti samo obaveštenja koja su uključena, a možeš i da biraš kako će se prikazivati.",
+    "notificationsBodyOff": "Sva obaveštenja su trenutno utišana i neće ti se prikazivati u aplikaciji.",
+    "deliveryTitle": "Način prikaza",
+    "deliveryBody": "Izaberi da li želiš kratku traku na vrhu ekrana ili samo listu obaveštenja.",
+    "deliveryBannerTitle": "Traka na vrhu",
+    "deliveryBannerBody": "Svako novo obaveštenje kratko se prikazuje oko 4 sekunde.",
+    "deliveryInboxTitle": "Samo u obaveštenjima",
+    "deliveryInboxBody": "Nova obaveštenja ostaju samo u listi bez iskačuće trake.",
+    "generalSection": "Opšta podešavanja",
+    "liveBadge": "Novo obaveštenje",
+    "openNotifications": "Otvori",
+    "menu": {
+      "editProfile": "Izmeni profil",
+      "language": "Jezik",
+      "region": "Region",
+      "support": "Pomoć i podrška",
+      "privacy": "Privatnost i podaci",
+      "terms": "Uslovi korišćenja",
+      "about": "O aplikaciji",
+      "appearance": "Izgled",
+      "notifications": "Obaveštenja",
+      "location": "Lokacija"
     },
-    "about":  {
-                  "supportTitle":  "Informacije i podrška",
-                  "quote":  "\"Naša misija je da svakom putniku pružimo autentična iskustva i olakšamo otkrivanje najlepših destinacija širom sveta.\"",
-                  "privacy":  "Politika privatnosti",
-                  "privacyBody":  "Kako štitimo vaše podatke",
-                  "terms":  "Uslovi korišćenja",
-                  "termsBody":  "Pravila korišćenja aplikacije",
-                  "contact":  "Kontaktirajte nas",
-                  "contactBody":  "Pitanja, sugestije ili problemi",
-                  "footerMade":  "Napravljeno sa srcem u Crnoj Gori",
-                  "footerRights":  "Sva prava zadržana."
-              },
-    "privacy":  {
-                    "title":  "Privatnost i podaci",
-                    "eyebrow":  "TRANSPARENTNO",
-                    "heroTitle":  "Kako SpireGO koristi vaše podatke",
-                    "heroBody":  "Vaša privatnost i bezbednost podataka su nam važni. Na ovoj stranici možete saznati koje informacije aplikacija prikazuje, kako se koriste i na koji način pomažu u unapređenju vašeg iskustva putovanja.",
-                    "notesTitle":  "Bitne napomene",
-                    "section":  {
-                                    "1":  {
-                                              "title":  "Podaci naloga",
-                                              "body":  "SpireGO može prikazivati osnovne informacije vašeg naloga kao što su ime, email adresa, profilna fotografija i podešavanja profila, kako bismo personalizovali vaše iskustvo u aplikaciji."
-                                          },
-                                    "2":  {
-                                              "title":  "Lokalno sačuvani podaci",
-                                              "body":  "Određeni podaci, poput planova putovanja, omiljenih destinacija ili podešavanja aplikacije, mogu biti privremeno sačuvani na vašem uređaju radi bržeg i jednostavnijeg korišćenja aplikacije."
-                                          },
-                                    "3":  {
-                                              "title":  "Kako nas kontaktirati",
-                                              "body":  "Određeni podaci, poput planova putovanja, omiljenih destinacija ili podešavanja aplikacije, mogu biti privremeno sačuvani na vašem uređaju radi bržeg i jednostavnijeg korišćenja aplikacije."
-                                          }
-                                },
-                    "note":  {
-                                 "1":  "Vaši podaci koriste se isključivo za funkcionalnosti aplikacije i unapređenje korisničkog iskustva.",
-                                 "2":  "Trudimo se da informacije budu zaštićene i dostupne samo vama.",
-                                 "3":  "Neke funkcionalnosti mogu zahtevati dodatnu potvrdu identiteta radi bezbednosti naloga."
-                             }
-                },
-        "terms": {
-            "title": "Uslovi korišćenja",
-            "eyebrow": "USLOVI KORIŠĆENJA",
-            "heroTitle": "Pravila i smernice za korišćenje aplikacije.",
-            "heroBody": "Korišćenjem aplikacije SpireGO prihvatate osnovna pravila korišćenja, zaštite podataka i odgovornog korišćenja dostupnih funkcionalnosti.",
-            "notesTitle": "Važne napomene",
-            "section": {
-                "1": {
-                "title": "Korišćenje aplikacije",
-                "body": "SpireGO omogućava pregled destinacija, objekata, događaja, favorita i personalizovanih sadržaja. Korisnik je odgovoran za tačnost informacija koje unosi i koristi u okviru svog naloga."
-                },
-                "2": {
-                "title": "Sadržaj i informacije",
-                "body": "Trudimo se da informacije u aplikaciji budu tačne i ažurne, ali dostupnost sadržaja može zavisiti od spoljašnjih servisa i izvora podataka. Pojedine informacije mogu biti promenjene ili privremeno nedostupne."
-                },
-                "3": {
-                "title": "Nalog i bezbednost",
-                "body": "Korisnik je odgovoran za bezbednost svog naloga i poverljivost pristupnih podataka. Preporučujemo korišćenje sigurnih lozinki i redovno ažuriranje podataka naloga."
-                }
-            },
-            "note": {
-                "1": "Favoriti, recenzije i podešavanja povezani su sa vašim korisničkim nalogom.",
-                "2": "Određeni podaci mogu biti privremeno sačuvani lokalno na uređaju radi boljeg korisničkog iskustva.",
-                "3": "Korišćenjem aplikacije prihvatate buduća unapređenja i izmene funkcionalnosti sistema."
-            }
-            },
-    "map":  {
-                "searchPlaceholder":  "Pretraži objekte, rute...",
-                "geoUnsupported":  "Geolokacija nije podržana u ovom browseru.",
-                "geoDenied":  "Dozvolite pristup lokaciji u podešavanjima browsera.",
-                "geoUnavailable":  "Lokacija trenutno nije dostupna.",
-                "geoFailed":  "Nije moguće dobiti Vašu lokaciju.",
-                "useMyLocation": "Koristi moju lokaciju",
-                "locationLoading": "Tražimo lokaciju...",
-                "locationConsentTitle": "Uključi lokaciju da bi GPS radio",
-                "locationConsentBody": "Praćenje lokacije trenutno nije uključeno. Klikni ispod i otvori podešavanja da uključiš saglasnost za praćenje lokacije.",
-                "locationConsentAction": "Klikni ovde"
-            },
-    "event":  {
-                  "title":  "Dogadjaj",
-                  "loadingError":  "Greška pri učitavanju dogadjaja.",
-                  "addedToPlanner":  "Dogadjaj je dodat u Planner",
-                  "free":  "Besplatno",
-                  "buyTicket":  "Kupi kartu",
-                  "ticketAlert":  "Kupovina karte - Cena: {{price}}",
-                  "addToPlanner":  "Dodaj u Planner",
-                  "about":  "O događaju",
-                  "descriptionFallback":  "Opis nije dostupan.",
-                  "availableTickets":  "Dostupne ulaznice",
-                  "standardTicket":  "Standardna ulaznica",
-                  "select":  "Odaberi",
-                  "amenities": "Sadržaji",
-                  "nearbyTitle": "Obližnji događaji",
-                  "noNearby": "Nema drugih objekata u istoj lokaciji.",
-                  "nearbyEmpty": "Nema drugih događaja u blizini.",
-                  "listTitle": "Događaji",
-                  "searchPlaceholder": "Pretraži događaje...",
-                  "foundCount": "{{count}} pronađenih događaja",
-                  "empty": "Nema pronađenih događaja.",
-                  "nature": "Priroda"
-
-              },
-    "object":  {
-                   "titleFallback":  "Objekat",
-                   "loadingError":  "Greška pri učitavanju objekta.",
-                   "about":  "O {{name}}u",
-                   "amenitiesSoon":  "Sadržaji će biti dostupni uskoro.",
-                   "writeReviewSoon":  "Forma za novu recenziju je još u izradi.",
-                   "workingHoursMissing":  "Radno vreme nije navedeno",
-                   "nearbyNone":  "Nema drugih {{name}}a u istoj lokaciji.",
-                   "allReviews":  "Sve recenzije",
-                   "totalReviews":  "{{count}} recenzija",
-                   "amenities": "Sadržaji",
-                   "nearbyTitle": "Obližnji {{name}}",
-                   "nearbyEmpty": "Nema drugih {{name}}a u istoj lokaciji.",
-                   "writeReview": "Napiši recenziju",
-                   "reviewPlaceholder": "Kakvo je bilo Vaše iskustvo? Šta biste preporučili drugim putnicima?",
-                   "addPhotos": "Dodaj fotografije (max 5)",
-                   "photos": "slika",
-                   "sending": "Šaljem...",
-                   "submitReview": "Pošalji recenziju",
-                   "listTitle": "Objekti",
-                   "searchPlaceholder": "Pretraži objekte...",
-                   "foundCount": "{{count}} pronađenih objekata",
-                   "empty": "Nema pronađenih objekata.",
-                   "open": "Otvoreno",
-                   "loadError": "Neuspešno učitavanje objekata."
-               },
-    "restaurant":  {
-                       "title":  "Restoran",
-                       "loadingError":  "Greška pri učitavanju restorana.",
-                       "about":  "O restoranu",
-                       "writeReviewSoon":  "Forma za novu recenziju je još u izradi."
-                   },
-    "hotel":  {
-                  "loadingError":  "Greška pri učitavanju hotela.",
-                  "bookingSoon":  "Booking sistem će biti integrisan kasnije.",
-                  "addedToPlanner":  "Hotel je dodat u Planner",
-                  "phoneMissing":  "Broj telefona nije dostupan",
-                  "galleryEmpty":  "Nema dostupnih slika",
-                  "reviewTitle":  "Recenzije",
-                  "showLess":  "Prikaži manje \u003e",
-                  "reviewAria":  "Ocena recenzije",
-                  "responseLabel":  "Odgovor hotela",
-                  "reviewsPending":  "Recenzije će biti prikazane kada stignu sa backenda.",
-                  "nearbyTitle":  "Obližnji hoteli",
-                  "nearbyEmpty":  "Nema drugih hotela u istoj lokaciji.",
-                  "visitWebsite":  "Poseti sajt",
-                  "aboutTitle":  "O hotelu",
-                  "aboutFallback":  "Detaljnije informacije o ovom hotelu biće prikazane ovde.",
-                  "locationMontenegro":  "Crna Gora"
-              },
-    "time":  {
-                 "today":  "DANAS",
-                 "dayAgo":  "PRE 1 DAN",
-                 "daysAgo":  "PRE {{count}} DANA",
-                 "weekAgo":  "PRE 1 NEDELJU",
-                 "weeksAgo":  "PRE {{count}} NEDELJE",
-                 "monthAgo":  "PRE 1 MESEC",
-                 "monthsAgo":  "PRE {{count}} MESECI",
-                 "yearAgo":  "PRE 1 GODINU",
-                 "yearsAgo":  "PRE {{count}} GODINA"
-             },
-    "planner":  {
-                    "addEventCta":  "Dodaj event",
-                    "quotePlanned":  "Planirano za lokalitet {{name}}.",
-                    "tripEventWeekSuffix":  "{{name}} plan",
-                    "tripDateFallback":  "Datumi još nisu definisani",
-                    "savedNav":  "Favoriti",
-                    "browseEvents":  "Pregledaj događaje",
-                    "quoteHosted":  "Događaj se održava u objektu {{name}}.",
-                    "loadingBody":  "Pripremamo tvoj raspored i sačuvane eventove.",
-                    "removeError":  "Event nije uklonjen iz planera. Pokušaj ponovo.",
-                    "quoteFallback":  "Sačuvano kao deo tvog plana.",
-                    "itemsCount":  "{{count}} stavki",
-                    "totalEvents":  "Ukupno eventova",
-                    "emptyBody":  "Dodaj eventove i napravi raspored putovanja po danima.",
-                    "scheduleTitle":  "Raspored dana",
-                    "loadError":  "Planer trenutno nije dostupan.",
-                    "removeFooter":  "\"{{title}}\" možeš ponovo dodati iz detalja dogadjaja.",
-                    "emptyTitle":  "Planer je još prazan",
-                    "eventSingular":  "događaj",
-                    "title":  "Planer",
-                    "removeConfirmTitle":  "Ukloni iz planera",
-                    "eventPlural":  "događaja",
-                    "loadingTitle":  "Učitavamo planer",
-                    "planningNextTitle":  "Šta sledeće planiraš?",
-                    "priorityHighlights":  "Prioriteti",
-                    "daysPlanned":  "{{count}} dana u planu",
-                    "removeConfirmBody":  "Da li želiš da ukloniš \"{{title}}\" iz planera?",
-                    "proTipLabel":  "Mali savet",
-                    "plannedHours":  "Planirani sati",
-                    "tripLocationFallback":  "Lokacija nije dostupna",
-                    "planningNextBody":  "Dodaj još jedan event i napravi jasniji tok dana.",
-                    "openEventDetails":  "Otvori detalje događaja",
-                    "removeEvent":  "Ukloni event",
-                    "proTipBody":  "Sačuvaj najvažnije eventove kao prioritet da ih lakše izdvojis u planu.",
-                    "removeFromPlanner":  "Ukloni iz planera",
-                    "notifications":  "Obaveštenja",
-                    "tripTitleFallback":  "Tvoj plan putovanja",
-                    "tripWeekSuffix":  "{{name}} nedelja"
-                },
-    "addToPlanner":  {
-                         "termsLink":  "Uslovi korišćenja",
-                         "timeConflictTitle":  "Detektovano preklapanje termina",
-                         "scheduleBody":  "Popuni detalje kako bi ovaj event ušao u tvoj raspored putovanja.",
-                         "previewFallbackTitle":  "Odabrani event",
-                         "startTime":  "Početno vreme",
-                         "nonEventHint":  "Ovaj prikaz trenutno nije event. Planer za sada podržava samo dodavanje eventova.",
-                         "feedbackCannotAdd":  "Event trenutno nije moguće dodati u planer.",
-                         "duration":  "Trajanje",
-                         "feedbackOnlyEvents":  "Planer trenutno podržava samo čuvanje eventova.",
-                         "cancel":  "Odustani",
-                         "priorityBody":  "Istakni ga u pregledu planera i dnevnom rasporedu.",
-                         "endTime":  "Završno vreme",
-                         "priorityTitle":  "Označi kao prioritet",
-                         "conflictMessage":  "Ovaj termin se preklapa sa \"{{title}}\" u {{time}}.",
-                         "scheduleTitle":  "Isplaniraj event",
-                         "backAria":  "Nazad na planer",
-                         "saving":  "Čuvanje...",
-                         "notesLabel":  "Dodatne napomene",
-                         "estimatedDuration":  "Procenjeno trajanje",
-                         "previewFallbackLocation":  "Lokacija dogadjaja",
-                         "previewFallbackType":  "Dogadjaj",
-                         "feedbackAlreadyAdded":  "Ovaj event je vec dodat u planer.",
-                         "travelDate":  "Datum putovanja",
-                         "previewFallbackDescription":  "Dodaj ovaj event u planer i organizuj dan oko svojih omiljenih trenutaka.",
-                         "helpCenter":  "Centar za pomoć",
-                         "notesPlaceholder":  "Na primer: ponesi fotoaparat, dođi 15 minuta ranije...",
-                         "title":  "Dodaj event u planer",
-                         "togglePriority":  "Promeni prioritet",
-                         "save":  "Sačuvaj u planer"
-                     },
-    "destination": {
-                        "title": "Destinacija",
-                        "descriptionFallback": "Opis nije dostupan.",
-                        "listTitle": "Destinacije",
-                        "searchPlaceholder": "Pretraži destinacije...",
-                        "foundCount": "{{count}} pronađenih destinacija",
-                        "empty": "Nema pronađenih destinacija."
-                    },
-                "activity": {
-                      "title": "Aktivnost",
-                      "descriptionFallback": "Opis nije dostupan.",
-                      "nearbyTitle": "Obližnje aktivnosti",
-                      "nearbyEmpty": "Nema aktivnosti u blizini.",
-                      "listTitle": "Aktivnosti",
-                      "searchPlaceholder": "Pretraži aktivnosti...",
-                      "resultsFound": "aktivnosti pronađeno",
-                      "empty": "Nema pronađenih aktivnosti."
-                    },
-   "locality": {
-        "title": "Lokalitet",
-        "descriptionFallback": "Opis nije dostupan.",
-        "nearbyTitle": "Obližnji lokaliteti",
-        "nearbyEmpty": "Nema lokaliteta u blizini.",
-        "listTitle": "Lokaliteti",
-        "searchPlaceholder": "Pretraži lokalitete...",
-        "foundCount": "{{count}} pronađenih lokaliteta",
-        "empty": "Nema pronađenih lokaliteta."
-        }                                                
+    "notificationGroups": {
+      "travel": "Putovanja i favoriti",
+      "reviews": "Recenzije",
+      "creator": "Sadržaj koji objavljuješ",
+      "manager": "Menadžerska obrada",
+      "admin": "Administracija"
+    },
+    "notificationTypes": {
+      "favoritedLocationNewEvent": {
+        "title": "Novi događaj u omiljenoj destinaciji",
+        "body": "Obavesti me kada se pojavi novi događaj u destinaciji ili lokalitetu koji sam sačuvala."
+      },
+      "plannerEventReminder2Hours": {
+        "title": "Podsetnik 2 sata pre događaja",
+        "body": "Pošalji mi kratki podsetnik kada se događaj iz planera približava."
+      },
+      "plannerEventUpdated": {
+        "title": "Promena događaja u planeru",
+        "body": "Obavesti me kada se promene datum, vreme, cena ili lokacija događaja koji sam dodala u planer."
+      },
+      "plannerEventUnavailable": {
+        "title": "Događaj iz planera više nije dostupan",
+        "body": "Obavesti me kada se događaj otkaže, deaktivira ili više ne može da se prati."
+      },
+      "reviewReply": {
+        "title": "Odgovor na moju recenziju",
+        "body": "Obavesti me kada content creator prvi put odgovori na recenziju koju sam ostavila."
+      },
+      "reviewReplyUpdated": {
+        "title": "Izmena odgovora na moju recenziju",
+        "body": "Obavesti me kada content creator izmeni svoj odgovor na recenziju koju sam ostavila."
+      },
+      "creatorContentReviewed": {
+        "title": "Moj sadržaj je odobren ili odbijen",
+        "body": "Obavesti me kada admin ili menadžer pregleda moj objekat, događaj ili aktivnost."
+      },
+      "creatorNewObjectReview": {
+        "title": "Nova recenzija na mom objektu",
+        "body": "Obavesti me kada turista ostavi novu recenziju na objektu koji sam kreirala."
+      },
+      "creatorDeletionRequestReviewed": {
+        "title": "Rešen zahtev za brisanje sadržaja",
+        "body": "Obavesti me kada moj zahtev za brisanje bude odobren ili odbijen."
+      },
+      "creatorObjectReviewDeleted": {
+        "title": "Recenzija na mom objektu je obrisana",
+        "body": "Obavesti me kada neka recenzija sa mog objekta bude uklonjena iz sistema."
+      },
+      "managerNewPendingContent": {
+        "title": "Novi pending sadržaj u mojoj destinaciji",
+        "body": "Obavesti me kada stigne novi objekat, događaj ili aktivnost za pregled."
+      },
+      "managerNewDeletionRequest": {
+        "title": "Novi zahtev za brisanje u mojoj destinaciji",
+        "body": "Obavesti me kada content creator pošalje zahtev za brisanje sadržaja koji pripada mojoj destinaciji."
+      },
+      "managerReportReviewed": {
+        "title": "Admin je rešio moju prijavu",
+        "body": "Obavesti me kada admin odobri ili odbije prijavu koju sam poslala."
+      },
+      "adminNewCreatorRoleRequest": {
+        "title": "Novi zahtev za Content Creator ulogu",
+        "body": "Obavesti me kada stigne novi zahtev korisnika za dodatnu ulogu."
+      },
+      "adminNewManagerReport": {
+        "title": "Nova ManagerReport prijava",
+        "body": "Obavesti me kada menadžer pošalje novu prijavu protiv content creatora."
+      },
+      "adminRepeatedManagerReports": {
+        "title": "Više prijava za istog content creatora",
+        "body": "Obavesti me kada isti content creator sakupi više menadžerskih prijava."
+      },
+      "adminCreatorMultipleRejectedContent": {
+        "title": "Više odbijenih sadržaja istog kreatora",
+        "body": "Obavesti me kada isti content creator dobije više odbijenih sadržaja."
+      }
+    }
+  },
+  "region": {
+    "title": "Region",
+    "available": "Dostupni regioni",
+    "infoTitle": "Promena regiona se primenjuje odmah",
+    "infoBody": "Nakon čuvanja, kompletan mobilni interfejs će odmah biti prikazan na izabranom regionu.",
+    "montenegro": "Crna Gora",
+    "spain": "Španija",
+    "defaultBadge": "Podrazumevano",
+    "active": "Region je već aktivan.",
+    "saved": "Region je uspešno ažuriran.",
+    "saveFailed": "Promena regiona nije sačuvana.",
+    "loadFailed": "Regioni trenutno nisu dostupni.",
+    "noneAvailable": "Nema dostupnih regiona.",
+    "apply": "Primeni region",
+    "confirm": "Klikom na dugme potvrđujete promenu regiona aplikacije na {{language}}."
+  },
+  "language": {
+    "title": "Jezik",
+    "available": "Dostupni jezici",
+    "infoTitle": "Promena jezika se primenjuje odmah",
+    "infoBody": "Nakon čuvanja, mobilni interfejs će odmah biti prikazan na izabranom jeziku.",
+    "active": "Jezik je vec aktivan.",
+    "saveFailed": "Promena jezika nije sačuvana.",
+    "saved": "Jezik je uspešno azuriran.",
+    "saving": "Čuvanje...",
+    "apply": "Primeni jezik",
+    "confirm": "Klikom na dugme potvrđujete promenu jezika aplikacije na {{language}}.",
+    "serbianMontenegrin": "Srpski/Crnogorski",
+    "english": "Engleski",
+    "spanish": "Španski",
+    "italian": "Italijanski"
+  },
+  "favorites": {
+    "heroEyebrow": "FAVORITI",
+    "heroTitle": "Tvoje omiljene stavke su na jednom mestu.",
+    "heroBody": "Pregledaj sve što si dodao u favorite i brzo ukloni stavke koje više ne želiš da čuvaš.",
+    "loadError": "Favoriti trenutno nisu dostupni.",
+    "removeError": "Favorit nije uklonjen. Pokušaj ponovo.",
+    "loadingBody": "Pripremamo tvoje favorite.",
+    "emptyTitle": "Još nemas favorita",
+    "emptyBody": "Kada dodaš destinaciju ili objekat u favorite, ovde će se pojaviti.",
+    "removing": "Uklanjanje...",
+    "type": {
+      "default": "Favorit",
+      "destination": "Destinacija",
+      "object": "Objekat",
+      "activity": "Aktivnost",
+      "route": "Ruta",
+      "locality": "Mesto"
+    },
+    "fallbackTitle": "Favorit #{{id}}",
+    "plannerBannerBody": "Sačuvane eventove lako pretvori u raspored putovanja.",
+    "allSaved": "Sve sačuvano",
+    "removeConfirmFooter": "\"{{title}}\" možeš ponovo dodati kad god poželiš.",
+    "latestEmpty": "Nema skoro sacuvanih stavki.",
+    "heroBodyModern": "Brzo pregledaj sve što si sačuvala, otvori detalje i prebaci inspiraciju u planer.",
+    "loadingTitle": "Učitavamo favorite",
+    "readyTitle": "Spremna za sledeći korak?",
+    "screenTitle": "Favoriti",
+    "plannerBannerTitle": "Nastavi planiranje",
+    "plannerEventsOnly": "Dogadjaji iz favorita se dodaju kroz planer.",
+    "totalFavorites": "{{count}} sačuvanih stavki",
+    "openDetails": "Otvori detalje",
+    "smartRoutes": "Pametni predlozi i pregled dana",
+    "summaryTitle": "Pregled favorita",
+    "searchPlaceholder": "Pretraži sačuvana mesta...",
+    "goToPlanner": "Idi u planer",
+    "readyBody": "Otvorene favorite pretvori u konkretan plan dana i raspored dogadjaja.",
+    "emptyBodyModern": "Dodaj destinacije, objekte, aktivnosti ili lokalitete i ovde ćeš ih videti na jednom mestu.",
+    "emptyTitleModern": "Jos nemaš sačuvanih favorita",
+    "recentTitle": "Poslednje sačuvano",
+    "heroTitleModern": "Tvoja omiljena mesta su spremna za sledeci plan.",
+    "removeConfirmTitle": "Ukloni iz favorita",
+    "loadingBodyModern": "Pripremamo sačuvane stavke i najskorije uspomene.",
+    "removeConfirmBody": "Da li želiš da ukloniš \"{{title}}\" iz favorita?",
+    "footerShowingAll": "Prikazano {{count}} sačuvanih stavki",
+    "panelEmpty": "Još nema dovoljno podataka za pregled.",
+    "routeLabel": "Ruta",
+    "addedOneDayAgo": "Dodato pre 1 dana",
+    "savedItemsCount": "{{count}} sačuvanih stavki",
+    "routeQuote": "Sačuvana ruta čeka sledeće putovanje.",
+    "activityDurationQuote": "{{count}} min iskustvo sačuvano za kasnije.",
+    "addedOneWeekAgo": "Dodato pre 1 nedelju",
+    "sortDateAdded": "Najskorije dodato",
+    "addedWeeksAgo": "Dodato pre {{count}} nedelje",
+    "fallbackQuote": "Sacuvano za kasnije.",
+    "savedItemCount": "{{count}} sačuvana stavka",
+    "savedItemLabel": "Sačuvano mesto",
+    "locationFallback": "Lokacija nije dostupna",
+    "addedToday": "Dodato danas",
+    "savedRecently": "Sačuvano skoro",
+    "routeLocation": "Planirana ruta",
+    "sortName": "Po nazivu",
+    "addedDaysAgo": "Dodato pre {{count}} dana",
+    "mustSee": "Top izbor",
+    "breakdown": {
+      "destination": "Destinacije",
+      "object": "Objekti",
+      "activity": "Aktivnosti",
+      "locality": "Lokaliteti",
+      "route": "Rute"
+    }
+  },
+  "reviews": {
+    "title": "Moje recenzije",
+    "heroEyebrow": "TVOJ UTISAK",
+    "heroTitle": "Sve recenzije koje si ostavio nalaze se ovde.",
+    "heroBody": "Pregledaj šta si ocenio, kada je komentar ostavljen i da li postoji odgovor.",
+    "loadError": "Tvoje recenzije trenutno nisu dostupne.",
+    "loadingBody": "Pripremamo tvoje recenzije.",
+    "emptyTitle": "Još nemas recenzija",
+    "emptyBody": "Kada ostaviš komentar na objekat ili destinaciju, ovde ćeš ga videti.",
+    "objectFallback": "Objekat bez naziva",
+    "textFallback": "Recenzija nema dodatni komentar.",
+    "statusFallback": "Bez statusa",
+    "ratingAria": "Ocena {{rating}}",
+    "creatorResponse": "Odgovor kreatora"
+  },
+  "moderator": {
+    "title": "Pristup moderatoru",
+    "eyebrow": "POSEBNA ULOGA",
+    "heroTitle": "Pošaljite zahtev za pristup moderatorskim opcijama",
+    "heroBody": "Ako želite veću ulogu u održavanju kvaliteta sadržaja, ovde možete poslati zahtev koji administracija naknadno proverava i odobrava.",
+    "currentStatus": "Trenutni status",
+    "currentRole": "Vaša aktivna uloga: {{role}}",
+    "whatYouGet": "Šta dobijate",
+    "requirements": "Uslovi za prijavu",
+    "sendRequestTitle": "Pošaljite zahtev",
+    "sendRequestBody": "Klikom na dugme šaljete zahtev timu za proveru. Nakon obrade, pristup će biti odobren ili odbijen u skladu sa pravilima platforme.",
+    "submitting": "Slanje zahteva...",
+    "sendRequest": "Pošalji zahtev",
+    "requestFailed": "Zahtev trenutno nije moguće poslati.",
+    "requestSent": "Zahtev za pristup moderatoru je uspešno poslat.",
+    "role": {
+      "tourist": "Turista",
+      "moderator": "Moderator",
+      "admin": "Administrator",
+      "manager": "Menadžer"
+    },
+    "badge": {
+      "approved": "Pristup odobren",
+      "activeRole": "Posebna uloga aktivna",
+      "available": "Zahtev dostupan"
+    },
+    "req": {
+      "1": "Nalog treba da bude aktivan i uredno korišćen.",
+      "2": "Poželjno je da imate iskustva sa prijavama sadržaja i pravilima zajednice.",
+      "3": "Nakon prijave, administracija proverava zahtev i status naloga."
+    },
+    "resp": {
+      "1": "Pregled prijavljenog sadržaja i osnovna moderacija objava.",
+      "2": "Brza komunikacija sa podrškom kada je potrebno reagovati.",
+      "3": "Doprinos kvalitetu i sigurnosti sadržaja unutar aplikacije."
+    }
+  },
+  "editProfile": {
+    "title": "Izmeni profil",
+    "photoAlt": "Profilna fotografija",
+    "changePhoto": "Promeni fotografiju",
+    "removePhoto": "Ukloni fotografiju",
+    "firstName": "Ime",
+    "lastName": "Prezime",
+    "country": "Država",
+    "email": "Email adresa",
+    "phone": "Broj telefona",
+    "interests": "Tvoja interesovanja",
+    "selectedCount": "Izabrano: {{count}}",
+    "appLanguage": "Jezik aplikacije",
+    "currentLanguage": "Trenutno: {{language}}",
+    "changePassword": "Promeni šifru",
+    "changePasswordBody": "Ažuriraj lozinku svog naloga",
+    "saving": "Čuvanje...",
+    "saveChanges": "Sačuvaj promene",
+    "cancelChanges": "Otkaži izmene",
+    "refreshFallback": "Profil nije osvežen sa servera. Prikazani su lokalni podaci.",
+    "saveFailed": "Promene nisu sačuvane.",
+    "saved": "Promene su uspešno sacuvane.",
+    "photoRemoveFailed": "Fotografija nije uklonjena.",
+    "photoRemoved": "Fotografija je uklonjena.",
+    "photoFormats": "Dozvoljeni formati su PNG, JPG i WEBP.",
+    "photoSize": "Fotografija ne sme biti veća od 5MB.",
+    "photoSaveFailed": "Fotografija nije sačuvana.",
+    "photoSaved": "Fotografija je uspešno azurirana.",
+    "languageSelected": "Izabran je jezik: {{language}}.",
+    "nameError": "Ime mora imati najmanje 2 karaktera.",
+    "lastNameError": "Prezime mora imati najmanje 2 karaktera.",
+    "countryError": "Država moze imati najvise 40 karaktera.",
+    "phoneError": "Telefon unesi u formatu +382 67 000 000 ili slicno.",
+    "validationError": "Proveri označena polja pre cuvanja.",
+    "interest": {
+      "beaches": "Plaže",
+      "hiking": "Planinarenje",
+      "history": "Istorija",
+      "gastronomy": "Gastronomija",
+      "nightlife": "Noćni zivot",
+      "culture": "Kultura",
+      "parks": "Nacionalni parkovi"
+    }
+  },
+  "support": {
+    "title": "Pomoć i podrška",
+    "heroTitle": "Tu smo da vam pomognemo",
+    "searchAria": "Pretraga pitanja",
+    "searchPlaceholder": "Pretraži često postavljana pitanja...",
+    "faqTitle": "Često postavljana pitanja",
+    "contactTitle": "Direktan kontakt",
+    "contactUsers": "Podrška korisnicima",
+    "contactUsersBody": "Pozovite nas ukoliko vam je potrebna pomoć u vezi naloga, podešavanja ili korišćenja aplikacije.",
+    "reportProblem": "Prijavi problem",
+    "reportProblemBody": "Pošaljite nam opis problema kako bismo mogli što brže da proverimo i pomognemo.",
+    "hoursTitle": "Radno vreme podrške",
+    "weekdays": "Ponedeljak - Petak",
+    "weekend": "Subota - Nedelja",
+    "chatNote": "* Prosečno vreme odgovora na poruku je manje od 5 minuta.",
+    "ticketNote": "* Odgovori na prijave problema stižu u roku od 24h.",
+    "aiTitle": "AI turistički asistent",
+    "aiFloatingTitle": "Pitajte SpireGO AI",
+    "aiFloatingShort": "AI vodič",
+    "aiFloatingOpen": "Otvori SpireGO AI asistenta",
+    "aiFloatingBody": "Brzo pitajte za mesta, hranu, događaje i ideje za obilazak.",
+    "aiFloatingWelcomeTitle": "Kako mogu da pomognem?",
+    "aiFloatingSupportHint": "AI asistent je sada dostupan preko plutajućeg dugmeta dole desno na svakom ekranu.",
+    "aiBody": "Postavite pitanje prirodnim jezikom i asistent će vam pomoći da pronađete destinacije, restorane, hotele, događaje ili aktivnosti koje odgovaraju vašim interesovanjima.",
+    "aiPlaceholder": "Na primer: gde mogu da idem sa decom u šetnju?",
+    "aiSend": "Pošalji pitanje",
+    "aiThinking": "AI upravo traži najbolje predloge...",
+    "aiEmpty": "Još nema poruka. Probajte da pitate za restoran, hotel, šetnju ili događaj.",
+    "aiError": "AI odgovor trenutno nije dostupan. Pokušajte ponovo za nekoliko sekundi.",
+    "aiPromptWalk": "Šetnja sa decom",
+    "aiPromptLunch": "Restoran za ručak",
+    "aiPromptHotel": "Hotel sa bazenom",
+    "faq": {
+      "1": {
+        "q": "Kako da ažuriram podatke na profilu?",
+        "a": "Podatke možete izmeniti na ekranu Profil u delu Izmeni profil ili na ekranu Podešavanja u delu Izmeni profil. Tu možete promeniti ime, prezime, telefon, državu, profilnu fotografiju, kao i svoju lozinku."
+      },
+      "2": {
+        "q": "Gde mogu da vidim omiljene stavke?",
+        "a": "Omiljene destinacije, objekti i drugi sačuvani sadržaji nalaze se na ekranu Favoriti, gde ih možete pregledati ili ukloniti."
+      },
+      "3": {
+        "q": "Kako radi planer putovanja?",
+        "a": "Planer vam omogućava da sačuvate događaje na koje želite da odete tokom putovanja i podseti vas na njih."
+      },
+      "4": {
+        "q": "Kako da promenim jezik aplikacije?",
+        "a": "Jezik aplikacije možete promeniti na ekranu Podešavanja u delu Jezik. Nakon izbora jezika, promena će se odmah prikazati u aplikaciji."
+      }
+    }
+  },
+  "notifications": {
+    "title": "Obaveštenja",
+    "markAll": "Označi kao pročitano",
+    "deleteRead": "Obriši pročitana",
+    "deleteSingle": "Obriši obaveštenje",
+    "emptyTitle": "Nema obaveštenja",
+    "emptyBody": "Sve je pročitano."
+  },
+  "about": {
+    "supportTitle": "Informacije i podrška",
+    "quote": "\"Naša misija je da svakom putniku pružimo autentična iskustva i olakšamo otkrivanje najlepših destinacija širom sveta.\"",
+    "privacy": "Politika privatnosti",
+    "privacyBody": "Kako štitimo vaše podatke",
+    "terms": "Uslovi korišćenja",
+    "termsBody": "Pravila korišćenja aplikacije",
+    "contact": "Kontaktirajte nas",
+    "contactBody": "Pitanja, sugestije ili problemi",
+    "footerMade": "Napravljeno sa srcem u Crnoj Gori",
+    "footerRights": "Sva prava zadržana."
+  },
+  "privacy": {
+    "title": "Privatnost i podaci",
+    "eyebrow": "TRANSPARENTNO",
+    "heroTitle": "Kako SpireGO koristi vaše podatke",
+    "heroBody": "Vaša privatnost i bezbednost podataka su nam važni. Na ovoj stranici možete saznati koje informacije aplikacija prikazuje, kako se koriste i na koji način pomažu u unapređenju vašeg iskustva putovanja.",
+    "notesTitle": "Bitne napomene",
+    "section": {
+      "1": {
+        "title": "Podaci naloga",
+        "body": "SpireGO može prikazivati osnovne informacije vašeg naloga kao što su ime, email adresa, profilna fotografija i podešavanja profila, kako bismo personalizovali vaše iskustvo u aplikaciji."
+      },
+      "2": {
+        "title": "Lokalno sačuvani podaci",
+        "body": "Određeni podaci, poput planova putovanja, omiljenih destinacija ili podešavanja aplikacije, mogu biti privremeno sačuvani na vašem uređaju radi bržeg i jednostavnijeg korišćenja aplikacije."
+      },
+      "3": {
+        "title": "Kako nas kontaktirati",
+        "body": "Određeni podaci, poput planova putovanja, omiljenih destinacija ili podešavanja aplikacije, mogu biti privremeno sačuvani na vašem uređaju radi bržeg i jednostavnijeg korišćenja aplikacije."
+      }
+    },
+    "note": {
+      "1": "Vaši podaci koriste se isključivo za funkcionalnosti aplikacije i unapređenje korisničkog iskustva.",
+      "2": "Trudimo se da informacije budu zaštićene i dostupne samo vama.",
+      "3": "Neke funkcionalnosti mogu zahtevati dodatnu potvrdu identiteta radi bezbednosti naloga."
+    }
+  },
+  "terms": {
+    "title": "Uslovi korišćenja",
+    "eyebrow": "USLOVI KORIŠĆENJA",
+    "heroTitle": "Pravila i smernice za korišćenje aplikacije.",
+    "heroBody": "Korišćenjem aplikacije SpireGO prihvatate osnovna pravila korišćenja, zaštite podataka i odgovornog korišćenja dostupnih funkcionalnosti.",
+    "notesTitle": "Važne napomene",
+    "section": {
+      "1": {
+        "title": "Korišćenje aplikacije",
+        "body": "SpireGO omogućava pregled destinacija, objekata, događaja, favorita i personalizovanih sadržaja. Korisnik je odgovoran za tačnost informacija koje unosi i koristi u okviru svog naloga."
+      },
+      "2": {
+        "title": "Sadržaj i informacije",
+        "body": "Trudimo se da informacije u aplikaciji budu tačne i ažurne, ali dostupnost sadržaja može zavisiti od spoljašnjih servisa i izvora podataka. Pojedine informacije mogu biti promenjene ili privremeno nedostupne."
+      },
+      "3": {
+        "title": "Nalog i bezbednost",
+        "body": "Korisnik je odgovoran za bezbednost svog naloga i poverljivost pristupnih podataka. Preporučujemo korišćenje sigurnih lozinki i redovno ažuriranje podataka naloga."
+      }
+    },
+    "note": {
+      "1": "Favoriti, recenzije i podešavanja povezani su sa vašim korisničkim nalogom.",
+      "2": "Određeni podaci mogu biti privremeno sačuvani lokalno na uređaju radi boljeg korisničkog iskustva.",
+      "3": "Korišćenjem aplikacije prihvatate buduća unapređenja i izmene funkcionalnosti sistema."
+    }
+  },
+  "map": {
+    "searchPlaceholder": "Pretraži objekte, rute...",
+    "geoUnsupported": "Geolokacija nije podržana u ovom browseru.",
+    "geoDenied": "Dozvolite pristup lokaciji u podešavanjima browsera.",
+    "geoUnavailable": "Lokacija trenutno nije dostupna.",
+    "geoFailed": "Nije moguće dobiti Vašu lokaciju.",
+    "useMyLocation": "Koristi moju lokaciju",
+    "locationLoading": "Tražimo lokaciju...",
+    "locationConsentTitle": "Uključi lokaciju da bi GPS radio",
+    "locationConsentBody": "Praćenje lokacije trenutno nije uključeno. Klikni ispod i otvori podešavanja da uključiš saglasnost za praćenje lokacije.",
+    "locationConsentAction": "Klikni ovde"
+  },
+  "event": {
+    "title": "Dogadjaj",
+    "loadingError": "Greška pri učitavanju dogadjaja.",
+    "addedToPlanner": "Dogadjaj je dodat u Planner",
+    "free": "Besplatno",
+    "buyTicket": "Kupi kartu",
+    "ticketAlert": "Kupovina karte - Cena: {{price}}",
+    "addToPlanner": "Dodaj u Planner",
+    "about": "O događaju",
+    "descriptionFallback": "Opis nije dostupan.",
+    "availableTickets": "Dostupne ulaznice",
+    "standardTicket": "Standardna ulaznica",
+    "select": "Odaberi",
+    "amenities": "Sadržaji",
+    "nearbyTitle": "Obližnji događaji",
+    "noNearby": "Nema drugih objekata u istoj lokaciji.",
+    "nearbyEmpty": "Nema drugih događaja u blizini.",
+    "listTitle": "Događaji",
+    "searchPlaceholder": "Pretraži događaje...",
+    "foundCount": "{{count}} pronađenih događaja",
+    "empty": "Nema pronađenih događaja.",
+    "nature": "Priroda"
+  },
+  "object": {
+    "titleFallback": "Objekat",
+    "loadingError": "Greška pri učitavanju objekta.",
+    "about": "O {{name}}u",
+    "amenitiesSoon": "Sadržaji će biti dostupni uskoro.",
+    "writeReviewSoon": "Forma za novu recenziju je još u izradi.",
+    "workingHoursMissing": "Radno vreme nije navedeno",
+    "nearbyNone": "Nema drugih {{name}}a u istoj lokaciji.",
+    "allReviews": "Sve recenzije",
+    "totalReviews": "{{count}} recenzija",
+    "amenities": "Sadržaji",
+    "nearbyTitle": "Obližnji {{name}}",
+    "nearbyEmpty": "Nema drugih {{name}}a u istoj lokaciji.",
+    "writeReview": "Napiši recenziju",
+    "reviewPlaceholder": "Kakvo je bilo Vaše iskustvo? Šta biste preporučili drugim putnicima?",
+    "addPhotos": "Dodaj fotografije (max 5)",
+    "photos": "slika",
+    "sending": "Šaljem...",
+    "submitReview": "Pošalji recenziju",
+    "listTitle": "Objekti",
+    "searchPlaceholder": "Pretraži objekte...",
+    "foundCount": "{{count}} pronađenih objekata",
+    "empty": "Nema pronađenih objekata.",
+    "open": "Otvoreno",
+    "loadError": "Neuspešno učitavanje objekata."
+  },
+  "restaurant": {
+    "title": "Restoran",
+    "loadingError": "Greška pri učitavanju restorana.",
+    "about": "O restoranu",
+    "writeReviewSoon": "Forma za novu recenziju je još u izradi."
+  },
+  "hotel": {
+    "loadingError": "Greška pri učitavanju hotela.",
+    "bookingSoon": "Booking sistem će biti integrisan kasnije.",
+    "addedToPlanner": "Hotel je dodat u Planner",
+    "phoneMissing": "Broj telefona nije dostupan",
+    "galleryEmpty": "Nema dostupnih slika",
+    "reviewTitle": "Recenzije",
+    "showLess": "Prikaži manje >",
+    "reviewAria": "Ocena recenzije",
+    "responseLabel": "Odgovor hotela",
+    "reviewsPending": "Recenzije će biti prikazane kada stignu sa backenda.",
+    "nearbyTitle": "Obližnji hoteli",
+    "nearbyEmpty": "Nema drugih hotela u istoj lokaciji.",
+    "visitWebsite": "Poseti sajt",
+    "aboutTitle": "O hotelu",
+    "aboutFallback": "Detaljnije informacije o ovom hotelu biće prikazane ovde.",
+    "locationMontenegro": "Crna Gora"
+  },
+  "time": {
+    "today": "DANAS",
+    "dayAgo": "PRE 1 DAN",
+    "daysAgo": "PRE {{count}} DANA",
+    "weekAgo": "PRE 1 NEDELJU",
+    "weeksAgo": "PRE {{count}} NEDELJE",
+    "monthAgo": "PRE 1 MESEC",
+    "monthsAgo": "PRE {{count}} MESECI",
+    "yearAgo": "PRE 1 GODINU",
+    "yearsAgo": "PRE {{count}} GODINA"
+  },
+  "planner": {
+    "addEventCta": "Dodaj event",
+    "quotePlanned": "Planirano za lokalitet {{name}}.",
+    "tripEventWeekSuffix": "{{name}} plan",
+    "tripDateFallback": "Datumi još nisu definisani",
+    "savedNav": "Favoriti",
+    "browseEvents": "Pregledaj događaje",
+    "quoteHosted": "Događaj se održava u objektu {{name}}.",
+    "loadingBody": "Pripremamo tvoj raspored i sačuvane eventove.",
+    "removeError": "Event nije uklonjen iz planera. Pokušaj ponovo.",
+    "quoteFallback": "Sačuvano kao deo tvog plana.",
+    "itemsCount": "{{count}} stavki",
+    "totalEvents": "Ukupno eventova",
+    "emptyBody": "Dodaj eventove i napravi raspored putovanja po danima.",
+    "scheduleTitle": "Raspored dana",
+    "loadError": "Planer trenutno nije dostupan.",
+    "removeFooter": "\"{{title}}\" možeš ponovo dodati iz detalja dogadjaja.",
+    "emptyTitle": "Planer je još prazan",
+    "eventSingular": "događaj",
+    "title": "Planer",
+    "removeConfirmTitle": "Ukloni iz planera",
+    "eventPlural": "događaja",
+    "loadingTitle": "Učitavamo planer",
+    "planningNextTitle": "Šta sledeće planiraš?",
+    "priorityHighlights": "Prioriteti",
+    "daysPlanned": "{{count}} dana u planu",
+    "removeConfirmBody": "Da li želiš da ukloniš \"{{title}}\" iz planera?",
+    "proTipLabel": "Mali savet",
+    "plannedHours": "Planirani sati",
+    "tripLocationFallback": "Lokacija nije dostupna",
+    "planningNextBody": "Dodaj još jedan event i napravi jasniji tok dana.",
+    "openEventDetails": "Otvori detalje događaja",
+    "removeEvent": "Ukloni event",
+    "proTipBody": "Sačuvaj najvažnije eventove kao prioritet da ih lakše izdvojis u planu.",
+    "removeFromPlanner": "Ukloni iz planera",
+    "notifications": "Obaveštenja",
+    "tripTitleFallback": "Tvoj plan putovanja",
+    "tripWeekSuffix": "{{name}} nedelja"
+  },
+  "addToPlanner": {
+    "termsLink": "Uslovi korišćenja",
+    "timeConflictTitle": "Detektovano preklapanje termina",
+    "scheduleBody": "Popuni detalje kako bi ovaj event ušao u tvoj raspored putovanja.",
+    "previewFallbackTitle": "Odabrani event",
+    "startTime": "Početno vreme",
+    "nonEventHint": "Ovaj prikaz trenutno nije event. Planer za sada podržava samo dodavanje eventova.",
+    "feedbackCannotAdd": "Event trenutno nije moguće dodati u planer.",
+    "duration": "Trajanje",
+    "feedbackOnlyEvents": "Planer trenutno podržava samo čuvanje eventova.",
+    "cancel": "Odustani",
+    "priorityBody": "Istakni ga u pregledu planera i dnevnom rasporedu.",
+    "endTime": "Završno vreme",
+    "priorityTitle": "Označi kao prioritet",
+    "conflictMessage": "Ovaj termin se preklapa sa \"{{title}}\" u {{time}}.",
+    "scheduleTitle": "Isplaniraj event",
+    "backAria": "Nazad na planer",
+    "saving": "Čuvanje...",
+    "notesLabel": "Dodatne napomene",
+    "estimatedDuration": "Procenjeno trajanje",
+    "previewFallbackLocation": "Lokacija dogadjaja",
+    "previewFallbackType": "Dogadjaj",
+    "feedbackAlreadyAdded": "Ovaj event je vec dodat u planer.",
+    "travelDate": "Datum putovanja",
+    "previewFallbackDescription": "Dodaj ovaj event u planer i organizuj dan oko svojih omiljenih trenutaka.",
+    "helpCenter": "Centar za pomoć",
+    "notesPlaceholder": "Na primer: ponesi fotoaparat, dođi 15 minuta ranije...",
+    "title": "Dodaj event u planer",
+    "togglePriority": "Promeni prioritet",
+    "save": "Sačuvaj u planer"
+  },
+  "destination": {
+    "title": "Destinacija",
+    "descriptionFallback": "Opis nije dostupan.",
+    "listTitle": "Destinacije",
+    "searchPlaceholder": "Pretraži destinacije...",
+    "foundCount": "{{count}} pronađenih destinacija",
+    "empty": "Nema pronađenih destinacija."
+  },
+  "activity": {
+    "title": "Aktivnost",
+    "descriptionFallback": "Opis nije dostupan.",
+    "nearbyTitle": "Obližnje aktivnosti",
+    "nearbyEmpty": "Nema aktivnosti u blizini.",
+    "listTitle": "Aktivnosti",
+    "searchPlaceholder": "Pretraži aktivnosti...",
+    "resultsFound": "aktivnosti pronađeno",
+    "empty": "Nema pronađenih aktivnosti."
+  },
+  "locality": {
+    "title": "Lokalitet",
+    "descriptionFallback": "Opis nije dostupan.",
+    "nearbyTitle": "Obližnji lokaliteti",
+    "nearbyEmpty": "Nema lokaliteta u blizini.",
+    "listTitle": "Lokaliteti",
+    "searchPlaceholder": "Pretraži lokalitete...",
+    "foundCount": "{{count}} pronađenih lokaliteta",
+    "empty": "Nema pronađenih lokaliteta."
+  }
 }
