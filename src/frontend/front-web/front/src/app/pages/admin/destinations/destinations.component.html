@@ -1,0 +1,290 @@
+<section class="destinations-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Destinations management</p>
+      <h1>Destinations</h1>
+      <p class="page-intro">
+        Curate regional destinations, keep locality hierarchies organized, and preview how each
+        destination appears across the platform.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="primary-btn" (click)="onAddDestination()">
+        <span class="material-symbols-outlined">add</span>
+        Add destination
+      </button>
+    </div>
+  </header>
+
+  <div class="toolbar card">
+    <div class="toolbar-search">
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input
+        type="text"
+        class="toolbar-input"
+        [(ngModel)]="draftSearchQuery"
+        (keydown.enter)="onSearchEnter($event)"
+        placeholder="Search destinations, regions, or country..."
+      />
+    </div>
+
+    <button type="button" class="ghost-btn slim-btn" (click)="onMoreFilters()">
+      <span class="material-symbols-outlined">filter_alt</span>
+      More Filters
+    </button>
+  </div>
+
+  @if (filterPanelOpen) {
+    <div class="filters-panel card">
+      <label>
+        <span>Status</span>
+        <select [(ngModel)]="statusFilter">
+          <option *ngFor="let option of statusOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>Region</span>
+        <select [(ngModel)]="regionFilter">
+          <option *ngFor="let option of regionOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>Sort by</span>
+        <select [(ngModel)]="sortBy">
+          <option *ngFor="let option of sortByOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>Order</span>
+        <select [(ngModel)]="sortOrder">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </label>
+
+      <div class="filter-actions">
+        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
+          Apply Filters
+        </button>
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  }
+
+  <div class="destinations-layout">
+    <div class="main-column">
+      <div class="insights-grid">
+        <article
+          *ngFor="let insight of insightCards"
+          class="insight-card card"
+          [attr.data-tone]="insight.tone"
+        >
+          <p>{{ insight.label }}</p>
+          <strong>{{ insight.value }}</strong>
+          <span>{{ insight.hint }}</span>
+        </article>
+      </div>
+
+      <div class="table-card">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Destination</th>
+                <th>Region</th>
+                <th>Localities</th>
+                <th>Featured</th>
+                <th class="col-actions">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let row of visibleDestinations; trackBy: trackByDestinationId"
+                [class.active-row]="selectedDestination?.id === row.id"
+                (click)="selectDestination(row)"
+              >
+                <td>
+                  <span class="status-chip" [ngClass]="getStatusClass(row.status)">
+                    <span class="chip-dot">●</span>
+                    {{ formatStatus(row.status) }}
+                  </span>
+                </td>
+                <td>
+                  <div class="destination-cell">
+                    <span
+                      class="destination-thumb"
+                      [style.background-image]="row.mainImageUrl ? 'url(' + row.mainImageUrl + ')' : ''"
+                    ></span>
+                    <div>
+                      <strong>{{ row.name }}</strong>
+                      <span>{{ row.country }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ row.region }}</td>
+                <td>{{ row.localityCount }}</td>
+                <td>
+                  <span class="featured-pill" [class.is-on]="row.featured">
+                    {{ row.featured ? 'Yes' : 'No' }}
+                  </span>
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <button
+                      type="button"
+                      class="icon-btn plain"
+                      title="Edit destination"
+                      (click)="onEditDestination(row); $event.stopPropagation()"
+                    >
+                      <span class="material-symbols-outlined">edit</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <footer class="table-footer">
+          <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ totalCount }} destinations</p>
+          <div class="pagination-buttons">
+            <label class="page-size-control">
+              <span>Page size</span>
+              <select
+                class="page-size-select"
+                [(ngModel)]="pageSize"
+                (ngModelChange)="onPageSizeChange($event)"
+              >
+                <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
+              </select>
+            </label>
+
+            <button
+              type="button"
+              class="ghost-btn slim-btn"
+              (click)="onPreviousPage()"
+              [disabled]="currentPage === 1"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              class="ghost-btn slim-btn"
+              (click)="onNextPage()"
+              [disabled]="currentPage >= totalPages"
+            >
+              Next
+            </button>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <aside class="detail-column card">
+      @if (selectedDestination) {
+        <div class="destination-hero">
+          <div class="hero-media" [style.background-image]="'url(' + selectedBanner + ')'">
+            <span class="hero-badge">{{ selectedDestination.region }}</span>
+          </div>
+
+          <div class="hero-copy">
+            <p class="eyebrow">Featured destination</p>
+            <h2>{{ selectedDestination.name }}</h2>
+            <p class="hero-meta">
+              {{ selectedDestination.country }} · {{ selectedDestination.localityCount }} localities
+            </p>
+            <span class="detail-status" [ngClass]="getStatusClass(selectedDestination.status)">
+              {{ formatStatus(selectedDestination.status) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="detail-metrics">
+          <div class="metric-card">
+            <span>Localities</span>
+            <strong>{{ selectedDestination.localityCount }}</strong>
+          </div>
+          <div class="metric-card">
+            <span>Featured</span>
+            <strong>{{ selectedDestination.featured ? 'On' : 'Off' }}</strong>
+          </div>
+        </div>
+
+        <section class="detail-section">
+          <div class="section-head">
+            <h3>Destination info</h3>
+          </div>
+
+          <div class="schedule-list">
+            <div class="schedule-item">
+              <span>Country</span>
+              <strong>{{ selectedDestination.country }}</strong>
+            </div>
+            <div class="schedule-item">
+              <span>Region</span>
+              <strong>{{ selectedDestination.region }}</strong>
+            </div>
+            <div class="schedule-item">
+              <span>Slug / code</span>
+              <strong>{{ selectedDestination.code }}</strong>
+            </div>
+            <div class="schedule-item">
+              <span>Last updated</span>
+              <strong>{{ selectedDestination.updatedAt | date: 'MMM d, y' }}</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h3>Description</h3>
+          <p class="description-copy">{{ selectedDestination.summary }}</p>
+        </section>
+
+        <section class="detail-section">
+          <div class="map-card">
+            @if (hasSelectedCoordinates) {
+              <app-map
+                [lat]="selectedLat"
+                [lng]="selectedLng"
+                [zoom]="8"
+                [popupText]="selectedMapLabel"
+                [interactive]="false"
+                mapId="admin-destination-map"
+              ></app-map>
+            } @else {
+              <div class="map-empty-state">
+                <span class="material-symbols-outlined">location_off</span>
+                <p>Map preview will appear when coordinates are configured.</p>
+              </div>
+            }
+          </div>
+        </section>
+      } @else {
+        <div class="empty-state">
+          <p class="eyebrow">No destination selected</p>
+          <h2>Pick a destination from the table</h2>
+          <p>
+            Select a row to review coverage, featured status, and how the destination is summarized
+            for admins.
+          </p>
+          <button type="button" class="primary-btn" (click)="onAddDestination()">
+            Add destination
+          </button>
+        </div>
+      }
+    </aside>
+  </div>
+</section>
