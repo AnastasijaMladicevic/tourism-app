@@ -97,6 +97,8 @@
         "locationTitle": "Turn on location",
         "locationBodyOn": "Location is enabled and the app can use your current position for recommendations and nearby places.",
         "locationBodyOff": "Location is turned off. Enable it if you want more precise suggestions and easier nearby discovery.",
+        "locationConsentTitle": "Enable location tracking for the map GPS",
+        "locationConsentBody": "To use GPS on the map, confirm location tracking here. After that, the app can use your current position for navigation and nearby places.",
         "notificationsSection": "Notifications",
         "notificationsTitle": "Turn on notifications",
         "notificationsBodyOn": "Only the notification types you keep enabled will appear, and you can choose how they are shown.",
@@ -450,7 +452,7 @@
                 },
     "notifications": {
         "title": "Notifications",
-        "markAll": "Mark all",
+        "markAll": "Mark as Read",
         "deleteRead": "Delete read",
         "deleteSingle": "Delete notification",
         "emptyTitle": "No notifications",
@@ -526,7 +528,12 @@
                 "geoUnsupported":  "Geolocation is not supported in this browser.",
                 "geoDenied":  "Please allow location access in your browser settings.",
                 "geoUnavailable":  "Location is currently unavailable.",
-                "geoFailed":  "Unable to get your location."
+                "geoFailed":  "Unable to get your location.",
+                "useMyLocation": "Use my location",
+                "locationLoading": "Locating...",
+                "locationConsentTitle": "Turn on location so GPS can work",
+                "locationConsentBody": "Location tracking is currently turned off. Tap below to open settings and enable consent for location tracking.",
+                "locationConsentAction": "Click here"
             },
     "event":  {
                   "title":  "Event",

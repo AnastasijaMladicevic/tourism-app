@@ -102,7 +102,7 @@
       <!-- ADD -->
       <div class="route-add">
         <div class="route-controls">
-          <div class="route-search-anchor">
+        <div class="route-search-anchor">
             <input
               type="text"
               placeholder="Add stop..."
@@ -120,12 +120,19 @@
               </div>
             }
           </div>
-          @if (userLocation) {
-            <div class="route-gps" (click)="addMyLocationAsStart()">
-              <mat-icon>my_location</mat-icon>
-              Use my location
-            </div>
-          }
+          <button
+            class="route-gps"
+            type="button"
+            [disabled]="isRouteLocationLoading()"
+            (click)="addMyLocationAsStart()"
+          >
+            <mat-icon>my_location</mat-icon>
+            {{
+              (isRouteLocationLoading()
+                ? 'map.locationLoading'
+                : 'map.useMyLocation') | translate
+            }}
+          </button>
           <button class="route-planner__btn" (click)="calculateRoute()">
             <mat-icon>alt_route</mat-icon>
             Show Route
@@ -149,6 +156,37 @@
     <button class="control-btn" (click)="zoomIn()"><mat-icon>add</mat-icon></button>
     <button class="control-btn" (click)="zoomOut()"><mat-icon>remove</mat-icon></button>
   </div>
+
+  @if (showLocationConsentPrompt) {
+    <div class="location-consent-backdrop" (click)="closeLocationConsentPrompt()"></div>
+
+    <div class="location-consent-modal" role="dialog" aria-modal="true">
+      <div class="location-consent-modal__icon">
+        <mat-icon>my_location</mat-icon>
+      </div>
+
+      <h3>{{ 'map.locationConsentTitle' | translate }}</h3>
+      <p>{{ 'map.locationConsentBody' | translate }}</p>
+
+      <div class="location-consent-modal__actions">
+        <button
+          class="location-consent-modal__btn location-consent-modal__btn--ghost"
+          type="button"
+          (click)="closeLocationConsentPrompt()"
+        >
+          {{ 'common.cancel' | translate }}
+        </button>
+
+        <button
+          class="location-consent-modal__btn"
+          type="button"
+          (click)="openLocationConsentSettings()"
+        >
+          {{ 'map.locationConsentAction' | translate }}
+        </button>
+      </div>
+    </div>
+  }
 
   @if (selectedItem) {
     <div class="bottom-card" (click)="$event.stopPropagation()">

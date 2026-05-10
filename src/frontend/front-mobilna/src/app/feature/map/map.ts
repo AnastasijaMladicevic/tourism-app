@@ -23,6 +23,7 @@ import { LocalityService } from '../../services/locality';
 import { RegionService } from '../../services/region';
 import { ActiveRegionService } from '../../services/active-region';
 import { LocationTrackingService, TrackedLocation } from '../../services/location-tracking';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 import { environment } from '../../../environment/environment';
 import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
@@ -64,7 +65,7 @@ const SEARCH_STOP_WORDS = new Set([
 @Component({
   selector: 'app-map',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, DragDropModule],
+  imports: [CommonModule, FormsModule, MatIconModule, DragDropModule, TranslatePipe],
   templateUrl: './map.html',
   styleUrls: ['./map.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -97,6 +98,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   isRoutePickingMode = false;
   routePickingType: 'start' | 'end' | 'add' = 'add';
   isTracking = false;
+  showLocationConsentPrompt = false;
   private userMarker: L.Marker | null = null;
   private userCircle: L.Circle | null = null;
 
@@ -193,20 +195,32 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   toggleGpsTracking(): void {
-    if (this.isTracking) {
-      this.locationTrackingService.stopTracking();
-    } else {
-      if (!this.locationTrackingService.startTracking()) {
-        return;
-      }
-
-      this.shouldCenterOnNextLocation = true;
-      const currentLocation = this.locationTrackingService.getCurrentLocation();
-      if (currentLocation) {
-        this.mapService.flyTo(currentLocation.latitude, currentLocation.longitude, 16);
-        this.shouldCenterOnNextLocation = false;
-      }
+    if (!this.isTracking) {
+      this.openLocationConsentPrompt();
+      return;
     }
+
+    this.shouldCenterOnNextLocation = true;
+    const currentLocation = this.locationTrackingService.getCurrentLocation();
+    if (currentLocation) {
+      this.mapService.flyTo(currentLocation.latitude, currentLocation.longitude, 16);
+      this.shouldCenterOnNextLocation = false;
+    }
+  }
+
+  openLocationConsentPrompt(): void {
+    this.showLocationConsentPrompt = true;
+  }
+
+  closeLocationConsentPrompt(): void {
+    this.showLocationConsentPrompt = false;
+  }
+
+  openLocationConsentSettings(): void {
+    this.showLocationConsentPrompt = false;
+    void this.router.navigate(['/settings'], {
+      queryParams: { locationConsent: '1' },
+    });
   }
 
   private updateUserMarker(latlng: L.LatLng, accuracy: number): void {
@@ -1121,6 +1135,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   addMyLocationAsStart(): void {
+    if (!this.locationTrackingService.isTrackingEnabled()) {
+      this.openLocationConsentPrompt();
+      return;
+    }
+
     if (!this.userLocation) return;
 
     const exists = this.routePoints.some(p => p.id === -1);
@@ -1135,6 +1154,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     this.calculateRoute();
+  }
+
+  isRouteLocationLoading(): boolean {
+    return this.locationTrackingService.isTrackingEnabled() && !this.userLocation;
   }
 
   private runLocalSearch(query: string, limit: number): SearchResult[] {

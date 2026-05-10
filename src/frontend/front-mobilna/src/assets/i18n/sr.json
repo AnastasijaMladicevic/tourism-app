@@ -97,6 +97,8 @@
         "locationTitle": "Uključi lokaciju",
         "locationBodyOn": "Lokacija je uključena i aplikacija može da koristi tvoju trenutnu poziciju za preporuke i sadržaj u blizini.",
         "locationBodyOff": "Lokacija je isključena. Uključi je ako želiš preciznije preporuke i lakše pronalaženje mesta u blizini.",
+        "locationConsentTitle": "Uključi praćenje lokacije za GPS na mapi",
+        "locationConsentBody": "Da bi GPS na mapi radio, potrebno je da ovde potvrdiš saglasnost za praćenje lokacije. Nakon toga aplikacija može da koristi tvoju trenutnu poziciju za navigaciju i mesta u blizini.",
         "notificationsSection": "Obaveštenja",
         "notificationsTitle": "Uključi obaveštenja",
         "notificationsBodyOn": "Stizaće ti samo obaveštenja koja su uključena, a možeš i da biraš kako će se prikazivati.",
@@ -450,11 +452,11 @@
             },
     "notifications": {
         "title": "Obaveštenja",
-        "markAll": "Označi sve",
+        "markAll": "Označi kao pročitano",
         "deleteRead": "Obriši pročitana",
         "deleteSingle": "Obriši obaveštenje",
         "emptyTitle": "Nema obaveštenja",
-        "emptyBody": "Sve je pregledano."
+        "emptyBody": "Sve je pročitano."
     },
     "about":  {
                   "supportTitle":  "Informacije i podrška",
@@ -525,7 +527,12 @@
                 "geoUnsupported":  "Geolokacija nije podržana u ovom browseru.",
                 "geoDenied":  "Dozvolite pristup lokaciji u podešavanjima browsera.",
                 "geoUnavailable":  "Lokacija trenutno nije dostupna.",
-                "geoFailed":  "Nije moguće dobiti Vašu lokaciju."
+                "geoFailed":  "Nije moguće dobiti Vašu lokaciju.",
+                "useMyLocation": "Koristi moju lokaciju",
+                "locationLoading": "Tražimo lokaciju...",
+                "locationConsentTitle": "Uključi lokaciju da bi GPS radio",
+                "locationConsentBody": "Praćenje lokacije trenutno nije uključeno. Klikni ispod i otvori podešavanja da uključiš saglasnost za praćenje lokacije.",
+                "locationConsentAction": "Klikni ovde"
             },
     "event":  {
                   "title":  "Dogadjaj",

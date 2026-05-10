@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
 import { AuthService } from '../../services/auth';
@@ -27,6 +27,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private authService: AuthService,
     private routerHistoryService: RouterHistoryService,
     private locationTrackingService: LocationTrackingService,
@@ -86,6 +87,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   ];
 
   locationEnabled = false;
+  showLocationConsentHint = false;
   notificationsEnabled = true;
   bannerMode: NotificationBannerMode = 'banner';
   notificationGroups: NotificationPreferenceGroupView[] = [];
@@ -94,6 +96,12 @@ export class SettingsComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
         this.locationEnabled = enabled;
+      }),
+    );
+
+    this.subscriptions.add(
+      this.route.queryParamMap.subscribe((params) => {
+        this.showLocationConsentHint = params.get('locationConsent') === '1';
       }),
     );
 
@@ -148,6 +156,9 @@ export class SettingsComponent implements OnInit, OnDestroy {
     if (enabled) {
       const started = this.locationTrackingService.startTracking();
       this.locationEnabled = started;
+      if (started) {
+        this.clearLocationConsentHint();
+      }
       return;
     }
 
@@ -175,9 +186,23 @@ export class SettingsComponent implements OnInit, OnDestroy {
     });
   }
 
+  dismissLocationConsentHint(): void {
+    this.clearLocationConsentHint();
+  }
+
   private refreshUnreadCount(): void {
     this.notificationService.refreshUnreadCount().subscribe({
       error: () => void 0,
+    });
+  }
+
+  private clearLocationConsentHint(): void {
+    this.showLocationConsentHint = false;
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { locationConsent: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
     });
   }
 }

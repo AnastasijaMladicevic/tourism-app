@@ -17,6 +17,21 @@
       </div>
 
       <div class="preference-card">
+        @if (showLocationConsentHint) {
+          <div class="consent-banner">
+            <div class="consent-banner__copy">
+              <strong>{{ 'settings.locationConsentTitle' | translate }}</strong>
+              <p>{{ 'settings.locationConsentBody' | translate }}</p>
+            </div>
+
+            <button type="button" class="consent-banner__dismiss" (click)="dismissLocationConsentHint()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <div class="preference-divider"></div>
+        }
+
         <div class="preference-row">
           <div class="preference-copy">
             <span class="menu-title">{{ 'settings.locationTitle' | translate }}</span>

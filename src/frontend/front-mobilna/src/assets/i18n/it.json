@@ -97,6 +97,8 @@
         "locationTitle": "Attiva posizione",
         "locationBodyOn": "La posizione è attiva e l'app può usare la tua posizione corrente per suggerimenti e luoghi vicini.",
         "locationBodyOff": "La posizione è disattivata. Attivala se vuoi suggerimenti più precisi e risultati migliori nelle vicinanze.",
+        "locationConsentTitle": "Attiva il tracciamento della posizione per il GPS della mappa",
+        "locationConsentBody": "Per usare il GPS sulla mappa, conferma qui il tracciamento della posizione. Dopo di ciò, l'app potrà usare la tua posizione attuale per la navigazione e i luoghi vicini.",
         "notificationsSection": "Notifiche",
         "notificationsTitle": "Attiva notifiche",
         "notificationsBodyOn": "Saranno mostrate solo le notifiche che lasci attive e puoi scegliere anche come visualizzarle.",
@@ -526,7 +528,12 @@
                 "geoUnsupported":  "La geolocalizzazione non Ã¨ supportata in questo browser.",
                 "geoDenied":  "Consenti l\u0027accesso alla posizione nelle impostazioni del browser.",
                 "geoUnavailable":  "La posizione non Ã¨ attualmente disponibile.",
-                "geoFailed":  "Impossibile ottenere la tua posizione."
+                "geoFailed":  "Impossibile ottenere la tua posizione.",
+                "useMyLocation": "Usa la mia posizione",
+                "locationLoading": "Ricerca posizione...",
+                "locationConsentTitle": "Attiva la posizione per usare il GPS",
+                "locationConsentBody": "Il tracciamento della posizione è attualmente disattivato. Tocca qui sotto per aprire le impostazioni e attivare il consenso al tracciamento della posizione.",
+                "locationConsentAction": "Clicca qui"
             },
     "event":  {
                   "title":  "Evento",
