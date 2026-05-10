@@ -245,8 +245,15 @@ export class DestinationsComponent implements OnInit {
     this.router.navigate(['/admin/destinations/create']);
   }
 
-  onEditDestination(_row: AdminDestinationRow): void {
-    this.router.navigate(['/admin/destinations/edit', _row.id]);
+  onEditDestination(row: AdminDestinationRow): void {
+    this.router.navigate(['/admin/destinations/edit', row.id], {
+      state: {
+        linkedEntityCounts: {
+          objects: row.objectCount ?? 0,
+          localities: row.localityCount ?? 0
+        }
+      }
+    });
   }
 
   formatStatus(status: AdminDestinationStatus): string {

@@ -253,31 +253,33 @@
               <span class="entity-name">Objects</span>
               <span class="entity-meta">Hotels, shops…</span>
             </div>
-            <span class="entity-count">0</span>
+            <span class="entity-count">{{ linkedEntityCounts.objects }}</span>
           </li>
           <li>
             <span class="material-symbols-outlined entity-ico">event</span>
             <div>
               <span class="entity-name">Related events</span>
             </div>
-            <span class="entity-count">0</span>
+            <span class="entity-count">{{ linkedEntityCounts.events }}</span>
           </li>
           <li>
             <span class="material-symbols-outlined entity-ico">hiking</span>
             <div>
               <span class="entity-name">Featured activities</span>
             </div>
-            <span class="entity-count">0</span>
+            <span class="entity-count">{{ linkedEntityCounts.activities }}</span>
           </li>
           <li>
             <span class="material-symbols-outlined entity-ico">map</span>
             <div>
               <span class="entity-name">Localities</span>
             </div>
-            <span class="entity-count">0</span>
+            <span class="entity-count">{{ linkedEntityCounts.localities }}</span>
           </li>
         </ul>
-        <p class="fine-print">Counts will populate after this destination is saved.</p>
+        <p class="fine-print">
+          {{ isLoadingLinkedEntities ? 'Loading linked entity counts…' : 'Linked entity counts are loaded from live data.' }}
+        </p>
       </article>
 
       <article class="panel">

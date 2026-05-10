@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import {
+  ChangeDetectorRef,
   Component,
   ElementRef,
   HostListener,
@@ -48,6 +49,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   private readonly adminUsersService = inject(AdminUsersService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   @ViewChild('managerCombo') managerComboRef?: ElementRef<HTMLElement>;
 
@@ -62,6 +64,9 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   private savedDestinationId: number | null = null;
   editDestinationId: number | null = null;
   isLoadingDestination = false;
+  private readonly navigationState = (this.router.getCurrentNavigation()?.extras?.state ??
+    history.state ??
+    {}) as { linkedEntityCounts?: { objects?: number; localities?: number } };
 
   regions: RegionDto[] = [];
 
@@ -78,6 +83,13 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   imagePreviews: string[] = [];
   destinationImages: DestinationImageDto[] = [];
   isUpdatingImages = false;
+  isLoadingLinkedEntities = false;
+  linkedEntityCounts = {
+    objects: 0,
+    events: 0,
+    activities: 0,
+    localities: 0
+  };
 
   form: CreateDestinationDto = {
     name: '',
@@ -112,6 +124,12 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    const fromState = this.navigationState.linkedEntityCounts;
+    if (fromState) {
+      this.linkedEntityCounts.objects = Number(fromState.objects ?? 0);
+      this.linkedEntityCounts.localities = Number(fromState.localities ?? 0);
+    }
+
     const rawId = this.route.snapshot.paramMap.get('id');
     const parsedId = rawId ? Number(rawId) : NaN;
     if (Number.isInteger(parsedId) && parsedId > 0) {
@@ -148,6 +166,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         finalize(() => {
           this.isLoadingRegions = false;
           this.isLoadingDestination = false;
+          this.cdr.detectChanges();
         })
       )
       .subscribe(({ regions, destination }) => {
@@ -155,6 +174,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         if (destination) {
           this.applyLoadedDestination(destination.destination, destination.images);
         }
+        this.cdr.detectChanges();
       });
 
     this.managerSearchInput$
@@ -187,6 +207,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         const skipId = this.selectedManager?.id;
         this.managerSuggestions = page.items.filter((u) => u.id !== skipId);
         this.managerSuggestionsOpen = true;
+        this.cdr.detectChanges();
       });
   }
 
@@ -208,10 +229,12 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         next: (res) => {
           const manager = res.items.find((u) => u.id === destination.managedByUserId) ?? null;
           this.selectedManager = manager;
+          this.cdr.detectChanges();
         }
       });
     }
   }
+
 
   setPrimaryDestinationImage(image: DestinationImageDto): void {
     if (!this.isEditMode || this.isUpdatingImages || !image?.id) {
@@ -227,9 +250,11 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
           this.destinationImages = this.destinationImages
             .map((img) => ({ ...img, isMain: img.id === image.id }))
             .sort((a, b) => (a.isMain === b.isMain ? 0 : a.isMain ? -1 : 1));
+          this.cdr.detectChanges();
         },
         error: (err) => {
           this.errorMessage = this.extractApiErrorMessage(err);
+          this.cdr.detectChanges();
         }
       });
   }
@@ -246,9 +271,11 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.destinationImages = this.destinationImages.filter((img) => img.id !== image.id);
+          this.cdr.detectChanges();
         },
         error: (err) => {
           this.errorMessage = this.extractApiErrorMessage(err);
+          this.cdr.detectChanges();
         }
       });
   }
