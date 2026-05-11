@@ -20,8 +20,6 @@ import {
 } from 'rxjs';
 import { ObjectDto, ObjectImageDto, ObjectService } from '../../../services/object';
 import { ReviewDto, ReviewQueryParams, ReviewService } from '../../../services/review';
-import { ActivitiesService } from '../../../services/activities';
-import { EventService } from '../../../services/event.service';
 
 @Component({
   selector: 'app-content-creator-reviews',
@@ -33,8 +31,6 @@ import { EventService } from '../../../services/event.service';
 export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly reviewService = inject(ReviewService);
   private readonly objectService = inject(ObjectService);
-  private readonly activitiesService = inject(ActivitiesService);
-  private readonly eventService = inject(EventService);
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
@@ -58,9 +54,13 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   sortOrder: 'desc' | 'asc' = 'desc';
 
   responseText = '';
+  private sourceReviews: ReviewDto[] = [];
   private selectedObjectIdFilter: number | null = null;
 
   ngOnInit(): void {
+    const initialObjectId = this.parseObjectId(this.route.snapshot.queryParamMap.get('objectId'));
+    this.selectedObjectIdFilter = initialObjectId;
+
     this.searchInput$
       .pipe(
         map((value) => value.trim()),
@@ -68,16 +68,21 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
         distinctUntilChanged(),
         takeUntil(this.destroy$)
       )
-      .subscribe(() => this.loadReviews());
+      .subscribe(() => this.applyCurrentFilters());
+
+    this.loadReviews();
 
     this.route.queryParamMap
       .pipe(
-        map((params) => Number(params.get('objectId'))),
-        map((id) => Number.isFinite(id) && id > 0 ? id : null),
+        map((params) => this.parseObjectId(params.get('objectId'))),
         distinctUntilChanged(),
         takeUntil(this.destroy$)
       )
       .subscribe((objectId) => {
+        if (objectId === this.selectedObjectIdFilter) {
+          return;
+        }
+
         this.selectedObjectIdFilter = objectId;
         this.loadReviews();
       });
@@ -88,62 +93,48 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  loadReviews(): void {
+  loadReviews(keepSuccessMessage = false): void {
     this.isLoading = true;
     this.errorMessage = '';
-    this.successMessage = '';
+    if (!keepSuccessMessage) {
+      this.successMessage = '';
+    }
 
-    this.loadReviewsRequest()
+    this.fetchCreatorObjectReviews()
       .pipe(
         timeout(12000),
         catchError((firstError) => {
           // Auto-retry once to recover from transient auth-refresh stalls.
           return timer(300).pipe(
-            switchMap(() => this.loadReviewsRequest()),
+            switchMap(() => this.fetchCreatorObjectReviews()),
             timeout(12000),
             catchError(() => throwError(() => firstError))
           );
         }),
-        switchMap((objectIds) => {
-          if (objectIds.length === 0) {
-            return of([] as ReviewDto[]);
-          }
-
-          return this.fetchAllReviews().pipe(
-            map((reviews) => reviews.filter((review) => objectIds.includes(review.objectId))),
-            map((reviews) => this.selectedObjectIdFilter == null
-              ? reviews
-              : reviews.filter((review) => review.objectId === this.selectedObjectIdFilter)),
-            map((reviews) => this.applyRatingFilter(reviews))
-          );
-        }),
         finalize(() => {
           this.isLoading = false;
-          this.cdr.detectChanges();
+          this.triggerViewUpdate();
         })
       )
       .subscribe({
         next: (reviews) => {
-          this.allReviews = reviews;
-          this.filteredReviews = reviews;
-          if (!this.selectedReview || !reviews.some((item) => item.id === this.selectedReview?.id)) {
-            this.selectReview(reviews[0] ?? null);
-          }
-          this.cdr.detectChanges();
+          const previousSelectedId = this.selectedReview?.id ?? null;
+          this.sourceReviews = this.dedupeReviewsById(reviews);
+          this.applyCurrentFilters(previousSelectedId);
         },
         error: (error: any) => {
+          this.sourceReviews = [];
+          this.allReviews = [];
+          this.filteredReviews = [];
+          this.selectReview(null);
           this.errorMessage = error?.error?.message ?? 'Failed to load reviews.';
-          this.cdr.detectChanges();
+          this.triggerViewUpdate();
         }
       });
   }
 
-  private loadReviewsRequest() {
-    return this.getMyContentIds();
-  }
-
   onFilterChange(): void {
-    this.loadReviews();
+    this.applyCurrentFilters();
   }
 
   onSearchChange(value: string): void {
@@ -160,7 +151,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
     this.selectedRatings = [];
     this.responseFilter = 'all';
     this.sortOrder = 'desc';
-    this.loadReviews();
+    this.applyCurrentFilters();
   }
 
   get isAllFiltersSelected(): boolean {
@@ -174,7 +165,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
       this.selectedRatings = [...this.selectedRatings, rating].sort((a, b) => a - b);
     }
 
-    this.loadReviews();
+    this.applyCurrentFilters();
   }
 
   isRatingSelected(rating: number): boolean {
@@ -231,23 +222,32 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const reviewId = this.selectedReview.id;
     this.isSubmitting = true;
     this.errorMessage = '';
     this.successMessage = '';
 
     const action$ = this.selectedReview.creatorResponse
-      ? this.reviewService.updateResponse(this.selectedReview.id, { creatorResponse: content })
-      : this.reviewService.respond(this.selectedReview.id, { creatorResponse: content });
+      ? this.reviewService.updateResponse(reviewId, { creatorResponse: content })
+      : this.reviewService.respond(reviewId, { creatorResponse: content });
 
     action$
-      .pipe(finalize(() => {
-        this.isSubmitting = false;
-      }))
+      .pipe(
+        switchMap((updated) =>
+          this.reviewService.getById(updated.id).pipe(
+            catchError(() => of(updated))
+          )
+        ),
+        finalize(() => {
+          this.isSubmitting = false;
+        })
+      )
       .subscribe({
-        next: (updated) => {
-          this.updateReviewInCollections(updated);
-          localStorage.removeItem(this.getDraftKey(updated.id));
+        next: (fresh) => {
+          this.updateReviewInCollections(fresh);
+          localStorage.removeItem(this.getDraftKey(fresh.id));
           this.successMessage = 'Response sent successfully.';
+          this.loadReviews(true);
         },
         error: (error: any) => {
           this.errorMessage = error?.error?.message ?? 'Failed to send response.';
@@ -316,76 +316,53 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
     this.objectService.getById(objectId).subscribe({
       next: (objectDetails) => {
         this.selectedObject = objectDetails;
-        this.cdr.detectChanges();
+        this.triggerViewUpdate();
       },
       error: () => {
         this.selectedObject = null;
-        this.cdr.detectChanges();
+        this.triggerViewUpdate();
       }
     });
 
     this.isLoadingImages = true;
-    this.cdr.detectChanges();
     this.objectService.getImages(objectId)
       .pipe(finalize(() => {
         this.isLoadingImages = false;
-        this.cdr.detectChanges();
+        this.triggerViewUpdate();
       }))
       .subscribe({
         next: (images) => {
-          this.selectedObjectImages = images ?? [];
-          this.cdr.detectChanges();
+          this.selectedObjectImages = this.dedupeImagesById(images ?? []);
+          this.triggerViewUpdate();
         },
         error: () => {
           this.selectedObjectImages = [];
-          this.cdr.detectChanges();
+          this.triggerViewUpdate();
         }
       });
   }
 
-  private getMyContentIds() {
+  private getMyObjects(): Observable<ObjectDto[]> {
     const pageSize = 200;
 
-    const objectIds$ = this.getAllPagedIds((page) => (
+    return this.getAllPagedItems((page) => (
       this.objectService.getMy(
         { page, pageSize, sortBy: 'name', sortOrder: 'asc' },
         { bypassRegion: true }
       )
     ));
-
-    const activityIds$ = this.getAllPagedIds((page) => (
-      this.activitiesService.getMyActivities(
-        { page, pageSize, sortBy: 'name', sortOrder: 'asc' }
-      )
-    ));
-
-    const eventIds$ = this.getAllPagedIds((page) => (
-      this.eventService.getMy(
-        { page, pageSize, sortBy: 'name', sortOrder: 'asc' }
-      )
-    ));
-
-    return forkJoin([objectIds$, activityIds$, eventIds$]).pipe(
-      map(([objectIds, activityIds, eventIds]) => ([
-        ...objectIds,
-        ...activityIds,
-        ...eventIds
-      ])),
-      map((ids) => Array.from(new Set(ids))),
-      map((ids) => ids.filter((id) => Number.isFinite(id) && id > 0)),
-    );
   }
 
-  private getAllPagedIds<T extends { id: number }>(
+  private getAllPagedItems<T>(
     fetchPage: (page: number) => Observable<{ items?: T[]; totalPages?: number }>
-  ) {
+  ): Observable<T[]> {
     return fetchPage(1).pipe(
       switchMap((firstPage) => {
         const firstItems = firstPage.items ?? [];
         const totalPages = Math.max(1, firstPage.totalPages ?? 1);
 
         if (totalPages === 1) {
-          return of(firstItems.map((item) => item.id));
+          return of(firstItems);
         }
 
         const requests = Array.from({ length: totalPages - 1 }, (_, index) => fetchPage(index + 2));
@@ -394,16 +371,19 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
           map((pages) => [
             ...firstItems,
             ...pages.flatMap((page) => page.items ?? [])
-          ]),
-          map((items) => items.map((item) => item.id))
+          ])
         );
       }),
     );
   }
 
   private updateReviewInCollections(updated: ReviewDto): void {
-    this.allReviews = this.allReviews.map((review) => review.id === updated.id ? updated : review);
-    this.filteredReviews = this.filteredReviews.map((review) => review.id === updated.id ? updated : review);
+    this.allReviews = this.dedupeReviewsById(
+      this.allReviews.map((review) => review.id === updated.id ? updated : review)
+    );
+    this.filteredReviews = this.dedupeReviewsById(
+      this.filteredReviews.map((review) => review.id === updated.id ? updated : review)
+    );
     this.selectedReview = this.filteredReviews.find((review) => review.id === updated.id) ?? null;
     if (this.selectedReview) {
       this.responseText = this.selectedReview.creatorResponse?.trim() ?? this.responseText;
@@ -412,28 +392,6 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
 
   private getDraftKey(reviewId: number): string {
     return `cc-review-draft-${reviewId}`;
-  }
-
-  private getReviewQuery(): ReviewQueryParams {
-    const query: ReviewQueryParams = {
-      page: 1,
-      pageSize: 100,
-      sortBy: 'createdAt',
-      sortOrder: this.sortOrder
-    };
-
-    const trimmedSearch = this.searchTerm.trim();
-    if (trimmedSearch) {
-      query.search = trimmedSearch;
-    }
-
-    if (this.responseFilter === 'responded') {
-      query.hasResponse = true;
-    } else if (this.responseFilter === 'pending') {
-      query.hasResponse = false;
-    }
-
-    return query;
   }
 
   private applyRatingFilter(reviews: ReviewDto[]): ReviewDto[] {
@@ -445,32 +403,126 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
     return reviews.filter((review) => allowedRatings.has(review.rating));
   }
 
-  private fetchAllReviews() {
-    const query = this.getReviewQuery();
-    const pageSize = query.pageSize ?? 100;
-    return this.reviewService.getAll(query, { bypassRegion: true }).pipe(
-      switchMap((firstPage) => {
-        const firstItems = firstPage.items ?? [];
-        const totalPages = Math.max(1, firstPage.totalPages ?? 1);
-
-        if (totalPages === 1) {
-          return of(firstItems);
+  private fetchCreatorObjectReviews(): Observable<ReviewDto[]> {
+    return this.getMyObjects().pipe(
+      switchMap((objects: ObjectDto[]) => {
+        if (objects.length === 0) {
+          return of([] as ReviewDto[]);
         }
 
-        const requests = Array.from({ length: totalPages - 1 }, (_, index) => (
+        const objectIds = new Set(objects.map((object) => object.id));
+        const objectNames = new Map(objects.map((object) => [object.id, object.name] as const));
+
+        return this.getAllPagedItems((page) => (
           this.reviewService.getAll(
-            { ...query, page: index + 2, pageSize },
+            { page, pageSize: 200, sortBy: 'createdAt', sortOrder: 'desc' },
             { bypassRegion: true }
           )
-        ));
-
-        return forkJoin(requests).pipe(
-          map((pages) => [
-            ...firstItems,
-            ...pages.flatMap((page) => page.items ?? [])
-          ])
+        )).pipe(
+          map((reviews: ReviewDto[]) => reviews
+            .filter((review: ReviewDto) => objectIds.has(review.objectId))
+            .map((review: ReviewDto) => ({
+              ...review,
+              objectName: review.objectName?.trim()
+                ? review.objectName
+                : (objectNames.get(review.objectId) ?? `Object #${review.objectId}`)
+            }))),
+          map((reviews: ReviewDto[]) => this.dedupeReviewsById(reviews))
         );
       })
     );
+  }
+
+  private applyCurrentFilters(previousSelectedId: number | null = this.selectedReview?.id ?? null): void {
+    const normalizedSearch = this.searchTerm.trim().toLowerCase();
+
+    let reviews = [...this.sourceReviews];
+
+    if (this.selectedObjectIdFilter != null) {
+      reviews = reviews.filter((review) => review.objectId === this.selectedObjectIdFilter);
+    }
+
+    if (this.responseFilter === 'responded') {
+      reviews = reviews.filter((review) => !!review.creatorResponse?.trim());
+    } else if (this.responseFilter === 'pending') {
+      reviews = reviews.filter((review) => !review.creatorResponse?.trim());
+    }
+
+    if (normalizedSearch) {
+      reviews = reviews.filter((review) => this.matchesSearch(review, normalizedSearch));
+    }
+
+    reviews = this.applyRatingFilter(reviews);
+    reviews = this.sortReviews(reviews);
+
+    this.allReviews = [...this.sourceReviews];
+    this.filteredReviews = reviews;
+
+    if (reviews.length === 0) {
+      this.selectReview(null);
+      this.triggerViewUpdate();
+      return;
+    }
+
+    const match = previousSelectedId != null
+      ? reviews.find((review) => review.id === previousSelectedId) ?? null
+      : null;
+
+    this.selectReview(match ?? reviews[0]);
+    this.triggerViewUpdate();
+  }
+
+  private matchesSearch(review: ReviewDto, normalizedSearch: string): boolean {
+    return [
+      review.userFullName,
+      review.objectName,
+      review.text,
+      review.creatorResponse ?? ''
+    ]
+      .some((value) => value.toLowerCase().includes(normalizedSearch));
+  }
+
+  private sortReviews(reviews: ReviewDto[]): ReviewDto[] {
+    return [...reviews].sort((left, right) => {
+      const leftTime = new Date(left.createdAt).getTime();
+      const rightTime = new Date(right.createdAt).getTime();
+      return this.sortOrder === 'asc' ? leftTime - rightTime : rightTime - leftTime;
+    });
+  }
+
+  private dedupeReviewsById(reviews: ReviewDto[]): ReviewDto[] {
+    const seen = new Set<number>();
+    return reviews.filter((review) => {
+      if (seen.has(review.id)) {
+        return false;
+      }
+
+      seen.add(review.id);
+      return true;
+    });
+  }
+
+  private dedupeImagesById(images: ObjectImageDto[]): ObjectImageDto[] {
+    const seen = new Set<string>();
+    return images.filter((image) => {
+      const key = image.id != null ? `id:${image.id}` : `url:${image.url}`;
+      if (seen.has(key)) {
+        return false;
+      }
+
+      seen.add(key);
+      return true;
+    });
+  }
+
+  private triggerViewUpdate(): void {
+    queueMicrotask(() => {
+      this.cdr.detectChanges();
+    });
+  }
+
+  private parseObjectId(value: string | null): number | null {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
   }
 }

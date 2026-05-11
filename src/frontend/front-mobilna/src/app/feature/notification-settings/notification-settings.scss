@@ -1,0 +1,262 @@
+// Notification Settings page reuses the same design system as the main settings page.
+// All relevant styles are defined here so the component is fully self-contained.
+
+.settings-page {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at top center, rgba(22, 138, 173, 0.1), transparent 30%),
+    linear-gradient(180deg, #fbfeff 0%, #eef8fb 62%, #ebf6fa 100%);
+}
+
+.settings-shell {
+  width: min(100%, 430px);
+  margin: 0 auto;
+  padding: 8px 13px 88px;
+}
+
+.topbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  margin-bottom: 18px;
+
+  h1 {
+    text-align: center;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--emperor);
+  }
+}
+
+.back-btn {
+  width: 42px;
+  height: 42px;
+  border: none;
+  background: transparent;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.topbar-spacer {
+  width: 42px;
+}
+
+.preference-section {
+  margin-bottom: 18px;
+
+  h3 {
+    margin: 0;
+  }
+}
+
+.section-heading {
+  margin: 0 3px 10px;
+
+  span {
+    display: inline-flex;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(42, 70, 84, 0.7);
+  }
+}
+
+.preference-card {
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(208, 234, 240, 0.9);
+  border-radius: 18px;
+  box-shadow: 0 14px 34px rgba(23, 110, 134, 0.07);
+  backdrop-filter: blur(10px);
+}
+
+.preference-row {
+  padding: 18px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.preference-row--nested {
+  padding: 14px 0;
+}
+
+.preference-copy {
+  min-width: 0;
+  flex: 1;
+
+  p {
+    margin: 6px 0 0;
+    font-size: 13px;
+    line-height: 1.45;
+    color: rgba(77, 99, 112, 0.88);
+  }
+}
+
+.preference-copy--compact {
+  margin-bottom: 14px;
+}
+
+.preference-divider {
+  height: 1px;
+  background: rgba(208, 234, 240, 0.72);
+}
+
+.mode-block {
+  padding: 18px 16px;
+}
+
+.delivery-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.delivery-toggle__option {
+  border: 1px solid rgba(188, 225, 235, 0.92);
+  border-radius: 16px;
+  background: #f7fcfe;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  color: var(--emperor);
+  transition: all 0.2s ease;
+
+  strong {
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  span {
+    font-size: 12px;
+    line-height: 1.45;
+    color: rgba(78, 101, 113, 0.86);
+  }
+}
+
+.delivery-toggle__option--active {
+  background: linear-gradient(135deg, rgba(31, 148, 191, 0.14), rgba(85, 214, 216, 0.14));
+  border-color: rgba(31, 148, 191, 0.4);
+  box-shadow: 0 12px 28px rgba(31, 148, 191, 0.12);
+}
+
+.notification-group {
+  padding: 18px 16px;
+
+  h3 {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(42, 70, 84, 0.7);
+    margin-bottom: 8px;
+  }
+}
+
+.notification-group__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--emperor);
+}
+
+.switch {
+  position: relative;
+  width: 48px;
+  height: 28px;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: #d7e5eb;
+  box-shadow: inset 0 0 0 1px rgba(117, 150, 165, 0.24);
+  transition: 0.25s;
+}
+
+.slider::before {
+  content: '';
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  left: 3px;
+  top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: 0.25s;
+}
+
+.switch input:checked + .slider {
+  background: var(--primary);
+}
+
+.switch--checked .slider {
+  background: var(--primary);
+  box-shadow: none;
+}
+
+.switch:not(.switch--checked) .slider::before {
+  transform: translateX(0);
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(20px);
+}
+
+.switch--checked .slider::before {
+  transform: translateX(20px);
+}
+
+.back-btn mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+@media (min-width: 768px) {
+  .settings-page {
+    padding: 18px 24px 36px;
+  }
+
+  .settings-shell {
+    width: min(100%, 680px);
+    padding: 12px 0 24px;
+  }
+
+  .menu-title {
+    font-size: 16px;
+  }
+
+  .preference-row {
+    padding: 18px 20px;
+  }
+
+  .mode-block,
+  .notification-group {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 520px) {
+  .delivery-toggle {
+    grid-template-columns: 1fr;
+  }
+}

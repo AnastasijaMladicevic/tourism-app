@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ReviewDto } from './review';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
@@ -57,6 +57,11 @@ export interface ObjectQueryParams {
   locality?: string;
   status?: string;
   regionId?: number;
+  amenities?: string[];
+  minPrice?: number;
+  maxPrice?: number;
+  minRating?: number;
+  maxRating?: number;
   page?: number;
   pageSize?: number;
   search?: string;
@@ -94,6 +99,7 @@ export interface PagedResultDto<T> {
 @Injectable({ providedIn: 'root' })
 export class ObjectService {
   private readonly url = `${environment.apiUrl}/objects`;
+  private readonly fetchBatchSize = 100;
 
   constructor(
     private readonly http: HttpClient,
@@ -109,23 +115,90 @@ export class ObjectService {
     return params.set('Lang', this.translationService.language());
   }
 
-  getAll(
-    query?: ObjectQueryParams,
+  private buildParams(
+    query?: ObjectQueryParams | NearbyObjectQueryParams,
     options?: RegionRequestOptions,
-  ): Observable<ObjectDto[]> {
+  ): HttpParams {
     const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options);
     let params = new HttpParams();
 
     if (effectiveQuery) {
       Object.entries(effectiveQuery).forEach(([key, value]) => {
-        if (value != null && value !== '') {
-          params = params.set(key, String(value));
+        if (value == null || value === '') {
+          return;
         }
+
+        if (Array.isArray(value)) {
+          value.forEach((item) => {
+            if (item != null && item !== '') {
+              params = params.append(key, String(item));
+            }
+          });
+          return;
+        }
+
+        params = params.set(key, String(value));
       });
     }
 
-    params = this.addLang(params, options);
-    return this.http.get<ObjectDto[]>(this.url, { params });
+    return this.addLang(params, options);
+  }
+
+  getPage(
+    query?: ObjectQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<PagedResultDto<ObjectDto>> {
+    const params = this.buildParams(query, options);
+    return this.http.get<PagedResultDto<ObjectDto>>(this.url, { params });
+  }
+
+  getAll(
+    query?: ObjectQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<ObjectDto[]> {
+    return this.getPage(query, options).pipe(
+      map((result) => result.items ?? []),
+    );
+  }
+
+  getAllItems(
+    query?: ObjectQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<ObjectDto[]> {
+    const firstQuery: ObjectQueryParams = {
+      ...query,
+      page: 1,
+      pageSize: this.fetchBatchSize,
+    };
+
+    return this.getPage(firstQuery, options).pipe(
+      switchMap((firstPage) => {
+        const firstItems = firstPage.items ?? [];
+        const totalPages = Math.max(1, Number(firstPage.totalPages ?? 1));
+
+        if (totalPages <= 1) {
+          return of(firstItems);
+        }
+
+        const requests = Array.from({ length: totalPages - 1 }, (_, index) =>
+          this.getPage(
+            {
+              ...query,
+              page: index + 2,
+              pageSize: this.fetchBatchSize,
+            },
+            options,
+          ),
+        );
+
+        return forkJoin(requests).pipe(
+          map((pages) => [
+            ...firstItems,
+            ...pages.flatMap((page) => page.items ?? []),
+          ]),
+        );
+      }),
+    );
   }
 
   getById(id: number): Observable<ObjectDto> {
@@ -139,27 +212,7 @@ export class ObjectService {
     query: NearbyObjectQueryParams,
     options?: RegionRequestOptions,
   ): Observable<PagedResultDto<ObjectDto>> {
-    const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options) ?? query;
-    let params = new HttpParams();
-
-    Object.entries(effectiveQuery).forEach(([key, value]) => {
-      if (value == null || value === '') {
-        return;
-      }
-
-      if (Array.isArray(value)) {
-        value.forEach((item) => {
-          if (item != null && item !== '') {
-            params = params.append(key, String(item));
-          }
-        });
-        return;
-      }
-
-      params = params.set(key, String(value));
-    });
-
-    params = this.addLang(params, options);
+    const params = this.buildParams(query, options);
     return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/nearby`, { params });
   }
 

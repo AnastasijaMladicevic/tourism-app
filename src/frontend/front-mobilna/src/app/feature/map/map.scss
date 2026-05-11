@@ -323,11 +323,11 @@
   overflow-y: auto;
 }
 
-.route-suggestions>div {
+.route-suggestion-item {
   padding: 10px 14px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--emperor);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
   cursor: pointer;
   border-bottom: 1px solid var(--border);
   transition: background 0.15s;
@@ -339,6 +339,18 @@
   &:hover {
     background: var(--athens-gray);
   }
+}
+
+.route-suggestion-item strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--emperor);
+}
+
+.route-suggestion-item span {
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--text-gray);
 }
 
 .route-controls {
@@ -375,10 +387,20 @@
   padding: 8px;
   border-radius: 10px;
   background: #e0f2fe;
+  border: none;
   cursor: pointer;
   display: flex;
   gap: 6px;
   align-items: center;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #168AAD;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
 }
 .route-planner__row {
   display: flex;
@@ -496,6 +518,92 @@
 .gps-btn--active {
   background: #10b981 !important;
   color: var(--white) !important;
+}
+
+.location-consent-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(15, 23, 42, 0.38);
+  backdrop-filter: blur(3px);
+}
+
+.location-consent-modal {
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1201;
+  background: rgba(255, 255, 255, 0.97);
+  border: 1px solid rgba(208, 234, 240, 0.95);
+  border-radius: 22px;
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.22);
+  padding: 20px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--emperor);
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.55;
+    color: rgba(77, 99, 112, 0.92);
+  }
+
+  @media (min-width: 768px) {
+    left: 50%;
+    right: auto;
+    width: min(420px, calc(100vw - 32px));
+    transform: translate(-50%, -50%);
+  }
+}
+
+.location-consent-modal__icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(22, 138, 173, 0.12);
+  color: #168AAD;
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.location-consent-modal__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.location-consent-modal__btn {
+  min-height: 44px;
+  border: none;
+  border-radius: 14px;
+  background: #168AAD;
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.location-consent-modal__btn--ghost {
+  background: rgba(22, 138, 173, 0.08);
+  color: #168AAD;
+  border: 1px solid rgba(22, 138, 173, 0.18);
 }
 
 // ─── User location marker ──────────────────────────────────────────────────────

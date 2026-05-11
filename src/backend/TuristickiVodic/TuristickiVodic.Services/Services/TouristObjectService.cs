@@ -52,11 +52,7 @@ namespace TuristickiVodic.Services.Services
 
             if (!string.IsNullOrWhiteSpace(query.Type))
             {
-                var type = query.Type.Trim().ToLower();
-
-                objectsQuery = objectsQuery.Where(o =>
-                    o.ObjectType != null &&
-                    o.ObjectType.Name.ToLower().Contains(type));
+                objectsQuery = ApplyObjectTypeFilter(objectsQuery, query.Type);
             }
 
             if (!string.IsNullOrWhiteSpace(query.Destination))
@@ -205,10 +201,7 @@ namespace TuristickiVodic.Services.Services
 
             if (!string.IsNullOrWhiteSpace(query.Type))
             {
-                var type = query.Type.Trim().ToLower();
-                objectsQuery = objectsQuery.Where(o =>
-                    o.ObjectType != null &&
-                    o.ObjectType.Name.ToLower().Contains(type));
+                objectsQuery = ApplyObjectTypeFilter(objectsQuery, query.Type);
             }
 
             if (!string.IsNullOrWhiteSpace(query.Destination))
@@ -367,10 +360,7 @@ namespace TuristickiVodic.Services.Services
 
             if (!string.IsNullOrWhiteSpace(query.Type))
             {
-                var type = query.Type.Trim().ToLower();
-                objectsQuery = objectsQuery.Where(o =>
-                    o.ObjectType != null &&
-                    o.ObjectType.Name.ToLower().Contains(type));
+                objectsQuery = ApplyObjectTypeFilter(objectsQuery, query.Type);
             }
 
             if (!string.IsNullOrWhiteSpace(query.Destination))
@@ -505,11 +495,7 @@ namespace TuristickiVodic.Services.Services
 
             if (!string.IsNullOrWhiteSpace(query.Type))
             {
-                var type = query.Type.Trim().ToLower();
-
-                objectsQuery = objectsQuery.Where(o =>
-                    o.ObjectType != null &&
-                    o.ObjectType.Name.ToLower().Contains(type));
+                objectsQuery = ApplyObjectTypeFilter(objectsQuery, query.Type);
             }
 
             if (!string.IsNullOrWhiteSpace(query.Destination))
@@ -1160,18 +1146,28 @@ namespace TuristickiVodic.Services.Services
 
         private static IEnumerable<TouristObject> ApplyObjectSearchFilter(IEnumerable<TouristObject> objects, string search)
         {
-            return objects.Where(o => MatchesObjectSearch(o, search));
+            var tokens = TokenizeSearchTerms(search);
+            return tokens.Length == 0
+                ? objects
+                : objects.Where(o => MatchesObjectSearch(o, tokens));
         }
 
-        private static bool MatchesObjectSearch(TouristObject obj, string search)
+        private static bool MatchesObjectSearch(TouristObject obj, IReadOnlyCollection<string> tokens)
         {
-            return obj.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+            return tokens.All(token => MatchesObjectSearchToken(obj, token));
+        }
+
+        private static bool MatchesObjectSearchToken(TouristObject obj, string token)
+        {
+            return obj.Name.Contains(token, StringComparison.OrdinalIgnoreCase) ||
                 (obj.ObjectType != null &&
-                    obj.ObjectType.Name.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+                    obj.ObjectType.Name.Contains(token, StringComparison.OrdinalIgnoreCase)) ||
+                (!string.IsNullOrWhiteSpace(obj.CuisineType) &&
+                    obj.CuisineType.Contains(token, StringComparison.OrdinalIgnoreCase)) ||
                 (!string.IsNullOrWhiteSpace(obj.Description) &&
-                    obj.Description.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+                    obj.Description.Contains(token, StringComparison.OrdinalIgnoreCase)) ||
                 (obj.Amenities != null &&
-                    obj.Amenities.Any(a => a.Contains(search, StringComparison.OrdinalIgnoreCase)));
+                    obj.Amenities.Any(a => a.Contains(token, StringComparison.OrdinalIgnoreCase)));
         }
 
         private static int GetObjectSearchRank(TouristObject obj, string search)
@@ -1179,19 +1175,34 @@ namespace TuristickiVodic.Services.Services
             if (obj.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
                 return 0;
 
-            if (obj.ObjectType != null &&
-                obj.ObjectType.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+            var tokens = TokenizeSearchTerms(search);
+            if (tokens.Length == 0)
+                return 5;
+
+            if (tokens.All(token => obj.Name.Contains(token, StringComparison.OrdinalIgnoreCase)))
                 return 1;
 
-            if (!string.IsNullOrWhiteSpace(obj.Description) &&
-                obj.Description.Contains(search, StringComparison.OrdinalIgnoreCase))
+            if (obj.ObjectType != null &&
+                (obj.ObjectType.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                 tokens.All(token => obj.ObjectType.Name.Contains(token, StringComparison.OrdinalIgnoreCase))))
                 return 2;
 
-            if (obj.Amenities != null &&
-                obj.Amenities.Any(a => a.Contains(search, StringComparison.OrdinalIgnoreCase)))
+            if (!string.IsNullOrWhiteSpace(obj.CuisineType) &&
+                (obj.CuisineType.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                 tokens.All(token => obj.CuisineType.Contains(token, StringComparison.OrdinalIgnoreCase))))
                 return 3;
 
-            return 4;
+            if (!string.IsNullOrWhiteSpace(obj.Description) &&
+                (obj.Description.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                 tokens.All(token => obj.Description.Contains(token, StringComparison.OrdinalIgnoreCase))))
+                return 4;
+
+            if (obj.Amenities != null &&
+                (obj.Amenities.Any(a => a.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+                 tokens.All(token => obj.Amenities.Any(a => a.Contains(token, StringComparison.OrdinalIgnoreCase)))))
+                return 5;
+
+            return 6;
         }
 
         private static IQueryable<TouristObject> ApplyObjectSorting(IQueryable<TouristObject> query, string? sortBy, string? sortOrder)
@@ -1253,6 +1264,78 @@ namespace TuristickiVodic.Services.Services
                 : query.OrderBy(o => o.Name);
         }
 
+        private static IQueryable<TouristObject> ApplyObjectTypeFilter(IQueryable<TouristObject> query, string rawType)
+        {
+            var type = rawType.Trim().ToLower();
+
+            if (type == "hrana i pice")
+            {
+                return query.Where(o =>
+                    o.ObjectType != null && (
+                        o.ObjectType.Name.ToLower().Contains("restoran") ||
+                        o.ObjectType.Name.ToLower().Contains("kafana") ||
+                        o.ObjectType.Name.ToLower().Contains("bar") ||
+                        o.ObjectType.Name.ToLower().Contains("kafic") ||
+                        o.ObjectType.Name.ToLower().Contains("kafić") ||
+                        o.ObjectType.Name.ToLower().Contains("fast food") ||
+                        o.ObjectType.Name.ToLower().Contains("fast_food") ||
+                        o.ObjectType.Name.ToLower().Contains("vinarija") ||
+                        o.ObjectType.Name.ToLower().Contains("club")));
+            }
+
+            if (type == "pumpe")
+            {
+                return query.Where(o =>
+                    o.ObjectType != null && (
+                        o.ObjectType.Name.ToLower().Contains("pumpa") ||
+                        o.ObjectType.Name.ToLower().Contains("benzinska pumpa") ||
+                        o.ObjectType.Name.ToLower().Contains("gas station")));
+            }
+
+            if (type == "smestaj")
+            {
+                return query.Where(o =>
+                    o.ObjectType != null && (
+                        o.ObjectType.Name.ToLower().Contains("hotel") ||
+                        o.ObjectType.Name.ToLower().Contains("apartman") ||
+                        o.ObjectType.Name.ToLower().Contains("apartment") ||
+                        o.ObjectType.Name.ToLower().Contains("motel") ||
+                        o.ObjectType.Name.ToLower().Contains("resort") ||
+                        o.ObjectType.Name.ToLower().Contains("hostel") ||
+                        o.ObjectType.Name.ToLower().Contains("pansion") ||
+                        o.ObjectType.Name.ToLower().Contains("smestaj") ||
+                        o.ObjectType.Name.ToLower().Contains("smeštaj")));
+            }
+
+            if (type == "soping" || type == "šoping")
+            {
+                return query.Where(o =>
+                    o.ObjectType != null && (
+                        o.ObjectType.Name.ToLower().Contains("shop") ||
+                        o.ObjectType.Name.ToLower().Contains("shopping centar") ||
+                        o.ObjectType.Name.ToLower().Contains("trzni centar") ||
+                        o.ObjectType.Name.ToLower().Contains("tržni centar") ||
+                        o.ObjectType.Name.ToLower().Contains("market") ||
+                        o.ObjectType.Name.ToLower().Contains("prodavnica")));
+            }
+
+            if (type == "bolnice")
+            {
+                return query.Where(o =>
+                    o.ObjectType != null && (
+                        o.ObjectType.Name.ToLower().Contains("bolnica") ||
+                        o.ObjectType.Name.ToLower().Contains("klinika") ||
+                        o.ObjectType.Name.ToLower().Contains("poliklinika") ||
+                        o.ObjectType.Name.ToLower().Contains("dom zdravlja") ||
+                        o.ObjectType.Name.ToLower().Contains("hospital") ||
+                        o.ObjectType.Name.ToLower().Contains("clinic")));
+            }
+
+            return query.Where(o =>
+                o.ObjectType != null &&
+                o.ObjectType.Name.ToLower().Contains(type));
+        }
+
         private static string[] NormalizeAmenities(string[]? amenities)
         {
             if (amenities == null)
@@ -1263,6 +1346,17 @@ namespace TuristickiVodic.Services.Services
                 .Select(a => a.Trim())
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToArray();
+        }
+
+        private static string[] TokenizeSearchTerms(string search)
+        {
+            var tokens = search
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                .Where(token => token.Length >= 2)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            return tokens.Length > 0 ? tokens : new[] { search };
         }
 
         private static string? NormalizeOptionalText(string? value)
@@ -1306,7 +1400,7 @@ namespace TuristickiVodic.Services.Services
                 if (!objectsById.TryGetValue(dto.Id, out var obj))
                     continue;
 
-                await ApplyTranslationsAsync(dto, obj, normalizedLang, false);
+                await ApplyTranslationsAsync(dto, obj, normalizedLang, true);
             }
         }
 

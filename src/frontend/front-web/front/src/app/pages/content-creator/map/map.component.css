@@ -1,9 +1,15 @@
+:host {
+  display: block;
+  height: calc(100vh - 62px);
+  overflow: hidden;
+}
+
 .map-page {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 62px);
   overflow: hidden;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-base);
 }
 
 .main-map {
@@ -12,12 +18,17 @@
   z-index: 0;
 }
 
+.main-map,
+.main-map :is(.leaflet-container, .leaflet-control, .leaflet-popup-content-wrapper) {
+  font-family: var(--font-base);
+}
+
 .search-bar {
   position: absolute;
   top: 16px;
   left: 16px;
   right: 16px;
-  z-index: 1000;
+  z-index: 1200;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -25,18 +36,20 @@
 }
 
 .search-input {
+  position: relative;
   flex: 1;
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--white);
-  border-radius: 14px;
-  padding: 10px 14px;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
-  position: relative;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
 
   mat-icon {
-    color: var(--text-gray);
+    color: var(--text-secondary);
     font-size: 18px;
     width: 18px;
     height: 18px;
@@ -48,11 +61,11 @@
     border: none;
     outline: none;
     background: transparent;
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--font-base);
     font-size: 14px;
-    color: var(--text-dark);
+    color: var(--text-primary);
     &::placeholder {
-      color: var(--text-light);
+      color: var(--text-muted);
     }
   }
 }
@@ -60,7 +73,7 @@
 .clear-btn {
   border: none;
   background: transparent;
-  color: var(--text-gray);
+  color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -95,12 +108,12 @@
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
-  right: 52px;
-  background: var(--white);
-  border-radius: 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  right: 0;
+  background: var(--bg-white);
+  border-radius: 16px;
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.14);
   overflow: hidden;
-  z-index: 100;
+  z-index: 1250;
   max-height: 320px;
   overflow-y: auto;
 }
@@ -114,24 +127,24 @@
   transition: background 0.15s;
 
   &:hover {
-    background: var(--athens-gray);
+    background: var(--gray-50);
   }
   & + & {
-    border-top: 1px solid var(--border);
+    border-top: 1px solid var(--border-color);
   }
 }
 
 .suggestion-item__image {
   width: 44px;
   height: 44px;
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   flex-shrink: 0;
-  background: var(--athens-gray);
+  background: var(--gray-100);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-gray);
+  color: var(--text-secondary);
 
   img {
     width: 100%;
@@ -152,8 +165,8 @@
 
 .suggestion-item__name {
   font-size: 14px;
-  font-weight: 600;
-  color: var(--emperor);
+  font-weight: 700;
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -161,7 +174,7 @@
 
 .suggestion-item__meta {
   font-size: 12px;
-  color: var(--text-gray);
+  color: var(--text-secondary);
 }
 
 .filter-chips {
@@ -169,7 +182,7 @@
   top: 76px;
   left: 16px;
   right: 16px;
-  z-index: 10;
+  z-index: 1100;
   display: flex;
   gap: 8px;
   overflow-x: auto;
@@ -187,7 +200,7 @@
   padding: 6px 14px;
   border-radius: 20px;
   border: none;
-  background: var(--white);
+  background: #ffffff;
   font-family: 'DM Sans', sans-serif;
   font-size: 13px;
   font-weight: 500;
@@ -196,21 +209,46 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition:
     background 0.2s,
-    color 0.2s;
+    color 0.2s,
+    opacity 0.2s,
+    border-color 0.2s,
+    box-shadow 0.2s;
   white-space: nowrap;
+  opacity: 1 !important;
+  border: 1px solid rgba(255, 255, 255, 0.85);
 
   &:hover {
-    background: var(--primary-light);
-    color: var(--primary);
+    background: #ffffff;
+    color: var(--emperor);
+    opacity: 1 !important;
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: none;
+    filter: none;
   }
 }
 
+.chip mat-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+  line-height: 1;
+}
+
 .chip--active {
-  background: var(--primary);
-  color: var(--white);
+  background: #168aad !important;
+  color: #ffffff;
+  opacity: 1 !important;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(22, 138, 173, 0.28) !important;
   &:hover {
-    background: var(--primary-dark);
-    color: var(--white);
+    background: #168aad !important;
+    color: #ffffff;
+    opacity: 1 !important;
+    border: none !important;
+    box-shadow: 0 2px 8px rgba(22, 138, 173, 0.28) !important;
+    transform: none;
+    filter: none;
   }
 }
 
@@ -219,7 +257,7 @@
   top: 124px;
   left: 16px;
   right: 16px;
-  z-index: 10;
+  z-index: 1000;
   background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(10px);
   border-radius: 18px;
@@ -295,7 +333,7 @@
   right: 16px;
   top: 40%;
   transform: translateY(-50%);
-  z-index: 10;
+  z-index: 1000;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -306,17 +344,17 @@
 }
 
 .control-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
   border: none;
-  background: var(--white);
-  color: var(--emperor);
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14);
   transition:
     background 0.2s,
     color 0.2s;
@@ -326,24 +364,9 @@
     height: 20px;
   }
   &:hover {
-    background: var(--primary-light);
-    color: var(--primary);
+    background: var(--color-primary-light);
+    color: var(--color-primary);
   }
-}
-
-.gps-btn {
-  background: var(--primary);
-  color: var(--white);
-  margin-bottom: 8px;
-  &:hover {
-    background: var(--primary-dark);
-    color: var(--white);
-  }
-}
-
-.gps-btn--active {
-  background: #10b981 !important;
-  color: var(--white) !important;
 }
 
 .user-dot {
@@ -392,10 +415,10 @@
   bottom: 72px;
   left: 16px;
   right: 16px;
-  z-index: 10;
-  background: var(--white);
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 24px;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.18);
   overflow: hidden;
   animation: slideUp 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 
@@ -429,14 +452,14 @@
 
 .bottom-card__close {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 30px;
-  height: 30px;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  border: none;
-  background: rgba(0, 0, 0, 0.4);
-  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -470,18 +493,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--athens-gray);
-    color: var(--text-light);
+    background: linear-gradient(180deg, #eef5ff 0%, #dde8ff 100%);
+    color: var(--color-primary);
     mat-icon {
-      font-size: 40px;
-      width: 40px;
-      height: 40px;
+      font-size: 42px;
+      width: 42px;
+      height: 42px;
     }
   }
 }
 
 .bottom-card__body {
-  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
 }
 
 .bottom-card__top {
@@ -489,17 +515,18 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
-  margin-bottom: 8px;
+  gap: 8px;
 }
 
 .bottom-card__info {
+  min-width: 0;
   flex: 1;
 }
 
 .bottom-card__name {
   font-size: 16px;
-  font-weight: 700;
-  color: var(--emperor);
+  font-weight: 800;
+  color: var(--text-primary);
   margin: 0 0 4px;
 }
 
@@ -508,7 +535,7 @@
   align-items: center;
   gap: 3px;
   font-size: 12px;
-  color: var(--text-gray);
+  color: var(--text-secondary);
   margin: 0;
   mat-icon {
     font-size: 13px;
@@ -521,9 +548,9 @@
   display: flex;
   align-items: center;
   gap: 3px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  color: var(--emperor);
+  color: var(--text-primary);
   flex-shrink: 0;
   mat-icon {
     font-size: 15px;
@@ -535,8 +562,8 @@
 
 .bottom-card__badges {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 12px;
 }
 
 .badge {
@@ -561,8 +588,8 @@
     color: #ef4444;
   }
   &--distance {
-    background: var(--athens-gray);
-    color: var(--text-gray);
+    background: var(--gray-100);
+    color: var(--text-secondary);
   }
 }
 
@@ -585,7 +612,7 @@
   border: 1px solid rgba(22, 138, 173, 0.22);
   background: rgba(22, 138, 173, 0.06);
   color: #168aad;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-base);
   font-size: 13px;
   font-weight: 700;
   display: flex;
@@ -635,6 +662,7 @@
 .leaflet-routing-container {
   display: none !important;
 }
+
 .custom-type-marker {
   background: transparent !important;
   border: none !important;
@@ -644,26 +672,116 @@
     filter 0.2s ease;
 }
 
-.custom-type-marker.marker-dimmed {
-  opacity: 0.32;
-  filter: saturate(0.65) brightness(0.72);
-  transform: scale(0.92);
+.custom-type-marker .marker-pin {
+  position: relative;
+  display: flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  --marker-fill: #168aad;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--marker-fill);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.26);
 }
 
-.custom-type-marker.marker-focused {
-  opacity: 1;
-  filter: none;
-  transform: scale(1.06);
-  z-index: 450 !important;
+.custom-type-marker .marker-pin::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  width: 12px;
+  height: 12px;
+  background: var(--marker-fill);
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  border-bottom-left-radius: 4px;
+  transform: translateX(-50%) rotate(-45deg);
 }
 
-.leaflet-marker-icon.marker-selected-pin {
-  filter: drop-shadow(0 10px 20px rgba(22, 138, 173, 0.34));
-  transform: translateY(-4px) scale(1.08);
-  transition:
-    transform 0.18s ease,
-    filter 0.18s ease;
+.custom-type-marker .marker-pin__icon {
+  font-size: 14px;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.custom-type-marker.marker-filter-match .marker-pin {
+  --marker-fill: #ef4444;
+}
+
+.custom-type-marker.marker-selected {
   z-index: 500 !important;
+}
+
+.custom-type-marker .marker-pin--selected {
+  --marker-fill: #2563eb;
+  background: var(--marker-fill);
+  transform: scale(1.12);
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.4);
+}
+
+.custom-type-marker.marker-dimmed {
+  opacity: 0.24;
+  filter: saturate(0.65) brightness(0.72);
+}
+
+.destination-cluster {
+  background: transparent !important;
+  border: none !important;
+}
+
+.destination-cluster__pin {
+  position: relative;
+  display: flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid rgba(255, 255, 255, 0.96);
+  border-radius: 50% 50% 50% 0;
+  background: linear-gradient(145deg, #4cc9f0 0%, #2563eb 58%, #1d4ed8 100%);
+  box-shadow:
+    0 18px 30px rgba(37, 99, 235, 0.32),
+    inset 0 2px 10px rgba(255, 255, 255, 0.18);
+  transform: rotate(-45deg);
+}
+
+.destination-cluster__pin::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.destination-cluster__count {
+  position: relative;
+  z-index: 1;
+  color: white;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(15, 23, 42, 0.22);
+  transform: rotate(45deg);
+}
+
+.destination-cluster--medium .destination-cluster__pin {
+  width: 47px;
+  height: 47px;
+}
+
+.destination-cluster--medium .destination-cluster__count {
+  font-size: 13px;
+}
+
+.destination-cluster--large .destination-cluster__pin {
+  width: 52px;
+  height: 52px;
+}
+
+.destination-cluster--large .destination-cluster__count {
+  font-size: 15px;
 }
 
 .leaflet-popup {

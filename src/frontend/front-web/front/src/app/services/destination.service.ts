@@ -21,6 +21,7 @@ export interface DestinationDto {
   regionId?: number;
   regionName?: string;
   regionCode?: string;
+  managedByUserId?: number;
   images?: DestinationImageDto[];
   isFavorite?: boolean;
   favoriteId?: number;
@@ -51,6 +52,7 @@ export interface CreateDestinationDto {
   isActive: boolean;
   destinationTypeId: number;
   regionId?: number;
+  managedByUserId?: number;
 }
 
 export interface UpdateDestinationDto {
@@ -61,6 +63,10 @@ export interface UpdateDestinationDto {
   isActive?: boolean;
   destinationTypeId?: number;
   regionId?: number;
+}
+
+export interface AssignManagerDto {
+  managerUserId: number;
 }
 @Injectable({
   providedIn: 'root'
@@ -100,7 +106,37 @@ export class DestinationService {
     return this.http.put<DestinationDto>(`${this.apiUrl}/${id}`, dto);
   }
 
+  assignManager(id: number, managerUserId: number): Observable<DestinationDto> {
+    const body: AssignManagerDto = { managerUserId };
+    return this.http.put<DestinationDto>(`${this.apiUrl}/${id}/assign-manager`, body);
+  }
+
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  getImages(destinationId: number): Observable<DestinationImageDto[]> {
+    return this.http.get<DestinationImageDto[]>(`${environment.apiUrl}/destinations/${destinationId}/images`);
+  }
+
+  addImage(destinationId: number, file: File, isMain = false, altText?: string): Observable<DestinationImageDto> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('isMain', String(isMain));
+    if (altText?.trim()) {
+      formData.append('altText', altText.trim());
+    }
+    return this.http.post<DestinationImageDto>(
+      `${environment.apiUrl}/destinations/${destinationId}/images`,
+      formData
+    );
+  }
+
+  deleteImageById(imageId: number): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/images/${imageId}`);
+  }
+
+  setMainImage(imageId: number): Observable<DestinationImageDto> {
+    return this.http.patch<DestinationImageDto>(`${environment.apiUrl}/images/${imageId}/set-main`, {});
   }
 }

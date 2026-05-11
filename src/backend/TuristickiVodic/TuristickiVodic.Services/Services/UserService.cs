@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using NetTopologySuite.Geometries;
 using System.Security.Cryptography;
 using System.Text;
@@ -18,24 +19,33 @@ namespace TuristickiVodic.Services
     {
         private const int ResetCodeLifetimeMinutes = 5;
         private const int ResetSessionLifetimeMinutes = 5;
+        private const int ShareLocationStaleMinutes = 30;
+        private const int MaxVisitedHistoryPoints = 3000;
+        private const double MaxVisitedPointAccuracyMeters = 250d;
+        private const double LocalityVisitRadiusMeters = 250d;
+        private const double DestinationVisitRadiusMeters = 700d;
+        private const string DefaultPublicAppBaseUrl = "http://localhost:4200";
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
         private readonly IEmailService _emailService;
         private readonly IWebHostEnvironment _environment;
+        private readonly IConfiguration _configuration;
 
         public UserService(
             AppDbContext context,
             IMapper mapper,
             ITokenService tokenService,
             IEmailService emailService,
-            IWebHostEnvironment environment)
+            IWebHostEnvironment environment,
+            IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
             _tokenService = tokenService;
             _emailService = emailService;
             _environment = environment;
+            _configuration = configuration;
         }
 
         public async Task<PagedResultDto<UserDto>> GetAllAsync(UserQueryDto query)
@@ -358,6 +368,163 @@ namespace TuristickiVodic.Services
 
             await _context.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<List<VisitedPlaceDto>> GetVisitedPlacesAsync(int userId, int limit)
+        {
+            if (limit < 1)
+                limit = 12;
+
+            if (limit > 50)
+                limit = 50;
+
+            var historyPoints = await _context.UserLocationHistories
+                .AsNoTracking()
+                .Where(x => x.UserId == userId)
+                .Where(x => x.AccuracyMeters.HasValue && x.AccuracyMeters.Value <= MaxVisitedPointAccuracyMeters)
+                .OrderByDescending(x => x.RecordedAt)
+                .ThenByDescending(x => x.Id)
+                .Take(MaxVisitedHistoryPoints)
+                .Select(x => new VisitPointCandidate
+                {
+                    Latitude = x.Location.Y,
+                    Longitude = x.Location.X,
+                    AccuracyMeters = x.AccuracyMeters,
+                    RecordedAt = x.RecordedAt
+                })
+                .ToListAsync();
+
+            if (historyPoints.Count == 0)
+                return new List<VisitedPlaceDto>();
+
+            var localities = await _context.Localities
+                .AsNoTracking()
+                .Include(x => x.Destination)
+                .ThenInclude(x => x.Region)
+                .Where(x => x.Geolocation != null)
+                .ToListAsync();
+
+            var destinations = await _context.Destinations
+                .AsNoTracking()
+                .Include(x => x.Region)
+                .Where(x => x.Geolocation != null)
+                .ToListAsync();
+
+            var visitedPlaces = new List<VisitedPlaceDto>();
+
+            foreach (var locality in localities)
+            {
+                var visitedAt = FindLatestVisit(
+                    historyPoints,
+                    locality.Geolocation!.Y,
+                    locality.Geolocation.X,
+                    LocalityVisitRadiusMeters);
+
+                if (!visitedAt.HasValue)
+                    continue;
+
+                visitedPlaces.Add(new VisitedPlaceDto
+                {
+                    Id = locality.Id,
+                    Kind = "locality",
+                    Name = locality.Name,
+                    DestinationName = locality.Destination?.Name,
+                    RegionName = locality.Destination?.Region?.Name,
+                    Latitude = locality.Geolocation!.Y,
+                    Longitude = locality.Geolocation.X,
+                    VisitedAtUtc = visitedAt.Value
+                });
+            }
+
+            foreach (var destination in destinations)
+            {
+                var visitedAt = FindLatestVisit(
+                    historyPoints,
+                    destination.Geolocation!.Y,
+                    destination.Geolocation.X,
+                    DestinationVisitRadiusMeters);
+
+                if (!visitedAt.HasValue)
+                    continue;
+
+                visitedPlaces.Add(new VisitedPlaceDto
+                {
+                    Id = destination.Id,
+                    Kind = "destination",
+                    Name = destination.Name,
+                    DestinationName = destination.Name,
+                    RegionName = destination.Region?.Name,
+                    Latitude = destination.Geolocation!.Y,
+                    Longitude = destination.Geolocation.X,
+                    VisitedAtUtc = visitedAt.Value
+                });
+            }
+
+            return visitedPlaces
+                .OrderByDescending(x => x.VisitedAtUtc)
+                .ThenBy(x => x.Kind)
+                .ThenBy(x => x.Name)
+                .Take(limit)
+                .ToList();
+        }
+
+        public async Task<LocationShareDto> CreateLocationShareAsync(int userId, int durationHours)
+        {
+            if (durationHours != 1 && durationHours != 4 && durationHours != 24)
+                throw new InvalidOperationException("Location can be shared only for 1h, 4h or 24h.");
+
+            var user = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                throw new InvalidOperationException("User not found.");
+
+            if (user.LastKnownLocation == null || !user.LastLocationUpdatedAt.HasValue)
+                throw new InvalidOperationException("Current location is not available for sharing.");
+
+            if (user.LastLocationUpdatedAt.Value < DateTime.UtcNow.AddMinutes(-ShareLocationStaleMinutes))
+                throw new InvalidOperationException("Current location is too old to be shared.");
+
+            var expiresAtUtc = DateTime.UtcNow.AddHours(durationHours);
+            var token = BuildLocationShareToken(user.Id, expiresAtUtc);
+            var shareUrl = $"{ResolvePublicAppBaseUrl().TrimEnd('/')}/shared-location?token={Uri.EscapeDataString(token)}";
+
+            return new LocationShareDto
+            {
+                ShareUrl = shareUrl,
+                ExpiresAtUtc = expiresAtUtc
+            };
+        }
+
+        public async Task<SharedLocationDto?> ResolveLocationShareAsync(string token)
+        {
+            if (!TryParseLocationShareToken(token, out var userId, out var expiresAtUtc))
+                return null;
+
+            if (expiresAtUtc <= DateTime.UtcNow)
+                return null;
+
+            var user = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == userId && u.IsActive && !u.IsBlacklisted);
+
+            if (user == null || user.LastKnownLocation == null || !user.LastLocationUpdatedAt.HasValue)
+                return null;
+
+            var displayName = $"{user.FirstName} {user.LastName}".Trim();
+            if (string.IsNullOrWhiteSpace(displayName))
+                displayName = user.Email;
+
+            return new SharedLocationDto
+            {
+                DisplayName = displayName,
+                Longitude = user.LastKnownLocation.X,
+                Latitude = user.LastKnownLocation.Y,
+                AccuracyMeters = user.LastLocationAccuracyMeters,
+                UpdatedAtUtc = user.LastLocationUpdatedAt.Value,
+                ExpiresAtUtc = expiresAtUtc
+            };
         }
 
         public async Task<UserDto> CreateAsync(CreateUserDto createUserDto)
@@ -925,6 +1092,121 @@ namespace TuristickiVodic.Services
 
             var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
             return earthRadiusMeters * c;
+        }
+
+        private static DateTime? FindLatestVisit(
+            IReadOnlyList<VisitPointCandidate> historyPoints,
+            double targetLatitude,
+            double targetLongitude,
+            double radiusMeters)
+        {
+            foreach (var point in historyPoints)
+            {
+                var accuracyMeters = point.AccuracyMeters ?? 0d;
+                var visitRadius = Math.Max(120d, Math.Min(radiusMeters, accuracyMeters + 60d));
+                var distanceMeters = CalculateHaversineDistanceMeters(
+                    point.Latitude,
+                    point.Longitude,
+                    targetLatitude,
+                    targetLongitude);
+
+                if (distanceMeters <= visitRadius)
+                    return point.RecordedAt;
+            }
+
+            return null;
+        }
+
+        private string BuildLocationShareToken(int userId, DateTime expiresAtUtc)
+        {
+            var payload = $"v1|{userId}|{new DateTimeOffset(expiresAtUtc).ToUnixTimeSeconds()}";
+            var payloadBytes = Encoding.UTF8.GetBytes(payload);
+            var signatureBytes = ComputeLocationShareSignature(payloadBytes);
+
+            return $"{Base64UrlEncode(payloadBytes)}.{Base64UrlEncode(signatureBytes)}";
+        }
+
+        private bool TryParseLocationShareToken(string token, out int userId, out DateTime expiresAtUtc)
+        {
+            userId = 0;
+            expiresAtUtc = DateTime.MinValue;
+
+            var parts = token.Split('.', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length != 2)
+                return false;
+
+            byte[] payloadBytes;
+            byte[] providedSignature;
+
+            try
+            {
+                payloadBytes = Base64UrlDecode(parts[0]);
+                providedSignature = Base64UrlDecode(parts[1]);
+            }
+            catch
+            {
+                return false;
+            }
+
+            var expectedSignature = ComputeLocationShareSignature(payloadBytes);
+            if (!CryptographicOperations.FixedTimeEquals(providedSignature, expectedSignature))
+                return false;
+
+            var payload = Encoding.UTF8.GetString(payloadBytes);
+            var segments = payload.Split('|', StringSplitOptions.None);
+            if (segments.Length != 3 || !string.Equals(segments[0], "v1", StringComparison.Ordinal))
+                return false;
+
+            if (!int.TryParse(segments[1], out userId))
+                return false;
+
+            if (!long.TryParse(segments[2], out var expiresAtUnix))
+                return false;
+
+            expiresAtUtc = DateTimeOffset.FromUnixTimeSeconds(expiresAtUnix).UtcDateTime;
+            return true;
+        }
+
+        private byte[] ComputeLocationShareSignature(byte[] payloadBytes)
+        {
+            var secret = _configuration["Jwt:Key"] ?? "spirego-location-share-fallback-key";
+            using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secret));
+            return hmac.ComputeHash(payloadBytes);
+        }
+
+        private string ResolvePublicAppBaseUrl()
+        {
+            var configuredBaseUrl = _configuration["PublicApp:BaseUrl"];
+            if (!string.IsNullOrWhiteSpace(configuredBaseUrl))
+                return configuredBaseUrl;
+
+            return DefaultPublicAppBaseUrl;
+        }
+
+        private static string Base64UrlEncode(byte[] bytes)
+        {
+            return Convert.ToBase64String(bytes)
+                .TrimEnd('=')
+                .Replace('+', '-')
+                .Replace('/', '_');
+        }
+
+        private static byte[] Base64UrlDecode(string value)
+        {
+            var padded = value
+                .Replace('-', '+')
+                .Replace('_', '/');
+
+            padded = padded.PadRight(padded.Length + ((4 - padded.Length % 4) % 4), '=');
+            return Convert.FromBase64String(padded);
+        }
+
+        private sealed class VisitPointCandidate
+        {
+            public double Latitude { get; set; }
+            public double Longitude { get; set; }
+            public double? AccuracyMeters { get; set; }
+            public DateTime RecordedAt { get; set; }
         }
 
         private static double DegreesToRadians(double degrees) => degrees * Math.PI / 180d;

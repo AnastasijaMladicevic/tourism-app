@@ -7,14 +7,6 @@ import { RouterHistoryService } from '../../services/router-history';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
-import { LocationTrackingService } from '../../services/location-tracking';
-import {
-  AppNotificationType,
-  NotificationBannerMode,
-  NotificationPreferenceGroupView,
-  NotificationPreferencesService,
-} from '../../services/notification-preferences';
-import { NotificationService } from '../../services/notification';
 
 @Component({
   selector: 'app-settings',
@@ -29,9 +21,6 @@ export class SettingsComponent implements OnInit, OnDestroy {
     private router: Router,
     private authService: AuthService,
     private routerHistoryService: RouterHistoryService,
-    private locationTrackingService: LocationTrackingService,
-    private notificationPreferencesService: NotificationPreferencesService,
-    private notificationService: NotificationService,
   ) { }
 
   generalItems = [
@@ -52,6 +41,18 @@ export class SettingsComponent implements OnInit, OnDestroy {
       titleKey: 'settings.menu.region',
       route: '/region',
       accent: 'purple'
+    },
+    {
+      icon: 'notifications',
+      titleKey: 'settings.menu.notifications',
+      route: '/notification-settings',
+      accent: 'blue'
+    },
+    {
+      icon: 'location_on',
+      titleKey: 'settings.menu.location',
+      route: '/location-settings',
+      accent: 'teal'
     },
     {
       icon: 'support_agent',
@@ -85,28 +86,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     },
   ];
 
-  locationEnabled = false;
-  notificationsEnabled = true;
-  bannerMode: NotificationBannerMode = 'banner';
-  notificationGroups: NotificationPreferenceGroupView[] = [];
-
-  ngOnInit(): void {
-    this.subscriptions.add(
-      this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
-        this.locationEnabled = enabled;
-      }),
-    );
-
-    this.subscriptions.add(
-      this.notificationPreferencesService.state$.subscribe((state) => {
-        this.notificationsEnabled = state.notificationsEnabled;
-        this.bannerMode = state.bannerMode;
-        this.notificationGroups = this.notificationPreferencesService.getGroupedDefinitionsForRole(
-          this.authService.getAuthenticatedRole(),
-        );
-      }),
-    );
-  }
+  ngOnInit(): void { }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
@@ -123,7 +103,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
         this.router.navigate(['/login'], {
           queryParams: {
-            returnUrl: this.router.url
+            returnUrl: item.route
           }
         });
 
@@ -136,48 +116,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
     }
 
     if (item.action == 'logout') {
-      this.logout();
+      this.authService.logout().subscribe({ error: () => void 0 });
     }
   }
 
-  isNotificationTypeEnabled(type: AppNotificationType): boolean {
-    return this.notificationPreferencesService.isTypeEnabled(type);
-  }
-
-  setLocationEnabled(enabled: boolean): void {
-    if (enabled) {
-      const started = this.locationTrackingService.startTracking();
-      this.locationEnabled = started;
-      return;
-    }
-
-    this.locationTrackingService.stopTracking();
-    this.locationEnabled = false;
-  }
-
-  setNotificationsEnabled(enabled: boolean): void {
-    this.notificationPreferencesService.setNotificationsEnabled(enabled);
-    this.refreshUnreadCount();
-  }
-
-  setBannerMode(mode: NotificationBannerMode): void {
-    this.notificationPreferencesService.setBannerMode(mode);
-  }
-
-  setNotificationTypeEnabled(type: AppNotificationType, enabled: boolean): void {
-    this.notificationPreferencesService.setTypeEnabled(type, enabled);
-    this.refreshUnreadCount();
-  }
-
-  logout(): void {
-    this.authService.logout().subscribe({
-      error: () => void 0,
-    });
-  }
-
-  private refreshUnreadCount(): void {
-    this.notificationService.refreshUnreadCount().subscribe({
-      error: () => void 0,
-    });
-  }
 }

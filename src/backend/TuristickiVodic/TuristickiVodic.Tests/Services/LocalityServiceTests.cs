@@ -4,6 +4,7 @@ using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
 using TuristickiVodic.Services;
+using TuristickiVodic.Services.Services;
 using Xunit;
 using FluentAssertions;
 using NetTopologySuite.Geometries;
@@ -46,9 +47,9 @@ namespace TuristickiVodic.Tests.Services
             return config.CreateMapper();
         }
 
-        private static LocalityService CreateService(AppDbContext ctx)
+        private static LocalityService CreateService(AppDbContext ctx, ITranslationService? translationService = null)
         {
-            return new LocalityService(ctx, CreateMapper());
+            return new LocalityService(ctx, CreateMapper(), translationService);
         }
 
 
@@ -157,6 +158,37 @@ namespace TuristickiVodic.Tests.Services
 
             result.TotalCount.Should().Be(2);
             result.Items.Should().HaveCount(2);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_KadaJeStraniJezik_GenerisePrevodZaOpisITipUListi()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaJeStraniJezik_GenerisePrevodZaOpisITipUListi));
+            var (_, _, lt, mgr, dest, _) = SeedBase(ctx);
+
+            var locality = MakeLocality(1, "Stari grad", dest, lt, mgr.Id);
+            locality.Description = "Kamene ulice i trgovi";
+
+            ctx.Localities.Add(locality);
+            ctx.SaveChanges();
+
+            ctx.Images.Add(new Image
+            {
+                Id = 1,
+                LocalityId = locality.Id,
+                Url = "loc-main.jpg",
+                IsMain = true,
+                CreatedAt = DateTime.UtcNow
+            });
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx, new TrackingTranslationService());
+            var result = await svc.GetAllAsync(new LocalityQueryDto { Lang = "en" });
+
+            result.Items.Should().ContainSingle();
+            var item = result.Items.Single();
+            item.Description.Should().Be("generated:Locality:Description:Kamene ulice i trgovi");
+            item.LocalityTypeName.Should().Be("generated:LocalityType:Name:Centar");
         }
 
         [Fact]
@@ -762,6 +794,39 @@ namespace TuristickiVodic.Tests.Services
             await svc.Invoking(s => s.DeleteAsync(1, userId: 1, "Admin"))
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*Admins cannot*");
+        }
+
+        private sealed class TrackingTranslationService : ITranslationService
+        {
+            public Task<string> GetTextAsync(
+                string entityType,
+                int entityId,
+                string fieldName,
+                string originalText,
+                string languageCode)
+            {
+                return Task.FromResult($"existing:{entityType}:{fieldName}:{originalText}");
+            }
+
+            public Task<string> GetOrCreateTextAsync(
+                string entityType,
+                int entityId,
+                string fieldName,
+                string originalText,
+                string languageCode)
+            {
+                return Task.FromResult($"generated:{entityType}:{fieldName}:{originalText}");
+            }
+
+            public Task GenerateIfMissingAsync(
+                string entityType,
+                int entityId,
+                string fieldName,
+                string originalText,
+                IEnumerable<string> targetLanguages)
+            {
+                return Task.CompletedTask;
+            }
         }
     }
 }

@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environment/environment';
-import { TranslationService } from './translation.service';
 import { ActiveRegionService } from './active-region';
 
 export interface LoginDto {
@@ -79,21 +78,47 @@ export interface UpdateUserPreferredRegionDto {
   regionId?: number | null;
 }
 
+export interface UpdateUserLocationPayload {
+  latitude: number;
+  longitude: number;
+  accuracyMeters?: number | null;
+  recordedAtUtc?: string | null;
+}
+
+export interface VisitedPlaceDto {
+  id: number;
+  kind: 'destination' | 'locality';
+  name: string;
+  destinationName?: string | null;
+  regionName?: string | null;
+  latitude: number;
+  longitude: number;
+  visitedAtUtc: string;
+}
+
+export interface LocationShareDto {
+  shareUrl: string;
+  expiresAtUtc: string;
+}
+
+export interface SharedLocationDto {
+  displayName: string;
+  latitude: number;
+  longitude: number;
+  accuracyMeters?: number | null;
+  updatedAtUtc: string;
+  expiresAtUtc: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private url = `${environment.apiUrl}/users`;
 
   constructor(
     private http: HttpClient,
-    private translationService: TranslationService,
     private activeRegionService: ActiveRegionService,
   ) {
     this.syncStoredUserWithAuthenticatedRole();
-
-    const currentUser = this.readStoredUser();
-    if (currentUser?.language) {
-      this.translationService.setLanguage(currentUser.language);
-    }
   }
 
   register(dto: CreateUserDto): Observable<UserDto> {
@@ -185,7 +210,6 @@ export class AuthService {
 
   setCurrentUser(user: UserDto): void {
     localStorage.setItem('user', JSON.stringify(user));
-    this.translationService.setLanguage(user.language);
   }
 
   isLoggedIn(): boolean {
@@ -217,8 +241,8 @@ export class AuthService {
     });
   }
 
-  updateMyLocation(latitude: number, longitude: number): Observable<any> {
-    return this.http.put(`${this.url}/me/location`, { latitude, longitude });
+  updateMyLocation(payload: UpdateUserLocationPayload): Observable<any> {
+    return this.http.put(`${this.url}/me/location`, payload);
   }
 
   getMyPreferredRegion(): Observable<UserPreferredRegionDto> {
@@ -227,6 +251,24 @@ export class AuthService {
 
   updateMyPreferredRegion(dto: UpdateUserPreferredRegionDto): Observable<UserPreferredRegionDto> {
     return this.http.put<UserPreferredRegionDto>(`${this.url}/me/preferred-region`, dto);
+  }
+
+  getVisitedPlaces(limit = 12): Observable<VisitedPlaceDto[]> {
+    return this.http.get<VisitedPlaceDto[]>(`${this.url}/me/visited-places`, {
+      params: { limit },
+    });
+  }
+
+  createLocationShare(durationHours: number): Observable<LocationShareDto> {
+    return this.http.post<LocationShareDto>(`${this.url}/me/location-share`, {
+      durationHours,
+    });
+  }
+
+  resolveLocationShare(token: string): Observable<SharedLocationDto> {
+    return this.http.get<SharedLocationDto>(`${this.url}/location-share`, {
+      params: { token },
+    });
   }
 
   private syncStoredUserWithAuthenticatedRole(): void {

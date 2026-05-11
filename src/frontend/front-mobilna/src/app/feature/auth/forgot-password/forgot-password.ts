@@ -4,11 +4,13 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LogoComponent } from '../../../shared/components/logo/logo';
 import { AuthService } from '../../../services/auth';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../../services/translation.service';
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, LogoComponent],
+  imports: [ReactiveFormsModule, CommonModule, LogoComponent, TranslatePipe],
   templateUrl: './forgot-password.html',
   styleUrls: ['./forgot-password.scss'],
 })
@@ -21,6 +23,7 @@ export class ForgotPasswordComponent {
     private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
+    private translationService: TranslationService
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -44,7 +47,7 @@ export class ForgotPasswordComponent {
       },
       error: err => {
         this.isLoading = false;
-        this.errorMessage = err?.error?.message ?? 'Something went wrong. Please try again.';
+        this.errorMessage = err?.error?.message ?? 'forgotPassword.errors.generic';
       }
     });
   }

@@ -22,14 +22,10 @@ interface UserPreferredRegionDto {
 
 @Injectable({ providedIn: 'root' })
 export class ActiveRegionService {
-  private readonly storageKey = 'spirego-region-id';
-  private readonly sourceStorageKey = 'spirego-region-source';
   private readonly usersUrl = `${environment.apiUrl}/users`;
   private readonly regionsUrl = `${environment.apiUrl}/Regions`;
   private readonly fallbackRegionId = 1;
-  private readonly activeRegionIdSubject = new BehaviorSubject<number | null>(
-    this.readStoredRegionId(),
-  );
+  private readonly activeRegionIdSubject = new BehaviorSubject<number | null>(null);
 
   constructor(private readonly http: HttpClient) {}
 
@@ -40,23 +36,12 @@ export class ActiveRegionService {
   }
 
   async loadInitialRegion(): Promise<void> {
-    const storedRegionId = this.readStoredRegionId();
-    const storedSource = this.readStoredRegionSource();
-
     if (this.hasAuthToken()) {
       const serverRegionId = await this.tryLoadUserRegionId();
       if (serverRegionId != null) {
         this.setActiveRegionId(serverRegionId, 'user');
         return;
       }
-
-      if (storedRegionId != null) {
-        this.activeRegionIdSubject.next(storedRegionId);
-        return;
-      }
-    } else if (storedRegionId != null && storedSource === 'guest') {
-      this.activeRegionIdSubject.next(storedRegionId);
-      return;
     }
 
     const defaultRegionId = await this.tryLoadDefaultRegionId();
@@ -65,25 +50,10 @@ export class ActiveRegionService {
       return;
     }
 
-    if (storedRegionId != null) {
-      this.activeRegionIdSubject.next(storedRegionId);
-      return;
-    }
-
     this.setActiveRegionId(this.fallbackRegionId, 'default');
   }
 
   setActiveRegionId(regionId: number | null, source: RegionSelectionSource = 'guest'): void {
-    if (typeof localStorage !== 'undefined') {
-      if (regionId == null) {
-        localStorage.removeItem(this.storageKey);
-        localStorage.removeItem(this.sourceStorageKey);
-      } else {
-        localStorage.setItem(this.storageKey, String(regionId));
-        localStorage.setItem(this.sourceStorageKey, source);
-      }
-    }
-
     this.activeRegionIdSubject.next(regionId);
   }
 
@@ -101,46 +71,6 @@ export class ActiveRegionService {
     }
 
     return { ...(query ?? {}), regionId: activeRegionId } as T;
-  }
-
-  private readStoredRegionId(): number | null {
-    if (typeof localStorage === 'undefined') {
-      return null;
-    }
-
-    const raw = localStorage.getItem(this.storageKey);
-    if (!raw) {
-      return null;
-    }
-
-    const parsed = Number(raw);
-    const normalized = this.normalizeRegionId(parsed);
-    if (normalized == null) {
-      if (typeof localStorage !== 'undefined' && raw) {
-        localStorage.removeItem(this.storageKey);
-        localStorage.removeItem(this.sourceStorageKey);
-      }
-      return null;
-    }
-
-    return normalized;
-  }
-
-  private readStoredRegionSource(): RegionSelectionSource | null {
-    if (typeof localStorage === 'undefined') {
-      return null;
-    }
-
-    const raw = localStorage.getItem(this.sourceStorageKey);
-    if (raw === 'guest' || raw === 'user' || raw === 'default') {
-      return raw;
-    }
-
-    if (raw) {
-      localStorage.removeItem(this.sourceStorageKey);
-    }
-
-    return null;
   }
 
   private hasAuthToken(): boolean {

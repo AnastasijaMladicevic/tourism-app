@@ -4,6 +4,7 @@ import * as signalR from '@microsoft/signalr';
 import { BehaviorSubject, Observable, Subject, tap } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { AuthService } from './auth';
+import { LocationIntelligenceService } from './location-intelligence';
 import { NotificationPreferencesService } from './notification-preferences';
 
 export interface NotificationDto {
@@ -48,6 +49,7 @@ export class NotificationService {
   constructor(
     private http: HttpClient,
     private authService: AuthService,
+    private locationIntelligenceService: LocationIntelligenceService,
     private notificationPreferencesService: NotificationPreferencesService,
     private ngZone: NgZone,
   ) { }
@@ -67,6 +69,13 @@ export class NotificationService {
 
     this.hubConnection.on('notificationReceived', (notification: NotificationDto) => {
       this.ngZone.run(() => {
+        if (this.locationIntelligenceService.shouldSuppressDestinationNotifications(notification.type)) {
+          if (!notification.isRead) {
+            this.markAsRead(notification.id).subscribe({ error: () => void 0 });
+          }
+          return;
+        }
+
         if (!this.notificationPreferencesService.shouldSurfaceNotification(notification.type)) {
           return;
         }

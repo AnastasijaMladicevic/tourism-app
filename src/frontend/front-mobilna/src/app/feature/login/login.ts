@@ -14,11 +14,13 @@ import { AuthService } from '../../services/auth';
 import { ChangeDetectorRef } from '@angular/core';
 import { PendingActionService } from '../../services/pending-action';
 import { RouterHistoryService } from '../../services/router-history';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule, LogoComponent],
+  imports: [ReactiveFormsModule, CommonModule, LogoComponent, TranslatePipe],
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
@@ -35,9 +37,10 @@ export class LoginComponent {
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
     private pendingActionService: PendingActionService,
-    private routerHistory: RouterHistoryService
+    private routerHistory: RouterHistoryService,
+    private translationService: TranslationService
   ) {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
+    this.returnUrl = this.readReturnUrl();
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: [
@@ -100,7 +103,7 @@ export class LoginComponent {
           const role = this.authService.getAuthenticatedRole();
 
           if (role !== 'tourist') {
-            this.errorMessage = 'Only tourists can log in here.';
+            this.errorMessage = this.translationService.translate('login.onlyTourists');
 
             this.authService.logout().subscribe({
               complete: () => {
@@ -110,8 +113,7 @@ export class LoginComponent {
             this.cdr.detectChanges();
             return;
           }
-          const returnUrl =
-            this.route.snapshot.queryParams['returnUrl'] || '/home';
+          const returnUrl = this.readReturnUrl();
 
           const openReview =
             this.route.snapshot.queryParams['openReview'];
@@ -136,7 +138,7 @@ export class LoginComponent {
         },
         error: (err) => {
           this.isLoading = false;
-          this.errorMessage = err?.error?.message ?? 'Invalid email or password.';
+          this.errorMessage = err?.error?.message ?? this.translationService.translate('login.invalidCredentials');
           this.cdr.detectChanges();
         },
       });
@@ -167,5 +169,11 @@ export class LoginComponent {
   }
   goTerms(): void {
     this.router.navigate(['/terms']);
+  }
+
+  private readReturnUrl(): string {
+    return this.route.snapshot.queryParams['returnUrl'] ||
+      this.route.snapshot.queryParams['redirectTo'] ||
+      '/home';
   }
 }

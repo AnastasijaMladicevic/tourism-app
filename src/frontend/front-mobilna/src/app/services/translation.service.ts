@@ -14,10 +14,8 @@ const LANGUAGE_LABEL_KEYS: Record<AppLanguage, string> = {
 @Injectable({ providedIn: 'root' })
 export class TranslationService {
   private readonly http = inject(HttpClient);
-  private readonly storageKey = 'spirego-language';
-  private readonly legacyStorageKey = 'appLanguage';
-  private readonly translationAssetVersion = '2026-05-10-notifications-delete-controls';
-  private readonly activeLanguage = signal<AppLanguage>(this.readStoredLanguage());
+  private readonly translationAssetVersion = '2026-05-11-home-smart-search';
+  private readonly activeLanguage = signal<AppLanguage>('sr');
   private translations: Record<string, string> = {};
 
   // Signal koji se menja svaki put kad se prevodi učitaju —
@@ -27,11 +25,6 @@ export class TranslationService {
   constructor() {
     effect(() => {
       const lang = this.activeLanguage();
-
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(this.storageKey, lang);
-        localStorage.setItem(this.legacyStorageKey, lang);
-      }
 
       if (typeof document !== 'undefined') {
         document.documentElement.setAttribute('lang', lang);
@@ -109,18 +102,6 @@ export class TranslationService {
 
   private buildTranslationUrl(language: AppLanguage): string {
     return `/assets/i18n/${language}.json?v=${this.translationAssetVersion}`;
-  }
-
-  private readStoredLanguage(): AppLanguage {
-    if (typeof localStorage === 'undefined') {
-      return 'sr';
-    }
-
-    const storedLanguage =
-      localStorage.getItem(this.storageKey) ??
-      localStorage.getItem(this.legacyStorageKey);
-
-    return this.normalizeLanguage(storedLanguage);
   }
 
   private normalizeLanguage(language?: string | null): AppLanguage {

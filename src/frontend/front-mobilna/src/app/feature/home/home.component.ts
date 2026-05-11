@@ -22,6 +22,8 @@ import { PendingActionService } from '../../services/pending-action';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
 import { ActiveRegionService } from '../../services/active-region';
+import { SmartSearchResultDto } from '../../services/smart-search';
+import { LocalityDto, LocalityService } from '../../services/locality';
 
 interface PlaceCard {
   title: string;
@@ -89,6 +91,27 @@ interface HomeCategory {
   key: 'object' | 'locality' | 'event' | 'activity' | 'destination'
 }
 
+type SearchToken = {
+  value: string;
+  isShortPrefix: boolean;
+};
+
+type SearchIntent = {
+  category?: HomeSearchResult['category'];
+  markerTypes?: string[];
+};
+
+type HomeSearchResult = SmartSearchResultDto & {
+  raw: Record<string, unknown>;
+};
+
+const SEARCH_STOP_WORDS = new Set([
+  'gde', 'mogu', 'moze', 'mozete', 'da', 'na', 'sa', 'u', 'uz', 'za', 'od', 'do', 'i', 'ili',
+  'nije', 'nisu', 'je', 'su', 'koji', 'koja', 'koje', 'mnogo', 'malo', 'malom', 'mala', 'male',
+  'mali', 'skupa', 'skupo', 'skup', 'skupu', 'hrana', 'hranu', 'jel', 'ima', 'imas', 'neki',
+  'neka', 'bas', 'predlog', 'molim', 'te', 'mi',
+]);
+
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -112,7 +135,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   popular: PlaceCard[] = [];
   events: any[] = [];
   upcomingEvents: EventCard[] = [];
-  searchResults: Array<{ id: number; name: string; typeName: string; location: string; image?: string; icon?: string }> = [];
+  searchResults: HomeSearchResult[] = [];
   rotationInterval: any;
   currentIndex = 0;
   showSuggestions = false;
@@ -128,6 +151,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private plannerMap = new Map<number, number>();
   private lastRecommendationLocationKey: string | null = null;
+  private searchIndex: HomeSearchResult[] = [];
+  private isLoadingSearchIndex = false;
   constructor(
     public router: Router,
     private http: HttpClient,
@@ -146,6 +171,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private pendingActionService: PendingActionService,
     private translationService: TranslationService,
     private activeRegionService: ActiveRegionService,
+    private localityService: LocalityService,
   ) { }
 
   
@@ -301,13 +327,54 @@ export class HomeComponent implements OnInit, OnDestroy {
       clearTimeout(this.searchDebounceTimer);
       this.searchDebounceTimer = null;
     }
+
+    const query = this.searchQuery.trim();
+    if (query.length < 2) {
+      this.searchResults = [];
+      this.showSuggestions = false;
+      this.flushUi();
+      return;
+    }
+
+    if (!this.searchIndex.length) {
+      this.loadSearchIndex();
+    }
+
+    this.searchDebounceTimer = setTimeout(() => {
+      if (this.searchQuery.trim() !== query) {
+        return;
+      }
+
+      this.applyLocalSearch(query);
+    }, 220);
   }
   clearSearch(): void {
     this.searchQuery = '';
+    this.searchResults = [];
+    this.showSuggestions = false;
     if (this.searchDebounceTimer) {
       clearTimeout(this.searchDebounceTimer);
       this.searchDebounceTimer = null;
     }
+    this.flushUi();
+  }
+
+  private applyLocalSearch(query: string): void {
+    if (!this.searchIndex.length) {
+      this.searchResults = [];
+      this.showSuggestions = false;
+      this.flushUi();
+      return;
+    }
+
+    if (this.searchQuery.trim() !== query) {
+      return;
+    }
+
+    const results = this.runLocalSearch(query, 8);
+    this.searchResults = results;
+    this.showSuggestions = results.length > 0;
+    this.flushUi();
   }
 
   private distanceTextFromCoords(latitude?: number | null, longitude?: number | null): string {
@@ -353,8 +420,14 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const topResult = this.searchResults[0];
+    if (topResult) {
+      this.selectSuggestion(topResult);
+      return;
+    }
+
     this.router.navigate(['/search'], {
-      queryParams: { q: query, source: 'home' },
+      queryParams: { q: query },
     });
   }
   nextFeatured(): void {
@@ -409,6 +482,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
     this.loadUserName();
     this.loadPlaceCards();
+    this.loadSearchIndex();
     this.loadRecommendedCards();
     this.loadEventCards();
     this.loadFavorites();
@@ -545,8 +619,15 @@ export class HomeComponent implements OnInit, OnDestroy {
     window.removeEventListener('focus', this.handleWindowFocus);
     document.removeEventListener('visibilitychange', this.handleVisibilityChange);
   }
-  selectSuggestion(_result?: { id: number }): void {
+  selectSuggestion(result?: SmartSearchResultDto): void {
+    this.searchQuery = '';
+    this.searchResults = [];
     this.showSuggestions = false;
+    if (!result) {
+      return;
+    }
+
+    this.openSearchResult(result);
   }
   loadEvents(): void {
     this.eventService.getAll().subscribe({
@@ -636,7 +717,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     const regionId = this.activeRegionId;
     this.isLoadingPlaces = true;
 
-    const lang = (localStorage.getItem('spirego-language') || 'sr').trim().toLowerCase();
+    const lang = this.translationService.language().trim().toLowerCase();
 
     forkJoin({
       destinations: this.destinationService
@@ -721,9 +802,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private translateFeaturedDisplayTitles(
     featured: FeaturedDestination[]
   ): Observable<FeaturedDestination[]> {
-    const lang = (localStorage.getItem('spirego-language') || 'sr')
-      .trim()
-      .toLowerCase();
+    const lang = this.translationService.language().trim().toLowerCase();
 
     if (!featured.length || lang === 'sr' || lang === 'me') {
       return of(featured);
@@ -889,6 +968,89 @@ export class HomeComponent implements OnInit, OnDestroy {
       });
   }
 
+  private loadSearchIndex(): void {
+    if (this.isLoadingSearchIndex || this.searchIndex.length > 0) {
+      return;
+    }
+
+    this.isLoadingSearchIndex = true;
+
+    forkJoin({
+      destinations: this.destinationService
+        .getAll(
+          { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
+          { bypassRegion: true },
+        )
+        .pipe(catchError(() => of([] as DestinationDto[]))),
+      objects: this.objectService
+        .getAllItems(
+          { sortBy: 'name', sortOrder: 'asc' },
+          { bypassRegion: true, bypassLanguage: true },
+        )
+        .pipe(catchError(() => of([] as ObjectDto[]))),
+      events: this.eventService
+        .getAllItems(
+          { sortBy: 'startDate', sortOrder: 'asc' },
+          { bypassRegion: true, bypassLanguage: true },
+        )
+        .pipe(catchError(() => of([] as EventDto[]))),
+      activities: this.activityService
+        .getAll(
+          { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
+          { bypassRegion: true },
+        )
+        .pipe(catchError(() => of([] as ActivityDto[]))),
+      localities: this.localityService
+        .getAll(
+          { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
+          { bypassRegion: true },
+        )
+        .pipe(catchError(() => of([] as LocalityDto[]))),
+    })
+      .pipe(
+        finalize(() => {
+          this.isLoadingSearchIndex = false;
+
+          if (this.searchQuery.trim().length >= 2) {
+            this.applyLocalSearch(this.searchQuery.trim());
+          }
+        }),
+      )
+      .subscribe(({ destinations, objects, events, activities, localities }) => {
+        const destinationResults = this.toArray<DestinationDto>(destinations)
+          .map((destination) => this.normalizeDestination(destination))
+          .filter((destination) => destination.id > 0 && destination.isActive !== false)
+          .map((destination) => this.toHomeSearchResult(destination, 'destination', 'destination'));
+
+        const objectResults = this.toArray<ObjectDto>(objects)
+          .map((obj) => this.normalizeObject(obj))
+          .filter((obj) => obj.id > 0 && obj.isActive !== false)
+          .map((obj) => this.toHomeSearchResult(obj, this.getObjectSearchType(obj.objectTypeName), 'object'));
+
+        const eventResults = this.toArray<EventDto>(events)
+          .map((event) => this.normalizeEvent(event))
+          .filter((event) => event.id > 0 && event.isActive !== false)
+          .map((event) => this.toHomeSearchResult(event, 'event', 'event'));
+
+        const activityResults = this.toArray<ActivityDto>(activities)
+          .map((activity) => this.normalizeActivity(activity))
+          .filter((activity) => activity.id > 0 && activity.isActive !== false)
+          .map((activity) => this.toHomeSearchResult(activity, 'activity', 'activity'));
+
+        const localityResults = this.toArray<LocalityDto>(localities)
+          .filter((locality) => locality.id > 0 && locality.isActive !== false)
+          .map((locality) => this.toHomeSearchResult(locality as unknown as Record<string, unknown>, 'locality', 'locality'));
+
+        this.searchIndex = [
+          ...objectResults,
+          ...destinationResults,
+          ...eventResults,
+          ...activityResults,
+          ...localityResults,
+        ];
+      });
+  }
+
   private toArray<T>(raw: unknown): T[] {
     if (Array.isArray(raw)) return raw as T[];
     if (!raw || typeof raw !== 'object') return [];
@@ -899,6 +1061,371 @@ export class HomeComponent implements OnInit, OnDestroy {
       if (Array.isArray(candidate)) return candidate as T[];
     }
     return [];
+  }
+
+  private toHomeSearchResult(
+    raw: Record<string, unknown>,
+    markerType: string,
+    category: HomeSearchResult['category'],
+  ): HomeSearchResult {
+    const iconMap: Record<string, string> = {
+      destination: 'place',
+      hotel: 'hotel',
+      apartment: 'apartment',
+      restaurant: 'restaurant',
+      kafana: 'local_bar',
+      gas_station: 'local_gas_station',
+      shop: 'shopping_bag',
+      mall: 'shopping_bag',
+      market: 'storefront',
+      hospital: 'local_hospital',
+      clinic: 'local_hospital',
+      pharmacy: 'medication',
+      activity: 'directions_walk',
+      event: 'event',
+      locality: 'location_city',
+      default: 'place',
+    };
+
+    const images = Array.isArray(raw['images']) ? (raw['images'] as Array<Record<string, unknown>>) : [];
+    const firstImageUrl = typeof images[0]?.['url'] === 'string' ? String(images[0]['url']) : '';
+
+    return {
+      id: Number(raw['id'] ?? 0),
+      name: String(raw['name'] ?? ''),
+      typeName:
+        String(
+          raw['objectTypeName'] ??
+          raw['destinationTypeName'] ??
+          raw['eventTypeName'] ??
+          raw['activityTypeName'] ??
+          raw['localityTypeName'] ??
+          markerType,
+        ),
+      location: String(raw['localityName'] ?? raw['destinationName'] ?? raw['regionName'] ?? ''),
+      category,
+      markerType,
+      icon: iconMap[markerType] ?? iconMap['default'],
+      imageUrl: this.resolveMediaUrl(String(raw['mainImageUrl'] ?? firstImageUrl ?? '')),
+      latitude: Number(raw['latitude'] ?? 0) || undefined,
+      longitude: Number(raw['longitude'] ?? 0) || undefined,
+      matchReason: 'Keyword match',
+      score: 0,
+      raw,
+    };
+  }
+
+  private runLocalSearch(query: string, limit: number): HomeSearchResult[] {
+    const tokens = this.buildSearchTokens(query);
+    const normalizedQuery = this.normalizeForSearch(query);
+
+    return this.searchIndex
+      .map((item) => ({
+        item,
+        score: this.scoreSearchResult(item, tokens, normalizedQuery),
+      }))
+      .filter((entry) => this.matchesAllTokens(entry.item, tokens))
+      .sort((left, right) => right.score - left.score || left.item.name.localeCompare(right.item.name))
+      .slice(0, limit)
+      .map((entry) => entry.item);
+  }
+
+  private buildSearchTokens(query: string): SearchToken[] {
+    const normalizedQuery = this.normalizeForSearch(query);
+    const rawTokens = normalizedQuery.split(/\s+/).filter(Boolean);
+    const longTokens = rawTokens.filter((token) => token.length >= 2 && !SEARCH_STOP_WORDS.has(token));
+    const lastToken = rawTokens[rawTokens.length - 1];
+
+    if (lastToken && lastToken.length === 1 && rawTokens.length > 1 && !SEARCH_STOP_WORDS.has(lastToken)) {
+      longTokens.push(lastToken);
+    }
+
+    if (longTokens.length > 0) {
+      return [...new Set(longTokens)].map((token) => ({
+        value: token,
+        isShortPrefix: token.length === 1,
+      }));
+    }
+
+    return normalizedQuery.length >= 2
+      ? [{ value: normalizedQuery, isShortPrefix: false }]
+      : [];
+  }
+
+  private matchesAllTokens(item: HomeSearchResult, tokens: SearchToken[]): boolean {
+    if (!tokens.length) {
+      return true;
+    }
+
+    const haystacks = this.buildSearchHaystacks(item);
+
+    return tokens.every((token) =>
+      haystacks.some((value) =>
+        token.isShortPrefix
+          ? this.matchesWordPrefix(value, token.value)
+          : value.includes(token.value),
+      ),
+    );
+  }
+
+  private scoreSearchResult(
+    item: HomeSearchResult,
+    tokens: SearchToken[],
+    normalizedQuery: string,
+  ): number {
+    const intent = this.inferSearchIntent(normalizedQuery);
+    const haystacks = this.buildSearchHaystacks(item);
+    const name = this.normalizeForSearch(item.name);
+    const typeName = this.normalizeForSearch(item.typeName);
+    const typeThenName = this.normalizeForSearch(`${item.typeName} ${item.name}`);
+    const nameThenType = this.normalizeForSearch(`${item.name} ${item.typeName}`);
+    const searchable = this.normalizeForSearch(this.getSearchableText(item));
+
+    let score = 0;
+
+    if (intent.category) {
+      score += intent.category === item.category ? 20 : -18;
+    }
+
+    if (intent.markerTypes?.length) {
+      score += intent.markerTypes.includes(item.markerType) ? 24 : -20;
+    }
+
+    if (normalizedQuery) {
+      if (typeThenName.startsWith(normalizedQuery)) score += 24;
+      if (nameThenType.startsWith(normalizedQuery)) score += 20;
+      if (name.startsWith(normalizedQuery)) score += 18;
+      if (typeName.startsWith(normalizedQuery)) score += 12;
+      if (searchable.includes(normalizedQuery)) score += 6;
+      if (haystacks.some((value) => value.includes(normalizedQuery))) score += 4;
+    }
+
+    for (const token of tokens) {
+      if (token.isShortPrefix) {
+        if (this.matchesWordPrefix(typeThenName, token.value)) score += 10;
+        if (this.matchesWordPrefix(nameThenType, token.value)) score += 8;
+        if (this.matchesWordPrefix(name, token.value)) score += 7;
+        if (this.matchesWordPrefix(typeName, token.value)) score += 5;
+        continue;
+      }
+
+      if (name.includes(token.value)) score += 8;
+      if (typeName.includes(token.value)) score += 6;
+      if (typeThenName.includes(token.value)) score += 5;
+      if (searchable.includes(token.value)) score += 3;
+    }
+
+    return score;
+  }
+
+  private buildSearchHaystacks(item: HomeSearchResult): string[] {
+    return [
+      item.name,
+      item.typeName,
+      item.location,
+      `${item.typeName} ${item.name}`,
+      `${item.name} ${item.typeName}`,
+      this.getSearchableText(item),
+    ]
+      .filter(Boolean)
+      .map((value) => this.normalizeForSearch(value));
+  }
+
+  private matchesWordPrefix(value: string, token: string): boolean {
+    return value
+      .split(/[^a-z0-9]+/)
+      .filter(Boolean)
+      .some((part) => part.startsWith(token));
+  }
+
+  private normalizeForSearch(value: string): string {
+    return value
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  }
+
+  private getSearchableText(item: HomeSearchResult): string {
+    const source = item.raw ?? {};
+    const amenities = Array.isArray(source['amenities']) ? source['amenities'].join(' ') : '';
+    const description = String(source['description'] ?? '');
+    const cuisineType = String(source['cuisineType'] ?? '');
+    const objectTypeName = String(source['objectTypeName'] ?? '');
+    const eventTypeName = String(source['eventTypeName'] ?? '');
+    const destinationTypeName = String(source['destinationTypeName'] ?? '');
+    const activityTypeName = String(source['activityTypeName'] ?? '');
+    const localityTypeName = String(source['localityTypeName'] ?? '');
+    const address = String(source['address'] ?? '');
+
+    return [
+      description,
+      amenities,
+      cuisineType,
+      objectTypeName,
+      eventTypeName,
+      destinationTypeName,
+      activityTypeName,
+      localityTypeName,
+      address,
+    ]
+      .filter(Boolean)
+      .join(' ');
+  }
+
+  private getObjectSearchType(name: string): string {
+    const normalized = this.normalizeForSearch(name);
+
+    if (
+      normalized.includes('hotel') ||
+      normalized.includes('resort') ||
+      normalized.includes('hostel') ||
+      normalized.includes('motel')
+    ) {
+      return 'hotel';
+    }
+
+    if (normalized.includes('apartman') || normalized.includes('apartment') || normalized.includes('villa')) {
+      return 'apartment';
+    }
+
+    if (
+      normalized.includes('pump') ||
+      normalized.includes('gas') ||
+      normalized.includes('fuel') ||
+      normalized.includes('petrol')
+    ) {
+      return 'gas_station';
+    }
+
+    if (normalized.includes('apoteka') || normalized.includes('pharmacy')) {
+      return 'pharmacy';
+    }
+
+    if (normalized.includes('bolnica') || normalized.includes('hospital')) {
+      return 'hospital';
+    }
+
+    if (
+      normalized.includes('klinika') ||
+      normalized.includes('clinic') ||
+      normalized.includes('dom zdravlja')
+    ) {
+      return 'clinic';
+    }
+
+    if (
+      normalized.includes('trzni') ||
+      normalized.includes('trznica') ||
+      normalized.includes('mall') ||
+      normalized.includes('shopping')
+    ) {
+      return 'mall';
+    }
+
+    if (
+      normalized.includes('prodavnica') ||
+      normalized.includes('shop') ||
+      normalized.includes('butik') ||
+      normalized.includes('market')
+    ) {
+      return 'shop';
+    }
+
+    if (
+      normalized.includes('restoran') ||
+      normalized.includes('restaurant') ||
+      normalized.includes('ristorante') ||
+      normalized.includes('konoba') ||
+      normalized.includes('bistro') ||
+      normalized.includes('pizzeria') ||
+      normalized.includes('taverna')
+    ) {
+      return 'restaurant';
+    }
+
+    if (
+      normalized.includes('kafana') ||
+      normalized.includes('bar') ||
+      normalized.includes('cafe') ||
+      normalized.includes('kafic') ||
+      normalized.includes('pub') ||
+      normalized.includes('club') ||
+      normalized.includes('klub') ||
+      normalized.includes('winery') ||
+      normalized.includes('vinarija')
+    ) {
+      return 'kafana';
+    }
+
+    return 'destination';
+  }
+
+  private inferSearchIntent(normalizedQuery: string): SearchIntent {
+    if (
+      this.containsHint(normalizedQuery, [
+        'restoran',
+        'restaurant',
+        'konoba',
+        'bistro',
+        'pizzeria',
+        'taverna',
+      ])
+    ) {
+      return { category: 'object', markerTypes: ['restaurant'] };
+    }
+
+    if (
+      this.containsHint(normalizedQuery, [
+        'kafana',
+        'bar',
+        'cafe',
+        'kafic',
+        'pub',
+        'club',
+        'klub',
+        'winery',
+        'vinarija',
+      ])
+    ) {
+      return { category: 'object', markerTypes: ['kafana'] };
+    }
+
+    if (
+      this.containsHint(normalizedQuery, [
+        'hotel',
+        'resort',
+        'hostel',
+        'motel',
+        'apartman',
+        'apartment',
+        'villa',
+      ])
+    ) {
+      return { category: 'object', markerTypes: ['hotel', 'apartment'] };
+    }
+
+    if (this.containsHint(normalizedQuery, ['dogadjaj', 'događaj', 'event', 'festival', 'koncert'])) {
+      return { category: 'event' };
+    }
+
+    if (this.containsHint(normalizedQuery, ['aktivnost', 'activity', 'tura', 'izlet'])) {
+      return { category: 'activity' };
+    }
+
+    if (this.containsHint(normalizedQuery, ['lokalitet', 'locality', 'znamenitost'])) {
+      return { category: 'locality' };
+    }
+
+    if (this.containsHint(normalizedQuery, ['destinacija', 'destination', 'grad', 'plaza', 'plaža', 'planina'])) {
+      return { category: 'destination' };
+    }
+
+    return {};
+  }
+
+  private containsHint(normalizedQuery: string, hints: string[]): boolean {
+    return hints.some((hint) => normalizedQuery.startsWith(hint) || normalizedQuery.includes(` ${hint}`));
   }
 
   private normalizeDestination(raw: DestinationDto): {
@@ -1519,6 +2046,26 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   openRegionPicker(): void {
     this.router.navigate(['/region']);
+  }
+
+  private openSearchResult(result: SmartSearchResultDto): void {
+    switch (result.category) {
+      case 'destination':
+        this.router.navigate(['/destination', result.id]);
+        break;
+      case 'locality':
+        this.router.navigate(['/locality', result.id]);
+        break;
+      case 'object':
+        this.router.navigate(['/object', result.id]);
+        break;
+      case 'event':
+        this.router.navigate(['/event', result.id]);
+        break;
+      case 'activity':
+        this.router.navigate(['/activity', result.id]);
+        break;
+    }
   }
 
   getCategoryIcon(type: string): string {

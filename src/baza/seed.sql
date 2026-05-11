@@ -169,81 +169,81 @@ INSERT INTO "Users"
 ("FirstName", "LastName", "DateOfBirth", "Email", "PasswordHash", "PhoneNumber", "Country", "Language",
  "IsVerified", "IsActive", "IsBlacklisted", "HasRequestedCreatorRole", "RoleId", "ManagedDestinationId", "CreatedAt", "UpdatedAt", "ProfileImageUrl")
 VALUES
-('Nikola', 'Nikolic', '1990-01-01', 'admin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', 382456123, 'Crna Gora', 'sr', true, true, false, false,
+('Nikola', 'Nikolić', '1990-01-01', 'admin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', 382456123, 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Marko', 'Jovanovic', '1992-05-15', 'marko@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269123456', 'Crna Gora', 'sr', true, true, false, false,
+('Marko', 'Jovanović', '1992-05-15', 'marko@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269123456', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Ana', 'Petrovic', '1995-03-20', 'ana@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269234567', 'Crna Gora', 'sr', true, true, false, false,
+('Ana', 'Petrović', '1995-03-20', 'ana@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269234567', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'ContentCreator'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Ana', 'Anic', '1998-07-10', 'ana@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+('Ana', 'Anić', '1998-07-10', 'ana@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Mila', 'Milic', '1997-04-12', 'mila@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+('Mila', 'Milić', '1997-04-12', 'mila@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Ivan', 'Ivanic', '1996-09-03', 'ivan@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Crna Gora', 'sr', true, true, false, false,
+('Ivan', 'Ivanić', '1996-09-03', 'ivan@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Jelena', 'Jelenic', '1994-06-18', 'jelena@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+('Jelena', 'Jelenić', '1994-06-18', 'jelena@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Stefan', 'Stefanic', '1991-11-02', 'stefan@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Crna Gora', 'sr', true, true, false, false,
+('Stefan', 'Stefanić', '1991-11-02', 'stefan@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Tamara', 'Tamaric', '1993-02-14', 'tamara@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Crna Gora', 'sr', true, true, false, false,
+('Tamara', 'Tamarić', '1993-02-14', 'tamara@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Nemanja', 'Nemanjic', '1989-09-30', 'nemanja@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+('Nemanja', 'Nemanjić', '1989-09-30', 'nemanja@gmail.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Jelena', 'Bokic', '1991-02-11', 'manager.kotorskizaliv@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000001', 'Crna Gora', 'sr', true, true, false, false,
+('Jelena', 'Bokić', '1991-02-11', 'manager.kotorskizaliv@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000001', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 ('Ivana', 'Budimir', '1993-06-14', 'manager.budva@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000002', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Petar', 'Duric', '1989-09-02', 'manager.durmitor@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000003', 'Crna Gora', 'sr', true, true, false, false,
+('Petar', 'Đurić', '1989-09-02', 'manager.durmitor@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000003', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Milena', 'Stefanic', '1990-03-25', 'manager.svetistefan@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000004', 'Crna Gora', 'sr', true, true, false, false,
+('Milena', 'Stefanić', '1990-03-25', 'manager.svetistefan@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000004', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Luka', 'Jovanovic', '1988-12-01', 'manager.podgorica@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000005', 'Crna Gora', 'sr', true, true, false, false,
+('Luka', 'Jovanović', '1988-12-01', 'manager.podgorica@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000005', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Sanja', 'Ilic', '1992-04-18', 'manager.hercegnovi@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000006', 'Crna Gora', 'sr', true, true, false, false,
+('Sanja', 'Ilić', '1992-04-18', 'manager.hercegnovi@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000006', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Nikola', 'Sretenovic', '1991-08-09', 'manager.bar@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000007', 'Crna Gora', 'sr', true, true, false, false,
+('Nikola', 'Sretenović', '1991-08-09', 'manager.bar@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000007', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Amar', 'Jovic', '1994-01-30', 'manager.ulcinj@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000008', 'Crna Gora', 'sr', true, true, false, false,
+('Amar', 'Jović', '1994-01-30', 'manager.ulcinj@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000008', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Teodora', 'Jokic', '1990-11-19', 'manager.cetinje@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000009', 'Crna Gora', 'sr', true, true, false, false,
+('Teodora', 'Jokić', '1990-11-19', 'manager.cetinje@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000009', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Vuk', 'Milivojevic', '1987-07-12', 'manager.niksic@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000010', 'Crna Gora', 'sr', true, true, false, false,
+('Vuk', 'Milivojević', '1987-07-12', 'manager.niksic@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000010', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Jovana', 'Stojanovic', '1993-05-21', 'manager.tivat@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000011', 'Crna Gora', 'sr', true, true, false, false,
+('Jovana', 'Stojanović', '1993-05-21', 'manager.tivat@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000011', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Milos', 'Stanojevic', '1989-10-05', 'manager.igalo@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000012', 'Crna Gora', 'sr', true, true, false, false,
+('Miloš', 'Stanojević', '1989-10-05', 'manager.igalo@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000012', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Katarina', 'Milanovic', '1992-02-27', 'manager.njegusi@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000013', 'Crna Gora', 'sr', true, true, false, false,
+('Katarina', 'Milanović', '1992-02-27', 'manager.njegusi@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000013', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Stefan', 'Obradovic', '1991-06-30', 'manager.lovcen@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000014', 'Crna Gora', 'sr', true, true, false, false,
+('Stefan', 'Obradović', '1991-06-30', 'manager.lovcen@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000014', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Marija', 'Markovic', '1990-09-17', 'manager.skadarsko@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000015', 'Crna Gora', 'sr', true, true, false, false,
+('Marija', 'Marković', '1990-09-17', 'manager.skadarsko@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000015', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Dusan', 'Miladinovic', '1988-01-08', 'manager.kolasin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000016', 'Crna Gora', 'sr', true, true, false, false,
+('Dušan', 'Miladinović', '1988-01-08', 'manager.kolasin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000016', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Andjela', 'Petrovic', '1994-03-13', 'manager.zabljak@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000017', 'Crna Gora', 'sr', true, true, false, false,
+('Anđela', 'Petrović', '1994-03-13', 'manager.zabljak@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000017', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
- ('Marija', 'Misic', '1995-11-10', 'manager.pluzine@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000018', 'Crna Gora', 'sr', true, true, false, false,
+ ('Marija', 'Mišić', '1995-11-10', 'manager.pluzine@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000018', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Jovan', 'Mikic', '1990-01-03', 'manager.andrijevica@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000019', 'Crna Gora', 'sr', true, true, false, false,
+('Jovan', 'Mikić', '1990-01-03', 'manager.andrijevica@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000019', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Marijan', 'Peric', '1996-07-29', 'manager.plav@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000020', 'Crna Gora', 'sr', true, true, false, false,
+('Marijan', 'Perić', '1996-07-29', 'manager.plav@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+38269000020', 'Crna Gora', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
- ('Lucia', 'Romero', '1988-05-14', 'lucia.admin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000001', 'Spanija', 'es', true, true, false, false,
+ ('Lucia', 'Romero', '1988-05-14', 'lucia.admin@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000001', 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Carmen', 'Alvarez', '1992-09-08', 'carmen.creator@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000002', 'Spanija', 'es', true, true, false, false,
+('Carmen', 'Alvarez', '1992-09-08', 'carmen.creator@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000002', 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'ContentCreator'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Mateo', 'Garcia', '1990-02-11', 'manager.barcelona@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000003', 'Spanija', 'es', true, true, false, false,
+('Mateo', 'Garcia', '1990-02-11', 'manager.barcelona@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000003', 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Javier', 'Ortega', '1989-11-03', 'manager.madrid@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000004', 'Spanija', 'es', true, true, false, false,
+('Javier', 'Ortega', '1989-11-03', 'manager.madrid@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000004', 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Paula', 'Moreno', '1991-07-22', 'manager.valencia@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000005', 'Spanija', 'es', true, true, false, false,
+('Paula', 'Moreno', '1991-07-22', 'manager.valencia@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000005', 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Diego', 'Santos', '1996-04-18', 'diego.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Spanija', 'es', true, true, false, false,
+('Diego', 'Santos', '1996-04-18', 'diego.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Sofia', 'Marin', '1997-01-26', 'sofia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Spanija', 'es', true, true, false, false,
+('Sofia', 'Marin', '1997-01-26', 'sofia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Elena', 'Ruiz', '1995-10-10', 'elena.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Spanija', 'es', true, true, false, false,
+('Elena', 'Ruiz', '1995-10-10', 'elena.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
 
 
@@ -303,7 +303,7 @@ VALUES
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
 
-('Niksic', 'Nikšić je drugi po veličini grad u Crnoj Gori, poznat po prostranim trgovima, parkovima i bogatom kulturnom životu. Grad ima dugu industrijsku i istorijsku tradiciju, ali i brojne manifestacije i događaje tokom godine. Okružen je prirodom, jezerima i planinama, što ga čini pogodnim za izlete i odmor.',
+('Nikšić', 'Nikšić je drugi po veličini grad u Crnoj Gori, poznat po prostranim trgovima, parkovima i bogatom kulturnom životu. Grad ima dugu industrijsku i istorijsku tradiciju, ali i brojne manifestacije i događaje tokom godine. Okružen je prirodom, jezerima i planinama, što ga čini pogodnim za izlete i odmor.',
  ST_SetSRID(ST_MakePoint(18.956, 42.773), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
@@ -318,7 +318,7 @@ VALUES
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Banja'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
  
- ('Lovcen', 'Lovćen je planina i nacionalni park koji predstavlja simbol crnogorske istorije i identiteta. Poznat je po Njegoševom mauzoleju, sa kog se pruža spektakularan pogled na more i unutrašnjost zemlje. Idealan je za planinarenje, istraživanje prirode i uživanje u panoramama.',
+ ('Lovćen', 'Lovćen je planina i nacionalni park koji predstavlja simbol crnogorske istorije i identiteta. Poznat je po Njegoševom mauzoleju, sa kog se pruža spektakularan pogled na more i unutrašnjost zemlje. Idealan je za planinarenje, istraživanje prirode i uživanje u panoramama.',
  ST_SetSRID(ST_MakePoint(18.839, 42.399), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Planina'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
@@ -328,17 +328,17 @@ VALUES
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Jezero'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
 
-('Kolasin', 'Kolašin je planinski grad na severu Crne Gore, poznat po svežem vazduhu, prirodi i ski centrima. Okružen je planinama i nacionalnim parkovima, što ga čini odličnim za zimske sportove i letnje avanture. Idealan je za odmor u prirodi tokom cele godine.',
+('Kolašin', 'Kolašin je planinski grad na severu Crne Gore, poznat po svežem vazduhu, prirodi i ski centrima. Okružen je planinama i nacionalnim parkovima, što ga čini odličnim za zimske sportove i letnje avanture. Idealan je za odmor u prirodi tokom cele godine.',
  ST_SetSRID(ST_MakePoint(19.522, 42.822), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
 
-('Zabljak', 'Žabljak je najviši grad na Balkanu, smešten u srcu Nacionalnog parka Durmitor. Poznat je po Crnom jezeru, planinskim pejzažima i brojnim avanturističkim aktivnostima poput planinarenja i skijanja. Idealan je za ljubitelje prirode i aktivnog odmora tokom cele godine.',
+('Žabljak', 'Žabljak je najviši grad na Balkanu, smešten u srcu Nacionalnog parka Durmitor. Poznat je po Crnom jezeru, planinskim pejzažima i brojnim avanturističkim aktivnostima poput planinarenja i skijanja. Idealan je za ljubitelje prirode i aktivnog odmora tokom cele godine.',
  ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
  
-('Pluzine', 'Plužine su mali planinski grad poznat po blizini Pivskog jezera i impresivnim prirodnim pejzažima. Okružene su planinama i kanjonima, pružajući mir i netaknutu prirodu. Savršene su za opuštanje, kampovanje i istraživanje prirodnih lepota.',
+('Plužine', 'Plužine su mali planinski grad poznat po blizini Pivskog jezera i impresivnim prirodnim pejzažima. Okružene su planinama i kanjonima, pružajući mir i netaknutu prirodu. Savršene su za opuštanje, kampovanje i istraživanje prirodnih lepota.',
  ST_SetSRID(ST_MakePoint(18.84090, 43.15385), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
@@ -366,14 +366,14 @@ WITH manager_assignments AS (
         ('Bar', 'manager.bar@spirego.com'),
         ('Ulcinj', 'manager.ulcinj@spirego.com'),
         ('Cetinje', 'manager.cetinje@spirego.com'),
-        ('Niksic', 'manager.niksic@spirego.com'),
+        ('Nikšić', 'manager.niksic@spirego.com'),
         ('Tivat', 'manager.tivat@spirego.com'),
         ('Igalo', 'manager.igalo@spirego.com'),
-        ('Lovcen', 'manager.lovcen@spirego.com'),
+        ('Lovćen', 'manager.lovcen@spirego.com'),
         ('Skadarsko jezero', 'manager.skadarsko@spirego.com'),
-        ('Kolasin', 'manager.kolasin@spirego.com'),
-        ('Zabljak', 'manager.zabljak@spirego.com'),
-        ('Pluzine', 'manager.pluzine@spirego.com'),
+        ('Kolašin', 'manager.kolasin@spirego.com'),
+        ('Žabljak', 'manager.zabljak@spirego.com'),
+        ('Plužine', 'manager.pluzine@spirego.com'),
         ('Andrijevica', 'manager.andrijevica@spirego.com'),
         ('Plav', 'manager.plav@spirego.com')
     ) AS map(destination_name, manager_email)
@@ -398,14 +398,14 @@ WITH manager_assignments AS (
         ('Bar', 'manager.bar@spirego.com'),
         ('Ulcinj', 'manager.ulcinj@spirego.com'),
         ('Cetinje', 'manager.cetinje@spirego.com'),
-        ('Niksic', 'manager.niksic@spirego.com'),
+        ('Nikšić', 'manager.niksic@spirego.com'),
         ('Tivat', 'manager.tivat@spirego.com'),
         ('Igalo', 'manager.igalo@spirego.com'),
-        ('Lovcen', 'manager.lovcen@spirego.com'),
+        ('Lovćen', 'manager.lovcen@spirego.com'),
         ('Skadarsko jezero', 'manager.skadarsko@spirego.com'),
-        ('Kolasin', 'manager.kolasin@spirego.com'),
-        ('Zabljak', 'manager.zabljak@spirego.com'),
-        ('Pluzine', 'manager.pluzine@spirego.com'),
+        ('Kolašin', 'manager.kolasin@spirego.com'),
+        ('Žabljak', 'manager.zabljak@spirego.com'),
+        ('Plužine', 'manager.pluzine@spirego.com'),
         ('Andrijevica', 'manager.andrijevica@spirego.com'),
         ('Plav', 'manager.plav@spirego.com')
     ) AS map(destination_name, manager_email)
@@ -429,57 +429,57 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Stari Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Centar Podgorice', 'Centralna gradska zona Podgorice sa trgovima, kaficima i institucijama',
+('Centar Podgorice', 'Centralna gradska zona Podgorice sa trgovima, kafićima i institucijama',
  ST_SetSRID(ST_MakePoint(19.2634, 42.4381), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Crno jezero', 'Poznati prirodni lokalitet u blizini Zabljaka i Durmitora',
+('Crno jezero', 'Poznati prirodni lokalitet u blizini Žabljaka i Durmitora',
  ST_SetSRID(ST_MakePoint(19.091, 43.146), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Prirodni lokalitet'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Plaza Mogren', 'Jedna od najlepsih plaza na Jadranu',
+('Plaža Mogren', 'Jedna od najlepših plaža na Jadranu',
  ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Plaza'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Setaliste Pet Danica', 'Poznato setaliste uz more u Herceg Novom',
+('Šetalište Pet Danica', 'Poznato šetalište uz more u Herceg Novom',
  ST_SetSRID(ST_MakePoint(18.5412, 42.4504), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Setaliste'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Stari Bar', 'Istorijska lokacija i stari utvrdjeni deo Bara',
+('Stari Bar', 'Istorijska lokacija i stari utvrđeni deo Bara',
  ST_SetSRID(ST_MakePoint(19.140, 42.097), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Velika plaza', 'Poznata pescana plaza i obalna zona u Ulcinju',
+('Velika plaža', 'Poznata peščana plaža i obalna zona u Ulcinju',
  ST_SetSRID(ST_MakePoint(19.238, 41.906), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Plaza'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Stari grad Kotor', 'Srednjovekovno gradsko jezgro Kotora pod zastitom UNESCO-a',
+('Stari grad Kotor', 'Srednjovekovno gradsko jezgro Kotora pod zaštitom UNESCO-a',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Stari Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Cetinjski manastir', 'Istorijska i duhovna lokacija od velikog znacaja',
+('Cetinjski manastir', 'Istorijska i duhovna lokacija od velikog značaja',
  ST_SetSRID(ST_MakePoint(18.922, 42.391), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Trg Slobode', 'Glavni trg i centar gradskih desavanja u Niksicu',
+('Trg Slobode', 'Glavni trg i centar gradskih dešavanja u Nikšiću',
  ST_SetSRID(ST_MakePoint(18.956, 42.774), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Trg'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
@@ -489,33 +489,33 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Marina'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
- ('Spomen park Slobode Niksic',  'Memorijalni park posvećen istorijskim događajima i borcima',
+ ('Spomen park Slobode Nikšić',  'Memorijalni park posvećen istorijskim događajima i borcima',
  ST_SetSRID(ST_MakePoint(18.943, 42.773), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Spomen park'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
- ('Njegusi', 'Naselje u podnozju Lovcena',
+ ('Njeguši', 'Naselje u podnožju Lovćena',
  ST_SetSRID(ST_MakePoint(18.82640, 42.43007), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovcen'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovćen'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
- ('Virpazar', 'Malo mesto na obali Skadarskog jezera, polazna tacka za ture',
+ ('Virpazar', 'Malo mesto na obali Skadarskog jezera, polazna tačka za ture',
  ST_SetSRID(ST_MakePoint(19.091, 42.246), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Turisticka Zona'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
- ('Biogradsko jezero', 'Lednicko jezero u nacionalnom parku Biogradska gora',
+ ('Biogradsko jezero', 'Ledničko jezero u nacionalnom parku Biogradska gora',
  ST_SetSRID(ST_MakePoint(19.565, 42.890), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Prirodni lokalitet'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
-('Centar Zabljaka', 'Glavna turisticka zona Zabljaka',
+('Centar Žabljaka', 'Glavna turistička zona Žabljaka',
  ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
@@ -551,7 +551,7 @@ VALUES
 
  ('Ostrog', 'Jedan od najpoznatijih pravoslavnih manastira u regionu, uklesan u stenu i mesto hodočašća',
  ST_SetSRID(ST_MakePoint(19.028, 42.683), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
@@ -587,11 +587,11 @@ VALUES
 
  ('Grahovac', 'Naselje u zaleđu Boke Kotorske, poznato po prirodi i istorijskom značaju Grahova',
  ST_SetSRID(ST_MakePoint(18.617, 42.686), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Izletiste'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
- ('Tudjemili', 'Naselje u blizini Bara, poznato po istorijskom značaju i ostacima starog grada na brdu iznad obale',
+ ('Tuđemili', 'Naselje u blizini Bara, poznato po istorijskom značaju i ostacima starog grada na brdu iznad obale',
  ST_SetSRID(ST_MakePoint(19.120, 42.110), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
@@ -603,13 +603,13 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Izletiste'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
- ('Centar Niksica', 'Glavna gradska zona Nikšića sa trgovima, kafićima, institucijama i urbanim sadržajem',
+ ('Centar Nikšića', 'Glavna gradska zona Nikšića sa trgovima, kafićima, institucijama i urbanim sadržajem',
  ST_SetSRID(ST_MakePoint(18.944, 42.774), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
- ('Canj', 'Malo turističko primorsko naselje poznato po dugoj peščanoj plaži između Bara i Budve',
+ ('Čanj', 'Malo turističko primorsko naselje poznato po dugoj peščanoj plaži između Bara i Budve',
  ST_SetSRID(ST_MakePoint(19.033, 42.124), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Turisticka Zona'),
@@ -627,19 +627,19 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
- ('Centar Kolasina', 'Glavna gradska zona Kolašina sa trgovima, hotelima i turističkim sadržajem, polazna tačka za planine',
+ ('Centar Kolašina', 'Glavna gradska zona Kolašina sa trgovima, hotelima i turističkim sadržajem, polazna tačka za planine',
  ST_SetSRID(ST_MakePoint(19.516, 42.823), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
- ('Slovenska plaza', 'Najveća i najpoznatija plaža u Budvi, duga šljunkovito-peščana obala sa bogatim turističkim sadržajem',
+ ('Slovenska plaža', 'Najveća i najpoznatija plaža u Budvi, duga šljunkovito-peščana obala sa bogatim turističkim sadržajem',
  ST_SetSRID(ST_MakePoint(18.840, 42.286), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Plaza'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
- ('Lustica', 'Poluostrvo na ulazu u Bokokotorski zaliv, poznato po prirodi, plažama i autentičnim selima',
+ ('Luštica', 'Poluostrvo na ulazu u Bokokotorski zaliv, poznato po prirodi, plažama i autentičnim selima',
  ST_SetSRID(ST_MakePoint(18.620, 42.370), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Turisticka Zona'),
@@ -657,7 +657,7 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
- ('Radanovici', 'Naselje u opštini Kotor, poznato kao saobraćajno i trgovačko čvorište između Budve i Kotora',
+ ('Radanovići', 'Naselje u opštini Kotor, poznato kao saobraćajno i trgovačko čvorište između Budve i Kotora',
  ST_SetSRID(ST_MakePoint(18.752, 42.362), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Turisticka Zona'),
@@ -669,7 +669,7 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
- ('Gradjani', 'Naselje u blizini Cetinja, pretežno stambeno područje sa tradicionalnim crnogorskim ambijentom',
+ ('Građani', 'Naselje u blizini Cetinja, pretežno stambeno područje sa tradicionalnim crnogorskim ambijentom',
  ST_SetSRID(ST_MakePoint(19.00392, 42.27452), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
@@ -681,7 +681,7 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
- ('Becici', 'Popularno turističko naselje pored Budve, poznato po dugoj peščanoj plaži i hotelima',
+ ('Bečići', 'Popularno turističko naselje pored Budve, poznato po dugoj peščanoj plaži i hotelima',
  ST_SetSRID(ST_MakePoint(18.86981, 42.28282), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Turisticka Zona'),
@@ -693,13 +693,13 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
- ('Moraca', 'Područje uz reku Moraču u opštini Kolašin, poznato po kanjonima, prirodi i planinskom pejzažu',
+ ('Morača', 'Područje uz reku Moraču u opštini Kolašin, poznato po kanjonima, prirodi i planinskom pejzažu',
  ST_SetSRID(ST_MakePoint(19.401, 42.812), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Prirodni lokalitet'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
- ('Prcanj', 'Primorsko naselje u Bokokotorskom zalivu, poznato po baroknim crkvama i dugoj pomorskoj tradiciji',
+ ('Prčanj', 'Primorsko naselje u Bokokotorskom zalivu, poznato po baroknim crkvama i dugoj pomorskoj tradiciji',
  ST_SetSRID(ST_MakePoint(18.75221, 42.44778), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
@@ -711,21 +711,21 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
- ('Centar Pluzina', 'Centar grada Pluzina',
+ ('Centar Plužina', 'Centar grada Plužina',
  ST_SetSRID(ST_MakePoint(18.839, 43.152), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Pluzine'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plužine'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Pivsko jezero', 'Vještačko jezero u blizini Pluzina, poznato po pejzažima',
+('Pivsko jezero', 'Veštačko jezero u blizini Plužina, poznato po pejzažima',
  ST_SetSRID(ST_MakePoint(18.837, 43.147), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Pluzine'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plužine'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Prirodni lokalitet'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
 ('Komarnica', 'Kanjon Komarnice i okolno područje',
  ST_SetSRID(ST_MakePoint(19.045, 43.029), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Pluzine'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plužine'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Prirodni lokalitet'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
@@ -741,7 +741,7 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Izletiste'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
-('Tresnjevik', 'Planinski prevoj i izletište poznato po prirodi i pogledu na Komove',
+('Trešnjevik', 'Planinski prevoj i izletište poznato po prirodi i pogledu na Komove',
  ST_SetSRID(ST_MakePoint(19.6988, 42.7431), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Andrijevica'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Vidikovac'),
@@ -759,7 +759,7 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
- ('Rijeka Crnojevica', 'Malo istorijsko mesto i izletište na obali reke, poznato po mostu i prirodi',
+ ('Rijeka Crnojevića', 'Malo istorijsko mesto i izletište na obali reke, poznato po mostu i prirodi',
  ST_SetSRID(ST_MakePoint(19.0267, 42.3556), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Izletiste'),
@@ -777,7 +777,7 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Prirodni lokalitet'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
- ('Curevac', 'Vidikovac iznad kanjona Tare sa spektakularnim pogledom na prirodu Durmitora',
+ ('Ćurevac', 'Vidikovac iznad kanjona Tare sa spektakularnim pogledom na prirodu Durmitora',
  ST_SetSRID(ST_MakePoint(19.0929, 43.2014), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Vidikovac'),
@@ -795,15 +795,15 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
- ('Tvrdjava Onogost', 'Istorijska tvrđava u Nikšiću poznata kao Bedem, mesto održavanja kulturnih i muzičkih događaja.',
+ ('Tvrđava Onogošt', 'Istorijska tvrđava u Nikšiću poznata kao Bedem, mesto održavanja kulturnih i muzičkih događaja.',
  ST_SetSRID(ST_MakePoint(18.9417, 42.7748), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Tvrdjava'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
- ('Krupacko jezero', 'Poznato izletiste i kupaliste u blizini Niksica, omiljeno mesto za festivale, kampovanje i odmor u prirodi.',
+ ('Krupačko jezero', 'Poznato izletište i kupalište u blizini Nikšića, omiljeno mesto za festivale, kampovanje i odmor u prirodi.',
  ST_SetSRID(ST_MakePoint(18.892, 42.783), 4326), true,
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Prirodni lokalitet'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
@@ -832,7 +832,7 @@ INSERT INTO "Objects"
  "Status", "IsActive", "ObjectTypeId", "LocalityId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
 VALUES
 ('Hotel Vardar', 'Hotel u srcu starog grada Kotora', 'Stari grad Kotor', '+38232345678', 'https://hotelvardar.com',
- NULL, NULL, '{"pon":"00:00-24:00"}', 145.00, ARRAY['WiFi', 'Parking', 'Spa', 'Dorucak'], ST_SetSRID(ST_MakePoint(18.7705, 42.4247), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 145.00, ARRAY['WiFi', 'Parking', 'Spa', 'Doručak'], ST_SetSRID(ST_MakePoint(18.7705, 42.4247), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -840,7 +840,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Restoran Galion', 'Restoran sa pogledom na zaliv', 'Skaljari bb, Kotor', '+38232345679', 'https://galion.me',
+('Restoran Galion', 'Restoran sa pogledom na zaliv', 'Škaljari bb, Kotor', '+38232345679', 'https://galion.me',
  'https://galion.me/menu/', 'Mediteranska i morski plodovi', '{"pon":"10:00-23:00"}', 35.00, ARRAY['WiFi', 'Terasa', 'Pogled na more', 'Rezervacije'], ST_SetSRID(ST_MakePoint(18.768, 42.427), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
@@ -850,7 +850,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Hotel Avala', 'Luksuzni hotel pored mora', 'Budva centar', '+38233456789', 'https://avala.me',
- 'https://www.avalaresort.com/explore', NULL, '{"pon":"00:00-24:00"}', 180.00, ARRAY['WiFi', 'Bazen', 'Spa', 'Parking', 'Dorucak'], ST_SetSRID(ST_MakePoint(18.838, 42.279), 4326), 0, 0, 'Approved', true,
+ 'https://www.avalaresort.com/explore', NULL, '{"pon":"00:00-24:00"}', 180.00, ARRAY['WiFi', 'Bazen', 'Spa', 'Parking', 'Doručak'], ST_SetSRID(ST_MakePoint(18.838, 42.279), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -858,10 +858,10 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Mogren Beach Bar', 'Bar na plazi', 'Plaza Mogren', '+38233456780', 'https://mogren2.me/en',
+('Mogren Beach Bar', 'Bar na plaži', 'Plaža Mogren', '+38233456780', 'https://mogren2.me/en',
  'https://www.dotyourspot.com/EfQ3u4/', 'Mediteranska i bar food', '{"pon":"08:00-02:00"}', 12.00, ARRAY['Terasa', 'Pogled na more', 'Kokteli', 'Muzika'], ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaza Mogren'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
@@ -876,17 +876,17 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
  NOW(), NOW(), NOW()),
  
- ('Biblioteka Niksic', 'Gradska biblioteka u Nikšiću', 'Alekse Backovića, Nikšić',  NULL, 'http://bibliotekank.me/',
- NULL, NULL, '{"pon":"08:00-20:00"}', NULL, ARRAY['WiFi', 'Citaonica', 'Klimatizovano'], ST_SetSRID(ST_MakePoint(18.94548, 42.78035), 4326), 0, 0, 'Approved', true,
+ ('Biblioteka Nikšić', 'Gradska biblioteka u Nikšiću', 'Alekse Backovića, Nikšić',  NULL, 'http://bibliotekank.me/',
+ NULL, NULL, '{"pon":"08:00-20:00"}', NULL, ARRAY['WiFi', 'Čitaonica', 'Klimatizovano'], ST_SetSRID(ST_MakePoint(18.94548, 42.78035), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Biblioteka'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
  
  ('Crkva Svetog Nikole Bar', 'Pravoslavna crkva u Starom Baru', 'Stari Bar', NULL, NULL,
- NULL, NULL, '{"pon":"06:00-18:00"}', NULL, ARRAY['Vodic', 'Mirno okruzenje'], ST_SetSRID(ST_MakePoint(19.142, 42.097), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"06:00-18:00"}', NULL, ARRAY['Vodič', 'Mirno okruženje'], ST_SetSRID(ST_MakePoint(19.142, 42.097), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Crkva'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari Bar'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
@@ -903,11 +903,11 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Hotel Bianca Kolasin', 'Popularan hotel u Kolasinu',  'Mirka Vešovića, Kolašin', '+38220863000', 'https://www.biancaresort.com/',
- 'https://www.biancaresort.com/explore', NULL, '{"pon":"00:00-24:00"}', 130.00, ARRAY['WiFi', 'Spa', 'Parking', 'Dorucak', 'Ski ostava'], ST_SetSRID(ST_MakePoint(19.517, 42.824), 4326), 0, 0, 'Approved', true,
+ ('Hotel Bianca Kolašin', 'Popularan hotel u Kolašinu',  'Mirka Vešovića, Kolašin', '+38220863000', 'https://www.biancaresort.com/',
+ 'https://www.biancaresort.com/explore', NULL, '{"pon":"00:00-24:00"}', 130.00, ARRAY['WiFi', 'Spa', 'Parking', 'Doručak', 'Ski ostava'], ST_SetSRID(ST_MakePoint(19.517, 42.824), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolasina'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolašina'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
  NOW(), NOW(), NOW()),
@@ -923,8 +923,8 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Restoran Pod Volat', 'Poznat po rostilju i domacoj hrani', '1 Trg Vojvode Bećira Osmanagića, Podgorica', '+38269618633', NULL,
- NULL, 'Balkanska kuhinja', '{"pon":"08:00-22:00"}', 18.00, ARRAY['Rostilj', 'WiFi', 'Brza usluga'], ST_SetSRID(ST_MakePoint(19.260, 42.435), 4326), 0, 0, 'Approved', true,
+('Restoran Pod Volat', 'Poznat po roštilju i domaćoj hrani', '1 Trg Vojvode Bećira Osmanagića, Podgorica', '+38269618633', NULL,
+ NULL, 'Balkanska kuhinja', '{"pon":"08:00-22:00"}', 18.00, ARRAY['Roštilj', 'WiFi', 'Brza usluga'], ST_SetSRID(ST_MakePoint(19.260, 42.435), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
@@ -941,29 +941,29 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Konoba Batricevic Njegusi', 'Domaca hrana i specijaliteti od prsute i sira', 'Selo Njegusi', '+38220000007', NULL,
- NULL, 'Tradicionalna kuhinja', '{"pon":"09:00-21:00"}', 20.00, ARRAY['Domaca hrana', 'Parking', 'Pogled na planinu'], ST_SetSRID(ST_MakePoint(18.82297, 42.43828), 4326), 0, 0, 'Approved', true,
+('Konoba Batričević Njeguši', 'Domaća hrana i specijaliteti od pršute i sira', 'Selo Njeguši', '+38220000007', NULL,
+ NULL, 'Tradicionalna kuhinja', '{"pon":"09:00-21:00"}', 20.00, ARRAY['Domaća hrana', 'Parking', 'Pogled na planinu'], ST_SetSRID(ST_MakePoint(18.82297, 42.43828), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njegusi'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovcen'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njeguši'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovćen'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Restoran Ulcinj Sunset', 'Restoran sa pogledom na zalazak sunca na Velikoj plazi', 'Ulcinjskih moreplovaca', '+38269683122', NULL,
+('Restoran Ulcinj Sunset', 'Restoran sa pogledom na zalazak sunca na Velikoj plaži', 'Ulcinjskih moreplovaca', '+38269683122', NULL,
  NULL, 'Mediteranska kuhinja', '{"pon":"10:00-23:00"}', 28.00, ARRAY['Pogled na more', 'Terasa', 'Kokteli'], ST_SetSRID(ST_MakePoint(19.20534, 41.92144), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaza'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaža'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Restaurant OrO', 'Popularan restoran u centru Zabljaka sa lokalnim i evropskim specijalitetima', 'Njegoševa, Žabljak', '+38269406210', 'http://www.restaurantoro.me/',
- NULL, 'Crnogorska i evropska kuhinja', '{"pon":"08:00-01:00"}', 20.00, ARRAY['WiFi', 'Terasa', 'Rezervacije', 'Porodicno okruzenje'], ST_SetSRID(ST_MakePoint(19.1202, 43.1550), 4326), 0, 0, 'Approved', true,
+('Restaurant OrO', 'Popularan restoran u centru Žabljaka sa lokalnim i evropskim specijalitetima', 'Njegoševa, Žabljak', '+38269406210', 'http://www.restaurantoro.me/',
+ NULL, 'Crnogorska i evropska kuhinja', '{"pon":"08:00-01:00"}', 20.00, ARRAY['WiFi', 'Terasa', 'Rezervacije', 'Porodično okruženje'], ST_SetSRID(ST_MakePoint(19.1202, 43.1550), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
@@ -981,10 +981,10 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Hotel Splendid Conference & Spa Resort', 'Luksuzni resort na obali', 'Bečići bb, Budva', '+38233773777', 'https://www.splendid.me',
- NULL, NULL, '{"pon":"00:00-24:00"}', 250.00, ARRAY['Spa', 'Privatna plaza', 'Bazen', 'Fitness', 'Restoran'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', 250.00, ARRAY['Spa', 'Privatna plaža', 'Bazen', 'Fitness', 'Restoran'],
  ST_SetSRID(ST_MakePoint(18.876, 42.284), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Becici'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Bečići'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
@@ -1001,10 +1001,10 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Hotel Palmon Bay', 'Spa hotel uz more u Igalu', 'Igalo, Herceg Novi', '+38231777777', 'https://www.palmonbay.com',
- NULL, NULL, '{"pon":"00:00-24:00"}', 160.00, ARRAY['Spa', 'Bazen', 'Plaza', 'Wellness', 'Parking'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', 160.00, ARRAY['Spa', 'Bazen', 'Plaža', 'Wellness', 'Parking'],
  ST_SetSRID(ST_MakePoint(18.514, 42.460), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
@@ -1014,14 +1014,14 @@ VALUES
  NULL, NULL, '{"pon":"00:00-24:00"}', 210.00, ARRAY['Marina', 'Spa', 'Bazen', 'Restoran', 'Parking'],
  ST_SetSRID(ST_MakePoint(18.5594, 42.4542), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
 ('Hotel Palas', 'Porodični hotel na plaži', 'Petrovac na Moru', '+38233421000', 'https://www.hotelpalas.me',
- NULL, NULL, '{"pon":"00:00-24:00"}', 140.00, ARRAY['Plaza', 'Bazen', 'Restoran', 'Parking', 'WiFi'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', 140.00, ARRAY['Plaža', 'Bazen', 'Restoran', 'Parking', 'WiFi'],
  ST_SetSRID(ST_MakePoint(18.942, 42.206), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Petrovac'),
@@ -1031,7 +1031,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Hotel Forza Mare', 'Luksuzni boutique hotel na obali mora sa tematskim sobama i privatnom plažom', 'Dobrota bb, Kotor', '+38232301100', 'https://forzamare.com/',
- NULL, NULL, '{"pon":"00:00-24:00"}', 260.00, ARRAY['WiFi', 'Privatna plaza', 'Spa', 'Bazen', 'Parking', 'Restoran'], ST_SetSRID(ST_MakePoint(18.762, 42.441), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 260.00, ARRAY['WiFi', 'Privatna plaža', 'Spa', 'Bazen', 'Parking', 'Restoran'], ST_SetSRID(ST_MakePoint(18.762, 42.441), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Dobrota'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -1040,7 +1040,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Hotel Princess', 'Hotel uz more i šetalište', 'Bar centar', '+38230310000', 'https://www.hotelprincess.me',
- NULL, NULL, '{"pon":"00:00-24:00"}', 120.00, ARRAY['Bazen', 'Plaza', 'Restoran', 'Parking'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', 120.00, ARRAY['Bazen', 'Plaža', 'Restoran', 'Parking'],
  ST_SetSRID(ST_MakePoint(19.097, 42.093), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Bara'),
@@ -1063,24 +1063,24 @@ VALUES
  NULL, NULL, '{"pon":"00:00-24:00"}', 100.00, ARRAY['Grejanje', 'Parking', 'Restoran', 'Planinski pogled'],
  ST_SetSRID(ST_MakePoint(19.1748, 43.1636), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
  ---KAFANE---
- ('Gradska kafanica Zabljak', 'Tradicionalna kafana sa domaćom crnogorskom kuhinjom u rustičnom ambijentu', '3 Vuka Karadžića, Žabljak', '+38268132101', NULL,
- NULL, 'Crnogorska kuhinja', '{"pon":"09:00-23:00"}', 20.00, ARRAY['Parking', 'Domaca hrana', 'Basta', 'Porodicno okruzenje'], ST_SetSRID(ST_MakePoint(19.124, 43.156), 4326), 0, 0, 'Approved', true,
+ ('Gradska kafanica Žabljak', 'Tradicionalna kafana sa domaćom crnogorskom kuhinjom u rustičnom ambijentu', '3 Vuka Karadžića, Žabljak', '+38268132101', NULL,
+ NULL, 'Crnogorska kuhinja', '{"pon":"09:00-23:00"}', 20.00, ARRAY['Parking', 'Domaća hrana', 'Bašta', 'Porodično okruženje'], ST_SetSRID(ST_MakePoint(19.124, 43.156), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafana'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
 ('Konoba Stari Grad', 'Kafana poznata po roštilju i narodnoj muzici', '12 Njegoševa, Budva', '+38233454443', NULL,
- NULL, 'Balkanska kuhinja', '{"pon":"10:00-02:00"}', 17.00, ARRAY['Ziva muzika', 'Rostilj', 'Kokteli', 'Basta'], ST_SetSRID(ST_MakePoint(18.837, 42.278), 4326), 0, 0, 'Approved', true,
+ NULL, 'Balkanska kuhinja', '{"pon":"10:00-02:00"}', 17.00, ARRAY['Živa muzika', 'Roštilj', 'Kokteli', 'Bašta'], ST_SetSRID(ST_MakePoint(18.837, 42.278), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafana'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -1088,8 +1088,8 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Kafana Markovic', 'Tradicionalna crnogorska kafana poznata po domaćoj hrani i opuštenoj atmosferi', 'Bulevar Svetog Petra Cetinjskog, Podgorica', '+38267266667', NULL,
- NULL, 'Crnogorska kuhinja', '{"pon":"08:00-23:00"}', 16.00, ARRAY['Rostilj', 'Domaca hrana', 'Brza usluga', 'Basta'], ST_SetSRID(ST_MakePoint(19.28571, 42.45234), 4326), 0, 0, 'Approved', true,
+ ('Kafana Marković', 'Tradicionalna crnogorska kafana poznata po domaćoj hrani i opuštenoj atmosferi', 'Bulevar Svetog Petra Cetinjskog, Podgorica', '+38267266667', NULL,
+ NULL, 'Crnogorska kuhinja', '{"pon":"08:00-23:00"}', 16.00, ARRAY['Roštilj', 'Domaća hrana', 'Brza usluga', 'Bašta'], ST_SetSRID(ST_MakePoint(19.28571, 42.45234), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafana'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
@@ -1099,8 +1099,8 @@ VALUES
 
  ---Planinarski domovi---
 
-('Planinarski dom Skrka', 'Planinarski dom u srcu Durmitora, polazna tačka za planinske ture i alpinizam', 'Škrka, Durmitor', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', 35.00, ARRAY['Smještaj', 'Grejanje', 'Planinske ture', 'Voda'], ST_SetSRID(ST_MakePoint(19.045, 43.130), 4326), 0, 0, 'Approved', true,
+('Planinarski dom Škrka', 'Planinarski dom u srcu Durmitora, polazna tačka za planinske ture i alpinizam', 'Škrka, Durmitor', NULL, NULL,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 35.00, ARRAY['Smeštaj', 'Grejanje', 'Planinske ture', 'Voda'], ST_SetSRID(ST_MakePoint(19.045, 43.130), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Planinarski dom'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
@@ -1109,17 +1109,17 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Planinarski dom Vranjak', 'Planinarski dom na planini Bjelasici, poznat po zimskim sportovima i planinskom turizmu', 'Bjelasica, Kolašin', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', 40.00, ARRAY['Smještaj', 'Ski pristup', 'Grejanje', 'Planinarenje'], ST_SetSRID(ST_MakePoint(19.620, 42.830), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 40.00, ARRAY['Smeštaj', 'Ski pristup', 'Grejanje', 'Planinarenje'], ST_SetSRID(ST_MakePoint(19.620, 42.830), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Planinarski dom'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Biogradsko jezero'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
  ---Biblioteke---
 
- ('Nacionalna biblioteka Crne Gore Djurdje Crnojevic', 'Centralna nacionalna biblioteka Crne Gore smještena u istorijskom jezgru Cetinja', '163 Bulevar Crnogorskih Junaka, Cetinje', '+38241231143', 'https://nbc-cg.me',
+ ('Nacionalna biblioteka Crne Gore Đurđe Crnojević', 'Centralna nacionalna biblioteka Crne Gore smeštena u istorijskom jezgru Cetinja', '163 Bulevar Crnogorskih Junaka, Cetinje', '+38241231143', 'https://nbc-cg.me',
  NULL, NULL, '{"pon":"08:00-20:00"}', NULL, ARRAY['Čitaonica', 'Arhiv', 'Istraživački centar', 'WiFi'], ST_SetSRID(ST_MakePoint(18.915, 42.395), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Biblioteka'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Cetinja'),
@@ -1128,7 +1128,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Narodna biblioteka Radosav Ljumovic', 'Glavna gradska biblioteka u Podgorici sa bogatim fondom knjiga i kulturnim programima', 'Bokeška, Podgorica', '+38220664715', 'http://www.nbpg.me/',
+ ('Narodna biblioteka Radosav Ljumović', 'Glavna gradska biblioteka u Podgorici sa bogatim fondom knjiga i kulturnim programima', 'Bokeška, Podgorica', '+38220664715', 'http://www.nbpg.me/',
  NULL, NULL, '{"pon":"08:00-20:00"}', NULL, ARRAY['Čitaonica', 'WiFi', 'Događaji', 'Knjige'], ST_SetSRID(ST_MakePoint(19.262, 42.442), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Biblioteka'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -1137,7 +1137,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Gradska biblioteka i citaonica Herceg Novi', 'Javna biblioteka sa dugom tradicijom i kulturnim programima u Herceg Novom', 'Trg Herceg Stjepana 6, Herceg Novi', '+38231321900', 'http://www.bibliotekahercegnovi.co.me/',
+('Gradska biblioteka i čitaonica Herceg Novi', 'Javna biblioteka sa dugom tradicijom i kulturnim programima u Herceg Novom', 'Trg Herceg Stjepana 6, Herceg Novi', '+38231321900', 'http://www.bibliotekahercegnovi.co.me/',
  NULL, NULL, '{"pon":"08:00-20:00"}', NULL, ARRAY['Čitaonica', 'Arhiv', 'Kultura', 'WiFi'], ST_SetSRID(ST_MakePoint(18.536, 42.452), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Biblioteka'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Herceg Novog'),
@@ -1148,16 +1148,16 @@ VALUES
 
  ---Crkve---
 
- ('Manastir Ostrog', 'Jedan od najpoznatijih pravoslavnih manastira na Balkanu, uklesan u stijenu Ostroške grede', 'Ostrog, Nikšić', NULL, 'https://www.manastirostrog.com',
+ ('Manastir Ostrog', 'Jedan od najpoznatijih pravoslavnih manastira na Balkanu, uklesan u stenu Ostroške grede', 'Ostrog, Nikšić', NULL, 'https://www.manastirostrog.com',
  NULL, NULL, '{"pon":"06:00-20:00"}', NULL, ARRAY['Hodočašće', 'Pogled', 'Vodič', 'Parking'], ST_SetSRID(ST_MakePoint(19.031, 42.675), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Crkva'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ostrog'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Katedrala Svetog Tripuna', 'Rimokatolička katedrala i jedan od najstarijih spomenika u Kotoru iz 12. vijeka', 'Stari grad Kotor', '+38232336315', 'http://www.kotorskabiskupija.me/',
+ ('Katedrala Svetog Tripuna', 'Rimokatolička katedrala i jedan od najstarijih spomenika u Kotoru iz 12. veka', 'Stari grad Kotor', '+38232336315', 'http://www.kotorskabiskupija.me/',
  NULL, NULL, '{"pon":"08:00-18:00"}', NULL, ARRAY['Istorijski spomenik', 'Vodič', 'Religijski objekat'], ST_SetSRID(ST_MakePoint(18.772, 42.424), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Crkva'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
@@ -1167,7 +1167,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Crkva Svetog Nikole', 'Pravoslavna crkva u starom gradu Kotoru poznata po velikoj ikonografskoj zbirci', 'Stari grad Kotor', NULL, 'http://www.mitropolija.com/',
- NULL, NULL, '{"pon":"07:00-19:00"}', NULL, ARRAY['Ikone', 'Mirno okruzenje', 'Religija', 'Istorija'], ST_SetSRID(ST_MakePoint(18.771, 42.426), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"07:00-19:00"}', NULL, ARRAY['Ikone', 'Mirno okruženje', 'Religija', 'Istorija'], ST_SetSRID(ST_MakePoint(18.771, 42.426), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Crkva'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -1176,7 +1176,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Crkva Svetog Jovana Vladimira', 'Pravoslavna crkva u Baru posvećena prvom srpskom svecu i knezu', '38 Ulica Jovana Tomasevica, Bar', '+38230315106', 'https://www.hrambar.com/',
- NULL, NULL, '{"pon":"07:00-18:00"}', NULL, ARRAY['Religija', 'Mir', 'Istorija', 'Vjerski turizam'], ST_SetSRID(ST_MakePoint(19.094, 42.102), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"07:00-18:00"}', NULL, ARRAY['Religija', 'Mir', 'Istorija', 'Verski turizam'], ST_SetSRID(ST_MakePoint(19.094, 42.102), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Crkva'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Bara'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
@@ -1186,8 +1186,8 @@ VALUES
 
  --- Apartmani ---
 
-('Apartments Djurovic', 'Apartmani u Petrovcu plaže, pogodni za porodice', 'broj 31 XIII Ulica, Petrovac', NULL, 'https://aptsdurovic.traveleto.com/',
- NULL, NULL, '{"pon":"00:00-24:00"}', 70.00, ARRAY['WiFi', 'Parking', 'Klima', 'Blizina plaze'], ST_SetSRID(ST_MakePoint(18.938, 42.208), 4326), 0, 0, 'Approved', true,
+('Apartments Đurović', 'Apartmani u Petrovcu plaže, pogodni za porodice', 'broj 31 XIII Ulica, Petrovac', NULL, 'https://aptsdurovic.traveleto.com/',
+ NULL, NULL, '{"pon":"00:00-24:00"}', 70.00, ARRAY['WiFi', 'Parking', 'Klima', 'Blizina plaže'], ST_SetSRID(ST_MakePoint(18.938, 42.208), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Apartman'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Petrovac'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -1195,7 +1195,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Apartments Vukovic', 'Komforni apartmani sa pogledom na Boku Kotorsku', 'Jadranska magistrala, Muo', '+38269687310', NULL,
+ ('Apartments Vuković', 'Komforni apartmani sa pogledom na Boku Kotorsku', 'Jadranska magistrala, Muo', '+38269687310', NULL,
  NULL, NULL, '{"pon":"00:00-24:00"}', 85.00, ARRAY['WiFi', 'Parking', 'Terasa', 'Pogled na more'], ST_SetSRID(ST_MakePoint(18.756, 42.437), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Apartman'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Muo'),
@@ -1223,7 +1223,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Boutique Hotel Casa del Mare - Amfora', 'Boutique apartmani uz Bokokotorski zaliv', 'Orahovac bb, Kotor', '+38232305852', 'https://casadelmare.me',
- NULL, NULL, '{"pon":"00:00-24:00"}', 120.00, ARRAY['Spa', 'Privatna plaza', 'WiFi', 'Parking'], ST_SetSRID(ST_MakePoint(18.760, 42.490), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 120.00, ARRAY['Spa', 'Privatna plaža', 'WiFi', 'Parking'], ST_SetSRID(ST_MakePoint(18.760, 42.490), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Apartman'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Orahovac'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -1231,7 +1231,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Apartments Mijovic', 'Porodični apartmani blizu plaže', '4. Proleterske, Budva', '+38267319039', 'https://mijovic.traveleto.com/',
+ ('Apartments Mijović', 'Porodični apartmani blizu plaže', '4. Proleterske, Budva', '+38267319039', 'https://mijovic.traveleto.com/',
  NULL, NULL, '{"pon":"00:00-24:00"}', 55.00, ARRAY['WiFi', 'Parking', 'Klima'], ST_SetSRID(ST_MakePoint(18.851, 42.293), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Apartman'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Budve'),
@@ -1243,8 +1243,8 @@ VALUES
  ('Durmitor View Apartments', 'Apartmani sa pogledom na planine Durmitora', 'Žabljak centar', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00"}', 60.00, ARRAY['Grejanje', 'Parking', 'Planinski pogled'], ST_SetSRID(ST_MakePoint(19.118, 43.162), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Apartman'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
@@ -1252,13 +1252,13 @@ VALUES
  ('Apartments Aleksandar', 'Apartmani blizu Velike plaže', 'Velika plaža, Ulcinj', '+38269703603', NULL,
  NULL, NULL, '{"pon":"00:00-24:00"}', 65.00, ARRAY['WiFi', 'Parking', 'Klima'], ST_SetSRID(ST_MakePoint(19.212, 41.924), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Apartman'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaza'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaža'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Villa Ljubanovic Apartments', 'Komforni apartmani u mirnom dijelu Budve', '18 Nikole Tesle, Budva', '+38269931474', 'http://www.ljubanovic.com/',
+ ('Villa Ljubanović Apartments', 'Komforni apartmani u mirnom delu Budve', '18 Nikole Tesle, Budva', '+38269931474', 'http://www.ljubanovic.com/',
  NULL, NULL, '{"pon":"00:00-24:00"}', 75.00, ARRAY['WiFi', 'Parking', 'Terasa'], ST_SetSRID(ST_MakePoint(18.834, 42.286), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Apartman'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Budve'),
@@ -1279,7 +1279,7 @@ VALUES
  ---SPA CENTRI---
 
 ('Banya Wellness & Spa', 'Moderan spa centar sa saunama i masažama u Podgorici', '19/2 Šeika Zaida, Podgorica', '+38267134611', 'https://www.banyawellness.com/',
- NULL, NULL, '{"pon":"09:00-22:00"}', 30.00, ARRAY['Spa', 'Sauna', 'Masaze', 'Jacuzzi'],
+ NULL, NULL, '{"pon":"09:00-22:00"}', 30.00, ARRAY['Spa', 'Sauna', 'Masaže', 'Jacuzzi'],
  ST_SetSRID(ST_MakePoint(19.243, 42.440), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spa Centar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -1288,7 +1288,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Wellness Center Simo Milosevic', 'Spa i rehabilitacioni centar sa dugom tradicijom', '5 Sava Ilića, Igalo', '+38263211313', 'https://www.igalospa.com',
+ ('Wellness Center Simo Milošević', 'Spa i rehabilitacioni centar sa dugom tradicijom', '5 Sava Ilića, Igalo', '+38263211313', 'https://www.igalospa.com',
  NULL, NULL, '{"pon":"07:00-21:00"}', 35.00, ARRAY['Spa', 'Bazen', 'Terapije', 'Sauna'],
  ST_SetSRID(ST_MakePoint(18.513, 42.459), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spa Centar'),
@@ -1299,7 +1299,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Perla Residence Spa', 'Samostalni wellness i spa centar sa fokusom na relaksaciju i tretmane tela', '70 Vlada Ćetkovića, Podgorica', '+38220511511', 'http://www.perlaresidence.me/',
- NULL, NULL, '{"pon":"09:00-21:00"}', 35.00, ARRAY['Spa', 'Masaze', 'Sauna', 'Jacuzzi', 'Relax zona'],
+ NULL, NULL, '{"pon":"09:00-21:00"}', 35.00, ARRAY['Spa', 'Masaže', 'Sauna', 'Jacuzzi', 'Relax zona'],
  ST_SetSRID(ST_MakePoint(19.236, 42.453), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spa Centar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -1309,7 +1309,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Huma Bay Spa', 'Ekskluzivni spa centar sa pogledom na Bokokotorski zaliv, fokus na relaksaciji i premium tretmanima', 'Dobrota 175, Kotor', '+38268888884', 'http://www.humahotel.me/',
- NULL, NULL, '{"pon":"09:00-21:00"}', 75.00, ARRAY['Spa', 'Sauna', 'Bazen', 'Masaze', 'Wellness'],
+ NULL, NULL, '{"pon":"09:00-21:00"}', 75.00, ARRAY['Spa', 'Sauna', 'Bazen', 'Masaže', 'Wellness'],
  ST_SetSRID(ST_MakePoint(18.766, 42.448), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spa Centar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Dobrota'),
@@ -1319,7 +1319,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Casa del Mare Spa', 'Boutique wellness centar sa personalizovanim spa tretmanima u mirnom okruženju', 'Kamenari 23, Herceg Novi', '+38269700702', 'https://www.casadelmare.me',
- NULL, NULL, '{"pon":"10:00-20:00"}', 65.00, ARRAY['Spa', 'Masaze', 'Sauna', 'Jacuzzi', 'Relax zona'],
+ NULL, NULL, '{"pon":"10:00-20:00"}', 65.00, ARRAY['Spa', 'Masaže', 'Sauna', 'Jacuzzi', 'Relax zona'],
  ST_SetSRID(ST_MakePoint(18.672, 42.463), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spa Centar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kamenari'),
@@ -1331,7 +1331,7 @@ VALUES
  ---Spomenici---
 
  ('Spomenik Partizanu borcu na Gorici', 'Monument posvećen borcima NOB-a, jedan od simbola Podgorice', 'Brdo Gorica, Podgorica', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj', 'Pogled na grad'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj', 'Pogled na grad'],
  ST_SetSRID(ST_MakePoint(19.266, 42.450), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -1341,7 +1341,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Spomenik Vladimiru i Kosari', 'Spomenik legendarnim istorijskim ličnostima Duklje', 'Ul. Vladimira Rolovića, Bar', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj', 'Turisticka atrakcija'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj', 'Turistička atrakcija'],
  ST_SetSRID(ST_MakePoint(19.100, 42.098), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Bara'),
@@ -1351,7 +1351,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Spomenik kralju Nikoli', 'Spomenik poslednjem kralju Crne Gore', 'Trg kralja Nikole, Podgorica', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj', 'Centar grada'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj', 'Centar grada'],
  ST_SetSRID(ST_MakePoint(19.261, 42.440), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -1360,38 +1360,38 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Spomenik Ljubu Cupicu', 'Spomenik narodnom heroju poznatom po osmehu pred streljanje', 'Trg Slobode, Nikšić', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj'],
+ ('Spomenik Ljubu Čupiću', 'Spomenik narodnom heroju poznatom po osmehu pred streljanje', 'Trg Slobode, Nikšić', NULL, NULL,
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj'],
  ST_SetSRID(ST_MakePoint(18.950, 42.773), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Niksic'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Nikšić'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
  ('Spomenik palim borcima na Grahovcu', 'Spomenik posvećen bici na Grahovcu iz 1858. godine', 'Grahovac, Nikšić', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj'],
  ST_SetSRID(ST_MakePoint(18.637, 42.688), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Grahovac'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Spomenik Tudjemilima', 'Spomenik bici kod Tuđemila gde je Duklja izvojevala pobedu', 'Tuđemili, Bar', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj'],
+ ('Spomenik Tuđemilima', 'Spomenik bici kod Tuđemila gde je Duklja izvojevala pobedu', 'Tuđemili, Bar', NULL, NULL,
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj'],
  ST_SetSRID(ST_MakePoint(19.135, 42.141), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tudjemili'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tuđemili'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Spomenik Punisi Racicu', 'Istorijski spomenik kontroverznoj ličnosti iz perioda Kraljevine Jugoslavije', 'Andrijevica', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj'],
+ ('Spomenik Puniši Račiću', 'Istorijski spomenik kontroverznoj ličnosti iz perioda Kraljevine Jugoslavije', 'Andrijevica', NULL, NULL,
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj'],
  ST_SetSRID(ST_MakePoint(19.787, 42.738), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Andrijevice'),
@@ -1400,8 +1400,8 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Spomenik herojima Bozicnog ustanka', 'Spomenik posvećen učesnicima ustanka iz 1919. godine', 'Cetinje', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj'],
+ ('Spomenik herojima Božićnog ustanka', 'Spomenik posvećen učesnicima ustanka iz 1919. godine', 'Cetinje', NULL, NULL,
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj'],
  ST_SetSRID(ST_MakePoint(18.916, 42.394), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Cetinja'),
@@ -1411,7 +1411,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Spomenik bici na Fundini', 'Spomenik jednoj od najznačajnijih bitaka protiv Osmanskog carstva', 'Fundina, Podgorica', NULL, NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski znacaj'],
+ NULL, NULL, '{"pon":"00:00-24:00"}', NULL, ARRAY['Istorijski značaj'],
  ST_SetSRID(ST_MakePoint(19.360, 42.455), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Fundina'),
@@ -1420,12 +1420,12 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Spomenik Njegosu na Lovcenu', 'Monument posvećen Petru II Petroviću Njegošu, smešten u okviru Mauzoleja na Lovćenu', 'Lovćen, Cetinje', NULL, NULL,
- NULL, NULL, '{"pon":"08:00-18:00"}', NULL, ARRAY['Istorijski znacaj', 'Pogled', 'Kulturna bastina'],
+('Spomenik Njegošu na Lovćenu', 'Monument posvećen Petru II Petroviću Njegošu, smešten u okviru Mauzoleja na Lovćenu', 'Lovćen, Cetinje', NULL, NULL,
+ NULL, NULL, '{"pon":"08:00-18:00"}', NULL, ARRAY['Istorijski značaj', 'Pogled', 'Kulturna baština'],
  ST_SetSRID(ST_MakePoint(18.838, 42.400), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Spomenik'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njegusi'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovcen'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njeguši'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovćen'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.cetinje@spirego.com'),
  NOW(), NOW(), NOW()),
@@ -1477,8 +1477,8 @@ VALUES
  NULL, NULL, '{"pon":"23:00-05:00"}', NULL, ARRAY['DJ', 'VIP zona', 'Kokteli'],
  ST_SetSRID(ST_MakePoint(18.947, 42.770), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Klub'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Niksica'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Nikšića'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.niksic@spirego.com'),
  NOW(), NOW(), NOW()),
@@ -1497,7 +1497,7 @@ VALUES
  NULL, NULL, '{"pon":"22:00-04:00"}', 0.00, ARRAY['DJ', 'VIP zona', 'Kokteli', 'Lounge'],
  ST_SetSRID(ST_MakePoint(19.207, 41.922), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Klub'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaza'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaža'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.ulcinj@spirego.com'),
@@ -1507,18 +1507,18 @@ VALUES
  NULL, NULL, '{"pon":"10:00-03:00"}', 0.00, ARRAY['Beach club', 'DJ', 'Ležaljke', 'Kokteli', 'Letnje žurke'],
  ST_SetSRID(ST_MakePoint(18.522, 42.457), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Klub'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.hercegnovi@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Montenegro Pub', 'Noćni klub u Niksicu sa modernim ambijentom, DJ nastupima i koktel barom', 'Novice Cerovića, Nikšić', NULL, NULL,
+ ('Montenegro Pub', 'Noćni klub u Nikšiću sa modernim ambijentom, DJ nastupima i koktel barom', 'Novice Cerovića, Nikšić', NULL, NULL,
  NULL, NULL, '{"pon":"22:00-04:00"}', 0.00, ARRAY['DJ', 'Kokteli', 'Lounge', 'VIP zona'],
  ST_SetSRID(ST_MakePoint(18.951, 42.774), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Klub'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Niksica'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Nikšić'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.niksic@spirego.com'),
  NOW(), NOW(), NOW()), 
@@ -1565,7 +1565,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('INA Skaljari Kotor', 'INA benzinska pumpa u Kotoru', 'Skaljari bb, Kotor', '+38267061664', 'https://inacg.me/',
+ ('INA Škaljari Kotor', 'INA benzinska pumpa u Kotoru', 'Škaljari bb, Kotor', '+38267061664', 'https://inacg.me/',
  NULL, NULL, '{"pon":"00:00-24:00"}', 0.00, ARRAY['Gorivo', 'Market'],
  ST_SetSRID(ST_MakePoint(18.765, 42.416), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Benzinska Pumpa'),
@@ -1595,12 +1595,12 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.bar@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Lukoil Kolasin', 'Lukoil benzinska pumpa u Kolasinu', '2, Bakovići', NULL, 'http://www.lukoil.co.me/',
+ ('Lukoil Kolašin', 'Lukoil benzinska pumpa u Kolašinu', '2, Bakovići', NULL, 'http://www.lukoil.co.me/',
  NULL, NULL, '{"pon":"00:00-24:00"}', 0.00, ARRAY['Gorivo', 'Market'],
  ST_SetSRID(ST_MakePoint(19.526, 42.849), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Benzinska Pumpa'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolasina'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolašina'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.kolasin@spirego.com'),
  NOW(), NOW(), NOW()),
@@ -1625,12 +1625,12 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('EKO Zabljak', 'EKO benzinska pumpa u planinskom centru Žabljak', 'b.b Durmitorski put, Žabljak', '+38252363412', 'http://www.jugopetrol.co.me/',
+ ('EKO Žabljak', 'EKO benzinska pumpa u planinskom centru Žabljak', 'b.b Durmitorski put, Žabljak', '+38252363412', 'http://www.jugopetrol.co.me/',
  NULL, NULL, '{"pon":"00:00-24:00"}', 0.00, ARRAY['Gorivo', 'Market', 'Planinski uslovi'],
  ST_SetSRID(ST_MakePoint(19.129, 43.152), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Benzinska Pumpa'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.zabljak@spirego.com'),
  NOW(), NOW(), NOW()),
@@ -1651,15 +1651,15 @@ VALUES
  NULL, NULL, '{"pon":"09:00-01:00"}', 9.00, ARRAY['Kafa', 'Lounge', 'DJ'],
  ST_SetSRID(ST_MakePoint(18.841, 42.284), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafic'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Slovenska plaza'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Slovenska plaža'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.budva@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Kafic Marshall’s Gelato & Coffee', 'Popularan kafić i poslastičarnica poznata po gelatu i kafi', 'STARI GRAD 359 A, Kotor', '+38267876875', 'http://www.marshallsgelato.com/',
+('Kafić Marshall’s Gelato & Coffee', 'Popularan kafić i poslastičarnica poznata po gelatu i kafi', 'STARI GRAD 359 A, Kotor', '+38267876875', 'http://www.marshallsgelato.com/',
  NULL, 'Kafeterija i slatkiši', '{"pon":"08:00-17:00"}', 8.00,
- ARRAY['WiFi', 'Basta', 'Deserti', 'Kafa', 'Porodicno okruzenje'],
+ ARRAY['WiFi', 'Bašta', 'Deserti', 'Kafa', 'Porodično okruženje'],
  ST_SetSRID(ST_MakePoint(18.771, 42.425), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafic'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
@@ -1708,11 +1708,11 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.tivat@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Astoria Cafe Lustica', 'Elegantni kafić uz more', 'Lustica, Tivat', '+38269066566', NULL,
+ ('Astoria Cafe Luštica', 'Elegantni kafić uz more', 'Luštica, Tivat', '+38269066566', NULL,
  NULL, NULL, '{"pon":"08:00-00:00"}', 9.00, ARRAY['Kafa', 'More', 'Terasa'],
  ST_SetSRID(ST_MakePoint(18.672, 42.393), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafic'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Lustica'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Luštica'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.hercegnovi@spirego.com'),
@@ -1742,7 +1742,7 @@ VALUES
 
 ('Beer & Bike Club', 'Poznati bar u centru Budve sa opuštenom atmosferom', 'Slovenska Obala, Budva', '+38268033180', 'http://beerbikeclub.me/',
  NULL, 'Bar i kokteli', '{"pon":"09:00-01:00","uto":"09:00-01:00","sre":"09:00-01:00","cet":"09:00-01:00","pet":"09:00-02:00","sub":"09:00-02:00","ned":"00:00-00:00"}', 10.00,
- ARRAY['Kokteli', 'Basta', 'Muzika', 'WiFi'],
+ ARRAY['Kokteli', 'Bašta', 'Muzika', 'WiFi'],
  ST_SetSRID(ST_MakePoint(18.838, 42.282), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Budve'),
@@ -1763,12 +1763,12 @@ VALUES
  NOW(), NOW(), NOW()),
 
 
-('Havana Beach Bar', 'Plažni bar sa dnevnim žurkama', 'Velika Plaza, Ulcinj', '+38267231034', NULL,
+('Havana Beach Bar', 'Plažni bar sa dnevnim žurkama', 'Velika Plaža, Ulcinj', '+38267231034', NULL,
  NULL, 'Bar i kokteli', '{"pon":"08:00-00:00","uto":"08:00-00:00","sre":"08:00-00:00","cet":"08:00-00:00","pet":"08:00-02:00","sub":"08:00-02:00","ned":"00:00-00:00"}', 12.00,
- ARRAY['Plaza', 'Kokteli', 'Muzika', 'Basta'],
+ ARRAY['Plaža', 'Kokteli', 'Muzika', 'Bašta'],
  ST_SetSRID(ST_MakePoint(19.287, 41.895), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaza'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaža'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.ulcinj@spirego.com'),
@@ -1776,7 +1776,7 @@ VALUES
 
  ('Evergreen Jazz Bar', 'Jazz bar sa živom muzikom', 'Kotor Stari Grad', NULL, NULL,
  NULL, 'Jazz i kokteli', '{"pon":"18:00-01:00","uto":"18:00-01:00","sre":"18:00-01:00","cet":"18:00-01:00","pet":"18:00-02:00","sub":"18:00-02:00","ned":"00:00-00:00"}', 14.00,
- ARRAY['Ziva muzika', 'Kokteli', 'Atmosfera'],
+ ARRAY['Živa muzika', 'Kokteli', 'Atmosfera'],
  ST_SetSRID(ST_MakePoint(18.772, 42.425), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
@@ -1787,7 +1787,7 @@ VALUES
 
  ('Itaka Library Bar', 'Alternativni bar poznat po muzici i atmosferi', 'Bulevar Svetog Petra Cetinjskog, Podgorica', '+38267156650', 'https://instagram.com/itaka_library.bar?utm_medium=copy_link',
  'https://itaka.digitalnimeni.me/', 'Bar i pivo', '{"pon":"10:00-00:00","uto":"10:00-00:00","sre":"10:00-00:00","cet":"10:00-00:00","pet":"10:00-02:00","sub":"10:00-02:00","ned":"00:00-00:00"}', 9.00,
- ARRAY['Pivo', 'Muzika', 'Basta'],
+ ARRAY['Pivo', 'Muzika', 'Bašta'],
  ST_SetSRID(ST_MakePoint(19.266, 42.438), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -1820,7 +1820,7 @@ VALUES
 
  ('Medusa', 'Bar na obali mora u Petrovcu', '16 Nika Anđusa, Petrovac', NULL, NULL,
  NULL, 'Bar i kokteli', '{"pon":"08:00-00:00","uto":"08:00-00:00","sre":"08:00-00:00","cet":"08:00-00:00","pet":"08:00-02:00","sub":"08:00-02:00","ned":"00:00-00:00"}', 10.00,
- ARRAY['Plaza', 'Kokteli', 'Pogled na more'],
+ ARRAY['Plaža', 'Kokteli', 'Pogled na more'],
  ST_SetSRID(ST_MakePoint(18.942, 42.205), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Petrovac'),
@@ -1831,7 +1831,7 @@ VALUES
 
  ('Strix Bar', 'Popularan koktel bar u Starom gradu Budve sa živom atmosferom', '2 Ivana Crnojevića, Budva', '+38268134097', NULL,
  'https://menusa.app/11eeb241404891a997d94a12937fd993?fbclid=PAZXh0bgNhZW0CMTEAAabPY1K9rzMSJoDjF1DCR1WLNDi2baRNhV35STTTlg7e_YE-xXM_KPaTJa0_aem_-8tZ2OyXeHInxs0AV-kKwg', 'Kokteli', '{"pon":"10:00-00:00","uto":"10:00-00:00","sre":"10:00-00:00","cet":"10:00-00:00","pet":"10:00-02:00","sub":"10:00-02:00","ned":"00:00-00:00"}', 14.00,
- ARRAY['Kokteli', 'Muzika', 'Basta'],
+ ARRAY['Kokteli', 'Muzika', 'Bašta'],
  ST_SetSRID(ST_MakePoint(18.839, 42.278), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
@@ -1842,7 +1842,7 @@ VALUES
 
 ('Hard Rock Cafe Podgorica', 'Poznati internacionalni bar i restoran u srcu Podgorice sa muzikom i koktelima', 'Trg Nezavisnosti, Podgorica', '+38268076291', 'https://cafe.hardrock.com/podgorica/#utm_source=Google&utm_medium=Yext&utm_campaign=Listings',
  'https://www.hardrockcafe.com/location/podgorica/files/5470/Local_menu.pdf', 'Američki bar i kokteli', '{"pon":"10:00-00:00","uto":"10:00-00:00","sre":"10:00-00:00","cet":"10:00-00:00","pet":"10:00-02:00","sub":"10:00-02:00","ned":"10:00-00:00"}', 18.00,
- ARRAY['Kokteli', 'Muzika', 'Souvenir shop', 'Basta'],
+ ARRAY['Kokteli', 'Muzika', 'Souvenir shop', 'Bašta'],
  ST_SetSRID(ST_MakePoint(19.262, 42.442), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -1886,9 +1886,9 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.cetinje@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Prirodnjacki muzej Crne Gore', 'Muzej prirodne istorije sa fosilima i biodiverzitetom', '74 Oktobarske Revolucije, Podgorica', '+38220633184', 'https://pmcg.co.me/',
+('Prirodnjački muzej Crne Gore', 'Muzej prirodne istorije sa fosilima i biodiverzitetom', '74 Oktobarske Revolucije, Podgorica', '+38220633184', 'https://pmcg.co.me/',
  NULL, 'Prirodne nauke', '{"pon":"08:00-16:00","uto":"08:00-16:00","sre":"08:00-16:00","cet":"08:00-16:00","pet":"08:00-16:00","sub":"10:00-13:00","ned":"00:00-00:00"}', 2.00,
- ARRAY['Edukacija', 'Izlozbe', 'Vodič'],
+ ARRAY['Edukacija', 'Izložbe', 'Vodič'],
  ST_SetSRID(ST_MakePoint(19.262, 42.434), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Muzej'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -1912,7 +1912,7 @@ VALUES
 
 --- TRZNI CENTRI ---
 
-('Big Fesn Podgorica', 'Najveći tržni centar u Crnoj Gori sa brojnim radnjama i bioskopom', 'b.b Cetinjski Put, Podgorica', '+38268878637', 'https://www.bigcenters.rs/podgorica/',
+('Big Fešn Podgorica', 'Najveći tržni centar u Crnoj Gori sa brojnim radnjama i bioskopom', 'b.b Cetinjski Put, Podgorica', '+38268878637', 'https://www.bigcenters.rs/podgorica/',
  NULL, 'Shopping centar', '{"pon":"10:00-22:00","uto":"10:00-22:00","sre":"10:00-22:00","cet":"10:00-22:00","pet":"10:00-22:00","sub":"10:00-22:00","ned":"10:00-22:00"}', 0,
  ARRAY['Parking', 'WiFi', 'Bioskop', 'Restorani'],
  ST_SetSRID(ST_MakePoint(19.236, 42.437), 4326), 0, 0, 'Approved', true,
@@ -1934,9 +1934,9 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Kamelija Shopping Center', 'Glavni tržni centar u Kotoru', 'Square Mata Petrovića, Kotor', '+38232335380', 'http://www.kamelija.me/',
+ ('Kamelija Shopping Center', 'Glavni tržni centar u Kotoru', 'Trg Mata Petrovića, Kotor', '+38232335380', 'http://www.kamelija.me/',
  NULL, 'Shopping centar', '{"pon":"09:00-21:00","uto":"09:00-21:00","sre":"09:00-21:00","cet":"09:00-21:00","pet":"09:00-21:00","sub":"09:00-21:00","ned":"09:00-21:00"}', 0,
- ARRAY['Parking', 'Radnje', 'Kafici'],
+ ARRAY['Parking', 'Radnje', 'Kafići'],
  ST_SetSRID(ST_MakePoint(18.770, 42.428), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trzni Centar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Dobrota'),
@@ -1978,34 +1978,34 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.budva@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('TC HDL Lakovic Niksic', 'Veliki retail centar sa supermarketom i radnjama', 'Nikšić ulaz', '+38269568423', NULL,
+('TC HDL Laković Nikšić', 'Veliki retail centar sa supermarketom i radnjama', 'Nikšić ulaz', '+38269568423', NULL,
  NULL, 'Shopping centar', '{"pon":"08:00-22:00","uto":"08:00-22:00","sre":"08:00-22:00","cet":"08:00-22:00","pet":"08:00-22:00","sub":"08:00-22:00","ned":"08:00-22:00"}', 0,
  ARRAY['Supermarket', 'Parking', 'Radnje'],
  ST_SetSRID(ST_MakePoint(18.951, 42.768), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trzni Centar'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Niksica'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Nikšića'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.niksic@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Lakovic Kotor', 'Tržni centar i supermarket u Kotoru', 'Radanovici, Kotor', NULL, NULL,
+ ('Laković Kotor', 'Tržni centar i supermarket u Kotoru', 'Radanovići, Kotor', NULL, NULL,
  NULL, 'Shopping centar', '{"pon":"08:00-22:00","uto":"08:00-22:00","sre":"08:00-22:00","cet":"08:00-22:00","pet":"08:00-22:00","sub":"08:00-22:00","ned":"08:00-22:00"}', 0,
  ARRAY['Supermarket', 'Parking'],
  ST_SetSRID(ST_MakePoint(18.746, 42.384), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trzni Centar'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Radanovici'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Radanovići'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Butiko Shopping Center', 'Retail centar u Radanovicima', 'Radanovici BB', '+38267033977', NULL,
+ ('Butiko Shopping Center', 'Retail centar u Radanovićima', 'Radanovići BB', '+38267033977', NULL,
  NULL, 'Shopping centar', '{"pon":"08:00-22:00","uto":"08:00-22:00","sre":"08:00-22:00","cet":"08:00-22:00","pet":"08:00-22:00","sub":"08:00-22:00","ned":"08:00-22:00"}', 0,
  ARRAY['Supermarket', 'Parking'],
  ST_SetSRID(ST_MakePoint(18.742, 42.386), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trzni Centar'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Radanovici'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Radanovići'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
@@ -2024,7 +2024,7 @@ VALUES
 
 --- GALERIJE ---
 
-('Galerija Muzeja savremene umjetnosti Crne Gore', 'Najvažnija institucija savremene umjetnosti u Crnoj Gori, sa izložbama domaćih i međunarodnih umjetnika', '2 Njegoševa, Podgorica', '+38220665409', 'https://msucg.me/',
+('Galerija Muzeja savremene umjetnosti Crne Gore', 'Najvažnija institucija savremene umetnosti u Crnoj Gori, sa izložbama domaćih i međunarodnih umetnika', '2 Njegoševa, Podgorica', '+38220665409', 'https://msucg.me/',
  NULL, NULL, '{"pon":"09:00-20:00","uto":"09:00-20:00","sre":"09:00-20:00","cet":"09:00-20:00","pet":"09:00-20:00","sub":"10:00-18:00","ned":"neradno"}', NULL,
  ARRAY['Izložbe', 'Kultura', 'Radionice'],
  ST_SetSRID(ST_MakePoint(19.261, 42.440), 4326), 0, 0, 'Approved', true,
@@ -2035,9 +2035,9 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Galerija Pizana', 'Savremena galerija u Podgorici sa fokusom na regionalne umjetnike i izložbe', '60 Hercegovačka, Podgorica', '+38269021882', 'http://www.pizana.me/',
+ ('Galerija Pizana', 'Savremena galerija u Podgorici sa fokusom na regionalne umetnike i izložbe', '60 Hercegovačka, Podgorica', '+38269021882', 'http://www.pizana.me/',
  NULL, NULL, '{"pon":"10:00-22:00","uto":"10:00-22:00","sre":"10:00-22:00","cet":"10:00-22:00","pet":"10:00-22:00","sub":"11:00-23:00","ned":"neradno"}', NULL,
- ARRAY['Umjetnost', 'Izložbe', 'Prodaja umjetnina'], ST_SetSRID(ST_MakePoint(19.264, 42.442), 4326),
+ ARRAY['Umetnost', 'Izložbe', 'Prodaja umetnina'], ST_SetSRID(ST_MakePoint(19.264, 42.442), 4326),
  0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Galerija'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -2046,7 +2046,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Galerija Velimir A. Lekovic', 'Kulturni centar i galerija sa stalnim i povremenim izložbama', 'Šetalište kralja Nikole 2, Bar', '+38230312431', 'https://instagram.com/galerija_velimir_a_lekovic?igshid=MzRlODBiNWFlZA==',
+ ('Galerija Velimir A. Leković', 'Kulturni centar i galerija sa stalnim i povremenim izložbama', 'Šetalište kralja Nikole 2, Bar', '+38230312431', 'https://instagram.com/galerija_velimir_a_lekovic?igshid=MzRlODBiNWFlZA==',
  NULL, NULL, '{"pon":"08:00-20:00","uto":"08:00-20:00","sre":"08:00-20:00","cet":"08:00-20:00","pet":"08:00-20:00","sub":"09:00-15:00","ned":"neradno"}', NULL,
  ARRAY['Kultura', 'Izložbe', 'Događaji'], ST_SetSRID(ST_MakePoint(19.091, 42.100), 4326),
  0, 0, 'Approved', true,
@@ -2059,7 +2059,7 @@ VALUES
 
  --- PANSIONI ---
 
- ('Villa Ljubanovic', 'Porodični pansion blizu Mogren plaže, poznat po mirnom ambijentu i domaćinskoj atmosferi', '18 Nikole Tesle, Budva', '+38269931474', 'http://www.ljubanovic.com/',
+ ('Villa Ljubanović', 'Porodični pansion blizu Mogren plaže, poznat po mirnom ambijentu i domaćinskoj atmosferi', '18 Nikole Tesle, Budva', '+38269931474', 'http://www.ljubanovic.com/',
  NULL, NULL, '{"pon":"08:00-22:00","uto":"08:00-22:00","sre":"08:00-22:00","cet":"08:00-22:00","pet":"08:00-22:00","sub":"08:00-22:00","ned":"09:00-20:00"}', 65.00,
  ARRAY['WiFi', 'Parking', 'Klima', 'Terasa'], ST_SetSRID(ST_MakePoint(18.83456, 42.28564), 4326),
  0, 0, 'Approved', true,
@@ -2070,7 +2070,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.budva@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Guesthouse Zmukic', 'Autentični porodični pansion u starom dijelu Kotora sa pogledom na zaliv', 'Perast, Kotor', '+38268103559', 'https://instagram.com/guesthouse_zmukic?utm_medium=copy_link',
+ ('Guesthouse Žmukić', 'Autentični porodični pansion u starom dijelu Kotora sa pogledom na zaliv', 'Perast, Kotor', '+38268103559', 'https://instagram.com/guesthouse_zmukic?utm_medium=copy_link',
  NULL, NULL, '{"pon":"07:00-23:00","uto":"07:00-23:00","sre":"07:00-23:00","cet":"07:00-23:00","pet":"07:00-23:00","sub":"08:00-23:00","ned":"neradno"}', 70.00,
  ARRAY['WiFi', 'Parking', 'Pogled na more', 'Doručak'], ST_SetSRID(ST_MakePoint(18.69556, 42.48814), 4326),
  0, 0, 'Approved', true,
@@ -2092,55 +2092,55 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.budva@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Pansion Vukovic Zabljak', 'Planinski pansion u blizini Durmitora, pogodan za planinare i prirodu', 'Tmajevci b.b, Žabljak', '+38267570242', NULL,
+ ('Pansion Vuković Žabljak', 'Planinski pansion u blizini Durmitora, pogodan za planinare i prirodu', 'Tmajevci b.b, Žabljak', '+38267570242', NULL,
  NULL, NULL, '{"pon":"07:00-22:00","uto":"07:00-22:00","sre":"07:00-22:00","cet":"07:00-22:00","pet":"07:00-22:00","sub":"07:00-22:00","ned":"08:00-20:00"}', 55.00,
  ARRAY['Parking', 'Grejanje', 'WiFi', 'Planinski pogled'], ST_SetSRID(ST_MakePoint(19.13467, 43.158904), 4326),
  0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Pansion'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.zabljak@spirego.com'),
  NOW(), NOW(), NOW()),
 
 
  --- ETNO SELA ---
- ('Etno Selo Montenegro', 'Autentično etno selo u prirodi sa tradicionalnim kućicama i domaćom hranom', 'Donja Brezna, Pluzine', '+38267209049', 'http://etnoselo.me/',
+ ('Etno Selo Montenegro', 'Autentično etno selo u prirodi sa tradicionalnim kućicama i domaćom hranom', 'Donja Brezna, Plužine', '+38267209049', 'http://etnoselo.me/',
  NULL, NULL, '{"pon":"08:00-22:00","uto":"08:00-22:00","sre":"08:00-22:00","cet":"08:00-22:00","pet":"08:00-22:00","sub":"08:00-23:00","ned":"09:00-21:00"}', 45.00,
  ARRAY['WiFi', 'Parking', 'Restoran', 'Etno ambijent', 'Priroda'], ST_SetSRID(ST_MakePoint(18.93277, 42.98276), 4326),
  0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Etno selo'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Pluzina'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Pluzine'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Plužina'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plužine'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.zabljak@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Etno Selo Izlazak', 'Planinsko etno selo sa pogledom na Bjelasicu, idealno za odmor u prirodi', 'Dubljevici, Pluzine', '+38269149323', 'http://www.etno-selo-izlazak.me/',
+ ('Etno Selo Izlazak', 'Planinsko etno selo sa pogledom na Bjelasicu, idealno za odmor u prirodi', 'Dubljevići, Plužine', '+38269149323', 'http://www.etno-selo-izlazak.me/',
  NULL, NULL, '{"pon":"09:00-21:00","uto":"09:00-21:00","sre":"09:00-21:00","cet":"09:00-21:00","pet":"09:00-22:00","sub":"09:00-23:00","ned":"09:00-20:00"}', 52.00,
- ARRAY['WiFi', 'Parking', 'Restoran', 'Planinski pogled', 'Etno smještaj'], ST_SetSRID(ST_MakePoint(18.86401, 43.06553), 4326),
+ ARRAY['WiFi', 'Parking', 'Restoran', 'Planinski pogled', 'Etno smeštaj'], ST_SetSRID(ST_MakePoint(18.86401, 43.06553), 4326),
  0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Etno selo'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Pivsko jezero'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Pluzine'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plužine'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.zabljak@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Etno Selo Komarnica', 'Autentično etno selo u kanjonu Komarnice, poznato po netaknutoj prirodi i tradicionalnom smještaju', 'Komarnica bb, Plužine', '+38268040124', NULL,
+ ('Etno Selo Komarnica', 'Autentično etno selo u kanjonu Komarnice, poznato po netaknutoj prirodi i tradicionalnom smeštaju', 'Komarnica bb, Plužine', '+38268040124', NULL,
  NULL, NULL, '{"pon":"08:00-21:00","uto":"08:00-21:00","sre":"08:00-21:00","cet":"08:00-21:00","pet":"08:00-22:00","sub":"09:00-22:00","ned":"09:00-20:00"}', 40.00,
  ARRAY['Parking', 'Etno kuće', 'Priroda', 'Restoran'], ST_SetSRID(ST_MakePoint(19.04526, 43.02867), 4326),
  0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Etno selo'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Komarnica'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Pluzine'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plužine'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.zabljak@spirego.com'),
  NOW(), NOW(), NOW()),
 
  --- VINARIJE ---
 
-('Vinarija Plantaze 13 Jul', 'Najveća vinarija u Crnoj Gori, poznata po vinima iz Zete i Skadarskog basena', 'Karabuško polje bb, Tuzi', '+38267099099', 'http://www.plantaze.com/en/#/sipcanik',
+('Vinarija Plantaže 13 Jul', 'Najveća vinarija u Crnoj Gori, poznata po vinima iz Zete i Skadarskog basena', 'Karabuško polje bb, Tuzi', '+38267099099', 'http://www.plantaze.com/en/#/sipcanik',
  NULL, NULL, '{"pon":"08:00-20:00","uto":"08:00-20:00","sre":"08:00-20:00","cet":"08:00-20:00","pet":"08:00-20:00","sub":"09:00-18:00","ned":"neradno"}', NULL,
  ARRAY['Degustacija', 'Prodaja vina', 'Turističke ture'], ST_SetSRID(ST_MakePoint(19.32017, 42.37529), 4326),
  0, 0, 'Approved', true,
@@ -2156,7 +2156,7 @@ VALUES
  ARRAY['Degustacija', 'Prodaja vina', 'Vinski podrum'], ST_SetSRID(ST_MakePoint(19.00802, 42.27054), 4326),
  0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Vinarija'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gradjani'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Građani'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.cetinje@spirego.com'),
@@ -2173,7 +2173,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Winery Masanovic', 'Vinarija iz okoline Bara sa fokusom na mediteranske sorte grožđa', 'Railway station, Virpazar, Bar', '+38268509541', 'http://www.instagram.com/winery.masanovic',
+ ('Winery Mašanović', 'Vinarija iz okoline Bara sa fokusom na mediteranske sorte grožđa', 'Railway station, Virpazar, Bar', '+38268509541', 'http://www.instagram.com/winery.masanovic',
  NULL, NULL, '{"pon":"09:00-20:00","uto":"09:00-20:00","sre":"09:00-20:00","cet":"09:00-20:00","pet":"09:00-20:00","sub":"10:00-18:00","ned":"neradno"}', NULL,
  ARRAY['Degustacija', 'Vino', 'Prodaja'], ST_SetSRID(ST_MakePoint(19.08346, 42.24013), 4326),
  0, 0, 'Approved', true,
@@ -2186,7 +2186,7 @@ VALUES
 
 ('Vinarija Savina', 'Boutique vinarija u Herceg Novom poznata po premium bijelim i crvenim vinima', '7d Branka Ćopića, Herceg - Novi', '+38268205189', 'https://castelsavina.me/',
  NULL, NULL, '{"pon":"10:00-18:00","uto":"10:00-18:00","sre":"10:00-18:00","cet":"10:00-18:00","pet":"10:00-18:00","sub":"11:00-17:00","ned":"neradno"}', NULL,
- ARRAY['Degustacija', 'Podrum', 'Vino', 'Turističke posjete'], ST_SetSRID(ST_MakePoint(18.55196, 42.45173), 4326),
+ ARRAY['Degustacija', 'Podrum', 'Vino', 'Turističke posete'], ST_SetSRID(ST_MakePoint(18.55196, 42.45173), 4326),
  0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Vinarija'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Herceg Novog'),
@@ -2199,7 +2199,7 @@ VALUES
 
  ('Aqua Park Budva', 'Najveći akva park u Crnoj Gori sa brojnim toboganima i bazenima za sve uzraste', 'Podostrog, Budva', '+38268334433', NULL,
  NULL, NULL, '{"pon":"10:00-18:00","uto":"10:00-18:00","sre":"10:00-18:00","cet":"10:00-18:00","pet":"10:00-18:00","sub":"10:00-19:00","ned":"10:00-19:00"}', 25.00,
- ARRAY['Tobogani', 'Bazen', 'Parking', 'Restoran', 'Porodicno'], ST_SetSRID(ST_MakePoint(18.82242, 42.29189), 4326),
+ ARRAY['Tobogani', 'Bazen', 'Parking', 'Restoran', 'Porodično'], ST_SetSRID(ST_MakePoint(18.82242, 42.29189), 4326),
  0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Akva park'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Podostrog'),
@@ -2208,12 +2208,12 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.budva@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Aqua Park Mediteran', 'Manji sezonski akva park sa bazenima i zabavnim sadržajem za djecu i odrasle', 'Becici bb, Boreti', '+38233689000', 'https://www.mediteran.me/en/aqua-park',
+ ('Aqua Park Mediteran', 'Manji sezonski akva park sa bazenima i zabavnim sadržajem za decu i odrasle', 'Bečići bb, Boreti', '+38233689000', 'https://www.mediteran.me/en/aqua-park',
  NULL, NULL, '{"pon":"10:00-18:00","uto":"10:00-18:00","sre":"10:00-18:00","cet":"10:00-18:00","pet":"10:00-18:00","sub":"10:00-19:00","ned":"10:00-19:00"}', 15.00,
- ARRAY['Bazen', 'Djeca', 'Tobogani', 'Parking'], ST_SetSRID(ST_MakePoint(18.86364, 42.28353), 4326),
+ ARRAY['Bazen', 'Deca', 'Tobogani', 'Parking'], ST_SetSRID(ST_MakePoint(18.86364, 42.28353), 4326),
  0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Akva park'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Becici'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Bečići'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.budva@spirego.com'),
@@ -2221,7 +2221,7 @@ VALUES
 
 ('Aqua Park Imanje Knjaz', 'Vodeni zabavni kompleks u Podgorici', 'Imanje, Podgorica', '+38267995252', 'http://www.imanje-knjaz.me/',
  NULL, NULL, '{"pon":"09:00-19:00","uto":"09:00-19:00","sre":"09:00-19:00","cet":"09:00-19:00","pet":"09:00-19:00","sub":"09:00-19:00","ned":"09:00-19:00"}', 20.00,
- ARRAY['Bazeni', 'Deciji vodeni park', 'Tobogani', 'Bar', 'Lezaljke'],
+ ARRAY['Bazeni', 'Dečiji vodeni park', 'Tobogani', 'Bar', 'Ležaljke'],
  ST_SetSRID(ST_MakePoint(19.18486, 42.47035), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Akva park'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Imanje'),
@@ -2234,7 +2234,7 @@ VALUES
 
 ('Mini Zoo Vrt Podgorica', 'Mali zoološki vrt sa domaćim i egzotičnim životinjama, popularan među porodicama', 'Podgorica bb', '+38268719404', NULL,
  NULL, NULL, '{"pon":"09:00-18:00","uto":"09:00-18:00","sre":"09:00-18:00","cet":"09:00-18:00","pet":"09:00-18:00","sub":"09:00-19:00","ned":"09:00-19:00"}', 5.00,
- ARRAY['Deciji sadrzaj', 'Zivotinje', 'Priroda', 'Parking'],
+ ARRAY['Dečiji sadržaj', 'Životinje', 'Priroda', 'Parking'],
  ST_SetSRID(ST_MakePoint(19.23861, 42.46411), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Zoo vrt'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
@@ -2245,7 +2245,7 @@ VALUES
 
  ('Zoo Sad', 'Manji zoo vrt sa domaćim životinjama i edukativnim sadržajem', 'Centar Budve', NULL, NULL,
  NULL, NULL, '{"pon":"10:00-17:00","uto":"10:00-17:00","sre":"10:00-17:00","cet":"10:00-17:00","pet":"10:00-17:00","sub":"10:00-18:00","ned":"10:00-18:00"}', 4.00,
- ARRAY['Zivotinje', 'Priroda', 'Porodicno okruzenje'],
+ ARRAY['Životinje', 'Priroda', 'Porodično okruženje'],
  ST_SetSRID(ST_MakePoint(18.83947, 42.28978), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Zoo vrt'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Budve'),
@@ -2254,9 +2254,9 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.budva@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Park Macaka', 'Park sa mackama u Kotoru', 'Stari grad Kotor', NULL, NULL,
+('Park Mačaka', 'Park sa mačkama u Kotoru', 'Stari grad Kotor', NULL, NULL,
  NULL, NULL, '{"pon":"10:00-17:00","uto":"10:00-17:00","sre":"10:00-17:00","cet":"10:00-17:00","pet":"10:00-17:00","sub":"10:00-18:00","ned":"10:00-18:00"}', 4.00,
- ARRAY['Zivotinje', 'Priroda', 'Porodicno okruzenje'],
+ ARRAY['Životinje', 'Priroda', 'Porodično okruženje'],
  ST_SetSRID(ST_MakePoint(18.77201, 42.42601), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Zoo vrt'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
@@ -2268,7 +2268,7 @@ VALUES
  --- AKVARIJUMI ---
 ('Akvarijum Boka', 'Prvi javni akvarijum u Crnoj Gori sa prikazom jadranskih morskih vrsta', 'Put Bokeljskih Brigada, Dobrota', '+38267946497', 'http://www.aquariumboka.ucg.ac.me/',
  NULL, NULL, '{"pon":"09:00-20:00","uto":"09:00-20:00","sre":"09:00-20:00","cet":"09:00-20:00","pet":"09:00-20:00","sub":"09:00-20:00","ned":"10:00-18:00"}', 8.00,
- ARRAY['Edukacija', 'Morske vrste', 'Turisticka atrakcija', 'Deciji sadrzaj'],
+ ARRAY['Edukacija', 'Morske vrste', 'Turistička atrakcija', 'Dečiji sadržaj'],
  ST_SetSRID(ST_MakePoint(18.76420, 42.43605), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Akvarijum'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Dobrota'),
@@ -2279,7 +2279,7 @@ VALUES
 
  --- IGRALISTA ---
 
- ('Igraliste Njegosev park', 'Dečije igralište u okviru gradskog parka', 'Njegošev park, Podgorica', NULL, NULL,
+ ('Igralište Njegošev park', 'Dečije igralište u okviru gradskog parka', 'Njegošev park, Podgorica', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Klackalice', 'Tobogan', 'Ljuljaške'], ST_SetSRID(ST_MakePoint(19.25889, 42.44212), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2289,7 +2289,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Igraliste Gorica Park', 'Dečije igralište u šumi Gorica', '18 Radomira Vešovića', NULL, NULL,
+ ('Igralište Gorica Park', 'Dečije igralište u šumi Gorica', '18 Radomira Vešovića', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Priroda', 'Klackalice', 'Penjalice'], ST_SetSRID(ST_MakePoint(19.26738, 42.44933), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2299,19 +2299,19 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Igraliste Slovenska plaza', 'Dečije igralište u turističkom kompleksu', 'Slovenska plaža, Budva', NULL, NULL,
+ ('Igralište Slovenska plaža', 'Dečije igralište u turističkom kompleksu', 'Slovenska plaža, Budva', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['More', 'Tobogan', 'Ljuljaške'], ST_SetSRID(ST_MakePoint(18.83962, 42.28348), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Slovenska plaza'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Slovenska plaža'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.budva@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Djecije Igraliste Park Nezavisnosti', 'Igralište uz šetalište', 'Park Nezavisnosti, Herceg Novi', NULL, NULL,
+('Dječije Igralište Park Nezavisnosti', 'Igralište uz šetalište', 'Park Nezavisnosti, Herceg Novi', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
- NULL, ARRAY['More', 'Klackalice', 'Biciklisticka zona'], ST_SetSRID(ST_MakePoint(18.53149, 42.45283), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['More', 'Klackalice', 'Biciklistička zona'], ST_SetSRID(ST_MakePoint(18.53149, 42.45283), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Herceg Novog'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
@@ -2319,7 +2319,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.hercegnovi@spirego.com'),
  NOW(), NOW(), NOW()),
  
- ('Igraliste Centar Kotor', 'Malo gradsko igralište u starom gradu', 'Stari grad Kotor', NULL, NULL,
+ ('Igralište Centar Kotor', 'Malo gradsko igralište u starom gradu', 'Stari grad Kotor', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Klackalice', 'Ljuljaške'], ST_SetSRID(ST_MakePoint(18.76836, 42.42676), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2329,7 +2329,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Igraliste Tolosi', 'Gradsko igralište u naselju Tološi', 'Tološi, Podgorica', NULL, NULL,
+ ('Igralište Tološi', 'Gradsko igralište u naselju Tološi', 'Tološi, Podgorica', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Sport', 'Fudbalski teren', 'Ljuljaške'], ST_SetSRID(ST_MakePoint(19.23797, 42.45096), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2339,17 +2339,17 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Igraliste Kolasin', 'Dečije igralište u centru Kolasina', 'Mirka Vešovića, Kolašin', NULL, NULL,
+ ('Igralište Kolašin', 'Dečije igralište u centru Kolašina', 'Mirka Vešovića, Kolašin', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Priroda', 'Klackalice'], ST_SetSRID(ST_MakePoint(19.51693, 42.82508), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolasina'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolašina'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.kolasin@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Igraliste Igalo', 'Dečije igralište u centru Igalo Banje', '30 Janka Beka, Igalo', NULL, NULL,
+ ('Igralište Igalo', 'Dečije igralište u centru Igalo Banje', '30 Janka Beka, Igalo', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['More', 'Tobogan', 'Klackalice'], ST_SetSRID(ST_MakePoint(18.50755, 42.46072), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2359,7 +2359,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.igalo@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Igraliste Park 13 Jul', 'Dečije igralište u gradskom parku', 'Park 13 Jul, Cetinje', NULL, NULL,
+('Igralište Park 13 Jul', 'Dečije igralište u gradskom parku', 'Park 13 Jul, Cetinje', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Ljuljaške', 'Klackalice', 'Klupice'], ST_SetSRID(ST_MakePoint(18.92777, 42.38661), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2369,17 +2369,17 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.cetinje@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Igraliste Niksic', 'Gradsko igraliste', 'Ulica 135, Niksic', NULL, NULL,
+ ('Igralište Nikšić', 'Gradsko igraliste', 'Ulica 135, Nikšić', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Fudbalski teren', 'Ljuljaške', 'Koš'], ST_SetSRID(ST_MakePoint(18.94318, 42.77990), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Niksica'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Nikšića'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.niksic@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Djecje igraliste kod vozica', 'Djecije igraliste kod vozica', 'Pjesacka staza, Tivat', NULL, NULL,
+('Dječje igralište kod vozića', 'Igralište blizu vozića u pešačkoj zoni', 'Pešačka staza, Tivat', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Klackalice', 'Ljuljaške', 'Zelenilo'], ST_SetSRID(ST_MakePoint(18.69288, 42.44178), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2389,7 +2389,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.tivat@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Igraliste Bar Setaliste', 'Dečije igralište uz obalu mora', 'Šetalište kralja Nikole, Bar', NULL, NULL,
+('Igralište Bar Šetalište', 'Dečije igralište uz obalu mora', 'Šetalište kralja Nikole, Bar', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['More', 'Tobogan', 'Klackalice'], ST_SetSRID(ST_MakePoint(19.08954, 42.10233), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2399,7 +2399,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.bar@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Igraliste Crno jezero', 'Dečije igralište u na putu ka Crnom jezeru', 'Šetalište ka Crnom jezeru', NULL, NULL,
+ ('Igralište Crno jezero', 'Dečije igralište na putu ka Crnom jezeru', 'Šetalište ka Crnom jezeru', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Klackalice', 'Ljuljaške', 'Zelenilo'], ST_SetSRID(ST_MakePoint(19.10032, 43.15027), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2409,7 +2409,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.durmitor@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('Igraliste Milocer Park', 'Dečije igralište u okviru parka Miločer', 'Park Miločer, Budva', NULL, NULL,
+('Igralište Miločer Park', 'Dečije igralište u okviru parka Miločer', 'Park Miločer, Budva', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Ljuljaške', 'Klackalice', 'Prirodno okruženje'], ST_SetSRID(ST_MakePoint(18.89628, 42.26102), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2419,7 +2419,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.budva@spirego.com'),
  NOW(), NOW(), NOW()),
  
-('Djecija igraonica Igalo', 'Dečije igralište u naselju Igalo', '43-27 Dr Svetozara Živojinovića, Igalo', NULL, NULL,
+('Dječija igraonica Igalo', 'Dečije igralište u naselju Igalo', '43-27 Dr Svetozara Živojinovića, Igalo', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Ljuljaške', 'Klackalice', 'Penjalice'], ST_SetSRID(ST_MakePoint(18.50343, 42.45191), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
@@ -2429,19 +2429,19 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.igalo@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Igraliste Lovcen National Park', 'Dečije igralište u prirodnom ambijentu Nacionalnog parka Lovćen', 'Lovćen National Park, Cetinje', NULL, NULL,
+ ('Igralište Lovćen National Park', 'Dečije igralište u prirodnom ambijentu Nacionalnog parka Lovćen', 'Lovćen National Park, Cetinje', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Drvene sprave', 'Klackalice', 'Ljuljaške', 'Priroda'], ST_SetSRID(ST_MakePoint(18.79377, 42.39303), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njegusi'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovcen'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njeguši'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovćen'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.lovcen@spirego.com'),
  NOW(), NOW(), NOW()),
  
 --- POZORISTA ---
 
-('Crnogorsko narodno pozoriste', 'Nacionalno pozorište Crne Gore', '18 Bulevar Stanka Dragojevića, Podgorica', '+38220404120', 'https://www.cnp.me',
+('Crnogorsko narodno pozorište', 'Nacionalno pozorište Crne Gore', '18 Bulevar Stanka Dragojevića, Podgorica', '+38220404120', 'https://www.cnp.me',
  NULL, NULL, '{"pon":"10:00-20:00","uto":"10:00-20:00","sre":"10:00-20:00","cet":"10:00-20:00","pet":"10:00-20:00","sub":"18:00-22:00","ned":"neradni dan"}',
  NULL, ARRAY['Predstave', 'Festival', 'Sala'], ST_SetSRID(ST_MakePoint(19.26037, 42.44206), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Pozoriste'),
@@ -2461,12 +2461,12 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.cetinje@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Niksicko pozoriste', 'Gradsko pozorište Nikšića', 'Njegoševa, Nikšić', '+38240213566', NULL,
+ ('Nikšićko pozorište', 'Gradsko pozorište Nikšića', 'Njegoševa, Nikšić', '+38240213566', NULL,
  NULL, NULL, '{"pon":"10:00-20:00","uto":"10:00-20:00","sre":"10:00-20:00","cet":"10:00-20:00","pet":"10:00-20:00","sub":"18:00-22:00","ned":"neradni dan"}',
  NULL, ARRAY['Predstave', 'Koncerti'], ST_SetSRID(ST_MakePoint(18.94666, 42.77143), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Pozoriste'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Niksica'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Nikšića'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.niksic@spirego.com'),
  NOW(), NOW(), NOW()),
@@ -2475,13 +2475,13 @@ VALUES
  NULL, NULL, '{"pon":"10:00-20:00","uto":"10:00-20:00","sre":"10:00-20:00","cet":"10:00-20:00","pet":"10:00-20:00","sub":"19:00-22:00","ned":"neradni dan"}',
  NULL, ARRAY['Drama', 'Film', 'Koncerti'], ST_SetSRID(ST_MakePoint(18.53231, 42.45222), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Pozoriste'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.hercegnovi@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Kulturni centar Kotor - scena', 'Pozorišne i kulturne predstave u Kotoru', 'Ulica 2 (sjever-jug), Kotor', '+38232304140', 'http://www.kckotor.me/',
+ ('Kulturni centar Kotor - scena', 'Pozorišne i kulturne predstave u Kotoru', 'Ulica 2 (sever-jug), Kotor', '+38232304140', 'http://www.kckotor.me/',
  NULL, NULL, '{"pon":"10:00-20:00","uto":"10:00-20:00","sre":"10:00-20:00","cet":"10:00-20:00","pet":"10:00-20:00","sub":"19:00-22:00","ned":"neradni dan"}',
  NULL, ARRAY['Festival', 'Drama'], ST_SetSRID(ST_MakePoint(18.77136, 42.42331), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Pozoriste'),
@@ -2531,29 +2531,29 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.tivat@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Dom kulture Kolasin', 'Kulturni centar i mala pozorišna scena u Kolašinu', 'Trg boraca, Kolašin', '+38267338053', NULL,
+ ('Dom kulture Kolašin', 'Kulturni centar i mala pozorišna scena u Kolašinu', 'Trg boraca, Kolašin', '+38267338053', NULL,
  NULL, NULL, '{"pon":"10:00-20:00","uto":"10:00-20:00","sre":"10:00-20:00","cet":"10:00-20:00","pet":"10:00-20:00","sub":"18:00-22:00","ned":"neradni dan"}',
  NULL, ARRAY['Predstave', 'Koncerti', 'Projekcije filmova'], ST_SetSRID(ST_MakePoint(19.520818, 42.82361), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Pozoriste'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolasina'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolašina'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.kolasin@spirego.com'),
  NOW(), NOW(), NOW()),
 
  --- MANASTIRI ---
 
- ('Manastir Moraca', 'Srednjovjekovni pravoslavni manastir iz 13. vijeka', 'Kolašin region, kanjon Morače', NULL, 'http://www.manastiri-crkve.com/manastiri/manastir_moraca.htm',
+ ('Manastir Morača', 'Srednjovekovni pravoslavni manastir iz 13. vijeka', 'Kolašin region, kanjon Morače', NULL, 'http://www.manastiri-crkve.com/manastiri/manastir_moraca.htm',
  NULL, NULL, '{"pon":"07:00-19:00","uto":"07:00-19:00","sre":"07:00-19:00","cet":"07:00-19:00","pet":"07:00-19:00","sub":"07:00-19:00","ned":"07:00-19:00"}',
  NULL, ARRAY['Freske', 'Istorijski spomenik', 'Priroda'], ST_SetSRID(ST_MakePoint(19.39052, 42.76612), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Manastir'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Moraca'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Morača'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.kolasin@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Cetinjski manastir', 'Duhovni centar Crne Gore i sjedište Mitropolije', 'Cetinje centar', NULL, NULL,
+ ('Cetinjski manastir', 'Duhovni centar Crne Gore i sedište Mitropolije', 'Cetinje centar', NULL, NULL,
  NULL, NULL, '{"pon":"08:00-19:00","uto":"08:00-19:00","sre":"08:00-19:00","cet":"08:00-19:00","pet":"08:00-19:00","sub":"08:00-19:00","ned":"08:00-19:00"}',
  NULL, ARRAY['Relikvije', 'Istorija', 'Muzej'], ST_SetSRID(ST_MakePoint(18.92168, 42.38783), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Manastir'),
@@ -2563,19 +2563,19 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.cetinje@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Manastir Piva', 'Pravoslavni manastir iz 16. vijeka premješten zbog izgradnje hidrocentrale', 'Plužine, Piva region', NULL, NULL,
+ ('Manastir Piva', 'Pravoslavni manastir iz 16. vijeka premešten zbog izgradnje hidrocentrale', 'Plužine, Piva region', NULL, NULL,
  NULL, NULL, '{"pon":"08:00-18:00","uto":"08:00-18:00","sre":"08:00-18:00","cet":"08:00-18:00","pet":"08:00-18:00","sub":"08:00-18:00","ned":"08:00-18:00"}',
  NULL, ARRAY['Freske', 'Istorijski značaj', 'Muzej'], ST_SetSRID(ST_MakePoint(18.81834, 43.10998), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Manastir'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Pluzina'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Pluzine'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Plužina'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plužine'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.zabljak@spirego.com'),
  NOW(), NOW(), NOW()),
 
  --- SPORTSKI CENTRI ---
 
-('SC Moraca', 'Glavni sportski centar i dvorana u Podgorici', 'bb Ivana Milutinovića, Podgorica', NULL, 'https://www.pgsport.me/a1/index.php/cg/organizacija/potpredsjednik/o-nama',
+('SC Morača', 'Glavni sportski centar i dvorana u Podgorici', 'bb Ivana Milutinovića, Podgorica', NULL, 'https://www.pgsport.me/a1/index.php/cg/organizacija/potpredsjednik/o-nama',
  NULL, NULL, '{"pon":"08:00-22:00","uto":"08:00-22:00","sre":"08:00-22:00","cet":"08:00-22:00","pet":"08:00-22:00","sub":"10:00-22:00","ned":"10:00-20:00"}',
  NULL, ARRAY['Košarka', 'Rukomet', 'Koncerti'], ST_SetSRID(ST_MakePoint(19.25379, 42.43819), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Sportski centar'),
@@ -2595,12 +2595,12 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.bar@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('SC Niksic', 'Gradski sportski centar Nikšića', 'Njegoševa bb, Nikšić', '+38240201252', 'https://www.scniksic.me/',
+ ('SC Nikšić', 'Gradski sportski centar Nikšića', 'Njegoševa bb, Nikšić', '+38240201252', 'https://www.scniksic.me/',
  NULL, NULL, '{"pon":"08:00-22:00","uto":"08:00-22:00","sre":"08:00-22:00","cet":"08:00-22:00","pet":"08:00-22:00","sub":"10:00-22:00","ned":"10:00-20:00"}',
  NULL, ARRAY['Košarka', 'Rukomet', 'Trening'], ST_SetSRID(ST_MakePoint(18.95070, 42.78126), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Sportski centar'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Niksica'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Nikšića'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.niksic@spirego.com'),
  NOW(), NOW(), NOW()),
@@ -2615,19 +2615,19 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.igalo@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('SC Kolasin', 'Sportski centar u planinskom gradu', 'Jagoša Simonovića, Kolašin', NULL, NULL,
+ ('SC Kolašin', 'Sportski centar u planinskom gradu', 'Jagoša Simonovića, Kolašin', NULL, NULL,
  NULL, NULL, '{"pon":"08:00-21:00","uto":"08:00-21:00","sre":"08:00-21:00","cet":"08:00-21:00","pet":"08:00-21:00","sub":"10:00-21:00","ned":"10:00-18:00"}',
  NULL, ARRAY['Ski sport', 'Sala', 'Trening'], ST_SetSRID(ST_MakePoint(19.51640, 42.82302), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Sportski centar'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolasina'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolašina'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.kolasin@spirego.com'),
  NOW(), NOW(), NOW()),
 
  --- WELLNESS CENTRI ---
 
- ('Spa Center Avala Medical Wellness', 'Medicinski i wellness spa centar otvoren za vanjske posjetioce', 'Hotel Avala, 2 Mediteranska', '+38269328922', 'http://www.avalaresort.com/',
+ ('Spa Center Avala Medical Wellness', 'Medicinski i wellness spa centar otvoren za eksterne posetioce', 'Hotel Avala, 2 Mediteranska', '+38269328922', 'http://www.avalaresort.com/',
  NULL, NULL, '{"pon":"09:00-21:00","uto":"09:00-21:00","sre":"09:00-21:00","cet":"09:00-21:00","pet":"09:00-21:00","sub":"10:00-20:00","ned":"10:00-18:00"}',
  NULL, ARRAY['Sauna', 'Tretmani lica', 'Masaže', 'Jacuzzi'], ST_SetSRID(ST_MakePoint(18.83512, 42.27833), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Wellness centar'),
@@ -2637,11 +2637,11 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.budva@spirego.com'),
  NOW(), NOW(), NOW()),
 
-('The Chedi Lustica Bay', 'Savremeni wellness i spa centar u okviru naselja Luštica Bay, otvoren i za posjetioce', 'Luštica Bay Marina, Radovići', '+38232661266', 'https://www.chedilusticabay.com/',
+('The Chedi Luštica Bay', 'Savremeni wellness i spa centar u okviru naselja Luštica Bay, otvoren i za posetioce', 'Luštica Bay Marina, Radovići', '+38232661266', 'https://www.chedilusticabay.com/',
  NULL, NULL, '{"pon":"09:00-21:00","uto":"09:00-21:00","sre":"09:00-21:00","cet":"09:00-21:00","pet":"09:00-21:00","sub":"09:00-21:00","ned":"09:00-20:00"}',
  NULL, ARRAY['Spa', 'Sauna', 'Masaže', 'Fitness'], ST_SetSRID(ST_MakePoint(18.66421, 42.38651), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Wellness centar'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Lustica'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Luštica'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.tivat@spirego.com'),
@@ -2651,7 +2651,7 @@ VALUES
  NULL, NULL, '{"pon":"10:00-20:00","uto":"10:00-20:00","sre":"10:00-20:00","cet":"10:00-20:00","pet":"10:00-20:00","sub":"11:00-18:00","ned":"neradni dan"}',
  NULL, ARRAY['Masaže', 'Sauna', 'Aromaterapija', 'Relaks zona'], ST_SetSRID(ST_MakePoint(18.73299, 42.46463), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Wellness centar'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Prcanj'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Prčanj'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
@@ -2669,9 +2669,9 @@ VALUES
 
 --- TRZNICE ---
 
- ('Trznica Podgorica', 'Glavna gradska pijaca sa voćem, povrćem i domaćim proizvodima', 'Bratstva i Jedinstva, Podgorica', '+38220625424', 'http://www.pijacepg.me/',
+ ('Tržnica Podgorica', 'Glavna gradska pijaca sa voćem, povrćem i domaćim proizvodima', 'Bratstva i Jedinstva, Podgorica', '+38220625424', 'http://www.pijacepg.me/',
  NULL, NULL, '{"pon":"07:00-15:00","uto":"07:00-15:00","sre":"07:00-15:00","cet":"07:00-15:00","pet":"07:00-15:00","sub":"07:00-14:00","ned":"neradni dan"}',
- NULL, ARRAY['Voce', 'Povrce', 'Domaci proizvodi'], ST_SetSRID(ST_MakePoint(19.26315, 42.43284), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Voće', 'Povrće', 'Domaći proizvodi'], ST_SetSRID(ST_MakePoint(19.26315, 42.43284), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
@@ -2681,7 +2681,7 @@ VALUES
 
 ('Gradska pijaca Kotor', 'Gradska pijaca u starom gradu Kotora', 'Stari grad Kotor', NULL, NULL,
  NULL, NULL, '{"pon":"07:00-14:00","uto":"07:00-14:00","sre":"07:00-14:00","cet":"07:00-14:00","pet":"07:00-14:00","sub":"07:00-13:00","ned":"neradni dan"}',
- NULL, ARRAY['Riba', 'Povrce', 'Voce'], ST_SetSRID(ST_MakePoint(18.77047, 42.42393), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Riba', 'Povrće', 'Voće'], ST_SetSRID(ST_MakePoint(18.77047, 42.42393), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -2691,7 +2691,7 @@ VALUES
 
  ('Pijaca Budva', 'Glavna gradska pijaca Budve sa lokalnim proizvodima', 'Mediteranska, Budva', NULL, NULL,
  NULL, NULL, '{"pon":"07:00-15:00","uto":"07:00-15:00","sre":"07:00-15:00","cet":"07:00-15:00","pet":"07:00-15:00","sub":"07:00-14:00","ned":"neradni dan"}',
- NULL, ARRAY['Voce', 'Povrce', 'Suveniri'], ST_SetSRID(ST_MakePoint(18.83683, 42.28449), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Voće', 'Povrće', 'Suveniri'], ST_SetSRID(ST_MakePoint(18.83683, 42.28449), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Budve'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -2699,19 +2699,19 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.budva@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Zelena pijaca Niksic', 'Gradska pijaca u Nikšiću', '5. proleterske brigade, Niksic', NULL, NULL,
+ ('Zelena pijaca Nikšić', 'Gradska pijaca u Nikšiću', '5. proleterske brigade, Nikšić', NULL, NULL,
  NULL, NULL, '{"pon":"07:00-14:00","uto":"07:00-14:00","sre":"07:00-14:00","cet":"07:00-14:00","pet":"07:00-14:00","sub":"07:00-13:00","ned":"neradni dan"}',
- NULL, ARRAY['Domaca hrana', 'Meso', 'Povrce'], ST_SetSRID(ST_MakePoint(18.95014, 42.77480), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Domaća hrana', 'Meso', 'Povrće'], ST_SetSRID(ST_MakePoint(18.95014, 42.77480), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Niksica'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Nikšića'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.niksic@spirego.com'),
  NOW(), NOW(), NOW()),
 
 ('Pijaca Bar', 'Gradska pijaca u Baru', 'Bulevar Revolucije, Bar', NULL, NULL,
  NULL, NULL, '{"pon":"07:00-15:00","uto":"07:00-15:00","sre":"07:00-15:00","cet":"07:00-15:00","pet":"07:00-15:00","sub":"07:00-14:00","ned":"neradni dan"}',
- NULL, ARRAY['Voce', 'Riba', 'Povrce'], ST_SetSRID(ST_MakePoint(19.09973, 42.10443), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Voće', 'Riba', 'Povrće'], ST_SetSRID(ST_MakePoint(19.09973, 42.10443), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Bara'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
@@ -2721,7 +2721,7 @@ VALUES
 
  ('Pijaca Herceg Novi', 'Gradska pijaca uz obalu mora', 'Topla, Herceg Novi', '+38231347755', NULL,
  NULL, NULL, '{"pon":"07:00-14:00","uto":"07:00-14:00","sre":"07:00-14:00","cet":"07:00-14:00","pet":"07:00-14:00","sub":"07:00-13:00","ned":"neradni dan"}',
- NULL, ARRAY['Riba', 'Voce', 'Zelena pijaca'], ST_SetSRID(ST_MakePoint(18.53628, 42.45197), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Riba', 'Voće', 'Zelena pijaca'], ST_SetSRID(ST_MakePoint(18.53628, 42.45197), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Herceg Novog'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
@@ -2731,7 +2731,7 @@ VALUES
 
 ('Pijaca Tivat', 'Mala gradska pijaca u Tivtu', '21.Novembra, Tivat', NULL, NULL,
  NULL, NULL, '{"pon":"07:00-14:00","uto":"07:00-14:00","sre":"07:00-14:00","cet":"07:00-14:00","pet":"07:00-14:00","sub":"07:00-13:00","ned":"neradni dan"}',
- NULL, ARRAY['Voce', 'Povrce'], ST_SetSRID(ST_MakePoint(18.69944, 42.42939), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Voće', 'Povrće'], ST_SetSRID(ST_MakePoint(18.69944, 42.42939), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Tivta'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
@@ -2741,7 +2741,7 @@ VALUES
 
 ('Zelena pijaca Cetinje', 'Tradicionalna pijaca u istorijskom gradu', '24 Baja Pivljanina, Cetinje', NULL, NULL,
  NULL, NULL, '{"pon":"07:00-14:00","uto":"07:00-14:00","sre":"07:00-14:00","cet":"07:00-14:00","pet":"07:00-14:00","sub":"07:00-13:00","ned":"neradni dan"}',
- NULL, ARRAY['Domaci proizvodi', 'Voce', 'Povrce'], ST_SetSRID(ST_MakePoint(18.92540, 42.39000), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Domaći proizvodi', 'Voće', 'Povrće'], ST_SetSRID(ST_MakePoint(18.92540, 42.39000), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Cetinja'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
@@ -2751,7 +2751,7 @@ VALUES
 
 ('Pijaca Ulcinj', 'Gradska pijaca sa lokalnim i mediteranskim proizvodima', 'Nikole Đakovića, Ulcinj', NULL, NULL,
  NULL, NULL, '{"pon":"07:00-15:00","uto":"07:00-15:00","sre":"07:00-15:00","cet":"07:00-15:00","pet":"07:00-15:00","sub":"07:00-14:00","ned":"neradni dan"}',
- NULL, ARRAY['Riba', 'Voce', 'Povrce'], ST_SetSRID(ST_MakePoint(19.215, 41.928), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Riba', 'Voće', 'Povrće'], ST_SetSRID(ST_MakePoint(19.215, 41.928), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trznica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Ulcinja'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
@@ -2773,7 +2773,7 @@ VALUES
 
  ('Kotorska Suvenirnica', 'Suvenirnica u starom gradu Kotora sa lokalnim rukotvorinama', 'Stari grad Kotor', '+38269177281', NULL,
  NULL, NULL, '{"pon":"09:00-21:00","uto":"09:00-21:00","sre":"09:00-21:00","cet":"09:00-21:00","pet":"09:00-21:00","sub":"09:00-22:00","ned":"09:00-21:00"}',
- NULL, ARRAY['Suveniri', 'Rucni radovi', 'Magneti'], ST_SetSRID(ST_MakePoint(18.77137, 42.42536), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Suveniri', 'Ručni radovi', 'Magneti'], ST_SetSRID(ST_MakePoint(18.77137, 42.42536), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Suvenirnica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -2783,7 +2783,7 @@ VALUES
 
  ('By The Sea Handmade', 'Prodavnica suvenira u starom gradu Budve', 'Vranjak, Budva', '+38268116590', 'https://instagram.com/by_the_sea_mne?igshid=YmMyMTA2M2Y=',
  NULL, NULL, '{"pon":"09:00-22:00","uto":"09:00-22:00","sre":"09:00-22:00","cet":"09:00-22:00","pet":"09:00-22:00","sub":"09:00-23:00","ned":"09:00-22:00"}',
- NULL, ARRAY['Suveniri', 'Privešci', 'Odjeća'], ST_SetSRID(ST_MakePoint(18.83870, 42.27799), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Suveniri', 'Privešci', 'Odeća'], ST_SetSRID(ST_MakePoint(18.83870, 42.27799), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Suvenirnica'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -2805,7 +2805,7 @@ VALUES
  NULL, NULL, '{"pon":"09:00-21:00","uto":"09:00-21:00","sre":"09:00-21:00","cet":"09:00-21:00","pet":"09:00-21:00","sub":"09:00-22:00","ned":"09:00-21:00"}',
  NULL, ARRAY['Suveniri', 'Školjke', 'Magneti'], ST_SetSRID(ST_MakePoint(18.53368, 42.45103), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Suvenirnica'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.hercegnovi@spirego.com'),
@@ -2821,19 +2821,19 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.cetinje@spirego.com'),
  NOW(), NOW(), NOW()),
  
-('Promenada Krupac', 'Uredjena promenada oko Krupackog jezera, popularno mesto za setnju, odmor i organizaciju festivala poput Lake Festa', 'Krupacko jezero, Niksic', NULL, NULL,
+('Promenada Krupac', 'Uređena promenada oko Krupačkog jezera, popularno mesto za šetnju, odmor i organizaciju festivala poput Lake Festa', 'Krupačko jezero, Nikšić', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-23:59","uto":"00:00-23:59","sre":"00:00-23:59","cet":"00:00-23:59","pet":"00:00-23:59","sub":"00:00-23:59","ned":"00:00-23:59"}',
- NULL, ARRAY['Setnja', 'Priroda', 'Festival', 'Rekreacija'], ST_SetSRID(ST_MakePoint(18.892, 42.783), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Šetnja', 'Priroda', 'Festival', 'Rekreacija'], ST_SetSRID(ST_MakePoint(18.892, 42.783), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Sportski centar'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupacko jezero'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupačko jezero'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.niksic@spirego.com'),
  NOW(), NOW(), NOW()),
  
 ---- BOLNICE ----
 
-('Klinicki centar Crne Gore', 'Najveća državna zdravstvena ustanova u Crnoj Gori, centralna bolnička institucija sa urgentnim centrom i specijalističkim klinikama.', 'Ljubljanska bb, Podgorica', '+38220412412', 'https://www.kccg.me',
+('Klinički centar Crne Gore', 'Najveća državna zdravstvena ustanova u Crnoj Gori, centralna bolnička institucija sa urgentnim centrom i specijalističkim klinikama.', 'Ljubljanska bb, Podgorica', '+38220412412', 'https://www.kccg.me',
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Urgentni centar', 'Specijalističke klinike', 'Bolničko lečenje', 'Dijagnostika'], ST_SetSRID(ST_MakePoint(19.2459, 42.4374), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Klinika'),
@@ -2843,17 +2843,17 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.podgorica@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Opsta bolnica Niksic', 'Državna opšta bolnica koja pruža usluge sekundarne zdravstvene zaštite za Nikšić i okolne opštine.', 'Dr Nika Miljanića, Nikšić', '+38240231204', 'https://domzdravljaniksic.me/',
+ ('Opšta bolnica Nikšić', 'Državna opšta bolnica koja pruža usluge sekundarne zdravstvene zaštite za Nikšić i okolne opštine.', 'Dr Nika Miljanića, Nikšić', '+38240231204', 'https://domzdravljaniksic.me/',
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Interna medicina', 'Hirurgija', 'Dijagnostika', 'Bolničko lečenje'], ST_SetSRID(ST_MakePoint(18.9350, 42.7774), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Niksica'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Nikšića'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.niksic@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Opsta bolnica Bar', 'Državna opšta bolnica u Baru, važna zdravstvena ustanova za južni deo crnogorskog primorja.', 'Podgrad bb, Stari Bar', '+38230342333', 'https://bolnicabar.me',
+ ('Opšta bolnica Bar', 'Državna opšta bolnica u Baru, važna zdravstvena ustanova za južni deo crnogorskog primorja.', 'Podgrad bb, Stari Bar', '+38230342333', 'https://bolnicabar.me',
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Urgentni prijem', 'Bolničko lečenje', 'Dijagnostika', 'Specijalističke službe'], ST_SetSRID(ST_MakePoint(19.1285, 42.0895), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
@@ -2863,7 +2863,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.bar@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Opsta bolnica Kotor', 'Državna opšta bolnica u Kotoru, namenjena bolničkoj i specijalističkoj zdravstvenoj zaštiti stanovnika Boke Kotorske.', 'Škaljari bb, Kotor', '+38232325602', 'https://www.kbckotor.me',
+ ('Opšta bolnica Kotor', 'Državna opšta bolnica u Kotoru, namenjena bolničkoj i specijalističkoj zdravstvenoj zaštiti stanovnika Boke Kotorske.', 'Škaljari bb, Kotor', '+38232325602', 'https://www.kbckotor.me',
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Bolničko lečenje', 'Specijalističke službe', 'Dijagnostika'], ST_SetSRID(ST_MakePoint(18.7610, 42.4207), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
@@ -2873,7 +2873,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'marko@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Opsta bolnica Danilo Prvi Cetinje', 'Jedna od najstarijih državnih bolnica u Crnoj Gori, smeštena u istorijskoj prestonici Cetinju.', 'Vuka Mićunovića 1, Cetinje', '+38241230441', 'http://daniloprvi.me/kontakt/',
+ ('Opšta bolnica Danilo Prvi Cetinje', 'Jedna od najstarijih državnih bolnica u Crnoj Gori, smeštena u istorijskoj prestonici Cetinju.', 'Vuka Mićunovića 1, Cetinje', '+38241230441', 'http://daniloprvi.me/kontakt/',
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Hirurgija', 'Interna medicina', 'Pedijatrija', 'Ginekologija'], ST_SetSRID(ST_MakePoint(18.9237, 42.3889), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bolnica'),
@@ -2913,12 +2913,12 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.bar@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Zdravstvena stanica Pluzine', 'Zdravstvena stanica u Plužinama, deo sistema primarne zdravstvene zaštite.', 'Ulica Jelene Mitrić, Pluzine', '+38240271135', NULL,
+ ('Zdravstvena stanica Plužine', 'Zdravstvena stanica u Plužinama, deo sistema primarne zdravstvene zaštite.', 'Ulica Jelene Mitrić, Pluzine', '+38240271135', NULL,
  NULL, NULL, '{"pon":"07:00-15:00","uto":"07:00-15:00","sre":"07:00-15:00","cet":"07:00-15:00","pet":"07:00-15:00","sub":"neradni dan","ned":"neradni dan"}',
  NULL, ARRAY['Primarna zaštita', 'Ambulanta', 'Osnovne zdravstvene usluge'], ST_SetSRID(ST_MakePoint(18.8427, 43.1548), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Poliklinika'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Pluzina'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Pluzine'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Plužina'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plužine'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.pluzine@spirego.com'),
  NOW(), NOW(), NOW()),
@@ -2967,10 +2967,10 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
  NOW(), NOW()),
 
-('Nocni provod Budva', 'Budva je poznata po živahnom noćnom životu, muzici i provodu do kasnih sati. Ova aktivnost je namenjena svima koji žele opušteno veče uz dobru atmosferu, piće i zabavu pored mora.',
+('Noćni provod Budva', 'Budva je poznata po živahnom noćnom životu, muzici i provodu do kasnih sati. Ova aktivnost je namenjena svima koji žele opušteno veče uz dobru atmosferu, piće i zabavu pored mora.',
  ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), 10.00, 240, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Nocni provod'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaza Mogren'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
  1,
@@ -2987,7 +2987,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
  NOW(), NOW()),
 
-('Setnja starim gradom Kotora', 'Šetnja starim gradom Kotora vodi kroz uske kamene ulice, trgove i istorijske znamenitosti ovog primorskog grada. Savršena je za posetioce koji žele da upoznaju kulturu, arhitekturu i duh Kotora.',
+('Šetnja starim gradom Kotora', 'Šetnja starim gradom Kotora vodi kroz uske kamene ulice, trgove i istorijske znamenitosti ovog primorskog grada. Savršena je za posetioce koji žele da upoznaju kulturu, arhitekturu i duh Kotora.',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 0.00, 120, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Razgledanje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
@@ -2997,7 +2997,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), 
  NOW(), NOW()),
  
- ('Voznja camcem Skadarsko jezero', 'Vožnja čamcem po Skadarskom jezeru omogućava uživanje u mirnoj vodi, prirodi i bogatom biljnom i životinjskom svetu. Aktivnost je odlična za opuštanje, fotografisanje i doživljaj jezera iz drugačije perspektive.',
+ ('Vožnja čamcem Skadarsko jezero', 'Vožnja čamcem po Skadarskom jezeru omogućava uživanje u mirnoj vodi, prirodi i bogatom biljnom i životinjskom svetu. Aktivnost je odlična za opuštanje, fotografisanje i doživljaj jezera iz drugačije perspektive.',
  ST_SetSRID(ST_MakePoint(19.091, 42.246), 4326), 15.00, 120, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Voznja camcem'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
@@ -3007,11 +3007,11 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
  NOW(), NOW()),
 
- ('Skijanje Kolasin', 'Skijanje u Kolašinu pruža uživanje na planinskim stazama i snežnim pejzažima severa Crne Gore. Aktivnost je pogodna za ljubitelje zimskih sportova i boravka na svežem planinskom vazduhu.',
+ ('Skijanje Kolašin', 'Skijanje u Kolašinu pruža uživanje na planinskim stazama i snežnim pejzažima severa Crne Gore. Aktivnost je pogodna za ljubitelje zimskih sportova i boravka na svežem planinskom vazduhu.',
  ST_SetSRID(ST_MakePoint(19.522, 42.822), 4326), 30.00, 240, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Skijanje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Biogradsko jezero'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
  NULL,
  1,
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'),
@@ -3051,7 +3051,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW()),
 
-('Vece klasicne muzike', 'U čarobnoj atmosferi starog grada Kotora, ovo veče klasične muzike nudi jedinstven spoj umetnosti i istorije. Program obuhvata pažljivo odabrane kompozicije koje izvode talentovani muzičari, stvarajući intimnu i sofisticiranu atmosferu. Idealno za sve ljubitelje kulture, muzike i romantičnih večeri pod otvorenim nebom. Autentični ambijent kamenih trgova i osvetljenih uličica dodatno pojačava doživljaj, pretvarajući svaki ton u posebno emotivno iskustvo. Posetioci će imati priliku da se prepuste zvucima klasične muzike dok uživaju u jedinstvenom spoju tradicije i umetnosti. Ovaj događaj pruža savršenu priliku za opuštanje, inspiraciju i stvaranje nezaboravnih uspomena u jednom od najlepših primorskih gradova.',
+('Veče klasične muzike', 'U čarobnoj atmosferi starog grada Kotora, ovo veče klasične muzike nudi jedinstven spoj umetnosti i istorije. Program obuhvata pažljivo odabrane kompozicije koje izvode talentovani muzičari, stvarajući intimnu i sofisticiranu atmosferu. Idealno za sve ljubitelje kulture, muzike i romantičnih večeri pod otvorenim nebom. Autentični ambijent kamenih trgova i osvetljenih uličica dodatno pojačava doživljaj, pretvarajući svaki ton u posebno emotivno iskustvo. Posetioci će imati priliku da se prepuste zvucima klasične muzike dok uživaju u jedinstvenom spoju tradicije i umetnosti. Ovaj događaj pruža savršenu priliku za opuštanje, inspiraciju i stvaranje nezaboravnih uspomena u jednom od najlepših primorskih gradova.',
  ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), '2026-08-05 21:00', '2026-08-05 23:00', 15.00, 200, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Koncert'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
@@ -3072,7 +3072,7 @@ VALUES
 ('DJ Night Mogren', 'DJ Night Mogren je večernji događaj namenjen ljubiteljima elektronske muzike, plesa i letnje atmosfere pored mora. Smešten u atraktivnom ambijentu plaže Mogren, ovaj događaj okuplja posetioce koji žele da uživaju u modernim ritmovima, dobroj energiji i nezaboravnom noćnom provodu. Spoj muzike, mora i letnje večeri stvara poseban ambijent koji privlači kako turiste tako i lokalne posetioce. Uz dinamičan program i opuštenu atmosferu, događaj pruža savršenu priliku za druženje, zabavu i uživanje u jedinstvenom noćnom iskustvu na obali. DJ Night Mogren je idealan za sve koji žele da dožive živopisnu letnju scenu Budve i provedu noć ispunjenu muzikom, plesom i odličnim raspoloženjem.',
  ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), '2026-08-10 22:00', '2026-08-11 03:00', 8.00, 500, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Nastup'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaza Mogren'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
@@ -3081,7 +3081,7 @@ VALUES
 ('Planinarski susret', 'Planinarski susret na Durmitoru predstavlja idealnu priliku za sve ljubitelje prirode, pešačenja i boravka na svežem planinskom vazduhu. Događaj okuplja planinare, rekreativce i avanturiste koji žele da provedu dan u druženju, istraživanju prirodnih lepota i uživanju u spektakularnim pejzažima jednog od najlepših planinskih predela. Program je osmišljen tako da spoji aktivan odmor, rekreaciju i zajedničko uživanje u prirodi. Pored same šetnje i okupljanja, učesnici imaju priliku da upoznaju druge zaljubljenike u planinu i provedu vreme u prijatnoj i opuštenoj atmosferi. Ovaj događaj pruža savršen beg od svakodnevice i mogućnost da se doživi mir, lepota i autentičan duh Durmitora kroz aktivan i ispunjen dan u prirodi.',
  ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326), '2026-09-01 08:00', '2026-09-01 18:00', 5.00, 100, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Okupljanje'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Zabljak'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Žabljak'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
@@ -3099,7 +3099,7 @@ VALUES
 ('Herceg Novi Film Festival', 'Herceg Novi Film Festival okuplja ljubitelje filmske umetnosti iz zemlje i inostranstva. Program obuhvata projekcije igranih, dokumentarnih i autorskih filmova. Poseban doživljaj pružaju projekcije na otvorenom uz more.',
  ST_SetSRID(ST_MakePoint(18.53231, 42.45222), 4326), '2026-08-22 20:00', '2026-08-28 23:30', 8.00, 500, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dvorana Park Herceg Novi'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
@@ -3126,8 +3126,8 @@ VALUES
 ('Bedem Fest', 'Bedem Fest je muzički festival koji se održava na istorijskoj tvrđavi u Nikšiću. Poznat je po nastupima regionalnih i domaćih izvođača različitih žanrova. Autentična lokacija daje posebnu atmosferu svakom koncertu.',
  ST_SetSRID(ST_MakePoint(18.9417, 42.7748), 4326), '2026-07-30 20:00', '2026-08-01 23:30', 15.00, 1200, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tvrdjava Onogost'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tvrđava Onogošt'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  NULL,
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW()),
@@ -3144,7 +3144,7 @@ VALUES
 ('Dani muzike Herceg Novi', 'Dani muzike Herceg Novi predstavljaju prestižni festival klasične muzike. Nastupaju domaći i međunarodni umetnici visokog renomea. Program obuhvata koncerte različitih muzičkih stilova i epoha.',
  ST_SetSRID(ST_MakePoint(18.53231, 42.45222), 4326), '2026-07-10 20:00', '2026-07-20 23:00', 10.00, 300, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Koncert'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dvorana Park Herceg Novi'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
@@ -3162,8 +3162,8 @@ VALUES
 ('Lake Fest 2026', 'Lake Fest je jedan od najvećih crnogorskih muzičkih festivala, poznat po rok i alternativnoj muzici, kampovanju i atmosferi pored Krupačkog jezera kod Nikšića. Festival okuplja ljubitelje muzike iz regiona i pruža višednevni program koncerata na otvorenom.',
  ST_SetSRID(ST_MakePoint(18.892, 42.783), 4326),  '2026-08-07 20:00',  '2026-08-09 23:30',  20.00,  2000,  true,  'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupacko jezero'),
- (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupačko jezero'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW());
@@ -3182,7 +3182,7 @@ SET "ObjectId" = (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Dur
 WHERE "Name" = 'Durmitor Trail Run';
 
 UPDATE "Events"
-SET "LocalityId" = (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
+SET "LocalityId" = (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
     "ObjectId" = (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Polar Star'),
     "Geolocation" = ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326)
 WHERE "Name" = 'Wild Beauty Art Festival';
@@ -3230,63 +3230,63 @@ INSERT INTO "Reviews"
 VALUES
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
- 5, 'Odlican hotel, preporucujem! Lokacija savrsena.', NOW()),
+ 5, 'Odličan hotel, preporučujem! Lokacija savršena.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
- 4, 'Restoran je fantastican, hrana odlicna, pogled prelep! Jedina zamerka je cena ovog restorana.', NOW()),
+ 4, 'Restoran je fantastičan, hrana odlična, pogled prelep! Jedina zamerka je cena ovog restorana.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
- 5, 'Luksuzno i udobno, vredi svake pare. Djakuzi vrhunski.', NOW()),
+ 5, 'Luksuzno i udobno, vredi svake pare. Đakuzi vrhunski.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
- 3, 'Lep hotel i odlicna lokacija, dorucak moze biti bolji, a cena malo jeftinija.', NOW()),
+ 3, 'Lep hotel i odlična lokacija, doručak može biti bolji, a cena malo jeftinija.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
- 4, 'Vrlo prijatan smestaj i sjajan pogled sa terase.', NOW()),
+ 4, 'Vrlo prijatan smeštaj i sjajan pogled sa terase.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
- 2, 'Hrana je okej i pogled je lep ali je osoblje veoma neljubazno. Ja se sigurno necu vratiti!', NOW()),
+ 2, 'Hrana je okej i pogled je lep ali je osoblje veoma neljubazno. Ja se sigurno neću vratiti!', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
- 4, 'Opustena atmosfera i super muzika predvece. Nije za roditelje sa malom decom.', NOW()),
+ 4, 'Opuštena atmosfera i super muzika predveče. Nije za roditelje sa malom decom.', NOW()),
 
  ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
- 2, 'Lokacija bara je vrlo privlacna, ali nazalost nije za roditelje sa decom :(', NOW()),
+ 2, 'Lokacija bara je vrlo privlačna, ali nažalost nije za roditelje sa decom :(', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
- 5, 'Odlicno mesto za pice posle plaze.', NOW()),
+ 5, 'Odlično mesto za piće posle plaže.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
- 5, 'Savrsena baza za planinarenje, na moje iznenadjenje i veoma cisto! :).', NOW()),
+ 5, 'Savršena baza za planinarenje, na moje iznenađenje i veoma čisto! :).', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
  4, 'Topla preporuka za ljubitelje prirode i planine.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolasin'),
- 3, 'Sobe su udobne i lokacija je dobra za skijanje, ali spa zona je bila prevelika guzva tokom vikenda.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolašin'),
+ 3, 'Sobe su udobne i lokacija je dobra za skijanje, ali spa zona je bila prevelika gužva tokom vikenda.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolasin'),
- 4, 'Dobar dorucak i prijatan ambijent, osoblje brzo reaguje na zahteve.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolašin'),
+ 4, 'Dobar doručak i prijatan ambijent, osoblje brzo reaguje na zahteve.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
- 5, 'Riba je bila sveza, a terasa uz jezero je najlepsi deo vecere pred zalazak sunca.', NOW()),
+ 5, 'Riba je bila sveža, a terasa uz jezero je najlepši deo večere pred zalazak sunca.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
- 4, 'Pogled i hrana su odlicni, ali se na uslugu cekalo malo duze nego sto sam ocekivala.', NOW()),
+ 4, 'Pogled i hrana su odlični, ali se na uslugu čekalo malo duže nego što sam očekivala.', NOW()),
 
 -- =========================
 -- Konoba Scala Santa
@@ -3334,18 +3334,18 @@ VALUES
  5, 'Jedan od najboljih restorana uz obalu.', NOW()),
 
 -- =========================
--- Konoba Batricevic Njeguši
+-- Konoba Batričević Njeguši
 -- =========================
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batricevic Njegusi'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batričević Njeguši'),
  4, 'Odličan domaći sir i pršut, prava planinska hrana.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batricevic Njegusi'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batričević Njeguši'),
  5, 'Sve je bilo savršeno, posebno atmosfera sela.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batricevic Njegusi'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batričević Njeguši'),
  5, 'Autentično i domaće, vredi posetiti.', NOW()),
 
 -- =========================
@@ -3531,18 +3531,18 @@ VALUES
 
 
 
--- Gradska kafanica Zabljak
+-- Gradska kafanica Žabljak
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Zabljak'),
- 5, 'Prava planinska kafana, hrana domaca i ukusna, porcije velike.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Žabljak'),
+ 5, 'Prava planinska kafana, hrana domaća i ukusna, porcije velike.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Zabljak'),
- 4, 'Lepa atmosfera i prijatno osoblje, idealno posle setnje po hladnom vremenu.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Žabljak'),
+ 4, 'Lepa atmosfera i prijatno osoblje, idealno posle šetnje po hladnom vremenu.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Zabljak'),
- 2, 'Hrana je okej ali sam ocekivao vise za tu cenu. Ambijent malo zastareo.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Žabljak'),
+ 2, 'Hrana je okej ali sam očekivao više za tu cenu. Ambijent malo zastareo.', NOW()),
 
 
 -- Konoba Stari Grad
@@ -3556,41 +3556,41 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Stari Grad'),
- 3, 'Lokacija je top, ali sam ocekivala malo brzu uslugu. Hrana solidna.', NOW()),
+ 3, 'Lokacija je top, ali sam očekivala malo bržu uslugu. Hrana solidna.', NOW()),
 
 
--- Kafana Markovic
+-- Kafana Marković
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Markovic'),
- 5, 'Odlicna kafana za drustvo, muzika i atmosfera vrhunski.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Marković'),
+ 5, 'Odlična kafana za društvo, muzika i atmosfera vrhunski.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Markovic'),
- 4, 'Super provod, hrana ukusna, ali zna da bude guzva.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Marković'),
+ 4, 'Super provod, hrana ukusna, ali zna da bude gužva.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Markovic'),
- 2, 'Previse buke za moj ukus, jedva smo mogli da pricamo. Hrana nista specijalno.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Marković'),
+ 2, 'Previše buke za moj ukus, jedva smo mogli da pričamo. Hrana ništa specijalno.', NOW()),
 
 
--- Planinarski dom Skrka
+-- Planinarski dom Škrka
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Skrka'),
- 5, 'Savrseno mesto za odmor u prirodi, mir i tisina. Dom je uredan i domacini ljubazni.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Škrka'),
+ 5, 'Savršeno mesto za odmor u prirodi, mir i tišina. Dom je uredan i domaćini ljubazni.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Skrka'),
- 4, 'Prelep pogled i dobra lokacija za planinarenje, uslovi solidni za ovakav tip smestaja.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Škrka'),
+ 4, 'Prelep pogled i dobra lokacija za planinarenje, uslovi solidni za ovakav tip smeštaja.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Skrka'),
- 3, 'Priroda je fantasticna, ali sam ocekivao malo bolje odrzavanje samog doma.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Škrka'),
+ 3, 'Priroda je fantastična, ali sam očekivao malo bolje održavanje samog doma.', NOW()),
 
 
 -- Planinarski dom Vranjak
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Vranjak'),
- 5, 'Odlican dom za beg iz grada, sve preporuke za ljubitelje planine.', NOW()),
+ 5, 'Odličan dom za beg iz grada, sve preporuke za ljubitelje planine.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Vranjak'),
@@ -3598,49 +3598,49 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Vranjak'),
- 2, 'Lokacija lepa, ali uslovi dosta skromni. Nije bas za svakoga ko ocekuje komfor.', NOW()),
+ 2, 'Lokacija lepa, ali uslovi dosta skromni. Nije baš za svakoga ko očekuje komfor.', NOW()),
 
 
--- Nacionalna biblioteka Crne Gore Djurdje Crnojevic
+-- Nacionalna biblioteka Crne Gore Đurđe Crnojević
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Djurdje Crnojevic'),
- 5, 'Prelepo mesto za ucenje i istrazivanje, bogata zbirka i prijatan ambijent.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Đurđe Crnojević'),
+ 5, 'Prelepo mesto za učenje i istraživanje, bogata zbirka i prijatan ambijent.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Djurdje Crnojevic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Đurđe Crnojević'),
  4, 'Mirno i uredno, idealno za rad. Osoblje ljubazno i spremno da pomogne.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Djurdje Crnojevic'),
- 4, 'Lepa atmosfera i dobar izbor knjiga, ali bi radno vreme moglo biti duze.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Đurđe Crnojević'),
+ 4, 'Lepa atmosfera i dobar izbor knjiga, ali bi radno vreme moglo biti duže.', NOW()),
 
 
--- Narodna biblioteka Radosav Ljumovic
+-- Narodna biblioteka Radosav Ljumović
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumovic'),
- 5, 'Odlicna biblioteka, veliki izbor knjiga i prijatan prostor za citanje.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumović'),
+ 5, 'Odlična biblioteka, veliki izbor knjiga i prijatan prostor za čitanje.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumović'),
  4, 'Sve pohvale za organizaciju i mir koji vlada unutra.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumovic'),
- 3, 'Prostor je okej, ali je nekad tesko naci slobodno mesto za sedenje.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumović'),
+ 3, 'Prostor je okej, ali je nekad teško naći slobodno mesto za sedenje.', NOW()),
 
 
--- Gradska biblioteka i citaonica Herceg Novi
+-- Gradska biblioteka i čitaonica Herceg Novi
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i citaonica Herceg Novi'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i čitaonica Herceg Novi'),
  5, 'Vrlo prijatan ambijent i dobar izbor literature, rado dolazim ovde.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i citaonica Herceg Novi'),
- 4, 'Mirno mesto za citanje, osoblje korektno i usluzno.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i čitaonica Herceg Novi'),
+ 4, 'Mirno mesto za čitanje, osoblje korektno i uslužno.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i citaonica Herceg Novi'),
- 4, 'Lepo uredjeno i prijatno, iako bi moglo biti malo vise novijih naslova.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i čitaonica Herceg Novi'),
+ 4, 'Lepo uređeno i prijatno, iako bi moglo biti malo više novijih naslova.', NOW()),
 
 
 -- Manastir Ostrog
@@ -3650,25 +3650,25 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Ostrog'),
- 5, 'Dolazio sam vise puta i svaki put je isti osecaj mira. Vredi posetiti makar jednom.', NOW()),
+ 5, 'Dolazio sam više puta i svaki put je isti osećaj mira. Vredi posetiti makar jednom.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Ostrog'),
- 4, 'Prelepo i znacajno mesto, ali treba biti spreman na guzvu u sezoni.', NOW()),
+ 4, 'Prelepo i značajno mesto, ali treba biti spreman na gužvu u sezoni.', NOW()),
 
 
 -- Katedrala Svetog Tripuna
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Katedrala Svetog Tripuna'),
- 5, 'Impresivna gradjevina i jako lepo ocuvana. Unutra je posebno zanimljivo.', NOW()),
+ 5, 'Impresivna građevina i jako lepo očuvana. Unutra je posebno zanimljivo.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Katedrala Svetog Tripuna'),
- 4, 'Vredi obici ako ste u Kotoru, istorija i arhitektura su bas zanimljivi.', NOW()),
+ 4, 'Vredi obići ako ste u Kotoru, istorija i arhitektura su baš zanimljivi.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Katedrala Svetog Tripuna'),
- 4, 'Lepo mesto za kratku posetu, nije guzva kao na drugim lokacijama.', NOW()),
+ 4, 'Lepo mesto za kratku posetu, nije gužva kao na drugim lokacijama.', NOW()),
 
 
 -- Crkva Svetog Nikole
@@ -3678,17 +3678,17 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Nikole'),
- 4, 'Mirno mesto, lepo za kratko zadrzavanje i predah od guzve.', NOW()),
+ 4, 'Mirno mesto, lepo za kratko zadržavanje i predah od gužve.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Nikole'),
- 3, 'Lepa crkva, ali nisam nasla mnogo informacija o istoriji na licu mesta.', NOW()),
+ 3, 'Lepa crkva, ali nisam našla mnogo informacija o istoriji na licu mesta.', NOW()),
 
 
 -- Crkva Svetog Jovana Vladimira
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Jovana Vladimira'),
- 5, 'Nova i veoma lepo uredjena crkva, ostavlja bas lep utisak.', NOW()),
+ 5, 'Nova i veoma lepo uređena crkva, ostavlja baš lep utisak.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Jovana Vladimira'),
@@ -3699,42 +3699,42 @@ VALUES
  4, 'Lepo mesto, uredno i mirno. Prijatno za posetu i razgledanje.', NOW()),
 
 
--- Apartments Djurovic
+-- Apartments Đurović
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Djurovic'),
- 5, 'Bas prijatan smestaj, cisto i uredno. Domacini jako ljubazni, osecas se kao kod kuce.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Đurović'),
+ 5, 'Baš prijatan smeštaj, čisto i uredno. Domaćini jako ljubazni, osećaš se kao kod kuće.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Djurovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Đurović'),
  4, 'Dobar odnos cene i kvaliteta, bez nekih velikih zamerki.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Djurovic'),
- 3, 'Solidno, ali nista sto se posebno izdvaja. Za kraci boravak ok.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Đurović'),
+ 3, 'Solidno, ali ništa što se posebno izdvaja. Za kraći boravak ok.', NOW()),
 
 
--- Apartments Vukovic
+-- Apartments Vuković
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vukovic'),
- 5, 'Cisto, uredno i mirno. Bas sam zadovoljna, opet bih dosla.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vuković'),
+ 5, 'Čisto, uredno i mirno. Baš sam zadovoljna, opet bih došla.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vukovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vuković'),
  4, 'Sve kako treba, bez komplikacija. Lokacija dobra.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vukovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vuković'),
  4, 'Prijatno mesto, iako bi kupatilo moglo biti malo modernije.', NOW()),
 
 
 -- Lux Apartment Budva
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lux Apartment Budva'),
- 5, 'Stvarno luksuzno, sve novo i lepo sredjeno. Blizu svega.', NOW()),
+ 5, 'Stvarno luksuzno, sve novo i lepo sređeno. Blizu svega.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lux Apartment Budva'),
- 4, 'Lep stan, dobra lokacija, ali cena malo jaca nego sto sam ocekivao.', NOW()),
+ 4, 'Lep stan, dobra lokacija, ali cena malo jača nego sto sam očekivao.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lux Apartment Budva'),
@@ -3744,53 +3744,53 @@ VALUES
 -- Apartmani M Herceg Novi
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani M Herceg Novi'),
- 5, 'Divan pogled na more, bas sam uzivala u boravku.', NOW()),
+ 5, 'Divan pogled na more, baš sam uživala u boravku.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani M Herceg Novi'),
- 4, 'Lepa lokacija i korektan smestaj.', NOW()),
+ 4, 'Lepa lokacija i korektan smeštaj.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani M Herceg Novi'),
- 3, 'Ok je, ali ima dosta stepenica do apartmana, nije bas prakticno.', NOW()),
+ 3, 'Ok je, ali ima dosta stepenica do apartmana, nije baš praktično.', NOW()),
 
 
 -- Boutique Hotel Casa del Mare - Amfora
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Boutique Hotel Casa del Mare - Amfora'),
- 5, 'Prelep ambijent i odlicna usluga. Sve deluje jako elegantno.', NOW()),
+ 5, 'Prelep ambijent i odlična usluga. Sve deluje jako elegantno.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Boutique Hotel Casa del Mare - Amfora'),
- 5, 'Jedan od boljih smestaja gde sam bio. Sve na nivou.', NOW()),
+ 5, 'Jedan od boljih smeštaja gde sam bio. Sve na nivou.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Boutique Hotel Casa del Mare - Amfora'),
- 4, 'Stvarno lepo, ali malo skuplje nego sto sam planirala.', NOW()),
+ 4, 'Stvarno lepo, ali malo skuplje nego što sam planirala.', NOW()),
 
 
--- Apartments Mijovic
+-- Apartments Mijović
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijovic'),
- 4, 'Sve korektno, cisto i uredno. Bez velikih zamerki.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijović'),
+ 4, 'Sve korektno, čisto i uredno. Bez velikih zamerki.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijovic'),
- 3, 'Prosecno iskustvo, ali za cenu sasvim okej.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijović'),
+ 3, 'Prosečno iskustvo, ali za cenu sasvim okej.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijovic'),
- 4, 'Mirno mesto, lepo za odmor bez guzve.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijović'),
+ 4, 'Mirno mesto, lepo za odmor bez gužve.', NOW()),
 
 
 -- Durmitor View Apartments
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Durmitor View Apartments'),
- 5, 'Pogled je stvarno brutalan, vredi doci samo zbog toga.', NOW()),
+ 5, 'Pogled je stvarno brutalan, vredi doći samo zbog toga.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Durmitor View Apartments'),
- 5, 'Savrseno za odmor u prirodi, sve preporuke.', NOW()),
+ 5, 'Savršeno za odmor u prirodi, sve preporuke.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Durmitor View Apartments'),
@@ -3800,77 +3800,77 @@ VALUES
 -- Apartments Aleksandar
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Aleksandar'),
- 4, 'Prijatno mesto, sve uredno i cisto.', NOW()),
+ 4, 'Prijatno mesto, sve uredno i čisto.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Aleksandar'),
- 3, 'Nista specijalno, ali zavrsava posao za nocenje.', NOW()),
+ 3, 'Ništa specijalno, ali završava posao za noćenje.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Aleksandar'),
- 4, 'Lepa lokacija i korektan smestaj.', NOW()),
+ 4, 'Lepa lokacija i korektan smeštaj.', NOW()),
 
 
--- Villa Ljubanovic Apartments
+-- Villa Ljubanović Apartments
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic Apartments'),
- 5, 'Odlicno mesto, sve uredno i domacini bas gostoljubivi.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović Apartments'),
+ 5, 'Odlično mesto, sve uredno i domaćini baš gostoljubivi.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic Apartments'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović Apartments'),
  4, 'Prijatno iskustvo, bez ikakvih problema tokom boravka.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic Apartments'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović Apartments'),
  4, 'Sve kako treba, vratio bih se opet.', NOW()),
 
 
 -- Casa Nuova
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa Nuova'),
- 5, 'Bas lepo uredjeno i moderno, dopalo mi se na prvi pogled.', NOW()),
+ 5, 'Baš lepo uređeno i moderno, dopalo mi se na prvi pogled.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa Nuova'),
- 4, 'Lep smestaj, dobra lokacija i sve blizu.', NOW()),
+ 4, 'Lep smeštaj, dobra lokacija i sve blizu.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa Nuova'),
- 3, 'Ok je, ali sam ocekivao malo vise za tu cenu.', NOW()),
+ 3, 'Ok je, ali sam očekivao malo više za tu cenu.', NOW()),
 
 
 -- Banya Wellness & Spa
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Banya Wellness & Spa'),
- 5, 'Bas sam se opustila, sve je cisto i mirise lepo. Masaža odlicna.', NOW()),
+ 5, 'Baš sam se opustila, sve je čisto i miriše lepo. Masaža odlična.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Banya Wellness & Spa'),
- 4, 'Dobar spa, sauna i bazen super. Malo guzve vikendom.', NOW()),
+ 4, 'Dobar spa, sauna i bazen super. Malo gužve vikendom.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Banya Wellness & Spa'),
- 4, 'Prijatna atmosfera, sve uredno. Moglo bi malo vise prostora za lezaljke.', NOW()),
+ 4, 'Prijatna atmosfera, sve uredno. Moglo bi malo više prostora za ležaljke.', NOW()),
 
 
--- Wellness Center Simo Milosevic
+-- Wellness Center Simo Milošević
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milosevic'),
- 5, 'Odlican za oporavak i relaksaciju. Sve preporuke, dolazim opet.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milošević'),
+ 5, 'Odličan za oporavak i relaksaciju. Sve preporuke, dolazim opet.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milosevic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milošević'),
  4, 'Usluga dobra, osoblje ljubazno. Malo stariji objekat ali uredan.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milosevic'),
- 3, 'Ok iskustvo, ali sam ocekivao moderniji prostor.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milošević'),
+ 3, 'Ok iskustvo, ali sam očekivao moderniji prostor.', NOW()),
 
 
 -- Perla Residence Spa
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Perla Residence Spa'),
- 5, 'Prelep prostor, bas luksuzno i tiho. Idealno za opustanje.', NOW()),
+ 5, 'Prelep prostor, baš luksuzno i tiho. Idealno za opuštanje.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Perla Residence Spa'),
@@ -3878,7 +3878,7 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Perla Residence Spa'),
- 4, 'Lepo uredjeno i cisto, samo malo skuplje nego sto sam planirao.', NOW()),
+ 4, 'Lepo uređeno i čisto, samo malo skuplje nego što sam planirao.', NOW()),
 
 
 -- Huma Bay Spa
@@ -3888,11 +3888,11 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Huma Bay Spa'),
- 4, 'Bas lepo mesto, samo je malo vise ljudi nego sto sam ocekivala.', NOW()),
+ 4, 'Baš lepo mesto, samo je malo više ljudi nego sto sam očekivala.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Huma Bay Spa'),
- 4, 'Sve pohvale za ambijent i uslugu. Osecaj bas kao na odmoru.', NOW()),
+ 4, 'Sve pohvale za ambijent i uslugu. Osećaj baš kao na odmoru.', NOW()),
 
 
 -- Casa del Mare Spa
@@ -3902,11 +3902,11 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa del Mare Spa'),
- 5, 'Predivno mesto, mirno i elegantno. Bas sam uzivala.', NOW()),
+ 5, 'Predivno mesto, mirno i elegantno. Baš sam uživala.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa del Mare Spa'),
- 4, 'Vrlo dobro, ali cena je malo jaca.', NOW()),
+ 4, 'Vrlo dobro, ali cena je malo jača.', NOW()),
 
 
 -- Spomenik Partizanu borcu na Gorici
@@ -3950,15 +3950,15 @@ VALUES
 
 -- Spomenik Ljubu Čupiću
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Cupicu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Čupiću'),
  5, 'Veoma emotivan spomenik, ostavlja jak utisak.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Cupicu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Čupiću'),
  4, 'Zanimljivo i simbolično mesto, vredi posetiti.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Cupicu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Čupiću'),
  5, 'Jedan od najpoznatijih spomenika, baš snažna poruka.', NOW()),
 
 -- Spomenik palim borcima na Grahovcu
@@ -3976,41 +3976,41 @@ VALUES
 
 -- Spomenik Tuđemilima
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Tudjemilima'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Tuđemilima'),
  4, 'Zanimljiva lokacija sa dosta istorije, ali malo zaboravljena.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Tudjemilima'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Tuđemilima'),
  5, 'Lepo mesto koje ima posebnu atmosferu.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Tudjemilima'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Tuđemilima'),
  4, 'Zanimljivo, ali nedostaje više informacija za posetioce.', NOW()),
 
--- Spomenik Punisi Račiću
+-- Spomenik Puniši Račiću
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Punisi Racicu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Puniši Račiću'),
  5, 'Vrlo značajan istorijski spomenik, ostavlja jak utisak.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Punisi Racicu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Puniši Račiću'),
  4, 'Lepo urađeno, ali malo skromna lokacija.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Punisi Racicu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Puniši Račiću'),
  5, 'Važan deo istorije lepo predstavljen.', NOW()),
 
 -- Spomenik herojima Božićnog ustanka
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Bozicnog ustanka'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Božićnog ustanka'),
  5, 'Veoma snažan i emotivan spomenik.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Bozicnog ustanka'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Božićnog ustanka'),
  4, 'Lepo obeleženo mesto, ali može biti malo sređenije.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Bozicnog ustanka'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Božićnog ustanka'),
  5, 'Vrlo značajan i dostojanstven spomenik.', NOW()),
 
 -- Spomenik bici na Fundini
@@ -4028,15 +4028,15 @@ VALUES
 
 -- Spomenik Njegošu na Lovćenu
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegosu na Lovcenu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegošu na Lovćenu'),
  5, 'Impresivno i veličanstveno mesto, pogled je neverovatan.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegosu na Lovcenu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegošu na Lovćenu'),
  5, 'Jedno od najlepših mesta u Crnoj Gori, vredno svake posete.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegosu na Lovcenu'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegošu na Lovćenu'),
  4, 'Prelepa lokacija, ali uspon može biti naporan.', NOW()),
 
 
@@ -4121,7 +4121,7 @@ VALUES
 -- Madam Open Bar
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Madam Open Bar'),
- 4, 'Opusteno mesto za piće, ali nije za velike žurke.', NOW()),
+ 4, 'Opušteno mesto za piće, ali nije za velike žurke.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Madam Open Bar'),
@@ -4210,17 +4210,17 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Konik Podgorica'),
  2, 'Dosta loš utisak, sporo i neorganizovano.', NOW()),
 
--- INA Skaljari Kotor
+-- INA Škaljari Kotor
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Skaljari Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Škaljari Kotor'),
  5, 'Odlična lokacija i brza usluga.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Skaljari Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Škaljari Kotor'),
  4, 'Sve korektno, pumpa radi kako treba.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Skaljari Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Škaljari Kotor'),
  3, 'Ništa specijalno, ali obavlja posao.', NOW()),
 
 -- EKO Tivat
@@ -4249,17 +4249,17 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Petrol Bar'),
  2, 'Spora usluga i loša organizacija kada je gužva.', NOW()),
 
--- Lukoil Kolasin
+-- Lukoil Kolašin
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Kolasin'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Kolašin'),
  5, 'Odlična pumpa, sve brzo i uredno.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Kolasin'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Kolašin'),
  4, 'Korektna usluga, bez problema.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Kolasin'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Kolašin'),
  3, 'Ok, ali nema baš mnogo sadržaja oko pumpe.', NOW()),
 
 -- Eko Igalo Banja
@@ -4288,17 +4288,17 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Kotor'),
  5, 'Brzo i efikasno, odlična lokacija.', NOW()),
 
--- EKO Zabljak
+-- EKO Žabljak
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Zabljak'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Žabljak'),
  5, 'Odlična pumpa u planinskom okruženju.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Zabljak'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Žabljak'),
  4, 'Sve korektno, ali nema puno opcija.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Zabljak'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Žabljak'),
  3, 'Ok pumpa, ali skromna ponuda.', NOW()),
 
 
@@ -4330,15 +4330,15 @@ VALUES
 
 -- Marshall’s Gelato & Coffee
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafic Marshall’s Gelato & Coffee'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafić Marshall’s Gelato & Coffee'),
  5, 'Najbolji sladoled u gradu, sve pohvale.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafic Marshall’s Gelato & Coffee'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafić Marshall’s Gelato & Coffee'),
  4, 'Ukusno i prijatno mesto za pauzu.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafic Marshall’s Gelato & Coffee'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafić Marshall’s Gelato & Coffee'),
  3, 'Ok kafa, ali malo skuplje nego očekivano.', NOW()),
 
 -- Karver Bookstore & Cafe Podgorica
@@ -4393,17 +4393,17 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Al Posto Giusto Tivat'),
  5, 'Odlična lokacija i prijatna atmosfera.', NOW()),
 
--- Astoria Cafe Lustica
+-- Astoria Cafe Luštica
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Astoria Cafe Lustica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Astoria Cafe Luštica'),
  5, 'Predivan ambijent, mir i pogled.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Astoria Cafe Lustica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Astoria Cafe Luštica'),
  4, 'Lepo mesto za opuštanje.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Astoria Cafe Lustica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Astoria Cafe Luštica'),
  3, 'Ok, ali dosta udaljeno.', NOW()),
 
 -- HEIST Bar Ulcinj
@@ -4603,17 +4603,17 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej kralja Nikole'),
  4, 'Zanimljiv uvid u istoriju, ali nije za duže zadržavanje.', NOW()),
 
--- Prirodnjacki muzej Crne Gore
+-- Prirodnjački muzej Crne Gore
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjacki muzej Crne Gore'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjački muzej Crne Gore'),
  5, 'Super kolekcija, posebno deo sa životinjama i mineralima.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjacki muzej Crne Gore'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjački muzej Crne Gore'),
  4, 'Vrlo edukativno za decu i odrasle.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjacki muzej Crne Gore'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjački muzej Crne Gore'),
  3, 'Ok, ali prostor bi mogao biti moderniji.', NOW()),
 
 -- Muzej grada Perasta
@@ -4630,17 +4630,17 @@ VALUES
  4, 'Mali, ali jako zanimljiv muzej.', NOW()),
 
 
--- Big Fesn Podgorica
+-- Big Fešn Podgorica
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fesn Podgorica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fešn Podgorica'),
  4, 'Dobar izbor radnji, sve na jednom mestu.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fesn Podgorica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fešn Podgorica'),
  3, 'Ok centar, ali može biti gužva i parking je problem.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fesn Podgorica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fešn Podgorica'),
  4, 'Praktično mesto za kupovinu, solidan izbor.', NOW()),
 
 -- Mall of Montenegro
@@ -4708,30 +4708,30 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mega Mall Budva'),
  4, 'Dobar centar, ali zna da bude gužva.', NOW()),
 
--- TC HDL Lakovic Niksic
+-- TC HDL Laković Nikšić
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Lakovic Niksic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Laković Nikšić'),
  4, 'Povoljne cene i dobar izbor proizvoda.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Lakovic Niksic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Laković Nikšić'),
  3, 'Ok market, ali nije baš najmoderniji.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Lakovic Niksic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Laković Nikšić'),
  4, 'Praktično mesto za svakodnevnu kupovinu.', NOW()),
 
--- Lakovic Kotor
+-- Laković Kotor
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lakovic Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Laković Kotor'),
  4, 'Dobar supermarket, sve osnovno ima.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lakovic Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Laković Kotor'),
  3, 'Ok, ali zna da bude gužva u sezoni.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lakovic Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Laković Kotor'),
  4, 'Praktično i blizu centra.', NOW()),
 
 -- Butiko Shopping Center
@@ -4787,44 +4787,44 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Pizana'),
  3, 'Zanimljivo, ali malo i brzo se obiđe.', NOW()),
 
--- Galerija Velimir A. Lekovic
+-- Galerija Velimir A. Leković
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Lekovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Leković'),
  5, 'Vrlo kvalitetna postavka, lepo predstavljena umetnost.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Lekovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Leković'),
  4, 'Dobar prostor i zanimljiva dela lokalnih umetnika.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Lekovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Leković'),
  4, 'Mirno i prijatno mesto za ljubitelje umetnosti.', NOW()),
 
 
--- Villa Ljubanovic
+-- Villa Ljubanović
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović'),
  5, 'Veoma prijatan smeštaj, čisto i domaćinski osećaj.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović'),
  4, 'Dobra lokacija i ljubazni domaćini.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović'),
  4, 'Uredno i mirno mesto za boravak.', NOW()),
 
--- Guesthouse Zmukic
+-- Guesthouse Žmukić
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Zmukic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Žmukić'),
  4, 'Solidan smeštaj, korektna usluga.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Zmukic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Žmukić'),
  3, 'Ok za kraći boravak, ali skromnije nego na slikama.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Zmukic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Žmukić'),
  4, 'Prijatno mesto, domaćini ljubazni.', NOW()),
 
 -- Guesthouse Plima
@@ -4840,17 +4840,17 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Plima'),
  4, 'Dobar odnos cene i kvaliteta.', NOW()),
 
--- Pansion Vukovic Zabljak
+-- Pansion Vuković Žabljak
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vukovic Zabljak'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vuković Žabljak'),
  5, 'Savršeno mesto za odmor u prirodi.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vukovic Zabljak'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vuković Žabljak'),
  4, 'Topla atmosfera i dobar smeštaj.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vukovic Zabljak'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vuković Žabljak'),
  4, 'Mirno i lepo, ali malo jednostavno uređeno.', NOW()),
 
 
@@ -4893,17 +4893,17 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Etno Selo Komarnica'),
  4, 'Lepo iskustvo, ali pristup može biti malo nezgodan.', NOW()),
 
--- Vinarija Plantaze 13 Jul
+-- Vinarija Plantaže 13 Jul
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaze 13 Jul'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaže 13 Jul'),
  5, 'Odlična organizacija obilaska i vrhunska vina, posebno crvena.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaze 13 Jul'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaže 13 Jul'),
  4, 'Lep ambijent i zanimljiva degustacija, samo je bilo malo gužve.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaze 13 Jul'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaže 13 Jul'),
  3, 'Dobra vina, ali obilazak je mogao biti bolje organizovan.', NOW()),
 
 -- Vinarija Lipovac
@@ -4932,17 +4932,17 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cem winery and vineyard'),
  5, 'Odlična vina i jako prijatna degustacija.', NOW()),
 
--- Winery Masanovic
+-- Winery Mašanović
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Masanovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Mašanović'),
  5, 'Autentično iskustvo i vrhunska domaća vina.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Masanovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Mašanović'),
  4, 'Lepo uređeno imanje i fina vina za degustaciju.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Masanovic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Mašanović'),
  3, 'Solidno, ali očekivao sam malo bogatiju ponudu.', NOW()),
 
 -- Vinarija Savina
@@ -5024,17 +5024,17 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zoo Sad'),
  3, 'Solidan zoo, ali neke kaveze bi trebalo obnoviti.', NOW()),
 
--- Park Macaka
+-- Park Mačaka
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Macaka'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Mačaka'),
  5, 'Neobično i jako simpatično mesto za ljubitelje mačaka.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Macaka'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Mačaka'),
  4, 'Opustajuće i zanimljivo, mačke su baš druželjubive.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Macaka'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Mačaka'),
  3, 'Lepo za kratku posetu, ali brzo se obiđe.', NOW()),
 
 -- Akvarijum Boka
@@ -5051,181 +5051,181 @@ VALUES
  3, 'Zanimljivo, ali očekivao sam više vrsta riba.', NOW()),
 
 
--- Igraliste Njegosev park
+-- Igralište Njegošev park
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Njegosev park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Njegošev park'),
  5, 'Lepo uređeno i čisto, idealno za decu u centru grada.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Njegosev park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Njegošev park'),
  4, 'Dosta sadržaja, ali bi moglo još klupa za roditelje.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Njegosev park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Njegošev park'),
  3, 'Ok za kratko zadržavanje, ništa posebno.', NOW()),
 
--- Igraliste Gorica Park
+-- Igralište Gorica Park
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Gorica Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Gorica Park'),
  5, 'Prelepa priroda oko igrališta, baš prijatno.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Gorica Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Gorica Park'),
  4, 'Dobar prostor za decu, malo strm prilaz.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Gorica Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Gorica Park'),
  3, 'Solidno, ali bi moglo više sprava.', NOW()),
 
--- Igraliste Slovenska plaza
+-- Igralište Slovenska plaža
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Slovenska plaza'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Slovenska plaža'),
  4, 'Odlična lokacija pored mora, deca uživaju.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Slovenska plaza'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Slovenska plaža'),
  5, 'Savršeno za letnji odmor i igru.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Slovenska plaza'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Slovenska plaža'),
  3, 'Lepo, ali previše gužve u sezoni.', NOW()),
 
--- Djecije Igraliste Park Nezavisnosti
+-- Dječije Igralište Park Nezavisnosti
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecije Igraliste Park Nezavisnosti'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječije Igralište Park Nezavisnosti'),
  5, 'Veoma uredno i bezbedno za decu.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecije Igraliste Park Nezavisnosti'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječije Igralište Park Nezavisnosti'),
  4, 'Lepo igralište, ali malo hladovine fali.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecije Igraliste Park Nezavisnosti'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječije Igralište Park Nezavisnosti'),
  3, 'U redu, ali jednostavno.', NOW()),
 
--- Igraliste Centar Kotor
+-- Igralište Centar Kotor
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Centar Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Centar Kotor'),
  4, 'Lepa lokacija u starom gradu, simpatično.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Centar Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Centar Kotor'),
  5, 'Deca su se super provela, baš zanimljivo mesto.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Centar Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Centar Kotor'),
  3, 'Malo skučen prostor, ali ok.', NOW()),
 
--- Igraliste Tolosi
+-- Igralište Tološi
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Tolosi'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Tološi'),
  4, 'Mirno i bezbedno igralište.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Tolosi'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Tološi'),
  3, 'Solidno, ali bi moglo biti bolje održavano.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Tolosi'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Tološi'),
  5, 'Lepo mesto za decu iz kraja.', NOW()),
 
--- Igraliste Kolasin
+-- Igralište Kolašin
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Kolasin'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Kolašin'),
  5, 'Prelepo okruženje u prirodi, super za decu.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Kolasin'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Kolašin'),
  4, 'Lepo i čisto, ali malo manje sprava.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Kolasin'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Kolašin'),
  3, 'Ok, ali jednostavno igralište.', NOW()),
 
--- Igraliste Igalo
+-- Igralište Igalo
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Igalo'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Igalo'),
  4, 'Blizu mora, lepo za popodne sa decom.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Igalo'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Igalo'),
  5, 'Odlično mesto, deca uživaju svaki put.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Igalo'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Igalo'),
  3, 'Dosta osnovno, ali funkcionalno.', NOW()),
 
--- Igraliste Park 13 Jul
+-- Igralište Park 13 Jul
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Park 13 Jul'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Park 13 Jul'),
  5, 'Veliko i lepo uređeno igralište.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Park 13 Jul'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Park 13 Jul'),
  4, 'Dosta prostora, ali može još sadržaja.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Park 13 Jul'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Park 13 Jul'),
  3, 'Solidno, ništa spektakularno.', NOW()),
 
--- Igraliste Niksic
+-- Igralište Nikšić
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Niksic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Nikšić'),
  4, 'Dobar prostor za decu u gradu.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Niksic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Nikšić'),
  3, 'Može bolje održavanje.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Niksic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Nikšić'),
  5, 'Deca vole da dolaze ovde.', NOW()),
 
--- Djecje igraliste kod vozica
+-- Dječje igralište kod vozića
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecje igraliste kod vozica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječje igralište kod vozića'),
  5, 'Baš simpatično i zanimljivo za malu decu.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecje igraliste kod vozica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječje igralište kod vozića'),
  4, 'Lepo uređeno i bezbedno.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecje igraliste kod vozica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječje igralište kod vozića'),
  3, 'Malo, ali ok za kratku igru.', NOW()),
 
--- Igraliste Bar Setaliste
+-- Igralište Bar Šetalište
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Bar Setaliste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Bar Šetalište'),
  5, 'Prelepa lokacija pored mora.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Bar Setaliste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Bar Šetalište'),
  4, 'Dobar prostor, ali u sezoni gužva.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Bar Setaliste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Bar Šetalište'),
  3, 'Ok, ali ništa posebno.', NOW()),
 
--- Igraliste Crno jezero
+-- Igralište Crno jezero
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Crno jezero'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Crno jezero'),
  5, 'Neverovatna priroda, prelepo za decu i roditelje.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Crno jezero'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Crno jezero'),
  4, 'Jedinstveno mesto, ali malo hladno.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Crno jezero'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Crno jezero'),
  3, 'Lepo, ali ograničeno sadržajem.', NOW()),
 
--- Igraliste Milocer Park
+-- Igralište Miločer Park
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Milocer Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Miločer Park'),
  5, 'Prelepo i uredno, prava oaza.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Milocer Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Miločer Park'),
  4, 'Veoma lepo, ali malo ekskluzivno.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Milocer Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Miločer Park'),
  3, 'Ok, ali više za šetnju nego igru.', NOW()),
 
--- Igraliste Lovcen National Park
+-- Igralište Lovćen National Park
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Lovcen National Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen National Park'),
  5, 'Neverovatan pogled i priroda.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Lovcen National Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen National Park'),
  4, 'Lepo iskustvo, ali vetrovito.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Lovcen National Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen National Park'),
  3, 'Zanimljivo, ali nije klasično igralište.', NOW()),
 
 
--- Crnogorsko narodno pozoriste
+-- Crnogorsko narodno pozorište
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozoriste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozorište'),
  5, 'Odlične predstave i profesionalna atmosfera, pravi kulturni centar.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozoriste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozorište'),
  4, 'Veoma kvalitetan repertoar, ali ponekad karte brzo planu.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozoriste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozorište'),
  3, 'Solidno, ali nisam bio oduševljen poslednjom predstavom.', NOW()),
 
 -- Zetski dom
@@ -5239,15 +5239,15 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zetski dom'),
  3, 'Ok, ali prostor bi mogao biti moderniji.', NOW()),
 
--- Niksicko pozoriste
+-- Nikšićko pozorište
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Niksicko pozoriste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nikšićko pozorište'),
  4, 'Lep repertoar i prijatan ambijent.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Niksicko pozoriste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nikšićko pozorište'),
  3, 'Dobar sadržaj, ali sala bi mogla biti renovirana.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Niksicko pozoriste'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nikšićko pozorište'),
  5, 'Odlične predstave, prijatno iznenađenje.', NOW()),
 
 -- Dvorana Park Herceg Novi
@@ -5316,27 +5316,27 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Ljetnja Pozornica Tivat'),
  3, 'Lepo, ali ponekad neudobna sedišta.', NOW()),
 
--- Dom kulture Kolasin
+-- Dom kulture Kolašin
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Kolasin'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Kolašin'),
  4, 'Dobar lokalni kulturni centar.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Kolasin'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Kolašin'),
  3, 'Solidno, ali mali izbor sadržaja.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Kolasin'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Kolašin'),
  5, 'Prijatno iznenađenje za mali grad.', NOW()),
 
 
--- Manastir Moraca
+-- Manastir Morača
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Moraca'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Morača'),
  5, 'Predivan mir i priroda oko manastira, posebno mesto.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Moraca'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Morača'),
  4, 'Veoma lepo i duhovno mesto, vredno posete.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Moraca'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Morača'),
  3, 'Zanimljivo, ali put do njega je malo naporan.', NOW()),
 
 -- Cetinjski manastir
@@ -5361,15 +5361,15 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Piva'),
  2, 'Lepo, ali dosta udaljeno i teško za dolazak.', NOW()),
 
--- SC Moraca
+-- SC Morača
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Moraca'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Morača'),
  5, 'Odlična hala i organizacija sportskih događaja.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Moraca'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Morača'),
  4, 'Dobar sportski centar, ali parking je problem.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Moraca'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Morača'),
  3, 'Solidno, ali bi moglo biti modernije.', NOW()),
 
 -- SC Topolica
@@ -5383,15 +5383,15 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Topolica'),
  5, 'Odličan za treninge i rekreaciju.', NOW()),
 
--- SC Niksic
+-- SC Nikšić
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Niksic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Nikšić'),
  4, 'Dobar centar, funkcionalan i uredan.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Niksic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Nikšić'),
  2, 'Može mnogo bolje održavanje.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Niksic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Nikšić'),
  3, 'Solidno, ništa posebno.', NOW()),
 
 -- SC Igalo
@@ -5405,15 +5405,15 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Igalo'),
  3, 'Ok, ali očekivao sam više sadržaja.', NOW()),
 
--- SC Kolasin
+-- SC Kolašin
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Kolasin'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Kolašin'),
  4, 'Lepo uklopljen u prirodu, prijatan centar.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Kolasin'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Kolašin'),
  5, 'Odlično mesto, posebno zimi.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Kolasin'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Kolašin'),
  2, 'Solidno, ali mali kapacitet.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
@@ -5427,15 +5427,15 @@ VALUES
  3, 'Solidno iskustvo, ali očekivala sam više za tu cijenu.', NOW()),
 
  ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Chedi Lustica Bay'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Chedi Luštica Bay'),
  5, 'Perfektan luksuz, pogled i spa zona su nevjerovatni. Sve preporuke.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Chedi Lustica Bay'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Chedi Luštica Bay'),
  4, 'Prelijepo mjesto, ali dosta skupo, pa nije za svaku priliku.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Chedi Lustica Bay'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Chedi Luštica Bay'),
  5, 'Sve je na visokom nivou, posebno infinity bazen i mir.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
@@ -5463,15 +5463,15 @@ VALUES
  2, 'Očekivala sam više za spa centar ovog tipa, djeluje malo zapušteno.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trznica Podgorica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tržnica Podgorica'),
  4, 'Velik izbor proizvoda, posebno voće i povrće. Cijene korektne.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trznica Podgorica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tržnica Podgorica'),
  3, 'Solidno, ali zna biti gužva i nije uvijek sve svježe u popodnevnim satima.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trznica Podgorica'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tržnica Podgorica'),
  5, 'Najbolja pijaca u gradu, uvijek nađem sve što mi treba.', NOW()),
 
  ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
@@ -5499,15 +5499,15 @@ VALUES
  2, 'Nije loše, ali cijene su previsoke za lokalnu pijacu.', NOW()),
 
  ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Niksic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Nikšić'),
  4, 'Dobar izbor lokalnih proizvoda i pristupačne cijene.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Niksic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Nikšić'),
  3, 'Solidna pijaca, ali bi mogla biti bolje organizovana.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Niksic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Nikšić'),
  5, 'Uvijek svježe i domaće, baš prijatno za kupovinu.', NOW()),
 
  ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
@@ -5632,71 +5632,71 @@ VALUES
  
  ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
- 5, 'Prelepo mesto za setnju i opustanje, posebno uvece uz zalazak sunca.', NOW()),
+ 5, 'Prelepo mesto za šetnju i opuštanje, posebno uveče uz zalazak sunca.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
- 4, 'Lepa priroda i prijatna atmosfera, idealno za vikend izlet sa drustvom.', NOW()),
+ 4, 'Lepa priroda i prijatna atmosfera, idealno za vikend izlet sa društvom.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
- 5, 'Odlicno uredjeno setaliste, cisto i mirno, savrseno za beg od gradske guzve.', NOW()),
+ 5, 'Odlično uređeno šetalište, čisto i mirno, savršeno za beg od gradske gužve.', NOW()),
  
  
--- Klinicki centar Crne Gore
+-- Klinički centar Crne Gore
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinicki centar Crne Gore'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinički centar Crne Gore'),
  5, 'Brza reakcija i ljubazno osoblje, veoma profesionalno.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinicki centar Crne Gore'),
- 4, 'Dobra usluga, ali se ceka na pregled.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinički centar Crne Gore'),
+ 4, 'Dobra usluga, ali se čeka na pregled.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinicki centar Crne Gore'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinički centar Crne Gore'),
  3, 'Osoblje ok, ali organizacija bi mogla biti bolja.', NOW()),
  
- -- Opsta bolnica Niksic
+ -- Opšta bolnica Nikšić
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Niksic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Nikšić'),
  4, 'Korektna usluga i doktori.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Niksic'),
- 2, 'Predugo cekanje na pregled.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Nikšić'),
+ 2, 'Predugo čekanje na pregled.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Niksic'),
- 5, 'Odlicna briga i profesionalnost.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Nikšić'),
+ 5, 'Odlična briga i profesionalnost.', NOW()),
 
--- Opsta bolnica Bar
+-- Opšta bolnica Bar
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Bar'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Bar'),
  4, 'Dobri uslovi i ljubazno osoblje.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Bar'),
- 3, 'Usluga solidna, ali guzva velika.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Bar'),
+ 3, 'Usluga solidna, ali gužva velika.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Bar'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Bar'),
  5, 'Veoma zadovoljna tretmanom.', NOW()),
 
--- Opsta bolnica Kotor
+-- Opšta bolnica Kotor
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Kotor'),
  5, 'Sve pohvale za medicinsko osoblje.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Kotor'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Kotor'),
  4, 'Dobra usluga, prijatno iskustvo.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Kotor'),
- 3, 'Moze bolje, ali nije lose.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Kotor'),
+ 3, 'Moze bolje, ali nije loše.', NOW()),
 
--- Opsta bolnica Danilo Prvi Cetinje
+-- Opšta bolnica Danilo Prvi Cetinje
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Danilo Prvi Cetinje'),
- 4, 'Doktori strucni i posveceni.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Danilo Prvi Cetinje'),
+ 4, 'Doktori stručni i posvećeni.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Danilo Prvi Cetinje'),
- 2, 'Dugo cekanje i losa organizacija.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Danilo Prvi Cetinje'),
+ 2, 'Dugo čekanje i loša organizacija.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Danilo Prvi Cetinje'),
- 5, 'Odlicno iskustvo, sve preporuke.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Danilo Prvi Cetinje'),
+ 5, 'Odlično iskustvo, sve preporuke.', NOW()),
 
 -- Dom zdravlja Tivat
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
@@ -5715,7 +5715,7 @@ VALUES
  4, 'Korektno i brzo.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Herceg Novi'),
- 2, 'Prevelika guzva.', NOW()),
+ 2, 'Prevelika gužva.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Herceg Novi'),
  5, 'Sve pohvale za osoblje.', NOW()),
@@ -5723,7 +5723,7 @@ VALUES
 -- Dom zdravlja Bar
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Bar'),
- 3, 'Ok, ali moze bolje.', NOW()),
+ 3, 'Ok, ali može bolje.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Bar'),
  4, 'Zadovoljna sam uslugom.', NOW()),
@@ -5731,15 +5731,15 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Bar'),
  5, 'Profesionalno i brzo.', NOW()),
 
--- Zdravstvena stanica Pluzine
+-- Zdravstvena stanica Plužine
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Pluzine'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Plužine'),
  4, 'Malo mesto ali dobra usluga.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Pluzine'),
- 3, 'Osnovne usluge, nista vise.', NOW()),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Plužine'),
+ 3, 'Osnovne usluge, nista više.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Pluzine'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Plužine'),
  5, 'Vrlo ljubazno osoblje.', NOW()),
 
 -- Dom zdravlja Plav
@@ -5748,7 +5748,7 @@ VALUES
  4, 'Korektna usluga.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Plav'),
- 2, 'Dugo cekanje.', NOW()),
+ 2, 'Dugo čekanje.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Plav'),
  5, 'Sve preporuke, jako ljubazni.', NOW());
@@ -6109,33 +6109,33 @@ VALUES
     NOW()),
 (
     'https://rtnk.me/wp-content/uploads/2023/11/Niksic-foto-Milan-Sapuric-22-3.jpg',
-    'Niksic',
+    'Nikšić',
     true,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/d/d3/Nikšić.jpg',
-    'Niksic',
+    'Nikšić',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
     NOW()),
 (
     'https://rtnk.me/wp-content/uploads/2025/08/niksic-rtnk.jpg',
-    'Niksic',
+    'Nikšić',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
     NOW()),
 (
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWVeb5mWVFUHrP0NE5AEUvRAJATkTuTocOqA&s',
-    'Niksic',
+    'Nikšić',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
     NOW()),
 (
     'https://diplomacyandcommerce.me/wp-content/uploads/2025/12/Diplomacy-and-Commerce-Montenegro-niksic-2030-capital-of-culture.jpeg',
-    'Niksic',
+    'Nikšić',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niksic'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
     NOW()),
 (
     'https://opstinativat.me/wp-content/uploads/2020/09/DJI_0022-1-1100x450.jpg',
@@ -6211,37 +6211,37 @@ VALUES
     NOW()),
 (
     'https://www.portomontenegro.com/wp-content/uploads/2022/05/Lovcen23-1.jpg',
-    'Lovcen',
+    'Lovćen',
     true,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovcen'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovćen'),
     NOW()),
 
 (
     'https://upload.wikimedia.org/wikipedia/commons/2/20/Jezerski_vrh_na_Lovcenu_-_Njegosev_mauzolej_08.jpg',
-    'Lovcen',
+    'Lovćen',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovcen'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovćen'),
     NOW()),
 
 (
     'https://nparkovi.me/educational_corner/lovcen/images/npark-lovcen-03.jpg',
-    'Lovcen',
+    'Lovćen',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovcen'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovćen'),
     NOW()),
 
 (
     'https://360monte.me/wp-content/uploads/2024/03/kotor-to-lovcen-6396-original.jpg',
-    'Lovcen',
+    'Lovćen',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovcen'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovćen'),
     NOW()),
 
 (
     'https://visitcetinje.com/lat/wp-content/uploads/2024/10/lovcen.jpg',
-    'Lovcen',
+    'Lovćen',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovcen'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovćen'),
     NOW()),
 
 (
@@ -6281,87 +6281,87 @@ VALUES
 
 (
     'https://upload.wikimedia.org/wikipedia/commons/0/0e/Kola%C5%A1in_Town_Center.jpg',
-    'Kolasin',
+    'Kolašin',
     true,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
     NOW()),
 
 (
     'https://upload.wikimedia.org/wikipedia/commons/2/24/Kolasin_-_Town_view.JPG',
-    'Kolasin',
+    'Kolašin',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
     NOW()),
 
 (
     'https://skijalista.me/wp-content/uploads/DJI_0765.jpg',
-    'Kolasin',
+    'Kolašin',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
     NOW()),
     
 (
     'https://www.kolasin.com/img/hero/hero-2.jpg',
-    'Kolasin',
+    'Kolašin',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
     NOW()),
 (
     'https://www.gradnja.rs/wp-content/uploads/2023/09/swissotel-kolasin-resort-02.jpg',
-    'Kolasin',
+    'Kolašin',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolasin'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
     NOW()),
 
 (
     'https://www.zabljak.com/img/hero/hero-2.jpg',
-    'Zabljak',
+    'Žabljak',
     true,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
     NOW()),
 
 (
     'https://content.r9cdn.net/rimg/dimg/58/3a/77a7ed40-city-59219-17337d814d2.jpg?width=1366&height=768&xhint=2475&yhint=2129&crop=true',
-    'Zabljak',
+    'Žabljak',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
     NOW()),
 
 (
     'https://rezidenthotel.com/wp-content/uploads/2025/05/crno-jezero-zabljak-rezident-hotel.webp',
-    'Zabljak',
+    'Žabljak',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
     NOW()),
 (
     'https://pohcdn.com/sites/default/files/styles/paragraph__live_banner__lb_image__1880bp/public/live_banner/zabljak-1.jpg',
-    'Zabljak',
+    'Žabljak',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
     NOW()),
 (
     'https://adria.fun/wp-content/uploads/2025/12/Zabljak-Photo-Bigguns-Depositphotos.webp',
-    'Zabljak',
+    'Žabljak',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zabljak'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/e/e0/Plu%C5%BEine_Piva_Lake.JPG',
-    'Pluzine',
+    'Plužine',
     true,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Pluzine'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plužine'),
     NOW()),
 (
     'https://itinari-images.s3.eu-west-1.amazonaws.com/activity/images/original/23532394-bfda-4db1-8912-8b18f5c253ac-istock-501058345.jpg',
-    'Pluzine',
+    'Plužine',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Pluzine'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plužine'),
     NOW()),
 (
     'https://www.pluzine.me/wp-content/uploads/2023/08/IMG_20230206_131749-scaled.jpg',
-    'Pluzine',
+    'Plužine',
     false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Pluzine'),
+    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plužine'),
     NOW()),
 (
     'https://opstinaandrijevica.me/wp-content/uploads/2020/10/trg-Andrijevica.jpg',
@@ -6432,7 +6432,7 @@ VALUES
     NOW()),
 (
     'https://kotor.art/wp-content/uploads/2025/02/kotor-art-festival-006-1024x681.jpg',
-    'Neki izvodjac na festivalu',
+    'Neki izvođač na festivalu',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'KotorArt festival'),
     NOW()),
@@ -6444,25 +6444,25 @@ VALUES
     NOW()),
 (
     'https://www.radiodux.me/sites/default/files/2017/10-07-2017-gradska-muzika-kotor-priredila-gradu-velicanstvenu-noc/dsc0935resize.jpg',
-    'Vece klasicne muzike',
+    'Veče klasične muzike',
     true,
-    (SELECT "Id" FROM "Events" WHERE "Name" = 'Vece klasicne muzike'),
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Veče klasične muzike'),
     NOW()),
 (
     'https://radiokotor.info/files/images/1771230895-1771170853-IMG-a22537d6019981f93e0bc6c1e3e12e28-V.jpg',
     'Poster',
     false,
-    (SELECT "Id" FROM "Events" WHERE "Name" = 'Vece klasicne muzike'),
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Veče klasične muzike'),
     NOW()),
 (
     'https://bokanews.me/wp-content/uploads/2025/12/Begovic_resize.jpg',
-    'Vece klasicne muzike izvodjac',
+    'Veče klasične muzike izvođač',
     false,
-    (SELECT "Id" FROM "Events" WHERE "Name" = 'Vece klasicne muzike'),
+    (SELECT "Id" FROM "Events" WHERE "Name" = 'Veče klasične muzike'),
     NOW()),
 (
     'https://www.wofafestivals.com/wp-content/uploads/2024/10/IMG_2885-scaled.webp',
-    'devojcica sa zastavom',
+    'devojčica sa zastavom',
     true,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Budva Summer Festival'),
     NOW()),
@@ -6522,7 +6522,7 @@ VALUES
     NOW()),
 (
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4A95dHfmkuuRKJMl0755n-_t4GrVbpYo95A&s',
-    'Pesacenje',
+    'Pešačenje',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Planinarski susret'),
     NOW()),
@@ -6703,27 +6703,27 @@ INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 VALUES
 (
     'https://upload.wikimedia.org/wikipedia/commons/2/2c/Mogren_beach_aptil_19_th.jpg',
-    'Plaza Mogren',
+    'Plaža Mogren',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaza Mogren'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
     NOW()),
 (
     'https://upoznajcrnugoru.com/wp-content/uploads/2018/04/Plaza-Mogren-Budva_fs.jpg',
-    'Plaza Mogren',
+    'Plaža Mogren',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaza Mogren'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
     NOW()),
 (
     'https://sharemontenegro.me/wp-content/uploads/2019/06/62000806_632077597307537_4593433872003235840_n.jpg',
-    'Plaza Mogren',
+    'Plaža Mogren',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaza Mogren'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
     NOW()),
 (
     'https://hgbudvanskarivijera.com/media/yootheme/cache/52/mogren-1-2-plaza-52d17106.jpg',
-    'Plaza Mogren',
+    'Plaža Mogren',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaza Mogren'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
     NOW()),
 (
     'https://media.istockphoto.com/id/1481840480/photo/the-iron-gate-to-the-old-town-of-budva.jpg?s=612x612&w=0&k=20&c=NfMBwy76q1IjxDfStL2_887kLmLryFIlXipBJYnGzeo=',
@@ -6799,27 +6799,27 @@ VALUES
     NOW()),
 (
     'https://kofer.info/wp-content/uploads/2020/03/shutterstock_291029393.jpg',
-    'Setaliste Pet Danica',
+    'Šetalište Pet Danica',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
     NOW()),
 (
     'https://kofer.info/wp-content/uploads/2020/03/shutterstock_1548398111-1000x600.jpg',
-    'Setaliste Pet Danica',
+    'Šetalište Pet Danica',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
     NOW()),
 (
     'https://bokanews.me/wp-content/uploads/2019/11/%C5%A1etali%C5%A1te.jpg',
-    'Setaliste Pet Danica',
+    'Šetalište Pet Danica',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
     NOW()),
 (
     'https://www.montenegrofortravellers.com/sites/default/files/styles/monte1140x550/public/place/setaliste_pet_danica_gorodskaya_naberezhnaya_pet_danica_v_herceg-novi.jpg?itok=fPmqL_Ro',
-    'Setaliste Pet Danica',
+    'Šetalište Pet Danica',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Setaliste Pet Danica'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
     NOW()),
 (
     'https://bar.me/wp-content/uploads/bar_61.jpg',
@@ -6847,27 +6847,27 @@ VALUES
     NOW()),
 (
     'https://visitadabojana.com/wp-content/uploads/2025/09/velika-plaza-aerial-coastline-view.webp',
-    'Velika plaza',
+    'Velika plaža',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaza'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaža'),
     NOW()),
 (
     'https://www.gradnja.rs/wp-content/uploads/2025/04/velika-plaza-ulcinj.jpg',
-    'Velika plaza',
+    'Velika plaža',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaza'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaža'),
     NOW()),
 (
     'https://kofer.info/wp-content/uploads/2020/02/shutterstock_1809771406-1000x600.jpg',
-    'Velika plaza',
+    'Velika plaža',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaza'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaža'),
     NOW()),
 (
     'https://itinari-images.s3.eu-west-1.amazonaws.com/activity/images/original/610157eb-d89f-4b83-82df-62255fbe753b-velika_6.jpg',
-    'Velika plaza',
+    'Velika plaža',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaza'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaža'),
     NOW()),
 (
     'https://www.golivegotravel.nl/wp-content/uploads/2018/04/Stair-Grad-Kotor-8-1160x773.jpg',
@@ -6967,45 +6967,45 @@ VALUES
     NOW()),
 (
     'https://www.ekapija.com/thumbs169/spomenik_na_trebjesi_041224_tw1024.jpg',
-    'Spomen park Slobode Niksic',
+    'Spomen park Slobode Nikšić',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Niksic'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Nikšić'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2021/03/29/20/5312665_spomenik-trubjela_share.jpg',
-    'Spomen park Slobode Niksic',
+    'Spomen park Slobode Nikšić',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Niksic'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Nikšić'),
     NOW()),
 (
     'https://podgorica.travel/wp-content/uploads/2024/04/kralj_nikola_04-08-26-scaled.jpg',
-    'Spomen park Slobode Niksic',
+    'Spomen park Slobode Nikšić',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Niksic'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Nikšić'),
     NOW()),
 (
     'https://media.pobjeda.me/media/2023/07/13/1689264523-1920-1280-max-1.jpg',
-    'Spomen park Slobode Niksic',
+    'Spomen park Slobode Nikšić',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Niksic'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Nikšić'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/d/d2/View_over_Njegusi.jpg',
-    'Njegusi',
+    'Njeguši',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njegusi'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njeguši'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/3/31/Njegusi_-_Church.jpg',
-    'Njegusi',
+    'Njeguši',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njegusi'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njeguši'),
     NOW()),
 (
     'https://adriaticways.com/wp-content/uploads/2025/12/Njegusi-Village-Montenegro-3.webp',
-    'Njegusi',
+    'Njeguši',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njegusi'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njeguši'),
     NOW()),
 (
     'https://tinymontenegro.com/wp-content/uploads/2023/10/imageedit_1_2824406581.jpg',
@@ -7069,33 +7069,33 @@ VALUES
     NOW()),
 (
     'https://www.gradnja.rs/wp-content/uploads/2023/12/trg-zabljak-konkurs-03.jpg',
-    'Centar Zabljaka',
+    'Centar Žabljaka',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/5/5c/%C5%BDabljak%2C_Montenegro_-_town_centre_2.jpg',
-    'Centar Zabljaka',
+    'Centar Žabljaka',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
     NOW()),
 (
     'https://rtnk.me/wp-content/uploads/2025/10/zabljak-rtnk.jpg',
-    'Centar Zabljaka',
+    'Centar Žabljaka',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
     NOW()),
 (
     'https://static.dan.co.me/images/slike/new/2023/05/28/1850818.jpg',
-    'Centar Zabljaka',
+    'Centar Žabljaka',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
     NOW()),
 (
     'https://mondo.me/Picture/812309/jpeg/591559472_1196910645682401_8312711898158084581_n.jpg?ts=2025-12-01T08:54:54',
-    'Centar Zabljaka',
+    'Centar Žabljaka',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Zabljaka'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
     NOW()),
 (
     'https://jasninaputovanja.me/wp-content/uploads/2022/04/IMG_3529-2000x1333.jpg',
@@ -7309,21 +7309,21 @@ VALUES
     NOW()),
 (
     'https://bar.travel/wp-content/uploads/2022/03/Vidikovac-Tudjemili-scaled.jpg',
-    'Tudjemili',
+    'Tuđemili',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tudjemili'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tuđemili'),
     NOW()),
 (
     'https://immo-monte.me/wp-content/uploads/2022/12/Immo-Monte_Spomenik_360-3-scaled.jpg',
-    'Tudjemili',
+    'Tuđemili',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tudjemili'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tuđemili'),
     NOW()),
 (
     'https://cozymontenegro.com/wp-content/uploads/2022/07/Road-and-parking-of-Viewpoint-Tudjemili-1630x860.jpg',
-    'Tudjemili',
+    'Tuđemili',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tudjemili'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tuđemili'),
     NOW()),
 (
     'https://cdn-processed.tmatic.travel/0bb6654d-5c90-4825-b927-a6eaece8e632.jpg',
@@ -7345,39 +7345,39 @@ VALUES
     NOW()),
 (
     'https://bookaweb.s3.eu-central-1.amazonaws.com/media/28723/inbound4956367721833486138.jpg',
-    'Centar Niksica',
+    'Centar Nikšića',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Niksica'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Nikšića'),
     NOW()),
 (
     'https://rtnk.me/wp-content/uploads/2023/11/Niksic-foto-Milan-Sapuric-22-3.jpg',
-    'Centar Niksica',
+    'Centar Nikšića',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Niksica'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Nikšića'),
     NOW()),
 (
     'https://www.in4s.net/wp-content/uploads/2020/09/Centar-Niksic.jpg',
-    'Centar Niksica',
+    'Centar Nikšića',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Niksica'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Nikšića'),
     NOW()),
 (
     'https://www.ponte.rs/UPLOADS-PONTE/2022/12/CANJ.jpg',
-    'Canj',
+    'Čanj',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Canj'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Čanj'),
     NOW()),
 (
     'https://www.jadranskibiser.com/img/canj2.jpg',
-    'Canj',
+    'Čanj',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Canj'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Čanj'),
     NOW()),
 (
     'https://maestralcanj.com/images/gallery/beach-1.jpg',
-    'Canj',
+    'Čanj',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Canj'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Čanj'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/4/4d/Kotor_Montenegro.jpg',
@@ -7417,57 +7417,57 @@ VALUES
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/0/0e/Kola%C5%A1in_Town_Center.jpg',
-    'Centar Kolasina',
+    'Centar Kolašina',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolasina'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolašina'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2019/08/01/00/4576536_20190801200824_acc0e98099a547218011496814c7bb54b86f69d29170423b0b7e42d4b595c412_ls.jpg',
-    'Centar Kolasina',
+    'Centar Kolašina',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolasina'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolašina'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2020/05/08/00/5166375_20200508120532_15b2b4d6e5e4b8fac8536ee8b7cc6fd69d14f19dc573ca6773d8cf252cfe964f_ff.jpg',
-    'Centar Kolasina',
+    'Centar Kolašina',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolasina'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolašina'),
     NOW()),
 (
     'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/13/42/92/9c/slovenska-beach.jpg?w=1200&h=-1&s=1',
-    'Slovenska plaza',
+    'Slovenska plaža',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Slovenska plaza'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Slovenska plaža'),
     NOW()),
 (
     'https://www.hgbudvanskarivijera.com/images/hotel-slovenska-plaza/novo-totali/dji_0516.jpg',
-    'Slovenska plaza',
+    'Slovenska plaža',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Slovenska plaza'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Slovenska plaža'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/e/e4/Slovenska_Beach_in_Budva%2C_Montenegro_aa.jpg',
-    'Slovenska plaza',
+    'Slovenska plaža',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Slovenska plaza'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Slovenska plaža'),
     NOW()),
 (
     'https://lusticabay.com/wp-content/uploads/2022/04/Marina-Village-Lustica-Bay-e1655734430415.jpg',
-    'Lustica',
+    'Luštica',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Lustica'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Luštica'),
     NOW()),
 (
     'https://d1tfdfyb9rvaxg.cloudfront.net/chedilusticabay.com-1070583806/cms/cache/v2/6315646eed574.jpg/1920x1080/fit/80/81f4fda3ffdd2153fdb2520418512bba.jpg',
-    'Lustica',
+    'Luštica',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Lustica'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Luštica'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/4/4b/%D0%A1%D0%B2%D1%98%D0%B5%D1%82%D0%BB%D0%BE%D0%BF%D0%B8%D1%81_%D0%B7%D0%B2%D0%BE%D0%BD%D0%B8%D0%BA%D0%B0_%D1%81%D1%80%D0%B1%D1%81%D0%BA%D0%B5_%D0%BF%D1%80%D0%B0%D0%B2%D0%BE%D1%81%D0%BB%D0%B0%D0%B2%D0%BD%D0%B5_%D1%86%D1%80%D0%BA%D0%B2%D0%B5_%D0%A1%D0%B2._%D0%9D%D0%B5%D0%B4%D1%98%D0%B5%D1%99%D0%B5_%D1%83_%D0%97%D0%B0%D0%B1%D1%80%D1%92%D1%83%2C_%D0%9B%D1%83%D1%88%D1%82%D0%B8%D1%86%D0%B0.jpg',
-    'Lustica',
+    'Luštica',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Lustica'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Luštica'),
     NOW()),
 (
     'https://velikaplaza.com/wp-content/uploads/2020/03/dsc_0020.jpg',
@@ -7507,21 +7507,21 @@ VALUES
     NOW()),
 (
     'https://beachatlas.s3.us-east-2.amazonaws.com/a20f585f-f4d3-43a7-817f-40e06eb2ae74.jpeg',
-    'Radanovici',
+    'Radanovići',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Radanovici'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Radanovići'),
     NOW()),
 (
     'https://www.maestrotravel.rs/wp-content/uploads/2024/03/Radanovi%C4%87i.jpg',
-    'Radanovici',
+    'Radanovići',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Radanovici'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Radanovići'),
     NOW()),
 (
     'https://cdn.nadjidom.com/images/photos/large/2025/12/03/-a41-4900-1679557921-viber-slika-2023-03-22-13-35-56-571.jpg',
-    'Radanovici',
+    'Radanovići',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Radanovici'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Radanovići'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/2/21/Podgorica-Tuzi_Vulaj_village_IMG_1321_De%C4%8Di%C4%87_mountain.JPG',
@@ -7543,21 +7543,21 @@ VALUES
     NOW()),
 (
     'https://bosnjackidnk.com/wp-content/uploads/2021/08/image_2021-08-27_143828.png',
-    'Gradjani',
+    'Građani',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gradjani'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Građani'),
     NOW()),
 (
     'https://www.poreklo.rs/wp-content/uploads/2019/07/selo.jpg',
-    'Gradjani',
+    'Građani',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gradjani'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Građani'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2021/07/13/22/5348555_2247292_ff.jpg',
-    'Gradjani',
+    'Građani',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gradjani'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Građani'),
     NOW()),
 (
     'https://static.wixstatic.com/media/943f6a_dc7129f291b94358a2bc3811c6fa4ab3~mv2.jpg/v1/fill/w_2500,h_1668,al_c/943f6a_dc7129f291b94358a2bc3811c6fa4ab3~mv2.jpg',
@@ -7579,21 +7579,21 @@ VALUES
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/f/f6/Budva_%2826939787035%29.jpg',
-    'Becici',
+    'Bečići',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Becici'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Bečići'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/7/72/Be%C4%8Di%C4%87i%2C_Montenegro_-_panoramio_%286%29.jpg',
-    'Becici',
+    'Bečići',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Becici'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Bečići'),
     NOW()),
 (
     'https://kontiki.ba/Handler/LocationPictHandler.ashx?LocationTvRecId=92&LocationPictTvRecId=528',
-    'Becici',
+    'Bečići',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Becici'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Bečići'),
     NOW()),
 (
     'https://sothebysrealty.me/wp-content/uploads/2023/01/39-Podgorica-Mareza-luxury-villa-with-a-swimming-pool-1-1536x863.jpg',
@@ -7615,39 +7615,39 @@ VALUES
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/3/3c/R%C3%ADo_Moraca%2C_norte_de_Podgorica%2C_Montenegro%2C_2014-04-14%2C_DD_09.JPG',
-    'Moraca',
+    'Morača',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Moraca'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Morača'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/8/84/%D0%A7%D0%B5%D1%80%D0%BD%D0%BE%D0%B3%D0%BE%D1%80%D0%B8%D1%8F%2C_%D0%9C%D0%BE%D0%BD%D0%B0%D1%81%D1%82%D1%8B%D1%80%D1%8C_%D0%9C%D0%BE%D1%80%D0%B0%D1%87%D0%B0.jpg',
-    'Moraca',
+    'Morača',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Moraca'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Morača'),
     NOW()),
 (
     'https://podgorica.travel/wp-content/uploads/2024/04/moraca-1-scaled.jpg',
-    'Moraca',
+    'Morača',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Moraca'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Morača'),
     NOW()),
 (
     'https://forzatravel.rs/fajlovi/city/prcanj-455.jpg',
-    'Prcanj',
+    'Prčanj',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Prcanj'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Prčanj'),
     NOW()),
 (
     'https://www.adriaticvacationrentals.com/wp-content/uploads/2025/06/Prcanj-feature.jpg',
-    'Prcanj',
+    'Prčanj',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Prcanj'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Prčanj'),
     NOW()),
 (
     'https://montenegro-for.me/wp-content/uploads/2025/05/old-parish-church-Prcanj1.jpg',
-    'Prcanj',
+    'Prčanj',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Prcanj'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Prčanj'),
     NOW()),
 (
     'https://s-medijicg.com/images/stories/2020/08/19/ANDRIJEVICA-CENTAR-2.jpeg',
@@ -7669,21 +7669,21 @@ VALUES
     NOW()),
 (
     'https://www.vijesti.me/data/images/2023/03/06/10/5472797_pjesnicka-rijec-1_share.jpg',
-    'Centar Pluzina',
+    'Centar Plužina',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Pluzina'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Plužina'),
     NOW()),
 (
     'https://parkpiva.com/wp-content/uploads/2019/06/Pluzine-dron21-1024x768.jpg',
-    'Centar Pluzina',
+    'Centar Plužina',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Pluzina'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Plužina'),
     NOW()),
 (
     'https://rtcg.me/upload//media/2023/7/19/12/10/687/1456199/thumbs/2160808/thumb0.jpg',
-    'Centar Pluzina',
+    'Centar Plužina',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Pluzina'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Plužina'),
     NOW()),
 (
     'https://parkpiva.com/wp-content/uploads/2016/10/Pivsko-jezero-Park-Piva.jpg',
@@ -7759,21 +7759,21 @@ VALUES
     NOW()),
 (
     'https://vcdn.bergfex.at/images/resized/profiles/detail/36a/e6e861aeb705da50a149a6722c96c36a.jpg',
-    'Tresnjevik',
+    'Trešnjevik',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tresnjevik'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trešnjevik'),
     NOW()),
 (
     'https://vcdn.bergfex.at/images/resized/profiles/detail/357/fea532dc5d4660446535dca5670f1357.jpg',
-    'Tresnjevik',
+    'Trešnjevik',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tresnjevik'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trešnjevik'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2021/01/21/14/5290805_1942600_share.jpg',
-    'Tresnjevik',
+    'Trešnjevik',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tresnjevik'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trešnjevik'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2024/05/26/15/5569651_2374098_ff.jpg',
@@ -7813,21 +7813,21 @@ VALUES
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/3/34/Crnojevica_rijeka.jpg',
-    'Rijeka Crnojevica',
+    'Rijeka Crnojevića',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rijeka Crnojevica'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rijeka Crnojevića'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/f/fe/Rijeka_Crnojevi%C4%87a.jpg',
-    'Rijeka Crnojevica',
+    'Rijeka Crnojevića',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rijeka Crnojevica'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rijeka Crnojevića'),
     NOW()),
 (
     'https://sharemontenegro.me/wp-content/uploads/2019/10/viber_image_2019-10-30_14-21-45.jpg',
-    'Rijeka Crnojevica',
+    'Rijeka Crnojevića',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rijeka Crnojevica'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rijeka Crnojevića'),
     NOW()),
 (
     'https://lifeontheroam.com/wp-content/uploads/2024/11/Lipa-Cave-Montenegro-tn.webp',
@@ -7867,21 +7867,21 @@ VALUES
     NOW()),
 (
     'https://s0.wklcdn.com/image_200/6002773/147428061/92972676Master.jpg',
-    'Curevac',
+    'Ćurevac',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Curevac'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ćurevac'),
     NOW()),
 (
     'https://sailingstonetravel.b-cdn.net/wp-content/uploads/2021/11/Durmitor-National-Park-Hiking-to-the-Curevac-Viewpoint-56-copy.jpg.webp',
-    'Curevac',
+    'Ćurevac',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Curevac'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ćurevac'),
     NOW()),
 (
     'https://sailingstonetravel.b-cdn.net/wp-content/uploads/2021/11/Durmitor-National-Park-Hiking-to-the-Curevac-Viewpoint-55-copy.jpg',
-    'Curevac',
+    'Ćurevac',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Curevac'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ćurevac'),
     NOW()),
 (
     'https://www.montenegroprospects.com/sites/default/files/styles/realty_xxl/public/2022-04/ruins_for_sale_13471_9.jpg.webp?itok=crOxvsaa',
@@ -7921,39 +7921,39 @@ VALUES
     NOW()),
 (
     'https://onogost.me/wp-content/uploads/2023/12/tvrdjava-onogost-nasa-slika.jpg',
-    'Tvrdjava Onogost',
-    false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tvrdjava Onogost'),
+    'Tvrđava Onogošt',
+    true,
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tvrđava Onogošt'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2019/03/31/00/4355293_20190331200328_505cdd0bc5d93f91405c69c3bf1364fc2a58fc8e384cf6288526dc7f64d8f17c_share.jpg',
-    'Tvrdjava Onogost',
+    'Tvrđava Onogošt',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tvrdjava Onogost'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tvrđava Onogošt'),
     NOW()),
 (
     'https://adria.fun/wp-content/uploads/2023/09/Onogost-Nikisic-Photo-Adria.fun_.JPG-2-ok.jpg',
-    'Tvrdjava Onogost',
+    'Tvrđava Onogošt',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tvrdjava Onogost'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tvrđava Onogošt'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/e/ec/%D0%A1%D0%B2%D1%98%D0%B5%D1%82%D0%BB%D0%BE%D0%BF%D0%B8%D1%81_%D1%98%D0%B5%D0%B7%D0%B5%D1%80%D0%B0_%D0%9A%D1%80%D1%83%D0%BF%D0%B0%D1%86_%D0%BA%D0%BE%D0%B4_%D0%9D%D0%B8%D0%BA%D1%88%D0%B8%D1%9B%D0%B03.jpg',
-    'Krupacko jezero',
+    'Krupačko jezero',
     true,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupacko jezero'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupačko jezero'),
     NOW()),
 (
     'https://wevotravel.com/wp-content/uploads/2023/04/1_1-5-1536x1151-1.jpg',
-    'Krupacko jezero',
+    'Krupačko jezero',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupacko jezero'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupačko jezero'),
     NOW()),
 (
     'https://wevotravel.com/wp-content/uploads/2023/04/3_1-3.jpg',
-    'Krupacko jezero',
+    'Krupačko jezero',
     false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupacko jezero'),
+    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupačko jezero'),
     NOW()),
 (
     'https://www.ekapija.com/thumbs/grad_plav_060323_tw1024.jpg',
@@ -8101,27 +8101,27 @@ VALUES
     NOW()),
 (
     'https://rtnk.me/wp-content/uploads/2025/10/gradska-kuca-rtnk.jpg',
-    'Biblioteka Niksic',
+    'Biblioteka Nikšić',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Nikšić'),
     NOW()),
 (
     'https://www.standard.co.me/wp-content/uploads/2018/02/ed05e0e0c4febd7b2b95b70b5743b93a.jpg',
-    'Biblioteka Niksic',
+    'Biblioteka Nikšić',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Nikšić'),
     NOW()),
 (
     'https://rtnk.me/wp-content/uploads/2025/04/gradska-kuca-rtnk.jpg',
-    'Biblioteka Niksic',
+    'Biblioteka Nikšić',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Nikšić'),
     NOW()),
 (
     'https://www.vijesti.me/data/images_intext/2019/10/16/14/20191016151024_6475cc02abfa00ff342bb2b5f0f51fd8170852b7828c926115eea5cc932b93ea.jpeg',
-    'Biblioteka Niksic',
+    'Biblioteka Nikšić',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Nikšić'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Katoli%C4%8Dka_crkva_svetog_Nikole_u_Starom_Baru.JPG/1280px-Katoli%C4%8Dka_crkva_svetog_Nikole_u_Starom_Baru.JPG',
@@ -8179,33 +8179,33 @@ VALUES
     NOW()),
 (
     'https://cf.bstatic.com/xdata/images/hotel/max1024x768/77650626.jpg?k=5626605edcaec3c0992f24c5d442839d08193e6d27e5c514ba354d7b20394a75&o=',
-    'Hotel Bianca Kolasin',
+    'Hotel Bianca Kolašin',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolasin'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolašin'),
     NOW()),
 (
     'https://cf.bstatic.com/xdata/images/hotel/max1024x768/19026752.jpg?k=e14990f4ba96f2a7cf0c568743d3285f1ad3a7129866214c4f33d8e67b9d6d91&o=',
-    'Hotel Bianca Kolasin',
+    'Hotel Bianca Kolašin',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolasin'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolašin'),
     NOW()),
 (
     'https://images.trvl-media.com/lodging/3000000/2360000/2351700/2351617/9d2b65dc.jpg?impolicy=fcrop&w=1200&h=800&quality=medium',
-    'Hotel Bianca Kolasin',
+    'Hotel Bianca Kolašin',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolasin'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolašin'),
     NOW()),
 (
     'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/f6/7c/ec/caption.jpg?w=1200&h=1200&s=1',
-    'Hotel Bianca Kolasin',
+    'Hotel Bianca Kolašin',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolasin'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolašin'),
     NOW()),
 (
     'https://www.hotels-me.net/data/Photos/OriginalPhoto/17144/1714498/1714498335.JPEG',
-    'Hotel Bianca Kolasin',
+    'Hotel Bianca Kolašin',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolasin'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolašin'),
     NOW()),
 (
     'https://foodbook.me/storage/restaurants/375/bhPAke1vwjwf6FaVL5GK35nsvkuPbVTPVkYutaXU.jpg',
@@ -8263,21 +8263,21 @@ VALUES
     NOW()),
 (
     'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/18/3b/43/d9/entrance.jpg?w=1200&h=1200&s=1',
-    'Konoba Batricevic Njegusi',
+    'Konoba Batričević Njeguši',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batricevic Njegusi'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batričević Njeguši'),
     NOW()),
 (
     'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/18/3b/46/3a/hanging-hams.jpg?w=1200&h=1200&s=1',
-    'Konoba Batricevic Njegusi',
+    'Konoba Batričević Njeguši',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batricevic Njegusi'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batričević Njeguši'),
     NOW()),
 (
     'https://media-cdn.tripadvisor.com/media/photo-m/1280/18/3b/43/e4/inside.jpg',
-    'Konoba Batricevic Njegusi',
+    'Konoba Batričević Njeguši',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batricevic Njegusi'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batričević Njeguši'),
     NOW()),
 (
     'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/f8/37/7e/caption.jpg?w=1200&h=1200&s=1',
@@ -8497,21 +8497,21 @@ VALUES
     NOW()),
 (
     'https://tcdn.mindtrip.ai/images/745425/1hhxwnd.png',
-    'Gradska kafanica Zabljak',
+    'Gradska kafanica Žabljak',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Zabljak'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Žabljak'),
     NOW()),
 (
     'https://tcdn.mindtrip.ai/images/745425/e68yl7.png',
-    'Gradska kafanica Zabljak',
+    'Gradska kafanica Žabljak',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Zabljak'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Žabljak'),
     NOW()),
 (
     'https://d2kihw5e8drjh5.cloudfront.net/eyJidWNrZXQiOiJ1dGEtaW1hZ2VzIiwia2V5IjoicGxhY2VfaW1nL2k5V25YLThXUXFTYklJb3o1bXNVZ3ciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjY0MCwiaGVpZ2h0Ijo2NDAsImZpdCI6Imluc2lkZSJ9LCJyb3RhdGUiOm51bGwsInRvRm9ybWF0IjogIndlYnAifX0=',
-    'Gradska kafanica Zabljak',
+    'Gradska kafanica Žabljak',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Zabljak'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Žabljak'),
     NOW()),
 (
     'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2f/a9/69/d2/delicious-food-and-great.jpg?w=1100&h=1100&s=1',
@@ -8533,39 +8533,39 @@ VALUES
     NOW()),
 (
     'https://glovo.dhmedia.io/image/stores-glovo/stores/a49b8c02f265dba2b2a77d1a78e72e7677c53985885e1d57e9e9ee3bd9ce2812?t=W3sicmVzaXplIjp7Im1vZGUiOiJmaXQiLCJ3aWR0aCI6MTI4MCwiaGVpZ2h0IjoxMjB9fSx7IndlYnAiOnsicSI6ImxvdyJ9fV0=',
-    'Kafana Markovic',
+    'Kafana Marković',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Markovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Marković'),
     NOW()),
 (
     'https://mindtrip.ai/restaurants/5e28/8b4a/cd96/ba6c/1fc9/995d/3604/f63b',
-    'Kafana Markovic',
+    'Kafana Marković',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Markovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Marković'),
     NOW()),
 (
     'https://scontent.fbeg7-2.fna.fbcdn.net/v/t1.6435-9/131350056_2225937470871146_8621430501454951551_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=7b2446&_nc_ohc=XRyXQ0M3xAkQ7kNvwH-mkJR&_nc_oc=AdofnOxUdqJ-ZTaA6-8Dc46LySbC0YV85tedPBz8cSRbOSWh55aPIBpRSiPjCt1Xmmk&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=sp2WVHyCZerzOHPuVK_LhQ&oh=00_Af2rJ-xWDsuEhw8kX-UICFhNTXcEOiNYR5vuByQsCuqUog&oe=6A12D591',
-    'Kafana Markovic',
+    'Kafana Marković',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Markovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Marković'),
     NOW()),
 (
     'https://i0.wp.com/maja.team/wp-content/uploads/2025/08/Planinarski-dom-Skrka.jpg?fit=1600%2C739&ssl=1',
-    'Planinarski dom Skrka',
+    'Planinarski dom Škrka',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Skrka'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Škrka'),
     NOW()),
 (
     'https://mindtrip.ai/attractions/160d/6a7a/9e9c/101a/4e94/9809/feb2/d9c0',
-    'Planinarski dom Skrka',
+    'Planinarski dom Škrka',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Skrka'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Škrka'),
     NOW()),
 (
     'https://mindtrip.ai/restaurants/40ef/4b21/97b3/4d06/b02b/021d/7e32/5810',
-    'Planinarski dom Skrka',
+    'Planinarski dom Škrka',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Skrka'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Škrka'),
     NOW()),
 (
     'https://img1.oastatic.com/img2/19566032/max/variant.webp',
@@ -8587,57 +8587,57 @@ VALUES
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/7/70/Former_Italian_Embassy_in_Cetinje%2C_Montenegro.jpg',
-    'Nacionalna biblioteka Crne Gore Djurdje Crnojevic',
+    'Nacionalna biblioteka Crne Gore Đurđe Crnojević',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Djurdje Crnojevic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Đurđe Crnojević'),
     NOW()),
 (
     'https://www.nb-cg.me/fajlovi/p1ib9hmscud4uh5g41k1cj815fd6.jpeg',
-    'Nacionalna biblioteka Crne Gore Djurdje Crnojevic',
+    'Nacionalna biblioteka Crne Gore Đurđe Crnojević',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Djurdje Crnojevic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Đurđe Crnojević'),
     NOW()),
 (
     'https://www.czkdanilovgrad.me/wp-content/uploads/2024/05/viber_image_2024-05-16_10-34-07-345.jpg',
-    'Nacionalna biblioteka Crne Gore Djurdje Crnojevic',
+    'Nacionalna biblioteka Crne Gore Đurđe Crnojević',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Djurdje Crnojevic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Đurđe Crnojević'),
     NOW()),
 (
     'https://lh3.googleusercontent.com/proxy/yKEWJ8QT7AOuJXgry43berYLICOpIMBmfhVoDtRa4ygT2chAAXHdtos8bhg2ww5dxK1aO0Ign8qzzucbZyDX1ozK1j2VUPF-yWZanu-LKlPu4MxTt4dN0TNb_fjuv8I5',
-    'Narodna biblioteka Radosav Ljumovic',
+    'Narodna biblioteka Radosav Ljumović',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumović'),
     NOW()),
 (
     'https://www.standard.co.me/wp-content/uploads/2018/02/ed05e0e0c4febd7b2b95b70b5743b93a.jpg',
-    'Narodna biblioteka Radosav Ljumovic',
+    'Narodna biblioteka Radosav Ljumović',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumović'),
     NOW()),
 (
     'https://mondo.me/Picture/354583/jpeg/knjige.jpeg',
-    'Narodna biblioteka Radosav Ljumovic',
+    'Narodna biblioteka Radosav Ljumović',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumović'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2019/02/25/00/4115345_2019022512020_5c73cb0fb789683b9225368ejpeg_share.jpg',
-    'Gradska biblioteka i citaonica Herceg Novi',
+    'Gradska biblioteka i čitaonica Herceg Novi',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i citaonica Herceg Novi'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i čitaonica Herceg Novi'),
     NOW()),
 (
     'https://www.bibliotekahercegnovi.co.me/index.php/lat/%D0%B3%D0%B0%D0%BB%D0%B5%D1%80%D0%B8%D1%98%D0%B0/130-%D0%B8%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D0%BE%D0%BD%D0%B0-%D0%BF%D0%B8%D1%81%D0%BC%D0%B5%D0%BD%D0%BE%D1%81%D1%82/detail/3386-%D0%B8%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D0%BE%D0%BD%D0%B0-%D0%BF%D0%B8%D1%81%D0%BC%D0%B5%D0%BD%D0%BE%D1%81%D1%82?phocadownload=2',
-    'Gradska biblioteka i citaonica Herceg Novi',
+    'Gradska biblioteka i čitaonica Herceg Novi',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i citaonica Herceg Novi'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i čitaonica Herceg Novi'),
     NOW()),
 (
     'https://bokanews.me/wp-content/uploads/2015/06/Herceg-Novi.jpg',
-    'Gradska biblioteka i citaonica Herceg Novi',
+    'Gradska biblioteka i čitaonica Herceg Novi',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i citaonica Herceg Novi'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i čitaonica Herceg Novi'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Ostrog_monastery_-_panoramio.jpg/960px-Ostrog_monastery_-_panoramio.jpg',
@@ -8713,39 +8713,39 @@ VALUES
     NOW()),
 (
     'https://www.rentalino.com/uploads/8D7EF73D-8A1E-4F0B-9E9C-B375E158CB16_1.jpeg',
-    'Apartments Djurovic',
+    'Apartments Đurović',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Djurovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Đurović'),
     NOW()),
 (
     'https://crnagoraapartmani.me/wp-content/uploads/2022/05/6B428420-417E-43D9-9286-2230E89695B4_1.jpeg',
-    'Apartments Djurovic',
+    'Apartments Đurović',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Djurovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Đurović'),
     NOW()),
 (
     'https://www.viladjuricpetrovac.me/wp-content/uploads/2024/02/petrovac_2023_2-1.jpg',
-    'Apartments Djurovic',
+    'Apartments Đurović',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Djurovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Đurović'),
     NOW()),
 (
     'https://images.trvl-media.com/lodging/24000000/23570000/23568200/23568189/3db2c668.jpg?impolicy=fcrop&w=1200&h=800&quality=medium',
-    'Apartments Vukovic',
+    'Apartments Vuković',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vukovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vuković'),
     NOW()),
 (
     'https://www.turizzam.com/upload/objects/1427306960_InCQyB/DSC00106.JPG',
-    'Apartments Vukovic',
+    'Apartments Vuković',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vukovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vuković'),
     NOW()),
 (
     'https://www.turizzam.com/upload/objects/1427306960_InCQyB/DSC00188_resize.JPG',
-    'Apartments Vukovic',
+    'Apartments Vuković',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vukovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vuković'),
     NOW()),
 (
     'https://cf.bstatic.com/xdata/images/hotel/max1024x768/448886275.jpg?k=b4e8ec5ae4506773f6214c0b37422b85a3c0a15d98d4659bf0abccea7a3202c6&o=',
@@ -8803,21 +8803,21 @@ VALUES
     NOW()),
 (
     'https://cdn.worldota.net/t/1200x616/content/a2/c8/a2c8b0b910c933f89adb5949662156cbaf33693e.jpeg',
-    'Apartments Mijovic',
+    'Apartments Mijović',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijović'),
     NOW()),
 (
     'https://cf.bstatic.com/xdata/images/hotel/max1024x768/209630322.jpg?k=fa8338c75f30184cbe50d55852d402067ce988dd8a3e050348bf4c23b0589d6d&o=',
-    'Apartments Mijovic',
+    'Apartments Mijović',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijović'),
     NOW()),
 (
     'https://cf.bstatic.com/xdata/images/hotel/max1024x768/209639468.jpg?k=e359adff7fd69f5afe224a07054800b49bc48ae021152b1d7d465ec1455decba&o=',
-    'Apartments Mijovic',
+    'Apartments Mijović',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijović'),
     NOW()),
 (
     'https://cf.bstatic.com/xdata/images/hotel/max1024x768/382636212.jpg?k=7256a6565339155e4e015fb94f406d1f28c58b63a648b28bd0090e36ebc8762d&o=',
@@ -8857,21 +8857,21 @@ VALUES
     NOW()),
 (
     'https://www.ljubanovic.com/uploads/5eb3fb1ca4a62.jpg',
-    'Villa Ljubanovic Apartments',
+    'Villa Ljubanović Apartments',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic Apartments'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović Apartments'),
     NOW()),
 (
     'https://www.ljubanovic.com/uploads/5eb40199023fa.jpg',
-    'Villa Ljubanovic Apartments',
+    'Villa Ljubanović Apartments',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic Apartments'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović Apartments'),
     NOW()),
 (
     'https://www.ljubanovic.com/uploads/6409e33eca94a.jpg',
-    'Villa Ljubanovic Apartments',
+    'Villa Ljubanović Apartments',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic Apartments'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović Apartments'),
     NOW()),
 (
     'https://aw-d.tripcdn.com/images/0225812000kwqkap3C7DB.jpg',
@@ -8911,21 +8911,21 @@ VALUES
     NOW()),
 (
     'https://www.atlantic.travel/sites/default/files/styles/colorbox_images/public/Slike%20hotela/hotel_mediteranski_centar_igalo_letovanje_atlantic_travel_11.jpg?itok=knqEq2kO',
-    'Wellness Center Simo Milosevic',
+    'Wellness Center Simo Milošević',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milosevic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milošević'),
     NOW()),
 (
     'https://www.montenegro.travel/uploads/content/2_explore/3i.Institute-Simo-Milosevic-Igalo.webp',
-    'Wellness Center Simo Milosevic',
+    'Wellness Center Simo Milošević',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milosevic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milošević'),
     NOW()),
 (
     'https://www.atlantic.travel/sites/default/files/styles/colorbox_images/public/Slike%20hotela/hotel_mediteranski_centar_igalo_letovanje_atlantic_travel_4.jpg?itok=gphMEL9A',
-    'Wellness Center Simo Milosevic',
+    'Wellness Center Simo Milošević',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milosevic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milošević'),
     NOW()),
 (
     'https://perla.me/public_content/images_media/h_images/1165.jpg',
@@ -9037,21 +9037,21 @@ VALUES
     NOW()),
 (
     'https://borba.me/wp-content/uploads/2021/11/Ljubo-Cupic-spomenik-1.jpg',
-    'Spomenik Ljubu Cupicu',
+    'Spomenik Ljubu Čupiću',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Cupicu'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Čupiću'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2019/01/30/00/378174_20190130060116_5c513370b7896801fa611150jpeg_ff.jpg',
-    'Spomenik Ljubu Cupicu',
+    'Spomenik Ljubu Čupiću',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Cupicu'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Čupiću'),
     NOW()),
 (
     'https://rtcg.me/upload//media/2024/6/13/10/9/907/1795332/thumbs/3415224/thumb0.jpg',
-    'Spomenik Ljubu Cupicu',
+    'Spomenik Ljubu Čupiću',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Cupicu'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Čupiću'),
     NOW()),
 (
     'https://onogost.me/wp-content/uploads/2020/07/107386482_3629926013688663_821234783065601292_n.jpg',
@@ -9073,57 +9073,57 @@ VALUES
     NOW()),
 (
     'https://immo-monte.me/wp-content/uploads/2022/12/Immo-Monte_Spomenik_360-3-scaled.jpg',
-    'Spomenik Tudjemilima',
+    'Spomenik Tuđemilima',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Tudjemilima'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Tuđemilima'),
     NOW()),
 (
     'https://feral.bar/posts/feral-bar-1759856681_IMG_4510.jpeg',
-    'Spomenik Tudjemilima',
+    'Spomenik Tuđemilima',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Tudjemilima'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Tuđemilima'),
     NOW()),
 (
     'https://prch.me/wp-content/uploads/2023/03/image00023-768x1024.jpeg',
-    'Spomenik Tudjemilima',
+    'Spomenik Tuđemilima',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Tudjemilima'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Tuđemilima'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2019/02/04/00/1203410_2019020414024_5c5838a8b7896801fb67f4d5jpeg_share.jpg',
-    'Spomenik Punisi Racicu',
+    'Spomenik Puniši Račiću',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Punisi Racicu'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Puniši Račiću'),
     NOW()),
 (
     'https://www.in4s.net/wp-content/uploads/2017/07/punisa-racic.jpg',
-    'Spomenik Punisi Racicu',
+    'Spomenik Puniši Račiću',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Punisi Racicu'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Puniši Račiću'),
     NOW()),
 (
     'https://www.politika.rs/thumbs//upload/Article/Image/2017_07///906z513_spomenik-punisa-racic-rtcg.jpg',
-    'Spomenik Punisi Racicu',
+    'Spomenik Puniši Račiću',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Punisi Racicu'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Puniši Račiću'),
     NOW()),
 (
     'https://rtcg.me/upload//media/2022/10/25/20/55/623/1249616/resize/1249617/1212_1125x900',
-    'Spomenik herojima Bozicnog ustanka',
+    'Spomenik herojima Božićnog ustanka',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Bozicnog ustanka'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Božićnog ustanka'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2020/01/06/00/4917393_2020010612010_f25e15c4313c648c1f1017be66f7dbaad176d8170c64d64a9877d21fe6370a77_share.jpg',
-    'Spomenik herojima Bozicnog ustanka',
+    'Spomenik herojima Božićnog ustanka',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Bozicnog ustanka'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Božićnog ustanka'),
     NOW()),
 (
     'https://www.standard.co.me/wp-content/uploads/2021/01/prijestonica_polaganje-vijenaca_5.jpg',
-    'Spomenik herojima Bozicnog ustanka',
+    'Spomenik herojima Božićnog ustanka',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Bozicnog ustanka'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Božićnog ustanka'),
     NOW()),
 (
     'https://24kroz7.com/stav/crnom-gorom-uzduz-i-poprijeko-panoramski-put-krug-oko-korita/attachment/9-18/',
@@ -9145,21 +9145,21 @@ VALUES
     NOW()),
 (
     'https://gdb.rferl.org/034d0000-0aff-0242-1ccb-08dad5f22e02_cx0_cy1_cw0_w1080_r0_s.jpg',
-    'Spomenik Njegosu na Lovcenu',
+    'Spomenik Njegošu na Lovćenu',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegosu na Lovcenu'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegošu na Lovćenu'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/1/18/Lovcen.jpg',
-    'Spomenik Njegosu na Lovcenu',
+    'Spomenik Njegošu na Lovćenu',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegosu na Lovcenu'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegošu na Lovćenu'),
     NOW()),
 (
     'https://cdns.russiatoday.com/srbmedia/images/2024.10/original/6707de14e1947654b80885af.jpg',
-    'Spomenik Njegosu na Lovcenu',
+    'Spomenik Njegošu na Lovćenu',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegosu na Lovcenu'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegošu na Lovćenu'),
     NOW()),
 (
     'https://apartments-sofija.com/wp-content/uploads/top-hill-budva.jpg',
@@ -9397,21 +9397,21 @@ VALUES
     NOW()),
 (
     'https://www.vijesti.me/data/images/2019/02/19/00/3497061_20190219230216_5c6c80c1b789684e9f15dbcdjpeg_ls.jpg',
-    'INA Skaljari Kotor',
+    'INA Škaljari Kotor',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Skaljari Kotor'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Škaljari Kotor'),
     NOW()),
 (
     'https://www.ekapija.com/thumbs/ina_pumpa_300713_tw1024.jpg',
-    'INA Skaljari Kotor',
+    'INA Škaljari Kotor',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Skaljari Kotor'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Škaljari Kotor'),
     NOW()),
 (
     'https://bokanews.me/wp-content/uploads/2016/12/INA-2-768x568.jpg',
-    'INA Skaljari Kotor',
+    'INA Škaljari Kotor',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Skaljari Kotor'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Škaljari Kotor'),
     NOW()),
 (
     'https://radiotivat.com/wp-content/uploads/2021/11/maxresdefault-2-1280x720.jpg',
@@ -9451,21 +9451,21 @@ VALUES
     NOW()),
 (
     'https://www.vijesti.me/data/images/2025/10/24/08/5680549_10040620-ispitivanje-goriva-institut_share.jpg',
-    'Lukoil Kolasin',
+    'Lukoil Kolašin',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Kolasin'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Kolašin'),
     NOW()),
 (
     'https://www.ekapija.com/thumbs/benzinska_pumpa_100222_tw1024.jpg',
-    'Lukoil Kolasin',
+    'Lukoil Kolašin',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Kolasin'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Kolašin'),
     NOW()),
 (
     'https://www.b92.net/data/images/2025-10-30/182700_4947385_f.jpg',
-    'Lukoil Kolasin',
+    'Lukoil Kolašin',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Kolasin'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Kolašin'),
     NOW()),
 (
     'https://www.ekapija.com/thumbs169/eko_pumpa_igalo_heceg_novi_071224_tw1024.jpg',
@@ -9505,21 +9505,21 @@ VALUES
     NOW()),
 (
     'https://www.vijesti.me/data/images/2022/04/12/08/5403961_lapcici-hd_share.jpg',
-    'EKO Zabljak',
+    'EKO Žabljak',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Zabljak'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Žabljak'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2026/04/04/08/5717493_benzinska-pumpa-gorivo-15_share.jpg',
-    'EKO Zabljak',
+    'EKO Žabljak',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Zabljak'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Žabljak'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2026/03/18/22/5713801_benzinska-pumpa-gorivo-47_share.jpg',
-    'EKO Zabljak',
+    'EKO Žabljak',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Zabljak'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Žabljak'),
     NOW()),
 (
     'https://media-cdn.tripadvisor.com/media/photo-m/1280/19/1a/f0/b8/photo0jpg.jpg',
@@ -9559,21 +9559,21 @@ VALUES
     NOW()),
 (
     'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/ef/71/be/caption.jpg?w=1100&h=1100&s=1',
-    'Kafic Marshall’s Gelato & Coffee',
+    'Kafić Marshall’s Gelato & Coffee',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafic Marshall’s Gelato & Coffee'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafić Marshall’s Gelato & Coffee'),
     NOW()),
 (
     'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/6a/8e/86/caption.jpg?w=1100&h=1100&s=1',
-    'Kafic Marshall’s Gelato & Coffee',
+    'Kafić Marshall’s Gelato & Coffee',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafic Marshall’s Gelato & Coffee'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafić Marshall’s Gelato & Coffee'),
     NOW()),
 (
     'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/ef/71/bf/caption.jpg?w=1100&h=1100&s=1',
-    'Kafic Marshall’s Gelato & Coffee',
+    'Kafić Marshall’s Gelato & Coffee',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafic Marshall’s Gelato & Coffee'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafić Marshall’s Gelato & Coffee'),
     NOW()),
 (
     'https://media.evendo.com/locations-resized/LandmarkImages/1920x466/a2276aad-03fe-49ff-b5f0-52cfc1d09c33',
@@ -9649,21 +9649,21 @@ VALUES
     NOW()),
 (
     'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/30/3e/d3/6f/caption.jpg?w=1100&h=1100&s=1',
-    'Astoria Cafe Lustica',
+    'Astoria Cafe Luštica',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Astoria Cafe Lustica'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Astoria Cafe Luštica'),
     NOW()),
 (
     'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2b/67/11/40/caption.jpg?w=1200&h=1200&s=1',
-    'Astoria Cafe Lustica',
+    'Astoria Cafe Luštica',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Astoria Cafe Lustica'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Astoria Cafe Luštica'),
     NOW()),
 (
     'https://traveldrinkdine.com/europe/a-unique-stay-at-hotel-astoria-in-kotor/attachment/19737947919_f9d05fdd5b_o/',
-    'Astoria Cafe Lustica',
+    'Astoria Cafe Luštica',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Astoria Cafe Lustica'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Astoria Cafe Luštica'),
     NOW()),
 (
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQitI7jmXWhXI9BjwB1FTj1hQdZhKq8hxf64g&s',
@@ -9937,21 +9937,21 @@ VALUES
     NOW()),
 (
     'https://podgorica.travel/wp-content/uploads/2024/04/A11A9034-1-scaled.jpg',
-    'Prirodnjacki muzej Crne Gore',
+    'Prirodnjački muzej Crne Gore',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjacki muzej Crne Gore'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjački muzej Crne Gore'),
     NOW()),
 (
     'https://pmcg.co.me/wp-content/uploads/2023/04/NOVA1.png',
-    'Prirodnjacki muzej Crne Gore',
+    'Prirodnjački muzej Crne Gore',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjacki muzej Crne Gore'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjački muzej Crne Gore'),
     NOW()),
 (
     'https://podgorica.travel/wp-content/uploads/2024/04/A11A9032-scaled.jpg',
-    'Prirodnjacki muzej Crne Gore',
+    'Prirodnjački muzej Crne Gore',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjacki muzej Crne Gore'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjački muzej Crne Gore'),
     NOW()),
 (
     'https://muzejikotor.me/wp-content/uploads/2023/05/IMG_5692-1-scaled.jpg',
@@ -9973,21 +9973,21 @@ VALUES
     NOW()),
 (
     'https://www.big-cee.com/wp-content/uploads/2022/10/big-podgorica-featured.webp',
-    'Big Fesn Podgorica',
+    'Big Fešn Podgorica',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fesn Podgorica'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fešn Podgorica'),
     NOW()),
 (
     'https://montenegro.org/wp-content/uploads/2023/05/312048262_790846772025647_8199514003964736491_n.jpg',
-    'Big Fesn Podgorica',
+    'Big Fešn Podgorica',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fesn Podgorica'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fešn Podgorica'),
     NOW()),
 (
     'https://www.novineniksica.me/wp-content/uploads/2022/09/BIG_night.jpg',
-    'Big Fesn Podgorica',
+    'Big Fešn Podgorica',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fesn Podgorica'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fešn Podgorica'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/8/86/Podgorica_Mall_of_Montenegro_and_Ramada_Hotel_IMG_1297.JPG',
@@ -10081,39 +10081,39 @@ VALUES
     NOW()),
 (
     'https://lh4.googleusercontent.com/proxy/6oAHJOCHk3Q5fZeuVMAFLktYDQBXB1k7HPK9sAEDP5e-lYhCuD2ZD317wPDiEsYjOIWwYOH179kh48UfeABCxVzZY1IUK1Zq819tLuF8Uc4vOIS5rtTLKaXotYCKgv9xrMfARhO7WTy_K2K3_ytn_LvES7ET66E4LaUpyQFyfTUsGGtwrdk',
-    'TC HDL Lakovic Niksic',
+    'TC HDL Laković Nikšić',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Lakovic Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Laković Nikšić'),
     NOW()),
 (
     'https://lh4.googleusercontent.com/proxy/bIwqDRnQCvs2Rd1gYOeYLP4nxhUzUpiuY4whYq0lKoXUo7HRkpLgoE-SKJXpreOJiJMNu_MqsyqsArmj24b28jPFk5k5hTaoUZPfEixN6NrtQStkTHlWGTIpGsWz9e6dZd79Hfj0Yea_cJaTLTnJ_7HbIeo9iFoh_-Y8k_glCs4FJuVI4XM',
-    'TC HDL Lakovic Niksic',
+    'TC HDL Laković Nikšić',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Lakovic Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Laković Nikšić'),
     NOW()),
 (
     'https://www.ekapija.com/thumbs/trzni_centar_261115_tw1024.jpg',
-    'TC HDL Lakovic Niksic',
+    'TC HDL Laković Nikšić',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Lakovic Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Laković Nikšić'),
     NOW()),
 (
     'https://svetistefan-realestate.com/wp-content/uploads/2024/05/hdl_lakovici.jpg',
-    'Lakovic Kotor',
+    'Laković Kotor',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lakovic Kotor'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Laković Kotor'),
     NOW()),
 (
     'https://aspirano.s3.eu-central-1.amazonaws.com/media/media/1884/apoteka-benu-hdl-radanovici_1395273907.jpg',
-    'Lakovic Kotor',
+    'Laković Kotor',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lakovic Kotor'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Laković Kotor'),
     NOW()),
 (
     'https://maplz.com/media/image/commercial-premises-in-the-hdl-lakovici-shopping-center-1.jpg',
-    'Lakovic Kotor',
+    'Laković Kotor',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lakovic Kotor'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Laković Kotor'),
     NOW()),
 (
     'https://celebic.com/wp-content/uploads/2019/07/DJI_0147-copy-1.jpg',
@@ -10189,57 +10189,57 @@ VALUES
     NOW()),
 (
     'https://www.vijesti.me/data/images/2022/12/26/15/5459573_320673919-578454017454978-4369255730523475141-n_share.jpg',
-    'Galerija Velimir A. Lekovic',
+    'Galerija Velimir A. Leković',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Lekovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Leković'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2025/08/20/13/5666347_oaf200zw_share.jpg',
-    'Galerija Velimir A. Lekovic',
+    'Galerija Velimir A. Leković',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Lekovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Leković'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2025/07/08/15/5658001_har_share.jpg',
-    'Galerija Velimir A. Lekovic',
+    'Galerija Velimir A. Leković',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Lekovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Leković'),
     NOW()),
 (
     'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/19/51/f6/55/villa-ljubanovic.jpg?w=1200&h=1200&s=1',
-    'Villa Ljubanovic',
+    'Villa Ljubanović',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović'),
     NOW()),
 (
     'https://images.trvl-media.com/lodging/90000000/89650000/89641200/89641129/5d68dc1a.jpg?impolicy=fcrop&w=1200&h=800&quality=medium',
-    'Villa Ljubanovic',
+    'Villa Ljubanović',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović'),
     NOW()),
 (
     'https://www.ljubanovic.com/uploads/6409e33eca94a.jpg',
-    'Villa Ljubanovic',
+    'Villa Ljubanović',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović'),
     NOW()),
 (
     'https://cf.bstatic.com/xdata/images/hotel/max1024x768/841139372.jpg?k=9eac4270322fa8656a945aeac5ef75de33aaebc3ebd703caba8c5109f22230a0&o=',
-    'Guesthouse Zmukic',
+    'Guesthouse Žmukić',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Zmukic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Žmukić'),
     NOW()),
 (
     'https://a0.muscache.com/im/pictures/c3e4ae61-fdcc-406b-87dc-ed031c1a284b.jpg',
-    'Guesthouse Zmukic',
+    'Guesthouse Žmukić',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Zmukic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Žmukić'),
     NOW()),
 (
     'https://a0.muscache.com/im/pictures/99f78802-f048-4245-b6a6-72de33631acb.jpg',
-    'Guesthouse Zmukic',
+    'Guesthouse Žmukić',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Zmukic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Žmukić'),
     NOW()),
 (
     'https://cf.bstatic.com/xdata/images/hotel/max1024x768/654530649.jpg?k=d96bb9b96d7fd00b0cd4717907fe95bc73906cc0bc0e468e1fdafea3e110c34e&o=',
@@ -10261,21 +10261,21 @@ VALUES
     NOW()),
 (
     'https://static.cupid.travel/hotels/266854609.jpg',
-    'Pansion Vukovic Zabljak',
+    'Pansion Vuković Žabljak',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vukovic Zabljak'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vuković Žabljak'),
     NOW()),
 (
     'https://cf.bstatic.com/xdata/images/hotel/max1024x768/19849596.jpg?k=3673239add680895bdab952a7ce6fb540613a78b1d925ee136d110074a4858d0&o=',
-    'Pansion Vukovic Zabljak',
+    'Pansion Vuković Žabljak',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vukovic Zabljak'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vuković Žabljak'),
     NOW()),
 (
     'https://static.cupid.travel/hotels/319007791.jpg',
-    'Pansion Vukovic Zabljak',
+    'Pansion Vuković Žabljak',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vukovic Zabljak'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vuković Žabljak'),
     NOW()),
 (
     'https://a0.muscache.com/im/pictures/7b7a07f9-6b8a-40b2-b649-bc853a9f61b9.jpg',
@@ -10333,21 +10333,21 @@ VALUES
     NOW()),
 (
     'https://caffemontenegro.me/images/2022/planta%C5%BEe/cover.jpg',
-    'Vinarija Plantaze 13 Jul',
+    'Vinarija Plantaže 13 Jul',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaze 13 Jul'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaže 13 Jul'),
     NOW()),
 (
     'https://winestyle.rs/wp-content/uploads/2021/11/Vinski-Putopis-13.-Jul-Plantaze-img-7.jpg',
-    'Vinarija Plantaze 13 Jul',
+    'Vinarija Plantaže 13 Jul',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaze 13 Jul'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaže 13 Jul'),
     NOW()),
 (
     'https://stari.plantaze.com/wp-content/uploads/2019/05/Sipcanik-05-1920x710.jpg',
-    'Vinarija Plantaze 13 Jul',
+    'Vinarija Plantaže 13 Jul',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaze 13 Jul'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaže 13 Jul'),
     NOW()),
 (
     'https://lipovacwines.com/images/2022/12/03/vinarija-mne.jpg',
@@ -10387,21 +10387,21 @@ VALUES
     NOW()),
 (
     'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/08/9d/fe/a8/winery-masanovic.jpg?w=1200&h=-1&s=1',
-    'Winery Masanovic',
+    'Winery Mašanović',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Masanovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Mašanović'),
     NOW()),
 (
     'https://wineofmontenegro.com/wp-content/uploads/2024/11/wine-tasting-room-Masanovic-winery.jpg',
-    'Winery Masanovic',
+    'Winery Mašanović',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Masanovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Mašanović'),
     NOW()),
 (
     'https://wineofmontenegro.com/wp-content/uploads/2024/11/Crmnica-wine-Krin-barrique-Masanovic-winery.jpg',
-    'Winery Masanovic',
+    'Winery Mašanović',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Masanovic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Mašanović'),
     NOW()),
 (
     'https://cdn.prod.website-files.com/628ba2ca6ae2f8e75697f7e4/65eeece820b1b3b54cc6ca4b_Lazure%20Hotel%20Savina%20Winery%20Experience_1.webp',
@@ -10513,21 +10513,21 @@ VALUES
     NOW()),
 (
     'https://www.vijesti.me/data/images/2019/02/20/00/3546016_20190220060232_5c6ce70db789684e9f1769f1jpeg_share.jpg',
-    'Park Macaka',
+    'Park Mačaka',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Macaka'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Mačaka'),
     NOW()),
 (
     'https://mindtrip.ai/attractions/03fa/0775/1e45/0d13/5705/4287/26bb/f793',
-    'Park Macaka',
+    'Park Mačaka',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Macaka'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Mačaka'),
     NOW()),
 (
     'https://gosailmontenegro.com/wp-content/uploads/2025/01/cat-and-a-view-of-kotor-v0-hb8umanfsbdb1.jpg',
-    'Park Macaka',
+    'Park Mačaka',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Macaka'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Mačaka'),
     NOW()),
 (
     'https://aquariumboka.ucg.ac.me/wp-content/uploads/2021/05/Akvarijum-tankovi.jpg',
@@ -10549,297 +10549,297 @@ VALUES
     NOW()),
 (
     'https://mnemagazin.me/wp-content/uploads/2019/06/igraliste-sajt.jpg',
-    'Igraliste Njegosev park',
+    'Igralište Njegošev park',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Njegosev park'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Njegošev park'),
     NOW()),
 (
     'https://media.pobjeda.me/media/1623408831-pct-igraliste-3.jpg',
-    'Igraliste Njegosev park',
+    'Igralište Njegošev park',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Njegosev park'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Njegošev park'),
     NOW()),
 (
     'https://sportskiobjekti.podgorica.me/wp-content/uploads/2025/06/DJI_0794.jpg',
-    'Igraliste Njegosev park',
+    'Igralište Njegošev park',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Njegosev park'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Njegošev park'),
     NOW()),
 (
     'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/f6/61/e6/welcome-to-the-new-adventure.jpg?w=1200&h=-1&s=1',
-    'Igraliste Gorica Park',
+    'Igralište Gorica Park',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Gorica Park'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Gorica Park'),
     NOW()),
 (
     'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/14/45/00/c1/photo1jpg.jpg?w=1200&h=-1&s=1',
-    'Igraliste Gorica Park',
+    'Igralište Gorica Park',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Gorica Park'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Gorica Park'),
     NOW()),
 (
     'https://wevotravel.com/wp-content/uploads/2023/04/IMG_2615-1.jpg',
-    'Igraliste Gorica Park',
+    'Igralište Gorica Park',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Gorica Park'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Gorica Park'),
     NOW()),
 (
     'https://agencijapanorama.rs/wp-content/uploads/ws-form/2/dropzonejs/61/Slovenska-Plaza-Lux-Budva-Crna-Gora-7.jpg',
-    'Igraliste Slovenska plaza',
+    'Igralište Slovenska plaža',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Slovenska plaza'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Slovenska plaža'),
     NOW()),
 (
     'https://startravelnis.rs/wp-content/uploads/2022/02/budva-slovenska-plaza-3-16.jpg',
-    'Igraliste Slovenska plaza',
+    'Igralište Slovenska plaža',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Slovenska plaza'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Slovenska plaža'),
     NOW()),
 (
     'https://www.hercegnovi.me/images/stories/15072022/02.jpg',
-    'Djecije Igraliste Park Nezavisnosti',
+    'Dječije Igralište Park Nezavisnosti',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecije Igraliste Park Nezavisnosti'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječije Igralište Park Nezavisnosti'),
     NOW()),
 (
     'https://rthn.co.me/wp-content/uploads/2022/10/Dogadjaj-Najbolji-smo-domacini-a-Herceg-%E2%80%93-Novi-grad-tvoj-i-moj.jpg',
-    'Djecije Igraliste Park Nezavisnosti',
+    'Dječije Igralište Park Nezavisnosti',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecije Igraliste Park Nezavisnosti'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječije Igralište Park Nezavisnosti'),
     NOW()),
 (
     'https://www.hercegnovi.travel/storage/app/public/project-image/1700744811.jpg',
-    'Djecije Igraliste Park Nezavisnosti',
+    'Dječije Igralište Park Nezavisnosti',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecije Igraliste Park Nezavisnosti'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječije Igralište Park Nezavisnosti'),
     NOW()),
 (
     'https://www.kotor.me/files/images/1745583583-WhatsApp%20slika%202025-04-25%20u%2013.48.33_5cb55a84.jpg',
-    'Igraliste Centar Kotor',
+    'Igralište Centar Kotor',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Centar Kotor'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Centar Kotor'),
     NOW()),
 (
     'https://radiokotor.info/files/images/1745591172-1745583581-Foto-9.jpg',
-    'Igraliste Centar Kotor',
+    'Igralište Centar Kotor',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Centar Kotor'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Centar Kotor'),
     NOW()),
 (
     'https://www.kotor.me/files/images/1745583582-Foto-8.JPG',
-    'Igraliste Centar Kotor',
+    'Igralište Centar Kotor',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Centar Kotor'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Centar Kotor'),
     NOW()),
 (
     'https://www.cdm.me/wp-content/uploads/2021/11/tolosi.jpg',
-    'Igraliste Tolosi',
+    'Igralište Tološi',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Tolosi'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Tološi'),
     NOW()),
 (
     'https://www.antenam.net/uploads/6/e/d/6ed7fb080c86bde2fff21d4f6a56a30b.jpg',
-    'Igraliste Tolosi',
+    'Igralište Tološi',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Tolosi'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Tološi'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2020/09/11/13/5248883_1253767_share.jpg',
-    'Igraliste Tolosi',
+    'Igralište Tološi',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Tolosi'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Tološi'),
     NOW()),    
 (
     'https://www.vijesti.me/data/images/2022/07/01/10/5421393_djecije-igraliste_ls.jpg',
-    'Igraliste Kolasin',
+    'Igralište Kolašin',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Kolasin'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Kolašin'),
     NOW()),
 (
     'https://rtcg.me/upload//media/2022/7/17/21/48/184/1214620/resize/1214622/1660762115845_1068x900',
-    'Igraliste Kolasin',
+    'Igralište Kolašin',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Kolasin'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Kolašin'),
     NOW()),    
 (
     'https://www.vijesti.me/data/images/2021/09/30/10/5364413_juce-na-trgu-vukmana-kruscica_ls.jpg',
-    'Igraliste Kolasin',
+    'Igralište Kolašin',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Kolasin'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Kolašin'),
     NOW()),
 (
     'https://rthn.co.me/wp-content/uploads/2023/04/igraliste-Igalo.jpg',
-    'Igraliste Igalo',
+    'Igralište Igalo',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Igalo'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Igalo'),
     NOW()),
 (
     'https://bookaweb.s3.eu-central-1.amazonaws.com/media/28555/omladinski-park-igalo.jpg',
-    'Igraliste Igalo',
+    'Igralište Igalo',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Igalo'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Igalo'),
     NOW()),
 (
     'https://biznisuregionu.com/wp-content/uploads/2025/11/soso-Milan-Petrovic-Novi-Sad.jpg',
-    'Igraliste Igalo',
+    'Igralište Igalo',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Igalo'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Igalo'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2022/08/02/12/5428098_viber-image-20220802-122227576_share.jpg',
-    'Igraliste Park 13 Jul',
+    'Igralište Park 13 Jul',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Park 13 Jul'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Park 13 Jul'),
     NOW()),
 (
     'https://www.antenam.net/uploads/8/5/b/85b64f91c8fd6579abc311e0f9c193ea.jpg',
-    'Igraliste Park 13 Jul',
+    'Igralište Park 13 Jul',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Park 13 Jul'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Park 13 Jul'),
     NOW()),
 (
     'https://www.cdm.me/wp-content/uploads/2021/06/pct_igraliste_4.jpg',
-    'Igraliste Park 13 Jul',
+    'Igralište Park 13 Jul',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Park 13 Jul'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Park 13 Jul'),
     NOW()),
 (
     'https://rtnk.me/wp-content/uploads/2024/10/novo-igraliste-u-kosovskoj-ulici-rtnk.jpg',
-    'Igraliste Niksic',
+    'Igralište Nikšić',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Nikšić'),
     NOW()),
 (
     'https://rtnk.me/wp-content/uploads/2023/09/igraliste-kod-Desetke-rtnk-1.jpg',
-    'Igraliste Niksic',
+    'Igralište Nikšić',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Nikšić'),
     NOW()),
 (
     'https://rtnk.me/wp-content/uploads/2023/10/igraliste-stara-varos-rtnk.jpg',
-    'Igraliste Niksic',
+    'Igralište Nikšić',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Nikšić'),
     NOW()),
 (
     'https://opstinativat.me/wp-content/uploads/2022/09/43918C30-2DF0-4A92-AE32-5EC0E3C7407C-scaled.jpeg',
-    'Djecje igraliste kod vozica',
+    'Dječje igralište kod vozića',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecje igraliste kod vozica'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječje igralište kod vozića'),
     NOW()),
 (
     'https://bokanews.me/wp-content/uploads/2025/02/Novo-igraliste-i-teren_resize.jpg',
-    'Djecje igraliste kod vozica',
+    'Dječje igralište kod vozića',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecje igraliste kod vozica'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječje igralište kod vozića'),
     NOW()),
 (
     'https://radiotivat.com/wp-content/uploads/2026/03/ostvj-igraliste.jpg',
-    'Djecje igraliste kod vozica',
+    'Dječje igralište kod vozića',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecje igraliste kod vozica'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječje igralište kod vozića'),
     NOW()),
 (
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQf19k1RmCSIEtzZCfqdwGP9IpbmHvjOCBbWw&s',
-    'Igraliste Bar Setaliste',
+    'Igralište Bar Šetalište',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Bar Setaliste'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Bar Šetalište'),
     NOW()),
 (
     'https://www.putovanja.info/forum/uploads/monthly_2021_06/IMG_20190808_131116_1067x800.jpg.b12464c970ea513a45e21184ec346b5d.jpg',
-    'Igraliste Bar Setaliste',
+    'Igralište Bar Šetalište',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Bar Setaliste'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Bar Šetalište'),
     NOW()),
 (
     'https://barinfo.me/wp-content/uploads/2024/07/igraliste-1-2407-70ea.jpg',
-    'Igraliste Bar Setaliste',
+    'Igralište Bar Šetalište',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Bar Setaliste'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Bar Šetalište'),
     NOW()),
 (
     'https://radiotitograd.me/wp-content/uploads/2025/08/obnovljeno-igraliste-NPD-scaled.jpg',
-    'Igraliste Crno jezero',
+    'Igralište Crno jezero',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Crno jezero'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Crno jezero'),
     NOW()),
 (
     'https://nparkovi.me/storage/images/news/1754288130.jpg',
-    'Igraliste Crno jezero',
+    'Igralište Crno jezero',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Crno jezero'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Crno jezero'),
     NOW()),
 (
     'https://nparkovi.me/storage/images/news/1754288098_68904fe2db78c.jpg',
-    'Igraliste Crno jezero',
+    'Igralište Crno jezero',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Crno jezero'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Crno jezero'),
     NOW()),
 (
     'https://cf.bstatic.com/xdata/images/hotel/max1024x768/85068015.jpg?k=ba5ce5ed5d58026ba4f9f44c50ea9d3be236284e517d523545df24219c77e6b2&o=',
-    'Igraliste Milocer Park',
+    'Igralište Miločer Park',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Milocer Park'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Miločer Park'),
     NOW()),
 (
     'https://cf.bstatic.com/xdata/images/hotel/max1024x768/85068008.jpg?k=808052ece3d899557c778f973c0ecafd0042e569658f91e15a88edfbef5395d5&o=',
-    'Igraliste Milocer Park',
+    'Igralište Miločer Park',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Milocer Park'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Miločer Park'),
     NOW()),
 (
     'https://commons.wikimedia.org/wiki/Special:FilePath/Park%20%28children%27s%20playground%29.jpg',
-    'Igraliste Lovcen National Park',
+    'Igralište Lovćen National Park',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Lovcen National Park'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen National Park'),
     NOW()),
 (
     'https://commons.wikimedia.org/wiki/Special:FilePath/Lovcen%20view%20Montenegro%20june%202021%20%289%29.jpg',
-    'Igraliste Lovcen National Park',
+    'Igralište Lovćen National Park',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Lovcen National Park'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen National Park'),
     NOW()),
 (
     'https://commons.wikimedia.org/wiki/Special:FilePath/Lovcen%20view%20Montenegro%20june%202021%20%288%29.jpg',
-    'Igraliste Lovcen National Park',
+    'Igralište Lovćen National Park',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igraliste Lovcen National Park'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen National Park'),
     NOW()),
 (
     'https://commons.wikimedia.org/wiki/Special:FilePath/Indoor%20playground%20%288129595643%29.jpg',
-    'Djecija igraonica Igalo',
+    'Dječija igraonica Igalo',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecija igraonica Igalo'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječija igraonica Igalo'),
     NOW()),
 (
     'https://commons.wikimedia.org/wiki/Special:FilePath/USSRC%20indoor%20playground.JPG',
-    'Djecija igraonica Igalo',
+    'Dječija igraonica Igalo',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecija igraonica Igalo'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječija igraonica Igalo'),
     NOW()),
 (
     'https://commons.wikimedia.org/wiki/Special:FilePath/Playroom%2C%20Viking%20Grace%2C%2020230604%20-%2016.jpg',
-    'Djecija igraonica Igalo',
+    'Dječija igraonica Igalo',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecija igraonica Igalo'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječija igraonica Igalo'),
     NOW()),
 (
     'https://cnp.me/wp-content/uploads/2019/01/eksterijer-12-18-2.jpg',
-    'Crnogorsko narodno pozoriste',
+    'Crnogorsko narodno pozorište',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozoriste'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozorište'),
     NOW()),
 (
     'https://cnp.me/wp-content/uploads/2016/12/CNP-Crnogorsko-narodno-pozoriste-9.jpg',
-    'Crnogorsko narodno pozoriste',
+    'Crnogorsko narodno pozorište',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozoriste'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozorište'),
     NOW()),
 (
     'https://www.narodnopozoriste.rs/media/images/news/6396/gallery/eri-moja-cnp-7.jpg',
-    'Crnogorsko narodno pozoriste',
+    'Crnogorsko narodno pozorište',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozoriste'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozorište'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/a/a3/2023_Cetinje_theatre.jpg',
@@ -10861,21 +10861,21 @@ VALUES
     NOW()),
 (
     'https://rtnk.me/wp-content/uploads/2024/06/niksicko-pozoriste-rtnk-1200x676-1.webp',
-    'Niksicko pozoriste',
+    'Nikšićko pozorište',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Niksicko pozoriste'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nikšićko pozorište'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2019/02/16/00/2930291_20190216050232_5c6792e3b789684e9f0515b6jpeg_share.jpg',
-    'Niksicko pozoriste',
+    'Nikšićko pozorište',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Niksicko pozoriste'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nikšićko pozorište'),
     NOW()),
 (
     'https://kossev.info/wp-content/uploads/2025/10/violina-daire-1.jpg',
-    'Niksicko pozoriste',
+    'Nikšićko pozorište',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Niksicko pozoriste'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nikšićko pozorište'),
     NOW()),
 (
     'https://me.ekapija.com/thumbs169/dvorana_park_herceg_novi_1_170224_tw1024.jpg',
@@ -10987,39 +10987,39 @@ VALUES
     NOW()),
 (
     'https://res.cloudinary.com/dt5z2gs3c/image/upload/v1760477333/dom-oilpainting_pn04mc.jpg',
-    'Dom kulture Kolasin',
+    'Dom kulture Kolašin',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Kolasin'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Kolašin'),
     NOW()),
 (
     'https://kossev.info/wp-content/uploads/2019/04/Dom-Kulture-Stari-Kola%C5%A1in-krupni-plan-1024x768.jpg',
-    'Dom kulture Kolasin',
+    'Dom kulture Kolašin',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Kolasin'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Kolašin'),
     NOW()),
 (
     'https://i.ytimg.com/vi/D6J49YPa_Ns/maxresdefault.jpg',
-    'Dom kulture Kolasin',
+    'Dom kulture Kolašin',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Kolasin'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Kolašin'),
     NOW()),
 (
     'https://sharemontenegro.me/wp-content/uploads/2021/05/IMG_0108.jpg',
-    'Manastir Moraca',
+    'Manastir Morača',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Moraca'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Morača'),
     NOW()),
 (
     'https://www.mojacrnagora.rs/wp-content/uploads/2021/05/drone-montenegro-manastir-moraca.jpg',
-    'Manastir Moraca',
+    'Manastir Morača',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Moraca'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Morača'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/7/7c/Manastir_Moraca.jpg',
-    'Manastir Moraca',
+    'Manastir Morača',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Moraca'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Morača'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/3/35/Monastero_di_cetinje%2C_01.JPG',
@@ -11059,21 +11059,21 @@ VALUES
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/c/cf/Sports_Center_Moraca.jpg',
-    'SC Moraca',
+    'SC Morača',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Moraca'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Morača'),
     NOW()),
 (
     'https://media.pobjeda.me/media/2024/03/03/1709505820-sc-moraca-2809-2023-dragan-mijatovic-001-19-1-i_1280x800.JPG?cacheControl=1709505822',
-    'SC Moraca',
+    'SC Morača',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Moraca'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Morača'),
     NOW()),
 (
     'https://www.standard.co.me/wp-content/uploads/2020/07/SC-moraca.jpg',
-    'SC Moraca',
+    'SC Morača',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Moraca'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Morača'),
     NOW()),
 (
     'https://upload.wikimedia.org/wikipedia/commons/c/cd/Sportska_dvorana_Topolica.jpg',
@@ -11095,21 +11095,21 @@ VALUES
     NOW()),
 (
     'https://egca.info/wp-content/uploads/2022/07/Venue-Niksic1-1.jpg',
-    'SC Niksic',
+    'SC Nikšić',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Nikšić'),
     NOW()),
 (
     'https://wevotravel.com/wp-content/uploads/2023/04/DSC7460-1.jpg',
-    'SC Niksic',
+    'SC Nikšić',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Nikšić'),
     NOW()),
 (
     'https://media.pobjeda.me/media/2022/02/23/1645610845-nk-img-5e60e2759c7e6894283a50e326403546-v-i_960x600.jpg?cacheControl=1645610859',
-    'SC Niksic',
+    'SC Nikšić',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Nikšić'),
     NOW()),
 (
     'https://www.ekapija.com/thumbs/sportski_centar_igalo_1_290920_tw1024.jpg',
@@ -11131,21 +11131,21 @@ VALUES
     NOW()),
 (
     'https://skijalista.me/wp-content/uploads/DJI_0021.jpg',
-    'SC Kolasin',
+    'SC Kolašin',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Kolasin'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Kolašin'),
     NOW()),
 (
     'https://srbijazamlade.rs/fajlovi/productitem/kolasin-1600-skijaliste_5ffefd29559fc.jpg',
-    'SC Kolasin',
+    'SC Kolašin',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Kolasin'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Kolašin'),
     NOW()),
 (
     'https://rtnk.me/wp-content/uploads/2023/07/oscg.jpg',
-    'SC Kolasin',
+    'SC Kolašin',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Kolasin'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Kolašin'),
     NOW()),
 (
     'https://www.avalaresort.com/photos/1/Gallery/Spa%20&%20Wellness/homepage/DSC_7301.jpg',
@@ -11167,21 +11167,21 @@ VALUES
     NOW()),
 (
     'https://d1tfdfyb9rvaxg.cloudfront.net/chedilusticabay.com-1070583806/cms/cache/v2/64afc7d4c5820.jpg/1920x1080/fit/80/8a0e6122621764bdd3b6819e6a3b3eac.jpg',
-    'The Chedi Lustica Bay',
+    'The Chedi Luštica Bay',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Chedi Lustica Bay'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Chedi Luštica Bay'),
     NOW()),
 (
     'https://d1tfdfyb9rvaxg.cloudfront.net/chedilusticabay.com-1070583806/cms/cache/v2/66210aad640cc.jpg/1920x1080/fit/80/6be62e08a98bbde8ec17bd6c96904f20.jpg',
-    'The Chedi Lustica Bay',
+    'The Chedi Luštica Bay',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Chedi Lustica Bay'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Chedi Luštica Bay'),
     NOW()),
 (
     'https://www.simplyluxuryescapes.co.uk/wp-content/uploads/2025/04/The-Chedi-Lustica-Bay-Montenegro-20.jpg',
-    'The Chedi Lustica Bay',
+    'The Chedi Luštica Bay',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Chedi Lustica Bay'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Chedi Luštica Bay'),
     NOW()),
 (
     'https://radiotitograd.me/wp-content/uploads/2024/09/Vrmac-HealthWellbeing-photo-Rozana-Sazdic-7163.jpg-2-scaled.jpg',
@@ -11221,21 +11221,21 @@ VALUES
     NOW()),
 (
     'https://pijacepg.me/wp-content/uploads/2025/04/IMG_4153-1-scaled.jpeg',
-    'Trznica Podgorica',
+    'Tržnica Podgorica',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trznica Podgorica'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tržnica Podgorica'),
     NOW()),
 (
     'https://pijacepg.me/wp-content/uploads/2025/04/IMG_3996-scaled.jpeg',
-    'Trznica Podgorica',
+    'Tržnica Podgorica',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trznica Podgorica'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tržnica Podgorica'),
     NOW()),
 (
     'https://pijacepg.me/wp-content/uploads/2025/04/IMG_3790-2-scaled.jpeg',
-    'Trznica Podgorica',
+    'Tržnica Podgorica',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trznica Podgorica'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tržnica Podgorica'),
     NOW()),
 (
     'https://bokanews.me/wp-content/uploads/2014/11/DSC_3999_resize.jpg',
@@ -11275,21 +11275,21 @@ VALUES
     NOW()),
 (
     'https://rtnk.me/wp-content/uploads/2024/04/pijaca-niksic-rtnk.jpg',
-    'Zelena pijaca Niksic',
+    'Zelena pijaca Nikšić',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Nikšić'),
     NOW()),
 (
     'https://seljak.me/savjetuje/wp-content/uploads/2022/04/277935918_1026062591656638_1337074368930576300_n.jpg',
-    'Zelena pijaca Niksic',
+    'Zelena pijaca Nikšić',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Nikšić'),
     NOW()),
 (
     'https://i.ytimg.com/vi/cHmWcwUxcxE/maxresdefault.jpg',
-    'Zelena pijaca Niksic',
+    'Zelena pijaca Nikšić',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Nikšić'),
     NOW()),
 (
     'https://komunalnobar.me/images/pjaca.JPG',
@@ -11491,93 +11491,93 @@ VALUES
     NOW()),
 (
     'https://www.kccg.me/wp-content/uploads/2025/04/DJI-0139.jpg',
-    'Klinicki centar Crne Gore',
+    'Klinički centar Crne Gore',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinicki centar Crne Gore'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinički centar Crne Gore'),
     NOW()),
 (
     'https://www.kccg.me/wp-content/uploads/2021/03/Zastave-na-pola-koplja-na-ulazu-KCCG.jpg',
-    'Klinicki centar Crne Gore',
+    'Klinički centar Crne Gore',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinicki centar Crne Gore'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinički centar Crne Gore'),
     NOW()),
 (
     'https://www.ekapija.com/thumbs169/klinicki_centar_crne_gore_190223_tw1024.jpg',
-    'Klinicki centar Crne Gore',
+    'Klinički centar Crne Gore',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinicki centar Crne Gore'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinički centar Crne Gore'),
     NOW()),
 (
     'https://bolnica-nk.com/wp-content/uploads/2022/11/glavni-2.jpg',
-    'Opsta bolnica Niksic',
+    'Opšta bolnica Nikšić',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Nikšić'),
     NOW()),
 (
     'https://rtnk.me/wp-content/uploads/2023/05/bolnica-1.jpg',
-    'Opsta bolnica Niksic',
+    'Opšta bolnica Nikšić',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Nikšić'),
     NOW()),
 (
     'https://onogost.me/wp-content/uploads/2024/04/opsta-bolnica.jpg',
-    'Opsta bolnica Niksic',
+    'Opšta bolnica Nikšić',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Niksic'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Nikšić'),
     NOW()),
 (
     'https://www.vijesti.me/data/images/2021/03/27/07/5311543_opsta-bolnica-bar_share.jpg',
-    'Opsta bolnica Bar',
+    'Opšta bolnica Bar',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Bar'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Bar'),
     NOW()),
 (
     'https://www.bolnicabar.me/images/2023/IMG-1d0accf27a0bf0e0bc553cac09fc0698-V_1.jpg',
-    'Opsta bolnica Bar',
+    'Opšta bolnica Bar',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Bar'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Bar'),
     NOW()),
 (
     'https://rtnk.me/wp-content/uploads/2023/09/bolnica-bar-pr-centar.jpg',
-    'Opsta bolnica Bar',
+    'Opšta bolnica Bar',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Bar'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Bar'),
     NOW()),
 (
     'https://me.ekapija.com/thumbs169/opsta_bolnica_kotor_190820_tw1024.jpg',
-    'Opsta bolnica Kotor',
+    'Opšta bolnica Kotor',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Kotor'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Kotor'),
     NOW()),
 (
     'https://bokanews.me/wp-content/uploads/2016/09/ulaz-u-novu-polikliniku_resize.jpg',
-    'Opsta bolnica Kotor',
+    'Opšta bolnica Kotor',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Kotor'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Kotor'),
     NOW()),
 (
     'https://bokanews.me/wp-content/uploads/2016/09/detalj-iz-nove-poliklinike-2_resize.jpg',
-    'Opsta bolnica Kotor',
+    'Opšta bolnica Kotor',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Kotor'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Kotor'),
     NOW()),
 (
     'https://media.pobjeda.me/media/2026/04/24/1777052914-bolnica-danilo-prvi-cetinje-0904-2026-dragan-mijatovic-1-i_1280x800.jpeg?cacheControl=1777052915',
-    'Opsta bolnica Danilo Prvi Cetinje',
+    'Opšta bolnica Danilo Prvi Cetinje',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Danilo Prvi Cetinje'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Danilo Prvi Cetinje'),
     NOW()),
 (
     'https://me.ekapija.com/thumbs169/bolnica_danilo_prvi_cetinje_050323_tw1024.jpg',
-    'Opsta bolnica Danilo Prvi Cetinje',
+    'Opšta bolnica Danilo Prvi Cetinje',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Danilo Prvi Cetinje'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Danilo Prvi Cetinje'),
     NOW()),
 (
     'https://www.gradnja.rs/wp-content/uploads/2023/11/bolnica-danilo-1-cetinje.jpg',
-    'Opsta bolnica Danilo Prvi Cetinje',
+    'Opšta bolnica Danilo Prvi Cetinje',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opsta bolnica Danilo Prvi Cetinje'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Danilo Prvi Cetinje'),
     NOW()),
 (
     'https://radiotivat.com/wp-content/uploads/2021/11/DOM-ZDRAVLJA.webp',
@@ -11635,21 +11635,21 @@ VALUES
     NOW()),
 (
     'https://www.vijesti.me/data/images/2021/07/22/08/5351161_zdravstvena-stanica-u-pluzinama_share.jpg',
-    'Zdravstvena stanica Pluzine',
+    'Zdravstvena stanica Plužine',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Pluzine'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Plužine'),
     NOW()),
 (
     'https://www.antenam.net/uploads/0/9/3/0937dd1305acef12ed6bf380eea2160a.JPG',
-    'Zdravstvena stanica Pluzine',
+    'Zdravstvena stanica Plužine',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Pluzine'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Plužine'),
     NOW()),
 (
     'https://radiotitograd.me/wp-content/uploads/2021/07/pluzine.jpg',
-    'Zdravstvena stanica Pluzine',
+    'Zdravstvena stanica Plužine',
     false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Pluzine'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Plužine'),
     NOW()),
 (
     'https://www.ekapija.com/thumbs169/dom_zdravlja_plav_190220_tw1024.jpg',
@@ -11702,27 +11702,27 @@ VALUES
     NOW()),
 (
     'https://www.montenegrofortravellers.com/sites/default/files/styles/monte1140x550/public/place/top_hill_budva_nochnoy_klub_top_hill_v_budve.jpg?itok=zTr34xsE',
-    'Nocni provod Budva',
+    'Noćni provod Budva',
     true,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Nocni provod Budva'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod Budva'),
     NOW()),
 (
     'https://apartments-sofija.com/wp-content/uploads/budva-party-apartments-1.jpg',
-    'Nocni provod Budva',
+    'Noćni provod Budva',
     false,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Nocni provod Budva'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod Budva'),
     NOW()),
 (
     'https://www.budvanocu.com/getimage.php?img=p18rspcf3312ih5uk1uf4eb99bm1.jpg&w=600',
-    'Nocni provod Budva',
+    'Noćni provod Budva',
     false,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Nocni provod Budva'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod Budva'),
     NOW()),
 (
     'https://balkanfun.travel/sites/default/files/inline-images/nocni-klub-plesanje.jpg',
-    'Nocni provod Budva',
+    'Noćni provod Budva',
     false,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Nocni provod Budva'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod Budva'),
     NOW()),
 (
     'https://www.hrana-pice-price.com/wp-content/uploads/2019/04/prawn-2370680_1920.jpg',
@@ -11750,87 +11750,87 @@ VALUES
     NOW()),
 (
     'https://cdn.getyourguide.com/img/tour/b462479da72df66db77e9a7154f272c7ba1b86fe125727996216cb2ad1a398fc.jpg/99.jpg',
-    'Setnja starim gradom Kotora',
+    'Šetnja starim gradom Kotora',
     true,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Setnja starim gradom Kotora'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Šetnja starim gradom Kotora'),
     NOW()),
 (
     'https://monteonline.org/wp-content/uploads/2023/01/oldtownkotor05.jpg',
-    'Setnja starim gradom Kotora',
+    'Šetnja starim gradom Kotora',
     false,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Setnja starim gradom Kotora'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Šetnja starim gradom Kotora'),
     NOW()),
 (
     'https://kofer.info/wp-content/uploads/2020/03/shutterstock_1703935768-1000x600.jpg',
-    'Setnja starim gradom Kotora',
+    'Šetnja starim gradom Kotora',
     false,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Setnja starim gradom Kotora'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Šetnja starim gradom Kotora'),
     NOW()),
 (
     'https://respectacar.com/storage/blog/c5cf293f-db96-4743-9f6c-6ad90f46846b/kotor-old-town.jpg',
-    'Setnja starim gradom Kotora',
+    'Šetnja starim gradom Kotora',
     false,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Setnja starim gradom Kotora'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Šetnja starim gradom Kotora'),
     NOW()),
 (
     'https://skadarlakeboatcruise.com/wp-content/uploads/1111.jpg',
-    'Voznja camcem Skadarsko jezero',
+    'Vožnja čamcem Skadarsko jezero',
     true,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Voznja camcem Skadarsko jezero'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem Skadarsko jezero'),
     NOW()),
 (
     'https://skadarlakeboatcruise.com/wp-content/uploads/5-27.jpg',
-    'Voznja camcem Skadarsko jezero',
+    'Vožnja čamcem Skadarsko jezero',
     false,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Voznja camcem Skadarsko jezero'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem Skadarsko jezero'),
     NOW()),
 (
     'https://static.wixstatic.com/media/a86f42_6eedbde07bcf4db293648d5a455d2646~mv2_d_5184_3456_s_4_2.jpg/v1/fill/w_862,h_1104,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/a86f42_6eedbde07bcf4db293648d5a455d2646~mv2_d_5184_3456_s_4_2.jpg',
-    'Voznja camcem Skadarsko jezero',
+    'Vožnja čamcem Skadarsko jezero',
     false,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Voznja camcem Skadarsko jezero'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem Skadarsko jezero'),
     NOW()),
 (
     'https://visitskadarlake.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-17-at-14.28.22_58e34723.jpg',
-    'Voznja camcem Skadarsko jezero',
+    'Vožnja čamcem Skadarsko jezero',
     false,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Voznja camcem Skadarsko jezero'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem Skadarsko jezero'),
     NOW()),
 (
     'https://skadarlakeboatcruise.com/wp-content/uploads/7-7.jpg',
-    'Voznja camcem Skadarsko jezero',
+    'Vožnja čamcem Skadarsko jezero',
     false,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Voznja camcem Skadarsko jezero'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem Skadarsko jezero'),
     NOW()),
 (
     'https://www.kolasin.com/img/hero/hero-3.jpg',
-    'Skijanje Kolasin',
+    'Skijanje Kolašin',
     true,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolasin'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolašin'),
     NOW()),
 (
     'https://skijalista.me/wp-content/uploads/DJI_0410-Copy.jpg',
-    'Skijanje Kolasin',
+    'Skijanje Kolašin',
     false,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolasin'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolašin'),
     NOW()),
 (
     'https://skijalista.me/wp-content/uploads/Kolasin-1600-11-scaled.jpg',
-    'Skijanje Kolasin',
+    'Skijanje Kolašin',
     false,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolasin'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolašin'),
     NOW()),
 (
     'https://sharemontenegro.me/wp-content/uploads/2026/01/vikend-kolasin-1450.jpg',
-    'Skijanje Kolasin',
+    'Skijanje Kolašin',
     false,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolasin'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolašin'),
     NOW()),
 (
     'https://i0.wp.com/primorski.me/wp-content/uploads/2026/02/Kolasin-1450-1.jpg?fit=1920%2C1080&ssl=1',
-    'Skijanje Kolasin',
+    'Skijanje Kolašin',
     false,
-    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolasin'),
+    (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolašin'),
     NOW())
     ;
 
@@ -11845,33 +11845,33 @@ INSERT INTO "Users"
  "RoleId", "ManagedDestinationId", "CreatedAt", "UpdatedAt", "ProfileImageUrl")
 VALUES
 -- TURISTI
-('Alejandro', 'Navarro', '1998-03-15', 'alejandro.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Spanija', 'es', true, true, false, false,
+('Alejandro', 'Navarro', '1998-03-15', 'alejandro.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Isabel', 'Castro', '1999-06-27', 'isabel.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Spanija', 'es', true, true, false, false,
+('Isabel', 'Castro', '1999-06-27', 'isabel.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Miguel', 'Herrera', '1997-12-04', 'miguel.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Spanija', 'es', true, true, false, false,
+('Miguel', 'Herrera', '1997-12-04', 'miguel.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 
 -- MENADZERI ZA NOVE DESTINACIJE
-('Andres', 'Lopez', '1988-01-19', 'manager.seville@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000006', 'Spanija', 'es', true, true, false, false,
+('Andres', 'Lopez', '1988-01-19', 'manager.seville@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000006', 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Natalia', 'Vega', '1990-08-11', 'manager.granada@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000007', 'Spanija', 'es', true, true, false, false,
+('Natalia', 'Vega', '1990-08-11', 'manager.granada@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000007', 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Raul', 'Molina', '1987-05-23', 'manager.malaga@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000008', 'Spanija', 'es', true, true, false, false,
+('Raul', 'Molina', '1987-05-23', 'manager.malaga@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000008', 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Clara', 'Serrano', '1991-02-17', 'manager.bilbao@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000009', 'Spanija', 'es', true, true, false, false,
+('Clara', 'Serrano', '1991-02-17', 'manager.bilbao@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000009', 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Hugo', 'Ramos', '1989-09-30', 'manager.zaragoza@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000010', 'Spanija', 'es', true, true, false, false,
+('Hugo', 'Ramos', '1989-09-30', 'manager.zaragoza@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000010', 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Marta', 'Dominguez', '1992-04-06', 'manager.cordoba@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000011', 'Spanija', 'es', true, true, false, false,
+('Marta', 'Dominguez', '1992-04-06', 'manager.cordoba@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000011', 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Pablo', 'Iglesias', '1986-10-14', 'manager.toledo@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000012', 'Spanija', 'es', true, true, false, false,
+('Pablo', 'Iglesias', '1986-10-14', 'manager.toledo@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000012', 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Laura', 'Fuentes', '1993-07-01', 'manager.salamanca@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000013', 'Spanija', 'es', true, true, false, false,
+('Laura', 'Fuentes', '1993-07-01', 'manager.salamanca@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000013', 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Adrian', 'Campos', '1988-11-26', 'manager.ibiza@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000014', 'Spanija', 'es', true, true, false, false,
+('Adrian', 'Campos', '1988-11-26', 'manager.ibiza@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000014', 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Nerea', 'Blanco', '1990-12-09', 'manager.mallorca@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000015', 'Spanija', 'es', true, true, false, false,
+('Nerea', 'Blanco', '1990-12-09', 'manager.mallorca@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+34600000015', 'Španija', 'es', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
 
 -- 14.2 DESTINATIONS
@@ -12067,7 +12067,7 @@ INSERT INTO "Objects"
  "Status", "IsActive", "ObjectTypeId", "LocalityId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
 VALUES
 ('Hotel Casa Batllo Suites', 'Boutique hotel u istorijskom jezgru Barselone sa pogledom na gradske krovove', 'Gothic Quarter, Barcelona', '+34930000001', 'https://www.barcelonaturisme.com',
- NULL, NULL, '{"pon":"00:00-24:00"}', 210.00, ARRAY['WiFi', 'Rooftop', 'Dorucak', 'Transfer'], ST_SetSRID(ST_MakePoint(2.1746, 41.3856), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 210.00, ARRAY['WiFi', 'Rooftop', 'Doručak', 'Transfer'], ST_SetSRID(ST_MakePoint(2.1746, 41.3856), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gothic Quarter Barcelona'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'),
@@ -12094,7 +12094,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Hotel Gran Via Palace', 'Elegantni gradski hotel u centru Madrida, pogodan za obilaske i poslovna putovanja', 'Gran Via 42, Madrid', '+34910000001', 'https://www.esmadrid.com',
- NULL, NULL, '{"pon":"00:00-24:00"}', 195.00, ARRAY['WiFi', 'Spa', 'Parking', 'Dorucak'], ST_SetSRID(ST_MakePoint(-3.7049, 40.4205), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 195.00, ARRAY['WiFi', 'Spa', 'Parking', 'Doručak'], ST_SetSRID(ST_MakePoint(-3.7049, 40.4205), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Gran Via Madrid'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Madrid'),
@@ -12103,7 +12103,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Oceanic Bistro Valencia', 'Restoran inspirisan mediteranskom kuhinjom u modernom delu Valensije', 'Avinguda del Professor Lopez Pinero, Valencia', '+34960000001', 'https://www.visitvalencia.com',
- NULL, 'Mediteranska i španjolska', '{"pon":"11:00-23:00"}', 34.00, ARRAY['Terasa', 'Pogled na vodu', 'Porodicno', 'Rezervacije'], ST_SetSRID(ST_MakePoint(-0.3508, 39.4557), 4326), 0, 0, 'Approved', true,
+ NULL, 'Mediteranska i španska', '{"pon":"11:00-23:00"}', 34.00, ARRAY['Terasa', 'Pogled na vodu', 'Porodično', 'Rezervacije'], ST_SetSRID(ST_MakePoint(-0.3508, 39.4557), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ciudad de las Artes Valencia'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Valencia'),
@@ -12209,35 +12209,35 @@ INSERT INTO "Reviews"
 VALUES
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'diego.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Casa Batllo Suites'),
- 5, 'Sjajna lokacija i odlican dorucak, hotel je idealan za obilazak Barselone.', NOW()),
+ 5, 'Sjajna lokacija i odličan doručak, hotel je idealan za obilazak Barselone.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'sofia.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Casa Batllo Suites'),
- 4, 'Veoma prijatan smestaj i lep pogled sa krova, recepcija je bila brza i ljubazna.', NOW()),
+ 4, 'Veoma prijatan smeštaj i lep pogled sa krova, recepcija je bila brza i ljubazna.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'elena.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tapas House Gothic'),
- 5, 'Tapasi su bili fantasticni, a osoblje je davalo odlicne preporuke za vino.', NOW()),
+ 5, 'Tapasi su bili fantastični, a osoblje je davalo odlične preporuke za vino.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'diego.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tapas House Gothic'),
- 4, 'Odlicna hrana i fina atmosfera, samo je bilo malo guzve u vecernjem terminu.', NOW()),
+ 4, 'Odlična hrana i fina atmosfera, samo je bilo malo gužve u večernjem terminu.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'sofia.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Barceloneta Sunset Bar'),
- 5, 'Savrsen zalazak sunca, muzika taman koliko treba i super kokteli.', NOW()),
+ 5, 'Savršen zalazak sunca, muzika taman koliko treba i super kokteli.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'elena.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Gran Via Palace'),
- 4, 'Hotel je tih i uredan, a Gran Via je odlicna baza za gradske obilaske.', NOW()),
+ 4, 'Hotel je tih i uredan, a Gran Via je odlična baza za gradske obilaske.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'diego.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oceanic Bistro Valencia'),
- 5, 'Paelja je bila odlicna, a ambijent moderan i opusten.', NOW()),
+ 5, 'Paelja je bila odlična, a ambijent moderan i opušten.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'sofia.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Oceanic Bistro Valencia'),
- 4, 'Dobra usluga i lep pogled na moderni deo grada, preporuka za veceru.', NOW());
+ 4, 'Dobra usluga i lep pogled na moderni deo grada, preporuka za večeru.', NOW());
 
 INSERT INTO "Reviews"
 ("UserId", "ObjectId", "Rating", "Text", "CreatedAt")
@@ -12253,19 +12253,19 @@ VALUES
  5, 'Autentično mesto sa bogatom ponudom. Preporuka za sve koji vole lokalnu hranu.', NOW()),
 
 
--- Biblioteka Niksic
+-- Biblioteka Nikšić
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Niksic'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Nikšić'),
  4, 'Prijatno i tiho mesto za učenje. Mogao bi biti veći izbor novih knjiga.', NOW()),
 
 
--- Djecija igraonica Igalo
+-- Dječija igraonica Igalo
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecija igraonica Igalo'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječija igraonica Igalo'),
  5, 'Odlično mesto za decu, bezbedno i zabavno. Osoblje jako ljubazno.', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Djecija igraonica Igalo'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječija igraonica Igalo'),
  4, 'Deca su uživala, prostor je čist i lepo organizovan.', NOW()),
 
 
@@ -12377,11 +12377,11 @@ SET "CuisineType" = CASE "Name"
     WHEN 'Restoran Galion' THEN 'Mediteranska i morski plodovi'
     WHEN 'Hotel Avala' THEN 'Internacionalna i mediteranska'
     WHEN 'Hotel Vardar' THEN 'Mediteranska i internacionalna'
-    WHEN 'Hotel Bianca Kolasin' THEN 'Planinska i internacionalna'
+    WHEN 'Hotel Bianca Kolašin' THEN 'Planinska i internacionalna'
     ELSE "CuisineType"
 END,
     "UpdatedAt" = NOW()
-WHERE "Name" IN ('Restoran Galion', 'Hotel Avala', 'Hotel Vardar', 'Hotel Bianca Kolasin')
+WHERE "Name" IN ('Restoran Galion', 'Hotel Avala', 'Hotel Vardar', 'Hotel Bianca Kolašin')
   AND COALESCE("CuisineType", '') = '';
 
 -- 15. ITALIJA + SRBIJA DEMO KORISNICI
@@ -12431,47 +12431,47 @@ VALUES
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
 ('Riccardo', 'Lombardi', '1995-12-11', 'riccardo.italy.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Italija', 'it', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Milica', 'Petrovic', '1987-02-11', 'milica.admin.serbia@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000001', 'Srbija', 'sr', true, true, false, false,
+('Milica', 'Petrović', '1987-02-11', 'milica.admin.serbia@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000001', 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Admin'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Jelena', 'Nikolic', '1992-05-18', 'jelena.creator@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000002', 'Srbija', 'sr', true, true, false, false,
+('Jelena', 'Nikolić', '1992-05-18', 'jelena.creator@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000002', 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'ContentCreator'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Stefan', 'Jovanovic', '1989-09-02', 'manager.belgrade@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000003', 'Srbija', 'sr', true, true, false, false,
+('Stefan', 'Jovanović', '1989-09-02', 'manager.belgrade@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000003', 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Ana', 'Markovic', '1990-12-14', 'manager.novisad@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000004', 'Srbija', 'sr', true, true, false, false,
+('Ana', 'Marković', '1990-12-14', 'manager.novisad@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000004', 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Nikola', 'Savic', '1988-04-25', 'manager.zlatibor@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000005', 'Srbija', 'sr', true, true, false, false,
+('Nikola', 'Savić', '1988-04-25', 'manager.zlatibor@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640000005', 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Tamara', 'Ilic', '1997-01-17', 'tamara.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+('Tamara', 'Ilić', '1997-01-17', 'tamara.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Andrija', 'Stojanovic', '1996-08-09', 'andrija.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+('Andrija', 'Stojanović', '1996-08-09', 'andrija.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Teodora', 'Pavlovic', '1998-06-06', 'teodora.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+('Teodora', 'Pavlović', '1998-06-06', 'teodora.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
  (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Mina', 'Savic', '1998-02-14', 'mina.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+('Mina', 'Savić', '1998-02-14', 'mina.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'), 
-('Filip', 'Kostic', '1997-05-20', 'filip.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+('Filip', 'Kostić', '1997-05-20', 'filip.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Kristina', 'Vukovic', '1999-09-12', 'kristina.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
+('Kristina', 'Vuković', '1999-09-12', 'kristina.serbia.tourist@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', NULL, 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Tourist'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
- ('Marko', 'Petrovic', '1988-03-14', 'manager.nis@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001001', 'Srbija', 'sr', true, true, false, false,
+ ('Marko', 'Petrović', '1988-03-14', 'manager.nis@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001001', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Ivana', 'Jankovic', '1991-07-22', 'manager.kragujevac@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001002', 'Srbija', 'sr', true, true, false, false,
+('Ivana', 'Janković', '1991-07-22', 'manager.kragujevac@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001002', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Nikola', 'Radulovic', '1987-11-09', 'manager.subotica@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001003', 'Srbija', 'sr', true, true, false, false,
+('Nikola', 'Radulović', '1987-11-09', 'manager.subotica@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001003', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Jovana', 'Maksimovic', '1990-04-17', 'manager.kopaonik@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001004', 'Srbija', 'sr', true, true, false, false,
+('Jovana', 'Maksimović', '1990-04-17', 'manager.kopaonik@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001004', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Milos', 'Stankovic', '1989-09-28', 'manager.tara@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001005', 'Srbija', 'sr', true, true, false, false,
+('Miloš', 'Stanković', '1989-09-28', 'manager.tara@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001005', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(),'/images/profiles/default_icon.png'),
-('Aleksandra', 'Milosevic', '1992-12-03', 'manager.djerdap@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001006', 'Srbija', 'sr', true, true, false, false,
+('Aleksandra', 'Milošević', '1992-12-03', 'manager.djerdap@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001006', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Sofija', 'Nikolic', '1994-06-30', 'manager.vrnjackabanja@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001007', 'Srbija', 'sr', true, true, false, false,
+('Sofija', 'Nikolić', '1994-06-30', 'manager.vrnjackabanja@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001007', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Luka', 'Zivkovic', '1986-01-11', 'manager.palic@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001008', 'Srbija', 'sr', true, true, false, false,
+('Luka', 'Živković', '1986-01-11', 'manager.palic@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001008', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Tamara', 'Ristic', '1993-08-19', 'manager.uvac@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001009', 'Srbija', 'sr', true, true, false, false,
+('Tamara', 'Ristić', '1993-08-19', 'manager.uvac@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001009', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
-('Stefan', 'Obradovic', '1990-10-08', 'manager.mokragora@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001010', 'Srbija', 'sr', true, true, false, false,
+('Stefan', 'Obradović', '1990-10-08', 'manager.mokragora@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+381640001010', 'Srbija', 'sr', true, true, false, false,
 (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
 
 -- 15.1 ITALIJA + SRBIJA DESTINACIJE
@@ -12791,7 +12791,7 @@ VALUES
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rome'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Stari Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
-('Colosseum District', 'Istorijski deo Rima oko Koloseuma i okolnih arheoloskih tačaka, pogodan za prve obilaske grada.',
+('Colosseum District', 'Istorijski deo Rima oko Koloseuma i okolnih arheoloških tačaka, pogodan za prve obilaske grada.',
  ST_SetSRID(ST_MakePoint(12.4922, 41.8902), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rome'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
@@ -12831,7 +12831,7 @@ VALUES
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Novi Sad'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'), NOW()),
-('Petrovaradin Fortress', 'Petrovaradinska tvrđava sa vidikovcima, tunelima i jednim od najlepsih pogleda na grad i Dunav.',
+('Petrovaradin Fortress', 'Petrovaradinska tvrđava sa vidikovcima, tunelima i jednim od najlepših pogleda na grad i Dunav.',
  ST_SetSRID(ST_MakePoint(19.8644, 45.2528), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Novi Sad'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Tvrdjava'),
@@ -12861,14 +12861,14 @@ INSERT INTO "Objects"
  "Status", "IsActive", "ObjectTypeId", "LocalityId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
 VALUES
 ('Hotel Artemide Rome', 'Hotel u centralnom delu Rima sa komfornim sobama, krovnim barom i lokacijom pogodnom za obilazak glavnih znamenitosti peške.', 'Via Nazionale 22, Rome', '+3906499911', 'https://www.hotelartemide.it/',
- NULL, NULL, '{"pon":"00:00-24:00"}', 240.00, ARRAY['WiFi', 'Spa', 'Dorucak', 'Rooftop'], ST_SetSRID(ST_MakePoint(12.4938, 41.9017), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 240.00, ARRAY['WiFi', 'Spa', 'Doručak', 'Rooftop'], ST_SetSRID(ST_MakePoint(12.4938, 41.9017), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Colosseum District'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Rome'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.rome@spirego.com'),
  NOW(), NOW(), NOW()),
-('Rione 13 Trastevere', 'Restoran u Trastevereu fokusiran na rimske klasike, pizzu i opuštenu večernju atmosferu. Dobar je izbor kada neko zeli da spoji kvartovsku šetnju i konkretnu večeru.', 'Via Roma Libera 19, Rome', '+39065817418', 'https://www.rione13ristorante.com/en',
+('Rione 13 Trastevere', 'Restoran u Trastevereu fokusiran na rimske klasike, pizzu i opuštenu večernju atmosferu. Dobar je izbor kada neko želi da spoji kvartovsku šetnju i konkretnu večeru.', 'Via Roma Libera 19, Rome', '+39065817418', 'https://www.rione13ristorante.com/en',
  'https://www.rione13ristorante.com/en/menu', 'Rimska i italijanska', '{"pon":"12:00-23:30"}', 32.00, ARRAY['Rezervacije', 'Terasa', 'Vegetarijanske opcije', 'Vinska karta'], ST_SetSRID(ST_MakePoint(12.4707, 41.8898), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trastevere Rome'),
@@ -12877,7 +12877,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.rome@spirego.com'),
  NOW(), NOW(), NOW()),
 ('Hotel Canaletto Venice', 'Miran hotel u istorijskom jezgru Venecije sa tradicionalnim enterijerom i lakim pristupom mostovima i trgovima.', 'Castello 5487, Venice', '+390415220518', 'https://www.hotelcanaletto.com/',
- NULL, NULL, '{"pon":"00:00-24:00"}', 265.00, ARRAY['WiFi', 'Dorucak', 'Concierge', 'Bar'], ST_SetSRID(ST_MakePoint(12.3391, 45.4364), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 265.00, ARRAY['WiFi', 'Doručak', 'Concierge', 'Bar'], ST_SetSRID(ST_MakePoint(12.3391, 45.4364), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'San Marco Venice'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Venice'),
@@ -12893,7 +12893,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.venice@spirego.com'),
  NOW(), NOW(), NOW()),
 ('Hotel Davanzati Florence', 'Manji hotel u srcu Firence, miran i praktičan za obilazak starog jezgra bez oslanjanja na prevoz. Dobro funkcioniše za parove i za kratke gradske boravke.', 'Via Porta Rossa 5, Florence', '+39055286666', 'https://www.hoteldavanzati.it/?lang=eng',
- NULL, NULL, '{"pon":"00:00-24:00"}', 230.00, ARRAY['WiFi', 'Dorucak', 'Happy hour', 'Transfer'], ST_SetSRID(ST_MakePoint(11.2529, 43.7697), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 230.00, ARRAY['WiFi', 'Doručak', 'Happy hour', 'Transfer'], ST_SetSRID(ST_MakePoint(11.2529, 43.7697), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ponte Vecchio Florence'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Florence'),
@@ -12909,7 +12909,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.florence@spirego.com'),
  NOW(), NOW(), NOW()),
 ('Hotel Moskva Beograd', 'Istorijski hotel u centru Beograda koji je dobar izbor za goste kojima je bitna lokacija i prepoznatljiv gradski ambijent. Koristan je i za poslovna putovanja i za kratke gradske vikende.', 'Terazije 20, Belgrade', '+381113648999', 'https://hotelmoskva.rs/',
- NULL, NULL, '{"pon":"00:00-24:00"}', 185.00, ARRAY['WiFi', 'Spa', 'Dorucak', 'Poslasticarnica'], ST_SetSRID(ST_MakePoint(20.4613, 44.8135), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 185.00, ARRAY['WiFi', 'Spa', 'Doručak', 'Poslastičarnica'], ST_SetSRID(ST_MakePoint(20.4613, 44.8135), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Terazije Beograd'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
@@ -12917,7 +12917,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
  NOW(), NOW(), NOW()),
 ('Restoran Frans Beograd', 'Veliki gradski restoran sa širokim jelovnikom, baštom i ponudom koja pokriva i klasična domaća jela i internacionalnije izbore. Dobro radi i za porodične ručkove i za duža večernja sedenja.', 'Bulevar oslobodjenja 18G, Belgrade', '+381652641944', 'https://frans.rs/',
- 'https://frans.rs/menu/jelovnik/', 'Srpska i internacionalna', '{"pon":"09:00-23:30"}', 27.00, ARRAY['Basta', 'Rezervacije', 'Parking', 'Vegetarijanske opcije'], ST_SetSRID(ST_MakePoint(20.4691, 44.7976), 4326), 0, 0, 'Approved', true,
+ 'https://frans.rs/menu/jelovnik/', 'Srpska i internacionalna', '{"pon":"09:00-23:30"}', 27.00, ARRAY['Bašta', 'Rezervacije', 'Parking', 'Vegetarijanske opcije'], ST_SetSRID(ST_MakePoint(20.4691, 44.7976), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Terazije Beograd'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
@@ -12925,7 +12925,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
  NOW(), NOW(), NOW()),
 ('Hotel Pupin Novi Sad', 'Moderan gradski hotel sa centralnom pozicijom i lakim pristupom trgovima, pešačkoj zoni i obali Dunava. Često je dobar kompromis između komfora, lokacije i urednog servisa.', 'Narodnih Heroja 3, Novi Sad', '+381212156000', 'https://hotelpupin.rs/en/',
- NULL, NULL, '{"pon":"00:00-24:00"}', 170.00, ARRAY['WiFi', 'Parking', 'Dorucak', 'Fitness'], ST_SetSRID(ST_MakePoint(19.8414, 45.2559), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 170.00, ARRAY['WiFi', 'Parking', 'Doručak', 'Fitness'], ST_SetSRID(ST_MakePoint(19.8414, 45.2559), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode Novi Sad'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Novi Sad'),
@@ -12933,7 +12933,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.novisad@spirego.com'),
  NOW(), NOW(), NOW()),
 ('Kalem by Zak Novi Sad', 'Restoran i gradski lounge sa savremenijom ponudom, koktelima i urbanim ambijentom. Praktičan je za goste koji hoće ozbiljniji ručak, ali i opušteniji večernji izlazak bez napuštanja centra.', 'Narodnih Heroja 3, Novi Sad', '+381668888021', 'https://hotelpupin.rs/en/dining/kalem-by-zak/',
- 'https://hotelpupin.rs/en/dining/kalem-by-zak/menu-kalem/', 'Moderna evropska i lokalna', '{"pon":"08:00-23:30"}', 24.00, ARRAY['Terasa', 'Kokteli', 'Rezervacije', 'Dorucak'], ST_SetSRID(ST_MakePoint(19.8417, 45.2560), 4326), 0, 0, 'Approved', true,
+ 'https://hotelpupin.rs/en/dining/kalem-by-zak/menu-kalem/', 'Moderna evropska i lokalna', '{"pon":"08:00-23:30"}', 24.00, ARRAY['Terasa', 'Kokteli', 'Rezervacije', 'Doručak'], ST_SetSRID(ST_MakePoint(19.8417, 45.2560), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode Novi Sad'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Novi Sad'),
@@ -13073,53 +13073,53 @@ VALUES
 INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "CreatedAt")
 VALUES
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Artemide Rome'),
- 5, 'Lokacija je bila odlicna za prvi obilazak Rima, a osoblje je brzo resavalo sitne zahteve oko kasnog check-ina. Soba nije bila ogromna, ali je sve delovalo uredno i kvalitetno odrzavano.', NOW()),
+ 5, 'Lokacija je bila odlična za prvi obilazak Rima, a osoblje je brzo rešavalo sitne zahteve oko kasnog check-ina. Soba nije bila ogromna, ali je sve delovalo uredno i kvalitetno održavano.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Artemide Rome'),
- 4, 'Dopao mi se rooftop i cinjenica da se vecina znamenitosti moze obici peske. Jedino je dorucak bio jaci prvi dan nego drugog jutra, ali ukupni utisak je i dalje vrlo dobar.', NOW()),
+ 4, 'Dopao mi se rooftop i činjenica da se većina znamenitosti može obići peške. Jedino je doručak bio jači prvi dan nego drugog jutra, ali ukupni utisak je i dalje vrlo dobar.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rione 13 Trastevere'),
- 5, 'Hrana je stigla brzo i nijedno jelo nije delovalo genericki, sto mi je bilo vazno jer sam htela bas rimski fazon vecere. Konobari su lepo objasnili sta je jace, a sta lakse za deljenje.', NOW()),
+ 5, 'Hrana je stigla brzo i nijedno jelo nije delovalo generički, što mi je bilo važno jer sam htela baš rimski fazon večere. Konobari su lepo objasnili šta je jače, a sta lakše za deljenje.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Rione 13 Trastevere'),
- 3, 'Pasta je bila dobra, ali je terasa bila dosta bucna i cekali smo duze na drugo pice nego sto bih voleo. Vratio bih se zbog hrane, ali ne u najudarnijem terminu.', NOW()),
+ 3, 'Pasta je bila dobra, ali je terasa bila dosta bučna i čekali smo duže na drugo piće nego što bih voleo. Vratio bih se zbog hrane, ali ne u najudarnijem terminu.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Canaletto Venice'),
- 4, 'Hotel ima lep, starinski karakter i osoblje je dalo korisne savete za kretanje kroz manje prometne ulice. Soba je bila tiha, mada bi kupatilo moglo da se osvezi.', NOW()),
+ 4, 'Hotel ima lep, starinski karakter i osoblje je dalo korisne savete za kretanje kroz manje prometne ulice. Soba je bila tiha, mada bi kupatilo moglo da se osveži.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Canaletto Venice'),
- 3, 'Boravak je bio prijatan i lokacija je vrlo dobra za pesacke obilaske, ali je prostor delovao malo skuplje nego sto realno nudi. Ako je cilj centar Venecije bez mnogo komplikacija, hotel i dalje radi posao.', NOW()),
+ 3, 'Boravak je bio prijatan i lokacija je vrlo dobra za pešačke obilaske, ali je prostor delovao malo skuplje nego što realno nudi. Ako je cilj centar Venecije bez mnogo komplikacija, hotel i dalje radi posao.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Bistrot de Venise'),
- 5, 'Ovde se stvarno oseca da kuhinja ima identitet i da neko vodi racuna o detaljima, ne samo o prezentaciji. Usluga je bila mirna i profesionalna, bez onog osecaja da te ubrzavaju da oslobodis sto.', NOW()),
+ 5, 'Ovde se stvarno oseća da kuhinja ima identitet i da neko vodi računa o detaljima, ne samo o prezentaciji. Usluga je bila mirna i profesionalna, bez onog osećaja da te ubrzavaju da oslobodiš sto.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Bistrot de Venise'),
- 4, 'Jela su bila vrlo dobra, posebno riba i vino uz veceru, ali cene su vise i to treba imati u vidu. Za jedno vece u Veneciji kada zelis ozbiljniji obrok, izbor je opravdan.', NOW()),
+ 4, 'Jela su bila vrlo dobra, posebno riba i vino uz večeru, ali cene su više i to treba imati u vidu. Za jedno veče u Veneciji kada želiš ozbiljniji obrok, izbor je opravdan.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Davanzati Florence'),
- 4, 'Hotel je prijatan i deluje toplije od klasicnih gradskih hotela, sto mi je posebno prijalo posle dugog dana po muzeju. Lokacija je jaka strana, a dorucak je bio sasvim korektan.', NOW()),
+ 4, 'Hotel je prijatan i deluje toplije od klasičnih gradskih hotela, što mi je posebno prijalo posle dugog dana po muzeju. Lokacija je jaka strana, a doručak je bio sasvim korektan.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Davanzati Florence'),
- 5, 'Osoblje je bilo zaista gostoljubivo i nekoliko sitnih preporuka za veceru nam je znacilo vise nego bilo koji turisticki vodic. Sve je bilo cisto, mirno i bez neprijatnih iznenadjenja.', NOW()),
+ 5, 'Osoblje je bilo zaista gostoljubivo i nekoliko sitnih preporuka za večeru nam je značilo više nego bilo koji turistički vodič. Sve je bilo čisto, mirno i bez neprijatnih iznenađenja.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'La Loggia Firenze'),
- 3, 'Pogled je sjajan i vredan dolaska, ali su neka jela vise igrala na utisak nego na dubinu ukusa. Nije lose, samo treba ici sa idejom da placas i lokaciju i atmosferu.', NOW()),
+ 3, 'Pogled je sjajan i vredan dolaska, ali su neka jela više igrala na utisak nego na dubinu ukusa. Nije loše, samo treba ići sa idejom da plaćaš i lokaciju i atmosferu.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'La Loggia Firenze'),
- 5, 'Vece ovde je bilo jedno od najboljih u Firenci jer se dobar pogled uklopio sa opustenom uslugom i finim ritmom posluzenja. Nije mesto za brz obrok, ali za duzu veceru radi odlicno.', NOW()),
+ 5, 'Veče ovde je bilo jedno od najboljih u Firenci jer se dobar pogled uklopio sa opuštenom uslugom i finim ritmom posluženja. Nije mesto za brz obrok, ali za dužu večeru radi odlično.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Moskva Beograd'),
- 5, 'Svidelo mi se sto hotel ima prepoznatljiv karakter i ne deluje kao bilo koji moderan lanac bez identiteta. Lokacija je odlicna za peske i za dnevni obilazak i za vecernji povratak.', NOW()),
+ 5, 'Svidelo mi se što hotel ima prepoznatljiv karakter i ne deluje kao bilo koji moderan lanac bez identiteta. Lokacija je odlična za peške i za dnevni obilazak i za večernji povratak.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Moskva Beograd'),
- 4, 'Soba je bila uredna i mirna, a osoblje profesionalno, ali je ceo dozivljaj vise klasicno gradski nego luksuzan. Ipak, zbog lokacije i atmosfere bih ga opet uzeo za kraci boravak.', NOW()),
+ 4, 'Soba je bila uredna i mirna, a osoblje profesionalno, ali je ceo doživljaj više klasično gradski nego luksuzan. Ipak, zbog lokacije i atmosfere bih ga opet uzeo za kraći boravak.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Frans Beograd'),
- 4, 'Jelovnik je sirok i lako je naci nesto i za ljude koji vole klasiku i za one koji hoce laksi obrok. Usluga je bila dobra, samo je terasa bila dosta puna pa je ritam malo usporio.', NOW()),
+ 4, 'Jelovnik je širok i lako je naći nešto i za ljude koji vole klasiku i za one koji hoće lakši obrok. Usluga je bila dobra, samo je terasa bila dosta puna pa je ritam malo usporio.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Frans Beograd'),
- 3, 'Hrana je korektna i porcije su ozbiljne, ali mesto vise volim za duze sedenje i drustvo nego za nesto posebno gastronomsko. Ako neko ocekuje mirniji restoran, guzva moze malo da zasmeta.', NOW()),
+ 3, 'Hrana je korektna i porcije su ozbiljne, ali mesto više volim za duže sedenje i društvo nego za nesto posebno gastronomsko. Ako neko očekuje mirniji restoran, gužva može malo da zasmeta.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Pupin Novi Sad'),
- 5, 'Hotel je uredan, moderan i vrlo praktican kada hoces da budes blizu glavnog trga i pesacke zone. Posebno mi je znacilo sto sve deluje novo i dobro organizovano bez nepotrebne pompe.', NOW()),
+ 5, 'Hotel je uredan, moderan i vrlo praktičan kada hoćeš da budes blizu glavnog trga i pešačke zone. Posebno mi je značilo što sve deluje novo i dobro organizovano bez nepotrebne pompe.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Pupin Novi Sad'),
- 4, 'Lokacija je jaka strana, a dorucak i prijava su prosli bez problema. Jedino je pogled iz sobe bio manje zanimljiv nego sto sam ocekivala po fotografijama.', NOW()),
+ 4, 'Lokacija je jaka strana, a doručak i prijava su prosli bez problema. Jedino je pogled iz sobe bio manje zanimljiv nego što sam očekivala po fotografijama.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kalem by Zak Novi Sad'),
- 5, 'Mesto ima fin balans izmedju ozbiljnog rucka i opustenije gradske energije, pa je lako ostati duze nego sto planiras. Hrana nije bila teska, a kokteli su bili iznad ocekivanja.', NOW()),
+ 5, 'Mesto ima fin balans izmedju ozbiljnog ručka i opuštenije gradske energije, pa je lako ostati duže nego što planiraš. Hrana nije bila teška, a kokteli su bili iznad očekivanja.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kalem by Zak Novi Sad'),
- 4, 'Ambijent je vrlo prijatan i lokacija zgodna kada si vec u centru, a meni ima dovoljno izbora da grupa lako nadje zajednicki termin. Cene nisu najnize, ali servis je bio uredan i brz.', NOW()),
+ 4, 'Ambijent je vrlo prijatan i lokacija zgodna kada si već u centru, a meni ima dovoljno izbora da grupa lako nađe zajednički termin. Cene nisu najniže, ali servis je bio uredan i brz.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Zlatibor Mountain Resort'),
- 3, 'Hotel ima dosta sadrzaja i dobra je baza za kraci odmor, ali u spicu se oseca da kroz zajednicke prostore prolazi veliki broj gostiju. Kada je cilj prakticnost i spa, to ne mora da bude problem.', NOW()),
+ 3, 'Hotel ima dosta sadržaja i dobra je baza za kraći odmor, ali u špicu se oseća da kroz zajedničke prostore prolazi veliki broj gostiju. Kada je cilj praktičnost i spa, to ne mora da bude problem.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Zlatibor Mountain Resort'),
- 4, 'Spa i lokacija u centru su mi bili najveci plus, a osoblje je bilo vrlo korektno kada smo trazili kasniji check-out. Dobar je izbor ako zelis da sve bude na jednom mestu.', NOW()),
+ 4, 'Spa i lokacija u centru su mi bili najveći plus, a osoblje je bilo vrlo korektno kada smo tražili kasniji check-out. Dobar je izbor ako želiš da sve bude na jednom mestu.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lobby Bar Zlatibor'),
- 2, 'Pice je bilo okej, ali je usluga tog dana bila sporija nego sto sam ocekivao, a muzika je bila glasnija nego sto prija kada hoces samo kratku pauzu. Za opusten razgovor nisam uhvatio pravi termin.', NOW()),
+ 2, 'Piće je bilo okej, ali je usluga tog dana bila sporija nego što sam očekivao, a muzika je bila glasnija nego što prija kada hoćeš samo kratku pauzu. Za opušten razgovor nisam uhvatio pravi termin.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lobby Bar Zlatibor'),
- 4, 'Kad smo svratili ranije popodne atmosfera je bila dosta prijatnija i mesto je lepo leglo za kratki predah posle setnje. Karta pica je solidna, a prostor deluje moderno i uredno.', NOW());
+ 4, 'Kad smo svratili ranije popodne atmosfera je bila dosta prijatnija i mesto je lepo leglo za kratki predah posle šetnje. Karta pića je solidna, a prostor deluje moderno i uredno.', NOW());
 
 -- 15.7 ITALIJA + SRBIJA IMAGES - DESTINACIJE
 WITH source("Url", "AltText", "IsMain", "DestinationName") AS (
@@ -13479,14 +13479,14 @@ SET
         WHEN 'Bar' THEN 'Luka, Stari Bar i opuštena obala za lagan obilazak'
         WHEN 'Ulcinj' THEN 'Pesak, sunce i jug sa drugačijom energijom'
         WHEN 'Cetinje' THEN 'Istorija, muzeji i mirniji ritam stare prestonice'
-        WHEN 'Niksic' THEN 'Trgovi, parkovi i gradski život okružen prirodom'
-        WHEN 'Tivat' THEN 'Marina, šetalista i moderan ritam zaliva'
+        WHEN 'Nikšić' THEN 'Trgovi, parkovi i gradski život okružen prirodom'
+        WHEN 'Tivat' THEN 'Marina, šetališta i moderan ritam zaliva'
         WHEN 'Igalo' THEN 'More, wellness i lagane šetnje uz obalu'
-        WHEN 'Lovcen' THEN 'Vidikovci, Njegoš i planina koja čuva identitet zemlje'
+        WHEN 'Lovćen' THEN 'Vidikovci, Njegoš i planina koja čuva identitet zemlje'
         WHEN 'Skadarsko jezero' THEN 'Čamci, ptice i mir koji traje duže od izleta'
-        WHEN 'Kolasin' THEN 'Planinski vazduh, ski centri i odmor tokom cele godine'
-        WHEN 'Zabljak' THEN 'Crno jezero, Durmitor i dani puni aktivnosti'
-        WHEN 'Pluzine' THEN 'Pivsko jezero, kanjoni i mirniji planinski beg'
+        WHEN 'Kolašin' THEN 'Planinski vazduh, ski centri i odmor tokom cele godine'
+        WHEN 'Žabljak' THEN 'Crno jezero, Durmitor i dani puni aktivnosti'
+        WHEN 'Plužine' THEN 'Pivsko jezero, kanjoni i mirniji planinski beg'
         WHEN 'Andrijevica' THEN 'Komovi, reke i autentični severni ambijent'
         WHEN 'Plav' THEN 'Jezero, Prokletije i miran ritam severa'
         WHEN 'Barcelona' THEN 'Gaudi, more i večeri u gotičkoj četvrti'
@@ -13501,42 +13501,42 @@ SET
         ELSE "DisplayTitle"
     END,
     "Description" = CASE "Name"
-        WHEN 'Kotorski zaliv' THEN 'Kotorski zaliv spaja mirnu morsku površinu, strme planine i niz istorijskih mesta uz samu obalu. Putovanje ovde lako prelazi iz setnje kroz Kotor i Perast u kratke voznje obalom, kafu uz more i sporiji mediteranski ritam. Dobar je izbor za putnike koji vole pejzaze, fotografiju i kombinaciju kulture i odmora.'
-        WHEN 'Kotor' THEN 'Kotor je istorijski grad u srcu zaliva, poznat po zidinama, trgovima i starom gradu pod zastitom UNESCO-a. Dan ovde lako krene obilaskom uskih kamenih ulica, nastavi se usponom ka tvrdjavi i zavrsi vecerom uz more. Posebno prija putnicima koji vole istoriju, atmosferu i setnje bez zurbe.'
-        WHEN 'Budva' THEN 'Budva kombinuje plaze, stari grad i energicnu turisticku scenu na malom prostoru. Posetioci mogu da provedu jutro uz more, popodne u kamenim ulicama starog grada, a vece u restoranima i barovima uz obalu. Odlicna je za one koji zele i odmor i zivlju atmosferu.'
-        WHEN 'Durmitor' THEN 'Durmitor je planinska destinacija za ljude koji traze prirodu, vazduh i aktivan dan napolju. Crno jezero, vidikovci, pesacke staze i blizina kanjona Tare cine ga odlicnim za vise dana istrazivanja. Ovde se lako prelazi iz mirne setnje u ozbiljniju avanturu, zavisno od ritma putovanja.'
-        WHEN 'Sveti Stefan' THEN 'Sveti Stefan je jedna od najupecatljivijih tacki crnogorskog primorja, prepoznatljiv po ostrvu povezanom sa kopnom. Okolina nudi mirnije uvale, panoramske poglede i elegantniji ritam odmora nego veci turisticki centri. Posebno prija putnicima koji traze lepe kadrove, tisinu i more.'
-        WHEN 'Podgorica' THEN 'Podgorica je glavni grad i prakticna baza za istrazivanje razlicitih delova Crne Gore. Grad ima siroke bulevare, reke, restorane, parkove i dovoljno urbanog ritma za kraci city break ili usputni boravak. Dobra je kada neko zeli kombinaciju svakodnevnog gradskog zivota i lakih izleta van centra.'
-        WHEN 'Herceg Novi' THEN 'Herceg Novi je grad stepenica, tvrdjava i dugih setnji uz more na ulazu u Bokokotorski zaliv. Njegovi trgovi i stare ulice daju mu izrazen karakter, dok obala ostavlja prostor za mirnije popodne i duza vecernja setalista. Posebno odgovara putnicima koji vole zeleni mediteranski ambijent i staru primorsku atmosferu.'
-        WHEN 'Bar' THEN 'Bar spaja funkcionalan primorski grad, dugu obalu i istorijski sloj Starog Bara u zaledju. Posetioci mogu da provedu dan na moru, a zatim da obilaze tvrdjavu, maslinjake i starije kamene delove grada. Dobar je za ljude koji vole da kombinuju plazu, istoriju i opusteniji ritam.'
-        WHEN 'Ulcinj' THEN 'Ulcinj nosi drugaciju energiju juga, sa dugim pescanim plazama, vetrom i opustenijom atmosferom. Velika plaza i Ada Bojana su najjaci magnet za ljubitelje sunca, vode i duzih boravaka napolju. Grad prija putnicima koji zele vise prostora, topliji mediteranski ritam i malo drugaciji kulturni ton.'
-        WHEN 'Cetinje' THEN 'Cetinje je istorijska prestonica sa muzejima, manastirima i ulicama koje cuvaju drzavnicku i kulturnu memoriju zemlje. Nije grad za zurbu, vec za sporiji obilazak, kratke pauze i fokus na price, zgrade i institucije. Posebno ce prijati ljubiteljima istorije i mirnijeg gradskog ambijenta.'
-        WHEN 'Niksic' THEN 'Niksic je sirok, pregledan grad sa trgovima, parkovima i jakim lokalnim ritmom. Osim urbanog dela, blizu su mu jezera, izletista i versko-istorijske tacke poput Ostroga. Dobar je kada neko zeli gradski boravak uz lak izlaz u prirodu.'
-        WHEN 'Tivat' THEN 'Tivat je moderan primorski grad sa marinom, setalistima i uredjenim delovima obale. Porto Montenegro mu daje elegantniji ton, ali grad ostaje lagan za setnju i prijatan za kraci odmor uz more. Odgovara putnicima koji vole savremeniji izgled obale, restorane i mirniji luksuz.'
-        WHEN 'Igalo' THEN 'Igalo je poznato po banjskom i wellness turizmu, ali i po dugim setnjama uz obalu. U blizini Herceg Novog nudi mirniji boravak, tretmane, more i vise prostora za oporavak i laganiji tempo dana. Dobro odgovara ljudima koji na putovanju zele da spoje zdravlje, odmor i setnju.'
-        WHEN 'Lovcen' THEN 'Lovcen je planina sa jakim simbolickim znacajem i jednim od najimpresivnijih vidikovaca u zemlji. Put do Njegosevog mauzoleja i pogled sa vrha cine ovu destinaciju jednom od najpamtljivijih za prvi obilazak Crne Gore. Prija putnicima koji vole panorame, planinski vazduh i osecaj prostora.'
-        WHEN 'Skadarsko jezero' THEN 'Skadarsko jezero je destinacija za sporiji boravak u prirodi, voznju camcem i posmatranje ptica. Oko jezera se smenjuju mala mesta, vidikovci, vinske tacke i mirniji ritam od morskih gradova. Posebno je dobar izbor za putnike koji traze fotografiju, prirodu i lagan dan van gradske guzve.'
-        WHEN 'Kolasin' THEN 'Kolasin je planinski grad koji dobro radi i zimi i leti. Zimi ga ljudi vezuju za ski centre, a topliji deo godine za setnje, recne doline, sumu i izlazak ka nacionalnim parkovima. Dobar je za one koji hoce uredjenu bazu za aktivan odmor u prirodi.'
-        WHEN 'Zabljak' THEN 'Zabljak je ulaz u Durmitor i jedna od najboljih baza za planinske aktivnosti u zemlji. Crno jezero, vidikovci, biciklisticke i pesacke staze, kao i zimski sadrzaji, daju mu ritam tokom cele godine. Prija putnicima koji zele prirodu na dohvat ruke od jutra do veceri.'
-        WHEN 'Pluzine' THEN 'Pluzine nude mirniji planinski boravak uz Pivsko jezero, kanjone i siroke pejzaze. Ovo je mesto za sporiji tempo, voznju, poglede i odmore koji vise zavise od prirode nego od gradske ponude. Dobar je izbor za one koji traze tisi sever zemlje.'
-        WHEN 'Andrijevica' THEN 'Andrijevica je severna planinska baza za izlete ka Komovima i Prokletijama. Reke, doline i okolne planine daju joj jednostavan, autentican karakter i dosta mogucnosti za aktivan dan napolju. Posebno prija putnicima koji vole manje sredine i planinski ambijent bez velike guzve.'
-        WHEN 'Plav' THEN 'Plav kombinuje planinsku atmosferu, jezero i blizinu Prokletija. Destinacija je pogodna za one koji vole prirodu, duze voznje, pesacenje i mirniji severni ritam. Dobro radi kao baza za vise dana istrazivanja okoline.'
-        WHEN 'Barcelona' THEN 'Barcelona spaja more, Gaudijevu arhitekturu, kvartove pune detalja i vrlo ziv gradski ritam. U istom danu mozes da obidjes Sagradu Familiju, prosetas kroz Gothic Quarter, sednes na tapas i zavrsis uz obalu. Posebno prija putnicima koji vole kombinaciju kulture, hrane i grada koji dugo ostaje budan.'
-        WHEN 'Madrid' THEN 'Madrid je grad sirokih bulevara, velikih muzeja i stalne gradske energije. Putnici ovde lako kombinuju Prado, Retiro, trznice, tapas barove i vecernji izlazak bez potrebe da zure izmedju tacki. Dobar je za city break koji trazi i kulturu i ritam velikog grada.'
-        WHEN 'Valencia' THEN 'Valencia spaja mediteranski tempo, modernu arhitekturu i poznatu gastronomsku scenu. Grad je prijatan za setnju i bicikl, a lako kombinuje istorijski centar, more i Ciudad de las Artes. Dobar je za putnike koji zele topliji i opusteniji ritam od vecih evropskih prestonica.'
-        WHEN 'Rome' THEN 'Rim je grad u kojem se svakodnevni ritam mesa sa antickim slojevima istorije, trgovima, fontanama i dugim vecerama. Putnik u jednom danu moze da obidje Koloseum, da sedne na kafu u malom baru i da završi veče uz testeninu i vino u Trastevereu. Zbog tog spoja velikih znamenitosti i malih kvartovskih trenutaka, Rim je dobar i za prvi dolazak i za sporiji povratak.'
-        WHEN 'Venice' THEN 'Venecija nudi sporiji ritam obilaska, setnje preko mostova i male gastronomske pauze uz poglede na kanale. Grad je posebno zanimljiv putnicima koji vole atmosferu, umetnost i osećaj da je gotovo svaka ulica scenografija. Najviše prija kada se obilazi bez velike žurbe, uz vreme za male prolaze, trgove i zalaske sunca.'
-        WHEN 'Florence' THEN 'Firenca spaja umetnost, zanatstvo i toskansku gastronomiju na malom prostoru koji je lako obici peske. Grad je odličan za putnike koji žele da kombinuju muzeje, panoramske poglede, lagan gradski tempo i ozbiljno dobru hranu. Posebno je lepa za one koji vole da im se kultura i svakodnevni život prepliću iz ulice u ulicu.'
+        WHEN 'Kotorski zaliv' THEN 'Kotorski zaliv spaja mirnu morsku površinu, strme planine i niz istorijskih mesta uz samu obalu. Putovanje ovde lako prelazi iz šetnje kroz Kotor i Perast u kratke vožnje obalom, kafu uz more i sporiji mediteranski ritam. Dobar je izbor za putnike koji vole pejzaže, fotografiju i kombinaciju kulture i odmora.'
+        WHEN 'Kotor' THEN 'Kotor je istorijski grad u srcu zaliva, poznat po zidinama, trgovima i starom gradu pod zaštitom UNESCO-a. Dan ovde lako krene obilaskom uskih kamenih ulica, nastavi se usponom ka tvrđavi i završi večerom uz more. Posebno prija putnicima koji vole istoriju, atmosferu i šetnje bez žurbe.'
+        WHEN 'Budva' THEN 'Budva kombinuje plaže, stari grad i energičnu turističku scenu na malom prostoru. Posetioci mogu da provedu jutro uz more, popodne u kamenim ulicama starog grada, a veče u restoranima i barovima uz obalu. Odlična je za one koji žele i odmor i življu atmosferu.'
+        WHEN 'Durmitor' THEN 'Durmitor je planinska destinacija za ljude koji traže prirodu, vazduh i aktivan dan napolju. Crno jezero, vidikovci, pešačke staze i blizina kanjona Tare čine ga odličnim za više dana istraživanja. Ovde se lako prelazi iz mirne šetnje u ozbiljniju avanturu, zavisno od ritma putovanja.'
+        WHEN 'Sveti Stefan' THEN 'Sveti Stefan je jedna od najupečatljivijih tački crnogorskog primorja, prepoznatljiv po ostrvu povezanom sa kopnom. Okolina nudi mirnije uvale, panoramske poglede i elegantniji ritam odmora nego veći turistički centri. Posebno prija putnicima koji traže lepe kadrove, tišinu i more.'
+        WHEN 'Podgorica' THEN 'Podgorica je glavni grad i praktična baza za istraživanje različitih delova Crne Gore. Grad ima široke bulevare, reke, restorane, parkove i dovoljno urbanog ritma za kraći city break ili usputni boravak. Dobra je kada neko želi kombinaciju svakodnevnog gradskog života i lakih izleta van centra.'
+        WHEN 'Herceg Novi' THEN 'Herceg Novi je grad stepenica, tvrđava i dugih šetnji uz more na ulazu u Bokokotorski zaliv. Njegovi trgovi i stare ulice daju mu izražen karakter, dok obala ostavlja prostor za mirnije popodne i duža večernja šetališta. Posebno odgovara putnicima koji vole zeleni mediteranski ambijent i staru primorsku atmosferu.'
+        WHEN 'Bar' THEN 'Bar spaja funkcionalan primorski grad, dugu obalu i istorijski sloj Starog Bara u zaleđu. Posetioci mogu da provedu dan na moru, a zatim da obilaze tvrđavu, maslinjake i starije kamene delove grada. Dobar je za ljude koji vole da kombinuju plažu, istoriju i opušteniji ritam.'
+        WHEN 'Ulcinj' THEN 'Ulcinj nosi drugačiju energiju juga, sa dugim peščanim plažama, vetrom i opuštenijom atmosferom. Velika plaža i Ada Bojana su najjači magnet za ljubitelje sunca, vode i dužih boravaka napolju. Grad prija putnicima koji žele više prostora, topliji mediteranski ritam i malo drugačiji kulturni ton.'
+        WHEN 'Cetinje' THEN 'Cetinje je istorijska prestonica sa muzejima, manastirima i ulicama koje čuvaju državničku i kulturnu memoriju zemlje. Nije grad za žurbu, već za sporiji obilazak, kratke pauze i fokus na priče, zgrade i institucije. Posebno će prijati ljubiteljima istorije i mirnijeg gradskog ambijenta.'
+        WHEN 'Nikšić' THEN 'Nikšić je širok, pregledan grad sa trgovima, parkovima i jakim lokalnim ritmom. Osim urbanog dela, blizu su mu jezera, izletišta i versko-istorijske tačke poput Ostroga. Dobar je kada neko želi gradski boravak uz lak izlaz u prirodu.'
+        WHEN 'Tivat' THEN 'Tivat je moderan primorski grad sa marinom, šetalištima i uređenim delovima obale. Porto Montenegro mu daje elegantniji ton, ali grad ostaje lagan za šetnju i prijatan za kraći odmor uz more. Odgovara putnicima koji vole savremeniji izgled obale, restorane i mirniji luksuz.'
+        WHEN 'Igalo' THEN 'Igalo je poznato po banjskom i wellness turizmu, ali i po dugim šetnjama uz obalu. U blizini Herceg Novog nudi mirniji boravak, tretmane, more i više prostora za oporavak i laganiji tempo dana. Dobro odgovara ljudima koji na putovanju žele da spoje zdravlje, odmor i šetnju.'
+        WHEN 'Lovćen' THEN 'Lovćen je planina sa jakim simboličkim značajem i jednim od najimpresivnijih vidikovaca u zemlji. Put do Njegoševog mauzoleja i pogled sa vrha čine ovu destinaciju jednom od najpamtljivijih za prvi obilazak Crne Gore. Prija putnicima koji vole panorame, planinski vazduh i osećaj prostora.'
+        WHEN 'Skadarsko jezero' THEN 'Skadarsko jezero je destinacija za sporiji boravak u prirodi, vožnju čamcem i posmatranje ptica. Oko jezera se smenjuju mala mesta, vidikovci, vinske tačke i mirniji ritam od morskih gradova. Posebno je dobar izbor za putnike koji traže fotografiju, prirodu i lagan dan van gradske gužve.'
+        WHEN 'Kolašin' THEN 'Kolašin je planinski grad koji dobro radi i zimi i leti. Zimi ga ljudi vezuju za ski centre, a topliji deo godine za šetnje, rečne doline, šumu i izlazak ka nacionalnim parkovima. Dobar je za one koji hoće uređenu bazu za aktivan odmor u prirodi.'
+        WHEN 'Žabljak' THEN 'Žabljak je ulaz u Durmitor i jedna od najboljih baza za planinske aktivnosti u zemlji. Crno jezero, vidikovci, biciklističke i pešačke staze, kao i zimski sadržaji, daju mu ritam tokom cele godine. Prija putnicima koji žele prirodu na dohvat ruke od jutra do večeri.'
+        WHEN 'Plužine' THEN 'Plužine nude mirniji planinski boravak uz Pivsko jezero, kanjone i široke pejzaže. Ovo je mesto za sporiji tempo, vožnju, poglede i odmore koji više zavise od prirode nego od gradske ponude. Dobar je izbor za one koji traže tiši sever zemlje.'
+        WHEN 'Andrijevica' THEN 'Andrijevica je severna planinska baza za izlete ka Komovima i Prokletijama. Reke, doline i okolne planine daju joj jednostavan, autentičan karakter i dosta mogućnosti za aktivan dan napolju. Posebno prija putnicima koji vole manje sredine i planinski ambijent bez velike gužve.'
+        WHEN 'Plav' THEN 'Plav kombinuje planinsku atmosferu, jezero i blizinu Prokletija. Destinacija je pogodna za one koji vole prirodu, duže vožnje, pešačenje i mirniji severni ritam. Dobro radi kao baza za više dana istraživanja okoline.'
+        WHEN 'Barcelona' THEN 'Barcelona spaja more, Gaudijevu arhitekturu, kvartove pune detalja i vrlo živ gradski ritam. U istom danu možeš da obiđeš Sagradu Familiju, prošetaš kroz Gothic Quarter, sedneš na tapas i završiš uz obalu. Posebno prija putnicima koji vole kombinaciju kulture, hrane i grada koji dugo ostaje budan.'
+        WHEN 'Madrid' THEN 'Madrid je grad širokih bulevara, velikih muzeja i stalne gradske energije. Putnici ovde lako kombinuju Prado, Retiro, tržnice, tapas barove i večernji izlazak bez potrebe da žure između tački. Dobar je za city break koji traži i kulturu i ritam velikog grada.'
+        WHEN 'Valencia' THEN 'Valencia spaja mediteranski tempo, modernu arhitekturu i poznatu gastronomsku scenu. Grad je prijatan za šetnju i bicikl, a lako kombinuje istorijski centar, more i Ciudad de las Artes. Dobar je za putnike koji žele topliji i opušteniji ritam od većih evropskih prestonica.'
+        WHEN 'Rome' THEN 'Rim je grad u kojem se svakodnevni ritam meša sa antičkim slojevima istorije, trgovima, fontanama i dugim večerama. Putnik u jednom danu može da obiđe Koloseum, da sedne na kafu u malom baru i da završi veče uz testeninu i vino u Trastevereu. Zbog tog spoja velikih znamenitosti i malih kvartovskih trenutaka, Rim je dobar i za prvi dolazak i za sporiji povratak.'
+        WHEN 'Venice' THEN 'Venecija nudi sporiji ritam obilaska, šetnje preko mostova i male gastronomske pauze uz poglede na kanale. Grad je posebno zanimljiv putnicima koji vole atmosferu, umetnost i osećaj da je gotovo svaka ulica scenografija. Najviše prija kada se obilazi bez velike žurbe, uz vreme za male prolaze, trgove i zalaske sunca.'
+        WHEN 'Florence' THEN 'Firenca spaja umetnost, zanatstvo i toskansku gastronomiju na malom prostoru koji je lako obići peške. Grad je odličan za putnike koji žele da kombinuju muzeje, panoramske poglede, lagan gradski tempo i ozbiljno dobru hranu. Posebno je lepa za one koji vole da im se kultura i svakodnevni život prepliću iz ulice u ulicu.'
         WHEN 'Beograd' THEN 'Beograd je grad širokih bulevara, tvrđave iznad ušća i kafana koje žive do kasno. Posetioci ovde lako kombinuju istorijske tačke, moderni gradski ritam, dobru kafu i večere koje se često produže više nego što je planirano. Dobar je izbor za putnike koji vole energiju velikog grada, ali i spontane male pauze pored reke.'
-        WHEN 'Novi Sad' THEN 'Novi Sad ima mirniji ritam, ali bogat gradski sadrzaj, uredjene trgove, dobru gastronomsku scenu i jak kulturni identitet. Posebno je prijatan za putnike koji vole setnju, dobru hranu i pogled sa Petrovaradina prema Dunavu i gradu. Grad lako ostavlja utisak mesta u kome možeš i da obilaziš i da usporiš.'
+        WHEN 'Novi Sad' THEN 'Novi Sad ima mirniji ritam, ali bogat gradski sadržaj, uređene trgove, dobru gastronomsku scenu i jak kulturni identitet. Posebno je prijatan za putnike koji vole šetnju, dobru hranu i pogled sa Petrovaradina prema Dunavu i gradu. Grad lako ostavlja utisak mesta u kome možeš i da obilaziš i da usporiš.'
         WHEN 'Zlatibor' THEN 'Zlatibor je destinacija za sporiji planinski ritam, panoramske poglede, duge šetnje i odmor uz lokalne specijalitete. Pogodan je i za kratke vikend odmore i za duže boravke kada neko želi da kombinuje prirodu, wellness i lakše aktivnosti napolju. Posebno odgovara putnicima koji hoće uređenu planinsku bazu bez prevelikog napora oko organizacije.'
         ELSE "Description"
     END,
     "UpdatedAt" = NOW()
 WHERE "Name" IN (
     'Kotorski zaliv', 'Kotor', 'Budva', 'Durmitor', 'Sveti Stefan', 'Podgorica',
-    'Herceg Novi', 'Bar', 'Ulcinj', 'Cetinje', 'Niksic', 'Tivat', 'Igalo', 'Lovcen',
-    'Skadarsko jezero', 'Kolasin', 'Zabljak', 'Pluzine', 'Andrijevica', 'Plav',
+    'Herceg Novi', 'Bar', 'Ulcinj', 'Cetinje', 'Nikšić', 'Tivat', 'Igalo', 'Lovćen',
+    'Skadarsko jezero', 'Kolašin', 'Žabljak', 'Plužine', 'Andrijevica', 'Plav',
     'Barcelona', 'Madrid', 'Valencia', 'Rome', 'Venice', 'Florence', 'Beograd',
     'Novi Sad', 'Zlatibor'
 );

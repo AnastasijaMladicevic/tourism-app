@@ -23,12 +23,17 @@ import { LocalityService } from '../../services/locality';
 import { RegionService } from '../../services/region';
 import { ActiveRegionService } from '../../services/active-region';
 import { LocationTrackingService, TrackedLocation } from '../../services/location-tracking';
+import {
+  LocationIntelligenceService,
+  QuietZoneAddressSuggestion,
+} from '../../services/location-intelligence';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 import { environment } from '../../../environment/environment';
 import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
 
 interface SearchResult {
-  id: number;
+  id: number | string;
   name: string;
   typeName: string;
   location: string;
@@ -37,7 +42,7 @@ interface SearchResult {
   lat?: number;
   lng?: number;
   raw: any;
-  category: 'destination' | 'object' | 'event' | 'activity' | 'locality';
+  category: 'destination' | 'object' | 'event' | 'activity' | 'locality' | 'address';
   markerType: string;
 }
 
@@ -48,7 +53,7 @@ interface FilterChip {
 }
 
 interface RoutePoint {
-  id: number;
+  id: number | string;
   name: string;
   type: string;
   lat: number;
@@ -64,7 +69,7 @@ const SEARCH_STOP_WORDS = new Set([
 @Component({
   selector: 'app-map',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, DragDropModule],
+  imports: [CommonModule, FormsModule, MatIconModule, DragDropModule, TranslatePipe],
   templateUrl: './map.html',
   styleUrls: ['./map.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -97,6 +102,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   isRoutePickingMode = false;
   routePickingType: 'start' | 'end' | 'add' = 'add';
   isTracking = false;
+  showLocationConsentPrompt = false;
   private userMarker: L.Marker | null = null;
   private userCircle: L.Circle | null = null;
 
@@ -106,6 +112,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly subscriptions = new Subscription();
   private shouldCenterOnNextLocation = false;
   private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+  private routeSearchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+  private temporarySearchMarker: L.Marker | null = null;
 
   constructor(
     private mapService: MapService,
@@ -120,11 +128,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     private regionService: RegionService,
     private activeRegionService: ActiveRegionService,
     private locationTrackingService: LocationTrackingService,
+    private locationIntelligenceService: LocationIntelligenceService,
   ) { }
 
   ngOnInit(): void {
     window.addEventListener('map-marker-clicked', (event: any) => {
       this.ngZone.run(() => {
+        this.clearTemporarySearchMarker();
         this.selectedItem = event.detail.data;
         this.selectedType = event.detail.type;
 
@@ -189,24 +199,41 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       clearTimeout(this.searchDebounceTimer);
       this.searchDebounceTimer = null;
     }
+    if (this.routeSearchDebounceTimer) {
+      clearTimeout(this.routeSearchDebounceTimer);
+      this.routeSearchDebounceTimer = null;
+    }
+    this.clearTemporarySearchMarker();
     this.mapService.destroyMap();
   }
 
   toggleGpsTracking(): void {
-    if (this.isTracking) {
-      this.locationTrackingService.stopTracking();
-    } else {
-      if (!this.locationTrackingService.startTracking()) {
-        return;
-      }
-
-      this.shouldCenterOnNextLocation = true;
-      const currentLocation = this.locationTrackingService.getCurrentLocation();
-      if (currentLocation) {
-        this.mapService.flyTo(currentLocation.latitude, currentLocation.longitude, 16);
-        this.shouldCenterOnNextLocation = false;
-      }
+    if (!this.isTracking) {
+      this.openLocationConsentPrompt();
+      return;
     }
+
+    this.shouldCenterOnNextLocation = true;
+    const currentLocation = this.locationTrackingService.getCurrentLocation();
+    if (currentLocation) {
+      this.mapService.flyTo(currentLocation.latitude, currentLocation.longitude, 16);
+      this.shouldCenterOnNextLocation = false;
+    }
+  }
+
+  openLocationConsentPrompt(): void {
+    this.showLocationConsentPrompt = true;
+  }
+
+  closeLocationConsentPrompt(): void {
+    this.showLocationConsentPrompt = false;
+  }
+
+  openLocationConsentSettings(): void {
+    this.showLocationConsentPrompt = false;
+    void this.router.navigate(['/location-settings'], {
+      queryParams: { locationConsent: '1' },
+    });
   }
 
   private updateUserMarker(latlng: L.LatLng, accuracy: number): void {
@@ -420,8 +447,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         return;
       }
 
-      this.applyFallbackSearch(query);
-      this.cdr.detectChanges();
+      void this.applyFallbackSearch(query);
     }, 260);
   }
 
@@ -473,10 +499,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    this.showSuggestions = false;
-    this.router.navigate(['/search'], {
-      queryParams: { q: query, source: 'map' },
-    });
+    if (this.searchResults.length > 0) {
+      this.selectSuggestion(this.searchResults[0]);
+      return;
+    }
+
+    void this.selectTopSearchResult(query);
   }
 
   private toRoutePoint(result: SearchResult): RoutePoint | null {
@@ -498,18 +526,21 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     if (result.lat && result.lng) {
       this.mapService.flyTo(result.lat, result.lng, 16);
-      if (
+      if (result.category === 'address') {
+        this.focusAddressResult(result);
+      } else if (
         result.category === 'destination' ||
         result.category === 'locality' ||
         result.category === 'activity' ||
         result.category === 'object' ||
         result.category === 'event'
       ) {
+        this.clearTemporarySearchMarker();
         setTimeout(() => {
           const markerType = result.category === 'object'
             ? this.normalizeMarkerType(result.markerType)
             : result.category;
-          this.mapService.triggerMarkerClick(markerType, result.id);
+          this.mapService.triggerMarkerClick(markerType, Number(result.id));
         }, 600);
       }
       if (this.isRoutePlannerOpen) {
@@ -518,9 +549,20 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private applyFallbackSearch(query: string): void {
-    this.searchResults = this.runLocalSearch(query, 8);
+  private async applyFallbackSearch(query: string): Promise<void> {
+    const localResults = this.runLocalSearch(query, 5);
+    const addressResults = this.toAddressSearchResults(
+      await this.locationIntelligenceService.searchAddresses(query),
+      'map',
+    );
+
+    if (this.searchQuery.trim() !== query) {
+      return;
+    }
+
+    this.searchResults = [...localResults, ...addressResults].slice(0, 8);
     this.showSuggestions = this.searchResults.length > 0;
+    this.cdr.detectChanges();
   }
 
   private tokenizeSearchQuery(query: string): string[] {
@@ -852,6 +894,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   getItemLocation(): string {
     if (!this.selectedItem) return '';
+    if (this.selectedType === 'address') {
+      return this.selectedItem.address ?? '';
+    }
     if (this.selectedType === 'destination') {
       return this.selectedItem.regionName ?? this.selectedItem.destinationTypeName ?? '';
     }
@@ -949,14 +994,45 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   openDetails(): void {
     if (!this.selectedItem) return;
 
-    this.router.navigate(['/destination', this.selectedItem.id]);
-}
+    switch (this.selectedType) {
+      case 'destination':
+        void this.router.navigate(['/destination', this.selectedItem.id]);
+        return;
+      case 'locality':
+        void this.router.navigate(['/locality', this.selectedItem.id]);
+        return;
+      case 'activity':
+        void this.router.navigate(['/activity', this.selectedItem.id]);
+        return;
+      case 'event':
+        void this.router.navigate(['/event', this.selectedItem.id]);
+        return;
+      case 'address':
+        return;
+      default:
+        void this.router.navigate(['/object', this.selectedItem.id]);
+        return;
+    }
+  }
+
+  shouldShowDetailsButton(): boolean {
+    if (!this.selectedItem) {
+      return false;
+    }
+
+    if (this.selectedType === 'address') {
+      return false;
+    }
+
+    return this.selectedItem.isExternalAddress !== true;
+  }
 
   closeCard(): void {
     this.routeSearchResults = [];
     this.showSuggestions = false;
     this.selectedItem = null;
     this.selectedType = '';
+    this.clearTemporarySearchMarker();
 
     this.mapService.clearMarkerFocus();
 
@@ -1002,7 +1078,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
 
     return {
-      id: Number(item.id),
+      id: item.id ?? `${type}:${lat}:${lng}`,
       name: String(item.name ?? 'Point'),
       type: String(item.objectTypeName ?? item.destinationTypeName ?? item.eventTypeName ?? type),
       lat,
@@ -1105,6 +1181,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const query = this.routeSearchQuery.trim();
 
     if (!query) {
+      if (this.routeSearchDebounceTimer) {
+        clearTimeout(this.routeSearchDebounceTimer);
+        this.routeSearchDebounceTimer = null;
+      }
       this.routeSearchResults = [];
       return;
     }
@@ -1116,11 +1196,25 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.routeSuggestionsRight = `${window.innerWidth - rect.right}px`;
     }
 
-    this.routeSearchResults = this.runLocalSearch(query, 6);
-    this.cdr.detectChanges();
+    if (this.routeSearchDebounceTimer) {
+      clearTimeout(this.routeSearchDebounceTimer);
+    }
+
+    this.routeSearchDebounceTimer = setTimeout(() => {
+      if (this.routeSearchQuery.trim() !== query) {
+        return;
+      }
+
+      void this.applyRouteSearch(query);
+    }, 220);
   }
 
   addMyLocationAsStart(): void {
+    if (!this.locationTrackingService.isTrackingEnabled()) {
+      this.openLocationConsentPrompt();
+      return;
+    }
+
     if (!this.userLocation) return;
 
     const exists = this.routePoints.some(p => p.id === -1);
@@ -1137,6 +1231,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.calculateRoute();
   }
 
+  isRouteLocationLoading(): boolean {
+    return this.locationTrackingService.isTrackingEnabled() && !this.userLocation;
+  }
+
   private runLocalSearch(query: string, limit: number): SearchResult[] {
     const terms = this.tokenizeSearchQuery(query);
     return this.allItems
@@ -1148,5 +1246,101 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       .sort((left, right) => right.score - left.score)
       .slice(0, limit)
       .map((entry) => entry.item);
+  }
+
+  private async applyRouteSearch(query: string): Promise<void> {
+    const localResults = this.runLocalSearch(query, 4);
+    const addressResults = this.toAddressSearchResults(
+      await this.locationIntelligenceService.searchAddresses(query),
+      'route',
+    );
+
+    if (this.routeSearchQuery.trim() !== query) {
+      return;
+    }
+
+    this.routeSearchResults = [...localResults, ...addressResults].slice(0, 6);
+    this.cdr.detectChanges();
+  }
+
+  private async selectTopSearchResult(query: string): Promise<void> {
+    const localResults = this.runLocalSearch(query, 5);
+    const addressResults = this.toAddressSearchResults(
+      await this.locationIntelligenceService.searchAddresses(query),
+      'map-enter',
+    );
+    const combinedResults = [...localResults, ...addressResults];
+
+    if (this.searchQuery.trim() !== query) {
+      return;
+    }
+
+    if (combinedResults.length > 0) {
+      this.searchResults = combinedResults.slice(0, 8);
+      this.selectSuggestion(combinedResults[0]);
+      return;
+    }
+
+    this.showSuggestions = false;
+    void this.router.navigate(['/search'], {
+      queryParams: { q: query, source: 'map' },
+    });
+  }
+
+  private toAddressSearchResults(
+    suggestions: QuietZoneAddressSuggestion[],
+    source: string,
+  ): SearchResult[] {
+    return suggestions.map((suggestion, index) => {
+      const segments = suggestion.displayName
+        .split(',')
+        .map((segment) => segment.trim())
+        .filter(Boolean);
+      const name = segments[0] || suggestion.displayName;
+      const location = segments.slice(1).join(', ') || suggestion.displayName;
+      const id = `address:${source}:${index}:${suggestion.latitude}:${suggestion.longitude}`;
+
+      return {
+        id,
+        name,
+        typeName: 'Adresa',
+        location,
+        icon: 'near_me',
+        lat: suggestion.latitude,
+        lng: suggestion.longitude,
+        raw: {
+          id,
+          name,
+          address: suggestion.displayName,
+          latitude: suggestion.latitude,
+          longitude: suggestion.longitude,
+          isExternalAddress: true,
+        },
+        category: 'address',
+        markerType: 'address',
+      };
+    });
+  }
+
+  private focusAddressResult(result: SearchResult): void {
+    if (!result.lat || !result.lng) {
+      return;
+    }
+
+    this.clearTemporarySearchMarker();
+    this.mapService.clearMarkerFocus();
+    this.temporarySearchMarker = this.mapService.addMainMapMarker(result.lat, result.lng, result.name);
+    this.selectedItem = result.raw;
+    this.selectedType = 'address';
+    this.cdr.detectChanges();
+  }
+
+  private clearTemporarySearchMarker(): void {
+    if (!this.temporarySearchMarker) {
+      return;
+    }
+
+    this.temporarySearchMarker.remove();
+    this.temporarySearchMarker = null;
   }
 }

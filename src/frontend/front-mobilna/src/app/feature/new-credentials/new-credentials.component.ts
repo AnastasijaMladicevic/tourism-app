@@ -12,6 +12,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import { AuthService, ChangePasswordDto } from '../../services/auth';
 import { HeaderComponent } from '../header/header.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 
 const passwordStrengthRegex = /^(?=.*[A-Z])(?=.*[\d\W]).{8,}$/;
 
@@ -26,7 +28,7 @@ const passwordMatchValidator: ValidatorFn = (control: AbstractControl): Validati
 @Component({
   selector: 'app-new-credentials',
   standalone: true,
-  imports: [HeaderComponent, ReactiveFormsModule, CommonModule],
+  imports: [HeaderComponent, ReactiveFormsModule, CommonModule, TranslatePipe],
   templateUrl: './new-credentials.component.html',
   styleUrl: './new-credentials.component.scss',
 })
@@ -46,6 +48,11 @@ export class NewCredentialsComponent {
   hideNewPassword = true;
   hideConfirmPassword = true;
   resetSessionToken = '';
+
+  constructor(
+    private translationService: TranslationService
+  ) {}
+
   ngOnInit(): void {
     this.email = this.route.snapshot.queryParams['email'] ?? '';
     this.code = history.state?.code ?? '';
@@ -104,7 +111,7 @@ export class NewCredentialsComponent {
         this.resetSessionToken
       ).pipe(
           catchError(err => {
-            this.errorMessage = err?.error?.message ?? 'Reset nije uspeo.';
+            this.errorMessage = err?.error?.message ?? 'newCredentials.errors.resetFailed';
             setTimeout(() => this.cdr.detectChanges());
             return of(null);
           }),
@@ -126,7 +133,7 @@ export class NewCredentialsComponent {
     }
 
     if (!user?.id) {
-      this.errorMessage = 'Niste ulogovani. Prijavite se pa promenite lozinku.';
+      this.errorMessage ='newCredentials.errors.notLoggedIn';      
       return;
     }
 
@@ -141,10 +148,7 @@ export class NewCredentialsComponent {
       .changePassword(user.id, dto)
       .pipe(
         catchError((err) => {
-          this.errorMessage =
-            err?.error?.message ||
-            err?.error?.title ||
-            'Promena lozinke nije uspela. Proveri unos i pokušaj ponovo.';
+          this.errorMessage = err?.error?.message || err?.error?.title || 'newCredentials.errors.changeFailed';
           return of(null);
         }),
         finalize(() => {

@@ -1,6 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
+  effect,
   HostListener,
   OnInit,
   ViewEncapsulation,
@@ -17,6 +18,8 @@ import { AuthService } from '../../services/auth';
 import { FavoriteStateService } from '../../services/favorite-state';
 import { ImageService } from '../../services/image';
 import { PendingActionService } from '../../services/pending-action';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 
 export interface DestinationView extends DestinationDto {
   distanceMeters?: number;
@@ -27,7 +30,7 @@ export interface DestinationView extends DestinationDto {
 @Component({
   selector: 'app-destinations',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, TranslatePipe],
   templateUrl: './destinations.html',
   styleUrls: ['./destinations.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -53,6 +56,8 @@ export class DestinationsComponent implements OnInit {
   private readonly fetchPageSize = 100;
   private readonly maxFetchPages = 50;
   private readonly imageCache = new Map<number, DestinationDto['images']>();
+  private hasInitializedLanguageWatcher = false;
+  private lastLanguage = 'sr';
 
   constructor(
     private router: Router,
@@ -62,8 +67,27 @@ export class DestinationsComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private imageService: ImageService,
     private locationTrackingService: LocationTrackingService,
-    private pendingActionService: PendingActionService
-  ) { }
+    private pendingActionService: PendingActionService,
+    private translationService: TranslationService
+  ) {
+    effect(() => {
+      const language = this.translationService.language();
+
+      if (!this.hasInitializedLanguageWatcher) {
+        this.lastLanguage = language;
+        this.hasInitializedLanguageWatcher = true;
+        return;
+      }
+
+      if (language === this.lastLanguage) {
+        return;
+      }
+
+      this.lastLanguage = language;
+      this.currentPage = 1;
+      void this.loadData();
+    });
+  }
 
   ngOnInit(): void {
     this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
@@ -138,7 +162,7 @@ export class DestinationsComponent implements OnInit {
       this.visibleDestinations = [];
       this.totalCount = 0;
       this.hasNextPage = false;
-      this.errorMessage = 'Failed to load destinations.';
+      this.errorMessage = this.translationService.translate('destination.loadError');
       this.isLoading = false;
       this.cdr.detectChanges();
     }
@@ -297,8 +321,13 @@ export class DestinationsComponent implements OnInit {
   }
 
   sortLabel(): string {
-    const map = { az: 'A -> Z', za: 'Z -> A', distance: 'Nearest' };
-    return map[this.sortOption];
+    const map = {
+      az: 'A -> Z',
+      za: 'Z -> A',
+      distance: this.translationService.translate('common.nearest')
+    };
+    
+  return map[this.sortOption];
   }
 
   toggleFavorite(destination: DestinationView, event: Event): void {

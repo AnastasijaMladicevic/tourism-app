@@ -125,6 +125,51 @@
   margin-bottom: 14px;
 }
 
+.consent-banner {
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: linear-gradient(135deg, rgba(31, 148, 191, 0.12), rgba(85, 214, 216, 0.12));
+  border-radius: 18px 18px 0 0;
+}
+
+.consent-banner__copy {
+  flex: 1;
+
+  strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--emperor);
+  }
+
+  p {
+    margin: 6px 0 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(77, 99, 112, 0.9);
+  }
+}
+
+.consent-banner__dismiss {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  color: rgba(42, 70, 84, 0.72);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
 .preference-divider {
   height: 1px;
   background: rgba(208, 234, 240, 0.72);

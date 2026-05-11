@@ -5,8 +5,8 @@
     <app-logo />
 
     <div class="title-section">
-      <h1>Create account</h1>
-      <p>Join us and improve your experience</p>
+      <h1>{{ 'signup.title' | translate }}</h1>
+      <p>{{ 'signup.subtitle' | translate }}</p>
     </div>
 
     <form class="form" [formGroup]="form" (ngSubmit)="submit()" (keydown.enter)="submit()">
@@ -28,13 +28,13 @@
                 <circle cx="12" cy="7" r="4" />
               </svg>
             </span>
-            <input type="text" formControlName="firstName" placeholder="Ime" />
+            <input type="text" formControlName="firstName" [placeholder]="'signup.firstName' | translate" />
           </div>
           @if (firstName?.touched && firstName?.hasError('required')) {
-            <p class="field-error">Ime je obavezno.</p>
+            <p class="field-error">{{ 'signup.errors.firstNameRequired' | translate }}</p>
           }
           @if (firstName?.touched && firstName?.hasError('minlength')) {
-            <p class="field-error">Ime mora imati najmanje 2 karaktera.</p>
+            <p class="field-error">{{ 'signup.errors.firstNameMin' | translate }}</p>
           }
         </div>
 
@@ -55,13 +55,13 @@
                 <circle cx="12" cy="7" r="4" />
               </svg>
             </span>
-            <input type="text" formControlName="lastName" placeholder="Prezime" />
+            <input type="text" formControlName="firstName" [placeholder]="'signup.firstName' | translate" />
           </div>
           @if (lastName?.touched && lastName?.hasError('required')) {
-            <p class="field-error">Prezime je obavezno.</p>
+            <p class="field-error">{{ 'signup.errors.firstNameRequired' | translate }}</p>
           }
           @if (lastName?.touched && lastName?.hasError('minlength')) {
-            <p class="field-error">Prezime mora imati najmanje 2 karaktera.</p>
+            <p class="field-error">{{ 'signup.errors.firstNameMin' | translate }}</p>
           }
         </div>
       </div>
@@ -91,11 +91,11 @@
             [class.is-empty]="!dateOfBirth?.value"
           />
           @if (!dateOfBirth?.value) {
-            <span class="date-placeholder">Date of Birth</span>
+            <span class="date-placeholder">{{ 'signup.dateOfBirth' | translate }}</span>
           }
         </div>
         @if (dateOfBirth?.touched && dateOfBirth?.hasError('required')) {
-          <p class="field-error">Date of birth is required.</p>
+          <p class="field-error">{{ 'signup.errors.dateRequired' | translate }}</p>
         }
       </div>
 
@@ -118,13 +118,13 @@
               <polyline points="22,6 12,13 2,6" />
             </svg>
           </span>
-          <input type="email" formControlName="email" placeholder="Email" />
+          <input type="email" formControlName="email" [placeholder]="'common.email' | translate" />
         </div>
         @if (email?.touched && email?.hasError('required')) {
-          <p class="field-error">Email is required.</p>
+          <p class="field-error">{{ 'signup.errors.emailRequired' | translate }}</p>
         }
         @if (email?.touched && email?.hasError('email')) {
-          <p class="field-error">Enter a valid email address.</p>
+          <p class="field-error">{{ 'signup.errors.emailInvalid' | translate }}</p>
         }
       </div>
 
@@ -146,10 +146,10 @@
               />
             </svg>
           </span>
-          <input type="tel" formControlName="phoneNumber" placeholder="Phone number (optional)" />
+          <input type="tel" formControlName="phoneNumber" [placeholder]="'signup.phoneOptional' | translate" />
         </div>
         @if (phoneNumber?.touched && phoneNumber?.hasError('invalidPhone')) {
-          <p class="field-error">Unesi telefon u formatu +382 67 000 000 ili slično.</p>
+          <p class="field-error">{{ 'signup.errors.phoneInvalid' | translate }}</p>
         }
       </div>
 
@@ -170,10 +170,10 @@
               <circle cx="12" cy="11" r="2" />
             </svg>
           </span>
-          <input type="text" formControlName="country" placeholder="Country (optional)" />
+          <input type="text" formControlName="country" [placeholder]="'signup.countryOptional' | translate" />
         </div>
         @if (country?.touched && country?.hasError('maxlength')) {
-          <p class="field-error">Država može imati najviše 40 karaktera.</p>
+          <p class="field-error">{{ 'signup.errors.countryMax' | translate }}</p>
         }
       </div>
 
@@ -225,21 +225,21 @@
           <input
             [type]="hidePassword ? 'password' : 'text'"
             formControlName="password"
-            placeholder="Password"
+            [placeholder]="'common.password' | translate"
           />
           <button class="eye" type="button" (click)="togglePassword('password')">
             {{ hidePassword ? 'visibility_off' : 'visibility' }}
           </button>
         </div>
         @if (password?.touched && password?.hasError('required')) {
-          <p class="field-error">Password is required.</p>
+          <p class="field-error">{{ 'signup.errors.passwordRequired' | translate }}</p>
         }
         @if (password?.touched && password?.hasError('minlength')) {
-          <p class="field-error">Password must have at least 8 characters.</p>
+          <p class="field-error">{{ 'signup.errors.passwordMin' | translate }}</p>
         }
         @if (password?.touched && password?.hasError('weakPassword')) {
           <p class="field-error">
-            Use one uppercase letter, one number, and one special character.
+            {{ 'signup.errors.passwordWeak' | translate }}
           </p>
         }
       </div>
@@ -264,17 +264,17 @@
           <input
             [type]="hideConfirmPassword ? 'password' : 'text'"
             formControlName="confirmPassword"
-            placeholder="Confirm password"
+            [placeholder]="'signup.confirmPassword' | translate"
           />
           <button class="eye" type="button" (click)="togglePassword('confirmPassword')">
             {{ hideConfirmPassword ? 'visibility_off' : 'visibility' }}
           </button>
         </div>
         @if (confirmPassword?.touched && confirmPassword?.hasError('required')) {
-          <p class="field-error">Please confirm your password.</p>
+          <p class="field-error">{{ 'signup.errors.confirmPasswordRequired' | translate }}</p>
         }
         @if (form.touched && form.hasError('passwordsMismatch')) {
-          <p class="field-error">Passwords do not match.</p>
+          <p class="field-error">{{ 'signup.errors.passwordMismatch' | translate }}</p>
         }
       </div>
 
@@ -283,13 +283,13 @@
       }
 
       <button class="btn-primary" type="submit" [disabled]="form.invalid || isLoading">
-        {{ isLoading ? 'Creating account...' : 'Sign Up' }}
+        {{ isLoading ? ('signup.creating' | translate) : ('signup.submit' | translate) }}
       </button>
     </form>
 
     <div class="login-link">
-      <span>Already have an account?</span>
-      <a routerLink="/login">Log In</a>
+      <span>{{ 'signup.haveAccount' | translate }}</span>
+      <a routerLink="/login">{{ 'login.loginButton' | translate }}</a>
     </div>
 
     <!-- <p class="terms">

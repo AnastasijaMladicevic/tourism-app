@@ -60,6 +60,8 @@ interface RoutePoint {
   encapsulation: ViewEncapsulation.None
 })
 export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDestroy {
+  private static readonly CREATOR_CONTENT_FOCUS_ZOOM = 14;
+
   searchQuery = '';
   searchResults: SearchResult[] = [];
   showSuggestions = false;
@@ -117,10 +119,10 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
     const lng = state?.lng ?? 18.771;
     const zoom = state?.zoom ?? 13;
 
-    this.mapService.initMap('main-map', lat, lng, zoom);
-    if (!state?.lat || !state?.lng) {
-      this.focusActiveRegion();
-    }
+    this.mapService.initMap('main-map', lat, lng, zoom, { enableClustering: true });
+    setTimeout(() => {
+      this.mapService.getMap()?.invalidateSize();
+    }, 0);
     this.loadAllData(state);
 
     const map = this.mapService['map'];
@@ -396,23 +398,53 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
     } else {
       this.activeFilters.push(key);
     }
+
+    if (
+      this.selectedItem &&
+      this.activeFilters.length > 0 &&
+      !this.matchesActiveFilters(this.selectedType)
+    ) {
+      this.closeCard();
+    }
+
     this.applyFilters();
   }
 
   private applyFilters(): void {
-    const map = this.mapService['map'];
-    if (!map) return;
+    this.mapService.setActiveFilters(this.activeFilters);
+  }
 
-    this.mapService['markerMap'].forEach((value: any, key: string) => {
-      const type = key.split(':')[0];
-      const marker = value.marker;
+  private matchesActiveFilters(type: string): boolean {
+    if (!this.activeFilters.length) {
+      return true;
+    }
 
-      if (this.activeFilters.length === 0 || this.activeFilters.includes(type)) {
-        if (!map.hasLayer(marker)) marker.addTo(map);
-      } else if (map.hasLayer(marker)) {
-        marker.remove();
-      }
-    });
+    const objectTypes = new Set([
+      'hotel',
+      'apartment',
+      'motel',
+      'resort',
+      'hostel',
+      'restaurant',
+      'kafana',
+      'bar',
+      'cafe',
+      'fast_food',
+      'winery',
+      'club',
+      'gas_station',
+      'shop',
+      'mall',
+      'market',
+      'hospital',
+      'clinic',
+      'pharmacy',
+      'attraction',
+    ]);
+
+    return this.activeFilters.some(
+      (filter) => filter === type || (filter === 'object' && objectTypes.has(type)),
+    );
   }
 
   /**
@@ -460,6 +492,8 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
             this.allItems.push(this.toSearchResult(activity, 'activity', 'activity'));
           }
         });
+
+        this.focusCreatorContent(objects, events, activities, state);
 
         if (state?.selectedItem) {
           setTimeout(() => {
@@ -530,8 +564,25 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
   private getObjectType(name: string): string {
     const normalized = name.toLowerCase();
     if (normalized.includes('hotel')) return 'hotel';
-    if (normalized.includes('restoran')) return 'restaurant';
+    if (normalized.includes('apartman') || normalized.includes('apartment')) return 'apartment';
+    if (normalized.includes('motel')) return 'motel';
+    if (normalized.includes('resort')) return 'resort';
+    if (normalized.includes('hostel')) return 'hostel';
+    if (normalized.includes('restoran') || normalized.includes('restaurant')) return 'restaurant';
     if (normalized.includes('kafana')) return 'kafana';
+    if (normalized.includes('bar')) return 'bar';
+    if (normalized.includes('cafe') || normalized.includes('kafi')) return 'cafe';
+    if (normalized.includes('fast') || normalized.includes('brza')) return 'fast_food';
+    if (normalized.includes('wine') || normalized.includes('vinar')) return 'winery';
+    if (normalized.includes('club') || normalized.includes('klub')) return 'club';
+    if (normalized.includes('pump') || normalized.includes('gas')) return 'gas_station';
+    if (normalized.includes('mall')) return 'mall';
+    if (normalized.includes('market')) return 'market';
+    if (normalized.includes('shop') || normalized.includes('prodavn')) return 'shop';
+    if (normalized.includes('hospital') || normalized.includes('bolnic')) return 'hospital';
+    if (normalized.includes('clinic') || normalized.includes('klin')) return 'clinic';
+    if (normalized.includes('pharmacy') || normalized.includes('apotek')) return 'pharmacy';
+    if (normalized.includes('attraction') || normalized.includes('atrakc')) return 'attraction';
     return 'restaurant';
   }
 
@@ -542,12 +593,54 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
 
   getItemLocation(): string {
     if (!this.selectedItem) return '';
-    if (this.selectedType === 'destination') {
-      return this.selectedItem.regionName ?? this.selectedItem.destinationTypeName ?? '';
-    }
     return [this.selectedItem.localityName, this.selectedItem.destinationName, this.selectedItem.regionName]
       .filter(Boolean)
       .join(', ');
+  }
+
+  private focusCreatorContent(
+    objects: any[],
+    events: any[],
+    activities: any[],
+    state?: any,
+  ): void {
+    if (state?.lat != null && state?.lng != null) {
+      return;
+    }
+
+    const map = this.mapService['map'];
+    if (!map) {
+      return;
+    }
+
+    const points = [...objects, ...events, ...activities]
+      .map((item) => this.toLatLng(item))
+      .filter((point): point is L.LatLngTuple => point !== null);
+
+    if (!points.length) {
+      this.focusActiveRegion();
+      return;
+    }
+
+    if (points.length === 1) {
+      const [lat, lng] = points[0];
+      this.mapService.flyTo(lat, lng, ContentCreatorMapComponent.CREATOR_CONTENT_FOCUS_ZOOM);
+      return;
+    }
+
+    const bounds = L.latLngBounds(points);
+    map.fitBounds(bounds.pad(0.2), {
+      padding: [72, 72],
+      maxZoom: ContentCreatorMapComponent.CREATOR_CONTENT_FOCUS_ZOOM,
+    });
+  }
+
+  private toLatLng(item: { latitude?: number | null; longitude?: number | null }): L.LatLngTuple | null {
+    if (item.latitude == null || item.longitude == null) {
+      return null;
+    }
+
+    return [item.latitude, item.longitude];
   }
 
   private focusActiveRegion(): void {

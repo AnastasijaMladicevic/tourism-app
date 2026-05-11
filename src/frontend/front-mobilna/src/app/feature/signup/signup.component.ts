@@ -12,6 +12,7 @@ import { AuthService } from '../../services/auth';
 import { AppLanguage, TranslationService } from '../../services/translation.service';
 import { HeaderComponent } from '../header/header.component';
 import { LogoComponent } from '../header/logo.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 interface SignupLanguageOption {
   code: AppLanguage;
@@ -21,7 +22,7 @@ interface SignupLanguageOption {
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, HeaderComponent, LogoComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, HeaderComponent, LogoComponent, TranslatePipe],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss',
 })

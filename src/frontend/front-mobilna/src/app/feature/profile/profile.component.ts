@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, WritableSignal } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, forkJoin, of } from 'rxjs';
+import { Observable, catchError, finalize, forkJoin, map, of, switchMap, timeout } from 'rxjs';
 import { environment } from '../../../environment/environment';
-import { AuthService, UserDto } from '../../services/auth';
+import { AuthService, UserDto, VisitedPlaceDto } from '../../services/auth';
 import { FavoriteService } from '../../services/favorite';
 import { EventPlannerService } from '../../services/event-planner';
+import { LocationTrackingService, TrackedLocation } from '../../services/location-tracking';
 import { ReviewService } from '../../services/review';
 import { ProfileStatsCacheService, ProfileStatsSnapshot } from '../../services/profile-stats-cache';
 import { TranslationService } from '../../services/translation.service';
@@ -38,9 +39,11 @@ interface ProfileSection {
   styleUrl: './profile.component.scss',
 })
 export class ProfileComponent implements OnInit {
+  private readonly maxShareLocationAgeMs = 25 * 60 * 1000;
   private readonly authService = inject(AuthService);
   private readonly favoriteService = inject(FavoriteService);
   private readonly eventPlannerService = inject(EventPlannerService);
+  private readonly locationTrackingService = inject(LocationTrackingService);
   private readonly reviewService = inject(ReviewService);
   private readonly profileStatsCache = inject(ProfileStatsCacheService);
   private readonly router = inject(Router);
@@ -48,6 +51,13 @@ export class ProfileComponent implements OnInit {
 
   protected user: UserDto | null = null;
   protected readonly stats = signal<ProfileStat[]>(this.buildStats());
+  protected visitedPlaces: VisitedPlaceDto[] = [];
+  protected readonly shareUrl = signal('');
+  protected readonly shareExpiresAt = signal('');
+  protected readonly shareError = signal('');
+  protected readonly shareBusyHours = signal<number | null>(null);
+  protected readonly copySuccess = signal(false);
+  protected readonly shareDurations = [1, 4, 24];
 
   protected readonly sections: ProfileSection[] = [
     {
@@ -83,6 +93,7 @@ export class ProfileComponent implements OnInit {
     this.user = currentUser;
     this.applyStatsSnapshot(this.resolveInitialStats(currentUser));
     this.loadStats();
+    this.loadVisitedPlaces();
 
     this.authService
       .getById(currentUser.id)
@@ -92,6 +103,7 @@ export class ProfileComponent implements OnInit {
         this.user = user;
         this.applyStatsSnapshot(this.resolveInitialStats(user));
         this.loadStats();
+        this.loadVisitedPlaces();
       });
   }
 
@@ -146,6 +158,57 @@ export class ProfileComponent implements OnInit {
     this.router.navigate(['/profile/edit']);
   }
 
+  protected openVisitedPlace(place: VisitedPlaceDto): void {
+    const route = place.kind === 'destination' ? '/destination' : '/locality';
+    this.router.navigate([route, place.id]);
+  }
+
+  protected async copyShareUrl(): Promise<void> {
+    if (!this.shareUrl() || typeof navigator === 'undefined' || !navigator.clipboard) {
+      return;
+    }
+
+    await navigator.clipboard.writeText(this.shareUrl());
+    this.copySuccess.set(true);
+    setTimeout(() => {
+      this.copySuccess.set(false);
+    }, 2200);
+  }
+
+  protected generateLocationShare(durationHours: number): void {
+    this.shareError.set('');
+    this.copySuccess.set(false);
+    this.shareUrl.set('');
+    this.shareExpiresAt.set('');
+    this.shareBusyHours.set(durationHours);
+
+    this.prepareLocationShare()
+      .pipe(
+        switchMap(() => {
+          console.log('[ShareLocation] prepareLocationShare završen, pozivam createLocationShare...');
+          return this.authService.createLocationShare(durationHours);
+        }),
+        catchError((error) => {
+          console.error('[ShareLocation] greška:', error);
+          this.shareError.set(this.resolveShareError(error));
+          return of(null);
+        }),
+        finalize(() => {
+          console.log('[ShareLocation] finalize pozvan');
+          this.shareBusyHours.set(null);
+        }),
+      )
+      .subscribe((share) => {
+        console.log('[ShareLocation] subscribe dobio:', share);
+        if (!share) {
+          return;
+        }
+
+        this.shareUrl.set(share.shareUrl);
+        this.shareExpiresAt.set(share.expiresAtUtc);
+      });
+  }
+
   protected trackSection(_: number, section: ProfileSection): string {
     return section.titleKey;
   }
@@ -156,6 +219,58 @@ export class ProfileComponent implements OnInit {
 
   protected trackStat(_: number, stat: ProfileStat): string {
     return stat.labelKey;
+  }
+
+  private prepareLocationShare(): Observable<void> {
+    const currentLocation = this.locationTrackingService.getCurrentLocation();
+    console.log('[ShareLocation] currentLocation:', currentLocation);
+    console.log('[ShareLocation] isFresh:', this.isFreshLocation(currentLocation));
+
+    if (this.isFreshLocation(currentLocation)) {
+      console.log('[ShareLocation] Lokacija sveža, šaljem na backend...');
+      return this.pushLocationToBackend(currentLocation).pipe(
+        map(() => { console.log('[ShareLocation] push uspeo'); return void 0; }),
+        catchError((err) => { console.warn('[ShareLocation] push failed, nastavljam:', err); return of(void 0); }),
+      );
+    }
+
+    console.log('[ShareLocation] Lokacija nije sveža, pozivam captureCurrentLocation...');
+    return this.locationTrackingService.captureCurrentLocation().pipe(
+      map((loc) => { console.log('[ShareLocation] capture uspeo:', loc); return void 0; }),
+      timeout(15000),
+      catchError((err) => { console.warn('[ShareLocation] capture failed/timeout:', err); return of(void 0); }),
+    );
+  }
+
+  private pushLocationToBackend(location: TrackedLocation): Observable<unknown> {
+    return this.authService.updateMyLocation({
+      latitude: location.latitude,
+      longitude: location.longitude,
+      accuracyMeters: location.accuracy,
+      recordedAtUtc: new Date(location.updatedAt).toISOString(),
+    });
+  }
+
+  private isFreshLocation(location: TrackedLocation | null): location is TrackedLocation {
+    return !!location && Date.now() - location.updatedAt <= this.maxShareLocationAgeMs;
+  }
+
+  private resolveShareError(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    const message = (error as { error?: { message?: string } })?.error?.message?.trim();
+
+    if (!message) {
+      return 'profile.shareLocationError';
+    }
+
+    if (message.includes('Current location') || message.includes('Location can be shared')) {
+      return 'profile.shareLocationError';
+    }
+
+    return message;
   }
 
   private loadStats(): void {
@@ -194,6 +309,20 @@ export class ProfileComponent implements OnInit {
 
       this.applyStatsSnapshot(snapshot);
     });
+  }
+
+  private loadVisitedPlaces(): void {
+    if (!this.authService.isLoggedIn()) {
+      this.visitedPlaces = [];
+      return;
+    }
+
+    this.authService
+      .getVisitedPlaces(6)
+      .pipe(catchError(() => of([])))
+      .subscribe((places) => {
+        this.visitedPlaces = places;
+      });
   }
 
   private resolveInitialStats(user: UserDto): Partial<ProfileStatsSnapshot> {

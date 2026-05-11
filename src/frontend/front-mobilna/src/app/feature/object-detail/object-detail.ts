@@ -16,11 +16,13 @@ import { FavoriteStateService } from '../../services/favorite-state';
 import { FormsModule } from '@angular/forms';
 import { RouterHistoryService } from '../../services/router-history';
 import { PendingActionService } from '../../services/pending-action';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 
 @Component({
   selector: 'app-restaurant-detail',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, MapComponent, FormsModule],
+  imports: [CommonModule, MatIconModule, MatButtonModule, MapComponent, FormsModule, TranslatePipe],
   templateUrl: './object-detail.html',
   styleUrls: ['./object-detail.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -33,6 +35,18 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
   errorMessage = '';
   qrLink: QrLinkDto | null = null;
 
+  
+  showConfirmModal = false;
+  confirmMessage = '';
+  confirmCallback: (() => void) | null = null;
+
+  showSuccessModal = false;
+  successMessage = '';
+
+  showReviewImagesModal = false;
+  selectedReviewImagesForModal: ImageDto[] = [];
+  selectedReviewImageIndex = 0;
+  existingReviewImages: ImageDto[] = [];
   reviews: ReviewDto[] = [];
   nearbyObjects: ObjectDto[] = [];
   galleryImages: string[] = [];
@@ -67,7 +81,8 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     private reviewService: ReviewService,
     private routerHistory: RouterHistoryService,
     private pendingActionService: PendingActionService,
-    private qrLinkService: QrLinkService
+    private qrLinkService: QrLinkService,
+    private translationService: TranslationService
   ) { }
 
   ngOnInit(): void {
@@ -172,7 +187,7 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error(err);
         this.isLoading = false;
-        this.errorMessage = 'Greska pri ucitavanju objekta.';
+        this.errorMessage = this.translationService.translate('object.loadError');
         this.cdr.detectChanges();
       },
     });
@@ -520,6 +535,36 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
       },
     });
   }
+  openConfirm(message: string, onConfirm: () => void): void {
+    this.confirmMessage = message;
+    this.confirmCallback = onConfirm;
+    this.showConfirmModal = true;
+    document.body.style.overflow = 'hidden';
+    this.cdr.detectChanges();
+  }
+  
+  closeConfirm(): void {
+    this.showConfirmModal = false;
+    this.confirmCallback = null;
+    document.body.style.overflow = 'visible';
+  }
+  
+  confirmAction(): void {
+    this.confirmCallback?.();
+    this.closeConfirm();
+  }
+  
+  openSuccess(message: string): void {
+    this.successMessage = message;
+    this.showSuccessModal = true;
+    document.body.style.overflow = 'hidden';
+    this.cdr.detectChanges();
+  }
+  
+  closeSuccess(): void {
+    this.showSuccessModal = false;
+    document.body.style.overflow = 'visible';
+  }
 
   openGallery(index = 0): void {
     if (!this.images || this.images.length === 0) return;
@@ -569,7 +614,7 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
   }
 
   getWorkingHours(): string {
-    if (!this.object?.workingHours) return 'Radno vreme nije navedeno';
+    if (!this.object?.workingHours) return this.translationService.translate('object.workingHoursNotAvailable');
 
     try {
       const hours = JSON.parse(this.object.workingHours) as Record<string, string>;
@@ -577,7 +622,7 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
       const dayKeys = ['ned', 'pon', 'uto', 'sre', 'cet', 'pet', 'sub'];
       const todayKey = dayKeys[today];
 
-      return hours[todayKey] || hours['pon'] || 'Radno vreme nije navedeno';
+      return hours[todayKey] || hours['pon'] || this.translationService.translate('object.workingHoursNotAvailable');
     } catch {
       return this.object.workingHours;
     }
@@ -626,11 +671,27 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
         text: this.userReview.text,
         images: []
       };
+
+      this.existingReviewImages = [];
+    
+      this.imageService.getForReview(this.userReview.id).subscribe({
+        next: images => {
+          this.existingReviewImages = images.map(img => ({
+            ...img,
+            url: this.resolveMediaUrl(img.url) ?? ''
+          }));
+    
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.existingReviewImages = [];
+        }
+      });
     } else {
       this.resetNewReview();
+      this.existingReviewImages = [];
     }
 
-    // Forsirano otvaranje modala
     setTimeout(() => {
       this.showWriteReviewModal = true;
       document.body.style.overflow = 'hidden';
@@ -643,6 +704,9 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     document.body.style.overflow = 'visible';
     this.resetNewReview();
     this.isSubmittingReview = false;
+    this.existingReviewImages = [];
+    this.selectedReviewImages = [];
+    this.reviewImagePreviews = [];
   }
 
   private resetNewReview(): void {
@@ -657,9 +721,45 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     const files: FileList = event.target.files;
     if (!files?.length) return;
 
-    const newFiles = Array.from(files).slice(0, 5 - this.selectedReviewImages.length);
-
-    newFiles.forEach(file => {
+    const maxImages = 5;
+    const maxSizePerImage = 5 * 1024 * 1024; // 5MB
+  
+    const currentCount = this.existingReviewImages.length + this.selectedReviewImages.length;
+    const availableSlots = maxImages - currentCount;
+  
+    if (availableSlots <= 0) {
+      alert('Možete dodati najviše 5 slika.');
+      event.target.value = '';
+      return;
+    }
+  
+    const selectedFileKeys = new Set(
+      this.selectedReviewImages.map(file =>
+        `${file.name}_${file.size}_${file.lastModified}`
+      )
+    );
+  
+    const pickedFiles = Array.from(files).slice(0, availableSlots);
+  
+    for (const file of pickedFiles) {
+      const fileKey = `${file.name}_${file.size}_${file.lastModified}`;
+  
+      if (!file.type.startsWith('image/')) {
+        alert(`Fajl "${file.name}" nije slika.`);
+        continue;
+      }
+  
+      if (file.size > maxSizePerImage) {
+        alert(`Slika "${file.name}" je veća od 5MB.`);
+        continue;
+      }
+  
+      if (selectedFileKeys.has(fileKey)) {
+        alert(`Slika "${file.name}" je već dodata.`);
+        continue;
+      }
+  
+      selectedFileKeys.add(fileKey);
       this.selectedReviewImages.push(file);
 
       const reader = new FileReader();
@@ -668,9 +768,80 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       };
       reader.readAsDataURL(file);
-    });
+    }
 
     event.target.value = '';
+  }
+
+  deleteExistingReviewImage(imageId: number): void {
+    console.log('klik na X', imageId);
+  
+    if (!this.userReview?.id) return;
+  
+    const reviewId = this.userReview.id;
+  
+    this.openConfirm('Da li sigurno želiš da obrišeš ovu sliku?', () => {
+      console.log('potvrđeno brisanje');
+  
+      this.imageService.deleteReviewImage(reviewId, imageId).subscribe({
+        next: () => {
+          this.existingReviewImages =
+            this.existingReviewImages.filter(img => img.id !== imageId);
+  
+          this.reviews = this.reviews.map(review => {
+            if (review.id !== reviewId) return review;
+  
+            return {
+              ...review,
+              images: (review.images || []).filter(img => img.id !== imageId)
+            };
+          });
+  
+          if (this.userReview) {
+            this.userReview.images =
+              (this.userReview.images || []).filter(img => img.id !== imageId);
+          }
+  
+          this.cdr.detectChanges();
+          this.openSuccess('Slika je uspešno obrisana.');
+        },
+        error: (err) => {
+          console.error('Failed to delete review image', err);
+          this.openSuccess('Slika nije obrisana.');
+        }
+      });
+    });
+  }
+
+  openReviewImages(review: ReviewDto): void {
+    if (!review.images?.length) return;
+  
+    this.selectedReviewImagesForModal = review.images;
+    this.selectedReviewImageIndex = 0;
+    this.showReviewImagesModal = true;
+    document.body.style.overflow = 'hidden';
+  }
+  
+  closeReviewImages(): void {
+    this.showReviewImagesModal = false;
+    this.selectedReviewImagesForModal = [];
+    this.selectedReviewImageIndex = 0;
+    document.body.style.overflow = this.showAllReviewsModal ? 'hidden' : 'visible';
+  }
+  
+  nextReviewImage(): void {
+    if (!this.selectedReviewImagesForModal.length) return;
+  
+    this.selectedReviewImageIndex =
+      (this.selectedReviewImageIndex + 1) % this.selectedReviewImagesForModal.length;
+  }
+  
+  prevReviewImage(): void {
+    if (!this.selectedReviewImagesForModal.length) return;
+  
+    this.selectedReviewImageIndex =
+      (this.selectedReviewImageIndex - 1 + this.selectedReviewImagesForModal.length) %
+      this.selectedReviewImagesForModal.length;
   }
   private loadReviewImages(): void {
     if (!this.reviews.length) return;
@@ -701,85 +872,103 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
       alert('Molimo unesite ocenu (1-5) i komentar.');
       return;
     }
-
+  
     this.isSubmittingReview = true;
-
+  
     const payload = {
       objectId: this.object.id,
       rating: this.newReview.rating,
       text: this.newReview.text.trim(),
     };
-
+  
     const request$ = this.userReview
       ? this.reviewService.update(this.userReview.id, payload)
       : this.reviewService.create(payload);
-
-    request$.pipe(
-      finalize(() => {
-        this.isSubmittingReview = false;
-        this.cdr.detectChanges();
-      })
-    ).subscribe({
-      next: (newReview) => {
-        alert(this.userReview ? 'Recenzija uspešno ažurirana!' : 'Recenzija uspešno poslata!');
-
-        if (this.userReview) {
-          // UPDATE
-          this.reviews = this.reviews.map(r => r.id === newReview.id ? newReview : r);
-          this.userReview = newReview;
-        } else {
-          // CREATE
-          this.reviews = [newReview, ...this.reviews];
-          if (this.object) {
-            this.object.reviewCount = (this.object.reviewCount || 0) + 1;
-            if (this.object.averageRating !== undefined) {
-              const total = (this.object.averageRating * (this.reviews.length - 1)) + newReview.rating;
-              this.object.averageRating = Number((total / this.reviews.length).toFixed(1));
-            } else {
-              this.object.averageRating = newReview.rating;
+  
+    request$
+      .pipe(
+        finalize(() => {
+          this.isSubmittingReview = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (savedReview) => {
+          const wasEdit = !!this.userReview;
+  
+          if (wasEdit) {
+            this.reviews = this.reviews.map(r =>
+              r.id === savedReview.id
+                ? {
+                    ...savedReview,
+                    images: this.userReview?.images || []
+                  }
+                : r
+            );
+  
+            this.userReview = {
+              ...savedReview,
+              images: this.userReview?.images || []
+            };
+          } else {
+            this.reviews = [
+              {
+                ...savedReview,
+                images: []
+              },
+              ...this.reviews
+            ];
+  
+            this.userReview = {
+              ...savedReview,
+              images: []
+            };
+  
+            if (this.object) {
+              this.object.reviewCount = (this.object.reviewCount || 0) + 1;
+  
+              if (this.object.averageRating !== undefined) {
+                const total =
+                  this.object.averageRating * (this.reviews.length - 1) + savedReview.rating;
+  
+                this.object.averageRating = Number((total / this.reviews.length).toFixed(1));
+              } else {
+                this.object.averageRating = savedReview.rating;
+              }
             }
           }
-        }
-        this.userReview = newReview;
-        // === UPLOAD REVIEW IMAGES I DODAVANJE U GALERIJU ===
-        if (this.selectedReviewImages.length > 0 && newReview?.id) {
-          this.imageService.uploadReviewImages(newReview.id, this.selectedReviewImages)
-            .subscribe({
-              next: (uploaded: any) => {
-                const uploadedImages = Array.isArray(uploaded)
-                  ? uploaded
-                  : (uploaded?.items ?? uploaded?.data ?? []);
-
-                const mapped: ImageDto[] = uploadedImages.map((img: any) => ({
-                  id: img.id ?? 0,
-                  url: this.resolveMediaUrl(img?.url || img) ?? '',
-                  altText: img?.altText || 'Review photo',
-                  isMain: false
-                }));
-
-                // DODAJ U GLAVNU GALERIJU
-                this.images = [...mapped, ...this.images];
-
-                // DODAJ U OBJECT (da se sačuva u modelu)
-                if (this.object) {
-                  this.object.images = [
-                    ...mapped,
-                    ...(this.object.images || [])
-                  ];
+  
+          const finish = () => {
+            this.loadReviewImages();
+            this.closeWriteReview();
+            this.cdr.detectChanges();
+  
+            this.openSuccess(
+              wasEdit
+                ? 'Recenzija uspešno ažurirana!'
+                : 'Recenzija uspešno poslata!'
+            );
+          };
+  
+          if (this.selectedReviewImages.length > 0 && savedReview?.id) {
+            this.imageService.uploadReviewImages(savedReview.id, this.selectedReviewImages)
+              .subscribe({
+                next: () => {
+                  finish();
+                },
+                error: (err) => {
+                  console.error('Failed to upload review images', err);
+                  finish();
                 }
-
-                this.cdr.detectChanges();
-              },
-              error: (err) => console.error('Failed to upload review images', err)
-            });
+              });
+          } else {
+            finish();
+          }
+        },
+        error: (err) => {
+          console.error(err);
+          alert('Došlo je do greške. Molimo pokušajte ponovo.');
         }
-        this.closeWriteReview();
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error(err);
-        alert('Došlo je do greške. Molimo pokušajte ponovo.');
-      }
-    });
+      });
   }
 }

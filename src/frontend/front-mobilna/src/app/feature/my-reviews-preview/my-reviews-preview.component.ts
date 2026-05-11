@@ -382,14 +382,10 @@ export class MyReviewsPreviewComponent implements OnInit {
 
     try {
       const parsed = new URL(apiBase);
-      if (parsed.hostname === 'localhost') {
-        return `http://localhost:5047`;
-      }
+      return parsed.origin;
     } catch {
       return apiBase;
     }
-
-    return apiBase;
   }
 
   private toArray<T>(raw: unknown): T[] {

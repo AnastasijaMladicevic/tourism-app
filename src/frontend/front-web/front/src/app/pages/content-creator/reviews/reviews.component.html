@@ -146,7 +146,7 @@
             <div class="composer-buttons">
               <button class="secondary" type="button" (click)="saveDraft()">Save Draft</button>
               <button class="primary" type="button" (click)="sendResponse()" [disabled]="isSubmitting">
-                {{ isSubmitting ? 'Sending...' : (selectedReviewHasResponse ? 'Update Response' : 'Send Response') }}
+                {{ selectedReviewHasResponse ? 'Update Response' : 'Send Response' }}
               </button>
             </div>
           </div>

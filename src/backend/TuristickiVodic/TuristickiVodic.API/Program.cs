@@ -202,18 +202,18 @@ if (app.Environment.IsDevelopment())
 
 var useHttpsRedirection = app.Configuration.GetValue<bool?>("ReverseProxy:UseHttpsRedirection") ?? true;
 
-// ─── Middleware redosled — VAŽNO, ne menjati ───────────────────────────────
 app.UseForwardedHeaders();
 
 if (useHttpsRedirection)
 {
-    app.UseHttpsRedirection();
+    if (!app.Environment.IsDevelopment())
+    {
+        app.UseHttpsRedirection();
+    }
 }
 
-// CORS mora biti pre static files i autentifikacije
 app.UseCors("AllowAngular");
 
-// SPA fallback — UseDefaultFiles MORA biti pre UseStaticFiles
 var defaultFileOptions = new DefaultFilesOptions();
 defaultFileOptions.DefaultFileNames.Clear();
 defaultFileOptions.DefaultFileNames.Add("index.html");
