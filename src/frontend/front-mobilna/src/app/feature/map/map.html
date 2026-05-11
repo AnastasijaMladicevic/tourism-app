@@ -4,7 +4,7 @@
       <mat-icon>search</mat-icon>
       <input
         type="text"
-        placeholder="Search objects, routes..."
+        placeholder="Search places, streets, routes..."
         [(ngModel)]="searchQuery"
         (input)="onSearchInput()"
         (keydown.enter)="submitSearch()"
@@ -21,7 +21,7 @@
 
     @if (showSuggestions && searchResults.length > 0) {
       <div class="suggestions">
-        @for (result of searchResults; track result.id) {
+        @for (result of searchResults; track result.id + ':' + (result.lat ?? 0) + ':' + (result.lng ?? 0)) {
           <div class="suggestion-item" (mousedown)="selectSuggestion(result)">
             <div class="suggestion-item__image">
               @if (result.image) {
@@ -105,16 +105,18 @@
         <div class="route-search-anchor">
             <input
               type="text"
-              placeholder="Add stop..."
+              placeholder="Add stop or address..."
               [(ngModel)]="routeSearchQuery"
               (input)="onRouteSearch()"
+              (keydown.enter)="routeSearchResults.length ? addRoutePoint(routeSearchResults[0]) : null"
               (blur)="onRouteSearchBlur()"
             />
             @if (routeSearchResults.length > 0) {
               <div class="route-suggestions">
-                @for (r of routeSearchResults; track r.id) {
-                  <div (click)="addRoutePoint(r)">
-                    {{ r.name }}
+                @for (r of routeSearchResults; track r.id + ':' + (r.lat ?? 0) + ':' + (r.lng ?? 0)) {
+                  <div class="route-suggestion-item" (mousedown)="addRoutePoint(r)">
+                    <strong>{{ r.name }}</strong>
+                    <span>{{ r.typeName }} · {{ r.location }}</span>
                   </div>
                 }
               </div>
@@ -247,7 +249,9 @@
         </div>
 
         <div class="bottom-card__actions">
-          <button class="bottom-card__btn" (click)="openDetails()">Details</button>
+          @if (selectedType !== 'address') {
+            <button class="bottom-card__btn" (click)="openDetails()">Details</button>
+          }
 
           <button class="bottom-card__btn bottom-card__btn--primary" (click)="openDirections()">
             <mat-icon>directions</mat-icon>
