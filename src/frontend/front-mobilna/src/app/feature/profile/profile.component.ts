@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, WritableSignal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, catchError, finalize, forkJoin, map, of, switchMap } from 'rxjs';
+import { Observable, catchError, finalize, forkJoin, map, of, switchMap, timeout } from 'rxjs';
 import { environment } from '../../../environment/environment';
 import { AuthService, UserDto, VisitedPlaceDto } from '../../services/auth';
 import { FavoriteService } from '../../services/favorite';
@@ -52,11 +52,11 @@ export class ProfileComponent implements OnInit {
   protected user: UserDto | null = null;
   protected readonly stats = signal<ProfileStat[]>(this.buildStats());
   protected visitedPlaces: VisitedPlaceDto[] = [];
-  protected shareUrl = '';
-  protected shareExpiresAt = '';
-  protected shareError = '';
-  protected shareBusyHours: number | null = null;
-  protected copySuccess = false;
+  protected readonly shareUrl = signal('');
+  protected readonly shareExpiresAt = signal('');
+  protected readonly shareError = signal('');
+  protected readonly shareBusyHours = signal<number | null>(null);
+  protected readonly copySuccess = signal(false);
   protected readonly shareDurations = [1, 4, 24];
 
   protected readonly sections: ProfileSection[] = [
@@ -164,42 +164,48 @@ export class ProfileComponent implements OnInit {
   }
 
   protected async copyShareUrl(): Promise<void> {
-    if (!this.shareUrl || typeof navigator === 'undefined' || !navigator.clipboard) {
+    if (!this.shareUrl() || typeof navigator === 'undefined' || !navigator.clipboard) {
       return;
     }
 
-    await navigator.clipboard.writeText(this.shareUrl);
-    this.copySuccess = true;
+    await navigator.clipboard.writeText(this.shareUrl());
+    this.copySuccess.set(true);
     setTimeout(() => {
-      this.copySuccess = false;
+      this.copySuccess.set(false);
     }, 2200);
   }
 
   protected generateLocationShare(durationHours: number): void {
-    this.shareError = '';
-    this.copySuccess = false;
-    this.shareUrl = '';
-    this.shareExpiresAt = '';
-    this.shareBusyHours = durationHours;
+    this.shareError.set('');
+    this.copySuccess.set(false);
+    this.shareUrl.set('');
+    this.shareExpiresAt.set('');
+    this.shareBusyHours.set(durationHours);
 
     this.prepareLocationShare()
       .pipe(
-        switchMap(() => this.authService.createLocationShare(durationHours)),
+        switchMap(() => {
+          console.log('[ShareLocation] prepareLocationShare završen, pozivam createLocationShare...');
+          return this.authService.createLocationShare(durationHours);
+        }),
         catchError((error) => {
-          this.shareError = this.resolveShareError(error);
+          console.error('[ShareLocation] greška:', error);
+          this.shareError.set(this.resolveShareError(error));
           return of(null);
         }),
         finalize(() => {
-          this.shareBusyHours = null;
+          console.log('[ShareLocation] finalize pozvan');
+          this.shareBusyHours.set(null);
         }),
       )
       .subscribe((share) => {
+        console.log('[ShareLocation] subscribe dobio:', share);
         if (!share) {
           return;
         }
 
-        this.shareUrl = share.shareUrl;
-        this.shareExpiresAt = share.expiresAtUtc;
+        this.shareUrl.set(share.shareUrl);
+        this.shareExpiresAt.set(share.expiresAtUtc);
       });
   }
 
@@ -217,12 +223,23 @@ export class ProfileComponent implements OnInit {
 
   private prepareLocationShare(): Observable<void> {
     const currentLocation = this.locationTrackingService.getCurrentLocation();
+    console.log('[ShareLocation] currentLocation:', currentLocation);
+    console.log('[ShareLocation] isFresh:', this.isFreshLocation(currentLocation));
 
     if (this.isFreshLocation(currentLocation)) {
-      return this.pushLocationToBackend(currentLocation).pipe(map(() => void 0));
+      console.log('[ShareLocation] Lokacija sveža, šaljem na backend...');
+      return this.pushLocationToBackend(currentLocation).pipe(
+        map(() => { console.log('[ShareLocation] push uspeo'); return void 0; }),
+        catchError((err) => { console.warn('[ShareLocation] push failed, nastavljam:', err); return of(void 0); }),
+      );
     }
 
-    return this.locationTrackingService.captureCurrentLocation().pipe(map(() => void 0));
+    console.log('[ShareLocation] Lokacija nije sveža, pozivam captureCurrentLocation...');
+    return this.locationTrackingService.captureCurrentLocation().pipe(
+      map((loc) => { console.log('[ShareLocation] capture uspeo:', loc); return void 0; }),
+      timeout(15000),
+      catchError((err) => { console.warn('[ShareLocation] capture failed/timeout:', err); return of(void 0); }),
+    );
   }
 
   private pushLocationToBackend(location: TrackedLocation): Observable<unknown> {

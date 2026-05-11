@@ -183,6 +183,40 @@
   color: var(--emperor);
 }
 
+.zone-suggestions {
+  margin-top: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(188, 225, 235, 0.92);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 10px 22px rgba(16, 99, 122, 0.08);
+}
+
+.zone-suggestion {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 11px 14px;
+  text-align: left;
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--emperor);
+  cursor: pointer;
+}
+
+.zone-suggestion + .zone-suggestion {
+  border-top: 1px solid rgba(208, 234, 240, 0.72);
+}
+
+.zone-suggestion:hover {
+  background: rgba(22, 138, 173, 0.08);
+}
+
+.zone-suggestion span {
+  display: block;
+}
+
 .zone-card__summary,
 .zone-card__error {
   margin: 10px 0 0;

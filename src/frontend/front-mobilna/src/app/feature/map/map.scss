@@ -323,11 +323,11 @@
   overflow-y: auto;
 }
 
-.route-suggestions>div {
+.route-suggestion-item {
   padding: 10px 14px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--emperor);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
   cursor: pointer;
   border-bottom: 1px solid var(--border);
   transition: background 0.15s;
@@ -339,6 +339,18 @@
   &:hover {
     background: var(--athens-gray);
   }
+}
+
+.route-suggestion-item strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--emperor);
+}
+
+.route-suggestion-item span {
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--text-gray);
 }
 
 .route-controls {

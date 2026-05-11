@@ -15,4 +15,12 @@ export class App {
   private readonly translationService = inject(TranslationService);
   private readonly locationIntelligenceService = inject(LocationIntelligenceService);
   protected readonly title = signal('front-mobilna');
+
+  constructor() {
+    localStorage.setItem('spirego-language', 'sr');
+    localStorage.setItem('appLanguage', 'sr');
+    localStorage.setItem('spirego-region-id', '1');
+  
+    this.translationService.setLanguage('sr');
+  }
 }

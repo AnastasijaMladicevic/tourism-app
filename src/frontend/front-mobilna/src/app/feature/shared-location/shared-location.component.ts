@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { catchError, of } from 'rxjs';
 import { AuthService, SharedLocationDto } from '../../services/auth';
@@ -17,15 +17,15 @@ export class SharedLocationComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly authService = inject(AuthService);
 
-  protected isLoading = true;
-  protected sharedLocation: SharedLocationDto | null = null;
-  protected hasError = false;
+  protected readonly isLoading = signal(true);
+  protected readonly sharedLocation = signal<SharedLocationDto | null>(null);
+  protected readonly hasError = signal(false);
 
   ngOnInit(): void {
     const token = this.route.snapshot.queryParamMap.get('token');
     if (!token) {
-      this.hasError = true;
-      this.isLoading = false;
+      this.hasError.set(true);
+      this.isLoading.set(false);
       return;
     }
 
@@ -33,9 +33,9 @@ export class SharedLocationComponent implements OnInit {
       .resolveLocationShare(token)
       .pipe(catchError(() => of(null)))
       .subscribe((location) => {
-        this.sharedLocation = location;
-        this.hasError = !location;
-        this.isLoading = false;
+        this.sharedLocation.set(location);
+        this.hasError.set(!location);
+        this.isLoading.set(false);
       });
   }
 }

@@ -29,11 +29,11 @@
       </div>
       @if (showSuggestions && searchResults.length > 0) {
         <div class="suggestions">
-          @for (result of searchResults; track result.id) {
+          @for (result of searchResults; track result.category + '-' + result.id) {
             <div class="suggestion-item" (mousedown)="selectSuggestion(result)">
               <div class="suggestion-item__image">
-                @if (result.image) {
-                  <img [src]="result.image" [alt]="result.name" loading="lazy" decoding="async" />
+                @if (result.imageUrl) {
+                  <img [src]="result.imageUrl" [alt]="result.name" loading="lazy" decoding="async" />
                 } @else {
                   <mat-icon>{{ result.icon }}</mat-icon>
                 }
