@@ -4,7 +4,7 @@
       <mat-icon>search</mat-icon>
       <input
         type="text"
-        placeholder="Search your places, events, activities…"
+        placeholder="Search objects, events, activities..."
         [(ngModel)]="searchQuery"
         (input)="onSearchInput()"
         (focus)="showSuggestions = searchResults.length > 0"
@@ -42,56 +42,35 @@
   </div>
 
   <div class="filter-chips">
-    @for (chip of filterChips; track chip.key) {
-      <button
-        class="chip"
-        [class.chip--active]="activeFilters.includes(chip.key)"
-        (click)="toggleFilter(chip.key)"
-      >
-        <span>{{ chip.icon }}</span>
-        {{ chip.label }}
-      </button>
-    }
+    <button
+      class="chip"
+      [class.chip--active]="activeFilters.includes('object')"
+      (click)="toggleFilter('object')"
+    >
+      <mat-icon>apartment</mat-icon>
+      Objects
+    </button>
+    <button
+      class="chip"
+      [class.chip--active]="activeFilters.includes('event')"
+      (click)="toggleFilter('event')"
+    >
+      <mat-icon>event</mat-icon>
+      Events
+    </button>
+    <button
+      class="chip"
+      [class.chip--active]="activeFilters.includes('activity')"
+      (click)="toggleFilter('activity')"
+    >
+      <mat-icon>hiking</mat-icon>
+      Activities
+    </button>
   </div>
-
-  @if (routeStart || routeEnd) {
-    <div class="route-planner">
-      <div class="route-planner__row">
-        <span class="route-planner__label">Start</span>
-        <span class="route-planner__value">{{ routeSummary(routeStart) }}</span>
-      </div>
-      <div class="route-planner__row">
-        <span class="route-planner__label">End</span>
-        <span class="route-planner__value">{{ routeSummary(routeEnd) }}</span>
-      </div>
-      <div class="route-planner__actions">
-        <button
-          class="route-planner__btn"
-          (click)="showRouteBetweenPins()"
-          [disabled]="!routeStart || !routeEnd"
-        >
-          <mat-icon>alt_route</mat-icon>
-          Show route
-        </button>
-        <button class="route-planner__btn route-planner__btn--ghost" (click)="clearPlannedRoute()">
-          <mat-icon>close</mat-icon>
-          Clear
-        </button>
-      </div>
-    </div>
-  }
 
   <div id="main-map" class="main-map"></div>
 
   <div class="map-controls">
-    <button
-      class="control-btn gps-btn"
-      (click)="toggleGpsTracking()"
-      [class.gps-btn--active]="isTracking"
-      aria-label="My location"
-    >
-      <mat-icon>{{ isTracking ? 'gps_fixed' : 'my_location' }}</mat-icon>
-    </button>
     <button class="control-btn" (click)="zoomIn()"><mat-icon>add</mat-icon></button>
     <button class="control-btn" (click)="zoomOut()"><mat-icon>remove</mat-icon></button>
   </div>
@@ -148,44 +127,8 @@
           }
         </div>
 
-        @if (canUseSelectedForRoute()) {
-          <div class="route-assign">
-            <button
-              class="route-assign__btn"
-              [class.route-assign__btn--active]="isSelectedAsStart()"
-              (click)="setRoutePoint('start')"
-            >
-              <mat-icon>trip_origin</mat-icon>
-              Set start
-            </button>
-            <button
-              class="route-assign__btn"
-              [class.route-assign__btn--active]="isSelectedAsEnd()"
-              (click)="setRoutePoint('end')"
-            >
-              <mat-icon>location_on</mat-icon>
-              Set end
-            </button>
-          </div>
-        }
-
         <div class="bottom-card__actions">
           <button class="bottom-card__btn" (click)="openDetails()">Details</button>
-          @if (userLocation) {
-            <button class="bottom-card__btn bottom-card__btn--outline" (click)="getDirections()">
-              <mat-icon>directions</mat-icon>
-              From GPS
-            </button>
-          }
-          @if (routeStart && routeEnd) {
-            <button
-              class="bottom-card__btn bottom-card__btn--outline"
-              (click)="showRouteBetweenPins()"
-            >
-              <mat-icon>alt_route</mat-icon>
-              Between pins
-            </button>
-          }
         </div>
       </div>
     </div>
