@@ -9,6 +9,7 @@ import {
   ViewChild,
   inject
 } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Subject, forkJoin, of } from 'rxjs';
@@ -47,6 +48,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   private readonly destinationService = inject(DestinationService);
   private readonly regionService = inject(RegionService);
   private readonly adminUsersService = inject(AdminUsersService);
+  private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -55,6 +57,8 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
 
   private readonly destroy$ = new Subject<void>();
   private readonly managerSearchInput$ = new Subject<string>();
+  private readonly destinationNameInput$ = new Subject<string>();
+  private isHydratingForm = false;
 
   isSubmitting = false;
   isLoadingRegions = true;
@@ -77,6 +81,8 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   managerSuggestionsOpen = false;
   managerSuggestionsLoading = false;
   selectedManager: AdminUserListItemDto | null = null;
+  locationLookupState: 'idle' | 'loading' | 'resolved' | 'not_found' | 'error' = 'idle';
+  locationLookupMessage = '';
 
   imageFiles: File[] = [];
   imagePreviews: string[] = [];
@@ -211,9 +217,48 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         this.managerSuggestionsOpen = true;
         this.cdr.detectChanges();
       });
+
+    this.destinationNameInput$
+      .pipe(
+        debounceTime(650),
+        distinctUntilChanged(),
+        tap((name) => {
+          const query = name.trim();
+          if (!query || query.length < 2) {
+            this.locationLookupState = 'idle';
+            this.locationLookupMessage = '';
+            return;
+          }
+          this.locationLookupState = 'loading';
+          this.locationLookupMessage = 'Searching map location...';
+        }),
+        switchMap((name) => this.lookupCoordinatesByName(name)),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((result) => {
+        if (!result) {
+          return;
+        }
+        if (result.kind === 'resolved') {
+          this.form.latitude = Number(result.lat.toFixed(6));
+          this.form.longitude = Number(result.lng.toFixed(6));
+          this.locationLookupState = 'resolved';
+          this.locationLookupMessage = `Location matched: ${result.label}`;
+        } else if (result.kind === 'not_found') {
+          this.locationLookupState = 'not_found';
+          this.locationLookupMessage =
+            'This destination name was not found in the selected region/country. Please check spelling or set coordinates manually.';
+        } else {
+          this.locationLookupState = 'error';
+          this.locationLookupMessage =
+            'Location lookup is temporarily unavailable. You can still set coordinates manually.';
+        }
+        this.cdr.detectChanges();
+      });
   }
 
   private applyLoadedDestination(destination: DestinationDto, images: DestinationImageDto[]): void {
+    this.isHydratingForm = true;
     this.form = {
       name: destination.name ?? '',
       description: destination.description,
@@ -235,6 +280,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         }
       });
     }
+    this.isHydratingForm = false;
   }
 
 
@@ -364,6 +410,22 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     return this.selectedRegion?.name ?? '—';
   }
 
+  get latitudeDirection(): 'N' | 'S' {
+    const lat = Number(this.form.latitude);
+    if (!Number.isFinite(lat)) {
+      return 'N';
+    }
+    return lat >= 0 ? 'N' : 'S';
+  }
+
+  get longitudeDirection(): 'E' | 'W' {
+    const lng = Number(this.form.longitude);
+    if (!Number.isFinite(lng)) {
+      return 'E';
+    }
+    return lng >= 0 ? 'E' : 'W';
+  }
+
   get coordinatesDisplay(): string {
     const lat = this.form.latitude;
     const lng = this.form.longitude;
@@ -379,17 +441,136 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     return this.form.name?.trim() || 'New destination';
   }
 
+  onDestinationNameInput(value: string): void {
+    if (this.isHydratingForm) {
+      return;
+    }
+    const query = (value ?? '').trim();
+    if (!query || query.length < 2) {
+      this.locationLookupState = 'idle';
+      this.locationLookupMessage = '';
+    }
+    this.destinationNameInput$.next(query);
+  }
+
   onRegionChange(): void {
     const r = this.selectedRegion;
     if (r?.centerLatitude != null && r?.centerLongitude != null) {
       this.form.latitude = Number(r.centerLatitude);
       this.form.longitude = Number(r.centerLongitude);
     }
+    this.destinationNameInput$.next(this.form.name?.trim() ?? '');
   }
 
   onMapLocationSelected(position: { lat: number; lng: number }): void {
     this.form.latitude = Number(position.lat.toFixed(6));
     this.form.longitude = Number(position.lng.toFixed(6));
+  }
+
+  private lookupCoordinatesByName(name: string) {
+    const query = name.trim();
+    if (!query || query.length < 2) {
+      return of(null as { kind: 'resolved'; lat: number; lng: number; label: string } | { kind: 'not_found' } | { kind: 'error' } | null);
+    }
+
+    const regionName = this.selectedRegion?.name?.trim();
+    const fullQuery = regionName ? `${query}, ${regionName}` : query;
+    let params = new HttpParams()
+      .set('q', fullQuery)
+      .set('format', 'jsonv2')
+      .set('limit', '5')
+      .set('addressdetails', '1');
+
+    if (this.selectedRegion?.code?.trim()) {
+      params = params.set('countrycodes', this.selectedRegion.code.toLowerCase());
+    }
+
+    return this.http
+      .get<
+        Array<{
+          lat: string;
+          lon: string;
+          class?: string;
+          type?: string;
+          name?: string;
+          display_name?: string;
+          address?: Record<string, string | undefined>;
+        }>
+      >('https://nominatim.openstreetmap.org/search', {
+        params
+      })
+      .pipe(
+        map((results) => {
+          const acceptable = (results ?? []).find((item) =>
+            this.isAcceptableGeocodeResult(query, item)
+          );
+          if (!acceptable) {
+            return { kind: 'not_found' } as const;
+          }
+          const lat = Number(acceptable.lat);
+          const lng = Number(acceptable.lon);
+          if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+            return { kind: 'not_found' } as const;
+          }
+          return {
+            kind: 'resolved' as const,
+            lat,
+            lng,
+            label: acceptable.display_name?.trim() || fullQuery
+          };
+        }),
+        catchError(() => of({ kind: 'error' as const }))
+      );
+  }
+
+  private isAcceptableGeocodeResult(
+    query: string,
+    item: {
+      class?: string;
+      type?: string;
+      name?: string;
+      address?: Record<string, string | undefined>;
+    }
+  ): boolean {
+    const normalize = (value: string | undefined): string =>
+      (value ?? '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim();
+
+    const normalizedQuery = normalize(query);
+    if (!normalizedQuery) {
+      return false;
+    }
+
+    // City-only search:
+    // - accept only map objects representing settlement places/admin areas
+    // - reject POIs (amenity/shop/tourism/etc.) such as cafes named like a city
+    const itemClass = normalize(item.class);
+    if (itemClass && itemClass !== 'place' && itemClass !== 'boundary') {
+      return false;
+    }
+
+    // Allow only city/town-level types.
+    const allowedTypes = new Set(['city', 'town']);
+    const resultType = normalize(item.type);
+    if (!allowedTypes.has(resultType)) {
+      return false;
+    }
+
+    const address = item.address ?? {};
+    const candidateNames = [
+      item.name,
+      address['city'],
+      address['town'],
+      address['city_district']
+    ]
+      .map((v) => normalize(v))
+      .filter((v) => v.length > 0);
+
+    // Require exact token match with one of primary place names.
+    return candidateNames.includes(normalizedQuery);
   }
 
   addCategory(): void {

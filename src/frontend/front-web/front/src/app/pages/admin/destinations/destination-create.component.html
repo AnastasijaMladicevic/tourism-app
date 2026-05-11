@@ -145,7 +145,22 @@
         <div class="field-grid">
           <label class="form-field full">
             <span class="label">Destination name *</span>
-            <input type="text" [(ngModel)]="form.name" placeholder="e.g. Emerald Valley Park" />
+            <input
+              type="text"
+              [(ngModel)]="form.name"
+              (ngModelChange)="onDestinationNameInput($event)"
+              placeholder="e.g. Emerald Valley Park"
+            />
+            @if (locationLookupState !== 'idle' && form.name.trim().length >= 2) {
+              <p
+                class="location-lookup-note"
+                [class.location-lookup-note--loading]="locationLookupState === 'loading'"
+                [class.location-lookup-note--ok]="locationLookupState === 'resolved'"
+                [class.location-lookup-note--warn]="locationLookupState === 'not_found' || locationLookupState === 'error'"
+              >
+                {{ locationLookupMessage }}
+              </p>
+            }
           </label>
 
           <label class="form-field full">
@@ -231,11 +246,17 @@
         <div class="coord-editor">
           <label class="form-field">
             <span class="label">Latitude</span>
-            <input type="number" step="any" [(ngModel)]="form.latitude" placeholder="42.424" />
+            <div class="coord-input-wrap">
+              <input type="number" step="any" [(ngModel)]="form.latitude" placeholder="42.424" />
+              <span class="coord-input-suffix">{{ latitudeDirection }}</span>
+            </div>
           </label>
           <label class="form-field">
             <span class="label">Longitude</span>
-            <input type="number" step="any" [(ngModel)]="form.longitude" placeholder="18.771" />
+            <div class="coord-input-wrap">
+              <input type="number" step="any" [(ngModel)]="form.longitude" placeholder="18.771" />
+              <span class="coord-input-suffix">{{ longitudeDirection }}</span>
+            </div>
           </label>
         </div>
 
@@ -244,10 +265,6 @@
           <p class="readonly-value">{{ regionDisplayName }}</p>
         </div>
 
-        <div class="readonly-field">
-          <span class="label">Coordinates</span>
-          <p class="readonly-value">{{ coordinatesDisplay }}</p>
-        </div>
       </article>
 
       <article class="panel">

@@ -237,6 +237,25 @@
   gap: 6px;
 }
 
+.location-lookup-note {
+  margin: 2px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.location-lookup-note--loading {
+  color: #0369a1;
+}
+
+.location-lookup-note--ok {
+  color: #166534;
+}
+
+.location-lookup-note--warn {
+  color: #b45309;
+}
+
 .form-field.full {
   grid-column: 1 / -1;
 }
@@ -538,6 +557,26 @@ textarea {
   grid-template-columns: 1fr 1fr;
   gap: 12px;
   margin-bottom: 14px;
+}
+
+.coord-input-wrap {
+  position: relative;
+}
+
+.coord-input-wrap input {
+  padding-right: 40px;
+}
+
+.coord-input-suffix {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  pointer-events: none;
 }
 
 .readonly-field {
