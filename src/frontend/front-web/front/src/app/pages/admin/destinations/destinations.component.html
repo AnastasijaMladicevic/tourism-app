@@ -1,0 +1,332 @@
+<section class="destinations-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Destinations management</p>
+      <h1>Destinations</h1>
+      <p class="page-intro">
+        Curate regional destinations, keep locality hierarchies organized, and preview how each
+        destination appears across the platform.
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="primary-btn" (click)="onAddDestination()">
+        <span class="material-symbols-outlined">add</span>
+        Add destination
+      </button>
+    </div>
+  </header>
+
+  <div class="toolbar card">
+    <div class="toolbar-search">
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input
+        type="text"
+        class="toolbar-input"
+        [(ngModel)]="draftSearchQuery"
+        (keydown.enter)="onSearchEnter($event)"
+        placeholder="Search destinations, regions, or country..."
+      />
+    </div>
+
+    <button type="button" class="ghost-btn slim-btn" (click)="onMoreFilters()">
+      <span class="material-symbols-outlined">filter_alt</span>
+      More Filters
+    </button>
+  </div>
+
+  @if (filterPanelOpen) {
+    <div class="filters-panel card">
+      <label>
+        <span>Status</span>
+        <select [(ngModel)]="statusFilter">
+          <option *ngFor="let option of statusOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>Region</span>
+        <select [(ngModel)]="regionFilter">
+          <option *ngFor="let option of regionFilterOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>Sort by</span>
+        <select [(ngModel)]="sortBy">
+          <option *ngFor="let option of sortByOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>Order</span>
+        <select [(ngModel)]="sortOrder">
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </label>
+
+      <div class="filter-actions">
+        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
+          Apply Filters
+        </button>
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
+          Reset Filters
+        </button>
+      </div>
+    </div>
+  }
+
+  <div class="destinations-layout">
+    <div class="main-column">
+      <div class="insights-grid">
+        <article
+          *ngFor="let insight of insightCards"
+          class="insight-card card"
+          [attr.data-tone]="insight.tone"
+        >
+          <p class="insight-title">
+            <span class="material-symbols-outlined insight-icon--title">{{ insight.icon }}</span>
+            {{ insight.label }}
+          </p>
+          <strong>{{ insight.value }}</strong>
+          <span>{{ insight.hint }}</span>
+        </article>
+      </div>
+
+      <div class="table-card">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Status</th>
+                <th>Destination</th>
+                <th>Type</th>
+                <th>Region</th>
+                <th>Manager</th>
+                <th>Inventory</th>
+                <th class="col-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (isLoading) {
+                <tr>
+                  <td colspan="7" class="table-message">Loading destinations…</td>
+                </tr>
+              } @else if (loadError) {
+                <tr>
+                  <td colspan="7" class="table-message table-message--error">
+                    <p>{{ loadError }}</p>
+                    <button type="button" class="ghost-btn slim-btn" (click)="reloadFromApi()">
+                      Retry
+                    </button>
+                  </td>
+                </tr>
+              } @else if (!visibleDestinations.length) {
+                <tr>
+                  <td colspan="7" class="table-message">No destinations match the current filters.</td>
+                </tr>
+              } @else {
+                <tr
+                  *ngFor="let row of visibleDestinations; trackBy: trackByDestinationId"
+                  [class.active-row]="selectedDestination?.id === row.id"
+                  (click)="selectDestination(row)"
+                >
+                  <td>
+                    <span class="table-status" [ngClass]="getTableStatusClass(row.status)">
+                      {{ formatTableStatus(row.status) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="destination-cell">
+                      <span
+                        class="destination-thumb"
+                        [style.background-image]="row.mainImageUrl ? 'url(' + row.mainImageUrl + ')' : ''"
+                        role="img"
+                        [attr.aria-label]="row.name"
+                      ></span>
+                      <div class="name-cell">
+                        <strong>{{ row.name }}</strong>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="type-pill">{{ row.destinationType }}</span>
+                  </td>
+                  <td>{{ row.region }}</td>
+                  <td>
+                    <span class="manager-cell">{{ row.managerName }}</span>
+                  </td>
+                  <td>
+                    <span class="inventory-cell">
+                      <span class="material-symbols-outlined inventory-icon">apartment</span>
+                      {{ row.objectCount }} Objects
+                    </span>
+                  </td>
+                  <td>
+                    <div class="row-actions">
+                      <button
+                        type="button"
+                        class="icon-btn plain"
+                        title="Edit destination"
+                        (click)="onEditDestination(row); $event.stopPropagation()"
+                      >
+                        <span class="material-symbols-outlined">edit</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <footer class="table-footer">
+          <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ totalCount }} destinations</p>
+          <div class="pagination-buttons">
+            <label class="page-size-control">
+              <span>Page size</span>
+              <select
+                class="page-size-select"
+                [(ngModel)]="pageSize"
+                (ngModelChange)="onPageSizeChange($event)"
+              >
+                <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
+              </select>
+            </label>
+
+            <button
+              type="button"
+              class="ghost-btn slim-btn"
+              (click)="onPreviousPage()"
+              [disabled]="currentPage === 1"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              class="ghost-btn slim-btn"
+              (click)="onNextPage()"
+              [disabled]="currentPage >= totalPages"
+            >
+              Next
+            </button>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+    <aside class="detail-column card">
+      @if (selectedDestination) {
+        <div class="destination-hero">
+          <div class="hero-media" [class.has-slides]="heroImageUrls.length > 0">
+            <div class="hero-media-slides" aria-hidden="true">
+              @for (url of heroImageUrls; track trackByHeroImage($index, url); let i = $index) {
+                <div
+                  class="hero-media-slide"
+                  [class.is-active]="i === currentHeroImageIndex"
+                  [ngStyle]="getHeroSlideStyle(url)"
+                ></div>
+              }
+            </div>
+            <span class="hero-badge">{{ selectedDestination.region }}</span>
+          </div>
+
+          <div class="hero-copy">
+            <p class="eyebrow">Destination preview</p>
+            <h2>{{ selectedDestination.name }}</h2>
+            <p class="hero-meta">
+              {{ selectedDestination.region }} · {{ selectedDestination.localityCount }} localities ·
+              {{ selectedDestination.objectCount }} objects
+            </p>
+            <span class="detail-status" [ngClass]="getStatusClass(selectedDestination.status)">
+              {{ formatTableStatus(selectedDestination.status) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="detail-metrics">
+          <div class="metric-card">
+            <span>Localities</span>
+            <strong>{{ selectedDestination.localityCount }}</strong>
+          </div>
+          <div class="metric-card">
+            <span>Objects</span>
+            <strong>{{ selectedDestination.objectCount }}</strong>
+          </div>
+        </div>
+
+        <section class="detail-section">
+          <div class="section-head">
+            <h3>Destination info</h3>
+          </div>
+
+          <div class="schedule-list">
+            <div class="schedule-item">
+              <span>Manager</span>
+              <strong>{{ selectedDestination.managerName || '—' }}</strong>
+            </div>
+            <div class="schedule-item">
+              <span>Region</span>
+              <strong>{{ selectedDestination.region }}</strong>
+            </div>
+            <div class="schedule-item">
+              <span>Last updated</span>
+              <strong>{{ selectedDestination.updatedAt | date: 'MMM d, y' }}</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h3>Description</h3>
+          <p class="description-copy">{{ selectedDestination.summary }}</p>
+        </section>
+
+        <section class="detail-section">
+          <div class="map-card">
+            <app-map
+              [lat]="selectedLat"
+              [lng]="selectedLng"
+              [zoom]="8"
+              [popupText]="hasSelectedCoordinates ? selectedMapLabel : ''"
+              [showMarker]="hasSelectedCoordinates"
+              [interactive]="false"
+              mapId="admin-destination-map"
+            ></app-map>
+            @if (!hasSelectedCoordinates) {
+              <div class="map-empty-state">
+                <span class="material-symbols-outlined">location_off</span>
+                <p>Map preview will appear when coordinates are configured.</p>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <button type="button" class="primary-btn sidebar-review-btn" (click)="onEditDestination(selectedDestination)">
+            <span class="material-symbols-outlined">rate_review</span>
+            Open full review
+          </button>
+        </section>
+      } @else {
+        <div class="empty-state">
+          <p class="eyebrow">No destination selected</p>
+          <h2>Pick a destination from the table</h2>
+          <p>
+            Select a row to review coverage, featured status, and how the destination is summarized
+            for admins.
+          </p>
+          <button type="button" class="primary-btn" (click)="onAddDestination()">
+            Add destination
+          </button>
+        </div>
+      }
+    </aside>
+  </div>
+</section>

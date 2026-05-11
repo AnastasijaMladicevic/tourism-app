@@ -95,7 +95,7 @@ export class ContentCreatorObjectsComponent implements OnInit {
       minRating: this.getMinRatingFromFilter(this.ratingFilter),
       sortBy: this.sortBy,
       sortOrder: this.sortOrder
-    }).subscribe({
+    }, { bypassRegion: true }).subscribe({
       next: (response) => {
         const items = response?.items ?? [];
         this.objects = items;

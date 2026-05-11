@@ -1,0 +1,18 @@
+{
+  "/api": {
+    "target": "https://localhost:7047",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/images": {
+    "target": "https://localhost:7047",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/hubs": {
+    "target": "https://localhost:7047",
+    "secure": false,
+    "changeOrigin": true,
+    "ws": true
+  }
+}

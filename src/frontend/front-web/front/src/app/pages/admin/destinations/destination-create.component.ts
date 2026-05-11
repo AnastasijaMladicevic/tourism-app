@@ -1,0 +1,854 @@
+import { CommonModule } from '@angular/common';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  inject
+} from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { Subject, forkJoin, of } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  finalize,
+  map,
+  switchMap,
+  takeUntil,
+  tap
+} from 'rxjs/operators';
+import {
+  AdminUserListItemDto,
+  AdminUsersService
+} from '../../../services/admin-users.service';
+import {
+  CreateDestinationDto,
+  DestinationDto,
+  DestinationImageDto,
+  DestinationService,
+  UpdateDestinationDto
+} from '../../../services/destination.service';
+import { RegionDto, RegionService } from '../../../services/region';
+import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
+
+@Component({
+  selector: 'app-admin-create-destination',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink, SharedMapComponent],
+  templateUrl: './destination-create.component.html',
+  styleUrls: ['./destination-create.component.css']
+})
+export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
+  private readonly destinationService = inject(DestinationService);
+  private readonly regionService = inject(RegionService);
+  private readonly adminUsersService = inject(AdminUsersService);
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
+  private readonly cdr = inject(ChangeDetectorRef);
+
+  @ViewChild('managerCombo') managerComboRef?: ElementRef<HTMLElement>;
+
+  private readonly destroy$ = new Subject<void>();
+  private readonly managerSearchInput$ = new Subject<string>();
+  private readonly destinationNameInput$ = new Subject<string>();
+  private isHydratingForm = false;
+
+  isSubmitting = false;
+  isLoadingRegions = true;
+  errorMessage = '';
+  draftSavedMessage = '';
+  private savedDestinationId: number | null = null;
+  editDestinationId: number | null = null;
+  isLoadingDestination = false;
+  private readonly navigationState = (this.router.getCurrentNavigation()?.extras?.state ??
+    history.state ??
+    {}) as { linkedEntityCounts?: { objects?: number; localities?: number } };
+
+  regions: RegionDto[] = [];
+
+  fullDescription = '';
+  categoryInput = '';
+  categories: string[] = [];
+  managerSearch = '';
+  managerSuggestions: AdminUserListItemDto[] = [];
+  managerSuggestionsOpen = false;
+  managerSuggestionsLoading = false;
+  selectedManager: AdminUserListItemDto | null = null;
+  locationLookupState: 'idle' | 'loading' | 'resolved' | 'not_found' | 'error' = 'idle';
+  locationLookupMessage = '';
+
+  imageFiles: File[] = [];
+  imagePreviews: string[] = [];
+  primaryPreviewImageIndex = 0;
+  destinationImages: DestinationImageDto[] = [];
+  isUpdatingImages = false;
+  isLoadingLinkedEntities = false;
+  linkedEntityCounts = {
+    objects: 0,
+    events: 0,
+    activities: 0,
+    localities: 0
+  };
+
+  form: CreateDestinationDto = {
+    name: '',
+    description: '',
+    destinationTypeId: 1,
+    regionId: undefined,
+    latitude: undefined,
+    longitude: undefined,
+    isActive: true
+  };
+
+  get isEditMode(): boolean {
+    return this.editDestinationId != null;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.imagePreviews.forEach((url) => {
+      if (url.startsWith('blob:')) {
+        URL.revokeObjectURL(url);
+      }
+    });
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const root = this.managerComboRef?.nativeElement;
+    if (root && !root.contains(event.target as Node)) {
+      this.managerSuggestionsOpen = false;
+    }
+  }
+
+  ngOnInit(): void {
+    this.scrollPageToTop();
+    const fromState = this.navigationState.linkedEntityCounts;
+    if (fromState) {
+      this.linkedEntityCounts.objects = Number(fromState.objects ?? 0);
+      this.linkedEntityCounts.localities = Number(fromState.localities ?? 0);
+    }
+
+    const rawId = this.route.snapshot.paramMap.get('id');
+    const parsedId = rawId ? Number(rawId) : NaN;
+    if (Number.isInteger(parsedId) && parsedId > 0) {
+      this.editDestinationId = parsedId;
+      this.savedDestinationId = parsedId;
+      this.isLoadingDestination = true;
+      this.errorMessage = '';
+    }
+
+    const regionRequest$ = this.regionService.getAll(true).pipe(
+      catchError(() => {
+        this.errorMessage = 'Could not load regions. You can still create a destination without a region.';
+        return of([] as RegionDto[]);
+      })
+    );
+
+    const destinationRequest$ =
+      this.editDestinationId != null
+        ? forkJoin({
+            destination: this.destinationService.getById(this.editDestinationId),
+            images: this.destinationService.getImages(this.editDestinationId).pipe(
+              catchError(() => of([] as DestinationImageDto[]))
+            )
+          }).pipe(
+            catchError(() => {
+              this.errorMessage = 'Could not load destination for editing.';
+              return of(null);
+            })
+          )
+        : of(null);
+
+    forkJoin({ regions: regionRequest$, destination: destinationRequest$ })
+      .pipe(
+        finalize(() => {
+          this.isLoadingRegions = false;
+          this.isLoadingDestination = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe(({ regions, destination }) => {
+        this.regions = [...regions].sort((a, b) => a.name.localeCompare(b.name));
+        if (destination) {
+          this.applyLoadedDestination(destination.destination, destination.images);
+        }
+        this.cdr.detectChanges();
+        this.scrollPageToTop();
+      });
+
+    this.managerSearchInput$
+      .pipe(
+        debounceTime(250),
+        distinctUntilChanged(),
+        tap((term) => {
+          if (!term.trim()) {
+            this.managerSuggestions = [];
+            this.managerSuggestionsLoading = false;
+            this.managerSuggestionsOpen = false;
+          }
+        }),
+        switchMap((term) => {
+          const q = term.trim();
+          if (!q) {
+            return of(null);
+          }
+          this.managerSuggestionsLoading = true;
+          return this.adminUsersService.searchManagers(q).pipe(
+            finalize(() => (this.managerSuggestionsLoading = false))
+          );
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((page) => {
+        if (!page) {
+          return;
+        }
+        const skipId = this.selectedManager?.id;
+        this.managerSuggestions = page.items.filter((u) => u.id !== skipId);
+        this.managerSuggestionsOpen = true;
+        this.cdr.detectChanges();
+      });
+
+    this.destinationNameInput$
+      .pipe(
+        debounceTime(650),
+        distinctUntilChanged(),
+        tap((name) => {
+          const query = name.trim();
+          if (!query || query.length < 2) {
+            this.locationLookupState = 'idle';
+            this.locationLookupMessage = '';
+            return;
+          }
+          this.locationLookupState = 'loading';
+          this.locationLookupMessage = 'Searching map location...';
+        }),
+        switchMap((name) => this.lookupCoordinatesByName(name)),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((result) => {
+        if (!result) {
+          return;
+        }
+        if (result.kind === 'resolved') {
+          this.form.latitude = Number(result.lat.toFixed(6));
+          this.form.longitude = Number(result.lng.toFixed(6));
+          this.locationLookupState = 'resolved';
+          this.locationLookupMessage = `Location matched: ${result.label}`;
+        } else if (result.kind === 'not_found') {
+          this.locationLookupState = 'not_found';
+          this.locationLookupMessage =
+            'This destination name was not found in the selected region/country. Please check spelling or set coordinates manually.';
+        } else {
+          this.locationLookupState = 'error';
+          this.locationLookupMessage =
+            'Location lookup is temporarily unavailable. You can still set coordinates manually.';
+        }
+        this.cdr.detectChanges();
+      });
+  }
+
+  private applyLoadedDestination(destination: DestinationDto, images: DestinationImageDto[]): void {
+    this.isHydratingForm = true;
+    this.form = {
+      name: destination.name ?? '',
+      description: destination.description,
+      destinationTypeId: destination.destinationTypeId ?? 1,
+      regionId: destination.regionId,
+      latitude: destination.latitude,
+      longitude: destination.longitude,
+      isActive: Boolean(destination.isActive)
+    };
+    this.fullDescription = destination.description ?? '';
+    this.destinationImages = [...images].sort((a, b) => (a.isMain === b.isMain ? 0 : a.isMain ? -1 : 1));
+
+    if (destination.managedByUserId) {
+      this.adminUsersService.searchManagers('', 200).subscribe({
+        next: (res) => {
+          const manager = res.items.find((u) => u.id === destination.managedByUserId) ?? null;
+          this.selectedManager = manager;
+          this.cdr.detectChanges();
+        }
+      });
+    }
+    this.isHydratingForm = false;
+  }
+
+
+  setPrimaryDestinationImage(image: DestinationImageDto): void {
+    if (!this.isEditMode || this.isUpdatingImages || !image?.id) {
+      return;
+    }
+
+    this.isUpdatingImages = true;
+    this.destinationService
+      .setMainImage(image.id)
+      .pipe(finalize(() => (this.isUpdatingImages = false)))
+      .subscribe({
+        next: () => {
+          this.destinationImages = this.destinationImages
+            .map((img) => ({ ...img, isMain: img.id === image.id }))
+            .sort((a, b) => (a.isMain === b.isMain ? 0 : a.isMain ? -1 : 1));
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.errorMessage = this.extractApiErrorMessage(err);
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  removeDestinationImage(image: DestinationImageDto): void {
+    if (!this.isEditMode || this.isUpdatingImages || !image?.id) {
+      return;
+    }
+
+    this.isUpdatingImages = true;
+    this.destinationService
+      .deleteImageById(image.id)
+      .pipe(finalize(() => (this.isUpdatingImages = false)))
+      .subscribe({
+        next: () => {
+          this.destinationImages = this.destinationImages.filter((img) => img.id !== image.id);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.errorMessage = this.extractApiErrorMessage(err);
+          this.cdr.detectChanges();
+        }
+      });
+  }
+
+  onManagerSearchInput(value: string): void {
+    const normalized = value.trim();
+    if (!normalized) {
+      this.managerSuggestions = [];
+      this.managerSuggestionsOpen = false;
+      this.managerSuggestionsLoading = false;
+      return;
+    }
+    this.managerSuggestionsOpen = true;
+    this.managerSearchInput$.next(normalized);
+  }
+
+  onManagerSearchFocus(): void {
+    const q = this.managerSearch.trim();
+    if (!q) {
+      this.managerSuggestionsLoading = true;
+      this.adminUsersService
+        .searchManagers('', 10)
+        .pipe(finalize(() => (this.managerSuggestionsLoading = false)))
+        .subscribe({
+          next: (page) => {
+            const skipId = this.selectedManager?.id;
+            this.managerSuggestions = page.items.filter((u) => u.id !== skipId);
+            this.managerSuggestionsOpen = true;
+            this.cdr.detectChanges();
+          },
+          error: () => {
+            this.managerSuggestions = [];
+            this.managerSuggestionsOpen = true;
+            this.cdr.detectChanges();
+          }
+        });
+      return;
+    }
+    this.managerSuggestionsOpen = true;
+    this.managerSearchInput$.next(q);
+  }
+
+  selectManager(user: AdminUserListItemDto): void {
+    this.selectedManager = user;
+    this.managerSearch = '';
+    this.managerSuggestions = [];
+    this.managerSuggestionsOpen = false;
+  }
+
+  clearSelectedManager(): void {
+    this.selectedManager = null;
+  }
+
+  displayName(user: AdminUserListItemDto): string {
+    return `${user.firstName} ${user.lastName}`.trim() || user.email;
+  }
+
+  managerInitials(user: AdminUserListItemDto): string {
+    const a = user.firstName?.charAt(0) ?? '';
+    const b = user.lastName?.charAt(0) ?? '';
+    const s = `${a}${b}`.toUpperCase();
+    return s || user.email.charAt(0).toUpperCase();
+  }
+
+  get mapLat(): number {
+    const v = Number(this.form.latitude);
+    return Number.isFinite(v) ? v : 42.424;
+  }
+
+  get mapLng(): number {
+    const v = Number(this.form.longitude);
+    return Number.isFinite(v) ? v : 18.771;
+  }
+
+  get selectedRegion(): RegionDto | undefined {
+    const id = this.form.regionId;
+    if (id == null) {
+      return undefined;
+    }
+    return this.regions.find((r) => r.id === id);
+  }
+
+  get regionDisplayName(): string {
+    return this.selectedRegion?.name ?? '—';
+  }
+
+  get latitudeDirection(): 'N' | 'S' {
+    const lat = Number(this.form.latitude);
+    if (!Number.isFinite(lat)) {
+      return 'N';
+    }
+    return lat >= 0 ? 'N' : 'S';
+  }
+
+  get longitudeDirection(): 'E' | 'W' {
+    const lng = Number(this.form.longitude);
+    if (!Number.isFinite(lng)) {
+      return 'E';
+    }
+    return lng >= 0 ? 'E' : 'W';
+  }
+
+  get coordinatesDisplay(): string {
+    const lat = this.form.latitude;
+    const lng = this.form.longitude;
+    if (lat == null || lng == null || !Number.isFinite(Number(lat)) || !Number.isFinite(Number(lng))) {
+      return 'Set latitude and longitude';
+    }
+    const ns = Number(lat) >= 0 ? 'N' : 'S';
+    const ew = Number(lng) >= 0 ? 'E' : 'W';
+    return `${Math.abs(Number(lat)).toFixed(4)}° ${ns}, ${Math.abs(Number(lng)).toFixed(4)}° ${ew}`;
+  }
+
+  get mapPopupText(): string {
+    return this.form.name?.trim() || 'New destination';
+  }
+
+  onDestinationNameInput(value: string): void {
+    if (this.isHydratingForm) {
+      return;
+    }
+    const query = (value ?? '').trim();
+    if (!query || query.length < 2) {
+      this.locationLookupState = 'idle';
+      this.locationLookupMessage = '';
+    }
+    this.destinationNameInput$.next(query);
+  }
+
+  onRegionChange(): void {
+    const r = this.selectedRegion;
+    if (r?.centerLatitude != null && r?.centerLongitude != null) {
+      this.form.latitude = Number(r.centerLatitude);
+      this.form.longitude = Number(r.centerLongitude);
+    }
+    this.destinationNameInput$.next(this.form.name?.trim() ?? '');
+  }
+
+  onMapLocationSelected(position: { lat: number; lng: number }): void {
+    this.form.latitude = Number(position.lat.toFixed(6));
+    this.form.longitude = Number(position.lng.toFixed(6));
+  }
+
+  private lookupCoordinatesByName(name: string) {
+    const query = name.trim();
+    if (!query || query.length < 2) {
+      return of(null as { kind: 'resolved'; lat: number; lng: number; label: string } | { kind: 'not_found' } | { kind: 'error' } | null);
+    }
+
+    const regionName = this.selectedRegion?.name?.trim();
+    const queryVariants = this.buildLocationQueryVariants(query);
+    const requests = queryVariants.map((variant) => {
+      const fullQuery = regionName ? `${variant}, ${regionName}` : variant;
+      let params = new HttpParams()
+        .set('q', fullQuery)
+        .set('format', 'jsonv2')
+        .set('limit', '8')
+        .set('addressdetails', '1')
+        .set('namedetails', '1')
+        .set('accept-language', 'sr,en');
+
+      if (this.selectedRegion?.code?.trim()) {
+        params = params.set('countrycodes', this.selectedRegion.code.toLowerCase());
+      }
+
+      return this.http.get<
+        Array<{
+          lat: string;
+          lon: string;
+          class?: string;
+          type?: string;
+          name?: string;
+          display_name?: string;
+          address?: Record<string, string | undefined>;
+          namedetails?: Record<string, string | undefined>;
+        }>
+      >('https://nominatim.openstreetmap.org/search', {
+        params
+      });
+    });
+
+    return forkJoin(requests)
+      .pipe(
+        map((responseGroups) => {
+          const allResults = responseGroups.flatMap((group) => group ?? []);
+          const acceptable = allResults.find((item) =>
+            this.isAcceptableGeocodeResult(queryVariants, item)
+          );
+          if (!acceptable) {
+            return { kind: 'not_found' } as const;
+          }
+          const lat = Number(acceptable.lat);
+          const lng = Number(acceptable.lon);
+          if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+            return { kind: 'not_found' } as const;
+          }
+          return {
+            kind: 'resolved' as const,
+            lat,
+            lng,
+            label: acceptable.display_name?.trim() || query
+          };
+        }),
+        catchError(() => of({ kind: 'error' as const }))
+      );
+  }
+
+  private buildLocationQueryVariants(query: string): string[] {
+    const normalized = this.normalizeLookupValue(query);
+    const aliases: Record<string, string[]> = {
+      tasos: ['thasos'],
+      thasos: ['tasos'],
+      roma: ['rome'],
+      rome: ['roma'],
+      atina: ['athens'],
+      athens: ['atina'],
+      bec: ['vienna'],
+      vienna: ['bec'],
+      solun: ['thessaloniki'],
+      thessaloniki: ['solun']
+    };
+
+    const variants = [query.trim(), ...(aliases[normalized] ?? [])].filter((v) => v.trim().length > 0);
+    return Array.from(new Set(variants));
+  }
+
+  private normalizeLookupValue(value: string | undefined): string {
+    return (value ?? '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+  }
+
+  private isAcceptableGeocodeResult(
+    queryVariants: string[],
+    item: {
+      class?: string;
+      type?: string;
+      name?: string;
+      display_name?: string;
+      address?: Record<string, string | undefined>;
+      namedetails?: Record<string, string | undefined>;
+    }
+  ): boolean {
+    const normalizedQueries = queryVariants
+      .map((q) => this.normalizeLookupValue(q))
+      .filter((q) => q.length > 0);
+    if (!normalizedQueries.length) {
+      return false;
+    }
+
+    const itemClass = this.normalizeLookupValue(item.class);
+    if (itemClass && itemClass !== 'place' && itemClass !== 'boundary') {
+      return false;
+    }
+
+    // Keep settlement/admin-like place types and avoid POIs.
+    const allowedTypes = new Set([
+      'city',
+      'town',
+      'village',
+      'municipality',
+      'administrative',
+      'hamlet',
+      'suburb',
+      'island'
+    ]);
+    const resultType = this.normalizeLookupValue(item.type);
+    if (!allowedTypes.has(resultType)) {
+      return false;
+    }
+
+    const address = item.address ?? {};
+    const namedetails = item.namedetails ?? {};
+    const candidateNames = [
+      item.name,
+      item.display_name?.split(',')[0],
+      address['city'],
+      address['town'],
+      address['village'],
+      address['municipality'],
+      address['county'],
+      address['state'],
+      address['island'],
+      address['city_district'],
+      namedetails['name'],
+      namedetails['name:en'],
+      namedetails['name:sr'],
+      namedetails['name:sr-Latn']
+    ]
+      .map((v) => this.normalizeLookupValue(v))
+      .filter((v) => v.length > 0);
+
+    return normalizedQueries.some((q) => candidateNames.includes(q));
+  }
+
+  addCategory(): void {
+    const next = this.categoryInput.trim();
+    if (!next) {
+      return;
+    }
+    this.categories = [...this.categories, next];
+    this.categoryInput = '';
+  }
+
+  removeCategory(index: number): void {
+    this.categories = this.categories.filter((_, i) => i !== index);
+  }
+
+  onGalleryFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = input.files;
+    if (!files?.length) {
+      return;
+    }
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      this.imageFiles.push(file);
+      this.imagePreviews.push(URL.createObjectURL(file));
+    }
+    if (this.primaryPreviewImageIndex >= this.imagePreviews.length) {
+      this.primaryPreviewImageIndex = Math.max(0, this.imagePreviews.length - 1);
+    }
+    input.value = '';
+  }
+
+  removeGalleryImage(index: number): void {
+    const url = this.imagePreviews[index];
+    if (url?.startsWith('blob:')) {
+      URL.revokeObjectURL(url);
+    }
+    this.imagePreviews = this.imagePreviews.filter((_, i) => i !== index);
+    this.imageFiles = this.imageFiles.filter((_, i) => i !== index);
+    if (this.imagePreviews.length === 0) {
+      this.primaryPreviewImageIndex = 0;
+      return;
+    }
+    if (index < this.primaryPreviewImageIndex) {
+      this.primaryPreviewImageIndex--;
+    } else if (index === this.primaryPreviewImageIndex) {
+      this.primaryPreviewImageIndex = 0;
+    }
+  }
+
+  setPrimaryPreviewImage(index: number): void {
+    if (index < 0 || index >= this.imagePreviews.length) {
+      return;
+    }
+    this.primaryPreviewImageIndex = index;
+  }
+
+  private buildDescriptionPayload(): string | undefined {
+    const text = this.fullDescription.trim();
+    return text || undefined;
+  }
+
+  private validateBasics(): boolean {
+    if (!this.form.name.trim()) {
+      this.errorMessage = 'Destination name is required.';
+      return false;
+    }
+    if (!this.selectedManager && this.savedDestinationId == null) {
+      this.errorMessage = 'Please select a manager.';
+      return false;
+    }
+    this.errorMessage = '';
+    return true;
+  }
+
+  onSaveDraft(): void {
+    if (!this.validateBasics() || this.isSubmitting) {
+      return;
+    }
+    this.persist(false);
+  }
+
+  onSubmit(): void {
+    if (!this.validateBasics() || this.isSubmitting) {
+      return;
+    }
+    this.persist(true);
+  }
+
+  private persist(published: boolean): void {
+    this.isSubmitting = true;
+    this.draftSavedMessage = '';
+
+    const createPayload: CreateDestinationDto = {
+      name: this.form.name.trim(),
+      description: this.buildDescriptionPayload(),
+      destinationTypeId: Number(this.form.destinationTypeId),
+      regionId: this.form.regionId ? Number(this.form.regionId) : undefined,
+      latitude: this.form.latitude != null ? Number(this.form.latitude) : undefined,
+      longitude: this.form.longitude != null ? Number(this.form.longitude) : undefined,
+      isActive: published,
+      managedByUserId: this.selectedManager?.id
+    };
+
+    const updatePayload: UpdateDestinationDto = {
+      name: createPayload.name,
+      description: createPayload.description,
+      destinationTypeId: createPayload.destinationTypeId,
+      regionId: createPayload.regionId,
+      latitude: createPayload.latitude,
+      longitude: createPayload.longitude,
+      isActive: createPayload.isActive
+    };
+
+    const isCreateRequest = this.savedDestinationId == null;
+    const request$ =
+      !isCreateRequest
+        ? this.destinationService.update(this.savedDestinationId!, updatePayload)
+        : this.destinationService.create(createPayload);
+
+    request$
+      .pipe(
+        switchMap((saved: DestinationDto) => {
+          this.savedDestinationId = saved.id;
+          if (!this.selectedManager) {
+            return of({ assigned: true as const });
+          }
+          if (isCreateRequest) {
+            return this.destinationService.assignManager(saved.id, this.selectedManager.id).pipe(
+              map(() => ({ assigned: true as const })),
+              catchError((err) =>
+                of({
+                  assigned: false as const,
+                  assignError:
+                    typeof err?.error?.message === 'string'
+                      ? err.error.message
+                      : 'Destination was saved, but assigning the manager failed.'
+                })
+              )
+            );
+          }
+          return this.destinationService.assignManager(saved.id, this.selectedManager.id).pipe(
+            map(() => ({ assigned: true as const })),
+            catchError((err) =>
+              of({
+                assigned: false as const,
+                assignError:
+                  typeof err?.error?.message === 'string'
+                    ? err.error.message
+                    : 'Destination was saved, but assigning the manager failed.'
+              })
+            )
+          );
+        }),
+        finalize(() => (this.isSubmitting = false))
+      )
+      .subscribe({
+        next: (out) => {
+          if (!out.assigned) {
+            if (published) {
+              this.router.navigate(['/admin/destinations']);
+              return;
+            }
+            this.errorMessage = out.assignError;
+            this.draftSavedMessage =
+              'Draft saved to the server. You can fix manager assignment and save again.';
+            return;
+          }
+          if (published) {
+            this.router.navigate(['/admin/destinations']);
+            return;
+          }
+          this.form.isActive = false;
+          this.draftSavedMessage = 'Draft saved to the server';
+        },
+        error: (err) => {
+          this.errorMessage = this.extractApiErrorMessage(err);
+        }
+      });
+  }
+
+  private extractApiErrorMessage(err: unknown): string {
+    const maybeError = err as {
+      error?: { message?: string; errors?: Record<string, string[]> | string[] };
+    };
+    const direct = maybeError?.error?.message;
+    if (typeof direct === 'string' && direct.trim().length > 0) {
+      return direct;
+    }
+    const validation = maybeError?.error?.errors;
+    if (Array.isArray(validation) && validation.length) {
+      return validation[0];
+    }
+    if (validation && typeof validation === 'object') {
+      const validationMap = validation as Record<string, string[]>;
+      const firstKey = Object.keys(validationMap)[0];
+      const firstValue = firstKey ? validationMap[firstKey] : undefined;
+      if (Array.isArray(firstValue) && firstValue.length) {
+        return firstValue[0];
+      }
+    }
+    return 'Save failed. Please check fields and try again.';
+  }
+
+  private scrollPageToTop(): void {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    // Some layouts use custom scroll containers instead of window.
+    const scrollableContainers = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        '.page-outlet, .main-content, .content, .page-content, .workspace'
+      )
+    );
+    for (const container of scrollableContainers) {
+      container.scrollTop = 0;
+    }
+
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      for (const container of scrollableContainers) {
+        container.scrollTop = 0;
+      }
+    }, 0);
+  }
+
+  onCancel(): void {
+    this.router.navigate(['/admin/destinations']);
+  }
+}
