@@ -45,7 +45,7 @@
   },
   "home": {
     "greeting": "Hi, glad to see you again",
-    "searchPlaceholder": "Ask where to go, what to see or where to eat...",
+    "searchPlaceholder": "Search places, restaurants, events or activities...",
     "chooseRegion": "Choose Region",
     "categories": "Categories",
     "featuredDestination": "Featured Destination",

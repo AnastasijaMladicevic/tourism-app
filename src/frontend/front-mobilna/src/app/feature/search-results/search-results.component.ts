@@ -5,10 +5,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { Subscription, catchError, forkJoin, of } from 'rxjs';
 import { ActivityDto, ActivityService } from '../../services/activity';
-import { AiChatResponseDto, AiChatService } from '../../services/ai-chat';
 import { DestinationDto, DestinationService } from '../../services/destination';
 import { EventDto, EventService } from '../../services/event';
-import { LocationTrackingService } from '../../services/location-tracking';
 import { LocalityDto, LocalityService } from '../../services/locality';
 import { ObjectDto, ObjectService } from '../../services/object';
 import { SmartSearchResultDto } from '../../services/smart-search';
@@ -45,13 +43,11 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly aiChatService: AiChatService,
     private readonly destinationService: DestinationService,
     private readonly objectService: ObjectService,
     private readonly eventService: EventService,
     private readonly activityService: ActivityService,
     private readonly localityService: LocalityService,
-    private readonly locationTrackingService: LocationTrackingService,
   ) {}
 
   ngOnInit(): void {
@@ -159,49 +155,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   private runSearch(query: string, source: SearchSource): void {
     this.isLoading = true;
     this.hasSearched = true;
-
-    if (source === 'home') {
-      this.runAiSearch(query, source);
-      return;
-    }
-
     this.runKeywordSearch(query, source);
-  }
-
-  private runAiSearch(query: string, source: SearchSource): void {
-    const currentLocation = this.locationTrackingService.getCurrentLocation();
-    const includeLocation =
-      this.locationTrackingService.isTrackingEnabled() && currentLocation != null;
-
-    this.aiChatService
-      .chat({
-        message: query,
-        history: [],
-        latitude: includeLocation ? currentLocation?.latitude : undefined,
-        longitude: includeLocation ? currentLocation?.longitude : undefined,
-      })
-      .pipe(
-        catchError(() =>
-          of({
-            answer: '',
-            provider: 'fallback',
-            usedTool: false,
-            usedFallback: true,
-            warning: 'Odgovor trenutno nije dostupan. Pokusaj ponovo za trenutak.',
-            results: [],
-          } as AiChatResponseDto),
-        ),
-      )
-      .subscribe((response) => {
-        if (this.searchQuery.trim() !== query || this.source !== source) {
-          return;
-        }
-
-        this.answer = response.answer?.trim() ?? '';
-        this.warning = response.warning?.trim() || null;
-        this.results = response.results ?? [];
-        this.isLoading = false;
-      });
   }
 
   private runKeywordSearch(query: string, source: SearchSource): void {
