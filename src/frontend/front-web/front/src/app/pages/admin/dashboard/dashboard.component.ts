@@ -1,7 +1,6 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import * as L from 'leaflet';
-
+import { MapService } from '../../../services/map.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -9,7 +8,7 @@ import * as L from 'leaflet';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements AfterViewInit {
+export class DashboardComponent implements AfterViewInit, OnDestroy {
 
   // ---- Stat kartice ----
   // Kada backend bude gotov, ove vrednosti dobijaš iz servisa
@@ -71,36 +70,31 @@ export class DashboardComponent implements AfterViewInit {
     { lat: 42.2594, lng: 18.8767, label: 'Rafailovići' },
     { lat: 42.2683, lng: 18.8831, label: 'Bečići' }
   ];
-
+  constructor(private mapService: MapService) { }
+  ngOnDestroy(): void {
+    this.mapService.destroyMap();
+  }
   ngAfterViewInit(): void {
     this.initMap();
   }
 
   private initMap(): void {
-    const icon = L.icon({
-      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-      iconSize: [20, 32],
-      iconAnchor: [10, 32],
-      popupAnchor: [0, -32],
-      shadowSize: [32, 32]
-    });
 
-    const map = L.map('dashboard-map', {
-      center: [42.35, 18.75],
-      zoom: 9,
-      zoomControl: true,
-      scrollWheelZoom: false
-    });
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: ''
-    }).addTo(map);
+    this.mapService.initMap(
+      'dashboard-map',
+      42.35,
+      18.75,
+      9
+    );
 
     this.mapMarkers.forEach(m => {
-      L.marker([m.lat, m.lng], { icon })
-        .addTo(map)
-        .bindPopup(`<strong>${m.label}</strong>`);
+
+      this.mapService.addMainMapMarker(
+        m.lat,
+        m.lng,
+        m.label
+      );
+
     });
   }
 }

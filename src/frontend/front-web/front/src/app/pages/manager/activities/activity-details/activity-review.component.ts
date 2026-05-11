@@ -1,46 +1,33 @@
 import { CommonModule } from '@angular/common';
 import {
-  AfterViewInit,
   ChangeDetectorRef,
   Component,
-  ElementRef,
-  NgZone,
   OnDestroy,
   OnInit,
-  ViewChild,
   inject
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
-import * as L from 'leaflet';
+import { MapComponent } from '../../../../shared/components/map/map';
 import { ActivitiesService, ActivityDto, ActivityImageDto, ApproveActivityDto } from '../../../../services/activities';
 import { environment } from '../../../../../environment/environment';
 
 @Component({
   selector: 'app-manager-activity-review',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent],
   templateUrl: './activity-review.component.html',
   styleUrls: ['./activity-review.component.css']
 })
-export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly activitiesService = inject(ActivitiesService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
-  private readonly ngZone = inject(NgZone);
   private readonly http = inject(HttpClient);
-
-  @ViewChild('activityMap') private activityMap?: ElementRef<HTMLDivElement>;
-
-  private readonly defaultMapCenter: [number, number] = [42.424, 18.771];
-  private readonly defaultMapZoom = 13;
-
-  private map: L.Map | null = null;
-  private mapMarker: L.Marker | null = null;
 
   activityId: number | null = null;
   activity: ActivityDto | null = null;
@@ -91,16 +78,7 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
     this.loadActivity();
   }
 
-  ngAfterViewInit(): void {
-    this.initializeMap();
-    this.syncMapFromActivity();
-  }
-
-  ngOnDestroy(): void {
-    this.map?.remove();
-    this.map = null;
-    this.mapMarker = null;
-  }
+  ngOnDestroy(): void { }
 
   loadActivity(): void {
     if (!this.activityId) {
@@ -116,14 +94,6 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
       finalize(() => {
         this.isLoading = false;
         this.cdr.detectChanges();
-        this.ngZone.runOutsideAngular(() => {
-          setTimeout(() => {
-            this.ngZone.run(() => {
-              this.initializeMap();
-              this.syncMapFromActivity();
-            });
-          });
-        });
       })
     ).subscribe({
       next: (activity) => {
@@ -143,7 +113,6 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
         this.resolveCreatorName(activity);
         this.resolveApproverName(activity);
         this.cdr.detectChanges();
-        this.syncMapFromActivity();
         this.loadActivityImages(activity.id, activity.mainImageUrl);
       },
       error: (error: any) => {
@@ -548,87 +517,6 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
       default:
         return 'badge-pending';
     }
-  }
-
-  private initializeMap(): void {
-    if (!this.activityMap || this.map) {
-      return;
-    }
-
-    const selectedCoordinates = this.selectedCoordinates;
-    const center: L.LatLngExpression = selectedCoordinates
-      ? [selectedCoordinates.latitude, selectedCoordinates.longitude]
-      : this.defaultMapCenter;
-    const zoom = selectedCoordinates ? 15 : this.defaultMapZoom;
-
-    this.map = L.map(this.activityMap.nativeElement, {
-      zoomControl: true,
-      scrollWheelZoom: false,
-      doubleClickZoom: false,
-      dragging: false,
-      touchZoom: false,
-      boxZoom: false,
-      keyboard: false
-    }).setView(center, zoom);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '',
-      subdomains: '',
-      maxZoom: 19
-    }).addTo(this.map);
-
-    // Keep the same real map renderer as create page, but make it strictly view-only.
-    this.map.dragging.disable();
-    this.map.touchZoom.disable();
-    this.map.doubleClickZoom.disable();
-    this.map.scrollWheelZoom.disable();
-    this.map.boxZoom.disable();
-    this.map.keyboard.disable();
-
-    this.map.whenReady(() => {
-      setTimeout(() => {
-        this.map?.invalidateSize();
-      }, 0);
-    });
-  }
-
-  private syncMapFromActivity(): void {
-    if (!this.map) {
-      return;
-    }
-
-    const selectedCoordinates = this.selectedCoordinates;
-    if (!selectedCoordinates) {
-      this.map.setView(this.defaultMapCenter, this.defaultMapZoom);
-      return;
-    }
-
-    this.updateMapMarker(selectedCoordinates.latitude, selectedCoordinates.longitude);
-  }
-
-  private updateMapMarker(latitude: number, longitude: number): void {
-    if (!this.map) {
-      return;
-    }
-
-    if (!this.mapMarker) {
-      const markerIcon = L.icon({
-        iconUrl: 'assets/marker-icon.png',
-        iconRetinaUrl: 'assets/marker-icon-2x.png',
-        shadowUrl: 'assets/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-      });
-
-      this.mapMarker = L.marker([latitude, longitude], { icon: markerIcon, draggable: false }).addTo(this.map);
-    } else {
-      this.mapMarker.setLatLng([latitude, longitude]);
-    }
-
-    const targetZoom = Math.max(this.map.getZoom(), 15);
-    this.map.flyTo([latitude, longitude], targetZoom, { duration: 0.8 });
   }
 
   private toNumber(value: string | number | null | undefined): number | null {

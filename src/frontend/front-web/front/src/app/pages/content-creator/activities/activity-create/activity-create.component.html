@@ -201,7 +201,14 @@
           <h3 class="location-card__title">Location Intelligence</h3>
         </div>
 
-        <div #activityMap class="location-map" aria-label="Activity location map"></div>
+        <app-map
+          class="map-container"
+          [lat]="form.controls.latitude.value ?? 42.424"
+          [lng]="form.controls.longitude.value ?? 18.771"
+          [zoom]="form.controls.latitude.value && form.controls.longitude.value ? 15 : 13"
+          [popupText]="form.controls.name.value || 'Activity'"
+          (mapClick)="selectLocation($event.lat, $event.lng)">
+        </app-map>
 
         <div class="location-context-search">
           <span class="material-symbols-outlined location-context-search__icon" aria-hidden="true">search</span>

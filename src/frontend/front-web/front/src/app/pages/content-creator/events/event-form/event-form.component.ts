@@ -1,13 +1,9 @@
 import {
-  AfterViewInit,
   ChangeDetectorRef,
   Component,
   DestroyRef,
-  ElementRef,
-  NgZone,
   OnDestroy,
   OnInit,
-  ViewChild,
   inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -16,12 +12,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, from, Observable, of } from 'rxjs';
 import { catchError, concatMap, finalize, map, switchMap, tap, toArray } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import * as L from 'leaflet';
 import { AuthService } from '../../../../services/auth.service';
 import { DestinationDto, DestinationService } from '../../../../services/destination.service';
 import { EventImageDto, EventService } from '../../../../services/event.service';
 import { ActivitiesService } from '../../../../services/activities';
 import { CreateEventDto, EventDto, UpdateEventDto } from '../../../../models/event.model';
+import { MapComponent } from '../../../../shared/components/map/map';
 
 interface VenueOption {
   id: number;
@@ -41,11 +37,11 @@ interface RelatedActivity {
 @Component({
   selector: 'app-event-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent],
   templateUrl: './event-form.component.html',
   styleUrls: ['./event-form.component.css']
 })
-export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
+export class EventFormComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly destinationService = inject(DestinationService);
@@ -54,16 +50,7 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
-  private readonly ngZone = inject(NgZone);
   private readonly destroyRef = inject(DestroyRef);
-
-  @ViewChild('eventMap') private eventMap?: ElementRef<HTMLDivElement>;
-
-  private readonly defaultMapCenter: L.LatLngExpression = [42.424, 18.771];
-  private readonly defaultMapZoom = 13;
-
-  private map: L.Map | null = null;
-  private mapMarker: L.Marker | null = null;
 
   form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(200)]],
@@ -224,26 +211,9 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
         this.loadEvent();
       }
     });
-
-    // Use takeUntilDestroyed for cleaner subscription management
-    this.form.controls.latitude.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.syncMapFromForm());
-
-    this.form.controls.longitude.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.syncMapFromForm());
-  }
-
-  ngAfterViewInit(): void {
-    this.initializeMap();
-    this.syncMapFromForm();
   }
 
   ngOnDestroy(): void {
-    this.map?.remove();
-    this.map = null;
-    this.mapMarker = null;
   }
 
   private loadDropdownOptions(): void {
@@ -289,8 +259,6 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
       // Sync any existing selection with new data
       this.syncObjectSelectionWithDestination();
       this.applyLocationFromSelection();
-      this.syncMapFromForm();
-
       this.cdr.detectChanges();
     });
   }
@@ -338,7 +306,6 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.applyLocationFromSelection();
-        this.syncMapFromForm();
         this.cdr.detectChanges();
       });
   }
@@ -351,8 +318,6 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
     if (selectedObjectId && !this.filteredVenueOptions.some((venue) => venue.id === selectedObjectId)) {
       this.form.patchValue({ objectId: '' }, { emitEvent: false });
     }
-
-    this.syncMapFromForm();
   }
 
   private applyLocationFromSelection(): void {
@@ -394,7 +359,6 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
       longitude: lngValue
     }, { emitEvent: false });
 
-    this.updateMapMarker(latitude, longitude);
     this.cdr.detectChanges();
   }
 
@@ -473,7 +437,6 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
     // Sync the selection and map display
     this.syncObjectSelectionWithDestination();
     this.applyLocationFromSelection();
-    this.syncMapFromForm();
     this.cdr.detectChanges();
   }
 
@@ -1019,90 +982,7 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
       return false;
     }
   }
-
-  private initializeMap(): void {
-    if (!this.eventMap || this.map) {
-      return;
-    }
-
-    const latitude = this.toNumber(this.form.controls.latitude.value);
-    const longitude = this.toNumber(this.form.controls.longitude.value);
-    const center: L.LatLngExpression = latitude != null && longitude != null
-      ? [latitude, longitude]
-      : this.defaultMapCenter;
-    const zoom = latitude != null && longitude != null ? 15 : this.defaultMapZoom;
-
-    this.map = L.map(this.eventMap.nativeElement, {
-      zoomControl: true,
-      scrollWheelZoom: true,
-      doubleClickZoom: true,
-      dragging: true,
-      touchZoom: true,
-      boxZoom: true,
-      keyboard: true
-    }).setView(center, zoom);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '',
-      subdomains: '',
-      maxZoom: 19
-    }).addTo(this.map);
-
-    this.map.on('click', (event: L.LeafletMouseEvent) => {
-      this.ngZone.run(() => this.selectLocation(event.latlng.lat, event.latlng.lng));
-    });
-  }
-
-  private syncMapFromForm(): void {
-    const latitude = this.toNumber(this.form.controls.latitude.value);
-    const longitude = this.toNumber(this.form.controls.longitude.value);
-
-    if (latitude == null || longitude == null) {
-      return;
-    }
-
-    this.updateMapMarker(latitude, longitude);
-  }
-
-  private selectLocation(latitude: number, longitude: number): void {
-    this.form.patchValue({
-      latitude: latitude.toFixed(6),
-      longitude: longitude.toFixed(6)
-    }, { emitEvent: false });
-
-    this.form.get('latitude')?.markAsDirty();
-    this.form.get('longitude')?.markAsDirty();
-    this.form.get('latitude')?.markAsTouched();
-    this.form.get('longitude')?.markAsTouched();
-
-    this.updateMapMarker(latitude, longitude);
-  }
-
-  private updateMapMarker(latitude: number, longitude: number): void {
-    if (!this.map) {
-      return;
-    }
-
-    if (!this.mapMarker) {
-      const markerIcon = L.icon({
-        iconUrl: 'assets/marker-icon.png',
-        iconRetinaUrl: 'assets/marker-icon-2x.png',
-        shadowUrl: 'assets/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-      });
-
-      this.mapMarker = L.marker([latitude, longitude], { icon: markerIcon, draggable: false }).addTo(this.map);
-    } else {
-      this.mapMarker.setLatLng([latitude, longitude]);
-    }
-
-    const targetZoom = Math.max(this.map.getZoom(), 15);
-    this.map.flyTo([latitude, longitude], targetZoom, { duration: 0.8 });
-  }
-  private toNumber(value: number | string | null | undefined): number | null {
+  toNumber(value: number | string | null | undefined): number | null {
     if (value == null || value === '') {
       return null;
     }
