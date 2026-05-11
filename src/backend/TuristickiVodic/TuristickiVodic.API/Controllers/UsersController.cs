@@ -138,6 +138,47 @@ namespace TuristickiVodic.API.Controllers
             return NoContent();
         }
 
+        [HttpGet("me/visited-places")]
+        public async Task<IActionResult> GetMyVisitedPlaces([FromQuery] int limit = 12)
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var visitedPlaces = await _userService.GetVisitedPlacesAsync(currentUserId, limit);
+            return Ok(visitedPlaces);
+        }
+
+        [HttpPost("me/location-share")]
+        public async Task<IActionResult> CreateLocationShare([FromBody] CreateLocationShareDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            try
+            {
+                var share = await _userService.CreateLocationShareAsync(currentUserId, dto.DurationHours);
+                return Ok(share);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet("location-share")]
+        public async Task<IActionResult> GetSharedLocation([FromQuery] string token)
+        {
+            if (string.IsNullOrWhiteSpace(token))
+                return BadRequest(new { message = "Token is required." });
+
+            var location = await _userService.ResolveLocationShareAsync(token);
+            if (location == null)
+                return NotFound(new { message = "Shared location is not available." });
+
+            return Ok(location);
+        }
+
         [HttpDelete("me/location/history")]
         public async Task<IActionResult> ClearMyLocationHistory()
         {

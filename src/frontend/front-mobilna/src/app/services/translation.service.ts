@@ -16,7 +16,7 @@ export class TranslationService {
   private readonly http = inject(HttpClient);
   private readonly storageKey = 'spirego-language';
   private readonly legacyStorageKey = 'appLanguage';
-  private readonly translationAssetVersion = '2026-05-10-notifications-delete-controls';
+  private readonly translationAssetVersion = '2026-05-10-location-intelligence-share';
   private readonly activeLanguage = signal<AppLanguage>(this.readStoredLanguage());
   private translations: Record<string, string> = {};
 

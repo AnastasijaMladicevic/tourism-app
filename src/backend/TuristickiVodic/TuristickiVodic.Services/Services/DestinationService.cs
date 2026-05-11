@@ -389,15 +389,7 @@ namespace TuristickiVodic.Services
                 if (!destinationsById.TryGetValue(dto.Id, out var destination))
                     continue;
 
-                if (!string.IsNullOrWhiteSpace(destination.DisplayTitle))
-                {
-                    dto.DisplayTitle = await _translationService.GetOrCreateTextAsync(
-                        "Destination",
-                        destination.Id,
-                        "DisplayTitle",
-                        destination.DisplayTitle,
-                        normalizedLang);
-                }
+                await ApplyTranslationsAsync(dto, destination, normalizedLang, true);
             }
         }
 

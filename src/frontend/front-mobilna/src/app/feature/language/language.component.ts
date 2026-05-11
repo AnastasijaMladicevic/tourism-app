@@ -40,7 +40,9 @@ export class LanguageComponent implements OnInit {
   ngOnInit(): void {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser?.id) {
-      this.router.navigate(['/profile']);
+      const currentCode = this.translationService.language();
+      this.selectedCode.set(currentCode);
+      this.appliedCode.set(currentCode);
       return;
     }
 
@@ -71,11 +73,20 @@ export class LanguageComponent implements OnInit {
   }
 
   protected applyLanguage(): void {
-    if (!this.user?.id || this.isSaving()) return;
+    if (this.isSaving()) return;
 
     const selected = this.selectedCode();
     if (selected === this.appliedCode()) {
       this.feedback.set(this.translationService.translate('language.active'));
+      return;
+    }
+
+    if (!this.user?.id) {
+      const applied = this.translationService.setLanguage(selected);
+      this.selectedCode.set(applied);
+      this.appliedCode.set(applied);
+      this.feedback.set(this.translationService.translate('language.saved'));
+      window.location.reload();
       return;
     }
 

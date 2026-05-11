@@ -8,6 +8,7 @@ using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
 using TuristickiVodic.Services;
+using TuristickiVodic.Services.Services;
 using Xunit;
 
 namespace TuristickiVodic.Tests.Services
@@ -38,6 +39,9 @@ namespace TuristickiVodic.Tests.Services
                 cfg.AddProfile<TuristickiVodic.Services.Mappings.MappingProfile>());
             return config.CreateMapper();
         }
+
+        private static DestinationService CreateService(AppDbContext ctx, ITranslationService? translationService = null) =>
+            new(ctx, CreateMapper(), translationService);
 
         private static (Role tourist, Role manager, Role admin, DestinationType tip) SeedBase(AppDbContext ctx)
         {
@@ -365,6 +369,45 @@ namespace TuristickiVodic.Tests.Services
             var result = await svc.GetAllAsync(null, null, new DestinationQueryDto());
 
             result.TotalCount.Should().Be(2);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_KadaJeStraniJezik_PrevedeOpisITipUListi()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaJeStraniJezik_PrevedeOpisITipUListi));
+            var (_, _, _, tip) = SeedBase(ctx);
+
+            ctx.Destinations.Add(new Destination
+            {
+                Id = 1,
+                Name = "Kotor",
+                DisplayTitle = "Boka",
+                Description = "Primorski grad sa zidinama",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                CreatedByUserId = 99,
+                Status = ContentStatus.Approved
+            });
+            ctx.SaveChanges();
+
+            ctx.Images.Add(new Image
+            {
+                Id = 1,
+                DestinationId = 1,
+                Url = "dest-main.jpg",
+                IsMain = true,
+                CreatedAt = DateTime.UtcNow
+            });
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx, new TrackingTranslationService());
+            var result = await svc.GetAllAsync(null, null, new DestinationQueryDto { Lang = "en" });
+
+            result.Items.Should().ContainSingle();
+            var item = result.Items.Single();
+            item.DisplayTitle.Should().Be("generated:Destination:DisplayTitle:Boka");
+            item.Description.Should().Be("generated:Destination:Description:Primorski grad sa zidinama");
+            item.DestinationTypeName.Should().Be("generated:DestinationType:Name:Stari Grad");
         }
 
         [Fact]
@@ -1022,6 +1065,39 @@ namespace TuristickiVodic.Tests.Services
 
             deleted.Should().BeTrue();
             ctx.Destinations.Find(8).Should().BeNull();
+        }
+
+        private sealed class TrackingTranslationService : ITranslationService
+        {
+            public Task<string> GetTextAsync(
+                string entityType,
+                int entityId,
+                string fieldName,
+                string originalText,
+                string languageCode)
+            {
+                return Task.FromResult($"existing:{entityType}:{fieldName}:{originalText}");
+            }
+
+            public Task<string> GetOrCreateTextAsync(
+                string entityType,
+                int entityId,
+                string fieldName,
+                string originalText,
+                string languageCode)
+            {
+                return Task.FromResult($"generated:{entityType}:{fieldName}:{originalText}");
+            }
+
+            public Task GenerateIfMissingAsync(
+                string entityType,
+                int entityId,
+                string fieldName,
+                string originalText,
+                IEnumerable<string> targetLanguages)
+            {
+                return Task.CompletedTask;
+            }
         }
     }
 }

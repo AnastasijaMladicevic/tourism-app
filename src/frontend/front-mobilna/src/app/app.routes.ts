@@ -118,7 +118,6 @@ export const routes: Routes = [
   },
   {
     path: 'terms',
-    canActivate: [profileAuthGuard],
     loadComponent: () => import('./feature/terms/terms.component').then((m) => m.TermsComponent),
   },
   {
@@ -133,13 +132,11 @@ export const routes: Routes = [
   },
   {
     path: 'language',
-    canActivate: [profileAuthGuard],
     loadComponent: () =>
       import('./feature/language/language.component').then((m) => m.LanguageComponent),
   },
   {
     path: 'support',
-    canActivate: [profileAuthGuard],
     loadComponent: () =>
       import('./feature/support/support.component').then((m) => m.SupportComponent),
   },
@@ -243,6 +240,21 @@ export const routes: Routes = [
     loadComponent: () => import('./feature/settings/settings').then((m) => m.SettingsComponent),
   },
   {
+    path: 'notification-settings',
+    canActivate: [profileAuthGuard],
+    loadComponent: () =>
+      import('./feature/notification-settings/notification-settings').then(
+        (m) => m.NotificationSettingsComponent,
+      ),
+  },
+  {
+    path: 'location-settings',
+    loadComponent: () =>
+      import('./feature/location-settings/location-settings').then(
+        (m) => m.LocationSettingsComponent,
+      ),
+  },
+  {
     path: 'profile',
     canActivate: [profileAuthGuard],
     loadComponent: () =>
@@ -298,7 +310,6 @@ export const routes: Routes = [
   },
   {
     path: 'privacy-data',
-    canActivate: [profileAuthGuard],
     loadComponent: () =>
       import('./feature/privacy-data/privacy-data.component').then(
         (m) => m.PrivacyDataComponent,
@@ -333,5 +344,12 @@ export const routes: Routes = [
     path: 'results',
     loadComponent: () =>
       import('./feature/results/results').then(m => m.ResultsComponent)
+  },
+  {
+    path: 'shared-location',
+    loadComponent: () =>
+      import('./feature/shared-location/shared-location.component').then(
+        (m) => m.SharedLocationComponent,
+      )
   },
 ];
