@@ -290,16 +290,16 @@
 
         <section class="detail-section">
           <div class="map-card">
-            @if (hasSelectedCoordinates) {
-              <app-map
-                [lat]="selectedLat"
-                [lng]="selectedLng"
-                [zoom]="8"
-                [popupText]="selectedMapLabel"
-                [interactive]="false"
-                mapId="admin-destination-map"
-              ></app-map>
-            } @else {
+            <app-map
+              [lat]="selectedLat"
+              [lng]="selectedLng"
+              [zoom]="8"
+              [popupText]="hasSelectedCoordinates ? selectedMapLabel : ''"
+              [showMarker]="hasSelectedCoordinates"
+              [interactive]="false"
+              mapId="admin-destination-map"
+            ></app-map>
+            @if (!hasSelectedCoordinates) {
               <div class="map-empty-state">
                 <span class="material-symbols-outlined">location_off</span>
                 <p>Map preview will appear when coordinates are configured.</p>

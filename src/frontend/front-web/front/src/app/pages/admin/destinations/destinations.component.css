@@ -456,12 +456,15 @@
 }
 
 .map-empty-state {
-  min-height: 180px;
+  position: absolute;
+  inset: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  background: rgba(248, 250, 252, 0.94);
+  backdrop-filter: blur(1px);
   color: #64748b;
   text-align: center;
   padding: 12px;
