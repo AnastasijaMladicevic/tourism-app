@@ -66,7 +66,11 @@ export class LocationTrackingService {
               observer.next(snapshot);
               observer.complete();
             },
-            error: () => observer.error(new Error('profile.shareLocationError')),
+            error: () => {
+              // Lokacija je dobijena, samo push nije uspeo — nastavi svejedno
+              observer.next(snapshot);
+              observer.complete();
+            },
           });
       };
 

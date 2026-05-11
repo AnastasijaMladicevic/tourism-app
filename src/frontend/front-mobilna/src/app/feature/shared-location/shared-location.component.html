@@ -6,29 +6,29 @@
       <p>{{ 'profile.shareLocationGuestBody' | translate }}</p>
     </header>
 
-    @if (isLoading) {
+    @if (isLoading()) {
       <div class="shared-location-card shared-location-card--empty">
         {{ 'common.loading' | translate }}
       </div>
-    } @else if (hasError || !sharedLocation) {
+    } @else if (hasError() || !sharedLocation()) {
       <div class="shared-location-card shared-location-card--empty">
         {{ 'profile.shareLocationUnavailable' | translate }}
       </div>
     } @else {
       <div class="shared-location-card">
         <div class="shared-location-card__copy">
-          <strong>{{ sharedLocation.displayName }}</strong>
+          <strong>{{ sharedLocation()!.displayName }}</strong>
           <p>{{ 'profile.shareLocationLive' | translate }}</p>
           <span>
-            {{ 'profile.shareExpires' | translate:{ date: ((sharedLocation.expiresAtUtc | date:'dd.MM.yyyy. HH:mm') ?? '') } }}
+            {{ 'profile.shareExpires' | translate:{ date: ((sharedLocation()!.expiresAtUtc | date:'dd.MM.yyyy. HH:mm') ?? '') } }}
           </span>
         </div>
 
         <app-map
-          [lat]="sharedLocation.latitude"
-          [lng]="sharedLocation.longitude"
+          [lat]="sharedLocation()!.latitude"
+          [lng]="sharedLocation()!.longitude"
           [zoom]="15"
-          [popupText]="sharedLocation.displayName"
+          [popupText]="sharedLocation()!.displayName"
           [interactive]="false"
         />
       </div>
