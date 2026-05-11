@@ -1,0 +1,34 @@
+<div class="mobile-route-page">
+  <section class="mobile-route-frame">
+    <div class="mobile-route-handle"></div>
+
+    <header class="mobile-route-header">
+      <h1>Plan Route</h1>
+      <a routerLink="/planner-preview/route-desktop">Optimize Sequence</a>
+    </header>
+
+    <div class="mobile-route-search">
+      <span>Add a stop or destination...</span>
+      <button type="button">Map</button>
+    </div>
+
+    <div class="mobile-route-list">
+      @for (stop of stops; track stop.order) {
+        <article class="mobile-route-card">
+          <div class="mobile-route-card__order">{{ stop.order }}</div>
+          <div class="mobile-route-card__copy">
+            <strong>{{ stop.title }}</strong>
+            <span>{{ stop.meta }}</span>
+          </div>
+          <span class="mobile-route-card__drag">⋮⋮</span>
+          <span class="mobile-route-card__remove">×</span>
+        </article>
+      }
+    </div>
+
+    <button type="button" class="mobile-route-secondary-btn">＋ Add another destination</button>
+    <button type="button" class="mobile-route-primary-btn">Start Route →</button>
+
+    <footer class="mobile-route-footer">POWERED BY SPIREGO NAVIGATION</footer>
+  </section>
+</div>

@@ -288,6 +288,34 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'planner-preview/add-stop-panel',
+    loadComponent: () =>
+      import('./feature/route-previews/route-preview-add-stop-panel.component').then(
+        (m) => m.RoutePreviewAddStopPanelComponent,
+      ),
+  },
+  {
+    path: 'planner-preview/add-stop-sheet',
+    loadComponent: () =>
+      import('./feature/route-previews/route-preview-add-stop-sheet.component').then(
+        (m) => m.RoutePreviewAddStopSheetComponent,
+      ),
+  },
+  {
+    path: 'planner-preview/route-mobile',
+    loadComponent: () =>
+      import('./feature/route-previews/route-preview-route-mobile.component').then(
+        (m) => m.RoutePreviewRouteMobileComponent,
+      ),
+  },
+  {
+    path: 'planner-preview/route-desktop',
+    loadComponent: () =>
+      import('./feature/route-previews/route-preview-route-desktop.component').then(
+        (m) => m.RoutePreviewRouteDesktopComponent,
+      ),
+  },
+  {
     path: 'my-reviews',
     canActivate: [profileAuthGuard],
     loadComponent: () =>
