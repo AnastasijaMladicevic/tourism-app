@@ -474,19 +474,22 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     }
 
     const regionName = this.selectedRegion?.name?.trim();
-    const fullQuery = regionName ? `${query}, ${regionName}` : query;
-    let params = new HttpParams()
-      .set('q', fullQuery)
-      .set('format', 'jsonv2')
-      .set('limit', '5')
-      .set('addressdetails', '1');
+    const queryVariants = this.buildLocationQueryVariants(query);
+    const requests = queryVariants.map((variant) => {
+      const fullQuery = regionName ? `${variant}, ${regionName}` : variant;
+      let params = new HttpParams()
+        .set('q', fullQuery)
+        .set('format', 'jsonv2')
+        .set('limit', '8')
+        .set('addressdetails', '1')
+        .set('namedetails', '1')
+        .set('accept-language', 'sr,en');
 
-    if (this.selectedRegion?.code?.trim()) {
-      params = params.set('countrycodes', this.selectedRegion.code.toLowerCase());
-    }
+      if (this.selectedRegion?.code?.trim()) {
+        params = params.set('countrycodes', this.selectedRegion.code.toLowerCase());
+      }
 
-    return this.http
-      .get<
+      return this.http.get<
         Array<{
           lat: string;
           lon: string;
@@ -495,14 +498,19 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
           name?: string;
           display_name?: string;
           address?: Record<string, string | undefined>;
+          namedetails?: Record<string, string | undefined>;
         }>
       >('https://nominatim.openstreetmap.org/search', {
         params
-      })
+      });
+    });
+
+    return forkJoin(requests)
       .pipe(
-        map((results) => {
-          const acceptable = (results ?? []).find((item) =>
-            this.isAcceptableGeocodeResult(query, item)
+        map((responseGroups) => {
+          const allResults = responseGroups.flatMap((group) => group ?? []);
+          const acceptable = allResults.find((item) =>
+            this.isAcceptableGeocodeResult(queryVariants, item)
           );
           if (!acceptable) {
             return { kind: 'not_found' } as const;
@@ -516,61 +524,101 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
             kind: 'resolved' as const,
             lat,
             lng,
-            label: acceptable.display_name?.trim() || fullQuery
+            label: acceptable.display_name?.trim() || query
           };
         }),
         catchError(() => of({ kind: 'error' as const }))
       );
   }
 
+  private buildLocationQueryVariants(query: string): string[] {
+    const normalized = this.normalizeLookupValue(query);
+    const aliases: Record<string, string[]> = {
+      tasos: ['thasos'],
+      thasos: ['tasos'],
+      roma: ['rome'],
+      rome: ['roma'],
+      atina: ['athens'],
+      athens: ['atina'],
+      bec: ['vienna'],
+      vienna: ['bec'],
+      solun: ['thessaloniki'],
+      thessaloniki: ['solun']
+    };
+
+    const variants = [query.trim(), ...(aliases[normalized] ?? [])].filter((v) => v.trim().length > 0);
+    return Array.from(new Set(variants));
+  }
+
+  private normalizeLookupValue(value: string | undefined): string {
+    return (value ?? '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+  }
+
   private isAcceptableGeocodeResult(
-    query: string,
+    queryVariants: string[],
     item: {
       class?: string;
       type?: string;
       name?: string;
+      display_name?: string;
       address?: Record<string, string | undefined>;
+      namedetails?: Record<string, string | undefined>;
     }
   ): boolean {
-    const normalize = (value: string | undefined): string =>
-      (value ?? '')
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .trim();
-
-    const normalizedQuery = normalize(query);
-    if (!normalizedQuery) {
+    const normalizedQueries = queryVariants
+      .map((q) => this.normalizeLookupValue(q))
+      .filter((q) => q.length > 0);
+    if (!normalizedQueries.length) {
       return false;
     }
 
-    // City-only search:
-    // - accept only map objects representing settlement places/admin areas
-    // - reject POIs (amenity/shop/tourism/etc.) such as cafes named like a city
-    const itemClass = normalize(item.class);
+    const itemClass = this.normalizeLookupValue(item.class);
     if (itemClass && itemClass !== 'place' && itemClass !== 'boundary') {
       return false;
     }
 
-    // Allow only city/town-level types.
-    const allowedTypes = new Set(['city', 'town']);
-    const resultType = normalize(item.type);
+    // Keep settlement/admin-like place types and avoid POIs.
+    const allowedTypes = new Set([
+      'city',
+      'town',
+      'village',
+      'municipality',
+      'administrative',
+      'hamlet',
+      'suburb',
+      'island'
+    ]);
+    const resultType = this.normalizeLookupValue(item.type);
     if (!allowedTypes.has(resultType)) {
       return false;
     }
 
     const address = item.address ?? {};
+    const namedetails = item.namedetails ?? {};
     const candidateNames = [
       item.name,
+      item.display_name?.split(',')[0],
       address['city'],
       address['town'],
-      address['city_district']
+      address['village'],
+      address['municipality'],
+      address['county'],
+      address['state'],
+      address['island'],
+      address['city_district'],
+      namedetails['name'],
+      namedetails['name:en'],
+      namedetails['name:sr'],
+      namedetails['name:sr-Latn']
     ]
-      .map((v) => normalize(v))
+      .map((v) => this.normalizeLookupValue(v))
       .filter((v) => v.length > 0);
 
-    // Require exact token match with one of primary place names.
-    return candidateNames.includes(normalizedQuery);
+    return normalizedQueries.some((q) => candidateNames.includes(q));
   }
 
   addCategory(): void {
