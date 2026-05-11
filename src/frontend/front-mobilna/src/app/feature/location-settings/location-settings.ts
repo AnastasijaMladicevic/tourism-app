@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -40,6 +40,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
     private routerHistoryService: RouterHistoryService,
     private locationTrackingService: LocationTrackingService,
     private locationIntelligenceService: LocationIntelligenceService,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
@@ -100,6 +101,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
   async saveQuietZone(kind: QuietZoneKind): Promise<void> {
     this.setQuietZoneError(kind, '');
     this.savingQuietZone = kind;
+    this.cdr.markForCheck();
 
     try {
       const input = kind === 'home' ? this.homeZoneInput : this.workZoneInput;
@@ -114,6 +116,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
       this.setQuietZoneError(kind, 'settings.smartLocation.zoneSaveError');
     } finally {
       this.savingQuietZone = null;
+      this.cdr.markForCheck();
     }
   }
 
