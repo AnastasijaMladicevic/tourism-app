@@ -222,45 +222,7 @@ export class ProfileComponent implements OnInit {
       return this.pushLocationToBackend(currentLocation).pipe(map(() => void 0));
     }
 
-    return this.requestCurrentLocation().pipe(
-      switchMap((location) => this.pushLocationToBackend(location)),
-      map(() => void 0),
-    );
-  }
-
-  private requestCurrentLocation(): Observable<TrackedLocation> {
-    return new Observable<TrackedLocation>((observer) => {
-      if (typeof navigator === 'undefined' || !navigator.geolocation) {
-        observer.error(new Error('geoUnsupported'));
-        return;
-      }
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          observer.next({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy,
-            updatedAt: Date.now(),
-            source: 'gps',
-          });
-          observer.complete();
-        },
-        (error) => {
-          switch (error.code) {
-            case error.PERMISSION_DENIED:
-              observer.error(new Error('geoDenied'));
-              return;
-            case error.POSITION_UNAVAILABLE:
-              observer.error(new Error('geoUnavailable'));
-              return;
-            default:
-              observer.error(new Error('geoFailed'));
-          }
-        },
-        { enableHighAccuracy: true, maximumAge: 0, timeout: 12000 },
-      );
-    });
+    return this.locationTrackingService.captureCurrentLocation().pipe(map(() => void 0));
   }
 
   private pushLocationToBackend(location: TrackedLocation): Observable<unknown> {

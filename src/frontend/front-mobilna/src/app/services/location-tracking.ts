@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { AuthService } from './auth';
 
 export interface TrackedLocation {
@@ -43,16 +43,65 @@ export class LocationTrackingService {
     return this.locationSubject.value;
   }
 
+  captureCurrentLocation(): Observable<TrackedLocation> {
+    return new Observable<TrackedLocation>((observer) => {
+      const finishWithSnapshot = (snapshot: TrackedLocation) => {
+        this.storeLocation(snapshot);
+
+        if (!this.authService.isLoggedIn()) {
+          observer.next(snapshot);
+          observer.complete();
+          return;
+        }
+
+        this.authService
+          .updateMyLocation({
+            latitude: snapshot.latitude,
+            longitude: snapshot.longitude,
+            accuracyMeters: snapshot.accuracy,
+            recordedAtUtc: new Date(snapshot.updatedAt).toISOString(),
+          })
+          .subscribe({
+            next: () => {
+              observer.next(snapshot);
+              observer.complete();
+            },
+            error: () => observer.error(new Error('profile.shareLocationError')),
+          });
+      };
+
+      const finishWithIpFallback = (fallbackError?: Error) => {
+        if (!this.canUseIpFallback()) {
+          observer.error(fallbackError ?? new Error('geoUnsupported'));
+          return;
+        }
+
+        void this.fetchIpLocationSnapshot()
+          .then((snapshot) => finishWithSnapshot(snapshot))
+          .catch(() => observer.error(fallbackError ?? new Error('geoFailed')));
+      };
+
+      if (this.canUseGeolocation()) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => finishWithSnapshot(this.createGpsSnapshot(position)),
+          (error) => finishWithIpFallback(this.mapGeolocationError(error)),
+          { enableHighAccuracy: true, maximumAge: 0, timeout: 12000 },
+        );
+        return;
+      }
+
+      finishWithIpFallback(new Error('geoUnsupported'));
+    });
+  }
+
   startTracking(): boolean {
     if (this.canUseGeolocation()) {
-      // GPS dostupan (HTTPS ili localhost) — koristi precizni GPS
       this.setTrackingEnabled(true);
       this.ensureTracking();
       return true;
     }
 
     if (this.canUseIpFallback()) {
-      // HTTP bez GPS — koristi IP geolocation kao fallback
       this.setTrackingEnabled(true);
       this.ensureIpFallback();
       return true;
@@ -62,13 +111,11 @@ export class LocationTrackingService {
   }
 
   stopTracking(): void {
-    // Zaustavi GPS watch
     if (this.watchId !== null && this.canUseGeolocation()) {
       navigator.geolocation.clearWatch(this.watchId);
     }
     this.watchId = null;
 
-    // Zaustavi IP fallback interval
     if (this.ipFallbackInterval !== null) {
       clearInterval(this.ipFallbackInterval);
       this.ipFallbackInterval = null;
@@ -78,8 +125,6 @@ export class LocationTrackingService {
     this.locationSubject.next(null);
     this.removeSnapshot();
   }
-
-  // ─── GPS (samo na HTTPS / localhost) ───────────────────────────────────────
 
   private canUseGeolocation(): boolean {
     return (
@@ -109,15 +154,7 @@ export class LocationTrackingService {
   }
 
   private handlePosition(position: GeolocationPosition): void {
-    const snapshot: TrackedLocation = {
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-      accuracy: position.coords.accuracy,
-      updatedAt: Date.now(),
-      source: 'gps',
-    };
-
-    this.emitLocation(snapshot);
+    this.emitLocation(this.createGpsSnapshot(position));
   }
 
   private handleError(error: GeolocationPositionError): void {
@@ -126,21 +163,17 @@ export class LocationTrackingService {
     }
   }
 
-  // ─── IP Geolocation fallback (radi na HTTP) ────────────────────────────────
-
   private canUseIpFallback(): boolean {
     return typeof window !== 'undefined' && typeof fetch !== 'undefined';
   }
 
   private ensureIpFallback(): void {
     if (this.ipFallbackInterval !== null) {
-      return; // već radi
+      return;
     }
 
-    // Odmah jednom pozovi
     void this.fetchIpLocation();
 
-    // Osvežavaj svakih 5 minuta (IP lokacija se ne menja često)
     this.ipFallbackInterval = setInterval(() => {
       void this.fetchIpLocation();
     }, 5 * 60 * 1000);
@@ -148,42 +181,14 @@ export class LocationTrackingService {
 
   private async fetchIpLocation(): Promise<void> {
     try {
-      // ipapi.co je besplatan, bez API ključa, do 1000 req/dan
-      const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(8000) });
-
-      if (!res.ok) {
-        throw new Error(`ipapi.co HTTP ${res.status}`);
-      }
-
-      const data = await res.json() as {
-        latitude?: number;
-        longitude?: number;
-        error?: boolean;
-      };
-
-      if (data.error || typeof data.latitude !== 'number' || typeof data.longitude !== 'number') {
-        throw new Error('ipapi.co returned invalid data');
-      }
-
-      const snapshot: TrackedLocation = {
-        latitude: data.latitude,
-        longitude: data.longitude,
-        accuracy: 5000, // IP geolocation je ~1-5 km preciznosti
-        updatedAt: Date.now(),
-        source: 'ip',
-      };
-
-      this.emitLocation(snapshot);
+      this.emitLocation(await this.fetchIpLocationSnapshot());
     } catch (err) {
       console.warn('[LocationTracking] IP geolocation fallback failed:', err);
     }
   }
 
-  // ─── Zajednička logika ─────────────────────────────────────────────────────
-
   private emitLocation(snapshot: TrackedLocation): void {
-    this.locationSubject.next(snapshot);
-    this.persistSnapshot(snapshot);
+    this.storeLocation(snapshot);
 
     if (this.authService.isLoggedIn()) {
       this.authService
@@ -194,6 +199,58 @@ export class LocationTrackingService {
           recordedAtUtc: new Date(snapshot.updatedAt).toISOString(),
         })
         .subscribe({ error: () => void 0 });
+    }
+  }
+
+  private storeLocation(snapshot: TrackedLocation): void {
+    this.locationSubject.next(snapshot);
+    this.persistSnapshot(snapshot);
+  }
+
+  private createGpsSnapshot(position: GeolocationPosition): TrackedLocation {
+    return {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+      accuracy: position.coords.accuracy,
+      updatedAt: Date.now(),
+      source: 'gps',
+    };
+  }
+
+  private async fetchIpLocationSnapshot(): Promise<TrackedLocation> {
+    const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(8000) });
+
+    if (!res.ok) {
+      throw new Error(`ipapi.co HTTP ${res.status}`);
+    }
+
+    const data = (await res.json()) as {
+      latitude?: number;
+      longitude?: number;
+      error?: boolean;
+    };
+
+    if (data.error || typeof data.latitude !== 'number' || typeof data.longitude !== 'number') {
+      throw new Error('ipapi.co returned invalid data');
+    }
+
+    return {
+      latitude: data.latitude,
+      longitude: data.longitude,
+      accuracy: 5000,
+      updatedAt: Date.now(),
+      source: 'ip',
+    };
+  }
+
+  private mapGeolocationError(error: GeolocationPositionError): Error {
+    switch (error.code) {
+      case error.PERMISSION_DENIED:
+        return new Error('geoDenied');
+      case error.POSITION_UNAVAILABLE:
+        return new Error('geoUnavailable');
+      default:
+        return new Error('geoFailed');
     }
   }
 
