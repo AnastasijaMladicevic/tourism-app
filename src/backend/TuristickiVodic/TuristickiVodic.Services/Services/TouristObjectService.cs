@@ -1306,7 +1306,7 @@ namespace TuristickiVodic.Services.Services
                 if (!objectsById.TryGetValue(dto.Id, out var obj))
                     continue;
 
-                await ApplyTranslationsAsync(dto, obj, normalizedLang, false);
+                await ApplyTranslationsAsync(dto, obj, normalizedLang, true);
             }
         }
 

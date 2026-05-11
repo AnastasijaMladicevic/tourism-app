@@ -31,8 +31,8 @@ namespace TuristickiVodic.Tests.Services
             return config.CreateMapper();
         }
 
-        private static TouristObjectService CreateService(AppDbContext ctx) =>
-        new(ctx, CreateMapper(), new FakeTranslationService());
+        private static TouristObjectService CreateService(AppDbContext ctx, ITranslationService? translationService = null) =>
+            new(ctx, CreateMapper(), translationService ?? new FakeTranslationService());
         
         private static (ObjectType objectType, Destination destination, Destination otherDestination, Locality locality, Locality otherLocality, User creator, User otherCreator, User manager, User admin)
             SeedBase(AppDbContext ctx)
@@ -393,6 +393,47 @@ namespace TuristickiVodic.Tests.Services
             result.Items.Should().HaveCount(1);
             result.Items[0].Name.Should().Be("Objekat 1");
             result.Items[0].AverageRating.Should().Be(4.8m);
+        }
+
+        [Fact]
+        public async Task GetAllAsync_KadaJeStraniJezik_GenerisePrevodZaOpisITipUListi()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetAllAsync_KadaJeStraniJezik_GenerisePrevodZaOpisITipUListi));
+            var (objectType, destination, _, locality, _, creator, _, _, _) = SeedBase(ctx);
+
+            ctx.Objects.Add(new TouristObject
+            {
+                Id = 1,
+                Name = "Pomorski muzej",
+                Description = "Istorija pomorstva i obale",
+                ObjectTypeId = objectType.Id,
+                DestinationId = destination.Id,
+                LocalityId = locality.Id,
+                CreatedByUserId = creator.Id,
+                Status = ContentStatus.Approved,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            });
+
+            ctx.Images.Add(new Image
+            {
+                Id = 1,
+                ObjectId = 1,
+                Url = "https://test.com/object-1.jpg",
+                IsMain = true,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            ctx.SaveChanges();
+
+            var svc = CreateService(ctx, new TrackingTranslationService());
+            var result = await svc.GetAllAsync(new TouristObjectQueryDto { Lang = "en" });
+
+            result.Items.Should().ContainSingle();
+            var item = result.Items.Single();
+            item.Description.Should().Be("generated:Object:Description:Istorija pomorstva i obale");
+            item.ObjectTypeName.Should().Be("generated:ObjectType:Name:Muzej");
         }
 
         [Fact]
@@ -879,6 +920,39 @@ namespace TuristickiVodic.Tests.Services
                 string languageCode)
             {
                 return Task.FromResult(originalText);
+            }
+
+            public Task GenerateIfMissingAsync(
+                string entityType,
+                int entityId,
+                string fieldName,
+                string originalText,
+                IEnumerable<string> targetLanguages)
+            {
+                return Task.CompletedTask;
+            }
+        }
+
+        private sealed class TrackingTranslationService : ITranslationService
+        {
+            public Task<string> GetTextAsync(
+                string entityType,
+                int entityId,
+                string fieldName,
+                string originalText,
+                string languageCode)
+            {
+                return Task.FromResult($"existing:{entityType}:{fieldName}:{originalText}");
+            }
+
+            public Task<string> GetOrCreateTextAsync(
+                string entityType,
+                int entityId,
+                string fieldName,
+                string originalText,
+                string languageCode)
+            {
+                return Task.FromResult($"generated:{entityType}:{fieldName}:{originalText}");
             }
 
             public Task GenerateIfMissingAsync(
