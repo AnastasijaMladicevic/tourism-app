@@ -37,7 +37,7 @@ export class LoginComponent {
     private pendingActionService: PendingActionService,
     private routerHistory: RouterHistoryService
   ) {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/home';
+    this.returnUrl = this.readReturnUrl();
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: [
@@ -110,8 +110,7 @@ export class LoginComponent {
             this.cdr.detectChanges();
             return;
           }
-          const returnUrl =
-            this.route.snapshot.queryParams['returnUrl'] || '/home';
+          const returnUrl = this.readReturnUrl();
 
           const openReview =
             this.route.snapshot.queryParams['openReview'];
@@ -167,5 +166,11 @@ export class LoginComponent {
   }
   goTerms(): void {
     this.router.navigate(['/terms']);
+  }
+
+  private readReturnUrl(): string {
+    return this.route.snapshot.queryParams['returnUrl'] ||
+      this.route.snapshot.queryParams['redirectTo'] ||
+      '/home';
   }
 }

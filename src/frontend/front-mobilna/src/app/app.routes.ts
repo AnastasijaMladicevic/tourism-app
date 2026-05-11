@@ -118,7 +118,6 @@ export const routes: Routes = [
   },
   {
     path: 'terms',
-    canActivate: [profileAuthGuard],
     loadComponent: () => import('./feature/terms/terms.component').then((m) => m.TermsComponent),
   },
   {
@@ -133,13 +132,11 @@ export const routes: Routes = [
   },
   {
     path: 'language',
-    canActivate: [profileAuthGuard],
     loadComponent: () =>
       import('./feature/language/language.component').then((m) => m.LanguageComponent),
   },
   {
     path: 'support',
-    canActivate: [profileAuthGuard],
     loadComponent: () =>
       import('./feature/support/support.component').then((m) => m.SupportComponent),
   },
@@ -244,6 +241,7 @@ export const routes: Routes = [
   },
   {
     path: 'notification-settings',
+    canActivate: [profileAuthGuard],
     loadComponent: () =>
       import('./feature/notification-settings/notification-settings').then(
         (m) => m.NotificationSettingsComponent,
@@ -312,7 +310,6 @@ export const routes: Routes = [
   },
   {
     path: 'privacy-data',
-    canActivate: [profileAuthGuard],
     loadComponent: () =>
       import('./feature/privacy-data/privacy-data.component').then(
         (m) => m.PrivacyDataComponent,

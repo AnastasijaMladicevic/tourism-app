@@ -103,7 +103,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
         this.router.navigate(['/login'], {
           queryParams: {
-            returnUrl: this.router.url
+            returnUrl: item.route
           }
         });
 

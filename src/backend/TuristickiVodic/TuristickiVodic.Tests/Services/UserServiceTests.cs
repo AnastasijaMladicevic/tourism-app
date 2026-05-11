@@ -4,6 +4,7 @@ using FluentAssertions.Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using System.IO;
 using TuristickiVodic.Core.DTO;
@@ -55,13 +56,30 @@ namespace TuristickiVodic.Tests.Services
             return environmentMock;
         }
 
+        private static IConfiguration CreateConfiguration(string? publicAppBaseUrl = null)
+        {
+            return new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string?>
+                {
+                    ["Jwt:Key"] = "unit-test-jwt-key",
+                    ["PublicApp:BaseUrl"] = publicAppBaseUrl ?? "https://spirego-tourist.test",
+                })
+                .Build();
+        }
+
         private static UserService CreateUserService(
             AppDbContext ctx,
             Mock<ITokenService> tokenSvc,
             Mock<IEmailService>? emailSvc = null)
         {
             emailSvc ??= new Mock<IEmailService>();
-            return new UserService(ctx, CreateMapper(), tokenSvc.Object, emailSvc.Object, CreateEnvironmentMock().Object);
+            return new UserService(
+                ctx,
+                CreateMapper(),
+                tokenSvc.Object,
+                emailSvc.Object,
+                CreateEnvironmentMock().Object,
+                CreateConfiguration());
         }
 
         private static (Role tourist, Role cc, Role manager, Role admin) SeedRoles(AppDbContext ctx)

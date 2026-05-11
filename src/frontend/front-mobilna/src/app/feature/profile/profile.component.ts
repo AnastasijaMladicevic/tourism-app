@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, forkJoin, of } from 'rxjs';
+import { Observable, catchError, finalize, forkJoin, map, of, switchMap } from 'rxjs';
 import { environment } from '../../../environment/environment';
 import { AuthService, UserDto, VisitedPlaceDto } from '../../services/auth';
 import { FavoriteService } from '../../services/favorite';
 import { EventPlannerService } from '../../services/event-planner';
+import { LocationTrackingService, TrackedLocation } from '../../services/location-tracking';
 import { ReviewService } from '../../services/review';
 import { ProfileStatsCacheService, ProfileStatsSnapshot } from '../../services/profile-stats-cache';
 import { TranslationService } from '../../services/translation.service';
@@ -38,9 +39,11 @@ interface ProfileSection {
   styleUrl: './profile.component.scss',
 })
 export class ProfileComponent implements OnInit {
+  private readonly maxShareLocationAgeMs = 25 * 60 * 1000;
   private readonly authService = inject(AuthService);
   private readonly favoriteService = inject(FavoriteService);
   private readonly eventPlannerService = inject(EventPlannerService);
+  private readonly locationTrackingService = inject(LocationTrackingService);
   private readonly reviewService = inject(ReviewService);
   private readonly profileStatsCache = inject(ProfileStatsCacheService);
   private readonly router = inject(Router);
@@ -179,14 +182,19 @@ export class ProfileComponent implements OnInit {
     this.shareExpiresAt = '';
     this.shareBusyHours = durationHours;
 
-    this.authService
-      .createLocationShare(durationHours)
-      .pipe(catchError(() => of(null)))
+    this.prepareLocationShare()
+      .pipe(
+        switchMap(() => this.authService.createLocationShare(durationHours)),
+        catchError((error) => {
+          this.shareError = this.resolveShareError(error);
+          return of(null);
+        }),
+        finalize(() => {
+          this.shareBusyHours = null;
+        }),
+      )
       .subscribe((share) => {
-        this.shareBusyHours = null;
-
         if (!share) {
-          this.shareError = 'profile.shareLocationError';
           return;
         }
 
@@ -205,6 +213,85 @@ export class ProfileComponent implements OnInit {
 
   protected trackStat(_: number, stat: ProfileStat): string {
     return stat.labelKey;
+  }
+
+  private prepareLocationShare(): Observable<void> {
+    const currentLocation = this.locationTrackingService.getCurrentLocation();
+
+    if (this.isFreshLocation(currentLocation)) {
+      return this.pushLocationToBackend(currentLocation).pipe(map(() => void 0));
+    }
+
+    return this.requestCurrentLocation().pipe(
+      switchMap((location) => this.pushLocationToBackend(location)),
+      map(() => void 0),
+    );
+  }
+
+  private requestCurrentLocation(): Observable<TrackedLocation> {
+    return new Observable<TrackedLocation>((observer) => {
+      if (typeof navigator === 'undefined' || !navigator.geolocation) {
+        observer.error(new Error('geoUnsupported'));
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          observer.next({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            updatedAt: Date.now(),
+            source: 'gps',
+          });
+          observer.complete();
+        },
+        (error) => {
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              observer.error(new Error('geoDenied'));
+              return;
+            case error.POSITION_UNAVAILABLE:
+              observer.error(new Error('geoUnavailable'));
+              return;
+            default:
+              observer.error(new Error('geoFailed'));
+          }
+        },
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 12000 },
+      );
+    });
+  }
+
+  private pushLocationToBackend(location: TrackedLocation): Observable<unknown> {
+    return this.authService.updateMyLocation({
+      latitude: location.latitude,
+      longitude: location.longitude,
+      accuracyMeters: location.accuracy,
+      recordedAtUtc: new Date(location.updatedAt).toISOString(),
+    });
+  }
+
+  private isFreshLocation(location: TrackedLocation | null): location is TrackedLocation {
+    return !!location && Date.now() - location.updatedAt <= this.maxShareLocationAgeMs;
+  }
+
+  private resolveShareError(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    const message = (error as { error?: { message?: string } })?.error?.message?.trim();
+
+    if (!message) {
+      return 'profile.shareLocationError';
+    }
+
+    if (message.includes('Current location') || message.includes('Location can be shared')) {
+      return 'profile.shareLocationError';
+    }
+
+    return message;
   }
 
   private loadStats(): void {
