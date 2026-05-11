@@ -25,6 +25,13 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "allowedCommonJsDependencies": ["leaflet", "leaflet-routing-machine", "leaflet.markercluster"],
+            "scripts": [
+              "node_modules/leaflet/dist/leaflet.js",
+              "node_modules/leaflet.markercluster/dist/leaflet.markercluster.js"
+            ],
+            "tsConfig": "tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "allowedCommonJsDependencies": ["leaflet", "leaflet-routing-machine", "leaflet.markercluster"],
             "assets": [
               "src/assets",
               {

@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
+import 'leaflet.markercluster';
 import { catchError, firstValueFrom, forkJoin, of, Subscription } from 'rxjs';
 import * as L from 'leaflet';
 
