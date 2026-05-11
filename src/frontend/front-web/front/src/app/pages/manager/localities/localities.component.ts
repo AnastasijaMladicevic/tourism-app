@@ -51,12 +51,10 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
   totalCount = 0;
   totalPages = 1;
   readonly pageSizeOptions = [5, 10, 20, 50];
-  private managerUserId: number | null = null;
   private managedDestinationIds = new Set<number>();
   private readonly creatorNameById = new Map<number, string>();
 
   ngOnInit(): void {
-    this.managerUserId = this.getCurrentUserIdFromToken();
     this.loadManagedDestinationScope();
   }
 
@@ -127,7 +125,7 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
         type: this.typeFilter !== 'all' ? this.typeFilter : undefined,
         sortBy: this.sortBy,
         sortOrder: this.sortOrder
-      })
+      }, { bypassRegion: true })
       .subscribe({
         next: (response) => {
           const scopedItems = this.applyManagerScopeFilters(response?.items ?? []);
@@ -196,7 +194,7 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
       pageSize: 500,
       sortBy: 'name',
       sortOrder: 'asc'
-    }).subscribe({
+    }, { bypassRegion: true }).subscribe({
       next: (response) => {
         const scopedItems = this.applyManagerScopeFilters(response?.items ?? []);
         const destinationOptions = this.toUniqueOptions(scopedItems.map((item) => item.destinationName));
@@ -422,46 +420,11 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
   }
 
   private applyManagerScopeFilters(items: LocalityDto[]): LocalityDto[] {
-    const filteredByOwner = this.managerUserId == null
-      ? []
-      : items.filter((item) => item.createdByUserId === this.managerUserId);
-
     if (!this.managedDestinationIds.size) {
-      return filteredByOwner;
+      return [];
     }
 
-    return filteredByOwner.filter((item) => this.managedDestinationIds.has(item.destinationId));
-  }
-
-  private getCurrentUserIdFromToken(): number | null {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      return null;
-    }
-
-    const parts = token.split('.');
-    if (parts.length !== 3) {
-      return null;
-    }
-
-    try {
-      const payloadBase64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
-      const paddedPayload = payloadBase64.padEnd(payloadBase64.length + ((4 - (payloadBase64.length % 4)) % 4), '=');
-      const decodedPayload = decodeURIComponent(
-        atob(paddedPayload)
-          .split('')
-          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-
-      const payload = JSON.parse(decodedPayload) as Record<string, unknown>;
-      const rawId = payload['nameid'] ?? payload['sub'] ?? payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
-      const parsedId = Number(rawId);
-
-      return Number.isInteger(parsedId) && parsedId > 0 ? parsedId : null;
-    } catch {
-      return null;
-    }
+    return items.filter((item) => this.managedDestinationIds.has(item.destinationId));
   }
 
   private toUniqueOptions(values: Array<string | undefined>): FilterOption[] {

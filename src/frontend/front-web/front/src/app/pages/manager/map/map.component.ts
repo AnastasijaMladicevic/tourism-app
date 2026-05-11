@@ -58,10 +58,11 @@ interface RoutePoint {
   standalone: true,
   imports: [CommonModule, FormsModule, MatIconModule],
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css']
+  styleUrls: ['./map.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
-
+  private static readonly MANAGER_DESTINATION_FOCUS_ZOOM = 14;
 
   searchQuery = '';
   searchResults: SearchResult[] = [];
@@ -69,11 +70,8 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   activeFilters: string[] = [];
   filterChips: FilterChip[] = [
-    { key: 'destination', label: 'Destinations', icon: '📍' },
     { key: 'locality', label: 'Localities', icon: '🏙️' },
-    { key: 'hotel', label: 'Hotels', icon: '🏨' },
-    { key: 'restaurant', label: 'Restaurants', icon: '🍽️' },
-    { key: 'kafana', label: 'Bars', icon: '🍷' },
+    { key: 'object', label: 'Objects', icon: '🏨' },
     { key: 'event', label: 'Events', icon: '🎉' },
     { key: 'activity', label: 'Activities', icon: '🏃' },
   ];
@@ -124,10 +122,10 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
     const lng = state?.lng ?? 18.771;
     const zoom = state?.zoom ?? 13;
 
-    this.mapService.initMap('main-map', lat, lng, zoom);
-    if (!state?.lat || !state?.lng) {
-      this.focusActiveRegion();
-    }
+    this.mapService.initMap('main-map', lat, lng, zoom, { enableClustering: true });
+    setTimeout(() => {
+      this.mapService.getMap()?.invalidateSize();
+    }, 0);
     this.loadAllData(state);
 
     const map = this.mapService['map'];
@@ -403,23 +401,53 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.activeFilters.push(key);
     }
+
+    if (
+      this.selectedItem &&
+      this.activeFilters.length > 0 &&
+      !this.matchesActiveFilters(this.selectedType)
+    ) {
+      this.closeCard();
+    }
+
     this.applyFilters();
   }
 
   private applyFilters(): void {
-    const map = this.mapService['map'];
-    if (!map) return;
+    this.mapService.setActiveFilters(this.activeFilters);
+  }
 
-    this.mapService['markerMap'].forEach((value: any, key: string) => {
-      const type = key.split(':')[0];
-      const marker = value.marker;
+  private matchesActiveFilters(type: string): boolean {
+    if (!this.activeFilters.length) {
+      return true;
+    }
 
-      if (this.activeFilters.length === 0 || this.activeFilters.includes(type)) {
-        if (!map.hasLayer(marker)) marker.addTo(map);
-      } else if (map.hasLayer(marker)) {
-        marker.remove();
-      }
-    });
+    const objectTypes = new Set([
+      'hotel',
+      'apartment',
+      'motel',
+      'resort',
+      'hostel',
+      'restaurant',
+      'kafana',
+      'bar',
+      'cafe',
+      'fast_food',
+      'winery',
+      'club',
+      'gas_station',
+      'shop',
+      'mall',
+      'market',
+      'hospital',
+      'clinic',
+      'pharmacy',
+      'attraction',
+    ]);
+
+    return this.activeFilters.some(
+      (filter) => filter === type || (filter === 'object' && objectTypes.has(type)),
+    );
   }
 
   /**
@@ -464,19 +492,24 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
       )
       .subscribe({
         next: ({ destinations, objects, events, activities, localities }) => {
-          destinations.forEach((destination) => {
-            if (destination.latitude != null && destination.longitude != null) {
-              this.mapService.addMarkerWithType(
-                destination.latitude,
-                destination.longitude,
-                'destination',
-                destination,
-              );
-              this.allItems.push(this.toSearchResult(destination, 'destination', 'destination'));
-            }
-          });
+          const managedDestinationIds = new Set(
+            destinations.map((destination) => destination.id).filter((id): id is number => id != null),
+          );
 
-          localities.forEach((loc) => {
+          const filteredLocalities = localities.filter((locality) =>
+            this.belongsToManagedDestination(locality, managedDestinationIds),
+          );
+          const filteredObjects = objects.filter((obj) =>
+            this.belongsToManagedDestination(obj, managedDestinationIds),
+          );
+          const filteredEvents = events.filter((event) =>
+            this.belongsToManagedDestination(event, managedDestinationIds),
+          );
+          const filteredActivities = activities.filter((activity) =>
+            this.belongsToManagedDestination(activity, managedDestinationIds),
+          );
+
+          filteredLocalities.forEach((loc) => {
             if (loc.latitude != null && loc.longitude != null) {
               this.mapService.addMarkerWithType(
                 loc.latitude,
@@ -488,7 +521,7 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
             }
           });
 
-          objects.forEach((obj) => {
+          filteredObjects.forEach((obj) => {
             if (obj.latitude != null && obj.longitude != null) {
               const type = this.getObjectType(obj.objectTypeName || '');
               this.mapService.addMarkerWithType(obj.latitude, obj.longitude, type, obj);
@@ -496,14 +529,14 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
             }
           });
 
-          events.forEach((event) => {
+          filteredEvents.forEach((event) => {
             if (event.latitude != null && event.longitude != null) {
               this.mapService.addMarkerWithType(event.latitude, event.longitude, 'event', event);
               this.allItems.push(this.toSearchResult(event, 'event', 'event'));
             }
           });
 
-          activities.forEach((activity) => {
+          filteredActivities.forEach((activity) => {
             if (activity.latitude != null && activity.longitude != null) {
               this.mapService.addMarkerWithType(
                 activity.latitude,
@@ -514,6 +547,15 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
               this.allItems.push(this.toSearchResult(activity, 'activity', 'activity'));
             }
           });
+
+          this.focusManagedContent(
+            destinations,
+            filteredLocalities,
+            filteredObjects,
+            filteredEvents,
+            filteredActivities,
+            state,
+          );
 
           if (state?.selectedItem) {
             setTimeout(() => {
@@ -527,6 +569,21 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
         },
         error: (err) => console.error('Greska:', err),
       });
+  }
+
+  private belongsToManagedDestination(
+    item: { destinationId?: number | null },
+    managedDestinationIds: Set<number>,
+  ): boolean {
+    if (!managedDestinationIds.size) {
+      return false;
+    }
+
+    if (item.destinationId == null) {
+      return false;
+    }
+
+    return managedDestinationIds.has(item.destinationId);
   }
 
   private fetchAllPages<TItem>(
@@ -667,6 +724,59 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
         // keep the existing default center if region lookup fails
       },
     });
+  }
+
+  private focusManagedContent(
+    destinations: DestinationDto[],
+    localities: any[],
+    objects: any[],
+    events: any[],
+    activities: any[],
+    state?: any,
+  ): void {
+    if (state?.lat != null && state?.lng != null) {
+      return;
+    }
+
+    const map = this.mapService['map'];
+    if (!map) {
+      return;
+    }
+
+    const points = [
+      ...destinations,
+      ...localities,
+      ...objects,
+      ...events,
+      ...activities,
+    ]
+      .map((item) => this.toLatLng(item))
+      .filter((point): point is L.LatLngTuple => point !== null);
+
+    if (!points.length) {
+      this.focusActiveRegion();
+      return;
+    }
+
+    if (points.length === 1) {
+      const [lat, lng] = points[0];
+      this.mapService.flyTo(lat, lng, ManagerMapComponent.MANAGER_DESTINATION_FOCUS_ZOOM);
+      return;
+    }
+
+    const bounds = L.latLngBounds(points);
+    map.fitBounds(bounds.pad(0.2), {
+      padding: [72, 72],
+      maxZoom: ManagerMapComponent.MANAGER_DESTINATION_FOCUS_ZOOM,
+    });
+  }
+
+  private toLatLng(item: { latitude?: number | null; longitude?: number | null }): L.LatLngTuple | null {
+    if (item.latitude == null || item.longitude == null) {
+      return null;
+    }
+
+    return [item.latitude, item.longitude];
   }
 
   getWorkingStatus(): boolean | null {
