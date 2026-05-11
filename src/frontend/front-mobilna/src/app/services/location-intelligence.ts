@@ -15,6 +15,12 @@ export interface QuietZone {
   radiusMeters: number;
 }
 
+export interface QuietZoneAddressSuggestion {
+  displayName: string;
+  latitude: number;
+  longitude: number;
+}
+
 export interface LocationIntelligenceState {
   autoRegionEnabled: boolean;
   quietZones: Record<QuietZoneKind, QuietZone | null>;
@@ -80,43 +86,45 @@ export class LocationIntelligenceService {
     return this.stateSubject.value.quietZones[kind];
   }
 
+  async searchAddresses(query: string): Promise<QuietZoneAddressSuggestion[]> {
+    const trimmedQuery = query.trim();
+    if (trimmedQuery.length < 3) {
+      return [];
+    }
+
+    const results = await this.fetchGeocodeResults(trimmedQuery, 5);
+
+    return results
+      .map((result) => this.mapSuggestion(result))
+      .filter((suggestion): suggestion is QuietZoneAddressSuggestion => suggestion !== null);
+  }
+
   async saveQuietZoneFromAddress(kind: QuietZoneKind, address: string): Promise<QuietZone> {
     const trimmedAddress = address.trim();
     if (!trimmedAddress) {
       throw new Error('Address is required.');
     }
 
-    const url = new URL('https://nominatim.openstreetmap.org/search');
-    url.searchParams.set('format', 'jsonv2');
-    url.searchParams.set('limit', '1');
-    url.searchParams.set('q', trimmedAddress);
+    const results = await this.fetchGeocodeResults(trimmedAddress, 1);
+    const suggestion = this.mapSuggestion(results[0], trimmedAddress);
 
-    const response = await fetch(url.toString(), {
-      headers: {
-        Accept: 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Address lookup failed.');
-    }
-
-    const results = (await response.json()) as GeocodeResult[];
-    const firstResult = results[0];
-    const latitude = Number(firstResult?.lat);
-    const longitude = Number(firstResult?.lon);
-
-    if (!firstResult || Number.isNaN(latitude) || Number.isNaN(longitude)) {
+    if (!suggestion) {
       throw new Error('Address not found.');
     }
 
-    const zone: QuietZone = {
+    const zone = this.createQuietZone(kind, suggestion.displayName, suggestion.latitude, suggestion.longitude);
+
+    this.writeQuietZone(zone);
+    return zone;
+  }
+
+  saveQuietZoneFromSuggestion(kind: QuietZoneKind, suggestion: QuietZoneAddressSuggestion): QuietZone {
+    const zone = this.createQuietZone(
       kind,
-      address: firstResult.display_name?.trim() || trimmedAddress,
-      latitude,
-      longitude,
-      radiusMeters: 350,
-    };
+      suggestion.displayName,
+      suggestion.latitude,
+      suggestion.longitude,
+    );
 
     this.writeQuietZone(zone);
     return zone;
@@ -292,6 +300,59 @@ export class LocationIntelligenceService {
         typeof zone.radiusMeters === 'number' && Number.isFinite(zone.radiusMeters)
           ? zone.radiusMeters
           : 350,
+    };
+  }
+
+  private async fetchGeocodeResults(query: string, limit: number): Promise<GeocodeResult[]> {
+    const url = new URL('https://nominatim.openstreetmap.org/search');
+    url.searchParams.set('format', 'jsonv2');
+    url.searchParams.set('limit', String(limit));
+    url.searchParams.set('addressdetails', '1');
+    url.searchParams.set('q', query);
+
+    const response = await fetch(url.toString(), {
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Address lookup failed.');
+    }
+
+    return (await response.json()) as GeocodeResult[];
+  }
+
+  private mapSuggestion(
+    result: GeocodeResult | undefined,
+    fallbackAddress?: string,
+  ): QuietZoneAddressSuggestion | null {
+    const latitude = Number(result?.lat);
+    const longitude = Number(result?.lon);
+
+    if (!result || Number.isNaN(latitude) || Number.isNaN(longitude)) {
+      return null;
+    }
+
+    return {
+      displayName: result.display_name?.trim() || fallbackAddress || '',
+      latitude,
+      longitude,
+    };
+  }
+
+  private createQuietZone(
+    kind: QuietZoneKind,
+    address: string,
+    latitude: number,
+    longitude: number,
+  ): QuietZone {
+    return {
+      kind,
+      address,
+      latitude,
+      longitude,
+      radiusMeters: 350,
     };
   }
 

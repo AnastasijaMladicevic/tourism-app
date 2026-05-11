@@ -82,11 +82,28 @@
               <div class="zone-card__input">
                 <input
                   type="text"
+                  autocomplete="off"
                   [placeholder]="('settings.smartLocation.zone.' + kind + '.placeholder') | translate"
                   [ngModel]="$any(kind) === 'home' ? homeZoneInput : workZoneInput"
-                  (ngModelChange)="$any(kind) === 'home' ? homeZoneInput = $event : workZoneInput = $event"
+                  (ngModelChange)="onQuietZoneInputChange($any(kind), $event)"
+                  (focus)="onQuietZoneFocus($any(kind))"
+                  (blur)="onQuietZoneBlur($any(kind))"
                 />
               </div>
+
+              @if (getQuietZoneSuggestions($any(kind)).length) {
+                <div class="zone-suggestions">
+                  @for (suggestion of getQuietZoneSuggestions($any(kind)); track suggestion.displayName + suggestion.latitude + suggestion.longitude) {
+                    <button
+                      type="button"
+                      class="zone-suggestion"
+                      (mousedown)="selectQuietZoneSuggestion($any(kind), suggestion)"
+                    >
+                      <span>{{ suggestion.displayName }}</span>
+                    </button>
+                  }
+                </div>
+              }
 
               @if (getQuietZone($any(kind)); as zone) {
                 <p class="zone-card__summary">
