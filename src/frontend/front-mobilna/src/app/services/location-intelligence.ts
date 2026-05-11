@@ -130,15 +130,29 @@ export class LocationIntelligenceService {
     return zone;
   }
 
-  saveQuietZoneFromCurrentLocation(kind: QuietZoneKind, customLabel?: string | null): QuietZone {
-    const currentLocation = this.locationTrackingService.getCurrentLocation();
+  async saveQuietZoneFromCurrentLocation(
+    kind: QuietZoneKind,
+    customLabel?: string | null,
+  ): Promise<QuietZone> {
+    const currentLocation =
+      this.locationTrackingService.getCurrentLocation()
+      ?? await firstValueFrom(this.locationTrackingService.captureCurrentLocation());
+
     if (!currentLocation) {
       throw new Error('Current location is not available.');
     }
 
+    const resolvedAddress = await this.reverseGeocode(
+      currentLocation.latitude,
+      currentLocation.longitude,
+    ).catch(() => null);
+
+    const fallbackAddress = customLabel?.trim()
+      || `${currentLocation.latitude.toFixed(5)}, ${currentLocation.longitude.toFixed(5)}`;
+
     const zone: QuietZone = {
       kind,
-      address: customLabel?.trim() || (kind === 'home' ? 'Home zone' : 'Work zone'),
+      address: resolvedAddress?.trim() || fallbackAddress,
       latitude: currentLocation.latitude,
       longitude: currentLocation.longitude,
       radiusMeters: 350,
@@ -308,6 +322,7 @@ export class LocationIntelligenceService {
     url.searchParams.set('format', 'jsonv2');
     url.searchParams.set('limit', String(limit));
     url.searchParams.set('addressdetails', '1');
+    url.searchParams.set('accept-language', this.getPreferredGeocodeLanguage());
     url.searchParams.set('q', query);
 
     const response = await fetch(url.toString(), {
@@ -321,6 +336,29 @@ export class LocationIntelligenceService {
     }
 
     return (await response.json()) as GeocodeResult[];
+  }
+
+  private async reverseGeocode(latitude: number, longitude: number): Promise<string | null> {
+    const url = new URL('https://nominatim.openstreetmap.org/reverse');
+    url.searchParams.set('format', 'jsonv2');
+    url.searchParams.set('lat', String(latitude));
+    url.searchParams.set('lon', String(longitude));
+    url.searchParams.set('zoom', '18');
+    url.searchParams.set('addressdetails', '1');
+    url.searchParams.set('accept-language', this.getPreferredGeocodeLanguage());
+
+    const response = await fetch(url.toString(), {
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Reverse geocoding failed.');
+    }
+
+    const payload = (await response.json()) as GeocodeResult;
+    return payload.display_name?.trim() || null;
   }
 
   private mapSuggestion(
@@ -381,5 +419,13 @@ export class LocationIntelligenceService {
 
   private toRadians(value: number): number {
     return (value * Math.PI) / 180;
+  }
+
+  private getPreferredGeocodeLanguage(): string {
+    if (typeof navigator === 'undefined') {
+      return 'sr';
+    }
+
+    return navigator.language || 'sr';
   }
 }

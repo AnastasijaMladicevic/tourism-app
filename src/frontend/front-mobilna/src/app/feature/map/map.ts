@@ -231,7 +231,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   openLocationConsentSettings(): void {
     this.showLocationConsentPrompt = false;
-    void this.router.navigate(['/settings'], {
+    void this.router.navigate(['/location-settings'], {
       queryParams: { locationConsent: '1' },
     });
   }

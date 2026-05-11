@@ -163,14 +163,16 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
     }
   }
 
-  useCurrentLocationForZone(kind: QuietZoneKind): void {
+  async useCurrentLocationForZone(kind: QuietZoneKind): Promise<void> {
     this.setQuietZoneError(kind, '');
     this.setQuietZoneSuggestions(kind, []);
     this.setSelectedQuietZoneSuggestion(kind, null);
+    this.savingQuietZone = kind;
+    this.cdr.markForCheck();
 
     try {
       const label = kind === 'home' ? this.homeZoneInput : this.workZoneInput;
-      const zone = this.locationIntelligenceService.saveQuietZoneFromCurrentLocation(kind, label);
+      const zone = await this.locationIntelligenceService.saveQuietZoneFromCurrentLocation(kind, label);
 
       if (kind === 'home') {
         this.homeZoneInput = zone.address;
@@ -179,6 +181,9 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
       }
     } catch {
       this.setQuietZoneError(kind, 'settings.smartLocation.zoneLocationError');
+    } finally {
+      this.savingQuietZone = null;
+      this.cdr.markForCheck();
     }
   }
 
