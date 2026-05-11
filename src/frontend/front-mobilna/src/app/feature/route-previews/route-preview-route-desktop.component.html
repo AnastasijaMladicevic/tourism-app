@@ -1,0 +1,44 @@
+<div class="desktop-route-page">
+  <section class="desktop-route-shell">
+    <div class="desktop-route-handle"></div>
+
+    <header class="desktop-route-header">
+      <div class="desktop-route-summary">
+        <span class="desktop-route-summary__logo">△</span>
+        <div>
+          <small>CURRENT ROUTE</small>
+          <strong>Pacific Coast Tour</strong>
+        </div>
+      </div>
+
+      <div class="desktop-route-stats">
+        <span>7h 45m</span>
+        <span>452 miles</span>
+        <span class="desktop-route-pill">5 Stops</span>
+      </div>
+
+      <div class="desktop-route-header__actions">
+        <a routerLink="/planner-preview/route-mobile">Hide List</a>
+        <button type="button">Start Route ▷</button>
+      </div>
+    </header>
+
+    <div class="desktop-route-add-row">
+      <div class="desktop-route-add-input">＋ Add another stop to your journey...</div>
+      <button type="button">Add Stop</button>
+    </div>
+
+    <div class="desktop-route-list">
+      @for (stop of stops; track stop.order) {
+        <article class="desktop-route-item">
+          <span class="desktop-route-item__grip">⋮⋮</span>
+          <span class="desktop-route-item__order">{{ stop.order }}</span>
+          <div class="desktop-route-item__copy">
+            <strong>{{ stop.title }}</strong>
+            <span>{{ stop.meta }}</span>
+          </div>
+        </article>
+      }
+    </div>
+  </section>
+</div>
