@@ -278,7 +278,7 @@ export class ObjectService {
       pageSize: 500,
       sortBy: 'name',
       sortOrder: 'asc'
-    }).pipe(
+    }, { bypassRegion: true }).pipe(
       map((response) => {
         const items = response?.items ?? [];
 
