@@ -243,9 +243,7 @@ export class EventFormComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.map?.remove();
-    this.map = null;
-    this.mapMarker = null;
+    this.mapService.destroyMap();
   }
 
   private loadDropdownOptions(): void {

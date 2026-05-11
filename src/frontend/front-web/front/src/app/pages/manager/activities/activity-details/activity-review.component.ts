@@ -14,7 +14,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
-import * as L from 'leaflet';
+import { MapService } from '../../../../services/map.service';
 import { ActivitiesService, ActivityDto, ActivityImageDto, ApproveActivityDto } from '../../../../services/activities';
 import { environment } from '../../../../../environment/environment';
 
@@ -33,12 +33,14 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly ngZone = inject(NgZone);
   private readonly http = inject(HttpClient);
+  private readonly mapService = inject(MapService);
 
   @ViewChild('activityMap') private activityMap?: ElementRef<HTMLDivElement>;
 
   private readonly defaultMapCenter: [number, number] = [42.424, 18.771];
   private readonly defaultMapZoom = 13;
-
+  private readonly defaultLat = 42.424;
+  private readonly defaultLng = 18.771;
   private map: L.Map | null = null;
   private mapMarker: L.Marker | null = null;
 
@@ -97,9 +99,7 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
   }
 
   ngOnDestroy(): void {
-    this.map?.remove();
-    this.map = null;
-    this.mapMarker = null;
+    this.mapService.destroyMap();
   }
 
   loadActivity(): void {
@@ -551,84 +551,61 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
   }
 
   private initializeMap(): void {
-    if (!this.activityMap || this.map) {
+    if (!this.activityMap) {
       return;
     }
 
-    const selectedCoordinates = this.selectedCoordinates;
-    const center: L.LatLngExpression = selectedCoordinates
-      ? [selectedCoordinates.latitude, selectedCoordinates.longitude]
-      : this.defaultMapCenter;
-    const zoom = selectedCoordinates ? 15 : this.defaultMapZoom;
+    const initialLat = this.latitudeNumber ?? this.defaultLat;
+    const initialLng = this.longitudeNumber ?? this.defaultLng;
 
-    this.map = L.map(this.activityMap.nativeElement, {
-      zoomControl: true,
-      scrollWheelZoom: false,
-      doubleClickZoom: false,
-      dragging: false,
-      touchZoom: false,
-      boxZoom: false,
-      keyboard: false
-    }).setView(center, zoom);
+    this.mapService.destroyMap();
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '',
-      subdomains: '',
-      maxZoom: 19
-    }).addTo(this.map);
+    this.mapService.initMap(
+      this.activityMap.nativeElement.id,
+      initialLat,
+      initialLng,
+      this.hasCoordinates ? 15 : this.defaultMapZoom
+    );
 
-    // Keep the same real map renderer as create page, but make it strictly view-only.
-    this.map.dragging.disable();
-    this.map.touchZoom.disable();
-    this.map.doubleClickZoom.disable();
-    this.map.scrollWheelZoom.disable();
-    this.map.boxZoom.disable();
-    this.map.keyboard.disable();
+    this.map = this.mapService.getMap();
 
-    this.map.whenReady(() => {
-      setTimeout(() => {
-        this.map?.invalidateSize();
-      }, 0);
-    });
+    setTimeout(() => {
+      this.map?.invalidateSize();
+    }, 0);
   }
 
   private syncMapFromActivity(): void {
-    if (!this.map) {
-      return;
-    }
-
     const selectedCoordinates = this.selectedCoordinates;
+
     if (!selectedCoordinates) {
-      this.map.setView(this.defaultMapCenter, this.defaultMapZoom);
+      this.mapService.flyTo(
+        this.defaultLat,
+        this.defaultLng,
+        this.defaultMapZoom
+      );
       return;
     }
 
-    this.updateMapMarker(selectedCoordinates.latitude, selectedCoordinates.longitude);
+    this.updateMapMarker(
+      selectedCoordinates.latitude,
+      selectedCoordinates.longitude
+    );
   }
 
   private updateMapMarker(latitude: number, longitude: number): void {
-    if (!this.map) {
+    const map = this.mapService.getMap();
+
+    if (!map) {
       return;
     }
 
-    if (!this.mapMarker) {
-      const markerIcon = L.icon({
-        iconUrl: 'assets/marker-icon.png',
-        iconRetinaUrl: 'assets/marker-icon-2x.png',
-        shadowUrl: 'assets/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-      });
+    this.mapService.flyTo(latitude, longitude, 15);
 
-      this.mapMarker = L.marker([latitude, longitude], { icon: markerIcon, draggable: false }).addTo(this.map);
-    } else {
-      this.mapMarker.setLatLng([latitude, longitude]);
-    }
-
-    const targetZoom = Math.max(this.map.getZoom(), 15);
-    this.map.flyTo([latitude, longitude], targetZoom, { duration: 0.8 });
+    this.mapService.addMainMapMarker(
+      latitude,
+      longitude,
+      this.form.controls.name.value || 'Activity'
+    );
   }
 
   private toNumber(value: string | number | null | undefined): number | null {
