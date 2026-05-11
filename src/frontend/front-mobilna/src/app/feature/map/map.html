@@ -249,7 +249,7 @@
         </div>
 
         <div class="bottom-card__actions">
-          @if (selectedType !== 'address') {
+          @if (shouldShowDetailsButton()) {
             <button class="bottom-card__btn" (click)="openDetails()">Details</button>
           }
 

@@ -1015,6 +1015,18 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  shouldShowDetailsButton(): boolean {
+    if (!this.selectedItem) {
+      return false;
+    }
+
+    if (this.selectedType === 'address') {
+      return false;
+    }
+
+    return this.selectedItem.isExternalAddress !== true;
+  }
+
   closeCard(): void {
     this.routeSearchResults = [];
     this.showSuggestions = false;
@@ -1302,6 +1314,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
           address: suggestion.displayName,
           latitude: suggestion.latitude,
           longitude: suggestion.longitude,
+          isExternalAddress: true,
         },
         category: 'address',
         markerType: 'address',
