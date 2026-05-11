@@ -167,7 +167,14 @@
                 <p>Map preview and coordinates for the linked location.</p>
               </div>
 
-              <div #activityMap id="activity-create-map" class="location-map mini-map" aria-label="Activity location map"></div>
+              <app-map
+                [lat]="latitudeNumber ?? 42.424"
+                [lng]="longitudeNumber ?? 18.771"
+                [zoom]="15"
+                [popupText]="form.controls.name.value || 'Activity'"
+                [interactive]="false"
+                [showMarker]="true">
+              </app-map>
 
               <div class="location-line">
                 <span class="material-symbols-outlined">search</span>

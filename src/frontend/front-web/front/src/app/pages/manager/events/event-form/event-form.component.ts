@@ -1,6 +1,6 @@
-import { Component, OnInit, inject, ChangeDetectorRef, AfterViewInit, OnDestroy, ViewChild, ElementRef, NgZone } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { MapService } from '../../../../services/map.service';
+import { MapComponent } from '../../../../shared/components/map/map';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -25,20 +25,18 @@ interface RelatedActivity {
 @Component({
   selector: 'app-manager-event-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent],
   templateUrl: './event-form.component.html',
   styleUrls: ['./event-form.component.css']
 })
-export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ManagerEventFormComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly eventService = inject(EventService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
-  private readonly ngZone = inject(NgZone);
   private readonly http = inject(HttpClient);
-  private readonly mapService = inject(MapService);
 
   form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(200)]],
@@ -197,19 +195,7 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
     });
   }
 
-  @ViewChild('eventMap') private eventMap?: ElementRef<HTMLDivElement>;
-
-  private readonly defaultMapCenter: [number, number] = [42.424, 18.771];
-  private readonly defaultMapZoom = 13;
-
-  ngAfterViewInit(): void {
-    this.initializeMap();
-    this.syncMapFromForm();
-  }
-
-  ngOnDestroy(): void {
-    this.mapService.destroyMap();
-  }
+  ngOnDestroy(): void { }
 
   loadEvent(): void {
     if (!this.eventId) {
@@ -262,7 +248,6 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
       tagsInput: ''
     });
     this.selectedReviewImageUrl = event.mainImageUrl ?? '';
-    this.syncMapFromForm();
   }
 
   private resolveCreatorName(event: EventDto): void {
@@ -303,66 +288,7 @@ export class ManagerEventFormComponent implements OnInit, AfterViewInit, OnDestr
       });
   }
 
-  private initializeMap(): void {
-    if (!this.eventMap) {
-      return;
-    }
-
-    const latitude = this.toNumber(this.form.controls.latitude.value);
-    const longitude = this.toNumber(this.form.controls.longitude.value);
-
-    const lat = latitude ?? this.defaultMapCenter[0];
-    const lng = longitude ?? this.defaultMapCenter[1];
-
-    this.mapService.initMap(
-      this.eventMap.nativeElement.id,
-      lat,
-      lng,
-      latitude != null && longitude != null
-        ? 15
-        : this.defaultMapZoom
-    );
-
-    const map = this.mapService.getMap();
-
-    setTimeout(() => {
-      map?.invalidateSize();
-    }, 0);
-  }
-
-  private syncMapFromForm(): void {
-    const latitude = this.toNumber(this.form.controls.latitude.value);
-    const longitude = this.toNumber(this.form.controls.longitude.value);
-
-    if (latitude == null || longitude == null) {
-      return;
-    }
-
-    this.mapService.destroyMap();
-
-    setTimeout(() => {
-      this.initializeMap();
-      this.updateMapMarker(latitude, longitude);
-    }, 0);
-  }
-
-  private updateMapMarker(latitude: number, longitude: number): void {
-    const map = this.mapService.getMap();
-
-    if (!map) {
-      return;
-    }
-
-    this.mapService.flyTo(latitude, longitude, 15);
-
-    this.mapService.addMainMapMarker(
-      latitude,
-      longitude,
-      this.form.controls.name.value || 'Event'
-    );
-  }
-
-  private toNumber(value: number | string | null | undefined): number | null {
+  toNumber(value: number | string | null | undefined): number | null {
     if (value == null || value === '') {
       return null;
     }

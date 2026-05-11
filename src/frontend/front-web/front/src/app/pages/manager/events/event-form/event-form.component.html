@@ -245,7 +245,14 @@
           <p>Map preview and coordinates for the linked location.</p>
         </div>
 
-        <div #eventMap class="location-map mini-map" aria-label="Event location map"></div>
+        <app-map
+          [lat]="toNumber(form.controls.latitude.value) ?? 42.424"
+          [lng]="toNumber(form.controls.longitude.value) ?? 18.771"
+          [zoom]="15"
+          [popupText]="form.controls.name.value || 'Event'"
+          [interactive]="false"
+          [showMarker]="true">
+        </app-map>
 
         <div class="location-line">
           <span class="material-symbols-outlined">search</span>

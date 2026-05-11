@@ -1,21 +1,17 @@
 import { CommonModule } from '@angular/common';
 import {
-  AfterViewInit,
   ChangeDetectorRef,
   Component,
   DestroyRef,
-  ElementRef,
   NgZone,
   OnDestroy,
   OnInit,
-  ViewChild,
   inject,
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, forkJoin, map, of, switchMap } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MapService } from '../../../../services/map.service';
+import { MapComponent } from '../../../../shared/components/map/map';
 import {
   ActivitiesService,
   ActivityTypeOption,
@@ -78,11 +74,11 @@ interface DraftPayload {
 @Component({
   selector: 'app-activity-create',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent],
   templateUrl: './activity-create.component.html',
   styleUrl: './activity-create.component.css'
 })
-export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ActivityCreateComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly activitiesService = inject(ActivitiesService);
   private readonly destinationService = inject(DestinationService);
@@ -92,16 +88,6 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
   private readonly destroyRef = inject(DestroyRef);
   private readonly ngZone = inject(NgZone);
   private readonly cdr = inject(ChangeDetectorRef);
-  private readonly mapService = inject(MapService);
-
-  @ViewChild('activityMap') private activityMap?: ElementRef<HTMLDivElement>;
-
-  private readonly draftKey = 'content-creator:add-activity-draft';
-  private readonly defaultLat = 42.424;
-  private readonly defaultLng = 18.771;
-  private readonly defaultMapZoom = 13;
-  private geocodeRequestId = 0;
-  private forwardGeocodeRequestId = 0;
 
   form = this.fb.group(
     {
@@ -143,6 +129,10 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
   objects: ObjectOption[] = [];
   private loadedActivity: ActivityDto | null = null;
   private deletionRequestSubmitted = false;
+
+  private readonly draftKey = 'content-creator:add-activity-draft';
+  private geocodeRequestId = 0;
+  private forwardGeocodeRequestId = 0;
 
   locationDetails = {
     city: '-',
@@ -193,24 +183,9 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
     this.form.controls.objectId.valueChanges.subscribe(() => {
       this.applyLocationFromSelection();
     });
-
-    this.form.controls.latitude.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.syncMapFromForm());
-
-    this.form.controls.longitude.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.syncMapFromForm());
   }
 
-  ngAfterViewInit(): void {
-    this.initializeMap();
-    this.syncMapFromForm();
-  }
-
-  ngOnDestroy(): void {
-    this.mapService.destroyMap();
-  }
+  ngOnDestroy(): void { }
 
   get pageTitle(): string {
     return this.isEditMode ? 'Edit Activity' : 'Create Activity';
@@ -633,7 +608,6 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
       { emitEvent: false }
     );
 
-    this.updateMapMarker(latitude, longitude);
     this.reverseGeocode(latitude, longitude);
   }
 
@@ -892,58 +866,7 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
     return (selectTypeId ?? manualTypeId) ? null : { activityTypeRequired: true };
   }
 
-  private initializeMap(): void {
-    if (!this.activityMap) {
-      return;
-    }
-
-    const initialLat = this.toNumber(this.form.controls.latitude.value);
-    const initialLng = this.toNumber(this.form.controls.longitude.value);
-
-    const lat = initialLat ?? this.defaultLat;
-    const lng = initialLng ?? this.defaultLng;
-
-    this.mapService.initMap(
-      this.activityMap.nativeElement.id,
-      lat,
-      lng,
-      initialLat != null && initialLng != null
-        ? 15
-        : this.defaultMapZoom
-    );
-
-    const map = this.mapService.getMap();
-
-    map?.on('click', (event: any) => {
-      this.ngZone.run(() => {
-        this.selectLocation(event.latlng.lat, event.latlng.lng);
-      });
-    });
-
-    setTimeout(() => {
-      map?.invalidateSize();
-    }, 0);
-  }
-
-  private syncMapFromForm(): void {
-    const latitude = this.toNumber(this.form.controls.latitude.value);
-    const longitude = this.toNumber(this.form.controls.longitude.value);
-
-    if (latitude == null || longitude == null) {
-      this.resetLocationDetails();
-      return;
-    }
-
-    this.mapService.destroyMap();
-
-    setTimeout(() => {
-      this.initializeMap();
-      this.updateMapMarker(latitude, longitude);
-    }, 0);
-    this.reverseGeocode(latitude, longitude);
-  }
-
-  private selectLocation(latitude: number, longitude: number): void {
+  selectLocation(latitude: number, longitude: number): void {
     this.form.patchValue(
       {
         latitude,
@@ -957,24 +880,7 @@ export class ActivityCreateComponent implements OnInit, AfterViewInit, OnDestroy
     this.form.controls.latitude.markAsTouched();
     this.form.controls.longitude.markAsTouched();
 
-    this.updateMapMarker(latitude, longitude);
     this.reverseGeocode(latitude, longitude);
-  }
-
-  private updateMapMarker(latitude: number, longitude: number): void {
-    const map = this.mapService.getMap();
-
-    if (!map) {
-      return;
-    }
-
-    this.mapService.flyTo(latitude, longitude, 15);
-
-    this.mapService.addMainMapMarker(
-      latitude,
-      longitude,
-      this.form.controls.name.value || 'Activity'
-    );
   }
 
   private reverseGeocode(latitude: number, longitude: number): void {

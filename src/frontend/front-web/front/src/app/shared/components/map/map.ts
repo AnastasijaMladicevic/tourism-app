@@ -1,4 +1,4 @@
-import { Component, Input, AfterViewInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, AfterViewInit, OnDestroy, OnChanges, SimpleChanges, EventEmitter, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import { MapService } from '../../../services/map.service';
@@ -23,7 +23,7 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   private transitionTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private mapInitialized = false;
 
-  constructor(private mapService: MapService) {}
+  constructor(private mapService: MapService) { }
 
   ngAfterViewInit(): void {
     this.initMap();
@@ -49,9 +49,16 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     if (!this.lat || !this.lng) return;
 
     this.mapService.initMap(this.mapId, this.lat, this.lng, this.zoom);
+
+
     this.mapInitialized = true;
     const map = this.mapService.getMap();
-
+    map?.on('click', (e: any) => {
+      this.mapClick.emit({
+        lat: e.latlng.lat,
+        lng: e.latlng.lng
+      });
+    });
     if (!this.interactive) {
       if (map) {
         map.dragging.disable();
@@ -131,4 +138,5 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     }
     this.mapService.destroyMap();
   }
+  @Output() mapClick = new EventEmitter<{ lat: number; lng: number }>();
 }

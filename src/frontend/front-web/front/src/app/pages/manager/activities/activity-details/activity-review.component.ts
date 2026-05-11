@@ -1,48 +1,33 @@
 import { CommonModule } from '@angular/common';
 import {
-  AfterViewInit,
   ChangeDetectorRef,
   Component,
-  ElementRef,
-  NgZone,
   OnDestroy,
   OnInit,
-  ViewChild,
   inject
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
-import { MapService } from '../../../../services/map.service';
+import { MapComponent } from '../../../../shared/components/map/map';
 import { ActivitiesService, ActivityDto, ActivityImageDto, ApproveActivityDto } from '../../../../services/activities';
 import { environment } from '../../../../../environment/environment';
 
 @Component({
   selector: 'app-manager-activity-review',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent],
   templateUrl: './activity-review.component.html',
   styleUrls: ['./activity-review.component.css']
 })
-export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, OnDestroy {
+export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly activitiesService = inject(ActivitiesService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
-  private readonly ngZone = inject(NgZone);
   private readonly http = inject(HttpClient);
-  private readonly mapService = inject(MapService);
-
-  @ViewChild('activityMap') private activityMap?: ElementRef<HTMLDivElement>;
-
-  private readonly defaultMapCenter: [number, number] = [42.424, 18.771];
-  private readonly defaultMapZoom = 13;
-  private readonly defaultLat = 42.424;
-  private readonly defaultLng = 18.771;
-  private map: L.Map | null = null;
-  private mapMarker: L.Marker | null = null;
 
   activityId: number | null = null;
   activity: ActivityDto | null = null;
@@ -93,14 +78,7 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
     this.loadActivity();
   }
 
-  ngAfterViewInit(): void {
-    this.initializeMap();
-    this.syncMapFromActivity();
-  }
-
-  ngOnDestroy(): void {
-    this.mapService.destroyMap();
-  }
+  ngOnDestroy(): void { }
 
   loadActivity(): void {
     if (!this.activityId) {
@@ -116,14 +94,6 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
       finalize(() => {
         this.isLoading = false;
         this.cdr.detectChanges();
-        this.ngZone.runOutsideAngular(() => {
-          setTimeout(() => {
-            this.ngZone.run(() => {
-              this.initializeMap();
-              this.syncMapFromActivity();
-            });
-          });
-        });
       })
     ).subscribe({
       next: (activity) => {
@@ -143,7 +113,6 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
         this.resolveCreatorName(activity);
         this.resolveApproverName(activity);
         this.cdr.detectChanges();
-        this.syncMapFromActivity();
         this.loadActivityImages(activity.id, activity.mainImageUrl);
       },
       error: (error: any) => {
@@ -548,64 +517,6 @@ export class ManagerActivityReviewComponent implements OnInit, AfterViewInit, On
       default:
         return 'badge-pending';
     }
-  }
-
-  private initializeMap(): void {
-    if (!this.activityMap) {
-      return;
-    }
-
-    const initialLat = this.latitudeNumber ?? this.defaultLat;
-    const initialLng = this.longitudeNumber ?? this.defaultLng;
-
-    this.mapService.destroyMap();
-
-    this.mapService.initMap(
-      this.activityMap.nativeElement.id,
-      initialLat,
-      initialLng,
-      this.hasCoordinates ? 15 : this.defaultMapZoom
-    );
-
-    this.map = this.mapService.getMap();
-
-    setTimeout(() => {
-      this.map?.invalidateSize();
-    }, 0);
-  }
-
-  private syncMapFromActivity(): void {
-    const selectedCoordinates = this.selectedCoordinates;
-
-    if (!selectedCoordinates) {
-      this.mapService.flyTo(
-        this.defaultLat,
-        this.defaultLng,
-        this.defaultMapZoom
-      );
-      return;
-    }
-
-    this.updateMapMarker(
-      selectedCoordinates.latitude,
-      selectedCoordinates.longitude
-    );
-  }
-
-  private updateMapMarker(latitude: number, longitude: number): void {
-    const map = this.mapService.getMap();
-
-    if (!map) {
-      return;
-    }
-
-    this.mapService.flyTo(latitude, longitude, 15);
-
-    this.mapService.addMainMapMarker(
-      latitude,
-      longitude,
-      this.form.controls.name.value || 'Activity'
-    );
   }
 
   private toNumber(value: string | number | null | undefined): number | null {
