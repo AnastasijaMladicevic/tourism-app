@@ -35,7 +35,7 @@ namespace TuristickiVodic.Services
         Task<UserLocationPathDto> GetLocationPathAsync(int userId, UserLocationPathQueryDto query);
         Task<bool> ClearLocationHistoryAsync(int userId);
         Task<List<VisitedPlaceDto>> GetVisitedPlacesAsync(int userId, int limit);
-        Task<LocationShareDto> CreateLocationShareAsync(int userId, int durationHours);
+        Task<LocationShareDto> CreateLocationShareAsync(int userId, CreateLocationShareDto dto);
         Task<SharedLocationDto?> ResolveLocationShareAsync(string token);
     }
 }

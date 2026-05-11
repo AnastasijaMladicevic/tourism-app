@@ -156,7 +156,7 @@ namespace TuristickiVodic.API.Controllers
 
             try
             {
-                var share = await _userService.CreateLocationShareAsync(currentUserId, dto.DurationHours);
+                var share = await _userService.CreateLocationShareAsync(currentUserId, dto);
                 return Ok(share);
             }
             catch (InvalidOperationException ex)

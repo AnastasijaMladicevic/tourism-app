@@ -101,6 +101,14 @@ export interface LocationShareDto {
   expiresAtUtc: string;
 }
 
+export interface CreateLocationSharePayload {
+  durationHours: number;
+  latitude?: number;
+  longitude?: number;
+  accuracyMeters?: number | null;
+  recordedAtUtc?: string | null;
+}
+
 export interface SharedLocationDto {
   displayName: string;
   latitude: number;
@@ -259,10 +267,19 @@ export class AuthService {
     });
   }
 
-  createLocationShare(durationHours: number): Observable<LocationShareDto> {
-    return this.http.post<LocationShareDto>(`${this.url}/me/location-share`, {
+  createLocationShare(
+    durationHours: number,
+    location?: UpdateUserLocationPayload | null,
+  ): Observable<LocationShareDto> {
+    const payload: CreateLocationSharePayload = {
       durationHours,
-    });
+      latitude: location?.latitude ?? undefined,
+      longitude: location?.longitude ?? undefined,
+      accuracyMeters: location?.accuracyMeters ?? undefined,
+      recordedAtUtc: location?.recordedAtUtc ?? undefined,
+    };
+
+    return this.http.post<LocationShareDto>(`${this.url}/me/location-share`, payload);
   }
 
   resolveLocationShare(token: string): Observable<SharedLocationDto> {

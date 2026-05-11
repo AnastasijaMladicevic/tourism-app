@@ -219,32 +219,18 @@ namespace TuristickiVodic.Services
             if (user == null)
                 return null;
 
-            var recordedAtUtc = NormalizeRecordedAtUtc(dto.RecordedAtUtc);
-            user.LastKnownLocation = new Point(dto.Longitude, dto.Latitude) { SRID = 4326 };
-            user.LastLocationAccuracyMeters = dto.AccuracyMeters;
-            user.LastLocationUpdatedAt = recordedAtUtc;
-            user.UpdatedAt = DateTime.UtcNow;
-
-            _context.UserLocationHistories.Add(new UserLocationHistory
-            {
-                UserId = user.Id,
-                Location = new Point(dto.Longitude, dto.Latitude) { SRID = 4326 },
-                AccuracyMeters = dto.AccuracyMeters,
-                SpeedMetersPerSecond = dto.SpeedMetersPerSecond,
-                HeadingDegrees = dto.HeadingDegrees,
-                RecordedAt = recordedAtUtc,
-                CreatedAt = DateTime.UtcNow
-            });
+            ApplyCurrentLocation(
+                user,
+                dto.Longitude,
+                dto.Latitude,
+                dto.AccuracyMeters,
+                dto.SpeedMetersPerSecond,
+                dto.HeadingDegrees,
+                dto.RecordedAtUtc);
 
             await _context.SaveChangesAsync();
 
-            return new UserLocationDto
-            {
-                Longitude = user.LastKnownLocation.X,
-                Latitude = user.LastKnownLocation.Y,
-                AccuracyMeters = user.LastLocationAccuracyMeters,
-                UpdatedAt = user.LastLocationUpdatedAt.Value
-            };
+            return MapCurrentLocation(user);
         }
 
         public async Task<PagedResultDto<UserLocationHistoryPointDto>> GetLocationHistoryAsync(int userId, UserLocationHistoryQueryDto query)
@@ -468,17 +454,34 @@ namespace TuristickiVodic.Services
                 .ToList();
         }
 
-        public async Task<LocationShareDto> CreateLocationShareAsync(int userId, int durationHours)
+        public async Task<LocationShareDto> CreateLocationShareAsync(int userId, CreateLocationShareDto dto)
         {
-            if (durationHours != 1 && durationHours != 4 && durationHours != 24)
+            if (dto.DurationHours != 1 && dto.DurationHours != 4 && dto.DurationHours != 24)
                 throw new InvalidOperationException("Location can be shared only for 1h, 4h or 24h.");
 
             var user = await _context.Users
-                .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)
                 throw new InvalidOperationException("User not found.");
+
+            var hasLocationPayload = dto.Longitude.HasValue || dto.Latitude.HasValue;
+            if (hasLocationPayload && (!dto.Longitude.HasValue || !dto.Latitude.HasValue))
+                throw new InvalidOperationException("Both latitude and longitude are required for location sharing.");
+
+            if (dto.Longitude.HasValue && dto.Latitude.HasValue)
+            {
+                ApplyCurrentLocation(
+                    user,
+                    dto.Longitude.Value,
+                    dto.Latitude.Value,
+                    dto.AccuracyMeters,
+                    null,
+                    null,
+                    dto.RecordedAtUtc);
+
+                await _context.SaveChangesAsync();
+            }
 
             if (user.LastKnownLocation == null || !user.LastLocationUpdatedAt.HasValue)
                 throw new InvalidOperationException("Current location is not available for sharing.");
@@ -486,7 +489,7 @@ namespace TuristickiVodic.Services
             if (user.LastLocationUpdatedAt.Value < DateTime.UtcNow.AddMinutes(-ShareLocationStaleMinutes))
                 throw new InvalidOperationException("Current location is too old to be shared.");
 
-            var expiresAtUtc = DateTime.UtcNow.AddHours(durationHours);
+            var expiresAtUtc = DateTime.UtcNow.AddHours(dto.DurationHours);
             var token = BuildLocationShareToken(user.Id, expiresAtUtc);
             var shareUrl = $"{ResolvePublicAppBaseUrl().TrimEnd('/')}/shared-location?token={Uri.EscapeDataString(token)}";
 
@@ -1043,6 +1046,44 @@ namespace TuristickiVodic.Services
             }
 
             return query;
+        }
+
+        private void ApplyCurrentLocation(
+            User user,
+            double longitude,
+            double latitude,
+            double? accuracyMeters,
+            double? speedMetersPerSecond,
+            double? headingDegrees,
+            DateTime? recordedAtUtc)
+        {
+            var normalizedRecordedAtUtc = NormalizeRecordedAtUtc(recordedAtUtc);
+            user.LastKnownLocation = new Point(longitude, latitude) { SRID = 4326 };
+            user.LastLocationAccuracyMeters = accuracyMeters;
+            user.LastLocationUpdatedAt = normalizedRecordedAtUtc;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            _context.UserLocationHistories.Add(new UserLocationHistory
+            {
+                UserId = user.Id,
+                Location = new Point(longitude, latitude) { SRID = 4326 },
+                AccuracyMeters = accuracyMeters,
+                SpeedMetersPerSecond = speedMetersPerSecond,
+                HeadingDegrees = headingDegrees,
+                RecordedAt = normalizedRecordedAtUtc,
+                CreatedAt = DateTime.UtcNow
+            });
+        }
+
+        private static UserLocationDto MapCurrentLocation(User user)
+        {
+            return new UserLocationDto
+            {
+                Longitude = user.LastKnownLocation!.X,
+                Latitude = user.LastKnownLocation.Y,
+                AccuracyMeters = user.LastLocationAccuracyMeters,
+                UpdatedAt = user.LastLocationUpdatedAt!.Value
+            };
         }
 
         private static DateTime NormalizeRecordedAtUtc(DateTime? recordedAtUtc)

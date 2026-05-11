@@ -43,12 +43,12 @@ export class LocationTrackingService {
     return this.locationSubject.value;
   }
 
-  captureCurrentLocation(): Observable<TrackedLocation> {
+  captureCurrentLocation(syncWithBackend = true): Observable<TrackedLocation> {
     return new Observable<TrackedLocation>((observer) => {
       const finishWithSnapshot = (snapshot: TrackedLocation) => {
         this.storeLocation(snapshot);
 
-        if (!this.authService.isLoggedIn()) {
+        if (!syncWithBackend || !this.authService.isLoggedIn()) {
           observer.next(snapshot);
           observer.complete();
           return;

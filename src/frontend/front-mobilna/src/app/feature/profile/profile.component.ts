@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal, WritableSignal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, catchError, finalize, forkJoin, map, of, switchMap, timeout } from 'rxjs';
+import { Observable, catchError, finalize, forkJoin, map, of, switchMap, throwError, timeout } from 'rxjs';
 import { environment } from '../../../environment/environment';
-import { AuthService, UserDto, VisitedPlaceDto } from '../../services/auth';
-import { FavoriteService } from '../../services/favorite';
+import { AuthService, UpdateUserLocationPayload, UserDto, VisitedPlaceDto } from '../../services/auth';
 import { EventPlannerService } from '../../services/event-planner';
+import { FavoriteService } from '../../services/favorite';
 import { LocationTrackingService, TrackedLocation } from '../../services/location-tracking';
-import { ReviewService } from '../../services/review';
 import { ProfileStatsCacheService, ProfileStatsSnapshot } from '../../services/profile-stats-cache';
+import { ReviewService } from '../../services/review';
 import { TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
@@ -184,22 +184,16 @@ export class ProfileComponent implements OnInit {
 
     this.prepareLocationShare()
       .pipe(
-        switchMap(() => {
-          console.log('[ShareLocation] prepareLocationShare završen, pozivam createLocationShare...');
-          return this.authService.createLocationShare(durationHours);
-        }),
+        switchMap((location) => this.authService.createLocationShare(durationHours, location)),
         catchError((error) => {
-          console.error('[ShareLocation] greška:', error);
           this.shareError.set(this.resolveShareError(error));
           return of(null);
         }),
         finalize(() => {
-          console.log('[ShareLocation] finalize pozvan');
           this.shareBusyHours.set(null);
         }),
       )
       .subscribe((share) => {
-        console.log('[ShareLocation] subscribe dobio:', share);
         if (!share) {
           return;
         }
@@ -221,38 +215,47 @@ export class ProfileComponent implements OnInit {
     return stat.labelKey;
   }
 
-  private prepareLocationShare(): Observable<void> {
+  private prepareLocationShare(): Observable<UpdateUserLocationPayload | null> {
     const currentLocation = this.locationTrackingService.getCurrentLocation();
-    console.log('[ShareLocation] currentLocation:', currentLocation);
-    console.log('[ShareLocation] isFresh:', this.isFreshLocation(currentLocation));
 
     if (this.isFreshLocation(currentLocation)) {
-      console.log('[ShareLocation] Lokacija sveža, šaljem na backend...');
-      return this.pushLocationToBackend(currentLocation).pipe(
-        map(() => { console.log('[ShareLocation] push uspeo'); return void 0; }),
-        catchError((err) => { console.warn('[ShareLocation] push failed, nastavljam:', err); return of(void 0); }),
-      );
+      return of(this.mapTrackedLocationToLocationPayload(currentLocation));
     }
 
-    console.log('[ShareLocation] Lokacija nije sveža, pozivam captureCurrentLocation...');
-    return this.locationTrackingService.captureCurrentLocation().pipe(
-      map((loc) => { console.log('[ShareLocation] capture uspeo:', loc); return void 0; }),
+    return this.locationTrackingService.captureCurrentLocation(false).pipe(
       timeout(15000),
-      catchError((err) => { console.warn('[ShareLocation] capture failed/timeout:', err); return of(void 0); }),
+      map((location) => this.mapTrackedLocationToLocationPayload(location)),
+      catchError((error) => throwError(() => this.resolveLocationPreparationError(error))),
     );
   }
 
-  private pushLocationToBackend(location: TrackedLocation): Observable<unknown> {
-    return this.authService.updateMyLocation({
+  private mapTrackedLocationToLocationPayload(location: TrackedLocation): UpdateUserLocationPayload {
+    return {
       latitude: location.latitude,
       longitude: location.longitude,
       accuracyMeters: location.accuracy,
       recordedAtUtc: new Date(location.updatedAt).toISOString(),
-    });
+    };
   }
 
   private isFreshLocation(location: TrackedLocation | null): location is TrackedLocation {
     return !!location && Date.now() - location.updatedAt <= this.maxShareLocationAgeMs;
+  }
+
+  private resolveLocationPreparationError(error: unknown): Error {
+    if (error instanceof Error) {
+      switch (error.message) {
+        case 'geoDenied':
+        case 'geoUnavailable':
+        case 'geoUnsupported':
+        case 'geoFailed':
+          return error;
+        default:
+          return new Error('profile.shareLocationError');
+      }
+    }
+
+    return new Error('profile.shareLocationError');
   }
 
   private resolveShareError(error: unknown): string {
@@ -358,7 +361,6 @@ export class ProfileComponent implements OnInit {
 
     const obj = raw as Record<string, unknown>;
 
-    // Proba sve poznate varijante totalCount polja
     const totalCount =
       obj['totalCount'] ??
       obj['TotalCount'] ??
@@ -378,7 +380,6 @@ export class ProfileComponent implements OnInit {
       }
     }
 
-    // Proba array polja
     const items =
       obj['items'] ??
       obj['Items'] ??

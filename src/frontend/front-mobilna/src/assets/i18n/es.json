@@ -194,7 +194,7 @@
     "beenThere": "Ya estuve allí",
     "visitedDestination": "Destino",
     "visitedLocality": "Localidad",
-    "shareLocationTitle": "Compartir ubicación",
+    "shareLocationTitle": "COMPARTIR UBICACION",
     "shareLocationBody": "Genera un enlace temporal para compartir tu ubicación actual con un amigo.",
     "shareHours": "{{hours}}h",
     "shareLoading": "Preparando...",
