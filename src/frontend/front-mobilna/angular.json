@@ -76,7 +76,8 @@
               "buildTarget": "front-mobilna:build:production"
             },
             "development": {
-              "buildTarget": "front-mobilna:build:development"
+              "buildTarget": "front-mobilna:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

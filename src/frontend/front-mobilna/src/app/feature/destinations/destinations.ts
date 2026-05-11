@@ -18,6 +18,7 @@ import { AuthService } from '../../services/auth';
 import { FavoriteStateService } from '../../services/favorite-state';
 import { ImageService } from '../../services/image';
 import { PendingActionService } from '../../services/pending-action';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
 
 export interface DestinationView extends DestinationDto {
@@ -29,7 +30,7 @@ export interface DestinationView extends DestinationDto {
 @Component({
   selector: 'app-destinations',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, TranslatePipe],
   templateUrl: './destinations.html',
   styleUrls: ['./destinations.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -161,7 +162,7 @@ export class DestinationsComponent implements OnInit {
       this.visibleDestinations = [];
       this.totalCount = 0;
       this.hasNextPage = false;
-      this.errorMessage = 'Failed to load destinations.';
+      this.errorMessage = this.translationService.translate('destination.loadError');
       this.isLoading = false;
       this.cdr.detectChanges();
     }
@@ -320,8 +321,13 @@ export class DestinationsComponent implements OnInit {
   }
 
   sortLabel(): string {
-    const map = { az: 'A -> Z', za: 'Z -> A', distance: 'Nearest' };
-    return map[this.sortOption];
+    const map = {
+      az: 'A -> Z',
+      za: 'Z -> A',
+      distance: this.translationService.translate('common.nearest')
+    };
+    
+  return map[this.sortOption];
   }
 
   toggleFavorite(destination: DestinationView, event: Event): void {

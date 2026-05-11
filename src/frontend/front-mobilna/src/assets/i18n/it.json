@@ -34,7 +34,16 @@
     "nearest": "Più vicini",
     "prev": "Precedente",
     "next": "Successiva",
-    "pageOf": "Pagina {{current}} di {{total}}"
+    "pageOf": "Pagina {{current}} di {{total}}",
+    "any": "Qualsiasi",
+    "topRated": "Più votati",
+    "confirmation": "Conferma",
+    "confirm": "Conferma",
+    "success": "Successo",
+    "ok": "OK",
+    "viewDetails": "Dettagli",
+    "email": "Email",
+    "password": "Password"
   },
   "nav": {
     "home": "Home",
@@ -45,7 +54,7 @@
   },
   "home": {
     "greeting": "Ciao, siamo felici di rivederti",
-    "searchPlaceholder": "Cerca luoghi, ristoranti, eventi o attività...",
+    "searchPlaceholder": "Chiedi dove andare, cosa vedere o dove mangiare...",
     "chooseRegion": "Scegli regione",
     "categories": "Categorie",
     "featuredDestination": "Destinazione in evidenza",
@@ -61,6 +70,98 @@
       "locality": "Località",
       "activity": "Attività",
       "event": "Eventi"
+    }
+  },
+  "login": {
+    "email": "Email",
+    "password": "Password",
+    "emailRequired": "L'email è obbligatoria",
+    "emailInvalid": "Formato email non valido",
+    "passwordRules": "La password deve contenere almeno 6 caratteri, una lettera maiuscola, un numero e un carattere speciale.",
+    "rememberMe": "Ricordami",
+    "loggingIn": "Accesso in corso...",
+    "logIn": "Accedi",
+    "noAccount": "Non hai un account?",
+    "signUp": "Registrati",
+    "forgotPassword": "Hai dimenticato la password?",
+    "onlyTourists": "Solo i turisti possono accedere da qui.",
+    "invalidCredentials": "Email o password non validi.",
+    "loginButton": "Accedi"
+  },
+  "forgotPassword": {
+    "title": "Password dimenticata",
+    "subtitle1": "Inserisci l'email associata al tuo account",
+    "subtitle2": "per reimpostare la password",
+    "emailPlaceholder": "Inserisci la tua email",
+    "hint": "Inserisci la tua email registrata",
+    "submit": "Richiedi link di reset password",
+    "sending": "Invio...",
+    "errors": {
+      "emailRequired": "L'email è obbligatoria",
+      "emailInvalid": "Formato email non valido",
+      "generic": "Si è verificato un errore. Riprova."
+    }
+  },
+  "newCredentials": {
+    "title": "Nuove credenziali",
+    "currentPassword": "Password attuale",
+    "newPassword": "Nuova password",
+    "confirmPassword": "Conferma password",
+
+    "showCurrentPassword": "Mostra password attuale",
+    "hideCurrentPassword": "Nascondi password attuale",
+
+    "showNewPassword": "Mostra nuova password",
+    "hideNewPassword": "Nascondi nuova password",
+
+    "showConfirmPassword": "Mostra conferma password",
+    "hideConfirmPassword": "Nascondi conferma password",
+
+    "submit": "Conferma",
+    "saving": "Salvataggio...",
+
+    "rules": {
+      "minLength": "La password deve contenere almeno 8 caratteri.",
+      "uppercase": "La password deve contenere almeno una lettera maiuscola.",
+      "numberOrSpecial": "La password deve contenere almeno un numero o carattere speciale."
+    },
+
+    "errors": {
+      "currentPasswordRequired": "La password attuale è obbligatoria.",
+      "passwordInvalid": "Usa almeno 8 caratteri, 1 maiuscola e 1 numero o carattere speciale.",
+      "passwordMismatch": "Le password non coincidono.",
+      "resetFailed": "Reimpostazione password non riuscita.",
+      "notLoggedIn": "Non hai effettuato l'accesso.",
+      "changeFailed": "Cambio password non riuscito. Riprova."
+    }
+  },
+  "signup": {
+    "title": "Crea account",
+    "subtitle": "Unisciti a noi e migliora la tua esperienza",
+    "firstName": "Nome",
+    "lastName": "Cognome",
+    "dateOfBirth": "Data di nascita",
+    "phoneOptional": "Numero di telefono (opzionale)",
+    "countryOptional": "Paese (opzionale)",
+    "confirmPassword": "Conferma password",
+    "submit": "Registrati",
+    "creating": "Creazione account...",
+    "haveAccount": "Hai già un account?",
+    "errors": {
+      "firstNameRequired": "Il nome è obbligatorio.",
+      "firstNameMin": "Il nome deve contenere almeno 2 caratteri.",
+      "lastNameRequired": "Il cognome è obbligatorio.",
+      "lastNameMin": "Il cognome deve contenere almeno 2 caratteri.",
+      "dateRequired": "La data di nascita è obbligatoria.",
+      "emailRequired": "L'email è obbligatoria.",
+      "emailInvalid": "Inserisci un indirizzo email valido.",
+      "phoneInvalid": "Inserisci un numero di telefono valido.",
+      "countryMax": "Il paese può contenere massimo 40 caratteri.",
+      "passwordRequired": "La password è obbligatoria.",
+      "passwordMin": "La password deve contenere almeno 8 caratteri.",
+      "passwordWeak": "Usa una lettera maiuscola, un numero e un carattere speciale.",
+      "confirmPasswordRequired": "Conferma la password.",
+      "passwordMismatch": "Le password non coincidono."
     }
   },
   "profile": {
@@ -621,7 +722,14 @@
     "foundCount": "{{count}} oggetti trovati",
     "empty": "Nessun oggetto trovato.",
     "open": "Aperto",
-    "loadError": "Impossibile caricare gli oggetti."
+    "loadError": "Impossibile caricare gli oggetti.",
+    "aboutTitle": "Informazioni su {{name}}",
+    "descriptionFallback": "La descrizione non è disponibile.",
+    "openQr": "Apri QR",
+    "viewPhotos": "Vedi foto ({{count}})",
+    "ownerReply": "Risposta del proprietario",
+    "editReview": "Modifica recensione",
+    "workingHoursNotAvailable": "Orari non disponibili"
   },
   "restaurant": {
     "title": "Ristorante",
@@ -734,7 +842,8 @@
     "listTitle": "Destinazioni",
     "searchPlaceholder": "Cerca destinazioni...",
     "foundCount": "{{count}} destinazioni trovate",
-    "empty": "Nessuna destinazione trovata."
+    "empty": "Nessuna destinazione trovata.",
+    "loadError": "Impossibile caricare le destinazioni."
   },
   "activity": {
     "title": "Attività",

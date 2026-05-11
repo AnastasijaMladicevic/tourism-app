@@ -1,7 +1,7 @@
 <div class="login-container">
   <div class="overlay">
     <div class="auth-topbar">
-      <button class="back-btn" (click)="goBack()" aria-label="Go back">
+      <button class="back-btn" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
         <span class="material-icons">arrow_back_ios</span>
       </button>
       <div class="logo">
@@ -32,15 +32,15 @@
               <polyline points="22,6 12,13 2,6" />
             </svg>
           </span>
-          <input type="email" placeholder="Email" formControlName="email" />
+          <input type="email" [placeholder]="'login.email' | translate" formControlName="email" />
         </div>
         @if (email?.touched && email?.invalid) {
           <div class="error">
             @if (email?.errors?.['required']) {
-              <span>Email is required</span>
+              <span>{{ 'login.emailRequired' | translate }}</span>
             }
             @if (email?.errors?.['email']) {
-              <span>Invalid email format</span>
+              <span>{{ 'login.emailInvalid' | translate }}</span>
             }
           </div>
         }
@@ -65,7 +65,7 @@
 
           <input
             [type]="hidePassword ? 'password' : 'text'"
-            placeholder="Password"
+            [placeholder]="'login.password' | translate"
             formControlName="password"
           />
 
@@ -76,30 +76,29 @@
         @if (password?.touched && password?.invalid) {
           <div class="error">
             <span>
-              Password must be at least 6 characters long, contain at least one uppercase letter,
-              one number, and one special character.
+              {{ 'login.passwordRules' | translate }}
             </span>
           </div>
         }
         <div class="remember-me">
           <input type="checkbox" formControlName="rememberMe" id="rememberMe" />
-          <label for="rememberMe">Remember me</label>
+          <label for="rememberMe">{{ 'login.rememberMe' | translate }}</label>
         </div>
       </form>
 
       <button class="login-btn" (click)="submit()" [disabled]="form.invalid || isLoading">
-        {{ isLoading ? 'Logging in...' : 'Log In' }}
+        {{ isLoading ? ('login.loggingIn' | translate) : ('login.logIn' | translate) }}
       </button>
       @if (errorMessage) {
         <div class="error">{{ errorMessage }}</div>
       }
       <p class="links">
         <span class="row">
-          Don't have an account?
-          <span class="link signup" (click)="goRegister()">Sign Up</span>
+          {{ 'login.noAccount' | translate }}
+          <span class="link signup" (click)="goRegister()">{{ 'login.signUp' | translate }}</span>
         </span>
 
-        <span class="link forgot" (click)="goForgot()">Forgot password?</span>
+        <span class="link forgot" (click)="goForgot()">{{ 'login.forgotPassword' | translate }}</span>
       </p>
     </div>
 

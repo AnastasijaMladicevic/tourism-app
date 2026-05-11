@@ -24,12 +24,13 @@ import { AuthService } from '../../services/auth';
 import { LocationTrackingService } from '../../services/location-tracking';
 import { FavoriteStateService } from '../../services/favorite-state';
 import { PendingActionService } from '../../services/pending-action';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
 
 @Component({
   selector: 'app-objects',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, TranslatePipe],
   templateUrl: './objects.html',
   styleUrls: ['./objects.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -42,7 +43,7 @@ export class ObjectsComponent implements OnInit {
   showSortMenu = false;
   isLoading = true;
   errorMessage = '';
-  pageTitle = 'Objects';
+  pageTitle = '';
   hideTypeFilters = false;
   currentPage = 1;
   pageSize = 8;
@@ -60,7 +61,6 @@ export class ObjectsComponent implements OnInit {
   visibleObjects: ObjectView[] = [];
   userLocation: { lat: number; lng: number } | null = null;
   isTracking = false;
-
   private readonly favoritePendingIds = new Set<number>();
   private readonly nearbyRadiusMeters = 3_000_000;
   private favoritesLoaded = false;
@@ -135,9 +135,8 @@ export class ObjectsComponent implements OnInit {
 
     this.route.data.subscribe((routeData) => {
       const type = routeData['type'] as string | null;
-      const title = routeData['title'] as string | undefined;
+      this.pageTitle = this.translationService.translate('object.listTitle');
 
-      this.pageTitle = title || 'Objects';
       this.hideTypeFilters = Boolean(type);
       this.activeFilter = type ?? 'All';
       this.currentPage = 1;
@@ -215,7 +214,7 @@ export class ObjectsComponent implements OnInit {
       this.totalCount = 0;
       this.hasNextPage = false;
       this.isLoading = false;
-      this.errorMessage = 'Failed to load objects.';
+      this.errorMessage = this.translationService.translate('object.loadError');
       this.cdr.detectChanges();
     }
   }
@@ -395,8 +394,14 @@ export class ObjectsComponent implements OnInit {
   }
 
   sortLabel(): string {
-    const map = { rating: 'Top Rated', az: 'A -> Z', za: 'Z -> A', distance: 'Nearest' };
-    return map[this.sortOption];
+    const map = {
+      rating: this.translationService.translate('common.topRated'),
+      az: 'A -> Z',
+      za: 'Z -> A',
+      distance: this.translationService.translate('common.nearest')
+    };
+
+      return map[this.sortOption];
   }
 
   isFavoritePending(objectId: number): boolean {
@@ -424,11 +429,11 @@ export class ObjectsComponent implements OnInit {
     if (!this.authService.isLoggedIn()) {
       this.pendingActionService.setAction({
         type: 'favorite-object',
-        payload: object,
+        payload: object
       });
 
       this.router.navigate(['/login'], {
-        queryParams: { returnUrl: this.router.url },
+        queryParams: { returnUrl: this.router.url }
       });
 
       return;

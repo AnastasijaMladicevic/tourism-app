@@ -34,7 +34,16 @@
     "nearest": "Najbliže",
     "prev": "Prethodna",
     "next": "Sledeća",
-    "pageOf": "Strana {{current}} od {{total}}"
+    "pageOf": "Strana {{current}} od {{total}}",
+    "any": "Bilo koji",
+    "topRated": "Najbolje ocenjeno",
+    "confirmation": "Potvrda",
+    "confirm": "Potvrdi",
+    "success": "Uspešno",
+    "ok": "U redu",
+    "viewDetails": "Detalji",
+    "email": "Email",
+    "password": "Lozinka"
   },
   "nav": {
     "home": "Početna",
@@ -45,7 +54,7 @@
   },
   "home": {
     "greeting": "Zdravo, drago nam je što ste ponovo tu",
-    "searchPlaceholder": "Pretraži mesta, restorane, događaje ili aktivnosti...",
+    "searchPlaceholder": "Pitaj gde da ideš, šta da vidiš ili gde da jedeš...",
     "chooseRegion": "Izaberi region",
     "categories": "Kategorije",
     "featuredDestination": "Izdvojena destinacija",
@@ -61,6 +70,98 @@
       "locality": "Lokaliteti",
       "activity": "Aktivnosti",
       "event": "Događaji"
+    }
+  },
+  "login": {
+    "email": "Email",
+    "password": "Lozinka",
+    "emailRequired": "Email je obavezan",
+    "emailInvalid": "Email format nije ispravan",
+    "passwordRules": "Lozinka mora imati najmanje 6 karaktera, jedno veliko slovo, jedan broj i jedan specijalni karakter.",
+    "rememberMe": "Zapamti me",
+    "loggingIn": "Prijavljivanje...",
+    "logIn": "Prijavi se",
+    "noAccount": "Nemaš nalog?",
+    "signUp": "Registruj se",
+    "forgotPassword": "Zaboravljena lozinka?",
+    "onlyTourists": "Samo turisti mogu da se prijave ovde.",
+    "invalidCredentials": "Neispravan email ili lozinka.",
+    "loginButton": "Prijavi se"
+  },
+  "forgotPassword": {
+    "title": "Zaboravljena lozinka",
+    "subtitle1": "Unesite email adresu povezanu sa vašim nalogom",
+    "subtitle2": "da biste resetovali lozinku",
+    "emailPlaceholder": "Unesite vaš email",
+    "hint": "Molimo unesite registrovani email",
+    "submit": "Zatraži link za reset lozinke",
+    "sending": "Slanje...",
+    "errors": {
+      "emailRequired": "Email je obavezan",
+      "emailInvalid": "Neispravan format email adrese",
+      "generic": "Došlo je do greške. Pokušajte ponovo."
+    }
+  },
+  "newCredentials": {
+    "title": "Novi kredencijali",
+    "currentPassword": "Trenutna lozinka",
+    "newPassword": "Nova lozinka",
+    "confirmPassword": "Potvrdi lozinku",
+
+    "showCurrentPassword": "Prikaži trenutnu lozinku",
+    "hideCurrentPassword": "Sakrij trenutnu lozinku",
+
+    "showNewPassword": "Prikaži novu lozinku",
+    "hideNewPassword": "Sakrij novu lozinku",
+
+    "showConfirmPassword": "Prikaži potvrdu lozinke",
+    "hideConfirmPassword": "Sakrij potvrdu lozinke",
+
+    "submit": "Potvrdi",
+    "saving": "Čuvanje...",
+
+    "rules": {
+      "minLength": "Lozinka mora imati najmanje 8 karaktera.",
+      "uppercase": "Lozinka mora sadržati najmanje jedno veliko slovo.",
+      "numberOrSpecial": "Lozinka mora sadržati najmanje jedan broj ili specijalni karakter."
+    },
+
+    "errors": {
+      "currentPasswordRequired": "Trenutna lozinka je obavezna.",
+      "passwordInvalid": "Koristite najmanje 8 karaktera, 1 veliko slovo i 1 broj ili specijalni karakter.",
+      "passwordMismatch": "Lozinke se ne poklapaju.",
+      "resetFailed": "Resetovanje lozinke nije uspelo.",
+      "notLoggedIn": "Niste ulogovani. Prijavite se pa promenite lozinku.",
+      "changeFailed": "Promena lozinke nije uspela. Proverite unos i pokušajte ponovo."
+    }
+  },
+  "signup": {
+    "title": "Kreiraj nalog",
+    "subtitle": "Pridruži nam se i unapredi svoje iskustvo",
+    "firstName": "Ime",
+    "lastName": "Prezime",
+    "dateOfBirth": "Datum rođenja",
+    "phoneOptional": "Broj telefona (opciono)",
+    "countryOptional": "Država (opciono)",
+    "confirmPassword": "Potvrdi lozinku",
+    "submit": "Registruj se",
+    "creating": "Kreiranje naloga...",
+    "haveAccount": "Već imaš nalog?",
+    "errors": {
+      "firstNameRequired": "Ime je obavezno.",
+      "firstNameMin": "Ime mora imati najmanje 2 karaktera.",
+      "lastNameRequired": "Prezime je obavezno.",
+      "lastNameMin": "Prezime mora imati najmanje 2 karaktera.",
+      "dateRequired": "Datum rođenja je obavezan.",
+      "emailRequired": "Email je obavezan.",
+      "emailInvalid": "Unesite ispravnu email adresu.",
+      "phoneInvalid": "Unesi telefon u formatu +382 67 000 000 ili slično.",
+      "countryMax": "Država može imati najviše 40 karaktera.",
+      "passwordRequired": "Lozinka je obavezna.",
+      "passwordMin": "Lozinka mora imati najmanje 8 karaktera.",
+      "passwordWeak": "Koristi jedno veliko slovo, jedan broj i jedan specijalni karakter.",
+      "confirmPasswordRequired": "Potvrdi lozinku.",
+      "passwordMismatch": "Lozinke se ne poklapaju."
     }
   },
   "profile": {
@@ -623,7 +724,14 @@
     "foundCount": "{{count}} pronađenih objekata",
     "empty": "Nema pronađenih objekata.",
     "open": "Otvoreno",
-    "loadError": "Neuspešno učitavanje objekata."
+    "loadError": "Neuspešno učitavanje objekata.",
+    "aboutTitle": "O {{name}}",
+    "descriptionFallback": "Opis nije dostupan.",
+    "openQr": "Otvori QR",
+    "viewPhotos": "Vidi slike ({{count}})",
+    "ownerReply": "Odgovor vlasnika",
+    "editReview": "Izmeni recenziju",
+    "workingHoursNotAvailable": "Radno vreme nije navedeno"
   },
   "restaurant": {
     "title": "Restoran",
@@ -736,7 +844,8 @@
     "listTitle": "Destinacije",
     "searchPlaceholder": "Pretraži destinacije...",
     "foundCount": "{{count}} pronađenih destinacija",
-    "empty": "Nema pronađenih destinacija."
+    "empty": "Nema pronađenih destinacija.",
+    "loadError": "Neuspešno učitavanje destinacija."
   },
   "activity": {
     "title": "Aktivnost",

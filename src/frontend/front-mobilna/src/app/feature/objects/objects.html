@@ -1,6 +1,6 @@
 <div class="screen">
   <div class="header">
-    <button class="icon-btn" (click)="goBack()" aria-label="Go back">
+    <button class="icon-btn" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
       <mat-icon>arrow_back_ios</mat-icon>
     </button>
     <h1 class="header__title">{{ pageTitle }}</h1>
@@ -12,7 +12,7 @@
         <mat-icon>search</mat-icon>
         <input
           type="text"
-          placeholder="Search..."
+          [placeholder]="'object.searchPlaceholder' | translate"
           [(ngModel)]="searchQuery"
           (ngModelChange)="onSearchChange()"
         />
@@ -40,14 +40,14 @@
               [class.sort-menu__item--active]="sortOption === 'rating'"
               (click)="setSort('rating')"
             >
-              <mat-icon>star</mat-icon> Top Rated
+              <mat-icon>star</mat-icon> {{ 'common.topRated' | translate }}
             </button>
             <button
               class="sort-menu__item"
               [class.sort-menu__item--active]="sortOption === 'distance'"
               (click)="setSort('distance')"
             >
-              <mat-icon>near_me</mat-icon> Nearest
+              <mat-icon>near_me</mat-icon> {{ 'common.nearest' | translate }}
             </button>
             <button
               class="sort-menu__item"
@@ -75,7 +75,7 @@
           [class.filter-btn--active]="activeFilter === 'All'"
           (click)="setFilter('All')"
         >
-          All
+        {{ 'common.all' | translate }}
         </button>
         @for (type of objectTypes; track type.id) {
           <button
@@ -95,7 +95,7 @@
         [class.filter-btn--active]="minRatingFilter === 0"
         (click)="setMinRating(0)"
       >
-        Any
+      {{ 'common.any' | translate }}
       </button>
       <button
         class="filter-btn"
@@ -122,14 +122,14 @@
   </div>
 
   <div class="results-bar">
-    <span class="results-bar__count">{{ totalCount }} objects found</span>
+    <span class="results-bar__count">{{ 'object.foundCount' | translate:{ count: totalCount } }}</span>
   </div>
 
   @if (isLoading) {
     <div class="loading-screen">
       <div class="loading-content">
         <div class="spinner"></div>
-        <p>Loading...</p>
+        <p>{{ 'common.loading' | translate }}</p>
       </div>
     </div>
   }
@@ -138,7 +138,7 @@
     <div class="error-state">
       <mat-icon>error_outline</mat-icon>
       <p>{{ errorMessage }}</p>
-      <button (click)="loadData()">Retry</button>
+      <button (click)="loadData()">{{ 'common.retry' | translate }}</button>
     </div>
   }
 
@@ -162,7 +162,7 @@
           }
 
           @if (isOpenNow(obj)) {
-            <span class="card__open-badge">Open</span>
+            <span class="card__open-badge">{{ 'common.openNow' | translate }}</span>
           }
 
           <span class="card__distance">
@@ -197,7 +197,7 @@
 
           <div class="card__footer">
             <span></span>
-            <button class="card__details" (click)="viewDetails(obj)">VIEW DETAILS</button>
+            <button class="card__details" (click)="viewDetails(obj)">{{ 'common.details' | translate }}</button>
           </div>
         </div>
       </div>
@@ -206,14 +206,14 @@
     @if (totalCount === 0 && !isLoading) {
       <div class="empty">
         <mat-icon>search_off</mat-icon>
-        <p>No objects found.</p>
+        <p>{{ 'object.empty' | translate }}</p>
       </div>
     }
   </div>
 
   <div class="pagination">
-    <button mat-button (click)="prevPage()" [disabled]="currentPage === 1">Prev</button>
-    <span>Page {{ currentPage }} of {{ totalPages }}</span>
-    <button mat-button (click)="nextPage()" [disabled]="!hasNextPage">Next</button>
+    <button mat-button (click)="prevPage()" [disabled]="currentPage === 1">{{ 'common.prev' | translate }}</button>
+    <span>{{ 'common.pageOf' | translate:{ current: currentPage, total: totalPages } }}</span>
+    <button mat-button (click)="nextPage()" [disabled]="!hasNextPage">{{ 'common.next' | translate }}</button>
   </div>
 </div>

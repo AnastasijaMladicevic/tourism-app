@@ -34,7 +34,16 @@
     "nearest": "Nearest",
     "prev": "Prev",
     "next": "Next",
-    "pageOf": "Page {{current}} of {{total}}"
+    "pageOf": "Page {{current}} of {{total}}",
+    "any": "Any",
+    "topRated": "Top Rated",
+    "confirmation": "Confirmation",
+    "confirm": "Confirm",
+    "success": "Success",
+    "ok": "OK",
+    "viewDetails": "Details",
+    "email": "Email",
+    "password": "Password"
   },
   "nav": {
     "home": "Home",
@@ -45,7 +54,7 @@
   },
   "home": {
     "greeting": "Hi, glad to see you again",
-    "searchPlaceholder": "Search places, restaurants, events or activities...",
+    "searchPlaceholder": "Ask where to go, what to see or where to eat...",
     "chooseRegion": "Choose Region",
     "categories": "Categories",
     "featuredDestination": "Featured Destination",
@@ -61,6 +70,98 @@
       "locality": "Localities",
       "activity": "Activities",
       "event": "Events"
+    }
+  },
+  "login": {
+    "email": "Email",
+    "password": "Password",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Invalid email format",
+    "passwordRules": "Password must be at least 6 characters long, contain at least one uppercase letter, one number, and one special character.",
+    "rememberMe": "Remember me",
+    "loggingIn": "Logging in...",
+    "logIn": "Log In",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign Up",
+    "forgotPassword": "Forgot password?",
+    "onlyTourists": "Only tourists can log in here.",
+    "invalidCredentials": "Invalid email or password.",
+    "loginButton": "Log In"
+  },
+  "forgotPassword": {
+    "title": "Forgot Password",
+    "subtitle1": "Provide the email address linked with your account",
+    "subtitle2": "to reset your password",
+    "emailPlaceholder": "Enter your email",
+    "hint": "Please enter your registered email",
+    "submit": "Request Password Reset Link",
+    "sending": "Sending...",
+    "errors": {
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email format",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "newCredentials": {
+    "title": "New Credentials",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+
+    "showCurrentPassword": "Show current password",
+    "hideCurrentPassword": "Hide current password",
+
+    "showNewPassword": "Show new password",
+    "hideNewPassword": "Hide new password",
+
+    "showConfirmPassword": "Show confirm password",
+    "hideConfirmPassword": "Hide confirm password",
+
+    "submit": "Submit",
+    "saving": "Saving...",
+
+    "rules": {
+      "minLength": "Password must be at least 8 characters long.",
+      "uppercase": "Password must contain at least one uppercase letter.",
+      "numberOrSpecial": "Password must contain at least one number or special character."
+    },
+
+    "errors": {
+      "currentPasswordRequired": "Current password is required.",
+      "passwordInvalid": "Use at least 8 chars, 1 uppercase and 1 number or special char.",
+      "passwordMismatch": "Passwords do not match.",
+      "resetFailed": "Password reset failed.",
+      "notLoggedIn": "You are not logged in.",
+      "changeFailed": "Password change failed. Please try again."
+    }
+  },
+  "signup": {
+    "title": "Create account",
+    "subtitle": "Join us and improve your experience",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "dateOfBirth": "Date of birth",
+    "phoneOptional": "Phone number (optional)",
+    "countryOptional": "Country (optional)",
+    "confirmPassword": "Confirm password",
+    "submit": "Sign Up",
+    "creating": "Creating account...",
+    "haveAccount": "Already have an account?",
+    "errors": {
+      "firstNameRequired": "First name is required.",
+      "firstNameMin": "First name must contain at least 2 characters.",
+      "lastNameRequired": "Last name is required.",
+      "lastNameMin": "Last name must contain at least 2 characters.",
+      "dateRequired": "Date of birth is required.",
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Enter a valid email address.",
+      "phoneInvalid": "Enter a valid phone number.",
+      "countryMax": "Country can contain at most 40 characters.",
+      "passwordRequired": "Password is required.",
+      "passwordMin": "Password must contain at least 8 characters.",
+      "passwordWeak": "Use one uppercase letter, one number and one special character.",
+      "confirmPasswordRequired": "Please confirm your password.",
+      "passwordMismatch": "Passwords do not match."
     }
   },
   "profile": {
@@ -621,7 +722,14 @@
     "foundCount": "{{count}} objects found",
     "empty": "No objects found.",
     "open": "Open",
-    "loadError": "Failed to load objects."
+    "loadError": "Failed to load objects.",
+    "aboutTitle": "About {{name}}",
+    "descriptionFallback": "No description available.",
+    "openQr": "Open QR",
+    "viewPhotos": "View photos ({{count}})",
+    "ownerReply": "Owner reply",
+    "editReview": "Edit review",
+    "workingHoursNotAvailable": "Working hours are not available"
   },
   "restaurant": {
     "title": "Restaurant",
@@ -734,7 +842,8 @@
     "listTitle": "Destinations",
     "searchPlaceholder": "Search destinations...",
     "foundCount": "{{count}} destinations found",
-    "empty": "No destinations found."
+    "empty": "No destinations found.",
+    "loadError": "Failed to load destinations."
   },
   "activity": {
     "title": "Activity",

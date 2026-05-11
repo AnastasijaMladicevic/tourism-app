@@ -16,11 +16,13 @@ import { FavoriteStateService } from '../../services/favorite-state';
 import { FormsModule } from '@angular/forms';
 import { RouterHistoryService } from '../../services/router-history';
 import { PendingActionService } from '../../services/pending-action';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 
 @Component({
   selector: 'app-restaurant-detail',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, MapComponent, FormsModule],
+  imports: [CommonModule, MatIconModule, MatButtonModule, MapComponent, FormsModule, TranslatePipe],
   templateUrl: './object-detail.html',
   styleUrls: ['./object-detail.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -79,7 +81,8 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     private reviewService: ReviewService,
     private routerHistory: RouterHistoryService,
     private pendingActionService: PendingActionService,
-    private qrLinkService: QrLinkService
+    private qrLinkService: QrLinkService,
+    private translationService: TranslationService
   ) { }
 
   ngOnInit(): void {
@@ -184,7 +187,7 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error(err);
         this.isLoading = false;
-        this.errorMessage = 'Greska pri ucitavanju objekta.';
+        this.errorMessage = this.translationService.translate('object.loadError');
         this.cdr.detectChanges();
       },
     });
@@ -611,7 +614,7 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
   }
 
   getWorkingHours(): string {
-    if (!this.object?.workingHours) return 'Radno vreme nije navedeno';
+    if (!this.object?.workingHours) return this.translationService.translate('object.workingHoursNotAvailable');
 
     try {
       const hours = JSON.parse(this.object.workingHours) as Record<string, string>;
@@ -619,7 +622,7 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
       const dayKeys = ['ned', 'pon', 'uto', 'sre', 'cet', 'pet', 'sub'];
       const todayKey = dayKeys[today];
 
-      return hours[todayKey] || hours['pon'] || 'Radno vreme nije navedeno';
+      return hours[todayKey] || hours['pon'] || this.translationService.translate('object.workingHoursNotAvailable');
     } catch {
       return this.object.workingHours;
     }

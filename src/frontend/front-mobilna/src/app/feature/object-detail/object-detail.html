@@ -3,14 +3,14 @@
     <button class="icon-btn" (click)="goBack()">
       <mat-icon>arrow_back_ios</mat-icon>
     </button>
-    <h1 class="header__title">{{ object?.objectTypeName || 'Objekat' }}</h1>
+    <h1 class="header__title">{{ object?.objectTypeName || ('object.titleFallback' | translate) }}</h1>
   </div>
 
   @if (isLoading) {
     <div class="loading-screen">
       <div class="loading-content">
         <div class="spinner"></div>
-        <p>Loading...</p>
+        <p>{{ 'common.loading' | translate }}</p>
       </div>
     </div>
   }
@@ -19,7 +19,7 @@
     <div class="error-state">
       <mat-icon>error_outline</mat-icon>
       <p>{{ errorMessage }}</p>
-      <button (click)="goBack()">Nazad</button>
+      <button (click)="goBack()">{{ 'common.back' | translate }}</button>
     </div>
   }
 
@@ -54,13 +54,13 @@
           </div>
 
           <p class="location-bold">{{ object.localityName }}, {{ object.destinationName }}</p>
-          <p class="venue"><mat-icon>location_on</mat-icon> {{ object.address || 'N/A' }}</p>
+          <p class="venue"><mat-icon>location_on</mat-icon> {{ object.address || ('common.notAvailable' | translate) }}</p>
           @if (object.cuisineType) {
             <p class="cuisine"><mat-icon>restaurant</mat-icon>{{object.cuisineType}}</p>
           }
         </div>
         <div class="card">
-          <h2>Amenities</h2>
+          <h2>{{ 'object.amenities' | translate }}</h2>
           <div class="amenities-grid">
             @if (object.amenities && object.amenities.length > 0) {
               @for (amenity of object.amenities; track amenity) {
@@ -70,22 +70,22 @@
                 </div>
               }
             } @else {
-              <p>Amenities će biti dostupni uskoro.</p>
+              <p>{{ 'object.amenitiesSoon' | translate }}</p>
             }
           </div>
         </div>
         <!-- O objektu -->
         <div class="card">
-          <h2>O {{ object?.objectTypeName || 'Objekat' }}</h2>
-          <p class="description">{{ object.description || 'Opis nije dostupan.' }}</p>
+          <h2>{{ 'object.aboutTitle' | translate:{ name: object?.objectTypeName || ('object.titleFallback' | translate) } }}</h2>
+          <p class="description">{{ object.description || ('object.descriptionFallback' | translate) }}</p>
         </div>
 
         <!-- Galerija -->
         <div class="section">
           <div class="card gallery-card">
             <div class="gallery-header">
-              <h2>Galerija</h2>
-              <button class="see-all-btn" (click)="openGallery(0)">See All ></button>
+              <h2>{{ 'common.gallery' | translate }}</h2>
+              <button class="see-all-btn" (click)="openGallery(0)">{{ 'common.seeAll' | translate }}</button>
             </div>
             <div class="gallery-scroll">
               @for (img of images; track img.id; let i = $index) {
@@ -98,7 +98,7 @@
         </div>
         <div class="card nearby-card">
           <div class="nearby-header">
-            <h2>Nearby {{ object?.objectTypeName || 'Objekat' }}s</h2>
+            <h2>{{ 'object.nearbyTitle' | translate:{ name: object?.objectTypeName || ('object.titleFallback' | translate) } }}</h2>
           </div>
 
           @if (nearbyObjects.length > 0) {
@@ -127,7 +127,7 @@
                         nearbyObject.address ||
                           nearbyObject.localityName ||
                           nearbyObject.destinationName ||
-                          'Lokacija nije dostupna'
+                          ('common.notAvailable' | translate)
                       }}</span>
                     </p>
                     <p class="nearby-item__rating">
@@ -136,9 +136,9 @@
                         {{
                           nearbyObject.averageRating
                             ? (nearbyObject.averageRating | number: '1.1-1')
-                            : 'New'
+                            : ('common.new' | translate)
                         }}
-                        ({{ nearbyObject.reviewCount || 0 }} reviews)
+                        ({{ nearbyObject.reviewCount || 0 }} {{ 'common.reviews' | translate }})
                       </span>
                     </p>
                   </div>
@@ -147,7 +147,7 @@
             </div>
           } @else {
             <div class="nearby-empty">
-              Nema drugih {{ object?.objectTypeName || 'Objekat' }}a u istoj lokaciji.
+              {{ 'object.nearbyEmpty' | translate:{ name: object?.objectTypeName || ('object.titleFallback' | translate) } }}
             </div>
           }
         </div>
@@ -156,8 +156,8 @@
       <!-- DESNA STRANA -->
       <div class="right">
         <div class="card">
-          <h2>Lokacija</h2>
-          <div class="location-image" [attr.data-name]="object.address || object.name || 'N/A'">
+          <h2>{{ 'common.location' | translate }}</h2>
+          <div class="location-image" [attr.data-name]="object.address || object.name || ('common.notAvailable' | translate)">
             <app-map
               [lat]="object.latitude || 42.424"
               [lng]="object.longitude || 18.771"
@@ -165,14 +165,14 @@
               [interactive]="false"
             >
             </app-map>
-            <button class="map-btn-overlay" (click)="viewOnMap()">Pogledaj na mapi</button>
+            <button class="map-btn-overlay" (click)="viewOnMap()">{{ 'common.viewOnMap' | translate }}</button>
           </div>
         </div>
 
         <div class="section">
           <div class="card contact-card">
             <div class="contact-header">
-              <h2>Contact info</h2>
+              <h2>{{ 'common.contactInfo' | translate }}</h2>
             </div>
             <div class="contact-info">
               <div class="contact-info__details">
@@ -201,7 +201,7 @@
               @if (qrLink) {
                 <a class="qr-mini qr-mini--contact" [href]="qrLink.targetUrl" target="_blank" rel="noopener">
                   <img [src]="qrLink.qrImageUrl" [alt]="qrLink.label" />
-                  <span>Otvori QR</span>
+                  <span>{{ 'object.openQr' | translate }}</span>
                 </a>
               }
             </div>
@@ -212,11 +212,11 @@
         <div class="section">
           <div class="card price-card">
             <div class="price-header">
-              <h2>Price</h2>
+              <h2>{{ 'common.price' | translate }}</h2>
             </div>
             <div class="price">
               <p class="price-tag">
-                Starting from <strong>{{ object.price }}$</strong>
+                {{ 'common.startingFrom' | translate }} <strong>{{ object.price }}$</strong>
               </p>
             </div>
           </div>
@@ -226,7 +226,7 @@
         <!-- Recenzije -->
         <div class="card reviews-card">
           <div class="reviews-header">
-            <h2>Recenzije</h2>
+            <h2>{{ 'common.reviewsTitle' | translate }}</h2>
             <button class="see-all-btn" (click)="openAllReviews()">See All ></button>
           </div>
 
@@ -246,7 +246,7 @@
                 @if (review.images && review.images.length > 0) {
                   <button type="button" class="review-photos-btn" (click)="openReviewImages(review)">
                     <mat-icon>photo_library</mat-icon>
-                    <span>Vidi slike ({{ review.images.length }})</span>
+                    {{ 'object.viewPhotos' | translate:{ count: review.images.length } }}
                   </button>
                 }
 
@@ -254,7 +254,7 @@
                   <div class="creator-response">
                     <div class="creator-response-header">
                       <mat-icon>reply</mat-icon>
-                      <span>Odgovor vlasnika</span>
+                      <span>{{ 'object.ownerReply' | translate }}</span>
                       @if (review.creatorResponseAt) {
                         <span class="response-date">
                           {{ formatReviewDate(review.creatorResponseAt) }}
@@ -272,7 +272,7 @@
 
           <button class="add-review-btn" (click)="openWriteReview()">
             <mat-icon>{{ userReview ? 'edit' : 'add' }}</mat-icon>
-            {{ userReview ? 'Izmeni recenziju' : 'Dodaj recenziju' }}
+            {{ userReview ? ('object.editReview' | translate) : ('common.addReview' | translate) }}
           </button>
         </div>
       </div>
@@ -345,7 +345,7 @@
         <button class="modal-close" (click)="closeAllReviews()">
           <mat-icon>arrow_back</mat-icon>
         </button>
-        <h2>All Reviews</h2>
+        <h2>{{ 'object.allReviews' | translate }}</h2>
       </div>
 
       <!-- Prosečna ocena + grafik -->
@@ -357,7 +357,7 @@
               <mat-icon [class.filled]="star <= (object?.averageRating || 0)">star</mat-icon>
             }
           </div>
-          <span class="total-reviews">{{ object?.reviewCount || 0 }} Reviews</span>
+          <span class="total-reviews">{{ object?.reviewCount || 0 }} {{ 'common.reviews' | translate }}</span>
         </div>
 
         <div class="rating-bars">
@@ -416,7 +416,7 @@
         <mat-icon>close</mat-icon>
       </button>
 
-      <h2>{{ userReview ? 'Izmeni recenziju' : 'Napiši recenziju' }}</h2>
+      <h2>{{ userReview ? ('object.editReview' | translate) : ('object.writeReview' | translate) }}</h2>
       <p class="review-for">{{ object?.name }}</p>
 
       <!-- Zvezdice -->
@@ -432,7 +432,7 @@
 
       <textarea 
         [(ngModel)]="newReview.text" 
-        placeholder="Kako je bilo vaše iskustvo? Šta biste preporučili drugim putnicima?"
+        [placeholder]="'object.reviewPlaceholder' | translate"
         rows="5"
         maxlength="500"
       ></textarea>
@@ -442,7 +442,7 @@
         <div class="upload-row">
           <label class="upload-label">
             <mat-icon>add_a_photo</mat-icon>
-            Dodaj fotografije (max 5)
+            {{ 'object.addPhotos' | translate }}
             <input 
               type="file" 
               multiple 
@@ -450,7 +450,7 @@
               (change)="onReviewImagesSelected($event)" 
               hidden>
           </label>
-          <small>{{ existingReviewImages.length + selectedReviewImages.length }}/5 slika</small>
+          <small>{{ existingReviewImages.length + selectedReviewImages.length }}/5 {{ 'object.photos' | translate }}</small>
         </div>
         @if (existingReviewImages.length > 0) {
           <div class="review-preview-grid">
@@ -485,7 +485,7 @@
         class="submit-review-btn" 
         [disabled]="isSubmittingReview || newReview.rating === 0 || !newReview.text.trim()"
         (click)="submitReview()">
-        {{ isSubmittingReview ? 'Šaljem...' : 'Pošalji recenziju' }}
+        {{ isSubmittingReview ? ('object.sending' | translate) : ('object.submitReview' | translate) }}
       </button>
     </div>
   </div>
@@ -527,17 +527,17 @@
   @if (showConfirmModal) {
     <div class="custom-modal-backdrop" (click)="closeConfirm()">
       <div class="custom-modal" (click)="$event.stopImmediatePropagation()">
-        <h3>Potvrda</h3>
+        <h3>{{ 'common.confirmation' | translate }}</h3>
   
         <p>{{ confirmMessage }}</p>
   
         <div class="custom-modal-actions">
           <button class="modal-btn modal-btn-secondary" (click)="closeConfirm()">
-            Otkaži
+            {{ 'common.cancel' | translate }}
           </button>
   
           <button class="modal-btn modal-btn-primary" (click)="confirmAction()">
-            Potvrdi
+            {{ 'common.confirm' | translate }}
           </button>
         </div>
       </div>
@@ -554,12 +554,12 @@
           <mat-icon>check_circle</mat-icon>
         </div>
   
-        <h3>Uspešno</h3>
+        <h3>{{ 'common.success' | translate }}</h3>
   
         <p>{{ successMessage }}</p>
   
         <button class="modal-btn modal-btn-primary" (click)="closeSuccess()">
-          U redu
+          {{ 'common.ok' | translate }}
         </button>
       </div>
     </div>
