@@ -1,6 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
+  effect,
   HostListener,
   OnInit,
   ViewEncapsulation,
@@ -17,6 +18,7 @@ import { AuthService } from '../../services/auth';
 import { FavoriteStateService } from '../../services/favorite-state';
 import { ImageService } from '../../services/image';
 import { PendingActionService } from '../../services/pending-action';
+import { TranslationService } from '../../services/translation.service';
 
 export interface DestinationView extends DestinationDto {
   distanceMeters?: number;
@@ -53,6 +55,8 @@ export class DestinationsComponent implements OnInit {
   private readonly fetchPageSize = 100;
   private readonly maxFetchPages = 50;
   private readonly imageCache = new Map<number, DestinationDto['images']>();
+  private hasInitializedLanguageWatcher = false;
+  private lastLanguage = 'sr';
 
   constructor(
     private router: Router,
@@ -62,8 +66,27 @@ export class DestinationsComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private imageService: ImageService,
     private locationTrackingService: LocationTrackingService,
-    private pendingActionService: PendingActionService
-  ) { }
+    private pendingActionService: PendingActionService,
+    private translationService: TranslationService
+  ) {
+    effect(() => {
+      const language = this.translationService.language();
+
+      if (!this.hasInitializedLanguageWatcher) {
+        this.lastLanguage = language;
+        this.hasInitializedLanguageWatcher = true;
+        return;
+      }
+
+      if (language === this.lastLanguage) {
+        return;
+      }
+
+      this.lastLanguage = language;
+      this.currentPage = 1;
+      void this.loadData();
+    });
+  }
 
   ngOnInit(): void {
     this.locationTrackingService.trackingEnabled$.subscribe(enabled => {

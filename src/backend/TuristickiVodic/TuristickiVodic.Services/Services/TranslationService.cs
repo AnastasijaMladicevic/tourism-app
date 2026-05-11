@@ -2,6 +2,7 @@ using TuristickiVodic.Core.Helpers;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
 
@@ -9,6 +10,7 @@ namespace TuristickiVodic.Services.Services
 {
     public class TranslationService : ITranslationService
     {
+        private const string TranslationUniqueConstraint = "IX_Translations_EntityType_EntityId_FieldName_LanguageCode";
         private readonly AppDbContext _context;
         private readonly IExternalTranslationProvider _translationProvider;
 
@@ -74,7 +76,7 @@ namespace TuristickiVodic.Services.Services
                 if (string.IsNullOrWhiteSpace(translated))
                     return originalText;
 
-                _context.Translations.Add(new Translation
+                var newTranslation = new Translation
                 {
                     EntityType = entityType,
                     EntityId = entityId,
@@ -85,10 +87,29 @@ namespace TuristickiVodic.Services.Services
                     IsAutoTranslated = true,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
-                });
+                };
 
-                await _context.SaveChangesAsync();
-                return translated;
+                _context.Translations.Add(newTranslation);
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    return translated;
+                }
+                catch (DbUpdateException ex) when (IsDuplicateTranslationViolation(ex))
+                {
+                    DetachEntity(newTranslation);
+
+                    var existingTranslation = await _context.Translations
+                        .AsNoTracking()
+                        .FirstOrDefaultAsync(t =>
+                            t.EntityType == entityType &&
+                            t.EntityId == entityId &&
+                            t.FieldName == fieldName &&
+                            t.LanguageCode == normalizedLanguage);
+
+                    return existingTranslation?.TranslatedText ?? translated;
+                }
             }
             catch
             {
@@ -126,7 +147,7 @@ namespace TuristickiVodic.Services.Services
 
                 var translated = await _translationProvider.TranslateAsync(originalText, lang, "sr");
 
-                _context.Translations.Add(new Translation
+                var newTranslation = new Translation
                 {
                     EntityType = entityType,
                     EntityId = entityId,
@@ -137,10 +158,36 @@ namespace TuristickiVodic.Services.Services
                     IsAutoTranslated = true,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
-                });
+                };
 
-                await _context.SaveChangesAsync();
+                _context.Translations.Add(newTranslation);
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException ex) when (IsDuplicateTranslationViolation(ex))
+                {
+                    DetachEntity(newTranslation);
+                }
             }
+        }
+
+        private void DetachEntity(Translation translation)
+        {
+            var entry = _context.Entry(translation);
+            if (entry != null)
+                entry.State = EntityState.Detached;
+        }
+
+        private static bool IsDuplicateTranslationViolation(DbUpdateException exception)
+        {
+            return exception.InnerException is PostgresException postgresException &&
+                   postgresException.SqlState == PostgresErrorCodes.UniqueViolation &&
+                   string.Equals(
+                       postgresException.ConstraintName,
+                       TranslationUniqueConstraint,
+                       StringComparison.Ordinal);
         }
 
         private static string HashText(string text)

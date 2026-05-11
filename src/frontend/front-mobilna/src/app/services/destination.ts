@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
 import { TranslationService } from './translation.service';
@@ -68,6 +68,14 @@ export interface UpdateDestinationDto {
   regionId?: number;
 }
 
+export interface PagedDestinationResultDto<T> {
+  items: T[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class DestinationService {
   private readonly url = `${environment.apiUrl}/Destinations`;
@@ -90,6 +98,15 @@ export class DestinationService {
     query?: DestinationQueryParams,
     options?: RegionRequestOptions,
   ): Observable<DestinationDto[]> {
+    return this.getPage(query, options).pipe(
+      map((result) => result.items ?? []),
+    );
+  }
+
+  getPage(
+    query?: DestinationQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<PagedDestinationResultDto<DestinationDto>> {
     const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options);
     let params = new HttpParams();
 
@@ -102,7 +119,7 @@ export class DestinationService {
     }
 
     params = this.addLang(params, options);
-    return this.http.get<DestinationDto[]>(this.url, { params });
+    return this.http.get<PagedDestinationResultDto<DestinationDto>>(this.url, { params });
   }
 
   getById(id: number): Observable<DestinationDto> {

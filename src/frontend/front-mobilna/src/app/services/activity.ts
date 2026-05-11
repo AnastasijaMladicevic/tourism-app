@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
 import { TranslationService } from './translation.service';
@@ -110,6 +110,15 @@ export class ActivityService {
     query?: ActivityQueryParams,
     options?: RegionRequestOptions,
   ): Observable<ActivityDto[]> {
+    return this.getPage(query, options).pipe(
+      map((result) => result.items ?? []),
+    );
+  }
+
+  getPage(
+    query?: ActivityQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<PagedActivityResultDto<ActivityDto>> {
     const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options);
     let params = new HttpParams();
 
@@ -122,7 +131,7 @@ export class ActivityService {
     }
 
     params = this.addLang(params, options);
-    return this.http.get<ActivityDto[]>(this.url, { params });
+    return this.http.get<PagedActivityResultDto<ActivityDto>>(this.url, { params });
   }
 
   getById(id: number): Observable<ActivityDto> {

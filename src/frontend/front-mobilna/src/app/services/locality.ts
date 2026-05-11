@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
 import { TranslationService } from './translation.service';
@@ -98,6 +98,15 @@ export class LocalityService {
     query?: LocalityQueryParams,
     options?: RegionRequestOptions,
   ): Observable<LocalityDto[]> {
+    return this.getPage(query, options).pipe(
+      map((result) => result.items ?? []),
+    );
+  }
+
+  getPage(
+    query?: LocalityQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<PagedLocalityResultDto<LocalityDto>> {
     const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options);
     let params = new HttpParams();
 
@@ -110,7 +119,7 @@ export class LocalityService {
     }
 
     params = this.addLang(params, options);
-    return this.http.get<LocalityDto[]>(this.url, { params });
+    return this.http.get<PagedLocalityResultDto<LocalityDto>>(this.url, { params });
   }
 
   getById(id: number): Observable<LocalityDto> {

@@ -1,6 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
+  effect,
   HostListener,
   OnInit,
   ViewEncapsulation,
@@ -12,11 +13,18 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { catchError, firstValueFrom, of } from 'rxjs';
 
-import { ObjectDto, ObjectService, ObjectView } from '../../services/object';
+import {
+  NearbyObjectQueryParams,
+  ObjectDto,
+  ObjectService,
+  ObjectView,
+  PagedResultDto,
+} from '../../services/object';
 import { AuthService } from '../../services/auth';
 import { LocationTrackingService } from '../../services/location-tracking';
 import { FavoriteStateService } from '../../services/favorite-state';
 import { PendingActionService } from '../../services/pending-action';
+import { TranslationService } from '../../services/translation.service';
 
 @Component({
   selector: 'app-objects',
@@ -52,22 +60,52 @@ export class ObjectsComponent implements OnInit {
   visibleObjects: ObjectView[] = [];
   userLocation: { lat: number; lng: number } | null = null;
   isTracking = false;
+
   private readonly favoritePendingIds = new Set<number>();
+  private readonly nearbyRadiusMeters = 3_000_000;
+  private favoritesLoaded = false;
+  private loadToken = 0;
+  private hasInitializedLanguageWatcher = false;
+  private lastLanguage = 'sr';
 
   constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private objectService: ObjectService,
-    private authService: AuthService,
-    private cdr: ChangeDetectorRef,
-    private locationTrackingService: LocationTrackingService,
-    private favoriteStateService: FavoriteStateService,
-    private pendingActionService: PendingActionService
-  ) { }
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly objectService: ObjectService,
+    private readonly authService: AuthService,
+    private readonly cdr: ChangeDetectorRef,
+    private readonly locationTrackingService: LocationTrackingService,
+    private readonly favoriteStateService: FavoriteStateService,
+    private readonly pendingActionService: PendingActionService,
+    private readonly translationService: TranslationService,
+  ) {
+    effect(() => {
+      const language = this.translationService.language();
+
+      if (!this.hasInitializedLanguageWatcher) {
+        this.lastLanguage = language;
+        this.hasInitializedLanguageWatcher = true;
+        return;
+      }
+
+      if (language === this.lastLanguage) {
+        return;
+      }
+
+      this.lastLanguage = language;
+      this.currentPage = 1;
+      void this.loadData();
+    });
+  }
 
   ngOnInit(): void {
     this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
       this.isTracking = enabled;
+
+      if (this.sortOption === 'distance') {
+        void this.loadData();
+        return;
+      }
 
       if (!enabled) {
         this.clearDistances();
@@ -81,15 +119,20 @@ export class ObjectsComponent implements OnInit {
     this.locationTrackingService.location$.subscribe((loc) => {
       this.userLocation = loc ? { lat: loc.latitude, lng: loc.longitude } : null;
 
+      if (this.sortOption === 'distance') {
+        void this.loadData();
+        return;
+      }
+
       if (this.userLocation) {
         this.updateDistances();
       } else {
         this.clearDistances();
       }
 
-      this.refreshVisibleObjects();
       this.cdr.detectChanges();
     });
+
     this.route.data.subscribe((routeData) => {
       const type = routeData['type'] as string | null;
       const title = routeData['title'] as string | undefined;
@@ -99,56 +142,152 @@ export class ObjectsComponent implements OnInit {
       this.activeFilter = type ?? 'All';
       this.currentPage = 1;
 
-      this.loadData();
-      window.addEventListener('favorite-object', (event: any) => {
-        const obj = event.detail;
-        if (obj) {
-          this.toggleFavorite(obj, new Event('click'));
-        }
-      });
+      void this.loadData();
     });
+
+    window.addEventListener('favorite-object', (event: Event & { detail?: ObjectView }) => {
+      const obj = event.detail;
+      if (obj) {
+        this.toggleFavorite(obj, new Event('click'));
+      }
+    });
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
   }
 
   onPageSizeChange(size: number): void {
     this.pageSize = size;
     this.currentPage = 1;
-    this.refreshVisibleObjects();
+    void this.loadData();
   }
 
-  loadData(): void {
+  async loadData(): Promise<void> {
+    const currentToken = ++this.loadToken;
     this.isLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
 
-    const scopedType = this.hideTypeFilters && this.activeFilter !== 'All' ? this.activeFilter : undefined;
+    try {
+      await this.ensureFavoritesLoaded();
 
-    this.loadAllObjects(scopedType)
-      .then((data) => {
-        this.objects = data.map((obj) => ({
-          ...obj,
-          isFavorite: false,
-          favoriteId: undefined,
-        }));
+      const response = await this.fetchObjectsPage();
+      if (currentToken !== this.loadToken) {
+        return;
+      }
 
-        return firstValueFrom(
-          this.favoriteStateService.loadFavorites(true).pipe(catchError(() => of(new Map<string, number>()))),
-        );
-      })
-      .then(() => {
+      this.totalCount = response.totalCount ?? 0;
+      this.hasNextPage = (response.page ?? this.currentPage) < (response.totalPages ?? 0);
+
+      this.objects = (response.items ?? []).map((obj) => ({
+        ...obj,
+        isFavorite: false,
+        favoriteId: undefined,
+      }));
+
+      if (this.userLocation && this.sortOption !== 'distance') {
         this.updateDistances();
-        this.refreshVisibleObjects();
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      })
-      .catch((err) => {
-        console.error(err);
-        this.objects = [];
-        this.visibleObjects = [];
-        this.totalCount = 0;
-        this.hasNextPage = false;
-        this.isLoading = false;
-        this.errorMessage = 'Failed to load objects.';
-        this.cdr.detectChanges();
-      });
+      } else if (!this.userLocation && this.sortOption !== 'distance') {
+        this.clearDistances();
+      }
+
+      this.visibleObjects = [...this.objects];
+      this.favoriteStateService.applyToList(this.objects, (object) => ({
+        type: 'object',
+        entityId: object.id,
+      }));
+      this.favoriteStateService.applyToList(this.visibleObjects, (object) => ({
+        type: 'object',
+        entityId: object.id,
+      }));
+
+      this.isLoading = false;
+      this.cdr.detectChanges();
+    } catch (err) {
+      if (currentToken !== this.loadToken) {
+        return;
+      }
+
+      console.error(err);
+      this.objects = [];
+      this.visibleObjects = [];
+      this.totalCount = 0;
+      this.hasNextPage = false;
+      this.isLoading = false;
+      this.errorMessage = 'Failed to load objects.';
+      this.cdr.detectChanges();
+    }
+  }
+
+  private async ensureFavoritesLoaded(): Promise<void> {
+    if (this.favoritesLoaded || !this.authService.isLoggedIn()) {
+      return;
+    }
+
+    await firstValueFrom(
+      this.favoriteStateService.loadFavorites(true).pipe(
+        catchError(() => of(new Map<string, number>())),
+      ),
+    );
+    this.favoritesLoaded = true;
+  }
+
+  private async fetchObjectsPage(): Promise<PagedResultDto<ObjectDto>> {
+    const query = {
+      page: this.currentPage,
+      pageSize: this.pageSize,
+      search: this.normalizeSearchQuery(),
+      type: this.resolveTypeFilter(),
+      minRating: this.minRatingFilter > 0 ? this.minRatingFilter : undefined,
+    };
+
+    if (this.sortOption === 'distance' && this.userLocation) {
+      const nearbyQuery: NearbyObjectQueryParams = {
+        ...query,
+        latitude: this.userLocation.lat,
+        longitude: this.userLocation.lng,
+        radiusMeters: this.nearbyRadiusMeters,
+        sortOrder: 'asc',
+      };
+
+      return firstValueFrom(this.objectService.getNearby(nearbyQuery));
+    }
+
+    const sort = this.resolveSortQuery();
+    return firstValueFrom(
+      this.objectService.getPage({
+        ...query,
+        sortBy: sort.sortBy,
+        sortOrder: sort.sortOrder,
+      }),
+    );
+  }
+
+  private resolveSortQuery(): { sortBy: string; sortOrder: string } {
+    switch (this.sortOption) {
+      case 'rating':
+        return { sortBy: 'rating', sortOrder: 'desc' };
+      case 'za':
+        return { sortBy: 'name', sortOrder: 'desc' };
+      case 'az':
+      case 'distance':
+      default:
+        return { sortBy: 'name', sortOrder: 'asc' };
+    }
+  }
+
+  private resolveTypeFilter(): string | undefined {
+    if (this.activeFilter === 'All') {
+      return undefined;
+    }
+
+    return this.activeFilter;
+  }
+
+  private normalizeSearchQuery(): string | undefined {
+    const query = this.searchQuery.trim();
+    return query.length > 0 ? query : undefined;
   }
 
   private updateDistances(): void {
@@ -171,6 +310,8 @@ export class ObjectsComponent implements OnInit {
         ),
       };
     });
+
+    this.visibleObjects = [...this.objects];
   }
 
   private clearDistances(): void {
@@ -178,6 +319,7 @@ export class ObjectsComponent implements OnInit {
       ...item,
       distanceMeters: undefined,
     }));
+    this.visibleObjects = [...this.objects];
   }
 
   getDistanceText(item: ObjectView): string | null {
@@ -202,9 +344,9 @@ export class ObjectsComponent implements OnInit {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
 
     return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
@@ -212,30 +354,30 @@ export class ObjectsComponent implements OnInit {
   setFilter(filter: string): void {
     this.activeFilter = filter;
     this.currentPage = 1;
-    this.refreshVisibleObjects();
+    void this.loadData();
   }
 
   setMinRating(rating: number): void {
     this.minRatingFilter = rating;
     this.currentPage = 1;
-    this.refreshVisibleObjects();
+    void this.loadData();
   }
 
   onSearchChange(): void {
     this.currentPage = 1;
-    this.refreshVisibleObjects();
+    void this.loadData();
   }
 
   prevPage(): void {
     if (this.currentPage === 1) return;
     this.currentPage--;
-    this.refreshVisibleObjects();
+    void this.loadData();
   }
 
   nextPage(): void {
     if (!this.hasNextPage) return;
     this.currentPage++;
-    this.refreshVisibleObjects();
+    void this.loadData();
   }
 
   @HostListener('document:click', ['$event'])
@@ -244,74 +386,12 @@ export class ObjectsComponent implements OnInit {
       this.showSortMenu = false;
     }
   }
-  private tokenize(query: string): string[] {
-    return query
-      .toLowerCase()
-      .split(' ')
-      .filter((t) => t.length >= 2);
-  }
-  get filtered(): ObjectView[] {
-    let list = [...this.objects];
-
-    if (this.searchQuery.trim()) {
-      const terms = this.tokenize(this.searchQuery);
-
-      list = list.filter((obj) => {
-        const text = `
-          ${obj.name}
-          ${obj.description}
-          ${obj.cuisineType}
-          ${obj.objectTypeName}
-          ${Array.isArray(obj.amenities) ? obj.amenities.join(' ') : ''}
-        `.toLowerCase();
-
-        return terms.every(term => text.includes(term));
-      });
-    }
-
-    if (!this.hideTypeFilters && this.activeFilter !== 'All') {
-      const allowedTypes = this.mapFilterToTypes(this.activeFilter);
-      if (allowedTypes?.length) {
-        list = list.filter((obj) =>
-          allowedTypes.includes(this.normalizeTypeToken(obj.objectTypeName)),
-        );
-      }
-    }
-
-    if (this.minRatingFilter > 0) {
-      list = list.filter((obj) => (obj.averageRating ?? 0) >= this.minRatingFilter);
-    }
-
-    switch (this.sortOption) {
-      case 'rating':
-        list.sort((a, b) => (b.averageRating ?? 0) - (a.averageRating ?? 0));
-        break;
-      case 'az':
-        list.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'za':
-        list.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-      case 'distance':
-        list.sort(
-          (a, b) =>
-            (a.distanceMeters ?? Number.MAX_SAFE_INTEGER) -
-            (b.distanceMeters ?? Number.MAX_SAFE_INTEGER),
-        );
-        break;
-    }
-
-    return list;
-  }
-
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
-  }
 
   setSort(option: 'rating' | 'az' | 'za' | 'distance'): void {
     this.sortOption = option;
     this.showSortMenu = false;
-    this.refreshVisibleObjects();
+    this.currentPage = 1;
+    void this.loadData();
   }
 
   sortLabel(): string {
@@ -344,11 +424,11 @@ export class ObjectsComponent implements OnInit {
     if (!this.authService.isLoggedIn()) {
       this.pendingActionService.setAction({
         type: 'favorite-object',
-        payload: object
+        payload: object,
       });
 
       this.router.navigate(['/login'], {
-        queryParams: { returnUrl: this.router.url }
+        queryParams: { returnUrl: this.router.url },
       });
 
       return;
@@ -430,120 +510,6 @@ export class ObjectsComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/home']);
-  }
-
-  private refreshVisibleObjects(): void {
-    const filteredObjects = this.filtered;
-    this.totalCount = filteredObjects.length;
-
-    if (this.totalCount === 0) {
-      this.currentPage = 1;
-      this.hasNextPage = false;
-      this.visibleObjects = [];
-      this.cdr.detectChanges();
-      return;
-    }
-
-    const totalPages = Math.ceil(this.totalCount / this.pageSize);
-    this.currentPage = Math.min(this.currentPage, totalPages);
-    this.hasNextPage = this.currentPage < totalPages;
-
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    this.visibleObjects = filteredObjects.slice(startIndex, startIndex + this.pageSize);
-    this.favoriteStateService.applyToList(this.visibleObjects, (object) => ({
-      type: 'object',
-      entityId: object.id,
-    }));
-    this.cdr.detectChanges();
-  }
-
-  private toArray<T>(raw: unknown): T[] {
-    if (Array.isArray(raw)) return raw as T[];
-    if (!raw || typeof raw !== 'object') return [];
-
-    const obj = raw as Record<string, unknown>;
-    const keys = ['items', 'Items', 'data', 'Data', 'results', 'Results', 'value', 'Value'];
-
-    for (const key of keys) {
-      const candidate = obj[key];
-      if (Array.isArray(candidate)) return candidate as T[];
-    }
-
-    return [];
-  }
-
-  private mapFilterToTypes(filter: string): string[] | undefined {
-    switch (filter) {
-      case 'Hrana i pice':
-        return ['restoran', 'kafana', 'bar', 'kafic', 'fast food', 'fast_food', 'vinarija', 'club'];
-      case 'Pumpe':
-        return ['pumpa', 'benzinska pumpa', 'gas_station'];
-      case 'Smestaj':
-        return ['hotel', 'apartman', 'motel', 'resort', 'hostel', 'pansion'];
-      case 'Soping':
-        return ['shop', 'shopping centar', 'trzni centar', 'market', 'prodavnica'];
-      case 'Bolnice':
-        return ['bolnica', 'klinika', 'Poliklinika', 'Dom zdravlja', 'hospital', 'clinic'];
-      default:
-        return undefined;
-    }
-  }
-
-  private normalizeTypeToken(value?: string | null): string {
-    return (value ?? '')
-      .trim()
-      .toLowerCase()
-      .replace(/š/g, 's')
-      .replace(/đ/g, 'dj')
-      .replace(/ž/g, 'z')
-      .replace(/č/g, 'c')
-      .replace(/ć/g, 'c');
-  }
-
-  private async loadAllObjects(scopedType?: string): Promise<ObjectDto[]> {
-    const allItems: ObjectDto[] = [];
-    const seenIds = new Set<number>();
-    const pageSize = 100;
-    let page = 1;
-
-    while (true) {
-      const response = (await firstValueFrom(
-        this.objectService.getAll({
-          type: scopedType,
-          page,
-          pageSize,
-        }),
-      )) as unknown;
-
-      const items = this.toArray<ObjectDto>(response);
-      if (!items.length) {
-        break;
-      }
-
-      let newItemsCount = 0;
-
-      for (const item of items) {
-        if (!item?.id || seenIds.has(item.id)) {
-          continue;
-        }
-
-        seenIds.add(item.id);
-        allItems.push(item);
-        newItemsCount += 1;
-      }
-
-      if (newItemsCount === 0) {
-        break;
-      }
-
-      if (items.length < pageSize) {
-        break;
-      }
-
-      page += 1;
-    }
-
-    return allItems;
   }
 
   private timeToMinutes(time: string): number {

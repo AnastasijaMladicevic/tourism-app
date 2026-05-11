@@ -38,18 +38,16 @@ export class LanguageComponent implements OnInit {
   private user: UserDto | null = null;
 
   ngOnInit(): void {
+    const currentCode = this.translationService.language();
+    this.selectedCode.set(currentCode);
+    this.appliedCode.set(currentCode);
+
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser?.id) {
-      const currentCode = this.translationService.language();
-      this.selectedCode.set(currentCode);
-      this.appliedCode.set(currentCode);
       return;
     }
 
     this.user = currentUser;
-    const code = this.normalizeLanguage(currentUser.language);
-    this.selectedCode.set(code);
-    this.appliedCode.set(code);
 
     this.authService
       .getById(currentUser.id)
@@ -57,9 +55,6 @@ export class LanguageComponent implements OnInit {
       .subscribe((user) => {
         if (!user) return;
         this.user = user;
-        const latestCode = this.normalizeLanguage(user.language);
-        this.selectedCode.set(latestCode);
-        this.appliedCode.set(latestCode);
       });
   }
 
@@ -86,7 +81,6 @@ export class LanguageComponent implements OnInit {
       this.selectedCode.set(applied);
       this.appliedCode.set(applied);
       this.feedback.set(this.translationService.translate('language.saved'));
-      window.location.reload();
       return;
     }
 
@@ -115,8 +109,6 @@ export class LanguageComponent implements OnInit {
         this.selectedCode.set(applied);
         this.appliedCode.set(applied);
         this.feedback.set(this.translationService.translate('language.saved'));
-
-        window.location.reload();
       });
   }
 

@@ -1,6 +1,7 @@
 import {
   ChangeDetectorRef,
   Component,
+  effect,
   OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -9,7 +10,10 @@ import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { catchError, firstValueFrom, of } from 'rxjs';
-import { LocalityDto, LocalityService } from '../../services/locality';
+import {
+  LocalityDto,
+  LocalityService,
+} from '../../services/locality';
 import { AuthService } from '../../services/auth';
 import { ImageDto, ImageService } from '../../services/image';
 import { LocationTrackingService } from '../../services/location-tracking';
@@ -48,149 +52,104 @@ export class LocalitiesComponent implements OnInit {
   pageSizeOptions = [8, 12, 16, 24, 32];
   userLocation: { lat: number; lng: number } | null = null;
   isTracking = false;
-  private readonly fetchPageSize = 100;
-  private readonly maxFetchPages = 50;
+
+  private readonly nearbyRadiusMeters = 3_000_000;
   private readonly imageCache = new Map<number, LocalityDto['images']>();
   private readonly favoritePendingIds = new Set<number>();
+  private favoritesLoaded = false;
+  private loadToken = 0;
+  private hasInitializedLanguageWatcher = false;
+  private lastLanguage = 'sr';
+
   constructor(
-    private router: Router,
-    private localityService: LocalityService,
-    private authService: AuthService,
-    private cdr: ChangeDetectorRef,
-    private imageService: ImageService,
-    private favoriteStateService: FavoriteStateService,
-    private locationTrackingService: LocationTrackingService,
-    private pendingActionService: PendingActionService,
-    private translationService: TranslationService
-  ) { }
+    private readonly router: Router,
+    private readonly localityService: LocalityService,
+    private readonly authService: AuthService,
+    private readonly cdr: ChangeDetectorRef,
+    private readonly imageService: ImageService,
+    private readonly favoriteStateService: FavoriteStateService,
+    private readonly locationTrackingService: LocationTrackingService,
+    private readonly pendingActionService: PendingActionService,
+    private readonly translationService: TranslationService,
+  ) {
+    effect(() => {
+      const language = this.translationService.language();
+
+      if (!this.hasInitializedLanguageWatcher) {
+        this.lastLanguage = language;
+        this.hasInitializedLanguageWatcher = true;
+        return;
+      }
+
+      if (language === this.lastLanguage) {
+        return;
+      }
+
+      this.lastLanguage = language;
+      this.currentPage = 1;
+      void this.loadData();
+    });
+  }
+
   ngOnInit(): void {
-    this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
+    this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
       this.isTracking = enabled;
+
+      if (this.sortOption === 'distance') {
+        void this.loadData();
+        return;
+      }
 
       if (!enabled) {
         this.clearDistances();
       } else {
         this.updateDistances();
-        this.cdr.detectChanges();
       }
+
+      this.cdr.detectChanges();
     });
 
-    this.locationTrackingService.location$.subscribe(loc => {
-      this.userLocation = loc
-        ? { lat: loc.latitude, lng: loc.longitude }
-        : null;
+    this.locationTrackingService.location$.subscribe((loc) => {
+      this.userLocation = loc ? { lat: loc.latitude, lng: loc.longitude } : null;
+
+      if (this.sortOption === 'distance') {
+        void this.loadData();
+        return;
+      }
 
       if (this.userLocation) {
         this.updateDistances();
       } else {
         this.clearDistances();
       }
-      this.refreshVisibleLocalities();
+
       this.cdr.detectChanges();
     });
+
     void this.loadData();
-    window.addEventListener('favorite-object', (event: any) => {
+
+    window.addEventListener('favorite-object', (event: Event & { detail?: LocalityView }) => {
       const obj = event.detail;
       if (obj) {
         this.toggleFavorite(obj, new Event('click'));
       }
     });
-    this.cdr.detectChanges();
   }
-  get filtered(): LocalityView[] {
-    let list = [...this.localities];
 
-    if (this.searchQuery.trim()) {
-      const query = this.searchQuery.trim().toLowerCase();
-      list = list.filter((locality) => locality.name.toLowerCase().includes(query));
-    }
-
-    if (this.activeFilter !== 'All') {
-      const activeType = this.activeFilter.trim().toLowerCase();
-      list = list.filter(
-        (locality) => locality.localityTypeName?.trim().toLowerCase() === activeType,
-      );
-    }
-
-    switch (this.sortOption) {
-      case 'az':
-        list.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'za':
-        list.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-      case 'distance':
-        list.sort((a, b) => (a.distanceMeters ?? Number.MAX_SAFE_INTEGER) - (b.distanceMeters ?? Number.MAX_SAFE_INTEGER));
-        break;
-    }
-
-    return list;
-  }
   get totalPages(): number {
     return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
   }
-  private updateDistances(): void {
-    if (!this.userLocation) return;
 
-    this.localities = this.localities.map(a => {
-      if (a.latitude == null || a.longitude == null) {
-        return { ...a, distanceMeters: undefined };
-      }
-
-      return {
-        ...a,
-        distanceMeters: this.getDistanceKm(
-          this.userLocation!.lat,
-          this.userLocation!.lng,
-          a.latitude,
-          a.longitude
-        )
-      };
-    });
-  }
-  private clearDistances(): void {
-    this.localities = this.localities.map(a => ({
-      ...a,
-      distanceMeters: undefined
-    }));
-  }
-  getDistanceText(item: any): string | null {
-    if (!this.isTracking || !this.userLocation) return null;
-    if (!item.latitude || !item.longitude) return null;
-
-    const km = this.getDistanceKm(
-      this.userLocation.lat,
-      this.userLocation.lng,
-      item.latitude,
-      item.longitude
-    );
-
-    return km < 1
-      ? `${Math.round(km * 1000)} m`
-      : `${km.toFixed(1)} km`;
-  }
-  private getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
-    const R = 6371; // km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLng = (lng2 - lng1) * Math.PI / 180;
-
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1 * Math.PI / 180) *
-      Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLng / 2) *
-      Math.sin(dLng / 2);
-
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  }
   onPageSizeChange(size: number): void {
     this.pageSize = size;
     this.currentPage = 1;
-    void this.refreshVisibleLocalities();
+    void this.loadData();
   }
+
   isFavoritePending(localityId: number): boolean {
     return this.favoritePendingIds.has(localityId);
   }
+
   private patchFavoriteState(localityId: number, isFavorite: boolean, favoriteId?: number): void {
     const applyPatch = (list: LocalityView[]) => {
       list.forEach((locality) => {
@@ -204,17 +163,19 @@ export class LocalitiesComponent implements OnInit {
     applyPatch(this.localities);
     applyPatch(this.visibleLocalities);
   }
+
   toggleFavorite(locality: LocalityView, event: Event): void {
     event.preventDefault();
     event.stopPropagation();
+
     if (!this.authService.isLoggedIn()) {
       this.pendingActionService.setAction({
         type: 'favorite-object',
-        payload: locality
+        payload: locality,
       });
 
       this.router.navigate(['/login'], {
-        queryParams: { returnUrl: this.router.url }
+        queryParams: { returnUrl: this.router.url },
       });
 
       return;
@@ -242,22 +203,25 @@ export class LocalitiesComponent implements OnInit {
         },
       });
   }
+
   prevPage(): void {
     if (this.currentPage === 1) return;
 
     this.currentPage--;
-    void this.refreshVisibleLocalities();
+    void this.loadData();
   }
 
   nextPage(): void {
     if (!this.hasNextPage) return;
 
     this.currentPage++;
-    void this.refreshVisibleLocalities();
+    void this.loadData();
   }
+
   viewDetails(locality: LocalityView): void {
     this.router.navigate(['/locality', locality.id]);
   }
+
   getMainImage(locality: LocalityView): string {
     if (locality.images && locality.images.length > 0) {
       const mainImage = locality.images.find((image) => image.isMain);
@@ -266,55 +230,65 @@ export class LocalitiesComponent implements OnInit {
 
     return this.locality?.mainImageUrl || '';
   }
+
   onImageError(event: Event): void {
     (event.target as HTMLImageElement).style.display = 'none';
   }
-  private extractUniqueTypes(localities: LocalityView[]): { id: number; name: string }[] {
-    const map = new Map<string, { id: number; name: string }>();
-
-    localities.forEach((locality) => {
-      if (locality.localityTypeName) {
-        map.set(locality.localityTypeName, {
-          id: locality.localityTypeId,
-          name: locality.localityTypeName,
-        });
-      }
-    });
-
-    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
-  }
 
   async loadData(): Promise<void> {
+    const currentToken = ++this.loadToken;
     this.isLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges();
 
     try {
-      if (this.authService.isLoggedIn()) {
-        await firstValueFrom(
-          this.favoriteStateService
-            .loadFavorites(true)
-            .pipe(catchError(() => of(new Map<string, number>()))),
-        );
+      await this.ensureFavoritesLoaded();
+      const response = await this.fetchLocalitiesPage();
+      if (currentToken !== this.loadToken) {
+        return;
       }
-      const localities = await this.fetchAllLocalities();
 
-      this.localities = localities.map((locality) => ({
-        ...locality,
-        images: this.imageCache.get(locality.id) ?? [],
+      this.totalCount = response.totalCount ?? 0;
+      this.hasNextPage = (response.page ?? this.currentPage) < (response.totalPages ?? 0);
+
+      const items = (response.items ?? []).map((locality) => ({
+        ...this.normalizeLocality(locality),
+        images: locality.images ?? this.imageCache.get(locality.id) ?? [],
         isFavorite: false,
         favoriteId: undefined,
       }));
-      this.favoriteStateService.applyToList(this.localities, (locality) => ({
+
+      this.localities = items;
+      this.mergeLocalityTypes(items);
+      this.favoriteStateService.applyToList(this.localities, (item) => ({
         type: 'locality',
-        entityId: locality.id,
+        entityId: item.id,
       }));
-      this.updateDistances();
-      this.localityTypes = this.extractUniqueTypes(this.localities);
-      await this.refreshVisibleLocalities();
+
+      if (this.userLocation && this.sortOption !== 'distance') {
+        this.updateDistances();
+      } else if (!this.userLocation && this.sortOption !== 'distance') {
+        this.clearDistances();
+      }
+
+      this.visibleLocalities = await Promise.all(
+        this.localities.map(async (item) => ({
+          ...item,
+          images: await this.getLocalityImages(item),
+        })),
+      );
+      this.favoriteStateService.applyToList(this.visibleLocalities, (item) => ({
+        type: 'locality',
+        entityId: item.id,
+      }));
 
       this.isLoading = false;
       this.cdr.detectChanges();
     } catch (err) {
+      if (currentToken !== this.loadToken) {
+        return;
+      }
+
       console.error(err);
       this.localities = [];
       this.visibleLocalities = [];
@@ -325,6 +299,55 @@ export class LocalitiesComponent implements OnInit {
       this.cdr.detectChanges();
     }
   }
+
+  private async ensureFavoritesLoaded(): Promise<void> {
+    if (this.favoritesLoaded || !this.authService.isLoggedIn()) {
+      return;
+    }
+
+    await firstValueFrom(
+      this.favoriteStateService
+        .loadFavorites(true)
+        .pipe(catchError(() => of(new Map<string, number>()))),
+    );
+
+    this.favoritesLoaded = true;
+  }
+
+  private async fetchLocalitiesPage() {
+    const query = {
+      page: this.currentPage,
+      pageSize: this.pageSize,
+      search: this.normalizeSearchQuery(),
+      type: this.activeFilter !== 'All' ? this.activeFilter : undefined,
+    };
+
+    if (this.sortOption === 'distance' && this.userLocation) {
+      return firstValueFrom(
+        this.localityService.getNearby({
+          ...query,
+          latitude: this.userLocation.lat,
+          longitude: this.userLocation.lng,
+          radiusMeters: this.nearbyRadiusMeters,
+          sortOrder: 'asc',
+        }),
+      );
+    }
+
+    return firstValueFrom(
+      this.localityService.getPage({
+        ...query,
+        sortBy: 'name',
+        sortOrder: this.sortOption === 'za' ? 'desc' : 'asc',
+      }),
+    );
+  }
+
+  private normalizeSearchQuery(): string | undefined {
+    const query = this.searchQuery.trim();
+    return query.length > 0 ? query : undefined;
+  }
+
   private normalizeLocality(raw: LocalityDto): LocalityDto {
     const dto = raw as unknown as Record<string, unknown>;
 
@@ -346,138 +369,142 @@ export class LocalitiesComponent implements OnInit {
       destinationId: Number(dto['destinationId'] ?? 0),
     };
   }
+
   private readOptionalNumber(obj: Record<string, unknown>, keys: string[]): number | undefined {
     for (const key of keys) {
       const value = obj[key];
       if (value == null) {
         continue;
       }
+
       const parsed = Number(value);
       if (!Number.isNaN(parsed)) {
         return parsed;
       }
     }
+
     return undefined;
   }
-  private async fetchAllLocalities(): Promise<LocalityDto[]> {
-    const allLocalities: LocalityDto[] = [];
-    const seenIds = new Set<number>();
 
-    for (let page = 1; page <= this.maxFetchPages; page++) {
-      const response = await firstValueFrom(
-        this.localityService.getAll({
-          page,
-          pageSize: this.fetchPageSize,
-        }),
-      );
-      const items = this.toArray<LocalityDto>(response).map((locality) =>
-        this.normalizeLocality(locality),
-      );
+  private updateDistances(): void {
+    if (!this.userLocation) return;
 
-      const newItems = items.filter((item) => {
-        if (seenIds.has(item.id)) {
-          return false;
-        }
-
-        seenIds.add(item.id);
-        return true;
-      });
-
-      if (!newItems.length) {
-        break;
+    this.localities = this.localities.map((item) => {
+      if (item.latitude == null || item.longitude == null) {
+        return { ...item, distanceMeters: undefined };
       }
 
-      allLocalities.push(...newItems);
+      return {
+        ...item,
+        distanceMeters: this.getDistanceKm(
+          this.userLocation!.lat,
+          this.userLocation!.lng,
+          item.latitude,
+          item.longitude,
+        ),
+      };
+    });
+  }
 
-      if (items.length < this.fetchPageSize) {
-        break;
+  private clearDistances(): void {
+    this.localities = this.localities.map((item) => ({
+      ...item,
+      distanceMeters: undefined,
+    }));
+  }
+
+  getDistanceText(item: LocalityView): string | null {
+    if (!this.isTracking || !this.userLocation) return null;
+    if (!item.latitude || !item.longitude) return null;
+
+    const km = this.getDistanceKm(
+      this.userLocation.lat,
+      this.userLocation.lng,
+      item.latitude,
+      item.longitude,
+    );
+
+    return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
+  }
+
+  private getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const r = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+
+    return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  private mergeLocalityTypes(items: LocalityView[]): void {
+    const map = new Map(this.localityTypes.map((type) => [type.name, type]));
+
+    items.forEach((item) => {
+      if (item.localityTypeName) {
+        map.set(item.localityTypeName, {
+          id: item.localityTypeId,
+          name: item.localityTypeName,
+        });
       }
-    }
+    });
 
-    return allLocalities;
+    this.localityTypes = Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
   }
-  private toArray<T>(raw: unknown): T[] {
-    if (Array.isArray(raw)) return raw as T[];
-    if (!raw || typeof raw !== 'object') return [];
 
-    const obj = raw as Record<string, unknown>;
-    const listKeys = ['items', 'Items', 'data', 'Data', 'results', 'Results', 'value', 'Value'];
-
-    for (const key of listKeys) {
-      const candidate = obj[key];
-      if (Array.isArray(candidate)) return candidate as T[];
-    }
-
-    return [];
-  }
   sortLabel(): string {
     const map = {
       az: 'A -> Z',
       za: 'Z -> A',
-      distance: this.translationService.translate('common.nearest')
+      distance: this.translationService.translate('common.nearest'),
     };
     return map[this.sortOption];
   }
+
   setSort(option: 'az' | 'za' | 'distance'): void {
     this.sortOption = option;
     this.showSortMenu = false;
-    void this.refreshVisibleLocalities();
+    this.currentPage = 1;
+    void this.loadData();
   }
+
   setFilter(filter: string): void {
     this.activeFilter = filter;
     this.currentPage = 1;
-    void this.refreshVisibleLocalities();
+    void this.loadData();
   }
-  private async refreshVisibleLocalities(): Promise<void> {
-    const filteredLocalities = this.filtered;
-    this.totalCount = filteredLocalities.length;
 
-    if (this.totalCount === 0) {
-      this.currentPage = 1;
-      this.hasNextPage = false;
-      this.visibleLocalities = [];
-      this.cdr.detectChanges();
-      return;
+  private async getLocalityImages(locality: LocalityView): Promise<LocalityDto['images']> {
+    if (locality.images && locality.images.length > 0) {
+      this.imageCache.set(locality.id, locality.images);
+      return locality.images;
     }
 
-    const totalPages = Math.ceil(this.totalCount / this.pageSize);
-    this.currentPage = Math.min(this.currentPage, totalPages);
-    this.hasNextPage = this.currentPage < totalPages;
-
-    const startIndex = (this.currentPage - 1) * this.pageSize;
-    const pageItems = filteredLocalities.slice(startIndex, startIndex + this.pageSize);
-
-    this.visibleLocalities = await Promise.all(
-      pageItems.map(async (locality) => ({
-        ...locality,
-        images: await this.getLocalityImages(locality.id),
-      })),
-    );
-    this.favoriteStateService.applyToList(this.visibleLocalities, (locality) => ({
-      type: 'locality',
-      entityId: locality.id,
-    }));
-    this.cdr.detectChanges();
-  }
-  private async getLocalityImages(localityId: number): Promise<LocalityDto['images']> {
-    const cachedImages = this.imageCache.get(localityId);
+    const cachedImages = this.imageCache.get(locality.id);
     if (cachedImages) {
       return cachedImages;
     }
 
     try {
-      const images = (await firstValueFrom(this.imageService.getForLocality(localityId))) ?? [];
-      this.imageCache.set(localityId, images);
+      const images = (await firstValueFrom(this.imageService.getForLocality(locality.id))) ?? [];
+      this.imageCache.set(locality.id, images);
       return images;
     } catch {
-      this.imageCache.set(localityId, []);
+      this.imageCache.set(locality.id, []);
       return [];
     }
   }
+
   onSearchChange(): void {
     this.currentPage = 1;
-    void this.refreshVisibleLocalities();
+    void this.loadData();
   }
+
   goBack(): void {
     this.router.navigate(['/home']);
   }

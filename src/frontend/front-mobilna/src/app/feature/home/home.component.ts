@@ -717,7 +717,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     const regionId = this.activeRegionId;
     this.isLoadingPlaces = true;
 
-    const lang = (localStorage.getItem('spirego-language') || 'sr').trim().toLowerCase();
+    const lang = this.translationService.language().trim().toLowerCase();
 
     forkJoin({
       destinations: this.destinationService
@@ -802,9 +802,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private translateFeaturedDisplayTitles(
     featured: FeaturedDestination[]
   ): Observable<FeaturedDestination[]> {
-    const lang = (localStorage.getItem('spirego-language') || 'sr')
-      .trim()
-      .toLowerCase();
+    const lang = this.translationService.language().trim().toLowerCase();
 
     if (!featured.length || lang === 'sr' || lang === 'me') {
       return of(featured);

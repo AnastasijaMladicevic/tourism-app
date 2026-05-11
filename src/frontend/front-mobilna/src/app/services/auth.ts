@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environment/environment';
-import { TranslationService } from './translation.service';
 import { ActiveRegionService } from './active-region';
 
 export interface LoginDto {
@@ -117,15 +116,9 @@ export class AuthService {
 
   constructor(
     private http: HttpClient,
-    private translationService: TranslationService,
     private activeRegionService: ActiveRegionService,
   ) {
     this.syncStoredUserWithAuthenticatedRole();
-
-    const currentUser = this.readStoredUser();
-    if (currentUser?.language) {
-      this.translationService.setLanguage(currentUser.language);
-    }
   }
 
   register(dto: CreateUserDto): Observable<UserDto> {
@@ -217,7 +210,6 @@ export class AuthService {
 
   setCurrentUser(user: UserDto): void {
     localStorage.setItem('user', JSON.stringify(user));
-    this.translationService.setLanguage(user.language);
   }
 
   isLoggedIn(): boolean {

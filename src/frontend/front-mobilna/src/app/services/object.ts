@@ -57,6 +57,11 @@ export interface ObjectQueryParams {
   locality?: string;
   status?: string;
   regionId?: number;
+  amenities?: string[];
+  minPrice?: number;
+  maxPrice?: number;
+  minRating?: number;
+  maxRating?: number;
   page?: number;
   pageSize?: number;
   search?: string;
