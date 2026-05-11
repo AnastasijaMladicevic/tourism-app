@@ -443,128 +443,127 @@
   },
   "support": {
     "title": "Aiuto e supporto",
-    "heroTitle": "Aiuto per profilo e impostazioni mobile",
+    "heroTitle": "Siamo qui per aiutarti",
     "searchAria": "Cerca domande",
-    "searchPlaceholder": "Cerca domande frequenti...",
+    "searchPlaceholder": "Cerca nelle domande frequenti...",
     "faqTitle": "Domande frequenti",
     "contactTitle": "Contatto diretto",
-    "contactUsers": "Supporto clienti",
-    "contactUsersBody": "Chiamaci per domande rapide sul tuo account e sull'app",
+    "contactUsers": "Supporto utenti",
+    "contactUsersBody": "Chiamaci se hai bisogno di aiuto con il tuo account, le impostazioni o l'uso dell'applicazione.",
     "reportProblem": "Segnala un problema",
-    "reportProblemBody": "Invia i dettagli se una funzione del profilo non funziona come previsto",
-    "hoursTitle": "Orari di supporto",
-    "weekdays": "LunedÃ¬ - VenerdÃ¬",
+    "reportProblemBody": "Inviaci una descrizione del problema così potremo verificarlo e aiutarti il prima possibile.",
+    "hoursTitle": "Orari del supporto",
+    "weekdays": "Lunedì - Venerdì",
     "weekend": "Sabato - Domenica",
-    "chatNote": "* Il tempo medio di risposta in chat Ã¨ inferiore a 5 minuti.",
-    "ticketNote": "* Le risposte ai problemi segnalati arrivano entro 24 ore.",
+    "chatNote": "* Il tempo medio di risposta a un messaggio è inferiore a 5 minuti.",
+    "ticketNote": "* Le risposte alle segnalazioni arrivano entro 24 ore.",
     "aiTitle": "Assistente turistico AI",
     "aiFloatingTitle": "Chiedi a SpireGO AI",
-    "aiFloatingShort": "AI",
-    "aiFloatingOpen": "Apri l'assistente SpireGO AI",
-    "aiFloatingBody": "Chiedi velocemente consigli su luoghi, cibo, eventi e idee da esplorare.",
+    "aiFloatingShort": "Guida AI",
+    "aiFloatingOpen": "Apri l'assistente AI di SpireGO",
+    "aiFloatingBody": "Chiedi rapidamente informazioni su luoghi, cibo, eventi e idee per visite.",
     "aiFloatingWelcomeTitle": "Come posso aiutarti?",
-    "aiFloatingSupportHint": "L'assistente AI e ora disponibile tramite il pulsante flottante in basso a destra su ogni schermata.",
-    "aiBody": "Fai una domanda in linguaggio naturale e l'assistente cerchera prima nei contenuti dell'app prima di rispondere.",
+    "aiFloatingSupportHint": "L'assistente AI è ora disponibile tramite il pulsante flottante in basso a destra su ogni schermata.",
+    "aiBody": "Fai una domanda in linguaggio naturale e l'assistente ti aiuterà a trovare destinazioni, ristoranti, hotel, eventi o attività che corrispondono ai tuoi interessi.",
     "aiPlaceholder": "Per esempio: dove posso andare a passeggiare con i bambini?",
     "aiSend": "Invia domanda",
-    "aiThinking": "L'AI sta cercando i suggerimenti migliori...",
-    "aiEmpty": "Non ci sono ancora messaggi. Prova a chiedere di un ristorante, hotel, passeggiata o evento.",
-    "aiError": "La risposta dell'AI non e disponibile in questo momento. Riprova tra qualche secondo.",
-    "aiPromptWalk": "Passeggiata con bambini",
+    "aiThinking": "L'AI sta cercando i migliori suggerimenti...",
+    "aiEmpty": "Non ci sono ancora messaggi. Prova a chiedere di un ristorante, un hotel, una passeggiata o un evento.",
+    "aiError": "La risposta dell'AI non è al momento disponibile. Riprova tra qualche secondo.",
+    "aiPromptWalk": "Passeggiata con i bambini",
     "aiPromptLunch": "Ristorante per pranzo",
     "aiPromptHotel": "Hotel con piscina",
     "faq": {
       "1": {
-        "q": "Come aggiorno le informazioni del profilo?",
-        "a": "Nella schermata Modifica profilo puoi cambiare nome, cognome, numero di telefono, paese e foto del profilo usando le opzioni account esistenti."
+        "q": "Come posso aggiornare i dati del mio profilo?",
+        "a": "Puoi modificare i tuoi dati nella schermata Profilo, nella sezione Modifica profilo, oppure nella schermata Impostazioni, nella sezione Modifica profilo. Lì puoi cambiare nome, cognome, telefono, paese, foto del profilo e anche la password."
       },
       "2": {
-        "q": "Dove posso vedere i miei preferiti?",
-        "a": "La schermata Preferiti mostra tutti gli elementi salvati tramite l'API corrente e ti consente di rimuovere rapidamente tutto ciÃ² di cui non hai piÃ¹ bisogno."
+        "q": "Dove posso vedere i miei elementi preferiti?",
+        "a": "Le destinazioni preferite, i luoghi e gli altri contenuti salvati si trovano nella schermata Preferiti, dove puoi visualizzarli o rimuoverli."
       },
       "3": {
         "q": "Come funziona il pianificatore di viaggio?",
-        "a": "Il pianificatore attualmente funziona localmente sul dispositivo e non richiede modifiche al backend. Puoi salvare una destinazione, una data, note e una checklist."
+        "a": "Il pianificatore ti consente di salvare gli eventi a cui vuoi partecipare durante il viaggio e ti ricorda questi eventi."
       },
       "4": {
-        "q": "Come cambio la lingua dell'app?",
-        "a": "Nella schermata Lingua puoi scegliere una lingua supportata e salvare la modifica tramite il percorso utente. La modifica si riflette immediatamente nell'interfaccia mobile."
+        "q": "Come posso cambiare la lingua dell'applicazione?",
+        "a": "Puoi cambiare la lingua dell'applicazione nella schermata Impostazioni, nella sezione Lingua. Dopo aver selezionato una lingua, la modifica apparirà immediatamente nell'applicazione."
       }
     }
   },
   "notifications": {
     "title": "Notifiche",
-    "markAll": "Segna tutto",
-    "deleteRead": "Elimina lette",
+    "markAll": "Segna tutto come letto",
+    "deleteRead": "Elimina quelle lette",
     "deleteSingle": "Elimina notifica",
     "emptyTitle": "Nessuna notifica",
-    "emptyBody": "Hai già visto tutto."
+    "emptyBody": "È stato letto tutto."
   },
   "about": {
     "supportTitle": "Informazioni e supporto",
-    "version": "Versione 2.4.0",
-    "quote": "\"La nostra missione Ã¨ offrire ad ogni viaggiatore un'esperienza autentica del Montenegro, dalle spiagge nascoste del sud alle vette incontaminate del nord.\"",
-    "privacy": "Politica sulla privacy",
+    "quote": "\"La nostra missione è offrire a ogni viaggiatore esperienze autentiche e rendere più facile scoprire le destinazioni più belle del mondo.\"",
+    "privacy": "Informativa sulla privacy",
     "privacyBody": "Come proteggiamo i tuoi dati",
     "terms": "Termini di utilizzo",
-    "termsBody": "Regole per l'utilizzo dell'app",
+    "termsBody": "Regole per l'utilizzo dell'applicazione",
     "contact": "Contattaci",
     "contactBody": "Domande, suggerimenti o problemi",
-    "footerMade": "Fatto con il cuore in Montenegro",
+    "footerMade": "Realizzato con amore in Montenegro",
     "footerRights": "Tutti i diritti riservati."
   },
   "privacy": {
     "title": "Privacy e dati",
-    "eyebrow": "TRASPARENTE",
-    "heroTitle": "Cosa l'app mobile archivia e mostra attualmente.",
-    "heroBody": "Questa schermata fornisce una chiara panoramica dei dati utilizzati dal frontend e delle attuali limitazioni fino a quando il backend non riceverÃ  funzionalitÃ  aggiuntive.",
+    "eyebrow": "TRASPARENZA",
+    "heroTitle": "Come SpireGO utilizza i tuoi dati",
+    "heroBody": "La tua privacy e la sicurezza dei dati sono importanti per noi. In questa pagina puoi scoprire quali informazioni mostra l'applicazione, come vengono utilizzate e in che modo aiutano a migliorare la tua esperienza di viaggio.",
     "notesTitle": "Note importanti",
     "section": {
       "1": {
         "title": "Dati dell'account",
-        "body": "Il frontend mobile mostra attualmente i dati di base dell'account come nome, cognome, email, numero di telefono, paese e foto del profilo."
+        "body": "SpireGO può mostrare le informazioni di base del tuo account, come nome, indirizzo email, foto del profilo e impostazioni del profilo, per personalizzare la tua esperienza nell'applicazione."
       },
       "2": {
-        "title": "Dati archiviati localmente",
-        "body": "I dati del pianificatore di viaggio e gli interessi possono essere archiviati localmente sul dispositivo senza inviare nuovi dati al backend."
+        "title": "Dati salvati localmente",
+        "body": "Alcuni dati, come i piani di viaggio, le destinazioni preferite o le impostazioni dell'applicazione, possono essere temporaneamente salvati sul tuo dispositivo per un utilizzo più rapido e semplice dell'applicazione."
       },
       "3": {
-        "title": "Come richiedere una modifica",
-        "body": "Se desideri una correzione dei dati o una spiegazione aggiuntiva, usa la schermata Aiuto e supporto o l'indirizzo di contatto indicato nell'app."
+        "title": "Come contattarci",
+        "body": "Alcuni dati, come i piani di viaggio, le destinazioni preferite o le impostazioni dell'applicazione, possono essere temporaneamente salvati sul tuo dispositivo per un utilizzo più rapido e semplice dell'applicazione."
       }
     },
     "note": {
-      "1": "Il frontend non gestisce l'eliminazione dell'account o l'esportazione dei dati senza supporto backend.",
-      "2": "Gli aggiornamenti della foto del profilo e le modifiche di base al profilo utilizzano le rotte API esistenti giÃ  disponibili.",
-      "3": "Le azioni sensibili dell'account richiedono supporto backend aggiuntivo e autorizzazioni."
+      "1": "I tuoi dati vengono utilizzati esclusivamente per le funzionalità dell'applicazione e per migliorare l'esperienza utente.",
+      "2": "Ci impegniamo a garantire che le tue informazioni siano protette e accessibili solo a te.",
+      "3": "Alcune funzionalità potrebbero richiedere un'ulteriore verifica dell'identità per la sicurezza dell'account."
     }
   },
   "terms": {
     "title": "Termini di utilizzo",
-    "eyebrow": "PANORAMICA TERMINI",
-    "heroTitle": "Un chiaro riepilogo delle regole per l'app mobile.",
-    "heroBody": "Questa schermata fornisce una panoramica frontend delle regole di utilizzo piÃ¹ importanti fino a quando la versione legale completa non viene allineata nell'intero sistema.",
-    "notesTitle": "Note",
+    "eyebrow": "TERMINI DI UTILIZZO",
+    "heroTitle": "Regole e linee guida per l'utilizzo dell'applicazione.",
+    "heroBody": "Utilizzando l'applicazione SpireGO, accetti le regole fondamentali di utilizzo, la protezione dei dati e l'uso responsabile delle funzionalità disponibili.",
+    "notesTitle": "Note importanti",
     "section": {
       "1": {
-        "title": "Utilizzo dell'app",
-        "body": "Il frontend mobile ti consente di sfogliare destinazioni, oggetti, preferiti e impostazioni personali. L'utente Ã¨ responsabile dell'accuratezza dei dati inseriti nell'account."
+        "title": "Utilizzo dell'applicazione",
+        "body": "SpireGO consente di consultare destinazioni, luoghi, eventi, preferiti e contenuti personalizzati. L'utente è responsabile dell'accuratezza delle informazioni che inserisce e utilizza all'interno del proprio account."
       },
       "2": {
         "title": "Contenuti e informazioni",
-        "body": "I dati visualizzati dipendono dalle risposte API disponibili. Il frontend mostra ciÃ² che il backend restituisce attualmente e non garantisce funzionalitÃ  aggiuntive non supportate dalle rotte di sistema."
+        "body": "Ci impegniamo a mantenere le informazioni nell'applicazione accurate e aggiornate, ma la disponibilità dei contenuti può dipendere da servizi esterni e fonti di dati. Alcune informazioni potrebbero essere modificate o temporaneamente non disponibili."
       },
       "3": {
         "title": "Account e sicurezza",
-        "body": "Logout, modifiche di base al profilo e cambi di foto utilizzano i meccanismi account esistenti. Le azioni account aggiuntive richiedono supporto backend dedicato."
+        "body": "L'utente è responsabile della sicurezza del proprio account e della riservatezza dei dati di accesso. Consigliamo di utilizzare password sicure e di aggiornare regolarmente le informazioni dell'account."
       }
     },
     "note": {
-      "1": "Preferiti, recensioni e dati del profilo sono collegati all'account attualmente connesso.",
-      "2": "Il pianificatore archiviato localmente funziona solo sul dispositivo in cui Ã¨ stato creato.",
-      "3": "Le versioni legali e di produzione dei termini devono ancora essere allineate con il team e le specifiche del backend."
+      "1": "Preferiti, recensioni e impostazioni sono collegati al tuo account utente.",
+      "2": "Alcuni dati possono essere temporaneamente salvati localmente sul dispositivo per migliorare l'esperienza utente.",
+      "3": "Utilizzando l'applicazione, accetti futuri miglioramenti e modifiche alle funzionalità del sistema."
     }
-  },
+},
   "map": {
     "searchPlaceholder": "Cerca oggetti, percorsi...",
     "geoUnsupported": "La geolocalizzazione non Ã¨ supportata in questo browser.",

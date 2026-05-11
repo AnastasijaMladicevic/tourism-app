@@ -443,126 +443,125 @@
   },
   "support": {
     "title": "Help and support",
-    "heroTitle": "Help for profile and mobile settings",
+    "heroTitle": "We are here to help you",
     "searchAria": "Search questions",
     "searchPlaceholder": "Search frequently asked questions...",
     "faqTitle": "Frequently asked questions",
     "contactTitle": "Direct contact",
     "contactUsers": "Customer support",
-    "contactUsersBody": "Call us for quick questions about your account and the app",
-    "reportProblem": "Report an issue",
-    "reportProblemBody": "Send details if a profile feature is not working as expected",
+    "contactUsersBody": "Call us if you need help with your account, settings, or using the application.",
+    "reportProblem": "Report a problem",
+    "reportProblemBody": "Send us a description of the problem so we can check it and help you as quickly as possible.",
     "hoursTitle": "Support hours",
     "weekdays": "Monday - Friday",
     "weekend": "Saturday - Sunday",
-    "chatNote": "* Average chat response time is under 5 minutes.",
-    "ticketNote": "* Replies to reported issues arrive within 24 hours.",
+    "chatNote": "* The average response time to a message is less than 5 minutes.",
+    "ticketNote": "* Responses to reported issues arrive within 24 hours.",
     "aiTitle": "AI travel assistant",
     "aiFloatingTitle": "Ask SpireGO AI",
     "aiFloatingShort": "AI guide",
     "aiFloatingOpen": "Open the SpireGO AI assistant",
-    "aiFloatingBody": "Ask quickly about places, food, events, and ideas for your next stop.",
+    "aiFloatingBody": "Quickly ask about places, food, events, and sightseeing ideas.",
     "aiFloatingWelcomeTitle": "How can I help?",
-    "aiFloatingSupportHint": "The AI assistant is now available through the floating button in the bottom right corner on every screen.",
-    "aiBody": "Ask in natural language and the assistant will search the app content before replying in a friendly way.",
-    "aiPlaceholder": "For example: where can I go for a walk with kids?",
+    "aiFloatingSupportHint": "The AI assistant is now available through the floating button at the bottom right of every screen.",
+    "aiBody": "Ask a question in natural language and the assistant will help you find destinations, restaurants, hotels, events, or activities that match your interests.",
+    "aiPlaceholder": "For example: where can I go for a walk with children?",
     "aiSend": "Send question",
-    "aiThinking": "The AI is looking for the best suggestions...",
-    "aiEmpty": "No messages yet. Try asking about a restaurant, hotel, walk, or event.",
-    "aiError": "The AI answer is not available right now. Please try again in a few seconds.",
-    "aiPromptWalk": "Walk with kids",
+    "aiThinking": "AI is currently looking for the best suggestions...",
+    "aiEmpty": "There are no messages yet. Try asking about a restaurant, hotel, walk, or event.",
+    "aiError": "The AI response is currently unavailable. Please try again in a few seconds.",
+    "aiPromptWalk": "Walk with children",
     "aiPromptLunch": "Restaurant for lunch",
-    "aiPromptHotel": "Hotel with pool",
+    "aiPromptHotel": "Hotel with a pool",
     "faq": {
       "1": {
-        "q": "How do I update profile information?",
-        "a": "On the Edit profile screen you can change your first name, last name, phone number, country and profile photo using the existing account options."
+        "q": "How do I update my profile information?",
+        "a": "You can edit your information on the Profile screen in the Edit profile section or on the Settings screen in the Edit profile section. There you can change your first name, last name, phone number, country, profile photo, as well as your password."
       },
       "2": {
-        "q": "Where can I see my favorites?",
-        "a": "The Favorites screen shows every item saved through the current API and lets you quickly remove anything you no longer need."
+        "q": "Where can I see my favorite items?",
+        "a": "Favorite destinations, places, and other saved content are located on the Favorites screen, where you can view or remove them."
       },
       "3": {
         "q": "How does the trip planner work?",
-        "a": "The planner currently works locally on the device and does not require backend changes. You can save a destination, date, notes and a checklist."
+        "a": "The planner allows you to save events you want to attend during your trip and reminds you about them."
       },
       "4": {
-        "q": "How do I change the app language?",
-        "a": "On the Language screen you can choose a supported language and save the change through the user route. The change is reflected immediately in the mobile interface."
+        "q": "How do I change the application language?",
+        "a": "You can change the application language on the Settings screen in the Language section. After selecting a language, the change will appear immediately in the application."
       }
     }
   },
   "notifications": {
     "title": "Notifications",
-    "markAll": "Mark as Read",
+    "markAll": "Mark all as read",
     "deleteRead": "Delete read",
     "deleteSingle": "Delete notification",
     "emptyTitle": "No notifications",
-    "emptyBody": "You're all caught up."
+    "emptyBody": "Everything has been read."
   },
   "about": {
     "supportTitle": "Information and support",
-    "version": "Version 2.4.0",
-    "quote": "\"Our mission is to give every traveler an authentic experience of Montenegro, from hidden southern beaches to untouched mountain peaks in the north.\"",
+    "quote": "\"Our mission is to provide every traveler with authentic experiences and make discovering the most beautiful destinations around the world easier.\"",
     "privacy": "Privacy policy",
     "privacyBody": "How we protect your data",
     "terms": "Terms of use",
-    "termsBody": "Rules for using the app",
+    "termsBody": "Rules for using the application",
     "contact": "Contact us",
-    "contactBody": "Questions, suggestions or issues",
-    "footerMade": "Made with heart in Montenegro",
+    "contactBody": "Questions, suggestions, or problems",
+    "footerMade": "Made with love in Montenegro",
     "footerRights": "All rights reserved."
   },
   "privacy": {
     "title": "Privacy and data",
-    "eyebrow": "TRANSPARENT",
-    "heroTitle": "What the mobile app currently stores and shows.",
-    "heroBody": "This screen gives a clear overview of the data used by the frontend and the current limitations until the backend gets additional functionality.",
+    "eyebrow": "TRANSPARENTLY",
+    "heroTitle": "How SpireGO uses your data",
+    "heroBody": "Your privacy and data security are important to us. On this page, you can learn which information the application displays, how it is used, and how it helps improve your travel experience.",
     "notesTitle": "Important notes",
     "section": {
       "1": {
         "title": "Account data",
-        "body": "The mobile frontend currently shows basic account data such as first name, last name, email, phone number, country and profile photo."
+        "body": "SpireGO may display basic account information such as your name, email address, profile photo, and profile settings in order to personalize your experience in the application."
       },
       "2": {
         "title": "Locally stored data",
-        "body": "Trip planner data and interests can be stored locally on the device without sending new data to the backend."
+        "body": "Certain data, such as travel plans, favorite destinations, or application settings, may be temporarily stored on your device for faster and easier use of the application."
       },
       "3": {
-        "title": "How to request a change",
-        "body": "If you want a data correction or additional explanation, use the Help and support screen or the contact address listed in the app."
+        "title": "How to contact us",
+        "body": "Certain data, such as travel plans, favorite destinations, or application settings, may be temporarily stored on your device for faster and easier use of the application."
       }
     },
     "note": {
-      "1": "The frontend does not manage account deletion or data export without backend support.",
-      "2": "Profile photo updates and basic profile edits use the existing API routes that are already available.",
-      "3": "Sensitive account actions require additional backend support and permissions."
+      "1": "Your data is used exclusively for the application's functionality and for improving the user experience.",
+      "2": "We strive to ensure that your information is protected and accessible only to you.",
+      "3": "Some features may require additional identity verification for account security."
     }
-  },
+},
   "terms": {
-    "title": "Terms of use",
-    "eyebrow": "TERMS OVERVIEW",
-    "heroTitle": "A clear summary of the rules for the mobile app.",
-    "heroBody": "This screen gives a frontend overview of the most important usage rules until the full legal version is aligned across the system.",
-    "notesTitle": "Notes",
+    "title": "Terms of Use",
+    "eyebrow": "TERMS OF USE",
+    "heroTitle": "Rules and guidelines for using the application.",
+    "heroBody": "By using the SpireGO application, you accept the basic rules of use, data protection principles, and the responsible use of the available features.",
+    "notesTitle": "Important notes",
     "section": {
       "1": {
-        "title": "Using the app",
-        "body": "The mobile frontend lets you browse destinations, objects, favorites and personal settings. The user is responsible for the accuracy of the data entered on the account."
+        "title": "Using the application",
+        "body": "SpireGO allows users to browse destinations, places, events, favorites, and personalized content. The user is responsible for the accuracy of the information they enter and use within their account."
       },
       "2": {
         "title": "Content and information",
-        "body": "Displayed data depends on available API responses. The frontend shows what the backend currently returns and does not guarantee additional features that are not supported by system routes."
+        "body": "We strive to keep the information in the application accurate and up to date, but content availability may depend on external services and data sources. Some information may be changed or temporarily unavailable."
       },
       "3": {
         "title": "Account and security",
-        "body": "Logout, basic profile edits and photo changes use existing account mechanisms. Additional account actions require dedicated backend support."
+        "body": "The user is responsible for the security of their account and the confidentiality of their login credentials. We recommend using strong passwords and regularly updating account information."
       }
     },
     "note": {
-      "1": "Favorites, reviews and profile data are tied to the currently signed-in account.",
-      "2": "The locally stored planner works only on the device where it was created.",
-      "3": "Legal and production versions of the terms still need to be aligned with the team and the backend specification."
+      "1": "Favorites, reviews, and settings are linked to your user account.",
+      "2": "Certain data may be temporarily stored locally on your device to improve the user experience.",
+      "3": "By using the application, you accept future improvements and changes to the system's functionality."
     }
   },
   "map": {

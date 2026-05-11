@@ -76,7 +76,7 @@
         </div>
         <!-- O objektu -->
         <div class="card">
-          <h2>O {{ object?.objectTypeName || 'Objekat' }}u</h2>
+          <h2>O {{ object?.objectTypeName || 'Objekat' }}</h2>
           <p class="description">{{ object.description || 'Opis nije dostupan.' }}</p>
         </div>
 
@@ -243,6 +243,13 @@
                   }
                 </div>
                 <p class="review-text">{{ review.text }}</p>
+                @if (review.images && review.images.length > 0) {
+                  <button type="button" class="review-photos-btn" (click)="openReviewImages(review)">
+                    <mat-icon>photo_library</mat-icon>
+                    <span>Vidi slike ({{ review.images.length }})</span>
+                  </button>
+                }
+
                 @if (review.creatorResponse) {
                   <div class="creator-response">
                     <div class="creator-response-header">
@@ -443,8 +450,24 @@
               (change)="onReviewImagesSelected($event)" 
               hidden>
           </label>
-          <small>{{ selectedReviewImages.length }}/5 slika</small>
+          <small>{{ existingReviewImages.length + selectedReviewImages.length }}/5 slika</small>
         </div>
+        @if (existingReviewImages.length > 0) {
+          <div class="review-preview-grid">
+            @for (img of existingReviewImages; track img.id) {
+              <div class="preview-item">
+                <img [src]="img.url" [alt]="img.altText || 'Review photo'">
+        
+                <button
+                  type="button"
+                  class="remove-preview-btn"
+                  (click)="deleteExistingReviewImage(img.id)">
+                  ×
+                </button>
+              </div>
+            }
+          </div>
+        }
 
         @if (reviewImagePreviews.length > 0) {
           <div class="review-preview-grid">
@@ -466,4 +489,78 @@
       </button>
     </div>
   </div>
+}
+
+  @if (showReviewImagesModal && selectedReviewImagesForModal.length > 0) {
+    <div class="review-images-modal" (click)="closeReviewImages()">
+      <div class="review-images-modal-content" (click)="$event.stopImmediatePropagation()">
+        <button class="modal-close" (click)="closeReviewImages()">
+          <mat-icon>close</mat-icon>
+        </button>
+  
+        <div class="review-modal-image-container">
+          <img
+            [src]="selectedReviewImagesForModal[selectedReviewImageIndex].url"
+            [alt]="selectedReviewImagesForModal[selectedReviewImageIndex].altText || 'Review photo'"
+          />
+        </div>
+  
+        @if (selectedReviewImagesForModal.length > 1) {
+          <button class="review-modal-nav review-modal-nav-left" (click)="prevReviewImage()">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+  
+          <button class="review-modal-nav review-modal-nav-right" (click)="nextReviewImage()">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        }
+  
+        <div class="review-modal-counter">
+          {{ selectedReviewImageIndex + 1 }} / {{ selectedReviewImagesForModal.length }}
+        </div>
+      </div>
+    </div>
+  
+  }
+  
+  
+  @if (showConfirmModal) {
+    <div class="custom-modal-backdrop" (click)="closeConfirm()">
+      <div class="custom-modal" (click)="$event.stopImmediatePropagation()">
+        <h3>Potvrda</h3>
+  
+        <p>{{ confirmMessage }}</p>
+  
+        <div class="custom-modal-actions">
+          <button class="modal-btn modal-btn-secondary" (click)="closeConfirm()">
+            Otkaži
+          </button>
+  
+          <button class="modal-btn modal-btn-primary" (click)="confirmAction()">
+            Potvrdi
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+  
+  
+  @if (showSuccessModal) {
+    <div class="custom-modal-backdrop" (click)="closeSuccess()">
+      <div class="custom-modal custom-modal-success"
+           (click)="$event.stopImmediatePropagation()">
+  
+        <div class="success-icon">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+  
+        <h3>Uspešno</h3>
+  
+        <p>{{ successMessage }}</p>
+  
+        <button class="modal-btn modal-btn-primary" (click)="closeSuccess()">
+          U redu
+        </button>
+      </div>
+    </div>
 }

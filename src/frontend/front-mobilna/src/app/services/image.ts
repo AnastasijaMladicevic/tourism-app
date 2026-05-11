@@ -66,6 +66,7 @@ export class ImageService {
   getAll(): Observable<ImageDto[]> {
     return this.http.get<ImageDto[]>(this.apiUrl);
   }
+
   uploadReviewImages(reviewId: number, files: File[]) {
     const formData = new FormData();
 
@@ -82,6 +83,12 @@ export class ImageService {
   getForReview(reviewId: number) {
     return this.http.get<ImageDto[]>(
       `${environment.apiUrl}/reviews/${reviewId}/images`
+    );
+  }
+
+  deleteReviewImage(reviewId: number, imageId: number): Observable<void> {
+    return this.http.delete<void>(
+      `${environment.apiUrl}/reviews/${reviewId}/images/${imageId}`
     );
   }
 }
