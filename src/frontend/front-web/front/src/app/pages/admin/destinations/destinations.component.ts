@@ -354,6 +354,11 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   }
 
   onEditDestination(row: AdminDestinationRow): void {
+    const pageOutlet = document.querySelector<HTMLElement>('.page-outlet');
+    if (pageOutlet) {
+      pageOutlet.scrollTop = 0;
+    }
+
     this.router.navigate(['/admin/destinations/edit', row.id], {
       state: {
         linkedEntityCounts: {

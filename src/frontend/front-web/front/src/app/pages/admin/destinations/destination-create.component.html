@@ -222,26 +222,22 @@
             [lng]="mapLng"
             [zoom]="9"
             [popupText]="mapPopupText"
-            [interactive]="false"
+            [interactive]="true"
+            (locationSelected)="onMapLocationSelected($event)"
             mapId="admin-destination-create-map"
           ></app-map>
-          <button type="button" class="map-edit-btn" (click)="togglePinEditor()">
-            {{ showPinEditor ? 'Close editor' : 'Edit pin' }}
-          </button>
         </div>
 
-        @if (showPinEditor) {
-          <div class="coord-editor">
-            <label class="form-field">
-              <span class="label">Latitude</span>
-              <input type="number" step="any" [(ngModel)]="form.latitude" placeholder="42.424" />
-            </label>
-            <label class="form-field">
-              <span class="label">Longitude</span>
-              <input type="number" step="any" [(ngModel)]="form.longitude" placeholder="18.771" />
-            </label>
-          </div>
-        }
+        <div class="coord-editor">
+          <label class="form-field">
+            <span class="label">Latitude</span>
+            <input type="number" step="any" [(ngModel)]="form.latitude" placeholder="42.424" />
+          </label>
+          <label class="form-field">
+            <span class="label">Longitude</span>
+            <input type="number" step="any" [(ngModel)]="form.longitude" placeholder="18.771" />
+          </label>
+        </div>
 
         <div class="readonly-field">
           <span class="label">Region (preview)</span>
@@ -323,7 +319,7 @@
               aria-controls="manager-suggestion-list"
             />
           </div>
-          @if (managerSuggestionsOpen && managerSearch.trim().length > 0) {
+          @if (managerSuggestionsOpen) {
             <ul
               id="manager-suggestion-list"
               class="manager-suggestions"

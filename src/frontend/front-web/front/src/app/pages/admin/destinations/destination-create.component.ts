@@ -60,7 +60,6 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   isLoadingRegions = true;
   errorMessage = '';
   draftSavedMessage = '';
-  showPinEditor = false;
   private savedDestinationId: number | null = null;
   editDestinationId: number | null = null;
   isLoadingDestination = false;
@@ -125,6 +124,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.scrollPageToTop();
     const fromState = this.navigationState.linkedEntityCounts;
     if (fromState) {
       this.linkedEntityCounts.objects = Number(fromState.objects ?? 0);
@@ -176,6 +176,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
           this.applyLoadedDestination(destination.destination, destination.images);
         }
         this.cdr.detectChanges();
+        this.scrollPageToTop();
       });
 
     this.managerSearchInput$
@@ -282,14 +283,41 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   }
 
   onManagerSearchInput(value: string): void {
-    this.managerSearchInput$.next(value);
+    const normalized = value.trim();
+    if (!normalized) {
+      this.managerSuggestions = [];
+      this.managerSuggestionsOpen = false;
+      this.managerSuggestionsLoading = false;
+      return;
+    }
+    this.managerSuggestionsOpen = true;
+    this.managerSearchInput$.next(normalized);
   }
 
   onManagerSearchFocus(): void {
     const q = this.managerSearch.trim();
-    if (q.length > 0) {
-      this.managerSearchInput$.next(this.managerSearch);
+    if (!q) {
+      this.managerSuggestionsLoading = true;
+      this.adminUsersService
+        .searchManagers('', 10)
+        .pipe(finalize(() => (this.managerSuggestionsLoading = false)))
+        .subscribe({
+          next: (page) => {
+            const skipId = this.selectedManager?.id;
+            this.managerSuggestions = page.items.filter((u) => u.id !== skipId);
+            this.managerSuggestionsOpen = true;
+            this.cdr.detectChanges();
+          },
+          error: () => {
+            this.managerSuggestions = [];
+            this.managerSuggestionsOpen = true;
+            this.cdr.detectChanges();
+          }
+        });
+      return;
     }
+    this.managerSuggestionsOpen = true;
+    this.managerSearchInput$.next(q);
   }
 
   selectManager(user: AdminUserListItemDto): void {
@@ -359,8 +387,9 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     }
   }
 
-  togglePinEditor(): void {
-    this.showPinEditor = !this.showPinEditor;
+  onMapLocationSelected(position: { lat: number; lng: number }): void {
+    this.form.latitude = Number(position.lat.toFixed(6));
+    this.form.longitude = Number(position.lng.toFixed(6));
   }
 
   addCategory(): void {
@@ -563,6 +592,31 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       }
     }
     return 'Save failed. Please check fields and try again.';
+  }
+
+  private scrollPageToTop(): void {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    // Some layouts use custom scroll containers instead of window.
+    const scrollableContainers = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        '.page-outlet, .main-content, .content, .page-content, .workspace'
+      )
+    );
+    for (const container of scrollableContainers) {
+      container.scrollTop = 0;
+    }
+
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      for (const container of scrollableContainers) {
+        container.scrollTop = 0;
+      }
+    }, 0);
   }
 
   onCancel(): void {

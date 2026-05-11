@@ -1,4 +1,4 @@
-import { Component, Input, AfterViewInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, AfterViewInit, OnDestroy, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import { MapService } from '../../../services/map.service';
@@ -18,6 +18,7 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   @Input() interactive: boolean = false;
   @Input() showMarker: boolean = true;
   @Input() mapId: string = 'map-' + Math.random().toString(36).substr(2, 9); // dinamički ID
+  @Output() locationSelected = new EventEmitter<{ lat: number; lng: number }>();
 
   private marker: L.Marker | null = null;
   private transitionTimeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -62,6 +63,13 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
         map.keyboard.disable();
         map.zoomControl?.remove();
       }
+    } else if (map) {
+      map.on('click', (event: L.LeafletMouseEvent) => {
+        this.lat = event.latlng.lat;
+        this.lng = event.latlng.lng;
+        this.renderMarker();
+        this.locationSelected.emit({ lat: this.lat, lng: this.lng });
+      });
     }
 
     this.renderMarker();
@@ -119,6 +127,18 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     }
 
     this.marker = this.mapService.addMarker(this.lat, this.lng, this.popupText);
+    if (this.interactive && this.marker) {
+      this.marker.dragging?.enable();
+      this.marker.on('dragend', () => {
+        const point = this.marker?.getLatLng();
+        if (!point) {
+          return;
+        }
+        this.lat = point.lat;
+        this.lng = point.lng;
+        this.locationSelected.emit({ lat: this.lat, lng: this.lng });
+      });
+    }
     if (this.marker && this.popupText) {
       this.marker.openPopup();
     }
