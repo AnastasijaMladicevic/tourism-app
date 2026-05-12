@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
+import { CreateUserDto, UserDto } from '../models/user.model';
 
 export interface AdminUserListItemDto {
   id: number;
@@ -64,5 +65,15 @@ export class AdminUsersService {
       sortBy: 'createdAt',
       sortOrder: 'desc'
     });
+  }
+
+  /** Admin-only: creates a user with Manager role (`POST .../users/register-manager`). */
+  createManager(dto: CreateUserDto): Observable<UserDto> {
+    return this.http.post<UserDto>(`${this.apiUrl}/register-manager`, dto);
+  }
+
+  /** Creates a tourist account (`POST .../users/register`). Typically used from signup; admins may use it to add tourists. */
+  createTourist(dto: CreateUserDto): Observable<UserDto> {
+    return this.http.post<UserDto>(`${this.apiUrl}/register`, dto);
   }
 }

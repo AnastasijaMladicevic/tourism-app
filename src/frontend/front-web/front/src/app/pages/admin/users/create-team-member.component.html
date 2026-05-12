@@ -13,6 +13,8 @@
   </header>
 
   <div class="form-shell">
+    <div class="form-feedback error" *ngIf="submitError" role="alert">{{ submitError }}</div>
+
     <!-- Personal Information -->
     <section class="form-section">
       <div class="section-heading">
@@ -52,7 +54,7 @@
 
       <div class="field-grid field-grid--2">
         <label class="field">
-          <span class="field-label">Date of Birth</span>
+          <span class="field-label">Date of Birth <span class="req">*</span></span>
           <div class="input-with-icon">
             <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">calendar_today</span>
             <input type="date" class="input-control input-control--padded" [(ngModel)]="dateOfBirth" />
@@ -164,6 +166,9 @@
             <span class="role-card-desc">Restricted access to asset creation and publishing tools only.</span>
           </button>
         </div>
+        <p class="role-api-note" *ngIf="selectedRole === 'content-creator'">
+          Direct Content Creator signup is not exposed on the API. Use Manager or Tourist to create an account.
+        </p>
       </div>
     </section>
 
@@ -211,13 +216,13 @@
     </section>
 
     <footer class="form-actions">
-      <button type="button" class="btn-cancel" (click)="onCancel()">
+      <button type="button" class="btn-cancel" (click)="onCancel()" [disabled]="isSubmitting">
         <span class="material-symbols-outlined btn-icon" aria-hidden="true">close</span>
         Cancel
       </button>
-      <button type="button" class="btn-primary" (click)="onCreate()">
-        <span class="material-symbols-outlined btn-icon" aria-hidden="true">save</span>
-        Create Team Member
+      <button type="button" class="btn-primary" (click)="onCreate()" [disabled]="isSubmitting">
+        <span class="material-symbols-outlined btn-icon" aria-hidden="true" *ngIf="!isSubmitting">save</span>
+        {{ isSubmitting ? 'Creating…' : 'Create Team Member' }}
       </button>
     </footer>
   </div>

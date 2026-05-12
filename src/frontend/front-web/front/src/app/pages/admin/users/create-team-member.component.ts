@@ -1,7 +1,11 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { finalize } from 'rxjs/operators';
+import { CreateUserDto } from '../../../models/user.model';
+import { AdminUsersService } from '../../../services/admin-users.service';
 
 export type TeamMemberRole = 'manager' | 'content-creator' | 'tourist';
 
@@ -14,6 +18,10 @@ export type TeamMemberRole = 'manager' | 'content-creator' | 'tourist';
 })
 export class CreateTeamMemberComponent {
   private readonly router = inject(Router);
+  private readonly adminUsers = inject(AdminUsersService);
+
+  isSubmitting = false;
+  submitError = '';
 
   firstName = '';
   lastName = '';
@@ -59,8 +67,20 @@ export class CreateTeamMemberComponent {
     'Asia-Pacific'
   ];
 
+  /** Maps UI labels to API `language` codes (max 5 chars per backend). */
+  private readonly languageCodes: Record<string, string> = {
+    'English (US)': 'en',
+    'English (UK)': 'en-GB',
+    German: 'de',
+    French: 'fr',
+    Spanish: 'es',
+    Italian: 'it',
+    Croatian: 'hr'
+  };
+
   selectRole(role: TeamMemberRole): void {
     this.selectedRole = role;
+    this.submitError = '';
   }
 
   get passwordStrengthLabel(): string {
@@ -119,6 +139,86 @@ export class CreateTeamMemberComponent {
   }
 
   onCreate(): void {
-    // UI-only: form submission wired later when API exists.
+    this.submitError = '';
+
+    if (this.selectedRole === 'content-creator') {
+      this.submitError =
+        'The API does not support creating Content Creator accounts from this screen. Choose Manager or Tourist.';
+      return;
+    }
+
+    const first = this.firstName.trim();
+    const last = this.lastName.trim();
+    const email = this.workEmail.trim();
+    if (!first || !last || !email || !this.dateOfBirth) {
+      this.submitError = 'Please fill in first name, last name, work email, and date of birth.';
+      return;
+    }
+    if (!this.password || this.password.length < 6) {
+      this.submitError = 'Password must be at least 6 characters.';
+      return;
+    }
+    if (this.password !== this.confirmPassword) {
+      this.submitError = 'Passwords do not match.';
+      return;
+    }
+
+    const dto = this.buildCreatePayload();
+    this.isSubmitting = true;
+
+    const request$ =
+      this.selectedRole === 'manager'
+        ? this.adminUsers.createManager(dto)
+        : this.adminUsers.createTourist(dto);
+
+    request$
+      .pipe(finalize(() => (this.isSubmitting = false)))
+      .subscribe({
+        next: () => void this.router.navigate(['/admin/users']),
+        error: (err: unknown) => {
+          this.submitError = this.extractApiMessage(err);
+        }
+      });
+  }
+
+  private buildCreatePayload(): CreateUserDto {
+    const language = this.languageCodes[this.preferredLanguage] ?? 'en';
+
+    return {
+      firstName: this.firstName.trim(),
+      lastName: this.lastName.trim(),
+      dateOfBirth: this.dateOfBirth,
+      email: this.workEmail.trim(),
+      password: this.password,
+      phoneNumber: this.phoneNumber.trim(),
+      country: this.country.trim(),
+      language
+    };
+  }
+
+  private extractApiMessage(err: unknown): string {
+    if (err instanceof HttpErrorResponse) {
+      const body = err.error as { message?: string; errors?: Record<string, string[] | string> } | null;
+      if (body && typeof body.message === 'string' && body.message.trim()) {
+        return body.message;
+      }
+      if (body?.errors && typeof body.errors === 'object') {
+        for (const val of Object.values(body.errors)) {
+          if (Array.isArray(val) && val[0]) {
+            return String(val[0]);
+          }
+          if (typeof val === 'string') {
+            return val;
+          }
+        }
+      }
+      if (err.status === 0) {
+        return 'Network error. Check that the API is running.';
+      }
+      if (err.status >= 500) {
+        return 'Server error. Try again later.';
+      }
+    }
+    return 'Could not create user. Please try again.';
   }
 }
