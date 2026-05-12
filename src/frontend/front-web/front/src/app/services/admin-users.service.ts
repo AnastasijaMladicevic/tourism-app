@@ -26,7 +26,7 @@ export interface PagedUsersResultDto {
 @Injectable({ providedIn: 'root' })
 export class AdminUsersService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/Users`;
+  private readonly apiUrl = `${environment.apiUrl}/users`;
 
   getUsers(options?: {
     page?: number;

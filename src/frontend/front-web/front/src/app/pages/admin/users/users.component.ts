@@ -1,12 +1,17 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Observable, forkJoin, of } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { Observable, TimeoutError, forkJoin, of } from 'rxjs';
+import { catchError, finalize, map, switchMap, tap, timeout } from 'rxjs/operators';
 import { AdminUserListItemDto, AdminUsersService } from '../../../services/admin-users.service';
 import { ReviewDto, ReviewService } from '../../../services/review';
 
 const CHART_DAYS = 14;
+const MAX_USER_LIST_PAGES = 40;
+const MAX_REVIEW_LIST_PAGES = 25;
+const USERS_LOAD_TIMEOUT_MS = 90_000;
+const REVIEWS_LOAD_TIMEOUT_MS = 45_000;
 
 @Component({
   selector: 'app-users',
@@ -18,6 +23,8 @@ const CHART_DAYS = 14;
 export class UsersComponent implements OnInit {
   private readonly adminUsersService = inject(AdminUsersService);
   private readonly reviewService = inject(ReviewService);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   isLoading = true;
   loadError = '';
@@ -79,34 +86,56 @@ export class UsersComponent implements OnInit {
     this.isLoading = true;
     this.loadError = '';
 
+    // Load user lists first so the UI can render even if reviews are slow; avoids stuck loading state.
     forkJoin({
       allUsers: this.fetchAllUsers(),
-      tourists: this.fetchAllUsers('Tourist'),
-      reviews: this.fetchAllReviews()
+      tourists: this.fetchAllUsers('Tourist')
     })
       .pipe(
-        map(({ allUsers, tourists, reviews }) => {
-          this.bindUsersData(allUsers, tourists, reviews);
+        takeUntilDestroyed(this.destroyRef),
+        timeout(USERS_LOAD_TIMEOUT_MS),
+        tap(({ allUsers, tourists }) => {
+          this.bindUsersData(allUsers, tourists, []);
+          this.isLoading = false;
+          this.cdr.markForCheck();
         }),
-        catchError(() => {
-          this.loadError = 'Could not load users data. Check API and try again.';
+        switchMap(({ allUsers, tourists }) =>
+          this.fetchAllReviews().pipe(
+            timeout(REVIEWS_LOAD_TIMEOUT_MS),
+            map((reviews) => ({ allUsers, tourists, reviews })),
+            catchError(() => of({ allUsers, tourists, reviews: [] as ReviewDto[] }))
+          )
+        ),
+        tap(({ allUsers, tourists, reviews }) => {
+          this.bindUsersData(allUsers, tourists, reviews);
+          this.cdr.markForCheck();
+        }),
+        catchError((err: unknown) => {
+          if (err instanceof TimeoutError) {
+            this.loadError =
+              'Loading took too long. Check that the API is running and reachable, then try again.';
+          } else {
+            this.loadError = 'Could not load users data. Check API and try again.';
+          }
           return of(null);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.markForCheck();
         })
       )
-      .subscribe(() => {
-        this.isLoading = false;
-      });
+      .subscribe();
   }
 
   private fetchAllUsers(role?: string): Observable<AdminUserListItemDto[]> {
     return this.adminUsersService.getUsers({ page: 1, pageSize: 100, role }).pipe(
       switchMap((firstPage) => {
-        const totalPages = firstPage.totalPages ?? 1;
-        if (totalPages <= 1) {
+        const cappedTotal = this.capTotalPages(firstPage.totalPages, MAX_USER_LIST_PAGES);
+        if (cappedTotal <= 1) {
           return of(firstPage.items ?? []);
         }
 
-        const requests = Array.from({ length: totalPages - 1 }, (_, i) =>
+        const requests = Array.from({ length: cappedTotal - 1 }, (_, i) =>
           this.adminUsersService.getUsers({ page: i + 2, pageSize: 100, role })
         );
 
@@ -127,12 +156,12 @@ export class UsersComponent implements OnInit {
       .getAll({ page: 1, pageSize: 100, sortBy: 'createdAt', sortOrder: 'desc' }, { bypassRegion: true })
       .pipe(
         switchMap((firstPage) => {
-          const totalPages = firstPage.totalPages ?? 1;
-          if (totalPages <= 1) {
+          const cappedTotal = this.capTotalPages(firstPage.totalPages, MAX_REVIEW_LIST_PAGES);
+          if (cappedTotal <= 1) {
             return of(firstPage.items ?? []);
           }
 
-          const requests = Array.from({ length: totalPages - 1 }, (_, i) =>
+          const requests = Array.from({ length: cappedTotal - 1 }, (_, i) =>
             this.reviewService.getAll(
               { page: i + 2, pageSize: 100, sortBy: 'createdAt', sortOrder: 'desc' },
               { bypassRegion: true }
@@ -149,6 +178,14 @@ export class UsersComponent implements OnInit {
         map((value) => (Array.isArray(value) ? value : [])),
         catchError(() => of([]))
       );
+  }
+
+  private capTotalPages(totalPages: number | undefined, maxPages: number): number {
+    const raw = totalPages ?? 1;
+    if (!Number.isFinite(raw) || raw < 1) {
+      return 1;
+    }
+    return Math.min(Math.floor(raw), maxPages);
   }
 
   private bindUsersData(
