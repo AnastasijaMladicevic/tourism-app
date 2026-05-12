@@ -24,10 +24,61 @@ export interface PagedUsersResultDto {
   totalPages: number;
 }
 
+/** Tourists who requested promotion to Content Creator (`GET .../users/creator-requests`). */
+export interface CreatorRoleRequestDto {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  roleName: string;
+  hasRequestedCreatorRole: boolean;
+  isActive: boolean;
+  isVerified: boolean;
+  createdAt: string;
+}
+
+export interface PagedCreatorRequestsResultDto {
+  items: CreatorRoleRequestDto[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminUsersService {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/users`;
+
+  /** Admin-only: tourists with a pending Content Creator role request. */
+  getCreatorRequests(options?: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    isActive?: boolean;
+    isVerified?: boolean;
+  }): Observable<PagedCreatorRequestsResultDto> {
+    let params = new HttpParams()
+      .set('page', String(options?.page ?? 1))
+      .set('pageSize', String(options?.pageSize ?? 10))
+      .set('sortBy', options?.sortBy ?? 'createdAt')
+      .set('sortOrder', options?.sortOrder ?? 'desc');
+
+    const search = options?.search?.trim();
+    if (search) {
+      params = params.set('search', search);
+    }
+    if (options?.isActive !== undefined) {
+      params = params.set('isActive', String(options.isActive));
+    }
+    if (options?.isVerified !== undefined) {
+      params = params.set('isVerified', String(options.isVerified));
+    }
+
+    return this.http.get<PagedCreatorRequestsResultDto>(`${this.apiUrl}/creator-requests`, { params });
+  }
 
   getUsers(options?: {
     page?: number;

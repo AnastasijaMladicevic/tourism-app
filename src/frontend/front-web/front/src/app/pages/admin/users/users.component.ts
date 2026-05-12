@@ -1,11 +1,16 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Observable, TimeoutError, forkJoin, of } from 'rxjs';
+import { EMPTY, Observable, TimeoutError, forkJoin, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap, timeout } from 'rxjs/operators';
-import { AdminUserListItemDto, AdminUsersService } from '../../../services/admin-users.service';
+import {
+  AdminUserListItemDto,
+  AdminUsersService,
+  CreatorRoleRequestDto
+} from '../../../services/admin-users.service';
 import { ReviewDto, ReviewService } from '../../../services/review';
 
 const CHART_DAYS = 14;
@@ -38,6 +43,9 @@ const MAX_USER_LIST_PAGES = 40;
 const MAX_REVIEW_LIST_PAGES = 25;
 const USERS_LOAD_TIMEOUT_MS = 90_000;
 const REVIEWS_LOAD_TIMEOUT_MS = 45_000;
+
+/** While the Tourists tab is open, refetch creator-role requests so new submissions appear without manual refresh. */
+const TOURISTS_TAB_CREATOR_REQUESTS_POLL_MS = 12_000;
 
 type UsersPageViewTab = 'internal' | 'tourists';
 
@@ -140,13 +148,75 @@ export class UsersComponent implements OnInit {
   touristPageSize = 5;
   readonly pageSizeOptions = [5, 10, 20, 50];
 
+  /** Pending Content Creator role requests (Tourists tab). */
+  creatorRequests: CreatorRoleRequestDto[] = [];
+  creatorRequestsLoading = false;
+  creatorRequestsError = '';
+  creatorRequestsApproveError = '';
+  creatorRequestSearch = '';
+  creatorRequestsPage = 1;
+  creatorRequestsPageSize = 5;
+  creatorRequestsTotalCount = 0;
+  creatorRequestsTotalPages = 1;
+  approvingCreatorUserId: number | null = null;
+  private creatorRequestSearchDebounce?: ReturnType<typeof setTimeout>;
+  private creatorRequestsSilentInFlight = false;
+  private touristsTabPollTimer?: ReturnType<typeof setInterval>;
+
+  private readonly onTouristsTabDocumentVisibility = (): void => {
+    if (document.visibilityState !== 'visible' || this.usersViewTab !== 'tourists') {
+      return;
+    }
+    if (this.creatorRequestsLoading || this.approvingCreatorUserId !== null) {
+      return;
+    }
+    this.loadCreatorRequests({ silent: true });
+  };
+
   ngOnInit(): void {
+    this.destroyRef.onDestroy(() => {
+      if (this.creatorRequestSearchDebounce) {
+        clearTimeout(this.creatorRequestSearchDebounce);
+      }
+      this.stopTouristsTabLiveRefresh();
+    });
     this.loadDashboardData();
   }
 
   selectUsersViewTab(tab: UsersPageViewTab): void {
     this.usersViewTab = tab;
     this.originsDemographicsChart = false;
+    if (tab === 'tourists') {
+      this.loadCreatorRequests();
+      this.startTouristsTabLiveRefresh();
+    } else {
+      this.stopTouristsTabLiveRefresh();
+    }
+  }
+
+  private startTouristsTabLiveRefresh(): void {
+    this.stopTouristsTabLiveRefresh();
+    if (typeof window === 'undefined') {
+      return;
+    }
+    document.addEventListener('visibilitychange', this.onTouristsTabDocumentVisibility);
+    this.touristsTabPollTimer = window.setInterval(() => {
+      if (this.usersViewTab !== 'tourists') {
+        return;
+      }
+      if (this.creatorRequestsLoading || this.approvingCreatorUserId !== null) {
+        return;
+      }
+      this.loadCreatorRequests({ silent: true });
+    }, TOURISTS_TAB_CREATOR_REQUESTS_POLL_MS);
+  }
+
+  private stopTouristsTabLiveRefresh(): void {
+    if (this.touristsTabPollTimer !== undefined) {
+      clearInterval(this.touristsTabPollTimer);
+      this.touristsTabPollTimer = undefined;
+    }
+    document.removeEventListener('visibilitychange', this.onTouristsTabDocumentVisibility);
   }
 
   private loadDashboardData(): void {
@@ -571,6 +641,165 @@ export class UsersComponent implements OnInit {
     tourist.avatarLoadFailed = true;
   }
 
+  loadCreatorRequests(options?: { silent?: boolean }): void {
+    const silent = options?.silent === true;
+    if (silent) {
+      if (this.creatorRequestsSilentInFlight || this.creatorRequestsLoading) {
+        return;
+      }
+      this.creatorRequestsSilentInFlight = true;
+    } else {
+      this.creatorRequestsLoading = true;
+      this.creatorRequestsError = '';
+      this.creatorRequestsApproveError = '';
+    }
+    this.adminUsersService
+      .getCreatorRequests({
+        page: this.creatorRequestsPage,
+        pageSize: this.creatorRequestsPageSize,
+        search: this.creatorRequestSearch.trim() || undefined,
+        sortBy: 'createdAt',
+        sortOrder: 'desc'
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError(() => {
+          if (!silent) {
+            this.creatorRequestsError = 'Could not load content creator requests.';
+            return of({
+              items: [] as CreatorRoleRequestDto[],
+              page: 1,
+              pageSize: this.creatorRequestsPageSize,
+              totalCount: 0,
+              totalPages: 0
+            });
+          }
+          return EMPTY;
+        }),
+        finalize(() => {
+          if (silent) {
+            this.creatorRequestsSilentInFlight = false;
+          } else {
+            this.creatorRequestsLoading = false;
+          }
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe((result) => {
+        this.creatorRequests = result.items ?? [];
+        this.creatorRequestsTotalCount =
+          typeof result.totalCount === 'number' && Number.isFinite(result.totalCount) && result.totalCount >= 0
+            ? result.totalCount
+            : this.creatorRequests.length;
+        const pages =
+          typeof result.totalPages === 'number' && Number.isFinite(result.totalPages) && result.totalPages >= 0
+            ? result.totalPages
+            : 0;
+        this.creatorRequestsTotalPages =
+          this.creatorRequestsTotalCount === 0 ? 1 : Math.max(1, pages || Math.ceil(this.creatorRequestsTotalCount / this.creatorRequestsPageSize));
+        this.creatorRequestsPage = Math.min(Math.max(1, result.page || 1), this.creatorRequestsTotalPages);
+        this.cdr.markForCheck();
+      });
+  }
+
+  onCreatorRequestSearchInput(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.creatorRequestSearch = value;
+    if (this.creatorRequestSearchDebounce) {
+      clearTimeout(this.creatorRequestSearchDebounce);
+    }
+    this.creatorRequestSearchDebounce = setTimeout(() => {
+      this.creatorRequestSearchDebounce = undefined;
+      if (this.usersViewTab !== 'tourists') {
+        return;
+      }
+      this.creatorRequestsPage = 1;
+      this.loadCreatorRequests();
+    }, 400);
+  }
+
+  clearCreatorRequestSearch(): void {
+    if (this.creatorRequestSearchDebounce) {
+      clearTimeout(this.creatorRequestSearchDebounce);
+      this.creatorRequestSearchDebounce = undefined;
+    }
+    this.creatorRequestSearch = '';
+    this.creatorRequestsPage = 1;
+    this.loadCreatorRequests();
+  }
+
+  onCreatorRequestsPageSizeChange(value: number | string): void {
+    this.creatorRequestsPageSize = Number(value);
+    this.creatorRequestsPage = 1;
+    this.loadCreatorRequests();
+  }
+
+  onCreatorRequestsPreviousPage(): void {
+    if (this.creatorRequestsPage > 1) {
+      this.creatorRequestsPage--;
+      this.loadCreatorRequests();
+    }
+  }
+
+  onCreatorRequestsNextPage(): void {
+    if (this.creatorRequestsPage < this.creatorRequestsTotalPages) {
+      this.creatorRequestsPage++;
+      this.loadCreatorRequests();
+    }
+  }
+
+  get creatorRequestsPageStart(): number {
+    if (!this.creatorRequestsTotalCount || !this.creatorRequests.length) {
+      return 0;
+    }
+    return (this.creatorRequestsPage - 1) * this.creatorRequestsPageSize + 1;
+  }
+
+  get creatorRequestsPageEnd(): number {
+    return this.creatorRequestsPageStart + this.creatorRequests.length - 1;
+  }
+
+  formatCreatorRequestDate(value?: string): string {
+    return this.formatDate(value);
+  }
+
+  approveCreatorRequest(row: CreatorRoleRequestDto): void {
+    const name = `${row.firstName} ${row.lastName}`.trim() || row.email;
+    if (
+      !window.confirm(
+        `Approve ${name} as a Content Creator? They will be able to create objects, activities, and events for manager review.`
+      )
+    ) {
+      return;
+    }
+    this.approvingCreatorUserId = row.id;
+    this.creatorRequestsApproveError = '';
+    this.adminUsersService
+      .approveCreatorRole(row.id)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError((err: unknown) => {
+          let msg = 'Could not approve this request.';
+          if (err instanceof HttpErrorResponse && err.error && typeof err.error === 'object' && 'message' in err.error) {
+            msg = String((err.error as { message?: string }).message ?? msg);
+          }
+          this.creatorRequestsApproveError = msg;
+          return EMPTY;
+        }),
+        finalize(() => {
+          this.approvingCreatorUserId = null;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe(() => {
+        const nextTotal = Math.max(0, this.creatorRequestsTotalCount - 1);
+        if (this.creatorRequestsPage > 1 && (this.creatorRequestsPage - 1) * this.creatorRequestsPageSize >= nextTotal) {
+          this.creatorRequestsPage--;
+        }
+        this.loadCreatorRequests();
+      });
+  }
+
   /** Rows for the origins sidebar: internal team vs tourists by active tab. */
   get activeOriginsRows(): { name: string; users: number; barPercent: number }[] {
     return this.usersViewTab === 'internal' ? this.topTeamOrigins : this.topOrigins;
@@ -819,7 +1048,7 @@ export class UsersComponent implements OnInit {
     return Math.round(((current - previous) / previous) * 1000) / 10;
   }
 
-  private getInitials(firstName: string, lastName: string): string {
+  getInitials(firstName: string, lastName: string): string {
     return `${(firstName || '').charAt(0)}${(lastName || '').charAt(0)}`.toUpperCase() || 'U';
   }
 
