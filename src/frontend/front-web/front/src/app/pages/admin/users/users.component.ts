@@ -76,6 +76,25 @@ export class UsersComponent implements OnInit {
   chartXLabels: { label: string }[] = [];
   readonly gridLineYs = [0, 25, 50, 75, 100];
 
+  /** Tourist tab: geography-focused chart (signups vs distinct origin countries per day). */
+  touristChartLineSignups = '';
+  touristChartLineDistinctOrigins = '';
+  touristChartAreaSignups = '';
+  touristChartMaxY = 1;
+  touristChartYTopLabel = '1';
+  touristChartYMidLabel = '0';
+  touristChartIsEmpty = false;
+  touristChartSubtitle = '';
+  touristChartXLabels: { label: string }[] = [];
+
+  /** KPIs when Tourists tab is selected. */
+  touristKpiTotal = 0;
+  touristKpiSignupDeltaPercent = 0;
+  touristKpiUniqueReviewers = 0;
+  touristKpiReviewersSharePercent = 0;
+  touristKpiActiveTourists = 0;
+  touristKpiActiveSharePercent = 0;
+
   totalAdmins = 0;
   totalManagers = 0;
   totalContentCreators = 0;
@@ -268,6 +287,27 @@ export class UsersComponent implements OnInit {
       CHART_DAYS
     );
     this.bindChartSeries(dailyTouristSignups, dailyReviews);
+    this.bindTouristGeographyChart(touristsOnly);
+
+    const touristSignupsCurrent = touristsOnly.filter((u) =>
+      this.isInRange(u.createdAt, startCurrentPeriod, now)
+    ).length;
+    const touristSignupsPrevious = touristsOnly.filter((u) =>
+      this.isInRange(u.createdAt, startPreviousPeriod, startCurrentPeriod)
+    ).length;
+    this.touristKpiTotal = touristsOnly.length;
+    this.touristKpiSignupDeltaPercent = this.computePercentDelta(touristSignupsCurrent, touristSignupsPrevious);
+
+    const activeTourists = touristsOnly.filter((u) => u.isActive).length;
+    this.touristKpiActiveTourists = activeTourists;
+    this.touristKpiActiveSharePercent =
+      touristsOnly.length > 0 ? Math.round((activeTourists / touristsOnly.length) * 1000) / 10 : 0;
+
+    const reviewerIds = new Set(reviews.map((r) => r.userId).filter((id) => id != null && Number.isFinite(id)));
+    this.touristKpiUniqueReviewers = reviewerIds.size;
+    const platformTotal = allUsers.length;
+    this.touristKpiReviewersSharePercent =
+      platformTotal > 0 ? Math.round((reviewerIds.size / platformTotal) * 1000) / 10 : 0;
 
     const internalTeam = allUsers.filter((u) => (u.roleName ?? '').toLowerCase() !== 'tourist');
     this.adminMembers = internalTeam.map((u) => ({
@@ -506,6 +546,55 @@ export class UsersComponent implements OnInit {
       ...r,
       barPercent: total > 0 ? Math.round((r.users / total) * 1000) / 10 : 0
     }));
+  }
+
+  private bindTouristGeographyChart(tourists: AdminUserListItemDto[]): void {
+    const dailySignups = this.buildDailyBucketsFromUsers(tourists, CHART_DAYS);
+    const dailyDistinctOrigins = this.buildDailyDistinctOriginCountries(tourists, CHART_DAYS);
+    const sum = (arr: number[]) => arr.reduce((a, b) => a + b, 0);
+    const signupTotal = sum(dailySignups);
+    const maxDistinct = dailyDistinctOrigins.length ? Math.max(...dailyDistinctOrigins) : 0;
+    const maxVal = Math.max(...dailySignups, ...dailyDistinctOrigins, 0);
+    this.touristChartMaxY = Math.max(maxVal, 1);
+    this.touristChartYTopLabel = maxVal === 0 ? '0' : String(maxVal);
+    this.touristChartYMidLabel = maxVal === 0 ? '0' : String(Math.round(maxVal / 2));
+    this.touristChartIsEmpty = maxVal === 0;
+    this.touristChartSubtitle = this.touristChartIsEmpty
+      ? `Last ${CHART_DAYS} days — no tourist registrations with origin data in this window.`
+      : `Last ${CHART_DAYS} days — ${signupTotal} new tourists; up to ${maxDistinct} different origin countries on a single day.`;
+    this.touristChartLineSignups = this.buildLinePath(dailySignups, this.touristChartMaxY);
+    this.touristChartLineDistinctOrigins = this.buildLinePath(dailyDistinctOrigins, this.touristChartMaxY);
+    this.touristChartAreaSignups = this.buildAreaPath(dailySignups, this.touristChartMaxY);
+    this.touristChartXLabels = this.buildChartXLabels(CHART_DAYS);
+  }
+
+  /** Per day, count distinct non-empty origin countries among tourists who registered that day. */
+  private buildDailyDistinctOriginCountries(users: AdminUserListItemDto[], days: number): number[] {
+    const daySets: Set<string>[] = Array.from({ length: days }, () => new Set());
+    const now = new Date();
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    start.setDate(now.getDate() - (days - 1));
+
+    for (const user of users) {
+      const raw = user.createdAt;
+      if (!raw) {
+        continue;
+      }
+      const created = new Date(raw);
+      if (Number.isNaN(created.getTime()) || created < start || created > now) {
+        continue;
+      }
+      const dayIndex = Math.floor((created.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+      if (dayIndex < 0 || dayIndex >= days) {
+        continue;
+      }
+      const c = (user.country ?? '').trim();
+      if (c) {
+        daySets[dayIndex].add(c);
+      }
+    }
+    return daySets.map((s) => s.size);
   }
 
   private bindChartSeries(dailyTouristSignups: number[], dailyReviews: number[]): void {

@@ -106,9 +106,66 @@
   border: 1px solid #e5e7eb;
 }
 
-.kpi-green { background: #eaf6ef; }
-.kpi-blue { background: #eaf2ff; }
-.kpi-yellow { background: #f5f4e6; }
+/* Internal Team tab — tinted cards; text/icons are darker shades of each hue */
+.kpi-card.kpi-internal-a {
+  background: #ecfdf5;
+  border-color: #6ee7b7;
+}
+
+.kpi-card.kpi-internal-a .kpi-icon,
+.kpi-card.kpi-internal-a .kpi-label {
+  color: #047857;
+}
+
+.kpi-card.kpi-internal-a .kpi-value {
+  color: #064e3b;
+}
+
+.kpi-card.kpi-internal-a .kpi-pill {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: #34d399;
+  color: #065f46;
+}
+
+.kpi-card.kpi-internal-b {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+.kpi-card.kpi-internal-b .kpi-icon,
+.kpi-card.kpi-internal-b .kpi-label {
+  color: #1d4ed8;
+}
+
+.kpi-card.kpi-internal-b .kpi-value {
+  color: #1e3a8a;
+}
+
+.kpi-card.kpi-internal-b .kpi-pill {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: #60a5fa;
+  color: #1e40af;
+}
+
+.kpi-card.kpi-internal-c {
+  background: #fef3c7;
+  border-color: #fcd34d;
+}
+
+.kpi-card.kpi-internal-c .kpi-icon,
+.kpi-card.kpi-internal-c .kpi-label {
+  color: #b45309;
+}
+
+.kpi-card.kpi-internal-c .kpi-value {
+  color: #78350f;
+}
+
+.kpi-card.kpi-internal-c .kpi-pill {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: #fbbf24;
+  color: #92400e;
+}
 
 .kpi-top {
   display: flex;
@@ -145,6 +202,67 @@
   font-size: 34px;
   font-weight: 700;
   color: #111827;
+}
+
+/* Tourist tab — distinct tints; labels, values, icons use darker shades of each hue */
+.kpi-card.kpi-tourist-a {
+  background: #fce7f3;
+  border-color: #f9a8d4;
+}
+
+.kpi-card.kpi-tourist-a .kpi-icon,
+.kpi-card.kpi-tourist-a .kpi-label {
+  color: #be185d;
+}
+
+.kpi-card.kpi-tourist-a .kpi-value {
+  color: #831843;
+}
+
+.kpi-card.kpi-tourist-a .kpi-pill {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: #f472b6;
+  color: #9d174d;
+}
+
+.kpi-card.kpi-tourist-b {
+  background: #e0e7ff;
+  border-color: #a5b4fc;
+}
+
+.kpi-card.kpi-tourist-b .kpi-icon,
+.kpi-card.kpi-tourist-b .kpi-label {
+  color: #4338ca;
+}
+
+.kpi-card.kpi-tourist-b .kpi-value {
+  color: #312e81;
+}
+
+.kpi-card.kpi-tourist-b .kpi-pill {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: #818cf8;
+  color: #3730a3;
+}
+
+.kpi-card.kpi-tourist-c {
+  background: #ccfbf1;
+  border-color: #5eead4;
+}
+
+.kpi-card.kpi-tourist-c .kpi-icon,
+.kpi-card.kpi-tourist-c .kpi-label {
+  color: #0f766e;
+}
+
+.kpi-card.kpi-tourist-c .kpi-value {
+  color: #134e4a;
+}
+
+.kpi-card.kpi-tourist-c .kpi-pill {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: #2dd4bf;
+  color: #115e59;
 }
 
 .card {
@@ -245,6 +363,11 @@
   stroke-dasharray: 4 3;
 }
 
+.chart-line--origins {
+  stroke: #059669;
+  stroke-width: 2;
+}
+
 .chart-empty {
   position: absolute;
   inset: 0;
@@ -296,6 +419,10 @@
 
 .chart-dot--reviews {
   background: #7c3aed;
+}
+
+.chart-dot--origins {
+  background: #059669;
 }
 
 .origins-card {

@@ -41,88 +41,188 @@
 
   <div class="dashboard-overview">
     <div class="dashboard-overview-main">
-      <div class="kpi-grid">
-        <article class="kpi-card kpi-green">
-          <div class="kpi-top">
-            <span class="kpi-icon material-symbols-outlined">groups</span>
-            <span class="kpi-pill">{{ totalRegistered | number }}</span>
-          </div>
-          <p class="kpi-label">Total Registered</p>
-          <p class="kpi-value">{{ totalRegistered | number }}</p>
-        </article>
-
-        <article class="kpi-card kpi-blue">
-          <div class="kpi-top">
-            <span class="kpi-icon material-symbols-outlined">trending_up</span>
-            <span class="kpi-pill">{{ activePercentDelta }}%</span>
-          </div>
-          <p class="kpi-label">Active This Period</p>
-          <p class="kpi-value">{{ activeThisPeriod | number }}</p>
-        </article>
-
-        <article class="kpi-card kpi-yellow">
-          <div class="kpi-top">
-            <span class="kpi-icon material-symbols-outlined">public</span>
-            <span class="kpi-pill">{{ countryPercentDelta }}%</span>
-          </div>
-          <p class="kpi-label">New Countries</p>
-          <p class="kpi-value">{{ newCountries }}</p>
-        </article>
-      </div>
-
-      <section class="card chart-card">
-        <div class="card-head">
-          <h3>New tourists &amp; reviews</h3>
-          <p>{{ chartSubtitle }}</p>
-        </div>
-        <div class="chart-placeholder">
-          <div class="chart-main-row">
-            <div class="chart-y-axis" aria-hidden="true">
-              <span>{{ chartYTopLabel }}</span>
-              <span>{{ chartYMidLabel }}</span>
-              <span>0</span>
+      <ng-container *ngIf="usersViewTab === 'internal'">
+        <div class="kpi-grid">
+          <article class="kpi-card kpi-internal-a">
+            <div class="kpi-top">
+              <span class="kpi-icon material-symbols-outlined">groups</span>
+              <span class="kpi-pill">{{ totalRegistered | number }}</span>
             </div>
-            <div class="chart-surface">
-              <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg">
-                <defs>
-                  <linearGradient id="usersSignupAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.22" />
-                    <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
-                  </linearGradient>
-                </defs>
-                <g class="chart-grid">
-                  <line
-                    *ngFor="let gy of gridLineYs"
-                    x1="0"
-                    [attr.y1]="gy"
-                    x2="100"
-                    [attr.y2]="gy"
+            <p class="kpi-label">Total Registered</p>
+            <p class="kpi-value">{{ totalRegistered | number }}</p>
+          </article>
+
+          <article class="kpi-card kpi-internal-b">
+            <div class="kpi-top">
+              <span class="kpi-icon material-symbols-outlined">trending_up</span>
+              <span class="kpi-pill">{{ activePercentDelta }}%</span>
+            </div>
+            <p class="kpi-label">Active This Period</p>
+            <p class="kpi-value">{{ activeThisPeriod | number }}</p>
+          </article>
+
+          <article class="kpi-card kpi-internal-c">
+            <div class="kpi-top">
+              <span class="kpi-icon material-symbols-outlined">public</span>
+              <span class="kpi-pill">{{ countryPercentDelta }}%</span>
+            </div>
+            <p class="kpi-label">New Countries</p>
+            <p class="kpi-value">{{ newCountries }}</p>
+          </article>
+        </div>
+
+        <section class="card chart-card">
+          <div class="card-head">
+            <h3>New tourists &amp; reviews</h3>
+            <p>{{ chartSubtitle }}</p>
+          </div>
+          <div class="chart-placeholder">
+            <div class="chart-main-row">
+              <div class="chart-y-axis" aria-hidden="true">
+                <span>{{ chartYTopLabel }}</span>
+                <span>{{ chartYMidLabel }}</span>
+                <span>0</span>
+              </div>
+              <div class="chart-surface">
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg">
+                  <defs>
+                    <linearGradient id="usersSignupAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.22" />
+                      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <g class="chart-grid">
+                    <line
+                      *ngFor="let gy of gridLineYs"
+                      x1="0"
+                      [attr.y1]="gy"
+                      x2="100"
+                      [attr.y2]="gy"
+                    />
+                  </g>
+                  <path *ngIf="chartAreaSignups" [attr.d]="chartAreaSignups" class="chart-area" fill="url(#usersSignupAreaGrad)" />
+                  <path *ngIf="chartLineReviews" [attr.d]="chartLineReviews" class="chart-line chart-line--reviews" />
+                  <path *ngIf="chartLineSignups" [attr.d]="chartLineSignups" class="chart-line chart-line--signups" />
+                </svg>
+                <div class="chart-empty" *ngIf="chartIsEmpty">No tourist registrations or reviews in the last {{ chartDays }} days.</div>
+              </div>
+            </div>
+            <div class="chart-x-axis" aria-hidden="true">
+              <span *ngFor="let x of chartXLabels">{{ x.label }}</span>
+            </div>
+            <div class="chart-legend">
+              <span class="chart-legend-item"><i class="chart-dot chart-dot--signups"></i> New tourists</span>
+              <span class="chart-legend-item"><i class="chart-dot chart-dot--reviews"></i> Reviews posted</span>
+            </div>
+          </div>
+        </section>
+      </ng-container>
+
+      <ng-container *ngIf="usersViewTab === 'tourists'">
+        <div class="kpi-grid">
+          <article class="kpi-card kpi-tourist-a">
+            <div class="kpi-top">
+              <span class="kpi-icon material-symbols-outlined">travel_explore</span>
+              <span class="kpi-pill">{{ touristKpiSignupDeltaPercent }}%</span>
+            </div>
+            <p class="kpi-label">Registered tourists</p>
+            <p class="kpi-value">{{ touristKpiTotal | number }}</p>
+          </article>
+
+          <article class="kpi-card kpi-tourist-b">
+            <div class="kpi-top">
+              <span class="kpi-icon material-symbols-outlined">rate_review</span>
+              <span class="kpi-pill">{{ touristKpiReviewersSharePercent }}%</span>
+            </div>
+            <p class="kpi-label">Users who posted reviews</p>
+            <p class="kpi-value">{{ touristKpiUniqueReviewers | number }}</p>
+          </article>
+
+          <article class="kpi-card kpi-tourist-c">
+            <div class="kpi-top">
+              <span class="kpi-icon material-symbols-outlined">verified_user</span>
+              <span class="kpi-pill">{{ touristKpiActiveSharePercent }}%</span>
+            </div>
+            <p class="kpi-label">Active tourist accounts</p>
+            <p class="kpi-value">{{ touristKpiActiveTourists | number }}</p>
+          </article>
+        </div>
+
+        <section class="card chart-card">
+          <div class="card-head">
+            <h3>Tourist signups &amp; origin diversity</h3>
+            <p>{{ touristChartSubtitle }}</p>
+          </div>
+          <div class="chart-placeholder">
+            <div class="chart-main-row">
+              <div class="chart-y-axis" aria-hidden="true">
+                <span>{{ touristChartYTopLabel }}</span>
+                <span>{{ touristChartYMidLabel }}</span>
+                <span>0</span>
+              </div>
+              <div class="chart-surface">
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg">
+                  <defs>
+                    <linearGradient id="touristGeoSignupAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.22" />
+                      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <g class="chart-grid">
+                    <line
+                      *ngFor="let gy of gridLineYs"
+                      x1="0"
+                      [attr.y1]="gy"
+                      x2="100"
+                      [attr.y2]="gy"
+                    />
+                  </g>
+                  <path
+                    *ngIf="touristChartAreaSignups"
+                    [attr.d]="touristChartAreaSignups"
+                    class="chart-area"
+                    fill="url(#touristGeoSignupAreaGrad)"
                   />
-                </g>
-                <path *ngIf="chartAreaSignups" [attr.d]="chartAreaSignups" class="chart-area" fill="url(#usersSignupAreaGrad)" />
-                <path *ngIf="chartLineReviews" [attr.d]="chartLineReviews" class="chart-line chart-line--reviews" />
-                <path *ngIf="chartLineSignups" [attr.d]="chartLineSignups" class="chart-line chart-line--signups" />
-              </svg>
-              <div class="chart-empty" *ngIf="chartIsEmpty">No tourist registrations or reviews in the last {{ chartDays }} days.</div>
+                  <path
+                    *ngIf="touristChartLineDistinctOrigins"
+                    [attr.d]="touristChartLineDistinctOrigins"
+                    class="chart-line chart-line--origins"
+                  />
+                  <path
+                    *ngIf="touristChartLineSignups"
+                    [attr.d]="touristChartLineSignups"
+                    class="chart-line chart-line--signups"
+                  />
+                </svg>
+                <div class="chart-empty" *ngIf="touristChartIsEmpty">
+                  No tourist registrations in the last {{ chartDays }} days to chart by country.
+                </div>
+              </div>
+            </div>
+            <div class="chart-x-axis" aria-hidden="true">
+              <span *ngFor="let x of touristChartXLabels">{{ x.label }}</span>
+            </div>
+            <div class="chart-legend">
+              <span class="chart-legend-item"><i class="chart-dot chart-dot--signups"></i> New tourists per day</span>
+              <span class="chart-legend-item"><i class="chart-dot chart-dot--origins"></i> Distinct origin countries (that day)</span>
             </div>
           </div>
-          <div class="chart-x-axis" aria-hidden="true">
-            <span *ngFor="let x of chartXLabels">{{ x.label }}</span>
-          </div>
-          <div class="chart-legend">
-            <span class="chart-legend-item"><i class="chart-dot chart-dot--signups"></i> New tourists</span>
-            <span class="chart-legend-item"><i class="chart-dot chart-dot--reviews"></i> Reviews posted</span>
-          </div>
-        </div>
-      </section>
+        </section>
+      </ng-container>
     </div>
 
     <section class="card origins-card origins-card--sidebar">
       <div class="origins-card-header">
         <span class="material-symbols-outlined origins-globe" aria-hidden="true">public</span>
         <div class="origins-card-titles">
-          <h3>Top Origins</h3>
-          <p>Major geographic sources of tourist traffic.</p>
+          <ng-container *ngIf="usersViewTab === 'internal'">
+            <h3>Top Origins</h3>
+            <p>Major geographic sources of tourist traffic.</p>
+          </ng-container>
+          <ng-container *ngIf="usersViewTab === 'tourists'">
+            <h3>Countries &amp; regions</h3>
+            <p>Where registered tourists are from (share of loaded accounts).</p>
+          </ng-container>
         </div>
       </div>
 
