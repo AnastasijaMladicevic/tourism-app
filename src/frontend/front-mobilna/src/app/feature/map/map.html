@@ -261,35 +261,43 @@
           <div class="add-stop-panel__chips">
             <button
               class="add-stop-panel__chip"
-              [class.add-stop-panel__chip--active]="isAddStopPanelFilterActive('coffee')"
+              [class.add-stop-panel__chip--active]="isAddStopPanelFilterActive('food')"
               type="button"
-              (click)="setAddStopPanelFilter('coffee')"
+              (click)="setAddStopPanelFilter('food')"
             >
-              <mat-icon>local_cafe</mat-icon>Coffee
+              <mat-icon>restaurant</mat-icon>Hrana i piće
             </button>
             <button
               class="add-stop-panel__chip"
-              [class.add-stop-panel__chip--active]="isAddStopPanelFilterActive('gas')"
+              [class.add-stop-panel__chip--active]="isAddStopPanelFilterActive('fuel')"
               type="button"
-              (click)="setAddStopPanelFilter('gas')"
+              (click)="setAddStopPanelFilter('fuel')"
             >
-              <mat-icon>local_gas_station</mat-icon>Gas
+              <mat-icon>local_gas_station</mat-icon>Pumpe
             </button>
             <button
               class="add-stop-panel__chip"
-              [class.add-stop-panel__chip--active]="isAddStopPanelFilterActive('dining')"
+              [class.add-stop-panel__chip--active]="isAddStopPanelFilterActive('accommodation')"
               type="button"
-              (click)="setAddStopPanelFilter('dining')"
+              (click)="setAddStopPanelFilter('accommodation')"
             >
-              <mat-icon>restaurant</mat-icon>Dining
+              <mat-icon>hotel</mat-icon>Smeštaj
             </button>
             <button
               class="add-stop-panel__chip"
-              [class.add-stop-panel__chip--active]="isAddStopPanelFilterActive('sights')"
+              [class.add-stop-panel__chip--active]="isAddStopPanelFilterActive('shopping')"
               type="button"
-              (click)="setAddStopPanelFilter('sights')"
+              (click)="setAddStopPanelFilter('shopping')"
             >
-              <mat-icon>photo_camera</mat-icon>Sights
+              <mat-icon>shopping_bag</mat-icon>Šoping
+            </button>
+            <button
+              class="add-stop-panel__chip"
+              [class.add-stop-panel__chip--active]="isAddStopPanelFilterActive('health')"
+              type="button"
+              (click)="setAddStopPanelFilter('health')"
+            >
+              <mat-icon>local_hospital</mat-icon>Bolnice
             </button>
           </div>
 
@@ -339,24 +347,30 @@
         </div>
 
         <div class="add-stop-panel__preview">
-          <div class="add-stop-panel__preview-map">
-            @if (selectedAddStopResult?.image) {
-              <img
-                class="add-stop-panel__preview-image"
-                [src]="selectedAddStopResult?.image"
-                [alt]="selectedAddStopResult?.name"
-                loading="lazy"
-                decoding="async"
-              />
-            }
-            <div class="add-stop-panel__preview-pin">
-              <mat-icon>place</mat-icon>
-            </div>
+          <div class="add-stop-panel__location-card">
+            <h4>Location</h4>
 
-            <div class="add-stop-panel__preview-copy">
-              <span>Previewing Stop</span>
-              <strong>{{ selectedAddStopResult?.name || 'Choose a stop' }}</strong>
-              <small>Current Route: {{ routeDisplayTitle }}</small>
+            <div
+              class="add-stop-panel__location-map"
+              [attr.data-name]="selectedAddStopResult?.name || 'Choose a stop'"
+            >
+              @if (selectedAddStopPreviewMapUrl) {
+                <iframe
+                  class="add-stop-panel__location-frame"
+                  [src]="selectedAddStopPreviewMapUrl"
+                  title="Selected stop location"
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                ></iframe>
+              } @else {
+                <div class="add-stop-panel__location-placeholder">
+                  <mat-icon>place</mat-icon>
+                </div>
+              }
+
+              <button class="map-btn-overlay" type="button" (click)="viewSelectedAddStopOnMap()">
+                View on map
+              </button>
             </div>
           </div>
         </div>

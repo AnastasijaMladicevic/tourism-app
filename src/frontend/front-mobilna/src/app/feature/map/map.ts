@@ -10,6 +10,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { catchError, firstValueFrom, forkJoin, of, Subscription } from 'rxjs';
 import * as L from 'leaflet';
@@ -70,7 +71,7 @@ interface AddStopPreviewItem {
   lng: number;
 }
 
-type AddStopPanelFilter = 'coffee' | 'gas' | 'dining' | 'sights';
+type AddStopPanelFilter = 'food' | 'fuel' | 'accommodation' | 'shopping' | 'health';
 
 const SEARCH_STOP_WORDS = new Set([
   'gde', 'mogu', 'moze', 'da', 'na', 'sa', 'u', 'uz', 'za', 'od', 'do', 'i', 'ili',
@@ -101,7 +102,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   showAddStopPanel = false;
   addStopPanelQuery = '';
   addStopPanelResults: SearchResult[] = [];
-  activeAddStopPanelFilter: AddStopPanelFilter = 'sights';
+  activeAddStopPanelFilter: AddStopPanelFilter | null = null;
   selectedAddStopResultKey = '';
   totalDistance = 0;
   totalDuration = 0;
@@ -180,6 +181,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     private locationTrackingService: LocationTrackingService,
     private locationIntelligenceService: LocationIntelligenceService,
     private routeBuilderStateService: RouteBuilderStateService,
+    private sanitizer: DomSanitizer,
   ) { }
 
   ngOnInit(): void {
@@ -1192,6 +1194,15 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.addStopPanelResults.find((item) => this.toSearchResultKey(item) === this.selectedAddStopResultKey) ?? null;
   }
 
+  get selectedAddStopPreviewMapUrl(): SafeResourceUrl | null {
+    const item = this.selectedAddStopResult;
+    if (!item?.lat || !item?.lng) {
+      return null;
+    }
+
+    return this.buildAddStopPreviewMapUrl(item.lat, item.lng);
+  }
+
   zoomIn(): void {
     this.mapService.getMap()?.zoomIn();
   }
@@ -1515,7 +1526,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.showAddStopPanel = true;
     this.addStopPanelQuery = '';
-    this.activeAddStopPanelFilter = 'sights';
+    this.activeAddStopPanelFilter = null;
     this.selectedAddStopResultKey = '';
     void this.refreshAddStopPanelResults();
 
@@ -1541,17 +1552,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   setAddStopPanelFilter(filter: AddStopPanelFilter): void {
-    if (this.activeAddStopPanelFilter === filter) {
-      return;
-    }
-
-    this.activeAddStopPanelFilter = filter;
+    this.activeAddStopPanelFilter = this.activeAddStopPanelFilter === filter ? null : filter;
     void this.refreshAddStopPanelResults();
   }
 
   clearAddStopPanelFilters(): void {
     this.addStopPanelQuery = '';
-    this.activeAddStopPanelFilter = 'sights';
+    this.activeAddStopPanelFilter = null;
     void this.refreshAddStopPanelResults();
   }
 
@@ -1576,6 +1583,32 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   openManualMapStopPicking(): void {
     this.closeAddStopPanel();
     this.enableMapStopPicking();
+  }
+
+  viewSelectedAddStopOnMap(): void {
+    const item = this.selectedAddStopResult;
+    if (!item?.lat || !item?.lng) {
+      return;
+    }
+
+    this.closeAddStopPanel();
+    this.clearTemporarySearchMarker();
+    this.mapService.flyTo(item.lat, item.lng, 16);
+
+    if (item.category === 'address') {
+      this.temporarySearchMarker = this.mapService.addMainMapMarker(item.lat, item.lng, item.name);
+      return;
+    }
+
+    const numericId = Number(item.id);
+    if (!Number.isNaN(numericId)) {
+      this.mapService.triggerMarkerClick(item.markerType, numericId, 16);
+      return;
+    }
+
+    this.selectedItem = item.raw;
+    this.selectedType = item.markerType;
+    this.cdr.detectChanges();
   }
 
   isRouteLocationLoading(): boolean {
@@ -1667,28 +1700,41 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private matchesAddStopPanelFilter(item: SearchResult): boolean {
+    if (!this.activeAddStopPanelFilter) {
+      return true;
+    }
+
     switch (this.activeAddStopPanelFilter) {
-      case 'coffee':
-        return item.markerType === 'kafana';
-      case 'gas':
-        return item.markerType === 'gas_station';
-      case 'dining':
+      case 'food':
         return item.markerType === 'restaurant' || item.markerType === 'kafana';
-      case 'sights':
+      case 'fuel':
+        return item.markerType === 'gas_station';
+      case 'accommodation':
+        return item.markerType === 'hotel' || item.markerType === 'apartment';
+      case 'shopping':
+        return ['shop', 'mall', 'market'].includes(item.markerType);
+      case 'health':
+        return ['pharmacy', 'hospital', 'clinic'].includes(item.markerType);
       default:
-        return (
-          item.category === 'destination' ||
-          item.category === 'locality' ||
-          item.category === 'activity' ||
-          item.category === 'event' ||
-          item.markerType === 'attraction' ||
-          item.category === 'address'
-        );
+        return true;
     }
   }
 
   private toSearchResultKey(item: SearchResult): string {
     return `${item.category}:${item.id}`;
+  }
+
+  private buildAddStopPreviewMapUrl(lat: number, lng: number): SafeResourceUrl {
+    const delta = 0.012;
+    const left = lng - delta;
+    const right = lng + delta;
+    const top = lat + delta;
+    const bottom = lat - delta;
+    const url =
+      `https://www.openstreetmap.org/export/embed.html?bbox=${left}%2C${bottom}%2C${right}%2C${top}` +
+      `&layer=mapnik&marker=${lat}%2C${lng}`;
+
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 
   private async selectTopSearchResult(query: string): Promise<void> {

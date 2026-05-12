@@ -20,7 +20,7 @@ import {
 } from '../../services/route-builder-state.service';
 import { environment } from '../../../environment/environment';
 
-type AddStopCategoryKey = 'coffee' | 'atms' | 'restaurants' | 'pharmacy';
+type AddStopCategoryKey = 'food' | 'fuel' | 'accommodation' | 'shopping' | 'health';
 type AddStopResultCategory =
   | 'destination'
   | 'object'
@@ -59,14 +59,15 @@ interface AddStopResult {
 })
 export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
   readonly categories: AddStopCategory[] = [
-    { key: 'coffee', label: 'Coffee', icon: 'coffee' },
-    { key: 'atms', label: 'ATMs', icon: 'credit_card' },
-    { key: 'restaurants', label: 'Restaurants', icon: 'restaurant' },
-    { key: 'pharmacy', label: 'Pharmacy', icon: 'local_hospital' },
+    { key: 'food', label: 'Hrana i piće', icon: 'restaurant' },
+    { key: 'fuel', label: 'Pumpe', icon: 'local_gas_station' },
+    { key: 'accommodation', label: 'Smeštaj', icon: 'hotel' },
+    { key: 'shopping', label: 'Šoping', icon: 'shopping_bag' },
+    { key: 'health', label: 'Bolnice', icon: 'local_hospital' },
   ];
 
   searchQuery = '';
-  activeCategory: AddStopCategoryKey = 'coffee';
+  activeCategory: AddStopCategoryKey | null = null;
   results: AddStopResult[] = [];
   selectedResultKey = '';
   isLoading = true;
@@ -121,17 +122,14 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
   }
 
   setCategory(category: AddStopCategoryKey): void {
-    if (this.activeCategory === category) {
-      return;
-    }
-
-    this.activeCategory = category;
+    this.activeCategory = this.activeCategory === category ? null : category;
     this.visibleResultLimit = this.collapsedResultLimit;
     void this.refreshResults();
   }
 
   clearAll(): void {
     this.searchQuery = '';
+    this.activeCategory = null;
     this.visibleResultLimit = this.collapsedResultLimit;
     void this.refreshResults();
   }
@@ -155,7 +153,7 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
   }
 
   get activeLabel(): string {
-    return this.categories.find((category) => category.key === this.activeCategory)?.label ?? 'Stop';
+    return this.categories.find((category) => category.key === this.activeCategory)?.label ?? 'all';
   }
 
   get routeDisplayTitle(): string {
@@ -348,14 +346,20 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
       return this.searchQuery.trim().length > 0;
     }
 
+    if (!this.activeCategory) {
+      return true;
+    }
+
     switch (this.activeCategory) {
-      case 'coffee':
-        return item.markerType === 'kafana';
-      case 'atms':
-        return item.markerType === 'atm';
-      case 'restaurants':
-        return item.markerType === 'restaurant';
-      case 'pharmacy':
+      case 'food':
+        return item.markerType === 'restaurant' || item.markerType === 'kafana';
+      case 'fuel':
+        return item.markerType === 'gas_station';
+      case 'accommodation':
+        return item.markerType === 'hotel' || item.markerType === 'apartment';
+      case 'shopping':
+        return ['shop', 'mall', 'market'].includes(item.markerType);
+      case 'health':
         return ['pharmacy', 'hospital', 'clinic'].includes(item.markerType);
       default:
         return true;
@@ -476,6 +480,20 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     }
 
     if (
+      normalized.includes('hotel') ||
+      normalized.includes('albergo') ||
+      normalized.includes('resort') ||
+      normalized.includes('hostel') ||
+      normalized.includes('motel')
+    ) {
+      return 'hotel';
+    }
+
+    if (normalized.includes('apartman') || normalized.includes('apartment') || normalized.includes('villa')) {
+      return 'apartment';
+    }
+
+    if (
       normalized.includes('pump') ||
       normalized.includes('gas') ||
       normalized.includes('fuel') ||
@@ -494,6 +512,24 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
 
     if (normalized.includes('klinika') || normalized.includes('clinic') || normalized.includes('dom zdravlja')) {
       return 'clinic';
+    }
+
+    if (
+      normalized.includes('trzni') ||
+      normalized.includes('trznica') ||
+      normalized.includes('mall') ||
+      normalized.includes('shopping')
+    ) {
+      return 'mall';
+    }
+
+    if (
+      normalized.includes('prodavnica') ||
+      normalized.includes('shop') ||
+      normalized.includes('butik') ||
+      normalized.includes('market')
+    ) {
+      return 'shop';
     }
 
     if (

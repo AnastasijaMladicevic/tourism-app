@@ -24,31 +24,8 @@
   height: 5px;
   border-radius: 999px;
   background: #eceff3;
-  margin: 12px auto 14px;
+  margin: 10px auto 10px;
   flex-shrink: 0;
-}
-
-.add-stop-screen__statusbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 26px 14px 30px;
-  color: #111827;
-  font-size: 0.93rem;
-  font-weight: 700;
-  flex-shrink: 0;
-}
-
-.add-stop-screen__status-icons {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-
-  mat-icon {
-    width: 17px;
-    height: 17px;
-    font-size: 17px;
-  }
 }
 
 .add-stop-screen__header {
@@ -56,7 +33,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 0 22px 16px;
+  padding: 0 22px 14px;
   border-bottom: 1px solid #eef2f6;
   flex-shrink: 0;
 }
@@ -171,7 +148,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #13a5e7;
+  color: #168aad;
 }
 
 .add-stop-screen__icon-button mat-icon {
@@ -184,7 +161,7 @@
   display: flex;
   gap: 10px;
   overflow-x: auto;
-  padding-bottom: 2px;
+  padding: 2px 0 4px;
   scrollbar-width: none;
   flex-shrink: 0;
 
@@ -195,18 +172,19 @@
 
 .add-stop-screen__chip {
   flex-shrink: 0;
-  min-height: 40px;
-  padding: 0 16px;
+  min-height: 38px;
+  padding: 0 14px;
   border-radius: 999px;
-  border: 1px solid #e7edf4;
+  border: 1px solid rgba(207, 218, 230, 0.92);
   background: #fff;
   color: #202833;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-size: 0.92rem;
-  font-weight: 700;
+  font-size: 0.96rem;
+  font-weight: 500;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
 
   mat-icon {
     width: 16px;
@@ -216,9 +194,10 @@
 }
 
 .add-stop-screen__chip--active {
-  background: #1598d8;
-  border-color: #1598d8;
+  background: #168aad;
+  border-color: #168aad;
   color: #fff;
+  box-shadow: none;
 }
 
 .add-stop-screen__choose-map {
@@ -251,7 +230,7 @@
   align-items: center;
   justify-content: center;
   background: #e5f5fe;
-  color: #1499db;
+  color: #168aad;
 
   mat-icon {
     width: 20px;
@@ -282,7 +261,7 @@
   button {
     border: none;
     background: transparent;
-    color: #18a8ea;
+    color: #168aad;
     font-size: 0.86rem;
     font-weight: 700;
   }
@@ -316,7 +295,7 @@
 }
 
 .add-stop-screen__recent-item--selected {
-  background: rgba(21, 152, 216, 0.06);
+  background: rgba(22, 138, 173, 0.06);
 }
 
 .add-stop-screen__recent-icon {
@@ -354,7 +333,7 @@
 
   small {
     font-size: 0.79rem;
-    color: #1499db;
+    color: #168aad;
     font-weight: 600;
   }
 }
@@ -362,7 +341,7 @@
 .add-stop-screen__more-link {
   border: none;
   background: transparent;
-  color: #19a9eb;
+  color: #168aad;
   font-size: 0.9rem;
   font-weight: 700;
   text-align: center;
@@ -410,8 +389,8 @@
 }
 
 .add-stop-screen__primary:not(:disabled) {
-  background: linear-gradient(135deg, #1697d8, #157cb0);
-  box-shadow: 0 18px 34px rgba(21, 124, 176, 0.22);
+  background: #168aad;
+  box-shadow: 0 18px 34px rgba(22, 138, 173, 0.22);
   color: #fff;
 }
 
@@ -432,8 +411,8 @@
     padding: 24px;
     background:
       linear-gradient(rgba(245, 247, 251, 0.88), rgba(245, 247, 251, 0.88)),
-      radial-gradient(circle at top left, rgba(20, 184, 255, 0.12), transparent 32%),
-      radial-gradient(circle at bottom right, rgba(21, 124, 176, 0.1), transparent 30%);
+      radial-gradient(circle at top left, rgba(22, 138, 173, 0.12), transparent 32%),
+      radial-gradient(circle at bottom right, rgba(22, 138, 173, 0.1), transparent 30%);
   }
 
   .add-stop-screen {
@@ -444,8 +423,7 @@
     box-shadow: 0 28px 90px rgba(15, 23, 42, 0.18);
   }
 
-  .add-stop-screen__handle,
-  .add-stop-screen__statusbar {
+  .add-stop-screen__handle {
     display: none;
   }
 
@@ -503,18 +481,20 @@
   }
 
   .add-stop-screen__chips {
-    flex-wrap: wrap;
-    overflow: visible;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 6px;
   }
 
   .add-stop-screen__chip {
     min-height: 38px;
-    font-size: 0.92rem;
-    font-weight: 600;
+    font-size: 0.96rem;
+    font-weight: 500;
   }
 
   .add-stop-screen__chip--active {
-    background: linear-gradient(135deg, #14b8ff, #168aad);
+    background: #168aad;
     border-color: transparent;
   }
 
@@ -551,8 +531,8 @@
   }
 
   .add-stop-screen__recent-item--selected {
-    border-color: #1fb6ff;
-    background: #eef9ff;
+    border-color: #168aad;
+    background: rgba(22, 138, 173, 0.08);
   }
 
   .add-stop-screen__preview {
@@ -599,7 +579,7 @@
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #14b8ff, #168aad);
+    background: #168aad;
     color: #fff;
     display: inline-flex;
     align-items: center;
