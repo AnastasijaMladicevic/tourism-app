@@ -73,24 +73,18 @@
 
         <section class="card chart-card">
           <div class="card-head">
-            <h3>New tourists &amp; reviews</h3>
-            <p>{{ chartSubtitle }}</p>
+            <h3>Team activity by role</h3>
+            <p>{{ internalChartSubtitle }}</p>
           </div>
           <div class="chart-placeholder">
             <div class="chart-main-row">
               <div class="chart-y-axis" aria-hidden="true">
-                <span>{{ chartYTopLabel }}</span>
-                <span>{{ chartYMidLabel }}</span>
+                <span>{{ internalChartYTopLabel }}</span>
+                <span>{{ internalChartYMidLabel }}</span>
                 <span>0</span>
               </div>
               <div class="chart-surface">
                 <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg">
-                  <defs>
-                    <linearGradient id="usersSignupAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.22" />
-                      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
-                    </linearGradient>
-                  </defs>
                   <g class="chart-grid">
                     <line
                       *ngFor="let gy of gridLineYs"
@@ -100,19 +94,34 @@
                       [attr.y2]="gy"
                     />
                   </g>
-                  <path *ngIf="chartAreaSignups" [attr.d]="chartAreaSignups" class="chart-area" fill="url(#usersSignupAreaGrad)" />
-                  <path *ngIf="chartLineReviews" [attr.d]="chartLineReviews" class="chart-line chart-line--reviews" />
-                  <path *ngIf="chartLineSignups" [attr.d]="chartLineSignups" class="chart-line chart-line--signups" />
+                  <path
+                    *ngIf="internalChartLineCreators"
+                    [attr.d]="internalChartLineCreators"
+                    class="chart-line chart-line--team-cc"
+                  />
+                  <path
+                    *ngIf="internalChartLineManagers"
+                    [attr.d]="internalChartLineManagers"
+                    class="chart-line chart-line--team-manager"
+                  />
+                  <path
+                    *ngIf="internalChartLineAdmins"
+                    [attr.d]="internalChartLineAdmins"
+                    class="chart-line chart-line--team-admin"
+                  />
                 </svg>
-                <div class="chart-empty" *ngIf="chartIsEmpty">No tourist registrations or reviews in the last {{ chartDays }} days.</div>
+                <div class="chart-empty" *ngIf="internalChartIsEmpty">
+                  No new admin, manager, or content-creator accounts in the last {{ chartDays }} days (from loaded team).
+                </div>
               </div>
             </div>
             <div class="chart-x-axis" aria-hidden="true">
-              <span *ngFor="let x of chartXLabels">{{ x.label }}</span>
+              <span *ngFor="let x of internalChartXLabels">{{ x.label }}</span>
             </div>
-            <div class="chart-legend">
-              <span class="chart-legend-item"><i class="chart-dot chart-dot--signups"></i> New tourists</span>
-              <span class="chart-legend-item"><i class="chart-dot chart-dot--reviews"></i> Reviews posted</span>
+            <div class="chart-legend chart-legend--three">
+              <span class="chart-legend-item"><i class="chart-dot chart-dot--team-admin"></i> Admins</span>
+              <span class="chart-legend-item"><i class="chart-dot chart-dot--team-manager"></i> Managers</span>
+              <span class="chart-legend-item"><i class="chart-dot chart-dot--team-cc"></i> Content creators</span>
             </div>
           </div>
         </section>

@@ -65,15 +65,16 @@ export class UsersComponent implements OnInit {
 
   readonly chartDays = CHART_DAYS;
 
-  chartLineSignups = '';
-  chartLineReviews = '';
-  chartAreaSignups = '';
-  chartMaxY = 1;
-  chartYTopLabel = '1';
-  chartYMidLabel = '0';
-  chartIsEmpty = false;
-  chartSubtitle = '';
-  chartXLabels: { label: string }[] = [];
+  /** Internal Team tab: new accounts per day by role (from loaded team members). */
+  internalChartLineAdmins = '';
+  internalChartLineManagers = '';
+  internalChartLineCreators = '';
+  internalChartMaxY = 1;
+  internalChartYTopLabel = '1';
+  internalChartYMidLabel = '0';
+  internalChartIsEmpty = false;
+  internalChartSubtitle = '';
+  internalChartXLabels: { label: string }[] = [];
   readonly gridLineYs = [0, 25, 50, 75, 100];
 
   /** Tourist tab: geography-focused chart (signups vs distinct origin countries per day). */
@@ -361,12 +362,6 @@ export class UsersComponent implements OnInit {
     this.newCountries = currentCountries.size;
     this.countryPercentDelta = this.computePercentDelta(currentCountries.size, previousCountries.size);
 
-    const dailyTouristSignups = this.buildDailyBucketsFromUsers(touristsOnly, CHART_DAYS);
-    const dailyReviews = this.buildDailyBucketsFromDates(
-      reviews.map((r) => r.createdAt),
-      CHART_DAYS
-    );
-    this.bindChartSeries(dailyTouristSignups, dailyReviews);
     this.bindTouristGeographyChart(touristsOnly);
 
     const touristSignupsCurrent = touristsOnly.filter((u) =>
@@ -407,6 +402,8 @@ export class UsersComponent implements OnInit {
 
     this.topOrigins = this.buildTopOrigins(touristsOnly);
     this.topTeamOrigins = this.buildTopOrigins(internalTeam);
+
+    this.bindInternalTeamActivityChart(internalTeam);
 
     this.totalAdmins = roleTotals.admins;
     this.totalManagers = roleTotals.managers;
@@ -686,23 +683,41 @@ export class UsersComponent implements OnInit {
     return daySets.map((s) => s.size);
   }
 
-  private bindChartSeries(dailyTouristSignups: number[], dailyReviews: number[]): void {
+  /** New internal-team accounts per day in the window, by normalized role name. */
+  private bindInternalTeamActivityChart(internalTeam: AdminUserListItemDto[]): void {
+    const norm = (u: AdminUserListItemDto) =>
+      (u.roleName ?? '')
+        .trim()
+        .toLowerCase()
+        .replace(/[\s-]+/g, '');
+    const dailyAdmins = this.buildDailyBucketsFromUsers(
+      internalTeam.filter((u) => norm(u) === 'admin'),
+      CHART_DAYS
+    );
+    const dailyManagers = this.buildDailyBucketsFromUsers(
+      internalTeam.filter((u) => norm(u) === 'manager'),
+      CHART_DAYS
+    );
+    const dailyCreators = this.buildDailyBucketsFromUsers(
+      internalTeam.filter((u) => norm(u) === 'contentcreator'),
+      CHART_DAYS
+    );
     const sum = (arr: number[]) => arr.reduce((a, b) => a + b, 0);
-    const touristTotal = sum(dailyTouristSignups);
-    const reviewTotal = sum(dailyReviews);
-    const maxVal = Math.max(...dailyTouristSignups, ...dailyReviews, 0);
-    this.chartMaxY = Math.max(maxVal, 1);
-    this.chartYTopLabel = maxVal === 0 ? '0' : String(maxVal);
-    this.chartYMidLabel = maxVal === 0 ? '0' : String(Math.round(maxVal / 2));
-    this.chartIsEmpty = maxVal === 0;
-    this.chartSubtitle = this.chartIsEmpty
-      ? `Last ${CHART_DAYS} days — no tourist registrations or reviews in this window.`
-      : `Last ${CHART_DAYS} days — ${touristTotal} new tourists, ${reviewTotal} reviews.`;
-
-    this.chartLineSignups = this.buildLinePath(dailyTouristSignups, this.chartMaxY);
-    this.chartLineReviews = this.buildLinePath(dailyReviews, this.chartMaxY);
-    this.chartAreaSignups = this.buildAreaPath(dailyTouristSignups, this.chartMaxY);
-    this.chartXLabels = this.buildChartXLabels(CHART_DAYS);
+    const maxVal = Math.max(...dailyAdmins, ...dailyManagers, ...dailyCreators, 0);
+    this.internalChartMaxY = Math.max(maxVal, 1);
+    this.internalChartYTopLabel = maxVal === 0 ? '0' : String(maxVal);
+    this.internalChartYMidLabel = maxVal === 0 ? '0' : String(Math.round(maxVal / 2));
+    this.internalChartIsEmpty = maxVal === 0;
+    const a = sum(dailyAdmins);
+    const m = sum(dailyManagers);
+    const c = sum(dailyCreators);
+    this.internalChartSubtitle = this.internalChartIsEmpty
+      ? `Last ${CHART_DAYS} days — no new admin, manager, or content-creator accounts with a join date in this window (from loaded team).`
+      : `Last ${CHART_DAYS} days — new accounts: ${a} admin, ${m} manager, ${c} content creator (from loaded team).`;
+    this.internalChartLineAdmins = this.buildLinePath(dailyAdmins, this.internalChartMaxY);
+    this.internalChartLineManagers = this.buildLinePath(dailyManagers, this.internalChartMaxY);
+    this.internalChartLineCreators = this.buildLinePath(dailyCreators, this.internalChartMaxY);
+    this.internalChartXLabels = this.buildChartXLabels(CHART_DAYS);
   }
 
   private buildDailyBucketsFromUsers(users: AdminUserListItemDto[], days: number): number[] {

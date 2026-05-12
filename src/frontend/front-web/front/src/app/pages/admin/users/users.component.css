@@ -368,6 +368,22 @@
   stroke-width: 2;
 }
 
+.chart-line--team-admin {
+  stroke: #1d4ed8;
+  stroke-width: 2.25;
+}
+
+.chart-line--team-manager {
+  stroke: #7c3aed;
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+}
+
+.chart-line--team-cc {
+  stroke: #c2410c;
+  stroke-width: 2;
+}
+
 .chart-empty {
   position: absolute;
   inset: 0;
@@ -423,6 +439,18 @@
 
 .chart-dot--origins {
   background: #059669;
+}
+
+.chart-dot--team-admin {
+  background: #1d4ed8;
+}
+
+.chart-dot--team-manager {
+  background: #7c3aed;
+}
+
+.chart-dot--team-cc {
+  background: #c2410c;
 }
 
 .origins-card {
