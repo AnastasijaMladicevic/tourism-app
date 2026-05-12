@@ -1,83 +1,142 @@
-<div class="add-stop-screen">
-  <div class="add-stop-screen__handle" aria-hidden="true"></div>
+<div class="add-stop-screen-shell">
+  <div class="add-stop-screen">
+    <div class="add-stop-screen__handle" aria-hidden="true"></div>
 
-  <div class="add-stop-screen__statusbar" aria-hidden="true">
-    <span>9:41</span>
-    <div class="add-stop-screen__status-icons">
-      <mat-icon>signal_cellular_alt</mat-icon>
-      <mat-icon>wifi</mat-icon>
-      <mat-icon>battery_full</mat-icon>
-    </div>
-  </div>
-
-  <header class="add-stop-screen__header">
-    <div class="add-stop-screen__title">
-      <span class="add-stop-screen__logo">
-        <mat-icon>flash_on</mat-icon>
-      </span>
-      <h1>Add Stop</h1>
+    <div class="add-stop-screen__statusbar" aria-hidden="true">
+      <span>9:41</span>
+      <div class="add-stop-screen__status-icons">
+        <mat-icon>signal_cellular_alt</mat-icon>
+        <mat-icon>wifi</mat-icon>
+        <mat-icon>battery_full</mat-icon>
+      </div>
     </div>
 
-    <button class="add-stop-screen__close" type="button" (click)="close()" aria-label="Close">
-      <mat-icon>close</mat-icon>
-    </button>
-  </header>
+    <header class="add-stop-screen__header">
+      <div class="add-stop-screen__title">
+        <span class="add-stop-screen__logo">
+          <mat-icon>flash_on</mat-icon>
+        </span>
+        <h1>Add Stop</h1>
+      </div>
 
-  <div class="add-stop-screen__content">
-    <div class="add-stop-screen__search">
-      <mat-icon>search</mat-icon>
-      <span>Search for a place...</span>
-      <mat-icon>mic_none</mat-icon>
-    </div>
+      <button class="add-stop-screen__close" type="button" (click)="close()" aria-label="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
 
-    <div class="add-stop-screen__chips">
-      @for (category of categories; track category.label) {
-        <button
-          class="add-stop-screen__chip"
-          type="button"
-          [class.add-stop-screen__chip--active]="category.active"
-        >
-          <mat-icon>{{ category.icon }}</mat-icon>
-          <span>{{ category.label }}</span>
+    <div class="add-stop-screen__desktop-layout">
+      <div class="add-stop-screen__content">
+        <label class="add-stop-screen__search" aria-label="Search for a place">
+          <mat-icon>search</mat-icon>
+          <input
+            type="text"
+            [ngModel]="searchQuery"
+            (ngModelChange)="searchQuery = $event; onSearchChange()"
+            placeholder="Search for a place..."
+          />
+          <button class="add-stop-screen__icon-button" type="button" aria-label="Voice search">
+            <mat-icon>mic_none</mat-icon>
+          </button>
+        </label>
+
+        <div class="add-stop-screen__chips">
+          @for (category of categories; track category.key) {
+            <button
+              class="add-stop-screen__chip"
+              type="button"
+              [class.add-stop-screen__chip--active]="activeCategory === category.key"
+              (click)="setCategory(category.key)"
+            >
+              <mat-icon>{{ category.icon }}</mat-icon>
+              <span>{{ category.label }}</span>
+            </button>
+          }
+        </div>
+
+        <button class="add-stop-screen__choose-map" type="button" (click)="chooseOnMap()">
+          <span class="add-stop-screen__choose-icon">
+            <mat-icon>place</mat-icon>
+          </span>
+          <span class="add-stop-screen__choose-copy">Choose on map</span>
+          <mat-icon>chevron_right</mat-icon>
         </button>
-      }
-    </div>
 
-    <button class="add-stop-screen__choose-map" type="button">
-      <span class="add-stop-screen__choose-icon">
-        <mat-icon>place</mat-icon>
-      </span>
-      <span class="add-stop-screen__choose-copy">Choose on map</span>
-      <mat-icon>chevron_right</mat-icon>
-    </button>
+        <div class="add-stop-screen__section-head">
+          <h2>Recent</h2>
+          <button type="button" (click)="clearAll()">Clear All</button>
+        </div>
 
-    <div class="add-stop-screen__section-head">
-      <h2>Recent</h2>
-      <button type="button">Clear All</button>
-    </div>
-
-    <div class="add-stop-screen__recent-list">
-      @for (item of recentItems; track item.title) {
-        <article class="add-stop-screen__recent-item">
-          <span class="add-stop-screen__recent-icon">
-            <mat-icon>schedule</mat-icon>
-          </span>
-          <span class="add-stop-screen__recent-copy">
-            <strong>{{ item.title }}</strong>
-            <span>{{ item.subtitle }}</span>
-            @if (item.meta) {
-              <small>{{ item.meta }}</small>
+        <div class="add-stop-screen__recent-list">
+          @if (isLoading) {
+            <div class="add-stop-screen__state">Loading {{ activeLabel.toLowerCase() }} stops...</div>
+          } @else if (results.length === 0) {
+            <div class="add-stop-screen__state">No matching places found.</div>
+          } @else {
+            @for (item of results; track item.key) {
+              <button
+                class="add-stop-screen__recent-item"
+                type="button"
+                [class.add-stop-screen__recent-item--selected]="isSelected(item)"
+                (click)="selectResult(item)"
+              >
+                <span class="add-stop-screen__recent-icon">
+                  <mat-icon>{{ item.category === 'address' ? 'near_me' : 'schedule' }}</mat-icon>
+                </span>
+                <span class="add-stop-screen__recent-copy">
+                  <strong>{{ item.name }}</strong>
+                  <span>{{ item.subtitle }}</span>
+                  @if (item.meta) {
+                    <small>{{ item.meta }}</small>
+                  }
+                </span>
+              </button>
             }
-          </span>
-        </article>
-      }
+          }
+        </div>
+
+        @if (hasMoreResults) {
+          <button class="add-stop-screen__more-link" type="button" (click)="showMore()">
+            More from recent history
+          </button>
+        }
+      </div>
+
+      <aside class="add-stop-screen__preview">
+        <div class="add-stop-screen__preview-surface">
+          @if (selectedResult?.image) {
+            <img
+              class="add-stop-screen__preview-image"
+              [src]="selectedResult?.image"
+              [alt]="selectedResult?.name"
+              loading="lazy"
+              decoding="async"
+            />
+          }
+          <div class="add-stop-screen__preview-pin">
+            <mat-icon>place</mat-icon>
+          </div>
+          <div class="add-stop-screen__preview-copy">
+            <span>Previewing Stop</span>
+            <strong>{{ selectedResult?.name || 'Choose a stop' }}</strong>
+            <small>Current Route: {{ routeDisplayTitle }}</small>
+          </div>
+        </div>
+      </aside>
     </div>
 
-    <button class="add-stop-screen__more-link" type="button">More from recent history</button>
+    <footer class="add-stop-screen__footer">
+      <button class="add-stop-screen__cancel" type="button" (click)="close()">Cancel</button>
+      <button
+        class="add-stop-screen__primary"
+        type="button"
+        [disabled]="!canAddToRoute || isSubmitting"
+        (click)="addToRoute()"
+      >
+        @if (canAddToRoute) {
+          <mat-icon>add</mat-icon>
+        }
+        Add to Route
+      </button>
+    </footer>
   </div>
-
-  <footer class="add-stop-screen__footer">
-    <button class="add-stop-screen__primary" type="button" disabled>Add to Route</button>
-    <button class="add-stop-screen__cancel" type="button" (click)="close()">Cancel</button>
-  </footer>
 </div>

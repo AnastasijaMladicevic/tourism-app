@@ -5,10 +5,14 @@
   font-family: 'DM Sans', sans-serif;
 }
 
-.add-stop-screen {
-  width: min(100%, 430px);
+.add-stop-screen-shell {
   min-height: 100dvh;
-  margin: 0 auto;
+  background: #f5f7fb;
+}
+
+.add-stop-screen {
+  width: 100%;
+  min-height: 100dvh;
   background: #fff;
   display: flex;
   flex-direction: column;
@@ -106,6 +110,13 @@
   }
 }
 
+.add-stop-screen__desktop-layout {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
 .add-stop-screen__content {
   flex: 1 1 auto;
   min-height: 0;
@@ -127,17 +138,46 @@
   padding: 0 16px;
   color: #a0acbb;
   font-size: 0.95rem;
+  flex-shrink: 0;
 
   mat-icon {
     width: 19px;
     height: 19px;
     font-size: 19px;
   }
+}
 
-  mat-icon:last-child {
-    margin-left: auto;
-    color: #13a5e7;
-  }
+.add-stop-screen__search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: #1f2937;
+  font: inherit;
+  outline: none;
+}
+
+.add-stop-screen__search input::placeholder {
+  color: #a0acbb;
+}
+
+.add-stop-screen__icon-button {
+  width: 24px;
+  height: 24px;
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #13a5e7;
+}
+
+.add-stop-screen__icon-button mat-icon {
+  width: 19px;
+  height: 19px;
+  font-size: 19px;
 }
 
 .add-stop-screen__chips {
@@ -146,6 +186,7 @@
   overflow-x: auto;
   padding-bottom: 2px;
   scrollbar-width: none;
+  flex-shrink: 0;
 
   &::-webkit-scrollbar {
     display: none;
@@ -191,6 +232,7 @@
   gap: 14px;
   padding: 0 18px;
   color: #1f2937;
+  flex-shrink: 0;
 
   > mat-icon {
     margin-left: auto;
@@ -228,6 +270,7 @@
   align-items: center;
   justify-content: space-between;
   margin-top: 2px;
+  flex-shrink: 0;
 
   h2 {
     margin: 0;
@@ -248,14 +291,32 @@
 .add-stop-screen__recent-list {
   display: grid;
   gap: 0;
+  min-height: 0;
+  align-content: start;
+}
+
+.add-stop-screen__state {
+  padding: 8px 2px 2px;
+  color: #8f9bad;
+  font-size: 0.92rem;
+  line-height: 1.45;
 }
 
 .add-stop-screen__recent-item {
+  width: 100%;
   display: grid;
   grid-template-columns: 40px 1fr;
   gap: 14px;
   align-items: start;
   padding: 11px 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  border-radius: 18px;
+}
+
+.add-stop-screen__recent-item--selected {
+  background: rgba(21, 152, 216, 0.06);
 }
 
 .add-stop-screen__recent-icon {
@@ -308,6 +369,10 @@
   padding: 10px 0 6px;
 }
 
+.add-stop-screen__preview {
+  display: none;
+}
+
 .add-stop-screen__footer {
   flex-shrink: 0;
   padding: 14px 18px max(18px, env(safe-area-inset-bottom));
@@ -332,6 +397,22 @@
   color: #cdd5de;
   font-size: 0.98rem;
   font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+}
+
+.add-stop-screen__primary:not(:disabled) {
+  background: linear-gradient(135deg, #1697d8, #157cb0);
+  box-shadow: 0 18px 34px rgba(21, 124, 176, 0.22);
+  color: #fff;
 }
 
 .add-stop-screen__cancel {
@@ -342,16 +423,245 @@
 }
 
 @media (min-width: 768px) {
-  :host {
+  :host,
+  .add-stop-screen-shell {
+    min-height: 100dvh;
     display: flex;
-    align-items: stretch;
+    align-items: center;
     justify-content: center;
-    padding: 20px 0;
+    padding: 24px;
+    background:
+      linear-gradient(rgba(245, 247, 251, 0.88), rgba(245, 247, 251, 0.88)),
+      radial-gradient(circle at top left, rgba(20, 184, 255, 0.12), transparent 32%),
+      radial-gradient(circle at bottom right, rgba(21, 124, 176, 0.1), transparent 30%);
   }
 
   .add-stop-screen {
-    min-height: calc(100dvh - 40px);
-    border-radius: 0;
-    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+    width: min(100%, 1000px);
+    min-height: min(780px, calc(100dvh - 48px));
+    max-height: calc(100dvh - 48px);
+    border-radius: 28px;
+    box-shadow: 0 28px 90px rgba(15, 23, 42, 0.18);
+  }
+
+  .add-stop-screen__handle,
+  .add-stop-screen__statusbar {
+    display: none;
+  }
+
+  .add-stop-screen__header {
+    padding: 22px 28px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.92);
+  }
+
+  .add-stop-screen__title {
+    gap: 14px;
+
+    h1 {
+      font-size: 1.15rem;
+    }
+  }
+
+  .add-stop-screen__logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+
+    mat-icon {
+      width: 18px;
+      height: 18px;
+      font-size: 18px;
+    }
+  }
+
+  .add-stop-screen__close {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+  }
+
+  .add-stop-screen__desktop-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+    min-height: 0;
+  }
+
+  .add-stop-screen__content {
+    padding: 24px 22px 18px;
+    display: grid;
+    grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
+    gap: 16px;
+    overflow: hidden;
+  }
+
+  .add-stop-screen__search {
+    min-height: 56px;
+    border-radius: 20px;
+    box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.95);
+    padding: 0 18px;
+    font-size: 0.98rem;
+  }
+
+  .add-stop-screen__chips {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  .add-stop-screen__chip {
+    min-height: 38px;
+    font-size: 0.92rem;
+    font-weight: 600;
+  }
+
+  .add-stop-screen__chip--active {
+    background: linear-gradient(135deg, #14b8ff, #168aad);
+    border-color: transparent;
+  }
+
+  .add-stop-screen__choose-map {
+    min-height: 56px;
+    border-radius: 20px;
+    box-shadow: none;
+    border: 2px dashed rgba(203, 213, 225, 0.95);
+    background: #fff;
+    padding: 0 18px;
+  }
+
+  .add-stop-screen__choose-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .add-stop-screen__section-head h2 {
+    font-size: 1rem;
+  }
+
+  .add-stop-screen__recent-list {
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .add-stop-screen__recent-item {
+    grid-template-columns: 36px 1fr;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    background: #fff;
+    margin-bottom: 12px;
+  }
+
+  .add-stop-screen__recent-item--selected {
+    border-color: #1fb6ff;
+    background: #eef9ff;
+  }
+
+  .add-stop-screen__preview {
+    display: block;
+    border-left: 1px solid rgba(226, 232, 240, 0.92);
+    background: linear-gradient(180deg, #f8fafc, #f1f5f9);
+    min-height: 0;
+  }
+
+  .add-stop-screen__preview-surface {
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .add-stop-screen__preview-surface::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.6), transparent 28%),
+      radial-gradient(circle at 70% 35%, rgba(255, 255, 255, 0.45), transparent 24%),
+      linear-gradient(135deg, rgba(226, 232, 240, 0.92), rgba(241, 245, 249, 0.98));
+  }
+
+  .add-stop-screen__preview-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .add-stop-screen__preview-pin,
+  .add-stop-screen__preview-copy {
+    position: relative;
+    z-index: 1;
+  }
+
+  .add-stop-screen__preview-pin {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #14b8ff, #168aad);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 24px 40px rgba(22, 138, 173, 0.26);
+
+    mat-icon {
+      width: 28px;
+      height: 28px;
+      font-size: 28px;
+    }
+  }
+
+  .add-stop-screen__preview-copy {
+    position: absolute;
+    left: 50%;
+    bottom: 96px;
+    transform: translateX(-50%);
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+
+    span,
+    small {
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.78);
+      color: #64748b;
+      font-size: 0.84rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    strong {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #1f2937;
+      white-space: nowrap;
+    }
+  }
+
+  .add-stop-screen__footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    padding: 22px 28px;
+    border-top: 1px solid rgba(226, 232, 240, 0.92);
+  }
+
+  .add-stop-screen__cancel {
+    order: 1;
+    color: #64748b;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .add-stop-screen__primary {
+    order: 2;
+    min-height: 50px;
+    padding: 0 28px;
+    border-radius: 18px;
+    font-size: 1rem;
   }
 }

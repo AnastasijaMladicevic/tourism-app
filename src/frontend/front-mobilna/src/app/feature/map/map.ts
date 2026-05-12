@@ -27,6 +27,7 @@ import {
   LocationIntelligenceService,
   QuietZoneAddressSuggestion,
 } from '../../services/location-intelligence';
+import { RouteBuilderStateService } from '../../services/route-builder-state.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 import { environment } from '../../../environment/environment';
@@ -178,6 +179,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     private activeRegionService: ActiveRegionService,
     private locationTrackingService: LocationTrackingService,
     private locationIntelligenceService: LocationIntelligenceService,
+    private routeBuilderStateService: RouteBuilderStateService,
   ) { }
 
   ngOnInit(): void {
@@ -225,6 +227,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.mapService.initMap('main-map', lat, lng, zoom, { enableClustering: true });
     this.isTracking = this.locationTrackingService.isTrackingEnabled();
     this.applyTrackedLocation(this.locationTrackingService.getCurrentLocation());
+    this.restoreRouteBuilderState();
     if (!state?.lat || !state?.lng) {
       this.focusActiveRegion();
     }
@@ -355,6 +358,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!point) return;
 
     this.routePoints = [point];
+    this.routeBuilderStateService.openPlanner(this.routePoints);
     this.totalDistance = 0;
     this.totalDuration = 0;
     this.isRoutePlannerOpen = true;
@@ -418,6 +422,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.routeSearchResults = [];
     this.routeSearchQuery = '';
     this.showAddStopPanel = false;
+    this.routeBuilderStateService.clearPlanner();
   }
 
   clearDirections(): void {
@@ -1362,6 +1367,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!routePoint) return;
 
     this.routePoints.push(routePoint);
+    this.routeBuilderStateService.updateRoutePoints(this.routePoints);
 
     this.routeSearchQuery = '';
     this.routeSearchResults = [];
@@ -1383,6 +1389,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       event.currentIndex
     );
 
+    this.routeBuilderStateService.updateRoutePoints(this.routePoints);
     void this.calculateRoute();
   }
 
@@ -1399,6 +1406,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   removeRoutePoint(index: number): void {
     this.routePoints.splice(index, 1);
+
+    if (this.routePoints.length === 0) {
+      this.closeRoutePlanner();
+      return;
+    }
+
+    this.routeBuilderStateService.updateRoutePoints(this.routePoints);
     void this.calculateRoute();
   }
 
@@ -1489,6 +1503,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       lng: this.userLocation.lng
     });
 
+    this.routeBuilderStateService.updateRoutePoints(this.routePoints);
     void this.calculateRoute();
   }
 
@@ -1775,5 +1790,31 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     document.documentElement.classList.toggle('route-planner-open', isOpen);
     document.body.classList.toggle('route-planner-open', isOpen);
+  }
+
+  private restoreRouteBuilderState(): void {
+    const restoredRoutePoints = this.routeBuilderStateService.getRoutePoints();
+
+    if (restoredRoutePoints.length > 0) {
+      this.routePoints = restoredRoutePoints.map((point) => ({ ...point }));
+      this.isRoutePlannerOpen = true;
+      this.isRouteListCollapsed = false;
+      this.isRoutePlannerExpanded = false;
+      this.isRoutePickingMode = false;
+      this.routePickingType = 'add';
+      this.routeSearchQuery = '';
+      this.routeSearchResults = [];
+      this.syncRoutePlannerPageState(true);
+
+      if (this.routePoints.length > 1) {
+        void this.calculateRoute();
+      } else {
+        this.clearDirections();
+      }
+    }
+
+    if (this.routeBuilderStateService.consumeMapPickingRequest()) {
+      this.enableMapStopPicking();
+    }
   }
 }
