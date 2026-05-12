@@ -151,23 +151,10 @@
             <span class="role-card-title">Content Creator</span>
             <span class="role-card-desc">Restricted access to asset creation and publishing tools only.</span>
           </button>
-
-          <button
-            type="button"
-            class="role-card"
-            [class.role-card--selected]="selectedRole === 'tourist'"
-            (click)="selectRole('tourist')"
-          >
-            <span class="role-card-check material-symbols-outlined" *ngIf="selectedRole === 'tourist'"
-              >check_circle</span
-            >
-            <span class="material-symbols-outlined role-card-icon">person</span>
-            <span class="role-card-title">Tourist</span>
-            <span class="role-card-desc">Restricted access to asset creation and publishing tools only.</span>
-          </button>
         </div>
         <p class="role-api-note" *ngIf="selectedRole === 'content-creator'">
-          Direct Content Creator signup is not exposed on the API. Use Manager or Tourist to create an account.
+          Direct Content Creator signup is not exposed on the API. Choose Manager to create an account, or promote an
+          existing tourist from Users.
         </p>
       </div>
     </section>

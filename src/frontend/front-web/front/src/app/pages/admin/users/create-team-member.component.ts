@@ -7,7 +7,7 @@ import { finalize } from 'rxjs/operators';
 import { CreateUserDto } from '../../../models/user.model';
 import { AdminUsersService } from '../../../services/admin-users.service';
 
-export type TeamMemberRole = 'manager' | 'content-creator' | 'tourist';
+export type TeamMemberRole = 'manager' | 'content-creator';
 
 @Component({
   selector: 'app-create-team-member',
@@ -143,7 +143,7 @@ export class CreateTeamMemberComponent {
 
     if (this.selectedRole === 'content-creator') {
       this.submitError =
-        'The API does not support creating Content Creator accounts from this screen. Choose Manager or Tourist.';
+        'The API does not support creating Content Creator accounts from this screen. Choose Manager, or promote an existing tourist from Users.';
       return;
     }
 
@@ -166,10 +166,7 @@ export class CreateTeamMemberComponent {
     const dto = this.buildCreatePayload();
     this.isSubmitting = true;
 
-    const request$ =
-      this.selectedRole === 'manager'
-        ? this.adminUsers.createManager(dto)
-        : this.adminUsers.createTourist(dto);
+    const request$ = this.adminUsers.createManager(dto);
 
     request$
       .pipe(finalize(() => (this.isSubmitting = false)))
