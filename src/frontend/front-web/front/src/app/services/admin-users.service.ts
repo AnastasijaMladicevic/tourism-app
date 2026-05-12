@@ -88,4 +88,12 @@ export class AdminUsersService {
   changeUserPassword(id: number, dto: ChangePasswordDto): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.apiUrl}/${id}/change-password`, dto);
   }
+
+  /**
+   * Admin promotes a tourist to Content Creator (`POST .../users/{id}/approve-creator`).
+   * Backend requires the user to be a tourist who has already requested creator access.
+   */
+  approveCreatorRole(id: number): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/${id}/approve-creator`, {});
+  }
 }

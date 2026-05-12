@@ -50,8 +50,14 @@ export class EditTeamMemberComponent {
   password = '';
   confirmPassword = '';
 
-  /** Role from API — display only; cannot be changed via UpdateUserDto. */
+  /** Role from API (updates after reload). */
   displayRole: DisplayRole = 'tourist';
+
+  /** Snapshot of role when the form was loaded — used to decide if Save should call approve-creator. */
+  roleAtLoad: DisplayRole = 'tourist';
+
+  /** For tourists: chosen role before Save (Tourist vs Content Creator). */
+  touristRoleSelection: 'tourist' | 'content-creator' = 'tourist';
 
   country = 'United States';
   preferredLanguage = 'English (US)';
@@ -157,6 +163,23 @@ export class EditTeamMemberComponent {
     this.preferredLanguage = this.languageLabelFromCode(langCode);
 
     this.displayRole = this.mapApiRole(user.roleName ?? '');
+    this.roleAtLoad = this.displayRole;
+    if (this.roleAtLoad === 'tourist') {
+      this.touristRoleSelection = 'tourist';
+    }
+  }
+
+  selectTouristRole(role: 'tourist' | 'content-creator'): void {
+    if (this.displayRole !== 'tourist') {
+      return;
+    }
+    this.touristRoleSelection = role;
+    this.cdr.markForCheck();
+  }
+
+  /** Used in templates for role chip selection without strict-control-flow issues. */
+  isRole(role: DisplayRole): boolean {
+    return this.displayRole === role;
   }
 
   private extractLoadError(err: unknown): string {
@@ -272,6 +295,9 @@ export class EditTeamMemberComponent {
     const updateDto = this.buildUpdatePayload();
     this.isSubmitting = true;
 
+    const promoteTouristToCreator =
+      this.roleAtLoad === 'tourist' && this.touristRoleSelection === 'content-creator';
+
     this.adminUsers
       .updateUser(this.userId, updateDto)
       .pipe(
@@ -285,14 +311,22 @@ export class EditTeamMemberComponent {
             confirmPassword: confirm
           });
         }),
+        switchMap(() => {
+          if (!promoteTouristToCreator) {
+            return of(null);
+          }
+          return this.adminUsers.approveCreatorRole(this.userId);
+        }),
         finalize(() => {
           this.isSubmitting = false;
+          this.cdr.markForCheck();
         })
       )
       .subscribe({
         next: () => void this.router.navigate(['/admin/users']),
         error: (err: unknown) => {
           this.submitError = this.extractApiMessage(err);
+          this.cdr.markForCheck();
         }
       });
   }

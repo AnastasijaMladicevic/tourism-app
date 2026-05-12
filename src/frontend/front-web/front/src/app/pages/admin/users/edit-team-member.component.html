@@ -8,7 +8,13 @@
   <header class="page-intro">
     <h1 class="page-title">Edit Team Member</h1>
     <p class="page-subtitle">
-      Update profile and localization. Role is shown for reference only.
+      Update profile and localization.
+      <ng-container *ngIf="displayRole === 'tourist'">
+        For tourist accounts, choose Tourist or Content Creator below; promotion applies when you save.
+      </ng-container>
+      <ng-container *ngIf="displayRole !== 'tourist'">
+        Role is shown for reference; only tourist→creator promotion is available (see below when editing a tourist).
+      </ng-container>
     </p>
   </header>
 
@@ -128,40 +134,88 @@
         <p class="role-api-note role-api-note--info" *ngIf="displayRole === 'admin'">
           This account has the <strong>Admin</strong> role. Role cannot be changed on this screen.
         </p>
-        <div class="role-cards role-cards--readonly" role="group" aria-label="Primary role (read-only)">
-          <button
-            type="button"
-            class="role-card"
-            disabled
-            [class.role-card--selected]="displayRole === 'manager'"
-          >
-            <span class="material-symbols-outlined role-card-icon">grid_view</span>
-            <span class="role-card-title">Manager</span>
-            <span class="role-card-desc">Full administrative control over teams, hubs, and billing.</span>
-          </button>
 
-          <button
-            type="button"
-            class="role-card"
-            disabled
-            [class.role-card--selected]="displayRole === 'content-creator'"
-          >
-            <span class="material-symbols-outlined role-card-icon">description</span>
-            <span class="role-card-title">Content Creator</span>
-            <span class="role-card-desc">Restricted access to asset creation and publishing tools only.</span>
-          </button>
+        <ng-container *ngIf="displayRole === 'tourist'">
+          <p class="role-api-note role-api-note--info role-tourist-scope-hint">
+            Pick <strong>Tourist</strong> or <strong>Content Creator</strong>. Saving with Content Creator calls the API to approve creator access. That succeeds only if this user has already requested the creator role from their tourist session.
+          </p>
+          <div class="role-cards role-cards--tourist-pair" role="radiogroup" aria-label="Primary role">
+            <button
+              type="button"
+              class="role-card role-card--clickable"
+              [class.role-card--selected]="touristRoleSelection === 'tourist'"
+              (click)="selectTouristRole('tourist')"
+            >
+              <span
+                class="role-card-check material-symbols-outlined"
+                *ngIf="touristRoleSelection === 'tourist'"
+                aria-hidden="true"
+                >check_circle</span>
+              <span class="material-symbols-outlined role-card-icon">person</span>
+              <span class="role-card-title">Tourist</span>
+              <span class="role-card-desc">Standard visitor access. No promotion when you save.</span>
+            </button>
 
-          <button
-            type="button"
-            class="role-card"
-            disabled
-            [class.role-card--selected]="displayRole === 'tourist'"
+            <button
+              type="button"
+              class="role-card role-card--clickable"
+              [class.role-card--selected]="touristRoleSelection === 'content-creator'"
+              (click)="selectTouristRole('content-creator')"
+            >
+              <span
+                class="role-card-check material-symbols-outlined"
+                *ngIf="touristRoleSelection === 'content-creator'"
+                aria-hidden="true"
+                >check_circle</span>
+              <span class="material-symbols-outlined role-card-icon">description</span>
+              <span class="role-card-title">Content Creator</span>
+              <span class="role-card-desc">On save, requests promotion via the server (requires prior creator request).</span>
+            </button>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="displayRole !== 'tourist'">
+          <p
+            class="role-api-note role-api-note--info"
+            *ngIf="displayRole === 'manager' || displayRole === 'content-creator'"
           >
-            <span class="material-symbols-outlined role-card-icon">person</span>
-            <span class="role-card-title">Tourist</span>
-            <span class="role-card-desc">Restricted access to asset creation and publishing tools only.</span>
-          </button>
-        </div>
+            This member’s role cannot be changed here without backend support. You can still update profile fields.
+          </p>
+          <div class="role-cards role-cards--readonly" role="group" aria-label="Primary role (read-only)">
+            <button
+              type="button"
+              class="role-card"
+              disabled
+              [class.role-card--selected]="isRole('manager')"
+            >
+              <span class="material-symbols-outlined role-card-icon">grid_view</span>
+              <span class="role-card-title">Manager</span>
+              <span class="role-card-desc">Full administrative control over teams, hubs, and billing.</span>
+            </button>
+
+            <button
+              type="button"
+              class="role-card"
+              disabled
+              [class.role-card--selected]="isRole('content-creator')"
+            >
+              <span class="material-symbols-outlined role-card-icon">description</span>
+              <span class="role-card-title">Content Creator</span>
+              <span class="role-card-desc">Restricted access to asset creation and publishing tools only.</span>
+            </button>
+
+            <button
+              type="button"
+              class="role-card"
+              disabled
+              [class.role-card--selected]="isRole('tourist')"
+            >
+              <span class="material-symbols-outlined role-card-icon">person</span>
+              <span class="role-card-title">Tourist</span>
+              <span class="role-card-desc">Restricted access to asset creation and publishing tools only.</span>
+            </button>
+          </div>
+        </ng-container>
       </div>
     </section>
 
