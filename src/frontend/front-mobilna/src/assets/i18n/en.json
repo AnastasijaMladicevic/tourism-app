@@ -728,7 +728,14 @@
     "locationLoading": "Locating...",
     "locationConsentTitle": "Turn on location so GPS can work",
     "locationConsentBody": "Location tracking is currently turned off. Tap below to open settings and enable consent for location tracking.",
-    "locationConsentAction": "Click here"
+    "locationConsentAction": "Click here",
+    "filters": {
+      "food": "Food & Drinks",
+      "fuel": "Gas Stations",
+      "accommodation": "Accommodation",
+      "shopping": "Shopping",
+      "health": "Hospitals"
+    }
   },
   "event": {
     "title": "Event",

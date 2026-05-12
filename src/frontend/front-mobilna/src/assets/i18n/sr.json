@@ -728,7 +728,14 @@
     "locationLoading": "Tražimo lokaciju...",
     "locationConsentTitle": "Uključi lokaciju da bi GPS radio",
     "locationConsentBody": "Praćenje lokacije trenutno nije uključeno. Klikni ispod i otvori podešavanja da uključiš saglasnost za praćenje lokacije.",
-    "locationConsentAction": "Klikni ovde"
+    "locationConsentAction": "Klikni ovde",
+    "filters": {
+      "food": "Hrana i piće",
+      "fuel": "Pumpe",
+      "accommodation": "Smeštaj",
+      "shopping": "Šoping",
+      "health": "Bolnice"
+    }
   },
   "event": {
     "title": "Dogadjaj",

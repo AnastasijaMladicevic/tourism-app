@@ -728,7 +728,14 @@
     "locationLoading": "Buscando ubicación...",
     "locationConsentTitle": "Activa la ubicación para que el GPS funcione",
     "locationConsentBody": "El seguimiento de ubicación está desactivado en este momento. Toca abajo para abrir ajustes y activar el consentimiento para el seguimiento de ubicación.",
-    "locationConsentAction": "Haz clic aquí"
+    "locationConsentAction": "Haz clic aquí",
+    "filters": {
+      "food": "Comida y bebida",
+      "fuel": "Gasolineras",
+      "accommodation": "Alojamiento",
+      "shopping": "Compras",
+      "health": "Hospitales"
+    }
   },
   "event": {
     "title": "Evento",

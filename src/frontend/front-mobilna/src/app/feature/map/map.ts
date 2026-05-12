@@ -88,11 +88,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   totalDuration = 0;
   activeFilters: string[] = [];
   filterChips: FilterChip[] = [
-    { key: 'food', label: 'Hrana i piće', icon: '🍽️' },
-    { key: 'fuel', label: 'Pumpe', icon: '⛽' },
-    { key: 'accommodation', label: 'Smeštaj', icon: '🏨' },
-    { key: 'shopping', label: 'Šoping', icon: '🛍️' },
-    { key: 'health', label: 'Bolnice', icon: '🏥' }
+    { key: 'food', label: 'map.filters.food', icon: '🍽️' },
+    { key: 'fuel', label: 'map.filters.fuel', icon: '⛽' },
+    { key: 'accommodation', label: 'map.filters.accommodation', icon: '🏨' },
+    { key: 'shopping', label: 'map.filters.shopping', icon: '🛍️' },
+    { key: 'health', label: 'map.filters.health', icon: '🏥' }
   ];
 
   selectedItem: any = null;

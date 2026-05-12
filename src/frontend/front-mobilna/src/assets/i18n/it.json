@@ -728,7 +728,14 @@
     "locationLoading": "Ricerca posizione...",
     "locationConsentTitle": "Attiva la posizione per usare il GPS",
     "locationConsentBody": "Il tracciamento della posizione è attualmente disattivato. Tocca qui sotto per aprire le impostazioni e attivare il consenso al tracciamento della posizione.",
-    "locationConsentAction": "Clicca qui"
+    "locationConsentAction": "Clicca qui",
+    "filters": {
+      "food": "Cibo e bevande",
+      "fuel": "Stazioni di servizio",
+      "accommodation": "Alloggio",
+      "shopping": "Shopping",
+      "health": "Ospedali"
+    }
   },
   "event": {
     "title": "Evento",
