@@ -1,0 +1,156 @@
+<div class="users-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Users &amp; Roles</h1>
+      <p class="page-subtitle">Manage internal team members and platform access permissions.</p>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="tabs">
+      <button class="tab active">Internal Team</button>
+      <button class="tab">Roles &amp; Permissions</button>
+    </div>
+    <button class="add-btn">+ Add User</button>
+  </div>
+
+  <div class="kpi-grid">
+    <article class="kpi-card kpi-green">
+      <div class="kpi-top">
+        <span class="kpi-icon">👥</span>
+        <span class="kpi-pill">+14.2%</span>
+      </div>
+      <p class="kpi-label">Total Registered</p>
+      <p class="kpi-value">12,482</p>
+    </article>
+
+    <article class="kpi-card kpi-blue">
+      <div class="kpi-top">
+        <span class="kpi-icon">📈</span>
+        <span class="kpi-pill">+8.7%</span>
+      </div>
+      <p class="kpi-label">Active This Period</p>
+      <p class="kpi-value">3,891</p>
+    </article>
+
+    <article class="kpi-card kpi-yellow">
+      <div class="kpi-top">
+        <span class="kpi-icon">🌍</span>
+        <span class="kpi-pill">-3.4%</span>
+      </div>
+      <p class="kpi-label">New Countries</p>
+      <p class="kpi-value">12</p>
+    </article>
+  </div>
+
+  <div class="analytics-grid">
+    <section class="card">
+      <div class="card-head">
+        <h3>Signups by Day</h3>
+        <p>Daily registration trends for the last 14 days.</p>
+      </div>
+      <div class="chart-placeholder">
+        <div class="line"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h3>Top Origins</h3>
+        <p>Major geographic sources of tourist traffic.</p>
+      </div>
+      <ul class="origin-list">
+        <li *ngFor="let item of topOrigins">
+          <span>{{ item.name }}</span>
+          <strong>{{ item.users }} users</strong>
+        </li>
+      </ul>
+      <a class="details-link" href="javascript:void(0)">View Detailed Demographics</a>
+    </section>
+  </div>
+
+  <section class="card">
+    <div class="table-head">
+      <div>
+        <h3>Admin Directory</h3>
+        <p>A list of all users with administrative access to the platform.</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Team Member</th>
+            <th>Role</th>
+            <th>Last Login</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let member of adminMembers">
+            <td>
+              <div class="person">
+                <div class="avatar">{{ member.initials }}</div>
+                <div>
+                  <p class="person-name">{{ member.name }}</p>
+                  <p class="person-email">{{ member.email }}</p>
+                </div>
+              </div>
+            </td>
+            <td><span class="role-pill">{{ member.role }}</span></td>
+            <td>{{ member.lastLogin }}</td>
+            <td><span class="status-pill" [class.pending]="member.status !== 'Active'">{{ member.status }}</span></td>
+            <td class="actions">✎</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="small-kpis">
+    <article class="mini-card">
+      <p>Total Admins</p>
+      <strong>02</strong>
+      <span>+1 since last month</span>
+    </article>
+    <article class="mini-card">
+      <p>Total Managers</p>
+      <strong>03</strong>
+      <span>+1 since last week</span>
+    </article>
+    <article class="mini-card">
+      <p>Total Content Creator</p>
+      <strong>01</strong>
+      <span>+1 since last week</span>
+    </article>
+  </div>
+
+  <section class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tourist</th>
+            <th>Email Address</th>
+            <th>Origin</th>
+            <th>Status</th>
+            <th>Joined Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let tourist of tourists">
+            <td>{{ tourist.name }}</td>
+            <td>{{ tourist.email }}</td>
+            <td>{{ tourist.origin }}</td>
+            <td><span class="status-pill" [class.pending]="tourist.status !== 'active'">{{ tourist.status }}</span></td>
+            <td>{{ tourist.joinedDate }}</td>
+            <td class="actions">✎</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
