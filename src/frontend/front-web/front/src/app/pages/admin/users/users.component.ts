@@ -1,5 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Observable, forkJoin, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { AdminUserListItemDto, AdminUsersService } from '../../../services/admin-users.service';
@@ -10,7 +11,7 @@ const CHART_DAYS = 14;
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.css']
 })
@@ -63,6 +64,12 @@ export class UsersComponent implements OnInit {
 
   adminDirectorySearch = '';
   touristSearch = '';
+
+  adminCurrentPage = 1;
+  adminPageSize = 5;
+  touristCurrentPage = 1;
+  touristPageSize = 5;
+  readonly pageSizeOptions = [5, 10, 20, 50];
 
   ngOnInit(): void {
     this.loadDashboardData();
@@ -232,6 +239,108 @@ export class UsersComponent implements OnInit {
     ]);
   }
 
+  get adminTotalCount(): number {
+    return this.filteredAdminDirectory.length;
+  }
+
+  get adminTotalPages(): number {
+    if (!this.adminTotalCount || this.adminPageSize < 1) {
+      return 1;
+    }
+    return Math.max(1, Math.ceil(this.adminTotalCount / this.adminPageSize));
+  }
+
+  get visibleAdminDirectory() {
+    const page = Math.min(Math.max(1, this.adminCurrentPage), this.adminTotalPages);
+    const start = (page - 1) * this.adminPageSize;
+    return this.filteredAdminDirectory.slice(start, start + this.adminPageSize);
+  }
+
+  get adminPageStart(): number {
+    if (!this.adminTotalCount || !this.visibleAdminDirectory.length) {
+      return 0;
+    }
+    const page = Math.min(Math.max(1, this.adminCurrentPage), this.adminTotalPages);
+    return (page - 1) * this.adminPageSize + 1;
+  }
+
+  get adminPageEnd(): number {
+    return this.adminPageStart + this.visibleAdminDirectory.length - 1;
+  }
+
+  get touristTotalCount(): number {
+    return this.filteredTourists.length;
+  }
+
+  get touristTotalPages(): number {
+    if (!this.touristTotalCount || this.touristPageSize < 1) {
+      return 1;
+    }
+    return Math.max(1, Math.ceil(this.touristTotalCount / this.touristPageSize));
+  }
+
+  get visibleTourists() {
+    const page = Math.min(Math.max(1, this.touristCurrentPage), this.touristTotalPages);
+    const start = (page - 1) * this.touristPageSize;
+    return this.filteredTourists.slice(start, start + this.touristPageSize);
+  }
+
+  get touristPageStart(): number {
+    if (!this.touristTotalCount || !this.visibleTourists.length) {
+      return 0;
+    }
+    const page = Math.min(Math.max(1, this.touristCurrentPage), this.touristTotalPages);
+    return (page - 1) * this.touristPageSize + 1;
+  }
+
+  get touristPageEnd(): number {
+    return this.touristPageStart + this.visibleTourists.length - 1;
+  }
+
+  onAdminSearchInput(event: Event): void {
+    this.adminDirectorySearch = (event.target as HTMLInputElement).value;
+    this.adminCurrentPage = 1;
+  }
+
+  onTouristSearchInput(event: Event): void {
+    this.touristSearch = (event.target as HTMLInputElement).value;
+    this.touristCurrentPage = 1;
+  }
+
+  onAdminPageSizeChange(value: number | string): void {
+    this.adminPageSize = Number(value);
+    this.adminCurrentPage = 1;
+  }
+
+  onTouristPageSizeChange(value: number | string): void {
+    this.touristPageSize = Number(value);
+    this.touristCurrentPage = 1;
+  }
+
+  onAdminPreviousPage(): void {
+    if (this.adminCurrentPage > 1) {
+      this.adminCurrentPage--;
+    }
+  }
+
+  onAdminNextPage(): void {
+    if (this.adminCurrentPage < this.adminTotalPages) {
+      this.adminCurrentPage++;
+    }
+  }
+
+  onTouristPreviousPage(): void {
+    if (this.touristCurrentPage > 1) {
+      this.touristCurrentPage--;
+    }
+  }
+
+  onTouristNextPage(): void {
+    if (this.touristCurrentPage < this.touristTotalPages) {
+      this.touristCurrentPage++;
+    }
+  }
+
   private filterBySearch<T>(rows: T[], query: string, fieldFns: (row: T) => string[]): T[] {
     const q = query.trim().toLowerCase();
     if (!q) {
@@ -244,10 +353,12 @@ export class UsersComponent implements OnInit {
 
   clearAdminSearch(): void {
     this.adminDirectorySearch = '';
+    this.adminCurrentPage = 1;
   }
 
   clearTouristSearch(): void {
     this.touristSearch = '';
+    this.touristCurrentPage = 1;
   }
 
   private buildTopOrigins(users: AdminUserListItemDto[]): { name: string; users: number }[] {

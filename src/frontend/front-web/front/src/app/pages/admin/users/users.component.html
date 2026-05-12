@@ -125,10 +125,10 @@
         placeholder="Search by name, email, role, status…"
         autocomplete="off"
         [value]="adminDirectorySearch"
-        (input)="adminDirectorySearch = $any($event.target).value"
+        (input)="onAdminSearchInput($event)"
       />
-      <span class="table-filter-meta" *ngIf="adminMembers.length">
-        Showing {{ filteredAdminDirectory.length }} of {{ adminMembers.length }}
+      <span class="table-filter-meta" *ngIf="adminMembers.length && adminDirectorySearch.trim()">
+        {{ filteredAdminDirectory.length }} match(es) of {{ adminMembers.length }}
       </span>
       <button
         type="button"
@@ -152,7 +152,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let member of filteredAdminDirectory">
+          <tr *ngFor="let member of visibleAdminDirectory">
             <td>
               <div class="person">
                 <div class="avatar">{{ member.initials }}</div>
@@ -176,6 +176,41 @@
         </tbody>
       </table>
     </div>
+
+    <footer class="table-footer">
+      <p>
+        Showing {{ adminPageStart }} to {{ adminPageEnd }} of {{ adminTotalCount }} team members
+      </p>
+      <div class="pagination-buttons">
+        <label class="page-size-control">
+          <span>Page size</span>
+          <select
+            class="page-size-select"
+            [(ngModel)]="adminPageSize"
+            (ngModelChange)="onAdminPageSizeChange($event)"
+          >
+            <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
+          </select>
+        </label>
+
+        <button
+          type="button"
+          class="ghost-btn slim-btn"
+          (click)="onAdminPreviousPage()"
+          [disabled]="adminCurrentPage <= 1"
+        >
+          Previous
+        </button>
+        <button
+          type="button"
+          class="ghost-btn slim-btn"
+          (click)="onAdminNextPage()"
+          [disabled]="adminCurrentPage >= adminTotalPages"
+        >
+          Next
+        </button>
+      </div>
+    </footer>
   </section>
 
   <div class="small-kpis">
@@ -213,10 +248,10 @@
         placeholder="Search by name, email, origin, status, joined date…"
         autocomplete="off"
         [value]="touristSearch"
-        (input)="touristSearch = $any($event.target).value"
+        (input)="onTouristSearchInput($event)"
       />
-      <span class="table-filter-meta" *ngIf="tourists.length">
-        Showing {{ filteredTourists.length }} of {{ tourists.length }}
+      <span class="table-filter-meta" *ngIf="tourists.length && touristSearch.trim()">
+        {{ filteredTourists.length }} match(es) of {{ tourists.length }}
       </span>
       <button type="button" class="table-search-clear" *ngIf="touristSearch.trim()" (click)="clearTouristSearch()">
         Clear
@@ -236,7 +271,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let tourist of filteredTourists">
+          <tr *ngFor="let tourist of visibleTourists">
             <td>{{ tourist.name }}</td>
             <td>{{ tourist.email }}</td>
             <td>{{ tourist.origin }}</td>
@@ -253,5 +288,40 @@
         </tbody>
       </table>
     </div>
+
+    <footer class="table-footer">
+      <p>
+        Showing {{ touristPageStart }} to {{ touristPageEnd }} of {{ touristTotalCount }} tourists
+      </p>
+      <div class="pagination-buttons">
+        <label class="page-size-control">
+          <span>Page size</span>
+          <select
+            class="page-size-select"
+            [(ngModel)]="touristPageSize"
+            (ngModelChange)="onTouristPageSizeChange($event)"
+          >
+            <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
+          </select>
+        </label>
+
+        <button
+          type="button"
+          class="ghost-btn slim-btn"
+          (click)="onTouristPreviousPage()"
+          [disabled]="touristCurrentPage <= 1"
+        >
+          Previous
+        </button>
+        <button
+          type="button"
+          class="ghost-btn slim-btn"
+          (click)="onTouristNextPage()"
+          [disabled]="touristCurrentPage >= touristTotalPages"
+        >
+          Next
+        </button>
+      </div>
+    </footer>
   </section>
 </div>
