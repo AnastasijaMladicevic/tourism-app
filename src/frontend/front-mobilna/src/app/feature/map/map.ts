@@ -83,6 +83,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   routeSearchQuery = '';
   routeSearchResults: SearchResult[] = [];
   isRoutePlannerOpen = false;
+  isRouteListCollapsed = false;
+  isRoutePlannerExpanded = false;
+  isRoutePlannerDragging = false;
   totalDistance = 0;
   totalDuration = 0;
   activeFilters: string[] = [];
@@ -114,6 +117,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private routeSearchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private temporarySearchMarker: L.Marker | null = null;
+  private routePlannerDragStartY: number | null = null;
+  private routePlannerDragCleanup: (() => void) | null = null;
+  routePlannerDragOffset = 0;
 
   constructor(
     private mapService: MapService,
@@ -203,6 +209,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       clearTimeout(this.routeSearchDebounceTimer);
       this.routeSearchDebounceTimer = null;
     }
+    this.stopRoutePlannerDrag();
+    this.syncRoutePlannerPageState(false);
     this.clearTemporarySearchMarker();
     this.mapService.destroyMap();
   }
@@ -300,9 +308,17 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!point) return;
 
     this.routePoints = [point];
+    this.totalDistance = 0;
+    this.totalDuration = 0;
     this.isRoutePlannerOpen = true;
+    this.isRouteListCollapsed = false;
+    this.isRoutePlannerExpanded = false;
     this.isRoutePickingMode = true;
     this.routePickingType = 'add';
+    this.routeSearchQuery = '';
+    this.routeSearchResults = [];
+    this.syncRoutePlannerPageState(true);
+    this.closeCard();
   }
 
   getDirections(): void {
@@ -349,12 +365,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   clearPlannedRoute(): void {
     this.routePoints = [];
-
-    if (this.routeLine) {
-      this.routeLine.remove();
-      this.routeLine = null;
-    }
-
+    this.clearDirections();
+    this.totalDistance = 0;
+    this.totalDuration = 0;
     this.routeSearchResults = [];
     this.routeSearchQuery = '';
   }
@@ -364,10 +377,16 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.routeLine.remove();
       this.routeLine = null;
     }
+
+    this.totalDistance = 0;
+    this.totalDuration = 0;
   }
 
   async calculateRoute(): Promise<void> {
-    if (this.routePoints.length < 2) return;
+    if (this.routePoints.length < 2) {
+      this.clearDirections();
+      return;
+    }
 
     const coords = this.routePoints
       .map(p => `${p.lng},${p.lat}`)
@@ -1062,6 +1081,56 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     return `${point.name} (${point.type})`;
   }
 
+  get routeDisplayTitle(): string {
+    if (this.routePoints.length === 0) {
+      return 'Plan your route';
+    }
+
+    if (this.routePoints.length === 1) {
+      return this.routePoints[0].name;
+    }
+
+    const extraStops = this.routePoints.length - 1;
+    const extraLabel = extraStops === 1 ? '1 more stop' : `${extraStops} more stops`;
+    return `${this.routePoints[0].name} + ${extraLabel}`;
+  }
+
+  get routeDistanceLabel(): string {
+    if (this.totalDistance <= 0) {
+      return '0 km';
+    }
+
+    return `${this.totalDistance.toFixed(1)} km`;
+  }
+
+  get routeDurationLabel(): string {
+    if (this.totalDuration <= 0) {
+      return '0 min';
+    }
+
+    const roundedMinutes = Math.round(this.totalDuration);
+    const hours = Math.floor(roundedMinutes / 60);
+    const minutes = roundedMinutes % 60;
+
+    if (hours === 0) {
+      return `${minutes} min`;
+    }
+
+    if (minutes === 0) {
+      return `${hours}h`;
+    }
+
+    return `${hours}h ${minutes}m`;
+  }
+
+  get routePlannerTransform(): string | null {
+    if (!this.isRoutePlannerDragging || this.routePlannerDragOffset === 0) {
+      return null;
+    }
+
+    return `translateY(${this.routePlannerDragOffset}px)`;
+  }
+
   zoomIn(): void {
     this.mapService.getMap()?.zoomIn();
   }
@@ -1120,6 +1189,109 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.showDirectionsModal = false;
   }
 
+  onRoutePlannerDragStart(event: PointerEvent): void {
+    if (event.pointerType === 'mouse' && event.button !== 0) {
+      return;
+    }
+
+    event.preventDefault();
+    this.stopRoutePlannerDrag();
+    this.routePlannerDragStartY = event.clientY;
+    this.routePlannerDragOffset = 0;
+    this.isRoutePlannerDragging = true;
+
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      if (this.routePlannerDragStartY == null) {
+        return;
+      }
+
+      const rawDelta = moveEvent.clientY - this.routePlannerDragStartY;
+      const isMovingTowardOtherState =
+        (!this.isRoutePlannerExpanded && rawDelta < 0) ||
+        (this.isRoutePlannerExpanded && rawDelta > 0);
+
+      this.routePlannerDragOffset = isMovingTowardOtherState ? rawDelta : rawDelta * 0.18;
+      this.cdr.detectChanges();
+    };
+
+    const handlePointerEnd = () => {
+      const delta = this.routePlannerDragOffset;
+
+      if (delta <= -60) {
+        this.isRoutePlannerExpanded = true;
+      } else if (delta >= 60) {
+        this.isRoutePlannerExpanded = false;
+      }
+
+      this.stopRoutePlannerDrag();
+      this.cdr.detectChanges();
+    };
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerEnd, { once: true });
+    window.addEventListener('pointercancel', handlePointerEnd, { once: true });
+
+    this.routePlannerDragCleanup = () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerEnd);
+      window.removeEventListener('pointercancel', handlePointerEnd);
+    };
+  }
+
+  toggleRouteListCollapse(): void {
+    this.isRouteListCollapsed = !this.isRouteListCollapsed;
+  }
+
+  focusRouteSearch(): void {
+    const input = document.querySelector('.route-planner__search-input') as HTMLInputElement | null;
+    input?.focus();
+  }
+
+  addFirstRouteSearchResultOrFocus(): void {
+    if (this.routeSearchResults.length > 0) {
+      this.addRoutePoint(this.routeSearchResults[0]);
+      return;
+    }
+
+    this.focusRouteSearch();
+  }
+
+  startPlannedRoute(): void {
+    void this.calculateRoute();
+  }
+
+  optimizeRouteSequence(): void {
+    void this.calculateRoute();
+  }
+
+  enableMapStopPicking(): void {
+    this.isRoutePickingMode = true;
+    this.routePickingType = 'add';
+    this.routeSearchResults = [];
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  }
+
+  getRoutePointMeta(point: RoutePoint, index: number): string {
+    if (index === 0) {
+      return 'Start • 0 km';
+    }
+
+    const previousPoint = this.routePoints[index - 1];
+    if (!previousPoint) {
+      return `Stop ${index + 1}`;
+    }
+
+    const legDistanceKm =
+      L.latLng(previousPoint.lat, previousPoint.lng).distanceTo(L.latLng(point.lat, point.lng)) / 1000;
+    const roundedDistance = legDistanceKm >= 10 ? legDistanceKm.toFixed(0) : legDistanceKm.toFixed(1);
+    const estimatedMinutes = Math.max(1, Math.round((legDistanceKm / 40) * 60));
+
+    return `${estimatedMinutes} min • ${roundedDistance} km`;
+  }
+
   addRoutePoint(result: SearchResult): void {
     if (!result.lat || !result.lng) return;
 
@@ -1133,8 +1305,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.routeSearchQuery = '';
     this.routeSearchResults = [];
-
-    this.calculateRoute();
+    void this.calculateRoute();
   }
 
   showRouteSuggestions(): void {
@@ -1152,18 +1323,22 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       event.currentIndex
     );
 
-    this.calculateRoute();
+    void this.calculateRoute();
   }
 
   closeRoutePlanner(): void {
     this.isRoutePlannerOpen = false;
+    this.isRouteListCollapsed = false;
+    this.isRoutePlannerExpanded = false;
     this.isRoutePickingMode = false;
+    this.syncRoutePlannerPageState(false);
+    this.stopRoutePlannerDrag();
     this.clearPlannedRoute();
   }
 
   removeRoutePoint(index: number): void {
     this.routePoints.splice(index, 1);
-    this.calculateRoute();
+    void this.calculateRoute();
   }
 
   onRouteSearchBlur(): void {
@@ -1172,10 +1347,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.cdr.detectChanges();
     }, 150);
   }
-
-  routeSuggestionsTop = '0px';
-  routeSuggestionsLeft = '16px';
-  routeSuggestionsRight = '16px';
 
   onRouteSearch(): void {
     const query = this.routeSearchQuery.trim();
@@ -1187,13 +1358,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       this.routeSearchResults = [];
       return;
-    }
-    const input = document.querySelector('.route-add input') as HTMLElement;
-    if (input) {
-      const rect = input.getBoundingClientRect();
-      this.routeSuggestionsTop = `${rect.bottom + 6}px`;
-      this.routeSuggestionsLeft = `${rect.left}px`;
-      this.routeSuggestionsRight = `${window.innerWidth - rect.right}px`;
     }
 
     if (this.routeSearchDebounceTimer) {
@@ -1228,7 +1392,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       lng: this.userLocation.lng
     });
 
-    this.calculateRoute();
+    void this.calculateRoute();
   }
 
   isRouteLocationLoading(): boolean {
@@ -1342,5 +1506,25 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.temporarySearchMarker.remove();
     this.temporarySearchMarker = null;
+  }
+
+  private stopRoutePlannerDrag(): void {
+    if (this.routePlannerDragCleanup) {
+      this.routePlannerDragCleanup();
+      this.routePlannerDragCleanup = null;
+    }
+
+    this.routePlannerDragStartY = null;
+    this.routePlannerDragOffset = 0;
+    this.isRoutePlannerDragging = false;
+  }
+
+  private syncRoutePlannerPageState(isOpen: boolean): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    document.documentElement.classList.toggle('route-planner-open', isOpen);
+    document.body.classList.toggle('route-planner-open', isOpen);
   }
 }

@@ -1,5 +1,5 @@
 <div class="map-page">
-  <div class="search-bar">
+  <div class="search-bar" [class.search-bar--hidden]="isRoutePlannerExpanded">
     <div class="search-input">
       <mat-icon>search</mat-icon>
       <input
@@ -32,9 +32,7 @@
             </div>
             <div class="suggestion-item__body">
               <span class="suggestion-item__name">{{ result.name }}</span>
-              <span class="suggestion-item__meta"
-                >{{ result.typeName }} · {{ result.location }}</span
-              >
+              <span class="suggestion-item__meta">{{ result.typeName }} · {{ result.location }}</span>
             </div>
           </div>
         }
@@ -42,7 +40,7 @@
     }
   </div>
 
-  <div class="filter-chips">
+  <div class="filter-chips" [class.filter-chips--hidden]="isRoutePlannerExpanded">
     @for (chip of filterChips; track chip.key) {
       <button
         class="chip"
@@ -56,97 +54,178 @@
   </div>
 
   @if (isRoutePlannerOpen) {
-    <div class="route-planner">
-      <!-- HEADER -->
+    <div
+      class="route-planner"
+      [class.route-planner--expanded]="isRoutePlannerExpanded"
+      [class.route-planner--dragging]="isRoutePlannerDragging"
+      [style.transform]="routePlannerTransform"
+    >
+      <div class="route-planner__drag-surface" (pointerdown)="onRoutePlannerDragStart($event)">
+        <div class="route-planner__handle"></div>
+      </div>
+
       <div class="route-planner__header">
-        <h3>Route</h3>
-        <div class="route-summary">
-          {{ totalDistance | number:'1.1-1' }} km •
-          {{ totalDuration | number:'1.0-0' }} min
+        <div class="route-planner__header-main">
+          <span class="route-planner__badge-icon">
+            <mat-icon>navigation</mat-icon>
+          </span>
+
+          <div class="route-planner__title-block">
+            <span class="route-planner__eyebrow">CURRENT ROUTE</span>
+            <h3>{{ routeDisplayTitle }}</h3>
+          </div>
         </div>
-        <div class="route-planner__actions-top">
-          <button class="icon-btn" (click)="clearPlannedRoute()">
+
+        <div class="route-planner__stats">
+          <span>
+            <mat-icon>schedule</mat-icon>
+            {{ routeDurationLabel }}
+          </span>
+          <span>
+            <mat-icon>place</mat-icon>
+            {{ routeDistanceLabel }}
+          </span>
+          <span class="route-planner__stat-pill">{{ routePoints.length }} Stops</span>
+        </div>
+
+        <div class="route-planner__header-actions">
+          <button class="route-planner__toggle" type="button" (click)="toggleRouteListCollapse()">
+            <mat-icon>{{ isRouteListCollapsed ? 'expand_more' : 'expand_less' }}</mat-icon>
+            {{ isRouteListCollapsed ? 'Show List' : 'Hide List' }}
+          </button>
+
+          <button
+            class="route-planner__primary-btn"
+            type="button"
+            [disabled]="routePoints.length < 2"
+            (click)="startPlannedRoute()"
+          >
+            Start Route
+            <mat-icon>play_arrow</mat-icon>
+          </button>
+
+          <button class="route-planner__icon-btn" type="button" (click)="clearPlannedRoute()">
             <mat-icon>delete</mat-icon>
           </button>
 
-          <button class="icon-btn" (click)="closeRoutePlanner()">
+          <button class="route-planner__icon-btn" type="button" (click)="closeRoutePlanner()">
             <mat-icon>close</mat-icon>
           </button>
         </div>
-        
       </div>
 
-      <!-- LISTA PINOVA -->
-      <div
-        cdkDropList
-        cdkDropListOrientation="horizontal"
-        (cdkDropListDropped)="drop($any($event))"
-        class="route-list"
-      >
-        @for (point of routePoints; track point.id; let i = $index) {
-          <div cdkDrag class="route-item">
-            <div class="drag-handle" cdkDragHandle>
-              <mat-icon>drag_indicator</mat-icon>
+      @if (!isRouteListCollapsed) {
+        <div class="route-planner__body">
+          <div class="route-planner__mobile-header">
+            <h3>Plan Route</h3>
+            <div class="route-planner__mobile-actions">
+              <button class="route-planner__icon-btn route-planner__icon-btn--mobile" type="button" (click)="clearPlannedRoute()">
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button class="route-planner__icon-btn route-planner__icon-btn--mobile" type="button" (click)="closeRoutePlanner()">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="route-planner__add-row">
+            <div class="route-planner__search-anchor">
+              <div class="route-planner__search-box">
+                <mat-icon>search</mat-icon>
+                <input
+                  class="route-planner__search-input"
+                  type="text"
+                  placeholder="Add a stop or destination..."
+                  [(ngModel)]="routeSearchQuery"
+                  (input)="onRouteSearch()"
+                  (keydown.enter)="routeSearchResults.length ? addRoutePoint(routeSearchResults[0]) : focusRouteSearch()"
+                  (blur)="onRouteSearchBlur()"
+                />
+
+                <button class="route-planner__map-pill" type="button" (click)="enableMapStopPicking()">
+                  <mat-icon>place</mat-icon>
+                  Map
+                </button>
+              </div>
+
+              @if (routeSearchResults.length > 0) {
+                <div class="route-suggestions">
+                  @for (r of routeSearchResults; track r.id + ':' + (r.lat ?? 0) + ':' + (r.lng ?? 0)) {
+                    <div class="route-suggestion-item" (mousedown)="addRoutePoint(r)">
+                      <strong>{{ r.name }}</strong>
+                      <span>{{ r.typeName }} · {{ r.location }}</span>
+                    </div>
+                  }
+                </div>
+              }
             </div>
 
-            <div class="route-content">
-              {{ point.name }}
-            </div>
-            <button class="remove-btn" (click)="removeRoutePoint(i)">
-              <mat-icon>close</mat-icon>
+            <button class="route-planner__add-btn" type="button" (click)="addFirstRouteSearchResultOrFocus()">
+              Add Stop
             </button>
           </div>
-        }
-      </div>
 
-      <!-- ADD -->
-      <div class="route-add">
-        <div class="route-controls">
-        <div class="route-search-anchor">
-            <input
-              type="text"
-              placeholder="Add stop or address..."
-              [(ngModel)]="routeSearchQuery"
-              (input)="onRouteSearch()"
-              (keydown.enter)="routeSearchResults.length ? addRoutePoint(routeSearchResults[0]) : null"
-              (blur)="onRouteSearchBlur()"
-            />
-            @if (routeSearchResults.length > 0) {
-              <div class="route-suggestions">
-                @for (r of routeSearchResults; track r.id + ':' + (r.lat ?? 0) + ':' + (r.lng ?? 0)) {
-                  <div class="route-suggestion-item" (mousedown)="addRoutePoint(r)">
-                    <strong>{{ r.name }}</strong>
-                    <span>{{ r.typeName }} · {{ r.location }}</span>
-                  </div>
-                }
-              </div>
+          <div class="route-planner__helper-row">
+            <button
+              class="route-planner__ghost-btn"
+              type="button"
+              [disabled]="isRouteLocationLoading()"
+              (click)="addMyLocationAsStart()"
+            >
+              <mat-icon>my_location</mat-icon>
+              {{
+                (isRouteLocationLoading()
+                  ? 'map.locationLoading'
+                  : 'map.useMyLocation') | translate
+              }}
+            </button>
+          </div>
+
+          <div
+            cdkDropList
+            cdkDropListOrientation="vertical"
+            (cdkDropListDropped)="drop($any($event))"
+            class="route-planner__list"
+          >
+            @for (point of routePoints; track point.id + ':' + $index; let i = $index) {
+              <article cdkDrag class="route-stop-card">
+                <div class="route-stop-card__rail">
+                  <span class="route-stop-card__order">{{ i + 1 }}</span>
+                  @if (i < routePoints.length - 1) {
+                    <span class="route-stop-card__connector"></span>
+                  }
+                </div>
+
+                <div class="route-stop-card__body">
+                  <strong>{{ point.name }}</strong>
+                  <span>{{ getRoutePointMeta(point, i) }}</span>
+                </div>
+
+                <button class="route-stop-card__grip" type="button" cdkDragHandle aria-label="Reorder stop">
+                  <mat-icon>drag_indicator</mat-icon>
+                </button>
+
+                <button class="route-stop-card__remove" type="button" (click)="removeRoutePoint(i)">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </article>
             }
           </div>
-          <button
-            class="route-gps"
-            type="button"
-            [disabled]="isRouteLocationLoading()"
-            (click)="addMyLocationAsStart()"
-          >
-            <mat-icon>my_location</mat-icon>
-            {{
-              (isRouteLocationLoading()
-                ? 'map.locationLoading'
-                : 'map.useMyLocation') | translate
-            }}
-          </button>
-          <button class="route-planner__btn" (click)="calculateRoute()">
-            <mat-icon>alt_route</mat-icon>
-            Show Route
-          </button>
+
+          @if (routePoints.length > 1) {
+            <button class="route-planner__mobile-start" type="button" (click)="startPlannedRoute()">
+              Start Route
+              <mat-icon>play_arrow</mat-icon>
+            </button>
+          }
         </div>
-      </div>
+      }
     </div>
   }
 
   <div id="main-map" class="main-map"></div>
 
-  <div class="map-controls">
+  <div class="map-controls" [class.map-controls--hidden]="isRoutePlannerExpanded">
     <button
       class="control-btn gps-btn"
       (click)="toggleGpsTracking()"
@@ -190,7 +269,7 @@
     </div>
   }
 
-  @if (selectedItem) {
+  @if (selectedItem && !isRoutePlannerOpen) {
     <div class="bottom-card" (click)="$event.stopPropagation()">
       <button class="bottom-card__close" (click)="closeCard()">
         <mat-icon>close</mat-icon>
