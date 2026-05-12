@@ -848,19 +848,18 @@ th {
   object-fit: cover;
 }
 
-.tourist-avatar-placeholder {
+.tourist-avatar-initials {
   display: grid;
   place-items: center;
   width: 100%;
   height: 100%;
-  padding: 2px;
   box-sizing: border-box;
-}
-
-.tourist-avatar-svg {
-  width: 100%;
-  height: 100%;
-  display: block;
+  border-radius: 50%;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .person-name {
@@ -1098,12 +1097,15 @@ th {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 76px;
   padding: 10px 14px;
   border-radius: 10px;
   background: #eef2ff;
   border: 1px solid #c7d2fe;
+  text-align: center;
 }
 
 .creator-requests-count-label {
@@ -1112,6 +1114,7 @@ th {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #4338ca;
+  width: 100%;
 }
 
 .creator-requests-count {
@@ -1120,6 +1123,7 @@ th {
   color: #312e81;
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
+  width: 100%;
 }
 
 .creator-requests-toolbar {
@@ -1156,10 +1160,14 @@ th {
 }
 
 .creator-requests-actions {
-  display: flex;
+  white-space: nowrap;
+}
+
+.creator-requests-action-buttons {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
+  flex-wrap: nowrap;
 }
 
 .approve-creator-btn {
@@ -1182,6 +1190,21 @@ th {
   opacity: 0.45;
   cursor: not-allowed;
   box-shadow: none;
+}
+
+.deny-creator-btn {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: default;
+  color: #374151;
+  background: #ffffff;
+}
+
+.deny-creator-btn:hover {
+  background: #f9fafb;
 }
 
 @media (max-width: 920px) {

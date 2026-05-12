@@ -133,7 +133,6 @@ export class UsersComponent implements OnInit {
     joinedDate: string;
     profileImageUrl: string | null;
     initials: string;
-    avatarLoadFailed?: boolean;
   }[] = [];
 
   adminDirectorySearch = '';
@@ -635,10 +634,6 @@ export class UsersComponent implements OnInit {
   clearTouristSearch(): void {
     this.touristSearch = '';
     this.touristCurrentPage = 1;
-  }
-
-  onTouristAvatarError(tourist: (typeof this.tourists)[0]): void {
-    tourist.avatarLoadFailed = true;
   }
 
   loadCreatorRequests(options?: { silent?: boolean }): void {
