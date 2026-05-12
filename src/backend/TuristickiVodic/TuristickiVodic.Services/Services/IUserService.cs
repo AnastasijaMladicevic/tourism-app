@@ -21,6 +21,7 @@ namespace TuristickiVodic.Services
         Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenDto refreshTokenDto);
         Task<bool> RequestCreatorRoleAsync(int userId, string creatorType);
         Task<bool> ApproveCreatorRoleAsync(int userId);
+        Task<bool> RejectCreatorRoleAsync(int userId);
         Task<bool> ToggleUserActiveAsync(int userId, bool isActive);
         Task<bool> LogoutAsync(int userId, string? jti, DateTime? accessTokenExpiryUtc);
         Task<PagedResultDto<CreatorRoleRequestDto>> GetCreatorRequestsAsync(CreatorRoleRequestQueryDto query);

@@ -1011,6 +1011,46 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
+        public async Task RejectCreatorRole_KadaKorisnikJeTraZioUlogu_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.RejectCreatorRoleAsync(8)).ReturnsAsync(true);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            var result = await controller.RejectCreatorRole(8);
+
+            result.Should().BeOfType<OkObjectResult>();
+        }
+
+        [Fact]
+        public async Task RejectCreatorRole_KadaKorisnikNijeTraZioUlogu_VracaBadRequest()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.RejectCreatorRoleAsync(8))
+                .ThrowsAsync(new InvalidOperationException("User has not requested creator role."));
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            var result = await controller.RejectCreatorRole(8);
+
+            result.Should().BeOfType<BadRequestObjectResult>();
+        }
+
+        [Fact]
+        public async Task RejectCreatorRole_KadaKorisnikNijePronadjen_VracaNotFound()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.RejectCreatorRoleAsync(999)).ReturnsAsync(false);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            var result = await controller.RejectCreatorRole(999);
+
+            result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Fact]
         public async Task RemoveProfileImage_KadaKorisnikBriseSvojuSliku_VracaOk()
         {
             var mockService = new Mock<IUserService>();
