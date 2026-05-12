@@ -43,7 +43,60 @@
     "ok": "OK",
     "viewDetails": "Details",
     "email": "Email",
-    "password": "Password"
+    "password": "Password",
+    "soonest": "Soonest"
+  },
+  "moderatorAccess": {
+    "title": "Moderator access",
+    "introTitle": "Become a SpireGO moderator",
+    "introBody": "As a moderator or content creator, you will have a direct impact on the quality of information in our community. You can manage places, approve authentic photos and help travelers find the best locations.",
+    "privilegesTitle": "Available privileges",
+    "statusTitle": "Request status",
+    "currentRole": "Current role: {{role}}",
+    "statusNoteBefore": "By submitting a request, you accept the ",
+    "moderationRules": "Moderation rules.",
+    "statusNoteAfter": " Our team reserves the right to revoke access in case of community standards violations.",
+    "sending": "Sending request...",
+    "requestSent": "Request sent",
+    "requestAccess": "Request access",
+    "roles": {
+      "tourist": "Tourist",
+      "moderator": "Moderator",
+      "admin": "Administrator",
+      "manager": "Manager"
+    },
+    "status": {
+      "requestSent": "Request sent",
+      "approved": "Access approved",
+      "specialRoleActive": "Special role active",
+      "notRequested": "Not requested"
+    },
+    "feedback": {
+      "sendFailed": "The request cannot be sent right now.",
+      "sendSuccess": "Moderator access request was sent successfully."
+    },
+    "privileges": {
+      "addEvents": {
+        "title": "Adding events",
+        "body": "Publish new local events and festivals."
+      },
+      "editObjects": {
+        "title": "Adding and editing objects",
+        "body": "Create and edit new places and restaurants on the map."
+      },
+      "manageActivities": {
+        "title": "Managing activities",
+        "body": "Add new tours and sports activities."
+      },
+      "editEvents": {
+        "title": "Editing event details",
+        "body": "Create and edit new events on the map."
+      },
+      "analytics": {
+        "title": "Analytics access",
+        "body": "Track visits and popularity of your posts."
+      }
+    }
   },
   "nav": {
     "home": "Home",
@@ -194,7 +247,7 @@
     "beenThere": "I've been there",
     "visitedDestination": "Destination",
     "visitedLocality": "Locality",
-    "shareLocationTitle": "SHARE LOCATION",
+    "shareLocationTitle": "Share location",
     "shareLocationBody": "Generate a temporary link to share your current location with a friend.",
     "shareHours": "{{hours}}h",
     "shareLoading": "Preparing...",

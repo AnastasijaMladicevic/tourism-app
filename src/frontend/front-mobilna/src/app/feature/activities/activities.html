@@ -30,7 +30,15 @@
         class="sort-anchor sort-trigger"
         (click)="$event.stopPropagation(); showSortMenu = !showSortMenu"
       >
-        <span>{{ sortLabel() }}</span>
+      <span>
+        @if (sortOption === 'distance') {
+          {{ 'common.nearest' | translate }}
+        } @else if (sortOption === 'az') {
+          A -> Z
+        } @else {
+          Z -> A
+        }
+      </span>
         <mat-icon>expand_more</mat-icon>
 
         @if (showSortMenu) {
@@ -47,14 +55,14 @@
               [class.sort-menu__item--active]="sortOption === 'az'"
               (click)="setSort('az')"
             >
-              <mat-icon>sort_by_alpha</mat-icon> {{ 'common.sortAZ' | translate }}
+              <mat-icon>sort_by_alpha</mat-icon> A -> Z
             </button>
             <button
               class="sort-menu__item"
               [class.sort-menu__item--active]="sortOption === 'za'"
               (click)="setSort('za')"
             >
-              <mat-icon>sort_by_alpha</mat-icon> {{ 'common.sortZA' | translate }}
+              <mat-icon>sort_by_alpha</mat-icon> Z -> A
             </button>
           </div>
         }

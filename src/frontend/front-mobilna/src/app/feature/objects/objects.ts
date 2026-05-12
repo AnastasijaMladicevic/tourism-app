@@ -179,11 +179,20 @@ export class ObjectsComponent implements OnInit {
       this.totalCount = response.totalCount ?? 0;
       this.hasNextPage = (response.page ?? this.currentPage) < (response.totalPages ?? 0);
 
-      this.objects = (response.items ?? []).map((obj) => ({
-        ...obj,
-        isFavorite: false,
-        favoriteId: undefined,
-      }));
+      this.objects = (response.items ?? []).map((obj) => {
+        const raw = obj as unknown as Record<string, unknown>;
+
+        return {
+          ...obj,
+          latitude: this.readOptionalNumber(raw, ['latitude', 'Latitude']),
+          longitude: this.readOptionalNumber(raw, ['longitude', 'Longitude']),
+          distanceMeters: this.readOptionalNumber(raw, ['distanceMeters', 'DistanceMeters']),
+          averageRating: this.readOptionalNumber(raw, ['averageRating', 'AverageRating']),
+          reviewCount: this.readOptionalNumber(raw, ['reviewCount', 'ReviewCount']),
+          isFavorite: false,
+          favoriteId: undefined,
+        };
+      });
 
       if (this.userLocation && this.sortOption !== 'distance') {
         this.updateDistances();
@@ -301,7 +310,7 @@ export class ObjectsComponent implements OnInit {
 
       return {
         ...item,
-        distanceMeters: this.getDistanceKm(
+        distanceMeters: this.getDistanceMeters(
           this.userLocation!.lat,
           this.userLocation!.lng,
           item.latitude,
@@ -325,14 +334,14 @@ export class ObjectsComponent implements OnInit {
     if (!this.isTracking || !this.userLocation) return null;
     if (!item.latitude || !item.longitude) return null;
 
-    const km = this.getDistanceKm(
+    const distanceMeters = this.getDistanceMeters(
       this.userLocation.lat,
       this.userLocation.lng,
       item.latitude,
       item.longitude,
     );
 
-    return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
+    return this.formatDistance(distanceMeters);
   }
 
   private getDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -348,6 +357,10 @@ export class ObjectsComponent implements OnInit {
         Math.sin(dLng / 2);
 
     return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  private getDistanceMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    return this.getDistanceKm(lat1, lng1, lat2, lng2) * 1000;
   }
 
   setFilter(filter: string): void {
@@ -476,9 +489,12 @@ export class ObjectsComponent implements OnInit {
     (event.target as HTMLImageElement).style.display = 'none';
   }
 
-  formatDistance(km?: number): string {
-    if (km == null) return '';
-    return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
+  formatDistance(distanceMeters?: number): string {
+    if (distanceMeters == null) return '';
+
+    return distanceMeters < 1000
+      ? `${Math.round(distanceMeters)} m`
+      : `${(distanceMeters / 1000).toFixed(1)} km`;
   }
 
   isOpenNow(obj: ObjectView): boolean {
@@ -520,5 +536,21 @@ export class ObjectsComponent implements OnInit {
   private timeToMinutes(time: string): number {
     const [h, m] = time.split(':').map(Number);
     return (h || 0) * 60 + (m || 0);
+  }
+
+  private readOptionalNumber(obj: Record<string, unknown>, keys: string[]): number | undefined {
+    for (const key of keys) {
+      const value = obj[key];
+      if (value == null) {
+        continue;
+      }
+
+      const parsed = Number(value);
+      if (!Number.isNaN(parsed)) {
+        return parsed;
+      }
+    }
+
+    return undefined;
   }
 }

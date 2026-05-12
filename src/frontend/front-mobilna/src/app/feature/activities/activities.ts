@@ -425,10 +425,21 @@ export class ActivitiesComponent implements OnInit {
         ),
       };
     });
+
+    const distancesById = new Map(this.activities.map((item) => [item.id, item.distanceMeters]));
+    this.visibleActivities = this.visibleActivities.map((item) => ({
+      ...item,
+      distanceMeters: distancesById.get(item.id),
+    }));
   }
 
   private clearDistances(): void {
     this.activities = this.activities.map((item) => ({
+      ...item,
+      distanceMeters: undefined,
+    }));
+
+    this.visibleActivities = this.visibleActivities.map((item) => ({
       ...item,
       distanceMeters: undefined,
     }));

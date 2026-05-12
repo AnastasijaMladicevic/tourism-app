@@ -404,10 +404,21 @@ export class LocalitiesComponent implements OnInit {
         ),
       };
     });
+
+    const distancesById = new Map(this.localities.map((item) => [item.id, item.distanceMeters]));
+    this.visibleLocalities = this.visibleLocalities.map((item) => ({
+      ...item,
+      distanceMeters: distancesById.get(item.id),
+    }));
   }
 
   private clearDistances(): void {
     this.localities = this.localities.map((item) => ({
+      ...item,
+      distanceMeters: undefined,
+    }));
+
+    this.visibleLocalities = this.visibleLocalities.map((item) => ({
       ...item,
       distanceMeters: undefined,
     }));

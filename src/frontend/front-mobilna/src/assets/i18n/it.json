@@ -43,7 +43,60 @@
     "ok": "OK",
     "viewDetails": "Dettagli",
     "email": "Email",
-    "password": "Password"
+    "password": "Password",
+    "soonest": "Più vicini nel tempo"
+  },
+  "moderatorAccess": {
+    "title": "Accesso moderatore",
+    "introTitle": "Diventa moderatore SpireGO",
+    "introBody": "Come moderatore o content creator, avrai un impatto diretto sulla qualità delle informazioni nella nostra community. Potrai gestire luoghi, approvare foto autentiche e aiutare i viaggiatori a trovare le migliori località.",
+    "privilegesTitle": "Privilegi disponibili",
+    "statusTitle": "Stato richiesta",
+    "currentRole": "Ruolo attuale: {{role}}",
+    "statusNoteBefore": "Inviando la richiesta accetti le ",
+    "moderationRules": "regole di moderazione.",
+    "statusNoteAfter": " Il nostro team si riserva il diritto di revocare l'accesso in caso di violazione degli standard della community.",
+    "sending": "Invio richiesta...",
+    "requestSent": "Richiesta inviata",
+    "requestAccess": "Richiedi accesso",
+    "roles": {
+      "tourist": "Turista",
+      "moderator": "Moderatore",
+      "admin": "Amministratore",
+      "manager": "Manager"
+    },
+    "status": {
+      "requestSent": "Richiesta inviata",
+      "approved": "Accesso approvato",
+      "specialRoleActive": "Ruolo speciale attivo",
+      "notRequested": "Non richiesto"
+    },
+    "feedback": {
+      "sendFailed": "La richiesta non può essere inviata al momento.",
+      "sendSuccess": "La richiesta di accesso moderatore è stata inviata con successo."
+    },
+    "privileges": {
+      "addEvents": {
+        "title": "Aggiunta eventi",
+        "body": "Pubblica nuovi eventi locali e festival."
+      },
+      "editObjects": {
+        "title": "Aggiunta e modifica oggetti",
+        "body": "Crea e modifica nuovi luoghi e ristoranti sulla mappa."
+      },
+      "manageActivities": {
+        "title": "Gestione attività",
+        "body": "Aggiungi nuovi tour e attività sportive."
+      },
+      "editEvents": {
+        "title": "Modifica dettagli eventi",
+        "body": "Crea e modifica nuovi eventi sulla mappa."
+      },
+      "analytics": {
+        "title": "Accesso alle analisi",
+        "body": "Monitora visite e popolarità delle tue pubblicazioni."
+      }
+    }
   },
   "nav": {
     "home": "Home",
@@ -194,7 +247,7 @@
     "beenThere": "Ci sono stata",
     "visitedDestination": "Destinazione",
     "visitedLocality": "Località",
-    "shareLocationTitle": "CONDIVIDI POSIZIONE",
+    "shareLocationTitle": "Condividi posizione",
     "shareLocationBody": "Genera un link temporaneo per condividere la tua posizione attuale con un amico.",
     "shareHours": "{{hours}}h",
     "shareLoading": "Preparazione...",
