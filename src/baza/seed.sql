@@ -13691,3 +13691,168 @@ UPDATE "Objects"
 SET "Price" = 0.00
 WHERE "Price" IS NULL;
 
+-- KRAGUJEVAC
+
+INSERT INTO "Localities"
+("Name", "Description", "Geolocation", "IsActive", "DestinationId", "LocalityTypeId", "CreatedByUserId", "CreatedAt")
+VALUES
+
+('Centar Kragujevca',
+ 'Centralna gradska zona Kragujevca sa trgovima, šetalištem, kafićima i važnim gradskim sadržajima.',
+ ST_SetSRID(ST_MakePoint(20.9114, 44.0128), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kragujevac'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+('Šumarice',
+ 'Memorijalni park i veliko zeleno područje poznato po istorijskom značaju, šetnji i rekreaciji.',
+ ST_SetSRID(ST_MakePoint(20.8734, 44.0231), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kragujevac'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Park'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+('Bubanj',
+ 'Mirniji deo Kragujevca sa stambenim zonama, sportskim terenima i pristupom jezeru Bubanj.',
+ ST_SetSRID(ST_MakePoint(20.9171, 44.0196), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kragujevac'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+('Aerodrom',
+ 'Moderno gradsko naselje u Kragujevcu sa stambenim blokovima, školama i lokalnim sadržajima.',
+ ST_SetSRID(ST_MakePoint(20.9057, 44.0302), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kragujevac'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+('Drača',
+ 'Prigradsko naselje kod Kragujevca poznato po mirnijem ambijentu, zelenilu i lokalnom seoskom karakteru.',
+ ST_SetSRID(ST_MakePoint(20.8087, 44.0356), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kragujevac'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+('Ilina voda',
+ 'Rekreativna zona u Kragujevcu sa parkom, jezerom i prostorom pogodnim za šetnju i odmor.',
+ ST_SetSRID(ST_MakePoint(20.9387, 44.0173), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kragujevac'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Park'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+ -- BEOGRAD
+
+('Knez Mihailova',
+ 'Najpoznatija pešačka zona Beograda sa prodavnicama, restoranima, galerijama i istorijskim zgradama.',
+ ST_SetSRID(ST_MakePoint(20.4730, 44.8032), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+('Dorćol',
+ 'Jedan od najstarijih delova Beograda poznat po kafićima, galerijama, restoranima i urbanom noćnom životu.',
+ ST_SetSRID(ST_MakePoint(20.4604, 44.8253), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+('Skadarlija',
+ 'Boemska četvrt Beograda poznata po starim restoranima, muzici, kaldrmi i tradicionalnom gradskom ambijentu.',
+ ST_SetSRID(ST_MakePoint(20.4647, 44.8179), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+('Ada Ciganlija',
+ 'Popularno beogradsko izletište sa jezerom, plažama, sportskim terenima i sadržajima za rekreaciju.',
+ ST_SetSRID(ST_MakePoint(20.3937, 44.7883), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Plaza'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+('Zemun Kej',
+ 'Šetalište uz Dunav sa restoranima, kafićima i pogledom na reku, posebno prijatno za večernje šetnje.',
+ ST_SetSRID(ST_MakePoint(20.4249, 44.8352), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Park'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+('Novi Beograd',
+ 'Moderan deo Beograda sa poslovnim centrima, širokim bulevarima, tržnim centrima i velikim blokovima.',
+ ST_SetSRID(ST_MakePoint(20.3948, 44.8160), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+('Tašmajdan',
+ 'Gradski park u centru Beograda poznat po zelenilu, crkvi Svetog Marka i sportskim sadržajima.',
+ ST_SetSRID(ST_MakePoint(20.4657, 44.8099), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Park'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+('Savski trg',
+ 'Centralni gradski trg sa spomenikom Stefanu Nemanji i važnim saobraćajnim vezama ka centru Beograda.',
+ ST_SetSRID(ST_MakePoint(20.4570, 44.8083), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Trg'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW());
+
+
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
+VALUES
+
+('https://zdravopancevo.rs/wp-content/uploads/2024/11/IMG_20240313_122751-1-scaled.jpg', 'Centar Kragujevca', true,
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kragujevca'), NOW()),
+
+('https://www.spomenpark.rs/wp-content/uploads/2022/08/Spomenik-streljanim-djacima-i-profesorima.jpg', 'Šumarice', true,
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šumarice'), NOW()),
+
+('https://www.ekapija.com/thumbs/jezero_bubanj_090711_tw1024.gif', 'Bubanj', true,
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Bubanj'), NOW()),
+
+('https://informer.rs/data/images/2024-04-05/893593_aerordom-naselje-u-kg_orig.jpg?timestamp=1712268000', 'Aerodrom', true,
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Aerodrom'), NOW()),
+
+('https://www.infokg.rs/files/gallery/3442/draa%2002.jpg', 'Drača', true,
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Drača'), NOW()),
+
+('https://upload.wikimedia.org/wikipedia/commons/b/be/Ilina_voda.jpg', 'Ilina voda', true,
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ilina voda'), NOW()),
+
+('https://itinari-images.s3.eu-west-1.amazonaws.com/activity/images/original/74f9cd38-aa68-4dd0-b5a0-b6fe12e9776f-knez.jpg', 'Knez Mihailova', true,
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Knez Mihailova'), NOW()),
+
+('https://beobuild.rs/shared/the-dorcol-residence-3d-eksterijer-120126-01.jpg', 'Dorćol', true,
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Dorćol'), NOW()),
+
+('https://static.beograd.rs/api/v3/images/63469?ts=2024-07-05T16:17:29', 'Skadarlija', true,
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Skadarlija'), NOW()),
+
+('https://beogradskiizlet.com/wp-content/uploads/2026/03/nova-platforma-ada-ciganlija-savsko-jezero.jpg', 'Ada Ciganlija', true,
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ada Ciganlija'), NOW()),
+
+('https://bookaweb.s3.eu-central-1.amazonaws.com/media/47945/zemun-kej-beograd.jpg', 'Zemun Kej', true,
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Zemun Kej'), NOW()),
+
+('https://cityexpert.rs/blog/sites/default/files/slika/blokovi-novog-beograda.jpg', 'Novi Beograd', true,
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Novi Beograd'), NOW()),
+
+('https://s3.eu-central-1.amazonaws.com/apartmani-u-beogradu/uploads/firms/697/sr/main/tasmajdan-park-znamenitosti-beograd-palilula.jpg', 'Tašmajdan', true,
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tašmajdan'), NOW()),
+
+('https://www.belgradewaterfront.com/static/uploads/2025/05/2Savski-trg-aerial-shot-1_14__.jpg', 'Savski trg', true,
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Savski trg'), NOW());
