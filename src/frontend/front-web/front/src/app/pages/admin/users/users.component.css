@@ -80,6 +80,20 @@
   text-decoration: none;
 }
 
+.dashboard-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 2.15fr) minmax(260px, 0.95fr);
+  gap: 12px;
+  align-items: stretch;
+}
+
+.dashboard-overview-main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -131,12 +145,6 @@
   font-size: 34px;
   font-weight: 700;
   color: #111827;
-}
-
-.analytics-grid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 12px;
 }
 
 .card {
@@ -294,6 +302,28 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.origins-card--sidebar {
+  min-width: 0;
+  min-height: 100%;
+}
+
+.origins-card--sidebar .origins-visual {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.origins-card--sidebar .origins-visual-layers {
+  flex: 1 1 auto;
+  min-height: 220px;
+  max-height: none;
+}
+
+.origins-card--sidebar .origins-details-link {
+  margin-top: auto;
 }
 
 .origins-card-header {
@@ -729,13 +759,13 @@ th {
 }
 
 @media (max-width: 1100px) {
-  .analytics-grid {
+  .dashboard-overview {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 900px) {
-  .kpi-grid,
+  .dashboard-overview-main .kpi-grid,
   .small-kpis {
     grid-template-columns: 1fr;
   }
