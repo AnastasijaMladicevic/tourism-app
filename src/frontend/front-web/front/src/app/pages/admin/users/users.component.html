@@ -47,15 +47,49 @@
   </div>
 
   <div class="analytics-grid">
-    <section class="card">
+    <section class="card chart-card">
       <div class="card-head">
-        <h3>Signups by Day</h3>
-        <p>Daily registration trends for the last 14 days.</p>
+        <h3>New tourists &amp; reviews</h3>
+        <p>{{ chartSubtitle }}</p>
       </div>
       <div class="chart-placeholder">
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg">
-          <path [attr.d]="chartPath" class="chart-line"></path>
-        </svg>
+        <div class="chart-main-row">
+        <div class="chart-y-axis" aria-hidden="true">
+          <span>{{ chartYTopLabel }}</span>
+          <span>{{ chartYMidLabel }}</span>
+          <span>0</span>
+        </div>
+        <div class="chart-surface">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg">
+            <defs>
+              <linearGradient id="usersSignupAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.22" />
+                <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            <g class="chart-grid">
+              <line
+                *ngFor="let gy of gridLineYs"
+                x1="0"
+                [attr.y1]="gy"
+                x2="100"
+                [attr.y2]="gy"
+              />
+            </g>
+            <path *ngIf="chartAreaSignups" [attr.d]="chartAreaSignups" class="chart-area" fill="url(#usersSignupAreaGrad)" />
+            <path *ngIf="chartLineReviews" [attr.d]="chartLineReviews" class="chart-line chart-line--reviews" />
+            <path *ngIf="chartLineSignups" [attr.d]="chartLineSignups" class="chart-line chart-line--signups" />
+          </svg>
+          <div class="chart-empty" *ngIf="chartIsEmpty">No tourist registrations or reviews in the last {{ chartDays }} days.</div>
+        </div>
+        </div>
+        <div class="chart-x-axis" aria-hidden="true">
+          <span *ngFor="let x of chartXLabels">{{ x.label }}</span>
+        </div>
+        <div class="chart-legend">
+          <span class="chart-legend-item"><i class="chart-dot chart-dot--signups"></i> New tourists</span>
+          <span class="chart-legend-item"><i class="chart-dot chart-dot--reviews"></i> Reviews posted</span>
+        </div>
       </div>
     </section>
 
@@ -82,6 +116,30 @@
       </div>
     </div>
 
+    <div class="table-toolbar">
+      <label class="sr-only" for="admin-directory-search">Search admin directory</label>
+      <input
+        id="admin-directory-search"
+        type="search"
+        class="table-search"
+        placeholder="Search by name, email, role, status…"
+        autocomplete="off"
+        [value]="adminDirectorySearch"
+        (input)="adminDirectorySearch = $any($event.target).value"
+      />
+      <span class="table-filter-meta" *ngIf="adminMembers.length">
+        Showing {{ filteredAdminDirectory.length }} of {{ adminMembers.length }}
+      </span>
+      <button
+        type="button"
+        class="table-search-clear"
+        *ngIf="adminDirectorySearch.trim()"
+        (click)="clearAdminSearch()"
+      >
+        Clear
+      </button>
+    </div>
+
     <div class="table-wrap">
       <table>
         <thead>
@@ -94,7 +152,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let member of adminMembers">
+          <tr *ngFor="let member of filteredAdminDirectory">
             <td>
               <div class="person">
                 <div class="avatar">{{ member.initials }}</div>
@@ -108,6 +166,12 @@
             <td>{{ member.lastLogin }}</td>
             <td><span class="status-pill" [class.pending]="member.status !== 'Active'">{{ member.status }}</span></td>
             <td class="actions">✎</td>
+          </tr>
+          <tr *ngIf="!filteredAdminDirectory.length && adminMembers.length" class="table-empty-row">
+            <td colspan="5">No team members match your search.</td>
+          </tr>
+          <tr *ngIf="!adminMembers.length" class="table-empty-row">
+            <td colspan="5">No administrative users found.</td>
           </tr>
         </tbody>
       </table>
@@ -133,6 +197,32 @@
   </div>
 
   <section class="card">
+    <div class="table-head">
+      <div>
+        <h3>Tourist accounts</h3>
+        <p>Registered tourists and their profile details.</p>
+      </div>
+    </div>
+
+    <div class="table-toolbar">
+      <label class="sr-only" for="tourist-search">Search tourists</label>
+      <input
+        id="tourist-search"
+        type="search"
+        class="table-search"
+        placeholder="Search by name, email, origin, status, joined date…"
+        autocomplete="off"
+        [value]="touristSearch"
+        (input)="touristSearch = $any($event.target).value"
+      />
+      <span class="table-filter-meta" *ngIf="tourists.length">
+        Showing {{ filteredTourists.length }} of {{ tourists.length }}
+      </span>
+      <button type="button" class="table-search-clear" *ngIf="touristSearch.trim()" (click)="clearTouristSearch()">
+        Clear
+      </button>
+    </div>
+
     <div class="table-wrap">
       <table>
         <thead>
@@ -146,13 +236,19 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let tourist of tourists">
+          <tr *ngFor="let tourist of filteredTourists">
             <td>{{ tourist.name }}</td>
             <td>{{ tourist.email }}</td>
             <td>{{ tourist.origin }}</td>
             <td><span class="status-pill" [class.pending]="tourist.status !== 'active'">{{ tourist.status }}</span></td>
             <td>{{ tourist.joinedDate }}</td>
             <td class="actions">✎</td>
+          </tr>
+          <tr *ngIf="!filteredTourists.length && tourists.length" class="table-empty-row">
+            <td colspan="6">No tourists match your search.</td>
+          </tr>
+          <tr *ngIf="!tourists.length" class="table-empty-row">
+            <td colspan="6">No tourist accounts found.</td>
           </tr>
         </tbody>
       </table>

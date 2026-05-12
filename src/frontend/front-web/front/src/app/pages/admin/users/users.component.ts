@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { Observable, forkJoin, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { AdminUserListItemDto, AdminUsersService } from '../../../services/admin-users.service';
+import { ReviewDto, ReviewService } from '../../../services/review';
+
+const CHART_DAYS = 14;
 
 @Component({
   selector: 'app-users',
@@ -13,6 +16,7 @@ import { AdminUserListItemDto, AdminUsersService } from '../../../services/admin
 })
 export class UsersComponent implements OnInit {
   private readonly adminUsersService = inject(AdminUsersService);
+  private readonly reviewService = inject(ReviewService);
 
   isLoading = true;
   loadError = '';
@@ -23,8 +27,18 @@ export class UsersComponent implements OnInit {
   activePercentDelta = 0;
   countryPercentDelta = 0;
 
-  chartPath = '';
-  dailySignups: number[] = [];
+  readonly chartDays = CHART_DAYS;
+
+  chartLineSignups = '';
+  chartLineReviews = '';
+  chartAreaSignups = '';
+  chartMaxY = 1;
+  chartYTopLabel = '1';
+  chartYMidLabel = '0';
+  chartIsEmpty = false;
+  chartSubtitle = '';
+  chartXLabels: { label: string }[] = [];
+  readonly gridLineYs = [0, 25, 50, 75, 100];
 
   totalAdmins = 0;
   totalManagers = 0;
@@ -47,6 +61,9 @@ export class UsersComponent implements OnInit {
     joinedDate: string;
   }[] = [];
 
+  adminDirectorySearch = '';
+  touristSearch = '';
+
   ngOnInit(): void {
     this.loadDashboardData();
   }
@@ -57,11 +74,12 @@ export class UsersComponent implements OnInit {
 
     forkJoin({
       allUsers: this.fetchAllUsers(),
-      tourists: this.fetchAllUsers('Tourist')
+      tourists: this.fetchAllUsers('Tourist'),
+      reviews: this.fetchAllReviews()
     })
       .pipe(
-        map(({ allUsers, tourists }) => {
-          this.bindUsersData(allUsers, tourists);
+        map(({ allUsers, tourists, reviews }) => {
+          this.bindUsersData(allUsers, tourists, reviews);
         }),
         catchError(() => {
           this.loadError = 'Could not load users data. Check API and try again.';
@@ -97,7 +115,40 @@ export class UsersComponent implements OnInit {
     );
   }
 
-  private bindUsersData(allUsers: AdminUserListItemDto[], touristsOnly: AdminUserListItemDto[]): void {
+  private fetchAllReviews(): Observable<ReviewDto[]> {
+    return this.reviewService
+      .getAll({ page: 1, pageSize: 100, sortBy: 'createdAt', sortOrder: 'desc' }, { bypassRegion: true })
+      .pipe(
+        switchMap((firstPage) => {
+          const totalPages = firstPage.totalPages ?? 1;
+          if (totalPages <= 1) {
+            return of(firstPage.items ?? []);
+          }
+
+          const requests = Array.from({ length: totalPages - 1 }, (_, i) =>
+            this.reviewService.getAll(
+              { page: i + 2, pageSize: 100, sortBy: 'createdAt', sortOrder: 'desc' },
+              { bypassRegion: true }
+            )
+          );
+
+          return forkJoin(requests).pipe(
+            map((restPages) => [
+              ...(firstPage.items ?? []),
+              ...restPages.flatMap((p) => p.items ?? [])
+            ])
+          );
+        }),
+        map((value) => (Array.isArray(value) ? value : [])),
+        catchError(() => of([]))
+      );
+  }
+
+  private bindUsersData(
+    allUsers: AdminUserListItemDto[],
+    touristsOnly: AdminUserListItemDto[],
+    reviews: ReviewDto[]
+  ): void {
     const now = new Date();
     const startCurrentPeriod = new Date(now);
     startCurrentPeriod.setDate(now.getDate() - 30);
@@ -126,11 +177,15 @@ export class UsersComponent implements OnInit {
     this.newCountries = currentCountries.size;
     this.countryPercentDelta = this.computePercentDelta(currentCountries.size, previousCountries.size);
 
-    this.dailySignups = this.buildDailySignups(allUsers, 14);
-    this.chartPath = this.buildChartPath(this.dailySignups);
+    const dailyTouristSignups = this.buildDailyBucketsFromUsers(touristsOnly, CHART_DAYS);
+    const dailyReviews = this.buildDailyBucketsFromDates(
+      reviews.map((r) => r.createdAt),
+      CHART_DAYS
+    );
+    this.bindChartSeries(dailyTouristSignups, dailyReviews);
 
     const internalTeam = allUsers.filter((u) => (u.roleName ?? '').toLowerCase() !== 'tourist');
-    this.adminMembers = internalTeam.slice(0, 6).map((u) => ({
+    this.adminMembers = internalTeam.map((u) => ({
       initials: this.getInitials(u.firstName, u.lastName),
       name: `${u.firstName} ${u.lastName}`.trim(),
       email: u.email,
@@ -148,13 +203,51 @@ export class UsersComponent implements OnInit {
       return role === 'contentcreator' || role === 'content-creator';
     }).length;
 
-    this.tourists = touristsOnly.slice(0, 5).map((u) => ({
+    this.tourists = touristsOnly.map((u) => ({
       name: `${u.firstName} ${u.lastName}`.trim(),
       email: u.email,
       origin: (u.country ?? '').trim() || 'Unknown',
       status: u.isActive ? 'active' : 'inactive',
       joinedDate: this.formatDate(u.createdAt)
     }));
+  }
+
+  get filteredAdminDirectory(): typeof this.adminMembers {
+    return this.filterBySearch(this.adminMembers, this.adminDirectorySearch, (m) => [
+      m.name,
+      m.email,
+      m.role,
+      m.lastLogin,
+      m.status
+    ]);
+  }
+
+  get filteredTourists(): typeof this.tourists {
+    return this.filterBySearch(this.tourists, this.touristSearch, (t) => [
+      t.name,
+      t.email,
+      t.origin,
+      t.status,
+      t.joinedDate
+    ]);
+  }
+
+  private filterBySearch<T>(rows: T[], query: string, fieldFns: (row: T) => string[]): T[] {
+    const q = query.trim().toLowerCase();
+    if (!q) {
+      return rows;
+    }
+    return rows.filter((row) =>
+      fieldFns(row).some((text) => text.toLowerCase().includes(q))
+    );
+  }
+
+  clearAdminSearch(): void {
+    this.adminDirectorySearch = '';
+  }
+
+  clearTouristSearch(): void {
+    this.touristSearch = '';
   }
 
   private buildTopOrigins(users: AdminUserListItemDto[]): { name: string; users: number }[] {
@@ -169,18 +262,44 @@ export class UsersComponent implements OnInit {
       .slice(0, 4);
   }
 
-  private buildDailySignups(users: AdminUserListItemDto[], days: number): number[] {
+  private bindChartSeries(dailyTouristSignups: number[], dailyReviews: number[]): void {
+    const sum = (arr: number[]) => arr.reduce((a, b) => a + b, 0);
+    const touristTotal = sum(dailyTouristSignups);
+    const reviewTotal = sum(dailyReviews);
+    const maxVal = Math.max(...dailyTouristSignups, ...dailyReviews, 0);
+    this.chartMaxY = Math.max(maxVal, 1);
+    this.chartYTopLabel = maxVal === 0 ? '0' : String(maxVal);
+    this.chartYMidLabel = maxVal === 0 ? '0' : String(Math.round(maxVal / 2));
+    this.chartIsEmpty = maxVal === 0;
+    this.chartSubtitle = this.chartIsEmpty
+      ? `Last ${CHART_DAYS} days — no tourist registrations or reviews in this window.`
+      : `Last ${CHART_DAYS} days — ${touristTotal} new tourists, ${reviewTotal} reviews.`;
+
+    this.chartLineSignups = this.buildLinePath(dailyTouristSignups, this.chartMaxY);
+    this.chartLineReviews = this.buildLinePath(dailyReviews, this.chartMaxY);
+    this.chartAreaSignups = this.buildAreaPath(dailyTouristSignups, this.chartMaxY);
+    this.chartXLabels = this.buildChartXLabels(CHART_DAYS);
+  }
+
+  private buildDailyBucketsFromUsers(users: AdminUserListItemDto[], days: number): number[] {
+    return this.buildDailyBucketsFromDates(
+      users.map((u) => u.createdAt),
+      days
+    );
+  }
+
+  private buildDailyBucketsFromDates(isoDates: (string | undefined)[], days: number): number[] {
     const buckets: number[] = Array.from({ length: days }, () => 0);
     const now = new Date();
     const start = new Date(now);
     start.setHours(0, 0, 0, 0);
     start.setDate(now.getDate() - (days - 1));
 
-    for (const user of users) {
-      if (!user.createdAt) {
+    for (const raw of isoDates) {
+      if (!raw) {
         continue;
       }
-      const created = new Date(user.createdAt);
+      const created = new Date(raw);
       if (Number.isNaN(created.getTime()) || created < start || created > now) {
         continue;
       }
@@ -192,20 +311,45 @@ export class UsersComponent implements OnInit {
     return buckets;
   }
 
-  private buildChartPath(values: number[]): string {
-    if (!values.length) {
+  private buildChartXLabels(days: number): { label: string }[] {
+    const now = new Date();
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    start.setDate(now.getDate() - (days - 1));
+    const fmt = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
+    const indices = [0, Math.floor(days / 4), Math.floor(days / 2), Math.floor((3 * days) / 4), days - 1];
+    const unique = [...new Set(indices)].filter((i) => i >= 0 && i < days).sort((a, b) => a - b);
+    return unique.map((i) => {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      return { label: fmt.format(d) };
+    });
+  }
+
+  private buildLinePath(values: number[], maxY: number): string {
+    if (!values.length || maxY <= 0) {
       return '';
     }
     const width = 100;
     const height = 100;
-    const max = Math.max(...values, 1);
     return values
       .map((v, i) => {
         const x = (i / Math.max(values.length - 1, 1)) * width;
-        const y = height - (v / max) * height;
+        const y = height - (v / maxY) * height;
         return `${i === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
       })
       .join(' ');
+  }
+
+  private buildAreaPath(values: number[], maxY: number): string {
+    const line = this.buildLinePath(values, maxY);
+    if (!line || !values.length) {
+      return '';
+    }
+    const width = 100;
+    const n = values.length;
+    const lastX = ((n - 1) / Math.max(n - 1, 1)) * width;
+    return `${line} L ${lastX.toFixed(2)} 100 L 0 100 Z`;
   }
 
   private isInRange(value: string | undefined, from: Date, to: Date): boolean {
