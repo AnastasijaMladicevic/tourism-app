@@ -5,6 +5,22 @@
   gap: 16px;
 }
 
+.feedback {
+  border: 1px solid #dbeafe;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.feedback.error {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
 .page-title {
   margin: 0;
   font-size: 28px;
@@ -82,6 +98,12 @@
   align-items: center;
 }
 
+.kpi-icon {
+  font-size: 20px;
+  color: #4b5563;
+  line-height: 1;
+}
+
 .kpi-pill {
   font-size: 11px;
   border: 1px solid #d1d5db;
@@ -144,15 +166,19 @@
   overflow: hidden;
 }
 
-.line {
+.chart-svg {
   position: absolute;
-  left: 6%;
-  right: 6%;
-  top: 58%;
-  height: 2px;
-  border-radius: 2px;
-  background: #3b82f6;
-  transform: skewY(-8deg);
+  inset: 14px 10px;
+  width: calc(100% - 20px);
+  height: calc(100% - 28px);
+}
+
+.chart-line {
+  fill: none;
+  stroke: #3b82f6;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .origin-list {

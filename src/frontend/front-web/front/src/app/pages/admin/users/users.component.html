@@ -1,4 +1,7 @@
 <div class="users-page">
+  <div class="feedback" *ngIf="isLoading">Loading users data...</div>
+  <div class="feedback error" *ngIf="!isLoading && loadError">{{ loadError }}</div>
+
   <div class="page-header">
     <div>
       <h1 class="page-title">Users &amp; Roles</h1>
@@ -17,29 +20,29 @@
   <div class="kpi-grid">
     <article class="kpi-card kpi-green">
       <div class="kpi-top">
-        <span class="kpi-icon">👥</span>
-        <span class="kpi-pill">+14.2%</span>
+        <span class="kpi-icon material-symbols-outlined">groups</span>
+        <span class="kpi-pill">{{ totalRegistered | number }}</span>
       </div>
       <p class="kpi-label">Total Registered</p>
-      <p class="kpi-value">12,482</p>
+      <p class="kpi-value">{{ totalRegistered | number }}</p>
     </article>
 
     <article class="kpi-card kpi-blue">
       <div class="kpi-top">
-        <span class="kpi-icon">📈</span>
-        <span class="kpi-pill">+8.7%</span>
+        <span class="kpi-icon material-symbols-outlined">trending_up</span>
+        <span class="kpi-pill">{{ activePercentDelta }}%</span>
       </div>
       <p class="kpi-label">Active This Period</p>
-      <p class="kpi-value">3,891</p>
+      <p class="kpi-value">{{ activeThisPeriod | number }}</p>
     </article>
 
     <article class="kpi-card kpi-yellow">
       <div class="kpi-top">
-        <span class="kpi-icon">🌍</span>
-        <span class="kpi-pill">-3.4%</span>
+        <span class="kpi-icon material-symbols-outlined">public</span>
+        <span class="kpi-pill">{{ countryPercentDelta }}%</span>
       </div>
       <p class="kpi-label">New Countries</p>
-      <p class="kpi-value">12</p>
+      <p class="kpi-value">{{ newCountries }}</p>
     </article>
   </div>
 
@@ -50,7 +53,9 @@
         <p>Daily registration trends for the last 14 days.</p>
       </div>
       <div class="chart-placeholder">
-        <div class="line"></div>
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg">
+          <path [attr.d]="chartPath" class="chart-line"></path>
+        </svg>
       </div>
     </section>
 
@@ -112,18 +117,18 @@
   <div class="small-kpis">
     <article class="mini-card">
       <p>Total Admins</p>
-      <strong>02</strong>
-      <span>+1 since last month</span>
+      <strong>{{ totalAdmins | number : '2.0-0' }}</strong>
+      <span>Live count</span>
     </article>
     <article class="mini-card">
       <p>Total Managers</p>
-      <strong>03</strong>
-      <span>+1 since last week</span>
+      <strong>{{ totalManagers | number : '2.0-0' }}</strong>
+      <span>Live count</span>
     </article>
     <article class="mini-card">
       <p>Total Content Creator</p>
-      <strong>01</strong>
-      <span>+1 since last week</span>
+      <strong>{{ totalContentCreators | number : '2.0-0' }}</strong>
+      <span>Live count</span>
     </article>
   </div>
 
