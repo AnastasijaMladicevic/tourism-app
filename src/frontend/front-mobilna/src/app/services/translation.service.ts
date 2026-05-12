@@ -15,7 +15,8 @@ const LANGUAGE_LABEL_KEYS: Record<AppLanguage, string> = {
 export class TranslationService {
   private readonly http = inject(HttpClient);
   private readonly translationAssetVersion = '2026-05-11-home-smart-search';
-  private readonly activeLanguage = signal<AppLanguage>('sr');
+  private readonly languageStorageKey = 'spirego-session-language';
+  private readonly activeLanguage = signal<AppLanguage>(this.readStoredLanguage());
   private translations: Record<string, string> = {};
 
   // Signal koji se menja svaki put kad se prevodi učitaju —
@@ -66,6 +67,7 @@ export class TranslationService {
   setLanguage(language?: string | null): AppLanguage {
     const normalized = this.normalizeLanguage(language);
     this.activeLanguage.set(normalized);
+    this.persistLanguage(normalized);
     return normalized;
   }
 
@@ -115,5 +117,21 @@ export class TranslationService {
       case 'sr':
       default:   return 'sr';
     }
+  }
+
+  private persistLanguage(language: AppLanguage): void {
+    if (typeof sessionStorage === 'undefined') {
+      return;
+    }
+
+    sessionStorage.setItem(this.languageStorageKey, language);
+  }
+
+  private readStoredLanguage(): AppLanguage {
+    if (typeof sessionStorage === 'undefined') {
+      return 'sr';
+    }
+
+    return this.normalizeLanguage(sessionStorage.getItem(this.languageStorageKey));
   }
 }
