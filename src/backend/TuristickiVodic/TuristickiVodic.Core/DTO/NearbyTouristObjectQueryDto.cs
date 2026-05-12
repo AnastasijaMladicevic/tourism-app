@@ -10,7 +10,7 @@ namespace TuristickiVodic.Core.DTO
         [Range(-180, 180, ErrorMessage = "Longitude must be between -180 and 180.")]
         public double Longitude { get; set; }
 
-        [Range(1, 100000, ErrorMessage = "RadiusMeters must be between 1 and 100000.")]
+        [Range(1, 3000000, ErrorMessage = "RadiusMeters must be between 1 and 3000000.")]
         public double RadiusMeters { get; set; } = 5000;
 
         public string? Type { get; set; }
