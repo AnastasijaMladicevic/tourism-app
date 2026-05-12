@@ -1,6 +1,12 @@
 import { Injectable } from '@angular/core';
-import * as L from 'leaflet';
+import * as LeafletModule from 'leaflet';
 import 'leaflet.markercluster';
+
+// Production builds can load Leaflet and markercluster through bundled scripts.
+// Prefer the shared global runtime instance so the plugin augments the same Leaflet object.
+const globalLeaflet = (globalThis as typeof globalThis & { L?: typeof LeafletModule }).L;
+const L = (globalLeaflet ?? LeafletModule) as typeof LeafletModule;
+type MarkerClusterGroup = LeafletModule.MarkerClusterGroup;
 
 interface MarkerEntry {
   marker: L.Marker;
@@ -26,7 +32,7 @@ export class MapService {
   private markerMap = new Map<string, MarkerEntry>();
   private activeMarkerKey: string | null = null;
   private map: L.Map | null = null;
-  private clusterGroups = new Map<string, L.MarkerClusterGroup>();
+  private clusterGroups = new Map<string, MarkerClusterGroup>();
   private clusteringEnabled = false;
   private activeFilters: string[] = [];
 
@@ -352,7 +358,7 @@ export class MapService {
     });
   }
 
-  private createClusterGroup(): L.MarkerClusterGroup {
+  private createClusterGroup(): MarkerClusterGroup {
     return L.markerClusterGroup({
       showCoverageOnHover: false,
       spiderfyOnMaxZoom: true,
@@ -376,7 +382,7 @@ export class MapService {
     });
   }
 
-  private getOrCreateClusterGroup(clusterKey: string): L.MarkerClusterGroup {
+  private getOrCreateClusterGroup(clusterKey: string): MarkerClusterGroup {
     let group = this.clusterGroups.get(clusterKey);
     if (group) {
       return group;

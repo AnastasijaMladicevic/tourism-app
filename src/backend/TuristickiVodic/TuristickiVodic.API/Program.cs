@@ -161,9 +161,26 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular", policy =>
     {
-        var allowedOrigins = builder.Configuration
+        var configuredOrigins = builder.Configuration
             .GetSection("Cors:AllowedOrigins")
             .Get<string[]>() ?? new[] { "http://localhost:4200" };
+
+        var fallbackOrigins = new[]
+        {
+            "http://softeng.pmf.kg.ac.rs:10201",
+            "http://softeng.pmf.kg.ac.rs:10202",
+            "https://softeng.pmf.kg.ac.rs:10201",
+            "https://softeng.pmf.kg.ac.rs:10202",
+            "http://147.91.204.115:10201",
+            "http://147.91.204.115:10202",
+            "https://147.91.204.115:10201",
+            "https://147.91.204.115:10202"
+        };
+
+        var allowedOrigins = configuredOrigins
+            .Concat(fallbackOrigins)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
 
         policy.SetIsOriginAllowed(origin =>
             allowedOrigins.Contains(origin, StringComparer.OrdinalIgnoreCase) ||
