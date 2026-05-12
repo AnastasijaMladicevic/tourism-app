@@ -473,6 +473,21 @@
 
         <p class="feedback error" *ngIf="creatorRequestsError">{{ creatorRequestsError }}</p>
         <p class="feedback error" *ngIf="creatorRequestsApproveError">{{ creatorRequestsApproveError }}</p>
+        <div
+          class="feedback feedback--success"
+          *ngIf="creatorRequestsApproveSuccess"
+          role="status"
+        >
+          <span class="feedback-success-text">{{ creatorRequestsApproveSuccess }}</span>
+          <button
+            type="button"
+            class="feedback-dismiss-btn"
+            aria-label="Dismiss success message"
+            (click)="dismissCreatorApproveSuccess()"
+          >
+            ×
+          </button>
+        </div>
 
         <div class="table-toolbar creator-requests-toolbar">
           <label class="sr-only" for="creator-requests-search">Search content creator requests</label>
@@ -536,8 +551,10 @@
                     <button
                       type="button"
                       class="approve-creator-btn"
-                      (click)="approveCreatorRequest(req)"
-                      [disabled]="approvingCreatorUserId === req.id || !req.isActive"
+                      (click)="openCreatorApproveConfirm(req)"
+                      [disabled]="
+                        approvingCreatorUserId === req.id || !req.isActive || approveConfirmRow !== null
+                      "
                       [title]="
                         !req.isActive
                           ? 'Activate the account before approving'
@@ -592,6 +609,36 @@
             </button>
           </div>
         </footer>
+
+        <ng-container *ngIf="approveConfirmRow as approveRow">
+          <div
+            class="creator-approve-modal-backdrop"
+            role="presentation"
+            (click)="cancelCreatorApproveConfirm()"
+          >
+            <div
+              class="creator-approve-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="creator-approve-modal-title"
+              (click)="$event.stopPropagation()"
+            >
+              <h4 id="creator-approve-modal-title" class="creator-approve-modal-title">
+                Approve Content Creator role
+              </h4>
+              <p class="creator-approve-modal-body">
+                Approve <strong>{{ creatorRequestDisplayName(approveRow) }}</strong> as a Content Creator? They will
+                be able to create objects, activities, and events for manager review.
+              </p>
+              <div class="creator-approve-modal-actions">
+                <button type="button" class="ghost-btn slim-btn" (click)="cancelCreatorApproveConfirm()">
+                  Cancel
+                </button>
+                <button type="button" class="approve-creator-btn" (click)="confirmCreatorApprove()">Confirm</button>
+              </div>
+            </div>
+          </div>
+        </ng-container>
       </div>
     </section>
 

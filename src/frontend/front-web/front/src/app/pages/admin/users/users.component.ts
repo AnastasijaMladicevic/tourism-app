@@ -158,9 +158,13 @@ export class UsersComponent implements OnInit {
   creatorRequestsTotalCount = 0;
   creatorRequestsTotalPages = 1;
   approvingCreatorUserId: number | null = null;
+  /** Row pending confirmation in the approve dialog. */
+  approveConfirmRow: CreatorRoleRequestDto | null = null;
+  creatorRequestsApproveSuccess = '';
   private creatorRequestSearchDebounce?: ReturnType<typeof setTimeout>;
   private creatorRequestsSilentInFlight = false;
   private touristsTabPollTimer?: ReturnType<typeof setInterval>;
+  private approveSuccessDismissTimer?: ReturnType<typeof setTimeout>;
 
   private readonly onTouristsTabDocumentVisibility = (): void => {
     if (document.visibilityState !== 'visible' || this.usersViewTab !== 'tourists') {
@@ -177,6 +181,9 @@ export class UsersComponent implements OnInit {
       if (this.creatorRequestSearchDebounce) {
         clearTimeout(this.creatorRequestSearchDebounce);
       }
+      if (this.approveSuccessDismissTimer) {
+        clearTimeout(this.approveSuccessDismissTimer);
+      }
       this.stopTouristsTabLiveRefresh();
     });
     this.loadDashboardData();
@@ -185,6 +192,10 @@ export class UsersComponent implements OnInit {
   selectUsersViewTab(tab: UsersPageViewTab): void {
     this.usersViewTab = tab;
     this.originsDemographicsChart = false;
+    if (tab !== 'tourists') {
+      this.approveConfirmRow = null;
+      this.dismissCreatorApproveSuccess();
+    }
     if (tab === 'tourists') {
       this.loadCreatorRequests();
       this.startTouristsTabLiveRefresh();
@@ -203,7 +214,7 @@ export class UsersComponent implements OnInit {
       if (this.usersViewTab !== 'tourists') {
         return;
       }
-      if (this.creatorRequestsLoading || this.approvingCreatorUserId !== null) {
+      if (this.creatorRequestsLoading || this.approvingCreatorUserId !== null || this.approveConfirmRow !== null) {
         return;
       }
       this.loadCreatorRequests({ silent: true });
@@ -758,15 +769,31 @@ export class UsersComponent implements OnInit {
     return this.formatDate(value);
   }
 
-  approveCreatorRequest(row: CreatorRoleRequestDto): void {
-    const name = `${row.firstName} ${row.lastName}`.trim() || row.email;
-    if (
-      !window.confirm(
-        `Approve ${name} as a Content Creator? They will be able to create objects, activities, and events for manager review.`
-      )
-    ) {
+  creatorRequestDisplayName(row: CreatorRoleRequestDto): string {
+    const name = `${row.firstName} ${row.lastName}`.trim();
+    return name || row.email;
+  }
+
+  openCreatorApproveConfirm(row: CreatorRoleRequestDto): void {
+    if (!row.isActive) {
       return;
     }
+    this.dismissCreatorApproveSuccess();
+    this.creatorRequestsApproveError = '';
+    this.approveConfirmRow = row;
+  }
+
+  cancelCreatorApproveConfirm(): void {
+    this.approveConfirmRow = null;
+  }
+
+  confirmCreatorApprove(): void {
+    const row = this.approveConfirmRow;
+    if (!row) {
+      return;
+    }
+    const displayName = this.creatorRequestDisplayName(row);
+    this.approveConfirmRow = null;
     this.approvingCreatorUserId = row.id;
     this.creatorRequestsApproveError = '';
     this.adminUsersService
@@ -787,12 +814,34 @@ export class UsersComponent implements OnInit {
         })
       )
       .subscribe(() => {
+        this.creatorRequestsApproveError = '';
+        this.creatorRequestsApproveSuccess = `${displayName} has become a Content Creator.`;
+        this.scheduleCreatorApproveSuccessDismiss();
         const nextTotal = Math.max(0, this.creatorRequestsTotalCount - 1);
         if (this.creatorRequestsPage > 1 && (this.creatorRequestsPage - 1) * this.creatorRequestsPageSize >= nextTotal) {
           this.creatorRequestsPage--;
         }
         this.loadCreatorRequests();
       });
+  }
+
+  dismissCreatorApproveSuccess(): void {
+    this.creatorRequestsApproveSuccess = '';
+    if (this.approveSuccessDismissTimer !== undefined) {
+      clearTimeout(this.approveSuccessDismissTimer);
+      this.approveSuccessDismissTimer = undefined;
+    }
+  }
+
+  private scheduleCreatorApproveSuccessDismiss(): void {
+    if (this.approveSuccessDismissTimer !== undefined) {
+      clearTimeout(this.approveSuccessDismissTimer);
+    }
+    this.approveSuccessDismissTimer = window.setTimeout(() => {
+      this.creatorRequestsApproveSuccess = '';
+      this.approveSuccessDismissTimer = undefined;
+      this.cdr.markForCheck();
+    }, 8000);
   }
 
   /** Rows for the origins sidebar: internal team vs tourists by active tab. */
