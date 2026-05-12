@@ -502,7 +502,34 @@
         </thead>
         <tbody>
           <tr *ngFor="let tourist of visibleTourists">
-            <td>{{ tourist.name }}</td>
+            <td>
+              <div class="person">
+                <div class="tourist-avatar">
+                  <img
+                    *ngIf="tourist.profileImageUrl && !tourist.avatarLoadFailed"
+                    [src]="tourist.profileImageUrl"
+                    [alt]="tourist.name + ' profile photo'"
+                    class="tourist-avatar-img"
+                    (error)="onTouristAvatarError(tourist)"
+                  />
+                  <span
+                    *ngIf="!tourist.profileImageUrl || tourist.avatarLoadFailed"
+                    class="tourist-avatar-placeholder"
+                    role="img"
+                    [attr.aria-label]="'Default avatar for ' + tourist.name"
+                  >
+                    <svg viewBox="0 0 48 48" class="tourist-avatar-svg" aria-hidden="true">
+                      <circle cx="24" cy="24" r="22" fill="#ffffff" stroke="#111827" stroke-width="2" />
+                      <circle cx="24" cy="16.5" r="6.5" fill="#111827" />
+                      <path d="M24 25.2c6.4 0 11.8 4.1 14.3 12.3H9.7c2.5-8.2 7.9-12.3 14.3-12.3z" fill="#111827" />
+                    </svg>
+                  </span>
+                </div>
+                <div>
+                  <p class="person-name">{{ tourist.name }}</p>
+                </div>
+              </div>
+            </td>
             <td>{{ tourist.email }}</td>
             <td>{{ tourist.origin }}</td>
             <td><span class="status-pill" [class.pending]="tourist.status !== 'active'">{{ tourist.status }}</span></td>

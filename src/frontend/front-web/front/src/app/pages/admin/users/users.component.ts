@@ -123,6 +123,9 @@ export class UsersComponent implements OnInit {
     origin: string;
     status: 'active' | 'inactive';
     joinedDate: string;
+    profileImageUrl: string | null;
+    initials: string;
+    avatarLoadFailed?: boolean;
   }[] = [];
 
   adminDirectorySearch = '';
@@ -415,7 +418,9 @@ export class UsersComponent implements OnInit {
       email: u.email,
       origin: (u.country ?? '').trim() || 'Unknown',
       status: u.isActive ? 'active' : 'inactive',
-      joinedDate: this.formatDate(u.createdAt)
+      joinedDate: this.formatDate(u.createdAt),
+      profileImageUrl: (u.profileImageUrl ?? '').trim() || null,
+      initials: this.getInitials(u.firstName, u.lastName)
     }));
   }
 
@@ -435,7 +440,8 @@ export class UsersComponent implements OnInit {
       t.email,
       t.origin,
       t.status,
-      t.joinedDate
+      t.joinedDate,
+      t.initials
     ]);
   }
 
@@ -559,6 +565,10 @@ export class UsersComponent implements OnInit {
   clearTouristSearch(): void {
     this.touristSearch = '';
     this.touristCurrentPage = 1;
+  }
+
+  onTouristAvatarError(tourist: (typeof this.tourists)[0]): void {
+    tourist.avatarLoadFailed = true;
   }
 
   /** Rows for the origins sidebar: internal team vs tourists by active tab. */
