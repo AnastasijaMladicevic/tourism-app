@@ -326,12 +326,114 @@
   line-height: 1.35;
 }
 
-.origin-list-wrap {
-  max-height: min(420px, 55vh);
-  overflow-y: auto;
+.origins-visual {
   margin: 8px -6px 0;
+}
+
+.origins-visual-layers {
+  position: relative;
+  min-height: 240px;
+  max-height: min(420px, 55vh);
+}
+
+.origins-layer {
+  position: absolute;
+  inset: 0;
   padding: 0 6px;
+  overflow-x: hidden;
+  overflow-y: auto;
   scrollbar-gutter: stable;
+  transition:
+    opacity 0.45s cubic-bezier(0.32, 0.72, 0, 1),
+    transform 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.origins-layer-list {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+  z-index: 1;
+}
+
+.origins-layer-pie {
+  opacity: 0;
+  transform: translateY(12px) scale(0.96);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.origins-visual-layers.show-pie .origins-layer-list {
+  opacity: 0;
+  transform: translateY(-12px) scale(0.96);
+  pointer-events: none;
+}
+
+.origins-visual-layers.show-pie .origins-layer-pie {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.origin-pie-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 0 8px;
+}
+
+.origin-pie-svg {
+  width: min(200px, 78%);
+  height: auto;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 10px rgba(15, 23, 42, 0.07));
+}
+
+.origin-pie-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: min(180px, 28vh);
+  overflow-y: auto;
+}
+
+.origin-pie-legend-row {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+}
+
+.origin-pie-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.origin-pie-legend-name {
+  font-weight: 600;
+  color: #111827;
+  min-width: 0;
+}
+
+.origin-pie-legend-meta {
+  color: #6b7280;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .origins-layer,
+  .origins-chevron {
+    transition: none;
+  }
 }
 
 .origin-list {
@@ -396,16 +498,27 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
+  width: 100%;
   margin-top: 12px;
-  padding-top: 4px;
+  padding: 8px 4px 4px;
   color: #2563eb;
-  text-decoration: none;
+  font: inherit;
   font-size: 13px;
   font-weight: 600;
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 8px;
 }
 
 .origins-details-link:hover {
   text-decoration: underline;
+}
+
+.origins-details-link:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
 }
 
 .origins-chevron {
@@ -413,6 +526,11 @@
   width: 18px;
   height: 18px;
   color: #2563eb;
+  transition: transform 0.45s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.origins-chevron--back {
+  transform: rotate(180deg);
 }
 
 .table-toolbar {

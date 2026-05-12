@@ -9,6 +9,31 @@ import { AdminUserListItemDto, AdminUsersService } from '../../../services/admin
 import { ReviewDto, ReviewService } from '../../../services/review';
 
 const CHART_DAYS = 14;
+
+/** Distinct fills for the Top Origins pie (cycles if there are more slices). */
+const ORIGIN_PIE_COLORS = [
+  '#2563eb',
+  '#7c3aed',
+  '#059669',
+  '#d97706',
+  '#db2777',
+  '#0d9488',
+  '#4f46e5',
+  '#ca8a04',
+  '#dc2626',
+  '#0891b2',
+  '#65a30d',
+  '#9333ea'
+];
+
+interface OriginsPieSlice {
+  name: string;
+  users: number;
+  path: string;
+  color: string;
+  shareLabel: string;
+}
+
 const MAX_USER_LIST_PAGES = 40;
 const MAX_REVIEW_LIST_PAGES = 25;
 const USERS_LOAD_TIMEOUT_MS = 90_000;
@@ -55,6 +80,9 @@ export class UsersComponent implements OnInit {
 
   /** Tourist counts by country from loaded users; `barPercent` is share of all tourists (0–100). */
   topOrigins: { name: string; users: number; barPercent: number }[] = [];
+
+  /** When true, Top Origins shows a pie chart instead of the bar list. */
+  originsDemographicsChart = false;
   adminMembers: {
     id: number;
     initials: string;
@@ -402,6 +430,56 @@ export class UsersComponent implements OnInit {
   clearTouristSearch(): void {
     this.touristSearch = '';
     this.touristCurrentPage = 1;
+  }
+
+  toggleOriginsDemographics(): void {
+    this.originsDemographicsChart = !this.originsDemographicsChart;
+  }
+
+  /** Pie slices: each angle is proportional to `users` within the displayed origins total. */
+  get originsPieSlices(): OriginsPieSlice[] {
+    const rows = this.topOrigins;
+    if (!rows.length) {
+      return [];
+    }
+    const totalUsers = rows.reduce((sum, r) => sum + r.users, 0);
+    if (totalUsers <= 0) {
+      return [];
+    }
+
+    const cx = 50;
+    const cy = 50;
+    const R = 38;
+    let angle = -Math.PI / 2;
+    const colors = ORIGIN_PIE_COLORS;
+
+    return rows.map((r, i) => {
+      const sliceAngle = (r.users / totalUsers) * 2 * Math.PI;
+      const sharePct = Math.round((r.users / totalUsers) * 1000) / 10;
+      const shareLabel = `${sharePct}%`;
+
+      let path: string;
+      if (sliceAngle >= 2 * Math.PI - 1e-4) {
+        path = `M ${cx} ${cy} L ${cx} ${cy - R} A ${R} ${R} 0 0 1 ${cx} ${cy + R} A ${R} ${R} 0 0 1 ${cx} ${cy - R} Z`;
+      } else {
+        const x0 = cx + R * Math.cos(angle);
+        const y0 = cy + R * Math.sin(angle);
+        const x1 = cx + R * Math.cos(angle + sliceAngle);
+        const y1 = cy + R * Math.sin(angle + sliceAngle);
+        const largeArc = sliceAngle > Math.PI ? 1 : 0;
+        path = `M ${cx} ${cy} L ${x0.toFixed(3)} ${y0.toFixed(3)} A ${R} ${R} 0 ${largeArc} 1 ${x1.toFixed(3)} ${y1.toFixed(3)} Z`;
+      }
+
+      angle += sliceAngle;
+
+      return {
+        name: r.name,
+        users: r.users,
+        path,
+        color: colors[i % colors.length],
+        shareLabel
+      };
+    });
   }
 
   private buildTopOrigins(users: AdminUserListItemDto[]): { name: string; users: number; barPercent: number }[] {

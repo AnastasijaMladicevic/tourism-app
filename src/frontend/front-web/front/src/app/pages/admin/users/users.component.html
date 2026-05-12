@@ -102,25 +102,73 @@
         </div>
       </div>
 
-      <div class="origin-list-wrap" *ngIf="topOrigins.length">
-      <ul class="origin-list">
-        <li *ngFor="let item of topOrigins" class="origin-row">
-          <div class="origin-row-top">
-            <span class="origin-name">{{ item.name }}</span>
-            <span class="origin-count">{{ item.users }} users</span>
+      <div class="origins-visual" *ngIf="topOrigins.length" id="origins-demographics-panel">
+        <div class="origins-visual-layers" [class.show-pie]="originsDemographicsChart">
+          <div
+            class="origins-layer origins-layer-list"
+            [attr.aria-hidden]="originsDemographicsChart ? 'true' : null"
+          >
+            <div class="origin-list-inner">
+              <ul class="origin-list">
+                <li *ngFor="let item of topOrigins" class="origin-row">
+                  <div class="origin-row-top">
+                    <span class="origin-name">{{ item.name }}</span>
+                    <span class="origin-count">{{ item.users }} users</span>
+                  </div>
+                  <div class="origin-bar-track" role="presentation">
+                    <div class="origin-bar-fill" [style.width.%]="item.barPercent"></div>
+                  </div>
+                </li>
+              </ul>
+            </div>
           </div>
-          <div class="origin-bar-track" role="presentation">
-            <div class="origin-bar-fill" [style.width.%]="item.barPercent"></div>
+          <div
+            class="origins-layer origins-layer-pie"
+            [attr.aria-hidden]="!originsDemographicsChart ? 'true' : null"
+          >
+            <div class="origin-pie-inner">
+              <svg viewBox="0 0 100 100" class="origin-pie-svg" role="img" aria-label="Tourist origins distribution">
+                <title>Share of tourists among listed origins</title>
+                <g *ngFor="let slice of originsPieSlices">
+                  <path
+                    [attr.d]="slice.path"
+                    [attr.fill]="slice.color"
+                    stroke="#ffffff"
+                    stroke-width="0.6"
+                    vector-effect="non-scaling-stroke"
+                  >
+                    <title>{{ slice.name }}: {{ slice.users }} tourists ({{ slice.shareLabel }} of chart)</title>
+                  </path>
+                </g>
+              </svg>
+              <ul class="origin-pie-legend">
+                <li *ngFor="let slice of originsPieSlices" class="origin-pie-legend-row">
+                  <span class="origin-pie-swatch" [style.background]="slice.color"></span>
+                  <span class="origin-pie-legend-name">{{ slice.name }}</span>
+                  <span class="origin-pie-legend-meta">{{ slice.users }} · {{ slice.shareLabel }}</span>
+                </li>
+              </ul>
+            </div>
           </div>
-        </li>
-      </ul>
+        </div>
       </div>
       <p class="origins-empty" *ngIf="!topOrigins.length">No tourist geographic data yet.</p>
 
-      <a class="origins-details-link" href="javascript:void(0)">
-        View Detailed Demographics
-        <span class="material-symbols-outlined origins-chevron" aria-hidden="true">chevron_right</span>
-      </a>
+      <button
+        *ngIf="topOrigins.length"
+        type="button"
+        class="origins-details-link"
+        (click)="toggleOriginsDemographics()"
+        [attr.aria-expanded]="originsDemographicsChart"
+        aria-controls="origins-demographics-panel"
+      >
+        {{ originsDemographicsChart ? 'View bar list' : 'View pie chart' }}
+        <span
+          class="material-symbols-outlined origins-chevron"
+          [class.origins-chevron--back]="originsDemographicsChart"
+          aria-hidden="true"
+        >chevron_right</span>
+      </button>
     </section>
   </div>
 
