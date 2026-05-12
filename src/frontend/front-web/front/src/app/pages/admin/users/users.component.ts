@@ -99,8 +99,10 @@ export class UsersComponent implements OnInit {
   totalManagers = 0;
   totalContentCreators = 0;
 
-  /** Tourist counts by country from loaded users; `barPercent` is share of all tourists (0–100). */
+  /** Tourist counts by country (Tourists tab sidebar). */
   topOrigins: { name: string; users: number; barPercent: number }[] = [];
+  /** Internal team (admin, manager, content creator) counts by country (Internal Team tab sidebar). */
+  topTeamOrigins: { name: string; users: number; barPercent: number }[] = [];
 
   /** When true, Top Origins shows a pie chart instead of the bar list. */
   originsDemographicsChart = false;
@@ -140,6 +142,7 @@ export class UsersComponent implements OnInit {
 
   selectUsersViewTab(tab: UsersPageViewTab): void {
     this.usersViewTab = tab;
+    this.originsDemographicsChart = false;
   }
 
   private loadDashboardData(): void {
@@ -148,26 +151,84 @@ export class UsersComponent implements OnInit {
 
     // Load user lists first so the UI can render even if reviews are slow; avoids stuck loading state.
     forkJoin({
-      allUsers: this.fetchAllUsers(),
-      tourists: this.fetchAllUsers('Tourist')
+      allUsersResult: this.fetchAllUsers(),
+      touristsResult: this.fetchAllUsers('Tourist'),
+      totalAdminsApi: this.fetchRoleTotalCount('Admin'),
+      totalManagersApi: this.fetchRoleTotalCount('Manager'),
+      totalCreatorsApi: this.fetchRoleTotalCount('ContentCreator')
     })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         timeout(USERS_LOAD_TIMEOUT_MS),
-        tap(({ allUsers, tourists }) => {
-          this.bindUsersData(allUsers, tourists, []);
-          this.isLoading = false;
-          this.cdr.markForCheck();
-        }),
-        switchMap(({ allUsers, tourists }) =>
-          this.fetchAllReviews().pipe(
-            timeout(REVIEWS_LOAD_TIMEOUT_MS),
-            map((reviews) => ({ allUsers, tourists, reviews })),
-            catchError(() => of({ allUsers, tourists, reviews: [] as ReviewDto[] }))
-          )
+        tap(
+          ({
+            allUsersResult,
+            touristsResult,
+            totalAdminsApi,
+            totalManagersApi,
+            totalCreatorsApi
+          }) => {
+            const roleTotals = {
+              admins: totalAdminsApi,
+              managers: totalManagersApi,
+              contentCreators: totalCreatorsApi
+            };
+            this.bindUsersData(
+              allUsersResult.items,
+              allUsersResult.totalCount,
+              touristsResult.items,
+              touristsResult.totalCount,
+              [],
+              roleTotals
+            );
+            this.isLoading = false;
+            this.cdr.markForCheck();
+          }
         ),
-        tap(({ allUsers, tourists, reviews }) => {
-          this.bindUsersData(allUsers, tourists, reviews);
+        switchMap(
+          ({
+            allUsersResult,
+            touristsResult,
+            totalAdminsApi,
+            totalManagersApi,
+            totalCreatorsApi
+          }) =>
+            this.fetchAllReviews().pipe(
+              timeout(REVIEWS_LOAD_TIMEOUT_MS),
+              map((reviews) => ({
+                allUsersResult,
+                touristsResult,
+                totalAdminsApi,
+                totalManagersApi,
+                totalCreatorsApi,
+                reviews
+              })),
+              catchError(() =>
+                of({
+                  allUsersResult,
+                  touristsResult,
+                  totalAdminsApi,
+                  totalManagersApi,
+                  totalCreatorsApi,
+                  reviews: [] as ReviewDto[]
+                })
+              )
+            )
+        ),
+        tap(({ allUsersResult, touristsResult, totalAdminsApi, totalManagersApi, totalCreatorsApi, reviews }) => {
+          const roleTotals = {
+            admins: totalAdminsApi,
+            managers: totalManagersApi,
+            contentCreators: totalCreatorsApi
+          };
+          this.bindUsersData(
+            allUsersResult.items,
+            allUsersResult.totalCount,
+            touristsResult.items,
+            touristsResult.totalCount,
+            reviews,
+            roleTotals
+          );
           this.cdr.markForCheck();
         }),
         catchError((err: unknown) => {
@@ -187,12 +248,28 @@ export class UsersComponent implements OnInit {
       .subscribe();
   }
 
-  private fetchAllUsers(role?: string): Observable<AdminUserListItemDto[]> {
+  private fetchRoleTotalCount(role: string): Observable<number> {
+    return this.adminUsersService.getUsers({ page: 1, pageSize: 1, role }).pipe(
+      map((p) =>
+        typeof p.totalCount === 'number' && Number.isFinite(p.totalCount) && p.totalCount >= 0
+          ? p.totalCount
+          : 0
+      ),
+      catchError(() => of(0))
+    );
+  }
+
+  private fetchAllUsers(role?: string): Observable<{ items: AdminUserListItemDto[]; totalCount: number }> {
     return this.adminUsersService.getUsers({ page: 1, pageSize: 100, role }).pipe(
       switchMap((firstPage) => {
+        const itemsFirst = firstPage.items ?? [];
+        const totalCount =
+          typeof firstPage.totalCount === 'number' && Number.isFinite(firstPage.totalCount) && firstPage.totalCount >= 0
+            ? firstPage.totalCount
+            : itemsFirst.length;
         const cappedTotal = this.capTotalPages(firstPage.totalPages, MAX_USER_LIST_PAGES);
         if (cappedTotal <= 1) {
-          return of(firstPage.items ?? []);
+          return of({ items: itemsFirst, totalCount });
         }
 
         const requests = Array.from({ length: cappedTotal - 1 }, (_, i) =>
@@ -200,14 +277,13 @@ export class UsersComponent implements OnInit {
         );
 
         return forkJoin(requests).pipe(
-          map((restPages) => [
-            ...(firstPage.items ?? []),
-            ...restPages.flatMap((p) => p.items ?? [])
-          ])
+          map((restPages) => ({
+            items: [...itemsFirst, ...restPages.flatMap((p) => p.items ?? [])],
+            totalCount
+          }))
         );
       }),
-      map((value) => (Array.isArray(value) ? value : [])),
-      catchError(() => of([]))
+      catchError(() => of({ items: [] as AdminUserListItemDto[], totalCount: 0 }))
     );
   }
 
@@ -250,8 +326,11 @@ export class UsersComponent implements OnInit {
 
   private bindUsersData(
     allUsers: AdminUserListItemDto[],
+    allUsersTotalCount: number,
     touristsOnly: AdminUserListItemDto[],
-    reviews: ReviewDto[]
+    touristsTotalCount: number,
+    reviews: ReviewDto[],
+    roleTotals: { admins: number; managers: number; contentCreators: number }
   ): void {
     const now = new Date();
     const startCurrentPeriod = new Date(now);
@@ -259,7 +338,8 @@ export class UsersComponent implements OnInit {
     const startPreviousPeriod = new Date(now);
     startPreviousPeriod.setDate(now.getDate() - 60);
 
-    this.totalRegistered = allUsers.length;
+    this.totalRegistered =
+      allUsersTotalCount > 0 ? allUsersTotalCount : allUsers.length;
     this.activeThisPeriod = allUsers.filter((u) => this.isInRange(u.createdAt, startCurrentPeriod, now)).length;
     const previousActive = allUsers.filter((u) =>
       this.isInRange(u.createdAt, startPreviousPeriod, startCurrentPeriod)
@@ -295,17 +375,22 @@ export class UsersComponent implements OnInit {
     const touristSignupsPrevious = touristsOnly.filter((u) =>
       this.isInRange(u.createdAt, startPreviousPeriod, startCurrentPeriod)
     ).length;
-    this.touristKpiTotal = touristsOnly.length;
+    this.touristKpiTotal = touristsTotalCount > 0 ? touristsTotalCount : touristsOnly.length;
     this.touristKpiSignupDeltaPercent = this.computePercentDelta(touristSignupsCurrent, touristSignupsPrevious);
 
     const activeTourists = touristsOnly.filter((u) => u.isActive).length;
     this.touristKpiActiveTourists = activeTourists;
+    const touristDenomForActivePct =
+      touristsOnly.length > 0 ? touristsOnly.length : Math.max(touristsTotalCount, 1);
     this.touristKpiActiveSharePercent =
-      touristsOnly.length > 0 ? Math.round((activeTourists / touristsOnly.length) * 1000) / 10 : 0;
+      touristDenomForActivePct > 0
+        ? Math.round((activeTourists / touristDenomForActivePct) * 1000) / 10
+        : 0;
 
     const reviewerIds = new Set(reviews.map((r) => r.userId).filter((id) => id != null && Number.isFinite(id)));
     this.touristKpiUniqueReviewers = reviewerIds.size;
-    const platformTotal = allUsers.length;
+    const platformTotal =
+      allUsersTotalCount > 0 ? allUsersTotalCount : Math.max(allUsers.length, 1);
     this.touristKpiReviewersSharePercent =
       platformTotal > 0 ? Math.round((reviewerIds.size / platformTotal) * 1000) / 10 : 0;
 
@@ -321,13 +406,11 @@ export class UsersComponent implements OnInit {
     }));
 
     this.topOrigins = this.buildTopOrigins(touristsOnly);
+    this.topTeamOrigins = this.buildTopOrigins(internalTeam);
 
-    this.totalAdmins = internalTeam.filter((u) => (u.roleName ?? '').toLowerCase() === 'admin').length;
-    this.totalManagers = internalTeam.filter((u) => (u.roleName ?? '').toLowerCase() === 'manager').length;
-    this.totalContentCreators = internalTeam.filter((u) => {
-      const role = (u.roleName ?? '').toLowerCase().replace(/\s+/g, '');
-      return role === 'contentcreator' || role === 'content-creator';
-    }).length;
+    this.totalAdmins = roleTotals.admins;
+    this.totalManagers = roleTotals.managers;
+    this.totalContentCreators = roleTotals.contentCreators;
 
     this.tourists = touristsOnly.map((u) => ({
       id: u.id,
@@ -481,13 +564,18 @@ export class UsersComponent implements OnInit {
     this.touristCurrentPage = 1;
   }
 
+  /** Rows for the origins sidebar: internal team vs tourists by active tab. */
+  get activeOriginsRows(): { name: string; users: number; barPercent: number }[] {
+    return this.usersViewTab === 'internal' ? this.topTeamOrigins : this.topOrigins;
+  }
+
   toggleOriginsDemographics(): void {
     this.originsDemographicsChart = !this.originsDemographicsChart;
   }
 
   /** Pie slices: each angle is proportional to `users` within the displayed origins total. */
   get originsPieSlices(): OriginsPieSlice[] {
-    const rows = this.topOrigins;
+    const rows = this.activeOriginsRows;
     if (!rows.length) {
       return [];
     }
@@ -531,6 +619,7 @@ export class UsersComponent implements OnInit {
     });
   }
 
+  /** Country histogram for a user list (tourists or internal team). */
   private buildTopOrigins(users: AdminUserListItemDto[]): { name: string; users: number; barPercent: number }[] {
     const counts = new Map<string, number>();
     for (const user of users) {

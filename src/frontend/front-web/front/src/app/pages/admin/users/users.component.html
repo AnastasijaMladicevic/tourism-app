@@ -217,7 +217,7 @@
         <div class="origins-card-titles">
           <ng-container *ngIf="usersViewTab === 'internal'">
             <h3>Top Origins</h3>
-            <p>Major geographic sources of tourist traffic.</p>
+            <p>Admins, managers, and content creators by country or region.</p>
           </ng-container>
           <ng-container *ngIf="usersViewTab === 'tourists'">
             <h3>Countries &amp; regions</h3>
@@ -226,7 +226,7 @@
         </div>
       </div>
 
-      <div class="origins-visual" *ngIf="topOrigins.length" id="origins-demographics-panel">
+      <div class="origins-visual" *ngIf="activeOriginsRows.length" id="origins-demographics-panel">
         <div class="origins-visual-layers" [class.show-pie]="originsDemographicsChart">
           <div
             class="origins-layer origins-layer-list"
@@ -234,10 +234,10 @@
           >
             <div class="origin-list-inner">
               <ul class="origin-list">
-                <li *ngFor="let item of topOrigins" class="origin-row">
+                <li *ngFor="let item of activeOriginsRows" class="origin-row">
                   <div class="origin-row-top">
                     <span class="origin-name">{{ item.name }}</span>
-                    <span class="origin-count">{{ item.users }} users</span>
+                    <span class="origin-count">{{ item.users }} {{ usersViewTab === 'internal' ? 'members' : 'tourists' }}</span>
                   </div>
                   <div class="origin-bar-track" role="presentation">
                     <div class="origin-bar-fill" [style.width.%]="item.barPercent"></div>
@@ -251,8 +251,15 @@
             [attr.aria-hidden]="!originsDemographicsChart ? 'true' : null"
           >
             <div class="origin-pie-inner">
-              <svg viewBox="0 0 100 100" class="origin-pie-svg" role="img" aria-label="Tourist origins distribution">
-                <title>Share of tourists among listed origins</title>
+              <svg
+                viewBox="0 0 100 100"
+                class="origin-pie-svg"
+                role="img"
+                [attr.aria-label]="usersViewTab === 'internal' ? 'Internal team by country' : 'Tourist origins distribution'"
+              >
+                <title>
+                  {{ usersViewTab === 'internal' ? 'Share of internal team among listed countries' : 'Share of tourists among listed origins' }}
+                </title>
                 <g *ngFor="let slice of originsPieSlices">
                   <path
                     [attr.d]="slice.path"
@@ -261,7 +268,11 @@
                     stroke-width="0.6"
                     vector-effect="non-scaling-stroke"
                   >
-                    <title>{{ slice.name }}: {{ slice.users }} tourists ({{ slice.shareLabel }} of chart)</title>
+                    <title>
+                      {{ slice.name }}: {{ slice.users }}
+                      {{ usersViewTab === 'internal' ? 'team members' : 'tourists' }}
+                      ({{ slice.shareLabel }} of chart)
+                    </title>
                   </path>
                 </g>
               </svg>
@@ -276,10 +287,17 @@
           </div>
         </div>
       </div>
-      <p class="origins-empty" *ngIf="!topOrigins.length">No tourist geographic data yet.</p>
+      <p class="origins-empty" *ngIf="!activeOriginsRows.length">
+        <ng-container *ngIf="usersViewTab === 'internal'">
+          No country or region recorded for the internal team yet.
+        </ng-container>
+        <ng-container *ngIf="usersViewTab === 'tourists'">
+          No tourist geographic data yet.
+        </ng-container>
+      </p>
 
       <button
-        *ngIf="topOrigins.length"
+        *ngIf="activeOriginsRows.length"
         type="button"
         class="origins-details-link"
         (click)="toggleOriginsDemographics()"
