@@ -160,7 +160,7 @@
               }
             </div>
 
-            <button class="route-planner__add-btn" type="button" (click)="addFirstRouteSearchResultOrFocus()">
+            <button class="route-planner__add-btn" type="button" (click)="openAddStopPanel()">
               Add Stop
             </button>
           </div>
@@ -220,6 +220,152 @@
           }
         </div>
       }
+    </div>
+  }
+
+  @if (showAddStopPanel) {
+    <div class="add-stop-panel-backdrop" (click)="closeAddStopPanel()"></div>
+
+    <div class="add-stop-panel" role="dialog" aria-modal="true">
+      <div class="add-stop-panel__header">
+        <div class="add-stop-panel__title">
+          <span class="add-stop-panel__title-icon">
+            <mat-icon>flash_on</mat-icon>
+          </span>
+          <h3>Add Stop to Route</h3>
+        </div>
+
+        <button class="add-stop-panel__close" type="button" (click)="closeAddStopPanel()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="add-stop-panel__content">
+        <div class="add-stop-panel__left">
+          <div class="add-stop-panel__search">
+            <mat-icon>search</mat-icon>
+            <input
+              type="text"
+              placeholder="Search for a place, address, or category"
+              [(ngModel)]="addStopPanelQuery"
+              (input)="onAddStopPanelSearch()"
+              (keydown.enter)="onAddStopPanelSearchEnter()"
+              (blur)="onAddStopPanelSearchBlur()"
+            />
+            <mat-icon>mic_none</mat-icon>
+          </div>
+
+          <div class="add-stop-panel__chips">
+            <button
+              class="add-stop-panel__chip"
+              [class.add-stop-panel__chip--active]="isAddStopPanelFilterActive('coffee')"
+              type="button"
+              (click)="setAddStopPanelFilter('coffee')"
+            >
+              <mat-icon>local_cafe</mat-icon>Coffee
+            </button>
+            <button
+              class="add-stop-panel__chip"
+              [class.add-stop-panel__chip--active]="isAddStopPanelFilterActive('gas')"
+              type="button"
+              (click)="setAddStopPanelFilter('gas')"
+            >
+              <mat-icon>local_gas_station</mat-icon>Gas
+            </button>
+            <button
+              class="add-stop-panel__chip"
+              [class.add-stop-panel__chip--active]="isAddStopPanelFilterActive('dining')"
+              type="button"
+              (click)="setAddStopPanelFilter('dining')"
+            >
+              <mat-icon>restaurant</mat-icon>Dining
+            </button>
+            <button
+              class="add-stop-panel__chip"
+              [class.add-stop-panel__chip--active]="isAddStopPanelFilterActive('sights')"
+              type="button"
+              (click)="setAddStopPanelFilter('sights')"
+            >
+              <mat-icon>photo_camera</mat-icon>Sights
+            </button>
+          </div>
+
+          <button class="add-stop-panel__manual" type="button" (click)="openManualMapStopPicking()">
+            <span class="add-stop-panel__manual-icon"><mat-icon>place</mat-icon></span>
+            <span>Choose manually on map</span>
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+
+          <div class="add-stop-panel__section-head">
+            <h4>{{ addStopPanelQuery.trim() ? 'Search Results' : 'Recent & Suggested' }}</h4>
+            <button type="button" (click)="clearAddStopPanelFilters()">Clear All</button>
+          </div>
+
+          <div class="add-stop-panel__results">
+            @for (item of addStopPanelResults; track item.id + ':' + item.category) {
+              <button
+                class="add-stop-panel__result"
+                [class.add-stop-panel__result--selected]="isAddStopResultSelected(item)"
+                type="button"
+                (click)="selectAddStopResult(item)"
+              >
+                <span class="add-stop-panel__result-icon">
+                  <mat-icon>{{ item.icon }}</mat-icon>
+                </span>
+
+                <span class="add-stop-panel__result-body">
+                  <strong>{{ item.name }}</strong>
+                  <span>{{ item.location || item.typeName }}</span>
+                  <em>{{ item.typeName }}</em>
+                </span>
+
+                <span class="add-stop-panel__result-radio">
+                  <span></span>
+                </span>
+              </button>
+            } @empty {
+              <div class="add-stop-panel__empty">
+                <mat-icon>travel_explore</mat-icon>
+                <strong>No stops found</strong>
+                <span>Try another keyword or switch category.</span>
+              </div>
+            }
+          </div>
+
+          <p class="add-stop-panel__hint">* Selecting a stop will recalculate your travel time and distance.</p>
+        </div>
+
+        <div class="add-stop-panel__preview">
+          <div class="add-stop-panel__preview-map">
+            @if (selectedAddStopResult?.image) {
+              <img
+                class="add-stop-panel__preview-image"
+                [src]="selectedAddStopResult?.image"
+                [alt]="selectedAddStopResult?.name"
+                loading="lazy"
+                decoding="async"
+              />
+            }
+            <div class="add-stop-panel__preview-pin">
+              <mat-icon>place</mat-icon>
+            </div>
+
+            <div class="add-stop-panel__preview-copy">
+              <span>Previewing Stop</span>
+              <strong>{{ selectedAddStopResult?.name || 'Choose a stop' }}</strong>
+              <small>Current Route: {{ routeDisplayTitle }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="add-stop-panel__footer">
+        <button class="add-stop-panel__cancel" type="button" (click)="closeAddStopPanel()">Cancel</button>
+        <button class="add-stop-panel__confirm" type="button" [disabled]="!selectedAddStopResult" (click)="confirmAddStopResult()">
+          <mat-icon>add</mat-icon>
+          Add to Route
+        </button>
+      </div>
     </div>
   }
 

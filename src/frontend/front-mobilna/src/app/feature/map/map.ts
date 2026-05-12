@@ -60,6 +60,17 @@ interface RoutePoint {
   lng: number;
 }
 
+interface AddStopPreviewItem {
+  id: string;
+  name: string;
+  subtitle: string;
+  badge: string;
+  lat: number;
+  lng: number;
+}
+
+type AddStopPanelFilter = 'coffee' | 'gas' | 'dining' | 'sights';
+
 const SEARCH_STOP_WORDS = new Set([
   'gde', 'mogu', 'moze', 'da', 'na', 'sa', 'u', 'uz', 'za', 'od', 'do', 'i', 'ili',
   'nije', 'nisu', 'je', 'su', 'koji', 'koja', 'koje', 'mnogo', 'malo', 'malom',
@@ -86,6 +97,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   isRouteListCollapsed = false;
   isRoutePlannerExpanded = false;
   isRoutePlannerDragging = false;
+  showAddStopPanel = false;
+  addStopPanelQuery = '';
+  addStopPanelResults: SearchResult[] = [];
+  activeAddStopPanelFilter: AddStopPanelFilter = 'sights';
+  selectedAddStopResultKey = '';
   totalDistance = 0;
   totalDuration = 0;
   activeFilters: string[] = [];
@@ -110,12 +126,39 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   private userCircle: L.Circle | null = null;
 
   private routeLine: L.Polyline | null = null;
+  readonly addStopPreviewItems: AddStopPreviewItem[] = [
+    {
+      id: 'kotor-old-town',
+      name: 'Kotor Old Town',
+      subtitle: 'Stari Grad, Kotor 85330',
+      badge: 'Highly Rated',
+      lat: 42.4247,
+      lng: 18.7712,
+    },
+    {
+      id: 'perast-waterfront',
+      name: 'Perast Waterfront',
+      subtitle: 'Obala Kapetana Marka Martinovića',
+      badge: 'Quick Access',
+      lat: 42.4868,
+      lng: 18.6995,
+    },
+    {
+      id: 'lovcen-park',
+      name: 'Lovćen National Park',
+      subtitle: 'Ivanova Korita, Cetinje',
+      badge: 'Scenic Stop',
+      lat: 42.3993,
+      lng: 18.8399,
+    },
+  ];
 
   private allItems: SearchResult[] = [];
   private readonly subscriptions = new Subscription();
   private shouldCenterOnNextLocation = false;
   private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private routeSearchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+  private addStopPanelSearchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private temporarySearchMarker: L.Marker | null = null;
   private routePlannerDragStartY: number | null = null;
   private routePlannerDragCleanup: (() => void) | null = null;
@@ -208,6 +251,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.routeSearchDebounceTimer) {
       clearTimeout(this.routeSearchDebounceTimer);
       this.routeSearchDebounceTimer = null;
+    }
+    if (this.addStopPanelSearchDebounceTimer) {
+      clearTimeout(this.addStopPanelSearchDebounceTimer);
+      this.addStopPanelSearchDebounceTimer = null;
     }
     this.stopRoutePlannerDrag();
     this.syncRoutePlannerPageState(false);
@@ -370,6 +417,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.totalDuration = 0;
     this.routeSearchResults = [];
     this.routeSearchQuery = '';
+    this.showAddStopPanel = false;
   }
 
   clearDirections(): void {
@@ -1131,6 +1179,14 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     return `translateY(${this.routePlannerDragOffset}px)`;
   }
 
+  get selectedAddStopResult(): SearchResult | null {
+    if (!this.selectedAddStopResultKey) {
+      return this.addStopPanelResults[0] ?? null;
+    }
+
+    return this.addStopPanelResults.find((item) => this.toSearchResultKey(item) === this.selectedAddStopResultKey) ?? null;
+  }
+
   zoomIn(): void {
     this.mapService.getMap()?.zoomIn();
   }
@@ -1293,15 +1349,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   addRoutePoint(result: SearchResult): void {
-    if (!result.lat || !result.lng) return;
+    const routePoint = this.toRoutePoint(result);
+    if (!routePoint) return;
 
-    this.routePoints.push({
-      id: result.id,
-      name: result.name,
-      type: result.typeName,
-      lat: result.lat,
-      lng: result.lng
-    });
+    this.routePoints.push(routePoint);
 
     this.routeSearchQuery = '';
     this.routeSearchResults = [];
@@ -1331,6 +1382,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isRouteListCollapsed = false;
     this.isRoutePlannerExpanded = false;
     this.isRoutePickingMode = false;
+    this.showAddStopPanel = false;
     this.syncRoutePlannerPageState(false);
     this.stopRoutePlannerDrag();
     this.clearPlannedRoute();
@@ -1373,6 +1425,42 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 220);
   }
 
+  onAddStopPanelSearch(): void {
+    const query = this.addStopPanelQuery.trim();
+
+    if (this.addStopPanelSearchDebounceTimer) {
+      clearTimeout(this.addStopPanelSearchDebounceTimer);
+      this.addStopPanelSearchDebounceTimer = null;
+    }
+
+    if (!query) {
+      void this.refreshAddStopPanelResults();
+      return;
+    }
+
+    this.addStopPanelSearchDebounceTimer = setTimeout(() => {
+      if (this.addStopPanelQuery.trim() !== query) {
+        return;
+      }
+
+      void this.refreshAddStopPanelResults();
+    }, 220);
+  }
+
+  onAddStopPanelSearchBlur(): void {
+    if (this.addStopPanelSearchDebounceTimer) {
+      clearTimeout(this.addStopPanelSearchDebounceTimer);
+      this.addStopPanelSearchDebounceTimer = null;
+    }
+  }
+
+  onAddStopPanelSearchEnter(): void {
+    const firstResult = this.addStopPanelResults[0];
+    if (firstResult) {
+      this.selectAddStopResult(firstResult);
+    }
+  }
+
   addMyLocationAsStart(): void {
     if (!this.locationTrackingService.isTrackingEnabled()) {
       this.openLocationConsentPrompt();
@@ -1393,6 +1481,77 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     void this.calculateRoute();
+  }
+
+  openAddStopPanel(): void {
+    if (window.innerWidth <= 768) {
+      this.addFirstRouteSearchResultOrFocus();
+      return;
+    }
+
+    this.showAddStopPanel = true;
+    this.addStopPanelQuery = '';
+    this.activeAddStopPanelFilter = 'sights';
+    this.selectedAddStopResultKey = '';
+    void this.refreshAddStopPanelResults();
+
+    setTimeout(() => {
+      const input = document.querySelector('.add-stop-panel__search input') as HTMLInputElement | null;
+      input?.focus();
+    }, 0);
+  }
+
+  closeAddStopPanel(): void {
+    this.showAddStopPanel = false;
+    this.addStopPanelQuery = '';
+    this.addStopPanelResults = [];
+    this.selectedAddStopResultKey = '';
+    if (this.addStopPanelSearchDebounceTimer) {
+      clearTimeout(this.addStopPanelSearchDebounceTimer);
+      this.addStopPanelSearchDebounceTimer = null;
+    }
+  }
+
+  isAddStopPanelFilterActive(filter: AddStopPanelFilter): boolean {
+    return this.activeAddStopPanelFilter === filter;
+  }
+
+  setAddStopPanelFilter(filter: AddStopPanelFilter): void {
+    if (this.activeAddStopPanelFilter === filter) {
+      return;
+    }
+
+    this.activeAddStopPanelFilter = filter;
+    void this.refreshAddStopPanelResults();
+  }
+
+  clearAddStopPanelFilters(): void {
+    this.addStopPanelQuery = '';
+    this.activeAddStopPanelFilter = 'sights';
+    void this.refreshAddStopPanelResults();
+  }
+
+  selectAddStopResult(item: SearchResult): void {
+    this.selectedAddStopResultKey = this.toSearchResultKey(item);
+  }
+
+  isAddStopResultSelected(item: SearchResult): boolean {
+    return this.toSearchResultKey(item) === this.selectedAddStopResultKey;
+  }
+
+  confirmAddStopResult(): void {
+    const item = this.selectedAddStopResult;
+    if (!item) {
+      return;
+    }
+
+    this.addRoutePoint(item);
+    this.closeAddStopPanel();
+  }
+
+  openManualMapStopPicking(): void {
+    this.closeAddStopPanel();
+    this.enableMapStopPicking();
   }
 
   isRouteLocationLoading(): boolean {
@@ -1425,6 +1584,87 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.routeSearchResults = [...localResults, ...addressResults].slice(0, 6);
     this.cdr.detectChanges();
+  }
+
+  private async refreshAddStopPanelResults(): Promise<void> {
+    const query = this.addStopPanelQuery.trim();
+    let results: SearchResult[];
+
+    if (query) {
+      const localResults = this
+        .runLocalSearch(query, 10)
+        .filter((item) => this.matchesAddStopPanelFilter(item));
+      const addressResults = this.toAddressSearchResults(
+        await this.locationIntelligenceService.searchAddresses(query),
+        'desktop-add-stop',
+      );
+
+      if (this.addStopPanelQuery.trim() !== query) {
+        return;
+      }
+
+      results = this.mergeSearchResults(localResults, addressResults).slice(0, 8);
+    } else {
+      results = this.getSuggestedAddStopResults();
+    }
+
+    this.addStopPanelResults = results;
+    this.selectedAddStopResultKey = results[0] ? this.toSearchResultKey(results[0]) : '';
+    this.cdr.detectChanges();
+  }
+
+  private getSuggestedAddStopResults(): SearchResult[] {
+    const anchor = this.routePoints[this.routePoints.length - 1] ?? this.routePoints[0] ?? null;
+
+    return this.allItems
+      .filter((item) => this.matchesAddStopPanelFilter(item))
+      .filter((item) => !!item.lat && !!item.lng)
+      .slice()
+      .sort((left, right) => this.scoreSuggestedAddStop(left, anchor) - this.scoreSuggestedAddStop(right, anchor))
+      .slice(0, 8);
+  }
+
+  private scoreSuggestedAddStop(item: SearchResult, anchor: RoutePoint | null): number {
+    if (!anchor || !item.lat || !item.lng) {
+      return 0;
+    }
+
+    return L.latLng(anchor.lat, anchor.lng).distanceTo(L.latLng(item.lat, item.lng));
+  }
+
+  private mergeSearchResults(localResults: SearchResult[], addressResults: SearchResult[]): SearchResult[] {
+    const merged = new Map<string, SearchResult>();
+
+    [...localResults, ...addressResults].forEach((result) => {
+      merged.set(this.toSearchResultKey(result), result);
+    });
+
+    return [...merged.values()];
+  }
+
+  private matchesAddStopPanelFilter(item: SearchResult): boolean {
+    switch (this.activeAddStopPanelFilter) {
+      case 'coffee':
+        return item.markerType === 'kafana';
+      case 'gas':
+        return item.markerType === 'gas_station';
+      case 'dining':
+        return item.markerType === 'restaurant' || item.markerType === 'kafana';
+      case 'sights':
+      default:
+        return (
+          item.category === 'destination' ||
+          item.category === 'locality' ||
+          item.category === 'activity' ||
+          item.category === 'event' ||
+          item.markerType === 'attraction' ||
+          item.category === 'address'
+        );
+    }
+  }
+
+  private toSearchResultKey(item: SearchResult): string {
+    return `${item.category}:${item.id}`;
   }
 
   private async selectTopSearchResult(query: string): Promise<void> {
