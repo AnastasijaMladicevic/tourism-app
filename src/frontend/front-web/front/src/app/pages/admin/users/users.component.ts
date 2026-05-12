@@ -56,6 +56,7 @@ export class UsersComponent implements OnInit {
   /** Tourist counts by country from loaded users; `barPercent` is share of all tourists (0–100). */
   topOrigins: { name: string; users: number; barPercent: number }[] = [];
   adminMembers: {
+    id: number;
     initials: string;
     name: string;
     email: string;
@@ -64,6 +65,7 @@ export class UsersComponent implements OnInit {
     status: 'Active' | 'Inactive';
   }[] = [];
   tourists: {
+    id: number;
     name: string;
     email: string;
     origin: string;
@@ -232,6 +234,7 @@ export class UsersComponent implements OnInit {
 
     const internalTeam = allUsers.filter((u) => (u.roleName ?? '').toLowerCase() !== 'tourist');
     this.adminMembers = internalTeam.map((u) => ({
+      id: u.id,
       initials: this.getInitials(u.firstName, u.lastName),
       name: `${u.firstName} ${u.lastName}`.trim(),
       email: u.email,
@@ -250,6 +253,7 @@ export class UsersComponent implements OnInit {
     }).length;
 
     this.tourists = touristsOnly.map((u) => ({
+      id: u.id,
       name: `${u.firstName} ${u.lastName}`.trim(),
       email: u.email,
       origin: (u.country ?? '').trim() || 'Unknown',

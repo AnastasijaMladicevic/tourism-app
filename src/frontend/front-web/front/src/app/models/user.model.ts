@@ -26,6 +26,26 @@ export interface UserDto {
   userType?: string;
   roles?: string[];
   profileImageUrl?: string;
+  preferredRegionId?: number | null;
+  preferredRegionName?: string | null;
+  preferredRegionCode?: string | null;
+}
+
+/** Matches TuristickiVodic.Core.DTO.UpdateUserDto — profile fields admins may update (email is not included). */
+export interface UpdateUserDto {
+  firstName?: string;
+  lastName?: string;
+  dateOfBirth?: string;
+  phoneNumber?: string;
+  country?: string;
+  language?: string;
+}
+
+/** Matches TuristickiVodic.Core.DTO.ChangePasswordDto — admin may reset another user's password without knowing the current one. */
+export interface ChangePasswordDto {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 export interface LoginDto {

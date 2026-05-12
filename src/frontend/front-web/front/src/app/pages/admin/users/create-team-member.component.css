@@ -431,3 +431,38 @@
 .meta-link:hover {
   color: #2563eb;
 }
+
+.input-readonly {
+  background: #f9fafb;
+  color: #4b5563;
+  cursor: default;
+}
+
+.role-cards--readonly .role-card[disabled] {
+  cursor: default;
+  opacity: 1;
+}
+
+.role-cards--readonly .role-card--selected[disabled] {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.role-api-note--info {
+  color: #1e40af;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.form-shell--loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+.loading-copy {
+  margin: 0;
+  font-size: 14px;
+  color: #6b7280;
+}

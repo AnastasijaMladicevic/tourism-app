@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
-import { CreateUserDto, UserDto } from '../models/user.model';
+import { ChangePasswordDto, CreateUserDto, UpdateUserDto, UserDto } from '../models/user.model';
 
 export interface AdminUserListItemDto {
   id: number;
@@ -75,5 +75,17 @@ export class AdminUsersService {
   /** Creates a tourist account (`POST .../users/register`). Typically used from signup; admins may use it to add tourists. */
   createTourist(dto: CreateUserDto): Observable<UserDto> {
     return this.http.post<UserDto>(`${this.apiUrl}/register`, dto);
+  }
+
+  getUserById(id: number): Observable<UserDto> {
+    return this.http.get<UserDto>(`${this.apiUrl}/${id}`);
+  }
+
+  updateUser(id: number, dto: UpdateUserDto): Observable<UserDto> {
+    return this.http.put<UserDto>(`${this.apiUrl}/${id}`, dto);
+  }
+
+  changeUserPassword(id: number, dto: ChangePasswordDto): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/${id}/change-password`, dto);
   }
 }
