@@ -286,27 +286,129 @@
   background: #7c3aed;
 }
 
+.origins-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.origins-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.origins-globe {
+  font-size: 26px;
+  width: 26px;
+  height: 26px;
+  color: #2563eb;
+  flex-shrink: 0;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.origins-card-titles h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.origins-card-titles p {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.35;
+}
+
+.origin-list-wrap {
+  max-height: min(420px, 55vh);
+  overflow-y: auto;
+  margin: 8px -6px 0;
+  padding: 0 6px;
+  scrollbar-gutter: stable;
+}
+
 .origin-list {
-  margin: 12px 0;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.origin-list li {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
+.origin-row {
+  padding: 12px 0;
   border-bottom: 1px solid #f3f4f6;
-  font-size: 13px;
 }
 
-.details-link {
-  display: inline-block;
-  margin-top: 10px;
+.origin-row:last-child {
+  border-bottom: 0;
+}
+
+.origin-row-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.origin-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.origin-count {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.origin-bar-track {
+  height: 8px;
+  border-radius: 999px;
+  background: #eef2f7;
+  overflow: hidden;
+}
+
+.origin-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #2563eb;
+  min-width: 0;
+  transition: width 0.35s ease;
+}
+
+.origins-empty {
+  margin: 12px 0 8px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.origins-details-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 12px;
+  padding-top: 4px;
   color: #2563eb;
   text-decoration: none;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
+}
+
+.origins-details-link:hover {
+  text-decoration: underline;
+}
+
+.origins-chevron {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #2563eb;
 }
 
 .table-toolbar {

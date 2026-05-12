@@ -93,18 +93,34 @@
       </div>
     </section>
 
-    <section class="card">
-      <div class="card-head">
-        <h3>Top Origins</h3>
-        <p>Major geographic sources of tourist traffic.</p>
+    <section class="card origins-card">
+      <div class="origins-card-header">
+        <span class="material-symbols-outlined origins-globe" aria-hidden="true">public</span>
+        <div class="origins-card-titles">
+          <h3>Top Origins</h3>
+          <p>Major geographic sources of tourist traffic.</p>
+        </div>
       </div>
+
+      <div class="origin-list-wrap" *ngIf="topOrigins.length">
       <ul class="origin-list">
-        <li *ngFor="let item of topOrigins">
-          <span>{{ item.name }}</span>
-          <strong>{{ item.users }} users</strong>
+        <li *ngFor="let item of topOrigins" class="origin-row">
+          <div class="origin-row-top">
+            <span class="origin-name">{{ item.name }}</span>
+            <span class="origin-count">{{ item.users }} users</span>
+          </div>
+          <div class="origin-bar-track" role="presentation">
+            <div class="origin-bar-fill" [style.width.%]="item.barPercent"></div>
+          </div>
         </li>
       </ul>
-      <a class="details-link" href="javascript:void(0)">View Detailed Demographics</a>
+      </div>
+      <p class="origins-empty" *ngIf="!topOrigins.length">No tourist geographic data yet.</p>
+
+      <a class="origins-details-link" href="javascript:void(0)">
+        View Detailed Demographics
+        <span class="material-symbols-outlined origins-chevron" aria-hidden="true">chevron_right</span>
+      </a>
     </section>
   </div>
 

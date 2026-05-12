@@ -52,7 +52,8 @@ export class UsersComponent implements OnInit {
   totalManagers = 0;
   totalContentCreators = 0;
 
-  topOrigins: { name: string; users: number }[] = [];
+  /** Tourist counts by country from loaded users; `barPercent` is share of all tourists (0–100). */
+  topOrigins: { name: string; users: number; barPercent: number }[] = [];
   adminMembers: {
     initials: string;
     name: string;
@@ -398,16 +399,21 @@ export class UsersComponent implements OnInit {
     this.touristCurrentPage = 1;
   }
 
-  private buildTopOrigins(users: AdminUserListItemDto[]): { name: string; users: number }[] {
+  private buildTopOrigins(users: AdminUserListItemDto[]): { name: string; users: number; barPercent: number }[] {
     const counts = new Map<string, number>();
     for (const user of users) {
       const country = (user.country ?? '').trim() || 'Unknown';
       counts.set(country, (counts.get(country) ?? 0) + 1);
     }
-    return [...counts.entries()]
+    const rows = [...counts.entries()]
       .map(([name, usersCount]) => ({ name, users: usersCount }))
-      .sort((a, b) => b.users - a.users)
-      .slice(0, 4);
+      .sort((a, b) => b.users - a.users);
+
+    const total = users.length;
+    return rows.map((r) => ({
+      ...r,
+      barPercent: total > 0 ? Math.round((r.users / total) * 1000) / 10 : 0
+    }));
   }
 
   private bindChartSeries(dailyTouristSignups: number[], dailyReviews: number[]): void {
