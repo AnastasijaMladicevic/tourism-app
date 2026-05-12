@@ -1,0 +1,233 @@
+<div class="create-member-page">
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a routerLink="/admin/users" class="crumb-link">Team Management</a>
+    <span class="crumb-sep" aria-hidden="true">›</span>
+    <span class="crumb-current">Create Member</span>
+  </nav>
+
+  <header class="page-intro">
+    <h1 class="page-title">Create Team Member</h1>
+    <p class="page-subtitle">
+      Add a new manager or content creator to your organizational workspace.
+    </p>
+  </header>
+
+  <div class="form-shell">
+    <!-- Personal Information -->
+    <section class="form-section">
+      <div class="section-heading">
+        <span class="section-icon-wrap" aria-hidden="true">
+          <span class="material-symbols-outlined section-icon">person</span>
+        </span>
+        <div>
+          <h2 class="section-title">Personal Information</h2>
+          <p class="section-desc">Basic identity details for this account.</p>
+        </div>
+      </div>
+
+      <div class="field-grid field-grid--2">
+        <label class="field">
+          <span class="field-label">First Name <span class="req">*</span></span>
+          <input type="text" class="input-control" placeholder="e.g. Sarah" [(ngModel)]="firstName" />
+        </label>
+        <label class="field">
+          <span class="field-label">Last Name <span class="req">*</span></span>
+          <input type="text" class="input-control" placeholder="e.g. Jenkins" [(ngModel)]="lastName" />
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="field-label">Work Email <span class="req">*</span></span>
+        <div class="input-with-icon">
+          <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">mail</span>
+          <input
+            type="email"
+            class="input-control input-control--padded"
+            placeholder="sarah.j@company.com"
+            [(ngModel)]="workEmail"
+            autocomplete="email"
+          />
+        </div>
+      </label>
+
+      <div class="field-grid field-grid--2">
+        <label class="field">
+          <span class="field-label">Date of Birth</span>
+          <div class="input-with-icon">
+            <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">calendar_today</span>
+            <input type="date" class="input-control input-control--padded" [(ngModel)]="dateOfBirth" />
+          </div>
+        </label>
+        <label class="field">
+          <span class="field-label">Phone Number</span>
+          <div class="input-with-icon">
+            <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">call</span>
+            <input
+              type="tel"
+              class="input-control input-control--padded"
+              placeholder="+1 (555) 000-0000"
+              [(ngModel)]="phoneNumber"
+            />
+          </div>
+        </label>
+      </div>
+    </section>
+
+    <!-- Account Security -->
+    <section class="form-section">
+      <div class="section-heading">
+        <span class="section-icon-wrap" aria-hidden="true">
+          <span class="material-symbols-outlined section-icon">shield</span>
+        </span>
+        <div>
+          <h2 class="section-title">Account Security</h2>
+          <p class="section-desc">Credentials and internal role assignment.</p>
+        </div>
+      </div>
+
+      <label class="field">
+        <span class="field-label">Password <span class="req">*</span></span>
+        <div class="input-with-icon">
+          <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">lock</span>
+          <input
+            type="password"
+            class="input-control input-control--padded"
+            placeholder="Secret123!"
+            [(ngModel)]="password"
+            autocomplete="new-password"
+          />
+        </div>
+        <p class="strength-line" *ngIf="password && passwordStrengthLabel">
+          STRENGTH:
+          <span class="strength-value" [ngClass]="passwordStrengthClass">{{ passwordStrengthLabel }}</span>
+        </p>
+      </label>
+
+      <label class="field">
+        <span class="field-label">Confirm Password <span class="req">*</span></span>
+        <div class="input-with-icon">
+          <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">lock</span>
+          <input
+            type="password"
+            class="input-control input-control--padded"
+            [class.input-invalid]="passwordsMismatch"
+            placeholder="••••••••"
+            [(ngModel)]="confirmPassword"
+            autocomplete="new-password"
+          />
+        </div>
+        <p class="field-error" *ngIf="passwordsMismatch">Passwords do not match</p>
+      </label>
+
+      <div class="role-block">
+        <p class="role-block-label">Primary Role</p>
+        <div class="role-cards" role="radiogroup" aria-label="Primary role">
+          <button
+            type="button"
+            class="role-card"
+            [class.role-card--selected]="selectedRole === 'manager'"
+            (click)="selectRole('manager')"
+          >
+            <span class="role-card-check material-symbols-outlined" *ngIf="selectedRole === 'manager'"
+              >check_circle</span
+            >
+            <span class="material-symbols-outlined role-card-icon">grid_view</span>
+            <span class="role-card-title">Manager</span>
+            <span class="role-card-desc">Full administrative control over teams, hubs, and billing.</span>
+          </button>
+
+          <button
+            type="button"
+            class="role-card"
+            [class.role-card--selected]="selectedRole === 'content-creator'"
+            (click)="selectRole('content-creator')"
+          >
+            <span class="role-card-check material-symbols-outlined" *ngIf="selectedRole === 'content-creator'"
+              >check_circle</span
+            >
+            <span class="material-symbols-outlined role-card-icon">description</span>
+            <span class="role-card-title">Content Creator</span>
+            <span class="role-card-desc">Restricted access to asset creation and publishing tools only.</span>
+          </button>
+
+          <button
+            type="button"
+            class="role-card"
+            [class.role-card--selected]="selectedRole === 'tourist'"
+            (click)="selectRole('tourist')"
+          >
+            <span class="role-card-check material-symbols-outlined" *ngIf="selectedRole === 'tourist'"
+              >check_circle</span
+            >
+            <span class="material-symbols-outlined role-card-icon">person</span>
+            <span class="role-card-title">Tourist</span>
+            <span class="role-card-desc">Restricted access to asset creation and publishing tools only.</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Region & Localization -->
+    <section class="form-section">
+      <div class="section-heading">
+        <span class="section-icon-wrap" aria-hidden="true">
+          <span class="material-symbols-outlined section-icon">public</span>
+        </span>
+        <div>
+          <h2 class="section-title">Region &amp; Localization</h2>
+          <p class="section-desc">Where this member operates and their UI language.</p>
+        </div>
+      </div>
+
+      <div class="field-grid field-grid--2">
+        <label class="field">
+          <span class="field-label">Country</span>
+          <div class="input-with-icon select-wrap">
+            <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">location_on</span>
+            <select class="input-control input-control--padded select-control" [(ngModel)]="country">
+              <option *ngFor="let c of countries" [ngValue]="c">{{ c }}</option>
+            </select>
+          </div>
+        </label>
+        <label class="field">
+          <span class="field-label">Preferred Language</span>
+          <div class="input-with-icon select-wrap">
+            <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">translate</span>
+            <select class="input-control input-control--padded select-control" [(ngModel)]="preferredLanguage">
+              <option *ngFor="let lang of languages" [ngValue]="lang">{{ lang }}</option>
+            </select>
+          </div>
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="field-label">Region Assignment <span class="optional">(Optional)</span></span>
+        <select class="input-control select-control select-control--full" [(ngModel)]="regionAssignment">
+          <option value="">Select target market region</option>
+          <option *ngFor="let r of regionOptions" [ngValue]="r">{{ r }}</option>
+        </select>
+        <p class="field-hint">Leave empty to grant global access across all active regions.</p>
+      </label>
+    </section>
+
+    <footer class="form-actions">
+      <button type="button" class="btn-cancel" (click)="onCancel()">
+        <span class="material-symbols-outlined btn-icon" aria-hidden="true">close</span>
+        Cancel
+      </button>
+      <button type="button" class="btn-primary" (click)="onCreate()">
+        <span class="material-symbols-outlined btn-icon" aria-hidden="true">save</span>
+        Create Team Member
+      </button>
+    </footer>
+  </div>
+
+  <footer class="page-meta-footer">
+    <span class="page-meta-version">SPIREGO ADMIN • BUILD 2026.05</span>
+    <div class="page-meta-links">
+      <a href="#" class="meta-link">Support Center</a>
+      <a href="#" class="meta-link">Privacy Policy</a>
+      <a href="#" class="meta-link">Terms of Service</a>
+    </div>
+  </footer>
+</div>
