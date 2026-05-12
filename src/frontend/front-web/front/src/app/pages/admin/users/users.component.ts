@@ -39,6 +39,8 @@ const MAX_REVIEW_LIST_PAGES = 25;
 const USERS_LOAD_TIMEOUT_MS = 90_000;
 const REVIEWS_LOAD_TIMEOUT_MS = 45_000;
 
+type UsersPageViewTab = 'internal' | 'tourists';
+
 @Component({
   selector: 'app-users',
   standalone: true,
@@ -104,6 +106,9 @@ export class UsersComponent implements OnInit {
   adminDirectorySearch = '';
   touristSearch = '';
 
+  /** Internal Team vs Tourist accounts. */
+  usersViewTab: UsersPageViewTab = 'internal';
+
   adminCurrentPage = 1;
   adminPageSize = 5;
   touristCurrentPage = 1;
@@ -112,6 +117,10 @@ export class UsersComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadDashboardData();
+  }
+
+  selectUsersViewTab(tab: UsersPageViewTab): void {
+    this.usersViewTab = tab;
   }
 
   private loadDashboardData(): void {
