@@ -918,32 +918,58 @@ th {
 .small-kpis {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
 }
 
-.mini-card {
+/* Internal directory — role totals; mirrors “objects” KPI style: white card, UPPER label, colored figure, grey hint */
+.mini-kpi-card {
   background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 14px;
+  border: 1px solid #e8eaed;
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05), 0 4px 12px rgba(15, 23, 42, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
 }
 
-.mini-card p {
+.mini-kpi-label {
   margin: 0;
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.mini-card strong {
-  display: block;
-  margin-top: 8px;
-  font-size: 28px;
-  color: #111827;
-}
-
-.mini-card span {
   font-size: 11px;
-  color: #10b981;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #4b5563;
+  line-height: 1.35;
+}
+
+.mini-kpi-value {
+  margin: 4px 0 0;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.mini-kpi-card--admins .mini-kpi-value {
+  color: #2563eb;
+}
+
+.mini-kpi-card--managers .mini-kpi-value {
+  color: #16a34a;
+}
+
+.mini-kpi-card--creators .mini-kpi-value {
+  color: #d97706;
+}
+
+.mini-kpi-hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  font-weight: 400;
+  color: #9ca3af;
+  line-height: 1.45;
 }
 
 @media (max-width: 1100px) {

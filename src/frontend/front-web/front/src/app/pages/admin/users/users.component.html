@@ -437,20 +437,20 @@
     </section>
 
     <div class="small-kpis">
-      <article class="mini-card">
-        <p>Total Admins</p>
-        <strong>{{ totalAdmins | number : '2.0-0' }}</strong>
-        <span>Live count</span>
+      <article class="mini-kpi-card mini-kpi-card--admins">
+        <p class="mini-kpi-label">Total admins</p>
+        <p class="mini-kpi-value">{{ totalAdmins | number : '1.0-0' }}</p>
+        <p class="mini-kpi-hint">Admin accounts across the platform</p>
       </article>
-      <article class="mini-card">
-        <p>Total Managers</p>
-        <strong>{{ totalManagers | number : '2.0-0' }}</strong>
-        <span>Live count</span>
+      <article class="mini-kpi-card mini-kpi-card--managers">
+        <p class="mini-kpi-label">Total managers</p>
+        <p class="mini-kpi-value">{{ totalManagers | number : '1.0-0' }}</p>
+        <p class="mini-kpi-hint">Manager accounts across the platform</p>
       </article>
-      <article class="mini-card">
-        <p>Total Content Creator</p>
-        <strong>{{ totalContentCreators | number : '2.0-0' }}</strong>
-        <span>Live count</span>
+      <article class="mini-kpi-card mini-kpi-card--creators">
+        <p class="mini-kpi-label">Total content creators</p>
+        <p class="mini-kpi-value">{{ totalContentCreators | number : '1.0-0' }}</p>
+        <p class="mini-kpi-hint">Content creator accounts across the platform</p>
       </article>
     </div>
   </ng-container>
