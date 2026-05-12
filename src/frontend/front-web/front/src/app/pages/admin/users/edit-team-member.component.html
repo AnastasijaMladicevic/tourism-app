@@ -12,7 +12,10 @@
       <ng-container *ngIf="displayRole === 'tourist'">
         For tourist accounts, choose Tourist or Content Creator below; promotion applies when you save.
       </ng-container>
-      <ng-container *ngIf="displayRole !== 'tourist'">
+      <ng-container *ngIf="displayRole === 'content-creator'">
+        Choose <strong>Content Creator</strong> to keep this account, or <strong>Tourist</strong> if demotion is supported later. Saving as Tourist is not available from the API yet.
+      </ng-container>
+      <ng-container *ngIf="displayRole === 'manager' || displayRole === 'admin'">
         Role is shown for reference; only tourist→creator promotion is available (see below when editing a tourist).
       </ng-container>
     </p>
@@ -135,10 +138,7 @@
           This account has the <strong>Admin</strong> role. Role cannot be changed on this screen.
         </p>
 
-        <ng-container *ngIf="displayRole === 'tourist'">
-          <p class="role-api-note role-api-note--info role-tourist-scope-hint">
-            Pick <strong>Tourist</strong> or <strong>Content Creator</strong>. Saving with Content Creator calls the API to approve creator access. That succeeds only if this user has already requested the creator role from their tourist session.
-          </p>
+        <ng-container *ngIf="showRolePairPicker">
           <div class="role-cards role-cards--tourist-pair" role="radiogroup" aria-label="Primary role">
             <button
               type="button"
@@ -169,18 +169,29 @@
                 >check_circle</span>
               <span class="material-symbols-outlined role-card-icon">description</span>
               <span class="role-card-title">Content Creator</span>
-              <span class="role-card-desc">On save, requests promotion via the server (requires prior creator request).</span>
+              <span class="role-card-desc" *ngIf="displayRole === 'tourist'">On save, requests promotion via the server (requires prior creator request).</span>
+              <span class="role-card-desc" *ngIf="displayRole === 'content-creator'">Keeps publishing tools for this account after save.</span>
             </button>
           </div>
         </ng-container>
 
-        <ng-container *ngIf="displayRole !== 'tourist'">
-          <p
-            class="role-api-note role-api-note--info"
-            *ngIf="displayRole === 'manager' || displayRole === 'content-creator'"
-          >
-            This member’s role cannot be changed here without backend support. You can still update profile fields.
-          </p>
+        <ng-container *ngIf="displayRole === 'manager'">
+          <div class="role-cards role-cards--readonly role-cards--tourist-pair" role="group" aria-label="Primary role (read-only)">
+            <button type="button" class="role-card" disabled [class.role-card--selected]="isRole('manager')">
+              <span class="material-symbols-outlined role-card-icon">grid_view</span>
+              <span class="role-card-title">Manager</span>
+              <span class="role-card-desc">Full administrative control over teams, hubs, and billing.</span>
+            </button>
+
+            <button type="button" class="role-card" disabled [class.role-card--selected]="isRole('content-creator')">
+              <span class="material-symbols-outlined role-card-icon">description</span>
+              <span class="role-card-title">Content Creator</span>
+              <span class="role-card-desc">Restricted access to asset creation and publishing tools only.</span>
+            </button>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="displayRole === 'admin'">
           <div class="role-cards role-cards--readonly" role="group" aria-label="Primary role (read-only)">
             <button
               type="button"

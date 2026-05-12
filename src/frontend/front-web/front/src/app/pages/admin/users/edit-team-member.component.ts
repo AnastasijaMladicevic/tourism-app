@@ -56,7 +56,7 @@ export class EditTeamMemberComponent {
   /** Snapshot of role when the form was loaded — used to decide if Save should call approve-creator. */
   roleAtLoad: DisplayRole = 'tourist';
 
-  /** For tourists: chosen role before Save (Tourist vs Content Creator). */
+  /** For tourists and content creators: chosen role before Save (Tourist vs Content Creator). */
   touristRoleSelection: 'tourist' | 'content-creator' = 'tourist';
 
   country = 'United States';
@@ -166,11 +166,13 @@ export class EditTeamMemberComponent {
     this.roleAtLoad = this.displayRole;
     if (this.roleAtLoad === 'tourist') {
       this.touristRoleSelection = 'tourist';
+    } else if (this.roleAtLoad === 'content-creator') {
+      this.touristRoleSelection = 'content-creator';
     }
   }
 
   selectTouristRole(role: 'tourist' | 'content-creator'): void {
-    if (this.displayRole !== 'tourist') {
+    if (this.displayRole !== 'tourist' && this.displayRole !== 'content-creator') {
       return;
     }
     this.touristRoleSelection = role;
@@ -180,6 +182,10 @@ export class EditTeamMemberComponent {
   /** Used in templates for role chip selection without strict-control-flow issues. */
   isRole(role: DisplayRole): boolean {
     return this.displayRole === role;
+  }
+
+  get showRolePairPicker(): boolean {
+    return this.displayRole === 'tourist' || this.displayRole === 'content-creator';
   }
 
   private extractLoadError(err: unknown): string {
@@ -290,6 +296,12 @@ export class EditTeamMemberComponent {
         this.submitError = 'Passwords do not match.';
         return;
       }
+    }
+
+    if (this.roleAtLoad === 'content-creator' && this.touristRoleSelection === 'tourist') {
+      this.submitError =
+        'Changing this account from Content Creator to Tourist is not supported by the API yet. Keep Content Creator selected to save profile changes.';
+      return;
     }
 
     const updateDto = this.buildUpdatePayload();
