@@ -218,11 +218,11 @@
     <footer class="form-actions">
       <button type="button" class="btn-cancel" (click)="onCancel()" [disabled]="isSubmitting">
         <span class="material-symbols-outlined btn-icon" aria-hidden="true">close</span>
-        Cancel
+        <span class="btn-text">Cancel</span>
       </button>
       <button type="button" class="btn-primary" (click)="onCreate()" [disabled]="isSubmitting">
         <span class="material-symbols-outlined btn-icon" aria-hidden="true" *ngIf="!isSubmitting">save</span>
-        {{ isSubmitting ? 'Creating…' : 'Create Team Member' }}
+        <span class="btn-text">{{ isSubmitting ? 'Creating…' : 'Create Team Member' }}</span>
       </button>
     </footer>
   </div>

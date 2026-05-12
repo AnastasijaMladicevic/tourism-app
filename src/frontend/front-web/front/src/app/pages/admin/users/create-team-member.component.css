@@ -344,7 +344,9 @@
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-top: 32px;
   padding-top: 24px;
   border-top: 1px solid #f3f4f6;
@@ -353,14 +355,17 @@
 .btn-cancel {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  border: none;
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
   background: transparent;
-  color: #6b7280;
+  color: #4b5563;
   font-size: 14px;
   font-weight: 600;
-  padding: 10px 14px;
-  border-radius: 8px;
+  line-height: 1.25;
   cursor: pointer;
   font-family: inherit;
 }
@@ -368,19 +373,23 @@
 .btn-cancel:hover {
   background: #f3f4f6;
   color: #111827;
+  border-color: #e5e7eb;
 }
 
 .btn-primary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  min-height: 40px;
+  padding: 8px 16px;
   border: none;
+  border-radius: 8px;
   background: #2563eb;
   color: #fff;
   font-size: 14px;
   font-weight: 600;
-  padding: 10px 18px;
-  border-radius: 8px;
+  line-height: 1.25;
   cursor: pointer;
   font-family: inherit;
   box-shadow: 0 1px 2px rgba(37, 99, 235, 0.25);
@@ -396,9 +405,31 @@
   cursor: not-allowed;
 }
 
+.btn-text {
+  display: inline-block;
+  line-height: 1.25;
+}
+
 .btn-icon {
-  font-size: 20px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25em;
+  height: 1.25em;
+  font-size: 18px;
   line-height: 1;
+  font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+.btn-primary .btn-icon {
+  color: #ffffff;
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+}
+
+.btn-cancel .btn-icon {
+  color: currentColor;
+  font-size: 17px;
 }
 
 .page-meta-footer {

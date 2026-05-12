@@ -266,11 +266,11 @@
     <footer class="form-actions">
       <button type="button" class="btn-cancel" (click)="onCancel()" [disabled]="isSubmitting">
         <span class="material-symbols-outlined btn-icon" aria-hidden="true">close</span>
-        Cancel
+        <span class="btn-text">Cancel</span>
       </button>
       <button type="button" class="btn-primary" (click)="onSave()" [disabled]="isSubmitting">
         <span class="material-symbols-outlined btn-icon" aria-hidden="true" *ngIf="!isSubmitting">save</span>
-        {{ isSubmitting ? 'Saving…' : 'Save changes' }}
+        <span class="btn-text">{{ isSubmitting ? 'Saving…' : 'Save changes' }}</span>
       </button>
     </footer>
   </div>
