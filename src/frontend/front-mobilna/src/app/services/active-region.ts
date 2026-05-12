@@ -25,7 +25,8 @@ export class ActiveRegionService {
   private readonly usersUrl = `${environment.apiUrl}/users`;
   private readonly regionsUrl = `${environment.apiUrl}/Regions`;
   private readonly fallbackRegionId = 1;
-  private readonly activeRegionIdSubject = new BehaviorSubject<number | null>(null);
+  private readonly regionStorageKey = 'spirego-session-region-id';
+  private readonly activeRegionIdSubject = new BehaviorSubject<number | null>(this.readStoredRegionId());
 
   constructor(private readonly http: HttpClient) {}
 
@@ -36,6 +37,12 @@ export class ActiveRegionService {
   }
 
   async loadInitialRegion(): Promise<void> {
+    const storedRegionId = this.readStoredRegionId();
+    if (storedRegionId != null) {
+      this.setActiveRegionId(storedRegionId, 'guest');
+      return;
+    }
+
     if (this.hasAuthToken()) {
       const serverRegionId = await this.tryLoadUserRegionId();
       if (serverRegionId != null) {
@@ -55,6 +62,7 @@ export class ActiveRegionService {
 
   setActiveRegionId(regionId: number | null, source: RegionSelectionSource = 'guest'): void {
     this.activeRegionIdSubject.next(regionId);
+    this.persistRegionId(regionId);
   }
 
   applySelectedRegion<T extends { regionId?: number }>(
@@ -107,5 +115,31 @@ export class ActiveRegionService {
     } catch {
       return null;
     }
+  }
+
+  private persistRegionId(regionId: number | null): void {
+    if (typeof sessionStorage === 'undefined') {
+      return;
+    }
+
+    if (regionId == null) {
+      sessionStorage.removeItem(this.regionStorageKey);
+      return;
+    }
+
+    sessionStorage.setItem(this.regionStorageKey, String(regionId));
+  }
+
+  private readStoredRegionId(): number | null {
+    if (typeof sessionStorage === 'undefined') {
+      return null;
+    }
+
+    const raw = sessionStorage.getItem(this.regionStorageKey);
+    if (!raw) {
+      return null;
+    }
+
+    return this.normalizeRegionId(Number(raw));
   }
 }
