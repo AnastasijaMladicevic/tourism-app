@@ -31,7 +31,11 @@ export class LocationTrackingService {
     }
 
     if (this.trackingEnabledSubject.value) {
-      this.ensureTracking();
+      if (this.canUseGeolocation()) {
+        this.ensureTracking();
+      } else if (this.canUseIpFallback()) {
+        this.ensureIpFallback();
+      }
     }
   }
 

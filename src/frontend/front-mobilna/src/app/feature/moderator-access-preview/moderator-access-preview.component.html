@@ -1,11 +1,11 @@
 <div class="preview-page">
   <header class="preview-topbar">
-    <a class="back-btn" routerLink="/home" aria-label="Nazad">
+    <a class="back-btn" routerLink="/home" [attr.aria-label]="'common.back' | translate">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="m15 18-6-6 6-6" />
       </svg>
     </a>
-    <h1>Moderator pristup</h1>
+    <h1>{{ 'moderatorAccess.title' | translate }}</h1>
     <div class="topbar-spacer" aria-hidden="true"></div>
   </header>
 
@@ -17,19 +17,15 @@
         </svg>
       </div> -->
 
-      <h2>Postanite SpireGO moderator</h2>
-      <p>
-        Kao moderator ili kreator sadržaja, imaćete direktan uticaj na kvalitet informacija u našoj
-        zajednici. Možete upravljati mestima, odobravati autentične fotografije i pomagati
-        putnicima da pronađu najbolje lokacije
-      </p>
+      <h2>{{ 'moderatorAccess.introTitle' | translate }}</h2>
+      <p>{{ 'moderatorAccess.introBody' | translate }}</p>
     </section>
 
     <section class="privileges-card">
-      <h3>Dostupne privilegije</h3>
+      <h3>{{ 'moderatorAccess.privilegesTitle' | translate }}</h3>
 
       <div class="privileges-list">
-        @for (item of privileges; track item.title) {
+        @for (item of privileges; track item.titleKey) {
           <article class="privilege-row">
             <div class="privilege-icon">
               <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -38,8 +34,8 @@
             </div>
 
             <div class="privilege-copy">
-              <h4>{{ item.title }}</h4>
-              <p>{{ item.body }}</p>
+              <h4>{{ item.titleKey | translate }}</h4>
+              <p>{{ item.bodyKey | translate }}</p>
             </div>
           </article>
         }
@@ -49,15 +45,16 @@
     <section class="status-panel">
       <div class="status-card">
         <div class="status-row">
-          <span class="status-title">Status zahteva</span>
+          <span class="status-title">{{ 'moderatorAccess.statusTitle' | translate }}</span>
           <span class="status-pill">{{ statusLabel() }}</span>
         </div>
-        <p class="status-role">Trenutna uloga: {{ roleLabel() }}</p>
+        <p class="status-role">{{ 'moderatorAccess.currentRole' | translate:{ role: roleLabel() } }}</p>
       </div>
 
       <p class="status-note">
-        Slanjem zahteva prihvatate <span>Pravila moderacije.</span> Nas tim zadrzava pravo da
-        povuce pristup u slucaju krsenja standarda zajednice.
+        {{ 'moderatorAccess.statusNoteBefore' | translate }}
+        <span>{{ 'moderatorAccess.moderationRules' | translate }}</span>
+        {{ 'moderatorAccess.statusNoteAfter' | translate }}
       </p>
 
       <button class="request-btn" type="button" [disabled]="!canRequest()" (click)="submitRequest()">

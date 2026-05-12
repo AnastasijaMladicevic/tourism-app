@@ -2,17 +2,20 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import { AuthService, UserDto } from '../../services/auth';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 
 @Component({
   selector: 'app-moderator-access-preview',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, TranslatePipe],
   templateUrl: './moderator-access-preview.component.html',
   styleUrl: './moderator-access-preview.component.scss',
 })
 export class ModeratorAccessPreviewComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly translationService = inject(TranslationService);
 
   protected readonly isSubmitting = signal(false);
   protected readonly feedback = signal('');
@@ -25,37 +28,50 @@ export class ModeratorAccessPreviewComponent {
   protected readonly privileges = [
     {
       icon: 'plus',
-      title: 'Dodavanje dogadaja',
-      body: 'Objavljujte nove lokalne manifestacije i festivale.',
+      titleKey: 'moderatorAccess.privileges.addEvents.title',
+      bodyKey: 'moderatorAccess.privileges.addEvents.body',
     },
     {
       icon: 'pin',
-      title: 'Dodavanje i izmena objekata',
-      body: 'Kreirajte i izmenite nove lokacije i restorane na mapi.',
+      titleKey: 'moderatorAccess.privileges.editObjects.title',
+      bodyKey: 'moderatorAccess.privileges.editObjects.body',
     },
     {
       icon: 'activity',
-      title: 'Upravljanje aktivnostima',
-      body: 'Dodajte nove ture i sportske aktivnosti.',
+      titleKey: 'moderatorAccess.privileges.manageActivities.title',
+      bodyKey: 'moderatorAccess.privileges.manageActivities.body',
     },
     {
       icon: 'edit',
-      title: 'Uredjivanje detalja dogadaja',
-      body: 'Kreirajte i izmenite nove dogadaje na mapi.',
+      titleKey: 'moderatorAccess.privileges.editEvents.title',
+      bodyKey: 'moderatorAccess.privileges.editEvents.body',
     },
     {
       icon: 'chart',
-      title: 'Pristup analitici',
-      body: 'Pratite posecenost i popularnost vasih objava.',
+      titleKey: 'moderatorAccess.privileges.analytics.title',
+      bodyKey: 'moderatorAccess.privileges.analytics.body',
     },
   ];
 
   protected readonly roleLabel = computed(() => {
     const roleName = this.user?.roleName?.trim();
-    if (!roleName || roleName === 'Tourist') return 'Turista';
-    if (roleName === 'ContentCreator') return 'Moderator';
-    if (roleName === 'Admin') return 'Administrator';
-    if (roleName === 'Manager') return 'Menadzer';
+  
+    if (!roleName || roleName === 'Tourist') {
+      return this.translationService.translate('moderatorAccess.roles.tourist');
+    }
+  
+    if (roleName === 'ContentCreator') {
+      return this.translationService.translate('moderatorAccess.roles.moderator');
+    }
+  
+    if (roleName === 'Admin') {
+      return this.translationService.translate('moderatorAccess.roles.admin');
+    }
+  
+    if (roleName === 'Manager') {
+      return this.translationService.translate('moderatorAccess.roles.manager');
+    }
+  
     return roleName;
   });
 
@@ -64,16 +80,31 @@ export class ModeratorAccessPreviewComponent {
   });
 
   protected readonly statusLabel = computed(() => {
-    if (this.hasRequested()) return 'Zahtev je poslat';
-    if (this.user?.roleName === 'ContentCreator') return 'Pristup odobren';
-    if (this.user?.roleName && this.user.roleName !== 'Tourist') return 'Posebna uloga aktivna';
-    return 'Nije zatrazeno';
+    if (this.hasRequested()) {
+      return this.translationService.translate('moderatorAccess.status.requestSent');
+    }
+  
+    if (this.user?.roleName === 'ContentCreator') {
+      return this.translationService.translate('moderatorAccess.status.approved');
+    }
+  
+    if (this.user?.roleName && this.user.roleName !== 'Tourist') {
+      return this.translationService.translate('moderatorAccess.status.specialRoleActive');
+    }
+  
+    return this.translationService.translate('moderatorAccess.status.notRequested');
   });
 
   protected readonly requestButtonLabel = computed(() => {
-    if (this.isSubmitting()) return 'Slanje zahteva...';
-    if (this.hasRequested()) return 'Zahtev je poslat';
-    return 'Zatrazi pristup';
+    if (this.isSubmitting()) {
+      return this.translationService.translate('moderatorAccess.sending');
+    }
+  
+    if (this.hasRequested()) {
+      return this.translationService.translate('moderatorAccess.requestSent');
+    }
+  
+    return this.translationService.translate('moderatorAccess.requestAccess');
   });
 
   constructor() {
@@ -108,7 +139,7 @@ export class ModeratorAccessPreviewComponent {
         catchError((error) => {
           const message = (error as { error?: { message?: string } })?.error?.message;
           this.feedbackTone.set('error');
-          this.feedback.set(message || 'Zahtev trenutno nije moguce poslati.');
+          this.feedback.set(message || this.translationService.translate('moderatorAccess.feedback.sendFailed'));
           return of(null);
         }),
         finalize(() => this.isSubmitting.set(false)),
@@ -119,7 +150,7 @@ export class ModeratorAccessPreviewComponent {
         sessionStorage.setItem(this.requestStorageKey(this.user.id), 'sent');
         this.hasRequested.set(true);
         this.feedbackTone.set('success');
-        this.feedback.set(result.message || 'Zahtev za pristup moderatoru je uspesno poslat.');
+        this.feedback.set(result.message || this.translationService.translate('moderatorAccess.feedback.sendSuccess'));
       });
   }
 
