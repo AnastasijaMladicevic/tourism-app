@@ -316,6 +316,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'map/add-stop',
+    loadComponent: () =>
+      import('./feature/add-stop-mobile-screen/add-stop-mobile-screen.component').then(
+        (m) => m.AddStopMobileScreenComponent,
+      ),
+  },
+  {
     path: 'my-reviews',
     canActivate: [profileAuthGuard],
     loadComponent: () =>

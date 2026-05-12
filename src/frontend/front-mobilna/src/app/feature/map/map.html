@@ -142,9 +142,12 @@
                   (blur)="onRouteSearchBlur()"
                 />
 
-                <button class="route-planner__map-pill" type="button" (click)="enableMapStopPicking()">
-                  <mat-icon>place</mat-icon>
-                  Map
+                <button class="route-planner__map-pill" type="button" (click)="handleInlineRouteAction()">
+                  <span class="route-planner__map-pill-desktop">
+                    <mat-icon>place</mat-icon>
+                    Map
+                  </span>
+                  <span class="route-planner__map-pill-mobile">Add Stop</span>
                 </button>
               </div>
 

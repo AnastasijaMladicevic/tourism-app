@@ -1330,6 +1330,15 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  handleInlineRouteAction(): void {
+    if (window.innerWidth <= 768) {
+      void this.router.navigate(['/map/add-stop']);
+      return;
+    }
+
+    this.enableMapStopPicking();
+  }
+
   getRoutePointMeta(point: RoutePoint, index: number): string {
     if (index === 0) {
       return 'Start • 0 km';

@@ -1,0 +1,83 @@
+<div class="add-stop-screen">
+  <div class="add-stop-screen__handle" aria-hidden="true"></div>
+
+  <div class="add-stop-screen__statusbar" aria-hidden="true">
+    <span>9:41</span>
+    <div class="add-stop-screen__status-icons">
+      <mat-icon>signal_cellular_alt</mat-icon>
+      <mat-icon>wifi</mat-icon>
+      <mat-icon>battery_full</mat-icon>
+    </div>
+  </div>
+
+  <header class="add-stop-screen__header">
+    <div class="add-stop-screen__title">
+      <span class="add-stop-screen__logo">
+        <mat-icon>flash_on</mat-icon>
+      </span>
+      <h1>Add Stop</h1>
+    </div>
+
+    <button class="add-stop-screen__close" type="button" (click)="close()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <div class="add-stop-screen__content">
+    <div class="add-stop-screen__search">
+      <mat-icon>search</mat-icon>
+      <span>Search for a place...</span>
+      <mat-icon>mic_none</mat-icon>
+    </div>
+
+    <div class="add-stop-screen__chips">
+      @for (category of categories; track category.label) {
+        <button
+          class="add-stop-screen__chip"
+          type="button"
+          [class.add-stop-screen__chip--active]="category.active"
+        >
+          <mat-icon>{{ category.icon }}</mat-icon>
+          <span>{{ category.label }}</span>
+        </button>
+      }
+    </div>
+
+    <button class="add-stop-screen__choose-map" type="button">
+      <span class="add-stop-screen__choose-icon">
+        <mat-icon>place</mat-icon>
+      </span>
+      <span class="add-stop-screen__choose-copy">Choose on map</span>
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+
+    <div class="add-stop-screen__section-head">
+      <h2>Recent</h2>
+      <button type="button">Clear All</button>
+    </div>
+
+    <div class="add-stop-screen__recent-list">
+      @for (item of recentItems; track item.title) {
+        <article class="add-stop-screen__recent-item">
+          <span class="add-stop-screen__recent-icon">
+            <mat-icon>schedule</mat-icon>
+          </span>
+          <span class="add-stop-screen__recent-copy">
+            <strong>{{ item.title }}</strong>
+            <span>{{ item.subtitle }}</span>
+            @if (item.meta) {
+              <small>{{ item.meta }}</small>
+            }
+          </span>
+        </article>
+      }
+    </div>
+
+    <button class="add-stop-screen__more-link" type="button">More from recent history</button>
+  </div>
+
+  <footer class="add-stop-screen__footer">
+    <button class="add-stop-screen__primary" type="button" disabled>Add to Route</button>
+    <button class="add-stop-screen__cancel" type="button" (click)="close()">Cancel</button>
+  </footer>
+</div>

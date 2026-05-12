@@ -502,6 +502,18 @@ body.route-planner-open {
   }
 }
 
+.route-planner__map-pill-desktop,
+.route-planner__map-pill-mobile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.route-planner__map-pill-mobile {
+  display: none;
+}
+
 .route-planner__search-input {
   width: 100%;
   border: none;
@@ -791,6 +803,26 @@ body.route-planner-open {
     min-height: 44px;
     border-radius: 18px;
     padding: 0 10px 0 12px;
+  }
+
+  .route-planner__map-pill {
+    min-height: 34px;
+    padding: 0 16px;
+    border: none;
+    background: linear-gradient(135deg, #1697d8, #157cb0);
+    color: #fff;
+    box-shadow: 0 12px 24px rgba(21, 124, 176, 0.2);
+  }
+
+  .route-planner__map-pill-desktop {
+    display: none;
+  }
+
+  .route-planner__map-pill-mobile {
+    display: inline-flex;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
   }
 
   .route-planner__search-input {
