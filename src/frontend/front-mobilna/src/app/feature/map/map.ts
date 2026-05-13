@@ -29,6 +29,7 @@ import {
   QuietZoneAddressSuggestion,
 } from '../../services/location-intelligence';
 import { RouteBuilderStateService } from '../../services/route-builder-state.service';
+import { AuthService } from '../../services/auth';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 import { environment } from '../../../environment/environment';
@@ -188,6 +189,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     private localityService: LocalityService,
     private regionService: RegionService,
     private activeRegionService: ActiveRegionService,
+    private authService: AuthService,
     private locationTrackingService: LocationTrackingService,
     private locationIntelligenceService: LocationIntelligenceService,
     private routeBuilderStateService: RouteBuilderStateService,
@@ -242,13 +244,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const zoom = state?.zoom ?? 13;
 
     this.mapService.initMap('main-map', lat, lng, zoom, { enableClustering: true });
-    this.isTracking = this.locationTrackingService.isTrackingEnabled();
-    this.applyTrackedLocation(this.locationTrackingService.getCurrentLocation());
-    this.restoreRouteBuilderState();
-    if (!state?.lat || !state?.lng) {
-      this.focusActiveRegion();
-    }
-    this.loadAllData(state);
 
     const map = this.mapService.getMap();
     if (!map) return;
@@ -266,6 +261,20 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         });
       });
     }
+
+    queueMicrotask(() => {
+      this.ngZone.run(() => {
+        this.isTracking = this.locationTrackingService.isTrackingEnabled();
+        this.applyTrackedLocation(this.locationTrackingService.getCurrentLocation());
+        this.restoreRouteBuilderState();
+        if (!state?.lat || !state?.lng) {
+          this.focusActiveRegion();
+        }
+        void this.maybeOpenLocationConsentPromptOnMapEnter();
+        this.loadAllData(state);
+        this.cdr.detectChanges();
+      });
+    });
   }
 
   ngOnDestroy(): void {
@@ -283,6 +292,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.addStopPanelSearchDebounceTimer = null;
     }
     this.stopRoutePlannerDrag();
+    this.syncRouteNavigationPageState(false);
     this.syncRoutePlannerPageState(false);
     this.clearTemporarySearchMarker();
     this.mapService.destroyMap();
@@ -315,6 +325,55 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     void this.router.navigate(['/settings'], {
       queryParams: { locationConsent: '1' },
     });
+  }
+
+  private async maybeOpenLocationConsentPromptOnMapEnter(): Promise<void> {
+    if (!this.authService.isLoggedIn()) {
+      return;
+    }
+
+    const currentLocation = this.locationTrackingService.getCurrentLocation();
+    if (currentLocation?.source === 'gps') {
+      this.closeLocationConsentPrompt();
+      return;
+    }
+
+    const permissionState = await this.getGeolocationPermissionState();
+    if (permissionState === 'granted') {
+      if (!this.locationTrackingService.isTrackingEnabled()) {
+        this.locationTrackingService.startTracking();
+      }
+      this.closeLocationConsentPrompt();
+      return;
+    }
+
+    if (permissionState === 'prompt' || permissionState === 'denied') {
+      this.showLocationConsentPrompt = true;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (!this.locationTrackingService.isTrackingEnabled() && !currentLocation) {
+      this.showLocationConsentPrompt = true;
+      this.cdr.detectChanges();
+    }
+  }
+
+  private async getGeolocationPermissionState(): Promise<PermissionState | 'unsupported'> {
+    if (
+      typeof navigator === 'undefined' ||
+      !('permissions' in navigator) ||
+      typeof navigator.permissions?.query !== 'function'
+    ) {
+      return 'unsupported';
+    }
+
+    try {
+      const status = await navigator.permissions.query({ name: 'geolocation' as PermissionName });
+      return status.state;
+    } catch {
+      return 'unsupported';
+    }
   }
 
   private updateUserMarker(latlng: L.LatLng): void {
@@ -1456,6 +1515,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isNavigationAutoCenterEnabled = true;
     this.isRoutePickingMode = false;
     this.shouldCenterOnNextLocation = !this.userLocation;
+    this.syncRouteNavigationPageState(true);
 
     let routeChanged = false;
     if (this.userLocation) {
@@ -1497,8 +1557,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     } else if (map) {
       map.setZoom(this.stoppedNavigationZoom, { animate: true });
     }
-
-    this.locationTrackingService.stopTracking();
   }
 
   optimizeRouteSequence(): void {
@@ -2019,6 +2077,15 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     document.body.classList.toggle('route-planner-open', isOpen);
   }
 
+  private syncRouteNavigationPageState(isActive: boolean): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    document.documentElement.classList.toggle('route-navigation-active', isActive);
+    document.body.classList.toggle('route-navigation-active', isActive);
+  }
+
   private restoreRouteBuilderState(): void {
     const restoredRoutePoints = this.routeBuilderStateService.getRoutePoints();
 
@@ -2116,6 +2183,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isRouteNavigationActive = false;
     this.isNavigationAutoCenterEnabled = false;
     this.shouldCenterOnNextLocation = false;
+    this.syncRouteNavigationPageState(false);
     this.mapService.resetNavigationBearing();
   }
 

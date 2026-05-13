@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { catchError, firstValueFrom, of, timeout } from 'rxjs';
 
@@ -73,6 +74,7 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
   isLoading = true;
   isSubmitting = false;
   hasMoreResults = false;
+  isDesktopLayout = false;
 
   private readonly collapsedResultLimit = 6;
   private visibleResultLimit = this.collapsedResultLimit;
@@ -89,11 +91,14 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     private readonly eventService: EventService,
     private readonly activityService: ActivityService,
     private readonly localityService: LocalityService,
+    private readonly sanitizer: DomSanitizer,
     private readonly locationIntelligenceService: LocationIntelligenceService,
     private readonly routeBuilderStateService: RouteBuilderStateService,
   ) {}
 
   async ngOnInit(): Promise<void> {
+    this.updateLayoutMode();
+    this.syncAddStopPageState(true);
     this.routePoints = this.routeBuilderStateService.getRoutePoints();
     await this.loadResults();
   }
@@ -103,10 +108,17 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
       clearTimeout(this.searchDebounceTimer);
       this.searchDebounceTimer = null;
     }
+
+    this.syncAddStopPageState(false);
   }
 
   close(): void {
     void this.router.navigate(['/map']);
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.updateLayoutMode();
   }
 
   onSearchChange(): void {
@@ -140,6 +152,21 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     void this.router.navigate(['/map']);
   }
 
+  viewSelectedOnMap(): void {
+    const selectedResult = this.selectedResult;
+    if (!selectedResult || selectedResult.lat == null || selectedResult.lng == null) {
+      return;
+    }
+
+    void this.router.navigate(['/map'], {
+      state: {
+        lat: selectedResult.lat,
+        lng: selectedResult.lng,
+        zoom: 16,
+      },
+    });
+  }
+
   selectResult(item: AddStopResult): void {
     this.selectedResultKey = item.key;
   }
@@ -171,10 +198,23 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
 
   get selectedResult(): AddStopResult | null {
     if (!this.selectedResultKey) {
-      return null;
+      return this.results[0] ?? null;
     }
 
     return this.results.find((item) => item.key === this.selectedResultKey) ?? null;
+  }
+
+  get selectedResultPreviewMapUrl(): SafeResourceUrl | null {
+    const selectedResult = this.selectedResult;
+    if (selectedResult?.lat == null || selectedResult.lng == null) {
+      return null;
+    }
+
+    return this.buildPreviewMapUrl(selectedResult.lat, selectedResult.lng);
+  }
+
+  get desktopSectionTitle(): string {
+    return this.searchQuery.trim() ? 'Search Results' : 'Recent & Suggested';
   }
 
   get canAddToRoute(): boolean {
@@ -684,5 +724,36 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     }
 
     return copy;
+  }
+
+  private updateLayoutMode(): void {
+    if (typeof window === 'undefined') {
+      this.isDesktopLayout = false;
+      return;
+    }
+
+    this.isDesktopLayout = window.innerWidth >= 768;
+  }
+
+  private buildPreviewMapUrl(lat: number, lng: number): SafeResourceUrl {
+    const delta = 0.012;
+    const left = lng - delta;
+    const right = lng + delta;
+    const top = lat + delta;
+    const bottom = lat - delta;
+    const url =
+      `https://www.openstreetmap.org/export/embed.html?bbox=${left}%2C${bottom}%2C${right}%2C${top}` +
+      `&layer=mapnik&marker=${lat}%2C${lng}`;
+
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
+
+  private syncAddStopPageState(isOpen: boolean): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    document.documentElement.classList.toggle('route-add-stop-open', isOpen);
+    document.body.classList.toggle('route-add-stop-open', isOpen);
   }
 }

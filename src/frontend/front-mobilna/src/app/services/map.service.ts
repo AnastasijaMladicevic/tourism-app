@@ -379,19 +379,15 @@ export class MapService {
   }
 
   private syncClusteredMarkers(): void {
-    this.markerMap.forEach((entry) => {
-      const group = this.clusterGroups.get(entry.clusterKey);
-      if (!group) {
-        return;
-      }
+    this.clusterGroups.forEach((group, clusterKey) => {
+      const visibleMarkers = this.markers
+        .filter((entry) => entry.clusterKey === clusterKey && this.matchesCurrentFilters(entry.type))
+        .map((entry) => entry.marker);
 
-      const shouldShow = this.matchesCurrentFilters(entry.type);
-      const hasLayer = group.hasLayer(entry.marker);
+      group.clearLayers();
 
-      if (shouldShow && !hasLayer) {
-        group.addLayer(entry.marker);
-      } else if (!shouldShow && hasLayer) {
-        group.removeLayer(entry.marker);
+      if (visibleMarkers.length > 0) {
+        group.addLayers(visibleMarkers);
       }
     });
   }
