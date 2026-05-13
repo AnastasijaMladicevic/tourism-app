@@ -158,6 +158,7 @@ export class UsersComponent implements OnInit {
   creatorRequestsTotalCount = 0;
   creatorRequestsTotalPages = 1;
   approvingCreatorUserId: number | null = null;
+  rejectingCreatorUserId: number | null = null;
   /** Row pending confirmation in the approve dialog. */
   approveConfirmRow: CreatorRoleRequestDto | null = null;
   creatorRequestsApproveSuccess = '';
@@ -816,6 +817,45 @@ export class UsersComponent implements OnInit {
       .subscribe(() => {
         this.creatorRequestsApproveError = '';
         this.creatorRequestsApproveSuccess = `${displayName} has become a Content Creator.`;
+        this.scheduleCreatorApproveSuccessDismiss();
+        const nextTotal = Math.max(0, this.creatorRequestsTotalCount - 1);
+        if (this.creatorRequestsPage > 1 && (this.creatorRequestsPage - 1) * this.creatorRequestsPageSize >= nextTotal) {
+          this.creatorRequestsPage--;
+        }
+        this.loadCreatorRequests();
+      });
+  }
+
+  denyCreatorRequest(row: CreatorRoleRequestDto): void {
+    if (!row.isActive || this.approvingCreatorUserId !== null || this.rejectingCreatorUserId !== null) {
+      return;
+    }
+
+    const displayName = this.creatorRequestDisplayName(row);
+    this.dismissCreatorApproveSuccess();
+    this.creatorRequestsApproveError = '';
+    this.rejectingCreatorUserId = row.id;
+
+    this.adminUsersService
+      .rejectCreatorRole(row.id)
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        catchError((err: unknown) => {
+          let msg = 'Could not reject this request.';
+          if (err instanceof HttpErrorResponse && err.error && typeof err.error === 'object' && 'message' in err.error) {
+            msg = String((err.error as { message?: string }).message ?? msg);
+          }
+          this.creatorRequestsApproveError = msg;
+          return EMPTY;
+        }),
+        finalize(() => {
+          this.rejectingCreatorUserId = null;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe(() => {
+        this.creatorRequestsApproveError = '';
+        this.creatorRequestsApproveSuccess = `${displayName}'s request was denied and they were notified.`;
         this.scheduleCreatorApproveSuccessDismiss();
         const nextTotal = Math.max(0, this.creatorRequestsTotalCount - 1);
         if (this.creatorRequestsPage > 1 && (this.creatorRequestsPage - 1) * this.creatorRequestsPageSize >= nextTotal) {

@@ -1231,13 +1231,18 @@ th {
   padding: 7px 12px;
   font-size: 12px;
   font-weight: 600;
-  cursor: default;
+  cursor: pointer;
   color: #374151;
   background: #ffffff;
 }
 
-.deny-creator-btn:hover {
+.deny-creator-btn:hover:not(:disabled) {
   background: #f9fafb;
+}
+
+.deny-creator-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .creator-approve-modal-backdrop {

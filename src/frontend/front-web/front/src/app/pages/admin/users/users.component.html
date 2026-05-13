@@ -563,7 +563,17 @@
                     >
                       {{ approvingCreatorUserId === req.id ? 'Approving…' : 'Approve' }}
                     </button>
-                    <button type="button" class="deny-creator-btn" title="Not available yet">Deny</button>
+                    <button
+                      type="button"
+                      class="deny-creator-btn"
+                      (click)="denyCreatorRequest(req)"
+                      [disabled]="
+                        rejectingCreatorUserId === req.id || !req.isActive || approvingCreatorUserId !== null || approveConfirmRow !== null
+                      "
+                      [title]="!req.isActive ? 'Activate the account before denying' : 'Reject Content Creator request'"
+                    >
+                      {{ rejectingCreatorUserId === req.id ? 'Denying…' : 'Deny' }}
+                    </button>
                   </div>
                 </td>
               </tr>

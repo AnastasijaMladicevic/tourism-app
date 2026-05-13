@@ -147,4 +147,12 @@ export class AdminUsersService {
   approveCreatorRole(id: number): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.apiUrl}/${id}/approve-creator`, {});
   }
+
+  /**
+   * Admin rejects a tourist's Content Creator request (`POST .../users/{id}/reject-creator`).
+   * Backend keeps the tourist role and sends rejection notification to the user.
+   */
+  rejectCreatorRole(id: number): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/${id}/reject-creator`, {});
+  }
 }
