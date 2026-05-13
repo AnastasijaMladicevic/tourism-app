@@ -71,6 +71,16 @@ export const routes: Routes = [
           )
       },
       {
+        path: 'users/create',
+        loadComponent: () =>
+          import('./pages/admin/users/create-team-member.component').then(m => m.CreateTeamMemberComponent)
+      },
+      {
+        path: 'users/edit/:userId',
+        loadComponent: () =>
+          import('./pages/admin/users/edit-team-member.component').then(m => m.EditTeamMemberComponent)
+      },
+      {
         path: 'users',
         loadComponent: () =>
           import('./pages/admin/users/users.component').then(m => m.UsersComponent)

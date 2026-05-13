@@ -1,0 +1,762 @@
+<div class="users-page">
+  <div class="feedback" *ngIf="isLoading">Loading users data...</div>
+  <div class="feedback error" *ngIf="!isLoading && loadError">{{ loadError }}</div>
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Users &amp; Roles</h1>
+      <p class="page-subtitle">Manage internal team members and platform access permissions.</p>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="tabs" role="tablist" aria-label="Internal team and tourists">
+      <button
+        type="button"
+        class="tab"
+        role="tab"
+        [class.active]="usersViewTab === 'internal'"
+        [attr.aria-selected]="usersViewTab === 'internal' ? 'true' : 'false'"
+        id="users-tab-internal"
+        aria-controls="users-panel-internal"
+        (click)="selectUsersViewTab('internal')"
+      >
+        Internal Team
+      </button>
+      <button
+        type="button"
+        class="tab"
+        role="tab"
+        [class.active]="usersViewTab === 'tourists'"
+        [attr.aria-selected]="usersViewTab === 'tourists' ? 'true' : 'false'"
+        id="users-tab-tourists"
+        aria-controls="users-panel-tourists"
+        (click)="selectUsersViewTab('tourists')"
+      >
+        Tourists
+      </button>
+    </div>
+    <a *ngIf="usersViewTab === 'internal'" class="add-btn" routerLink="/admin/users/create">+ Add User</a>
+  </div>
+
+  <div class="dashboard-overview">
+    <div class="dashboard-overview-main">
+      <ng-container *ngIf="usersViewTab === 'internal'">
+        <div class="kpi-grid">
+          <article class="kpi-card kpi-internal-a">
+            <div class="kpi-top">
+              <span class="kpi-icon material-symbols-outlined">groups</span>
+              <span class="kpi-pill">{{ totalRegistered | number }}</span>
+            </div>
+            <p class="kpi-label">Total Registered</p>
+            <p class="kpi-value">{{ totalRegistered | number }}</p>
+          </article>
+
+          <article class="kpi-card kpi-internal-b">
+            <div class="kpi-top">
+              <span class="kpi-icon material-symbols-outlined">trending_up</span>
+              <span class="kpi-pill">{{ activePercentDelta }}%</span>
+            </div>
+            <p class="kpi-label">Active This Period</p>
+            <p class="kpi-value">{{ activeThisPeriod | number }}</p>
+          </article>
+
+          <article class="kpi-card kpi-internal-c">
+            <div class="kpi-top">
+              <span class="kpi-icon material-symbols-outlined">public</span>
+              <span class="kpi-pill">{{ countryPercentDelta }}%</span>
+            </div>
+            <p class="kpi-label">New Countries</p>
+            <p class="kpi-value">{{ newCountries }}</p>
+          </article>
+        </div>
+
+        <section class="card chart-card">
+          <div class="card-head">
+            <h3>Team activity by role</h3>
+            <p>{{ internalChartSubtitle }}</p>
+          </div>
+          <div class="chart-placeholder">
+            <div class="chart-main-row">
+              <div class="chart-y-axis" aria-hidden="true">
+                <span>{{ internalChartYTopLabel }}</span>
+                <span>{{ internalChartYMidLabel }}</span>
+                <span>0</span>
+              </div>
+              <div class="chart-surface">
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg">
+                  <g class="chart-grid">
+                    <line
+                      *ngFor="let gy of gridLineYs"
+                      x1="0"
+                      [attr.y1]="gy"
+                      x2="100"
+                      [attr.y2]="gy"
+                    />
+                  </g>
+                  <path
+                    *ngIf="internalChartLineCreators"
+                    [attr.d]="internalChartLineCreators"
+                    class="chart-line chart-line--team-cc"
+                  />
+                  <path
+                    *ngIf="internalChartLineManagers"
+                    [attr.d]="internalChartLineManagers"
+                    class="chart-line chart-line--team-manager"
+                  />
+                  <path
+                    *ngIf="internalChartLineAdmins"
+                    [attr.d]="internalChartLineAdmins"
+                    class="chart-line chart-line--team-admin"
+                  />
+                </svg>
+                <div class="chart-empty" *ngIf="internalChartIsEmpty">
+                  No new admin, manager, or content-creator accounts in the last {{ chartDays }} days (from loaded team).
+                </div>
+              </div>
+            </div>
+            <div class="chart-x-axis" aria-hidden="true">
+              <span *ngFor="let x of internalChartXLabels">{{ x.label }}</span>
+            </div>
+            <div class="chart-legend chart-legend--three">
+              <span class="chart-legend-item"><i class="chart-dot chart-dot--team-admin"></i> Admins</span>
+              <span class="chart-legend-item"><i class="chart-dot chart-dot--team-manager"></i> Managers</span>
+              <span class="chart-legend-item"><i class="chart-dot chart-dot--team-cc"></i> Content creators</span>
+            </div>
+          </div>
+        </section>
+      </ng-container>
+
+      <ng-container *ngIf="usersViewTab === 'tourists'">
+        <div class="kpi-grid">
+          <article class="kpi-card kpi-tourist-a">
+            <div class="kpi-top">
+              <span class="kpi-icon material-symbols-outlined">travel_explore</span>
+              <span class="kpi-pill">{{ touristKpiSignupDeltaPercent }}%</span>
+            </div>
+            <p class="kpi-label">Registered tourists</p>
+            <p class="kpi-value">{{ touristKpiTotal | number }}</p>
+          </article>
+
+          <article class="kpi-card kpi-tourist-b">
+            <div class="kpi-top">
+              <span class="kpi-icon material-symbols-outlined">rate_review</span>
+              <span class="kpi-pill">{{ touristKpiReviewersSharePercent }}%</span>
+            </div>
+            <p class="kpi-label">Users who posted reviews</p>
+            <p class="kpi-value">{{ touristKpiUniqueReviewers | number }}</p>
+          </article>
+
+          <article class="kpi-card kpi-tourist-c">
+            <div class="kpi-top">
+              <span class="kpi-icon material-symbols-outlined">verified_user</span>
+              <span class="kpi-pill">{{ touristKpiActiveSharePercent }}%</span>
+            </div>
+            <p class="kpi-label">Active tourist accounts</p>
+            <p class="kpi-value">{{ touristKpiActiveTourists | number }}</p>
+          </article>
+        </div>
+
+        <section class="card chart-card">
+          <div class="card-head">
+            <h3>Tourist signups &amp; origin diversity</h3>
+            <p>{{ touristChartSubtitle }}</p>
+          </div>
+          <div class="chart-placeholder">
+            <div class="chart-main-row">
+              <div class="chart-y-axis" aria-hidden="true">
+                <span>{{ touristChartYTopLabel }}</span>
+                <span>{{ touristChartYMidLabel }}</span>
+                <span>0</span>
+              </div>
+              <div class="chart-surface">
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg">
+                  <defs>
+                    <linearGradient id="touristGeoSignupAreaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.22" />
+                      <stop offset="100%" stop-color="#3b82f6" stop-opacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <g class="chart-grid">
+                    <line
+                      *ngFor="let gy of gridLineYs"
+                      x1="0"
+                      [attr.y1]="gy"
+                      x2="100"
+                      [attr.y2]="gy"
+                    />
+                  </g>
+                  <path
+                    *ngIf="touristChartAreaSignups"
+                    [attr.d]="touristChartAreaSignups"
+                    class="chart-area"
+                    fill="url(#touristGeoSignupAreaGrad)"
+                  />
+                  <path
+                    *ngIf="touristChartLineDistinctOrigins"
+                    [attr.d]="touristChartLineDistinctOrigins"
+                    class="chart-line chart-line--origins"
+                  />
+                  <path
+                    *ngIf="touristChartLineSignups"
+                    [attr.d]="touristChartLineSignups"
+                    class="chart-line chart-line--signups"
+                  />
+                </svg>
+                <div class="chart-empty" *ngIf="touristChartIsEmpty">
+                  No tourist registrations in the last {{ chartDays }} days to chart by country.
+                </div>
+              </div>
+            </div>
+            <div class="chart-x-axis" aria-hidden="true">
+              <span *ngFor="let x of touristChartXLabels">{{ x.label }}</span>
+            </div>
+            <div class="chart-legend">
+              <span class="chart-legend-item"><i class="chart-dot chart-dot--signups"></i> New tourists per day</span>
+              <span class="chart-legend-item"><i class="chart-dot chart-dot--origins"></i> Distinct origin countries (that day)</span>
+            </div>
+          </div>
+        </section>
+      </ng-container>
+    </div>
+
+    <section class="card origins-card origins-card--sidebar">
+      <div class="origins-card-header">
+        <span class="material-symbols-outlined origins-globe" aria-hidden="true">public</span>
+        <div class="origins-card-titles">
+          <ng-container *ngIf="usersViewTab === 'internal'">
+            <h3>Top Origins</h3>
+            <p>Admins, managers, and content creators by country or region.</p>
+          </ng-container>
+          <ng-container *ngIf="usersViewTab === 'tourists'">
+            <h3>Countries &amp; regions</h3>
+            <p>Where registered tourists are from (share of loaded accounts).</p>
+          </ng-container>
+        </div>
+      </div>
+
+      <div class="origins-visual" *ngIf="activeOriginsRows.length" id="origins-demographics-panel">
+        <div class="origins-visual-layers" [class.show-pie]="originsDemographicsChart">
+          <div
+            class="origins-layer origins-layer-list"
+            [attr.aria-hidden]="originsDemographicsChart ? 'true' : null"
+          >
+            <div class="origin-list-inner">
+              <ul class="origin-list">
+                <li *ngFor="let item of activeOriginsRows" class="origin-row">
+                  <div class="origin-row-top">
+                    <span class="origin-name">{{ item.name }}</span>
+                    <span class="origin-count">{{ item.users }} {{ usersViewTab === 'internal' ? 'members' : 'tourists' }}</span>
+                  </div>
+                  <div class="origin-bar-track" role="presentation">
+                    <div class="origin-bar-fill" [style.width.%]="item.barPercent"></div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div
+            class="origins-layer origins-layer-pie"
+            [attr.aria-hidden]="!originsDemographicsChart ? 'true' : null"
+          >
+            <div class="origin-pie-inner">
+              <svg
+                viewBox="0 0 100 100"
+                class="origin-pie-svg"
+                role="img"
+                [attr.aria-label]="usersViewTab === 'internal' ? 'Internal team by country' : 'Tourist origins distribution'"
+              >
+                <title>
+                  {{ usersViewTab === 'internal' ? 'Share of internal team among listed countries' : 'Share of tourists among listed origins' }}
+                </title>
+                <g *ngFor="let slice of originsPieSlices">
+                  <path
+                    [attr.d]="slice.path"
+                    [attr.fill]="slice.color"
+                    stroke="#ffffff"
+                    stroke-width="0.6"
+                    vector-effect="non-scaling-stroke"
+                  >
+                    <title>
+                      {{ slice.name }}: {{ slice.users }}
+                      {{ usersViewTab === 'internal' ? 'team members' : 'tourists' }}
+                      ({{ slice.shareLabel }} of chart)
+                    </title>
+                  </path>
+                </g>
+              </svg>
+              <ul class="origin-pie-legend">
+                <li *ngFor="let slice of originsPieSlices" class="origin-pie-legend-row">
+                  <span class="origin-pie-swatch" [style.background]="slice.color"></span>
+                  <span class="origin-pie-legend-name">{{ slice.name }}</span>
+                  <span class="origin-pie-legend-meta">{{ slice.users }} · {{ slice.shareLabel }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="origins-empty" *ngIf="!activeOriginsRows.length">
+        <ng-container *ngIf="usersViewTab === 'internal'">
+          No country or region recorded for the internal team yet.
+        </ng-container>
+        <ng-container *ngIf="usersViewTab === 'tourists'">
+          No tourist geographic data yet.
+        </ng-container>
+      </p>
+
+      <button
+        *ngIf="activeOriginsRows.length"
+        type="button"
+        class="origins-details-link"
+        (click)="toggleOriginsDemographics()"
+        [attr.aria-expanded]="originsDemographicsChart"
+        aria-controls="origins-demographics-panel"
+      >
+        {{ originsDemographicsChart ? 'View bar list' : 'View pie chart' }}
+        <span
+          class="material-symbols-outlined origins-chevron"
+          [class.origins-chevron--back]="originsDemographicsChart"
+          aria-hidden="true"
+        >chevron_right</span>
+      </button>
+    </section>
+  </div>
+
+  <ng-container *ngIf="usersViewTab === 'internal'">
+    <section
+      class="card"
+      id="users-panel-internal"
+      role="tabpanel"
+      aria-labelledby="users-tab-internal"
+    >
+      <div class="table-head">
+        <div>
+          <h3>Admin Directory</h3>
+          <p>A list of all users with administrative access to the platform.</p>
+        </div>
+      </div>
+
+      <div class="table-toolbar">
+        <label class="sr-only" for="admin-directory-search">Search admin directory</label>
+        <input
+          id="admin-directory-search"
+          type="search"
+          class="table-search"
+          placeholder="Search by name, email, role, status…"
+          autocomplete="off"
+          [value]="adminDirectorySearch"
+          (input)="onAdminSearchInput($event)"
+        />
+        <span class="table-filter-meta" *ngIf="adminMembers.length && adminDirectorySearch.trim()">
+          {{ filteredAdminDirectory.length }} match(es) of {{ adminMembers.length }}
+        </span>
+        <button
+          type="button"
+          class="table-search-clear"
+          *ngIf="adminDirectorySearch.trim()"
+          (click)="clearAdminSearch()"
+        >
+          Clear
+        </button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Team Member</th>
+              <th>Role</th>
+              <th>Last Login</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let member of visibleAdminDirectory">
+              <td>
+                <div class="person">
+                  <div class="avatar">{{ member.initials }}</div>
+                  <div>
+                    <p class="person-name">{{ member.name }}</p>
+                    <p class="person-email">{{ member.email }}</p>
+                  </div>
+                </div>
+              </td>
+              <td><span class="role-pill">{{ member.role }}</span></td>
+              <td>{{ member.lastLogin }}</td>
+              <td><span class="status-pill" [class.pending]="member.status !== 'Active'">{{ member.status }}</span></td>
+              <td class="actions">
+                <a class="actions-edit-link" [routerLink]="['/admin/users/edit', member.id]" title="Edit user">✎</a>
+              </td>
+            </tr>
+            <tr *ngIf="!filteredAdminDirectory.length && adminMembers.length" class="table-empty-row">
+              <td colspan="5">No team members match your search.</td>
+            </tr>
+            <tr *ngIf="!adminMembers.length" class="table-empty-row">
+              <td colspan="5">No administrative users found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <footer class="table-footer">
+        <p>
+          Showing {{ adminPageStart }} to {{ adminPageEnd }} of {{ adminTotalCount }} team members
+        </p>
+        <div class="pagination-buttons">
+          <label class="page-size-control">
+            <span>Page size</span>
+            <select
+              class="page-size-select"
+              [(ngModel)]="adminPageSize"
+              (ngModelChange)="onAdminPageSizeChange($event)"
+            >
+              <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
+            </select>
+          </label>
+
+          <button
+            type="button"
+            class="ghost-btn slim-btn"
+            (click)="onAdminPreviousPage()"
+            [disabled]="adminCurrentPage <= 1"
+          >
+            Previous
+          </button>
+          <button
+            type="button"
+            class="ghost-btn slim-btn"
+            (click)="onAdminNextPage()"
+            [disabled]="adminCurrentPage >= adminTotalPages"
+          >
+            Next
+          </button>
+        </div>
+      </footer>
+    </section>
+
+    <div class="small-kpis">
+      <article class="mini-kpi-card mini-kpi-card--admins">
+        <p class="mini-kpi-label">Total admins</p>
+        <p class="mini-kpi-value">{{ totalAdmins | number : '1.0-0' }}</p>
+        <p class="mini-kpi-hint">Admin accounts across the platform</p>
+      </article>
+      <article class="mini-kpi-card mini-kpi-card--managers">
+        <p class="mini-kpi-label">Total managers</p>
+        <p class="mini-kpi-value">{{ totalManagers | number : '1.0-0' }}</p>
+        <p class="mini-kpi-hint">Manager accounts across the platform</p>
+      </article>
+      <article class="mini-kpi-card mini-kpi-card--creators">
+        <p class="mini-kpi-label">Total content creators</p>
+        <p class="mini-kpi-value">{{ totalContentCreators | number : '1.0-0' }}</p>
+        <p class="mini-kpi-hint">Content creator accounts across the platform</p>
+      </article>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="usersViewTab === 'tourists'">
+    <section class="card creator-requests-card" aria-labelledby="creator-requests-heading">
+      <div class="creator-requests-card-inner">
+        <div class="table-head creator-requests-head">
+          <div class="creator-requests-head-text">
+            <h3 id="creator-requests-heading">Content creator requests</h3>
+            <p>Tourists who asked to contribute content. Approving assigns the Content Creator role.</p>
+          </div>
+          <div class="creator-requests-count-wrap" aria-live="polite">
+            <span class="creator-requests-count-label">Pending</span>
+            <span class="creator-requests-count">{{
+              creatorRequestsLoading ? '…' : (creatorRequestsTotalCount | number : '1.0-0')
+            }}</span>
+          </div>
+        </div>
+
+        <p class="feedback error" *ngIf="creatorRequestsError">{{ creatorRequestsError }}</p>
+        <p class="feedback error" *ngIf="creatorRequestsApproveError">{{ creatorRequestsApproveError }}</p>
+        <div
+          class="feedback feedback--success"
+          *ngIf="creatorRequestsApproveSuccess"
+          role="status"
+        >
+          <span class="feedback-success-text">{{ creatorRequestsApproveSuccess }}</span>
+          <button
+            type="button"
+            class="feedback-dismiss-btn"
+            aria-label="Dismiss success message"
+            (click)="dismissCreatorApproveSuccess()"
+          >
+            ×
+          </button>
+        </div>
+
+        <div class="table-toolbar creator-requests-toolbar">
+          <label class="sr-only" for="creator-requests-search">Search content creator requests</label>
+          <input
+            id="creator-requests-search"
+            type="search"
+            class="table-search"
+            placeholder="Search by name or email…"
+            autocomplete="off"
+            [value]="creatorRequestSearch"
+            (input)="onCreatorRequestSearchInput($event)"
+          />
+          <button
+            type="button"
+            class="table-search-clear"
+            *ngIf="creatorRequestSearch.trim()"
+            (click)="clearCreatorRequestSearch()"
+          >
+            Clear
+          </button>
+        </div>
+
+        <p class="creator-requests-loading" *ngIf="creatorRequestsLoading">Loading requests…</p>
+
+        <div class="table-wrap" *ngIf="!creatorRequestsLoading">
+          <table>
+            <thead>
+              <tr>
+                <th>Requester</th>
+                <th>Email</th>
+                <th>Account status</th>
+                <th>Verified</th>
+                <th>Member since</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let req of creatorRequests">
+                <td>
+                  <div class="person">
+                    <div class="avatar">{{ getInitials(req.firstName, req.lastName) }}</div>
+                    <div>
+                      <p class="person-name">{{ req.firstName }} {{ req.lastName }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ req.email }}</td>
+                <td>
+                  <span class="status-pill" [class.pending]="!req.isActive">{{
+                    req.isActive ? 'Active' : 'Inactive'
+                  }}</span>
+                </td>
+                <td>
+                  <span class="verify-pill" [class.verify-pill--no]="!req.isVerified">{{
+                    req.isVerified ? 'Yes' : 'No'
+                  }}</span>
+                </td>
+                <td>{{ formatCreatorRequestDate(req.createdAt) }}</td>
+                <td class="actions creator-requests-actions">
+                  <div class="creator-requests-action-buttons">
+                    <button
+                      type="button"
+                      class="approve-creator-btn"
+                      (click)="openCreatorApproveConfirm(req)"
+                      [disabled]="
+                        approvingCreatorUserId === req.id || !req.isActive || approveConfirmRow !== null
+                      "
+                      [title]="
+                        !req.isActive
+                          ? 'Activate the account before approving'
+                          : 'Grant Content Creator role'
+                      "
+                    >
+                      {{ approvingCreatorUserId === req.id ? 'Approving…' : 'Approve' }}
+                    </button>
+                    <button
+                      type="button"
+                      class="deny-creator-btn"
+                      (click)="denyCreatorRequest(req)"
+                      [disabled]="
+                        rejectingCreatorUserId === req.id || !req.isActive || approvingCreatorUserId !== null || approveConfirmRow !== null
+                      "
+                      [title]="!req.isActive ? 'Activate the account before denying' : 'Reject Content Creator request'"
+                    >
+                      {{ rejectingCreatorUserId === req.id ? 'Denying…' : 'Deny' }}
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="!creatorRequests.length" class="table-empty-row">
+                <td colspan="6">No pending content creator requests.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <footer class="table-footer" *ngIf="!creatorRequestsLoading && creatorRequestsTotalCount > 0">
+          <p>
+            Showing {{ creatorRequestsPageStart }} to {{ creatorRequestsPageEnd }} of
+            {{ creatorRequestsTotalCount }} requests
+          </p>
+          <div class="pagination-buttons">
+            <label class="page-size-control">
+              <span>Page size</span>
+              <select
+                class="page-size-select"
+                [(ngModel)]="creatorRequestsPageSize"
+                (ngModelChange)="onCreatorRequestsPageSizeChange($event)"
+              >
+                <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
+              </select>
+            </label>
+
+            <button
+              type="button"
+              class="ghost-btn slim-btn"
+              (click)="onCreatorRequestsPreviousPage()"
+              [disabled]="creatorRequestsPage <= 1"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              class="ghost-btn slim-btn"
+              (click)="onCreatorRequestsNextPage()"
+              [disabled]="creatorRequestsPage >= creatorRequestsTotalPages"
+            >
+              Next
+            </button>
+          </div>
+        </footer>
+
+        <ng-container *ngIf="approveConfirmRow as approveRow">
+          <div
+            class="creator-approve-modal-backdrop"
+            role="presentation"
+            (click)="cancelCreatorApproveConfirm()"
+          >
+            <div
+              class="creator-approve-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="creator-approve-modal-title"
+              (click)="$event.stopPropagation()"
+            >
+              <h4 id="creator-approve-modal-title" class="creator-approve-modal-title">
+                Approve Content Creator role
+              </h4>
+              <p class="creator-approve-modal-body">
+                Approve <strong>{{ creatorRequestDisplayName(approveRow) }}</strong> as a Content Creator? They will
+                be able to create objects, activities, and events for manager review.
+              </p>
+              <div class="creator-approve-modal-actions">
+                <button type="button" class="ghost-btn slim-btn" (click)="cancelCreatorApproveConfirm()">
+                  Cancel
+                </button>
+                <button type="button" class="approve-creator-btn" (click)="confirmCreatorApprove()">Confirm</button>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </section>
+
+    <section class="card" id="users-panel-tourists" role="tabpanel" aria-labelledby="users-tab-tourists">
+      <div class="table-head">
+        <div>
+          <h3>Tourist accounts</h3>
+          <p>Registered tourists and their profile details.</p>
+        </div>
+      </div>
+
+    <div class="table-toolbar">
+      <label class="sr-only" for="tourist-search">Search tourists</label>
+      <input
+        id="tourist-search"
+        type="search"
+        class="table-search"
+        placeholder="Search by name, email, origin, status, joined date…"
+        autocomplete="off"
+        [value]="touristSearch"
+        (input)="onTouristSearchInput($event)"
+      />
+      <span class="table-filter-meta" *ngIf="tourists.length && touristSearch.trim()">
+        {{ filteredTourists.length }} match(es) of {{ tourists.length }}
+      </span>
+      <button type="button" class="table-search-clear" *ngIf="touristSearch.trim()" (click)="clearTouristSearch()">
+        Clear
+      </button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tourist</th>
+            <th>Email Address</th>
+            <th>Origin</th>
+            <th>Status</th>
+            <th>Joined Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let tourist of visibleTourists">
+            <td>
+              <div class="person">
+                <div class="tourist-avatar">
+                  <span class="tourist-avatar-initials" role="img" [attr.aria-label]="'Initials for ' + tourist.name">{{
+                    tourist.initials
+                  }}</span>
+                </div>
+                <div>
+                  <p class="person-name">{{ tourist.name }}</p>
+                </div>
+              </div>
+            </td>
+            <td>{{ tourist.email }}</td>
+            <td>{{ tourist.origin }}</td>
+            <td><span class="status-pill" [class.pending]="tourist.status !== 'active'">{{ tourist.status }}</span></td>
+            <td>{{ tourist.joinedDate }}</td>
+            <td class="actions">
+              <a class="actions-edit-link" [routerLink]="['/admin/users/edit', tourist.id]" title="Edit user">✎</a>
+            </td>
+          </tr>
+          <tr *ngIf="!filteredTourists.length && tourists.length" class="table-empty-row">
+            <td colspan="6">No tourists match your search.</td>
+          </tr>
+          <tr *ngIf="!tourists.length" class="table-empty-row">
+            <td colspan="6">No tourist accounts found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="table-footer">
+      <p>
+        Showing {{ touristPageStart }} to {{ touristPageEnd }} of {{ touristTotalCount }} tourists
+      </p>
+      <div class="pagination-buttons">
+        <label class="page-size-control">
+          <span>Page size</span>
+          <select
+            class="page-size-select"
+            [(ngModel)]="touristPageSize"
+            (ngModelChange)="onTouristPageSizeChange($event)"
+          >
+            <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
+          </select>
+        </label>
+
+        <button
+          type="button"
+          class="ghost-btn slim-btn"
+          (click)="onTouristPreviousPage()"
+          [disabled]="touristCurrentPage <= 1"
+        >
+          Previous
+        </button>
+        <button
+          type="button"
+          class="ghost-btn slim-btn"
+          (click)="onTouristNextPage()"
+          [disabled]="touristCurrentPage >= touristTotalPages"
+        >
+          Next
+        </button>
+      </div>
+    </footer>
+    </section>
+  </ng-container>
+</div>

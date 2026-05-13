@@ -1,0 +1,301 @@
+<div class="create-member-page">
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a routerLink="/admin/users" class="crumb-link">Team Management</a>
+    <span class="crumb-sep" aria-hidden="true">›</span>
+    <span class="crumb-current">Edit Member</span>
+  </nav>
+
+  <header class="page-intro">
+    <h1 class="page-title">Edit Team Member</h1>
+    <p class="page-subtitle">
+      Update profile and localization.
+      <ng-container *ngIf="displayRole === 'tourist'">
+        For tourist accounts, choose Tourist or Content Creator below; promotion applies when you save.
+      </ng-container>
+      <ng-container *ngIf="displayRole === 'content-creator'">
+        Choose <strong>Content Creator</strong> to keep this account, or <strong>Tourist</strong> if demotion is supported later. Saving as Tourist is not available from the API yet.
+      </ng-container>
+      <ng-container *ngIf="displayRole === 'manager' || displayRole === 'admin'">
+        Role is shown for reference; only tourist→creator promotion is available (see below when editing a tourist).
+      </ng-container>
+    </p>
+  </header>
+
+  <div class="form-feedback error" *ngIf="loadError" role="alert">{{ loadError }}</div>
+  <div class="form-shell" *ngIf="!isLoading && !loadError">
+    <div class="form-feedback error" *ngIf="submitError" role="alert">{{ submitError }}</div>
+
+    <!-- Personal Information -->
+    <section class="form-section">
+      <div class="section-heading">
+        <span class="section-icon-wrap" aria-hidden="true">
+          <span class="material-symbols-outlined section-icon">person</span>
+        </span>
+        <div>
+          <h2 class="section-title">Personal Information</h2>
+          <p class="section-desc">Basic identity details for this account.</p>
+        </div>
+      </div>
+
+      <div class="field-grid field-grid--2">
+        <label class="field">
+          <span class="field-label">First Name <span class="req">*</span></span>
+          <input type="text" class="input-control" placeholder="e.g. Sarah" [(ngModel)]="firstName" />
+        </label>
+        <label class="field">
+          <span class="field-label">Last Name <span class="req">*</span></span>
+          <input type="text" class="input-control" placeholder="e.g. Jenkins" [(ngModel)]="lastName" />
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="field-label">Work Email</span>
+        <div class="input-with-icon">
+          <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">mail</span>
+          <input
+            type="email"
+            class="input-control input-control--padded input-readonly"
+            [value]="workEmail"
+            readonly
+            tabindex="-1"
+          />
+        </div>
+        <p class="field-hint">Email cannot be changed.</p>
+      </label>
+
+      <div class="field-grid field-grid--2">
+        <label class="field">
+          <span class="field-label">Date of Birth <span class="req">*</span></span>
+          <div class="input-with-icon">
+            <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">calendar_today</span>
+            <input type="date" class="input-control input-control--padded" [(ngModel)]="dateOfBirth" />
+          </div>
+        </label>
+        <label class="field">
+          <span class="field-label">Phone Number</span>
+          <div class="input-with-icon">
+            <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">call</span>
+            <input
+              type="tel"
+              class="input-control input-control--padded"
+              placeholder="+1 (555) 000-0000"
+              [(ngModel)]="phoneNumber"
+            />
+          </div>
+        </label>
+      </div>
+    </section>
+
+    <!-- Account Security -->
+    <section class="form-section">
+      <div class="section-heading">
+        <span class="section-icon-wrap" aria-hidden="true">
+          <span class="material-symbols-outlined section-icon">shield</span>
+        </span>
+        <div>
+          <h2 class="section-title">Account Security</h2>
+          <p class="section-desc">Set a new password only if you want to replace the current one.</p>
+        </div>
+      </div>
+
+      <label class="field">
+        <span class="field-label">New Password <span class="optional">(optional)</span></span>
+        <div class="input-with-icon">
+          <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">lock</span>
+          <input
+            type="password"
+            class="input-control input-control--padded"
+            placeholder="Leave blank to keep current password"
+            [(ngModel)]="password"
+            autocomplete="new-password"
+          />
+        </div>
+        <p class="strength-line" *ngIf="password && passwordStrengthLabel">
+          STRENGTH:
+          <span class="strength-value" [ngClass]="passwordStrengthClass">{{ passwordStrengthLabel }}</span>
+        </p>
+      </label>
+
+      <label class="field">
+        <span class="field-label">Confirm New Password <span class="optional">(optional)</span></span>
+        <div class="input-with-icon">
+          <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">lock</span>
+          <input
+            type="password"
+            class="input-control input-control--padded"
+            [class.input-invalid]="passwordsMismatch"
+            placeholder="Repeat new password"
+            [(ngModel)]="confirmPassword"
+            autocomplete="new-password"
+          />
+        </div>
+        <p class="field-error" *ngIf="passwordsMismatch">Passwords do not match</p>
+      </label>
+
+      <div class="role-block">
+        <p class="role-block-label">Primary Role</p>
+        <p class="role-api-note role-api-note--info" *ngIf="displayRole === 'admin'">
+          This account has the <strong>Admin</strong> role. Role cannot be changed on this screen.
+        </p>
+
+        <ng-container *ngIf="showRolePairPicker">
+          <div class="role-cards role-cards--tourist-pair" role="radiogroup" aria-label="Primary role">
+            <button
+              type="button"
+              class="role-card role-card--clickable"
+              [class.role-card--selected]="touristRoleSelection === 'tourist'"
+              (click)="selectTouristRole('tourist')"
+            >
+              <span
+                class="role-card-check material-symbols-outlined"
+                *ngIf="touristRoleSelection === 'tourist'"
+                aria-hidden="true"
+                >check_circle</span>
+              <span class="material-symbols-outlined role-card-icon">person</span>
+              <span class="role-card-title">Tourist</span>
+              <span class="role-card-desc">Standard visitor access. No promotion when you save.</span>
+            </button>
+
+            <button
+              type="button"
+              class="role-card role-card--clickable"
+              [class.role-card--selected]="touristRoleSelection === 'content-creator'"
+              (click)="selectTouristRole('content-creator')"
+            >
+              <span
+                class="role-card-check material-symbols-outlined"
+                *ngIf="touristRoleSelection === 'content-creator'"
+                aria-hidden="true"
+                >check_circle</span>
+              <span class="material-symbols-outlined role-card-icon">description</span>
+              <span class="role-card-title">Content Creator</span>
+              <span class="role-card-desc" *ngIf="displayRole === 'tourist'">On save, requests promotion via the server (requires prior creator request).</span>
+              <span class="role-card-desc" *ngIf="displayRole === 'content-creator'">Keeps publishing tools for this account after save.</span>
+            </button>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="displayRole === 'manager'">
+          <div class="role-cards role-cards--readonly role-cards--tourist-pair" role="group" aria-label="Primary role (read-only)">
+            <button type="button" class="role-card" disabled [class.role-card--selected]="isRole('manager')">
+              <span class="material-symbols-outlined role-card-icon">grid_view</span>
+              <span class="role-card-title">Manager</span>
+              <span class="role-card-desc">Full administrative control over teams, hubs, and billing.</span>
+            </button>
+
+            <button type="button" class="role-card" disabled [class.role-card--selected]="isRole('content-creator')">
+              <span class="material-symbols-outlined role-card-icon">description</span>
+              <span class="role-card-title">Content Creator</span>
+              <span class="role-card-desc">Restricted access to asset creation and publishing tools only.</span>
+            </button>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="displayRole === 'admin'">
+          <div class="role-cards role-cards--readonly" role="group" aria-label="Primary role (read-only)">
+            <button
+              type="button"
+              class="role-card"
+              disabled
+              [class.role-card--selected]="isRole('manager')"
+            >
+              <span class="material-symbols-outlined role-card-icon">grid_view</span>
+              <span class="role-card-title">Manager</span>
+              <span class="role-card-desc">Full administrative control over teams, hubs, and billing.</span>
+            </button>
+
+            <button
+              type="button"
+              class="role-card"
+              disabled
+              [class.role-card--selected]="isRole('content-creator')"
+            >
+              <span class="material-symbols-outlined role-card-icon">description</span>
+              <span class="role-card-title">Content Creator</span>
+              <span class="role-card-desc">Restricted access to asset creation and publishing tools only.</span>
+            </button>
+
+            <button
+              type="button"
+              class="role-card"
+              disabled
+              [class.role-card--selected]="isRole('tourist')"
+            >
+              <span class="material-symbols-outlined role-card-icon">person</span>
+              <span class="role-card-title">Tourist</span>
+              <span class="role-card-desc">Restricted access to asset creation and publishing tools only.</span>
+            </button>
+          </div>
+        </ng-container>
+      </div>
+    </section>
+
+    <!-- Region & Localization -->
+    <section class="form-section">
+      <div class="section-heading">
+        <span class="section-icon-wrap" aria-hidden="true">
+          <span class="material-symbols-outlined section-icon">public</span>
+        </span>
+        <div>
+          <h2 class="section-title">Region &amp; Localization</h2>
+          <p class="section-desc">Where this member operates and their UI language.</p>
+        </div>
+      </div>
+
+      <div class="field-grid field-grid--2">
+        <label class="field">
+          <span class="field-label">Country</span>
+          <div class="input-with-icon select-wrap">
+            <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">location_on</span>
+            <select class="input-control input-control--padded select-control" [(ngModel)]="country">
+              <option *ngIf="country && !countries.includes(country)" [ngValue]="country">{{ country }}</option>
+              <option *ngFor="let c of countries" [ngValue]="c">{{ c }}</option>
+            </select>
+          </div>
+        </label>
+        <label class="field">
+          <span class="field-label">Preferred Language</span>
+          <div class="input-with-icon select-wrap">
+            <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">translate</span>
+            <select class="input-control input-control--padded select-control" [(ngModel)]="preferredLanguage">
+              <option *ngFor="let lang of languages" [ngValue]="lang">{{ lang }}</option>
+            </select>
+          </div>
+        </label>
+      </div>
+
+      <label class="field">
+        <span class="field-label">Region Assignment <span class="optional">(Optional)</span></span>
+        <select class="input-control select-control select-control--full" [(ngModel)]="regionAssignment">
+          <option value="">Select target market region</option>
+          <option *ngFor="let r of regionOptions" [ngValue]="r">{{ r }}</option>
+        </select>
+        <p class="field-hint">Leave empty to grant global access across all active regions.</p>
+      </label>
+    </section>
+
+    <footer class="form-actions">
+      <button type="button" class="btn-cancel" (click)="onCancel()" [disabled]="isSubmitting">
+        <span class="material-symbols-outlined btn-icon" aria-hidden="true">close</span>
+        <span class="btn-text">Cancel</span>
+      </button>
+      <button type="button" class="btn-primary" (click)="onSave()" [disabled]="isSubmitting">
+        <span class="material-symbols-outlined btn-icon" aria-hidden="true" *ngIf="!isSubmitting">save</span>
+        <span class="btn-text">{{ isSubmitting ? 'Saving…' : 'Save changes' }}</span>
+      </button>
+    </footer>
+  </div>
+
+  <div class="form-shell form-shell--loading" *ngIf="isLoading">
+    <p class="loading-copy">Loading user…</p>
+  </div>
+
+  <footer class="page-meta-footer">
+    <span class="page-meta-version">SPIREGO ADMIN • BUILD 2026.05</span>
+    <div class="page-meta-links">
+      <a href="#" class="meta-link">Support Center</a>
+      <a href="#" class="meta-link">Privacy Policy</a>
+      <a href="#" class="meta-link">Terms of Service</a>
+    </div>
+  </footer>
+</div>

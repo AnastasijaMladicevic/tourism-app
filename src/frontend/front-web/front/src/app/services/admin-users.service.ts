@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
+import { ChangePasswordDto, CreateUserDto, UpdateUserDto, UserDto } from '../models/user.model';
 
 export interface AdminUserListItemDto {
   id: number;
@@ -10,6 +11,9 @@ export interface AdminUserListItemDto {
   email: string;
   roleName: string;
   profileImageUrl?: string | null;
+  country?: string | null;
+  isActive?: boolean;
+  createdAt?: string;
 }
 
 export interface PagedUsersResultDto {
@@ -20,17 +24,135 @@ export interface PagedUsersResultDto {
   totalPages: number;
 }
 
+/** Tourists who requested promotion to Content Creator (`GET .../users/creator-requests`). */
+export interface CreatorRoleRequestDto {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  roleName: string;
+  hasRequestedCreatorRole: boolean;
+  isActive: boolean;
+  isVerified: boolean;
+  createdAt: string;
+}
+
+export interface PagedCreatorRequestsResultDto {
+  items: CreatorRoleRequestDto[];
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminUsersService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/Users`;
+  private readonly apiUrl = `${environment.apiUrl}/users`;
+
+  /** Admin-only: tourists with a pending Content Creator role request. */
+  getCreatorRequests(options?: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+    isActive?: boolean;
+    isVerified?: boolean;
+  }): Observable<PagedCreatorRequestsResultDto> {
+    let params = new HttpParams()
+      .set('page', String(options?.page ?? 1))
+      .set('pageSize', String(options?.pageSize ?? 10))
+      .set('sortBy', options?.sortBy ?? 'createdAt')
+      .set('sortOrder', options?.sortOrder ?? 'desc');
+
+    const search = options?.search?.trim();
+    if (search) {
+      params = params.set('search', search);
+    }
+    if (options?.isActive !== undefined) {
+      params = params.set('isActive', String(options.isActive));
+    }
+    if (options?.isVerified !== undefined) {
+      params = params.set('isVerified', String(options.isVerified));
+    }
+
+    return this.http.get<PagedCreatorRequestsResultDto>(`${this.apiUrl}/creator-requests`, { params });
+  }
+
+  getUsers(options?: {
+    page?: number;
+    pageSize?: number;
+    search?: string;
+    role?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }): Observable<PagedUsersResultDto> {
+    let params = new HttpParams()
+      .set('page', String(options?.page ?? 1))
+      .set('pageSize', String(options?.pageSize ?? 50))
+      .set('sortBy', options?.sortBy ?? 'createdAt')
+      .set('sortOrder', options?.sortOrder ?? 'desc');
+
+    const search = options?.search?.trim();
+    if (search) {
+      params = params.set('search', search);
+    }
+
+    const role = options?.role?.trim();
+    if (role) {
+      params = params.set('role', role);
+    }
+
+    return this.http.get<PagedUsersResultDto>(this.apiUrl, { params });
+  }
 
   searchManagers(search: string, pageSize = 20): Observable<PagedUsersResultDto> {
-    let params = new HttpParams().set('role', 'Manager').set('page', '1').set('pageSize', String(pageSize));
-    const term = search.trim();
-    if (term) {
-      params = params.set('search', term);
-    }
-    return this.http.get<PagedUsersResultDto>(this.apiUrl, { params });
+    return this.getUsers({
+      page: 1,
+      pageSize,
+      role: 'Manager',
+      search,
+      sortBy: 'createdAt',
+      sortOrder: 'desc'
+    });
+  }
+
+  /** Admin-only: creates a user with Manager role (`POST .../users/register-manager`). */
+  createManager(dto: CreateUserDto): Observable<UserDto> {
+    return this.http.post<UserDto>(`${this.apiUrl}/register-manager`, dto);
+  }
+
+  /** Creates a tourist account (`POST .../users/register`). Typically used from signup; admins may use it to add tourists. */
+  createTourist(dto: CreateUserDto): Observable<UserDto> {
+    return this.http.post<UserDto>(`${this.apiUrl}/register`, dto);
+  }
+
+  getUserById(id: number): Observable<UserDto> {
+    return this.http.get<UserDto>(`${this.apiUrl}/${id}`);
+  }
+
+  updateUser(id: number, dto: UpdateUserDto): Observable<UserDto> {
+    return this.http.put<UserDto>(`${this.apiUrl}/${id}`, dto);
+  }
+
+  changeUserPassword(id: number, dto: ChangePasswordDto): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/${id}/change-password`, dto);
+  }
+
+  /**
+   * Admin promotes a tourist to Content Creator (`POST .../users/{id}/approve-creator`).
+   * Backend requires the user to be a tourist who has already requested creator access.
+   */
+  approveCreatorRole(id: number): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/${id}/approve-creator`, {});
+  }
+
+  /**
+   * Admin rejects a tourist's Content Creator request (`POST .../users/{id}/reject-creator`).
+   * Backend keeps the tourist role and sends rejection notification to the user.
+   */
+  rejectCreatorRole(id: number): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/${id}/reject-creator`, {});
   }
 }
