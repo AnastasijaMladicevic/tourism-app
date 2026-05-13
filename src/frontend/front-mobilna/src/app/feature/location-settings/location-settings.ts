@@ -30,6 +30,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
   };
   private activeQuietZone: QuietZoneKind | null = null;
   private pendingLocationEnableRequest = false;
+  private hasLocationConsentContext = false;
   private readonly handleWindowFocus = () => {
     void this.syncLocationTrackingState();
   };
@@ -67,12 +68,17 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
         this.locationEnabled = enabled;
+        this.showLocationConsentHint = this.hasLocationConsentContext && !enabled;
+        this.cdr.markForCheck();
       }),
     );
 
     this.subscriptions.add(
       this.route.queryParamMap.subscribe((params) => {
-        this.showLocationConsentHint = params.get('locationConsent') === '1';
+        if (params.get('locationConsent') === '1') {
+          this.hasLocationConsentContext = true;
+        }
+        this.showLocationConsentHint = this.hasLocationConsentContext && !this.locationEnabled;
         void this.syncLocationTrackingState();
       }),
     );
@@ -143,6 +149,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
       this.pendingLocationEnableRequest = true;
       this.locationTrackingService.startTracking();
       this.locationEnabled = this.locationTrackingService.isTrackingEnabled();
+      this.showLocationConsentHint = this.hasLocationConsentContext && !this.locationEnabled;
       this.cdr.markForCheck();
       return;
     }
@@ -150,6 +157,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
     this.pendingLocationEnableRequest = false;
     this.locationTrackingService.stopTracking();
     this.locationEnabled = false;
+    this.showLocationConsentHint = this.hasLocationConsentContext;
     this.cdr.markForCheck();
   }
 
@@ -289,6 +297,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
   }
 
   private clearLocationConsentHint(): void {
+    this.hasLocationConsentContext = false;
     this.showLocationConsentHint = false;
     void this.router.navigate([], {
       relativeTo: this.route,
@@ -305,6 +314,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
     if (trackingEnabled && currentLocation?.source === 'gps') {
       this.locationEnabled = true;
       this.pendingLocationEnableRequest = false;
+      this.showLocationConsentHint = false;
       this.cdr.markForCheck();
       return;
     }
@@ -319,6 +329,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
     }
 
     this.locationEnabled = this.locationTrackingService.isTrackingEnabled();
+    this.showLocationConsentHint = this.hasLocationConsentContext && !this.locationEnabled;
 
     if (this.locationEnabled) {
       this.pendingLocationEnableRequest = false;
