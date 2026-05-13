@@ -163,13 +163,32 @@ export class LocationTrackingService {
   }
 
   private handlePosition(position: GeolocationPosition): void {
+    if (this.ipFallbackInterval !== null) {
+      clearInterval(this.ipFallbackInterval);
+      this.ipFallbackInterval = null;
+    }
+
     this.emitLocation(this.createGpsSnapshot(position));
   }
 
   private handleError(error: GeolocationPositionError): void {
     if (error.code === error.PERMISSION_DENIED) {
+      if (this.canUseIpFallback()) {
+        this.switchToIpFallback();
+        return;
+      }
+
       this.stopTracking();
     }
+  }
+
+  private switchToIpFallback(): void {
+    if (this.watchId !== null && this.canUseGeolocation()) {
+      navigator.geolocation.clearWatch(this.watchId);
+    }
+    this.watchId = null;
+    this.setTrackingEnabled(true);
+    this.ensureIpFallback();
   }
 
   private canUseIpFallback(): boolean {

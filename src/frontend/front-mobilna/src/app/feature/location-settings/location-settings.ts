@@ -143,9 +143,6 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
       this.pendingLocationEnableRequest = true;
       this.locationTrackingService.startTracking();
       this.locationEnabled = this.locationTrackingService.isTrackingEnabled();
-      if (this.locationEnabled) {
-        this.clearLocationConsentHint();
-      }
       this.cdr.markForCheck();
       return;
     }
@@ -308,28 +305,23 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
     if (trackingEnabled && currentLocation?.source === 'gps') {
       this.locationEnabled = true;
       this.pendingLocationEnableRequest = false;
-      if (this.showLocationConsentHint) {
-        this.clearLocationConsentHint();
-      }
       this.cdr.markForCheck();
       return;
     }
 
-    const shouldRetryEnable = this.showLocationConsentHint || this.pendingLocationEnableRequest;
-    if (shouldRetryEnable) {
-      const permissionState = await this.getGeolocationPermissionState();
-      if (permissionState === 'granted' || permissionState === 'unsupported') {
-        this.locationTrackingService.startTracking();
-      }
+    const permissionState = await this.getGeolocationPermissionState();
+    const shouldUpgradeToGps =
+      trackingEnabled && permissionState === 'granted' && currentLocation?.source !== 'gps';
+    const shouldRetryEnable = this.pendingLocationEnableRequest || shouldUpgradeToGps;
+
+    if (shouldRetryEnable && (permissionState === 'granted' || permissionState === 'unsupported')) {
+      this.locationTrackingService.startTracking();
     }
 
     this.locationEnabled = this.locationTrackingService.isTrackingEnabled();
 
     if (this.locationEnabled) {
       this.pendingLocationEnableRequest = false;
-      if (this.showLocationConsentHint) {
-        this.clearLocationConsentHint();
-      }
     }
 
     this.cdr.markForCheck();

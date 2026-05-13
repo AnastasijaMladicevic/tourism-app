@@ -341,7 +341,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const permissionState = await this.getGeolocationPermissionState();
     if (permissionState === 'granted') {
-      if (!this.locationTrackingService.isTrackingEnabled()) {
+      if (!this.locationTrackingService.isTrackingEnabled() || !currentLocation) {
         this.locationTrackingService.startTracking();
       }
       this.closeLocationConsentPrompt();
