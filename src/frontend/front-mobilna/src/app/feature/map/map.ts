@@ -345,17 +345,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.locationTrackingService.startTracking();
       }
       this.closeLocationConsentPrompt();
-      return;
-    }
-
-    if (permissionState === 'prompt' || permissionState === 'denied') {
-      this.showLocationConsentPrompt = true;
-      this.cdr.detectChanges();
-      return;
-    }
-
-    if (!this.locationTrackingService.isTrackingEnabled() && !currentLocation) {
-      this.showLocationConsentPrompt = true;
       this.cdr.detectChanges();
     }
   }

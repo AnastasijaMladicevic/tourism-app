@@ -29,6 +29,15 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
     work: null,
   };
   private activeQuietZone: QuietZoneKind | null = null;
+  private pendingLocationEnableRequest = false;
+  private readonly handleWindowFocus = () => {
+    void this.syncLocationTrackingState();
+  };
+  private readonly handleVisibilityChange = () => {
+    if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+      void this.syncLocationTrackingState();
+    }
+  };
 
   locationEnabled = false;
   showLocationConsentHint = false;
@@ -64,6 +73,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.route.queryParamMap.subscribe((params) => {
         this.showLocationConsentHint = params.get('locationConsent') === '1';
+        void this.syncLocationTrackingState();
       }),
     );
 
@@ -101,12 +111,27 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         }),
     );
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('focus', this.handleWindowFocus);
+    }
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', this.handleVisibilityChange);
+    }
+
+    void this.syncLocationTrackingState();
   }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
     this.clearQuietZoneBlurTimeout('home');
     this.clearQuietZoneBlurTimeout('work');
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('focus', this.handleWindowFocus);
+    }
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+    }
   }
 
   goBack(): void {
@@ -115,16 +140,20 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
 
   setLocationEnabled(enabled: boolean): void {
     if (enabled) {
-      const started = this.locationTrackingService.startTracking();
-      this.locationEnabled = started;
-      if (started) {
+      this.pendingLocationEnableRequest = true;
+      this.locationTrackingService.startTracking();
+      this.locationEnabled = this.locationTrackingService.isTrackingEnabled();
+      if (this.locationEnabled) {
         this.clearLocationConsentHint();
       }
+      this.cdr.markForCheck();
       return;
     }
 
+    this.pendingLocationEnableRequest = false;
     this.locationTrackingService.stopTracking();
     this.locationEnabled = false;
+    this.cdr.markForCheck();
   }
 
   dismissLocationConsentHint(): void {
@@ -270,6 +299,57 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
       queryParamsHandling: 'merge',
       replaceUrl: true,
     });
+  }
+
+  private async syncLocationTrackingState(): Promise<void> {
+    const currentLocation = this.locationTrackingService.getCurrentLocation();
+    const trackingEnabled = this.locationTrackingService.isTrackingEnabled();
+
+    if (trackingEnabled && currentLocation?.source === 'gps') {
+      this.locationEnabled = true;
+      this.pendingLocationEnableRequest = false;
+      if (this.showLocationConsentHint) {
+        this.clearLocationConsentHint();
+      }
+      this.cdr.markForCheck();
+      return;
+    }
+
+    const shouldRetryEnable = this.showLocationConsentHint || this.pendingLocationEnableRequest;
+    if (shouldRetryEnable) {
+      const permissionState = await this.getGeolocationPermissionState();
+      if (permissionState === 'granted' || permissionState === 'unsupported') {
+        this.locationTrackingService.startTracking();
+      }
+    }
+
+    this.locationEnabled = this.locationTrackingService.isTrackingEnabled();
+
+    if (this.locationEnabled) {
+      this.pendingLocationEnableRequest = false;
+      if (this.showLocationConsentHint) {
+        this.clearLocationConsentHint();
+      }
+    }
+
+    this.cdr.markForCheck();
+  }
+
+  private async getGeolocationPermissionState(): Promise<PermissionState | 'unsupported'> {
+    if (
+      typeof navigator === 'undefined' ||
+      !('permissions' in navigator) ||
+      typeof navigator.permissions?.query !== 'function'
+    ) {
+      return 'unsupported';
+    }
+
+    try {
+      const status = await navigator.permissions.query({ name: 'geolocation' as PermissionName });
+      return status.state;
+    } catch {
+      return 'unsupported';
+    }
   }
 
   private setQuietZoneError(kind: QuietZoneKind, value: string): void {
