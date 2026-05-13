@@ -754,6 +754,21 @@
   position: relative;
 }
 
+.region-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  /*.region-arrow {
+    font-size: 18px;
+    opacity: 0.7;
+  }*/
+
+  .region-icon {
+    color: #4FB3D9;
+  }
+}
+
 .filter-btn {
   width: 100%;
   min-height: 48px;

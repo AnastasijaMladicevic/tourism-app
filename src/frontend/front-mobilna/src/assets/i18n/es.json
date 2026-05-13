@@ -737,6 +737,12 @@
       "health": "Hospitales"
     }
   },
+  "regions": {
+    "montenegro": "Montenegro",
+    "serbia": "Serbia",
+    "spain": "España",
+    "italy": "Italia"
+  },
   "event": {
     "title": "Evento",
     "loadingError": "Error al cargar el evento.",

@@ -23,8 +23,14 @@
         }
       </div>
       <div class="region-wrapper">
-        <button class="filter-btn" type="button" (click)="openRegionPicker()">
-          {{ 'home.chooseRegion' | translate }}
+        <button class="filter-btn region-btn" type="button" (click)="openRegionPicker()">
+          <mat-icon class="region-icon">public</mat-icon>
+        
+          <span>
+            {{ activeRegionNameKey | translate }}
+          </span>
+        
+          <mat-icon class="region-arrow">chevron_right</mat-icon>
         </button>
       </div>
       @if (showSuggestions && searchResults.length > 0) {

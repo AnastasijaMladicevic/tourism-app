@@ -737,6 +737,12 @@
       "health": "Bolnice"
     }
   },
+  "regions": {
+    "montenegro": "Crna Gora",
+    "serbia": "Srbija",
+    "spain": "Španija",
+    "italy": "Italija"
+  },
   "event": {
     "title": "Dogadjaj",
     "loadingError": "Greška pri učitavanju dogadjaja.",

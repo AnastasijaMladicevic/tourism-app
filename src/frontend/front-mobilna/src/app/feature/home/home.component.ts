@@ -292,6 +292,19 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.isPlannerBusy = false;
   }
 
+  get activeRegionNameKey(): string {
+    const regionId = this.activeRegionId;
+  
+    const regions: Record<number, string> = {
+      1: 'regions.montenegro',
+      2: 'regions.serbia',
+      3: 'regions.spain',
+      4: 'regions.italy',
+    };
+  
+    return regions[regionId] ?? regions[1];
+  }
+
   togglePlannerForRecommended(card: PlaceCard, event?: Event): void {
     event?.stopPropagation();
 
