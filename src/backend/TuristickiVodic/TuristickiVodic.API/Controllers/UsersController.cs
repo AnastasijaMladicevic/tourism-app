@@ -528,6 +528,32 @@ namespace TuristickiVodic.API.Controllers
 
                 return Ok(new { message = "User approved as content creator successfully" });
             }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("{id}/reject-creator")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RejectCreatorRole(int id)
+        {
+            try
+            {
+                var result = await _userService.RejectCreatorRoleAsync(id);
+                if (!result)
+                    return NotFound();
+
+                return Ok(new { message = "Creator role request rejected successfully" });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
             catch (InvalidOperationException ex)
             {
                 return BadRequest(new { message = ex.Message });

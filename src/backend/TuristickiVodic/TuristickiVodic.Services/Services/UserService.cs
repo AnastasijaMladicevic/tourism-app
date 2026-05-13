@@ -881,7 +881,7 @@ namespace TuristickiVodic.Services
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)
-                throw new KeyNotFoundException("User not found.");
+                return false;
 
             if (user.IsBlacklisted)
                 throw new InvalidOperationException("User is blacklisted.");
@@ -900,6 +900,28 @@ namespace TuristickiVodic.Services
 
             user.RoleId = contentCreatorRole.Id;
             user.Role = contentCreatorRole;
+            user.HasRequestedCreatorRole = false;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> RejectCreatorRoleAsync(int userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return false;
+
+            if (user.Role.Name != RoleType.Tourist)
+                throw new InvalidOperationException("Only tourists can have creator role requests rejected.");
+
+            if (!user.HasRequestedCreatorRole)
+                throw new InvalidOperationException("User has not requested creator role.");
+
             user.HasRequestedCreatorRole = false;
             user.UpdatedAt = DateTime.UtcNow;
 

@@ -1259,6 +1259,93 @@ namespace TuristickiVodic.Tests.Services
         // ═══════════════════════════════════════════
 
         [Fact]
+        public async Task RejectCreatorRoleAsync_TouristImaZahtev_SkidaPendingFlag()
+        {
+            using var ctx = CreateInMemoryContext(nameof(RejectCreatorRoleAsync_TouristImaZahtev_SkidaPendingFlag));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+            ctx.Users.Add(new User
+            {
+                Id = 15,
+                FirstName = "R",
+                LastName = "R",
+                Email = "r@r.com",
+                PasswordHash = "hash",
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                HasRequestedCreatorRole = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            });
+            ctx.SaveChanges();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            var result = await svc.RejectCreatorRoleAsync(15);
+
+            result.Should().BeTrue();
+            var updated = ctx.Users.Include(u => u.Role).First(u => u.Id == 15);
+            updated.HasRequestedCreatorRole.Should().BeFalse();
+            updated.Role.Name.Should().Be(RoleType.Tourist);
+        }
+
+        [Fact]
+        public async Task RejectCreatorRoleAsync_KadaKorisnikNemaZahtev_BacaException()
+        {
+            using var ctx = CreateInMemoryContext(nameof(RejectCreatorRoleAsync_KadaKorisnikNemaZahtev_BacaException));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+            ctx.Users.Add(new User
+            {
+                Id = 16,
+                FirstName = "S",
+                LastName = "S",
+                Email = "s@s.com",
+                PasswordHash = "hash",
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                HasRequestedCreatorRole = false,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            });
+            ctx.SaveChanges();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            await svc.Invoking(s => s.RejectCreatorRoleAsync(16))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*has not requested creator role*");
+        }
+
+        [Fact]
+        public async Task RejectCreatorRoleAsync_VecJeCC_BacaException()
+        {
+            using var ctx = CreateInMemoryContext(nameof(RejectCreatorRoleAsync_VecJeCC_BacaException));
+            var (_, cc, _, _) = SeedRoles(ctx);
+            ctx.Users.Add(new User
+            {
+                Id = 17,
+                FirstName = "T",
+                LastName = "T",
+                Email = "t@t.com",
+                PasswordHash = "hash",
+                RoleId = cc.Id,
+                Role = cc,
+                IsActive = true,
+                IsBlacklisted = false,
+                HasRequestedCreatorRole = false,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            });
+            ctx.SaveChanges();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            await svc.Invoking(s => s.RejectCreatorRoleAsync(17))
+                .Should().ThrowAsync<InvalidOperationException>()
+                .WithMessage("*tourists*");
+        }
+
+        [Fact]
         public async Task ToggleUserActiveAsync_Deaktivacija_SmestaKorisnika()
         {
             using var ctx = CreateInMemoryContext(nameof(ToggleUserActiveAsync_Deaktivacija_SmestaKorisnika));
