@@ -6,6 +6,8 @@ export interface RouteBuilderPoint {
   type: string;
   lat: number;
   lng: number;
+  markerType?: string;
+  markerId?: number;
 }
 
 @Injectable({ providedIn: 'root' })

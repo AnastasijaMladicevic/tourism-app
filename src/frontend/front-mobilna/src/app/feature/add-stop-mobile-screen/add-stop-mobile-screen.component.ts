@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
-import { catchError, firstValueFrom, forkJoin, of } from 'rxjs';
+import { catchError, firstValueFrom, of, timeout } from 'rxjs';
 
 import { ActivityDto, ActivityService } from '../../services/activity';
 import { DestinationDto, DestinationService } from '../../services/destination';
@@ -82,6 +82,7 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
   private latestRefreshToken = 0;
 
   constructor(
+    private readonly cdr: ChangeDetectorRef,
     private readonly router: Router,
     private readonly destinationService: DestinationService,
     private readonly objectService: ObjectService,
@@ -205,39 +206,56 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
 
   private async loadResults(): Promise<void> {
     this.isLoading = true;
+    this.allItems = [];
+    this.results = [];
 
     try {
-      const payload = await firstValueFrom(
-        forkJoin({
-          destinations: this.destinationService
-            .getAll({ page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' })
-            .pipe(catchError(() => of([] as DestinationDto[]))),
-          objects: this.objectService
-            .getAllItems({ sortBy: 'name', sortOrder: 'asc' })
-            .pipe(catchError(() => of([] as ObjectDto[]))),
-          events: this.eventService
-            .getAllItems({ sortBy: 'startDate', sortOrder: 'asc' })
-            .pipe(catchError(() => of([] as EventDto[]))),
-          activities: this.activityService
-            .getAll({ page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' })
-            .pipe(catchError(() => of([] as ActivityDto[]))),
-          localities: this.localityService
-            .getAll({ page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' })
-            .pipe(catchError(() => of([] as LocalityDto[]))),
+      const progressiveLoads = [
+        this.resolveSource(
+          this.destinationService.getAll({ page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' }),
+          [] as DestinationDto[],
+        ).then((items) => items.map((item) => this.toDestinationResult(item))),
+        this.resolveSource(
+          this.objectService.getAllItems({ sortBy: 'name', sortOrder: 'asc' }),
+          [] as ObjectDto[],
+        ).then((items) => items.map((item) => this.toObjectResult(item))),
+        this.resolveSource(
+          this.eventService.getAllItems({ sortBy: 'startDate', sortOrder: 'asc' }),
+          [] as EventDto[],
+        ).then((items) => items.map((item) => this.toEventResult(item))),
+        this.resolveSource(
+          this.activityService.getAll({ page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' }),
+          [] as ActivityDto[],
+        ).then((items) => items.map((item) => this.toActivityResult(item))),
+        this.resolveSource(
+          this.localityService.getAll({ page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' }),
+          [] as LocalityDto[],
+        ).then((items) => items.map((item) => this.toLocalityResult(item))),
+      ];
+
+      await Promise.all(
+        progressiveLoads.map(async (loadPromise) => {
+          const items = (await loadPromise).filter((item) => item.lat != null && item.lng != null);
+          if (items.length === 0) {
+            return;
+          }
+
+          const existing = new Set(this.allItems.map((item) => item.key));
+          const appended = items.filter((item) => !existing.has(item.key));
+
+          if (appended.length === 0) {
+            return;
+          }
+
+          this.allItems = [...this.allItems, ...appended];
+          await this.refreshResults();
+          this.cdr.detectChanges();
         }),
       );
-
-      this.allItems = [
-        ...(payload.destinations ?? []).map((item) => this.toDestinationResult(item)),
-        ...(payload.objects ?? []).map((item) => this.toObjectResult(item)),
-        ...(payload.events ?? []).map((item) => this.toEventResult(item)),
-        ...(payload.activities ?? []).map((item) => this.toActivityResult(item)),
-        ...(payload.localities ?? []).map((item) => this.toLocalityResult(item)),
-      ].filter((item) => item.lat != null && item.lng != null);
-
-      await this.refreshResults();
     } finally {
       this.isLoading = false;
+      await this.refreshResults();
+      this.cdr.detectChanges();
     }
   }
 
@@ -247,7 +265,7 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     const queryNormalized = this.normalizeText(query);
     const localResults = queryNormalized
       ? this.searchLocalResults(queryNormalized)
-      : this.getSuggestedResults();
+      : this.getRecommendedResults();
 
     const addressResults = queryNormalized
       ? this.toAddressResults(
@@ -268,6 +286,7 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
 
     if (this.results.length === 0) {
       this.selectedResultKey = '';
+      this.cdr.detectChanges();
       return;
     }
 
@@ -275,6 +294,8 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     if (!hasSelectedVisible) {
       this.selectedResultKey = this.results[0].key;
     }
+
+    this.cdr.detectChanges();
   }
 
   private searchLocalResults(query: string): AddStopResult[] {
@@ -294,6 +315,42 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     return this.allItems
       .slice()
       .sort((left, right) => this.scoreSuggestedDistance(left, anchor) - this.scoreSuggestedDistance(right, anchor));
+  }
+
+  private getRecommendedResults(): AddStopResult[] {
+    const anchor = this.routePoints[this.routePoints.length - 1] ?? this.routePoints[0] ?? null;
+    const sorted = this.getSuggestedResults();
+
+    const destinations = sorted.filter((item) => item.category === 'destination' || item.category === 'locality');
+    const objects = sorted.filter((item) => item.category === 'object');
+    const activities = sorted.filter((item) => item.category === 'activity');
+    const events = sorted.filter((item) => item.category === 'event');
+
+    const picks = [
+      ...this.shuffleResults(destinations).slice(0, 3),
+      ...this.shuffleResults(objects).slice(0, 6),
+      ...this.shuffleResults(activities).slice(0, 2),
+      ...this.shuffleResults(events).slice(0, 2),
+    ];
+
+    const merged = new Map<string, AddStopResult>();
+    picks.forEach((item) => merged.set(item.key, item));
+
+    for (const item of this.shuffleResults(sorted)) {
+      if (merged.size >= 24) {
+        break;
+      }
+
+      merged.set(item.key, item);
+    }
+
+    if (!anchor) {
+      return [...merged.values()];
+    }
+
+    return [...merged.values()].sort(
+      (left, right) => this.scoreSuggestedDistance(left, anchor) - this.scoreSuggestedDistance(right, anchor),
+    );
   }
 
   private scoreResult(item: AddStopResult, query: string): number {
@@ -607,5 +664,25 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     }
 
     return `${environment.apiUrl}${path.startsWith('/') ? '' : '/'}${path}`;
+  }
+
+  private async resolveSource<T>(source: import('rxjs').Observable<T>, fallback: T): Promise<T> {
+    return firstValueFrom(
+      source.pipe(
+        timeout(15000),
+        catchError(() => of(fallback)),
+      ),
+    );
+  }
+
+  private shuffleResults(items: AddStopResult[]): AddStopResult[] {
+    const copy = items.slice();
+
+    for (let index = copy.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      [copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+    }
+
+    return copy;
   }
 }

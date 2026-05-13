@@ -53,16 +53,13 @@
         </button>
 
         <div class="add-stop-screen__section-head">
-          <h2>Recent</h2>
-          <button type="button" (click)="clearAll()">Clear All</button>
+          <h2>Recommended</h2>
         </div>
 
         <div class="add-stop-screen__recent-list">
-          @if (isLoading) {
-            <div class="add-stop-screen__state">Loading {{ activeLabel.toLowerCase() }} stops...</div>
-          } @else if (results.length === 0) {
+          @if (results.length === 0 && !isLoading) {
             <div class="add-stop-screen__state">No matching places found.</div>
-          } @else {
+          } @else if (results.length > 0) {
             @for (item of results; track item.key) {
               <button
                 class="add-stop-screen__recent-item"
@@ -87,7 +84,7 @@
 
         @if (hasMoreResults) {
           <button class="add-stop-screen__more-link" type="button" (click)="showMore()">
-            More from recent history
+            Show more recommendations
           </button>
         }
       </div>
