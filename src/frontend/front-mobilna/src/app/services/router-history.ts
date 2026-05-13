@@ -5,6 +5,7 @@ import { filter } from 'rxjs/operators';
 @Injectable({ providedIn: 'root' })
 export class RouterHistoryService {
   private history: string[] = [];
+  private isGoingBack = false;
 
   constructor(private router: Router) {
     this.router.events
@@ -12,12 +13,15 @@ export class RouterHistoryService {
       .subscribe((e: any) => {
         const url = e.urlAfterRedirects;
 
-        // ne cuvaj login u history
         if (url.startsWith('/login')) {
           return;
         }
 
-        // izbegni duplikate
+        if (this.isGoingBack) {
+          this.isGoingBack = false;
+          return;
+        }
+
         const last = this.history[this.history.length - 1];
 
         if (last !== url) {
@@ -27,19 +31,30 @@ export class RouterHistoryService {
   }
 
   getPreviousUrl(): string | null {
-    if (this.history.length < 2) return null;
+    if (this.history.length < 2) {
+      return null;
+    }
 
     return this.history[this.history.length - 2];
   }
 
   goBack(fallback: string = '/home'): void {
-    const prev = this.getPreviousUrl();
-
-    if (prev) {
-      this.router.navigateByUrl(prev);
-    } else {
+    if (this.history.length < 2) {
       this.router.navigateByUrl(fallback);
+      return;
     }
+
+    this.history.pop();
+
+    const previous = this.history[this.history.length - 1];
+
+    if (!previous) {
+      this.router.navigateByUrl(fallback);
+      return;
+    }
+
+    this.isGoingBack = true;
+    this.router.navigateByUrl(previous);
   }
 
   clear(): void {

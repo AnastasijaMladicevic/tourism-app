@@ -16,7 +16,7 @@
         <span>{{ 'settings.generalSection' | translate }}</span>
       </div>
       <div class="menu-card">
-        @for (item of generalItems; track item.titleKey) {
+        @for (item of visibleGeneralItems; track item.titleKey) {
           <button
             class="menu-item"
             type="button"
