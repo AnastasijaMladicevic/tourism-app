@@ -56,6 +56,7 @@
   @if (isRoutePlannerOpen) {
     <div
       class="route-planner"
+      [class.route-planner--navigation-active]="isRouteNavigationActive"
       [class.route-planner--expanded]="isRoutePlannerExpanded"
       [class.route-planner--dragging]="isRoutePlannerDragging"
       [style.transform]="routePlannerTransform"
@@ -96,15 +97,16 @@
 
           <button
             class="route-planner__primary-btn"
+            [class.route-planner__primary-btn--active]="isRouteNavigationActive"
             type="button"
             [disabled]="routePoints.length < 2"
             (click)="startPlannedRoute()"
           >
-            Start Route
-            <mat-icon>play_arrow</mat-icon>
+            {{ isRouteNavigationActive ? 'Following Route' : 'Start Route' }}
+            <mat-icon>{{ isRouteNavigationActive ? 'my_location' : 'play_arrow' }}</mat-icon>
           </button>
 
-          <button class="route-planner__icon-btn" type="button" (click)="clearPlannedRoute()">
+          <button class="route-planner__icon-btn" type="button" (click)="clearPlannedRouteKeepMyLocation()">
             <mat-icon>delete</mat-icon>
           </button>
 
@@ -119,7 +121,7 @@
           <div class="route-planner__mobile-header">
             <h3>Plan Route</h3>
             <div class="route-planner__mobile-actions">
-              <button class="route-planner__icon-btn route-planner__icon-btn--mobile" type="button" (click)="clearPlannedRoute()">
+              <button class="route-planner__icon-btn route-planner__icon-btn--mobile" type="button" (click)="clearPlannedRouteKeepMyLocation()">
                 <mat-icon>delete</mat-icon>
               </button>
               <button class="route-planner__icon-btn route-planner__icon-btn--mobile" type="button" (click)="closeRoutePlanner()">
@@ -168,22 +170,6 @@
             </button>
           </div>
 
-          <div class="route-planner__helper-row">
-            <button
-              class="route-planner__ghost-btn"
-              type="button"
-              [disabled]="isRouteLocationLoading()"
-              (click)="addMyLocationAsStart()"
-            >
-              <mat-icon>my_location</mat-icon>
-              {{
-                (isRouteLocationLoading()
-                  ? 'map.locationLoading'
-                  : 'map.useMyLocation') | translate
-              }}
-            </button>
-          </div>
-
           <div
             cdkDropList
             cdkDropListOrientation="vertical"
@@ -216,9 +202,14 @@
           </div>
 
           @if (routePoints.length > 1) {
-            <button class="route-planner__mobile-start" type="button" (click)="startPlannedRoute()">
-              Start Route
-              <mat-icon>play_arrow</mat-icon>
+            <button
+              class="route-planner__mobile-start"
+              [class.route-planner__mobile-start--active]="isRouteNavigationActive"
+              type="button"
+              (click)="startPlannedRoute()"
+            >
+              {{ isRouteNavigationActive ? 'Following Route' : 'Start Route' }}
+              <mat-icon>{{ isRouteNavigationActive ? 'my_location' : 'play_arrow' }}</mat-icon>
             </button>
           }
         </div>
@@ -387,6 +378,28 @@
   }
 
   <div id="main-map" class="main-map"></div>
+
+  @if (isRouteNavigationActive) {
+    <div class="navigation-actions">
+      @if (!isNavigationAutoCenterEnabled) {
+        <button class="navigation-action navigation-action--primary" type="button" (click)="resumeRouteNavigationAutoCenter()">
+          <mat-icon>my_location</mat-icon>
+          Re-center
+        </button>
+      }
+    </div>
+
+    <div class="navigation-summary-card" (click)="$event.stopPropagation()">
+      <div class="navigation-summary-card__stats">
+        <strong>{{ routeDurationLabel }}</strong>
+        <span>{{ routeDistanceCompactLabel }}</span>
+      </div>
+
+      <button class="navigation-summary-card__exit" type="button" (click)="stopRouteNavigation()">
+        Exit
+      </button>
+    </div>
+  }
 
   <div class="map-controls" [class.map-controls--hidden]="isRoutePlannerExpanded">
     <button

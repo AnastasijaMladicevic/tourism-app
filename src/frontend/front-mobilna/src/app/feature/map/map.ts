@@ -60,6 +60,8 @@ interface RoutePoint {
   type: string;
   lat: number;
   lng: number;
+  markerType?: string;
+  markerId?: number;
 }
 
 interface AddStopPreviewItem {
@@ -123,11 +125,19 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   isRoutePickingMode = false;
   routePickingType: 'start' | 'end' | 'add' = 'add';
   isTracking = false;
+  isRouteNavigationActive = false;
+  isNavigationAutoCenterEnabled = false;
   showLocationConsentPrompt = false;
   private userMarker: L.Marker | null = null;
-  private userCircle: L.Circle | null = null;
 
   private routeLine: L.Polyline | null = null;
+  private routeCalculationVersion = 0;
+  private readonly navigationZoom = 18;
+  private readonly stoppedNavigationZoom = 12;
+  private readonly navigationRecalculationThresholdMeters = 12;
+  private readonly navigationHeadingThresholdMeters = 3;
+  private navigationHeading = 0;
+  private previousTrackedLocation: TrackedLocation | null = null;
   readonly addStopPreviewItems: AddStopPreviewItem[] = [
     {
       id: 'kotor-old-town',
@@ -195,7 +205,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
           const point = this.getRoutePointFromItem(this.selectedItem, this.selectedType);
           if (point) {
             this.routePoints.push(point);
-            this.calculateRoute();
+            this.routeBuilderStateService.updateRoutePoints(this.routePoints);
+            this.syncRoutePointMarkers();
+            void this.calculateRoute({ preserveViewport: this.isRouteNavigationActive });
           }
         }
         this.cdr.detectChanges();
@@ -205,6 +217,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
         this.ngZone.run(() => {
           this.isTracking = enabled;
+          if (!enabled) {
+            this.deactivateRouteNavigation();
+          }
           this.cdr.detectChanges();
         });
       }),
@@ -243,6 +258,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.routeSearchQuery = '';
         this.showSuggestions = false;
         this.closeCard();
+      });
+      map.on('dragstart', () => {
+        this.ngZone.run(() => {
+          this.pauseRouteNavigationAutoCenter();
+          this.cdr.detectChanges();
+        });
       });
     }
   }
@@ -296,33 +317,26 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private updateUserMarker(latlng: L.LatLng, accuracy: number): void {
+  private updateUserMarker(latlng: L.LatLng): void {
     const map = this.mapService.getMap();
     if (!map) return;
 
     const userIcon = L.divIcon({
       className: 'user-location-marker',
-      html: `<div class="user-dot"><div class="user-dot__pulse"></div></div>`,
-      iconSize: [20, 20],
-      iconAnchor: [10, 10],
+      html:
+        '<div class="user-dot">' +
+        '<div class="user-dot__pulse"></div>' +
+        '<div class="user-dot__halo"></div>' +
+        '<div class="user-dot__core"></div>' +
+        '</div>',
+      iconSize: [44, 44],
+      iconAnchor: [22, 22],
     });
 
     if (this.userMarker) {
       this.userMarker.setLatLng(latlng);
     } else {
       this.userMarker = L.marker(latlng, { icon: userIcon, zIndexOffset: 1000 }).addTo(map);
-    }
-
-    if (this.userCircle) {
-      this.userCircle.setLatLng(latlng).setRadius(accuracy);
-    } else {
-      this.userCircle = L.circle(latlng, {
-        radius: accuracy,
-        color: '#168AAD',
-        fillColor: '#168AAD',
-        fillOpacity: 0.1,
-        weight: 1,
-      }).addTo(map);
     }
   }
 
@@ -331,23 +345,27 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.userMarker.remove();
       this.userMarker = null;
     }
-
-    if (this.userCircle) {
-      this.userCircle.remove();
-      this.userCircle = null;
-    }
   }
 
   private applyTrackedLocation(location: TrackedLocation | null): void {
     if (!location) {
       this.userLocation = null;
+      this.previousTrackedLocation = null;
       this.clearUserMarker();
+      this.deactivateRouteNavigation();
       return;
     }
 
     const latlng = L.latLng(location.latitude, location.longitude);
+    this.navigationHeading = this.resolveNavigationHeading(location);
     this.userLocation = latlng;
-    this.updateUserMarker(latlng, location.accuracy);
+    this.updateUserMarker(latlng);
+    this.previousTrackedLocation = location;
+
+    if (this.isRouteNavigationActive) {
+      this.syncActiveRouteNavigation(latlng);
+      return;
+    }
 
     if (this.shouldCenterOnNextLocation) {
       this.mapService.flyTo(location.latitude, location.longitude, 16);
@@ -356,10 +374,21 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openDirections(): void {
+    this.deactivateRouteNavigation();
+
     const point = this.getRoutePointFromItem(this.selectedItem, this.selectedType);
     if (!point) return;
 
-    this.routePoints = [point];
+    const initialPoints: RoutePoint[] = [];
+    const myLocationPoint = this.createMyLocationRoutePoint();
+
+    if (myLocationPoint) {
+      initialPoints.push(myLocationPoint);
+    }
+
+    initialPoints.push(point);
+
+    this.routePoints = initialPoints;
     this.routeBuilderStateService.openPlanner(this.routePoints);
     this.totalDistance = 0;
     this.totalDuration = 0;
@@ -371,7 +400,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.routeSearchQuery = '';
     this.routeSearchResults = [];
     this.syncRoutePlannerPageState(true);
+    this.syncRoutePointMarkers();
     this.closeCard();
+
+    if (this.routePoints.length > 1) {
+      void this.calculateRoute();
+    }
   }
 
   getDirections(): void {
@@ -417,6 +451,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   clearPlannedRoute(): void {
+    this.deactivateRouteNavigation();
     this.routePoints = [];
     this.clearDirections();
     this.totalDistance = 0;
@@ -425,9 +460,39 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.routeSearchQuery = '';
     this.showAddStopPanel = false;
     this.routeBuilderStateService.clearPlanner();
+    this.syncRoutePointMarkers();
+  }
+
+  clearPlannedRouteKeepMyLocation(): void {
+    this.deactivateRouteNavigation();
+    const existingOrigin = this.routePoints.find((point) => point.id === -1 && point.type === 'gps') ?? null;
+    const myLocationPoint = existingOrigin ?? this.createMyLocationRoutePoint();
+
+    this.clearDirections();
+    this.routeSearchResults = [];
+    this.routeSearchQuery = '';
+    this.showAddStopPanel = false;
+
+    if (!myLocationPoint) {
+      this.clearPlannedRoute();
+      return;
+    }
+
+    this.routePoints = [{ ...myLocationPoint }];
+    this.totalDistance = 0;
+    this.totalDuration = 0;
+    this.routeBuilderStateService.updateRoutePoints(this.routePoints);
+    this.syncRoutePointMarkers();
+    this.isRoutePlannerOpen = true;
+    this.isRouteListCollapsed = false;
+    this.isRoutePlannerExpanded = false;
+    this.isRoutePickingMode = true;
+    this.routePickingType = 'add';
   }
 
   clearDirections(): void {
+    this.routeCalculationVersion++;
+
     if (this.routeLine) {
       this.routeLine.remove();
       this.routeLine = null;
@@ -437,11 +502,14 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.totalDuration = 0;
   }
 
-  async calculateRoute(): Promise<void> {
+  async calculateRoute(options: { preserveViewport?: boolean } = {}): Promise<void> {
     if (this.routePoints.length < 2) {
+      this.deactivateRouteNavigation();
       this.clearDirections();
       return;
     }
+
+    const requestVersion = ++this.routeCalculationVersion;
 
     const coords = this.routePoints
       .map(p => `${p.lng},${p.lat}`)
@@ -460,6 +528,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       const route = data?.routes?.[0];
       if (!route) return;
 
+      if (requestVersion !== this.routeCalculationVersion || this.routePoints.length < 2) {
+        return;
+      }
+
       const distanceKm = route.distance / 1000;
       const durationMin = route.duration / 60;
       this.totalDistance = distanceKm;
@@ -471,6 +543,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       const map = this.mapService.getMap();
       if (!map) return;
 
+      if (requestVersion !== this.routeCalculationVersion || this.routePoints.length < 2) {
+        return;
+      }
+
       if (this.routeLine) {
         this.routeLine.remove();
       }
@@ -480,10 +556,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         weight: 5,
       }).addTo(map);
 
-      map.fitBounds(L.latLngBounds(latlngs), {
-        padding: [50, 50],
-        maxZoom: 16,
-      });
+      if (!options.preserveViewport && !this.isRouteNavigationActive) {
+        map.fitBounds(L.latLngBounds(latlngs), {
+          padding: [50, 50],
+          maxZoom: 16,
+        });
+      }
 
     } catch (e) {
       console.error(e);
@@ -584,12 +662,16 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   private toRoutePoint(result: SearchResult): RoutePoint | null {
     if (!result.lat || !result.lng) return null;
 
+    const markerId = Number(result.id);
+
     return {
       id: result.id,
       name: result.name,
       type: result.markerType || result.category || 'point',
       lat: result.lat,
-      lng: result.lng
+      lng: result.lng,
+      markerType: result.markerType || result.category || 'point',
+      markerId: Number.isNaN(markerId) ? undefined : markerId,
     };
   }
 
@@ -1060,7 +1142,15 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const point = this.getRoutePointFromItem(this.selectedItem, this.selectedType);
     if (!point) return;
-    this.routePoints = [point];
+
+    const initialPoints: RoutePoint[] = [];
+    const myLocationPoint = this.createMyLocationRoutePoint();
+    if (myLocationPoint) {
+      initialPoints.push(myLocationPoint);
+    }
+    initialPoints.push(point);
+
+    this.routePoints = initialPoints;
 
     this.showDirectionsModal = true;
   }
@@ -1178,6 +1268,18 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     return `${hours}h ${minutes}m`;
   }
 
+  get routeDistanceCompactLabel(): string {
+    if (this.totalDistance <= 0) {
+      return '0 m';
+    }
+
+    if (this.totalDistance < 1) {
+      return `${Math.max(1, Math.round(this.totalDistance * 1000))} m`;
+    }
+
+    return `${this.totalDistance.toFixed(1)} km`;
+  }
+
   get routePlannerTransform(): string | null {
     if (!this.isRoutePlannerDragging || this.routePlannerDragOffset === 0) {
       return null;
@@ -1218,12 +1320,17 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const lng = Number(item.longitude);
     if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
 
+    const markerId = Number(item.id);
+    const markerType = this.normalizeMarkerType(type);
+
     return {
       id: item.id ?? `${type}:${lat}:${lng}`,
       name: String(item.name ?? 'Point'),
       type: String(item.objectTypeName ?? item.destinationTypeName ?? item.eventTypeName ?? type),
       lat,
       lng,
+      markerType,
+      markerId: Number.isNaN(markerId) ? undefined : markerId,
     };
   }
 
@@ -1329,11 +1436,73 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   startPlannedRoute(): void {
-    void this.calculateRoute();
+    if (this.routePoints.length < 2) {
+      return;
+    }
+
+    if (this.isRouteNavigationActive && !this.isNavigationAutoCenterEnabled) {
+      this.resumeRouteNavigationAutoCenter();
+      return;
+    }
+
+    const trackingReady = this.isTracking || this.locationTrackingService.startTracking();
+    if (!trackingReady) {
+      this.openLocationConsentPrompt();
+      return;
+    }
+
+    this.closeLocationConsentPrompt();
+    this.isRouteNavigationActive = true;
+    this.isNavigationAutoCenterEnabled = true;
+    this.isRoutePickingMode = false;
+    this.shouldCenterOnNextLocation = !this.userLocation;
+
+    let routeChanged = false;
+    if (this.userLocation) {
+      routeChanged = this.syncNavigationRouteOrigin(this.userLocation);
+      this.focusNavigationOnLocation(this.userLocation);
+    }
+
+    if (routeChanged) {
+      this.routeBuilderStateService.updateRoutePoints(this.routePoints);
+      this.syncRoutePointMarkers();
+    }
+
+    void this.calculateRoute({ preserveViewport: true });
+  }
+
+  resumeRouteNavigationAutoCenter(): void {
+    if (!this.isRouteNavigationActive) {
+      return;
+    }
+
+    this.isNavigationAutoCenterEnabled = true;
+
+    if (this.userLocation) {
+      this.focusNavigationOnLocation(this.userLocation, true);
+      return;
+    }
+
+    this.shouldCenterOnNextLocation = true;
+  }
+
+  stopRouteNavigation(): void {
+    const map = this.mapService.getMap();
+    const targetCenter = this.userLocation ?? map?.getCenter() ?? null;
+
+    this.deactivateRouteNavigation();
+
+    if (map && targetCenter) {
+      map.flyTo(targetCenter, this.stoppedNavigationZoom, { duration: 0.9 });
+    } else if (map) {
+      map.setZoom(this.stoppedNavigationZoom, { animate: true });
+    }
+
+    this.locationTrackingService.stopTracking();
   }
 
   optimizeRouteSequence(): void {
-    void this.calculateRoute();
+    void this.calculateRoute({ preserveViewport: this.isRouteNavigationActive });
   }
 
   enableMapStopPicking(): void {
@@ -1379,10 +1548,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.routePoints.push(routePoint);
     this.routeBuilderStateService.updateRoutePoints(this.routePoints);
+    this.syncRoutePointMarkers();
 
     this.routeSearchQuery = '';
     this.routeSearchResults = [];
-    void this.calculateRoute();
+    void this.calculateRoute({ preserveViewport: this.isRouteNavigationActive });
   }
 
   showRouteSuggestions(): void {
@@ -1401,10 +1571,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     );
 
     this.routeBuilderStateService.updateRoutePoints(this.routePoints);
-    void this.calculateRoute();
+    this.syncRoutePointMarkers();
+    void this.calculateRoute({ preserveViewport: this.isRouteNavigationActive });
   }
 
   closeRoutePlanner(): void {
+    this.deactivateRouteNavigation();
     this.isRoutePlannerOpen = false;
     this.isRouteListCollapsed = false;
     this.isRoutePlannerExpanded = false;
@@ -1423,8 +1595,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    if (this.routePoints.length < 2) {
+      this.deactivateRouteNavigation();
+    }
+
     this.routeBuilderStateService.updateRoutePoints(this.routePoints);
-    void this.calculateRoute();
+    this.syncRoutePointMarkers();
+    void this.calculateRoute({ preserveViewport: this.isRouteNavigationActive });
   }
 
   onRouteSearchBlur(): void {
@@ -1495,27 +1672,18 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  addMyLocationAsStart(): void {
-    if (!this.locationTrackingService.isTrackingEnabled()) {
-      this.openLocationConsentPrompt();
-      return;
+  private createMyLocationRoutePoint(): RoutePoint | null {
+    if (!this.locationTrackingService.isTrackingEnabled() || !this.userLocation) {
+      return null;
     }
 
-    if (!this.userLocation) return;
-
-    const exists = this.routePoints.some(p => p.id === -1);
-    if (exists) return;
-
-    this.routePoints.unshift({
+    return {
       id: -1,
       name: 'My Location',
       type: 'gps',
       lat: this.userLocation.lat,
-      lng: this.userLocation.lng
-    });
-
-    this.routeBuilderStateService.updateRoutePoints(this.routePoints);
-    void this.calculateRoute();
+      lng: this.userLocation.lng,
+    };
   }
 
   openAddStopPanel(): void {
@@ -1829,6 +1997,19 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isRoutePlannerDragging = false;
   }
 
+  private syncRoutePointMarkers(): void {
+    const routeMarkers = this.routePoints
+      .filter((point): point is RoutePoint & { markerType: string; markerId: number } =>
+        !!point.markerType && typeof point.markerId === 'number' && Number.isFinite(point.markerId),
+      )
+      .map((point) => ({
+        type: this.normalizeMarkerType(point.markerType ?? point.type),
+        id: point.markerId,
+      }));
+
+    this.mapService.setRouteMarkers(routeMarkers);
+  }
+
   private syncRoutePlannerPageState(isOpen: boolean): void {
     if (typeof document === 'undefined') {
       return;
@@ -1857,10 +2038,131 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       } else {
         this.clearDirections();
       }
+      this.syncRoutePointMarkers();
+    } else {
+      this.syncRoutePointMarkers();
     }
 
     if (this.routeBuilderStateService.consumeMapPickingRequest()) {
       this.enableMapStopPicking();
     }
+  }
+
+  private syncActiveRouteNavigation(latlng: L.LatLng): void {
+    const routeChanged = this.syncNavigationRouteOrigin(latlng);
+    if (this.isNavigationAutoCenterEnabled) {
+      this.focusNavigationOnLocation(latlng);
+    }
+
+    if (!routeChanged) {
+      return;
+    }
+
+    this.routeBuilderStateService.updateRoutePoints(this.routePoints);
+    this.syncRoutePointMarkers();
+    void this.calculateRoute({ preserveViewport: true });
+  }
+
+  private syncNavigationRouteOrigin(latlng: L.LatLng): boolean {
+    if (this.routePoints.length < 2) {
+      return false;
+    }
+
+    const liveOrigin = this.createMyLocationRoutePoint();
+    if (!liveOrigin) {
+      return false;
+    }
+
+    const firstPoint = this.routePoints[0];
+    if (!this.isGpsRoutePoint(firstPoint)) {
+      this.routePoints = [liveOrigin, ...this.routePoints];
+      return true;
+    }
+
+    const previousOrigin = L.latLng(firstPoint.lat, firstPoint.lng);
+    if (previousOrigin.distanceTo(latlng) < this.navigationRecalculationThresholdMeters) {
+      return false;
+    }
+
+    this.routePoints[0] = {
+      ...firstPoint,
+      ...liveOrigin,
+    };
+    return true;
+  }
+
+  private focusNavigationOnLocation(latlng: L.LatLng, forceRecentering = false): void {
+    const map = this.mapService.getMap();
+    if (!map) {
+      return;
+    }
+
+    this.mapService.setNavigationBearing(this.navigationHeading);
+    const targetZoom = Math.max(map.getZoom(), this.navigationZoom);
+    if (forceRecentering || this.shouldCenterOnNextLocation || map.getZoom() < this.navigationZoom - 1) {
+      map.flyTo(latlng, targetZoom, { duration: 0.9 });
+      this.shouldCenterOnNextLocation = false;
+      return;
+    }
+
+    map.panTo(latlng, { animate: true, duration: 0.8 });
+  }
+
+  private isGpsRoutePoint(point: RoutePoint | null | undefined): point is RoutePoint {
+    return !!point && point.id === -1 && point.type === 'gps';
+  }
+
+  private deactivateRouteNavigation(): void {
+    this.isRouteNavigationActive = false;
+    this.isNavigationAutoCenterEnabled = false;
+    this.shouldCenterOnNextLocation = false;
+    this.mapService.resetNavigationBearing();
+  }
+
+  private pauseRouteNavigationAutoCenter(): void {
+    if (!this.isRouteNavigationActive || !this.isNavigationAutoCenterEnabled) {
+      return;
+    }
+
+    this.isNavigationAutoCenterEnabled = false;
+  }
+
+  private resolveNavigationHeading(location: TrackedLocation): number {
+    if (typeof location.heading === 'number' && Number.isFinite(location.heading)) {
+      return location.heading;
+    }
+
+    if (!this.previousTrackedLocation) {
+      return this.navigationHeading;
+    }
+
+    const previousPoint = L.latLng(this.previousTrackedLocation.latitude, this.previousTrackedLocation.longitude);
+    const currentPoint = L.latLng(location.latitude, location.longitude);
+
+    if (previousPoint.distanceTo(currentPoint) < this.navigationHeadingThresholdMeters) {
+      return this.navigationHeading;
+    }
+
+    return this.calculateBearing(previousPoint, currentPoint);
+  }
+
+  private calculateBearing(from: L.LatLng, to: L.LatLng): number {
+    const fromLat = this.toRadians(from.lat);
+    const toLat = this.toRadians(to.lat);
+    const deltaLng = this.toRadians(to.lng - from.lng);
+    const y = Math.sin(deltaLng) * Math.cos(toLat);
+    const x =
+      Math.cos(fromLat) * Math.sin(toLat) -
+      Math.sin(fromLat) * Math.cos(toLat) * Math.cos(deltaLng);
+
+    return (this.toDegrees(Math.atan2(y, x)) + 360) % 360;
+  }
+
+  private toRadians(value: number): number {
+    return (value * Math.PI) / 180;
+  }
+
+  private toDegrees(value: number): number {
+    return (value * 180) / Math.PI;
   }
 }
