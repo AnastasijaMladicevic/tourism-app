@@ -605,9 +605,14 @@ body.route-navigation-active app-floating-ai-assistant {
 .route-planner__list {
   display: grid;
   gap: 12px;
+  max-height: none;
+  overflow: visible;
+  padding-right: 4px;
+}
+
+.route-planner__list--scrollable {
   max-height: min(26vh, 240px);
   overflow-y: auto;
-  padding-right: 4px;
 }
 
 .route-planner--expanded .route-planner__body {
@@ -846,8 +851,13 @@ body.route-navigation-active app-floating-ai-assistant {
   }
 
   .route-planner__list {
-    max-height: min(16vh, 152px);
+    max-height: none;
     gap: 8px;
+    overflow: visible;
+  }
+
+  .route-planner__list--scrollable {
+    max-height: 152px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
@@ -1073,7 +1083,12 @@ body.route-navigation-active app-floating-ai-assistant {
 
   .route-planner__list {
     gap: 10px;
-    max-height: min(22vh, 200px);
+    max-height: none;
+  }
+
+  .route-planner__list--scrollable {
+    max-height: 138px;
+    overflow-y: auto;
   }
 
   .route-stop-card {
@@ -1147,7 +1162,11 @@ body.route-navigation-active app-floating-ai-assistant {
   }
 
   .route-planner__list {
-    max-height: 104px;
+    max-height: none;
+  }
+
+  .route-planner__list--scrollable {
+    max-height: 138px;
   }
 }
 

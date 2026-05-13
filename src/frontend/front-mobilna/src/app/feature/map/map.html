@@ -143,14 +143,6 @@
                   (keydown.enter)="routeSearchResults.length ? addRoutePoint(routeSearchResults[0]) : focusRouteSearch()"
                   (blur)="onRouteSearchBlur()"
                 />
-
-                <button class="route-planner__map-pill" type="button" (click)="handleInlineRouteAction()">
-                  <span class="route-planner__map-pill-desktop">
-                    <mat-icon>place</mat-icon>
-                    Map
-                  </span>
-                  <span class="route-planner__map-pill-mobile">Add Stop</span>
-                </button>
               </div>
 
               @if (routeSearchResults.length > 0) {
@@ -175,6 +167,7 @@
             cdkDropListOrientation="vertical"
             (cdkDropListDropped)="drop($any($event))"
             class="route-planner__list"
+            [class.route-planner__list--scrollable]="routePoints.length > 2"
           >
             @for (point of routePoints; track point.id + ':' + $index; let i = $index) {
               <article cdkDrag class="route-stop-card">
