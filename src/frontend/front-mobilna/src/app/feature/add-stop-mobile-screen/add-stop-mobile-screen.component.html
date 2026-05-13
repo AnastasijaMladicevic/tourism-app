@@ -1,0 +1,264 @@
+<div class="add-stop-screen-shell" [class.add-stop-screen-shell--desktop]="isDesktopLayout">
+  @if (isDesktopLayout) {
+    <div class="add-stop-route-modal" role="dialog" aria-modal="true">
+      <div class="add-stop-route-modal__header">
+        <div class="add-stop-route-modal__title">
+          <span class="add-stop-route-modal__title-icon">
+            <mat-icon>flash_on</mat-icon>
+          </span>
+          <h3>Add Stop to Route</h3>
+        </div>
+
+        <button class="add-stop-route-modal__close" type="button" (click)="close()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="add-stop-route-modal__content">
+        <div class="add-stop-route-modal__left">
+          <div class="add-stop-route-modal__search">
+            <mat-icon>search</mat-icon>
+            <input
+              type="text"
+              [ngModel]="searchQuery"
+              (ngModelChange)="searchQuery = $event; onSearchChange()"
+              placeholder="Search for a place, address, or category"
+            />
+            <mat-icon>mic_none</mat-icon>
+          </div>
+
+          <div class="add-stop-route-modal__chips">
+            @for (category of categories; track category.key) {
+              <button
+                class="add-stop-route-modal__chip"
+                [class.add-stop-route-modal__chip--active]="activeCategory === category.key"
+                type="button"
+                (click)="setCategory(category.key)"
+              >
+                <mat-icon>{{ category.icon }}</mat-icon>
+                {{ category.label }}
+              </button>
+            }
+          </div>
+
+          <button class="add-stop-route-modal__manual" type="button" (click)="chooseOnMap()">
+            <span class="add-stop-route-modal__manual-icon"><mat-icon>place</mat-icon></span>
+            <span>Choose manually on map</span>
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+
+          <div class="add-stop-route-modal__section-head">
+            <h4>{{ desktopSectionTitle }}</h4>
+            <button type="button" (click)="clearAll()">Clear All</button>
+          </div>
+
+          <div class="add-stop-route-modal__results">
+            @if (results.length === 0 && !isLoading) {
+              <div class="add-stop-route-modal__empty">
+                <mat-icon>travel_explore</mat-icon>
+                <strong>No stops found</strong>
+                <span>Try another keyword or switch category.</span>
+              </div>
+            } @else {
+              @for (item of results; track item.key) {
+                <button
+                  class="add-stop-route-modal__result"
+                  [class.add-stop-route-modal__result--selected]="isSelected(item)"
+                  type="button"
+                  (click)="selectResult(item)"
+                >
+                  <span class="add-stop-route-modal__result-icon">
+                    <mat-icon>{{ item.category === 'address' ? 'near_me' : 'place' }}</mat-icon>
+                  </span>
+
+                  <span class="add-stop-route-modal__result-body">
+                    <strong>{{ item.name }}</strong>
+                    <span>{{ item.subtitle }}</span>
+                    <em>{{ item.meta }}</em>
+                  </span>
+
+                  <span class="add-stop-route-modal__result-radio">
+                    <span></span>
+                  </span>
+                </button>
+              }
+            }
+          </div>
+
+          <p class="add-stop-route-modal__hint">* Selecting a stop will recalculate your travel time and distance.</p>
+        </div>
+
+        <div class="add-stop-route-modal__preview">
+          <div class="add-stop-route-modal__location-card">
+            <h4>Location</h4>
+
+            <div
+              class="add-stop-route-modal__location-map"
+              [attr.data-name]="selectedResult?.name || 'Choose a stop'"
+            >
+              @if (selectedResultPreviewMapUrl) {
+                <iframe
+                  class="add-stop-route-modal__location-frame"
+                  [src]="selectedResultPreviewMapUrl"
+                  title="Selected stop location"
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                ></iframe>
+              } @else {
+                <div class="add-stop-route-modal__location-placeholder">
+                  <mat-icon>place</mat-icon>
+                </div>
+              }
+
+              <button class="map-btn-overlay" type="button" (click)="viewSelectedOnMap()">
+                View on map
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="add-stop-route-modal__footer">
+        <button class="add-stop-route-modal__cancel" type="button" (click)="close()">Cancel</button>
+        <button
+          class="add-stop-route-modal__confirm"
+          type="button"
+          [disabled]="!canAddToRoute || isSubmitting"
+          (click)="addToRoute()"
+        >
+          <mat-icon>add</mat-icon>
+          Add to Route
+        </button>
+      </div>
+    </div>
+  } @else {
+    <div class="add-stop-screen">
+      <div class="add-stop-screen__handle" aria-hidden="true"></div>
+
+      <header class="add-stop-screen__header">
+        <div class="add-stop-screen__title">
+          <span class="add-stop-screen__logo">
+            <mat-icon>flash_on</mat-icon>
+          </span>
+          <h1>Add Stop</h1>
+        </div>
+
+        <button class="add-stop-screen__close" type="button" (click)="close()" aria-label="Close">
+          <mat-icon>close</mat-icon>
+        </button>
+      </header>
+
+      <div class="add-stop-screen__desktop-layout">
+        <div class="add-stop-screen__content">
+          <label class="add-stop-screen__search" aria-label="Search for a place">
+            <mat-icon>search</mat-icon>
+            <input
+              type="text"
+              [ngModel]="searchQuery"
+              (ngModelChange)="searchQuery = $event; onSearchChange()"
+              placeholder="Search for a place..."
+            />
+            <button class="add-stop-screen__icon-button" type="button" aria-label="Voice search">
+              <mat-icon>mic_none</mat-icon>
+            </button>
+          </label>
+
+          <div class="add-stop-screen__chips">
+            @for (category of categories; track category.key) {
+              <button
+                class="add-stop-screen__chip"
+                type="button"
+                [class.add-stop-screen__chip--active]="activeCategory === category.key"
+                (click)="setCategory(category.key)"
+              >
+                <mat-icon>{{ category.icon }}</mat-icon>
+                <span>{{ category.label }}</span>
+              </button>
+            }
+          </div>
+
+          <button class="add-stop-screen__choose-map" type="button" (click)="chooseOnMap()">
+            <span class="add-stop-screen__choose-icon">
+              <mat-icon>place</mat-icon>
+            </span>
+            <span class="add-stop-screen__choose-copy">Choose on map</span>
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+
+          <div class="add-stop-screen__section-head">
+            <h2>Recommended</h2>
+          </div>
+
+          <div class="add-stop-screen__recent-list">
+            @if (results.length === 0 && !isLoading) {
+              <div class="add-stop-screen__state">No matching places found.</div>
+            } @else if (results.length > 0) {
+              @for (item of results; track item.key) {
+                <button
+                  class="add-stop-screen__recent-item"
+                  type="button"
+                  [class.add-stop-screen__recent-item--selected]="isSelected(item)"
+                  (click)="selectResult(item)"
+                >
+                  <span class="add-stop-screen__recent-icon">
+                    <mat-icon>{{ item.category === 'address' ? 'near_me' : 'schedule' }}</mat-icon>
+                  </span>
+                  <span class="add-stop-screen__recent-copy">
+                    <strong>{{ item.name }}</strong>
+                    <span>{{ item.subtitle }}</span>
+                    @if (item.meta) {
+                      <small>{{ item.meta }}</small>
+                    }
+                  </span>
+                </button>
+              }
+            }
+          </div>
+
+          @if (hasMoreResults) {
+            <button class="add-stop-screen__more-link" type="button" (click)="showMore()">
+              Show more recommendations
+            </button>
+          }
+        </div>
+
+        <aside class="add-stop-screen__preview">
+          <div class="add-stop-screen__preview-surface">
+            @if (selectedResult?.image) {
+              <img
+                class="add-stop-screen__preview-image"
+                [src]="selectedResult?.image"
+                [alt]="selectedResult?.name"
+                loading="lazy"
+                decoding="async"
+              />
+            }
+            <div class="add-stop-screen__preview-pin">
+              <mat-icon>place</mat-icon>
+            </div>
+            <div class="add-stop-screen__preview-copy">
+              <span>Previewing Stop</span>
+              <strong>{{ selectedResult?.name || 'Choose a stop' }}</strong>
+              <small>Current Route: {{ routeDisplayTitle }}</small>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <footer class="add-stop-screen__footer">
+        <button class="add-stop-screen__cancel" type="button" (click)="close()">Cancel</button>
+        <button
+          class="add-stop-screen__primary"
+          type="button"
+          [disabled]="!canAddToRoute || isSubmitting"
+          (click)="addToRoute()"
+        >
+          @if (canAddToRoute) {
+            <mat-icon>add</mat-icon>
+          }
+          Add to Route
+        </button>
+      </footer>
+    </div>
+  }
+</div>

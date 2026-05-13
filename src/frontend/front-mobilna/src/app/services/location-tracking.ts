@@ -7,6 +7,7 @@ export interface TrackedLocation {
   longitude: number;
   accuracy: number;
   updatedAt: number;
+  heading?: number | null;
   source?: 'gps' | 'ip';
 }
 
@@ -216,11 +217,17 @@ export class LocationTrackingService {
   }
 
   private createGpsSnapshot(position: GeolocationPosition): TrackedLocation {
+    const rawHeading = position.coords.heading;
+    const heading = typeof rawHeading === 'number' && Number.isFinite(rawHeading) && rawHeading >= 0
+      ? rawHeading
+      : null;
+
     return {
       latitude: position.coords.latitude,
       longitude: position.coords.longitude,
       accuracy: position.coords.accuracy,
       updatedAt: Date.now(),
+      heading,
       source: 'gps',
     };
   }
@@ -247,6 +254,7 @@ export class LocationTrackingService {
       longitude: data.longitude,
       accuracy: 5000,
       updatedAt: Date.now(),
+      heading: null,
       source: 'ip',
     };
   }
@@ -325,6 +333,10 @@ export class LocationTrackingService {
         longitude: parsed.longitude,
         accuracy: parsed.accuracy,
         updatedAt: typeof parsed.updatedAt === 'number' ? parsed.updatedAt : Date.now(),
+        heading:
+          typeof parsed.heading === 'number' && Number.isFinite(parsed.heading)
+            ? parsed.heading
+            : null,
         source: parsed.source ?? 'ip',
       };
     } catch {

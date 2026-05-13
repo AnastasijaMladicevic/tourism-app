@@ -1,0 +1,94 @@
+<div class="preview-page preview-page--desktop">
+  <aside class="preview-sidebar">
+    <div class="preview-brand">
+      <span class="preview-brand__badge">S</span>
+      <span>SpireGO</span>
+    </div>
+
+    <nav class="preview-nav">
+      <a class="preview-nav__item preview-nav__item--active" routerLink="/planner-preview/add-stop-panel">
+        Route Builder
+      </a>
+      <a class="preview-nav__item" routerLink="/planner-preview/add-stop-sheet">Add Stop Sheet</a>
+      <a class="preview-nav__item" routerLink="/planner-preview/route-mobile">Mobile Route</a>
+      <a class="preview-nav__item" routerLink="/planner-preview/route-desktop">Desktop Route</a>
+    </nav>
+  </aside>
+
+  <main class="preview-canvas">
+    <header class="preview-toolbar">
+      <div class="preview-toolbar__search">Search destinations, events...</div>
+      <div class="preview-toolbar__actions">
+        <span></span>
+        <span></span>
+      </div>
+    </header>
+
+    <section class="panel-mockup">
+      <div class="panel-mockup__phone-bar">
+        <span>9:41</span>
+        <span class="panel-mockup__status">signal wifi battery</span>
+      </div>
+
+      <div class="panel-mockup__header">
+        <div class="panel-mockup__title">
+          <span class="panel-mockup__logo">⚡</span>
+          <h1>Add Stop to Route</h1>
+        </div>
+        <button type="button" class="panel-mockup__close">×</button>
+      </div>
+
+      <div class="panel-mockup__body">
+        <div class="panel-mockup__content">
+          <div class="panel-search">Search for a place, address, or category</div>
+
+          <div class="panel-filters">
+            @for (filter of quickFilters; track filter) {
+              <span class="panel-filter" [class.panel-filter--active]="filter === 'Sights'">{{ filter }}</span>
+            }
+          </div>
+
+          <button type="button" class="manual-pick">
+            <span>Choose manually on map</span>
+            <span>›</span>
+          </button>
+
+          <div class="panel-section-head">
+            <h2>Recent & Suggested</h2>
+            <button type="button">Clear All</button>
+          </div>
+
+          <div class="panel-suggestion-list">
+            @for (item of suggestions; track item.title) {
+              <article class="panel-suggestion" [class.panel-suggestion--selected]="item.selected">
+                <div class="panel-suggestion__icon">◷</div>
+                <div class="panel-suggestion__copy">
+                  <strong>{{ item.title }}</strong>
+                  <span>{{ item.subtitle }}</span>
+                  <small>{{ item.badge }}</small>
+                </div>
+                <div class="panel-suggestion__radio"></div>
+              </article>
+            }
+          </div>
+        </div>
+
+        <aside class="panel-map">
+          <div class="panel-map__pin">⌖</div>
+          <span class="panel-map__label">Previewing Stop</span>
+          <strong>Kotor Old Town</strong>
+          <small>Current Route: Pacific Coast Tour</small>
+        </aside>
+      </div>
+
+      <footer class="panel-mockup__footer">
+        <span>* Selecting a stop will recalculate your travel time and distance.</span>
+
+        <div class="panel-mockup__actions">
+          <button type="button" class="ghost-btn">Cancel</button>
+          <button type="button" class="primary-btn">＋ Add to Route</button>
+        </div>
+      </footer>
+    </section>
+  </main>
+</div>

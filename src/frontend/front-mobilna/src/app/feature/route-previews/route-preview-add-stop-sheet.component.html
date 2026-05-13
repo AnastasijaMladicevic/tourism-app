@@ -1,0 +1,56 @@
+<div class="sheet-preview-page">
+  <div class="sheet-preview-frame">
+    <div class="sheet-preview-handle"></div>
+
+    <header class="sheet-preview-header">
+      <div class="sheet-preview-title">
+        <span class="sheet-preview-logo">⚡</span>
+        <h1>Add Stop</h1>
+      </div>
+      <button type="button">×</button>
+    </header>
+
+    <div class="sheet-search">Search for a place...</div>
+
+    <div class="sheet-category-row">
+      @for (category of categories; track category) {
+        <button type="button" class="sheet-chip" [class.sheet-chip--active]="category === 'Coffee'">
+          {{ category }}
+        </button>
+      }
+    </div>
+
+    <button type="button" class="sheet-map-picker">
+      <span class="sheet-map-picker__icon">⌖</span>
+      <span>Choose on map</span>
+      <span>›</span>
+    </button>
+
+    <div class="sheet-section-head">
+      <h2>Recent</h2>
+      <a routerLink="/planner-preview/add-stop-panel">Clear All</a>
+    </div>
+
+    <div class="sheet-recent-list">
+      @for (item of recent; track item.title) {
+        <article class="sheet-recent-item">
+          <div class="sheet-recent-item__icon">◷</div>
+          <div class="sheet-recent-item__copy">
+            <strong>{{ item.title }}</strong>
+            <span>{{ item.subtitle }}</span>
+            @if (item.meta) {
+              <small>{{ item.meta }}</small>
+            }
+          </div>
+        </article>
+      }
+    </div>
+
+    <a class="sheet-more-link" routerLink="/planner-preview/route-mobile">More from recent history</a>
+
+    <footer class="sheet-footer">
+      <button type="button" class="sheet-primary-btn" disabled>Add to Route</button>
+      <button type="button" class="sheet-cancel-btn" routerLink="/map">Cancel</button>
+    </footer>
+  </div>
+</div>

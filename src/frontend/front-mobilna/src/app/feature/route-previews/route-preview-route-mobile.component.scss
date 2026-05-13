@@ -1,0 +1,162 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top, rgba(20, 151, 215, 0.12), transparent 32%),
+    #eef6fb;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.mobile-route-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 12px;
+}
+
+.mobile-route-frame {
+  width: min(100%, 430px);
+  min-height: 860px;
+  background: #fff;
+  border-radius: 34px;
+  box-shadow: 0 24px 56px rgba(16, 46, 73, 0.18);
+  padding: 14px 20px 28px;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-route-handle {
+  width: 72px;
+  height: 6px;
+  border-radius: 999px;
+  background: #e8eef5;
+  margin: 0 auto 18px;
+}
+
+.mobile-route-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.mobile-route-header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.mobile-route-header a {
+  color: #17a3e7;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.mobile-route-search {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 12px 0 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: #fbfdff;
+  color: #8a97aa;
+  margin-bottom: 20px;
+}
+
+.mobile-route-search button {
+  min-width: 86px;
+  min-height: 40px;
+  border-radius: 14px;
+  border: 1px solid rgba(20, 151, 215, 0.18);
+  background: #fff;
+  color: #1497d7;
+  font-weight: 700;
+}
+
+.mobile-route-list {
+  display: grid;
+  gap: 14px;
+}
+
+.mobile-route-card {
+  display: grid;
+  grid-template-columns: 56px 1fr 24px 24px;
+  align-items: center;
+  gap: 14px;
+  min-height: 106px;
+  padding: 0 14px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow:
+    0 12px 28px rgba(15, 23, 42, 0.06),
+    inset 0 0 0 1px rgba(148, 163, 184, 0.12);
+}
+
+.mobile-route-card__order {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1497d7, #146cab);
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.3rem;
+}
+
+.mobile-route-card__copy {
+  display: grid;
+  gap: 4px;
+}
+
+.mobile-route-card__copy strong {
+  font-size: 1.5rem;
+  color: #1f2937;
+}
+
+.mobile-route-card__copy span {
+  color: #64748b;
+}
+
+.mobile-route-card__drag {
+  color: #a5b2c3;
+  font-size: 1.3rem;
+}
+
+.mobile-route-card__remove {
+  color: #ff8b8b;
+  font-size: 1.6rem;
+}
+
+.mobile-route-secondary-btn,
+.mobile-route-primary-btn {
+  min-height: 60px;
+  border-radius: 20px;
+  font-weight: 800;
+  margin-top: 22px;
+}
+
+.mobile-route-secondary-btn {
+  border: 2px solid #5b6980;
+  background: #fff;
+  color: #56657a;
+}
+
+.mobile-route-primary-btn {
+  border: none;
+  background: linear-gradient(135deg, #1697d6, #1270ab);
+  color: #fff;
+  box-shadow: 0 18px 34px rgba(18, 112, 171, 0.24);
+}
+
+.mobile-route-footer {
+  margin-top: auto;
+  padding-top: 22px;
+  text-align: center;
+  letter-spacing: 0.2em;
+  font-size: 0.74rem;
+  color: #7b889a;
+}

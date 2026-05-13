@@ -33,7 +33,9 @@ export class MapService {
   private markers: MarkerEntry[] = [];
   private markerMap = new Map<string, MarkerEntry>();
   private activeMarkerKey: string | null = null;
+  private routeMarkerKeys = new Set<string>();
   private map: L.Map | null = null;
+  private navigationBearing = 0;
   private clusterGroups = new Map<string, MarkerClusterGroup>();
   private clusteringEnabled = false;
   private activeFilters: string[] = [];
@@ -107,10 +109,16 @@ export class MapService {
         this.map.on('moveend zoomend', () => {
           this.refreshAllClusters();
           this.updateMarkerStyles();
+          this.applyNavigationBearing();
         });
       } else {
-        this.map.on('moveend zoomend', () => this.syncVisibleMarkers());
+        this.map.on('moveend zoomend', () => {
+          this.syncVisibleMarkers();
+          this.applyNavigationBearing();
+        });
       }
+
+      this.map.on('zoom viewreset resize', () => this.applyNavigationBearing());
 
       return this.map;
     } catch (error) {
@@ -161,6 +169,8 @@ export class MapService {
     this.markers = [];
     this.markerMap.clear();
     this.activeMarkerKey = null;
+    this.routeMarkerKeys.clear();
+    this.navigationBearing = 0;
   }
 
   clearAllMarkers(): void {
@@ -170,12 +180,23 @@ export class MapService {
     this.markers = [];
     this.markerMap.clear();
     this.activeMarkerKey = null;
+    this.routeMarkerKeys.clear();
   }
 
   flyTo(lat: number, lng: number, zoom = 16): void {
     if (this.map) {
       this.map.flyTo([lat, lng], zoom, { duration: 1.5 });
     }
+  }
+
+  setNavigationBearing(bearing: number): void {
+    this.navigationBearing = ((bearing % 360) + 360) % 360;
+    this.applyNavigationBearing();
+  }
+
+  resetNavigationBearing(): void {
+    this.navigationBearing = 0;
+    this.applyNavigationBearing();
   }
 
   addMarkerWithType(
@@ -267,6 +288,15 @@ export class MapService {
     this.updateMarkerStyles();
   }
 
+  setRouteMarkers(markers: Array<{ type: string; id: number }>): void {
+    this.routeMarkerKeys = new Set(
+      markers
+        .filter((marker) => Number.isFinite(marker.id) && !!marker.type)
+        .map((marker) => this.toMarkerKey(marker.type, marker.id)),
+    );
+    this.updateMarkerStyles();
+  }
+
   setActiveFilters(filters: string[]): void {
     this.activeFilters = [...filters];
 
@@ -319,12 +349,14 @@ export class MapService {
 
       const matchesFilter = this.matchesCurrentFilters(entry.type);
       const isSelected = key === this.activeMarkerKey;
+      const isRouteStop = this.routeMarkerKeys.has(key);
       const shouldDim = (hasFilters && !matchesFilter && !isSelected) || (!!this.activeMarkerKey && !isSelected);
       const shouldHighlight = hasFilters && matchesFilter && !isSelected && !this.activeMarkerKey;
 
       element.classList.toggle('marker-dimmed', shouldDim);
       element.classList.toggle('marker-filter-match', shouldHighlight);
       element.classList.toggle('marker-selected', isSelected);
+      element.classList.toggle('marker-route-stop', isRouteStop);
 
       const pin = element.querySelector('.marker-pin');
       if (pin) {
@@ -353,19 +385,15 @@ export class MapService {
   }
 
   private syncClusteredMarkers(): void {
-    this.markerMap.forEach((entry) => {
-      const group = this.clusterGroups.get(entry.clusterKey);
-      if (!group) {
-        return;
-      }
+    this.clusterGroups.forEach((group, clusterKey) => {
+      const visibleMarkers = this.markers
+        .filter((entry) => entry.clusterKey === clusterKey && this.matchesCurrentFilters(entry.type))
+        .map((entry) => entry.marker);
 
-      const shouldShow = this.matchesCurrentFilters(entry.type);
-      const hasLayer = group.hasLayer(entry.marker);
+      group.clearLayers();
 
-      if (shouldShow && !hasLayer) {
-        group.addLayer(entry.marker);
-      } else if (!shouldShow && hasLayer) {
-        group.removeLayer(entry.marker);
+      if (visibleMarkers.length > 0) {
+        group.addLayers(visibleMarkers);
       }
     });
   }
@@ -432,6 +460,32 @@ export class MapService {
     }
 
     this.map.panInsideBounds(this.worldBounds, { animate: false });
+  }
+
+  private applyNavigationBearing(): void {
+    if (!this.map) {
+      return;
+    }
+
+    const container = this.map.getContainer();
+    const mapPane = this.map.getPane('mapPane');
+    if (!container || !mapPane) {
+      return;
+    }
+
+    const normalizedBearing = ((this.navigationBearing % 360) + 360) % 360;
+    const rotation = normalizedBearing === 0 ? '' : ` rotate(${-normalizedBearing}deg)`;
+    const baseTransform = this.stripNavigationRotation(mapPane.style.transform);
+
+    mapPane.style.transformOrigin = '50% 50%';
+    mapPane.style.transition = rotation ? 'transform 180ms linear' : '';
+    mapPane.style.transform = `${baseTransform}${rotation}`;
+    container.classList.toggle('map--navigation-bearing', normalizedBearing !== 0);
+    container.style.setProperty('--map-bearing', `${-normalizedBearing}deg`);
+  }
+
+  private stripNavigationRotation(transformValue: string): string {
+    return transformValue.replace(/\srotate\([^)]*\)\s*$/, '');
   }
 
   private getClusterKey(data: any): string {
