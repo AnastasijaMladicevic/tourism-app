@@ -123,6 +123,11 @@ export class AdminUsersService {
     return this.http.post<UserDto>(`${this.apiUrl}/register-manager`, dto);
   }
 
+  /** Admin-only: creates a user with Admin role (`POST .../users/register-admin`). */
+  createAdmin(dto: CreateUserDto): Observable<UserDto> {
+    return this.http.post<UserDto>(`${this.apiUrl}/register-admin`, dto);
+  }
+
   /** Creates a tourist account (`POST .../users/register`). Typically used from signup; admins may use it to add tourists. */
   createTourist(dto: CreateUserDto): Observable<UserDto> {
     return this.http.post<UserDto>(`${this.apiUrl}/register`, dto);

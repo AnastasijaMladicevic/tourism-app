@@ -183,16 +183,27 @@
               <span class="role-card-desc">Full administrative control over teams, hubs, and billing.</span>
             </button>
 
-            <button type="button" class="role-card" disabled [class.role-card--selected]="isRole('content-creator')">
-              <span class="material-symbols-outlined role-card-icon">description</span>
-              <span class="role-card-title">Content Creator</span>
-              <span class="role-card-desc">Restricted access to asset creation and publishing tools only.</span>
+            <button type="button" class="role-card" disabled [class.role-card--selected]="isRole('admin')">
+              <span class="material-symbols-outlined role-card-icon">admin_panel_settings</span>
+              <span class="role-card-title">Admin</span>
+              <span class="role-card-desc">Platform-wide administrative access, including user and role management.</span>
             </button>
           </div>
         </ng-container>
 
         <ng-container *ngIf="displayRole === 'admin'">
           <div class="role-cards role-cards--readonly" role="group" aria-label="Primary role (read-only)">
+            <button
+              type="button"
+              class="role-card"
+              disabled
+              [class.role-card--selected]="isRole('admin')"
+            >
+              <span class="material-symbols-outlined role-card-icon">admin_panel_settings</span>
+              <span class="role-card-title">Admin</span>
+              <span class="role-card-desc">Platform-wide administrative access, including user and role management.</span>
+            </button>
+
             <button
               type="button"
               class="role-card"
@@ -204,27 +215,6 @@
               <span class="role-card-desc">Full administrative control over teams, hubs, and billing.</span>
             </button>
 
-            <button
-              type="button"
-              class="role-card"
-              disabled
-              [class.role-card--selected]="isRole('content-creator')"
-            >
-              <span class="material-symbols-outlined role-card-icon">description</span>
-              <span class="role-card-title">Content Creator</span>
-              <span class="role-card-desc">Restricted access to asset creation and publishing tools only.</span>
-            </button>
-
-            <button
-              type="button"
-              class="role-card"
-              disabled
-              [class.role-card--selected]="isRole('tourist')"
-            >
-              <span class="material-symbols-outlined role-card-icon">person</span>
-              <span class="role-card-title">Tourist</span>
-              <span class="role-card-desc">Restricted access to asset creation and publishing tools only.</span>
-            </button>
           </div>
         </ng-container>
       </div>

@@ -4,10 +4,11 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs/operators';
-import { CreateUserDto } from '../../../models/user.model';
+import { Observable } from 'rxjs';
+import { CreateUserDto, UserDto } from '../../../models/user.model';
 import { AdminUsersService } from '../../../services/admin-users.service';
 
-export type TeamMemberRole = 'manager' | 'content-creator';
+export type TeamMemberRole = 'manager' | 'admin';
 
 @Component({
   selector: 'app-create-team-member',
@@ -141,12 +142,6 @@ export class CreateTeamMemberComponent {
   onCreate(): void {
     this.submitError = '';
 
-    if (this.selectedRole === 'content-creator') {
-      this.submitError =
-        'The API does not support creating Content Creator accounts from this screen. Choose Manager, or promote an existing tourist from Users.';
-      return;
-    }
-
     const first = this.firstName.trim();
     const last = this.lastName.trim();
     const email = this.workEmail.trim();
@@ -166,7 +161,8 @@ export class CreateTeamMemberComponent {
     const dto = this.buildCreatePayload();
     this.isSubmitting = true;
 
-    const request$ = this.adminUsers.createManager(dto);
+    const request$: Observable<UserDto> =
+      this.selectedRole === 'admin' ? this.adminUsers.createAdmin(dto) : this.adminUsers.createManager(dto);
 
     request$
       .pipe(finalize(() => (this.isSubmitting = false)))
