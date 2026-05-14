@@ -1241,6 +1241,10 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<string>("CreatorRoleRequestStatus")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<bool>("HasRequestedCreatorRole")
                         .HasColumnType("boolean");
 

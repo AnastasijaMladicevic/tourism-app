@@ -10,6 +10,7 @@ namespace TuristickiVodic.Core.DTO
         public string Email { get; set; } = string.Empty;
         public string RoleName { get; set; } = string.Empty;
         public bool HasRequestedCreatorRole { get; set; }
+        public string CreatorRoleRequestStatus { get; set; } = string.Empty;
         public bool IsActive { get; set; }
         public bool IsVerified { get; set; }
         public DateTime CreatedAt { get; set; }

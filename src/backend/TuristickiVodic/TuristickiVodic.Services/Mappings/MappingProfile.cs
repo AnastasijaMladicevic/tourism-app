@@ -20,7 +20,9 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.PreferredRegionName,
                     opt => opt.MapFrom(src => src.PreferredRegion != null ? src.PreferredRegion.Name : null))
                 .ForMember(dest => dest.PreferredRegionCode,
-                    opt => opt.MapFrom(src => src.PreferredRegion != null ? src.PreferredRegion.Code : null));
+                    opt => opt.MapFrom(src => src.PreferredRegion != null ? src.PreferredRegion.Code : null))
+                .ForMember(dest => dest.CreatorRoleRequestStatus,
+                    opt => opt.MapFrom(src => src.CreatorRoleRequestStatus.ToString()));
 
             CreateMap<Region, RegionDto>();
 
@@ -38,6 +40,7 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.PreferredRegion, opt => opt.Ignore())
                 .ForMember(dest => dest.IsVerified, opt => opt.MapFrom(src => false))
                 .ForMember(dest => dest.HasRequestedCreatorRole, opt => opt.MapFrom(src => false))
+                .ForMember(dest => dest.CreatorRoleRequestStatus, opt => opt.MapFrom(src => CreatorRoleRequestStatus.None))
                 .ForMember(dest => dest.VerificationToken, opt => opt.Ignore())
                 .ForMember(dest => dest.VerificationTokenExpiry, opt => opt.Ignore())
                 .ForMember(dest => dest.ResetToken, opt => opt.Ignore())
@@ -77,6 +80,7 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.PreferredRegion, opt => opt.Ignore())
                 .ForMember(dest => dest.IsVerified, opt => opt.Ignore())
                 .ForMember(dest => dest.HasRequestedCreatorRole, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatorRoleRequestStatus, opt => opt.Ignore())
                 .ForMember(dest => dest.VerificationToken, opt => opt.Ignore())
                 .ForMember(dest => dest.VerificationTokenExpiry, opt => opt.Ignore())
                 .ForMember(dest => dest.ResetToken, opt => opt.Ignore())
@@ -359,7 +363,9 @@ namespace TuristickiVodic.Services.Mappings
 
             CreateMap<User, CreatorRoleRequestDto>()
                 .ForMember(dest => dest.RoleName,
-                    opt => opt.MapFrom(src => src.Role != null ? src.Role.Name.ToString() : string.Empty));
+                    opt => opt.MapFrom(src => src.Role != null ? src.Role.Name.ToString() : string.Empty))
+                .ForMember(dest => dest.CreatorRoleRequestStatus,
+                    opt => opt.MapFrom(src => src.CreatorRoleRequestStatus.ToString()));
 
             CreateMap<ManagerReport, ManagerReportDto>()
                 .ForMember(dest => dest.ManagerName,

@@ -56,13 +56,14 @@ namespace TuristickiVodic.Tests.Services
             return environmentMock;
         }
 
-        private static IConfiguration CreateConfiguration(string? publicAppBaseUrl = null)
+        private static IConfiguration CreateConfiguration(string? publicAppBaseUrl = null, string? adminAppBaseUrl = null)
         {
             return new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string?>
                 {
                     ["Jwt:Key"] = "unit-test-jwt-key",
                     ["PublicApp:BaseUrl"] = publicAppBaseUrl ?? "https://spirego-tourist.test",
+                    ["AdminApp:BaseUrl"] = adminAppBaseUrl ?? "https://spirego-admin.test",
                 })
                 .Build();
         }
@@ -70,7 +71,9 @@ namespace TuristickiVodic.Tests.Services
         private static UserService CreateUserService(
             AppDbContext ctx,
             Mock<ITokenService> tokenSvc,
-            Mock<IEmailService>? emailSvc = null)
+            Mock<IEmailService>? emailSvc = null,
+            string? publicAppBaseUrl = null,
+            string? adminAppBaseUrl = null)
         {
             emailSvc ??= new Mock<IEmailService>();
             return new UserService(
@@ -79,7 +82,7 @@ namespace TuristickiVodic.Tests.Services
                 tokenSvc.Object,
                 emailSvc.Object,
                 CreateEnvironmentMock().Object,
-                CreateConfiguration());
+                CreateConfiguration(publicAppBaseUrl, adminAppBaseUrl));
         }
 
         private static (Role tourist, Role cc, Role manager, Role admin) SeedRoles(AppDbContext ctx)
@@ -1168,6 +1171,84 @@ namespace TuristickiVodic.Tests.Services
         // ═══════════════════════════════════════════
 
         [Fact]
+        public async Task RequestCreatorRoleAsync_CuvaPendingStatusIKreiraAdminObavestenje()
+        {
+            using var ctx = CreateInMemoryContext(nameof(RequestCreatorRoleAsync_CuvaPendingStatusIKreiraAdminObavestenje));
+            var (tourist, _, _, admin) = SeedRoles(ctx);
+
+            ctx.Users.AddRange(
+                new User
+                {
+                    Id = 8,
+                    FirstName = "Mila",
+                    LastName = "Petrovic",
+                    Email = "mila@test.com",
+                    PasswordHash = "hash",
+                    RoleId = tourist.Id,
+                    Role = tourist,
+                    IsActive = true,
+                    IsBlacklisted = false,
+                    DateOfBirth = new DateTime(1995, 1, 1)
+                },
+                new User
+                {
+                    Id = 9,
+                    FirstName = "Admin",
+                    LastName = "User",
+                    Email = "admin@test.com",
+                    PasswordHash = "hash",
+                    RoleId = admin.Id,
+                    Role = admin,
+                    IsActive = true,
+                    IsBlacklisted = false,
+                    DateOfBirth = new DateTime(1990, 1, 1)
+                });
+            ctx.SaveChanges();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>());
+
+            var result = await svc.RequestCreatorRoleAsync(8, "Moderator");
+
+            result.Should().BeTrue();
+            var updated = ctx.Users.Find(8)!;
+            updated.HasRequestedCreatorRole.Should().BeTrue();
+            updated.CreatorRoleRequestStatus.Should().Be(CreatorRoleRequestStatus.Pending);
+            ctx.Notifications.Should().ContainSingle(n =>
+                n.UserId == 9 &&
+                n.Type == NotificationType.AdminNewCreatorRoleRequest);
+        }
+
+        [Fact]
+        public async Task GetByIdAsync_ContentCreatorVracaApprovedStatusIAdminLoginUrl()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetByIdAsync_ContentCreatorVracaApprovedStatusIAdminLoginUrl));
+            var (_, cc, _, _) = SeedRoles(ctx);
+            ctx.Users.Add(new User
+            {
+                Id = 18,
+                FirstName = "Approved",
+                LastName = "Creator",
+                Email = "approved@test.com",
+                PasswordHash = "hash",
+                RoleId = cc.Id,
+                Role = cc,
+                IsActive = true,
+                IsBlacklisted = false,
+                CreatorRoleRequestStatus = CreatorRoleRequestStatus.None,
+                DateOfBirth = new DateTime(1991, 1, 1)
+            });
+            ctx.SaveChanges();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>(), adminAppBaseUrl: "https://spirego-admin.test");
+
+            var result = await svc.GetByIdAsync(18);
+
+            result.Should().NotBeNull();
+            result!.CreatorRoleRequestStatus.Should().Be("Approved");
+            result.AdminAppLoginUrl.Should().Be("https://spirego-admin.test/login");
+        }
+
+        [Fact]
         public async Task ApproveCreatorRoleAsync_TouristPostajeCc_PromenaUloge()
         {
             using var ctx = CreateInMemoryContext(nameof(ApproveCreatorRoleAsync_TouristPostajeCc_PromenaUloge));
@@ -1184,18 +1265,25 @@ namespace TuristickiVodic.Tests.Services
                 IsActive = true,
                 IsBlacklisted = false,
                 HasRequestedCreatorRole = true,
+                CreatorRoleRequestStatus = CreatorRoleRequestStatus.Pending,
                 DateOfBirth = new DateTime(1990, 1, 1)
             });
             ctx.SaveChanges();
 
             var tokenSvc = new Mock<ITokenService>();
-            var svc = CreateUserService(ctx, tokenSvc);
+            var svc = CreateUserService(ctx, tokenSvc, adminAppBaseUrl: "https://spirego-admin.test");
 
             var result = await svc.ApproveCreatorRoleAsync(10);
 
             result.Should().BeTrue();
             var updated = ctx.Users.Include(u => u.Role).First(u => u.Id == 10);
             updated.Role.Name.Should().Be(RoleType.ContentCreator);
+            updated.HasRequestedCreatorRole.Should().BeFalse();
+            updated.CreatorRoleRequestStatus.Should().Be(CreatorRoleRequestStatus.Approved);
+            ctx.Notifications.Should().ContainSingle(n =>
+                n.UserId == 10 &&
+                n.Type == NotificationType.CreatorRoleRequestApproved &&
+                n.ActionUrl == "https://spirego-admin.test/login");
         }
 
         [Fact]
@@ -1275,6 +1363,7 @@ namespace TuristickiVodic.Tests.Services
                 IsActive = true,
                 IsBlacklisted = false,
                 HasRequestedCreatorRole = true,
+                CreatorRoleRequestStatus = CreatorRoleRequestStatus.Pending,
                 DateOfBirth = new DateTime(1990, 1, 1)
             });
             ctx.SaveChanges();
@@ -1287,6 +1376,11 @@ namespace TuristickiVodic.Tests.Services
             var updated = ctx.Users.Include(u => u.Role).First(u => u.Id == 15);
             updated.HasRequestedCreatorRole.Should().BeFalse();
             updated.Role.Name.Should().Be(RoleType.Tourist);
+            updated.CreatorRoleRequestStatus.Should().Be(CreatorRoleRequestStatus.Rejected);
+            ctx.Notifications.Should().ContainSingle(n =>
+                n.UserId == 15 &&
+                n.Type == NotificationType.CreatorRoleRequestRejected &&
+                n.ActionUrl == null);
         }
 
         [Fact]
@@ -1667,6 +1761,7 @@ namespace TuristickiVodic.Tests.Services
             result.Items.Should().ContainSingle();
             result.Items[0].Email.Should().Be("ana@test.com");
             result.Items[0].HasRequestedCreatorRole.Should().BeTrue();
+            result.Items[0].CreatorRoleRequestStatus.Should().Be("Pending");
         }
 
         [Fact]

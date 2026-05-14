@@ -25,6 +25,7 @@ namespace TuristickiVodic.Services
         private const double LocalityVisitRadiusMeters = 250d;
         private const double DestinationVisitRadiusMeters = 700d;
         private const string DefaultPublicAppBaseUrl = "http://localhost:4200";
+        private const string DefaultAdminAppBaseUrl = "http://localhost:4200";
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
@@ -838,7 +839,12 @@ namespace TuristickiVodic.Services
             if (user.IsBlacklisted)
                 throw new InvalidOperationException("Blacklisted users cannot request creator role.");
 
+            if (HasPendingCreatorRoleRequest(user))
+                throw new InvalidOperationException("User already has a pending creator role request.");
+
             user.HasRequestedCreatorRole = true;
+            user.CreatorRoleRequestStatus = CreatorRoleRequestStatus.Pending;
+            user.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
             await CreateAdminNewCreatorRoleRequestNotificationsAsync(user);
             return true;
@@ -889,7 +895,7 @@ namespace TuristickiVodic.Services
             if (user.Role.Name != RoleType.Tourist)
                 throw new InvalidOperationException("Only tourists can be approved for content creator role.");
 
-            if (!user.HasRequestedCreatorRole)
+            if (!HasPendingCreatorRoleRequest(user))
                 throw new InvalidOperationException("User has not requested creator role.");
 
             var contentCreatorRole = await _context.Roles
@@ -901,7 +907,9 @@ namespace TuristickiVodic.Services
             user.RoleId = contentCreatorRole.Id;
             user.Role = contentCreatorRole;
             user.HasRequestedCreatorRole = false;
+            user.CreatorRoleRequestStatus = CreatorRoleRequestStatus.Approved;
             user.UpdatedAt = DateTime.UtcNow;
+            _context.Notifications.Add(CreateCreatorRoleDecisionNotification(user, approved: true));
 
             await _context.SaveChangesAsync();
             return true;
@@ -919,11 +927,13 @@ namespace TuristickiVodic.Services
             if (user.Role.Name != RoleType.Tourist)
                 throw new InvalidOperationException("Only tourists can have creator role requests rejected.");
 
-            if (!user.HasRequestedCreatorRole)
+            if (!HasPendingCreatorRoleRequest(user))
                 throw new InvalidOperationException("User has not requested creator role.");
 
             user.HasRequestedCreatorRole = false;
+            user.CreatorRoleRequestStatus = CreatorRoleRequestStatus.Rejected;
             user.UpdatedAt = DateTime.UtcNow;
+            _context.Notifications.Add(CreateCreatorRoleDecisionNotification(user, approved: false));
 
             await _context.SaveChangesAsync();
             return true;
@@ -1246,6 +1256,58 @@ namespace TuristickiVodic.Services
             return DefaultPublicAppBaseUrl;
         }
 
+        private string ResolveAdminAppBaseUrl()
+        {
+            var configuredBaseUrl = _configuration["AdminApp:BaseUrl"];
+            if (!string.IsNullOrWhiteSpace(configuredBaseUrl))
+                return configuredBaseUrl.Trim().TrimEnd('/');
+
+            return DefaultAdminAppBaseUrl;
+        }
+
+        private string ResolveAdminAppLoginUrl()
+            => $"{ResolveAdminAppBaseUrl()}{AdminAppSettings.LoginPath}";
+
+        private static bool HasPendingCreatorRoleRequest(User user)
+            => user.HasRequestedCreatorRole || user.CreatorRoleRequestStatus == CreatorRoleRequestStatus.Pending;
+
+        private static CreatorRoleRequestStatus ResolveCreatorRoleRequestStatus(User user)
+        {
+            if (user.CreatorRoleRequestStatus != CreatorRoleRequestStatus.None)
+                return user.CreatorRoleRequestStatus;
+
+            if (user.HasRequestedCreatorRole)
+                return CreatorRoleRequestStatus.Pending;
+
+            if (user.Role?.Name == RoleType.ContentCreator)
+                return CreatorRoleRequestStatus.Approved;
+
+            return CreatorRoleRequestStatus.None;
+        }
+
+        private Notification CreateCreatorRoleDecisionNotification(User user, bool approved)
+        {
+            var targetLoginUrl = ResolveAdminAppLoginUrl();
+            var title = approved
+                ? "Zahtev za ContentCreator ulogu je odobren"
+                : "Zahtev za ContentCreator ulogu je odbijen";
+            var message = approved
+                ? "Tvoj zahtev za ContentCreator ulogu je odobren. Prijavi se u admin aplikaciju da nastavis."
+                : "Tvoj zahtev za ContentCreator ulogu je odbijen. Mozes poslati novi zahtev kasnije.";
+
+            return new Notification
+            {
+                UserId = user.Id,
+                Type = approved
+                    ? NotificationType.CreatorRoleRequestApproved
+                    : NotificationType.CreatorRoleRequestRejected,
+                Title = title,
+                Message = message,
+                ActionUrl = approved ? targetLoginUrl : null,
+                CreatedAt = DateTime.UtcNow
+            };
+        }
+
         private static string Base64UrlEncode(byte[] bytes)
         {
             return Convert.ToBase64String(bytes)
@@ -1330,7 +1392,9 @@ namespace TuristickiVodic.Services
             var usersQuery = _context.Users
                 .Include(u => u.Role)
                 .Where(u => u.Role != null)
-                .Where(u => u.Role.Name == RoleType.Tourist && u.HasRequestedCreatorRole)
+                .Where(u => u.Role.Name == RoleType.Tourist &&
+                    (u.CreatorRoleRequestStatus == CreatorRoleRequestStatus.Pending ||
+                     (u.CreatorRoleRequestStatus == CreatorRoleRequestStatus.None && u.HasRequestedCreatorRole)))
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.Search))
@@ -1363,6 +1427,11 @@ namespace TuristickiVodic.Services
                 .ToListAsync();
 
             var mappedItems = _mapper.Map<List<CreatorRoleRequestDto>>(users);
+            for (var i = 0; i < users.Count; i++)
+            {
+                mappedItems[i].HasRequestedCreatorRole = HasPendingCreatorRoleRequest(users[i]);
+                mappedItems[i].CreatorRoleRequestStatus = ResolveCreatorRoleRequestStatus(users[i]).ToString();
+            }
 
             return new PagedResultDto<CreatorRoleRequestDto>
             {
@@ -1517,6 +1586,9 @@ namespace TuristickiVodic.Services
         private async Task<UserDto> MapExistingUserDtoWithMetricsAsync(User user)
         {
             var dto = _mapper.Map<UserDto>(user);
+            dto.HasRequestedCreatorRole = HasPendingCreatorRoleRequest(user);
+            dto.CreatorRoleRequestStatus = ResolveCreatorRoleRequestStatus(user).ToString();
+            dto.AdminAppLoginUrl = ResolveAdminAppLoginUrl();
             await PopulateUserMetricsAsync(dto, user.Id);
             return dto;
         }

@@ -18,6 +18,9 @@ namespace TuristickiVodic.Core.DTO
         public int? PreferredRegionId { get; set; }
         public string? PreferredRegionName { get; set; }
         public string? PreferredRegionCode { get; set; }
+        public bool HasRequestedCreatorRole { get; set; }
+        public string CreatorRoleRequestStatus { get; set; } = string.Empty;
+        public string? AdminAppLoginUrl { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? ProfileImageUrl { get; set; }
         public int FavoritesCount { get; set; }

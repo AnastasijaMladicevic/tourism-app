@@ -63,6 +63,10 @@ public class AppDbContext : DbContext
             .IsUnique();
 
         mb.Entity<User>()
+            .Property(u => u.CreatorRoleRequestStatus)
+            .HasConversion<string>();
+
+        mb.Entity<User>()
             .HasOne(u => u.PreferredRegion)
             .WithMany(r => r.PreferredByUsers)
             .HasForeignKey(u => u.PreferredRegionId)

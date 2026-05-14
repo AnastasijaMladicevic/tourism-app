@@ -18,6 +18,8 @@ namespace TuristickiVodic.Core.Models
         ReviewReplyUpdated = 14,
         CreatorObjectReviewDeleted = 15,
         AdminRepeatedManagerReports = 16,
-        AdminCreatorMultipleRejectedContent = 17
+        AdminCreatorMultipleRejectedContent = 17,
+        CreatorRoleRequestApproved = 18,
+        CreatorRoleRequestRejected = 19
     }
 }
