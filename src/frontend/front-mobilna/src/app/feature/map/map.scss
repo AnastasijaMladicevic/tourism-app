@@ -764,6 +764,7 @@ body.route-navigation-active app-floating-ai-assistant {
     border-radius: 28px 28px 0 0;
     padding: 10px 14px 10px;
     box-shadow: 0 -20px 40px rgba(15, 23, 42, 0.16);
+    overflow: visible;
   }
 
   .route-planner--expanded {

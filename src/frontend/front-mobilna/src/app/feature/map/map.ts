@@ -1615,6 +1615,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.routePoints.push(routePoint);
     this.routeBuilderStateService.updateRoutePoints(this.routePoints);
     this.syncRoutePointMarkers();
+    this.scheduleRoutePlannerListReset();
 
     this.routeSearchQuery = '';
     this.routeSearchResults = [];
@@ -1638,6 +1639,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.routeBuilderStateService.updateRoutePoints(this.routePoints);
     this.syncRoutePointMarkers();
+    this.scheduleRoutePlannerListReset();
     void this.calculateRoute({ preserveViewport: this.isRouteNavigationActive });
   }
 
@@ -1667,6 +1669,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.routeBuilderStateService.updateRoutePoints(this.routePoints);
     this.syncRoutePointMarkers();
+    this.scheduleRoutePlannerListReset();
     void this.calculateRoute({ preserveViewport: this.isRouteNavigationActive });
   }
 
@@ -2129,6 +2132,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.clearDirections();
       }
       this.syncRoutePointMarkers();
+      this.scheduleRoutePlannerListReset();
     } else {
       this.syncRoutePointMarkers();
     }
@@ -2179,6 +2183,27 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       ...liveOrigin,
     };
     return true;
+  }
+
+  private scheduleRoutePlannerListReset(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    let attempts = 0;
+    const resetListScroll = () => {
+      const routePlannerList = document.querySelector('.route-planner__list') as HTMLElement | null;
+      if (routePlannerList) {
+        routePlannerList.scrollTop = 0;
+      }
+
+      attempts += 1;
+      if (attempts < 6) {
+        window.setTimeout(resetListScroll, 60);
+      }
+    };
+
+    requestAnimationFrame(resetListScroll);
   }
 
   private focusNavigationOnLocation(latlng: L.LatLng, forceRecentering = false): void {
