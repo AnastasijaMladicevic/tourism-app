@@ -85,8 +85,17 @@ export class SettingsComponent implements OnInit, OnDestroy {
       accent: 'gray'
     },
   ];
+  get visibleGeneralItems() {
+    return this.generalItems.filter(item => {
+      if (item.route === '/profile/edit') {
+        return this.authService.isLoggedIn();
+      }
 
-  ngOnInit(): void { }
+      return true;
+    });
+  }
+  ngOnInit(): void {
+  }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
@@ -97,26 +106,9 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   handleItem(item: any): void {
-    if (item.route === '/profile/edit') {
-
-      if (!this.authService.isLoggedIn()) {
-
-        this.router.navigate(['/login'], {
-          queryParams: {
-            returnUrl: item.route
-          }
-        });
-
-        return;
-      }
-    }
     if (item.route) {
       this.router.navigate([item.route]);
       return;
-    }
-
-    if (item.action == 'logout') {
-      this.authService.logout().subscribe({ error: () => void 0 });
     }
   }
 
