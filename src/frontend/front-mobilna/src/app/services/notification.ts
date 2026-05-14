@@ -54,6 +54,28 @@ export class NotificationService {
     private ngZone: NgZone,
   ) { }
 
+  hasActionUrl(notification?: NotificationDto | null): boolean {
+    return !!notification?.actionUrl?.trim();
+  }
+
+  isExternalActionUrl(actionUrl?: string | null): boolean {
+    if (!actionUrl?.trim()) {
+      return false;
+    }
+
+    return /^https?:\/\//i.test(actionUrl.trim());
+  }
+
+  logoutAndRedirect(url: string): void {
+    this.authService.logout().subscribe({
+      next: () => {
+        window.location.href = url;
+      },
+      error: (err) => {
+        window.location.href = url;
+      }
+    });
+  }
   startLiveConnection(): void {
     const token = this.authService.getToken();
     if (!token || this.hubConnection) {
@@ -85,7 +107,7 @@ export class NotificationService {
         }
 
         this.liveNotificationSubject.next(notification);
-
+        console.log('=== liveNotificationSubject.next() called ===');
         if (this.notificationPreferencesService.shouldShowBanner(notification.type)) {
           this.liveBannerSubject.next(notification);
         }

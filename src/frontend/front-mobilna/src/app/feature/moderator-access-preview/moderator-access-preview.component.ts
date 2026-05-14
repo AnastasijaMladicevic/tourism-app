@@ -20,7 +20,7 @@ export class ModeratorAccessPreviewComponent {
   protected readonly isSubmitting = signal(false);
   protected readonly feedback = signal('');
   protected readonly feedbackTone = signal<'success' | 'error'>('success');
-  protected readonly hasRequested = signal(false);
+  protected readonly requestStatus = signal<'none' | 'pending' | 'approved' | 'rejected'>('none');
   protected readonly creatorType = 'Moderator';
 
   protected user: UserDto | null = null;
@@ -55,43 +55,48 @@ export class ModeratorAccessPreviewComponent {
 
   protected readonly roleLabel = computed(() => {
     const roleName = this.user?.roleName?.trim();
-  
+
     if (!roleName || roleName === 'Tourist') {
       return this.translationService.translate('moderatorAccess.roles.tourist');
     }
-  
+
     if (roleName === 'ContentCreator') {
       return this.translationService.translate('moderatorAccess.roles.moderator');
     }
-  
+
     if (roleName === 'Admin') {
       return this.translationService.translate('moderatorAccess.roles.admin');
     }
-  
+
     if (roleName === 'Manager') {
       return this.translationService.translate('moderatorAccess.roles.manager');
     }
-  
+
     return roleName;
   });
 
   protected readonly canRequest = computed(() => {
-    return !!this.user?.id && this.user?.roleName === 'Tourist' && !this.isSubmitting() && !this.hasRequested();
+    return !!this.user?.id
+      && this.user?.roleName === 'Tourist'
+      && !this.isSubmitting()
+      && this.requestStatus() !== 'pending';
   });
 
   protected readonly statusLabel = computed(() => {
-    if (this.hasRequested()) {
+    const status = this.requestStatus();
+
+    if (status === 'pending') {
       return this.translationService.translate('moderatorAccess.status.requestSent');
     }
-  
-    if (this.user?.roleName === 'ContentCreator') {
+
+    if (status === 'approved') {
       return this.translationService.translate('moderatorAccess.status.approved');
     }
-  
-    if (this.user?.roleName && this.user.roleName !== 'Tourist') {
-      return this.translationService.translate('moderatorAccess.status.specialRoleActive');
+
+    if (status === 'rejected') {
+      return this.translationService.translate('moderatorAccess.status.rejected');
     }
-  
+
     return this.translationService.translate('moderatorAccess.status.notRequested');
   });
 
@@ -99,11 +104,11 @@ export class ModeratorAccessPreviewComponent {
     if (this.isSubmitting()) {
       return this.translationService.translate('moderatorAccess.sending');
     }
-  
-    if (this.hasRequested()) {
+
+    if (this.requestStatus() === 'pending') {
       return this.translationService.translate('moderatorAccess.requestSent');
     }
-  
+
     return this.translationService.translate('moderatorAccess.requestAccess');
   });
 
@@ -115,7 +120,28 @@ export class ModeratorAccessPreviewComponent {
     }
 
     this.user = currentUser;
-    this.hasRequested.set(sessionStorage.getItem(this.requestStorageKey(currentUser.id)) === 'sent');
+    this.authService
+      .getById(currentUser.id)
+      .pipe(catchError(() => of(null)))
+      .subscribe((user) => {
+        if (!user) return;
+
+        this.user = user;
+
+        switch (user.creatorRoleRequestStatus) {
+          case 'Pending':
+            this.requestStatus.set('pending');
+            break;
+          case 'Approved':
+            this.requestStatus.set('approved');
+            break;
+          case 'Rejected':
+            this.requestStatus.set('rejected');
+            break;
+          default:
+            this.requestStatus.set('none');
+        }
+      });
 
     this.authService
       .getById(currentUser.id)
@@ -123,7 +149,6 @@ export class ModeratorAccessPreviewComponent {
       .subscribe((user) => {
         if (!user) return;
         this.user = user;
-        this.hasRequested.set(sessionStorage.getItem(this.requestStorageKey(user.id)) === 'sent');
       });
   }
 
@@ -147,15 +172,11 @@ export class ModeratorAccessPreviewComponent {
       .subscribe((result) => {
         if (!result || !this.user?.id) return;
 
-        sessionStorage.setItem(this.requestStorageKey(this.user.id), 'sent');
-        this.hasRequested.set(true);
+        this.requestStatus.set('pending');
+
         this.feedbackTone.set('success');
         this.feedback.set(result.message || this.translationService.translate('moderatorAccess.feedback.sendSuccess'));
       });
-  }
-
-  private requestStorageKey(userId: number): string {
-    return `moderator-access-request:${userId}`;
   }
 
   protected iconPath(icon: string): string {

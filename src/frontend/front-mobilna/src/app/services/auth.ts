@@ -43,6 +43,8 @@ export interface UserDto {
   favoritesCount?: number;
   plansCount?: number;
   reviewsCount?: number;
+  hasRequestedCreatorRole: boolean;
+  creatorRoleRequestStatus: 'None' | 'Pending' | 'Approved' | 'Rejected';
 }
 
 export interface AuthResponseDto {
@@ -270,9 +272,9 @@ export class AuthService {
     return this.http.post(`${this.url}/verify-reset-code`, data);
   }
   resetPassword(email: string, code: string, newPassword: string, confirmPassword: string, resetSessionToken: string): Observable<any> {
-    return this.http.post(`${this.url}/reset-password`, { 
-      email, 
-      code, 
+    return this.http.post(`${this.url}/reset-password`, {
+      email,
+      code,
       newPassword,
       confirmPassword,
       resetSessionToken

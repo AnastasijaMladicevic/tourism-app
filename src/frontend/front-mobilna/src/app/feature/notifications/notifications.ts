@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { ChangeDetectorRef } from '@angular/core';
+import { Router } from '@angular/router';
 
 import {
   NotificationDto,
@@ -28,20 +29,33 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   constructor(
     private notificationService: NotificationService,
     private routerHistoryService: RouterHistoryService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
+    private router: Router,
   ) { }
 
   ngOnInit(): void {
+    this.liveSub = this.notificationService.liveNotification$.subscribe(notification => {
+      const actionUrl = notification.actionUrl?.trim() || '';
+      const shouldLogoutAndRedirect = this.notificationService.isExternalActionUrl(actionUrl);
+
+      this.ngZone.run(() => {
+        if (shouldLogoutAndRedirect) {
+          this.notificationService.stopLiveConnection();
+          this.notificationService.logoutAndRedirect(actionUrl);
+          return;
+        }
+
+        if (this.notifications.some(n => n.id === notification.id)) {
+          return;
+        }
+
+        this.notifications = [notification, ...this.notifications];
+        this.cdr.markForCheck();
+      });
+    });
     this.loadNotifications();
     this.notificationService.startLiveConnection();
-    this.liveSub = this.notificationService.liveNotification$.subscribe(notification => {
-      if (this.notifications.some(item => item.id === notification.id)) {
-        return;
-      }
-
-      this.notifications = [notification, ...this.notifications];
-      this.cdr.detectChanges();
-    });
   }
 
   ngOnDestroy(): void {
@@ -57,14 +71,40 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
     this.notificationService.getMy().subscribe({
       next: (res) => {
-        this.notifications = res.items ?? res ?? [];
-        this.isLoading = false;
-        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.notifications = res.items ?? res ?? [];
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        });
       },
       error: () => {
-        this.isLoading = false;
-        this.cdr.detectChanges();
+        setTimeout(() => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        });
       }
+    });
+  }
+
+  openNotification(notification: NotificationDto): void {
+    const proceed = () => this.handleNotificationAction(notification);
+
+    if (notification.isRead) {
+      proceed();
+      return;
+    }
+
+    this.notificationService.markAsRead(notification.id).subscribe({
+      next: () => {
+        this.notifications = this.notifications.map((item) =>
+          item.id === notification.id ? { ...item, isRead: true } : item,
+        );
+        this.cdr.detectChanges();
+        proceed();
+      },
+      error: () => {
+        proceed();
+      },
     });
   }
 
@@ -73,23 +113,19 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.notificationService
-      .markAsRead(notification.id)
-      .subscribe(() => {
-        notification.isRead = true;
-      });
+    this.notificationService.markAsRead(notification.id).subscribe(() => {
+      this.notifications = this.notifications.map(n =>
+        n.id === notification.id ? { ...n, isRead: true } : n
+      );
+      this.cdr.detectChanges();
+    });
   }
 
   markAllAsRead(): void {
-    this.notificationService
-      .markAllAsRead()
-      .subscribe(() => {
-        this.notifications =
-          this.notifications.map(n => ({
-            ...n,
-            isRead: true
-          }));
-      });
+    this.notificationService.markAllAsRead().subscribe(() => {
+      this.notifications = this.notifications.map(n => ({ ...n, isRead: true }));
+      this.cdr.detectChanges();
+    });
   }
 
   deleteReadNotifications(): void {
@@ -114,6 +150,21 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
   hasReadNotifications(): boolean {
     return this.notifications.some((notification) => notification.isRead);
+  }
+
+  private handleNotificationAction(notification: NotificationDto): void {
+    const actionUrl = notification.actionUrl?.trim();
+    if (!actionUrl) {
+      return;
+    }
+
+    if (this.notificationService.isExternalActionUrl(actionUrl)) {
+      this.notificationService.stopLiveConnection();
+      this.notificationService.logoutAndRedirect(actionUrl);
+      return;
+    }
+
+    this.router.navigateByUrl(actionUrl);
   }
 
   formatDate(date: string): string {

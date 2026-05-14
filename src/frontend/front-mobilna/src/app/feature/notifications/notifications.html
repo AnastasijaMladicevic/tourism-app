@@ -51,9 +51,9 @@
           role="button"
           tabindex="0"
           [class.notification-card--unread]="!item.isRead"
-          (click)="markAsRead(item)"
-          (keydown.enter)="markAsRead(item)"
-          (keydown.space)="markAsRead(item); $event.preventDefault()"
+          (click)="openNotification(item)"
+          (keydown.enter)="openNotification(item)"
+          (keydown.space)="openNotification(item); $event.preventDefault()"
         >
           <div class="notification-icon">
             <mat-icon>
