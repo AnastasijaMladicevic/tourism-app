@@ -213,11 +213,12 @@
   color: #a3a7ac;
   font-size: 12px;
   line-height: 1.7;
+}
 
-  span {
-    color: #2792bd;
-    font-weight: 700;
-  }
+.status-note__link {
+  color: #2792bd;
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .request-btn {

@@ -1,0 +1,55 @@
+<div class="rules-page">
+  <header class="rules-topbar">
+    <a class="back-btn" routerLink="/moderator-access" [attr.aria-label]="'common.back' | translate">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m15 18-6-6 6-6" />
+      </svg>
+    </a>
+    <h1>{{ 'moderationRules.title' | translate }}</h1>
+    <div class="topbar-spacer" aria-hidden="true"></div>
+  </header>
+
+  <div class="rules-shell">
+    <section class="rules-intro-card">
+      <div class="rules-intro-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path [attr.d]="iconPath('shield')" />
+        </svg>
+      </div>
+      <div class="rules-intro-copy">
+        <h2>{{ 'moderationRules.introTitle' | translate }}</h2>
+        <p>{{ 'moderationRules.introBody' | translate }}</p>
+      </div>
+    </section>
+
+    <section class="rules-agreement-card">
+      @for (section of sections; track section.number) {
+        <article class="rules-section">
+          <div class="rules-section__index">{{ section.number }}</div>
+          <div class="rules-section__content">
+            <div class="rules-section__title-row">
+              <span class="rules-section__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path [attr.d]="iconPath(section.icon)" />
+                </svg>
+              </span>
+              <h3>{{ section.titleKey | translate }}</h3>
+            </div>
+            <p>{{ section.bodyKey | translate }}</p>
+          </div>
+        </article>
+      }
+    </section>
+
+    <p class="rules-footnote">{{ 'moderationRules.footnote' | translate }}</p>
+
+    <div class="rules-actions">
+      <a class="rules-primary-btn" routerLink="/moderator-access">
+        {{ 'moderationRules.accept' | translate }}
+      </a>
+      <a class="rules-secondary-btn" routerLink="/moderator-access">
+        {{ 'moderationRules.backToRequest' | translate }}
+      </a>
+    </div>
+  </div>
+</div>
