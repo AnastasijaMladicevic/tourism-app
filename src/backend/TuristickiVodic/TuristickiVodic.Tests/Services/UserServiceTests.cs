@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using System.IO;
+using System.Text.RegularExpressions;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
@@ -378,6 +379,161 @@ namespace TuristickiVodic.Tests.Services
             stored.RememberMe.Should().BeTrue();
             stored.RefreshTokenExpiry.Should().BeAfter(before.AddDays(29));
             stored.RefreshTokenExpiry.Should().BeBefore(after.AddDays(31));
+        }
+
+        [Fact]
+        public async Task LoginAsync_KadaJeTwoFactorUkljucen_ZaTouristVracaChallengeBezTokena()
+        {
+            using var ctx = CreateInMemoryContext(nameof(LoginAsync_KadaJeTwoFactorUkljucen_ZaTouristVracaChallengeBezTokena));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 150,
+                FirstName = "Ana",
+                LastName = "Login",
+                Email = "ana.2fa@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("pass123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                IsTwoFactorEnabled = true,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var tokenSvc = CreateTokenServiceMock("jwt-2fa", "refresh-2fa");
+            var emailSvc = new Mock<IEmailService>();
+            var svc = CreateUserService(ctx, tokenSvc, emailSvc);
+
+            var result = await svc.LoginAsync(new LoginDto
+            {
+                Email = "ana.2fa@test.com",
+                Password = "pass123",
+                RememberMe = true
+            });
+
+            result.Should().NotBeNull();
+            result!.RequiresTwoFactor.Should().BeTrue();
+            result.Token.Should().BeNull();
+            result.RefreshToken.Should().BeNull();
+            result.User.Should().BeNull();
+            result.TwoFactorChallengeToken.Should().NotBeNullOrWhiteSpace();
+            result.TwoFactorDeliveryTarget.Should().EndWith("@test.com");
+            result.TwoFactorDeliveryTarget.Should().Contain("*");
+            ctx.RefreshTokens.Should().BeEmpty();
+
+            var user = await ctx.Users.SingleAsync(u => u.Id == 150);
+            user.TwoFactorChallengeTokenHash.Should().NotBeNullOrWhiteSpace();
+            user.TwoFactorCodeHash.Should().NotBeNullOrWhiteSpace();
+            user.TwoFactorRememberMe.Should().BeTrue();
+            emailSvc.Verify(
+                x => x.SendAsync(
+                    "ana.2fa@test.com",
+                    It.IsAny<string>(),
+                    It.Is<string>(body => body.Contains("style=\"font-size: 24px"))),
+                Times.Once);
+        }
+
+        [Fact]
+        public async Task VerifyTwoFactorLoginAsync_SaValidnimKodom_IzdajeTokeneICistiChallenge()
+        {
+            using var ctx = CreateInMemoryContext(nameof(VerifyTwoFactorLoginAsync_SaValidnimKodom_IzdajeTokeneICistiChallenge));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 151,
+                FirstName = "Mina",
+                LastName = "Login",
+                Email = "mina.2fa@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("pass123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                IsTwoFactorEnabled = true,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var tokenSvc = CreateTokenServiceMock("jwt-verify", "refresh-verify");
+            var emailSvc = new Mock<IEmailService>();
+            string? sentBody = null;
+            emailSvc.Setup(x => x.SendAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                .Callback<string, string, string>((_, _, body) => sentBody = body)
+                .Returns(Task.CompletedTask);
+
+            var svc = CreateUserService(ctx, tokenSvc, emailSvc);
+
+            var challenge = await svc.LoginAsync(new LoginDto
+            {
+                Email = "mina.2fa@test.com",
+                Password = "pass123",
+                RememberMe = false
+            });
+
+            var code = Regex.Match(sentBody ?? string.Empty, "\\d{6}").Value;
+            code.Should().NotBeNullOrWhiteSpace();
+
+            var result = await svc.VerifyTwoFactorLoginAsync(new VerifyTwoFactorLoginDto
+            {
+                ChallengeToken = challenge!.TwoFactorChallengeToken!,
+                Code = code
+            });
+
+            result.RequiresTwoFactor.Should().BeFalse();
+            result.Token.Should().Be("jwt-verify");
+            result.RefreshToken.Should().Be("refresh-verify");
+            result.User.Should().NotBeNull();
+
+            var user = await ctx.Users.SingleAsync(u => u.Id == 151);
+            user.TwoFactorChallengeTokenHash.Should().BeNull();
+            user.TwoFactorCodeHash.Should().BeNull();
+            user.TwoFactorRememberMe.Should().BeNull();
+            ctx.RefreshTokens.Should().ContainSingle(x => x.UserId == 151);
+        }
+
+        [Fact]
+        public async Task UpdateTwoFactorSettingsAsync_MenjaStanjeZaKorisnika()
+        {
+            using var ctx = CreateInMemoryContext(nameof(UpdateTwoFactorSettingsAsync_MenjaStanjeZaKorisnika));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 152,
+                FirstName = "Sara",
+                LastName = "Security",
+                Email = "sara@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("pass123"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var svc = CreateUserService(ctx, CreateTokenServiceMock());
+
+            var enabled = await svc.UpdateTwoFactorSettingsAsync(152, new UpdateTwoFactorSettingsDto
+            {
+                IsEnabled = true
+            });
+
+            enabled.Should().NotBeNull();
+            enabled!.IsEnabled.Should().BeTrue();
+
+            var disabled = await svc.UpdateTwoFactorSettingsAsync(152, new UpdateTwoFactorSettingsDto
+            {
+                IsEnabled = false
+            });
+
+            disabled.Should().NotBeNull();
+            disabled!.IsEnabled.Should().BeFalse();
+            (await ctx.Users.SingleAsync(u => u.Id == 152)).IsTwoFactorEnabled.Should().BeFalse();
         }
 
         [Fact]

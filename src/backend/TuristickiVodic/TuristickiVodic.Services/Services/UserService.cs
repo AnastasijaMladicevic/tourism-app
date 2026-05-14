@@ -19,6 +19,7 @@ namespace TuristickiVodic.Services
     {
         private const int ResetCodeLifetimeMinutes = 5;
         private const int ResetSessionLifetimeMinutes = 5;
+        private const int TwoFactorCodeLifetimeMinutes = 5;
         private const int ShareLocationStaleMinutes = 30;
         private const int MaxVisitedHistoryPoints = 3000;
         private const double MaxVisitedPointAccuracyMeters = 250d;
@@ -788,7 +789,119 @@ namespace TuristickiVodic.Services
             if (!user.IsActive)
                 throw new InvalidOperationException("Account is deactivated");
 
+            if (ShouldRequireTwoFactor(user))
+                return await CreateTwoFactorChallengeAsync(user, loginDto.RememberMe);
+
             return await IssueTokensAsync(user, loginDto.RememberMe);
+        }
+
+        public async Task<AuthResponseDto> VerifyTwoFactorLoginAsync(VerifyTwoFactorLoginDto dto)
+        {
+            var challengeTokenHash = HashOpaqueToken(dto.ChallengeToken);
+
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .Include(u => u.PreferredRegion)
+                .FirstOrDefaultAsync(u => u.TwoFactorChallengeTokenHash == challengeTokenHash);
+
+            if (user == null || !user.TwoFactorChallengeExpiryUtc.HasValue || user.TwoFactorChallengeExpiryUtc.Value <= DateTime.UtcNow)
+                throw new InvalidOperationException("Two-step verification session expired. Please log in again.");
+
+            if (user.IsBlacklisted)
+                throw new InvalidOperationException("User is blacklisted");
+
+            if (!user.IsActive)
+                throw new InvalidOperationException("Account is deactivated");
+
+            if (string.IsNullOrWhiteSpace(user.TwoFactorCodeHash) ||
+                !user.TwoFactorCodeExpiryUtc.HasValue ||
+                user.TwoFactorCodeExpiryUtc.Value <= DateTime.UtcNow)
+            {
+                throw new InvalidOperationException("Verification code expired. Please request a new code.");
+            }
+
+            if (!string.Equals(user.TwoFactorCodeHash, HashOpaqueToken(dto.Code.Trim()), StringComparison.Ordinal))
+                throw new InvalidOperationException("Invalid verification code.");
+
+            var rememberMe = user.TwoFactorRememberMe ?? false;
+            ClearTwoFactorChallenge(user);
+            return await IssueTokensAsync(user, rememberMe);
+        }
+
+        public async Task<AuthResponseDto> ResendTwoFactorLoginCodeAsync(ResendTwoFactorLoginCodeDto dto)
+        {
+            var challengeTokenHash = HashOpaqueToken(dto.ChallengeToken);
+
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.TwoFactorChallengeTokenHash == challengeTokenHash);
+
+            if (user == null || !user.TwoFactorChallengeExpiryUtc.HasValue || user.TwoFactorChallengeExpiryUtc.Value <= DateTime.UtcNow)
+                throw new InvalidOperationException("Two-step verification session expired. Please log in again.");
+
+            if (!ShouldRequireTwoFactor(user))
+                throw new InvalidOperationException("Two-step verification is not enabled for this account.");
+
+            var code = GenerateTwoFactorCode();
+            var now = DateTime.UtcNow;
+
+            user.TwoFactorCodeHash = HashOpaqueToken(code);
+            user.TwoFactorCodeExpiryUtc = now.AddMinutes(TwoFactorCodeLifetimeMinutes);
+            user.TwoFactorChallengeExpiryUtc = now.AddMinutes(TwoFactorCodeLifetimeMinutes);
+            user.UpdatedAt = now;
+
+            await _context.SaveChangesAsync();
+            await SendTwoFactorCodeEmailAsync(user, code);
+
+            return new AuthResponseDto
+            {
+                RequiresTwoFactor = true,
+                TwoFactorChallengeToken = dto.ChallengeToken,
+                TwoFactorExpiresAt = user.TwoFactorChallengeExpiryUtc,
+                TwoFactorDeliveryTarget = MaskEmailAddress(user.Email)
+            };
+        }
+
+        public async Task<TwoFactorSettingsDto?> GetTwoFactorSettingsAsync(int userId)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return null;
+
+            return new TwoFactorSettingsDto
+            {
+                IsEnabled = user.IsTwoFactorEnabled,
+                DeliveryMethod = "email",
+                MaskedEmailAddress = MaskEmailAddress(user.Email)
+            };
+        }
+
+        public async Task<TwoFactorSettingsDto?> UpdateTwoFactorSettingsAsync(int userId, UpdateTwoFactorSettingsDto dto)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return null;
+
+            user.IsTwoFactorEnabled = dto.IsEnabled;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            if (!dto.IsEnabled)
+            {
+                ClearTwoFactorChallenge(user);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return new TwoFactorSettingsDto
+            {
+                IsEnabled = user.IsTwoFactorEnabled,
+                DeliveryMethod = "email",
+                MaskedEmailAddress = MaskEmailAddress(user.Email)
+            };
         }
 
         public async Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenDto refreshTokenDto)
@@ -1057,6 +1170,116 @@ namespace TuristickiVodic.Services
         {
             var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken));
             return Convert.ToBase64String(bytes);
+        }
+
+        private static string HashOpaqueToken(string value)
+        {
+            var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(value));
+            return Convert.ToBase64String(bytes);
+        }
+
+        private static bool ShouldRequireTwoFactor(User user)
+            => user.IsTwoFactorEnabled && user.Role?.Name == RoleType.Tourist;
+
+        private async Task<AuthResponseDto> CreateTwoFactorChallengeAsync(User user, bool rememberMe)
+        {
+            var now = DateTime.UtcNow;
+            var code = GenerateTwoFactorCode();
+            var challengeToken = GenerateOpaqueToken();
+
+            user.TwoFactorCodeHash = HashOpaqueToken(code);
+            user.TwoFactorCodeExpiryUtc = now.AddMinutes(TwoFactorCodeLifetimeMinutes);
+            user.TwoFactorChallengeTokenHash = HashOpaqueToken(challengeToken);
+            user.TwoFactorChallengeExpiryUtc = now.AddMinutes(TwoFactorCodeLifetimeMinutes);
+            user.TwoFactorRememberMe = rememberMe;
+            user.UpdatedAt = now;
+
+            await _context.SaveChangesAsync();
+            await SendTwoFactorCodeEmailAsync(user, code);
+
+            return new AuthResponseDto
+            {
+                RequiresTwoFactor = true,
+                TwoFactorChallengeToken = challengeToken,
+                TwoFactorExpiresAt = user.TwoFactorChallengeExpiryUtc,
+                TwoFactorDeliveryTarget = MaskEmailAddress(user.Email)
+            };
+        }
+
+        private async Task SendTwoFactorCodeEmailAsync(User user, string code)
+        {
+            var subject = ResolveTwoFactorEmailSubject(user.Language);
+            var htmlBody = BuildTwoFactorEmailBody(user.FirstName, code, user.Language);
+            await _emailService.SendAsync(user.Email, subject, htmlBody);
+        }
+
+        private static string ResolveTwoFactorEmailSubject(string? language)
+        {
+            return language?.Trim().ToLowerInvariant() switch
+            {
+                "sr" or "me" or "cnr" => "SpireGO kod za potvrdu prijave",
+                _ => "SpireGO login verification code"
+            };
+        }
+
+        private static string BuildTwoFactorEmailBody(string? firstName, string code, string? language)
+        {
+            var safeName = string.IsNullOrWhiteSpace(firstName) ? "there" : firstName.Trim();
+
+            return language?.Trim().ToLowerInvariant() switch
+            {
+                "sr" or "me" or "cnr" => $"""
+                    <p>Zdravo {safeName},</p>
+                    <p>Tvoj kod za potvrdu prijave je:</p>
+                    <p style="font-size: 24px; font-weight: 700; letter-spacing: 4px;">{code}</p>
+                    <p>Kod važi {TwoFactorCodeLifetimeMinutes} minuta.</p>
+                    <p>Ako nisi pokušala prijavu, slobodno ignoriši ovu poruku.</p>
+                    """,
+                _ => $"""
+                    <p>Hello {safeName},</p>
+                    <p>Your login verification code is:</p>
+                    <p style="font-size: 24px; font-weight: 700; letter-spacing: 4px;">{code}</p>
+                    <p>This code is valid for {TwoFactorCodeLifetimeMinutes} minutes.</p>
+                    <p>If this was not you, you can safely ignore this email.</p>
+                    """
+            };
+        }
+
+        private static string GenerateTwoFactorCode()
+            => RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
+
+        private static string GenerateOpaqueToken()
+        {
+            Span<byte> bytes = stackalloc byte[32];
+            RandomNumberGenerator.Fill(bytes);
+            return Base64UrlEncode(bytes.ToArray());
+        }
+
+        private static string MaskEmailAddress(string? email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return string.Empty;
+
+            var parts = email.Split('@', 2, StringSplitOptions.TrimEntries);
+            if (parts.Length != 2)
+                return email;
+
+            var local = parts[0];
+            var domain = parts[1];
+
+            if (local.Length <= 2)
+                return $"{local[0]}*@{domain}";
+
+            return $"{local[0]}{new string('*', Math.Max(1, local.Length - 2))}{local[^1]}@{domain}";
+        }
+
+        private static void ClearTwoFactorChallenge(User user)
+        {
+            user.TwoFactorCodeHash = null;
+            user.TwoFactorCodeExpiryUtc = null;
+            user.TwoFactorChallengeTokenHash = null;
+            user.TwoFactorChallengeExpiryUtc = null;
+            user.TwoFactorRememberMe = null;
         }
 
         private IQueryable<UserLocationHistory> BuildUserLocationHistoryQuery(int userId, DateTime? fromUtc, DateTime? toUtc)

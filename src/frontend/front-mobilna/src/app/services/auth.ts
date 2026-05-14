@@ -39,16 +39,21 @@ export interface UserDto {
   roleName: string;
   isActive: boolean;
   isVerified: boolean;
+  isTwoFactorEnabled?: boolean;
   favoritesCount?: number;
   plansCount?: number;
   reviewsCount?: number;
 }
 
 export interface AuthResponseDto {
-  token: string;
-  refreshToken: string;
-  user: UserDto;
-  expiresAt: string;
+  token?: string | null;
+  refreshToken?: string | null;
+  user?: UserDto | null;
+  expiresAt?: string | null;
+  requiresTwoFactor?: boolean;
+  twoFactorChallengeToken?: string | null;
+  twoFactorExpiresAt?: string | null;
+  twoFactorDeliveryTarget?: string | null;
 }
 
 export interface RefreshTokenDto {
@@ -61,6 +66,21 @@ export interface UpdateUserDto {
   phoneNumber?: string | null;
   country?: string | null;
   language?: string | null;
+}
+
+export interface TwoFactorSettingsDto {
+  isEnabled: boolean;
+  deliveryMethod: string;
+  maskedEmailAddress?: string | null;
+}
+
+export interface VerifyTwoFactorLoginDto {
+  challengeToken: string;
+  code: string;
+}
+
+export interface ResendTwoFactorLoginCodeDto {
+  challengeToken: string;
 }
 
 export interface UserPreferredRegionDto {
@@ -135,7 +155,7 @@ export class AuthService {
 
   login(dto: LoginDto): Observable<AuthResponseDto> {
     return this.http.post<AuthResponseDto>(`${this.url}/login`, dto).pipe(
-      tap((res) => this.persistSession(res)),
+      tap((res) => this.persistSessionIfComplete(res)),
     );
   }
 
@@ -154,7 +174,17 @@ export class AuthService {
     const refreshToken = localStorage.getItem('refreshToken');
     return this.http
       .post<AuthResponseDto>(`${this.url}/refresh`, { refreshToken } as RefreshTokenDto)
-      .pipe(tap((res) => this.persistSession(res)));
+      .pipe(tap((res) => this.persistSessionIfComplete(res)));
+  }
+
+  verifyTwoFactorLogin(dto: VerifyTwoFactorLoginDto): Observable<AuthResponseDto> {
+    return this.http
+      .post<AuthResponseDto>(`${this.url}/login/verify-2fa`, dto)
+      .pipe(tap((res) => this.persistSessionIfComplete(res)));
+  }
+
+  resendTwoFactorLoginCode(dto: ResendTwoFactorLoginCodeDto): Observable<AuthResponseDto> {
+    return this.http.post<AuthResponseDto>(`${this.url}/login/resend-2fa`, dto);
   }
 
   getById(userId: number): Observable<UserDto> {
@@ -257,6 +287,28 @@ export class AuthService {
     return this.http.get<UserPreferredRegionDto>(`${this.url}/me/preferred-region`);
   }
 
+  getMyTwoFactorSettings(): Observable<TwoFactorSettingsDto> {
+    return this.http.get<TwoFactorSettingsDto>(`${this.url}/me/two-factor-settings`);
+  }
+
+  updateMyTwoFactorSettings(isEnabled: boolean): Observable<TwoFactorSettingsDto> {
+    return this.http
+      .put<TwoFactorSettingsDto>(`${this.url}/me/two-factor-settings`, { isEnabled })
+      .pipe(
+        tap((settings) => {
+          const currentUser = this.getCurrentUser();
+          if (!currentUser) {
+            return;
+          }
+
+          this.setCurrentUser({
+            ...currentUser,
+            isTwoFactorEnabled: settings.isEnabled,
+          });
+        }),
+      );
+  }
+
   updateMyPreferredRegion(dto: UpdateUserPreferredRegionDto): Observable<UserPreferredRegionDto> {
     return this.http.put<UserPreferredRegionDto>(`${this.url}/me/preferred-region`, dto);
   }
@@ -320,7 +372,11 @@ export class AuthService {
     return normalizedUser;
   }
 
-  private persistSession(response: AuthResponseDto): void {
+  private persistSessionIfComplete(response: AuthResponseDto): void {
+    if (!response.token || !response.refreshToken || !response.user) {
+      return;
+    }
+
     localStorage.setItem('token', response.token);
     localStorage.setItem('refreshToken', response.refreshToken);
     this.setCurrentUser(response.user);

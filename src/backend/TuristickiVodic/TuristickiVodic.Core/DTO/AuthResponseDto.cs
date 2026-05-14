@@ -1,10 +1,14 @@
-﻿namespace TuristickiVodic.Core.DTO
+namespace TuristickiVodic.Core.DTO
 {
     public class AuthResponseDto
     {
-        public string Token { get; set; }
-        public string RefreshToken { get; set; }
-        public UserDto User { get; set; }
-        public DateTime ExpiresAt { get; set; }
+        public string? Token { get; set; }
+        public string? RefreshToken { get; set; }
+        public UserDto? User { get; set; }
+        public DateTime? ExpiresAt { get; set; }
+        public bool RequiresTwoFactor { get; set; }
+        public string? TwoFactorChallengeToken { get; set; }
+        public DateTime? TwoFactorExpiresAt { get; set; }
+        public string? TwoFactorDeliveryTarget { get; set; }
     }
 }

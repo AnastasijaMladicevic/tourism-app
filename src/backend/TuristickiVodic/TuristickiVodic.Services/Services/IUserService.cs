@@ -18,7 +18,11 @@ namespace TuristickiVodic.Services
         Task<ResetPasswordVerificationDto> VerifyResetCodeAsync(VerifyResetCodeDto dto);
         Task ResetPasswordAsync(ResetPasswordDto dto);
         Task<AuthResponseDto?> LoginAsync(LoginDto loginDto);
+        Task<AuthResponseDto> VerifyTwoFactorLoginAsync(VerifyTwoFactorLoginDto dto);
+        Task<AuthResponseDto> ResendTwoFactorLoginCodeAsync(ResendTwoFactorLoginCodeDto dto);
         Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenDto refreshTokenDto);
+        Task<TwoFactorSettingsDto?> GetTwoFactorSettingsAsync(int userId);
+        Task<TwoFactorSettingsDto?> UpdateTwoFactorSettingsAsync(int userId, UpdateTwoFactorSettingsDto dto);
         Task<bool> RequestCreatorRoleAsync(int userId, string creatorType);
         Task<bool> ApproveCreatorRoleAsync(int userId);
         Task<bool> RejectCreatorRoleAsync(int userId);

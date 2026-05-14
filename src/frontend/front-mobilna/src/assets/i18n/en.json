@@ -280,8 +280,16 @@
     "deliveryInboxTitle": "Notifications only",
     "deliveryInboxBody": "New notifications stay only in the list without a top banner.",
     "generalSection": "General settings",
+    "securitySection": "Security",
     "liveBadge": "New notification",
     "openNotifications": "Open",
+    "twoFactorPageTitle": "Two-step verification",
+    "twoFactorTitle": "Enable two-step verification",
+    "twoFactorBodyOn": "Every login will require an additional six-digit code sent to your email.",
+    "twoFactorBodyOff": "If you enable it, every login will require an additional code sent to your email.",
+    "twoFactorDeliveryTitle": "Code delivery",
+    "twoFactorDeliveryBody": "Login verification codes are sent to the email address on your account.",
+    "twoFactorSaveError": "Two-step verification settings could not be saved right now.",
     "menu": {
       "editProfile": "Edit profile",
       "language": "Language",
@@ -292,7 +300,8 @@
       "about": "About the app",
       "appearance": "Appearance",
       "notifications": "Notifications",
-      "location": "Location"
+      "location": "Location",
+      "twoFactor": "Two-step verification"
     },
     "smartLocation": {
       "autoRegionTitle": "Automatic region by location",
@@ -395,6 +404,19 @@
         "body": "Notify me when the same content creator accumulates several rejected items."
       }
     }
+  },
+  "twoFactor": {
+    "title": "Two-step verification",
+    "subtitle": "Enter the six-digit code sent to",
+    "verify": "Verify code",
+    "resend": "Resend code",
+    "resendSuccess": "A new code was sent.",
+    "resendFailed": "The code could not be resent right now.",
+    "codeRequired": "Enter all 6 digits.",
+    "codeExpired": "The code expired. Request a new one.",
+    "invalidCode": "The code is not valid.",
+    "invalidState": "Your login session expired. Please try again.",
+    "backToLogin": "Back to login"
   },
   "region": {
     "title": "Region",

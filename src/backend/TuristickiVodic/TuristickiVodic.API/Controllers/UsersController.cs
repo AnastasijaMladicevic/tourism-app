@@ -71,6 +71,30 @@ namespace TuristickiVodic.API.Controllers
             return Ok(region);
         }
 
+        [HttpGet("me/two-factor-settings")]
+        public async Task<IActionResult> GetMyTwoFactorSettings()
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var settings = await _userService.GetTwoFactorSettingsAsync(currentUserId);
+
+            if (settings == null)
+                return NotFound();
+
+            return Ok(settings);
+        }
+
+        [HttpPut("me/two-factor-settings")]
+        public async Task<IActionResult> UpdateMyTwoFactorSettings([FromBody] UpdateTwoFactorSettingsDto dto)
+        {
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var settings = await _userService.UpdateTwoFactorSettingsAsync(currentUserId, dto);
+
+            if (settings == null)
+                return NotFound();
+
+            return Ok(settings);
+        }
+
         [HttpPut("me/preferred-region")]
         public async Task<IActionResult> UpdateMyPreferredRegion([FromBody] UpdateUserPreferredRegionDto dto)
         {
@@ -261,6 +285,42 @@ namespace TuristickiVodic.API.Controllers
                     return Unauthorized(new { message = "Invalid email or password" });
 
                 return Ok(NormalizeAuthResponse(response));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("login/verify-2fa")]
+        [AllowAnonymous]
+        public async Task<IActionResult> VerifyTwoFactorLogin([FromBody] VerifyTwoFactorLoginDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var response = await _userService.VerifyTwoFactorLoginAsync(dto);
+                return Ok(NormalizeAuthResponse(response));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("login/resend-2fa")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResendTwoFactorLoginCode([FromBody] ResendTwoFactorLoginCodeDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var response = await _userService.ResendTwoFactorLoginCodeAsync(dto);
+                return Ok(response);
             }
             catch (InvalidOperationException ex)
             {

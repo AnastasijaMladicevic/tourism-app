@@ -55,6 +55,12 @@ export class SettingsComponent implements OnInit, OnDestroy {
       accent: 'teal'
     },
     {
+      icon: 'verified_user',
+      titleKey: 'settings.menu.twoFactor',
+      route: '/two-factor-settings',
+      accent: 'indigo'
+    },
+    {
       icon: 'support_agent',
       titleKey: 'settings.menu.support',
       route: '/support',
@@ -87,7 +93,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   ];
   get visibleGeneralItems() {
     return this.generalItems.filter(item => {
-      if (item.route === '/profile/edit') {
+      if (item.route === '/profile/edit' || item.route === '/two-factor-settings') {
         return this.authService.isLoggedIn();
       }
 

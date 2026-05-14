@@ -55,13 +55,13 @@
                 <circle cx="12" cy="7" r="4" />
               </svg>
             </span>
-            <input type="text" formControlName="firstName" [placeholder]="'signup.firstName' | translate" />
+            <input type="text" formControlName="lastName" [placeholder]="'signup.lastName' | translate" />
           </div>
           @if (lastName?.touched && lastName?.hasError('required')) {
-            <p class="field-error">{{ 'signup.errors.firstNameRequired' | translate }}</p>
+            <p class="field-error">{{ 'signup.errors.lastNameRequired' | translate }}</p>
           }
           @if (lastName?.touched && lastName?.hasError('minlength')) {
-            <p class="field-error">{{ 'signup.errors.firstNameMin' | translate }}</p>
+            <p class="field-error">{{ 'signup.errors.lastNameMin' | translate }}</p>
           }
         </div>
       </div>

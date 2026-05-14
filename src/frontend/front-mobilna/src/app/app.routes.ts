@@ -162,6 +162,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'two-factor-verification',
+    loadComponent: () =>
+      import('./feature/auth/two-factor-verification/two-factor-verification').then(
+        (m) => m.TwoFactorVerificationComponent,
+      ),
+  },
+  {
     path: 'new-credentials',
     loadComponent: () =>
       import('./feature/new-credentials/new-credentials.component').then(
@@ -245,6 +252,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./feature/notification-settings/notification-settings').then(
         (m) => m.NotificationSettingsComponent,
+      ),
+  },
+  {
+    path: 'two-factor-settings',
+    canActivate: [profileAuthGuard],
+    loadComponent: () =>
+      import('./feature/two-factor-settings/two-factor-settings').then(
+        (m) => m.TwoFactorSettingsComponent,
       ),
   },
   {

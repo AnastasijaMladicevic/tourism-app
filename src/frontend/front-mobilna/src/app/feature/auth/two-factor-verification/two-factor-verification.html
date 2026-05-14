@@ -1,0 +1,73 @@
+<div class="page">
+  <div class="card">
+    <div class="auth-topbar">
+      <button class="back-btn" type="button" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
+        <span class="material-icons">arrow_back_ios</span>
+      </button>
+
+      <div class="logo">
+        <app-logo size="lg"></app-logo>
+      </div>
+
+      <span class="auth-topbar__spacer" aria-hidden="true"></span>
+    </div>
+
+    <h1 class="title">{{ 'twoFactor.title' | translate }}</h1>
+    <p class="subtitle">
+      {{ 'twoFactor.subtitle' | translate }}<br />
+      <span class="email">{{ deliveryTarget }}</span>
+    </p>
+
+    <div class="otp-row" (paste)="onPaste($event)">
+      @for (value of otpValues; track $index) {
+        <input
+          #otpInput
+          class="otp-input"
+          [class.otp-input--filled]="otpValues[$index] !== ''"
+          [class.otp-input--error]="errorMessage !== ''"
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          autocomplete="one-time-code"
+          [value]="value"
+          (input)="onInput($event, $index)"
+          (keydown)="onKeyDown($event, $index)"
+          (keydown.enter)="verifyCode()"
+          [attr.aria-label]="'OTP digit ' + ($index + 1)"
+        />
+      }
+    </div>
+
+    <p class="timer" [class.timer--expired]="isExpired">{{ timerDisplay }}</p>
+
+    @if (successMessage) {
+      <p class="success" role="status">{{ successMessage }}</p>
+    }
+
+    @if (errorMessage) {
+      <p class="error" role="alert">{{ errorMessage }}</p>
+    }
+
+    <button
+      class="btn btn-primary"
+      type="button"
+      [disabled]="isLoading || isResending || !isOtpComplete || isExpired"
+      (click)="verifyCode()"
+    >
+      @if (isLoading) {
+        <span class="spinner"></span>
+      } @else {
+        {{ 'twoFactor.verify' | translate }}
+      }
+    </button>
+
+    <button
+      class="btn btn-outline"
+      type="button"
+      [disabled]="isLoading || isResending"
+      (click)="resendCode()"
+    >
+      {{ 'twoFactor.resend' | translate }}
+    </button>
+  </div>
+</div>

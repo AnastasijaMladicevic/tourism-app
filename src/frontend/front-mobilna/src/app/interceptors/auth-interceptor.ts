@@ -4,7 +4,7 @@ import { BehaviorSubject, catchError, filter, finalize, switchMap, take, throwEr
 import { AuthService } from '../services/auth';
 
 let isRefreshing = false;
-const refreshedToken$ = new BehaviorSubject<string | null>(null);
+const refreshedToken$ = new BehaviorSubject<string | false | null>(null);
 
 function clearStoredSession(): void {
   localStorage.removeItem('token');
@@ -42,9 +42,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
       if (isRefreshing) {
         return refreshedToken$.pipe(
-          filter((newToken): newToken is string => !!newToken),
+          filter((newToken): newToken is string | false => newToken !== null),
           take(1),
           switchMap((newToken) => {
+            if (newToken === false) {
+              clearStoredSession();
+              return throwError(() => error);
+            }
+
             const retryReq = req.clone({
               setHeaders: { Authorization: `Bearer ${newToken}` },
             });
@@ -58,6 +63,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
       return authService.refresh().pipe(
         switchMap((res) => {
+          if (!res.token) {
+            clearStoredSession();
+            refreshedToken$.next(false);
+            return throwError(() => error);
+          }
+
           refreshedToken$.next(res.token);
           const retryReq = req.clone({
             setHeaders: { Authorization: `Bearer ${res.token}` },
@@ -65,6 +76,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
           return next(retryReq);
         }),
         catchError((refreshError) => {
+          refreshedToken$.next(false);
           clearStoredSession();
           return throwError(() => refreshError);
         }),

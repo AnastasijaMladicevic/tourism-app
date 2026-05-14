@@ -282,6 +282,14 @@
     "generalSection": "Opšta podešavanja",
     "liveBadge": "Novo obaveštenje",
     "openNotifications": "Otvori",
+    "securitySection": "Bezbednost",
+    "twoFactorPageTitle": "Dvostepena verifikacija",
+    "twoFactorTitle": "Ukljuci dvostepenu verifikaciju",
+    "twoFactorBodyOn": "Pri svakoj prijavi trazice se dodatni sestocifreni kod poslat na tvoj email.",
+    "twoFactorBodyOff": "Ako je ukljucis, pri svakoj prijavi trazice se dodatni kod poslat na tvoj email.",
+    "twoFactorDeliveryTitle": "Nacin isporuke koda",
+    "twoFactorDeliveryBody": "Verifikacioni kodovi za prijavu salju se na email adresu tvog naloga.",
+    "twoFactorSaveError": "Podesavanje dvostepene verifikacije trenutno nije moguce sacuvati.",
     "menu": {
       "editProfile": "Izmeni profil",
       "language": "Jezik",
@@ -292,7 +300,8 @@
       "about": "O aplikaciji",
       "appearance": "Izgled",
       "notifications": "Obaveštenja",
-      "location": "Lokacija"
+      "location": "Lokacija",
+      "twoFactor": "Dvostepena verifikacija"
     },
     "smartLocation": {
       "autoRegionTitle": "Automatski region po lokaciji",
@@ -395,6 +404,19 @@
         "body": "Obavesti me kada isti content creator dobije više odbijenih sadržaja."
       }
     }
+  },
+  "twoFactor": {
+    "title": "Dvostepena verifikacija",
+    "subtitle": "Unesi sestocifreni kod poslat na",
+    "verify": "Potvrdi kod",
+    "resend": "Posalji kod ponovo",
+    "resendSuccess": "Novi kod je poslat.",
+    "resendFailed": "Kod trenutno nije moguce ponovo poslati.",
+    "codeRequired": "Unesi svih 6 cifara.",
+    "codeExpired": "Kod je istekao. Zatrazi novi.",
+    "invalidCode": "Kod nije ispravan.",
+    "invalidState": "Sesija za prijavu je istekla. Pokusaj ponovo.",
+    "backToLogin": "Nazad na prijavu"
   },
   "region": {
     "title": "Region",

@@ -545,6 +545,47 @@ namespace TuristickiVodic.Tests.Controllers
             result.Should().BeOfType<BadRequestObjectResult>();
         }
 
+        [Fact]
+        public async Task Login_KadaJePotrebnaTwoFactorVerifikacija_VracaOkSaChallengeOdgovorom()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.LoginAsync(It.IsAny<LoginDto>()))
+                .ReturnsAsync(new AuthResponseDto
+                {
+                    RequiresTwoFactor = true,
+                    TwoFactorChallengeToken = "challenge-token",
+                    TwoFactorDeliveryTarget = "a**a@test.com"
+                });
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.Login(new LoginDto { Email = "a@b.com", Password = "pass" });
+
+            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            var dto = ok.Value.Should().BeOfType<AuthResponseDto>().Subject;
+            dto.RequiresTwoFactor.Should().BeTrue();
+            dto.TwoFactorChallengeToken.Should().Be("challenge-token");
+            dto.TwoFactorDeliveryTarget.Should().Be("a**a@test.com");
+        }
+
+        [Fact]
+        public async Task VerifyTwoFactorLogin_KadaKodNijeValidan_VracaBadRequest()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.VerifyTwoFactorLoginAsync(It.IsAny<VerifyTwoFactorLoginDto>()))
+                .ThrowsAsync(new InvalidOperationException("Invalid verification code."));
+
+            var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
+
+            var result = await controller.VerifyTwoFactorLogin(new VerifyTwoFactorLoginDto
+            {
+                ChallengeToken = "challenge",
+                Code = "123456"
+            });
+
+            result.Should().BeOfType<BadRequestObjectResult>();
+        }
+
         // ═══════════════════════════════════════════
         //  POST /api/users/logout
         // ═══════════════════════════════════════════

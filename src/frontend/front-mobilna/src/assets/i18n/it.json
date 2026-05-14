@@ -280,8 +280,16 @@
     "deliveryInboxTitle": "Solo notifiche",
     "deliveryInboxBody": "Le nuove notifiche restano solo nell'elenco, senza barra a comparsa.",
     "generalSection": "Impostazioni generali",
+    "securitySection": "Sicurezza",
     "liveBadge": "Nuova notifica",
     "openNotifications": "Apri",
+    "twoFactorPageTitle": "Verifica in due passaggi",
+    "twoFactorTitle": "Attiva la verifica in due passaggi",
+    "twoFactorBodyOn": "Ogni accesso richiedera un codice aggiuntivo di sei cifre inviato alla tua email.",
+    "twoFactorBodyOff": "Se la attivi, ogni accesso richiedera un codice aggiuntivo inviato alla tua email.",
+    "twoFactorDeliveryTitle": "Consegna del codice",
+    "twoFactorDeliveryBody": "I codici di verifica per l'accesso vengono inviati all'indirizzo email del tuo account.",
+    "twoFactorSaveError": "Impossibile salvare ora le impostazioni della verifica in due passaggi.",
     "menu": {
       "editProfile": "Modifica profilo",
       "language": "Lingua",
@@ -292,7 +300,8 @@
       "about": "Informazioni sull'app",
       "appearance": "Aspetto",
       "notifications": "Notifiche",
-      "location": "Posizione"
+      "location": "Posizione",
+      "twoFactor": "Verifica in due passaggi"
     },
     "smartLocation": {
       "autoRegionTitle": "Regione automatica in base alla posizione",
@@ -395,6 +404,19 @@
         "body": "Avvisami quando lo stesso content creator accumula più contenuti rifiutati."
       }
     }
+  },
+  "twoFactor": {
+    "title": "Verifica in due passaggi",
+    "subtitle": "Inserisci il codice di sei cifre inviato a",
+    "verify": "Conferma codice",
+    "resend": "Invia di nuovo il codice",
+    "resendSuccess": "E stato inviato un nuovo codice.",
+    "resendFailed": "Impossibile inviare di nuovo il codice in questo momento.",
+    "codeRequired": "Inserisci tutte le 6 cifre.",
+    "codeExpired": "Il codice e scaduto. Richiedine uno nuovo.",
+    "invalidCode": "Il codice non e valido.",
+    "invalidState": "La sessione di accesso e scaduta. Riprova.",
+    "backToLogin": "Torna al login"
   },
   "region": {
     "title": "Regione",

@@ -41,6 +41,17 @@ namespace TuristickiVodic.Core.Models
         public string? ResetToken { get; set; }
         public DateTime? ResetTokenExpiry { get; set; }
 
+        public bool IsTwoFactorEnabled { get; set; } = false;
+
+        [MaxLength(128)]
+        public string? TwoFactorCodeHash { get; set; }
+        public DateTime? TwoFactorCodeExpiryUtc { get; set; }
+
+        [MaxLength(128)]
+        public string? TwoFactorChallengeTokenHash { get; set; }
+        public DateTime? TwoFactorChallengeExpiryUtc { get; set; }
+        public bool? TwoFactorRememberMe { get; set; }
+
         public Point? LastKnownLocation { get; set; }
         public double? LastLocationAccuracyMeters { get; set; }
         public DateTime? LastLocationUpdatedAt { get; set; }

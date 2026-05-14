@@ -97,44 +97,26 @@ export class LoginComponent {
         rememberMe: this.form.value.rememberMe,
       })
       .subscribe({
-        next: () => {
+        next: (response) => {
           this.isLoading = false;
           this.cdr.detectChanges();
-          const role = this.authService.getAuthenticatedRole();
 
-          if (role !== 'tourist') {
-            this.errorMessage = this.translationService.translate('login.onlyTourists');
+          if (response.requiresTwoFactor) {
+            if (response.twoFactorChallengeToken) {
+              this.navigateToTwoFactorVerification(
+                response.twoFactorChallengeToken,
+                response.twoFactorDeliveryTarget ?? this.form.value.email,
+                response.twoFactorExpiresAt,
+              );
+              return;
+            }
 
-            this.authService.logout().subscribe({
-              complete: () => {
-                this.cdr.detectChanges();
-              }
-            });
+            this.errorMessage = this.translationService.translate('twoFactor.invalidState');
             this.cdr.detectChanges();
             return;
           }
-          const returnUrl = this.readReturnUrl();
 
-          const openReview =
-            this.route.snapshot.queryParams['openReview'];
-
-          const pending = this.pendingActionService.consumeAction();
-
-          const finalUrl =
-            openReview === 'true'
-              ? `${returnUrl}${returnUrl.includes('?') ? '&' : '?'}openReview=true`
-              : returnUrl;
-
-          if (pending) {
-            this.router.navigateByUrl(finalUrl).then(() => {
-              setTimeout(() => {
-                this.executePendingAction(pending);
-              }, 100);
-            });
-            return;
-          }
-
-          this.router.navigateByUrl(finalUrl);
+          this.handleSuccessfulTouristLogin();
         },
         error: (err) => {
           this.isLoading = false;
@@ -169,6 +151,63 @@ export class LoginComponent {
   }
   goTerms(): void {
     this.router.navigate(['/terms']);
+  }
+
+  private handleSuccessfulTouristLogin(): void {
+    const role = this.authService.getAuthenticatedRole();
+
+    if (role !== 'tourist') {
+      this.errorMessage = this.translationService.translate('login.onlyTourists');
+
+      this.authService.logout().subscribe({
+        complete: () => {
+          this.cdr.detectChanges();
+        }
+      });
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.navigateAfterAuthenticatedLogin();
+  }
+
+  private navigateToTwoFactorVerification(
+    challengeToken: string,
+    deliveryTarget: string,
+    expiresAt?: string | null,
+  ): void {
+    this.router.navigate(['/two-factor-verification'], {
+      state: {
+        challengeToken,
+        deliveryTarget,
+        email: this.form.value.email,
+        expiresAt: expiresAt ?? null,
+        returnUrl: this.readReturnUrl(),
+        openReview: this.route.snapshot.queryParams['openReview'] === 'true',
+      },
+    });
+  }
+
+  private navigateAfterAuthenticatedLogin(): void {
+    const returnUrl = this.readReturnUrl();
+    const openReview = this.route.snapshot.queryParams['openReview'];
+    const pending = this.pendingActionService.consumeAction();
+
+    const finalUrl =
+      openReview === 'true'
+        ? `${returnUrl}${returnUrl.includes('?') ? '&' : '?'}openReview=true`
+        : returnUrl;
+
+    if (pending) {
+      this.router.navigateByUrl(finalUrl).then(() => {
+        setTimeout(() => {
+          this.executePendingAction(pending);
+        }, 100);
+      });
+      return;
+    }
+
+    this.router.navigateByUrl(finalUrl);
   }
 
   private readReturnUrl(): string {

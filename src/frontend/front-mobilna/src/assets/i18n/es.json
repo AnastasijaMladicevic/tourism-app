@@ -280,8 +280,16 @@
     "deliveryInboxTitle": "Solo notificaciones",
     "deliveryInboxBody": "Las nuevas notificaciones quedan solo en la lista, sin barra emergente.",
     "generalSection": "Configuración general",
+    "securitySection": "Seguridad",
     "liveBadge": "Nueva notificación",
     "openNotifications": "Abrir",
+    "twoFactorPageTitle": "Verificacion en dos pasos",
+    "twoFactorTitle": "Activar la verificacion en dos pasos",
+    "twoFactorBodyOn": "Cada inicio de sesion requerira un codigo adicional de seis digitos enviado a tu correo.",
+    "twoFactorBodyOff": "Si la activas, cada inicio de sesion requerira un codigo adicional enviado a tu correo.",
+    "twoFactorDeliveryTitle": "Entrega del codigo",
+    "twoFactorDeliveryBody": "Los codigos de verificacion de acceso se envian al correo de tu cuenta.",
+    "twoFactorSaveError": "No se pudo guardar la configuracion de verificacion en dos pasos en este momento.",
     "menu": {
       "editProfile": "Editar perfil",
       "language": "Idioma",
@@ -292,7 +300,8 @@
       "about": "Sobre la aplicación",
       "appearance": "Apariencia",
       "notifications": "Notificaciones",
-      "location": "Ubicación"
+      "location": "Ubicación",
+      "twoFactor": "Verificacion en dos pasos"
     },
     "smartLocation": {
       "autoRegionTitle": "Región automática por ubicación",
@@ -395,6 +404,19 @@
         "body": "Avísame cuando el mismo creador acumule varios contenidos rechazados."
       }
     }
+  },
+  "twoFactor": {
+    "title": "Verificacion en dos pasos",
+    "subtitle": "Introduce el codigo de seis digitos enviado a",
+    "verify": "Confirmar codigo",
+    "resend": "Reenviar codigo",
+    "resendSuccess": "Se envio un nuevo codigo.",
+    "resendFailed": "No se pudo reenviar el codigo en este momento.",
+    "codeRequired": "Introduce los 6 digitos.",
+    "codeExpired": "El codigo ha caducado. Solicita uno nuevo.",
+    "invalidCode": "El codigo no es valido.",
+    "invalidState": "Tu sesion de acceso ha caducado. Intentalo de nuevo.",
+    "backToLogin": "Volver al acceso"
   },
   "region": {
     "title": "Región",

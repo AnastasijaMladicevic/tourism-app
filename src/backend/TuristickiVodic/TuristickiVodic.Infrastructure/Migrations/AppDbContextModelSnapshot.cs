@@ -1257,6 +1257,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<bool>("IsVerified")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("IsTwoFactorEnabled")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Language")
                         .IsRequired()
                         .HasMaxLength(5)
@@ -1299,6 +1302,23 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.Property<DateTime?>("ResetTokenExpiry")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TwoFactorChallengeTokenHash")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTime?>("TwoFactorChallengeExpiryUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TwoFactorCodeHash")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<DateTime?>("TwoFactorCodeExpiryUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool?>("TwoFactorRememberMe")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("integer");
