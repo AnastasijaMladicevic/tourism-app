@@ -176,7 +176,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   private temporarySearchMarker: L.Marker | null = null;
   private routePlannerDragStartY: number | null = null;
   private routePlannerDragCleanup: (() => void) | null = null;
-  routePlannerDragOffset = 0;
+  private routePlannerSettledHeight: number | null = null;
+  private routePlannerDefaultHeight: number | null = null;
+  private routePlannerDragStartHeight = 0;
+  private routePlannerDragMinHeight = 0;
+  private routePlannerDragMaxHeight = 0;
+  routePlannerDragCurrentHeight: number | null = null;
 
   constructor(
     private mapService: MapService,
@@ -443,7 +448,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.totalDuration = 0;
     this.isRoutePlannerOpen = true;
     this.isRouteListCollapsed = false;
-    this.isRoutePlannerExpanded = false;
+    this.resetRoutePlannerPosition();
     this.isRoutePickingMode = true;
     this.routePickingType = 'add';
     this.routeSearchQuery = '';
@@ -534,7 +539,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.syncRoutePointMarkers();
     this.isRoutePlannerOpen = true;
     this.isRouteListCollapsed = false;
-    this.isRoutePlannerExpanded = false;
+    this.resetRoutePlannerPosition();
     this.isRoutePickingMode = true;
     this.routePickingType = 'add';
   }
@@ -1329,12 +1334,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     return `${this.totalDistance.toFixed(1)} km`;
   }
 
-  get routePlannerTransform(): string | null {
-    if (!this.isRoutePlannerDragging || this.routePlannerDragOffset === 0) {
+  get routePlannerHeightStyle(): string | null {
+    if (!this.isCompactViewport()) {
       return null;
     }
 
-    return `translateY(${this.routePlannerDragOffset}px)`;
+    const activeHeight = this.isRoutePlannerDragging ? this.routePlannerDragCurrentHeight : this.routePlannerSettledHeight;
+    return activeHeight == null ? null : `${activeHeight}px`;
   }
 
   get selectedAddStopResult(): SearchResult | null {
@@ -1418,14 +1424,28 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onRoutePlannerDragStart(event: PointerEvent): void {
+    if (!this.isCompactViewport()) {
+      return;
+    }
+
     if (event.pointerType === 'mouse' && event.button !== 0) {
       return;
     }
 
     event.preventDefault();
     this.stopRoutePlannerDrag();
+    const planner = document.querySelector('.route-planner') as HTMLElement | null;
+    if (!planner) {
+      return;
+    }
+
+    const rect = planner.getBoundingClientRect();
+    this.routePlannerDefaultHeight ??= rect.height;
     this.routePlannerDragStartY = event.clientY;
-    this.routePlannerDragOffset = 0;
+    this.routePlannerDragStartHeight = this.routePlannerSettledHeight ?? rect.height;
+    this.routePlannerDragMinHeight = 188;
+    this.routePlannerDragMaxHeight = this.resolveRoutePlannerMaxHeight(rect);
+    this.routePlannerDragCurrentHeight = this.routePlannerDragStartHeight;
     this.isRoutePlannerDragging = true;
 
     const handlePointerMove = (moveEvent: PointerEvent) => {
@@ -1434,22 +1454,20 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
       const rawDelta = moveEvent.clientY - this.routePlannerDragStartY;
-      const isMovingTowardOtherState =
-        (!this.isRoutePlannerExpanded && rawDelta < 0) ||
-        (this.isRoutePlannerExpanded && rawDelta > 0);
-
-      this.routePlannerDragOffset = isMovingTowardOtherState ? rawDelta : rawDelta * 0.18;
+      const nextHeight = this.routePlannerDragStartHeight - rawDelta;
+      this.routePlannerDragCurrentHeight = Math.max(
+        this.routePlannerDragMinHeight,
+        Math.min(this.routePlannerDragMaxHeight, nextHeight),
+      );
       this.cdr.detectChanges();
     };
 
     const handlePointerEnd = () => {
-      const delta = this.routePlannerDragOffset;
-
-      if (delta <= -60) {
-        this.isRoutePlannerExpanded = true;
-      } else if (delta >= 60) {
-        this.isRoutePlannerExpanded = false;
-      }
+      const releasedHeight = this.routePlannerDragCurrentHeight;
+      const defaultHeight = this.routePlannerDefaultHeight ?? releasedHeight ?? 0;
+      this.routePlannerSettledHeight =
+        releasedHeight != null && Math.abs(releasedHeight - defaultHeight) > 8 ? releasedHeight : null;
+      this.syncRoutePlannerExpandedState();
 
       this.stopRoutePlannerDrag();
       this.cdr.detectChanges();
@@ -1627,7 +1645,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.deactivateRouteNavigation();
     this.isRoutePlannerOpen = false;
     this.isRouteListCollapsed = false;
-    this.isRoutePlannerExpanded = false;
+    this.resetRoutePlannerPosition();
     this.isRoutePickingMode = false;
     this.showAddStopPanel = false;
     this.syncRoutePlannerPageState(false);
@@ -1735,21 +1753,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openAddStopPanel(): void {
-    if (window.innerWidth <= 768) {
-      this.addFirstRouteSearchResultOrFocus();
-      return;
-    }
-
-    this.showAddStopPanel = true;
-    this.addStopPanelQuery = '';
-    this.activeAddStopPanelFilter = null;
-    this.selectedAddStopResultKey = '';
-    void this.refreshAddStopPanelResults();
-
-    setTimeout(() => {
-      const input = document.querySelector('.add-stop-panel__search input') as HTMLInputElement | null;
-      input?.focus();
-    }, 0);
+    void this.router.navigate(['/map/add-stop']);
   }
 
   closeAddStopPanel(): void {
@@ -2041,8 +2045,37 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.routePlannerDragStartY = null;
-    this.routePlannerDragOffset = 0;
+    this.routePlannerDragStartHeight = this.routePlannerSettledHeight ?? this.routePlannerDefaultHeight ?? 0;
+    this.routePlannerDragCurrentHeight = null;
     this.isRoutePlannerDragging = false;
+  }
+
+  private resetRoutePlannerPosition(): void {
+    this.routePlannerSettledHeight = null;
+    this.routePlannerDefaultHeight = null;
+    this.isRoutePlannerExpanded = false;
+  }
+
+  private isCompactViewport(): boolean {
+    return typeof window !== 'undefined' && window.innerWidth <= 768;
+  }
+
+  private resolveRoutePlannerMaxHeight(rect: DOMRect): number {
+    if (typeof window === 'undefined') {
+      return 520;
+    }
+
+    const searchBarBottom =
+      (document.querySelector('.search-bar:not(.search-bar--hidden)') as HTMLElement | null)?.getBoundingClientRect().bottom ?? 0;
+    const chipsBottom =
+      (document.querySelector('.filter-chips:not(.filter-chips--hidden)') as HTMLElement | null)?.getBoundingClientRect().bottom ?? 0;
+    const topLimit = Math.max(12, searchBarBottom, chipsBottom) + 12;
+    const bottomInset = Math.max(0, window.innerHeight - rect.bottom);
+    return Math.max(this.routePlannerDragMinHeight, window.innerHeight - topLimit - bottomInset);
+  }
+
+  private syncRoutePlannerExpandedState(): void {
+    this.isRoutePlannerExpanded = false;
   }
 
   private syncRoutePointMarkers(): void {
@@ -2083,7 +2116,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.routePoints = restoredRoutePoints.map((point) => ({ ...point }));
       this.isRoutePlannerOpen = true;
       this.isRouteListCollapsed = false;
-      this.isRoutePlannerExpanded = false;
+      this.resetRoutePlannerPosition();
       this.isRoutePickingMode = false;
       this.routePickingType = 'add';
       this.routeSearchQuery = '';
