@@ -10,6 +10,12 @@ export interface LoginDto {
   rememberMe: boolean;
 }
 
+export interface GoogleLoginDto {
+  idToken: string;
+  rememberMe: boolean;
+  language?: string | null;
+}
+
 export interface ChangePasswordDto {
   currentPassword: string;
   newPassword: string;
@@ -54,6 +60,10 @@ export interface AuthResponseDto {
   twoFactorChallengeToken?: string | null;
   twoFactorExpiresAt?: string | null;
   twoFactorDeliveryTarget?: string | null;
+}
+
+export interface PublicAuthSettingsDto {
+  googleClientId?: string | null;
 }
 
 export interface RefreshTokenDto {
@@ -157,6 +167,16 @@ export class AuthService {
     return this.http.post<AuthResponseDto>(`${this.url}/login`, dto).pipe(
       tap((res) => this.persistSessionIfComplete(res)),
     );
+  }
+
+  loginWithGoogle(dto: GoogleLoginDto): Observable<AuthResponseDto> {
+    return this.http.post<AuthResponseDto>(`${this.url}/login/google`, dto).pipe(
+      tap((res) => this.persistSessionIfComplete(res)),
+    );
+  }
+
+  getPublicAuthSettings(): Observable<PublicAuthSettingsDto> {
+    return this.http.get<PublicAuthSettingsDto>(`${this.url}/auth-settings`);
   }
 
   logout(): Observable<any> {

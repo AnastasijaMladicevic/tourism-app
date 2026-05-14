@@ -159,6 +159,36 @@
   cursor: pointer;
 }
 
+.social-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: -34px 0 18px;
+}
+
+.social-divider {
+  color: var(--emperor);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.google-button-shell {
+  display: flex;
+  justify-content: center;
+}
+
+.google-button-container {
+  width: 100%;
+  max-width: 320px;
+}
+
+.google-loading {
+  color: var(--emperor);
+  font-size: 12px;
+  text-align: center;
+}
+
 .terms {
   color: var(--primary);
   text-decoration: underline;

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -13,6 +13,7 @@ import { AppLanguage, TranslationService } from '../../services/translation.serv
 import { HeaderComponent } from '../header/header.component';
 import { LogoComponent } from '../header/logo.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { GoogleIdentityService } from '../../services/google-identity';
 
 interface SignupLanguageOption {
   code: AppLanguage;
@@ -27,12 +28,17 @@ interface SignupLanguageOption {
   styleUrl: './signup.component.scss',
 })
 export class SignupComponent {
+  @ViewChild('googleButtonContainer') private googleButtonContainer?: ElementRef<HTMLElement>;
+
   private readonly phonePattern = /^\+?[0-9][0-9\s/-]{5,19}$/;
 
   isLoading = false;
   errorMessage = '';
   hidePassword = true;
   hideConfirmPassword = true;
+  googleClientId: string | null = null;
+  googleLoading = false;
+  private viewReady = false;
 
   form;
   protected readonly languageOptions: SignupLanguageOption[];
@@ -42,6 +48,7 @@ export class SignupComponent {
     private authService: AuthService,
     private router: Router,
     private translationService: TranslationService,
+    private googleIdentityService: GoogleIdentityService,
   ) {
     this.form = this.fb.group(
       {
@@ -65,6 +72,13 @@ export class SignupComponent {
       code,
       labelKey: this.translationService.labelKeyForLanguage(code),
     }));
+
+    this.loadGoogleAuthSettings();
+  }
+
+  ngAfterViewInit(): void {
+    this.viewReady = true;
+    void this.tryRenderGoogleButton();
   }
 
   private passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
@@ -139,6 +153,80 @@ export class SignupComponent {
           this.errorMessage = err?.error?.message ?? 'Registration failed.';
         },
       });
+  }
+
+  private loadGoogleAuthSettings(): void {
+    this.authService.getPublicAuthSettings().subscribe({
+      next: (settings) => {
+        this.googleClientId = settings.googleClientId?.trim() || null;
+        void this.tryRenderGoogleButton();
+      },
+      error: () => {
+        this.googleClientId = null;
+      },
+    });
+  }
+
+  private async tryRenderGoogleButton(): Promise<void> {
+    if (!this.viewReady || !this.googleClientId || !this.googleButtonContainer?.nativeElement) {
+      return;
+    }
+
+    this.googleLoading = true;
+
+    try {
+      await this.googleIdentityService.renderButton(
+        this.googleButtonContainer.nativeElement,
+        this.googleClientId,
+        (credential) => this.registerWithGoogle(credential),
+        'signup_with',
+      );
+    } catch {
+      this.googleClientId = null;
+    } finally {
+      this.googleLoading = false;
+    }
+  }
+
+  private registerWithGoogle(idToken: string): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.authService.loginWithGoogle({
+      idToken,
+      rememberMe: false,
+      language: this.form.value.language ?? this.translationService.language(),
+    }).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+
+        if (response.requiresTwoFactor && response.twoFactorChallengeToken) {
+          this.router.navigate(['/two-factor-verification'], {
+            state: {
+              challengeToken: response.twoFactorChallengeToken,
+              deliveryTarget: response.twoFactorDeliveryTarget ?? '',
+              email: '',
+              expiresAt: response.twoFactorExpiresAt ?? null,
+              returnUrl: '/home',
+              openReview: false,
+            },
+          });
+          return;
+        }
+
+        if (this.authService.getAuthenticatedRole() !== 'tourist') {
+          this.errorMessage = this.translationService.translate('login.onlyTourists');
+          this.authService.logout().subscribe();
+          return;
+        }
+
+        this.router.navigateByUrl('/home');
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.errorMessage = err?.error?.message ?? this.translationService.translate('login.googleFailed');
+      },
+    });
   }
 
   get firstName() {

@@ -134,11 +134,13 @@
     "rememberMe": "Recordarme",
     "loggingIn": "Iniciando sesión...",
     "logIn": "Iniciar sesión",
+    "orContinueWithGoogle": "o continúa con Google",
     "noAccount": "¿No tienes una cuenta?",
     "signUp": "Registrarse",
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "onlyTourists": "Solo los turistas pueden iniciar sesión aquí.",
     "invalidCredentials": "Email o contraseña incorrectos.",
+    "googleFailed": "El acceso con Google no está disponible en este momento.",
     "loginButton": "Iniciar sesión"
   },
   "forgotPassword": {

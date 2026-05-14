@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -16,6 +16,7 @@ import { PendingActionService } from '../../services/pending-action';
 import { RouterHistoryService } from '../../services/router-history';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
+import { GoogleIdentityService } from '../../services/google-identity';
 
 @Component({
   selector: 'app-login',
@@ -25,11 +26,17 @@ import { TranslationService } from '../../services/translation.service';
   styleUrl: './login.scss',
 })
 export class LoginComponent {
+  @ViewChild('googleButtonContainer') private googleButtonContainer?: ElementRef<HTMLElement>;
+
   form: FormGroup;
   hidePassword = true;
   isLoading = false;
   errorMessage = '';
   returnUrl = '/home';
+  googleClientId: string | null = null;
+  googleLoading = false;
+  private viewReady = false;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
@@ -38,7 +45,8 @@ export class LoginComponent {
     private route: ActivatedRoute,
     private pendingActionService: PendingActionService,
     private routerHistory: RouterHistoryService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private googleIdentityService: GoogleIdentityService,
   ) {
     this.returnUrl = this.readReturnUrl();
     this.form = this.fb.group({
@@ -49,6 +57,13 @@ export class LoginComponent {
       ],
       rememberMe: [false]
     });
+
+    this.loadGoogleAuthSettings();
+  }
+
+  ngAfterViewInit(): void {
+    this.viewReady = true;
+    void this.tryRenderGoogleButton();
   }
 
   passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
@@ -124,6 +139,78 @@ export class LoginComponent {
           this.cdr.detectChanges();
         },
       });
+  }
+
+  private loadGoogleAuthSettings(): void {
+    this.authService.getPublicAuthSettings().subscribe({
+      next: (settings) => {
+        this.googleClientId = settings.googleClientId?.trim() || null;
+        void this.tryRenderGoogleButton();
+      },
+      error: () => {
+        this.googleClientId = null;
+      },
+    });
+  }
+
+  private async tryRenderGoogleButton(): Promise<void> {
+    if (!this.viewReady || !this.googleClientId || !this.googleButtonContainer?.nativeElement) {
+      return;
+    }
+
+    this.googleLoading = true;
+
+    try {
+      await this.googleIdentityService.renderButton(
+        this.googleButtonContainer.nativeElement,
+        this.googleClientId,
+        (credential) => this.loginWithGoogle(credential),
+        'signin_with',
+      );
+    } catch {
+      this.googleClientId = null;
+    } finally {
+      this.googleLoading = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  private loginWithGoogle(idToken: string): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.authService.loginWithGoogle({
+      idToken,
+      rememberMe: this.form.value.rememberMe ?? false,
+      language: this.translationService.language(),
+    }).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+
+        if (response.requiresTwoFactor) {
+          if (response.twoFactorChallengeToken) {
+            this.navigateToTwoFactorVerification(
+              response.twoFactorChallengeToken,
+              response.twoFactorDeliveryTarget ?? this.form.value.email,
+              response.twoFactorExpiresAt,
+            );
+            return;
+          }
+
+          this.errorMessage = this.translationService.translate('twoFactor.invalidState');
+          this.cdr.detectChanges();
+          return;
+        }
+
+        this.handleSuccessfulTouristLogin();
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.errorMessage = err?.error?.message ?? this.translationService.translate('login.googleFailed');
+        this.cdr.detectChanges();
+      },
+    });
   }
   private executePendingAction(action: any): void {
     switch (action.type) {

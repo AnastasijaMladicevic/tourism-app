@@ -134,11 +134,13 @@
     "rememberMe": "Zapamti me",
     "loggingIn": "Prijavljivanje...",
     "logIn": "Prijavi se",
+    "orContinueWithGoogle": "ili nastavi pomoću Google naloga",
     "noAccount": "Nemaš nalog?",
     "signUp": "Registruj se",
     "forgotPassword": "Zaboravljena lozinka?",
     "onlyTourists": "Samo turisti mogu da se prijave ovde.",
     "invalidCredentials": "Neispravan email ili lozinka.",
+    "googleFailed": "Google prijava trenutno nije uspela.",
     "loginButton": "Prijavi se"
   },
   "forgotPassword": {

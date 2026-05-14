@@ -15,10 +15,12 @@ namespace TuristickiVodic.API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly IConfiguration _configuration;
 
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, IConfiguration configuration)
         {
             _userService = userService;
+            _configuration = configuration;
         }
 
         // Samo Admin može da vidi sve korisnike + paginacija
@@ -245,6 +247,17 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
+        [HttpGet("auth-settings")]
+        [AllowAnonymous]
+        public IActionResult GetPublicAuthSettings()
+        {
+            var googleClientId = _configuration["GoogleAuth:ClientId"]?.Trim();
+            return Ok(new PublicAuthSettingsDto
+            {
+                GoogleClientId = string.IsNullOrWhiteSpace(googleClientId) ? null : googleClientId
+            });
+        }
+
         [HttpPost("register-manager")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> RegisterManager([FromBody] CreateUserDto createUserDto)
@@ -284,6 +297,24 @@ namespace TuristickiVodic.API.Controllers
                 if (response == null)
                     return Unauthorized(new { message = "Invalid email or password" });
 
+                return Ok(NormalizeAuthResponse(response));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("login/google")]
+        [AllowAnonymous]
+        public async Task<IActionResult> LoginWithGoogle([FromBody] GoogleLoginDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var response = await _userService.GoogleLoginAsync(dto);
                 return Ok(NormalizeAuthResponse(response));
             }
             catch (InvalidOperationException ex)

@@ -285,6 +285,18 @@
       <button class="btn-primary" type="submit" [disabled]="form.invalid || isLoading">
         {{ isLoading ? ('signup.creating' | translate) : ('signup.submit' | translate) }}
       </button>
+
+      @if (googleClientId) {
+        <div class="social-auth">
+          <div class="social-divider">{{ 'login.orContinueWithGoogle' | translate }}</div>
+          <div class="google-button-shell">
+            <div #googleButtonContainer class="google-button-container"></div>
+          </div>
+          @if (googleLoading) {
+            <div class="google-loading">{{ 'common.loading' | translate }}</div>
+          }
+        </div>
+      }
     </form>
 
     <div class="login-link">

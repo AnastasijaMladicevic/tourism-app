@@ -134,11 +134,13 @@
     "rememberMe": "Remember me",
     "loggingIn": "Logging in...",
     "logIn": "Log In",
+    "orContinueWithGoogle": "or continue with Google",
     "noAccount": "Don't have an account?",
     "signUp": "Sign Up",
     "forgotPassword": "Forgot password?",
     "onlyTourists": "Only tourists can log in here.",
     "invalidCredentials": "Invalid email or password.",
+    "googleFailed": "Google sign-in is currently unavailable.",
     "loginButton": "Log In"
   },
   "forgotPassword": {
