@@ -272,6 +272,11 @@ export const routes: Routes = [
         path: 'map',
         loadComponent: () =>
           import('./pages/manager/map/map.component').then(m => m.ManagerMapComponent)
+      },
+      {
+        path: 'reports',
+        loadComponent: () =>
+          import('./pages/manager/reports/manager-reports.component').then(m => m.ManagerReportsComponent)
       }
     ]
   },
