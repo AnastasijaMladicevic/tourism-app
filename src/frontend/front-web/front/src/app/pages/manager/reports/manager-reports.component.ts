@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 export type ReportStatus = 'Pending' | 'Approved' | 'Rejected';
 
@@ -27,7 +28,7 @@ export interface ReportableCreator {
 @Component({
   selector: 'app-manager-reports',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './manager-reports.component.html',
   styleUrls: ['./manager-reports.component.css'],
 })
