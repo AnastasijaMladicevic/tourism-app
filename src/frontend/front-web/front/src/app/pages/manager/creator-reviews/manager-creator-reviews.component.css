@@ -129,7 +129,7 @@
 
 .stats-row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -167,6 +167,11 @@
 .stat-card[data-tone='amber'] {
   background: #fffbeb;
   border-color: #fde68a;
+}
+
+.stat-card[data-tone='green'] {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
 }
 
 .stat-card[data-tone='red'] {

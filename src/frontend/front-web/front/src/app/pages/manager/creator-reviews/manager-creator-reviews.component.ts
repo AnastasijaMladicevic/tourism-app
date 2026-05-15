@@ -224,7 +224,8 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   get stats() {
     const concerning = this.allThreads.filter((t) => this.isConcerning(t)).length;
     const noResponse = this.allThreads.filter((t) => !t.creatorResponse?.trim()).length;
-    return { concerning, noResponse, total: this.allThreads.length };
+    const withReply = this.allThreads.filter((t) => this.hasCreatorReply(t)).length;
+    return { concerning, noResponse, withReply, total: this.allThreads.length };
   }
 
   isConcerning(thread: ManagerReviewThread): boolean {
