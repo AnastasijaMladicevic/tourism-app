@@ -1,3 +1,5 @@
+import { isConcerningCreatorReply as isConcerningCreatorReplyFromUtil } from './concerning-reply.util';
+
 /** Design-time mock data for tourist reviews on manager object views. */
 
 export interface ManagerObjectReviewThread {
@@ -73,10 +75,8 @@ export function getMockObjectReviewThreads(
 }
 
 export function isConcerningCreatorReply(thread: ManagerObjectReviewThread): boolean {
-  if (!thread.creatorResponse?.trim()) {
-    return false;
-  }
-  const text = thread.creatorResponse.toLowerCase();
-  const flags = ['not our problem', 'your fault', 'read the listing', 'cannot follow', 'complaining'];
-  return flags.some((f) => text.includes(f)) || (thread.rating <= 2 && text.length > 0);
+  return isConcerningCreatorReplyFromUtil({
+    creatorResponse: thread.creatorResponse,
+    touristRating: thread.rating,
+  });
 }
