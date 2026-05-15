@@ -49,6 +49,24 @@
   color: #6b7280;
 }
 
+.inline-alert {
+  padding: 12px 14px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.inline-alert.error-banner {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.inline-alert.success-banner {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
 .primary-btn,
 .ghost-btn,
 .icon-btn {

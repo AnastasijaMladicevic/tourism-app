@@ -14,6 +14,13 @@
     </button>
   </div>
 
+  @if (errorMessage) {
+    <div class="inline-alert error-banner card" role="alert">{{ errorMessage }}</div>
+  }
+  @if (successMessage) {
+    <div class="inline-alert success-banner card" role="status">{{ successMessage }}</div>
+  }
+
   <div class="info-banner card">
     <span class="material-symbols-outlined info-icon">info</span>
     <div>
@@ -85,7 +92,9 @@
           <span class="table-meta">{{ filteredReports.length }} shown</span>
         </header>
 
-        @if (!filteredReports.length) {
+        @if (isLoading) {
+          <div class="state">Loading reports…</div>
+        } @else if (!filteredReports.length) {
           <div class="state">No reports match your filters.</div>
         } @else {
           <div class="table-scroll">
@@ -113,7 +122,7 @@
                     <td>
                       <div class="creator-cell">
                         <strong>{{ report.reportedUserName }}</strong>
-                        <span>{{ report.reportedUserEmail }}</span>
+                        <span>Creator ID {{ report.reportedUserId }}</span>
                       </div>
                     </td>
                     <td class="reason-cell">{{ report.reason }}</td>
@@ -150,7 +159,6 @@
               <div class="creator-avatar">{{ creator.name.charAt(0) }}</div>
               <div class="creator-info">
                 <strong>{{ creator.name }}</strong>
-                <span>{{ creator.email }}</span>
                 <span class="content-pill">{{ creator.contentSummary }}</span>
               </div>
               @if (creator.hasPendingReport) {
@@ -224,65 +232,12 @@
   </div>
 </section>
 
-@if (reportModalOpen) {
-  <div class="modal-backdrop" (click)="closeReportModal()" role="presentation"></div>
-  <div class="report-modal card" role="dialog" aria-labelledby="report-modal-title" aria-modal="true">
-    <header class="modal-header">
-      <div>
-        <h2 id="report-modal-title">Report Content Creator</h2>
-        <p class="modal-subtitle">Admin will review your submission. Only one pending report per creator.</p>
-      </div>
-      <button type="button" class="icon-btn" title="Close" (click)="closeReportModal()">
-        <span class="material-symbols-outlined">close</span>
-      </button>
-    </header>
-
-    <form class="modal-body" (ngSubmit)="submitReport()">
-      <label>
-        <span>Content Creator</span>
-        <select [(ngModel)]="reportForm.creatorId" name="creatorId" required>
-          <option [ngValue]="null" disabled>Select creator...</option>
-          @for (creator of availableCreators; track creator.id) {
-            <option [ngValue]="creator.id">{{ creator.name }} — {{ creator.contentSummary }}</option>
-          }
-        </select>
-      </label>
-
-      <label>
-        <span>Category</span>
-        <select [(ngModel)]="reportForm.category" name="category">
-          @for (opt of reportCategoryOptions; track opt.value) {
-            <option [value]="opt.value">{{ opt.label }}</option>
-          }
-        </select>
-      </label>
-
-      <label>
-        <span>Description <em>(required, max 500 characters)</em></span>
-        <textarea
-          [(ngModel)]="reportForm.reason"
-          name="reason"
-          rows="5"
-          maxlength="500"
-          placeholder="Describe what happened, which content was involved, and why per-item review was not sufficient..."
-          required
-        ></textarea>
-        <span class="char-count">{{ reportForm.reason.length }} / 500</span>
-      </label>
-
-      <div class="modal-warning">
-        <span class="material-symbols-outlined">warning</span>
-        <p>
-          If approved by Admin, the creator loses Content Creator access and cannot request the role again.
-        </p>
-      </div>
-
-      <footer class="modal-footer">
-        <button type="button" class="ghost-btn" (click)="closeReportModal()">Cancel</button>
-        <button type="submit" class="primary-btn" [disabled]="!reportForm.creatorId || !reportForm.reason.trim()">
-          Submit report
-        </button>
-      </footer>
-    </form>
-  </div>
-}
+<app-manager-report-modal
+  [open]="reportModalOpen"
+  [creators]="reportableCreators"
+  [initialCreatorId]="reportModalCreatorId"
+  [initialCategory]="reportModalCategory"
+  [initialReason]="reportModalReason"
+  (closed)="closeReportModal()"
+  (submitted)="onReportSubmitted()"
+/>

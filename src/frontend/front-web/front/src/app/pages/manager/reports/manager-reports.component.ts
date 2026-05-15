@@ -1,107 +1,60 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { catchError, finalize, forkJoin, map, of, switchMap } from 'rxjs';
+import { DestinationService } from '../../../services/destination.service';
+import { ObjectDto, ObjectService } from '../../../services/object';
+import {
+  ManagerReportDto,
+  ManagerReportsService,
+} from '../../../services/manager-reports.service';
+import { environment } from '../../../../environment/environment';
+import { HttpClient } from '@angular/common/http';
+import { buildReviewReportReason } from '../shared/concerning-reply.util';
+import {
+  ManagerReportModalComponent,
+  ReportableCreatorOption,
+} from '../shared/manager-report-modal.component';
 
 export type ReportStatus = 'Pending' | 'Approved' | 'Rejected';
 
 export interface ManagerReportRow {
   id: number;
   reportedUserName: string;
-  reportedUserEmail: string;
   reason: string;
   status: ReportStatus;
   destinationName: string;
   createdAt: string;
   resolvedAt?: string;
   rejectionReason?: string;
-}
-
-export interface ReportableCreator {
-  id: number;
-  name: string;
-  email: string;
-  contentSummary: string;
-  hasPendingReport: boolean;
+  reportedUserId: number;
 }
 
 @Component({
   selector: 'app-manager-reports',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, ManagerReportModalComponent],
   templateUrl: './manager-reports.component.html',
   styleUrls: ['./manager-reports.component.css'],
 })
-export class ManagerReportsComponent {
-  readonly managedDestination = 'Kotor Bay';
+export class ManagerReportsComponent implements OnInit {
+  private readonly managerReportsService = inject(ManagerReportsService);
+  private readonly objectService = inject(ObjectService);
+  private readonly destinationService = inject(DestinationService);
+  private readonly http = inject(HttpClient);
+  private readonly route = inject(ActivatedRoute);
+  private readonly cdr = inject(ChangeDetectorRef);
 
-  readonly reportCategoryOptions = [
-    { value: '', label: 'Select a category (optional)' },
-    { value: 'inappropriate_content', label: 'Inappropriate or misleading content' },
-    { value: 'repeated_violations', label: 'Repeated policy violations' },
-    { value: 'unprofessional_conduct', label: 'Unprofessional conduct' },
-    { value: 'spam_abuse', label: 'Spam or platform abuse' },
-    { value: 'other', label: 'Other (describe below)' },
-  ];
+  private readonly creatorNameById = new Map<number, string>();
 
-  /** Mock data — replace with API when wiring backend. */
-  readonly allReports: ManagerReportRow[] = [
-    {
-      id: 1042,
-      reportedUserName: 'Marko Petrović',
-      reportedUserEmail: 'marko.p@example.com',
-      reason:
-        'Repeated submissions with misleading descriptions after two rejections. Content does not match destination guidelines.',
-      status: 'Pending',
-      destinationName: 'Kotor Bay',
-      createdAt: '2026-05-14T09:22:00Z',
-    },
-    {
-      id: 1031,
-      reportedUserName: 'Ana Jović',
-      reportedUserEmail: 'ana.jovic@example.com',
-      reason: 'Offensive language in review replies to tourists on multiple objects.',
-      status: 'Approved',
-      destinationName: 'Kotor Bay',
-      createdAt: '2026-05-02T14:10:00Z',
-      resolvedAt: '2026-05-04T11:30:00Z',
-    },
-    {
-      id: 1018,
-      reportedUserName: 'Luka Mirić',
-      reportedUserEmail: 'luka.m@example.com',
-      reason: 'Uploaded duplicate events with incorrect dates; ignored manager feedback.',
-      status: 'Rejected',
-      destinationName: 'Kotor Bay',
-      createdAt: '2026-04-20T08:45:00Z',
-      resolvedAt: '2026-04-22T16:00:00Z',
-      rejectionReason: 'Insufficient evidence — content issues were resolved through standard review.',
-    },
-  ];
+  managedDestination = 'your destinations';
+  allReports: ManagerReportRow[] = [];
+  reportableCreators: ReportableCreatorOption[] = [];
 
-  readonly reportableCreators: ReportableCreator[] = [
-    {
-      id: 201,
-      name: 'Marko Petrović',
-      email: 'marko.p@example.com',
-      contentSummary: '3 objects · 2 events · 1 activity',
-      hasPendingReport: true,
-    },
-    {
-      id: 202,
-      name: 'Jelena Vuković',
-      email: 'jelena.v@example.com',
-      contentSummary: '1 object · 4 activities',
-      hasPendingReport: false,
-    },
-    {
-      id: 203,
-      name: 'Stefan Nikolić',
-      email: 'stefan.n@example.com',
-      contentSummary: '2 events in your destination',
-      hasPendingReport: false,
-    },
-  ];
+  isLoading = true;
+  errorMessage = '';
+  successMessage = '';
 
   draftSearchQuery = '';
   searchQuery = '';
@@ -109,16 +62,34 @@ export class ManagerReportsComponent {
   filterPanelOpen = false;
 
   reportModalOpen = false;
-  reportForm = {
-    creatorId: null as number | null,
-    category: '',
-    reason: '',
-  };
+  reportModalCreatorId: number | null = null;
+  reportModalCategory = 'unprofessional_conduct';
+  reportModalReason = '';
 
-  selectedReport: ManagerReportRow | null = this.allReports[0];
+  selectedReport: ManagerReportRow | null = null;
+
+  ngOnInit(): void {
+    this.loadManagedDestinationLabel();
+    this.loadPageData();
+
+    this.route.queryParamMap.subscribe((params) => {
+      const creatorId = Number(params.get('creatorId'));
+      const openReport = params.get('openReport') === '1' || params.get('openReport') === 'true';
+      const reason = params.get('reason')?.trim() ?? '';
+      const category = params.get('category')?.trim() ?? 'unprofessional_conduct';
+
+      if (openReport && Number.isFinite(creatorId) && creatorId > 0) {
+        this.reportModalCreatorId = creatorId;
+        this.reportModalCategory = category || 'unprofessional_conduct';
+        this.reportModalReason = reason;
+        this.reportModalOpen = true;
+        this.cdr.detectChanges();
+      }
+    });
+  }
 
   get pendingCount(): number {
-    return this.allReports.filter((r) => r.status === 'Pending').length;
+    return this.allReports.filter((report) => report.status === 'Pending').length;
   }
 
   get filteredReports(): ManagerReportRow[] {
@@ -138,17 +109,62 @@ export class ManagerReportsComponent {
     });
   }
 
-  get availableCreators(): ReportableCreator[] {
-    return this.reportableCreators.filter((c) => !c.hasPendingReport);
+  get availableCreators(): ReportableCreatorOption[] {
+    return this.reportableCreators.filter((creator) => !creator.hasPendingReport);
+  }
+
+  loadPageData(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    forkJoin({
+      reports: this.getAllPagedReports(),
+      objects: this.getAllPagedObjects(),
+    })
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }),
+      )
+      .subscribe({
+        next: ({ reports, objects }) => {
+          const pendingIds = new Set(
+            reports
+              .filter((report) => report.status?.toLowerCase() === 'pending')
+              .map((report) => report.reportedUserId),
+          );
+
+          this.allReports = reports.map((report) => this.mapReportRow(report));
+          this.reportableCreators = this.buildReportableCreators(objects, pendingIds);
+          this.resolveCreatorNames(this.reportableCreators.map((creator) => creator.id));
+
+          if (!this.selectedReport || !this.allReports.some((r) => r.id === this.selectedReport!.id)) {
+            this.selectedReport = this.filteredReports[0] ?? null;
+          }
+        },
+        error: (error: { error?: { message?: string } }) => {
+          this.allReports = [];
+          this.reportableCreators = [];
+          this.selectedReport = null;
+          this.errorMessage = error?.error?.message ?? 'Failed to load reports.';
+        },
+      });
   }
 
   onSearchEnter(event: Event): void {
     event.preventDefault();
     this.searchQuery = this.draftSearchQuery.trim();
+    if (this.selectedReport && !this.filteredReports.some((r) => r.id === this.selectedReport!.id)) {
+      this.selectedReport = this.filteredReports[0] ?? null;
+    }
   }
 
   onApplyFilters(): void {
     this.filterPanelOpen = false;
+    if (this.selectedReport && !this.filteredReports.some((r) => r.id === this.selectedReport!.id)) {
+      this.selectedReport = this.filteredReports[0] ?? null;
+    }
   }
 
   onResetFilters(): void {
@@ -166,12 +182,10 @@ export class ManagerReportsComponent {
     this.selectedReport = report;
   }
 
-  openReportModal(creator?: ReportableCreator): void {
-    this.reportForm = {
-      creatorId: creator?.id ?? null,
-      category: '',
-      reason: '',
-    };
+  openReportModal(creator?: ReportableCreatorOption): void {
+    this.reportModalCreatorId = creator?.id ?? null;
+    this.reportModalCategory = 'unprofessional_conduct';
+    this.reportModalReason = '';
     this.reportModalOpen = true;
   }
 
@@ -179,8 +193,10 @@ export class ManagerReportsComponent {
     this.reportModalOpen = false;
   }
 
-  submitReport(): void {
-    this.closeReportModal();
+  onReportSubmitted(): void {
+    this.successMessage = 'Creator report submitted successfully.';
+    this.reportModalOpen = false;
+    this.loadPageData();
   }
 
   withdrawReport(report: ManagerReportRow, event: Event): void {
@@ -188,6 +204,17 @@ export class ManagerReportsComponent {
     if (report.status !== 'Pending') {
       return;
     }
+
+    this.managerReportsService.withdrawReport(report.id).subscribe({
+      next: () => {
+        this.successMessage = 'Report withdrawn.';
+        this.loadPageData();
+      },
+      error: (error: { error?: { message?: string } }) => {
+        this.errorMessage = error?.error?.message ?? 'Failed to withdraw report.';
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   formatStatus(status: ReportStatus): string {
@@ -210,5 +237,183 @@ export class ManagerReportsComponent {
 
   trackByReportId(_: number, report: ManagerReportRow): number {
     return report.id;
+  }
+
+  /** Build report reason from query params when redirected from reviews page. */
+  static buildReasonFromReviewQuery(params: {
+    reviewId?: string;
+    objectName?: string;
+    touristName?: string;
+    rating?: string;
+    creatorName?: string;
+    reply?: string;
+    category?: string;
+    autoDetected?: string;
+  }): string {
+    const reviewId = Number(params.reviewId);
+    if (!Number.isFinite(reviewId) || !params.reply?.trim()) {
+      return params.reply?.trim() ?? '';
+    }
+
+    return buildReviewReportReason({
+      reviewId,
+      objectName: params.objectName ?? 'Object',
+      touristName: params.touristName ?? 'Tourist',
+      touristRating: Number(params.rating) || 0,
+      creatorName: params.creatorName ?? 'Content creator',
+      creatorResponse: params.reply,
+      category: params.category ?? 'unprofessional_conduct',
+      autoDetected: params.autoDetected === '1' || params.autoDetected === 'true',
+    });
+  }
+
+  private mapReportRow(report: ManagerReportDto): ManagerReportRow {
+    const status = this.normalizeStatus(report.status);
+    return {
+      id: report.id,
+      reportedUserId: report.reportedUserId,
+      reportedUserName: report.reportedUserName?.trim() || `Creator #${report.reportedUserId}`,
+      reason: report.reason,
+      status,
+      destinationName: report.destinationName?.trim() || '—',
+      createdAt: report.createdAt,
+      resolvedAt: report.resolvedAt ?? undefined,
+      rejectionReason: report.rejectionReason ?? undefined,
+    };
+  }
+
+  private normalizeStatus(status: string): ReportStatus {
+    const value = status?.trim();
+    if (value === 'Approved' || value === 'Rejected' || value === 'Pending') {
+      return value;
+    }
+    return 'Pending';
+  }
+
+  private buildReportableCreators(
+    objects: ObjectDto[],
+    pendingIds: Set<number>,
+  ): ReportableCreatorOption[] {
+    const counts = new Map<number, number>();
+    for (const object of objects) {
+      if (!object.createdByUserId) {
+        continue;
+      }
+      counts.set(object.createdByUserId, (counts.get(object.createdByUserId) ?? 0) + 1);
+    }
+
+    return Array.from(counts.entries())
+      .map(([id, count]) => ({
+        id,
+        name: this.creatorNameById.get(id) ?? `Content creator #${id}`,
+        contentSummary: `${count} object${count === 1 ? '' : 's'} in your destinations`,
+        hasPendingReport: pendingIds.has(id),
+      }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  private getAllPagedReports() {
+    return this.getAllPagedItems((page) =>
+      this.managerReportsService.getMyReports({
+        page,
+        pageSize: 100,
+        sortBy: 'createdAt',
+        sortOrder: 'desc',
+      }),
+    );
+  }
+
+  private getAllPagedObjects() {
+    return this.getAllPagedItems((page) =>
+      this.objectService.getForManager({
+        page,
+        pageSize: 100,
+        sortBy: 'name',
+        sortOrder: 'asc',
+      }),
+    );
+  }
+
+  private getAllPagedItems<T>(
+    fetchPage: (page: number) => import('rxjs').Observable<{ items?: T[]; totalPages?: number }>,
+  ) {
+    return fetchPage(1).pipe(
+      switchMap((firstPage) => {
+        const firstItems = firstPage.items ?? [];
+        const totalPages = Math.max(1, firstPage.totalPages ?? 1);
+        if (totalPages === 1) {
+          return of(firstItems);
+        }
+        const requests = Array.from({ length: totalPages - 1 }, (_, index) => fetchPage(index + 2));
+        return forkJoin(requests).pipe(
+          map((pages) => [...firstItems, ...pages.flatMap((page) => page.items ?? [])]),
+        );
+      }),
+    );
+  }
+
+  private loadManagedDestinationLabel(): void {
+    this.destinationService
+      .getAll({ page: 1, pageSize: 100, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
+      .subscribe({
+        next: (response: unknown) => {
+          const list = Array.isArray(response)
+            ? response
+            : ((response as { items?: unknown[] })?.items ?? []);
+          const destinations = list as Array<{ name?: string }>;
+          const cityNames = [
+            ...new Set(
+              destinations
+                .map((d) => d.name?.trim())
+                .filter((n): n is string => !!n),
+            ),
+          ].sort((a, b) => a.localeCompare(b));
+          this.managedDestination = cityNames.length ? cityNames.join(', ') : 'your destinations';
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.managedDestination = 'your destinations';
+        },
+      });
+  }
+
+  private resolveCreatorNames(creatorIds: number[]): void {
+    for (const userId of creatorIds) {
+      if (this.creatorNameById.has(userId)) {
+        continue;
+      }
+
+      this.http
+        .get<{ firstName?: string; lastName?: string; email?: string }>(
+          `${environment.apiUrl}/users/${userId}`,
+        )
+        .pipe(catchError(() => of(null)))
+        .subscribe((user) => {
+          const fullName = user
+            ? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || user.email?.trim() || ''
+            : '';
+          if (fullName) {
+            this.creatorNameById.set(userId, fullName);
+            this.applyCreatorNamesToLists();
+          }
+        });
+    }
+  }
+
+  private applyCreatorNamesToLists(): void {
+    this.reportableCreators = this.reportableCreators.map((creator) => ({
+      ...creator,
+      name: this.creatorNameById.get(creator.id) ?? creator.name,
+    }));
+    this.allReports = this.allReports.map((report) => ({
+      ...report,
+      reportedUserName:
+        this.creatorNameById.get(report.reportedUserId) ?? report.reportedUserName,
+    }));
+    if (this.selectedReport) {
+      const updated = this.allReports.find((report) => report.id === this.selectedReport!.id);
+      this.selectedReport = updated ?? null;
+    }
+    this.cdr.detectChanges();
   }
 }
