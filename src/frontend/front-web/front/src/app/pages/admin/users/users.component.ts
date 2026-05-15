@@ -45,7 +45,7 @@ const USERS_LOAD_TIMEOUT_MS = 90_000;
 const REVIEWS_LOAD_TIMEOUT_MS = 45_000;
 
 /** While the Tourists tab is open, refetch creator-role requests so new submissions appear without manual refresh. */
-const TOURISTS_TAB_CREATOR_REQUESTS_POLL_MS = 1_000;
+const TOURISTS_TAB_CREATOR_REQUESTS_POLL_MS = 500;
 
 type UsersPageViewTab = 'internal' | 'tourists';
 
@@ -230,9 +230,13 @@ export class UsersComponent implements OnInit {
     document.removeEventListener('visibilitychange', this.onTouristsTabDocumentVisibility);
   }
 
-  private loadDashboardData(): void {
-    this.isLoading = true;
-    this.loadError = '';
+  private loadDashboardData(options?: { silent?: boolean }): void {
+    const silent = options?.silent === true;
+
+    if (!silent) {
+      this.isLoading = true;
+      this.loadError = '';
+    }
 
     // Load user lists first so the UI can render even if reviews are slow; avoids stuck loading state.
     forkJoin({
@@ -266,7 +270,9 @@ export class UsersComponent implements OnInit {
               [],
               roleTotals
             );
-            this.isLoading = false;
+            if (!silent) {
+              this.isLoading = false;
+            }
             this.cdr.markForCheck();
           }
         ),
@@ -317,6 +323,10 @@ export class UsersComponent implements OnInit {
           this.cdr.markForCheck();
         }),
         catchError((err: unknown) => {
+          if (silent) {
+            return of(null);
+          }
+
           if (err instanceof TimeoutError) {
             this.loadError =
               'Loading took too long. Check that the API is running and reachable, then try again.';
@@ -326,7 +336,9 @@ export class UsersComponent implements OnInit {
           return of(null);
         }),
         finalize(() => {
-          this.isLoading = false;
+          if (!silent) {
+            this.isLoading = false;
+          }
           this.cdr.markForCheck();
         })
       )
@@ -822,6 +834,7 @@ export class UsersComponent implements OnInit {
         if (this.creatorRequestsPage > 1 && (this.creatorRequestsPage - 1) * this.creatorRequestsPageSize >= nextTotal) {
           this.creatorRequestsPage--;
         }
+        this.loadDashboardData({ silent: true });
         this.loadCreatorRequests();
       });
   }
@@ -861,6 +874,7 @@ export class UsersComponent implements OnInit {
         if (this.creatorRequestsPage > 1 && (this.creatorRequestsPage - 1) * this.creatorRequestsPageSize >= nextTotal) {
           this.creatorRequestsPage--;
         }
+        this.loadDashboardData({ silent: true });
         this.loadCreatorRequests();
       });
   }
