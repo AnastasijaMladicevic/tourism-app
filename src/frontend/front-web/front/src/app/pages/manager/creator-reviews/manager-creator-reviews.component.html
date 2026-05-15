@@ -105,6 +105,7 @@
         <span>{{ filteredThreads.length }} items</span>
       </div>
 
+      <div class="queue-panel-body">
       @if (!isLoading && !filteredThreads.length) {
         <p class="empty-note">
           @if (allThreads.length) {
@@ -139,6 +140,7 @@
           </article>
         }
       }
+      </div>
     </aside>
 
     <main class="thread-panel card">
@@ -159,6 +161,7 @@
           </span>
         </header>
 
+        <div class="thread-panel-scroll">
         <div class="conversation">
           <article class="message message-tourist">
             <div class="message-avatar tourist">{{ selectedThread.touristInitials }}</div>
@@ -209,15 +212,19 @@
             </a>
           </div>
         }
+        </div>
       } @else {
+        <div class="thread-panel-scroll">
         <div class="thread-empty">
           <span class="material-symbols-outlined">forum</span>
           <p>Select a review from the queue to read the full conversation.</p>
+        </div>
         </div>
       }
     </main>
 
     <aside class="context-panel card">
+      <div class="context-panel-scroll">
       @if (selectedThread) {
         <section class="context-block">
           <h3>Object</h3>
@@ -271,6 +278,7 @@
       } @else {
         <p class="empty-note">Object and creator details appear here.</p>
       }
+      </div>
     </aside>
   </div>
 </section>
