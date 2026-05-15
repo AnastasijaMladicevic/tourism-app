@@ -1,10 +1,15 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { DestinationService } from '../../../services/destination.service';
 import { FilterOption, ObjectDto, ObjectService } from '../../../services/object';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
+import {
+  getMockObjectReviewThreads,
+  isConcerningCreatorReply,
+  ManagerObjectReviewThread,
+} from '../shared/manager-object-review.mock';
 
 interface WorkingHoursRow {
   day: string;
@@ -15,7 +20,7 @@ interface WorkingHoursRow {
 @Component({
   selector: 'app-manager-objects',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedMapComponent],
+  imports: [CommonModule, FormsModule, SharedMapComponent, RouterLink],
   templateUrl: './objects.component.html',
   styleUrls: ['./objects.component.css']
 })
@@ -471,6 +476,41 @@ export class ManagerObjectsComponent implements OnInit {
     }
 
     this.router.navigate(['/manager/objects/review', this.selectedObject.id]);
+  }
+
+  get selectedObjectReviews(): ManagerObjectReviewThread[] {
+    if (!this.selectedObject) {
+      return [];
+    }
+    return getMockObjectReviewThreads(
+      this.selectedObject.id,
+      'Content Creator',
+      this.selectedObject.createdByUserId ?? 201,
+    );
+  }
+
+  get selectedObjectReviewsPreview(): ManagerObjectReviewThread[] {
+    return this.selectedObjectReviews.slice(0, 2);
+  }
+
+  isConcerningReply(thread: ManagerObjectReviewThread): boolean {
+    return isConcerningCreatorReply(thread);
+  }
+
+  formatReviewDate(iso: string): string {
+    return new Date(iso).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  }
+
+  ratingStars(rating: number): string {
+    return '★'.repeat(rating) + '☆'.repeat(5 - rating);
+  }
+
+  reportCreatorQuery(thread: ManagerObjectReviewThread): Record<string, string> {
+    return { creatorId: String(thread.creatorId) };
   }
 
   private getMinRatingFromFilter(value: string): number | undefined {
