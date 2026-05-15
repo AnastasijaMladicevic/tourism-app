@@ -31,6 +31,16 @@ export interface ManagerReportRow {
   reportedUserId: number;
 }
 
+interface DeletionRequestNameHint {
+  requestedByUserId: number;
+  requestedByName?: string;
+}
+
+interface ManagerReportNameHint {
+  reportedUserId: number;
+  reportedUserName?: string;
+}
+
 @Component({
   selector: 'app-manager-reports',
   standalone: true,
@@ -117,11 +127,14 @@ export class ManagerReportsComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    forkJoin({
-      reports: this.getAllPagedReports(),
-      objects: this.getAllPagedObjects(),
-    })
+    this.loadCreatorNameHints()
       .pipe(
+        switchMap(() =>
+          forkJoin({
+            reports: this.getAllPagedReports(),
+            objects: this.getAllPagedObjects(),
+          }),
+        ),
         finalize(() => {
           this.isLoading = false;
           this.cdr.detectChanges();
@@ -135,9 +148,23 @@ export class ManagerReportsComponent implements OnInit {
               .map((report) => report.reportedUserId),
           );
 
+          for (const report of reports) {
+            const name = report.reportedUserName?.trim();
+            if (name && report.reportedUserId > 0) {
+              this.creatorNameById.set(report.reportedUserId, name);
+            }
+          }
+
           this.allReports = reports.map((report) => this.mapReportRow(report));
           this.reportableCreators = this.buildReportableCreators(objects, pendingIds);
-          this.resolveCreatorNames(this.reportableCreators.map((creator) => creator.id));
+
+          const creatorIds = [
+            ...new Set([
+              ...this.reportableCreators.map((creator) => creator.id),
+              ...this.allReports.map((report) => report.reportedUserId),
+            ]),
+          ];
+          this.resolveCreatorNames(creatorIds);
 
           if (!this.selectedReport || !this.allReports.some((r) => r.id === this.selectedReport!.id)) {
             this.selectedReport = this.filteredReports[0] ?? null;
@@ -377,27 +404,86 @@ export class ManagerReportsComponent implements OnInit {
       });
   }
 
-  private resolveCreatorNames(creatorIds: number[]): void {
-    for (const userId of creatorIds) {
-      if (this.creatorNameById.has(userId)) {
-        continue;
-      }
+  private loadCreatorNameHints() {
+    const pageSize = 100;
+    const deletionUrl = `${environment.apiUrl}/deletion-requests`;
+    const reportsUrl = `${environment.apiUrl}/manager-reports/my`;
 
-      this.http
-        .get<{ firstName?: string; lastName?: string; email?: string }>(
-          `${environment.apiUrl}/users/${userId}`,
-        )
-        .pipe(catchError(() => of(null)))
-        .subscribe((user) => {
-          const fullName = user
-            ? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim() || user.email?.trim() || ''
-            : '';
-          if (fullName) {
-            this.creatorNameById.set(userId, fullName);
-            this.applyCreatorNamesToLists();
+    return forkJoin({
+      deletionRequests: this.getAllPagedItems<DeletionRequestNameHint>((page) =>
+        this.http.get<{ items?: DeletionRequestNameHint[]; totalPages?: number }>(deletionUrl, {
+          params: { page, pageSize },
+        }),
+      ).pipe(catchError(() => of([] as DeletionRequestNameHint[]))),
+      managerReports: this.getAllPagedItems<ManagerReportNameHint>((page) =>
+        this.http.get<{ items?: ManagerReportNameHint[]; totalPages?: number }>(reportsUrl, {
+          params: { page, pageSize },
+        }),
+      ).pipe(catchError(() => of([] as ManagerReportNameHint[]))),
+    }).pipe(
+      map(({ deletionRequests, managerReports }) => {
+        for (const request of deletionRequests) {
+          const name = request.requestedByName?.trim();
+          if (name && request.requestedByUserId > 0) {
+            this.creatorNameById.set(request.requestedByUserId, name);
           }
-        });
+        }
+
+        for (const report of managerReports) {
+          const name = report.reportedUserName?.trim();
+          if (name && report.reportedUserId > 0) {
+            this.creatorNameById.set(report.reportedUserId, name);
+          }
+        }
+      }),
+    );
+  }
+
+  private resolveCreatorNames(creatorIds: number[]): void {
+    const pending = creatorIds.filter((id) => id > 0 && !this.hasResolvedCreatorName(id));
+    if (!pending.length) {
+      this.applyCreatorNamesToLists();
+      return;
     }
+
+    forkJoin(
+      pending.map((creatorId) =>
+        this.http
+          .get<{ firstName?: string; lastName?: string; email?: string }>(
+            `${environment.apiUrl}/users/${creatorId}`,
+          )
+          .pipe(
+            map((user) => {
+              const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+              return {
+                creatorId,
+                fullName: fullName || user.email?.trim() || '',
+              };
+            }),
+            catchError(() => of({ creatorId, fullName: '' })),
+          ),
+      ),
+    ).subscribe((results) => {
+      let changed = false;
+      for (const result of results) {
+        if (!result.fullName) {
+          continue;
+        }
+        this.creatorNameById.set(result.creatorId, result.fullName);
+        changed = true;
+      }
+      if (changed || pending.length) {
+        this.applyCreatorNamesToLists();
+      }
+    });
+  }
+
+  private hasResolvedCreatorName(creatorId: number): boolean {
+    const name = this.creatorNameById.get(creatorId)?.trim();
+    if (!name) {
+      return false;
+    }
+    return !/^Content creator #\d+$/i.test(name);
   }
 
   private applyCreatorNamesToLists(): void {

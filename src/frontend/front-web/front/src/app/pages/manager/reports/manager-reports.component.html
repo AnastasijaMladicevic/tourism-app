@@ -95,7 +95,14 @@
         @if (isLoading) {
           <div class="state">Loading reports…</div>
         } @else if (!filteredReports.length) {
-          <div class="state">No reports match your filters.</div>
+          <div class="state">
+            @if (allReports.length) {
+              No reports match your filters.
+            } @else {
+              You have not submitted any creator reports yet. Use Report on a creator below, or report from
+              <a routerLink="/manager/creator-reviews">tourist reviews &amp; creator replies</a>.
+            }
+          </div>
         } @else {
           <div class="table-scroll">
             <table>
