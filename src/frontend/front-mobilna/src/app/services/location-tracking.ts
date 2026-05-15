@@ -292,14 +292,14 @@ export class LocationTrackingService {
   private setTrackingEnabled(enabled: boolean): void {
     this.trackingEnabledSubject.next(enabled);
 
-    if (typeof localStorage === 'undefined') {
+    if (typeof sessionStorage === 'undefined') {
       return;
     }
 
     if (enabled) {
-      localStorage.setItem(this.enabledKey, 'true');
+      sessionStorage.setItem(this.enabledKey, 'true');
     } else {
-      localStorage.removeItem(this.enabledKey);
+      sessionStorage.removeItem(this.enabledKey);
     }
   }
 
@@ -320,11 +320,11 @@ export class LocationTrackingService {
   }
 
   private readEnabled(): boolean {
-    if (typeof localStorage === 'undefined') {
+    if (typeof sessionStorage === 'undefined') {
       return false;
     }
 
-    return localStorage.getItem(this.enabledKey) === 'true';
+    return sessionStorage.getItem(this.enabledKey) === 'true';
   }
 
   private readSnapshot(): TrackedLocation | null {

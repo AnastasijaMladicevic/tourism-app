@@ -203,7 +203,7 @@ export class ProfileComponent implements OnInit {
           return;
         }
 
-        this.shareUrl.set(share.shareUrl);
+        this.shareUrl.set(this.withShareLanguage(share.shareUrl));
         this.shareExpiresAt.set(share.expiresAtUtc);
       });
   }
@@ -313,6 +313,19 @@ export class ProfileComponent implements OnInit {
       return document.execCommand('copy');
     } finally {
       document.body.removeChild(textarea);
+    }
+  }
+
+  private withShareLanguage(shareUrl: string): string {
+    const language = this.translationService.language();
+
+    try {
+      const url = new URL(shareUrl);
+      url.searchParams.set('lang', language);
+      return url.toString();
+    } catch {
+      const separator = shareUrl.includes('?') ? '&' : '?';
+      return `${shareUrl}${separator}lang=${encodeURIComponent(language)}`;
     }
   }
 

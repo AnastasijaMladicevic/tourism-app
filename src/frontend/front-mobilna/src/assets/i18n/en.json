@@ -250,7 +250,7 @@
     "beenThere": "I've been there",
     "visitedDestination": "Destination",
     "visitedLocality": "Locality",
-    "shareLocationTitle": "Share location",
+    "shareLocationTitle": "SHARE LOCATION",
     "shareLocationBody": "Generate a temporary link to share your current location with a friend.",
     "shareHours": "{{hours}}h",
     "shareLoading": "Preparing...",
