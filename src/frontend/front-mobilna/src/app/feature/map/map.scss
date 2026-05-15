@@ -1,8 +1,8 @@
 .map-page {
   position: relative;
   width: 100%;
-  height: 100dvh;
-  min-height: 100dvh;
+  height: var(--map-viewport-height, 100dvh);
+  min-height: var(--map-viewport-height, 100dvh);
   overflow: hidden;
   font-family: 'DM Sans', sans-serif;
 }
@@ -749,6 +749,11 @@ body.route-navigation-active app-floating-ai-assistant {
   .search-bar--hidden,
   .filter-chips--hidden {
     transform: translateY(-10px);
+  }
+
+  .search-bar--hidden,
+  .filter-chips--hidden {
+    display: none;
   }
 
   .map-controls--hidden {

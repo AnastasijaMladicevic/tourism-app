@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { Router } from '@angular/router';
+import { NavigationExtras, Router } from '@angular/router';
 import { catchError, firstValueFrom, of, timeout } from 'rxjs';
 
 import { ActivityDto, ActivityService } from '../../services/activity';
@@ -120,7 +120,7 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
   }
 
   close(): void {
-    void this.router.navigate(['/map']);
+    void this.navigateBackToMap();
   }
 
   @HostListener('window:resize')
@@ -162,7 +162,7 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
 
   chooseOnMap(): void {
     this.routeBuilderStateService.requestMapPicking();
-    void this.router.navigate(['/map']);
+    void this.navigateBackToMap();
   }
 
   viewSelectedOnMap(): void {
@@ -170,8 +170,7 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     if (!selectedResult || selectedResult.lat == null || selectedResult.lng == null) {
       return;
     }
-
-    void this.router.navigate(['/map'], {
+    void this.navigateBackToMap({
       state: {
         lat: selectedResult.lat,
         lng: selectedResult.lng,
@@ -297,15 +296,14 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
 
     try {
       this.storeRecentItem(selectedResult);
-      this.routeBuilderStateService.addRoutePoint({
+      this.routeBuilderStateService.addRoutePoint( {
         id: selectedResult.id,
         name: selectedResult.name,
         type: selectedResult.markerType || selectedResult.typeName || selectedResult.category,
         lat: selectedResult.lat,
         lng: selectedResult.lng,
       });
-
-      await this.router.navigate(['/map']);
+      await this.navigateBackToMap();
     } finally {
       this.isSubmitting = false;
     }
@@ -1137,5 +1135,27 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
 
     document.documentElement.classList.toggle('route-add-stop-open', isOpen);
     document.body.classList.toggle('route-add-stop-open', isOpen);
+  }
+
+  private async navigateBackToMap(extras?: NavigationExtras): Promise<boolean> {
+    this.dismissActiveInput();
+    this.syncAddStopPageState(false);
+
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
+
+    return this.router.navigate(['/map'], extras);
+  }
+
+  private dismissActiveInput(): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    const activeElement = document.activeElement;
+    if (activeElement instanceof HTMLElement) {
+      activeElement.blur();
+    }
   }
 }
