@@ -10,6 +10,10 @@ export interface ReviewDto {
   userFullName: string;
   objectId: number;
   objectName: string;
+  objectTypeName?: string;
+  localityName?: string | null;
+  destinationName?: string | null;
+  address?: string | null;
   rating: number;
   text: string;
   creatorResponse?: string | null;
