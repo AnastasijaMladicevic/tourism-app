@@ -911,6 +911,8 @@
     "endTime": "Ora di fine",
     "priorityTitle": "Segna come priorita",
     "conflictMessage": "Questo orario si sovrappone a \"{{title}}\" alle {{time}}.",
+    "estimatedScheduleTitle": "Programma stimato",
+    "estimatedScheduleBody": "Questo evento finira intorno alle {{time}} in base alle impostazioni correnti.",
     "scheduleTitle": "Organizza il tuo evento",
     "backAria": "Torna al pianificatore",
     "saving": "Salvataggio...",
