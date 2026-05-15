@@ -14,7 +14,7 @@ const LANGUAGE_LABEL_KEYS: Record<AppLanguage, string> = {
 @Injectable({ providedIn: 'root' })
 export class TranslationService {
   private readonly http = inject(HttpClient);
-  private readonly translationAssetVersion = '2026-05-14-two-factor-auth';
+  private readonly translationAssetVersion = '2026-05-15-google-auth';
   private readonly languageStorageKey = 'spirego-session-language';
   private readonly activeLanguage = signal<AppLanguage>(this.readStoredLanguage());
   private translations: Record<string, string> = {};

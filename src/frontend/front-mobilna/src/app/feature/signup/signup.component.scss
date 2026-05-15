@@ -201,6 +201,36 @@ select {
   }
 }
 
+.social-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.social-divider {
+  color: var(--text-gray);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.google-button-shell {
+  display: flex;
+  justify-content: center;
+}
+
+.google-button-container {
+  width: 100%;
+  max-width: 320px;
+}
+
+.google-loading {
+  color: var(--text-gray);
+  font-size: 12px;
+  text-align: center;
+}
+
 /* Login link */
 .login-link {
   display: flex;

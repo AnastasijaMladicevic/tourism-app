@@ -1,6 +1,7 @@
-@if (!isOpen()) {
+@if (isVisible() && !isOpen()) {
   <button
     class="ai-fab"
+    [class.ai-fab--lifted]="isLiftedForMoreMenu()"
     type="button"
     (click)="togglePanel()"
     [attr.aria-label]="'support.aiFloatingOpen' | translate"
@@ -10,7 +11,7 @@
   </button>
 }
 
-@if (isOpen()) {
+@if (isVisible() && isOpen()) {
   <div class="ai-overlay" (click)="closePanel()">
     <section class="ai-panel" (click)="$event.stopPropagation()">
       <header class="ai-panel__header">

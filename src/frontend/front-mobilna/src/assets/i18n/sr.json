@@ -103,7 +103,8 @@
     "map": "Mapa",
     "favorites": "Favoriti",
     "planner": "Planer",
-    "profile": "Profil"
+    "profile": "Profil",
+    "more": "Još"
   },
   "home": {
     "greeting": "Zdravo, drago nam je što ste ponovo tu",
@@ -134,11 +135,13 @@
     "rememberMe": "Zapamti me",
     "loggingIn": "Prijavljivanje...",
     "logIn": "Prijavi se",
+    "orContinueWithGoogle": "ili nastavi pomoću Google naloga",
     "noAccount": "Nemaš nalog?",
     "signUp": "Registruj se",
     "forgotPassword": "Zaboravljena lozinka?",
     "onlyTourists": "Samo turisti mogu da se prijave ovde.",
     "invalidCredentials": "Neispravan email ili lozinka.",
+    "googleFailed": "Google prijava trenutno nije uspela.",
     "loginButton": "Prijavi se"
   },
   "forgotPassword": {
@@ -247,7 +250,7 @@
     "beenThere": "Bila sam tu",
     "visitedDestination": "Destinacija",
     "visitedLocality": "Lokalitet",
-    "shareLocationTitle": "Podeli lokaciju",
+    "shareLocationTitle": "PODELI LOKACIJU",
     "shareLocationBody": "Generiši privremeni link za deljenje tvoje trenutne lokacije sa prijateljem.",
     "shareHours": "{{hours}}h",
     "shareLoading": "Pripremam...",

@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using Microsoft.IdentityModel.Tokens;
 using NetTopologySuite.Geometries;
 using System.Security.Cryptography;
 using System.Text;
@@ -26,7 +30,12 @@ namespace TuristickiVodic.Services
         private const double LocalityVisitRadiusMeters = 250d;
         private const double DestinationVisitRadiusMeters = 700d;
         private const string DefaultPublicAppBaseUrl = "http://localhost:4200";
-        private const string DefaultAdminAppBaseUrl = "http://localhost:60312";
+        private const string DefaultAdminAppBaseUrl = "http://localhost:4200";
+        private static readonly DateTime DefaultGoogleUserDateOfBirth = new(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        private static readonly ConfigurationManager<OpenIdConnectConfiguration> GoogleConfigurationManager = new(
+            "https://accounts.google.com/.well-known/openid-configuration",
+            new OpenIdConnectConfigurationRetriever(),
+            new HttpDocumentRetriever { RequireHttps = true });
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
@@ -795,6 +804,89 @@ namespace TuristickiVodic.Services
             return await IssueTokensAsync(user, loginDto.RememberMe);
         }
 
+        public async Task<AuthResponseDto> GoogleLoginAsync(GoogleLoginDto dto)
+        {
+            var googleIdentity = await ValidateGoogleIdTokenAsync(dto.IdToken);
+            var normalizedEmail = googleIdentity.Email.Trim().ToLowerInvariant();
+
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .Include(u => u.PreferredRegion)
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
+
+            if (user == null)
+            {
+                var touristRole = await _context.Roles
+                    .FirstOrDefaultAsync(r => r.Name == RoleType.Tourist);
+
+                if (touristRole == null)
+                    throw new InvalidOperationException("Tourist role not found");
+
+                var now = DateTime.UtcNow;
+                user = new User
+                {
+                    FirstName = NormalizeGoogleName(googleIdentity.GivenName, "Google"),
+                    LastName = NormalizeGoogleName(googleIdentity.FamilyName, "User"),
+                    DateOfBirth = DefaultGoogleUserDateOfBirth,
+                    Email = normalizedEmail,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(GenerateOpaqueToken()),
+                    Country = null,
+                    PhoneNumber = null,
+                    Language = NormalizeGoogleLanguage(dto.Language),
+                    IsVerified = true,
+                    IsActive = true,
+                    IsBlacklisted = false,
+                    ProfileImageUrl = "/images/profiles/default_icon.png",
+                    RoleId = touristRole.Id,
+                    Role = touristRole,
+                    CreatedAt = now,
+                    UpdatedAt = now
+                };
+
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                var hasChanges = false;
+
+                if (!user.IsVerified)
+                {
+                    user.IsVerified = true;
+                    hasChanges = true;
+                }
+
+                if (string.IsNullOrWhiteSpace(user.FirstName))
+                {
+                    user.FirstName = NormalizeGoogleName(googleIdentity.GivenName, "Google");
+                    hasChanges = true;
+                }
+
+                if (string.IsNullOrWhiteSpace(user.LastName))
+                {
+                    user.LastName = NormalizeGoogleName(googleIdentity.FamilyName, "User");
+                    hasChanges = true;
+                }
+
+                if (hasChanges)
+                {
+                    user.UpdatedAt = DateTime.UtcNow;
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            if (user.IsBlacklisted)
+                throw new InvalidOperationException("User is blacklisted");
+
+            if (!user.IsActive)
+                throw new InvalidOperationException("Account is deactivated");
+
+            if (ShouldRequireTwoFactor(user))
+                return await CreateTwoFactorChallengeAsync(user, dto.RememberMe);
+
+            return await IssueTokensAsync(user, dto.RememberMe);
+        }
+
         public async Task<AuthResponseDto> VerifyTwoFactorLoginAsync(VerifyTwoFactorLoginDto dto)
         {
             var challengeTokenHash = HashOpaqueToken(dto.ChallengeToken);
@@ -1277,11 +1369,73 @@ namespace TuristickiVodic.Services
         private static string GenerateTwoFactorCode()
             => RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
 
+        private async Task<GoogleIdentityPayload> ValidateGoogleIdTokenAsync(string idToken)
+        {
+            var clientId = _configuration["GoogleAuth:ClientId"]?.Trim();
+            if (string.IsNullOrWhiteSpace(clientId))
+                throw new InvalidOperationException("Google login is not configured.");
+
+            var configuration = await GoogleConfigurationManager.GetConfigurationAsync(CancellationToken.None);
+            var tokenHandler = new JsonWebTokenHandler();
+
+            var validationResult = await tokenHandler.ValidateTokenAsync(idToken, new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuers = new[]
+                {
+                    "https://accounts.google.com",
+                    "accounts.google.com"
+                },
+                ValidateAudience = true,
+                ValidAudience = clientId,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKeys = configuration.SigningKeys,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.FromMinutes(2)
+            });
+
+            if (!validationResult.IsValid || validationResult.ClaimsIdentity == null)
+                throw new InvalidOperationException("Google login failed.");
+
+            var identity = validationResult.ClaimsIdentity;
+            var email = identity.FindFirst("email")?.Value;
+            var isEmailVerified = string.Equals(
+                identity.FindFirst("email_verified")?.Value,
+                "true",
+                StringComparison.OrdinalIgnoreCase);
+
+            if (string.IsNullOrWhiteSpace(email) || !isEmailVerified)
+                throw new InvalidOperationException("Google account email is not verified.");
+
+            return new GoogleIdentityPayload(
+                email,
+                identity.FindFirst("given_name")?.Value,
+                identity.FindFirst("family_name")?.Value);
+        }
+
         private static string GenerateOpaqueToken()
         {
             Span<byte> bytes = stackalloc byte[32];
             RandomNumberGenerator.Fill(bytes);
             return Base64UrlEncode(bytes.ToArray());
+        }
+
+        private static string NormalizeGoogleName(string? value, string fallback)
+        {
+            var normalized = string.IsNullOrWhiteSpace(value) ? fallback : value.Trim();
+            return normalized.Length <= 100 ? normalized : normalized[..100];
+        }
+
+        private static string NormalizeGoogleLanguage(string? language)
+        {
+            return language?.Trim().ToLowerInvariant() switch
+            {
+                "en" => "en",
+                "es" => "es",
+                "it" => "it",
+                "me" or "cnr" or "sr" => "sr",
+                _ => "sr"
+            };
         }
 
         private static string MaskEmailAddress(string? email)
@@ -1522,6 +1676,11 @@ namespace TuristickiVodic.Services
 
         private string ResolveAdminAppLoginUrl()
             => $"{ResolveAdminAppBaseUrl()}{AdminAppSettings.LoginPath}";
+
+        private sealed record GoogleIdentityPayload(
+            string Email,
+            string? GivenName,
+            string? FamilyName);
 
         private static bool HasPendingCreatorRoleRequest(User user)
             => user.HasRequestedCreatorRole || user.CreatorRoleRequestStatus == CreatorRoleRequestStatus.Pending;

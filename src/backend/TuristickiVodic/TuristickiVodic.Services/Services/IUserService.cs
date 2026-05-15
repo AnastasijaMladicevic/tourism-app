@@ -18,6 +18,7 @@ namespace TuristickiVodic.Services
         Task<ResetPasswordVerificationDto> VerifyResetCodeAsync(VerifyResetCodeDto dto);
         Task ResetPasswordAsync(ResetPasswordDto dto);
         Task<AuthResponseDto?> LoginAsync(LoginDto loginDto);
+        Task<AuthResponseDto> GoogleLoginAsync(GoogleLoginDto dto);
         Task<AuthResponseDto> VerifyTwoFactorLoginAsync(VerifyTwoFactorLoginDto dto);
         Task<AuthResponseDto> ResendTwoFactorLoginCodeAsync(ResendTwoFactorLoginCodeDto dto);
         Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenDto refreshTokenDto);

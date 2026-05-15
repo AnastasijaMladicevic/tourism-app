@@ -155,6 +155,10 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
     }
 
     this.pendingLocationEnableRequest = false;
+    if (this.autoRegionEnabled) {
+      void this.locationIntelligenceService.setAutoRegionEnabled(false);
+      this.autoRegionEnabled = false;
+    }
     this.locationTrackingService.stopTracking();
     this.locationEnabled = false;
     this.showLocationConsentHint = this.hasLocationConsentContext;
@@ -166,8 +170,18 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
   }
 
   setAutoRegionEnabled(enabled: boolean): void {
-    this.locationIntelligenceService.setAutoRegionEnabled(enabled);
+    if (enabled && !this.locationTrackingService.isTrackingEnabled()) {
+      this.setLocationEnabled(true);
+      if (!this.locationTrackingService.isTrackingEnabled()) {
+        this.autoRegionEnabled = false;
+        this.cdr.markForCheck();
+        return;
+      }
+    }
+
     this.autoRegionEnabled = enabled;
+    void this.locationIntelligenceService.setAutoRegionEnabled(enabled);
+    this.cdr.markForCheck();
   }
 
   async saveQuietZone(kind: QuietZoneKind): Promise<void> {

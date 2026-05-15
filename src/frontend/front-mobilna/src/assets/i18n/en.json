@@ -103,7 +103,8 @@
     "map": "Map",
     "favorites": "Favorites",
     "planner": "Planner",
-    "profile": "Profile"
+    "profile": "Profile",
+    "more": "More"
   },
   "home": {
     "greeting": "Hi, glad to see you again",
@@ -134,11 +135,13 @@
     "rememberMe": "Remember me",
     "loggingIn": "Logging in...",
     "logIn": "Log In",
+    "orContinueWithGoogle": "or continue with Google",
     "noAccount": "Don't have an account?",
     "signUp": "Sign Up",
     "forgotPassword": "Forgot password?",
     "onlyTourists": "Only tourists can log in here.",
     "invalidCredentials": "Invalid email or password.",
+    "googleFailed": "Google sign-in is currently unavailable.",
     "loginButton": "Log In"
   },
   "forgotPassword": {
@@ -247,7 +250,7 @@
     "beenThere": "I've been there",
     "visitedDestination": "Destination",
     "visitedLocality": "Locality",
-    "shareLocationTitle": "Share location",
+    "shareLocationTitle": "SHARE LOCATION",
     "shareLocationBody": "Generate a temporary link to share your current location with a friend.",
     "shareHours": "{{hours}}h",
     "shareLoading": "Preparing...",

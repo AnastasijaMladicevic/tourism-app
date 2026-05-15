@@ -409,6 +409,19 @@ export class HomeComponent implements OnInit, OnDestroy {
       ? `${(distanceMeters / 1000).toFixed(1)} km away`
       : `${Math.round(distanceMeters)} m away`;
   }
+  
+  getRegionFlag(): string {
+    const regionId = this.activeRegionId;
+  
+    const flags: Record<number, string> = {
+      1: 'https://flagcdn.com/w40/me.png',
+      2: 'https://flagcdn.com/w40/rs.png',
+      3: 'https://flagcdn.com/w40/es.png',
+      4: 'https://flagcdn.com/w40/it.png',
+    };
+  
+    return flags[regionId] ?? flags[1];
+  }
 
   private calculateDistanceMeters(lat1: number, lon1: number, lat2: number, lon2: number): number {
     const r = 6371000;

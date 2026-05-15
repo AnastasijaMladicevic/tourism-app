@@ -1,7 +1,7 @@
 .ai-fab {
   position: fixed;
   right: 18px;
-  bottom: 84px;
+  bottom: 120px;
   z-index: 1200;
   min-width: 60px;
   height: 60px;
@@ -27,6 +27,10 @@
     font-size: 13px;
     white-space: nowrap;
   }
+}
+
+.ai-fab--lifted {
+  bottom: 188px;
 }
 
 .ai-overlay {
@@ -269,6 +273,10 @@
     bottom: 28px;
   }
 
+  .ai-fab--lifted {
+    bottom: 28px;
+  }
+
   .ai-overlay {
     align-items: center;
     padding: 24px;
@@ -290,6 +298,10 @@
     &__label {
       display: none;
     }
+  }
+
+  .ai-fab--lifted {
+    bottom: 194px;
   }
 
   .ai-overlay {
