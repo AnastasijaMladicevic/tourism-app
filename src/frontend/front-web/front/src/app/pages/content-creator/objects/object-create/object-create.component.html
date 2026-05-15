@@ -293,6 +293,93 @@
     </aside>
   </div>
 
+  @if (isManagerReview && objectId) {
+    <section class="manager-guest-reviews card">
+      <header class="guest-reviews-header">
+        <div>
+          <p class="guest-reviews-eyebrow">Tourist feedback on this object</p>
+          <h2>Guest reviews &amp; creator replies</h2>
+          <p class="guest-reviews-intro">
+            Only tourists can review objects. Read what guests wrote and how the Content Creator
+            responded before approving content or reporting the creator.
+          </p>
+        </div>
+        @if (primaryReportThread) {
+          <a
+            class="report-creator-btn"
+            [routerLink]="['/manager/reports']"
+            [queryParams]="reportCreatorQuery(primaryReportThread)"
+          >
+            <span class="material-symbols-outlined">flag</span>
+            Report creator
+          </a>
+        }
+      </header>
+
+      @if (!managerGuestReviews.length) {
+        <p class="guest-reviews-empty">No guest reviews for this object yet.</p>
+      } @else {
+        <div class="guest-reviews-list">
+          @for (thread of managerGuestReviews; track thread.id) {
+            <article
+              class="guest-review-item"
+              [class.expanded]="isGuestReviewExpanded(thread.id)"
+              [class.flagged]="isConcerningGuestReply(thread)"
+            >
+              <button type="button" class="guest-review-toggle" (click)="toggleGuestReviewExpand(thread.id)">
+                <div class="toggle-main">
+                  <span class="tourist-avatar">{{ thread.touristInitials }}</span>
+                  <div class="toggle-copy">
+                    <strong>{{ thread.touristName }}</strong>
+                    <span>{{ formatGuestReviewDate(thread.createdAt) }} · {{ guestRatingStars(thread.rating) }}</span>
+                  </div>
+                </div>
+                <span class="material-symbols-outlined expand-icon">
+                  {{ isGuestReviewExpanded(thread.id) ? 'expand_less' : 'expand_more' }}
+                </span>
+              </button>
+
+              @if (isGuestReviewExpanded(thread.id)) {
+                <div class="guest-review-thread">
+                  <div class="thread-bubble thread-tourist">
+                    <span class="bubble-role">Tourist review</span>
+                    <p>{{ thread.touristReview }}</p>
+                  </div>
+
+                  @if (thread.creatorResponse?.trim()) {
+                    <div class="thread-bubble thread-creator" [class.concerning]="isConcerningGuestReply(thread)">
+                      <span class="bubble-role">
+                        {{ thread.creatorName }} · Content Creator
+                        @if (isConcerningGuestReply(thread)) {
+                          <em class="concerning-tag">Concerning</em>
+                        }
+                      </span>
+                      <p>{{ thread.creatorResponse }}</p>
+                      <span class="bubble-time">{{ formatGuestReviewDate(thread.creatorResponseAt!) }}</span>
+                    </div>
+                  } @else {
+                    <p class="thread-no-reply">Creator has not replied to this review yet.</p>
+                  }
+
+                  @if (isConcerningGuestReply(thread)) {
+                    <a
+                      class="inline-report-link"
+                      [routerLink]="['/manager/reports']"
+                      [queryParams]="reportCreatorQuery(thread)"
+                    >
+                      <span class="material-symbols-outlined">flag</span>
+                      Report {{ thread.creatorName }}
+                    </a>
+                  }
+                </div>
+              }
+            </article>
+          }
+        </div>
+      }
+    </section>
+  }
+
   @if (showDeclineModal) {
     <div class="object-decline-backdrop" (click)="closeDeclineModal()">
       <section
