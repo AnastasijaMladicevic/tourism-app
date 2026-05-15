@@ -51,6 +51,8 @@ export interface UserDto {
   reviewsCount?: number;
   hasRequestedCreatorRole: boolean;
   creatorRoleRequestStatus: 'None' | 'Pending' | 'Approved' | 'Rejected';
+  adminAppLoginUrl?: string | null;
+  publicAppHomeUrl?: string | null;
 }
 
 export interface AuthResponseDto {
@@ -382,6 +384,11 @@ export class AuthService {
       return user;
     }
 
+    const serverRole = this.normalizeRawRole(user.roleName);
+    if (serverRole && this.getRoleRank(serverRole) > this.getRoleRank(authenticatedRole)) {
+      return user;
+    }
+
     const normalizedUser = {
       ...user,
       roleName: this.mapNormalizedRoleToBackendRole(authenticatedRole),
@@ -510,6 +517,21 @@ export class AuthService {
         return 'Tourist';
       default:
         return role;
+    }
+  }
+
+  private getRoleRank(role: string | null): number {
+    switch (role) {
+      case 'admin':
+        return 300;
+      case 'manager':
+        return 200;
+      case 'content-creator':
+        return 100;
+      case 'tourist':
+        return 0;
+      default:
+        return -1;
     }
   }
 }

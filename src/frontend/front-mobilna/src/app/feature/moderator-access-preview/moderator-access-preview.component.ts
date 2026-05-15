@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, OnDestroy, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import { AuthService, UserDto } from '../../services/auth';
@@ -22,6 +22,9 @@ export class ModeratorAccessPreviewComponent {
   protected readonly feedbackTone = signal<'success' | 'error'>('success');
   protected readonly requestStatus = signal<'none' | 'pending' | 'approved' | 'rejected'>('none');
   protected readonly creatorType = 'Moderator';
+  private readonly requestStatusPollMs = 4000;
+  private requestStatusTimer?: ReturnType<typeof setInterval>;
+  private redirectingToAdmin = false;
 
   protected user: UserDto | null = null;
 
@@ -120,36 +123,15 @@ export class ModeratorAccessPreviewComponent {
     }
 
     this.user = currentUser;
-    this.authService
-      .getById(currentUser.id)
-      .pipe(catchError(() => of(null)))
-      .subscribe((user) => {
-        if (!user) return;
+    this.syncUserState(currentUser);
+    this.refreshCurrentUser();
+    this.requestStatusTimer = setInterval(() => this.refreshCurrentUser(), this.requestStatusPollMs);
+  }
 
-        this.user = user;
-
-        switch (user.creatorRoleRequestStatus) {
-          case 'Pending':
-            this.requestStatus.set('pending');
-            break;
-          case 'Approved':
-            this.requestStatus.set('approved');
-            break;
-          case 'Rejected':
-            this.requestStatus.set('rejected');
-            break;
-          default:
-            this.requestStatus.set('none');
-        }
-      });
-
-    this.authService
-      .getById(currentUser.id)
-      .pipe(catchError(() => of(null)))
-      .subscribe((user) => {
-        if (!user) return;
-        this.user = user;
-      });
+  ngOnDestroy(): void {
+    if (this.requestStatusTimer) {
+      clearInterval(this.requestStatusTimer);
+    }
   }
 
   protected submitRequest(): void {
@@ -172,11 +154,95 @@ export class ModeratorAccessPreviewComponent {
       .subscribe((result) => {
         if (!result || !this.user?.id) return;
 
+        const updatedUser: UserDto = {
+          ...this.user,
+          hasRequestedCreatorRole: true,
+          creatorRoleRequestStatus: 'Pending',
+        };
+        this.authService.setCurrentUser(updatedUser);
+        this.syncUserState(updatedUser);
         this.requestStatus.set('pending');
-
         this.feedbackTone.set('success');
         this.feedback.set(result.message || this.translationService.translate('moderatorAccess.feedback.sendSuccess'));
       });
+  }
+
+  private refreshCurrentUser(): void {
+    if (!this.user?.id) {
+      return;
+    }
+
+    this.authService
+      .getById(this.user.id)
+      .pipe(catchError(() => of(null)))
+      .subscribe((user) => {
+        if (!user) {
+          return;
+        }
+
+        this.syncUserState(user);
+      });
+  }
+
+  private syncUserState(user: UserDto): void {
+    this.user = user;
+
+    const isApproved = user.creatorRoleRequestStatus === 'Approved' || user.roleName === 'ContentCreator';
+
+    switch (user.creatorRoleRequestStatus) {
+      case 'Pending':
+        this.requestStatus.set('pending');
+        break;
+      case 'Approved':
+        this.requestStatus.set('approved');
+        break;
+      case 'Rejected':
+        this.requestStatus.set('rejected');
+        break;
+      default:
+        this.requestStatus.set(isApproved ? 'approved' : 'none');
+        break;
+    }
+
+    if (isApproved) {
+      this.redirectToAdminApp(user);
+    }
+  }
+
+  private redirectToAdminApp(user: UserDto): void {
+    if (this.redirectingToAdmin) {
+      return;
+    }
+
+    const targetUrl = user.adminAppLoginUrl?.trim() || this.resolveAdminLoginFallbackUrl();
+    if (!targetUrl) {
+      return;
+    }
+
+    this.redirectingToAdmin = true;
+    this.feedbackTone.set('success');
+    this.feedback.set('Tvoj zahtev je odobren. Preusmeravamo te na admin aplikaciju.');
+
+    window.setTimeout(() => {
+      window.location.href = targetUrl;
+    }, 1200);
+  }
+
+  private resolveAdminLoginFallbackUrl(): string | null {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+
+    const { origin, hostname, protocol, port } = window.location;
+    if (port === '10201') {
+      return `${protocol}//${hostname}:10202/login`;
+    }
+
+    if (origin.includes('localhost:4200')) {
+      return 'http://localhost:60312/login';
+    }
+
+    return null;
   }
 
   protected iconPath(icon: string): string {

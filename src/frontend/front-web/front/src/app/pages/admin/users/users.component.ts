@@ -45,7 +45,7 @@ const USERS_LOAD_TIMEOUT_MS = 90_000;
 const REVIEWS_LOAD_TIMEOUT_MS = 45_000;
 
 /** While the Tourists tab is open, refetch creator-role requests so new submissions appear without manual refresh. */
-const TOURISTS_TAB_CREATOR_REQUESTS_POLL_MS = 12_000;
+const TOURISTS_TAB_CREATOR_REQUESTS_POLL_MS = 1_000;
 
 type UsersPageViewTab = 'internal' | 'tourists';
 

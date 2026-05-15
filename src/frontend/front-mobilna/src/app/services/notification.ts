@@ -91,6 +91,8 @@ export class NotificationService {
 
     this.hubConnection.on('notificationReceived', (notification: NotificationDto) => {
       this.ngZone.run(() => {
+        const hasExternalAction = this.isExternalActionUrl(notification.actionUrl);
+
         if (this.locationIntelligenceService.shouldSuppressDestinationNotifications(notification.type)) {
           if (!notification.isRead) {
             this.markAsRead(notification.id).subscribe({ error: () => void 0 });
@@ -98,7 +100,7 @@ export class NotificationService {
           return;
         }
 
-        if (!this.notificationPreferencesService.shouldSurfaceNotification(notification.type)) {
+        if (!hasExternalAction && !this.notificationPreferencesService.shouldSurfaceNotification(notification.type)) {
           return;
         }
 
@@ -107,8 +109,7 @@ export class NotificationService {
         }
 
         this.liveNotificationSubject.next(notification);
-        console.log('=== liveNotificationSubject.next() called ===');
-        if (this.notificationPreferencesService.shouldShowBanner(notification.type)) {
+        if (hasExternalAction || this.notificationPreferencesService.shouldShowBanner(notification.type)) {
           this.liveBannerSubject.next(notification);
         }
       });
