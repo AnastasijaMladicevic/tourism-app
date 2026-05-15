@@ -214,23 +214,16 @@
               This reply was flagged as potentially inappropriate (including non-English phrases).
               Submit a creator report for Admin review.
             </p>
-            <button type="button" class="primary-btn compact" (click)="openReportModal(selectedThread)">
-              Report creator
-            </button>
-          </div>
-        }
-
-        @if (hasCreatorReply(selectedThread)) {
-          <div class="reply-actions-bar">
-            <button type="button" class="ghost-btn report-reply-btn" (click)="openReportModal(selectedThread)">
-              <span class="material-symbols-outlined">flag</span>
-              Report this creator
-            </button>
             @if (hasPendingReportForCreator(selectedThread.creatorId)) {
               <span class="pending-report-note">Pending report on file</span>
+            } @else {
+              <button type="button" class="primary-btn compact" (click)="openReportModal(selectedThread)">
+                Report creator
+              </button>
             }
           </div>
         }
+
         </div>
       } @else {
         <div class="thread-panel-scroll">
@@ -261,19 +254,6 @@
               <p class="context-sub">Creator ID {{ selectedThread.creatorId }}</p>
             </div>
           </div>
-          <button
-            type="button"
-            class="primary-btn full-width"
-            (click)="openReportModal(selectedThread)"
-            [disabled]="hasPendingReportForCreator(selectedThread.creatorId)"
-          >
-            <span class="material-symbols-outlined">flag</span>
-            {{ hasPendingReportForCreator(selectedThread.creatorId) ? 'Report pending' : 'Report this creator' }}
-          </button>
-          <p class="context-hint">
-            Reporting is for account-level issues. Reject or deactivate content from Objects if the
-            problem is limited to one listing.
-          </p>
         </section>
 
         <section class="context-block">
