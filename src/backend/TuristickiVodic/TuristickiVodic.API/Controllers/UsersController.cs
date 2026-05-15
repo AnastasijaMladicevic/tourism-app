@@ -620,6 +620,28 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
+        [HttpPost("{id}/demote-creator")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DemoteCreatorRole(int id)
+        {
+            try
+            {
+                var result = await _userService.DemoteCreatorRoleAsync(id);
+                if (!result)
+                    return NotFound();
+
+                return Ok(new { message = "Content creator moved back to tourist role successfully" });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         // Samo Admin može da aktivira/deaktivira korisnike
         [HttpPost("{id}/toggle-active")]
         [Authorize(Roles = "Admin")]

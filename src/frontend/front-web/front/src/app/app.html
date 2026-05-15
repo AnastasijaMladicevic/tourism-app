@@ -1,1 +1,6 @@
+<div class="role-redirect-banner" *ngIf="roleRedirectNotice()">
+  <strong>Obavestenje</strong>
+  <span>{{ roleRedirectNotice() }}</span>
+</div>
+
 <router-outlet></router-outlet>

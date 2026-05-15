@@ -150,6 +150,36 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 if (isRevoked)
                 {
                     context.Fail("Token has been revoked.");
+                    return;
+                }
+
+                var userIdClaim = context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (!int.TryParse(userIdClaim, out var userId))
+                {
+                    context.Fail("Token does not contain a valid user id.");
+                    return;
+                }
+
+                var user = await db.Users
+                    .Include(x => x.Role)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.Id == userId);
+
+                if (user == null || user.Role == null)
+                {
+                    context.Fail("User not found.");
+                    return;
+                }
+
+                var tokenRole = NormalizeRoleValue(context.Principal?.FindFirst(ClaimTypes.Role)?.Value);
+                var databaseRole = NormalizeRoleValue(user.Role.Name.ToString());
+
+                if (!string.IsNullOrWhiteSpace(tokenRole) &&
+                    !string.IsNullOrWhiteSpace(databaseRole) &&
+                    !string.Equals(tokenRole, databaseRole, StringComparison.Ordinal) &&
+                    GetRoleRank(tokenRole) > GetRoleRank(databaseRole))
+                {
+                    context.Fail("Token role is outdated.");
                 }
             }
         };
@@ -395,6 +425,31 @@ static bool IsAllowedDevelopmentOrigin(string origin)
         return false;
 
     return ipAddress.AddressFamily == AddressFamily.InterNetwork && IsPrivateIpv4(ipAddress);
+}
+
+static string NormalizeRoleValue(string? role)
+{
+    if (string.IsNullOrWhiteSpace(role))
+        return string.Empty;
+
+    return role
+        .Trim()
+        .ToLowerInvariant()
+        .Replace("_", string.Empty)
+        .Replace("-", string.Empty)
+        .Replace(" ", string.Empty);
+}
+
+static int GetRoleRank(string normalizedRole)
+{
+    return normalizedRole switch
+    {
+        "admin" => 300,
+        "manager" => 200,
+        "contentcreator" => 100,
+        "tourist" => 0,
+        _ => 0
+    };
 }
 
 static bool IsPrivateIpv4(IPAddress ipAddress)

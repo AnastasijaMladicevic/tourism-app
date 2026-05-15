@@ -29,6 +29,7 @@ export interface UserDto {
   preferredRegionId?: number | null;
   preferredRegionName?: string | null;
   preferredRegionCode?: string | null;
+  publicAppHomeUrl?: string | null;
 }
 
 /** Matches TuristickiVodic.Core.DTO.UpdateUserDto — profile fields admins may update (email is not included). */

@@ -26,7 +26,7 @@ namespace TuristickiVodic.Services
         private const double LocalityVisitRadiusMeters = 250d;
         private const double DestinationVisitRadiusMeters = 700d;
         private const string DefaultPublicAppBaseUrl = "http://localhost:4200";
-        private const string DefaultAdminAppBaseUrl = "http://localhost:4200";
+        private const string DefaultAdminAppBaseUrl = "http://localhost:60312";
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
@@ -1052,6 +1052,35 @@ namespace TuristickiVodic.Services
             return true;
         }
 
+        public async Task<bool> DemoteCreatorRoleAsync(int userId)
+        {
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return false;
+
+            if (user.Role.Name != RoleType.ContentCreator)
+                throw new InvalidOperationException("Only content creators can be moved back to tourist role.");
+
+            var touristRole = await _context.Roles
+                .FirstOrDefaultAsync(r => r.Name == RoleType.Tourist);
+
+            if (touristRole == null)
+                throw new KeyNotFoundException("Tourist role not found.");
+
+            user.RoleId = touristRole.Id;
+            user.Role = touristRole;
+            user.HasRequestedCreatorRole = false;
+            user.CreatorRoleRequestStatus = CreatorRoleRequestStatus.None;
+            user.UpdatedAt = DateTime.UtcNow;
+            _context.Notifications.Add(CreateCreatorRoleRevokedNotification(user));
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<bool> ToggleUserActiveAsync(int userId, bool isActive)
         {
             var user = await _context.Users.FindAsync(userId);
@@ -1474,10 +1503,13 @@ namespace TuristickiVodic.Services
         {
             var configuredBaseUrl = _configuration["PublicApp:BaseUrl"];
             if (!string.IsNullOrWhiteSpace(configuredBaseUrl))
-                return configuredBaseUrl;
+                return configuredBaseUrl.Trim().TrimEnd('/');
 
             return DefaultPublicAppBaseUrl;
         }
+
+        private string ResolvePublicAppHomeUrl()
+            => $"{ResolvePublicAppBaseUrl()}{PublicAppSettings.HomePath}";
 
         private string ResolveAdminAppBaseUrl()
         {
@@ -1527,6 +1559,19 @@ namespace TuristickiVodic.Services
                 Title = title,
                 Message = message,
                 ActionUrl = approved ? targetLoginUrl : null,
+                CreatedAt = DateTime.UtcNow
+            };
+        }
+
+        private Notification CreateCreatorRoleRevokedNotification(User user)
+        {
+            return new Notification
+            {
+                UserId = user.Id,
+                Type = NotificationType.CreatorRoleAccessRevoked,
+                Title = "ContentCreator uloga je uklonjena",
+                Message = "Tvoja ContentCreator uloga je uklonjena. Vracamo te na turisticku aplikaciju.",
+                ActionUrl = ResolvePublicAppHomeUrl(),
                 CreatedAt = DateTime.UtcNow
             };
         }
@@ -1812,6 +1857,7 @@ namespace TuristickiVodic.Services
             dto.HasRequestedCreatorRole = HasPendingCreatorRoleRequest(user);
             dto.CreatorRoleRequestStatus = ResolveCreatorRoleRequestStatus(user).ToString();
             dto.AdminAppLoginUrl = ResolveAdminAppLoginUrl();
+            dto.PublicAppHomeUrl = ResolvePublicAppHomeUrl();
             await PopulateUserMetricsAsync(dto, user.Id);
             return dto;
         }

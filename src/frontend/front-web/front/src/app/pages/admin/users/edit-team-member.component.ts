@@ -298,17 +298,13 @@ export class EditTeamMemberComponent {
       }
     }
 
-    if (this.roleAtLoad === 'content-creator' && this.touristRoleSelection === 'tourist') {
-      this.submitError =
-        'Changing this account from Content Creator to Tourist is not supported by the API yet. Keep Content Creator selected to save profile changes.';
-      return;
-    }
-
     const updateDto = this.buildUpdatePayload();
     this.isSubmitting = true;
 
     const promoteTouristToCreator =
       this.roleAtLoad === 'tourist' && this.touristRoleSelection === 'content-creator';
+    const demoteCreatorToTourist =
+      this.roleAtLoad === 'content-creator' && this.touristRoleSelection === 'tourist';
 
     this.adminUsers
       .updateUser(this.userId, updateDto)
@@ -328,6 +324,12 @@ export class EditTeamMemberComponent {
             return of(null);
           }
           return this.adminUsers.approveCreatorRole(this.userId);
+        }),
+        switchMap(() => {
+          if (!demoteCreatorToTourist) {
+            return of(null);
+          }
+          return this.adminUsers.demoteCreatorRole(this.userId);
         }),
         finalize(() => {
           this.isSubmitting = false;

@@ -20,6 +20,7 @@ namespace TuristickiVodic.Core.Models
         AdminRepeatedManagerReports = 16,
         AdminCreatorMultipleRejectedContent = 17,
         CreatorRoleRequestApproved = 18,
-        CreatorRoleRequestRejected = 19
+        CreatorRoleRequestRejected = 19,
+        CreatorRoleAccessRevoked = 20
     }
 }

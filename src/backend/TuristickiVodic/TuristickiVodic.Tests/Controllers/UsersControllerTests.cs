@@ -1092,6 +1092,46 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
+        public async Task DemoteCreatorRole_KadaKorisnikJeContentCreator_VracaOk()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.DemoteCreatorRoleAsync(8)).ReturnsAsync(true);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            var result = await controller.DemoteCreatorRole(8);
+
+            result.Should().BeOfType<OkObjectResult>();
+        }
+
+        [Fact]
+        public async Task DemoteCreatorRole_KadaKorisnikNijePronadjen_VracaNotFound()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.DemoteCreatorRoleAsync(999)).ReturnsAsync(false);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            var result = await controller.DemoteCreatorRole(999);
+
+            result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Fact]
+        public async Task DemoteCreatorRole_KadaDemocijaNijeDozvoljena_VracaBadRequest()
+        {
+            var mockService = new Mock<IUserService>();
+            mockService.Setup(s => s.DemoteCreatorRoleAsync(8))
+                .ThrowsAsync(new InvalidOperationException("Only content creators can be moved back to tourist role."));
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            var result = await controller.DemoteCreatorRole(8);
+
+            result.Should().BeOfType<BadRequestObjectResult>();
+        }
+
+        [Fact]
         public async Task RemoveProfileImage_KadaKorisnikBriseSvojuSliku_VracaOk()
         {
             var mockService = new Mock<IUserService>();
