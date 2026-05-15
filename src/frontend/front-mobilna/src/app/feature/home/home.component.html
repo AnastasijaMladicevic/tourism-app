@@ -24,8 +24,13 @@
       </div>
       <div class="region-wrapper">
         <button class="filter-btn region-btn" type="button" (click)="openRegionPicker()">
-          <mat-icon class="region-icon">public</mat-icon>
-        
+
+          <img
+            class="region-flag"
+            [src]="getRegionFlag()"
+            [alt]="activeRegionNameKey | translate"
+          />
+              
           <span>
             {{ activeRegionNameKey | translate }}
           </span>

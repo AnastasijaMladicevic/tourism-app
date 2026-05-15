@@ -29,6 +29,10 @@
   }
 }
 
+.ai-fab--lifted {
+  bottom: 150px;
+}
+
 .ai-overlay {
   position: fixed;
   inset: 0;
@@ -269,6 +273,10 @@
     bottom: 28px;
   }
 
+  .ai-fab--lifted {
+    bottom: 28px;
+  }
+
   .ai-overlay {
     align-items: center;
     padding: 24px;
@@ -290,6 +298,10 @@
     &__label {
       display: none;
     }
+  }
+
+  .ai-fab--lifted {
+    bottom: 156px;
   }
 
   .ai-overlay {

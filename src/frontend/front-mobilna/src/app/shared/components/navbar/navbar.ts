@@ -27,6 +27,7 @@ interface NavItem {
 export class NavbarComponent implements OnInit, OnDestroy {
   activeRoute = '';
   notificationsUnreadCount = 0;
+  moreMenuOpen = false;
   private unreadSub?: Subscription;
   private routerSub?: Subscription;
 
@@ -49,6 +50,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
     { labelKey: 'nav.profile', icon: 'person_outline', route: '/profile' },
     { labelKey: 'settings.title', icon: 'settings', route: '/settings' },
   ];
+  mobilePrimaryNavItems: NavItem[] = this.navItems.filter(
+    (item) => item.route !== '/profile' && item.route !== '/settings',
+  );
+  mobileMoreNavItems: NavItem[] = this.navItems.filter(
+    (item) => item.route === '/profile' || item.route === '/settings',
+  );
 
   constructor(
     private router: Router,
@@ -60,6 +67,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
       .pipe(filter((e) => e instanceof NavigationEnd))
       .subscribe((e: NavigationEnd) => {
         this.activeRoute = e.urlAfterRedirects;
+        this.moreMenuOpen = false;
+        this.emitMoreMenuState();
         this.syncNotificationState();
       });
   }
@@ -82,16 +91,44 @@ export class NavbarComponent implements OnInit, OnDestroy {
     return this.activeRoute.startsWith(route);
   }
 
+  isMoreMenuActive(): boolean {
+    return this.mobileMoreNavItems.some((item) => this.isActive(item.route));
+  }
+
+  toggleMoreMenu(): void {
+    this.moreMenuOpen = !this.moreMenuOpen;
+    this.emitMoreMenuState();
+  }
+
+  closeMoreMenu(): void {
+    this.moreMenuOpen = false;
+    this.emitMoreMenuState();
+  }
+
   goTo(route: string): void {
     const protectedRoutes = ['/favorites', '/profile', '/notifications'];
     if (protectedRoutes.includes(route) && !this.authService.isLoggedIn()) {
+      this.moreMenuOpen = false;
+      this.emitMoreMenuState();
       this.router.navigate(['/login'], {
         queryParams: { returnUrl: route }
       });
 
       return;
     }
+    this.moreMenuOpen = false;
+    this.emitMoreMenuState();
     this.router.navigate([route]);
+  }
+
+  private emitMoreMenuState(): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.dispatchEvent(new CustomEvent('spirego-mobile-more-menu', {
+      detail: { open: this.moreMenuOpen },
+    }));
   }
 
   private syncNotificationState(): void {

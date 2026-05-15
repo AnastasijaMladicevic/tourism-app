@@ -103,7 +103,8 @@
     "map": "Map",
     "favorites": "Favorites",
     "planner": "Planner",
-    "profile": "Profile"
+    "profile": "Profile",
+    "more": "More"
   },
   "home": {
     "greeting": "Hi, glad to see you again",
