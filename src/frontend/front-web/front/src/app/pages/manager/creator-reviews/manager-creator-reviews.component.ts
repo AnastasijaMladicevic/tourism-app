@@ -10,6 +10,15 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { environment } from '../../../../environment/environment';
+import { ManagerReportsService } from '../../../services/manager-reports.service';
+import {
+  buildReviewReportReason,
+  isConcerningCreatorReply,
+} from '../shared/concerning-reply.util';
+import {
+  ManagerReportModalComponent,
+  ReportableCreatorOption,
+} from '../shared/manager-report-modal.component';
 import {
   Subject,
   catchError,
@@ -66,7 +75,7 @@ interface ManagerReportNameHint {
 @Component({
   selector: 'app-manager-creator-reviews',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, ManagerReportModalComponent],
   templateUrl: './manager-creator-reviews.component.html',
   styleUrls: ['./manager-creator-reviews.component.css'],
 })
@@ -75,11 +84,14 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly objectService = inject(ObjectService);
   private readonly destinationService = inject(DestinationService);
   private readonly http = inject(HttpClient);
+  private readonly managerReportsService = inject(ManagerReportsService);
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
   private readonly searchInput$ = new Subject<string>();
   private readonly creatorNameById = new Map<number, string>();
+  private readonly pendingReportCreatorIds = new Set<number>();
+  private readonly creatorObjectCounts = new Map<number, number>();
 
   allThreads: ManagerReviewThread[] = [];
   managedDestination = 'your destinations';
@@ -93,6 +105,12 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
 
   isLoading = true;
   errorMessage = '';
+  successMessage = '';
+
+  reportModalOpen = false;
+  reportModalCreatorId: number | null = null;
+  reportModalCategory = 'unprofessional_conduct';
+  reportModalReason = '';
 
   ngOnInit(): void {
     const creatorIdParam = this.route.snapshot.queryParamMap.get('creatorId');
@@ -124,6 +142,9 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.errorMessage = '';
     this.creatorNameById.clear();
+    this.pendingReportCreatorIds.clear();
+    this.creatorObjectCounts.clear();
+    this.successMessage = '';
 
     this.fetchManagerReviewThreads()
       .pipe(
@@ -207,18 +228,77 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   }
 
   isConcerning(thread: ManagerReviewThread): boolean {
-    if (!thread.creatorResponse?.trim()) {
-      return false;
+    return isConcerningCreatorReply({
+      creatorResponse: thread.creatorResponse,
+      touristRating: thread.rating,
+    });
+  }
+
+  hasCreatorReply(thread: ManagerReviewThread): boolean {
+    return !!thread.creatorResponse?.trim();
+  }
+
+  get reportableCreators(): ReportableCreatorOption[] {
+    const map = new Map<number, ReportableCreatorOption>();
+    for (const thread of this.allThreads) {
+      if (!thread.creatorId) {
+        continue;
+      }
+      const existing = map.get(thread.creatorId);
+      const objectCount = this.creatorObjectCounts.get(thread.creatorId) ?? 0;
+      const summary =
+        objectCount > 0
+          ? `${objectCount} object${objectCount === 1 ? '' : 's'} in your destinations`
+          : 'Content in your destinations';
+      map.set(thread.creatorId, {
+        id: thread.creatorId,
+        name: thread.creatorName,
+        contentSummary: existing?.contentSummary ?? summary,
+        hasPendingReport: this.pendingReportCreatorIds.has(thread.creatorId),
+      });
     }
-    const text = thread.creatorResponse.toLowerCase();
-    const flags = [
-      'not our problem',
-      'your fault',
-      'read the listing',
-      'cannot follow',
-      'complaining',
-    ];
-    return flags.some((f) => text.includes(f)) || (thread.rating <= 2 && text.length > 0);
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  openReportModal(thread?: ManagerReviewThread | null): void {
+    const target = thread ?? this.selectedThread;
+    if (!target?.creatorId) {
+      return;
+    }
+
+    const concerning = this.isConcerning(target);
+    this.reportModalCreatorId = target.creatorId;
+    this.reportModalCategory = concerning ? 'unprofessional_conduct' : 'other';
+    this.reportModalReason = target.creatorResponse?.trim()
+      ? buildReviewReportReason({
+          reviewId: target.id,
+          objectName: target.objectName,
+          touristName: target.touristName,
+          touristRating: target.rating,
+          creatorName: target.creatorName,
+          creatorResponse: target.creatorResponse!,
+          category: this.reportModalCategory,
+          autoDetected: concerning,
+        })
+      : '';
+    this.reportModalOpen = true;
+  }
+
+  closeReportModal(): void {
+    this.reportModalOpen = false;
+  }
+
+  onReportSubmitted(): void {
+    if (this.reportModalCreatorId) {
+      this.pendingReportCreatorIds.add(this.reportModalCreatorId);
+    }
+    this.successMessage = 'Creator report submitted successfully.';
+    this.reportModalOpen = false;
+    this.triggerViewUpdate();
+  }
+
+  hasPendingReportForCreator(creatorId: number): boolean {
+    return this.pendingReportCreatorIds.has(creatorId);
   }
 
   isRatingSelected(rating: number): boolean {
@@ -287,10 +367,6 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     return '★'.repeat(clamped) + '☆'.repeat(5 - clamped);
   }
 
-  reportLinkQuery(thread: ManagerReviewThread): Record<string, string> {
-    return { creatorId: String(thread.creatorId) };
-  }
-
   trackByThreadId(_: number, thread: ManagerReviewThread): number {
     return thread.id;
   }
@@ -347,14 +423,34 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
               sortOrder: 'desc',
             }),
           ),
+          myReports: this.getAllPagedItems((page) =>
+            this.managerReportsService.getMyReports({
+              page,
+              pageSize,
+              sortBy: 'createdAt',
+              sortOrder: 'desc',
+            }),
+          ),
         }),
       ),
-      map(({ objects, reviews }) => {
+      map(({ objects, reviews, myReports }) => {
+        this.pendingReportCreatorIds.clear();
+        for (const report of myReports) {
+          if (report.status?.toLowerCase() === 'pending') {
+            this.pendingReportCreatorIds.add(report.reportedUserId);
+          }
+        }
+
+        this.creatorObjectCounts.clear();
         const objectContext = new Map<number, ObjectReviewContext>();
         for (const object of objects) {
           if (!object.createdByUserId) {
             continue;
           }
+          this.creatorObjectCounts.set(
+            object.createdByUserId,
+            (this.creatorObjectCounts.get(object.createdByUserId) ?? 0) + 1,
+          );
           objectContext.set(object.id, {
             creatorId: object.createdByUserId,
             localityName: object.localityName?.trim() ?? '',

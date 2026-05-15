@@ -27,6 +27,13 @@
     </div>
   }
 
+  @if (successMessage) {
+    <div class="inline-alert success-banner" role="status">
+      <span class="material-symbols-outlined">check_circle</span>
+      <p>{{ successMessage }}</p>
+    </div>
+  }
+
   <div class="stats-row">
     <article class="stat-card" data-tone="neutral">
       <p>Threads in destination</p>
@@ -204,12 +211,24 @@
           <div class="inline-alert">
             <span class="material-symbols-outlined">info</span>
             <p>
-              This reply may violate professional conduct guidelines. Consider documenting it when
-              submitting a creator report.
+              This reply was flagged as potentially inappropriate (including non-English phrases).
+              Submit a creator report for Admin review.
             </p>
-            <a class="primary-btn compact" [routerLink]="['/manager/reports']" [queryParams]="reportLinkQuery(selectedThread)">
+            <button type="button" class="primary-btn compact" (click)="openReportModal(selectedThread)">
               Report creator
-            </a>
+            </button>
+          </div>
+        }
+
+        @if (hasCreatorReply(selectedThread)) {
+          <div class="reply-actions-bar">
+            <button type="button" class="ghost-btn report-reply-btn" (click)="openReportModal(selectedThread)">
+              <span class="material-symbols-outlined">flag</span>
+              Report this creator
+            </button>
+            @if (hasPendingReportForCreator(selectedThread.creatorId)) {
+              <span class="pending-report-note">Pending report on file</span>
+            }
           </div>
         }
         </div>
@@ -242,14 +261,15 @@
               <p class="context-sub">Creator ID {{ selectedThread.creatorId }}</p>
             </div>
           </div>
-          <a
+          <button
+            type="button"
             class="primary-btn full-width"
-            [routerLink]="['/manager/reports']"
-            [queryParams]="reportLinkQuery(selectedThread)"
+            (click)="openReportModal(selectedThread)"
+            [disabled]="hasPendingReportForCreator(selectedThread.creatorId)"
           >
             <span class="material-symbols-outlined">flag</span>
-            Report this creator
-          </a>
+            {{ hasPendingReportForCreator(selectedThread.creatorId) ? 'Report pending' : 'Report this creator' }}
+          </button>
           <p class="context-hint">
             Reporting is for account-level issues. Reject or deactivate content from Objects if the
             problem is limited to one listing.
@@ -282,3 +302,13 @@
     </aside>
   </div>
 </section>
+
+<app-manager-report-modal
+  [open]="reportModalOpen"
+  [creators]="reportableCreators"
+  [initialCreatorId]="reportModalCreatorId"
+  [initialCategory]="reportModalCategory"
+  [initialReason]="reportModalReason"
+  (closed)="closeReportModal()"
+  (submitted)="onReportSubmitted()"
+/>
