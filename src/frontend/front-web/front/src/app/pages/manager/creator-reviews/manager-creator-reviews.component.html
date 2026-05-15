@@ -177,7 +177,7 @@
 
           @if (selectedThread.creatorResponse?.trim()) {
             <article class="message message-creator" [class.concerning]="isConcerning(selectedThread)">
-              <div class="message-avatar creator">{{ selectedThread.creatorName.charAt(0) }}</div>
+              <div class="message-avatar creator">{{ creatorInitials(selectedThread.creatorName) }}</div>
               <div class="message-body">
                 <div class="message-meta">
                   <strong>{{ selectedThread.creatorName }}</strong>
@@ -236,7 +236,7 @@
         <section class="context-block creator-block">
           <h3>Content Creator</h3>
           <div class="creator-card">
-            <div class="creator-avatar-lg">{{ selectedThread.creatorName.charAt(0) }}</div>
+            <div class="creator-avatar-lg">{{ creatorInitials(selectedThread.creatorName) }}</div>
             <div>
               <p class="context-title">{{ selectedThread.creatorName }}</p>
               <p class="context-sub">Creator ID {{ selectedThread.creatorId }}</p>

@@ -6,8 +6,10 @@ import {
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { environment } from '../../../../environment/environment';
 import {
   Subject,
   catchError,
@@ -51,6 +53,16 @@ interface ObjectReviewContext {
   destinationName: string;
 }
 
+interface DeletionRequestNameHint {
+  requestedByUserId: number;
+  requestedByName?: string;
+}
+
+interface ManagerReportNameHint {
+  reportedUserId: number;
+  reportedUserName?: string;
+}
+
 @Component({
   selector: 'app-manager-creator-reviews',
   standalone: true,
@@ -62,10 +74,12 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly reviewService = inject(ReviewService);
   private readonly objectService = inject(ObjectService);
   private readonly destinationService = inject(DestinationService);
+  private readonly http = inject(HttpClient);
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
   private readonly searchInput$ = new Subject<string>();
+  private readonly creatorNameById = new Map<number, string>();
 
   allThreads: ManagerReviewThread[] = [];
   managedDestination = 'your destinations';
@@ -109,6 +123,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   loadReviews(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    this.creatorNameById.clear();
 
     this.fetchManagerReviewThreads()
       .pipe(
@@ -129,6 +144,9 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
         next: (threads) => {
           const previousId = this.selectedThread?.id ?? null;
           this.allThreads = threads;
+          this.resolveMissingCreatorNames([
+            ...new Set(threads.map((thread) => thread.creatorId).filter((id) => id > 0)),
+          ]);
           this.applySelectionAfterLoad(previousId);
         },
         error: (error: { error?: { message?: string } }) => {
@@ -277,6 +295,10 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     return thread.id;
   }
 
+  creatorInitials(fullName: string): string {
+    return this.initials(fullName);
+  }
+
   private loadManagedDestinationLabel(): void {
     this.destinationService
       .getAll({ page: 1, pageSize: 100, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
@@ -306,24 +328,27 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   private fetchManagerReviewThreads(): Observable<ManagerReviewThread[]> {
     const pageSize = 100;
 
-    return forkJoin({
-      objects: this.getAllPagedItems((page) =>
-        this.objectService.getForManager({
-          page,
-          pageSize,
-          sortBy: 'name',
-          sortOrder: 'asc',
+    return this.loadCreatorNameHints().pipe(
+      switchMap(() =>
+        forkJoin({
+          objects: this.getAllPagedItems((page) =>
+            this.objectService.getForManager({
+              page,
+              pageSize,
+              sortBy: 'name',
+              sortOrder: 'asc',
+            }),
+          ),
+          reviews: this.getAllPagedItems((page) =>
+            this.reviewService.getAll({
+              page,
+              pageSize,
+              sortBy: 'createdAt',
+              sortOrder: 'desc',
+            }),
+          ),
         }),
       ),
-      reviews: this.getAllPagedItems((page) =>
-        this.reviewService.getAll({
-          page,
-          pageSize,
-          sortBy: 'createdAt',
-          sortOrder: 'desc',
-        }),
-      ),
-    }).pipe(
       map(({ objects, reviews }) => {
         const objectContext = new Map<number, ObjectReviewContext>();
         for (const object of objects) {
@@ -345,16 +370,49 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     );
   }
 
+  private loadCreatorNameHints(): Observable<void> {
+    const pageSize = 100;
+    const deletionUrl = `${environment.apiUrl}/deletion-requests`;
+    const reportsUrl = `${environment.apiUrl}/manager-reports/my`;
+
+    return forkJoin({
+      deletionRequests: this.getAllPagedItems<DeletionRequestNameHint>((page) =>
+        this.http.get<{ items?: DeletionRequestNameHint[]; totalPages?: number }>(deletionUrl, {
+          params: { page, pageSize },
+        }),
+      ).pipe(catchError(() => of([] as DeletionRequestNameHint[]))),
+      managerReports: this.getAllPagedItems<ManagerReportNameHint>((page) =>
+        this.http.get<{ items?: ManagerReportNameHint[]; totalPages?: number }>(reportsUrl, {
+          params: { page, pageSize },
+        }),
+      ).pipe(catchError(() => of([] as ManagerReportNameHint[]))),
+    }).pipe(
+      map(({ deletionRequests, managerReports }) => {
+        for (const request of deletionRequests) {
+          const name = request.requestedByName?.trim();
+          if (name && request.requestedByUserId > 0) {
+            this.creatorNameById.set(request.requestedByUserId, name);
+          }
+        }
+
+        for (const report of managerReports) {
+          const name = report.reportedUserName?.trim();
+          if (name && report.reportedUserId > 0) {
+            this.creatorNameById.set(report.reportedUserId, name);
+          }
+        }
+      }),
+    );
+  }
+
   private mapReviewsToThreads(
     reviews: ReviewDto[],
     objectContext: Map<number, ObjectReviewContext>,
   ): ManagerReviewThread[] {
-    const creatorLabels = new Map<number, string>();
-
     const threads = reviews.map((review) => {
       const context = objectContext.get(review.objectId);
       const creatorId = context?.creatorId ?? 0;
-      const creatorName = this.creatorDisplayName(creatorId, creatorLabels);
+      const creatorName = this.creatorDisplayName(creatorId);
 
       return {
         id: review.id,
@@ -385,19 +443,84 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     );
   }
 
-  private creatorDisplayName(creatorId: number, cache: Map<number, string>): string {
+  private creatorDisplayName(creatorId: number): string {
     if (!creatorId) {
       return 'Unknown creator';
     }
 
-    const cached = cache.get(creatorId);
-    if (cached) {
-      return cached;
+    const known = this.creatorNameById.get(creatorId)?.trim();
+    if (known) {
+      return known;
     }
 
-    const label = `Content creator #${creatorId}`;
-    cache.set(creatorId, label);
-    return label;
+    return `Content creator #${creatorId}`;
+  }
+
+  private resolveMissingCreatorNames(creatorIds: number[]): void {
+    const pending = creatorIds.filter((id) => !this.hasResolvedCreatorName(id));
+    if (!pending.length) {
+      return;
+    }
+
+    forkJoin(
+      pending.map((creatorId) =>
+        this.http
+          .get<{ firstName?: string; lastName?: string; email?: string }>(
+            `${environment.apiUrl}/users/${creatorId}`,
+          )
+          .pipe(
+            map((user) => {
+              const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+              return {
+                creatorId,
+                fullName: fullName || user.email?.trim() || '',
+              };
+            }),
+            catchError(() => of({ creatorId, fullName: '' })),
+          ),
+      ),
+    )
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((results) => {
+        let changed = false;
+
+        for (const result of results) {
+          if (!result.fullName) {
+            continue;
+          }
+
+          this.creatorNameById.set(result.creatorId, result.fullName);
+          changed = true;
+        }
+
+        if (!changed) {
+          return;
+        }
+
+        this.applyCreatorNamesToThreads();
+        this.triggerViewUpdate();
+      });
+  }
+
+  private hasResolvedCreatorName(creatorId: number): boolean {
+    const name = this.creatorNameById.get(creatorId)?.trim();
+    if (!name) {
+      return false;
+    }
+
+    return !/^Content creator #\d+$/i.test(name);
+  }
+
+  private applyCreatorNamesToThreads(): void {
+    this.allThreads = this.allThreads.map((thread) => ({
+      ...thread,
+      creatorName: this.creatorDisplayName(thread.creatorId),
+    }));
+
+    if (this.selectedThread) {
+      const updated = this.allThreads.find((thread) => thread.id === this.selectedThread!.id);
+      this.selectedThread = updated ?? null;
+    }
   }
 
   private initials(fullName?: string | null): string {
