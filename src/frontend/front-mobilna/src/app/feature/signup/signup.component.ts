@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -49,6 +49,7 @@ export class SignupComponent {
     private router: Router,
     private translationService: TranslationService,
     private googleIdentityService: GoogleIdentityService,
+    private cdr: ChangeDetectorRef,
   ) {
     this.form = this.fb.group(
       {
@@ -78,7 +79,7 @@ export class SignupComponent {
 
   ngAfterViewInit(): void {
     this.viewReady = true;
-    void this.tryRenderGoogleButton();
+    this.scheduleGoogleButtonRender();
   }
 
   private passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
@@ -159,7 +160,8 @@ export class SignupComponent {
     this.authService.getPublicAuthSettings().subscribe({
       next: (settings) => {
         this.googleClientId = settings.googleClientId?.trim() || null;
-        void this.tryRenderGoogleButton();
+        this.cdr.detectChanges();
+        this.scheduleGoogleButtonRender();
       },
       error: () => {
         this.googleClientId = null;
@@ -167,8 +169,19 @@ export class SignupComponent {
     });
   }
 
+  private scheduleGoogleButtonRender(): void {
+    setTimeout(() => {
+      void this.tryRenderGoogleButton();
+    }, 0);
+  }
+
   private async tryRenderGoogleButton(): Promise<void> {
-    if (!this.viewReady || !this.googleClientId || !this.googleButtonContainer?.nativeElement) {
+    if (!this.viewReady || !this.googleClientId) {
+      return;
+    }
+
+    if (!this.googleButtonContainer?.nativeElement) {
+      this.scheduleGoogleButtonRender();
       return;
     }
 
@@ -185,6 +198,7 @@ export class SignupComponent {
       this.googleClientId = null;
     } finally {
       this.googleLoading = false;
+      this.cdr.detectChanges();
     }
   }
 

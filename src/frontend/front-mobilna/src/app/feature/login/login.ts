@@ -63,7 +63,7 @@ export class LoginComponent {
 
   ngAfterViewInit(): void {
     this.viewReady = true;
-    void this.tryRenderGoogleButton();
+    this.scheduleGoogleButtonRender();
   }
 
   passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
@@ -145,7 +145,8 @@ export class LoginComponent {
     this.authService.getPublicAuthSettings().subscribe({
       next: (settings) => {
         this.googleClientId = settings.googleClientId?.trim() || null;
-        void this.tryRenderGoogleButton();
+        this.cdr.detectChanges();
+        this.scheduleGoogleButtonRender();
       },
       error: () => {
         this.googleClientId = null;
@@ -153,8 +154,19 @@ export class LoginComponent {
     });
   }
 
+  private scheduleGoogleButtonRender(): void {
+    setTimeout(() => {
+      void this.tryRenderGoogleButton();
+    }, 0);
+  }
+
   private async tryRenderGoogleButton(): Promise<void> {
-    if (!this.viewReady || !this.googleClientId || !this.googleButtonContainer?.nativeElement) {
+    if (!this.viewReady || !this.googleClientId) {
+      return;
+    }
+
+    if (!this.googleButtonContainer?.nativeElement) {
+      this.scheduleGoogleButtonRender();
       return;
     }
 
