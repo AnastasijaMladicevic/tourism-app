@@ -1,0 +1,248 @@
+<section class="manager-reviews-page">
+  <header class="page-head">
+    <div class="page-head-copy">
+      <p class="breadcrumbs">Dashboard <span>&gt;</span> Reviews &amp; Replies</p>
+      <h1>Creator review activity</h1>
+      <p class="subtle-text">
+        Read-only view of tourist reviews and Content Creator replies on objects in
+        {{ managedDestination }}. Use this context before escalating a creator report.
+      </p>
+    </div>
+    <a class="ghost-btn" routerLink="/manager/reports">
+      <span class="material-symbols-outlined">flag</span>
+      Creator reports
+    </a>
+  </header>
+
+  <div class="stats-row">
+    <article class="stat-card" data-tone="neutral">
+      <p>Threads in destination</p>
+      <strong>{{ stats.total }}</strong>
+      <span>Sample data for design</span>
+    </article>
+    <article class="stat-card" data-tone="amber">
+      <p>Needs CC response</p>
+      <strong>{{ stats.noResponse }}</strong>
+      <span>No reply from creator yet</span>
+    </article>
+    <article class="stat-card" data-tone="red">
+      <p>Flagged replies</p>
+      <strong>{{ stats.concerning }}</strong>
+      <span>May warrant a report</span>
+    </article>
+  </div>
+
+  <div class="filters-bar card">
+    <div class="filter-chips">
+      <button type="button" class="chip" [class.active]="isAllRatingsSelected" (click)="selectAllRatings(); onFilterChange()">
+        All ratings
+      </button>
+      @for (r of [5, 4, 3, 2, 1]; track r) {
+        <button type="button" class="chip" [class.active]="isRatingSelected(r)" (click)="toggleRating(r); onFilterChange()">
+          {{ r }}★
+        </button>
+      }
+      <span class="chip-divider" aria-hidden="true"></span>
+      <button type="button" class="chip" [class.active]="responseFilter === 'all'" (click)="responseFilter = 'all'; onFilterChange()">
+        All
+      </button>
+      <button type="button" class="chip" [class.active]="responseFilter === 'responded'" (click)="responseFilter = 'responded'; onFilterChange()">
+        With CC reply
+      </button>
+      <button type="button" class="chip" [class.active]="responseFilter === 'pending'" (click)="responseFilter = 'pending'; onFilterChange()">
+        No reply yet
+      </button>
+      <button type="button" class="chip warn" [class.active]="responseFilter === 'concerning'" (click)="responseFilter = 'concerning'; onFilterChange()">
+        <span class="material-symbols-outlined">warning</span>
+        Concerning replies
+      </button>
+    </div>
+
+    <div class="filter-row-secondary">
+      <label class="creator-select">
+        <span>Content Creator</span>
+        <select [(ngModel)]="creatorFilter" (ngModelChange)="onFilterChange()">
+          <option [ngValue]="'all'">All creators</option>
+          @for (c of creatorOptions; track c.id) {
+            <option [ngValue]="c.id">{{ c.name }}</option>
+          }
+        </select>
+      </label>
+      <label class="search-field">
+        <span class="material-symbols-outlined">search</span>
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onFilterChange()"
+          placeholder="Search tourist, object, review text, reply..."
+        />
+      </label>
+      <button type="button" class="ghost-btn small-btn" (click)="resetFilters()">Reset</button>
+    </div>
+  </div>
+
+  <div class="moderation-grid">
+    <aside class="queue-panel card">
+      <div class="queue-panel-head">
+        <h2>Review queue</h2>
+        <span>{{ filteredThreads.length }} items</span>
+      </div>
+
+      @if (!filteredThreads.length) {
+        <p class="empty-note">No reviews match your filters.</p>
+      } @else {
+        @for (thread of filteredThreads; track trackByThreadId($index, thread)) {
+          <article
+            class="queue-item"
+            [class.active]="selectedThread?.id === thread.id"
+            [class.flagged]="isConcerning(thread)"
+            (click)="selectThread(thread)"
+          >
+            <div class="queue-item-top">
+              <span class="rating-badge">{{ thread.rating }}/5</span>
+              @if (isConcerning(thread)) {
+                <span class="flag-dot" title="Concerning reply">!</span>
+              }
+            </div>
+            <h3>{{ thread.touristName }}</h3>
+            <p class="queue-snippet">{{ thread.touristReview }}</p>
+            <div class="queue-meta">
+              <span>{{ thread.objectName }}</span>
+              <span class="creator-tag">{{ thread.creatorName }}</span>
+            </div>
+            <span class="reply-status" [class.has-reply]="thread.creatorResponse">
+              {{ thread.creatorResponse ? 'CC replied' : 'Awaiting reply' }}
+            </span>
+          </article>
+        }
+      }
+    </aside>
+
+    <main class="thread-panel card">
+      @if (selectedThread) {
+        <header class="thread-header">
+          <div>
+            <p class="eyebrow">Review #{{ selectedThread.id }} · {{ selectedThread.objectName }}</p>
+            <h2>{{ selectedThread.localityName }}, {{ managedDestination }}</h2>
+          </div>
+          <span class="read-only-badge">
+            <span class="material-symbols-outlined">visibility</span>
+            Manager view
+          </span>
+        </header>
+
+        <div class="conversation">
+          <article class="message message-tourist">
+            <div class="message-avatar tourist">{{ selectedThread.touristInitials }}</div>
+            <div class="message-body">
+              <div class="message-meta">
+                <strong>{{ selectedThread.touristName }}</strong>
+                <span>Tourist · {{ formatDate(selectedThread.createdAt) }}</span>
+                <span class="stars">{{ ratingStars(selectedThread.rating) }}</span>
+              </div>
+              <p class="message-text">{{ selectedThread.touristReview }}</p>
+            </div>
+          </article>
+
+          @if (selectedThread.creatorResponse?.trim()) {
+            <article class="message message-creator" [class.concerning]="isConcerning(selectedThread)">
+              <div class="message-avatar creator">{{ selectedThread.creatorName.charAt(0) }}</div>
+              <div class="message-body">
+                <div class="message-meta">
+                  <strong>{{ selectedThread.creatorName }}</strong>
+                  <span>Content Creator · {{ formatDate(selectedThread.creatorResponseAt!) }}</span>
+                  @if (isConcerning(selectedThread)) {
+                    <span class="concerning-label">
+                      <span class="material-symbols-outlined">warning</span>
+                      Concerning tone
+                    </span>
+                  }
+                </div>
+                <p class="message-text">{{ selectedThread.creatorResponse }}</p>
+              </div>
+            </article>
+          } @else {
+            <div class="no-reply-placeholder">
+              <span class="material-symbols-outlined">hourglass_empty</span>
+              <p>This creator has not replied to the tourist yet.</p>
+            </div>
+          }
+        </div>
+
+        @if (isConcerning(selectedThread)) {
+          <div class="inline-alert">
+            <span class="material-symbols-outlined">info</span>
+            <p>
+              This reply may violate professional conduct guidelines. Consider documenting it when
+              submitting a creator report.
+            </p>
+            <a class="primary-btn compact" [routerLink]="['/manager/reports']" [queryParams]="reportLinkQuery(selectedThread)">
+              Report creator
+            </a>
+          </div>
+        }
+      } @else {
+        <div class="thread-empty">
+          <span class="material-symbols-outlined">forum</span>
+          <p>Select a review from the queue to read the full conversation.</p>
+        </div>
+      }
+    </main>
+
+    <aside class="context-panel card">
+      @if (selectedThread) {
+        <section class="context-block">
+          <h3>Object</h3>
+          <p class="context-title">{{ selectedThread.objectName }}</p>
+          <p class="context-sub">{{ selectedThread.localityName }}</p>
+          <a class="text-link" routerLink="/manager/objects">Open in Objects</a>
+        </section>
+
+        <section class="context-block creator-block">
+          <h3>Content Creator</h3>
+          <div class="creator-card">
+            <div class="creator-avatar-lg">{{ selectedThread.creatorName.charAt(0) }}</div>
+            <div>
+              <p class="context-title">{{ selectedThread.creatorName }}</p>
+              <p class="context-sub">{{ selectedThread.creatorEmail }}</p>
+            </div>
+          </div>
+          <a
+            class="primary-btn full-width"
+            [routerLink]="['/manager/reports']"
+            [queryParams]="reportLinkQuery(selectedThread)"
+          >
+            <span class="material-symbols-outlined">flag</span>
+            Report this creator
+          </a>
+          <p class="context-hint">
+            Reporting is for account-level issues. Reject or deactivate content from Objects if the
+            problem is limited to one listing.
+          </p>
+        </section>
+
+        <section class="context-block">
+          <h3>Reply status</h3>
+          <dl class="detail-list">
+            <div>
+              <dt>Tourist rating</dt>
+              <dd>{{ selectedThread.rating }} / 5</dd>
+            </div>
+            <div>
+              <dt>Creator responded</dt>
+              <dd>{{ selectedThread.creatorResponse ? 'Yes' : 'No' }}</dd>
+            </div>
+            @if (selectedThread.creatorResponseAt) {
+              <div>
+                <dt>Reply sent</dt>
+                <dd>{{ formatDate(selectedThread.creatorResponseAt) }}</dd>
+              </div>
+            }
+          </dl>
+        </section>
+      } @else {
+        <p class="empty-note">Object and creator details appear here.</p>
+      }
+    </aside>
+  </div>
+</section>
