@@ -252,9 +252,11 @@ namespace TuristickiVodic.API.Controllers
         public IActionResult GetPublicAuthSettings()
         {
             var googleClientId = _configuration["GoogleAuth:ClientId"]?.Trim();
+            var webPushPublicKey = _configuration["WebPush:PublicKey"]?.Trim();
             return Ok(new PublicAuthSettingsDto
             {
-                GoogleClientId = string.IsNullOrWhiteSpace(googleClientId) ? null : googleClientId
+                GoogleClientId = string.IsNullOrWhiteSpace(googleClientId) ? null : googleClientId,
+                WebPushPublicKey = string.IsNullOrWhiteSpace(webPushPublicKey) ? null : webPushPublicKey
             });
         }
 

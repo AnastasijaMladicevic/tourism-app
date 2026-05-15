@@ -60,6 +60,7 @@ namespace TuristickiVodic.Core.Models
         public bool IsBlacklisted { get; set; } = false;
         public bool HasRequestedCreatorRole { get; set; } = false;
         public CreatorRoleRequestStatus CreatorRoleRequestStatus { get; set; } = CreatorRoleRequestStatus.None;
+        public bool AllowPushNotifications { get; set; } = false;
         [MaxLength(500)]
         public string? ProfileImageUrl { get; set; }
 
@@ -84,6 +85,7 @@ namespace TuristickiVodic.Core.Models
         public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
         public ICollection<EventPlannerItem> EventPlannerItems { get; set; } = new List<EventPlannerItem>();
         public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+        public ICollection<BrowserPushSubscription> BrowserPushSubscriptions { get; set; } = new List<BrowserPushSubscription>();
         public ICollection<UserLog> UserLogs { get; set; } = new List<UserLog>();
         public ICollection<UserLocationHistory> LocationHistory { get; set; } = new List<UserLocationHistory>();
         public ICollection<ManagerReport> SentReports { get; set; } = new List<ManagerReport>();

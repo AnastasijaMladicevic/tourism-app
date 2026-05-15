@@ -683,6 +683,55 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.ToTable("ManagerReports");
                 });
 
+            modelBuilder.Entity("TuristickiVodic.Core.Models.BrowserPushSubscription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Auth")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Endpoint")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("ExpirationTimeUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Language")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("P256dh")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Endpoint")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BrowserPushSubscriptions");
+                });
+
             modelBuilder.Entity("TuristickiVodic.Core.Models.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -1245,6 +1294,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<bool>("AllowPushNotifications")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("HasRequestedCreatorRole")
                         .HasColumnType("boolean");
 
@@ -1610,6 +1662,17 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Event");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TuristickiVodic.Core.Models.BrowserPushSubscription", b =>
+                {
+                    b.HasOne("TuristickiVodic.Core.Models.User", "User")
+                        .WithMany("BrowserPushSubscriptions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -2044,6 +2107,8 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
             modelBuilder.Entity("TuristickiVodic.Core.Models.User", b =>
                 {
+                    b.Navigation("BrowserPushSubscriptions");
+
                     b.Navigation("CreatedDestinations");
 
                     b.Navigation("CreatedEvents");

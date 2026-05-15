@@ -37,6 +37,64 @@ namespace TuristickiVodic.API.Controllers
             });
         }
 
+        [HttpGet("push-settings")]
+        public async Task<IActionResult> GetPushSettings()
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var settings = await _notificationService.GetPushSettingsAsync(userId);
+
+            if (settings == null)
+                return NotFound();
+
+            return Ok(settings);
+        }
+
+        [HttpPut("push-settings")]
+        public async Task<IActionResult> UpdatePushSettings([FromBody] UpdatePushNotificationSettingsDto dto)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var settings = await _notificationService.UpdatePushSettingsAsync(userId, dto);
+
+            if (settings == null)
+                return NotFound();
+
+            return Ok(settings);
+        }
+
+        [HttpPost("push-subscriptions")]
+        public async Task<IActionResult> SavePushSubscription([FromBody] CreatePushSubscriptionDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var settings = await _notificationService.SavePushSubscriptionAsync(userId, dto);
+
+                if (settings == null)
+                    return NotFound();
+
+                return Ok(settings);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpDelete("push-subscriptions")]
+        public async Task<IActionResult> RemovePushSubscription([FromQuery] string? endpoint = null)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var settings = await _notificationService.RemovePushSubscriptionAsync(userId, endpoint);
+
+            if (settings == null)
+                return NotFound();
+
+            return Ok(settings);
+        }
+
         [HttpPost("{id}/read")]
         public async Task<IActionResult> MarkAsRead(int id)
         {

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
@@ -8,10 +9,12 @@ namespace TuristickiVodic.Services.Services
     public class NotificationService : INotificationService
     {
         private readonly AppDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public NotificationService(AppDbContext context)
+        public NotificationService(AppDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         public async Task<PagedResultDto<NotificationDto>> GetMyAsync(int userId, NotificationQueryDto query)
@@ -114,6 +117,123 @@ namespace TuristickiVodic.Services.Services
             _context.Notifications.RemoveRange(notifications);
             await _context.SaveChangesAsync();
             return notifications.Count;
+        }
+
+        public async Task<PushNotificationSettingsDto?> GetPushSettingsAsync(int userId)
+        {
+            var user = await _context.Users
+                .AsNoTracking()
+                .Where(x => x.Id == userId)
+                .Select(x => new
+                {
+                    x.AllowPushNotifications
+                })
+                .FirstOrDefaultAsync();
+
+            if (user == null)
+                return null;
+
+            var hasSubscription = await _context.BrowserPushSubscriptions
+                .AsNoTracking()
+                .AnyAsync(x => x.UserId == userId);
+
+            return new PushNotificationSettingsDto
+            {
+                Enabled = user.AllowPushNotifications,
+                HasSubscription = hasSubscription,
+                PublicKey = GetWebPushPublicKey()
+            };
+        }
+
+        public async Task<PushNotificationSettingsDto?> UpdatePushSettingsAsync(int userId, UpdatePushNotificationSettingsDto dto)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            if (user == null)
+                return null;
+
+            user.AllowPushNotifications = dto.Enabled;
+            user.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return await GetPushSettingsAsync(userId);
+        }
+
+        public async Task<PushNotificationSettingsDto?> SavePushSubscriptionAsync(int userId, CreatePushSubscriptionDto dto)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userId);
+            if (user == null)
+                return null;
+
+            var endpoint = dto.Endpoint.Trim();
+            var p256dh = dto.Keys.P256dh.Trim();
+            var auth = dto.Keys.Auth.Trim();
+
+            if (string.IsNullOrWhiteSpace(endpoint) ||
+                string.IsNullOrWhiteSpace(p256dh) ||
+                string.IsNullOrWhiteSpace(auth))
+            {
+                throw new InvalidOperationException("Push subscription is incomplete.");
+            }
+
+            var existing = await _context.BrowserPushSubscriptions
+                .FirstOrDefaultAsync(x => x.Endpoint == endpoint);
+
+            var expirationTimeUtc = dto.ExpirationTime.HasValue
+                ? DateTimeOffset.FromUnixTimeMilliseconds(dto.ExpirationTime.Value).UtcDateTime
+                : (DateTime?)null;
+
+            if (existing == null)
+            {
+                existing = new BrowserPushSubscription
+                {
+                    UserId = userId,
+                    Endpoint = endpoint,
+                    P256dh = p256dh,
+                    Auth = auth,
+                    ExpirationTimeUtc = expirationTimeUtc,
+                    Language = user.Language,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                _context.BrowserPushSubscriptions.Add(existing);
+            }
+            else
+            {
+                existing.UserId = userId;
+                existing.P256dh = p256dh;
+                existing.Auth = auth;
+                existing.ExpirationTimeUtc = expirationTimeUtc;
+                existing.Language = user.Language;
+                existing.UpdatedAt = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync();
+            return await GetPushSettingsAsync(userId);
+        }
+
+        public async Task<PushNotificationSettingsDto?> RemovePushSubscriptionAsync(int userId, string? endpoint)
+        {
+            var userExists = await _context.Users.AsNoTracking().AnyAsync(x => x.Id == userId);
+            if (!userExists)
+                return null;
+
+            var subscriptionsQuery = _context.BrowserPushSubscriptions.Where(x => x.UserId == userId);
+
+            if (!string.IsNullOrWhiteSpace(endpoint))
+            {
+                var normalizedEndpoint = endpoint.Trim();
+                subscriptionsQuery = subscriptionsQuery.Where(x => x.Endpoint == normalizedEndpoint);
+            }
+
+            var subscriptions = await subscriptionsQuery.ToListAsync();
+            if (subscriptions.Count > 0)
+            {
+                _context.BrowserPushSubscriptions.RemoveRange(subscriptions);
+                await _context.SaveChangesAsync();
+            }
+
+            return await GetPushSettingsAsync(userId);
         }
 
         private async Task GeneratePlannerEventRemindersAsync(int userId)
@@ -241,6 +361,12 @@ namespace TuristickiVodic.Services.Services
                 TriggerAtUtc = notification.TriggerAtUtc,
                 CreatedAt = notification.CreatedAt
             };
+        }
+
+        private string? GetWebPushPublicKey()
+        {
+            var publicKey = _configuration["WebPush:PublicKey"]?.Trim();
+            return string.IsNullOrWhiteSpace(publicKey) ? null : publicKey;
         }
     }
 }
