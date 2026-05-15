@@ -71,7 +71,7 @@ export class LocationIntelligenceService {
     return this.stateSubject.value.autoRegionEnabled;
   }
 
-  setAutoRegionEnabled(enabled: boolean): void {
+  async setAutoRegionEnabled(enabled: boolean): Promise<void> {
     this.patchState({ autoRegionEnabled: enabled });
 
     if (enabled) {
@@ -79,7 +79,11 @@ export class LocationIntelligenceService {
       if (currentLocation) {
         void this.applyAutoRegion(currentLocation);
       }
+
+      return;
     }
+
+    await this.activeRegionService.restoreDefaultRegion();
   }
 
   getQuietZone(kind: QuietZoneKind): QuietZone | null {

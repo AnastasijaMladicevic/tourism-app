@@ -36,6 +36,13 @@ export class ActiveRegionService {
     return this.activeRegionIdSubject.value;
   }
 
+  async restoreDefaultRegion(): Promise<number> {
+    const defaultRegionId = await this.tryLoadDefaultRegionId();
+    const resolvedRegionId = defaultRegionId ?? this.fallbackRegionId;
+    this.setActiveRegionId(resolvedRegionId, 'default');
+    return resolvedRegionId;
+  }
+
   async loadInitialRegion(): Promise<void> {
     const storedRegionId = this.readStoredRegionId();
     if (storedRegionId != null) {
