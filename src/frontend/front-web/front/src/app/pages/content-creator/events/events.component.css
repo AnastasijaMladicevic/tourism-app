@@ -531,16 +531,50 @@ tbody tr:hover,
   position: relative;
   min-height: 170px;
   border-radius: 18px;
+  padding: 14px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.06), rgba(15, 23, 42, 0.28)),
+    linear-gradient(135deg, #dbeafe, #bfdbfe);
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
   overflow: hidden;
+  isolation: isolate;
 }
 
-.hero-media::after {
+.hero-media-slides {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-media-slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 1200ms ease-in-out, transform 20s ease-out;
+  transform: scale(1.04);
+  will-change: opacity, transform;
+}
+
+.hero-media-slide::after {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.04), rgba(15, 23, 42, 0.68));
+}
+
+.hero-media-slide.is-active {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .hero-badge,
