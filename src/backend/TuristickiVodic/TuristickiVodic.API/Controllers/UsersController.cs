@@ -183,7 +183,7 @@ namespace TuristickiVodic.API.Controllers
             try
             {
                 var share = await _userService.CreateLocationShareAsync(currentUserId, dto);
-                return Ok(share);
+                return Ok(NormalizeLocationShare(share));
             }
             catch (InvalidOperationException ex)
             {
@@ -731,12 +731,32 @@ namespace TuristickiVodic.API.Controllers
             return response;
         }
 
+        private LocationShareDto NormalizeLocationShare(LocationShareDto share)
+        {
+            if (!Request.Host.HasValue || string.IsNullOrWhiteSpace(share.ShareUrl))
+                return share;
+
+            if (!Uri.TryCreate(share.ShareUrl, UriKind.Absolute, out var uri))
+                return share;
+
+            var normalized = new UriBuilder(uri)
+            {
+                Scheme = Request.Scheme,
+                Host = Request.Host.Host,
+                Port = Request.Host.Port ?? -1
+            };
+
+            share.ShareUrl = normalized.Uri.ToString();
+            return share;
+        }
+
         private UserDto? NormalizeUser(UserDto? user)
         {
             if (user == null)
                 return null;
 
             user.ProfileImageUrl = BuildAbsoluteProfileImageUrl(user.ProfileImageUrl);
+            user.PublicAppHomeUrl = NormalizeCurrentHostAppUrl(user.PublicAppHomeUrl);
             return user;
         }
 
@@ -752,6 +772,27 @@ namespace TuristickiVodic.API.Controllers
                 return profileImageUrl;
 
             return $"{Request.Scheme}://{Request.Host.Value}{profileImageUrl}";
+        }
+
+        private string? NormalizeCurrentHostAppUrl(string? appUrl)
+        {
+            if (string.IsNullOrWhiteSpace(appUrl) || !Request.Host.HasValue)
+                return appUrl;
+
+            if (!Uri.TryCreate(appUrl, UriKind.Absolute, out var uri))
+                return appUrl;
+
+            if (!string.Equals(uri.Host, Request.Host.Host, StringComparison.OrdinalIgnoreCase))
+                return appUrl;
+
+            var normalized = new UriBuilder(uri)
+            {
+                Scheme = Request.Scheme,
+                Host = Request.Host.Host,
+                Port = Request.Host.Port ?? -1
+            };
+
+            return normalized.Uri.ToString();
         }
     }
 }
