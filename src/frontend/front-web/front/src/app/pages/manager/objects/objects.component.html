@@ -251,7 +251,9 @@
             Tourists review this object only. Below are their ratings and any Content Creator replies.
           </p>
 
-          @if (!selectedObjectReviews.length) {
+          @if (reviewsLoading) {
+            <p class="reviews-empty">Loading guest reviews…</p>
+          } @else if (!selectedObjectReviews.length) {
             <p class="reviews-empty">No guest reviews yet for this object.</p>
           } @else {
             <div class="reviews-preview-list">
@@ -278,11 +280,11 @@
                 View all {{ selectedObjectReviews.length }} reviews on object page
               </button>
             }
-            @if (isConcerningReply(selectedObjectReviews[0])) {
+            @if (concerningReportThread) {
               <a
                 class="report-creator-btn"
                 [routerLink]="['/manager/reports']"
-                [queryParams]="reportCreatorQuery(selectedObjectReviews[0])"
+                [queryParams]="reportCreatorQuery(concerningReportThread)"
               >
                 <span class="material-symbols-outlined">flag</span>
                 Report creator

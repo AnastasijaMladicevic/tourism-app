@@ -2,11 +2,14 @@ import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { of } from 'rxjs';
+import { catchError, finalize } from 'rxjs/operators';
 import { DestinationService } from '../../../services/destination.service';
 import { FilterOption, ObjectDto, ObjectService } from '../../../services/object';
+import { ReviewService } from '../../../services/review';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
+import { mapReviewDtosToObjectThreads } from '../shared/manager-object-review.mapper';
 import {
-  getMockObjectReviewThreads,
   isConcerningCreatorReply,
   ManagerObjectReviewThread,
 } from '../shared/manager-object-review.mock';
@@ -27,11 +30,15 @@ interface WorkingHoursRow {
 export class ManagerObjectsComponent implements OnInit {
   private readonly objectService = inject(ObjectService);
   private readonly destinationService = inject(DestinationService);
+  private readonly reviewService = inject(ReviewService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
 
   pagedObjects: ObjectDto[] = [];
   selectedObject: ObjectDto | null = null;
+  selectedObjectReviews: ManagerObjectReviewThread[] = [];
+  reviewsLoading = false;
+  private reviewsRequestToken = 0;
 
   /** Destination name(s) the manager oversees — cities/towns (not region/country). */
   managedCityLabel = '';
@@ -141,6 +148,7 @@ export class ManagerObjectsComponent implements OnInit {
             this.selectedObject = sorted[0] ?? null;
           }
 
+          this.loadSelectedObjectReviews();
           this.isLoading = false;
           this.cdr.detectChanges();
         },
@@ -148,6 +156,7 @@ export class ManagerObjectsComponent implements OnInit {
           this.errorMessage = error?.error?.message ?? 'Failed to load objects';
           this.pagedObjects = [];
           this.selectedObject = null;
+          this.selectedObjectReviews = [];
           this.totalCount = 0;
           this.totalPages = 1;
           this.isLoading = false;
@@ -309,6 +318,41 @@ export class ManagerObjectsComponent implements OnInit {
 
   selectObject(obj: ObjectDto): void {
     this.selectedObject = obj;
+    this.loadSelectedObjectReviews();
+  }
+
+  private loadSelectedObjectReviews(): void {
+    const object = this.selectedObject;
+    if (!object?.id) {
+      this.selectedObjectReviews = [];
+      this.reviewsLoading = false;
+      return;
+    }
+
+    const token = ++this.reviewsRequestToken;
+    this.reviewsLoading = true;
+    const creatorId = object.createdByUserId ?? 0;
+    const creatorName = 'Content Creator';
+
+    this.reviewService
+      .getForObject(object.id)
+      .pipe(
+        catchError(() => of([])),
+        finalize(() => {
+          if (token === this.reviewsRequestToken) {
+            this.reviewsLoading = false;
+            this.cdr.detectChanges();
+          }
+        })
+      )
+      .subscribe((reviews) => {
+        if (token !== this.reviewsRequestToken) {
+          return;
+        }
+
+        this.selectedObjectReviews = mapReviewDtosToObjectThreads(reviews, creatorId, creatorName);
+        this.cdr.detectChanges();
+      });
   }
 
   trackByObjectId(_: number, obj: ObjectDto): number {
@@ -478,19 +522,12 @@ export class ManagerObjectsComponent implements OnInit {
     this.router.navigate(['/manager/objects/review', this.selectedObject.id]);
   }
 
-  get selectedObjectReviews(): ManagerObjectReviewThread[] {
-    if (!this.selectedObject) {
-      return [];
-    }
-    return getMockObjectReviewThreads(
-      this.selectedObject.id,
-      'Content Creator',
-      this.selectedObject.createdByUserId ?? 201,
-    );
-  }
-
   get selectedObjectReviewsPreview(): ManagerObjectReviewThread[] {
     return this.selectedObjectReviews.slice(0, 2);
+  }
+
+  get concerningReportThread(): ManagerObjectReviewThread | null {
+    return this.selectedObjectReviews.find((thread) => isConcerningCreatorReply(thread)) ?? null;
   }
 
   isConcerningReply(thread: ManagerObjectReviewThread): boolean {
