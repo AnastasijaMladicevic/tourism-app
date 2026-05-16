@@ -33,6 +33,43 @@
           <div class="preference-divider"></div>
 
           <div class="mode-block">
+            <div class="preference-row preference-row--background">
+              <div class="preference-copy">
+                <span class="menu-title">{{ 'settings.pushTitle' | translate }}</span>
+                <p>{{ 'settings.pushBody' | translate }}</p>
+              </div>
+
+              <button
+                type="button"
+                class="switch switch-button"
+                [class.switch--checked]="pushNotificationsEnabled"
+                [class.switch--disabled]="pushNotificationsBusy"
+                [attr.aria-pressed]="pushNotificationsEnabled"
+                [attr.aria-busy]="pushNotificationsBusy"
+                (click)="onBackgroundNotificationsToggleClick()"
+              >
+                <span class="slider"></span>
+              </button>
+            </div>
+
+            <div class="preference-copy preference-copy--push-state">
+              @if (!pushAvailable) {
+                <p>{{ 'settings.pushUnsupported' | translate }}</p>
+              } @else if (pushNeedsSecureContext) {
+                <p>{{ 'settings.pushRequiresHttps' | translate }}</p>
+              } @else if (pushMessageText) {
+                <p>{{ pushMessageText }}</p>
+              } @else if (pushMessageKey) {
+                <p>{{ pushMessageKey | translate }}</p>
+              } @else {
+                <p>{{ 'settings.pushHint' | translate }}</p>
+              }
+            </div>
+          </div>
+
+          <div class="preference-divider"></div>
+
+          <div class="mode-block">
             <div class="preference-copy preference-copy--compact">
               <span class="menu-title">{{ 'settings.deliveryTitle' | translate }}</span>
               <p>{{ 'settings.deliveryBody' | translate }}</p>

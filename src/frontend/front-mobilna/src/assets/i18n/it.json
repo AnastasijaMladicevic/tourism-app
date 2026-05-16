@@ -103,7 +103,8 @@
     "map": "Mappa",
     "favorites": "Preferiti",
     "planner": "Pianificatore",
-    "profile": "Profilo"
+    "profile": "Profilo",
+    "more": "Altro"
   },
   "home": {
     "greeting": "Ciao, siamo felici di rivederti",
@@ -249,7 +250,7 @@
     "beenThere": "Ci sono stata",
     "visitedDestination": "Destinazione",
     "visitedLocality": "Località",
-    "shareLocationTitle": "Condividi posizione",
+    "shareLocationTitle": "CONDIVIDI POSIZIONE",
     "shareLocationBody": "Genera un link temporaneo per condividere la tua posizione attuale con un amico.",
     "shareHours": "{{hours}}h",
     "shareLoading": "Preparazione...",
@@ -292,6 +293,17 @@
     "twoFactorDeliveryTitle": "Consegna del codice",
     "twoFactorDeliveryBody": "I codici di verifica per l'accesso vengono inviati all'indirizzo email del tuo account.",
     "twoFactorSaveError": "Impossibile salvare ora le impostazioni della verifica in due passaggi.",
+    "pushTitle": "Notifiche quando l'app e chiusa",
+    "pushBody": "Consenti le notifiche push del browser cosi gli aggiornamenti importanti possono arrivare anche quando SpireGO non e aperto.",
+    "pushHint": "Questo funziona su localhost e su un server che serve l'app tramite HTTPS.",
+    "pushBackgroundEnabled": "Le notifiche in background sono attive.",
+    "pushBackgroundDisabled": "Le notifiche in background sono disattivate.",
+    "pushUnsupported": "Questo browser non supporta le notifiche push.",
+    "pushRequiresHttps": "Le notifiche in background richiedono HTTPS sul server. Su localhost funzionano anche senza HTTPS.",
+    "pushPermissionDenied": "Il permesso del browser per le notifiche e stato negato. Abilitalo nelle impostazioni del browser e riprova.",
+    "pushUnavailable": "Le notifiche push non sono configurate correttamente in questo momento.",
+    "pushLoadError": "Impossibile caricare le impostazioni delle notifiche push in questo momento.",
+    "pushSaveError": "Impossibile salvare le impostazioni delle notifiche push in questo momento.",
     "menu": {
       "editProfile": "Modifica profilo",
       "language": "Lingua",

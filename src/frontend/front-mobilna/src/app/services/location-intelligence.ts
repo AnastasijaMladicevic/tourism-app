@@ -43,6 +43,7 @@ const DEFAULT_STATE: LocationIntelligenceState = {
 @Injectable({ providedIn: 'root' })
 export class LocationIntelligenceService {
   private readonly storageKey = 'spirego-location-intelligence';
+  private readonly autoRegionStorageKey = 'spirego-session-auto-region-enabled';
   private readonly stateSubject = new BehaviorSubject<LocationIntelligenceState>(this.readState());
   private regionsCache: RegionDto[] | null = null;
 
@@ -269,6 +270,14 @@ export class LocationIntelligenceService {
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem(this.storageKey, JSON.stringify(nextState));
     }
+
+    if (patch.autoRegionEnabled != null && typeof sessionStorage !== 'undefined') {
+      if (patch.autoRegionEnabled) {
+        sessionStorage.setItem(this.autoRegionStorageKey, 'true');
+      } else {
+        sessionStorage.removeItem(this.autoRegionStorageKey);
+      }
+    }
   }
 
   private readState(): LocationIntelligenceState {
@@ -284,7 +293,9 @@ export class LocationIntelligenceService {
     try {
       const parsed = JSON.parse(raw) as Partial<LocationIntelligenceState>;
       return {
-        autoRegionEnabled: parsed.autoRegionEnabled === true,
+        autoRegionEnabled:
+          typeof sessionStorage !== 'undefined' &&
+          sessionStorage.getItem(this.autoRegionStorageKey) === 'true',
         quietZones: {
           home: this.normalizeQuietZone(parsed.quietZones?.home, 'home'),
           work: this.normalizeQuietZone(parsed.quietZones?.work, 'work'),

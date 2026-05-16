@@ -103,7 +103,8 @@
     "map": "Map",
     "favorites": "Favorites",
     "planner": "Planner",
-    "profile": "Profile"
+    "profile": "Profile",
+    "more": "More"
   },
   "home": {
     "greeting": "Hi, glad to see you again",
@@ -249,7 +250,7 @@
     "beenThere": "I've been there",
     "visitedDestination": "Destination",
     "visitedLocality": "Locality",
-    "shareLocationTitle": "Share location",
+    "shareLocationTitle": "SHARE LOCATION",
     "shareLocationBody": "Generate a temporary link to share your current location with a friend.",
     "shareHours": "{{hours}}h",
     "shareLoading": "Preparing...",
@@ -292,6 +293,17 @@
     "twoFactorDeliveryTitle": "Code delivery",
     "twoFactorDeliveryBody": "Login verification codes are sent to the email address on your account.",
     "twoFactorSaveError": "Two-step verification settings could not be saved right now.",
+    "pushTitle": "Notifications when the app is closed",
+    "pushBody": "Allow browser push notifications so important updates can arrive even when SpireGO is not open.",
+    "pushHint": "This works on localhost and on a server that serves the app over HTTPS.",
+    "pushBackgroundEnabled": "Background notifications are enabled.",
+    "pushBackgroundDisabled": "Background notifications are disabled.",
+    "pushUnsupported": "This browser does not support push notifications.",
+    "pushRequiresHttps": "Background notifications require HTTPS on the server. Localhost works without HTTPS.",
+    "pushPermissionDenied": "Browser permission for notifications is denied. Allow notifications in browser settings and try again.",
+    "pushUnavailable": "Push notifications are not configured correctly right now.",
+    "pushLoadError": "Push notification settings could not be loaded right now.",
+    "pushSaveError": "Push notification settings could not be saved right now.",
     "menu": {
       "editProfile": "Edit profile",
       "language": "Language",

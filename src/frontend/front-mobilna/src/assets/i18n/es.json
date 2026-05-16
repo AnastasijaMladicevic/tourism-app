@@ -103,7 +103,8 @@
     "map": "Mapa",
     "favorites": "Favoritos",
     "planner": "Planificador",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "more": "Más"
   },
   "home": {
     "greeting": "Hola, nos alegra verte de nuevo",
@@ -249,7 +250,7 @@
     "beenThere": "Ya estuve allí",
     "visitedDestination": "Destino",
     "visitedLocality": "Localidad",
-    "shareLocationTitle": "Compartir ubicación",
+    "shareLocationTitle": "COMPARTIR UBICACIÓN",
     "shareLocationBody": "Genera un enlace temporal para compartir tu ubicación actual con un amigo.",
     "shareHours": "{{hours}}h",
     "shareLoading": "Preparando...",
@@ -292,6 +293,17 @@
     "twoFactorDeliveryTitle": "Entrega del codigo",
     "twoFactorDeliveryBody": "Los codigos de verificacion de acceso se envian al correo de tu cuenta.",
     "twoFactorSaveError": "No se pudo guardar la configuracion de verificacion en dos pasos en este momento.",
+    "pushTitle": "Notificaciones cuando la app esta cerrada",
+    "pushBody": "Permite notificaciones push del navegador para que las actualizaciones importantes lleguen incluso cuando SpireGO no este abierto.",
+    "pushHint": "Esto funciona en localhost y en un servidor que sirve la app por HTTPS.",
+    "pushBackgroundEnabled": "Las notificaciones en segundo plano estan activadas.",
+    "pushBackgroundDisabled": "Las notificaciones en segundo plano estan desactivadas.",
+    "pushUnsupported": "Este navegador no admite notificaciones push.",
+    "pushRequiresHttps": "Las notificaciones en segundo plano requieren HTTPS en el servidor. En localhost funcionan sin HTTPS.",
+    "pushPermissionDenied": "El permiso del navegador para las notificaciones fue denegado. Activalo en la configuracion del navegador e intentalo de nuevo.",
+    "pushUnavailable": "Las notificaciones push no estan configuradas correctamente ahora mismo.",
+    "pushLoadError": "No se pudieron cargar las configuraciones de notificaciones push.",
+    "pushSaveError": "No se pudieron guardar las configuraciones de notificaciones push.",
     "menu": {
       "editProfile": "Editar perfil",
       "language": "Idioma",

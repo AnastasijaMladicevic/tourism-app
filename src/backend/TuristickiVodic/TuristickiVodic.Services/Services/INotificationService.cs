@@ -10,5 +10,9 @@ namespace TuristickiVodic.Services.Services
         Task<int> MarkAllAsReadAsync(int userId);
         Task<bool> DeleteReadAsync(int id, int userId);
         Task<int> DeleteAllReadAsync(int userId);
+        Task<PushNotificationSettingsDto?> GetPushSettingsAsync(int userId);
+        Task<PushNotificationSettingsDto?> UpdatePushSettingsAsync(int userId, UpdatePushNotificationSettingsDto dto);
+        Task<PushNotificationSettingsDto?> SavePushSubscriptionAsync(int userId, CreatePushSubscriptionDto dto);
+        Task<PushNotificationSettingsDto?> RemovePushSubscriptionAsync(int userId, string? endpoint);
     }
 }

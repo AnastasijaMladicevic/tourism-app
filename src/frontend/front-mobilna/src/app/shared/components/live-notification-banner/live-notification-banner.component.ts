@@ -20,11 +20,24 @@ export class LiveNotificationBannerComponent implements OnInit, OnDestroy {
   private readonly queue: NotificationDto[] = [];
   private liveSub?: Subscription;
   private dismissTimer?: ReturnType<typeof setTimeout>;
+  private redirectTimer?: ReturnType<typeof setTimeout>;
 
   protected readonly currentNotification = signal<NotificationDto | null>(null);
 
   ngOnInit(): void {
     this.liveSub = this.notificationService.liveBanner$.subscribe((notification) => {
+      const actionUrl = notification.actionUrl?.trim() || '';
+      if (this.notificationService.isExternalActionUrl(actionUrl)) {
+        this.queue.length = 0;
+        this.currentNotification.set(notification);
+        this.clearTimer();
+        this.redirectTimer = setTimeout(() => {
+          this.notificationService.stopLiveConnection();
+          this.notificationService.logoutAndRedirect(actionUrl);
+        }, 1600);
+        return;
+      }
+
       this.queue.push(notification);
 
       if (!this.currentNotification()) {
@@ -49,6 +62,13 @@ export class LiveNotificationBannerComponent implements OnInit, OnDestroy {
   }
 
   protected openNotifications(): void {
+    const actionUrl = this.currentNotification()?.actionUrl?.trim() || '';
+    if (this.notificationService.isExternalActionUrl(actionUrl)) {
+      this.notificationService.stopLiveConnection();
+      this.notificationService.logoutAndRedirect(actionUrl);
+      return;
+    }
+
     this.queue.length = 0;
     this.dismiss();
     this.router.navigate(['/notifications']);
@@ -69,6 +89,11 @@ export class LiveNotificationBannerComponent implements OnInit, OnDestroy {
   }
 
   private clearTimer(): void {
+    if (this.redirectTimer) {
+      clearTimeout(this.redirectTimer);
+      this.redirectTimer = undefined;
+    }
+
     if (!this.dismissTimer) {
       return;
     }

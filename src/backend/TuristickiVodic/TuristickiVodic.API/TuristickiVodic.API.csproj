@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <NuGetAuditMode>direct</NuGetAuditMode>
+    <UseAppHost>false</UseAppHost>
     <UserSecretsId>21296d5e-0092-4275-a345-4fd1547ddf37</UserSecretsId>
   </PropertyGroup>
 
@@ -25,6 +26,7 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite" Version="10.0.1" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="WebPush" Version="1.0.13" />
   </ItemGroup>
 
   <ItemGroup>

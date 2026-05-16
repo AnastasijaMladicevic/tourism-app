@@ -17,6 +17,7 @@ import { RouterHistoryService } from '../../services/router-history';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
 import { GoogleIdentityService } from '../../services/google-identity';
+import { environment } from '../../../environment/environment';
 
 @Component({
   selector: 'app-login',
@@ -144,12 +145,14 @@ export class LoginComponent {
   private loadGoogleAuthSettings(): void {
     this.authService.getPublicAuthSettings().subscribe({
       next: (settings) => {
-        this.googleClientId = settings.googleClientId?.trim() || null;
+        this.googleClientId = settings.googleClientId?.trim() || environment.googleClientId || null;
         this.cdr.detectChanges();
         this.scheduleGoogleButtonRender();
       },
       error: () => {
-        this.googleClientId = null;
+        this.googleClientId = environment.googleClientId || null;
+        this.cdr.detectChanges();
+        this.scheduleGoogleButtonRender();
       },
     });
   }

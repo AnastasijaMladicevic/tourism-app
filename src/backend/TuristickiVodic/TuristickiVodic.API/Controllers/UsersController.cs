@@ -252,9 +252,11 @@ namespace TuristickiVodic.API.Controllers
         public IActionResult GetPublicAuthSettings()
         {
             var googleClientId = _configuration["GoogleAuth:ClientId"]?.Trim();
+            var webPushPublicKey = _configuration["WebPush:PublicKey"]?.Trim();
             return Ok(new PublicAuthSettingsDto
             {
-                GoogleClientId = string.IsNullOrWhiteSpace(googleClientId) ? null : googleClientId
+                GoogleClientId = string.IsNullOrWhiteSpace(googleClientId) ? null : googleClientId,
+                WebPushPublicKey = string.IsNullOrWhiteSpace(webPushPublicKey) ? null : webPushPublicKey
             });
         }
 
@@ -640,6 +642,28 @@ namespace TuristickiVodic.API.Controllers
                     return NotFound();
 
                 return Ok(new { message = "Creator role request rejected successfully" });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("{id}/demote-creator")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DemoteCreatorRole(int id)
+        {
+            try
+            {
+                var result = await _userService.DemoteCreatorRoleAsync(id);
+                if (!result)
+                    return NotFound();
+
+                return Ok(new { message = "Content creator moved back to tourist role successfully" });
             }
             catch (KeyNotFoundException ex)
             {

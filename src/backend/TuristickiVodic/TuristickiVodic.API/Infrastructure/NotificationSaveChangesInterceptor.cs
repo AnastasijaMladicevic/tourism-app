@@ -4,17 +4,25 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using TuristickiVodic.API.Hubs;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
+using TuristickiVodic.Services.Services;
 
 namespace TuristickiVodic.API.Infrastructure
 {
     public class NotificationSaveChangesInterceptor : SaveChangesInterceptor
     {
         private readonly IHubContext<NotificationsHub> _hubContext;
+        private readonly IWebPushService _webPushService;
+        private readonly NotificationPresenceTracker _presenceTracker;
         private readonly List<Notification> _pendingNotifications = new();
 
-        public NotificationSaveChangesInterceptor(IHubContext<NotificationsHub> hubContext)
+        public NotificationSaveChangesInterceptor(
+            IHubContext<NotificationsHub> hubContext,
+            IWebPushService webPushService,
+            NotificationPresenceTracker presenceTracker)
         {
             _hubContext = hubContext;
+            _webPushService = webPushService;
+            _presenceTracker = presenceTracker;
         }
 
         public override InterceptionResult<int> SavingChanges(
@@ -77,6 +85,11 @@ namespace TuristickiVodic.API.Infrastructure
                 await _hubContext.Clients
                     .Group(NotificationsHub.GetUserGroupName(notification.UserId))
                     .SendAsync("notificationReceived", MapToDto(notification), cancellationToken);
+
+                if (!_presenceTracker.HasActiveConnections(notification.UserId))
+                {
+                    await _webPushService.SendNotificationAsync(notification, cancellationToken);
+                }
             }
         }
 

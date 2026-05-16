@@ -13,7 +13,7 @@
         For tourist accounts, choose Tourist or Content Creator below; promotion applies when you save.
       </ng-container>
       <ng-container *ngIf="displayRole === 'content-creator'">
-        Choose <strong>Content Creator</strong> to keep this account, or <strong>Tourist</strong> if demotion is supported later. Saving as Tourist is not available from the API yet.
+        Choose <strong>Content Creator</strong> to keep this account, or <strong>Tourist</strong> to remove publishing access and return the user to the tourist app.
       </ng-container>
       <ng-container *ngIf="displayRole === 'manager' || displayRole === 'admin'">
         Role is shown for reference; only tourist→creator promotion is available (see below when editing a tourist).

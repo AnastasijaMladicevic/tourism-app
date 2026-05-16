@@ -22,6 +22,7 @@ namespace TuristickiVodic.Core.DTO
         public bool HasRequestedCreatorRole { get; set; }
         public string CreatorRoleRequestStatus { get; set; } = string.Empty;
         public string? AdminAppLoginUrl { get; set; }
+        public string? PublicAppHomeUrl { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? ProfileImageUrl { get; set; }
         public int FavoritesCount { get; set; }

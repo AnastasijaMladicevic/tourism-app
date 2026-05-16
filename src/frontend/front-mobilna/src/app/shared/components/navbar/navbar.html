@@ -1,5 +1,4 @@
 @if (isVisible) {
-  <!-- ── Desktop sidebar (left, sticky) ── -->
   <nav class="sidebar">
     <div class="sidebar__logo">
       <app-logo size="sm"></app-logo>
@@ -25,9 +24,8 @@
     }
   </nav>
 
-  <!-- ── Mobile bottom nav ── -->
   <nav class="bottom-nav">
-    @for (item of navItems; track item.route) {
+    @for (item of mobilePrimaryNavItems; track item.route) {
       <button
         class="bottom-nav__item"
         [class.bottom-nav__item--active]="isActive(item.route)"
@@ -42,5 +40,35 @@
         <span>{{ item.labelKey | translate }}</span>
       </button>
     }
+
+    <div class="bottom-nav__more">
+      @if (moreMenuOpen) {
+        <div class="bottom-nav__more-menu">
+          @for (item of mobileMoreNavItems; track item.route) {
+            <button
+              type="button"
+              class="bottom-nav__more-action"
+              [class.bottom-nav__more-action--active]="isActive(item.route)"
+              (click)="goTo(item.route)"
+            >
+              <mat-icon>{{ item.icon }}</mat-icon>
+              <span>{{ item.labelKey | translate }}</span>
+            </button>
+          }
+        </div>
+      }
+
+      <button
+        type="button"
+        class="bottom-nav__item"
+        [class.bottom-nav__item--active]="isMoreMenuActive() || moreMenuOpen"
+        (click)="toggleMoreMenu()"
+      >
+        <span class="nav-icon-wrap">
+          <mat-icon>menu</mat-icon>
+        </span>
+        <span>{{ 'nav.more' | translate }}</span>
+      </button>
+    </div>
   </nav>
 }

@@ -84,6 +84,10 @@
   padding: 14px 0;
 }
 
+.preference-row--background {
+  padding: 0;
+}
+
 .preference-copy {
   min-width: 0;
   flex: 1;
@@ -98,6 +102,14 @@
 
 .preference-copy--compact {
   margin-bottom: 14px;
+}
+
+.preference-copy--push-state {
+  margin-top: 12px;
+
+  p {
+    margin-top: 0;
+  }
 }
 
 .preference-divider {
@@ -175,6 +187,18 @@
   height: 28px;
   display: inline-block;
   flex: 0 0 auto;
+}
+
+.switch-button {
+  border: none;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.switch--disabled {
+  opacity: 0.6;
+  cursor: progress;
 }
 
 .switch input {

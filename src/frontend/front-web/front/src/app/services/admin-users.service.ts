@@ -160,4 +160,11 @@ export class AdminUsersService {
   rejectCreatorRole(id: number): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.apiUrl}/${id}/reject-creator`, {});
   }
+
+  /**
+   * Admin removes Content Creator access and returns the account to Tourist role.
+   */
+  demoteCreatorRole(id: number): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/${id}/demote-creator`, {});
+  }
 }

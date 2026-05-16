@@ -37,6 +37,7 @@ public class AppDbContext : DbContext
     public DbSet<DeletionRequest> DeletionRequests { get; set; }
     public DbSet<EventPlannerItem> EventPlannerItems { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+    public DbSet<BrowserPushSubscription> BrowserPushSubscriptions { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<RevokedToken> RevokedTokens { get; set; }
     public DbSet<UserLocationHistory> UserLocationHistories { get; set; }
@@ -567,6 +568,20 @@ public class AppDbContext : DbContext
             .HasIndex(n => new { n.UserId, n.Type, n.EventPlannerItemId, n.TriggerAtUtc })
             .IsUnique()
             .HasFilter("\"EventPlannerItemId\" IS NOT NULL AND \"TriggerAtUtc\" IS NOT NULL");
+
+        // ==================== BROWSER PUSH SUBSCRIPTION ====================
+        mb.Entity<BrowserPushSubscription>()
+            .HasOne(subscription => subscription.User)
+            .WithMany(user => user.BrowserPushSubscriptions)
+            .HasForeignKey(subscription => subscription.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        mb.Entity<BrowserPushSubscription>()
+            .HasIndex(subscription => subscription.UserId);
+
+        mb.Entity<BrowserPushSubscription>()
+            .HasIndex(subscription => subscription.Endpoint)
+            .IsUnique();
 
         // ==================== USER LOG ====================
         mb.Entity<UserLog>()

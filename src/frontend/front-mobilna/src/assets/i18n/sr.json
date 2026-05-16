@@ -103,7 +103,8 @@
     "map": "Mapa",
     "favorites": "Favoriti",
     "planner": "Planer",
-    "profile": "Profil"
+    "profile": "Profil",
+    "more": "Još"
   },
   "home": {
     "greeting": "Zdravo, drago nam je što ste ponovo tu",
@@ -249,7 +250,7 @@
     "beenThere": "Bila sam tu",
     "visitedDestination": "Destinacija",
     "visitedLocality": "Lokalitet",
-    "shareLocationTitle": "Podeli lokaciju",
+    "shareLocationTitle": "PODELI LOKACIJU",
     "shareLocationBody": "Generiši privremeni link za deljenje tvoje trenutne lokacije sa prijateljem.",
     "shareHours": "{{hours}}h",
     "shareLoading": "Pripremam...",
@@ -292,6 +293,17 @@
     "twoFactorDeliveryTitle": "Nacin isporuke koda",
     "twoFactorDeliveryBody": "Verifikacioni kodovi za prijavu salju se na email adresu tvog naloga.",
     "twoFactorSaveError": "Podesavanje dvostepene verifikacije trenutno nije moguce sacuvati.",
+    "pushTitle": "Obavestenja kada app nije otvorena",
+    "pushBody": "Dozvoli browser push obavestenja da vazne informacije stignu i kada SpireGO nije otvoren.",
+    "pushHint": "Ovo radi na localhost-u i na serveru koji sluzi aplikaciju preko HTTPS-a.",
+    "pushBackgroundEnabled": "Pozadinska obavestenja su ukljucena.",
+    "pushBackgroundDisabled": "Pozadinska obavestenja su iskljucena.",
+    "pushUnsupported": "Ovaj browser ne podrzava push obavestenja.",
+    "pushRequiresHttps": "Pozadinska obavestenja zahtevaju HTTPS na serveru. Na localhost-u rade i bez HTTPS-a.",
+    "pushPermissionDenied": "Browser dozvola za obavestenja je odbijena. Ukljuci je u podesavanjima browsera pa pokusaj ponovo.",
+    "pushUnavailable": "Push obavestenja trenutno nisu ispravno podesena.",
+    "pushLoadError": "Podesavanja push obavestenja trenutno ne mogu da se ucitaju.",
+    "pushSaveError": "Podesavanja push obavestenja trenutno ne mogu da se sacuvaju.",
     "menu": {
       "editProfile": "Izmeni profil",
       "language": "Jezik",

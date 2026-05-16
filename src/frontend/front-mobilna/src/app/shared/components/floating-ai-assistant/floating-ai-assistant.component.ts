@@ -31,23 +31,51 @@ export class FloatingAiAssistantComponent {
   private readonly locationTrackingService = inject(LocationTrackingService);
   private readonly destroyRef = inject(DestroyRef);
 
+  private readonly hiddenRoutes = [
+    '/login',
+    '/register',
+    '/forgot-password',
+    '/code-verification',
+    '/new-credentials',
+    '/password-updated',
+  ];
+
   @ViewChild('threadContainer')
   private threadContainer?: ElementRef<HTMLDivElement>;
 
   protected readonly isOpen = signal(false);
+  protected readonly isVisible = signal(true);
+  protected readonly isLiftedForMoreMenu = signal(false);
   protected readonly aiInput = signal('');
   protected readonly aiLoading = signal(false);
   protected readonly chatMessages = signal<FloatingAiMessage[]>([]);
 
   constructor() {
+    this.updateVisibility(this.router.url);
+
     this.router.events
       .pipe(
         filter((event) => event instanceof NavigationStart),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe(() => {
+      .subscribe((event) => {
+        const nextUrl = (event as NavigationStart).url;
         this.isOpen.set(false);
+        this.isLiftedForMoreMenu.set(false);
+        this.updateVisibility(nextUrl);
       });
+
+    if (typeof window !== 'undefined') {
+      const handleMoreMenuState = (event: Event) => {
+        const customEvent = event as CustomEvent<{ open?: boolean }>;
+        this.isLiftedForMoreMenu.set(customEvent.detail?.open === true);
+      };
+
+      window.addEventListener('spirego-mobile-more-menu', handleMoreMenuState as EventListener);
+      this.destroyRef.onDestroy(() => {
+        window.removeEventListener('spirego-mobile-more-menu', handleMoreMenuState as EventListener);
+      });
+    }
   }
 
   protected togglePanel(): void {
@@ -178,5 +206,9 @@ export class FloatingAiAssistantComponent {
         behavior: 'smooth',
       });
     });
+  }
+
+  private updateVisibility(url: string): void {
+    this.isVisible.set(!this.hiddenRoutes.some((route) => url.startsWith(route)));
   }
 }

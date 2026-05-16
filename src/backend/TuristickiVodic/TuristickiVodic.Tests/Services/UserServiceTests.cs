@@ -1402,6 +1402,7 @@ namespace TuristickiVodic.Tests.Services
             result.Should().NotBeNull();
             result!.CreatorRoleRequestStatus.Should().Be("Approved");
             result.AdminAppLoginUrl.Should().Be("https://spirego-admin.test/login");
+            result.PublicAppHomeUrl.Should().Be("https://spirego-tourist.test/home");
         }
 
         [Fact]
@@ -1501,6 +1502,44 @@ namespace TuristickiVodic.Tests.Services
         // ═══════════════════════════════════════════
         //  ToggleUserActiveAsync
         // ═══════════════════════════════════════════
+
+        [Fact]
+        public async Task DemoteCreatorRoleAsync_ContentCreatorPostajeTourist_KreiraRedirectObavestenje()
+        {
+            using var ctx = CreateInMemoryContext(nameof(DemoteCreatorRoleAsync_ContentCreatorPostajeTourist_KreiraRedirectObavestenje));
+            var (tourist, cc, _, _) = SeedRoles(ctx);
+            ctx.Users.Add(new User
+            {
+                Id = 14,
+                FirstName = "M",
+                LastName = "M",
+                Email = "m@m.com",
+                PasswordHash = "hash",
+                RoleId = cc.Id,
+                Role = cc,
+                IsActive = true,
+                IsBlacklisted = false,
+                HasRequestedCreatorRole = false,
+                CreatorRoleRequestStatus = CreatorRoleRequestStatus.Approved,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            });
+            ctx.SaveChanges();
+
+            var svc = CreateUserService(ctx, new Mock<ITokenService>(), publicAppBaseUrl: "https://spirego-tourist.test");
+
+            var result = await svc.DemoteCreatorRoleAsync(14);
+
+            result.Should().BeTrue();
+            var updated = ctx.Users.Include(u => u.Role).First(u => u.Id == 14);
+            updated.RoleId.Should().Be(tourist.Id);
+            updated.Role.Name.Should().Be(RoleType.Tourist);
+            updated.HasRequestedCreatorRole.Should().BeFalse();
+            updated.CreatorRoleRequestStatus.Should().Be(CreatorRoleRequestStatus.None);
+            ctx.Notifications.Should().ContainSingle(n =>
+                n.UserId == 14 &&
+                n.Type == NotificationType.CreatorRoleAccessRevoked &&
+                n.ActionUrl == "https://spirego-tourist.test/home");
+        }
 
         [Fact]
         public async Task RejectCreatorRoleAsync_TouristImaZahtev_SkidaPendingFlag()

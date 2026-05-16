@@ -14,6 +14,7 @@ import { HeaderComponent } from '../header/header.component';
 import { LogoComponent } from '../header/logo.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { GoogleIdentityService } from '../../services/google-identity';
+import { environment } from '../../../environment/environment';
 
 interface SignupLanguageOption {
   code: AppLanguage;
@@ -159,12 +160,14 @@ export class SignupComponent {
   private loadGoogleAuthSettings(): void {
     this.authService.getPublicAuthSettings().subscribe({
       next: (settings) => {
-        this.googleClientId = settings.googleClientId?.trim() || null;
+        this.googleClientId = settings.googleClientId?.trim() || environment.googleClientId || null;
         this.cdr.detectChanges();
         this.scheduleGoogleButtonRender();
       },
       error: () => {
-        this.googleClientId = null;
+        this.googleClientId = environment.googleClientId || null;
+        this.cdr.detectChanges();
+        this.scheduleGoogleButtonRender();
       },
     });
   }
