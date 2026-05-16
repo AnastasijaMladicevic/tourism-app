@@ -316,7 +316,9 @@
         }
       </header>
 
-      @if (!managerGuestReviews.length) {
+      @if (managerGuestReviewsLoading) {
+        <p class="guest-reviews-empty">Loading guest reviews…</p>
+      } @else if (!managerGuestReviews.length) {
         <p class="guest-reviews-empty">No guest reviews for this object yet.</p>
       } @else {
         <div class="guest-reviews-list">

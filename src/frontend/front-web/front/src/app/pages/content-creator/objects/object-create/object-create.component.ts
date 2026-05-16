@@ -17,9 +17,10 @@ import {
 import { ActivitiesService, LocalityOption } from '../../../../services/activities';
 import { DestinationDto, DestinationService } from '../../../../services/destination.service';
 import { AuthService } from '../../../../services/auth.service';
+import { ReviewService } from '../../../../services/review';
 import { MapComponent as SharedMapComponent } from '../../../../shared/components/map/map';
+import { mapReviewDtosToObjectThreads } from '../../../manager/shared/manager-object-review.mapper';
 import {
-  getMockObjectReviewThreads,
   isConcerningCreatorReply,
   ManagerObjectReviewThread,
 } from '../../../manager/shared/manager-object-review.mock';
@@ -42,6 +43,7 @@ export class ObjectCreateComponent implements OnInit {
   private readonly destinationService = inject(DestinationService);
   private readonly activitiesService = inject(ActivitiesService);
   private readonly authService = inject(AuthService);
+  private readonly reviewService = inject(ReviewService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   /** Manager opens this page read-only via `/manager/objects/review/:id` (route data). */
@@ -92,6 +94,8 @@ export class ObjectCreateComponent implements OnInit {
   imagesSnapshot: ObjectImageDto[] = [];
 
   expandedGuestReviewId: number | null = null;
+  managerGuestReviews: ManagerObjectReviewThread[] = [];
+  managerGuestReviewsLoading = false;
 
   /** Server-backed sidebar row when editing / reviewing an existing object. */
   editSidebar: {
@@ -209,28 +213,12 @@ export class ObjectCreateComponent implements OnInit {
     );
   }
 
-  get managerGuestReviews(): ManagerObjectReviewThread[] {
-    if (!this.isManagerReview || !this.objectId) {
-      return [];
-    }
-    const creatorName = this.editSidebar?.creatorFullName || 'Content Creator';
-    return getMockObjectReviewThreads(
-      this.objectId,
-      creatorName,
-      this.loadedObject?.createdByUserId ?? 201,
-    );
-  }
-
   get hasConcerningGuestReply(): boolean {
     return this.managerGuestReviews.some((t) => isConcerningCreatorReply(t));
   }
 
   get primaryReportThread(): ManagerObjectReviewThread | null {
-    return (
-      this.managerGuestReviews.find((t) => isConcerningCreatorReply(t)) ??
-      this.managerGuestReviews[0] ??
-      null
-    );
+    return this.managerGuestReviews.find((t) => isConcerningCreatorReply(t)) ?? null;
   }
 
   /** CC edit only: approved tourist objects require a manager-reviewed deletion request. */
@@ -915,16 +903,50 @@ export class ObjectCreateComponent implements OnInit {
     this.patchWorkingHours(objectItem.workingHours);
     this.reviewObjectStatus = (objectItem.status ?? '').trim();
     this.applyManagerReadOnlyState();
-    this.initManagerGuestReviewExpansion(creatorName, objectItem.createdByUserId);
+    if (this.isManagerReview && this.objectId) {
+      this.loadManagerGuestReviews(this.objectId, creatorName, objectItem.createdByUserId);
+    }
   }
 
-  private initManagerGuestReviewExpansion(creatorName: string, createdByUserId?: number): void {
-    if (!this.isManagerReview || !this.objectId) {
+  private loadManagerGuestReviews(
+    objectId: number,
+    creatorName: string,
+    createdByUserId?: number,
+  ): void {
+    if (!this.isManagerReview) {
       return;
     }
-    const threads = getMockObjectReviewThreads(this.objectId, creatorName, createdByUserId ?? 201);
-    const flagged = threads.find((t) => isConcerningCreatorReply(t));
-    this.expandedGuestReviewId = flagged?.id ?? threads[0]?.id ?? null;
+
+    this.managerGuestReviewsLoading = true;
+    this.managerGuestReviews = [];
+
+    this.reviewService
+      .getForObject(objectId)
+      .pipe(
+        catchError(() => of([])),
+        finalize(() => {
+          this.managerGuestReviewsLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe((reviews) => {
+        this.managerGuestReviews = mapReviewDtosToObjectThreads(
+          reviews,
+          createdByUserId ?? 0,
+          creatorName.trim() || 'Content Creator',
+        );
+        this.initManagerGuestReviewExpansion();
+        this.cdr.detectChanges();
+      });
+  }
+
+  private initManagerGuestReviewExpansion(): void {
+    if (!this.isManagerReview) {
+      return;
+    }
+
+    const flagged = this.managerGuestReviews.find((t) => isConcerningCreatorReply(t));
+    this.expandedGuestReviewId = flagged?.id ?? this.managerGuestReviews[0]?.id ?? null;
   }
 
   private normalizeOptionalId(value: unknown): number | null {
