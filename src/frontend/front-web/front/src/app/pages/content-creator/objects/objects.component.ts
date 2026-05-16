@@ -1,8 +1,8 @@
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FilterOption, ObjectDto, ObjectService } from '../../../services/object';
+import { FilterOption, ObjectDto, ObjectImageDto, ObjectService } from '../../../services/object';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { ReviewDto, ReviewService } from '../../../services/review';
 
@@ -19,15 +19,22 @@ interface WorkingHoursRow {
   templateUrl: './objects.component.html',
   styleUrls: ['./objects.component.css']
 })
-export class ContentCreatorObjectsComponent implements OnInit {
+export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
   private readonly objectService = inject(ObjectService);
   private readonly reviewService = inject(ReviewService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
 
+  private static readonly HERO_ROTATION_INTERVAL_MS = 8000;
+  private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
+
   objects: ObjectDto[] = [];
   pagedObjects: ObjectDto[] = [];
   selectedObject: ObjectDto | null = null;
+
+  heroImageUrls: string[] = [];
+  currentHeroImageIndex = 0;
+  private heroRotationTimerId: ReturnType<typeof setInterval> | null = null;
   previewReviews: ReviewDto[] = [];
   isLoadingPreviewReviews = false;
 
@@ -82,6 +89,10 @@ export class ContentCreatorObjectsComponent implements OnInit {
     this.loadObjects();
   }
 
+  ngOnDestroy(): void {
+    this.stopHeroImageRotation();
+  }
+
   loadObjects(): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -106,9 +117,10 @@ export class ContentCreatorObjectsComponent implements OnInit {
         this.totalPages = response?.totalPages ?? Math.max(1, Math.ceil(this.totalCount / this.pageSize));
 
         if (!this.selectedObject || !items.some((item) => item.id === this.selectedObject?.id)) {
-          this.selectedObject = items[0] ?? null;
+          this.setSelectedObject(items[0] ?? null);
+        } else {
+          this.loadPreviewReviews();
         }
-        this.loadPreviewReviews();
 
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -117,8 +129,7 @@ export class ContentCreatorObjectsComponent implements OnInit {
         this.errorMessage = error?.error?.message ?? 'Failed to load objects';
         this.objects = [];
         this.pagedObjects = [];
-        this.selectedObject = null;
-        this.previewReviews = [];
+        this.setSelectedObject(null);
         this.totalCount = 0;
         this.totalPages = 1;
         this.isLoading = false;
@@ -191,8 +202,15 @@ export class ContentCreatorObjectsComponent implements OnInit {
   }
 
   selectObject(object: ObjectDto): void {
-    this.selectedObject = object;
-    this.loadPreviewReviews();
+    this.setSelectedObject(object);
+  }
+
+  getHeroSlideStyle(url: string): Record<string, string> {
+    return { 'background-image': `url("${url}")` };
+  }
+
+  trackByHeroImage(index: number, url: string): string {
+    return `${index}-${url}`;
   }
 
   trackByObjectId(_: number, object: ObjectDto): number {
@@ -226,19 +244,6 @@ export class ContentCreatorObjectsComponent implements OnInit {
     }
 
     return { 'background-image': `url("${image}")` };
-  }
-
-  getHeroStyle(): Record<string, string> {
-    const overlay =
-      'linear-gradient(180deg, rgba(15, 23, 42, 0.06), rgba(15, 23, 42, 0.28))';
-    const placeholder = 'linear-gradient(135deg, #dbeafe, #bfdbfe)';
-    const image = this.normalizeImageUrl(this.selectedObject?.mainImageUrl);
-
-    if (!image) {
-      return { 'background-image': `${overlay}, ${placeholder}` };
-    }
-
-    return { 'background-image': `${overlay}, url("${image}")` };
   }
 
   /** Location line below the title (venue/locality · destination). */
@@ -462,6 +467,89 @@ export class ContentCreatorObjectsComponent implements OnInit {
     this.router.navigate(['/content-creator/reviews'], {
       queryParams: { objectId: this.selectedObject.id }
     });
+  }
+
+  private setSelectedObject(object: ObjectDto | null): void {
+    const previousId = this.selectedObject?.id ?? null;
+    this.selectedObject = object;
+
+    if (!object) {
+      this.stopHeroImageRotation();
+      this.heroImageUrls = [];
+      this.currentHeroImageIndex = 0;
+      this.previewReviews = [];
+      return;
+    }
+
+    if (object.id !== previousId) {
+      this.loadHeroImagesForSelectedObject();
+      this.loadPreviewReviews();
+    }
+  }
+
+  private getDetailBanner(object: ObjectDto | null): string {
+    if (object?.mainImageUrl) {
+      return this.normalizeImageUrl(object.mainImageUrl);
+    }
+
+    return ContentCreatorObjectsComponent.DEFAULT_BANNER_URL;
+  }
+
+  private loadHeroImagesForSelectedObject(): void {
+    this.stopHeroImageRotation();
+    this.heroImageUrls = [];
+    this.currentHeroImageIndex = 0;
+
+    if (!this.selectedObject) {
+      return;
+    }
+
+    const fallbackUrl = this.getDetailBanner(this.selectedObject);
+
+    this.objectService.getImages(this.selectedObject.id).subscribe({
+      next: (images: ObjectImageDto[]) => {
+        const orderedUrls = (images ?? [])
+          .slice()
+          .sort((a, b) => Number(b.isMain) - Number(a.isMain))
+          .map((image) => this.normalizeImageUrl(image.url))
+          .filter((url): url is string => !!url);
+
+        this.heroImageUrls = orderedUrls.length > 0 ? orderedUrls : [fallbackUrl];
+        this.currentHeroImageIndex = 0;
+
+        if (this.heroImageUrls.length > 1) {
+          this.startHeroImageRotation();
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.heroImageUrls = [fallbackUrl];
+        this.currentHeroImageIndex = 0;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private startHeroImageRotation(): void {
+    this.stopHeroImageRotation();
+
+    this.heroRotationTimerId = setInterval(() => {
+      if (this.heroImageUrls.length <= 1) {
+        return;
+      }
+
+      this.currentHeroImageIndex =
+        (this.currentHeroImageIndex + 1) % this.heroImageUrls.length;
+      this.cdr.detectChanges();
+    }, ContentCreatorObjectsComponent.HERO_ROTATION_INTERVAL_MS);
+  }
+
+  private stopHeroImageRotation(): void {
+    if (this.heroRotationTimerId != null) {
+      clearInterval(this.heroRotationTimerId);
+      this.heroRotationTimerId = null;
+    }
   }
 
   private getMinRatingFromFilter(value: string): number | undefined {
