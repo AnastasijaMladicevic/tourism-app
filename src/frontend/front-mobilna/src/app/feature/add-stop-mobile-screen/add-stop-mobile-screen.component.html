@@ -6,7 +6,7 @@
           <span class="add-stop-route-modal__title-icon">
             <mat-icon>flash_on</mat-icon>
           </span>
-          <h3>Add Stop to Route</h3>
+          <h3>{{ 'map.addStop.titleToRoute' | translate }}</h3>
         </div>
 
         <button class="add-stop-route-modal__close" type="button" (click)="close()">
@@ -22,7 +22,7 @@
               type="text"
               [ngModel]="searchQuery"
               (ngModelChange)="searchQuery = $event; onSearchChange()"
-              placeholder="Search for a place, address, or category"
+              [placeholder]="'map.addStop.searchPlaceholder' | translate"
             />
             <mat-icon>mic_none</mat-icon>
           </div>
@@ -36,14 +36,14 @@
                 (click)="setCategory(category.key)"
               >
                 <mat-icon>{{ category.icon }}</mat-icon>
-                {{ category.label }}
+                {{ getCategoryLabel(category.key) }}
               </button>
             }
           </div>
 
           <button class="add-stop-route-modal__manual" type="button" (click)="chooseOnMap()">
             <span class="add-stop-route-modal__manual-icon"><mat-icon>place</mat-icon></span>
-            <span>Choose manually on map</span>
+            <span>{{ 'map.addStop.chooseManuallyOnMap' | translate }}</span>
             <mat-icon>chevron_right</mat-icon>
           </button>
 
@@ -51,15 +51,15 @@
             @if (shouldShowSearchResultsSection) {
               <section class="add-stop-route-modal__section-block">
                 <div class="add-stop-route-modal__section-head">
-                  <h4>Search Results</h4>
-                  <button type="button" (click)="clearAll()">Reset</button>
+                  <h4>{{ 'map.addStop.searchResults' | translate }}</h4>
+                  <button type="button" (click)="clearAll()">{{ 'map.addStop.reset' | translate }}</button>
                 </div>
 
                 @if (results.length === 0 && !isLoading) {
                   <div class="add-stop-route-modal__empty">
                     <mat-icon>travel_explore</mat-icon>
-                    <strong>No stops found</strong>
-                    <span>Try another keyword or switch category.</span>
+                    <strong>{{ 'map.addStop.noStopsFound' | translate }}</strong>
+                    <span>{{ 'map.addStop.tryAnotherKeyword' | translate }}</span>
                   </div>
                 } @else {
                   @for (item of results; track item.key) {
@@ -121,8 +121,8 @@
               @if (shouldShowRecentSection) {
                 <section class="add-stop-route-modal__section-block">
                   <div class="add-stop-route-modal__section-head">
-                    <h4>Recent</h4>
-                    <button type="button" (click)="clearRecentHistory()">Clear recent</button>
+                    <h4>{{ 'map.addStop.recent' | translate }}</h4>
+                    <button type="button" (click)="clearRecentHistory()">{{ 'map.addStop.clearRecent' | translate }}</button>
                   </div>
 
                   @for (item of recentResults; track item.key) {
@@ -154,7 +154,7 @@
                 <div class="add-stop-route-modal__section-head">
                   <h4>{{ suggestedSectionTitle }}</h4>
                   @if (activeCategory) {
-                    <button type="button" (click)="clearAll()">Reset</button>
+                    <button type="button" (click)="clearAll()">{{ 'map.addStop.reset' | translate }}</button>
                   }
                 </div>
 
@@ -184,22 +184,22 @@
             }
           </div>
 
-          <p class="add-stop-route-modal__hint">* Selecting a stop will recalculate your travel time and distance.</p>
+          <p class="add-stop-route-modal__hint">{{ 'map.addStop.hint' | translate }}</p>
         </div>
 
         <div class="add-stop-route-modal__preview">
           <div class="add-stop-route-modal__location-card">
-            <h4>Location</h4>
+            <h4>{{ 'common.location' | translate }}</h4>
 
             <div
               class="add-stop-route-modal__location-map"
-              [attr.data-name]="selectedResult?.name || 'Choose a stop'"
+              [attr.data-name]="selectedResult?.name || ('map.addStop.chooseStop' | translate)"
             >
               @if (selectedResultPreviewMapUrl) {
                 <iframe
                   class="add-stop-route-modal__location-frame"
                   [src]="selectedResultPreviewMapUrl"
-                  title="Selected stop location"
+                  [title]="'map.addStop.selectedStopLocationTitle' | translate"
                   loading="lazy"
                   referrerpolicy="no-referrer-when-downgrade"
                 ></iframe>
@@ -210,7 +210,7 @@
               }
 
               <button class="map-btn-overlay" type="button" (click)="viewSelectedOnMap()">
-                View on map
+                {{ 'common.viewOnMap' | translate }}
               </button>
             </div>
           </div>
@@ -218,7 +218,7 @@
       </div>
 
       <div class="add-stop-route-modal__footer">
-        <button class="add-stop-route-modal__cancel" type="button" (click)="close()">Cancel</button>
+        <button class="add-stop-route-modal__cancel" type="button" (click)="close()">{{ 'common.cancel' | translate }}</button>
         <button
           class="add-stop-route-modal__confirm"
           type="button"
@@ -226,7 +226,7 @@
           (click)="addToRoute()"
         >
           <mat-icon>add</mat-icon>
-          Add to Route
+          {{ 'map.addStop.addToRoute' | translate }}
         </button>
       </div>
     </div>
@@ -239,25 +239,25 @@
           <span class="add-stop-screen__logo">
             <mat-icon>flash_on</mat-icon>
           </span>
-          <h1>Add Stop</h1>
+          <h1>{{ 'map.addStop.title' | translate }}</h1>
         </div>
 
-        <button class="add-stop-screen__close" type="button" (click)="close()" aria-label="Close">
+        <button class="add-stop-screen__close" type="button" (click)="close()" [attr.aria-label]="'common.close' | translate">
           <mat-icon>close</mat-icon>
         </button>
       </header>
 
       <div class="add-stop-screen__desktop-layout">
         <div class="add-stop-screen__content">
-          <label class="add-stop-screen__search" aria-label="Search for a place">
+          <label class="add-stop-screen__search" [attr.aria-label]="'map.addStop.searchAria' | translate">
             <mat-icon>search</mat-icon>
             <input
               type="text"
               [ngModel]="searchQuery"
               (ngModelChange)="searchQuery = $event; onSearchChange()"
-              placeholder="Search for a place..."
+              [placeholder]="'map.addStop.searchCompactPlaceholder' | translate"
             />
-            <button class="add-stop-screen__icon-button" type="button" aria-label="Voice search">
+            <button class="add-stop-screen__icon-button" type="button" [attr.aria-label]="'map.addStop.voiceSearch' | translate">
               <mat-icon>mic_none</mat-icon>
             </button>
           </label>
@@ -271,7 +271,7 @@
                 (click)="setCategory(category.key)"
               >
                 <mat-icon>{{ category.icon }}</mat-icon>
-                <span>{{ category.label }}</span>
+                <span>{{ getCategoryLabel(category.key) }}</span>
               </button>
             }
           </div>
@@ -280,19 +280,19 @@
             <span class="add-stop-screen__choose-icon">
               <mat-icon>place</mat-icon>
             </span>
-            <span class="add-stop-screen__choose-copy">Choose on map</span>
+            <span class="add-stop-screen__choose-copy">{{ 'map.addStop.chooseOnMap' | translate }}</span>
             <mat-icon>chevron_right</mat-icon>
           </button>
 
           <div class="add-stop-screen__recent-list">
             @if (shouldShowSearchResultsSection) {
               <div class="add-stop-screen__section-head">
-                <h2>Search Results</h2>
-                <button type="button" (click)="clearAll()">Reset</button>
+                <h2>{{ 'map.addStop.searchResults' | translate }}</h2>
+                <button type="button" (click)="clearAll()">{{ 'map.addStop.reset' | translate }}</button>
               </div>
 
               @if (results.length === 0 && !isLoading) {
-                <div class="add-stop-screen__state">No matching places found.</div>
+                <div class="add-stop-screen__state">{{ 'map.addStop.noMatchingPlaces' | translate }}</div>
               } @else {
                 @for (item of results; track item.key) {
                   <button
@@ -343,8 +343,8 @@
             } @else {
               @if (shouldShowRecentSection) {
                 <div class="add-stop-screen__section-head">
-                  <h2>Recent</h2>
-                  <button type="button" (click)="clearRecentHistory()">Clear recent</button>
+                  <h2>{{ 'map.addStop.recent' | translate }}</h2>
+                  <button type="button" (click)="clearRecentHistory()">{{ 'map.addStop.clearRecent' | translate }}</button>
                 </div>
 
                 @for (item of recentResults; track item.key) {
@@ -371,7 +371,7 @@
               <div class="add-stop-screen__section-head" [class.add-stop-screen__section-head--spaced]="shouldShowRecentSection">
                 <h2>{{ suggestedSectionTitle }}</h2>
                 @if (activeCategory) {
-                  <button type="button" (click)="clearAll()">Reset</button>
+                  <button type="button" (click)="clearAll()">{{ 'map.addStop.reset' | translate }}</button>
                 }
               </div>
 
@@ -419,16 +419,16 @@
               <mat-icon>place</mat-icon>
             </div>
             <div class="add-stop-screen__preview-copy">
-              <span>Previewing Stop</span>
-              <strong>{{ selectedResult?.name || 'Choose a stop' }}</strong>
-              <small>Current Route: {{ routeDisplayTitle }}</small>
+              <span>{{ 'map.addStop.previewingStop' | translate }}</span>
+              <strong>{{ selectedResult?.name || ('map.addStop.chooseStop' | translate) }}</strong>
+              <small>{{ 'map.addStop.currentRoute' | translate }}: {{ routeDisplayTitle }}</small>
             </div>
           </div>
         </aside>
       </div>
 
       <footer class="add-stop-screen__footer">
-        <button class="add-stop-screen__cancel" type="button" (click)="close()">Cancel</button>
+        <button class="add-stop-screen__cancel" type="button" (click)="close()">{{ 'common.cancel' | translate }}</button>
         <button
           class="add-stop-screen__primary"
           type="button"
@@ -438,7 +438,7 @@
           @if (canAddToRoute) {
             <mat-icon>add</mat-icon>
           }
-          Add to Route
+          {{ 'map.addStop.addToRoute' | translate }}
         </button>
       </footer>
     </div>
