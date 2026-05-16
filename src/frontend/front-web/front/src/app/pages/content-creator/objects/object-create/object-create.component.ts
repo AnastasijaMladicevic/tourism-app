@@ -17,7 +17,13 @@ import {
 import { ActivitiesService, LocalityOption } from '../../../../services/activities';
 import { DestinationDto, DestinationService } from '../../../../services/destination.service';
 import { AuthService } from '../../../../services/auth.service';
+import { ReviewService } from '../../../../services/review';
 import { MapComponent as SharedMapComponent } from '../../../../shared/components/map/map';
+import { mapReviewDtosToObjectThreads } from '../../../manager/shared/manager-object-review.mapper';
+import {
+  isConcerningCreatorReply,
+  ManagerObjectReviewThread,
+} from '../../../manager/shared/manager-object-review.mock';
 
 type WorkingDayKey = 'pon' | 'uto' | 'sre' | 'cet' | 'pet' | 'sub' | 'ned';
 
@@ -37,6 +43,7 @@ export class ObjectCreateComponent implements OnInit {
   private readonly destinationService = inject(DestinationService);
   private readonly activitiesService = inject(ActivitiesService);
   private readonly authService = inject(AuthService);
+  private readonly reviewService = inject(ReviewService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   /** Manager opens this page read-only via `/manager/objects/review/:id` (route data). */
@@ -85,6 +92,10 @@ export class ObjectCreateComponent implements OnInit {
 
   /** Last-known server image rows for this object (used to delete/update on save). */
   imagesSnapshot: ObjectImageDto[] = [];
+
+  expandedGuestReviewId: number | null = null;
+  managerGuestReviews: ManagerObjectReviewThread[] = [];
+  managerGuestReviewsLoading = false;
 
   /** Server-backed sidebar row when editing / reviewing an existing object. */
   editSidebar: {
@@ -200,6 +211,14 @@ export class ObjectCreateComponent implements OnInit {
       s === 'approved' ||
       s === 'rejected'
     );
+  }
+
+  get hasConcerningGuestReply(): boolean {
+    return this.managerGuestReviews.some((t) => isConcerningCreatorReply(t));
+  }
+
+  get primaryReportThread(): ManagerObjectReviewThread | null {
+    return this.managerGuestReviews.find((t) => isConcerningCreatorReply(t)) ?? null;
   }
 
   /** CC edit only: approved tourist objects require a manager-reviewed deletion request. */
@@ -884,6 +903,50 @@ export class ObjectCreateComponent implements OnInit {
     this.patchWorkingHours(objectItem.workingHours);
     this.reviewObjectStatus = (objectItem.status ?? '').trim();
     this.applyManagerReadOnlyState();
+    if (this.isManagerReview && this.objectId) {
+      this.loadManagerGuestReviews(this.objectId, creatorName, objectItem.createdByUserId);
+    }
+  }
+
+  private loadManagerGuestReviews(
+    objectId: number,
+    creatorName: string,
+    createdByUserId?: number,
+  ): void {
+    if (!this.isManagerReview) {
+      return;
+    }
+
+    this.managerGuestReviewsLoading = true;
+    this.managerGuestReviews = [];
+
+    this.reviewService
+      .getForObject(objectId)
+      .pipe(
+        catchError(() => of([])),
+        finalize(() => {
+          this.managerGuestReviewsLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe((reviews) => {
+        this.managerGuestReviews = mapReviewDtosToObjectThreads(
+          reviews,
+          createdByUserId ?? 0,
+          creatorName.trim() || 'Content Creator',
+        );
+        this.initManagerGuestReviewExpansion();
+        this.cdr.detectChanges();
+      });
+  }
+
+  private initManagerGuestReviewExpansion(): void {
+    if (!this.isManagerReview) {
+      return;
+    }
+
+    const flagged = this.managerGuestReviews.find((t) => isConcerningCreatorReply(t));
+    this.expandedGuestReviewId = flagged?.id ?? this.managerGuestReviews[0]?.id ?? null;
   }
 
   private normalizeOptionalId(value: unknown): number | null {
@@ -951,6 +1014,36 @@ export class ObjectCreateComponent implements OnInit {
     } catch {
       return '';
     }
+  }
+
+  isConcerningGuestReply(thread: ManagerObjectReviewThread): boolean {
+    return isConcerningCreatorReply(thread);
+  }
+
+  toggleGuestReviewExpand(id: number): void {
+    this.expandedGuestReviewId = this.expandedGuestReviewId === id ? null : id;
+  }
+
+  isGuestReviewExpanded(id: number): boolean {
+    return this.expandedGuestReviewId === id;
+  }
+
+  formatGuestReviewDate(iso: string): string {
+    return new Date(iso).toLocaleString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  guestRatingStars(rating: number): string {
+    return '★'.repeat(rating) + '☆'.repeat(5 - rating);
+  }
+
+  reportCreatorQuery(thread: ManagerObjectReviewThread): Record<string, string> {
+    return { creatorId: String(thread.creatorId) };
   }
 
   ratingStarsVisual(rating: number | null): string {

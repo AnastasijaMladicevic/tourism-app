@@ -3,12 +3,12 @@ const productionHost =
     ? window.location.hostname
     : 'softeng.pmf.kg.ac.rs';
 
-const productionProtocol =
-  typeof window !== 'undefined' && window.location.protocol
-    ? window.location.protocol
-    : 'https:';
+const apiHost =
+  productionHost === '147.91.204.115'
+    ? 'softeng.pmf.kg.ac.rs'
+    : productionHost;
 
 export const environment = {
   production: true,
-  apiUrl: `${productionProtocol}//${productionHost}:10201/api`,
+  apiUrl: `https://${apiHost}:10201/api`,
 };

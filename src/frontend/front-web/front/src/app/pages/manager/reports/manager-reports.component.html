@@ -1,0 +1,250 @@
+<section class="manager-reports-page">
+  <div class="page-head">
+    <div class="page-head-copy">
+      <p class="breadcrumbs">Dashboard <span>&gt;</span> Creator Reports</p>
+      <h1>Content Creator Reports</h1>
+      <p class="subtle-text">
+        Escalate serious or repeated violations in {{ managedDestination }} to Admin review.
+        Use object, event, and activity review for individual content issues.
+      </p>
+    </div>
+    <button type="button" class="primary-btn" (click)="openReportModal()">
+      <span class="material-symbols-outlined">flag</span>
+      Report Content Creator
+    </button>
+  </div>
+
+  @if (errorMessage) {
+    <div class="inline-alert error-banner card" role="alert">{{ errorMessage }}</div>
+  }
+  @if (successMessage) {
+    <div class="inline-alert success-banner card" role="status">{{ successMessage }}</div>
+  }
+
+  <div class="info-banner card">
+    <span class="material-symbols-outlined info-icon">info</span>
+    <div>
+      <strong>When to use a report</strong>
+      <p>
+        Reports are for account-level concerns (repeated violations, abuse, unprofessional conduct).
+        Reject or deactivate specific content from Objects, Events, or Activities first when possible.
+      </p>
+      <a class="info-link" routerLink="/manager/creator-reviews">View tourist reviews &amp; creator replies →</a>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <article class="stat-card" data-tone="amber">
+      <p>Pending review</p>
+      <strong>{{ pendingCount }}</strong>
+      <span>Awaiting Admin decision</span>
+    </article>
+    <article class="stat-card" data-tone="blue">
+      <p>Total submitted</p>
+      <strong>{{ allReports.length }}</strong>
+      <span>Your reports in this destination</span>
+    </article>
+    <article class="stat-card" data-tone="green">
+      <p>Creators you can report</p>
+      <strong>{{ availableCreators.length }}</strong>
+      <span>No pending report on file</span>
+    </article>
+  </div>
+
+  <div class="toolbar card">
+    <label class="search-field" aria-label="Search reports">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        [(ngModel)]="draftSearchQuery"
+        (keydown.enter)="onSearchEnter($event)"
+        placeholder="Search by creator name, reason, or report ID..."
+      />
+    </label>
+    <button type="button" class="ghost-btn" (click)="toggleFilters()">
+      <span class="material-symbols-outlined">filter_alt</span>
+      Filters
+    </button>
+  </div>
+
+  @if (filterPanelOpen) {
+    <div class="filters-panel card">
+      <label>
+        <span>Status</span>
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onApplyFilters()">
+          <option value="all">All statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+      </label>
+      <div class="filter-actions">
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">Reset</button>
+      </div>
+    </div>
+  }
+
+  <div class="reports-content-grid">
+    <div class="reports-main-column">
+      <section class="reports-table-wrap card">
+        <header class="table-header">
+          <h2>Your reports</h2>
+          <span class="table-meta">{{ filteredReports.length }} shown</span>
+        </header>
+
+        @if (isLoading) {
+          <div class="state">Loading reports…</div>
+        } @else if (!filteredReports.length) {
+          <div class="state">
+            @if (allReports.length) {
+              No reports match your filters.
+            } @else {
+              You have not submitted any creator reports yet. Use Report on a creator below, or report from
+              <a routerLink="/manager/creator-reviews">tourist reviews &amp; creator replies</a>.
+            }
+          </div>
+        } @else {
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Status</th>
+                  <th>Content Creator</th>
+                  <th>Reason</th>
+                  <th>Submitted</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (report of filteredReports; track trackByReportId($index, report)) {
+                  <tr
+                    [class.active-row]="selectedReport?.id === report.id"
+                    (click)="selectReport(report)"
+                  >
+                    <td>
+                      <span class="status-chip" [ngClass]="getStatusClass(report.status)">
+                        {{ formatStatus(report.status) }}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="creator-cell">
+                        <strong>{{ report.reportedUserName }}</strong>
+                        <span>Creator ID {{ report.reportedUserId }}</span>
+                      </div>
+                    </td>
+                    <td class="reason-cell">{{ report.reason }}</td>
+                    <td>{{ formatDate(report.createdAt) }}</td>
+                    <td>
+                      @if (report.status === 'Pending') {
+                        <button
+                          type="button"
+                          class="ghost-btn small-btn danger-outline"
+                          (click)="withdrawReport(report, $event)"
+                        >
+                          Withdraw
+                        </button>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+
+      <section class="creators-panel card">
+        <header class="section-inline-head">
+          <div>
+            <h2>Report a creator</h2>
+            <p class="section-hint">Content creators with content in {{ managedDestination }}</p>
+          </div>
+        </header>
+        <ul class="creator-list">
+          @for (creator of reportableCreators; track creator.id) {
+            <li class="creator-row" [class.is-blocked]="creator.hasPendingReport">
+              <div class="creator-avatar">{{ creator.name.charAt(0) }}</div>
+              <div class="creator-info">
+                <strong>{{ creator.name }}</strong>
+                <span class="content-pill">{{ creator.contentSummary }}</span>
+              </div>
+              @if (creator.hasPendingReport) {
+                <span class="pending-tag">Pending report</span>
+              }
+              <button
+                type="button"
+                class="ghost-btn small-btn"
+                [disabled]="creator.hasPendingReport"
+                (click)="openReportModal(creator)"
+              >
+                Report
+              </button>
+            </li>
+          }
+        </ul>
+      </section>
+    </div>
+
+    <aside class="detail-column card">
+      @if (selectedReport) {
+        <div class="detail-hero">
+          <span class="detail-eyebrow">Report #{{ selectedReport.id }}</span>
+          <h2>{{ selectedReport.reportedUserName }}</h2>
+          <span class="status-chip" [ngClass]="getStatusClass(selectedReport.status)">
+            {{ formatStatus(selectedReport.status) }}
+          </span>
+        </div>
+
+        <div class="detail-metrics">
+          <div class="metric-card">
+            <span>Destination</span>
+            <strong>{{ selectedReport.destinationName }}</strong>
+          </div>
+          <div class="metric-card">
+            <span>Submitted</span>
+            <strong>{{ formatDate(selectedReport.createdAt) }}</strong>
+          </div>
+        </div>
+
+        <section class="detail-section">
+          <h3>Reason</h3>
+          <p class="detail-body">{{ selectedReport.reason }}</p>
+        </section>
+
+        @if (selectedReport.resolvedAt) {
+          <section class="detail-section">
+            <h3>Admin decision</h3>
+            <p class="detail-meta">Resolved {{ formatDate(selectedReport.resolvedAt) }}</p>
+            @if (selectedReport.rejectionReason) {
+              <p class="detail-body muted">{{ selectedReport.rejectionReason }}</p>
+            } @else if (selectedReport.status === 'Approved') {
+              <p class="detail-body muted">
+                Report approved — creator role removed and account blacklisted per platform policy.
+              </p>
+            }
+          </section>
+        } @else {
+          <section class="detail-section notice-pending">
+            <span class="material-symbols-outlined">hourglass_top</span>
+            <p>Admin has not reviewed this report yet. You can withdraw while status is Pending.</p>
+          </section>
+        }
+      } @else {
+        <div class="detail-empty">
+          <span class="material-symbols-outlined">description</span>
+          <p>Select a report to view details</p>
+        </div>
+      }
+    </aside>
+  </div>
+</section>
+
+<app-manager-report-modal
+  [open]="reportModalOpen"
+  [creators]="reportableCreators"
+  [initialCreatorId]="reportModalCreatorId"
+  [initialCategory]="reportModalCategory"
+  [initialReason]="reportModalReason"
+  (closed)="closeReportModal()"
+  (submitted)="onReportSubmitted()"
+/>

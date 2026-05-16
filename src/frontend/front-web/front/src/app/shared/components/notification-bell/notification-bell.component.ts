@@ -82,6 +82,9 @@ export class NotificationBellComponent implements OnInit {
     const performNavigation = () => {
       const actionUrl = notification.actionUrl?.trim();
       if (!actionUrl) {
+        if (this.isCreatorRoleRequestNotification(notification)) {
+          this.router.navigateByUrl('/admin/users?tab=tourists');
+        }
         this.isOpen.set(false);
         return;
       }
@@ -91,7 +94,7 @@ export class NotificationBellComponent implements OnInit {
         return;
       }
 
-      this.router.navigateByUrl(this.resolveInternalActionUrl(actionUrl));
+      this.router.navigateByUrl(this.resolveInternalActionUrl(actionUrl, notification));
       this.isOpen.set(false);
     };
 
@@ -178,12 +181,21 @@ export class NotificationBellComponent implements OnInit {
     this.isOpen.set(false);
   }
 
-  private resolveInternalActionUrl(actionUrl: string): string {
+  private isCreatorRoleRequestNotification(notification: NotificationDto): boolean {
+    const type = (notification.type ?? '').toLowerCase();
+    return type === 'adminnewcreatorrolerequest';
+  }
+
+  private resolveInternalActionUrl(actionUrl: string, notification?: NotificationDto): string {
     const normalized = actionUrl.startsWith('/') ? actionUrl : `/${actionUrl}`;
     const role = this.authService.getAuthenticatedRole();
 
-    if (normalized.startsWith('/users/creator-requests')) {
-      return '/admin/users';
+    if (
+      normalized.startsWith('/users/creator-requests')
+      || normalized.includes('/creator-requests')
+      || (notification && this.isCreatorRoleRequestNotification(notification))
+    ) {
+      return '/admin/users?tab=tourists';
     }
 
     if (role === 'admin') {

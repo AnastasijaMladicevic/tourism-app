@@ -242,6 +242,57 @@
           <p class="description-copy">{{ selectedObject.description || 'No description provided for this object.' }}</p>
         </section>
 
+        <section class="detail-section guest-reviews-section">
+          <div class="section-head reviews-section-head">
+            <h3>Guest reviews</h3>
+            <span class="reviews-count">{{ selectedObject.reviewCount ?? selectedObjectReviews.length }} total</span>
+          </div>
+          <p class="reviews-section-hint">
+            Tourists review this object only. Below are their ratings and any Content Creator replies.
+          </p>
+
+          @if (reviewsLoading) {
+            <p class="reviews-empty">Loading guest reviews…</p>
+          } @else if (!selectedObjectReviews.length) {
+            <p class="reviews-empty">No guest reviews yet for this object.</p>
+          } @else {
+            <div class="reviews-preview-list">
+              @for (thread of selectedObjectReviewsPreview; track thread.id) {
+                <article class="review-preview-card" [class.flagged]="isConcerningReply(thread)">
+                  <div class="review-preview-head">
+                    <strong>{{ thread.touristName }}</strong>
+                    <span class="review-stars">{{ ratingStars(thread.rating) }}</span>
+                  </div>
+                  <p class="review-preview-text">{{ thread.touristReview }}</p>
+                  @if (thread.creatorResponse?.trim()) {
+                    <div class="cc-reply-snippet" [class.concerning]="isConcerningReply(thread)">
+                      <span class="reply-label">CC reply</span>
+                      <p>{{ thread.creatorResponse }}</p>
+                    </div>
+                  } @else {
+                    <span class="reply-pending">No creator reply yet</span>
+                  }
+                </article>
+              }
+            </div>
+            @if (selectedObjectReviews.length > 2) {
+              <button type="button" class="text-link-btn" (click)="onOpenSelectedObjectReview()">
+                View all {{ selectedObjectReviews.length }} reviews on object page
+              </button>
+            }
+            @if (concerningReportThread) {
+              <a
+                class="report-creator-btn"
+                [routerLink]="['/manager/reports']"
+                [queryParams]="reportCreatorQuery(concerningReportThread)"
+              >
+                <span class="material-symbols-outlined">flag</span>
+                Report creator
+              </a>
+            }
+          }
+        </section>
+
         <section class="detail-section">
           <div class="map-card">
             @if (hasSelectedObjectCoordinates) {
@@ -265,7 +316,7 @@
         <div class="detail-cta">
           <button type="button" class="primary-btn full-cta sidebar-cta-btn" (click)="onOpenSelectedObjectReview()">
             <span class="material-symbols-outlined">rate_review</span>
-            Open full review
+            Open object review &amp; guest feedback
           </button>
         </div>
       } @else {

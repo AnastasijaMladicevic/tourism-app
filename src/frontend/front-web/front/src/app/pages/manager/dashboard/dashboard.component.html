@@ -1,3 +1,68 @@
-<section class="manager-page">
-  <h1>Manager Dashboard</h1>
+<section class="manager-dashboard">
+  <div class="page-head">
+    <div>
+      <p class="breadcrumbs">Main Menu <span>&gt;</span> Dashboard</p>
+      <h1>Manager Dashboard</h1>
+      <p class="subtle-text">Welcome back{{ user?.firstName ? ', ' + user?.firstName : '' }}.</p>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <a class="dash-card card" routerLink="/manager/creator-reviews">
+      <div class="card-icon-wrap" data-tone="purple">
+        <span class="material-symbols-outlined">forum</span>
+      </div>
+      <div class="card-copy">
+        <h2>Reviews &amp; Replies</h2>
+        <p>Read tourist reviews and how creators respond before escalating a report.</p>
+        <span class="card-cta">
+          View conversations
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </span>
+      </div>
+    </a>
+
+    <a class="dash-card card moderation-card" routerLink="/manager/reports">
+      <div class="card-icon-wrap" data-tone="amber">
+        <span class="material-symbols-outlined">flag</span>
+      </div>
+      <div class="card-copy">
+        <h2>Content Creator Reports</h2>
+        <p>Escalate serious violations to Admin. View pending and past reports.</p>
+        <span class="card-cta">
+          Open reports
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </span>
+      </div>
+      <span class="pending-pill">1 pending</span>
+    </a>
+
+    <a class="dash-card card" routerLink="/manager/objects">
+      <div class="card-icon-wrap" data-tone="blue">
+        <span class="material-symbols-outlined">apartment</span>
+      </div>
+      <div class="card-copy">
+        <h2>Review Objects</h2>
+        <p>Approve, reject, or deactivate tourist objects in your destination.</p>
+        <span class="card-cta">
+          Go to objects
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </span>
+      </div>
+    </a>
+
+    <a class="dash-card card" routerLink="/manager/events">
+      <div class="card-icon-wrap" data-tone="green">
+        <span class="material-symbols-outlined">event</span>
+      </div>
+      <div class="card-copy">
+        <h2>Review Events</h2>
+        <p>Manage pending submissions and active events from creators.</p>
+        <span class="card-cta">
+          Go to events
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </span>
+      </div>
+    </a>
+  </div>
 </section>
