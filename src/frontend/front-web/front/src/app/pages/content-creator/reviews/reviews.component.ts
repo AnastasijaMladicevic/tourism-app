@@ -53,6 +53,10 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   selectedRatings: number[] = [];
   sortOrder: 'desc' | 'asc' = 'desc';
 
+  queuePage = 1;
+  queuePageSize = 8;
+  readonly queuePageSizeOptions = [5, 8, 10, 15];
+
   responseText = '';
   private sourceReviews: ReviewDto[] = [];
   private selectedObjectIdFilter: number | null = null;
@@ -144,7 +148,30 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
 
   resetFilters(): void {
     this.searchTerm = '';
+    this.queuePage = 1;
     this.selectAllFilters();
+  }
+
+  onQueuePreviousPage(): void {
+    if (this.queuePage <= 1) {
+      return;
+    }
+
+    this.queuePage--;
+  }
+
+  onQueueNextPage(): void {
+    if (this.queuePage >= this.queueTotalPages) {
+      return;
+    }
+
+    this.queuePage++;
+  }
+
+  onQueuePageSizeChange(value: number | string): void {
+    this.queuePageSize = Number(value);
+    this.queuePage = 1;
+    this.ensureSelectedReviewOnQueuePage();
   }
 
   selectAllFilters(): void {
@@ -283,6 +310,31 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
 
   get queueCountLabel(): string {
     return `${this.filteredReviews.length} review${this.filteredReviews.length === 1 ? '' : 's'}`;
+  }
+
+  get queueTotalPages(): number {
+    if (this.filteredReviews.length === 0) {
+      return 1;
+    }
+
+    return Math.max(1, Math.ceil(this.filteredReviews.length / this.queuePageSize));
+  }
+
+  get pagedQueueReviews(): ReviewDto[] {
+    const start = (this.queuePage - 1) * this.queuePageSize;
+    return this.filteredReviews.slice(start, start + this.queuePageSize);
+  }
+
+  get queuePageStart(): number {
+    if (this.filteredReviews.length === 0) {
+      return 0;
+    }
+
+    return (this.queuePage - 1) * this.queuePageSize + 1;
+  }
+
+  get queuePageEnd(): number {
+    return Math.min(this.queuePage * this.queuePageSize, this.filteredReviews.length);
   }
 
   get selectedReviewHasResponse(): boolean {
@@ -457,6 +509,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
 
     this.allReviews = [...this.sourceReviews];
     this.filteredReviews = reviews;
+    this.queuePage = 1;
 
     if (reviews.length === 0) {
       this.selectReview(null);
@@ -469,7 +522,21 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
       : null;
 
     this.selectReview(match ?? reviews[0]);
+    this.ensureSelectedReviewOnQueuePage();
     this.triggerViewUpdate();
+  }
+
+  private ensureSelectedReviewOnQueuePage(): void {
+    if (!this.selectedReview || this.filteredReviews.length === 0) {
+      return;
+    }
+
+    const index = this.filteredReviews.findIndex((review) => review.id === this.selectedReview!.id);
+    if (index < 0) {
+      return;
+    }
+
+    this.queuePage = Math.floor(index / this.queuePageSize) + 1;
   }
 
   private matchesSearch(review: ReviewDto, normalizedSearch: string): boolean {

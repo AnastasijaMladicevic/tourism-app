@@ -69,21 +69,39 @@
       } @else if (filteredReviews.length === 0) {
         <p class="empty-note">No reviews found for your objects.</p>
       } @else {
-        @for (review of filteredReviews; track review.id) {
-          <article class="queue-item" [class.active]="selectedReview?.id === review.id" (click)="selectReview(review)">
-            <div class="queue-item-head">
-              <div>
-                <h3>{{ review.userFullName }}</h3>
-                <span>{{ formatDate(review.createdAt) }}</span>
+        <div class="queue-list">
+          @for (review of pagedQueueReviews; track review.id) {
+            <article class="queue-item" [class.active]="selectedReview?.id === review.id" (click)="selectReview(review)">
+              <div class="queue-item-head">
+                <div>
+                  <h3>{{ review.userFullName }}</h3>
+                  <span>{{ formatDate(review.createdAt) }}</span>
+                </div>
+                <span class="status" [class.approved]="review.creatorResponse" [class.pending]="!review.creatorResponse">
+                  {{ review.creatorResponse ? 'Responded' : 'Pending' }}
+                </span>
               </div>
-              <span class="status" [class.approved]="review.creatorResponse" [class.pending]="!review.creatorResponse">
-                {{ review.creatorResponse ? 'Responded' : 'Pending' }}
-              </span>
-            </div>
-            <p>{{ review.text }}</p>
-            <small>{{ review.objectName }} • {{ review.rating }}/5</small>
-          </article>
-        }
+              <p class="queue-item-preview">{{ review.text }}</p>
+              <small>{{ review.objectName }} • {{ review.rating }}/5</small>
+            </article>
+          }
+        </div>
+        <footer class="queue-footer">
+          <p>{{ queuePageStart }}–{{ queuePageEnd }} of {{ filteredReviews.length }}</p>
+          <div class="queue-pagination">
+            <label class="page-size-control">
+              <span>Per page</span>
+              <select class="page-size-select" [(ngModel)]="queuePageSize" (ngModelChange)="onQueuePageSizeChange($event)">
+                @for (option of queuePageSizeOptions; track option) {
+                  <option [ngValue]="option">{{ option }}</option>
+                }
+              </select>
+            </label>
+            <button class="queue-page-btn" type="button" (click)="onQueuePreviousPage()" [disabled]="queuePage === 1">Prev</button>
+            <span class="queue-page-indicator">{{ queuePage }} / {{ queueTotalPages }}</span>
+            <button class="queue-page-btn" type="button" (click)="onQueueNextPage()" [disabled]="queuePage >= queueTotalPages">Next</button>
+          </div>
+        </footer>
       }
     </aside>
 
