@@ -922,6 +922,8 @@
     "endTime": "Hora de fin",
     "priorityTitle": "Marcar como prioridad",
     "conflictMessage": "Este horario se superpone con \"{{title}}\" a las {{time}}.",
+    "estimatedScheduleTitle": "Horario estimado",
+    "estimatedScheduleBody": "Este evento terminara alrededor de las {{time}} segun la configuracion actual.",
     "scheduleTitle": "Programa tu evento",
     "backAria": "Volver al planificador",
     "saving": "Guardando...",

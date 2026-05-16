@@ -924,6 +924,8 @@
     "endTime": "Završno vreme",
     "priorityTitle": "Označi kao prioritet",
     "conflictMessage": "Ovaj termin se preklapa sa \"{{title}}\" u {{time}}.",
+    "estimatedScheduleTitle": "Procena rasporeda",
+    "estimatedScheduleBody": "Ovaj event ce se zavrsiti oko {{time}} na osnovu trenutnih podesavanja.",
     "scheduleTitle": "Isplaniraj event",
     "backAria": "Nazad na planer",
     "saving": "Čuvanje...",

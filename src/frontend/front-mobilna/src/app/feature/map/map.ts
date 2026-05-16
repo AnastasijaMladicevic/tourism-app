@@ -795,6 +795,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private async loadAllData(state?: any): Promise<void> {
     this.allItems = [];
+    this.mapService.clearAllMarkers();
 
     const allObjects = await this.fetchAllObjects();
 
@@ -802,18 +803,38 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       destinations: this.destinationService.getAll(
         { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
         { bypassRegion: true, bypassLanguage: true },
+      ).pipe(
+        catchError((error) => {
+          console.warn('Neuspesno ucitavanje destinacija za mapu.', error);
+          return of([]);
+        }),
       ),
       events: this.eventService.getAll(
         { page: 1, pageSize: 500, sortBy: 'startDate', sortOrder: 'asc' },
         { bypassRegion: true, bypassLanguage: true },
+      ).pipe(
+        catchError((error) => {
+          console.warn('Neuspesno ucitavanje dogadjaja za mapu.', error);
+          return of([]);
+        }),
       ),
       activities: this.activityService.getAll(
         { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
-        { bypassRegion: true },
+        { bypassRegion: true, bypassLanguage: true },
+      ).pipe(
+        catchError((error) => {
+          console.warn('Neuspesno ucitavanje aktivnosti za mapu.', error);
+          return of([]);
+        }),
       ),
       localities: this.localityService.getAll(
         { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
-        { bypassRegion: true },
+        { bypassRegion: true, bypassLanguage: true },
+      ).pipe(
+        catchError((error) => {
+          console.warn('Neuspesno ucitavanje lokaliteta za mapu.', error);
+          return of([]);
+        }),
       ),
     }).subscribe({
       next: ({ destinations, events, activities, localities }) => {

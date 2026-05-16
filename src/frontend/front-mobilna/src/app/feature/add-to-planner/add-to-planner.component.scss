@@ -1,7 +1,8 @@
 .add-planner-page {
   min-height: 100dvh;
-  background: linear-gradient(180deg, #fbfdff 0%, #f2f6fb 100%);
+  background: var(--bg);
   color: #1f2937;
+  overflow-x: clip;
 }
 
 .add-planner-topbar {
@@ -12,17 +13,15 @@
   grid-template-columns: 40px minmax(0, 1fr) 40px;
   align-items: center;
   gap: 12px;
-  padding: 20px 20px 18px;
-  border-bottom: 1px solid #dde6ef;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(14px);
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--white);
 
   h1 {
     margin: 0;
-    color: #111827;
-    font-size: 17px;
-    font-weight: 800;
-    letter-spacing: -0.03em;
+    color: var(--emperor);
+    font-size: 18px;
+    font-weight: 700;
     text-align: left;
   }
 }
@@ -58,27 +57,29 @@
 }
 
 .add-planner-shell {
-  width: min(100%, 440px);
+  width: min(100%, 460px);
   margin: 0 auto;
-  padding: 18px 16px 118px;
+  padding: 20px 12px calc(64px + env(safe-area-inset-bottom));
 }
 
 .add-planner-layout {
   display: grid;
-  gap: 18px;
+  gap: 20px;
+  min-width: 0;
 }
 
 .event-preview-card,
 .schedule-card,
 .priority-card {
   border: 1px solid #dfe7ef;
-  border-radius: 24px;
+  border-radius: 20px;
   background: #fff;
-  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
 .event-preview-card {
   overflow: hidden;
+  min-width: 0;
 }
 
 .event-preview-card__image-wrap {
@@ -86,7 +87,7 @@
 
   img {
     width: 100%;
-    height: 192px;
+    height: 184px;
     object-fit: cover;
     display: block;
   }
@@ -108,12 +109,12 @@
 }
 
 .event-preview-card__body {
-  padding: 18px 18px 20px;
+  padding: 18px 16px 18px;
 
   h2 {
     margin: 0 0 8px;
     color: #111827;
-    font-size: 19px;
+    font-size: 18px;
     line-height: 1.2;
     font-weight: 800;
     letter-spacing: -0.03em;
@@ -161,16 +162,17 @@
 }
 
 .schedule-card {
-  padding: 22px 18px;
+  padding: 22px 16px 24px;
+  min-width: 0;
 }
 
 .schedule-card__header {
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 
   h3 {
-    margin: 0 0 8px;
+    margin: 0 0 10px;
     color: #111827;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 800;
     letter-spacing: -0.03em;
   }
@@ -179,7 +181,7 @@
     margin: 0;
     color: #667085;
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 1.6;
   }
 }
 
@@ -196,11 +198,12 @@
 
 .field-grid {
   display: grid;
-  gap: 16px;
+  gap: 18px;
 }
 
 .field-grid--split {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
   margin-top: 18px;
 }
 
@@ -212,8 +215,8 @@
     align-items: center;
     gap: 8px;
     margin-bottom: 10px;
-    color: #111827;
-    font-size: 14px;
+    color: #1f2937;
+    font-size: 13px;
     font-weight: 700;
 
     svg {
@@ -233,21 +236,23 @@
     margin-top: 8px;
     color: #667085;
     font-size: 13px;
+    line-height: 1.45;
   }
 }
 
 .field-card__surface {
-  min-height: 50px;
+  min-height: 54px;
   padding: 0 16px;
   border: 1px solid #d9e2ec;
-  border-radius: 18px;
-  background: #fff;
+  border-radius: 16px;
+  background: #fbfdff;
   display: flex;
   align-items: center;
 
   input,
   select {
     width: 100%;
+    min-width: 0;
     border: none;
     background: transparent;
     color: #374151;
@@ -267,7 +272,7 @@
 }
 
 .calendar-strip {
-  display: flex;
+  display: none;
   gap: 10px;
   margin: 18px 0 0;
   overflow-x: auto;
@@ -465,6 +470,7 @@
 .notes-field {
   display: block;
   margin-top: 24px;
+  min-width: 0;
 
   span {
     display: block;
@@ -476,11 +482,11 @@
 
   textarea {
     width: 100%;
-    min-height: 124px;
-    padding: 18px 16px;
+    min-height: 132px;
+    padding: 16px;
     border: 1px solid #d9e2ec;
-    border-radius: 20px;
-    background: #fff;
+    border-radius: 16px;
+    background: #fbfdff;
     color: #475467;
     font: inherit;
     resize: none;
@@ -489,15 +495,13 @@
 }
 
 .schedule-actions {
-  position: sticky;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  margin: 24px -18px -22px;
-  padding: 14px 18px 22px;
-  border-top: 1px solid #e5e7eb;
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(12px);
+  display: grid;
+  gap: 12px;
+  margin: 28px 0 0;
+  padding: 0;
+  border-top: none;
+  background: transparent;
+  backdrop-filter: none;
 }
 
 .save-btn,
@@ -521,10 +525,9 @@
 }
 
 .cancel-btn {
-  margin-top: 12px;
-  border: none;
-  background: transparent;
-  color: #667085;
+  border: 1px solid #d0d5dd;
+  background: #fff;
+  color: #1f2937;
 }
 
 .form-feedback {
@@ -543,6 +546,7 @@
   .add-planner-shell {
     padding-left: 12px;
     padding-right: 12px;
+    padding-bottom: calc(68px + env(safe-area-inset-bottom));
   }
 
   .field-grid--split {
@@ -555,6 +559,44 @@
 
   .toggle-btn {
     justify-self: end;
+  }
+}
+
+@media (max-width: 767px) {
+  .event-preview-card {
+    border-radius: 22px;
+  }
+
+  .event-preview-card__mobile-meta {
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+  }
+
+  .priority-card__copy p {
+    max-width: 220px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1099px) {
+  .add-planner-shell {
+    width: 100%;
+    max-width: none;
+    padding: 28px 24px 36px;
+  }
+
+  .add-planner-layout {
+    width: 100%;
+  }
+
+  .event-preview-card,
+  .schedule-card {
+    width: 100%;
+    max-width: none;
+  }
+
+  .event-preview-card__image-wrap img {
+    height: 240px;
   }
 }
 
@@ -576,7 +618,8 @@
   }
 
   .add-planner-shell {
-    width: min(100%, 1240px);
+    width: 100%;
+    max-width: none;
     padding: 40px 32px 40px;
   }
 
@@ -584,6 +627,7 @@
     grid-template-columns: minmax(340px, 470px) minmax(0, 1fr);
     gap: 38px;
     align-items: stretch;
+    width: 100%;
   }
 
   .event-preview-card__image-wrap {
@@ -597,6 +641,10 @@
   .event-preview-card__mobile-meta,
   .event-preview-card__body {
     display: none;
+  }
+
+  .calendar-strip {
+    display: flex;
   }
 
   .event-preview-card__desktop-overlay {
@@ -678,7 +726,6 @@
   }
 
   .schedule-actions {
-    position: static;
     display: flex;
     gap: 14px;
     margin: 28px 0 0;
@@ -700,7 +747,6 @@
 
   .cancel-btn {
     flex: 0 0 200px;
-    margin-top: 0;
     border: 1px solid #d0d5dd;
     background: #fff;
     color: #1f2937;
