@@ -198,14 +198,17 @@
 
 .stat-card.blue {
   background: #ffffff;
+  border-color: #2563eb;
 }
 
 .stat-card.green {
   background: #ffffff;
+  border-color: #16a34a;
 }
 
 .stat-card.amber {
   background: #ffffff;
+  border-color: #d97706;
 }
 
 .stat-card.blue strong {

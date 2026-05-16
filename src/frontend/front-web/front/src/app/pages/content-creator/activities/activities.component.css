@@ -53,8 +53,8 @@
 .card {
     background: #ffffff;
     border: 1px solid #e5e7eb;
-    border-radius: 18px;
-    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.04);
+    border-radius: 14px;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
 }
 
 .primary-btn,
@@ -272,6 +272,18 @@
     font-size: 12px;
 }
 
+.insight-card[data-tone='blue'] {
+    border-color: #2563eb;
+}
+
+.insight-card[data-tone='green'] {
+    border-color: #16a34a;
+}
+
+.insight-card[data-tone='amber'] {
+    border-color: #d97706;
+}
+
 .insight-card[data-tone='blue'] strong {
     color: #2563eb;
 }
@@ -302,7 +314,7 @@
 .hero-media {
     position: relative;
     min-height: 190px;
-    border-radius: 16px;
+    border-radius: 14px;
     background:
         linear-gradient(180deg, rgba(15, 23, 42, 0.06), rgba(15, 23, 42, 0.28)),
         linear-gradient(135deg, #dbeafe, #bfdbfe);
@@ -395,9 +407,9 @@
 }
 
 .metric-card {
-    padding: 14px;
+    padding: 12px;
     border: 1px solid #e5e7eb;
-    border-radius: 14px;
+    border-radius: 12px;
     background: #f8fafc;
 }
 
