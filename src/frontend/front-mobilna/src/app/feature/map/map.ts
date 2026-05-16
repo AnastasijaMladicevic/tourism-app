@@ -138,6 +138,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   isRouteNavigationActive = false;
   isNavigationAutoCenterEnabled = false;
   showLocationConsentPrompt = false;
+  private desktopPlannerResizeStartY: number | null = null;
+  private desktopPlannerResizeStartHeight = 0;
+  private desktopPlannerResizeCleanup: (() => void) | null = null;
+  desktopPlannerHeight: number | null = null;
+  private readonly desktopPlannerMinHeight = 180;
+  private readonly desktopPlannerMaxHeight = 600;
   private userMarker: L.Marker | null = null;
 
   private routeLine: L.Polyline | null = null;
@@ -218,7 +224,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.cdr.detectChanges();
     });
   };
-
+  get plannerHeightStyle(): string | null {
+    const activeHeight = this.isRoutePlannerDragging ? this.routePlannerDragCurrentHeight : this.routePlannerSettledHeight;
+    return activeHeight == null ? null : `${activeHeight}px`;
+  }
   constructor(
     private mapService: MapService,
     private router: Router,
@@ -335,6 +344,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.routeLine.remove();
       this.routeLine = null;
     }
+    this.stopDesktopPlannerResize();
     this.mapService.destroyMap();
   }
 
@@ -614,21 +624,21 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
       const routeLegSummaries = Array.isArray(route.legs)
         ? route.legs.map((leg: { distance?: number; duration?: number }) => ({
-            distanceKm: (leg.distance ?? 0) / 1000,
-            durationMin: (leg.duration ?? 0) / 60,
-          }))
+          distanceKm: (leg.distance ?? 0) / 1000,
+          durationMin: (leg.duration ?? 0) / 60,
+        }))
         : [];
       const distanceKm = routeLegSummaries.length > 0
         ? routeLegSummaries.reduce(
-            (sum: number, leg: RouteLegSummary) => sum + leg.distanceKm,
-            0,
-          )
+          (sum: number, leg: RouteLegSummary) => sum + leg.distanceKm,
+          0,
+        )
         : (route.distance ?? 0) / 1000;
       const durationMin = routeLegSummaries.length > 0
         ? routeLegSummaries.reduce(
-            (sum: number, leg: RouteLegSummary) => sum + leg.durationMin,
-            0,
-          )
+          (sum: number, leg: RouteLegSummary) => sum + leg.durationMin,
+          0,
+        )
         : (route.duration ?? 0) / 60;
 
       this.routeLegSummaries = routeLegSummaries;
@@ -1472,10 +1482,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onRoutePlannerDragStart(event: PointerEvent): void {
-    if (!this.isCompactViewport()) {
-      return;
-    }
-
     if (event.pointerType === 'mouse' && event.button !== 0) {
       return;
     }
@@ -1803,7 +1809,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.addStopPanelQuery = '';
     this.addStopPanelResults = [];
     this.selectedAddStopResultKey = '';
-      if (this.addStopPanelSearchDebounceTimer) {
+    if (this.addStopPanelSearchDebounceTimer) {
       clearTimeout(this.addStopPanelSearchDebounceTimer);
       this.addStopPanelSearchDebounceTimer = null;
     }
@@ -2095,11 +2101,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   private resetRoutePlannerPosition(): void {
     this.routePlannerSettledHeight = null;
     this.routePlannerDefaultHeight = null;
+    this.desktopPlannerHeight = null;
     this.isRoutePlannerExpanded = false;
   }
 
   private isCompactViewport(): boolean {
-    return typeof window !== 'undefined' && window.innerWidth <= 768;
+    return typeof window !== 'undefined' && window.innerWidth <= 769;
   }
 
   private resolveRoutePlannerMaxHeight(rect: DOMRect): number {
@@ -2117,7 +2124,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private syncRoutePlannerExpandedState(): void {
-    this.isRoutePlannerExpanded = false;
+    const defaultHeight = this.routePlannerDefaultHeight ?? 0;
+    const settledHeight = this.routePlannerSettledHeight ?? defaultHeight;
+    this.isRoutePlannerExpanded = settledHeight > defaultHeight + 48;
   }
 
   private syncRoutePointMarkers(): void {
@@ -2479,5 +2488,62 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private toDegrees(value: number): number {
     return (value * 180) / Math.PI;
+  }
+  onDesktopPlannerResizeStart(event: PointerEvent): void {
+    if (this.isCompactViewport()) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    this.stopDesktopPlannerResize();
+
+    const planner = document.querySelector('.route-planner') as HTMLElement | null;
+    if (!planner) {
+      return;
+    }
+
+    this.desktopPlannerResizeStartY = event.clientY;
+    this.desktopPlannerResizeStartHeight = this.desktopPlannerHeight ?? planner.getBoundingClientRect().height;
+
+    const handleMove = (moveEvent: PointerEvent) => {
+      if (this.desktopPlannerResizeStartY == null) {
+        return;
+      }
+
+      const delta = moveEvent.clientY - this.desktopPlannerResizeStartY;
+      const next = this.desktopPlannerResizeStartHeight + delta;
+      this.desktopPlannerHeight = Math.max(
+        this.desktopPlannerMinHeight,
+        Math.min(this.desktopPlannerMaxHeight, next)
+      );
+      this.syncRoutePlannerExpandedState();
+      this.cdr.detectChanges();
+    };
+
+    const handleEnd = () => {
+      this.syncRoutePlannerExpandedState();
+      this.stopDesktopPlannerResize();
+      this.cdr.detectChanges();
+    };
+
+    window.addEventListener('pointermove', handleMove);
+    window.addEventListener('pointerup', handleEnd, { once: true });
+    window.addEventListener('pointercancel', handleEnd, { once: true });
+
+    this.desktopPlannerResizeCleanup = () => {
+      window.removeEventListener('pointermove', handleMove);
+      window.removeEventListener('pointerup', handleEnd);
+      window.removeEventListener('pointercancel', handleEnd);
+    };
+  }
+
+  private stopDesktopPlannerResize(): void {
+    if (this.desktopPlannerResizeCleanup) {
+      this.desktopPlannerResizeCleanup();
+      this.desktopPlannerResizeCleanup = null;
+    }
+    this.desktopPlannerResizeStartY = null;
   }
 }
