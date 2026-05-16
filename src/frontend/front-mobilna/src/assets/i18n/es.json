@@ -205,25 +205,19 @@
     "currentPassword": "Contraseña actual",
     "newPassword": "Nueva contraseña",
     "confirmPassword": "Confirmar contraseña",
-
     "showCurrentPassword": "Mostrar contraseña actual",
     "hideCurrentPassword": "Ocultar contraseña actual",
-
     "showNewPassword": "Mostrar nueva contraseña",
     "hideNewPassword": "Ocultar nueva contraseña",
-
     "showConfirmPassword": "Mostrar confirmación de contraseña",
     "hideConfirmPassword": "Ocultar confirmación de contraseña",
-
     "submit": "Confirmar",
     "saving": "Guardando...",
-
     "rules": {
       "minLength": "La contraseña debe tener al menos 8 caracteres.",
       "uppercase": "La contraseña debe contener al menos una letra mayúscula.",
       "numberOrSpecial": "La contraseña debe contener al menos un número o carácter especial."
     },
-
     "errors": {
       "currentPasswordRequired": "La contraseña actual es obligatoria.",
       "passwordInvalid": "Usa al menos 8 caracteres, 1 mayúscula y 1 número o carácter especial.",
@@ -233,7 +227,7 @@
       "changeFailed": "No se pudo cambiar la contraseña. Inténtalo de nuevo."
     }
   },
-    "signup": {
+  "signup": {
     "title": "Crear cuenta",
     "subtitle": "Únete y mejora tu experiencia",
     "firstName": "Nombre",
@@ -744,7 +738,7 @@
     "footerMade": "Hecho con amor en Montenegro",
     "footerRights": "Todos los derechos reservados."
   },
- "privacy": {
+  "privacy": {
     "title": "Privacidad y datos",
     "eyebrow": "TRANSPARENTE",
     "heroTitle": "Cómo SpireGO utiliza tus datos",
@@ -798,21 +792,82 @@
   },
   "map": {
     "searchPlaceholder": "Busca objetos, rutas...",
-    "geoUnsupported": "La geolocalización no es compatible con este navegador.",
-    "geoDenied": "Permite el acceso a la ubicación en la configuración de tu navegador.",
-    "geoUnavailable": "La ubicación no está disponible actualmente.",
-    "geoFailed": "No se puede obtener tu ubicación.",
-    "useMyLocation": "Usar mi ubicación",
-    "locationLoading": "Buscando ubicación...",
-    "locationConsentTitle": "Activa la ubicación para que el GPS funcione",
-    "locationConsentBody": "El seguimiento de ubicación está desactivado en este momento. Toca abajo para abrir ajustes y activar el consentimiento para el seguimiento de ubicación.",
-    "locationConsentAction": "Haz clic aquí",
+    "topSearchPlaceholder": "Busca lugares, calles, rutas...",
+    "geoUnsupported": "La geolocalizacion no es compatible con este navegador.",
+    "geoDenied": "Permite el acceso a la ubicacion en la configuracion de tu navegador.",
+    "geoUnavailable": "La ubicacion no esta disponible actualmente.",
+    "geoFailed": "No se puede obtener tu ubicacion.",
+    "useMyLocation": "Usar mi ubicacion",
+    "locationLoading": "Buscando ubicacion...",
+    "locationConsentTitle": "Activa la ubicacion para que el GPS funcione",
+    "locationConsentBody": "El seguimiento de ubicacion esta desactivado en este momento. Toca abajo para abrir ajustes y activar el consentimiento para el seguimiento de ubicacion.",
+    "locationConsentAction": "Haz clic aqui",
     "filters": {
       "food": "Comida y bebida",
       "fuel": "Gasolineras",
       "accommodation": "Alojamiento",
       "shopping": "Compras",
       "health": "Hospitales"
+    },
+    "routePlanner": {
+      "currentRoute": "Ruta actual",
+      "stopsCount": "{{count}} paradas",
+      "showList": "Mostrar lista",
+      "hideList": "Ocultar lista",
+      "startRoute": "Iniciar ruta",
+      "followingRoute": "Siguiendo ruta",
+      "title": "Planificar ruta",
+      "emptyTitle": "Planifica tu ruta",
+      "oneMoreStop": "1 parada mas",
+      "moreStops": "{{count}} paradas mas",
+      "addStop": "Agregar parada",
+      "addStopPlaceholder": "Agrega una parada o destino...",
+      "myLocation": "Mi ubicacion",
+      "notSelected": "No seleccionado",
+      "recenter": "Recentrar",
+      "exit": "Salir",
+      "reorderStop": "Reordenar parada"
+    },
+    "addStop": {
+      "title": "Agregar parada",
+      "titleToRoute": "Agregar parada a la ruta",
+      "searchPlaceholder": "Busca un lugar, direccion o categoria",
+      "searchCompactPlaceholder": "Busca un lugar...",
+      "searchAria": "Busca un lugar",
+      "voiceSearch": "Busqueda por voz",
+      "chooseOnMap": "Elegir en el mapa",
+      "chooseManuallyOnMap": "Elegir manualmente en el mapa",
+      "searchResults": "Resultados de busqueda",
+      "recent": "Reciente",
+      "recentAndSuggested": "Reciente y sugerido",
+      "clearRecent": "Borrar recientes",
+      "clearAll": "Borrar todo",
+      "reset": "Restablecer",
+      "noStopsFound": "No se encontraron paradas",
+      "tryAnotherKeyword": "Prueba otra palabra o cambia de categoria.",
+      "noMatchingPlaces": "No se encontraron lugares coincidentes.",
+      "hint": "* Seleccionar una parada recalculara tu tiempo de viaje y la distancia.",
+      "chooseStop": "Elige una parada",
+      "selectedStopLocationTitle": "Ubicacion de la parada seleccionada",
+      "showMoreResults": "Mostrar mas resultados",
+      "showMoreSuggestions": "Mostrar mas sugerencias",
+      "suggestedAlongRoute": "Sugerido en la ruta",
+      "alongRouteWithCategory": "{{category}} en tu ruta",
+      "relatedSuggestions": "Sugerencias relacionadas",
+      "popularIn": "Popular en {{name}}",
+      "moreNearby": "Mas {{category}} cerca",
+      "moreLike": "Mas como {{name}}",
+      "previewingStop": "Vista previa de la parada",
+      "currentRoute": "Ruta actual",
+      "plannedRoute": "Ruta planificada",
+      "addToRoute": "Agregar a la ruta",
+      "resultTypes": {
+        "destination": "Destino",
+        "object": "Objeto",
+        "event": "Evento",
+        "activity": "Actividad",
+        "locality": "Localidad"
+      }
     }
   },
   "regions": {

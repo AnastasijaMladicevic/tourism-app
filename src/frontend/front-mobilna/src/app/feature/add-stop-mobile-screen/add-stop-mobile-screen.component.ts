@@ -15,7 +15,9 @@ import {
   RouteBuilderPoint,
   RouteBuilderStateService,
 } from '../../services/route-builder-state.service';
+import { TranslationService } from '../../services/translation.service';
 import { environment } from '../../../environment/environment';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 type AddStopCategoryKey = 'food' | 'fuel' | 'accommodation' | 'shopping' | 'health';
 type AddStopResultCategory =
@@ -56,7 +58,7 @@ interface SearchContext {
 @Component({
   selector: 'app-add-stop-mobile-screen',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, TranslatePipe],
   templateUrl: './add-stop-mobile-screen.component.html',
   styleUrl: './add-stop-mobile-screen.component.scss',
 })
@@ -100,6 +102,7 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     private readonly localityService: LocalityService,
     private readonly sanitizer: DomSanitizer,
     private readonly routeBuilderStateService: RouteBuilderStateService,
+    private readonly translationService: TranslationService,
   ) {}
 
   async ngOnInit(): Promise<void> {
@@ -194,8 +197,12 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     void this.refreshResults();
   }
 
+  getCategoryLabel(categoryKey: AddStopCategoryKey): string {
+    return this.translate(`map.filters.${categoryKey}`);
+  }
+
   get activeLabel(): string {
-    return this.categories.find((category) => category.key === this.activeCategory)?.label ?? 'all';
+    return this.activeCategory ? this.getCategoryLabel(this.activeCategory) : this.translate('common.all');
   }
 
   get isSearchActive(): boolean {
@@ -204,14 +211,19 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
 
   get routeDisplayTitle(): string {
     if (this.routePoints.length === 0) {
-      return 'Planned route';
+      return this.translate('map.addStop.plannedRoute');
     }
 
     if (this.routePoints.length === 1) {
       return this.routePoints[0].name;
     }
 
-    return `${this.routePoints[0].name} + ${this.routePoints.length - 1} more stop${this.routePoints.length > 2 ? 's' : ''}`;
+    const extraStops = this.routePoints.length - 1;
+    const extraLabel = extraStops === 1
+      ? this.translate('map.routePlanner.oneMoreStop')
+      : this.translate('map.routePlanner.moreStops', { count: extraStops });
+
+    return `${this.routePoints[0].name} + ${extraLabel}`;
   }
 
   get selectedResult(): AddStopResult | null {
@@ -234,36 +246,40 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
   }
 
   get desktopSectionTitle(): string {
-    return this.isSearchActive ? 'Search Results' : 'Recent';
+    return this.isSearchActive
+      ? this.translate('map.addStop.searchResults')
+      : this.translate('map.addStop.recent');
   }
 
   get showMoreLabel(): string {
-    return this.isSearchActive ? 'Show more results' : 'Show more suggestions';
+    return this.isSearchActive
+      ? this.translate('map.addStop.showMoreResults')
+      : this.translate('map.addStop.showMoreSuggestions');
   }
 
   get suggestedSectionTitle(): string {
     if (this.activeCategory) {
-      return `${this.activeLabel} along your route`;
+      return this.translate('map.addStop.alongRouteWithCategory', { category: this.activeLabel });
     }
 
-    return 'Suggested along route';
+    return this.translate('map.addStop.suggestedAlongRoute');
   }
 
   get relatedSectionTitle(): string {
     const selected = this.selectedResult;
     if (!selected) {
-      return 'Related suggestions';
+      return this.translate('map.addStop.relatedSuggestions');
     }
 
     if (this.isLocationLike(selected)) {
-      return `Popular in ${selected.name}`;
+      return this.translate('map.addStop.popularIn', { name: selected.name });
     }
 
     if (this.activeCategory) {
-      return `More ${this.activeLabel} nearby`;
+      return this.translate('map.addStop.moreNearby', { category: this.activeLabel });
     }
 
-    return `More like ${selected.name}`;
+    return this.translate('map.addStop.moreLike', { name: selected.name });
   }
 
   get shouldShowRecentSection(): boolean {
@@ -862,89 +878,102 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     this.persistRecentHistory();
   }
 
+  private translate(key: string, params?: Record<string, string | number>): string {
+    return this.translationService.translate(key, params);
+  }
+
   private toDestinationResult(item: DestinationDto): AddStopResult {
+    const destinationLabel = this.translate('map.addStop.resultTypes.destination');
+
     return {
       key: `destination:${item.id}`,
       id: item.id,
       name: item.name,
-      subtitle: item.regionName || item.destinationTypeName || 'Destination',
-      meta: item.destinationTypeName || 'Destination',
+      subtitle: item.regionName || item.destinationTypeName || destinationLabel,
+      meta: item.destinationTypeName || destinationLabel,
       image: this.resolveMediaUrl(item.mainImageUrl || item.images?.[0]?.url || ''),
       lat: item.latitude,
       lng: item.longitude,
       category: 'destination',
       markerType: 'destination',
-      typeName: item.destinationTypeName || 'Destination',
+      typeName: item.destinationTypeName || destinationLabel,
       raw: item,
     };
   }
 
   private toObjectResult(item: ObjectDto): AddStopResult {
     const markerType = this.getObjectType(item.objectTypeName || '');
+    const objectLabel = this.translate('map.addStop.resultTypes.object');
 
     return {
       key: `object:${item.id}`,
       id: item.id,
       name: item.name,
-      subtitle: item.address || item.localityName || item.destinationName || 'Object',
-      meta: item.objectTypeName || 'Object',
+      subtitle: item.address || item.localityName || item.destinationName || objectLabel,
+      meta: item.objectTypeName || objectLabel,
       image: this.resolveMediaUrl(item.mainImageUrl || item.images?.[0]?.url || ''),
       lat: item.latitude,
       lng: item.longitude,
       category: 'object',
       markerType,
-      typeName: item.objectTypeName || 'Object',
+      typeName: item.objectTypeName || objectLabel,
       raw: item,
     };
   }
 
   private toEventResult(item: EventDto): AddStopResult {
+    const eventLabel = this.translate('map.addStop.resultTypes.event');
+
     return {
       key: `event:${item.id}`,
       id: item.id,
       name: item.name,
-      subtitle: item.localityName || item.destinationName || 'Event',
-      meta: item.eventTypeName || 'Event',
+      subtitle: item.localityName || item.destinationName || eventLabel,
+      meta: item.eventTypeName || eventLabel,
       image: this.resolveMediaUrl(item.mainImageUrl || item.images?.[0]?.url || ''),
       lat: item.latitude,
       lng: item.longitude,
       category: 'event',
       markerType: 'event',
-      typeName: item.eventTypeName || 'Event',
+      typeName: item.eventTypeName || eventLabel,
       raw: item,
     };
   }
 
   private toActivityResult(item: ActivityDto): AddStopResult {
+    const activityLabel = this.translate('map.addStop.resultTypes.activity');
+
     return {
       key: `activity:${item.id}`,
       id: item.id,
       name: item.name,
-      subtitle: item.localityName || item.destinationName || 'Activity',
-      meta: item.activityTypeName || 'Activity',
+      subtitle: item.localityName || item.destinationName || activityLabel,
+      meta: item.activityTypeName || activityLabel,
       image: this.resolveMediaUrl(item.mainImageUrl || item.images?.[0]?.url || ''),
       lat: item.latitude,
       lng: item.longitude,
       category: 'activity',
       markerType: 'activity',
-      typeName: item.activityTypeName || 'Activity',
+      typeName: item.activityTypeName || activityLabel,
       raw: item,
     };
   }
 
   private toLocalityResult(item: LocalityDto): AddStopResult {
+    const localityLabel = this.translate('map.addStop.resultTypes.locality');
+
     return {
       key: `locality:${item.id}`,
       id: item.id,
       name: item.name,
-      subtitle: item.destinationName || item.regionName || 'Locality',
-      meta: item.localityTypeName || 'Locality',
+      subtitle: item.destinationName || item.regionName || localityLabel,
+      meta: item.localityTypeName || localityLabel,
       image: this.resolveMediaUrl(item.mainImageUrl || item.images?.[0]?.url || ''),
       lat: item.latitude,
       lng: item.longitude,
       category: 'locality',
       markerType: 'locality',
-      typeName: item.localityTypeName || 'Locality',
+      typeName: item.localityTypeName || localityLabel,
       raw: item,
     };
   }
