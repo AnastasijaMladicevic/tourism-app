@@ -59,7 +59,7 @@
       [class.route-planner--navigation-active]="isRouteNavigationActive"
       [class.route-planner--expanded]="isRoutePlannerExpanded"
       [class.route-planner--dragging]="isRoutePlannerDragging"
-      [style.transform]="routePlannerTransform"
+      [style.height]="routePlannerHeightStyle"
     >
       <div class="route-planner__drag-surface" (pointerdown)="onRoutePlannerDragStart($event)">
         <div class="route-planner__handle"></div>

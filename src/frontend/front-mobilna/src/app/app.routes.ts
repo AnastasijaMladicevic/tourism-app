@@ -155,6 +155,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'moderation-rules',
+    loadComponent: () =>
+      import('./feature/moderation-rules/moderation-rules.component').then(
+        (m) => m.ModerationRulesComponent,
+      ),
+  },
+  {
     path: 'code-verification',
     loadComponent: () =>
       import('./feature/auth/code-verification/code-verification').then(
