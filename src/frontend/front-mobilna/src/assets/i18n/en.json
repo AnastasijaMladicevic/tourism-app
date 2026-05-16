@@ -98,6 +98,48 @@
       }
     }
   },
+  "moderationRules": {
+    "title": "Moderation Rules",
+    "introTitle": "Introduction to Moderation",
+    "introBody": "Before submitting a moderator access request, users must read and accept the moderation rules. These rules help ensure the accuracy, quality, and safety of content on the platform.",
+    "footnote": "*By submitting a request, you confirm that you agree with all of the above conditions.",
+    "accept": "I Understand and Accept",
+    "backToRequest": "Back to the previous screen",
+    "sections": {
+      "role": {
+        "title": "Role of the Moderator",
+        "body": "The moderator is responsible for preserving the quality, accuracy, and reliability of content on the platform. Moderators are expected to act impartially, responsibly, and in the best interest of the user community."
+      },
+      "obligations": {
+        "title": "Moderator Responsibilities",
+        "body": "The moderator must verify the accuracy of information before publishing or editing, update inaccurate or outdated data, use appropriate and professional communication, and report content that may be harmful, false, or inappropriate."
+      },
+      "allowed": {
+        "title": "Allowed Activities",
+        "body": "A moderator may add verified information, correct existing data, improve the descriptions of locations, events, and places, and contribute to better organization and higher content quality across the platform."
+      },
+      "forbidden": {
+        "title": "Prohibited Activities",
+        "body": "A moderator must not submit false or unverified information, abuse moderation privileges for personal gain, favor their own content or known businesses, change valid content without cause, or publish offensive, discriminatory, or misleading content."
+      },
+      "standards": {
+        "title": "Content Standards",
+        "body": "All submitted data must be accurate, clear, up to date, and useful. Names, descriptions, categories, addresses, locations, and photos must be relevant and trustworthy. Content must not mislead users."
+      },
+      "fairness": {
+        "title": "Responsibility and Impartiality",
+        "body": "A moderator is required to act objectively and avoid conflicts of interest. Personal, business, or promotional interests must not influence decisions about content and edits on the platform."
+      },
+      "penalties": {
+        "title": "Consequences of Violations",
+        "body": "Violating the moderation rules may result in a warning, temporary restriction of moderator privileges, permanent removal of moderator access, or additional administrative review of the account."
+      },
+      "acceptance": {
+        "title": "Acceptance of the Rules",
+        "body": "By submitting a moderator access request, the user confirms that they have read, understood, and accepted the moderation rules and that they will follow them while using the platform."
+      }
+    }
+  },
   "nav": {
     "home": "Home",
     "map": "Map",
@@ -922,6 +964,8 @@
     "endTime": "End time",
     "priorityTitle": "Mark as priority",
     "conflictMessage": "This time overlaps with \"{{title}}\" at {{time}}.",
+    "estimatedScheduleTitle": "Estimated schedule",
+    "estimatedScheduleBody": "This event will end around {{time}} based on the current settings.",
     "scheduleTitle": "Schedule your event",
     "backAria": "Back to planner",
     "saving": "Saving...",

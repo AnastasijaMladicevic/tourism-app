@@ -105,9 +105,9 @@
             </button>
           }
         </div>
+
         <div class="field-grid field-grid--split">
 
-          <!-- START TIME -->
           <div class="field-card field-card--muted">
             <span>
               <svg viewBox="0 0 24 24">
@@ -122,7 +122,6 @@
             </div>
           </div>
 
-          <!-- END TIME -->
           <div class="field-card field-card--muted">
             <span>
               <svg viewBox="0 0 24 24">
@@ -136,8 +135,8 @@
               <strong>{{ eventEndLabel() }}</strong>
             </div>
           </div>
-
         </div>
+
         <article class="priority-card">
           <div class="priority-card__icon">
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -170,6 +169,23 @@
             (ngModelChange)="notes.set($event)"
           ></textarea>
         </label>
+
+        @if (conflictMessage()) {
+          <article class="warning-card">
+            <div class="warning-card__icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3 2 21h20L12 3Z" />
+                <path d="M12 9v5" />
+                <circle cx="12" cy="17" r="1" fill="currentColor" stroke="none" />
+              </svg>
+            </div>
+
+            <div>
+              <strong>{{ translate('addToPlanner.timeConflictTitle') }}</strong>
+              <p>{{ conflictMessage() }}</p>
+            </div>
+          </article>
+        }
 
         <div class="schedule-actions">
           <button type="button" class="save-btn" [disabled]="isSaving()" (click)="save()">

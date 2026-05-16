@@ -213,6 +213,12 @@ body.route-add-stop-open app-floating-ai-assistant {
   padding-right: 4px;
 }
 
+.add-stop-route-modal__section-block {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
 .add-stop-route-modal__result {
   width: 100%;
   border: 1px solid rgba(226, 232, 240, 0.95);
@@ -711,6 +717,10 @@ body.route-add-stop-open app-floating-ai-assistant {
     font-size: 0.86rem;
     font-weight: 700;
   }
+}
+
+.add-stop-screen__section-head--spaced {
+  margin-top: 16px;
 }
 
 .add-stop-screen__recent-list {

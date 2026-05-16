@@ -118,7 +118,6 @@ export class AddToPlannerComponent implements OnInit {
       imageUrl: state.imageUrl || '/assets/izlet-boko-kotorski-zaliv-1.jpg',
       description: state.description || this.translate('addToPlanner.previewFallbackDescription'),
     };
-    console.log('STATE:', state);
   }
 
   ngOnInit(): void {

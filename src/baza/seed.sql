@@ -13856,3 +13856,682 @@ VALUES
 
 ('https://www.belgradewaterfront.com/static/uploads/2025/05/2Savski-trg-aerial-shot-1_14__.jpg', 'Savski trg', true,
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Savski trg'), NOW());
+
+ ---KRAGUJEVAC OBJEKTI
+
+INSERT INTO "Objects"
+("Name", "Description", "Address", "PhoneNumber", "Website", "MenuUrl", "CuisineType", "WorkingHours", "Price", "Amenities", "Geolocation", "AverageRating", "ReviewCount",
+ "Status", "IsActive", "ObjectTypeId", "LocalityId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
+VALUES
+
+('Kafana Stara Srbija',
+ 'Tradicionalna kafana u centru Kragujevca poznata po domaćoj kuhinji, roštilju i prijatnoj atmosferi za porodična i večernja okupljanja.',
+ 'Karađorđeva 7, Kragujevac',
+ '+381631021786',
+ 'https://www.instagram.com/starasrbijagradskakafana?igsh=MWhma3o3bDZvdzc4OQ==',
+ NULL,
+ 'Domaća kuhinja i roštilj',
+ '{"pon":"07:00-00:00","uto":"07:00-00:00","sre":"07:00-00:00","cet":"07:00-00:00","pet":"07:00-01:00","sub":"08:00-01:00","ned":"08:00-00:00"}',
+ 1800,
+ ARRAY['Bašta', 'Rezervacije', 'Porodično'],
+ ST_SetSRID(ST_MakePoint(20.9135, 44.0132), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafana'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kragujevca'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kragujevac'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.kragujevac@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Kafić Mademoiselle',
+ 'Moderan gradski kafić sa prijatnim enterijerom, kafom, kolačima i atmosferom pogodnom za druženje i kraće pauze tokom dana.',
+ 'Luja Pastera 16, Kragujevac',
+ '+38134250550',
+ 'https://m.facebook.com/CaffeMademoiselle/',
+ NULL,
+ 'Kafa i poslastice',
+ '{"pon":"07:00-00:00","uto":"07:00-00:00","sre":"07:00-00:00","cet":"07:00-00:00","pet":"07:00-01:00","sub":"07:00-01:00","ned":"09:00-00:00"}',
+ 850,
+ ARRAY['WiFi', 'Kafa za poneti', 'Bašta'],
+ ST_SetSRID(ST_MakePoint(20.9129, 44.0176), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafic'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kragujevca'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kragujevac'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.kragujevac@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Hala Jezero',
+ 'Sportska hala u Kragujevcu namenjena održavanju utakmica, treninga, rekreativnih aktivnosti i sportskih događaja tokom cele godine.',
+ 'Grada Sirena 15, Kragujevac',
+ NULL,
+ NULL,
+ NULL,
+ NULL,
+ '{"pon":"08:00-22:00","uto":"08:00-22:00","sre":"08:00-22:00","cet":"08:00-22:00","pet":"08:00-22:00","sub":"09:00-22:00","ned":"09:00-20:00"}',
+ 0,
+ ARRAY['Sportski događaji', 'Parking', 'Treninzi'],
+ ST_SetSRID(ST_MakePoint(20.9244, 44.0135), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Sportski centar'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Bubanj'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kragujevac'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.kragujevac@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Narodna biblioteka Vuk Karadžić',
+ 'Centralna biblioteka Kragujevca sa bogatim fondom knjiga, čitaonicama i kulturnim programima tokom cele godine.',
+ 'Dr Zorana Đinđića 10, Kragujevac',
+ '+38134208874',
+ 'http://www.nbkg.rs/',
+ NULL,
+ NULL,
+ '{"pon":"08:00-19:00","uto":"08:00-19:00","sre":"08:00-19:00","cet":"08:00-19:00","pet":"08:00-19:00","sub":"08:00-14:00","ned":"neradni dan"}',
+ 0,
+ ARRAY['Čitaonica', 'Kulturni program', 'Internet'],
+ ST_SetSRID(ST_MakePoint(20.9199, 44.0123), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Biblioteka'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kragujevca'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kragujevac'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.kragujevac@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Muzej "21. oktobar"',
+ 'Memorijalni muzej posvećen događajima iz Drugog svetskog rata i istoriji streljanja u Šumaricama, sa stalnim postavkama i edukativnim sadržajem.',
+ 'Desankin venac bb, Kragujevac',
+ '+38134111666',
+ 'https://www.muzej21oktobar.rs',
+ NULL,
+ NULL,
+ '{"pon":"09:00-18:00","uto":"08:00-18:00","sre":"08:00-18:00","cet":"08:00-18:00","pet":"09:00-18:00","sub":"09:00-16:00","ned":"09:00-16:00"}',
+ 400,
+ ARRAY['Vođene ture', 'Istorijska postavka', 'Suvenirnica'],
+ ST_SetSRID(ST_MakePoint(20.8943, 44.0214), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Muzej'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šumarice'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kragujevac'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.kragujevac@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Akvarijum PMF',
+ 'Univerzitetski akvarijum Prirodno-matematičkog fakulteta sa slatkovodnim i tropskim vrstama riba, edukativnim sadržajem i naučnim postavkama.',
+ 'Radoja Domanovića 12, Kragujevac',
+ '+38134300246',
+ 'http://www.pmf.kg.ac.rs/akvarijum/',
+ NULL,
+ NULL,
+ '{"pon":"09:00-17:00","uto":"10:00-19:00","sre":"10:00-19:00","cet":"10:00-19:00","pet":"10:00-19:00","sub":"09:00-17:00","ned":"neradni dan"}',
+ 300,
+ ARRAY['Edukativni sadržaj', 'Izložbe', 'Vođene posete'],
+ ST_SetSRID(ST_MakePoint(20.9066, 44.0177), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Akvarijum'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kragujevca'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kragujevac'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.kragujevac@spirego.com'),
+ NOW(), NOW(), NOW());
+
+--NIS LOKALITETI
+
+INSERT INTO "Localities"
+("Name", "Description", "Geolocation", "IsActive", "DestinationId", "LocalityTypeId", "CreatedByUserId", "CreatedAt")
+VALUES
+
+('Centar Niša', 'Centralna gradska zona Niša sa trgovima, pešačkim ulicama, restoranima, kafićima i najvažnijim gradskim sadržajima.',
+ ST_SetSRID(ST_MakePoint(21.8917, 43.3183), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niš'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+('Čair', 'Poznati deo Niša sa velikim parkom, sportskim centrima i rekreativnim sadržajima pogodnim za odmor i šetnju.',
+ ST_SetSRID(ST_MakePoint(21.9093, 43.3168), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niš'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Park'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+('Kičevo', 'Mirnije gradsko naselje Niša sa stambenim zonama, lokalnim prodavnicama i dobrim povezivanjem sa ostatkom grada.',
+ ST_SetSRID(ST_MakePoint(21.8791, 43.3210), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niš'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+('Medoševac', 'Naselje na širem području Niša poznato po mirnijem ambijentu, porodičnim kućama i blizini glavnih saobraćajnica.',
+ ST_SetSRID(ST_MakePoint(21.8612, 43.3250), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niš'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+('Durlan', 'Veliko gradsko naselje u Nišu sa stambenim blokovima, školama, parkovima i brojnim lokalnim sadržajima.',
+ ST_SetSRID(ST_MakePoint(21.9285, 43.3299), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niš'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW()),
+
+('Trošarina', 'Prometan deo Niša poznat po saobraćajnim vezama, prodavnicama, ugostiteljskim objektima i svakodnevnom gradskom ritmu.',
+ ST_SetSRID(ST_MakePoint(21.9299, 43.3114), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niš'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Naselje'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW());
+-- NIŠ OBJEKTI
+
+INSERT INTO "Objects"
+("Name", "Description", "Address", "PhoneNumber", "Website", "MenuUrl", "CuisineType", "WorkingHours", "Price", "Amenities", "Geolocation", "AverageRating", "ReviewCount",
+ "Status", "IsActive", "ObjectTypeId", "LocalityId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
+VALUES
+
+('Forum Shopping Centar',
+ 'Najveći tržni centar u Nišu sa brojnim prodavnicama, restoranima, bioskopom i sadržajima za svakodnevnu kupovinu i zabavu.',
+ 'Obrenovićeva 42, Niš',
+ '0800525529',
+ 'http://www.forumshoppingcenter.rs/',
+ NULL,
+ NULL,
+ '{"pon":"10:00-22:00","uto":"10:00-22:00","sre":"10:00-22:00","cet":"10:00-22:00","pet":"10:00-22:00","sub":"10:00-22:00","ned":"10:00-22:00"}',
+ 0,
+ ARRAY['Parking', 'Prodavnice', 'Restorani', 'Bioskop'],
+ ST_SetSRID(ST_MakePoint(21.8947, 43.3189), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trzni Centar'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Niša'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niš'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.nis@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Hotel Crystal Ice',
+ 'Moderan hotel u Nišu sa smeštajem, restoranom i sadržajima pogodnim za poslovne i turističke posete gradu.',
+ 'Dušana Popovića 18, Niš',
+ '018305615',
+ NULL,
+ NULL,
+ NULL,
+ '{"pon":"00:00-23:59","uto":"00:00-23:59","sre":"00:00-23:59","cet":"00:00-23:59","pet":"00:00-23:59","sub":"00:00-23:59","ned":"00:00-23:59"}',
+ 8500,
+ ARRAY['WiFi', 'Parking', 'Restoran'],
+ ST_SetSRID(ST_MakePoint(21.9077, 43.3119), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Čair'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niš'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.nis@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Noćni klub Livnica',
+ 'Popularan noćni klub u Nišu poznat po nastupima, DJ večerima i urbanom noćnom provodu tokom vikenda.',
+ 'Šumadijska 1, Niš',
+ NULL,
+ 'https://www.instagram.com/livnica.nis/?hl=en',
+ NULL,
+ NULL,
+ '{"pon":"zatvoreno","uto":"zatvoreno","sre":"zatvoreno","cet":"zatvoreno","pet":"22:00-04:00","sub":"22:00-04:00","ned":"zatvoreno"}',
+ 1500,
+ ARRAY['DJ nastupi', 'Rezervacije', 'VIP separei'],
+ ST_SetSRID(ST_MakePoint(21.8794, 43.3187), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Klub'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kičevo'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niš'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.nis@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Park Prijateljstva',
+ 'Gradski park namenjen šetnji, odmoru i rekreaciji, sa zelenim površinama i sadržajima za boravak na otvorenom.',
+ 'Medoševac bb, Niš',
+ NULL,
+ NULL,
+ NULL,
+ NULL,
+ '{"pon":"00:00-23:59","uto":"00:00-23:59","sre":"00:00-23:59","cet":"00:00-23:59","pet":"00:00-23:59","sub":"00:00-23:59","ned":"00:00-23:59"}',
+ 0,
+ ARRAY['Park', 'Klupe', 'Zelene površine'],
+ ST_SetSRID(ST_MakePoint(21.8656, 43.3235), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igraliste'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Medoševac'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niš'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.nis@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Relax Apartmani',
+ 'Apartmanski smeštaj u mirnijem delu Niša, pogodan za kraće turističke i poslovne boravke.',
+ 'Bukovička 15/a, Niš',
+ '+381616178150',
+ NULL,
+ NULL,
+ NULL,
+ '{"pon":"00:00-23:59","uto":"00:00-23:59","sre":"00:00-23:59","cet":"00:00-23:59","pet":"00:00-23:59","sub":"00:00-23:59","ned":"00:00-23:59"}',
+ 4500,
+ ARRAY['WiFi', 'Parking', 'Klima'],
+ ST_SetSRID(ST_MakePoint(21.9315, 43.3284), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Apartman'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Durlan'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niš'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.nis@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Restoran Paris Lux',
+ 'Elegantni restoran u Nišu poznat po domaćoj i internacionalnoj kuhinji, porodičnim okupljanjima i večernjoj atmosferi.',
+ 'Francuska 11, Niš',
+ '+381677777177',
+ 'http://parislux.rs/',
+ NULL,
+ 'Domaća i internacionalna kuhinja',
+ '{"pon":"09:00-23:00","uto":"09:00-23:00","sre":"09:00-23:00","cet":"09:00-23:00","pet":"09:00-00:00","sub":"09:00-00:00","ned":"10:00-22:00"}',
+ 2200,
+ ARRAY['Rezervacije', 'Bašta', 'Porodično'],
+ ST_SetSRID(ST_MakePoint(21.9296, 43.3066), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trošarina'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Niš'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.nis@spirego.com'),
+ NOW(), NOW(), NOW());
+
+--BEOGRAD LOKALITETI
+
+INSERT INTO "Localities"
+("Name", "Description", "Geolocation", "IsActive", "DestinationId", "LocalityTypeId", "CreatedByUserId", "CreatedAt")
+VALUES
+
+('Stari Grad',
+ 'Istorijsko jezgro Beograda poznato po znamenitostima, pešačkim zonama, kulturnim institucijama i velikom broju turističkih sadržaja.',
+ ST_SetSRID(ST_MakePoint(20.4612, 44.8158), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Stari Grad'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW());
+
+ INSERT INTO "Localities"
+("Name", "Description", "Geolocation", "IsActive", "DestinationId", "LocalityTypeId", "CreatedByUserId", "CreatedAt")
+VALUES
+
+('Kosančićev venac', 'Istorijski deo Beograda poznat po staroj gradskoj arhitekturi, kaldrmi, galerijama i pogledima prema reci Savi.',
+ ST_SetSRID(ST_MakePoint(20.4529, 44.8165), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW());
+
+ INSERT INTO "Localities"
+("Name", "Description", "Geolocation", "IsActive", "DestinationId", "LocalityTypeId", "CreatedByUserId", "CreatedAt")
+VALUES
+
+('Beograd na vodi', 'Moderan deo Beograda uz reku Savu poznat po savremenim zgradama, šetalištima, restoranima i luksuznim sadržajima.',
+ ST_SetSRID(ST_MakePoint(20.4482, 44.8049), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Turisticka Zona'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'),
+ NOW());
+
+-- BEOGRAD OBJEKTI
+
+INSERT INTO "Objects"
+("Name", "Description", "Address", "PhoneNumber", "Website", "MenuUrl", "CuisineType", "WorkingHours", "Price", "Amenities", "Geolocation", "AverageRating", "ReviewCount",
+ "Status", "IsActive", "ObjectTypeId", "LocalityId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
+VALUES
+
+('Metropol Palace', 'Luksuzni hotel u centru Beograda poznat po elegantnom enterijeru, spa centru i smeštaju pogodnom za poslovne i turističke posete.',
+ 'Bulevar kralja Aleksandra 69, Beograd',
+ '+381113333100',
+ 'http://www.metropolpalace.com/',
+ NULL,
+ NULL,
+ '{"pon":"00:00-23:59","uto":"00:00-23:59","sre":"00:00-23:59","cet":"00:00-23:59","pet":"00:00-23:59","sub":"00:00-23:59","ned":"00:00-23:59"}',
+ 12000,
+ ARRAY['WiFi', 'Parking', 'Spa', 'Restoran', 'Konferencijska sala'],
+ ST_SetSRID(ST_MakePoint(20.4739, 44.8068), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tašmajdan'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Restoran Lorenzo & Kakalamba', 'Popularan restoran u Beogradu poznat po neobičnom enterijeru, velikim porcijama i spoju italijanske i domaće kuhinje.',
+ 'Cvijićeva 110, Beograd',
+ '+381113295351',
+ 'http://www.lk.rs/',
+ 'http://www.lk.rs/',
+ 'Italijanska i domaća kuhinja',
+ '{"pon":"12:00-00:00","uto":"12:00-00:00","sre":"12:00-00:00","cet":"12:00-00:00","pet":"12:00-01:00","sub":"12:00-10:00","ned":"12:00-00:00"}',
+ 2500,
+ ARRAY['WiFi', 'Rezervacije', 'Porodično', 'Bašta'],
+ ST_SetSRID(ST_MakePoint(20.4804, 44.8095), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kosančićev venac'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Kafeterija Magazin 1907', 'Moderan gradski kafić poznat po specijalitetima od kafe, prijatnom enterijeru i opuštenoj atmosferi tokom celog dana.',
+ 'Kralja Petra 16, Beograd',
+ '+381113281311',
+ 'https://www.kafeterija.com/',
+ 'https://www.kafeterija.com/meni/',
+ 'Kafa i poslastice',
+ '{"pon":"07:00-23:00","uto":"07:00-23:00","sre":"07:00-23:00","cet":"07:00-23:00","pet":"07:00-00:00","sub":"08:00-23:00","ned":"08:00-23:00"}',
+ 900,
+ ARRAY['WiFi', 'Kafa za poneti', 'Pet friendly'],
+ ST_SetSRID(ST_MakePoint(20.4542, 44.8189), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafic'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Dorćol'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Narodni muzej Srbije', 'Najveći i najznačajniji muzej u Srbiji sa bogatim kolekcijama umetnosti, istorijskih predmeta i arheoloških eksponata.',
+ 'Trg Republike 1a, Beograd',
+ '+381608075020',
+ 'http://www.narodnimuzej.rs/',
+ NULL,
+ NULL,
+ '{"pon":"zatvoreno","uto":"10:00-18:00","sre":"10:00-18:00","cet":"12:00-20:00","pet":"10:00-18:00","sub":"12:00-20:00","ned":"10:00-18:00"}',
+ 800,
+ ARRAY['Vođene ture', 'Suvenirnica', 'Edukativni program'],
+ ST_SetSRID(ST_MakePoint(20.4593, 44.8168), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Muzej'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari Grad'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Narodno pozorište', 'Istorijsko pozorište u centru Beograda poznato po dramskim predstavama, operi i baletskim izvođenjima.',
+ 'Francuska 3, Beograd',
+ '+381113281333',
+ 'https://www.narodnopozoriste.rs/',
+ NULL,
+ NULL,
+ '{"pon":"09:00-22:00","uto":"09:00-22:00","sre":"09:00-22:00","cet":"09:00-22:00","pet":"09:00-22:00","sub":"09:00-22:00","ned":"09:00-22:00"}',
+ 1200,
+ ARRAY['Predstave', 'Opera', 'Balet'],
+ ST_SetSRID(ST_MakePoint(20.4606, 44.8167), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Pozoriste'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari Grad'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Galerija Belgrade', 'Savremeni tržni centar u okviru Beograda na vodi sa prodavnicama, restoranima i bioskopskim sadržajima.',
+ 'Bulevar Vudroa Vilsona 12, Beograd',
+ '++381800800900',
+ 'https://www.galerijabelgrade.com/',
+ NULL,
+ NULL,
+ '{"pon":"10:00-22:00","uto":"10:00-22:00","sre":"10:00-22:00","cet":"10:00-22:00","pet":"10:00-22:00","sub":"10:00-22:00","ned":"10:00-22:00"}',
+ 0,
+ ARRAY['Parking', 'Restorani', 'Prodavnice', 'Bioskop'],
+ ST_SetSRID(ST_MakePoint(20.4464, 44.8027), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Trzni Centar'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Beograd na vodi'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Cineplexx Ušće', 'Moderan bioskop sa više sala, najnovijim filmskim projekcijama i sadržajima za porodične i večernje izlaske.',
+ 'Bulevar Mihajla Pupina 4, Beograd',
+ '+381113113370',
+ 'http://www.cineplexx.rs/',
+ NULL,
+ NULL,
+ '{"pon":"11:00-23:30","uto":"11:00-23:30","sre":"11:00-23:30","cet":"11:00-23:30","pet":"11:00-00:30","sub":"11:00-00:30","ned":"11:00-23:30"}',
+ 750,
+ ARRAY['3D projekcije', 'Kokice', 'Parking', 'Online karte'],
+ ST_SetSRID(ST_MakePoint(20.4382, 44.8154), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bioskop'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Novi Beograd'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Freestyler', 'Poznati beogradski splav i noćni klub sa muzikom, nastupima i velikim brojem posetilaca tokom vikenda.',
+ 'Obala kralja Aleksandra I Karađorđevića 100, Beograd',
+ '++381628002020',
+ 'https://freestylerclub.com/',
+ 'https://freestylerclub.com/pricelist',
+ NULL,
+ '{"pon":"zatvoreno","uto":"zatvoreno","sre":"zatvoreno","cet":"zatvoreno","pet":"23:00-04:00","sub":"23:00-04:00","ned":"23:00-04:00"}',
+ 1500,
+ ARRAY['Rezervacije', 'DJ nastupi', 'VIP separei'],
+ ST_SetSRID(ST_MakePoint(20.4259, 44.8250), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Klub'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Zemun Kej'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Saruna Wellness Skyline', 'Wellness i spa centar sa bazenima, saunama i sadržajima za opuštanje i rekreaciju u modernom delu Beograda.',
+ 'Kneza Miloša 90a, Beograd',
+ '+381603358774',
+ 'https://saruna.rs/saruna-wellness-spa-skyline/',
+ NULL,
+ NULL,
+ '{"pon":"06:30-22:00","uto":"06:30-22:00","sre":"06:30-22:00","cet":"06:30-22:00","pet":"06:30-22:00","sub":"06:30-22:00","ned":"06:30-22:00"}',
+ 3000,
+ ARRAY['Spa', 'Sauna', 'Bazen', 'Masaže'],
+ ST_SetSRID(ST_MakePoint(20.4515, 44.8000), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Wellness centar'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Beograd na vodi'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
+ NOW(), NOW(), NOW()),
+
+('Blaznavac', 'Popularan gradski bar poznat po alternativnoj atmosferi, koktelima i večernjim okupljanjima u centru Beograda.',
+ 'Kneginje Ljubice 18, Beograd',
+ '+381113285857',
+ 'https://blaznavac.artcodingagency.com/sr',
+ NULL,
+ 'Bar i kokteli',
+ '{"pon":"09:00-00:00","uto":"09:00-00:00","sre":"09:00-00:00","cet":"09:00-00:00","pet":"09:00-01:00","sub":"09:00-01:00","ned":"09:00-00:00"}',
+ 1200,
+ ARRAY['Kokteli', 'Bašta', 'Muzika'],
+ ST_SetSRID(ST_MakePoint(20.4661, 44.8195), 4326),
+ 0, 0,
+ 'Approved', true,
+ (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Skadarlija'),
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.belgrade@spirego.com'),
+ NOW(), NOW(), NOW());
+
+ -- NIŠ + BEOGRAD IMAGES - LOKALITETI
+
+WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
+    VALUES
+    ('https://www.ni.rs/wp-content/uploads/2021/10/DJI_00934-scaled.jpg', 'Centar Niša', true, 'Centar Niša'),
+    ('https://www.ni.rs/wp-content/uploads/2021/11/SC-Cair-1.jpg', 'Čair', true, 'Čair'),
+    ('https://upload.wikimedia.org/wikipedia/commons/8/84/Nis_Kicevo.jpgd', 'Kičevo', true, 'Kičevo'),
+    ('https://glasjuga.rs/wp-content/uploads/2024/05/medosevac-most-priroda-vreme.jpg', 'Medoševac', true, 'Medoševac'),
+    ('https://upload.wikimedia.org/wikipedia/commons/6/69/3_Aces.JPG', 'Durlan', true, 'Durlan'),
+    ('https://glasjuga.rs/wp-content/uploads/2024/01/nis-trosarina-vreme.jpg', 'Trošarina', true, 'Trošarina'),
+    ('https://www.zim-rentacar.com/assets/img/pages/zim-rent-a-car-stari-grad.jpg', 'Stari Grad', true, 'Stari Grad'),
+    ('https://serbia.com/wp-content/uploads/2025/04/Kosancicev_Venac_Beograd_PKIC_6-1-1280x853.jpg', 'Kosančićev venac', true, 'Kosančićev venac'),
+    ('https://upload.wikimedia.org/wikipedia/commons/4/47/Belgrade_Waterfront_%28%D0%91%D0%B5%D0%BE%D0%B3%D1%80%D0%B0%D0%B4_%D0%BD%D0%B0_%D0%B2%D0%BE%D0%B4%D0%B8%29.jpg', 'Beograd na vodi', true, 'Beograd na vodi')
+)
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
+SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
+FROM source s
+JOIN "Localities" l ON l."Name" = s."LocalityName";
+
+-- KRAGUJEVAC + NIŠ + BEOGRAD IMAGES - OBJEKTI
+
+WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
+    VALUES
+    ('https://www.restoranjezero.rs/wp-content/uploads/2018/08/000_3458.jpg', 'Kafana Stara Srbija', true, 'Kafana Stara Srbija'),
+    ('https://tipo.rs/wp-content/uploads/2025/06/mademoiselle-8.jpg', 'Kafić Mademoiselle', true, 'Kafić Mademoiselle'),
+    ('https://n1info.rs/wp-content/uploads/2023/05/27/1685176164-thumbnail_SBB-halapokrivena-zastavom-1200x800.jpg', 'Hala Jezero', true, 'Hala Jezero'),
+    ('hhttps://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Narodna_biblioteka_Vuk_Karad%C5%BEi%C4%87_Kragujevac_01.jpg/3840px-Narodna_biblioteka_Vuk_Karad%C5%BEi%C4%87_Kragujevac_01.jpg', 'Narodna biblioteka Vuk Karadžić', true, 'Narodna biblioteka Vuk Karadžić'),
+    ('hhttps://i0.wp.com/blueprint.rs/exdes/wp-content/uploads/2015/07/Kragujevac_001.jpg?fit=1200%2C782&ssl=1', 'Muzej 21. oktobar', true, 'Muzej "21. oktobar"'),
+    ('https://upload.wikimedia.org/wikipedia/commons/6/65/Akvarijum_Kragujevac_01.jpg', 'Akvarijum PMF', true, 'Akvarijum PMF'),
+
+    ('https://mareraproperties.com/wp-content/uploads/2025/04/forum-large-scaled.jpg', 'Forum Shopping Centar', true, 'Forum Shopping Centar'),
+    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/17/de/4a/8e/crystal-ice.jpg?w=1200&h=1200&s=1', 'Hotel Crystal Ice', true, 'Hotel Crystal Ice'),
+    ('https://glasjuga.rs/wp-content/uploads/2024/11/petar-livnica-2.jpeg', 'Noćni klub Livnica', true, 'Noćni klub Livnica'),
+    ('https://insajder.mpanel.app/image/cache/original/files/images/1733218827.4191', 'Park Prijateljstva', true, 'Park Prijateljstva'),
+    ('https://bookaweb.s3.eu-central-1.amazonaws.com/media/88652/IMG_20231114_144125.jpg', 'Relax Apartmani', true, 'Relax Apartmani'),
+    ('https://static.goto-where.com/114175-albums-1.jpg', 'Restoran Paris Lux', true, 'Restoran Paris Lux'),
+
+    ('https://www.metropolpalace.com/wp-content/uploads/2023/02/metropol-palace-slider-4.webp', 'Metropol Palace', true, 'Metropol Palace'),
+    ('https://www.ludikamen.rs/storage/uploads/vendors/2840/gallery/Lorenzo-kakalamba-prostor-za-proslave-restoran-beograd-3_0.52857700%201719557038.JPG', 'Restoran Lorenzo & Kakalamba', true, 'Restoran Lorenzo & Kakalamba'),
+    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2a/65/87/a8/caption.jpg?w=1100&h=1100&s=1', 'Kafeterija Magazin 1907', true, 'Kafeterija Magazin 1907'),
+    ('https://upload.wikimedia.org/wikipedia/commons/3/36/National_Museum_of_Serbia_%28DSC04612%29.jpg', 'Narodni muzej Srbije', true, 'Narodni muzej Srbije'),
+    ('https://beogradskiizlet.com/wp-content/uploads/2021/05/1619266043373.jpg', 'Narodno pozorište', true, 'Narodno pozorište'),
+    ('https://www.galerijabelgrade.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FaboutHero.7375dbfc.webp&w=3840&q=75', 'Galerija Belgrade', true, 'Galerija Belgrade'),
+    ('https://lh3.googleusercontent.com/p/AF1QipMkSbN_MNuxkJ2mk-guD_NJbnE115mWj2v-QSjW=w1024-k', 'Cineplexx Ušće', true, 'Cineplexx Ušće'),
+    ('https://www.beogradnocu.com/wp-content/uploads/2016/05/Splav-Freestyler-enterijer4.jpg', 'Freestyler', true, 'Freestyler'),
+    ('https://greenwall-plus.rs/wp-content/uploads/2021/01/Saruna3.png', 'Saruna Wellness Skyline', true, 'Saruna Wellness Skyline'),
+    ('https://beogradskiizlet.com/wp-content/uploads/2023/05/IMG_20210627_115349.jpg', 'Blaznavac', true, 'Blaznavac')
+)
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
+SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
+FROM source s
+JOIN "Objects" o ON o."Name" = s."ObjectName";
+
+
+-- RECENZIJE ZA NOVE OBJEKTE U SRBIJI
+
+INSERT INTO "Reviews"
+("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+-- KRAGUJEVAC
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Stara Srbija'), 5, 'Hrana je odlična, porcije su velike, a atmosfera baš domaća.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Stara Srbija'), 4, 'Dobar roštilj i prijatna usluga, ali je vikendom malo bučno.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Stara Srbija'), 3, 'Hrana je korektna, ali sam očekivala malo bržu uslugu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafić Mademoiselle'), 5, 'Lep enterijer, dobra kafa i baš prijatno mesto za pauzu.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'filip.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafić Mademoiselle'), 4, 'Kolači su odlični, ali su cene malo više nego što sam očekivao.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'kristina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hala Jezero'), 4, 'Dobra hala za sportske događaje i treninge.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hala Jezero'), 3, 'Prostor je funkcionalan, ali bi mogao da bude bolje održavan.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hala Jezero'), 4, 'Lepo mesto za utakmice, samo je gužva oko parkinga.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Vuk Karadžić'), 5, 'Mirno, prijatno i odlično za učenje ili čitanje.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Vuk Karadžić'), 5, 'Osoblje je veoma ljubazno, a fond knjiga je stvarno dobar.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'filip.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Vuk Karadžić'), 4, 'Dobra biblioteka, ali bi čitaonica mogla da ima više mesta.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'kristina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej "21. oktobar"'), 5, 'Vrlo snažno i emotivno mesto, vredi ga posetiti.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej "21. oktobar"'), 5, 'Postavka je ozbiljna, edukativna i ostavlja jak utisak.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej "21. oktobar"'), 4, 'Važno istorijsko mesto, mada bi moglo da ima više interaktivnog sadržaja.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Akvarijum PMF'), 5, 'Zanimljivo i edukativno, posebno za decu.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Akvarijum PMF'), 4, 'Mali prostor, ali lepo organizovan i drugačiji od ostalih mesta.', 'Approved', NOW()),
+
+-- NIŠ
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'filip.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Forum Shopping Centar'), 4, 'Dobar izbor prodavnica i praktična lokacija u centru.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'kristina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Forum Shopping Centar'), 3, 'Solidan tržni centar, ali ume da bude velika gužva.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Forum Shopping Centar'), 4, 'Lepo mesto za kupovinu i kratku pauzu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Crystal Ice'), 4, 'Sobe su uredne i osoblje je korektno.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Crystal Ice'), 3, 'Hotel je okej za kraći boravak, ali nije ništa posebno.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Noćni klub Livnica'), 5, 'Odlična muzika i atmosfera za izlazak.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'filip.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Noćni klub Livnica'), 4, 'Dobar provod, ali je prostor bio prepun.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'kristina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Noćni klub Livnica'), 3, 'Muzika je bila dobra, ali usluga za šankom spora.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Prijateljstva'), 4, 'Lepo mesto za šetnju i kratak odmor.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Prijateljstva'), 3, 'Prijatan park, ali bi moglo da bude više sadržaja.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Relax Apartmani'), 5, 'Apartman je čist, miran i odličan za kratak boravak.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Relax Apartmani'), 4, 'Dobar smeštaj i korektna cena.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'filip.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Relax Apartmani'), 4, 'Sve je bilo uredno, lokacija mi je odgovarala.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'kristina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Paris Lux'), 5, 'Hrana je odlična, a ambijent veoma prijatan.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Paris Lux'), 4, 'Lep restoran za porodični ručak, usluga dobra.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Paris Lux'), 3, 'Hrana je dobra, ali su cene malo jače.', 'Approved', NOW()),
+
+-- BEOGRAD
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Metropol Palace'), 5, 'Luksuzan hotel sa odličnim sadržajima i lepom lokacijom.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Metropol Palace'), 4, 'Veoma udobno, ali očekivano skupo.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'filip.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Lorenzo & Kakalamba'), 5, 'Jedinstven enterijer i veoma ukusna hrana.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'kristina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Lorenzo & Kakalamba'), 4, 'Hrana je odlična, ali je gužva skoro uvek velika.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Lorenzo & Kakalamba'), 3, 'Zanimljivo mesto, ali mi je enterijer malo previše napadan.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafeterija Magazin 1907'), 5, 'Odlična kafa i lep prostor za sedenje.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafeterija Magazin 1907'), 4, 'Lepo mesto, ali često nema slobodnih stolova.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodni muzej Srbije'), 5, 'Prelepa postavka i mnogo toga za videti.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'filip.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodni muzej Srbije'), 5, 'Jedan od najboljih muzeja kod nas, vredi izdvojiti vreme.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'kristina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodni muzej Srbije'), 4, 'Odličan muzej, samo bih volela jasnije oznake za neke postavke.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodno pozorište'), 5, 'Divna zgrada i odlična atmosfera tokom predstave.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodno pozorište'), 4, 'Predstava je bila odlična, ali su sedišta malo neudobna.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Belgrade'), 4, 'Veliki izbor prodavnica i restorana.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Belgrade'), 3, 'Lepo izgleda, ali je dosta skupo i gužva je velika.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'filip.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Belgrade'), 4, 'Dobro mesto za kupovinu i šetnju kad je loše vreme.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'kristina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cineplexx Ušće'), 4, 'Dobre sale i solidan izbor filmova.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cineplexx Ušće'), 3, 'Bioskop je dobar, ali su kokice i piće preskupi.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Freestyler'), 4, 'Dobar provod i muzika, posebno vikendom.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Freestyler'), 2, 'Prevelika gužva i nije mi prijala atmosfera.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Freestyler'), 4, 'Ako voliš noćni provod, mesto je stvarno zabavno.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'filip.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Saruna Wellness Skyline'), 5, 'Odličan wellness, sve je čisto i lepo organizovano.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'kristina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Saruna Wellness Skyline'), 4, 'Lepo iskustvo, ali cena nije mala.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Saruna Wellness Skyline'), 5, 'Savršeno mesto za odmor i opuštanje.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Blaznavac'), 5, 'Odlični kokteli i baš posebna atmosfera.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Blaznavac'), 4, 'Zanimljiv lokal, lepo uređen i opušten.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mina.serbia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Blaznavac'), 3, 'Mesto je lepo, ali mi je muzika bila malo preglasna.', 'Approved', NOW());

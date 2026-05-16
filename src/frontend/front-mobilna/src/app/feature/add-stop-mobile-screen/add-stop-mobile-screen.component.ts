@@ -1,18 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { Router } from '@angular/router';
+import { NavigationExtras, Router } from '@angular/router';
 import { catchError, firstValueFrom, of, timeout } from 'rxjs';
 
 import { ActivityDto, ActivityService } from '../../services/activity';
 import { DestinationDto, DestinationService } from '../../services/destination';
 import { EventDto, EventService } from '../../services/event';
-import {
-  LocationIntelligenceService,
-  QuietZoneAddressSuggestion,
-} from '../../services/location-intelligence';
 import { LocalityDto, LocalityService } from '../../services/locality';
 import { ObjectDto, ObjectService } from '../../services/object';
 import {
@@ -27,8 +23,7 @@ type AddStopResultCategory =
   | 'object'
   | 'event'
   | 'activity'
-  | 'locality'
-  | 'address';
+  | 'locality';
 
 interface AddStopCategory {
   key: AddStopCategoryKey;
@@ -51,6 +46,13 @@ interface AddStopResult {
   raw: unknown;
 }
 
+type SearchIntent = 'event' | 'food' | 'fuel' | 'accommodation' | 'shopping' | 'health' | null;
+
+interface SearchContext {
+  intent: SearchIntent;
+  locationCandidate: AddStopResult | null;
+}
+
 @Component({
   selector: 'app-add-stop-mobile-screen',
   standalone: true,
@@ -70,6 +72,9 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
   searchQuery = '';
   activeCategory: AddStopCategoryKey | null = null;
   results: AddStopResult[] = [];
+  recentResults: AddStopResult[] = [];
+  suggestedResults: AddStopResult[] = [];
+  relatedResults: AddStopResult[] = [];
   selectedResultKey = '';
   isLoading = true;
   isSubmitting = false;
@@ -80,8 +85,10 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
   private visibleResultLimit = this.collapsedResultLimit;
   private allItems: AddStopResult[] = [];
   private routePoints: RouteBuilderPoint[] = [];
+  private recentHistory: AddStopResult[] = [];
   private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private latestRefreshToken = 0;
+  private readonly recentStorageKey = 'route-add-stop-recent-v2';
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
@@ -92,7 +99,6 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     private readonly activityService: ActivityService,
     private readonly localityService: LocalityService,
     private readonly sanitizer: DomSanitizer,
-    private readonly locationIntelligenceService: LocationIntelligenceService,
     private readonly routeBuilderStateService: RouteBuilderStateService,
   ) {}
 
@@ -100,6 +106,7 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     this.updateLayoutMode();
     this.syncAddStopPageState(true);
     this.routePoints = this.routeBuilderStateService.getRoutePoints();
+    this.recentHistory = this.readRecentHistory();
     await this.loadResults();
   }
 
@@ -113,7 +120,7 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
   }
 
   close(): void {
-    void this.router.navigate(['/map']);
+    void this.navigateBackToMap();
   }
 
   @HostListener('window:resize')
@@ -147,9 +154,15 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     void this.refreshResults();
   }
 
+  clearRecentHistory(): void {
+    this.recentHistory = [];
+    this.persistRecentHistory();
+    void this.refreshResults();
+  }
+
   chooseOnMap(): void {
     this.routeBuilderStateService.requestMapPicking();
-    void this.router.navigate(['/map']);
+    void this.navigateBackToMap();
   }
 
   viewSelectedOnMap(): void {
@@ -157,8 +170,7 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     if (!selectedResult || selectedResult.lat == null || selectedResult.lng == null) {
       return;
     }
-
-    void this.router.navigate(['/map'], {
+    void this.navigateBackToMap({
       state: {
         lat: selectedResult.lat,
         lng: selectedResult.lng,
@@ -169,6 +181,8 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
 
   selectResult(item: AddStopResult): void {
     this.selectedResultKey = item.key;
+    this.storeRecentItem(item);
+    this.refreshRelatedResultsForSelection();
   }
 
   isSelected(item: AddStopResult): boolean {
@@ -184,6 +198,10 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     return this.categories.find((category) => category.key === this.activeCategory)?.label ?? 'all';
   }
 
+  get isSearchActive(): boolean {
+    return this.searchQuery.trim().length > 0;
+  }
+
   get routeDisplayTitle(): string {
     if (this.routePoints.length === 0) {
       return 'Planned route';
@@ -197,11 +215,13 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
   }
 
   get selectedResult(): AddStopResult | null {
+    const visibleItems = [...this.results, ...this.relatedResults, ...this.recentResults, ...this.suggestedResults];
+
     if (!this.selectedResultKey) {
-      return this.results[0] ?? null;
+      return visibleItems[0] ?? null;
     }
 
-    return this.results.find((item) => item.key === this.selectedResultKey) ?? null;
+    return visibleItems.find((item) => item.key === this.selectedResultKey) ?? null;
   }
 
   get selectedResultPreviewMapUrl(): SafeResourceUrl | null {
@@ -214,7 +234,52 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
   }
 
   get desktopSectionTitle(): string {
-    return this.searchQuery.trim() ? 'Search Results' : 'Recent & Suggested';
+    return this.isSearchActive ? 'Search Results' : 'Recent';
+  }
+
+  get showMoreLabel(): string {
+    return this.isSearchActive ? 'Show more results' : 'Show more suggestions';
+  }
+
+  get suggestedSectionTitle(): string {
+    if (this.activeCategory) {
+      return `${this.activeLabel} along your route`;
+    }
+
+    return 'Suggested along route';
+  }
+
+  get relatedSectionTitle(): string {
+    const selected = this.selectedResult;
+    if (!selected) {
+      return 'Related suggestions';
+    }
+
+    if (this.isLocationLike(selected)) {
+      return `Popular in ${selected.name}`;
+    }
+
+    if (this.activeCategory) {
+      return `More ${this.activeLabel} nearby`;
+    }
+
+    return `More like ${selected.name}`;
+  }
+
+  get shouldShowRecentSection(): boolean {
+    return !this.isSearchActive && this.recentResults.length > 0;
+  }
+
+  get shouldShowSuggestedSection(): boolean {
+    return !this.isSearchActive && this.suggestedResults.length > 0;
+  }
+
+  get shouldShowSearchResultsSection(): boolean {
+    return this.isSearchActive;
+  }
+
+  get shouldShowRelatedSection(): boolean {
+    return this.relatedResults.length > 0;
   }
 
   get canAddToRoute(): boolean {
@@ -230,15 +295,15 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     this.isSubmitting = true;
 
     try {
-      this.routeBuilderStateService.addRoutePoint({
+      this.storeRecentItem(selectedResult);
+      this.routeBuilderStateService.addRoutePoint( {
         id: selectedResult.id,
         name: selectedResult.name,
         type: selectedResult.markerType || selectedResult.typeName || selectedResult.category,
         lat: selectedResult.lat,
         lng: selectedResult.lng,
       });
-
-      await this.router.navigate(['/map']);
+      await this.navigateBackToMap();
     } finally {
       this.isSubmitting = false;
     }
@@ -252,23 +317,38 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     try {
       const progressiveLoads = [
         this.resolveSource(
-          this.destinationService.getAll({ page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' }),
+          this.destinationService.getAll(
+            { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
+            { bypassRegion: true, bypassLanguage: true },
+          ),
           [] as DestinationDto[],
         ).then((items) => items.map((item) => this.toDestinationResult(item))),
         this.resolveSource(
-          this.objectService.getAllItems({ sortBy: 'name', sortOrder: 'asc' }),
+          this.objectService.getAllItems(
+            { sortBy: 'name', sortOrder: 'asc' },
+            { bypassRegion: true, bypassLanguage: true },
+          ),
           [] as ObjectDto[],
         ).then((items) => items.map((item) => this.toObjectResult(item))),
         this.resolveSource(
-          this.eventService.getAllItems({ sortBy: 'startDate', sortOrder: 'asc' }),
+          this.eventService.getAllItems(
+            { sortBy: 'startDate', sortOrder: 'asc' },
+            { bypassRegion: true, bypassLanguage: true },
+          ),
           [] as EventDto[],
         ).then((items) => items.map((item) => this.toEventResult(item))),
         this.resolveSource(
-          this.activityService.getAll({ page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' }),
+          this.activityService.getAll(
+            { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
+            { bypassRegion: true },
+          ),
           [] as ActivityDto[],
         ).then((items) => items.map((item) => this.toActivityResult(item))),
         this.resolveSource(
-          this.localityService.getAll({ page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' }),
+          this.localityService.getAll(
+            { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
+            { bypassRegion: true },
+          ),
           [] as LocalityDto[],
         ).then((items) => items.map((item) => this.toLocalityResult(item))),
       ];
@@ -300,39 +380,46 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
   }
 
   private async refreshResults(): Promise<void> {
-    const token = ++this.latestRefreshToken;
     const query = this.searchQuery.trim();
     const queryNormalized = this.normalizeText(query);
-    const localResults = queryNormalized
-      ? this.searchLocalResults(queryNormalized)
-      : this.getRecommendedResults();
+    ++this.latestRefreshToken;
 
-    const addressResults = queryNormalized
-      ? this.toAddressResults(
-          await this.locationIntelligenceService.searchAddresses(query),
-          `mobile-add-stop:${token}`,
-        )
-      : [];
+    this.recentResults = !queryNormalized ? this.getRecentResults() : [];
 
-    if (token !== this.latestRefreshToken) {
-      return;
-    }
+    if (queryNormalized) {
+      const mergedResults = this.searchLocalResults(queryNormalized).filter((item) => this.matchesCategory(item));
+      const searchContext = this.buildSearchContext(mergedResults, queryNormalized);
+      const rankedResults = this.rankSearchResults(mergedResults, queryNormalized, searchContext);
 
-    const mergedResults = this.mergeResults(localResults, addressResults);
-    const filteredResults = mergedResults.filter((item) => this.matchesCategory(item));
+      this.hasMoreResults = rankedResults.length > this.visibleResultLimit;
+      this.results = rankedResults.slice(0, this.visibleResultLimit);
+      this.suggestedResults = [];
 
-    this.hasMoreResults = filteredResults.length > this.visibleResultLimit;
-    this.results = filteredResults.slice(0, this.visibleResultLimit);
+      if (this.results.length === 0) {
+        this.relatedResults = [];
+        this.selectedResultKey = '';
+        this.cdr.detectChanges();
+        return;
+      }
 
-    if (this.results.length === 0) {
-      this.selectedResultKey = '';
-      this.cdr.detectChanges();
-      return;
-    }
+      const selectedVisible = this.results.some((item) => item.key === this.selectedResultKey);
+      if (!selectedVisible) {
+        this.selectedResultKey = this.pickPrimarySearchResult(this.results, searchContext)?.key ?? this.results[0].key;
+      }
 
-    const hasSelectedVisible = this.results.some((item) => item.key === this.selectedResultKey);
-    if (!hasSelectedVisible) {
-      this.selectedResultKey = this.results[0].key;
+      this.refreshRelatedResultsForSelection(searchContext);
+    } else {
+      const suggestedPool = this.getRecommendedResults();
+      this.hasMoreResults = suggestedPool.length > this.visibleResultLimit;
+      this.suggestedResults = suggestedPool.slice(0, this.visibleResultLimit);
+      this.results = [];
+      this.relatedResults = [];
+
+      const visibleItems = [...this.recentResults, ...this.suggestedResults];
+      const hasSelectedVisible = visibleItems.some((item) => item.key === this.selectedResultKey);
+      if (!hasSelectedVisible) {
+        this.selectedResultKey = visibleItems[0]?.key ?? '';
+      }
     }
 
     this.cdr.detectChanges();
@@ -359,24 +446,16 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
 
   private getRecommendedResults(): AddStopResult[] {
     const anchor = this.routePoints[this.routePoints.length - 1] ?? this.routePoints[0] ?? null;
-    const sorted = this.getSuggestedResults();
+    const sorted = this.getSuggestedResults().filter((item) => this.matchesCategory(item));
+    const locations = sorted.filter((item) => this.isLocationLike(item));
+    const venues = sorted.filter((item) => !this.isLocationLike(item));
 
-    const destinations = sorted.filter((item) => item.category === 'destination' || item.category === 'locality');
-    const objects = sorted.filter((item) => item.category === 'object');
-    const activities = sorted.filter((item) => item.category === 'activity');
-    const events = sorted.filter((item) => item.category === 'event');
-
-    const picks = [
-      ...this.shuffleResults(destinations).slice(0, 3),
-      ...this.shuffleResults(objects).slice(0, 6),
-      ...this.shuffleResults(activities).slice(0, 2),
-      ...this.shuffleResults(events).slice(0, 2),
-    ];
+    const picks = [...locations.slice(0, 3), ...venues.slice(0, 12)];
 
     const merged = new Map<string, AddStopResult>();
     picks.forEach((item) => merged.set(item.key, item));
 
-    for (const item of this.shuffleResults(sorted)) {
+    for (const item of sorted) {
       if (merged.size >= 24) {
         break;
       }
@@ -394,28 +473,332 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
   }
 
   private scoreResult(item: AddStopResult, query: string): number {
-    const haystacks = [
-      this.normalizeText(item.name),
-      this.normalizeText(item.subtitle),
-      this.normalizeText(item.meta),
-      this.normalizeText(item.typeName),
-      this.normalizeText(item.markerType),
-    ];
-
+    const name = this.normalizeText(item.name);
+    const subtitle = this.normalizeText(item.subtitle);
+    const meta = this.normalizeText(item.meta);
+    const typeName = this.normalizeText(item.typeName);
+    const markerType = this.normalizeText(item.markerType);
+    const haystacks = [name, subtitle, meta, typeName, markerType];
+    const tokens = query.split(/\s+/).filter((token) => token.length > 1);
+    const intent = this.detectSearchIntent(query);
     let score = 0;
-    for (const haystack of haystacks) {
-      if (!haystack) {
-        continue;
+    let textMatched = false;
+
+    if (name === query) {
+      score += 26;
+      textMatched = true;
+    } else if (name.startsWith(query)) {
+      score += 18;
+      textMatched = true;
+    } else if (name.includes(query)) {
+      score += 12;
+      textMatched = true;
+    }
+
+    if (subtitle.includes(query)) {
+      score += 9;
+      textMatched = true;
+    }
+
+    for (const token of tokens) {
+      if (name.startsWith(token)) {
+        score += 7;
+        textMatched = true;
+      } else if (name.includes(token)) {
+        score += 5;
+        textMatched = true;
       }
 
-      if (haystack.startsWith(query)) {
+      if (subtitle.includes(token)) {
         score += 4;
-      } else if (haystack.includes(query)) {
-        score += 2;
+        textMatched = true;
+      }
+
+      if (meta.includes(token) || typeName.includes(token) || markerType.includes(token)) {
+        score += 3;
+        textMatched = true;
+      }
+    }
+
+    if (tokens.length > 1 && tokens.every((token) => haystacks.some((haystack) => haystack.includes(token)))) {
+      score += 8;
+      textMatched = true;
+    }
+
+    if (!textMatched) {
+      return 0;
+    }
+
+    if (this.activeCategory && this.matchesCategory(item)) {
+      score += 6;
+    }
+
+    if (intent && this.matchesSearchIntent(item, intent)) {
+      score += 7;
+    }
+
+    if (this.isLocationLike(item)) {
+      score += 2;
+    }
+
+    return score;
+  }
+
+  private buildSearchContext(results: AddStopResult[], query: string): SearchContext {
+    const intent = this.detectSearchIntent(query);
+    const locationCandidate = this.pickLocationContextResult(results, query);
+
+    return { intent, locationCandidate };
+  }
+
+  private rankSearchResults(results: AddStopResult[], query: string, context: SearchContext): AddStopResult[] {
+    return results
+      .map((item) => ({
+        item,
+        score: this.scoreSearchDisplayResult(item, query, context),
+      }))
+      .sort((left, right) => right.score - left.score)
+      .map((entry) => entry.item);
+  }
+
+  private scoreSearchDisplayResult(item: AddStopResult, query: string, context: SearchContext): number {
+    let score = this.scoreResult(item, query);
+
+    if (context.locationCandidate) {
+      if (item.key === context.locationCandidate.key) {
+        score += context.intent ? 8 : 24;
+      } else if (this.matchesLocationContext(item, context.locationCandidate)) {
+        score += 14;
+      }
+    }
+
+    if (context.intent && this.matchesSearchIntent(item, context.intent)) {
+      score += 12;
+    }
+
+    if (context.intent && context.locationCandidate && this.matchesLocationContext(item, context.locationCandidate)) {
+      score += this.matchesSearchIntent(item, context.intent) ? 18 : 0;
+    }
+
+    return score;
+  }
+
+  private pickPrimarySearchResult(results: AddStopResult[], context: SearchContext): AddStopResult | null {
+    if (context.intent) {
+      const intentMatchInLocation = results.find(
+        (item) =>
+          this.matchesSearchIntent(item, context.intent) &&
+          (!!context.locationCandidate ? this.matchesLocationContext(item, context.locationCandidate) : true),
+      );
+
+      if (intentMatchInLocation) {
+        return intentMatchInLocation;
+      }
+    }
+
+    if (context.locationCandidate) {
+      return context.locationCandidate;
+    }
+
+    return results.find((item) => this.isLocationLike(item)) ?? results[0] ?? null;
+  }
+
+  private pickLocationContextResult(results: AddStopResult[], query: string): AddStopResult | null {
+    const locationTerms = this.extractLocationTerms(query);
+    if (locationTerms.length === 0) {
+      return null;
+    }
+
+    return results
+      .filter((item) => this.isLocationLike(item))
+      .map((item) => ({
+        item,
+        score: this.scoreLocationContextResult(item, locationTerms),
+      }))
+      .filter((entry) => entry.score > 0)
+      .sort((left, right) => right.score - left.score)[0]?.item ?? null;
+  }
+
+  private scoreLocationContextResult(item: AddStopResult, locationTerms: string[]): number {
+    const haystack = this.describeItem(item);
+    let score = 0;
+
+    for (const term of locationTerms) {
+      if (this.normalizeText(item.name) === term) {
+        score += 18;
+      } else if (this.normalizeText(item.name).startsWith(term)) {
+        score += 12;
+      } else if (haystack.includes(term)) {
+        score += 8;
       }
     }
 
     return score;
+  }
+
+  private getRecentResults(): AddStopResult[] {
+    return this.recentHistory
+      .filter((item) => this.matchesCategory(item))
+      .slice(0, 6);
+  }
+
+  private refreshRelatedResultsForSelection(context?: SearchContext): void {
+    if (!this.isSearchActive) {
+      this.relatedResults = [];
+      return;
+    }
+
+    const selected = this.selectedResult;
+    if (!selected) {
+      this.relatedResults = [];
+      return;
+    }
+
+    this.relatedResults = this.getRelatedResults(selected, context ?? this.buildSearchContext(this.results, this.normalizeText(this.searchQuery)));
+  }
+
+  private getRelatedResults(selected: AddStopResult, context: SearchContext): AddStopResult[] {
+    if (selected.lat == null || selected.lng == null) {
+      return [];
+    }
+
+    const relatedPool = this.allItems
+      .filter((item) => item.key !== selected.key)
+      .filter((item) => this.matchesCategory(item))
+      .filter((item) => item.lat != null && item.lng != null);
+
+    const scopedPool = this.isLocationLike(selected)
+      ? relatedPool.filter((item) => !this.isLocationLike(item) && this.matchesLocationContext(item, selected))
+      : relatedPool.filter((item) =>
+          context.locationCandidate ? this.matchesLocationContext(item, context.locationCandidate) : true,
+        );
+
+    const distanceCap = this.isLocationLike(selected) ? 30000 : 12000;
+
+    return scopedPool
+      .map((item) => ({
+        item,
+        score: this.scoreRelatedResult(item, selected, context),
+      }))
+      .filter((entry) => entry.score > 0)
+      .sort((left, right) => right.score - left.score)
+      .map((entry) => entry.item)
+      .filter((item) => {
+        if (this.matchesLocationContext(item, this.isLocationLike(selected) ? selected : (context.locationCandidate ?? selected))) {
+          return true;
+        }
+
+        return this.calculateDistanceMeters(selected.lat!, selected.lng!, item.lat!, item.lng!) <= distanceCap;
+      })
+      .slice(0, 8);
+  }
+
+  private scoreRelatedResult(item: AddStopResult, selected: AddStopResult, context: SearchContext): number {
+    if (item.lat == null || item.lng == null || selected.lat == null || selected.lng == null) {
+      return 0;
+    }
+
+    const distanceScore = Math.max(0, 100000 - this.calculateDistanceMeters(selected.lat, selected.lng, item.lat, item.lng));
+    let score = distanceScore / 1000;
+
+    if (this.activeCategory && this.matchesCategory(item)) {
+      score += 16;
+    }
+
+    if (item.category === selected.category) {
+      score += 10;
+    }
+
+    if (this.normalizeText(item.subtitle).includes(this.normalizeText(selected.name))) {
+      score += 12;
+    }
+
+    if (context.locationCandidate && this.matchesLocationContext(item, context.locationCandidate)) {
+      score += 18;
+    }
+
+    if (context.intent && this.matchesSearchIntent(item, context.intent)) {
+      score += 16;
+    }
+
+    return score;
+  }
+
+  private matchesLocationContext(item: AddStopResult, location: AddStopResult): boolean {
+    const locationName = this.normalizeText(location.name);
+    const haystack = this.describeItem(item);
+
+    if (haystack.includes(locationName)) {
+      return true;
+    }
+
+    if (item.lat != null && item.lng != null && location.lat != null && location.lng != null) {
+      return this.calculateDistanceMeters(item.lat, item.lng, location.lat, location.lng) <= 30000;
+    }
+
+    return false;
+  }
+
+  private extractLocationTerms(query: string): string[] {
+    const ignoredTerms = new Set([
+      'zurka', 'party', 'night', 'club', 'klub', 'bar', 'izlazak',
+      'restoran', 'kafana', 'kafic', 'cafe', 'coffee', 'hrana', 'pice', 'food', 'drink',
+      'pumpa', 'gorivo', 'gas', 'fuel', 'petrol',
+      'hotel', 'apartman', 'smestaj', 'hostel', 'villa', 'resort',
+      'shop', 'shopping', 'market', 'prodavnica', 'trzni',
+      'hospital', 'bolnica', 'apoteka', 'pharmacy', 'clinic', 'klinika',
+    ]);
+
+    return query
+      .split(/\s+/)
+      .map((token) => token.trim())
+      .filter((token) => token.length > 1)
+      .filter((token) => !ignoredTerms.has(token));
+  }
+
+  private describeItem(item: AddStopResult): string {
+    return [
+      item.name,
+      item.subtitle,
+      item.meta,
+      item.typeName,
+      item.markerType,
+    ]
+      .map((value) => this.normalizeText(value))
+      .join(' ');
+  }
+
+  private isLocationLike(item: AddStopResult): boolean {
+    return item.category === 'destination' || item.category === 'locality';
+  }
+
+  private detectSearchIntent(query: string): SearchIntent {
+    if (/(zurka|party|night|club|klub|bar|izlazak)/.test(query)) return 'event';
+    if (/(restoran|kafana|kafic|cafe|coffee|hrana|pice|food|drink)/.test(query)) return 'food';
+    if (/(pumpa|gorivo|gas|fuel|petrol)/.test(query)) return 'fuel';
+    if (/(hotel|apartman|smestaj|hostel|villa|resort)/.test(query)) return 'accommodation';
+    if (/(shop|shopping|market|prodavnica|trzni)/.test(query)) return 'shopping';
+    if (/(hospital|bolnica|apoteka|pharmacy|clinic|klinika)/.test(query)) return 'health';
+    return null;
+  }
+
+  private matchesSearchIntent(item: AddStopResult, intent: SearchIntent): boolean {
+    switch (intent) {
+      case 'event':
+        return item.category === 'event' || item.markerType === 'kafana';
+      case 'food':
+        return item.markerType === 'restaurant' || item.markerType === 'kafana';
+      case 'fuel':
+        return item.markerType === 'gas_station';
+      case 'accommodation':
+        return item.markerType === 'hotel' || item.markerType === 'apartment';
+      case 'shopping':
+        return ['shop', 'mall', 'market'].includes(item.markerType);
+      case 'health':
+        return ['pharmacy', 'hospital', 'clinic'].includes(item.markerType);
+      default:
+        return false;
+    }
   }
 
   private scoreSuggestedDistance(item: AddStopResult, anchor: RouteBuilderPoint | null): number {
@@ -426,23 +809,7 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     return this.calculateDistanceMeters(anchor.lat, anchor.lng, item.lat, item.lng);
   }
 
-  private mergeResults(localResults: AddStopResult[], addressResults: AddStopResult[]): AddStopResult[] {
-    const merged = new Map<string, AddStopResult>();
-
-    [...localResults, ...addressResults].forEach((result) => {
-      if (!merged.has(result.key)) {
-        merged.set(result.key, result);
-      }
-    });
-
-    return [...merged.values()];
-  }
-
   private matchesCategory(item: AddStopResult): boolean {
-    if (item.category === 'address') {
-      return this.searchQuery.trim().length > 0;
-    }
-
     if (!this.activeCategory) {
       return true;
     }
@@ -461,6 +828,38 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
       default:
         return true;
     }
+  }
+
+  private readRecentHistory(): AddStopResult[] {
+    if (typeof localStorage === 'undefined') {
+      return [];
+    }
+
+    try {
+      const raw = localStorage.getItem(this.recentStorageKey);
+      if (!raw) {
+        return [];
+      }
+
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed.filter((item) => !!item?.key) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private persistRecentHistory(): void {
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
+    localStorage.setItem(this.recentStorageKey, JSON.stringify(this.recentHistory.slice(0, 8)));
+  }
+
+  private storeRecentItem(item: AddStopResult): void {
+    const snapshot: AddStopResult = { ...item };
+    this.recentHistory = [snapshot, ...this.recentHistory.filter((entry) => entry.key !== item.key)].slice(0, 8);
+    this.persistRecentHistory();
   }
 
   private toDestinationResult(item: DestinationDto): AddStopResult {
@@ -548,25 +947,6 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
       typeName: item.localityTypeName || 'Locality',
       raw: item,
     };
-  }
-
-  private toAddressResults(
-    suggestions: QuietZoneAddressSuggestion[],
-    source: string,
-  ): AddStopResult[] {
-    return suggestions.map((suggestion, index) => ({
-      key: `address:${source}:${index}:${suggestion.latitude}:${suggestion.longitude}`,
-      id: `address:${source}:${index}`,
-      name: suggestion.displayName.split(',')[0]?.trim() || suggestion.displayName,
-      subtitle: suggestion.displayName,
-      meta: 'Address search result',
-      lat: suggestion.latitude,
-      lng: suggestion.longitude,
-      category: 'address',
-      markerType: 'address',
-      typeName: 'Address',
-      raw: suggestion,
-    }));
   }
 
   private getObjectType(name: string): string {
@@ -755,5 +1135,27 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
 
     document.documentElement.classList.toggle('route-add-stop-open', isOpen);
     document.body.classList.toggle('route-add-stop-open', isOpen);
+  }
+
+  private async navigateBackToMap(extras?: NavigationExtras): Promise<boolean> {
+    this.dismissActiveInput();
+    this.syncAddStopPageState(false);
+
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() => resolve());
+    });
+
+    return this.router.navigate(['/map'], extras);
+  }
+
+  private dismissActiveInput(): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    const activeElement = document.activeElement;
+    if (activeElement instanceof HTMLElement) {
+      activeElement.blur();
+    }
   }
 }

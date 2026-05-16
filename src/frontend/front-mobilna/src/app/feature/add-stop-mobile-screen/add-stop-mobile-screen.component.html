@@ -47,41 +47,140 @@
             <mat-icon>chevron_right</mat-icon>
           </button>
 
-          <div class="add-stop-route-modal__section-head">
-            <h4>{{ desktopSectionTitle }}</h4>
-            <button type="button" (click)="clearAll()">Clear All</button>
-          </div>
-
           <div class="add-stop-route-modal__results">
-            @if (results.length === 0 && !isLoading) {
-              <div class="add-stop-route-modal__empty">
-                <mat-icon>travel_explore</mat-icon>
-                <strong>No stops found</strong>
-                <span>Try another keyword or switch category.</span>
-              </div>
-            } @else {
-              @for (item of results; track item.key) {
-                <button
-                  class="add-stop-route-modal__result"
-                  [class.add-stop-route-modal__result--selected]="isSelected(item)"
-                  type="button"
-                  (click)="selectResult(item)"
-                >
-                  <span class="add-stop-route-modal__result-icon">
-                    <mat-icon>{{ item.category === 'address' ? 'near_me' : 'place' }}</mat-icon>
-                  </span>
+            @if (shouldShowSearchResultsSection) {
+              <section class="add-stop-route-modal__section-block">
+                <div class="add-stop-route-modal__section-head">
+                  <h4>Search Results</h4>
+                  <button type="button" (click)="clearAll()">Reset</button>
+                </div>
 
-                  <span class="add-stop-route-modal__result-body">
-                    <strong>{{ item.name }}</strong>
-                    <span>{{ item.subtitle }}</span>
-                    <em>{{ item.meta }}</em>
-                  </span>
+                @if (results.length === 0 && !isLoading) {
+                  <div class="add-stop-route-modal__empty">
+                    <mat-icon>travel_explore</mat-icon>
+                    <strong>No stops found</strong>
+                    <span>Try another keyword or switch category.</span>
+                  </div>
+                } @else {
+                  @for (item of results; track item.key) {
+                    <button
+                      class="add-stop-route-modal__result"
+                      [class.add-stop-route-modal__result--selected]="isSelected(item)"
+                      type="button"
+                      (click)="selectResult(item)"
+                    >
+                      <span class="add-stop-route-modal__result-icon">
+                        <mat-icon>place</mat-icon>
+                      </span>
 
-                  <span class="add-stop-route-modal__result-radio">
-                    <span></span>
-                  </span>
-                </button>
+                      <span class="add-stop-route-modal__result-body">
+                        <strong>{{ item.name }}</strong>
+                        <span>{{ item.subtitle }}</span>
+                        <em>{{ item.meta }}</em>
+                      </span>
+
+                      <span class="add-stop-route-modal__result-radio">
+                        <span></span>
+                      </span>
+                    </button>
+                  }
+                }
+              </section>
+
+              @if (shouldShowRelatedSection) {
+                <section class="add-stop-route-modal__section-block">
+                  <div class="add-stop-route-modal__section-head">
+                    <h4>{{ relatedSectionTitle }}</h4>
+                  </div>
+
+                  @for (item of relatedResults; track item.key) {
+                    <button
+                      class="add-stop-route-modal__result"
+                      [class.add-stop-route-modal__result--selected]="isSelected(item)"
+                      type="button"
+                      (click)="selectResult(item)"
+                    >
+                      <span class="add-stop-route-modal__result-icon">
+                        <mat-icon>place</mat-icon>
+                      </span>
+
+                      <span class="add-stop-route-modal__result-body">
+                        <strong>{{ item.name }}</strong>
+                        <span>{{ item.subtitle }}</span>
+                        <em>{{ item.meta }}</em>
+                      </span>
+
+                      <span class="add-stop-route-modal__result-radio">
+                        <span></span>
+                      </span>
+                    </button>
+                  }
+                </section>
               }
+            } @else {
+              @if (shouldShowRecentSection) {
+                <section class="add-stop-route-modal__section-block">
+                  <div class="add-stop-route-modal__section-head">
+                    <h4>Recent</h4>
+                    <button type="button" (click)="clearRecentHistory()">Clear recent</button>
+                  </div>
+
+                  @for (item of recentResults; track item.key) {
+                    <button
+                      class="add-stop-route-modal__result"
+                      [class.add-stop-route-modal__result--selected]="isSelected(item)"
+                      type="button"
+                      (click)="selectResult(item)"
+                    >
+                      <span class="add-stop-route-modal__result-icon">
+                        <mat-icon>history</mat-icon>
+                      </span>
+
+                      <span class="add-stop-route-modal__result-body">
+                        <strong>{{ item.name }}</strong>
+                        <span>{{ item.subtitle }}</span>
+                        <em>{{ item.meta }}</em>
+                      </span>
+
+                      <span class="add-stop-route-modal__result-radio">
+                        <span></span>
+                      </span>
+                    </button>
+                  }
+                </section>
+              }
+
+              <section class="add-stop-route-modal__section-block">
+                <div class="add-stop-route-modal__section-head">
+                  <h4>{{ suggestedSectionTitle }}</h4>
+                  @if (activeCategory) {
+                    <button type="button" (click)="clearAll()">Reset</button>
+                  }
+                </div>
+
+                @for (item of suggestedResults; track item.key) {
+                  <button
+                    class="add-stop-route-modal__result"
+                    [class.add-stop-route-modal__result--selected]="isSelected(item)"
+                    type="button"
+                    (click)="selectResult(item)"
+                  >
+                    <span class="add-stop-route-modal__result-icon">
+                      <mat-icon>place</mat-icon>
+                    </span>
+
+                    <span class="add-stop-route-modal__result-body">
+                      <strong>{{ item.name }}</strong>
+                      <span>{{ item.subtitle }}</span>
+                      <em>{{ item.meta }}</em>
+                    </span>
+
+                    <span class="add-stop-route-modal__result-radio">
+                      <span></span>
+                    </span>
+                  </button>
+                }
+              </section>
             }
           </div>
 
@@ -185,15 +284,98 @@
             <mat-icon>chevron_right</mat-icon>
           </button>
 
-          <div class="add-stop-screen__section-head">
-            <h2>Recommended</h2>
-          </div>
-
           <div class="add-stop-screen__recent-list">
-            @if (results.length === 0 && !isLoading) {
-              <div class="add-stop-screen__state">No matching places found.</div>
-            } @else if (results.length > 0) {
-              @for (item of results; track item.key) {
+            @if (shouldShowSearchResultsSection) {
+              <div class="add-stop-screen__section-head">
+                <h2>Search Results</h2>
+                <button type="button" (click)="clearAll()">Reset</button>
+              </div>
+
+              @if (results.length === 0 && !isLoading) {
+                <div class="add-stop-screen__state">No matching places found.</div>
+              } @else {
+                @for (item of results; track item.key) {
+                  <button
+                    class="add-stop-screen__recent-item"
+                    type="button"
+                    [class.add-stop-screen__recent-item--selected]="isSelected(item)"
+                    (click)="selectResult(item)"
+                  >
+                    <span class="add-stop-screen__recent-icon">
+                      <mat-icon>place</mat-icon>
+                    </span>
+                    <span class="add-stop-screen__recent-copy">
+                      <strong>{{ item.name }}</strong>
+                      <span>{{ item.subtitle }}</span>
+                      @if (item.meta) {
+                        <small>{{ item.meta }}</small>
+                      }
+                    </span>
+                  </button>
+                }
+              }
+
+              @if (shouldShowRelatedSection) {
+                <div class="add-stop-screen__section-head add-stop-screen__section-head--spaced">
+                  <h2>{{ relatedSectionTitle }}</h2>
+                </div>
+
+                @for (item of relatedResults; track item.key) {
+                  <button
+                    class="add-stop-screen__recent-item"
+                    type="button"
+                    [class.add-stop-screen__recent-item--selected]="isSelected(item)"
+                    (click)="selectResult(item)"
+                  >
+                    <span class="add-stop-screen__recent-icon">
+                      <mat-icon>place</mat-icon>
+                    </span>
+                    <span class="add-stop-screen__recent-copy">
+                      <strong>{{ item.name }}</strong>
+                      <span>{{ item.subtitle }}</span>
+                      @if (item.meta) {
+                        <small>{{ item.meta }}</small>
+                      }
+                    </span>
+                  </button>
+                }
+              }
+            } @else {
+              @if (shouldShowRecentSection) {
+                <div class="add-stop-screen__section-head">
+                  <h2>Recent</h2>
+                  <button type="button" (click)="clearRecentHistory()">Clear recent</button>
+                </div>
+
+                @for (item of recentResults; track item.key) {
+                  <button
+                    class="add-stop-screen__recent-item"
+                    type="button"
+                    [class.add-stop-screen__recent-item--selected]="isSelected(item)"
+                    (click)="selectResult(item)"
+                  >
+                    <span class="add-stop-screen__recent-icon">
+                      <mat-icon>history</mat-icon>
+                    </span>
+                    <span class="add-stop-screen__recent-copy">
+                      <strong>{{ item.name }}</strong>
+                      <span>{{ item.subtitle }}</span>
+                      @if (item.meta) {
+                        <small>{{ item.meta }}</small>
+                      }
+                    </span>
+                  </button>
+                }
+              }
+
+              <div class="add-stop-screen__section-head" [class.add-stop-screen__section-head--spaced]="shouldShowRecentSection">
+                <h2>{{ suggestedSectionTitle }}</h2>
+                @if (activeCategory) {
+                  <button type="button" (click)="clearAll()">Reset</button>
+                }
+              </div>
+
+              @for (item of suggestedResults; track item.key) {
                 <button
                   class="add-stop-screen__recent-item"
                   type="button"
@@ -201,7 +383,7 @@
                   (click)="selectResult(item)"
                 >
                   <span class="add-stop-screen__recent-icon">
-                    <mat-icon>{{ item.category === 'address' ? 'near_me' : 'schedule' }}</mat-icon>
+                    <mat-icon>place</mat-icon>
                   </span>
                   <span class="add-stop-screen__recent-copy">
                     <strong>{{ item.name }}</strong>
@@ -217,7 +399,7 @@
 
           @if (hasMoreResults) {
             <button class="add-stop-screen__more-link" type="button" (click)="showMore()">
-              Show more recommendations
+              {{ showMoreLabel }}
             </button>
           }
         </div>
