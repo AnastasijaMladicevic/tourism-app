@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -59,6 +59,7 @@ type UsersPageViewTab = 'internal' | 'tourists';
 export class UsersComponent implements OnInit {
   private readonly adminUsersService = inject(AdminUsersService);
   private readonly reviewService = inject(ReviewService);
+  private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -187,7 +188,28 @@ export class UsersComponent implements OnInit {
       }
       this.stopTouristsTabLiveRefresh();
     });
+
+    this.route.queryParamMap
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((params) => this.applyTabFromQuery(params.get('tab')));
+
     this.loadDashboardData();
+  }
+
+  private applyTabFromQuery(tab: string | null): void {
+    const normalized = tab?.trim().toLowerCase();
+    if (normalized === 'tourists' || normalized === 'tourist') {
+      if (this.usersViewTab !== 'tourists') {
+        this.selectUsersViewTab('tourists');
+      }
+      return;
+    }
+
+    if (normalized === 'internal') {
+      if (this.usersViewTab !== 'internal') {
+        this.selectUsersViewTab('internal');
+      }
+    }
   }
 
   selectUsersViewTab(tab: UsersPageViewTab): void {
