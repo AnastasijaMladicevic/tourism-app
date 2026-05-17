@@ -13,6 +13,10 @@ namespace TuristickiVodic.Core.DTO
         public string Language { get; set; } = string.Empty;
         public bool IsVerified { get; set; }
         public bool IsActive { get; set; }
+        public bool IsBanned { get; set; }
+        public string? BanReason { get; set; }
+        public DateTime? BanExpiresAtUtc { get; set; }
+        public DateTime? BannedAtUtc { get; set; }
         public string RoleName { get; set; } = string.Empty;
         public bool IsTwoFactorEnabled { get; set; }
         public DateTime DateOfBirth { get; set; }

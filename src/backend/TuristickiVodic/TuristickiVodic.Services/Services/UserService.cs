@@ -61,6 +61,8 @@ namespace TuristickiVodic.Services
 
         public async Task<PagedResultDto<UserDto>> GetAllAsync(UserQueryDto query)
         {
+            await ReleaseExpiredBansAsync();
+
             if (query.Page < 1)
                 query.Page = 1;
 
@@ -111,6 +113,10 @@ namespace TuristickiVodic.Services
                 .ToListAsync();
 
             var mappedUsers = _mapper.Map<List<UserDto>>(users);
+            for (var i = 0; i < users.Count; i++)
+            {
+                ApplyBanStatus(mappedUsers[i], users[i]);
+            }
 
             return new PagedResultDto<UserDto>
             {
@@ -124,6 +130,8 @@ namespace TuristickiVodic.Services
 
         public async Task<UserDto?> GetByIdAsync(int id)
         {
+            await ReleaseExpiredBansAsync();
+
             var user = await _context.Users
                 .Include(u => u.Role)
                 .Include(u => u.PreferredRegion)
@@ -134,6 +142,8 @@ namespace TuristickiVodic.Services
 
         public async Task<UserDto?> GetByEmailAsync(string email)
         {
+            await ReleaseExpiredBansAsync();
+
             var user = await _context.Users
                 .Include(u => u.Role)
                 .Include(u => u.PreferredRegion)
@@ -696,6 +706,8 @@ namespace TuristickiVodic.Services
 
         public async Task ForgotPasswordAsync(ForgotPasswordDto dto)
         {
+            await ReleaseExpiredBansAsync();
+
             var normalizedEmail = dto.Email.Trim().ToLower();
 
             var user = await _context.Users
@@ -707,8 +719,7 @@ namespace TuristickiVodic.Services
             if (!user.IsActive)
                 throw new InvalidOperationException("Korisnicki nalog nije aktivan.");
 
-            if (user.IsBlacklisted)
-                throw new InvalidOperationException("Reset lozinke nije dostupan za ovaj nalog.");
+            await EnsureUserNotBannedAsync(user);
 
             var resetCode = GenerateResetCode();
 
@@ -726,13 +737,17 @@ namespace TuristickiVodic.Services
 
         public async Task<ResetPasswordVerificationDto> VerifyResetCodeAsync(VerifyResetCodeDto dto)
         {
+            await ReleaseExpiredBansAsync();
+
             var normalizedEmail = dto.Email.Trim().ToLower();
 
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
 
-            if (user == null || !user.IsActive || user.IsBlacklisted)
+            if (user == null || !user.IsActive)
                 throw new InvalidOperationException("Invalid or expired reset code.");
+
+            await EnsureUserNotBannedAsync(user);
 
             if (string.IsNullOrWhiteSpace(user.ResetToken) ||
                 !user.ResetTokenExpiry.HasValue ||
@@ -762,6 +777,8 @@ namespace TuristickiVodic.Services
 
         public async Task ResetPasswordAsync(ResetPasswordDto dto)
         {
+            await ReleaseExpiredBansAsync();
+
             var resetSessionTokenHash = HashResetToken(dto.ResetSessionToken.Trim());
 
             var user = await _context.Users
@@ -770,8 +787,10 @@ namespace TuristickiVodic.Services
                     u.ResetTokenExpiry.HasValue &&
                     u.ResetTokenExpiry.Value > DateTime.UtcNow);
 
-            if (user == null || !user.IsActive || user.IsBlacklisted)
+            if (user == null || !user.IsActive)
                 throw new InvalidOperationException("Invalid or expired reset session.");
+
+            await EnsureUserNotBannedAsync(user);
 
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
             user.ResetToken = null;
@@ -784,6 +803,8 @@ namespace TuristickiVodic.Services
 
         public async Task<AuthResponseDto?> LoginAsync(LoginDto loginDto)
         {
+            await ReleaseExpiredBansAsync();
+
             var user = await _context.Users
                 .Include(u => u.Role)
                 .Include(u => u.PreferredRegion)
@@ -792,8 +813,7 @@ namespace TuristickiVodic.Services
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
                 return null;
 
-            if (user.IsBlacklisted)
-                throw new InvalidOperationException("User is blacklisted");
+            await EnsureUserNotBannedAsync(user);
 
             if (!user.IsActive)
                 throw new InvalidOperationException("Account is deactivated");
@@ -806,6 +826,8 @@ namespace TuristickiVodic.Services
 
         public async Task<AuthResponseDto> GoogleLoginAsync(GoogleLoginDto dto)
         {
+            await ReleaseExpiredBansAsync();
+
             var googleIdentity = await ValidateGoogleIdTokenAsync(dto.IdToken);
             var normalizedEmail = googleIdentity.Email.Trim().ToLowerInvariant();
 
@@ -875,8 +897,7 @@ namespace TuristickiVodic.Services
                 }
             }
 
-            if (user.IsBlacklisted)
-                throw new InvalidOperationException("User is blacklisted");
+            await EnsureUserNotBannedAsync(user);
 
             if (!user.IsActive)
                 throw new InvalidOperationException("Account is deactivated");
@@ -889,6 +910,8 @@ namespace TuristickiVodic.Services
 
         public async Task<AuthResponseDto> VerifyTwoFactorLoginAsync(VerifyTwoFactorLoginDto dto)
         {
+            await ReleaseExpiredBansAsync();
+
             var challengeTokenHash = HashOpaqueToken(dto.ChallengeToken);
 
             var user = await _context.Users
@@ -899,8 +922,7 @@ namespace TuristickiVodic.Services
             if (user == null || !user.TwoFactorChallengeExpiryUtc.HasValue || user.TwoFactorChallengeExpiryUtc.Value <= DateTime.UtcNow)
                 throw new InvalidOperationException("Two-step verification session expired. Please log in again.");
 
-            if (user.IsBlacklisted)
-                throw new InvalidOperationException("User is blacklisted");
+            await EnsureUserNotBannedAsync(user);
 
             if (!user.IsActive)
                 throw new InvalidOperationException("Account is deactivated");
@@ -922,6 +944,8 @@ namespace TuristickiVodic.Services
 
         public async Task<AuthResponseDto> ResendTwoFactorLoginCodeAsync(ResendTwoFactorLoginCodeDto dto)
         {
+            await ReleaseExpiredBansAsync();
+
             var challengeTokenHash = HashOpaqueToken(dto.ChallengeToken);
 
             var user = await _context.Users
@@ -930,6 +954,8 @@ namespace TuristickiVodic.Services
 
             if (user == null || !user.TwoFactorChallengeExpiryUtc.HasValue || user.TwoFactorChallengeExpiryUtc.Value <= DateTime.UtcNow)
                 throw new InvalidOperationException("Two-step verification session expired. Please log in again.");
+
+            await EnsureUserNotBannedAsync(user);
 
             if (!ShouldRequireTwoFactor(user))
                 throw new InvalidOperationException("Two-step verification is not enabled for this account.");
@@ -956,6 +982,8 @@ namespace TuristickiVodic.Services
 
         public async Task<TwoFactorSettingsDto?> GetTwoFactorSettingsAsync(int userId)
         {
+            await ReleaseExpiredBansAsync();
+
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
@@ -972,6 +1000,8 @@ namespace TuristickiVodic.Services
 
         public async Task<TwoFactorSettingsDto?> UpdateTwoFactorSettingsAsync(int userId, UpdateTwoFactorSettingsDto dto)
         {
+            await ReleaseExpiredBansAsync();
+
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
@@ -998,6 +1028,8 @@ namespace TuristickiVodic.Services
 
         public async Task<AuthResponseDto?> RefreshTokenAsync(RefreshTokenDto refreshTokenDto)
         {
+            await ReleaseExpiredBansAsync();
+
             var refreshTokenHash = HashRefreshToken(refreshTokenDto.RefreshToken);
 
             var storedRefreshToken = await _context.RefreshTokens
@@ -1017,8 +1049,7 @@ namespace TuristickiVodic.Services
             if (user == null)
                 return null;
 
-            if (user.IsBlacklisted)
-                throw new InvalidOperationException("User is blacklisted");
+            await EnsureUserNotBannedAsync(user);
 
             if (!user.IsActive)
                 throw new InvalidOperationException("Account is deactivated");
@@ -1031,6 +1062,8 @@ namespace TuristickiVodic.Services
 
         public async Task<bool> RequestCreatorRoleAsync(int userId, string creatorType)
         {
+            await ReleaseExpiredBansAsync();
+
             var user = await _context.Users
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Id == userId);
@@ -1041,8 +1074,7 @@ namespace TuristickiVodic.Services
             if (user.Role.Name != RoleType.Tourist)
                 throw new InvalidOperationException("Only tourists can request creator role");
 
-            if (user.IsBlacklisted)
-                throw new InvalidOperationException("Blacklisted users cannot request creator role.");
+            await EnsureUserNotBannedAsync(user);
 
             if (HasPendingCreatorRoleRequest(user))
                 throw new InvalidOperationException("User already has a pending creator role request.");
@@ -1087,6 +1119,8 @@ namespace TuristickiVodic.Services
 
         public async Task<bool> ApproveCreatorRoleAsync(int userId)
         {
+            await ReleaseExpiredBansAsync();
+
             var user = await _context.Users
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Id == userId);
@@ -1094,8 +1128,7 @@ namespace TuristickiVodic.Services
             if (user == null)
                 return false;
 
-            if (user.IsBlacklisted)
-                throw new InvalidOperationException("User is blacklisted.");
+            await EnsureUserNotBannedAsync(user);
 
             if (user.Role.Name != RoleType.Tourist)
                 throw new InvalidOperationException("Only tourists can be approved for content creator role.");
@@ -1122,6 +1155,8 @@ namespace TuristickiVodic.Services
 
         public async Task<bool> RejectCreatorRoleAsync(int userId)
         {
+            await ReleaseExpiredBansAsync();
+
             var user = await _context.Users
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Id == userId);
@@ -1146,6 +1181,8 @@ namespace TuristickiVodic.Services
 
         public async Task<bool> DemoteCreatorRoleAsync(int userId)
         {
+            await ReleaseExpiredBansAsync();
+
             var user = await _context.Users
                 .Include(u => u.Role)
                 .FirstOrDefaultAsync(u => u.Id == userId);
@@ -1173,8 +1210,63 @@ namespace TuristickiVodic.Services
             return true;
         }
 
+        public async Task<UserDto?> BanUserAsync(int userId, BanUserDto dto)
+        {
+            await ReleaseExpiredBansAsync();
+
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .Include(u => u.PreferredRegion)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return null;
+
+            if (user.Role?.Name != RoleType.Tourist && user.Role?.Name != RoleType.ContentCreator)
+                throw new InvalidOperationException("Only tourist and content creator accounts can be banned.");
+
+            var normalizedReason = dto.Reason?.Trim();
+            if (string.IsNullOrWhiteSpace(normalizedReason))
+                throw new InvalidOperationException("Ban reason is required.");
+
+            var normalizedExpiry = dto.BanExpiresAtUtc?.ToUniversalTime();
+            if (normalizedExpiry.HasValue && normalizedExpiry.Value <= DateTime.UtcNow)
+                throw new InvalidOperationException("Ban end date must be in the future.");
+
+            user.IsBlacklisted = true;
+            user.BanReason = normalizedReason;
+            user.BanExpiresAtUtc = normalizedExpiry;
+            user.BannedAtUtc = DateTime.UtcNow;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await RevokeRefreshTokenAsync(user.Id);
+            await _context.SaveChangesAsync();
+
+            return await MapExistingUserDtoWithMetricsAsync(user);
+        }
+
+        public async Task<UserDto?> UnbanUserAsync(int userId)
+        {
+            await ReleaseExpiredBansAsync();
+
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .Include(u => u.PreferredRegion)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return null;
+
+            ClearBan(user, DateTime.UtcNow);
+            await _context.SaveChangesAsync();
+
+            return await MapExistingUserDtoWithMetricsAsync(user);
+        }
+
         public async Task<bool> ToggleUserActiveAsync(int userId, bool isActive)
         {
+            await ReleaseExpiredBansAsync();
+
             var user = await _context.Users.FindAsync(userId);
 
             if (user == null)
@@ -2017,6 +2109,7 @@ namespace TuristickiVodic.Services
             dto.CreatorRoleRequestStatus = ResolveCreatorRoleRequestStatus(user).ToString();
             dto.AdminAppLoginUrl = ResolveAdminAppLoginUrl();
             dto.PublicAppHomeUrl = ResolvePublicAppHomeUrl();
+            ApplyBanStatus(dto, user);
             await PopulateUserMetricsAsync(dto, user.Id);
             return dto;
         }
@@ -2026,6 +2119,84 @@ namespace TuristickiVodic.Services
             dto.FavoritesCount = await _context.Favorites.CountAsync(f => f.UserId == userId);
             dto.PlansCount = await _context.EventPlannerItems.CountAsync(item => item.UserId == userId);
             dto.ReviewsCount = await _context.Reviews.CountAsync(review => review.UserId == userId);
+        }
+
+        private void ApplyBanStatus(UserDto dto, User user)
+        {
+            var isBanned = HasActiveBan(user);
+            dto.IsBanned = isBanned;
+            dto.BanReason = isBanned ? user.BanReason : null;
+            dto.BanExpiresAtUtc = isBanned ? user.BanExpiresAtUtc : null;
+            dto.BannedAtUtc = isBanned ? user.BannedAtUtc : null;
+        }
+
+        private async Task ReleaseExpiredBansAsync()
+        {
+            var now = DateTime.UtcNow;
+            var expiredUsers = await _context.Users
+                .Where(u => u.IsBlacklisted && u.BanExpiresAtUtc.HasValue && u.BanExpiresAtUtc.Value <= now)
+                .ToListAsync();
+
+            if (expiredUsers.Count == 0)
+                return;
+
+            foreach (var user in expiredUsers)
+            {
+                ClearBan(user, now);
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task EnsureUserNotBannedAsync(User user)
+        {
+            if (TryLiftExpiredBan(user))
+            {
+                await _context.SaveChangesAsync();
+                return;
+            }
+
+            if (HasActiveBan(user))
+                throw CreateAccountBannedException(user);
+        }
+
+        private static bool HasActiveBan(User user)
+        {
+            if (!user.IsBlacklisted)
+                return false;
+
+            return !user.BanExpiresAtUtc.HasValue || user.BanExpiresAtUtc.Value > DateTime.UtcNow;
+        }
+
+        private static bool TryLiftExpiredBan(User user)
+        {
+            if (!user.IsBlacklisted || !user.BanExpiresAtUtc.HasValue || user.BanExpiresAtUtc.Value > DateTime.UtcNow)
+                return false;
+
+            ClearBan(user, DateTime.UtcNow);
+            return true;
+        }
+
+        private static void ClearBan(User user, DateTime now)
+        {
+            user.IsBlacklisted = false;
+            user.BanReason = null;
+            user.BanExpiresAtUtc = null;
+            user.BannedAtUtc = null;
+            user.UpdatedAt = now;
+        }
+
+        private AccountBannedException CreateAccountBannedException(User user)
+        {
+            var reason = string.IsNullOrWhiteSpace(user.BanReason)
+                ? "Krsenje pravila platforme."
+                : user.BanReason.Trim();
+
+            var message = user.BanExpiresAtUtc.HasValue
+                ? $"Ovaj nalog je banovan do {user.BanExpiresAtUtc.Value:dd.MM.yyyy. HH:mm} UTC. Razlog: {reason}"
+                : $"Ovaj nalog je trajno banovan. Razlog: {reason}";
+
+            return new AccountBannedException(message, reason, user.BanExpiresAtUtc, user.Role?.Name.ToString());
         }
     }
 }

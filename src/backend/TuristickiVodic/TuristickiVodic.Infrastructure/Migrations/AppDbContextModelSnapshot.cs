@@ -1297,6 +1297,16 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<bool>("AllowPushNotifications")
                         .HasColumnType("boolean");
 
+                    b.Property<DateTime?>("BannedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("BanExpiresAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("BanReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<bool>("HasRequestedCreatorRole")
                         .HasColumnType("boolean");
 
