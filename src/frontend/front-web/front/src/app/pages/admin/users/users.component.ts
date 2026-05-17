@@ -54,6 +54,18 @@ const MAX_MANAGER_REPORT_PAGES = 20;
 
 type UsersPageViewTab = 'internal' | 'tourists';
 
+type BanDurationOption = '30-days' | 'indefinite' | 'custom';
+
+interface AdminBanDurationRecord {
+  userId: number;
+  reportId: number;
+  duration: BanDurationOption;
+  endsAt: string | null;
+  recordedAt: string;
+}
+
+const ADMIN_BAN_DURATION_STORAGE_KEY = 'techspire-admin-ban-durations';
+
 @Component({
   selector: 'app-users',
   standalone: true,
@@ -180,6 +192,8 @@ export class UsersComponent implements OnInit {
   reportReviewError = '';
   reportRejectReason = '';
   reportReviewSuccess = '';
+  banDuration: BanDurationOption = 'indefinite';
+  banCustomEndDate = '';
 
   private creatorRequestSearchDebounce?: ReturnType<typeof setTimeout>;
   private pendingReportQuery: { reportId?: number; reportedUserId?: number } | null = null;
@@ -1251,12 +1265,44 @@ export class UsersComponent implements OnInit {
     this.highlightedReportUserId = null;
     this.reportReviewError = '';
     this.reportRejectReason = '';
+    this.resetBanDurationForm();
     this.clearReportQueryParams();
     this.cdr.markForCheck();
   }
 
+  selectBanDuration(option: BanDurationOption): void {
+    this.banDuration = option;
+    if (option !== 'custom') {
+      this.banCustomEndDate = '';
+    }
+    this.reportReviewError = '';
+    this.cdr.markForCheck();
+  }
+
+  get banCustomDateMin(): string {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return this.toDateInputValue(today);
+  }
+
+  get isBanDurationValid(): boolean {
+    if (this.banDuration !== 'custom') {
+      return true;
+    }
+    return !!this.resolveBanEndsAt();
+  }
+
+  get canConfirmBanFromReport(): boolean {
+    return !!this.activeManagerReport && !this.reportReviewSubmitting && this.isBanDurationValid;
+  }
+
   confirmBanFromReport(): void {
     if (!this.activeManagerReport || this.reportReviewSubmitting) {
+      return;
+    }
+    if (!this.isBanDurationValid) {
+      this.reportReviewError = 'Choose an end date for a custom ban duration.';
+      this.cdr.markForCheck();
       return;
     }
     this.submitManagerReportReview(true);
@@ -1301,12 +1347,16 @@ export class UsersComponent implements OnInit {
       .subscribe({
         next: () => {
           this.pendingReportByUserId.delete(report.reportedUserId);
+          if (approve) {
+            this.recordBanDurationChoice(report);
+          }
           this.reportReviewSuccess = approve
-            ? 'Report approved. The content creator has been banned and demoted to tourist.'
+            ? `Report approved. The content creator has been banned (${this.banDurationSummary()}).`
             : 'Report rejected. The content creator remains on the platform.';
           this.activeManagerReport = null;
           this.highlightedReportUserId = null;
           this.reportRejectReason = '';
+          this.resetBanDurationForm();
           this.clearReportQueryParams();
           this.loadDashboardData({ silent: true });
           this.cdr.markForCheck();
@@ -1439,8 +1489,109 @@ export class UsersComponent implements OnInit {
     this.reportReviewError = '';
     this.reportReviewSuccess = '';
     this.reportRejectReason = '';
+    this.resetBanDurationForm();
     this.focusAdminDirectoryPageForUser(report.reportedUserId);
     this.cdr.markForCheck();
+  }
+
+  private resetBanDurationForm(): void {
+    this.banDuration = 'indefinite';
+    this.banCustomEndDate = '';
+  }
+
+  banDurationSummary(): string {
+    const endsAt = this.resolveBanEndsAt();
+    if (this.banDuration === 'indefinite' || !endsAt) {
+      return 'indefinite';
+    }
+    return `until ${this.formatDate(endsAt)}`;
+  }
+
+  private resolveBanEndsAt(): string | null {
+    if (this.banDuration === 'indefinite') {
+      return null;
+    }
+
+    if (this.banDuration === '30-days') {
+      const end = new Date();
+      end.setHours(0, 0, 0, 0);
+      end.setDate(end.getDate() + 30);
+      return end.toISOString();
+    }
+
+    const raw = this.banCustomEndDate.trim();
+    if (!raw) {
+      return null;
+    }
+
+    const picked = new Date(`${raw}T00:00:00`);
+    if (Number.isNaN(picked.getTime())) {
+      return null;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (picked < today) {
+      return null;
+    }
+
+    return picked.toISOString();
+  }
+
+  private recordBanDurationChoice(report: ManagerReportDto): void {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const record: AdminBanDurationRecord = {
+      userId: report.reportedUserId,
+      reportId: report.id,
+      duration: this.banDuration,
+      endsAt: this.resolveBanEndsAt(),
+      recordedAt: new Date().toISOString()
+    };
+
+    try {
+      const existing = this.readBanDurationRecords();
+      const withoutUser = existing.filter((item) => item.userId !== report.reportedUserId);
+      withoutUser.unshift(record);
+      window.localStorage.setItem(ADMIN_BAN_DURATION_STORAGE_KEY, JSON.stringify(withoutUser.slice(0, 200)));
+    } catch {
+      // Ignore storage failures; ban still applied on the server.
+    }
+  }
+
+  private readBanDurationRecords(): AdminBanDurationRecord[] {
+    if (typeof window === 'undefined') {
+      return [];
+    }
+
+    try {
+      const raw = window.localStorage.getItem(ADMIN_BAN_DURATION_STORAGE_KEY);
+      if (!raw) {
+        return [];
+      }
+      const parsed = JSON.parse(raw) as unknown;
+      if (!Array.isArray(parsed)) {
+        return [];
+      }
+      return parsed.filter(
+        (item): item is AdminBanDurationRecord =>
+          !!item &&
+          typeof item === 'object' &&
+          typeof (item as AdminBanDurationRecord).userId === 'number' &&
+          typeof (item as AdminBanDurationRecord).reportId === 'number'
+      );
+    } catch {
+      return [];
+    }
+  }
+
+  private toDateInputValue(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   private focusAdminDirectoryPageForUser(userId: number): void {

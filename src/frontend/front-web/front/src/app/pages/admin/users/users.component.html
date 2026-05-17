@@ -495,9 +495,60 @@
               </div>
             </dl>
 
-            <p class="manager-report-ban-note">
-              Approving this report bans the content creator: they are demoted to tourist and blocked from signing in again.
-            </p>
+            <section class="ban-duration-block" aria-labelledby="ban-duration-label">
+              <p id="ban-duration-label" class="ban-duration-label">Duration of Ban</p>
+              <div class="ban-duration-options" role="radiogroup" aria-labelledby="ban-duration-label">
+                <button
+                  type="button"
+                  class="ban-duration-option"
+                  role="radio"
+                  [attr.aria-checked]="banDuration === '30-days'"
+                  [class.ban-duration-option--selected]="banDuration === '30-days'"
+                  (click)="selectBanDuration('30-days')"
+                  [disabled]="reportReviewSubmitting"
+                >
+                  30 Days
+                </button>
+                <button
+                  type="button"
+                  class="ban-duration-option"
+                  role="radio"
+                  [attr.aria-checked]="banDuration === 'indefinite'"
+                  [class.ban-duration-option--selected]="banDuration === 'indefinite'"
+                  (click)="selectBanDuration('indefinite')"
+                  [disabled]="reportReviewSubmitting"
+                >
+                  Indefinite
+                </button>
+                <button
+                  type="button"
+                  class="ban-duration-option"
+                  role="radio"
+                  [attr.aria-checked]="banDuration === 'custom'"
+                  [class.ban-duration-option--selected]="banDuration === 'custom'"
+                  (click)="selectBanDuration('custom')"
+                  [disabled]="reportReviewSubmitting"
+                >
+                  Custom Date
+                </button>
+              </div>
+
+              <label class="ban-duration-custom-field" *ngIf="banDuration === 'custom'">
+                <span>Ban ends on</span>
+                <input
+                  type="date"
+                  class="ban-duration-date-input"
+                  [(ngModel)]="banCustomEndDate"
+                  [min]="banCustomDateMin"
+                  [disabled]="reportReviewSubmitting"
+                />
+              </label>
+
+              <p class="ban-duration-hint">
+                Access is blocked immediately when you approve. The selected duration is saved for admin records
+                (timed expiry is not enforced by the server yet).
+              </p>
+            </section>
 
             <label class="manager-report-reject-field" *ngIf="!reportReviewSubmitting">
               <span>Rejection reason (required if you dismiss the report)</span>
@@ -526,7 +577,7 @@
                 type="button"
                 class="ban-from-report-btn"
                 (click)="confirmBanFromReport()"
-                [disabled]="reportReviewSubmitting"
+                [disabled]="!canConfirmBanFromReport"
               >
                 {{ reportReviewSubmitting ? 'Processing…' : 'Approve & ban creator' }}
               </button>
