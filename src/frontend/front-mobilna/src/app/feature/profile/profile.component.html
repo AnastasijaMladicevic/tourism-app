@@ -100,34 +100,69 @@
       <h3>{{ 'profile.shareLocationTitle' | translate }}</h3>
 
       <div class="menu-card share-card">
-        <p>{{ 'profile.shareLocationBody' | translate }}</p>
+        <div class="share-group">
+          <strong class="share-group__title">{{ 'profile.shareLinkTitle' | translate }}</strong>
+          <p>{{ 'profile.shareLinkBody' | translate }}</p>
 
-        <div class="share-actions">
-          @for (hours of shareDurations; track hours) {
-            <button class="share-btn" type="button" (click)="generateLocationShare(hours)">
-              {{
-                (shareBusyHours() === hours
-                  ? 'profile.shareLoading'
-                  : 'profile.shareHours') | translate:{ hours: hours }
-              }}
-            </button>
+          <div class="share-actions">
+            @for (hours of shareDurations; track 'link-' + hours) {
+              <button class="share-btn" type="button" (click)="generateLocationShare(hours)">
+                {{
+                  (isShareBusy('link', hours)
+                    ? 'profile.shareLoading'
+                    : 'profile.shareHours') | translate:{ hours: hours }
+                }}
+              </button>
+            }
+          </div>
+
+          @if (shareUrl()) {
+            <div class="share-result">
+              <strong>{{ 'profile.shareReady' | translate }}</strong>
+              <p>{{ shareUrl() }}</p>
+              <span>{{ 'profile.shareExpires' | translate:{ date: ((shareExpiresAt() | date:'dd.MM.yyyy. HH:mm') ?? '') } }}</span>
+              <button class="share-copy" type="button" (click)="copyShareUrl()">
+                {{ (isCopySuccess('link') ? 'profile.shareCopied' : 'profile.shareCopy') | translate }}
+              </button>
+            </div>
+          }
+
+          @if (shareError()) {
+            <div class="share-error">{{ shareError() | translate }}</div>
           }
         </div>
 
-        @if (shareUrl()) {
-          <div class="share-result">
-            <strong>{{ 'profile.shareReady' | translate }}</strong>
-            <p>{{ shareUrl() }}</p>
-            <span>{{ 'profile.shareExpires' | translate:{ date: ((shareExpiresAt() | date:'dd.MM.yyyy. HH:mm') ?? '') } }}</span>
-            <button class="share-copy" type="button" (click)="copyShareUrl()">
-              {{ (copySuccess() ? 'profile.shareCopied' : 'profile.shareCopy') | translate }}
-            </button>
-          </div>
-        }
+        <div class="share-group share-group--live">
+          <strong class="share-group__title">{{ 'profile.shareLiveTitle' | translate }}</strong>
+          <p>{{ 'profile.shareLiveBody' | translate }}</p>
 
-        @if (shareError()) {
-          <div class="share-error">{{ shareError() | translate }}</div>
-        }
+          <div class="share-actions">
+            @for (hours of shareDurations; track 'live-' + hours) {
+              <button class="share-btn" type="button" (click)="generateLiveLocationShare(hours)">
+                {{
+                  (isShareBusy('live', hours)
+                    ? 'profile.shareLoading'
+                    : 'profile.shareHours') | translate:{ hours: hours }
+                }}
+              </button>
+            }
+          </div>
+
+          @if (liveShareUrl()) {
+            <div class="share-result share-result--live">
+              <strong>{{ 'profile.shareReady' | translate }}</strong>
+              <p>{{ liveShareUrl() }}</p>
+              <span>{{ 'profile.shareExpires' | translate:{ date: ((liveShareExpiresAt() | date:'dd.MM.yyyy. HH:mm') ?? '') } }}</span>
+              <button class="share-copy" type="button" (click)="copyLiveShareUrl()">
+                {{ (isCopySuccess('live') ? 'profile.shareCopied' : 'profile.shareCopy') | translate }}
+              </button>
+            </div>
+          }
+
+          @if (liveShareError()) {
+            <div class="share-error">{{ liveShareError() | translate }}</div>
+          }
+        </div>
       </div>
     </section>
 

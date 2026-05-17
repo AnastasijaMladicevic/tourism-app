@@ -304,7 +304,17 @@
     "shareLocationGuestTitle": "Posizione condivisa",
     "shareLocationGuestBody": "Hai aperto un link temporaneo per vedere una posizione condivisa con te.",
     "shareLocationUnavailable": "Questa posizione condivisa non è più disponibile oppure è scaduta.",
-    "shareLocationLive": "Posizione condivisa attuale"
+    "shareLocationLive": "Posizione condivisa attuale",
+    "shareLinkTitle": "Link singolo di posizione",
+    "shareLinkBody": "Condividi una posizione approssimativa che rimane uguale finché il link non scade.",
+    "shareLiveTitle": "Tracciamento posizione in tempo reale",
+    "shareLiveBody": "Condividi una mappa live che si aggiorna mentre la tua app resta aperta. Il GPS deve rimanere attivo per tutta la sessione.",
+    "shareLocationGuestLiveBody": "Hai aperto un link di posizione live che si aggiorna mentre la sessione di condivisione resta attiva.",
+    "shareLocationTrackingLive": "Posizione condivisa in tempo reale",
+    "shareLocationSnapshot": "Posizione al momento della condivisione",
+    "shareUpdatedAt": "Ultimo aggiornamento {{date}}",
+    "shareCapturedAt": "Condivisa da questa posizione alle {{date}}",
+    "shareLiveGpsRequired": "Attiva il GPS per la condivisione live della posizione e lascialo acceso per tutta la sessione."
   },
   "settings": {
     "title": "Impostazioni",
@@ -314,6 +324,8 @@
     "locationBodyOff": "La posizione è disattivata. Attivala se vuoi suggerimenti più precisi e risultati migliori nelle vicinanze.",
     "locationConsentTitle": "Attiva il tracciamento della posizione per il GPS della mappa",
     "locationConsentBody": "Per usare il GPS sulla mappa, conferma qui il tracciamento della posizione. Dopo di ciò, l'app potrà usare la tua posizione attuale per la navigazione e i luoghi vicini.",
+    "liveShareConsentTitle": "Attiva il GPS per la posizione live",
+    "liveShareConsentBody": "Per far funzionare bene il link di tracciamento live, attiva qui la posizione e lascia il GPS acceso per tutta la sessione.",
     "notificationsSection": "Notifiche",
     "notificationsTitle": "Attiva notifiche",
     "notificationsBodyOn": "Saranno mostrate solo le notifiche che lasci attive e puoi scegliere anche come visualizzarle.",

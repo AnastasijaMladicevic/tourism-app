@@ -3,7 +3,13 @@
     <header class="shared-location-hero">
       <span>{{ 'profile.shareLocationTitle' | translate }}</span>
       <h1>{{ 'profile.shareLocationGuestTitle' | translate }}</h1>
-      <p>{{ 'profile.shareLocationGuestBody' | translate }}</p>
+      <p>
+        {{
+          (isLiveView()
+            ? 'profile.shareLocationGuestLiveBody'
+            : 'profile.shareLocationGuestBody') | translate
+        }}
+      </p>
     </header>
 
     @if (isLoading()) {
@@ -18,7 +24,22 @@
       <div class="shared-location-card">
         <div class="shared-location-card__copy">
           <strong>{{ sharedLocation()!.displayName }}</strong>
-          <p>{{ 'profile.shareLocationLive' | translate }}</p>
+          <p>
+            {{
+              (isLiveView()
+                ? 'profile.shareLocationTrackingLive'
+                : 'profile.shareLocationSnapshot') | translate
+            }}
+          </p>
+          <span>
+            {{
+              (isLiveView()
+                ? 'profile.shareUpdatedAt'
+                : 'profile.shareCapturedAt') | translate:{
+                  date: ((sharedLocation()!.updatedAtUtc | date:'dd.MM.yyyy. HH:mm:ss') ?? '')
+                }
+            }}
+          </span>
           <span>
             {{ 'profile.shareExpires' | translate:{ date: ((sharedLocation()!.expiresAtUtc | date:'dd.MM.yyyy. HH:mm') ?? '') } }}
           </span>
