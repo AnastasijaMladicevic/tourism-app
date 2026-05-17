@@ -1,171 +1,317 @@
 <div class="dashboard">
 
-  <!-- Page header -->
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Dashboard Overview</h1>
-      <p class="page-sub">Real-time performance metrics and regional operations monitoring.</p>
+  <header class="page-header">
+    <div class="page-intro">
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-sub">Overview of platform performance and regional activity.</p>
     </div>
-    <button class="date-btn">
-      <svg width="13" height="13" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
+    <button type="button" class="pill-select" aria-label="Date range">
+      <svg width="14" height="14" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
         <rect x="3" y="4" width="16" height="15" rx="2"/>
         <path d="M7 2v3M15 2v3M3 9h16"/>
       </svg>
-      Last 30 Days
-      <svg width="10" height="10" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2.5">
+      {{ selectedRange }}
+      <svg width="10" height="10" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
         <path d="M5 8l6 6 6-6"/>
       </svg>
     </button>
-  </div>
+  </header>
 
-  <!-- =====================
-       STAT CARDS
-       ===================== -->
-  <div class="stats-grid">
-
-    <div class="stat-card blue">
-      <div class="stat-header">
-        <span class="stat-label">Total Tourists</span>
-        <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
-          <circle cx="11" cy="8" r="4"/>
-          <path d="M3 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
-        </svg>
+  <section class="kpi-grid" aria-label="Key metrics">
+    <article class="kpi-card">
+      <div class="kpi-top">
+        <span class="kpi-label">Total Tourists</span>
+        <span class="kpi-icon indigo" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
+            <circle cx="11" cy="8" r="4"/><path d="M3 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
+          </svg>
+        </span>
       </div>
-      <div class="stat-value">{{ stats.tourists | number }}</div>
-      <span class="stat-badge green">+12.5% since last month</span>
-    </div>
+      <div class="kpi-value">{{ stats.tourists | number }}</div>
+      <span class="trend-pill" [class.up]="statTrends[0].positive" [class.down]="statTrends[0].positive === false">
+        {{ statTrends[0].value }} <span class="trend-muted">{{ statTrends[0].label }}</span>
+      </span>
+    </article>
 
-    <div class="stat-card green">
-      <div class="stat-header">
-        <span class="stat-label">Active Destinations</span>
-        <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
-          <path d="M11 2C8.2 2 6 4.2 6 7c0 4.5 5 11 5 11s5-6.5 5-11c0-2.8-2.2-5-5-5z"/>
-          <circle cx="11" cy="7" r="2"/>
-        </svg>
+    <article class="kpi-card">
+      <div class="kpi-top">
+        <span class="kpi-label">Active Destinations</span>
+        <span class="kpi-icon teal" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M11 2C8.2 2 6 4.2 6 7c0 4.5 5 11 5 11s5-6.5 5-11c0-2.8-2.2-5-5-5z"/><circle cx="11" cy="7" r="2"/>
+          </svg>
+        </span>
       </div>
-      <div class="stat-value">{{ stats.destinations }}</div>
-      <span class="stat-badge green">+3 new this week</span>
-    </div>
+      <div class="kpi-value">{{ stats.destinations }}</div>
+      <span class="trend-pill up">{{ statTrends[1].value }} <span class="trend-muted">{{ statTrends[1].label }}</span></span>
+    </article>
 
-    <div class="stat-card amber">
-      <div class="stat-header">
-        <span class="stat-label">Upcoming Events</span>
-        <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
-          <rect x="3" y="4" width="16" height="15" rx="2"/>
-          <path d="M7 2v3M15 2v3M3 9h16"/>
-        </svg>
+    <article class="kpi-card">
+      <div class="kpi-top">
+        <span class="kpi-label">Upcoming Events</span>
+        <span class="kpi-icon violet" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
+            <rect x="3" y="4" width="16" height="15" rx="2"/><path d="M7 2v3M15 2v3M3 9h16"/>
+          </svg>
+        </span>
       </div>
-      <div class="stat-value">{{ stats.events }}</div>
-      <span class="stat-badge red">-4% vs previous period</span>
-    </div>
+      <div class="kpi-value">{{ stats.events }}</div>
+      <span class="trend-pill down">{{ statTrends[2].value }} <span class="trend-muted">{{ statTrends[2].label }}</span></span>
+    </article>
 
-    <div class="stat-card purple">
-      <div class="stat-header">
-        <span class="stat-label">Pending Reviews</span>
-        <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
-          <path d="M20 2H4a2 2 0 00-2 2v14l4-4h14a2 2 0 002-2V4a2 2 0 00-2-2z"/>
-        </svg>
+    <article class="kpi-card">
+      <div class="kpi-top">
+        <span class="kpi-label">Pending Reviews</span>
+        <span class="kpi-icon slate" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
+            <path d="M20 2H4a2 2 0 00-2 2v14l4-4h14a2 2 0 002-2V4a2 2 0 00-2-2z"/>
+          </svg>
+        </span>
       </div>
-      <div class="stat-value">{{ stats.reviews }}</div>
-      <span class="stat-badge amber">Moderate — requires moderation</span>
-    </div>
+      <div class="kpi-value">{{ stats.reviews }}</div>
+      <span class="trend-pill neutral">{{ statTrends[3].value }}</span>
+    </article>
+  </section>
 
-  </div>
+  <section class="analytics-grid">
 
-  <!-- =====================
-       MIDDLE SECTION
-       ===================== -->
-  <div class="middle-grid">
-
-    <!-- Activity Feed -->
-    <div class="card activity-card">
-      <div class="card-header">
+    <article class="panel panel-wide">
+      <div class="panel-head">
         <div>
-          <div class="card-title">Recent Administrative Activity</div>
-          <div class="card-sub">Latest changes made by team members across the region.</div>
+          <h2 class="panel-title">Visitor Analytics</h2>
+          <p class="panel-desc">Unique visitors vs. active sessions</p>
         </div>
-        <span class="view-all">View Full Log</span>
+        <button type="button" class="pill-select pill-select-sm">{{ chartRange }}</button>
       </div>
+      <div class="chart-legend">
+        <span class="legend-item"><i class="dot solid"></i> Visitors</span>
+        <span class="legend-item"><i class="dot dashed"></i> Sessions</span>
+      </div>
+      <div class="line-chart-wrap">
+        <svg class="line-chart" viewBox="0 0 560 200" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="visitorFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#4f46e5" stop-opacity="0.18"/>
+              <stop offset="100%" stop-color="#4f46e5" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <line x1="0" y1="40" x2="560" y2="40" class="grid-line"/>
+          <line x1="0" y1="90" x2="560" y2="90" class="grid-line"/>
+          <line x1="0" y1="140" x2="560" y2="140" class="grid-line"/>
+          <path class="area-fill" d="M0,155 L70,130 L140,142 L210,108 L280,118 L350,88 L420,98 L490,72 L560,82 L560,200 L0,200 Z" fill="url(#visitorFill)"/>
+          <path class="line-primary" d="M0,155 L70,130 L140,142 L210,108 L280,118 L350,88 L420,98 L490,72 L560,82" fill="none"/>
+          <path class="line-secondary" d="M0,168 L70,148 L140,158 L210,125 L280,135 L350,102 L420,112 L490,88 L560,98" fill="none"/>
+          <circle cx="350" cy="88" r="5" class="chart-point"/>
+        </svg>
+        <div class="chart-labels">
+          <span *ngFor="let d of visitorTrend">{{ d.label }}</span>
+        </div>
+      </div>
+    </article>
 
-      <div class="activity-list">
-        <div class="activity-item" *ngFor="let item of activityFeed">
-          <div class="act-avatar" [ngClass]="item.avatarColor">{{ item.initials }}</div>
+    <article class="panel">
+      <div class="panel-head">
+        <h2 class="panel-title">Monthly Goal</h2>
+        <button type="button" class="icon-btn" aria-label="More options">
+          <svg width="16" height="16" viewBox="0 0 22 22" fill="currentColor"><circle cx="5" cy="11" r="1.5"/><circle cx="11" cy="11" r="1.5"/><circle cx="17" cy="11" r="1.5"/></svg>
+        </button>
+      </div>
+      <div class="gauge-wrap">
+        <svg class="gauge" viewBox="0 0 120 70" aria-hidden="true">
+          <path class="gauge-track" d="M10,60 A50,50 0 0 1 110,60" fill="none"/>
+          <path class="gauge-fill" d="M10,60 A50,50 0 0 1 110,60" fill="none"
+                [attr.stroke-dasharray]="157"
+                [attr.stroke-dashoffset]="157 - (157 * monthlyGoal.percent / 100)"/>
+        </svg>
+        <div class="gauge-center">
+          <span class="gauge-pct">{{ monthlyGoal.percent }}%</span>
+        </div>
+      </div>
+      <p class="gauge-note">On track — <strong>{{ monthlyGoal.change }}</strong> vs last month</p>
+      <div class="goal-stats">
+        <div class="goal-stat">
+          <span class="goal-stat-label">Target</span>
+          <span class="goal-stat-val">{{ monthlyGoal.target | number }}</span>
+        </div>
+        <div class="goal-stat">
+          <span class="goal-stat-label">Visitors</span>
+          <span class="goal-stat-val accent">{{ monthlyGoal.current | number }}</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="panel">
+      <div class="panel-head">
+        <h2 class="panel-title">Content Mix</h2>
+        <button type="button" class="icon-btn" aria-label="More options">
+          <svg width="16" height="16" viewBox="0 0 22 22" fill="currentColor"><circle cx="5" cy="11" r="1.5"/><circle cx="11" cy="11" r="1.5"/><circle cx="17" cy="11" r="1.5"/></svg>
+        </button>
+      </div>
+      <div class="donut-layout">
+        <div class="donut-wrap" aria-hidden="true">
+          <svg class="donut" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#e8ecf4" stroke-width="14"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#4f46e5" stroke-width="14"
+                    stroke-dasharray="86 152" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#0d9488" stroke-width="14"
+                    stroke-dasharray="69 152" stroke-dashoffset="-86" transform="rotate(-90 50 50)"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#6366f1" stroke-width="14"
+                    stroke-dasharray="43 152" stroke-dashoffset="-155" transform="rotate(-90 50 50)"/>
+            <circle cx="50" cy="50" r="38" fill="none" stroke="#818cf8" stroke-width="14"
+                    stroke-dasharray="41 152" stroke-dashoffset="-198" transform="rotate(-90 50 50)"/>
+          </svg>
+          <div class="donut-center">
+            <span class="donut-label">Engagement</span>
+            <span class="donut-total">{{ formatCompact(contentTotal) }}</span>
+          </div>
+        </div>
+        <ul class="category-list">
+          <li *ngFor="let cat of contentCategories">
+            <span class="cat-dot" [style.background]="cat.color"></span>
+            <span class="cat-name">{{ cat.name }}</span>
+            <span class="cat-val">{{ formatCompact(cat.value) }}</span>
+          </li>
+        </ul>
+      </div>
+    </article>
+  </section>
+
+  <section class="insights-grid">
+
+    <article class="panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">Active by Region</h2>
+          <p class="panel-desc">2,758 active users today</p>
+        </div>
+        <span class="trend-pill up sm">+4.1%</span>
+      </div>
+      <ul class="region-bars">
+        <li *ngFor="let r of regionBreakdown">
+          <div class="region-row">
+            <span class="region-name">{{ r.name }}</span>
+            <span class="region-count">{{ r.users | number }}</span>
+          </div>
+          <div class="region-track">
+            <div class="region-fill" [style.width.%]="r.share"></div>
+          </div>
+        </li>
+      </ul>
+    </article>
+
+    <article class="panel panel-wide">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">Engagement Funnel</h2>
+          <p class="panel-desc">User journey through the platform</p>
+        </div>
+        <button type="button" class="pill-select pill-select-sm">{{ funnelRange }}</button>
+      </div>
+      <div class="funnel-chart">
+        <div class="funnel-col" *ngFor="let step of engagementFunnel">
+          <div class="funnel-bar-wrap">
+            <div class="funnel-bar" [style.height.%]="funnelHeight(step.count)"></div>
+          </div>
+          <span class="funnel-count">{{ step.count | number }}</span>
+          <span class="funnel-stage">{{ step.stage }}</span>
+          <span class="funnel-change" [class.up]="step.positive" [class.down]="!step.positive">{{ step.change }}</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="panel">
+      <div class="panel-head">
+        <h2 class="panel-title">Discovery Channels</h2>
+      </div>
+      <div class="stacked-bar" aria-hidden="true">
+        <span *ngFor="let ch of discoveryChannels"
+              class="stack-segment"
+              [style.width.%]="ch.percent"
+              [style.background]="ch.color">
+        </span>
+      </div>
+      <ul class="channel-list">
+        <li *ngFor="let ch of discoveryChannels">
+          <span class="cat-dot" [style.background]="ch.color"></span>
+          <span class="cat-name">{{ ch.name }}</span>
+          <span class="cat-val">{{ ch.percent }}%</span>
+        </li>
+      </ul>
+    </article>
+  </section>
+
+  <section class="bottom-grid">
+
+    <article class="panel activity-panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">Recent Activity</h2>
+          <p class="panel-desc">Latest changes by your team</p>
+        </div>
+        <a class="text-link" href="#">View full log</a>
+      </div>
+      <ul class="activity-list">
+        <li class="activity-item" *ngFor="let item of activityFeed">
+          <span class="act-avatar" [ngClass]="item.avatarColor">{{ item.initials }}</span>
           <div class="act-body">
-            <div class="act-text">
+            <p class="act-text">
               <strong>{{ item.user }}</strong> {{ item.action }}
               <a href="#">{{ item.target }}</a>
-            </div>
+            </p>
             <div class="act-meta">
-              <svg width="11" height="11" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="11" height="11" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <circle cx="11" cy="11" r="9"/><path d="M11 6v5l3 3"/>
               </svg>
               {{ item.time }}
               <span class="act-role">{{ item.role }}</span>
             </div>
           </div>
-          <svg class="act-arrow" width="14" height="14" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="act-chevron" width="14" height="14" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M8 5l6 6-6 6"/>
           </svg>
+        </li>
+      </ul>
+    </article>
+
+    <div class="bottom-sidebar">
+    <article class="panel ratings-panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">Top Rated Regions</h2>
+          <p class="panel-desc">Highest performing zones</p>
         </div>
       </div>
+      <ul class="rating-bars">
+        <li *ngFor="let r of topRegions" class="rating-row">
+          <span class="rating-name">{{ r.name }}</span>
+          <div class="rating-track">
+            <div class="rating-fill" [style.width.%]="r.percent"></div>
+          </div>
+          <span class="rating-score">{{ r.score }}</span>
+        </li>
+      </ul>
+    </article>
 
-      <div class="load-more">Load More Activities</div>
-    </div>
-
-    <!-- Map -->
-    <div class="card map-card">
-      <div class="card-header">
-        <div class="card-title">Geospatial Overview</div>
-        <button class="expand-btn">
-          <svg width="13" height="13" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2">
+    <article class="panel map-panel">
+      <div class="panel-head">
+        <div>
+          <h2 class="panel-title">Geospatial Overview</h2>
+          <p class="panel-desc">Tourist hotspots &amp; POIs</p>
+        </div>
+        <button type="button" class="pill-select pill-select-sm">
+          <svg width="12" height="12" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <path d="M13 2h7v7M9 20H2v-7M20 2l-8 8M2 20l8-8"/>
           </svg>
-          Expand Full Map
+          Expand
         </button>
       </div>
-      <div class="card-sub">Hotspots of tourist activity and new POIs.</div>
       <div id="dashboard-map" class="map-container"></div>
-      <div class="map-stats">
-        <div class="map-stat">
-          <span class="map-stat-label">Active Tracking</span>
-          <span class="map-stat-val">82 Devices</span>
-        </div>
-        <div class="map-stat">
-          <span class="map-stat-label">Recent Sync</span>
-          <span class="map-stat-val">3 minutes ago</span>
-        </div>
+      <div class="map-meta">
+        <div><span class="map-meta-label">Active tracking</span><span class="map-meta-val">82 devices</span></div>
+        <div><span class="map-meta-label">Last sync</span><span class="map-meta-val">3 min ago</span></div>
       </div>
+    </article>
     </div>
-
-  </div>
-
-  <!-- =====================
-       BAR CHART
-       ===================== -->
-  <div class="card chart-card">
-    <div class="card-header">
-      <div>
-        <div class="card-title">Top Rated Regions</div>
-        <div class="card-sub">Highest performing zones today</div>
-      </div>
-    </div>
-    <div class="bars">
-      <div class="bar-row" *ngFor="let r of topRegions">
-        <div class="bar-name">{{ r.name }}</div>
-        <div class="bar-track">
-          <div class="bar-fill" [style.width.%]="r.percent"></div>
-        </div>
-        <div class="bar-score">{{ r.score }}</div>
-      </div>
-    </div>
-    <div class="bar-axis">
-      <span>4.5</span>
-      <span>4.6</span>
-      <span>4.7</span>
-      <span>4.8</span>
-      <span>4.9</span>
-      <span>5.0</span>
-    </div>
-  </div>
+  </section>
 
 </div>
