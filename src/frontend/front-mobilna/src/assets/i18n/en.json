@@ -205,25 +205,19 @@
     "currentPassword": "Current Password",
     "newPassword": "New Password",
     "confirmPassword": "Confirm Password",
-
     "showCurrentPassword": "Show current password",
     "hideCurrentPassword": "Hide current password",
-
     "showNewPassword": "Show new password",
     "hideNewPassword": "Hide new password",
-
     "showConfirmPassword": "Show confirm password",
     "hideConfirmPassword": "Hide confirm password",
-
     "submit": "Submit",
     "saving": "Saving...",
-
     "rules": {
       "minLength": "Password must be at least 8 characters long.",
       "uppercase": "Password must contain at least one uppercase letter.",
       "numberOrSpecial": "Password must contain at least one number or special character."
     },
-
     "errors": {
       "currentPasswordRequired": "Current password is required.",
       "passwordInvalid": "Use at least 8 chars, 1 uppercase and 1 number or special char.",
@@ -304,7 +298,19 @@
     "shareLocationGuestTitle": "Shared location",
     "shareLocationGuestBody": "You opened a temporary link to view a location shared with you.",
     "shareLocationUnavailable": "This shared location is no longer available or has expired.",
-    "shareLocationLive": "Current shared position"
+    "shareLocationLive": "Current shared position",
+    "shareLinkTitle": "One-time location link",
+    "shareLinkBody": "Share one approximate location snapshot that stays the same until the link expires.",
+    "shareLiveTitle": "Live location tracking",
+    "shareLiveBody": "Share a live map that refreshes while your app remains open. GPS must stay enabled for the whole sharing session.",
+    "shareLiveReady": "Your live tracking link is ready",
+    "shareLiveNotice": "The shared page will refresh automatically while this sharing session is active.",
+    "shareLocationGuestLiveBody": "You opened a live location link that refreshes while the shared session is active.",
+    "shareLocationTrackingLive": "Live shared position",
+    "shareLocationSnapshot": "Location at the time it was shared",
+    "shareUpdatedAt": "Last updated {{date}}",
+    "shareCapturedAt": "Shared from this location at {{date}}",
+    "shareLiveGpsRequired": "Turn on GPS for live location sharing and keep it enabled during the whole sharing session."
   },
   "settings": {
     "title": "Settings",
@@ -314,6 +320,8 @@
     "locationBodyOff": "Location is turned off. Enable it if you want more precise suggestions and easier nearby discovery.",
     "locationConsentTitle": "Enable location tracking for the map GPS",
     "locationConsentBody": "To use GPS on the map, confirm location tracking here. After that, the app can use your current position for navigation and nearby places.",
+    "liveShareConsentTitle": "Turn on GPS for live location sharing",
+    "liveShareConsentBody": "To make the live tracking link work properly, enable location here and keep GPS on for the whole sharing session.",
     "notificationsSection": "Notifications",
     "notificationsTitle": "Turn on notifications",
     "notificationsBodyOn": "Only the notification types you keep enabled will appear, and you can choose how they are shown.",
@@ -769,7 +777,7 @@
       "2": "We strive to ensure that your information is protected and accessible only to you.",
       "3": "Some features may require additional identity verification for account security."
     }
-},
+  },
   "terms": {
     "title": "Terms of Use",
     "eyebrow": "TERMS OF USE",
@@ -798,6 +806,7 @@
   },
   "map": {
     "searchPlaceholder": "Search objects, routes...",
+    "topSearchPlaceholder": "Search places, streets, routes...",
     "geoUnsupported": "Geolocation is not supported in this browser.",
     "geoDenied": "Please allow location access in your browser settings.",
     "geoUnavailable": "Location is currently unavailable.",
@@ -813,6 +822,66 @@
       "accommodation": "Accommodation",
       "shopping": "Shopping",
       "health": "Hospitals"
+    },
+    "routePlanner": {
+      "currentRoute": "Current Route",
+      "stopsCount": "{{count}} Stops",
+      "showList": "Show List",
+      "hideList": "Hide List",
+      "startRoute": "Start Route",
+      "followingRoute": "Following Route",
+      "title": "Plan Route",
+      "emptyTitle": "Plan your route",
+      "oneMoreStop": "1 more stop",
+      "moreStops": "{{count}} more stops",
+      "addStop": "Add Stop",
+      "addStopPlaceholder": "Add a stop or destination...",
+      "myLocation": "My Location",
+      "notSelected": "Not selected",
+      "recenter": "Re-center",
+      "exit": "Exit",
+      "reorderStop": "Reorder stop"
+    },
+    "addStop": {
+      "title": "Add Stop",
+      "titleToRoute": "Add Stop to Route",
+      "searchPlaceholder": "Search for a place, address, or category",
+      "searchCompactPlaceholder": "Search for a place...",
+      "searchAria": "Search for a place",
+      "voiceSearch": "Voice search",
+      "chooseOnMap": "Choose on map",
+      "chooseManuallyOnMap": "Choose manually on map",
+      "searchResults": "Search Results",
+      "recent": "Recent",
+      "recentAndSuggested": "Recent & Suggested",
+      "clearRecent": "Clear recent",
+      "clearAll": "Clear All",
+      "reset": "Reset",
+      "noStopsFound": "No stops found",
+      "tryAnotherKeyword": "Try another keyword or switch category.",
+      "noMatchingPlaces": "No matching places found.",
+      "hint": "* Selecting a stop will recalculate your travel time and distance.",
+      "chooseStop": "Choose a stop",
+      "selectedStopLocationTitle": "Selected stop location",
+      "showMoreResults": "Show more results",
+      "showMoreSuggestions": "Show more suggestions",
+      "suggestedAlongRoute": "Suggested along route",
+      "alongRouteWithCategory": "{{category}} along your route",
+      "relatedSuggestions": "Related suggestions",
+      "popularIn": "Popular in {{name}}",
+      "moreNearby": "More {{category}} nearby",
+      "moreLike": "More like {{name}}",
+      "previewingStop": "Previewing Stop",
+      "currentRoute": "Current Route",
+      "plannedRoute": "Planned route",
+      "addToRoute": "Add to Route",
+      "resultTypes": {
+        "destination": "Destination",
+        "object": "Object",
+        "event": "Event",
+        "activity": "Activity",
+        "locality": "Locality"
+      }
     }
   },
   "regions": {
@@ -834,8 +903,10 @@
     "availableTickets": "Available tickets",
     "standardTicket": "Standard ticket",
     "select": "Select",
+    "amenities": "Amenities",
     "nearbyEmpty": "There are no nearby events.",
     "nearbyTitle": "Nearby events",
+    "noNearby": "There are no other places in the same location.",
     "listTitle": "Events",
     "searchPlaceholder": "Search events...",
     "foundCount": "{{count}} events found",

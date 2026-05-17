@@ -16,8 +16,8 @@
         @if (showLocationConsentHint) {
           <div class="consent-banner">
             <div class="consent-banner__copy">
-              <strong>{{ 'settings.locationConsentTitle' | translate }}</strong>
-              <p>{{ 'settings.locationConsentBody' | translate }}</p>
+              <strong>{{ locationConsentTitleKey | translate }}</strong>
+              <p>{{ locationConsentBodyKey | translate }}</p>
             </div>
 
             <button type="button" class="consent-banner__dismiss" (click)="dismissLocationConsentHint()">

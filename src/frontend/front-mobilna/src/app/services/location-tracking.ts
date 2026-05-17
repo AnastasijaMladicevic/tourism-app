@@ -48,8 +48,13 @@ export class LocationTrackingService {
     return this.locationSubject.value;
   }
 
-  captureCurrentLocation(syncWithBackend = true): Observable<TrackedLocation> {
+  captureCurrentLocation(
+    syncWithBackend = true,
+    options?: { allowIpFallback?: boolean },
+  ): Observable<TrackedLocation> {
     return new Observable<TrackedLocation>((observer) => {
+      const allowIpFallback = options?.allowIpFallback ?? true;
+
       const finishWithSnapshot = (snapshot: TrackedLocation) => {
         this.storeLocation(snapshot);
 
@@ -80,7 +85,7 @@ export class LocationTrackingService {
       };
 
       const finishWithIpFallback = (fallbackError?: Error) => {
-        if (!this.canUseIpFallback()) {
+        if (!allowIpFallback || !this.canUseIpFallback()) {
           observer.error(fallbackError ?? new Error('geoUnsupported'));
           return;
         }

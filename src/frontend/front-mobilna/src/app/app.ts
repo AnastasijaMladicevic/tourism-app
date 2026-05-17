@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './shared/components/navbar/navbar';
 import { FloatingAiAssistantComponent } from './shared/components/floating-ai-assistant/floating-ai-assistant.component';
 import { LiveNotificationBannerComponent } from './shared/components/live-notification-banner/live-notification-banner.component';
+import { LiveLocationShareService } from './services/live-location-share';
 import { LocationIntelligenceService } from './services/location-intelligence';
 @Component({
   selector: 'app-root',
@@ -11,10 +12,12 @@ import { LocationIntelligenceService } from './services/location-intelligence';
   styleUrl: './app.scss',
 })
 export class App {
+  private readonly liveLocationShareService = inject(LiveLocationShareService);
   private readonly locationIntelligenceService = inject(LocationIntelligenceService);
   protected readonly title = signal('front-mobilna');
 
   constructor() {
+    void this.liveLocationShareService;
     void this.locationIntelligenceService;
   }
 }

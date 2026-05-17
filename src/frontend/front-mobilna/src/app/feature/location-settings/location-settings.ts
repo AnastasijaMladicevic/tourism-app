@@ -31,6 +31,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
   private activeQuietZone: QuietZoneKind | null = null;
   private pendingLocationEnableRequest = false;
   private hasLocationConsentContext = false;
+  private locationConsentMode: 'default' | 'liveShare' = 'default';
   private readonly handleWindowFocus = () => {
     void this.syncLocationTrackingState();
   };
@@ -78,6 +79,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
         if (params.get('locationConsent') === '1') {
           this.hasLocationConsentContext = true;
         }
+        this.locationConsentMode = params.get('liveShare') === '1' ? 'liveShare' : 'default';
         this.showLocationConsentHint = this.hasLocationConsentContext && !this.locationEnabled;
         void this.syncLocationTrackingState();
       }),
@@ -167,6 +169,18 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
 
   dismissLocationConsentHint(): void {
     this.clearLocationConsentHint();
+  }
+
+  get locationConsentTitleKey(): string {
+    return this.locationConsentMode === 'liveShare'
+      ? 'settings.liveShareConsentTitle'
+      : 'settings.locationConsentTitle';
+  }
+
+  get locationConsentBodyKey(): string {
+    return this.locationConsentMode === 'liveShare'
+      ? 'settings.liveShareConsentBody'
+      : 'settings.locationConsentBody';
   }
 
   setAutoRegionEnabled(enabled: boolean): void {
@@ -312,10 +326,11 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
 
   private clearLocationConsentHint(): void {
     this.hasLocationConsentContext = false;
+    this.locationConsentMode = 'default';
     this.showLocationConsentHint = false;
     void this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { locationConsent: null },
+      queryParams: { locationConsent: null, liveShare: null },
       queryParamsHandling: 'merge',
       replaceUrl: true,
     });

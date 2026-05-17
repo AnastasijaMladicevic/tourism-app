@@ -6,6 +6,7 @@ import { environment } from '../../../environment/environment';
 import { AuthService, UpdateUserLocationPayload, UserDto, VisitedPlaceDto } from '../../services/auth';
 import { EventPlannerService } from '../../services/event-planner';
 import { FavoriteService } from '../../services/favorite';
+import { LiveLocationShareService } from '../../services/live-location-share';
 import { LocationTrackingService, TrackedLocation } from '../../services/location-tracking';
 import { ProfileStatsCacheService, ProfileStatsSnapshot } from '../../services/profile-stats-cache';
 import { ReviewService } from '../../services/review';
@@ -44,6 +45,7 @@ export class ProfileComponent implements OnInit {
   private readonly favoriteService = inject(FavoriteService);
   private readonly eventPlannerService = inject(EventPlannerService);
   private readonly locationTrackingService = inject(LocationTrackingService);
+  private readonly liveLocationShareService = inject(LiveLocationShareService);
   private readonly reviewService = inject(ReviewService);
   private readonly profileStatsCache = inject(ProfileStatsCacheService);
   private readonly router = inject(Router);
@@ -55,8 +57,11 @@ export class ProfileComponent implements OnInit {
   protected readonly shareUrl = signal('');
   protected readonly shareExpiresAt = signal('');
   protected readonly shareError = signal('');
-  protected readonly shareBusyHours = signal<number | null>(null);
-  protected readonly copySuccess = signal(false);
+  protected readonly liveShareUrl = signal('');
+  protected readonly liveShareExpiresAt = signal('');
+  protected readonly liveShareError = signal('');
+  protected readonly shareBusyKey = signal<string | null>(null);
+  protected readonly copySuccessKey = signal<string | null>(null);
   protected readonly shareDurations = [1, 4, 24];
 
   protected readonly sections: ProfileSection[] = [
@@ -164,7 +169,30 @@ export class ProfileComponent implements OnInit {
   }
 
   protected async copyShareUrl(): Promise<void> {
-    const shareUrl = this.shareUrl();
+    await this.copyGeneratedShare(this.shareUrl(), 'link');
+  }
+
+  protected async copyLiveShareUrl(): Promise<void> {
+    await this.copyGeneratedShare(this.liveShareUrl(), 'live');
+  }
+
+  protected generateLiveLocationShare(durationHours: number): void {
+    this.createLocationShare(durationHours, true);
+  }
+
+  protected generateLocationShare(durationHours: number): void {
+    this.createLocationShare(durationHours, false);
+  }
+
+  protected isShareBusy(kind: 'link' | 'live', hours: number): boolean {
+    return this.shareBusyKey() === `${kind}:${hours}`;
+  }
+
+  protected isCopySuccess(kind: 'link' | 'live'): boolean {
+    return this.copySuccessKey() === kind;
+  }
+
+  private async copyGeneratedShare(shareUrl: string, kind: 'link' | 'live'): Promise<void> {
     if (!shareUrl) {
       return;
     }
@@ -174,28 +202,47 @@ export class ProfileComponent implements OnInit {
       return;
     }
 
-    this.copySuccess.set(true);
+    this.copySuccessKey.set(kind);
     setTimeout(() => {
-      this.copySuccess.set(false);
+      if (this.copySuccessKey() === kind) {
+        this.copySuccessKey.set(null);
+      }
     }, 2200);
   }
 
-  protected generateLocationShare(durationHours: number): void {
-    this.shareError.set('');
-    this.copySuccess.set(false);
-    this.shareUrl.set('');
-    this.shareExpiresAt.set('');
-    this.shareBusyHours.set(durationHours);
+  private createLocationShare(durationHours: number, live: boolean): void {
+    const kind: 'link' | 'live' = live ? 'live' : 'link';
+    this.copySuccessKey.set(null);
+    this.shareBusyKey.set(`${kind}:${durationHours}`);
 
-    this.prepareLocationShare()
+    if (live) {
+      this.liveShareError.set('');
+      this.liveShareUrl.set('');
+      this.liveShareExpiresAt.set('');
+    } else {
+      this.shareError.set('');
+      this.shareUrl.set('');
+      this.shareExpiresAt.set('');
+    }
+
+    const locationRequest = live
+      ? this.prepareLiveLocationShare()
+      : this.prepareLocationShare();
+
+    locationRequest
       .pipe(
         switchMap((location) => this.authService.createLocationShare(durationHours, location)),
         catchError((error) => {
-          this.shareError.set(this.resolveShareError(error));
+          const message = this.resolveShareError(error);
+          if (live) {
+            this.liveShareError.set(message);
+          } else {
+            this.shareError.set(message);
+          }
           return of(null);
         }),
         finalize(() => {
-          this.shareBusyHours.set(null);
+          this.shareBusyKey.set(null);
         }),
       )
       .subscribe((share) => {
@@ -203,7 +250,16 @@ export class ProfileComponent implements OnInit {
           return;
         }
 
-        this.shareUrl.set(this.withShareLanguage(share.shareUrl));
+        const shareUrl = this.withShareOptions(share.shareUrl, live);
+
+        if (live) {
+          this.liveLocationShareService.startSession(share.expiresAtUtc);
+          this.liveShareUrl.set(shareUrl);
+          this.liveShareExpiresAt.set(share.expiresAtUtc);
+          return;
+        }
+
+        this.shareUrl.set(shareUrl);
         this.shareExpiresAt.set(share.expiresAtUtc);
       });
   }
@@ -234,6 +290,31 @@ export class ProfileComponent implements OnInit {
     );
   }
 
+  private prepareLiveLocationShare(): Observable<UpdateUserLocationPayload | null> {
+    const currentLocation = this.locationTrackingService.getCurrentLocation();
+    const trackingEnabled = this.locationTrackingService.isTrackingEnabled();
+
+    if (!trackingEnabled) {
+      return this.redirectToLiveLocationSettings();
+    }
+
+    if (this.isFreshGpsLocation(currentLocation)) {
+      return of(this.mapTrackedLocationToLocationPayload(currentLocation));
+    }
+
+    return this.locationTrackingService.captureCurrentLocation(false, { allowIpFallback: false }).pipe(
+      timeout(15000),
+      map((location) => {
+        if (location.source !== 'gps') {
+          throw new Error('profile.shareLiveGpsRequired');
+        }
+
+        return this.mapTrackedLocationToLocationPayload(location);
+      }),
+      catchError(() => this.redirectToLiveLocationSettings()),
+    );
+  }
+
   private mapTrackedLocationToLocationPayload(location: TrackedLocation): UpdateUserLocationPayload {
     return {
       latitude: location.latitude,
@@ -245,6 +326,18 @@ export class ProfileComponent implements OnInit {
 
   private isFreshLocation(location: TrackedLocation | null): location is TrackedLocation {
     return !!location && Date.now() - location.updatedAt <= this.maxShareLocationAgeMs;
+  }
+
+  private isFreshGpsLocation(location: TrackedLocation | null): location is TrackedLocation {
+    return this.isFreshLocation(location) && location.source === 'gps';
+  }
+
+  private redirectToLiveLocationSettings(): Observable<never> {
+    this.liveShareError.set('profile.shareLiveGpsRequired');
+    void this.router.navigate(['/location-settings'], {
+      queryParams: { locationConsent: 1, liveShare: 1 },
+    });
+    return throwError(() => new Error('profile.shareLiveGpsRequired'));
   }
 
   private resolveLocationPreparationError(error: unknown): Error {
@@ -316,16 +409,22 @@ export class ProfileComponent implements OnInit {
     }
   }
 
-  private withShareLanguage(shareUrl: string): string {
+  private withShareOptions(shareUrl: string, live: boolean): string {
     const language = this.translationService.language();
 
     try {
       const url = new URL(shareUrl);
       url.searchParams.set('lang', language);
+      if (live) {
+        url.searchParams.set('live', '1');
+      } else {
+        url.searchParams.delete('live');
+      }
       return url.toString();
     } catch {
       const separator = shareUrl.includes('?') ? '&' : '?';
-      return `${shareUrl}${separator}lang=${encodeURIComponent(language)}`;
+      const liveSegment = live ? '&live=1' : '';
+      return `${shareUrl}${separator}lang=${encodeURIComponent(language)}${liveSegment}`;
     }
   }
 

@@ -205,25 +205,19 @@
     "currentPassword": "Password attuale",
     "newPassword": "Nuova password",
     "confirmPassword": "Conferma password",
-
     "showCurrentPassword": "Mostra password attuale",
     "hideCurrentPassword": "Nascondi password attuale",
-
     "showNewPassword": "Mostra nuova password",
     "hideNewPassword": "Nascondi nuova password",
-
     "showConfirmPassword": "Mostra conferma password",
     "hideConfirmPassword": "Nascondi conferma password",
-
     "submit": "Conferma",
     "saving": "Salvataggio...",
-
     "rules": {
       "minLength": "La password deve contenere almeno 8 caratteri.",
       "uppercase": "La password deve contenere almeno una lettera maiuscola.",
       "numberOrSpecial": "La password deve contenere almeno un numero o carattere speciale."
     },
-
     "errors": {
       "currentPasswordRequired": "La password attuale è obbligatoria.",
       "passwordInvalid": "Usa almeno 8 caratteri, 1 maiuscola e 1 numero o carattere speciale.",
@@ -304,7 +298,17 @@
     "shareLocationGuestTitle": "Posizione condivisa",
     "shareLocationGuestBody": "Hai aperto un link temporaneo per vedere una posizione condivisa con te.",
     "shareLocationUnavailable": "Questa posizione condivisa non è più disponibile oppure è scaduta.",
-    "shareLocationLive": "Posizione condivisa attuale"
+    "shareLocationLive": "Posizione condivisa attuale",
+    "shareLinkTitle": "Link singolo di posizione",
+    "shareLinkBody": "Condividi una posizione approssimativa che rimane uguale finché il link non scade.",
+    "shareLiveTitle": "Tracciamento posizione in tempo reale",
+    "shareLiveBody": "Condividi una mappa live che si aggiorna mentre la tua app resta aperta. Il GPS deve rimanere attivo per tutta la sessione.",
+    "shareLocationGuestLiveBody": "Hai aperto un link di posizione live che si aggiorna mentre la sessione di condivisione resta attiva.",
+    "shareLocationTrackingLive": "Posizione condivisa in tempo reale",
+    "shareLocationSnapshot": "Posizione al momento della condivisione",
+    "shareUpdatedAt": "Ultimo aggiornamento {{date}}",
+    "shareCapturedAt": "Condivisa da questa posizione alle {{date}}",
+    "shareLiveGpsRequired": "Attiva il GPS per la condivisione live della posizione e lascialo acceso per tutta la sessione."
   },
   "settings": {
     "title": "Impostazioni",
@@ -314,6 +318,8 @@
     "locationBodyOff": "La posizione è disattivata. Attivala se vuoi suggerimenti più precisi e risultati migliori nelle vicinanze.",
     "locationConsentTitle": "Attiva il tracciamento della posizione per il GPS della mappa",
     "locationConsentBody": "Per usare il GPS sulla mappa, conferma qui il tracciamento della posizione. Dopo di ciò, l'app potrà usare la tua posizione attuale per la navigazione e i luoghi vicini.",
+    "liveShareConsentTitle": "Attiva il GPS per la posizione live",
+    "liveShareConsentBody": "Per far funzionare bene il link di tracciamento live, attiva qui la posizione e lascia il GPS acceso per tutta la sessione.",
     "notificationsSection": "Notifiche",
     "notificationsTitle": "Attiva notifiche",
     "notificationsBodyOn": "Saranno mostrate solo le notifiche che lasci attive e puoi scegliere anche come visualizzarle.",
@@ -795,17 +801,18 @@
       "2": "Alcuni dati possono essere temporaneamente salvati localmente sul dispositivo per migliorare l'esperienza utente.",
       "3": "Utilizzando l'applicazione, accetti futuri miglioramenti e modifiche alle funzionalità del sistema."
     }
-},
+  },
   "map": {
     "searchPlaceholder": "Cerca oggetti, percorsi...",
-    "geoUnsupported": "La geolocalizzazione non Ã¨ supportata in questo browser.",
+    "topSearchPlaceholder": "Cerca luoghi, strade, percorsi...",
+    "geoUnsupported": "La geolocalizzazione non e supportata in questo browser.",
     "geoDenied": "Consenti l'accesso alla posizione nelle impostazioni del browser.",
-    "geoUnavailable": "La posizione non Ã¨ attualmente disponibile.",
+    "geoUnavailable": "La posizione non e attualmente disponibile.",
     "geoFailed": "Impossibile ottenere la tua posizione.",
     "useMyLocation": "Usa la mia posizione",
     "locationLoading": "Ricerca posizione...",
     "locationConsentTitle": "Attiva la posizione per usare il GPS",
-    "locationConsentBody": "Il tracciamento della posizione è attualmente disattivato. Tocca qui sotto per aprire le impostazioni e attivare il consenso al tracciamento della posizione.",
+    "locationConsentBody": "Il tracciamento della posizione e attualmente disattivato. Tocca qui sotto per aprire le impostazioni e attivare il consenso al tracciamento della posizione.",
     "locationConsentAction": "Clicca qui",
     "filters": {
       "food": "Cibo e bevande",
@@ -813,6 +820,66 @@
       "accommodation": "Alloggio",
       "shopping": "Shopping",
       "health": "Ospedali"
+    },
+    "routePlanner": {
+      "currentRoute": "Percorso attuale",
+      "stopsCount": "{{count}} fermate",
+      "showList": "Mostra elenco",
+      "hideList": "Nascondi elenco",
+      "startRoute": "Avvia percorso",
+      "followingRoute": "Seguendo il percorso",
+      "title": "Pianifica percorso",
+      "emptyTitle": "Pianifica il tuo percorso",
+      "oneMoreStop": "1 fermata in piu",
+      "moreStops": "{{count}} fermate in piu",
+      "addStop": "Aggiungi fermata",
+      "addStopPlaceholder": "Aggiungi una fermata o destinazione...",
+      "myLocation": "La mia posizione",
+      "notSelected": "Non selezionato",
+      "recenter": "Ricentra",
+      "exit": "Esci",
+      "reorderStop": "Riordina fermata"
+    },
+    "addStop": {
+      "title": "Aggiungi fermata",
+      "titleToRoute": "Aggiungi fermata al percorso",
+      "searchPlaceholder": "Cerca un luogo, indirizzo o categoria",
+      "searchCompactPlaceholder": "Cerca un luogo...",
+      "searchAria": "Cerca un luogo",
+      "voiceSearch": "Ricerca vocale",
+      "chooseOnMap": "Scegli sulla mappa",
+      "chooseManuallyOnMap": "Scegli manualmente sulla mappa",
+      "searchResults": "Risultati di ricerca",
+      "recent": "Recenti",
+      "recentAndSuggested": "Recenti e suggeriti",
+      "clearRecent": "Cancella recenti",
+      "clearAll": "Cancella tutto",
+      "reset": "Reimposta",
+      "noStopsFound": "Nessuna fermata trovata",
+      "tryAnotherKeyword": "Prova un'altra parola chiave o cambia categoria.",
+      "noMatchingPlaces": "Nessun luogo corrispondente trovato.",
+      "hint": "* La selezione di una fermata ricalcolera il tempo di viaggio e la distanza.",
+      "chooseStop": "Scegli una fermata",
+      "selectedStopLocationTitle": "Posizione della fermata selezionata",
+      "showMoreResults": "Mostra piu risultati",
+      "showMoreSuggestions": "Mostra piu suggerimenti",
+      "suggestedAlongRoute": "Suggeriti lungo il percorso",
+      "alongRouteWithCategory": "{{category}} lungo il tuo percorso",
+      "relatedSuggestions": "Suggerimenti correlati",
+      "popularIn": "Popolare a {{name}}",
+      "moreNearby": "Altri {{category}} nelle vicinanze",
+      "moreLike": "Altri come {{name}}",
+      "previewingStop": "Anteprima fermata",
+      "currentRoute": "Percorso attuale",
+      "plannedRoute": "Percorso pianificato",
+      "addToRoute": "Aggiungi al percorso",
+      "resultTypes": {
+        "destination": "Destinazione",
+        "object": "Oggetto",
+        "event": "Evento",
+        "activity": "Attivita",
+        "locality": "Localita"
+      }
     }
   },
   "regions": {

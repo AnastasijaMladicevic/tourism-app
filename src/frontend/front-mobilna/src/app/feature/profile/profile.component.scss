@@ -360,6 +360,30 @@
   padding: 16px;
 }
 
+.share-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.share-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.share-group--live {
+  padding-top: 16px;
+  border-top: 1px solid rgba(208, 234, 240, 0.78);
+}
+
+.share-group__title {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #223642;
+}
+
 .visit-list {
   display: flex;
   flex-direction: column;
@@ -468,6 +492,11 @@
     color: #223642;
     font-weight: 600;
   }
+}
+
+.share-result--live {
+  border-color: rgba(208, 234, 240, 0.78);
+  background: rgba(247, 252, 254, 0.85);
 }
 
 .share-copy {

@@ -736,6 +736,9 @@ namespace TuristickiVodic.API.Controllers
             if (!Request.Host.HasValue || string.IsNullOrWhiteSpace(share.ShareUrl))
                 return share;
 
+            if (IsLoopbackHost(Request.Host.Host))
+                return share;
+
             if (!Uri.TryCreate(share.ShareUrl, UriKind.Absolute, out var uri))
                 return share;
 
@@ -779,6 +782,9 @@ namespace TuristickiVodic.API.Controllers
             if (string.IsNullOrWhiteSpace(appUrl) || !Request.Host.HasValue)
                 return appUrl;
 
+            if (IsLoopbackHost(Request.Host.Host))
+                return appUrl;
+
             if (!Uri.TryCreate(appUrl, UriKind.Absolute, out var uri))
                 return appUrl;
 
@@ -794,5 +800,10 @@ namespace TuristickiVodic.API.Controllers
 
             return normalized.Uri.ToString();
         }
+
+        private static bool IsLoopbackHost(string host)
+            => string.Equals(host, "localhost", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(host, "127.0.0.1", StringComparison.OrdinalIgnoreCase)
+                || string.Equals(host, "::1", StringComparison.OrdinalIgnoreCase);
     }
 }
