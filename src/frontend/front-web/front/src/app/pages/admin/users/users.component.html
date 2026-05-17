@@ -361,6 +361,9 @@
         </button>
       </div>
 
+      <div class="feedback error" *ngIf="managerReportsLoadError" role="alert">{{ managerReportsLoadError }}</div>
+      <div class="feedback feedback--success" *ngIf="reportReviewSuccess" role="status">{{ reportReviewSuccess }}</div>
+
       <div class="table-wrap">
         <table>
           <thead>
@@ -373,14 +376,27 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let member of visibleAdminDirectory">
+            <tr
+              *ngFor="let member of visibleAdminDirectory"
+              [class.team-row--report-highlight]="isReportRowHighlighted(member.id)"
+            >
               <td>
                 <div class="person">
                   <div class="avatar">{{ member.initials }}</div>
-                  <div>
+                  <div class="person-text">
                     <p class="person-name">{{ member.name }}</p>
                     <p class="person-email">{{ member.email }}</p>
                   </div>
+                  <button
+                    *ngIf="hasPendingManagerReport(member.id)"
+                    type="button"
+                    class="report-alert-btn"
+                    title="View manager report"
+                    [attr.aria-label]="'View pending report for ' + member.name"
+                    (click)="openManagerReportForUser(member.id, $event)"
+                  >
+                    <span class="material-symbols-outlined" aria-hidden="true">error</span>
+                  </button>
                 </div>
               </td>
               <td><span class="role-pill">{{ member.role }}</span></td>
@@ -434,6 +450,90 @@
           </button>
         </div>
       </footer>
+
+      <ng-container *ngIf="activeManagerReport as report">
+        <div
+          class="manager-report-modal-backdrop"
+          role="presentation"
+          (click)="closeManagerReportModal()"
+        >
+          <div
+            class="manager-report-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="manager-report-modal-title"
+            (click)="$event.stopPropagation()"
+          >
+            <div class="manager-report-modal-head">
+              <span class="manager-report-modal-icon material-symbols-outlined" aria-hidden="true">error</span>
+              <div>
+                <h4 id="manager-report-modal-title" class="manager-report-modal-title">
+                  Content creator report
+                </h4>
+                <p class="manager-report-modal-subtitle">
+                  Reported user: <strong>{{ report.reportedUserName }}</strong>
+                </p>
+              </div>
+            </div>
+
+            <dl class="manager-report-details">
+              <div>
+                <dt>Submitted by</dt>
+                <dd>{{ managerReportSubmittedLabel(report) }}</dd>
+              </div>
+              <div *ngIf="report.destinationName">
+                <dt>Destination</dt>
+                <dd>{{ report.destinationName }}</dd>
+              </div>
+              <div>
+                <dt>Submitted on</dt>
+                <dd>{{ formatDate(report.createdAt) }}</dd>
+              </div>
+              <div class="manager-report-reason-block">
+                <dt>Reason</dt>
+                <dd>{{ report.reason }}</dd>
+              </div>
+            </dl>
+
+            <p class="manager-report-ban-note">
+              Approving this report bans the content creator: they are demoted to tourist and blocked from signing in again.
+            </p>
+
+            <label class="manager-report-reject-field" *ngIf="!reportReviewSubmitting">
+              <span>Rejection reason (required if you dismiss the report)</span>
+              <textarea
+                rows="3"
+                [(ngModel)]="reportRejectReason"
+                placeholder="Explain why the report is not upheld…"
+              ></textarea>
+            </label>
+
+            <p class="manager-report-modal-error" *ngIf="reportReviewError" role="alert">{{ reportReviewError }}</p>
+
+            <div class="manager-report-modal-actions">
+              <button type="button" class="ghost-btn slim-btn" (click)="closeManagerReportModal()" [disabled]="reportReviewSubmitting">
+                Close
+              </button>
+              <button
+                type="button"
+                class="ghost-btn slim-btn"
+                (click)="confirmRejectReport()"
+                [disabled]="reportReviewSubmitting"
+              >
+                Reject report
+              </button>
+              <button
+                type="button"
+                class="ban-from-report-btn"
+                (click)="confirmBanFromReport()"
+                [disabled]="reportReviewSubmitting"
+              >
+                {{ reportReviewSubmitting ? 'Processing…' : 'Approve & ban creator' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
     </section>
 
     <div class="small-kpis">

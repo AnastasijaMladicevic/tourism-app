@@ -1292,6 +1292,188 @@ th {
   flex-wrap: wrap;
 }
 
+.person-text {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.report-alert-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #fef2f2;
+  color: #dc2626;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.report-alert-btn:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+  transform: scale(1.04);
+}
+
+.report-alert-btn .material-symbols-outlined {
+  font-size: 20px;
+  font-variation-settings: 'FILL' 1, 'wght' 600;
+}
+
+.team-row--report-highlight td {
+  background: #fff7ed;
+}
+
+.manager-report-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.manager-report-modal {
+  width: 100%;
+  max-width: 520px;
+  max-height: min(90vh, 720px);
+  overflow: auto;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.18);
+  padding: 22px 24px 20px;
+}
+
+.manager-report-modal-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.manager-report-modal-icon {
+  color: #dc2626;
+  font-size: 28px;
+  font-variation-settings: 'FILL' 1, 'wght' 600;
+}
+
+.manager-report-modal-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.manager-report-modal-subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.manager-report-details {
+  margin: 0 0 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.manager-report-details div {
+  display: grid;
+  gap: 2px;
+}
+
+.manager-report-details dt {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.manager-report-details dd {
+  margin: 0;
+  font-size: 14px;
+  color: #111827;
+  line-height: 1.45;
+}
+
+.manager-report-reason-block dd {
+  white-space: pre-wrap;
+}
+
+.manager-report-ban-note {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #9a3412;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.manager-report-reject-field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.manager-report-reject-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #dbe1ea;
+  border-radius: 10px;
+  font: inherit;
+  resize: vertical;
+  min-height: 72px;
+}
+
+.manager-report-modal-error {
+  margin: 0 0 12px;
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+.manager-report-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ban-from-report-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 12px;
+  background: #dc2626;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ban-from-report-btn:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.ban-from-report-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 @media (max-width: 920px) {
   .table-footer {
     flex-direction: column;

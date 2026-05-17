@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -12,6 +12,10 @@ import {
   CreatorRoleRequestDto
 } from '../../../services/admin-users.service';
 import { ReviewDto, ReviewService } from '../../../services/review';
+import {
+  ManagerReportDto,
+  ManagerReportsService
+} from '../../../services/manager-reports.service';
 
 const CHART_DAYS = 14;
 
@@ -46,6 +50,7 @@ const REVIEWS_LOAD_TIMEOUT_MS = 45_000;
 
 /** While the Tourists tab is open, refetch creator-role requests so new submissions appear without manual refresh. */
 const TOURISTS_TAB_CREATOR_REQUESTS_POLL_MS = 500;
+const MAX_MANAGER_REPORT_PAGES = 20;
 
 type UsersPageViewTab = 'internal' | 'tourists';
 
@@ -59,7 +64,9 @@ type UsersPageViewTab = 'internal' | 'tourists';
 export class UsersComponent implements OnInit {
   private readonly adminUsersService = inject(AdminUsersService);
   private readonly reviewService = inject(ReviewService);
+  private readonly managerReportsService = inject(ManagerReportsService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -163,7 +170,19 @@ export class UsersComponent implements OnInit {
   /** Row pending confirmation in the approve dialog. */
   approveConfirmRow: CreatorRoleRequestDto | null = null;
   creatorRequestsApproveSuccess = '';
+
+  /** Pending manager reports keyed by reported content creator user id. */
+  pendingReportByUserId = new Map<number, ManagerReportDto>();
+  managerReportsLoadError = '';
+  activeManagerReport: ManagerReportDto | null = null;
+  highlightedReportUserId: number | null = null;
+  reportReviewSubmitting = false;
+  reportReviewError = '';
+  reportRejectReason = '';
+  reportReviewSuccess = '';
+
   private creatorRequestSearchDebounce?: ReturnType<typeof setTimeout>;
+  private pendingReportQuery: { reportId?: number; reportedUserId?: number } | null = null;
   private creatorRequestsSilentInFlight = false;
   private touristsTabPollTimer?: ReturnType<typeof setInterval>;
   private approveSuccessDismissTimer?: ReturnType<typeof setTimeout>;
@@ -191,9 +210,28 @@ export class UsersComponent implements OnInit {
 
     this.route.queryParamMap
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((params) => this.applyTabFromQuery(params.get('tab')));
+      .subscribe((params) => {
+        this.applyTabFromQuery(params.get('tab'));
+        const reportId = this.parsePositiveIntParam(params.get('reportId'));
+        const reportedUserId = this.parsePositiveIntParam(params.get('reportedUserId'));
+        if (reportId || reportedUserId) {
+          this.pendingReportQuery = { reportId, reportedUserId };
+          if (this.usersViewTab !== 'internal') {
+            this.selectUsersViewTab('internal');
+          }
+          this.tryOpenPendingReportFromQuery();
+        }
+      });
 
     this.loadDashboardData();
+  }
+
+  private parsePositiveIntParam(raw: string | null): number | undefined {
+    if (!raw) {
+      return undefined;
+    }
+    const parsed = parseInt(raw, 10);
+    return Number.isFinite(parsed) && parsed >= 1 ? parsed : undefined;
   }
 
   private applyTabFromQuery(tab: string | null): void {
@@ -266,7 +304,8 @@ export class UsersComponent implements OnInit {
       touristsResult: this.fetchAllUsers('Tourist'),
       totalAdminsApi: this.fetchRoleTotalCount('Admin'),
       totalManagersApi: this.fetchRoleTotalCount('Manager'),
-      totalCreatorsApi: this.fetchRoleTotalCount('ContentCreator')
+      totalCreatorsApi: this.fetchRoleTotalCount('ContentCreator'),
+      pendingManagerReports: this.fetchAllPendingManagerReports()
     })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
@@ -277,13 +316,15 @@ export class UsersComponent implements OnInit {
             touristsResult,
             totalAdminsApi,
             totalManagersApi,
-            totalCreatorsApi
+            totalCreatorsApi,
+            pendingManagerReports
           }) => {
             const roleTotals = {
               admins: totalAdminsApi,
               managers: totalManagersApi,
               contentCreators: totalCreatorsApi
             };
+            this.bindPendingManagerReports(pendingManagerReports);
             this.bindUsersData(
               allUsersResult.items,
               allUsersResult.totalCount,
@@ -292,6 +333,7 @@ export class UsersComponent implements OnInit {
               [],
               roleTotals
             );
+            this.tryOpenPendingReportFromQuery();
             if (!silent) {
               this.isLoading = false;
             }
@@ -304,7 +346,8 @@ export class UsersComponent implements OnInit {
             touristsResult,
             totalAdminsApi,
             totalManagersApi,
-            totalCreatorsApi
+            totalCreatorsApi,
+            pendingManagerReports
           }) =>
             this.fetchAllReviews().pipe(
               timeout(REVIEWS_LOAD_TIMEOUT_MS),
@@ -314,6 +357,7 @@ export class UsersComponent implements OnInit {
                 totalAdminsApi,
                 totalManagersApi,
                 totalCreatorsApi,
+                pendingManagerReports,
                 reviews
               })),
               catchError(() =>
@@ -323,17 +367,28 @@ export class UsersComponent implements OnInit {
                   totalAdminsApi,
                   totalManagersApi,
                   totalCreatorsApi,
+                  pendingManagerReports,
                   reviews: [] as ReviewDto[]
                 })
               )
             )
         ),
-        tap(({ allUsersResult, touristsResult, totalAdminsApi, totalManagersApi, totalCreatorsApi, reviews }) => {
+        tap(
+          ({
+            allUsersResult,
+            touristsResult,
+            totalAdminsApi,
+            totalManagersApi,
+            totalCreatorsApi,
+            pendingManagerReports,
+            reviews
+          }) => {
           const roleTotals = {
             admins: totalAdminsApi,
             managers: totalManagersApi,
             contentCreators: totalCreatorsApi
           };
+          this.bindPendingManagerReports(pendingManagerReports);
           this.bindUsersData(
             allUsersResult.items,
             allUsersResult.totalCount,
@@ -342,8 +397,10 @@ export class UsersComponent implements OnInit {
             reviews,
             roleTotals
           );
+          this.tryOpenPendingReportFromQuery();
           this.cdr.markForCheck();
-        }),
+        }
+        ),
         catchError((err: unknown) => {
           if (silent) {
             return of(null);
@@ -1172,7 +1229,249 @@ export class UsersComponent implements OnInit {
     return `${(firstName || '').charAt(0)}${(lastName || '').charAt(0)}`.toUpperCase() || 'U';
   }
 
-  private formatDate(value?: string): string {
+  hasPendingManagerReport(userId: number): boolean {
+    return this.pendingReportByUserId.has(userId);
+  }
+
+  isReportRowHighlighted(userId: number): boolean {
+    return this.highlightedReportUserId === userId;
+  }
+
+  openManagerReportForUser(userId: number, event?: Event): void {
+    event?.stopPropagation();
+    event?.preventDefault();
+    const report = this.pendingReportByUserId.get(userId);
+    if (report) {
+      this.openManagerReportModal(report);
+    }
+  }
+
+  closeManagerReportModal(): void {
+    this.activeManagerReport = null;
+    this.highlightedReportUserId = null;
+    this.reportReviewError = '';
+    this.reportRejectReason = '';
+    this.clearReportQueryParams();
+    this.cdr.markForCheck();
+  }
+
+  confirmBanFromReport(): void {
+    if (!this.activeManagerReport || this.reportReviewSubmitting) {
+      return;
+    }
+    this.submitManagerReportReview(true);
+  }
+
+  confirmRejectReport(): void {
+    if (!this.activeManagerReport || this.reportReviewSubmitting) {
+      return;
+    }
+    const reason = this.reportRejectReason.trim();
+    if (!reason) {
+      this.reportReviewError = 'Enter a reason when rejecting a report.';
+      this.cdr.markForCheck();
+      return;
+    }
+    this.submitManagerReportReview(false, reason);
+  }
+
+  private submitManagerReportReview(approve: boolean, rejectionReason?: string): void {
+    const report = this.activeManagerReport;
+    if (!report) {
+      return;
+    }
+
+    this.reportReviewSubmitting = true;
+    this.reportReviewError = '';
+    this.reportReviewSuccess = '';
+    this.cdr.markForCheck();
+
+    this.managerReportsService
+      .reviewReport(report.id, {
+        approve,
+        rejectionReason: approve ? null : rejectionReason
+      })
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          this.reportReviewSubmitting = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.pendingReportByUserId.delete(report.reportedUserId);
+          this.reportReviewSuccess = approve
+            ? 'Report approved. The content creator has been banned and demoted to tourist.'
+            : 'Report rejected. The content creator remains on the platform.';
+          this.activeManagerReport = null;
+          this.highlightedReportUserId = null;
+          this.reportRejectReason = '';
+          this.clearReportQueryParams();
+          this.loadDashboardData({ silent: true });
+          this.cdr.markForCheck();
+        },
+        error: (err: unknown) => {
+          this.reportReviewError = this.extractReportReviewError(err);
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  private extractReportReviewError(err: unknown): string {
+    if (err instanceof HttpErrorResponse) {
+      const body = err.error;
+      if (body && typeof body === 'object' && 'message' in body && typeof body.message === 'string') {
+        return body.message;
+      }
+    }
+    return 'Could not process this report. Try again.';
+  }
+
+  private fetchAllPendingManagerReports(): Observable<ManagerReportDto[]> {
+    return this.managerReportsService
+      .getAllReports({
+        page: 1,
+        pageSize: 100,
+        status: 'Pending',
+        sortBy: 'createdAt',
+        sortOrder: 'desc'
+      })
+      .pipe(
+        switchMap((firstPage) => {
+          const firstItems = (firstPage.items ?? []).filter(
+            (r) => (r.status ?? '').toLowerCase() === 'pending'
+          );
+          const cappedTotal = this.capTotalPages(firstPage.totalPages, MAX_MANAGER_REPORT_PAGES);
+          if (cappedTotal <= 1) {
+            return of(firstItems);
+          }
+
+          const requests = Array.from({ length: cappedTotal - 1 }, (_, i) =>
+            this.managerReportsService.getAllReports({
+              page: i + 2,
+              pageSize: 100,
+              status: 'Pending',
+              sortBy: 'createdAt',
+              sortOrder: 'desc'
+            })
+          );
+
+          return forkJoin(requests).pipe(
+            map((restPages) => [
+              ...firstItems,
+              ...restPages
+                .flatMap((p) => p.items ?? [])
+                .filter((r) => (r.status ?? '').toLowerCase() === 'pending')
+            ])
+          );
+        }),
+        catchError(() => {
+          this.managerReportsLoadError = 'Could not load pending creator reports.';
+          return of([] as ManagerReportDto[]);
+        })
+      );
+  }
+
+  private bindPendingManagerReports(reports: ManagerReportDto[]): void {
+    this.pendingReportByUserId.clear();
+    for (const report of reports) {
+      if ((report.status ?? '').toLowerCase() !== 'pending') {
+        continue;
+      }
+      const existing = this.pendingReportByUserId.get(report.reportedUserId);
+      if (!existing || new Date(report.createdAt).getTime() > new Date(existing.createdAt).getTime()) {
+        this.pendingReportByUserId.set(report.reportedUserId, report);
+      }
+    }
+    this.managerReportsLoadError = '';
+  }
+
+  private tryOpenPendingReportFromQuery(): void {
+    if (!this.pendingReportQuery || this.isLoading) {
+      return;
+    }
+
+    const { reportId, reportedUserId } = this.pendingReportQuery;
+
+    if (reportId) {
+      const fromMap = [...this.pendingReportByUserId.values()].find((r) => r.id === reportId);
+      if (fromMap) {
+        this.pendingReportQuery = null;
+        this.openManagerReportModal(fromMap);
+        return;
+      }
+
+      this.managerReportsService
+        .getReportById(reportId)
+        .pipe(takeUntilDestroyed(this.destroyRef), catchError(() => of(null)))
+        .subscribe((report) => {
+          if (!report || (report.status ?? '').toLowerCase() !== 'pending') {
+            this.pendingReportQuery = null;
+            this.clearReportQueryParams();
+            this.cdr.markForCheck();
+            return;
+          }
+          this.pendingReportByUserId.set(report.reportedUserId, report);
+          this.pendingReportQuery = null;
+          this.openManagerReportModal(report);
+        });
+      return;
+    }
+
+    if (reportedUserId) {
+      const report = this.pendingReportByUserId.get(reportedUserId);
+      this.pendingReportQuery = null;
+      if (report) {
+        this.openManagerReportModal(report);
+      } else {
+        this.clearReportQueryParams();
+        this.highlightedReportUserId = reportedUserId;
+        this.focusAdminDirectoryPageForUser(reportedUserId);
+        this.cdr.markForCheck();
+      }
+    }
+  }
+
+  private openManagerReportModal(report: ManagerReportDto): void {
+    this.activeManagerReport = report;
+    this.highlightedReportUserId = report.reportedUserId;
+    this.reportReviewError = '';
+    this.reportReviewSuccess = '';
+    this.reportRejectReason = '';
+    this.focusAdminDirectoryPageForUser(report.reportedUserId);
+    this.cdr.markForCheck();
+  }
+
+  private focusAdminDirectoryPageForUser(userId: number): void {
+    const index = this.filteredAdminDirectory.findIndex((m) => m.id === userId);
+    if (index < 0) {
+      return;
+    }
+    const page = Math.floor(index / this.adminPageSize) + 1;
+    this.adminCurrentPage = Math.min(Math.max(1, page), this.adminTotalPages);
+  }
+
+  private clearReportQueryParams(): void {
+    const reportId = this.route.snapshot.queryParamMap.get('reportId');
+    const reportedUserId = this.route.snapshot.queryParamMap.get('reportedUserId');
+    if (!reportId && !reportedUserId) {
+      return;
+    }
+
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { reportId: null, reportedUserId: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
+  managerReportSubmittedLabel(report: ManagerReportDto): string {
+    return report.managerName?.trim() || `Manager #${report.managerId}`;
+  }
+
+  formatDate(value?: string): string {
     if (!value) {
       return '—';
     }
