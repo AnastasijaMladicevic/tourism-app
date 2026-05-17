@@ -59,9 +59,12 @@
       [class.route-planner--navigation-active]="isRouteNavigationActive"
       [class.route-planner--expanded]="isRoutePlannerExpanded"
       [class.route-planner--dragging]="isRoutePlannerDragging"
-      [style.height]="routePlannerHeightStyle"
+      [style.height]="plannerHeightStyle"
     >
-      <div class="route-planner__drag-surface" (pointerdown)="onRoutePlannerDragStart($event)">
+      <div
+        class="route-planner__drag-surface"
+        (pointerdown)="onRoutePlannerDragStart($event)"
+      >
         <div class="route-planner__handle"></div>
       </div>
 
@@ -165,12 +168,15 @@
           <div
             cdkDropList
             cdkDropListOrientation="vertical"
+            cdkDropListLockAxis="y"
+            [cdkDropListAutoScrollStep]="18"
             (cdkDropListDropped)="drop($any($event))"
             class="route-planner__list"
             [class.route-planner__list--scrollable]="routePoints.length > 2"
+            #routeDropList
           >
             @for (point of routePoints; track point.id + ':' + $index; let i = $index) {
-              <article cdkDrag class="route-stop-card">
+              <article cdkDrag cdkDragBoundary=".route-planner__list" class="route-stop-card">
                 <div class="route-stop-card__rail">
                   <span class="route-stop-card__order">{{ i + 1 }}</span>
                   @if (i < routePoints.length - 1) {
@@ -207,6 +213,7 @@
           }
         </div>
       }
+      <div class="route-planner__resize-handle" title="Resize panel"></div>
     </div>
   }
 
