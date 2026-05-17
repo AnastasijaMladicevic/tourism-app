@@ -33,6 +33,7 @@ import {
 import { RouteBuilderPoint, RouteBuilderStateService } from '../../services/route-builder-state.service';
 import { AuthService } from '../../services/auth';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 
 import { environment } from '../../../environment/environment';
 import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
@@ -236,6 +237,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     private locationIntelligenceService: LocationIntelligenceService,
     private routeBuilderStateService: RouteBuilderStateService,
     private sanitizer: DomSanitizer,
+    private translationService: TranslationService,
   ) { }
 
   ngOnInit(): void {
@@ -1344,13 +1346,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   routeSummary(point: RoutePoint | null): string {
-    if (!point) return 'Not selected';
+    if (!point) return this.translationService.translate('map.routePlanner.notSelected');
     return `${point.name} (${point.type})`;
   }
 
   get routeDisplayTitle(): string {
     if (this.routePoints.length === 0) {
-      return 'Plan your route';
+      return this.translationService.translate('map.routePlanner.emptyTitle');
     }
 
     if (this.routePoints.length === 1) {
@@ -1358,7 +1360,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const extraStops = this.routePoints.length - 1;
-    const extraLabel = extraStops === 1 ? '1 more stop' : `${extraStops} more stops`;
+    const extraLabel = extraStops === 1
+      ? this.translationService.translate('map.routePlanner.oneMoreStop')
+      : this.translationService.translate('map.routePlanner.moreStops', { count: extraStops });
     return `${this.routePoints[0].name} + ${extraLabel}`;
   }
 
@@ -1787,7 +1791,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     return {
       id: -1,
-      name: 'My Location',
+      name: this.translationService.translate('map.routePlanner.myLocation'),
       type: 'gps',
       lat: this.userLocation.lat,
       lng: this.userLocation.lng,

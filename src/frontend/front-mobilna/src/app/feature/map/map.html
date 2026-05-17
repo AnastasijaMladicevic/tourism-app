@@ -4,7 +4,7 @@
       <mat-icon>search</mat-icon>
       <input
         type="text"
-        placeholder="Search places, streets, routes..."
+        [placeholder]="'map.topSearchPlaceholder' | translate"
         [(ngModel)]="searchQuery"
         (input)="onSearchInput()"
         (keydown.enter)="submitSearch()"
@@ -32,7 +32,7 @@
             </div>
             <div class="suggestion-item__body">
               <span class="suggestion-item__name">{{ result.name }}</span>
-              <span class="suggestion-item__meta">{{ result.typeName }} · {{ result.location }}</span>
+              <span class="suggestion-item__meta">{{ result.typeName }} Â· {{ result.location }}</span>
             </div>
           </div>
         }
@@ -72,7 +72,7 @@
           </span>
 
           <div class="route-planner__title-block">
-            <span class="route-planner__eyebrow">CURRENT ROUTE</span>
+            <span class="route-planner__eyebrow">{{ 'map.routePlanner.currentRoute' | translate }}</span>
             <h3>{{ routeDisplayTitle }}</h3>
           </div>
         </div>
@@ -86,13 +86,13 @@
             <mat-icon>place</mat-icon>
             {{ routeDistanceLabel }}
           </span>
-          <span class="route-planner__stat-pill">{{ routePoints.length }} Stops</span>
+          <span class="route-planner__stat-pill">{{ 'map.routePlanner.stopsCount' | translate:{ count: routePoints.length } }}</span>
         </div>
 
         <div class="route-planner__header-actions">
           <button class="route-planner__toggle" type="button" (click)="toggleRouteListCollapse()">
             <mat-icon>{{ isRouteListCollapsed ? 'expand_more' : 'expand_less' }}</mat-icon>
-            {{ isRouteListCollapsed ? 'Show List' : 'Hide List' }}
+            {{ isRouteListCollapsed ? ('map.routePlanner.showList' | translate) : ('map.routePlanner.hideList' | translate) }}
           </button>
 
           <button
@@ -102,7 +102,7 @@
             [disabled]="routePoints.length < 2"
             (click)="startPlannedRoute()"
           >
-            {{ isRouteNavigationActive ? 'Following Route' : 'Start Route' }}
+            {{ isRouteNavigationActive ? ('map.routePlanner.followingRoute' | translate) : ('map.routePlanner.startRoute' | translate) }}
             <mat-icon>{{ isRouteNavigationActive ? 'my_location' : 'play_arrow' }}</mat-icon>
           </button>
 
@@ -119,7 +119,7 @@
       @if (!isRouteListCollapsed) {
         <div class="route-planner__body">
           <div class="route-planner__mobile-header">
-            <h3>Plan Route</h3>
+            <h3>{{ 'map.routePlanner.title' | translate }}</h3>
             <div class="route-planner__mobile-actions">
               <button class="route-planner__icon-btn route-planner__icon-btn--mobile" type="button" (click)="clearPlannedRouteKeepMyLocation()">
                 <mat-icon>delete</mat-icon>
@@ -137,7 +137,7 @@
                 <input
                   class="route-planner__search-input"
                   type="text"
-                  placeholder="Add a stop or destination..."
+                  [placeholder]="'map.routePlanner.addStopPlaceholder' | translate"
                   [(ngModel)]="routeSearchQuery"
                   (input)="onRouteSearch()"
                   (keydown.enter)="routeSearchResults.length ? addRoutePoint(routeSearchResults[0]) : focusRouteSearch()"
@@ -150,7 +150,7 @@
                   @for (r of routeSearchResults; track r.id + ':' + (r.lat ?? 0) + ':' + (r.lng ?? 0)) {
                     <div class="route-suggestion-item" (mousedown)="addRoutePoint(r)">
                       <strong>{{ r.name }}</strong>
-                      <span>{{ r.typeName }} · {{ r.location }}</span>
+                      <span>{{ r.typeName }} Â· {{ r.location }}</span>
                     </div>
                   }
                 </div>
@@ -158,7 +158,7 @@
             </div>
 
             <button class="route-planner__add-btn" type="button" (click)="openAddStopPanel()">
-              Add Stop
+              {{ 'map.routePlanner.addStop' | translate }}
             </button>
           </div>
 
@@ -183,7 +183,7 @@
                   <span>{{ getRoutePointMeta(point, i) }}</span>
                 </div>
 
-                <button class="route-stop-card__grip" type="button" cdkDragHandle aria-label="Reorder stop">
+                <button class="route-stop-card__grip" type="button" cdkDragHandle [attr.aria-label]="'map.routePlanner.reorderStop' | translate">
                   <mat-icon>drag_indicator</mat-icon>
                 </button>
 
@@ -201,7 +201,7 @@
               type="button"
               (click)="startPlannedRoute()"
             >
-              {{ isRouteNavigationActive ? 'Following Route' : 'Start Route' }}
+              {{ isRouteNavigationActive ? ('map.routePlanner.followingRoute' | translate) : ('map.routePlanner.startRoute' | translate) }}
               <mat-icon>{{ isRouteNavigationActive ? 'my_location' : 'play_arrow' }}</mat-icon>
             </button>
           }
@@ -219,7 +219,7 @@
           <span class="add-stop-panel__title-icon">
             <mat-icon>flash_on</mat-icon>
           </span>
-          <h3>Add Stop to Route</h3>
+          <h3>{{ 'map.addStop.titleToRoute' | translate }}</h3>
         </div>
 
         <button class="add-stop-panel__close" type="button" (click)="closeAddStopPanel()">
@@ -233,7 +233,7 @@
             <mat-icon>search</mat-icon>
             <input
               type="text"
-              placeholder="Search for a place, address, or category"
+              [placeholder]="'map.addStop.searchPlaceholder' | translate"
               [(ngModel)]="addStopPanelQuery"
               (input)="onAddStopPanelSearch()"
               (keydown.enter)="onAddStopPanelSearchEnter()"
@@ -249,7 +249,7 @@
               type="button"
               (click)="setAddStopPanelFilter('food')"
             >
-              <mat-icon>restaurant</mat-icon>Hrana i piće
+              <mat-icon>restaurant</mat-icon>{{ 'map.filters.food' | translate }}
             </button>
             <button
               class="add-stop-panel__chip"
@@ -257,7 +257,7 @@
               type="button"
               (click)="setAddStopPanelFilter('fuel')"
             >
-              <mat-icon>local_gas_station</mat-icon>Pumpe
+              <mat-icon>local_gas_station</mat-icon>{{ 'map.filters.fuel' | translate }}
             </button>
             <button
               class="add-stop-panel__chip"
@@ -265,7 +265,7 @@
               type="button"
               (click)="setAddStopPanelFilter('accommodation')"
             >
-              <mat-icon>hotel</mat-icon>Smeštaj
+              <mat-icon>hotel</mat-icon>{{ 'map.filters.accommodation' | translate }}
             </button>
             <button
               class="add-stop-panel__chip"
@@ -273,7 +273,7 @@
               type="button"
               (click)="setAddStopPanelFilter('shopping')"
             >
-              <mat-icon>shopping_bag</mat-icon>Šoping
+              <mat-icon>shopping_bag</mat-icon>{{ 'map.filters.shopping' | translate }}
             </button>
             <button
               class="add-stop-panel__chip"
@@ -281,19 +281,19 @@
               type="button"
               (click)="setAddStopPanelFilter('health')"
             >
-              <mat-icon>local_hospital</mat-icon>Bolnice
+              <mat-icon>local_hospital</mat-icon>{{ 'map.filters.health' | translate }}
             </button>
           </div>
 
           <button class="add-stop-panel__manual" type="button" (click)="openManualMapStopPicking()">
             <span class="add-stop-panel__manual-icon"><mat-icon>place</mat-icon></span>
-            <span>Choose manually on map</span>
+            <span>{{ 'map.addStop.chooseManuallyOnMap' | translate }}</span>
             <mat-icon>chevron_right</mat-icon>
           </button>
 
           <div class="add-stop-panel__section-head">
-            <h4>{{ addStopPanelQuery.trim() ? 'Search Results' : 'Recent & Suggested' }}</h4>
-            <button type="button" (click)="clearAddStopPanelFilters()">Clear All</button>
+            <h4>{{ addStopPanelQuery.trim() ? ('map.addStop.searchResults' | translate) : ('map.addStop.recentAndSuggested' | translate) }}</h4>
+            <button type="button" (click)="clearAddStopPanelFilters()">{{ 'map.addStop.clearAll' | translate }}</button>
           </div>
 
           <div class="add-stop-panel__results">
@@ -321,28 +321,28 @@
             } @empty {
               <div class="add-stop-panel__empty">
                 <mat-icon>travel_explore</mat-icon>
-                <strong>No stops found</strong>
-                <span>Try another keyword or switch category.</span>
+                <strong>{{ 'map.addStop.noStopsFound' | translate }}</strong>
+                <span>{{ 'map.addStop.tryAnotherKeyword' | translate }}</span>
               </div>
             }
           </div>
 
-          <p class="add-stop-panel__hint">* Selecting a stop will recalculate your travel time and distance.</p>
+          <p class="add-stop-panel__hint">{{ 'map.addStop.hint' | translate }}</p>
         </div>
 
         <div class="add-stop-panel__preview">
           <div class="add-stop-panel__location-card">
-            <h4>Location</h4>
+            <h4>{{ 'common.location' | translate }}</h4>
 
             <div
               class="add-stop-panel__location-map"
-              [attr.data-name]="selectedAddStopResult?.name || 'Choose a stop'"
+              [attr.data-name]="selectedAddStopResult?.name || ('map.addStop.chooseStop' | translate)"
             >
               @if (selectedAddStopPreviewMapUrl) {
                 <iframe
                   class="add-stop-panel__location-frame"
                   [src]="selectedAddStopPreviewMapUrl"
-                  title="Selected stop location"
+                  [title]="'map.addStop.selectedStopLocationTitle' | translate"
                   loading="lazy"
                   referrerpolicy="no-referrer-when-downgrade"
                 ></iframe>
@@ -353,7 +353,7 @@
               }
 
               <button class="map-btn-overlay" type="button" (click)="viewSelectedAddStopOnMap()">
-                View on map
+                {{ 'common.viewOnMap' | translate }}
               </button>
             </div>
           </div>
@@ -361,10 +361,10 @@
       </div>
 
       <div class="add-stop-panel__footer">
-        <button class="add-stop-panel__cancel" type="button" (click)="closeAddStopPanel()">Cancel</button>
+        <button class="add-stop-panel__cancel" type="button" (click)="closeAddStopPanel()">{{ 'common.cancel' | translate }}</button>
         <button class="add-stop-panel__confirm" type="button" [disabled]="!selectedAddStopResult" (click)="confirmAddStopResult()">
           <mat-icon>add</mat-icon>
-          Add to Route
+          {{ 'map.addStop.addToRoute' | translate }}
         </button>
       </div>
     </div>
@@ -377,7 +377,7 @@
       @if (!isNavigationAutoCenterEnabled) {
         <button class="navigation-action navigation-action--primary" type="button" (click)="resumeRouteNavigationAutoCenter()">
           <mat-icon>my_location</mat-icon>
-          Re-center
+          {{ 'map.routePlanner.recenter' | translate }}
         </button>
       }
     </div>
@@ -389,7 +389,7 @@
       </div>
 
       <button class="navigation-summary-card__exit" type="button" (click)="stopRouteNavigation()">
-        Exit
+        {{ 'map.routePlanner.exit' | translate }}
       </button>
     </div>
   }
@@ -399,7 +399,7 @@
       class="control-btn gps-btn"
       (click)="toggleGpsTracking()"
       [class.gps-btn--active]="isTracking"
-      aria-label="My location"
+      [attr.aria-label]="'map.useMyLocation' | translate"
     >
       <mat-icon>{{ isTracking ? 'gps_fixed' : 'my_location' }}</mat-icon>
     </button>
