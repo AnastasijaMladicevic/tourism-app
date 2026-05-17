@@ -1167,13 +1167,13 @@ body.route-navigation-active app-floating-ai-assistant {
     right: max(24px, calc((100% - 1240px) / 2));
     bottom: 24px;
     gap: 12px;
-    max-height: none;
+    max-height: calc(100dvh - 160px);
     padding: 12px 22px 20px;
   }
 
   .route-planner--expanded {
     bottom: 24px;
-    max-height: none;
+    max-height: calc(100dvh - 160px);
   }
 
   .route-planner__header {
