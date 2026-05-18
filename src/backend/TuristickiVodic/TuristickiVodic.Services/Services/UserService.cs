@@ -813,8 +813,6 @@ namespace TuristickiVodic.Services
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
                 return null;
 
-            await EnsureUserNotBannedAsync(user);
-
             if (!user.IsActive)
                 throw new InvalidOperationException("Account is deactivated");
 
@@ -897,8 +895,6 @@ namespace TuristickiVodic.Services
                 }
             }
 
-            await EnsureUserNotBannedAsync(user);
-
             if (!user.IsActive)
                 throw new InvalidOperationException("Account is deactivated");
 
@@ -921,8 +917,6 @@ namespace TuristickiVodic.Services
 
             if (user == null || !user.TwoFactorChallengeExpiryUtc.HasValue || user.TwoFactorChallengeExpiryUtc.Value <= DateTime.UtcNow)
                 throw new InvalidOperationException("Two-step verification session expired. Please log in again.");
-
-            await EnsureUserNotBannedAsync(user);
 
             if (!user.IsActive)
                 throw new InvalidOperationException("Account is deactivated");
@@ -954,8 +948,6 @@ namespace TuristickiVodic.Services
 
             if (user == null || !user.TwoFactorChallengeExpiryUtc.HasValue || user.TwoFactorChallengeExpiryUtc.Value <= DateTime.UtcNow)
                 throw new InvalidOperationException("Two-step verification session expired. Please log in again.");
-
-            await EnsureUserNotBannedAsync(user);
 
             if (!ShouldRequireTwoFactor(user))
                 throw new InvalidOperationException("Two-step verification is not enabled for this account.");
@@ -1048,8 +1040,6 @@ namespace TuristickiVodic.Services
 
             if (user == null)
                 return null;
-
-            await EnsureUserNotBannedAsync(user);
 
             if (!user.IsActive)
                 throw new InvalidOperationException("Account is deactivated");
@@ -1239,7 +1229,6 @@ namespace TuristickiVodic.Services
             user.BannedAtUtc = DateTime.UtcNow;
             user.UpdatedAt = DateTime.UtcNow;
 
-            await RevokeRefreshTokenAsync(user.Id);
             await _context.SaveChangesAsync();
 
             return await MapExistingUserDtoWithMetricsAsync(user);
@@ -1313,12 +1302,18 @@ namespace TuristickiVodic.Services
             _context.RefreshTokens.Add(newRefreshToken);
             await _context.SaveChangesAsync();
 
+            var banException = HasActiveBan(user) ? CreateAccountBannedException(user) : null;
+
             return new AuthResponseDto
             {
                 Token = token,
                 RefreshToken = refreshToken,
                 User = await MapExistingUserDtoWithMetricsAsync(user),
-                ExpiresAt = DateTime.UtcNow.AddMinutes(15)
+                ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+                IsBanned = banException != null,
+                BanMessage = banException?.Message,
+                BanReason = banException?.Reason,
+                BanExpiresAtUtc = banException?.ExpiresAtUtc
             };
         }
 

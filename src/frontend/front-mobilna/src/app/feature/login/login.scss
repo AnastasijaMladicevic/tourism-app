@@ -67,7 +67,7 @@
 
     &:focus-within {
       border-color: var(--primary);
-      background: var(--white);
+      background: var(--surface-strong);
       box-shadow: 0 0 0 3px rgba(58, 181, 198, 0.12);
     }
 
@@ -81,11 +81,11 @@
       font-family: 'Nunito', sans-serif;
       font-size: 14px;
       font-weight: 600;
-      color: #000000;
+      color: var(--text-dark);
       appearance: none;
 
       &::placeholder {
-        color: #000000;
+        color: var(--text-dark);
         font-weight: 600;
         opacity: 0.85;
       }

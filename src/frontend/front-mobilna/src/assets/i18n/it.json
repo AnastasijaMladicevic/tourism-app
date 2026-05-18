@@ -679,6 +679,23 @@
       "parks": "Parchi nazionali"
     }
   },
+  "appearance": {
+    "title": "Aspetto",
+    "kicker": "Tema",
+    "heading": "Scegli come appare SpireGO",
+    "body": "Passa tra tema chiaro e tema scuro. La modifica si applica subito e resta salvata su questo dispositivo.",
+    "appliesImmediately": "La modifica si applica subito e resta salvata su questo dispositivo.",
+    "options": {
+      "light": {
+        "title": "Tema chiaro",
+        "body": "Un'interfaccia luminosa e pulita per l'uso diurno e una leggibilità più netta."
+      },
+      "dark": {
+        "title": "Tema scuro",
+        "body": "Superfici più profonde e contrasto più morbido per la sera e meno affaticamento visivo."
+      }
+    }
+  },
   "support": {
     "title": "Aiuto e supporto",
     "heroTitle": "Siamo qui per aiutarti",

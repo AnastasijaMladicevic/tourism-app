@@ -80,6 +80,10 @@ export class AuthService {
   setCurrentUser(user: UserDto): void {
     localStorage.setItem('user', JSON.stringify(user));
     this.translationService.setLanguage(user.language);
+    if (!user.isBanned) {
+      sessionStorage.removeItem('spirego-admin-ban-message');
+    }
+    window.dispatchEvent(new CustomEvent('auth-user-changed'));
   }
   isAdmin(): boolean {
     return this.getAuthenticatedRole() === 'admin';
@@ -193,6 +197,8 @@ export class AuthService {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.refreshTokenKey);
     localStorage.removeItem(this.userKey);
+    sessionStorage.removeItem('spirego-admin-ban-message');
+    window.dispatchEvent(new CustomEvent('auth-user-changed'));
   }
 
   isLoggedIn(): boolean {
@@ -337,6 +343,12 @@ export class AuthService {
     localStorage.setItem(this.tokenKey, response.token);
     localStorage.setItem(this.refreshTokenKey, response.refreshToken);
     localStorage.setItem(this.userKey, JSON.stringify(response.user));
+    if (response.isBanned && response.banMessage?.trim()) {
+      sessionStorage.setItem('spirego-admin-ban-message', response.banMessage.trim());
+    } else {
+      sessionStorage.removeItem('spirego-admin-ban-message');
+    }
+    window.dispatchEvent(new CustomEvent('auth-user-changed'));
   }
 
   getDashboardRouteForRole(role: string | null): string {
