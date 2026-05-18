@@ -7,6 +7,7 @@ import { LiveNotificationBannerComponent } from './shared/components/live-notifi
 import { LiveLocationShareService } from './services/live-location-share';
 import { LocationIntelligenceService } from './services/location-intelligence';
 import { AuthService } from './services/auth';
+import { ThemeService } from './services/theme';
 @Component({
   selector: 'app-root',
   imports: [CommonModule, RouterOutlet, NavbarComponent, FloatingAiAssistantComponent, LiveNotificationBannerComponent],
@@ -17,6 +18,7 @@ export class App implements OnInit, OnDestroy {
   private readonly liveLocationShareService = inject(LiveLocationShareService);
   private readonly locationIntelligenceService = inject(LocationIntelligenceService);
   private readonly authService = inject(AuthService);
+  private readonly themeService = inject(ThemeService);
   protected readonly title = signal('front-mobilna');
   protected readonly bannedAccountNotice = signal('');
 
@@ -25,6 +27,7 @@ export class App implements OnInit, OnDestroy {
   constructor() {
     void this.liveLocationShareService;
     void this.locationIntelligenceService;
+    void this.themeService;
   }
 
   ngOnInit(): void {

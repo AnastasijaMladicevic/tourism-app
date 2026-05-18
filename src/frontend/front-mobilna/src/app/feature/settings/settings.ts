@@ -87,7 +87,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
     {
       icon: 'dark_mode',
       titleKey: 'settings.menu.appearance',
-      action: 'theme',
+      route: '/appearance',
       accent: 'gray'
     },
   ];

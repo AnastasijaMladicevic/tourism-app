@@ -679,6 +679,23 @@
       "parks": "Parques nacionales"
     }
   },
+  "appearance": {
+    "title": "Apariencia",
+    "kicker": "Tema",
+    "heading": "Elige cómo se ve SpireGO",
+    "body": "Cambia la interfaz entre un tema claro y uno oscuro. El cambio se aplica al instante y queda guardado en este dispositivo.",
+    "appliesImmediately": "El cambio se aplica al instante y queda guardado en este dispositivo.",
+    "options": {
+      "light": {
+        "title": "Tema claro",
+        "body": "Una vista limpia y luminosa para usar la app durante el día y ver todo con más claridad."
+      },
+      "dark": {
+        "title": "Tema oscuro",
+        "body": "Superficies más profundas y un contraste más suave para la noche y menos cansancio visual."
+      }
+    }
+  },
   "support": {
     "title": "Ayuda y soporte",
     "heroTitle": "Estamos aquí para ayudarte",

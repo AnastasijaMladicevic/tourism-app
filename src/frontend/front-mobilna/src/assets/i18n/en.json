@@ -681,6 +681,23 @@
       "parks": "National parks"
     }
   },
+  "appearance": {
+    "title": "Appearance",
+    "kicker": "Theme",
+    "heading": "Choose how SpireGO looks",
+    "body": "Switch the interface between a bright light theme and a softer dark theme. The change applies immediately and stays saved on this device.",
+    "appliesImmediately": "The change applies immediately and stays saved on this device.",
+    "options": {
+      "light": {
+        "title": "Light theme",
+        "body": "A clean bright layout for daytime browsing and stronger visual clarity."
+      },
+      "dark": {
+        "title": "Dark theme",
+        "body": "Deeper surfaces and gentler contrast for evening browsing and reduced eye strain."
+      }
+    }
+  },
   "support": {
     "title": "Help and support",
     "heroTitle": "We are here to help you",
