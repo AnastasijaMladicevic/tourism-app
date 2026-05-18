@@ -5,24 +5,31 @@
     </div>
 
     <div class="content">
-      <aside class="visual" aria-hidden="true">
+      <aside class="visual">
         <div class="visual-glow"></div>
-        <div class="visual-ring">
-          <div class="circle">
-            <img src="assets/pozadina.png" alt="">
+        <div class="profile-block">
+          <div class="visual-ring">
+            <div class="circle">
+              @if (profileImageUrl() && showProfileImage()) {
+                <img
+                  [src]="profileImageUrl()"
+                  [alt]="displayName()"
+                  (error)="onProfileImageError()"
+                />
+              } @else {
+                <span class="profile-initials">{{ initials() }}</span>
+              }
+            </div>
+            <div class="visual-badge">
+              <span class="material-symbols-outlined">gpp_maybe</span>
+            </div>
           </div>
-          <div class="visual-badge">
-            <span class="material-symbols-outlined">gpp_maybe</span>
-          </div>
+          <p class="profile-name">{{ displayName() }}</p>
         </div>
         <ul class="visual-notes">
           <li>
             <span class="material-symbols-outlined">edit_off</span>
             Content editing is disabled
-          </li>
-          <li>
-            <span class="material-symbols-outlined">visibility</span>
-            You can still view this notice
           </li>
           <li>
             <span class="material-symbols-outlined">schedule</span>
@@ -128,4 +135,5 @@
     </div>
   </div>
 </div>
+
 

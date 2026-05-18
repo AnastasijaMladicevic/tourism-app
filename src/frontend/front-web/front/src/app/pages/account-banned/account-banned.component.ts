@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { interval, Subscription, take } from 'rxjs';
+import { environment } from '../../../environment/environment';
+import { UserDto } from '../../models/user.model';
 import { AuthService } from '../../services/auth.service';
 import { BanCountdownParts, computeBanCountdown } from '../../utils/ban-countdown';
 
@@ -13,6 +15,12 @@ import { BanCountdownParts, computeBanCountdown } from '../../utils/ban-countdow
   styleUrl: './account-banned.component.css',
 })
 export class AccountBannedComponent implements OnInit, OnDestroy {
+  private static readonly DEFAULT_PROFILE_IMAGE_URL = `${environment.apiUrl.replace('/api', '')}/images/profiles/default_icon.png`;
+
+  protected readonly displayName = signal('');
+  protected readonly profileImageUrl = signal<string | null>(null);
+  protected readonly initials = signal('');
+  protected readonly showProfileImage = signal(true);
   protected readonly banReason = signal('Krsenje pravila platforme.');
   protected readonly isPermanent = signal(false);
   protected readonly banExpiresLabel = signal('');
@@ -32,6 +40,7 @@ export class AccountBannedComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadBanState();
+    this.loadUserProfile();
     this.tickSub = interval(1000).subscribe(() => this.updateCountdown());
   }
 
@@ -45,6 +54,10 @@ export class AccountBannedComponent implements OnInit, OnDestroy {
 
   protected formatUnit(value: number): string {
     return String(Math.max(0, value)).padStart(2, '0');
+  }
+
+  protected onProfileImageError(): void {
+    this.showProfileImage.set(false);
   }
 
   checkAccessAgain(): void {
@@ -75,12 +88,44 @@ export class AccountBannedComponent implements OnInit, OnDestroy {
           this.banReason.set(user.banReason?.trim() || 'Krsenje pravila platforme.');
           this.isPermanent.set(!this.banExpiresAtUtc);
           this.banExpiresLabel.set(this.formatExpiryLabel(this.banExpiresAtUtc));
+          this.applyProfileFromUser(user);
           this.updateCountdown();
         },
         error: () => {
           this.isCheckingStatus.set(false);
         },
       });
+  }
+
+  private loadUserProfile(): void {
+    const user = this.authService.getUser();
+    if (user) {
+      this.applyProfileFromUser(user);
+    }
+  }
+
+  private applyProfileFromUser(user: UserDto): void {
+    const firstName = user.firstName?.trim() ?? '';
+    const lastName = user.lastName?.trim() ?? '';
+    const fullName = `${firstName} ${lastName}`.trim();
+
+    this.displayName.set(fullName || user.email?.trim() || 'Content Creator');
+    this.initials.set(this.buildInitials(firstName, lastName, user.email));
+    this.profileImageUrl.set(
+      user.profileImageUrl?.trim() || AccountBannedComponent.DEFAULT_PROFILE_IMAGE_URL,
+    );
+    this.showProfileImage.set(true);
+  }
+
+  private buildInitials(firstName: string, lastName: string, email?: string): string {
+    const first = firstName.charAt(0).toUpperCase();
+    const last = lastName.charAt(0).toUpperCase();
+
+    if (first || last) {
+      return `${first}${last}`;
+    }
+
+    return (email?.charAt(0) ?? 'C').toUpperCase();
   }
 
   private loadBanState(): void {

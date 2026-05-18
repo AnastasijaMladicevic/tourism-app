@@ -83,9 +83,25 @@
   pointer-events: none;
 }
 
+.profile-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: min(100%, 320px);
+}
+
 .visual-ring {
   position: relative;
-  width: min(100%, 320px);
+  width: 100%;
+}
+
+.profile-name {
+  margin: 0;
+  font: 700 1.15rem/1.25 'Inter', sans-serif;
+  letter-spacing: -0.02em;
+  color: var(--ban-ink);
+  text-align: center;
 }
 
 .circle {
@@ -103,9 +119,15 @@
 }
 
 .circle img {
-  width: 88%;
-  height: 88%;
-  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-initials {
+  font: 700 3.25rem/1 'Inter', sans-serif;
+  letter-spacing: 0.04em;
+  color: #1a5f7a;
 }
 
 .visual-badge {
@@ -447,7 +469,7 @@ h1 {
     gap: 16px;
   }
 
-  .visual-ring {
+  .profile-block {
     width: min(100%, 260px);
   }
 
