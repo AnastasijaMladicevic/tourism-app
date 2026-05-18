@@ -942,10 +942,14 @@
     *ngIf="usersViewTab === 'internal' && !isLoading"
     aria-labelledby="banned-users-heading"
   >
-    <div class="table-head">
-      <div>
+    <div class="table-head creator-requests-head">
+      <div class="creator-requests-head-text">
         <h3 id="banned-users-heading">Banned team members</h3>
         <p>Content creators with an active ban. Unban restores their access to the platform.</p>
+      </div>
+      <div class="creator-requests-count-wrap banned-users-count-wrap" aria-live="polite">
+        <span class="creator-requests-count-label">Banned</span>
+        <span class="creator-requests-count">{{ bannedUsers.length | number : '1.0-0' }}</span>
       </div>
     </div>
 

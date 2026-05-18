@@ -1235,6 +1235,19 @@ th {
   width: 100%;
 }
 
+.banned-users-count-wrap {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.banned-users-count-wrap .creator-requests-count-label {
+  color: #b91c1c;
+}
+
+.banned-users-count-wrap .creator-requests-count {
+  color: #991b1b;
+}
+
 .creator-requests-toolbar {
   margin-top: 0;
 }
