@@ -20,6 +20,8 @@ import { AdminUsersService, BanUserDto } from '../../../services/admin-users.ser
 /** Mirrors role cards on create page; includes Admin when API returns it. */
 export type DisplayRole = 'manager' | 'content-creator' | 'tourist' | 'admin';
 
+type BanDurationOption = '30-days' | 'permanent' | 'custom';
+
 @Component({
   selector: 'app-edit-team-member',
   standalone: true,
@@ -71,8 +73,8 @@ export class EditTeamMemberComponent {
   activeBanExpiresLabel = '';
   activeBannedAtLabel = '';
   banReason = '';
-  banDurationValue = 7;
-  banDurationUnit: 'hours' | 'days' | 'weeks' | 'months' | 'permanent' = 'days';
+  banDuration: BanDurationOption = 'permanent';
+  banCustomEndDate = '';
 
   readonly countries = [
     'United States',
@@ -205,24 +207,26 @@ export class EditTeamMemberComponent {
     return this.displayRole === 'tourist' || this.displayRole === 'content-creator';
   }
 
-  get isPermanentBanSelected(): boolean {
-    return this.banDurationUnit === 'permanent';
+  selectBanDuration(option: BanDurationOption): void {
+    this.banDuration = option;
+    if (option !== 'custom') {
+      this.banCustomEndDate = '';
+    }
+    this.moderationError = '';
+    this.cdr.markForCheck();
   }
 
-  get banDurationPreview(): string {
-    if (this.isPermanentBanSelected) {
-      return 'Permanent ban';
+  get banCustomDateMin(): string {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return this.toDateInputValue(today);
+  }
+
+  get isBanDurationValid(): boolean {
+    if (this.banDuration !== 'custom') {
+      return true;
     }
-
-    const value = Math.max(1, Math.floor(Number(this.banDurationValue) || 0));
-    const unitMap: Record<'hours' | 'days' | 'weeks' | 'months', string> = {
-      hours: value === 1 ? 'hour' : 'hours',
-      days: value === 1 ? 'day' : 'days',
-      weeks: value === 1 ? 'week' : 'weeks',
-      months: value === 1 ? 'month' : 'months'
-    };
-
-    return `${value} ${unitMap[this.banDurationUnit as 'hours' | 'days' | 'weeks' | 'months']}`;
+    return !!this.resolveBanExpiresAtUtc();
   }
 
   private extractLoadError(err: unknown): string {
@@ -326,17 +330,14 @@ export class EditTeamMemberComponent {
       return;
     }
 
-    if (!this.isPermanentBanSelected) {
-      const normalizedDuration = Math.floor(Number(this.banDurationValue) || 0);
-      if (!Number.isFinite(normalizedDuration) || normalizedDuration < 1) {
-        this.moderationError = 'Please enter a valid ban duration.';
-        return;
-      }
+    if (!this.isBanDurationValid) {
+      this.moderationError = 'Choose an end date for a custom ban duration.';
+      return;
     }
 
     const dto: BanUserDto = {
       reason,
-      banExpiresAtUtc: this.buildBanExpiryUtc()
+      banExpiresAtUtc: this.resolveBanExpiresAtUtc()
     };
 
     this.isModerating = true;
@@ -352,8 +353,7 @@ export class EditTeamMemberComponent {
         next: (user) => {
           this.applyUser(user);
           this.banReason = '';
-          this.banDurationValue = 7;
-          this.banDurationUnit = 'days';
+          this.resetBanDurationForm();
           this.moderationSuccess = user.banExpiresAtUtc
             ? `User banned until ${this.activeBanExpiresLabel}.`
             : 'User permanently banned.';
@@ -481,11 +481,11 @@ export class EditTeamMemberComponent {
     };
   }
 
-  private toDateInputValue(iso?: string): string {
-    if (!iso) {
+  private toDateInputValue(value?: string | Date): string {
+    if (!value) {
       return '';
     }
-    const d = new Date(iso);
+    const d = value instanceof Date ? value : new Date(value);
     if (Number.isNaN(d.getTime())) {
       return '';
     }
@@ -528,31 +528,39 @@ export class EditTeamMemberComponent {
     this.activeBannedAtLabel = this.formatDateTime(user.bannedAtUtc);
   }
 
-  private buildBanExpiryUtc(): string | null {
-    if (this.isPermanentBanSelected) {
+  private resetBanDurationForm(): void {
+    this.banDuration = 'permanent';
+    this.banCustomEndDate = '';
+  }
+
+  /** ISO UTC expiry for `POST /users/{id}/ban`; `null` = permanent. */
+  private resolveBanExpiresAtUtc(): string | null {
+    if (this.banDuration === 'permanent') {
       return null;
     }
 
-    const durationValue = Math.max(1, Math.floor(Number(this.banDurationValue) || 1));
-    const expiresAt = new Date();
-
-    switch (this.banDurationUnit) {
-      case 'hours':
-        expiresAt.setUTCHours(expiresAt.getUTCHours() + durationValue);
-        break;
-      case 'weeks':
-        expiresAt.setUTCDate(expiresAt.getUTCDate() + durationValue * 7);
-        break;
-      case 'months':
-        expiresAt.setUTCMonth(expiresAt.getUTCMonth() + durationValue);
-        break;
-      case 'days':
-      default:
-        expiresAt.setUTCDate(expiresAt.getUTCDate() + durationValue);
-        break;
+    if (this.banDuration === '30-days') {
+      const end = new Date();
+      end.setUTCDate(end.getUTCDate() + 30);
+      return end.toISOString();
     }
 
-    return expiresAt.toISOString();
+    const raw = this.banCustomEndDate.trim();
+    if (!raw) {
+      return null;
+    }
+
+    const parts = raw.split('-').map((part) => parseInt(part, 10));
+    if (parts.length !== 3 || parts.some((part) => !Number.isFinite(part))) {
+      return null;
+    }
+
+    const end = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2], 23, 59, 59, 999));
+    if (Number.isNaN(end.getTime()) || end.getTime() <= Date.now()) {
+      return null;
+    }
+
+    return end.toISOString();
   }
 
   private formatDateTime(value?: string | null): string {

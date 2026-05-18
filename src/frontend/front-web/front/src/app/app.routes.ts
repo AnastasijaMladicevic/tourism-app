@@ -3,6 +3,7 @@ import { AdminLayoutComponent } from './layout/adminlayout/adminlayout.component
 import { ContentCreatorLayoutComponent } from './layout/contentcreatorlayout/contentcreatorlayout.component';
 import { ManagerLayoutComponent } from './layout/managerlayout/managerlayout.component';
 import { authGuard } from './guards/auth.guard';
+import { activeContentCreatorGuard, bannedAccountGuard } from './guards/banned-account.guard';
 import { roleGuard } from './guards/role.guard';
 
 export const routes: Routes = [
@@ -26,6 +27,14 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/signout/signout').then(m => m.Signout)
+  },
+
+  // Banned content creator notice
+  {
+    path: 'account-banned',
+    canActivate: [authGuard, bannedAccountGuard],
+    loadComponent: () =>
+      import('./pages/account-banned/account-banned.component').then(m => m.AccountBannedComponent),
   },
   //Signin
   {
@@ -102,7 +111,7 @@ export const routes: Routes = [
   {
     path: 'content-creator',
     component: ContentCreatorLayoutComponent,
-    canActivate: [authGuard, roleGuard(['content-creator'])],
+    canActivate: [authGuard, roleGuard(['content-creator']), activeContentCreatorGuard],
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       {

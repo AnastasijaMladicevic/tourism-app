@@ -339,10 +339,50 @@ export class AuthService {
     }
   }
 
+  isBannedContentCreator(user?: UserDto | null): boolean {
+    const role = this.getNormalizedRole(user ?? this.getUser());
+    if (role !== 'content-creator') {
+      return false;
+    }
+
+    return this.hasActiveBan(user ?? this.getUser());
+  }
+
+  hasActiveBan(user?: UserDto | null): boolean {
+    const snapshot = user ?? this.getUser();
+    return !!snapshot?.isBanned;
+  }
+
+  getBanSnapshot(user?: UserDto | null): {
+    reason: string;
+    expiresAtUtc: string | null;
+    isPermanent: boolean;
+  } {
+    const snapshot = user ?? this.getUser();
+    const expiresAtUtc = snapshot?.banExpiresAtUtc?.trim() || null;
+
+    return {
+      reason: snapshot?.banReason?.trim() || 'Krsenje pravila platforme.',
+      expiresAtUtc,
+      isPermanent: !!snapshot?.isBanned && !expiresAtUtc,
+    };
+  }
+
+  getAccountBannedRoute(): string {
+    return '/account-banned';
+  }
+
   private persistSession(response: AuthResponseDto): void {
+    const user: UserDto = {
+      ...response.user,
+      isBanned: response.isBanned ?? response.user?.isBanned ?? false,
+      banReason: response.banReason ?? response.user?.banReason ?? null,
+      banExpiresAtUtc: response.banExpiresAtUtc ?? response.user?.banExpiresAtUtc ?? null,
+    };
+
     localStorage.setItem(this.tokenKey, response.token);
     localStorage.setItem(this.refreshTokenKey, response.refreshToken);
-    localStorage.setItem(this.userKey, JSON.stringify(response.user));
+    localStorage.setItem(this.userKey, JSON.stringify(user));
     if (response.isBanned && response.banMessage?.trim()) {
       sessionStorage.setItem('spirego-admin-ban-message', response.banMessage.trim());
     } else {
@@ -352,6 +392,10 @@ export class AuthService {
   }
 
   getDashboardRouteForRole(role: string | null): string {
+    if (role === 'content-creator' && this.isBannedContentCreator()) {
+      return this.getAccountBannedRoute();
+    }
+
     switch (role) {
       case 'admin':
         return '/admin/dashboard';

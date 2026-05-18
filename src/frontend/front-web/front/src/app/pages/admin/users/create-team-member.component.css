@@ -631,3 +631,88 @@
   opacity: 0.65;
   cursor: not-allowed;
 }
+
+.section-icon-wrap--danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.ban-duration-block {
+  margin: 0 0 16px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #f3f4f6;
+}
+
+.ban-duration-label {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.ban-duration-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ban-duration-option {
+  padding: 12px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: #fff;
+  color: #111827;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ban-duration-option:hover:not(:disabled) {
+  border-color: #9ca3af;
+}
+
+.ban-duration-option--selected {
+  border-color: #dc2626;
+  color: #dc2626;
+  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.12);
+}
+
+.ban-duration-option:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ban-duration-custom-field {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.ban-duration-date-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+}
+
+.ban-duration-date-input:focus {
+  outline: none;
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.ban-duration-hint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #6b7280;
+}

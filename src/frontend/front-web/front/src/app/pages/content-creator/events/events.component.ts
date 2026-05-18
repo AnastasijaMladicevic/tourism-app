@@ -1,9 +1,9 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
-import { EventService } from '../../../services/event.service';
+import { EventImageDto, EventService } from '../../../services/event.service';
 import { EventDto, EventQueryDto } from '../../../models/event.model';
 import { buildEventQueryDto, EventFilterState } from '../../../models/event-filters.model';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
@@ -27,10 +27,13 @@ interface EventScheduleRow {
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.css']
 })
-export class ContentCreatorEventsComponent implements OnInit {
+export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
   private readonly eventService = inject(EventService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+
+  private static readonly HERO_ROTATION_INTERVAL_MS = 8000;
+  private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
 
   Math = Math;
 
@@ -40,6 +43,10 @@ export class ContentCreatorEventsComponent implements OnInit {
   isLoading = true;
   errorMessage = '';
   selectedEvent: EventDto | null = null;
+
+  heroImageUrls: string[] = [];
+  currentHeroImageIndex = 0;
+  private heroRotationTimerId: ReturnType<typeof setInterval> | null = null;
 
   currentPage = 1;
   pageSize = 5;
@@ -88,6 +95,10 @@ export class ContentCreatorEventsComponent implements OnInit {
     this.loadCategoryOptions();
     this.loadEvents();
     this.loadUpcomingThisWeekStat();
+  }
+
+  ngOnDestroy(): void {
+    this.stopHeroImageRotation();
   }
 
   private loadUpcomingThisWeekStat(): void {
@@ -179,7 +190,7 @@ export class ContentCreatorEventsComponent implements OnInit {
         this.refreshPageInsightCards(response.items ?? []);
 
         if (!this.selectedEvent || !this.pagedEvents.some((event) => event.id === this.selectedEvent?.id)) {
-          this.selectedEvent = this.pagedEvents[0] ?? null;
+          this.setSelectedEvent(this.pagedEvents[0] ?? null);
         }
 
         this.isLoading = false;
@@ -272,8 +283,7 @@ export class ContentCreatorEventsComponent implements OnInit {
   }
 
   onViewEvent(event: EventDto): void {
-    this.selectedEvent = event;
-    this.cdr.detectChanges();
+    this.setSelectedEvent(event);
   }
 
   openEventDetails(event: EventDto): void {
@@ -295,7 +305,15 @@ export class ContentCreatorEventsComponent implements OnInit {
   }
 
   selectEvent(event: EventDto): void {
-    this.selectedEvent = event;
+    this.setSelectedEvent(event);
+  }
+
+  getHeroSlideStyle(url: string): Record<string, string> {
+    return { 'background-image': `url("${url}")` };
+  }
+
+  trackByHeroImage(index: number, url: string): string {
+    return `${index}-${url}`;
   }
 
   trackByEventId(_: number, event: EventDto): number {
@@ -363,7 +381,7 @@ export class ContentCreatorEventsComponent implements OnInit {
       return this.normalizeImageUrl(event.mainImageUrl);
     }
 
-    return '/assets/pozadina.png';
+    return ContentCreatorEventsComponent.DEFAULT_BANNER_URL;
   }
 
   getSelectedSummary(event: EventDto | null): string {
@@ -430,6 +448,72 @@ export class ContentCreatorEventsComponent implements OnInit {
 
     const location = this.selectedEvent.localityName || this.selectedEvent.destinationName || this.selectedEvent.objectName;
     return location ? `${this.selectedEvent.name} · ${location}` : this.selectedEvent.name;
+  }
+
+  private setSelectedEvent(event: EventDto | null): void {
+    const previousId = this.selectedEvent?.id ?? null;
+    this.selectedEvent = event;
+
+    if ((event?.id ?? null) !== previousId) {
+      this.loadHeroImagesForSelectedEvent();
+    }
+  }
+
+  private loadHeroImagesForSelectedEvent(): void {
+    this.stopHeroImageRotation();
+    this.heroImageUrls = [];
+    this.currentHeroImageIndex = 0;
+
+    if (!this.selectedEvent) {
+      return;
+    }
+
+    const fallbackUrl = this.getDetailBanner(this.selectedEvent);
+
+    this.eventService.getImages(this.selectedEvent.id).subscribe({
+      next: (images: EventImageDto[]) => {
+        const orderedUrls = (images ?? [])
+          .slice()
+          .sort((a, b) => Number(b.isMain) - Number(a.isMain))
+          .map((image) => this.normalizeImageUrl(image.url))
+          .filter((url): url is string => !!url);
+
+        this.heroImageUrls = orderedUrls.length > 0 ? orderedUrls : [fallbackUrl];
+        this.currentHeroImageIndex = 0;
+
+        if (this.heroImageUrls.length > 1) {
+          this.startHeroImageRotation();
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.heroImageUrls = [fallbackUrl];
+        this.currentHeroImageIndex = 0;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private startHeroImageRotation(): void {
+    this.stopHeroImageRotation();
+
+    this.heroRotationTimerId = setInterval(() => {
+      if (this.heroImageUrls.length <= 1) {
+        return;
+      }
+
+      this.currentHeroImageIndex =
+        (this.currentHeroImageIndex + 1) % this.heroImageUrls.length;
+      this.cdr.detectChanges();
+    }, ContentCreatorEventsComponent.HERO_ROTATION_INTERVAL_MS);
+  }
+
+  private stopHeroImageRotation(): void {
+    if (this.heroRotationTimerId != null) {
+      clearInterval(this.heroRotationTimerId);
+      this.heroRotationTimerId = null;
+    }
   }
 
   private normalizeImageUrl(value: string): string {

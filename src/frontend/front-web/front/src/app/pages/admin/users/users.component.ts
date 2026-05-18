@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,9 +9,14 @@ import { catchError, finalize, map, switchMap, tap, timeout } from 'rxjs/operato
 import {
   AdminUserListItemDto,
   AdminUsersService,
+  BanUserDto,
   CreatorRoleRequestDto
 } from '../../../services/admin-users.service';
 import { ReviewDto, ReviewService } from '../../../services/review';
+import {
+  ManagerReportDto,
+  ManagerReportsService
+} from '../../../services/manager-reports.service';
 
 const CHART_DAYS = 14;
 
@@ -46,8 +51,23 @@ const REVIEWS_LOAD_TIMEOUT_MS = 45_000;
 
 /** While the Tourists tab is open, refetch creator-role requests so new submissions appear without manual refresh. */
 const TOURISTS_TAB_CREATOR_REQUESTS_POLL_MS = 500;
+const MAX_MANAGER_REPORT_PAGES = 20;
 
 type UsersPageViewTab = 'internal' | 'tourists';
+
+type BanDurationOption = '30-days' | 'permanent' | 'custom';
+
+interface BannedUserRow {
+  id: number;
+  initials: string;
+  name: string;
+  email: string;
+  role: string;
+  banReason: string;
+  bannedAtLabel: string;
+  banExpiresLabel: string;
+  bannedAtSort: number;
+}
 
 @Component({
   selector: 'app-users',
@@ -59,7 +79,9 @@ type UsersPageViewTab = 'internal' | 'tourists';
 export class UsersComponent implements OnInit {
   private readonly adminUsersService = inject(AdminUsersService);
   private readonly reviewService = inject(ReviewService);
+  private readonly managerReportsService = inject(ManagerReportsService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -163,7 +185,30 @@ export class UsersComponent implements OnInit {
   /** Row pending confirmation in the approve dialog. */
   approveConfirmRow: CreatorRoleRequestDto | null = null;
   creatorRequestsApproveSuccess = '';
+
+  /** Pending manager reports keyed by reported content creator user id. */
+  pendingReportByUserId = new Map<number, ManagerReportDto>();
+  managerReportsLoadError = '';
+  activeManagerReport: ManagerReportDto | null = null;
+  highlightedReportUserId: number | null = null;
+  reportReviewSubmitting = false;
+  reportReviewError = '';
+  reportRejectReason = '';
+  reportReviewSuccess = '';
+  banDuration: BanDurationOption = 'permanent';
+  banCustomEndDate = '';
+
+  bannedUsers: BannedUserRow[] = [];
+  bannedUsersSearch = '';
+  bannedCurrentPage = 1;
+  bannedPageSize = 5;
+  unbanConfirmRow: BannedUserRow | null = null;
+  unbanSubmitting = false;
+  unbanError = '';
+  unbanSuccess = '';
+
   private creatorRequestSearchDebounce?: ReturnType<typeof setTimeout>;
+  private pendingReportQuery: { reportId?: number; reportedUserId?: number } | null = null;
   private creatorRequestsSilentInFlight = false;
   private touristsTabPollTimer?: ReturnType<typeof setInterval>;
   private approveSuccessDismissTimer?: ReturnType<typeof setTimeout>;
@@ -191,9 +236,28 @@ export class UsersComponent implements OnInit {
 
     this.route.queryParamMap
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe((params) => this.applyTabFromQuery(params.get('tab')));
+      .subscribe((params) => {
+        this.applyTabFromQuery(params.get('tab'));
+        const reportId = this.parsePositiveIntParam(params.get('reportId'));
+        const reportedUserId = this.parsePositiveIntParam(params.get('reportedUserId'));
+        if (reportId || reportedUserId) {
+          this.pendingReportQuery = { reportId, reportedUserId };
+          if (this.usersViewTab !== 'internal') {
+            this.selectUsersViewTab('internal');
+          }
+          this.tryOpenPendingReportFromQuery();
+        }
+      });
 
     this.loadDashboardData();
+  }
+
+  private parsePositiveIntParam(raw: string | null): number | undefined {
+    if (!raw) {
+      return undefined;
+    }
+    const parsed = parseInt(raw, 10);
+    return Number.isFinite(parsed) && parsed >= 1 ? parsed : undefined;
   }
 
   private applyTabFromQuery(tab: string | null): void {
@@ -266,7 +330,8 @@ export class UsersComponent implements OnInit {
       touristsResult: this.fetchAllUsers('Tourist'),
       totalAdminsApi: this.fetchRoleTotalCount('Admin'),
       totalManagersApi: this.fetchRoleTotalCount('Manager'),
-      totalCreatorsApi: this.fetchRoleTotalCount('ContentCreator')
+      totalCreatorsApi: this.fetchRoleTotalCount('ContentCreator'),
+      pendingManagerReports: this.fetchAllPendingManagerReports()
     })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
@@ -277,13 +342,15 @@ export class UsersComponent implements OnInit {
             touristsResult,
             totalAdminsApi,
             totalManagersApi,
-            totalCreatorsApi
+            totalCreatorsApi,
+            pendingManagerReports
           }) => {
             const roleTotals = {
               admins: totalAdminsApi,
               managers: totalManagersApi,
               contentCreators: totalCreatorsApi
             };
+            this.bindPendingManagerReports(pendingManagerReports);
             this.bindUsersData(
               allUsersResult.items,
               allUsersResult.totalCount,
@@ -292,6 +359,7 @@ export class UsersComponent implements OnInit {
               [],
               roleTotals
             );
+            this.tryOpenPendingReportFromQuery();
             if (!silent) {
               this.isLoading = false;
             }
@@ -304,7 +372,8 @@ export class UsersComponent implements OnInit {
             touristsResult,
             totalAdminsApi,
             totalManagersApi,
-            totalCreatorsApi
+            totalCreatorsApi,
+            pendingManagerReports
           }) =>
             this.fetchAllReviews().pipe(
               timeout(REVIEWS_LOAD_TIMEOUT_MS),
@@ -314,6 +383,7 @@ export class UsersComponent implements OnInit {
                 totalAdminsApi,
                 totalManagersApi,
                 totalCreatorsApi,
+                pendingManagerReports,
                 reviews
               })),
               catchError(() =>
@@ -323,17 +393,28 @@ export class UsersComponent implements OnInit {
                   totalAdminsApi,
                   totalManagersApi,
                   totalCreatorsApi,
+                  pendingManagerReports,
                   reviews: [] as ReviewDto[]
                 })
               )
             )
         ),
-        tap(({ allUsersResult, touristsResult, totalAdminsApi, totalManagersApi, totalCreatorsApi, reviews }) => {
+        tap(
+          ({
+            allUsersResult,
+            touristsResult,
+            totalAdminsApi,
+            totalManagersApi,
+            totalCreatorsApi,
+            pendingManagerReports,
+            reviews
+          }) => {
           const roleTotals = {
             admins: totalAdminsApi,
             managers: totalManagersApi,
             contentCreators: totalCreatorsApi
           };
+          this.bindPendingManagerReports(pendingManagerReports);
           this.bindUsersData(
             allUsersResult.items,
             allUsersResult.totalCount,
@@ -342,8 +423,10 @@ export class UsersComponent implements OnInit {
             reviews,
             roleTotals
           );
+          this.tryOpenPendingReportFromQuery();
           this.cdr.markForCheck();
-        }),
+        }
+        ),
         catchError((err: unknown) => {
           if (silent) {
             return of(null);
@@ -537,6 +620,34 @@ export class UsersComponent implements OnInit {
       profileImageUrl: (u.profileImageUrl ?? '').trim() || null,
       initials: this.getInitials(u.firstName, u.lastName)
     }));
+
+    this.bannedUsers = allUsers
+      .filter((u) => u.isBanned && this.isContentCreatorRole(u.roleName))
+      .map((u) => this.mapBannedUserRow(u))
+      .sort((a, b) => b.bannedAtSort - a.bannedAtSort);
+
+    if (this.unbanConfirmRow && !this.bannedUsers.some((row) => row.id === this.unbanConfirmRow!.id)) {
+      this.unbanConfirmRow = null;
+    }
+  }
+
+  private mapBannedUserRow(u: AdminUserListItemDto): BannedUserRow {
+    const bannedAtRaw = u.bannedAtUtc ?? '';
+    const bannedAtDate = bannedAtRaw ? new Date(bannedAtRaw) : null;
+    const bannedAtSort =
+      bannedAtDate && !Number.isNaN(bannedAtDate.getTime()) ? bannedAtDate.getTime() : 0;
+
+    return {
+      id: u.id,
+      initials: this.getInitials(u.firstName, u.lastName),
+      name: `${u.firstName} ${u.lastName}`.trim(),
+      email: u.email,
+      role: u.roleName || 'Unknown',
+      banReason: (u.banReason ?? '').trim() || '—',
+      bannedAtLabel: this.formatDate(u.bannedAtUtc ?? undefined),
+      banExpiresLabel: u.banExpiresAtUtc ? this.formatDate(u.banExpiresAtUtc ?? undefined) : 'Permanent',
+      bannedAtSort
+    };
   }
 
   get filteredAdminDirectory(): typeof this.adminMembers {
@@ -558,6 +669,47 @@ export class UsersComponent implements OnInit {
       t.joinedDate,
       t.initials
     ]);
+  }
+
+  get filteredBannedUsers(): BannedUserRow[] {
+    return this.filterBySearch(this.bannedUsers, this.bannedUsersSearch, (row) => [
+      row.name,
+      row.email,
+      row.role,
+      row.banReason,
+      row.bannedAtLabel,
+      row.banExpiresLabel,
+      row.initials
+    ]);
+  }
+
+  get bannedTotalCount(): number {
+    return this.filteredBannedUsers.length;
+  }
+
+  get bannedTotalPages(): number {
+    if (!this.bannedTotalCount || this.bannedPageSize < 1) {
+      return 1;
+    }
+    return Math.max(1, Math.ceil(this.bannedTotalCount / this.bannedPageSize));
+  }
+
+  get visibleBannedUsers(): BannedUserRow[] {
+    const page = Math.min(Math.max(1, this.bannedCurrentPage), this.bannedTotalPages);
+    const start = (page - 1) * this.bannedPageSize;
+    return this.filteredBannedUsers.slice(start, start + this.bannedPageSize);
+  }
+
+  get bannedPageStart(): number {
+    if (!this.bannedTotalCount || !this.visibleBannedUsers.length) {
+      return 0;
+    }
+    const page = Math.min(Math.max(1, this.bannedCurrentPage), this.bannedTotalPages);
+    return (page - 1) * this.bannedPageSize + 1;
+  }
+
+  get bannedPageEnd(): number {
+    return this.bannedPageStart + this.visibleBannedUsers.length - 1;
   }
 
   get adminTotalCount(): number {
@@ -628,6 +780,11 @@ export class UsersComponent implements OnInit {
     this.touristCurrentPage = 1;
   }
 
+  onBannedUsersSearchInput(event: Event): void {
+    this.bannedUsersSearch = (event.target as HTMLInputElement).value;
+    this.bannedCurrentPage = 1;
+  }
+
   onAdminPageSizeChange(value: number | string): void {
     this.adminPageSize = Number(value);
     this.adminCurrentPage = 1;
@@ -636,6 +793,11 @@ export class UsersComponent implements OnInit {
   onTouristPageSizeChange(value: number | string): void {
     this.touristPageSize = Number(value);
     this.touristCurrentPage = 1;
+  }
+
+  onBannedPageSizeChange(value: number | string): void {
+    this.bannedPageSize = Number(value);
+    this.bannedCurrentPage = 1;
   }
 
   onAdminPreviousPage(): void {
@@ -660,6 +822,84 @@ export class UsersComponent implements OnInit {
     if (this.touristCurrentPage < this.touristTotalPages) {
       this.touristCurrentPage++;
     }
+  }
+
+  onBannedPreviousPage(): void {
+    if (this.bannedCurrentPage > 1) {
+      this.bannedCurrentPage--;
+    }
+  }
+
+  onBannedNextPage(): void {
+    if (this.bannedCurrentPage < this.bannedTotalPages) {
+      this.bannedCurrentPage++;
+    }
+  }
+
+  clearBannedUsersSearch(): void {
+    this.bannedUsersSearch = '';
+    this.bannedCurrentPage = 1;
+  }
+
+  openUnbanConfirm(row: BannedUserRow): void {
+    if (this.unbanSubmitting) {
+      return;
+    }
+    this.unbanError = '';
+    this.unbanSuccess = '';
+    this.unbanConfirmRow = row;
+    this.cdr.markForCheck();
+  }
+
+  cancelUnbanConfirm(): void {
+    if (this.unbanSubmitting) {
+      return;
+    }
+    this.unbanConfirmRow = null;
+    this.unbanError = '';
+    this.cdr.markForCheck();
+  }
+
+  confirmUnban(): void {
+    const row = this.unbanConfirmRow;
+    if (!row || this.unbanSubmitting) {
+      return;
+    }
+
+    this.unbanSubmitting = true;
+    this.unbanError = '';
+    this.cdr.markForCheck();
+
+    this.adminUsersService
+      .unbanUser(row.id)
+      .pipe(
+        finalize(() => {
+          this.unbanSubmitting = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.unbanConfirmRow = null;
+          this.unbanSuccess = `${row.name} has been unbanned.`;
+          this.loadDashboardData({ silent: true });
+          this.cdr.markForCheck();
+        },
+        error: (err: unknown) => {
+          this.unbanError = this.extractUnbanError(err);
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  private extractUnbanError(err: unknown): string {
+    if (err instanceof HttpErrorResponse) {
+      const body = err.error;
+      if (body && typeof body === 'object' && 'message' in body && typeof body.message === 'string') {
+        return body.message;
+      }
+    }
+    return 'Could not remove the ban. Try again.';
   }
 
   private filterBySearch<T>(rows: T[], query: string, fieldFns: (row: T) => string[]): T[] {
@@ -1172,7 +1412,359 @@ export class UsersComponent implements OnInit {
     return `${(firstName || '').charAt(0)}${(lastName || '').charAt(0)}`.toUpperCase() || 'U';
   }
 
-  private formatDate(value?: string): string {
+  hasPendingManagerReport(userId: number): boolean {
+    return this.pendingReportByUserId.has(userId);
+  }
+
+  isReportRowHighlighted(userId: number): boolean {
+    return this.highlightedReportUserId === userId;
+  }
+
+  openManagerReportForUser(userId: number, event?: Event): void {
+    event?.stopPropagation();
+    event?.preventDefault();
+    const report = this.pendingReportByUserId.get(userId);
+    if (report) {
+      this.openManagerReportModal(report);
+    }
+  }
+
+  closeManagerReportModal(): void {
+    this.activeManagerReport = null;
+    this.highlightedReportUserId = null;
+    this.reportReviewError = '';
+    this.reportRejectReason = '';
+    this.resetBanDurationForm();
+    this.clearReportQueryParams();
+    this.cdr.markForCheck();
+  }
+
+  selectBanDuration(option: BanDurationOption): void {
+    this.banDuration = option;
+    if (option !== 'custom') {
+      this.banCustomEndDate = '';
+    }
+    this.reportReviewError = '';
+    this.cdr.markForCheck();
+  }
+
+  get banCustomDateMin(): string {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return this.toDateInputValue(today);
+  }
+
+  get isBanDurationValid(): boolean {
+    if (this.banDuration !== 'custom') {
+      return true;
+    }
+    return !!this.resolveBanExpiresAtUtc();
+  }
+
+  get canConfirmBanFromReport(): boolean {
+    return !!this.activeManagerReport && !this.reportReviewSubmitting && this.isBanDurationValid;
+  }
+
+  confirmBanFromReport(): void {
+    if (!this.activeManagerReport || this.reportReviewSubmitting) {
+      return;
+    }
+    if (!this.isBanDurationValid) {
+      this.reportReviewError = 'Choose an end date for a custom ban duration.';
+      this.cdr.markForCheck();
+      return;
+    }
+    this.submitManagerReportReview(true);
+  }
+
+  confirmRejectReport(): void {
+    if (!this.activeManagerReport || this.reportReviewSubmitting) {
+      return;
+    }
+    const reason = this.reportRejectReason.trim();
+    if (!reason) {
+      this.reportReviewError = 'Enter a reason when rejecting a report.';
+      this.cdr.markForCheck();
+      return;
+    }
+    this.submitManagerReportReview(false, reason);
+  }
+
+  private submitManagerReportReview(approve: boolean, rejectionReason?: string): void {
+    const report = this.activeManagerReport;
+    if (!report) {
+      return;
+    }
+
+    this.reportReviewSubmitting = true;
+    this.reportReviewError = '';
+    this.reportReviewSuccess = '';
+    this.cdr.markForCheck();
+
+    this.managerReportsService
+      .reviewReport(report.id, {
+        approve,
+        rejectionReason: approve ? null : rejectionReason
+      })
+      .pipe(
+        switchMap(() =>
+          approve
+            ? this.adminUsersService.banUser(
+                report.reportedUserId,
+                this.buildBanDto(this.buildReportBanReason(report))
+              )
+            : of(null)
+        ),
+        finalize(() => {
+          this.reportReviewSubmitting = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.pendingReportByUserId.delete(report.reportedUserId);
+          this.reportReviewSuccess = approve
+            ? `Report approved. The user has been banned (${this.banDurationSummary()}).`
+            : 'Report rejected. The content creator remains on the platform.';
+          this.activeManagerReport = null;
+          this.highlightedReportUserId = null;
+          this.reportRejectReason = '';
+          this.resetBanDurationForm();
+          this.clearReportQueryParams();
+          this.loadDashboardData({ silent: true });
+          this.cdr.markForCheck();
+        },
+        error: (err: unknown) => {
+          this.reportReviewError = this.extractReportReviewError(err);
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  private isContentCreatorRole(roleName?: string): boolean {
+    return (roleName ?? '').trim().toLowerCase().replace(/[\s-]+/g, '') === 'contentcreator';
+  }
+
+  private buildBanDto(reason: string): BanUserDto {
+    return {
+      reason,
+      banExpiresAtUtc: this.resolveBanExpiresAtUtc()
+    };
+  }
+
+  private buildReportBanReason(report: ManagerReportDto): string {
+    const reason = (report.reason ?? '').trim();
+    if (!reason) {
+      return 'Banned following an upheld manager report.';
+    }
+    return reason.length > 500 ? reason.slice(0, 500) : reason;
+  }
+
+  private extractReportReviewError(err: unknown): string {
+    if (err instanceof HttpErrorResponse) {
+      const body = err.error;
+      if (body && typeof body === 'object' && 'message' in body && typeof body.message === 'string') {
+        return body.message;
+      }
+    }
+    return 'Could not process this report. Try again.';
+  }
+
+  private fetchAllPendingManagerReports(): Observable<ManagerReportDto[]> {
+    return this.managerReportsService
+      .getAllReports({
+        page: 1,
+        pageSize: 100,
+        status: 'Pending',
+        sortBy: 'createdAt',
+        sortOrder: 'desc'
+      })
+      .pipe(
+        switchMap((firstPage) => {
+          const firstItems = (firstPage.items ?? []).filter(
+            (r) => (r.status ?? '').toLowerCase() === 'pending'
+          );
+          const cappedTotal = this.capTotalPages(firstPage.totalPages, MAX_MANAGER_REPORT_PAGES);
+          if (cappedTotal <= 1) {
+            return of(firstItems);
+          }
+
+          const requests = Array.from({ length: cappedTotal - 1 }, (_, i) =>
+            this.managerReportsService.getAllReports({
+              page: i + 2,
+              pageSize: 100,
+              status: 'Pending',
+              sortBy: 'createdAt',
+              sortOrder: 'desc'
+            })
+          );
+
+          return forkJoin(requests).pipe(
+            map((restPages) => [
+              ...firstItems,
+              ...restPages
+                .flatMap((p) => p.items ?? [])
+                .filter((r) => (r.status ?? '').toLowerCase() === 'pending')
+            ])
+          );
+        }),
+        catchError(() => {
+          this.managerReportsLoadError = 'Could not load pending creator reports.';
+          return of([] as ManagerReportDto[]);
+        })
+      );
+  }
+
+  private bindPendingManagerReports(reports: ManagerReportDto[]): void {
+    this.pendingReportByUserId.clear();
+    for (const report of reports) {
+      if ((report.status ?? '').toLowerCase() !== 'pending') {
+        continue;
+      }
+      const existing = this.pendingReportByUserId.get(report.reportedUserId);
+      if (!existing || new Date(report.createdAt).getTime() > new Date(existing.createdAt).getTime()) {
+        this.pendingReportByUserId.set(report.reportedUserId, report);
+      }
+    }
+    this.managerReportsLoadError = '';
+  }
+
+  private tryOpenPendingReportFromQuery(): void {
+    if (!this.pendingReportQuery || this.isLoading) {
+      return;
+    }
+
+    const { reportId, reportedUserId } = this.pendingReportQuery;
+
+    if (reportId) {
+      const fromMap = [...this.pendingReportByUserId.values()].find((r) => r.id === reportId);
+      if (fromMap) {
+        this.pendingReportQuery = null;
+        this.openManagerReportModal(fromMap);
+        return;
+      }
+
+      this.managerReportsService
+        .getReportById(reportId)
+        .pipe(takeUntilDestroyed(this.destroyRef), catchError(() => of(null)))
+        .subscribe((report) => {
+          if (!report || (report.status ?? '').toLowerCase() !== 'pending') {
+            this.pendingReportQuery = null;
+            this.clearReportQueryParams();
+            this.cdr.markForCheck();
+            return;
+          }
+          this.pendingReportByUserId.set(report.reportedUserId, report);
+          this.pendingReportQuery = null;
+          this.openManagerReportModal(report);
+        });
+      return;
+    }
+
+    if (reportedUserId) {
+      const report = this.pendingReportByUserId.get(reportedUserId);
+      this.pendingReportQuery = null;
+      if (report) {
+        this.openManagerReportModal(report);
+      } else {
+        this.clearReportQueryParams();
+        this.highlightedReportUserId = reportedUserId;
+        this.focusAdminDirectoryPageForUser(reportedUserId);
+        this.cdr.markForCheck();
+      }
+    }
+  }
+
+  private openManagerReportModal(report: ManagerReportDto): void {
+    this.activeManagerReport = report;
+    this.highlightedReportUserId = report.reportedUserId;
+    this.reportReviewError = '';
+    this.reportReviewSuccess = '';
+    this.reportRejectReason = '';
+    this.resetBanDurationForm();
+    this.focusAdminDirectoryPageForUser(report.reportedUserId);
+    this.cdr.markForCheck();
+  }
+
+  private resetBanDurationForm(): void {
+    this.banDuration = 'permanent';
+    this.banCustomEndDate = '';
+  }
+
+  banDurationSummary(): string {
+    const endsAt = this.resolveBanExpiresAtUtc();
+    if (this.banDuration === 'permanent' || !endsAt) {
+      return 'permanent';
+    }
+    return `until ${this.formatDate(endsAt)}`;
+  }
+
+  /** ISO UTC expiry for `POST /users/{id}/ban`; `null` = permanent. */
+  private resolveBanExpiresAtUtc(): string | null {
+    if (this.banDuration === 'permanent') {
+      return null;
+    }
+
+    if (this.banDuration === '30-days') {
+      const end = new Date();
+      end.setUTCDate(end.getUTCDate() + 30);
+      return end.toISOString();
+    }
+
+    const raw = this.banCustomEndDate.trim();
+    if (!raw) {
+      return null;
+    }
+
+    const parts = raw.split('-').map((part) => parseInt(part, 10));
+    if (parts.length !== 3 || parts.some((part) => !Number.isFinite(part))) {
+      return null;
+    }
+
+    const end = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2], 23, 59, 59, 999));
+    if (Number.isNaN(end.getTime()) || end.getTime() <= Date.now()) {
+      return null;
+    }
+
+    return end.toISOString();
+  }
+
+  private toDateInputValue(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private focusAdminDirectoryPageForUser(userId: number): void {
+    const index = this.filteredAdminDirectory.findIndex((m) => m.id === userId);
+    if (index < 0) {
+      return;
+    }
+    const page = Math.floor(index / this.adminPageSize) + 1;
+    this.adminCurrentPage = Math.min(Math.max(1, page), this.adminTotalPages);
+  }
+
+  private clearReportQueryParams(): void {
+    const reportId = this.route.snapshot.queryParamMap.get('reportId');
+    const reportedUserId = this.route.snapshot.queryParamMap.get('reportedUserId');
+    if (!reportId && !reportedUserId) {
+      return;
+    }
+
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { reportId: null, reportedUserId: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
+  managerReportSubmittedLabel(report: ManagerReportDto): string {
+    return report.managerName?.trim() || `Manager #${report.managerId}`;
+  }
+
+  formatDate(value?: string): string {
     if (!value) {
       return '—';
     }
