@@ -69,13 +69,6 @@ interface BannedUserRow {
   bannedAtSort: number;
 }
 
-interface BanUserModalTarget {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
-}
-
 @Component({
   selector: 'app-users',
   standalone: true,
@@ -204,10 +197,6 @@ export class UsersComponent implements OnInit {
   reportReviewSuccess = '';
   banDuration: BanDurationOption = 'permanent';
   banCustomEndDate = '';
-  banModalTarget: BanUserModalTarget | null = null;
-  banModalReason = '';
-  banModalError = '';
-  banModalSubmitting = false;
 
   bannedUsers: BannedUserRow[] = [];
   bannedUsersSearch = '';
@@ -1456,7 +1445,6 @@ export class UsersComponent implements OnInit {
       this.banCustomEndDate = '';
     }
     this.reportReviewError = '';
-    this.banModalError = '';
     this.cdr.markForCheck();
   }
 
@@ -1475,15 +1463,6 @@ export class UsersComponent implements OnInit {
 
   get canConfirmBanFromReport(): boolean {
     return !!this.activeManagerReport && !this.reportReviewSubmitting && this.isBanDurationValid;
-  }
-
-  get canConfirmBanModal(): boolean {
-    return (
-      !!this.banModalTarget &&
-      !this.banModalSubmitting &&
-      !!this.banModalReason.trim() &&
-      this.isBanDurationValid
-    );
   }
 
   confirmBanFromReport(): void {
@@ -1562,83 +1541,8 @@ export class UsersComponent implements OnInit {
       });
   }
 
-  canBanAccount(roleName: string, isBanned: boolean): boolean {
-    if (isBanned) {
-      return false;
-    }
-    return this.isContentCreatorRole(roleName);
-  }
-
   private isContentCreatorRole(roleName?: string): boolean {
     return (roleName ?? '').trim().toLowerCase().replace(/[\s-]+/g, '') === 'contentcreator';
-  }
-
-  openBanUserModal(target: BanUserModalTarget): void {
-    if (this.banModalSubmitting || this.reportReviewSubmitting) {
-      return;
-    }
-    this.banModalTarget = target;
-    this.banModalReason = '';
-    this.banModalError = '';
-    this.resetBanDurationForm();
-    this.cdr.markForCheck();
-  }
-
-  closeBanUserModal(): void {
-    if (this.banModalSubmitting) {
-      return;
-    }
-    this.banModalTarget = null;
-    this.banModalError = '';
-    this.cdr.markForCheck();
-  }
-
-  confirmBanUserModal(): void {
-    const target = this.banModalTarget;
-    if (!target || this.banModalSubmitting) {
-      return;
-    }
-
-    const reason = this.banModalReason.trim();
-    if (!reason) {
-      this.banModalError = 'Enter a ban reason.';
-      this.cdr.markForCheck();
-      return;
-    }
-
-    if (!this.isBanDurationValid) {
-      this.banModalError = 'Choose a valid end date for a custom ban duration.';
-      this.cdr.markForCheck();
-      return;
-    }
-
-    this.banModalSubmitting = true;
-    this.banModalError = '';
-    this.cdr.markForCheck();
-
-    this.adminUsersService
-      .banUser(target.id, this.buildBanDto(reason))
-      .pipe(
-        finalize(() => {
-          this.banModalSubmitting = false;
-          this.cdr.markForCheck();
-        })
-      )
-      .subscribe({
-        next: () => {
-          const summary = this.banDurationSummary();
-          this.banModalTarget = null;
-          this.banModalReason = '';
-          this.resetBanDurationForm();
-          this.reportReviewSuccess = `${target.name} has been banned (${summary}).`;
-          this.loadDashboardData({ silent: true });
-          this.cdr.markForCheck();
-        },
-        error: (err: unknown) => {
-          this.banModalError = this.extractReportReviewError(err);
-          this.cdr.markForCheck();
-        }
-      });
   }
 
   private buildBanDto(reason: string): BanUserDto {
