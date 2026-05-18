@@ -936,9 +936,62 @@ th {
   color: #b91c1c;
 }
 
+.banned-users-card {
+  margin-top: 18px;
+}
+
+.ban-reason-cell {
+  max-width: 220px;
+  color: #374151;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 .actions {
   width: 60px;
   color: #6b7280;
+}
+
+.actions--banned {
+  width: auto;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.unban-user-btn {
+  border: 1px solid #86efac;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #166534;
+  background: #f0fdf4;
+}
+
+.unban-user-btn:hover:not(:disabled) {
+  background: #dcfce7;
+  border-color: #4ade80;
+}
+
+.unban-user-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.unban-user-btn--confirm {
+  border: 0;
+  color: #fff;
+  background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
+  box-shadow: 0 1px 2px rgba(21, 128, 61, 0.25);
+  padding: 7px 12px;
+  font-size: 12px;
+}
+
+.unban-user-btn--confirm:hover:not(:disabled) {
+  background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
 }
 
 .actions-edit-link {

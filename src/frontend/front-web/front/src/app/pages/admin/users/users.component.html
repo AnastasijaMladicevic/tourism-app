@@ -926,4 +926,158 @@
     </footer>
     </section>
   </ng-container>
+
+  <section
+    class="card banned-users-card"
+    id="banned-users-panel"
+    *ngIf="!isLoading"
+    aria-labelledby="banned-users-heading"
+  >
+    <div class="table-head">
+      <div>
+        <h3 id="banned-users-heading">Banned users</h3>
+        <p>Tourist and content creator accounts with an active ban. Unban restores full platform access.</p>
+      </div>
+    </div>
+
+    <div class="feedback feedback--success" *ngIf="unbanSuccess" role="status">{{ unbanSuccess }}</div>
+
+    <div class="table-toolbar">
+      <label class="sr-only" for="banned-users-search">Search banned users</label>
+      <input
+        id="banned-users-search"
+        type="search"
+        class="table-search"
+        placeholder="Search by name, email, role, reason…"
+        autocomplete="off"
+        [value]="bannedUsersSearch"
+        (input)="onBannedUsersSearchInput($event)"
+      />
+      <span class="table-filter-meta" *ngIf="bannedUsers.length && bannedUsersSearch.trim()">
+        {{ filteredBannedUsers.length }} match(es) of {{ bannedUsers.length }}
+      </span>
+      <button
+        type="button"
+        class="table-search-clear"
+        *ngIf="bannedUsersSearch.trim()"
+        (click)="clearBannedUsersSearch()"
+      >
+        Clear
+      </button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Role</th>
+            <th>Reason</th>
+            <th>Banned on</th>
+            <th>Ban expires</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of visibleBannedUsers">
+            <td>
+              <div class="person">
+                <div class="avatar">{{ row.initials }}</div>
+                <div class="person-text">
+                  <p class="person-name">{{ row.name }}</p>
+                  <p class="person-email">{{ row.email }}</p>
+                </div>
+              </div>
+            </td>
+            <td><span class="role-pill">{{ row.role }}</span></td>
+            <td class="ban-reason-cell">{{ row.banReason }}</td>
+            <td>{{ row.bannedAtLabel }}</td>
+            <td>{{ row.banExpiresLabel }}</td>
+            <td class="actions actions--banned">
+              <a class="actions-edit-link" [routerLink]="['/admin/users/edit', row.id]" title="Edit user">✎</a>
+              <button
+                type="button"
+                class="unban-user-btn"
+                (click)="openUnbanConfirm(row)"
+                [disabled]="unbanSubmitting"
+              >
+                Unban
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="!filteredBannedUsers.length && bannedUsers.length" class="table-empty-row">
+            <td colspan="6">No banned users match your search.</td>
+          </tr>
+          <tr *ngIf="!bannedUsers.length" class="table-empty-row">
+            <td colspan="6">No banned users at the moment.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <footer class="table-footer" *ngIf="bannedUsers.length">
+      <p>Showing {{ bannedPageStart }} to {{ bannedPageEnd }} of {{ bannedTotalCount }} banned users</p>
+      <div class="pagination-buttons">
+        <label class="page-size-control">
+          <span>Page size</span>
+          <select
+            class="page-size-select"
+            [(ngModel)]="bannedPageSize"
+            (ngModelChange)="onBannedPageSizeChange($event)"
+          >
+            <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
+          </select>
+        </label>
+
+        <button
+          type="button"
+          class="ghost-btn slim-btn"
+          (click)="onBannedPreviousPage()"
+          [disabled]="bannedCurrentPage <= 1"
+        >
+          Previous
+        </button>
+        <button
+          type="button"
+          class="ghost-btn slim-btn"
+          (click)="onBannedNextPage()"
+          [disabled]="bannedCurrentPage >= bannedTotalPages"
+        >
+          Next
+        </button>
+      </div>
+    </footer>
+
+    <ng-container *ngIf="unbanConfirmRow as unbanRow">
+      <div class="creator-approve-modal-backdrop" role="presentation" (click)="cancelUnbanConfirm()">
+        <div
+          class="creator-approve-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="unban-user-modal-title"
+          (click)="$event.stopPropagation()"
+        >
+          <h4 id="unban-user-modal-title" class="creator-approve-modal-title">Remove ban</h4>
+          <p class="creator-approve-modal-body">
+            Unban <strong>{{ unbanRow.name }}</strong> ({{ unbanRow.email }})? They will regain access to the
+            platform according to their role.
+          </p>
+          <p class="manager-report-modal-error" *ngIf="unbanError" role="alert">{{ unbanError }}</p>
+          <div class="creator-approve-modal-actions">
+            <button type="button" class="ghost-btn slim-btn" (click)="cancelUnbanConfirm()" [disabled]="unbanSubmitting">
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="unban-user-btn unban-user-btn--confirm"
+              (click)="confirmUnban()"
+              [disabled]="unbanSubmitting"
+            >
+              {{ unbanSubmitting ? 'Removing…' : 'Confirm unban' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </section>
 </div>

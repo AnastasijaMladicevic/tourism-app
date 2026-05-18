@@ -56,6 +56,18 @@ type UsersPageViewTab = 'internal' | 'tourists';
 
 type BanDurationOption = '30-days' | 'indefinite' | 'custom';
 
+interface BannedUserRow {
+  id: number;
+  initials: string;
+  name: string;
+  email: string;
+  role: string;
+  banReason: string;
+  bannedAtLabel: string;
+  banExpiresLabel: string;
+  bannedAtSort: number;
+}
+
 interface AdminBanDurationRecord {
   userId: number;
   reportId: number;
@@ -194,6 +206,15 @@ export class UsersComponent implements OnInit {
   reportReviewSuccess = '';
   banDuration: BanDurationOption = 'indefinite';
   banCustomEndDate = '';
+
+  bannedUsers: BannedUserRow[] = [];
+  bannedUsersSearch = '';
+  bannedCurrentPage = 1;
+  bannedPageSize = 5;
+  unbanConfirmRow: BannedUserRow | null = null;
+  unbanSubmitting = false;
+  unbanError = '';
+  unbanSuccess = '';
 
   private creatorRequestSearchDebounce?: ReturnType<typeof setTimeout>;
   private pendingReportQuery: { reportId?: number; reportedUserId?: number } | null = null;
@@ -608,6 +629,34 @@ export class UsersComponent implements OnInit {
       profileImageUrl: (u.profileImageUrl ?? '').trim() || null,
       initials: this.getInitials(u.firstName, u.lastName)
     }));
+
+    this.bannedUsers = allUsers
+      .filter((u) => u.isBanned)
+      .map((u) => this.mapBannedUserRow(u))
+      .sort((a, b) => b.bannedAtSort - a.bannedAtSort);
+
+    if (this.unbanConfirmRow && !this.bannedUsers.some((row) => row.id === this.unbanConfirmRow!.id)) {
+      this.unbanConfirmRow = null;
+    }
+  }
+
+  private mapBannedUserRow(u: AdminUserListItemDto): BannedUserRow {
+    const bannedAtRaw = u.bannedAtUtc ?? '';
+    const bannedAtDate = bannedAtRaw ? new Date(bannedAtRaw) : null;
+    const bannedAtSort =
+      bannedAtDate && !Number.isNaN(bannedAtDate.getTime()) ? bannedAtDate.getTime() : 0;
+
+    return {
+      id: u.id,
+      initials: this.getInitials(u.firstName, u.lastName),
+      name: `${u.firstName} ${u.lastName}`.trim(),
+      email: u.email,
+      role: u.roleName || 'Unknown',
+      banReason: (u.banReason ?? '').trim() || '—',
+      bannedAtLabel: this.formatDate(u.bannedAtUtc ?? undefined),
+      banExpiresLabel: u.banExpiresAtUtc ? this.formatDate(u.banExpiresAtUtc ?? undefined) : 'Permanent',
+      bannedAtSort
+    };
   }
 
   get filteredAdminDirectory(): typeof this.adminMembers {
@@ -629,6 +678,47 @@ export class UsersComponent implements OnInit {
       t.joinedDate,
       t.initials
     ]);
+  }
+
+  get filteredBannedUsers(): BannedUserRow[] {
+    return this.filterBySearch(this.bannedUsers, this.bannedUsersSearch, (row) => [
+      row.name,
+      row.email,
+      row.role,
+      row.banReason,
+      row.bannedAtLabel,
+      row.banExpiresLabel,
+      row.initials
+    ]);
+  }
+
+  get bannedTotalCount(): number {
+    return this.filteredBannedUsers.length;
+  }
+
+  get bannedTotalPages(): number {
+    if (!this.bannedTotalCount || this.bannedPageSize < 1) {
+      return 1;
+    }
+    return Math.max(1, Math.ceil(this.bannedTotalCount / this.bannedPageSize));
+  }
+
+  get visibleBannedUsers(): BannedUserRow[] {
+    const page = Math.min(Math.max(1, this.bannedCurrentPage), this.bannedTotalPages);
+    const start = (page - 1) * this.bannedPageSize;
+    return this.filteredBannedUsers.slice(start, start + this.bannedPageSize);
+  }
+
+  get bannedPageStart(): number {
+    if (!this.bannedTotalCount || !this.visibleBannedUsers.length) {
+      return 0;
+    }
+    const page = Math.min(Math.max(1, this.bannedCurrentPage), this.bannedTotalPages);
+    return (page - 1) * this.bannedPageSize + 1;
+  }
+
+  get bannedPageEnd(): number {
+    return this.bannedPageStart + this.visibleBannedUsers.length - 1;
   }
 
   get adminTotalCount(): number {
@@ -699,6 +789,11 @@ export class UsersComponent implements OnInit {
     this.touristCurrentPage = 1;
   }
 
+  onBannedUsersSearchInput(event: Event): void {
+    this.bannedUsersSearch = (event.target as HTMLInputElement).value;
+    this.bannedCurrentPage = 1;
+  }
+
   onAdminPageSizeChange(value: number | string): void {
     this.adminPageSize = Number(value);
     this.adminCurrentPage = 1;
@@ -707,6 +802,11 @@ export class UsersComponent implements OnInit {
   onTouristPageSizeChange(value: number | string): void {
     this.touristPageSize = Number(value);
     this.touristCurrentPage = 1;
+  }
+
+  onBannedPageSizeChange(value: number | string): void {
+    this.bannedPageSize = Number(value);
+    this.bannedCurrentPage = 1;
   }
 
   onAdminPreviousPage(): void {
@@ -731,6 +831,84 @@ export class UsersComponent implements OnInit {
     if (this.touristCurrentPage < this.touristTotalPages) {
       this.touristCurrentPage++;
     }
+  }
+
+  onBannedPreviousPage(): void {
+    if (this.bannedCurrentPage > 1) {
+      this.bannedCurrentPage--;
+    }
+  }
+
+  onBannedNextPage(): void {
+    if (this.bannedCurrentPage < this.bannedTotalPages) {
+      this.bannedCurrentPage++;
+    }
+  }
+
+  clearBannedUsersSearch(): void {
+    this.bannedUsersSearch = '';
+    this.bannedCurrentPage = 1;
+  }
+
+  openUnbanConfirm(row: BannedUserRow): void {
+    if (this.unbanSubmitting) {
+      return;
+    }
+    this.unbanError = '';
+    this.unbanSuccess = '';
+    this.unbanConfirmRow = row;
+    this.cdr.markForCheck();
+  }
+
+  cancelUnbanConfirm(): void {
+    if (this.unbanSubmitting) {
+      return;
+    }
+    this.unbanConfirmRow = null;
+    this.unbanError = '';
+    this.cdr.markForCheck();
+  }
+
+  confirmUnban(): void {
+    const row = this.unbanConfirmRow;
+    if (!row || this.unbanSubmitting) {
+      return;
+    }
+
+    this.unbanSubmitting = true;
+    this.unbanError = '';
+    this.cdr.markForCheck();
+
+    this.adminUsersService
+      .unbanUser(row.id)
+      .pipe(
+        finalize(() => {
+          this.unbanSubmitting = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.unbanConfirmRow = null;
+          this.unbanSuccess = `${row.name} has been unbanned.`;
+          this.loadDashboardData({ silent: true });
+          this.cdr.markForCheck();
+        },
+        error: (err: unknown) => {
+          this.unbanError = this.extractUnbanError(err);
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  private extractUnbanError(err: unknown): string {
+    if (err instanceof HttpErrorResponse) {
+      const body = err.error;
+      if (body && typeof body === 'object' && 'message' in body && typeof body.message === 'string') {
+        return body.message;
+      }
+    }
+    return 'Could not remove the ban. Try again.';
   }
 
   private filterBySearch<T>(rows: T[], query: string, fieldFns: (row: T) => string[]): T[] {
