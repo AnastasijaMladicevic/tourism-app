@@ -1,136 +1,158 @@
-<div class="dashboard">
-
-  <header class="page-header">
-    <div class="page-intro">
-      <h1 class="page-title">Control center</h1>
-      <p class="page-sub">Platform users, moderation queues, and governance — live from your API.</p>
+<section class="admin-dashboard">
+  <div class="page-head">
+    <div>
+      <p class="breadcrumbs">Main Menu <span>&gt;</span> Dashboard</p>
+      <h1>Admin Dashboard</h1>
+      <p class="subtle-text">
+        Welcome back{{ user?.firstName ? ', ' + user?.firstName : '' }}. Platform overview and moderation at a glance.
+      </p>
     </div>
-    <button type="button" class="pill-select" (click)="reload()" [disabled]="isLoading">
-      <svg width="14" height="14" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-        <path d="M4 4v6h6M18 18v-6h-6"/>
-        <path d="M5.5 16.5a7 7 0 0011-2.2M16.5 5.5a7 7 0 00-11 2.2"/>
-      </svg>
-      Refresh
+    <button type="button" class="refresh-btn" (click)="reload()" [disabled]="isLoading" title="Refresh data">
+      <span class="material-symbols-outlined" [class.spin]="isLoading">refresh</span>
     </button>
-  </header>
+  </div>
 
   <p class="state-banner error" *ngIf="loadError">{{ loadError }}</p>
   <p class="state-banner loading" *ngIf="isLoading && !loadError">Loading platform overview…</p>
 
-  <section class="kpi-grid" aria-label="Key metrics" *ngIf="!isLoading || totalTourists">
-    <article class="kpi-card">
-      <div class="kpi-top">
-        <span class="kpi-label">Registered tourists</span>
-        <span class="kpi-icon indigo" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
-            <circle cx="11" cy="8" r="4"/><path d="M3 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
-          </svg>
+  <div class="stats-strip card" *ngIf="!isLoading">
+    <div class="stat-chip">
+      <span class="stat-value">{{ totalTourists | number }}</span>
+      <span class="stat-label">Tourists</span>
+      <span class="stat-meta" *ngIf="newTourists7d > 0">+{{ newTourists7d }} this week</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-value">{{ teamTotal | number }}</span>
+      <span class="stat-label">Team members</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-value">{{ destinationCount | number }}</span>
+      <span class="stat-label">Destinations</span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-value">{{ bannedUsers | number }}</span>
+      <span class="stat-label">Banned accounts</span>
+    </div>
+  </div>
+
+  <div class="dashboard-grid" *ngIf="!isLoading">
+    <a class="dash-card card" routerLink="/admin/users" [queryParams]="{ tab: 'tourists' }">
+      <div class="card-icon-wrap" data-tone="purple">
+        <span class="material-symbols-outlined">groups</span>
+      </div>
+      <div class="card-copy">
+        <h2>Tourists &amp; moderation</h2>
+        <p>Review tourist accounts, bans, and content creator role requests.</p>
+        <span class="card-cta">
+          Open users
+          <span class="material-symbols-outlined">arrow_forward</span>
         </span>
       </div>
-      <div class="kpi-value">{{ totalTourists | number }}</div>
-      <span class="trend-pill" [class.up]="newTourists7d > 0" [class.neutral]="newTourists7d === 0">
-        +{{ newTourists7d }} <span class="trend-muted">last 7 days</span>
-        <span class="trend-muted" *ngIf="touristSignupDeltaPercent !== 0"> · {{ touristSignupDeltaPercent }}% vs prior week</span>
+    </a>
+
+    <a
+      class="dash-card card"
+      [class.moderation-card]="pendingCreatorRequests > 0"
+      routerLink="/admin/users"
+      [queryParams]="{ tab: 'tourists' }"
+    >
+      <div class="card-icon-wrap" data-tone="amber">
+        <span class="material-symbols-outlined">verified</span>
+      </div>
+      <div class="card-copy">
+        <h2>Creator role requests</h2>
+        <p>Approve or reject tourists requesting Content Creator access.</p>
+        <span class="card-cta">
+          Review queue
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </span>
+      </div>
+      <span class="pending-pill" *ngIf="pendingCreatorRequests > 0">
+        {{ pendingCreatorRequests }} pending
       </span>
-    </article>
+    </a>
 
-    <article class="kpi-card kpi-alert" [class.has-pending]="pendingCreatorRequests > 0">
-      <div class="kpi-top">
-        <span class="kpi-label">Creator requests</span>
-        <span class="kpi-icon violet" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
-            <path d="M11 2l2.5 5 5.5.8-4 3.9 1 5.2-4.7 2.8 1.2 5-4.5-2.4-2.4 5.5-.8-4-3.9 1-5.2 4.7-2.8-1.2-5 4.5 2.4z"/>
-          </svg>
+    <a
+      class="dash-card card"
+      [class.moderation-card]="pendingManagerReports > 0"
+      routerLink="/admin/users"
+      [queryParams]="{ tab: 'tourists' }"
+    >
+      <div class="card-icon-wrap" data-tone="red">
+        <span class="material-symbols-outlined">flag</span>
+      </div>
+      <div class="card-copy">
+        <h2>Manager escalations</h2>
+        <p>Review reports from managers about content creators in their destination.</p>
+        <span class="card-cta">
+          View escalations
+          <span class="material-symbols-outlined">arrow_forward</span>
         </span>
       </div>
-      <div class="kpi-value">{{ pendingCreatorRequests | number }}</div>
-      <a class="trend-pill neutral" routerLink="/admin/users" [queryParams]="{ tab: 'tourists' }">Review queue →</a>
-    </article>
-
-    <article class="kpi-card kpi-alert" [class.has-pending]="pendingManagerReports > 0">
-      <div class="kpi-top">
-        <span class="kpi-label">Manager reports</span>
-        <span class="kpi-icon amber" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
-            <path d="M4 4h14v14H4z"/><path d="M11 7v5M11 15h.01"/>
-          </svg>
-        </span>
-      </div>
-      <div class="kpi-value">{{ pendingManagerReports | number }}</div>
-      <span class="trend-pill neutral">Pending admin review</span>
-    </article>
-
-    <article class="kpi-card">
-      <div class="kpi-top">
-        <span class="kpi-label">Banned accounts</span>
-        <span class="kpi-icon slate" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
-            <circle cx="11" cy="11" r="8"/><path d="M7 7l8 8"/>
-          </svg>
-        </span>
-      </div>
-      <div class="kpi-value">{{ bannedUsers | number }}</div>
-      <span class="trend-pill neutral">Tourists &amp; creators (loaded)</span>
-    </article>
-
-    <article class="kpi-card">
-      <div class="kpi-top">
-        <span class="kpi-label">Platform team</span>
-        <span class="kpi-icon teal" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
-            <circle cx="8" cy="7" r="3"/><path d="M2 19c0-3.3 2.7-6 6-6"/>
-            <circle cx="16" cy="9" r="2.5"/><path d="M13 19c0-2.5 1.8-4.5 4-4.5"/>
-          </svg>
-        </span>
-      </div>
-      <div class="kpi-value">{{ teamTotal | number }}</div>
-      <span class="trend-pill neutral">
-        {{ teamAdmins }} admin · {{ teamManagers }} mgr · {{ teamCreators }} CC
+      <span class="pending-pill" *ngIf="pendingManagerReports > 0">
+        {{ pendingManagerReports }} pending
       </span>
-    </article>
+    </a>
 
-    <article class="kpi-card">
-      <div class="kpi-top">
-        <span class="kpi-label">Destinations</span>
-        <span class="kpi-icon indigo" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
-            <path d="M11 2C8.2 2 6 4.2 6 7c0 4.5 5 11 5 11s5-6.5 5-11c0-2.8-2.2-5-5-5z"/><circle cx="11" cy="7" r="2"/>
-          </svg>
+    <a class="dash-card card" routerLink="/admin/users">
+      <div class="card-icon-wrap" data-tone="blue">
+        <span class="material-symbols-outlined">badge</span>
+      </div>
+      <div class="card-copy">
+        <h2>Team directory</h2>
+        <p>Manage admins, managers, and content creators on the platform.</p>
+        <span class="card-cta">
+          Manage team
+          <span class="material-symbols-outlined">arrow_forward</span>
         </span>
       </div>
-      <div class="kpi-value">{{ destinationCount | number }}</div>
-      <a class="trend-pill neutral" routerLink="/admin/destinations">Manage destinations →</a>
-    </article>
-  </section>
+    </a>
 
-  <section class="analytics-grid" *ngIf="!isLoading">
-    <article class="panel panel-wide">
-      <div class="panel-head">
+    <a class="dash-card card" routerLink="/admin/destinations">
+      <div class="card-icon-wrap" data-tone="green">
+        <span class="material-symbols-outlined">location_on</span>
+      </div>
+      <div class="card-copy">
+        <h2>Destinations</h2>
+        <p>Create destinations, assign managers, and configure regional structure.</p>
+        <span class="card-cta">
+          Manage destinations
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </span>
+      </div>
+    </a>
+  </div>
+
+  <div class="overview-grid" *ngIf="!isLoading">
+    <article class="card insight-card chart-card">
+      <div class="section-head">
         <div>
-          <h2 class="panel-title">Tourist registrations</h2>
-          <p class="panel-desc">{{ touristChartSubtitle }}</p>
+          <h3>Tourist registrations</h3>
+          <p>{{ touristChartSubtitle }}</p>
         </div>
-        <a class="text-link" routerLink="/admin/users" [queryParams]="{ tab: 'tourists' }">All tourists</a>
+        <a class="section-link" routerLink="/admin/users" [queryParams]="{ tab: 'tourists' }">All tourists</a>
       </div>
-      <div class="chart-legend">
-        <span class="legend-item"><i class="dot solid"></i> New signups per day</span>
-      </div>
-      <div class="line-chart-wrap chart-with-axis">
+      <div class="chart-wrap">
         <div class="chart-y-axis" aria-hidden="true">
           <span>{{ touristChartYTopLabel }}</span>
           <span>{{ touristChartYMidLabel }}</span>
           <span>0</span>
         </div>
         <div class="chart-surface">
-          <svg class="line-chart" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg">
             <defs>
-              <linearGradient id="signupFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#4f46e5" stop-opacity="0.2"/>
-                <stop offset="100%" stop-color="#4f46e5" stop-opacity="0"/>
+              <linearGradient id="adminSignupFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#1976d2" stop-opacity="0.18" />
+                <stop offset="100%" stop-color="#1976d2" stop-opacity="0" />
               </linearGradient>
             </defs>
-            <path *ngIf="touristChartAreaSignups" [attr.d]="touristChartAreaSignups" fill="url(#signupFill)"/>
-            <path *ngIf="touristChartLineSignups" [attr.d]="touristChartLineSignups" class="line-primary" fill="none"/>
+            <path *ngIf="touristChartAreaSignups" [attr.d]="touristChartAreaSignups" fill="url(#adminSignupFill)" />
+            <path
+              *ngIf="touristChartLineSignups"
+              [attr.d]="touristChartLineSignups"
+              class="chart-line"
+              fill="none"
+            />
           </svg>
           <p class="chart-empty" *ngIf="touristChartIsEmpty">No signups in the last {{ chartDays }} days.</p>
         </div>
@@ -140,190 +162,133 @@
       </div>
     </article>
 
-    <article class="panel">
-      <div class="panel-head">
-        <h2 class="panel-title">Tourist account health</h2>
-        <p class="panel-desc">Among loaded tourist accounts</p>
-      </div>
-      <ul class="health-list">
-        <li>
-          <span class="health-label">Active</span>
-          <div class="health-track"><div class="health-fill active" [style.width.%]="touristStatusTotal() ? (activeTourists / touristStatusTotal()) * 100 : 0"></div></div>
-          <span class="health-val">{{ activeTourists }}</span>
-        </li>
-        <li>
-          <span class="health-label">Inactive</span>
-          <div class="health-track"><div class="health-fill inactive" [style.width.%]="touristStatusTotal() ? (inactiveTourists / touristStatusTotal()) * 100 : 0"></div></div>
-          <span class="health-val">{{ inactiveTourists }}</span>
-        </li>
-        <li>
-          <span class="health-label">Banned</span>
-          <div class="health-track"><div class="health-fill banned" [style.width.%]="touristStatusTotal() ? (bannedTourists / touristStatusTotal()) * 100 : 0"></div></div>
-          <span class="health-val">{{ bannedTourists }}</span>
-        </li>
-      </ul>
-    </article>
-
-    <article class="panel">
-      <div class="panel-head">
-        <h2 class="panel-title">Manager report outcomes</h2>
-        <p class="panel-desc">{{ reportStatusTotal() | number }} total escalations</p>
-      </div>
-      <div class="stacked-bar" *ngIf="reportStatusTotal() > 0" aria-hidden="true">
-        <span *ngFor="let s of reportStatusSlices"
-              class="stack-segment"
-              [style.width.%]="s.percent"
-              [style.background]="s.color">
-        </span>
-      </div>
-      <p class="empty-note" *ngIf="reportStatusTotal() === 0">No manager reports yet.</p>
-      <ul class="category-list">
-        <li *ngFor="let s of reportStatusSlices">
-          <span class="cat-dot" [style.background]="s.color"></span>
-          <span class="cat-name">{{ s.label }}</span>
-          <span class="cat-val">{{ s.count | number }}</span>
-        </li>
-      </ul>
-    </article>
-  </section>
-
-  <section class="moderation-grid" *ngIf="!isLoading">
-    <article class="panel">
-      <div class="panel-head">
+    <article class="card insight-card">
+      <div class="section-head">
         <div>
-          <h2 class="panel-title">Creator role requests</h2>
-          <p class="panel-desc">{{ pendingCreatorRequests | number }} pending</p>
-        </div>
-        <a class="text-link" routerLink="/admin/users" [queryParams]="{ tab: 'tourists' }">Open queue</a>
-      </div>
-      <p class="empty-note" *ngIf="!pendingCreatorQueue.length">No pending requests right now.</p>
-      <ul class="queue-list" *ngIf="pendingCreatorQueue.length">
-        <li *ngFor="let r of pendingCreatorQueue">
-          <div class="queue-main">
-            <strong>{{ r.firstName }} {{ r.lastName }}</strong>
-            <span class="queue-sub">{{ r.email }}</span>
-          </div>
-          <span class="queue-time">{{ formatRelative(r.createdAt) }}</span>
-        </li>
-      </ul>
-    </article>
-
-    <article class="panel">
-      <div class="panel-head">
-        <div>
-          <h2 class="panel-title">Manager escalations</h2>
-          <p class="panel-desc">{{ pendingManagerReports | number }} awaiting review</p>
+          <h3>Platform snapshot</h3>
+          <p>Account health and escalation outcomes</p>
         </div>
       </div>
-      <p class="empty-note" *ngIf="!pendingReportQueue.length">No pending escalations.</p>
-      <ul class="queue-list" *ngIf="pendingReportQueue.length">
-        <li *ngFor="let r of pendingReportQueue">
-          <div class="queue-main">
-            <strong>{{ r.reportedUserName }}</strong>
-            <span class="queue-sub">{{ r.destinationName }} · {{ r.managerName }}</span>
-            <span class="queue-reason">{{ r.reason }}</span>
+      <ul class="snapshot-list">
+        <li>
+          <span class="snapshot-label">Active tourists</span>
+          <div class="snapshot-track">
+            <div
+              class="snapshot-fill active"
+              [style.width.%]="touristStatusTotal() ? (activeTourists / touristStatusTotal()) * 100 : 0"
+            ></div>
           </div>
-          <span class="queue-time">{{ formatRelative(r.createdAt) }}</span>
+          <span class="snapshot-val">{{ activeTourists }}</span>
+        </li>
+        <li>
+          <span class="snapshot-label">Inactive</span>
+          <div class="snapshot-track">
+            <div
+              class="snapshot-fill inactive"
+              [style.width.%]="touristStatusTotal() ? (inactiveTourists / touristStatusTotal()) * 100 : 0"
+            ></div>
+          </div>
+          <span class="snapshot-val">{{ inactiveTourists }}</span>
+        </li>
+        <li>
+          <span class="snapshot-label">Banned</span>
+          <div class="snapshot-track">
+            <div
+              class="snapshot-fill banned"
+              [style.width.%]="touristStatusTotal() ? (bannedTourists / touristStatusTotal()) * 100 : 0"
+            ></div>
+          </div>
+          <span class="snapshot-val">{{ bannedTourists }}</span>
         </li>
       </ul>
-    </article>
-
-    <article class="panel">
-      <div class="panel-head">
-        <h2 class="panel-title">Top tourist origins</h2>
-        <p class="panel-desc">By country (loaded tourists)</p>
-      </div>
-      <p class="empty-note" *ngIf="!topOrigins.length">No country data on tourist profiles.</p>
-      <ul class="region-bars" *ngIf="topOrigins.length">
-        <li *ngFor="let r of topOrigins">
-          <div class="region-row">
-            <span class="region-name">{{ r.name }}</span>
-            <span class="region-count">{{ r.users | number }}</span>
-          </div>
-          <div class="region-track">
-            <div class="region-fill" [style.width.%]="r.barPercent"></div>
-          </div>
-        </li>
-      </ul>
-    </article>
-  </section>
-
-  <section class="bottom-grid" *ngIf="!isLoading">
-    <article class="panel activity-panel">
-      <div class="panel-head">
-        <div>
-          <h2 class="panel-title">Recent platform activity</h2>
-          <p class="panel-desc">Signups, requests, reports, and bans (synthesized)</p>
+      <div class="report-breakdown" *ngIf="reportStatusTotal() > 0">
+        <p class="report-breakdown-title">Manager reports ({{ reportStatusTotal() | number }})</p>
+        <div class="stacked-bar">
+          <span
+            *ngFor="let s of reportStatusSlices"
+            class="stack-segment"
+            [style.width.%]="s.percent"
+            [style.background]="s.color"
+          ></span>
         </div>
-        <a class="text-link" routerLink="/admin/activity-log">Activity log</a>
+        <ul class="legend-list">
+          <li *ngFor="let s of reportStatusSlices">
+            <span class="legend-dot" [style.background]="s.color"></span>
+            {{ s.label }} · {{ s.count | number }}
+          </li>
+        </ul>
+      </div>
+      <p class="empty-note" *ngIf="reportStatusTotal() === 0">No manager escalations recorded yet.</p>
+    </article>
+
+    <article class="card insight-card queue-card">
+      <div class="section-head">
+        <div>
+          <h3>Pending moderation</h3>
+          <p>Items needing your attention</p>
+        </div>
+      </div>
+      <div class="queue-block" *ngIf="pendingCreatorQueue.length">
+        <h4>Creator requests</h4>
+        <ul class="mini-queue">
+          <li *ngFor="let r of pendingCreatorQueue">
+            <span class="mini-queue-name">{{ r.firstName }} {{ r.lastName }}</span>
+            <span class="mini-queue-time">{{ formatRelative(r.createdAt) }}</span>
+          </li>
+        </ul>
+      </div>
+      <div class="queue-block" *ngIf="pendingReportQueue.length">
+        <h4>Manager escalations</h4>
+        <ul class="mini-queue">
+          <li *ngFor="let r of pendingReportQueue">
+            <span class="mini-queue-name">{{ r.reportedUserName }}</span>
+            <span class="mini-queue-time">{{ formatRelative(r.createdAt) }}</span>
+          </li>
+        </ul>
+      </div>
+      <p class="empty-note" *ngIf="!pendingCreatorQueue.length && !pendingReportQueue.length">
+        Nothing pending — you're all caught up.
+      </p>
+    </article>
+
+    <article class="card insight-card activity-card">
+      <div class="section-head">
+        <div>
+          <h3>Recent activity</h3>
+          <p>Signups, requests, reports, and bans</p>
+        </div>
+        <a class="section-link" routerLink="/admin/activity-log">Full log</a>
       </div>
       <p class="empty-note" *ngIf="!activityFeed.length">No recent events in loaded data.</p>
-      <ul class="activity-list" *ngIf="activityFeed.length">
-        <li class="activity-item" *ngFor="let item of activityFeed">
-          <a class="activity-link" [routerLink]="item.routerLink" [queryParams]="item.queryParams">
-            <span class="act-avatar" [ngClass]="item.avatarTone">{{ item.initials }}</span>
-            <div class="act-body">
-              <p class="act-text">
-                <strong>{{ item.title }}</strong> — {{ item.detail }}
-              </p>
-              <div class="act-meta">
-                {{ item.timeLabel }}
-                <span class="act-role">{{ item.roleBadge }}</span>
-              </div>
-            </div>
-            <svg class="act-chevron" width="14" height="14" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path d="M8 5l6 6-6 6"/>
-            </svg>
+      <ul class="activity-feed" *ngIf="activityFeed.length">
+        <li *ngFor="let item of activityFeed">
+          <a class="activity-row" [routerLink]="item.routerLink" [queryParams]="item.queryParams">
+            <span class="activity-avatar" [attr.data-tone]="item.avatarTone">{{ item.initials }}</span>
+            <span class="activity-copy">
+              <strong>{{ item.title }}</strong>
+              <span>{{ item.detail }}</span>
+            </span>
+            <span class="activity-meta">
+              <span class="activity-badge">{{ item.roleBadge }}</span>
+              {{ item.timeLabel }}
+            </span>
           </a>
         </li>
       </ul>
     </article>
 
-    <div class="bottom-sidebar">
-      <article class="panel quick-panel">
-      <div class="panel-head">
-        <h2 class="panel-title">Quick actions</h2>
-      </div>
-      <div class="quick-actions">
-        <a class="quick-card" routerLink="/admin/users" [queryParams]="{ tab: 'tourists' }">
-          <span class="quick-title">Users &amp; moderation</span>
-          <span class="quick-desc">Tourists, bans, creator approvals</span>
-        </a>
-        <a class="quick-card" routerLink="/admin/users">
-          <span class="quick-title">Team directory</span>
-          <span class="quick-desc">Admins, managers, content creators</span>
-        </a>
-        <a class="quick-card" routerLink="/admin/destinations">
-          <span class="quick-title">Destinations</span>
-          <span class="quick-desc">{{ destinationCount }} destinations on platform</span>
-        </a>
-        <a class="quick-card" routerLink="/admin/users/create">
-          <span class="quick-title">Add team member</span>
-          <span class="quick-desc">Create manager or admin account</span>
-        </a>
-      </div>
-      </article>
-
-      <article class="panel map-panel">
-        <div class="panel-head">
-          <div>
-            <h2 class="panel-title">Platform map</h2>
-            <p class="panel-desc">Destinations with coordinates from the API</p>
-          </div>
-          <a class="text-link" routerLink="/admin/map">Expand</a>
-        </div>
-        <div id="dashboard-map" class="map-container" role="img" aria-label="Map of platform destinations"></div>
-        <div class="map-meta">
-          <div>
-            <span class="map-meta-label">On map</span>
-            <span class="map-meta-val">{{ mapMarkerCount | number }} / {{ destinationCount | number }}</span>
-          </div>
-          <p class="map-meta-hint" *ngIf="destinationCount > mapMarkerCount">
-            Some destinations have no coordinates yet.
+    <article class="card insight-card map-card">
+      <div class="section-head">
+        <div>
+          <h3>Platform map</h3>
+          <p>
+            {{ mapMarkerCount | number }} of {{ destinationCount | number }} destinations on map
+            <span *ngIf="destinationCount > mapMarkerCount"> · some lack coordinates</span>
           </p>
         </div>
-      </article>
-    </div>
-  </section>
-
-</div>
+        <a class="section-link" routerLink="/admin/map">Expand</a>
+      </div>
+      <div id="dashboard-map" class="map-container" role="img" aria-label="Map of platform destinations"></div>
+    </article>
+  </div>
+</section>

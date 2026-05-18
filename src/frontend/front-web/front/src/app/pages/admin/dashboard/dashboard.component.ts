@@ -23,6 +23,8 @@ import {
 } from '../../../services/manager-reports.service';
 import { DestinationDto, DestinationService } from '../../../services/destination.service';
 import { MapService } from '../../../services/map.service';
+import { AuthService } from '../../../services/auth.service';
+import { UserDto } from '../../../models/user.model';
 
 const CHART_DAYS = 14;
 const MAX_USER_PAGES = 25;
@@ -65,8 +67,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly managerReports = inject(ManagerReportsService);
   private readonly destinationService = inject(DestinationService);
   private readonly mapService = inject(MapService);
+  private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly cdr = inject(ChangeDetectorRef);
+
+  user: UserDto | null = null;
 
   private mapViewReady = false;
   private mapDestinations: DestinationDto[] = [];
@@ -109,6 +114,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly chartDays = CHART_DAYS;
 
   ngOnInit(): void {
+    this.user = this.authService.getUser();
     this.loadDashboard();
   }
 
