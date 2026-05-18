@@ -951,13 +951,13 @@
   <section
     class="card banned-users-card"
     id="banned-users-panel"
-    *ngIf="!isLoading"
+    *ngIf="usersViewTab === 'internal' && !isLoading"
     aria-labelledby="banned-users-heading"
   >
     <div class="table-head">
       <div>
-        <h3 id="banned-users-heading">Banned users</h3>
-        <p>Tourist and content creator accounts with an active ban. Unban restores full platform access.</p>
+        <h3 id="banned-users-heading">Banned team members</h3>
+        <p>Content creators with an active ban. Unban restores their access to the platform.</p>
       </div>
     </div>
 
@@ -1030,7 +1030,7 @@
             <td colspan="6">No banned users match your search.</td>
           </tr>
           <tr *ngIf="!bannedUsers.length" class="table-empty-row">
-            <td colspan="6">No banned users at the moment.</td>
+            <td colspan="6">No banned content creators at the moment.</td>
           </tr>
         </tbody>
       </table>

@@ -633,7 +633,7 @@ export class UsersComponent implements OnInit {
     }));
 
     this.bannedUsers = allUsers
-      .filter((u) => u.isBanned)
+      .filter((u) => u.isBanned && this.isContentCreatorRole(u.roleName))
       .map((u) => this.mapBannedUserRow(u))
       .sort((a, b) => b.bannedAtSort - a.bannedAtSort);
 
@@ -1566,8 +1566,11 @@ export class UsersComponent implements OnInit {
     if (isBanned) {
       return false;
     }
-    const role = (roleName ?? '').trim().toLowerCase().replace(/[\s-]+/g, '');
-    return role === 'tourist' || role === 'contentcreator';
+    return this.isContentCreatorRole(roleName);
+  }
+
+  private isContentCreatorRole(roleName?: string): boolean {
+    return (roleName ?? '').trim().toLowerCase().replace(/[\s-]+/g, '') === 'contentcreator';
   }
 
   openBanUserModal(target: BanUserModalTarget): void {
