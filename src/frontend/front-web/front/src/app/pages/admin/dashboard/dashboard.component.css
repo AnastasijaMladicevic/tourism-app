@@ -23,16 +23,6 @@
   letter-spacing: -0.4px;
 }
 
-.breadcrumbs {
-  font-size: 12px;
-  color: #6b7280;
-  margin: 0;
-}
-
-.breadcrumbs span {
-  margin: 0 4px;
-}
-
 .subtle-text {
   margin: 6px 0 0;
   font-size: 14px;
@@ -274,7 +264,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 14px;
-  align-items: stretch;
+  align-items: start;
 }
 
 .overview-stack {
@@ -288,7 +278,7 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  max-height: min(720px, calc(100vh - 220px));
+  max-height: min(520px, calc(100vh - 240px));
   padding: 0;
   overflow: hidden;
 }
@@ -303,9 +293,12 @@
 .activity-scroll {
   flex: 1;
   min-height: 0;
+  max-height: min(440px, calc(100vh - 320px));
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 8px 12px 16px;
   scrollbar-gutter: stable;
+  overscroll-behavior: contain;
 }
 
 .activity-scroll::-webkit-scrollbar {
@@ -330,6 +323,12 @@
 }
 
 .map-card .map-container {
+  position: relative;
+  min-height: 200px;
+}
+
+.map-card .map-container app-admin-platform-map {
+  display: block;
   min-height: 200px;
 }
 

@@ -1,7 +1,6 @@
 <section class="admin-dashboard">
   <div class="page-head">
     <div>
-      <p class="breadcrumbs">Main Menu <span>&gt;</span> Dashboard</p>
       <h1>Admin Dashboard</h1>
       <p class="subtle-text">
         Welcome back{{ user?.firstName ? ', ' + user?.firstName : '' }}. Platform overview and moderation at a glance.
@@ -264,7 +263,15 @@
             </div>
             <a class="section-link" routerLink="/admin/map">Expand</a>
           </div>
-          <div id="dashboard-map" class="map-container" role="img" aria-label="Map of platform destinations"></div>
+          <div class="map-container" role="img" aria-label="Map of platform destinations">
+            <app-admin-platform-map
+              mapId="dashboard-map"
+              [compact]="true"
+              [destinations]="mapDestinations"
+              [focusRegion]="true"
+              (markersSummary)="onMapMarkersSummary($event)"
+            />
+          </div>
         </article>
       </div>
 

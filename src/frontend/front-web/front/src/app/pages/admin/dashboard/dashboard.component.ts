@@ -1,12 +1,4 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  DestroyRef,
-  OnDestroy,
-  OnInit,
-  inject
-} from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -22,8 +14,11 @@ import {
   ManagerReportsService
 } from '../../../services/manager-reports.service';
 import { DestinationDto, DestinationService } from '../../../services/destination.service';
-import { MapService } from '../../../services/map.service';
 import { AuthService } from '../../../services/auth.service';
+import {
+  AdminPlatformMapComponent,
+  AdminPlatformMapMarkersSummary
+} from '../../../shared/components/admin-platform-map/admin-platform-map.component';
 import { UserDto } from '../../../models/user.model';
 
 const CHART_DAYS = 14;
@@ -58,23 +53,21 @@ interface ReportStatusSlice {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, AdminPlatformMapComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+export class DashboardComponent implements OnInit {
   private readonly adminUsers = inject(AdminUsersService);
   private readonly managerReports = inject(ManagerReportsService);
   private readonly destinationService = inject(DestinationService);
-  private readonly mapService = inject(MapService);
   private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly cdr = inject(ChangeDetectorRef);
 
   user: UserDto | null = null;
 
-  private mapViewReady = false;
-  private mapDestinations: DestinationDto[] = [];
+  mapDestinations: DestinationDto[] = [];
 
   isLoading = true;
   loadError = '';
@@ -118,24 +111,18 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadDashboard();
   }
 
-  ngAfterViewInit(): void {
-    this.mapViewReady = true;
-    this.scheduleMapRender();
-  }
-
-  ngOnDestroy(): void {
-    this.mapService.destroyMap();
-  }
-
   reload(): void {
-    this.mapService.destroyMap();
     this.loadDashboard();
+  }
+
+  onMapMarkersSummary(summary: AdminPlatformMapMarkersSummary): void {
+    this.mapMarkerCount = summary.withCoords;
+    this.cdr.markForCheck();
   }
 
   private loadDashboard(): void {
     this.isLoading = true;
     this.loadError = '';
-    this.mapService.destroyMap();
 
     forkJoin({
       touristTotal: this.fetchRoleTotal('Tourist'),
@@ -166,7 +153,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         finalize(() => {
           this.isLoading = false;
           this.cdr.markForCheck();
-          this.scheduleMapRender();
         })
       )
       .subscribe({
@@ -220,34 +206,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           this.loadError = 'Could not load dashboard data. Check that the API is running and try again.';
         }
       });
-  }
-
-  private scheduleMapRender(): void {
-    if (!this.mapViewReady || this.isLoading) {
-      return;
-    }
-    setTimeout(() => this.renderDashboardMap(), 80);
-  }
-
-  private renderDashboardMap(): void {
-    const container = document.getElementById('dashboard-map');
-    if (!container) {
-      return;
-    }
-
-    this.mapService.destroyMap();
-    this.mapService.initMap('dashboard-map', 42.35, 18.75, 8);
-
-    const withCoords = this.mapDestinations.filter(
-      (d) => d.latitude != null && d.longitude != null && Number.isFinite(d.latitude) && Number.isFinite(d.longitude)
-    );
-
-    withCoords.forEach((d) => {
-      this.mapService.addMainMapMarker(d.latitude!, d.longitude!, d.name);
-    });
-
-    this.mapMarkerCount = withCoords.length;
-    this.cdr.markForCheck();
   }
 
   private fetchAllDestinations() {
