@@ -72,6 +72,11 @@ export class Login {
           return;
         }
 
+        if (response.isBanned && role === 'content-creator') {
+          this.router.navigateByUrl(this.authService.getAccountBannedRoute());
+          return;
+        }
+
         const targetRoute = this.authService.getDashboardRouteForRole(role);
         this.router.navigateByUrl(targetRoute);
       },
