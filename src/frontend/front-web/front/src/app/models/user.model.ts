@@ -65,4 +65,8 @@ export interface AuthResponseDto {
   refreshToken: string;
   user: UserDto;
   expiresAt: string;
+  isBanned?: boolean;
+  banMessage?: string | null;
+  banReason?: string | null;
+  banExpiresAtUtc?: string | null;
 }

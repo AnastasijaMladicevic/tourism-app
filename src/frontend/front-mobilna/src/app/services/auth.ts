@@ -53,6 +53,10 @@ export interface UserDto {
   creatorRoleRequestStatus: 'None' | 'Pending' | 'Approved' | 'Rejected';
   adminAppLoginUrl?: string | null;
   publicAppHomeUrl?: string | null;
+  isBanned?: boolean;
+  banReason?: string | null;
+  banExpiresAtUtc?: string | null;
+  bannedAtUtc?: string | null;
 }
 
 export interface AuthResponseDto {
@@ -64,6 +68,10 @@ export interface AuthResponseDto {
   twoFactorChallengeToken?: string | null;
   twoFactorExpiresAt?: string | null;
   twoFactorDeliveryTarget?: string | null;
+  isBanned?: boolean;
+  banMessage?: string | null;
+  banReason?: string | null;
+  banExpiresAtUtc?: string | null;
 }
 
 export interface PublicAuthSettingsDto {
@@ -189,6 +197,8 @@ export class AuthService {
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
+        sessionStorage.removeItem('spirego-ban-message');
+        window.dispatchEvent(new CustomEvent('auth-user-changed'));
         void this.activeRegionService.loadInitialRegion();
       }),
     );
@@ -272,6 +282,10 @@ export class AuthService {
 
   setCurrentUser(user: UserDto): void {
     localStorage.setItem('user', JSON.stringify(user));
+    if (!user.isBanned) {
+      sessionStorage.removeItem('spirego-ban-message');
+    }
+    window.dispatchEvent(new CustomEvent('auth-user-changed'));
   }
 
   isLoggedIn(): boolean {
@@ -409,6 +423,11 @@ export class AuthService {
     localStorage.setItem('token', response.token);
     localStorage.setItem('refreshToken', response.refreshToken);
     this.setCurrentUser(response.user);
+    if (response.isBanned && response.banMessage?.trim()) {
+      sessionStorage.setItem('spirego-ban-message', response.banMessage.trim());
+    } else {
+      sessionStorage.removeItem('spirego-ban-message');
+    }
     void this.activeRegionService.loadInitialRegion();
   }
 

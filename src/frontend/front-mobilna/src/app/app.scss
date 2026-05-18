@@ -4,6 +4,30 @@
   min-height: 100vh;
 }
 
+.banned-account-banner {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6000;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: min(720px, calc(100vw - 24px));
+  padding: 14px 16px;
+  border: 1px solid rgba(185, 28, 28, 0.16);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(254, 242, 242, 0.98), rgba(254, 226, 226, 0.96));
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.14);
+  color: #7f1d1d;
+  font: 600 14px/1.5 "Segoe UI", sans-serif;
+}
+
+.banned-account-banner strong {
+  color: #b91c1c;
+  white-space: nowrap;
+}
+
 .app-content {
   flex: 1;
   min-width: 0; // sprečava overflow

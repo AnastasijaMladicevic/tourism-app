@@ -520,22 +520,38 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
-        public async Task Login_KadaJeKorisnikBanovan_VracaLocked()
+        public async Task Login_KadaJeKorisnikBanovan_VracaOkSaBanStatusom()
         {
             var mockService = new Mock<IUserService>();
             mockService.Setup(s => s.LoginAsync(It.IsAny<LoginDto>()))
-                .ThrowsAsync(new AccountBannedException(
-                    "Ovaj nalog je banovan do 20.05.2026. 12:00 UTC. Razlog: Test.",
-                    "Test",
-                    new DateTime(2026, 5, 20, 12, 0, 0, DateTimeKind.Utc),
-                    "Tourist"));
+                .ReturnsAsync(new AuthResponseDto
+                {
+                    Token = "jwt",
+                    RefreshToken = "refresh",
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(15),
+                    IsBanned = true,
+                    BanMessage = "Ovaj nalog je banovan do 20.05.2026. 12:00 UTC. Razlog: Test.",
+                    BanReason = "Test",
+                    BanExpiresAtUtc = new DateTime(2026, 5, 20, 12, 0, 0, DateTimeKind.Utc),
+                    User = new UserDto
+                    {
+                        Id = 1,
+                        FirstName = "A",
+                        LastName = "B",
+                        Email = "a@b.com",
+                        RoleName = "Tourist",
+                        IsBanned = true,
+                        BanReason = "Test",
+                        BanExpiresAtUtc = new DateTime(2026, 5, 20, 12, 0, 0, DateTimeKind.Utc)
+                    }
+                });
 
             var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
 
             var result = await controller.Login(new LoginDto { Email = "a@b.com", Password = "pass" });
 
-            var locked = result.Should().BeOfType<ObjectResult>().Subject;
-            locked.StatusCode.Should().Be(423);
+            var ok = result.Should().BeOfType<OkObjectResult>().Subject;
+            ok.Value.Should().NotBeNull();
         }
 
         [Fact]

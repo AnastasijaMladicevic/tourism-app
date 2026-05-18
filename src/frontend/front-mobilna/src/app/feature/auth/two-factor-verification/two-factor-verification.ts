@@ -279,6 +279,7 @@ export class TwoFactorVerificationComponent implements OnInit, OnDestroy {
 
   private handleSuccessfulTouristLogin(): void {
     const role = this.authService.getAuthenticatedRole();
+    const currentUser = this.authService.getCurrentUser();
 
     if (role !== 'tourist') {
       this.errorMessage = this.translationService.translate('login.onlyTourists');
@@ -291,6 +292,12 @@ export class TwoFactorVerificationComponent implements OnInit, OnDestroy {
         },
       });
       this.cdr.detectChanges();
+      return;
+    }
+
+    if (currentUser?.isBanned) {
+      this.pendingActionService.clearAction();
+      this.router.navigateByUrl('/home');
       return;
     }
 

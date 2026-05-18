@@ -13,20 +13,25 @@ import { UserDto } from './models/user.model';
 export class App implements OnInit, OnDestroy {
   protected readonly title = signal('front');
   protected readonly roleRedirectNotice = signal('');
+  protected readonly bannedAccountNotice = signal('');
 
   private readonly roleCheckIntervalMs = 10000;
   private roleCheckTimer?: ReturnType<typeof setInterval>;
   private redirectTimer?: ReturnType<typeof setTimeout>;
   private isRedirectingForRoleChange = false;
+  private readonly syncBanNoticeHandler = () => this.syncBanNotice();
 
   constructor(private readonly authService: AuthService) {}
 
   ngOnInit(): void {
+    this.syncBanNotice();
     this.checkForContentCreatorDowngrade();
     this.roleCheckTimer = setInterval(
       () => this.checkForContentCreatorDowngrade(),
       this.roleCheckIntervalMs,
     );
+    window.addEventListener('auth-user-changed', this.syncBanNoticeHandler);
+    window.addEventListener('banned-user-action-blocked', this.syncBanNoticeHandler);
   }
 
   ngOnDestroy(): void {
@@ -36,6 +41,8 @@ export class App implements OnInit, OnDestroy {
     if (this.redirectTimer) {
       clearTimeout(this.redirectTimer);
     }
+    window.removeEventListener('auth-user-changed', this.syncBanNoticeHandler);
+    window.removeEventListener('banned-user-action-blocked', this.syncBanNoticeHandler);
   }
 
   private checkForContentCreatorDowngrade(): void {
@@ -98,5 +105,41 @@ export class App implements OnInit, OnDestroy {
     }
 
     return role.toLowerCase().replace(/[_\s-]+/g, '');
+  }
+
+  private syncBanNotice(): void {
+    const persistedMessage = sessionStorage.getItem('spirego-admin-ban-message')?.trim();
+    if (persistedMessage) {
+      this.bannedAccountNotice.set(persistedMessage);
+      return;
+    }
+
+    const currentUser = this.authService.getUser();
+    if (!currentUser?.isBanned) {
+      this.bannedAccountNotice.set('');
+      return;
+    }
+
+    const reason = currentUser.banReason?.trim() || 'Krsenje pravila platforme.';
+    const expiresAt = currentUser.banExpiresAtUtc?.trim();
+    this.bannedAccountNotice.set(
+      expiresAt
+        ? `Ovaj nalog je banovan do ${this.formatUtc(expiresAt)}. Razlog: ${reason}`
+        : `Ovaj nalog je trajno banovan. Razlog: ${reason}`,
+    );
+  }
+
+  private formatUtc(value: string): string {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    const day = String(date.getUTCDate()).padStart(2, '0');
+    const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const year = date.getUTCFullYear();
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+    return `${day}.${month}.${year}. ${hours}:${minutes} UTC`;
   }
 }
