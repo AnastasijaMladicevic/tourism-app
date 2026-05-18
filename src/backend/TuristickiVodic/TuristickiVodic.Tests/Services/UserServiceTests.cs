@@ -746,8 +746,8 @@ namespace TuristickiVodic.Tests.Services
             {
                 RefreshToken = "black-refresh"
             }))
-            .Should().ThrowAsync<InvalidOperationException>()
-            .WithMessage("*blacklisted*");
+            .Should().ThrowAsync<AccountBannedException>()
+            .WithMessage("*banovan*");
         }
 
         [Fact]
@@ -1005,8 +1005,8 @@ namespace TuristickiVodic.Tests.Services
             var svc = CreateUserService(ctx, tokenSvc);
 
             await svc.Invoking(s => s.LoginAsync(new LoginDto { Email = "b@b.com", Password = "pass" }))
-                .Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*blacklisted*");
+                .Should().ThrowAsync<AccountBannedException>()
+                .WithMessage("*banovan*");
         }
 
         [Fact]
@@ -1467,8 +1467,8 @@ namespace TuristickiVodic.Tests.Services
             var svc = CreateUserService(ctx, tokenSvc);
 
             await svc.Invoking(s => s.ApproveCreatorRoleAsync(11))
-                .Should().ThrowAsync<InvalidOperationException>()
-                .WithMessage("*blacklisted*");
+                .Should().ThrowAsync<AccountBannedException>()
+                .WithMessage("*banovan*");
         }
 
         [Fact]
@@ -2543,6 +2543,90 @@ namespace TuristickiVodic.Tests.Services
             }))
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*Invalid or expired reset session*");
+        }
+
+        [Fact]
+        public async Task BanUserAsync_KadaJeTurista_BeleziRazlogIVremeIsteka()
+        {
+            using var ctx = CreateInMemoryContext(nameof(BanUserAsync_KadaJeTurista_BeleziRazlogIVremeIsteka));
+            var (tourist, _, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 155,
+                FirstName = "Ban",
+                LastName = "Test",
+                Email = "ban.user@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Test123!"),
+                RoleId = tourist.Id,
+                Role = tourist,
+                IsActive = true,
+                IsBlacklisted = false,
+                DateOfBirth = new DateTime(1995, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+            var expiresAtUtc = DateTime.UtcNow.AddDays(3);
+
+            var result = await service.BanUserAsync(155, new BanUserDto
+            {
+                Reason = "Spam reviews",
+                BanExpiresAtUtc = expiresAtUtc
+            });
+
+            result.Should().NotBeNull();
+            result!.IsBanned.Should().BeTrue();
+            result.BanReason.Should().Be("Spam reviews");
+            result.BanExpiresAtUtc.Should().NotBeNull();
+
+            var user = await ctx.Users.FindAsync(155);
+            user.Should().NotBeNull();
+            user!.IsBlacklisted.Should().BeTrue();
+            user.BanReason.Should().Be("Spam reviews");
+            user.BanExpiresAtUtc.Should().NotBeNull();
+            user.BannedAtUtc.Should().NotBeNull();
+        }
+
+        [Fact]
+        public async Task UnbanUserAsync_KadaJeKorisnikBanovan_CistiBanPolja()
+        {
+            using var ctx = CreateInMemoryContext(nameof(UnbanUserAsync_KadaJeKorisnikBanovan_CistiBanPolja));
+            var (_, cc, _, _) = SeedRoles(ctx);
+
+            ctx.Users.Add(new User
+            {
+                Id = 156,
+                FirstName = "Creator",
+                LastName = "Blocked",
+                Email = "creator.blocked@test.com",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Test123!"),
+                RoleId = cc.Id,
+                Role = cc,
+                IsActive = true,
+                IsBlacklisted = true,
+                BanReason = "Abusive content",
+                BanExpiresAtUtc = DateTime.UtcNow.AddDays(10),
+                BannedAtUtc = DateTime.UtcNow.AddHours(-2),
+                DateOfBirth = new DateTime(1994, 1, 1)
+            });
+            await ctx.SaveChangesAsync();
+
+            var service = CreateUserService(ctx, new Mock<ITokenService>());
+
+            var result = await service.UnbanUserAsync(156);
+
+            result.Should().NotBeNull();
+            result!.IsBanned.Should().BeFalse();
+            result.BanReason.Should().BeNull();
+            result.BanExpiresAtUtc.Should().BeNull();
+
+            var user = await ctx.Users.FindAsync(156);
+            user.Should().NotBeNull();
+            user!.IsBlacklisted.Should().BeFalse();
+            user.BanReason.Should().BeNull();
+            user.BanExpiresAtUtc.Should().BeNull();
+            user.BannedAtUtc.Should().BeNull();
         }
     }
 }

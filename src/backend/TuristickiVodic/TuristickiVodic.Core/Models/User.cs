@@ -58,6 +58,10 @@ namespace TuristickiVodic.Core.Models
 
         public bool IsActive { get; set; } = true;
         public bool IsBlacklisted { get; set; } = false;
+        [MaxLength(500)]
+        public string? BanReason { get; set; }
+        public DateTime? BanExpiresAtUtc { get; set; }
+        public DateTime? BannedAtUtc { get; set; }
         public bool HasRequestedCreatorRole { get; set; } = false;
         public CreatorRoleRequestStatus CreatorRoleRequestStatus { get; set; } = CreatorRoleRequestStatus.None;
         public bool AllowPushNotifications { get; set; } = false;

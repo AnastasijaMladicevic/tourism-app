@@ -123,14 +123,14 @@ export class UsersComponent implements OnInit {
     email: string;
     role: string;
     lastLogin: string;
-    status: 'Active' | 'Inactive';
+    status: 'Active' | 'Inactive' | 'Banned';
   }[] = [];
   tourists: {
     id: number;
     name: string;
     email: string;
     origin: string;
-    status: 'active' | 'inactive';
+    status: 'active' | 'inactive' | 'banned';
     joinedDate: string;
     profileImageUrl: string | null;
     initials: string;
@@ -515,7 +515,7 @@ export class UsersComponent implements OnInit {
       email: u.email,
       role: u.roleName || 'Unknown',
       lastLogin: this.formatDate(u.createdAt),
-      status: u.isActive ? 'Active' : 'Inactive'
+      status: u.isBanned ? 'Banned' : (u.isActive ? 'Active' : 'Inactive')
     }));
 
     this.topOrigins = this.buildTopOrigins(touristsOnly);
@@ -532,7 +532,7 @@ export class UsersComponent implements OnInit {
       name: `${u.firstName} ${u.lastName}`.trim(),
       email: u.email,
       origin: (u.country ?? '').trim() || 'Unknown',
-      status: u.isActive ? 'active' : 'inactive',
+      status: u.isBanned ? 'banned' : (u.isActive ? 'active' : 'inactive'),
       joinedDate: this.formatDate(u.createdAt),
       profileImageUrl: (u.profileImageUrl ?? '').trim() || null,
       initials: this.getInitials(u.firstName, u.lastName)

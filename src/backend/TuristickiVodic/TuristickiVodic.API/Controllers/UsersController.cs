@@ -301,6 +301,10 @@ namespace TuristickiVodic.API.Controllers
 
                 return Ok(NormalizeAuthResponse(response));
             }
+            catch (AccountBannedException ex)
+            {
+                return BuildBannedAccountResponse(ex);
+            }
             catch (InvalidOperationException ex)
             {
                 return BadRequest(new { message = ex.Message });
@@ -318,6 +322,10 @@ namespace TuristickiVodic.API.Controllers
             {
                 var response = await _userService.GoogleLoginAsync(dto);
                 return Ok(NormalizeAuthResponse(response));
+            }
+            catch (AccountBannedException ex)
+            {
+                return BuildBannedAccountResponse(ex);
             }
             catch (InvalidOperationException ex)
             {
@@ -337,6 +345,10 @@ namespace TuristickiVodic.API.Controllers
                 var response = await _userService.VerifyTwoFactorLoginAsync(dto);
                 return Ok(NormalizeAuthResponse(response));
             }
+            catch (AccountBannedException ex)
+            {
+                return BuildBannedAccountResponse(ex);
+            }
             catch (InvalidOperationException ex)
             {
                 return BadRequest(new { message = ex.Message });
@@ -354,6 +366,10 @@ namespace TuristickiVodic.API.Controllers
             {
                 var response = await _userService.ResendTwoFactorLoginCodeAsync(dto);
                 return Ok(response);
+            }
+            catch (AccountBannedException ex)
+            {
+                return BuildBannedAccountResponse(ex);
             }
             catch (InvalidOperationException ex)
             {
@@ -429,6 +445,10 @@ namespace TuristickiVodic.API.Controllers
                     return Unauthorized(new { message = "Invalid or expired refresh token" });
 
                 return Ok(NormalizeAuthResponse(response));
+            }
+            catch (AccountBannedException ex)
+            {
+                return BuildBannedAccountResponse(ex);
             }
             catch (InvalidOperationException ex)
             {
@@ -676,6 +696,45 @@ namespace TuristickiVodic.API.Controllers
         }
 
         // Samo Admin može da aktivira/deaktivira korisnike
+        [HttpPost("{id}/ban")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> BanUser(int id, [FromBody] BanUserDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var user = await _userService.BanUserAsync(id, dto);
+                if (user == null)
+                    return NotFound();
+
+                return Ok(NormalizeUser(user));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("{id}/unban")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UnbanUser(int id)
+        {
+            try
+            {
+                var user = await _userService.UnbanUserAsync(id);
+                if (user == null)
+                    return NotFound();
+
+                return Ok(NormalizeUser(user));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         [HttpPost("{id}/toggle-active")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ToggleActive(int id, [FromBody] ToggleUserActiveDto dto)
@@ -731,6 +790,18 @@ namespace TuristickiVodic.API.Controllers
             return response;
         }
 
+        private IActionResult BuildBannedAccountResponse(AccountBannedException ex)
+        {
+            return StatusCode(423, new
+            {
+                message = ex.Message,
+                isBanned = true,
+                banReason = ex.Reason,
+                banExpiresAtUtc = ex.ExpiresAtUtc,
+                roleName = ex.RoleName
+            });
+        }
+
         private LocationShareDto NormalizeLocationShare(LocationShareDto share)
         {
             if (!Request.Host.HasValue || string.IsNullOrWhiteSpace(share.ShareUrl))
@@ -760,6 +831,7 @@ namespace TuristickiVodic.API.Controllers
 
             user.ProfileImageUrl = BuildAbsoluteProfileImageUrl(user.ProfileImageUrl);
             user.PublicAppHomeUrl = NormalizeCurrentHostAppUrl(user.PublicAppHomeUrl);
+            user.AdminAppLoginUrl = NormalizeCurrentHostAppUrl(user.AdminAppLoginUrl);
             return user;
         }
 
