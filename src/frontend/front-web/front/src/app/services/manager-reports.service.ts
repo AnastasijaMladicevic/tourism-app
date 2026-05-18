@@ -66,4 +66,17 @@ export class ManagerReportsService {
   withdrawReport(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
+
+  /** Admin: all manager escalations (`GET /api/manager-reports`). */
+  getAllReports(query?: ManagerReportQueryParams): Observable<PagedManagerReports> {
+    let params = new HttpParams();
+    if (query) {
+      Object.entries(query).forEach(([key, value]) => {
+        if (value != null && value !== '') {
+          params = params.set(key, String(value));
+        }
+      });
+    }
+    return this.http.get<PagedManagerReports>(this.baseUrl, { params });
+  }
 }
