@@ -681,6 +681,23 @@
       "parks": "Nacionalni parkovi"
     }
   },
+  "appearance": {
+    "title": "Izgled",
+    "kicker": "Tema",
+    "heading": "Izaberi kako SpireGO izgleda",
+    "body": "Prebaci interfejs na svetlu ili tamnu varijantu. Promena se primenjuje odmah i ostaje sačuvana na ovom uređaju.",
+    "appliesImmediately": "Promena se primenjuje odmah i ostaje sačuvana na ovom uređaju.",
+    "options": {
+      "light": {
+        "title": "Svetla tema",
+        "body": "Čist i svetao prikaz za dnevno korišćenje i veću preglednost."
+      },
+      "dark": {
+        "title": "Tamna tema",
+        "body": "Mračnija pozadina i blaži kontrast za večernje korišćenje i manje naprezanje očiju."
+      }
+    }
+  },
   "support": {
     "title": "Pomoć i podrška",
     "heroTitle": "Tu smo da vam pomognemo",

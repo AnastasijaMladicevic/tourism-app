@@ -185,11 +185,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                         user.UpdatedAt = now;
                         await db.SaveChangesAsync();
                     }
-                    else
-                    {
-                        context.Fail("User is banned.");
-                        return;
-                    }
                 }
 
                 var tokenRole = NormalizeRoleValue(context.Principal?.FindFirst(ClaimTypes.Role)?.Value);
@@ -290,6 +285,7 @@ app.UseDefaultFiles(defaultFileOptions);
 app.UseStaticFiles();
 
 app.UseAuthentication();
+app.UseMiddleware<BannedUserWriteBlockMiddleware>();
 app.UseAuthorization();
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));

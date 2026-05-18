@@ -106,7 +106,7 @@ namespace TuristickiVodic.Tests.Services
         {
             using var ctx = CreateInMemoryContext(nameof(CreateAsync_NovRegistracija_KreiraKorisnikaKaoTourist));
             var (tourist, _, _, _) = SeedRoles(ctx);
-            var tokenSvc = new Mock<ITokenService>();
+            var tokenSvc = CreateTokenServiceMock("jwt-blacklisted", "refresh-blacklisted");
             var svc = CreateUserService(ctx, tokenSvc);
 
             var dto = new CreateUserDto
@@ -708,9 +708,9 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
-        public async Task RefreshTokenAsync_BlacklistedKorisnik_BacaException()
+        public async Task RefreshTokenAsync_BlacklistedKorisnik_VracaTokeneUzBanStatus()
         {
-            using var ctx = CreateInMemoryContext(nameof(RefreshTokenAsync_BlacklistedKorisnik_BacaException));
+            using var ctx = CreateInMemoryContext(nameof(RefreshTokenAsync_BlacklistedKorisnik_VracaTokeneUzBanStatus));
             var (tourist, _, _, _) = SeedRoles(ctx);
 
             ctx.Users.Add(new User
@@ -742,12 +742,15 @@ namespace TuristickiVodic.Tests.Services
             var tokenSvc = CreateTokenServiceMock("jwt-7", "refresh-7");
             var svc = CreateUserService(ctx, tokenSvc);
 
-            await svc.Invoking(s => s.RefreshTokenAsync(new RefreshTokenDto
+            var result = await svc.RefreshTokenAsync(new RefreshTokenDto
             {
                 RefreshToken = "black-refresh"
-            }))
-            .Should().ThrowAsync<AccountBannedException>()
-            .WithMessage("*banovan*");
+            });
+
+            result.Should().NotBeNull();
+            result!.Token.Should().Be("jwt-7");
+            result.IsBanned.Should().BeTrue();
+            result.BanMessage.Should().Contain("banovan");
         }
 
         [Fact]
@@ -983,9 +986,9 @@ namespace TuristickiVodic.Tests.Services
         // ═══════════════════════════════════════════
 
         [Fact]
-        public async Task LoginAsync_BlacklistedKorisnik_BacaException()
+        public async Task LoginAsync_BlacklistedKorisnik_VracaTokeneUzBanStatus()
         {
-            using var ctx = CreateInMemoryContext(nameof(LoginAsync_BlacklistedKorisnik_BacaException));
+            using var ctx = CreateInMemoryContext(nameof(LoginAsync_BlacklistedKorisnik_VracaTokeneUzBanStatus));
             var (tourist, _, _, _) = SeedRoles(ctx);
             ctx.Users.Add(new User
             {
@@ -1004,9 +1007,12 @@ namespace TuristickiVodic.Tests.Services
             var tokenSvc = new Mock<ITokenService>();
             var svc = CreateUserService(ctx, tokenSvc);
 
-            await svc.Invoking(s => s.LoginAsync(new LoginDto { Email = "b@b.com", Password = "pass" }))
-                .Should().ThrowAsync<AccountBannedException>()
-                .WithMessage("*banovan*");
+            var result = await svc.LoginAsync(new LoginDto { Email = "b@b.com", Password = "pass" });
+
+            result.Should().NotBeNull();
+            result!.IsBanned.Should().BeTrue();
+            result.Token.Should().NotBeNullOrWhiteSpace();
+            result.BanMessage.Should().Contain("banovan");
         }
 
         [Fact]

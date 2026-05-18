@@ -1,3 +1,8 @@
+<div class="banned-account-banner" *ngIf="bannedAccountNotice()">
+  <strong>Obaveštenje</strong>
+  <span>{{ bannedAccountNotice() }}</span>
+</div>
+
 <div class="role-redirect-banner" *ngIf="roleRedirectNotice()">
   <strong>Obavestenje</strong>
   <span>{{ roleRedirectNotice() }}</span>

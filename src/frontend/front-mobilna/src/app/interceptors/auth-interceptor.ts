@@ -10,6 +10,17 @@ function clearStoredSession(): void {
   localStorage.removeItem('token');
   localStorage.removeItem('refreshToken');
   localStorage.removeItem('user');
+  sessionStorage.removeItem('spirego-ban-message');
+}
+
+function notifyBannedAction(error: HttpErrorResponse): void {
+  const message =
+    typeof error.error?.message === 'string' && error.error.message.trim().length > 0
+      ? error.error.message.trim()
+      : 'Ovaj nalog je trenutno u read-only režimu zbog bana.';
+
+  sessionStorage.setItem('spirego-ban-message', message);
+  window.dispatchEvent(new CustomEvent('banned-user-action-blocked', { detail: message }));
 }
 
 function isAuthEndpoint(url: string): boolean {
@@ -27,6 +38,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
+      if (error.status === 423) {
+        notifyBannedAction(error);
+        return throwError(() => error);
+      }
+
       const shouldRefresh =
         error.status === 401 && !isAuthEndpoint(req.url);
 

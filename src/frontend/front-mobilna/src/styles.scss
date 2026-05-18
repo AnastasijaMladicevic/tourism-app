@@ -26,6 +26,15 @@
   --emperor: #555555;
   --athens-gray: #f9fafb;
   --error: #ff6d6f;
+  --surface: rgba(255, 255, 255, 0.88);
+  --surface-strong: #ffffff;
+  --surface-soft: #f7fcfe;
+  --surface-muted: #eef8fb;
+  --page-glow: rgba(22, 138, 173, 0.1);
+  --page-gradient-start: #fbfeff;
+  --page-gradient-mid: #eef8fb;
+  --page-gradient-end: #ebf6fa;
+  --shadow-soft: 0 14px 34px rgba(23, 110, 134, 0.07);
   --font-family-base: 'Nunito', sans-serif;
   --font-size-button: 13px;
   --font-size-body: 14px;
@@ -37,6 +46,30 @@
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
   --font-weight-extrabold: 800;
+}
+
+:root[data-theme='dark'] {
+  --primary: #42b8d5;
+  --primary-dark: #6ecfe2;
+  --primary-deep: #2f92a8;
+  --primary-light: rgba(66, 184, 213, 0.14);
+  --text-dark: #eaf4f7;
+  --text-gray: #9eb3bc;
+  --text-light: #6f8590;
+  --bg: #071319;
+  --border: #264656;
+  --emperor: #eaf4f7;
+  --athens-gray: #13242d;
+  --error: #ff8d8f;
+  --surface: rgba(13, 28, 36, 0.9);
+  --surface-strong: #11232d;
+  --surface-soft: #152934;
+  --surface-muted: #0d1d25;
+  --page-glow: rgba(66, 184, 213, 0.18);
+  --page-gradient-start: #0b1820;
+  --page-gradient-mid: #0c1a22;
+  --page-gradient-end: #071319;
+  --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.34);
 }
 
 html {
@@ -73,6 +106,9 @@ body {
   background: var(--bg);
   color: var(--text-dark);
   -webkit-font-smoothing: antialiased;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 /* You can add global styles to this file, and also import other style files */
 html,
@@ -90,4 +126,15 @@ input,
 textarea,
 select {
   font-family: var(--font-family-base);
+  color: inherit;
+}
+
+input,
+textarea,
+select {
+  caret-color: var(--primary);
+}
+
+::selection {
+  background: rgba(22, 138, 173, 0.28);
 }

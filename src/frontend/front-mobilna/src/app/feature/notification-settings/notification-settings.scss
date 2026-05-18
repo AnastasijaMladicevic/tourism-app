@@ -4,8 +4,8 @@
 .settings-page {
   min-height: 100dvh;
   background:
-    radial-gradient(circle at top center, rgba(22, 138, 173, 0.1), transparent 30%),
-    linear-gradient(180deg, #fbfeff 0%, #eef8fb 62%, #ebf6fa 100%);
+    radial-gradient(circle at top center, var(--page-glow), transparent 30%),
+    linear-gradient(180deg, var(--page-gradient-start) 0%, var(--page-gradient-mid) 62%, var(--page-gradient-end) 100%);
 }
 
 .settings-shell {
@@ -65,10 +65,10 @@
 }
 
 .preference-card {
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(208, 234, 240, 0.9);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 18px;
-  box-shadow: 0 14px 34px rgba(23, 110, 134, 0.07);
+  box-shadow: var(--shadow-soft);
   backdrop-filter: blur(10px);
 }
 
@@ -114,7 +114,7 @@
 
 .preference-divider {
   height: 1px;
-  background: rgba(208, 234, 240, 0.72);
+  background: var(--border);
 }
 
 .mode-block {
@@ -128,9 +128,9 @@
 }
 
 .delivery-toggle__option {
-  border: 1px solid rgba(188, 225, 235, 0.92);
+  border: 1px solid var(--border);
   border-radius: 16px;
-  background: #f7fcfe;
+  background: var(--surface-soft);
   padding: 14px 12px;
   display: flex;
   flex-direction: column;
@@ -165,7 +165,7 @@
     font-weight: 800;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: rgba(42, 70, 84, 0.7);
+    color: var(--text-gray);
     margin-bottom: 8px;
   }
 }

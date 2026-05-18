@@ -18,6 +18,16 @@ function withAuthHeader<T>(request: HttpRequest<T>, token: string): HttpRequest<
   });
 }
 
+function notifyBannedAction(error: HttpErrorResponse): void {
+  const message =
+    typeof error.error?.message === 'string' && error.error.message.trim().length > 0
+      ? error.error.message.trim()
+      : 'Ovaj nalog je trenutno u read-only režimu zbog bana.';
+
+  sessionStorage.setItem('spirego-admin-ban-message', message);
+  window.dispatchEvent(new CustomEvent('banned-user-action-blocked', { detail: message }));
+}
+
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const authService = inject(AuthService);
   const token = authService.getToken();
@@ -28,6 +38,11 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
 
   return next(authRequest).pipe(
     catchError((error: HttpErrorResponse) => {
+      if (error.status === 423) {
+        notifyBannedAction(error);
+        return throwError(() => error);
+      }
+
       const shouldRefresh = error.status === 401 && !isAuthEndpoint(request.url);
 
       if (!shouldRefresh) {
