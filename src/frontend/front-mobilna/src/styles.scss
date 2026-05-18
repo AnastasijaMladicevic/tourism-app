@@ -59,17 +59,23 @@
   --bg: #071319;
   --border: #264656;
   --emperor: #eaf4f7;
-  --athens-gray: #13242d;
+  --athens-gray: #10212a;
   --error: #ff8d8f;
   --surface: rgba(13, 28, 36, 0.9);
   --surface-strong: #11232d;
   --surface-soft: #152934;
   --surface-muted: #0d1d25;
   --page-glow: rgba(66, 184, 213, 0.18);
-  --page-gradient-start: #0b1820;
-  --page-gradient-mid: #0c1a22;
-  --page-gradient-end: #071319;
+  --page-gradient-start: #08141b;
+  --page-gradient-mid: #071319;
+  --page-gradient-end: #050d12;
+  --bg: #071319;
   --shadow-soft: 0 18px 40px rgba(0, 0, 0, 0.34);
+}
+
+html,
+body {
+  background: var(--bg);
 }
 
 html {
@@ -90,7 +96,7 @@ body {
   // Default the application to a light color theme. This can be changed to
   // `dark` to enable the dark color theme, or to `light dark` to defer to the
   // user's system settings.
-  color-scheme: light;
+  color-scheme: light dark;
 
   // Set a default background, font and text colors for the application using
   // Angular Material's system-level CSS variables. Learn more about these
@@ -137,4 +143,64 @@ select {
 
 ::selection {
   background: rgba(22, 138, 173, 0.28);
+}
+
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+:root[data-theme='dark'] body,
+:root[data-theme='dark'] .app,
+:root[data-theme='dark'] main,
+:root[data-theme='dark'] .page,
+:root[data-theme='dark'] .content,
+:root[data-theme='dark'] .home-page,
+:root[data-theme='dark'] .favorites-page,
+:root[data-theme='dark'] .map-page,
+:root[data-theme='dark'] .planner-page,
+:root[data-theme='dark'] .notifications-page,
+:root[data-theme='dark'] .profile-page,
+:root[data-theme='dark'] .settings-page {
+  background: var(--bg) !important;
+  color: var(--text-dark) !important;
+}
+
+:root[data-theme='dark'] .card,
+:root[data-theme='dark'] .place-card,
+:root[data-theme='dark'] .favorite-card,
+:root[data-theme='dark'] .destination-card,
+:root[data-theme='dark'] .object-card,
+:root[data-theme='dark'] .event-card,
+:root[data-theme='dark'] .summary-card,
+:root[data-theme='dark'] .overview-card,
+:root[data-theme='dark'] .search-bar,
+:root[data-theme='dark'] .search-box,
+:root[data-theme='dark'] .filter-chip,
+:root[data-theme='dark'] .region-button,
+:root[data-theme='dark'] input,
+:root[data-theme='dark'] textarea,
+:root[data-theme='dark'] select {
+  background: var(--surface-strong) !important;
+  color: var(--text-dark) !important;
+  border-color: var(--border) !important;
+}
+
+:root[data-theme='dark'] h1,
+:root[data-theme='dark'] h2,
+:root[data-theme='dark'] h3,
+:root[data-theme='dark'] h4,
+:root[data-theme='dark'] p,
+:root[data-theme='dark'] span,
+:root[data-theme='dark'] label {
+  color: inherit;
+}
+
+:root[data-theme='dark'] .muted,
+:root[data-theme='dark'] .subtitle,
+:root[data-theme='dark'] .description,
+:root[data-theme='dark'] .meta,
+:root[data-theme='dark'] .location,
+:root[data-theme='dark'] .category-label {
+  color: var(--text-gray) !important;
 }

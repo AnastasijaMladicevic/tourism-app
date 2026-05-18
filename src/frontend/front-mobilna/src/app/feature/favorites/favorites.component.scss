@@ -1163,4 +1163,51 @@
   .favorites-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+
+
+  :host-context(:root[data-theme='dark']) {
+    .favorites-page {
+      background: var(--bg);
+      color: var(--text-dark);
+    }
+  
+    .favorites-mobile-topbar,
+    .favorites-desktop-toolbar,
+    .favorites-panel,
+    .favorite-card,
+    .favorites-summary-card,
+    .favorites-last-card {
+      background: var(--surface-strong);
+      color: var(--text-dark);
+      border-color: var(--border);
+    }
+  
+    .search-field input {
+      background: var(--surface-strong);
+      color: var(--text-dark);
+      border-color: var(--border);
+  
+      &::placeholder {
+        color: var(--text-gray);
+      }
+  
+      &:focus {
+        background: var(--surface-strong);
+      }
+    }
+  
+    .favorite-card__body,
+    .favorite-card__title,
+    .favorites-panel h2,
+    .favorites-panel h3,
+    .favorites-panel p,
+    .favorites-panel span {
+      color: var(--text-dark);
+    }
+  
+    .favorite-card__meta,
+    .favorites-muted {
+      color: var(--text-gray);
+    }
+  }
 }
