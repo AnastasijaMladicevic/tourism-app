@@ -162,133 +162,139 @@
       </div>
     </article>
 
-    <article class="card insight-card">
-      <div class="section-head">
-        <div>
-          <h3>Platform snapshot</h3>
-          <p>Account health and escalation outcomes</p>
-        </div>
-      </div>
-      <ul class="snapshot-list">
-        <li>
-          <span class="snapshot-label">Active tourists</span>
-          <div class="snapshot-track">
-            <div
-              class="snapshot-fill active"
-              [style.width.%]="touristStatusTotal() ? (activeTourists / touristStatusTotal()) * 100 : 0"
-            ></div>
+    <div class="overview-columns">
+      <div class="overview-stack">
+        <article class="card insight-card">
+          <div class="section-head">
+            <div>
+              <h3>Platform snapshot</h3>
+              <p>Account health and escalation outcomes</p>
+            </div>
           </div>
-          <span class="snapshot-val">{{ activeTourists }}</span>
-        </li>
-        <li>
-          <span class="snapshot-label">Inactive</span>
-          <div class="snapshot-track">
-            <div
-              class="snapshot-fill inactive"
-              [style.width.%]="touristStatusTotal() ? (inactiveTourists / touristStatusTotal()) * 100 : 0"
-            ></div>
+          <ul class="snapshot-list">
+            <li>
+              <span class="snapshot-label">Active tourists</span>
+              <div class="snapshot-track">
+                <div
+                  class="snapshot-fill active"
+                  [style.width.%]="touristStatusTotal() ? (activeTourists / touristStatusTotal()) * 100 : 0"
+                ></div>
+              </div>
+              <span class="snapshot-val">{{ activeTourists }}</span>
+            </li>
+            <li>
+              <span class="snapshot-label">Inactive</span>
+              <div class="snapshot-track">
+                <div
+                  class="snapshot-fill inactive"
+                  [style.width.%]="touristStatusTotal() ? (inactiveTourists / touristStatusTotal()) * 100 : 0"
+                ></div>
+              </div>
+              <span class="snapshot-val">{{ inactiveTourists }}</span>
+            </li>
+            <li>
+              <span class="snapshot-label">Banned</span>
+              <div class="snapshot-track">
+                <div
+                  class="snapshot-fill banned"
+                  [style.width.%]="touristStatusTotal() ? (bannedTourists / touristStatusTotal()) * 100 : 0"
+                ></div>
+              </div>
+              <span class="snapshot-val">{{ bannedTourists }}</span>
+            </li>
+          </ul>
+          <div class="report-breakdown" *ngIf="reportStatusTotal() > 0">
+            <p class="report-breakdown-title">Manager reports ({{ reportStatusTotal() | number }})</p>
+            <div class="stacked-bar">
+              <span
+                *ngFor="let s of reportStatusSlices"
+                class="stack-segment"
+                [style.width.%]="s.percent"
+                [style.background]="s.color"
+              ></span>
+            </div>
+            <ul class="legend-list">
+              <li *ngFor="let s of reportStatusSlices">
+                <span class="legend-dot" [style.background]="s.color"></span>
+                {{ s.label }} · {{ s.count | number }}
+              </li>
+            </ul>
           </div>
-          <span class="snapshot-val">{{ inactiveTourists }}</span>
-        </li>
-        <li>
-          <span class="snapshot-label">Banned</span>
-          <div class="snapshot-track">
-            <div
-              class="snapshot-fill banned"
-              [style.width.%]="touristStatusTotal() ? (bannedTourists / touristStatusTotal()) * 100 : 0"
-            ></div>
+          <p class="empty-note" *ngIf="reportStatusTotal() === 0">No manager escalations recorded yet.</p>
+        </article>
+
+        <article class="card insight-card queue-card">
+          <div class="section-head">
+            <div>
+              <h3>Pending moderation</h3>
+              <p>Items needing your attention</p>
+            </div>
           </div>
-          <span class="snapshot-val">{{ bannedTourists }}</span>
-        </li>
-      </ul>
-      <div class="report-breakdown" *ngIf="reportStatusTotal() > 0">
-        <p class="report-breakdown-title">Manager reports ({{ reportStatusTotal() | number }})</p>
-        <div class="stacked-bar">
-          <span
-            *ngFor="let s of reportStatusSlices"
-            class="stack-segment"
-            [style.width.%]="s.percent"
-            [style.background]="s.color"
-          ></span>
-        </div>
-        <ul class="legend-list">
-          <li *ngFor="let s of reportStatusSlices">
-            <span class="legend-dot" [style.background]="s.color"></span>
-            {{ s.label }} · {{ s.count | number }}
-          </li>
-        </ul>
-      </div>
-      <p class="empty-note" *ngIf="reportStatusTotal() === 0">No manager escalations recorded yet.</p>
-    </article>
-
-    <article class="card insight-card queue-card">
-      <div class="section-head">
-        <div>
-          <h3>Pending moderation</h3>
-          <p>Items needing your attention</p>
-        </div>
-      </div>
-      <div class="queue-block" *ngIf="pendingCreatorQueue.length">
-        <h4>Creator requests</h4>
-        <ul class="mini-queue">
-          <li *ngFor="let r of pendingCreatorQueue">
-            <span class="mini-queue-name">{{ r.firstName }} {{ r.lastName }}</span>
-            <span class="mini-queue-time">{{ formatRelative(r.createdAt) }}</span>
-          </li>
-        </ul>
-      </div>
-      <div class="queue-block" *ngIf="pendingReportQueue.length">
-        <h4>Manager escalations</h4>
-        <ul class="mini-queue">
-          <li *ngFor="let r of pendingReportQueue">
-            <span class="mini-queue-name">{{ r.reportedUserName }}</span>
-            <span class="mini-queue-time">{{ formatRelative(r.createdAt) }}</span>
-          </li>
-        </ul>
-      </div>
-      <p class="empty-note" *ngIf="!pendingCreatorQueue.length && !pendingReportQueue.length">
-        Nothing pending — you're all caught up.
-      </p>
-    </article>
-
-    <article class="card insight-card activity-card">
-      <div class="section-head">
-        <div>
-          <h3>Recent activity</h3>
-          <p>Signups, requests, reports, and bans</p>
-        </div>
-        <a class="section-link" routerLink="/admin/activity-log">Full log</a>
-      </div>
-      <p class="empty-note" *ngIf="!activityFeed.length">No recent events in loaded data.</p>
-      <ul class="activity-feed" *ngIf="activityFeed.length">
-        <li *ngFor="let item of activityFeed">
-          <a class="activity-row" [routerLink]="item.routerLink" [queryParams]="item.queryParams">
-            <span class="activity-avatar" [attr.data-tone]="item.avatarTone">{{ item.initials }}</span>
-            <span class="activity-copy">
-              <strong>{{ item.title }}</strong>
-              <span>{{ item.detail }}</span>
-            </span>
-            <span class="activity-meta">
-              <span class="activity-badge">{{ item.roleBadge }}</span>
-              {{ item.timeLabel }}
-            </span>
-          </a>
-        </li>
-      </ul>
-    </article>
-
-    <article class="card insight-card map-card">
-      <div class="section-head">
-        <div>
-          <h3>Platform map</h3>
-          <p>
-            {{ mapMarkerCount | number }} of {{ destinationCount | number }} destinations on map
-            <span *ngIf="destinationCount > mapMarkerCount"> · some lack coordinates</span>
+          <div class="queue-block" *ngIf="pendingCreatorQueue.length">
+            <h4>Creator requests</h4>
+            <ul class="mini-queue">
+              <li *ngFor="let r of pendingCreatorQueue">
+                <span class="mini-queue-name">{{ r.firstName }} {{ r.lastName }}</span>
+                <span class="mini-queue-time">{{ formatRelative(r.createdAt) }}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="queue-block" *ngIf="pendingReportQueue.length">
+            <h4>Manager escalations</h4>
+            <ul class="mini-queue">
+              <li *ngFor="let r of pendingReportQueue">
+                <span class="mini-queue-name">{{ r.reportedUserName }}</span>
+                <span class="mini-queue-time">{{ formatRelative(r.createdAt) }}</span>
+              </li>
+            </ul>
+          </div>
+          <p class="empty-note" *ngIf="!pendingCreatorQueue.length && !pendingReportQueue.length">
+            Nothing pending — you're all caught up.
           </p>
-        </div>
-        <a class="section-link" routerLink="/admin/map">Expand</a>
+        </article>
+
+        <article class="card insight-card map-card">
+          <div class="section-head">
+            <div>
+              <h3>Platform map</h3>
+              <p>
+                {{ mapMarkerCount | number }} of {{ destinationCount | number }} destinations on map
+                <span *ngIf="destinationCount > mapMarkerCount"> · some lack coordinates</span>
+              </p>
+            </div>
+            <a class="section-link" routerLink="/admin/map">Expand</a>
+          </div>
+          <div id="dashboard-map" class="map-container" role="img" aria-label="Map of platform destinations"></div>
+        </article>
       </div>
-      <div id="dashboard-map" class="map-container" role="img" aria-label="Map of platform destinations"></div>
-    </article>
+
+      <article class="card insight-card activity-card activity-card--scroll">
+        <div class="section-head activity-card__head">
+          <div>
+            <h3>Recent activity</h3>
+            <p>Signups, requests, reports, and bans</p>
+          </div>
+          <a class="section-link" routerLink="/admin/activity-log">Full log</a>
+        </div>
+        <div class="activity-scroll">
+          <p class="empty-note" *ngIf="!activityFeed.length">No recent events in loaded data.</p>
+          <ul class="activity-feed" *ngIf="activityFeed.length">
+            <li *ngFor="let item of activityFeed">
+              <a class="activity-row" [routerLink]="item.routerLink" [queryParams]="item.queryParams">
+                <span class="activity-avatar" [attr.data-tone]="item.avatarTone">{{ item.initials }}</span>
+                <span class="activity-copy">
+                  <strong>{{ item.title }}</strong>
+                  <span>{{ item.detail }}</span>
+                </span>
+                <span class="activity-meta">
+                  <span class="activity-badge">{{ item.roleBadge }}</span>
+                  {{ item.timeLabel }}
+                </span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </article>
+    </div>
   </div>
 </section>
