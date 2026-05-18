@@ -1,0 +1,131 @@
+<div class="page">
+  <div class="card" aria-labelledby="banned-heading">
+    <div class="logo">
+      <img src="assets/logo.png" alt="SpireGO">
+    </div>
+
+    <div class="content">
+      <aside class="visual" aria-hidden="true">
+        <div class="visual-glow"></div>
+        <div class="visual-ring">
+          <div class="circle">
+            <img src="assets/pozadina.png" alt="">
+          </div>
+          <div class="visual-badge">
+            <span class="material-symbols-outlined">gpp_maybe</span>
+          </div>
+        </div>
+        <ul class="visual-notes">
+          <li>
+            <span class="material-symbols-outlined">edit_off</span>
+            Content editing is disabled
+          </li>
+          <li>
+            <span class="material-symbols-outlined">visibility</span>
+            You can still view this notice
+          </li>
+          <li>
+            <span class="material-symbols-outlined">schedule</span>
+            Access restores automatically when the ban ends
+          </li>
+        </ul>
+      </aside>
+
+      <main class="main">
+        <div class="status-pill">
+          <span class="status-dot" aria-hidden="true"></span>
+          Suspended account
+        </div>
+
+        <h1 id="banned-heading">Your access is on hold</h1>
+        <p class="lead">
+          A platform administrator has restricted your Content Creator permissions.
+          Review the details below — your portal access will return when the suspension ends.
+        </p>
+
+        <section class="reason-card" aria-labelledby="ban-reason-heading">
+          <div class="reason-card-head">
+            <span class="reason-icon material-symbols-outlined" aria-hidden="true">report</span>
+            <h2 id="ban-reason-heading">Reason for suspension</h2>
+          </div>
+          <blockquote class="reason-text">{{ banReason() }}</blockquote>
+        </section>
+
+        @if (isPermanent()) {
+          <section class="timer-card timer-card--permanent" aria-labelledby="ban-duration-heading">
+            <div class="timer-card-head">
+              <span class="material-symbols-outlined" aria-hidden="true">all_inclusive</span>
+              <div>
+                <h2 id="ban-duration-heading">Suspension duration</h2>
+                <p class="timer-sub">No automatic end date is set</p>
+              </div>
+            </div>
+            <p class="permanent-label">Permanent suspension</p>
+            <p class="permanent-note">
+              An administrator must manually lift this suspension before you can create or edit content again.
+            </p>
+          </section>
+        } @else {
+          <section class="timer-card" aria-labelledby="ban-countdown-heading" aria-live="polite">
+            <div class="timer-card-head">
+              <span class="material-symbols-outlined" aria-hidden="true">hourglass_top</span>
+              <div>
+                <h2 id="ban-countdown-heading">Time until access is restored</h2>
+                @if (banExpiresLabel()) {
+                  <p class="timer-sub">Ends {{ banExpiresLabel() }}</p>
+                }
+              </div>
+            </div>
+
+            @if (banEnded()) {
+              <div class="ban-ended">
+                <span class="material-symbols-outlined" aria-hidden="true">check_circle</span>
+                <p>Your suspension has ended. Restoring access…</p>
+              </div>
+            } @else if (countdown(); as remaining) {
+              <div class="countdown" [class.countdown--tick]="countdownTick()">
+                <div class="countdown-segment">
+                  <span class="countdown-value">{{ formatUnit(remaining.months) }}</span>
+                  <span class="countdown-label">{{ remaining.months === 1 ? 'Month' : 'Months' }}</span>
+                </div>
+                <span class="countdown-sep" aria-hidden="true">:</span>
+                <div class="countdown-segment">
+                  <span class="countdown-value">{{ formatUnit(remaining.days) }}</span>
+                  <span class="countdown-label">{{ remaining.days === 1 ? 'Day' : 'Days' }}</span>
+                </div>
+                <span class="countdown-sep" aria-hidden="true">:</span>
+                <div class="countdown-segment">
+                  <span class="countdown-value">{{ formatUnit(remaining.hours) }}</span>
+                  <span class="countdown-label">{{ remaining.hours === 1 ? 'Hour' : 'Hours' }}</span>
+                </div>
+                <span class="countdown-sep" aria-hidden="true">:</span>
+                <div class="countdown-segment">
+                  <span class="countdown-value">{{ formatUnit(remaining.minutes) }}</span>
+                  <span class="countdown-label">{{ remaining.minutes === 1 ? 'Minute' : 'Minutes' }}</span>
+                </div>
+              </div>
+              <p class="countdown-hint">Updates every minute · shown in UTC</p>
+            }
+          </section>
+        }
+
+        <footer class="actions">
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="checkAccessAgain()"
+            [disabled]="isCheckingStatus()"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">refresh</span>
+            {{ isCheckingStatus() ? 'Checking access…' : 'Check access again' }}
+          </button>
+          <button type="button" class="btn btn-ghost" (click)="signOut()">
+            <span class="material-symbols-outlined" aria-hidden="true">logout</span>
+            Sign out
+          </button>
+        </footer>
+      </main>
+    </div>
+  </div>
+</div>
+
