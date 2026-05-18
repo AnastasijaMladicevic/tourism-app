@@ -1,4 +1,4 @@
-<div class="users-page">
+﻿<div class="users-page">
   <div class="feedback" *ngIf="isLoading">Loading users data...</div>
   <div class="feedback error" *ngIf="!isLoading && loadError">{{ loadError }}</div>
 
@@ -8,6 +8,11 @@
       <p class="page-subtitle">Manage internal team members and platform access permissions.</p>
     </div>
   </div>
+
+  <div class="feedback feedback--success page-notice" *ngIf="reportReviewSuccess" role="status">
+    {{ reportReviewSuccess }}
+  </div>
+
 
   <div class="toolbar">
     <div class="tabs" role="tablist" aria-label="Internal team and tourists">
@@ -289,7 +294,7 @@
                 <li *ngFor="let slice of originsPieSlices" class="origin-pie-legend-row">
                   <span class="origin-pie-swatch" [style.background]="slice.color"></span>
                   <span class="origin-pie-legend-name">{{ slice.name }}</span>
-                  <span class="origin-pie-legend-meta">{{ slice.users }} · {{ slice.shareLabel }}</span>
+                  <span class="origin-pie-legend-meta">{{ slice.users }} Â· {{ slice.shareLabel }}</span>
                 </li>
               </ul>
             </div>
@@ -343,7 +348,7 @@
           id="admin-directory-search"
           type="search"
           class="table-search"
-          placeholder="Search by name, email, role, status…"
+          placeholder="Search by name, email, role, statusâ€¦"
           autocomplete="off"
           [value]="adminDirectorySearch"
           (input)="onAdminSearchInput($event)"
@@ -410,8 +415,16 @@
                   {{ member.status }}
                 </span>
               </td>
-              <td class="actions">
-                <a class="actions-edit-link" [routerLink]="['/admin/users/edit', member.id]" title="Edit user">✎</a>
+              <td class="actions actions--banned">
+                <a class="actions-edit-link" [routerLink]="['/admin/users/edit', member.id]" title="Edit user">âœŽ</a>
+                <button
+                  *ngIf="canBanAccount(member.role, member.status === 'Banned')"
+                  type="button"
+                  class="ban-user-btn"
+                  (click)="openBanUserModal({ id: member.id, name: member.name, email: member.email, role: member.role })"
+                >
+                  Ban
+                </button>
               </td>
             </tr>
             <tr *ngIf="!filteredAdminDirectory.length && adminMembers.length" class="table-empty-row">
@@ -521,12 +534,12 @@
                   type="button"
                   class="ban-duration-option"
                   role="radio"
-                  [attr.aria-checked]="banDuration === 'indefinite'"
-                  [class.ban-duration-option--selected]="banDuration === 'indefinite'"
-                  (click)="selectBanDuration('indefinite')"
+                  [attr.aria-checked]="banDuration === 'permanent'"
+                  [class.ban-duration-option--selected]="banDuration === 'permanent'"
+                  (click)="selectBanDuration('permanent')"
                   [disabled]="reportReviewSubmitting"
                 >
-                  Indefinite
+                  Permanent
                 </button>
                 <button
                   type="button"
@@ -553,8 +566,8 @@
               </label>
 
               <p class="ban-duration-hint">
-                Access is blocked immediately when you approve. The selected duration is saved for admin records
-                (timed expiry is not enforced by the server yet).
+                Access is blocked when you approve. The ban ends automatically on the date you choose, or never for
+                a permanent ban.
               </p>
             </section>
 
@@ -563,7 +576,7 @@
               <textarea
                 rows="3"
                 [(ngModel)]="reportRejectReason"
-                placeholder="Explain why the report is not upheld…"
+                placeholder="Explain why the report is not upheldâ€¦"
               ></textarea>
             </label>
 
@@ -587,7 +600,7 @@
                 (click)="confirmBanFromReport()"
                 [disabled]="!canConfirmBanFromReport"
               >
-                {{ reportReviewSubmitting ? 'Processing…' : 'Approve & ban creator' }}
+                {{ reportReviewSubmitting ? 'Processingâ€¦' : 'Approve & ban creator' }}
               </button>
             </div>
           </div>
@@ -625,7 +638,7 @@
           <div class="creator-requests-count-wrap" aria-live="polite">
             <span class="creator-requests-count-label">Pending</span>
             <span class="creator-requests-count">{{
-              creatorRequestsLoading ? '…' : (creatorRequestsTotalCount | number : '1.0-0')
+              creatorRequestsLoading ? 'â€¦' : (creatorRequestsTotalCount | number : '1.0-0')
             }}</span>
           </div>
         </div>
@@ -644,7 +657,7 @@
             aria-label="Dismiss success message"
             (click)="dismissCreatorApproveSuccess()"
           >
-            ×
+            Ã—
           </button>
         </div>
 
@@ -654,7 +667,7 @@
             id="creator-requests-search"
             type="search"
             class="table-search"
-            placeholder="Search by name or email…"
+            placeholder="Search by name or emailâ€¦"
             autocomplete="off"
             [value]="creatorRequestSearch"
             (input)="onCreatorRequestSearchInput($event)"
@@ -669,7 +682,7 @@
           </button>
         </div>
 
-        <p class="creator-requests-loading" *ngIf="creatorRequestsLoading">Loading requests…</p>
+        <p class="creator-requests-loading" *ngIf="creatorRequestsLoading">Loading requestsâ€¦</p>
 
         <div class="table-wrap" *ngIf="!creatorRequestsLoading">
           <table>
@@ -720,7 +733,7 @@
                           : 'Grant Content Creator role'
                       "
                     >
-                      {{ approvingCreatorUserId === req.id ? 'Approving…' : 'Approve' }}
+                      {{ approvingCreatorUserId === req.id ? 'Approvingâ€¦' : 'Approve' }}
                     </button>
                     <button
                       type="button"
@@ -731,7 +744,7 @@
                       "
                       [title]="!req.isActive ? 'Activate the account before denying' : 'Reject Content Creator request'"
                     >
-                      {{ rejectingCreatorUserId === req.id ? 'Denying…' : 'Deny' }}
+                      {{ rejectingCreatorUserId === req.id ? 'Denyingâ€¦' : 'Deny' }}
                     </button>
                   </div>
                 </td>
@@ -825,7 +838,7 @@
         id="tourist-search"
         type="search"
         class="table-search"
-        placeholder="Search by name, email, origin, status, joined date…"
+        placeholder="Search by name, email, origin, status, joined dateâ€¦"
         autocomplete="off"
         [value]="touristSearch"
         (input)="onTouristSearchInput($event)"
@@ -876,8 +889,16 @@
               </span>
             </td>
             <td>{{ tourist.joinedDate }}</td>
-            <td class="actions">
-              <a class="actions-edit-link" [routerLink]="['/admin/users/edit', tourist.id]" title="Edit user">✎</a>
+            <td class="actions actions--banned">
+              <a class="actions-edit-link" [routerLink]="['/admin/users/edit', tourist.id]" title="Edit user">âœŽ</a>
+              <button
+                *ngIf="canBanAccount('Tourist', tourist.status === 'banned')"
+                type="button"
+                class="ban-user-btn"
+                (click)="openBanUserModal({ id: tourist.id, name: tourist.name, email: tourist.email, role: 'Tourist' })"
+              >
+                Ban
+              </button>
             </td>
           </tr>
           <tr *ngIf="!filteredTourists.length && tourists.length" class="table-empty-row">
@@ -948,7 +969,7 @@
         id="banned-users-search"
         type="search"
         class="table-search"
-        placeholder="Search by name, email, role, reason…"
+        placeholder="Search by name, email, role, reasonâ€¦"
         autocomplete="off"
         [value]="bannedUsersSearch"
         (input)="onBannedUsersSearchInput($event)"
@@ -994,7 +1015,7 @@
             <td>{{ row.bannedAtLabel }}</td>
             <td>{{ row.banExpiresLabel }}</td>
             <td class="actions actions--banned">
-              <a class="actions-edit-link" [routerLink]="['/admin/users/edit', row.id]" title="Edit user">✎</a>
+              <a class="actions-edit-link" [routerLink]="['/admin/users/edit', row.id]" title="Edit user">âœŽ</a>
               <button
                 type="button"
                 class="unban-user-btn"
@@ -1048,6 +1069,102 @@
       </div>
     </footer>
 
+    <ng-container *ngIf="banModalTarget as banTarget">
+      <div class="creator-approve-modal-backdrop" role="presentation" (click)="closeBanUserModal()">
+        <div
+          class="creator-approve-modal ban-user-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="ban-user-modal-title"
+          (click)="$event.stopPropagation()"
+        >
+          <h4 id="ban-user-modal-title" class="creator-approve-modal-title">Ban user</h4>
+          <p class="creator-approve-modal-body">
+            Restrict <strong>{{ banTarget.name }}</strong> ({{ banTarget.email }}, {{ banTarget.role }}).
+          </p>
+
+          <label class="manager-report-reject-field">
+            <span>Ban reason <span class="req">*</span></span>
+            <textarea
+              rows="3"
+              maxlength="500"
+              [(ngModel)]="banModalReason"
+              placeholder="Explain why this account is being banned."
+              [disabled]="banModalSubmitting"
+            ></textarea>
+          </label>
+
+          <section class="ban-duration-block" aria-labelledby="ban-modal-duration-label">
+            <p id="ban-modal-duration-label" class="ban-duration-label">Duration of ban</p>
+            <div class="ban-duration-options" role="radiogroup" aria-labelledby="ban-modal-duration-label">
+              <button
+                type="button"
+                class="ban-duration-option"
+                role="radio"
+                [attr.aria-checked]="banDuration === '30-days'"
+                [class.ban-duration-option--selected]="banDuration === '30-days'"
+                (click)="selectBanDuration('30-days')"
+                [disabled]="banModalSubmitting"
+              >
+                30 days
+              </button>
+              <button
+                type="button"
+                class="ban-duration-option"
+                role="radio"
+                [attr.aria-checked]="banDuration === 'permanent'"
+                [class.ban-duration-option--selected]="banDuration === 'permanent'"
+                (click)="selectBanDuration('permanent')"
+                [disabled]="banModalSubmitting"
+              >
+                Permanent
+              </button>
+              <button
+                type="button"
+                class="ban-duration-option"
+                role="radio"
+                [attr.aria-checked]="banDuration === 'custom'"
+                [class.ban-duration-option--selected]="banDuration === 'custom'"
+                (click)="selectBanDuration('custom')"
+                [disabled]="banModalSubmitting"
+              >
+                Custom date
+              </button>
+            </div>
+
+            <label class="ban-duration-custom-field" *ngIf="banDuration === 'custom'">
+              <span>Ban ends on</span>
+              <input
+                type="date"
+                class="ban-duration-date-input"
+                [(ngModel)]="banCustomEndDate"
+                [min]="banCustomDateMin"
+                [disabled]="banModalSubmitting"
+              />
+            </label>
+
+            <p class="ban-duration-hint">Selected duration: {{ banDurationSummary() }}.</p>
+          </section>
+
+          <p class="manager-report-modal-error" *ngIf="banModalError" role="alert">{{ banModalError }}</p>
+
+          <div class="creator-approve-modal-actions">
+            <button type="button" class="ghost-btn slim-btn" (click)="closeBanUserModal()" [disabled]="banModalSubmitting">
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="ban-from-report-btn"
+              (click)="confirmBanUserModal()"
+              [disabled]="!canConfirmBanModal"
+            >
+              {{ banModalSubmitting ? 'Applying…' : 'Confirm ban' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
     <ng-container *ngIf="unbanConfirmRow as unbanRow">
       <div class="creator-approve-modal-backdrop" role="presentation" (click)="cancelUnbanConfirm()">
         <div
@@ -1073,7 +1190,7 @@
               (click)="confirmUnban()"
               [disabled]="unbanSubmitting"
             >
-              {{ unbanSubmitting ? 'Removing…' : 'Confirm unban' }}
+              {{ unbanSubmitting ? 'Removingâ€¦' : 'Confirm unban' }}
             </button>
           </div>
         </div>

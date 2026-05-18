@@ -9,6 +9,7 @@ import { catchError, finalize, map, switchMap, tap, timeout } from 'rxjs/operato
 import {
   AdminUserListItemDto,
   AdminUsersService,
+  BanUserDto,
   CreatorRoleRequestDto
 } from '../../../services/admin-users.service';
 import { ReviewDto, ReviewService } from '../../../services/review';
@@ -54,7 +55,7 @@ const MAX_MANAGER_REPORT_PAGES = 20;
 
 type UsersPageViewTab = 'internal' | 'tourists';
 
-type BanDurationOption = '30-days' | 'indefinite' | 'custom';
+type BanDurationOption = '30-days' | 'permanent' | 'custom';
 
 interface BannedUserRow {
   id: number;
@@ -68,15 +69,12 @@ interface BannedUserRow {
   bannedAtSort: number;
 }
 
-interface AdminBanDurationRecord {
-  userId: number;
-  reportId: number;
-  duration: BanDurationOption;
-  endsAt: string | null;
-  recordedAt: string;
+interface BanUserModalTarget {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
 }
-
-const ADMIN_BAN_DURATION_STORAGE_KEY = 'techspire-admin-ban-durations';
 
 @Component({
   selector: 'app-users',
@@ -204,8 +202,12 @@ export class UsersComponent implements OnInit {
   reportReviewError = '';
   reportRejectReason = '';
   reportReviewSuccess = '';
-  banDuration: BanDurationOption = 'indefinite';
+  banDuration: BanDurationOption = 'permanent';
   banCustomEndDate = '';
+  banModalTarget: BanUserModalTarget | null = null;
+  banModalReason = '';
+  banModalError = '';
+  banModalSubmitting = false;
 
   bannedUsers: BannedUserRow[] = [];
   bannedUsersSearch = '';
@@ -1454,6 +1456,7 @@ export class UsersComponent implements OnInit {
       this.banCustomEndDate = '';
     }
     this.reportReviewError = '';
+    this.banModalError = '';
     this.cdr.markForCheck();
   }
 
@@ -1467,11 +1470,20 @@ export class UsersComponent implements OnInit {
     if (this.banDuration !== 'custom') {
       return true;
     }
-    return !!this.resolveBanEndsAt();
+    return !!this.resolveBanExpiresAtUtc();
   }
 
   get canConfirmBanFromReport(): boolean {
     return !!this.activeManagerReport && !this.reportReviewSubmitting && this.isBanDurationValid;
+  }
+
+  get canConfirmBanModal(): boolean {
+    return (
+      !!this.banModalTarget &&
+      !this.banModalSubmitting &&
+      !!this.banModalReason.trim() &&
+      this.isBanDurationValid
+    );
   }
 
   confirmBanFromReport(): void {
@@ -1516,7 +1528,14 @@ export class UsersComponent implements OnInit {
         rejectionReason: approve ? null : rejectionReason
       })
       .pipe(
-        takeUntilDestroyed(this.destroyRef),
+        switchMap(() =>
+          approve
+            ? this.adminUsersService.banUser(
+                report.reportedUserId,
+                this.buildBanDto(this.buildReportBanReason(report))
+              )
+            : of(null)
+        ),
         finalize(() => {
           this.reportReviewSubmitting = false;
           this.cdr.markForCheck();
@@ -1525,11 +1544,8 @@ export class UsersComponent implements OnInit {
       .subscribe({
         next: () => {
           this.pendingReportByUserId.delete(report.reportedUserId);
-          if (approve) {
-            this.recordBanDurationChoice(report);
-          }
           this.reportReviewSuccess = approve
-            ? `Report approved. The content creator has been banned (${this.banDurationSummary()}).`
+            ? `Report approved. The user has been banned (${this.banDurationSummary()}).`
             : 'Report rejected. The content creator remains on the platform.';
           this.activeManagerReport = null;
           this.highlightedReportUserId = null;
@@ -1544,6 +1560,97 @@ export class UsersComponent implements OnInit {
           this.cdr.markForCheck();
         }
       });
+  }
+
+  canBanAccount(roleName: string, isBanned: boolean): boolean {
+    if (isBanned) {
+      return false;
+    }
+    const role = (roleName ?? '').trim().toLowerCase().replace(/[\s-]+/g, '');
+    return role === 'tourist' || role === 'contentcreator';
+  }
+
+  openBanUserModal(target: BanUserModalTarget): void {
+    if (this.banModalSubmitting || this.reportReviewSubmitting) {
+      return;
+    }
+    this.banModalTarget = target;
+    this.banModalReason = '';
+    this.banModalError = '';
+    this.resetBanDurationForm();
+    this.cdr.markForCheck();
+  }
+
+  closeBanUserModal(): void {
+    if (this.banModalSubmitting) {
+      return;
+    }
+    this.banModalTarget = null;
+    this.banModalError = '';
+    this.cdr.markForCheck();
+  }
+
+  confirmBanUserModal(): void {
+    const target = this.banModalTarget;
+    if (!target || this.banModalSubmitting) {
+      return;
+    }
+
+    const reason = this.banModalReason.trim();
+    if (!reason) {
+      this.banModalError = 'Enter a ban reason.';
+      this.cdr.markForCheck();
+      return;
+    }
+
+    if (!this.isBanDurationValid) {
+      this.banModalError = 'Choose a valid end date for a custom ban duration.';
+      this.cdr.markForCheck();
+      return;
+    }
+
+    this.banModalSubmitting = true;
+    this.banModalError = '';
+    this.cdr.markForCheck();
+
+    this.adminUsersService
+      .banUser(target.id, this.buildBanDto(reason))
+      .pipe(
+        finalize(() => {
+          this.banModalSubmitting = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: () => {
+          const summary = this.banDurationSummary();
+          this.banModalTarget = null;
+          this.banModalReason = '';
+          this.resetBanDurationForm();
+          this.reportReviewSuccess = `${target.name} has been banned (${summary}).`;
+          this.loadDashboardData({ silent: true });
+          this.cdr.markForCheck();
+        },
+        error: (err: unknown) => {
+          this.banModalError = this.extractReportReviewError(err);
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  private buildBanDto(reason: string): BanUserDto {
+    return {
+      reason,
+      banExpiresAtUtc: this.resolveBanExpiresAtUtc()
+    };
+  }
+
+  private buildReportBanReason(report: ManagerReportDto): string {
+    const reason = (report.reason ?? '').trim();
+    if (!reason) {
+      return 'Banned following an upheld manager report.';
+    }
+    return reason.length > 500 ? reason.slice(0, 500) : reason;
   }
 
   private extractReportReviewError(err: unknown): string {
@@ -1673,27 +1780,27 @@ export class UsersComponent implements OnInit {
   }
 
   private resetBanDurationForm(): void {
-    this.banDuration = 'indefinite';
+    this.banDuration = 'permanent';
     this.banCustomEndDate = '';
   }
 
   banDurationSummary(): string {
-    const endsAt = this.resolveBanEndsAt();
-    if (this.banDuration === 'indefinite' || !endsAt) {
-      return 'indefinite';
+    const endsAt = this.resolveBanExpiresAtUtc();
+    if (this.banDuration === 'permanent' || !endsAt) {
+      return 'permanent';
     }
     return `until ${this.formatDate(endsAt)}`;
   }
 
-  private resolveBanEndsAt(): string | null {
-    if (this.banDuration === 'indefinite') {
+  /** ISO UTC expiry for `POST /users/{id}/ban`; `null` = permanent. */
+  private resolveBanExpiresAtUtc(): string | null {
+    if (this.banDuration === 'permanent') {
       return null;
     }
 
     if (this.banDuration === '30-days') {
       const end = new Date();
-      end.setHours(0, 0, 0, 0);
-      end.setDate(end.getDate() + 30);
+      end.setUTCDate(end.getUTCDate() + 30);
       return end.toISOString();
     }
 
@@ -1702,67 +1809,17 @@ export class UsersComponent implements OnInit {
       return null;
     }
 
-    const picked = new Date(`${raw}T00:00:00`);
-    if (Number.isNaN(picked.getTime())) {
+    const parts = raw.split('-').map((part) => parseInt(part, 10));
+    if (parts.length !== 3 || parts.some((part) => !Number.isFinite(part))) {
       return null;
     }
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (picked < today) {
+    const end = new Date(Date.UTC(parts[0], parts[1] - 1, parts[2], 23, 59, 59, 999));
+    if (Number.isNaN(end.getTime()) || end.getTime() <= Date.now()) {
       return null;
     }
 
-    return picked.toISOString();
-  }
-
-  private recordBanDurationChoice(report: ManagerReportDto): void {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    const record: AdminBanDurationRecord = {
-      userId: report.reportedUserId,
-      reportId: report.id,
-      duration: this.banDuration,
-      endsAt: this.resolveBanEndsAt(),
-      recordedAt: new Date().toISOString()
-    };
-
-    try {
-      const existing = this.readBanDurationRecords();
-      const withoutUser = existing.filter((item) => item.userId !== report.reportedUserId);
-      withoutUser.unshift(record);
-      window.localStorage.setItem(ADMIN_BAN_DURATION_STORAGE_KEY, JSON.stringify(withoutUser.slice(0, 200)));
-    } catch {
-      // Ignore storage failures; ban still applied on the server.
-    }
-  }
-
-  private readBanDurationRecords(): AdminBanDurationRecord[] {
-    if (typeof window === 'undefined') {
-      return [];
-    }
-
-    try {
-      const raw = window.localStorage.getItem(ADMIN_BAN_DURATION_STORAGE_KEY);
-      if (!raw) {
-        return [];
-      }
-      const parsed = JSON.parse(raw) as unknown;
-      if (!Array.isArray(parsed)) {
-        return [];
-      }
-      return parsed.filter(
-        (item): item is AdminBanDurationRecord =>
-          !!item &&
-          typeof item === 'object' &&
-          typeof (item as AdminBanDurationRecord).userId === 'number' &&
-          typeof (item as AdminBanDurationRecord).reportId === 'number'
-      );
-    } catch {
-      return [];
-    }
+    return end.toISOString();
   }
 
   private toDateInputValue(date: Date): string {
