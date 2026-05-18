@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter } from 'rxjs';
 import { AuthService } from './services/auth.service';
 import { UserDto } from './models/user.model';
 
@@ -21,9 +22,22 @@ export class App implements OnInit, OnDestroy {
   private isRedirectingForRoleChange = false;
   private readonly syncBanNoticeHandler = () => this.syncBanNotice();
 
-  constructor(private readonly authService: AuthService) {}
+  private currentUrl = '';
+
+  constructor(
+    private readonly authService: AuthService,
+    private readonly router: Router,
+  ) {}
 
   ngOnInit(): void {
+    this.currentUrl = this.router.url;
+    this.router.events
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event) => {
+        this.currentUrl = event.urlAfterRedirects;
+        this.syncBanNotice();
+      });
+
     this.syncBanNotice();
     this.checkForContentCreatorDowngrade();
     this.roleCheckTimer = setInterval(
@@ -108,6 +122,11 @@ export class App implements OnInit, OnDestroy {
   }
 
   private syncBanNotice(): void {
+    if (this.currentUrl.startsWith('/account-banned') || this.authService.isBannedContentCreator()) {
+      this.bannedAccountNotice.set('');
+      return;
+    }
+
     const persistedMessage = sessionStorage.getItem('spirego-admin-ban-message')?.trim();
     if (persistedMessage) {
       this.bannedAccountNotice.set(persistedMessage);
