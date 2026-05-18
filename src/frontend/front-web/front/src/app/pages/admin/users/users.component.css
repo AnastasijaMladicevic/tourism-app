@@ -931,6 +931,11 @@ th {
   color: #9a3412;
 }
 
+.status-pill.banned {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
 .actions {
   width: 60px;
   color: #6b7280;

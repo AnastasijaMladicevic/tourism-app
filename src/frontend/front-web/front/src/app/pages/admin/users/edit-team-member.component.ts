@@ -15,7 +15,7 @@ import {
   timeout
 } from 'rxjs/operators';
 import { UpdateUserDto, UserDto } from '../../../models/user.model';
-import { AdminUsersService } from '../../../services/admin-users.service';
+import { AdminUsersService, BanUserDto } from '../../../services/admin-users.service';
 
 /** Mirrors role cards on create page; includes Admin when API returns it. */
 export type DisplayRole = 'manager' | 'content-creator' | 'tourist' | 'admin';
@@ -62,6 +62,17 @@ export class EditTeamMemberComponent {
   country = 'United States';
   preferredLanguage = 'English (US)';
   regionAssignment = '';
+
+  isModerating = false;
+  moderationError = '';
+  moderationSuccess = '';
+  isBanned = false;
+  activeBanReason = '';
+  activeBanExpiresLabel = '';
+  activeBannedAtLabel = '';
+  banReason = '';
+  banDurationValue = 7;
+  banDurationUnit: 'hours' | 'days' | 'weeks' | 'months' | 'permanent' = 'days';
 
   readonly countries = [
     'United States',
@@ -169,6 +180,8 @@ export class EditTeamMemberComponent {
     } else if (this.roleAtLoad === 'content-creator') {
       this.touristRoleSelection = 'content-creator';
     }
+
+    this.syncBanState(user);
   }
 
   selectTouristRole(role: 'tourist' | 'content-creator'): void {
@@ -186,6 +199,30 @@ export class EditTeamMemberComponent {
 
   get showRolePairPicker(): boolean {
     return this.displayRole === 'tourist' || this.displayRole === 'content-creator';
+  }
+
+  get canModerateBan(): boolean {
+    return this.displayRole === 'tourist' || this.displayRole === 'content-creator';
+  }
+
+  get isPermanentBanSelected(): boolean {
+    return this.banDurationUnit === 'permanent';
+  }
+
+  get banDurationPreview(): string {
+    if (this.isPermanentBanSelected) {
+      return 'Permanent ban';
+    }
+
+    const value = Math.max(1, Math.floor(Number(this.banDurationValue) || 0));
+    const unitMap: Record<'hours' | 'days' | 'weeks' | 'months', string> = {
+      hours: value === 1 ? 'hour' : 'hours',
+      days: value === 1 ? 'day' : 'days',
+      weeks: value === 1 ? 'week' : 'weeks',
+      months: value === 1 ? 'month' : 'months'
+    };
+
+    return `${value} ${unitMap[this.banDurationUnit as 'hours' | 'days' | 'weeks' | 'months']}`;
   }
 
   private extractLoadError(err: unknown): string {
@@ -272,6 +309,92 @@ export class EditTeamMemberComponent {
 
   onCancel(): void {
     void this.router.navigate(['/admin/users']);
+  }
+
+  banUser(): void {
+    this.moderationError = '';
+    this.moderationSuccess = '';
+
+    if (!this.canModerateBan) {
+      this.moderationError = 'Only tourist and content creator accounts can be banned from this screen.';
+      return;
+    }
+
+    const reason = this.banReason.trim();
+    if (!reason) {
+      this.moderationError = 'Please enter a ban reason.';
+      return;
+    }
+
+    if (!this.isPermanentBanSelected) {
+      const normalizedDuration = Math.floor(Number(this.banDurationValue) || 0);
+      if (!Number.isFinite(normalizedDuration) || normalizedDuration < 1) {
+        this.moderationError = 'Please enter a valid ban duration.';
+        return;
+      }
+    }
+
+    const dto: BanUserDto = {
+      reason,
+      banExpiresAtUtc: this.buildBanExpiryUtc()
+    };
+
+    this.isModerating = true;
+    this.adminUsers
+      .banUser(this.userId, dto)
+      .pipe(
+        finalize(() => {
+          this.isModerating = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: (user) => {
+          this.applyUser(user);
+          this.banReason = '';
+          this.banDurationValue = 7;
+          this.banDurationUnit = 'days';
+          this.moderationSuccess = user.banExpiresAtUtc
+            ? `User banned until ${this.activeBanExpiresLabel}.`
+            : 'User permanently banned.';
+          this.cdr.markForCheck();
+        },
+        error: (err: unknown) => {
+          this.moderationError = this.extractApiMessage(err);
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  unbanUser(): void {
+    this.moderationError = '';
+    this.moderationSuccess = '';
+
+    if (!this.canModerateBan) {
+      this.moderationError = 'This account type cannot be unbanned from this screen.';
+      return;
+    }
+
+    this.isModerating = true;
+    this.adminUsers
+      .unbanUser(this.userId)
+      .pipe(
+        finalize(() => {
+          this.isModerating = false;
+          this.cdr.markForCheck();
+        })
+      )
+      .subscribe({
+        next: (user) => {
+          this.applyUser(user);
+          this.moderationSuccess = 'User ban has been removed.';
+          this.cdr.markForCheck();
+        },
+        error: (err: unknown) => {
+          this.moderationError = this.extractApiMessage(err);
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   onSave(): void {
@@ -396,6 +519,56 @@ export class EditTeamMemberComponent {
       return 'content-creator';
     }
     return 'tourist';
+  }
+
+  private syncBanState(user: UserDto): void {
+    this.isBanned = !!user.isBanned;
+    this.activeBanReason = (user.banReason ?? '').trim();
+    this.activeBanExpiresLabel = this.formatDateTime(user.banExpiresAtUtc);
+    this.activeBannedAtLabel = this.formatDateTime(user.bannedAtUtc);
+  }
+
+  private buildBanExpiryUtc(): string | null {
+    if (this.isPermanentBanSelected) {
+      return null;
+    }
+
+    const durationValue = Math.max(1, Math.floor(Number(this.banDurationValue) || 1));
+    const expiresAt = new Date();
+
+    switch (this.banDurationUnit) {
+      case 'hours':
+        expiresAt.setUTCHours(expiresAt.getUTCHours() + durationValue);
+        break;
+      case 'weeks':
+        expiresAt.setUTCDate(expiresAt.getUTCDate() + durationValue * 7);
+        break;
+      case 'months':
+        expiresAt.setUTCMonth(expiresAt.getUTCMonth() + durationValue);
+        break;
+      case 'days':
+      default:
+        expiresAt.setUTCDate(expiresAt.getUTCDate() + durationValue);
+        break;
+    }
+
+    return expiresAt.toISOString();
+  }
+
+  private formatDateTime(value?: string | null): string {
+    if (!value) {
+      return '';
+    }
+
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+      return '';
+    }
+
+    return new Intl.DateTimeFormat('en-GB', {
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    }).format(parsed);
   }
 
   private extractApiMessage(err: unknown): string {

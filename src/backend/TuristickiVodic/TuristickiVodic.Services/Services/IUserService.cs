@@ -28,6 +28,8 @@ namespace TuristickiVodic.Services
         Task<bool> ApproveCreatorRoleAsync(int userId);
         Task<bool> RejectCreatorRoleAsync(int userId);
         Task<bool> DemoteCreatorRoleAsync(int userId);
+        Task<UserDto?> BanUserAsync(int userId, BanUserDto dto);
+        Task<UserDto?> UnbanUserAsync(int userId);
         Task<bool> ToggleUserActiveAsync(int userId, bool isActive);
         Task<bool> LogoutAsync(int userId, string? jti, DateTime? accessTokenExpiryUtc);
         Task<PagedResultDto<CreatorRoleRequestDto>> GetCreatorRequestsAsync(CreatorRoleRequestQueryDto query);

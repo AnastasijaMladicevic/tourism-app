@@ -30,6 +30,10 @@ export interface UserDto {
   preferredRegionName?: string | null;
   preferredRegionCode?: string | null;
   publicAppHomeUrl?: string | null;
+  isBanned?: boolean;
+  banReason?: string | null;
+  banExpiresAtUtc?: string | null;
+  bannedAtUtc?: string | null;
 }
 
 /** Matches TuristickiVodic.Core.DTO.UpdateUserDto — profile fields admins may update (email is not included). */

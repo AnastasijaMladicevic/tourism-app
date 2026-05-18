@@ -14,6 +14,15 @@ export interface AdminUserListItemDto {
   country?: string | null;
   isActive?: boolean;
   createdAt?: string;
+  isBanned?: boolean;
+  banReason?: string | null;
+  banExpiresAtUtc?: string | null;
+  bannedAtUtc?: string | null;
+}
+
+export interface BanUserDto {
+  reason: string;
+  banExpiresAtUtc?: string | null;
 }
 
 export interface PagedUsersResultDto {
@@ -166,5 +175,13 @@ export class AdminUsersService {
    */
   demoteCreatorRole(id: number): Observable<{ message: string }> {
     return this.http.post<{ message: string }>(`${this.apiUrl}/${id}/demote-creator`, {});
+  }
+
+  banUser(id: number, dto: BanUserDto): Observable<UserDto> {
+    return this.http.post<UserDto>(`${this.apiUrl}/${id}/ban`, dto);
+  }
+
+  unbanUser(id: number): Observable<UserDto> {
+    return this.http.post<UserDto>(`${this.apiUrl}/${id}/unban`, {});
   }
 }

@@ -264,6 +264,95 @@
       </label>
     </section>
 
+    <section class="form-section">
+      <div class="section-heading">
+        <span class="section-icon-wrap" aria-hidden="true">
+          <span class="material-symbols-outlined section-icon">gpp_bad</span>
+        </span>
+        <div>
+          <h2 class="section-title">Access Restriction</h2>
+          <p class="section-desc">Temporarily or permanently ban tourist and content creator accounts, then remove the ban when needed.</p>
+        </div>
+      </div>
+
+      <p class="role-api-note role-api-note--info" *ngIf="!canModerateBan">
+        Ban controls are available only for <strong>Tourist</strong> and <strong>Content Creator</strong> accounts.
+      </p>
+
+      <div class="moderation-summary" *ngIf="canModerateBan && isBanned">
+        <div class="moderation-summary-header">
+          <span class="material-symbols-outlined moderation-summary-icon" aria-hidden="true">block</span>
+          <div>
+            <h3 class="moderation-summary-title">This account is currently banned</h3>
+            <p class="moderation-summary-meta" *ngIf="activeBannedAtLabel">Banned at {{ activeBannedAtLabel }}</p>
+          </div>
+        </div>
+        <p class="moderation-summary-copy" *ngIf="activeBanReason">Reason: {{ activeBanReason }}</p>
+        <p class="moderation-summary-copy" *ngIf="activeBanExpiresLabel; else permanentBanCopy">
+          Ban expires: {{ activeBanExpiresLabel }}
+        </p>
+        <ng-template #permanentBanCopy>
+          <p class="moderation-summary-copy">Ban expires: Permanent</p>
+        </ng-template>
+        <p class="moderation-summary-note">While the ban is active, this user can reach the login screen but cannot access the app.</p>
+      </div>
+
+      <div class="form-feedback error" *ngIf="moderationError" role="alert">{{ moderationError }}</div>
+      <div class="form-feedback success" *ngIf="moderationSuccess" role="status">{{ moderationSuccess }}</div>
+
+      <ng-container *ngIf="canModerateBan">
+        <label class="field">
+          <span class="field-label">Ban reason <span class="req">*</span></span>
+          <textarea
+            class="input-control textarea-control"
+            rows="4"
+            maxlength="500"
+            placeholder="Explain why this account is being banned."
+            [(ngModel)]="banReason"
+          ></textarea>
+          <p class="field-hint">This text will be shown to the user on the login screen.</p>
+        </label>
+
+        <div class="field-grid field-grid--2 moderation-grid">
+          <label class="field">
+            <span class="field-label">Duration</span>
+            <input
+              type="number"
+              class="input-control"
+              min="1"
+              step="1"
+              [disabled]="isPermanentBanSelected"
+              [(ngModel)]="banDurationValue"
+            />
+          </label>
+
+          <label class="field">
+            <span class="field-label">Time unit</span>
+            <select class="input-control select-control select-control--full" [(ngModel)]="banDurationUnit">
+              <option value="hours">Hours</option>
+              <option value="days">Days</option>
+              <option value="weeks">Weeks</option>
+              <option value="months">Months</option>
+              <option value="permanent">Permanent</option>
+            </select>
+          </label>
+        </div>
+
+        <p class="field-hint">Selected ban duration: {{ banDurationPreview }}</p>
+
+        <div class="moderation-actions">
+          <button type="button" class="btn-danger" (click)="banUser()" [disabled]="isModerating">
+            <span class="material-symbols-outlined btn-icon" aria-hidden="true">block</span>
+            <span class="btn-text">{{ isModerating ? 'Applying…' : (isBanned ? 'Update ban' : 'Ban user') }}</span>
+          </button>
+          <button type="button" class="btn-secondary" *ngIf="isBanned" (click)="unbanUser()" [disabled]="isModerating">
+            <span class="material-symbols-outlined btn-icon" aria-hidden="true">lock_open</span>
+            <span class="btn-text">{{ isModerating ? 'Working…' : 'Unban user' }}</span>
+          </button>
+        </div>
+      </ng-container>
+    </section>
+
     <footer class="form-actions">
       <button type="button" class="btn-cancel" (click)="onCancel()" [disabled]="isSubmitting">
         <span class="material-symbols-outlined btn-icon" aria-hidden="true">close</span>

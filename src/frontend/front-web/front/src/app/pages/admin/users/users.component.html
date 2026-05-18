@@ -401,7 +401,15 @@
               </td>
               <td><span class="role-pill">{{ member.role }}</span></td>
               <td>{{ member.lastLogin }}</td>
-              <td><span class="status-pill" [class.pending]="member.status !== 'Active'">{{ member.status }}</span></td>
+              <td>
+                <span
+                  class="status-pill"
+                  [class.pending]="member.status === 'Inactive'"
+                  [class.banned]="member.status === 'Banned'"
+                >
+                  {{ member.status }}
+                </span>
+              </td>
               <td class="actions">
                 <a class="actions-edit-link" [routerLink]="['/admin/users/edit', member.id]" title="Edit user">✎</a>
               </td>
@@ -858,7 +866,15 @@
             </td>
             <td>{{ tourist.email }}</td>
             <td>{{ tourist.origin }}</td>
-            <td><span class="status-pill" [class.pending]="tourist.status !== 'active'">{{ tourist.status }}</span></td>
+            <td>
+              <span
+                class="status-pill"
+                [class.pending]="tourist.status === 'inactive'"
+                [class.banned]="tourist.status === 'banned'"
+              >
+                {{ tourist.status }}
+              </span>
+            </td>
             <td>{{ tourist.joinedDate }}</td>
             <td class="actions">
               <a class="actions-edit-link" [routerLink]="['/admin/users/edit', tourist.id]" title="Edit user">✎</a>

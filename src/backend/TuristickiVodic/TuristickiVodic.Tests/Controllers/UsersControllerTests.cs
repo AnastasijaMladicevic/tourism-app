@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using System.Security.Claims;
 using Xunit;
@@ -25,7 +26,8 @@ namespace TuristickiVodic.Tests.Controllers
     {
         private static UsersController CreateController(Mock<IUserService> mockService, ClaimsPrincipal user)
         {
-            var controller = new UsersController(mockService.Object);
+            var configuration = new ConfigurationBuilder().Build();
+            var controller = new UsersController(mockService.Object, configuration);
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -518,17 +520,22 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
-        public async Task Login_KadaJeKorisnikBlacklisted_VracaBadRequest()
+        public async Task Login_KadaJeKorisnikBanovan_VracaLocked()
         {
             var mockService = new Mock<IUserService>();
             mockService.Setup(s => s.LoginAsync(It.IsAny<LoginDto>()))
-                .ThrowsAsync(new InvalidOperationException("User is blacklisted"));
+                .ThrowsAsync(new AccountBannedException(
+                    "Ovaj nalog je banovan do 20.05.2026. 12:00 UTC. Razlog: Test.",
+                    "Test",
+                    new DateTime(2026, 5, 20, 12, 0, 0, DateTimeKind.Utc),
+                    "Tourist"));
 
             var controller = CreateController(mockService, new ClaimsPrincipal(new ClaimsIdentity()));
 
             var result = await controller.Login(new LoginDto { Email = "a@b.com", Password = "pass" });
 
-            result.Should().BeOfType<BadRequestObjectResult>();
+            var locked = result.Should().BeOfType<ObjectResult>().Subject;
+            locked.StatusCode.Should().Be(423);
         }
 
         [Fact]
@@ -1324,6 +1331,62 @@ namespace TuristickiVodic.Tests.Controllers
             });
 
             result.Should().BeOfType<BadRequestObjectResult>();
+        }
+
+        [Fact]
+        public async Task BanUser_KadaAdminPozove_VracaOkSaBanovanimKorisnikom()
+        {
+            var mockService = new Mock<IUserService>();
+            var dto = new UserDto
+            {
+                Id = 77,
+                FirstName = "Ban",
+                LastName = "Target",
+                Email = "ban.target@test.com",
+                RoleName = "Tourist",
+                IsBanned = true,
+                BanReason = "Spam",
+                BanExpiresAtUtc = DateTime.UtcNow.AddDays(2)
+            };
+
+            mockService.Setup(s => s.BanUserAsync(77, It.IsAny<BanUserDto>()))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            var result = await controller.BanUser(77, new BanUserDto
+            {
+                Reason = "Spam",
+                BanExpiresAtUtc = DateTime.UtcNow.AddDays(2)
+            });
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
+        }
+
+        [Fact]
+        public async Task UnbanUser_KadaAdminPozove_VracaOkSaOdblokiranimKorisnikom()
+        {
+            var mockService = new Mock<IUserService>();
+            var dto = new UserDto
+            {
+                Id = 78,
+                FirstName = "Unban",
+                LastName = "Target",
+                Email = "unban.target@test.com",
+                RoleName = "ContentCreator",
+                IsBanned = false
+            };
+
+            mockService.Setup(s => s.UnbanUserAsync(78))
+                .ReturnsAsync(dto);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(1, "Admin"));
+
+            var result = await controller.UnbanUser(78);
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(dto);
         }
     }
 }
