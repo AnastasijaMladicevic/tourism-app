@@ -2,17 +2,7 @@ import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angul
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin, of } from 'rxjs';
-import { catchError, finalize, map, switchMap } from 'rxjs/operators';
-import {
-  AdminUserListItemDto,
-  AdminUsersService,
-  CreatorRoleRequestDto
-} from '../../../services/admin-users.service';
-import {
-  ManagerReportDto,
-  ManagerReportsService
-} from '../../../services/manager-reports.service';
+import { catchError, finalize, of } from 'rxjs';
 import { DestinationDto, DestinationService } from '../../../services/destination.service';
 import { AuthService } from '../../../services/auth.service';
 import {
@@ -21,34 +11,120 @@ import {
 } from '../../../shared/components/admin-platform-map/admin-platform-map.component';
 import { UserDto } from '../../../models/user.model';
 
-const CHART_DAYS = 14;
-const MAX_USER_PAGES = 25;
-const MAX_REPORT_PAGES = 10;
+export type DashboardPeriod = '7d' | '30d' | '3m' | '6m' | '1y' | '5y';
 
-interface TopOriginRow {
+interface PeriodOption {
+  key: DashboardPeriod;
+  label: string;
+}
+
+interface UserGrowthSeries {
+  key: string;
+  label: string;
+  color: string;
+  linePath: string;
+  values: number[];
+}
+
+interface RoleDonutSlice {
+  role: string;
+  label: string;
+  count: number;
+  color: string;
+  percent: number;
+  path: string;
+}
+
+interface RegionRow {
   name: string;
-  users: number;
+  code: string;
+  total: number;
+  active: number;
+  geocoded: number;
   barPercent: number;
 }
 
-interface PlatformActivityItem {
-  initials: string;
-  avatarTone: 'indigo' | 'teal' | 'violet' | 'amber' | 'slate';
-  title: string;
-  detail: string;
-  timeLabel: string;
-  roleBadge: string;
-  sortAt: number;
-  routerLink: string | (string | number)[];
-  queryParams?: Record<string, string>;
+interface HealthGroup {
+  label: string;
+  segments: { label: string; value: number; color: string; percent: number }[];
 }
 
-interface ReportStatusSlice {
+interface CreatorRequestSlice {
   label: string;
   count: number;
   color: string;
   percent: number;
 }
+
+interface ReportSlice {
+  label: string;
+  count: number;
+  color: string;
+  percent: number;
+}
+
+interface AdminActivityItem {
+  initials: string;
+  avatarTone: 'indigo' | 'teal' | 'violet' | 'amber' | 'blue' | 'slate';
+  actorName: string;
+  actionText: string;
+  targetLabel: string;
+  timeLabel: string;
+  roleBadge: string;
+  roleIcon: string;
+  routerLink: string | (string | number)[];
+}
+
+const ACTIVITY_PAGE_SIZE = 5;
+
+/** UI mock — mirrors AdminDashboardOverviewDto until overview API is wired. */
+interface DashboardMockOverview {
+  summary: {
+    totalTourists: number;
+    newTouristsInPeriod: number;
+    activeDestinations: number;
+    newDestinationsInPeriod: number;
+    pendingCreatorRequests: number;
+    openReports: number;
+  };
+  userGrowth: { label: string; tourists: number; creators: number; managers: number; admins: number }[];
+  granularityLabel: string;
+  roleDistribution: { role: string; label: string; count: number; color: string }[];
+  destinationsByRegion: RegionRow[];
+  creatorRequests: {
+    pending: number;
+    approved: number;
+    rejected: number;
+    none: number;
+    totalSubmitted: number;
+  };
+  reports: { pending: number; approved: number; rejected: number; total: number };
+  accountHealth: {
+    verified: number;
+    unverified: number;
+    active: number;
+    inactive: number;
+    temporarilyBanned: number;
+    permanentlyBanned: number;
+    totalBanned: number;
+  };
+}
+
+const PERIOD_OPTIONS: PeriodOption[] = [
+  { key: '7d', label: '7d' },
+  { key: '30d', label: '30d' },
+  { key: '3m', label: '3m' },
+  { key: '6m', label: '6m' },
+  { key: '1y', label: '1y' },
+  { key: '5y', label: '5y' }
+];
+
+const ROLE_COLORS: Record<string, string> = {
+  Tourist: '#0d9488',
+  ContentCreator: '#6366f1',
+  Manager: '#d97706',
+  Admin: '#dc2626'
+};
 
 @Component({
   selector: 'app-dashboard',
@@ -58,61 +134,78 @@ interface ReportStatusSlice {
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  private readonly adminUsers = inject(AdminUsersService);
-  private readonly managerReports = inject(ManagerReportsService);
   private readonly destinationService = inject(DestinationService);
   private readonly authService = inject(AuthService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly cdr = inject(ChangeDetectorRef);
 
-  user: UserDto | null = null;
+  readonly periodOptions = PERIOD_OPTIONS;
+  selectedPeriod: DashboardPeriod = '30d';
 
+  user: UserDto | null = null;
   mapDestinations: DestinationDto[] = [];
+  mapMarkerCount = 0;
 
   isLoading = true;
   loadError = '';
 
-  totalTourists = 0;
-  newTourists7d = 0;
-  touristSignupDeltaPercent = 0;
-  pendingCreatorRequests = 0;
-  pendingManagerReports = 0;
-  bannedUsers = 0;
-  bannedTourists = 0;
-  teamTotal = 0;
-  teamAdmins = 0;
-  teamManagers = 0;
-  teamCreators = 0;
-  destinationCount = 0;
-  mapMarkerCount = 0;
-  activeTourists = 0;
-  inactiveTourists = 0;
+  overview!: DashboardMockOverview;
 
-  pendingCreatorQueue: CreatorRoleRequestDto[] = [];
-  pendingReportQueue: ManagerReportDto[] = [];
+  userGrowthSeries: UserGrowthSeries[] = [];
+  userGrowthMaxY = 1;
+  userGrowthYTop = '0';
+  userGrowthYMid = '0';
+  userGrowthXLabels: { label: string }[] = [];
+  userGrowthIsEmpty = false;
+  roleDonutSlices: RoleDonutSlice[] = [];
+  roleDonutTotal = 0;
+  regionRows: RegionRow[] = [];
+  healthGroups: HealthGroup[] = [];
+  creatorSlices: CreatorRequestSlice[] = [];
+  reportSlices: ReportSlice[] = [];
 
-  topOrigins: TopOriginRow[] = [];
-  reportStatusSlices: ReportStatusSlice[] = [];
-  activityFeed: PlatformActivityItem[] = [];
+  activityItems: AdminActivityItem[] = [];
+  activityVisibleCount = ACTIVITY_PAGE_SIZE;
 
-  touristChartLineSignups = '';
-  touristChartAreaSignups = '';
-  touristChartMaxY = 1;
-  touristChartYTopLabel = '0';
-  touristChartYMidLabel = '0';
-  touristChartIsEmpty = true;
-  touristChartSubtitle = '';
-  touristChartXLabels: { label: string }[] = [];
-  readonly gridLineYs = [0, 25, 50, 75, 100];
-  readonly chartDays = CHART_DAYS;
+  get visibleActivityItems(): AdminActivityItem[] {
+    return this.activityItems.slice(0, this.activityVisibleCount);
+  }
+
+  get canLoadMoreActivity(): boolean {
+    return this.activityVisibleCount < this.activityItems.length;
+  }
 
   ngOnInit(): void {
     this.user = this.authService.getUser();
-    this.loadDashboard();
+    this.applyMockOverview();
+    this.loadMapDestinations();
+  }
+
+  selectPeriod(period: DashboardPeriod): void {
+    if (this.selectedPeriod === period) return;
+    this.selectedPeriod = period;
+    this.applyMockOverview();
+    this.cdr.markForCheck();
+  }
+
+  loadMoreActivity(): void {
+    this.activityVisibleCount = Math.min(
+      this.activityVisibleCount + ACTIVITY_PAGE_SIZE,
+      this.activityItems.length
+    );
+    this.cdr.markForCheck();
   }
 
   reload(): void {
-    this.loadDashboard();
+    this.applyMockOverview();
+    this.loadMapDestinations();
+  }
+
+  granularityHint(): string {
+    const p = this.selectedPeriod;
+    if (p === '7d' || p === '30d') return 'Grouped by day';
+    if (p === '3m' || p === '6m') return 'Grouped by week';
+    return 'Grouped by month';
   }
 
   onMapMarkersSummary(summary: AdminPlatformMapMarkersSummary): void {
@@ -120,361 +213,354 @@ export class DashboardComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  private loadDashboard(): void {
-    this.isLoading = true;
+  private applyMockOverview(): void {
+    this.overview = this.buildMockOverview(this.selectedPeriod);
+    this.bindCharts(this.overview);
+    this.activityItems = this.buildMockActivity(this.selectedPeriod);
+    this.activityVisibleCount = ACTIVITY_PAGE_SIZE;
+    this.isLoading = false;
     this.loadError = '';
+    this.cdr.markForCheck();
+  }
 
-    forkJoin({
-      touristTotal: this.fetchRoleTotal('Tourist'),
-      adminTotal: this.fetchRoleTotal('Admin'),
-      managerTotal: this.fetchRoleTotal('Manager'),
-      creatorTotal: this.fetchRoleTotal('ContentCreator'),
-      tourists: this.fetchAllUsers('Tourist'),
-      contentCreators: this.fetchAllUsers('ContentCreator'),
-      creatorRequestsPage: this.adminUsers
-        .getCreatorRequests({ page: 1, pageSize: 5, sortBy: 'createdAt', sortOrder: 'desc' })
-        .pipe(catchError(() => of({ items: [], totalCount: 0, page: 1, pageSize: 5, totalPages: 0 }))),
-      pendingReportsPage: this.managerReports
-        .getAllReports({ page: 1, pageSize: 5, status: 'Pending', sortBy: 'createdAt', sortOrder: 'desc' })
-        .pipe(catchError(() => of({ items: [], totalCount: 0, page: 1, pageSize: 5, totalPages: 0 }))),
-      pendingReportsCount: this.managerReports
-        .getAllReports({ page: 1, pageSize: 1, status: 'Pending' })
-        .pipe(
-          map((p) => p.totalCount ?? 0),
-          catchError(() => of(0))
-        ),
-      reportStatusCounts: this.fetchReportStatusCounts(),
-      destinationTotal: this.fetchDestinationTotal(),
-      mapDestinations: this.fetchAllDestinations(),
-      recentReports: this.fetchRecentReports()
-    })
+  private buildMockActivity(period: DashboardPeriod): AdminActivityItem[] {
+    const times: Record<DashboardPeriod, string[]> = {
+      '7d': ['2 hours ago', '5 hours ago', 'Yesterday at 14:20', '2 days ago', '3 days ago', '4 days ago', '6 days ago'],
+      '30d': ['2 hours ago', 'Yesterday at 14:20', '3 days ago', '1 week ago', '2 weeks ago', '3 weeks ago', '4 weeks ago'],
+      '3m': ['Yesterday', '1 week ago', '2 weeks ago', '1 month ago', '6 weeks ago', '2 months ago', '10 weeks ago'],
+      '6m': ['3 days ago', '2 weeks ago', '1 month ago', '2 months ago', '3 months ago', '4 months ago', '5 months ago'],
+      '1y': ['1 week ago', '1 month ago', '3 months ago', '5 months ago', '7 months ago', '9 months ago', '11 months ago'],
+      '5y': ['2 months ago', '6 months ago', '1 year ago', '2 years ago', '3 years ago', '4 years ago', '5 years ago']
+    };
+    const t = times[period];
+
+    return [
+      {
+        initials: 'MJ',
+        avatarTone: 'indigo',
+        actorName: 'Marko J.',
+        actionText: 'updated settings for',
+        targetLabel: 'Spire Mountain Resort',
+        timeLabel: t[0],
+        roleBadge: 'ADMIN',
+        roleIcon: 'admin_panel_settings',
+        routerLink: ['/admin/destinations']
+      },
+      {
+        initials: 'EP',
+        avatarTone: 'teal',
+        actorName: 'Elena P.',
+        actionText: 'published a new guide for',
+        targetLabel: 'Bay of Kotor',
+        timeLabel: t[1],
+        roleBadge: 'CONTENT CREATOR',
+        roleIcon: 'edit_note',
+        routerLink: ['/admin/destinations']
+      },
+      {
+        initials: 'NK',
+        avatarTone: 'amber',
+        actorName: 'Nikola K.',
+        actionText: 'assigned manager to',
+        targetLabel: 'Lake Skadar Reserve',
+        timeLabel: t[2],
+        roleBadge: 'MANAGER',
+        roleIcon: 'supervisor_account',
+        routerLink: ['/admin/users']
+      },
+      {
+        initials: 'AS',
+        avatarTone: 'violet',
+        actorName: 'Ana S.',
+        actionText: 'approved creator request for',
+        targetLabel: 'Coastal Trail Network',
+        timeLabel: t[3],
+        roleBadge: 'ADMIN',
+        roleIcon: 'verified',
+        routerLink: ['/admin/users']
+      },
+      {
+        initials: 'DM',
+        avatarTone: 'blue',
+        actorName: 'Davor M.',
+        actionText: 'resolved report on',
+        targetLabel: 'Old Town Heritage Walk',
+        timeLabel: t[4],
+        roleBadge: 'MANAGER',
+        roleIcon: 'flag',
+        routerLink: ['/admin/users']
+      },
+      {
+        initials: 'IL',
+        avatarTone: 'slate',
+        actorName: 'Ivana L.',
+        actionText: 'created destination',
+        targetLabel: 'Prokletije Peaks',
+        timeLabel: t[5],
+        roleBadge: 'ADMIN',
+        roleIcon: 'add_location_alt',
+        routerLink: ['/admin/destinations']
+      },
+      {
+        initials: 'TG',
+        avatarTone: 'teal',
+        actorName: 'Tea G.',
+        actionText: 'updated media for',
+        targetLabel: 'Biogradska Gora',
+        timeLabel: t[6],
+        roleBadge: 'CONTENT CREATOR',
+        roleIcon: 'photo_library',
+        routerLink: ['/admin/destinations']
+      }
+    ];
+  }
+
+  private loadMapDestinations(): void {
+    this.destinationService
+      .getAll({ page: 1, pageSize: 100, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
       .pipe(
         takeUntilDestroyed(this.destroyRef),
-        finalize(() => {
-          this.isLoading = false;
-          this.cdr.markForCheck();
-        })
+        finalize(() => this.cdr.markForCheck()),
+        catchError(() => of([]))
       )
-      .subscribe({
-        next: (data) => {
-          const tourists = data.tourists.items;
-          const creators = data.contentCreators.items;
-          const moderationUsers = [...tourists, ...creators];
-
-          this.totalTourists = data.touristTotal > 0 ? data.touristTotal : tourists.length;
-          this.teamAdmins = data.adminTotal;
-          this.teamManagers = data.managerTotal;
-          this.teamCreators = data.creatorTotal;
-          this.teamTotal = this.teamAdmins + this.teamManagers + this.teamCreators;
-          this.mapDestinations = data.mapDestinations;
-          this.destinationCount =
-            data.destinationTotal > 0 ? data.destinationTotal : data.mapDestinations.length;
-          this.pendingCreatorRequests = data.creatorRequestsPage.totalCount ?? data.creatorRequestsPage.items.length;
-          this.pendingManagerReports = data.pendingReportsCount;
-          this.pendingCreatorQueue = data.creatorRequestsPage.items ?? [];
-          this.pendingReportQueue = data.pendingReportsPage.items ?? [];
-
-          this.bannedUsers = moderationUsers.filter((u) => u.isBanned).length;
-          this.bannedTourists = tourists.filter((u) => u.isBanned).length;
-          this.activeTourists = tourists.filter((u) => u.isActive && !u.isBanned).length;
-          this.inactiveTourists = tourists.filter((u) => !u.isActive && !u.isBanned).length;
-
-          const now = new Date();
-          const start7 = new Date(now);
-          start7.setDate(now.getDate() - 7);
-          const start14 = new Date(now);
-          start14.setDate(now.getDate() - 14);
-          this.newTourists7d = tourists.filter((u) => this.isOnOrAfter(u.createdAt, start7)).length;
-          const prev7 = tourists.filter((u) =>
-            this.isInRange(u.createdAt, start14, start7)
-          ).length;
-          this.touristSignupDeltaPercent = this.computePercentDelta(this.newTourists7d, prev7);
-
-          this.topOrigins = this.buildTopOrigins(tourists).slice(0, 5);
-          this.bindTouristChart(tourists);
-          this.reportStatusSlices = this.buildReportStatusSlices(data.reportStatusCounts);
-          this.activityFeed = this.buildActivityFeed(
-            tourists,
-            creators,
-            data.creatorRequestsPage.items ?? [],
-            data.recentReports
-          );
-
-          this.cdr.markForCheck();
-        },
-        error: () => {
-          this.loadError = 'Could not load dashboard data. Check that the API is running and try again.';
-        }
+      .subscribe((response) => {
+        const items = Array.isArray(response)
+          ? response
+          : ((response as { items?: DestinationDto[] }).items ?? []);
+        this.mapDestinations = items;
+        this.cdr.markForCheck();
       });
   }
 
-  private fetchAllDestinations() {
-    const pageSize = 100;
-    return this.destinationService.getAll({ page: 1, pageSize, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true }).pipe(
-      switchMap((response) => {
-        const first = this.toDestinationPage(response);
-        if (first.totalPages <= 1) {
-          return of(first.items);
-        }
-        const rest = Array.from({ length: Math.min(first.totalPages - 1, 20) }, (_, i) =>
-          this.destinationService
-            .getAll({ page: i + 2, pageSize, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
-            .pipe(map((res) => this.toDestinationPage(res).items))
-        );
-        return forkJoin([of(first.items), ...rest]).pipe(map((pages) => pages.flat()));
-      }),
-      catchError(() => of([] as DestinationDto[]))
-    );
-  }
+  private buildMockOverview(period: DashboardPeriod): DashboardMockOverview {
+    const scale = this.periodScale(period);
+    const points = this.periodPointCount(period);
 
-  private toDestinationPage(response: unknown): {
-    items: DestinationDto[];
-    totalCount: number;
-    totalPages: number;
-  } {
-    if (Array.isArray(response)) {
-      return { items: response, totalCount: response.length, totalPages: 1 };
-    }
-    const paged = response as {
-      items?: DestinationDto[];
-      totalCount?: number;
-      totalPages?: number;
-    };
-    const items = paged.items ?? [];
-    return {
-      items,
-      totalCount: paged.totalCount ?? items.length,
-      totalPages: paged.totalPages ?? 1
-    };
-  }
+    const userGrowth = Array.from({ length: points }, (_, i) => {
+      const wave = Math.sin((i / points) * Math.PI * 2) * 0.35 + 0.65;
+      const bump = 1 + (i / points) * 0.2;
+      return {
+        label: this.bucketLabel(period, i, points),
+        tourists: Math.round((12 + i * 1.8) * wave * bump * scale),
+        creators: Math.round((2 + i * 0.4) * wave * scale),
+        managers: Math.round((0.5 + i * 0.15) * wave * scale),
+        admins: Math.max(0, Math.round((0.2 + i * 0.05) * wave * scale))
+      };
+    });
 
-  private fetchDestinationTotal() {
-    return this.destinationService
-      .getAll({ page: 1, pageSize: 1, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
-      .pipe(
-        map((res) => this.toDestinationPage(res).totalCount),
-        catchError(() => of(0))
-      );
-  }
+    const roles = [
+      { role: 'Tourist', label: 'Tourists', count: Math.round(2840 * scale), color: ROLE_COLORS['Tourist'] },
+      { role: 'ContentCreator', label: 'Creators', count: Math.round(186 * scale), color: ROLE_COLORS['ContentCreator'] },
+      { role: 'Manager', label: 'Managers', count: Math.round(42 * scale), color: ROLE_COLORS['Manager'] },
+      { role: 'Admin', label: 'Admins', count: Math.round(8 * scale), color: ROLE_COLORS['Admin'] }
+    ];
 
-  private fetchRoleTotal(role: string) {
-    return this.adminUsers.getUsers({ page: 1, pageSize: 1, role }).pipe(
-      map((p) => (Number.isFinite(p.totalCount) ? p.totalCount : 0)),
-      catchError(() => of(0))
-    );
-  }
-
-  private fetchAllUsers(role: string) {
-    return this.adminUsers.getUsers({ page: 1, pageSize: 100, role, sortBy: 'createdAt', sortOrder: 'desc' }).pipe(
-      switchMap((first) => {
-        const itemsFirst = first.items ?? [];
-        const totalCount = Number.isFinite(first.totalCount) ? first.totalCount : itemsFirst.length;
-        const totalPages = Math.min(this.capPages(first.totalPages), MAX_USER_PAGES);
-        if (totalPages <= 1) {
-          return of({ items: itemsFirst, totalCount });
-        }
-        const rest = Array.from({ length: totalPages - 1 }, (_, i) =>
-          this.adminUsers.getUsers({ page: i + 2, pageSize: 100, role, sortBy: 'createdAt', sortOrder: 'desc' })
-        );
-        return forkJoin(rest).pipe(
-          map((pages) => ({
-            items: [...itemsFirst, ...pages.flatMap((p) => p.items ?? [])],
-            totalCount
-          }))
-        );
-      }),
-      catchError(() => of({ items: [] as AdminUserListItemDto[], totalCount: 0 }))
-    );
-  }
-
-  private fetchReportStatusCounts() {
-    const statuses = ['Pending', 'Approved', 'Rejected'] as const;
-    return forkJoin(
-      statuses.map((status) =>
-        this.managerReports.getAllReports({ page: 1, pageSize: 1, status }).pipe(
-          map((p) => ({ status, count: p.totalCount ?? 0 })),
-          catchError(() => of({ status, count: 0 }))
-        )
-      )
-    );
-  }
-
-  private fetchRecentReports() {
-    return this.managerReports
-      .getAllReports({ page: 1, pageSize: 8, sortBy: 'createdAt', sortOrder: 'desc' })
-      .pipe(
-        switchMap((first) => {
-          const items = first.items ?? [];
-          const pages = Math.min(this.capPages(first.totalPages), MAX_REPORT_PAGES);
-          if (pages <= 1) {
-            return of(items);
-          }
-          const rest = Array.from({ length: pages - 1 }, (_, i) =>
-            this.managerReports.getAllReports({
-              page: i + 2,
-              pageSize: 8,
-              sortBy: 'createdAt',
-              sortOrder: 'desc'
-            })
-          );
-          return forkJoin(rest).pipe(map((more) => [...items, ...more.flatMap((p) => p.items ?? [])]));
-        }),
-        catchError(() => of([] as ManagerReportDto[]))
-      );
-  }
-
-  private buildReportStatusSlices(
-    rows: { status: string; count: number }[]
-  ): ReportStatusSlice[] {
-    const colors: Record<string, string> = {
-      Pending: '#d97706',
-      Approved: '#059669',
-      Rejected: '#dc2626'
-    };
-    const total = rows.reduce((s, r) => s + r.count, 0);
-    return rows.map((r) => ({
-      label: r.status,
-      count: r.count,
-      color: colors[r.status] ?? '#64748b',
-      percent: total > 0 ? Math.round((r.count / total) * 1000) / 10 : 0
-    }));
-  }
-
-  private buildActivityFeed(
-    tourists: AdminUserListItemDto[],
-    creators: AdminUserListItemDto[],
-    creatorRequests: CreatorRoleRequestDto[],
-    reports: ManagerReportDto[]
-  ): PlatformActivityItem[] {
-    const items: PlatformActivityItem[] = [];
-
-    for (const u of [...tourists].sort((a, b) => this.toTime(b.createdAt) - this.toTime(a.createdAt)).slice(0, 6)) {
-      items.push({
-        initials: this.initials(u.firstName, u.lastName),
-        avatarTone: 'teal',
-        title: `${u.firstName} ${u.lastName}`.trim() || u.email,
-        detail: 'Registered as tourist',
-        timeLabel: this.formatRelative(u.createdAt),
-        roleBadge: 'TOURIST',
-        sortAt: this.toTime(u.createdAt),
-        routerLink: ['/admin/users'],
-        queryParams: { tab: 'tourists' }
-      });
-    }
-
-    for (const r of creatorRequests.slice(0, 4)) {
-      items.push({
-        initials: this.initials(r.firstName, r.lastName),
-        avatarTone: 'indigo',
-        title: `${r.firstName} ${r.lastName}`.trim() || r.email,
-        detail: 'Requested Content Creator access',
-        timeLabel: this.formatRelative(r.createdAt),
-        roleBadge: 'MODERATION',
-        sortAt: this.toTime(r.createdAt),
-        routerLink: ['/admin/users'],
-        queryParams: { tab: 'tourists' }
-      });
-    }
-
-    for (const report of reports.slice(0, 6)) {
-      const isResolved = report.status?.toLowerCase() !== 'pending';
-      items.push({
-        initials: this.initialsFromName(report.managerName),
-        avatarTone: 'amber',
-        title: report.managerName || 'Manager',
-        detail: isResolved
-          ? `${report.status} report on ${report.reportedUserName}`
-          : `Escalated ${report.reportedUserName} — ${this.truncate(report.reason, 72)}`,
-        timeLabel: this.formatRelative(isResolved ? report.resolvedAt : report.createdAt),
-        roleBadge: 'REPORT',
-        sortAt: this.toTime(isResolved ? report.resolvedAt : report.createdAt),
-        routerLink: ['/admin/users'],
-        queryParams: { tab: 'tourists' }
-      });
-    }
-
-    for (const u of [...tourists, ...creators].filter((x) => x.isBanned && x.bannedAtUtc)) {
-      items.push({
-        initials: this.initials(u.firstName, u.lastName),
-        avatarTone: 'slate',
-        title: `${u.firstName} ${u.lastName}`.trim() || u.email,
-        detail: u.banReason?.trim() ? `Banned: ${this.truncate(u.banReason, 80)}` : 'Account banned',
-        timeLabel: this.formatRelative(u.bannedAtUtc),
-        roleBadge: 'BAN',
-        sortAt: this.toTime(u.bannedAtUtc),
-        routerLink: ['/admin/users', 'edit', u.id]
-      });
-    }
-
-    return items.sort((a, b) => b.sortAt - a.sortAt).slice(0, 12);
-  }
-
-  private bindTouristChart(tourists: AdminUserListItemDto[]): void {
-    const daily = this.buildDailyBuckets(tourists.map((t) => t.createdAt), CHART_DAYS);
-    const total = daily.reduce((a, b) => a + b, 0);
-    const maxVal = Math.max(...daily, 0);
-    this.touristChartMaxY = Math.max(maxVal, 1);
-    this.touristChartYTopLabel = maxVal === 0 ? '0' : String(maxVal);
-    this.touristChartYMidLabel = maxVal === 0 ? '0' : String(Math.round(maxVal / 2));
-    this.touristChartIsEmpty = maxVal === 0;
-    this.touristChartSubtitle = this.touristChartIsEmpty
-      ? `No tourist registrations in the last ${CHART_DAYS} days.`
-      : `${total} new tourists in the last ${CHART_DAYS} days (from loaded accounts).`;
-    this.touristChartLineSignups = this.buildLinePath(daily, this.touristChartMaxY);
-    this.touristChartAreaSignups = this.buildAreaPath(daily, this.touristChartMaxY);
-
-    const labels = this.buildChartXLabels(CHART_DAYS);
-    this.touristChartXLabels.length = 0;
-    this.touristChartXLabels.push(...labels);
-  }
-
-  private buildTopOrigins(users: AdminUserListItemDto[]): TopOriginRow[] {
-    const counts = new Map<string, number>();
-    for (const user of users) {
-      const country = (user.country ?? '').trim() || 'Unknown';
-      counts.set(country, (counts.get(country) ?? 0) + 1);
-    }
-    const rows = [...counts.entries()]
-      .map(([name, usersCount]) => ({ name, users: usersCount }))
-      .sort((a, b) => b.users - a.users);
-    const total = users.length;
-    return rows.map((r) => ({
+    const regions: RegionRow[] = [
+      { name: 'Coastal Montenegro', code: 'ME-CO', total: 48, active: 41, geocoded: 38 },
+      { name: 'Central Region', code: 'ME-CE', total: 32, active: 28, geocoded: 24 },
+      { name: 'Northern Highlands', code: 'ME-NH', total: 21, active: 17, geocoded: 12 },
+      { name: 'Lake District', code: 'ME-LD', total: 15, active: 14, geocoded: 11 },
+      { name: 'Bay of Kotor', code: 'ME-BK', total: 12, active: 11, geocoded: 10 }
+    ].map((r) => ({
       ...r,
-      barPercent: total > 0 ? Math.round((r.users / total) * 1000) / 10 : 0
+      total: Math.round(r.total * (0.85 + scale * 0.15)),
+      active: Math.round(r.active * (0.85 + scale * 0.15)),
+      geocoded: Math.round(r.geocoded * (0.85 + scale * 0.15)),
+      barPercent: 0
     }));
+    const maxRegion = Math.max(...regions.map((r) => r.total), 1);
+    regions.forEach((r) => (r.barPercent = Math.round((r.total / maxRegion) * 1000) / 10));
+
+    const pendingCc = Math.max(3, Math.round(7 * (period === '7d' ? 1.2 : 0.9)));
+    const approvedCc = Math.round(34 * scale);
+    const rejectedCc = Math.round(11 * scale);
+
+    return {
+      summary: {
+        totalTourists: Math.round(2840 * scale),
+        newTouristsInPeriod: userGrowth.reduce((s, p) => s + p.tourists, 0),
+        activeDestinations: Math.round(98 * (0.9 + scale * 0.1)),
+        newDestinationsInPeriod: Math.round(4 + scale * 3),
+        pendingCreatorRequests: pendingCc,
+        openReports: Math.round(5 + scale * 2)
+      },
+      userGrowth,
+      granularityLabel: this.granularityHint(),
+      roleDistribution: roles,
+      destinationsByRegion: regions,
+      creatorRequests: {
+        pending: pendingCc,
+        approved: approvedCc,
+        rejected: rejectedCc,
+        none: Math.round(120 * scale),
+        totalSubmitted: pendingCc + approvedCc + rejectedCc
+      },
+      reports: {
+        pending: Math.round(5 + scale * 2),
+        approved: Math.round(28 * scale),
+        rejected: Math.round(9 * scale),
+        total: 0
+      },
+      accountHealth: {
+        verified: Math.round(2100 * scale),
+        unverified: Math.round(740 * scale),
+        active: Math.round(2650 * scale),
+        inactive: Math.round(190 * scale),
+        temporarilyBanned: Math.round(12 * scale),
+        permanentlyBanned: Math.round(4 * scale),
+        totalBanned: 0
+      }
+    };
   }
 
-  private buildDailyBuckets(isoDates: (string | undefined)[], days: number): number[] {
-    const buckets = Array.from({ length: days }, () => 0);
-    const now = new Date();
-    const start = new Date(now);
-    start.setHours(0, 0, 0, 0);
-    start.setDate(now.getDate() - (days - 1));
-    for (const raw of isoDates) {
-      if (!raw) continue;
-      const created = new Date(raw);
-      if (Number.isNaN(created.getTime()) || created < start || created > now) continue;
-      const dayIndex = Math.floor((created.getTime() - start.getTime()) / 86400000);
-      if (dayIndex >= 0 && dayIndex < days) buckets[dayIndex] += 1;
+  private bindCharts(data: DashboardMockOverview): void {
+    data.reports.total = data.reports.pending + data.reports.approved + data.reports.rejected;
+    data.accountHealth.totalBanned =
+      data.accountHealth.temporarilyBanned + data.accountHealth.permanentlyBanned;
+
+    const seriesDefs = [
+      { key: 'tourists', label: 'Tourists', color: ROLE_COLORS['Tourist'], pick: (p: (typeof data.userGrowth)[0]) => p.tourists },
+      { key: 'creators', label: 'Creators', color: ROLE_COLORS['ContentCreator'], pick: (p: (typeof data.userGrowth)[0]) => p.creators },
+      { key: 'managers', label: 'Managers', color: ROLE_COLORS['Manager'], pick: (p: (typeof data.userGrowth)[0]) => p.managers },
+      { key: 'admins', label: 'Admins', color: ROLE_COLORS['Admin'], pick: (p: (typeof data.userGrowth)[0]) => p.admins }
+    ];
+
+    const allValues = data.userGrowth.flatMap((p) => [p.tourists, p.creators, p.managers, p.admins]);
+    const maxVal = Math.max(...allValues, 0);
+    this.userGrowthMaxY = Math.max(maxVal, 1);
+    this.userGrowthYTop = String(maxVal);
+    this.userGrowthYMid = maxVal === 0 ? '0' : String(Math.round(maxVal / 2));
+    this.userGrowthIsEmpty = maxVal === 0;
+
+    this.userGrowthSeries = seriesDefs.map((def) => {
+      const values = data.userGrowth.map(def.pick);
+      return {
+        key: def.key,
+        label: def.label,
+        color: def.color,
+        values,
+        linePath: this.buildLinePath(values, this.userGrowthMaxY)
+      };
+    });
+
+    const labelCount = Math.min(5, data.userGrowth.length);
+    const step = Math.max(1, Math.floor((data.userGrowth.length - 1) / (labelCount - 1)));
+    this.userGrowthXLabels = [];
+    for (let i = 0; i < data.userGrowth.length; i += step) {
+      this.userGrowthXLabels.push({ label: data.userGrowth[i].label });
     }
-    return buckets;
+    const last = data.userGrowth[data.userGrowth.length - 1];
+    if (this.userGrowthXLabels[this.userGrowthXLabels.length - 1]?.label !== last.label) {
+      this.userGrowthXLabels.push({ label: last.label });
+    }
+
+    this.roleDonutTotal = data.roleDistribution.reduce((s, r) => s + r.count, 0);
+    this.roleDonutSlices = this.buildDonutSlices(data.roleDistribution);
+    this.regionRows = data.destinationsByRegion;
+
+    const h = data.accountHealth;
+    this.healthGroups = [
+      {
+        label: 'Verification',
+        segments: [
+          { label: 'Verified', value: h.verified, color: '#059669', percent: 0 },
+          { label: 'Unverified', value: h.unverified, color: '#94a3b8', percent: 0 }
+        ]
+      },
+      {
+        label: 'Activity',
+        segments: [
+          { label: 'Active', value: h.active, color: '#1976d2', percent: 0 },
+          { label: 'Inactive', value: h.inactive, color: '#cbd5e1', percent: 0 }
+        ]
+      },
+      {
+        label: 'Bans',
+        segments: [
+          { label: 'Temporary', value: h.temporarilyBanned, color: '#d97706', percent: 0 },
+          { label: 'Permanent', value: h.permanentlyBanned, color: '#dc2626', percent: 0 }
+        ]
+      }
+    ];
+    for (const group of this.healthGroups) {
+      const total = group.segments.reduce((s, seg) => s + seg.value, 0);
+      group.segments.forEach((seg) => {
+        seg.percent = total > 0 ? Math.round((seg.value / total) * 1000) / 10 : 0;
+      });
+    }
+
+    const cr = data.creatorRequests;
+    const crTotal = Math.max(cr.pending + cr.approved + cr.rejected, 1);
+    this.creatorSlices = [
+      { label: 'Pending', count: cr.pending, color: '#d97706', percent: (cr.pending / crTotal) * 100 },
+      { label: 'Approved', count: cr.approved, color: '#059669', percent: (cr.approved / crTotal) * 100 },
+      { label: 'Rejected', count: cr.rejected, color: '#dc2626', percent: (cr.rejected / crTotal) * 100 }
+    ];
+
+    const rep = data.reports;
+    const repTotal = Math.max(rep.total, 1);
+    this.reportSlices = [
+      { label: 'Pending', count: rep.pending, color: '#d97706', percent: (rep.pending / repTotal) * 100 },
+      { label: 'Approved', count: rep.approved, color: '#059669', percent: (rep.approved / repTotal) * 100 },
+      { label: 'Rejected', count: rep.rejected, color: '#dc2626', percent: (rep.rejected / repTotal) * 100 }
+    ];
   }
 
-  private buildChartXLabels(days: number): { label: string }[] {
-    const now = new Date();
-    const start = new Date(now);
-    start.setHours(0, 0, 0, 0);
-    start.setDate(now.getDate() - (days - 1));
-    const fmt = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
-    const indices = [0, Math.floor(days / 4), Math.floor(days / 2), Math.floor((3 * days) / 4), days - 1];
-    return [...new Set(indices)]
-      .filter((i) => i >= 0 && i < days)
-      .sort((a, b) => a - b)
-      .map((i) => {
-        const d = new Date(start);
-        d.setDate(start.getDate() + i);
-        return { label: fmt.format(d) };
+  private buildDonutSlices(
+    roles: { role: string; label: string; count: number; color: string }[]
+  ): RoleDonutSlice[] {
+    const total = roles.reduce((s, r) => s + r.count, 0);
+    if (total <= 0) return [];
+
+    const cx = 50;
+    const cy = 50;
+    const outerR = 38;
+    const innerR = 24;
+    let angle = -Math.PI / 2;
+
+    return roles
+      .filter((r) => r.count > 0)
+      .map((r) => {
+        const slice = (r.count / total) * Math.PI * 2;
+        const start = angle;
+        const end = angle + slice;
+        angle = end;
+        const percent = Math.round((r.count / total) * 1000) / 10;
+        return {
+          role: r.role,
+          label: r.label,
+          count: r.count,
+          color: r.color,
+          percent,
+          path: this.arcDonutPath(cx, cy, outerR, innerR, start, end)
+        };
       });
+  }
+
+  private arcDonutPath(
+    cx: number,
+    cy: number,
+    outerR: number,
+    innerR: number,
+    start: number,
+    end: number
+  ): string {
+    const x1 = cx + outerR * Math.cos(start);
+    const y1 = cy + outerR * Math.sin(start);
+    const x2 = cx + outerR * Math.cos(end);
+    const y2 = cy + outerR * Math.sin(end);
+    const x3 = cx + innerR * Math.cos(end);
+    const y3 = cy + innerR * Math.sin(end);
+    const x4 = cx + innerR * Math.cos(start);
+    const y4 = cy + innerR * Math.sin(start);
+    const large = end - start > Math.PI ? 1 : 0;
+    return [
+      `M ${x1} ${y1}`,
+      `A ${outerR} ${outerR} 0 ${large} 1 ${x2} ${y2}`,
+      `L ${x3} ${y3}`,
+      `A ${innerR} ${innerR} 0 ${large} 0 ${x4} ${y4}`,
+      'Z'
+    ].join(' ');
   }
 
   private buildLinePath(values: number[], maxY: number): string {
@@ -490,77 +576,38 @@ export class DashboardComponent implements OnInit {
       .join(' ');
   }
 
-  private buildAreaPath(values: number[], maxY: number): string {
-    const line = this.buildLinePath(values, maxY);
-    if (!line || !values.length) return '';
-    const lastX = ((values.length - 1) / Math.max(values.length - 1, 1)) * 100;
-    return `${line} L ${lastX.toFixed(2)} 100 L 0 100 Z`;
+  private periodScale(period: DashboardPeriod): number {
+    const map: Record<DashboardPeriod, number> = {
+      '7d': 0.35,
+      '30d': 1,
+      '3m': 2.4,
+      '6m': 3.8,
+      '1y': 6.2,
+      '5y': 14
+    };
+    return map[period];
   }
 
-  private capPages(totalPages?: number): number {
-    const raw = totalPages ?? 1;
-    return !Number.isFinite(raw) || raw < 1 ? 1 : Math.floor(raw);
+  private periodPointCount(period: DashboardPeriod): number {
+    if (period === '7d') return 7;
+    if (period === '30d') return 14;
+    if (period === '3m') return 12;
+    if (period === '6m') return 16;
+    if (period === '1y') return 12;
+    return 10;
   }
 
-  private isOnOrAfter(value: string | undefined, from: Date): boolean {
-    if (!value) return false;
-    const d = new Date(value);
-    return !Number.isNaN(d.getTime()) && d >= from;
-  }
-
-  private isInRange(value: string | undefined, from: Date, to: Date): boolean {
-    if (!value) return false;
-    const d = new Date(value);
-    return !Number.isNaN(d.getTime()) && d >= from && d < to;
-  }
-
-  private computePercentDelta(current: number, previous: number): number {
-    if (previous <= 0) return current > 0 ? 100 : 0;
-    return Math.round(((current - previous) / previous) * 1000) / 10;
-  }
-
-  private toTime(value?: string | null): number {
-    if (!value) return 0;
-    const d = new Date(value);
-    return Number.isNaN(d.getTime()) ? 0 : d.getTime();
-  }
-
-  private initials(first: string, last: string): string {
-    return `${(first || '').charAt(0)}${(last || '').charAt(0)}`.toUpperCase() || 'U';
-  }
-
-  private initialsFromName(full: string): string {
-    const parts = full.trim().split(/\s+/).filter(Boolean);
-    if (!parts.length) return 'M';
-    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-    return `${parts[0].charAt(0)}${parts[parts.length - 1].charAt(0)}`.toUpperCase();
-  }
-
-  private truncate(text: string, max: number): string {
-    const t = text.trim();
-    return t.length <= max ? t : `${t.slice(0, max - 1)}…`;
-  }
-
-  formatRelative(value?: string | null): string {
-    if (!value) return '—';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return '—';
-    const diffMs = Date.now() - date.getTime();
-    const mins = Math.max(0, Math.round(diffMs / 60000));
-    if (mins < 1) return 'Just now';
-    if (mins < 60) return `${mins}m ago`;
-    const hrs = Math.round(mins / 60);
-    if (hrs < 24) return `${hrs}h ago`;
-    const days = Math.round(hrs / 24);
-    if (days < 7) return `${days}d ago`;
-    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(date);
-  }
-
-  reportStatusTotal(): number {
-    return this.reportStatusSlices.reduce((s, r) => s + r.count, 0);
-  }
-
-  touristStatusTotal(): number {
-    return this.activeTourists + this.inactiveTourists + this.bannedTourists;
+  private bucketLabel(period: DashboardPeriod, index: number, total: number): string {
+    if (period === '7d' || period === '30d') {
+      const d = new Date();
+      d.setDate(d.getDate() - (total - 1 - index));
+      return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(d);
+    }
+    if (period === '3m' || period === '6m') {
+      return `W${index + 1}`;
+    }
+    const d = new Date();
+    d.setMonth(d.getMonth() - (total - 1 - index));
+    return new Intl.DateTimeFormat('en-US', { month: 'short' }).format(d);
   }
 }

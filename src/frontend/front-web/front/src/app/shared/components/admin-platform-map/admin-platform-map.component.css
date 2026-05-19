@@ -10,7 +10,17 @@
 }
 
 :host(.admin-platform-map--compact) {
+  display: block;
   width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+:host(.admin-platform-map--compact) .admin-platform-map,
+:host(.admin-platform-map--compact) .leaflet-container {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
 }
 
 .admin-platform-map {

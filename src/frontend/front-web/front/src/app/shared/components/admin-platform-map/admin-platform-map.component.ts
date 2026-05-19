@@ -73,6 +73,7 @@ export class AdminPlatformMapComponent implements AfterViewInit, OnChanges, OnDe
   }
 
   private mapBootstrapped = false;
+  private resizeObserver: ResizeObserver | null = null;
 
   ngAfterViewInit(): void {
     this.bootstrapMap();
@@ -85,6 +86,8 @@ export class AdminPlatformMapComponent implements AfterViewInit, OnChanges, OnDe
   }
 
   ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
     this.mapService.destroyMap();
     this.mapBootstrapped = false;
   }
@@ -115,8 +118,21 @@ export class AdminPlatformMapComponent implements AfterViewInit, OnChanges, OnDe
     setTimeout(() => {
       this.mapService.getMap()?.invalidateSize();
       this.mapBootstrapped = true;
+      this.observeCompactResize();
       this.mapReady.emit();
     }, 120);
+  }
+
+  private observeCompactResize(): void {
+    if (!this.compact) return;
+    const el = document.getElementById(this.mapId);
+    if (!el) return;
+
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = new ResizeObserver(() => {
+      this.mapService.getMap()?.invalidateSize();
+    });
+    this.resizeObserver.observe(el);
   }
 
   private reloadMarkers(destinations: DestinationDto[]): void {
