@@ -13,6 +13,7 @@ namespace TuristickiVodic.Core.DTO
         public List<AdminDashboardDestinationByRegionDto> DestinationsByRegion { get; set; } = new();
         public AdminDashboardCreatorRequestStatusDto CreatorRequests { get; set; } = new();
         public AdminDashboardReportsSummaryDto Reports { get; set; } = new();
+        public AdminDashboardAccountHealthDto AccountHealth { get; set; } = new();
         public AdminDashboardGeospatialOverviewDto GeospatialOverview { get; set; } = new();
     }
 
@@ -66,6 +67,17 @@ namespace TuristickiVodic.Core.DTO
         public int Approved { get; set; }
         public int Rejected { get; set; }
         public int Total { get; set; }
+    }
+
+    public class AdminDashboardAccountHealthDto
+    {
+        public int Verified { get; set; }
+        public int Unverified { get; set; }
+        public int Active { get; set; }
+        public int Inactive { get; set; }
+        public int TemporarilyBanned { get; set; }
+        public int PermanentlyBanned { get; set; }
+        public int TotalBanned { get; set; }
     }
 
     public class AdminDashboardGeospatialOverviewDto

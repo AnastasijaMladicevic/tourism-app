@@ -80,6 +80,21 @@ namespace TuristickiVodic.Services.Services
                 })
                 .ToListAsync();
 
+            var accountHealthTask = _context.Users
+                .AsNoTracking()
+                .GroupBy(_ => 1)
+                .Select(g => new AdminDashboardAccountHealthDto
+                {
+                    Verified = g.Count(u => u.IsVerified),
+                    Unverified = g.Count(u => !u.IsVerified),
+                    Active = g.Count(u => u.IsActive),
+                    Inactive = g.Count(u => !u.IsActive),
+                    TemporarilyBanned = g.Count(u => u.IsBlacklisted && u.BanExpiresAtUtc != null),
+                    PermanentlyBanned = g.Count(u => u.IsBlacklisted && u.BanExpiresAtUtc == null),
+                    TotalBanned = g.Count(u => u.IsBlacklisted)
+                })
+                .FirstOrDefaultAsync();
+
             var destinationsByRegionTask = _context.Regions
                 .AsNoTracking()
                 .Select(r => new AdminDashboardDestinationByRegionDto
@@ -149,6 +164,7 @@ namespace TuristickiVodic.Services.Services
                 pendingCreatorRequestsTask,
                 reportsBreakdownTask,
                 roleDistributionTask,
+                accountHealthTask,
                 destinationsByRegionTask,
                 userGrowthRowsTask,
                 creatorRequestStatusesTask,
@@ -199,6 +215,7 @@ namespace TuristickiVodic.Services.Services
                     Rejected = reportsBreakdown.GetValueOrDefault(ContentStatus.Rejected),
                     Total = reportsBreakdown.Values.Sum()
                 },
+                AccountHealth = accountHealthTask.Result ?? new AdminDashboardAccountHealthDto(),
                 GeospatialOverview = new AdminDashboardGeospatialOverviewDto
                 {
                     TotalActiveDestinationsWithCoordinates = geospatialSummaryTask.Result?.Total ?? 0,
