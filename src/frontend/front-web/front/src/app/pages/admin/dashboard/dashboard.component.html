@@ -179,10 +179,10 @@
           </ul>
         </div>
       </article>
-    </div>
+        </div>
 
-    <div class="analytics-row analytics-row--third">
-      <article class="card panel">
+    <div class="dashboard-region-layout">
+      <article class="card panel panel--regions">
         <div class="section-head">
           <div>
             <h3>Destinations by Region</h3>
@@ -211,7 +211,7 @@
         </ul>
       </article>
 
-      <article class="card panel">
+      <article class="card panel panel--creator">
         <div class="section-head">
           <div>
             <h3>Creator Request Status</h3>
@@ -252,30 +252,6 @@
           Pending requests stay visible even when older than the selected period.
         </p>
       </article>
-
-      <article class="card panel panel--map">
-        <div class="section-head">
-          <div>
-            <h3>Geospatial Overview</h3>
-            <p>
-              {{ mapMarkerCount | number }} destinations with coordinates
-              <span *ngIf="mapDestinations.length"> · {{ mapDestinations.length }} loaded</span>
-            </p>
-          </div>
-          <a class="section-link" routerLink="/admin/map">Expand</a>
-        </div>
-        <div class="map-container" role="img" aria-label="Map of platform destinations">
-          <app-admin-platform-map
-            mapId="dashboard-overview-map"
-            [compact]="true"
-            [destinations]="mapDestinations"
-            [focusRegion]="true"
-            (markersSummary)="onMapMarkersSummary($event)"
-          />
-        </div>
-      </article>
-    </div>
-      </div>
 
       <aside class="card dashboard-activity" aria-labelledby="recent-activity-title">
         <div class="activity-panel-head">
@@ -326,6 +302,8 @@
           Load More Activities
         </button>
       </aside>
+    </div>
+      </div>
     </div>
   </ng-container>
 </section>

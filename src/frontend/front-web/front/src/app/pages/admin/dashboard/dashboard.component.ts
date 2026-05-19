@@ -1,14 +1,7 @@
-import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, finalize, of } from 'rxjs';
-import { DestinationDto, DestinationService } from '../../../services/destination.service';
 import { AuthService } from '../../../services/auth.service';
-import {
-  AdminPlatformMapComponent,
-  AdminPlatformMapMarkersSummary
-} from '../../../shared/components/admin-platform-map/admin-platform-map.component';
 import { UserDto } from '../../../models/user.model';
 
 export type DashboardPeriod = '7d' | '30d' | '3m' | '6m' | '1y' | '5y';
@@ -129,22 +122,18 @@ const ROLE_COLORS: Record<string, string> = {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, AdminPlatformMapComponent],
+  imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  private readonly destinationService = inject(DestinationService);
   private readonly authService = inject(AuthService);
-  private readonly destroyRef = inject(DestroyRef);
   private readonly cdr = inject(ChangeDetectorRef);
 
   readonly periodOptions = PERIOD_OPTIONS;
   selectedPeriod: DashboardPeriod = '30d';
 
   user: UserDto | null = null;
-  mapDestinations: DestinationDto[] = [];
-  mapMarkerCount = 0;
 
   isLoading = true;
   loadError = '';
@@ -178,7 +167,6 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.user = this.authService.getUser();
     this.applyMockOverview();
-    this.loadMapDestinations();
   }
 
   selectPeriod(period: DashboardPeriod): void {
@@ -198,7 +186,6 @@ export class DashboardComponent implements OnInit {
 
   reload(): void {
     this.applyMockOverview();
-    this.loadMapDestinations();
   }
 
   granularityHint(): string {
@@ -206,11 +193,6 @@ export class DashboardComponent implements OnInit {
     if (p === '7d' || p === '30d') return 'Grouped by day';
     if (p === '3m' || p === '6m') return 'Grouped by week';
     return 'Grouped by month';
-  }
-
-  onMapMarkersSummary(summary: AdminPlatformMapMarkersSummary): void {
-    this.mapMarkerCount = summary.withCoords;
-    this.cdr.markForCheck();
   }
 
   private applyMockOverview(): void {
@@ -313,23 +295,6 @@ export class DashboardComponent implements OnInit {
         routerLink: ['/admin/destinations']
       }
     ];
-  }
-
-  private loadMapDestinations(): void {
-    this.destinationService
-      .getAll({ page: 1, pageSize: 100, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.cdr.markForCheck()),
-        catchError(() => of([]))
-      )
-      .subscribe((response) => {
-        const items = Array.isArray(response)
-          ? response
-          : ((response as { items?: DestinationDto[] }).items ?? []);
-        this.mapDestinations = items;
-        this.cdr.markForCheck();
-      });
   }
 
   private buildMockOverview(period: DashboardPeriod): DashboardMockOverview {

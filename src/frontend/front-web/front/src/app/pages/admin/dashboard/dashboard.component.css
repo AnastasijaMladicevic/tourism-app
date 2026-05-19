@@ -202,12 +202,9 @@
   color: #94a3b8;
 }
 
-/* Main + activity sidebar */
+/* Dashboard shell */
 .dashboard-body {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 320px);
-  gap: 16px;
-  align-items: start;
+  display: block;
 }
 
 .dashboard-main {
@@ -217,14 +214,22 @@
   min-width: 0;
 }
 
+.dashboard-region-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr) minmax(260px, 300px);
+  gap: 14px;
+  align-items: start;
+}
+
 .dashboard-activity {
   padding: 0;
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 140px);
   position: sticky;
   top: 16px;
+  max-height: min(440px, calc(100vh - 120px));
   overflow: hidden;
+  align-self: start;
 }
 
 .activity-panel-head {
