@@ -202,9 +202,12 @@
   color: #94a3b8;
 }
 
-/* Dashboard shell */
+/* Dashboard shell — main (~75%) + activity sidebar (~25%) */
 .dashboard-body {
-  display: block;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 320px);
+  gap: 14px;
+  align-items: stretch;
 }
 
 .dashboard-main {
@@ -214,22 +217,31 @@
   min-width: 0;
 }
 
-.dashboard-region-layout {
+.dashboard-bottom-row {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.95fr) minmax(260px, 300px);
+  grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr);
   gap: 14px;
-  align-items: start;
+  align-items: stretch;
+}
+
+.panel--regions {
+  height: 100%;
+}
+
+.dashboard-bottom-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
 }
 
 .dashboard-activity {
   padding: 0;
   display: flex;
   flex-direction: column;
-  position: sticky;
-  top: 16px;
-  max-height: min(440px, calc(100vh - 120px));
+  min-height: 0;
   overflow: hidden;
-  align-self: start;
+  align-self: stretch;
 }
 
 .activity-panel-head {
@@ -428,10 +440,10 @@
   padding: 20px 16px;
 }
 
-/* Analytics rows */
+/* Analytics row — user growth (~65%) + role distribution (~35%) */
 .analytics-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr);
   gap: 14px;
   align-items: stretch;
 }
@@ -884,7 +896,6 @@
   }
 
   .dashboard-activity {
-    position: static;
     max-height: none;
   }
 
@@ -898,7 +909,8 @@
 }
 
 @media (max-width: 1200px) {
-  .analytics-row {
+  .analytics-row,
+  .dashboard-bottom-row {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -906,8 +918,8 @@
     grid-column: 1 / -1;
   }
 
-  .analytics-row--third {
-    grid-template-columns: 1fr 1fr;
+  .panel--regions {
+    grid-column: 1 / -1;
   }
 
   .panel--map {
@@ -921,8 +933,12 @@
   }
 
   .analytics-row,
-  .analytics-row--third {
+  .dashboard-bottom-row {
     grid-template-columns: 1fr;
+  }
+
+  .dashboard-bottom-side {
+    display: contents;
   }
 }
 

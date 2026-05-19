@@ -63,195 +63,199 @@
     <div class="dashboard-body">
       <div class="dashboard-main">
         <div class="analytics-row">
-      <article class="card panel panel--wide">
-        <div class="section-head">
-          <div>
-            <h3>User Growth</h3>
-            <p>{{ granularityHint() }} · tourists, creators, managers, admins</p>
-          </div>
-          <a class="section-link" routerLink="/admin/users">All users</a>
-        </div>
-        <div class="chart-legend chart-legend--inline">
-          <span *ngFor="let s of userGrowthSeries" class="legend-item">
-            <span class="legend-dot" [style.background]="s.color"></span>
-            {{ s.label }}
-          </span>
-        </div>
-        <div class="chart-wrap">
-          <div class="chart-y-axis" aria-hidden="true">
-            <span>{{ userGrowthYTop }}</span>
-            <span>{{ userGrowthYMid }}</span>
-            <span>0</span>
-          </div>
-          <div class="chart-surface">
-            <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg chart-svg--multi">
-              <path
-                *ngFor="let s of userGrowthSeries"
-                [attr.d]="s.linePath"
-                class="chart-line-multi"
-                fill="none"
-                [attr.stroke]="s.color"
-              />
-            </svg>
-            <p class="chart-empty" *ngIf="userGrowthIsEmpty">No signups in this period.</p>
-          </div>
-        </div>
-        <div class="chart-labels">
-          <span *ngFor="let d of userGrowthXLabels">{{ d.label }}</span>
-        </div>
-      </article>
-
-      <article class="card panel">
-        <div class="section-head">
-          <div>
-            <h3>Role Distribution</h3>
-            <p>{{ roleDonutTotal | number }} users in period</p>
-          </div>
-        </div>
-        <div class="donut-wrap" *ngIf="roleDonutSlices.length; else emptyDonut">
-          <svg viewBox="0 0 100 100" class="donut-svg" aria-hidden="true">
-            <path *ngFor="let slice of roleDonutSlices" [attr.d]="slice.path" [attr.fill]="slice.color" />
-          </svg>
-          <div class="donut-center">
-            <span class="donut-center-val">{{ roleDonutTotal | number }}</span>
-            <span class="donut-center-label">users</span>
-          </div>
-        </div>
-        <ng-template #emptyDonut>
-          <p class="empty-note">No role data for this period.</p>
-        </ng-template>
-        <ul class="donut-legend">
-          <li *ngFor="let slice of roleDonutSlices">
-            <span class="legend-dot" [style.background]="slice.color"></span>
-            <span class="donut-legend-name">{{ slice.label }}</span>
-            <span class="donut-legend-meta">{{ slice.count | number }} · {{ slice.percent }}%</span>
-          </li>
-        </ul>
-      </article>
-
-      <article class="card panel panel--health">
-        <div class="section-head">
-          <div>
-            <h3>Account Health</h3>
-            <p>Verification, activity &amp; bans</p>
-          </div>
-        </div>
-        <div class="health-groups">
-          <div class="health-group" *ngFor="let group of healthGroups">
-            <div class="health-group-head">
-              <span class="health-group-label">{{ group.label }}</span>
-              <span class="health-group-total">
-                {{ group.segments[0].value | number }} vs {{ group.segments[1].value | number }}
+          <article class="card panel panel--wide">
+            <div class="section-head">
+              <div>
+                <h3>User Growth</h3>
+                <p>{{ granularityHint() }} · tourists, creators, managers, admins</p>
+              </div>
+              <a class="section-link" routerLink="/admin/users">All users</a>
+            </div>
+            <div class="chart-legend chart-legend--inline">
+              <span *ngFor="let s of userGrowthSeries" class="legend-item">
+                <span class="legend-dot" [style.background]="s.color"></span>
+                {{ s.label }}
               </span>
             </div>
-            <div class="health-bar">
-              <span
-                *ngFor="let seg of group.segments"
-                class="health-bar-seg"
-                [style.width.%]="seg.percent"
-                [style.background]="seg.color"
-                [attr.title]="seg.label + ': ' + seg.value"
-              ></span>
+            <div class="chart-wrap">
+              <div class="chart-y-axis" aria-hidden="true">
+                <span>{{ userGrowthYTop }}</span>
+                <span>{{ userGrowthYMid }}</span>
+                <span>0</span>
+              </div>
+              <div class="chart-surface">
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg chart-svg--multi">
+                  <path
+                    *ngFor="let s of userGrowthSeries"
+                    [attr.d]="s.linePath"
+                    class="chart-line-multi"
+                    fill="none"
+                    [attr.stroke]="s.color"
+                  />
+                </svg>
+                <p class="chart-empty" *ngIf="userGrowthIsEmpty">No signups in this period.</p>
+              </div>
             </div>
-            <div class="health-legend">
-              <span *ngFor="let seg of group.segments">
-                <span class="legend-dot" [style.background]="seg.color"></span>
-                {{ seg.label }} · {{ seg.value | number }}
-              </span>
+            <div class="chart-labels">
+              <span *ngFor="let d of userGrowthXLabels">{{ d.label }}</span>
             </div>
-          </div>
-        </div>
-        <div class="reports-inline">
-          <p class="reports-inline-title">Reports ({{ overview.reports.total | number }})</p>
-          <div class="stacked-bar">
-            <span
-              *ngFor="let s of reportSlices"
-              class="stack-segment"
-              [style.width.%]="s.percent"
-              [style.background]="s.color"
-            ></span>
-          </div>
-          <ul class="legend-list legend-list--compact">
-            <li *ngFor="let s of reportSlices">
-              <span class="legend-dot" [style.background]="s.color"></span>
-              {{ s.label }} · {{ s.count | number }}
-            </li>
-          </ul>
-        </div>
-      </article>
+          </article>
+
+          <article class="card panel">
+            <div class="section-head">
+              <div>
+                <h3>Role Distribution</h3>
+                <p>{{ roleDonutTotal | number }} users in period</p>
+              </div>
+            </div>
+            <div class="donut-wrap" *ngIf="roleDonutSlices.length; else emptyDonut">
+              <svg viewBox="0 0 100 100" class="donut-svg" aria-hidden="true">
+                <path *ngFor="let slice of roleDonutSlices" [attr.d]="slice.path" [attr.fill]="slice.color" />
+              </svg>
+              <div class="donut-center">
+                <span class="donut-center-val">{{ roleDonutTotal | number }}</span>
+                <span class="donut-center-label">users</span>
+              </div>
+            </div>
+            <ng-template #emptyDonut>
+              <p class="empty-note">No role data for this period.</p>
+            </ng-template>
+            <ul class="donut-legend">
+              <li *ngFor="let slice of roleDonutSlices">
+                <span class="legend-dot" [style.background]="slice.color"></span>
+                <span class="donut-legend-name">{{ slice.label }}</span>
+                <span class="donut-legend-meta">{{ slice.count | number }} · {{ slice.percent }}%</span>
+              </li>
+            </ul>
+          </article>
         </div>
 
-    <div class="dashboard-region-layout">
-      <article class="card panel panel--regions">
-        <div class="section-head">
-          <div>
-            <h3>Destinations by Region</h3>
-            <p>Total, active &amp; geocoded per region</p>
-          </div>
-          <a class="section-link" routerLink="/admin/destinations">Manage</a>
-        </div>
-        <ul class="region-list">
-          <li *ngFor="let row of regionRows" class="region-row">
-            <div class="region-row-head">
-              <span class="region-name">{{ row.name }}</span>
-              <span class="region-code">{{ row.code }}</span>
+        <div class="dashboard-bottom-row">
+          <article class="card panel panel--regions">
+            <div class="section-head">
+              <div>
+                <h3>Destinations by Region</h3>
+                <p>Total, active &amp; geocoded per region</p>
+              </div>
+              <a class="section-link" routerLink="/admin/destinations">Manage</a>
             </div>
-            <div class="region-bar-track">
-              <div class="region-bar-fill" [style.width.%]="row.barPercent"></div>
-            </div>
-            <div class="region-stats">
-              <span>{{ row.total }} total</span>
-              <span>{{ row.active }} active</span>
-              <span class="region-geocoded">
-                <span class="material-symbols-outlined">pin_drop</span>
-                {{ row.geocoded }} mapped
-              </span>
-            </div>
-          </li>
-        </ul>
-      </article>
+            <ul class="region-list">
+              <li *ngFor="let row of regionRows" class="region-row">
+                <div class="region-row-head">
+                  <span class="region-name">{{ row.name }}</span>
+                  <span class="region-code">{{ row.code }}</span>
+                </div>
+                <div class="region-bar-track">
+                  <div class="region-bar-fill" [style.width.%]="row.barPercent"></div>
+                </div>
+                <div class="region-stats">
+                  <span>{{ row.total }} total</span>
+                  <span>{{ row.active }} active</span>
+                  <span class="region-geocoded">
+                    <span class="material-symbols-outlined">pin_drop</span>
+                    {{ row.geocoded }} mapped
+                  </span>
+                </div>
+              </li>
+            </ul>
+          </article>
 
-      <article class="card panel panel--creator">
-        <div class="section-head">
-          <div>
-            <h3>Creator Request Status</h3>
-            <p>{{ overview.creatorRequests.totalSubmitted | number }} submitted in period</p>
+          <div class="dashboard-bottom-side">
+            <article class="card panel panel--creator">
+              <div class="section-head">
+                <div>
+                  <h3>Creator Request Status</h3>
+                  <p>{{ overview.creatorRequests.totalSubmitted | number }} submitted in period</p>
+                </div>
+                <a class="section-link" routerLink="/admin/users" [queryParams]="{ tab: 'tourists' }">Review</a>
+              </div>
+              <div class="creator-summary">
+                <div class="creator-stat creator-stat--pending">
+                  <span class="creator-stat-val">{{ overview.creatorRequests.pending | number }}</span>
+                  <span class="creator-stat-label">Pending</span>
+                </div>
+                <div class="creator-stat">
+                  <span class="creator-stat-val">{{ overview.creatorRequests.approved | number }}</span>
+                  <span class="creator-stat-label">Approved</span>
+                </div>
+                <div class="creator-stat">
+                  <span class="creator-stat-val">{{ overview.creatorRequests.rejected | number }}</span>
+                  <span class="creator-stat-label">Rejected</span>
+                </div>
+              </div>
+              <div class="stacked-bar stacked-bar--tall">
+                <span
+                  *ngFor="let s of creatorSlices"
+                  class="stack-segment"
+                  [style.width.%]="s.percent"
+                  [style.background]="s.color"
+                ></span>
+              </div>
+              <ul class="legend-list">
+                <li *ngFor="let s of creatorSlices">
+                  <span class="legend-dot" [style.background]="s.color"></span>
+                  {{ s.label }} · {{ s.count | number }}
+                </li>
+              </ul>
+              <p class="creator-footnote">
+                <span class="material-symbols-outlined">info</span>
+                Pending requests stay visible even when older than the selected period.
+              </p>
+            </article>
+
+            <article class="card panel panel--health">
+              <div class="section-head">
+                <div>
+                  <h3>Account Health</h3>
+                  <p>Verification, activity &amp; bans</p>
+                </div>
+              </div>
+              <div class="health-groups">
+                <div class="health-group" *ngFor="let group of healthGroups">
+                  <div class="health-group-head">
+                    <span class="health-group-label">{{ group.label }}</span>
+                    <span class="health-group-total">
+                      {{ group.segments[0].value | number }} vs {{ group.segments[1].value | number }}
+                    </span>
+                  </div>
+                  <div class="health-bar">
+                    <span
+                      *ngFor="let seg of group.segments"
+                      class="health-bar-seg"
+                      [style.width.%]="seg.percent"
+                      [style.background]="seg.color"
+                      [attr.title]="seg.label + ': ' + seg.value"
+                    ></span>
+                  </div>
+                  <div class="health-legend">
+                    <span *ngFor="let seg of group.segments">
+                      <span class="legend-dot" [style.background]="seg.color"></span>
+                      {{ seg.label }} · {{ seg.value | number }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="reports-inline">
+                <p class="reports-inline-title">Reports ({{ overview.reports.total | number }})</p>
+                <div class="stacked-bar">
+                  <span
+                    *ngFor="let s of reportSlices"
+                    class="stack-segment"
+                    [style.width.%]="s.percent"
+                    [style.background]="s.color"
+                  ></span>
+                </div>
+                <ul class="legend-list legend-list--compact">
+                  <li *ngFor="let s of reportSlices">
+                    <span class="legend-dot" [style.background]="s.color"></span>
+                    {{ s.label }} · {{ s.count | number }}
+                  </li>
+                </ul>
+              </div>
+            </article>
           </div>
-          <a class="section-link" routerLink="/admin/users" [queryParams]="{ tab: 'tourists' }">Review</a>
         </div>
-        <div class="creator-summary">
-          <div class="creator-stat creator-stat--pending">
-            <span class="creator-stat-val">{{ overview.creatorRequests.pending | number }}</span>
-            <span class="creator-stat-label">Pending</span>
-          </div>
-          <div class="creator-stat">
-            <span class="creator-stat-val">{{ overview.creatorRequests.approved | number }}</span>
-            <span class="creator-stat-label">Approved</span>
-          </div>
-          <div class="creator-stat">
-            <span class="creator-stat-val">{{ overview.creatorRequests.rejected | number }}</span>
-            <span class="creator-stat-label">Rejected</span>
-          </div>
-        </div>
-        <div class="stacked-bar stacked-bar--tall">
-          <span
-            *ngFor="let s of creatorSlices"
-            class="stack-segment"
-            [style.width.%]="s.percent"
-            [style.background]="s.color"
-          ></span>
-        </div>
-        <ul class="legend-list">
-          <li *ngFor="let s of creatorSlices">
-            <span class="legend-dot" [style.background]="s.color"></span>
-            {{ s.label }} · {{ s.count | number }}
-          </li>
-        </ul>
-        <p class="creator-footnote">
-          <span class="material-symbols-outlined">info</span>
-          Pending requests stay visible even when older than the selected period.
-        </p>
-      </article>
+      </div>
 
       <aside class="card dashboard-activity" aria-labelledby="recent-activity-title">
         <div class="activity-panel-head">
@@ -302,8 +306,6 @@
           Load More Activities
         </button>
       </aside>
-    </div>
-      </div>
     </div>
   </ng-container>
 </section>
