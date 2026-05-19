@@ -262,3 +262,78 @@
     width: min(100%, 900px);
   }
 }
+
+:host-context(:root[data-theme='dark']) {
+  .about-page {
+    background:
+      radial-gradient(circle at top center, rgba(77, 194, 255, 0.08), transparent 30%),
+      var(--bg);
+  }
+
+  .about-hero,
+  .section-block {
+    border-bottom-color: var(--border);
+  }
+
+  .brand-copy {
+    strong {
+      color: var(--primary);
+      text-shadow: none;
+    }
+
+    span {
+      background: var(--surface-soft);
+      color: var(--text-gray);
+      border: 1px solid var(--border);
+    }
+  }
+
+  .mission-quote {
+    color: var(--text-gray);
+    border-left-color: var(--primary);
+  }
+
+  .section-block {
+    h2 {
+      color: var(--text-dark);
+    }
+  }
+
+  .info-card {
+    background: var(--surface-strong);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .info-card__icon {
+    background: rgba(77, 194, 255, 0.12);
+  }
+
+  .info-card__body {
+    strong {
+      color: var(--text-dark);
+    }
+
+    span {
+      color: var(--text-gray);
+    }
+  }
+
+  .info-card__chevron {
+    color: var(--text-gray);
+  }
+
+  .about-footer {
+    color: var(--text-gray);
+
+    small {
+      color: var(--text-muted);
+    }
+  }
+
+  .about-footer__meta {
+    color: var(--text-gray);
+    border-left-color: var(--border);
+    border-right-color: var(--border);
+  }
+}

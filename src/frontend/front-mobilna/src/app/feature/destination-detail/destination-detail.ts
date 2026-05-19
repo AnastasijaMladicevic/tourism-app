@@ -12,12 +12,13 @@ import { FavoriteStateService } from '../../services/favorite-state';
 import { PendingActionService } from '../../services/pending-action';
 import { RouterHistoryService } from '../../services/router-history';
 import { QrLinkDto, QrLinkService } from '../../services/qr-link';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-destination-detail',
   templateUrl: './destination-detail.html',
   styleUrls: ['./destination-detail.scss'],
-  imports: [MatIconModule, MapComponent]
+  imports: [MatIconModule, MapComponent, TranslatePipe]
 })
 export class DestinationDetailComponent implements OnInit, OnDestroy {
   showGalleryModal = false;

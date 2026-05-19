@@ -141,7 +141,7 @@
 .ai-thread__welcome {
   padding: 14px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface-soft);
   border: 1px solid rgba(217, 230, 235, 0.95);
 
   strong {
@@ -194,7 +194,7 @@
 
 .ai-message--assistant {
   align-self: flex-start;
-  background: #f5fafc;
+  background: var(--surface-soft);
   color: #273740;
   border: 1px solid rgba(217, 228, 233, 0.95);
   border-bottom-left-radius: 8px;
@@ -212,7 +212,7 @@
   padding: 10px 12px;
   border-radius: 16px;
   border: 1px solid rgba(209, 225, 231, 0.95);
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface-soft);
   text-align: left;
 
   strong {
@@ -307,5 +307,112 @@
   .ai-overlay {
     padding-left: 10px;
     padding-right: 10px;
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+
+  .ai-overlay {
+    background: rgba(2, 10, 16, 0.72);
+  }
+
+  .ai-panel {
+    background: var(--surface-strong);
+    border-color: var(--border);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
+  }
+
+  .ai-panel__header {
+    border-bottom-color: var(--border);
+  }
+
+  .ai-panel__title-wrap {
+    h2 {
+      color: var(--text-dark);
+    }
+
+    p {
+      color: var(--text-gray);
+    }
+  }
+
+  .ai-panel__badge {
+    background: linear-gradient(135deg, #23b7ff, #168aad);
+  }
+
+  .ai-panel__close {
+    background: var(--surface-soft);
+    color: var(--text-dark);
+  }
+
+  .ai-prompts {
+    button {
+      background: var(--surface-soft);
+      border-color: var(--border);
+      color: var(--text-dark);
+
+      &:hover {
+        background: rgba(77, 194, 255, 0.12);
+      }
+    }
+  }
+
+  .ai-thread__welcome {
+    background: var(--surface-soft);
+    border-color: var(--border);
+
+    strong {
+      color: var(--text-dark);
+    }
+
+    p {
+      color: var(--text-gray);
+    }
+  }
+
+  .ai-thinking {
+    color: var(--text-gray);
+  }
+
+  .ai-message--assistant {
+    background: var(--surface-soft);
+    border-color: var(--border);
+    color: var(--text-dark);
+
+    small {
+      color: var(--text-gray);
+    }
+  }
+
+  .ai-result-chip {
+    background: var(--surface-soft);
+    border-color: var(--border);
+
+    strong {
+      color: var(--text-dark);
+    }
+
+    span {
+      color: var(--text-gray);
+    }
+  }
+
+  .ai-compose {
+    background: var(--surface-strong);
+    border-top-color: var(--border);
+
+    textarea {
+      background: #132734;
+      border-color: var(--border);
+      color: var(--text-dark);
+
+      &::placeholder {
+        color: var(--text-gray);
+      }
+    }
+  }
+
+  .ai-send {
+    background: linear-gradient(135deg, #23b7ff, #168aad);
   }
 }

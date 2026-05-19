@@ -44,7 +44,9 @@
     "viewDetails": "Dettagli",
     "email": "Email",
     "password": "Password",
-    "soonest": "Più vicini nel tempo"
+    "soonest": "Più vicini nel tempo",
+    "qrTitle": "Codice QR",
+    "qrBody": "Scansiona per aprire rapidamente questa pagina."
   },
   "moderatorAccess": {
     "title": "Accesso moderatore",

@@ -203,4 +203,67 @@ select {
 :root[data-theme='dark'] .location,
 :root[data-theme='dark'] .category-label {
   color: var(--text-gray) !important;
+
+  button:hover {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  .card__fav,
+  .card__fav:hover,
+  .planner-btn,
+  .planner-btn:hover,
+  .event-card .planner-btn,
+  .event-card .planner-btn:hover {
+    background: #102632 !important;
+    color: #4dc2ff !important;
+    border: 1px solid rgba(77, 194, 255, 0.24) !important;
+    opacity: 1 !important;
+    filter: none !important;
+    box-shadow: none !important;
+  }
+
+  .card__fav--active,
+  .card__fav--active:hover,
+  .planner-btn--active,
+  .planner-btn--active:hover {
+    background: rgba(255, 107, 107, 0.16) !important;
+    color: #ff6b6b !important;
+    border-color: rgba(255, 107, 107, 0.32) !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  .chip,
+  .chip:hover,
+  .control-btn,
+  .control-btn:hover,
+  .filter-chip,
+  .filter-chip:hover,
+  .filter-btn,
+  .filter-btn:hover {
+    background: #102632 !important;
+    color: var(--text-dark) !important;
+    border-color: var(--border) !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  .chip--active,
+  .chip--active:hover,
+  .filter-chip--active,
+  .filter-chip--active:hover,
+  .filter-btn--active,
+  .filter-btn--active:hover {
+    background: var(--primary) !important;
+    color: white !important;
+    border-color: var(--primary) !important;
+  }
+
+  .gps-btn,
+  .gps-btn:hover {
+    background: var(--primary) !important;
+    color: white !important;
+    border-color: var(--primary) !important;
+  }
 }

@@ -3,14 +3,14 @@
     <button class="icon-btn" (click)="goBack()">
       <mat-icon>arrow_back_ios</mat-icon>
     </button>
-    <h1 class="header__title">Destination</h1>
+    <h1 class="header__title">{{ 'destination.title' | translate }}</h1>
   </div>
 
   @if (isLoading) {
     <div class="loading-screen">
       <div class="loading-content">
         <div class="spinner"></div>
-        <p>Loading...</p>
+        <p>{{ 'common.loading' | translate }}</p>
       </div>
     </div>
   }
@@ -19,7 +19,7 @@
     <div class="error-state">
       <mat-icon>error_outline</mat-icon>
       <p>{{ errorMessage }}</p>
-      <button (click)="goBack()">Back</button>
+      <button (click)="goBack()">{{ 'common.back' | translate }}</button>
     </div>
   }
 
@@ -65,17 +65,17 @@
       </div>
 
       <div class="card">
-        <h2>About</h2>
+        <h2>{{ 'common.about' | translate }}</h2>
         <p class="description">
-          {{ destination?.description || 'No description available' }}
+          {{ destination?.description || ('destination.descriptionFallback' | translate) }}
         </p>
       </div>
 
       <div class="section">
         <div class="card gallery-card">
           <div class="gallery-header">
-            <h2>Gallery</h2>
-            <button class="see-all-btn" (click)="openGallery(0)">See all ></button>
+            <h2>{{ 'common.gallery' | translate }}</h2>
+            <button class="see-all-btn" (click)="openGallery(0)">{{ 'common.seeAll' | translate }}</button>
           </div>
 
           <div class="gallery-scroll">
@@ -91,7 +91,7 @@
 
     <div class="right">
       <div class="card">
-        <h2>Location</h2>
+        <h2>{{ 'common.location' | translate }}</h2>
 
         <div class="location-image" [attr.data-name]="destination?.name || 'N/A'">
           <app-map
@@ -100,14 +100,14 @@
             [interactive]="false"
           >
           </app-map>
-          <button class="map-btn-overlay" (click)="viewOnMap()">View on map</button>
+          <button class="map-btn-overlay" (click)="viewOnMap()">{{ 'common.viewOnMap' | translate }}</button>
         </div>
       </div>
       @if (qrLink) {
         <div class="card qr-card">
           <div>
-            <h2>QR kod</h2>
-            <p>Skeniraj za brzo otvaranje ove stranice.</p>
+            <h2>{{ 'common.qrTitle' | translate }}</h2>
+            <p>{{ 'common.qrBody' | translate }}</p>
           </div>
           <a class="qr-mini" [href]="qrLink.targetUrl" target="_blank" rel="noopener">
             <img [src]="qrLink.qrImageUrl" [alt]="qrLink.label" />

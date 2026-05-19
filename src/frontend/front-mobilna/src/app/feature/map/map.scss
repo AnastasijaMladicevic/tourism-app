@@ -229,8 +229,7 @@ body.route-navigation-active app-floating-ai-assistant {
   white-space: nowrap;
 
   &:hover {
-    background: var(--primary-light);
-    color: var(--primary);
+    border: 1px solid rgba(77, 194, 255, 0.32);
   }
 }
 
@@ -1903,10 +1902,10 @@ body.route-navigation-active app-floating-ai-assistant {
     height: 20px;
   }
 
-  &:hover {
+  /*&:hover {
     background: var(--primary-light);
     color: var(--primary);
-  }
+  }*/
 }
 
 .gps-btn {
@@ -2510,55 +2509,6 @@ body.route-navigation-active app-floating-ai-assistant {
 
 :host-context(:root[data-theme='dark']) {
 
-  .leaflet-control-zoom a {
-    background: var(--surface-strong) !important;
-    color: var(--text-dark) !important;
-    border-color: var(--border) !important;
-  }
-
-  .leaflet-control-zoom a:hover {
-    background: rgba(27, 55, 69, 0.96) !important;
-    color: #4dc2ff !important;
-  }
-}
-
-:host-context(:root[data-theme='dark']) {
-
-  .chip:hover,
-  .control-btn:hover,
-  .filter-icon-btn:hover {
-    background: rgba(27, 55, 69, 0.96);
-    color: #4dc2ff;
-    border-color: rgba(77, 194, 255, 0.24);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
-  }
-
-  .chip--active:hover {
-    background: var(--primary);
-    color: white;
-  }
-
-  .control-btn,
-  .chip,
-  .filter-icon-btn {
-    transition:
-      background 0.18s ease,
-      border-color 0.18s ease,
-      color 0.18s ease,
-      box-shadow 0.18s ease;
-  }
-}
-
-:host-context(:root[data-theme='dark']) {
-  .bottom-card__btn--outline {
-    background: rgba(77, 194, 255, 0.08) !important;
-    border-color: rgba(77, 194, 255, 0.24) !important;
-    color: #4dc2ff !important;
-  }
-}
-
-:host-context(:root[data-theme='dark']) {
-
   .route-planner,
   .route-stop-card,
   .route-suggestions,
@@ -2610,24 +2560,35 @@ body.route-navigation-active app-floating-ai-assistant {
 }
 
 :host-context(:root[data-theme='dark']) {
-  .chip:hover,
-  .filter-icon-btn:hover,
-  .control-btn:hover,
+
+  .chip,
+  .control-btn,
+  .leaflet-control-zoom a {
+    transition:
+      background 0.18s ease,
+      border-color 0.18s ease,
+      transform 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+
+  .chip:not(.chip--active):hover,
+  .control-btn:not(.gps-btn):hover,
   .leaflet-control-zoom a:hover {
-    background: #16313d !important;
-    color: #f4fbff !important;
-    border-color: rgba(77, 194, 255, 0.35) !important;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.32) !important;
+    background: rgba(77, 194, 255, 0.10) !important;
+    border-color: rgba(77, 194, 255, 0.32) !important;
+    color: #4dc2ff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(77, 194, 255, 0.12) !important;
+  }
+
+  .gps-btn:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    box-shadow: 0 4px 16px rgba(77, 194, 255, 0.18) !important;
   }
 
   .chip--active:hover {
-    background: var(--primary) !important;
-    color: #fff !important;
-  }
-
-  .leaflet-control-zoom a {
-    background: var(--surface-strong) !important;
-    color: var(--text-dark) !important;
-    border-color: var(--border) !important;
+    filter: brightness(1.05);
+    transform: translateY(-1px);
   }
 }
