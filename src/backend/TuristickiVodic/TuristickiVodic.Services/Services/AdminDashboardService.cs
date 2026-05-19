@@ -11,11 +11,20 @@ namespace TuristickiVodic.Services.Services
 {
     public class AdminDashboardService : IAdminDashboardService
     {
+        private const int DefaultPeriodDays = 30;
         private const int MinPeriodDays = 7;
-        private const int MaxPeriodDays = 365;
+        private const int MaxPeriodDays = 1825;
         private const int MaxMapPoints = 200;
 
         private readonly AppDbContext _context;
+
+        private sealed class DashboardPeriod
+        {
+            public string Key { get; init; } = "30d";
+            public DateTime StartUtc { get; init; }
+            public int Days { get; init; }
+            public string Granularity { get; init; } = "day";
+        }
 
         private sealed class UserGrowthRow
         {
@@ -34,11 +43,12 @@ namespace TuristickiVodic.Services.Services
             _context = context;
         }
 
-        public async Task<AdminDashboardOverviewDto> GetOverviewAsync(int days)
+        public async Task<AdminDashboardOverviewDto> GetOverviewAsync(string? period = null, int? days = null)
         {
-            var periodDays = Math.Clamp(days, MinPeriodDays, MaxPeriodDays);
             var asOfUtc = DateTime.UtcNow;
-            var periodStartUtc = asOfUtc.Date.AddDays(-(periodDays - 1));
+            var dashboardPeriod = ResolveDashboardPeriod(asOfUtc, period, days);
+            var periodDays = dashboardPeriod.Days;
+            var periodStartUtc = dashboardPeriod.StartUtc;
 
             var totalTouristsTask = _context.Users
                 .AsNoTracking()
@@ -58,10 +68,16 @@ namespace TuristickiVodic.Services.Services
 
             var pendingCreatorRequestsTask = _context.Users
                 .AsNoTracking()
+                .Where(u =>
+                    u.CreatedAt >= periodStartUtc ||
+                    u.UpdatedAt >= periodStartUtc ||
+                    (u.CreatorRoleRequestStatus == CreatorRoleRequestStatus.Pending) ||
+                    (u.CreatorRoleRequestStatus == CreatorRoleRequestStatus.None && u.HasRequestedCreatorRole))
                 .CountAsync(HasPendingCreatorRoleRequestExpression());
 
             var reportsBreakdownTask = _context.ManagerReports
                 .AsNoTracking()
+                .Where(r => r.CreatedAt >= periodStartUtc)
                 .GroupBy(r => r.Status)
                 .Select(g => new
                 {
@@ -72,6 +88,7 @@ namespace TuristickiVodic.Services.Services
 
             var roleDistributionTask = _context.Users
                 .AsNoTracking()
+                .Where(u => u.CreatedAt >= periodStartUtc)
                 .GroupBy(u => u.Role.Name)
                 .Select(g => new
                 {
@@ -82,6 +99,7 @@ namespace TuristickiVodic.Services.Services
 
             var accountHealthTask = _context.Users
                 .AsNoTracking()
+                .Where(u => u.CreatedAt >= periodStartUtc)
                 .GroupBy(_ => 1)
                 .Select(g => new AdminDashboardAccountHealthDto
                 {
@@ -102,9 +120,9 @@ namespace TuristickiVodic.Services.Services
                     RegionId = r.Id,
                     RegionName = r.Name,
                     RegionCode = r.Code,
-                    TotalDestinations = r.Destinations.Count(),
-                    ActiveDestinations = r.Destinations.Count(d => d.IsActive),
-                    GeocodedDestinations = r.Destinations.Count(d => d.Geolocation != null)
+                    TotalDestinations = r.Destinations.Count(d => d.CreatedAt >= periodStartUtc),
+                    ActiveDestinations = r.Destinations.Count(d => d.CreatedAt >= periodStartUtc && d.IsActive),
+                    GeocodedDestinations = r.Destinations.Count(d => d.CreatedAt >= periodStartUtc && d.Geolocation != null)
                 })
                 .OrderByDescending(r => r.ActiveDestinations)
                 .ThenBy(r => r.RegionName)
@@ -122,6 +140,11 @@ namespace TuristickiVodic.Services.Services
 
             var creatorRequestStatusesTask = _context.Users
                 .AsNoTracking()
+                .Where(u =>
+                    u.CreatedAt >= periodStartUtc ||
+                    u.UpdatedAt >= periodStartUtc ||
+                    (u.CreatorRoleRequestStatus == CreatorRoleRequestStatus.Pending) ||
+                    (u.CreatorRoleRequestStatus == CreatorRoleRequestStatus.None && u.HasRequestedCreatorRole))
                 .Select(u => new CreatorRequestStatusSnapshot
                 {
                     HasRequestedCreatorRole = u.HasRequestedCreatorRole,
@@ -131,7 +154,7 @@ namespace TuristickiVodic.Services.Services
 
             var mapPointsTask = _context.Destinations
                 .AsNoTracking()
-                .Where(d => d.IsActive && d.Geolocation != null)
+                .Where(d => d.CreatedAt >= periodStartUtc && d.IsActive && d.Geolocation != null)
                 .OrderBy(d => d.Name)
                 .Select(d => new AdminDashboardMapPointDto
                 {
@@ -147,7 +170,7 @@ namespace TuristickiVodic.Services.Services
 
             var geospatialSummaryTask = _context.Destinations
                 .AsNoTracking()
-                .Where(d => d.IsActive && d.Geolocation != null)
+                .Where(d => d.CreatedAt >= periodStartUtc && d.IsActive && d.Geolocation != null)
                 .GroupBy(_ => 1)
                 .Select(g => new
                 {
@@ -186,8 +209,11 @@ namespace TuristickiVodic.Services.Services
 
             return new AdminDashboardOverviewDto
             {
+                PeriodKey = dashboardPeriod.Key,
                 PeriodDays = periodDays,
+                UserGrowthGranularity = dashboardPeriod.Granularity,
                 AsOfUtc = asOfUtc,
+                PeriodStartUtc = periodStartUtc,
                 Summary = new AdminDashboardSummaryDto
                 {
                     TotalTourists = totalTouristsTask.Result,
@@ -197,7 +223,7 @@ namespace TuristickiVodic.Services.Services
                     PendingCreatorRequests = pendingCreatorRequestsTask.Result,
                     OpenReports = reportsBreakdown.GetValueOrDefault(ContentStatus.Pending)
                 },
-                UserGrowth = BuildUserGrowth(periodStartUtc, periodDays, userGrowthRowsTask.Result),
+                UserGrowth = BuildUserGrowth(periodStartUtc, asOfUtc, dashboardPeriod.Granularity, userGrowthRowsTask.Result),
                 RoleDistribution = BuildRoleDistribution(roleDistributionLookup),
                 DestinationsByRegion = destinationsByRegionTask.Result,
                 CreatorRequests = new AdminDashboardCreatorRequestStatusDto
@@ -226,32 +252,126 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
-        private static List<AdminDashboardUserGrowthPointDto> BuildUserGrowth(
-            DateTime periodStartUtc,
-            int periodDays,
-            List<UserGrowthRow> rows)
+        private static DashboardPeriod ResolveDashboardPeriod(DateTime asOfUtc, string? period, int? days)
         {
-            var grouped = rows
-                .GroupBy(x => (x.Day, x.Role))
-                .ToDictionary(g => g.Key, g => g.Count());
-
-            var points = new List<AdminDashboardUserGrowthPointDto>(periodDays);
-
-            for (var i = 0; i < periodDays; i++)
+            var normalizedPeriod = period?.Trim().ToLowerInvariant();
+            if (!string.IsNullOrWhiteSpace(normalizedPeriod))
             {
-                var day = periodStartUtc.Date.AddDays(i);
-
-                points.Add(new AdminDashboardUserGrowthPointDto
+                return normalizedPeriod switch
                 {
-                    Date = day,
-                    Tourists = grouped.GetValueOrDefault((day, RoleType.Tourist)),
-                    ContentCreators = grouped.GetValueOrDefault((day, RoleType.ContentCreator)),
-                    Managers = grouped.GetValueOrDefault((day, RoleType.Manager)),
-                    Admins = grouped.GetValueOrDefault((day, RoleType.Admin))
-                });
+                    "7d" => CreateDashboardPeriod("7d", asOfUtc.Date.AddDays(-6), asOfUtc, "day"),
+                    "30d" => CreateDashboardPeriod("30d", asOfUtc.Date.AddDays(-29), asOfUtc, "day"),
+                    "3m" => CreateDashboardPeriod("3m", asOfUtc.Date.AddMonths(-3).AddDays(1), asOfUtc, "week"),
+                    "6m" => CreateDashboardPeriod("6m", asOfUtc.Date.AddMonths(-6).AddDays(1), asOfUtc, "week"),
+                    "1y" => CreateDashboardPeriod("1y", asOfUtc.Date.AddYears(-1).AddDays(1), asOfUtc, "month"),
+                    "5y" => CreateDashboardPeriod("5y", asOfUtc.Date.AddYears(-5).AddDays(1), asOfUtc, "month"),
+                    _ => CreateDashboardPeriod("30d", asOfUtc.Date.AddDays(-(Math.Clamp(days ?? DefaultPeriodDays, MinPeriodDays, MaxPeriodDays) - 1)), asOfUtc, ResolveGranularity(days ?? DefaultPeriodDays))
+                };
             }
 
-            return points;
+            var fallbackDays = Math.Clamp(days ?? DefaultPeriodDays, MinPeriodDays, MaxPeriodDays);
+            return CreateDashboardPeriod($"{fallbackDays}d", asOfUtc.Date.AddDays(-(fallbackDays - 1)), asOfUtc, ResolveGranularity(fallbackDays));
+        }
+
+        private static DashboardPeriod CreateDashboardPeriod(string key, DateTime startUtc, DateTime asOfUtc, string granularity)
+        {
+            var normalizedStart = startUtc.Date;
+            return new DashboardPeriod
+            {
+                Key = key,
+                StartUtc = normalizedStart,
+                Days = Math.Max(1, (asOfUtc.Date - normalizedStart).Days + 1),
+                Granularity = granularity
+            };
+        }
+
+        private static string ResolveGranularity(int days)
+            => days switch
+            {
+                <= 31 => "day",
+                <= 180 => "week",
+                _ => "month"
+            };
+
+        private static List<AdminDashboardUserGrowthPointDto> BuildUserGrowth(
+            DateTime periodStartUtc,
+            DateTime asOfUtc,
+            string granularity,
+            List<UserGrowthRow> rows)
+        {
+            var normalizedEndDate = asOfUtc.Date;
+            var buckets = BuildBuckets(periodStartUtc.Date, normalizedEndDate, granularity);
+
+            var grouped = rows
+                .GroupBy(x => (BucketStart: GetBucketStart(x.Day.Date, periodStartUtc.Date, granularity), x.Role))
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            return buckets
+                .Select(bucketStart => new AdminDashboardUserGrowthPointDto
+                {
+                    Date = bucketStart,
+                    Tourists = grouped.GetValueOrDefault((bucketStart, RoleType.Tourist)),
+                    ContentCreators = grouped.GetValueOrDefault((bucketStart, RoleType.ContentCreator)),
+                    Managers = grouped.GetValueOrDefault((bucketStart, RoleType.Manager)),
+                    Admins = grouped.GetValueOrDefault((bucketStart, RoleType.Admin))
+                })
+                .ToList();
+        }
+
+        private static List<DateTime> BuildBuckets(DateTime periodStartUtc, DateTime periodEndUtc, string granularity)
+        {
+            var buckets = new List<DateTime>();
+
+            switch (granularity)
+            {
+                case "month":
+                {
+                    var cursor = new DateTime(periodStartUtc.Year, periodStartUtc.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+                    var end = new DateTime(periodEndUtc.Year, periodEndUtc.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+
+                    while (cursor <= end)
+                    {
+                        buckets.Add(cursor);
+                        cursor = cursor.AddMonths(1);
+                    }
+
+                    break;
+                }
+                case "week":
+                {
+                    var cursor = periodStartUtc;
+                    while (cursor <= periodEndUtc)
+                    {
+                        buckets.Add(cursor);
+                        cursor = cursor.AddDays(7);
+                    }
+
+                    break;
+                }
+                default:
+                {
+                    var cursor = periodStartUtc;
+                    while (cursor <= periodEndUtc)
+                    {
+                        buckets.Add(cursor);
+                        cursor = cursor.AddDays(1);
+                    }
+
+                    break;
+                }
+            }
+
+            return buckets;
+        }
+
+        private static DateTime GetBucketStart(DateTime date, DateTime periodStartUtc, string granularity)
+        {
+            return granularity switch
+            {
+                "month" => new DateTime(date.Year, date.Month, 1, 0, 0, 0, DateTimeKind.Utc),
+                "week" => periodStartUtc.AddDays(((date - periodStartUtc).Days / 7) * 7),
+                _ => date
+            };
         }
 
         private static List<AdminDashboardRoleDistributionItemDto> BuildRoleDistribution(

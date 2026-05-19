@@ -17,9 +17,9 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpGet("overview")]
-        public async Task<IActionResult> GetOverview([FromQuery] int days = 30)
+        public async Task<IActionResult> GetOverview([FromQuery] string? period = null, [FromQuery] int? days = null)
         {
-            var overview = await _adminDashboardService.GetOverviewAsync(days);
+            var overview = await _adminDashboardService.GetOverviewAsync(period, days);
             return Ok(overview);
         }
     }

@@ -5,6 +5,6 @@ namespace TuristickiVodic.Services.Services
 {
     public interface IAdminDashboardService
     {
-        Task<AdminDashboardOverviewDto> GetOverviewAsync(int days);
+        Task<AdminDashboardOverviewDto> GetOverviewAsync(string? period = null, int? days = null);
     }
 }

@@ -5,8 +5,11 @@ namespace TuristickiVodic.Core.DTO
 {
     public class AdminDashboardOverviewDto
     {
+        public string PeriodKey { get; set; } = "30d";
         public int PeriodDays { get; set; }
+        public string UserGrowthGranularity { get; set; } = "day";
         public DateTime AsOfUtc { get; set; }
+        public DateTime PeriodStartUtc { get; set; }
         public AdminDashboardSummaryDto Summary { get; set; } = new();
         public List<AdminDashboardUserGrowthPointDto> UserGrowth { get; set; } = new();
         public List<AdminDashboardRoleDistributionItemDto> RoleDistribution { get; set; } = new();
