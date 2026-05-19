@@ -21,15 +21,6 @@
   font-size: 13px;
 }
 
-.export-btn {
-  border: 1px solid #d1d5db;
-  background: #fff;
-  border-radius: 999px;
-  padding: 8px 14px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
 .filters-row {
   display: flex;
   flex-direction: column;
