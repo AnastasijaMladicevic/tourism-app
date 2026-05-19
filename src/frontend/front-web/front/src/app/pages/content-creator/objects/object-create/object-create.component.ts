@@ -17,7 +17,7 @@ import {
 import { ActivitiesService, LocalityOption } from '../../../../services/activities';
 import { DestinationDto, DestinationService } from '../../../../services/destination.service';
 import { AuthService } from '../../../../services/auth.service';
-import { ReviewService } from '../../../../services/review';
+import { ReviewDto, ReviewService } from '../../../../services/review';
 import { MapComponent as SharedMapComponent } from '../../../../shared/components/map/map';
 import { mapReviewDtosToObjectThreads } from '../../../manager/shared/manager-object-review.mapper';
 import {
@@ -97,6 +97,10 @@ export class ObjectCreateComponent implements OnInit {
   managerGuestReviews: ManagerObjectReviewThread[] = [];
   managerGuestReviewsLoading = false;
 
+  previewReviews: ReviewDto[] = [];
+  isLoadingPreviewReviews = false;
+  private readonly previewReviewsLimit = 3;
+
   /** Server-backed sidebar row when editing / reviewing an existing object. */
   editSidebar: {
     averageRating: number | null;
@@ -172,6 +176,24 @@ export class ObjectCreateComponent implements OnInit {
       return 'Review object';
     }
     return this.isEditMode ? 'Edit Object' : 'Create Object';
+  }
+
+  get showCcReviewsPreview(): boolean {
+    return this.isEditMode && this.objectId != null && !this.isManagerReview;
+  }
+
+  get hasPreviewReviews(): boolean {
+    return this.previewReviews.length > 0;
+  }
+
+  get previewReviewsCountLabel(): string {
+    const total = this.editSidebar?.reviewCount ?? this.previewReviews.length;
+    if (total > this.previewReviews.length) {
+      return `Showing ${this.previewReviews.length} of ${total}`;
+    }
+
+    const count = this.previewReviews.length;
+    return `${count} review${count === 1 ? '' : 's'}`;
   }
 
   get pageIntro(): string {
@@ -495,6 +517,76 @@ export class ObjectCreateComponent implements OnInit {
     this.selectedReviewImageUrl = url?.trim() ?? '';
   }
 
+  trackByReviewId(_: number, review: ReviewDto): number {
+    return review.id;
+  }
+
+  getReviewInitials(review: ReviewDto): string {
+    const fullName = review.userFullName?.trim();
+    if (!fullName) {
+      return 'U';
+    }
+
+    const parts = fullName.split(/\s+/).filter(Boolean);
+    if (parts.length === 1) {
+      return parts[0].slice(0, 1).toUpperCase();
+    }
+
+    return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+  }
+
+  getReviewTimeAgo(value?: string): string {
+    if (!value) {
+      return '';
+    }
+
+    const createdAt = new Date(value).getTime();
+    if (!Number.isFinite(createdAt)) {
+      return '';
+    }
+
+    const minutes = Math.max(0, Math.floor((Date.now() - createdAt) / 60000));
+    if (minutes < 1) {
+      return 'just now';
+    }
+    if (minutes < 60) {
+      return `${minutes}m ago`;
+    }
+
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) {
+      return `${hours}h ago`;
+    }
+
+    const days = Math.floor(hours / 24);
+    if (days < 7) {
+      return `${days}d ago`;
+    }
+
+    const weeks = Math.floor(days / 7);
+    if (weeks < 5) {
+      return `${weeks}w ago`;
+    }
+
+    const months = Math.floor(days / 30);
+    if (months < 12) {
+      return `${months}mo ago`;
+    }
+
+    const years = Math.floor(days / 365);
+    return `${years}y ago`;
+  }
+
+  onViewMoreReviews(): void {
+    if (!this.objectId) {
+      return;
+    }
+
+    this.router.navigate(['/content-creator/reviews'], {
+      queryParams: { objectId: this.objectId }
+    });
+  }
+
   get reviewImagePreviewUrl(): string {
     if (this.selectedReviewImageUrl) {
       return this.selectedReviewImageUrl;
@@ -768,11 +860,38 @@ export class ObjectCreateComponent implements OnInit {
         };
         this.mergeOptionsFromLoadedObject(merged);
         this.applyFormFromObject(merged);
+        this.loadCcPreviewReviews(merged.id);
       },
       error: (error) => {
         this.errorMessage = error?.error?.message ?? 'Failed to load object details.';
+        this.previewReviews = [];
+        this.isLoadingPreviewReviews = false;
       }
     });
+  }
+
+  private loadCcPreviewReviews(objectId: number): void {
+    if (!this.showCcReviewsPreview) {
+      return;
+    }
+
+    this.isLoadingPreviewReviews = true;
+    this.previewReviews = [];
+
+    this.reviewService
+      .getForObject(objectId)
+      .pipe(
+        catchError(() => of([] as ReviewDto[])),
+        finalize(() => {
+          this.isLoadingPreviewReviews = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe((reviews) => {
+        this.previewReviews = [...(reviews ?? [])]
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .slice(0, this.previewReviewsLimit);
+      });
   }
 
   private fetchOptionLists(): Observable<{

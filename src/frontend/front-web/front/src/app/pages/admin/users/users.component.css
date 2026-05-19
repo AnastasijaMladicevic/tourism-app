@@ -833,10 +833,11 @@ table {
 
 th,
 td {
-  padding: 10px 8px;
+  padding: 12px 8px;
   text-align: left;
   border-bottom: 1px solid #f3f4f6;
   font-size: 13px;
+  vertical-align: middle;
 }
 
 th {
@@ -936,20 +937,90 @@ th {
   color: #b91c1c;
 }
 
+.banned-users-card {
+  margin-top: 18px;
+}
+
+.ban-reason-cell {
+  max-width: 220px;
+  color: #374151;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 .actions {
-  width: 60px;
+  width: 1%;
+  white-space: nowrap;
   color: #6b7280;
 }
 
+.actions-inner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  min-height: 32px;
+}
+
+.unban-user-btn {
+  border: 1px solid #86efac;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #166534;
+  background: #f0fdf4;
+}
+
+.unban-user-btn:hover:not(:disabled) {
+  background: #dcfce7;
+  border-color: #4ade80;
+}
+
+.unban-user-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.unban-user-btn--confirm {
+  border: 0;
+  color: #fff;
+  background: linear-gradient(180deg, #16a34a 0%, #15803d 100%);
+  box-shadow: 0 1px 2px rgba(21, 128, 61, 0.25);
+  padding: 7px 12px;
+  font-size: 12px;
+}
+
+.unban-user-btn--confirm:hover:not(:disabled) {
+  background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+}
+
+.page-notice {
+  margin-bottom: 12px;
+}
+
 .actions-edit-link {
-  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: #6b7280;
   text-decoration: none;
   cursor: pointer;
-  font-size: 16px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.actions-edit-link .material-symbols-outlined {
+  font-size: 18px;
+  line-height: 1;
 }
 
 .actions-edit-link:hover {
   color: #2563eb;
+  background: #eff6ff;
 }
 
 .small-kpis {
@@ -1164,6 +1235,19 @@ th {
   width: 100%;
 }
 
+.banned-users-count-wrap {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.banned-users-count-wrap .creator-requests-count-label {
+  color: #b91c1c;
+}
+
+.banned-users-count-wrap .creator-requests-count {
+  color: #991b1b;
+}
+
 .creator-requests-toolbar {
   margin-top: 0;
 }
@@ -1295,6 +1379,263 @@ th {
   justify-content: flex-end;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.person-text {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.report-alert-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #fef2f2;
+  color: #dc2626;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.report-alert-btn:hover {
+  background: #fee2e2;
+  color: #b91c1c;
+  transform: scale(1.04);
+}
+
+.report-alert-btn .material-symbols-outlined {
+  font-size: 20px;
+  font-variation-settings: 'FILL' 1, 'wght' 600;
+}
+
+.team-row--report-highlight td {
+  background: #fff7ed;
+}
+
+.manager-report-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2100;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.manager-report-modal {
+  width: 100%;
+  max-width: 520px;
+  max-height: min(90vh, 720px);
+  overflow: auto;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.18);
+  padding: 22px 24px 20px;
+}
+
+.manager-report-modal-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.manager-report-modal-icon {
+  color: #dc2626;
+  font-size: 28px;
+  font-variation-settings: 'FILL' 1, 'wght' 600;
+}
+
+.manager-report-modal-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.manager-report-modal-subtitle {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.manager-report-details {
+  margin: 0 0 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.manager-report-details div {
+  display: grid;
+  gap: 2px;
+}
+
+.manager-report-details dt {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.manager-report-details dd {
+  margin: 0;
+  font-size: 14px;
+  color: #111827;
+  line-height: 1.45;
+}
+
+.manager-report-reason-block dd {
+  white-space: pre-wrap;
+}
+
+.ban-duration-block {
+  margin: 0 0 14px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #f3f4f6;
+}
+
+.ban-duration-label {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.ban-duration-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.ban-duration-option {
+  padding: 12px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: #fff;
+  color: #111827;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ban-duration-option:hover:not(:disabled) {
+  border-color: #9ca3af;
+}
+
+.ban-duration-option--selected {
+  border-color: #dc2626;
+  color: #dc2626;
+  box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.12);
+}
+
+.ban-duration-option:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ban-duration-custom-field {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.ban-duration-date-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+}
+
+.ban-duration-date-input:focus {
+  outline: none;
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.ban-duration-hint {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: #6b7280;
+}
+
+.manager-report-reject-field {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.manager-report-reject-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #dbe1ea;
+  border-radius: 10px;
+  font: inherit;
+  resize: vertical;
+  min-height: 72px;
+}
+
+.manager-report-modal-error {
+  margin: 0 0 12px;
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+.manager-report-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.ban-from-report-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 12px;
+  background: #dc2626;
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ban-from-report-btn:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.ban-from-report-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (max-width: 520px) {
+  .ban-duration-options {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 920px) {

@@ -221,15 +221,15 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.03em;
-    color: #64748b;
     margin: 0;
 }
 
 .stat-card strong {
     display: block;
     margin-top: 6px;
-    font-size: 34px;
+    font-size: 32px;
     line-height: 1;
+    font-weight: 700;
 }
 
 .stat-card span {
@@ -240,11 +240,42 @@
 }
 
 .stat-card[data-tone='blue'] {
-    background: #eef5ff;
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.stat-card[data-tone='blue'] p {
+    color: #3b82f6;
+}
+
+.stat-card[data-tone='blue'] strong {
+    color: #1d4ed8;
 }
 
 .stat-card[data-tone='green'] {
-    background: #eefbf1;
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+}
+
+.stat-card[data-tone='green'] p {
+    color: #059669;
+}
+
+.stat-card[data-tone='green'] strong {
+    color: #047857;
+}
+
+.stat-card[data-tone='neutral'] {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+
+.stat-card[data-tone='neutral'] p {
+    color: #d97706;
+}
+
+.stat-card[data-tone='neutral'] strong {
+    color: #b45309;
 }
 
 .detail-column {

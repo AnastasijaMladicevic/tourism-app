@@ -186,6 +186,27 @@ export class NotificationBellComponent implements OnInit {
     return type === 'adminnewcreatorrolerequest';
   }
 
+  private isManagerReportNotification(notification?: NotificationDto): boolean {
+    const type = (notification?.type ?? '').toLowerCase();
+    return type === 'adminnewmanagerreport' || type === 'adminrepeatedmanagerreports';
+  }
+
+  private resolveManagerReportActionUrl(
+    normalized: string,
+    notification?: NotificationDto,
+  ): string | null {
+    const reportIdFromPath = normalized.match(/^\/manager-reports\/(\d+)(?:\/|$)/)?.[1];
+    if (reportIdFromPath) {
+      return `/admin/users?tab=internal&reportId=${reportIdFromPath}`;
+    }
+
+    if (notification && this.isManagerReportNotification(notification)) {
+      return '/admin/users?tab=internal';
+    }
+
+    return null;
+  }
+
   private resolveInternalActionUrl(actionUrl: string, notification?: NotificationDto): string {
     const normalized = actionUrl.startsWith('/') ? actionUrl : `/${actionUrl}`;
     const role = this.authService.getAuthenticatedRole();
@@ -196,6 +217,11 @@ export class NotificationBellComponent implements OnInit {
       || (notification && this.isCreatorRoleRequestNotification(notification))
     ) {
       return '/admin/users?tab=tourists';
+    }
+
+    const managerReportUrl = this.resolveManagerReportActionUrl(normalized, notification);
+    if (managerReportUrl) {
+      return managerReportUrl;
     }
 
     if (role === 'admin') {
