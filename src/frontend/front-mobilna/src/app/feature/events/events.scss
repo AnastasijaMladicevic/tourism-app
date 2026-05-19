@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   padding: 14px 16px 10px;
-  background: var(--white);
+  background: var(--surface-strong);
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
@@ -125,7 +125,7 @@
   position: absolute;
   top: 44px;
   right: 0;
-  background: var(--white);
+  background: var(--surface-strong);
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   overflow: hidden;
@@ -175,7 +175,7 @@
   gap: 10px;
   margin: 10px 16px;
   padding: 10px 14px;
-  background: var(--white);
+  background: var(--surface);
   border-radius: 12px;
   border: 1.5px solid var(--primary);
   color: var(--text-gray);
@@ -331,7 +331,7 @@
   height: 100%;
   border-radius: 14px;
   overflow: hidden;
-  background: #fff;
+  background: var(--surface-strong);
   box-shadow: 0 6px 16px rgba(17, 28, 45, 0.08);
   transition:
     transform 0.2s,
@@ -542,7 +542,7 @@
   padding: 7px 34px 7px 14px;
   border-radius: 20px;
   border: 1.5px solid var(--border);
-  background: var(--white);
+  background: var(--surface);
   font-family: 'DM Sans', sans-serif;
   font-size: 13.5px;
   font-weight: 600;
@@ -628,7 +628,7 @@
   padding: 7px 12px;
   border-radius: 20px;
   border: 1.5px solid var(--border);
-  background: var(--white);
+  background: var(--surface);
 
   mat-icon {
     font-size: 16px;
@@ -670,7 +670,7 @@
   padding: 7px 12px;
   border-radius: 20px;
   border: 1.5px solid var(--border);
-  background: var(--white);
+  background: var(--surface);
   cursor: pointer;
   font-family: 'DM Sans', sans-serif;
   font-size: 13.5px;
@@ -695,7 +695,7 @@
   padding: 7px 18px;
   border-radius: 20px;
   border: 1.5px solid var(--border);
-  background: var(--white);
+  background: var(--surface);
   font-family: 'DM Sans', sans-serif;
   font-size: 13.5px;
   font-weight: 500;
@@ -734,7 +734,7 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: white;
+  background: var(--surface);
   border: none;
   display: flex;
   align-items: center;
@@ -771,5 +771,79 @@
 
   mat-icon {
     animation: heart-pop 0.35s ease;
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+  .header {
+    background: var(--surface-strong);
+    border-bottom-color: var(--border);
+  }
+
+  .header__title,
+  .icon-btn,
+  .results-bar__count,
+  .event-body h3 {
+    color: var(--text-dark);
+  }
+
+  .search-bar,
+  .search-inline,
+  .sort-trigger,
+  .filter-btn,
+  .list-controls select,
+  .planner-btn {
+    background: var(--surface);
+    color: var(--text-dark);
+    border-color: var(--border);
+  }
+
+  .sort-menu,
+  .event-card {
+    background: var(--surface-strong);
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+
+  .event-body p,
+  .event-meta p,
+  .event-location,
+  .attending-text,
+  .meta-icon {
+    color: var(--text-gray);
+  }
+
+  .planner-btn {
+    color: #4dc2ff;
+    box-shadow: none;
+  }
+
+  .planner-btn--active {
+    background: rgba(255, 107, 107, 0.12);
+    color: #ff6b6b;
+    border-color: rgba(255, 107, 107, 0.22);
+  }
+
+  .event-price,
+  .event-price--free {
+    background: var(--surface);
+    color: var(--text-dark);
+  }
+
+  .event-image--empty {
+    background: var(--surface);
+  }
+
+  .event-image--empty h3 {
+    color: var(--text-dark);
+  }
+
+  .loading-screen {
+    background: rgba(7, 19, 25, 0.92);
+  }
+
+  .spinner {
+    border-color: rgba(255,255,255,0.08);
+    border-top-color: var(--primary);
   }
 }

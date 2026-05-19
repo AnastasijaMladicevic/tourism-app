@@ -11,7 +11,7 @@ button:hover {
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  background: var(--white);
+  background: var(--surface-strong);
   border-bottom: 1px solid var(--border);
 }
 
@@ -106,7 +106,7 @@ button:hover {
     width: 42px;
     height: 42px;
     border-radius: 50%;
-    background: #f5f7fa;
+    background: var(--surface-soft);
     box-shadow: none;
     margin-top: -10px;
     margin-bottom: 5px;
@@ -118,7 +118,7 @@ button:hover {
   flex-direction: column;
   gap: 20px;
   padding: 20px 12px 50px;
-  background: var(--white);
+  background: var(--bg);
   border-radius: 25px;
   position: relative;
   z-index: 1;
@@ -816,7 +816,7 @@ button:hover {
     grid-template-columns: 1.6fr 1fr;
     gap: 40px;
     padding: 30px 20px 60px;
-    background: #f5f7fa;
+    background: var(--bg);
     align-items: start;
   }
 
@@ -1085,7 +1085,7 @@ button:hover {
   width: 100%;
   max-width: 600px;
   height: 90vh;
-  background: white;
+  background: var(--surface-strong);
   border-radius: 20px;
   overflow: hidden;
   display: flex;
@@ -1173,7 +1173,7 @@ button:hover {
   align-items: center;
   text-align: center;
   padding: 16px;
-  background: #f8fafc;
+  background: var(--surface-soft);
   border-radius: 12px;
   border: 1px solid var(--border);
 
@@ -1311,7 +1311,7 @@ button:hover {
 }
 
 .modal-content-review {
-  background: white;
+  background: var(--surface-strong);
   border-radius: 24px;
   width: 100%;
   max-width: 460px;
@@ -1351,7 +1351,7 @@ textarea {
   padding: 20px;
   border: 2px dashed #cbd5e1;
   border-radius: 16px;
-  background: #f8fafc;
+  background: var(--surface-soft);
   text-align: center;
 }
 
@@ -1428,7 +1428,7 @@ textarea {
 .review-photos-btn {
   margin-top: 8px;
   border: none;
-  background: #eef9fc;
+  background: rgba(77, 194, 255, 0.08);
   color: #0086a8;
   font-size: 13px;
   font-weight: 600;
@@ -1487,7 +1487,7 @@ textarea {
   position: relative;
   width: min(92vw, 720px);
   height: min(82vh, 620px);
-  background: #fff;
+  background: var(--surface-strong);
   border-radius: 22px;
   padding: 44px 20px 52px;
 }
@@ -1578,7 +1578,7 @@ textarea {
 
 .custom-modal {
   width: min(92vw, 380px);
-  background: #fff;
+  background: var(--surface-strong);
   border-radius: 24px;
   padding: 26px 24px 22px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.18);
@@ -1652,4 +1652,328 @@ textarea {
   width: 58px;
   height: 58px;
   color: #10b981;
+}
+
+:host-context(:root[data-theme='dark']) {
+
+  .header {
+    background: var(--surface-strong);
+    border-bottom-color: var(--border);
+  }
+
+  .header__title,
+  .icon-btn {
+    color: var(--text-dark);
+  }
+
+  .content {
+    background: var(--bg);
+  }
+
+  .card,
+  .gallery-card,
+  .reviews-card,
+  .qr-card,
+  .custom-modal,
+  .modal-content-review,
+  .modal-content-reviews,
+  .review-images-modal-content {
+    background: var(--surface-strong);
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+
+  .title,
+  .location-bold,
+  .venue-big,
+  .section h2,
+  .review-author,
+  .modal-header h2,
+  .custom-modal h3,
+  .contact-info h3 {
+    color: var(--text-dark);
+  }
+
+  .description,
+  .date,
+  .venue,
+  .review-text,
+  .review-date,
+  .contact-info p,
+  .custom-modal p,
+  .price-label,
+  .nearby-empty,
+  .review-modal-counter {
+    color: var(--text-gray);
+  }
+
+  .fav-btn,
+  .fav-btn--desktop {
+    background: rgba(77, 194, 255, 0.1);
+    color: #4dc2ff;
+    border: 1px solid rgba(77, 194, 255, 0.18);
+    box-shadow: none;
+  }
+
+  .fav-btn:hover,
+  .fav-btn--desktop:hover {
+    background: rgba(77, 194, 255, 0.16);
+  }
+
+  .fav-btn--active {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.12);
+    border-color: rgba(255, 107, 107, 0.2);
+  }
+
+  .info-card,
+  .ticket-card,
+  .price,
+  .amenity-item,
+  .rating-summary,
+  .photo-upload {
+    background: var(--surface-soft);
+    border-color: var(--border);
+  }
+
+  .amenity-item span,
+  .info-card h3,
+  .ticket-type,
+  .modal-title,
+  .big-rating {
+    color: var(--text-dark);
+  }
+
+  .btn-outline,
+  .btn-map,
+  .review-photos-btn {
+    background: rgba(77, 194, 255, 0.08);
+    border-color: rgba(77, 194, 255, 0.24);
+    color: #4dc2ff;
+  }
+
+  .review-photos-btn:hover {
+    background: rgba(77, 194, 255, 0.14);
+  }
+
+  .location-image::after {
+    background: rgba(7, 19, 25, 0.88);
+    color: var(--text-dark);
+  }
+
+  textarea {
+    background: var(--surface-soft);
+    border-color: var(--border);
+    color: var(--text-dark);
+
+    &::placeholder {
+      color: var(--text-gray);
+    }
+  }
+
+  .modal-header,
+  .review-item,
+  .rating-summary,
+  .modal-title {
+    border-color: var(--border);
+  }
+
+  .loading-screen {
+    background: rgba(7, 19, 25, 0.92);
+  }
+
+  .spinner {
+    border-color: rgba(255,255,255,0.08);
+    border-top-color: var(--primary);
+  }
+
+  .qr-mini img {
+    background: var(--surface-soft);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .review-images-link {
+    color: #4dc2ff;
+  }
+
+  .creator-response {
+    background: rgba(77, 194, 255, 0.08);
+    border-left-color: #4dc2ff;
+
+    &-header {
+      color: #4dc2ff;
+    }
+
+    &-text {
+      color: var(--text-gray);
+    }
+  }
+}
+
+
+:host-context(:root[data-theme='dark']) {
+  .review-modal {
+    background: rgba(0, 0, 0, 0.78);
+  }
+
+  .modal-content-review,
+  .modal-content-reviews,
+  .review-images-modal-content,
+  .custom-modal {
+    background: var(--surface-strong);
+    color: var(--text-dark);
+    border: 1px solid var(--border);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  }
+
+  .modal-content-review h2,
+  .modal-content-review h3,
+  .modal-content-reviews h2,
+  .custom-modal h3 {
+    color: var(--text-dark);
+  }
+
+  .modal-content-review p,
+  .custom-modal p,
+  .review-modal-counter {
+    color: var(--text-gray);
+  }
+
+  textarea {
+    background: var(--surface-soft);
+    color: var(--text-dark);
+    border-color: var(--border);
+  }
+
+  .photo-upload {
+    background: var(--surface-soft);
+    border-color: rgba(77, 194, 255, 0.22);
+    color: var(--text-gray);
+  }
+
+  .preview-item {
+    background: var(--surface-soft);
+    border-color: var(--border);
+  }
+
+  .review-images-modal-content {
+    background: var(--surface-strong);
+  }
+
+  .review-modal-image-container {
+    background: var(--surface-strong);
+  }
+
+  .review-modal-counter {
+    color: var(--text-dark);
+  }
+
+  .modal-btn-secondary {
+    background: var(--surface-soft);
+    color: var(--text-dark);
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+  
+  .custom-modal {
+    background: var(--surface-strong) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text-dark) !important;
+  }
+
+  .custom-modal h2,
+  .custom-modal h3 {
+    color: var(--text-dark) !important;
+  }
+
+  .custom-modal p {
+    color: var(--text-gray) !important;
+  }
+
+    .confirm-modal,
+    .delete-confirm-modal,
+    .confirmation-modal {
+      background: var(--surface-strong) !important;
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+    }
+  
+    .confirm-modal h3,
+    .delete-confirm-modal h3,
+    .confirmation-modal h3 {
+      color: var(--text-dark) !important;
+    }
+  
+    .confirm-modal p,
+    .delete-confirm-modal p,
+    .confirmation-modal p {
+      color: var(--text-gray) !important;
+    }
+  
+    .confirm-cancel-btn,
+    .modal-cancel-btn {
+      background: var(--surface-soft) !important;
+      color: var(--text-dark) !important;
+      border: 1px solid var(--border);
+    }
+  
+    .confirm-submit-btn,
+    .modal-confirm-btn {
+      background: var(--primary) !important;
+      color: white !important;
+    }
+  }
+
+  .modal-content-review {
+    background: var(--surface-strong) !important;
+  }
+
+  .modal-content-review h2,
+  .modal-content-review h3,
+  .modal-content-review .modal-title {
+    color: var(--text-dark) !important;
+  }
+
+  .modal-content-review .subtitle,
+  .modal-content-review .review-subtitle {
+    color: var(--text-gray) !important;
+  }
+
+  .photo-upload {
+    background: var(--surface-soft) !important;
+    border: 2px dashed rgba(77, 194, 255, 0.22) !important;
+    color: var(--text-gray) !important;
+  }
+
+  .photo-upload * {
+    color: var(--text-gray) !important;
+  }
+
+  .preview-item,
+  .uploaded-image,
+  .review-image-preview {
+    background: var(--surface-soft) !important;
+    border-color: var(--border) !important;
+  }
+
+  .preview-remove-btn {
+    background: rgba(0, 0, 0, 0.72) !important;
+    color: white !important;
+  }
+
+  .rating-stars button {
+    color: #facc15;
+  }
+
+  .modal-submit-btn,
+  .submit-review-btn {
+    background: var(--primary) !important;
+    color: white !important;
+  }
+
+  .modal-submit-btn:hover,
+  .submit-review-btn:hover {
+    filter: brightness(1.06);
 }

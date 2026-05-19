@@ -294,7 +294,7 @@
 
 .explore-btn {
   align-self: flex-end;
-  background: var(--white);
+  background: var(--surface-soft);
   border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 20px;
   padding: 8px 18px;
@@ -364,7 +364,7 @@
   right: 8px;
   width: 28px;
   height: 28px;
-  background: white;
+  background: var(--surface-soft);
   border: none;
   border-radius: 50%;
   display: flex;
@@ -525,7 +525,7 @@
   height: 28px;
   border-radius: 50%;
   border: none;
-  background: var(--white);
+  background: var(--surface-soft);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -801,9 +801,9 @@
   padding: 0 12px;
   border-radius: 18px;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--surface-strong);
+  color: var(--text-dark);
   border: 1px solid rgba(215, 229, 236, 0.95);
-  color: #263945;
   font-size: 13px;
   font-weight: 700;
   box-shadow: 0 14px 34px rgba(23, 110, 134, 0.05);
@@ -983,5 +983,39 @@
     font-size: 12px;
     width: 12px;
     height: 12px;
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+  .filter-btn,
+  .explore-btn,
+  .heart-btn,
+  .planner-btn {
+    background: var(--surface-soft);
+    color: var(--text-dark);
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+
+  .filter-btn:hover,
+  .explore-btn:hover,
+  .heart-btn:hover,
+  .planner-btn:hover {
+    background: rgba(77, 194, 255, 0.12);
+    color: #4dc2ff;
+    border-color: rgba(77, 194, 255, 0.28);
+  }
+
+  .suggestions {
+    background: var(--surface-strong);
+    border: 1px solid var(--border);
+  }
+
+  .suggestion-item__name {
+    color: var(--text-dark);
+  }
+
+  .suggestion-item:hover {
+    background: rgba(77, 194, 255, 0.08);
   }
 }

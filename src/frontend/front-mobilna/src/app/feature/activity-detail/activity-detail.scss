@@ -12,7 +12,7 @@ button:hover {
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  background: var(--white);
+  background: var(--surface-strong);
   border-bottom: 1px solid var(--border);
 }
 
@@ -100,7 +100,7 @@ button:hover {
     width: 42px;
     height: 42px;
     border-radius: 50%;
-    background: #f5f7fa;
+    background: var(--surface-soft);
     box-shadow: none;
     margin-top: -10px;
     margin-bottom: 5px;
@@ -111,7 +111,7 @@ button:hover {
   flex-direction: column;
   gap: 20px;
   padding: 20px 12px 50px;
-  background: var(--white);
+  background: var(--bg);
   border-radius: 25px;
   position: relative;
   z-index: 1;
@@ -121,7 +121,7 @@ button:hover {
   h2{
     margin-bottom: 5px;
   }
-  background: white;
+  background: var(--surface-strong);
   border-radius: 20px;
   padding: 24px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
@@ -717,7 +717,7 @@ button:hover {
     grid-template-columns: 1.6fr 1fr;
     gap: 40px;
     padding: 30px 20px 60px;
-    background: #f5f7fa;
+    background: var(--bg);
   }
 
   .right {
@@ -799,5 +799,152 @@ button:hover {
     background: #fff;
     border: 1px solid var(--border);
     box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+
+  :host {
+    background: var(--bg);
+  }
+
+  .header,
+  .content {
+    background: var(--bg);
+    color: var(--text-dark);
+  }
+
+  .card,
+  .ticket-card,
+  .info-card,
+  .gallery-card,
+  .qr-card {
+    background: var(--surface-strong);
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+
+  .title,
+  .header__title,
+  .location-bold,
+  .venue-big,
+  .section h2,
+  .nearby-item__body h3,
+  .ticket-type,
+  .price-value,
+  .ticket-price,
+  .meta .date {
+    color: var(--text-dark);
+  }
+
+  .description,
+  .date,
+  .venue,
+  .meta .location,
+  .price-label,
+  .nearby-item__location,
+  .nearby-item__date,
+  .nearby-empty,
+  .qr-card p,
+  .loading-content p {
+    color: var(--text-gray);
+  }
+
+  .info-card,
+  .ticket-card {
+    background: var(--surface-soft);
+  }
+
+  .fav-btn,
+  .fav-btn--desktop {
+    background: var(--surface-soft);
+    color: var(--text-dark);
+    box-shadow: none;
+    border: 1px solid var(--border);
+  }
+
+  .btn-outline,
+  .btn-map {
+    background: rgba(77, 194, 255, 0.08);
+    border-color: rgba(77, 194, 255, 0.24);
+    color: #4dc2ff;
+  }
+
+  .location-image::after {
+    background: rgba(7, 19, 25, 0.88);
+    color: var(--text-dark);
+  }
+
+  .nearby-item__image {
+    background: linear-gradient(135deg, #16313d, #102733);
+  }
+
+  .nearby-item__placeholder {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .gallery-item {
+    box-shadow: none;
+  }
+
+  .modal-thumbnails {
+    background: rgba(7, 19, 25, 0.92);
+  }
+
+  .modal-dots {
+    background: rgba(7, 19, 25, 0.92);
+  }
+
+  .modal-close,
+  .modal-nav {
+    background: rgba(7, 19, 25, 0.72);
+    color: white;
+  }
+
+  .loading-screen {
+    background: rgba(7, 19, 25, 0.92);
+  }
+
+  .spinner {
+    border-color: rgba(255,255,255,0.08);
+    border-top-color: var(--primary);
+  }
+
+  .qr-mini img {
+    background: var(--surface-soft);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+
+  .header {
+    background: var(--surface-strong);
+    border-bottom-color: var(--border);
+  }
+
+  .icon-btn,
+  .header__title {
+    color: var(--text-dark);
+  }
+
+  .fav-btn,
+  .fav-btn--desktop {
+    background: rgba(77, 194, 255, 0.1);
+    color: #4dc2ff;
+    border: 1px solid rgba(77, 194, 255, 0.18);
+    box-shadow: none;
+  }
+
+  .fav-btn:hover,
+  .fav-btn--desktop:hover {
+    background: rgba(77, 194, 255, 0.16);
+  }
+
+  .fav-btn--active {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.12);
+    border-color: rgba(255, 107, 107, 0.2);
   }
 }

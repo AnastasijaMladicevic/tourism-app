@@ -13,7 +13,7 @@
   display: flex;
   align-items: center;
   padding: 14px 16px 10px;
-  background: var(--white);
+  background: var(--surface-strong);
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
@@ -131,7 +131,7 @@
   position: absolute;
   top: 44px;
   right: 0;
-  background: var(--white);
+  background: var(--surface-strong);
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   overflow: hidden;
@@ -182,7 +182,7 @@
   gap: 10px;
   margin: 10px 16px;
   padding: 10px 14px;
-  background: var(--white);
+  background: var(--surface);
   border-radius: 12px;
   border: 1.5px solid var(--primary);
   color: var(--text-gray);
@@ -249,7 +249,7 @@
   padding: 7px 12px;
   border-radius: 20px;
   border: 1.5px solid var(--border);
-  background: var(--white);
+  background: var(--surface);
 
   mat-icon {
     font-size: 16px;
@@ -291,7 +291,7 @@
   padding: 7px 12px;
   border-radius: 20px;
   border: 1.5px solid var(--border);
-  background: var(--white);
+  background: var(--surface);
   cursor: pointer;
   font-family: 'DM Sans', sans-serif;
   font-size: 13.5px;
@@ -316,7 +316,7 @@
   padding: 7px 18px;
   border-radius: 20px;
   border: 1.5px solid var(--border);
-  background: var(--white);
+  background: var(--surface);
   font-family: 'DM Sans', sans-serif;
   font-size: 13.5px;
   font-weight: 500;
@@ -406,7 +406,7 @@
 
 // ─── Card ──────────────────────────────────────────────────────────────────────
 .card {
-  background: var(--white);
+  background: var(--surface-strong);
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
@@ -462,7 +462,7 @@
   height: 34px;
   border-radius: 50%;
   border: none;
-  background: var(--white);
+  background: var(--surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -671,7 +671,7 @@
   padding: 7px 34px 7px 14px;
   border-radius: 20px;
   border: 1.5px solid var(--border);
-  background: var(--white);
+  background: var(--surface);
   font-family: 'DM Sans', sans-serif;
   font-size: 13.5px;
   font-weight: 600;
@@ -697,5 +697,64 @@
   &:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 3px var(--primary-light);
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+  .header {
+    background: var(--surface-strong);
+    border-bottom-color: var(--border);
+  }
+
+  .header__title,
+  .icon-btn,
+  .card__name,
+  .card__rating,
+  .results-bar__count {
+    color: var(--text-dark);
+  }
+
+  .search-bar,
+  .search-inline,
+  .sort-trigger,
+  .filter-btn,
+  .list-controls select,
+  .card__fav {
+    background: var(--surface);
+    color: var(--text-dark);
+    border-color: var(--border);
+  }
+
+  .sort-menu,
+  .card {
+    background: var(--surface-strong);
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+
+  .card__type,
+  .card__desc,
+  .card__reviews {
+    color: var(--text-gray);
+  }
+
+  .card__fav {
+    color: #4dc2ff;
+    box-shadow: none;
+  }
+
+  .card__fav--active {
+    background: rgba(255, 107, 107, 0.12);
+    color: #ff6b6b;
+    border-color: rgba(255, 107, 107, 0.22);
+  }
+
+  .loading-screen {
+    background: rgba(7, 19, 25, 0.92);
+  }
+
+  .spinner {
+    border-color: rgba(255,255,255,0.08);
+    border-top-color: var(--primary);
   }
 }

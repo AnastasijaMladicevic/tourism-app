@@ -251,7 +251,8 @@ body.route-navigation-active app-floating-ai-assistant {
   bottom: 14px;
   z-index: 20;
   max-height: min(66vh, 560px);
-  background: rgba(255, 255, 255, 0.98);
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
   backdrop-filter: blur(16px);
   border-radius: 28px;
   box-shadow:
@@ -368,7 +369,7 @@ body.route-navigation-active app-floating-ai-assistant {
 .route-planner__stat-pill {
   padding: 6px 12px;
   border-radius: 999px;
-  background: #f3f7fb;
+  background: var(--surface-soft);
   color: #3f4f61;
 }
 
@@ -398,7 +399,7 @@ body.route-navigation-active app-floating-ai-assistant {
   height: 36px;
   border-radius: 12px;
   justify-content: center;
-  background: #f3f7fb;
+  background: var(--surface-soft);
 
   mat-icon {
     width: 18px;
@@ -486,7 +487,7 @@ body.route-navigation-active app-floating-ai-assistant {
 .route-planner__search-box {
   min-height: 48px;
   border-radius: 18px;
-  background: #f7fafc;
+  background: var(--surface-soft);
   display: flex;
   align-items: center;
   gap: 10px;
@@ -573,7 +574,8 @@ body.route-navigation-active app-floating-ai-assistant {
   top: calc(100% + 8px);
   left: 0;
   right: 0;
-  background: white;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
   border-radius: 18px;
   box-shadow: 0 20px 38px rgba(15, 23, 42, 0.16);
   z-index: 1200;
@@ -596,7 +598,7 @@ body.route-navigation-active app-floating-ai-assistant {
   }
 
   &:hover {
-    background: #f7fafc;
+    background: rgba(27, 55, 69, 0.72);
   }
 }
 
@@ -648,10 +650,10 @@ body.route-navigation-active app-floating-ai-assistant {
   min-height: 74px;
   padding: 12px 14px 12px 8px;
   border-radius: 20px;
-  background: linear-gradient(180deg, #fdfefe, #ffffff);
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
   box-shadow:
     0 14px 30px rgba(15, 23, 42, 0.05),
-    inset 0 0 0 1px rgba(148, 163, 184, 0.11);
 }
 
 .route-stop-card__rail {
@@ -1803,7 +1805,8 @@ body.route-navigation-active app-floating-ai-assistant {
   min-height: 92px;
   padding: 18px 18px 16px;
   border-radius: 28px;
-  background: rgba(255, 255, 255, 0.98);
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
   box-shadow: 0 22px 44px rgba(15, 23, 42, 0.2);
   display: flex;
   align-items: center;
@@ -1937,7 +1940,7 @@ body.route-navigation-active app-floating-ai-assistant {
   top: 50%;
   transform: translateY(-50%);
   z-index: 1201;
-  background: rgba(255, 255, 255, 0.97);
+  background: var(--surface-strong);
   border: 1px solid rgba(208, 234, 240, 0.95);
   border-radius: 22px;
   box-shadow: 0 24px 48px rgba(15, 23, 42, 0.22);
@@ -2072,7 +2075,8 @@ body.route-navigation-active app-floating-ai-assistant {
   left: 16px;
   right: 16px;
   z-index: 10;
-  background: var(--white);
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
   border-radius: 20px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   overflow: auto;
@@ -2542,5 +2546,88 @@ body.route-navigation-active app-floating-ai-assistant {
       border-color 0.18s ease,
       color 0.18s ease,
       box-shadow 0.18s ease;
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+  .bottom-card__btn--outline {
+    background: rgba(77, 194, 255, 0.08) !important;
+    border-color: rgba(77, 194, 255, 0.24) !important;
+    color: #4dc2ff !important;
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+
+  .route-planner,
+  .route-stop-card,
+  .route-suggestions,
+  .navigation-summary-card,
+  .location-consent-modal,
+  .bottom-card {
+    background: var(--surface-strong);
+    border-color: var(--border);
+    color: var(--text-dark);
+  }
+
+  .route-stop-card__body strong,
+  .route-planner__title-block h3,
+  .navigation-summary-card__stats strong,
+  .bottom-card__name,
+  .location-consent-modal h3 {
+    color: var(--text-dark);
+  }
+
+  .route-stop-card__body span,
+  .navigation-summary-card__stats span,
+  .bottom-card__meta,
+  .location-consent-modal p {
+    color: var(--text-gray);
+  }
+
+  .route-planner__badge-icon {
+    background: rgba(77, 194, 255, 0.12);
+    color: #4dc2ff;
+  }
+
+  .route-planner__search-box,
+  .route-planner__icon-btn,
+  .route-planner__stat-pill {
+    background: var(--surface-soft);
+  }
+
+  .route-stop-card__body strong {
+    color: var(--text-dark);
+  }
+
+  .route-stop-card__body span {
+    color: var(--text-gray);
+  }
+
+  .route-stop-card__grip {
+    color: var(--text-gray);
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+  .chip:hover,
+  .filter-icon-btn:hover,
+  .control-btn:hover,
+  .leaflet-control-zoom a:hover {
+    background: #16313d !important;
+    color: #f4fbff !important;
+    border-color: rgba(77, 194, 255, 0.35) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.32) !important;
+  }
+
+  .chip--active:hover {
+    background: var(--primary) !important;
+    color: #fff !important;
+  }
+
+  .leaflet-control-zoom a {
+    background: var(--surface-strong) !important;
+    color: var(--text-dark) !important;
+    border-color: var(--border) !important;
   }
 }

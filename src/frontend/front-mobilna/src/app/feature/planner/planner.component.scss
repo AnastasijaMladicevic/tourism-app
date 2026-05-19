@@ -1,6 +1,6 @@
 .planner-page {
   min-height: 100dvh;
-  background: linear-gradient(180deg, #fbfdff 0%, #f3f6fb 100%);
+  background: var(--bg);
 }
 
 .planner-desktop-topbar,
@@ -163,7 +163,7 @@
   padding: 13px 10px;
   border: 1px solid #d8dee7;
   border-radius: 18px;
-  background: #fff;
+  background: var(--surface-strong);
   color: #64748b;
   box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);
   display: flex;
@@ -248,7 +248,7 @@
   overflow: hidden;
   border: 1px solid #e5e7eb;
   border-radius: 22px;
-  background: #fff;
+  background: var(--surface-strong);
   box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
   cursor: pointer;
 }
@@ -1067,5 +1067,131 @@
     border-radius: 50%;
     background: #fbbf24;
     flex: 0 0 auto;
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+
+  .planner-page {
+    background: var(--bg);
+    color: var(--text-dark);
+  }
+
+  .planner-mobile-topbar,
+  .planner-desktop-topbar,
+  .planner-stop-card,
+  .planner-empty-state,
+  .planner-remove-dialog,
+  .planner-mobile-nav,
+  .planner-cta-card,
+  .planner-highlight-card,
+  .planner-tip-card,
+  .planner-stat-card {
+    background: var(--surface-strong);
+    color: var(--text-dark);
+    border-color: var(--border);
+  }
+
+  .planner-day-pill,
+  .planner-schedule-pill,
+  .planner-desktop-overview__meta,
+  .planner-schedule-date,
+  .planner-card-icon-btn {
+    background: var(--surface-soft);
+    color: var(--text-dark);
+    border-color: var(--border);
+  }
+
+  .planner-card-icon-btn--danger {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ff6b6b;
+  }
+
+  .planner-mobile-nav {
+    border-top-color: var(--border);
+  }
+
+  .planner-mobile-nav a {
+    color: var(--text-gray);
+  }
+
+  .planner-mobile-nav__active {
+    color: var(--text-dark) !important;
+  }
+
+  .planner-stop-card__top h4,
+  .planner-desktop-topbar h1,
+  .planner-desktop-overview__copy h2,
+  .planner-schedule-head h3,
+  .planner-empty-state strong,
+  .planner-highlight-card__head h3,
+  .planner-highlight-row strong,
+  .planner-tip-card strong,
+  .planner-stat-card strong,
+  .planner-remove-dialog h3,
+  .planner-remove-dialog p strong {
+    color: var(--text-dark);
+  }
+
+  .planner-stop-card__meta,
+  .planner-schedule-date,
+  .planner-highlight-row span,
+  .planner-desktop-overview__copy p,
+  .planner-tip-card,
+  .planner-remove-dialog p,
+  .planner-desktop-footer,
+  .planner-desktop-footer a {
+    color: var(--text-gray);
+  }
+
+  .planner-timeline-row:not(:last-child)::before {
+    background: rgba(148, 163, 184, 0.22);
+  }
+
+  .planner-timeline-dot {
+    border-color: var(--surface-strong);
+    background: #4dc2ff;
+    box-shadow: 0 0 0 2px rgba(77, 194, 255, 0.18);
+  }
+
+  .planner-stop-card__quote {
+    border-left-color: rgba(148, 163, 184, 0.24);
+    color: var(--text-gray);
+  }
+
+  .planner-highlight-card__head {
+    border-bottom-color: var(--border);
+  }
+
+  .planner-highlight-row:not(:last-child) {
+    border-bottom-color: var(--border);
+  }
+
+  .planner-remove-dialog__footer {
+    border-top-color: var(--border);
+  }
+
+  .planner-cancel-remove-btn {
+    background: var(--surface-soft);
+    color: var(--text-dark);
+    border-color: var(--border);
+  }
+
+  .planner-desktop-topbar,
+  .planner-desktop-footer {
+    background: var(--surface-strong);
+    border-color: var(--border);
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+  .planner-stat-card__icon--events {
+    background: rgba(77, 194, 255, 0.12);
+    color: #4dc2ff;
+  }
+
+  .planner-stat-card__icon--hours {
+    background: rgba(77, 194, 255, 0.12);
+    color: #4dc2ff;
   }
 }

@@ -1167,3 +1167,128 @@ body.route-add-stop-open app-floating-ai-assistant {
     padding: 22px 28px;
   }
 }
+
+:host-context(:root[data-theme='dark']) {
+  :host,
+  .add-stop-screen-shell,
+  .add-stop-screen {
+    background: var(--bg);
+    color: var(--text-dark);
+  }
+
+  .add-stop-route-modal,
+  .add-stop-screen {
+    background: var(--surface-strong);
+    border: 1px solid var(--border);
+  }
+
+  .add-stop-route-modal__header,
+  .add-stop-route-modal__footer,
+  .add-stop-screen__header,
+  .add-stop-screen__footer {
+    background: var(--surface-strong);
+    border-color: var(--border);
+  }
+
+  .add-stop-route-modal__title-icon,
+  .add-stop-screen__logo,
+  .add-stop-screen__choose-icon {
+    background: rgba(77, 194, 255, 0.14);
+    color: #4dc2ff;
+  }
+
+  .add-stop-route-modal__title h3,
+  .add-stop-screen__title h1,
+  .add-stop-screen__section-head h2,
+  .add-stop-route-modal__section-head h4,
+  .add-stop-route-modal__result-body strong,
+  .add-stop-screen__recent-copy strong {
+    color: var(--text-dark);
+  }
+
+  .add-stop-route-modal__search,
+  .add-stop-screen__search,
+  .add-stop-screen__choose-map,
+  .add-stop-route-modal__manual,
+  .add-stop-route-modal__result,
+  .add-stop-screen__recent-item,
+  .add-stop-route-modal__empty {
+    background: var(--surface-soft);
+    color: var(--text-dark);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .add-stop-route-modal__chip,
+  .add-stop-screen__chip {
+    background: var(--surface-soft);
+    color: var(--text-dark);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .add-stop-route-modal__chip:hover,
+  .add-stop-screen__chip:hover,
+  .add-stop-route-modal__result:hover,
+  .add-stop-screen__recent-item:hover {
+    background: #16313d;
+    color: var(--text-dark);
+    border-color: rgba(77, 194, 255, 0.28);
+  }
+
+  .add-stop-route-modal__chip--active,
+  .add-stop-screen__chip--active {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+
+  .add-stop-route-modal__search input,
+  .add-stop-screen__search input {
+    color: var(--text-dark);
+
+    &::placeholder {
+      color: var(--text-gray);
+    }
+  }
+
+  .add-stop-route-modal__result-body span,
+  .add-stop-screen__recent-copy span,
+  .add-stop-screen__state,
+  .add-stop-route-modal__hint,
+  .add-stop-screen__cancel,
+  .add-stop-route-modal__cancel {
+    color: var(--text-gray);
+  }
+
+  .add-stop-route-modal__result-icon,
+  .add-stop-screen__recent-icon {
+    background: rgba(77, 194, 255, 0.1);
+    color: #4dc2ff;
+  }
+
+  .add-stop-route-modal__preview,
+  .add-stop-screen__preview {
+    background: var(--surface-soft);
+    border-color: var(--border);
+  }
+
+  .add-stop-screen__preview-surface::before {
+    background:
+      radial-gradient(circle at 30% 20%, rgba(77, 194, 255, 0.12), transparent 28%),
+      radial-gradient(circle at 70% 35%, rgba(77, 194, 255, 0.08), transparent 24%),
+      linear-gradient(135deg, #102733, #0b1b23);
+  }
+
+  .add-stop-screen__preview-copy span,
+  .add-stop-screen__preview-copy small,
+  .add-stop-route-modal__location-map::after {
+    background: rgba(7, 19, 25, 0.86);
+    color: var(--text-dark);
+  }
+
+  .add-stop-screen__preview-copy strong,
+  .add-stop-route-modal__location-card h4 {
+    color: var(--text-dark);
+  }
+}

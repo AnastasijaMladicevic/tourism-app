@@ -1,8 +1,6 @@
 .region-page {
   min-height: 100dvh;
-  background:
-    radial-gradient(circle at top center, rgba(22, 138, 173, 0.08), transparent 28%),
-    linear-gradient(180deg, #fbfeff 0%, #eef8fb 62%, #ebf6fa 100%);
+  background: var(--bg);
   display: flex;
   flex-direction: column;
 }
@@ -14,7 +12,7 @@
   grid-template-columns: 40px 1fr 40px;
   align-items: center;
   border-bottom: 1px solid rgba(208, 234, 240, 0.9);
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--surface-strong);
   backdrop-filter: blur(10px);
 
   h1 {
@@ -71,7 +69,7 @@
 
 .region-card,
 .region-note {
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--surface-strong);
   border: 1px solid rgba(215, 229, 236, 0.95);
   box-shadow: 0 14px 34px rgba(23, 110, 134, 0.07);
 }
@@ -154,6 +152,7 @@
   display: flex;
   align-items: flex-start;
   gap: 14px;
+  background: var(--surface-strong);
 }
 
 .region-note__icon {
@@ -205,7 +204,7 @@
   border: 1px solid rgba(33, 149, 195, 0.25);
   border-radius: 999px;
   padding: 10px 16px;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface);
   color: #1e87b1;
   font-size: 13px;
   font-weight: 800;
@@ -213,7 +212,7 @@
 
 .region-footer {
   padding: 16px 18px 28px;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface-strong);
   border-top: 1px solid rgba(208, 234, 240, 0.95);
 
   p {
@@ -364,5 +363,63 @@
   .region-footer p,
   .apply-btn {
     width: min(100%, 760px);
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+  .region-page {
+    background:
+      radial-gradient(circle at top center, rgba(77, 194, 255, 0.08), transparent 28%),
+      var(--bg);
+  }
+
+  .region-topbar,
+  .region-card,
+  .region-note,
+  .region-footer {
+    background: var(--surface-strong);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .region-topbar h1,
+  .back-btn,
+  .region-option__content strong {
+    color: var(--text-dark);
+  }
+
+  .region-section h2,
+  .region-option__content span,
+  .region-option__content small,
+  .region-note__content p,
+  .region-footer p,
+  .region-feedback {
+    color: var(--text-gray);
+  }
+
+  .region-option {
+    border-bottom-color: var(--border);
+  }
+
+  .region-option__radio {
+    border-color: var(--border);
+  }
+
+  .region-option__radio--active {
+    border-color: var(--primary);
+  }
+
+  .region-option__radio--active span {
+    background: var(--primary);
+  }
+
+  .retry-btn {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--primary);
+  }
+
+  .apply-btn {
+    box-shadow: none;
   }
 }

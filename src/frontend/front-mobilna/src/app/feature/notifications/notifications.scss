@@ -1,6 +1,6 @@
 .notifications-page {
   min-height: 100vh;
-  background: #f5f7fb;
+  background: var(--bg);
   padding: 24px;
 }
 
@@ -33,7 +33,7 @@
 
 .read-all-btn {
   border: none;
-  background: white;
+  background: var(--surface-strong);
   border-radius: 14px;
   height: 44px;
   padding: 0 16px;
@@ -64,7 +64,7 @@
 
 .notification-card {
   border: none;
-  background: white;
+  background: var(--surface-strong);
   border-radius: 22px;
   padding: 18px;
   display: flex;
@@ -88,7 +88,7 @@
   height: 34px;
   border: none;
   border-radius: 12px;
-  background: #f4f7fb;
+  background: var(--surface);
   color: #7b8794;
   display: inline-flex;
   align-items: center;
@@ -170,7 +170,7 @@
 }
 
 .empty-state {
-  background: white;
+  background: var(--surface-strong);
   border-radius: 28px;
   padding: 60px 24px;
   text-align: center;
@@ -207,5 +207,49 @@
   .topbar-actions {
     width: 100%;
     justify-content: flex-start;
+  }
+}
+
+
+:host-context(:root[data-theme='dark']) {
+  .notifications-page {
+    background: var(--bg);
+  }
+
+  .read-all-btn,
+  .notification-card,
+  .empty-state {
+    background: var(--surface-strong);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .topbar h1,
+  .notification-content h3,
+  .empty-state h2,
+  .back-btn {
+    color: var(--text-dark);
+  }
+
+  .notification-content p,
+  .notification-date,
+  .empty-state p {
+    color: var(--text-gray);
+  }
+
+  .notification-delete {
+    background: var(--surface);
+    color: var(--text-gray);
+  }
+
+  .notification-card--unread {
+    background: rgba(140, 90, 255, 0.08);
+    border: 1px solid rgba(140, 90, 255, 0.22);
+  }
+
+  .read-all-btn--danger {
+    background: rgba(255, 107, 107, 0.12);
+    color: #ff6b6b;
+    border-color: rgba(255, 107, 107, 0.22);
   }
 }

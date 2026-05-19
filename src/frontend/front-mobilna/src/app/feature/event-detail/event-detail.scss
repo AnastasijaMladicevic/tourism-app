@@ -15,7 +15,7 @@ button:hover {
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  background: var(--white);
+  background: var(--surface-strong);
   border-bottom: 1px solid var(--border);
 }
 
@@ -74,7 +74,7 @@ button:hover {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--surface);
   border: none;
   display: flex;
   align-items: center;
@@ -128,7 +128,7 @@ button:hover {
     width: 42px;
     height: 42px;
     border-radius: 50%;
-    background: #f5f7fa;
+    background: var(--surface);
     box-shadow: none;
     margin-top: -10px;
     margin-bottom: 5px;
@@ -154,7 +154,7 @@ button:hover {
   flex-direction: column;
   gap: 20px;
   padding: 20px 12px 50px;
-  background: var(--white);
+  background: var(--bg);
   border-radius: 25px;
   position: relative;
   z-index: 1;
@@ -165,7 +165,7 @@ button:hover {
     margin-bottom: 5px;
   }
 
-  background: white;
+  background: var(--surface-strong);
   border-radius: 20px;
   padding: 24px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
@@ -250,7 +250,7 @@ button:hover {
   position: absolute;
   bottom: 15px;
   left: 15px;
-  background: white;
+  background: var(--surface);
   padding: 5px 10px;
   border-radius: 8px;
 }
@@ -329,7 +329,7 @@ button:hover {
 }
 
 .info-card {
-  background: #f8fafc;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 16px;
@@ -372,7 +372,7 @@ button:hover {
   justify-content: space-between;
   gap: 10px;
   align-items: center;
-  background: #f8fafc;
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 18px 16px;
@@ -903,5 +903,166 @@ button:hover {
     background: #fff;
     border: 1px solid var(--border);
     box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+  }
+}
+
+
+:host-context(:root[data-theme='dark']) {
+
+  .header,
+  .card,
+  .hero-card {
+    background: var(--surface-strong);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .content {
+    background: var(--bg);
+  }
+
+  .title,
+  .header__title,
+  .location-bold,
+  .venue-big,
+  .section h2,
+  .nearby-item__body h3,
+  .meta .date {
+    color: var(--text-dark);
+  }
+
+  .description,
+  .date,
+  .venue,
+  .meta .location,
+  .price-label,
+  .nearby-item__location,
+  .nearby-item__date,
+  .qr-card p {
+    color: var(--text-gray);
+  }
+
+  .ticket-card,
+  .info-card {
+    background: var(--surface);
+    border-color: var(--border);
+  }
+
+  .planner-btn,
+  .planner-btn--desktop {
+    background: rgba(77, 194, 255, 0.1);
+    color: #4dc2ff;
+    border: 1px solid rgba(77, 194, 255, 0.16);
+    box-shadow: none;
+  }
+
+  .planner-btn--active {
+    background: rgba(255, 107, 107, 0.12);
+    color: #ff6b6b;
+    border-color: rgba(255, 107, 107, 0.22);
+  }
+
+  .location-image::after {
+    background: var(--surface-strong);
+    color: var(--text-dark);
+  }
+
+  .gallery-item {
+    box-shadow: none;
+  }
+
+  .loading-screen {
+    background: rgba(7, 19, 25, 0.92);
+  }
+
+  .spinner {
+    border-color: rgba(255,255,255,0.08);
+    border-top-color: var(--primary);
+  }
+
+  .qr-mini img {
+    background: var(--surface);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+
+  .header,
+  .card,
+  .hero-card {
+    background: var(--surface-strong);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .content {
+    background: var(--bg);
+  }
+
+  .title,
+  .header__title,
+  .location-bold,
+  .venue-big,
+  .section h2,
+  .nearby-item__body h3,
+  .meta .date {
+    color: var(--text-dark);
+  }
+
+  .description,
+  .date,
+  .venue,
+  .meta .location,
+  .price-label,
+  .nearby-item__location,
+  .nearby-item__date,
+  .qr-card p {
+    color: var(--text-gray);
+  }
+
+  .ticket-card,
+  .info-card {
+    background: var(--surface);
+    border-color: var(--border);
+  }
+
+  .planner-btn,
+  .planner-btn--desktop {
+    background: rgba(77, 194, 255, 0.1);
+    color: #4dc2ff;
+    border: 1px solid rgba(77, 194, 255, 0.16);
+    box-shadow: none;
+  }
+
+  .planner-btn--active {
+    background: rgba(255, 107, 107, 0.12);
+    color: #ff6b6b;
+    border-color: rgba(255, 107, 107, 0.22);
+  }
+
+  .location-image::after {
+    background: var(--surface-strong);
+    color: var(--text-dark);
+  }
+
+  .gallery-item {
+    box-shadow: none;
+  }
+
+  .loading-screen {
+    background: rgba(7, 19, 25, 0.92);
+  }
+
+  .spinner {
+    border-color: rgba(255,255,255,0.08);
+    border-top-color: var(--primary);
+  }
+
+  .qr-mini img {
+    background: var(--surface);
+    border-color: var(--border);
+    box-shadow: none;
   }
 }
