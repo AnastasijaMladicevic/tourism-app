@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { catchError, finalize, forkJoin, map, of, switchMap } from 'rxjs';
 import { environment } from '../../../environment/environment';
 import { EventDto, EventService } from '../../services/event';
@@ -48,6 +48,7 @@ interface PlannerMonthFilter {
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     EventCardComponent,
     DailyTimelineComponent,
     VaultSummaryComponent,
@@ -58,7 +59,7 @@ interface PlannerMonthFilter {
   styleUrl: './planner-page.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PlannerPageComponent implements OnInit {
+export class PlannerPageComponent implements OnInit, OnDestroy {
   private readonly fallbackImage =
     'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80';
   private readonly plannerService = inject(EventPlannerService);
@@ -78,8 +79,13 @@ export class PlannerPageComponent implements OnInit {
   protected readonly removingPlannerId = signal<number | null>(null);
   protected readonly pendingRemovalStop = signal<PlannerStop | null>(null);
   protected readonly isBulkRemoving = signal(false);
+  protected readonly isMobileViewport = signal(false);
   protected readonly loadingSkeletonIds = [1, 2, 3];
   protected readonly sidebarSkeletonIds = [1, 2, 3, 4];
+  private mobileMediaQuery?: MediaQueryList;
+  private readonly mobileMediaListener = (event: MediaQueryListEvent) => {
+    this.isMobileViewport.set(event.matches);
+  };
 
   protected readonly monthFilters = computed<PlannerMonthFilter[]>(() => {
     const grouped = new Map<string, Date>();
@@ -260,7 +266,12 @@ export class PlannerPageComponent implements OnInit {
   protected readonly hasDisplayedEvents = computed(() => this.events().length > 0);
 
   ngOnInit(): void {
+    this.initializeViewportWatcher();
     this.loadPlanner();
+  }
+
+  ngOnDestroy(): void {
+    this.mobileMediaQuery?.removeEventListener('change', this.mobileMediaListener);
   }
 
   protected updateSearchTerm(value: string): void {
@@ -435,6 +446,16 @@ export class PlannerPageComponent implements OnInit {
 
   protected translate(key: string, params?: Record<string, string | number>): string {
     return this.translationService.translate(key, params);
+  }
+
+  private initializeViewportWatcher(): void {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return;
+    }
+
+    this.mobileMediaQuery = window.matchMedia('(max-width: 760px)');
+    this.isMobileViewport.set(this.mobileMediaQuery.matches);
+    this.mobileMediaQuery.addEventListener('change', this.mobileMediaListener);
   }
 
   private loadPlanner(): void {
