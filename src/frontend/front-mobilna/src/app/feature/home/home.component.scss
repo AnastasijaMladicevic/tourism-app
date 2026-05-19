@@ -77,14 +77,14 @@
   min-height: 48px;
   flex: 7;
   margin-left: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(215, 229, 236, 0.95);
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
   border-radius: 18px;
   padding: 0 15px;
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #6b7c84;
+  color: var(--text-gray);
   box-shadow: 0 14px 34px rgba(23, 110, 134, 0.05);
 
   span {
@@ -98,7 +98,7 @@
     border: none;
     outline: none;
     background: transparent;
-    color: #263945;
+    color: var(--text-dark);
     font-family: 'Nunito', sans-serif;
     font-size: 14px;
     font-weight: 600;
@@ -230,7 +230,7 @@
   overflow: hidden;
   position: relative;
   box-shadow: 0 14px 32px rgba(22, 138, 173, 0.18);
-  background-color: #dbe9ef;
+  background-color: var(--surface-soft);
 
   &::before {
     content: '';
