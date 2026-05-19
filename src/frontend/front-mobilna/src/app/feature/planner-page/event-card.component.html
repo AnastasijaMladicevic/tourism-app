@@ -1,0 +1,90 @@
+<article class="event-card">
+  <div class="event-card__media">
+    <img [src]="event.imageUrl" [alt]="event.title" />
+    @if (event.badge) {
+      <span class="event-card__badge">{{ event.badge }}</span>
+    }
+  </div>
+
+  <div class="event-card__body">
+    <div class="event-card__top">
+      <div class="event-card__copy">
+        <h3>{{ event.title }}</h3>
+        <p>{{ event.description }}</p>
+      </div>
+
+      <div class="event-card__actions" aria-label="Event actions">
+        <button
+          type="button"
+          class="icon-button"
+          aria-label="Edit event"
+          [disabled]="editDisabled"
+          (click)="onEdit()"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="m4 20 4.5-1 9.6-9.6a1.8 1.8 0 0 0 0-2.5l-1-1a1.8 1.8 0 0 0-2.5 0L5 15.5 4 20Z"
+            />
+          </svg>
+        </button>
+
+        <button
+          type="button"
+          class="icon-button icon-button--danger"
+          aria-label="Delete event"
+          [disabled]="deleteDisabled"
+          (click)="onDelete()"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M4 7h16"
+            />
+            <path
+              d="M9 7V4h6v3"
+            />
+            <path
+              d="M8 7v13h8V7"
+            />
+            <path
+              d="M10.5 11v5"
+            />
+            <path
+              d="M13.5 11v5"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="event-card__divider"></div>
+
+    <div class="event-card__footer">
+      <div class="event-card__meta">
+        <div class="event-card__meta-row">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7Zm0 4.5A2.5 2.5 0 1 0 12 11.5a2.5 2.5 0 0 0 0-5Z"
+            />
+          </svg>
+          <span>{{ event.location }}</span>
+        </div>
+
+        <div class="event-card__meta-row">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20Zm1 5h-2v6l5 3 1-1.73-4-2.27V7Z"
+            />
+          </svg>
+          <span>{{ event.time }}</span>
+        </div>
+      </div>
+
+      <button type="button" class="event-card__details" [disabled]="detailsDisabled" (click)="onDetails()">
+        <span>Details</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="m13 5 7 7-7 7-1.4-1.4 4.6-4.6H4v-2h12.2l-4.6-4.6L13 5Z" />
+        </svg>
+      </button>
+    </div>
+  </div>
+</article>

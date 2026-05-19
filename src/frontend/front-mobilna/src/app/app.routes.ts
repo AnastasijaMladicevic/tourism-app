@@ -312,7 +312,7 @@ export const routes: Routes = [
     path: 'planner',
     canActivate: [profileAuthGuard],
     loadComponent: () =>
-      import('./feature/planner/planner.component').then((m) => m.PlannerComponent),
+      import('./feature/planner-page/planner-page.component').then((m) => m.PlannerPageComponent),
   },
   {
     path: 'planner/add',

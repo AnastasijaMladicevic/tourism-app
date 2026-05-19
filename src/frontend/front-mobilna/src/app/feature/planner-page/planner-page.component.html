@@ -1,0 +1,241 @@
+<main class="planner-page">
+  <div class="planner-page__shell">
+    <section class="planner-page__main">
+      <header class="planner-page__hero">
+        <div>
+          <h1>Planner</h1>
+          <p>Plan your day on trip</p>
+        </div>
+      </header>
+
+      @if (errorMessage()) {
+        <div class="planner-feedback planner-feedback--error">
+          {{ errorMessage() }}
+        </div>
+      }
+
+      <section class="planner-toolbar" aria-label="Search and sort">
+        <label class="planner-search">
+          <span class="planner-search__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="m21 19.59-4.69-4.69A7.92 7.92 0 0 0 18 10a8 8 0 1 0-8 8 7.92 7.92 0 0 0 4.9-1.69L19.59 21 21 19.59ZM4 10a6 6 0 1 1 6 6 6 6 0 0 1-6-6Z"
+              />
+            </svg>
+          </span>
+          <input
+            type="text"
+            placeholder="Search plans..."
+            [value]="searchTerm()"
+            [disabled]="isLoading()"
+            (input)="updateSearchTerm($any($event.target).value)"
+          />
+        </label>
+
+        <div class="planner-sort">
+          <span class="planner-sort__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M4 5h6v6H4V5Zm10 0h6v6h-6V5ZM4 13h6v6H4v-6Zm10 0h6v6h-6v-6ZM6 7v2h2V7H6Zm10 0v2h2V7h-2Zm-10 8v2h2v-2H6Zm10 0v2h2v-2h-2Z"
+              />
+            </svg>
+          </span>
+          <span>{{ sortOption() === 'name' ? 'Sort by: Name' : 'Sort by: Time' }}</span>
+          <span class="planner-sort__chevron" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="m7 10 5 5 5-5H7Z" />
+            </svg>
+          </span>
+          <select
+            class="planner-sort__native"
+            [value]="sortOption()"
+            [disabled]="isLoading()"
+            (change)="updateSortOption($any($event.target).value)"
+          >
+            <option value="time">Time</option>
+            <option value="name">Name</option>
+          </select>
+        </div>
+      </section>
+
+      <div class="planner-filter-group" aria-label="Planner month filters">
+        <span class="planner-filter-group__label">Month</span>
+        <div class="planner-filters planner-filters--months">
+          @for (month of monthFilters(); track month.id) {
+            <button
+              type="button"
+              class="planner-chip"
+              [class.planner-chip--active]="isMonthActive(month.id)"
+              [disabled]="isLoading()"
+              (click)="selectMonth(month.id)"
+            >
+              {{ month.label }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="planner-filter-group planner-filter-group--categories" aria-label="Planner category filters">
+        <span class="planner-filter-group__label">Filters</span>
+        <div class="planner-filters planner-filters--categories">
+          @for (filter of categoryFilters(); track filter) {
+            <button
+              type="button"
+              class="planner-chip"
+              [class.planner-chip--active]="isCategoryActive(filter)"
+              [disabled]="isLoading()"
+              (click)="selectCategory(filter)"
+            >
+              {{ filter }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="planner-section-head">
+        <div class="planner-section-head__title-wrap">
+          <div class="date-card">
+            <span>{{ selectedDateCard().label }}</span>
+            <strong>{{ selectedDateCard().date }}</strong>
+            <small>{{ selectedDateCard().month }}</small>
+          </div>
+          <h2>RASPORED DANA</h2>
+        </div>
+
+        <button
+          type="button"
+          class="clear-button"
+          [disabled]="!selectedDayStops().length || isLoading() || isBulkRemoving() || removingPlannerId() !== null"
+          (click)="clearSelectedDay()"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M9 3h6l1 2h4v2H4V5h4l1-2Zm1 7h2v7h-2v-7Zm4 0h2v7h-2v-7ZM7 8h10l-.7 11.2A2 2 0 0 1 14.31 21H9.69a2 2 0 0 1-1.99-1.8L7 8Z"
+            />
+          </svg>
+          <span>Clear All</span>
+        </button>
+      </div>
+
+      @if (isLoading()) {
+        <div class="planner-event-list">
+          @for (skeletonId of loadingSkeletonIds; track skeletonId) {
+            <article class="planner-skeleton planner-skeleton--event">
+              <div class="planner-skeleton__media"></div>
+              <div class="planner-skeleton__body">
+                <div class="planner-skeleton__line planner-skeleton__line--title"></div>
+                <div class="planner-skeleton__line planner-skeleton__line--copy"></div>
+                <div class="planner-skeleton__line planner-skeleton__line--copy short"></div>
+                <div class="planner-skeleton__divider"></div>
+                <div class="planner-skeleton__footer">
+                  <div class="planner-skeleton__meta">
+                    <div class="planner-skeleton__line planner-skeleton__line--meta"></div>
+                    <div class="planner-skeleton__line planner-skeleton__line--meta short"></div>
+                  </div>
+                  <div class="planner-skeleton__button"></div>
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      } @else if (hasDisplayedEvents()) {
+        <div class="planner-event-list">
+          @for (event of events(); track event.id) {
+            <app-event-card
+              [event]="event"
+              [editDisabled]="isBulkRemoving()"
+              [deleteDisabled]="isBulkRemoving() || removingPlannerId() === event.id"
+              (details)="openDetails($event)"
+              (edit)="openEdit($event)"
+              (delete)="removeEvent($event)"
+            ></app-event-card>
+          }
+        </div>
+      } @else {
+        <section class="planner-empty-state">
+          <h3>{{ hasPlannerItems() ? 'No plans match these filters.' : 'Planner is empty for now.' }}</h3>
+          <p>
+            {{
+              hasPlannerItems()
+                ? 'Try another category, search term or timeline day.'
+                : 'Add events to start building your trip and the sidebar summary will fill in automatically.'
+            }}
+          </p>
+          @if (!hasPlannerItems()) {
+            <button type="button" class="planner-empty-state__button" (click)="goToAddEvent()">
+              + Dodaj event
+            </button>
+          }
+        </section>
+      }
+    </section>
+
+    <aside class="planner-page__side">
+      @if (isLoading()) {
+        @for (skeletonId of sidebarSkeletonIds; track skeletonId) {
+          <div class="planner-skeleton planner-skeleton--side"></div>
+        }
+      } @else {
+        <app-daily-timeline [days]="days()" (daySelect)="selectDay($event)"></app-daily-timeline>
+        <app-vault-summary [stats]="stats()" [categories]="categories()"></app-vault-summary>
+        <app-upcoming-highlight [highlights]="highlights()" (details)="openDetails($event)"></app-upcoming-highlight>
+        <app-add-event-card (addEvent)="goToAddEvent()"></app-add-event-card>
+      }
+    </aside>
+  </div>
+
+  @if (pendingRemovalStop(); as stop) {
+    <div class="planner-remove-overlay" (click)="cancelRemoveEvent()">
+      <div class="planner-remove-dialog" (click)="$event.stopPropagation()">
+        <div class="planner-remove-dialog__mobile-handle" aria-hidden="true"></div>
+
+        <div class="planner-remove-dialog__icon-wrap">
+          <span class="planner-remove-dialog__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 7h16" />
+              <path d="M9 7V4h6v3" />
+              <path d="M8 7v13h8V7" />
+              <path d="M10.5 11v5" />
+              <path d="M13.5 11v5" />
+            </svg>
+          </span>
+        </div>
+
+        <h3>Ukloni iz planera</h3>
+        <p>Da li želiš da ukloniš "{{ stop.title }}" iz planera?</p>
+
+        <div class="planner-remove-dialog__actions">
+          <button
+            type="button"
+            class="planner-remove-btn"
+            [disabled]="removingPlannerId() === stop.plannerId || isBulkRemoving()"
+            (click)="confirmRemoveEvent()"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 7h16" />
+              <path d="M9 7V4h6v3" />
+              <path d="M8 7v13h8V7" />
+              <path d="M10.5 11v5" />
+              <path d="M13.5 11v5" />
+            </svg>
+            <span>{{ removingPlannerId() === stop.plannerId ? 'Uklanjanje...' : 'Ukloni event' }}</span>
+          </button>
+
+          <button
+            type="button"
+            class="planner-cancel-remove-btn"
+            [disabled]="removingPlannerId() === stop.plannerId || isBulkRemoving()"
+            (click)="cancelRemoveEvent()"
+          >
+            Otkaži
+          </button>
+        </div>
+
+        <div class="planner-remove-dialog__footer">
+          <span class="planner-remove-dialog__footer-dot" aria-hidden="true"></span>
+          <span>"{{ stop.title }}" možeš ponovo dodati iz detalja događaja.</span>
+        </div>
+      </div>
+    </div>
+  }
+</main>
