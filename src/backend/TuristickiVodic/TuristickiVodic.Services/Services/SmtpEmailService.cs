@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
-using System.Net;
-using System.Net.Mail;
+using MimeKit;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 
 namespace TuristickiVodic.Services.Services
 {
@@ -15,49 +16,44 @@ namespace TuristickiVodic.Services.Services
 
         public async Task SendAsync(string toEmail, string subject, string htmlBody)
         {
-            var host = _configuration["Smtp:Host"];
-            var fromEmail = _configuration["Smtp:FromEmail"];
+            var host = _configuration["Smtp:Host"]?.Trim();
+            var fromEmail = _configuration["Smtp:FromEmail"]?.Trim();
             var fromName = _configuration["Smtp:FromName"] ?? "TuristickiVodic";
 
             if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(fromEmail))
                 throw new InvalidOperationException("SMTP settings are not configured.");
 
             var port = int.TryParse(_configuration["Smtp:Port"], out var configuredPort)
-                ? configuredPort
-                : 587;
+                ? configuredPort : 587;
 
-            var enableSsl = bool.TryParse(_configuration["Smtp:EnableSsl"], out var configuredEnableSsl)
-                ? configuredEnableSsl
-                : true;
+            var username = _configuration["Smtp:Username"]?.Trim();
+            var password = _configuration["Smtp:Password"]?.Trim().Replace(" ", string.Empty);
 
-            var username = _configuration["Smtp:Username"];
-            var password = _configuration["Smtp:Password"];
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(fromName, fromEmail));
+            message.To.Add(new MailboxAddress("", toEmail));
+            message.Subject = subject;
 
-            using var message = new MailMessage
-            {
-                From = new MailAddress(fromEmail, fromName),
-                Subject = subject,
-                Body = htmlBody,
-                IsBodyHtml = true
-            };
+            var bodyBuilder = new BodyBuilder { HtmlBody = htmlBody };
+            message.Body = bodyBuilder.ToMessageBody();
 
-            message.To.Add(toEmail);
-
-            using var client = new SmtpClient(host, port)
-            {
-                EnableSsl = enableSsl
-            };
-
-            if (!string.IsNullOrWhiteSpace(username))
-            {
-                client.Credentials = new NetworkCredential(username, password);
-            }
+            using var client = new MailKit.Net.Smtp.SmtpClient();
 
             try
             {
-                await client.SendMailAsync(message);
+                var secureOption = port == 465
+                    ? SecureSocketOptions.SslOnConnect
+                    : SecureSocketOptions.StartTls;
+
+                await client.ConnectAsync(host, port, secureOption);
+
+                if (!string.IsNullOrWhiteSpace(username))
+                    await client.AuthenticateAsync(username, password);
+
+                await client.SendAsync(message);
+                await client.DisconnectAsync(true);
             }
-            catch (Exception ex) when (ex is SmtpException || ex is InvalidOperationException)
+            catch (Exception ex)
             {
                 throw new InvalidOperationException("Email could not be sent. Check SMTP settings.", ex);
             }

@@ -1,5 +1,4 @@
 import {
-  AfterViewInit,
   ChangeDetectorRef,
   Component,
   ElementRef,
@@ -13,17 +12,14 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Observable, forkJoin, map, of, switchMap } from 'rxjs';
 import * as L from 'leaflet';
 
 import { MatIconModule } from '@angular/material/icon';
-import {
-  DestinationDto,
-  DestinationService,
-} from '../../../services/destination.service';
+import { DestinationDto } from '../../../services/destination.service';
 import { MapService } from '../../../services/map.service';
-import { RegionService } from '../../../services/region';
-import { ActiveRegionService } from '../../../services/active-region';
+import {
+  AdminPlatformMapComponent,
+} from '../../../shared/components/admin-platform-map/admin-platform-map.component';
 
 interface SearchResult {
   id: number;
@@ -38,14 +34,6 @@ interface SearchResult {
   markerType: 'destination';
 }
 
-interface PagedDestinationResponse {
-  items: AdminMapDestination[];
-  page: number;
-  pageSize: number;
-  totalCount: number;
-  totalPages: number;
-}
-
 interface AdminMapDestination extends DestinationDto {
   workingHours?: string | Record<string, string>;
 }
@@ -53,12 +41,12 @@ interface AdminMapDestination extends DestinationDto {
 @Component({
   selector: 'app-map',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, AdminPlatformMapComponent],
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css'],
   encapsulation: ViewEncapsulation.None,
 })
-export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
+export class MapComponent implements OnInit, OnDestroy {
   private static readonly TARGET_DETAIL_ZOOM = 15;
   @ViewChild('cardElement') private cardElementRef?: ElementRef<HTMLElement>;
   @ViewChild('mapPage') private mapPageRef?: ElementRef<HTMLElement>;
@@ -72,6 +60,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   cardPosition = { left: 16, top: 16 };
   allItems: SearchResult[] = [];
 
+  readonly mapInitialLat = history.state?.lat ?? 42.424;
+  readonly mapInitialLng = history.state?.lng ?? 18.771;
+  readonly mapInitialZoom = history.state?.zoom ?? 13;
+  readonly mapFocusRegion = !history.state?.lat || !history.state?.lng;
+
+  private readonly navState = history.state;
   private readonly markerClickHandler = (event: Event) => {
     const customEvent = event as CustomEvent<{ data: AdminMapDestination }>;
 
@@ -88,27 +82,17 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     private router: Router,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
-    private destinationService: DestinationService,
-    private regionService: RegionService,
-    private activeRegionService: ActiveRegionService,
   ) {}
 
   ngOnInit(): void {
     window.addEventListener('map-marker-clicked', this.markerClickHandler as EventListener);
   }
 
-  ngAfterViewInit(): void {
-    const state = history.state;
-    const lat = state?.lat ?? 42.424;
-    const lng = state?.lng ?? 18.771;
-    const zoom = state?.zoom ?? 13;
+  ngOnDestroy(): void {
+    window.removeEventListener('map-marker-clicked', this.markerClickHandler as EventListener);
+  }
 
-    this.mapService.initMap('main-map', lat, lng, zoom, { enableClustering: true });
-    if (!state?.lat || !state?.lng) {
-      this.focusActiveRegion();
-    }
-    this.loadAllData(state);
-
+  onPlatformMapReady(): void {
     const map = this.mapService.getMap();
     if (map) {
       map.on('click', () => this.closeCard());
@@ -116,9 +100,23 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    window.removeEventListener('map-marker-clicked', this.markerClickHandler as EventListener);
-    this.mapService.destroyMap();
+  onDestinationsLoaded(destinations: AdminMapDestination[]): void {
+    this.allItems = destinations
+      .filter((destination) => destination.latitude != null && destination.longitude != null)
+      .map((destination) => this.toSearchResult(destination));
+
+    if (this.navState?.selectedItem) {
+      setTimeout(() => {
+        this.ngZone.run(() => {
+          this.mapService.triggerMarkerClick(
+            'destination',
+            this.navState.selectedItem.id,
+            this.navState.zoom ?? 16,
+          );
+          this.cdr.detectChanges();
+        });
+      }, 100);
+    }
   }
 
   @HostListener('window:resize')
@@ -246,95 +244,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     return score;
   }
 
-  private loadAllData(state?: any): void {
-    this.allItems = [];
-
-    this.getAllDestinations().subscribe({
-      next: (destinations) => {
-        destinations
-          .filter((destination) => destination.latitude != null && destination.longitude != null)
-          .forEach((destination) => {
-            this.mapService.addMarkerWithType(
-              destination.latitude!,
-              destination.longitude!,
-              'destination',
-              destination,
-            );
-            this.allItems.push(this.toSearchResult(destination));
-          });
-
-        if (state?.selectedItem) {
-          setTimeout(() => {
-            this.ngZone.run(() => {
-              this.mapService.triggerMarkerClick(
-                'destination',
-                state.selectedItem.id,
-                state.zoom ?? 16,
-              );
-              this.cdr.detectChanges();
-            });
-          }, 100);
-        }
-      },
-      error: (err) => console.error('Greska:', err),
-    });
-  }
-
-  private getAllDestinations(): Observable<AdminMapDestination[]> {
-    const pageSize = 100;
-
-    return this.destinationService
-      .getAll({ page: 1, pageSize }, { bypassRegion: true })
-      .pipe(
-        map((response) => this.toPagedResponse(response)),
-        switchMap((firstPage) => {
-          if (firstPage.totalPages <= 1) {
-            return of(firstPage.items);
-          }
-
-          const nextPageRequests = Array.from({ length: firstPage.totalPages - 1 }, (_, index) =>
-            this.destinationService
-              .getAll({ page: index + 2, pageSize }, { bypassRegion: true })
-              .pipe(map((response) => this.toPagedResponse(response).items)),
-          );
-
-          return forkJoin([of(firstPage.items), ...nextPageRequests]).pipe(
-            map((pages) => pages.flat()),
-          );
-        }),
-      );
-  }
-
-  private toPagedResponse(response: any): PagedDestinationResponse {
-    if (Array.isArray(response)) {
-      return {
-        items: response,
-        page: 1,
-        pageSize: response.length,
-        totalCount: response.length,
-        totalPages: 1,
-      };
-    }
-
-    if (Array.isArray(response?.items)) {
-      return {
-        items: response.items,
-        page: response.page ?? 1,
-        pageSize: response.pageSize ?? response.items.length,
-        totalCount: response.totalCount ?? response.items.length,
-        totalPages: response.totalPages ?? 1,
-      };
-    }
-
-    return {
-      items: [],
-      page: 1,
-      pageSize: 0,
-      totalCount: 0,
-      totalPages: 0,
-    };
-  }
-
   private toSearchResult(raw: AdminMapDestination): SearchResult {
     return {
       id: raw.id,
@@ -348,30 +257,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       raw,
       markerType: 'destination',
     };
-  }
-
-  private focusActiveRegion(): void {
-    const activeRegionId = this.activeRegionService.getActiveRegionId();
-    const regionRequest = activeRegionId
-      ? this.regionService.getById(activeRegionId)
-      : this.regionService.getDefault();
-
-    regionRequest.subscribe({
-      next: (region) => {
-        if (region.centerLatitude == null || region.centerLongitude == null) {
-          return;
-        }
-
-        this.mapService.flyTo(
-          region.centerLatitude,
-          region.centerLongitude,
-          Math.round(region.defaultMapZoom ?? 8),
-        );
-      },
-      error: () => {
-        // keep the fallback center if region lookup fails
-      },
-    });
   }
 
   private focusSelectedMarker(): void {

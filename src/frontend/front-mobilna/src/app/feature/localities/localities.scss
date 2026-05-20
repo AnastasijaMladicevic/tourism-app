@@ -774,14 +774,14 @@
   }
 
   .card__fav {
-    background: rgba(77, 194, 255, 0.1);
+    background: #102632;
     color: #4dc2ff;
     border: 1px solid rgba(77, 194, 255, 0.16);
     box-shadow: none;
   }
 
   .card__fav--active {
-    background: rgba(255, 107, 107, 0.12);
+    background: #102632;
     color: #ff6b6b;
     border-color: rgba(255, 107, 107, 0.22);
   }
@@ -793,5 +793,36 @@
   .spinner {
     border-color: rgba(255, 255, 255, 0.08);
     border-top-color: var(--primary);
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+  .card__fav,
+  .planner-btn {
+    background: #102632;
+    color: #4dc2ff;
+    border: 1px solid rgba(77, 194, 255, 0.16);
+    box-shadow: none;
+  }
+
+  .card__fav:hover,
+  .planner-btn:hover {
+    background: #102632;
+    color: #4dc2ff;
+    border-color: rgba(77, 194, 255, 0.16);
+  }
+
+  .card__fav--active,
+  .planner-btn--active {
+    background: #102632;
+    color: #ff6b6b;
+    border-color: rgba(255, 107, 107, 0.22);
+  }
+
+  .card__fav--active:hover,
+  .planner-btn--active:hover {
+    background: #102632;
+    color: #ff6b6b;
+    border-color: rgba(255, 107, 107, 0.22);
   }
 }

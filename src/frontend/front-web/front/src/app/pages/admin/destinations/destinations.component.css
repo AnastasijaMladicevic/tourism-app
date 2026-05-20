@@ -198,67 +198,90 @@
 .insights-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  gap: 12px;
 }
 
-.insight-card {
+.insight-card.card {
   display: flex;
   flex-direction: column;
-  padding: 16px;
-  min-height: 120px;
+  padding: 13px 14px;
+  min-height: 106px;
+  border-radius: 12px;
+  box-shadow: none;
 }
 
 .insight-title {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #6b7280;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   margin: 0;
 }
 
 .insight-card strong {
   display: block;
-  margin: 8px 0 4px;
-  font-size: 28px;
+  margin: 7px 0 3px;
+  font-size: 30px;
+  font-weight: 700;
   line-height: 1;
 }
 
 .insight-icon--title {
-  font-size: 26px;
+  font-size: 20px;
   line-height: 1;
   flex-shrink: 0;
 }
 
 .insight-card span {
-  color: #6b7280;
+  color: #64748b;
   font-size: 12px;
+  line-height: 1.35;
   margin-top: auto;
 }
 
-.insight-card[data-tone='blue'] strong {
-  color: #2563eb;
+.insight-card[data-tone='blue'] {
+  background: #dbeafe;
+  border-color: #93c5fd;
 }
 
+.insight-card[data-tone='blue'] .insight-title,
 .insight-card[data-tone='blue'] .insight-icon--title {
-  color: #2563eb;
+  color: #1d4ed8;
+}
+
+.insight-card[data-tone='blue'] strong {
+  color: #1e3a8a;
+}
+
+.insight-card[data-tone='green'] {
+  background: #ecfdf5;
+  border-color: #6ee7b7;
+}
+
+.insight-card[data-tone='green'] .insight-title,
+.insight-card[data-tone='green'] .insight-icon--title {
+  color: #047857;
 }
 
 .insight-card[data-tone='green'] strong {
-  color: #16a34a;
+  color: #064e3b;
 }
 
-.insight-card[data-tone='green'] .insight-icon--title {
-  color: #16a34a;
+.insight-card[data-tone='amber'] {
+  background: #fef3c7;
+  border-color: #fcd34d;
+}
+
+.insight-card[data-tone='amber'] .insight-title,
+.insight-card[data-tone='amber'] .insight-icon--title {
+  color: #b45309;
 }
 
 .insight-card[data-tone='amber'] strong {
-  color: #d97706;
-}
-
-.insight-card[data-tone='amber'] .insight-icon--title {
-  color: #d97706;
+  color: #78350f;
 }
 
 .detail-column {

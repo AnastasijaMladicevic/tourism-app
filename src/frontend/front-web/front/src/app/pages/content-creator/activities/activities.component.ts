@@ -1,9 +1,9 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
-import { ActivitiesService, ActivityDto } from '../../../services/activities';
+import { ActivitiesService, ActivityDto, ActivityImageDto } from '../../../services/activities';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 
 interface ActivityInsightCard {
@@ -20,9 +20,12 @@ interface ActivityInsightCard {
   templateUrl: './activities.component.html',
   styleUrls: ['./activities.component.css']
 })
-export class ContentCreatorActivitiesComponent implements OnInit {
+export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
   private readonly activitiesService = inject(ActivitiesService);
   private readonly cdr = inject(ChangeDetectorRef);
+
+  private static readonly HERO_ROTATION_INTERVAL_MS = 8000;
+  private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
 
   activities: ActivityDto[] = [];
   isLoading = true;
@@ -30,6 +33,10 @@ export class ContentCreatorActivitiesComponent implements OnInit {
   selectedActivity: ActivityDto | null = null;
   selectedActivityDetails: ActivityDto | null = null;
   isDetailsLoading = false;
+
+  heroImageUrls: string[] = [];
+  currentHeroImageIndex = 0;
+  private heroRotationTimerId: ReturnType<typeof setInterval> | null = null;
 
   currentPage = 1;
   pageSize = 5;
@@ -69,6 +76,10 @@ export class ContentCreatorActivitiesComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadActivities();
+  }
+
+  ngOnDestroy(): void {
+    this.stopHeroImageRotation();
   }
 
   /**
@@ -122,10 +133,8 @@ export class ContentCreatorActivitiesComponent implements OnInit {
         this.totalPages = response.totalPages ?? Math.max(1, Math.ceil(this.totalCount / this.pageSize));
 
         if (!this.selectedActivity || !this.activities.some((activity) => activity.id === this.selectedActivity?.id)) {
-          this.selectedActivity = this.activities[0] ?? null;
-        }
-
-        if (this.selectedActivity) {
+          this.setSelectedActivity(this.activities[0] ?? null);
+        } else if (this.selectedActivity) {
           this.loadSelectedActivityDetails(this.selectedActivity.id);
         } else {
           this.selectedActivityDetails = null;
@@ -138,8 +147,7 @@ export class ContentCreatorActivitiesComponent implements OnInit {
         this.activities = [];
         this.totalCount = 0;
         this.totalPages = 1;
-        this.selectedActivity = null;
-        this.selectedActivityDetails = null;
+        this.setSelectedActivity(null);
         this.statsTotalCount = null;
         this.statsPendingCount = null;
         this.isLoading = false;
@@ -287,9 +295,15 @@ export class ContentCreatorActivitiesComponent implements OnInit {
   }
 
   onSelectActivity(activity: ActivityDto): void {
-    this.selectedActivity = activity;
-    this.selectedActivityDetails = activity;
-    this.loadSelectedActivityDetails(activity.id);
+    this.setSelectedActivity(activity);
+  }
+
+  getHeroSlideStyle(url: string): Record<string, string> {
+    return { 'background-image': `url("${url}")` };
+  }
+
+  trackByHeroImage(index: number, url: string): string {
+    return `${index}-${url}`;
   }
 
   trackByActivityId(_: number, activity: ActivityDto): number {
@@ -375,7 +389,11 @@ export class ContentCreatorActivitiesComponent implements OnInit {
 
   get selectedBanner(): string {
     const activity = this.selectedActivityDetails ?? this.selectedActivity;
-    return activity?.mainImageUrl || '/assets/pozadina.png';
+    if (activity?.mainImageUrl) {
+      return this.normalizeImageUrl(activity.mainImageUrl);
+    }
+
+    return ContentCreatorActivitiesComponent.DEFAULT_BANNER_URL;
   }
 
   get hasSelectedActivityCoordinates(): boolean {
@@ -401,6 +419,102 @@ export class ContentCreatorActivitiesComponent implements OnInit {
 
     const location = activity.localityName || activity.destinationName || activity.regionName || activity.objectName;
     return location ? `${activity.name} · ${location}` : activity.name;
+  }
+
+  private setSelectedActivity(activity: ActivityDto | null): void {
+    const previousId = this.selectedActivity?.id ?? null;
+    this.selectedActivity = activity;
+
+    if (!activity) {
+      this.selectedActivityDetails = null;
+      this.stopHeroImageRotation();
+      this.heroImageUrls = [];
+      this.currentHeroImageIndex = 0;
+      return;
+    }
+
+    this.selectedActivityDetails = activity;
+
+    if (activity.id !== previousId) {
+      this.loadSelectedActivityDetails(activity.id);
+      this.loadHeroImagesForSelectedActivity();
+    }
+  }
+
+  private loadHeroImagesForSelectedActivity(): void {
+    this.stopHeroImageRotation();
+    this.heroImageUrls = [];
+    this.currentHeroImageIndex = 0;
+
+    const activity = this.selectedActivityDetails ?? this.selectedActivity;
+    if (!activity) {
+      return;
+    }
+
+    const fallbackUrl = this.selectedBanner;
+
+    this.activitiesService.getImages(activity.id).subscribe({
+      next: (images: ActivityImageDto[]) => {
+        const orderedUrls = (images ?? [])
+          .slice()
+          .sort((a, b) => Number(b.isMain) - Number(a.isMain))
+          .map((image) => this.normalizeImageUrl(image.url))
+          .filter((url): url is string => !!url);
+
+        this.heroImageUrls = orderedUrls.length > 0 ? orderedUrls : [fallbackUrl];
+        this.currentHeroImageIndex = 0;
+
+        if (this.heroImageUrls.length > 1) {
+          this.startHeroImageRotation();
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.heroImageUrls = [fallbackUrl];
+        this.currentHeroImageIndex = 0;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private startHeroImageRotation(): void {
+    this.stopHeroImageRotation();
+
+    this.heroRotationTimerId = setInterval(() => {
+      if (this.heroImageUrls.length <= 1) {
+        return;
+      }
+
+      this.currentHeroImageIndex =
+        (this.currentHeroImageIndex + 1) % this.heroImageUrls.length;
+      this.cdr.detectChanges();
+    }, ContentCreatorActivitiesComponent.HERO_ROTATION_INTERVAL_MS);
+  }
+
+  private stopHeroImageRotation(): void {
+    if (this.heroRotationTimerId != null) {
+      clearInterval(this.heroRotationTimerId);
+      this.heroRotationTimerId = null;
+    }
+  }
+
+  private normalizeImageUrl(value: string): string {
+    const trimmed = value.trim();
+
+    if (!trimmed) {
+      return '';
+    }
+
+    if (/^(data:|blob:|https?:\/\/|\/\/)/i.test(trimmed)) {
+      return trimmed;
+    }
+
+    try {
+      return encodeURI(new URL(trimmed, document.baseURI).href);
+    } catch {
+      return encodeURI(trimmed);
+    }
   }
 
   private loadSelectedActivityDetails(activityId: number): void {

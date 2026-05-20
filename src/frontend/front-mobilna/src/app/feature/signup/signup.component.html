@@ -89,10 +89,11 @@
             formControlName="dateOfBirth"
             class="date-input"
             [class.is-empty]="!dateOfBirth?.value"
+            [attr.aria-label]="'signup.dateOfBirth' | translate"
           />
-          @if (!dateOfBirth?.value) {
+          <!--@if (!dateOfBirth?.value) {
             <span class="date-placeholder">{{ 'signup.dateOfBirth' | translate }}</span>
-          }
+        }-->
         </div>
         @if (dateOfBirth?.touched && dateOfBirth?.hasError('required')) {
           <p class="field-error">{{ 'signup.errors.dateRequired' | translate }}</p>

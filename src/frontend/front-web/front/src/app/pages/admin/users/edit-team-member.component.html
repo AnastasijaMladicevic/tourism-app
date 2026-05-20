@@ -266,8 +266,8 @@
 
     <section class="form-section">
       <div class="section-heading">
-        <span class="section-icon-wrap" aria-hidden="true">
-          <span class="material-symbols-outlined section-icon">gpp_bad</span>
+        <span class="section-icon-wrap section-icon-wrap--danger" aria-hidden="true">
+          <span class="material-symbols-outlined section-icon">error</span>
         </span>
         <div>
           <h2 class="section-title">Access Restriction</h2>
@@ -313,35 +313,62 @@
           <p class="field-hint">This text will be shown to the user on the login screen.</p>
         </label>
 
-        <div class="field-grid field-grid--2 moderation-grid">
-          <label class="field">
-            <span class="field-label">Duration</span>
+        <section class="ban-duration-block" aria-labelledby="edit-ban-duration-label">
+          <p id="edit-ban-duration-label" class="ban-duration-label">Duration of Ban</p>
+          <div class="ban-duration-options" role="radiogroup" aria-labelledby="edit-ban-duration-label">
+            <button
+              type="button"
+              class="ban-duration-option"
+              role="radio"
+              [attr.aria-checked]="banDuration === '30-days'"
+              [class.ban-duration-option--selected]="banDuration === '30-days'"
+              (click)="selectBanDuration('30-days')"
+              [disabled]="isModerating"
+            >
+              30 Days
+            </button>
+            <button
+              type="button"
+              class="ban-duration-option"
+              role="radio"
+              [attr.aria-checked]="banDuration === 'permanent'"
+              [class.ban-duration-option--selected]="banDuration === 'permanent'"
+              (click)="selectBanDuration('permanent')"
+              [disabled]="isModerating"
+            >
+              Permanent
+            </button>
+            <button
+              type="button"
+              class="ban-duration-option"
+              role="radio"
+              [attr.aria-checked]="banDuration === 'custom'"
+              [class.ban-duration-option--selected]="banDuration === 'custom'"
+              (click)="selectBanDuration('custom')"
+              [disabled]="isModerating"
+            >
+              Custom Date
+            </button>
+          </div>
+
+          <label class="ban-duration-custom-field" *ngIf="banDuration === 'custom'">
+            <span>Ban ends on</span>
             <input
-              type="number"
-              class="input-control"
-              min="1"
-              step="1"
-              [disabled]="isPermanentBanSelected"
-              [(ngModel)]="banDurationValue"
+              type="date"
+              class="ban-duration-date-input"
+              [(ngModel)]="banCustomEndDate"
+              [min]="banCustomDateMin"
+              [disabled]="isModerating"
             />
           </label>
 
-          <label class="field">
-            <span class="field-label">Time unit</span>
-            <select class="input-control select-control select-control--full" [(ngModel)]="banDurationUnit">
-              <option value="hours">Hours</option>
-              <option value="days">Days</option>
-              <option value="weeks">Weeks</option>
-              <option value="months">Months</option>
-              <option value="permanent">Permanent</option>
-            </select>
-          </label>
-        </div>
-
-        <p class="field-hint">Selected ban duration: {{ banDurationPreview }}</p>
+          <p class="ban-duration-hint">
+            The ban ends automatically on the date you choose, or never for a permanent ban.
+          </p>
+        </section>
 
         <div class="moderation-actions">
-          <button type="button" class="btn-danger" (click)="banUser()" [disabled]="isModerating">
+          <button type="button" class="btn-danger" (click)="banUser()" [disabled]="isModerating || !isBanDurationValid">
             <span class="material-symbols-outlined btn-icon" aria-hidden="true">block</span>
             <span class="btn-text">{{ isModerating ? 'Applying…' : (isBanned ? 'Update ban' : 'Ban user') }}</span>
           </button>

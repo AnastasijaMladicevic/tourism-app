@@ -984,6 +984,7 @@
 }
 
 :host-context(:root[data-theme='dark']) {
+
   .filter-btn,
   .explore-btn,
   .heart-btn,
@@ -998,9 +999,25 @@
   .explore-btn:hover,
   .heart-btn:hover,
   .planner-btn:hover {
-    background: rgba(77, 194, 255, 0.12);
-    color: #4dc2ff;
-    border-color: rgba(77, 194, 255, 0.28);
+    background: var(--surface-soft) !important;
+    color: var(--text-dark) !important;
+    border: 1px solid var(--border) !important;
+    opacity: 1 !important;
+    box-shadow: none !important;
+  }
+
+  .heart-btn:hover svg {
+    opacity: 1 !important;
+  }
+
+  .planner-btn:hover mat-icon {
+    color: var(--text-light) !important;
+    opacity: 1 !important;
+  }
+
+  .planner-btn--active mat-icon {
+    color: #ff5b5b !important;
+    opacity: 1 !important;
   }
 
   .suggestions {

@@ -2,55 +2,70 @@
   <header class="page-header">
     <div>
       <h1>Review Moderation</h1>
-      <p>Queue: {{ queueCountLabel }}</p>
+      <p class="page-subtitle">
+        Queue: {{ queueCountLabel }}
+        @if (objectFilterId != null) {
+          <span class="subtitle-sep">·</span> {{ selectedObjectFilterLabel }}
+        }
+      </p>
     </div>
-    <button class="export-btn" type="button" (click)="loadReviews()" [disabled]="isLoading">Refresh</button>
   </header>
 
   <div class="filters-row">
     <div class="chip-group">
-      <button class="chip" type="button" [class.active]="isAllFiltersSelected" (click)="selectAllFilters()">
-        <span class="material-symbols-outlined">
-          language
-          </span>
-        All Ratings
-      </button>
-      <button class="chip" type="button" [class.active]="isRatingSelected(5)" (click)="toggleRating(5)">
-        <span class="material-symbols-outlined">grade</span>
-        5 Stars
-      </button>
-      <button class="chip" type="button" [class.active]="isRatingSelected(4)" (click)="toggleRating(4)">
-        <span class="material-symbols-outlined">grade</span>
-        4 Stars
-      </button>
-      <button class="chip" type="button" [class.active]="isRatingSelected(3)" (click)="toggleRating(3)">
-        <span class="material-symbols-outlined">grade</span>
-        3 Stars
-      </button>
-      <button class="chip" type="button" [class.active]="isRatingSelected(2)" (click)="toggleRating(2)">
-        <span class="material-symbols-outlined">grade</span>
-        2 Stars
-      </button>
-      <button class="chip" type="button" [class.active]="isRatingSelected(1)" (click)="toggleRating(1)">
-        <span class="material-symbols-outlined">grade</span>
-        1 Star
-      </button>
-      <button class="chip" type="button" [class.active]="responseFilter === 'pending'" (click)="responseFilter = 'pending'; onFilterChange()">
-        <span class="material-symbols-outlined">mark_chat_unread</span>
-        Needs Response
-      </button>
-      <button class="chip" type="button" [class.active]="responseFilter === 'responded'" (click)="responseFilter = 'responded'; onFilterChange()">
-        <span class="material-symbols-outlined">mark_chat_read</span>
-        Responded
-      </button>
+        <button class="chip" type="button" [class.active]="isAllRatingsSelected" (click)="selectAllRatings()">
+          <span class="material-symbols-outlined" aria-hidden="true">language</span>
+          All ratings
+        </button>
+        <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(5)" (click)="toggleRating(5)">5★</button>
+        <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(4)" (click)="toggleRating(4)">4★</button>
+        <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(3)" (click)="toggleRating(3)">3★</button>
+        <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(2)" (click)="toggleRating(2)">2★</button>
+        <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(1)" (click)="toggleRating(1)">1★</button>
+        <span class="chip-divider" aria-hidden="true"></span>
+        <label class="object-filter-inline" [class.is-active]="objectFilterId != null">
+          <span class="material-symbols-outlined object-filter-icon" aria-hidden="true">location_on</span>
+          <select
+            class="object-filter-select"
+            [ngModel]="objectFilterId"
+            (ngModelChange)="onObjectFilterChange($event)"
+            [disabled]="isLoading"
+            aria-label="Filter by object"
+          >
+            <option [ngValue]="null">All objects</option>
+            @for (object of creatorObjects; track object.id) {
+              <option [ngValue]="object.id">{{ object.name }}</option>
+            }
+          </select>
+          <span class="material-symbols-outlined object-filter-chevron" aria-hidden="true">expand_more</span>
+        </label>
+        <span class="chip-divider" aria-hidden="true"></span>
+        <button class="chip" type="button" [class.active]="responseFilter === 'all'" (click)="responseFilter = 'all'; onFilterChange()">
+          All
+        </button>
+        <button class="chip" type="button" [class.active]="responseFilter === 'pending'" (click)="responseFilter = 'pending'; onFilterChange()">
+          <span class="material-symbols-outlined" aria-hidden="true">mark_chat_unread</span>
+          No reply yet
+        </button>
+        <button class="chip" type="button" [class.active]="responseFilter === 'responded'" (click)="responseFilter = 'responded'; onFilterChange()">
+          <span class="material-symbols-outlined" aria-hidden="true">mark_chat_read</span>
+          With CC reply
+        </button>
+        <span class="chip-divider" aria-hidden="true"></span>
+        <button class="chip reset" type="button" (click)="resetFilters()">
+          <span class="material-symbols-outlined" aria-hidden="true">filter_alt_off</span>
+          Reset
+        </button>
     </div>
-    <div class="chip-divider" aria-hidden="true"></div>
-    <button class="chip reset" type="button" (click)="resetFilters()">
-      <span class="material-symbols-outlined">filter_alt_off</span>
-      Reset
-    </button>
+
     <div class="search-wrap">
-      <input type="text" placeholder="Search reviewer, object, content..." [ngModel]="searchTerm" (ngModelChange)="onSearchChange($event)" />
+      <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+      <input
+        type="search"
+        placeholder="Search reviewer, object, content..."
+        [ngModel]="searchTerm"
+        (ngModelChange)="onSearchChange($event)"
+      />
     </div>
   </div>
 
@@ -67,23 +82,41 @@
       @if (isLoading) {
         <p class="empty-note">Loading reviews...</p>
       } @else if (filteredReviews.length === 0) {
-        <p class="empty-note">No reviews found for your objects.</p>
+        <p class="empty-note">{{ emptyQueueMessage }}</p>
       } @else {
-        @for (review of filteredReviews; track review.id) {
-          <article class="queue-item" [class.active]="selectedReview?.id === review.id" (click)="selectReview(review)">
-            <div class="queue-item-head">
-              <div>
-                <h3>{{ review.userFullName }}</h3>
-                <span>{{ formatDate(review.createdAt) }}</span>
+        <div class="queue-list">
+          @for (review of pagedQueueReviews; track review.id) {
+            <article class="queue-item" [class.active]="selectedReview?.id === review.id" (click)="selectReview(review)">
+              <div class="queue-item-head">
+                <div>
+                  <h3>{{ review.userFullName }}</h3>
+                  <span>{{ formatDate(review.createdAt) }}</span>
+                </div>
+                <span class="status" [class.approved]="review.creatorResponse" [class.pending]="!review.creatorResponse">
+                  {{ review.creatorResponse ? 'Responded' : 'Pending' }}
+                </span>
               </div>
-              <span class="status" [class.approved]="review.creatorResponse" [class.pending]="!review.creatorResponse">
-                {{ review.creatorResponse ? 'Responded' : 'Pending' }}
-              </span>
-            </div>
-            <p>{{ review.text }}</p>
-            <small>{{ review.objectName }} • {{ review.rating }}/5</small>
-          </article>
-        }
+              <p class="queue-item-preview">{{ review.text }}</p>
+              <small>{{ review.objectName }} • {{ review.rating }}/5</small>
+            </article>
+          }
+        </div>
+        <footer class="queue-footer">
+          <p>{{ queuePageStart }}–{{ queuePageEnd }} of {{ filteredReviews.length }}</p>
+          <div class="queue-pagination">
+            <label class="page-size-control">
+              <span>Per page</span>
+              <select class="page-size-select" [(ngModel)]="queuePageSize" (ngModelChange)="onQueuePageSizeChange($event)">
+                @for (option of queuePageSizeOptions; track option) {
+                  <option [ngValue]="option">{{ option }}</option>
+                }
+              </select>
+            </label>
+            <button class="queue-page-btn" type="button" (click)="onQueuePreviousPage()" [disabled]="queuePage === 1">Prev</button>
+            <span class="queue-page-indicator">{{ queuePage }} / {{ queueTotalPages }}</span>
+            <button class="queue-page-btn" type="button" (click)="onQueueNextPage()" [disabled]="queuePage >= queueTotalPages">Next</button>
+          </div>
+        </footer>
       }
     </aside>
 
