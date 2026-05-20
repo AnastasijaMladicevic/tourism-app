@@ -201,12 +201,13 @@
   }
 
   .topbar {
-    align-items: flex-start;
+    align-items: center;
+    justify-content: space-between;
   }
 
   .topbar-actions {
     width: 100%;
-    justify-content: flex-start;
+    justify-content: flex-end;
   }
 }
 

@@ -4,7 +4,6 @@
   min-height: 100vh;
   background: var(--bg);
   font-family: 'DM Sans', sans-serif;
-  padding-bottom: 72px;
 }
 
 .header {
@@ -523,7 +522,6 @@
   justify-content: center;
   align-items: center;
   gap: 16px;
-  margin: 6px 0 20px;
 }
 
 .list-controls {
@@ -843,7 +841,7 @@
   }
 
   .spinner {
-    border-color: rgba(255,255,255,0.08);
+    border-color: rgba(255, 255, 255, 0.08);
     border-top-color: var(--primary);
   }
 }

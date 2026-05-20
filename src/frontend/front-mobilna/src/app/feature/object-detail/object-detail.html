@@ -76,7 +76,7 @@
         </div>
         <!-- O objektu -->
         <div class="card">
-          <h2>{{ 'object.aboutTitle' | translate:{ name: object?.objectTypeName || ('object.titleFallback' | translate) } }}</h2>
+          <h2>{{ 'object.aboutTitle' | translate:{ name: object.objectTypeName || ('object.titleFallback' | translate) } }}</h2>
           <p class="description">{{ object.description || ('object.descriptionFallback' | translate) }}</p>
         </div>
 
@@ -98,7 +98,7 @@
         </div>
         <div class="card nearby-card">
           <div class="nearby-header">
-            <h2>{{ 'object.nearbyTitle' | translate:{ name: object?.objectTypeName || ('object.titleFallback' | translate) } }}</h2>
+            <h2>{{ 'object.nearbyTitle' | translate:{ name: object.objectTypeName || ('object.titleFallback' | translate) } }}</h2>
           </div>
 
           @if (nearbyObjects.length > 0) {
@@ -147,7 +147,7 @@
             </div>
           } @else {
             <div class="nearby-empty">
-              {{ 'object.nearbyEmpty' | translate:{ name: object?.objectTypeName || ('object.titleFallback' | translate) } }}
+              {{ 'object.nearbyEmpty' | translate:{ name: object.objectTypeName || ('object.titleFallback' | translate) } }}
             </div>
           }
         </div>

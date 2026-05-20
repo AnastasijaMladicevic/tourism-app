@@ -1,12 +1,11 @@
 .edit-profile-page {
-  min-height: 100dvh;
   background: linear-gradient(180deg, #fbfeff 0%, #eef8fb 100%);
 }
 
 .edit-profile-shell {
   width: min(100%, 430px);
   margin: 0 auto;
-  padding: 8px 16px 92px;
+  padding: 8px 16px 0;
 }
 
 .visually-hidden {
@@ -523,6 +522,7 @@
 
 @media (min-width: 768px) {
   .edit-profile-page {
+    min-height: 100dvh;
     padding: 18px 24px 36px;
   }
 
