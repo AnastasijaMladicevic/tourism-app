@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { UserDto } from '../../../models/user.model';
@@ -8,8 +8,8 @@ import {
   AdminDashboardOverviewDto,
   AdminDashboardRoleDistributionItemDto,
   AdminDashboardService,
-  AdminDashboardTopVisitedDestinationDto,
-  AdminDashboardRegionVisitDto,
+  AdminDashboardTopEngagedDestinationDto,
+  AdminDashboardRegionEngagementDto,
   DashboardPeriod,
 } from '../../../services/admin-dashboard.service';
 import { DestinationDto } from '../../../services/destination.service';
@@ -57,11 +57,11 @@ interface CreatorRequestSlice {
   percent: number;
 }
 
-interface TopDestinationRow extends AdminDashboardTopVisitedDestinationDto {
+interface TopDestinationRow extends AdminDashboardTopEngagedDestinationDto {
   barPercent: number;
 }
 
-interface RegionVisitRow extends AdminDashboardRegionVisitDto {
+interface RegionVisitRow extends AdminDashboardRegionEngagementDto {
   barPercent: number;
 }
 
@@ -91,6 +91,7 @@ const ROLE_COLORS: Record<string, string> = {
 export class DashboardComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly adminDashboardService = inject(AdminDashboardService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   readonly periodOptions = PERIOD_OPTIONS;
 
@@ -130,6 +131,7 @@ export class DashboardComponent implements OnInit {
     }
 
     this.selectedPeriod = period;
+    this.cdr.detectChanges();
     this.loadOverview();
   }
 
@@ -145,25 +147,37 @@ export class DashboardComponent implements OnInit {
   }
 
   get hasVisitData(): boolean {
-    return (this.overview?.destinationVisits.totalVisits ?? 0) > 0;
+    return (
+      (this.overview?.destinationEngagement.totalFavoriteAdds ?? 0) > 0 ||
+      (this.overview?.destinationEngagement.totalPlannerAdds ?? 0) > 0 ||
+      (this.overview?.destinationEngagement.ratedDestinations ?? 0) > 0
+    );
   }
 
   private loadOverview(): void {
     this.isLoading = true;
     this.loadError = '';
+    this.cdr.detectChanges();
 
     this.adminDashboardService
       .getOverview(this.selectedPeriod)
-      .pipe(finalize(() => (this.isLoading = false)))
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        }),
+      )
       .subscribe({
         next: (overview) => {
           this.overview = overview;
           this.bindOverview(overview);
+          this.cdr.detectChanges();
         },
         error: () => {
           this.overview = null;
           this.resetDerivedState();
           this.loadError = 'Dashboard data could not be loaded right now.';
+          this.cdr.detectChanges();
         },
       });
   }
@@ -174,7 +188,7 @@ export class DashboardComponent implements OnInit {
     this.bindDestinationsByRegion(overview);
     this.bindAccountHealth(overview);
     this.bindCreatorRequests(overview);
-    this.bindDestinationVisits(overview);
+    this.bindDestinationEngagement(overview);
     this.bindMapPoints(overview);
   }
 
@@ -316,19 +330,19 @@ export class DashboardComponent implements OnInit {
     ];
   }
 
-  private bindDestinationVisits(overview: AdminDashboardOverviewDto): void {
-    const visits = overview.destinationVisits;
-    const maxDestinationVisits = Math.max(...visits.topDestinations.map((row) => row.visitCount), 1);
-    const maxRegionVisits = Math.max(...visits.regionVisits.map((row) => row.visitCount), 1);
+  private bindDestinationEngagement(overview: AdminDashboardOverviewDto): void {
+    const engagement = overview.destinationEngagement;
+    const maxDestinationScore = Math.max(...engagement.topDestinations.map((row) => row.engagementScore), 1);
+    const maxRegionScore = Math.max(...engagement.regionEngagement.map((row) => row.engagementScore), 1);
 
-    this.topDestinationRows = visits.topDestinations.map((row) => ({
+    this.topDestinationRows = engagement.topDestinations.map((row) => ({
       ...row,
-      barPercent: Math.round((row.visitCount / maxDestinationVisits) * 1000) / 10,
+      barPercent: Math.round((row.engagementScore / maxDestinationScore) * 1000) / 10,
     }));
 
-    this.regionVisitRows = visits.regionVisits.map((row) => ({
+    this.regionVisitRows = engagement.regionEngagement.map((row) => ({
       ...row,
-      barPercent: Math.round((row.visitCount / maxRegionVisits) * 1000) / 10,
+      barPercent: Math.round((row.engagementScore / maxRegionScore) * 1000) / 10,
     }));
   }
 

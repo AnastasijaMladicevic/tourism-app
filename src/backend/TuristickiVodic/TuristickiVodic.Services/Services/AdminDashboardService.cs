@@ -15,10 +15,8 @@ namespace TuristickiVodic.Services.Services
         private const int MinPeriodDays = 7;
         private const int MaxPeriodDays = 1825;
         private const int MaxMapPoints = 200;
-        private const int MaxTopVisitedDestinations = 6;
-        private const int MaxTopVisitedRegions = 6;
-        private const double MaxDashboardVisitPointAccuracyMeters = 250d;
-        private const double DestinationVisitRadiusMeters = 700d;
+        private const int MaxTopEngagedDestinations = 6;
+        private const int MaxTopEngagedRegions = 6;
 
         private readonly AppDbContext _context;
 
@@ -42,27 +40,7 @@ namespace TuristickiVodic.Services.Services
             public CreatorRoleRequestStatus CreatorRoleRequestStatus { get; set; }
         }
 
-        private sealed class DashboardVisitPoint
-        {
-            public int UserId { get; set; }
-            public double Latitude { get; set; }
-            public double Longitude { get; set; }
-            public double? AccuracyMeters { get; set; }
-            public DateTime RecordedAt { get; set; }
-        }
-
-        private sealed class DashboardVisitDestination
-        {
-            public int DestinationId { get; set; }
-            public string DestinationName { get; set; } = string.Empty;
-            public int RegionId { get; set; }
-            public string RegionName { get; set; } = string.Empty;
-            public string RegionCode { get; set; } = string.Empty;
-            public double Latitude { get; set; }
-            public double Longitude { get; set; }
-        }
-
-        private sealed class DestinationVisitMatch
+        private sealed class DashboardDestinationFavoriteRow
         {
             public int DestinationId { get; set; }
             public string DestinationName { get; set; } = string.Empty;
@@ -70,8 +48,26 @@ namespace TuristickiVodic.Services.Services
             public string RegionName { get; set; } = string.Empty;
             public string RegionCode { get; set; } = string.Empty;
             public int UserId { get; set; }
-            public DateTime VisitDate { get; set; }
-            public DateTime RecordedAt { get; set; }
+        }
+
+        private sealed class DashboardDestinationPlannerRow
+        {
+            public int DestinationId { get; set; }
+            public string DestinationName { get; set; } = string.Empty;
+            public int RegionId { get; set; }
+            public string RegionName { get; set; } = string.Empty;
+            public string RegionCode { get; set; } = string.Empty;
+            public int UserId { get; set; }
+        }
+
+        private sealed class DashboardDestinationReviewRow
+        {
+            public int DestinationId { get; set; }
+            public string DestinationName { get; set; } = string.Empty;
+            public int RegionId { get; set; }
+            public string RegionName { get; set; } = string.Empty;
+            public string RegionCode { get; set; } = string.Empty;
+            public int Rating { get; set; }
         }
 
         public AdminDashboardService(AppDbContext context)
@@ -86,31 +82,31 @@ namespace TuristickiVodic.Services.Services
             var periodDays = dashboardPeriod.Days;
             var periodStartUtc = dashboardPeriod.StartUtc;
 
-            var totalTouristsTask = _context.Users
+            var totalTourists = await _context.Users
                 .AsNoTracking()
                 .CountAsync(u => u.Role.Name == RoleType.Tourist);
 
-            var newTouristsInPeriodTask = _context.Users
+            var newTouristsInPeriod = await _context.Users
                 .AsNoTracking()
                 .CountAsync(u => u.Role.Name == RoleType.Tourist && u.CreatedAt >= periodStartUtc);
 
-            var activeDestinationsTask = _context.Destinations
+            var activeDestinations = await _context.Destinations
                 .AsNoTracking()
                 .CountAsync(d => d.IsActive);
 
-            var newDestinationsInPeriodTask = _context.Destinations
+            var newDestinationsInPeriod = await _context.Destinations
                 .AsNoTracking()
                 .CountAsync(d => d.CreatedAt >= periodStartUtc);
 
-            var pendingCreatorRequestsTask = _context.Users
+            var pendingCreatorRequests = await _context.Users
                 .AsNoTracking()
                 .CountAsync(HasPendingCreatorRoleRequestExpression());
 
-            var openReportsTask = _context.ManagerReports
+            var openReports = await _context.ManagerReports
                 .AsNoTracking()
                 .CountAsync(r => r.Status == ContentStatus.Pending);
 
-            var reportsBreakdownTask = _context.ManagerReports
+            var reportsBreakdownRows = await _context.ManagerReports
                 .AsNoTracking()
                 .Where(r => r.CreatedAt >= periodStartUtc)
                 .GroupBy(r => r.Status)
@@ -121,7 +117,7 @@ namespace TuristickiVodic.Services.Services
                 })
                 .ToListAsync();
 
-            var roleDistributionTask = _context.Users
+            var roleDistributionRows = await _context.Users
                 .AsNoTracking()
                 .GroupBy(u => u.Role.Name)
                 .Select(g => new
@@ -131,7 +127,7 @@ namespace TuristickiVodic.Services.Services
                 })
                 .ToListAsync();
 
-            var accountHealthTask = _context.Users
+            var accountHealth = await _context.Users
                 .AsNoTracking()
                 .GroupBy(_ => 1)
                 .Select(g => new AdminDashboardAccountHealthDto
@@ -146,7 +142,7 @@ namespace TuristickiVodic.Services.Services
                 })
                 .FirstOrDefaultAsync();
 
-            var destinationsByRegionTask = _context.Regions
+            var destinationsByRegion = await _context.Regions
                 .AsNoTracking()
                 .Select(r => new AdminDashboardDestinationByRegionDto
                 {
@@ -161,7 +157,7 @@ namespace TuristickiVodic.Services.Services
                 .ThenBy(r => r.RegionName)
                 .ToListAsync();
 
-            var userGrowthRowsTask = _context.Users
+            var userGrowthRows = await _context.Users
                 .AsNoTracking()
                 .Where(u => u.CreatedAt >= periodStartUtc)
                 .Select(u => new UserGrowthRow
@@ -171,7 +167,7 @@ namespace TuristickiVodic.Services.Services
                 })
                 .ToListAsync();
 
-            var creatorRequestStatusesTask = _context.Users
+            var creatorRequestStatuses = await _context.Users
                 .AsNoTracking()
                 .Where(u =>
                     u.CreatedAt >= periodStartUtc ||
@@ -185,7 +181,7 @@ namespace TuristickiVodic.Services.Services
                 })
                 .ToListAsync();
 
-            var mapPointsTask = _context.Destinations
+            var mapPoints = await _context.Destinations
                 .AsNoTracking()
                 .Where(d => d.IsActive && d.Geolocation != null)
                 .OrderBy(d => d.Name)
@@ -201,7 +197,7 @@ namespace TuristickiVodic.Services.Services
                 .Take(MaxMapPoints)
                 .ToListAsync();
 
-            var geospatialSummaryTask = _context.Destinations
+            var geospatialSummary = await _context.Destinations
                 .AsNoTracking()
                 .Where(d => d.IsActive && d.Geolocation != null)
                 .GroupBy(_ => 1)
@@ -212,59 +208,54 @@ namespace TuristickiVodic.Services.Services
                 })
                 .FirstOrDefaultAsync();
 
-            var visitPointsTask = _context.UserLocationHistories
+            var favoriteRows = await _context.Favorites
                 .AsNoTracking()
-                .Where(x => x.RecordedAt >= periodStartUtc)
-                .Where(x => x.AccuracyMeters.HasValue && x.AccuracyMeters.Value <= MaxDashboardVisitPointAccuracyMeters)
-                .Where(x => x.User.Role.Name == RoleType.Tourist || x.User.Role.Name == RoleType.ContentCreator)
-                .Select(x => new DashboardVisitPoint
+                .Where(x => x.CreatedAt >= periodStartUtc)
+                .Where(x => x.DestinationId != null)
+                .Select(x => new DashboardDestinationFavoriteRow
                 {
-                    UserId = x.UserId,
-                    Latitude = x.Location.Y,
-                    Longitude = x.Location.X,
-                    AccuracyMeters = x.AccuracyMeters,
-                    RecordedAt = x.RecordedAt
+                    DestinationId = x.DestinationId!.Value,
+                    DestinationName = x.Destination!.Name,
+                    RegionId = x.Destination.RegionId,
+                    RegionName = x.Destination.Region.Name,
+                    RegionCode = x.Destination.Region.Code,
+                    UserId = x.UserId
                 })
                 .ToListAsync();
 
-            var visitDestinationsTask = _context.Destinations
+            var plannerRows = await _context.EventPlannerItems
                 .AsNoTracking()
-                .Where(d => d.IsActive && d.Geolocation != null)
-                .Select(d => new DashboardVisitDestination
+                .Where(x => x.AddedAt >= periodStartUtc)
+                .Where(x => x.Event.DestinationId != null)
+                .Select(x => new DashboardDestinationPlannerRow
                 {
-                    DestinationId = d.Id,
-                    DestinationName = d.Name,
-                    RegionId = d.RegionId,
-                    RegionName = d.Region.Name,
-                    RegionCode = d.Region.Code,
-                    Latitude = d.Geolocation!.Y,
-                    Longitude = d.Geolocation!.X
+                    DestinationId = x.Event.DestinationId!.Value,
+                    DestinationName = x.Event.Destination!.Name,
+                    RegionId = x.Event.Destination.RegionId,
+                    RegionName = x.Event.Destination.Region.Name,
+                    RegionCode = x.Event.Destination.Region.Code,
+                    UserId = x.UserId
                 })
                 .ToListAsync();
 
-            await Task.WhenAll(
-                totalTouristsTask,
-                newTouristsInPeriodTask,
-                activeDestinationsTask,
-                newDestinationsInPeriodTask,
-                pendingCreatorRequestsTask,
-                openReportsTask,
-                reportsBreakdownTask,
-                roleDistributionTask,
-                accountHealthTask,
-                destinationsByRegionTask,
-                userGrowthRowsTask,
-                creatorRequestStatusesTask,
-                mapPointsTask,
-                geospatialSummaryTask,
-                visitPointsTask,
-                visitDestinationsTask
-            );
+            var reviewRows = await _context.Reviews
+                .AsNoTracking()
+                .Where(x => x.CreatedAt >= periodStartUtc)
+                .Where(x => x.Status == ContentStatus.Approved)
+                .Select(x => new DashboardDestinationReviewRow
+                {
+                    DestinationId = x.Object.DestinationId,
+                    DestinationName = x.Object.Destination.Name,
+                    RegionId = x.Object.Destination.RegionId,
+                    RegionName = x.Object.Destination.Region.Name,
+                    RegionCode = x.Object.Destination.Region.Code,
+                    Rating = x.Rating
+                })
+                .ToListAsync();
 
-            var reportsBreakdown = reportsBreakdownTask.Result.ToDictionary(x => x.Status, x => x.Count);
-            var roleDistributionLookup = roleDistributionTask.Result.ToDictionary(x => x.Role, x => x.Count);
-            var creatorRequestStatuses = creatorRequestStatusesTask.Result;
-            var destinationVisits = BuildDestinationVisits(visitPointsTask.Result, visitDestinationsTask.Result);
+            var reportsBreakdown = reportsBreakdownRows.ToDictionary(x => x.Status, x => x.Count);
+            var roleDistributionLookup = roleDistributionRows.ToDictionary(x => x.Role, x => x.Count);
+            var destinationEngagement = BuildDestinationEngagement(favoriteRows, plannerRows, reviewRows);
 
             var pendingRequests = creatorRequestStatuses.Count(IsPendingCreatorRoleRequestSnapshot);
             var approvedRequests = creatorRequestStatuses.Count(x => x.CreatorRoleRequestStatus == CreatorRoleRequestStatus.Approved);
@@ -283,16 +274,16 @@ namespace TuristickiVodic.Services.Services
                 PeriodStartUtc = periodStartUtc,
                 Summary = new AdminDashboardSummaryDto
                 {
-                    TotalTourists = totalTouristsTask.Result,
-                    NewTouristsInPeriod = newTouristsInPeriodTask.Result,
-                    ActiveDestinations = activeDestinationsTask.Result,
-                    NewDestinationsInPeriod = newDestinationsInPeriodTask.Result,
-                    PendingCreatorRequests = pendingCreatorRequestsTask.Result,
-                    OpenReports = openReportsTask.Result
+                    TotalTourists = totalTourists,
+                    NewTouristsInPeriod = newTouristsInPeriod,
+                    ActiveDestinations = activeDestinations,
+                    NewDestinationsInPeriod = newDestinationsInPeriod,
+                    PendingCreatorRequests = pendingCreatorRequests,
+                    OpenReports = openReports
                 },
-                UserGrowth = BuildUserGrowth(periodStartUtc, asOfUtc, dashboardPeriod.Granularity, userGrowthRowsTask.Result),
+                UserGrowth = BuildUserGrowth(periodStartUtc, asOfUtc, dashboardPeriod.Granularity, userGrowthRows),
                 RoleDistribution = BuildRoleDistribution(roleDistributionLookup),
-                DestinationsByRegion = destinationsByRegionTask.Result,
+                DestinationsByRegion = destinationsByRegion,
                 CreatorRequests = new AdminDashboardCreatorRequestStatusDto
                 {
                     Pending = pendingRequests,
@@ -308,14 +299,14 @@ namespace TuristickiVodic.Services.Services
                     Rejected = reportsBreakdown.GetValueOrDefault(ContentStatus.Rejected),
                     Total = reportsBreakdown.Values.Sum()
                 },
-                AccountHealth = accountHealthTask.Result ?? new AdminDashboardAccountHealthDto(),
-                DestinationVisits = destinationVisits,
+                AccountHealth = accountHealth ?? new AdminDashboardAccountHealthDto(),
+                DestinationEngagement = destinationEngagement,
                 GeospatialOverview = new AdminDashboardGeospatialOverviewDto
                 {
-                    TotalActiveDestinationsWithCoordinates = geospatialSummaryTask.Result?.Total ?? 0,
-                    RegionsRepresented = geospatialSummaryTask.Result?.RegionsRepresented ?? 0,
-                    DisplayedPoints = mapPointsTask.Result.Count,
-                    Points = mapPointsTask.Result
+                    TotalActiveDestinationsWithCoordinates = geospatialSummary?.Total ?? 0,
+                    RegionsRepresented = geospatialSummary?.RegionsRepresented ?? 0,
+                    DisplayedPoints = mapPoints.Count,
+                    Points = mapPoints
                 }
             };
         }
@@ -458,142 +449,119 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
-        private static AdminDashboardDestinationVisitsDto BuildDestinationVisits(
-            IReadOnlyList<DashboardVisitPoint> historyPoints,
-            IReadOnlyList<DashboardVisitDestination> destinations)
+        private static AdminDashboardDestinationEngagementDto BuildDestinationEngagement(
+            IReadOnlyList<DashboardDestinationFavoriteRow> favoriteRows,
+            IReadOnlyList<DashboardDestinationPlannerRow> plannerRows,
+            IReadOnlyList<DashboardDestinationReviewRow> reviewRows)
         {
-            if (historyPoints.Count == 0 || destinations.Count == 0)
+            if (favoriteRows.Count == 0 && plannerRows.Count == 0 && reviewRows.Count == 0)
             {
-                return new AdminDashboardDestinationVisitsDto();
+                return new AdminDashboardDestinationEngagementDto();
             }
 
-            var visitMatches = new List<DestinationVisitMatch>();
-
-            foreach (var point in historyPoints)
-            {
-                DashboardVisitDestination? bestMatch = null;
-                var bestDistance = double.MaxValue;
-                var visitRadius = Math.Max(120d, Math.Min(DestinationVisitRadiusMeters, (point.AccuracyMeters ?? 0d) + 60d));
-
-                foreach (var destination in destinations)
-                {
-                    var distanceMeters = CalculateHaversineDistanceMeters(
-                        point.Latitude,
-                        point.Longitude,
-                        destination.Latitude,
-                        destination.Longitude);
-
-                    if (distanceMeters > visitRadius || distanceMeters >= bestDistance)
+            var reviewLookup = reviewRows
+                .GroupBy(x => x.DestinationId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => new
                     {
-                        continue;
-                    }
+                        ReviewCount = g.Count(),
+                        AverageRating = Math.Round((decimal)g.Average(x => x.Rating), 1)
+                    });
 
-                    bestDistance = distanceMeters;
-                    bestMatch = destination;
-                }
+            var favoriteLookup = favoriteRows
+                .GroupBy(x => x.DestinationId)
+                .ToDictionary(g => g.Key, g => g.Count());
 
-                if (bestMatch == null)
-                {
-                    continue;
-                }
+            var plannerLookup = plannerRows
+                .GroupBy(x => x.DestinationId)
+                .ToDictionary(g => g.Key, g => g.Count());
 
-                visitMatches.Add(new DestinationVisitMatch
-                {
-                    DestinationId = bestMatch.DestinationId,
-                    DestinationName = bestMatch.DestinationName,
-                    RegionId = bestMatch.RegionId,
-                    RegionName = bestMatch.RegionName,
-                    RegionCode = bestMatch.RegionCode,
-                    UserId = point.UserId,
-                    VisitDate = point.RecordedAt.Date,
-                    RecordedAt = point.RecordedAt
-                });
-            }
-
-            if (visitMatches.Count == 0)
-            {
-                return new AdminDashboardDestinationVisitsDto();
-            }
-
-            var uniqueDestinationVisits = visitMatches
-                .GroupBy(x => new { x.DestinationId, x.UserId, x.VisitDate })
-                .Select(g => g.OrderByDescending(x => x.RecordedAt).First())
+            var destinationRows = favoriteRows
+                .Select(x => new { x.DestinationId, x.DestinationName, x.RegionId, x.RegionName, x.RegionCode })
+                .Concat(plannerRows.Select(x => new { x.DestinationId, x.DestinationName, x.RegionId, x.RegionName, x.RegionCode }))
+                .Concat(reviewRows.Select(x => new { x.DestinationId, x.DestinationName, x.RegionId, x.RegionName, x.RegionCode }))
+                .Distinct()
                 .ToList();
 
-            var topDestinations = uniqueDestinationVisits
-                .GroupBy(x => new
+            var topDestinations = destinationRows
+                .Select(row =>
                 {
-                    x.DestinationId,
-                    x.DestinationName,
-                    x.RegionId,
-                    x.RegionName,
-                    x.RegionCode
+                    var favoriteAdds = favoriteLookup.GetValueOrDefault(row.DestinationId);
+                    var plannerAdds = plannerLookup.GetValueOrDefault(row.DestinationId);
+                    var reviewInfo = reviewLookup.GetValueOrDefault(row.DestinationId);
+                    var reviewCount = reviewInfo?.ReviewCount ?? 0;
+                    var averageRating = reviewInfo?.AverageRating ?? 0m;
+                    var engagementScore = favoriteAdds + plannerAdds + reviewCount;
+
+                    return new AdminDashboardTopEngagedDestinationDto
+                    {
+                        DestinationId = row.DestinationId,
+                        DestinationName = row.DestinationName,
+                        RegionId = row.RegionId,
+                        RegionName = row.RegionName,
+                        RegionCode = row.RegionCode,
+                        FavoriteAdds = favoriteAdds,
+                        PlannerAdds = plannerAdds,
+                        ReviewCount = reviewCount,
+                        AverageRating = averageRating,
+                        EngagementScore = engagementScore
+                    };
                 })
-                .Select(g => new AdminDashboardTopVisitedDestinationDto
-                {
-                    DestinationId = g.Key.DestinationId,
-                    DestinationName = g.Key.DestinationName,
-                    RegionId = g.Key.RegionId,
-                    RegionName = g.Key.RegionName,
-                    RegionCode = g.Key.RegionCode,
-                    VisitCount = g.Count(),
-                    UniqueVisitors = g.Select(x => x.UserId).Distinct().Count(),
-                    LastVisitUtc = g.Max(x => x.RecordedAt)
-                })
-                .OrderByDescending(x => x.VisitCount)
-                .ThenByDescending(x => x.UniqueVisitors)
+                .Where(x => x.EngagementScore > 0 || x.AverageRating > 0)
+                .OrderByDescending(x => x.EngagementScore)
+                .ThenByDescending(x => x.AverageRating)
                 .ThenBy(x => x.DestinationName)
-                .Take(MaxTopVisitedDestinations)
+                .Take(MaxTopEngagedDestinations)
                 .ToList();
 
-            var regionVisits = uniqueDestinationVisits
+            var regionRows = destinationRows
                 .GroupBy(x => new { x.RegionId, x.RegionName, x.RegionCode })
-                .Select(g => new AdminDashboardRegionVisitDto
+                .Select(g =>
                 {
-                    RegionId = g.Key.RegionId,
-                    RegionName = g.Key.RegionName,
-                    RegionCode = g.Key.RegionCode,
-                    VisitCount = g.Select(x => new { x.UserId, x.VisitDate }).Distinct().Count(),
-                    UniqueVisitors = g.Select(x => x.UserId).Distinct().Count(),
-                    VisitedDestinations = g.Select(x => x.DestinationId).Distinct().Count(),
-                    LastVisitUtc = g.Max(x => x.RecordedAt)
+                    var regionDestinationIds = g.Select(x => x.DestinationId).Distinct().ToHashSet();
+                    var regionFavorites = favoriteLookup
+                        .Where(x => regionDestinationIds.Contains(x.Key))
+                        .Sum(x => x.Value);
+                    var regionPlannerAdds = plannerLookup
+                        .Where(x => regionDestinationIds.Contains(x.Key))
+                        .Sum(x => x.Value);
+                    var regionReviewSlice = reviewRows.Where(x => regionDestinationIds.Contains(x.DestinationId)).ToList();
+                    var regionReviewCount = regionReviewSlice.Count;
+                    var regionAverageRating = regionReviewCount > 0
+                        ? Math.Round((decimal)regionReviewSlice.Average(x => x.Rating), 1)
+                        : 0m;
+                    var engagementScore = regionFavorites + regionPlannerAdds + regionReviewCount;
+
+                    return new AdminDashboardRegionEngagementDto
+                    {
+                        RegionId = g.Key.RegionId,
+                        RegionName = g.Key.RegionName,
+                        RegionCode = g.Key.RegionCode,
+                        FavoriteAdds = regionFavorites,
+                        PlannerAdds = regionPlannerAdds,
+                        ReviewCount = regionReviewCount,
+                        EngagedDestinations = regionDestinationIds.Count,
+                        AverageRating = regionAverageRating,
+                        EngagementScore = engagementScore
+                    };
                 })
-                .OrderByDescending(x => x.VisitCount)
-                .ThenByDescending(x => x.UniqueVisitors)
+                .Where(x => x.EngagementScore > 0 || x.AverageRating > 0)
+                .OrderByDescending(x => x.EngagementScore)
+                .ThenByDescending(x => x.AverageRating)
                 .ThenBy(x => x.RegionName)
-                .Take(MaxTopVisitedRegions)
+                .Take(MaxTopEngagedRegions)
                 .ToList();
 
-            return new AdminDashboardDestinationVisitsDto
+            return new AdminDashboardDestinationEngagementDto
             {
-                TotalVisits = uniqueDestinationVisits.Count,
-                UniqueVisitors = uniqueDestinationVisits.Select(x => x.UserId).Distinct().Count(),
-                DestinationsVisited = uniqueDestinationVisits.Select(x => x.DestinationId).Distinct().Count(),
+                TotalFavoriteAdds = favoriteRows.Count,
+                TotalPlannerAdds = plannerRows.Count,
+                RatedDestinations = reviewRows.Select(x => x.DestinationId).Distinct().Count(),
                 TopDestinations = topDestinations,
-                RegionVisits = regionVisits
+                RegionEngagement = regionRows
             };
         }
-
-        private static double CalculateHaversineDistanceMeters(double latitude1, double longitude1, double latitude2, double longitude2)
-        {
-            const double earthRadiusMeters = 6371000d;
-
-            var deltaLatitude = DegreesToRadians(latitude2 - latitude1);
-            var deltaLongitude = DegreesToRadians(longitude2 - longitude1);
-            var normalizedLatitude1 = DegreesToRadians(latitude1);
-            var normalizedLatitude2 = DegreesToRadians(latitude2);
-
-            var a =
-                Math.Sin(deltaLatitude / 2) * Math.Sin(deltaLatitude / 2) +
-                Math.Cos(normalizedLatitude1) * Math.Cos(normalizedLatitude2) *
-                Math.Sin(deltaLongitude / 2) * Math.Sin(deltaLongitude / 2);
-
-            var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-            return earthRadiusMeters * c;
-        }
-
-        private static double DegreesToRadians(double degrees)
-            => degrees * (Math.PI / 180d);
 
         private static System.Linq.Expressions.Expression<Func<User, bool>> HasPendingCreatorRoleRequestExpression()
             => u => u.CreatorRoleRequestStatus == CreatorRoleRequestStatus.Pending ||

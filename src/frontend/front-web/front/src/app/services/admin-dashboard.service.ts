@@ -18,7 +18,7 @@ export interface AdminDashboardOverviewDto {
   creatorRequests: AdminDashboardCreatorRequestStatusDto;
   reports: AdminDashboardReportsSummaryDto;
   accountHealth: AdminDashboardAccountHealthDto;
-  destinationVisits: AdminDashboardDestinationVisitsDto;
+  destinationEngagement: AdminDashboardDestinationEngagementDto;
   geospatialOverview: AdminDashboardGeospatialOverviewDto;
 }
 
@@ -78,33 +78,37 @@ export interface AdminDashboardAccountHealthDto {
   totalBanned: number;
 }
 
-export interface AdminDashboardDestinationVisitsDto {
-  totalVisits: number;
-  uniqueVisitors: number;
-  destinationsVisited: number;
-  topDestinations: AdminDashboardTopVisitedDestinationDto[];
-  regionVisits: AdminDashboardRegionVisitDto[];
+export interface AdminDashboardDestinationEngagementDto {
+  totalFavoriteAdds: number;
+  totalPlannerAdds: number;
+  ratedDestinations: number;
+  topDestinations: AdminDashboardTopEngagedDestinationDto[];
+  regionEngagement: AdminDashboardRegionEngagementDto[];
 }
 
-export interface AdminDashboardTopVisitedDestinationDto {
+export interface AdminDashboardTopEngagedDestinationDto {
   destinationId: number;
   destinationName: string;
   regionId: number;
   regionName: string;
   regionCode: string;
-  visitCount: number;
-  uniqueVisitors: number;
-  lastVisitUtc: string | null;
+  favoriteAdds: number;
+  plannerAdds: number;
+  reviewCount: number;
+  averageRating: number;
+  engagementScore: number;
 }
 
-export interface AdminDashboardRegionVisitDto {
+export interface AdminDashboardRegionEngagementDto {
   regionId: number;
   regionName: string;
   regionCode: string;
-  visitCount: number;
-  uniqueVisitors: number;
-  visitedDestinations: number;
-  lastVisitUtc: string | null;
+  favoriteAdds: number;
+  plannerAdds: number;
+  reviewCount: number;
+  engagedDestinations: number;
+  averageRating: number;
+  engagementScore: number;
 }
 
 export interface AdminDashboardGeospatialOverviewDto {

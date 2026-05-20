@@ -248,23 +248,23 @@
       <article class="card panel panel--visits panel--wide">
         <div class="section-head">
           <div>
-            <h3>Destination Visits</h3>
-            <p>Location-based visits matched in {{ overview.periodKey }}</p>
+            <h3>Destination Engagement</h3>
+            <p>Favorites, planner adds and ratings in {{ overview.periodKey }}</p>
           </div>
         </div>
 
         <div class="visit-summary">
           <div class="visit-summary-card">
-            <span class="visit-summary-label">Visit events</span>
-            <span class="visit-summary-value">{{ overview.destinationVisits.totalVisits | number }}</span>
+            <span class="visit-summary-label">Favorite adds</span>
+            <span class="visit-summary-value">{{ overview.destinationEngagement.totalFavoriteAdds | number }}</span>
           </div>
           <div class="visit-summary-card">
-            <span class="visit-summary-label">Unique visitors</span>
-            <span class="visit-summary-value">{{ overview.destinationVisits.uniqueVisitors | number }}</span>
+            <span class="visit-summary-label">Planner adds</span>
+            <span class="visit-summary-value">{{ overview.destinationEngagement.totalPlannerAdds | number }}</span>
           </div>
           <div class="visit-summary-card">
-            <span class="visit-summary-label">Visited destinations</span>
-            <span class="visit-summary-value">{{ overview.destinationVisits.destinationsVisited | number }}</span>
+            <span class="visit-summary-label">Rated destinations</span>
+            <span class="visit-summary-value">{{ overview.destinationEngagement.ratedDestinations | number }}</span>
           </div>
         </div>
 
@@ -275,28 +275,30 @@
                 <div class="visit-name">{{ row.destinationName }}</div>
                 <div class="visit-subtle">{{ row.regionName }} · {{ row.regionCode }}</div>
               </div>
-              <div class="visit-count">{{ row.visitCount | number }} visits</div>
+              <div class="visit-count">score {{ row.engagementScore | number:'1.0-1' }}</div>
             </div>
             <div class="region-bar-track">
               <div class="region-bar-fill region-bar-fill--teal" [style.width.%]="row.barPercent"></div>
             </div>
             <div class="visit-meta">
-              <span>{{ row.uniqueVisitors | number }} unique visitors</span>
-              <span>Last visit {{ formatShortDate(row.lastVisitUtc) }}</span>
+              <span>{{ row.favoriteAdds | number }} favorites</span>
+              <span>{{ row.plannerAdds | number }} planner adds</span>
+              <span>{{ row.reviewCount | number }} reviews</span>
+              <span>{{ row.averageRating | number:'1.1-1' }} avg rating</span>
             </div>
           </div>
         </div>
 
         <ng-template #emptyVisits>
-          <p class="empty-note">No destination visits were detected for this period.</p>
+          <p class="empty-note">No destination engagement was detected for this period.</p>
         </ng-template>
       </article>
 
       <article class="card panel">
         <div class="section-head">
           <div>
-            <h3>Region Visit Share</h3>
-            <p>Most visited regions in {{ overview.periodKey }}</p>
+            <h3>Region Engagement</h3>
+            <p>Most engaged regions in {{ overview.periodKey }}</p>
           </div>
         </div>
 
@@ -310,15 +312,17 @@
               <div class="region-bar-fill region-bar-fill--teal" [style.width.%]="row.barPercent"></div>
             </div>
             <div class="region-stats">
-              <span>{{ row.visitCount | number }} visits</span>
-              <span>{{ row.uniqueVisitors | number }} visitors</span>
-              <span>{{ row.visitedDestinations | number }} destinations</span>
+              <span>{{ row.favoriteAdds | number }} favorites</span>
+              <span>{{ row.plannerAdds | number }} planner adds</span>
+              <span>{{ row.reviewCount | number }} reviews</span>
+              <span>{{ row.engagedDestinations | number }} destinations</span>
+              <span>{{ row.averageRating | number:'1.1-1' }} avg rating</span>
             </div>
           </div>
         </div>
 
         <ng-template #emptyRegionVisits>
-          <p class="empty-note">No region visit data is available for this period.</p>
+          <p class="empty-note">No region engagement data is available for this period.</p>
         </ng-template>
       </article>
 
