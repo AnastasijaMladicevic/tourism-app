@@ -413,6 +413,36 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     }
   }
 
+  getStatusBadgeClass(status: AdminDestinationStatus): string {
+    switch (status) {
+      case 'active':
+        return 'published';
+      case 'draft':
+        return 'draft';
+      case 'archived':
+        return 'rejected';
+      default:
+        return 'draft';
+    }
+  }
+
+  destinationLocationText(row: AdminDestinationRow): string {
+    const region = row.region?.trim();
+    const country = row.country?.trim();
+    if (region && country && region !== country) {
+      return `${region} · ${country}`;
+    }
+    return region || country || '—';
+  }
+
+  getDestinationMediaStyle(row: AdminDestinationRow): Record<string, string> {
+    const image = row.mainImageUrl?.trim();
+    if (!image) {
+      return {};
+    }
+    return { 'background-image': `url("${image}")` };
+  }
+
   onRowMoreActions(_row: AdminDestinationRow, event: Event): void {
     event.stopPropagation();
     // Wire to a context menu when flows are ready.
