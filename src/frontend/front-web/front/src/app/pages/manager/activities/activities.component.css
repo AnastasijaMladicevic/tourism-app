@@ -1,39 +1,12 @@
 .activities-page {
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    padding: 20px 20px 24px;
+    gap: 16px;
+    padding: 18px;
     min-height: calc(100vh - 62px);
-    color: #1f2937;
+    color: #111827;
 }
 
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 18px;
-    align-items: flex-start;
-}
-
-.eyebrow {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #6b7280;
-    margin-bottom: 6px;
-}
-
-.page-header h1 {
-    font-size: 28px;
-    line-height: 1.1;
-    margin-bottom: 6px;
-}
-
-.page-intro {
-    max-width: 680px;
-    color: #6b7280;
-    font-size: 14px;
-}
 
 .toolbar,
 .filters-panel,
@@ -768,65 +741,3 @@ tbody tr:hover,
     }
 }
 
-@media (max-width: 920px) {
-    .activities-page {
-        padding: 16px;
-    }
-
-    .table-header h2 {
-        font-size: 24px;
-    }
-
-    .page-header,
-    .table-footer,
-    .toolbar,
-    .filters-panel {
-        align-items: stretch;
-    }
-
-    .page-header,
-    .table-footer {
-        flex-direction: column;
-    }
-
-    .toolbar {
-        grid-template-columns: 1fr;
-    }
-
-    .toolbar-search {
-        max-width: none;
-    }
-
-    .filters-panel {
-        grid-template-columns: 1fr;
-    }
-
-    .filter-actions {
-        justify-content: stretch;
-        justify-self: stretch;
-    }
-
-    .filter-actions .filter-btn {
-        width: 100%;
-    }
-
-    .pagination-buttons {
-        flex-wrap: wrap;
-    }
-
-    .page-size-control {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .pagination-buttons .ghost-btn {
-        flex: 1 1 120px;
-        justify-content: center;
-    }
-
-    .schedule-list,
-    .detail-metrics,
-    .stats-row {
-        grid-template-columns: 1fr;
-    }
-}

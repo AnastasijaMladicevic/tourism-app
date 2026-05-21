@@ -13,7 +13,12 @@ import { MapComponent as SharedMapComponent } from '../../../shared/components/m
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, SharedMapComponent],
   templateUrl: './activities.component.html',
-  styleUrls: ['./activities.component.css']
+  styleUrls: [
+    './activities.component.css',
+    '../shared/manager-list-page-header.css',
+    '../shared/manager-list-page-responsive.css',
+    '../shared/manager-cc-page-parity.css'
+  ]
 })
 export class ManagerActivitiesComponent implements OnInit {
   private readonly activitiesService = inject(ActivitiesService);
@@ -362,6 +367,15 @@ export class ManagerActivitiesComponent implements OnInit {
     if (normalized === 'approved') return 'status-published';
     if (normalized === 'rejected') return 'status-archived';
     return 'status-pending';
+  }
+
+  get activitiesCountLabel(): string {
+    if (this.isLoading) {
+      return '…';
+    }
+
+    const count = this.totalCount;
+    return `${count} activit${count === 1 ? 'y' : 'ies'}`;
   }
 
   get pageStart(): number {
