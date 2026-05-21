@@ -419,7 +419,12 @@ export class AuthService {
     if (!response.token || !response.refreshToken || !response.user) {
       return;
     }
+    const role = response.user.roleName?.toLowerCase();
 
+    if (role !== 'tourist') {
+      this.logout().subscribe();
+      return;
+    }
     localStorage.setItem('token', response.token);
     localStorage.setItem('refreshToken', response.refreshToken);
     this.setCurrentUser(response.user);

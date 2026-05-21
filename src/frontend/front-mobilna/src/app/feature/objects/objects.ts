@@ -2,8 +2,10 @@ import {
   ChangeDetectorRef,
   Component,
   effect,
+  ElementRef,
   HostListener,
   OnInit,
+  ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -97,7 +99,7 @@ export class ObjectsComponent implements OnInit {
       void this.loadData();
     });
   }
-
+  @ViewChild('top') top!: ElementRef;
   ngOnInit(): void {
     this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
       this.isTracking = enabled;
@@ -352,9 +354,9 @@ export class ObjectsComponent implements OnInit {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos((lat1 * Math.PI) / 180) *
-        Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLng / 2) *
-        Math.sin(dLng / 2);
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
 
     return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
@@ -384,12 +386,14 @@ export class ObjectsComponent implements OnInit {
     if (this.currentPage === 1) return;
     this.currentPage--;
     void this.loadData();
+    this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
   nextPage(): void {
     if (!this.hasNextPage) return;
     this.currentPage++;
     void this.loadData();
+    this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
   @HostListener('document:click', ['$event'])
@@ -414,7 +418,7 @@ export class ObjectsComponent implements OnInit {
       distance: this.translationService.translate('common.nearest')
     };
 
-      return map[this.sortOption];
+    return map[this.sortOption];
   }
 
   isFavoritePending(objectId: number): boolean {

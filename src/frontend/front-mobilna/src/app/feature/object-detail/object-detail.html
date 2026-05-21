@@ -487,6 +487,17 @@
         (click)="submitReview()">
         {{ isSubmittingReview ? ('object.sending' | translate) : ('object.submitReview' | translate) }}
       </button>
+      @if (userReview) {
+        <button
+          class="delete-review-btn"
+          type="button"
+          (click)="deleteMyReview()"
+          [disabled]="isSubmittingReview"
+        >
+          <mat-icon>delete</mat-icon>
+          Obriši recenziju
+        </button>
+      }
     </div>
   </div>
 }
