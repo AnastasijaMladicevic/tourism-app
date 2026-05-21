@@ -194,7 +194,7 @@ export class DashboardComponent implements OnInit {
     this.bindUserGrowth(overview);
     this.bindRoleDistribution(overview.roleDistribution);
     this.bindDestinationsByRegion(overview);
-    this.bindAccountHealth(overview);
+    this.bindBanOverview(overview);
     this.bindCreatorRequests(overview);
     this.bindDestinationEngagement(overview);
     this.bindMapPoints(overview);
@@ -210,7 +210,7 @@ export class DashboardComponent implements OnInit {
     this.roleDonutSlices = [];
     this.roleDonutTotal = 0;
     this.regionRows = [];
-    this.healthGroups = [];
+    this.banRegionRows = [];
     this.creatorSlices = [];
     this.topDestinationRows = [];
     this.regionVisitRows = [];
@@ -239,6 +239,12 @@ export class DashboardComponent implements OnInit {
       label: def.label,
       color: def.color,
       linePath: this.buildLinePath(points.map(def.pick), this.userGrowthMaxY),
+      points: this.buildLinePoints(
+        points.map(def.pick),
+        this.userGrowthMaxY,
+        (value, index) =>
+          `${def.label}: ${value} on ${this.formatBucketLabel(points[index].date, overview.userGrowthGranularity)}`,
+      ),
     }));
 
     const labelCount = Math.min(6, points.length);
@@ -293,38 +299,12 @@ export class DashboardComponent implements OnInit {
     this.regionRows = rows;
   }
 
-  private bindAccountHealth(overview: AdminDashboardOverviewDto): void {
-    const health = overview.accountHealth;
-    this.healthGroups = [
-      {
-        label: 'Verification',
-        segments: [
-          { label: 'Verified', value: health.verified, color: '#059669', percent: 0 },
-          { label: 'Unverified', value: health.unverified, color: '#94a3b8', percent: 0 },
-        ],
-      },
-      {
-        label: 'Activity',
-        segments: [
-          { label: 'Active', value: health.active, color: '#1976d2', percent: 0 },
-          { label: 'Inactive', value: health.inactive, color: '#cbd5e1', percent: 0 },
-        ],
-      },
-      {
-        label: 'Bans',
-        segments: [
-          { label: 'Temporary', value: health.temporarilyBanned, color: '#d97706', percent: 0 },
-          { label: 'Permanent', value: health.permanentlyBanned, color: '#dc2626', percent: 0 },
-        ],
-      },
-    ];
-
-    for (const group of this.healthGroups) {
-      const total = group.segments.reduce((sum, segment) => sum + segment.value, 0);
-      group.segments.forEach((segment) => {
-        segment.percent = total > 0 ? Math.round((segment.value / total) * 1000) / 10 : 0;
-      });
-    }
+  private bindBanOverview(overview: AdminDashboardOverviewDto): void {
+    const maxBanned = Math.max(...overview.banOverview.regions.map((row) => row.totalBanned), 1);
+    this.banRegionRows = overview.banOverview.regions.map((row) => ({
+      ...row,
+      barPercent: Math.round((row.totalBanned / maxBanned) * 1000) / 10,
+    }));
   }
 
   private bindCreatorRequests(overview: AdminDashboardOverviewDto): void {
@@ -456,6 +436,26 @@ export class DashboardComponent implements OnInit {
         return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
       })
       .join(' ');
+  }
+
+  private buildLinePoints(
+    values: number[],
+    maxY: number,
+    titleFactory: (value: number, index: number) => string,
+  ): UserGrowthPoint[] {
+    if (!values.length || maxY <= 0) {
+      return [];
+    }
+
+    const width = 100;
+    const height = 100;
+
+    return values.map((value, index) => ({
+      x: (index / Math.max(values.length - 1, 1)) * width,
+      y: height - (value / maxY) * height,
+      value,
+      title: titleFactory(value, index),
+    }));
   }
 
   private formatBucketLabel(dateIso: string, granularity: string): string {
