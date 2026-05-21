@@ -135,12 +135,15 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
         if (!this.selectedActivity || !this.activities.some((activity) => activity.id === this.selectedActivity?.id)) {
           this.setSelectedActivity(this.activities[0] ?? null);
         } else if (this.selectedActivity) {
+          this.selectedActivityDetails = this.selectedActivity;
           this.loadSelectedActivityDetails(this.selectedActivity.id);
+          this.loadHeroImagesForSelectedActivity();
         } else {
           this.selectedActivityDetails = null;
         }
 
         this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: (error) => {
         this.errorMessage = error?.error?.message ?? 'Failed to load activities';
@@ -388,12 +391,12 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
   }
 
   get selectedBanner(): string {
-    const activity = this.selectedActivityDetails ?? this.selectedActivity;
-    if (activity?.mainImageUrl) {
-      return this.normalizeImageUrl(activity.mainImageUrl);
-    }
+    return this.getHeroFallbackUrl(this.selectedActivityDetails ?? this.selectedActivity);
+  }
 
-    return ContentCreatorActivitiesComponent.DEFAULT_BANNER_URL;
+  get heroMediaFallbackStyle(): Record<string, string> {
+    const url = this.selectedBanner;
+    return url ? { 'background-image': `url("${url}")` } : {};
   }
 
   get hasSelectedActivityCoordinates(): boolean {
@@ -434,24 +437,39 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
     }
 
     this.selectedActivityDetails = activity;
+    this.loadHeroImagesForSelectedActivity();
 
     if (activity.id !== previousId) {
       this.loadSelectedActivityDetails(activity.id);
-      this.loadHeroImagesForSelectedActivity();
     }
+  }
+
+  private getHeroFallbackUrl(activity: ActivityDto | null): string {
+    if (!activity) {
+      return ContentCreatorActivitiesComponent.DEFAULT_BANNER_URL;
+    }
+
+    if (activity.mainImageUrl) {
+      return this.normalizeImageUrl(activity.mainImageUrl);
+    }
+
+    return ContentCreatorActivitiesComponent.DEFAULT_BANNER_URL;
   }
 
   private loadHeroImagesForSelectedActivity(): void {
     this.stopHeroImageRotation();
-    this.heroImageUrls = [];
-    this.currentHeroImageIndex = 0;
 
     const activity = this.selectedActivityDetails ?? this.selectedActivity;
     if (!activity) {
+      this.heroImageUrls = [];
+      this.currentHeroImageIndex = 0;
       return;
     }
 
-    const fallbackUrl = this.selectedBanner;
+    const fallbackUrl = this.getHeroFallbackUrl(activity);
+    this.heroImageUrls = [fallbackUrl];
+    this.currentHeroImageIndex = 0;
+    this.cdr.detectChanges();
 
     this.activitiesService.getImages(activity.id).subscribe({
       next: (images: ActivityImageDto[]) => {
@@ -499,6 +517,23 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
     }
   }
 
+  private syncHeroFallbackAfterDetailsLoad(): void {
+    const fallbackUrl = this.getHeroFallbackUrl(this.selectedActivityDetails ?? this.selectedActivity);
+
+    if (!fallbackUrl) {
+      return;
+    }
+
+    if (this.heroImageUrls.length === 0) {
+      this.heroImageUrls = [fallbackUrl];
+      return;
+    }
+
+    if (this.heroImageUrls.length === 1) {
+      this.heroImageUrls = [fallbackUrl];
+    }
+  }
+
   private normalizeImageUrl(value: string): string {
     const trimmed = value.trim();
 
@@ -525,6 +560,7 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
       next: (activity) => {
         this.selectedActivityDetails = activity;
         this.isDetailsLoading = false;
+        this.syncHeroFallbackAfterDetailsLoad();
         this.cdr.detectChanges();
       },
       error: () => {
