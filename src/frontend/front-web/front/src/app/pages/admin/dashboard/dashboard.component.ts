@@ -5,6 +5,7 @@ import { finalize } from 'rxjs';
 import { UserDto } from '../../../models/user.model';
 import { AuthService } from '../../../services/auth.service';
 import {
+  AdminDashboardBannedUsersByRegionDto,
   AdminDashboardOverviewDto,
   AdminDashboardRoleDistributionItemDto,
   AdminDashboardService,
@@ -25,6 +26,14 @@ interface UserGrowthSeries {
   label: string;
   color: string;
   linePath: string;
+  points: UserGrowthPoint[];
+}
+
+interface UserGrowthPoint {
+  x: number;
+  y: number;
+  value: number;
+  title: string;
 }
 
 interface RoleDonutSlice {
@@ -45,9 +54,8 @@ interface RegionCoverageRow {
   barPercent: number;
 }
 
-interface HealthGroup {
-  label: string;
-  segments: { label: string; value: number; color: string; percent: number }[];
+interface BanRegionRow extends AdminDashboardBannedUsersByRegionDto {
+  barPercent: number;
 }
 
 interface CreatorRequestSlice {
@@ -76,7 +84,7 @@ const PERIOD_OPTIONS: PeriodOption[] = [
 
 const ROLE_COLORS: Record<string, string> = {
   Tourist: '#0d9488',
-  ContentCreator: '#6366f1',
+  ContentCreator: '#8b5cf6',
   Manager: '#d97706',
   Admin: '#dc2626',
 };
@@ -113,7 +121,7 @@ export class DashboardComponent implements OnInit {
   roleDonutTotal = 0;
 
   regionRows: RegionCoverageRow[] = [];
-  healthGroups: HealthGroup[] = [];
+  banRegionRows: BanRegionRow[] = [];
   creatorSlices: CreatorRequestSlice[] = [];
 
   topDestinationRows: TopDestinationRow[] = [];
