@@ -1,44 +1,47 @@
 <div #mapPage class="map-page">
-  <div class="search-bar">
-    <div class="search-input">
-      <mat-icon>search</mat-icon>
-      <input
-        type="text"
-        placeholder="Search destinations..."
-        [(ngModel)]="searchQuery"
-        (input)="onSearchInput()"
-        (focus)="showSuggestions = searchResults.length > 0"
-        (blur)="onSearchBlur()"
-        autocomplete="off"
-      />
-      @if (searchQuery) {
-        <button class="clear-btn" (click)="clearSearch()">
-          <mat-icon>close</mat-icon>
-        </button>
-      }
-    </div>
-
-    @if (showSuggestions && searchResults.length > 0) {
-      <div class="suggestions">
-        @for (result of searchResults; track result.id) {
-          <div class="suggestion-item" (mousedown)="selectSuggestion(result)">
-            <div class="suggestion-item__image">
-              @if (result.image) {
-                <img [src]="result.image" [alt]="result.name" />
-              } @else {
-                <mat-icon>{{ result.icon }}</mat-icon>
-              }
-            </div>
-            <div class="suggestion-item__body">
-              <span class="suggestion-item__name">{{ result.name }}</span>
-              <span class="suggestion-item__meta">{{ result.typeName }} · {{ result.location }}</span>
-            </div>
-          </div>
+  <div class="map-page__toolbar">
+    <div class="search-bar">
+      <div class="search-input">
+        <mat-icon>search</mat-icon>
+        <input
+          type="text"
+          placeholder="Search destinations..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearchInput()"
+          (focus)="showSuggestions = searchResults.length > 0"
+          (blur)="onSearchBlur()"
+          autocomplete="off"
+        />
+        @if (searchQuery) {
+          <button class="clear-btn" (click)="clearSearch()">
+            <mat-icon>close</mat-icon>
+          </button>
         }
       </div>
-    }
+
+      @if (showSuggestions && searchResults.length > 0) {
+        <div class="suggestions">
+          @for (result of searchResults; track result.id) {
+            <div class="suggestion-item" (mousedown)="selectSuggestion(result)">
+              <div class="suggestion-item__image">
+                @if (result.image) {
+                  <img [src]="result.image" [alt]="result.name" />
+                } @else {
+                  <mat-icon>{{ result.icon }}</mat-icon>
+                }
+              </div>
+              <div class="suggestion-item__body">
+                <span class="suggestion-item__name">{{ result.name }}</span>
+                <span class="suggestion-item__meta">{{ result.typeName }} · {{ result.location }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
   </div>
 
+  <div class="map-page__canvas">
   <app-admin-platform-map
     mapId="main-map"
     [initialLat]="mapInitialLat"
@@ -124,4 +127,5 @@
       </div>
     </div>
   }
+  </div>
 </div>

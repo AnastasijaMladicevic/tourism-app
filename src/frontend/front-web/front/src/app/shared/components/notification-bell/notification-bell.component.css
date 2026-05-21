@@ -56,10 +56,12 @@
 
 .notification-panel {
   position: absolute;
-  top: calc(100% + 12px);
+  top: calc(100% + 10px);
   right: 0;
-  width: 380px;
-  max-height: min(72vh, 560px);
+  display: flex;
+  flex-direction: column;
+  width: min(380px, calc(100vw - 24px));
+  max-height: min(28rem, calc(100dvh - 5.5rem));
   overflow: hidden;
   border-radius: 22px;
   border: 1px solid rgba(201, 224, 241, 0.95);
@@ -68,12 +70,13 @@
   box-shadow:
     0 24px 70px rgba(31, 41, 55, 0.16),
     0 8px 24px rgba(37, 99, 235, 0.08);
-  z-index: 300;
+  z-index: 2600;
   backdrop-filter: blur(14px);
 }
 
 .panel-header {
   display: flex;
+  flex-shrink: 0;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
@@ -109,9 +112,24 @@
 }
 
 .panel-body {
-  max-height: calc(min(72vh, 560px) - 72px);
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.panel-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.panel-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
 }
 
 .notification-row {
