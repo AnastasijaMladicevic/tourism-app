@@ -1,11 +1,11 @@
-<section class="manager-events-page">
-  <div class="page-head">
+<section class="manager-events-page manager-list-page">
+  <header class="page-head">
     <div>
       <p class="breadcrumbs">Dashboard <span>></span> Events</p>
       <h1>Events</h1>
-      <p class="subtle-text">{{ managedDestinationLabel }}</p>
+      <p class="page-subtitle">Total: {{ eventsCountLabel }}</p>
     </div>
-  </div>
+  </header>
 
   <div class="toolbar card">
     <label class="search-field" aria-label="Search events">
@@ -24,9 +24,9 @@
       Filters ready
     </button>
 
-    <button type="button" class="ghost-btn" (click)="onMoreFilters()">
-      <span class="material-symbols-outlined"> filter_alt </span>
-      More Filters
+    <button type="button" class="ghost-btn filters-toggle-btn" aria-label="More filters" (click)="onMoreFilters()">
+      <span class="material-symbols-outlined">filter_alt</span>
+      <span class="filters-toggle-label">More Filters</span>
     </button>
   </div>
 
@@ -86,8 +86,8 @@
 
   <div class="event-content-grid">
     <div class="event-main-column">
-      <div class="stats-row">
-        <article class="stat-card" *ngFor="let stat of stats" [attr.data-tone]="stat.tone">
+      <div class="insights-grid">
+        <article class="insight-card card" *ngFor="let stat of stats" [attr.data-tone]="stat.tone === 'neutral' ? 'amber' : stat.tone">
           <p>{{ stat.label }}</p>
           <strong>{{ stat.value }}</strong>
           <span>{{ stat.hint }}</span>
@@ -104,7 +104,50 @@
         } @else if (errorMessage) {
           <div class="state state-error">{{ errorMessage }}</div>
         } @else {
-          <div class="table-scroll">
+          <div class="events-mobile-list">
+            @for (event of pagedEvents; track event.id) {
+              <article
+                class="event-mobile-card"
+                [class.is-active]="selectedEvent?.id === event.id"
+                (click)="onViewEvent(event)"
+              >
+                <span
+                  class="event-mobile-card__media"
+                  [style.background-image]="event.mainImageUrl ? 'url(' + event.mainImageUrl + ')' : ''"
+                ></span>
+                <div class="event-mobile-card__content">
+                  <div class="event-mobile-card__head">
+                    <h3>{{ event.name }}</h3>
+                    <span class="status-chip status-chip--compact" [ngClass]="getStatusBadgeClass(event.status)">
+                      {{ event.status || 'Draft' }}
+                    </span>
+                  </div>
+                  <p class="event-mobile-card__date">
+                    <span class="material-symbols-outlined" aria-hidden="true">event</span>
+                    {{ formatDate(event.startDate) }}
+                  </p>
+                  <p class="event-mobile-card__location">
+                    <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
+                    {{ getLocationLabel(event) }}
+                  </p>
+                  <div class="event-mobile-card__meta">
+                    <span class="event-mobile-card__type">{{ getCategoryLabel(event) }}</span>
+                    <span class="event-mobile-card__capacity">{{ getCapacityLabel(event) }}</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  class="event-mobile-card__edit"
+                  title="Review event"
+                  (click)="onEditEvent(event); $event.stopPropagation()"
+                >
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+              </article>
+            }
+          </div>
+
+          <div class="table-scroll events-table-wrap">
             <table>
               <thead>
                 <tr>
@@ -198,8 +241,9 @@
       </section>
     </div>
 
-    <aside class="detail-column card">
+    <aside class="detail-column card" [class.has-selection]="!!selectedEvent">
       @if (selectedEvent) {
+        <p class="detail-sheet-label">Selected event</p>
         <div class="activity-hero">
           <div
             class="hero-media"

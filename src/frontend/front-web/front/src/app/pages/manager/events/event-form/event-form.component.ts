@@ -27,7 +27,7 @@ interface RelatedActivity {
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent],
   templateUrl: './event-form.component.html',
-  styleUrls: ['./event-form.component.css']
+  styleUrls: ['./event-form.component.css', '../../shared/manager-list-page-header.css', '../../shared/manager-list-page-responsive.css']
 })
 export class ManagerEventFormComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
