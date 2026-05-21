@@ -11,6 +11,7 @@ namespace TuristickiVodic.Services
 {
     public class DestinationService : IDestinationService
     {
+        private static readonly TimeSpan EditLockDuration = TimeSpan.FromMinutes(3);
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
         private readonly ITranslationService _translationService;
@@ -191,6 +192,30 @@ namespace TuristickiVodic.Services
             return _mapper.Map<DestinationDto>(created);
         }
 
+        public async Task<DestinationEditLockDto?> AcquireEditLockAsync(int destinationId, int requestingUserId)
+        {
+            return await UpsertEditLockAsync(destinationId, requestingUserId);
+        }
+
+        public async Task<DestinationEditLockDto?> RefreshEditLockAsync(int destinationId, int requestingUserId)
+        {
+            return await UpsertEditLockAsync(destinationId, requestingUserId);
+        }
+
+        public async Task<bool> ReleaseEditLockAsync(int destinationId, int requestingUserId)
+        {
+            var affected = await _context.Database.ExecuteSqlInterpolatedAsync($@"
+                UPDATE ""Destinations""
+                SET ""EditLockedByUserId"" = NULL,
+                    ""EditLockAcquiredAtUtc"" = NULL,
+                    ""EditLockExpiresAtUtc"" = NULL
+                WHERE ""Id"" = {destinationId}
+                  AND ""EditLockedByUserId"" = {requestingUserId};
+            ");
+
+            return affected > 0;
+        }
+
         // Samo Admin može da menja destinacije.
         // Promena menadžera ide kroz AssignManagerAsync - odvojeni Admin endpoint.
         public async Task<DestinationDto?> UpdateAsync(int id, UpdateDestinationDto dto, int requestingUserId, string roleName)
@@ -202,6 +227,8 @@ namespace TuristickiVodic.Services
 
             if (destination == null)
                 return null;
+
+            EnsureDestinationEditable(destination, requestingUserId);
 
             if (dto.DestinationTypeId.HasValue)
             {
@@ -238,6 +265,7 @@ namespace TuristickiVodic.Services
                 destination.Geolocation = CreatePoint(dto.Longitude, dto.Latitude);
 
             destination.UpdatedAt = DateTime.UtcNow;
+            destination.EditLockExpiresAtUtc = DateTime.UtcNow.Add(EditLockDuration);
 
             await _context.SaveChangesAsync();
 
@@ -253,7 +281,7 @@ namespace TuristickiVodic.Services
         /// Samo Admin može da promeni menadžera destinacije.
         /// Novi menadžer mora da ima rolu Manager i ne sme već da vodi drugu destinaciju.
         /// Stari menadžer se oslobađa (ManagedDestinationId -> null).
-        public async Task<DestinationDto?> AssignManagerAsync(int destinationId, int newManagerUserId)
+        public async Task<DestinationDto?> AssignManagerAsync(int destinationId, int newManagerUserId, int requestingUserId)
         {
             var destination = await _context.Destinations
                 .Include(d => d.Region)
@@ -262,6 +290,8 @@ namespace TuristickiVodic.Services
 
             if (destination == null)
                 return null;
+
+            EnsureDestinationEditable(destination, requestingUserId);
 
             var newManager = await _context.Users
                 .Include(u => u.Role)
@@ -292,6 +322,7 @@ namespace TuristickiVodic.Services
             // Dodeli novog menadžera
             destination.ManagedByUserId = newManagerUserId;
             destination.UpdatedAt = DateTime.UtcNow;
+            destination.EditLockExpiresAtUtc = DateTime.UtcNow.Add(EditLockDuration);
 
             newManager.ManagedDestinationId = destinationId;
             newManager.UpdatedAt = DateTime.UtcNow;
@@ -372,6 +403,127 @@ namespace TuristickiVodic.Services
             return isDesc
                 ? query.OrderByDescending(d => d.Name)
                 : query.OrderBy(d => d.Name);
+        }
+
+        private async Task<DestinationEditLockDto?> UpsertEditLockAsync(int destinationId, int requestingUserId)
+        {
+            var exists = await _context.Destinations
+                .AsNoTracking()
+                .AnyAsync(d => d.Id == destinationId);
+
+            if (!exists)
+                return null;
+
+            var now = DateTime.UtcNow;
+            var expiresAt = now.Add(EditLockDuration);
+
+            await _context.Database.ExecuteSqlInterpolatedAsync($@"
+                UPDATE ""Destinations""
+                SET ""EditLockedByUserId"" = {requestingUserId},
+                    ""EditLockAcquiredAtUtc"" = CASE
+                        WHEN ""EditLockedByUserId"" = {requestingUserId} AND ""EditLockAcquiredAtUtc"" IS NOT NULL
+                            THEN ""EditLockAcquiredAtUtc""
+                        ELSE {now}
+                    END,
+                    ""EditLockExpiresAtUtc"" = {expiresAt}
+                WHERE ""Id"" = {destinationId}
+                  AND (
+                      ""EditLockedByUserId"" IS NULL
+                      OR ""EditLockedByUserId"" = {requestingUserId}
+                      OR ""EditLockExpiresAtUtc"" IS NULL
+                      OR ""EditLockExpiresAtUtc"" <= {now}
+                  );
+            ");
+
+            return await BuildEditLockDtoAsync(destinationId, requestingUserId);
+        }
+
+        private void EnsureDestinationEditable(Destination destination, int requestingUserId)
+        {
+            var now = DateTime.UtcNow;
+            if (!IsLockActive(destination, now))
+            {
+                destination.EditLockedByUserId = requestingUserId;
+                destination.EditLockAcquiredAtUtc = now;
+                destination.EditLockExpiresAtUtc = now.Add(EditLockDuration);
+                return;
+            }
+
+            if (destination.EditLockedByUserId == requestingUserId)
+                return;
+
+            throw new DestinationEditLockException(BuildEditLockDto(destination, requestingUserId, null, now));
+        }
+
+        private async Task<DestinationEditLockDto> BuildEditLockDtoAsync(int destinationId, int requestingUserId)
+        {
+            var lockProjection = await _context.Destinations
+                .AsNoTracking()
+                .Where(d => d.Id == destinationId)
+                .Select(d => new
+                {
+                    d.Id,
+                    d.EditLockedByUserId,
+                    d.EditLockAcquiredAtUtc,
+                    d.EditLockExpiresAtUtc
+                })
+                .FirstAsync();
+
+            string? displayName = null;
+            if (lockProjection.EditLockedByUserId.HasValue)
+            {
+                displayName = await _context.Users
+                    .AsNoTracking()
+                    .Where(u => u.Id == lockProjection.EditLockedByUserId.Value)
+                    .Select(u => (u.FirstName + " " + u.LastName).Trim())
+                    .FirstOrDefaultAsync();
+            }
+
+            var destination = new Destination
+            {
+                Id = lockProjection.Id,
+                EditLockedByUserId = lockProjection.EditLockedByUserId,
+                EditLockAcquiredAtUtc = lockProjection.EditLockAcquiredAtUtc,
+                EditLockExpiresAtUtc = lockProjection.EditLockExpiresAtUtc
+            };
+
+            return BuildEditLockDto(destination, requestingUserId, displayName, DateTime.UtcNow);
+        }
+
+        private static DestinationEditLockDto BuildEditLockDto(
+            Destination destination,
+            int requestingUserId,
+            string? lockedByDisplayName,
+            DateTime now)
+        {
+            var isLocked = IsLockActive(destination, now);
+            var isOwnedByCurrentUser = isLocked && destination.EditLockedByUserId == requestingUserId;
+            var displayName = string.IsNullOrWhiteSpace(lockedByDisplayName) ? "Another admin" : lockedByDisplayName;
+
+            var message = !isLocked
+                ? "This destination is available for editing."
+                : isOwnedByCurrentUser
+                    ? "You are currently editing this destination."
+                    : $"{displayName} is currently editing this destination. Try again after the lock expires.";
+
+            return new DestinationEditLockDto
+            {
+                DestinationId = destination.Id,
+                IsLocked = isLocked,
+                IsOwnedByCurrentUser = isOwnedByCurrentUser,
+                LockedByUserId = isLocked ? destination.EditLockedByUserId : null,
+                LockedByDisplayName = isLocked ? displayName : null,
+                AcquiredAtUtc = isLocked ? destination.EditLockAcquiredAtUtc : null,
+                ExpiresAtUtc = isLocked ? destination.EditLockExpiresAtUtc : null,
+                Message = message
+            };
+        }
+
+        private static bool IsLockActive(Destination destination, DateTime now)
+        {
+            return destination.EditLockedByUserId.HasValue &&
+                   destination.EditLockExpiresAtUtc.HasValue &&
+                   destination.EditLockExpiresAtUtc.Value > now;
         }
 
         private async Task ApplyTranslationsAsync(List<DestinationDto> dtos, List<Destination> destinations, string? lang)

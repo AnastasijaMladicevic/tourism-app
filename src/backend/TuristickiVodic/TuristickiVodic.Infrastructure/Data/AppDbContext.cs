@@ -134,10 +134,19 @@ public class AppDbContext : DbContext
             .HasMethod("GIST");
 
         mb.Entity<Destination>()
+            .HasIndex(d => d.EditLockExpiresAtUtc);
+
+        mb.Entity<Destination>()
             .HasOne(d => d.CreatedBy)
             .WithMany(u => u.CreatedDestinations)
             .HasForeignKey(d => d.CreatedByUserId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        mb.Entity<Destination>()
+            .HasOne<User>()
+            .WithMany(u => u.LockedDestinations)
+            .HasForeignKey(d => d.EditLockedByUserId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         mb.Entity<Destination>()
             .HasOne(d => d.DestinationType)

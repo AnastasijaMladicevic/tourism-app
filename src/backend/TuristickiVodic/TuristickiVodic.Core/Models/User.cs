@@ -98,5 +98,6 @@ namespace TuristickiVodic.Core.Models
         public ICollection<TouristObject> CreatedObjects { get; set; } = new List<TouristObject>();
         public ICollection<Event> CreatedEvents { get; set; } = new List<Event>();
         public ICollection<Destination> CreatedDestinations { get; set; } = new List<Destination>();
+        public ICollection<Destination> LockedDestinations { get; set; } = new List<Destination>();
     }
 }

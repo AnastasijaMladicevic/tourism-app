@@ -29,6 +29,7 @@ import {
 } from '../../../services/admin-users.service';
 import {
   CreateDestinationDto,
+  DestinationEditLockDto,
   DestinationDto,
   DestinationImageDto,
   DestinationService,
@@ -64,9 +65,12 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   isLoadingRegions = true;
   errorMessage = '';
   draftSavedMessage = '';
+  editLockState: DestinationEditLockDto | null = null;
+  isEditBlocked = false;
   private savedDestinationId: number | null = null;
   editDestinationId: number | null = null;
   isLoadingDestination = false;
+  private editLockHeartbeatId: number | null = null;
   private readonly navigationState = (this.router.getCurrentNavigation()?.extras?.state ??
     history.state ??
     {}) as { linkedEntityCounts?: { objects?: number; localities?: number } };
@@ -111,7 +115,22 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     return this.editDestinationId != null;
   }
 
+  get editLockDisplayMessage(): string {
+    if (!this.editLockState || !this.isEditBlocked) {
+      return '';
+    }
+
+    const lockedBy = this.editLockState.lockedByDisplayName?.trim() || 'Another admin';
+    const expiresAt = this.editLockState.expiresAtUtc
+      ? this.formatUtcForDisplay(this.editLockState.expiresAtUtc)
+      : 'the current edit session ends';
+
+    return `${lockedBy} is currently editing this destination. Editing is temporarily disabled until ${expiresAt}.`;
+  }
+
   ngOnDestroy(): void {
+    this.stopEditLockHeartbeat();
+    this.releaseOwnedEditLock();
     this.destroy$.next();
     this.destroy$.complete();
     this.imagePreviews.forEach((url) => {
@@ -159,6 +178,16 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
             destination: this.destinationService.getById(this.editDestinationId),
             images: this.destinationService.getImages(this.editDestinationId).pipe(
               catchError(() => of([] as DestinationImageDto[]))
+            ),
+            editLock: this.destinationService.acquireEditLock(this.editDestinationId).pipe(
+              catchError((err) =>
+                of({
+                  destinationId: this.editDestinationId!,
+                  isLocked: true,
+                  isOwnedByCurrentUser: false,
+                  message: this.extractApiErrorMessage(err) || 'Could not start an edit session for this destination.'
+                } as DestinationEditLockDto)
+              )
             )
           }).pipe(
             catchError(() => {
@@ -180,6 +209,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         this.regions = [...regions].sort((a, b) => a.name.localeCompare(b.name));
         if (destination) {
           this.applyLoadedDestination(destination.destination, destination.images);
+          this.applyEditLockState(destination.editLock);
         }
         this.cdr.detectChanges();
         this.scrollPageToTop();
@@ -281,6 +311,78 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       });
     }
     this.isHydratingForm = false;
+  }
+
+  private applyEditLockState(lockState: DestinationEditLockDto | null): void {
+    this.editLockState = lockState;
+    this.isEditBlocked = Boolean(lockState?.isLocked && !lockState.isOwnedByCurrentUser);
+
+    if (lockState?.isOwnedByCurrentUser) {
+      this.startEditLockHeartbeat();
+    } else {
+      this.stopEditLockHeartbeat();
+    }
+  }
+
+  private startEditLockHeartbeat(): void {
+    if (this.editLockHeartbeatId != null || this.editDestinationId == null) {
+      return;
+    }
+
+    this.editLockHeartbeatId = window.setInterval(() => {
+      if (this.editDestinationId == null) {
+        return;
+      }
+
+      this.destinationService.refreshEditLock(this.editDestinationId).subscribe({
+        next: (lockState) => {
+          this.applyEditLockState(lockState);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          this.applyEditLockState({
+            destinationId: this.editDestinationId!,
+            isLocked: true,
+            isOwnedByCurrentUser: false,
+            message: this.extractApiErrorMessage(err) || 'Could not keep the edit session active.'
+          });
+          this.cdr.detectChanges();
+        }
+      });
+    }, 60000);
+  }
+
+  private stopEditLockHeartbeat(): void {
+    if (this.editLockHeartbeatId == null) {
+      return;
+    }
+
+    window.clearInterval(this.editLockHeartbeatId);
+    this.editLockHeartbeatId = null;
+  }
+
+  private releaseOwnedEditLock(): void {
+    if (!this.editDestinationId || !this.editLockState?.isOwnedByCurrentUser) {
+      return;
+    }
+
+    this.destinationService.releaseEditLock(this.editDestinationId).subscribe({
+      error: () => {
+        // Best effort release on page exit.
+      }
+    });
+  }
+
+  private formatUtcForDisplay(isoValue: string): string {
+    const parsed = new Date(isoValue);
+    if (Number.isNaN(parsed.getTime())) {
+      return 'the current edit session ends';
+    }
+
+    return new Intl.DateTimeFormat(undefined, {
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    }).format(parsed);
   }
 
 
@@ -695,14 +797,14 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   }
 
   onSaveDraft(): void {
-    if (!this.validateBasics() || this.isSubmitting) {
+    if (this.isEditBlocked || !this.validateBasics() || this.isSubmitting) {
       return;
     }
     this.persist(false);
   }
 
   onSubmit(): void {
-    if (!this.validateBasics() || this.isSubmitting) {
+    if (this.isEditBlocked || !this.validateBasics() || this.isSubmitting) {
       return;
     }
     this.persist(true);
@@ -795,9 +897,41 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
           this.draftSavedMessage = 'Draft saved to the server';
         },
         error: (err) => {
+          const lockState = this.extractLockState(err);
+          if (lockState) {
+            this.applyEditLockState(lockState);
+            this.errorMessage = '';
+            this.cdr.detectChanges();
+            return;
+          }
           this.errorMessage = this.extractApiErrorMessage(err);
         }
       });
+  }
+
+  private extractLockState(err: unknown): DestinationEditLockDto | null {
+    const maybeError = err as {
+      status?: number;
+      error?: Partial<DestinationEditLockDto> & { message?: string };
+    };
+
+    if (maybeError?.status !== 409 || !maybeError.error) {
+      return null;
+    }
+
+    const destinationId = Number(maybeError.error.destinationId ?? this.editDestinationId ?? 0);
+    return {
+      destinationId,
+      isLocked: Boolean(maybeError.error.isLocked ?? true),
+      isOwnedByCurrentUser: Boolean(maybeError.error.isOwnedByCurrentUser ?? false),
+      lockedByUserId: maybeError.error.lockedByUserId,
+      lockedByDisplayName: maybeError.error.lockedByDisplayName,
+      acquiredAtUtc: maybeError.error.acquiredAtUtc,
+      expiresAtUtc: maybeError.error.expiresAtUtc,
+      message: typeof maybeError.error.message === 'string' && maybeError.error.message.trim().length > 0
+        ? maybeError.error.message
+        : 'Another admin is currently editing this destination.'
+    };
   }
 
   private extractApiErrorMessage(err: unknown): string {
