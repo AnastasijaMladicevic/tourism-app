@@ -1,5 +1,5 @@
-<section class="manager-reports-page">
-  <div class="page-head">
+<section class="manager-reports-page manager-list-page">
+  <header class="page-head">
     <div class="page-head-copy">
       <p class="breadcrumbs">Dashboard <span>&gt;</span> Creator Reports</p>
       <h1>Content Creator Reports</h1>
@@ -10,9 +10,9 @@
     </div>
     <button type="button" class="primary-btn" (click)="openReportModal()">
       <span class="material-symbols-outlined">flag</span>
-      Report Content Creator
+      <span class="btn-label">Report Content Creator</span>
     </button>
-  </div>
+  </header>
 
   @if (errorMessage) {
     <div class="inline-alert error-banner card" role="alert">{{ errorMessage }}</div>
