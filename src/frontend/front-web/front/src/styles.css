@@ -648,6 +648,7 @@ router-outlet {
   display: contents;
 }
 
-body.cc-nav-open {
+body.cc-nav-open,
+body.manager-nav-open {
   overflow: hidden;
 }
