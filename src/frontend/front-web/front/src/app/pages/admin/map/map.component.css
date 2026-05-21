@@ -1,16 +1,25 @@
 :host {
   display: block;
-  height: 100%;
-  min-height: 0;
+  height: calc(100vh - 62px);
+  height: calc(100dvh - 62px);
+  overflow: hidden;
 }
 
 .map-page {
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 0;
-  overflow: auto;
+  min-height: calc(100vh - 62px);
+  min-height: calc(100dvh - 62px);
+  overflow: hidden;
   font-family: var(--font-base);
+}
+
+app-admin-platform-map {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
 }
 
 app-admin-platform-map.admin-platform-map--full,
@@ -376,4 +385,32 @@ app-admin-platform-map.admin-platform-map--full :is(.leaflet-container, .leaflet
   font-family: var(--font-base);
   font-size: 14px;
   font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .search-bar {
+    top: 12px;
+    left: 12px;
+    right: 12px;
+  }
+
+  .map-controls {
+    top: auto;
+    bottom: 24px;
+    right: 12px;
+    transform: none;
+  }
+
+  .bottom-card.bottom-card--anchored {
+    left: 12px !important;
+    right: 12px !important;
+    top: auto !important;
+    bottom: 72px !important;
+    width: auto !important;
+    max-width: none;
+  }
+
+  .bottom-card__image-wrap {
+    height: 120px;
+  }
 }
