@@ -449,20 +449,16 @@
 @media (min-width: 768px) {
 
   .settings-page {
-    padding: 18px 24px 36px;
+    padding: 18px 24px 0px;
   }
 
   .settings-shell {
     width: min(100%, 680px);
-    padding: 12px 0 24px;
+    padding: 12px 0 0;
   }
 
   .menu-title {
     font-size: 16px;
-  }
-
-  .menu-item {
-    padding: 18px;
   }
 
   .preference-row {

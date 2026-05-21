@@ -5,7 +5,6 @@
   min-height: 100vh;
   background: var(--bg);
   font-family: 'DM Sans', sans-serif;
-  padding-bottom: 72px;
 }
 
 // ─── Header ────────────────────────────────────────────────────────────────────
@@ -792,7 +791,7 @@
   }
 
   .spinner {
-    border-color: rgba(255,255,255,0.08);
+    border-color: rgba(255, 255, 255, 0.08);
     border-top-color: var(--primary);
   }
 }

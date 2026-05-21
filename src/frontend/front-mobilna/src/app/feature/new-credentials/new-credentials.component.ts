@@ -11,7 +11,6 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import { AuthService, ChangePasswordDto } from '../../services/auth';
-import { HeaderComponent } from '../header/header.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
 
@@ -28,7 +27,7 @@ const passwordMatchValidator: ValidatorFn = (control: AbstractControl): Validati
 @Component({
   selector: 'app-new-credentials',
   standalone: true,
-  imports: [HeaderComponent, ReactiveFormsModule, CommonModule, TranslatePipe],
+  imports: [ReactiveFormsModule, CommonModule, TranslatePipe],
   templateUrl: './new-credentials.component.html',
   styleUrl: './new-credentials.component.scss',
 })
@@ -51,7 +50,7 @@ export class NewCredentialsComponent {
 
   constructor(
     private translationService: TranslationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.email = this.route.snapshot.queryParams['email'] ?? '';
@@ -96,35 +95,37 @@ export class NewCredentialsComponent {
     return /[\d\W]/.test(this.newPasswordValue);
   }
 
-    submit(): void {
-      this.errorMessage = '';
-      if (this.form.invalid) { this.form.markAllAsTouched(); return; }
+  submit(): void {
+    this.errorMessage = '';
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
 
-      // Forgot password flow
-      if (this.isForgotFlow) {
-        this.isLoading = true;
-        this.authService.resetPassword(
+    // Forgot password flow
+    if (this.isForgotFlow) {
+      this.isLoading = true;
+      this.authService.resetPassword(
         this.email,
         this.code,
         this.form.controls.newPassword.value ?? '',
         this.form.controls.confirmPassword.value ?? '',
         this.resetSessionToken
       ).pipe(
-          catchError(err => {
-            this.errorMessage = err?.error?.message ?? 'newCredentials.errors.resetFailed';
-            setTimeout(() => this.cdr.detectChanges());
-            return of(null);
-          }),
-          finalize(() => {this.isLoading = false;
-        setTimeout(() => this.cdr.detectChanges())})
-        ).subscribe(res => {
-          if (!res) return;
-          this.router.navigate(['/password-updated']);
-        });
-        return;
-      }
+        catchError(err => {
+          this.errorMessage = err?.error?.message ?? 'newCredentials.errors.resetFailed';
+          setTimeout(() => this.cdr.detectChanges());
+          return of(null);
+        }),
+        finalize(() => {
+          this.isLoading = false;
+          setTimeout(() => this.cdr.detectChanges())
+        })
+      ).subscribe(res => {
+        if (!res) return;
+        this.router.navigate(['/password-updated']);
+      });
+      return;
+    }
 
-  // Postojeći change password flow...
+    // Postojeći change password flow...
     const user = this.authService.getCurrentUser();
     this.errorMessage = '';
     if (this.form.invalid) {
@@ -133,7 +134,7 @@ export class NewCredentialsComponent {
     }
 
     if (!user?.id) {
-      this.errorMessage ='newCredentials.errors.notLoggedIn';      
+      this.errorMessage = 'newCredentials.errors.notLoggedIn';
       return;
     }
 
