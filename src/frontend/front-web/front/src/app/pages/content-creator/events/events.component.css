@@ -955,16 +955,6 @@ tbody tr:hover,
   }
 }
 
-@media (max-width: 1024px) {
-  .insights-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .insights-grid .insight-card:last-child {
-    grid-column: 1 / -1;
-  }
-}
-
 @media (max-width: 920px) {
   .events-page {
     padding: 18px 18px 12px;
@@ -1081,53 +1071,6 @@ tbody tr:hover,
   .main-column {
     gap: 10px;
     padding-inline: 16px;
-  }
-
-  .insights-grid {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    margin-inline: 0;
-    padding: 0 0 6px;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 16px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  .insights-grid::after {
-    content: '';
-    flex: 0 0 4px;
-  }
-
-  .insights-grid::-webkit-scrollbar {
-    display: none;
-  }
-
-  .insights-grid,
-  .insights-grid .insight-card:last-child {
-    grid-template-columns: none;
-    grid-column: auto;
-  }
-
-  .insight-card {
-    flex: 0 0 min(72vw, 260px);
-    scroll-snap-align: start;
-    padding: 12px;
-    border-radius: 16px;
-  }
-
-  .insight-card p {
-    font-size: 10px;
-  }
-
-  .insight-card strong {
-    font-size: 22px;
-    margin: 6px 0 2px;
-  }
-
-  .insight-card span {
-    font-size: 11px;
   }
 
   .table-card {

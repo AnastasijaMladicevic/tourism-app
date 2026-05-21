@@ -18,7 +18,11 @@ interface ActivityInsightCard {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, SharedMapComponent],
   templateUrl: './activities.component.html',
-  styleUrls: ['./activities.component.css', '../shared/cc-list-page-header.css']
+  styleUrls: [
+    './activities.component.css',
+    '../shared/cc-list-page-header.css',
+    '../shared/cc-page-stats-scroll.css'
+  ]
 })
 export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
   private readonly activitiesService = inject(ActivitiesService);

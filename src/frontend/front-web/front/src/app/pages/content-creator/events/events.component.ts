@@ -25,7 +25,11 @@ interface EventScheduleRow {
   standalone: true,
   imports: [CommonModule, FormsModule, SharedMapComponent],
   templateUrl: './events.component.html',
-  styleUrls: ['./events.component.css', '../shared/cc-list-page-header.css']
+  styleUrls: [
+    './events.component.css',
+    '../shared/cc-list-page-header.css',
+    '../shared/cc-page-stats-scroll.css'
+  ]
 })
 export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
   private readonly eventService = inject(EventService);

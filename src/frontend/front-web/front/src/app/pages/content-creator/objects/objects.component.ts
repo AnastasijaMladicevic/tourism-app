@@ -17,7 +17,11 @@ interface WorkingHoursRow {
   standalone: true,
   imports: [CommonModule, FormsModule, SharedMapComponent],
   templateUrl: './objects.component.html',
-  styleUrls: ['./objects.component.css', '../shared/cc-list-page-header.css']
+  styleUrls: [
+    './objects.component.css',
+    '../shared/cc-list-page-header.css',
+    '../shared/cc-page-stats-scroll.css'
+  ]
 })
 export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
   private readonly objectService = inject(ObjectService);
