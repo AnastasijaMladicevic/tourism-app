@@ -92,6 +92,8 @@ namespace TuristickiVodic.Services
 
             var mappedItems = _mapper.Map<List<DestinationDto>>(destinations);
             await ApplyTranslationsAsync(mappedItems, destinations, query.Lang);
+            if (role == RoleType.Admin.ToString() && userId.HasValue)
+                await ApplyEditLocksAsync(mappedItems, destinations, userId.Value);
 
             return new PagedResultDto<DestinationDto>
             {
@@ -129,6 +131,8 @@ namespace TuristickiVodic.Services
 
             var dto = _mapper.Map<DestinationDto>(destination);
             await ApplyTranslationsAsync(dto, destination, lang);
+            if (role == RoleType.Admin.ToString() && userId.HasValue)
+                dto.EditLock = await BuildEditLockDtoAsync(destination, userId.Value);
             return dto;
         }
 
@@ -490,6 +494,20 @@ namespace TuristickiVodic.Services
             return BuildEditLockDto(destination, requestingUserId, displayName, DateTime.UtcNow);
         }
 
+        private async Task<DestinationEditLockDto> BuildEditLockDtoAsync(Destination destination, int requestingUserId)
+        {
+            if (!destination.EditLockedByUserId.HasValue)
+                return BuildEditLockDto(destination, requestingUserId, null, DateTime.UtcNow);
+
+            var displayName = await _context.Users
+                .AsNoTracking()
+                .Where(u => u.Id == destination.EditLockedByUserId.Value)
+                .Select(u => (u.FirstName + " " + u.LastName).Trim())
+                .FirstOrDefaultAsync();
+
+            return BuildEditLockDto(destination, requestingUserId, displayName, DateTime.UtcNow);
+        }
+
         private static DestinationEditLockDto BuildEditLockDto(
             Destination destination,
             int requestingUserId,
@@ -524,6 +542,41 @@ namespace TuristickiVodic.Services
             return destination.EditLockedByUserId.HasValue &&
                    destination.EditLockExpiresAtUtc.HasValue &&
                    destination.EditLockExpiresAtUtc.Value > now;
+        }
+
+        private async Task ApplyEditLocksAsync(List<DestinationDto> dtos, List<Destination> destinations, int requestingUserId)
+        {
+            if (dtos.Count == 0 || destinations.Count == 0)
+                return;
+
+            var now = DateTime.UtcNow;
+            var destinationsById = destinations.ToDictionary(d => d.Id);
+            var activeLockUserIds = destinations
+                .Where(d => IsLockActive(d, now) && d.EditLockedByUserId.HasValue)
+                .Select(d => d.EditLockedByUserId!.Value)
+                .Distinct()
+                .ToList();
+
+            var displayNamesByUserId = activeLockUserIds.Count == 0
+                ? new Dictionary<int, string>()
+                : await _context.Users
+                    .AsNoTracking()
+                    .Where(u => activeLockUserIds.Contains(u.Id))
+                    .ToDictionaryAsync(
+                        u => u.Id,
+                        u => (u.FirstName + " " + u.LastName).Trim());
+
+            foreach (var dto in dtos)
+            {
+                if (!destinationsById.TryGetValue(dto.Id, out var destination))
+                    continue;
+
+                string? displayName = null;
+                if (destination.EditLockedByUserId.HasValue)
+                    displayNamesByUserId.TryGetValue(destination.EditLockedByUserId.Value, out displayName);
+
+                dto.EditLock = BuildEditLockDto(destination, requestingUserId, displayName, now);
+            }
         }
 
         private async Task ApplyTranslationsAsync(List<DestinationDto> dtos, List<Destination> destinations, string? lang)

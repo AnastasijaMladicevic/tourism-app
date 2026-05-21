@@ -9,6 +9,7 @@ import { MapComponent as SharedMapComponent } from '../../../shared/components/m
 import { AdminUserListItemDto, AdminUsersService } from '../../../services/admin-users.service';
 import {
   DestinationDto,
+  DestinationEditLockDto,
   DestinationImageDto,
   DestinationService
 } from '../../../services/destination.service';
@@ -38,6 +39,7 @@ export interface AdminDestinationRow {
   latitude?: number;
   longitude?: number;
   updatedAt: string;
+  editLock?: DestinationEditLockDto;
 }
 
 interface DestinationInsightCard {
@@ -354,6 +356,10 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   }
 
   onEditDestination(row: AdminDestinationRow): void {
+    if (this.isEditLockedByAnother(row)) {
+      return;
+    }
+
     const pageOutlet = document.querySelector<HTMLElement>('.page-outlet');
     if (pageOutlet) {
       pageOutlet.scrollTop = 0;
@@ -367,6 +373,28 @@ export class DestinationsComponent implements OnInit, OnDestroy {
         }
       }
     });
+  }
+
+  isEditLockedByAnother(row: AdminDestinationRow | null | undefined): boolean {
+    return Boolean(row?.editLock?.isLocked && !row.editLock.isOwnedByCurrentUser);
+  }
+
+  getEditDisabledTitle(row: AdminDestinationRow | null | undefined): string {
+    if (!this.isEditLockedByAnother(row)) {
+      return 'Edit destination';
+    }
+
+    const lockedBy = row?.editLock?.lockedByDisplayName?.trim() || 'Another admin';
+    return `${lockedBy} is currently editing this destination.`;
+  }
+
+  getEditLockSummary(row: AdminDestinationRow | null | undefined): string {
+    if (!this.isEditLockedByAnother(row)) {
+      return '';
+    }
+
+    const lockedBy = row?.editLock?.lockedByDisplayName?.trim() || 'Another admin';
+    return `${lockedBy} is currently editing this destination.`;
   }
 
   formatStatus(status: AdminDestinationStatus): string {
@@ -532,7 +560,8 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       mainImageUrl: dto.mainImageUrl,
       latitude: dto.latitude,
       longitude: dto.longitude,
-      updatedAt
+      updatedAt,
+      editLock: dto.editLock
     };
   }
 

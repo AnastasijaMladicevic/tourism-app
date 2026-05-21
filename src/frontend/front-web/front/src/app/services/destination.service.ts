@@ -25,6 +25,7 @@ export interface DestinationDto {
   images?: DestinationImageDto[];
   isFavorite?: boolean;
   favoriteId?: number;
+  editLock?: DestinationEditLockDto;
 }
 
 export interface DestinationImageDto {
