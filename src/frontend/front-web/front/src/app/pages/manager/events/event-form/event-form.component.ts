@@ -272,20 +272,39 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
       .getImages(eventId)
       .pipe(catchError(() => of([] as EventImageDto[])))
       .subscribe((images) => {
-        const normalizedImages = Array.isArray(images) ? images : [];
-        this.eventImages = normalizedImages
-          .slice()
-          .sort((left, right) => Number(right.isMain) - Number(left.isMain));
+        this.eventImages = this.normalizeEventImages(images, fallbackImageUrl);
 
         this.selectedReviewImageUrl =
           this.eventImages.find((image) => image.isMain)?.url ??
           this.eventImages[0]?.url ??
-          fallbackImageUrl ??
+          fallbackImageUrl?.trim() ??
           '';
 
         this.form.patchValue({ imageUrl: this.selectedReviewImageUrl }, { emitEvent: false });
         this.cdr.detectChanges();
       });
+  }
+
+  private normalizeEventImages(images: EventImageDto[], fallbackImageUrl?: string): EventImageDto[] {
+    const fallback = fallbackImageUrl?.trim() ?? '';
+    const list = (Array.isArray(images) ? images : [])
+      .filter((image) => image.url?.trim())
+      .map((image) => ({ ...image, url: image.url.trim() }));
+
+    if (fallback && !list.some((image) => image.url === fallback)) {
+      list.unshift({
+        id: 0,
+        url: fallback,
+        isMain: !list.some((image) => image.isMain),
+        altText: '',
+      });
+    }
+
+    if (list.length === 0 && fallback) {
+      return [{ id: 0, url: fallback, isMain: true, altText: '' }];
+    }
+
+    return list.slice().sort((left, right) => Number(right.isMain) - Number(left.isMain));
   }
 
   toNumber(value: number | string | null | undefined): number | null {
@@ -406,15 +425,15 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
     this.form.patchValue({ imageUrl: this.selectedReviewImageUrl }, { emitEvent: false });
   }
 
-  get sideReviewImages(): EventImageDto[] {
-    const selectedUrl = this.imagePreviewUrl;
+  get sideGalleryImages(): EventImageDto[] {
+    const selectedUrl = this.imagePreviewUrl.trim();
     if (!selectedUrl) {
       return this.eventImages;
     }
 
     let removedSelectedOnce = false;
     return this.eventImages.filter((image) => {
-      const isSelected = image.url === selectedUrl;
+      const isSelected = image.url.trim() === selectedUrl;
       if (isSelected && !removedSelectedOnce) {
         removedSelectedOnce = true;
         return false;
