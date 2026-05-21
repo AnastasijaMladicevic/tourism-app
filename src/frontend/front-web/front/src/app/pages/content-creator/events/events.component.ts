@@ -25,7 +25,7 @@ interface EventScheduleRow {
   standalone: true,
   imports: [CommonModule, FormsModule, SharedMapComponent],
   templateUrl: './events.component.html',
-  styleUrls: ['./events.component.css']
+  styleUrls: ['./events.component.css', '../shared/cc-list-page-header.css']
 })
 export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
   private readonly eventService = inject(EventService);
@@ -402,6 +402,15 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
     }
 
     return event.description;
+  }
+
+  get eventsCountLabel(): string {
+    if (this.isLoading) {
+      return '…';
+    }
+
+    const count = this.totalCount;
+    return `${count} event${count === 1 ? '' : 's'}`;
   }
 
   get pageStart(): number {

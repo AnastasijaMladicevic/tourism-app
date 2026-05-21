@@ -1,14 +1,14 @@
 <section class="objects-page">
-  <div class="page-header">
+  <header class="page-header">
     <div class="page-header-copy">
       <h1>Objects</h1>
-      <p>Manage hotels, restaurants, and local businesses.</p>
+      <p class="page-subtitle">Total: {{ objectsCountLabel }}</p>
     </div>
     <button type="button" class="primary-btn page-header-cta" (click)="onCreateObject()">
       <span class="material-symbols-outlined">add</span>
       <span class="page-header-cta-label">Create Object</span>
     </button>
-  </div>
+  </header>
 
   <div class="toolbar card">
     <div class="toolbar-search">

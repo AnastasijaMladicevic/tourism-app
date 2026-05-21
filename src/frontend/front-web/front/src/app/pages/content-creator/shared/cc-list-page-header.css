@@ -1,0 +1,38 @@
+/* Shared list-page header chrome (matches reviews page). */
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.page-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 4px;
+  color: #111827;
+}
+
+.page-header-copy > p:not(.eyebrow),
+.page-header .page-intro {
+  margin-top: 2px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.page-header-eyebrow {
+  margin-bottom: 4px;
+}
+
+.page-subtitle {
+  margin-top: 2px;
+  color: #6b7280;
+  font-size: 13px;
+}
