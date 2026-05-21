@@ -1,4 +1,150 @@
-/* Horizontal scroll for top statistics only (Objects, Events, Activities, Localities, Reviews, Reports). */
+/* Horizontal scroll for top statistics until the host column fits all cards in one row. */
+
+.manager-list-page .main-column,
+.manager-objects-page .object-main-column,
+.manager-events-page .event-main-column,
+.manager-localities-page .locality-main-column,
+.manager-reviews-page,
+.manager-reports-page {
+  container-type: inline-size;
+  container-name: manager-stats-host;
+  min-width: 0;
+}
+
+@container manager-stats-host (max-width: 699px) {
+  .manager-objects-page .insights-grid,
+  .manager-events-page .insights-grid,
+  .activities-page.manager-list-page .insights-grid,
+  .manager-localities-page .insights-grid,
+  .manager-reports-page .stats-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    margin-inline: 0;
+    padding: 0 0 6px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    grid-template-columns: none;
+  }
+
+  .manager-objects-page .insights-grid::after,
+  .manager-events-page .insights-grid::after,
+  .activities-page.manager-list-page .insights-grid::after,
+  .manager-localities-page .insights-grid::after,
+  .manager-reports-page .stats-row::after {
+    content: '';
+    flex: 0 0 4px;
+  }
+
+  .manager-objects-page .insights-grid::-webkit-scrollbar,
+  .manager-events-page .insights-grid::-webkit-scrollbar,
+  .activities-page.manager-list-page .insights-grid::-webkit-scrollbar,
+  .manager-localities-page .insights-grid::-webkit-scrollbar,
+  .manager-reports-page .stats-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .manager-objects-page .insights-grid .insight-card:last-child,
+  .manager-events-page .insights-grid .insight-card:last-child,
+  .activities-page.manager-list-page .insights-grid .insight-card:last-child,
+  .manager-localities-page .insights-grid .insight-card:last-child,
+  .manager-reports-page .stats-row .stat-card:last-child {
+    grid-column: auto;
+  }
+
+  .manager-objects-page .insight-card,
+  .manager-events-page .insight-card,
+  .activities-page.manager-list-page .insight-card,
+  .manager-localities-page .insight-card,
+  .manager-reports-page .stat-card {
+    flex: 0 0 min(260px, 78%);
+    scroll-snap-align: start;
+    min-width: 0;
+  }
+}
+
+/* Reviews & Replies: four stat cards — scroll until all four fit in one row. */
+@container manager-stats-host (max-width: 919px) {
+  .manager-reviews-page .stats-row {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    margin-inline: 0;
+    padding: 0 0 6px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    grid-template-columns: none;
+  }
+
+  .manager-reviews-page .stats-row::after {
+    content: '';
+    flex: 0 0 4px;
+  }
+
+  .manager-reviews-page .stats-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .manager-reviews-page .stats-row .stat-card:last-child {
+    grid-column: auto;
+  }
+
+  .manager-reviews-page .stat-card {
+    flex: 0 0 min(240px, 42%);
+    scroll-snap-align: start;
+    min-width: 0;
+  }
+}
+
+@container manager-stats-host (min-width: 700px) {
+  .manager-objects-page .insights-grid,
+  .manager-events-page .insights-grid,
+  .activities-page.manager-list-page .insights-grid,
+  .manager-localities-page .insights-grid,
+  .manager-reports-page .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow-x: visible;
+    overflow-y: visible;
+    scroll-snap-type: none;
+  }
+
+  .manager-objects-page .insight-card,
+  .manager-events-page .insight-card,
+  .activities-page.manager-list-page .insight-card,
+  .manager-localities-page .insight-card,
+  .manager-reports-page .stat-card {
+    flex: unset;
+    min-width: 0;
+  }
+}
+
+@container manager-stats-host (min-width: 920px) {
+  .manager-reviews-page .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    overflow-x: visible;
+    overflow-y: visible;
+    scroll-snap-type: none;
+  }
+
+  .manager-reviews-page .stat-card {
+    flex: unset;
+    min-width: 0;
+  }
+}
 
 @media (max-width: 920px) {
   .manager-objects-page,
@@ -28,94 +174,60 @@
     max-width: 100%;
   }
 
-  .manager-objects-page .insights-grid,
-  .manager-events-page .insights-grid,
-  .activities-page.manager-list-page .insights-grid,
-  .manager-localities-page .insights-grid,
-  .manager-reviews-page .stats-row,
-  .manager-reports-page .stats-row {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 10px;
-    width: 100%;
-    max-width: 100%;
-    margin-inline: 0;
-    padding: 0 0 6px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 0;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    grid-template-columns: none;
+  @container manager-stats-host (max-width: 699px) {
+    .manager-objects-page .insight-card,
+    .manager-events-page .insight-card,
+    .activities-page.manager-list-page .insight-card,
+    .manager-localities-page .insight-card,
+    .manager-reports-page .stat-card {
+      padding: 12px;
+      border-radius: 16px;
+    }
+
+    .manager-objects-page .insight-card strong,
+    .manager-events-page .insight-card strong,
+    .activities-page.manager-list-page .insight-card strong,
+    .manager-localities-page .insight-card strong,
+    .manager-reports-page .stat-card strong {
+      font-size: 22px;
+      margin: 6px 0 2px;
+    }
+
+    .manager-objects-page .insight-card p,
+    .manager-events-page .insight-card p,
+    .activities-page.manager-list-page .insight-card p,
+    .manager-localities-page .insight-card p,
+    .manager-reports-page .stat-card p {
+      font-size: 10px;
+    }
+
+    .manager-objects-page .insight-card span,
+    .manager-events-page .insight-card span,
+    .activities-page.manager-list-page .insight-card span,
+    .manager-localities-page .insight-card span,
+    .manager-reports-page .stat-card span {
+      font-size: 11px;
+    }
   }
 
-  .manager-objects-page .insights-grid::after,
-  .manager-events-page .insights-grid::after,
-  .activities-page.manager-list-page .insights-grid::after,
-  .manager-localities-page .insights-grid::after,
-  .manager-reviews-page .stats-row::after,
-  .manager-reports-page .stats-row::after {
-    content: '';
-    flex: 0 0 4px;
-  }
+  @container manager-stats-host (max-width: 919px) {
+    .manager-reviews-page .stat-card {
+      padding: 12px;
+      border-radius: 16px;
+    }
 
-  .manager-objects-page .insights-grid::-webkit-scrollbar,
-  .manager-events-page .insights-grid::-webkit-scrollbar,
-  .activities-page.manager-list-page .insights-grid::-webkit-scrollbar,
-  .manager-localities-page .insights-grid::-webkit-scrollbar,
-  .manager-reviews-page .stats-row::-webkit-scrollbar,
-  .manager-reports-page .stats-row::-webkit-scrollbar {
-    display: none;
-  }
+    .manager-reviews-page .stat-card strong {
+      font-size: 22px;
+      margin: 6px 0 2px;
+    }
 
-  .manager-objects-page .insights-grid .insight-card:last-child,
-  .manager-events-page .insights-grid .insight-card:last-child,
-  .activities-page.manager-list-page .insights-grid .insight-card:last-child,
-  .manager-localities-page .insights-grid .insight-card:last-child,
-  .manager-reviews-page .stats-row .stat-card:last-child,
-  .manager-reports-page .stats-row .stat-card:last-child {
-    grid-column: auto;
-  }
+    .manager-reviews-page .stat-card p {
+      font-size: 10px;
+    }
 
-  .manager-objects-page .insight-card,
-  .manager-events-page .insight-card,
-  .activities-page.manager-list-page .insight-card,
-  .manager-localities-page .insight-card,
-  .manager-reviews-page .stat-card,
-  .manager-reports-page .stat-card {
-    flex: 0 0 min(72vw, 260px);
-    scroll-snap-align: start;
-    padding: 12px;
-    border-radius: 16px;
-  }
-
-  .manager-objects-page .insight-card strong,
-  .manager-events-page .insight-card strong,
-  .activities-page.manager-list-page .insight-card strong,
-  .manager-localities-page .insight-card strong,
-  .manager-reviews-page .stat-card strong,
-  .manager-reports-page .stat-card strong {
-    font-size: 22px;
-    margin: 6px 0 2px;
-  }
-
-  .manager-objects-page .insight-card p,
-  .manager-events-page .insight-card p,
-  .activities-page.manager-list-page .insight-card p,
-  .manager-localities-page .insight-card p,
-  .manager-reviews-page .stat-card p,
-  .manager-reports-page .stat-card p {
-    font-size: 10px;
-  }
-
-  .manager-objects-page .insight-card span,
-  .manager-events-page .insight-card span,
-  .activities-page.manager-list-page .insight-card span,
-  .manager-localities-page .insight-card span,
-  .manager-reviews-page .stat-card span,
-  .manager-reports-page .stat-card span {
-    font-size: 11px;
+    .manager-reviews-page .stat-card span {
+      font-size: 11px;
+    }
   }
 
   .manager-reports-page .table-scroll {

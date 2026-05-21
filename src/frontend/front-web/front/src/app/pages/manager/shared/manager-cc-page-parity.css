@@ -41,6 +41,10 @@
   gap: 14px;
 }
 
+.manager-reviews-page .stats-row {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .manager-list-page .stat-card,
 .manager-list-page .insight-card {
   background: #ffffff;
@@ -188,18 +192,6 @@
 .manager-list-page .detail-sheet-label {
   text-transform: uppercase;
   letter-spacing: 0.08em;
-}
-
-@media (max-width: 1024px) {
-  .manager-list-page .stats-row,
-  .manager-list-page .insights-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .manager-list-page .stats-row .stat-card:last-child,
-  .manager-list-page .insights-grid .insight-card:last-child {
-    grid-column: 1 / -1;
-  }
 }
 
 @media (max-width: 920px) {
