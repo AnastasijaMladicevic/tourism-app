@@ -269,13 +269,11 @@
   vector-effect: non-scaling-stroke;
 }
 
-.chart-point {
-  opacity: 0;
-  transition: opacity 0.12s ease, r 0.12s ease;
-}
-
-.chart-surface:hover .chart-point {
-  opacity: 0.96;
+.chart-point-hitbox {
+  fill: rgba(255, 255, 255, 0.001);
+  stroke: transparent;
+  pointer-events: all;
+  cursor: default;
 }
 
 .chart-empty {

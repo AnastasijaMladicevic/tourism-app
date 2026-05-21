@@ -36,6 +36,11 @@ interface UserGrowthPoint {
   title: string;
 }
 
+interface UserGrowthRenderPoint {
+  x: number;
+  y: number;
+}
+
 interface RoleDonutSlice {
   role: string;
   label: string;
@@ -228,23 +233,31 @@ export class DashboardComponent implements OnInit {
 
     const allValues = points.flatMap((p) => [p.tourists, p.contentCreators, p.managers, p.admins]);
     const maxVal = Math.max(...allValues, 0);
+    const seriesValueSets = seriesDefs.map((def) => ({
+      key: def.key,
+      values: points.map(def.pick),
+    }));
 
     this.userGrowthMaxY = Math.max(maxVal, 1);
     this.userGrowthYTop = String(maxVal);
     this.userGrowthYMid = maxVal === 0 ? '0' : String(Math.round(maxVal / 2));
     this.userGrowthIsEmpty = maxVal === 0;
 
+    const renderPointsBySeries = this.buildUserGrowthRenderPoints(seriesValueSets, this.userGrowthMaxY);
+
     this.userGrowthSeries = seriesDefs.map((def) => ({
       key: def.key,
       label: def.label,
       color: def.color,
-      linePath: this.buildLinePath(points.map(def.pick), this.userGrowthMaxY),
-      points: this.buildLinePoints(
-        points.map(def.pick),
-        this.userGrowthMaxY,
-        (value, index) =>
-          `${def.label}: ${value} on ${this.formatBucketLabel(points[index].date, overview.userGrowthGranularity)}`,
-      ),
+      linePath: this.buildLinePath(renderPointsBySeries[def.key] ?? []),
+      points: (renderPointsBySeries[def.key] ?? []).map((renderPoint, index) => {
+        const value = def.pick(points[index]);
+        return {
+          ...renderPoint,
+          value,
+          title: `${def.label}: ${value} on ${this.formatBucketLabel(points[index].date, overview.userGrowthGranularity)}`,
+        };
+      }),
     }));
 
     const labelCount = Math.min(6, points.length);
@@ -421,41 +434,67 @@ export class DashboardComponent implements OnInit {
     ].join(' ');
   }
 
-  private buildLinePath(values: number[], maxY: number): string {
-    if (!values.length || maxY <= 0) {
+  private buildLinePath(points: UserGrowthRenderPoint[]): string {
+    if (!points.length) {
       return '';
     }
 
-    const width = 100;
-    const height = 100;
-
-    return values
-      .map((value, index) => {
-        const x = (index / Math.max(values.length - 1, 1)) * width;
-        const y = height - (value / maxY) * height;
-        return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
+    return points
+      .map((point, index) => {
+        return `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
       })
       .join(' ');
   }
 
-  private buildLinePoints(
-    values: number[],
+  private buildUserGrowthRenderPoints(
+    seriesSets: { key: string; values: number[] }[],
     maxY: number,
-    titleFactory: (value: number, index: number) => string,
-  ): UserGrowthPoint[] {
-    if (!values.length || maxY <= 0) {
-      return [];
+  ): Record<string, UserGrowthRenderPoint[]> {
+    const result: Record<string, UserGrowthRenderPoint[]> = Object.fromEntries(
+      seriesSets.map((series) => [series.key, [] as UserGrowthRenderPoint[]]),
+    );
+
+    if (!seriesSets.length || maxY <= 0) {
+      return result;
     }
 
     const width = 100;
     const height = 100;
+    const count = seriesSets[0]?.values.length ?? 0;
 
-    return values.map((value, index) => ({
-      x: (index / Math.max(values.length - 1, 1)) * width,
-      y: height - (value / maxY) * height,
-      value,
-      title: titleFactory(value, index),
-    }));
+    for (let index = 0; index < count; index++) {
+      const x = (index / Math.max(count - 1, 1)) * width;
+      const groupedByValue = new Map<number, { key: string; value: number }[]>();
+
+      for (const series of seriesSets) {
+        const value = series.values[index] ?? 0;
+        const bucket = groupedByValue.get(value) ?? [];
+        bucket.push({ key: series.key, value });
+        groupedByValue.set(value, bucket);
+      }
+
+      for (const [value, bucket] of groupedByValue.entries()) {
+        const baseY = height - (value / maxY) * height;
+        const offsets = this.buildDuplicatePointOffsets(bucket.length);
+
+        bucket.forEach((series, bucketIndex) => {
+          const adjustedY = Math.min(99, Math.max(1, baseY + offsets[bucketIndex]));
+          result[series.key].push({ x, y: adjustedY });
+        });
+      }
+    }
+
+    return result;
+  }
+
+  private buildDuplicatePointOffsets(count: number): number[] {
+    if (count <= 1) {
+      return [0];
+    }
+
+    const spacing = 1.4;
+    const start = -((count - 1) * spacing) / 2;
+    return Array.from({ length: count }, (_, index) => start + index * spacing);
   }
 
   private formatBucketLabel(dateIso: string, granularity: string): string {

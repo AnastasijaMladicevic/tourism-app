@@ -90,11 +90,10 @@
               <g *ngFor="let series of userGrowthSeries">
                 <circle
                   *ngFor="let point of series.points"
-                  class="chart-point"
+                  class="chart-point-hitbox"
                   [attr.cx]="point.x"
                   [attr.cy]="point.y"
-                  [attr.r]="1.7"
-                  [attr.fill]="series.color"
+                  [attr.r]="3.6"
                 >
                   <title>{{ point.title }}</title>
                 </circle>
