@@ -1,73 +1,76 @@
 <div class="map-page">
-  <div class="search-bar">
-    <div class="search-input">
-      <mat-icon>search</mat-icon>
-      <input
-        type="text"
-        placeholder="Search objects, events, activities..."
-        [(ngModel)]="searchQuery"
-        (input)="onSearchInput()"
-        (focus)="showSuggestions = searchResults.length > 0"
-        (blur)="onSearchBlur()"
-        autocomplete="off"
-      />
-      @if (searchQuery) {
-        <button class="clear-btn" (click)="clearSearch()">
-          <mat-icon>close</mat-icon>
-        </button>
+  <div class="map-page__toolbar">
+    <div class="search-bar">
+      <div class="search-input">
+        <mat-icon>search</mat-icon>
+        <input
+          type="text"
+          placeholder="Search objects, events, activities..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearchInput()"
+          (focus)="showSuggestions = searchResults.length > 0"
+          (blur)="onSearchBlur()"
+          autocomplete="off"
+        />
+        @if (searchQuery) {
+          <button class="clear-btn" (click)="clearSearch()">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </div>
+
+      @if (showSuggestions && searchResults.length > 0) {
+        <div class="suggestions">
+          @for (result of searchResults; track `${result.markerType}-${result.id}`) {
+            <div class="suggestion-item" (mousedown)="selectSuggestion(result)">
+              <div class="suggestion-item__image">
+                @if (result.image) {
+                  <img [src]="result.image" [alt]="result.name" />
+                } @else {
+                  <mat-icon>{{ result.icon }}</mat-icon>
+                }
+              </div>
+              <div class="suggestion-item__body">
+                <span class="suggestion-item__name">{{ result.name }}</span>
+                <span class="suggestion-item__meta"
+                  >{{ result.typeName }} · {{ result.location }}</span
+                >
+              </div>
+            </div>
+          }
+        </div>
       }
     </div>
 
-    @if (showSuggestions && searchResults.length > 0) {
-      <div class="suggestions">
-        @for (result of searchResults; track `${result.markerType}-${result.id}`) {
-          <div class="suggestion-item" (mousedown)="selectSuggestion(result)">
-            <div class="suggestion-item__image">
-              @if (result.image) {
-                <img [src]="result.image" [alt]="result.name" />
-              } @else {
-                <mat-icon>{{ result.icon }}</mat-icon>
-              }
-            </div>
-            <div class="suggestion-item__body">
-              <span class="suggestion-item__name">{{ result.name }}</span>
-              <span class="suggestion-item__meta"
-                >{{ result.typeName }} · {{ result.location }}</span
-              >
-            </div>
-          </div>
-        }
-      </div>
-    }
+    <div class="filter-chips">
+      <button
+        class="chip"
+        [class.chip--active]="activeFilters.includes('object')"
+        (click)="toggleFilter('object')"
+      >
+        <mat-icon>apartment</mat-icon>
+        Objects
+      </button>
+      <button
+        class="chip"
+        [class.chip--active]="activeFilters.includes('event')"
+        (click)="toggleFilter('event')"
+      >
+        <mat-icon>event</mat-icon>
+        Events
+      </button>
+      <button
+        class="chip"
+        [class.chip--active]="activeFilters.includes('activity')"
+        (click)="toggleFilter('activity')"
+      >
+        <mat-icon>hiking</mat-icon>
+        Activities
+      </button>
+    </div>
   </div>
 
-  <div class="filter-chips">
-    <button
-      class="chip"
-      [class.chip--active]="activeFilters.includes('object')"
-      (click)="toggleFilter('object')"
-    >
-      <mat-icon>apartment</mat-icon>
-      Objects
-    </button>
-    <button
-      class="chip"
-      [class.chip--active]="activeFilters.includes('event')"
-      (click)="toggleFilter('event')"
-    >
-      <mat-icon>event</mat-icon>
-      Events
-    </button>
-    <button
-      class="chip"
-      [class.chip--active]="activeFilters.includes('activity')"
-      (click)="toggleFilter('activity')"
-    >
-      <mat-icon>hiking</mat-icon>
-      Activities
-    </button>
-  </div>
-
+  <div class="map-page__canvas">
   <div id="main-map" class="main-map"></div>
 
   <div class="map-controls">
@@ -133,4 +136,5 @@
       </div>
     </div>
   }
+  </div>
 </div>

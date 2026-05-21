@@ -124,7 +124,7 @@
   padding: 0 14px;
   gap: 14px;
   flex-shrink: 0;
-  z-index: 300;
+  z-index: 2500;
 }
 
 .topbar-logo {
@@ -180,6 +180,8 @@
 }
 
 .topbar-right {
+  position: relative;
+  z-index: 2601;
   margin-left: auto;
   display: flex;
   align-items: center;
@@ -266,6 +268,52 @@
   flex: 1;
   min-height: calc(100vh - 62px);
   background: #f7f8fa;
+  overflow-y: auto;
+}
+
+.page-outlet:has(.map-page) {
+  padding: 0;
+  overflow: hidden;
+  height: calc(100vh - 62px);
+  height: calc(100dvh - 62px);
+  min-height: calc(100vh - 62px);
+  min-height: calc(100dvh - 62px);
+}
+
+/* Map view: full-width map; nav drawer overlays map on small screens only. */
+.cc-layout--map .layout-shell .sidebar {
+  display: none;
+}
+
+.cc-layout--map .main {
+  width: 100%;
+}
+
+.cc-layout--map .page-outlet:has(.map-page) {
+  background: #e8eef3;
+}
+
+.cc-layout--map.sidebar-open .sidebar-backdrop.is-visible {
+  z-index: 2640;
+}
+
+.cc-layout--map.sidebar-open .sidebar {
+  z-index: 2650;
+}
+
+.cc-layout--map.sidebar-open .page-outlet .map-page__toolbar {
+  display: none;
+}
+
+@media (min-width: 901px) {
+  .cc-layout--map .layout-shell .sidebar {
+    display: none !important;
+  }
+
+  .cc-layout--map .main {
+    width: 100%;
+    max-width: 100%;
+  }
 }
 
 .sidebar-logout {
@@ -318,6 +366,25 @@
 }
 
 @media (max-width: 900px) {
+  .cc-layout--map .layout-shell .sidebar {
+    display: flex;
+    position: fixed;
+    top: 62px;
+    left: 0;
+    bottom: 0;
+    width: min(288px, 86vw);
+    min-width: 0;
+    height: auto;
+    z-index: 2650;
+    transform: translateX(-105%);
+    transition: transform 0.24s ease;
+    box-shadow: 12px 0 32px rgba(15, 23, 42, 0.12);
+  }
+
+  .cc-layout--map.sidebar-open .layout-shell .sidebar {
+    transform: translateX(0);
+  }
+
   .menu-toggle {
     display: inline-flex;
   }
