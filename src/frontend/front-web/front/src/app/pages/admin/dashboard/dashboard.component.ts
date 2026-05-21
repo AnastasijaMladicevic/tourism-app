@@ -26,13 +26,11 @@ interface UserGrowthSeries {
   label: string;
   color: string;
   linePath: string;
-  points: UserGrowthPoint[];
 }
 
-interface UserGrowthPoint {
+interface UserGrowthHoverZone {
   x: number;
-  y: number;
-  value: number;
+  width: number;
   title: string;
 }
 
@@ -121,6 +119,7 @@ export class DashboardComponent implements OnInit {
   userGrowthYMid = '0';
   userGrowthXLabels: { label: string }[] = [];
   userGrowthIsEmpty = false;
+  userGrowthHoverZones: UserGrowthHoverZone[] = [];
 
   roleDonutSlices: RoleDonutSlice[] = [];
   roleDonutTotal = 0;
@@ -212,6 +211,7 @@ export class DashboardComponent implements OnInit {
     this.userGrowthYMid = '0';
     this.userGrowthXLabels = [];
     this.userGrowthIsEmpty = false;
+    this.userGrowthHoverZones = [];
     this.roleDonutSlices = [];
     this.roleDonutTotal = 0;
     this.regionRows = [];
@@ -235,6 +235,7 @@ export class DashboardComponent implements OnInit {
     const maxVal = Math.max(...allValues, 0);
     const seriesValueSets = seriesDefs.map((def) => ({
       key: def.key,
+      label: def.label,
       values: points.map(def.pick),
     }));
 
@@ -250,15 +251,17 @@ export class DashboardComponent implements OnInit {
       label: def.label,
       color: def.color,
       linePath: this.buildLinePath(renderPointsBySeries[def.key] ?? []),
-      points: (renderPointsBySeries[def.key] ?? []).map((renderPoint, index) => {
-        const value = def.pick(points[index]);
-        return {
-          ...renderPoint,
-          value,
-          title: `${def.label}: ${value} on ${this.formatBucketLabel(points[index].date, overview.userGrowthGranularity)}`,
-        };
-      }),
     }));
+
+    this.userGrowthHoverZones = this.buildUserGrowthHoverZones(
+      points.map((point) => ({
+        label: this.formatBucketLabel(point.date, overview.userGrowthGranularity),
+        tourists: point.tourists,
+        creators: point.contentCreators,
+        managers: point.managers,
+        admins: point.admins,
+      })),
+    );
 
     const labelCount = Math.min(6, points.length);
     const step = labelCount <= 1 ? 1 : Math.max(1, Math.floor((points.length - 1) / (labelCount - 1)));
@@ -495,6 +498,37 @@ export class DashboardComponent implements OnInit {
     const spacing = 1.4;
     const start = -((count - 1) * spacing) / 2;
     return Array.from({ length: count }, (_, index) => start + index * spacing);
+  }
+
+  private buildUserGrowthHoverZones(
+    buckets: { label: string; tourists: number; creators: number; managers: number; admins: number }[],
+  ): UserGrowthHoverZone[] {
+    if (!buckets.length) {
+      return [];
+    }
+
+    const width = 100;
+    const step = buckets.length > 1 ? width / (buckets.length - 1) : width;
+
+    return buckets.map((bucket, index) => {
+      const center = buckets.length > 1 ? index * step : width / 2;
+      const previousCenter = index === 0 ? 0 : (index - 1) * step;
+      const nextCenter = index === buckets.length - 1 ? width : (index + 1) * step;
+      const start = index === 0 ? 0 : (previousCenter + center) / 2;
+      const end = index === buckets.length - 1 ? width : (center + nextCenter) / 2;
+
+      return {
+        x: start,
+        width: Math.max(2, end - start),
+        title: [
+          bucket.label,
+          `Tourists: ${bucket.tourists}`,
+          `Creators: ${bucket.creators}`,
+          `Managers: ${bucket.managers}`,
+          `Admins: ${bucket.admins}`,
+        ].join(' | '),
+      };
+    });
   }
 
   private formatBucketLabel(dateIso: string, granularity: string): string {

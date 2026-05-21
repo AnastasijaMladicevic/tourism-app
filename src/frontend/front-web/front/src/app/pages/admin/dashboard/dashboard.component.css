@@ -269,7 +269,7 @@
   vector-effect: non-scaling-stroke;
 }
 
-.chart-point-hitbox {
+.chart-hover-zone {
   fill: rgba(255, 255, 255, 0.001);
   stroke: transparent;
   pointer-events: all;

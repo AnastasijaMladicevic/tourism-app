@@ -87,17 +87,16 @@
                 fill="none"
                 [attr.stroke]="series.color"
               ></path>
-              <g *ngFor="let series of userGrowthSeries">
-                <circle
-                  *ngFor="let point of series.points"
-                  class="chart-point-hitbox"
-                  [attr.cx]="point.x"
-                  [attr.cy]="point.y"
-                  [attr.r]="3.6"
-                >
-                  <title>{{ point.title }}</title>
-                </circle>
-              </g>
+              <rect
+                *ngFor="let zone of userGrowthHoverZones"
+                class="chart-hover-zone"
+                [attr.x]="zone.x"
+                y="0"
+                [attr.width]="zone.width"
+                height="100"
+              >
+                <title>{{ zone.title }}</title>
+              </rect>
             </svg>
             <p class="chart-empty" *ngIf="userGrowthIsEmpty">No signups in this period.</p>
           </div>
