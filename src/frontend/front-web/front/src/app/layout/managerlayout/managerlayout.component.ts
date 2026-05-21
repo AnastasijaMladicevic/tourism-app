@@ -16,6 +16,7 @@ import { NotificationBellComponent } from '../../shared/components/notification-
 export class ManagerLayoutComponent implements OnInit, OnDestroy {
   searchQuery = '';
   sidebarOpen = false;
+  isMapRoute = false;
   private navSubscription?: Subscription;
 
   user: any = {
@@ -30,15 +31,28 @@ export class ManagerLayoutComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadUser();
     window.addEventListener('storage', this.loadUser);
+    this.syncMapRoute();
     this.navSubscription = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe(() => this.closeSidebar());
+      .subscribe(() => {
+        this.closeSidebar();
+        this.syncMapRoute();
+      });
+  }
+
+  private syncMapRoute(): void {
+    this.isMapRoute = this.router.url.includes('/manager/map');
+    document.body.classList.toggle('manager-map-route', this.isMapRoute);
+    if (this.isMapRoute) {
+      this.closeSidebar();
+    }
   }
 
   ngOnDestroy(): void {
     window.removeEventListener('storage', this.loadUser);
     this.navSubscription?.unsubscribe();
     document.body.classList.remove('manager-nav-open');
+    document.body.classList.remove('manager-map-route');
   }
 
   toggleSidebar(): void {

@@ -492,9 +492,12 @@
 
   .event-form-page,
   .locality-create-page,
-  .profile-page,
-  .map-page {
+  .profile-page {
     padding: 18px;
+  }
+
+  .manager-layout--map .page-outlet .map-page {
+    padding: 0;
   }
 
   .manager-reviews-page .page-head .ghost-btn {
