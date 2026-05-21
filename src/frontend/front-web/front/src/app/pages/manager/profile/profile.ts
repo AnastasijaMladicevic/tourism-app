@@ -13,7 +13,7 @@ import { UserDto } from '../../../models/user.model';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, MatIcon, ImageCropperComponent],
   templateUrl: './profile.html',
-  styleUrls: ['./profile.css'],
+  styleUrls: ['./profile.css', '../shared/manager-list-page-responsive.css'],
 })
 export class ProfileComponentManager implements OnInit, OnDestroy {
   private static readonly DEFAULT_PROFILE_IMAGE_URL =

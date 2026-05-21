@@ -58,7 +58,7 @@ interface RoutePoint {
   standalone: true,
   imports: [CommonModule, FormsModule, MatIconModule],
   templateUrl: './map.component.html',
-  styleUrls: ['./map.component.css'],
+  styleUrls: ['./map.component.css', '../shared/manager-list-page-responsive.css'],
   encapsulation: ViewEncapsulation.None,
 })
 export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {

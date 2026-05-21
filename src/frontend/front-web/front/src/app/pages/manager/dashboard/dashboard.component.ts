@@ -9,7 +9,7 @@ import { UserDto } from '../../../models/user.model';
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: ['./dashboard.component.css', '../shared/manager-list-page-header.css', '../shared/manager-list-page-responsive.css']
 })
 export class ManagerDashboardComponent implements OnInit {
   user: UserDto | null = null;
