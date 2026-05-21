@@ -53,7 +53,7 @@ interface DestinationInsightCard {
   standalone: true,
   imports: [CommonModule, FormsModule, SharedMapComponent],
   templateUrl: './destinations.component.html',
-  styleUrls: ['./destinations.component.css']
+  styleUrls: ['./destinations.component.css', '../shared/admin-page-stats-scroll.css']
 })
 export class DestinationsComponent implements OnInit, OnDestroy {
   private static readonly HERO_ROTATION_INTERVAL_MS = 8000;

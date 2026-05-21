@@ -1008,52 +1008,6 @@ tbody tr:hover,
     justify-content: center;
   }
 
-  .insights-grid {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 10px;
-    width: 100%;
-    max-width: 100%;
-    margin-inline: 0;
-    padding: 0 0 6px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 0;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    grid-template-columns: none;
-  }
-
-  .insights-grid::after {
-    content: '';
-    flex: 0 0 4px;
-  }
-
-  .insights-grid::-webkit-scrollbar {
-    display: none;
-  }
-
-  .insight-card.card {
-    flex: 0 0 min(72vw, 260px);
-    scroll-snap-align: start;
-    min-height: auto;
-    min-width: 0;
-  }
-
-  .insight-card strong {
-    font-size: 22px;
-    margin: 6px 0 2px;
-  }
-
-  .insight-title {
-    font-size: 10px;
-  }
-
-  .insight-card span {
-    font-size: 11px;
-  }
-
   .table-card {
     max-width: 100%;
     border-radius: 16px;

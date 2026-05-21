@@ -709,38 +709,6 @@
     overflow-x: hidden;
   }
 
-  .kpi-row {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 10px;
-    width: 100%;
-    max-width: 100%;
-    margin-inline: 0;
-    padding: 0 0 6px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 0;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    grid-template-columns: none;
-  }
-
-  .kpi-row::after {
-    content: '';
-    flex: 0 0 4px;
-  }
-
-  .kpi-row::-webkit-scrollbar {
-    display: none;
-  }
-
-  .kpi-card {
-    flex: 0 0 min(72vw, 260px);
-    scroll-snap-align: start;
-    min-width: 0;
-  }
-
   .top-grid,
   .middle-grid,
   .bottom-grid,

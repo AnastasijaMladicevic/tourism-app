@@ -74,7 +74,7 @@ interface BannedUserRow {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './users.component.html',
-  styleUrls: ['./users.component.css']
+  styleUrls: ['./users.component.css', '../shared/admin-page-stats-scroll.css']
 })
 export class UsersComponent implements OnInit {
   private readonly adminUsersService = inject(AdminUsersService);

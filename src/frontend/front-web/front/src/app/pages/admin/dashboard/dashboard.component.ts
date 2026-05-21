@@ -86,7 +86,7 @@ const ROLE_COLORS: Record<string, string> = {
   standalone: true,
   imports: [CommonModule, RouterLink, AdminPlatformMapComponent],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css'],
+  styleUrls: ['./dashboard.component.css', '../shared/admin-page-stats-scroll.css'],
 })
 export class DashboardComponent implements OnInit {
   private readonly authService = inject(AuthService);
