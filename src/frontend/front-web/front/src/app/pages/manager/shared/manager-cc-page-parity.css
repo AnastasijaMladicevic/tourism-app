@@ -251,30 +251,6 @@
     box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
   }
 
-  .manager-list-page .stat-card,
-  .manager-list-page .insight-card {
-    flex: 0 0 min(72vw, 260px);
-    scroll-snap-align: start;
-    padding: 12px;
-    border-radius: 16px;
-  }
-
-  .manager-list-page .stat-card strong,
-  .manager-list-page .insight-card strong {
-    font-size: 22px;
-    margin: 6px 0 2px;
-  }
-
-  .manager-list-page .stat-card p,
-  .manager-list-page .insight-card p {
-    font-size: 10px;
-  }
-
-  .manager-list-page .stat-card span,
-  .manager-list-page .insight-card span {
-    font-size: 11px;
-  }
-
   .manager-list-page .activity-mobile-card__edit,
   .manager-list-page .object-mobile-card__edit,
   .manager-list-page .event-mobile-card__edit,

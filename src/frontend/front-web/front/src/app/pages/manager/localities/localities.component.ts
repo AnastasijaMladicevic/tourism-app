@@ -16,7 +16,8 @@ import { AuthService } from '../../../services/auth.service';
     './localities.component.css',
     '../shared/manager-list-page-header.css',
     '../shared/manager-list-page-responsive.css',
-    '../shared/manager-cc-page-parity.css'
+    '../shared/manager-cc-page-parity.css',
+    '../shared/manager-page-stats-scroll.css'
   ]
 })
 export class ManagerLocalitiesComponent implements OnInit, OnDestroy {

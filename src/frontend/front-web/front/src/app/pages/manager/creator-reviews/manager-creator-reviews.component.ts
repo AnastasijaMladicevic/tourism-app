@@ -80,7 +80,8 @@ interface ManagerReportNameHint {
   styleUrls: [
     './manager-creator-reviews.component.css',
     '../shared/manager-list-page-header.css',
-    '../shared/manager-list-page-responsive.css'
+    '../shared/manager-list-page-responsive.css',
+    '../shared/manager-page-stats-scroll.css'
   ],
 })
 export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {

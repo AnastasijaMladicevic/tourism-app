@@ -144,30 +144,6 @@
     padding-inline: 0;
   }
 
-  .manager-list-page .stats-row,
-  .manager-list-page .insights-grid {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    margin-inline: 0;
-    padding: 0 0 6px;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 0;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  .manager-list-page .stats-row::after,
-  .manager-list-page .insights-grid::after {
-    content: '';
-    flex: 0 0 4px;
-  }
-
-  .manager-list-page .stats-row::-webkit-scrollbar,
-  .manager-list-page .insights-grid::-webkit-scrollbar {
-    display: none;
-  }
-
   .manager-list-page .object-table-wrap,
   .manager-list-page .event-table-wrap,
   .manager-list-page .locality-table-wrap,

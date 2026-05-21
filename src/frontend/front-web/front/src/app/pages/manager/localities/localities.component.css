@@ -700,10 +700,6 @@ tbody tr:hover,
     flex-wrap: wrap;
   }
 
-  .stats-row {
-    grid-template-columns: 1fr;
-  }
-
   .detail-metrics {
     grid-template-columns: 1fr;
   }

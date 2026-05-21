@@ -49,7 +49,8 @@ interface ManagerReportNameHint {
   styleUrls: [
     './manager-reports.component.css',
     '../shared/manager-list-page-header.css',
-    '../shared/manager-list-page-responsive.css'
+    '../shared/manager-list-page-responsive.css',
+    '../shared/manager-page-stats-scroll.css'
   ],
 })
 export class ManagerReportsComponent implements OnInit {

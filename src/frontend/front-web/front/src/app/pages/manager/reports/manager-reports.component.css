@@ -696,10 +696,6 @@ tbody tr.active-row {
 }
 
 @media (max-width: 720px) {
-  .stats-row {
-    grid-template-columns: 1fr;
-  }
-
   .creator-row {
     grid-template-columns: auto 1fr;
     grid-template-rows: auto auto;

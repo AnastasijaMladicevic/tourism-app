@@ -790,10 +790,6 @@ tbody tr:hover,
 		flex-wrap: wrap;
 	}
 
-	.stats-row {
-		grid-template-columns: 1fr;
-	}
-
 	.schedule-list,
 	.detail-metrics {
 		grid-template-columns: 1fr;

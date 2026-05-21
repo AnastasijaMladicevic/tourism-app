@@ -817,7 +817,6 @@
 }
 
 @media (max-width: 720px) {
-  .stats-row,
   .filter-row-secondary {
     grid-template-columns: 1fr;
   }

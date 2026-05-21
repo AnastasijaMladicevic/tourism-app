@@ -17,7 +17,8 @@ import { MapComponent as SharedMapComponent } from '../../../shared/components/m
     './activities.component.css',
     '../shared/manager-list-page-header.css',
     '../shared/manager-list-page-responsive.css',
-    '../shared/manager-cc-page-parity.css'
+    '../shared/manager-cc-page-parity.css',
+    '../shared/manager-page-stats-scroll.css'
   ]
 })
 export class ManagerActivitiesComponent implements OnInit {
