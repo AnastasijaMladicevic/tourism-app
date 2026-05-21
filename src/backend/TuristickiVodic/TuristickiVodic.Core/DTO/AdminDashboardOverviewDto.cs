@@ -17,6 +17,7 @@ namespace TuristickiVodic.Core.DTO
         public AdminDashboardCreatorRequestStatusDto CreatorRequests { get; set; } = new();
         public AdminDashboardReportsSummaryDto Reports { get; set; } = new();
         public AdminDashboardAccountHealthDto AccountHealth { get; set; } = new();
+        public AdminDashboardDestinationEngagementDto DestinationEngagement { get; set; } = new();
         public AdminDashboardGeospatialOverviewDto GeospatialOverview { get; set; } = new();
     }
 
@@ -81,6 +82,42 @@ namespace TuristickiVodic.Core.DTO
         public int TemporarilyBanned { get; set; }
         public int PermanentlyBanned { get; set; }
         public int TotalBanned { get; set; }
+    }
+
+    public class AdminDashboardDestinationEngagementDto
+    {
+        public int TotalFavoriteAdds { get; set; }
+        public int TotalPlannerAdds { get; set; }
+        public int RatedDestinations { get; set; }
+        public List<AdminDashboardTopEngagedDestinationDto> TopDestinations { get; set; } = new();
+        public List<AdminDashboardRegionEngagementDto> RegionEngagement { get; set; } = new();
+    }
+
+    public class AdminDashboardTopEngagedDestinationDto
+    {
+        public int DestinationId { get; set; }
+        public string DestinationName { get; set; } = string.Empty;
+        public int RegionId { get; set; }
+        public string RegionName { get; set; } = string.Empty;
+        public string RegionCode { get; set; } = string.Empty;
+        public int FavoriteAdds { get; set; }
+        public int PlannerAdds { get; set; }
+        public int ReviewCount { get; set; }
+        public decimal AverageRating { get; set; }
+        public decimal EngagementScore { get; set; }
+    }
+
+    public class AdminDashboardRegionEngagementDto
+    {
+        public int RegionId { get; set; }
+        public string RegionName { get; set; } = string.Empty;
+        public string RegionCode { get; set; } = string.Empty;
+        public int FavoriteAdds { get; set; }
+        public int PlannerAdds { get; set; }
+        public int ReviewCount { get; set; }
+        public int EngagedDestinations { get; set; }
+        public decimal AverageRating { get; set; }
+        public decimal EngagementScore { get; set; }
     }
 
     public class AdminDashboardGeospatialOverviewDto

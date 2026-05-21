@@ -1,8 +1,6 @@
 .reviews-page {
   min-height: 100dvh;
-  background:
-    radial-gradient(circle at top center, rgba(22, 138, 173, 0.08), transparent 28%),
-    linear-gradient(180deg, #fbfeff 0%, #eef8fb 62%, #ebf6fa 100%);
+  background: var(--bg);
 }
 
 .reviews-topbar {
@@ -12,7 +10,8 @@
   grid-template-columns: 40px 1fr 40px;
   align-items: center;
   border-bottom: 1px solid rgba(208, 234, 240, 0.9);
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--surface-strong);
+  border-color: var(--border);
   backdrop-filter: blur(10px);
 
   h1 {
@@ -58,7 +57,8 @@
 .review-card,
 .state-card,
 .response-card {
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface-strong);
+  border-color: var(--border);
   border: 1px solid rgba(215, 229, 236, 0.95);
   box-shadow: 0 14px 34px rgba(23, 110, 134, 0.06);
 }
@@ -239,5 +239,50 @@
   .reviews-shell {
     width: min(100%, 700px);
     padding: 8px 0 14px;
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+  .reviews-page {
+    background:
+      radial-gradient(circle at top center, rgba(77, 194, 255, 0.08), transparent 28%),
+      var(--bg);
+  }
+
+  .reviews-topbar,
+  .hero-card,
+  .review-card,
+  .state-card,
+  .response-card {
+    background: var(--surface-strong);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .reviews-topbar h1,
+  .back-btn,
+  .hero-card h2,
+  .state-card strong,
+  .review-card__header h3,
+  .rating-box strong {
+    color: var(--text-dark);
+  }
+
+  .hero-card p,
+  .state-card p,
+  .review-text,
+  .review-date,
+  .response-card p {
+    color: var(--text-gray);
+  }
+
+  .status-badge {
+    background: var(--surface-soft);
+    color: var(--primary);
+  }
+
+  .response-card strong,
+  .eyebrow {
+    color: var(--primary);
   }
 }

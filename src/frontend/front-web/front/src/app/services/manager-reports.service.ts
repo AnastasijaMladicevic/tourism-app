@@ -24,6 +24,11 @@ export interface CreateManagerReportDto {
   reason: string;
 }
 
+export interface ReviewManagerReportDto {
+  approve: boolean;
+  rejectionReason?: string | null;
+}
+
 export interface ManagerReportQueryParams {
   page?: number;
   pageSize?: number;
@@ -65,5 +70,27 @@ export class ManagerReportsService {
 
   withdrawReport(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  /** Admin: all manager reports (supports status filter, e.g. Pending). */
+  getAllReports(query?: ManagerReportQueryParams): Observable<PagedManagerReports> {
+    let params = new HttpParams();
+    if (query) {
+      Object.entries(query).forEach(([key, value]) => {
+        if (value != null && value !== '') {
+          params = params.set(key, String(value));
+        }
+      });
+    }
+    return this.http.get<PagedManagerReports>(this.baseUrl, { params });
+  }
+
+  getReportById(id: number): Observable<ManagerReportDto> {
+    return this.http.get<ManagerReportDto>(`${this.baseUrl}/${id}`);
+  }
+
+  /** Admin: approve (ban CC) or reject a pending report. */
+  reviewReport(id: number, dto: ReviewManagerReportDto): Observable<ManagerReportDto> {
+    return this.http.post<ManagerReportDto>(`${this.baseUrl}/${id}/review`, dto);
   }
 }

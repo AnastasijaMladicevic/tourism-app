@@ -218,6 +218,7 @@
 
     </form>
 
+    <div class="side-stack">
     <aside class="side-column card" [formGroup]="form">
       <header class="side-header">
         <span class="material-symbols-outlined">my_location</span>
@@ -291,6 +292,55 @@
         View Full Change History
       </a>
     </aside>
+
+    @if (showCcReviewsPreview) {
+      <section class="cc-reviews-preview card" aria-labelledby="cc-reviews-preview-title">
+        <header class="cc-reviews-preview-head">
+          <div>
+            <p class="cc-reviews-eyebrow">Guest feedback</p>
+            <h2 id="cc-reviews-preview-title">Recent reviews</h2>
+          </div>
+          @if (hasPreviewReviews || (editSidebar?.reviewCount ?? 0) > 0) {
+            <span class="reviews-count-pill">{{ previewReviewsCountLabel }}</span>
+          }
+        </header>
+
+        @if (isLoadingPreviewReviews) {
+          <p class="cc-reviews-empty">Loading reviews…</p>
+        } @else if (hasPreviewReviews) {
+          <div class="reviews-preview-list">
+            @for (review of previewReviews; track trackByReviewId($index, review)) {
+              <article class="review-preview-card">
+                <div class="review-preview-top">
+                  <div class="reviewer-meta">
+                    <span class="reviewer-avatar">{{ getReviewInitials(review) }}</span>
+                    <div>
+                      <strong>{{ review.userFullName }}</strong>
+                      <span>{{ getReviewTimeAgo(review.createdAt) }}</span>
+                    </div>
+                  </div>
+                  <span class="review-rating">{{ review.rating }}/5</span>
+                </div>
+                <p class="review-preview-text">{{ review.text }}</p>
+                @if (review.creatorResponse?.trim()) {
+                  <p class="review-reply-hint">
+                    <span class="material-symbols-outlined" aria-hidden="true">reply</span>
+                    You replied
+                  </p>
+                }
+              </article>
+            }
+          </div>
+        } @else {
+          <p class="cc-reviews-empty">No reviews for this object yet.</p>
+        }
+
+        <button type="button" class="text-btn view-more-btn" (click)="onViewMoreReviews()">
+          View more
+        </button>
+      </section>
+    }
+    </div>
   </div>
 
   @if (isManagerReview && objectId) {

@@ -1,171 +1,364 @@
-<div class="dashboard">
-
-  <!-- Page header -->
-  <div class="page-header">
+<section class="admin-dashboard">
+  <div class="page-head">
     <div>
-      <h1 class="page-title">Dashboard Overview</h1>
-      <p class="page-sub">Real-time performance metrics and regional operations monitoring.</p>
+      <h1>Admin Dashboard</h1>
+      <p class="subtle-text">
+        Welcome back{{ user?.firstName ? ', ' + user?.firstName : '' }}. Platform overview for the selected period.
+      </p>
     </div>
-    <button class="date-btn">
-      <svg width="13" height="13" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
-        <rect x="3" y="4" width="16" height="15" rx="2"/>
-        <path d="M7 2v3M15 2v3M3 9h16"/>
-      </svg>
-      Last 30 Days
-      <svg width="10" height="10" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M5 8l6 6 6-6"/>
-      </svg>
-    </button>
-  </div>
-
-  <!-- =====================
-       STAT CARDS
-       ===================== -->
-  <div class="stats-grid">
-
-    <div class="stat-card blue">
-      <div class="stat-header">
-        <span class="stat-label">Total Tourists</span>
-        <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
-          <circle cx="11" cy="8" r="4"/>
-          <path d="M3 20c0-4.4 3.6-8 8-8s8 3.6 8 8"/>
-        </svg>
-      </div>
-      <div class="stat-value">{{ stats.tourists | number }}</div>
-      <span class="stat-badge green">+12.5% since last month</span>
-    </div>
-
-    <div class="stat-card green">
-      <div class="stat-header">
-        <span class="stat-label">Active Destinations</span>
-        <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
-          <path d="M11 2C8.2 2 6 4.2 6 7c0 4.5 5 11 5 11s5-6.5 5-11c0-2.8-2.2-5-5-5z"/>
-          <circle cx="11" cy="7" r="2"/>
-        </svg>
-      </div>
-      <div class="stat-value">{{ stats.destinations }}</div>
-      <span class="stat-badge green">+3 new this week</span>
-    </div>
-
-    <div class="stat-card amber">
-      <div class="stat-header">
-        <span class="stat-label">Upcoming Events</span>
-        <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
-          <rect x="3" y="4" width="16" height="15" rx="2"/>
-          <path d="M7 2v3M15 2v3M3 9h16"/>
-        </svg>
-      </div>
-      <div class="stat-value">{{ stats.events }}</div>
-      <span class="stat-badge red">-4% vs previous period</span>
-    </div>
-
-    <div class="stat-card purple">
-      <div class="stat-header">
-        <span class="stat-label">Pending Reviews</span>
-        <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6">
-          <path d="M20 2H4a2 2 0 00-2 2v14l4-4h14a2 2 0 002-2V4a2 2 0 00-2-2z"/>
-        </svg>
-      </div>
-      <div class="stat-value">{{ stats.reviews }}</div>
-      <span class="stat-badge amber">Moderate — requires moderation</span>
-    </div>
-
-  </div>
-
-  <!-- =====================
-       MIDDLE SECTION
-       ===================== -->
-  <div class="middle-grid">
-
-    <!-- Activity Feed -->
-    <div class="card activity-card">
-      <div class="card-header">
-        <div>
-          <div class="card-title">Recent Administrative Activity</div>
-          <div class="card-sub">Latest changes made by team members across the region.</div>
-        </div>
-        <span class="view-all">View Full Log</span>
-      </div>
-
-      <div class="activity-list">
-        <div class="activity-item" *ngFor="let item of activityFeed">
-          <div class="act-avatar" [ngClass]="item.avatarColor">{{ item.initials }}</div>
-          <div class="act-body">
-            <div class="act-text">
-              <strong>{{ item.user }}</strong> {{ item.action }}
-              <a href="#">{{ item.target }}</a>
-            </div>
-            <div class="act-meta">
-              <svg width="11" height="11" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="11" cy="11" r="9"/><path d="M11 6v5l3 3"/>
-              </svg>
-              {{ item.time }}
-              <span class="act-role">{{ item.role }}</span>
-            </div>
-          </div>
-          <svg class="act-arrow" width="14" height="14" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M8 5l6 6-6 6"/>
-          </svg>
-        </div>
-      </div>
-
-      <div class="load-more">Load More Activities</div>
-    </div>
-
-    <!-- Map -->
-    <div class="card map-card">
-      <div class="card-header">
-        <div class="card-title">Geospatial Overview</div>
-        <button class="expand-btn">
-          <svg width="13" height="13" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M13 2h7v7M9 20H2v-7M20 2l-8 8M2 20l8-8"/>
-          </svg>
-          Expand Full Map
+    <div class="head-actions">
+      <div class="period-filter" role="group" aria-label="Dashboard period">
+        <button
+          type="button"
+          *ngFor="let opt of periodOptions"
+          class="period-btn"
+          [class.active]="selectedPeriod === opt.key"
+          (click)="selectPeriod(opt.key)"
+        >
+          {{ opt.label }}
         </button>
       </div>
-      <div class="card-sub">Hotspots of tourist activity and new POIs.</div>
-      <div id="dashboard-map" class="map-container"></div>
-      <div class="map-stats">
-        <div class="map-stat">
-          <span class="map-stat-label">Active Tracking</span>
-          <span class="map-stat-val">82 Devices</span>
-        </div>
-        <div class="map-stat">
-          <span class="map-stat-label">Recent Sync</span>
-          <span class="map-stat-val">3 minutes ago</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- =====================
-       BAR CHART
-       ===================== -->
-  <div class="card chart-card">
-    <div class="card-header">
-      <div>
-        <div class="card-title">Top Rated Regions</div>
-        <div class="card-sub">Highest performing zones today</div>
-      </div>
-    </div>
-    <div class="bars">
-      <div class="bar-row" *ngFor="let r of topRegions">
-        <div class="bar-name">{{ r.name }}</div>
-        <div class="bar-track">
-          <div class="bar-fill" [style.width.%]="r.percent"></div>
-        </div>
-        <div class="bar-score">{{ r.score }}</div>
-      </div>
-    </div>
-    <div class="bar-axis">
-      <span>4.5</span>
-      <span>4.6</span>
-      <span>4.7</span>
-      <span>4.8</span>
-      <span>4.9</span>
-      <span>5.0</span>
     </div>
   </div>
 
-</div>
+  <p class="state-banner error" *ngIf="loadError">{{ loadError }}</p>
+  <p class="state-banner loading" *ngIf="isLoading && !loadError">Loading dashboard...</p>
+
+  <ng-container *ngIf="!isLoading && overview">
+    <div class="kpi-row">
+      <article class="kpi-card card">
+        <span class="kpi-label">Total Tourists</span>
+        <span class="kpi-value">{{ overview.summary.totalTourists | number }}</span>
+        <span class="kpi-meta positive" *ngIf="overview.summary.newTouristsInPeriod > 0">
+          +{{ overview.summary.newTouristsInPeriod | number }} created in {{ overview.periodKey }}
+        </span>
+      </article>
+
+      <article class="kpi-card card">
+        <span class="kpi-label">Active Destinations</span>
+        <span class="kpi-value">{{ overview.summary.activeDestinations | number }}</span>
+        <span class="kpi-meta positive" *ngIf="overview.summary.newDestinationsInPeriod > 0">
+          +{{ overview.summary.newDestinationsInPeriod | number }} new in {{ overview.periodKey }}
+        </span>
+      </article>
+
+      <article class="kpi-card card" [class.kpi-card--alert]="overview.summary.pendingCreatorRequests > 0">
+        <span class="kpi-label">Pending CC Requests</span>
+        <span class="kpi-value">{{ overview.summary.pendingCreatorRequests | number }}</span>
+        <span class="kpi-meta muted">Current pending queue</span>
+      </article>
+
+      <article class="kpi-card card" [class.kpi-card--alert]="overview.summary.openReports > 0">
+        <span class="kpi-label">Open Reports</span>
+        <span class="kpi-value">{{ overview.summary.openReports | number }}</span>
+        <span class="kpi-meta muted">{{ overview.reports.total | number }} reports created in {{ overview.periodKey }}</span>
+      </article>
+    </div>
+
+    <div class="top-grid">
+      <article class="card panel panel--wide">
+        <div class="section-head">
+          <div>
+            <h3>User Growth</h3>
+            <p>{{ granularityHint }} · tourists, creators, managers, admins</p>
+          </div>
+          <a class="section-link" routerLink="/admin/users">All users</a>
+        </div>
+
+        <div class="chart-legend chart-legend--inline">
+          <span *ngFor="let series of userGrowthSeries" class="legend-item">
+            <span class="legend-dot" [style.background]="series.color"></span>
+            {{ series.label }}
+          </span>
+        </div>
+
+        <div class="chart-wrap">
+          <div class="chart-y-axis" aria-hidden="true">
+            <span>{{ userGrowthYTop }}</span>
+            <span>{{ userGrowthYMid }}</span>
+            <span>0</span>
+          </div>
+          <div class="chart-surface">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg chart-svg--multi">
+              <path
+                *ngFor="let series of userGrowthSeries"
+                [attr.d]="series.linePath"
+                class="chart-line-multi"
+                fill="none"
+                [attr.stroke]="series.color"
+              />
+            </svg>
+            <p class="chart-empty" *ngIf="userGrowthIsEmpty">No signups in this period.</p>
+          </div>
+        </div>
+
+        <div class="chart-labels">
+          <span *ngFor="let label of userGrowthXLabels">{{ label.label }}</span>
+        </div>
+      </article>
+
+      <article class="card panel">
+        <div class="section-head">
+          <div>
+            <h3>Role Distribution</h3>
+            <p>Current platform roles</p>
+          </div>
+        </div>
+
+        <div class="donut-wrap" *ngIf="roleDonutSlices.length; else emptyRoleDonut">
+          <svg viewBox="0 0 100 100" class="donut-svg" aria-hidden="true">
+            <path *ngFor="let slice of roleDonutSlices" [attr.d]="slice.path" [attr.fill]="slice.color"></path>
+          </svg>
+          <div class="donut-center">
+            <span class="donut-center-val">{{ roleDonutTotal | number }}</span>
+            <span class="donut-center-label">users</span>
+          </div>
+        </div>
+
+        <ng-template #emptyRoleDonut>
+          <p class="empty-note">No role data is available.</p>
+        </ng-template>
+
+        <ul class="donut-legend">
+          <li *ngFor="let slice of roleDonutSlices">
+            <span class="legend-dot" [style.background]="slice.color"></span>
+            <span class="donut-legend-name">{{ slice.label }}</span>
+            <span class="donut-legend-meta">{{ slice.count | number }} · {{ slice.percent }}%</span>
+          </li>
+        </ul>
+      </article>
+
+      <article class="card panel">
+        <div class="section-head">
+          <div>
+            <h3>Account Health</h3>
+            <p>Current verification, activity and bans</p>
+          </div>
+        </div>
+
+        <div class="health-groups">
+          <div class="health-group" *ngFor="let group of healthGroups">
+            <div class="health-group-head">
+              <span class="health-group-label">{{ group.label }}</span>
+              <span class="health-group-total">
+                {{ group.segments[0].value | number }} vs {{ group.segments[1].value | number }}
+              </span>
+            </div>
+
+            <div class="health-bar">
+              <span
+                *ngFor="let segment of group.segments"
+                class="health-bar-seg"
+                [style.width.%]="segment.percent"
+                [style.background]="segment.color"
+                [attr.title]="segment.label + ': ' + segment.value"
+              ></span>
+            </div>
+
+            <div class="health-legend">
+              <span *ngFor="let segment of group.segments">
+                <span class="legend-dot" [style.background]="segment.color"></span>
+                {{ segment.label }} · {{ segment.value | number }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="middle-grid">
+      <article class="card panel panel--regions">
+        <div class="section-head">
+          <div>
+            <h3>Destinations by Region</h3>
+            <p>Current coverage by region</p>
+          </div>
+          <a class="section-link" routerLink="/admin/destinations">Manage</a>
+        </div>
+
+        <ul class="region-list">
+          <li *ngFor="let row of regionRows" class="region-row">
+            <div class="region-row-head">
+              <span class="region-name">{{ row.name }}</span>
+              <span class="region-code">{{ row.code }}</span>
+            </div>
+            <div class="region-bar-track">
+              <div class="region-bar-fill" [style.width.%]="row.barPercent"></div>
+            </div>
+            <div class="region-stats">
+              <span>{{ row.total | number }} total</span>
+              <span>{{ row.active | number }} active</span>
+              <span class="region-geocoded">
+                <span class="material-symbols-outlined">pin_drop</span>
+                {{ row.geocoded | number }} mapped
+              </span>
+            </div>
+          </li>
+        </ul>
+      </article>
+
+      <article class="card panel panel--creator">
+        <div class="section-head">
+          <div>
+            <h3>Creator Request Status</h3>
+            <p>{{ overview.creatorRequests.totalSubmitted | number }} processed in {{ overview.periodKey }}</p>
+          </div>
+          <a class="section-link" routerLink="/admin/users" [queryParams]="{ tab: 'tourists' }">Review</a>
+        </div>
+
+        <div class="creator-summary">
+          <div class="creator-stat creator-stat--pending">
+            <span class="creator-stat-val">{{ overview.creatorRequests.pending | number }}</span>
+            <span class="creator-stat-label">Pending</span>
+          </div>
+          <div class="creator-stat">
+            <span class="creator-stat-val">{{ overview.creatorRequests.approved | number }}</span>
+            <span class="creator-stat-label">Approved</span>
+          </div>
+          <div class="creator-stat">
+            <span class="creator-stat-val">{{ overview.creatorRequests.rejected | number }}</span>
+            <span class="creator-stat-label">Rejected</span>
+          </div>
+        </div>
+
+        <div class="stacked-bar stacked-bar--tall">
+          <span
+            *ngFor="let slice of creatorSlices"
+            class="stack-segment"
+            [style.width.%]="slice.percent"
+            [style.background]="slice.color"
+          ></span>
+        </div>
+
+        <ul class="legend-list">
+          <li *ngFor="let slice of creatorSlices">
+            <span class="legend-dot" [style.background]="slice.color"></span>
+            {{ slice.label }} · {{ slice.count | number }}
+          </li>
+        </ul>
+
+        <p class="creator-footnote">
+          <span class="material-symbols-outlined">info</span>
+          Pending requests are always shown as the current queue, even when they are older than the selected period.
+        </p>
+      </article>
+    </div>
+
+    <div class="bottom-grid">
+      <article class="card panel panel--visits panel--wide">
+        <div class="section-head">
+          <div>
+            <h3>Destination Engagement</h3>
+            <p>Favorites, planner adds and ratings in {{ overview.periodKey }}</p>
+          </div>
+        </div>
+
+        <div class="visit-summary">
+          <div class="visit-summary-card">
+            <span class="visit-summary-label">Favorite adds</span>
+            <span class="visit-summary-value">{{ overview.destinationEngagement.totalFavoriteAdds | number }}</span>
+          </div>
+          <div class="visit-summary-card">
+            <span class="visit-summary-label">Planner adds</span>
+            <span class="visit-summary-value">{{ overview.destinationEngagement.totalPlannerAdds | number }}</span>
+          </div>
+          <div class="visit-summary-card">
+            <span class="visit-summary-label">Rated destinations</span>
+            <span class="visit-summary-value">{{ overview.destinationEngagement.ratedDestinations | number }}</span>
+          </div>
+        </div>
+
+        <div *ngIf="hasVisitData; else emptyVisits" class="visit-list">
+          <div *ngFor="let row of topDestinationRows" class="visit-row">
+            <div class="visit-row-head">
+              <div>
+                <div class="visit-name">{{ row.destinationName }}</div>
+                <div class="visit-subtle">{{ row.regionName }} · {{ row.regionCode }}</div>
+              </div>
+              <div class="visit-count">score {{ row.engagementScore | number:'1.0-1' }}</div>
+            </div>
+            <div class="region-bar-track">
+              <div class="region-bar-fill region-bar-fill--teal" [style.width.%]="row.barPercent"></div>
+            </div>
+            <div class="visit-meta">
+              <span>{{ row.favoriteAdds | number }} favorites</span>
+              <span>{{ row.plannerAdds | number }} planner adds</span>
+              <span>{{ row.reviewCount | number }} reviews</span>
+              <span>{{ row.averageRating | number:'1.1-1' }} avg rating</span>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #emptyVisits>
+          <p class="empty-note">No destination engagement was detected for this period.</p>
+        </ng-template>
+      </article>
+
+      <article class="card panel">
+        <div class="section-head">
+          <div>
+            <h3>Region Engagement</h3>
+            <p>Most engaged regions in {{ overview.periodKey }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="regionVisitRows.length; else emptyRegionVisits" class="region-list">
+          <div *ngFor="let row of regionVisitRows" class="region-row">
+            <div class="region-row-head">
+              <span class="region-name">{{ row.regionName }}</span>
+              <span class="region-code">{{ row.regionCode }}</span>
+            </div>
+            <div class="region-bar-track">
+              <div class="region-bar-fill region-bar-fill--teal" [style.width.%]="row.barPercent"></div>
+            </div>
+            <div class="region-stats">
+              <span>{{ row.favoriteAdds | number }} favorites</span>
+              <span>{{ row.plannerAdds | number }} planner adds</span>
+              <span>{{ row.reviewCount | number }} reviews</span>
+              <span>{{ row.engagedDestinations | number }} destinations</span>
+              <span>{{ row.averageRating | number:'1.1-1' }} avg rating</span>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #emptyRegionVisits>
+          <p class="empty-note">No region engagement data is available for this period.</p>
+        </ng-template>
+      </article>
+
+      <article class="card panel panel--map">
+        <div class="section-head">
+          <div>
+            <h3>Geospatial Overview</h3>
+            <p>Current active destinations with map coordinates</p>
+          </div>
+        </div>
+
+        <div class="geo-summary">
+          <div class="geo-summary-item">
+            <span class="geo-summary-value">{{ overview.geospatialOverview.totalActiveDestinationsWithCoordinates | number }}</span>
+            <span class="geo-summary-label">Mapped destinations</span>
+          </div>
+          <div class="geo-summary-item">
+            <span class="geo-summary-value">{{ overview.geospatialOverview.regionsRepresented | number }}</span>
+            <span class="geo-summary-label">Regions represented</span>
+          </div>
+          <div class="geo-summary-item">
+            <span class="geo-summary-value">{{ overview.geospatialOverview.displayedPoints | number }}</span>
+            <span class="geo-summary-label">Displayed markers</span>
+          </div>
+        </div>
+
+        <div class="map-container">
+          <app-admin-platform-map
+            [compact]="true"
+            [focusRegion]="false"
+            [enableClustering]="true"
+            [destinations]="mapDestinations"
+            mapId="admin-dashboard-map"
+          ></app-admin-platform-map>
+        </div>
+      </article>
+    </div>
+  </ng-container>
+</section>

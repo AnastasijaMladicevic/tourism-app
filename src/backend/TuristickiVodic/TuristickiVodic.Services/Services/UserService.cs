@@ -143,11 +143,12 @@ namespace TuristickiVodic.Services
         public async Task<UserDto?> GetByEmailAsync(string email)
         {
             await ReleaseExpiredBansAsync();
+            var normalizedEmail = email.Trim().ToLowerInvariant();
 
             var user = await _context.Users
                 .Include(u => u.Role)
                 .Include(u => u.PreferredRegion)
-                .FirstOrDefaultAsync(u => u.Email == email);
+                .FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == normalizedEmail);
 
             return await MapUserDtoWithMetricsAsync(user);
         }
@@ -616,11 +617,13 @@ namespace TuristickiVodic.Services
 
         private async Task<UserDto> CreateWithRoleAsync(CreateUserDto createUserDto, RoleType roleType)
         {
+            var normalizedEmail = createUserDto.Email.Trim().ToLowerInvariant();
+
             var existingUser = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == createUserDto.Email);
+                .FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == normalizedEmail);
 
             if (existingUser != null)
-                throw new InvalidOperationException("Email already exists");
+                throw new InvalidOperationException("Email already exists. If this account was created with Google sign-in, continue with Google or reset the password.");
 
             var role = await _context.Roles
                 .FirstOrDefaultAsync(r => r.Name == roleType);
@@ -629,6 +632,7 @@ namespace TuristickiVodic.Services
                 throw new InvalidOperationException($"{roleType} role not found");
 
             var user = _mapper.Map<User>(createUserDto);
+            user.Email = normalizedEmail;
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password);
             user.RoleId = role.Id;
             user.Role = role;
@@ -708,10 +712,10 @@ namespace TuristickiVodic.Services
         {
             await ReleaseExpiredBansAsync();
 
-            var normalizedEmail = dto.Email.Trim().ToLower();
+            var normalizedEmail = dto.Email.Trim().ToLowerInvariant();
 
             var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
+                .FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == normalizedEmail);
 
             if (user == null)
                 throw new InvalidOperationException("Korisnik sa ovom email adresom jos uvek nije registrovan.");
@@ -739,10 +743,10 @@ namespace TuristickiVodic.Services
         {
             await ReleaseExpiredBansAsync();
 
-            var normalizedEmail = dto.Email.Trim().ToLower();
+            var normalizedEmail = dto.Email.Trim().ToLowerInvariant();
 
             var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
+                .FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == normalizedEmail);
 
             if (user == null || !user.IsActive)
                 throw new InvalidOperationException("Invalid or expired reset code.");
@@ -805,10 +809,12 @@ namespace TuristickiVodic.Services
         {
             await ReleaseExpiredBansAsync();
 
+            var normalizedEmail = loginDto.Email.Trim().ToLowerInvariant();
+
             var user = await _context.Users
                 .Include(u => u.Role)
                 .Include(u => u.PreferredRegion)
-                .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
+                .FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == normalizedEmail);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash))
                 return null;
@@ -832,7 +838,7 @@ namespace TuristickiVodic.Services
             var user = await _context.Users
                 .Include(u => u.Role)
                 .Include(u => u.PreferredRegion)
-                .FirstOrDefaultAsync(u => u.Email.ToLower() == normalizedEmail);
+                .FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == normalizedEmail);
 
             if (user == null)
             {

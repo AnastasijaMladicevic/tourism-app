@@ -39,7 +39,15 @@
     }
   </div>
 
-  <div id="main-map" class="main-map"></div>
+  <app-admin-platform-map
+    mapId="main-map"
+    [initialLat]="mapInitialLat"
+    [initialLng]="mapInitialLng"
+    [initialZoom]="mapInitialZoom"
+    [focusRegion]="mapFocusRegion"
+    (mapReady)="onPlatformMapReady()"
+    (destinationsLoaded)="onDestinationsLoaded($event)"
+  />
 
   <div class="map-controls">
     <button class="control-btn" (click)="zoomIn()"><mat-icon>add</mat-icon></button>

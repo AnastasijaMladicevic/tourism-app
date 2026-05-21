@@ -44,7 +44,9 @@
     "viewDetails": "Details",
     "email": "Email",
     "password": "Password",
-    "soonest": "Soonest"
+    "soonest": "Soonest",
+    "qrTitle": "QR code",
+    "qrBody": "Scan to quickly open this page."
   },
   "moderatorAccess": {
     "title": "Moderator access",

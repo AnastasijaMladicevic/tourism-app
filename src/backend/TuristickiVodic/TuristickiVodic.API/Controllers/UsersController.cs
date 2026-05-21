@@ -391,7 +391,7 @@ namespace TuristickiVodic.API.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = ex.Message + " | " + ex.InnerException?.Message });
             }
         }
 

@@ -1,8 +1,6 @@
 .reviews-preview-page {
   min-height: 100dvh;
-  background:
-    radial-gradient(circle at top center, rgba(22, 138, 173, 0.08), transparent 28%),
-    linear-gradient(180deg, #fbfeff 0%, #eef8fb 62%, #ebf6fa 100%);
+  background: var(--bg);
   padding: 0;
 }
 
@@ -24,7 +22,8 @@
   gap: 12px;
   padding: 18px 20px 10px;
   border-bottom: 1px solid rgba(208, 234, 240, 0.9);
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--surface-strong);
+  border-color: var(--border);
   backdrop-filter: blur(10px);
 
   h1 {
@@ -143,7 +142,8 @@
   gap: 18px;
   border: 1px solid #ececf2;
   border-radius: 22px;
-  background: #fff;
+  background: var(--surface-strong);
+  border-color: var(--border);
   box-shadow: 0 8px 26px rgba(29, 44, 67, 0.04);
   padding: 22px 20px;
   margin-bottom: 20px;
@@ -219,7 +219,7 @@
 .search-box {
   height: 54px;
   border-radius: 20px;
-  background: #f7f7fa;
+  background: var(--surface);
   border: 1px solid #f1f2f7;
   display: flex;
   align-items: center;
@@ -272,7 +272,7 @@
   height: 40px;
   border: none;
   border-radius: 999px;
-  background: #f6f6f9;
+  background: var(--surface);
   color: #2a2f39;
   font-size: 15px;
   font-weight: 500;
@@ -289,7 +289,8 @@
   border: 1px solid rgba(215, 229, 236, 0.95);
   box-shadow: 0 14px 34px rgba(23, 110, 134, 0.06);
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--surface-strong);
+  border-color: var(--border);
   padding: 26px 20px;
   text-align: center;
 
@@ -317,7 +318,8 @@
 .review-card {
   border: 1px solid #ececf2;
   border-radius: 22px;
-  background: #fff;
+  background: var(--surface-strong);
+  border-color: var(--border);
   box-shadow: 0 8px 24px rgba(32, 44, 67, 0.04);
   padding: 18px;
 }
@@ -334,7 +336,7 @@
   width: 48px;
   height: 48px;
   border-radius: 16px;
-  background: linear-gradient(180deg, #edf7fb 0%, #dff0f7 100%);
+  background: var(--surface);
   display: grid;
   place-items: center;
   color: #1d8fb6;
@@ -377,7 +379,7 @@
   min-height: 30px;
   padding: 0 13px;
   border-radius: 999px;
-  background: #edf7fb;
+  background: var(--surface);
   color: #1d8fb6;
   font-size: 13px;
   font-weight: 800;
@@ -414,7 +416,8 @@
 
 .response-card {
   border-radius: 18px;
-  background: #f5fbfd;
+  background: var(--surface-strong);
+  border-color: var(--border);
   border: 1px solid #e0f1f6;
   padding: 15px 16px;
   margin-bottom: 14px;
@@ -451,7 +454,7 @@
 .meta-pill {
   min-height: 34px;
   border-radius: 13px;
-  background: #fafbfe;
+  background: var(--surface);
   border: 1px solid #eef0f5;
   display: inline-flex;
   align-items: center;
@@ -530,8 +533,7 @@
   .reviews-preview-page {
     min-height: 100%;
     padding: 12px 24px 30px;
-    background:
-      linear-gradient(180deg, #fff 0%, #fcfcfd 55%, #f7f8fa 100%);
+    background: var(--bg);
   }
 
   .topbar {
@@ -613,5 +615,77 @@
   .filter-row {
     flex-wrap: wrap;
     overflow: visible;
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+  .reviews-preview-page {
+    background:
+      radial-gradient(circle at top center, rgba(77, 194, 255, 0.08), transparent 28%),
+      var(--bg);
+  }
+
+  .topbar,
+  .rating-card,
+  .review-card,
+  .state-card,
+  .response-card {
+    background: var(--surface-strong);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .topbar h1,
+  .icon-btn,
+  .profile-copy h2,
+  .rating-summary strong,
+  .rating-row span,
+  .rating-row strong,
+  .state-card strong,
+  .review-title h3,
+  .response-card strong {
+    color: var(--text-dark);
+  }
+
+  .profile-copy p,
+  .rating-summary p,
+  .state-card p,
+  .review-title p,
+  .time,
+  .review-body,
+  .response-card p,
+  .action-btn,
+  .meta-pill {
+    color: var(--text-gray);
+  }
+
+  .search-box,
+  .filter-chip,
+  .status-chip,
+  .meta-pill,
+  .review-thumb {
+    background: var(--surface);
+    border-color: var(--border);
+  }
+
+  .search-box input {
+    color: var(--text-dark);
+  }
+
+  .search-box input::placeholder {
+    color: var(--text-gray);
+  }
+
+  .rating-track {
+    background: var(--surface-soft);
+  }
+
+  .review-divider {
+    background: var(--border);
+  }
+
+  .filter-chip--active {
+    background: var(--primary);
+    color: var(--white);
   }
 }

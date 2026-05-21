@@ -1,5 +1,6 @@
 import { HttpErrorResponse, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, filter, finalize, switchMap, take, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 
@@ -18,7 +19,7 @@ function withAuthHeader<T>(request: HttpRequest<T>, token: string): HttpRequest<
   });
 }
 
-function notifyBannedAction(error: HttpErrorResponse): void {
+function notifyBannedAction(error: HttpErrorResponse, authService: AuthService, router: Router): void {
   const message =
     typeof error.error?.message === 'string' && error.error.message.trim().length > 0
       ? error.error.message.trim()
@@ -26,10 +27,15 @@ function notifyBannedAction(error: HttpErrorResponse): void {
 
   sessionStorage.setItem('spirego-admin-ban-message', message);
   window.dispatchEvent(new CustomEvent('banned-user-action-blocked', { detail: message }));
+
+  if (authService.isBannedContentCreator() && !router.url.startsWith('/account-banned')) {
+    void router.navigateByUrl(authService.getAccountBannedRoute());
+  }
 }
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const authService = inject(AuthService);
+  const router = inject(Router);
   const token = authService.getToken();
   const authRequest =
     token && !request.headers.has('Authorization') && !isAuthEndpoint(request.url)
@@ -39,7 +45,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
   return next(authRequest).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 423) {
-        notifyBannedAction(error);
+        notifyBannedAction(error, authService, router);
         return throwError(() => error);
       }
 

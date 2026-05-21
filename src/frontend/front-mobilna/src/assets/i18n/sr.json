@@ -44,7 +44,9 @@
     "viewDetails": "Detalji",
     "email": "Email",
     "password": "Lozinka",
-    "soonest": "Najskorije"
+    "soonest": "Najskorije",
+    "qrTitle": "QR kod",
+  "qrBody": "Skeniraj za brzo otvaranje ove stranice."
   },
   "moderatorAccess": {
     "title": "Moderator pristup",
