@@ -647,3 +647,7 @@ input, textarea, select {
 router-outlet {
   display: contents;
 }
+
+body.cc-nav-open {
+  overflow: hidden;
+}
