@@ -18,7 +18,7 @@ interface ActivityInsightCard {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, SharedMapComponent],
   templateUrl: './activities.component.html',
-  styleUrls: ['./activities.component.css']
+  styleUrls: ['./activities.component.css', '../shared/cc-list-page-header.css']
 })
 export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
   private readonly activitiesService = inject(ActivitiesService);
@@ -351,6 +351,15 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
       default:
         return 'status-draft';
     }
+  }
+
+  get activitiesCountLabel(): string {
+    if (this.isLoading) {
+      return '…';
+    }
+
+    const count = this.totalCount;
+    return `${count} activit${count === 1 ? 'y' : 'ies'}`;
   }
 
   get pageStart(): number {

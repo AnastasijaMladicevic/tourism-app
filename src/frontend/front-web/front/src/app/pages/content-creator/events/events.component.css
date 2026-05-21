@@ -1,20 +1,13 @@
 .events-page {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 22px;
+  gap: 16px;
+  padding: 18px;
   min-height: calc(100vh - 62px);
-  color: #1f2937;
+  color: #111827;
   min-width: 0;
   width: 100%;
   box-sizing: border-box;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 18px;
-  align-items: flex-start;
 }
 
 .eyebrow {
@@ -23,19 +16,11 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #6b7280;
-  margin-bottom: 6px;
-}
-
-.page-header h1 {
-  font-size: 28px;
-  line-height: 1.1;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .page-intro {
   max-width: 680px;
-  color: #6b7280;
-  font-size: 14px;
 }
 
 .row-actions {
@@ -982,16 +967,9 @@ tbody tr:hover,
 
 @media (max-width: 920px) {
   .events-page {
-    padding: 0 0 12px;
-    gap: 10px;
-    background: #f1f5f9;
+    padding: 18px 18px 12px;
+    gap: 12px;
     min-height: 0;
-  }
-
-  .page-header,
-  .toolbar,
-  .filters-panel {
-    margin-inline: 16px;
   }
 
   .page-header,
@@ -1006,21 +984,10 @@ tbody tr:hover,
     flex-direction: row;
     align-items: center;
     gap: 10px;
-    margin: 0;
-    padding: 12px;
-    background: #fff;
-    border-bottom: 1px solid #e5e7eb;
-    box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04);
   }
 
-  .page-header-eyebrow,
-  .page-intro {
+  .page-header-eyebrow {
     display: none;
-  }
-
-  .page-header h1 {
-    font-size: 20px;
-    margin-bottom: 0;
   }
 
   .page-header-cta {
@@ -1480,10 +1447,6 @@ tbody tr:hover,
 }
 
 @media (max-width: 640px) {
-  .page-header h1 {
-    font-size: 18px;
-  }
-
   .insight-card strong {
     font-size: 20px;
   }

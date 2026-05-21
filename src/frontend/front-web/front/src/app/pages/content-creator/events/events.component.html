@@ -1,19 +1,16 @@
 <section class="events-page">
-  <div class="page-header">
+  <header class="page-header">
     <div class="page-header-copy">
       <p class="eyebrow page-header-eyebrow">Events management</p>
       <h1>Events &amp; Schedules</h1>
-      <p class="page-intro">
-        Manage published events, review the selected event, and jump straight into creation or
-        edits.
-      </p>
+      <p class="page-subtitle">Total: {{ eventsCountLabel }}</p>
     </div>
 
     <button type="button" class="primary-btn page-header-cta" (click)="onCreateEvent()">
       <span class="material-symbols-outlined">add</span>
       <span class="page-header-cta-label">Create New Event</span>
     </button>
-  </div>
+  </header>
 
   <div class="toolbar card">
     <div class="toolbar-search">
