@@ -540,6 +540,19 @@
     text-align: left;
   }
 
+  .profile-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .profile-name {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    max-width: 100%;
+  }
+
   .profile-reset-btn {
     width: 100%;
     justify-content: center;
