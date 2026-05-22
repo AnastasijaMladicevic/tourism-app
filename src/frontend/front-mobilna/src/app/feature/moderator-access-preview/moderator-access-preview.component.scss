@@ -72,6 +72,7 @@
     font-size: 15px;
     line-height: 1.35;
     font-weight: 900;
+    text-align: center;
   }
 
   p {
@@ -273,7 +274,7 @@
   }
 
   .preview-topbar {
-    width: min(100%, 860px);
+    width: min(100%, 720px);
     margin: 0 auto;
     padding: 16px 0 10px;
 
@@ -283,7 +284,7 @@
   }
 
   .preview-shell {
-    width: min(100%, 860px);
+    width: min(100%, 720px);
     padding: 0 0 34px;
   }
 
@@ -298,7 +299,7 @@
 
     p {
       font-size: 16px;
-      max-width: 56ch;
+      max-width: none;
     }
   }
 
@@ -331,18 +332,17 @@
 
   .status-panel {
     margin-top: 22px;
-    padding: 30px;
-    background: var(--surface-strong);
-    border: 1px solid var(--border);
-    border-radius: 28px;
-    box-shadow: 0 18px 34px rgba(30, 53, 65, 0.08);
+    padding: 30px 0 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
   }
 
   .status-card {
-    max-width: 520px;
     width: 100%;
   }
 
@@ -386,11 +386,16 @@
 
   .intro-card,
   .privileges-list,
-  .status-panel,
   .status-card {
     background: var(--surface-strong);
     border-color: var(--border);
     box-shadow: 0 18px 34px rgba(0, 0, 0, 0.18);
+  }
+
+  .status-panel {
+    background: transparent;
+    border: none;
+    box-shadow: none;
   }
 
   .privilege-icon,
