@@ -19,7 +19,7 @@
 
 .map-page__toolbar {
   position: relative;
-  z-index: 1200;
+  z-index: 100;
   padding: 12px 16px 10px;
   background: #e8eef3;
   flex-shrink: 0;
@@ -129,7 +129,7 @@
   border-radius: 16px;
   box-shadow: 0 18px 36px rgba(15, 23, 42, 0.14);
   overflow: hidden;
-  z-index: 1250;
+  z-index: 110;
   max-height: 320px;
   overflow-y: auto;
 }
@@ -276,7 +276,7 @@
   top: 128px;
   left: 16px;
   right: 16px;
-  z-index: 1000;
+  z-index: 100;
   background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(10px);
   border-radius: 18px;
@@ -352,7 +352,7 @@
   right: 16px;
   top: 40%;
   transform: translateY(-50%);
-  z-index: 1000;
+  z-index: 100;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -434,7 +434,7 @@
   bottom: 72px;
   left: 16px;
   right: 16px;
-  z-index: 1000;
+  z-index: 100;
   background: rgba(255, 255, 255, 0.98);
   border-radius: 24px;
   box-shadow: 0 18px 42px rgba(15, 23, 42, 0.18);

@@ -32,6 +32,7 @@
   overflow-y: auto;
   position: sticky;
   top: 62px;
+  z-index: 200;
 }
 
 .sidebar-section-label {
@@ -357,7 +358,7 @@
   padding: 0;
   margin: 0;
   background: rgba(15, 23, 42, 0.45);
-  z-index: 350;
+  z-index: 2640;
   cursor: pointer;
 }
 
@@ -407,7 +408,7 @@
     width: min(288px, 86vw);
     min-width: 0;
     height: auto;
-    z-index: 400;
+    z-index: 2650;
     border-right: 1px solid #ebebeb;
     border-bottom: none;
     padding-bottom: 16px;

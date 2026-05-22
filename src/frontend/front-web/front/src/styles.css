@@ -649,6 +649,43 @@ router-outlet {
 }
 
 body.cc-nav-open,
-body.manager-nav-open {
+body.manager-nav-open,
+body.admin-nav-open {
   overflow: hidden;
+}
+
+/* =====================
+   MAP LAYERING
+   Keep Leaflet below app navigation drawers (mobile menu, topbar).
+   ===================== */
+
+.map-card,
+.map-container,
+.location-map,
+.mini-map {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.map-card .leaflet-container,
+.map-container .leaflet-container,
+.location-map .leaflet-container,
+.mini-map .leaflet-container,
+app-map .leaflet-container {
+  z-index: 0 !important;
+}
+
+/* Full-screen map pages: UI chrome stays below nav overlay (2650) */
+.map-page__toolbar,
+.map-page .map-controls,
+.map-page .bottom-card,
+.map-page .suggestions,
+.map-page .filter-panel {
+  z-index: 100;
+}
+
+.map-page .suggestions {
+  z-index: 110;
 }
