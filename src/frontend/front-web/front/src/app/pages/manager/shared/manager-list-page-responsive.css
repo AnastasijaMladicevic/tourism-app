@@ -4,6 +4,7 @@
 .events-mobile-list,
 .activities-mobile-list,
 .localities-mobile-list,
+.reports-mobile-list,
 .detail-sheet-label {
   display: none;
 }
@@ -11,7 +12,8 @@
 .object-mobile-card,
 .event-mobile-card,
 .activity-mobile-card,
-.locality-mobile-card {
+.locality-mobile-card,
+.report-mobile-card {
   display: none;
 }
 
@@ -157,24 +159,27 @@
   .manager-list-page .objects-table-wrap,
   .manager-list-page .events-table-wrap,
   .manager-list-page .localities-table-wrap,
-  .manager-list-page .activities-table-wrap {
+  .manager-list-page .activities-table-wrap,
+  .manager-reports-page .reports-table-wrap.table-scroll {
     display: none;
   }
 
   .manager-list-page .objects-mobile-list,
   .manager-list-page .events-mobile-list,
   .manager-list-page .activities-mobile-list,
-  .manager-list-page .localities-mobile-list {
+  .manager-list-page .localities-mobile-list,
+  .manager-reports-page .reports-mobile-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 0;
+    padding: 0 12px 12px;
   }
 
   .manager-list-page .object-mobile-card,
   .manager-list-page .event-mobile-card,
   .manager-list-page .activity-mobile-card,
-  .manager-list-page .locality-mobile-card {
+  .manager-list-page .locality-mobile-card,
+  .manager-reports-page .report-mobile-card {
     display: grid;
     grid-template-columns: 56px minmax(0, 1fr) auto;
     gap: 12px;
@@ -193,14 +198,16 @@
   .manager-list-page .object-mobile-card:active,
   .manager-list-page .event-mobile-card:active,
   .manager-list-page .activity-mobile-card:active,
-  .manager-list-page .locality-mobile-card:active {
+  .manager-list-page .locality-mobile-card:active,
+  .manager-reports-page .report-mobile-card:active {
     transform: scale(0.99);
   }
 
   .manager-list-page .object-mobile-card.is-active,
   .manager-list-page .event-mobile-card.is-active,
   .manager-list-page .activity-mobile-card.is-active,
-  .manager-list-page .locality-mobile-card.is-active {
+  .manager-list-page .locality-mobile-card.is-active,
+  .manager-reports-page .report-mobile-card.is-active {
     border-color: #60a5fa;
     background: #f8fbff;
     box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35);
@@ -364,6 +371,21 @@
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .manager-list-page .detail-hero {
+    padding: 14px 16px 0;
+  }
+
+  .manager-list-page .detail-hero h2 {
+    font-size: 20px;
+    margin-top: 4px;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   .manager-list-page .detail-sheet-label {
