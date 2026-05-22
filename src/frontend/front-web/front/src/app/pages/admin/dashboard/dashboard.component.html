@@ -86,7 +86,17 @@
                 class="chart-line-multi"
                 fill="none"
                 [attr.stroke]="series.color"
-              />
+              ></path>
+              <rect
+                *ngFor="let zone of userGrowthHoverZones"
+                class="chart-hover-zone"
+                [attr.x]="zone.x"
+                y="0"
+                [attr.width]="zone.width"
+                height="100"
+              >
+                <title>{{ zone.title }}</title>
+              </rect>
             </svg>
             <p class="chart-empty" *ngIf="userGrowthIsEmpty">No signups in this period.</p>
           </div>
@@ -107,7 +117,9 @@
 
         <div class="donut-wrap" *ngIf="roleDonutSlices.length; else emptyRoleDonut">
           <svg viewBox="0 0 100 100" class="donut-svg" aria-hidden="true">
-            <path *ngFor="let slice of roleDonutSlices" [attr.d]="slice.path" [attr.fill]="slice.color"></path>
+            <path *ngFor="let slice of roleDonutSlices" [attr.d]="slice.path" [attr.fill]="slice.color">
+              <title>{{ slice.label }}: {{ slice.count | number }} users ({{ slice.percent }}%)</title>
+            </path>
           </svg>
           <div class="donut-center">
             <span class="donut-center-val">{{ roleDonutTotal | number }}</span>
@@ -131,38 +143,49 @@
       <article class="card panel">
         <div class="section-head">
           <div>
-            <h3>Account Health</h3>
-            <p>Current verification, activity and bans</p>
+            <h3>Banned Users</h3>
+            <p>Current temporary and permanent bans by region</p>
           </div>
         </div>
 
-        <div class="health-groups">
-          <div class="health-group" *ngFor="let group of healthGroups">
-            <div class="health-group-head">
-              <span class="health-group-label">{{ group.label }}</span>
-              <span class="health-group-total">
-                {{ group.segments[0].value | number }} vs {{ group.segments[1].value | number }}
-              </span>
-            </div>
+        <div class="creator-summary">
+          <div class="creator-stat creator-stat--pending">
+            <span class="creator-stat-val">{{ overview.banOverview.totalBanned | number }}</span>
+            <span class="creator-stat-label">Total banned</span>
+          </div>
+          <div class="creator-stat">
+            <span class="creator-stat-val">{{ overview.banOverview.temporarilyBanned | number }}</span>
+            <span class="creator-stat-label">Temporary</span>
+          </div>
+          <div class="creator-stat">
+            <span class="creator-stat-val">{{ overview.banOverview.permanentlyBanned | number }}</span>
+            <span class="creator-stat-label">Permanent</span>
+          </div>
+        </div>
 
-            <div class="health-bar">
-              <span
-                *ngFor="let segment of group.segments"
-                class="health-bar-seg"
-                [style.width.%]="segment.percent"
-                [style.background]="segment.color"
-                [attr.title]="segment.label + ': ' + segment.value"
-              ></span>
+        <div *ngIf="banRegionRows.length; else emptyBanRegions" class="region-list">
+          <div *ngFor="let row of banRegionRows" class="region-row">
+            <div class="region-row-head">
+              <span class="region-name">{{ row.regionName }}</span>
+              <span class="region-code">{{ row.regionCode }}</span>
             </div>
-
-            <div class="health-legend">
-              <span *ngFor="let segment of group.segments">
-                <span class="legend-dot" [style.background]="segment.color"></span>
-                {{ segment.label }} · {{ segment.value | number }}
-              </span>
+            <div
+              class="region-bar-track"
+              [title]="'Total banned: ' + row.totalBanned + ' · Temporary: ' + row.temporarilyBanned + ' · Permanent: ' + row.permanentlyBanned"
+            >
+              <div class="region-bar-fill region-bar-fill--ban" [style.width.%]="row.barPercent"></div>
+            </div>
+            <div class="region-stats">
+              <span>{{ row.totalBanned | number }} total</span>
+              <span>{{ row.temporarilyBanned | number }} temporary</span>
+              <span>{{ row.permanentlyBanned | number }} permanent</span>
             </div>
           </div>
         </div>
+
+        <ng-template #emptyBanRegions>
+          <p class="empty-note">There are currently no banned users by region.</p>
+        </ng-template>
       </article>
     </div>
 
@@ -183,7 +206,11 @@
               <span class="region-code">{{ row.code }}</span>
             </div>
             <div class="region-bar-track">
-              <div class="region-bar-fill" [style.width.%]="row.barPercent"></div>
+              <div
+                class="region-bar-fill"
+                [style.width.%]="row.barPercent"
+                [title]="row.name + ': ' + row.total + ' total, ' + row.active + ' active, ' + row.geocoded + ' mapped'"
+              ></div>
             </div>
             <div class="region-stats">
               <span>{{ row.total | number }} total</span>
@@ -227,6 +254,7 @@
             class="stack-segment"
             [style.width.%]="slice.percent"
             [style.background]="slice.color"
+            [title]="slice.label + ': ' + (slice.count | number)"
           ></span>
         </div>
 
@@ -278,7 +306,11 @@
               <div class="visit-count">score {{ row.engagementScore | number:'1.0-1' }}</div>
             </div>
             <div class="region-bar-track">
-              <div class="region-bar-fill region-bar-fill--teal" [style.width.%]="row.barPercent"></div>
+              <div
+                class="region-bar-fill region-bar-fill--teal"
+                [style.width.%]="row.barPercent"
+                [title]="row.destinationName + ': score ' + row.engagementScore + ', favorites ' + row.favoriteAdds + ', planner ' + row.plannerAdds + ', reviews ' + row.reviewCount + ', avg ' + row.averageRating"
+              ></div>
             </div>
             <div class="visit-meta">
               <span>{{ row.favoriteAdds | number }} favorites</span>
@@ -309,7 +341,11 @@
               <span class="region-code">{{ row.regionCode }}</span>
             </div>
             <div class="region-bar-track">
-              <div class="region-bar-fill region-bar-fill--teal" [style.width.%]="row.barPercent"></div>
+              <div
+                class="region-bar-fill region-bar-fill--teal"
+                [style.width.%]="row.barPercent"
+                [title]="row.regionName + ': score ' + row.engagementScore + ', favorites ' + row.favoriteAdds + ', planner ' + row.plannerAdds + ', reviews ' + row.reviewCount + ', destinations ' + row.engagedDestinations + ', avg ' + row.averageRating"
+              ></div>
             </div>
             <div class="region-stats">
               <span>{{ row.favoriteAdds | number }} favorites</span>

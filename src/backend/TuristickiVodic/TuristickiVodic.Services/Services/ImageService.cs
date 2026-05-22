@@ -434,9 +434,36 @@ namespace TuristickiVodic.Services.Services
 
         private async Task EnsureCanManageDestinationImagesAsync(int destinationId, int userId, string roleName)
         {
-            await EnsureDestinationExistsAsync(destinationId);
+            var destination = await _context.Destinations.FirstOrDefaultAsync(d => d.Id == destinationId);
+            if (destination == null)
+                throw new KeyNotFoundException($"Destination with id {destinationId} not found.");
+
             if (roleName != "Admin")
                 throw new UnauthorizedAccessException("Only admin can manage destination images.");
+
+            EnsureDestinationEditLockOwnership(destination, userId);
+        }
+
+        private static void EnsureDestinationEditLockOwnership(Destination destination, int requestingUserId)
+        {
+            var now = DateTime.UtcNow;
+            var isLockActive = destination.EditLockedByUserId.HasValue &&
+                               destination.EditLockExpiresAtUtc.HasValue &&
+                               destination.EditLockExpiresAtUtc.Value > now;
+
+            if (!isLockActive || destination.EditLockedByUserId == requestingUserId)
+                return;
+
+            throw new DestinationEditLockException(new DestinationEditLockDto
+            {
+                DestinationId = destination.Id,
+                IsLocked = true,
+                IsOwnedByCurrentUser = false,
+                LockedByUserId = destination.EditLockedByUserId,
+                AcquiredAtUtc = destination.EditLockAcquiredAtUtc,
+                ExpiresAtUtc = destination.EditLockExpiresAtUtc,
+                Message = "Another admin is currently editing this destination."
+            });
         }
 
         private async Task EnsureCanManageLocalityImagesAsync(int localityId, int userId, string roleName)

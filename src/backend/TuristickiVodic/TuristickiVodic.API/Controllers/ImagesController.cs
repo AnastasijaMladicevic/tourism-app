@@ -48,6 +48,10 @@ namespace TuristickiVodic.API.Controllers
             {
                 return Forbid();
             }
+            catch (DestinationEditLockException ex)
+            {
+                return Conflict(ex.LockState);
+            }
             catch (InvalidOperationException ex)
             {
                 return BadRequest(new { message = ex.Message });
@@ -69,6 +73,10 @@ namespace TuristickiVodic.API.Controllers
             catch (UnauthorizedAccessException)
             {
                 return Forbid();
+            }
+            catch (DestinationEditLockException ex)
+            {
+                return Conflict(ex.LockState);
             }
             catch (InvalidOperationException ex)
             {
@@ -92,6 +100,10 @@ namespace TuristickiVodic.API.Controllers
             catch (UnauthorizedAccessException)
             {
                 return Forbid();
+            }
+            catch (DestinationEditLockException ex)
+            {
+                return Conflict(ex.LockState);
             }
             catch (InvalidOperationException ex)
             {

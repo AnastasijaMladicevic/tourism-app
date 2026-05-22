@@ -38,6 +38,10 @@ namespace TuristickiVodic.Core.Models
         public int? ManagedByUserId { get; set; }
         public User? ManagedBy { get; set; }
 
+        public int? EditLockedByUserId { get; set; }
+        public DateTime? EditLockAcquiredAtUtc { get; set; }
+        public DateTime? EditLockExpiresAtUtc { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 

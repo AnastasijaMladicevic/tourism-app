@@ -808,6 +808,109 @@ namespace TuristickiVodic.Tests.Services
         }
 
         // ═══════════════════════════════════════════
+        //  Edit locks
+        // ═══════════════════════════════════════════
+
+        [Fact]
+        public async Task AcquireEditLockAsync_KadaDestinacijaNijeZakljucana_DodeljujeLockTekucemAdminu()
+        {
+            using var ctx = CreateInMemoryContext(nameof(AcquireEditLockAsync_KadaDestinacijaNijeZakljucana_DodeljujeLockTekucemAdminu));
+            var (_, managerRole, adminRole, tip) = SeedBase(ctx);
+
+            var adminUser = new User
+            {
+                Id = 100,
+                FirstName = "Admin",
+                LastName = "A",
+                Email = "admin@test.com",
+                PasswordHash = "hash",
+                RoleId = adminRole.Id,
+                Role = adminRole,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            };
+
+            var manager = CreateManager(10, "mgr@test.com", managerRole);
+
+            ctx.Users.AddRange(adminUser, manager);
+            ctx.Destinations.Add(new Destination
+            {
+                Id = 1,
+                Name = "Kotor",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                ManagedByUserId = manager.Id,
+                CreatedByUserId = adminUser.Id,
+                Status = ContentStatus.Approved
+            });
+            ctx.SaveChanges();
+
+            var svc = new DestinationService(ctx, CreateMapper());
+
+            var result = await svc.AcquireEditLockAsync(1, adminUser.Id);
+
+            result.Should().NotBeNull();
+            result!.IsOwnedByCurrentUser.Should().BeTrue();
+            result.LockedByUserId.Should().Be(adminUser.Id);
+        }
+
+        [Fact]
+        public async Task UpdateAsync_KadaDrugiAdminDrziAktivanLock_BacaDestinationEditLockException()
+        {
+            using var ctx = CreateInMemoryContext(nameof(UpdateAsync_KadaDrugiAdminDrziAktivanLock_BacaDestinationEditLockException));
+            var (_, managerRole, adminRole, tip) = SeedBase(ctx);
+
+            var admin1 = new User
+            {
+                Id = 100,
+                FirstName = "Ana",
+                LastName = "Admin",
+                Email = "ana@test.com",
+                PasswordHash = "hash",
+                RoleId = adminRole.Id,
+                Role = adminRole,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            };
+
+            var admin2 = new User
+            {
+                Id = 101,
+                FirstName = "Marko",
+                LastName = "Admin",
+                Email = "marko@test.com",
+                PasswordHash = "hash",
+                RoleId = adminRole.Id,
+                Role = adminRole,
+                IsActive = true,
+                DateOfBirth = new DateTime(1990, 1, 1)
+            };
+
+            var manager = CreateManager(10, "mgr@test.com", managerRole);
+
+            ctx.Users.AddRange(admin1, admin2, manager);
+            ctx.Destinations.Add(new Destination
+            {
+                Id = 1,
+                Name = "Kotor",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                ManagedByUserId = manager.Id,
+                CreatedByUserId = admin1.Id,
+                Status = ContentStatus.Approved,
+                EditLockedByUserId = admin1.Id,
+                EditLockAcquiredAtUtc = DateTime.UtcNow,
+                EditLockExpiresAtUtc = DateTime.UtcNow.AddMinutes(3)
+            });
+            ctx.SaveChanges();
+
+            var svc = new DestinationService(ctx, CreateMapper());
+
+            await svc.Invoking(s => s.UpdateAsync(1, new UpdateDestinationDto { Name = "Blocked" }, admin2.Id, "Admin"))
+                .Should().ThrowAsync<DestinationEditLockException>();
+        }
+
+        // ═══════════════════════════════════════════
         //  AssignManagerAsync
         // ═══════════════════════════════════════════
 
@@ -838,7 +941,7 @@ namespace TuristickiVodic.Tests.Services
             ctx.SaveChanges();
 
             var svc = new DestinationService(ctx, CreateMapper());
-            var result = await svc.AssignManagerAsync(2, mgr2.Id);
+            var result = await svc.AssignManagerAsync(2, mgr2.Id, mgr1.Id);
 
             result.Should().NotBeNull();
             result!.ManagedByUserId.Should().Be(mgr2.Id);
@@ -869,7 +972,7 @@ namespace TuristickiVodic.Tests.Services
 
             var svc = new DestinationService(ctx, CreateMapper());
 
-            await svc.Invoking(s => s.AssignManagerAsync(3, mgrZauzet.Id))
+            await svc.Invoking(s => s.AssignManagerAsync(3, mgrZauzet.Id, 1))
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*already manages*");
         }
@@ -910,7 +1013,7 @@ namespace TuristickiVodic.Tests.Services
 
             var svc = new DestinationService(ctx, CreateMapper());
 
-            await svc.Invoking(s => s.AssignManagerAsync(4, tourist_user.Id))
+            await svc.Invoking(s => s.AssignManagerAsync(4, tourist_user.Id, 1))
                 .Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage("*Manager role*");
         }

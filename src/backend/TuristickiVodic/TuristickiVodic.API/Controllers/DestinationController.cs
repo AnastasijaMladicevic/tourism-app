@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Services;
+using TuristickiVodic.Services.Services;
 
 namespace TuristickiVodic.API.Controllers
 {
@@ -97,10 +98,50 @@ namespace TuristickiVodic.API.Controllers
 
                 return Ok(updated);
             }
+            catch (DestinationEditLockException ex)
+            {
+                return Conflict(ex.LockState);
+            }
             catch (InvalidOperationException ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+        [HttpPost("{id}/edit-lock")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AcquireEditLock(int id)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var lockState = await _service.AcquireEditLockAsync(id, userId);
+            if (lockState == null)
+                return NotFound();
+
+            return Ok(lockState);
+        }
+
+        [HttpPut("{id}/edit-lock")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RefreshEditLock(int id)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var lockState = await _service.RefreshEditLockAsync(id, userId);
+            if (lockState == null)
+                return NotFound();
+
+            return Ok(lockState);
+        }
+
+        [HttpDelete("{id}/edit-lock")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ReleaseEditLock(int id)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var released = await _service.ReleaseEditLockAsync(id, userId);
+            if (!released)
+                return NoContent();
+
+            return NoContent();
         }
 
         [HttpPut("{id}/assign-manager")]
@@ -112,11 +153,16 @@ namespace TuristickiVodic.API.Controllers
 
             try
             {
-                var updated = await _service.AssignManagerAsync(id, dto.ManagerUserId);
+                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+                var updated = await _service.AssignManagerAsync(id, dto.ManagerUserId, userId);
                 if (updated == null)
                     return NotFound();
 
                 return Ok(updated);
+            }
+            catch (DestinationEditLockException ex)
+            {
+                return Conflict(ex.LockState);
             }
             catch (InvalidOperationException ex)
             {

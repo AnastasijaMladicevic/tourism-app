@@ -132,11 +132,23 @@
   color: #166534;
 }
 
+.alert-lock {
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  color: #9a3412;
+}
+
 .workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(320px, 460px);
   gap: 18px;
   align-items: start;
+}
+
+.workspace--blocked {
+  opacity: 0.72;
+  pointer-events: none;
+  user-select: none;
 }
 
 .workspace-main {

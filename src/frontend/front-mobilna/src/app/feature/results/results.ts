@@ -1,7 +1,9 @@
 import {
   ChangeDetectorRef,
   Component,
+  ElementRef,
   OnInit,
+  ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -87,7 +89,7 @@ export class ResultsComponent implements OnInit {
     private locationTrackingService: LocationTrackingService,
     private pendingActionService: PendingActionService
   ) { }
-
+  @ViewChild('top') top!: ElementRef;
   ngOnInit(): void {
     const state = history.state as any;
 
@@ -379,6 +381,7 @@ export class ResultsComponent implements OnInit {
 
     this.currentPage--;
     void this.refreshVisibleItems();
+    this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
   nextPage(): void {
@@ -386,6 +389,7 @@ export class ResultsComponent implements OnInit {
 
     this.currentPage++;
     void this.refreshVisibleItems();
+    this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
   viewDetails(item: View): void {
     const routes: Record<string, string> = {

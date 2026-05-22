@@ -210,10 +210,13 @@
                       <button
                         type="button"
                         class="icon-btn plain"
-                        title="Edit destination"
+                        [title]="getEditDisabledTitle(row)"
+                        [disabled]="isEditLockedByAnother(row)"
                         (click)="onEditDestination(row); $event.stopPropagation()"
                       >
-                        <span class="material-symbols-outlined">edit</span>
+                        <span class="material-symbols-outlined">
+                          {{ isEditLockedByAnother(row) ? 'lock' : 'edit' }}
+                        </span>
                       </button>
                     </div>
                   </td>
@@ -345,7 +348,19 @@
         </section>
 
         <section class="detail-section">
-          <button type="button" class="primary-btn sidebar-review-btn" (click)="onEditDestination(selectedDestination)">
+          @if (isEditLockedByAnother(selectedDestination)) {
+            <div class="selection-lock-note">
+              <span class="material-symbols-outlined">lock_clock</span>
+              <p>{{ getEditLockSummary(selectedDestination) }}</p>
+            </div>
+          }
+          <button
+            type="button"
+            class="primary-btn sidebar-review-btn"
+            [disabled]="isEditLockedByAnother(selectedDestination)"
+            [title]="getEditDisabledTitle(selectedDestination)"
+            (click)="onEditDestination(selectedDestination)"
+          >
             <span class="material-symbols-outlined">rate_review</span>
             Open full review
           </button>

@@ -22,5 +22,6 @@ namespace TuristickiVodic.Core.DTO
         public int? ManagedByUserId { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public DestinationEditLockDto? EditLock { get; set; }
     }
 }

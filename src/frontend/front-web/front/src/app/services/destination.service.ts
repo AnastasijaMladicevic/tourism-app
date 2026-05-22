@@ -25,6 +25,7 @@ export interface DestinationDto {
   images?: DestinationImageDto[];
   isFavorite?: boolean;
   favoriteId?: number;
+  editLock?: DestinationEditLockDto;
 }
 
 export interface DestinationImageDto {
@@ -68,6 +69,17 @@ export interface UpdateDestinationDto {
 export interface AssignManagerDto {
   managerUserId: number;
 }
+
+export interface DestinationEditLockDto {
+  destinationId: number;
+  isLocked: boolean;
+  isOwnedByCurrentUser: boolean;
+  lockedByUserId?: number;
+  lockedByDisplayName?: string;
+  acquiredAtUtc?: string;
+  expiresAtUtc?: string;
+  message: string;
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -104,6 +116,18 @@ export class DestinationService {
 
   update(id: number, dto: UpdateDestinationDto): Observable<DestinationDto> {
     return this.http.put<DestinationDto>(`${this.apiUrl}/${id}`, dto);
+  }
+
+  acquireEditLock(id: number): Observable<DestinationEditLockDto> {
+    return this.http.post<DestinationEditLockDto>(`${this.apiUrl}/${id}/edit-lock`, {});
+  }
+
+  refreshEditLock(id: number): Observable<DestinationEditLockDto> {
+    return this.http.put<DestinationEditLockDto>(`${this.apiUrl}/${id}/edit-lock`, {});
+  }
+
+  releaseEditLock(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}/edit-lock`);
   }
 
   assignManager(id: number, managerUserId: number): Observable<DestinationDto> {

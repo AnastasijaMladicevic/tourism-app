@@ -7,6 +7,7 @@ using Xunit;
 using TuristickiVodic.API.Controllers;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Services;
+using TuristickiVodic.Services.Services;
 using TuristickiVodic.Tests.Helpers;
 
 namespace TuristickiVodic.Tests.Controllers
@@ -267,13 +268,67 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
+        public async Task Update_KadaDestinacijuUredjujeDrugiAdmin_VracaConflict()
+        {
+            var mockService = new Mock<IDestinationService>();
+            var lockState = new DestinationEditLockDto
+            {
+                DestinationId = 1,
+                IsLocked = true,
+                IsOwnedByCurrentUser = false,
+                LockedByUserId = 2,
+                LockedByDisplayName = "Ana Admin",
+                Message = "Ana Admin is currently editing this destination."
+            };
+
+            mockService
+                .Setup(s => s.UpdateAsync(1, It.IsAny<UpdateDestinationDto>(), 1, "Admin"))
+                .ThrowsAsync(new DestinationEditLockException(lockState));
+
+            var admin = FakeUserHelper.CreateUser(1, "Admin");
+            var controller = CreateController(mockService, admin);
+
+            var result = await controller.Update(1, new UpdateDestinationDto { Name = "Blocked" });
+
+            result.Should().BeOfType<ConflictObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(lockState);
+        }
+
+        [Fact]
+        public async Task AcquireEditLock_KadaDestinacijaPostoji_VracaOk()
+        {
+            var mockService = new Mock<IDestinationService>();
+            var lockState = new DestinationEditLockDto
+            {
+                DestinationId = 1,
+                IsLocked = true,
+                IsOwnedByCurrentUser = true,
+                LockedByUserId = 1,
+                LockedByDisplayName = "Admin User",
+                Message = "You are currently editing this destination."
+            };
+
+            mockService
+                .Setup(s => s.AcquireEditLockAsync(1, 1))
+                .ReturnsAsync(lockState);
+
+            var admin = FakeUserHelper.CreateUser(1, "Admin");
+            var controller = CreateController(mockService, admin);
+
+            var result = await controller.AcquireEditLock(1);
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(lockState);
+        }
+
+        [Fact]
         public async Task AssignManager_KadaJeValidanManager_VracaOk()
         {
             var mockService = new Mock<IDestinationService>();
             var updatedDto = new DestinationDto { Id = 1, ManagedByUserId = 5 };
 
             mockService
-                .Setup(s => s.AssignManagerAsync(1, 5))
+                .Setup(s => s.AssignManagerAsync(1, 5, 1))
                 .ReturnsAsync(updatedDto);
 
             var admin = FakeUserHelper.CreateUser(1, "Admin");
@@ -291,7 +346,7 @@ namespace TuristickiVodic.Tests.Controllers
             var mockService = new Mock<IDestinationService>();
 
             mockService
-                .Setup(s => s.AssignManagerAsync(999, It.IsAny<int>()))
+                .Setup(s => s.AssignManagerAsync(999, It.IsAny<int>(), It.IsAny<int>()))
                 .ReturnsAsync((DestinationDto?)null);
 
             var admin = FakeUserHelper.CreateUser(1, "Admin");
@@ -308,7 +363,7 @@ namespace TuristickiVodic.Tests.Controllers
             var mockService = new Mock<IDestinationService>();
 
             mockService
-                .Setup(s => s.AssignManagerAsync(1, 5))
+                .Setup(s => s.AssignManagerAsync(1, 5, 1))
                 .ThrowsAsync(new InvalidOperationException("This manager already manages another destination."));
 
             var admin = FakeUserHelper.CreateUser(1, "Admin");
@@ -325,7 +380,7 @@ namespace TuristickiVodic.Tests.Controllers
             var mockService = new Mock<IDestinationService>();
 
             mockService
-                .Setup(s => s.AssignManagerAsync(1, 99))
+                .Setup(s => s.AssignManagerAsync(1, 99, 1))
                 .ThrowsAsync(new InvalidOperationException("The assigned user does not have the Manager role."));
 
             var admin = FakeUserHelper.CreateUser(1, "Admin");
@@ -342,7 +397,7 @@ namespace TuristickiVodic.Tests.Controllers
             var mockService = new Mock<IDestinationService>();
 
             mockService
-                .Setup(s => s.AssignManagerAsync(1, 999))
+                .Setup(s => s.AssignManagerAsync(1, 999, 1))
                 .ThrowsAsync(new InvalidOperationException("User not found."));
 
             var admin = FakeUserHelper.CreateUser(1, "Admin");

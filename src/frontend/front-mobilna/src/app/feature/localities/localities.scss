@@ -609,7 +609,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 0;
+  z-index: 9999;
 }
 
 
@@ -797,6 +797,7 @@
 }
 
 :host-context(:root[data-theme='dark']) {
+
   .card__fav,
   .planner-btn {
     background: #102632;

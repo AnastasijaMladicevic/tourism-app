@@ -17,7 +17,7 @@ export interface AdminDashboardOverviewDto {
   destinationsByRegion: AdminDashboardDestinationByRegionDto[];
   creatorRequests: AdminDashboardCreatorRequestStatusDto;
   reports: AdminDashboardReportsSummaryDto;
-  accountHealth: AdminDashboardAccountHealthDto;
+  banOverview: AdminDashboardBanOverviewDto;
   destinationEngagement: AdminDashboardDestinationEngagementDto;
   geospatialOverview: AdminDashboardGeospatialOverviewDto;
 }
@@ -68,14 +68,20 @@ export interface AdminDashboardReportsSummaryDto {
   total: number;
 }
 
-export interface AdminDashboardAccountHealthDto {
-  verified: number;
-  unverified: number;
-  active: number;
-  inactive: number;
+export interface AdminDashboardBanOverviewDto {
   temporarilyBanned: number;
   permanentlyBanned: number;
   totalBanned: number;
+  regions: AdminDashboardBannedUsersByRegionDto[];
+}
+
+export interface AdminDashboardBannedUsersByRegionDto {
+  regionId?: number;
+  regionName: string;
+  regionCode: string;
+  totalBanned: number;
+  temporarilyBanned: number;
+  permanentlyBanned: number;
 }
 
 export interface AdminDashboardDestinationEngagementDto {

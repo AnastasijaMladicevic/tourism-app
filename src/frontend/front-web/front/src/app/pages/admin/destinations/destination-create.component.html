@@ -11,11 +11,11 @@
         <h1 class="page-title">{{ form.name.trim() || 'New destination' }}</h1>
       </div>
       <div class="title-actions">
-        <button type="button" class="btn btn-ghost btn-with-icon" (click)="onSaveDraft()" [disabled]="isSubmitting">
+        <button type="button" class="btn btn-ghost btn-with-icon" (click)="onSaveDraft()" [disabled]="isSubmitting || isLoadingDestination || isEditBlocked">
           <span class="material-symbols-outlined">save</span>
           Save draft
         </button>
-        <button type="button" class="btn btn-primary btn-with-icon" (click)="onSubmit()" [disabled]="isSubmitting">
+        <button type="button" class="btn btn-primary btn-with-icon" (click)="onSubmit()" [disabled]="isSubmitting || isLoadingDestination || isEditBlocked">
           <span class="material-symbols-outlined">check_circle</span>
           {{ isSubmitting ? 'Saving…' : isEditMode ? 'Save changes' : 'Create destination' }}
         </button>
@@ -32,7 +32,11 @@
     <div class="alert alert-success" role="status">{{ draftSavedMessage }}</div>
   }
 
-  <div class="workspace">
+  @if (isEditBlocked) {
+    <div class="alert alert-lock" role="alert">{{ editLockDisplayMessage }}</div>
+  }
+
+  <div class="workspace" [class.workspace--blocked]="isEditBlocked">
     <div class="workspace-main">
       <article class="panel">
         <span class="step-tag">STEP 1</span>

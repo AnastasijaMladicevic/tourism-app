@@ -821,6 +821,35 @@ tbody tr:hover,
   background: transparent;
 }
 
+.icon-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.selection-lock-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid #fed7aa;
+  background: #fff7ed;
+  color: #9a3412;
+}
+
+.selection-lock-note .material-symbols-outlined {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.selection-lock-note p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
 .table-footer {
   justify-content: space-between;
   padding: 14px 18px 18px;

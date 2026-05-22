@@ -964,6 +964,7 @@ button:hover {
 }
 
 @media (max-width: 768px) {
+
   .contact-info,
   .qr-card {
     align-items: flex-start;
@@ -1568,7 +1569,7 @@ textarea {
 .custom-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   z-index: 999999;
   display: flex;
   align-items: center;
@@ -1581,7 +1582,7 @@ textarea {
   background: var(--surface-strong);
   border-radius: 24px;
   padding: 26px 24px 22px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
   text-align: center;
 }
 
@@ -1783,7 +1784,7 @@ textarea {
   }
 
   .spinner {
-    border-color: rgba(255,255,255,0.08);
+    border-color: rgba(255, 255, 255, 0.08);
     border-top-color: var(--primary);
   }
 
@@ -1876,7 +1877,7 @@ textarea {
 }
 
 :host-context(:root[data-theme='dark']) {
-  
+
   .custom-modal {
     background: var(--surface-strong) !important;
     border: 1px solid var(--border) !important;
@@ -1892,88 +1893,122 @@ textarea {
     color: var(--text-gray) !important;
   }
 
-    .confirm-modal,
-    .delete-confirm-modal,
-    .confirmation-modal {
-      background: var(--surface-strong) !important;
-      border: 1px solid var(--border);
-      box-shadow: 0 24px 60px rgba(0,0,0,0.45);
-    }
-  
-    .confirm-modal h3,
-    .delete-confirm-modal h3,
-    .confirmation-modal h3 {
-      color: var(--text-dark) !important;
-    }
-  
-    .confirm-modal p,
-    .delete-confirm-modal p,
-    .confirmation-modal p {
-      color: var(--text-gray) !important;
-    }
-  
-    .confirm-cancel-btn,
-    .modal-cancel-btn {
-      background: var(--surface-soft) !important;
-      color: var(--text-dark) !important;
-      border: 1px solid var(--border);
-    }
-  
-    .confirm-submit-btn,
-    .modal-confirm-btn {
-      background: var(--primary) !important;
-      color: white !important;
-    }
-  }
-
-  .modal-content-review {
+  .confirm-modal,
+  .delete-confirm-modal,
+  .confirmation-modal {
     background: var(--surface-strong) !important;
+    border: 1px solid var(--border);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
   }
 
-  .modal-content-review h2,
-  .modal-content-review h3,
-  .modal-content-review .modal-title {
+  .confirm-modal h3,
+  .delete-confirm-modal h3,
+  .confirmation-modal h3 {
     color: var(--text-dark) !important;
   }
 
-  .modal-content-review .subtitle,
-  .modal-content-review .review-subtitle {
+  .confirm-modal p,
+  .delete-confirm-modal p,
+  .confirmation-modal p {
     color: var(--text-gray) !important;
   }
 
-  .photo-upload {
+  .confirm-cancel-btn,
+  .modal-cancel-btn {
     background: var(--surface-soft) !important;
-    border: 2px dashed rgba(77, 194, 255, 0.22) !important;
-    color: var(--text-gray) !important;
+    color: var(--text-dark) !important;
+    border: 1px solid var(--border);
   }
 
-  .photo-upload * {
-    color: var(--text-gray) !important;
-  }
-
-  .preview-item,
-  .uploaded-image,
-  .review-image-preview {
-    background: var(--surface-soft) !important;
-    border-color: var(--border) !important;
-  }
-
-  .preview-remove-btn {
-    background: rgba(0, 0, 0, 0.72) !important;
-    color: white !important;
-  }
-
-  .rating-stars button {
-    color: #facc15;
-  }
-
-  .modal-submit-btn,
-  .submit-review-btn {
+  .confirm-submit-btn,
+  .modal-confirm-btn {
     background: var(--primary) !important;
     color: white !important;
   }
+}
 
-  .modal-submit-btn:hover,
-  .submit-review-btn:hover {
-    filter: brightness(1.06);
+.modal-content-review {
+  background: var(--surface-strong) !important;
+}
+
+.modal-content-review h2,
+.modal-content-review h3,
+.modal-content-review .modal-title {
+  color: var(--text-dark) !important;
+}
+
+.modal-content-review .subtitle,
+.modal-content-review .review-subtitle {
+  color: var(--text-gray) !important;
+}
+
+.photo-upload {
+  background: var(--surface-soft) !important;
+  border: 2px dashed rgba(77, 194, 255, 0.22) !important;
+  color: var(--text-gray) !important;
+}
+
+.photo-upload * {
+  color: var(--text-gray) !important;
+}
+
+.preview-item,
+.uploaded-image,
+.review-image-preview {
+  background: var(--surface-soft) !important;
+  border-color: var(--border) !important;
+}
+
+.preview-remove-btn {
+  background: rgba(0, 0, 0, 0.72) !important;
+  color: white !important;
+}
+
+.rating-stars button {
+  color: #facc15;
+}
+
+.modal-submit-btn,
+.submit-review-btn {
+  background: var(--primary) !important;
+  color: white !important;
+}
+
+.modal-submit-btn:hover,
+.submit-review-btn:hover {
+  filter: brightness(1.06);
+}
+
+.submit-review-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 9999px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.delete-review-btn {
+  margin-top: 12px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  background: transparent;
+  border: 1px solid var(--error);
+  color: var(--error);
+  padding: 14px;
+  border-radius: 9999px;
+
+  cursor: pointer;
+}
+
+.delete-review-btn:hover {
+  background: rgba(231, 76, 60, 0.1);
 }

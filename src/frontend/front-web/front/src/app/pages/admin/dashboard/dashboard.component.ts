@@ -5,6 +5,7 @@ import { finalize } from 'rxjs';
 import { UserDto } from '../../../models/user.model';
 import { AuthService } from '../../../services/auth.service';
 import {
+  AdminDashboardBannedUsersByRegionDto,
   AdminDashboardOverviewDto,
   AdminDashboardRoleDistributionItemDto,
   AdminDashboardService,
@@ -27,6 +28,17 @@ interface UserGrowthSeries {
   linePath: string;
 }
 
+interface UserGrowthHoverZone {
+  x: number;
+  width: number;
+  title: string;
+}
+
+interface UserGrowthRenderPoint {
+  x: number;
+  y: number;
+}
+
 interface RoleDonutSlice {
   role: string;
   label: string;
@@ -45,9 +57,8 @@ interface RegionCoverageRow {
   barPercent: number;
 }
 
-interface HealthGroup {
-  label: string;
-  segments: { label: string; value: number; color: string; percent: number }[];
+interface BanRegionRow extends AdminDashboardBannedUsersByRegionDto {
+  barPercent: number;
 }
 
 interface CreatorRequestSlice {
@@ -76,7 +87,7 @@ const PERIOD_OPTIONS: PeriodOption[] = [
 
 const ROLE_COLORS: Record<string, string> = {
   Tourist: '#0d9488',
-  ContentCreator: '#6366f1',
+  ContentCreator: '#8b5cf6',
   Manager: '#d97706',
   Admin: '#dc2626',
 };
@@ -108,12 +119,13 @@ export class DashboardComponent implements OnInit {
   userGrowthYMid = '0';
   userGrowthXLabels: { label: string }[] = [];
   userGrowthIsEmpty = false;
+  userGrowthHoverZones: UserGrowthHoverZone[] = [];
 
   roleDonutSlices: RoleDonutSlice[] = [];
   roleDonutTotal = 0;
 
   regionRows: RegionCoverageRow[] = [];
-  healthGroups: HealthGroup[] = [];
+  banRegionRows: BanRegionRow[] = [];
   creatorSlices: CreatorRequestSlice[] = [];
 
   topDestinationRows: TopDestinationRow[] = [];
@@ -186,7 +198,7 @@ export class DashboardComponent implements OnInit {
     this.bindUserGrowth(overview);
     this.bindRoleDistribution(overview.roleDistribution);
     this.bindDestinationsByRegion(overview);
-    this.bindAccountHealth(overview);
+    this.bindBanOverview(overview);
     this.bindCreatorRequests(overview);
     this.bindDestinationEngagement(overview);
     this.bindMapPoints(overview);
@@ -199,10 +211,11 @@ export class DashboardComponent implements OnInit {
     this.userGrowthYMid = '0';
     this.userGrowthXLabels = [];
     this.userGrowthIsEmpty = false;
+    this.userGrowthHoverZones = [];
     this.roleDonutSlices = [];
     this.roleDonutTotal = 0;
     this.regionRows = [];
-    this.healthGroups = [];
+    this.banRegionRows = [];
     this.creatorSlices = [];
     this.topDestinationRows = [];
     this.regionVisitRows = [];
@@ -220,18 +233,35 @@ export class DashboardComponent implements OnInit {
 
     const allValues = points.flatMap((p) => [p.tourists, p.contentCreators, p.managers, p.admins]);
     const maxVal = Math.max(...allValues, 0);
+    const seriesValueSets = seriesDefs.map((def) => ({
+      key: def.key,
+      label: def.label,
+      values: points.map(def.pick),
+    }));
 
     this.userGrowthMaxY = Math.max(maxVal, 1);
     this.userGrowthYTop = String(maxVal);
     this.userGrowthYMid = maxVal === 0 ? '0' : String(Math.round(maxVal / 2));
     this.userGrowthIsEmpty = maxVal === 0;
 
+    const renderPointsBySeries = this.buildUserGrowthRenderPoints(seriesValueSets, this.userGrowthMaxY);
+
     this.userGrowthSeries = seriesDefs.map((def) => ({
       key: def.key,
       label: def.label,
       color: def.color,
-      linePath: this.buildLinePath(points.map(def.pick), this.userGrowthMaxY),
+      linePath: this.buildLinePath(renderPointsBySeries[def.key] ?? []),
     }));
+
+    this.userGrowthHoverZones = this.buildUserGrowthHoverZones(
+      points.map((point) => ({
+        label: this.formatBucketLabel(point.date, overview.userGrowthGranularity),
+        tourists: point.tourists,
+        creators: point.contentCreators,
+        managers: point.managers,
+        admins: point.admins,
+      })),
+    );
 
     const labelCount = Math.min(6, points.length);
     const step = labelCount <= 1 ? 1 : Math.max(1, Math.floor((points.length - 1) / (labelCount - 1)));
@@ -285,38 +315,12 @@ export class DashboardComponent implements OnInit {
     this.regionRows = rows;
   }
 
-  private bindAccountHealth(overview: AdminDashboardOverviewDto): void {
-    const health = overview.accountHealth;
-    this.healthGroups = [
-      {
-        label: 'Verification',
-        segments: [
-          { label: 'Verified', value: health.verified, color: '#059669', percent: 0 },
-          { label: 'Unverified', value: health.unverified, color: '#94a3b8', percent: 0 },
-        ],
-      },
-      {
-        label: 'Activity',
-        segments: [
-          { label: 'Active', value: health.active, color: '#1976d2', percent: 0 },
-          { label: 'Inactive', value: health.inactive, color: '#cbd5e1', percent: 0 },
-        ],
-      },
-      {
-        label: 'Bans',
-        segments: [
-          { label: 'Temporary', value: health.temporarilyBanned, color: '#d97706', percent: 0 },
-          { label: 'Permanent', value: health.permanentlyBanned, color: '#dc2626', percent: 0 },
-        ],
-      },
-    ];
-
-    for (const group of this.healthGroups) {
-      const total = group.segments.reduce((sum, segment) => sum + segment.value, 0);
-      group.segments.forEach((segment) => {
-        segment.percent = total > 0 ? Math.round((segment.value / total) * 1000) / 10 : 0;
-      });
-    }
+  private bindBanOverview(overview: AdminDashboardOverviewDto): void {
+    const maxBanned = Math.max(...overview.banOverview.regions.map((row) => row.totalBanned), 1);
+    this.banRegionRows = overview.banOverview.regions.map((row) => ({
+      ...row,
+      barPercent: Math.round((row.totalBanned / maxBanned) * 1000) / 10,
+    }));
   }
 
   private bindCreatorRequests(overview: AdminDashboardOverviewDto): void {
@@ -433,21 +437,98 @@ export class DashboardComponent implements OnInit {
     ].join(' ');
   }
 
-  private buildLinePath(values: number[], maxY: number): string {
-    if (!values.length || maxY <= 0) {
+  private buildLinePath(points: UserGrowthRenderPoint[]): string {
+    if (!points.length) {
       return '';
+    }
+
+    return points
+      .map((point, index) => {
+        return `${index === 0 ? 'M' : 'L'} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+      })
+      .join(' ');
+  }
+
+  private buildUserGrowthRenderPoints(
+    seriesSets: { key: string; values: number[] }[],
+    maxY: number,
+  ): Record<string, UserGrowthRenderPoint[]> {
+    const result: Record<string, UserGrowthRenderPoint[]> = Object.fromEntries(
+      seriesSets.map((series) => [series.key, [] as UserGrowthRenderPoint[]]),
+    );
+
+    if (!seriesSets.length || maxY <= 0) {
+      return result;
     }
 
     const width = 100;
     const height = 100;
+    const count = seriesSets[0]?.values.length ?? 0;
 
-    return values
-      .map((value, index) => {
-        const x = (index / Math.max(values.length - 1, 1)) * width;
-        const y = height - (value / maxY) * height;
-        return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
-      })
-      .join(' ');
+    for (let index = 0; index < count; index++) {
+      const x = (index / Math.max(count - 1, 1)) * width;
+      const groupedByValue = new Map<number, { key: string; value: number }[]>();
+
+      for (const series of seriesSets) {
+        const value = series.values[index] ?? 0;
+        const bucket = groupedByValue.get(value) ?? [];
+        bucket.push({ key: series.key, value });
+        groupedByValue.set(value, bucket);
+      }
+
+      for (const [value, bucket] of groupedByValue.entries()) {
+        const baseY = height - (value / maxY) * height;
+        const offsets = this.buildDuplicatePointOffsets(bucket.length);
+
+        bucket.forEach((series, bucketIndex) => {
+          const adjustedY = Math.min(99, Math.max(1, baseY + offsets[bucketIndex]));
+          result[series.key].push({ x, y: adjustedY });
+        });
+      }
+    }
+
+    return result;
+  }
+
+  private buildDuplicatePointOffsets(count: number): number[] {
+    if (count <= 1) {
+      return [0];
+    }
+
+    const spacing = 1.4;
+    const start = -((count - 1) * spacing) / 2;
+    return Array.from({ length: count }, (_, index) => start + index * spacing);
+  }
+
+  private buildUserGrowthHoverZones(
+    buckets: { label: string; tourists: number; creators: number; managers: number; admins: number }[],
+  ): UserGrowthHoverZone[] {
+    if (!buckets.length) {
+      return [];
+    }
+
+    const width = 100;
+    const step = buckets.length > 1 ? width / (buckets.length - 1) : width;
+
+    return buckets.map((bucket, index) => {
+      const center = buckets.length > 1 ? index * step : width / 2;
+      const previousCenter = index === 0 ? 0 : (index - 1) * step;
+      const nextCenter = index === buckets.length - 1 ? width : (index + 1) * step;
+      const start = index === 0 ? 0 : (previousCenter + center) / 2;
+      const end = index === buckets.length - 1 ? width : (center + nextCenter) / 2;
+
+      return {
+        x: start,
+        width: Math.max(2, end - start),
+        title: [
+          bucket.label,
+          `Tourists: ${bucket.tourists}`,
+          `Creators: ${bucket.creators}`,
+          `Managers: ${bucket.managers}`,
+          `Admins: ${bucket.admins}`,
+        ].join(' | '),
+      };
+    });
   }
 
   private formatBucketLabel(dateIso: string, granularity: string): string {

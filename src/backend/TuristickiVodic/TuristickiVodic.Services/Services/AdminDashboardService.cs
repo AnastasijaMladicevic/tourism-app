@@ -70,6 +70,18 @@ namespace TuristickiVodic.Services.Services
             public int Rating { get; set; }
         }
 
+        private sealed class DashboardBannedUserRow
+        {
+            public int TemporarilyBanned { get; set; }
+            public int PermanentlyBanned { get; set; }
+            public int? PreferredRegionId { get; set; }
+            public string? PreferredRegionName { get; set; }
+            public string? PreferredRegionCode { get; set; }
+            public int? ManagedRegionId { get; set; }
+            public string? ManagedRegionName { get; set; }
+            public string? ManagedRegionCode { get; set; }
+        }
+
         public AdminDashboardService(AppDbContext context)
         {
             _context = context;
@@ -127,20 +139,21 @@ namespace TuristickiVodic.Services.Services
                 })
                 .ToListAsync();
 
-            var accountHealth = await _context.Users
+            var bannedUsers = await _context.Users
                 .AsNoTracking()
-                .GroupBy(_ => 1)
-                .Select(g => new AdminDashboardAccountHealthDto
+                .Where(u => u.IsBlacklisted)
+                .Select(u => new DashboardBannedUserRow
                 {
-                    Verified = g.Count(u => u.IsVerified),
-                    Unverified = g.Count(u => !u.IsVerified),
-                    Active = g.Count(u => u.IsActive),
-                    Inactive = g.Count(u => !u.IsActive),
-                    TemporarilyBanned = g.Count(u => u.IsBlacklisted && u.BanExpiresAtUtc != null),
-                    PermanentlyBanned = g.Count(u => u.IsBlacklisted && u.BanExpiresAtUtc == null),
-                    TotalBanned = g.Count(u => u.IsBlacklisted)
+                    TemporarilyBanned = u.BanExpiresAtUtc != null ? 1 : 0,
+                    PermanentlyBanned = u.BanExpiresAtUtc == null ? 1 : 0,
+                    PreferredRegionId = u.PreferredRegionId,
+                    PreferredRegionName = u.PreferredRegion != null ? u.PreferredRegion.Name : null,
+                    PreferredRegionCode = u.PreferredRegion != null ? u.PreferredRegion.Code : null,
+                    ManagedRegionId = u.ManagedDestination != null ? (int?)u.ManagedDestination.RegionId : null,
+                    ManagedRegionName = u.ManagedDestination != null ? u.ManagedDestination.Region.Name : null,
+                    ManagedRegionCode = u.ManagedDestination != null ? u.ManagedDestination.Region.Code : null
                 })
-                .FirstOrDefaultAsync();
+                .ToListAsync();
 
             var destinationsByRegion = await _context.Regions
                 .AsNoTracking()
@@ -299,7 +312,7 @@ namespace TuristickiVodic.Services.Services
                     Rejected = reportsBreakdown.GetValueOrDefault(ContentStatus.Rejected),
                     Total = reportsBreakdown.Values.Sum()
                 },
-                AccountHealth = accountHealth ?? new AdminDashboardAccountHealthDto(),
+                BanOverview = BuildBanOverview(bannedUsers),
                 DestinationEngagement = destinationEngagement,
                 GeospatialOverview = new AdminDashboardGeospatialOverviewDto
                 {
@@ -560,6 +573,45 @@ namespace TuristickiVodic.Services.Services
                 RatedDestinations = reviewRows.Select(x => x.DestinationId).Distinct().Count(),
                 TopDestinations = topDestinations,
                 RegionEngagement = regionRows
+            };
+        }
+
+        private static AdminDashboardBanOverviewDto BuildBanOverview(
+            IReadOnlyList<DashboardBannedUserRow> bannedUsers)
+        {
+            if (bannedUsers.Count == 0)
+                return new AdminDashboardBanOverviewDto();
+
+            var regionRows = bannedUsers
+                .Select(x => new
+                {
+                    RegionId = x.PreferredRegionId ?? x.ManagedRegionId,
+                    RegionName = x.PreferredRegionName ?? x.ManagedRegionName ?? "Unassigned",
+                    RegionCode = x.PreferredRegionCode ?? x.ManagedRegionCode ?? "N/A",
+                    x.TemporarilyBanned,
+                    x.PermanentlyBanned
+                })
+                .GroupBy(x => new { x.RegionId, x.RegionName, x.RegionCode })
+                .Select(g => new AdminDashboardBannedUsersByRegionDto
+                {
+                    RegionId = g.Key.RegionId,
+                    RegionName = g.Key.RegionName,
+                    RegionCode = g.Key.RegionCode,
+                    TemporarilyBanned = g.Sum(x => x.TemporarilyBanned),
+                    PermanentlyBanned = g.Sum(x => x.PermanentlyBanned),
+                    TotalBanned = g.Sum(x => x.TemporarilyBanned + x.PermanentlyBanned)
+                })
+                .OrderByDescending(x => x.TotalBanned)
+                .ThenBy(x => x.RegionName)
+                .Take(MaxTopEngagedRegions)
+                .ToList();
+
+            return new AdminDashboardBanOverviewDto
+            {
+                TemporarilyBanned = bannedUsers.Sum(x => x.TemporarilyBanned),
+                PermanentlyBanned = bannedUsers.Sum(x => x.PermanentlyBanned),
+                TotalBanned = bannedUsers.Sum(x => x.TemporarilyBanned + x.PermanentlyBanned),
+                Regions = regionRows
             };
         }
 

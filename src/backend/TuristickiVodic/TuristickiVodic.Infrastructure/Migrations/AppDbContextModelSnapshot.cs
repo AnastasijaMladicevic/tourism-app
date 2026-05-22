@@ -209,6 +209,15 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("EditLockAcquiredAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("EditLockExpiresAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("EditLockedByUserId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("DestinationTypeId")
                         .HasColumnType("integer");
 
@@ -247,6 +256,10 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("DestinationTypeId");
+
+                    b.HasIndex("EditLockExpiresAtUtc");
+
+                    b.HasIndex("EditLockedByUserId");
 
                     b.HasIndex("Geolocation");
 
@@ -1590,6 +1603,11 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TuristickiVodic.Core.Models.User", null)
+                        .WithMany("LockedDestinations")
+                        .HasForeignKey("EditLockedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("TuristickiVodic.Core.Models.User", "ManagedBy")
                         .WithOne("ManagedDestination")
                         .HasForeignKey("TuristickiVodic.Core.Models.Destination", "ManagedByUserId")
@@ -2132,6 +2150,8 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("LocationHistory");
 
                     b.Navigation("Notifications");
+
+                    b.Navigation("LockedDestinations");
 
                     b.Navigation("ManagedDestination");
 

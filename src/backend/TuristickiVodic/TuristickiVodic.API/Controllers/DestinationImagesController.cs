@@ -65,6 +65,10 @@ namespace TuristickiVodic.API.Controllers
             {
                 return Forbid();
             }
+            catch (DestinationEditLockException ex)
+            {
+                return Conflict(ex.LockState);
+            }
             catch (KeyNotFoundException ex)
             {
                 return NotFound(new { message = ex.Message });
