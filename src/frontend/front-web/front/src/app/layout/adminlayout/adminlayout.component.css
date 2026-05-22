@@ -125,6 +125,7 @@
   gap: 14px;
   flex-shrink: 0;
   z-index: 2500;
+  overflow: visible;
 }
 
 .topbar-logo {
@@ -147,6 +148,7 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  overflow: visible;
 }
 
 .icon-btn {

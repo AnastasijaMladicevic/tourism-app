@@ -677,6 +677,14 @@ app-map .leaflet-container {
   z-index: 0 !important;
 }
 
+/* Topbar overlays must not clip notification dropdown */
+.admin-layout .topbar,
+.manager-layout .topbar,
+.manager-layout .topbar-right,
+.admin-layout .topbar-right {
+  overflow: visible;
+}
+
 /* Full-screen map pages: UI chrome stays below nav overlay (2650) */
 .map-page__toolbar,
 .map-page .map-controls,

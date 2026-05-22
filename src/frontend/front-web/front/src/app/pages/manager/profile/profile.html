@@ -12,7 +12,7 @@
         <div class="profile-banner"></div>
 
         <div class="profile-header-content">
-          <div class="profile-identity">
+          <div class="profile-avatar-block">
             <div class="avatar-remove">
               <div class="avatar-wrapper">
                 <div class="avatar avatar-xl avatar-blue" (click)="triggerFileInput()">
@@ -38,9 +38,12 @@
                 />
               </div>
               <button class="avatar-remove-btn" type="button" (click)="removePhoto()">
-                  <p>Remove photo</p>
+                <p>Remove photo</p>
               </button>
             </div>
+          </div>
+
+          <div class="profile-header-main">
             <div class="profile-header-info">
               <div class="profile-title-row">
                 <h2 class="profile-name">{{ displayName }}</h2>
@@ -52,12 +55,12 @@
                 <span>SpireGO</span>
               </div>
             </div>
-          </div>
 
-          <button class="btn btn-danger profile-reset-btn" type="button" (click)="resetPassword()">
-            <mat-icon fontSet="material-icons-outlined">key</mat-icon>
-            <span>Reset Password</span>
-          </button>
+            <button class="btn btn-danger profile-reset-btn" type="button" (click)="resetPassword()">
+              <mat-icon fontSet="material-icons-outlined">key</mat-icon>
+              <span>Reset Password</span>
+            </button>
+          </div>
         </div>
       </section>
 
