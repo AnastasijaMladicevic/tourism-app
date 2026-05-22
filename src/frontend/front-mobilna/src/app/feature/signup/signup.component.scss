@@ -115,6 +115,14 @@
   position: relative;
 }
 
+.date-input {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent !important;
+  box-shadow: none !important;
+  color-scheme: normal;
+}
+
 .input-icon {
   color: var(--primary);
   display: flex;
@@ -143,12 +151,32 @@ select {
   }
 }
 
+.date-input,
 .date-input.is-empty {
-  color: transparent;
+  color: var(--text-dark);
 }
 
-.date-input.is-empty::-webkit-datetime-edit {
-  color: transparent;
+.date-input::-webkit-date-and-time-value,
+.date-input::-webkit-datetime-edit,
+.date-input::-webkit-datetime-edit-fields-wrapper,
+.date-input::-webkit-datetime-edit-text,
+.date-input::-webkit-datetime-edit-month-field,
+.date-input::-webkit-datetime-edit-day-field,
+.date-input::-webkit-datetime-edit-year-field,
+.date-input.is-empty::-webkit-date-and-time-value,
+.date-input.is-empty::-webkit-datetime-edit,
+.date-input.is-empty::-webkit-datetime-edit-fields-wrapper,
+.date-input.is-empty::-webkit-datetime-edit-text,
+.date-input.is-empty::-webkit-datetime-edit-month-field,
+.date-input.is-empty::-webkit-datetime-edit-day-field,
+.date-input.is-empty::-webkit-datetime-edit-year-field {
+  color: var(--text-dark);
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.date-input::-webkit-calendar-picker-indicator {
+  opacity: 0.9;
 }
 
 .date-placeholder {
@@ -336,6 +364,29 @@ select {
 :host-context(:root[data-theme='dark']) {
   .input-wrapper {
     background: var(--surface-strong);
+  }
+
+  .date-input,
+  .date-input.is-empty,
+  .date-input::-webkit-date-and-time-value,
+  .date-input::-webkit-datetime-edit,
+  .date-input::-webkit-datetime-edit-fields-wrapper,
+  .date-input::-webkit-datetime-edit-text,
+  .date-input::-webkit-datetime-edit-month-field,
+  .date-input::-webkit-datetime-edit-day-field,
+  .date-input::-webkit-datetime-edit-year-field,
+  .date-input.is-empty::-webkit-date-and-time-value,
+  .date-input.is-empty::-webkit-datetime-edit,
+  .date-input.is-empty::-webkit-datetime-edit-fields-wrapper,
+  .date-input.is-empty::-webkit-datetime-edit-text,
+  .date-input.is-empty::-webkit-datetime-edit-month-field,
+  .date-input.is-empty::-webkit-datetime-edit-day-field,
+  .date-input.is-empty::-webkit-datetime-edit-year-field {
+    color: var(--white);
+  }
+
+  .date-input::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(1.1);
   }
 
   .eye {

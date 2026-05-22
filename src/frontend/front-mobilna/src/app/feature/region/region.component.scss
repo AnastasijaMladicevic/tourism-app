@@ -413,6 +413,15 @@
     background: var(--primary);
   }
 
+  .region-note__icon {
+    border-color: #7fd8ff;
+    color: #7fd8ff;
+  }
+
+  .region-note__content strong {
+    color: #7fd8ff;
+  }
+
   .retry-btn {
     background: var(--surface);
     border-color: var(--border);
@@ -420,6 +429,18 @@
   }
 
   .apply-btn {
-    box-shadow: none;
+    box-shadow: 0 18px 30px rgba(21, 151, 215, 0.24);
+  }
+
+  @media (min-width: 768px) {
+    .region-topbar,
+    .region-footer {
+      background: transparent;
+      border-color: transparent;
+    }
+
+    .region-footer {
+      box-shadow: none;
+    }
   }
 }

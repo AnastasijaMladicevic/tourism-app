@@ -1210,7 +1210,7 @@ button:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f8fafc;
+  background: var(--surface-soft);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding-left: 18px;
@@ -1966,6 +1966,25 @@ textarea {
 
 .rating-stars button {
   color: #facc15;
+}
+
+:host-context(:root[data-theme='dark']) .price-card {
+  background: var(--surface-strong) !important;
+  border-color: var(--border) !important;
+}
+
+:host-context(:root[data-theme='dark']) .price-card .price {
+  background: var(--surface-soft) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: none !important;
+}
+
+:host-context(:root[data-theme='dark']) .price-card .price-tag {
+  color: var(--text-gray) !important;
+}
+
+:host-context(:root[data-theme='dark']) .price-card .price-tag strong {
+  color: #7fd8ff !important;
 }
 
 .modal-submit-btn,

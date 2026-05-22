@@ -75,7 +75,8 @@
     },
     "feedback": {
       "sendFailed": "La richiesta non può essere inviata al momento.",
-      "sendSuccess": "La richiesta di accesso moderatore è stata inviata con successo."
+      "sendSuccess": "La richiesta di accesso moderatore è stata inviata con successo.",
+      "redirectingToAdmin": "La tua richiesta è stata approvata. Ti stiamo reindirizzando all'applicazione amministrativa."
     },
     "privileges": {
       "addEvents": {
@@ -101,44 +102,44 @@
     }
   },
   "moderationRules": {
-    "title": "Moderation Rules",
-    "introTitle": "Introduction to Moderation",
-    "introBody": "Before submitting a moderator access request, users must read and accept the moderation rules. These rules help ensure the accuracy, quality, and safety of content on the platform.",
-    "footnote": "*By submitting a request, you confirm that you agree with all of the above conditions.",
-    "accept": "I Understand and Accept",
-    "backToRequest": "Back to the previous screen",
+    "title": "Regole di moderazione",
+    "introTitle": "Introduzione alla moderazione",
+    "introBody": "Prima di inviare una richiesta di accesso come moderatore, gli utenti devono leggere e accettare le regole di moderazione. Queste regole aiutano a garantire l'accuratezza, la qualità e la sicurezza dei contenuti sulla piattaforma.",
+    "footnote": "*Inviando una richiesta, confermi di accettare tutte le condizioni sopra indicate.",
+    "accept": "Ho capito e accetto",
+    "backToRequest": "Torna alla schermata precedente",
     "sections": {
       "role": {
-        "title": "Role of the Moderator",
-        "body": "The moderator is responsible for preserving the quality, accuracy, and reliability of content on the platform. Moderators are expected to act impartially, responsibly, and in the best interest of the user community."
+        "title": "Ruolo del moderatore",
+        "body": "Il moderatore è responsabile di preservare la qualità, l'accuratezza e l'affidabilità dei contenuti sulla piattaforma. Ci si aspetta che agisca con imparzialità, responsabilità e nel migliore interesse della comunità degli utenti."
       },
       "obligations": {
-        "title": "Moderator Responsibilities",
-        "body": "The moderator must verify the accuracy of information before publishing or editing, update inaccurate or outdated data, use appropriate and professional communication, and report content that may be harmful, false, or inappropriate."
+        "title": "Responsabilità del moderatore",
+        "body": "Il moderatore deve verificare l'accuratezza delle informazioni prima di pubblicarle o modificarle, aggiornare dati inesatti o non aggiornati, usare una comunicazione appropriata e professionale e segnalare contenuti che potrebbero essere dannosi, falsi o inappropriati."
       },
       "allowed": {
-        "title": "Allowed Activities",
-        "body": "A moderator may add verified information, correct existing data, improve the descriptions of locations, events, and places, and contribute to better organization and higher content quality across the platform."
+        "title": "Attività consentite",
+        "body": "Un moderatore può aggiungere informazioni verificate, correggere dati esistenti, migliorare le descrizioni di luoghi, eventi e strutture e contribuire a una migliore organizzazione e a una qualità più alta dei contenuti sulla piattaforma."
       },
       "forbidden": {
-        "title": "Prohibited Activities",
-        "body": "A moderator must not submit false or unverified information, abuse moderation privileges for personal gain, favor their own content or known businesses, change valid content without cause, or publish offensive, discriminatory, or misleading content."
+        "title": "Attività vietate",
+        "body": "Un moderatore non deve inserire informazioni false o non verificate, abusare dei privilegi di moderazione per vantaggio personale, favorire i propri contenuti o attività conosciute, modificare contenuti validi senza motivo né pubblicare contenuti offensivi, discriminatori o fuorvianti."
       },
       "standards": {
-        "title": "Content Standards",
-        "body": "All submitted data must be accurate, clear, up to date, and useful. Names, descriptions, categories, addresses, locations, and photos must be relevant and trustworthy. Content must not mislead users."
+        "title": "Standard dei contenuti",
+        "body": "Tutti i dati inviati devono essere accurati, chiari, aggiornati e utili. Nomi, descrizioni, categorie, indirizzi, località e foto devono essere pertinenti e affidabili. I contenuti non devono indurre in errore gli utenti."
       },
       "fairness": {
-        "title": "Responsibility and Impartiality",
-        "body": "A moderator is required to act objectively and avoid conflicts of interest. Personal, business, or promotional interests must not influence decisions about content and edits on the platform."
+        "title": "Responsabilità e imparzialità",
+        "body": "Il moderatore è tenuto ad agire in modo obiettivo ed evitare conflitti di interesse. Interessi personali, commerciali o promozionali non devono influenzare le decisioni sui contenuti e sulle modifiche della piattaforma."
       },
       "penalties": {
-        "title": "Consequences of Violations",
-        "body": "Violating the moderation rules may result in a warning, temporary restriction of moderator privileges, permanent removal of moderator access, or additional administrative review of the account."
+        "title": "Conseguenze delle violazioni",
+        "body": "La violazione delle regole di moderazione può comportare un avvertimento, una restrizione temporanea dei privilegi di moderatore, la rimozione permanente dell'accesso da moderatore o un'ulteriore revisione amministrativa dell'account."
       },
       "acceptance": {
-        "title": "Acceptance of the Rules",
-        "body": "By submitting a moderator access request, the user confirms that they have read, understood, and accepted the moderation rules and that they will follow them while using the platform."
+        "title": "Accettazione delle regole",
+        "body": "Inviando una richiesta di accesso come moderatore, l'utente conferma di aver letto, compreso e accettato le regole di moderazione e che le seguirà durante l'utilizzo della piattaforma."
       }
     }
   },

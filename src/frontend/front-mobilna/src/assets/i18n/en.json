@@ -75,7 +75,8 @@
     },
     "feedback": {
       "sendFailed": "The request cannot be sent right now.",
-      "sendSuccess": "Moderator access request was sent successfully."
+      "sendSuccess": "Moderator access request was sent successfully.",
+      "redirectingToAdmin": "Your request has been approved. Redirecting you to the admin application."
     },
     "privileges": {
       "addEvents": {

@@ -1,7 +1,7 @@
 .add-planner-page {
   min-height: 100dvh;
   background: var(--bg);
-  color: #1f2937;
+  color: var(--text-dark);
   overflow-x: clip;
 }
 
@@ -15,11 +15,11 @@
   gap: 12px;
   padding: 14px 16px;
   border-bottom: 1px solid var(--border);
-  background: var(--white);
+  background: var(--surface-strong);
 
   h1 {
     margin: 0;
-    color: var(--emperor);
+    color: var(--text-dark);
     font-size: 18px;
     font-weight: 700;
     text-align: left;
@@ -35,7 +35,7 @@
   border: none;
   border-radius: 50%;
   background: transparent;
-  color: #4b5563;
+  color: var(--text-gray);
 
   svg {
     width: 20px;
@@ -71,10 +71,10 @@
 .event-preview-card,
 .schedule-card,
 .priority-card {
-  border: 1px solid #dfe7ef;
+  border: 1px solid var(--border);
   border-radius: 20px;
-  background: #fff;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  background: var(--surface-strong);
+  box-shadow: var(--shadow-soft);
 }
 
 .event-preview-card {
@@ -113,7 +113,7 @@
 
   h2 {
     margin: 0 0 8px;
-    color: #111827;
+    color: var(--text-dark);
     font-size: 18px;
     line-height: 1.2;
     font-weight: 800;
@@ -126,7 +126,7 @@
   align-items: center;
   gap: 8px;
   margin: 0;
-  color: #6b7280;
+  color: var(--text-gray);
   font-size: 14px;
 
   svg {
@@ -171,7 +171,7 @@
 
   h3 {
     margin: 0 0 10px;
-    color: #111827;
+    color: var(--text-dark);
     font-size: 18px;
     font-weight: 800;
     letter-spacing: -0.03em;
@@ -179,7 +179,7 @@
 
   p {
     margin: 0;
-    color: #667085;
+    color: var(--text-gray);
     font-size: 14px;
     line-height: 1.6;
   }
@@ -215,7 +215,7 @@
     align-items: center;
     gap: 8px;
     margin-bottom: 10px;
-    color: #1f2937;
+    color: var(--text-dark);
     font-size: 13px;
     font-weight: 700;
 
@@ -234,7 +234,7 @@
   small {
     display: block;
     margin-top: 8px;
-    color: #667085;
+    color: var(--text-gray);
     font-size: 13px;
     line-height: 1.45;
   }
@@ -243,9 +243,9 @@
 .field-card__surface {
   min-height: 54px;
   padding: 0 16px;
-  border: 1px solid #d9e2ec;
+  border: 1px solid var(--border);
   border-radius: 16px;
-  background: #fbfdff;
+  background: var(--surface-soft);
   display: flex;
   align-items: center;
 
@@ -255,20 +255,46 @@
     min-width: 0;
     border: none;
     background: transparent;
-    color: #374151;
+    color: var(--text-dark);
     font: inherit;
     outline: none;
   }
 
+  input[type='date'] {
+    appearance: none;
+    -webkit-appearance: none;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: var(--white);
+    color-scheme: normal;
+  }
+
+  input[type='date']::-webkit-date-and-time-value,
+  input[type='date']::-webkit-datetime-edit,
+  input[type='date']::-webkit-datetime-edit-fields-wrapper,
+  input[type='date']::-webkit-datetime-edit-text,
+  input[type='date']::-webkit-datetime-edit-month-field,
+  input[type='date']::-webkit-datetime-edit-day-field,
+  input[type='date']::-webkit-datetime-edit-year-field {
+    color: var(--white);
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  input[type='date']::-webkit-calendar-picker-indicator {
+    opacity: 0.9;
+    filter: invert(1) brightness(1.1);
+  }
+
   strong {
-    color: #111827;
+    color: var(--text-dark);
     font-size: 15px;
     font-weight: 800;
   }
 }
 
 .field-card__surface--readonly {
-  background: #f8fafc;
+  background: var(--surface-soft);
 }
 
 .calendar-strip {
@@ -286,10 +312,10 @@
 .calendar-pill {
   min-width: 62px;
   padding: 12px 8px;
-  border: 1px solid #dce5ef;
+  border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fff;
-  color: #64748b;
+  background: var(--surface-strong);
+  color: var(--text-gray);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -374,7 +400,7 @@
 
   h4 {
     margin: 0;
-    color: #111827;
+    color: var(--text-dark);
     font-size: 16px;
     font-weight: 700;
   }
@@ -383,8 +409,8 @@
     min-height: 34px;
     padding: 0 14px;
     border-radius: 999px;
-    background: #e5e7eb;
-    color: #374151;
+    background: var(--surface-soft);
+    color: var(--text-dark);
     display: inline-flex;
     align-items: center;
     font-size: 14px;
@@ -426,14 +452,14 @@
   strong {
     display: block;
     margin-bottom: 4px;
-    color: #111827;
+    color: var(--text-dark);
     font-size: 15px;
     font-weight: 800;
   }
 
   p {
     margin: 0;
-    color: #667085;
+    color: var(--text-gray);
     font-size: 14px;
     line-height: 1.45;
   }
@@ -475,7 +501,7 @@
   span {
     display: block;
     margin-bottom: 12px;
-    color: #111827;
+    color: var(--text-dark);
     font-size: 16px;
     font-weight: 700;
   }
@@ -484,10 +510,10 @@
     width: 100%;
     min-height: 132px;
     padding: 16px;
-    border: 1px solid #d9e2ec;
+    border: 1px solid var(--border);
     border-radius: 16px;
-    background: #fbfdff;
-    color: #475467;
+    background: var(--surface-soft);
+    color: var(--text-dark);
     font: inherit;
     resize: none;
     outline: none;
@@ -525,9 +551,9 @@
 }
 
 .cancel-btn {
-  border: 1px solid #d0d5dd;
-  background: #fff;
-  color: #1f2937;
+  border: 1px solid var(--border);
+  background: var(--surface-strong);
+  color: var(--text-dark);
 }
 
 .form-feedback {
@@ -536,10 +562,6 @@
   font-size: 13px;
   font-weight: 700;
   text-align: center;
-}
-
-.add-planner-footer {
-  display: none;
 }
 
 @media (max-width: 380px) {
@@ -604,13 +626,14 @@
   .add-planner-page {
     display: flex;
     flex-direction: column;
-    background: #f8fafc;
+    background: var(--bg);
   }
 
   .add-planner-topbar {
     grid-template-columns: 40px minmax(0, 1fr) 40px;
     padding: 20px 32px;
-    border-bottom-color: #e5e7eb;
+    border-bottom-color: var(--border);
+    background: var(--surface-strong);
 
     h1 {
       font-size: 18px;
@@ -710,7 +733,7 @@
   .schedule-card__header {
     margin-bottom: 24px;
     padding-bottom: 22px;
-    border-bottom: 1px solid #e4e7ec;
+    border-bottom: 1px solid var(--border);
 
     h3 {
       font-size: 24px;
@@ -747,31 +770,48 @@
 
   .cancel-btn {
     flex: 0 0 200px;
-    border: 1px solid #d0d5dd;
-    background: #fff;
-    color: #1f2937;
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+  .support-hint {
+    border-color: rgba(245, 158, 11, 0.34);
+    background: rgba(245, 158, 11, 0.12);
+    color: #f7c66a;
   }
 
-  .add-planner-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 24px;
-    width: min(100%, 1240px);
-    margin: 0 auto;
-    padding: 0 32px 26px;
-    color: #667085;
-    font-size: 14px;
+  .warning-card {
+    border-color: rgba(239, 68, 68, 0.34);
+    border-left-color: #ff6b6b;
+    background: rgba(239, 68, 68, 0.12);
 
-    div {
-      display: flex;
-      align-items: center;
-      gap: 26px;
+    strong,
+    p,
+    .warning-card__icon {
+      color: #ff8d8f;
     }
+  }
 
-    a {
-      color: inherit;
-      text-decoration: none;
+  .priority-card__icon {
+    background: rgba(212, 167, 44, 0.14);
+    color: #f4cc68;
+  }
+
+  .toggle-btn {
+    background: #304653;
+
+    &--active {
+      background: var(--primary);
     }
+  }
+
+  .notes-field textarea::placeholder,
+  .field-card__surface input::placeholder,
+  .field-card__surface select::placeholder {
+    color: var(--text-light);
+  }
+
+  .event-preview-card__desktop-overlay {
+    background: linear-gradient(180deg, rgba(7, 19, 25, 0.04) 0%, rgba(7, 19, 25, 0.82) 100%);
   }
 }

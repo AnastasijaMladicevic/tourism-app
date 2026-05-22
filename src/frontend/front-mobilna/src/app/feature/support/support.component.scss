@@ -680,4 +680,11 @@
   .hours-divider {
     background: var(--border);
   }
+
+  @media (min-width: 768px) {
+    .support-topbar {
+      background: transparent;
+      border-color: transparent;
+    }
+  }
 }
