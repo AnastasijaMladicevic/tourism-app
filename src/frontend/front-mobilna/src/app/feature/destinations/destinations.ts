@@ -2,8 +2,10 @@ import {
   ChangeDetectorRef,
   Component,
   effect,
+  ElementRef,
   HostListener,
   OnInit,
+  ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -88,7 +90,7 @@ export class DestinationsComponent implements OnInit {
       void this.loadData();
     });
   }
-
+  @ViewChild('top') top!: ElementRef;
   ngOnInit(): void {
     this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
       this.isTracking = enabled;
@@ -221,8 +223,8 @@ export class DestinationsComponent implements OnInit {
 
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
-  onPageSizeChange(size: number): void {
-    this.pageSize = size;
+  onPageSizeChange(size: number | string): void {
+    this.pageSize = Number(size);
     this.currentPage = 1;
     void this.refreshVisibleDestinations();
   }
@@ -242,6 +244,7 @@ export class DestinationsComponent implements OnInit {
 
     this.currentPage--;
     void this.refreshVisibleDestinations();
+    this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
   nextPage(): void {
@@ -249,6 +252,7 @@ export class DestinationsComponent implements OnInit {
 
     this.currentPage++;
     void this.refreshVisibleDestinations();
+    this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
   @HostListener('document:click', ['$event'])
@@ -326,8 +330,8 @@ export class DestinationsComponent implements OnInit {
       za: 'Z -> A',
       distance: this.translationService.translate('common.nearest')
     };
-    
-  return map[this.sortOption];
+
+    return map[this.sortOption];
   }
 
   toggleFavorite(destination: DestinationView, event: Event): void {

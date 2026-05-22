@@ -116,7 +116,14 @@ export class LoginComponent {
         next: (response) => {
           this.isLoading = false;
           this.cdr.detectChanges();
+          const role = response.user?.roleName?.toLowerCase();
+          if (role && role !== 'tourist') {
+            this.errorMessage = this.translationService.translate('login.onlyTourists');
 
+            this.authService.logout().subscribe();
+            this.cdr.detectChanges();
+            return;
+          }
           if (response.requiresTwoFactor) {
             if (response.twoFactorChallengeToken) {
               this.navigateToTwoFactorVerification(

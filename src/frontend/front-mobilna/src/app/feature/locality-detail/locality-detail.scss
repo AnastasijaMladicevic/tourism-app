@@ -812,7 +812,7 @@ button:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 0;
+  z-index: 9999;
 }
 
 
@@ -938,7 +938,7 @@ button:hover {
   }
 
   .spinner {
-    border-color: rgba(255,255,255,0.08);
+    border-color: rgba(255, 255, 255, 0.08);
     border-top-color: var(--primary);
   }
 
