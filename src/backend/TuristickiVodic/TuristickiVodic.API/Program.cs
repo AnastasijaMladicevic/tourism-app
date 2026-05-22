@@ -92,6 +92,7 @@ builder.Services.AddScoped<IWebPushService, WebPushService>();
 builder.Services.AddScoped<IManagerReportService, ManagerReportService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddScoped<IContentCreatorDashboardService, ContentCreatorDashboardService>();
+builder.Services.AddScoped<IManagerDashboardService, ManagerDashboardService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<ISmartSearchService, SmartSearchService>();
