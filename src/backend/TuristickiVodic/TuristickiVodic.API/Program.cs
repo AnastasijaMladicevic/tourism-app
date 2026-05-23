@@ -489,6 +489,8 @@ using (var scope = app.Services.CreateScope())
             throw;
         }
     }
+
+    RemoveDeprecatedGreeceRegion(db);
 }
 
 app.Run();
@@ -509,6 +511,28 @@ static bool IsAllowedDevelopmentOrigin(string origin)
         return false;
 
     return ipAddress.AddressFamily == AddressFamily.InterNetwork && IsPrivateIpv4(ipAddress);
+}
+
+static void RemoveDeprecatedGreeceRegion(AppDbContext db)
+{
+    db.Database.ExecuteSqlRaw(@"
+        UPDATE ""Users""
+        SET ""PreferredRegionId"" = NULL,
+            ""UpdatedAt"" = NOW()
+        WHERE ""PreferredRegionId"" IN (
+            SELECT ""Id""
+            FROM ""Regions""
+            WHERE ""Code"" = 'GR'
+        );
+
+        DELETE FROM ""Regions"" r
+        WHERE r.""Code"" = 'GR'
+          AND NOT EXISTS (
+              SELECT 1
+              FROM ""Destinations"" d
+              WHERE d.""RegionId"" = r.""Id""
+          );
+    ");
 }
 
 static string NormalizeRoleValue(string? role)

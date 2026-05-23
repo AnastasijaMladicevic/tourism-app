@@ -157,6 +157,7 @@ namespace TuristickiVodic.Services.Services
 
             var destinationsByRegion = await _context.Regions
                 .AsNoTracking()
+                .Where(r => r.Code != "GR")
                 .Select(r => new AdminDashboardDestinationByRegionDto
                 {
                     RegionId = r.Id,
@@ -166,6 +167,7 @@ namespace TuristickiVodic.Services.Services
                     ActiveDestinations = r.Destinations.Count(d => d.IsActive),
                     GeocodedDestinations = r.Destinations.Count(d => d.Geolocation != null)
                 })
+                .Where(r => r.TotalDestinations > 0)
                 .OrderByDescending(r => r.ActiveDestinations)
                 .ThenBy(r => r.RegionName)
                 .ToListAsync();
@@ -601,6 +603,7 @@ namespace TuristickiVodic.Services.Services
                     PermanentlyBanned = g.Sum(x => x.PermanentlyBanned),
                     TotalBanned = g.Sum(x => x.TemporarilyBanned + x.PermanentlyBanned)
                 })
+                .Where(x => !string.Equals(x.RegionCode, "GR", StringComparison.OrdinalIgnoreCase))
                 .OrderByDescending(x => x.TotalBanned)
                 .ThenBy(x => x.RegionName)
                 .Take(MaxTopEngagedRegions)

@@ -135,6 +135,16 @@ select {
   color: inherit;
 }
 
+.leaflet-container img.leaflet-tile,
+.leaflet-container .leaflet-tile {
+  max-width: none !important;
+  max-height: none !important;
+  outline: 1px solid transparent;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
 input,
 textarea,
 select {

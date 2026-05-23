@@ -340,14 +340,16 @@ export class DashboardComponent implements OnInit {
   }
 
   private bindDestinationsByRegion(overview: AdminDashboardOverviewDto): void {
-    const rows = overview.destinationsByRegion.map((row) => ({
-      name: row.regionName,
-      code: row.regionCode,
-      total: row.totalDestinations,
-      active: row.activeDestinations,
-      geocoded: row.geocodedDestinations,
-      barPercent: 0,
-    }));
+    const rows = overview.destinationsByRegion
+      .filter((row) => row.totalDestinations > 0 && row.regionCode?.toUpperCase() !== 'GR')
+      .map((row) => ({
+        name: row.regionName,
+        code: row.regionCode,
+        total: row.totalDestinations,
+        active: row.activeDestinations,
+        geocoded: row.geocodedDestinations,
+        barPercent: 0,
+      }));
 
     const maxRegion = Math.max(...rows.map((row) => row.total), 1);
     rows.forEach((row) => {
@@ -389,21 +391,24 @@ export class DashboardComponent implements OnInit {
     this.regionVisitRows = engagement.regionEngagement.map((row) => ({
       ...row,
       barPercent: Math.round((row.engagementScore / maxRegionScore) * 1000) / 10,
-    }));
+    }))
+    .filter((row) => row.regionCode?.toUpperCase() !== 'GR');
   }
 
   private bindMapPoints(overview: AdminDashboardOverviewDto): void {
-    this.mapDestinations = overview.geospatialOverview.points.map((point) => ({
-      id: point.destinationId,
-      name: point.destinationName,
-      latitude: point.latitude,
-      longitude: point.longitude,
-      isActive: true,
-      destinationTypeId: 0,
-      destinationTypeName: 'Destination',
-      regionId: point.regionId,
-      regionName: point.regionName,
-    }));
+    this.mapDestinations = overview.geospatialOverview.points
+      .filter((point) => point.regionName?.trim().toLowerCase() !== 'grcka')
+      .map((point) => ({
+        id: point.destinationId,
+        name: point.destinationName,
+        latitude: point.latitude,
+        longitude: point.longitude,
+        isActive: true,
+        destinationTypeId: 0,
+        destinationTypeName: 'Destination',
+        regionId: point.regionId,
+        regionName: point.regionName,
+      }));
     this.mapRenderVersion += 1;
     this.mapComponentId = `admin-dashboard-map-${this.mapRenderVersion}`;
   }

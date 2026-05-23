@@ -822,20 +822,6 @@ public class AppDbContext : DbContext
                 IsActive = true,
                 CreatedAt = now,
                 UpdatedAt = now
-            },
-            new Region
-            {
-                Id = 5,
-                Name = "Grcka",
-                Code = "GR",
-                Description = "Region za sadrzaj iz Grcke.",
-                CenterLongitude = 23.6500,
-                CenterLatitude = 38.3500,
-                DefaultMapZoom = 6.4,
-                IsDefault = false,
-                IsActive = true,
-                CreatedAt = now,
-                UpdatedAt = now
             });
     }
 }
