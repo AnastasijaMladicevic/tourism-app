@@ -36,7 +36,7 @@ export class ContentCreatorLayoutComponent implements OnInit, OnDestroy {
     this.navSubscription = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
-        this.closeSidebar();
+        //this.closeSidebar();
         this.syncMapRoute();
       });
   }
@@ -44,9 +44,9 @@ export class ContentCreatorLayoutComponent implements OnInit, OnDestroy {
   private syncMapRoute(): void {
     this.isMapRoute = this.router.url.includes('/content-creator/map');
     document.body.classList.toggle('cc-map-route', this.isMapRoute);
-    if (this.isMapRoute) {
-      this.closeSidebar();
-    }
+    //if (this.isMapRoute) {
+    //  this.closeSidebar();
+    //}
   }
 
   ngOnDestroy(): void {

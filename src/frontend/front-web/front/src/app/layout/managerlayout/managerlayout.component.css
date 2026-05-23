@@ -285,7 +285,13 @@
 
 /* Map view: full-width map; nav drawer overlays map on small screens only. */
 .manager-layout--map .layout-shell .sidebar {
-  display: none;
+  display: flex;
+}
+
+.manager-layout--map .main {
+  flex: 1;
+  width: auto;
+  min-width: 0;
 }
 
 .manager-layout--map .main {
@@ -306,17 +312,6 @@
 
 .manager-layout--map.sidebar-open .page-outlet .map-page__toolbar {
   display: none;
-}
-
-@media (min-width: 901px) {
-  .manager-layout--map .layout-shell .sidebar {
-    display: none !important;
-  }
-
-  .manager-layout--map .main {
-    width: 100%;
-    max-width: 100%;
-  }
 }
 
 .sidebar-logout {

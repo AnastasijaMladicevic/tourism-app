@@ -35,7 +35,7 @@ export class ManagerLayoutComponent implements OnInit, OnDestroy {
     this.navSubscription = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => {
-        this.closeSidebar();
+      //  this.closeSidebar();
         this.syncMapRoute();
       });
   }
@@ -43,9 +43,9 @@ export class ManagerLayoutComponent implements OnInit, OnDestroy {
   private syncMapRoute(): void {
     this.isMapRoute = this.router.url.includes('/manager/map');
     document.body.classList.toggle('manager-map-route', this.isMapRoute);
-    if (this.isMapRoute) {
-      this.closeSidebar();
-    }
+    //if (this.isMapRoute) {
+    //  this.closeSidebar();
+    //}
   }
 
   ngOnDestroy(): void {
