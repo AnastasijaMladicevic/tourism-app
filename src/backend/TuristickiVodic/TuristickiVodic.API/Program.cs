@@ -491,6 +491,7 @@ using (var scope = app.Services.CreateScope())
     }
 
     RemoveDeprecatedGreeceRegion(db);
+    NormalizeSpainNaming(db);
 }
 
 app.Run();
@@ -532,6 +533,23 @@ static void RemoveDeprecatedGreeceRegion(AppDbContext db)
               FROM ""Destinations"" d
               WHERE d.""RegionId"" = r.""Id""
           );
+    ");
+}
+
+static void NormalizeSpainNaming(AppDbContext db)
+{
+    db.Database.ExecuteSqlRaw(@"
+        UPDATE ""Regions""
+        SET ""Name"" = 'Španija',
+            ""Description"" = 'Region za sadrzaj iz Španije.',
+            ""UpdatedAt"" = NOW()
+        WHERE ""Code"" = 'ES'
+          AND (""Name"" <> 'Španija' OR ""Description"" <> 'Region za sadrzaj iz Španije.');
+
+        UPDATE ""Users""
+        SET ""Country"" = 'Španija',
+            ""UpdatedAt"" = NOW()
+        WHERE ""Country"" = 'Spanija';
     ");
 }
 

@@ -2592,3 +2592,13 @@ body.route-navigation-active app-floating-ai-assistant {
     transform: translateY(-1px);
   }
 }
+
+.leaflet-tile {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+.leaflet-tile-container {
+  will-change: transform;
+}

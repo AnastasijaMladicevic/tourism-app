@@ -278,3 +278,22 @@ select {
     border-color: var(--primary) !important;
   }
 }
+
+/* GLOBAL LEAFLET TILE FIX */
+.leaflet-container {
+  background: #d7ecf2;
+}
+
+.leaflet-tile {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+.leaflet-tile-container {
+  will-change: transform;
+}
+
+.leaflet-tile-pane {
+  transform: translateZ(0);
+}

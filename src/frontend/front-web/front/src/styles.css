@@ -708,3 +708,21 @@ app-map .leaflet-container {
 .map-page .suggestions {
   z-index: 110;
 }
+
+.leaflet-container {
+  background: #d7ecf2;
+}
+
+.leaflet-tile {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+.leaflet-tile-container {
+  will-change: transform;
+}
+
+.leaflet-tile-pane {
+  transform: translateZ(0);
+}

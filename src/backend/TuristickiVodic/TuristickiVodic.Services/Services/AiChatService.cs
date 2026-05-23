@@ -711,7 +711,7 @@ namespace TuristickiVodic.Services.Services
                                 ["regionName"] = new OllamaToolProperty
                                 {
                                     Type = "string",
-                                    Description = "Naziv regiona ili drzave, na primer 'Crna Gora' ili 'Spanija'.",
+                                    Description = "Naziv regiona ili drzave, na primer 'Crna Gora' ili 'Španija'.",
                                 },
                                 ["regionId"] = new OllamaToolProperty
                                 {

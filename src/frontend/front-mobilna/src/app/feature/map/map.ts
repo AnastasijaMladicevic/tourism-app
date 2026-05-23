@@ -285,6 +285,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.mapService.initMap('main-map', lat, lng, zoom, { enableClustering: true });
 
+    setTimeout(() => {
+      this.mapService.getMap()?.invalidateSize(true);
+    }, 300);
+
     const map = this.mapService.getMap();
     if (!map) return;
     if (map) {
