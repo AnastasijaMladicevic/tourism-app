@@ -137,6 +137,7 @@ select {
 
 .leaflet-container img.leaflet-tile,
 .leaflet-container .leaflet-tile {
+  display: block;
   max-width: none !important;
   max-height: none !important;
   outline: 1px solid transparent;
