@@ -1,16 +1,41 @@
 :host {
   display: block;
-  height: 100%;
-  min-height: 0;
+  height: calc(100vh - 62px);
+  height: calc(100dvh - 62px);
+  overflow: hidden;
 }
 
 .map-page {
+  display: grid;
+  grid-template-rows: auto 1fr;
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 0;
-  overflow: auto;
+  min-height: calc(100vh - 62px);
+  min-height: calc(100dvh - 62px);
+  overflow: hidden;
   font-family: var(--font-base);
+}
+
+.map-page__toolbar {
+  position: relative;
+  z-index: 100;
+  padding: 12px 16px 8px;
+  background: #e8eef3;
+  flex-shrink: 0;
+}
+
+.map-page__canvas {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+
+app-admin-platform-map {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
 }
 
 app-admin-platform-map.admin-platform-map--full,
@@ -19,11 +44,8 @@ app-admin-platform-map.admin-platform-map--full :is(.leaflet-container, .leaflet
 }
 
 .search-bar {
-  position: absolute;
-  top: 16px;
-  left: 16px;
-  right: 16px;
-  z-index: 1000;
+  position: relative;
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -86,11 +108,12 @@ app-admin-platform-map.admin-platform-map--full :is(.leaflet-container, .leaflet
   top: calc(100% + 6px);
   left: 0;
   right: 0;
-  max-height: 320px;
+  max-height: min(320px, calc(100dvh - 10rem));
   overflow-y: auto;
   background: var(--bg-white);
   border-radius: 16px;
   box-shadow: 0 18px 36px rgba(15, 23, 42, 0.14);
+  z-index: 110;
 }
 
 .suggestion-item {
@@ -376,4 +399,34 @@ app-admin-platform-map.admin-platform-map--full :is(.leaflet-container, .leaflet
   font-family: var(--font-base);
   font-size: 14px;
   font-weight: 700;
+}
+
+:host-context(.admin-layout--map.sidebar-open) .map-page__toolbar {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .map-page__toolbar {
+    padding: 10px 12px 8px;
+  }
+
+  .map-controls {
+    top: auto;
+    bottom: 24px;
+    right: 12px;
+    transform: none;
+  }
+
+  .bottom-card.bottom-card--anchored {
+    left: 12px !important;
+    right: 12px !important;
+    top: auto !important;
+    bottom: 72px !important;
+    width: auto !important;
+    max-width: none;
+  }
+
+  .bottom-card__image-wrap {
+    height: 120px;
+  }
 }

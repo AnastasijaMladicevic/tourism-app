@@ -1,5 +1,5 @@
-<section class="manager-reports-page">
-  <div class="page-head">
+<section class="manager-reports-page manager-list-page">
+  <header class="page-head">
     <div class="page-head-copy">
       <p class="breadcrumbs">Dashboard <span>&gt;</span> Creator Reports</p>
       <h1>Content Creator Reports</h1>
@@ -10,9 +10,9 @@
     </div>
     <button type="button" class="primary-btn" (click)="openReportModal()">
       <span class="material-symbols-outlined">flag</span>
-      Report Content Creator
+      <span class="btn-label">Report Content Creator</span>
     </button>
-  </div>
+  </header>
 
   @if (errorMessage) {
     <div class="inline-alert error-banner card" role="alert">{{ errorMessage }}</div>
@@ -86,7 +86,7 @@
 
   <div class="reports-content-grid">
     <div class="reports-main-column">
-      <section class="reports-table-wrap card">
+      <section class="reports-table-wrap table-card card">
         <header class="table-header">
           <h2>Your reports</h2>
           <span class="table-meta">{{ filteredReports.length }} shown</span>
@@ -104,7 +104,42 @@
             }
           </div>
         } @else {
-          <div class="table-scroll">
+          <div class="reports-mobile-list">
+            @for (report of filteredReports; track trackByReportId($index, report)) {
+              <article
+                class="report-mobile-card"
+                [class.is-active]="selectedReport?.id === report.id"
+                (click)="selectReport(report)"
+              >
+                <div class="report-mobile-card__avatar" aria-hidden="true">
+                  {{ report.reportedUserName.charAt(0) }}
+                </div>
+                <div class="report-mobile-card__content">
+                  <div class="report-mobile-card__head">
+                    <h3>{{ report.reportedUserName }}</h3>
+                    <span class="status-chip status-chip--compact" [ngClass]="getStatusClass(report.status)">
+                      {{ formatStatus(report.status) }}
+                    </span>
+                  </div>
+                  <p class="report-mobile-card__meta">
+                    Creator ID {{ report.reportedUserId }} · {{ formatDate(report.createdAt) }}
+                  </p>
+                  <p class="report-mobile-card__reason">{{ report.reason }}</p>
+                  @if (report.status === 'Pending') {
+                    <button
+                      type="button"
+                      class="report-mobile-card__withdraw danger-outline"
+                      (click)="withdrawReport(report, $event)"
+                    >
+                      Withdraw
+                    </button>
+                  }
+                </div>
+              </article>
+            }
+          </div>
+
+          <div class="table-scroll reports-table-wrap">
             <table>
               <thead>
                 <tr>

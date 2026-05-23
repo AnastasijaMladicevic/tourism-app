@@ -142,8 +142,16 @@
 
 .header-actions {
   display: flex;
+  align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+.header-actions .ghost-btn,
+.header-actions .danger-btn,
+.header-actions .primary-btn {
+  white-space: nowrap;
 }
 
 .card {
@@ -182,14 +190,12 @@
 }
 
 .primary-btn.approved-locked:disabled {
-  background: repeating-linear-gradient(
-    135deg,
-    #94a3b8,
-    #94a3b8 8px,
-    #9ca8bb 8px,
-    #9ca8bb 16px
-  );
-  color: #f8fafc;
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  opacity: 1;
+  filter: none;
+  box-shadow: none;
 }
 
 .ghost-btn {
@@ -220,32 +226,33 @@
 }
 
 .form-layout {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
+  width: 100%;
+  min-width: 0;
 }
 
 .review-fieldset {
   border: 0;
   margin: 0;
   padding: 0;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 440px);
   gap: 16px;
-  align-items: flex-start;
+  align-items: start;
   min-width: 0;
   width: 100%;
 }
 
 .form-main {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 16px;
   min-width: 0;
+  width: 100%;
 }
 
 .form-side {
-  width: min(440px, 100%);
+  min-width: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -253,11 +260,14 @@
   top: 80px;
 }
 
-.upload-card {
-  padding: 16px;
+.review-shell {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+}
+
+.media-card {
+  padding: 16px;
 }
 
 .media-layout {
@@ -417,6 +427,24 @@
 .section-card,
 .side-card {
   padding: 16px;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+:host ::ng-deep .form-side app-map,
+:host ::ng-deep .side-card app-map {
+  display: block;
+  width: 100%;
+  min-height: 260px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+:host ::ng-deep .form-side app-map .leaflet-container,
+:host ::ng-deep .side-card app-map .leaflet-container {
+  min-height: 260px;
 }
 
 .section-title {
@@ -444,11 +472,20 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  width: 100%;
+  min-width: 0;
 }
 
 .two-columns .form-field {
   flex: 1 1 calc(50% - 12px);
-  min-width: 200px;
+  min-width: min(100%, 220px);
+}
+
+.schedule-grid .form-field,
+.ticket-grid .form-field,
+.restriction-field {
+  flex: 1 1 calc(33.333% - 12px);
+  min-width: min(100%, 220px);
 }
 
 .full-width {
@@ -463,6 +500,7 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
+  min-width: 0;
   color: #334155;
   font-size: 12px;
   font-weight: 600;
@@ -500,8 +538,10 @@
 
 .inline-fields {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.9fr);
   gap: 8px;
+  width: 100%;
+  min-width: 0;
 }
 
 .recurring-row {
@@ -951,8 +991,8 @@
 }
 
 @media (max-width: 1160px) {
-  .form-layout {
-    flex-direction: column;
+  .review-fieldset {
+    grid-template-columns: 1fr;
   }
 
   .media-layout {
@@ -970,29 +1010,43 @@
   }
 }
 
+@media (max-width: 920px) {
+  .event-form-page .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .event-form-page .header-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+
+  .event-form-page .header-actions .ghost-btn,
+  .event-form-page .header-actions .primary-btn,
+  .event-form-page .header-actions .danger-btn {
+    width: 100%;
+    min-height: 40px;
+    justify-content: center;
+    padding: 9px 10px;
+    font-size: 13px;
+  }
+}
+
 @media (max-width: 860px) {
   .event-form-page {
     padding: 16px;
   }
 
-  .page-header {
-    flex-direction: column;
-  }
-
-  .header-actions {
-    width: 100%;
-  }
-
-  .header-actions .ghost-btn,
-  .header-actions .primary-btn,
-  .header-actions .danger-btn {
-    flex: 1 1 100%;
-    justify-content: center;
-  }
-
   .two-columns .form-field,
+  .schedule-grid .form-field,
+  .ticket-grid .form-field,
+  .restriction-field,
   .half-width {
     flex-basis: 100% !important;
+    min-width: 0;
   }
 
   .inline-fields {
@@ -1001,5 +1055,12 @@
 
   .location-inputs {
     grid-template-columns: 1fr;
+  }
+
+}
+
+@media (max-width: 640px) {
+  .media-thumbnails {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

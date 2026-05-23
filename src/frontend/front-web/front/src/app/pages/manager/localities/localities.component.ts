@@ -12,7 +12,13 @@ import { AuthService } from '../../../services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule, SharedMapComponent],
   templateUrl: './localities.component.html',
-  styleUrls: ['./localities.component.css']
+  styleUrls: [
+    './localities.component.css',
+    '../shared/manager-list-page-header.css',
+    '../shared/manager-list-page-responsive.css',
+    '../shared/manager-cc-page-parity.css',
+    '../shared/manager-page-stats-scroll.css'
+  ]
 })
 export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
   private readonly localityService = inject(LocalityService);
@@ -64,6 +70,15 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
 
   get totalLocalitiesOnPage(): number {
     return this.localities.length;
+  }
+
+  get localitiesCountLabel(): string {
+    if (this.isLoading) {
+      return '…';
+    }
+
+    const count = this.totalCount;
+    return `${count} localit${count === 1 ? 'y' : 'ies'}`;
   }
 
   get pageStart(): number {

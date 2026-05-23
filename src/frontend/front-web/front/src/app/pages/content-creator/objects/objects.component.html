@@ -1,14 +1,14 @@
 <section class="objects-page">
-  <div class="page-header">
-    <div>
+  <header class="page-header">
+    <div class="page-header-copy">
       <h1>Objects</h1>
-      <p>Manage hotels, restaurants, and local businesses.</p>
+      <p class="page-subtitle">Total: {{ objectsCountLabel }}</p>
     </div>
-    <button type="button" class="primary-btn" (click)="onCreateObject()">
+    <button type="button" class="primary-btn page-header-cta" (click)="onCreateObject()">
       <span class="material-symbols-outlined">add</span>
-      Create Object
+      <span class="page-header-cta-label">Create Object</span>
     </button>
-  </div>
+  </header>
 
   <div class="toolbar card">
     <div class="toolbar-search">
@@ -21,9 +21,9 @@
         placeholder="Search by name, category or region..."
       />
     </div>
-    <button type="button" class="ghost-btn slim-btn" (click)="onMoreFilters()">
+    <button type="button" class="ghost-btn slim-btn filters-toggle-btn" aria-label="More filters" (click)="onMoreFilters()">
       <span class="material-symbols-outlined">filter_alt</span>
-      More Filters
+      <span class="filters-toggle-label">More Filters</span>
     </button>
   </div>
 
@@ -110,8 +110,50 @@
         } @else if (!pagedObjects.length) {
           <div class="state">No objects found for the selected filters.</div>
         } @else {
-        <div class="table-scroll">
-          <table>
+        <div class="objects-mobile-list">
+          @for (object of pagedObjects; track object.id) {
+            <article
+              class="object-mobile-card"
+              [class.is-active]="selectedObject?.id === object.id"
+              (click)="selectObject(object)"
+            >
+              <div class="object-mobile-card__media" [ngStyle]="getMediaStyle(object)"></div>
+              <div class="object-mobile-card__content">
+                <div class="object-mobile-card__head">
+                  <h3>{{ object.name }}</h3>
+                  <span class="status-chip status-chip--compact" [ngClass]="getStatusBadgeClass(object.status)">
+                    {{ formatStatus(object.status) }}
+                  </span>
+                </div>
+                <p class="object-mobile-card__location">
+                  <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
+                  {{ object.destinationName || object.localityName || 'N/A' }}
+                  @if (getObjectTableSubline(object) !== '—') {
+                    <span class="object-mobile-card__location-sub">· {{ getObjectTableSubline(object) }}</span>
+                  }
+                </p>
+                <div class="object-mobile-card__meta">
+                  <span class="object-mobile-card__type">{{ object.objectTypeName || 'N/A' }}</span>
+                  <span class="object-mobile-card__rating">
+                    <span class="material-symbols-outlined" aria-hidden="true">star</span>
+                    {{ (object.averageRating ?? 0).toFixed(1) }}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                class="object-mobile-card__edit"
+                title="Edit"
+                (click)="onEditObject(object); $event.stopPropagation()"
+              >
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+            </article>
+          }
+        </div>
+
+        <div class="table-scroll objects-table-wrap">
+          <table class="objects-table">
             <thead>
               <tr>
                 <th>Status</th>
@@ -128,27 +170,27 @@
                 [class.active-row]="selectedObject?.id === object.id"
                 (click)="selectObject(object)"
               >
-                <td>
+                <td data-label="Status">
                   <span class="status-chip" [ngClass]="getStatusBadgeClass(object.status)">
                     <span class="chip-dot">●</span>
                     {{ formatStatus(object.status) }}
                   </span>
                 </td>
-                <td>
+                <td class="object-details-cell" data-label="Object Details">
                   <div class="item-cell item-cell-with-media">
                     <div class="media-thumb" [ngStyle]="getMediaStyle(object)"></div>
                     <strong>{{ object.name }}</strong>
                   </div>
                 </td>
-                <td class="type-cell">{{ object.objectTypeName || 'N/A' }}</td>
-                <td>
+                <td class="type-cell" data-label="Type">{{ object.objectTypeName || 'N/A' }}</td>
+                <td data-label="Destination">
                   <div class="table-activity-cell">
                     <strong>{{ object.destinationName || object.localityName || 'N/A' }}</strong>
                     <span>{{ getObjectTableSubline(object) }}</span>
                   </div>
                 </td>
-                <td class="rating-cell">{{ (object.averageRating ?? 0).toFixed(1) }}</td>
-                <td>
+                <td class="rating-cell" data-label="Rating">{{ (object.averageRating ?? 0).toFixed(1) }}</td>
+                <td class="col-actions" data-label="Action">
                   <button type="button" class="icon-btn plain" title="Edit" (click)="onEditObject(object); $event.stopPropagation()">
                     <span class="material-symbols-outlined">edit</span>
                   </button>
@@ -175,8 +217,9 @@
       </div>
     </div>
 
-    <aside class="detail-column card">
+    <aside class="detail-column card" [class.has-selection]="!!selectedObject">
       @if (selectedObject) {
+        <p class="detail-sheet-label">Selected object</p>
         <div class="object-hero">
           <div class="hero-media" [class.has-slides]="heroImageUrls.length > 0">
             <div class="hero-media-slides" aria-hidden="true">

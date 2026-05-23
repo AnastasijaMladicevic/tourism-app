@@ -2,30 +2,29 @@
 
   <div class="card">
 
-    <div class="icon">
-        <span class="material-symbols-outlined">
-            logout
-        </span>
+    <div class="icon" aria-hidden="true">
+      <span class="material-symbols-outlined">logout</span>
     </div>
 
     <h2>Confirm Sign Out?</h2>
 
     <p class="desc">
-      Are you sure you want to end your current session and exit the admin panel?
+      Are you sure you want to end your current session and leave the platform?
     </p>
 
-    <button class="logout" (click)="confirmSignOut()">
-      Sign Out
-    </button>
+    <div class="actions">
+      <button type="button" class="logout" (click)="confirmSignOut()">
+        Sign Out
+      </button>
 
-    <button class="cancel" (click)="cancel()">
-      ← Keep me signed in
-    </button>
+      <button type="button" class="cancel" (click)="cancel()">
+        <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+        Keep me signed in
+      </button>
+    </div>
 
     <div class="info">
-      <span class="material-symbols-outlined shield">
-            gpp_maybe
-        </span>
+      <span class="material-symbols-outlined shield" aria-hidden="true">shield</span>
       <div>
         <strong>SESSION SECURITY</strong>
         <p>

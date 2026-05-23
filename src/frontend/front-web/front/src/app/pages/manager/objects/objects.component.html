@@ -1,11 +1,11 @@
-<section class="manager-objects-page">
-  <div class="page-head">
+<section class="manager-objects-page manager-list-page">
+  <header class="page-head">
     <div>
       <p class="breadcrumbs">Dashboard <span>></span> Objects</p>
       <h1>Objects</h1>
-      <p class="subtle-text">{{ managedCityLabel }}</p>
+      <p class="page-subtitle">Total: {{ objectsCountLabel }}</p>
     </div>
-  </div>
+  </header>
 
   <div class="toolbar card">
     <label class="search-field" aria-label="Search objects">
@@ -18,9 +18,9 @@
       />
     </label>
 
-    <button type="button" class="ghost-btn" (click)="onMoreFilters()">
+    <button type="button" class="ghost-btn filters-toggle-btn" aria-label="More filters" (click)="onMoreFilters()">
       <span class="material-symbols-outlined">filter_alt</span>
-      More Filters
+      <span class="filters-toggle-label">More Filters</span>
     </button>
   </div>
 
@@ -73,18 +73,18 @@
 
   <div class="object-content-grid">
     <div class="object-main-column">
-      <div class="stats-row">
-        <article class="stat-card" data-tone="blue">
+      <div class="insights-grid">
+        <article class="insight-card card" data-tone="blue">
           <p>Total number of objects</p>
           <strong>{{ totalCount }}</strong>
-          <span>Across your managed destinations</span>
+          <span>Matching active filters</span>
         </article>
-        <article class="stat-card" data-tone="green">
+        <article class="insight-card card" data-tone="green">
           <p>On this page</p>
           <strong>{{ pagedObjects.length }}</strong>
           <span>Visible rows</span>
         </article>
-        <article class="stat-card" data-tone="neutral">
+        <article class="insight-card card" data-tone="amber">
           <p>Average rating</p>
           <strong>{{ averageRatingDisplay }}</strong>
           <span>Across current page</span>
@@ -103,7 +103,46 @@
         } @else if (!pagedObjects.length) {
           <div class="state">No objects found for the selected filters.</div>
         } @else {
-          <div class="table-scroll">
+          <div class="objects-mobile-list">
+            @for (object of pagedObjects; track object.id) {
+              <article
+                class="object-mobile-card"
+                [class.is-active]="selectedObject?.id === object.id"
+                (click)="selectObject(object)"
+              >
+                <div class="object-mobile-card__media" [ngStyle]="getMediaStyle(object)"></div>
+                <div class="object-mobile-card__content">
+                  <div class="object-mobile-card__head">
+                    <h3>{{ object.name }}</h3>
+                    <span class="status-chip status-chip--compact" [ngClass]="getStatusBadgeClass(object.status)">
+                      {{ formatStatus(object.status) }}
+                    </span>
+                  </div>
+                  <p class="object-mobile-card__location">
+                    <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
+                    {{ destinationCellText(object) }}
+                  </p>
+                  <div class="object-mobile-card__meta">
+                    <span class="object-mobile-card__type">{{ object.objectTypeName || 'N/A' }}</span>
+                    <span class="object-mobile-card__rating">
+                      <span class="material-symbols-outlined" aria-hidden="true">star</span>
+                      {{ (object.averageRating ?? 0).toFixed(1) }}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  class="object-mobile-card__edit"
+                  title="Review object"
+                  (click)="onRowAction(object, $event)"
+                >
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+              </article>
+            }
+          </div>
+
+          <div class="table-scroll objects-table-wrap">
             <table>
               <thead>
                 <tr>
@@ -179,8 +218,9 @@
       </section>
     </div>
 
-    <aside class="detail-column card">
+    <aside class="detail-column card" [class.has-selection]="!!selectedObject">
       @if (selectedObject) {
+        <p class="detail-sheet-label">Selected object</p>
         <div class="activity-hero">
           <div class="hero-media" [ngStyle]="getHeroStyle()">
             <span class="hero-badge">{{ selectedObject.objectTypeName || 'Object' }}</span>

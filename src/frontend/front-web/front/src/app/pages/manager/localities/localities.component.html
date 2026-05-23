@@ -1,15 +1,15 @@
-<section class="manager-localities-page">
-  <div class="page-head">
+<section class="manager-localities-page manager-list-page">
+  <header class="page-head">
     <div>
       <p class="breadcrumbs">Dashboard <span>></span> Localities</p>
       <h1>Localities</h1>
-      <p class="subtle-text">Manage localities and review their visibility data.</p>
+      <p class="page-subtitle">Total: {{ localitiesCountLabel }}</p>
     </div>
-    <button type="button" class="primary-btn" (click)="onCreateLocation()">
+    <button type="button" class="primary-btn page-header-cta" (click)="onCreateLocation()">
       <span class="material-symbols-outlined">add</span>
-      Create Locality
+      <span class="page-header-cta-label">Create Locality</span>
     </button>
-  </div>
+  </header>
 
   <div class="toolbar card">
     <label class="search-field" aria-label="Search localities">
@@ -22,9 +22,9 @@
       />
     </label>
 
-    <button type="button" class="ghost-btn" (click)="onMoreFilters()">
+    <button type="button" class="ghost-btn filters-toggle-btn" aria-label="More filters" (click)="onMoreFilters()">
       <span class="material-symbols-outlined">filter_alt</span>
-      More Filters
+      <span class="filters-toggle-label">More Filters</span>
     </button>
   </div>
 
@@ -81,18 +81,18 @@
 
   <div class="locality-content-grid">
     <div class="locality-main-column">
-      <div class="stats-row">
-        <article class="stat-card" data-tone="blue">
+      <div class="insights-grid">
+        <article class="insight-card card" data-tone="blue">
           <p>Total localities</p>
           <strong>{{ totalCount }}</strong>
-          <span>Across your managed destinations</span>
+          <span>Matching active filters</span>
         </article>
-        <article class="stat-card" data-tone="green">
+        <article class="insight-card card" data-tone="green">
           <p>On this page</p>
           <strong>{{ totalLocalitiesOnPage }}</strong>
           <span>Visible rows</span>
         </article>
-        <article class="stat-card" data-tone="neutral">
+        <article class="insight-card card" data-tone="amber">
           <p>Active ratio</p>
           <strong>{{ activePercent }}</strong>
           <span>Current filtered set</span>
@@ -111,7 +111,42 @@
         } @else if (!localities.length) {
           <div class="state">No localities found for the selected filters.</div>
         } @else {
-          <div class="table-scroll">
+          <div class="localities-mobile-list">
+            @for (locality of localities; track locality.id) {
+              <article
+                class="locality-mobile-card"
+                [class.is-active]="selectedLocality?.id === locality.id"
+                (click)="selectLocality(locality)"
+              >
+                <div class="locality-mobile-card__media" [ngStyle]="getMediaStyle(locality)"></div>
+                <div class="locality-mobile-card__content">
+                  <div class="locality-mobile-card__head">
+                    <h3>{{ locality.name }}</h3>
+                    <span class="status-chip status-chip--compact" [ngClass]="getStatusClass(locality)">
+                      {{ getStatusLabel(locality) }}
+                    </span>
+                  </div>
+                  <p class="locality-mobile-card__location">
+                    <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
+                    {{ locality.destinationName || 'N/A' }}
+                  </p>
+                  <div class="locality-mobile-card__meta">
+                    <span class="locality-mobile-card__type">{{ locality.localityTypeName || 'N/A' }}</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  class="locality-mobile-card__edit"
+                  title="Edit locality"
+                  (click)="$event.stopPropagation(); onEditLocation(locality)"
+                >
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+              </article>
+            }
+          </div>
+
+          <div class="table-scroll localities-table-wrap">
             <table>
               <thead>
                 <tr>
@@ -187,8 +222,9 @@
       </section>
     </div>
 
-    <aside class="detail-column card">
+    <aside class="detail-column card" [class.has-selection]="!!selectedLocality">
       @if (selectedLocality) {
+        <p class="detail-sheet-label">Selected locality</p>
         <div class="activity-hero">
           <div class="hero-media" [class.has-slides]="heroImageUrls.length > 0">
             <div class="hero-media-slides" aria-hidden="true">

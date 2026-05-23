@@ -1,5 +1,14 @@
-<div class="manager-layout">
+<div class="manager-layout" [class.sidebar-open]="sidebarOpen" [class.cc-layout--map]="isMapRoute">
   <header class="topbar">
+    <button
+      type="button"
+      class="icon-btn menu-toggle"
+      aria-label="Open menu"
+      [attr.aria-expanded]="sidebarOpen"
+      (click)="toggleSidebar()"
+    >
+      <span class="material-symbols-outlined">{{ sidebarOpen ? 'close' : 'menu' }}</span>
+    </button>
     <div class="topbar-logo">
       <img src="assets/logo.png" alt="SpireGO" class="logo-img" />
     </div>
@@ -58,11 +67,19 @@
     </div>
   </header>
 
+  <button
+    type="button"
+    class="sidebar-backdrop"
+    aria-label="Close menu"
+    [class.is-visible]="sidebarOpen"
+    (click)="closeSidebar()"
+  ></button>
+
   <div class="layout-shell">
-    <aside class="sidebar">
+    <aside class="sidebar" aria-label="Main navigation">
       <p class="sidebar-section-label">Main Menu</p>
 
-      <a class="nav-item" routerLink="/content-creator/dashboard" routerLinkActive="active">
+      <a class="nav-item" routerLink="/content-creator/dashboard" routerLinkActive="active" (click)="closeSidebar()">
         <svg
           class="nav-icon"
           viewBox="0 0 22 22"
@@ -78,19 +95,19 @@
         Dashboard
       </a>
 
-      <a class="nav-item" routerLink="/content-creator/objects" routerLinkActive="active">
+      <a class="nav-item" routerLink="/content-creator/objects" routerLinkActive="active" (click)="closeSidebar()">
         <span class="material-symbols-outlined">
         apartment
         </span>
         Objects
       </a>
 
-      <a class="nav-item" routerLink="/content-creator/activities" routerLinkActive="active">
+      <a class="nav-item" routerLink="/content-creator/activities" routerLinkActive="active" (click)="closeSidebar()">
         <span class="material-symbols-outlined"> hiking </span>
         Activities
       </a>
 
-      <a class="nav-item" routerLink="/content-creator/events" routerLinkActive="active">
+      <a class="nav-item" routerLink="/content-creator/events" routerLinkActive="active" (click)="closeSidebar()">
         <svg
           class="nav-icon"
           viewBox="0 0 22 22"
@@ -106,7 +123,7 @@
         Events
       </a>
 
-      <a class="nav-item" routerLink="/content-creator/reviews" routerLinkActive="active">
+      <a class="nav-item" routerLink="/content-creator/reviews" routerLinkActive="active" (click)="closeSidebar()">
         <svg
           class="nav-icon"
           viewBox="0 0 22 22"
@@ -119,7 +136,7 @@
         Reviews
       </a>
 
-      <a class="nav-item" routerLink="/content-creator/map" routerLinkActive="active">
+      <a class="nav-item" routerLink="/content-creator/map" routerLinkActive="active" (click)="closeSidebar()">
         <svg
           class="nav-icon"
           viewBox="0 0 22 22"
@@ -134,7 +151,7 @@
         Map View
       </a>
 
-      <a class="sidebar-logout" routerLink="/signout">
+      <a class="sidebar-logout" routerLink="/signout" (click)="closeSidebar()">
         <svg
           class="logout-icon"
           viewBox="0 0 22 22"

@@ -10,9 +10,14 @@
     </div>
 
     <div class="header-actions">
-      <button type="button" class="primary-btn" (click)="onAddDestination()">
+      <button
+        type="button"
+        class="primary-btn page-header-cta"
+        aria-label="Add destination"
+        (click)="onAddDestination()"
+      >
         <span class="material-symbols-outlined">add</span>
-        Add destination
+        <span class="page-header-cta-label">Add destination</span>
       </button>
     </div>
   </header>
@@ -101,38 +106,69 @@
       </div>
 
       <div class="table-card">
-        <div class="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>Status</th>
-                <th>Destination</th>
-                <th>Type</th>
-                <th>Region</th>
-                <th>Manager</th>
-                <th>Inventory</th>
-                <th class="col-actions">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @if (isLoading) {
+        @if (isLoading) {
+          <div class="list-state list-state-loading">Loading destinations…</div>
+        } @else if (loadError) {
+          <div class="list-state list-state-error">
+            <p>{{ loadError }}</p>
+            <button type="button" class="ghost-btn slim-btn" (click)="reloadFromApi()">Retry</button>
+          </div>
+        } @else if (!visibleDestinations.length) {
+          <div class="list-state">No destinations match the current filters.</div>
+        } @else {
+          <div class="destinations-mobile-list">
+            @for (row of visibleDestinations; track row.id) {
+              <article
+                class="destination-mobile-card"
+                [class.is-active]="selectedDestination?.id === row.id"
+                (click)="selectDestination(row)"
+              >
+                <div class="destination-mobile-card__media" [ngStyle]="getDestinationMediaStyle(row)"></div>
+                <div class="destination-mobile-card__content">
+                  <div class="destination-mobile-card__head">
+                    <h3>{{ row.name }}</h3>
+                    <span class="status-chip status-chip--compact" [ngClass]="getStatusBadgeClass(row.status)">
+                      {{ formatTableStatus(row.status) }}
+                    </span>
+                  </div>
+                  <p class="destination-mobile-card__location">
+                    <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
+                    {{ destinationLocationText(row) }}
+                  </p>
+                  <div class="destination-mobile-card__meta">
+                    <span class="destination-mobile-card__type">{{ row.destinationType }}</span>
+                    <span class="destination-mobile-card__inventory">
+                      <span class="material-symbols-outlined" aria-hidden="true">apartment</span>
+                      {{ row.objectCount }} Objects
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  class="destination-mobile-card__edit"
+                  title="Edit destination"
+                  (click)="onEditDestination(row); $event.stopPropagation()"
+                >
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+              </article>
+            }
+          </div>
+
+          <div class="table-scroll destinations-table-wrap">
+            <table>
+              <thead>
                 <tr>
-                  <td colspan="7" class="table-message">Loading destinations…</td>
+                  <th>Status</th>
+                  <th>Destination</th>
+                  <th>Type</th>
+                  <th>Region</th>
+                  <th>Manager</th>
+                  <th>Inventory</th>
+                  <th class="col-actions">Actions</th>
                 </tr>
-              } @else if (loadError) {
-                <tr>
-                  <td colspan="7" class="table-message table-message--error">
-                    <p>{{ loadError }}</p>
-                    <button type="button" class="ghost-btn slim-btn" (click)="reloadFromApi()">
-                      Retry
-                    </button>
-                  </td>
-                </tr>
-              } @else if (!visibleDestinations.length) {
-                <tr>
-                  <td colspan="7" class="table-message">No destinations match the current filters.</td>
-                </tr>
-              } @else {
+              </thead>
+              <tbody>
                 <tr
                   *ngFor="let row of visibleDestinations; trackBy: trackByDestinationId"
                   [class.active-row]="selectedDestination?.id === row.id"
@@ -185,10 +221,10 @@
                     </div>
                   </td>
                 </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+              </tbody>
+            </table>
+          </div>
+        }
 
         <footer class="table-footer">
           <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ totalCount }} destinations</p>

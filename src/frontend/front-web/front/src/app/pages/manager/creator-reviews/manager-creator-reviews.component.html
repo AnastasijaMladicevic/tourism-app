@@ -1,4 +1,4 @@
-<section class="manager-reviews-page">
+<section class="manager-reviews-page manager-list-page">
   <header class="page-head">
     <div class="page-head-copy">
       <p class="breadcrumbs">Dashboard <span>&gt;</span> Reviews &amp; Replies</p>
@@ -9,10 +9,6 @@
       </p>
     </div>
     <div class="page-head-actions">
-      <button type="button" class="ghost-btn" (click)="loadReviews()" [disabled]="isLoading">
-        <span class="material-symbols-outlined">refresh</span>
-        Refresh
-      </button>
       <a class="ghost-btn" routerLink="/manager/reports">
         <span class="material-symbols-outlined">flag</span>
         Creator reports
@@ -210,24 +206,24 @@
               <p>This creator has not replied to the tourist yet.</p>
             </div>
           }
-        </div>
 
-        @if (isConcerning(selectedThread)) {
-          <div class="inline-alert">
-            <span class="material-symbols-outlined">info</span>
-            <p>
-              This reply was flagged as potentially inappropriate (including non-English phrases).
-              Submit a creator report for Admin review.
-            </p>
-            @if (hasPendingReportForCreator(selectedThread.creatorId)) {
-              <span class="pending-report-note">Pending report on file</span>
-            } @else {
-              <button type="button" class="primary-btn compact" (click)="openReportModal(selectedThread)">
-                Report creator
-              </button>
-            }
-          </div>
-        }
+          @if (isConcerning(selectedThread)) {
+            <div class="inline-alert" role="status">
+              <span class="material-symbols-outlined" aria-hidden="true">info</span>
+              <p>
+                This reply was flagged as potentially inappropriate (including non-English phrases).
+                Submit a creator report for Admin review.
+              </p>
+              @if (hasPendingReportForCreator(selectedThread.creatorId)) {
+                <span class="pending-report-note">Pending report on file</span>
+              } @else {
+                <button type="button" class="primary-btn compact" (click)="openReportModal(selectedThread)">
+                  Report creator
+                </button>
+              }
+            </div>
+          }
+        </div>
 
         </div>
       } @else {

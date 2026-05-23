@@ -25,7 +25,11 @@ interface EventScheduleRow {
   standalone: true,
   imports: [CommonModule, FormsModule, SharedMapComponent],
   templateUrl: './events.component.html',
-  styleUrls: ['./events.component.css']
+  styleUrls: [
+    './events.component.css',
+    '../shared/cc-list-page-header.css',
+    '../shared/cc-page-stats-scroll.css'
+  ]
 })
 export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
   private readonly eventService = inject(EventService);
@@ -191,6 +195,8 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
 
         if (!this.selectedEvent || !this.pagedEvents.some((event) => event.id === this.selectedEvent?.id)) {
           this.setSelectedEvent(this.pagedEvents[0] ?? null);
+        } else if (this.selectedEvent) {
+          this.loadHeroImagesForSelectedEvent();
         }
 
         this.isLoading = false;
@@ -384,12 +390,31 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
     return ContentCreatorEventsComponent.DEFAULT_BANNER_URL;
   }
 
+  getEventMediaStyle(event: EventDto): Record<string, string> {
+    const url = this.getDetailBanner(event);
+    return url ? { 'background-image': `url("${url}")` } : {};
+  }
+
+  get heroMediaFallbackStyle(): Record<string, string> {
+    const url = this.getDetailBanner(this.selectedEvent);
+    return url ? { 'background-image': `url("${url}")` } : {};
+  }
+
   getSelectedSummary(event: EventDto | null): string {
     if (!event?.description) {
       return 'A featured event selected from the creator workspace. Use this panel to inspect the schedule, media, and staffing for the event.';
     }
 
     return event.description;
+  }
+
+  get eventsCountLabel(): string {
+    if (this.isLoading) {
+      return '…';
+    }
+
+    const count = this.totalCount;
+    return `${count} event${count === 1 ? '' : 's'}`;
   }
 
   get pageStart(): number {
@@ -451,24 +476,31 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
   }
 
   private setSelectedEvent(event: EventDto | null): void {
-    const previousId = this.selectedEvent?.id ?? null;
     this.selectedEvent = event;
 
-    if ((event?.id ?? null) !== previousId) {
-      this.loadHeroImagesForSelectedEvent();
+    if (!event) {
+      this.stopHeroImageRotation();
+      this.heroImageUrls = [];
+      this.currentHeroImageIndex = 0;
+      return;
     }
+
+    this.loadHeroImagesForSelectedEvent();
   }
 
   private loadHeroImagesForSelectedEvent(): void {
     this.stopHeroImageRotation();
-    this.heroImageUrls = [];
-    this.currentHeroImageIndex = 0;
 
     if (!this.selectedEvent) {
+      this.heroImageUrls = [];
+      this.currentHeroImageIndex = 0;
       return;
     }
 
     const fallbackUrl = this.getDetailBanner(this.selectedEvent);
+    this.heroImageUrls = [fallbackUrl];
+    this.currentHeroImageIndex = 0;
+    this.cdr.detectChanges();
 
     this.eventService.getImages(this.selectedEvent.id).subscribe({
       next: (images: EventImageDto[]) => {
