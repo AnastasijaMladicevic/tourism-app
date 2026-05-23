@@ -649,6 +649,15 @@
   line-height: 1.45;
 }
 
+.empty-note--map {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+  padding: 16px;
+  text-align: center;
+}
+
 @media (max-width: 1380px) {
   .top-grid,
   .bottom-grid {

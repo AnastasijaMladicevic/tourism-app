@@ -199,7 +199,7 @@
           <a class="section-link" routerLink="/admin/destinations">Manage</a>
         </div>
 
-        <ul class="region-list">
+        <ul class="region-list" *ngIf="regionRows.length; else emptyRegions">
           <li *ngFor="let row of regionRows" class="region-row">
             <div class="region-row-head">
               <span class="region-name">{{ row.name }}</span>
@@ -222,6 +222,10 @@
             </div>
           </li>
         </ul>
+
+        <ng-template #emptyRegions>
+          <p class="empty-note">No destination coverage data is available right now.</p>
+        </ng-template>
       </article>
 
       <article class="card panel panel--creator">
@@ -386,13 +390,18 @@
         </div>
 
         <div class="map-container">
-          <app-admin-platform-map
-            [compact]="true"
-            [focusRegion]="false"
-            [enableClustering]="true"
-            [destinations]="mapDestinations"
-            mapId="admin-dashboard-map"
-          ></app-admin-platform-map>
+          <ng-container *ngIf="mapDestinations.length; else emptyMapPreview">
+            <app-admin-platform-map
+              [compact]="true"
+              [focusRegion]="false"
+              [enableClustering]="true"
+              [destinations]="mapDestinations"
+              [mapId]="mapComponentId"
+            ></app-admin-platform-map>
+          </ng-container>
+          <ng-template #emptyMapPreview>
+            <p class="empty-note empty-note--map">No mapped destination points are available right now.</p>
+          </ng-template>
         </div>
       </article>
     </div>

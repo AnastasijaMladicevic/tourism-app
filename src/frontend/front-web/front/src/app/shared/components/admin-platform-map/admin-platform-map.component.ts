@@ -80,6 +80,11 @@ export class AdminPlatformMapComponent implements AfterViewInit, OnChanges, OnDe
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['mapId'] && !changes['mapId'].firstChange && this.mapBootstrapped) {
+      this.reloadMarkers(this.destinations ?? []);
+      return;
+    }
+
     if (changes['destinations'] && !changes['destinations'].firstChange && this.mapBootstrapped) {
       this.reloadMarkers(this.destinations ?? []);
     }

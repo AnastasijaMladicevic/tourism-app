@@ -131,6 +131,8 @@ export class DashboardComponent implements OnInit {
   topDestinationRows: TopDestinationRow[] = [];
   regionVisitRows: RegionVisitRow[] = [];
   mapDestinations: DestinationDto[] = [];
+  mapComponentId = 'admin-dashboard-map-0';
+  private mapRenderVersion = 0;
 
   ngOnInit(): void {
     this.user = this.authService.getUser();
@@ -181,8 +183,9 @@ export class DashboardComponent implements OnInit {
       )
       .subscribe({
         next: (overview) => {
-          this.overview = overview;
-          this.bindOverview(overview);
+          const normalized = this.normalizeOverview(overview);
+          this.overview = normalized;
+          this.bindOverview(normalized);
           this.cdr.detectChanges();
         },
         error: () => {
@@ -192,6 +195,45 @@ export class DashboardComponent implements OnInit {
           this.cdr.detectChanges();
         },
       });
+  }
+
+  private normalizeOverview(overview: AdminDashboardOverviewDto): AdminDashboardOverviewDto {
+    return {
+      ...overview,
+      destinationsByRegion: overview.destinationsByRegion ?? [],
+      creatorRequests: {
+        pending: overview.creatorRequests?.pending ?? overview.summary?.pendingCreatorRequests ?? 0,
+        approved: overview.creatorRequests?.approved ?? 0,
+        rejected: overview.creatorRequests?.rejected ?? 0,
+        none: overview.creatorRequests?.none ?? 0,
+        totalSubmitted: overview.creatorRequests?.totalSubmitted ?? 0,
+      },
+      reports: {
+        pending: overview.reports?.pending ?? 0,
+        approved: overview.reports?.approved ?? 0,
+        rejected: overview.reports?.rejected ?? 0,
+        total: overview.reports?.total ?? 0,
+      },
+      banOverview: {
+        temporarilyBanned: overview.banOverview?.temporarilyBanned ?? 0,
+        permanentlyBanned: overview.banOverview?.permanentlyBanned ?? 0,
+        totalBanned: overview.banOverview?.totalBanned ?? 0,
+        regions: overview.banOverview?.regions ?? [],
+      },
+      destinationEngagement: {
+        totalFavoriteAdds: overview.destinationEngagement?.totalFavoriteAdds ?? 0,
+        totalPlannerAdds: overview.destinationEngagement?.totalPlannerAdds ?? 0,
+        ratedDestinations: overview.destinationEngagement?.ratedDestinations ?? 0,
+        topDestinations: overview.destinationEngagement?.topDestinations ?? [],
+        regionEngagement: overview.destinationEngagement?.regionEngagement ?? [],
+      },
+      geospatialOverview: {
+        totalActiveDestinationsWithCoordinates: overview.geospatialOverview?.totalActiveDestinationsWithCoordinates ?? 0,
+        regionsRepresented: overview.geospatialOverview?.regionsRepresented ?? 0,
+        displayedPoints: overview.geospatialOverview?.displayedPoints ?? 0,
+        points: overview.geospatialOverview?.points ?? [],
+      },
+    };
   }
 
   private bindOverview(overview: AdminDashboardOverviewDto): void {
@@ -362,6 +404,8 @@ export class DashboardComponent implements OnInit {
       regionId: point.regionId,
       regionName: point.regionName,
     }));
+    this.mapRenderVersion += 1;
+    this.mapComponentId = `admin-dashboard-map-${this.mapRenderVersion}`;
   }
 
   private humanizeRole(role: string): string {
