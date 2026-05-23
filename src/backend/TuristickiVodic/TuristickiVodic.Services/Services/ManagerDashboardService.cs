@@ -197,37 +197,56 @@ namespace TuristickiVodic.Services.Services
                 })
                 .ToListAsync();
 
-            var favoriteRows = await _context.Favorites
+            var objectFavoriteRows = await _context.Favorites
                 .AsNoTracking()
                 .Where(x => x.CreatedAt >= periodStartUtc)
-                .Where(x =>
-                    (x.ObjectId != null && x.Object != null && x.Object.DestinationId == destinationId) ||
-                    (x.ActivityId != null && x.Activity != null &&
-                        (x.Activity.DestinationId == destinationId ||
-                         (x.Activity.Locality != null && x.Activity.Locality.DestinationId == destinationId) ||
-                         (x.Activity.Object != null && x.Activity.Object.DestinationId == destinationId))))
+                .Where(x => x.ObjectId != null && x.Object != null && x.Object.DestinationId == destinationId)
                 .Select(x => new ManagerFavoriteRow
                 {
                     Day = x.CreatedAt.Date,
-                    ContentType = x.ObjectId != null ? "Object" : "Activity",
-                    ContentId = x.ObjectId ?? x.ActivityId!.Value,
-                    ContentName = x.ObjectId != null ? x.Object!.Name : x.Activity!.Name,
-                    Status = x.ObjectId != null ? x.Object!.Status : x.Activity!.Status,
-                    CreatorId = x.ObjectId != null ? x.Object!.CreatedByUserId : x.Activity!.CreatedByUserId,
-                    CreatorName = x.ObjectId != null
-                        ? ((x.Object!.CreatedBy.FirstName + " " + x.Object.CreatedBy.LastName).Trim())
-                        : ((x.Activity!.CreatedBy.FirstName + " " + x.Activity.CreatedBy.LastName).Trim()),
-                    CreatorEmail = x.ObjectId != null ? x.Object!.CreatedBy.Email : x.Activity!.CreatedBy.Email,
-                    CreatorRole = x.ObjectId != null ? x.Object!.CreatedBy.Role.Name : x.Activity!.CreatedBy.Role.Name,
-                    LocalityId = x.ObjectId != null
-                        ? x.Object!.LocalityId
-                        : (x.Activity!.LocalityId ?? (x.Activity.Object != null ? x.Activity.Object.LocalityId : null)),
-                    LocalityName = x.ObjectId != null
-                        ? (x.Object!.Locality != null ? x.Object.Locality.Name : null)
-                        : (x.Activity!.Locality != null ? x.Activity.Locality.Name :
-                            (x.Activity.Object != null && x.Activity.Object.Locality != null ? x.Activity.Object.Locality.Name : null))
+                    ContentType = "Object",
+                    ContentId = x.ObjectId!.Value,
+                    ContentName = x.Object!.Name,
+                    Status = x.Object.Status,
+                    CreatorId = x.Object.CreatedByUserId,
+                    CreatorName = (x.Object.CreatedBy.FirstName + " " + x.Object.CreatedBy.LastName).Trim(),
+                    CreatorEmail = x.Object.CreatedBy.Email,
+                    CreatorRole = x.Object.CreatedBy.Role.Name,
+                    LocalityId = x.Object.LocalityId,
+                    LocalityName = x.Object.Locality != null ? x.Object.Locality.Name : null
                 })
                 .ToListAsync();
+
+            var activityFavoriteRows = await _context.Favorites
+                .AsNoTracking()
+                .Where(x => x.CreatedAt >= periodStartUtc)
+                .Where(x =>
+                    x.ActivityId != null &&
+                    x.Activity != null &&
+                    (x.Activity.DestinationId == destinationId ||
+                     (x.Activity.Locality != null && x.Activity.Locality.DestinationId == destinationId) ||
+                     (x.Activity.Object != null && x.Activity.Object.DestinationId == destinationId)))
+                .Select(x => new ManagerFavoriteRow
+                {
+                    Day = x.CreatedAt.Date,
+                    ContentType = "Activity",
+                    ContentId = x.ActivityId!.Value,
+                    ContentName = x.Activity!.Name,
+                    Status = x.Activity.Status,
+                    CreatorId = x.Activity.CreatedByUserId,
+                    CreatorName = (x.Activity.CreatedBy.FirstName + " " + x.Activity.CreatedBy.LastName).Trim(),
+                    CreatorEmail = x.Activity.CreatedBy.Email,
+                    CreatorRole = x.Activity.CreatedBy.Role.Name,
+                    LocalityId = x.Activity.LocalityId ?? (x.Activity.Object != null ? x.Activity.Object.LocalityId : null),
+                    LocalityName = x.Activity.Locality != null
+                        ? x.Activity.Locality.Name
+                        : (x.Activity.Object != null && x.Activity.Object.Locality != null ? x.Activity.Object.Locality.Name : null)
+                })
+                .ToListAsync();
+
+            var favoriteRows = objectFavoriteRows
+                .Concat(activityFavoriteRows)
+                .ToList();
 
             var plannerRows = await _context.EventPlannerItems
                 .AsNoTracking()
