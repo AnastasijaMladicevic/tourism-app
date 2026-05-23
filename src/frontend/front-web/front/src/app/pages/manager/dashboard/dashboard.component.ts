@@ -52,6 +52,7 @@ interface ContentStatusRow {
   published: number;
   pending: number;
   rejected: number;
+  totalPercent: number;
   publishedPercent: number;
   pendingPercent: number;
   rejectedPercent: number;
@@ -141,13 +142,46 @@ export class ManagerDashboardComponent implements OnInit {
   }
 
   get managedDestinationTitle(): string {
-    return this.overview?.destination?.displayTitle?.trim()
-      || this.overview?.destination?.destinationName
+    return this.overview?.destination?.destinationName?.trim()
       || 'No managed destination';
+  }
+
+  get managedDestinationDisplayTitle(): string {
+    const displayTitle = this.overview?.destination?.displayTitle?.trim();
+    const destinationName = this.overview?.destination?.destinationName?.trim();
+
+    if (!displayTitle || displayTitle === destinationName) {
+      return '';
+    }
+
+    return displayTitle;
   }
 
   get hasManagedDestination(): boolean {
     return !!this.overview?.hasManagedDestination;
+  }
+
+  get managedDestinationSubtitle(): string {
+    const regionName = this.overview?.destination?.regionName?.trim();
+    const localityCount = this.overview?.destination?.localityCount ?? 0;
+
+    if (!regionName && localityCount <= 0) {
+      return '';
+    }
+
+    if (!regionName) {
+      return `${localityCount} localities`;
+    }
+
+    if (localityCount <= 0) {
+      return regionName;
+    }
+
+    return `${regionName} • ${localityCount} localities`;
+  }
+
+  get moderationTotalPendingDecisions(): number {
+    return (this.overview?.moderationQueue.totalPending ?? 0) + (this.overview?.reports.currentPending ?? 0);
   }
 
   private loadOverview(): void {
@@ -267,23 +301,27 @@ export class ManagerDashboardComponent implements OnInit {
 
   private bindModerationQueue(overview: ManagerDashboardOverviewDto): void {
     const queue = overview.moderationQueue;
-    const total = Math.max(queue.totalPending, 1);
+    const total = Math.max(queue.totalPending + overview.reports.currentPending, 1);
 
     this.moderationSlices = [
       { label: 'Objects', count: queue.pendingObjects, color: '#2563eb', percent: (queue.pendingObjects / total) * 100 },
       { label: 'Events', count: queue.pendingEvents, color: '#0d9488', percent: (queue.pendingEvents / total) * 100 },
       { label: 'Activities', count: queue.pendingActivities, color: '#8b5cf6', percent: (queue.pendingActivities / total) * 100 },
+      { label: 'Reports', count: overview.reports.currentPending, color: '#d97706', percent: (overview.reports.currentPending / total) * 100 },
       { label: 'Deletion requests', count: queue.pendingDeletionRequests, color: '#dc2626', percent: (queue.pendingDeletionRequests / total) * 100 },
     ];
   }
 
   private bindContentStatus(overview: ManagerDashboardOverviewDto): void {
-    this.contentStatusRows = [
+    const rows = [
       { key: 'overall', label: 'Overall', bucket: overview.contentStatus.overall },
       { key: 'objects', label: 'Objects', bucket: overview.contentStatus.objects },
       { key: 'events', label: 'Events', bucket: overview.contentStatus.events },
       { key: 'activities', label: 'Activities', bucket: overview.contentStatus.activities },
-    ].map(({ key, label, bucket }) => this.toContentStatusRow(key, label, bucket));
+    ];
+
+    const maxTotal = Math.max(...rows.map((row) => row.bucket.total), 1);
+    this.contentStatusRows = rows.map(({ key, label, bucket }) => this.toContentStatusRow(key, label, bucket, maxTotal));
   }
 
   private bindTopContent(rows: ManagerDashboardTopContentItemDto[]): void {
@@ -310,7 +348,12 @@ export class ManagerDashboardComponent implements OnInit {
     }));
   }
 
-  private toContentStatusRow(key: string, label: string, bucket: ManagerDashboardStatusBucketDto): ContentStatusRow {
+  private toContentStatusRow(
+    key: string,
+    label: string,
+    bucket: ManagerDashboardStatusBucketDto,
+    maxTotal: number,
+  ): ContentStatusRow {
     const total = Math.max(bucket.total, 1);
 
     return {
@@ -320,6 +363,7 @@ export class ManagerDashboardComponent implements OnInit {
       published: bucket.published,
       pending: bucket.pending,
       rejected: bucket.rejected,
+      totalPercent: bucket.total <= 0 ? 0 : Math.max((bucket.total / Math.max(maxTotal, 1)) * 100, 4),
       publishedPercent: (bucket.published / total) * 100,
       pendingPercent: (bucket.pending / total) * 100,
       rejectedPercent: (bucket.rejected / total) * 100,

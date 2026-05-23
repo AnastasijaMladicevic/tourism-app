@@ -38,19 +38,17 @@
 
     <ng-container *ngIf="hasManagedDestination">
       <div class="kpi-row">
-        <article class="kpi-card card kpi-card--feature">
-          <span class="kpi-label">Managed destination</span>
+        <article class="kpi-card card kpi-card--destination">
           <span class="kpi-value kpi-value--title">{{ managedDestinationTitle }}</span>
-          <span class="kpi-meta muted">
-            {{ overview.destination?.regionName }} · {{ overview.destination?.localityCount | number }} localities
-          </span>
+          <span class="kpi-destination-subtitle" *ngIf="managedDestinationDisplayTitle">{{ managedDestinationDisplayTitle }}</span>
+          <span class="kpi-meta muted" *ngIf="managedDestinationSubtitle">{{ managedDestinationSubtitle }}</span>
         </article>
 
         <article class="kpi-card card">
           <span class="kpi-label">Active creators</span>
           <span class="kpi-value">{{ overview.summary.activeCreators | number }}</span>
           <span class="kpi-meta muted">
-            {{ overview.summary.activeObjects | number }} objects · {{ overview.summary.activeEvents | number }} events · {{ overview.summary.activeActivities | number }} activities
+            {{ overview.summary.activeObjects | number }} objects &bull; {{ overview.summary.activeEvents | number }} events &bull; {{ overview.summary.activeActivities | number }} activities
           </span>
         </article>
 
@@ -70,7 +68,7 @@
           <span class="kpi-label">Average rating</span>
           <span class="kpi-value">{{ overview.summary.averageRatingInPeriod | number:'1.1-1' }}</span>
           <span class="kpi-meta muted">
-            {{ overview.summary.newReviewsInPeriod | number }} new reviews · {{ overview.summary.lowRatedReviewsInPeriod | number }} low-rated
+            {{ overview.summary.newReviewsInPeriod | number }} new reviews &bull; {{ overview.summary.lowRatedReviewsInPeriod | number }} low-rated
           </span>
         </article>
 
@@ -88,50 +86,69 @@
           <div class="section-head">
             <div>
               <h3>Engagement Trend</h3>
-              <p>{{ granularityHint }} · favorites, planner adds, reviews</p>
+              <p>{{ granularityHint }} &bull; favorites, planner adds, reviews</p>
             </div>
             <a class="section-link" routerLink="/manager/creator-reviews">Review feedback</a>
           </div>
 
-          <div class="chart-legend chart-legend--inline">
-            <span *ngFor="let series of engagementSeries" class="legend-item">
-              <span class="legend-dot" [style.background]="series.color"></span>
-              {{ series.label }}
-            </span>
-          </div>
+          <div class="trend-panel-body">
+            <div>
+              <div class="chart-legend chart-legend--inline">
+                <span *ngFor="let series of engagementSeries" class="legend-item">
+                  <span class="legend-dot" [style.background]="series.color"></span>
+                  {{ series.label }}
+                </span>
+              </div>
 
-          <div class="chart-wrap">
-            <div class="chart-y-axis" aria-hidden="true">
-              <span>{{ engagementYTop }}</span>
-              <span>{{ engagementYMid }}</span>
-              <span>0</span>
-            </div>
-            <div class="chart-surface">
-              <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg chart-svg--multi">
-                <path
-                  *ngFor="let series of engagementSeries"
-                  [attr.d]="series.linePath"
-                  class="chart-line-multi"
-                  fill="none"
-                  [attr.stroke]="series.color"
-                ></path>
-                <rect
-                  *ngFor="let zone of engagementHoverZones"
-                  class="chart-hover-zone"
-                  [attr.x]="zone.x"
-                  y="0"
-                  [attr.width]="zone.width"
-                  height="100"
-                >
-                  <title>{{ zone.title }}</title>
-                </rect>
-              </svg>
-              <p class="chart-empty" *ngIf="engagementIsEmpty">No engagement activity was recorded for this period.</p>
-            </div>
-          </div>
+              <div class="chart-wrap">
+                <div class="chart-y-axis" aria-hidden="true">
+                  <span>{{ engagementYTop }}</span>
+                  <span>{{ engagementYMid }}</span>
+                  <span>0</span>
+                </div>
+                <div class="chart-surface">
+                  <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg chart-svg--multi">
+                    <path
+                      *ngFor="let series of engagementSeries"
+                      [attr.d]="series.linePath"
+                      class="chart-line-multi"
+                      fill="none"
+                      [attr.stroke]="series.color"
+                    ></path>
+                    <rect
+                      *ngFor="let zone of engagementHoverZones"
+                      class="chart-hover-zone"
+                      [attr.x]="zone.x"
+                      y="0"
+                      [attr.width]="zone.width"
+                      height="100"
+                    >
+                      <title>{{ zone.title }}</title>
+                    </rect>
+                  </svg>
+                  <p class="chart-empty" *ngIf="engagementIsEmpty">No engagement activity was recorded for this period.</p>
+                </div>
+              </div>
 
-          <div class="chart-labels">
-            <span *ngFor="let label of engagementXLabels">{{ label.label }}</span>
+              <div class="chart-labels">
+                <span *ngFor="let label of engagementXLabels">{{ label.label }}</span>
+              </div>
+            </div>
+
+            <div class="trend-summary-row">
+              <div class="trend-summary-card">
+                <span class="trend-summary-label">Favorites in period</span>
+                <span class="trend-summary-value">{{ overview.summary.favoritesInPeriod | number }}</span>
+              </div>
+              <div class="trend-summary-card">
+                <span class="trend-summary-label">Planner adds</span>
+                <span class="trend-summary-value">{{ overview.summary.plannerAddsInPeriod | number }}</span>
+              </div>
+              <div class="trend-summary-card">
+                <span class="trend-summary-label">New reviews</span>
+                <span class="trend-summary-value">{{ overview.summary.newReviewsInPeriod | number }}</span>
+              </div>
+            </div>
           </div>
         </article>
 
@@ -151,9 +168,11 @@
                 <span class="status-row-total">{{ row.total | number }} total</span>
               </div>
               <div class="stacked-bar stacked-bar--tall">
-                <span class="stack-segment stack-segment--published" [style.width.%]="row.publishedPercent"></span>
-                <span class="stack-segment stack-segment--pending" [style.width.%]="row.pendingPercent"></span>
-                <span class="stack-segment stack-segment--rejected" [style.width.%]="row.rejectedPercent"></span>
+                <div class="stacked-bar-fill-wrap" [style.width.%]="row.totalPercent">
+                  <span class="stack-segment stack-segment--published" [style.width.%]="row.publishedPercent"></span>
+                  <span class="stack-segment stack-segment--pending" [style.width.%]="row.pendingPercent"></span>
+                  <span class="stack-segment stack-segment--rejected" [style.width.%]="row.rejectedPercent"></span>
+                </div>
               </div>
               <div class="status-row-meta">
                 <span>{{ row.published | number }} published</span>
@@ -178,10 +197,6 @@
           </div>
 
           <div class="creator-summary">
-            <div class="creator-stat creator-stat--pending">
-              <span class="creator-stat-val">{{ overview.moderationQueue.totalPending | number }}</span>
-              <span class="creator-stat-label">Total pending</span>
-            </div>
             <div class="creator-stat">
               <span class="creator-stat-val">{{ overview.moderationQueue.pendingObjects | number }}</span>
               <span class="creator-stat-label">Objects</span>
@@ -194,6 +209,18 @@
               <span class="creator-stat-val">{{ overview.moderationQueue.pendingActivities | number }}</span>
               <span class="creator-stat-label">Activities</span>
             </div>
+            <div class="creator-stat creator-stat--reports">
+              <span class="creator-stat-val">{{ overview.reports.currentPending | number }}</span>
+              <span class="creator-stat-label">Reports</span>
+            </div>
+          </div>
+
+          <div class="queue-total-card queue-total-card--highlight">
+            <span class="queue-total-label">Total pending decisions</span>
+            <span class="queue-total-value">{{ moderationTotalPendingDecisions | number }}</span>
+            <span class="queue-total-meta">
+              {{ overview.moderationQueue.totalPending | number }} content items &bull; {{ overview.reports.currentPending | number }} reports
+            </span>
           </div>
 
           <div class="stacked-bar stacked-bar--tall">
@@ -209,7 +236,7 @@
           <ul class="legend-list">
             <li *ngFor="let slice of moderationSlices">
               <span class="legend-dot" [style.background]="slice.color"></span>
-              {{ slice.label }} · {{ slice.count | number }}
+              {{ slice.label }} &bull; {{ slice.count | number }}
             </li>
           </ul>
         </article>
@@ -331,8 +358,8 @@
                   <div class="rank-name">{{ row.contentName }}</div>
                   <div class="rank-subtle">
                     {{ humanizeContentType(row.contentType) }}
-                    <span *ngIf="row.localityName">· {{ row.localityName }}</span>
-                    · {{ row.creatorName }}
+                    <span *ngIf="row.localityName">&bull; {{ row.localityName }}</span>
+                    &bull; {{ row.creatorName }}
                   </div>
                 </div>
                 <div class="rank-side">
@@ -405,7 +432,7 @@
         <div class="section-head">
           <div>
             <h3>Upcoming Events</h3>
-            <p>{{ overview.upcomingEvents.next7Days | number }} in next 7 days · {{ overview.upcomingEvents.next30Days | number }} in next 30 days</p>
+            <p>{{ overview.upcomingEvents.next7Days | number }} in next 7 days &bull; {{ overview.upcomingEvents.next30Days | number }} in next 30 days</p>
           </div>
           <a class="section-link" routerLink="/manager/events">Open events</a>
         </div>
@@ -415,7 +442,7 @@
             <div class="upcoming-date">{{ formatShortDate(row.startDate) }}</div>
             <h4>{{ row.eventName }}</h4>
             <p>{{ row.localityName || managedDestinationTitle }}</p>
-            <span class="upcoming-meta">Creator · {{ row.creatorName }}</span>
+            <span class="upcoming-meta">Creator &bull; {{ row.creatorName }}</span>
           </article>
         </div>
 

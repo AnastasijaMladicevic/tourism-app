@@ -137,9 +137,8 @@
   gap: 4px;
 }
 
-.kpi-card--feature {
-  background: linear-gradient(160deg, #eff6ff 0%, #ffffff 60%);
-  border-color: #bfdbfe;
+.kpi-card--destination {
+  justify-content: center;
 }
 
 .kpi-card--alert {
@@ -166,6 +165,12 @@
 .kpi-value--title {
   font-size: 20px;
   letter-spacing: -0.25px;
+}
+
+.kpi-destination-subtitle {
+  font-size: 13px;
+  line-height: 1.45;
+  color: #475569;
 }
 
 .kpi-meta {
@@ -223,6 +228,14 @@
   flex-wrap: wrap;
   gap: 10px 16px;
   margin-bottom: 10px;
+}
+
+.trend-panel-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .legend-item {
@@ -304,6 +317,36 @@
   color: #94a3b8;
 }
 
+.trend-summary-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.trend-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #eef2f7;
+}
+
+.trend-summary-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.trend-summary-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
 .creator-summary {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -323,6 +366,11 @@
   border: 1px solid #fde68a;
 }
 
+.creator-stat--reports {
+  background: #f8fafc;
+  border: 1px solid #eef2f7;
+}
+
 .creator-stat-val {
   display: block;
   font-size: 20px;
@@ -338,6 +386,44 @@
   letter-spacing: 0.03em;
 }
 
+.queue-total-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  margin: 12px 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #dbeafe;
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+}
+
+.queue-total-card--highlight {
+  border-color: #fdba74;
+  background: linear-gradient(180deg, #fff7ed 0%, #ffffff 100%);
+}
+
+.queue-total-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.queue-total-value {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  color: #0f172a;
+}
+
+.queue-total-meta {
+  font-size: 12px;
+  color: #64748b;
+}
+
 .stacked-bar {
   display: flex;
   height: 8px;
@@ -349,6 +435,14 @@
 .stacked-bar--tall {
   height: 10px;
   margin: 10px 0 8px;
+}
+
+.stacked-bar-fill-wrap {
+  display: flex;
+  height: 100%;
+  min-width: 0;
+  border-radius: 999px;
+  overflow: hidden;
 }
 
 .stack-segment {
@@ -605,6 +699,7 @@
   .top-grid,
   .middle-grid,
   .bottom-grid,
+  .trend-summary-row,
   .report-grid,
   .review-health,
   .upcoming-grid {
