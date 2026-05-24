@@ -41,12 +41,12 @@ export class MapService {
   private activeFilters: string[] = [];
 
   private readonly filterMap: Record<string, string[]> = {
-  food: ['restaurant', 'kafana'],         // kafana pokriva bar, cafe, club, winery
-  accommodation: ['hotel', 'apartment'],  // apartment pokriva resort, hostel, motel
-  fuel: ['gas_station'],
-  shopping: ['shop', 'mall', 'market'],
-  health: ['hospital', 'clinic', 'pharmacy'],
-};
+    food: ['restaurant', 'kafana', 'bar', 'cafe', 'club', 'winery'],
+    accommodation: ['hotel', 'apartment', 'resort', 'hostel', 'motel', 'villa'],
+    fuel: ['gas_station'],
+    shopping: ['shop', 'mall', 'market', 'storefront'],
+    health: ['hospital', 'clinic', 'pharmacy'],
+  };
 
   getMap(): L.Map | null {
     return this.map;
@@ -378,36 +378,34 @@ export class MapService {
   }
 
   private matchesCurrentFilters(type: string, data?: any): boolean {
-  if (!this.activeFilters.length) {
-    return true;
-  }
-
-  const normalizedType = this.normalizeFilterValue(type);
-
-  return this.activeFilters.some((filter) => {
-    const normalizedFilter = this.normalizeFilterValue(filter);
-
-    // Ako filter direktno odgovara tipu markera, npr. restaurant === restaurant
-    if (normalizedFilter === normalizedType) {
+    if (!this.activeFilters.length) {
       return true;
     }
 
-    // Ako filter predstavlja grupu, npr. food -> restaurant, kafana...
-    const mappedTypes = this.filterMap[normalizedFilter] ?? [];
+    const normalizedType = this.normalizeFilterValue(type);
 
-    return mappedTypes
-      .map((mappedType) => this.normalizeFilterValue(mappedType))
-      .includes(normalizedType);
-  });
-}
+    return this.activeFilters.some((filter) => {
+      const normalizedFilter = this.normalizeFilterValue(filter);
 
-private normalizeFilterValue(value: string): string {
-  return String(value ?? '')
-    .trim()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-}
+      if (normalizedFilter === normalizedType) {
+        return true;
+      }
+
+      const mappedTypes = this.filterMap[normalizedFilter] ?? [];
+
+      return mappedTypes
+        .map((mappedType) => this.normalizeFilterValue(mappedType))
+        .includes(normalizedType);
+    });
+  }
+
+  private normalizeFilterValue(value: string): string {
+    return String(value ?? '')
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  }
 
   private toMarkerKey(type: string, id: number): string {
     return `${type}:${id}`;

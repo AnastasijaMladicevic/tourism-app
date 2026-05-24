@@ -837,10 +837,10 @@
     "locationConsentBody": "Pracenje lokacije trenutno nije ukljuceno. Klikni ispod i otvori podesavanja da ukljucis saglasnost za pracenje lokacije.",
     "locationConsentAction": "Klikni ovde",
     "filters": {
-      "food": "Hrana i pice",
+      "food": "Hrana i piće",
       "fuel": "Pumpe",
-      "accommodation": "Smestaj",
-      "shopping": "Soping",
+      "accommodation": "Smeštaj",
+      "shopping": "Šoping",
       "health": "Bolnice"
     },
     "routePlanner": {

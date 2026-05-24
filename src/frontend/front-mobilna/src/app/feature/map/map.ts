@@ -1077,7 +1077,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getObjectType(name: string): string {
-    const normalized = name.toLowerCase();
+    const normalized = name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
     if (
       normalized.includes('hotel') ||
       normalized.includes('albergo') ||
@@ -1982,13 +1985,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     switch (this.activeAddStopPanelFilter) {
       case 'food':
-        return item.markerType === 'restaurant' || item.markerType === 'kafana';
+        return ['restaurant', 'kafana', 'bar', 'cafe', 'club', 'winery'].includes(item.markerType);
       case 'fuel':
         return item.markerType === 'gas_station';
       case 'accommodation':
-        return item.markerType === 'hotel' || item.markerType === 'apartment';
+        return ['hotel', 'apartment', 'resort', 'hostel', 'motel', 'villa'].includes(item.markerType);
       case 'shopping':
-        return ['shop', 'mall', 'market'].includes(item.markerType);
+        return ['shop', 'mall', 'market', 'storefront'].includes(item.markerType);
       case 'health':
         return ['pharmacy', 'hospital', 'clinic'].includes(item.markerType);
       default:
