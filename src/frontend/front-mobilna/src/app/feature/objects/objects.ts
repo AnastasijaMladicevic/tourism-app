@@ -43,6 +43,7 @@ export class ObjectsComponent implements OnInit {
   minRatingFilter = 0;
   sortOption: 'rating' | 'az' | 'za' | 'distance' = 'rating';
   showSortMenu = false;
+  showPageSizeMenu = false;
   isLoading = true;
   errorMessage = '';
   pageTitle = '';
@@ -162,8 +163,17 @@ export class ObjectsComponent implements OnInit {
     this.pageSize = size;
     this.currentPage = 1;
     void this.loadData();
+    this.cdr.detectChanges();
   }
+  togglePageSizeMenu(event: Event): void {
+    event.stopPropagation();
 
+    if (this.showSortMenu) {
+      this.showSortMenu = false;
+    }
+
+    this.showPageSizeMenu = !this.showPageSizeMenu;
+  }
   async loadData(): Promise<void> {
     const currentToken = ++this.loadToken;
     this.isLoading = true;
@@ -398,8 +408,11 @@ export class ObjectsComponent implements OnInit {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
-    if (!(event.target as HTMLElement).closest('.sort-anchor')) {
+    const target = event.target as HTMLElement;
+
+    if (!target.closest('.sort-anchor')) {
       this.showSortMenu = false;
+      this.showPageSizeMenu = false;
     }
   }
 

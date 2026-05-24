@@ -64,31 +64,12 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.route.paramMap.subscribe(params => {
+      const id = Number(params.get('id'));
+      if (!id) return;
 
-    forkJoin({
-      event: this.eventService.getById(id),
-      images: this.imageService.getForEvent(id),
-      qr: this.qrLinkService.getForEntity('events', id).pipe(catchError(() => of(null))),
-    }).subscribe({
-      next: ({ event, images, qr }) => {
-        const normalizedEvent = this.normalizeEvent(event);
-
-        this.event = normalizedEvent;
-        this.qrLink = qr;
-        this.images = images || [];
-        this.mainImage = this.getMainImage(this.images, normalizedEvent);
-        this.syncPlannerState();
-        this.loadNearbyEvents(normalizedEvent);
-      },
-      error: (err) => {
-        console.error('Failed to load event details:', err);
-        this.isLoading = false;
-        this.errorMessage = this.translationService.translate('event.loadingError');
-        this.cdr.detectChanges();
-      },
+      this.loadEvent(id);
     });
-
     window.addEventListener('focus', this.handleWindowFocus);
     window.addEventListener('add-to-planner', (event: any) => {
       const obj = event.detail;
@@ -102,7 +83,42 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     window.removeEventListener('focus', this.handleWindowFocus);
   }
+  private loadEvent(id: number): void {
+    this.isLoading = true;
+    this.errorMessage = '';
 
+    forkJoin({
+      event: this.eventService.getById(id),
+      images: this.imageService.getForEvent(id),
+      qr: this.qrLinkService
+        .getForEntity('events', id)
+        .pipe(catchError(() => of(null))),
+    }).subscribe({
+      next: ({ event, images, qr }) => {
+        const normalizedEvent = this.normalizeEvent(event);
+
+        this.event = normalizedEvent;
+        this.qrLink = qr;
+        this.images = images || [];
+        this.mainImage = this.getMainImage(this.images, normalizedEvent);
+
+        this.syncPlannerState();
+        this.loadNearbyEvents(normalizedEvent);
+
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Failed to load event details:', err);
+
+        this.isLoading = false;
+        this.errorMessage =
+          this.translationService.translate('event.loadingError');
+
+        this.cdr.detectChanges();
+      },
+    });
+  }
   removeFromPlanner(): void {
     if (!this.plannerId) return;
 

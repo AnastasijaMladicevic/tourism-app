@@ -50,29 +50,12 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.route.paramMap.subscribe(params => {
+      const id = Number(params.get('id'));
 
-    forkJoin({
-      activity: this.activityService.getById(id),
-      images: this.imageService.getForActivity?.(id),
-      qr: this.qrLinkService.getForEntity('activities', id).pipe(catchError(() => of(null)))
-    }).subscribe({
-      next: ({ activity, images, qr }) => {
-        const normalizedActivity = this.normalizeActivity(activity)
-        this.activity = normalizedActivity;
-        this.qrLink = qr;
-        this.images = images || [];
-        this.mainImage = this.getMainImage();
-        this.syncFavoriteState();
-        this.isLoading = false;
-        this.loadNearbyActivities(normalizedActivity);
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.errorMessage = 'Failed to load activity';
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      }
+      if (!id) return;
+
+      this.loadActivity(id);
     });
 
     window.addEventListener('focus', this.handleWindowFocus);
@@ -87,6 +70,35 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     window.removeEventListener('focus', this.handleWindowFocus);
+  }
+  private loadActivity(id: number): void {
+    this.isLoading = true;
+
+    forkJoin({
+      activity: this.activityService.getById(id),
+      images: this.imageService.getForActivity?.(id),
+      qr: this.qrLinkService.getForEntity('activities', id).pipe(catchError(() => of(null)))
+    }).subscribe({
+      next: ({ activity, images, qr }) => {
+        const normalized = this.normalizeActivity(activity);
+
+        this.activity = normalized;
+        this.qrLink = qr;
+        this.images = images || [];
+        this.mainImage = this.getMainImage();
+
+        this.syncFavoriteState();
+        this.loadNearbyActivities(normalized);
+
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.errorMessage = 'Failed to load activity';
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
   private loadNearbyActivities(currentActivity: ActivityDto): void {
     if (currentActivity.latitude == null || currentActivity.longitude == null) {

@@ -11,6 +11,9 @@ button:hover {
 }
 
 .header {
+  z-index: 100;
+  top: 0;
+  position: sticky;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -20,6 +23,7 @@ button:hover {
 }
 
 .icon-btn {
+  cursor: pointer;
   width: 40px;
   height: 40px;
   border: none;
@@ -558,6 +562,7 @@ button:hover {
 }
 
 .map-btn-overlay {
+  cursor: pointer;
   position: absolute;
   bottom: 16px;
   right: 16px;
@@ -655,7 +660,7 @@ button:hover {
 .gallery-item {
   flex: 0 0 auto;
   width: 160px;
-  /* veličina slika */
+  cursor: pointer;
   height: 160px;
   border-radius: 12px;
   overflow: hidden;
