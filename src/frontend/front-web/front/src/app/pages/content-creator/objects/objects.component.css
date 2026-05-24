@@ -9,6 +9,22 @@
   box-sizing: border-box;
 }
 
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: #2563eb;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.page-header-eyebrow {
+  margin-bottom: 4px;
+}
+
 .card {
   background: #ffffff;
   border: 1px solid #e5e7eb;
