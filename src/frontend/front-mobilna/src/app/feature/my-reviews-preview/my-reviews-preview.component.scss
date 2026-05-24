@@ -176,14 +176,18 @@
   color: #d5dce5;
   font-size: 20px;
   line-height: 1;
+
+  span {
+    color: #d5dce5;
+  }
+
+  span.star--filled {
+    color: #f7c12c;
+  }
 }
 
 .stars--row {
   font-size: 17px;
-}
-
-.star--filled {
-  color: #f7c12c;
 }
 
 .rating-bars {
