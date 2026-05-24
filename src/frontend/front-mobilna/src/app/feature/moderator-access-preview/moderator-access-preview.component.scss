@@ -1,6 +1,7 @@
 .preview-page {
   min-height: 100dvh;
-  background: #fff;
+  background: var(--bg);
+  color: var(--text-dark);
 }
 
 .preview-topbar {
@@ -9,15 +10,15 @@
   display: grid;
   grid-template-columns: 40px 1fr 40px;
   align-items: center;
-  border-bottom: 1px solid #edf0f2;
-  background: #fff;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
 
   h1 {
     margin: 0;
     text-align: center;
     font-size: 17px;
     font-weight: 800;
-    color: #232a31;
+    color: var(--text-dark);
   }
 }
 
@@ -28,12 +29,17 @@
 }
 
 .back-btn {
-  color: #202f39;
+  color: var(--text-dark);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   text-decoration: none;
+  transition: background-color 0.16s ease, color 0.16s ease;
+
+  &:hover {
+    background: rgba(77, 194, 255, 0.12);
+  }
 
   svg {
     width: 18px;
@@ -55,19 +61,23 @@
 .intro-card {
   margin-top: 0;
   padding: 22px 24px 26px;
-  background: #f3f4f6;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  box-shadow: 0 12px 26px rgba(30, 53, 65, 0.08);
 
   h2 {
     margin: 14px 0 12px;
-    color: #168dbb;
+    color: var(--text-dark);
     font-size: 15px;
     line-height: 1.35;
     font-weight: 900;
+    text-align: center;
   }
 
   p {
     margin: 0;
-    color: #878c92;
+    color: var(--text-gray);
     font-size: 14px;
     line-height: 1.65;
   }
@@ -77,12 +87,12 @@
   width: 30px;
   height: 30px;
   border-radius: 10px;
-  border: 1.5px solid #1690be;
-  color: #1690be;
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #fff;
+  background: var(--surface-strong);
 
   svg {
     width: 16px;
@@ -101,7 +111,7 @@
   h3 {
     margin: 0;
     padding: 0 24px 12px;
-    color: #9ea3a8;
+    color: var(--text-gray);
     font-size: 13px;
     font-weight: 900;
     letter-spacing: 0.06em;
@@ -110,7 +120,7 @@
 }
 
 .privileges-list {
-  border-top: 1px solid #edf0f2;
+  border-top: 1px solid var(--border);
 }
 
 .privilege-row {
@@ -119,15 +129,15 @@
   gap: 14px;
   align-items: start;
   padding: 16px 10px 18px;
-  border-bottom: 1px solid #edf0f2;
+  border-bottom: 1px solid var(--border);
 }
 
 .privilege-icon {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #f3f4f6;
-  color: #83898f;
+  background: var(--surface-soft);
+  color: var(--text-gray);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -146,7 +156,7 @@
 .privilege-copy {
   h4 {
     margin: 0 0 4px;
-    color: #232a31;
+    color: var(--text-dark);
     font-size: 16px;
     line-height: 1.2;
     font-weight: 900;
@@ -154,7 +164,7 @@
 
   p {
     margin: 0;
-    color: #90959a;
+    color: var(--text-gray);
     font-size: 14px;
     line-height: 1.5;
   }
@@ -163,13 +173,14 @@
 .status-panel {
   margin-top: 0;
   padding: 30px 10px 0;
-  background: #f7f8fa;
+  background: transparent;
 }
 
 .status-card {
   padding: 16px 14px;
   border-radius: 18px;
-  background: #fff;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
   box-shadow: 0 12px 26px rgba(30, 53, 65, 0.06);
   width: 100%;
 }
@@ -182,7 +193,7 @@
 }
 
 .status-title {
-  color: #232a31;
+  color: var(--text-dark);
   font-size: 16px;
   font-weight: 900;
 }
@@ -191,8 +202,9 @@
   min-height: 30px;
   padding: 0 14px;
   border-radius: 999px;
-  background: #f1f1f1;
-  color: #a6a8ad;
+  background: var(--surface-soft);
+  color: var(--text-gray);
+  border: 1px solid var(--border);
   font-size: 13px;
   font-weight: 800;
   display: inline-flex;
@@ -203,20 +215,20 @@
 
 .status-role {
   margin: 10px 0 0;
-  color: #91959a;
+  color: var(--text-gray);
   font-size: 13px;
   line-height: 1.5;
 }
 
 .status-note {
   margin: 60px 18px 0;
-  color: #a3a7ac;
+  color: var(--text-gray);
   font-size: 12px;
   line-height: 1.7;
 }
 
 .status-note__link {
-  color: #2792bd;
+  color: var(--primary);
   font-weight: 700;
   text-decoration: none;
 }
@@ -244,7 +256,7 @@
   margin: 14px auto 0;
   width: calc(100% - 26px);
   text-align: center;
-  color: #19857f;
+  color: #16a085;
   font-size: 13px;
   font-weight: 800;
 
@@ -258,11 +270,11 @@
     min-height: 100%;
     padding: 12px 24px 30px;
     background:
-      linear-gradient(180deg, #fff 0%, #fcfcfd 55%, #f7f8fa 100%);
+      linear-gradient(180deg, var(--bg) 0%, rgba(248, 252, 254, 0.55) 55%, rgba(241, 247, 251, 0.72) 100%);
   }
 
   .preview-topbar {
-    width: min(100%, 860px);
+    width: min(100%, 720px);
     margin: 0 auto;
     padding: 16px 0 10px;
 
@@ -272,7 +284,7 @@
   }
 
   .preview-shell {
-    width: min(100%, 860px);
+    width: min(100%, 720px);
     padding: 0 0 34px;
   }
 
@@ -287,7 +299,7 @@
 
     p {
       font-size: 16px;
-      max-width: 56ch;
+      max-width: none;
     }
   }
 
@@ -301,8 +313,8 @@
   }
 
   .privileges-list {
-    background: #fff;
-    border: 1px solid #edf0f2;
+    background: var(--surface-strong);
+    border: 1px solid var(--border);
     border-radius: 24px;
     overflow: hidden;
   }
@@ -320,15 +332,17 @@
 
   .status-panel {
     margin-top: 22px;
-    padding: 30px;
-    border-radius: 28px;
+    padding: 30px 0 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
   }
 
   .status-card {
-    max-width: 520px;
     width: 100%;
   }
 
@@ -347,5 +361,74 @@
 
   .feedback {
     width: min(100%, 420px);
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+  .preview-page {
+    background:
+      radial-gradient(circle at top left, rgba(77, 194, 255, 0.08), transparent 28%),
+      var(--bg);
+  }
+
+  .preview-topbar {
+    background: transparent;
+    border-bottom-color: var(--border);
+  }
+
+  .back-btn {
+    color: var(--text-dark);
+
+    &:hover {
+      background: rgba(77, 194, 255, 0.16);
+    }
+  }
+
+  .intro-card,
+  .privileges-list,
+  .status-card {
+    background: var(--surface-strong);
+    border-color: var(--border);
+    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.18);
+  }
+
+  .status-panel {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .privilege-icon,
+  .status-pill {
+    background: var(--surface-soft);
+    border-color: var(--border);
+  }
+
+  .privilege-icon {
+    color: #7fd8ff;
+  }
+
+  .status-pill {
+    color: var(--text-dark);
+  }
+
+  .status-note__link {
+    color: #7fd8ff;
+  }
+
+  .feedback {
+    color: #59d4c8;
+  }
+
+  .feedback--error {
+    color: #ff7d7d;
+  }
+
+  @media (min-width: 768px) {
+    .preview-page {
+      background:
+        radial-gradient(circle at top left, rgba(77, 194, 255, 0.08), transparent 24%),
+        linear-gradient(180deg, #08161d 0%, #0b1c25 55%, #0f2430 100%);
+    }
   }
 }

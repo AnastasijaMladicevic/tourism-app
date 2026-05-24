@@ -1,6 +1,7 @@
 .rules-page {
   min-height: 100dvh;
-  background: #fff;
+  background: var(--bg);
+  color: var(--text-dark);
 }
 
 .rules-topbar {
@@ -9,15 +10,15 @@
   display: grid;
   grid-template-columns: 40px 1fr 40px;
   align-items: center;
-  border-bottom: 1px solid #edf0f2;
-  background: #fff;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
 
   h1 {
     margin: 0;
     text-align: center;
     font-size: 17px;
     font-weight: 800;
-    color: #232a31;
+    color: var(--text-dark);
   }
 }
 
@@ -28,12 +29,17 @@
 }
 
 .back-btn {
-  color: #202f39;
+  color: var(--text-dark);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   text-decoration: none;
+  transition: background-color 0.16s ease, color 0.16s ease;
+
+  &:hover {
+    background: rgba(77, 194, 255, 0.12);
+  }
 
   svg {
     width: 18px;
@@ -58,8 +64,8 @@
   gap: 14px;
   align-items: start;
   padding: 16px 15px;
-  background: #f6fbff;
-  border: 1px solid #dcebf4;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
   border-radius: 20px;
   box-shadow: 0 10px 24px rgba(20, 69, 96, 0.08);
 }
@@ -68,7 +74,8 @@
   width: 34px;
   height: 34px;
   border-radius: 12px;
-  color: #1392c5;
+  background: rgba(77, 194, 255, 0.12);
+  color: var(--primary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -87,7 +94,7 @@
 .rules-intro-copy {
   h2 {
     margin: 2px 0 10px;
-    color: #168dbb;
+    color: var(--text-dark);
     font-size: 14px;
     line-height: 1.3;
     font-weight: 900;
@@ -95,7 +102,7 @@
 
   p {
     margin: 0;
-    color: #7e8a96;
+    color: var(--text-gray);
     font-size: 13px;
     line-height: 1.6;
   }
@@ -103,8 +110,8 @@
 
 .rules-agreement-card {
   margin-top: 16px;
-  background: #fff;
-  border: 1px solid #ebf0f4;
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
   border-radius: 22px;
   box-shadow: 0 14px 30px rgba(30, 53, 65, 0.06);
   overflow: hidden;
@@ -115,7 +122,7 @@
   grid-template-columns: 34px 1fr;
   gap: 14px;
   padding: 16px 15px;
-  border-bottom: 1px solid #edf0f2;
+  border-bottom: 1px solid var(--border);
 
   &:last-child {
     border-bottom: none;
@@ -126,8 +133,8 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: #eef6ff;
-  color: #3e8ff0;
+  background: rgba(77, 194, 255, 0.12);
+  color: var(--primary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -144,7 +151,7 @@
 
   h3 {
     margin: 0;
-    color: #2a3139;
+    color: var(--text-dark);
     font-size: 14px;
     line-height: 1.35;
     font-weight: 900;
@@ -154,7 +161,7 @@
 .rules-section__icon {
   width: 18px;
   height: 18px;
-  color: #5ba3ff;
+  color: var(--primary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -173,7 +180,7 @@
 
 .rules-section__content p {
   margin: 0;
-  color: #798592;
+  color: var(--text-gray);
   font-size: 13px;
   line-height: 1.64;
 }
@@ -181,7 +188,7 @@
 .rules-footnote {
   margin: 20px auto 0;
   max-width: 34ch;
-  color: #9aa4ae;
+  color: var(--text-gray);
   font-size: 11px;
   line-height: 1.6;
   text-align: center;
@@ -189,13 +196,12 @@
 }
 
 .rules-actions {
-  display: grid;
-  gap: 14px;
+  display: flex;
+  justify-content: center;
   margin-top: 22px;
 }
 
-.rules-primary-btn,
-.rules-secondary-btn {
+.rules-primary-btn {
   text-decoration: none;
   text-align: center;
   font-weight: 800;
@@ -212,18 +218,14 @@
   background: linear-gradient(180deg, #2a94ba 0%, #2288b0 100%);
   color: #fff;
   box-shadow: 0 18px 30px rgba(34, 136, 176, 0.24);
-}
-
-.rules-secondary-btn {
-  padding: 2px 0;
-  color: #7f8b96;
+  min-width: min(100%, 320px);
 }
 
 @media (min-width: 768px) {
   .rules-page {
     min-height: 100%;
     padding: 12px 24px 32px;
-    background: linear-gradient(180deg, #fff 0%, #fcfcfd 55%, #f7f8fa 100%);
+    background: linear-gradient(180deg, var(--bg) 0%, rgba(248, 252, 254, 0.55) 55%, rgba(241, 247, 251, 0.72) 100%);
   }
 
   .rules-topbar {
@@ -289,10 +291,60 @@
   }
 
   .rules-actions {
-    justify-items: center;
+    justify-content: center;
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+  .rules-page {
+    background:
+      radial-gradient(circle at top left, rgba(77, 194, 255, 0.08), transparent 28%),
+      var(--bg);
+  }
+
+  .rules-topbar {
+    background: transparent;
+    border-bottom-color: var(--border);
+  }
+
+  .back-btn {
+    color: var(--text-dark);
+
+    &:hover {
+      background: rgba(77, 194, 255, 0.16);
+    }
+  }
+
+  .rules-intro-card,
+  .rules-agreement-card {
+    background: var(--surface-strong);
+    border-color: var(--border);
+    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.18);
+  }
+
+  .rules-intro-icon,
+  .rules-section__index {
+    background: rgba(77, 194, 255, 0.14);
+    color: #7fd8ff;
+  }
+
+  .rules-section__icon {
+    color: #7fd8ff;
+  }
+
+  .rules-section {
+    border-bottom-color: var(--border);
   }
 
   .rules-primary-btn {
-    min-width: 290px;
+    box-shadow: 0 20px 32px rgba(21, 151, 215, 0.24);
+  }
+
+  @media (min-width: 768px) {
+    .rules-page {
+      background:
+        radial-gradient(circle at top left, rgba(77, 194, 255, 0.08), transparent 24%),
+        linear-gradient(180deg, #08161d 0%, #0b1c25 55%, #0f2430 100%);
+    }
   }
 }

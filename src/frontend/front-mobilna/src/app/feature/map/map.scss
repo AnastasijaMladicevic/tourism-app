@@ -4,7 +4,7 @@
   height: var(--map-viewport-height, 100dvh);
   min-height: var(--map-viewport-height, 100dvh);
   overflow: hidden;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-family-base);
 }
 
 .main-map {
@@ -290,7 +290,7 @@ body.route-navigation-active app-floating-ai-assistant {
   height: 6px;
   margin: 0 auto;
   border-radius: 999px;
-  background: #e6edf4;
+  background: var(--border);
 }
 
 .route-planner__header {
@@ -311,8 +311,8 @@ body.route-navigation-active app-floating-ai-assistant {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #e6f7ff, #eef9ff);
-  color: #1697d8;
+  background: var(--primary-light);
+  color: var(--primary);
   flex-shrink: 0;
 
   mat-icon {
@@ -332,14 +332,14 @@ body.route-navigation-active app-floating-ai-assistant {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: #8ea0b3;
+  color: var(--text-gray);
 }
 
 .route-planner__title-block h3 {
   margin: 0;
   font-size: 1.05rem;
   line-height: 1.12;
-  color: #1f2937;
+  color: var(--text-dark);
 }
 
 .route-planner__stats {
@@ -347,7 +347,7 @@ body.route-navigation-active app-floating-ai-assistant {
   flex-wrap: wrap;
   align-items: center;
   gap: 8px 12px;
-  color: #526274;
+  color: var(--text-gray);
   font-size: 0.84rem;
   font-weight: 600;
 
@@ -361,7 +361,7 @@ body.route-navigation-active app-floating-ai-assistant {
     width: 16px;
     height: 16px;
     font-size: 16px;
-    color: #7b8ca0;
+    color: var(--text-gray);
   }
 }
 
@@ -369,7 +369,7 @@ body.route-navigation-active app-floating-ai-assistant {
   padding: 6px 12px;
   border-radius: 999px;
   background: var(--surface-soft);
-  color: #3f4f61;
+  color: var(--text-dark);
 }
 
 .route-planner__header-actions {
@@ -384,8 +384,8 @@ body.route-navigation-active app-floating-ai-assistant {
 .route-planner__icon-btn {
   border: none;
   background: transparent;
-  color: #526274;
-  font-family: 'DM Sans', sans-serif;
+  color: var(--text-gray);
+  font-family: var(--font-family-base);
   font-size: 0.84rem;
   font-weight: 600;
   display: inline-flex;
@@ -415,7 +415,7 @@ body.route-navigation-active app-floating-ai-assistant {
   padding: 0 18px;
   background: linear-gradient(135deg, #1697d8, #157cb0);
   color: #fff;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-family-base);
   font-size: 0.9rem;
   font-weight: 800;
   display: inline-flex;
@@ -451,8 +451,8 @@ body.route-navigation-active app-floating-ai-assistant {
 .route-planner__mobile-link {
   border: none;
   background: transparent;
-  color: #1fa6e6;
-  font-family: 'DM Sans', sans-serif;
+  color: var(--primary);
+  font-family: var(--font-family-base);
   font-size: 0.95rem;
   font-weight: 700;
 }
@@ -467,8 +467,8 @@ body.route-navigation-active app-floating-ai-assistant {
   width: 40px;
   height: 40px;
   border-radius: 14px;
-  background: #f3f7fb;
-  color: #526274;
+  background: var(--surface-soft);
+  color: var(--text-gray);
   flex-shrink: 0;
 }
 
@@ -486,32 +486,33 @@ body.route-navigation-active app-floating-ai-assistant {
 .route-planner__search-box {
   min-height: 48px;
   border-radius: 18px;
-  background: var(--surface-soft);
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 0 14px;
-  box-shadow: inset 0 0 0 1px rgba(208, 222, 233, 0.7);
+  box-shadow: none;
 
   mat-icon {
     width: 20px;
     height: 20px;
     font-size: 20px;
-    color: #7f8fa1;
+    color: var(--text-gray);
   }
 }
 
 .route-planner__map-pill {
   border: 1px solid rgba(204, 221, 233, 0.95);
-  background: white;
-  color: #1fa6e6;
+  background: var(--surface-strong);
+  color: var(--primary);
   border-radius: 999px;
   min-height: 32px;
   padding: 0 10px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-family-base);
   font-size: 0.8rem;
   font-weight: 700;
   flex-shrink: 0;
@@ -520,7 +521,7 @@ body.route-navigation-active app-floating-ai-assistant {
     width: 16px;
     height: 16px;
     font-size: 16px;
-    color: #1fa6e6;
+    color: var(--primary);
   }
 }
 
@@ -538,15 +539,16 @@ body.route-navigation-active app-floating-ai-assistant {
 
 .route-planner__search-input {
   width: 100%;
-  border: none;
+  border: none !important;
   outline: none;
-  background: transparent;
-  font-family: 'DM Sans', sans-serif;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-family: var(--font-family-base);
   font-size: 0.92rem;
-  color: #243142;
+  color: var(--text-dark);
 
   &::placeholder {
-    color: #7f8fa1;
+    color: var(--text-light);
   }
 }
 
@@ -560,7 +562,7 @@ body.route-navigation-active app-floating-ai-assistant {
   border-radius: 999px;
   padding: 0 14px;
   background: rgba(22, 151, 216, 0.08);
-  color: #168aad;
+  color: var(--primary);
 
   &:disabled {
     opacity: 0.55;
@@ -666,7 +668,7 @@ body.route-navigation-active app-floating-ai-assistant {
 .route-stop-card__grip {
   border: none;
   background: transparent;
-  color: #8ea0b3;
+  color: var(--text-gray);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -694,6 +696,9 @@ body.route-navigation-active app-floating-ai-assistant {
   font-size: 0.95rem;
   font-weight: 800;
   flex-shrink: 0;
+  box-shadow:
+    0 10px 20px rgba(21, 124, 176, 0.22),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14);
 }
 
 .route-stop-card__connector {
@@ -715,7 +720,7 @@ body.route-navigation-active app-floating-ai-assistant {
 
   strong {
     font-size: 0.94rem;
-    color: #1f2937;
+    color: var(--text-dark);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -723,7 +728,7 @@ body.route-navigation-active app-floating-ai-assistant {
 
   span {
     font-size: 0.76rem;
-    color: #64748b;
+    color: var(--text-gray);
   }
 }
 
@@ -732,8 +737,8 @@ body.route-navigation-active app-floating-ai-assistant {
   height: 32px;
   border: none;
   border-radius: 10px;
-  background: #f5f8fb;
-  color: #8fa1b4;
+  background: var(--surface-soft);
+  color: var(--text-gray);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -805,7 +810,7 @@ body.route-navigation-active app-floating-ai-assistant {
       margin: 0;
       font-size: 1.65rem;
       line-height: 1.1;
-      color: #1f2937;
+      color: var(--text-dark);
     }
   }
 
@@ -959,7 +964,7 @@ body.route-navigation-active app-floating-ai-assistant {
     border-radius: 18px;
     background: linear-gradient(135deg, #1697d8, #157cb0);
     color: white;
-    font-family: 'DM Sans', sans-serif;
+    font-family: var(--font-family-base);
     font-size: 0.94rem;
     font-weight: 800;
     align-items: center;
@@ -1833,13 +1838,13 @@ body.route-navigation-active app-floating-ai-assistant {
     font-size: clamp(1.8rem, 5vw, 2.2rem);
     line-height: 1;
     font-weight: 800;
-    color: #111827;
+    color: var(--text-dark);
   }
 
   span {
     font-size: 1.2rem;
     line-height: 1.15;
-    color: #6b7280;
+    color: var(--text-gray);
     font-weight: 500;
   }
 
@@ -1862,7 +1867,7 @@ body.route-navigation-active app-floating-ai-assistant {
   border-radius: 20px;
   background: linear-gradient(135deg, #ff5f57, #e43d30);
   color: #fff;
-  font-family: 'DM Sans', sans-serif;
+  font-family: var(--font-family-base);
   font-size: 1.25rem;
   font-weight: 800;
   box-shadow: 0 18px 36px rgba(228, 61, 48, 0.26);
@@ -2543,7 +2548,11 @@ body.route-navigation-active app-floating-ai-assistant {
   .route-planner__search-box,
   .route-planner__icon-btn,
   .route-planner__stat-pill {
-    background: var(--surface-soft);
+    background: var(--surface-strong);
+  }
+
+  .route-planner__search-box {
+    border-color: var(--border);
   }
 
   .route-stop-card__body strong {

@@ -75,7 +75,8 @@
     },
     "feedback": {
       "sendFailed": "Zahtev trenutno nije moguće poslati.",
-      "sendSuccess": "Zahtev za pristup moderatoru je uspešno poslat."
+      "sendSuccess": "Zahtev za pristup moderatoru je uspešno poslat.",
+      "redirectingToAdmin": "Tvoj zahtev je odobren. Preusmeravamo te na admin aplikaciju."
     },
     "privileges": {
       "addEvents": {
@@ -103,42 +104,42 @@
   "moderationRules": {
     "title": "Pravila moderacije",
     "introTitle": "Uvod u moderaciju",
-    "introBody": "Pre slanja zahteva za moderatorski pristup, potrebno je da procitate i prihvatite pravila moderacije. Ova pravila obezbedjuju tacnost, kvalitet i bezbednost sadrzaja na platformi.",
-    "footnote": "*Slanjem zahteva potvrdjujete da ste saglasni sa svim gore navedenim uslovima.",
+    "introBody": "Pre slanja zahteva za moderatorski pristup, potrebno je da pročitate i prihvatite pravila moderacije. Ova pravila obezbeđuju tačnost, kvalitet i bezbednost sadržaja na platformi.",
+    "footnote": "*Slanjem zahteva potvrđujete da ste saglasni sa svim gore navedenim uslovima.",
     "accept": "Razumem i prihvatam",
     "backToRequest": "Nazad na prethodni ekran",
     "sections": {
       "role": {
         "title": "Uloga moderatora",
-        "body": "Moderator je odgovoran za ocuvanje kvaliteta, tacnosti i pouzdanosti sadrzaja na platformi. Od moderatora se ocekuje da postupa nepristrasno, odgovorno i u interesu zajednice korisnika."
+        "body": "Moderator je odgovoran za očuvanje kvaliteta, tačnosti i pouzdanosti sadržaja na platformi. Od moderatora se očekuje da postupa nepristrasno, odgovorno i u interesu zajednice korisnika."
       },
       "obligations": {
         "title": "Obaveze moderatora",
-        "body": "Moderator je duzan da proverava tacnost informacija pre objave ili izmene, azurira netacne ili zastarele podatke, koristi primeren i profesionalan nacin komunikacije i prijavi sadrzaj koji moze biti stetan, lazan ili neprimeren."
+        "body": "Moderator je dužan da proverava tačnost informacija pre objave ili izmene, ažurira netačne ili zastarele podatke, koristi primeren i profesionalan način komunikacije i prijavi sadržaj koji može biti štetan, lažan ili neprimeren."
       },
       "allowed": {
         "title": "Dozvoljene aktivnosti",
-        "body": "Moderator moze da dodaje proverene informacije, ispravlja postojece podatke, unapredjuje opise lokacija, dogadjaja i objekata i doprinosi boljoj organizaciji i kvalitetu sadrzaja na platformi."
+        "body": "Moderator može da dodaje proverene informacije, ispravlja postojeće podatke, unapređuje opise lokacija, događaja i objekata i doprinosi boljoj organizaciji i kvalitetu sadržaja na platformi."
       },
       "forbidden": {
         "title": "Zabranjene aktivnosti",
-        "body": "Moderator ne sme unositi lazne ili neproverene informacije, zloupotrebljavati moderatorska prava radi licne koristi, favorizovati sopstveni sadrzaj ili poznate objekte, menjati validan sadrzaj bez osnova niti objavljivati uvredljiv, diskriminatoran ili obmanjujuci sadrzaj."
+        "body": "Moderator ne sme unositi lažne ili neproverene informacije, zloupotrebljavati moderatorska prava radi lične koristi, favorizovati sopstveni sadržaj ili poznate objekte, menjati validan sadržaj bez osnova niti objavljivati uvredljiv, diskriminatoran ili obmanjujući sadržaj."
       },
       "standards": {
-        "title": "Standardi sadrzaja",
-        "body": "Svi uneti podaci moraju biti tacni, jasni, azurni i korisni. Nazivi, opisi, kategorije, adrese, lokacije i fotografije moraju biti relevantni i verodostojni. Sadrzaj ne sme dovoditi korisnike u zabludu."
+        "title": "Standardi sadržaja",
+        "body": "Svi uneti podaci moraju biti tačni, jasni, ažurni i korisni. Nazivi, opisi, kategorije, adrese, lokacije i fotografije moraju biti relevantni i verodostojni. Sadržaj ne sme dovoditi korisnike u zabludu."
       },
       "fairness": {
         "title": "Odgovornost i nepristrasnost",
-        "body": "Moderator je duzan da postupa objektivno i bez sukoba interesa. Licni, poslovni ili promotivni interesi ne smeju imati uticaj na odluke o sadrzaju i izmenama na platformi."
+        "body": "Moderator je dužan da postupa objektivno i bez sukoba interesa. Lični, poslovni ili promotivni interesi ne smeju imati uticaj na odluke o sadržaju i izmenama na platformi."
       },
       "penalties": {
-        "title": "Posledice krsenja pravila",
-        "body": "Krsenje pravila moderacije moze dovesti do upozorenja, privremenog ogranicenja moderatorskih prava, trajnog uklanjanja moderatorskog pristupa ili dodatne administrativne provere naloga."
+        "title": "Posledice kršenja pravila",
+        "body": "Kršenje pravila moderacije može dovesti do upozorenja, privremenog ograničenja moderatorskih prava, trajnog uklanjanja moderatorskog pristupa ili dodatne administrativne provere naloga."
       },
       "acceptance": {
         "title": "Prihvatanje pravila",
-        "body": "Slanjem zahteva za moderatorski pristup korisnik potvrdjuje da je procitao, razumeo i prihvatio pravila moderacije i da ce ih postovati tokom koriscenja platforme."
+        "body": "Slanjem zahteva za moderatorski pristup korisnik potvrđuje da je pročitao, razumeo i prihvatio pravila moderacije i da će ih poštovati tokom korišćenja platforme."
       }
     }
   },

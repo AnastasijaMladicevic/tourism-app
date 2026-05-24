@@ -63,6 +63,7 @@
 .content {
   flex: 1;
   padding: 20px 16px 32px;
+  background: transparent;
 }
 
 .feedback {
@@ -81,6 +82,9 @@
   align-items: center;
   gap: 15px;
   margin-bottom: 18px;
+  padding: 4px 0 8px;
+  background: transparent;
+  border: none;
 }
 
 .avatar-wrap {
@@ -555,7 +559,7 @@
   }
 
   .content {
-    padding: 10px 0 36px;
+    padding: 6px 0 36px;
   }
 
   .profile-copy {
@@ -625,13 +629,18 @@
       var(--bg);
   }
 
-  .topbar,
   .rating-card,
   .review-card,
   .state-card,
   .response-card {
     background: var(--surface-strong);
     border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .topbar {
+    background: transparent;
+    border-bottom-color: transparent;
     box-shadow: none;
   }
 
@@ -687,5 +696,16 @@
   .filter-chip--active {
     background: var(--primary);
     color: var(--white);
+  }
+
+  .online-dot {
+    border-color: var(--bg);
+  }
+
+  @media (min-width: 768px) {
+    .topbar {
+      background: transparent;
+      border-bottom: none;
+    }
   }
 }
