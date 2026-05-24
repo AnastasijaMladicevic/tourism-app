@@ -92,6 +92,8 @@ const ROLE_COLORS: Record<string, string> = {
   Admin: '#dc2626',
 };
 
+const ADMIN_DASHBOARD_PERIOD_STORAGE_KEY = 'admin-dashboard-selected-period';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -136,6 +138,7 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.user = this.authService.getUser();
+    this.selectedPeriod = this.readSavedPeriod();
     this.loadOverview();
   }
 
@@ -145,6 +148,7 @@ export class DashboardComponent implements OnInit {
     }
 
     this.selectedPeriod = period;
+    this.saveSelectedPeriod(period);
     this.cdr.detectChanges();
     this.loadOverview();
   }
@@ -600,5 +604,25 @@ export class DashboardComponent implements OnInit {
       day: 'numeric',
       year: 'numeric',
     }).format(new Date(value));
+  }
+
+  private readSavedPeriod(): DashboardPeriod {
+    const saved = typeof localStorage !== 'undefined'
+      ? localStorage.getItem(ADMIN_DASHBOARD_PERIOD_STORAGE_KEY)
+      : null;
+
+    return this.isValidPeriod(saved) ? saved : '30d';
+  }
+
+  private saveSelectedPeriod(period: DashboardPeriod): void {
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
+    localStorage.setItem(ADMIN_DASHBOARD_PERIOD_STORAGE_KEY, period);
+  }
+
+  private isValidPeriod(value: string | null): value is DashboardPeriod {
+    return PERIOD_OPTIONS.some((option) => option.key === value);
   }
 }

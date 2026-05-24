@@ -79,6 +79,8 @@ const PERIOD_OPTIONS: PeriodOption[] = [
   { key: '5y', label: '5y' },
 ];
 
+const MANAGER_DASHBOARD_PERIOD_STORAGE_KEY = 'manager-dashboard-selected-period';
+
 @Component({
   selector: 'app-manager-dashboard',
   standalone: true,
@@ -117,6 +119,7 @@ export class ManagerDashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.user = this.authService.getUser();
+    this.selectedPeriod = this.readSavedPeriod();
     this.loadOverview();
   }
 
@@ -126,6 +129,7 @@ export class ManagerDashboardComponent implements OnInit {
     }
 
     this.selectedPeriod = period;
+    this.saveSelectedPeriod(period);
     this.cdr.detectChanges();
     this.loadOverview();
   }
@@ -523,5 +527,25 @@ export class ManagerDashboardComponent implements OnInit {
     }
 
     return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
+  }
+
+  private readSavedPeriod(): ManagerDashboardPeriod {
+    const saved = typeof localStorage !== 'undefined'
+      ? localStorage.getItem(MANAGER_DASHBOARD_PERIOD_STORAGE_KEY)
+      : null;
+
+    return this.isValidPeriod(saved) ? saved : '30d';
+  }
+
+  private saveSelectedPeriod(period: ManagerDashboardPeriod): void {
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
+    localStorage.setItem(MANAGER_DASHBOARD_PERIOD_STORAGE_KEY, period);
+  }
+
+  private isValidPeriod(value: string | null): value is ManagerDashboardPeriod {
+    return PERIOD_OPTIONS.some((option) => option.key === value);
   }
 }

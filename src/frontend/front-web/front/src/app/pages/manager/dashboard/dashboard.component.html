@@ -190,8 +190,8 @@
         <article class="card panel">
           <div class="section-head">
             <div>
-              <h3>Moderation Queue</h3>
-              <p>What currently needs a manager decision</p>
+              <h3>Pending approvals</h3>
+              <p>Objects, events, activities and reports waiting for your review</p>
             </div>
             <a class="section-link" routerLink="/manager/reports">Reports</a>
           </div>
@@ -216,10 +216,12 @@
           </div>
 
           <div class="queue-total-card queue-total-card--highlight">
-            <span class="queue-total-label">Total pending decisions</span>
+            <span class="queue-total-label">Total pending</span>
             <span class="queue-total-value">{{ moderationTotalPendingDecisions | number }}</span>
             <span class="queue-total-meta">
-              {{ overview.moderationQueue.totalPending | number }} content items &bull; {{ overview.reports.currentPending | number }} reports
+              {{ overview.moderationQueue.totalPending | number }} objects, events and activities
+              <br />
+              {{ overview.reports.currentPending | number }} reports
             </span>
           </div>
 
