@@ -147,7 +147,7 @@ export class ManagerDashboardComponent implements OnInit {
 
   get managedDestinationTitle(): string {
     return this.overview?.destination?.destinationName?.trim()
-      || 'No managed destination';
+      || 'No destination';
   }
 
   get managedDestinationDisplayTitle(): string {

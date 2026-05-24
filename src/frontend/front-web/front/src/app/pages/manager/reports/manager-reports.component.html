@@ -4,8 +4,8 @@
       <p class="breadcrumbs">Dashboard <span>&gt;</span> Creator Reports</p>
       <h1>Content Creator Reports</h1>
       <p class="subtle-text">
-        Escalate serious or repeated violations in {{ managedDestination }} to Admin review.
-        Use object, event, and activity review for individual content issues.
+        Escalate serious or repeated violations to Admin review.
+        Use object, event, and activity review for individual content issues first.
       </p>
     </div>
     <button type="button" class="primary-btn" (click)="openReportModal()">
@@ -42,7 +42,7 @@
     <article class="stat-card" data-tone="blue">
       <p>Total submitted</p>
       <strong>{{ allReports.length }}</strong>
-      <span>Your reports in this destination</span>
+      <span>Your submitted reports</span>
     </article>
     <article class="stat-card" data-tone="green">
       <p>Creators you can report</p>
@@ -192,7 +192,7 @@
         <header class="section-inline-head">
           <div>
             <h2>Report a creator</h2>
-            <p class="section-hint">Content creators with content in {{ managedDestination }}</p>
+            <p class="section-hint">Content creators currently available for reporting</p>
           </div>
         </header>
         <ul class="creator-list">

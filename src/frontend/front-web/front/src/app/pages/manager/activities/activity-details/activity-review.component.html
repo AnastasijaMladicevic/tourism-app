@@ -3,7 +3,7 @@
     <div>
       <p class="eyebrow">Activities &gt; Review Activity</p>
       <h1>Activity Review</h1>
-      <p class="review-subtitle">Inspect the submitted activity and approve or decline it for your managed destination.</p>
+      <p class="review-subtitle">Inspect the submitted activity and approve or decline the submission.</p>
 
       @if (activity) {
         <div class="review-status-wrap">
@@ -285,7 +285,7 @@
           [(ngModel)]="rejectionReason"
           [ngModelOptions]="{ standalone: true }"
           rows="4"
-          placeholder="Example: The linked object does not belong to your managed destination."
+          placeholder="Example: The linked object does not match the submitted activity."
         ></textarea>
 
         <div class="event-delete-modal-actions">
