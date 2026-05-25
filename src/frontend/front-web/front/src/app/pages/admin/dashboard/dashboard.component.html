@@ -26,7 +26,10 @@
 
   <ng-container *ngIf="!isLoading && overview">
     <div class="kpi-row">
-      <article class="kpi-card card">
+      <article class="kpi-card card kpi-card--teal">
+        <div class="kpi-icon">
+          <span class="material-symbols-outlined">groups</span>
+        </div>
         <span class="kpi-label">Total Tourists</span>
         <span class="kpi-value">{{ overview.summary.totalTourists | number }}</span>
         <span class="kpi-meta positive" *ngIf="overview.summary.newTouristsInPeriod > 0">
@@ -34,7 +37,10 @@
         </span>
       </article>
 
-      <article class="kpi-card card">
+      <article class="kpi-card card kpi-card--blue">
+        <div class="kpi-icon">
+          <span class="material-symbols-outlined">travel_explore</span>
+        </div>
         <span class="kpi-label">Active Destinations</span>
         <span class="kpi-value">{{ overview.summary.activeDestinations | number }}</span>
         <span class="kpi-meta positive" *ngIf="overview.summary.newDestinationsInPeriod > 0">
@@ -42,16 +48,31 @@
         </span>
       </article>
 
-      <article class="kpi-card card" [class.kpi-card--alert]="overview.summary.pendingCreatorRequests > 0">
+      <article class="kpi-card card kpi-card--amber" [class.kpi-card--alert]="overview.summary.pendingCreatorRequests > 0">
+        <div class="kpi-icon">
+          <span class="material-symbols-outlined">hourglass_top</span>
+        </div>
         <span class="kpi-label">Pending CC Requests</span>
         <span class="kpi-value">{{ overview.summary.pendingCreatorRequests | number }}</span>
         <span class="kpi-meta muted">Current pending queue</span>
       </article>
 
-      <article class="kpi-card card" [class.kpi-card--alert]="overview.summary.openReports > 0">
+      <article class="kpi-card card kpi-card--red" [class.kpi-card--alert]="overview.summary.openReports > 0">
+        <div class="kpi-icon">
+          <span class="material-symbols-outlined">report</span>
+        </div>
         <span class="kpi-label">Open Reports</span>
         <span class="kpi-value">{{ overview.summary.openReports | number }}</span>
         <span class="kpi-meta muted">{{ overview.reports.total | number }} reports created in {{ overview.periodKey }}</span>
+      </article>
+
+      <article class="kpi-card card kpi-card--purple">
+        <div class="kpi-icon">
+          <span class="material-symbols-outlined">distance</span>
+        </div>
+        <span class="kpi-label">Geocoded Destinations</span>
+        <span class="kpi-value">{{ overview.geospatialOverview.totalActiveDestinationsWithCoordinates | number }}</span>
+        <span class="kpi-meta muted">{{ overview.geospatialOverview.regionsRepresented | number }} regions represented</span>
       </article>
     </div>
 
