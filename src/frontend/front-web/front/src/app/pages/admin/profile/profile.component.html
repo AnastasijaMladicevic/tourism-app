@@ -66,116 +66,170 @@
 
       <section class="card profile-form-card">
         <div class="form-card-header">
-          <h3 class="form-card-title">Account Information</h3>
-          <p class="form-card-sub">Update your personal details and organizational settings here.</p>
-        </div>
-
-        <div class="form-section">
-          <div class="section-label">Personal Details</div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" for="firstName">First Name</label>
-              <input id="firstName" class="form-input" type="text" [(ngModel)]="user.firstName" disabled/>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" for="lastName">Last Name</label>
-              <input id="lastName" class="form-input" type="text" [(ngModel)]="user.lastName" disabled/>
-            </div>
+          <div class="form-card-header__text">
+            <h3 class="form-card-title">Account Information</h3>
+            <p class="form-card-sub">Update the parts of the profile that are meant to be edited from this screen.</p>
           </div>
 
-          <div class="form-row form-row--compact">
-            <div class="form-group">
-              <label class="form-label" for="dateOfBirth">Date of Birth</label>
-              <div class="input-wrapper">
-                <mat-icon class="input-icon" fontSet="material-icons-outlined">calendar_month</mat-icon>
-                <input id="dateOfBirth" class="form-input" type="date" [(ngModel)]="user.dateOfBirth" disabled=""/>
-              </div>
+          <div class="form-card-header__actions">
+            <div class="save-feedback save-feedback--inline" [class.visible]="saveSuccess">
+              <mat-icon fontSet="material-icons-outlined">check_circle</mat-icon>
+              <span>Profile updated</span>
             </div>
+
+            <button class="profile-action-btn profile-action-btn--secondary" type="button" (click)="cancel()">
+              <mat-icon fontSet="material-icons-outlined">close</mat-icon>
+              <span>Cancel</span>
+            </button>
+
+            <button class="profile-action-btn profile-action-btn--primary" type="button" [disabled]="isSaving" (click)="saveChanges()">
+              @if (isSaving) {
+                <span class="spinner" aria-hidden="true"></span>
+              } @else {
+                <mat-icon fontSet="material-icons-outlined">save</mat-icon>
+              }
+              <span>{{ isSaving ? 'Saving...' : 'Save Changes' }}</span>
+            </button>
           </div>
         </div>
 
-        <div class="form-section">
-          <div class="section-label">Contact & Location</div>
+        <div class="profile-form-grid">
+          <div class="profile-form-column">
+            <div class="form-section">
+              <div class="section-label">Personal Details</div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" for="email">Email Address</label>
-              <div class="input-wrapper">
-                <mat-icon class="input-icon" fontSet="material-icons-outlined">mail</mat-icon>
-                <input id="email" class="form-input" type="email" [(ngModel)]="user.email" />
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="firstName">First Name</label>
+                  <input id="firstName" class="form-input" type="text" [(ngModel)]="user.firstName" disabled />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="lastName">Last Name</label>
+                  <input id="lastName" class="form-input" type="text" [(ngModel)]="user.lastName" disabled />
+                </div>
               </div>
-              <span class="form-hint">This email will be used for all system notifications.</span>
+
+              <div class="form-row form-row--compact">
+                <div class="form-group">
+                  <label class="form-label" for="dateOfBirth">Date of Birth</label>
+                  <div class="input-wrapper">
+                    <mat-icon class="input-icon" fontSet="material-icons-outlined">calendar_month</mat-icon>
+                    <input id="dateOfBirth" class="form-input" type="date" [(ngModel)]="user.dateOfBirth" disabled />
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div class="form-group">
-              <label class="form-label" for="phoneNumber">Phone Number</label>
-              <div class="input-wrapper">
-                <mat-icon class="input-icon" fontSet="material-icons-outlined">call</mat-icon>
-                <input id="phoneNumber" class="form-input" type="tel" [(ngModel)]="user.phoneNumber" />
+            <div class="form-section">
+              <div class="section-label">Contact & Location</div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="email">Email Address</label>
+                  <div class="input-wrapper">
+                    <mat-icon class="input-icon" fontSet="material-icons-outlined">mail</mat-icon>
+                    <input id="email" class="form-input" type="email" [(ngModel)]="user.email" disabled />
+                  </div>
+                  <span class="form-hint">Email is managed by the system and cannot be changed here.</span>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="phoneNumber">Phone Number</label>
+                  <div class="input-wrapper">
+                    <mat-icon class="input-icon" fontSet="material-icons-outlined">call</mat-icon>
+                    <input id="phoneNumber" class="form-input" type="tel" [(ngModel)]="user.phoneNumber" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="country">Country</label>
+                  <div class="input-wrapper">
+                    <mat-icon class="input-icon" fontSet="material-icons-outlined">public</mat-icon>
+                    <input id="country" class="form-input" type="text" [(ngModel)]="user.country" />
+                  </div>
+                </div>
               </div>
             </div>
+
+            <div class="form-section">
+              <div class="section-label">Application Language</div>
+
+              <div class="language-summary">
+                <span>Current app language</span>
+                <strong>{{ activeLanguageLabel }}</strong>
+              </div>
+
+              <div class="language-options">
+                @for (option of languageOptions; track option.value) {
+                  <label class="language-option" [class.language-option--active]="user.language === option.value">
+                    <input
+                      class="language-option__input"
+                      type="radio"
+                      name="language"
+                      [value]="option.value"
+                      [(ngModel)]="user.language"
+                    />
+
+                    <span class="language-option__content">
+                      <span class="language-option__label">{{ option.label }}</span>
+                      <span class="language-option__detail">{{ option.description }}</span>
+                    </span>
+
+                    <mat-icon class="language-option__check" fontSet="material-icons-outlined">check_circle</mat-icon>
+                  </label>
+                }
+              </div>
+            </div>
+
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label" for="country">Country</label>
-              <div class="input-wrapper">
-                <mat-icon class="input-icon" fontSet="material-icons-outlined">public</mat-icon>
-                <input id="country" class="form-input" type="text" [(ngModel)]="user.country" />
-              </div>
-            </div>
+          <aside class="profile-sidebar">
+            <section class="access-card">
+              <div class="access-card__header">
+                <div>
+                  <div class="section-label section-label--tight">Access Control</div>
+                  <h3 class="access-card__title">System Role & Permissions</h3>
+                  <p class="access-card__sub">Read-only permissions inherited from the administrator role.</p>
+                </div>
 
-            <div class="form-group">
-              <label class="form-label" for="language">Language</label>
-              <div class="input-wrapper">
-                <mat-icon class="input-icon" fontSet="material-icons-outlined">translate</mat-icon>
-                <input id="language" class="form-input" type="text" [(ngModel)]="user.language" />
+                <span class="badge badge-blue access-card__badge">{{ permissionCount }} permissions</span>
               </div>
-            </div>
-          </div>
+
+              <div class="role-summary">
+                <div class="role-summary__icon">
+                  <mat-icon fontSet="material-icons-outlined">verified_user</mat-icon>
+                </div>
+
+                <div class="role-summary__content">
+                  <span class="role-summary__label">System Role</span>
+                  <span class="role-summary__value">{{ role | titlecase }}</span>
+                </div>
+
+                <span class="badge badge-gray role-summary__badge">Restricted</span>
+              </div>
+
+              <div class="permissions-list">
+                @for (permission of permissionItems; track permission.label) {
+                  <div class="permission-item">
+                    <span class="permission-icon">
+                      <mat-icon fontSet="material-icons-outlined">check</mat-icon>
+                    </span>
+
+                    <div class="permission-copy">
+                      <div class="permission-item__label">{{ permission.label }}</div>
+                      <div class="permission-item__detail">{{ permission.detail }}</div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </section>
+          </aside>
         </div>
 
-        <div class="form-section">
-          <div class="section-label">Access Control</div>
-
-          <div class="form-group form-group--role">
-            <label class="form-label form-label--inline" for="systemRole">
-              <span>System Role</span>
-              <mat-icon fontSet="material-icons-outlined">lock</mat-icon>
-            </label>
-
-            <div class="role-row">
-              <div class="role-input-shell">
-                <mat-icon class="input-icon" fontSet="material-icons-outlined">verified_user</mat-icon>
-                <input id="systemRole" class="form-input" type="text" [value]="role | titlecase" disabled />
-              </div>
-              <span class="badge badge-gray">Restricted</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-actions">
-          <div class="save-feedback" [class.visible]="saveSuccess">
-            <mat-icon fontSet="material-icons-outlined">check_circle</mat-icon>
-            <span>Profile updated</span>
-          </div>
-
-          <button class="btn btn-secondary" type="button" (click)="cancel()">
-            <mat-icon fontSet="material-icons-outlined">close</mat-icon>
-            <span>Cancel</span>
-          </button>
-
-          <button class="btn btn-primary" type="button" [disabled]="isSaving" (click)="saveChanges()">
-            @if (isSaving) {
-              <span class="spinner" aria-hidden="true"></span>
-            } @else {
-              <mat-icon fontSet="material-icons-outlined">save</mat-icon>
-            }
-            <span>{{ isSaving ? 'Saving...' : 'Save Changes' }}</span>
-          </button>
-        </div>
+        <div class="profile-footer-divider" aria-hidden="true"></div>
       </section>
     </div>
   </div>

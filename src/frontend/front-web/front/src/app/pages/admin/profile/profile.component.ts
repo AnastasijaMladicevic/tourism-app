@@ -7,6 +7,18 @@ import { ImageCropperComponent, ImageCroppedEvent } from 'ngx-image-cropper';
 import { environment } from '../../../../environment/environment';
 import { AuthService, UpdateUserDto } from '../../../services/auth.service';
 import { UserDto } from '../../../models/user.model';
+import { AppLanguage, TranslationService } from '../../../services/translation.service';
+
+type LanguageOption = {
+  value: AppLanguage;
+  label: string;
+  description: string;
+};
+
+type PermissionItem = {
+  label: string;
+  detail: string;
+};
 
 @Component({
   selector: 'app-profile',
@@ -18,6 +30,24 @@ import { UserDto } from '../../../models/user.model';
 export class ProfileComponent implements OnInit, OnDestroy {
   private static readonly DEFAULT_PROFILE_IMAGE_URL =
     `${environment.apiUrl.replace('/api', '')}/images/profiles/default_icon.png`;
+
+  readonly languageOptions: LanguageOption[] = [
+    { value: 'me', label: 'Montenegrin', description: 'Primary locale for Montenegro' },
+    { value: 'sr', label: 'Serbian', description: 'Latin script, regional default' },
+    { value: 'en', label: 'English', description: 'Global app language' },
+    { value: 'es', label: 'Spanish', description: 'Español for Spanish-speaking users' },
+    { value: 'it', label: 'Italian', description: 'Italiano for Italian-speaking users' },
+  ];
+
+  readonly permissionItems: PermissionItem[] = [
+    { label: 'View admin dashboard', detail: 'Open the admin overview at /api/admin/dashboard/overview.' },
+    { label: 'Manage user accounts', detail: 'View users, inspect user details, and find users by email.' },
+    { label: 'Manage admin access', detail: 'Register manager and admin accounts, plus review creator requests.' },
+    { label: 'Moderate users', detail: 'Approve, reject, demote, ban, unban, activate, or deactivate accounts.' },
+    { label: 'Manage destinations', detail: 'Create, update, assign managers to, or delete destinations.' },
+    { label: 'Control destination images', detail: 'Add destination images and handle destination edit locks.' },
+    { label: 'Review manager reports', detail: 'List all reports and review pending manager reports.' },
+  ];
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
@@ -43,6 +73,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   constructor(
     private authService: AuthService,
+    private translationService: TranslationService,
     private router: Router,
     private cdr: ChangeDetectorRef,
   ) { }
@@ -90,6 +121,14 @@ export class ProfileComponent implements OnInit, OnDestroy {
       default:
         return 'badge-blue';
     }
+  }
+
+  get activeLanguageLabel(): string {
+    return this.languageOptions.find((option) => option.value === this.user.language)?.label ?? 'Not set';
+  }
+
+  get permissionCount(): number {
+    return this.permissionItems.length;
   }
 
   triggerFileInput(): void {
@@ -239,13 +278,20 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   private syncUserState(user: UserDto): void {
+    const selectedLanguage = this.normalizeLanguage(user.language ?? this.translationService.language());
+
     this.user = {
       ...user,
+      language: selectedLanguage,
       dateOfBirth: this.normalizeDateForInput(user.dateOfBirth),
     };
     this.initials = this.buildInitials(user);
     this.role = this.authService.getNormalizedRole(user) ?? '';
     this.avatarUrl = user.profileImageUrl?.trim() || ProfileComponent.DEFAULT_PROFILE_IMAGE_URL;
+  }
+
+  private normalizeLanguage(language?: string | null): AppLanguage {
+    return this.translationService.normalizeLanguageCode(language);
   }
 
   private mergeUserState(updated: UserDto): UserDto {
