@@ -1,9 +1,10 @@
-const APP_SHELL_CACHE = 'spirego-app-shell-v1';
-const STATIC_ASSET_CACHE = 'spirego-static-v1';
+const APP_SHELL_CACHE = 'spirego-app-shell-v2';
+const STATIC_ASSET_CACHE = 'spirego-static-v2';
 const MAP_TILE_CACHE = 'spirego-map-tiles-v1';
 const MAP_DATA_CACHE = 'spirego-map-data-v1';
 const TILE_HOST_SUFFIX = '.tile.openstreetmap.org';
 const APP_SHELL_ROUTES = ['/', '/map'];
+const KNOWN_APP_ASSETS = ['/styles.css', '/scripts.js', '/main.js', '/@vite/client', '/favicon.ico'];
 const MAX_TILE_ENTRIES = 1200;
 const MAX_DATA_ENTRIES = 160;
 const MAX_STATIC_ASSET_ENTRIES = 220;
@@ -19,8 +20,11 @@ const MAP_API_PREFIXES = [
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil((async () => {
-    const cache = await caches.open(APP_SHELL_CACHE);
-    await Promise.all(APP_SHELL_ROUTES.map((route) => precacheShellRoute(cache, route)));
+    const shellCache = await caches.open(APP_SHELL_CACHE);
+    const staticCache = await caches.open(STATIC_ASSET_CACHE);
+
+    await Promise.all(APP_SHELL_ROUTES.map((route) => precacheShellRoute(shellCache, staticCache, route)));
+    await Promise.all(KNOWN_APP_ASSETS.map((asset) => precacheStaticAsset(staticCache, asset)));
   })());
 });
 
@@ -144,17 +148,34 @@ function isSameOriginStaticAssetRequest(request, url) {
     return false;
   }
 
+  const pathname = url.pathname.toLowerCase();
+  if (pathname.startsWith('/api/') || pathname.startsWith('/hubs/')) {
+    return false;
+  }
+
+  if (request.destination === 'document') {
+    return false;
+  }
+
   const destination = request.destination;
-  return ['script', 'style', 'worker', 'font', 'image'].includes(destination);
+  return (
+    ['script', 'style', 'worker', 'font', 'image', 'manifest'].includes(destination) ||
+    pathname === '/component' ||
+    pathname.endsWith('.json') ||
+    destination === 'fetch' ||
+    destination === ''
+  );
 }
 
 async function networkFirstNavigation(request) {
   const cache = await caches.open(APP_SHELL_CACHE);
+  const staticCache = await caches.open(STATIC_ASSET_CACHE);
 
   try {
     const response = await fetch(request);
     if (response && response.ok) {
       await cache.put(request, response.clone());
+      await cacheDiscoveredAssetsFromHtml(response.clone(), staticCache);
       return response;
     }
   } catch {
@@ -270,15 +291,63 @@ async function trimCache(cache, maxEntries) {
   await Promise.all(keys.slice(0, overflow).map((key) => cache.delete(key)));
 }
 
-async function precacheShellRoute(cache, route) {
+async function precacheShellRoute(shellCache, staticCache, route) {
   try {
     const request = new Request(route, { cache: 'reload' });
     const response = await fetch(request);
     if (response && response.ok) {
-      await cache.put(route, response.clone());
-      await cache.put(request, response.clone());
+      await shellCache.put(route, response.clone());
+      await shellCache.put(request, response.clone());
+      await cacheDiscoveredAssetsFromHtml(response.clone(), staticCache);
     }
   } catch {
     // Ignore install-time failures; runtime will warm the cache online.
   }
+}
+
+async function precacheStaticAsset(cache, assetPath) {
+  try {
+    const request = new Request(assetPath, { cache: 'reload' });
+    const response = await fetch(request);
+    if (response && response.ok) {
+      await cache.put(request, response.clone());
+      await cache.put(assetPath, response.clone());
+    }
+  } catch {
+    // Ignore install-time failures for optional dev assets.
+  }
+}
+
+async function cacheDiscoveredAssetsFromHtml(response, cache) {
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('text/html')) {
+    return;
+  }
+
+  let html = '';
+  try {
+    html = await response.text();
+  } catch {
+    return;
+  }
+
+  const assetUrls = new Set(KNOWN_APP_ASSETS);
+  const attrRegex = /(?:src|href)=["']([^"']+)["']/gi;
+  let match;
+
+  while ((match = attrRegex.exec(html)) !== null) {
+    const rawValue = match[1];
+    if (!rawValue || rawValue.startsWith('http://') || rawValue.startsWith('https://')) {
+      continue;
+    }
+
+    if (rawValue.startsWith('data:') || rawValue.startsWith('blob:')) {
+      continue;
+    }
+
+    const normalized = rawValue.startsWith('/') ? rawValue : `/${rawValue}`;
+    assetUrls.add(normalized);
+  }
+
+  await Promise.all([...assetUrls].map((asset) => precacheStaticAsset(cache, asset)));
 }
