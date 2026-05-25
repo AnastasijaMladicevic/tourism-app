@@ -161,7 +161,17 @@
         <div class="card__body">
           <h2 class="card__name">{{ locality.name }}</h2>
 
-          <p class="card__type"><mat-icon>place</mat-icon> {{ locality.localityTypeName }}</p>
+          @if (locality.destinationName || locality.regionName) {
+            <p class="card__destination">
+              {{ getLocalityLocation(locality) }}
+            </p>
+          }
+
+          <div class="card__meta">
+            @if (locality.localityTypeName) {
+              <span class="card__type-chip">{{ locality.localityTypeName }}</span>
+            }
+          </div>
 
           <p class="card__desc">{{ locality.description }}</p>
 

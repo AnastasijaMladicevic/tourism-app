@@ -4,7 +4,7 @@
     <button class="icon-btn" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
       <mat-icon>arrow_back_ios</mat-icon>
     </button>
-    <h1 class="header__title"><h1 class="header__title">{{ 'destination.listTitle' | translate }}</h1></h1>
+    <h1 class="header__title">{{ 'destination.listTitle' | translate }}</h1>
   </div>
 
   <div class="filters-row">
@@ -161,7 +161,15 @@
         <div class="card__body">
           <h2 class="card__name">{{ destination.name }}</h2>
 
-          <p class="card__type"><mat-icon>place</mat-icon> {{ destination.destinationTypeName }}</p>
+          @if (destination.regionName) {
+            <p class="card__destination">{{ destination.regionName }}</p>
+          }
+
+          @if (destination.destinationTypeName) {
+            <div class="card__meta">
+              <span class="destination-type-chip">{{ destination.destinationTypeName }}</span>
+            </div>
+          }
 
           <p class="card__desc">{{ destination.description }}</p>
 

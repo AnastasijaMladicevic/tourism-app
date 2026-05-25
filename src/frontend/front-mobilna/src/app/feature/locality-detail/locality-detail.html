@@ -53,13 +53,17 @@
             <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
           </button>
         </div>
-        @if (locality?.destinationName && locality?.regionName) {
-          <p class="location-bold">{{ locality?.destinationName }}, {{ locality?.regionName }}</p>
-        }
+        <div class="summary-meta">
+          @if (locality?.destinationName && locality?.regionName) {
+            <p class="summary-location">{{ locality?.destinationName }}, {{ locality?.regionName }}</p>
+          }
 
-        @if (locality?.localityTypeName) {
-          <p class="venue"><mat-icon>location_on</mat-icon>{{ locality?.localityTypeName }}</p>
-        }
+          @if (locality?.localityTypeName) {
+            <div class="summary-tags">
+              <span class="summary-type-chip">{{ locality?.localityTypeName }}</span>
+            </div>
+          }
+        </div>
       </div>
 
       <div class="card">

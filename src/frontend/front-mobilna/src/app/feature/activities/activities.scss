@@ -2,7 +2,7 @@
 .screen {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg);
   font-family: 'DM Sans', sans-serif;
 }
@@ -523,13 +523,29 @@
   }
 }
 
-.card__type {
+.card__details-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 6px 0 10px;
+}
+
+.card__destination {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0;
+  line-height: 1.35;
+}
+
+.card__meta {
   display: flex;
   align-items: center;
-  gap: 3px;
+  gap: 5px;
   font-size: 12px;
   color: var(--text-gray);
-  margin: 0 0 8px;
+  margin: 0;
+  line-height: 1.4;
 
   mat-icon {
     font-size: 13px;
@@ -539,11 +555,15 @@
   }
 }
 
+.card__meta--type {
+  padding-left: 1px;
+}
+
 .card__desc {
   font-size: 12.5px;
   color: var(--text-gray);
   line-height: 1.55;
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -651,7 +671,8 @@
   justify-content: center;
   align-items: center;
   gap: 16px;
-  margin-top: 10px;
+  margin-top: 20px;
+  padding: 12px 16px 20px;
 }
 
 :host-context(:root[data-theme='dark']) {
@@ -663,6 +684,7 @@
   .header__title,
   .icon-btn,
   .card__name,
+  .card__destination,
   .card__rating,
   .results-bar__count {
     color: var(--text-dark);
@@ -686,7 +708,7 @@
     box-shadow: none;
   }
 
-  .card__type,
+  .card__meta,
   .card__desc,
   .card__reviews {
     color: var(--text-gray);

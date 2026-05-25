@@ -6,6 +6,7 @@ import { environment } from '../../../environment/environment';
 import { AuthService, UserDto } from '../../services/auth';
 import { ReviewDto, ReviewService } from '../../services/review';
 import { TranslationService } from '../../services/translation.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 interface ReviewPreviewCard {
   id: number;
@@ -36,7 +37,7 @@ interface RatingRow {
 @Component({
   selector: 'app-my-reviews-preview',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './my-reviews-preview.component.html',
   styleUrl: './my-reviews-preview.component.scss',
 })

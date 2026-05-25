@@ -271,6 +271,7 @@ export class ResultsComponent implements OnInit {
         ...item,
         ...full,
         typeName,
+        location: this.resolveLocation(item.type, full, item.location),
         isFavorite: false
       };
 
@@ -293,6 +294,18 @@ export class ResultsComponent implements OnInit {
         return full?.localityTypeName ?? full?.typeName ?? 'Lokalitet';
       default:
         return full?.typeName ?? type;
+    }
+  }
+  private resolveLocation(type: string, full: any, fallback?: string): string | undefined {
+    switch (type) {
+      case 'destination':
+        return full?.regionName ?? fallback;
+      case 'locality':
+        return [full?.destinationName, full?.regionName].filter(Boolean).join(', ') || fallback;
+      case 'activity':
+        return [full?.destinationName, full?.localityName, full?.regionName].filter(Boolean).join(', ') || fallback;
+      default:
+        return fallback;
     }
   }
   private updateDistances(): void {
@@ -656,6 +669,7 @@ export class ResultsComponent implements OnInit {
       type: 'destination',
       typeId: x.destinationTypeId,
       typeName: x.destinationTypeName || 'Destinacija',
+      location: x.regionName,
       description: x.description,
       latitude: x.latitude,
       longitude: x.longitude,
@@ -708,6 +722,7 @@ export class ResultsComponent implements OnInit {
       type: 'locality',
       typeId: x.localityTypeId,
       typeName: x.localityTypeName || 'Locality',
+      location: [x.destinationName, x.regionName].filter(Boolean).join(', '),
       description: x.description,
       latitude: x.latitude,
       longitude: x.longitude,

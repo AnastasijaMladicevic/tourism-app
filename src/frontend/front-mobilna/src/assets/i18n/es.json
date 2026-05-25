@@ -46,7 +46,11 @@
     "password": "Contraseña",
     "soonest": "Más próximos",
     "qrTitle": "Código QR",
-    "qrBody": "Escanea para abrir rápidamente esta página."
+    "qrBody": "Escanea para abrir rápidamente esta página.",
+    "open": "Abrir",
+    "delete": "Eliminar",
+    "deleting": "Eliminando...",
+    "noResults": "Sin resultados"
   },
   "moderatorAccess": {
     "title": "Acceso de moderador",
@@ -229,6 +233,17 @@
       "notLoggedIn": "No has iniciado sesión.",
       "changeFailed": "No se pudo cambiar la contraseña. Inténtalo de nuevo."
     }
+  },
+  "myReviews": {
+    "title": "Mis reseñas",
+    "searchPlaceholder": "Buscar mis reseñas...",
+    "totalReviews": "{{count}} reseñas en total",
+    "loadingText": "Preparando tus reseñas y estadísticas de la cuenta.",
+    "emptyTitle": "Aún no tienes reseñas",
+    "emptyText": "Cuando dejes un comentario sobre un objeto, lo verás aquí.",
+    "noResultsText": "Prueba con otro filtro o búsqueda para mostrar tus reseñas.",
+    "creatorResponse": "Respuesta del creador",
+    "loadMore": "Cargar más reseñas"
   },
   "signup": {
     "title": "Crear cuenta",

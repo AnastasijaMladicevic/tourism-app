@@ -46,7 +46,11 @@
     "password": "Password",
     "soonest": "Soonest",
     "qrTitle": "QR code",
-    "qrBody": "Scan to quickly open this page."
+    "qrBody": "Scan to quickly open this page.",
+    "open": "Open",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "noResults": "No results"
   },
   "moderatorAccess": {
     "title": "Moderator access",
@@ -229,6 +233,17 @@
       "notLoggedIn": "You are not logged in.",
       "changeFailed": "Password change failed. Please try again."
     }
+  },
+  "myReviews": {
+    "title": "My reviews",
+    "searchPlaceholder": "Search my reviews...",
+    "totalReviews": "{{count}} reviews in total",
+    "loadingText": "Preparing your reviews and account statistics.",
+    "emptyTitle": "You don't have any reviews yet",
+    "emptyText": "When you leave a comment on an object, you will see it here.",
+    "noResultsText": "Try another filter or search to show your reviews.",
+    "creatorResponse": "Creator response",
+    "loadMore": "Load more reviews"
   },
   "signup": {
     "title": "Create account",

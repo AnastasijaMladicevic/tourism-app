@@ -188,6 +188,39 @@ button:hover {
   margin: 0 0 6px;
 }
 
+.summary-meta {
+  display: grid;
+  gap: 10px;
+}
+
+.summary-location {
+  margin: 0;
+  color: var(--emperor);
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.summary-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.summary-type-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 10%, white);
+  border: 1px solid color-mix(in srgb, var(--primary) 16%, white);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+
 .top-actions {
   display: flex;
   gap: 15px;
@@ -898,6 +931,7 @@ button:hover {
 
   .title,
   .location-bold,
+  .summary-location,
   .venue-big,
   .section h2,
   .nearby-item__body h3,
@@ -934,6 +968,12 @@ button:hover {
     color: #ff6b6b;
     background: rgba(255, 107, 107, 0.12);
     border-color: rgba(255, 107, 107, 0.2);
+  }
+
+  .summary-type-chip {
+    background: rgba(77, 194, 255, 0.12);
+    border-color: rgba(77, 194, 255, 0.2);
+    color: #4dc2ff;
   }
 
   .location-image::after {

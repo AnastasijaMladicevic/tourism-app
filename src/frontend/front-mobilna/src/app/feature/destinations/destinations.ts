@@ -28,6 +28,11 @@ export interface DestinationView extends DestinationDto {
   distanceMeters?: number;
   isFavorite: boolean;
   favoriteId?: number;
+  displayTitle?: string;
+  mainImageUrl?: string;
+  regionId?: number;
+  regionName?: string;
+  regionCode?: string;
 }
 
 @Component({
@@ -547,7 +552,9 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     return {
       id: Number(dto['id'] ?? dto['Id'] ?? 0),
       name: String(dto['name'] ?? dto['Name'] ?? ''),
+      displayTitle: (dto['displayTitle'] ?? dto['DisplayTitle'] ?? undefined) as string | undefined,
       description: (dto['description'] ?? dto['Description'] ?? undefined) as string | undefined,
+      mainImageUrl: (dto['mainImageUrl'] ?? dto['MainImageUrl'] ?? undefined) as string | undefined,
       latitude: this.readOptionalNumber(dto, ['latitude', 'Latitude']),
       longitude: this.readOptionalNumber(dto, ['longitude', 'Longitude']),
       averageRating: this.readOptionalNumber(dto, ['averageRating', 'AverageRating']),
@@ -557,6 +564,9 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       destinationTypeName: String(
         dto['destinationTypeName'] ?? dto['DestinationTypeName'] ?? '',
       ),
+      regionId: this.readOptionalNumber(dto, ['regionId', 'RegionId']),
+      regionName: (dto['regionName'] ?? dto['RegionName'] ?? undefined) as string | undefined,
+      regionCode: (dto['regionCode'] ?? dto['RegionCode'] ?? undefined) as string | undefined,
       images: ((dto['images'] ?? dto['Images'] ?? []) as DestinationDto['images']) || [],
       isFavorite: Boolean(dto['isFavorite'] ?? dto['IsFavorite'] ?? false),
       favoriteId: this.readOptionalNumber(dto, ['favoriteId', 'FavoriteId']),
