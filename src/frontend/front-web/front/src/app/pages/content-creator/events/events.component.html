@@ -1,26 +1,16 @@
 <section class="events-page">
-  <div class="page-header">
-    <div>
-      <p class="eyebrow">Events management</p>
+  <header class="page-header">
+    <div class="page-header-copy">
+      <p class="eyebrow page-header-eyebrow">Events management</p>
       <h1>Events &amp; Schedules</h1>
-      <p class="page-intro">
-        Manage published events, review the selected event, and jump straight into creation or
-        edits.
-      </p>
+      <p class="page-subtitle">Total: {{ eventsCountLabel }}</p>
     </div>
 
-    <div class="header-actions">
-      <!-- TBD Exports -->
-      <!-- <button type="button" class="ghost-btn">
-        <span class="material-symbols-outlined">download</span>
-        Export
-      </button> -->
-      <button type="button" class="primary-btn" (click)="onCreateEvent()">
-        <span class="material-symbols-outlined">add</span>
-        Create New Event
-      </button>
-    </div>
-  </div>
+    <button type="button" class="primary-btn page-header-cta" (click)="onCreateEvent()">
+      <span class="material-symbols-outlined">add</span>
+      <span class="page-header-cta-label">Create New Event</span>
+    </button>
+  </header>
 
   <div class="toolbar card">
     <div class="toolbar-search">
@@ -35,31 +25,38 @@
       />
     </div>
 
-    <div class="date-range-pill" aria-label="Date range filter">
-      <span class="material-symbols-outlined">calendar_month</span>
-      <div class="date-range-inputs">
-        <input
-          type="date"
-          class="date-range-input"
-          [(ngModel)]="rangeStartDate"
-          (ngModelChange)="onDateRangeChange()"
-          aria-label="From date"
-        />
-        <span class="date-range-separator">-</span>
-        <input
-          type="date"
-          class="date-range-input"
-          [(ngModel)]="rangeEndDate"
-          (ngModelChange)="onDateRangeChange()"
-          aria-label="To date"
-        />
+    <div class="toolbar-date-row">
+      <div class="date-range-pill" aria-label="Date range filter">
+        <span class="material-symbols-outlined date-range-icon" aria-hidden="true">calendar_month</span>
+        <div class="date-range-inputs">
+          <input
+            type="date"
+            class="date-range-input"
+            [(ngModel)]="rangeStartDate"
+            (ngModelChange)="onDateRangeChange()"
+            aria-label="From date"
+          />
+          <span class="date-range-separator" aria-hidden="true">–</span>
+          <input
+            type="date"
+            class="date-range-input"
+            [(ngModel)]="rangeEndDate"
+            (ngModelChange)="onDateRangeChange()"
+            aria-label="To date"
+          />
+        </div>
       </div>
-    </div>
 
-    <button type="button" class="ghost-btn slim-btn" (click)="onMoreFilters()">
-      <span class="material-symbols-outlined"> filter_alt </span>
-      More Filters
-    </button>
+      <button
+        type="button"
+        class="ghost-btn slim-btn filters-toggle-btn"
+        aria-label="More filters"
+        (click)="onMoreFilters()"
+      >
+        <span class="material-symbols-outlined">filter_alt</span>
+        <span class="filters-toggle-label">Filters</span>
+      </button>
+    </div>
   </div>
 
   @if (filterPanelOpen) {
@@ -130,8 +127,48 @@
         } @else if (errorMessage) {
           <div class="state state-error">{{ errorMessage }}</div>
         } @else {
-          <div class="table-scroll">
-            <table>
+          <div class="events-mobile-list">
+            @for (event of pagedEvents; track event.id) {
+              <article
+                class="event-mobile-card"
+                [class.is-active]="selectedEvent?.id === event.id"
+                (click)="selectEvent(event)"
+              >
+                <span class="event-mobile-card__media" [ngStyle]="getEventMediaStyle(event)"></span>
+                <div class="event-mobile-card__content">
+                  <div class="event-mobile-card__head">
+                    <h3>{{ event.name }}</h3>
+                    <span class="status-chip status-chip--compact" [ngClass]="getStatusBadgeClass(event.status)">
+                      {{ event.status || 'Draft' }}
+                    </span>
+                  </div>
+                  <p class="event-mobile-card__date">
+                    <span class="material-symbols-outlined" aria-hidden="true">event</span>
+                    {{ formatDate(event.startDate) }}
+                  </p>
+                  <p class="event-mobile-card__location">
+                    <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
+                    {{ getLocationLabel(event) }}
+                  </p>
+                  <div class="event-mobile-card__meta">
+                    <span class="event-mobile-card__type">{{ getCategoryLabel(event) }}</span>
+                    <span class="event-mobile-card__capacity">{{ getCapacityLabel(event) }}</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  class="event-mobile-card__edit"
+                  title="Edit"
+                  (click)="onEditEvent(event); $event.stopPropagation()"
+                >
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+              </article>
+            }
+          </div>
+
+          <div class="table-scroll events-table-wrap">
+            <table class="events-table">
               <thead>
                 <tr>
                   <th>Status</th>
@@ -225,10 +262,15 @@
       </div>
     </div>
 
-    <aside class="detail-column card">
+    <aside class="detail-column card" [class.has-selection]="!!selectedEvent">
       @if (selectedEvent) {
+        <p class="detail-sheet-label">Selected event</p>
         <div class="event-hero">
-          <div class="hero-media" [class.has-slides]="heroImageUrls.length > 0">
+          <div
+            class="hero-media"
+            [class.has-slides]="heroImageUrls.length > 0"
+            [ngStyle]="heroMediaFallbackStyle"
+          >
             <div class="hero-media-slides" aria-hidden="true">
               @for (url of heroImageUrls; track trackByHeroImage($index, url); let i = $index) {
                 <div

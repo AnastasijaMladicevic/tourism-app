@@ -77,7 +77,12 @@ interface ManagerReportNameHint {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, ManagerReportModalComponent],
   templateUrl: './manager-creator-reviews.component.html',
-  styleUrls: ['./manager-creator-reviews.component.css'],
+  styleUrls: [
+    './manager-creator-reviews.component.css',
+    '../shared/manager-list-page-header.css',
+    '../shared/manager-list-page-responsive.css',
+    '../shared/manager-page-stats-scroll.css'
+  ],
 })
 export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly reviewService = inject(ReviewService);

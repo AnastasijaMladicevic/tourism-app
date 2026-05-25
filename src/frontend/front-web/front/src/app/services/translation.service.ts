@@ -1,6 +1,6 @@
 import { Injectable, effect, signal } from '@angular/core';
 
-export type AppLanguage = 'me' | 'sr' | 'en' | 'es' | 'it' | 'el';
+export type AppLanguage = 'me' | 'sr' | 'en' | 'es' | 'it';
 type TranslationLocale = 'sr' | 'en';
 
 const LANGUAGE_LABEL_KEYS: Record<AppLanguage, string> = {
@@ -9,7 +9,6 @@ const LANGUAGE_LABEL_KEYS: Record<AppLanguage, string> = {
   en: 'language.english',
   es: 'language.spanish',
   it: 'language.italian',
-  el: 'language.greek',
 };
 
 const TRANSLATIONS: Record<string, Record<TranslationLocale, string>> = {
@@ -77,7 +76,7 @@ const TRANSLATIONS: Record<string, Record<TranslationLocale, string>> = {
     en: 'After saving, the entire mobile interface will switch to the selected region immediately.',
   },
   'region.montenegro': { sr: 'Crna Gora', en: 'Montenegro' },
-  'region.spain': { sr: 'Spanija', en: 'Spain' },
+  'region.spain': { sr: 'Španija', en: 'Spain' },
   'region.defaultBadge': { sr: 'Podrazumevano', en: 'Default' },
   'region.active': { sr: 'Region je vec aktivan.', en: 'This region is already active.' },
   'region.saved': { sr: 'Region je uspesno azuriran.', en: 'Region was updated successfully.' },
@@ -111,9 +110,8 @@ const TRANSLATIONS: Record<string, Record<TranslationLocale, string>> = {
   'language.montenegrin': { sr: 'Crnogorski', en: 'Montenegrin' },
   'language.serbian': { sr: 'Srpski', en: 'Serbian' },
   'language.english': { sr: 'English', en: 'English' },
-  'language.spanish': { sr: 'Spanski', en: 'Spanish' },
+  'language.spanish': { sr: 'Španski', en: 'Spanish' },
   'language.italian': { sr: 'Italijanski', en: 'Italian' },
-  'language.greek': { sr: 'Grcki', en: 'Greek' },
 
   'favorites.heroEyebrow': { sr: 'FAVORITI', en: 'FAVORITES' },
   'favorites.heroTitle': {
@@ -429,8 +427,6 @@ export class TranslationService {
         return 'es-ES';
       case 'it':
         return 'it-IT';
-      case 'el':
-        return 'el-GR';
       case 'me':
         return 'sr-Latn-ME';
       case 'sr':
@@ -487,7 +483,7 @@ export class TranslationService {
         return 'it';
       case 'el':
       case 'gr':
-        return 'el';
+        return 'sr';
       case 'sr':
       default:
         return 'sr';

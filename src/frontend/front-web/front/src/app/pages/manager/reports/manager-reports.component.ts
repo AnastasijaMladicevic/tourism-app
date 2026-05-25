@@ -46,7 +46,12 @@ interface ManagerReportNameHint {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, ManagerReportModalComponent],
   templateUrl: './manager-reports.component.html',
-  styleUrls: ['./manager-reports.component.css'],
+  styleUrls: [
+    './manager-reports.component.css',
+    '../shared/manager-list-page-header.css',
+    '../shared/manager-list-page-responsive.css',
+    '../shared/manager-page-stats-scroll.css'
+  ],
 })
 export class ManagerReportsComponent implements OnInit {
   private readonly managerReportsService = inject(ManagerReportsService);

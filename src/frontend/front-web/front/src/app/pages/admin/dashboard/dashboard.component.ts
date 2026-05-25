@@ -92,12 +92,14 @@ const ROLE_COLORS: Record<string, string> = {
   Admin: '#dc2626',
 };
 
+const ADMIN_DASHBOARD_PERIOD_STORAGE_KEY = 'admin-dashboard-selected-period';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, RouterLink, AdminPlatformMapComponent],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css'],
+  styleUrls: ['./dashboard.component.css', '../shared/admin-page-stats-scroll.css'],
 })
 export class DashboardComponent implements OnInit {
   private readonly authService = inject(AuthService);
@@ -131,9 +133,12 @@ export class DashboardComponent implements OnInit {
   topDestinationRows: TopDestinationRow[] = [];
   regionVisitRows: RegionVisitRow[] = [];
   mapDestinations: DestinationDto[] = [];
+  mapComponentId = 'admin-dashboard-map-0';
+  private mapRenderVersion = 0;
 
   ngOnInit(): void {
     this.user = this.authService.getUser();
+    this.selectedPeriod = this.readSavedPeriod();
     this.loadOverview();
   }
 
@@ -143,6 +148,7 @@ export class DashboardComponent implements OnInit {
     }
 
     this.selectedPeriod = period;
+    this.saveSelectedPeriod(period);
     this.cdr.detectChanges();
     this.loadOverview();
   }
@@ -181,8 +187,9 @@ export class DashboardComponent implements OnInit {
       )
       .subscribe({
         next: (overview) => {
-          this.overview = overview;
-          this.bindOverview(overview);
+          const normalized = this.normalizeOverview(overview);
+          this.overview = normalized;
+          this.bindOverview(normalized);
           this.cdr.detectChanges();
         },
         error: () => {
@@ -192,6 +199,45 @@ export class DashboardComponent implements OnInit {
           this.cdr.detectChanges();
         },
       });
+  }
+
+  private normalizeOverview(overview: AdminDashboardOverviewDto): AdminDashboardOverviewDto {
+    return {
+      ...overview,
+      destinationsByRegion: overview.destinationsByRegion ?? [],
+      creatorRequests: {
+        pending: overview.creatorRequests?.pending ?? overview.summary?.pendingCreatorRequests ?? 0,
+        approved: overview.creatorRequests?.approved ?? 0,
+        rejected: overview.creatorRequests?.rejected ?? 0,
+        none: overview.creatorRequests?.none ?? 0,
+        totalSubmitted: overview.creatorRequests?.totalSubmitted ?? 0,
+      },
+      reports: {
+        pending: overview.reports?.pending ?? 0,
+        approved: overview.reports?.approved ?? 0,
+        rejected: overview.reports?.rejected ?? 0,
+        total: overview.reports?.total ?? 0,
+      },
+      banOverview: {
+        temporarilyBanned: overview.banOverview?.temporarilyBanned ?? 0,
+        permanentlyBanned: overview.banOverview?.permanentlyBanned ?? 0,
+        totalBanned: overview.banOverview?.totalBanned ?? 0,
+        regions: overview.banOverview?.regions ?? [],
+      },
+      destinationEngagement: {
+        totalFavoriteAdds: overview.destinationEngagement?.totalFavoriteAdds ?? 0,
+        totalPlannerAdds: overview.destinationEngagement?.totalPlannerAdds ?? 0,
+        ratedDestinations: overview.destinationEngagement?.ratedDestinations ?? 0,
+        topDestinations: overview.destinationEngagement?.topDestinations ?? [],
+        regionEngagement: overview.destinationEngagement?.regionEngagement ?? [],
+      },
+      geospatialOverview: {
+        totalActiveDestinationsWithCoordinates: overview.geospatialOverview?.totalActiveDestinationsWithCoordinates ?? 0,
+        regionsRepresented: overview.geospatialOverview?.regionsRepresented ?? 0,
+        displayedPoints: overview.geospatialOverview?.displayedPoints ?? 0,
+        points: overview.geospatialOverview?.points ?? [],
+      },
+    };
   }
 
   private bindOverview(overview: AdminDashboardOverviewDto): void {
@@ -298,14 +344,16 @@ export class DashboardComponent implements OnInit {
   }
 
   private bindDestinationsByRegion(overview: AdminDashboardOverviewDto): void {
-    const rows = overview.destinationsByRegion.map((row) => ({
-      name: row.regionName,
-      code: row.regionCode,
-      total: row.totalDestinations,
-      active: row.activeDestinations,
-      geocoded: row.geocodedDestinations,
-      barPercent: 0,
-    }));
+    const rows = overview.destinationsByRegion
+      .filter((row) => row.totalDestinations > 0 && row.regionCode?.toUpperCase() !== 'GR')
+      .map((row) => ({
+        name: row.regionName,
+        code: row.regionCode,
+        total: row.totalDestinations,
+        active: row.activeDestinations,
+        geocoded: row.geocodedDestinations,
+        barPercent: 0,
+      }));
 
     const maxRegion = Math.max(...rows.map((row) => row.total), 1);
     rows.forEach((row) => {
@@ -347,21 +395,26 @@ export class DashboardComponent implements OnInit {
     this.regionVisitRows = engagement.regionEngagement.map((row) => ({
       ...row,
       barPercent: Math.round((row.engagementScore / maxRegionScore) * 1000) / 10,
-    }));
+    }))
+    .filter((row) => row.regionCode?.toUpperCase() !== 'GR');
   }
 
   private bindMapPoints(overview: AdminDashboardOverviewDto): void {
-    this.mapDestinations = overview.geospatialOverview.points.map((point) => ({
-      id: point.destinationId,
-      name: point.destinationName,
-      latitude: point.latitude,
-      longitude: point.longitude,
-      isActive: true,
-      destinationTypeId: 0,
-      destinationTypeName: 'Destination',
-      regionId: point.regionId,
-      regionName: point.regionName,
-    }));
+    this.mapDestinations = overview.geospatialOverview.points
+      .filter((point) => point.regionName?.trim().toLowerCase() !== 'grcka')
+      .map((point) => ({
+        id: point.destinationId,
+        name: point.destinationName,
+        latitude: point.latitude,
+        longitude: point.longitude,
+        isActive: true,
+        destinationTypeId: 0,
+        destinationTypeName: 'Destination',
+        regionId: point.regionId,
+        regionName: point.regionName,
+      }));
+    this.mapRenderVersion += 1;
+    this.mapComponentId = `admin-dashboard-map-${this.mapRenderVersion}`;
   }
 
   private humanizeRole(role: string): string {
@@ -551,5 +604,25 @@ export class DashboardComponent implements OnInit {
       day: 'numeric',
       year: 'numeric',
     }).format(new Date(value));
+  }
+
+  private readSavedPeriod(): DashboardPeriod {
+    const saved = typeof localStorage !== 'undefined'
+      ? localStorage.getItem(ADMIN_DASHBOARD_PERIOD_STORAGE_KEY)
+      : null;
+
+    return this.isValidPeriod(saved) ? saved : '30d';
+  }
+
+  private saveSelectedPeriod(period: DashboardPeriod): void {
+    if (typeof localStorage === 'undefined') {
+      return;
+    }
+
+    localStorage.setItem(ADMIN_DASHBOARD_PERIOD_STORAGE_KEY, period);
+  }
+
+  private isValidPeriod(value: string | null): value is DashboardPeriod {
+    return PERIOD_OPTIONS.some((option) => option.key === value);
   }
 }

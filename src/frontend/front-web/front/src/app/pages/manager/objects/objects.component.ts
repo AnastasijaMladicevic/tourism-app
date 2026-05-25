@@ -25,7 +25,13 @@ interface WorkingHoursRow {
   standalone: true,
   imports: [CommonModule, FormsModule, SharedMapComponent, RouterLink],
   templateUrl: './objects.component.html',
-  styleUrls: ['./objects.component.css']
+  styleUrls: [
+    './objects.component.css',
+    '../shared/manager-list-page-header.css',
+    '../shared/manager-list-page-responsive.css',
+    '../shared/manager-cc-page-parity.css',
+    '../shared/manager-page-stats-scroll.css'
+  ]
 })
 export class ManagerObjectsComponent implements OnInit {
   private readonly objectService = inject(ObjectService);
@@ -195,6 +201,15 @@ export class ManagerObjectsComponent implements OnInit {
 
     const total = this.pagedObjects.reduce((sum, item) => sum + (item.averageRating ?? 0), 0);
     return (total / this.pagedObjects.length).toFixed(1);
+  }
+
+  get objectsCountLabel(): string {
+    if (this.isLoading) {
+      return '…';
+    }
+
+    const count = this.totalCount;
+    return `${count} object${count === 1 ? '' : 's'}`;
   }
 
   get pageStart(): number {

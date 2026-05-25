@@ -1,0 +1,47 @@
+<div class="settings-page">
+  <div class="settings-shell">
+    <header class="topbar">
+      <button class="back-btn" type="button" (click)="goBack()">
+        <mat-icon>arrow_back_ios_new</mat-icon>
+      </button>
+
+      <h1>{{ 'settings.mapSection' | translate }}</h1>
+
+      <div class="topbar-spacer"></div>
+    </header>
+
+    <section class="preference-section">
+      <div class="preference-card">
+        <div class="preference-row">
+          <div class="preference-copy">
+            <span class="menu-title">{{ 'settings.offlineMapsTitle' | translate }}</span>
+            <p>{{ 'settings.offlineMapsBody' | translate }}</p>
+          </div>
+
+          <label class="switch" [class.switch--checked]="offlineMapsEnabled">
+            <input
+              type="checkbox"
+              [checked]="offlineMapsEnabled"
+              [disabled]="!offlineMapsSupported || offlineMapsBusy"
+              (change)="toggleOfflineMaps($any($event.target).checked)"
+            />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="preference-divider"></div>
+
+        <div class="preference-note">
+          @if (!offlineMapsSupported) {
+            <p>{{ 'settings.offlineMapsUnsupported' | translate }}</p>
+          } @else {
+            <p>{{ 'settings.offlineMapsHint' | translate }}</p>
+            @if (offlineMapsError) {
+              <p class="preference-error">{{ offlineMapsError | translate }}</p>
+            }
+          }
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

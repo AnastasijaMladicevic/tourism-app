@@ -91,6 +91,8 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IWebPushService, WebPushService>();
 builder.Services.AddScoped<IManagerReportService, ManagerReportService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
+builder.Services.AddScoped<IContentCreatorDashboardService, ContentCreatorDashboardService>();
+builder.Services.AddScoped<IManagerDashboardService, ManagerDashboardService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<ISmartSearchService, SmartSearchService>();
@@ -487,6 +489,9 @@ using (var scope = app.Services.CreateScope())
             throw;
         }
     }
+
+    RemoveDeprecatedGreeceRegion(db);
+    NormalizeSpainNaming(db);
 }
 
 app.Run();
@@ -507,6 +512,45 @@ static bool IsAllowedDevelopmentOrigin(string origin)
         return false;
 
     return ipAddress.AddressFamily == AddressFamily.InterNetwork && IsPrivateIpv4(ipAddress);
+}
+
+static void RemoveDeprecatedGreeceRegion(AppDbContext db)
+{
+    db.Database.ExecuteSqlRaw(@"
+        UPDATE ""Users""
+        SET ""PreferredRegionId"" = NULL,
+            ""UpdatedAt"" = NOW()
+        WHERE ""PreferredRegionId"" IN (
+            SELECT ""Id""
+            FROM ""Regions""
+            WHERE ""Code"" = 'GR'
+        );
+
+        DELETE FROM ""Regions"" r
+        WHERE r.""Code"" = 'GR'
+          AND NOT EXISTS (
+              SELECT 1
+              FROM ""Destinations"" d
+              WHERE d.""RegionId"" = r.""Id""
+          );
+    ");
+}
+
+static void NormalizeSpainNaming(AppDbContext db)
+{
+    db.Database.ExecuteSqlRaw(@"
+        UPDATE ""Regions""
+        SET ""Name"" = 'Španija',
+            ""Description"" = 'Region za sadrzaj iz Španije.',
+            ""UpdatedAt"" = NOW()
+        WHERE ""Code"" = 'ES'
+          AND (""Name"" <> 'Španija' OR ""Description"" <> 'Region za sadrzaj iz Španije.');
+
+        UPDATE ""Users""
+        SET ""Country"" = 'Španija',
+            ""UpdatedAt"" = NOW()
+        WHERE ""Country"" = 'Spanija';
+    ");
 }
 
 static string NormalizeRoleValue(string? role)

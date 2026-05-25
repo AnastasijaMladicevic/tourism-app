@@ -19,7 +19,7 @@ import { environment } from '../../../../../environment/environment';
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent],
   templateUrl: './activity-review.component.html',
-  styleUrls: ['./activity-review.component.css']
+  styleUrls: ['./activity-review.component.css', '../../shared/manager-list-page-header.css', '../../shared/manager-list-page-responsive.css']
 })
 export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);

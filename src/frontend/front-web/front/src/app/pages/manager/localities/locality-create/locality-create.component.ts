@@ -24,7 +24,7 @@ interface DestinationOption {
   standalone: true,
   imports: [CommonModule, FormsModule, SharedMapComponent],
   templateUrl: './locality-create.component.html',
-  styleUrls: ['./locality-create.component.css']
+  styleUrls: ['./locality-create.component.css', '../../shared/manager-list-page-header.css', '../../shared/manager-list-page-responsive.css']
 })
 export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
   private readonly localityService = inject(LocalityService);

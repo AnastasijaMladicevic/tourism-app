@@ -285,6 +285,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.mapService.initMap('main-map', lat, lng, zoom, { enableClustering: true });
 
+    setTimeout(() => {
+      this.mapService.getMap()?.invalidateSize(true);
+    }, 300);
+
     const map = this.mapService.getMap();
     if (!map) return;
     if (map) {
@@ -989,6 +993,20 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async fetchAllObjects(): Promise<any[]> {
+    try {
+      const response = await firstValueFrom(
+        this.objectService.getAllItems(
+          { sortBy: 'name', sortOrder: 'asc' },
+          { bypassRegion: true, bypassLanguage: true },
+        )
+      );
+
+      return this.toArray<any>(response);
+    } catch (err) {
+      console.error('Greška pri učitavanju svih objekata za mapu.', err);
+      return [];
+    }
+
     const all: any[] = [];
     let page = 1;
 
@@ -1073,7 +1091,64 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getObjectType(name: string): string {
-    const normalized = name.toLowerCase();
+    const normalized = name
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+
+    if (
+      normalized.includes('pumpa') ||
+      normalized.includes('benzin') ||
+      normalized.includes('benzinska')
+    ) {
+      return 'gas_station';
+    }
+
+    if (
+      normalized.includes('pekara') ||
+      normalized.includes('bakery') ||
+      normalized.includes('fast food') ||
+      normalized.includes('fastfood') ||
+      normalized.includes('rostilj') ||
+      normalized.includes('grill') ||
+      normalized.includes('picerija') ||
+      normalized.includes('slasticarnica') ||
+      normalized.includes('poslasticarnica')
+    ) {
+      return 'restaurant';
+    }
+
+    if (
+      normalized.includes('drogerija')
+    ) {
+      return 'pharmacy';
+    }
+
+    if (
+      normalized.includes('poliklinika')
+    ) {
+      return 'clinic';
+    }
+
+    if (
+      normalized.includes('supermarket') ||
+      normalized.includes('suvenir')
+    ) {
+      return 'shop';
+    }
+
+    if (
+      normalized.includes('outlet')
+    ) {
+      return 'mall';
+    }
+
+    if (
+      normalized.includes('lounge')
+    ) {
+      return 'kafana';
+    }
+
     if (
       normalized.includes('hotel') ||
       normalized.includes('albergo') ||
@@ -1978,13 +2053,13 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     switch (this.activeAddStopPanelFilter) {
       case 'food':
-        return item.markerType === 'restaurant' || item.markerType === 'kafana';
+        return ['restaurant', 'kafana', 'bar', 'cafe', 'club', 'winery'].includes(item.markerType);
       case 'fuel':
         return item.markerType === 'gas_station';
       case 'accommodation':
-        return item.markerType === 'hotel' || item.markerType === 'apartment';
+        return ['hotel', 'apartment', 'resort', 'hostel', 'motel', 'villa'].includes(item.markerType);
       case 'shopping':
-        return ['shop', 'mall', 'market'].includes(item.markerType);
+        return ['shop', 'mall', 'market', 'storefront'].includes(item.markerType);
       case 'health':
         return ['pharmacy', 'hospital', 'clinic'].includes(item.markerType);
       default:

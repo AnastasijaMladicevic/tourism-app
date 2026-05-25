@@ -135,6 +135,17 @@ select {
   color: inherit;
 }
 
+.leaflet-container img.leaflet-tile,
+.leaflet-container .leaflet-tile {
+  display: block;
+  max-width: none !important;
+  max-height: none !important;
+  outline: 1px solid transparent;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
 input,
 textarea,
 select {
@@ -266,4 +277,23 @@ select {
     color: white !important;
     border-color: var(--primary) !important;
   }
+}
+
+/* GLOBAL LEAFLET TILE FIX */
+.leaflet-container {
+  background: #d7ecf2;
+}
+
+.leaflet-tile {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+.leaflet-tile-container {
+  will-change: transform;
+}
+
+.leaflet-tile-pane {
+  transform: translateZ(0);
 }

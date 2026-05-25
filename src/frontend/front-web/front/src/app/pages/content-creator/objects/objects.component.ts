@@ -17,7 +17,11 @@ interface WorkingHoursRow {
   standalone: true,
   imports: [CommonModule, FormsModule, SharedMapComponent],
   templateUrl: './objects.component.html',
-  styleUrls: ['./objects.component.css']
+  styleUrls: [
+    './objects.component.css',
+    '../shared/cc-list-page-header.css',
+    '../shared/cc-page-stats-scroll.css'
+  ]
 })
 export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
   private readonly objectService = inject(ObjectService);
@@ -267,6 +271,15 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
     }
 
     return addr || locality || destination || region || '—';
+  }
+
+  get objectsCountLabel(): string {
+    if (this.isLoading) {
+      return '…';
+    }
+
+    const count = this.totalCount;
+    return `${count} object${count === 1 ? '' : 's'}`;
   }
 
   get pageStart(): number {

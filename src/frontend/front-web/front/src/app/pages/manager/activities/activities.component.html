@@ -1,12 +1,9 @@
-<section class="activities-page">
+<section class="activities-page manager-list-page">
   <header class="page-header">
-    <div>
-      <p class="eyebrow">Activities oversight</p>
+    <div class="page-header-copy">
+      <p class="eyebrow page-header-eyebrow">Activities oversight</p>
       <h1>Activities</h1>
-      <p class="page-intro">
-        Review activity submissions from creators in your managed destination, and decide whether
-        each one is approved or declined.
-      </p>
+      <p class="page-subtitle">Total: {{ activitiesCountLabel }}</p>
     </div>
   </header>
 
@@ -23,9 +20,9 @@
       />
     </div>
 
-    <button type="button" class="ghost-btn slim-btn" (click)="onMoreFilters()">
+    <button type="button" class="ghost-btn slim-btn filters-toggle-btn" aria-label="More filters" (click)="onMoreFilters()">
       <span class="material-symbols-outlined">filter_alt</span>
-      More Filters
+      <span class="filters-toggle-label">More Filters</span>
     </button>
   </div>
 
@@ -81,29 +78,26 @@
   <div class="activities-layout">
     <div class="main-column">
       @if (!errorMessage) {
-        <div class="stats-row">
-          <article class="stat-card" data-tone="blue">
+        <div class="insights-grid">
+          <article class="insight-card card" data-tone="blue">
             <p>Total activities</p>
             <strong>{{ statsTotalAllStatuses != null ? statsTotalAllStatuses : '—' }}</strong>
-            <span>All statuses · same search &amp; type filter as the table</span>
+            <span>Matching active filters</span>
           </article>
-          <article class="stat-card" data-tone="green">
+          <article class="insight-card card" data-tone="green">
             <p>On this page</p>
             <strong>{{ isLoading ? '—' : activities.length }}</strong>
             <span>Visible rows</span>
           </article>
-          <article class="stat-card" data-tone="neutral">
+          <article class="insight-card card" data-tone="amber">
             <p>Pending review</p>
             <strong>{{ statsPendingCount != null ? statsPendingCount : '—' }}</strong>
-            <span>Same search &amp; type filter as the table</span>
+            <span>Matching active filters</span>
           </article>
         </div>
       }
 
       <div class="table-card">
-        <header class="table-header">
-          <h2>{{ managedCityLabel || 'Activities' }}</h2>
-        </header>
         @if (isLoading) {
           <div class="state state-loading">Loading activities...</div>
         } @else if (errorMessage) {
@@ -111,7 +105,49 @@
         } @else if (activities.length === 0) {
           <div class="state">No activities to review yet.</div>
         } @else {
-          <div class="table-scroll">
+          <div class="activities-mobile-list">
+            @for (activity of activities; track activity.id) {
+              <article
+                class="activity-mobile-card"
+                [class.is-active]="selectedActivity?.id === activity.id"
+                (click)="onSelectActivity(activity)"
+              >
+                <span
+                  class="activity-mobile-card__media"
+                  [style.background-image]="activity.mainImageUrl ? 'url(' + activity.mainImageUrl + ')' : ''"
+                ></span>
+                <div class="activity-mobile-card__content">
+                  <div class="activity-mobile-card__head">
+                    <h3>{{ activity.name }}</h3>
+                    <span class="status-chip status-chip--compact" [ngClass]="getStatusClass(activity.status)">
+                      {{ getStatusLabel(activity.status) }}
+                    </span>
+                  </div>
+                  <p class="activity-mobile-card__location">
+                    <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
+                    {{ getActivityLocation(activity) }}
+                  </p>
+                  <div class="activity-mobile-card__meta">
+                    <span class="activity-mobile-card__type">{{ activity.activityTypeName || 'N/A' }}</span>
+                    <span class="activity-mobile-card__duration">
+                      <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
+                      {{ formatDuration(activity.durationMinutes) }}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  class="activity-mobile-card__edit"
+                  title="Review activity"
+                  (click)="onReviewActivity(activity); $event.stopPropagation()"
+                >
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+              </article>
+            }
+          </div>
+
+          <div class="table-scroll activities-table-wrap">
             <table>
               <thead>
                 <tr>
@@ -197,8 +233,9 @@
       </div>
     </div>
 
-    <aside class="detail-column card">
+    <aside class="detail-column card" [class.has-selection]="!!selectedActivity">
       @if (selectedActivity) {
+        <p class="detail-sheet-label">Selected activity</p>
         <div class="activity-hero">
           <div class="hero-media" [style.background-image]="'url(' + selectedBanner + ')'">
             <span class="hero-badge">{{ selectedCategory }}</span>

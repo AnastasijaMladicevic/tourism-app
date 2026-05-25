@@ -2,8 +2,11 @@ import {
   ChangeDetectorRef,
   Component,
   effect,
+  ElementRef,
   HostListener,
   OnInit,
+  OnDestroy,
+  ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -35,7 +38,7 @@ export interface DestinationView extends DestinationDto {
   styleUrls: ['./destinations.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class DestinationsComponent implements OnInit {
+export class DestinationsComponent implements OnInit, OnDestroy {
   searchQuery = '';
   activeFilter = 'All';
   sortOption: 'az' | 'za' | 'distance' = 'az';
@@ -58,6 +61,7 @@ export class DestinationsComponent implements OnInit {
   private readonly imageCache = new Map<number, DestinationDto['images']>();
   private hasInitializedLanguageWatcher = false;
   private lastLanguage = 'sr';
+  private searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private router: Router,
@@ -88,7 +92,7 @@ export class DestinationsComponent implements OnInit {
       void this.loadData();
     });
   }
-
+  @ViewChild('top') top!: ElementRef;
   ngOnInit(): void {
     this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
       this.isTracking = enabled;
@@ -221,8 +225,8 @@ export class DestinationsComponent implements OnInit {
 
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
-  onPageSizeChange(size: number): void {
-    this.pageSize = size;
+  onPageSizeChange(size: number | string): void {
+    this.pageSize = Number(size);
     this.currentPage = 1;
     void this.refreshVisibleDestinations();
   }
@@ -233,8 +237,14 @@ export class DestinationsComponent implements OnInit {
   }
 
   onSearchChange(): void {
-    this.currentPage = 1;
-    void this.refreshVisibleDestinations();
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+  
+    this.searchTimeout = setTimeout(() => {
+      this.currentPage = 1;
+      void this.refreshVisibleDestinations();
+    }, 250);
   }
 
   prevPage(): void {
@@ -242,6 +252,7 @@ export class DestinationsComponent implements OnInit {
 
     this.currentPage--;
     void this.refreshVisibleDestinations();
+    this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
   nextPage(): void {
@@ -249,6 +260,7 @@ export class DestinationsComponent implements OnInit {
 
     this.currentPage++;
     void this.refreshVisibleDestinations();
+    this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
   @HostListener('document:click', ['$event'])
@@ -326,8 +338,8 @@ export class DestinationsComponent implements OnInit {
       za: 'Z -> A',
       distance: this.translationService.translate('common.nearest')
     };
-    
-  return map[this.sortOption];
+
+    return map[this.sortOption];
   }
 
   toggleFavorite(destination: DestinationView, event: Event): void {
@@ -565,5 +577,11 @@ export class DestinationsComponent implements OnInit {
     });
 
     return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  ngOnDestroy(): void {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
   }
 }

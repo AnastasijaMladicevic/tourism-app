@@ -3,66 +3,455 @@
     <div>
       <p class="breadcrumbs">Main Menu <span>&gt;</span> Dashboard</p>
       <h1>Manager Dashboard</h1>
-      <p class="subtle-text">Welcome back{{ user?.firstName ? ', ' + user?.firstName : '' }}.</p>
+      <p class="subtle-text">
+        Welcome back{{ user?.firstName ? ', ' + user?.firstName : '' }}. Destination performance and moderation overview for the selected period.
+      </p>
+    </div>
+    <div class="head-actions">
+      <div class="period-filter" role="group" aria-label="Dashboard period">
+        <button
+          type="button"
+          *ngFor="let opt of periodOptions"
+          class="period-btn"
+          [class.active]="selectedPeriod === opt.key"
+          (click)="selectPeriod(opt.key)"
+        >
+          {{ opt.label }}
+        </button>
+      </div>
     </div>
   </div>
 
-  <div class="dashboard-grid">
-    <a class="dash-card card" routerLink="/manager/creator-reviews">
-      <div class="card-icon-wrap" data-tone="purple">
-        <span class="material-symbols-outlined">forum</span>
-      </div>
-      <div class="card-copy">
-        <h2>Reviews &amp; Replies</h2>
-        <p>Read tourist reviews and how creators respond before escalating a report.</p>
-        <span class="card-cta">
-          View conversations
-          <span class="material-symbols-outlined">arrow_forward</span>
-        </span>
-      </div>
-    </a>
+  <p class="state-banner error" *ngIf="loadError">{{ loadError }}</p>
+  <p class="state-banner loading" *ngIf="isLoading && !loadError">Loading manager dashboard...</p>
 
-    <a class="dash-card card moderation-card" routerLink="/manager/reports">
-      <div class="card-icon-wrap" data-tone="amber">
-        <span class="material-symbols-outlined">flag</span>
+  <ng-container *ngIf="!isLoading && overview">
+    <article class="card empty-shell" *ngIf="!hasManagedDestination">
+      <h3>No destination assigned yet</h3>
+      <p>
+        This dashboard becomes active as soon as an admin assigns you to a destination. Until then, you can still review your profile and wait for assignment.
+      </p>
+      <div class="empty-shell-actions">
+        <a class="ghost-link" routerLink="/manager/profile">Open profile</a>
       </div>
-      <div class="card-copy">
-        <h2>Content Creator Reports</h2>
-        <p>Escalate serious violations to Admin. View pending and past reports.</p>
-        <span class="card-cta">
-          Open reports
-          <span class="material-symbols-outlined">arrow_forward</span>
-        </span>
-      </div>
-      <span class="pending-pill">1 pending</span>
-    </a>
+    </article>
 
-    <a class="dash-card card" routerLink="/manager/objects">
-      <div class="card-icon-wrap" data-tone="blue">
-        <span class="material-symbols-outlined">apartment</span>
-      </div>
-      <div class="card-copy">
-        <h2>Review Objects</h2>
-        <p>Approve, reject, or deactivate tourist objects in your destination.</p>
-        <span class="card-cta">
-          Go to objects
-          <span class="material-symbols-outlined">arrow_forward</span>
-        </span>
-      </div>
-    </a>
+    <ng-container *ngIf="hasManagedDestination">
+      <div class="kpi-row">
+        <article class="kpi-card card kpi-card--destination">
+          <span class="kpi-value kpi-value--title">{{ managedDestinationTitle }}</span>
+          <span class="kpi-destination-subtitle" *ngIf="managedDestinationDisplayTitle">{{ managedDestinationDisplayTitle }}</span>
+          <span class="kpi-meta muted" *ngIf="managedDestinationSubtitle">{{ managedDestinationSubtitle }}</span>
+        </article>
 
-    <a class="dash-card card" routerLink="/manager/events">
-      <div class="card-icon-wrap" data-tone="green">
-        <span class="material-symbols-outlined">event</span>
+        <article class="kpi-card card">
+          <span class="kpi-label">Active creators</span>
+          <span class="kpi-value">{{ overview.summary.activeCreators | number }}</span>
+          <span class="kpi-meta muted">
+            {{ overview.summary.activeObjects | number }} objects &bull; {{ overview.summary.activeEvents | number }} events &bull; {{ overview.summary.activeActivities | number }} activities
+          </span>
+        </article>
+
+        <article class="kpi-card card" [class.kpi-card--alert]="overview.summary.pendingModerationItems > 0">
+          <span class="kpi-label">Pending moderation</span>
+          <span class="kpi-value">{{ overview.summary.pendingModerationItems | number }}</span>
+          <span class="kpi-meta muted">Current moderation queue</span>
+        </article>
+
+        <article class="kpi-card card" [class.kpi-card--alert]="overview.summary.openReports > 0">
+          <span class="kpi-label">Open reports</span>
+          <span class="kpi-value">{{ overview.summary.openReports | number }}</span>
+          <span class="kpi-meta muted">{{ overview.reports.totalInPeriod | number }} submitted in {{ overview.periodKey }}</span>
+        </article>
+
+        <article class="kpi-card card">
+          <span class="kpi-label">Average rating</span>
+          <span class="kpi-value">{{ overview.summary.averageRatingInPeriod | number:'1.1-1' }}</span>
+          <span class="kpi-meta muted">
+            {{ overview.summary.newReviewsInPeriod | number }} new reviews &bull; {{ overview.summary.lowRatedReviewsInPeriod | number }} low-rated
+          </span>
+        </article>
+
+        <article class="kpi-card card">
+          <span class="kpi-label">Unanswered reviews</span>
+          <span class="kpi-value">{{ overview.summary.unansweredReviews | number }}</span>
+          <span class="kpi-meta muted">
+            {{ overview.summary.upcomingEventsInNext30Days | number }} upcoming events in next 30 days
+          </span>
+        </article>
       </div>
-      <div class="card-copy">
-        <h2>Review Events</h2>
-        <p>Manage pending submissions and active events from creators.</p>
-        <span class="card-cta">
-          Go to events
-          <span class="material-symbols-outlined">arrow_forward</span>
-        </span>
+
+      <div class="top-grid">
+        <article class="card panel panel--wide">
+          <div class="section-head">
+            <div>
+              <h3>Engagement Trend</h3>
+              <p>{{ granularityHint }} &bull; favorites, planner adds, reviews</p>
+            </div>
+            <a class="section-link" routerLink="/manager/creator-reviews">Review feedback</a>
+          </div>
+
+          <div class="trend-panel-body">
+            <div>
+              <div class="chart-legend chart-legend--inline">
+                <span *ngFor="let series of engagementSeries" class="legend-item">
+                  <span class="legend-dot" [style.background]="series.color"></span>
+                  {{ series.label }}
+                </span>
+              </div>
+
+              <div class="chart-wrap">
+                <div class="chart-y-axis" aria-hidden="true">
+                  <span>{{ engagementYTop }}</span>
+                  <span>{{ engagementYMid }}</span>
+                  <span>0</span>
+                </div>
+                <div class="chart-surface">
+                  <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg chart-svg--multi">
+                    <path
+                      *ngFor="let series of engagementSeries"
+                      [attr.d]="series.linePath"
+                      class="chart-line-multi"
+                      fill="none"
+                      [attr.stroke]="series.color"
+                    ></path>
+                    <rect
+                      *ngFor="let zone of engagementHoverZones"
+                      class="chart-hover-zone"
+                      [attr.x]="zone.x"
+                      y="0"
+                      [attr.width]="zone.width"
+                      height="100"
+                    >
+                      <title>{{ zone.title }}</title>
+                    </rect>
+                  </svg>
+                  <p class="chart-empty" *ngIf="engagementIsEmpty">No engagement activity was recorded for this period.</p>
+                </div>
+              </div>
+
+              <div class="chart-labels">
+                <span *ngFor="let label of engagementXLabels">{{ label.label }}</span>
+              </div>
+            </div>
+
+            <div class="trend-summary-row">
+              <div class="trend-summary-card">
+                <span class="trend-summary-label">Favorites in period</span>
+                <span class="trend-summary-value">{{ overview.summary.favoritesInPeriod | number }}</span>
+              </div>
+              <div class="trend-summary-card">
+                <span class="trend-summary-label">Planner adds</span>
+                <span class="trend-summary-value">{{ overview.summary.plannerAddsInPeriod | number }}</span>
+              </div>
+              <div class="trend-summary-card">
+                <span class="trend-summary-label">New reviews</span>
+                <span class="trend-summary-value">{{ overview.summary.newReviewsInPeriod | number }}</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card panel">
+          <div class="section-head">
+            <div>
+              <h3>Content Status</h3>
+              <p>Published, pending and rejected across your destination</p>
+            </div>
+            <a class="section-link" routerLink="/manager/localities">Open localities</a>
+          </div>
+
+          <div class="status-list" *ngIf="contentStatusRows.length; else emptyContentStatus">
+            <div *ngFor="let row of contentStatusRows" class="status-row">
+              <div class="status-row-head">
+                <span class="status-row-name">{{ row.label }}</span>
+                <span class="status-row-total">{{ row.total | number }} total</span>
+              </div>
+              <div class="stacked-bar stacked-bar--tall">
+                <div class="stacked-bar-fill-wrap" [style.width.%]="row.totalPercent">
+                  <span class="stack-segment stack-segment--published" [style.width.%]="row.publishedPercent"></span>
+                  <span class="stack-segment stack-segment--pending" [style.width.%]="row.pendingPercent"></span>
+                  <span class="stack-segment stack-segment--rejected" [style.width.%]="row.rejectedPercent"></span>
+                </div>
+              </div>
+              <div class="status-row-meta">
+                <span>{{ row.published | number }} published</span>
+                <span>{{ row.pending | number }} pending</span>
+                <span>{{ row.rejected | number }} rejected</span>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #emptyContentStatus>
+            <p class="empty-note">No content status is available right now.</p>
+          </ng-template>
+        </article>
+
+        <article class="card panel">
+          <div class="section-head">
+            <div>
+              <h3>Pending approvals</h3>
+              <p>Objects, events, activities and reports waiting for your review</p>
+            </div>
+            <a class="section-link" routerLink="/manager/reports">Reports</a>
+          </div>
+
+          <div class="creator-summary">
+            <div class="creator-stat">
+              <span class="creator-stat-val">{{ overview.moderationQueue.pendingObjects | number }}</span>
+              <span class="creator-stat-label">Objects</span>
+            </div>
+            <div class="creator-stat">
+              <span class="creator-stat-val">{{ overview.moderationQueue.pendingEvents | number }}</span>
+              <span class="creator-stat-label">Events</span>
+            </div>
+            <div class="creator-stat">
+              <span class="creator-stat-val">{{ overview.moderationQueue.pendingActivities | number }}</span>
+              <span class="creator-stat-label">Activities</span>
+            </div>
+            <div class="creator-stat creator-stat--reports">
+              <span class="creator-stat-val">{{ overview.reports.currentPending | number }}</span>
+              <span class="creator-stat-label">Reports</span>
+            </div>
+          </div>
+
+          <div class="queue-total-card queue-total-card--highlight">
+            <span class="queue-total-label">Total pending</span>
+            <span class="queue-total-value">{{ moderationTotalPendingDecisions | number }}</span>
+            <span class="queue-total-meta">
+              {{ overview.moderationQueue.totalPending | number }} objects, events and activities
+              <br />
+              {{ overview.reports.currentPending | number }} reports
+            </span>
+          </div>
+
+          <div class="stacked-bar stacked-bar--tall">
+            <span
+              *ngFor="let slice of moderationSlices"
+              class="stack-segment"
+              [style.width.%]="slice.percent"
+              [style.background]="slice.color"
+              [title]="slice.label + ': ' + (slice.count | number)"
+            ></span>
+          </div>
+
+          <ul class="legend-list">
+            <li *ngFor="let slice of moderationSlices">
+              <span class="legend-dot" [style.background]="slice.color"></span>
+              {{ slice.label }} &bull; {{ slice.count | number }}
+            </li>
+          </ul>
+        </article>
       </div>
-    </a>
-  </div>
+
+      <div class="middle-grid">
+        <article class="card panel">
+          <div class="section-head">
+            <div>
+              <h3>Reports Status</h3>
+              <p>Current queue and resolved reports in {{ overview.periodKey }}</p>
+            </div>
+            <a class="section-link" routerLink="/manager/reports">Open reports</a>
+          </div>
+
+          <div class="report-grid">
+            <div class="report-chip">
+              <span class="report-chip-label">Pending now</span>
+              <span class="report-chip-value">{{ overview.reports.currentPending | number }}</span>
+            </div>
+            <div class="report-chip">
+              <span class="report-chip-label">Submitted</span>
+              <span class="report-chip-value">{{ overview.reports.submittedInPeriod | number }}</span>
+            </div>
+            <div class="report-chip">
+              <span class="report-chip-label">Approved</span>
+              <span class="report-chip-value">{{ overview.reports.approvedInPeriod | number }}</span>
+            </div>
+            <div class="report-chip">
+              <span class="report-chip-label">Rejected</span>
+              <span class="report-chip-value">{{ overview.reports.rejectedInPeriod | number }}</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="card panel">
+          <div class="section-head">
+            <div>
+              <h3>Review Health</h3>
+              <p>How tourists currently rate this destination content</p>
+            </div>
+            <a class="section-link" routerLink="/manager/creator-reviews">See reviews</a>
+          </div>
+
+          <div class="review-health">
+            <div class="review-health-card">
+              <span class="review-health-label">Average rating</span>
+              <span class="review-health-value">{{ overview.summary.averageRatingInPeriod | number:'1.1-1' }}</span>
+            </div>
+            <div class="review-health-card">
+              <span class="review-health-label">New reviews</span>
+              <span class="review-health-value">{{ overview.summary.newReviewsInPeriod | number }}</span>
+            </div>
+            <div class="review-health-card">
+              <span class="review-health-label">Unanswered</span>
+              <span class="review-health-value">{{ overview.summary.unansweredReviews | number }}</span>
+            </div>
+            <div class="review-health-card">
+              <span class="review-health-label">Low-rated</span>
+              <span class="review-health-value">{{ overview.summary.lowRatedReviewsInPeriod | number }}</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="card panel">
+          <div class="section-head">
+            <div>
+              <h3>Top Creators</h3>
+              <p>Creators with the strongest engagement score in {{ overview.periodKey }}</p>
+            </div>
+          </div>
+
+          <div class="creator-rank-list" *ngIf="topCreatorRows.length; else emptyCreators">
+            <div *ngFor="let row of topCreatorRows" class="rank-row">
+              <div class="rank-row-head">
+                <div>
+                  <div class="rank-name">{{ row.creatorName }}</div>
+                  <div class="rank-subtle">{{ row.creatorEmail }}</div>
+                </div>
+                <div class="rank-score">score {{ row.engagementScore | number:'1.0-1' }}</div>
+              </div>
+              <div class="region-bar-track">
+                <div
+                  class="region-bar-fill region-bar-fill--purple"
+                  [style.width.%]="row.barPercent"
+                  [title]="row.creatorName + ': score ' + row.engagementScore + ', favorites ' + row.favoriteAdds + ', planner ' + row.plannerAdds + ', reviews ' + row.reviewCount"
+                ></div>
+              </div>
+              <div class="rank-meta">
+                <span>{{ row.contentItems | number }} items</span>
+                <span>{{ row.publishedItems | number }} published</span>
+                <span>{{ row.pendingItems | number }} pending</span>
+                <span>{{ row.reviewCount | number }} reviews</span>
+                <span>{{ row.averageRating | number:'1.1-1' }} avg</span>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #emptyCreators>
+            <p class="empty-note">No creator performance data is available for this period.</p>
+          </ng-template>
+        </article>
+      </div>
+
+      <div class="bottom-grid">
+        <article class="card panel panel--wide">
+          <div class="section-head">
+            <div>
+              <h3>Top Content</h3>
+              <p>Best performing objects, events and activities in {{ overview.periodKey }}</p>
+            </div>
+            <a class="section-link" routerLink="/manager/localities">Manage content</a>
+          </div>
+
+          <div class="rank-list" *ngIf="topContentRows.length; else emptyTopContent">
+            <div *ngFor="let row of topContentRows" class="rank-row">
+              <div class="rank-row-head">
+                <div>
+                  <div class="rank-name">{{ row.contentName }}</div>
+                  <div class="rank-subtle">
+                    {{ humanizeContentType(row.contentType) }}
+                    <span *ngIf="row.localityName">&bull; {{ row.localityName }}</span>
+                    &bull; {{ row.creatorName }}
+                  </div>
+                </div>
+                <div class="rank-side">
+                  <span [class]="statusClass(row.status)">{{ humanizeStatus(row.status) }}</span>
+                  <span class="rank-score">score {{ row.engagementScore | number:'1.0-1' }}</span>
+                </div>
+              </div>
+              <div class="region-bar-track">
+                <div
+                  class="region-bar-fill region-bar-fill--teal"
+                  [style.width.%]="row.barPercent"
+                  [title]="row.contentName + ': score ' + row.engagementScore + ', favorites ' + row.favoriteAdds + ', planner ' + row.plannerAdds + ', reviews ' + row.reviewCount + ', avg ' + row.averageRating"
+                ></div>
+              </div>
+              <div class="rank-meta">
+                <span>{{ row.favoriteAdds | number }} favorites</span>
+                <span>{{ row.plannerAdds | number }} planner adds</span>
+                <span>{{ row.reviewCount | number }} reviews</span>
+                <span>{{ row.averageRating | number:'1.1-1' }} avg</span>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #emptyTopContent>
+            <p class="empty-note">No top content data is available for this period.</p>
+          </ng-template>
+        </article>
+
+        <article class="card panel">
+          <div class="section-head">
+            <div>
+              <h3>Locality Performance</h3>
+              <p>Most engaged localities in {{ overview.periodKey }}</p>
+            </div>
+            <a class="section-link" routerLink="/manager/localities">Open localities</a>
+          </div>
+
+          <div class="locality-list" *ngIf="localityRows.length; else emptyLocalities">
+            <div *ngFor="let row of localityRows" class="rank-row">
+              <div class="rank-row-head">
+                <div>
+                  <div class="rank-name">{{ row.localityName }}</div>
+                  <div class="rank-subtle">{{ row.contentItems | number }} content items</div>
+                </div>
+                <div class="rank-score">score {{ row.engagementScore | number:'1.0-1' }}</div>
+              </div>
+              <div class="region-bar-track">
+                <div
+                  class="region-bar-fill region-bar-fill--blue"
+                  [style.width.%]="row.barPercent"
+                  [title]="row.localityName + ': score ' + row.engagementScore + ', favorites ' + row.favoriteAdds + ', planner ' + row.plannerAdds + ', reviews ' + row.reviewCount + ', avg ' + row.averageRating"
+                ></div>
+              </div>
+              <div class="rank-meta">
+                <span>{{ row.favoriteAdds | number }} favorites</span>
+                <span>{{ row.plannerAdds | number }} planner adds</span>
+                <span>{{ row.reviewCount | number }} reviews</span>
+                <span>{{ row.averageRating | number:'1.1-1' }} avg</span>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #emptyLocalities>
+            <p class="empty-note">No locality performance data is available for this period.</p>
+          </ng-template>
+        </article>
+      </div>
+
+      <article class="card panel">
+        <div class="section-head">
+          <div>
+            <h3>Upcoming Events</h3>
+            <p>{{ overview.upcomingEvents.next7Days | number }} in next 7 days &bull; {{ overview.upcomingEvents.next30Days | number }} in next 30 days</p>
+          </div>
+          <a class="section-link" routerLink="/manager/events">Open events</a>
+        </div>
+
+        <div class="upcoming-grid" *ngIf="upcomingEventRows.length; else emptyEvents">
+          <article *ngFor="let row of upcomingEventRows" class="upcoming-card">
+            <div class="upcoming-date">{{ formatShortDate(row.startDate) }}</div>
+            <h4>{{ row.eventName }}</h4>
+            <p>{{ row.localityName || managedDestinationTitle }}</p>
+            <span class="upcoming-meta">Creator &bull; {{ row.creatorName }}</span>
+          </article>
+        </div>
+
+        <ng-template #emptyEvents>
+          <p class="empty-note">No upcoming events are scheduled in the selected period.</p>
+        </ng-template>
+      </article>
+    </ng-container>
+  </ng-container>
 </section>

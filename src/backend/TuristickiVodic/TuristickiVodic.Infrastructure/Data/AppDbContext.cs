@@ -798,9 +798,9 @@ public class AppDbContext : DbContext
             new Region
             {
                 Id = 3,
-                Name = "Spanija",
+                Name = "Španija",
                 Code = "ES",
-                Description = "Region za sadrzaj iz Spanije.",
+                Description = "Region za sadrzaj iz Španije.",
                 CenterLongitude = -3.7492,
                 CenterLatitude = 40.4637,
                 DefaultMapZoom = 6.0,
@@ -817,20 +817,6 @@ public class AppDbContext : DbContext
                 Description = "Region za sadrzaj iz Italije.",
                 CenterLongitude = 12.4964,
                 CenterLatitude = 42.4279,
-                DefaultMapZoom = 6.4,
-                IsDefault = false,
-                IsActive = true,
-                CreatedAt = now,
-                UpdatedAt = now
-            },
-            new Region
-            {
-                Id = 5,
-                Name = "Grcka",
-                Code = "GR",
-                Description = "Region za sadrzaj iz Grcke.",
-                CenterLongitude = 23.6500,
-                CenterLatitude = 38.3500,
                 DefaultMapZoom = 6.4,
                 IsDefault = false,
                 IsActive = true,

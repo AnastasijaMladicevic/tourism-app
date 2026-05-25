@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { ChangeDetectorRef, Component, HostListener, NgZone, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, NgZone, OnInit, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,6 +14,7 @@ import { PlannerLocalPreferencesService } from '../../services/planner-local-pre
 import { EventPlannerService } from '../../services/event-planner';
 import { PendingActionService } from '../../services/pending-action';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { RouterHistoryService } from '../../services/router-history';
 
 type EventCategory = 'All' | string;
 
@@ -47,7 +48,6 @@ interface EventCard {
   styleUrl: './events.scss',
 })
 export class EventsComponent implements OnInit {
-  private readonly location = inject(Location);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly ngZone = inject(NgZone);
   private readonly eventService = inject(EventService);
@@ -57,6 +57,7 @@ export class EventsComponent implements OnInit {
   private readonly plannerService = inject(PlannerLocalPreferencesService);
   private readonly eventPlannerService = inject(EventPlannerService);
   private readonly pendingActionService = inject(PendingActionService);
+  private readonly routerHistory = inject(RouterHistoryService);
   activeFilter = 'All';
   activeCategory: EventCategory = 'All';
   isLoading = true;
@@ -76,6 +77,7 @@ export class EventsComponent implements OnInit {
   eventTypes: { id: number; name: string }[] = [];
   isPlannerBusy = false;
   private plannerMap = new Map<number, number>();
+  @ViewChild('top') top!: ElementRef;
   ngOnInit(): void {
     this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
       this.isTracking = enabled;
@@ -240,6 +242,7 @@ export class EventsComponent implements OnInit {
 
     this.currentPage--;
     this.refreshVisibleEvents();
+    this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
   nextPage(): void {
@@ -247,6 +250,7 @@ export class EventsComponent implements OnInit {
 
     this.currentPage++;
     this.refreshVisibleEvents();
+    this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
   get totalPages(): number {
@@ -254,7 +258,7 @@ export class EventsComponent implements OnInit {
   }
 
   goBack(): void {
-    this.location.back();
+    this.routerHistory.goBack();
   }
 
   openEvent(id: number): void {

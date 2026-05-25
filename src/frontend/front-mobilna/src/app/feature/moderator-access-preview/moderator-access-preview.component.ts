@@ -221,7 +221,7 @@ export class ModeratorAccessPreviewComponent {
 
     this.redirectingToAdmin = true;
     this.feedbackTone.set('success');
-    this.feedback.set('Tvoj zahtev je odobren. Preusmeravamo te na admin aplikaciju.');
+    this.feedback.set(this.translationService.translate('moderatorAccess.feedback.redirectingToAdmin'));
 
     window.setTimeout(() => {
       window.location.href = targetUrl;

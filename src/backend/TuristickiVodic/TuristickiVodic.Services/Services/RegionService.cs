@@ -20,6 +20,8 @@ namespace TuristickiVodic.Services.Services
         {
             var query = _context.Regions.AsNoTracking().AsQueryable();
 
+            query = query.Where(r => r.Code != "GR");
+
             if (!includeInactive)
                 query = query.Where(r => r.IsActive);
 
@@ -35,7 +37,7 @@ namespace TuristickiVodic.Services.Services
         {
             var region = await _context.Regions
                 .AsNoTracking()
-                .FirstOrDefaultAsync(r => r.Id == id);
+                .FirstOrDefaultAsync(r => r.Id == id && r.Code != "GR");
 
             return region == null ? null : _mapper.Map<RegionDto>(region);
         }
@@ -44,7 +46,7 @@ namespace TuristickiVodic.Services.Services
         {
             var region = await _context.Regions
                 .AsNoTracking()
-                .Where(r => r.IsActive)
+                .Where(r => r.IsActive && r.Code != "GR")
                 .OrderByDescending(r => r.IsDefault)
                 .ThenBy(r => r.Name)
                 .FirstOrDefaultAsync();

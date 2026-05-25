@@ -1087,10 +1087,17 @@ th {
 }
 
 @media (max-width: 900px) {
-  .dashboard-overview-main .kpi-grid,
-  .small-kpis {
-    grid-template-columns: 1fr;
+  .users-page {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
   }
+
+  .dashboard-overview-main {
+    min-width: 0;
+    max-width: 100%;
+  }
+
 }
 
 .table-footer {

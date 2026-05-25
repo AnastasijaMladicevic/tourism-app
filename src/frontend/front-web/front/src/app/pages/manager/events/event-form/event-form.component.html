@@ -37,50 +37,46 @@
     <div class="alert alert-success">{{ successMessage }}</div>
   }
 
+  <section class="review-shell">
+    <section class="card media-card">
+      <div class="section-title">
+        <h2>Event Images</h2>
+        <p>Read-only gallery shown before the review details.</p>
+      </div>
+
+      <div class="media-layout" aria-label="Event image gallery">
+        <div class="media-preview" aria-label="Main event image preview">
+          @if (imagePreviewUrl && !isImagePreviewBroken) {
+            <img [src]="imagePreviewUrl" alt="Event preview" (error)="onImagePreviewError()" />
+          } @else {
+            <div class="upload-placeholder">
+              <span class="material-symbols-outlined">image</span>
+              <strong>No usable image preview yet</strong>
+              <p>The event does not have a valid main image URL, or the image could not be loaded.</p>
+            </div>
+          }
+        </div>
+
+        <div class="media-strip">
+          @if (sideGalleryImages.length > 0) {
+            <div class="media-thumbnails">
+              @for (image of sideGalleryImages; track image.id) {
+                <button type="button" class="media-thumb" (click)="selectReviewImage(image.url)">
+                  <img [src]="image.url" [alt]="image.altText || 'Event image thumbnail'" />
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="media-empty">No additional gallery images are available.</div>
+          }
+        </div>
+      </div>
+    </section>
+  </section>
+
   <form class="form-layout" [formGroup]="form">
     <fieldset class="review-fieldset">
     <div class="form-main">
-      <div
-        class="upload-card card"
-        [class.image-drop-active]="isImageDropActive"
-        (dragover)="onImageDragOver($event)"
-        (dragleave)="onImageDragLeave($event)"
-        (drop)="onImageDrop($event)"
-      >
-        <div class="section-title">
-          <h2>Event Images</h2>
-          <p>Read-only gallery shown before the review details.</p>
-        </div>
-
-        <div class="media-layout" aria-label="Event image gallery">
-          <div class="media-preview" aria-label="Main event image preview">
-            @if (imagePreviewUrl && !isImagePreviewBroken) {
-              <img [src]="imagePreviewUrl" alt="Event banner preview" (error)="onImagePreviewError()" />
-            } @else {
-              <div class="upload-placeholder">
-                <span class="material-symbols-outlined">image</span>
-                <strong>No usable image preview yet</strong>
-                <p>The event does not have a valid main image URL, or the image could not be loaded.</p>
-              </div>
-            }
-          </div>
-
-          <div class="media-strip">
-            @if (sideReviewImages.length > 0) {
-              <div class="media-thumbnails">
-                @for (image of sideReviewImages; track image.id) {
-                  <button type="button" class="media-thumb" (click)="selectReviewImage(image.url)">
-                    <img [src]="image.url" [alt]="image.altText || 'Event image thumbnail'" />
-                  </button>
-                }
-              </div>
-            } @else {
-              <div class="media-empty">No additional gallery images are available.</div>
-            }
-          </div>
-        </div>
-      </div>
-
       <section class="card section-card">
         <div class="section-title">
           <h2>General Information</h2>
@@ -313,7 +309,7 @@
           [(ngModel)]="rejectionReason"
           [ngModelOptions]="{ standalone: true }"
           rows="4"
-          placeholder="Example: Event location does not belong to your managed destination."
+          placeholder="Example: Event location does not match the submitted event."
         ></textarea>
 
         <div class="event-delete-modal-actions">

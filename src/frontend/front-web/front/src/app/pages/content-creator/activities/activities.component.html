@@ -1,19 +1,15 @@
 <section class="activities-page">
   <header class="page-header">
-    <div>
-      <p class="eyebrow">Activities management</p>
+    <div class="page-header-copy">
+      <p class="eyebrow page-header-eyebrow">Activities management</p>
       <h1>Activities</h1>
-      <p class="page-intro">
-        Manage regional activities, review their status, and keep the creator catalog organized.
-      </p>
+      <p class="page-subtitle">Total: {{ activitiesCountLabel }}</p>
     </div>
 
-    <div class="header-actions">
-      <button type="button" class="primary-btn" routerLink="/content-creator/activities/create">
-        <span class="material-symbols-outlined">add</span>
-        Add Activity
-      </button>
-    </div>
+    <button type="button" class="primary-btn page-header-cta" routerLink="/content-creator/activities/create">
+      <span class="material-symbols-outlined">add</span>
+      <span class="page-header-cta-label">Add Activity</span>
+    </button>
   </header>
 
   <div class="toolbar card">
@@ -50,9 +46,9 @@
       </div>
     </div> -->
 
-    <button type="button" class="ghost-btn slim-btn" (click)="onMoreFilters()">
+    <button type="button" class="ghost-btn slim-btn filters-toggle-btn" aria-label="More filters" (click)="onMoreFilters()">
       <span class="material-symbols-outlined">filter_alt</span>
-      More Filters
+      <span class="filters-toggle-label">More Filters</span>
     </button>
   </div>
 
@@ -137,8 +133,53 @@
         } @else if (errorMessage) {
           <div class="state state-error">{{ errorMessage }}</div>
         } @else {
-          <div class="table-scroll">
-            <table>
+          <div class="activities-mobile-list">
+            @for (activity of activities; track activity.id) {
+              <article
+                class="activity-mobile-card"
+                [class.is-active]="selectedActivity?.id === activity.id"
+                (click)="onSelectActivity(activity)"
+              >
+                <span
+                  class="activity-mobile-card__media"
+                  [style.background-image]="activity.mainImageUrl ? 'url(' + activity.mainImageUrl + ')' : ''"
+                ></span>
+                <div class="activity-mobile-card__content">
+                  <div class="activity-mobile-card__head">
+                    <h3>{{ activity.name }}</h3>
+                    <span class="status-chip status-chip--compact" [ngClass]="getStatusClass(activity.status)">
+                      {{ activity.status || 'Draft' }}
+                    </span>
+                  </div>
+                  <p class="activity-mobile-card__location">
+                    <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
+                    {{ getActivityLocation(activity) }}
+                    @if (activity.regionName) {
+                      <span class="activity-mobile-card__location-sub">· {{ activity.regionName }}</span>
+                    }
+                  </p>
+                  <div class="activity-mobile-card__meta">
+                    <span class="activity-mobile-card__type">{{ activity.activityTypeName || 'N/A' }}</span>
+                    <span class="activity-mobile-card__duration">
+                      <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
+                      {{ formatDuration(activity.durationMinutes) }}
+                    </span>
+                  </div>
+                </div>
+                <a
+                  class="activity-mobile-card__edit"
+                  title="Edit activity"
+                  [routerLink]="['/content-creator/activities/edit', activity.id]"
+                  (click)="$event.stopPropagation()"
+                >
+                  <span class="material-symbols-outlined">edit</span>
+                </a>
+              </article>
+            }
+          </div>
+
+          <div class="table-scroll activities-table-wrap">
+            <table class="activities-table">
               <thead>
                 <tr>
                   <th>Status</th>
@@ -225,10 +266,15 @@
       </div>
     </div>
 
-    <aside class="detail-column card">
+    <aside class="detail-column card" [class.has-selection]="!!selectedActivity">
       @if (selectedActivity) {
+        <p class="detail-sheet-label">Selected activity</p>
         <div class="activity-hero">
-          <div class="hero-media" [class.has-slides]="heroImageUrls.length > 0">
+          <div
+            class="hero-media"
+            [class.has-slides]="heroImageUrls.length > 0"
+            [ngStyle]="heroMediaFallbackStyle"
+          >
             <div class="hero-media-slides" aria-hidden="true">
               @for (url of heroImageUrls; track trackByHeroImage($index, url); let i = $index) {
                 <div

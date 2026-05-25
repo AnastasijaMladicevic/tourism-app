@@ -25,7 +25,13 @@ interface EventScheduleRow {
   standalone: true,
   imports: [CommonModule, FormsModule, SharedMapComponent],
   templateUrl: './events.component.html',
-  styleUrls: ['./events.component.css']
+  styleUrls: [
+    './events.component.css',
+    '../shared/manager-list-page-header.css',
+    '../shared/manager-list-page-responsive.css',
+    '../shared/manager-cc-page-parity.css',
+    '../shared/manager-page-stats-scroll.css'
+  ]
 })
 export class ManagerEventsComponent implements OnInit {
   private readonly eventService = inject(EventService);
@@ -361,6 +367,15 @@ export class ManagerEventsComponent implements OnInit {
 
     const location = this.selectedEvent.objectName || this.selectedEvent.localityName || this.selectedEvent.destinationName;
     return location ? `${this.selectedEvent.name} · ${location}` : this.selectedEvent.name;
+  }
+
+  get eventsCountLabel(): string {
+    if (this.isLoading) {
+      return '…';
+    }
+
+    const count = this.totalCount;
+    return `${count} event${count === 1 ? '' : 's'}`;
   }
 
   get pageStart(): number {

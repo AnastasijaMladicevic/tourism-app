@@ -41,10 +41,10 @@ export class MapService {
   private activeFilters: string[] = [];
 
   private readonly filterMap: Record<string, string[]> = {
-    food: ['restaurant', 'kafana', 'bar', 'cafe', 'fast_food', 'winery', 'club'],
-    accommodation: ['hotel', 'apartment', 'motel', 'resort', 'hostel'],
+    food: ['restaurant', 'kafana', 'bar', 'cafe', 'club', 'winery'],
+    accommodation: ['hotel', 'apartment', 'resort', 'hostel', 'motel', 'villa'],
     fuel: ['gas_station'],
-    shopping: ['shop', 'mall', 'market'],
+    shopping: ['shop', 'mall', 'market', 'storefront'],
     health: ['hospital', 'clinic', 'pharmacy'],
   };
 
@@ -298,17 +298,22 @@ export class MapService {
   }
 
   setActiveFilters(filters: string[]): void {
-    this.activeFilters = [...filters];
-
-    if (this.activeMarkerKey) {
-      const activeEntry = this.markerMap.get(this.activeMarkerKey);
-      if (activeEntry && !this.matchesCurrentFilters(activeEntry.type)) {
-        this.activeMarkerKey = null;
-      }
+  this.activeFilters = [...filters];
+  
+  if (this.activeMarkerKey) {
+    const activeEntry = this.markerMap.get(this.activeMarkerKey);
+    if (activeEntry && !this.matchesCurrentFilters(activeEntry.type, activeEntry.data)) {
+      this.activeMarkerKey = null;
     }
+  }
 
+  if (this.clusteringEnabled) {
+    this.syncClusteredMarkers();
+    this.updateMarkerStyles();
+  } else {
     this.syncVisibleMarkers();
   }
+}
 
   syncVisibleMarkers(): void {
     if (!this.map) {
@@ -326,7 +331,7 @@ export class MapService {
 
     this.markerMap.forEach((entry, key) => {
       const shouldShow =
-        this.matchesCurrentFilters(entry.type) &&
+        this.matchesCurrentFilters(entry.type, entry.data) &&
         (key === this.activeMarkerKey || bounds.contains([entry.lat, entry.lng]));
       const hasLayer = this.map?.hasLayer(entry.marker) ?? false;
 
@@ -347,7 +352,7 @@ export class MapService {
       const element = entry.marker.getElement();
       if (!element) return;
 
-      const matchesFilter = this.matchesCurrentFilters(entry.type);
+      const matchesFilter = this.matchesCurrentFilters(entry.type, entry.data);
       const isSelected = key === this.activeMarkerKey;
       const isRouteStop = this.routeMarkerKeys.has(key);
       const shouldDim = (hasFilters && !matchesFilter && !isSelected) || (!!this.activeMarkerKey && !isSelected);
@@ -372,12 +377,34 @@ export class MapService {
     });
   }
 
-  private matchesCurrentFilters(type: string): boolean {
+  private matchesCurrentFilters(type: string, data?: any): boolean {
     if (!this.activeFilters.length) {
       return true;
     }
 
-    return this.activeFilters.some((filter) => this.filterMap[filter]?.includes(type));
+    const normalizedType = this.normalizeFilterValue(type);
+
+    return this.activeFilters.some((filter) => {
+      const normalizedFilter = this.normalizeFilterValue(filter);
+
+      if (normalizedFilter === normalizedType) {
+        return true;
+      }
+
+      const mappedTypes = this.filterMap[normalizedFilter] ?? [];
+
+      return mappedTypes
+        .map((mappedType) => this.normalizeFilterValue(mappedType))
+        .includes(normalizedType);
+    });
+  }
+
+  private normalizeFilterValue(value: string): string {
+    return String(value ?? '')
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
   }
 
   private toMarkerKey(type: string, id: number): string {
@@ -385,18 +412,35 @@ export class MapService {
   }
 
   private syncClusteredMarkers(): void {
-    this.clusterGroups.forEach((group, clusterKey) => {
-      const visibleMarkers = this.markers
-        .filter((entry) => entry.clusterKey === clusterKey && this.matchesCurrentFilters(entry.type))
-        .map((entry) => entry.marker);
+  if (!this.map) return;
 
-      group.clearLayers();
+  // Ukloni sve grupe sa mape
+  this.clusterGroups.forEach((group) => {
+    group.clearLayers();
+    group.remove();
+  });
 
-      if (visibleMarkers.length > 0) {
-        group.addLayers(visibleMarkers);
-      }
-    });
-  }
+  // Grupiši markere po clusterKey
+  const markersByCluster = new Map<string, L.Marker[]>();
+
+  this.markers.forEach((entry) => {
+    if (!this.matchesCurrentFilters(entry.type, entry.data)) return;
+
+    if (!markersByCluster.has(entry.clusterKey)) {
+      markersByCluster.set(entry.clusterKey, []);
+    }
+    markersByCluster.get(entry.clusterKey)!.push(entry.marker);
+  });
+
+  // Dodaj nazad na mapu samo one grupe koje imaju vidljive markere
+  this.clusterGroups.forEach((group, clusterKey) => {
+    const visibleMarkers = markersByCluster.get(clusterKey) ?? [];
+    if (visibleMarkers.length > 0) {
+      group.addLayers(visibleMarkers);
+      group.addTo(this.map!);
+    }
+  });
+}
 
   private createClusterGroup(): MarkerClusterGroup {
     return L.markerClusterGroup({

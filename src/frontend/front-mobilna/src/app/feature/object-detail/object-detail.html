@@ -227,7 +227,7 @@
         <div class="card reviews-card">
           <div class="reviews-header">
             <h2>{{ 'common.reviewsTitle' | translate }}</h2>
-            <button class="see-all-btn" (click)="openAllReviews()">See All ></button>
+            <button class="see-all-btn" (click)="openAllReviews()"> {{ 'common.seeAll' | translate }}</button>
           </div>
 
           <div class="reviews-list">
@@ -243,12 +243,30 @@
                   }
                 </div>
                 <p class="review-text">{{ review.text }}</p>
-                @if (review.images && review.images.length > 0) {
-                  <button type="button" class="review-photos-btn" (click)="openReviewImages(review)">
-                    <mat-icon>photo_library</mat-icon>
-                    {{ 'object.viewPhotos' | translate:{ count: review.images.length } }}
-                  </button>
-                }
+
+                <div class="review-actions">
+                  @if (review.images && review.images.length > 0) {
+                    <button
+                      type="button"
+                      class="review-photos-btn"
+                      (click)="openReviewImages(review)"
+                    >
+                      <mat-icon>photo_library</mat-icon>
+                      {{ 'object.viewPhotos' | translate:{ count: review.images.length } }}
+                    </button>
+                  }
+                
+                  @if (userReview?.id === review.id) {
+                    <button
+                      type="button"
+                      class="delete-review-text-btn"
+                      (click)="deleteMyReview()"
+                      [disabled]="isSubmittingReview"
+                    >
+                    {{ 'object.deleteReview' | translate }}
+                    </button>
+                  }
+                </div>
 
                 @if (review.creatorResponse) {
                   <div class="creator-response">

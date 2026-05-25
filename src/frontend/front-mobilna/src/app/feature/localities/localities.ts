@@ -2,7 +2,10 @@ import {
   ChangeDetectorRef,
   Component,
   effect,
+  ElementRef,
   OnInit,
+  OnDestroy,
+  ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -33,7 +36,7 @@ export interface LocalityView extends LocalityDto {
   templateUrl: './localities.html',
   styleUrl: './localities.scss',
 })
-export class LocalitiesComponent implements OnInit {
+export class LocalitiesComponent implements OnInit, OnDestroy {
   searchQuery = '';
   currentPage = 1;
   isLoading = true;
@@ -60,6 +63,7 @@ export class LocalitiesComponent implements OnInit {
   private loadToken = 0;
   private hasInitializedLanguageWatcher = false;
   private lastLanguage = 'sr';
+  private searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly router: Router,
@@ -90,7 +94,7 @@ export class LocalitiesComponent implements OnInit {
       void this.loadData();
     });
   }
-
+  @ViewChild('top') top!: ElementRef;
   ngOnInit(): void {
     this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
       this.isTracking = enabled;
@@ -209,6 +213,7 @@ export class LocalitiesComponent implements OnInit {
 
     this.currentPage--;
     void this.loadData();
+    this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
   nextPage(): void {
@@ -216,6 +221,7 @@ export class LocalitiesComponent implements OnInit {
 
     this.currentPage++;
     void this.loadData();
+    this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
   viewDetails(locality: LocalityView): void {
@@ -446,9 +452,9 @@ export class LocalitiesComponent implements OnInit {
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(lat1 * Math.PI / 180) *
-        Math.cos(lat2 * Math.PI / 180) *
-        Math.sin(dLng / 2) *
-        Math.sin(dLng / 2);
+      Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2);
 
     return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
@@ -512,11 +518,23 @@ export class LocalitiesComponent implements OnInit {
   }
 
   onSearchChange(): void {
-    this.currentPage = 1;
-    void this.loadData();
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+  
+    this.searchTimeout = setTimeout(() => {
+      this.currentPage = 1;
+      void this.loadData();
+    }, 400);
   }
 
   goBack(): void {
     this.router.navigate(['/home']);
+  }
+
+  ngOnDestroy(): void {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
   }
 }
