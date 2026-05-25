@@ -80,7 +80,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   regionFilter = 'all';
   sortBy: 'name' | 'region' | 'localityCount' | 'status' | 'updatedAt' = 'name';
   sortOrder: 'asc' | 'desc' = 'asc';
-  filterPanelOpen = false;
+  filterPanelOpen = true;
 
   currentPage = 1;
   pageSize = 5;

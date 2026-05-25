@@ -57,7 +57,7 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
   destinationFilter = 'all';
   sortBy = 'status';
   sortOrder: 'asc' | 'desc' = 'desc';
-  filterPanelOpen = false;
+  filterPanelOpen = true;
   statsTotalCount: number | null = null;
   statsPendingCount: number | null = null;
 

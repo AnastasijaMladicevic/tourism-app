@@ -52,7 +52,7 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
   ratingFilter = 'all';
   sortBy = 'status';
   sortOrder: 'asc' | 'desc' = 'desc';
-  filterPanelOpen = false;
+  filterPanelOpen = true;
 
   currentPage = 1;
   pageSize = 5;

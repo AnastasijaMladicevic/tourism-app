@@ -74,7 +74,7 @@ export class ManagerReportsComponent implements OnInit {
   draftSearchQuery = '';
   searchQuery = '';
   statusFilter: 'all' | ReportStatus = 'all';
-  filterPanelOpen = false;
+  filterPanelOpen = true;
 
   reportModalOpen = false;
   reportModalCreatorId: number | null = null;

@@ -60,7 +60,7 @@ export class ManagerObjectsComponent implements OnInit {
   /** Secondary column for ordering within the same status group (pending is always listed first). */
   sortBy = 'status';
   sortOrder: 'asc' | 'desc' = 'desc';
-  filterPanelOpen = false;
+  filterPanelOpen = true;
 
   currentPage = 1;
   pageSize = 5;

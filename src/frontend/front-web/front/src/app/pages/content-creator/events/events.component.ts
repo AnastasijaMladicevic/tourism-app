@@ -63,7 +63,7 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
   categoryFilter = 'all';
   sortBy = 'status';
   sortOrder: 'asc' | 'desc' = 'desc';
-  filterPanelOpen = false;
+  filterPanelOpen = true;
   rangeStartDate = '';
   rangeEndDate = '';
 

@@ -49,7 +49,7 @@ export class ManagerActivitiesComponent implements OnInit {
   typeFilter = 'all';
   sortBy = 'status';
   sortOrder: 'asc' | 'desc' = 'desc';
-  filterPanelOpen = false;
+  filterPanelOpen = true;
 
   activityTypeOptions: ActivityTypeOption[] = [];
   isLoadingTypes = true;
