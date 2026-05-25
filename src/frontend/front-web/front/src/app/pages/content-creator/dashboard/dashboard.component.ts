@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit, inject, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { TimeoutError, finalize, timeout } from 'rxjs';
+import { TimeoutError, timeout } from 'rxjs';
 import { UserDto } from '../../../models/user.model';
 import { AuthService } from '../../../services/auth.service';
 import {
@@ -104,8 +104,10 @@ export class ContentCreatorDashboardComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly dashboardService = inject(ContentCreatorDashboardService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly zone = inject(NgZone);
 
   readonly periodOptions = PERIOD_OPTIONS;
+  readonly renderVersion = signal(0);
 
   user: UserDto | null = null;
   selectedPeriod: ContentCreatorDashboardPeriod = '30d';
@@ -239,34 +241,43 @@ export class ContentCreatorDashboardComponent implements OnInit {
   }
 
   private loadOverview(): void {
-    this.isLoading = true;
-    this.loadError = '';
-    this.cdr.detectChanges();
+    this.zone.run(() => {
+      this.isLoading = true;
+      this.loadError = '';
+      this.requestRender();
+    });
 
     this.dashboardService
       .getOverview(this.selectedPeriod)
-      .pipe(
-        timeout({ first: DASHBOARD_REQUEST_TIMEOUT_MS }),
-        finalize(() => {
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        }),
-      )
+      .pipe(timeout({ first: DASHBOARD_REQUEST_TIMEOUT_MS }))
       .subscribe({
         next: (overview) => {
-          this.overview = overview;
-          this.bindOverview(overview);
-          this.cdr.detectChanges();
+          this.zone.run(() => {
+            this.overview = overview;
+            this.bindOverview(overview);
+            this.isLoading = false;
+            this.requestRender();
+          });
         },
         error: (error: unknown) => {
-          this.overview = null;
-          this.resetDerivedState();
-          this.loadError = error instanceof TimeoutError
-            ? 'Content creator dashboard data is taking too long to load. Check that the backend is running and try again.'
-            : 'Content creator dashboard data could not be loaded right now.';
-          this.cdr.detectChanges();
+          this.zone.run(() => {
+            if (!this.overview) {
+              this.resetDerivedState();
+            }
+
+            this.loadError = error instanceof TimeoutError
+              ? 'Content creator dashboard data is taking too long to load. Check that the backend is running and try again.'
+              : 'Content creator dashboard data could not be loaded right now.';
+            this.isLoading = false;
+            this.requestRender();
+          });
         },
       });
+  }
+
+  private requestRender(): void {
+    this.renderVersion.update((value) => value + 1);
+    this.cdr.detectChanges();
   }
 
   private bindOverview(overview: ContentCreatorDashboardOverviewDto): void {

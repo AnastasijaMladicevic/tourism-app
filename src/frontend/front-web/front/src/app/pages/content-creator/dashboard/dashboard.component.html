@@ -1,4 +1,4 @@
-<section class="cc-dashboard">
+<section class="cc-dashboard" [attr.data-render-version]="renderVersion()">
   <div class="page-head">
     <div>
       <p class="breadcrumbs">Main Menu <span>&gt;</span> Dashboard</p>
@@ -9,7 +9,7 @@
     </div>
 
     <div class="head-actions">
-      <span class="preview-pill">Live data</span>
+      <!-- <span class="preview-pill">Live data</span> -->
       <div class="period-filter" role="group" aria-label="Dashboard period">
         <button
           type="button"
@@ -28,9 +28,8 @@
     <span>{{ loadError }}</span>
     <button type="button" class="state-action" (click)="retryLoad()">Retry</button>
   </div>
-  <p class="state-banner loading" *ngIf="isLoading && !loadError">Loading content creator dashboard...</p>
+  <p class="state-banner loading" *ngIf="isLoading && !loadError && !overview">Loading content creator dashboard...</p>
 
-  <ng-container *ngIf="!isLoading">
   <ng-container *ngIf="overview as data">
   <div class="summary-strip card">
     <div>
@@ -329,6 +328,5 @@
       </ng-template>
     </article>
   </div>
-  </ng-container>
   </ng-container>
 </section>
