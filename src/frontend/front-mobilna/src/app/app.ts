@@ -8,6 +8,7 @@ import { LiveLocationShareService } from './services/live-location-share';
 import { LocationIntelligenceService } from './services/location-intelligence';
 import { AuthService } from './services/auth';
 import { ThemeService } from './services/theme';
+import { OfflineMapService } from './services/offline-map';
 @Component({
   selector: 'app-root',
   imports: [CommonModule, RouterOutlet, NavbarComponent, FloatingAiAssistantComponent, LiveNotificationBannerComponent],
@@ -19,6 +20,7 @@ export class App implements OnInit, OnDestroy {
   private readonly locationIntelligenceService = inject(LocationIntelligenceService);
   private readonly authService = inject(AuthService);
   private readonly themeService = inject(ThemeService);
+  private readonly offlineMapService = inject(OfflineMapService);
   protected readonly title = signal('front-mobilna');
   protected readonly bannedAccountNotice = signal('');
 
@@ -28,10 +30,12 @@ export class App implements OnInit, OnDestroy {
     void this.liveLocationShareService;
     void this.locationIntelligenceService;
     void this.themeService;
+    void this.offlineMapService;
   }
 
   ngOnInit(): void {
     this.syncBanNotice();
+    void this.offlineMapService.syncRegistration();
     window.addEventListener('auth-user-changed', this.syncBanNoticeHandler);
     window.addEventListener('banned-user-action-blocked', this.syncBanNoticeHandler);
   }

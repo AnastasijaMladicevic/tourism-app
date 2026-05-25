@@ -357,10 +357,17 @@
     "pushUnavailable": "Push notifications are not configured correctly right now.",
     "pushLoadError": "Push notification settings could not be loaded right now.",
     "pushSaveError": "Push notification settings could not be saved right now.",
+    "mapSection": "Map",
+    "offlineMapsTitle": "Offline maps",
+    "offlineMapsBody": "Save map areas you already opened together with their pins so they remain available without internet.",
+    "offlineMapsHint": "For best results, first open the map online, move around and zoom, then that same area will remain available offline. Turn this off if you do not want extra cache and a slower first load.",
+    "offlineMapsUnsupported": "Offline maps work only when the browser supports service workers and caching in a secure context.",
+    "offlineMapsError": "Offline map settings could not be saved right now.",
     "menu": {
       "editProfile": "Edit profile",
       "language": "Language",
       "region": "Region",
+      "map": "Map",
       "support": "Help & Support",
       "privacy": "Privacy & Data",
       "terms": "Terms of Use",
@@ -964,7 +971,11 @@
     "viewPhotos": "View photos ({{count}})",
     "ownerReply": "Owner reply",
     "editReview": "Edit review",
-    "workingHoursNotAvailable": "Working hours are not available"
+    "workingHoursNotAvailable": "Working hours are not available",
+    "deleteReview": "Delete",
+    "deleteReviewConfirm": "Are you sure you want to delete this review?",
+    "deleteReviewSuccess": "Review deleted successfully.",
+    "deleteReviewError": "Review was not deleted."
   },
   "restaurant": {
     "title": "Restaurant",

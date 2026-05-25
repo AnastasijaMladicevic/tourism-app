@@ -5,6 +5,7 @@ import {
   ElementRef,
   HostListener,
   OnInit,
+  OnDestroy,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -37,7 +38,7 @@ export interface DestinationView extends DestinationDto {
   styleUrls: ['./destinations.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class DestinationsComponent implements OnInit {
+export class DestinationsComponent implements OnInit, OnDestroy {
   searchQuery = '';
   activeFilter = 'All';
   sortOption: 'az' | 'za' | 'distance' = 'az';
@@ -61,6 +62,7 @@ export class DestinationsComponent implements OnInit {
   private readonly imageCache = new Map<number, DestinationDto['images']>();
   private hasInitializedLanguageWatcher = false;
   private lastLanguage = 'sr';
+  private searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private router: Router,
@@ -246,8 +248,14 @@ export class DestinationsComponent implements OnInit {
   }
 
   onSearchChange(): void {
-    this.currentPage = 1;
-    void this.refreshVisibleDestinations();
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+  
+    this.searchTimeout = setTimeout(() => {
+      this.currentPage = 1;
+      void this.refreshVisibleDestinations();
+    }, 250);
   }
 
   prevPage(): void {
@@ -583,5 +591,11 @@ export class DestinationsComponent implements OnInit {
     });
 
     return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  ngOnDestroy(): void {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
   }
 }

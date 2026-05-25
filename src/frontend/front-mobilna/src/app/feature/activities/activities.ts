@@ -5,6 +5,7 @@ import {
   ElementRef,
   HostListener,
   OnInit,
+  OnDestroy,
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -36,7 +37,7 @@ export interface ActivityView extends ActivityDto {
   templateUrl: './activities.html',
   styleUrl: './activities.scss',
 })
-export class ActivitiesComponent implements OnInit {
+export class ActivitiesComponent implements OnInit, OnDestroy {
   searchQuery = '';
   currentPage = 1;
   isLoading = true;
@@ -64,6 +65,7 @@ export class ActivitiesComponent implements OnInit {
   private loadToken = 0;
   private hasInitializedLanguageWatcher = false;
   private lastLanguage = 'sr';
+  private searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly router: Router,
@@ -572,11 +574,23 @@ export class ActivitiesComponent implements OnInit {
   }
 
   onSearchChange(): void {
-    this.currentPage = 1;
-    void this.loadData();
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+  
+    this.searchTimeout = setTimeout(() => {
+      this.currentPage = 1;
+      void this.loadData();
+    }, 400);
   }
 
   goBack(): void {
     this.router.navigate(['/home']);
+  }
+  
+  ngOnDestroy(): void {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
   }
 }

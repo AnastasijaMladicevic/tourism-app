@@ -5,6 +5,7 @@ import {
   ElementRef,
   HostListener,
   OnInit,
+  OnDestroy,
   ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
@@ -37,7 +38,7 @@ import { TranslationService } from '../../services/translation.service';
   styleUrls: ['./objects.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class ObjectsComponent implements OnInit {
+export class ObjectsComponent implements OnInit, OnDestroy {
   searchQuery = '';
   activeFilter = 'All';
   minRatingFilter = 0;
@@ -70,6 +71,7 @@ export class ObjectsComponent implements OnInit {
   private loadToken = 0;
   private hasInitializedLanguageWatcher = false;
   private lastLanguage = 'sr';
+  private searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly router: Router,
@@ -388,8 +390,14 @@ export class ObjectsComponent implements OnInit {
   }
 
   onSearchChange(): void {
-    this.currentPage = 1;
-    void this.loadData();
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
+  
+    this.searchTimeout = setTimeout(() => {
+      this.currentPage = 1;
+      void this.loadData();
+    }, 400);
   }
 
   prevPage(): void {
@@ -569,5 +577,11 @@ export class ObjectsComponent implements OnInit {
     }
 
     return undefined;
+  }
+
+  ngOnDestroy(): void {
+    if (this.searchTimeout) {
+      clearTimeout(this.searchTimeout);
+    }
   }
 }

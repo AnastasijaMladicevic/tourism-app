@@ -55,10 +55,10 @@ export class SettingsComponent implements OnInit, OnDestroy {
       accent: 'teal'
     },
     {
-      icon: 'verified_user',
-      titleKey: 'settings.menu.twoFactor',
-      route: '/two-factor-settings',
-      accent: 'indigo'
+      icon: 'map',
+      titleKey: 'settings.menu.map',
+      route: '/offline-map-settings',
+      accent: 'blue'
     },
     {
       icon: 'support_agent',
@@ -67,22 +67,28 @@ export class SettingsComponent implements OnInit, OnDestroy {
       accent: 'blue'
     },
     {
+      icon: 'verified_user',
+      titleKey: 'settings.menu.twoFactor',
+      route: '/two-factor-settings',
+      accent: 'indigo'
+    },
+    {
       icon: 'privacy_tip',
       titleKey: 'settings.menu.privacy',
       route: '/privacy-data',
       accent: 'indigo'
     },
     {
-      icon: 'gavel',
-      titleKey: 'settings.menu.terms',
-      route: '/terms',
-      accent: 'orange'
-    },
-    {
       icon: 'info',
       titleKey: 'settings.menu.about',
       route: '/about',
       accent: 'teal'
+    },
+    {
+      icon: 'gavel',
+      titleKey: 'settings.menu.terms',
+      route: '/terms',
+      accent: 'orange'
     },
     {
       icon: 'dark_mode',
@@ -100,8 +106,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
       return true;
     });
   }
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
@@ -117,5 +122,4 @@ export class SettingsComponent implements OnInit, OnDestroy {
       return;
     }
   }
-
 }

@@ -142,46 +142,57 @@ namespace TuristickiVodic.Services.Services
                 })
                 .ToListAsync();
 
-            var favoriteRows = await _context.Favorites
+            var objectFavoriteRows = await _context.Favorites
                 .AsNoTracking()
                 .Where(x => x.CreatedAt >= periodStartUtc)
-                .Where(x =>
-                    (x.ObjectId != null && x.Object != null && x.Object.CreatedByUserId == creatorId) ||
-                    (x.ActivityId != null && x.Activity != null && x.Activity.CreatedByUserId == creatorId))
+                .Where(x => x.ObjectId != null && x.Object != null && x.Object.CreatedByUserId == creatorId)
                 .Select(x => new CreatorFavoriteRow
                 {
                     Day = x.CreatedAt.Date,
-                    ContentType = x.ObjectId != null ? "Object" : "Activity",
-                    ContentId = x.ObjectId ?? x.ActivityId!.Value,
-                    ContentName = x.ObjectId != null ? x.Object!.Name : x.Activity!.Name,
-                    Status = x.ObjectId != null ? x.Object!.Status : x.Activity!.Status,
-                    DestinationId = x.ObjectId != null
-                        ? (int?)x.Object!.DestinationId
-                        : (x.Activity!.DestinationId ??
-                           (x.Activity.Locality != null ? (int?)x.Activity.Locality.DestinationId :
-                           (x.Activity.Object != null ? (int?)x.Activity.Object.DestinationId : null))),
-                    DestinationName = x.ObjectId != null
-                        ? x.Object!.Destination.Name
-                        : (x.Activity!.Destination != null ? x.Activity.Destination.Name :
-                           (x.Activity.Locality != null ? x.Activity.Locality.Destination.Name :
-                           (x.Activity.Object != null ? x.Activity.Object.Destination.Name : null))),
-                    RegionId = x.ObjectId != null
-                        ? (int?)x.Object!.Destination.RegionId
-                        : (x.Activity!.Destination != null ? (int?)x.Activity.Destination.RegionId :
-                           (x.Activity.Locality != null ? (int?)x.Activity.Locality.Destination.RegionId :
-                           (x.Activity.Object != null ? (int?)x.Activity.Object.Destination.RegionId : null))),
-                    RegionName = x.ObjectId != null
-                        ? x.Object!.Destination.Region.Name
-                        : (x.Activity!.Destination != null ? x.Activity.Destination.Region.Name :
-                           (x.Activity.Locality != null ? x.Activity.Locality.Destination.Region.Name :
-                           (x.Activity.Object != null ? x.Activity.Object.Destination.Region.Name : null))),
-                    RegionCode = x.ObjectId != null
-                        ? x.Object!.Destination.Region.Code
-                        : (x.Activity!.Destination != null ? x.Activity.Destination.Region.Code :
-                           (x.Activity.Locality != null ? x.Activity.Locality.Destination.Region.Code :
-                           (x.Activity.Object != null ? x.Activity.Object.Destination.Region.Code : null)))
+                    ContentType = "Object",
+                    ContentId = x.ObjectId!.Value,
+                    ContentName = x.Object!.Name,
+                    Status = x.Object.Status,
+                    DestinationId = x.Object.DestinationId,
+                    DestinationName = x.Object.Destination.Name,
+                    RegionId = x.Object.Destination.RegionId,
+                    RegionName = x.Object.Destination.Region.Name,
+                    RegionCode = x.Object.Destination.Region.Code
                 })
                 .ToListAsync();
+
+            var activityFavoriteRows = await _context.Favorites
+                .AsNoTracking()
+                .Where(x => x.CreatedAt >= periodStartUtc)
+                .Where(x => x.ActivityId != null && x.Activity != null && x.Activity.CreatedByUserId == creatorId)
+                .Select(x => new CreatorFavoriteRow
+                {
+                    Day = x.CreatedAt.Date,
+                    ContentType = "Activity",
+                    ContentId = x.ActivityId!.Value,
+                    ContentName = x.Activity!.Name,
+                    Status = x.Activity.Status,
+                    DestinationId = x.Activity.DestinationId ??
+                        (x.Activity.Locality != null ? (int?)x.Activity.Locality.DestinationId :
+                        (x.Activity.Object != null ? (int?)x.Activity.Object.DestinationId : null)),
+                    DestinationName = x.Activity.Destination != null ? x.Activity.Destination.Name :
+                        (x.Activity.Locality != null ? x.Activity.Locality.Destination.Name :
+                        (x.Activity.Object != null ? x.Activity.Object.Destination.Name : null)),
+                    RegionId = x.Activity.Destination != null ? (int?)x.Activity.Destination.RegionId :
+                        (x.Activity.Locality != null ? (int?)x.Activity.Locality.Destination.RegionId :
+                        (x.Activity.Object != null ? (int?)x.Activity.Object.Destination.RegionId : null)),
+                    RegionName = x.Activity.Destination != null ? x.Activity.Destination.Region.Name :
+                        (x.Activity.Locality != null ? x.Activity.Locality.Destination.Region.Name :
+                        (x.Activity.Object != null ? x.Activity.Object.Destination.Region.Name : null)),
+                    RegionCode = x.Activity.Destination != null ? x.Activity.Destination.Region.Code :
+                        (x.Activity.Locality != null ? x.Activity.Locality.Destination.Region.Code :
+                        (x.Activity.Object != null ? x.Activity.Object.Destination.Region.Code : null))
+                })
+                .ToListAsync();
+
+            var favoriteRows = objectFavoriteRows
+                .Concat(activityFavoriteRows)
+                .ToList();
 
             var plannerRows = await _context.EventPlannerItems
                 .AsNoTracking()

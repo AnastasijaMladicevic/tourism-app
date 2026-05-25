@@ -357,10 +357,17 @@
     "pushUnavailable": "Push obavestenja trenutno nisu ispravno podesena.",
     "pushLoadError": "Podesavanja push obavestenja trenutno ne mogu da se ucitaju.",
     "pushSaveError": "Podesavanja push obavestenja trenutno ne mogu da se sacuvaju.",
+    "mapSection": "Mapa",
+    "offlineMapsTitle": "Offline mape",
+    "offlineMapsBody": "Sačuvaj već otvorene oblasti mape i njihove pinove da ostanu dostupni i bez interneta.",
+    "offlineMapsHint": "Za najbolji rezultat prvo otvori mapu online, pomeraj je i zumiraj, pa će ta ista oblast biti dostupna offline. Isključi ovu opciju ako ne želiš dodatni cache i sporije prvo učitavanje.",
+    "offlineMapsUnsupported": "Offline mape rade samo kada browser podržava service worker i keširanje na bezbednom kontekstu.",
+    "offlineMapsError": "Podešavanje offline mapa trenutno nije moglo da se sačuva.",
     "menu": {
       "editProfile": "Izmeni profil",
       "language": "Jezik",
       "region": "Region",
+      "map": "Mapa",
       "support": "Pomoć i podrška",
       "privacy": "Privatnost i podaci",
       "terms": "Uslovi korišćenja",
@@ -964,7 +971,11 @@
     "viewPhotos": "Vidi slike ({{count}})",
     "ownerReply": "Odgovor vlasnika",
     "editReview": "Izmeni recenziju",
-    "workingHoursNotAvailable": "Radno vreme nije navedeno"
+    "workingHoursNotAvailable": "Radno vreme nije navedeno",
+    "deleteReview": "Obriši",
+    "deleteReviewConfirm": "Da li ste sigurni da želite da obrišete recenziju?",
+    "deleteReviewSuccess": "Recenzija je uspešno obrisana.",
+    "deleteReviewError": "Recenzija nije obrisana."
   },
   "restaurant": {
     "title": "Restoran",
