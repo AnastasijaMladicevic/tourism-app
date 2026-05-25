@@ -355,6 +355,12 @@
     "pushUnavailable": "Le notifiche push non sono configurate correttamente in questo momento.",
     "pushLoadError": "Impossibile caricare le impostazioni delle notifiche push in questo momento.",
     "pushSaveError": "Impossibile salvare le impostazioni delle notifiche push in questo momento.",
+    "mapSection": "Mappa",
+    "offlineMapsTitle": "Mappe offline",
+    "offlineMapsBody": "Salva le aree della mappa che hai gia aperto insieme ai relativi pin, cosi restano disponibili anche senza internet.",
+    "offlineMapsHint": "Per risultati migliori, apri prima la mappa online, spostati e fai zoom, poi quella stessa area restera disponibile offline. Disattiva questa opzione se non vuoi cache aggiuntiva e un primo caricamento piu lento.",
+    "offlineMapsUnsupported": "Le mappe offline funzionano solo quando il browser supporta service worker e cache in un contesto sicuro.",
+    "offlineMapsError": "Non e stato possibile salvare ora le impostazioni delle mappe offline.",
     "menu": {
       "editProfile": "Modifica profilo",
       "language": "Lingua",

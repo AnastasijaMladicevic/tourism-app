@@ -11,6 +11,50 @@
       <div class="topbar-spacer"></div>
     </header>
 
+    <section class="preference-section">
+      <div class="section-heading">
+        <span>{{ 'settings.mapSection' | translate }}</span>
+      </div>
+
+      <div class="preference-card">
+        <div class="preference-row">
+          <div class="preference-copy">
+            <span class="preference-title">{{ 'settings.offlineMapsTitle' | translate }}</span>
+            <p>{{ 'settings.offlineMapsBody' | translate }}</p>
+          </div>
+
+          <label class="switch" [class.switch--checked]="offlineMapsEnabled">
+            <input
+              type="checkbox"
+              [checked]="offlineMapsEnabled"
+              [disabled]="!offlineMapsSupported || offlineMapsBusy"
+              (change)="toggleOfflineMaps($any($event.target).checked)"
+            />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        @if (!offlineMapsSupported) {
+          <div class="preference-divider"></div>
+          <div class="preference-row preference-row--nested">
+            <div class="preference-copy">
+              <p>{{ 'settings.offlineMapsUnsupported' | translate }}</p>
+            </div>
+          </div>
+        } @else {
+          <div class="preference-divider"></div>
+          <div class="preference-row preference-row--nested">
+            <div class="preference-copy">
+              <p>{{ 'settings.offlineMapsHint' | translate }}</p>
+              @if (offlineMapsError) {
+                <p class="preference-error">{{ offlineMapsError | translate }}</p>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
     <section class="menu-section">
       <div class="section-heading">
         <span>{{ 'settings.generalSection' | translate }}</span>

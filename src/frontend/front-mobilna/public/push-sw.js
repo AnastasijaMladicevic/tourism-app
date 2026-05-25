@@ -1,5 +1,5 @@
-const APP_SHELL_CACHE = 'spirego-app-shell-v2';
-const STATIC_ASSET_CACHE = 'spirego-static-v2';
+const APP_SHELL_CACHE = 'spirego-app-shell-v3';
+const STATIC_ASSET_CACHE = 'spirego-static-v3';
 const MAP_TILE_CACHE = 'spirego-map-tiles-v1';
 const MAP_DATA_CACHE = 'spirego-map-data-v1';
 const TILE_HOST_SUFFIX = '.tile.openstreetmap.org';
@@ -23,7 +23,7 @@ self.addEventListener('install', (event) => {
     const shellCache = await caches.open(APP_SHELL_CACHE);
     const staticCache = await caches.open(STATIC_ASSET_CACHE);
 
-    await Promise.all(APP_SHELL_ROUTES.map((route) => precacheShellRoute(shellCache, staticCache, route)));
+    await Promise.all(APP_SHELL_ROUTES.map((route) => precacheShellRoute(shellCache, route)));
     await Promise.all(KNOWN_APP_ASSETS.map((asset) => precacheStaticAsset(staticCache, asset)));
   })());
 });
@@ -169,13 +169,11 @@ function isSameOriginStaticAssetRequest(request, url) {
 
 async function networkFirstNavigation(request) {
   const cache = await caches.open(APP_SHELL_CACHE);
-  const staticCache = await caches.open(STATIC_ASSET_CACHE);
 
   try {
     const response = await fetch(request);
     if (response && response.ok) {
       await cache.put(request, response.clone());
-      await cacheDiscoveredAssetsFromHtml(response.clone(), staticCache);
       return response;
     }
   } catch {
@@ -291,14 +289,13 @@ async function trimCache(cache, maxEntries) {
   await Promise.all(keys.slice(0, overflow).map((key) => cache.delete(key)));
 }
 
-async function precacheShellRoute(shellCache, staticCache, route) {
+async function precacheShellRoute(shellCache, route) {
   try {
     const request = new Request(route, { cache: 'reload' });
     const response = await fetch(request);
     if (response && response.ok) {
       await shellCache.put(route, response.clone());
       await shellCache.put(request, response.clone());
-      await cacheDiscoveredAssetsFromHtml(response.clone(), staticCache);
     }
   } catch {
     // Ignore install-time failures; runtime will warm the cache online.
@@ -316,38 +313,4 @@ async function precacheStaticAsset(cache, assetPath) {
   } catch {
     // Ignore install-time failures for optional dev assets.
   }
-}
-
-async function cacheDiscoveredAssetsFromHtml(response, cache) {
-  const contentType = response.headers.get('content-type') || '';
-  if (!contentType.includes('text/html')) {
-    return;
-  }
-
-  let html = '';
-  try {
-    html = await response.text();
-  } catch {
-    return;
-  }
-
-  const assetUrls = new Set(KNOWN_APP_ASSETS);
-  const attrRegex = /(?:src|href)=["']([^"']+)["']/gi;
-  let match;
-
-  while ((match = attrRegex.exec(html)) !== null) {
-    const rawValue = match[1];
-    if (!rawValue || rawValue.startsWith('http://') || rawValue.startsWith('https://')) {
-      continue;
-    }
-
-    if (rawValue.startsWith('data:') || rawValue.startsWith('blob:')) {
-      continue;
-    }
-
-    const normalized = rawValue.startsWith('/') ? rawValue : `/${rawValue}`;
-    assetUrls.add(normalized);
-  }
-
-  await Promise.all([...assetUrls].map((asset) => precacheStaticAsset(cache, asset)));
 }

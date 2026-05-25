@@ -7,6 +7,7 @@ import { RouterHistoryService } from '../../services/router-history';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { OfflineMapService } from '../../services/offline-map';
 
 @Component({
   selector: 'app-settings',
@@ -16,11 +17,16 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 })
 export class SettingsComponent implements OnInit, OnDestroy {
   private readonly subscriptions = new Subscription();
+  offlineMapsEnabled = false;
+  offlineMapsSupported = false;
+  offlineMapsBusy = false;
+  offlineMapsError = '';
 
   constructor(
     private router: Router,
     private authService: AuthService,
     private routerHistoryService: RouterHistoryService,
+    private offlineMapService: OfflineMapService,
   ) { }
 
   generalItems = [
@@ -101,6 +107,8 @@ export class SettingsComponent implements OnInit, OnDestroy {
     });
   }
   ngOnInit(): void {
+    this.offlineMapsSupported = this.offlineMapService.isSupported();
+    this.offlineMapsEnabled = this.offlineMapService.isEnabled();
   }
 
   ngOnDestroy(): void {
@@ -115,6 +123,25 @@ export class SettingsComponent implements OnInit, OnDestroy {
     if (item.route) {
       this.router.navigate([item.route]);
       return;
+    }
+  }
+
+  async toggleOfflineMaps(enabled: boolean): Promise<void> {
+    if (!this.offlineMapsSupported || this.offlineMapsBusy) {
+      return;
+    }
+
+    this.offlineMapsError = '';
+    this.offlineMapsBusy = true;
+
+    try {
+      await this.offlineMapService.setEnabled(enabled);
+      this.offlineMapsEnabled = enabled;
+    } catch {
+      this.offlineMapsEnabled = this.offlineMapService.isEnabled();
+      this.offlineMapsError = 'settings.offlineMapsError';
+    } finally {
+      this.offlineMapsBusy = false;
     }
   }
 

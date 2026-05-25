@@ -113,6 +113,13 @@
   min-width: 0;
   flex: 1;
 
+  .preference-title {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--emperor);
+  }
+
   p {
     margin: 6px 0 0;
     font-size: 13px;
@@ -444,6 +451,11 @@
 
 .switch--checked .slider::before {
   transform: translateX(20px);
+}
+
+.preference-error {
+  color: #dc5757 !important;
+  font-weight: 700;
 }
 
 @media (min-width: 768px) {
