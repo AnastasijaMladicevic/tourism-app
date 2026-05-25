@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -10,8 +10,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { AppLanguage, TranslationService } from '../../services/translation.service';
-import { HeaderComponent } from '../header/header.component';
-import { LogoComponent } from '../header/logo.component';
+import { LogoComponent } from '../../shared/components/logo/logo';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { GoogleIdentityService } from '../../services/google-identity';
 import { environment } from '../../../environment/environment';
@@ -24,7 +23,7 @@ interface SignupLanguageOption {
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, HeaderComponent, LogoComponent, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, LogoComponent, TranslatePipe],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss',
 })
@@ -32,7 +31,7 @@ export class SignupComponent {
   @ViewChild('googleButtonContainer') private googleButtonContainer?: ElementRef<HTMLElement>;
 
   private readonly phonePattern = /^\+?[0-9][0-9\s/-]{5,19}$/;
-
+  showLanguageMenu = false;
   isLoading = false;
   errorMessage = '';
   hidePassword = true;
@@ -121,7 +120,25 @@ export class SignupComponent {
   languageLabel(option: SignupLanguageOption): string {
     return this.translationService.translate(option.labelKey);
   }
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    this.showLanguageMenu = false;
+  }
+  toggleLanguageMenu(event: Event): void {
+    event.stopPropagation();
+    this.showLanguageMenu = !this.showLanguageMenu;
+  }
 
+  selectLanguage(code: AppLanguage): void {
+    this.form.patchValue({ language: code });
+    this.showLanguageMenu = false;
+    this.cdr.detectChanges();
+  }
+
+  getSelectedLanguageLabel(): string {
+    const selected = this.languageOptions.find(opt => opt.code === this.form.value.language);
+    return selected ? this.languageLabel(selected) : 'Srpski';
+  }
   submit(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -245,7 +262,9 @@ export class SignupComponent {
       },
     });
   }
-
+  goBack() {
+    this.router.navigate(['/login']);
+  }
   get firstName() {
     return this.form.get('firstName');
   }

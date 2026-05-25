@@ -3,6 +3,7 @@ import {
   Component,
   effect,
   ElementRef,
+  HostListener,
   OnInit,
   OnDestroy,
   ViewChild,
@@ -50,6 +51,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
   visibleLocalities: LocalityView[] = [];
   localityTypes: { id: number; name: string }[] = [];
   showSortMenu = false;
+  showPageSizeMenu = false;
   images: ImageDto[] = [];
   locality: LocalityDto | null = null;
   pageSizeOptions = [8, 12, 16, 24, 32];
@@ -143,13 +145,30 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
   get totalPages(): number {
     return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
   }
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
 
+    if (!target.closest('.sort-anchor')) {
+      this.showSortMenu = false;
+      this.showPageSizeMenu = false;
+    }
+  }
   onPageSizeChange(size: number): void {
     this.pageSize = size;
     this.currentPage = 1;
     void this.loadData();
+    this.cdr.detectChanges();
   }
+  togglePageSizeMenu(event: Event): void {
+    event.stopPropagation();
 
+    if (this.showSortMenu) {
+      this.showSortMenu = false;
+    }
+
+    this.showPageSizeMenu = !this.showPageSizeMenu;
+  }
   isFavoritePending(localityId: number): boolean {
     return this.favoritePendingIds.has(localityId);
   }

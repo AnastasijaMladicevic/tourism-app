@@ -43,6 +43,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   activeFilter = 'All';
   sortOption: 'az' | 'za' | 'distance' = 'az';
   showSortMenu = false;
+  showPageSizeMenu = false;
   isLoading = true;
   errorMessage = '';
   currentPage = 1;
@@ -229,6 +230,16 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     this.pageSize = Number(size);
     this.currentPage = 1;
     void this.refreshVisibleDestinations();
+    this.cdr.detectChanges();
+  }
+  togglePageSizeMenu(event: Event): void {
+    event.stopPropagation();
+
+    if (this.showSortMenu) {
+      this.showSortMenu = false;
+    }
+
+    this.showPageSizeMenu = !this.showPageSizeMenu;
   }
   setFilter(filter: string): void {
     this.activeFilter = filter;
@@ -265,8 +276,11 @@ export class DestinationsComponent implements OnInit, OnDestroy {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
-    if (!(event.target as HTMLElement).closest('.sort-anchor')) {
+    const target = event.target as HTMLElement;
+
+    if (!target.closest('.sort-anchor')) {
       this.showSortMenu = false;
+      this.showPageSizeMenu = false;
     }
   }
   private tokenize(text: string): string[] {

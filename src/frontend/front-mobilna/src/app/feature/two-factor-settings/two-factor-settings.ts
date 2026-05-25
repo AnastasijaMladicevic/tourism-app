@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { Subscription, timeout } from 'rxjs';
 
@@ -7,12 +7,13 @@ import { AuthService, TwoFactorSettingsDto } from '../../services/auth';
 import { RouterHistoryService } from '../../services/router-history';
 import { TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-two-factor-settings',
   templateUrl: './two-factor-settings.html',
   styleUrls: ['./two-factor-settings.scss'],
-  imports: [CommonModule, MatIconModule, TranslatePipe],
+  imports: [CommonModule, MatIconModule, TranslatePipe, FormsModule],
 })
 export class TwoFactorSettingsComponent implements OnInit, OnDestroy {
   private readonly subscriptions = new Subscription();
@@ -28,7 +29,8 @@ export class TwoFactorSettingsComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private routerHistoryService: RouterHistoryService,
     private translationService: TranslationService,
-  ) {}
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     this.hydrateFromCurrentUser();
@@ -43,28 +45,30 @@ export class TwoFactorSettingsComponent implements OnInit, OnDestroy {
     this.routerHistoryService.goBack();
   }
 
-  setTwoFactorEnabled(isEnabled: boolean): void {
-    if (this.isLoading || this.isSaving || this.isEnabled === isEnabled) {
+  setTwoFactorEnabled(newValue: boolean): void {
+    if (this.isLoading || this.isSaving || this.isEnabled === newValue) {
       return;
     }
 
-    const previous = this.isEnabled;
-    this.isEnabled = isEnabled;
+    const previousValue = this.isEnabled;
+    this.isEnabled = newValue;
     this.isSaving = true;
     this.errorMessage = '';
 
     this.subscriptions.add(
-      this.authService.updateMyTwoFactorSettings(isEnabled).subscribe({
+      this.authService.updateMyTwoFactorSettings(newValue).subscribe({
         next: (settings) => {
           this.applySettings(settings);
           this.isSaving = false;
+          this.cdr.detectChanges();
         },
-        error: () => {
-          this.isEnabled = previous;
+        error: (err) => {
+          console.error(err);
+          this.isEnabled = previousValue;
           this.isSaving = false;
           this.errorMessage = this.translationService.translate('settings.twoFactorSaveError');
         },
-      }),
+      })
     );
   }
 

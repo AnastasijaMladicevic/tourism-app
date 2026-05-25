@@ -3,6 +3,7 @@ import {
   Component,
   effect,
   ElementRef,
+  HostListener,
   OnInit,
   OnDestroy,
   ViewChild,
@@ -50,6 +51,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
   visibleActivities: ActivityView[] = [];
   activityTypes: { id: number; name: string }[] = [];
   showSortMenu = false;
+  showPageSizeMenu = false;
   images: ImageDto[] = [];
   activity: ActivityDto | null = null;
   pageSizeOptions = [8, 12, 16, 24, 32];
@@ -202,13 +204,30 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
 
     return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
   }
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
 
+    if (!target.closest('.sort-anchor')) {
+      this.showSortMenu = false;
+      this.showPageSizeMenu = false;
+    }
+  }
   onPageSizeChange(size: number): void {
     this.pageSize = size;
     this.currentPage = 1;
     void this.loadData();
+    this.cdr.detectChanges();
   }
+  togglePageSizeMenu(event: Event): void {
+    event.stopPropagation();
 
+    if (this.showSortMenu) {
+      this.showSortMenu = false;
+    }
+
+    this.showPageSizeMenu = !this.showPageSizeMenu;
+  }
   isFavoritePending(activityId: number): boolean {
     return this.favoritePendingIds.has(activityId);
   }

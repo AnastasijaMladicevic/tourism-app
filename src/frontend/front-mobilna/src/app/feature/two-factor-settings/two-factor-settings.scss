@@ -140,6 +140,7 @@
   height: 28px;
   display: inline-block;
   flex: 0 0 auto;
+  cursor: pointer;
 }
 
 .switch input {
@@ -169,8 +170,13 @@
   transition: 0.25s;
 }
 
-.switch input:checked + .slider {
+.switch input:checked+.slider {
   background: var(--primary);
+}
+
+.switch input:disabled+.slider {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 .switch--checked .slider {
@@ -182,7 +188,7 @@
   transform: translateX(0);
 }
 
-.switch input:checked + .slider::before {
+.switch input:checked+.slider::before {
   transform: translateX(20px);
 }
 
