@@ -971,35 +971,49 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
         }
       });
   }
+
   protected deleteMyReview(): void {
     if (!this.userReview) return;
-
-    const confirmed = window.confirm('Da li sigurno želiš da obrišeš svoju recenziju?');
-    if (!confirmed) return;
-
-    this.isSubmittingReview = true;
-
-    this.reviewService.delete(this.userReview.id).subscribe({
-      next: () => {
-        this.reviews = this.reviews.filter(r => r.id !== this.userReview!.id);
-
-        this.closeWriteReview();
-        this.userReview = null;
-        this.newReview = {
-          rating: 0,
-          text: '',
-          images: [] as File[]
-        };
-
-        this.isSubmittingReview = false;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error(err);
-        alert('Greška pri brisanju recenzije');
-        this.isSubmittingReview = false;
-        this.cdr.detectChanges();
-      }
+  
+    const reviewId = this.userReview.id;
+  
+    this.openConfirm(this.translationService.translate('object.deleteReviewConfirm'), () => {
+      this.isSubmittingReview = true;
+  
+      this.reviewService.delete(reviewId)
+        .pipe(
+          finalize(() => {
+            this.isSubmittingReview = false;
+            this.cdr.detectChanges();
+          })
+        )
+        .subscribe({
+          next: () => {
+            this.reviews = this.reviews.filter(r => r.id !== reviewId);
+            this.userReview = null;
+            this.existingReviewImages = [];
+            this.selectedReviewImages = [];
+            this.reviewImagePreviews = [];
+  
+            if (this.object) {
+              this.object.reviewCount = Math.max((this.object.reviewCount || 1) - 1, 0);
+  
+              if (this.reviews.length > 0) {
+                const sum = this.reviews.reduce((acc, r) => acc + (r.rating || 0), 0);
+                this.object.averageRating = Number((sum / this.reviews.length).toFixed(1));
+              } else {
+                this.object.averageRating = 0;
+              }
+            }
+  
+            this.closeWriteReview();
+            this.openSuccess(this.translationService.translate('object.deleteReviewSuccess'));
+          },
+          error: (err) => {
+            console.error('Failed to delete review', err);
+            this.openSuccess(this.translationService.translate('object.deleteReviewError'));
+          }
+        });
     });
   }
 }

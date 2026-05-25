@@ -971,7 +971,11 @@
     "viewPhotos": "Vidi slike ({{count}})",
     "ownerReply": "Odgovor vlasnika",
     "editReview": "Izmeni recenziju",
-    "workingHoursNotAvailable": "Radno vreme nije navedeno"
+    "workingHoursNotAvailable": "Radno vreme nije navedeno",
+    "deleteReview": "Obriši",
+    "deleteReviewConfirm": "Da li ste sigurni da želite da obrišete recenziju?",
+    "deleteReviewSuccess": "Recenzija je uspešno obrisana.",
+    "deleteReviewError": "Recenzija nije obrisana."
   },
   "restaurant": {
     "title": "Restoran",

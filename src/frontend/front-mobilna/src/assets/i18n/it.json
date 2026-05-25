@@ -967,7 +967,11 @@
     "viewPhotos": "Vedi foto ({{count}})",
     "ownerReply": "Risposta del proprietario",
     "editReview": "Modifica recensione",
-    "workingHoursNotAvailable": "Orari non disponibili"
+    "workingHoursNotAvailable": "Orari non disponibili",
+    "deleteReview": "Elimina",
+    "deleteReviewConfirm": "Sei sicuro di voler eliminare questa recensione?",
+    "deleteReviewSuccess": "Recensione eliminata con successo.",
+    "deleteReviewError": "La recensione non è stata eliminata."
   },
   "restaurant": {
     "title": "Ristorante",
