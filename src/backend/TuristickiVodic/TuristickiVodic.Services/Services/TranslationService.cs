@@ -2,7 +2,6 @@ using TuristickiVodic.Core.Helpers;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
 
@@ -10,7 +9,6 @@ namespace TuristickiVodic.Services.Services
 {
     public class TranslationService : ITranslationService
     {
-        private const string TranslationUniqueConstraint = "IX_Translations_EntityType_EntityId_FieldName_LanguageCode";
         private readonly AppDbContext _context;
         private readonly IExternalTranslationProvider _translationProvider;
 
@@ -89,27 +87,17 @@ namespace TuristickiVodic.Services.Services
                     UpdatedAt = DateTime.UtcNow
                 };
 
-                _context.Translations.Add(newTranslation);
+                await InsertIfMissingAsync(newTranslation);
 
-                try
-                {
-                    await _context.SaveChangesAsync();
-                    return translated;
-                }
-                catch (DbUpdateException ex) when (IsDuplicateTranslationViolation(ex))
-                {
-                    DetachEntity(newTranslation);
+                var persistedTranslation = await _context.Translations
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(t =>
+                        t.EntityType == entityType &&
+                        t.EntityId == entityId &&
+                        t.FieldName == fieldName &&
+                        t.LanguageCode == normalizedLanguage);
 
-                    var existingTranslation = await _context.Translations
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(t =>
-                            t.EntityType == entityType &&
-                            t.EntityId == entityId &&
-                            t.FieldName == fieldName &&
-                            t.LanguageCode == normalizedLanguage);
-
-                    return existingTranslation?.TranslatedText ?? translated;
-                }
+                return persistedTranslation?.TranslatedText ?? translated;
             }
             catch
             {
@@ -160,34 +148,19 @@ namespace TuristickiVodic.Services.Services
                     UpdatedAt = DateTime.UtcNow
                 };
 
-                _context.Translations.Add(newTranslation);
-
-                try
-                {
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateException ex) when (IsDuplicateTranslationViolation(ex))
-                {
-                    DetachEntity(newTranslation);
-                }
+                await InsertIfMissingAsync(newTranslation);
             }
         }
 
-        private void DetachEntity(Translation translation)
+        private async Task InsertIfMissingAsync(Translation translation)
         {
-            var entry = _context.Entry(translation);
-            if (entry != null)
-                entry.State = EntityState.Detached;
-        }
-
-        private static bool IsDuplicateTranslationViolation(DbUpdateException exception)
-        {
-            return exception.InnerException is PostgresException postgresException &&
-                   postgresException.SqlState == PostgresErrorCodes.UniqueViolation &&
-                   string.Equals(
-                       postgresException.ConstraintName,
-                       TranslationUniqueConstraint,
-                       StringComparison.Ordinal);
+            await _context.Database.ExecuteSqlInterpolatedAsync($@"
+                INSERT INTO ""Translations""
+                    (""CreatedAt"", ""EntityId"", ""EntityType"", ""FieldName"", ""IsAutoTranslated"", ""LanguageCode"", ""OriginalTextHash"", ""ReviewedByUserId"", ""TranslatedText"", ""UpdatedAt"")
+                VALUES
+                    ({translation.CreatedAt}, {translation.EntityId}, {translation.EntityType}, {translation.FieldName}, {translation.IsAutoTranslated}, {translation.LanguageCode}, {translation.OriginalTextHash}, {translation.ReviewedByUserId}, {translation.TranslatedText}, {translation.UpdatedAt})
+                ON CONFLICT (""EntityType"", ""EntityId"", ""FieldName"", ""LanguageCode"") DO NOTHING;
+            ");
         }
 
         private static string HashText(string text)
