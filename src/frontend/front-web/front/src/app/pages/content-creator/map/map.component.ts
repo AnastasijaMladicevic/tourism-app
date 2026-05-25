@@ -60,6 +60,7 @@ interface RoutePoint {
   encapsulation: ViewEncapsulation.None
 })
 export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDestroy {
+  private static readonly TARGET_DETAIL_ZOOM = 15;
   private static readonly CREATOR_CONTENT_FOCUS_ZOOM = 14;
 
   searchQuery = '';
@@ -89,6 +90,16 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
   private routingControl: any = null;
 
   private allItems: SearchResult[] = [];
+  private readonly markerClickHandler = (event: Event) => {
+    const customEvent = event as CustomEvent<{ data: any; type: string }>;
+
+    this.ngZone.run(() => {
+      this.selectedItem = customEvent.detail.data;
+      this.selectedType = customEvent.detail.type;
+      this.focusSelectedMarker();
+      this.cdr.detectChanges();
+    });
+  };
 
   constructor(
     private mapService: MapService,
@@ -104,13 +115,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
   ) {}
 
   ngOnInit(): void {
-    window.addEventListener('map-marker-clicked', (event: any) => {
-      this.ngZone.run(() => {
-        this.selectedItem = event.detail.data;
-        this.selectedType = event.detail.type;
-        this.cdr.detectChanges();
-      });
-    });
+    window.addEventListener('map-marker-clicked', this.markerClickHandler as EventListener);
   }
 
   ngAfterViewInit(): void {
@@ -132,6 +137,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
   }
 
   ngOnDestroy(): void {
+    window.removeEventListener('map-marker-clicked', this.markerClickHandler as EventListener);
     this.stopTracking();
     this.mapService.destroyMap();
   }
@@ -765,6 +771,41 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
 
   zoomOut(): void {
     (this.mapService as any)['map']?.zoomOut();
+  }
+
+  private focusSelectedMarker(): void {
+    if (!this.selectedItem) {
+      return;
+    }
+
+    const latitude = Number(this.selectedItem.latitude);
+    const longitude = Number(this.selectedItem.longitude);
+    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+      return;
+    }
+
+    const map = this.mapService.getMap();
+    if (!map) {
+      return;
+    }
+
+    const targetLatLng = L.latLng(latitude, longitude);
+    const currentZoom = map.getZoom();
+    const targetZoom = ContentCreatorMapComponent.TARGET_DETAIL_ZOOM;
+    const currentCenter = map.getCenter();
+    const distanceToTarget = currentCenter.distanceTo(targetLatLng);
+    const isAlreadyFocused = currentZoom >= targetZoom && distanceToTarget < 6;
+
+    if (isAlreadyFocused) {
+      return;
+    }
+
+    if (currentZoom < targetZoom) {
+      map.flyTo(targetLatLng, targetZoom, { duration: 0.75 });
+      return;
+    }
+
+    map.panTo(targetLatLng, { animate: true, duration: 0.45 });
   }
 
   private getRoutePointFromItem(item: any, type: string): RoutePoint | null {
