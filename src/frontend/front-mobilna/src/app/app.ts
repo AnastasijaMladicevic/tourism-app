@@ -32,6 +32,7 @@ export class App implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.syncBanNotice();
+    this.registerMapOfflineWorker();
     window.addEventListener('auth-user-changed', this.syncBanNoticeHandler);
     window.addEventListener('banned-user-action-blocked', this.syncBanNoticeHandler);
   }
@@ -75,5 +76,26 @@ export class App implements OnInit, OnDestroy {
     const hours = String(date.getUTCHours()).padStart(2, '0');
     const minutes = String(date.getUTCMinutes()).padStart(2, '0');
     return `${day}.${month}.${year}. ${hours}:${minutes} UTC`;
+  }
+
+  private registerMapOfflineWorker(): void {
+    if (typeof window === 'undefined' || !('serviceWorker' in navigator)) {
+      return;
+    }
+
+    const host = window.location.hostname;
+    const canRegister =
+      window.isSecureContext ||
+      host === 'localhost' ||
+      host === '127.0.0.1' ||
+      host === '::1';
+
+    if (!canRegister) {
+      return;
+    }
+
+    navigator.serviceWorker
+      .register('/push-sw.js', { scope: '/' })
+      .catch((error) => console.warn('Offline map worker registration failed.', error));
   }
 }
