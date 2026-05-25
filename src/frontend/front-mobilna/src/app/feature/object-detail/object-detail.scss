@@ -2034,8 +2034,6 @@ textarea {
 
 .delete-review-btn:hover {
   background: rgba(231, 76, 60, 0.1);
-<<<<<<< HEAD
-=======
 }
 
 .delete-review-text-btn {
@@ -2049,6 +2047,7 @@ textarea {
   font-size: 14px;
   cursor: pointer;
   padding: 0;
+  transform: none !important;
 }
 
 .delete-review-text-btn:hover {
@@ -2062,22 +2061,6 @@ textarea {
   align-items: center;
   justify-content: space-between;
   margin-top: 10px;
-}
-
-.delete-review-text-btn {
-  background: transparent;
-  border: none;
-  color: #ef4444;
-  font-weight: 600;
-  font-size: 14px;
-  cursor: pointer;
-  padding: 0;
-  transform: none !important;
-}
-
-.delete-review-text-btn:hover {
-  color: #dc2626;
-  text-decoration: underline;
 }
 
 .rating-summary {
@@ -2097,5 +2080,4 @@ textarea {
 
 .bar {
   background: var(--border);
->>>>>>> origin/dev
 }
