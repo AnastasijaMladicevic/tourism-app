@@ -82,12 +82,12 @@
   }
 }
 
-/* Four KPI cards (admin dashboard). */
-@container admin-stats-host-4 (max-width: 919px) {
+/* Five KPI cards (admin dashboard). */
+@container admin-stats-host-4 (max-width: 1099px) {
   .admin-dashboard .kpi-row {
     display: flex;
     flex-wrap: nowrap;
-    gap: 10px;
+    gap: 8px;
     width: 100%;
     max-width: 100%;
     margin-inline: 0;
@@ -111,16 +111,16 @@
   }
 
   .admin-dashboard .kpi-row .kpi-card {
-    flex: 0 0 min(240px, 42%);
+    flex: 0 0 min(208px, 34%);
     scroll-snap-align: start;
     min-width: 0;
   }
 }
 
-@container admin-stats-host-4 (min-width: 920px) {
+@container admin-stats-host-4 (min-width: 1100px) {
   .admin-dashboard .kpi-row {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     overflow-x: visible;
     overflow-y: visible;
     scroll-snap-type: none;
