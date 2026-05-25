@@ -282,6 +282,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'offline-map-settings',
+    loadComponent: () =>
+      import('./feature/offline-map-settings/offline-map-settings').then(
+        (m) => m.OfflineMapSettingsComponent,
+      ),
+  },
+  {
     path: 'profile',
     canActivate: [profileAuthGuard],
     loadComponent: () =>
