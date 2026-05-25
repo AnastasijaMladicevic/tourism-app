@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { TimeoutError, finalize, timeout } from 'rxjs';
 import { UserDto } from '../../../models/user.model';
@@ -103,6 +103,7 @@ const DASHBOARD_REQUEST_TIMEOUT_MS = 15000;
 export class ContentCreatorDashboardComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly dashboardService = inject(ContentCreatorDashboardService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   readonly periodOptions = PERIOD_OPTIONS;
 
@@ -240,6 +241,7 @@ export class ContentCreatorDashboardComponent implements OnInit {
   private loadOverview(): void {
     this.isLoading = true;
     this.loadError = '';
+    this.cdr.detectChanges();
 
     this.dashboardService
       .getOverview(this.selectedPeriod)
@@ -247,12 +249,14 @@ export class ContentCreatorDashboardComponent implements OnInit {
         timeout({ first: DASHBOARD_REQUEST_TIMEOUT_MS }),
         finalize(() => {
           this.isLoading = false;
+          this.cdr.detectChanges();
         }),
       )
       .subscribe({
         next: (overview) => {
           this.overview = overview;
           this.bindOverview(overview);
+          this.cdr.detectChanges();
         },
         error: (error: unknown) => {
           this.overview = null;
@@ -260,6 +264,7 @@ export class ContentCreatorDashboardComponent implements OnInit {
           this.loadError = error instanceof TimeoutError
             ? 'Content creator dashboard data is taking too long to load. Check that the backend is running and try again.'
             : 'Content creator dashboard data could not be loaded right now.';
+          this.cdr.detectChanges();
         },
       });
   }
