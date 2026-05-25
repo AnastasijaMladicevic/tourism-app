@@ -58,7 +58,7 @@
 
             <button class="btn btn-danger profile-reset-btn" type="button" (click)="resetPassword()">
               <mat-icon fontSet="material-icons-outlined">key</mat-icon>
-              <span>Reset Password</span>
+              <span>Change Password</span>
             </button>
           </div>
         </div>
@@ -74,7 +74,7 @@
           <div class="form-card-header__actions">
             <div class="save-feedback save-feedback--inline" [class.visible]="saveSuccess">
               <mat-icon fontSet="material-icons-outlined">check_circle</mat-icon>
-              <span>Profile updated</span>
+              <span>Changes saved</span>
             </div>
 
             <button class="profile-action-btn profile-action-btn--secondary" type="button" (click)="cancel()">
@@ -257,6 +257,194 @@
       <div class="crop-modal__footer">
         <button class="crop-confirm-button" type="button" (click)="confirmCrop()">Set photo</button>
         <button class="crop-cancel-button" type="button" (click)="cancelCrop()">Cancel</button>
+      </div>
+    </div>
+  </div>
+}
+@if (passwordModalState !== 'closed') {
+  <div
+    class="password-modal-backdrop"
+    [class.password-modal-backdrop--closing]="passwordModalState === 'closing'"
+    (click)="closePasswordModal()"
+  >
+    <div
+      class="password-modal"
+      [class.password-modal--closing]="passwordModalState === 'closing'"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="password-modal__header">
+        <div class="password-modal__heading-copy">
+          <span class="password-modal__eyebrow">Security</span>
+          <h3>
+            {{ passwordChangeStep === 'credentials' ? 'Change Password' : 'Verify Code' }}
+          </h3>
+          <p>
+            {{
+              passwordChangeStep === 'credentials'
+                ? 'Stay on this page and complete the password change in a secure modal.'
+                : 'Enter the verification code to confirm the change.'
+            }}
+          </p>
+        </div>
+
+        <button class="password-modal__close" type="button" (click)="closePasswordModal()" aria-label="Close">
+          <mat-icon fontSet="material-icons-outlined">close</mat-icon>
+        </button>
+      </div>
+
+      <div class="password-modal__body">
+        @if (passwordChangeStep === 'credentials') {
+          <div class="password-modal__grid">
+            <div class="modal-field">
+              <label class="modal-label" for="current-password">Current Password</label>
+              <div class="modal-input-wrap">
+                <input
+                  id="current-password"
+                  name="currentPassword"
+                  [(ngModel)]="currentPassword"
+                  [type]="hideCurrentPassword ? 'password' : 'text'"
+                  autocomplete="current-password"
+                />
+                <button
+                  class="modal-toggle"
+                  type="button"
+                  (click)="hideCurrentPassword = !hideCurrentPassword"
+                  [attr.aria-label]="hideCurrentPassword ? 'Show current password' : 'Hide current password'"
+                >
+                  <mat-icon fontSet="material-icons-outlined">
+                    {{ hideCurrentPassword ? 'visibility' : 'visibility_off' }}
+                  </mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="modal-field">
+              <label class="modal-label" for="new-password">New Password</label>
+              <div class="modal-input-wrap">
+                <input
+                  id="new-password"
+                  name="newPassword"
+                  [(ngModel)]="newPassword"
+                  [type]="hideNewPassword ? 'password' : 'text'"
+                  autocomplete="new-password"
+                />
+                <button
+                  class="modal-toggle"
+                  type="button"
+                  (click)="hideNewPassword = !hideNewPassword"
+                  [attr.aria-label]="hideNewPassword ? 'Show new password' : 'Hide new password'"
+                >
+                  <mat-icon fontSet="material-icons-outlined">
+                    {{ hideNewPassword ? 'visibility' : 'visibility_off' }}
+                  </mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="modal-field modal-field--full">
+              <label class="modal-label" for="confirm-new-password">Confirm New Password</label>
+              <div class="modal-input-wrap">
+                <input
+                  id="confirm-new-password"
+                  name="confirmNewPassword"
+                  [(ngModel)]="confirmNewPassword"
+                  [type]="hideConfirmNewPassword ? 'password' : 'text'"
+                  autocomplete="new-password"
+                />
+                <button
+                  class="modal-toggle"
+                  type="button"
+                  (click)="hideConfirmNewPassword = !hideConfirmNewPassword"
+                  [attr.aria-label]="hideConfirmNewPassword ? 'Show confirm password' : 'Hide confirm password'"
+                >
+                  <mat-icon fontSet="material-icons-outlined">
+                    {{ hideConfirmNewPassword ? 'visibility' : 'visibility_off' }}
+                  </mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="password-rules">
+            <div class="password-rule">At least 8 characters</div>
+            <div class="password-rule">Include one uppercase letter</div>
+            <div class="password-rule">Include one number or symbol</div>
+          </div>
+        } @else {
+          <div class="otp-panel">
+            <div class="otp-panel__icon">
+              <mat-icon fontSet="material-icons-outlined">verified</mat-icon>
+            </div>
+
+            <div class="otp-panel__copy">
+              <h4>Enter verification code</h4>
+              <p>
+                Use the demo code shown below. It expires in
+                <strong>{{ otpSecondsRemaining }}s</strong>.
+              </p>
+              <div class="otp-panel__code">Demo code: <strong>{{ otpDemoCode }}</strong></div>
+            </div>
+          </div>
+
+          <div class="modal-field modal-field--otp">
+            <label class="modal-label" for="otp-code">Verification Code</label>
+            <input
+              id="otp-code"
+              name="otpCode"
+              [(ngModel)]="otpCode"
+              class="otp-input"
+              type="text"
+              inputmode="numeric"
+              maxlength="6"
+              placeholder="000000"
+              autocomplete="one-time-code"
+            />
+            <div class="otp-meta">
+              <span>Resend available in {{ otpResendSecondsRemaining }}s</span>
+              <button class="otp-resend" type="button" [disabled]="otpResendSecondsRemaining > 0 || passwordLoading" (click)="resendOtpCode()">
+                Resend code
+              </button>
+            </div>
+          </div>
+        }
+
+        @if (passwordError) {
+          <p class="modal-message modal-message--error">{{ passwordError }}</p>
+        }
+
+        @if (passwordInfo) {
+          <p class="modal-message modal-message--info">{{ passwordInfo }}</p>
+        }
+      </div>
+
+      <div class="password-modal__footer">
+        @if (passwordChangeStep === 'otp') {
+          <button class="modal-secondary-btn" type="button" (click)="backToPasswordStep()" [disabled]="passwordLoading">
+            Back
+          </button>
+        } @else {
+          <button class="modal-secondary-btn" type="button" (click)="closePasswordModal()" [disabled]="passwordLoading">
+            Cancel
+          </button>
+        }
+
+        <button
+          class="modal-primary-btn"
+          type="button"
+          [disabled]="passwordLoading || (passwordChangeStep === 'otp' && otpSecondsRemaining === 0)"
+          (click)="passwordChangeStep === 'credentials' ? submitPasswordStep() : submitOtpStep()"
+        >
+          @if (passwordLoading) {
+            <span class="spinner" aria-hidden="true"></span>
+          }
+          <span>
+            {{
+              passwordChangeStep === 'credentials'
+                ? 'Continue'
+                : (passwordLoading ? 'Verifying...' : 'Verify & Change')
+            }}
+          </span>
+        </button>
       </div>
     </div>
   </div>
