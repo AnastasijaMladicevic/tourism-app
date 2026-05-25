@@ -3,9 +3,7 @@
 
 .settings-page {
   min-height: 100dvh;
-  background:
-    radial-gradient(circle at top center, var(--page-glow), transparent 30%),
-    linear-gradient(180deg, var(--page-gradient-start) 0%, var(--page-gradient-mid) 62%, var(--page-gradient-end) 100%);
+  background: var(--bg);
 }
 
 .settings-shell {
@@ -65,10 +63,10 @@
 }
 
 .preference-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--surface-strong);
+  border: 1px solid rgba(208, 234, 240, 0.9);
   border-radius: 18px;
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 14px 34px rgba(23, 110, 134, 0.07);
   backdrop-filter: blur(10px);
 }
 
@@ -114,7 +112,7 @@
 
 .preference-divider {
   height: 1px;
-  background: var(--border);
+  background: rgba(208, 234, 240, 0.72);
 }
 
 .mode-block {
@@ -128,9 +126,9 @@
 }
 
 .delivery-toggle__option {
-  border: 1px solid var(--border);
+  border: 1px solid rgba(208, 234, 240, 0.85);
   border-radius: 16px;
-  background: var(--surface-soft);
+  background: var(--surface);
   padding: 14px 12px;
   display: flex;
   flex-direction: column;
@@ -165,7 +163,7 @@
     font-weight: 800;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--text-gray);
+    color: rgba(42, 70, 84, 0.7);
     margin-bottom: 8px;
   }
 }
@@ -282,5 +280,61 @@
 @media (max-width: 520px) {
   .delivery-toggle {
     grid-template-columns: 1fr;
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+  .settings-page {
+    background:
+      radial-gradient(circle at top center, rgba(77, 194, 255, 0.08), transparent 30%),
+      var(--bg);
+  }
+
+  .topbar h1,
+  .menu-title {
+    color: var(--text-dark);
+  }
+
+  .section-heading span,
+  .notification-group h3 {
+    color: rgba(226, 239, 245, 0.62);
+  }
+
+  .preference-card {
+    background: var(--surface-strong);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .preference-copy p {
+    color: var(--text-gray);
+  }
+
+  .preference-divider {
+    background: var(--border);
+  }
+
+  .delivery-toggle__option {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text-dark);
+  }
+
+  .delivery-toggle__option span {
+    color: var(--text-gray);
+  }
+
+  .delivery-toggle__option--active {
+    border-color: rgba(31, 148, 191, 0.42);
+    box-shadow: none;
+  }
+
+  .slider {
+    background: var(--surface-soft);
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+
+  .slider::before {
+    background: var(--text-dark);
   }
 }

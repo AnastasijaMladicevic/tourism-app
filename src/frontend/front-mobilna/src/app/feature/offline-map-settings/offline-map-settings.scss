@@ -1,8 +1,6 @@
 .settings-page {
   min-height: 100dvh;
-  background:
-    radial-gradient(circle at top center, var(--page-glow), transparent 30%),
-    linear-gradient(180deg, var(--page-gradient-start) 0%, var(--page-gradient-mid) 62%, var(--page-gradient-end) 100%);
+  background: var(--bg);
 }
 
 .settings-shell {
@@ -45,10 +43,10 @@
 }
 
 .preference-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--surface-strong);
+  border: 1px solid rgba(208, 234, 240, 0.9);
   border-radius: 18px;
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 14px 34px rgba(23, 110, 134, 0.07);
   backdrop-filter: blur(10px);
 }
 
@@ -91,7 +89,7 @@
 
 .preference-divider {
   height: 1px;
-  background: var(--border);
+  background: rgba(208, 234, 240, 0.72);
 }
 
 .menu-title {
@@ -176,5 +174,42 @@
   .preference-row,
   .preference-note {
     padding: 18px 20px;
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+  .settings-page {
+    background:
+      radial-gradient(circle at top center, rgba(77, 194, 255, 0.08), transparent 30%),
+      var(--bg);
+  }
+
+  .topbar h1,
+  .menu-title {
+    color: var(--text-dark);
+  }
+
+  .preference-card {
+    background: var(--surface-strong);
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  .preference-copy p,
+  .preference-note p {
+    color: var(--text-gray);
+  }
+
+  .preference-divider {
+    background: var(--border);
+  }
+
+  .slider {
+    background: var(--surface-soft);
+    box-shadow: inset 0 0 0 1px var(--border);
+  }
+
+  .slider::before {
+    background: var(--text-dark);
   }
 }

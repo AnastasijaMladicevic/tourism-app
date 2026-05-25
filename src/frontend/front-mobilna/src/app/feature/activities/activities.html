@@ -18,18 +18,33 @@
           (ngModelChange)="onSearchChange()"
         />
       </div>
-      <div class="list-controls">
-      <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
-          @for (size of pageSizeOptions; track $index) {
-            <option [value]="size">
-              {{ size }}
-            </option>
-          }
-        </select>
+      <!-- Page Size -->
+      <div class="page-size-anchor">
+        <div
+          class="sort-trigger"
+          (click)="togglePageSizeMenu($event)"
+        >
+          <span>{{ pageSize }}</span>
+          <mat-icon>expand_more</mat-icon>
+        </div>
+
+        @if (showPageSizeMenu) {
+          <div class="page-size-menu">
+            @for (size of pageSizeOptions; track size) {
+              <button
+                class="page-size-menu__item"
+                [class.page-size-menu__item--active]="pageSize === size"
+                (click)="onPageSizeChange(size)"
+              >
+                {{ size }}
+              </button>
+            }
+          </div>
+        }
       </div>
       <div
         class="sort-anchor sort-trigger"
-        (click)="$event.stopPropagation(); showSortMenu = !showSortMenu"
+        (click)="$event.stopPropagation(); showSortMenu = !showSortMenu; showPageSizeMenu = false"
       >
       <span>
         @if (sortOption === 'distance') {

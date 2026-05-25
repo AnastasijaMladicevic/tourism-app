@@ -216,32 +216,57 @@ body.route-navigation-active app-floating-ai-assistant {
   gap: 6px;
   padding: 6px 14px;
   border-radius: 20px;
-  border: none;
+  border: 1px solid var(--border);
   background: var(--surface-strong);
   color: var(--text-dark);
-  border: 1px solid var(--border);
   font-family: 'DM Sans', sans-serif;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: background 0.2s, color 0.2s;
   white-space: nowrap;
 
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+
   &:hover {
-    border: 1px solid rgba(77, 194, 255, 0.32);
+    background: #e9f6ff;
+    border-color: #4dc2ff;
+    color: #1184c7;
+    //box-shadow: 0 6px 18px rgba(0, 0, 0, 0.14);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: scale(0.97);
   }
 }
 
-.chip--active {
+.dark .chip,
+.dark-theme .chip {
+  &:hover {
+    background: #183748;
+    border-color: #4dc2ff;
+    color: #7fd7ff;
+  }
+}
+
+/*.chip--active {
   background: var(--primary);
   color: var(--white);
+  border-color: transparent;
 
   &:hover {
     background: var(--primary-dark);
     color: var(--white);
+    box-shadow: 0 8px 22px rgba(21, 124, 176, 0.3);
   }
-}
+}*/
 
 .route-planner {
   position: absolute;
@@ -1890,21 +1915,50 @@ body.route-navigation-active app-floating-ai-assistant {
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  border: none;
+  border: 1px solid var(--border);
   background: var(--surface-strong);
   color: var(--text-dark);
-  border: 1px solid var(--border);
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   cursor: pointer;
+
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
-  transition: background 0.2s, color 0.2s;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
 
   mat-icon {
     font-size: 20px;
     width: 20px;
     height: 20px;
+  }
+
+  &:hover {
+    background: #e9f6ff;
+    border-color: #4dc2ff;
+    color: #1184c7;
+    //box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+}
+
+.dark .control-btn,
+.dark-theme .control-btn {
+  &:hover {
+    background: #183748;
+    border-color: #4dc2ff;
+    color: #7fd7ff;
   }
 }
 

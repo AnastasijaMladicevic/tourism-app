@@ -1,8 +1,19 @@
 <div class="page">
-  <app-header [backLink]="null" />
 
   <div class="content">
-    <app-logo />
+    <div class="auth-topbar">
+      <!-- Back arrow -->
+      <div class="back" (click)="goBack()">
+        <span class="material-icons">arrow_back_ios</span>
+      </div>
+
+      <!-- Logo -->
+      <div class="logo">
+        <app-logo size="lg"></app-logo>
+      </div>
+
+      <span class="auth-topbar__spacer" aria-hidden="true"></span>
+    </div>
 
     <div class="title-section">
       <h1>{{ 'signup.title' | translate }}</h1>
@@ -198,11 +209,27 @@
               />
             </svg>
           </span>
-          <select formControlName="language">
-            @for (option of languageOptions; track option.code) {
-              <option [value]="option.code">{{ languageLabel(option) }}</option>
+          <!-- Language Custom Dropdown -->
+          <div class="language-dropdown">
+            <div 
+              class="sort-trigger language-trigger"
+              (click)="toggleLanguageMenu($event)">
+              <span>{{ getSelectedLanguageLabel() }}</span>
+            </div>
+
+            @if (showLanguageMenu) {
+              <div class="language-menu">
+                @for (option of languageOptions; track option.code) {
+                  <button
+                    class="language-menu__item"
+                    [class.language-menu__item--active]="form.value.language === option.code"
+                    (click)="selectLanguage(option.code)">
+                    {{ languageLabel(option) }}
+                  </button>
+                }
+              </div>
             }
-          </select>
+          </div>
         </div>
       </div>
 

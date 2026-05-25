@@ -32,9 +32,9 @@
             <label class="switch" [class.switch--checked]="isEnabled">
               <input
                 type="checkbox"
-                [checked]="isEnabled"
-                [disabled]="isSaving"
-                (change)="setTwoFactorEnabled($any($event.target).checked)"
+                [ngModel]="isEnabled"
+                (ngModelChange)="setTwoFactorEnabled($event)"
+                [disabled]="isSaving || isLoading"
               />
               <span class="slider"></span>
             </label>

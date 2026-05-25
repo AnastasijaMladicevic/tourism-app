@@ -51,29 +51,12 @@ export class LocalityDetailComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.route.paramMap.subscribe(params => {
+      const id = Number(params.get('id'));
 
-    forkJoin({
-      locality: this.localityService.getById(id),
-      images: this.imageService.getForLocality?.(id),
-      qr: this.qrLinkService.getForEntity('localities', id).pipe(catchError(() => of(null)))
-    }).subscribe({
-      next: ({ locality, images, qr }) => {
-        const normalizedLocality = this.normalizeLocality(locality)
-        this.locality = locality;
-        this.qrLink = qr;
-        this.images = images || [];
-        this.mainImage = this.getMainImage();
-        this.syncFavoriteState();
-        this.isLoading = false;
-        this.loadNearbyLocalities(normalizedLocality);
-        this.cdr.detectChanges();
-      },
-      error: () => {
-        this.errorMessage = 'Failed to load destination';
-        this.isLoading = false;
-        this.cdr.detectChanges();
-      }
+      if (!id) return;
+
+      this.loadLocality(id);
     });
     window.addEventListener('focus', this.handleWindowFocus);
     window.addEventListener('favorite-object', (event: any) => {
@@ -86,6 +69,35 @@ export class LocalityDetailComponent implements OnInit {
   }
   ngOnDestroy(): void {
     window.removeEventListener('focus', this.handleWindowFocus);
+  }
+  private loadLocality(id: number): void {
+    this.isLoading = true;
+
+    forkJoin({
+      locality: this.localityService.getById(id),
+      images: this.imageService.getForLocality?.(id),
+      qr: this.qrLinkService.getForEntity('localities', id).pipe(catchError(() => of(null)))
+    }).subscribe({
+      next: ({ locality, images, qr }) => {
+        const normalized = this.normalizeLocality(locality);
+
+        this.locality = locality;
+        this.qrLink = qr;
+        this.images = images || [];
+        this.mainImage = this.getMainImage();
+
+        this.syncFavoriteState();
+        this.loadNearbyLocalities(normalized);
+
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.errorMessage = 'Failed to load destination';
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
   private loadNearbyLocalities(currentLocality: LocalityDto): void {
     if (currentLocality.latitude == null || currentLocality.longitude == null) {
@@ -173,7 +185,7 @@ export class LocalityDetailComponent implements OnInit {
     return [];
   }
   openNearbyLocality(LocalityId: number): void {
-    this.router.navigate(['/Locality', LocalityId]);
+    this.router.navigate(['/locality', LocalityId]);
   }
   getNearbyLocalityImage(Locality: LocalityDto): string | undefined {
     return this.resolveMediaUrl(Locality.mainImageUrl);

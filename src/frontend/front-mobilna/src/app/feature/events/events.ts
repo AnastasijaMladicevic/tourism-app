@@ -63,6 +63,7 @@ export class EventsComponent implements OnInit {
   isLoading = true;
   showSearch = false;
   showSortMenu = false;
+  showPageSizeMenu = false
   searchQuery = '';
   sortOption: 'date' | 'az' | 'za' | 'distance' | 'price' = 'date';
   events: EventCard[] = [];
@@ -150,9 +151,13 @@ export class EventsComponent implements OnInit {
   }
 
   @HostListener('document:click', ['$event'])
-  onDocumentClick(e: Event): void {
-    const target = e.target as HTMLElement;
-    if (!target.closest('.sort-anchor')) this.showSortMenu = false;
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+
+    if (!target.closest('.sort-anchor')) {
+      this.showSortMenu = false;
+      this.showPageSizeMenu = false;
+    }
   }
 
   get categories(): { key: EventCategory; label: string; icon: string }[] {
@@ -204,6 +209,16 @@ export class EventsComponent implements OnInit {
     this.pageSize = size;
     this.currentPage = 1;
     void this.refreshVisibleEvents();
+    this.cdr.detectChanges();
+  }
+  togglePageSizeMenu(event: Event): void {
+    event.stopPropagation();
+
+    if (this.showSortMenu) {
+      this.showSortMenu = false;
+    }
+
+    this.showPageSizeMenu = !this.showPageSizeMenu;
   }
   setCategory(category: EventCategory): void {
     this.activeCategory = category;
