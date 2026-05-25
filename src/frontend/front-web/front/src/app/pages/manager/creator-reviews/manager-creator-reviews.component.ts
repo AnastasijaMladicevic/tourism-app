@@ -22,8 +22,6 @@ import {
 import {
   Subject,
   catchError,
-  debounceTime,
-  distinctUntilChanged,
   finalize,
   forkJoin,
   map,
@@ -93,7 +91,6 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
-  private readonly searchInput$ = new Subject<string>();
   private readonly creatorNameById = new Map<number, string>();
   private readonly pendingReportCreatorIds = new Set<number>();
   private readonly creatorObjectCounts = new Map<number, number>();
@@ -125,15 +122,6 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     }
 
     this.loadManagedDestinationLabel();
-
-    this.searchInput$
-      .pipe(
-        map((value) => value.trim()),
-        debounceTime(300),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$),
-      )
-      .subscribe(() => this.onFilterChange());
 
     this.loadReviews();
   }
@@ -339,7 +327,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
 
   onSearchChange(value: string): void {
     this.searchTerm = value;
-    this.searchInput$.next(value);
+    this.onFilterChange();
   }
 
   resetFilters(): void {

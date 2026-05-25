@@ -29,7 +29,7 @@
         type="text"
         class="toolbar-input"
         [(ngModel)]="draftSearchQuery"
-        (keydown.enter)="onSearchEnter($event)"
+        (keyup)="onSearchEnter($event)"
         placeholder="Search destinations, regions, or country..."
       />
     </div>

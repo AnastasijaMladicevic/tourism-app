@@ -18,7 +18,7 @@
         type="text"
         class="toolbar-input"
         [(ngModel)]="draftSearchQuery"
-        (keydown.enter)="onSearchEnter($event)"
+        (keyup)="onSearchEnter($event)"
         placeholder="Search by name, category or region..."
       />
     </div>

@@ -262,12 +262,15 @@ export class ManagerActivitiesComponent implements OnInit {
   }
 
   onSearch(): void {
-    // Search is applied explicitly on Enter or via the filter panel's Apply button.
+    // Search is applied on every keyup.
+    this.searchQuery = this.draftSearchQuery.trim();
+    this.currentPage = 1;
+    this.loadActivities();
   }
 
   onSearchEnter(event: Event): void {
     event.preventDefault();
-    this.onApplyFilters();
+    this.onSearch();
   }
 
   onMoreFilters(): void {

@@ -13,7 +13,7 @@
       <input
         type="text"
         [(ngModel)]="draftSearchQuery"
-        (keydown.enter)="onSearchEnter($event)"
+        (keyup)="onSearchEnter($event)"
         placeholder="Search by name, category or region..."
       />
     </label>

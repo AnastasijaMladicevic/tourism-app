@@ -19,8 +19,7 @@
         type="text"
         class="toolbar-input"
         [(ngModel)]="draftSearchQuery"
-        (ngModelChange)="onSearch()"
-        (keydown.enter)="onSearchEnter($event)"
+        (keyup)="onSearch()"
         placeholder="Search events, venues, or organizers..."
       />
     </div>

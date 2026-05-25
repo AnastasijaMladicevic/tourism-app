@@ -438,34 +438,35 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       this.managerSuggestionsLoading = false;
       return;
     }
+
     this.managerSuggestionsOpen = true;
-    this.managerSearchInput$.next(normalized);
+    this.managerSuggestionsLoading = true;
+    this.adminUsersService
+      .searchManagers(normalized)
+      .pipe(finalize(() => (this.managerSuggestionsLoading = false)))
+      .subscribe({
+        next: (page) => {
+          const skipId = this.selectedManager?.id;
+          this.managerSuggestions = page.items.filter((u) => u.id !== skipId);
+          this.managerSuggestionsOpen = true;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.managerSuggestions = [];
+          this.managerSuggestionsOpen = true;
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   onManagerSearchFocus(): void {
     const q = this.managerSearch.trim();
     if (!q) {
-      this.managerSuggestionsLoading = true;
-      this.adminUsersService
-        .searchManagers('', 10)
-        .pipe(finalize(() => (this.managerSuggestionsLoading = false)))
-        .subscribe({
-          next: (page) => {
-            const skipId = this.selectedManager?.id;
-            this.managerSuggestions = page.items.filter((u) => u.id !== skipId);
-            this.managerSuggestionsOpen = true;
-            this.cdr.detectChanges();
-          },
-          error: () => {
-            this.managerSuggestions = [];
-            this.managerSuggestionsOpen = true;
-            this.cdr.detectChanges();
-          }
-        });
+      this.onManagerSearchInput('');
       return;
     }
     this.managerSuggestionsOpen = true;
-    this.managerSearchInput$.next(q);
+    this.onManagerSearchInput(q);
   }
 
   selectManager(user: AdminUserListItemDto): void {
@@ -551,8 +552,31 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     if (!query || query.length < 2) {
       this.locationLookupState = 'idle';
       this.locationLookupMessage = '';
+      return;
     }
-    this.destinationNameInput$.next(query);
+
+    this.locationLookupState = 'loading';
+    this.locationLookupMessage = 'Searching map location...';
+    this.lookupCoordinatesByName(query).subscribe((result) => {
+      if (!result) {
+        return;
+      }
+      if (result.kind === 'resolved') {
+        this.form.latitude = Number(result.lat.toFixed(6));
+        this.form.longitude = Number(result.lng.toFixed(6));
+        this.locationLookupState = 'resolved';
+        this.locationLookupMessage = `Location matched: ${result.label}`;
+      } else if (result.kind === 'not_found') {
+        this.locationLookupState = 'not_found';
+        this.locationLookupMessage =
+          'This destination name was not found in the selected region/country. Please check spelling or set coordinates manually.';
+      } else {
+        this.locationLookupState = 'error';
+        this.locationLookupMessage =
+          'Location lookup is temporarily unavailable. You can still set coordinates manually.';
+      }
+      this.cdr.detectChanges();
+    });
   }
 
   onRegionChange(): void {
@@ -561,7 +585,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       this.form.latitude = Number(r.centerLatitude);
       this.form.longitude = Number(r.centerLongitude);
     }
-    this.destinationNameInput$.next(this.form.name?.trim() ?? '');
+    this.onDestinationNameInput(this.form.name?.trim() ?? '');
   }
 
   onMapLocationSelected(position: { lat: number; lng: number }): void {

@@ -6,14 +6,13 @@ import {
   Subject,
   Observable,
   catchError,
-  debounceTime,
-  distinctUntilChanged,
   finalize,
   forkJoin,
   map,
   of,
   switchMap,
   takeUntil,
+  distinctUntilChanged,
   throwError,
   timer,
   timeout
@@ -35,7 +34,6 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
-  private readonly searchInput$ = new Subject<string>();
 
   allReviews: ReviewDto[] = [];
   filteredReviews: ReviewDto[] = [];
@@ -65,15 +63,6 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.objectFilterId = this.parseObjectId(this.route.snapshot.queryParamMap.get('objectId'));
-
-    this.searchInput$
-      .pipe(
-        map((value) => value.trim()),
-        debounceTime(300),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(() => this.applyCurrentFilters());
 
     this.loadReviews();
 
@@ -158,7 +147,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
 
   onSearchChange(value: string): void {
     this.searchTerm = value;
-    this.searchInput$.next(value);
+    this.applyCurrentFilters();
   }
 
   resetFilters(): void {

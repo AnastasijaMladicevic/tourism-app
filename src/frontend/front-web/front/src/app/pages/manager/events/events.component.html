@@ -13,8 +13,7 @@
       <input
         type="text"
         [(ngModel)]="draftSearchQuery"
-        (ngModelChange)="onSearchChange()"
-        (keydown.enter)="onSearchEnter($event)"
+        (keyup)="onSearchChange()"
         placeholder="Search events, venues, or organizers..."
       />
     </label>

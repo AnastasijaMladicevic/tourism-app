@@ -130,12 +130,15 @@ export class ManagerEventsComponent implements OnInit {
   }
 
   onSearchChange(): void {
-    // Intentionally no-op: search is applied on Enter or when filters are applied.
+    // Search is applied on every keyup.
+    this.searchQuery = this.draftSearchQuery.trim();
+    this.currentPage = 1;
+    this.loadEvents();
   }
 
   onSearchEnter(event: Event): void {
     event.preventDefault();
-    this.applySearch();
+    this.onSearchChange();
   }
 
   onMoreFilters(): void {
