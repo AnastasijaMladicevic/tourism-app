@@ -201,7 +201,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   openDetails(item: AdminMapDestination): void {
     this.selectedItem = item;
-    this.router.navigate(['/admin/destinations']);
+    this.router.navigate(['/admin/destinations/edit', item.id]);
   }
 
   onCardImageLoad(): void {
