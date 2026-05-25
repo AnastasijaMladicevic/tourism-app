@@ -161,7 +161,7 @@
         <div class="card__body">
           <h2 class="card__name">{{ locality.name }}</h2>
 
-          @if (locality.destinationName || locality.regionName) {
+          @if (locality.destinationName) {
             <p class="card__destination">
               {{ getLocalityLocation(locality) }}
             </p>

@@ -239,11 +239,40 @@
     "searchPlaceholder": "Cerca tra le mie recensioni...",
     "totalReviews": "{{count}} recensioni in totale",
     "loadingText": "Stiamo preparando le tue recensioni e le statistiche dell'account.",
+    "loadError": "Le tue recensioni non sono disponibili al momento.",
     "emptyTitle": "Non hai ancora recensioni",
     "emptyText": "Quando lasci un commento su un oggetto, lo vedrai qui.",
     "noResultsText": "Prova un altro filtro o una ricerca diversa per mostrare le tue recensioni.",
     "creatorResponse": "Risposta del creatore",
-    "loadMore": "Carica altre recensioni"
+    "loadMore": "Carica altre recensioni",
+    "subtitleFallback": "Panoramica di tutti i tuoi commenti",
+    "locationFallback": "La posizione non è disponibile",
+    "objectTypeFallback": "Oggetto",
+    "deleteConfirm": "Sei sicuro di voler eliminare la tua recensione per \"{{title}}\"?",
+    "deleteError": "Si è verificato un problema durante l'eliminazione della recensione. Riprova.",
+    "status": {
+      "approved": "Approvato",
+      "pending": "In attesa",
+      "rejected": "Rifiutato"
+    },
+    "roles": {
+      "admin": "Amministratore",
+      "manager": "Manager",
+      "contentCreator": "Creatore di contenuti",
+      "tourist": "Turista",
+      "user": "Utente"
+    },
+    "time": {
+      "today": "Oggi",
+      "dayAgo": "1 giorno fa",
+      "daysAgo": "{{count}} giorni fa",
+      "weekAgo": "1 settimana fa",
+      "weeksAgo": "{{count}} settimane fa",
+      "monthAgo": "1 mese fa",
+      "monthsAgo": "{{count}} mesi fa",
+      "yearAgo": "1 anno fa",
+      "yearsAgo": "{{count}} anni fa"
+    }
   },
   "signup": {
     "title": "Crea account",

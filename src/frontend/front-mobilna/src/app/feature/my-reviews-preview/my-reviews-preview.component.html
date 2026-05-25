@@ -12,7 +12,7 @@
 
     <div class="content">
       @if (errorMessage()) {
-        <p class="feedback feedback--error">{{ errorMessage() }}</p>
+        <p class="feedback feedback--error">{{ errorMessage() | translate }}</p>
       }
 
       <section class="profile-strip">

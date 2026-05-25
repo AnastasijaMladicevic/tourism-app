@@ -161,10 +161,6 @@
         <div class="card__body">
           <h2 class="card__name">{{ destination.name }}</h2>
 
-          @if (destination.regionName) {
-            <p class="card__destination">{{ destination.regionName }}</p>
-          }
-
           @if (destination.destinationTypeName) {
             <div class="card__meta">
               <span class="destination-type-chip">{{ destination.destinationTypeName }}</span>
