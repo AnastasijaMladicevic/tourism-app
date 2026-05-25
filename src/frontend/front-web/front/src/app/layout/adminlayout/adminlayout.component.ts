@@ -4,11 +4,12 @@ import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, NotificationBellComponent],
+  imports: [CommonModule, RouterModule, NotificationBellComponent, TranslatePipe],
   templateUrl: './adminlayout.component.html',
   styleUrls: ['./adminlayout.component.css']
 })

@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, filter, finalize, switchMap, take, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { TranslationService } from '../services/translation.service';
 
 let isRefreshing = false;
 const refreshedToken$ = new BehaviorSubject<string | null>(null);
@@ -15,6 +16,14 @@ function withAuthHeader<T>(request: HttpRequest<T>, token: string): HttpRequest<
   return request.clone({
     setHeaders: {
       Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+function withLanguageHeader<T>(request: HttpRequest<T>, language: string): HttpRequest<T> {
+  return request.clone({
+    setHeaders: {
+      'accept-language': language,
     },
   });
 }
@@ -35,14 +44,19 @@ function notifyBannedAction(error: HttpErrorResponse, authService: AuthService, 
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const authService = inject(AuthService);
+  const translationService = inject(TranslationService);
   const router = inject(Router);
   const token = authService.getToken();
+  const language = translationService.currentLocale();
   const authRequest =
     token && !request.headers.has('Authorization') && !isAuthEndpoint(request.url)
       ? withAuthHeader(request, token)
       : request;
+  const localizedRequest = authRequest.headers.has('accept-language')
+    ? authRequest
+    : withLanguageHeader(authRequest, language);
 
-  return next(authRequest).pipe(
+  return next(localizedRequest).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 423) {
         notifyBannedAction(error, authService, router);
