@@ -1,3 +1,294 @@
-<section class="content-creator-page">
-  <h1>Content Creator Dashboard</h1>
+<section class="cc-dashboard">
+  <div class="page-head">
+    <div>
+      <p class="breadcrumbs">Main Menu <span>&gt;</span> Dashboard</p>
+      <h1>Content Creator Dashboard</h1>
+      <p class="subtle-text">
+        Welcome back{{ user?.firstName ? ', ' + user?.firstName : '' }}. Preview of your content performance, reviews and upcoming events.
+      </p>
+    </div>
+
+    <div class="head-actions">
+      <span class="preview-pill">UI preview</span>
+      <div class="period-filter" role="group" aria-label="Dashboard period">
+        <button
+          type="button"
+          *ngFor="let opt of periodOptions"
+          class="period-btn"
+          [class.active]="selectedPeriod === opt.key"
+          (click)="selectPeriod(opt.key)"
+        >
+          {{ opt.label }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="summary-strip card">
+    <div>
+      <span class="summary-label">Total Content</span>
+      <strong>53</strong>
+    </div>
+    <div>
+      <span class="summary-label">New Reviews</span>
+      <strong>146</strong>
+    </div>
+    <div>
+      <span class="summary-label">Average Rating</span>
+      <strong>4.7</strong>
+    </div>
+    <div>
+      <span class="summary-label">Upcoming Next 30 Days</span>
+      <strong>9</strong>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <article *ngFor="let card of kpiCards" class="kpi-card card" [ngClass]="'kpi-card--' + card.tone">
+      <div class="kpi-icon">
+        <span class="material-symbols-outlined">{{ card.icon }}</span>
+      </div>
+      <span class="kpi-label">{{ card.label }}</span>
+      <span class="kpi-value">{{ card.value }}</span>
+      <span class="kpi-meta">{{ card.meta }}</span>
+    </article>
+  </div>
+
+  <div class="main-grid">
+    <article class="card panel panel--wide">
+      <div class="section-head">
+        <div>
+          <h3>Engagement Trend</h3>
+          <p>Favorites, planner adds and reviews in selected period</p>
+        </div>
+        <a class="section-link" routerLink="/content-creator/reviews">Open reviews</a>
+      </div>
+
+      <div class="chart-legend">
+        <span *ngFor="let series of engagementSeries" class="legend-item">
+          <span class="legend-dot" [style.background]="series.color"></span>
+          {{ series.label }}
+        </span>
+      </div>
+
+      <div class="chart-wrap">
+        <div class="chart-y-axis" aria-hidden="true">
+          <span>1.4k</span>
+          <span>700</span>
+          <span>0</span>
+        </div>
+        <div class="chart-surface">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg" aria-label="Engagement trend preview">
+            <path
+              *ngFor="let series of engagementSeries"
+              [attr.d]="series.linePath"
+              class="chart-line"
+              fill="none"
+              [attr.stroke]="series.color"
+            ></path>
+          </svg>
+        </div>
+      </div>
+
+      <div class="chart-labels">
+        <span *ngFor="let label of engagementLabels">{{ label }}</span>
+      </div>
+
+      <div class="trend-summary-row">
+        <div *ngFor="let item of engagementSummary" class="trend-summary-card">
+          <span class="legend-dot" [style.background]="item.color"></span>
+          <span>{{ item.label }}</span>
+          <strong>{{ item.value }}</strong>
+        </div>
+      </div>
+    </article>
+
+    <div class="side-column">
+      <article class="card panel rating-card">
+        <div class="section-head">
+          <div>
+            <h3>Average Rating</h3>
+            <p>Across published content</p>
+          </div>
+        </div>
+        <div class="rating-score">
+          <strong>4.7</strong>
+          <span>/ 5.0</span>
+        </div>
+        <div class="rating-stars" aria-label="Average rating 4.7 of 5">
+          <span class="material-symbols-outlined">star</span>
+          <span class="material-symbols-outlined">star</span>
+          <span class="material-symbols-outlined">star</span>
+          <span class="material-symbols-outlined">star</span>
+          <span class="material-symbols-outlined">star_half</span>
+        </div>
+        <p class="rating-note">146 total reviews in the selected period</p>
+      </article>
+
+      <article class="card panel">
+        <div class="section-head">
+          <div>
+            <h3>Rating Distribution</h3>
+            <p>One star to five stars</p>
+          </div>
+        </div>
+
+        <div class="rating-list">
+          <div *ngFor="let row of ratingRows" class="rating-row">
+            <span>{{ row.label }}</span>
+            <div class="rating-track">
+              <div class="rating-fill" [style.width]="getStarTrackWidth(row.percent)"></div>
+            </div>
+            <strong>{{ row.count }}</strong>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <div class="bottom-grid">
+    <article class="card panel">
+      <div class="section-head">
+        <div>
+          <h3>Content Status Split</h3>
+          <p>Overall, objects, events and activities</p>
+        </div>
+      </div>
+
+      <div class="donut-section">
+        <div class="donut-wrap">
+          <svg viewBox="0 0 36 36" class="donut-svg" aria-label="Content status donut chart">
+            <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
+            <circle
+              *ngFor="let slice of contentDonutSlices"
+              class="donut-segment"
+              cx="18"
+              cy="18"
+              r="15.9155"
+              [attr.stroke]="slice.color"
+              [attr.stroke-dasharray]="slice.dashArray"
+              [attr.stroke-dashoffset]="slice.dashOffset"
+            >
+              <title>{{ slice.label }}: {{ slice.count }} ({{ slice.percent }}%)</title>
+            </circle>
+          </svg>
+          <div class="donut-center">
+            <strong>{{ contentDonutTotal }}</strong>
+            <span>total</span>
+          </div>
+        </div>
+
+        <ul class="donut-legend">
+          <li *ngFor="let slice of contentDonutSlices">
+            <span class="legend-dot" [style.background]="slice.color"></span>
+            <span>{{ slice.label }}</span>
+            <strong>{{ slice.count }} &bull; {{ slice.percent }}%</strong>
+          </li>
+        </ul>
+      </div>
+
+      <div class="status-list">
+        <div *ngFor="let row of statusRows" class="status-row">
+          <div class="status-row-head">
+            <span class="status-row-name">{{ row.label }}</span>
+            <span class="status-row-total">{{ row.total | number }} total</span>
+          </div>
+          <div class="stacked-bar">
+            <span class="stack-segment stack-segment--published" [style.width.%]="getPublishedPercent(row)"></span>
+            <span class="stack-segment stack-segment--pending" [style.width.%]="getPendingPercent(row)"></span>
+            <span class="stack-segment stack-segment--rejected" [style.width.%]="getRejectedPercent(row)"></span>
+          </div>
+          <div class="status-row-meta">
+            <span>{{ row.published }} published</span>
+            <span>{{ row.pending }} pending</span>
+            <span>{{ row.rejected }} rejected</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card panel panel--wide">
+      <div class="section-head">
+        <div>
+          <h3>Top Content</h3>
+          <p>Objects, events and activities with strongest engagement score</p>
+        </div>
+        <a class="section-link" routerLink="/content-creator/objects">Manage content</a>
+      </div>
+
+      <div class="rank-list">
+        <div *ngFor="let item of topContent" class="rank-row">
+          <div class="rank-row-head">
+            <div>
+              <div class="rank-name">{{ item.name }}</div>
+              <div class="rank-subtle">{{ item.type }} &bull; {{ item.destination }} &bull; {{ item.region }}</div>
+            </div>
+            <div class="rank-side">
+              <span [class]="statusClass(item.status)">{{ item.status }}</span>
+              <span class="rank-score">score {{ item.engagementScore | number }}</span>
+            </div>
+          </div>
+          <div class="region-bar-track">
+            <div class="region-bar-fill" [style.width.%]="item.barPercent"></div>
+          </div>
+          <div class="rank-meta">
+            <span>{{ item.favorites | number }} favorites</span>
+            <span>{{ item.plannerAdds | number }} planner adds</span>
+            <span>{{ item.reviews | number }} reviews</span>
+            <span>{{ item.averageRating | number:'1.1-1' }} avg rating</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card panel">
+      <div class="section-head">
+        <div>
+          <h3>Top Destinations</h3>
+          <p>Destination performance from your content</p>
+        </div>
+      </div>
+
+      <div class="destination-list">
+        <div *ngFor="let item of topDestinations" class="rank-row">
+          <div class="rank-row-head">
+            <div>
+              <div class="rank-name">{{ item.name }}</div>
+              <div class="rank-subtle">{{ item.region }} &bull; {{ item.creatorContent }} content items</div>
+            </div>
+            <span class="rank-score">{{ item.engagementScore | number }}</span>
+          </div>
+          <div class="region-bar-track">
+            <div class="region-bar-fill region-bar-fill--blue" [style.width.%]="item.barPercent"></div>
+          </div>
+          <div class="rank-meta">
+            <span>{{ item.favorites | number }} favorites</span>
+            <span>{{ item.plannerAdds | number }} planner adds</span>
+            <span>{{ item.reviews | number }} reviews</span>
+            <span>{{ item.averageRating | number:'1.1-1' }} avg</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card panel">
+      <div class="section-head">
+        <div>
+          <h3>Upcoming Events</h3>
+          <p>3 in next 7 days &bull; 9 in next 30 days</p>
+        </div>
+        <a class="section-link" routerLink="/content-creator/events">Open events</a>
+      </div>
+
+      <div class="upcoming-list">
+        <article *ngFor="let event of upcomingEvents" class="upcoming-card">
+          <div class="upcoming-date">{{ event.date }}</div>
+          <div>
+            <h4>{{ event.title }}</h4>
+            <p>{{ event.destination }} &bull; {{ event.type }}</p>
+          </div>
+        </article>
+      </div>
+    </article>
+  </div>
 </section>
