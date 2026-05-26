@@ -39,6 +39,8 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     { value: 'me', label: 'Montenegrin', description: 'Primary locale for Montenegro' },
     { value: 'sr', label: 'Serbian', description: 'Latin script, regional default' },
     { value: 'en', label: 'English', description: 'Global app language' },
+    { value: 'de', label: 'German', description: 'Deutsch for German-speaking users' },
+    { value: 'fr', label: 'French', description: 'Français for French-speaking users' },
     { value: 'es', label: 'Spanish', description: 'Español for Spanish-speaking users' },
     { value: 'it', label: 'Italian', description: 'Italiano for Italian-speaking users' },
   ];
