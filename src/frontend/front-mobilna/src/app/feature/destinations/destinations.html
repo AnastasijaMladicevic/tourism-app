@@ -156,16 +156,18 @@
           >
             <mat-icon>{{ destination.isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
           </button>
+
+          @if (destination.destinationTypeName) {
+            <span class="destination-type-chip">
+              {{ destination.destinationTypeName }}
+            </span>
+          }
         </div>
 
         <div class="card__body">
           <h2 class="card__name">{{ destination.name }}</h2>
 
-          @if (destination.destinationTypeName) {
-            <div class="card__meta">
-              <span class="destination-type-chip">{{ destination.destinationTypeName }}</span>
-            </div>
-          }
+          
 
           <p class="card__desc">{{ destination.description }}</p>
 

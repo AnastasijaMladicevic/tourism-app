@@ -156,6 +156,12 @@
           >
             <mat-icon>{{ locality.isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
           </button>
+
+          @if (locality.localityTypeName) {
+            <span class="card__type-chip">
+              {{ locality.localityTypeName }}
+            </span>
+          }
         </div>
 
         <div class="card__body">
@@ -163,15 +169,9 @@
 
           @if (locality.destinationName) {
             <p class="card__destination">
-              {{ getLocalityLocation(locality) }}
+              {{ locality.destinationName }}
             </p>
           }
-
-          <div class="card__meta">
-            @if (locality.localityTypeName) {
-              <span class="card__type-chip">{{ locality.localityTypeName }}</span>
-            }
-          </div>
 
           <p class="card__desc">{{ locality.description }}</p>
 

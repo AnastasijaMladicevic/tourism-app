@@ -5,7 +5,8 @@
 }
 
 .reviews-preview-shell {
-  width: min(100%, 390px);
+  width: 100%;
+  max-width: 860px;
   min-height: 100dvh;
   margin: 0 auto;
   background: transparent;
@@ -13,7 +14,6 @@
   display: flex;
   flex-direction: column;
 }
-
 .topbar {
   min-height: 76px;
   display: grid;
@@ -22,9 +22,9 @@
   gap: 12px;
   padding: 18px 20px 10px;
   border-bottom: 1px solid rgba(208, 234, 240, 0.9);
-  background: var(--surface-strong);
-  border-color: var(--border);
-  backdrop-filter: blur(10px);
+  background: transparent;
+  border-bottom-color: transparent;
+  backdrop-filter: none;
 
   h1 {
     text-align: center;
@@ -558,8 +558,7 @@
   }
 
   .reviews-preview-shell {
-    width: min(100%, 860px);
-    min-height: auto;
+    padding: 0 8px;
   }
 
   .content {
@@ -627,10 +626,23 @@
 }
 
 :host-context(:root[data-theme='dark']) {
+  :host {
+    display: block;
+    min-height: 100dvh;
+    background: var(--bg);
+  }
+  
   .reviews-preview-page {
-    background:
-      radial-gradient(circle at top center, rgba(77, 194, 255, 0.08), transparent 28%),
-      var(--bg);
+    min-height: 100dvh;
+    background: var(--bg);
+    padding: 0;
+  }
+  
+  .reviews-preview-shell,
+  .content,
+  .topbar,
+  .profile-strip {
+    background: transparent !important;
   }
 
   .rating-card,
@@ -712,9 +724,6 @@
       border-bottom: none;
     }
   }
-}
-
-:host-context(:root[data-theme='dark']) {
 
   .action-btn--danger {
     color: #ff5c5c !important;
@@ -722,5 +731,11 @@
     &:hover {
       color: #ff7b7b !important;
     }
+  }
+
+  .topbar {
+    background: transparent !important;
+    border-bottom-color: transparent !important;
+    backdrop-filter: none !important;
   }
 }
