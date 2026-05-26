@@ -161,6 +161,12 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     return this.permissionItems.length;
   }
 
+  onLanguageSelected(language: string): void {
+    const normalized = this.normalizeLanguage(language);
+    this.user = { ...this.user, language: normalized };
+    this.translationService.setLanguage(normalized);
+  }
+
   triggerFileInput(): void {
     this.fileInput?.nativeElement.click();
   }

@@ -148,6 +148,12 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
     return this.permissionItems.length;
   }
 
+  onLanguageSelected(language: string): void {
+    const normalized = this.normalizeLanguage(language);
+    this.user = { ...this.user, language: normalized };
+    this.translationService.setLanguage(normalized);
+  }
+
   get roleBadgeClass(): string {
     switch (this.role) {
       case 'admin':

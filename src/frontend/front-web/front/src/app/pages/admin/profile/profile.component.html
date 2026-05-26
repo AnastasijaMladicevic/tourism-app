@@ -171,6 +171,7 @@
                       name="language"
                       [value]="option.value"
                       [(ngModel)]="user.language"
+                      (ngModelChange)="onLanguageSelected($event)"
                     />
 
                     <span class="language-option__content">
