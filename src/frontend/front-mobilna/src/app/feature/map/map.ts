@@ -1062,15 +1062,18 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     return {
       id: raw.id,
-      name: raw.name,
-      typeName:
+      name: this.cleanSearchDisplayText(raw.name),
+      typeName: this.cleanSearchDisplayText(
         raw.objectTypeName ??
-        raw.destinationTypeName ??
-        raw.eventTypeName ??
-        raw.activityTypeName ??
-        raw.localityTypeName ??
-        markerType,
-      location: raw.localityName ?? raw.destinationName ?? raw.regionName ?? '',
+          raw.destinationTypeName ??
+          raw.eventTypeName ??
+          raw.activityTypeName ??
+          raw.localityTypeName ??
+          markerType,
+      ),
+      location: this.cleanSearchDisplayText(
+        raw.localityName ?? raw.destinationName ?? raw.regionName ?? '',
+      ),
       image: this.resolveMediaUrl(raw.mainImageUrl ?? raw.images?.[0]?.url ?? ''),
       icon: iconMap[markerType] ?? iconMap['default'],
       lat: raw.latitude,
@@ -1079,6 +1082,47 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       category,
       markerType,
     };
+  }
+
+  formatSearchResultMeta(result: Pick<SearchResult, 'typeName' | 'location'>): string {
+    const separator = ` ${String.fromCharCode(183)} `;
+    const parts = [
+      this.cleanSearchDisplayText(result.typeName),
+      this.cleanSearchDisplayText(result.location),
+    ].filter((part) => !!part);
+
+    return parts.join(separator);
+  }
+
+  private cleanSearchDisplayText(value: unknown): string {
+    const text = typeof value === 'string' ? value.trim() : '';
+    if (!text) {
+      return '';
+    }
+
+    return this.tryDecodeMojibake(text).replace(/\s+/g, ' ').trim();
+  }
+
+  private tryDecodeMojibake(text: string): string {
+    if (!/[ÂÃ]/.test(text)) {
+      return text;
+    }
+
+    try {
+      const bytes = Array.from(text).map((character) => character.charCodeAt(0));
+      if (bytes.some((code) => code > 255)) {
+        return text.replace(/Â/g, '');
+      }
+
+      const decoded = new TextDecoder('utf-8').decode(Uint8Array.from(bytes));
+      if (decoded && !decoded.includes('\uFFFD')) {
+        return decoded;
+      }
+    } catch {
+      // Fall back to the original text cleanup below.
+    }
+
+    return text.replace(/Â/g, '');
   }
 
   private toArray<T>(response: any): T[] {
@@ -2137,9 +2181,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
       return {
         id,
-        name,
-        typeName: 'Adresa',
-        location,
+        name: this.cleanSearchDisplayText(name),
+        typeName: this.cleanSearchDisplayText('Adresa'),
+        location: this.cleanSearchDisplayText(location),
         icon: 'near_me',
         lat: suggestion.latitude,
         lng: suggestion.longitude,

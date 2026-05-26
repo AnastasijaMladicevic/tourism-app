@@ -32,7 +32,7 @@
             </div>
             <div class="suggestion-item__body">
               <span class="suggestion-item__name">{{ result.name }}</span>
-              <span class="suggestion-item__meta">{{ result.typeName }} Â· {{ result.location }}</span>
+              <span class="suggestion-item__meta">{{ formatSearchResultMeta(result) }}</span>
             </div>
           </div>
         }
@@ -153,7 +153,7 @@
                   @for (r of routeSearchResults; track r.id + ':' + (r.lat ?? 0) + ':' + (r.lng ?? 0)) {
                     <div class="route-suggestion-item" (mousedown)="addRoutePoint(r)">
                       <strong>{{ r.name }}</strong>
-                      <span>{{ r.typeName }} Â· {{ r.location }}</span>
+                      <span>{{ formatSearchResultMeta(r) }}</span>
                     </div>
                   }
                 </div>

@@ -1293,6 +1293,15 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime?>("EditLockAcquiredAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("EditLockExpiresAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("EditLockedByUserId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -1411,6 +1420,10 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.HasIndex("Email")
                         .IsUnique();
+
+                    b.HasIndex("EditLockExpiresAtUtc");
+
+                    b.HasIndex("EditLockedByUserId");
 
                     b.HasIndex("LastKnownLocation");
 
@@ -1884,6 +1897,31 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TuristickiVodic.Core.Models.User", b =>
+                {
+                    b.HasOne("TuristickiVodic.Core.Models.User", "EditLockedByUser")
+                        .WithMany("LockedUsers")
+                        .HasForeignKey("EditLockedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TuristickiVodic.Core.Models.Region", "PreferredRegion")
+                        .WithMany("PreferredByUsers")
+                        .HasForeignKey("PreferredRegionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TuristickiVodic.Core.Models.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EditLockedByUser");
+
+                    b.Navigation("PreferredRegion");
+
+                    b.Navigation("Role");
+                });
+
             modelBuilder.Entity("TuristickiVodic.Core.Models.Review", b =>
                 {
                     b.HasOne("TuristickiVodic.Core.Models.TouristObject", "Object")
@@ -1981,24 +2019,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("Locality");
 
                     b.Navigation("ObjectType");
-                });
-
-            modelBuilder.Entity("TuristickiVodic.Core.Models.User", b =>
-                {
-                    b.HasOne("TuristickiVodic.Core.Models.Region", "PreferredRegion")
-                        .WithMany("PreferredByUsers")
-                        .HasForeignKey("PreferredRegionId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("TuristickiVodic.Core.Models.Role", "Role")
-                        .WithMany("Users")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PreferredRegion");
-
-                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("TuristickiVodic.Core.Models.UserLocationHistory", b =>
@@ -2148,6 +2168,8 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("Favorites");
 
                     b.Navigation("LocationHistory");
+
+                    b.Navigation("LockedUsers");
 
                     b.Navigation("Notifications");
 
