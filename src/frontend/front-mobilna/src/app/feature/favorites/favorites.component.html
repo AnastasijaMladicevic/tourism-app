@@ -21,28 +21,17 @@
       </a>
     </header>
 
-    <header class="favorites-desktop-toolbar">
-      <label class="search-field search-field--desktop">
-        <span class="search-field__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="6.5" />
-            <path d="m16 16 4 4" />
-          </svg>
-        </span>
-        <input
-          id="favorites-search-desktop"
-          type="search"
-          [placeholder]="translate('favorites.searchPlaceholder')"
-          [value]="searchTerm()"
-          (input)="updateSearchTerm(($any($event.target)).value)"
-        />
-      </label>
-    </header>
-
     <section class="favorites-content-shell">
       <main class="favorites-main">
-        <section class="favorites-mobile-search-wrap">
-          <label class="search-field search-field--mobile">
+        <section class="favorites-intro">
+          <div class="favorites-intro__copy">
+            <h1>{{ translate('favorites.screenTitle') }}</h1>
+            <p>{{ translate('favorites.heroBody') }}</p>
+          </div>
+        </section>
+
+        <section class="favorites-toolbar">
+          <label class="search-field">
             <span class="search-field__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24">
                 <circle cx="11" cy="11" r="6.5" />
@@ -58,47 +47,21 @@
             />
           </label>
 
-          @if (categoryChips().length) {
-            <div class="favorites-chip-row" [attr.aria-label]="translate('favorites.summaryTitle')">
-              <span class="favorites-chip favorites-chip--primary">{{ translate('favorites.allSaved') }}</span>
-              @for (chip of categoryChips(); track trackChip($index, chip)) {
-                <span class="favorites-chip">{{ chip.label }}</span>
+          @if (filterChips().length) {
+            <div class="favorites-filter-row" [attr.aria-label]="translate('favorites.summaryTitle')">
+              @for (chip of filterChips(); track trackChip($index, chip)) {
+                <button
+                  type="button"
+                  class="favorites-chip"
+                  [class.favorites-chip--active]="activeFilter() === chip.value"
+                  (click)="setActiveFilter(chip.value)"
+                >
+                  <span>{{ chip.label }}</span>
+                </button>
               }
             </div>
           }
         </section>
-
-        <!-- Hero sekcija sa opisom uklonjena — ne prikazujemo opis niti sort dugme ovde -->
-        <!--
-        <section class="favorites-hero">
-          <div class="favorites-hero__copy">
-            <span class="favorites-hero__eyebrow">{{ translate('favorites.screenTitle') }}</span>
-            <h2>{{ translate('favorites.heroTitleModern') }}</h2>
-            <p>{{ translate('favorites.heroBodyModern') }}</p>
-          </div>
-
-          <div class="favorites-hero__controls">
-            <button type="button" class="sort-btn" (click)="toggleSort()">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M8 7h10M8 12h7M8 17h4" />
-                <path d="m5 6-2 2 2 2" />
-              </svg>
-              <span>{{ sortLabel() }}</span>
-            </button>
-          </div>
-        </section>
-        -->
-
-        <!-- Planer baner (mobilni) uklonjen — plavi pozivni blok sklonjen -->
-        <!--
-        <a class="planner-banner planner-banner--mobile" routerLink="/planner">
-          <div>
-            <strong>{{ translate('favorites.plannerBannerTitle') }}</strong>
-            <p>{{ translate('favorites.plannerBannerBody') }}</p>
-          </div>
-          <span>{{ translate('favorites.goToPlanner') }}</span>
-        </a>
-        -->
 
         <div class="favorites-status-row">
           <span>{{ savedCountLabel() }}</span>
@@ -116,7 +79,7 @@
           </article>
         } @else if (displayedFavorites().length) {
           <div class="favorites-grid">
-            @for (item of displayedFavorites(); track trackFavorite($index, item)) {
+            @for (item of visibleFavorites(); track trackFavorite($index, item)) {
               <article
                 class="favorite-card"
                 [class.favorite-card--clickable]="item.canOpenDetails"
@@ -130,9 +93,11 @@
                   [attr.aria-label]="translate('common.remove')"
                 >
                   <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path
-                      d="M12 20.2 4.95 13.2a4.94 4.94 0 0 1 0-7 4.95 4.95 0 0 1 7 0L12 7.25l.05-.05a4.95 4.95 0 0 1 7 7z"
-                    />
+                    <path d="M4 7h16" />
+                    <path d="M9 7V4h6v3" />
+                    <path d="M8 7v13h8V7" />
+                    <path d="M10.5 11v5" />
+                    <path d="M13.5 11v5" />
                   </svg>
                 </button>
 
@@ -163,28 +128,28 @@
                     <mat-icon>place</mat-icon>
                     <span>{{ item.location }}</span>
                   </p>
-
-                  
                 </div>
-                <div class="favorite-card__meta">
-                    @if (item.rating) {
-                      <span class="favorite-card__rating">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <path
-                            d="m12 3.9 2.47 5 5.53.8-4 3.9.94 5.5L12 16.5l-4.94 2.6.94-5.5-4-3.9 5.53-.8z"
-                          />
-                        </svg>
-                        <strong>{{ item.rating.toFixed(1) }}</strong>
-                        @if (item.reviewCount) {
-                          <span>({{ item.reviewCount }} {{ translate('common.reviews') }})</span>
-                        }
-                      </span>
-                    } @else {
-                      <span class="favorite-card__meta-tag">{{ item.categoryLabel }}</span>
-                    }
 
-                    <span class="favorite-card__saved">{{ item.note }}</span>
-                  </div>
+                <div class="favorite-card__meta">
+                  @if (item.rating) {
+                    <span class="favorite-card__rating">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="m12 3.9 2.47 5 5.53.8-4 3.9.94 5.5L12 16.5l-4.94 2.6.94-5.5-4-3.9 5.53-.8z"
+                        />
+                      </svg>
+                      <strong>{{ item.rating.toFixed(1) }}</strong>
+                      @if (item.reviewCount) {
+                        <span>({{ item.reviewCount }} {{ translate('common.reviews') }})</span>
+                      }
+                    </span>
+                  } @else {
+                    <span class="favorite-card__meta-tag">{{ item.categoryLabel }}</span>
+                  }
+
+                  <span class="favorite-card__saved">{{ item.note }}</span>
+                </div>
+
                 <div class="favorite-card__footer">
                   @if (item.canOpenDetails) {
                     <button
@@ -211,6 +176,14 @@
             }
           </div>
 
+          @if (canShowMoreFavorites()) {
+            <div class="favorites-load-more">
+              <button type="button" class="favorites-more-btn" (click)="showMoreFavorites()">
+                {{ translate('favorites.showMore') }}
+              </button>
+            </div>
+          }
+
           <footer class="favorites-footer-note">
             {{ translate('favorites.footerShowingAll', { count: displayedFavorites().length }) }}
           </footer>
@@ -223,41 +196,43 @@
       </main>
 
       <aside class="favorites-panel">
-        <!-- Planer baner (desktop aside) uklonjen — plavi pozivni blok sklonjen -->
-        <!--
-        <a class="planner-banner planner-banner--desktop" routerLink="/planner">
-          <strong>{{ translate('favorites.readyTitle') }}</strong>
-          <p>{{ translate('favorites.readyBody') }}</p>
-
-          <div class="planner-banner__feature">
-            <span aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <path d="M12 3 4 7v5c0 5 3.4 9.6 8 11 4.6-1.4 8-6 8-11V7z" />
-                <path d="m9.5 12 1.8 1.8 3.7-3.8" />
-              </svg>
-            </span>
-            <span>{{ translate('favorites.smartRoutes') }}</span>
-          </div>
-
-          <span class="planner-banner__cta">{{ translate('favorites.goToPlanner') }}</span>
-        </a>
-        -->
-
         <section class="panel-card">
           <div class="panel-card__head">
-            <h3>{{ translate('favorites.summaryTitle') }}</h3>
-            <span>{{ favorites().length }} {{ translate('common.total') }}</span>
+            <h3>{{ translate('favorites.collectionsTitle') }}</h3>
+            <button type="button" class="panel-card__ghost-btn">+</button>
           </div>
 
-          @if (savedBreakdown().length) {
-            <div class="summary-list">
-              @for (item of savedBreakdown(); track trackBreakdown($index, item)) {
-                <div class="summary-row">
-                  <span>{{ item.label }}</span>
-                  <strong>{{ item.count }}</strong>
-                </div>
+          @if (collectionItems().length) {
+            <div class="collection-list">
+              @for (item of visibleCollectionItems(); track trackCollection($index, item)) {
+                <button
+                  type="button"
+                  class="collection-row"
+                  (click)="setActiveFilter(item.value)"
+                >
+                  <span class="collection-row__icon" [attr.data-tone]="item.tone">
+                    <mat-icon>{{ item.icon }}</mat-icon>
+                  </span>
+
+                  <span class="collection-row__copy">
+                    <strong>{{ item.label }}</strong>
+                    <small>{{ collectionCountLabel(item.count) }}</small>
+                  </span>
+
+                  <mat-icon class="collection-row__arrow">chevron_right</mat-icon>
+                </button>
               }
             </div>
+
+            @if (hasMoreCollectionItems()) {
+              <button
+                type="button"
+                class="panel-card__link panel-card__link--button"
+                (click)="toggleCollectionsExpanded()"
+              >
+                {{ showAllCollections() ? translate('favorites.collectionsCollapseLink') : translate('favorites.collectionsLink') }}
+              </button>
+            }
           } @else {
             <p class="panel-empty">{{ translate('favorites.panelEmpty') }}</p>
           }
@@ -265,20 +240,63 @@
 
         <section class="panel-card">
           <div class="panel-card__head">
-            <h3>{{ translate('favorites.recentTitle') }}</h3>
-            <span>{{ sortLabel() }}</span>
+            <h3>{{ translate('favorites.actionsTitle') }}</h3>
           </div>
 
-          @if (latestSavedItem(); as latest) {
-            <div class="panel-recent">
-              <strong>{{ latest.title }}</strong>
-              <span>{{ latest.categoryLabel }}</span>
-              <p class="panel-note">{{ latest.location }}</p>
-              <p class="panel-note panel-note--muted">{{ latest.note }}</p>
+          <div class="panel-actions">
+            <a class="panel-action" routerLink="/planner">
+              <span class="panel-action__icon panel-action__icon--blue">
+                <mat-icon>calendar_month</mat-icon>
+              </span>
+              <span class="panel-action__copy">
+                <strong>{{ translate('favorites.actionPlannerTitle') }}</strong>
+                <small>{{ translate('favorites.actionPlannerBody') }}</small>
+              </span>
+              <mat-icon class="panel-action__arrow">chevron_right</mat-icon>
+            </a>
+
+            <a class="panel-action" routerLink="/map">
+              <span class="panel-action__icon panel-action__icon--amber">
+                <mat-icon>map</mat-icon>
+              </span>
+              <span class="panel-action__copy">
+                <strong>{{ translate('favorites.actionMapTitle') }}</strong>
+                <small>{{ translate('favorites.actionMapBody') }}</small>
+              </span>
+              <mat-icon class="panel-action__arrow">chevron_right</mat-icon>
+            </a>
+
+            <a class="panel-action" routerLink="/profile">
+              <span class="panel-action__icon panel-action__icon--teal">
+                <mat-icon>group</mat-icon>
+              </span>
+              <span class="panel-action__copy">
+                <strong>{{ translate('favorites.actionShareTitle') }}</strong>
+                <small>{{ translate('favorites.actionShareBody') }}</small>
+              </span>
+              <mat-icon class="panel-action__arrow">chevron_right</mat-icon>
+            </a>
+          </div>
+        </section>
+
+        <section class="panel-card panel-card--tip">
+          <div class="panel-tip">
+            <span class="panel-tip__icon">
+              <mat-icon>lightbulb</mat-icon>
+            </span>
+
+            <div>
+              <strong>{{ translate('favorites.tipTitle') }}</strong>
+              <p>{{ translate('favorites.tipBody') }}</p>
+
+              @if (latestSavedItem(); as latest) {
+                <div class="panel-tip__latest">
+                  <span>{{ translate('favorites.recentTitle') }}</span>
+                  <strong>{{ latest.title }}</strong>
+                </div>
+              }
             </div>
-          } @else {
-            <p class="panel-note">{{ translate('favorites.latestEmpty') }}</p>
-          }
+          </div>
         </section>
       </aside>
     </section>

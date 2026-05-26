@@ -14,10 +14,12 @@ import { MatIcon } from "@angular/material/icon";
 
 type FavoriteKind = 'destination' | 'activity' | 'object' | 'locality' | 'route' | 'other';
 type FavoriteSortOption = 'newest' | 'title';
+const INITIAL_VISIBLE_FAVORITES = 6;
 
 interface FavoriteCard {
   id: number;
   title: string;
+  categoryKey: string;
   categoryLabel: string;
   location: string;
   note: string;
@@ -34,12 +36,23 @@ interface FavoriteCard {
 
 interface FavoriteChip {
   label: string;
+  value: string;
   count: number;
 }
 
 interface FavoriteBreakdownItem {
+  key: FavoriteKind;
   label: string;
   count: number;
+  icon: string;
+}
+
+interface FavoriteCollectionItem {
+  value: string;
+  label: string;
+  count: number;
+  icon: string;
+  tone: 'blue' | 'amber' | 'green' | 'violet';
 }
 
 @Component({
@@ -71,9 +84,13 @@ export class FavoritesComponent implements OnInit {
   protected readonly pendingRemovalFavorite = signal<FavoriteCard | null>(null);
   protected readonly searchTerm = signal('');
   protected readonly sortOption = signal<FavoriteSortOption>('newest');
+  protected readonly activeFilter = signal('all');
+  protected readonly visibleCount = signal(INITIAL_VISIBLE_FAVORITES);
+  protected readonly showAllCollections = signal(false);
 
   protected readonly displayedFavorites = computed(() => {
     const normalizedSearch = this.searchTerm().trim().toLowerCase();
+    const activeFilter = this.activeFilter();
     const sorted = [...this.favorites()].sort((left, right) => {
       if (this.sortOption() === 'title') {
         return left.title.localeCompare(right.title);
@@ -82,26 +99,47 @@ export class FavoritesComponent implements OnInit {
       return right.createdAtTimestamp - left.createdAtTimestamp;
     });
 
-    if (!normalizedSearch) {
-      return sorted;
-    }
-
-    return sorted.filter((item) => item.searchText.includes(normalizedSearch));
+    return sorted.filter((item) => {
+      const matchesSearch = !normalizedSearch || item.searchText.includes(normalizedSearch);
+      const matchesFilter = activeFilter === 'all' || item.categoryKey === activeFilter;
+      return matchesSearch && matchesFilter;
+    });
   });
 
   protected readonly locationCount = computed(() => this.displayedFavorites().length);
 
-  protected readonly categoryChips = computed<FavoriteChip[]>(() => {
-    const counts = new Map<string, number>();
+  protected readonly filterChips = computed<FavoriteChip[]>(() => {
+    const counts = new Map<string, FavoriteChip>();
 
     for (const favorite of this.favorites()) {
-      counts.set(favorite.categoryLabel, (counts.get(favorite.categoryLabel) ?? 0) + 1);
+      const existing = counts.get(favorite.categoryKey);
+
+      if (existing) {
+        existing.count += 1;
+        continue;
+      }
+
+      counts.set(favorite.categoryKey, {
+        label: favorite.categoryLabel,
+        value: favorite.categoryKey,
+        count: 1,
+      });
     }
 
-    return [...counts.entries()]
-      .sort((left, right) => right[1] - left[1])
-      .slice(0, 4)
-      .map(([label, count]) => ({ label, count }));
+    return [
+      {
+        label: this.translate('common.all'),
+        value: 'all',
+        count: this.favorites().length,
+      },
+      ...[...counts.values()].sort((left, right) => {
+        if (right.count !== left.count) {
+          return right.count - left.count;
+        }
+
+        return left.label.localeCompare(right.label);
+      }),
+    ];
   });
 
   protected readonly savedBreakdown = computed<FavoriteBreakdownItem[]>(() => {
@@ -118,14 +156,70 @@ export class FavoritesComponent implements OnInit {
       counts[favorite.kind] += 1;
     }
 
-    return [
-      { label: this.translate('favorites.breakdown.destination'), count: counts.destination },
-      { label: this.translate('favorites.breakdown.object'), count: counts.object },
-      { label: this.translate('favorites.breakdown.activity'), count: counts.activity },
-      { label: this.translate('favorites.breakdown.locality'), count: counts.locality },
-      { label: this.translate('favorites.breakdown.route'), count: counts.route },
-    ].filter((item) => item.count > 0);
+    const rows: FavoriteBreakdownItem[] = [
+      {
+        key: 'destination',
+        label: this.translate('favorites.breakdown.destination'),
+        count: counts.destination,
+        icon: 'travel_explore',
+      },
+      {
+        key: 'object',
+        label: this.translate('favorites.breakdown.object'),
+        count: counts.object,
+        icon: 'apartment',
+      },
+      {
+        key: 'activity',
+        label: this.translate('favorites.breakdown.activity'),
+        count: counts.activity,
+        icon: 'directions_run',
+      },
+      {
+        key: 'locality',
+        label: this.translate('favorites.breakdown.locality'),
+        count: counts.locality,
+        icon: 'place',
+      },
+      {
+        key: 'route',
+        label: this.translate('favorites.breakdown.route'),
+        count: counts.route,
+        icon: 'route',
+      },
+    ];
+
+    return rows.filter((item) => item.count > 0);
   });
+
+  protected readonly collectionItems = computed<FavoriteCollectionItem[]>(() =>
+    this.filterChips()
+      .filter((chip) => chip.value !== 'all')
+      .map((chip, index) => ({
+        value: chip.value,
+        label: chip.label,
+        count: chip.count,
+        icon: this.resolveCollectionIcon(chip.label),
+        tone: this.resolveCollectionTone(index),
+      })),
+  );
+
+  protected readonly visibleCollectionItems = computed<FavoriteCollectionItem[]>(() => {
+    const items = this.collectionItems();
+    return this.showAllCollections() ? items : items.slice(0, 4);
+  });
+
+  protected readonly hasMoreCollectionItems = computed(
+    () => this.collectionItems().length > 4,
+  );
+
+  protected readonly visibleFavorites = computed(() =>
+    this.displayedFavorites().slice(0, this.visibleCount()),
+  );
+
+  protected readonly canShowMoreFavorites = computed(
+    () => this.visibleFavorites().length < this.displayedFavorites().length,
+  );
 
   protected readonly latestSavedItem = computed(() => {
     return [...this.favorites()].sort((left, right) => right.createdAtTimestamp - left.createdAtTimestamp)[0] ?? null;
@@ -155,19 +249,47 @@ export class FavoritesComponent implements OnInit {
   }
 
   protected trackBreakdown(_: number, item: FavoriteBreakdownItem): string {
-    return item.label;
+    return item.key;
+  }
+
+  protected trackCollection(_: number, item: FavoriteCollectionItem): string {
+    return item.value;
   }
 
   protected trackChip(_: number, item: FavoriteChip): string {
-    return item.label;
+    return item.value;
   }
 
   protected updateSearchTerm(value: string): void {
     this.searchTerm.set(value);
+    this.visibleCount.set(INITIAL_VISIBLE_FAVORITES);
+  }
+
+  protected setActiveFilter(value: string): void {
+    this.activeFilter.set(value);
+    this.visibleCount.set(INITIAL_VISIBLE_FAVORITES);
   }
 
   protected toggleSort(): void {
     this.sortOption.update((current) => (current === 'newest' ? 'title' : 'newest'));
+  }
+
+  protected showMoreFavorites(): void {
+    this.visibleCount.update((current) => current + 4);
+  }
+
+  protected collectionCountLabel(count: number): string {
+    return count === 1
+      ? this.translate('favorites.collectionItemCountOne')
+      : this.translate('favorites.collectionItemCountMany', { count });
+  }
+
+  protected toggleCollectionsExpanded(): void {
+    if (!this.hasMoreCollectionItems()) {
+      return;
+    }
+
+    this.showAllCollections.update((current) => !current);
   }
 
   protected requestRemoveFavorite(card: FavoriteCard, event: Event): void {
@@ -206,6 +328,7 @@ export class FavoritesComponent implements OnInit {
     }
 
     this.favorites.set(nextFavorites);
+    this.ensureActiveFilterIsValid(nextFavorites);
     this.profileStatsCache.write({ favorites: nextFavorites.length });
     this.removingFavoriteId.set(favoriteId);
     this.errorMessage.set('');
@@ -216,6 +339,7 @@ export class FavoritesComponent implements OnInit {
       .pipe(
         catchError(() => {
           this.favorites.set(previousFavorites);
+          this.ensureActiveFilterIsValid(previousFavorites);
           this.errorMessage.set(this.translate('favorites.removeError'));
           return of(false);
         }),
@@ -261,6 +385,7 @@ export class FavoritesComponent implements OnInit {
       .subscribe((items) => {
         const nextItems = items.filter(Boolean);
         this.favorites.set(nextItems);
+        this.ensureActiveFilterIsValid(nextItems);
         this.profileStatsCache.write({ favorites: nextItems.length });
       });
   }
@@ -314,6 +439,7 @@ export class FavoritesComponent implements OnInit {
     return this.createCard({
       id: item.id,
       title,
+      categoryKey: this.buildCategoryKey(categoryLabel, 'destination'),
       categoryLabel,
       location,
       quote: this.translate('favorites.fallbackQuote'),
@@ -343,6 +469,7 @@ export class FavoritesComponent implements OnInit {
     return this.createCard({
       id: item.id,
       title,
+      categoryKey: this.buildCategoryKey(categoryLabel, 'activity'),
       categoryLabel,
       location,
       quote: activity?.durationMinutes
@@ -372,6 +499,7 @@ export class FavoritesComponent implements OnInit {
     return this.createCard({
       id: item.id,
       title,
+      categoryKey: this.buildCategoryKey(categoryLabel, 'object'),
       categoryLabel,
       location,
       quote: objectItem?.cuisineType?.trim()
@@ -399,6 +527,7 @@ export class FavoritesComponent implements OnInit {
     return this.createCard({
       id: item.id,
       title,
+      categoryKey: this.buildCategoryKey(categoryLabel, 'locality'),
       categoryLabel,
       location,
       quote: this.translate('favorites.fallbackQuote'),
@@ -418,6 +547,7 @@ export class FavoritesComponent implements OnInit {
     return this.createCard({
       id: item.id,
       title,
+      categoryKey: this.buildCategoryKey(this.translate('favorites.routeLabel'), 'route'),
       categoryLabel: this.translate('favorites.routeLabel'),
       location: this.translate('favorites.routeLocation'),
       quote: this.translate('favorites.routeQuote'),
@@ -433,6 +563,7 @@ export class FavoritesComponent implements OnInit {
     return this.createCard({
       id: item.id,
       title: this.translationService.translate('favorites.fallbackTitle', { id: item.id }),
+      categoryKey: this.buildCategoryKey(this.translate('favorites.savedItemLabel'), 'other'),
       categoryLabel: this.translate('favorites.savedItemLabel'),
       location: this.translate('favorites.locationFallback'),
       quote: this.translate('favorites.fallbackQuote'),
@@ -447,6 +578,7 @@ export class FavoritesComponent implements OnInit {
   private createCard(card: {
     id: number;
     title: string;
+    categoryKey: string;
     categoryLabel: string;
     location: string;
     note: string;
@@ -539,5 +671,55 @@ export class FavoritesComponent implements OnInit {
       month: 'short',
       year: 'numeric',
     });
+  }
+
+  private buildCategoryKey(label: string, kind: FavoriteKind): string {
+    const normalized = label
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    return normalized || kind;
+  }
+
+  private ensureActiveFilterIsValid(items: FavoriteCard[]): void {
+    const currentFilter = this.activeFilter();
+
+    if (currentFilter === 'all') {
+      return;
+    }
+
+    const hasActiveFilter = items.some((item) => item.categoryKey === currentFilter);
+
+    if (!hasActiveFilter) {
+      this.activeFilter.set('all');
+    }
+
+    if (items.length <= 4 && this.showAllCollections()) {
+      this.showAllCollections.set(false);
+    }
+  }
+
+  private resolveCollectionIcon(label: string): string {
+    const normalized = label.trim().toLowerCase();
+
+    if (normalized.includes('hotel')) return 'hotel';
+    if (normalized.includes('restoran')) return 'restaurant';
+    if (normalized.includes('bar')) return 'local_bar';
+    if (normalized.includes('grad')) return 'location_city';
+    if (normalized.includes('destin')) return 'travel_explore';
+    if (normalized.includes('objek')) return 'apartment';
+    if (normalized.includes('aktiv')) return 'hiking';
+    if (normalized.includes('rout') || normalized.includes('ruta')) return 'route';
+
+    return 'bookmark';
+  }
+
+  private resolveCollectionTone(index: number): FavoriteCollectionItem['tone'] {
+    const tones: FavoriteCollectionItem['tone'][] = ['blue', 'amber', 'green', 'violet'];
+    return tones[index % tones.length];
   }
 }
