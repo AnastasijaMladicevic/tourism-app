@@ -473,10 +473,14 @@
             <h3 class="bottom-card__name">{{ selectedItem.name }}</h3>
             <p class="bottom-card__meta">
               @if (getItemLocation()) {
-                <mat-icon>place</mat-icon>
                 {{ getItemLocation() }}
               }
             </p>
+            @if (getItemTypeLabel()) {
+              <div class="bottom-card__meta-group">
+                <span class="bottom-card__type-chip">{{ getItemTypeLabel() }}</span>
+              </div>
+            }
           </div>
           @if (selectedItem.averageRating > 0) {
             <div class="bottom-card__rating">

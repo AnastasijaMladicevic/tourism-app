@@ -153,10 +153,15 @@
               </span>
             }
           </div>
-          @if(item.type == 'destination' || item.type == 'activity') {
-            <p class="card__type"><mat-icon>place</mat-icon> {{ item.typeName }}</p>
+          @if (item.type === 'destination' || item.type === 'locality') {
+            @if (item.location) {
+              <p class="card__destination">{{ item.location }}</p>
+            }
+            <div class="card__meta">
+              <span class="card__type-chip">{{ item.typeName }}</span>
+            </div>
           } @else {
-          <p class="card__type"><mat-icon>place</mat-icon> {{ item.location }}</p>
+            <p class="card__type"><mat-icon>place</mat-icon> {{ item.location || item.typeName }}</p>
           }
 
           <p class="card__desc">{{ item.description }}</p>

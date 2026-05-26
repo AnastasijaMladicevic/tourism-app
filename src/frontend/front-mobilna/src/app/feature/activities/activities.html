@@ -168,7 +168,18 @@
         <div class="card__body">
           <h2 class="card__name">{{ activity.name }}</h2>
 
-          <p class="card__type"><mat-icon>place</mat-icon> {{ activity.activityTypeName }}</p>
+          <div class="card__details-stack">
+           
+
+            @if (activity.localityName) {
+              <p class="card__meta">
+                <mat-icon>place</mat-icon>
+                {{ activity.localityName }}
+              </p>
+            } @else if (activity.activityTypeName) {
+              <p class="card__meta card__meta--type">{{ activity.activityTypeName }}</p>
+            }
+          </div>
 
           <p class="card__desc">{{ activity.description }}</p>
 

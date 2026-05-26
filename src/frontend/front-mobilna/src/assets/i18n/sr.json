@@ -46,7 +46,11 @@
     "password": "Lozinka",
     "soonest": "Najskorije",
     "qrTitle": "QR kod",
-  "qrBody": "Skeniraj za brzo otvaranje ove stranice."
+    "qrBody": "Skeniraj za brzo otvaranje ove stranice.",
+    "open": "Otvori",
+    "delete": "Obriši",
+    "deleting": "Brišem...",
+    "noResults": "Nema rezultata"
   },
   "moderatorAccess": {
     "title": "Moderator pristup",
@@ -228,6 +232,46 @@
       "resetFailed": "Resetovanje lozinke nije uspelo.",
       "notLoggedIn": "Niste ulogovani. Prijavite se pa promenite lozinku.",
       "changeFailed": "Promena lozinke nije uspela. Proverite unos i pokušajte ponovo."
+    }
+  },
+  "myReviews": {
+    "title": "Moji utisci",
+    "searchPlaceholder": "Pretraži moje utiske...",
+    "totalReviews": "Ukupno {{count}} utisaka",
+    "loadingText": "Pripremamo tvoje utiske i statistiku naloga.",
+    "loadError": "Tvoji utisci trenutno nisu dostupni.",
+    "emptyTitle": "Još nemaš utisaka",
+    "emptyText": "Kada ostaviš komentar na neki objekat, ovde ćeš ga odmah videti.",
+    "noResultsText": "Probaj drugi filter ili pretragu da bi prikazao svoje utiske.",
+    "creatorResponse": "Odgovor kreatora",
+    "loadMore": "Učitaj još utisaka",
+    "subtitleFallback": "Pregled svih tvojih utisaka",
+    "locationFallback": "Lokacija nije dostupna",
+    "objectTypeFallback": "Objekat",
+    "deleteConfirm": "Da li sigurno želiš da obrišeš utisak za \"{{title}}\"?",
+    "deleteError": "Došlo je do greške prilikom brisanja utiska. Pokušaj ponovo.",
+    "status": {
+      "approved": "Odobreno",
+      "pending": "Na čekanju",
+      "rejected": "Odbijeno"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "manager": "Menadžer",
+      "contentCreator": "Kreator sadržaja",
+      "tourist": "Turista",
+      "user": "Korisnik"
+    },
+    "time": {
+      "today": "Danas",
+      "dayAgo": "Pre 1 dan",
+      "daysAgo": "Pre {{count}} dana",
+      "weekAgo": "Pre 1 nedelju",
+      "weeksAgo": "Pre {{count}} nedelje",
+      "monthAgo": "Pre 1 mesec",
+      "monthsAgo": "Pre {{count}} meseci",
+      "yearAgo": "Pre 1 godinu",
+      "yearsAgo": "Pre {{count}} godina"
     }
   },
   "signup": {

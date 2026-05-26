@@ -53,15 +53,17 @@
             <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
           </button>
         </div>
-        @if (destination?.regionName) {
-          <p class="location-bold">{{ destination?.regionName }}</p>
-        }
+        <div class="summary-meta">
+          @if (destination?.regionName) {
+            <p class="summary-location">{{ destination?.regionName }}</p>
+          }
 
-        @if (destination?.destinationTypeName) {
-          <p class="venue">
-            <mat-icon>location_on</mat-icon>{{ destination?.destinationTypeName }}
-          </p>
-        }
+          @if (destination?.destinationTypeName) {
+            <div class="summary-tags">
+              <span class="summary-type-chip">{{ destination?.destinationTypeName }}</span>
+            </div>
+          }
+        </div>
       </div>
 
       <div class="card">

@@ -6,6 +6,7 @@ import { environment } from '../../../environment/environment';
 import { AuthService, UserDto } from '../../services/auth';
 import { ReviewDto, ReviewService } from '../../services/review';
 import { TranslationService } from '../../services/translation.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 interface ReviewPreviewCard {
   id: number;
@@ -36,7 +37,7 @@ interface RatingRow {
 @Component({
   selector: 'app-my-reviews-preview',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './my-reviews-preview.component.html',
   styleUrl: './my-reviews-preview.component.scss',
 })
@@ -57,10 +58,10 @@ export class MyReviewsPreviewComponent implements OnInit {
 
   protected readonly filters = computed<ReviewFilter[]>(() => {
     const typeFilters = [...new Set(this.reviews().map((item) => item.objectType.trim()).filter(Boolean))]
-      .sort((a, b) => a.localeCompare(b, 'sr-Latn-RS'))
+      .sort((a, b) => a.localeCompare(b, this.translationService.currentLocale()))
       .map((type) => ({ label: type, value: type }));
 
-    return [{ label: 'Svi', value: 'all' }, ...typeFilters];
+    return [{ label: this.translationService.translate('common.all'), value: 'all' }, ...typeFilters];
   });
 
   protected readonly filteredReviews = computed(() => {
@@ -114,15 +115,15 @@ export class MyReviewsPreviewComponent implements OnInit {
 
   protected readonly displayName = computed(() => {
     const user = this.currentUser();
-    if (!user) return 'SpireGO korisnik';
+    if (!user) return this.translationService.translate('profile.defaultUser');
 
     const fullName = `${user.firstName?.trim() ?? ''} ${user.lastName?.trim() ?? ''}`.trim();
-    return fullName || 'SpireGO korisnik';
+    return fullName || this.translationService.translate('profile.defaultUser');
   });
 
   protected readonly profileSubtitle = computed(() => {
     const user = this.currentUser();
-    if (!user) return 'Pregled svih tvojih utisaka';
+    if (!user) return this.translationService.translate('myReviews.subtitleFallback');
 
     const role = this.roleLabel(user.roleName);
     const country = user.country?.trim();
@@ -149,7 +150,7 @@ export class MyReviewsPreviewComponent implements OnInit {
       reviews: this.reviewService.getMine({ page: 1, pageSize: 30 }).pipe(
         catchError((err) => {
           console.error(err);
-          this.errorMessage.set('Utisci trenutno nisu dostupni.');
+          this.errorMessage.set('myReviews.loadError');
           return of({ items: [] as ReviewDto[] });
         }),
       ),
@@ -211,7 +212,9 @@ export class MyReviewsPreviewComponent implements OnInit {
   protected deleteReview(card: ReviewPreviewCard): void {
     if (this.deletingId() === card.id) return;
 
-    const confirmed = window.confirm(`Da li sigurno želite da obrišete utisak za "${card.title}"?`);
+    const confirmed = window.confirm(
+      this.translationService.translate('myReviews.deleteConfirm', { title: card.title }),
+    );
     if (!confirmed) return;
 
     this.deletingId.set(card.id);
@@ -226,7 +229,7 @@ export class MyReviewsPreviewComponent implements OnInit {
       },
       error: (err) => {
         console.error('Delete review error:', err);
-        alert('Došlo je do greške prilikom brisanja recenzije. Pokušajte ponovo.');
+        alert(this.translationService.translate('myReviews.deleteError'));
         this.deletingId.set(null);
         this.cdr.detectChanges();
       }
@@ -245,15 +248,15 @@ export class MyReviewsPreviewComponent implements OnInit {
     return reviews
       .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
       .map((item) => {
-        const objectType = item.objectTypeName?.trim() || 'Objekat';
+        const objectType = item.objectTypeName?.trim() || this.translationService.translate('myReviews.objectTypeFallback');
         return {
           id: item.id,
           objectId: item.objectId,
-          title: item.objectName?.trim() || 'Objekat bez naziva',
+          title: item.objectName?.trim() || this.translationService.translate('reviews.objectFallback'),
           location: this.buildLocationLabel(item),
           createdLabel: this.formatDate(item.createdAt),
           timeAgo: this.formatRelativeDate(item.createdAt),
-          text: item.text?.trim() || 'Recenzija nema dodatni komentar.',
+          text: item.text?.trim() || this.translationService.translate('reviews.textFallback'),
           rating: this.normalizeRating(item.rating),
           objectType,
           objectTypeShort: this.buildTypeShortLabel(objectType),
@@ -271,7 +274,7 @@ export class MyReviewsPreviewComponent implements OnInit {
       return `${locality}, ${destination}`;
     }
 
-    return locality || destination || review.address?.trim() || 'Lokacija nije dostupna';
+    return locality || destination || review.address?.trim() || this.translationService.translate('myReviews.locationFallback');
   }
 
   private buildTypeShortLabel(type: string): string {
@@ -290,13 +293,13 @@ export class MyReviewsPreviewComponent implements OnInit {
   private normalizeStatus(status?: string | null): string {
     switch ((status ?? '').trim().toLowerCase()) {
       case 'approved':
-        return 'Odobreno';
+        return this.translationService.translate('myReviews.status.approved');
       case 'pending':
-        return 'Na cekanju';
+        return this.translationService.translate('myReviews.status.pending');
       case 'rejected':
-        return 'Odbijeno';
+        return this.translationService.translate('myReviews.status.rejected');
       default:
-        return status?.trim() || 'Bez statusa';
+        return status?.trim() || this.translationService.translate('reviews.statusFallback');
     }
   }
 
@@ -308,7 +311,7 @@ export class MyReviewsPreviewComponent implements OnInit {
     const date = new Date(value);
 
     if (Number.isNaN(date.getTime())) {
-      return 'Datum nije dostupan';
+      return this.translationService.translate('common.dateNotAvailable');
     }
 
     return date.toLocaleDateString(this.translationService.currentLocale(), {
@@ -322,40 +325,48 @@ export class MyReviewsPreviewComponent implements OnInit {
     const date = new Date(value);
 
     if (Number.isNaN(date.getTime())) {
-      return 'Datum nije dostupan';
+      return this.translationService.translate('common.dateNotAvailable');
     }
 
     const diffInDays = Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
 
-    if (diffInDays <= 0) return 'Danas';
-    if (diffInDays === 1) return 'Pre 1 dan';
-    if (diffInDays < 7) return `Pre ${diffInDays} dana`;
+    if (diffInDays <= 0) return this.translationService.translate('myReviews.time.today');
+    if (diffInDays === 1) return this.translationService.translate('myReviews.time.dayAgo');
+    if (diffInDays < 7) {
+      return this.translationService.translate('myReviews.time.daysAgo', { count: diffInDays });
+    }
 
     const diffInWeeks = Math.floor(diffInDays / 7);
-    if (diffInWeeks === 1) return 'Pre 1 nedelju';
-    if (diffInWeeks < 5) return `Pre ${diffInWeeks} nedelje`;
+    if (diffInWeeks === 1) return this.translationService.translate('myReviews.time.weekAgo');
+    if (diffInWeeks < 5) {
+      return this.translationService.translate('myReviews.time.weeksAgo', { count: diffInWeeks });
+    }
 
     const diffInMonths = Math.floor(diffInDays / 30);
-    if (diffInMonths === 1) return 'Pre 1 mesec';
-    if (diffInMonths < 12) return `Pre ${diffInMonths} meseci`;
+    if (diffInMonths === 1) return this.translationService.translate('myReviews.time.monthAgo');
+    if (diffInMonths < 12) {
+      return this.translationService.translate('myReviews.time.monthsAgo', { count: diffInMonths });
+    }
 
     const diffInYears = Math.floor(diffInDays / 365);
-    return diffInYears === 1 ? 'Pre 1 godinu' : `Pre ${diffInYears} godina`;
+    return diffInYears === 1
+      ? this.translationService.translate('myReviews.time.yearAgo')
+      : this.translationService.translate('myReviews.time.yearsAgo', { count: diffInYears });
   }
 
   private roleLabel(role?: string | null): string {
     switch ((role ?? '').trim().toLowerCase()) {
       case 'admin':
-        return 'Administrator';
+        return this.translationService.translate('myReviews.roles.admin');
       case 'manager':
-        return 'Menadzer';
+        return this.translationService.translate('myReviews.roles.manager');
       case 'contentcreator':
       case 'content-creator':
-        return 'Moderator';
+        return this.translationService.translate('myReviews.roles.contentCreator');
       case 'tourist':
-        return 'Turista';
+        return this.translationService.translate('myReviews.roles.tourist');
       default:
-        return 'Korisnik';
+        return this.translationService.translate('myReviews.roles.user');
     }
   }
 

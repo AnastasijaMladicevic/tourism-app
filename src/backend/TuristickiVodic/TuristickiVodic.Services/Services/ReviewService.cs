@@ -43,7 +43,7 @@ namespace TuristickiVodic.Services.Services
                 .ToListAsync();
 
             var items = _mapper.Map<List<ReviewDto>>(reviews);
-            await ApplyTranslationsAsync(items, query.LanguageCode, createMissing: false);
+            await ApplyTranslationsAsync(items, reviews, query.LanguageCode, createMissing: false);
 
             return new PagedResultDto<ReviewDto>
             {
@@ -77,7 +77,7 @@ namespace TuristickiVodic.Services.Services
                 .ToListAsync();
 
             var items = _mapper.Map<List<ReviewDto>>(reviews);
-            await ApplyTranslationsAsync(items, query.LanguageCode, createMissing: true);
+            await ApplyTranslationsAsync(items, reviews, query.LanguageCode, createMissing: true);
 
             return new PagedResultDto<ReviewDto>
             {
@@ -110,7 +110,7 @@ namespace TuristickiVodic.Services.Services
             if (review == null) return null;
 
             var dto = _mapper.Map<ReviewDto>(review);
-            await ApplyTranslationsAsync(new List<ReviewDto> { dto }, languageCode, createMissing: true);
+            await ApplyTranslationsAsync(new List<ReviewDto> { dto }, new List<Review> { review }, languageCode, createMissing: true);
 
             return dto;
         }
@@ -506,33 +506,93 @@ namespace TuristickiVodic.Services.Services
             return reviewsQuery;
         }
 
-        private async Task ApplyTranslationsAsync(List<ReviewDto> items, string? languageCode, bool createMissing)
+        private async Task ApplyTranslationsAsync(List<ReviewDto> items, List<Review> reviews, string? languageCode, bool createMissing)
         {
             var normalizedLanguage = LanguageHelper.Normalize(languageCode);
-            if (normalizedLanguage == "sr" || items.Count == 0)
+            if (normalizedLanguage == "sr" || items.Count == 0 || reviews.Count == 0)
                 return;
+
+            var reviewsById = reviews.ToDictionary(review => review.Id);
 
             foreach (var item in items)
             {
-                item.Text = await TranslateFieldAsync(item.Id, "Text", item.Text, normalizedLanguage, createMissing);
+                if (!reviewsById.TryGetValue(item.Id, out var review))
+                    continue;
 
-                if (!string.IsNullOrWhiteSpace(item.CreatorResponse))
+                item.Text = await TranslateOptionalFieldAsync("Review", review.Id, "Text", item.Text, normalizedLanguage, createMissing);
+
+                item.CreatorResponse = await TranslateOptionalFieldAsync(
+                    "Review",
+                    review.Id,
+                    "CreatorResponse",
+                    item.CreatorResponse,
+                    normalizedLanguage,
+                    createMissing);
+
+                if (review.Object == null)
+                    continue;
+
+                if (review.Object.ObjectType != null)
                 {
-                    item.CreatorResponse = await TranslateFieldAsync(
-                        item.Id,
-                        "CreatorResponse",
-                        item.CreatorResponse,
+                    item.ObjectTypeName = await TranslateOptionalFieldAsync(
+                        "ObjectType",
+                        review.Object.ObjectType.Id,
+                        "Name",
+                        item.ObjectTypeName,
+                        normalizedLanguage,
+                        createMissing);
+                }
+
+                if (review.Object.Locality != null)
+                {
+                    item.LocalityName = await TranslateOptionalFieldAsync(
+                        "Locality",
+                        review.Object.Locality.Id,
+                        "Name",
+                        item.LocalityName,
+                        normalizedLanguage,
+                        createMissing);
+                }
+
+                var destination = review.Object.Destination ?? review.Object.Locality?.Destination;
+                if (destination != null)
+                {
+                    item.DestinationName = await TranslateOptionalFieldAsync(
+                        "Destination",
+                        destination.Id,
+                        "Name",
+                        item.DestinationName,
                         normalizedLanguage,
                         createMissing);
                 }
             }
         }
 
-        private async Task<string> TranslateFieldAsync(int reviewId, string fieldName, string originalText, string languageCode, bool createMissing)
+        private async Task<string> TranslateOptionalFieldAsync(
+            string entityType,
+            int entityId,
+            string fieldName,
+            string? originalText,
+            string languageCode,
+            bool createMissing)
+        {
+            if (string.IsNullOrWhiteSpace(originalText))
+                return originalText ?? string.Empty;
+
+            return await TranslateFieldAsync(entityType, entityId, fieldName, originalText, languageCode, createMissing);
+        }
+
+        private async Task<string> TranslateFieldAsync(
+            string entityType,
+            int entityId,
+            string fieldName,
+            string originalText,
+            string languageCode,
+            bool createMissing)
         {
             return createMissing
-                ? await _translationService.GetOrCreateTextAsync("Review", reviewId, fieldName, originalText, languageCode)
-                : await _translationService.GetTextAsync("Review", reviewId, fieldName, originalText, languageCode);
+                ? await _translationService.GetOrCreateTextAsync(entityType, entityId, fieldName, originalText, languageCode)
+                : await _translationService.GetTextAsync(entityType, entityId, fieldName, originalText, languageCode);
         }
 
         private static IQueryable<Review> ApplyReviewSorting(IQueryable<Review> query, string? sortBy, string? sortOrder)

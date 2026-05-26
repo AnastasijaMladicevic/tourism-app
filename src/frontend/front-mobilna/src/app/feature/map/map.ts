@@ -1270,6 +1270,20 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       .join(', ');
   }
 
+  getItemTypeLabel(): string {
+    if (!this.selectedItem) return '';
+
+    if (this.selectedType === 'destination') {
+      return this.selectedItem.destinationTypeName ?? '';
+    }
+
+    if (this.selectedType === 'locality') {
+      return this.selectedItem.localityTypeName ?? '';
+    }
+
+    return '';
+  }
+
   private focusActiveRegion(): void {
     const activeRegionId = this.activeRegionService.getActiveRegionId();
     const regionRequest = activeRegionId

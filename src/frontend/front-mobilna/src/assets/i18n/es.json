@@ -46,7 +46,11 @@
     "password": "Contraseña",
     "soonest": "Más próximos",
     "qrTitle": "Código QR",
-    "qrBody": "Escanea para abrir rápidamente esta página."
+    "qrBody": "Escanea para abrir rápidamente esta página.",
+    "open": "Abrir",
+    "delete": "Eliminar",
+    "deleting": "Eliminando...",
+    "noResults": "Sin resultados"
   },
   "moderatorAccess": {
     "title": "Acceso de moderador",
@@ -228,6 +232,46 @@
       "resetFailed": "No se pudo restablecer la contraseña.",
       "notLoggedIn": "No has iniciado sesión.",
       "changeFailed": "No se pudo cambiar la contraseña. Inténtalo de nuevo."
+    }
+  },
+  "myReviews": {
+    "title": "Mis reseñas",
+    "searchPlaceholder": "Buscar mis reseñas...",
+    "totalReviews": "{{count}} reseñas en total",
+    "loadingText": "Preparando tus reseñas y estadísticas de la cuenta.",
+    "loadError": "Tus reseñas no están disponibles en este momento.",
+    "emptyTitle": "Aún no tienes reseñas",
+    "emptyText": "Cuando dejes un comentario sobre un objeto, lo verás aquí.",
+    "noResultsText": "Prueba con otro filtro o búsqueda para mostrar tus reseñas.",
+    "creatorResponse": "Respuesta del creador",
+    "loadMore": "Cargar más reseñas",
+    "subtitleFallback": "Resumen de todos tus comentarios",
+    "locationFallback": "La ubicación no está disponible",
+    "objectTypeFallback": "Objeto",
+    "deleteConfirm": "¿Seguro que quieres eliminar tu reseña de \"{{title}}\"?",
+    "deleteError": "Hubo un problema al eliminar tu reseña. Inténtalo de nuevo.",
+    "status": {
+      "approved": "Aprobado",
+      "pending": "Pendiente",
+      "rejected": "Rechazado"
+    },
+    "roles": {
+      "admin": "Administrador",
+      "manager": "Manager",
+      "contentCreator": "Creador de contenido",
+      "tourist": "Turista",
+      "user": "Usuario"
+    },
+    "time": {
+      "today": "Hoy",
+      "dayAgo": "Hace 1 día",
+      "daysAgo": "Hace {{count}} días",
+      "weekAgo": "Hace 1 semana",
+      "weeksAgo": "Hace {{count}} semanas",
+      "monthAgo": "Hace 1 mes",
+      "monthsAgo": "Hace {{count}} meses",
+      "yearAgo": "Hace 1 año",
+      "yearsAgo": "Hace {{count}} años"
     }
   },
   "signup": {

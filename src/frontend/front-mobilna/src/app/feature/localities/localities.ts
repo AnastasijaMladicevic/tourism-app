@@ -247,6 +247,12 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
     this.router.navigate(['/locality', locality.id]);
   }
 
+  getLocalityLocation(locality: LocalityView): string {
+    return [locality.destinationName, locality.regionName]
+      .filter((part): part is string => Boolean(part && part.trim()))
+      .join(', ');
+  }
+
   getMainImage(locality: LocalityView): string {
     if (locality.images && locality.images.length > 0) {
       const mainImage = locality.images.find((image) => image.isMain);
@@ -385,6 +391,9 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
       latitude: this.readOptionalNumber(dto, ['latitude', 'Latitude']),
       distanceMeters: this.readOptionalNumber(dto, ['distanceMeters', 'DistanceMeters']),
       isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
+      regionId: this.readOptionalNumber(dto, ['regionId', 'RegionId']),
+      regionName: (dto['regionName'] ?? dto['RegionName'] ?? undefined) as string | undefined,
+      regionCode: (dto['regionCode'] ?? dto['RegionCode'] ?? undefined) as string | undefined,
       localityTypeId: Number(dto['localityTypeId'] ?? dto['LocalityTypeId'] ?? 0),
       localityTypeName: String(dto['localityTypeName'] ?? dto['LocalityTypeName'] ?? ''),
       destinationName: String(dto['destinationName'] ?? dto['DestinationName'] ?? ''),

@@ -713,3 +713,14 @@
     }
   }
 }
+
+:host-context(:root[data-theme='dark']) {
+
+  .action-btn--danger {
+    color: #ff5c5c !important;
+
+    &:hover {
+      color: #ff7b7b !important;
+    }
+  }
+}

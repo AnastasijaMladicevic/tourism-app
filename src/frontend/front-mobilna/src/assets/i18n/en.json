@@ -46,7 +46,11 @@
     "password": "Password",
     "soonest": "Soonest",
     "qrTitle": "QR code",
-    "qrBody": "Scan to quickly open this page."
+    "qrBody": "Scan to quickly open this page.",
+    "open": "Open",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "noResults": "No results"
   },
   "moderatorAccess": {
     "title": "Moderator access",
@@ -228,6 +232,46 @@
       "resetFailed": "Password reset failed.",
       "notLoggedIn": "You are not logged in.",
       "changeFailed": "Password change failed. Please try again."
+    }
+  },
+  "myReviews": {
+    "title": "My reviews",
+    "searchPlaceholder": "Search my reviews...",
+    "totalReviews": "{{count}} reviews in total",
+    "loadingText": "Preparing your reviews and account statistics.",
+    "loadError": "Your reviews are currently unavailable.",
+    "emptyTitle": "You don't have any reviews yet",
+    "emptyText": "When you leave a comment on an object, you will see it here.",
+    "noResultsText": "Try another filter or search to show your reviews.",
+    "creatorResponse": "Creator response",
+    "loadMore": "Load more reviews",
+    "subtitleFallback": "Overview of all your feedback",
+    "locationFallback": "Location is not available",
+    "objectTypeFallback": "Object",
+    "deleteConfirm": "Are you sure you want to delete your review for \"{{title}}\"?",
+    "deleteError": "There was a problem deleting your review. Please try again.",
+    "status": {
+      "approved": "Approved",
+      "pending": "Pending",
+      "rejected": "Rejected"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "manager": "Manager",
+      "contentCreator": "Content creator",
+      "tourist": "Tourist",
+      "user": "User"
+    },
+    "time": {
+      "today": "Today",
+      "dayAgo": "1 day ago",
+      "daysAgo": "{{count}} days ago",
+      "weekAgo": "1 week ago",
+      "weeksAgo": "{{count}} weeks ago",
+      "monthAgo": "1 month ago",
+      "monthsAgo": "{{count}} months ago",
+      "yearAgo": "1 year ago",
+      "yearsAgo": "{{count}} years ago"
     }
   },
   "signup": {
