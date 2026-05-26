@@ -152,7 +152,7 @@
             <input
               type="text"
               [(ngModel)]="form.name"
-              (ngModelChange)="onDestinationNameInput($event)"
+              (keyup)="onDestinationNameInput(($any($event.target)).value)"
               placeholder="e.g. Emerald Valley Park"
             />
             @if (locationLookupState !== 'idle' && form.name.trim().length >= 2) {

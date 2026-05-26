@@ -213,6 +213,18 @@ export class MapService {
     const entry: MarkerEntry = { marker, data, type, lat, lng, clusterKey };
     const key = this.toMarkerKey(type, data?.id);
 
+    if (type === 'destination') {
+      const popupHtml = this.buildDestinationPopupHtml(data);
+      if (popupHtml) {
+        marker.bindPopup(popupHtml, {
+          closeButton: false,
+          autoPanPadding: [24, 24],
+          maxWidth: 300,
+          minWidth: 240,
+        });
+      }
+    }
+
     this.markers.push(entry);
     this.markerMap.set(key, entry);
 
@@ -486,5 +498,48 @@ export class MapService {
   private getMarkerIconHtml(type: string): string {
     const icon = this.getMarkerEmoji(type);
     return `<div class="marker-pin"><span class="marker-pin__icon">${icon}</span></div>`;
+  }
+
+  private buildDestinationPopupHtml(destination: any): string {
+    const destinationId = Number(destination?.id);
+    if (!Number.isFinite(destinationId) || destinationId <= 0) {
+      return '';
+    }
+
+    const name = this.escapeHtml(String(destination?.name ?? 'Destination'));
+    const region = this.escapeHtml(String(destination?.regionName ?? destination?.destinationTypeName ?? ''));
+    const imageUrl = this.escapeHtml(
+      String(destination?.mainImageUrl ?? destination?.images?.find((image: any) => image?.isMain)?.url ?? destination?.images?.[0]?.url ?? ''),
+    );
+    const detailsHref = `/admin/destinations/edit/${destinationId}`;
+
+    return `
+      <div class="destination-popup" style="width: 100%; max-width: 280px; display: flex; flex-direction: column; gap: 10px; font-family: inherit;">
+        <div style="border-radius: 14px; overflow: hidden; background: #f8fafc; border: 1px solid #e5e7eb; min-height: 132px; display: flex; align-items: center; justify-content: center;">
+          ${imageUrl
+            ? `<img src="${imageUrl}" alt="${name}" style="width: 100%; height: 132px; object-fit: cover; display: block;" />`
+            : `<div style="padding: 20px; color: #94a3b8; font-size: 13px; text-align: center;">No image available</div>`}
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 4px;">
+          <strong style="font-size: 14px; line-height: 1.3; color: #0f172a;">${name}</strong>
+          ${region ? `<span style="font-size: 12px; color: #64748b;">${region}</span>` : ''}
+        </div>
+        <a
+          href="${detailsHref}"
+          style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 12px; border-radius: 10px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; text-decoration: none; font-size: 13px; font-weight: 700;"
+        >
+          View details
+        </a>
+      </div>
+    `;
+  }
+
+  private escapeHtml(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 }

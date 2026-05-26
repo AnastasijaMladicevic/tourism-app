@@ -29,15 +29,11 @@
         type="text"
         class="toolbar-input"
         [(ngModel)]="draftSearchQuery"
-        (keydown.enter)="onSearchEnter($event)"
+        (keyup)="onSearchEnter($event)"
         placeholder="Search destinations, regions, or country..."
       />
     </div>
 
-    <button type="button" class="ghost-btn slim-btn" (click)="onMoreFilters()">
-      <span class="material-symbols-outlined">filter_alt</span>
-      More Filters
-    </button>
   </div>
 
   @if (filterPanelOpen) {

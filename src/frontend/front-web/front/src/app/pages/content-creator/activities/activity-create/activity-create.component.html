@@ -217,7 +217,7 @@
             class="location-context-search__input"
             [(ngModel)]="locationContextQuery"
             [ngModelOptions]="{ standalone: true }"
-            (keydown.enter)="$event.preventDefault(); onLocationContextSearch()"
+            (keyup)="onLocationContextSearch()"
             placeholder="Set destination/locality for location context"
             aria-label="Search for a place to set map context"
             [disabled]="isLocationContextSearching"

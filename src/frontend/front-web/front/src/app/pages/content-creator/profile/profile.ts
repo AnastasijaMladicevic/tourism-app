@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
@@ -7,17 +7,54 @@ import { ImageCropperComponent, ImageCroppedEvent } from 'ngx-image-cropper';
 import { environment } from '../../../../environment/environment';
 import { AuthService, UpdateUserDto } from '../../../services/auth.service';
 import { UserDto } from '../../../models/user.model';
+import { AppLanguage, TranslationService } from '../../../services/translation.service';
+
+type LanguageOption = {
+  value: AppLanguage;
+  label: string;
+  description: string;
+};
+
+type PermissionItem = {
+  label: string;
+  detail: string;
+};
+
+type PasswordChangeStep = 'credentials' | 'otp';
+
+type ModalState = 'closed' | 'opening' | 'open' | 'closing';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, MatIcon, ImageCropperComponent],
-  templateUrl: './profile.html',
-  styleUrls: ['./profile.css'],
+  templateUrl: '../../admin/profile/profile.component.html',
+  styleUrls: ['../../admin/profile/profile.component.css'],
 })
 export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   private static readonly DEFAULT_PROFILE_IMAGE_URL =
     `${environment.apiUrl.replace('/api', '')}/images/profiles/default_icon.png`;
+
+  readonly languageOptions: LanguageOption[] = [
+    { value: 'me', label: 'Montenegrin', description: 'Primary locale for Montenegro' },
+    { value: 'sr', label: 'Serbian', description: 'Latin script, regional default' },
+    { value: 'en', label: 'English', description: 'Global app language' },
+    { value: 'de', label: 'German', description: 'Deutsch for German-speaking users' },
+    { value: 'fr', label: 'French', description: 'Français for French-speaking users' },
+    { value: 'es', label: 'Spanish', description: 'Español for Spanish-speaking users' },
+    { value: 'it', label: 'Italian', description: 'Italiano for Italian-speaking users' },
+  ];
+
+  readonly permissionItems: PermissionItem[] = [
+    { label: 'Create objects, events, and activities', detail: 'Content Creator can create new objects, events, and activities, and they start in Pending state.' },
+    { label: 'Edit own published content', detail: 'Content Creator can update only their own objects, events, and activities.' },
+    { label: 'Delete own unpublished content', detail: 'Content Creator can delete only their own content before it is Approved.' },
+    { label: 'Manage content images', detail: 'Content Creator can add images to their own objects, events, and activities.' },
+    { label: 'Respond to reviews', detail: 'Content Creator can reply to reviews on their own objects and edit or delete that reply.' },
+    { label: 'Request deletions', detail: 'Content Creator can request deletion of their own Approved objects, events, and activities.' },
+    { label: 'View own deletion requests', detail: 'Content Creator can list and inspect only their own deletion requests.' },
+    { label: 'View dashboard overview', detail: 'Content Creator can open the content creator dashboard overview.' },
+  ];
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
@@ -37,12 +74,34 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   pendingCropFile: File | null = null;
   isSaving = false;
   saveSuccess = false;
+  passwordModalState: ModalState = 'closed';
+  passwordChangeStep: PasswordChangeStep = 'credentials';
+  passwordError = '';
+  passwordInfo = '';
+  passwordLoading = false;
+  currentPassword = '';
+  newPassword = '';
+  confirmNewPassword = '';
+  hideCurrentPassword = true;
+  hideNewPassword = true;
+  hideConfirmNewPassword = true;
+  otpCode = '';
+  otpDemoCode = '';
+  otpSecondsRemaining = 0;
+  otpResendSecondsRemaining = 0;
 
   private cropPreviewUrl: string | null = null;
   private pendingCroppedBlob: Blob | null = null;
+  private otpExpiryTimerId: number | null = null;
+  private otpResendTimerId: number | null = null;
+  private passwordModalCloseTimerId: number | null = null;
+
+  private static readonly OTP_EXPIRY_SECONDS = 300;
+  private static readonly OTP_RESEND_SECONDS = 30;
 
   constructor(
     private authService: AuthService,
+    private translationService: TranslationService,
     private router: Router,
     private cdr: ChangeDetectorRef,
   ) { }
@@ -69,6 +128,8 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.revokeCropPreviewUrl();
+    this.clearPasswordTimers();
+    this.unlockBodyScroll();
   }
 
   get cropPreview(): string | null {
@@ -77,6 +138,20 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
 
   get displayName(): string {
     return `${this.user.firstName} ${this.user.lastName}`.trim() || 'Unknown User';
+  }
+
+  get activeLanguageLabel(): string {
+    return this.languageOptions.find((option) => option.value === this.user.language)?.label ?? 'Not set';
+  }
+
+  get permissionCount(): number {
+    return this.permissionItems.length;
+  }
+
+  onLanguageSelected(language: string): void {
+    const normalized = this.normalizeLanguage(language);
+    this.user = { ...this.user, language: normalized };
+    this.translationService.setLanguage(normalized);
   }
 
   get roleBadgeClass(): string {
@@ -221,11 +296,159 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   }
 
   resetPassword(): void {
-    if (!this.user.email) return;
-    this.authService.forgotPassword(this.user.email).subscribe({
-      next: () => alert('Password reset email sent.'),
-      error: (err) => console.error('Reset failed', err),
+    if (!this.user.email || this.passwordModalState !== 'closed') return;
+
+    this.passwordModalState = 'opening';
+    this.passwordChangeStep = 'credentials';
+    this.passwordError = '';
+    this.passwordInfo = '';
+    this.passwordLoading = false;
+    this.currentPassword = '';
+    this.newPassword = '';
+    this.confirmNewPassword = '';
+    this.hideCurrentPassword = true;
+    this.hideNewPassword = true;
+    this.hideConfirmNewPassword = true;
+    this.otpCode = '';
+    this.otpDemoCode = '';
+    this.otpSecondsRemaining = 0;
+    this.otpResendSecondsRemaining = 0;
+    this.clearPasswordTimers();
+    this.lockBodyScroll();
+
+    window.setTimeout(() => {
+      if (this.passwordModalState === 'opening') {
+        this.passwordModalState = 'open';
+      }
+    }, 20);
+  }
+
+  closePasswordModal(forceClose = false): void {
+    if (this.passwordModalState === 'closed' || (this.passwordLoading && !forceClose)) {
+      return;
+    }
+
+    this.passwordModalState = 'closing';
+    this.passwordError = '';
+    this.passwordInfo = '';
+    this.clearPasswordTimers();
+
+    if (this.passwordModalCloseTimerId) {
+      window.clearTimeout(this.passwordModalCloseTimerId);
+    }
+
+    this.passwordModalCloseTimerId = window.setTimeout(() => {
+      this.passwordModalState = 'closed';
+      this.passwordChangeStep = 'credentials';
+      this.currentPassword = '';
+      this.newPassword = '';
+      this.confirmNewPassword = '';
+      this.otpCode = '';
+      this.otpDemoCode = '';
+      this.otpSecondsRemaining = 0;
+      this.otpResendSecondsRemaining = 0;
+      this.unlockBodyScroll();
+      this.passwordModalCloseTimerId = null;
+    }, 220);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    if (this.passwordModalState !== 'closed') {
+      this.closePasswordModal();
+    }
+  }
+
+  submitPasswordStep(): void {
+    if (this.passwordLoading) return;
+
+    this.passwordError = '';
+    this.passwordInfo = '';
+
+    if (!this.currentPassword.trim()) {
+      this.passwordError = 'Current password is required.';
+      return;
+    }
+
+    if (this.newPassword.length < 8) {
+      this.passwordError = 'New password must be at least 8 characters long.';
+      return;
+    }
+
+    if (!/[A-Z]/.test(this.newPassword) || !/[\d\W]/.test(this.newPassword)) {
+      this.passwordError = 'New password must include one uppercase letter and one number or symbol.';
+      return;
+    }
+
+    if (this.newPassword !== this.confirmNewPassword) {
+      this.passwordError = 'Passwords do not match.';
+      return;
+    }
+
+    this.passwordChangeStep = 'otp';
+    this.otpCode = '';
+    this.otpDemoCode = this.generateDemoOtpCode();
+    this.passwordInfo = `Demo verification code: ${this.otpDemoCode}`;
+    this.startOtpCountdown();
+  }
+
+  submitOtpStep(): void {
+    if (this.passwordLoading) return;
+
+    this.passwordError = '';
+    this.passwordInfo = '';
+
+    if (!/^\d{6}$/.test(this.otpCode.trim())) {
+      this.passwordError = 'Enter the 6-digit verification code.';
+      return;
+    }
+
+    if (!this.otpDemoCode) {
+      this.passwordError = 'The verification session expired. Resend the code to continue.';
+      return;
+    }
+
+    if (this.otpCode.trim() !== this.otpDemoCode) {
+      this.passwordError = 'Invalid verification code.';
+      return;
+    }
+
+    const dto = {
+      currentPassword: this.currentPassword,
+      newPassword: this.newPassword,
+      confirmPassword: this.confirmNewPassword,
+    };
+
+    this.showSaveSuccess();
+    this.closePasswordModal(true);
+
+    this.authService.changePassword(this.user.id!, dto).subscribe({
+      error: (err) => {
+        this.passwordError = err?.error?.message ?? err?.error?.title ?? 'Password change failed.';
+      },
     });
+  }
+
+  resendOtpCode(): void {
+    if (this.passwordLoading || this.otpResendSecondsRemaining > 0) return;
+
+    this.passwordError = '';
+    this.passwordInfo = '';
+    this.otpDemoCode = this.generateDemoOtpCode();
+    this.otpCode = '';
+    this.passwordInfo = `Demo verification code: ${this.otpDemoCode}`;
+    this.startOtpCountdown();
+  }
+
+  backToPasswordStep(): void {
+    if (this.passwordLoading) return;
+
+    this.passwordChangeStep = 'credentials';
+    this.passwordError = '';
+    this.passwordInfo = '';
+    this.otpCode = '';
+    this.otpDemoCode = '';
+    this.clearPasswordTimers();
   }
 
   cancel(): void {
@@ -239,13 +462,20 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   }
 
   private syncUserState(user: UserDto): void {
+    const selectedLanguage = this.normalizeLanguage(user.language ?? this.translationService.language());
+
     this.user = {
       ...user,
+      language: selectedLanguage,
       dateOfBirth: this.normalizeDateForInput(user.dateOfBirth),
     };
     this.initials = this.buildInitials(user);
     this.role = this.authService.getNormalizedRole(user) ?? '';
     this.avatarUrl = user.profileImageUrl?.trim() || ProfileComponentContentCreator.DEFAULT_PROFILE_IMAGE_URL;
+  }
+
+  private normalizeLanguage(language?: string | null): AppLanguage {
+    return this.translationService.normalizeLanguageCode(language);
   }
 
   private mergeUserState(updated: UserDto): UserDto {
@@ -292,5 +522,65 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
     setTimeout(() => {
       this.saveSuccess = false;
     }, 2500);
+  }
+
+  private startOtpCountdown(): void {
+    this.clearPasswordTimers();
+    this.otpSecondsRemaining = ProfileComponentContentCreator.OTP_EXPIRY_SECONDS;
+    this.otpResendSecondsRemaining = ProfileComponentContentCreator.OTP_RESEND_SECONDS;
+
+    this.otpExpiryTimerId = window.setInterval(() => {
+      this.otpSecondsRemaining = Math.max(0, this.otpSecondsRemaining - 1);
+
+      if (this.otpSecondsRemaining === 0) {
+        this.passwordError = 'The verification code has expired. Resend it to continue.';
+        this.clearOtpExpiryTimer();
+      }
+    }, 1000);
+
+    this.otpResendTimerId = window.setInterval(() => {
+      this.otpResendSecondsRemaining = Math.max(0, this.otpResendSecondsRemaining - 1);
+
+      if (this.otpResendSecondsRemaining === 0) {
+        this.clearOtpResendTimer();
+      }
+    }, 1000);
+  }
+
+  private clearPasswordTimers(): void {
+    this.clearOtpExpiryTimer();
+    this.clearOtpResendTimer();
+
+    if (this.passwordModalCloseTimerId !== null) {
+      window.clearTimeout(this.passwordModalCloseTimerId);
+      this.passwordModalCloseTimerId = null;
+    }
+  }
+
+  private clearOtpExpiryTimer(): void {
+    if (this.otpExpiryTimerId !== null) {
+      window.clearInterval(this.otpExpiryTimerId);
+      this.otpExpiryTimerId = null;
+    }
+  }
+
+  private clearOtpResendTimer(): void {
+    if (this.otpResendTimerId !== null) {
+      window.clearInterval(this.otpResendTimerId);
+      this.otpResendTimerId = null;
+    }
+  }
+
+  private lockBodyScroll(): void {
+    document.body.style.overflow = 'hidden';
+  }
+
+  private unlockBodyScroll(): void {
+    document.body.style.overflow = '';
+  }
+
+  private generateDemoOtpCode(): string {
+    const code = Math.floor(100000 + Math.random() * 900000);
+    return code.toString();
   }
 }

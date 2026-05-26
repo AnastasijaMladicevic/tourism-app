@@ -57,14 +57,10 @@
       <input
         type="text"
         [(ngModel)]="draftSearchQuery"
-        (keydown.enter)="onSearchEnter($event)"
+        (keyup)="onSearchEnter($event)"
         placeholder="Search by creator name, reason, or report ID..."
       />
     </label>
-    <button type="button" class="ghost-btn" (click)="toggleFilters()">
-      <span class="material-symbols-outlined">filter_alt</span>
-      Filters
-    </button>
   </div>
 
   @if (filterPanelOpen) {

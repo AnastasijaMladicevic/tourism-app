@@ -383,6 +383,7 @@ export class AuthService {
     localStorage.setItem(this.tokenKey, response.token);
     localStorage.setItem(this.refreshTokenKey, response.refreshToken);
     localStorage.setItem(this.userKey, JSON.stringify(user));
+    this.translationService.setLanguage(user.language);
     if (response.isBanned && response.banMessage?.trim()) {
       sessionStorage.setItem('spirego-admin-ban-message', response.banMessage.trim());
     } else {

@@ -5,11 +5,12 @@ import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-manager-layout',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NotificationBellComponent],
+  imports: [CommonModule, FormsModule, RouterModule, NotificationBellComponent, TranslatePipe],
   templateUrl: './managerlayout.component.html',
   styleUrls: ['./managerlayout.component.css'],
 })

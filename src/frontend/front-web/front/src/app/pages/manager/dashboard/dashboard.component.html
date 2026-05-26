@@ -38,13 +38,13 @@
 
     <ng-container *ngIf="hasManagedDestination">
       <div class="kpi-row">
-        <article class="kpi-card card kpi-card--destination">
+        <article class="kpi-card card kpi-card--destination kpi-card--teal">
           <span class="kpi-value kpi-value--title">{{ managedDestinationTitle }}</span>
           <span class="kpi-destination-subtitle" *ngIf="managedDestinationDisplayTitle">{{ managedDestinationDisplayTitle }}</span>
           <span class="kpi-meta muted" *ngIf="managedDestinationSubtitle">{{ managedDestinationSubtitle }}</span>
         </article>
 
-        <article class="kpi-card card">
+        <article class="kpi-card card kpi-card--blue">
           <span class="kpi-label">Active creators</span>
           <span class="kpi-value">{{ overview.summary.activeCreators | number }}</span>
           <span class="kpi-meta muted">
@@ -52,19 +52,19 @@
           </span>
         </article>
 
-        <article class="kpi-card card" [class.kpi-card--alert]="overview.summary.pendingModerationItems > 0">
+        <article class="kpi-card card kpi-card--amber" [class.kpi-card--alert]="overview.summary.pendingModerationItems > 0">
           <span class="kpi-label">Pending moderation</span>
           <span class="kpi-value">{{ overview.summary.pendingModerationItems | number }}</span>
           <span class="kpi-meta muted">Current moderation queue</span>
         </article>
 
-        <article class="kpi-card card" [class.kpi-card--alert]="overview.summary.openReports > 0">
+        <article class="kpi-card card kpi-card--red" [class.kpi-card--alert]="overview.summary.openReports > 0">
           <span class="kpi-label">Open reports</span>
           <span class="kpi-value">{{ overview.summary.openReports | number }}</span>
           <span class="kpi-meta muted">{{ overview.reports.totalInPeriod | number }} submitted in {{ overview.periodKey }}</span>
         </article>
 
-        <article class="kpi-card card">
+        <article class="kpi-card card kpi-card--purple">
           <span class="kpi-label">Average rating</span>
           <span class="kpi-value">{{ overview.summary.averageRatingInPeriod | number:'1.1-1' }}</span>
           <span class="kpi-meta muted">
@@ -72,7 +72,7 @@
           </span>
         </article>
 
-        <article class="kpi-card card">
+        <article class="kpi-card card kpi-card--green">
           <span class="kpi-label">Unanswered reviews</span>
           <span class="kpi-value">{{ overview.summary.unansweredReviews | number }}</span>
           <span class="kpi-meta muted">

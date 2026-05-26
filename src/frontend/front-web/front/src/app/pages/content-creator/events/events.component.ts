@@ -63,7 +63,7 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
   categoryFilter = 'all';
   sortBy = 'status';
   sortOrder: 'asc' | 'desc' = 'desc';
-  filterPanelOpen = false;
+  filterPanelOpen = true;
   rangeStartDate = '';
   rangeEndDate = '';
 
@@ -211,12 +211,15 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
   }
 
   onSearch(): void {
-    // Intentionally no-op: search is applied only on Enter or explicit Apply.
+    // Search is applied on every keyup.
+    this.searchQuery = this.draftSearchQuery.trim();
+    this.currentPage = 1;
+    this.loadEvents();
   }
 
   onSearchEnter(event: Event): void {
     event.preventDefault();
-    this.onApplyFilters();
+    this.onSearch();
   }
 
   onMoreFilters(): void {

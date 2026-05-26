@@ -46,7 +46,7 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
   typeFilter = 'all';
   sortBy = 'name';
   sortOrder: 'asc' | 'desc' = 'asc';
-  filterPanelOpen = false;
+  filterPanelOpen = true;
 
   destinationOptions: FilterOption[] = [];
   typeOptions: FilterOption[] = [];

@@ -94,7 +94,7 @@
         <input
           type="text"
           [ngModel]="searchTerm"
-          (ngModelChange)="onSearchChange($event)"
+          (keyup)="onSearchChange(($any($event.target)).value)"
           placeholder="Search tourist, object, review text, reply..."
         />
       </label>

@@ -57,7 +57,7 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
   destinationFilter = 'all';
   sortBy = 'status';
   sortOrder: 'asc' | 'desc' = 'desc';
-  filterPanelOpen = false;
+  filterPanelOpen = true;
   statsTotalCount: number | null = null;
   statsPendingCount: number | null = null;
 
@@ -226,12 +226,15 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
   }
 
   onSearch(): void {
-    // Search is applied explicitly on Enter or via the filter panel's Apply button.
+    // Search is applied on every keyup.
+    this.searchQuery = this.draftSearchQuery.trim();
+    this.currentPage = 1;
+    this.loadActivities();
   }
 
   onSearchEnter(event: Event): void {
     event.preventDefault();
-    this.onApplyFilters();
+    this.onSearch();
   }
 
   onMoreFilters(): void {

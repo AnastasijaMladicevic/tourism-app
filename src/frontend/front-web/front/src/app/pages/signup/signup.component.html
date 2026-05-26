@@ -8,42 +8,42 @@
     </div>
 
     <div class="right">
-      <h2>Welcome</h2>
+      <h2>{{ 'auth.signUp.welcome' | translate }}</h2>
 
       <div class="alert error" *ngIf="errorMessage">{{ errorMessage }}</div>
       <div class="alert success" *ngIf="successMessage">{{ successMessage }}</div>
 
       <form>
-        <label>First Name</label>
+        <label>{{ 'auth.signUp.firstName' | translate }}</label>
 <div class="input-group">
   <span class="material-symbols-outlined icon">person</span>
-  <input type="text" placeholder="First Name" [(ngModel)]="firstName" name="firstName" />
+  <input type="text" [placeholder]="'auth.signUp.firstName' | translate" [(ngModel)]="firstName" name="firstName" />
 </div>
 
-<label>Last Name</label>
+<label>{{ 'auth.signUp.lastName' | translate }}</label>
 <div class="input-group">
   <span class="material-symbols-outlined icon">person</span>
-  <input type="text" placeholder="Last Name" [(ngModel)]="lastName" name="lastName" />
+  <input type="text" [placeholder]="'auth.signUp.lastName' | translate" [(ngModel)]="lastName" name="lastName" />
 </div>
 
-<label>Date of Birth</label>
+<label>{{ 'auth.signUp.dob' | translate }}</label>
 <div class="input-group">
   <span class="material-symbols-outlined icon">calendar_today</span>
   <input type="date" [(ngModel)]="dateOfBirth" name="dateOfBirth" />
 </div>
 
-        <label>Email</label>
+        <label>{{ 'auth.signUp.email' | translate }}</label>
         <div class="input-group">
           <span class="material-symbols-outlined icon">mail</span>
-          <input type="email" placeholder="youremail@pmf.kg.ac.rs" [(ngModel)]="email" name="email" />
+          <input type="email" [placeholder]="'auth.signUp.email' | translate" [(ngModel)]="email" name="email" />
         </div>
 
-        <label>Password</label>
+        <label>{{ 'auth.signUp.password' | translate }}</label>
         <div class="input-group">
   <span class="material-symbols-outlined icon">lock</span>
   
-  <input [type]="showPassword ? 'text' : 'password'" 
-         placeholder="••••••••••" 
+    <input [type]="showPassword ? 'text' : 'password'" 
+      [placeholder]="'auth.signUp.password' | translate" 
          [(ngModel)]="password" 
          name="password" />
   
@@ -52,12 +52,12 @@
   </span>
 </div>
 
-        <label>Confirm Password</label>
+        <label>{{ 'auth.signUp.confirmPassword' | translate }}</label>
         <div class="input-group">
   <span class="material-symbols-outlined icon">lock_reset</span>
   
-  <input [type]="showConfirmPassword ? 'text' : 'password'" 
-         placeholder="••••••••••" 
+    <input [type]="showConfirmPassword ? 'text' : 'password'" 
+      [placeholder]="'auth.signUp.confirmPassword' | translate" 
          [(ngModel)]="confirmPassword" 
          name="confirmPassword" />
          
@@ -66,11 +66,11 @@
   </span>
 </div>
 
-        <button type="button" class="btn-signup" (click)="onSignUp()">Sign Up </button>
+        <button type="button" class="btn-signup" (click)="onSignUp()">{{ 'auth.signUp.button' | translate }}</button>
 
         <p class="help">
-          Need technical support?
-          <a href="#">Contact IT Helpdesk</a>
+          {{ 'auth.signUp.help' | translate }}
+          <a href="#">{{ 'auth.signUp.helpLink' | translate }}</a>
         </p>
       </form>
     </div>

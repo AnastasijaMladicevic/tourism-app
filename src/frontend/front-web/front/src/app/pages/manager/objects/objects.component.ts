@@ -7,7 +7,9 @@ import { catchError, finalize } from 'rxjs/operators';
 import { DestinationService } from '../../../services/destination.service';
 import { FilterOption, ObjectDto, ObjectService } from '../../../services/object';
 import { ReviewService } from '../../../services/review';
+import { TranslationService } from '../../../services/translation.service';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { mapReviewDtosToObjectThreads } from '../shared/manager-object-review.mapper';
 import {
   isConcerningCreatorReply,
@@ -23,7 +25,7 @@ interface WorkingHoursRow {
 @Component({
   selector: 'app-manager-objects',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedMapComponent, RouterLink],
+  imports: [CommonModule, FormsModule, SharedMapComponent, RouterLink, TranslatePipe],
   templateUrl: './objects.component.html',
   styleUrls: [
     './objects.component.css',
@@ -37,6 +39,7 @@ export class ManagerObjectsComponent implements OnInit {
   private readonly objectService = inject(ObjectService);
   private readonly destinationService = inject(DestinationService);
   private readonly reviewService = inject(ReviewService);
+  private readonly translationService = inject(TranslationService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
 
@@ -60,7 +63,7 @@ export class ManagerObjectsComponent implements OnInit {
   /** Secondary column for ordering within the same status group (pending is always listed first). */
   sortBy = 'status';
   sortOrder: 'asc' | 'desc' = 'desc';
-  filterPanelOpen = false;
+  filterPanelOpen = true;
 
   currentPage = 1;
   pageSize = 5;
@@ -69,19 +72,19 @@ export class ManagerObjectsComponent implements OnInit {
   readonly pageSizeOptions = [5, 10, 20, 50];
 
   readonly sortByOptions = [
-    { value: 'name', label: 'Name' },
-    { value: 'averageRating', label: 'Rating' },
-    { value: 'status', label: 'Status' }
+    { value: 'name', labelKey: 'manager.objects.sort.name' },
+    { value: 'averageRating', labelKey: 'manager.objects.sort.rating' },
+    { value: 'status', labelKey: 'manager.objects.sort.status' }
   ];
 
   readonly ratingOptions = [
-    { value: 'all', label: 'Any Rating' },
-    { value: '1', label: '1.0+' },
-    { value: '2', label: '2.0+' },
-    { value: '3', label: '3.0+' },
-    { value: '3.5', label: '3.5+' },
-    { value: '4', label: '4.0+' },
-    { value: '4.5', label: '4.5+' }
+    { value: 'all', labelKey: 'manager.objects.rating.any' },
+    { value: '1', labelKey: 'manager.objects.rating.1' },
+    { value: '2', labelKey: 'manager.objects.rating.2' },
+    { value: '3', labelKey: 'manager.objects.rating.3' },
+    { value: '3.5', labelKey: 'manager.objects.rating.3_5' },
+    { value: '4', labelKey: 'manager.objects.rating.4' },
+    { value: '4.5', labelKey: 'manager.objects.rating.4_5' }
   ];
 
   private readonly fallbackStatusOptions: FilterOption[] = [
@@ -159,7 +162,7 @@ export class ManagerObjectsComponent implements OnInit {
           this.cdr.detectChanges();
         },
         error: (error) => {
-          this.errorMessage = error?.error?.message ?? 'Failed to load objects';
+          this.errorMessage = error?.error?.message ?? this.t('manager.objects.error.load');
           this.pagedObjects = [];
           this.selectedObject = null;
           this.selectedObjectReviews = [];
@@ -209,7 +212,7 @@ export class ManagerObjectsComponent implements OnInit {
     }
 
     const count = this.totalCount;
-    return `${count} object${count === 1 ? '' : 's'}`;
+    return this.t('manager.objects.totalCount', { count });
   }
 
   get pageStart(): number {
@@ -409,11 +412,7 @@ export class ManagerObjectsComponent implements OnInit {
   }
 
   formatStatus(status?: string): string {
-    if (!status) {
-      return 'Pending';
-    }
-
-    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+    return this.statusLabel(status);
   }
 
   getMediaStyle(object: ObjectDto): Record<string, string> {
@@ -436,7 +435,7 @@ export class ManagerObjectsComponent implements OnInit {
 
   formatPrice(price?: number | null): string {
     if (price == null) {
-      return 'N/A';
+      return this.t('common.notAvailable');
     }
 
     return `$${Number(price).toFixed(2)}`;
@@ -512,7 +511,7 @@ export class ManagerObjectsComponent implements OnInit {
 
   get selectedObjectLocationLabel(): string {
     if (!this.selectedObject) {
-      return 'Selected object';
+      return this.t('manager.objects.selectedObject');
     }
 
     const location =
@@ -572,6 +571,30 @@ export class ManagerObjectsComponent implements OnInit {
 
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : undefined;
+  }
+
+  statusOptionLabel(option: FilterOption): string {
+    return this.statusLabel(option.value || option.label);
+  }
+
+  private statusLabel(status?: string): string {
+    switch ((status ?? '').toLowerCase()) {
+      case 'approved':
+      case 'published':
+        return this.t('manager.objects.status.approved');
+      case 'pending':
+      case 'draft':
+        return this.t('manager.objects.status.pending');
+      case 'rejected':
+      case 'cancelled':
+        return this.t('manager.objects.status.rejected');
+      default:
+        return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : this.t('manager.objects.status.pending');
+    }
+  }
+
+  private t(key: string, params?: Record<string, string | number>): string {
+    return this.translationService.translate(key, params);
   }
 
   private normalizeImageUrl(value?: string): string {

@@ -53,7 +53,6 @@
         </button>
         <span class="chip-divider" aria-hidden="true"></span>
         <button class="chip reset" type="button" (click)="resetFilters()">
-          <span class="material-symbols-outlined" aria-hidden="true">filter_alt_off</span>
           Reset
         </button>
     </div>
@@ -64,7 +63,7 @@
         type="search"
         placeholder="Search reviewer, object, content..."
         [ngModel]="searchTerm"
-        (ngModelChange)="onSearchChange($event)"
+        (keyup)="onSearchChange(($any($event.target)).value)"
       />
     </div>
   </div>
