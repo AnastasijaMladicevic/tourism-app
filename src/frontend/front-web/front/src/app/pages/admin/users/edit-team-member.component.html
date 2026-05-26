@@ -22,8 +22,9 @@
   </header>
 
   <div class="form-feedback error" *ngIf="loadError" role="alert">{{ loadError }}</div>
-  <div class="form-shell" *ngIf="!isLoading && !loadError">
+  <div class="form-shell" [class.form-shell--blocked]="isEditBlocked" *ngIf="!isLoading && !loadError">
     <div class="form-feedback error" *ngIf="submitError" role="alert">{{ submitError }}</div>
+    <div class="form-feedback lock" *ngIf="isEditBlocked" role="alert">{{ editLockDisplayMessage }}</div>
 
     <!-- Personal Information -->
     <section class="form-section">
@@ -40,11 +41,11 @@
       <div class="field-grid field-grid--2">
         <label class="field">
           <span class="field-label">First Name <span class="req">*</span></span>
-          <input type="text" class="input-control" placeholder="e.g. Sarah" [(ngModel)]="firstName" />
+          <input type="text" class="input-control" placeholder="e.g. Sarah" [(ngModel)]="firstName" [disabled]="isEditBlocked || isSubmitting" />
         </label>
         <label class="field">
           <span class="field-label">Last Name <span class="req">*</span></span>
-          <input type="text" class="input-control" placeholder="e.g. Jenkins" [(ngModel)]="lastName" />
+          <input type="text" class="input-control" placeholder="e.g. Jenkins" [(ngModel)]="lastName" [disabled]="isEditBlocked || isSubmitting" />
         </label>
       </div>
 
@@ -68,7 +69,7 @@
           <span class="field-label">Date of Birth <span class="req">*</span></span>
           <div class="input-with-icon">
             <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">calendar_today</span>
-            <input type="date" class="input-control input-control--padded" [(ngModel)]="dateOfBirth" />
+            <input type="date" class="input-control input-control--padded" [(ngModel)]="dateOfBirth" [disabled]="isEditBlocked || isSubmitting" />
           </div>
         </label>
         <label class="field">
@@ -80,6 +81,7 @@
               class="input-control input-control--padded"
               placeholder="+1 (555) 000-0000"
               [(ngModel)]="phoneNumber"
+              [disabled]="isEditBlocked || isSubmitting"
             />
           </div>
         </label>
@@ -94,9 +96,29 @@
         </span>
         <div>
           <h2 class="section-title">Account Security</h2>
-          <p class="section-desc">Set a new password only if you want to replace the current one.</p>
+          <p class="section-desc">Set a new password only if you want to replace the current one. The user's current password is required before you can change it.</p>
         </div>
       </div>
+
+      <div class="role-api-note role-api-note--info" *ngIf="passwordChangeBlockedByActiveSession">
+        {{ activeSessionBlockMessage }}
+      </div>
+
+      <label class="field">
+        <span class="field-label">Current Password <span class="optional">(required if changing password)</span></span>
+        <div class="input-with-icon">
+          <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">key</span>
+          <input
+            type="password"
+            class="input-control input-control--padded"
+            [class.input-invalid]="currentPasswordRequired && !currentPassword.trim()"
+            placeholder="Enter the user's current password"
+            [(ngModel)]="currentPassword"
+            autocomplete="current-password"
+            [disabled]="isEditBlocked || isSubmitting || passwordChangeBlockedByActiveSession"
+          />
+        </div>
+      </label>
 
       <label class="field">
         <span class="field-label">New Password <span class="optional">(optional)</span></span>
@@ -108,6 +130,7 @@
             placeholder="Leave blank to keep current password"
             [(ngModel)]="password"
             autocomplete="new-password"
+            [disabled]="isEditBlocked || isSubmitting || passwordChangeBlockedByActiveSession"
           />
         </div>
         <p class="strength-line" *ngIf="password && passwordStrengthLabel">
@@ -127,6 +150,7 @@
             placeholder="Repeat new password"
             [(ngModel)]="confirmPassword"
             autocomplete="new-password"
+            [disabled]="isEditBlocked || isSubmitting || passwordChangeBlockedByActiveSession"
           />
         </div>
         <p class="field-error" *ngIf="passwordsMismatch">Passwords do not match</p>
@@ -145,6 +169,7 @@
               class="role-card role-card--clickable"
               [class.role-card--selected]="touristRoleSelection === 'tourist'"
               (click)="selectTouristRole('tourist')"
+              [disabled]="isEditBlocked || isSubmitting"
             >
               <span
                 class="role-card-check material-symbols-outlined"
@@ -161,6 +186,7 @@
               class="role-card role-card--clickable"
               [class.role-card--selected]="touristRoleSelection === 'content-creator'"
               (click)="selectTouristRole('content-creator')"
+              [disabled]="isEditBlocked || isSubmitting"
             >
               <span
                 class="role-card-check material-symbols-outlined"
@@ -237,7 +263,7 @@
           <span class="field-label">Country</span>
           <div class="input-with-icon select-wrap">
             <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">location_on</span>
-            <select class="input-control input-control--padded select-control" [(ngModel)]="country">
+            <select class="input-control input-control--padded select-control" [(ngModel)]="country" [disabled]="isEditBlocked || isSubmitting">
               <option *ngIf="country && !countries.includes(country)" [ngValue]="country">{{ country }}</option>
               <option *ngFor="let c of countries" [ngValue]="c">{{ c }}</option>
             </select>
@@ -247,7 +273,7 @@
           <span class="field-label">Preferred Language</span>
           <div class="input-with-icon select-wrap">
             <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">translate</span>
-            <select class="input-control input-control--padded select-control" [(ngModel)]="preferredLanguage">
+            <select class="input-control input-control--padded select-control" [(ngModel)]="preferredLanguage" [disabled]="isEditBlocked || isSubmitting">
               <option *ngFor="let lang of languages" [ngValue]="lang">{{ lang }}</option>
             </select>
           </div>
@@ -256,7 +282,7 @@
 
       <label class="field">
         <span class="field-label">Region Assignment <span class="optional">(Optional)</span></span>
-        <select class="input-control select-control select-control--full" [(ngModel)]="regionAssignment">
+        <select class="input-control select-control select-control--full" [(ngModel)]="regionAssignment" [disabled]="isEditBlocked || isSubmitting">
           <option value="">Select target market region</option>
           <option *ngFor="let r of regionOptions" [ngValue]="r">{{ r }}</option>
         </select>
@@ -309,6 +335,7 @@
             maxlength="500"
             placeholder="Explain why this account is being banned."
             [(ngModel)]="banReason"
+            [disabled]="isEditBlocked || isModerating"
           ></textarea>
           <p class="field-hint">This text will be shown to the user on the login screen.</p>
         </label>
@@ -323,7 +350,7 @@
               [attr.aria-checked]="banDuration === '30-days'"
               [class.ban-duration-option--selected]="banDuration === '30-days'"
               (click)="selectBanDuration('30-days')"
-              [disabled]="isModerating"
+              [disabled]="isEditBlocked || isModerating"
             >
               30 Days
             </button>
@@ -334,7 +361,7 @@
               [attr.aria-checked]="banDuration === 'permanent'"
               [class.ban-duration-option--selected]="banDuration === 'permanent'"
               (click)="selectBanDuration('permanent')"
-              [disabled]="isModerating"
+              [disabled]="isEditBlocked || isModerating"
             >
               Permanent
             </button>
@@ -345,7 +372,7 @@
               [attr.aria-checked]="banDuration === 'custom'"
               [class.ban-duration-option--selected]="banDuration === 'custom'"
               (click)="selectBanDuration('custom')"
-              [disabled]="isModerating"
+              [disabled]="isEditBlocked || isModerating"
             >
               Custom Date
             </button>
@@ -358,7 +385,7 @@
               class="ban-duration-date-input"
               [(ngModel)]="banCustomEndDate"
               [min]="banCustomDateMin"
-              [disabled]="isModerating"
+              [disabled]="isEditBlocked || isModerating"
             />
           </label>
 
@@ -368,11 +395,11 @@
         </section>
 
         <div class="moderation-actions">
-          <button type="button" class="btn-danger" (click)="banUser()" [disabled]="isModerating || !isBanDurationValid">
+          <button type="button" class="btn-danger" (click)="banUser()" [disabled]="isEditBlocked || isModerating || !isBanDurationValid">
             <span class="material-symbols-outlined btn-icon" aria-hidden="true">block</span>
             <span class="btn-text">{{ isModerating ? 'Applying…' : (isBanned ? 'Update ban' : 'Ban user') }}</span>
           </button>
-          <button type="button" class="btn-secondary" *ngIf="isBanned" (click)="unbanUser()" [disabled]="isModerating">
+          <button type="button" class="btn-secondary" *ngIf="isBanned" (click)="unbanUser()" [disabled]="isEditBlocked || isModerating">
             <span class="material-symbols-outlined btn-icon" aria-hidden="true">lock_open</span>
             <span class="btn-text">{{ isModerating ? 'Working…' : 'Unban user' }}</span>
           </button>
@@ -385,7 +412,7 @@
         <span class="material-symbols-outlined btn-icon" aria-hidden="true">close</span>
         <span class="btn-text">Cancel</span>
       </button>
-      <button type="button" class="btn-primary" (click)="onSave()" [disabled]="isSubmitting">
+      <button type="button" class="btn-primary" (click)="onSave()" [disabled]="isSubmitting || isEditBlocked">
         <span class="material-symbols-outlined btn-icon" aria-hidden="true" *ngIf="!isSubmitting">save</span>
         <span class="btn-text">{{ isSubmitting ? 'Saving…' : 'Save changes' }}</span>
       </button>

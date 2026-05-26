@@ -78,6 +78,17 @@
   color: #166534;
 }
 
+.form-feedback.lock {
+  border: 1px solid #fde68a;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.form-shell--blocked {
+  border-color: #fde68a;
+  box-shadow: 0 1px 2px rgba(146, 64, 14, 0.06);
+}
+
 .role-api-note {
   margin: 12px 0 0;
   font-size: 12px;
@@ -278,6 +289,7 @@
 }
 
 .role-cards {
+  margin-top: 14px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
@@ -285,6 +297,7 @@
 
 @media (max-width: 900px) {
   .role-cards {
+    margin-top: 14px;
     grid-template-columns: 1fr;
   }
 }
@@ -365,21 +378,26 @@
   gap: 6px;
   min-height: 40px;
   padding: 8px 14px;
-  border: 1px solid transparent;
+
+  border: 1px solid #d1d5db; /* promenjeno */
   border-radius: 8px;
-  background: transparent;
+
+  background: #ffffff; /* dodato */
   color: #4b5563;
+
   font-size: 14px;
   font-weight: 600;
   line-height: 1.25;
   cursor: pointer;
   font-family: inherit;
+
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
 .btn-cancel:hover {
   background: #f3f4f6;
   color: #111827;
-  border-color: #e5e7eb;
+  border-color: #d1d5db;
 }
 
 .btn-primary {

@@ -4,7 +4,7 @@ import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { TimeoutError, of } from 'rxjs';
+import { TimeoutError, forkJoin, of } from 'rxjs';
 import {
   catchError,
   filter,
@@ -14,7 +14,7 @@ import {
   switchMap,
   timeout
 } from 'rxjs/operators';
-import { UpdateUserDto, UserDto } from '../../../models/user.model';
+import { ChangePasswordDto, UpdateUserDto, UserDto, UserEditLockDto } from '../../../models/user.model';
 import { AdminUsersService, BanUserDto } from '../../../services/admin-users.service';
 
 /** Mirrors role cards on create page; includes Admin when API returns it. */
@@ -49,6 +49,7 @@ export class EditTeamMemberComponent {
   dateOfBirth = '';
   phoneNumber = '';
 
+  currentPassword = '';
   password = '';
   confirmPassword = '';
 
@@ -72,9 +73,14 @@ export class EditTeamMemberComponent {
   activeBanReason = '';
   activeBanExpiresLabel = '';
   activeBannedAtLabel = '';
+  hasActiveSession = false;
+  activeSessionExpiresLabel = '';
   banReason = '';
   banDuration: BanDurationOption = 'permanent';
   banCustomEndDate = '';
+  editLockState: UserEditLockDto | null = null;
+  isEditBlocked = false;
+  private editLockHeartbeatId: number | null = null;
 
   readonly countries = [
     'United States',
@@ -139,8 +145,21 @@ export class EditTeamMemberComponent {
           this.isLoading = true;
           this.loadError = '';
           this.cdr.markForCheck();
-          return this.adminUsers.getUserById(userId).pipe(
-            timeout(15000),
+          return forkJoin({
+            user: this.adminUsers.getUserById(userId).pipe(timeout(15000)),
+            editLock: this.adminUsers.acquireEditLock(userId).pipe(
+              catchError((err: unknown) =>
+                of(
+                  this.extractLockState(err) ?? {
+                    userId,
+                    isLocked: true,
+                    isOwnedByCurrentUser: false,
+                    message: this.extractApiMessage(err) || 'Could not start an edit session for this user.'
+                  }
+                )
+              )
+            )
+          }).pipe(
             catchError((err: unknown) => {
               this.loadError = this.extractLoadError(err);
               this.cdr.markForCheck();
@@ -154,9 +173,10 @@ export class EditTeamMemberComponent {
         }),
         takeUntilDestroyed()
       )
-      .subscribe((user) => {
-        if (user) {
-          this.applyUser(user);
+      .subscribe((result) => {
+        if (result) {
+          this.applyUser(result.user);
+          this.applyEditLockState(result.editLock);
         }
         this.cdr.markForCheck();
       });
@@ -183,7 +203,50 @@ export class EditTeamMemberComponent {
       this.touristRoleSelection = 'content-creator';
     }
 
+    this.hasActiveSession = !!user.hasActiveSession;
+    this.activeSessionExpiresLabel = this.formatDateTime(user.activeSessionExpiresAtUtc);
     this.syncBanState(user);
+  }
+
+  get isEditMode(): boolean {
+    return Number.isFinite(this.userId) && this.userId >= 1;
+  }
+
+  get wantsPasswordChange(): boolean {
+    return !!(this.password.trim() || this.confirmPassword.trim());
+  }
+
+  get currentPasswordRequired(): boolean {
+    return this.wantsPasswordChange;
+  }
+
+  get passwordChangeBlockedByActiveSession(): boolean {
+    return this.hasActiveSession;
+  }
+
+  get editLockDisplayMessage(): string {
+    if (!this.editLockState || !this.isEditBlocked) {
+      return '';
+    }
+
+    const lockedBy = this.editLockState.lockedByDisplayName?.trim() || 'Another admin';
+    const expiresAt = this.editLockState.expiresAtUtc
+      ? this.formatDateTime(this.editLockState.expiresAtUtc)
+      : 'the current edit session ends';
+
+    return `${lockedBy} is currently editing this user. Editing is temporarily disabled until ${expiresAt}.`;
+  }
+
+  get activeSessionBlockMessage(): string {
+    if (!this.hasActiveSession) {
+      return '';
+    }
+
+    if (this.activeSessionExpiresLabel) {
+      return `This user is currently logged in. Ask them to log out before changing the password. Current session expires at ${this.activeSessionExpiresLabel}.`;
+    }
+
+    return 'This user is currently logged in. Ask them to log out before changing the password.';
   }
 
   selectTouristRole(role: 'tourist' | 'content-creator'): void {
@@ -311,6 +374,11 @@ export class EditTeamMemberComponent {
     return this.password !== this.confirmPassword;
   }
 
+  ngOnDestroy(): void {
+    this.stopEditLockHeartbeat();
+    this.releaseOwnedEditLock();
+  }
+
   onCancel(): void {
     void this.router.navigate(['/admin/users']);
   }
@@ -318,6 +386,11 @@ export class EditTeamMemberComponent {
   banUser(): void {
     this.moderationError = '';
     this.moderationSuccess = '';
+
+    if (this.isEditBlocked) {
+      this.moderationError = this.editLockDisplayMessage;
+      return;
+    }
 
     if (!this.canModerateBan) {
       this.moderationError = 'Only tourist and content creator accounts can be banned from this screen.';
@@ -370,6 +443,11 @@ export class EditTeamMemberComponent {
     this.moderationError = '';
     this.moderationSuccess = '';
 
+    if (this.isEditBlocked) {
+      this.moderationError = this.editLockDisplayMessage;
+      return;
+    }
+
     if (!this.canModerateBan) {
       this.moderationError = 'This account type cannot be unbanned from this screen.';
       return;
@@ -400,6 +478,11 @@ export class EditTeamMemberComponent {
   onSave(): void {
     this.submitError = '';
 
+    if (this.isEditBlocked) {
+      this.submitError = this.editLockDisplayMessage;
+      return;
+    }
+
     const first = this.firstName.trim();
     const last = this.lastName.trim();
     if (!first || !last || !this.dateOfBirth) {
@@ -411,6 +494,14 @@ export class EditTeamMemberComponent {
     const confirm = this.confirmPassword.trim();
     const changingPwd = !!(pwd || confirm);
     if (changingPwd) {
+      if (this.passwordChangeBlockedByActiveSession) {
+        this.submitError = this.activeSessionBlockMessage;
+        return;
+      }
+      if (!this.currentPassword.trim()) {
+        this.submitError = 'Current password is required before replacing this password.';
+        return;
+      }
       if (pwd.length < 6) {
         this.submitError = 'New password must be at least 6 characters.';
         return;
@@ -436,11 +527,12 @@ export class EditTeamMemberComponent {
           if (!pwd) {
             return of(null);
           }
-          return this.adminUsers.changeUserPassword(this.userId, {
-            currentPassword: '.',
+          const dto: ChangePasswordDto = {
+            currentPassword: this.currentPassword.trim(),
             newPassword: pwd,
             confirmPassword: confirm
-          });
+          };
+          return this.adminUsers.changeUserPassword(this.userId, dto);
         }),
         switchMap(() => {
           if (!promoteTouristToCreator) {
@@ -577,6 +669,90 @@ export class EditTeamMemberComponent {
       dateStyle: 'medium',
       timeStyle: 'short'
     }).format(parsed);
+  }
+
+  private applyEditLockState(lockState: UserEditLockDto | null): void {
+    this.editLockState = lockState;
+    this.isEditBlocked = Boolean(lockState?.isLocked && !lockState.isOwnedByCurrentUser);
+
+    if (lockState?.isOwnedByCurrentUser) {
+      this.startEditLockHeartbeat();
+    } else {
+      this.stopEditLockHeartbeat();
+    }
+  }
+
+  private startEditLockHeartbeat(): void {
+    if (this.editLockHeartbeatId != null || !this.isEditMode) {
+      return;
+    }
+
+    this.editLockHeartbeatId = window.setInterval(() => {
+      this.adminUsers.refreshEditLock(this.userId).subscribe({
+        next: (lockState) => {
+          this.applyEditLockState(lockState);
+          this.cdr.detectChanges();
+        },
+        error: (err: unknown) => {
+          this.applyEditLockState(
+            this.extractLockState(err) ?? {
+              userId: this.userId,
+              isLocked: true,
+              isOwnedByCurrentUser: false,
+              message: this.extractApiMessage(err) || 'Could not keep the edit session active.'
+            }
+          );
+          this.cdr.detectChanges();
+        }
+      });
+    }, 60000);
+  }
+
+  private stopEditLockHeartbeat(): void {
+    if (this.editLockHeartbeatId == null) {
+      return;
+    }
+
+    window.clearInterval(this.editLockHeartbeatId);
+    this.editLockHeartbeatId = null;
+  }
+
+  private releaseOwnedEditLock(): void {
+    if (!this.isEditMode || !this.editLockState?.isOwnedByCurrentUser) {
+      return;
+    }
+
+    this.adminUsers.releaseEditLock(this.userId).subscribe({
+      error: () => {
+        // Best effort release on page exit.
+      }
+    });
+  }
+
+  private extractLockState(err: unknown): UserEditLockDto | null {
+    const maybeError = err as {
+      status?: number;
+      error?: Partial<UserEditLockDto> & { message?: string };
+    };
+
+    if (maybeError?.status !== 409 || !maybeError.error) {
+      return null;
+    }
+
+    const userId = Number(maybeError.error.userId ?? this.userId ?? 0);
+    return {
+      userId,
+      isLocked: Boolean(maybeError.error.isLocked ?? true),
+      isOwnedByCurrentUser: Boolean(maybeError.error.isOwnedByCurrentUser ?? false),
+      lockedByUserId: maybeError.error.lockedByUserId,
+      lockedByDisplayName: maybeError.error.lockedByDisplayName,
+      acquiredAtUtc: maybeError.error.acquiredAtUtc,
+      expiresAtUtc: maybeError.error.expiresAtUtc,
+      message:
+        typeof maybeError.error.message === 'string' && maybeError.error.message.trim().length > 0
+          ? maybeError.error.message
+          : 'Another admin is currently editing this user.'
+    };
   }
 
   private extractApiMessage(err: unknown): string {

@@ -105,7 +105,8 @@
 
 .toolbar-search {
   position: relative;
-  max-width: 95%;
+  width: 100%;
+  max-width: none;
 }
 
 .search-icon {

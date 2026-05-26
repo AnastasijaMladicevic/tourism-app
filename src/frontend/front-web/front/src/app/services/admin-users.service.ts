@@ -2,7 +2,13 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
-import { ChangePasswordDto, CreateUserDto, UpdateUserDto, UserDto } from '../models/user.model';
+import {
+  ChangePasswordDto,
+  CreateUserDto,
+  UpdateUserDto,
+  UserDto,
+  UserEditLockDto
+} from '../models/user.model';
 
 export interface AdminUserListItemDto {
   id: number;
@@ -18,6 +24,9 @@ export interface AdminUserListItemDto {
   banReason?: string | null;
   banExpiresAtUtc?: string | null;
   bannedAtUtc?: string | null;
+  hasActiveSession?: boolean;
+  activeSessionExpiresAtUtc?: string | null;
+  editLock?: UserEditLockDto | null;
 }
 
 export interface BanUserDto {
@@ -148,6 +157,18 @@ export class AdminUsersService {
 
   updateUser(id: number, dto: UpdateUserDto): Observable<UserDto> {
     return this.http.put<UserDto>(`${this.apiUrl}/${id}`, dto);
+  }
+
+  acquireEditLock(id: number): Observable<UserEditLockDto> {
+    return this.http.post<UserEditLockDto>(`${this.apiUrl}/${id}/edit-lock`, {});
+  }
+
+  refreshEditLock(id: number): Observable<UserEditLockDto> {
+    return this.http.put<UserEditLockDto>(`${this.apiUrl}/${id}/edit-lock`, {});
+  }
+
+  releaseEditLock(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}/edit-lock`);
   }
 
   changeUserPassword(id: number, dto: ChangePasswordDto): Observable<{ message: string }> {

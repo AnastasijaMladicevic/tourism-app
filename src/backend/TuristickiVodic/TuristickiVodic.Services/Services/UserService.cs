@@ -29,6 +29,7 @@ namespace TuristickiVodic.Services
         private const double MaxVisitedPointAccuracyMeters = 250d;
         private const double LocalityVisitRadiusMeters = 250d;
         private const double DestinationVisitRadiusMeters = 700d;
+        private static readonly TimeSpan EditLockDuration = TimeSpan.FromMinutes(3);
         private const string DefaultPublicAppBaseUrl = "http://localhost:4200";
         private const string DefaultAdminAppBaseUrl = "http://localhost:4200";
         private static readonly DateTime DefaultGoogleUserDateOfBirth = new(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -59,7 +60,7 @@ namespace TuristickiVodic.Services
             _configuration = configuration;
         }
 
-        public async Task<PagedResultDto<UserDto>> GetAllAsync(UserQueryDto query)
+        public async Task<PagedResultDto<UserDto>> GetAllAsync(UserQueryDto query, int? requestingUserId = null)
         {
             await ReleaseExpiredBansAsync();
 
@@ -75,6 +76,7 @@ namespace TuristickiVodic.Services
             var usersQuery = _context.Users
                 .Include(u => u.Role)
                 .Include(u => u.PreferredRegion)
+                .Include(u => u.RefreshToken)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(query.Search))
@@ -113,9 +115,16 @@ namespace TuristickiVodic.Services
                 .ToListAsync();
 
             var mappedUsers = _mapper.Map<List<UserDto>>(users);
+            var now = DateTime.UtcNow;
             for (var i = 0; i < users.Count; i++)
             {
                 ApplyBanStatus(mappedUsers[i], users[i]);
+                ApplyActiveSessionStatus(mappedUsers[i], users[i], now);
+            }
+
+            if (requestingUserId.HasValue)
+            {
+                await ApplyEditLocksAsync(mappedUsers, users, requestingUserId.Value);
             }
 
             return new PagedResultDto<UserDto>
@@ -128,16 +137,17 @@ namespace TuristickiVodic.Services
             };
         }
 
-        public async Task<UserDto?> GetByIdAsync(int id)
+        public async Task<UserDto?> GetByIdAsync(int id, int? requestingUserId = null)
         {
             await ReleaseExpiredBansAsync();
 
             var user = await _context.Users
                 .Include(u => u.Role)
                 .Include(u => u.PreferredRegion)
+                .Include(u => u.RefreshToken)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
-            return await MapUserDtoWithMetricsAsync(user);
+            return await MapUserDtoWithMetricsAsync(user, requestingUserId);
         }
 
         public async Task<UserDto?> GetByEmailAsync(string email)
@@ -649,22 +659,33 @@ namespace TuristickiVodic.Services
             return await MapExistingUserDtoWithMetricsAsync(user);
         }
 
-        public async Task<UserDto?> UpdateAsync(int id, UpdateUserDto updateUserDto)
+        public async Task<UserDto?> UpdateAsync(int id, UpdateUserDto updateUserDto, int currentUserId, string roleName)
         {
             var user = await _context.Users
                 .Include(u => u.Role)
                 .Include(u => u.PreferredRegion)
+                .Include(u => u.RefreshToken)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
                 return null;
 
+            if (string.Equals(roleName, "Admin", StringComparison.OrdinalIgnoreCase) && currentUserId != id)
+            {
+                EnsureUserEditable(user, currentUserId);
+            }
+
             _mapper.Map(updateUserDto, user);
             user.UpdatedAt = DateTime.UtcNow;
 
+            if (IsUserEditLockActive(user, DateTime.UtcNow) && user.EditLockedByUserId == currentUserId)
+            {
+                user.EditLockExpiresAtUtc = DateTime.UtcNow.Add(EditLockDuration);
+            }
+
             await _context.SaveChangesAsync();
 
-            return await MapExistingUserDtoWithMetricsAsync(user);
+            return await MapExistingUserDtoWithMetricsAsync(user, currentUserId);
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -685,17 +706,53 @@ namespace TuristickiVodic.Services
             return true;
         }
 
+        public async Task<UserEditLockDto?> AcquireEditLockAsync(int userId, int requestingUserId)
+        {
+            return await UpsertEditLockAsync(userId, requestingUserId);
+        }
+
+        public async Task<UserEditLockDto?> RefreshEditLockAsync(int userId, int requestingUserId)
+        {
+            return await UpsertEditLockAsync(userId, requestingUserId);
+        }
+
+        public async Task<bool> ReleaseEditLockAsync(int userId, int requestingUserId)
+        {
+            var affected = await _context.Database.ExecuteSqlInterpolatedAsync($@"
+                UPDATE ""Users""
+                SET ""EditLockedByUserId"" = NULL,
+                    ""EditLockAcquiredAtUtc"" = NULL,
+                    ""EditLockExpiresAtUtc"" = NULL
+                WHERE ""Id"" = {userId}
+                  AND ""EditLockedByUserId"" = {requestingUserId};
+            ");
+
+            return affected > 0;
+        }
+
         public async Task ChangePasswordAsync(int userId, ChangePasswordDto dto, int currentUserId, string roleName)
         {
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.Users
+                .Include(u => u.RefreshToken)
+                .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)
                 throw new InvalidOperationException("User not found.");
 
-            if (roleName != "Admin")
+            if (user.Id == currentUserId)
             {
-                if (user.Id != currentUserId)
+                if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.PasswordHash))
+                    throw new InvalidOperationException("Current password is incorrect");
+            }
+            else
+            {
+                if (!string.Equals(roleName, "Admin", StringComparison.OrdinalIgnoreCase))
                     throw new UnauthorizedAccessException("You can change only your own password.");
+
+                EnsureUserEditable(user, currentUserId);
+
+                if (HasActiveSession(user, DateTime.UtcNow))
+                    throw new InvalidOperationException("This user is currently logged in. Ask them to log out before changing the password.");
 
                 if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.PasswordHash))
                     throw new InvalidOperationException("Current password is incorrect");
@@ -704,6 +761,11 @@ namespace TuristickiVodic.Services
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
             await RevokeRefreshTokenAsync(user.Id);
             user.UpdatedAt = DateTime.UtcNow;
+
+            if (IsUserEditLockActive(user, DateTime.UtcNow) && user.EditLockedByUserId == currentUserId)
+            {
+                user.EditLockExpiresAtUtc = DateTime.UtcNow.Add(EditLockDuration);
+            }
 
             await _context.SaveChangesAsync();
         }
@@ -2095,15 +2157,15 @@ namespace TuristickiVodic.Services
             return await MapExistingUserDtoWithMetricsAsync(user);
         }
 
-        private async Task<UserDto?> MapUserDtoWithMetricsAsync(User? user)
+        private async Task<UserDto?> MapUserDtoWithMetricsAsync(User? user, int? requestingUserId = null)
         {
             if (user == null)
                 return null;
 
-            return await MapExistingUserDtoWithMetricsAsync(user);
+            return await MapExistingUserDtoWithMetricsAsync(user, requestingUserId);
         }
 
-        private async Task<UserDto> MapExistingUserDtoWithMetricsAsync(User user)
+        private async Task<UserDto> MapExistingUserDtoWithMetricsAsync(User user, int? requestingUserId = null)
         {
             var dto = _mapper.Map<UserDto>(user);
             dto.HasRequestedCreatorRole = HasPendingCreatorRoleRequest(user);
@@ -2111,6 +2173,11 @@ namespace TuristickiVodic.Services
             dto.AdminAppLoginUrl = ResolveAdminAppLoginUrl();
             dto.PublicAppHomeUrl = ResolvePublicAppHomeUrl();
             ApplyBanStatus(dto, user);
+            ApplyActiveSessionStatus(dto, user, DateTime.UtcNow);
+            if (requestingUserId.HasValue)
+            {
+                dto.EditLock = await BuildEditLockDtoAsync(user, requestingUserId.Value);
+            }
             await PopulateUserMetricsAsync(dto, user.Id);
             return dto;
         }
@@ -2129,6 +2196,13 @@ namespace TuristickiVodic.Services
             dto.BanReason = isBanned ? user.BanReason : null;
             dto.BanExpiresAtUtc = isBanned ? user.BanExpiresAtUtc : null;
             dto.BannedAtUtc = isBanned ? user.BannedAtUtc : null;
+        }
+
+        private static void ApplyActiveSessionStatus(UserDto dto, User user, DateTime now)
+        {
+            var hasActiveSession = HasActiveSession(user, now);
+            dto.HasActiveSession = hasActiveSession;
+            dto.ActiveSessionExpiresAtUtc = hasActiveSession ? user.RefreshToken?.RefreshTokenExpiry : null;
         }
 
         private async Task ReleaseExpiredBansAsync()
@@ -2167,6 +2241,179 @@ namespace TuristickiVodic.Services
                 return false;
 
             return !user.BanExpiresAtUtc.HasValue || user.BanExpiresAtUtc.Value > DateTime.UtcNow;
+        }
+
+        private static bool HasActiveSession(User user, DateTime now)
+        {
+            return user.RefreshToken != null && user.RefreshToken.RefreshTokenExpiry > now;
+        }
+
+        private async Task<UserEditLockDto?> UpsertEditLockAsync(int userId, int requestingUserId)
+        {
+            var exists = await _context.Users
+                .AsNoTracking()
+                .AnyAsync(u => u.Id == userId);
+
+            if (!exists)
+                return null;
+
+            var now = DateTime.UtcNow;
+            var expiresAt = now.Add(EditLockDuration);
+
+            await _context.Database.ExecuteSqlInterpolatedAsync($@"
+                UPDATE ""Users""
+                SET ""EditLockedByUserId"" = {requestingUserId},
+                    ""EditLockAcquiredAtUtc"" = CASE
+                        WHEN ""EditLockedByUserId"" = {requestingUserId} AND ""EditLockAcquiredAtUtc"" IS NOT NULL
+                            THEN ""EditLockAcquiredAtUtc""
+                        ELSE {now}
+                    END,
+                    ""EditLockExpiresAtUtc"" = {expiresAt}
+                WHERE ""Id"" = {userId}
+                  AND (
+                      ""EditLockedByUserId"" IS NULL
+                      OR ""EditLockedByUserId"" = {requestingUserId}
+                      OR ""EditLockExpiresAtUtc"" IS NULL
+                      OR ""EditLockExpiresAtUtc"" <= {now}
+                  );
+            ");
+
+            return await BuildEditLockDtoAsync(userId, requestingUserId);
+        }
+
+        private void EnsureUserEditable(User user, int requestingUserId)
+        {
+            var now = DateTime.UtcNow;
+            if (!IsUserEditLockActive(user, now))
+            {
+                user.EditLockedByUserId = requestingUserId;
+                user.EditLockAcquiredAtUtc = now;
+                user.EditLockExpiresAtUtc = now.Add(EditLockDuration);
+                return;
+            }
+
+            if (user.EditLockedByUserId == requestingUserId)
+                return;
+
+            throw new UserEditLockException(BuildEditLockDto(user, requestingUserId, null, now));
+        }
+
+        private async Task<UserEditLockDto> BuildEditLockDtoAsync(int userId, int requestingUserId)
+        {
+            var lockProjection = await _context.Users
+                .AsNoTracking()
+                .Where(u => u.Id == userId)
+                .Select(u => new
+                {
+                    u.Id,
+                    u.EditLockedByUserId,
+                    u.EditLockAcquiredAtUtc,
+                    u.EditLockExpiresAtUtc
+                })
+                .FirstAsync();
+
+            string? displayName = null;
+            if (lockProjection.EditLockedByUserId.HasValue)
+            {
+                displayName = await _context.Users
+                    .AsNoTracking()
+                    .Where(u => u.Id == lockProjection.EditLockedByUserId.Value)
+                    .Select(u => (u.FirstName + " " + u.LastName).Trim())
+                    .FirstOrDefaultAsync();
+            }
+
+            var user = new User
+            {
+                Id = lockProjection.Id,
+                EditLockedByUserId = lockProjection.EditLockedByUserId,
+                EditLockAcquiredAtUtc = lockProjection.EditLockAcquiredAtUtc,
+                EditLockExpiresAtUtc = lockProjection.EditLockExpiresAtUtc
+            };
+
+            return BuildEditLockDto(user, requestingUserId, displayName, DateTime.UtcNow);
+        }
+
+        private async Task<UserEditLockDto> BuildEditLockDtoAsync(User user, int requestingUserId)
+        {
+            if (!user.EditLockedByUserId.HasValue)
+                return BuildEditLockDto(user, requestingUserId, null, DateTime.UtcNow);
+
+            var displayName = await _context.Users
+                .AsNoTracking()
+                .Where(u => u.Id == user.EditLockedByUserId.Value)
+                .Select(u => (u.FirstName + " " + u.LastName).Trim())
+                .FirstOrDefaultAsync();
+
+            return BuildEditLockDto(user, requestingUserId, displayName, DateTime.UtcNow);
+        }
+
+        private static UserEditLockDto BuildEditLockDto(
+            User user,
+            int requestingUserId,
+            string? lockedByDisplayName,
+            DateTime now)
+        {
+            var isLocked = IsUserEditLockActive(user, now);
+            var isOwnedByCurrentUser = isLocked && user.EditLockedByUserId == requestingUserId;
+            var displayName = string.IsNullOrWhiteSpace(lockedByDisplayName) ? "Another admin" : lockedByDisplayName;
+
+            var message = !isLocked
+                ? "This user is available for editing."
+                : isOwnedByCurrentUser
+                    ? "You are currently editing this user."
+                    : $"{displayName} is currently editing this user. Try again after the lock expires.";
+
+            return new UserEditLockDto
+            {
+                UserId = user.Id,
+                IsLocked = isLocked,
+                IsOwnedByCurrentUser = isOwnedByCurrentUser,
+                LockedByUserId = isLocked ? user.EditLockedByUserId : null,
+                LockedByDisplayName = isLocked ? displayName : null,
+                AcquiredAtUtc = isLocked ? user.EditLockAcquiredAtUtc : null,
+                ExpiresAtUtc = isLocked ? user.EditLockExpiresAtUtc : null,
+                Message = message
+            };
+        }
+
+        private static bool IsUserEditLockActive(User user, DateTime now)
+        {
+            return user.EditLockedByUserId.HasValue &&
+                   user.EditLockExpiresAtUtc.HasValue &&
+                   user.EditLockExpiresAtUtc.Value > now;
+        }
+
+        private async Task ApplyEditLocksAsync(List<UserDto> dtos, List<User> users, int requestingUserId)
+        {
+            if (dtos.Count == 0 || users.Count == 0)
+                return;
+
+            var now = DateTime.UtcNow;
+            var usersById = users.ToDictionary(u => u.Id);
+            var activeLockUserIds = users
+                .Where(u => IsUserEditLockActive(u, now) && u.EditLockedByUserId.HasValue)
+                .Select(u => u.EditLockedByUserId!.Value)
+                .Distinct()
+                .ToList();
+
+            var displayNamesByUserId = activeLockUserIds.Count == 0
+                ? new Dictionary<int, string>()
+                : await _context.Users
+                    .AsNoTracking()
+                    .Where(u => activeLockUserIds.Contains(u.Id))
+                    .ToDictionaryAsync(u => u.Id, u => (u.FirstName + " " + u.LastName).Trim());
+
+            foreach (var dto in dtos)
+            {
+                if (!usersById.TryGetValue(dto.Id, out var user))
+                    continue;
+
+                string? displayName = null;
+                if (user.EditLockedByUserId.HasValue)
+                    displayNamesByUserId.TryGetValue(user.EditLockedByUserId.Value, out displayName);
+
+                dto.EditLock = BuildEditLockDto(user, requestingUserId, displayName, now);
+            }
         }
 
         private static bool TryLiftExpiredBan(User user)

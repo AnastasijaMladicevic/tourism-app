@@ -42,8 +42,9 @@
 
 .toolbar-search {
   position: relative;
+  width: 100%;
+  max-width: none;
 }
-
 .search-icon {
   position: absolute;
   left: 12px;

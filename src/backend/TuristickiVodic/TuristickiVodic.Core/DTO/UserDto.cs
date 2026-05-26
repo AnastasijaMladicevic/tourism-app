@@ -29,6 +29,9 @@ namespace TuristickiVodic.Core.DTO
         public string? PublicAppHomeUrl { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? ProfileImageUrl { get; set; }
+        public bool HasActiveSession { get; set; }
+        public DateTime? ActiveSessionExpiresAtUtc { get; set; }
+        public UserEditLockDto? EditLock { get; set; }
         public int FavoritesCount { get; set; }
         public int PlansCount { get; set; }
         public int ReviewsCount { get; set; }

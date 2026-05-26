@@ -34,6 +34,20 @@ export interface UserDto {
   banReason?: string | null;
   banExpiresAtUtc?: string | null;
   bannedAtUtc?: string | null;
+  hasActiveSession?: boolean;
+  activeSessionExpiresAtUtc?: string | null;
+  editLock?: UserEditLockDto | null;
+}
+
+export interface UserEditLockDto {
+  userId: number;
+  isLocked: boolean;
+  isOwnedByCurrentUser: boolean;
+  lockedByUserId?: number | null;
+  lockedByDisplayName?: string | null;
+  acquiredAtUtc?: string | null;
+  expiresAtUtc?: string | null;
+  message?: string | null;
 }
 
 /** Matches TuristickiVodic.Core.DTO.UpdateUserDto — profile fields admins may update (email is not included). */
@@ -46,7 +60,7 @@ export interface UpdateUserDto {
   language?: string;
 }
 
-/** Matches TuristickiVodic.Core.DTO.ChangePasswordDto — admin may reset another user's password without knowing the current one. */
+/** Matches TuristickiVodic.Core.DTO.ChangePasswordDto — admins must provide the user's current password before replacing it. */
 export interface ChangePasswordDto {
   currentPassword: string;
   newPassword: string;

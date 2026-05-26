@@ -12,6 +12,7 @@ import {
   BanUserDto,
   CreatorRoleRequestDto
 } from '../../../services/admin-users.service';
+import { UserEditLockDto } from '../../../models/user.model';
 import { ReviewDto, ReviewService } from '../../../services/review';
 import {
   ManagerReportDto,
@@ -67,6 +68,7 @@ interface BannedUserRow {
   bannedAtLabel: string;
   banExpiresLabel: string;
   bannedAtSort: number;
+  editLock?: UserEditLockDto | null;
 }
 
 @Component({
@@ -146,6 +148,7 @@ export class UsersComponent implements OnInit {
     role: string;
     lastLogin: string;
     status: 'Active' | 'Inactive' | 'Banned';
+    editLock?: UserEditLockDto | null;
   }[] = [];
   tourists: {
     id: number;
@@ -156,6 +159,7 @@ export class UsersComponent implements OnInit {
     joinedDate: string;
     profileImageUrl: string | null;
     initials: string;
+    editLock?: UserEditLockDto | null;
   }[] = [];
 
   adminDirectorySearch = '';
@@ -598,7 +602,8 @@ export class UsersComponent implements OnInit {
       email: u.email,
       role: u.roleName || 'Unknown',
       lastLogin: this.formatDate(u.createdAt),
-      status: u.isBanned ? 'Banned' : (u.isActive ? 'Active' : 'Inactive')
+      status: u.isBanned ? 'Banned' : (u.isActive ? 'Active' : 'Inactive'),
+      editLock: u.editLock ?? null
     }));
 
     this.topOrigins = this.buildTopOrigins(touristsOnly);
@@ -618,7 +623,8 @@ export class UsersComponent implements OnInit {
       status: u.isBanned ? 'banned' : (u.isActive ? 'active' : 'inactive'),
       joinedDate: this.formatDate(u.createdAt),
       profileImageUrl: (u.profileImageUrl ?? '').trim() || null,
-      initials: this.getInitials(u.firstName, u.lastName)
+      initials: this.getInitials(u.firstName, u.lastName),
+      editLock: u.editLock ?? null
     }));
 
     this.bannedUsers = allUsers
@@ -646,7 +652,8 @@ export class UsersComponent implements OnInit {
       banReason: (u.banReason ?? '').trim() || '—',
       bannedAtLabel: this.formatDate(u.bannedAtUtc ?? undefined),
       banExpiresLabel: u.banExpiresAtUtc ? this.formatDate(u.banExpiresAtUtc ?? undefined) : 'Permanent',
-      bannedAtSort
+      bannedAtSort,
+      editLock: u.editLock ?? null
     };
   }
 
@@ -1410,6 +1417,19 @@ export class UsersComponent implements OnInit {
 
   getInitials(firstName: string, lastName: string): string {
     return `${(firstName || '').charAt(0)}${(lastName || '').charAt(0)}`.toUpperCase() || 'U';
+  }
+
+  isEditLockedByAnother(row: { editLock?: UserEditLockDto | null } | null | undefined): boolean {
+    return !!row?.editLock?.isLocked && !row.editLock.isOwnedByCurrentUser;
+  }
+
+  getEditDisabledTitle(row: { name?: string; editLock?: UserEditLockDto | null } | null | undefined): string {
+    if (!this.isEditLockedByAnother(row)) {
+      return 'Edit user';
+    }
+
+    const lockedBy = row?.editLock?.lockedByDisplayName?.trim() || 'Another admin';
+    return `${lockedBy} is currently editing this user.`;
   }
 
   hasPendingManagerReport(userId: number): boolean {

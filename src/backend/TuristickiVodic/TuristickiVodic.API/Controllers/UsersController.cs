@@ -4,6 +4,7 @@ using System;
 using System.Security.Claims;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Services;
+using TuristickiVodic.Services.Services;
 using System.IdentityModel.Tokens.Jwt;
 using SixLabors.ImageSharp;
 
@@ -28,7 +29,8 @@ namespace TuristickiVodic.API.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll([FromQuery] UserQueryDto query)
         {
-            var users = await _userService.GetAllAsync(query);
+            var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var users = await _userService.GetAllAsync(query, currentUserId);
             return Ok(NormalizeUsers(users));
         }
 
@@ -42,7 +44,7 @@ namespace TuristickiVodic.API.Controllers
             if (!isAdmin && currentUserId != id)
                 return Forbid();
 
-            var user = await _userService.GetByIdAsync(id);
+            var user = await _userService.GetByIdAsync(id, isAdmin ? currentUserId : null);
             if (user == null)
                 return NotFound();
 
@@ -490,15 +492,23 @@ namespace TuristickiVodic.API.Controllers
 
             var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
             var isAdmin = User.IsInRole("Admin");
+            var roleName = User.FindFirst(ClaimTypes.Role)!.Value;
 
             if (!isAdmin && currentUserId != id)
                 return Forbid();
 
-            var user = await _userService.UpdateAsync(id, updateUserDto);
-            if (user == null)
-                return NotFound();
+            try
+            {
+                var user = await _userService.UpdateAsync(id, updateUserDto, currentUserId, roleName);
+                if (user == null)
+                    return NotFound();
 
-            return Ok(NormalizeUser(user));
+                return Ok(NormalizeUser(user));
+            }
+            catch (UserEditLockException ex)
+            {
+                return Conflict(ex.LockState);
+            }
         }
 
         // Korisnik može da menja lozinku samo sebi; Admin može svakome
@@ -520,6 +530,10 @@ namespace TuristickiVodic.API.Controllers
                 await _userService.ChangePasswordAsync(id, changePasswordDto, currentUserId, roleName);
                 return Ok(new { message = "Password changed successfully" });
             }
+            catch (UserEditLockException ex)
+            {
+                return Conflict(ex.LockState);
+            }
             catch (UnauthorizedAccessException)
             {
                 return Forbid();
@@ -528,6 +542,39 @@ namespace TuristickiVodic.API.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+        [HttpPost("{id}/edit-lock")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AcquireEditLock(int id)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var lockState = await _userService.AcquireEditLockAsync(id, userId);
+            if (lockState == null)
+                return NotFound();
+
+            return Ok(lockState);
+        }
+
+        [HttpPut("{id}/edit-lock")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> RefreshEditLock(int id)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            var lockState = await _userService.RefreshEditLockAsync(id, userId);
+            if (lockState == null)
+                return NotFound();
+
+            return Ok(lockState);
+        }
+
+        [HttpDelete("{id}/edit-lock")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ReleaseEditLock(int id)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+            await _userService.ReleaseEditLockAsync(id, userId);
+            return NoContent();
         }
 
         [HttpPut("{id}/profile-image")]

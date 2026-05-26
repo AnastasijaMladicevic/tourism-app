@@ -5,15 +5,18 @@ namespace TuristickiVodic.Services
 {
     public interface IUserService
     {
-        Task<PagedResultDto<UserDto>> GetAllAsync(UserQueryDto query);
-        Task<UserDto?> GetByIdAsync(int id);
+        Task<PagedResultDto<UserDto>> GetAllAsync(UserQueryDto query, int? requestingUserId = null);
+        Task<UserDto?> GetByIdAsync(int id, int? requestingUserId = null);
         Task<UserDto?> GetByEmailAsync(string email);
         Task<UserDto> CreateAsync(CreateUserDto createUserDto);
         Task<UserDto> CreateManagerAsync(CreateUserDto createUserDto);
         Task<UserDto> CreateAdminAsync(CreateUserDto createUserDto);
-        Task<UserDto?> UpdateAsync(int id, UpdateUserDto updateUserDto);
+        Task<UserDto?> UpdateAsync(int id, UpdateUserDto updateUserDto, int currentUserId, string roleName);
         Task<bool> DeleteAsync(int id);
         Task ChangePasswordAsync(int userId, ChangePasswordDto dto, int currentUserId, string roleName);
+        Task<UserEditLockDto?> AcquireEditLockAsync(int userId, int requestingUserId);
+        Task<UserEditLockDto?> RefreshEditLockAsync(int userId, int requestingUserId);
+        Task<bool> ReleaseEditLockAsync(int userId, int requestingUserId);
         Task ForgotPasswordAsync(ForgotPasswordDto dto);
         Task<ResetPasswordVerificationDto> VerifyResetCodeAsync(VerifyResetCodeDto dto);
         Task ResetPasswordAsync(ResetPasswordDto dto);

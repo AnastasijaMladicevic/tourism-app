@@ -67,10 +67,14 @@ namespace TuristickiVodic.Core.Models
         public bool AllowPushNotifications { get; set; } = false;
         [MaxLength(500)]
         public string? ProfileImageUrl { get; set; }
+        public int? EditLockedByUserId { get; set; }
+        public DateTime? EditLockAcquiredAtUtc { get; set; }
+        public DateTime? EditLockExpiresAtUtc { get; set; }
 
         [Required]
         public int RoleId { get; set; }
         public Role Role { get; set; }
+        public User? EditLockedByUser { get; set; }
 
         public int? ManagedDestinationId { get; set; }
 
@@ -99,5 +103,6 @@ namespace TuristickiVodic.Core.Models
         public ICollection<Event> CreatedEvents { get; set; } = new List<Event>();
         public ICollection<Destination> CreatedDestinations { get; set; } = new List<Destination>();
         public ICollection<Destination> LockedDestinations { get; set; } = new List<Destination>();
+        public ICollection<User> LockedUsers { get; set; } = new List<User>();
     }
 }

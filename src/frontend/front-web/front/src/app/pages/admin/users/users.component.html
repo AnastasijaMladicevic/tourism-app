@@ -416,8 +416,15 @@
                 </span>
               </td>
               <td class="actions">
-                <a class="actions-edit-link" [routerLink]="['/admin/users/edit', member.id]" title="Edit user" aria-label="Edit user">
-                  <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+                <a
+                  class="actions-edit-link"
+                  [class.actions-edit-link--disabled]="isEditLockedByAnother(member)"
+                  [routerLink]="isEditLockedByAnother(member) ? null : ['/admin/users/edit', member.id]"
+                  [attr.title]="getEditDisabledTitle(member)"
+                  [attr.aria-label]="getEditDisabledTitle(member)"
+                  [attr.aria-disabled]="isEditLockedByAnother(member) ? 'true' : null"
+                >
+                  <span class="material-symbols-outlined" aria-hidden="true">{{ isEditLockedByAnother(member) ? 'lock' : 'edit' }}</span>
                 </a>
               </td>
             </tr>
@@ -884,8 +891,15 @@
             </td>
             <td>{{ tourist.joinedDate }}</td>
             <td class="actions">
-              <a class="actions-edit-link" [routerLink]="['/admin/users/edit', tourist.id]" title="Edit user" aria-label="Edit user">
-                <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+              <a
+                class="actions-edit-link"
+                [class.actions-edit-link--disabled]="isEditLockedByAnother(tourist)"
+                [routerLink]="isEditLockedByAnother(tourist) ? null : ['/admin/users/edit', tourist.id]"
+                [attr.title]="getEditDisabledTitle(tourist)"
+                [attr.aria-label]="getEditDisabledTitle(tourist)"
+                [attr.aria-disabled]="isEditLockedByAnother(tourist) ? 'true' : null"
+              >
+                <span class="material-symbols-outlined" aria-hidden="true">{{ isEditLockedByAnother(tourist) ? 'lock' : 'edit' }}</span>
               </a>
             </td>
           </tr>
@@ -1008,8 +1022,15 @@
             <td>{{ row.banExpiresLabel }}</td>
             <td class="actions">
               <div class="actions-inner">
-                <a class="actions-edit-link" [routerLink]="['/admin/users/edit', row.id]" title="Edit user" aria-label="Edit user">
-                  <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+                <a
+                  class="actions-edit-link"
+                  [class.actions-edit-link--disabled]="isEditLockedByAnother(row)"
+                  [routerLink]="isEditLockedByAnother(row) ? null : ['/admin/users/edit', row.id]"
+                  [attr.title]="getEditDisabledTitle(row)"
+                  [attr.aria-label]="getEditDisabledTitle(row)"
+                  [attr.aria-disabled]="isEditLockedByAnother(row) ? 'true' : null"
+                >
+                  <span class="material-symbols-outlined" aria-hidden="true">{{ isEditLockedByAnother(row) ? 'lock' : 'edit' }}</span>
                 </a>
                 <button
                   type="button"

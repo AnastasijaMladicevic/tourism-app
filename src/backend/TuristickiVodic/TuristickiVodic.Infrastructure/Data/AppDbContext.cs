@@ -77,6 +77,15 @@ public class AppDbContext : DbContext
             .HasIndex(u => u.LastKnownLocation)
             .HasMethod("GIST");
 
+        mb.Entity<User>()
+            .HasIndex(u => u.EditLockExpiresAtUtc);
+
+        mb.Entity<User>()
+            .HasOne(u => u.EditLockedByUser)
+            .WithMany(u => u.LockedUsers)
+            .HasForeignKey(u => u.EditLockedByUserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         mb.Entity<UserLocationHistory>()
             .HasIndex(ulh => new { ulh.UserId, ulh.RecordedAt });
 

@@ -85,16 +85,21 @@
 }
 
 .toolbar {
-    gap: 12px;
-    padding: 14px;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto auto;
-    align-items: center;
+  gap: 12px;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
 }
 
 .toolbar-search {
-    position: relative;
-    max-width: 95%;
+  position: relative;
+  width: 100%;
+}
+
+.toolbar-input {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .search-icon {
