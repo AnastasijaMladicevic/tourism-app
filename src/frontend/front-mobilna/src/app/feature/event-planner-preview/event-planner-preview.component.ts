@@ -2,24 +2,27 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  OnDestroy,
   OnInit,
   computed,
   inject,
   signal,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { catchError, finalize, forkJoin, map, of } from 'rxjs';
 import { AuthService } from '../../services/auth';
 import { ActiveRegionService } from '../../services/active-region';
 import { EventDto, EventService, EventTypeOptionDto } from '../../services/event';
 import { EventPlannerDto, EventPlannerService } from '../../services/event-planner';
 import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
+import { RouterHistoryService } from '../../services/router-history';
 
 interface PreviewEventItem {
   id: number;
   title: string;
   location: string;
   dateLabel: string;
+  compactDateLabel: string;
   day: string;
   month: string;
   price: string;
@@ -59,24 +62,55 @@ interface UpcomingHighlightItem {
   imageUrl: string;
 }
 
+interface MobilePreviewCard {
+  id: number;
+  eventId: number;
+  title: string;
+  location: string;
+  dateLabel: string;
+  compactDateLabel: string;
+  day: string;
+  month: string;
+  imageUrl: string;
+  categoryChip: string;
+  isAdded: boolean;
+  plannerId?: number;
+  startDate?: string;
+  endDate?: string;
+  eventTypeName: string;
+  description: string;
+}
+
+interface PreviewDateFilterOption {
+  key: string;
+  label: string;
+}
+
 const FALLBACK_IMAGE_URL =
   'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1200&q=80';
 
 @Component({
   selector: 'app-event-planner-preview',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './event-planner-preview.component.html',
   styleUrl: './event-planner-preview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EventPlannerPreviewComponent implements OnInit {
+export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   private readonly eventService = inject(EventService);
   private readonly activeRegionService = inject(ActiveRegionService);
   private readonly eventPlannerService = inject(EventPlannerService);
   private readonly plannerLocalPreferences = inject(PlannerLocalPreferencesService);
   private readonly authService = inject(AuthService);
+  private readonly routerHistory = inject(RouterHistoryService);
   private readonly router = inject(Router);
+  activeMobileTab: 'events' | 'planner' = 'events';
+  protected isMobileMoreFiltersOpen = false;
+  private mobileMediaQuery?: MediaQueryList;
+  private readonly mobileMediaListener = (event: MediaQueryListEvent) => {
+    this.isMobileViewport.set(event.matches);
+  };
 
   protected readonly filterChips = [
     'Svi',
@@ -85,11 +119,13 @@ export class EventPlannerPreviewComponent implements OnInit {
     'Sport',
     'Festival',
     'Hrana i piće',
+    'Za decu',
   ];
 
   protected readonly regionName = signal('Crna Gora');
   protected readonly activeChip = signal('Svi');
   protected readonly searchTerm = signal('');
+  protected readonly selectedDateKey = signal('all');
   protected readonly isLoading = signal(true);
   protected readonly hasError = signal(false);
   protected readonly allEvents = signal<PreviewEventItem[]>([]);
@@ -97,6 +133,7 @@ export class EventPlannerPreviewComponent implements OnInit {
   protected readonly plannerLoading = signal(false);
   protected readonly plannerError = signal('');
   protected readonly removingPlannerId = signal<number | null>(null);
+  protected readonly isMobileViewport = signal(false);
 
   protected readonly events = computed(() => {
     const query = this.normalizeText(this.searchTerm());
@@ -122,12 +159,71 @@ export class EventPlannerPreviewComponent implements OnInit {
 
   protected readonly plannedEvents = computed(() =>
     this.events()
+      .filter((event) => {
+        const selectedDateKey = this.selectedDateKey();
+        if (!this.isMobileViewport() || selectedDateKey === 'all') {
+          return true;
+        }
+
+        const eventDate = this.parseDate(event.startDate);
+        return eventDate ? this.toDayKey(eventDate) === selectedDateKey : false;
+      })
       .filter((event) => event.isAdded)
       .sort((left, right) => {
         const leftDate = this.parseDate(left.startDate)?.getTime() ?? 0;
         const rightDate = this.parseDate(right.startDate)?.getTime() ?? 0;
         return leftDate - rightDate;
       }),
+  );
+
+  protected readonly previewCards = computed<MobilePreviewCard[]>(() => {
+    const planned = this.plannedEvents();
+    const source = planned.length ? planned : this.events().slice(0, 4);
+
+    return source.map((event) => ({
+      id: event.id,
+      eventId: event.id,
+      title: event.title,
+      location: event.location,
+      dateLabel: event.dateLabel,
+      compactDateLabel: event.compactDateLabel,
+      day: event.day,
+      month: event.month,
+      imageUrl: event.imageUrl,
+      categoryChip: event.categoryChip,
+      isAdded: event.isAdded,
+      plannerId: event.plannerId,
+      startDate: event.startDate,
+      endDate: event.endDate,
+      eventTypeName: event.eventTypeName,
+      description: event.description,
+    }));
+  });
+
+  protected readonly dateFilterOptions = computed<PreviewDateFilterOption[]>(() => {
+    const options = new Map<string, PreviewDateFilterOption>();
+
+    for (const item of this.visiblePlannerItems()) {
+      const key = this.toDayKey(item.sortDate);
+      if (!options.has(key)) {
+        options.set(key, {
+          key,
+          label: new Intl.DateTimeFormat('sr-RS', {
+            day: '2-digit',
+            month: 'short',
+          })
+            .format(item.sortDate)
+            .replace('.', ''),
+        });
+      }
+    }
+
+    return [{ key: 'all', label: 'Datum' }, ...options.values()];
+  });
+
+  protected readonly mobilePrimaryFilterChips = ['Svi', 'Koncerti', 'Kultura', 'Sport'];
+  protected readonly mobileSecondaryFilterChips = computed(() =>
+    this.filterChips.filter((chip) => !this.mobilePrimaryFilterChips.includes(chip)),
   );
 
   protected readonly visiblePlannerItems = computed(() => {
@@ -165,18 +261,55 @@ export class EventPlannerPreviewComponent implements OnInit {
         };
       }),
   );
+  protected readonly mobileHighlights = computed<UpcomingHighlightItem[]>(() =>
+    this.previewCards()
+      .slice(0, 2)
+      .map((item, index) => ({
+        id: index + 1,
+        eventId: item.eventId,
+        title: item.title,
+        subtitle: this.buildMobileHighlightSubtitle(item.dateLabel),
+        imageUrl: item.imageUrl,
+      })),
+  );
 
   ngOnInit(): void {
+    this.initializeViewportWatcher();
     this.loadEvents();
     this.loadPlanner();
   }
 
+  ngOnDestroy(): void {
+    this.mobileMediaQuery?.removeEventListener('change', this.mobileMediaListener);
+  }
+
   protected setActiveChip(chip: string): void {
     this.activeChip.set(chip);
+    this.isMobileMoreFiltersOpen = false;
+  }
+
+  protected setMobileTab(tab: 'events' | 'planner'): void {
+    this.activeMobileTab = tab;
   }
 
   protected updateSearchTerm(value: string): void {
     this.searchTerm.set(value);
+  }
+
+  protected updateSelectedDateKey(value: string): void {
+    this.selectedDateKey.set(value || 'all');
+  }
+
+  protected toggleMobileMoreFilters(): void {
+    this.isMobileMoreFiltersOpen = !this.isMobileMoreFiltersOpen;
+  }
+
+  protected isMobileMoreActive(): boolean {
+    return this.mobileSecondaryFilterChips().includes(this.activeChip()) || this.isMobileMoreFiltersOpen;
+  }
+
+  protected goBack(): void {
+    this.routerHistory.goBack('/home');
   }
 
   protected openEvents(): void {
@@ -189,7 +322,7 @@ export class EventPlannerPreviewComponent implements OnInit {
     void this.router.navigate(['/event', eventId]);
   }
 
-  protected editPlannerEvent(event: PreviewEventItem): void {
+  protected editPlannerEvent(event: PreviewEventItem | MobilePreviewCard): void {
     if (!event.isAdded || !event.plannerId) {
       return;
     }
@@ -315,6 +448,16 @@ export class EventPlannerPreviewComponent implements OnInit {
     }
   }
 
+  private initializeViewportWatcher(): void {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return;
+    }
+
+    this.mobileMediaQuery = window.matchMedia('(max-width: 768px)');
+    this.isMobileViewport.set(this.mobileMediaQuery.matches);
+    this.mobileMediaQuery.addEventListener('change', this.mobileMediaListener);
+  }
+
   private loadEvents(): void {
     this.isLoading.set(true);
     this.hasError.set(false);
@@ -406,6 +549,7 @@ export class EventPlannerPreviewComponent implements OnInit {
       title: event.name?.trim() || 'Naziv događaja nije dostupan',
       location: this.buildEventLocation(event),
       dateLabel: this.buildDateLabel(startDate, endDate),
+      compactDateLabel: this.buildCompactDateLabel(startDate, endDate),
       day: startDate
         ? startDate.toLocaleDateString('sr-RS', { day: '2-digit' })
         : '--',
@@ -538,6 +682,26 @@ export class EventPlannerPreviewComponent implements OnInit {
     return formattedStart;
   }
 
+  private buildCompactDateLabel(startDate: Date | null, endDate: Date | null): string {
+    if (!startDate) {
+      return 'Datum nije naveden';
+    }
+
+    const formattedStart = this.formatDate(startDate);
+    const startTime = this.formatTime(startDate);
+    const endTime = endDate ? this.formatTime(endDate) : '';
+
+    if (startTime && endTime) {
+      return `${formattedStart} • ${startTime}-${endTime}`;
+    }
+
+    if (startTime) {
+      return `${formattedStart} • ${startTime}`;
+    }
+
+    return formattedStart;
+  }
+
   private buildPrice(price?: number): string {
     if (price == null || price <= 0) {
       return 'BESPLATNO';
@@ -615,6 +779,17 @@ export class EventPlannerPreviewComponent implements OnInit {
 
     const timePart = this.formatPlannerTime(date);
     return `Sledeće ${dayPart.toLowerCase()} u ${timePart}`;
+  }
+
+  private buildMobileHighlightSubtitle(label: string): string {
+    return label.replace(/\s*-\s*/g, ' • ');
+  }
+
+  private toDayKey(date: Date): string {
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const day = `${date.getDate()}`.padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   private matchesAny(value: string, needles: string[]): boolean {
