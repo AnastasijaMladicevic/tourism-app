@@ -51,6 +51,14 @@ interface PlannerGroup {
   items: PlannerItem[];
 }
 
+interface UpcomingHighlightItem {
+  id: number;
+  eventId: number;
+  title: string;
+  subtitle: string;
+  imageUrl: string;
+}
+
 const FALLBACK_IMAGE_URL =
   'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1200&q=80';
 
@@ -77,7 +85,6 @@ export class EventPlannerPreviewComponent implements OnInit {
     'Sport',
     'Festival',
     'Hrana i piće',
-    'Za decu',
   ];
 
   protected readonly regionName = signal('Crna Gora');
@@ -143,6 +150,21 @@ export class EventPlannerPreviewComponent implements OnInit {
   });
 
   protected readonly plannerCount = computed(() => this.visiblePlannerItems().length);
+  protected readonly upcomingHighlights = computed<UpcomingHighlightItem[]>(() =>
+    this.visiblePlannerItems()
+      .slice(0, 2)
+      .map((item) => {
+        const relatedEvent = this.allEvents().find((event) => event.id === item.eventId);
+
+        return {
+          id: item.id,
+          eventId: item.eventId,
+          title: item.title,
+          subtitle: this.buildUpcomingSubtitle(item.sortDate),
+          imageUrl: relatedEvent?.imageUrl || FALLBACK_IMAGE_URL,
+        };
+      }),
+  );
 
   ngOnInit(): void {
     this.loadEvents();
@@ -582,6 +604,17 @@ export class EventPlannerPreviewComponent implements OnInit {
       minute: '2-digit',
       hour12: false,
     });
+  }
+
+  private buildUpcomingSubtitle(date: Date): string {
+    const dayPart = date.toLocaleDateString('sr-RS', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    });
+
+    const timePart = this.formatPlannerTime(date);
+    return `Sledeće ${dayPart.toLowerCase()} u ${timePart}`;
   }
 
   private matchesAny(value: string, needles: string[]): boolean {

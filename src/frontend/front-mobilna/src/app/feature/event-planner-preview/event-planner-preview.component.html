@@ -34,9 +34,63 @@
                 type="button"
                 class="chip"
                 [class.chip--active]="activeChip() === chip"
+                [class.chip--text-only]="chip === 'Svi'"
                 (click)="setActiveChip(chip)"
               >
-                {{ chip }}
+                @if (chip !== 'Svi') {
+                  <span class="chip__icon" aria-hidden="true">
+                    @switch (chip) {
+                      @case ('Koncerti') {
+                        <svg viewBox="0 0 24 24">
+                          <path d="M15 5v9.2a2.8 2.8 0 1 1-1.5-2.48V7.4l6-1.6v7.4a2.8 2.8 0 1 1-1.5-2.48V4z" />
+                        </svg>
+                      }
+                      @case ('Kultura') {
+                        <svg viewBox="0 0 24 24">
+                          <path d="M4 20h16" />
+                          <path d="M6 20V10h12v10" />
+                          <path d="M3 10h18" />
+                          <path d="M12 4 3 8v2h18V8z" />
+                          <path d="M9 13v4" />
+                          <path d="M15 13v4" />
+                        </svg>
+                      }
+                      @case ('Sport') {
+                        <svg viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" r="8" />
+                          <path d="M12 4a12 12 0 0 1 3.6 8A12 12 0 0 1 12 20a12 12 0 0 1-3.6-8A12 12 0 0 1 12 4Z" />
+                          <path d="M4.9 9.2h14.2" />
+                          <path d="M4.9 14.8h14.2" />
+                        </svg>
+                      }
+                      @case ('Festival') {
+                        <svg viewBox="0 0 24 24">
+                          <path d="m12 4 2.1 4.3 4.8.7-3.4 3.3.8 4.7L12 14.7 7.7 17l.8-4.7L5.1 9l4.8-.7Z" />
+                        </svg>
+                      }
+                      @case ('Hrana i piće') {
+                        <svg viewBox="0 0 24 24">
+                          <path d="M7 4v7" />
+                          <path d="M10 4v7" />
+                          <path d="M7 7h3" />
+                          <path d="M8.5 11v9" />
+                          <path d="M15 4v7" />
+                          <path d="M18 4v16" />
+                          <path d="M15 11c1.7 0 3-1.3 3-3V4" />
+                        </svg>
+                      }
+                      @case ('Za decu') {
+                        <svg viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" r="8" />
+                          <path d="M9 10h.01" />
+                          <path d="M15 10h.01" />
+                          <path d="M9 14c.9 1 1.9 1.5 3 1.5s2.1-.5 3-1.5" />
+                        </svg>
+                      }
+                    }
+                  </span>
+                }
+                <span class="chip__label">{{ chip }}</span>
               </button>
             }
 
@@ -137,8 +191,7 @@
                         </svg>
                         {{ event.dateLabel }}
                       </span>
-
-                      </div>
+                    </div>
 
                       <span class="event-card__action-badge">{{ event.categoryChip }}</span>
                     </div>
@@ -220,13 +273,35 @@
           </div>
         </div>
 
-        <section class="planner-cta-card planner-cta-card--outside">
-          <h3>Šta sledeće planiraš?</h3>
-          <p>Dodaj još jedan event i napravi jasniji tok dana.</p>
-          <button type="button" class="planner-cta-button" (click)="openEvents()">
-            <span>+</span>
-            <span>Dodaj event</span>
-          </button>
+        <section class="upcoming-highlight-card">
+          <div class="upcoming-highlight-card__header">
+            <span class="upcoming-highlight-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 2 9.5 9H2l6 4.5L5.5 22 12 17.5 18.5 22 16 13.5 22 9h-7.5L12 2Z" />
+              </svg>
+            </span>
+            <h3>Upcoming Highlight</h3>
+          </div>
+
+          @if (upcomingHighlights().length > 0) {
+            <div class="upcoming-highlight-card__list">
+              @for (highlight of upcomingHighlights(); track highlight.id) {
+                <button
+                  type="button"
+                  class="upcoming-highlight-row"
+                  (click)="openEventDetails(highlight.eventId)"
+                >
+                  <img [src]="highlight.imageUrl" [alt]="highlight.title" />
+                  <div class="upcoming-highlight-row__copy">
+                    <strong>{{ highlight.title }}</strong>
+                    <span>{{ highlight.subtitle }}</span>
+                  </div>
+                </button>
+              }
+            </div>
+          } @else {
+            <p class="upcoming-highlight-card__empty">Nema izdvojenih planner događaja još uvek.</p>
+          }
         </section>
       </aside>
     </div>

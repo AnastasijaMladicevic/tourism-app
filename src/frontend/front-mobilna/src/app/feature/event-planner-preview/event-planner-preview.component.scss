@@ -194,12 +194,46 @@
 }
 
 .chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   padding: 0 20px;
   border: 1px solid #dceaf0;
   background: #ffffff;
-  color: #30404d;
-  font-size: 16px;
+  color: #233244;
+  font-size: 15px;
   font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  box-shadow: 0 6px 16px rgba(31, 37, 43, 0.05);
+}
+
+.chip__icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #1f2d3d;
+
+  svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.85;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+}
+
+.chip__label {
+  white-space: nowrap;
+}
+
+.chip--text-only {
+  min-width: 68px;
 }
 
 .chip--active {
@@ -209,14 +243,23 @@
   box-shadow: 0 12px 26px rgba(22, 138, 173, 0.2);
 }
 
-.chip--cta {
-  border-color: transparent;
-  background: linear-gradient(135deg, var(--preview-primary-soft) 0%, var(--preview-primary) 100%);
+.chip--active .chip__icon {
   color: #ffffff;
+}
+
+.chip--cta {
+  border-color: #dceaf0;
+  background: #ffffff;
+  color: #233244;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 12px 24px rgba(22, 138, 173, 0.18);
+}
+
+.chip--cta span:first-child {
+  color: var(--preview-primary);
+  font-size: 18px;
+  line-height: 1;
 }
 
 .event-list {
@@ -430,6 +473,12 @@
   gap: 10px;
 }
 
+.event-card__tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .preview-tag,
 .planner-priority {
   min-height: 28px;
@@ -626,49 +675,98 @@
   gap: 8px;
 }
 
-.planner-cta-card {
-  padding: 22px 18px;
+.upcoming-highlight-card {
+  padding: 22px 20px;
   border: 1px solid var(--preview-border);
-  border-radius: 18px;
-  background:
-    radial-gradient(circle at right center, rgba(22, 138, 173, 0.08), transparent 32%),
-    #f2f5f9;
-
-  h3 {
-    margin: 0 0 10px;
-    color: #1f2937;
-    font-size: 20px;
-    font-weight: 900;
-    letter-spacing: -0.03em;
-  }
-
-  p {
-    margin: 0 0 18px;
-    color: var(--preview-text-soft);
-    font-size: 15px;
-    line-height: 1.55;
-  }
-}
-
-.planner-cta-card--outside {
-  margin: 0;
+  border-radius: 22px;
+  background: #ffffff;
   box-shadow: var(--preview-shadow);
 }
 
-.planner-cta-button {
-  width: 100%;
-  min-height: 50px;
-  border: 0;
-  border-radius: 15px;
-  background: linear-gradient(135deg, var(--preview-primary-soft) 0%, var(--preview-primary) 100%);
-  color: #ffffff;
+.upcoming-highlight-card__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  h3 {
+    margin: 0;
+    color: var(--preview-text);
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+  }
+}
+
+.upcoming-highlight-card__icon {
+  width: 36px;
+  height: 36px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  font-size: 16px;
-  font-weight: 900;
-  box-shadow: 0 16px 30px rgba(22, 138, 173, 0.24);
+  border-radius: 50%;
+  background: #eef6ff;
+  color: var(--preview-primary);
+
+  svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+}
+
+.upcoming-highlight-card__list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.upcoming-highlight-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid #b9d6f2;
+  border-radius: 18px;
+  background: #eef6ff;
+  text-align: left;
+
+  img {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.upcoming-highlight-row__copy {
+  min-width: 0;
+
+  strong {
+    display: block;
+    margin: 0 0 4px;
+    color: var(--preview-primary);
+    font-size: 16px;
+    font-weight: 900;
+    line-height: 1.25;
+  }
+
+  span {
+    display: block;
+    color: #55606d;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+}
+
+.upcoming-highlight-card__empty {
+  margin: 0;
+  color: var(--preview-text-soft);
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .planner-groups {
