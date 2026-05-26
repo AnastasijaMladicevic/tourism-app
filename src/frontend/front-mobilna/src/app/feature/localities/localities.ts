@@ -157,7 +157,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
   onPageSizeChange(size: number): void {
     this.pageSize = size;
     this.currentPage = 1;
-    void this.loadData();
+    void this.refreshVisibleLocalities();
     this.cdr.detectChanges();
   }
   togglePageSizeMenu(event: Event): void {
@@ -231,7 +231,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
     if (this.currentPage === 1) return;
 
     this.currentPage--;
-    void this.loadData();
+    void this.refreshVisibleLocalities();
     this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
@@ -239,7 +239,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
     if (!this.hasNextPage) return;
 
     this.currentPage++;
-    void this.loadData();
+    void this.refreshVisibleLocalities();
     this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
@@ -274,23 +274,19 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
 
     try {
       await this.ensureFavoritesLoaded();
-      const response = await this.fetchLocalitiesPage();
-      if (currentToken !== this.loadToken) {
-        return;
-      }
 
-      this.totalCount = response.totalCount ?? 0;
-      this.hasNextPage = (response.page ?? this.currentPage) < (response.totalPages ?? 0);
+      const allLocalities = await this.fetchAllLocalities();
 
-      const items = (response.items ?? []).map((locality) => ({
+      if (currentToken !== this.loadToken) return;
+
+      this.localities = allLocalities.map((locality: LocalityDto) => ({
         ...this.normalizeLocality(locality),
         images: locality.images ?? this.imageCache.get(locality.id) ?? [],
         isFavorite: false,
         favoriteId: undefined,
       }));
 
-      this.localities = items;
-      this.mergeLocalityTypes(items);
+      this.mergeLocalityTypes(this.localities);
       this.favoriteStateService.applyToList(this.localities, (item) => ({
         type: 'locality',
         entityId: item.id,
@@ -302,33 +298,106 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
         this.clearDistances();
       }
 
-      this.visibleLocalities = await Promise.all(
-        this.localities.map(async (item) => ({
-          ...item,
-          images: await this.getLocalityImages(item),
-        })),
-      );
-      this.favoriteStateService.applyToList(this.visibleLocalities, (item) => ({
-        type: 'locality',
-        entityId: item.id,
-      }));
+      this.refreshVisibleLocalities();
 
       this.isLoading = false;
       this.cdr.detectChanges();
     } catch (err) {
-      if (currentToken !== this.loadToken) {
-        return;
-      }
-
+      if (currentToken !== this.loadToken) return;
       console.error(err);
       this.localities = [];
       this.visibleLocalities = [];
-      this.totalCount = 0;
-      this.hasNextPage = false;
       this.errorMessage = 'Failed to load localities.';
       this.isLoading = false;
       this.cdr.detectChanges();
     }
+  }
+  private async fetchAllLocalities(): Promise<LocalityDto[]> {
+    const all: LocalityDto[] = [];
+    let page = 1;
+    const pageSize = 100;
+
+    while (true) {
+      const response = await firstValueFrom(
+        this.localityService.getPage({
+          page,
+          pageSize,
+          search: undefined,
+          type: undefined,
+          sortBy: 'name',
+          sortOrder: 'asc',
+        })
+      );
+
+      const items = response.items ?? [];
+      all.push(...items);
+
+      if (items.length < pageSize) break;
+      page++;
+    }
+
+    return all;
+  }
+  private async refreshVisibleLocalities(): Promise<void> {
+    let list = [...this.localities];
+
+    // Pretraga
+    if (this.searchQuery.trim()) {
+      const q = this.searchQuery.trim().toLowerCase();
+      list = list.filter(loc =>
+        loc.name.toLowerCase().includes(q) ||
+        (loc.description?.toLowerCase().includes(q) ?? false)
+      );
+    }
+
+    // Filter po tipu
+    if (this.activeFilter !== 'All') {
+      list = list.filter(loc => loc.localityTypeName === this.activeFilter);
+    }
+
+    // Sortiranje
+    switch (this.sortOption) {
+      case 'az':
+        list.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'za':
+        list.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'distance':
+        list.sort((a, b) => (a.distanceMeters ?? 999999999) - (b.distanceMeters ?? 999999999));
+        break;
+    }
+
+    this.totalCount = list.length;
+
+    if (this.totalCount === 0) {
+      this.currentPage = 1;
+      this.hasNextPage = false;
+      this.visibleLocalities = [];
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const totalPages = Math.ceil(this.totalCount / this.pageSize);
+    this.currentPage = Math.min(this.currentPage, totalPages);
+    this.hasNextPage = this.currentPage < totalPages;
+
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const pageItems = list.slice(startIndex, startIndex + this.pageSize);
+
+    this.visibleLocalities = await Promise.all(
+      pageItems.map(async (item) => ({
+        ...item,
+        images: await this.getLocalityImages(item),
+      }))
+    );
+
+    this.favoriteStateService.applyToList(this.visibleLocalities, (item) => ({
+      type: 'locality',
+      entityId: item.id,
+    }));
+
+    this.cdr.detectChanges();
   }
 
   private async ensureFavoritesLoaded(): Promise<void> {
@@ -515,13 +584,13 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
     this.sortOption = option;
     this.showSortMenu = false;
     this.currentPage = 1;
-    void this.loadData();
+    void this.refreshVisibleLocalities();
   }
 
   setFilter(filter: string): void {
     this.activeFilter = filter;
     this.currentPage = 1;
-    void this.loadData();
+    void this.refreshVisibleLocalities();
   }
 
   private async getLocalityImages(locality: LocalityView): Promise<LocalityDto['images']> {
@@ -546,14 +615,8 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
   }
 
   onSearchChange(): void {
-    if (this.searchTimeout) {
-      clearTimeout(this.searchTimeout);
-    }
-  
-    this.searchTimeout = setTimeout(() => {
-      this.currentPage = 1;
-      void this.loadData();
-    }, 400);
+    this.currentPage = 1;
+    void this.refreshVisibleLocalities();
   }
 
   goBack(): void {

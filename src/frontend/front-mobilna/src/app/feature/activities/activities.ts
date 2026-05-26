@@ -216,7 +216,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
   onPageSizeChange(size: number): void {
     this.pageSize = size;
     this.currentPage = 1;
-    void this.loadData();
+    this.refreshVisibleActivities();
     this.cdr.detectChanges();
   }
   togglePageSizeMenu(event: Event): void {
@@ -290,7 +290,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
     if (this.currentPage === 1) return;
 
     this.currentPage--;
-    void this.loadData();
+    this.refreshVisibleActivities();
     this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
@@ -298,7 +298,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
     if (!this.hasNextPage) return;
 
     this.currentPage++;
-    void this.loadData();
+    this.refreshVisibleActivities();
     this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
@@ -327,23 +327,19 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
 
     try {
       await this.ensureFavoritesLoaded();
-      const response = await this.fetchActivitiesPage();
-      if (currentToken !== this.loadToken) {
-        return;
-      }
 
-      this.totalCount = response.totalCount ?? 0;
-      this.hasNextPage = (response.page ?? this.currentPage) < (response.totalPages ?? 0);
+      const allActivities = await this.fetchAllActivities();   // učitavamo SVE
 
-      const items = (response.items ?? []).map((activity) => ({
+      if (currentToken !== this.loadToken) return;
+
+      this.activities = allActivities.map((activity) => ({
         ...this.normalizeActivity(activity),
         images: activity.images ?? this.imageCache.get(activity.id) ?? [],
         isFavorite: false,
         favoriteId: undefined,
       }));
 
-      this.activities = items;
-      this.mergeActivityTypes(items);
+      this.mergeActivityTypes(this.activities);
       this.favoriteStateService.applyToList(this.activities, (item) => ({
         type: 'activity',
         entityId: item.id,
@@ -355,35 +351,108 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
         this.clearDistances();
       }
 
-      this.visibleActivities = await Promise.all(
-        this.activities.map(async (item) => ({
-          ...item,
-          images: await this.getActivityImages(item),
-        })),
-      );
-      this.favoriteStateService.applyToList(this.visibleActivities, (item) => ({
-        type: 'activity',
-        entityId: item.id,
-      }));
+      this.refreshVisibleActivities();
 
       this.isLoading = false;
       this.cdr.detectChanges();
     } catch (err) {
-      if (currentToken !== this.loadToken) {
-        return;
-      }
-
+      if (currentToken !== this.loadToken) return;
       console.error(err);
       this.activities = [];
       this.visibleActivities = [];
-      this.totalCount = 0;
-      this.hasNextPage = false;
       this.errorMessage = 'Failed to load activities.';
       this.isLoading = false;
       this.cdr.detectChanges();
     }
   }
+  private async fetchAllActivities(): Promise<ActivityDto[]> {
+    const all: ActivityDto[] = [];
+    let page = 1;
+    const pageSize = 100;
 
+    while (true) {
+      const response = await firstValueFrom(
+        this.activityService.getPage({
+          page,
+          pageSize,
+          search: undefined,
+          type: undefined,
+          sortBy: 'name',
+          sortOrder: 'asc',
+        })
+      );
+
+      const items = response.items ?? [];
+      all.push(...items);
+
+      if (items.length < pageSize) break;
+      page++;
+    }
+
+    return all;
+  }
+
+  private refreshVisibleActivities(): void {
+    let list = [...this.activities];
+
+    // Pretraga
+    if (this.searchQuery.trim()) {
+      const q = this.searchQuery.trim().toLowerCase();
+      list = list.filter(activity =>
+        activity.name.toLowerCase().includes(q) ||
+        (activity.description?.toLowerCase().includes(q) ?? false)
+      );
+    }
+
+    // Filter po tipu
+    if (this.activeFilter !== 'All') {
+      list = list.filter(activity => activity.activityTypeName === this.activeFilter);
+    }
+
+    // Sort
+    switch (this.sortOption) {
+      case 'az':
+        list.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'za':
+        list.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'distance':
+        list.sort((a, b) => (a.distanceMeters ?? 999999999) - (b.distanceMeters ?? 999999999));
+        break;
+    }
+
+    this.totalCount = list.length;
+
+    if (this.totalCount === 0) {
+      this.currentPage = 1;
+      this.hasNextPage = false;
+      this.visibleActivities = [];
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const totalPages = Math.ceil(this.totalCount / this.pageSize);
+    this.currentPage = Math.min(this.currentPage, totalPages);
+    this.hasNextPage = this.currentPage < totalPages;
+
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const pageItems = list.slice(startIndex, startIndex + this.pageSize);
+
+    Promise.all(
+      pageItems.map(async (item) => ({
+        ...item,
+        images: await this.getActivityImages(item),
+      }))
+    ).then((loadedItems) => {
+      this.visibleActivities = loadedItems;
+      this.favoriteStateService.applyToList(this.visibleActivities, (item) => ({
+        type: 'activity',
+        entityId: item.id,
+      }));
+      this.cdr.detectChanges();
+    });
+  }
   private async ensureFavoritesLoaded(): Promise<void> {
     if (this.favoritesLoaded || !this.authService.isLoggedIn()) {
       return;
@@ -543,13 +612,13 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
     this.sortOption = option;
     this.showSortMenu = false;
     this.currentPage = 1;
-    void this.loadData();
+    this.refreshVisibleActivities();
   }
 
   setFilter(filter: string): void {
     this.activeFilter = filter;
     this.currentPage = 1;
-    void this.loadData();
+    this.refreshVisibleActivities();
   }
 
   private async getActivityImages(activity: ActivityView): Promise<ActivityDto['images']> {
@@ -574,20 +643,14 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
   }
 
   onSearchChange(): void {
-    if (this.searchTimeout) {
-      clearTimeout(this.searchTimeout);
-    }
-  
-    this.searchTimeout = setTimeout(() => {
-      this.currentPage = 1;
-      void this.loadData();
-    }, 400);
+    this.currentPage = 1;
+    this.refreshVisibleActivities();
   }
 
   goBack(): void {
     this.router.navigate(['/home']);
   }
-  
+
   ngOnDestroy(): void {
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout);

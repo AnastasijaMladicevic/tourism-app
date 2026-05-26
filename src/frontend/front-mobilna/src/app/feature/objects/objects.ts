@@ -17,11 +17,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { catchError, firstValueFrom, of } from 'rxjs';
 
 import {
-  NearbyObjectQueryParams,
   ObjectDto,
   ObjectService,
   ObjectView,
-  PagedResultDto,
 } from '../../services/object';
 import { AuthService } from '../../services/auth';
 import { LocationTrackingService } from '../../services/location-tracking';
@@ -66,12 +64,36 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   userLocation: { lat: number; lng: number } | null = null;
   isTracking = false;
   private readonly favoritePendingIds = new Set<number>();
-  private readonly nearbyRadiusMeters = 3_000_000;
   private favoritesLoaded = false;
   private loadToken = 0;
   private hasInitializedLanguageWatcher = false;
   private lastLanguage = 'sr';
   private searchTimeout: ReturnType<typeof setTimeout> | null = null;
+  private readonly groupedTypeMap: Record<string, string[]> = {
+    'hrana i pice': ['restaurant', 'kafana'],
+    pumpe: ['gas_station'],
+    smestaj: [
+      'hotel',
+      'apartment',
+      'resort',
+      'hostel',
+      'motel',
+      'villa',
+      'apartman',
+      'smestaj',
+      'accommodation',
+      'guesthouse',
+      'guest house',
+      'pansion',
+      'bungalow',
+      'camp',
+      'kamp',
+    ],
+    soping: ['shop', 'mall'],
+    bolnice: ['hospital', 'clinic', 'pharmacy'],
+    hotel: ['hotel'],
+    restoran: ['restaurant'],
+  };
 
   constructor(
     private readonly router: Router,
@@ -107,11 +129,6 @@ export class ObjectsComponent implements OnInit, OnDestroy {
     this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
       this.isTracking = enabled;
 
-      if (this.sortOption === 'distance') {
-        void this.loadData();
-        return;
-      }
-
       if (!enabled) {
         this.clearDistances();
       } else {
@@ -123,11 +140,6 @@ export class ObjectsComponent implements OnInit, OnDestroy {
 
     this.locationTrackingService.location$.subscribe((loc) => {
       this.userLocation = loc ? { lat: loc.latitude, lng: loc.longitude } : null;
-
-      if (this.sortOption === 'distance') {
-        void this.loadData();
-        return;
-      }
 
       if (this.userLocation) {
         this.updateDistances();
@@ -164,7 +176,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   onPageSizeChange(size: number): void {
     this.pageSize = size;
     this.currentPage = 1;
-    void this.loadData();
+    this.refreshVisibleObjects();
     this.cdr.detectChanges();
   }
   togglePageSizeMenu(event: Event): void {
@@ -185,17 +197,12 @@ export class ObjectsComponent implements OnInit, OnDestroy {
     try {
       await this.ensureFavoritesLoaded();
 
-      const response = await this.fetchObjectsPage();
-      if (currentToken !== this.loadToken) {
-        return;
-      }
+      const allObjects = await this.fetchAllObjects();
 
-      this.totalCount = response.totalCount ?? 0;
-      this.hasNextPage = (response.page ?? this.currentPage) < (response.totalPages ?? 0);
+      if (currentToken !== this.loadToken) return;
 
-      this.objects = (response.items ?? []).map((obj) => {
+      this.objects = allObjects.map((obj) => {
         const raw = obj as unknown as Record<string, unknown>;
-
         return {
           ...obj,
           latitude: this.readOptionalNumber(raw, ['latitude', 'Latitude']),
@@ -214,32 +221,282 @@ export class ObjectsComponent implements OnInit, OnDestroy {
         this.clearDistances();
       }
 
-      this.visibleObjects = [...this.objects];
       this.favoriteStateService.applyToList(this.objects, (object) => ({
         type: 'object',
         entityId: object.id,
       }));
-      this.favoriteStateService.applyToList(this.visibleObjects, (object) => ({
-        type: 'object',
-        entityId: object.id,
-      }));
+
+      this.refreshVisibleObjects();
 
       this.isLoading = false;
       this.cdr.detectChanges();
     } catch (err) {
-      if (currentToken !== this.loadToken) {
-        return;
-      }
-
+      if (currentToken !== this.loadToken) return;
       console.error(err);
       this.objects = [];
       this.visibleObjects = [];
       this.totalCount = 0;
       this.hasNextPage = false;
-      this.isLoading = false;
       this.errorMessage = this.translationService.translate('object.loadError');
+      this.isLoading = false;
       this.cdr.detectChanges();
     }
+  }
+  private async fetchAllObjects(): Promise<ObjectDto[]> {
+    const all: ObjectDto[] = [];
+    let page = 1;
+    const batchSize = 100;
+
+    while (true) {
+      const response = await firstValueFrom(
+        this.objectService.getPage({
+          page,
+          pageSize: batchSize,
+          search: undefined,
+          type: undefined,
+          minRating: undefined,
+          sortBy: 'name',
+          sortOrder: 'asc',
+        })
+      );
+
+      const items = response.items ?? [];
+      all.push(...items);
+
+      if (items.length < batchSize) break;
+      page++;
+    }
+
+    return all;
+  }
+
+
+  private refreshVisibleObjects(): void {
+    let list = [...this.objects];
+
+    if (this.searchQuery?.trim()) {
+      const q = this.searchQuery.trim().toLowerCase();
+      list = list.filter(obj =>
+        obj.name?.toLowerCase().includes(q) ||
+        (obj.description ?? '').toLowerCase().includes(q)
+      );
+    }
+
+    if (this.activeFilter !== 'All' && this.activeFilter) {
+      list = list.filter((obj) => this.matchesActiveFilter(obj));
+    }
+
+    if (this.minRatingFilter > 0) {
+      list = list.filter(obj => (obj.averageRating ?? 0) >= this.minRatingFilter);
+    }
+
+    switch (this.sortOption) {
+      case 'rating':
+        list.sort((a, b) => (b.averageRating ?? 0) - (a.averageRating ?? 0));
+        break;
+      case 'az':
+        list.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'za':
+        list.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'distance':
+        list.sort((a, b) => (a.distanceMeters ?? 999999999) - (b.distanceMeters ?? 999999999));
+        break;
+    }
+
+    this.totalCount = list.length;
+
+    if (this.totalCount === 0) {
+      this.currentPage = 1;
+      this.hasNextPage = false;
+      this.visibleObjects = [];
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const totalPages = Math.ceil(this.totalCount / this.pageSize);
+    this.currentPage = Math.min(this.currentPage, totalPages);
+    this.hasNextPage = this.currentPage < totalPages;
+
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    this.visibleObjects = list.slice(startIndex, startIndex + this.pageSize);
+
+    this.favoriteStateService.applyToList(this.visibleObjects, (object) => ({
+      type: 'object',
+      entityId: object.id,
+    }));
+
+    this.cdr.detectChanges();
+  }
+
+  private matchesActiveFilter(obj: ObjectView): boolean {
+    const filterKey = this.normalizeTypeKey(this.activeFilter);
+    if (!filterKey || filterKey === 'all') {
+      return true;
+    }
+
+    const rawType =
+      obj.objectTypeName ??
+      ((obj as unknown as Record<string, unknown>)['type'] as string) ??
+      '';
+
+    const objectType = this.normalizeTypeKey(rawType);
+    const markerType = this.resolveObjectMarkerType(rawType);
+
+    if (!objectType && !markerType) {
+      return false;
+    }
+
+    const candidates = this.groupedTypeMap[filterKey] ?? [filterKey];
+    return candidates.some((candidate) => {
+      const normalizedCandidate = this.normalizeTypeKey(candidate);
+      return (
+        this.typeMatchesCandidate(objectType, normalizedCandidate) ||
+        this.typeMatchesCandidate(markerType, normalizedCandidate)
+      );
+    });
+  }
+
+  private typeMatchesCandidate(objectType: string, candidate: string): boolean {
+    if (!objectType || !candidate) {
+      return false;
+    }
+
+    const normalizedCandidate = this.normalizeTypeKey(candidate);
+    return (
+      objectType === normalizedCandidate ||
+      objectType.includes(normalizedCandidate) ||
+      normalizedCandidate.includes(objectType)
+    );
+  }
+
+  private normalizeTypeKey(value: string): string {
+    return value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+  }
+
+  private resolveObjectMarkerType(value: string): string {
+    const normalized = this.normalizeTypeKey(value);
+
+    if (
+      normalized.includes('pumpa') ||
+      normalized.includes('benzin') ||
+      normalized.includes('benzinska') ||
+      normalized.includes('pump') ||
+      normalized.includes('gas') ||
+      normalized.includes('fuel') ||
+      normalized.includes('petrol')
+    ) {
+      return 'gas_station';
+    }
+
+    if (
+      normalized.includes('pekara') ||
+      normalized.includes('bakery') ||
+      normalized.includes('fast food') ||
+      normalized.includes('fastfood') ||
+      normalized.includes('rostilj') ||
+      normalized.includes('grill') ||
+      normalized.includes('picerija') ||
+      normalized.includes('slasticarnica') ||
+      normalized.includes('poslasticarnica') ||
+      normalized.includes('restoran') ||
+      normalized.includes('restaurant') ||
+      normalized.includes('ristorante') ||
+      normalized.includes('konoba') ||
+      normalized.includes('bistro') ||
+      normalized.includes('pizzeria') ||
+      normalized.includes('taverna')
+    ) {
+      return 'restaurant';
+    }
+
+    if (
+      normalized.includes('drogerija') ||
+      normalized.includes('apoteka') ||
+      normalized.includes('pharmacy')
+    ) {
+      return 'pharmacy';
+    }
+
+    if (
+      normalized.includes('poliklinika') ||
+      normalized.includes('klinika') ||
+      normalized.includes('clinic') ||
+      normalized.includes('dom zdravlja')
+    ) {
+      return 'clinic';
+    }
+
+    if (normalized.includes('bolnica') || normalized.includes('hospital')) {
+      return 'hospital';
+    }
+
+    if (
+      normalized.includes('supermarket') ||
+      normalized.includes('suvenir') ||
+      normalized.includes('prodavnica') ||
+      normalized.includes('shop') ||
+      normalized.includes('butik') ||
+      normalized.includes('market') ||
+      normalized.includes('store') ||
+      normalized.includes('storefront')
+    ) {
+      return 'shop';
+    }
+
+    if (
+      normalized.includes('trzni') ||
+      normalized.includes('trznica') ||
+      normalized.includes('mall') ||
+      normalized.includes('shopping') ||
+      normalized.includes('outlet')
+    ) {
+      return 'mall';
+    }
+
+    if (
+      normalized.includes('lounge') ||
+      normalized.includes('kafana') ||
+      normalized.includes('bar') ||
+      normalized.includes('cafe') ||
+      normalized.includes('cafeteria') ||
+      normalized.includes('kafic') ||
+      normalized.includes('pub') ||
+      normalized.includes('club') ||
+      normalized.includes('klub') ||
+      normalized.includes('winery') ||
+      normalized.includes('vinarija')
+    ) {
+      return 'kafana';
+    }
+
+    if (
+      normalized.includes('hotel') ||
+      normalized.includes('albergo') ||
+      normalized.includes('resort') ||
+      normalized.includes('hostel') ||
+      normalized.includes('motel')
+    ) {
+      return 'hotel';
+    }
+
+    if (
+      normalized.includes('apartman') ||
+      normalized.includes('apartment') ||
+      normalized.includes('villa') ||
+      normalized.includes('pansion') ||
+      normalized.includes('guesthouse') ||
+      normalized.includes('guest house')
+    ) {
+      return 'apartment';
+    }
+
+    return '';
   }
 
   private async ensureFavoritesLoaded(): Promise<void> {
@@ -253,63 +510,6 @@ export class ObjectsComponent implements OnInit, OnDestroy {
       ),
     );
     this.favoritesLoaded = true;
-  }
-
-  private async fetchObjectsPage(): Promise<PagedResultDto<ObjectDto>> {
-    const query = {
-      page: this.currentPage,
-      pageSize: this.pageSize,
-      search: this.normalizeSearchQuery(),
-      type: this.resolveTypeFilter(),
-      minRating: this.minRatingFilter > 0 ? this.minRatingFilter : undefined,
-    };
-
-    if (this.sortOption === 'distance' && this.userLocation) {
-      const nearbyQuery: NearbyObjectQueryParams = {
-        ...query,
-        latitude: this.userLocation.lat,
-        longitude: this.userLocation.lng,
-        radiusMeters: this.nearbyRadiusMeters,
-        sortOrder: 'asc',
-      };
-
-      return firstValueFrom(this.objectService.getNearby(nearbyQuery));
-    }
-
-    const sort = this.resolveSortQuery();
-    return firstValueFrom(
-      this.objectService.getPage({
-        ...query,
-        sortBy: sort.sortBy,
-        sortOrder: sort.sortOrder,
-      }),
-    );
-  }
-
-  private resolveSortQuery(): { sortBy: string; sortOrder: string } {
-    switch (this.sortOption) {
-      case 'rating':
-        return { sortBy: 'rating', sortOrder: 'desc' };
-      case 'za':
-        return { sortBy: 'name', sortOrder: 'desc' };
-      case 'az':
-      case 'distance':
-      default:
-        return { sortBy: 'name', sortOrder: 'asc' };
-    }
-  }
-
-  private resolveTypeFilter(): string | undefined {
-    if (this.activeFilter === 'All') {
-      return undefined;
-    }
-
-    return this.activeFilter;
-  }
-
-  private normalizeSearchQuery(): string | undefined {
-    const query = this.searchQuery.trim();
-    return query.length > 0 ? query : undefined;
   }
 
   private updateDistances(): void {
@@ -332,8 +532,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
         ),
       };
     });
-
-    this.visibleObjects = [...this.objects];
+    this.refreshVisibleObjects();
   }
 
   private clearDistances(): void {
@@ -341,7 +540,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
       ...item,
       distanceMeters: undefined,
     }));
-    this.visibleObjects = [...this.objects];
+    this.refreshVisibleObjects();
   }
 
   getDistanceText(item: ObjectView): string | null {
@@ -380,37 +579,31 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   setFilter(filter: string): void {
     this.activeFilter = filter;
     this.currentPage = 1;
-    void this.loadData();
+    this.refreshVisibleObjects();
   }
 
   setMinRating(rating: number): void {
     this.minRatingFilter = rating;
     this.currentPage = 1;
-    void this.loadData();
+    this.refreshVisibleObjects();
   }
 
   onSearchChange(): void {
-    if (this.searchTimeout) {
-      clearTimeout(this.searchTimeout);
-    }
-  
-    this.searchTimeout = setTimeout(() => {
-      this.currentPage = 1;
-      void this.loadData();
-    }, 400);
+    this.currentPage = 1;
+    this.refreshVisibleObjects();
   }
 
   prevPage(): void {
     if (this.currentPage === 1) return;
     this.currentPage--;
-    void this.loadData();
+    this.refreshVisibleObjects();
     this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
   nextPage(): void {
     if (!this.hasNextPage) return;
     this.currentPage++;
-    void this.loadData();
+    this.refreshVisibleObjects();
     this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
@@ -428,7 +621,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
     this.sortOption = option;
     this.showSortMenu = false;
     this.currentPage = 1;
-    void this.loadData();
+    this.refreshVisibleObjects();
   }
 
   sortLabel(): string {

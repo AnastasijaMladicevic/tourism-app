@@ -181,9 +181,12 @@
             <span class="card__open-badge">{{ 'common.openNow' | translate }}</span>
           }
 
-          <span class="card__distance">
-            <mat-icon>radio_button_checked</mat-icon> {{ formatDistance(obj.distanceMeters) }}
-          </span>
+          @if (getDistanceText(obj)) {
+            <span class="card__distance">
+              <mat-icon>radio_button_checked</mat-icon>
+              {{ getDistanceText(obj) }}
+            </span>
+          }
 
           <button
             class="card__fav"
