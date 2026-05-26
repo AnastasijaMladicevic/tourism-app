@@ -331,7 +331,7 @@
             <input
               type="search"
               [(ngModel)]="managerSearch"
-              (keyup)="onManagerSearchInput(($any($event.target)).value)"
+              (ngModelChange)="onManagerSearchInput($event)"
               (focus)="onManagerSearchFocus()"
               autocomplete="off"
               placeholder="Search managers"

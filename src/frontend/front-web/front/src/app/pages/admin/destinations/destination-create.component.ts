@@ -59,6 +59,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   private readonly destroy$ = new Subject<void>();
   private readonly managerSearchInput$ = new Subject<string>();
   private readonly destinationNameInput$ = new Subject<string>();
+  private readonly managerSuggestionPageSize = 50;
   private isHydratingForm = false;
 
   isSubmitting = false;
@@ -217,23 +218,34 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
 
     this.managerSearchInput$
       .pipe(
-        debounceTime(250),
-        distinctUntilChanged(),
-        tap((term) => {
-          if (!term.trim()) {
-            this.managerSuggestions = [];
-            this.managerSuggestionsLoading = false;
-            this.managerSuggestionsOpen = false;
-          }
-        }),
         switchMap((term) => {
           const q = term.trim();
           if (!q) {
+            this.managerSuggestions = [];
+            this.managerSuggestionsLoading = false;
+            this.managerSuggestionsOpen = false;
+            this.cdr.detectChanges();
             return of(null);
           }
+
+          this.managerSuggestionsOpen = true;
           this.managerSuggestionsLoading = true;
-          return this.adminUsersService.searchManagers(q).pipe(
-            finalize(() => (this.managerSuggestionsLoading = false))
+          this.cdr.detectChanges();
+
+          return this.adminUsersService.searchManagers(q, this.managerSuggestionPageSize).pipe(
+            catchError(() =>
+              of({
+                items: [] as AdminUserListItemDto[],
+                page: 1,
+                pageSize: this.managerSuggestionPageSize,
+                totalCount: 0,
+                totalPages: 0
+              })
+            ),
+            finalize(() => {
+              this.managerSuggestionsLoading = false;
+              this.cdr.detectChanges();
+            })
           );
         }),
         takeUntil(this.destroy$)
@@ -242,8 +254,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         if (!page) {
           return;
         }
-        const skipId = this.selectedManager?.id;
-        this.managerSuggestions = page.items.filter((u) => u.id !== skipId);
+        this.managerSuggestions = this.filterManagerSuggestions(page.items, this.managerSearch);
         this.managerSuggestionsOpen = true;
         this.cdr.detectChanges();
       });
@@ -432,31 +443,9 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
 
   onManagerSearchInput(value: string): void {
     const normalized = value.trim();
-    if (!normalized) {
-      this.managerSuggestions = [];
-      this.managerSuggestionsOpen = false;
-      this.managerSuggestionsLoading = false;
-      return;
-    }
-
-    this.managerSuggestionsOpen = true;
-    this.managerSuggestionsLoading = true;
-    this.adminUsersService
-      .searchManagers(normalized)
-      .pipe(finalize(() => (this.managerSuggestionsLoading = false)))
-      .subscribe({
-        next: (page) => {
-          const skipId = this.selectedManager?.id;
-          this.managerSuggestions = page.items.filter((u) => u.id !== skipId);
-          this.managerSuggestionsOpen = true;
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.managerSuggestions = [];
-          this.managerSuggestionsOpen = true;
-          this.cdr.detectChanges();
-        }
-      });
+    this.managerSuggestionsOpen = normalized.length > 0;
+    this.managerSuggestionsLoading = normalized.length > 0;
+    this.managerSearchInput$.next(value);
   }
 
   onManagerSearchFocus(): void {
@@ -467,6 +456,30 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     }
     this.managerSuggestionsOpen = true;
     this.onManagerSearchInput(q);
+  }
+
+  private filterManagerSuggestions(
+    users: AdminUserListItemDto[],
+    searchTerm: string
+  ): AdminUserListItemDto[] {
+    const q = this.normalizeUserSearchValue(searchTerm);
+    const skipId = this.selectedManager?.id;
+    return users.filter((user) => {
+      if (user.id === skipId) {
+        return false;
+      }
+
+      const name = this.normalizeUserSearchValue(this.displayName(user));
+      return !q || name.includes(q);
+    });
+  }
+
+  private normalizeUserSearchValue(value: string | undefined): string {
+    return (value ?? '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
   }
 
   selectManager(user: AdminUserListItemDto): void {
