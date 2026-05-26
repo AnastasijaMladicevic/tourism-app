@@ -574,22 +574,25 @@
 }
 
 .destination-type-chip {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  align-self: flex-start;
   min-height: 30px;
   padding: 0 14px;
   border-radius: 999px;
-  width: fit-content;
-  background: rgba(22, 138, 173, 0.12);
-  border: 1px solid rgba(22, 138, 173, 0.26);
-  color: #168aad;
-  font-size: 13px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(22, 138, 173, 0.14);
+  color: #1b2a34;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
-  box-shadow: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
 
 .card__desc {
@@ -871,5 +874,14 @@
   &--active {
     color: var(--primary);
     font-weight: 600;
+  }
+}
+
+:host-context(:root[data-theme='dark']) {
+  .destination-type-chip {
+    background: rgba(7, 19, 25, 0.82);
+    border-color: rgba(77, 194, 255, 0.18);
+    color: #ffffff;
+    box-shadow: none;
   }
 }
