@@ -4,10 +4,11 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { AuthService } from './services/auth.service';
 import { UserDto } from './models/user.model';
+import { TranslatePipe } from './shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, TranslatePipe],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
