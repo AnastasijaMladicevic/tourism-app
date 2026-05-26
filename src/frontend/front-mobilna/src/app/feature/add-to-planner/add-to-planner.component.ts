@@ -25,6 +25,7 @@ interface PlannerPreviewState {
   description?: string;
   startDate?: string;
   endDate?: string;
+  returnUrl?: string;
 }
 
 interface PlannerPreviewViewModel {
@@ -66,6 +67,7 @@ export class AddToPlannerComponent implements OnInit {
   protected readonly maxSelectableDate: string | null;
   protected readonly isEventScheduleLocked: boolean;
   protected readonly fixedDurationMinutes: number;
+  private readonly returnUrl: string | null;
   protected readonly isEditMode = signal(false);
   protected readonly editingPlannerId = signal<number | null>(null);
   protected readonly estimatedEndLabel = computed(() =>
@@ -104,6 +106,8 @@ export class AddToPlannerComponent implements OnInit {
     this.isEventScheduleLocked = !!(this.eventId && this.eventStartDate && this.eventEndDate);
     this.minSelectableDate = this.eventStartDate ? this.toDateInputValue(this.eventStartDate) : null;
     this.maxSelectableDate = this.eventEndDate ? this.toDateInputValue(this.eventEndDate) : null;
+    this.returnUrl =
+      typeof state.returnUrl === 'string' && state.returnUrl.startsWith('/') ? state.returnUrl : null;
 
     const initialDate = this.eventStartDate ?? new Date();
     this.travelDate.set(this.toDateInputValue(initialDate));
@@ -197,7 +201,7 @@ export class AddToPlannerComponent implements OnInit {
       });
 
       this.isSaving.set(false);
-      void this.router.navigate(['/planner']);
+      void this.navigateAfterSave();
       return;
     }
 
@@ -234,8 +238,16 @@ export class AddToPlannerComponent implements OnInit {
           isPriority: this.isPriority(),
         });
 
-        void this.router.navigate(['/planner']);
+        void this.navigateAfterSave();
       });
+  }
+
+  private navigateAfterSave(): Promise<boolean> {
+    if (this.returnUrl) {
+      return this.router.navigateByUrl(this.returnUrl);
+    }
+
+    return this.router.navigate(['/planner']);
   }
 
   private buildConflictMessage(): string {

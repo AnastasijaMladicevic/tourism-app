@@ -81,6 +81,11 @@ export interface PagedEventResultDto<T> {
   totalPages: number;
 }
 
+export interface EventTypeOptionDto {
+  id: number;
+  name: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class EventService {
   private readonly url = `${environment.apiUrl}/events`;
@@ -104,6 +109,12 @@ export class EventService {
     let params = new HttpParams();
     params = this.addLang(params);
     return this.http.get<EventDto>(`${this.url}/${id}`, { params });
+  }
+
+  getTypes(options?: RegionRequestOptions): Observable<EventTypeOptionDto[]> {
+    let params = new HttpParams();
+    params = this.addLang(params, options);
+    return this.http.get<EventTypeOptionDto[]>(`${this.url}/types`, { params });
   }
 
   private buildParams(
