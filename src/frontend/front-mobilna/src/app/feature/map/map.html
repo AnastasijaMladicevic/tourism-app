@@ -200,17 +200,16 @@
             }
           </div>
 
-          @if (routePoints.length > 1) {
-            <button
-              class="route-planner__mobile-start"
-              [class.route-planner__mobile-start--active]="isRouteNavigationActive"
-              type="button"
-              (click)="startPlannedRoute()"
-            >
-              {{ isRouteNavigationActive ? ('map.routePlanner.followingRoute' | translate) : ('map.routePlanner.startRoute' | translate) }}
-              <mat-icon>{{ isRouteNavigationActive ? 'my_location' : 'play_arrow' }}</mat-icon>
-            </button>
-          }
+          <button
+            class="route-planner__mobile-start"
+            [class.route-planner__mobile-start--active]="isRouteNavigationActive"
+            type="button"
+            [disabled]="routePoints.length < 2"
+            (click)="startPlannedRoute()"
+          >
+            {{ isRouteNavigationActive ? ('map.routePlanner.followingRoute' | translate) : ('map.routePlanner.startRoute' | translate) }}
+            <mat-icon>{{ isRouteNavigationActive ? 'my_location' : 'play_arrow' }}</mat-icon>
+          </button>
         </div>
       }
       <div class="route-planner__resize-handle" title="Resize panel"></div>

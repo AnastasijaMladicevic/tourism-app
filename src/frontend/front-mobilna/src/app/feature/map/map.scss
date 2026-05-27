@@ -1014,6 +1014,12 @@ body.route-navigation-active app-floating-ai-assistant {
     justify-content: center;
     gap: 8px;
     box-shadow: 0 18px 34px rgba(21, 124, 176, 0.18);
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
   }
 
   .route-planner__mobile-start--active {
