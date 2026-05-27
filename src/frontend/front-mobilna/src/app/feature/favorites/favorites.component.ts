@@ -329,11 +329,11 @@ export class FavoritesComponent implements OnInit {
   }
 
   protected pageSizeLabel(size: number): string {
-    const lastDigit = size % 10;
-    const lastTwoDigits = size % 100;
-    const useFewForm = lastDigit >= 2 && lastDigit <= 4 && (lastTwoDigits < 12 || lastTwoDigits > 14);
+    const key = this.usesSerbianCardPlural(size)
+      ? 'favorites.pageSizeLabelFew'
+      : 'favorites.pageSizeLabelMany';
 
-    return `${size} ${useFewForm ? 'kartice' : 'kartica'}`;
+    return this.translate(key, { count: size });
   }
 
   protected toggleCollectionsExpanded(): void {
@@ -865,5 +865,15 @@ export class FavoritesComponent implements OnInit {
   private resolveCollectionTone(index: number): FavoriteCollectionItem['tone'] {
     const tones: FavoriteCollectionItem['tone'][] = ['blue', 'amber', 'green', 'violet'];
     return tones[index % tones.length];
+  }
+
+  private usesSerbianCardPlural(count: number): boolean {
+    if (this.translationService.language() !== 'sr') {
+      return false;
+    }
+
+    const lastDigit = count % 10;
+    const lastTwoDigits = count % 100;
+    return lastDigit >= 2 && lastDigit <= 4 && (lastTwoDigits < 12 || lastTwoDigits > 14);
   }
 }

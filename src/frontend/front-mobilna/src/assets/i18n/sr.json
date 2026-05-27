@@ -603,9 +603,14 @@
     "summaryTitle": "Pregled favorita",
     "collectionsTitle": "Tvoje kolekcije",
     "collectionsLink": "Prikazi sve kolekcije",
+    "collectionsLinkShort": "Vidi sve",
     "collectionsCollapseLink": "Prikazi manje kolekcija",
     "collectionItemCountOne": "1 stavka",
     "collectionItemCountMany": "{{count}} stavki",
+    "pageSizeAria": "Broj kartica po strani",
+    "pageSizeLabelFew": "{{count}} kartice",
+    "pageSizeLabelMany": "{{count}} kartica",
+    "paginationAria": "Paginacija favorita",
     "actionsTitle": "Sta mozes da uradis?",
     "actionPlannerTitle": "Dodaj u planer",
     "actionPlannerBody": "Organizuj favorite u svoj putni plan.",
@@ -1108,7 +1113,49 @@
     "removeFromPlanner": "Ukloni iz planera",
     "notifications": "Obaveštenja",
     "tripTitleFallback": "Tvoj plan putovanja",
-    "tripWeekSuffix": "{{name}} nedelja"
+    "tripWeekSuffix": "{{name}} nedelja",
+    "preview": {
+      "mobileTabs": {
+        "events": "Događaji",
+        "myPlanner": "Moj planer"
+      },
+      "searchPlaceholder": "Pretraži događaje",
+      "allCategories": "Sve kategorije",
+      "dateFilterAll": "Datum",
+      "range7": "7 dana",
+      "range14": "14 dana",
+      "range30": "Mesec",
+      "cardsPerPageFew": "{{count}} kartice",
+      "cardsPerPageMany": "{{count}} kartica",
+      "eventsLoading": "Učitavanje događaja...",
+      "eventsLoadError": "Greška pri učitavanju događaja.",
+      "emptyBody": "Dodaj event u planer i ovde će se pojaviti kartica događaja.",
+      "editAria": "Izmeni u planeru",
+      "paginationAria": "Paginacija događaja",
+      "highlightsTitle": "Izdvojeni događaji",
+      "highlightsEmpty": "Nema izdvojenih planner događaja još uvek.",
+      "myPlannerTitle": "Moj planer",
+      "loadingPlanner": "Učitavanje planera...",
+      "eventTypeFallback": "Događaj",
+      "eventTitleFallback": "Naziv događaja nije dostupan",
+      "locationFallback": "Lokacija nije navedena",
+      "dateAtTime": "{{date}} u {{time}}",
+      "upcomingSubtitle": "Sledeće {{day}} u {{time}}",
+      "priority": {
+        "must": "Obavezno",
+        "maybe": "Možda",
+        "later": "Ako bude vremena"
+      },
+      "category": {
+        "foodDrinks": "Hrana i piće",
+        "forKids": "Za decu",
+        "concerts": "Koncerti",
+        "festival": "Festival",
+        "sport": "Sport",
+        "culture": "Kultura",
+        "other": "Ostalo"
+      }
+    }
   },
   "addToPlanner": {
     "termsLink": "Uslovi korišćenja",

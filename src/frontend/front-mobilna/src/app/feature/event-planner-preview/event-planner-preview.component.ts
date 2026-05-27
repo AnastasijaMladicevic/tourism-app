@@ -17,19 +17,26 @@ import { EventDto, EventService, EventTypeOptionDto } from '../../services/event
 import { EventPlannerDto, EventPlannerService } from '../../services/event-planner';
 import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
 import { RouterHistoryService } from '../../services/router-history';
+import { TranslationService } from '../../services/translation.service';
+
+type PreviewCategoryKey =
+  | 'all'
+  | 'foodDrinks'
+  | 'forKids'
+  | 'concerts'
+  | 'festival'
+  | 'sport'
+  | 'culture'
+  | 'other';
+
+type PlannerPriorityKey = 'must' | 'maybe' | 'later';
 
 interface PreviewEventItem {
   id: number;
   title: string;
   location: string;
-  dateLabel: string;
-  compactDateLabel: string;
-  day: string;
-  month: string;
-  price: string;
-  tags: string[];
   imageUrl: string;
-  categoryChip: string;
+  categoryKey: PreviewCategoryKey;
   searchableCategory: string;
   startDate?: string;
   endDate?: string;
@@ -44,9 +51,7 @@ interface PlannerItem {
   eventId: number;
   title: string;
   location: string;
-  plannerTime: string;
-  plannerGroupLabel: string;
-  priority: 'Obavezno' | 'Možda' | 'Ako bude vremena';
+  priority: PlannerPriorityKey;
   sortDate: Date;
 }
 
@@ -123,6 +128,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly routerHistory = inject(RouterHistoryService);
   private readonly router = inject(Router);
+  private readonly translationService = inject(TranslationService);
   activeMobileTab: 'events' | 'planner' = 'events';
   protected isMobileMoreFiltersOpen = false;
   private mobileMediaQuery?: MediaQueryList;
@@ -131,7 +137,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   };
 
   protected readonly regionName = signal('Crna Gora');
-  protected readonly activeChip = signal('Svi');
+  protected readonly activeChip = signal<PreviewCategoryKey>('all');
   protected readonly searchTerm = signal('');
   protected readonly selectedDateKey = signal('all');
   protected readonly selectedRangeDays = signal(30);
@@ -156,7 +162,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
         return false;
       }
 
-      const matchesChip = activeChip === 'Svi' || event.eventTypeName === activeChip;
+      const matchesChip = activeChip === 'all' || event.categoryKey === activeChip;
       if (!matchesChip) {
         return false;
       }
@@ -166,7 +172,12 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
       }
 
       const haystack = this.normalizeText(
-        [event.title, event.location, event.searchableCategory, ...event.tags].join(' '),
+        [
+          event.title,
+          event.location,
+          event.searchableCategory,
+          this.translateCategoryKey(event.categoryKey),
+        ].join(' '),
       );
 
       return haystack.includes(query);
@@ -236,12 +247,15 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
       eventId: event.id,
       title: event.title,
       location: event.location,
-      dateLabel: event.dateLabel,
-      compactDateLabel: event.compactDateLabel,
-      day: event.day,
-      month: event.month,
+      dateLabel: this.buildDateLabel(this.parseDate(event.startDate), this.parseDate(event.endDate)),
+      compactDateLabel: this.buildCompactDateLabel(
+        this.parseDate(event.startDate),
+        this.parseDate(event.endDate),
+      ),
+      day: this.buildEventDayLabel(event.startDate),
+      month: this.buildEventMonthLabel(event.startDate),
       imageUrl: event.imageUrl,
-      categoryChip: event.categoryChip,
+      categoryChip: this.translateCategoryKey(event.categoryKey),
       isAdded: event.isAdded,
       plannerId: event.plannerId,
       startDate: event.startDate,
@@ -259,7 +273,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
       if (!options.has(key)) {
         options.set(key, {
           key,
-          label: new Intl.DateTimeFormat('sr-RS', {
+          label: new Intl.DateTimeFormat(this.translationService.currentLocale(), {
             day: '2-digit',
             month: 'short',
           })
@@ -269,28 +283,30 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
       }
     }
 
-    return [{ key: 'all', label: 'Datum' }, ...options.values()];
+    return [{ key: 'all', label: this.translate('planner.preview.dateFilterAll') }, ...options.values()];
   });
 
   protected readonly filterChips = computed<PlannerFilterChip[]>(() => {
-    const typeMap = new Map<string, PlannerFilterChip>();
+    const typeMap = new Map<PreviewCategoryKey, PlannerFilterChip>();
 
     for (const plannerItem of this.visiblePlannerItems()) {
       const relatedEvent = this.allEvents().find((event) => event.id === plannerItem.eventId);
-      const label = relatedEvent?.eventTypeName?.trim();
+      const categoryKey = relatedEvent?.categoryKey;
 
-      if (!label) {
+      if (!categoryKey || categoryKey === 'all') {
         continue;
       }
 
-      const value = this.buildFilterKey(label);
-      if (!typeMap.has(value)) {
-        typeMap.set(value, { label, value });
+      if (!typeMap.has(categoryKey)) {
+        typeMap.set(categoryKey, {
+          label: this.translateCategoryKey(categoryKey),
+          value: categoryKey,
+        });
       }
     }
 
     return [
-      { label: 'Svi', value: 'all' },
+      { label: this.translate('common.all'), value: 'all' },
       ...[...typeMap.values()].sort((left, right) => left.label.localeCompare(right.label)),
     ];
   });
@@ -299,14 +315,21 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   protected readonly mobileSecondaryFilterChips = computed(() =>
     this.filterChips().slice(4),
   );
-  protected readonly selectedCategoryLabel = computed(() =>
-    this.activeChip() === 'Svi' ? 'Sve kategorije' : this.activeChip(),
-  );
-  protected readonly selectedRangeLabel = computed(() => {
-    const match = this.rangeOptions.find((option) => option.value === this.selectedRangeDays());
-    return match?.label ?? '7 dana';
+  protected readonly selectedCategoryLabel = computed(() => {
+    if (this.activeChip() === 'all') {
+      return this.translate('planner.preview.allCategories');
+    }
+
+    return this.filterChips().find((chip) => chip.value === this.activeChip())?.label
+      ?? this.translate('planner.preview.allCategories');
   });
-  protected readonly selectedCardsPerPageLabel = computed(() => `${this.cardsPerPage()} kartice`);
+  protected readonly selectedRangeLabel = computed(() => {
+    const match = this.rangeOptions().find((option) => option.value === this.selectedRangeDays());
+    return match?.label ?? this.translate('planner.preview.range7');
+  });
+  protected readonly selectedCardsPerPageLabel = computed(() =>
+    this.cardsPerPageLabel(this.cardsPerPage()),
+  );
 
   protected readonly visiblePlannerItems = computed(() => {
     const eventIds = new Set(this.allEvents().map((event) => event.id));
@@ -319,9 +342,10 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     const groups = new Map<string, PlannerItem[]>();
 
     for (const item of this.visiblePlannerItems()) {
-      const existing = groups.get(item.plannerGroupLabel) ?? [];
+      const groupLabel = this.formatPlannerGroupLabel(item.sortDate);
+      const existing = groups.get(groupLabel) ?? [];
       existing.push(item);
-      groups.set(item.plannerGroupLabel, existing);
+      groups.set(groupLabel, existing);
     }
 
     return [...groups.entries()].map(([label, items]) => ({ label, items }));
@@ -354,15 +378,15 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
         imageUrl: item.imageUrl,
       })),
   );
-  protected readonly rangeOptions: PlannerRangeOption[] = [
-    { value: 7, label: '7 dana' },
-    { value: 14, label: '14 dana' },
-    { value: 30, label: 'Mesec' },
-  ];
-  protected readonly cardsPerPageOptions: PlannerCardsPerPageOption[] = [
-    { value: 3, label: '3 kartice' },
-    { value: 5, label: '5 kartica' },
-  ];
+  protected readonly rangeOptions = computed<PlannerRangeOption[]>(() => [
+    { value: 7, label: this.translate('planner.preview.range7') },
+    { value: 14, label: this.translate('planner.preview.range14') },
+    { value: 30, label: this.translate('planner.preview.range30') },
+  ]);
+  protected readonly cardsPerPageOptions = computed<PlannerCardsPerPageOption[]>(() => [
+    { value: 3, label: this.cardsPerPageLabel(3) },
+    { value: 5, label: this.cardsPerPageLabel(5) },
+  ]);
 
   ngOnInit(): void {
     this.initializeViewportWatcher();
@@ -384,7 +408,11 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     this.closeDropdown();
   }
 
-  protected setActiveChip(chip: string): void {
+  protected translate(key: string, params?: Record<string, string | number>): string {
+    return this.translationService.translate(key, params);
+  }
+
+  protected setActiveChip(chip: PreviewCategoryKey): void {
     this.activeChip.set(chip);
     this.isMobileMoreFiltersOpen = false;
     this.resetPagination();
@@ -405,7 +433,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   }
 
   protected updateCategoryFilter(value: string): void {
-    this.setActiveChip(value || 'Svi');
+    this.setActiveChip(this.isPreviewCategoryKey(value) ? value : 'all');
     this.closeDropdown();
   }
 
@@ -456,7 +484,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   }
 
   protected isMobileMoreActive(): boolean {
-    return this.mobileSecondaryFilterChips().some((chip) => chip.label === this.activeChip()) || this.isMobileMoreFiltersOpen;
+    return this.mobileSecondaryFilterChips().some((chip) => chip.value === this.activeChip()) || this.isMobileMoreFiltersOpen;
   }
 
   protected goBack(): void {
@@ -486,7 +514,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
         location: event.location,
         startDate: event.startDate,
         endDate: event.endDate,
-        type: event.eventTypeName || 'Dogadjaj',
+        type: event.eventTypeName || this.translate('planner.preview.eventTypeFallback'),
         imageUrl: event.imageUrl,
         description: event.description,
         returnUrl: this.router.url,
@@ -518,7 +546,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
         location: targetEvent.location,
         startDate: targetEvent.startDate,
         endDate: targetEvent.endDate,
-        type: targetEvent.eventTypeName || 'Dogadjaj',
+        type: targetEvent.eventTypeName || this.translate('planner.preview.eventTypeFallback'),
         imageUrl: targetEvent.imageUrl,
         description: targetEvent.description,
         returnUrl: this.router.url,
@@ -537,7 +565,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
       .remove(plannerId)
       .pipe(
         catchError(() => {
-          this.plannerError.set('Greška pri uklanjanju događaja iz planera.');
+          this.plannerError.set(this.translate('planner.removeError'));
           return of(false);
         }),
         finalize(() => this.removingPlannerId.set(null)),
@@ -590,13 +618,17 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
 
   protected getPriorityClass(priority: PlannerItem['priority']): string {
     switch (priority) {
-      case 'Obavezno':
+      case 'must':
         return 'planner-priority planner-priority--must';
-      case 'Možda':
+      case 'maybe':
         return 'planner-priority planner-priority--maybe';
       default:
         return 'planner-priority planner-priority--later';
     }
+  }
+
+  protected priorityLabel(priority: PlannerPriorityKey): string {
+    return this.translate(`planner.preview.priority.${priority}`);
   }
 
   private initializeViewportWatcher(): void {
@@ -665,7 +697,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
       .pipe(
         map((result) => (result.items ?? []).map((item) => this.mapPlannerItem(item))),
         catchError(() => {
-          this.plannerError.set('Greška pri učitavanju planera.');
+          this.plannerError.set(this.translate('planner.loadError'));
           return of([] as PlannerItem[]);
         }),
         finalize(() => this.plannerLoading.set(false)),
@@ -691,29 +723,16 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     this.ensureCurrentPageIsValid();
   }
 
-  private mapEvent(event: EventDto, typeChipMap: Map<string, string>): PreviewEventItem {
-    const startDate = this.parseDate(event.startDate);
-    const endDate = this.parseDate(event.endDate);
-    const categoryChip = this.resolveCategoryChip(event, typeChipMap);
-    const eventTypeName = event.eventTypeName?.trim() || categoryChip;
-    const tags = this.buildTags(categoryChip, eventTypeName);
+  private mapEvent(event: EventDto, typeChipMap: Map<string, PreviewCategoryKey>): PreviewEventItem {
+    const categoryKey = this.resolveCategoryKey(event, typeChipMap);
+    const eventTypeName = event.eventTypeName?.trim() || this.translateCategoryKey(categoryKey);
 
     return {
       id: event.id,
-      title: event.name?.trim() || 'Naziv događaja nije dostupan',
+      title: event.name?.trim() || this.translate('planner.preview.eventTitleFallback'),
       location: this.buildEventLocation(event),
-      dateLabel: this.buildDateLabel(startDate, endDate),
-      compactDateLabel: this.buildCompactDateLabel(startDate, endDate),
-      day: startDate
-        ? startDate.toLocaleDateString('sr-RS', { day: '2-digit' })
-        : '--',
-      month: startDate
-        ? startDate.toLocaleDateString('sr-RS', { month: 'short' }).replace('.', '').toUpperCase()
-        : 'DAT',
-      price: this.buildPrice(event.price),
-      tags,
       imageUrl: this.buildImageUrl(event),
-      categoryChip,
+      categoryKey,
       searchableCategory: eventTypeName,
       startDate: event.startDate,
       endDate: event.endDate,
@@ -735,37 +754,35 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     return {
       id: item.id,
       eventId: item.eventId,
-      title: item.eventName?.trim() || 'Naziv događaja nije dostupan',
+      title: item.eventName?.trim() || this.translate('planner.preview.eventTitleFallback'),
       location: this.buildPlannerLocation(item),
-      plannerTime: this.formatPlannerTime(startDate),
-      plannerGroupLabel: this.formatPlannerGroupLabel(startDate),
-      priority: resolvedSchedule.isPriority ? 'Obavezno' : notes ? 'Ako bude vremena' : 'Možda',
+      priority: resolvedSchedule.isPriority ? 'must' : notes ? 'later' : 'maybe',
       sortDate: startDate,
     };
   }
 
-  private buildEventTypeChipMap(eventTypes: EventTypeOptionDto[]): Map<string, string> {
-    const map = new Map<string, string>();
+  private buildEventTypeChipMap(eventTypes: EventTypeOptionDto[]): Map<string, PreviewCategoryKey> {
+    const map = new Map<string, PreviewCategoryKey>();
 
     for (const eventType of eventTypes) {
       const normalizedName = this.normalizeText(eventType.name);
-      map.set(normalizedName, this.resolveTypeNameToChip(normalizedName));
+      map.set(normalizedName, this.resolveTypeNameToCategoryKey(normalizedName));
     }
 
     return map;
   }
 
-  private resolveTypeNameToChip(normalizedName: string): string {
+  private resolveTypeNameToCategoryKey(normalizedName: string): PreviewCategoryKey {
     if (this.matchesAny(normalizedName, ['koncert', 'dj', 'nastup'])) {
-      return 'Koncerti';
+      return 'concerts';
     }
 
     if (this.matchesAny(normalizedName, ['festival', 'karneval', 'proslava', 'sajam', 'okupljanje'])) {
-      return 'Festival';
+      return 'festival';
     }
 
     if (this.matchesAny(normalizedName, ['sport', 'takmic', 'turnir', 'utakmic'])) {
-      return 'Sport';
+      return 'sport';
     }
 
     if (
@@ -780,20 +797,10 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
         'tura',
       ])
     ) {
-      return 'Kultura';
+      return 'culture';
     }
 
-    return 'Festival';
-  }
-
-  private buildTags(categoryChip: string, eventTypeName: string): string[] {
-    const tags = [categoryChip];
-
-    if (eventTypeName && this.normalizeText(eventTypeName) !== this.normalizeText(categoryChip)) {
-      tags.push(eventTypeName);
-    }
-
-    return [...new Set(tags)].slice(0, 2);
+    return 'festival';
   }
 
   private buildEventLocation(event: EventDto): string {
@@ -803,7 +810,9 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
       event.destinationName?.trim(),
     ].filter((part): part is string => !!part);
 
-    return locationParts.length > 0 ? locationParts.join(', ') : 'Lokacija nije navedena';
+    return locationParts.length > 0
+      ? locationParts.join(', ')
+      : this.translate('planner.preview.locationFallback');
   }
 
   private buildPlannerLocation(item: EventPlannerDto): string {
@@ -813,12 +822,14 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
       item.destinationName?.trim(),
     ].filter((part): part is string => !!part);
 
-    return locationParts.length > 0 ? locationParts.join(', ') : 'Lokacija nije navedena';
+    return locationParts.length > 0
+      ? locationParts.join(', ')
+      : this.translate('planner.preview.locationFallback');
   }
 
   private buildDateLabel(startDate: Date | null, endDate: Date | null): string {
     if (!startDate) {
-      return 'Datum nije naveden';
+      return this.translate('common.dateNotAvailable');
     }
 
     const formattedStart = this.formatDate(startDate);
@@ -830,7 +841,10 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     }
 
     if (timePart) {
-      return `${formattedStart} u ${timePart}`;
+      return this.translate('planner.preview.dateAtTime', {
+        date: formattedStart,
+        time: timePart,
+      });
     }
 
     return formattedStart;
@@ -838,7 +852,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
 
   private buildCompactDateLabel(startDate: Date | null, endDate: Date | null): string {
     if (!startDate) {
-      return 'Datum nije naveden';
+      return this.translate('common.dateNotAvailable');
     }
 
     const formattedStart = this.formatDate(startDate);
@@ -856,20 +870,15 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     return formattedStart;
   }
 
-  private buildPrice(price?: number): string {
-    if (price == null || price <= 0) {
-      return 'BESPLATNO';
-    }
-
-    return `od ${Math.round(price)} RSD`;
-  }
-
   private buildImageUrl(event: EventDto): string {
     const mainImage = event.images?.find((image) => image.isMain)?.url;
     return event.mainImageUrl || mainImage || event.images?.[0]?.url || FALLBACK_IMAGE_URL;
   }
 
-  private resolveCategoryChip(event: EventDto, typeChipMap: Map<string, string>): string {
+  private resolveCategoryKey(
+    event: EventDto,
+    typeChipMap: Map<string, PreviewCategoryKey>,
+  ): PreviewCategoryKey {
     const normalizedTypeName = this.normalizeText(event.eventTypeName ?? '');
     const mappedTypeChip = typeChipMap.get(normalizedTypeName);
     if (mappedTypeChip) {
@@ -881,41 +890,41 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     );
 
     if (this.matchesAny(eventText, ['hrana', 'vino', 'degust', 'gastro', 'food', 'piće', 'pice', 'wine'])) {
-      return 'Hrana i piće';
+      return 'foodDrinks';
     }
 
     if (this.matchesAny(eventText, ['deca', 'deč', 'decu', 'kids', 'family', 'porodi'])) {
-      return 'Za decu';
+      return 'forKids';
     }
 
     if (this.matchesAny(eventText, ['koncert', 'muzik', 'music', 'gig', 'dj', 'nastup'])) {
-      return 'Koncerti';
+      return 'concerts';
     }
 
     if (this.matchesAny(eventText, ['festival', 'fest', 'karneval', 'proslava', 'sajam', 'okupljanje'])) {
-      return 'Festival';
+      return 'festival';
     }
 
     if (this.matchesAny(eventText, ['sport', 'bicikl', 'maraton', 'trka', 'planinar', 'turnir', 'utakmic', 'takmic'])) {
-      return 'Sport';
+      return 'sport';
     }
 
     if (this.matchesAny(eventText, ['kultura', 'pozori', 'izloz', 'izlož', 'muzej', 'galerij', 'teatar', 'art', 'seminar', 'radionica'])) {
-      return 'Kultura';
+      return 'culture';
     }
 
-    return 'Svi';
+    return 'other';
   }
 
   private ensureActiveChipIsValid(): void {
     const activeChip = this.activeChip();
-    if (activeChip === 'Svi') {
+    if (activeChip === 'all') {
       return;
     }
 
-    const availableChips = new Set(this.filterChips().map((chip) => chip.label));
+    const availableChips = new Set(this.filterChips().map((chip) => chip.value));
     if (!availableChips.has(activeChip)) {
-      this.activeChip.set('Svi');
+      this.activeChip.set('all');
       this.isMobileMoreFiltersOpen = false;
       this.resetPagination();
     }
@@ -932,14 +941,8 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     this.currentPage.set(1);
   }
 
-  private buildFilterKey(label: string): string {
-    return this.normalizeText(label)
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  }
-
   private formatPlannerGroupLabel(date: Date): string {
-    return new Intl.DateTimeFormat('sr-RS', {
+    return new Intl.DateTimeFormat(this.translationService.currentLocale(), {
       day: '2-digit',
       month: 'short',
       year: 'numeric',
@@ -947,8 +950,8 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     }).format(date).toUpperCase();
   }
 
-  private formatPlannerTime(date: Date): string {
-    return date.toLocaleTimeString('sr-RS', {
+  protected formatPlannerTime(date: Date): string {
+    return date.toLocaleTimeString(this.translationService.currentLocale(), {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
@@ -956,18 +959,67 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   }
 
   private buildUpcomingSubtitle(date: Date): string {
-    const dayPart = date.toLocaleDateString('sr-RS', {
+    const dayPart = date.toLocaleDateString(this.translationService.currentLocale(), {
       weekday: 'short',
       day: 'numeric',
       month: 'short',
     });
 
     const timePart = this.formatPlannerTime(date);
-    return `Sledeće ${dayPart.toLowerCase()} u ${timePart}`;
+    return this.translate('planner.preview.upcomingSubtitle', {
+      day: dayPart.toLowerCase(),
+      time: timePart,
+    });
   }
 
   private buildMobileHighlightSubtitle(label: string): string {
     return label.replace(/\s*-\s*/g, ' • ');
+  }
+
+  private buildEventDayLabel(value?: string): string {
+    const date = this.parseDate(value);
+    return date
+      ? date.toLocaleDateString(this.translationService.currentLocale(), { day: '2-digit' })
+      : '--';
+  }
+
+  private buildEventMonthLabel(value?: string): string {
+    const date = this.parseDate(value);
+    return date
+      ? date
+          .toLocaleDateString(this.translationService.currentLocale(), { month: 'short' })
+          .replace('.', '')
+          .toUpperCase()
+      : '--';
+  }
+
+  private cardsPerPageLabel(count: number): string {
+    const key = this.usesSerbianCardPlural(count)
+      ? 'planner.preview.cardsPerPageFew'
+      : 'planner.preview.cardsPerPageMany';
+
+    return this.translate(key, { count });
+  }
+
+  private translateCategoryKey(categoryKey: PreviewCategoryKey): string {
+    if (categoryKey === 'all') {
+      return this.translate('common.all');
+    }
+
+    return this.translate(`planner.preview.category.${categoryKey}`);
+  }
+
+  private isPreviewCategoryKey(value: string): value is PreviewCategoryKey {
+    return [
+      'all',
+      'foodDrinks',
+      'forKids',
+      'concerts',
+      'festival',
+      'sport',
+      'culture',
+      'other',
+    ].includes(value);
   }
 
   private toDayKey(date: Date): string {
@@ -986,10 +1038,11 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   }
 
   private formatDate(date: Date): string {
-    const day = date.toLocaleDateString('sr-RS', { day: '2-digit' });
-    const month = date.toLocaleDateString('sr-RS', { month: '2-digit' });
-    const year = date.toLocaleDateString('sr-RS', { year: 'numeric' });
-    return `${day}.${month}.${year}.`;
+    return new Intl.DateTimeFormat(this.translationService.currentLocale(), {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(date);
   }
 
   private formatTime(date: Date): string {
@@ -998,7 +1051,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
       return '';
     }
 
-    return date.toLocaleTimeString('sr-RS', {
+    return date.toLocaleTimeString(this.translationService.currentLocale(), {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
@@ -1020,5 +1073,15 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
       .replace(/[\u0300-\u036f]/g, '')
       .toLowerCase()
       .trim();
+  }
+
+  private usesSerbianCardPlural(count: number): boolean {
+    if (this.translationService.language() !== 'sr') {
+      return false;
+    }
+
+    const lastDigit = count % 10;
+    const lastTwoDigits = count % 100;
+    return lastDigit >= 2 && lastDigit <= 4 && (lastTwoDigits < 12 || lastTwoDigits > 14);
   }
 }

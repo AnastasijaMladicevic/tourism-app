@@ -1,12 +1,12 @@
 <main class="planner-preview">
   <header class="planner-mobile-header">
-    <h1 class="planner-mobile-header__title">Planer događaja</h1>
+    <h1 class="planner-mobile-header__title">{{ translate('planner.title') }}</h1>
   </header>
 
   <div class="planner-preview__container">
     <div class="planner-preview__hero">
       <section class="hero-copy">
-        <h1>Planer događaja</h1>
+        <h1>{{ translate('planner.title') }}</h1>
       </section>
     </div>
 
@@ -28,7 +28,7 @@
                   <path d="M4 10h16" />
                 </svg>
               </span>
-              <span>Događaji</span>
+              <span>{{ translate('planner.preview.mobileTabs.events') }}</span>
             </button>
 
             <button
@@ -37,7 +37,7 @@
               [class.planner-mobile-tabs__item--active]="activeMobileTab === 'planner'"
               (click)="setMobileTab('planner')"
             >
-              <span>Moj planer</span>
+              <span>{{ translate('planner.preview.mobileTabs.myPlanner') }}</span>
               <span class="planner-mobile-tabs__badge">{{ plannerCount() }}</span>
             </button>
           </div>
@@ -56,7 +56,7 @@
                 </span>
                 <input
                   type="text"
-                  placeholder="Pretraži događaje"
+                  [placeholder]="translate('planner.preview.searchPlaceholder')"
                   [value]="searchTerm()"
                   (input)="updateSearchTerm(($any($event.target).value ?? '').toString())"
                 />
@@ -67,7 +67,7 @@
                 class="planner-toolbar-add-button"
                 (click)="openEvents()"
               >
-                Dodaj event
+                {{ translate('planner.addEventCta') }}
               </button>
             </div>
 
@@ -102,10 +102,10 @@
                         <button
                           type="button"
                           class="planner-toolbar-panel__option"
-                          [class.planner-toolbar-panel__option--active]="activeChip() === chip.label"
-                          (click)="updateCategoryFilter(chip.label)"
+                          [class.planner-toolbar-panel__option--active]="activeChip() === chip.value"
+                          (click)="updateCategoryFilter(chip.value)"
                         >
-                          {{ chip.label === 'Svi' ? 'Sve kategorije' : chip.label }}
+                          {{ chip.value === 'all' ? translate('planner.preview.allCategories') : chip.label }}
                         </button>
                       }
                     </div>
@@ -139,7 +139,7 @@
 
                   @if (isDropdownOpen('range')) {
                     <div class="planner-toolbar-panel__menu" (click)="$event.stopPropagation()">
-                      @for (option of rangeOptions; track option.value) {
+                      @for (option of rangeOptions(); track option.value) {
                         <button
                           type="button"
                           class="planner-toolbar-panel__option"
@@ -181,7 +181,7 @@
 
                   @if (isDropdownOpen('cards')) {
                     <div class="planner-toolbar-panel__menu" (click)="$event.stopPropagation()">
-                      @for (option of cardsPerPageOptions; track option.value) {
+                      @for (option of cardsPerPageOptions(); track option.value) {
                         <button
                           type="button"
                           class="planner-toolbar-panel__option"
@@ -201,16 +201,16 @@
 
           <div class="event-list">
             @if (isLoading()) {
-              <p class="event-list__state">Učitavanje događaja...</p>
+              <p class="event-list__state">{{ translate('planner.preview.eventsLoading') }}</p>
             } @else if (hasError()) {
-              <p class="event-list__state">Greška pri učitavanju događaja.</p>
+              <p class="event-list__state">{{ translate('planner.preview.eventsLoadError') }}</p>
             } @else if (!previewCards().length) {
               <section class="preview-empty-state">
-                <strong>Planer je trenutno prazan.</strong>
-                <p>Dodaj event u planer i ovde će se pojaviti kartica događaja.</p>
+                <strong>{{ translate('planner.emptyTitle') }}</strong>
+                <p>{{ translate('planner.preview.emptyBody') }}</p>
                 <button type="button" class="planner-cta-button preview-empty-state__button" (click)="openEvents()">
                   <span>+</span>
-                  <span>Dodaj event</span>
+                  <span>{{ translate('planner.addEventCta') }}</span>
                 </button>
               </section>
             } @else {
@@ -235,7 +235,7 @@
                         <button
                           type="button"
                           class="event-card__icon-btn"
-                          aria-label="Izmeni u planeru"
+                          [attr.aria-label]="translate('planner.preview.editAria')"
                           [disabled]="!event.isAdded"
                           (click)="editPlannerEvent(event)"
                         >
@@ -247,7 +247,7 @@
                         <button
                           type="button"
                           class="event-card__icon-btn event-card__icon-btn--danger"
-                          aria-label="Obriši iz planera"
+                          [attr.aria-label]="translate('planner.removeFromPlanner')"
                           [disabled]="!event.plannerId || removingPlannerId() === event.plannerId"
                           (click)="event.plannerId && removeFromPlanner(event.plannerId)"
                         >
@@ -288,7 +288,7 @@
                         class="planner-add-button event-card__details-button"
                         (click)="openEventDetails(event.id)"
                       >
-                        <span>Detalji</span>
+                        <span>{{ translate('common.details') }}</span>
                       </button>
                     </div>
                   </div>
@@ -296,18 +296,18 @@
               }
 
               @if (totalPages() > 1) {
-                <nav class="planner-pagination" aria-label="Paginacija događaja">
+                <nav class="planner-pagination" [attr.aria-label]="translate('planner.preview.paginationAria')">
                   <button
                     type="button"
                     class="planner-pagination__button"
                     [disabled]="currentPage() <= 1"
                     (click)="previousPage()"
                   >
-                    Prethodna
+                    {{ translate('common.prev') }}
                   </button>
 
                   <span class="planner-pagination__status">
-                    Strana {{ currentPage() }} od {{ totalPages() }}
+                    {{ translate('common.pageOf', { current: currentPage(), total: totalPages() }) }}
                   </span>
 
                   <button
@@ -316,7 +316,7 @@
                     [disabled]="currentPage() >= totalPages()"
                     (click)="nextPage()"
                   >
-                    Sledeća
+                    {{ translate('common.next') }}
                   </button>
                 </nav>
               }
@@ -331,7 +331,7 @@
                     <path d="M12 2 9.5 9H2l6 4.5L5.5 22 12 17.5 18.5 22 16 13.5 22 9h-7.5L12 2Z" />
                   </svg>
                 </span>
-                <h3>Upcoming Highlights</h3>
+                <h3>{{ translate('planner.preview.highlightsTitle') }}</h3>
               </div>
 
               @if (mobileHighlights().length) {
@@ -352,7 +352,7 @@
                   }
                 </div>
               } @else {
-                <p class="mobile-highlights-card__empty">Nema izdvojenih planner događaja još uvek.</p>
+                <p class="mobile-highlights-card__empty">{{ translate('planner.preview.highlightsEmpty') }}</p>
               }
             </section>
           }
@@ -362,18 +362,18 @@
           <section class="planner-panel planner-panel--mobile">
             <div class="planner-panel__header">
               <div class="planner-panel__title">
-                <h2>Moj planer</h2>
+                <h2>{{ translate('planner.preview.myPlannerTitle') }}</h2>
                 <span class="planner-panel__count">{{ plannerCount() }}</span>
               </div>
             </div>
 
             <div class="planner-groups">
               @if (plannerLoading()) {
-                <p class="planner-panel__state">Učitavanje planera...</p>
+                <p class="planner-panel__state">{{ translate('planner.preview.loadingPlanner') }}</p>
               } @else if (plannerError()) {
                 <p class="planner-panel__state">{{ plannerError() }}</p>
               } @else if (plannerGroups().length === 0) {
-                <p class="planner-panel__state">Dodaj eventove i napravi raspored putovanja po danima.</p>
+                <p class="planner-panel__state">{{ translate('planner.emptyBody') }}</p>
               } @else {
                 @for (group of plannerGroups(); track group.label) {
                   <section class="planner-group">
@@ -383,20 +383,20 @@
                       <article class="planner-item">
                         <div class="planner-item__time">
                           <span class="planner-item__dot" aria-hidden="true"></span>
-                          <strong>{{ event.plannerTime }}</strong>
+                          <strong>{{ formatPlannerTime(event.sortDate) }}</strong>
                         </div>
 
                         <div class="planner-item__content">
                           <h3>{{ event.title }}</h3>
                           <p>{{ event.location }}</p>
-                          <span [class]="getPriorityClass(event.priority)">{{ event.priority }}</span>
+                          <span [class]="getPriorityClass(event.priority)">{{ priorityLabel(event.priority) }}</span>
                         </div>
 
                         <div class="planner-item__actions">
                           <button
                             type="button"
                             class="icon-ghost-button icon-ghost-button--danger"
-                            aria-label="Obriši"
+                            [attr.aria-label]="translate('common.delete')"
                             [disabled]="removingPlannerId() === event.id"
                             (click)="removeFromPlanner(event.id)"
                           >
@@ -423,18 +423,18 @@
         <div class="planner-panel">
           <div class="planner-panel__header">
             <div class="planner-panel__title">
-              <h2>Moj planer</h2>
+              <h2>{{ translate('planner.preview.myPlannerTitle') }}</h2>
               <span class="planner-panel__count">{{ plannerCount() }}</span>
             </div>
           </div>
 
           <div class="planner-groups">
             @if (plannerLoading()) {
-              <p class="planner-panel__state">Učitavanje planera...</p>
+              <p class="planner-panel__state">{{ translate('planner.preview.loadingPlanner') }}</p>
             } @else if (plannerError()) {
               <p class="planner-panel__state">{{ plannerError() }}</p>
             } @else if (plannerGroups().length === 0) {
-              <p class="planner-panel__state">Dodaj eventove i napravi raspored putovanja po danima.</p>
+              <p class="planner-panel__state">{{ translate('planner.emptyBody') }}</p>
             } @else {
               @for (group of plannerGroups(); track group.label) {
                 <section class="planner-group">
@@ -444,20 +444,20 @@
                     <article class="planner-item">
                       <div class="planner-item__time">
                         <span class="planner-item__dot" aria-hidden="true"></span>
-                        <strong>{{ event.plannerTime }}</strong>
+                        <strong>{{ formatPlannerTime(event.sortDate) }}</strong>
                       </div>
 
                       <div class="planner-item__content">
                         <h3>{{ event.title }}</h3>
                         <p>{{ event.location }}</p>
-                        <span [class]="getPriorityClass(event.priority)">{{ event.priority }}</span>
+                        <span [class]="getPriorityClass(event.priority)">{{ priorityLabel(event.priority) }}</span>
                       </div>
 
                       <div class="planner-item__actions">
                       <button
                         type="button"
                         class="icon-ghost-button icon-ghost-button--danger"
-                        aria-label="Obriši"
+                        [attr.aria-label]="translate('common.delete')"
                         [disabled]="removingPlannerId() === event.id"
                         (click)="removeFromPlanner(event.id)"
                       >
@@ -485,7 +485,7 @@
                 <path d="M12 2 9.5 9H2l6 4.5L5.5 22 12 17.5 18.5 22 16 13.5 22 9h-7.5L12 2Z" />
               </svg>
             </span>
-            <h3>Upcoming Highlight</h3>
+            <h3>{{ translate('planner.preview.highlightsTitle') }}</h3>
           </div>
 
           @if (upcomingHighlights().length > 0) {
@@ -505,7 +505,7 @@
               }
             </div>
           } @else {
-            <p class="upcoming-highlight-card__empty">Nema izdvojenih planner događaja još uvek.</p>
+            <p class="upcoming-highlight-card__empty">{{ translate('planner.preview.highlightsEmpty') }}</p>
           }
         </section>
       </aside>

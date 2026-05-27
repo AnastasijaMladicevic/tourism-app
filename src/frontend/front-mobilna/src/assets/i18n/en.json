@@ -603,9 +603,14 @@
     "summaryTitle": "Favorites summary",
     "collectionsTitle": "Your collections",
     "collectionsLink": "View all collections",
+    "collectionsLinkShort": "See all",
     "collectionsCollapseLink": "Show fewer collections",
     "collectionItemCountOne": "1 item",
     "collectionItemCountMany": "{{count}} items",
+    "pageSizeAria": "Number of cards per page",
+    "pageSizeLabelFew": "{{count}} cards",
+    "pageSizeLabelMany": "{{count}} cards",
+    "paginationAria": "Favorites pagination",
     "actionsTitle": "What can you do?",
     "actionPlannerTitle": "Add to planner",
     "actionPlannerBody": "Turn favorites into your trip plan.",
@@ -1108,7 +1113,49 @@
     "removeFromPlanner": "Remove from planner",
     "notifications": "Notifications",
     "tripTitleFallback": "Your trip plan",
-    "tripWeekSuffix": "{{name}} week"
+    "tripWeekSuffix": "{{name}} week",
+    "preview": {
+      "mobileTabs": {
+        "events": "Events",
+        "myPlanner": "My planner"
+      },
+      "searchPlaceholder": "Search events",
+      "allCategories": "All categories",
+      "dateFilterAll": "Date",
+      "range7": "7 days",
+      "range14": "14 days",
+      "range30": "Month",
+      "cardsPerPageFew": "{{count}} cards",
+      "cardsPerPageMany": "{{count}} cards",
+      "eventsLoading": "Loading events...",
+      "eventsLoadError": "Error loading events.",
+      "emptyBody": "Add an event to the planner and its card will appear here.",
+      "editAria": "Edit in planner",
+      "paginationAria": "Events pagination",
+      "highlightsTitle": "Upcoming highlights",
+      "highlightsEmpty": "There are no highlighted planner events yet.",
+      "myPlannerTitle": "My planner",
+      "loadingPlanner": "Loading planner...",
+      "eventTypeFallback": "Event",
+      "eventTitleFallback": "Event name is not available",
+      "locationFallback": "Location not specified",
+      "dateAtTime": "{{date}} at {{time}}",
+      "upcomingSubtitle": "Next {{day}} at {{time}}",
+      "priority": {
+        "must": "Must",
+        "maybe": "Maybe",
+        "later": "If there is time"
+      },
+      "category": {
+        "foodDrinks": "Food and drinks",
+        "forKids": "For kids",
+        "concerts": "Concerts",
+        "festival": "Festival",
+        "sport": "Sport",
+        "culture": "Culture",
+        "other": "Other"
+      }
+    }
   },
   "addToPlanner": {
     "termsLink": "Terms of service",

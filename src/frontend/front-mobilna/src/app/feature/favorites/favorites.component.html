@@ -51,7 +51,7 @@
                 type="button"
                 class="favorites-page-size__trigger"
                 (click)="togglePageSizeMenu($event)"
-                aria-label="Broj kartica po strani"
+                [attr.aria-label]="translate('favorites.pageSizeAria')"
                 [attr.aria-expanded]="isPageSizeMenuOpen()"
               >
                 <span class="favorites-page-size__summary">
@@ -96,7 +96,7 @@
               </svg>
             </span>
             <span class="favorites-mobile-sort__label">
-              {{ sortOption() === 'newest' ? 'Sortiraj po datumu' : 'Sortiraj po nazivu' }}
+              {{ sortOption() === 'newest' ? translate('favorites.sortDateAdded') : translate('favorites.sortName') }}
             </span>
             <span class="favorites-mobile-sort__chevron" aria-hidden="true">
               <svg viewBox="0 0 24 24">
@@ -181,7 +181,7 @@
                         class="card-action-btn"
                         (click)="openFavoriteAction(item, $event)"
                       >
-                        <span>Detalji</span>
+                        <span>{{ translate('common.details') }}</span>
                       </button>
                     } @else {
                       <span class="favorite-card__helper">{{ translate('favorites.plannerEventsOnly') }}</span>
@@ -193,18 +193,18 @@
           </div>
 
           @if (totalPages() > 1) {
-            <nav class="favorites-pagination" aria-label="Paginacija favorita">
+            <nav class="favorites-pagination" [attr.aria-label]="translate('favorites.paginationAria')">
               <button
                 type="button"
                 class="favorites-pagination__button"
                 [disabled]="currentPage() <= 1"
                 (click)="previousPage()"
               >
-                Prethodna
+                {{ translate('common.prev') }}
               </button>
 
               <span class="favorites-pagination__status">
-                Strana {{ currentPage() }} od {{ totalPages() }}
+                {{ translate('common.pageOf', { current: currentPage(), total: totalPages() }) }}
               </span>
 
               <button
@@ -213,7 +213,7 @@
                 [disabled]="currentPage() >= totalPages()"
                 (click)="nextPage()"
               >
-                Sledeća
+                {{ translate('common.next') }}
               </button>
             </nav>
           }
@@ -230,8 +230,8 @@
 
         <section class="favorites-mobile-section favorites-mobile-collections">
           <div class="favorites-mobile-section__head">
-            <h2>Tvoje kolekcije</h2>
-            <button type="button" class="favorites-mobile-section__link">Vidi sve</button>
+            <h2>{{ translate('favorites.collectionsTitle') }}</h2>
+            <button type="button" class="favorites-mobile-section__link">{{ translate('favorites.collectionsLinkShort') }}</button>
           </div>
 
           <div class="favorites-mobile-collections__grid">
@@ -247,7 +247,7 @@
 
                 <span class="favorites-mobile-collection-card__copy">
                   <strong>{{ item.label }}</strong>
-                  <small>{{ item.count }} stavki</small>
+                  <small>{{ collectionCountLabel(item.count) }}</small>
                 </span>
 
                 <mat-icon class="favorites-mobile-collection-card__arrow">chevron_right</mat-icon>
