@@ -2252,8 +2252,11 @@
   .favorite-heart,
   .card-action-btn {
     background: var(--surface-soft);
-    color: var(--primary);
     border-color: var(--border);
+  }
+
+  .favorite-heart {
+    color: #ff8d8f;
   }
 
   .panel-action__icon--blue,
