@@ -269,12 +269,13 @@ body.route-navigation-active app-floating-ai-assistant {
 }*/
 
 .route-planner {
-  position: fixed;
+  position: absolute;
   left: 12px;
   right: 12px;
   bottom: 14px;
   z-index: 20;
   max-height: min(66vh, 560px);
+  min-height: 232px;
   background: var(--surface-strong);
   border: 1px solid var(--border);
   backdrop-filter: blur(16px);
@@ -464,6 +465,7 @@ body.route-navigation-active app-floating-ai-assistant {
 
 .route-planner__body {
   display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
   gap: 14px;
   min-height: 0;
   overflow: hidden;
@@ -641,12 +643,13 @@ body.route-navigation-active app-floating-ai-assistant {
 }
 
 .route-planner__list {
-  display: grid;
-  gap: 12px;
-  max-height: none;
-  overflow: visible;
+  flex: 1 1 auto;
+  overflow-y: auto !important;
   overflow-x: hidden;
-  padding-right: 0;
+  min-height: 0;
+  max-height: none;
+  padding-right: 4px;
+  scrollbar-width: thin;
 }
 
 .route-planner__list--scrollable {
@@ -663,6 +666,11 @@ body.route-navigation-active app-floating-ai-assistant {
 .route-planner--expanded .route-planner__list {
   max-height: none;
   min-height: 0;
+}
+
+.route-planner--expanded .route-planner__list--scrollable,
+.route-planner--dragging .route-planner__list--scrollable {
+  max-height: none;
 }
 
 .route-stop-card {
@@ -782,40 +790,49 @@ body.route-navigation-active app-floating-ai-assistant {
 
 @media (max-width: 768px) {
 
-  .search-bar--hidden,
-  .filter-chips--hidden,
-  .map-controls--hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
+  // .search-bar--hidden,
+  // .filter-chips--hidden,
+  // .map-controls--hidden {
+  //   opacity: 0;
+  //   pointer-events: none;
+  // }
 
-  .search-bar--hidden,
-  .filter-chips--hidden {
-    transform: translateY(-10px);
-  }
+  // .search-bar--hidden,
+  // .filter-chips--hidden {
+  //   transform: translateY(-10px);
+  // }
 
-  .search-bar--hidden,
-  .filter-chips--hidden {
-    display: none;
-  }
+  // .search-bar--hidden,
+  // .filter-chips--hidden {
+  //   display: none;
+  // }
 
-  .map-controls--hidden {
-    transform: translateY(-50%) translateX(14px);
+  // .map-controls--hidden {
+  //   transform: translateY(-50%) translateX(14px);
+  // }
+  .route-planner__list {
+    flex: 1 1 auto;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
   }
 
   .route-planner {
+    position: fixed;
     left: 0;
     right: 0;
     bottom: 64px;
     height: auto;
-    max-height: calc(100dvh - 164px);
+    max-height: calc(100dvh - 180px);
+    min-height: 262px;
     border-radius: 28px 28px 0 0;
     padding: 10px 14px 10px;
     box-shadow: 0 -20px 40px rgba(15, 23, 42, 0.16);
-    overflow: visible;
+    overflow: hidden;
   }
 
   .route-planner--expanded {
+    min-height: 280px;
+    max-height: calc(100dvh - 180px);
     z-index: 1100;
     padding-bottom: calc(16px + env(safe-area-inset-bottom));
   }
@@ -916,7 +933,7 @@ body.route-navigation-active app-floating-ai-assistant {
   }
 
   .route-planner__list--scrollable {
-    max-height: 152px;
+    max-height: 144px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
@@ -984,7 +1001,8 @@ body.route-navigation-active app-floating-ai-assistant {
     display: inline-flex;
     width: 100%;
     min-height: 44px;
-    margin-top: 2px;
+    margin-top: 6px;
+    flex-shrink: 0;
     border: none;
     border-radius: 18px;
     background: linear-gradient(135deg, #1697d8, #157cb0);
@@ -1152,6 +1170,11 @@ body.route-navigation-active app-floating-ai-assistant {
     overflow-y: auto;
   }
 
+  .route-planner--expanded .route-planner__list--scrollable,
+  .route-planner--dragging .route-planner__list--scrollable {
+    max-height: none;
+  }
+
   .route-stop-card {
     grid-template-columns: 50px 1fr auto auto;
     gap: 10px;
@@ -1229,6 +1252,11 @@ body.route-navigation-active app-floating-ai-assistant {
 
   .route-planner__list--scrollable {
     max-height: 138px;
+  }
+
+  .route-planner--expanded .route-planner__list--scrollable,
+  .route-planner--dragging .route-planner__list--scrollable {
+    max-height: none;
   }
 }
 
