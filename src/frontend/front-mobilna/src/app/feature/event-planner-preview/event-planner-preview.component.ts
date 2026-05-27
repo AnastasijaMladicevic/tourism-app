@@ -2,13 +2,14 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  HostListener,
   OnDestroy,
   OnInit,
   computed,
   inject,
   signal,
 } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { catchError, finalize, forkJoin, map, of } from 'rxjs';
 import { AuthService } from '../../services/auth';
 import { ActiveRegionService } from '../../services/active-region';
@@ -86,13 +87,30 @@ interface PreviewDateFilterOption {
   label: string;
 }
 
+interface PlannerFilterChip {
+  label: string;
+  value: string;
+}
+
+interface PlannerCardsPerPageOption {
+  value: number;
+  label: string;
+}
+
+interface PlannerRangeOption {
+  value: number;
+  label: string;
+}
+
+type PlannerToolbarDropdown = 'category' | 'range' | 'cards';
+
 const FALLBACK_IMAGE_URL =
   'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1200&q=80';
 
 @Component({
   selector: 'app-event-planner-preview',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './event-planner-preview.component.html',
   styleUrl: './event-planner-preview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -112,20 +130,14 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     this.isMobileViewport.set(event.matches);
   };
 
-  protected readonly filterChips = [
-    'Svi',
-    'Koncerti',
-    'Kultura',
-    'Sport',
-    'Festival',
-    'Hrana i piće',
-    'Za decu',
-  ];
-
   protected readonly regionName = signal('Crna Gora');
   protected readonly activeChip = signal('Svi');
   protected readonly searchTerm = signal('');
   protected readonly selectedDateKey = signal('all');
+  protected readonly selectedRangeDays = signal(30);
+  protected readonly cardsPerPage = signal(5);
+  protected readonly currentPage = signal(1);
+  protected readonly openDropdown = signal<PlannerToolbarDropdown | null>(null);
   protected readonly isLoading = signal(true);
   protected readonly hasError = signal(false);
   protected readonly allEvents = signal<PreviewEventItem[]>([]);
@@ -135,12 +147,16 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   protected readonly removingPlannerId = signal<number | null>(null);
   protected readonly isMobileViewport = signal(false);
 
-  protected readonly events = computed(() => {
+  protected readonly filteredPlannerEvents = computed(() => {
     const query = this.normalizeText(this.searchTerm());
     const activeChip = this.activeChip();
 
     return this.allEvents().filter((event) => {
-      const matchesChip = activeChip === 'Svi' || event.categoryChip === activeChip;
+      if (!event.isAdded) {
+        return false;
+      }
+
+      const matchesChip = activeChip === 'Svi' || event.eventTypeName === activeChip;
       if (!matchesChip) {
         return false;
       }
@@ -157,28 +173,63 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     });
   });
 
-  protected readonly plannedEvents = computed(() =>
-    this.events()
-      .filter((event) => {
-        const selectedDateKey = this.selectedDateKey();
-        if (!this.isMobileViewport() || selectedDateKey === 'all') {
-          return true;
-        }
+  protected readonly plannedEvents = computed(() => {
+    const sortedEvents = [...this.filteredPlannerEvents()].sort((left, right) => {
+      const leftDate = this.parseDate(left.startDate)?.getTime() ?? 0;
+      const rightDate = this.parseDate(right.startDate)?.getTime() ?? 0;
+      return leftDate - rightDate;
+    });
 
-        const eventDate = this.parseDate(event.startDate);
-        return eventDate ? this.toDayKey(eventDate) === selectedDateKey : false;
-      })
-      .filter((event) => event.isAdded)
-      .sort((left, right) => {
-        const leftDate = this.parseDate(left.startDate)?.getTime() ?? 0;
-        const rightDate = this.parseDate(right.startDate)?.getTime() ?? 0;
-        return leftDate - rightDate;
-      }),
-  );
+    const selectedDateKey = this.selectedDateKey();
+    const mobileFilteredEvents = sortedEvents.filter((event) => {
+      if (!this.isMobileViewport() || selectedDateKey === 'all') {
+        return true;
+      }
+
+      const eventDate = this.parseDate(event.startDate);
+      return eventDate ? this.toDayKey(eventDate) === selectedDateKey : false;
+    });
+
+    const eventsForRange = mobileFilteredEvents.length ? mobileFilteredEvents : sortedEvents;
+    const datedEvents = eventsForRange.filter((event) => this.parseDate(event.startDate));
+
+    if (!datedEvents.length) {
+      return eventsForRange;
+    }
+
+    const firstEventDate = this.parseDate(datedEvents[0].startDate);
+    if (!firstEventDate) {
+      return eventsForRange;
+    }
+
+    const rangeStart = this.getStartOfDay(firstEventDate);
+    const rangeEnd = new Date(rangeStart);
+    rangeEnd.setDate(rangeEnd.getDate() + this.selectedRangeDays() - 1);
+
+    const rangeFilteredEvents = eventsForRange.filter((event) => {
+      const eventDate = this.parseDate(event.startDate);
+      if (!eventDate) {
+        return false;
+      }
+
+      const normalizedEventDate = this.getStartOfDay(eventDate);
+      return normalizedEventDate >= rangeStart && normalizedEventDate <= rangeEnd;
+    });
+
+    return rangeFilteredEvents.length ? rangeFilteredEvents : eventsForRange;
+  });
+
+  protected readonly totalPages = computed(() => {
+    const totalItems = this.plannedEvents().length;
+    return Math.max(1, Math.ceil(totalItems / this.cardsPerPage()));
+  });
 
   protected readonly previewCards = computed<MobilePreviewCard[]>(() => {
     const planned = this.plannedEvents();
-    const source = planned.length ? planned : this.events().slice(0, 4);
+    const totalPages = this.totalPages();
+    const currentPage = Math.min(this.currentPage(), totalPages);
+    const startIndex = (currentPage - 1) * this.cardsPerPage();
+    const source = planned.slice(startIndex, startIndex + this.cardsPerPage());
 
     return source.map((event) => ({
       id: event.id,
@@ -221,10 +272,41 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     return [{ key: 'all', label: 'Datum' }, ...options.values()];
   });
 
-  protected readonly mobilePrimaryFilterChips = ['Svi', 'Koncerti', 'Kultura', 'Sport'];
+  protected readonly filterChips = computed<PlannerFilterChip[]>(() => {
+    const typeMap = new Map<string, PlannerFilterChip>();
+
+    for (const plannerItem of this.visiblePlannerItems()) {
+      const relatedEvent = this.allEvents().find((event) => event.id === plannerItem.eventId);
+      const label = relatedEvent?.eventTypeName?.trim();
+
+      if (!label) {
+        continue;
+      }
+
+      const value = this.buildFilterKey(label);
+      if (!typeMap.has(value)) {
+        typeMap.set(value, { label, value });
+      }
+    }
+
+    return [
+      { label: 'Svi', value: 'all' },
+      ...[...typeMap.values()].sort((left, right) => left.label.localeCompare(right.label)),
+    ];
+  });
+
+  protected readonly mobilePrimaryFilterChips = computed(() => this.filterChips().slice(0, 4));
   protected readonly mobileSecondaryFilterChips = computed(() =>
-    this.filterChips.filter((chip) => !this.mobilePrimaryFilterChips.includes(chip)),
+    this.filterChips().slice(4),
   );
+  protected readonly selectedCategoryLabel = computed(() =>
+    this.activeChip() === 'Svi' ? 'Sve kategorije' : this.activeChip(),
+  );
+  protected readonly selectedRangeLabel = computed(() => {
+    const match = this.rangeOptions.find((option) => option.value === this.selectedRangeDays());
+    return match?.label ?? '7 dana';
+  });
+  protected readonly selectedCardsPerPageLabel = computed(() => `${this.cardsPerPage()} kartice`);
 
   protected readonly visiblePlannerItems = computed(() => {
     const eventIds = new Set(this.allEvents().map((event) => event.id));
@@ -272,6 +354,15 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
         imageUrl: item.imageUrl,
       })),
   );
+  protected readonly rangeOptions: PlannerRangeOption[] = [
+    { value: 7, label: '7 dana' },
+    { value: 14, label: '14 dana' },
+    { value: 30, label: 'Mesec' },
+  ];
+  protected readonly cardsPerPageOptions: PlannerCardsPerPageOption[] = [
+    { value: 3, label: '3 kartice' },
+    { value: 5, label: '5 kartica' },
+  ];
 
   ngOnInit(): void {
     this.initializeViewportWatcher();
@@ -283,9 +374,20 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     this.mobileMediaQuery?.removeEventListener('change', this.mobileMediaListener);
   }
 
+  @HostListener('document:click')
+  protected handleDocumentClick(): void {
+    this.closeDropdown();
+  }
+
+  @HostListener('document:keydown.escape')
+  protected handleEscapeKey(): void {
+    this.closeDropdown();
+  }
+
   protected setActiveChip(chip: string): void {
     this.activeChip.set(chip);
     this.isMobileMoreFiltersOpen = false;
+    this.resetPagination();
   }
 
   protected setMobileTab(tab: 'events' | 'planner'): void {
@@ -294,10 +396,59 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
 
   protected updateSearchTerm(value: string): void {
     this.searchTerm.set(value);
+    this.resetPagination();
   }
 
   protected updateSelectedDateKey(value: string): void {
     this.selectedDateKey.set(value || 'all');
+    this.resetPagination();
+  }
+
+  protected updateCategoryFilter(value: string): void {
+    this.setActiveChip(value || 'Svi');
+    this.closeDropdown();
+  }
+
+  protected updateRangeDays(value: string): void {
+    const parsedValue = Number(value);
+    if (!Number.isFinite(parsedValue)) {
+      return;
+    }
+
+    this.selectedRangeDays.set(parsedValue);
+    this.resetPagination();
+    this.closeDropdown();
+  }
+
+  protected updateCardsPerPage(value: string): void {
+    const parsedValue = Number(value);
+    if (!Number.isFinite(parsedValue)) {
+      return;
+    }
+
+    this.cardsPerPage.set(parsedValue);
+    this.currentPage.set(1);
+    this.closeDropdown();
+  }
+
+  protected toggleDropdown(dropdown: PlannerToolbarDropdown): void {
+    this.openDropdown.update((current) => (current === dropdown ? null : dropdown));
+  }
+
+  protected closeDropdown(): void {
+    this.openDropdown.set(null);
+  }
+
+  protected isDropdownOpen(dropdown: PlannerToolbarDropdown): boolean {
+    return this.openDropdown() === dropdown;
+  }
+
+  protected previousPage(): void {
+    this.currentPage.update((page) => Math.max(1, page - 1));
+  }
+
+  protected nextPage(): void {
+    this.currentPage.update((page) => Math.min(this.totalPages(), page + 1));
   }
 
   protected toggleMobileMoreFilters(): void {
@@ -305,7 +456,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   }
 
   protected isMobileMoreActive(): boolean {
-    return this.mobileSecondaryFilterChips().includes(this.activeChip()) || this.isMobileMoreFiltersOpen;
+    return this.mobileSecondaryFilterChips().some((chip) => chip.label === this.activeChip()) || this.isMobileMoreFiltersOpen;
   }
 
   protected goBack(): void {
@@ -535,6 +686,9 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
         plannerId: plannerMap.get(event.id),
       })),
     );
+
+    this.ensureActiveChipIsValid();
+    this.ensureCurrentPageIsValid();
   }
 
   private mapEvent(event: EventDto, typeChipMap: Map<string, string>): PreviewEventItem {
@@ -753,6 +907,37 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     return 'Svi';
   }
 
+  private ensureActiveChipIsValid(): void {
+    const activeChip = this.activeChip();
+    if (activeChip === 'Svi') {
+      return;
+    }
+
+    const availableChips = new Set(this.filterChips().map((chip) => chip.label));
+    if (!availableChips.has(activeChip)) {
+      this.activeChip.set('Svi');
+      this.isMobileMoreFiltersOpen = false;
+      this.resetPagination();
+    }
+  }
+
+  private ensureCurrentPageIsValid(): void {
+    const totalPages = this.totalPages();
+    if (this.currentPage() > totalPages) {
+      this.currentPage.set(totalPages);
+    }
+  }
+
+  private resetPagination(): void {
+    this.currentPage.set(1);
+  }
+
+  private buildFilterKey(label: string): string {
+    return this.normalizeText(label)
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
   private formatPlannerGroupLabel(date: Date): string {
     return new Intl.DateTimeFormat('sr-RS', {
       day: '2-digit',
@@ -790,6 +975,10 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     const month = `${date.getMonth() + 1}`.padStart(2, '0');
     const day = `${date.getDate()}`.padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  private getStartOfDay(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
   }
 
   private matchesAny(value: string, needles: string[]): boolean {

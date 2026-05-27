@@ -221,10 +221,6 @@ export class FavoritesComponent implements OnInit {
     () => this.visibleFavorites().length < this.displayedFavorites().length,
   );
 
-  protected readonly latestSavedItem = computed(() => {
-    return [...this.favorites()].sort((left, right) => right.createdAtTimestamp - left.createdAtTimestamp)[0] ?? null;
-  });
-
   protected readonly sortLabel = computed(() =>
     this.sortOption() === 'newest'
       ? this.translate('favorites.sortDateAdded')
@@ -428,10 +424,11 @@ export class FavoritesComponent implements OnInit {
 
   private mapDestinationFavorite(item: FavoriteDto, destination?: DestinationDto): FavoriteCard {
     const title =
-      destination?.displayTitle?.trim() ||
       destination?.name?.trim() ||
+      destination?.displayTitle?.trim() ||
       item.destinationName ||
       this.translationService.translate('favorites.fallbackTitle', { id: item.id });
+    const displaySubtitle = destination?.displayTitle?.trim();
     const location = this.buildLocation(destination?.name, destination?.regionName);
     const categoryLabel =
       destination?.destinationTypeName || this.translate('favorites.type.destination');
@@ -442,7 +439,10 @@ export class FavoritesComponent implements OnInit {
       categoryKey: this.buildCategoryKey(categoryLabel, 'destination'),
       categoryLabel,
       location,
-      quote: this.translate('favorites.fallbackQuote'),
+      quote:
+        displaySubtitle && displaySubtitle !== title
+          ? displaySubtitle
+          : this.translate('favorites.fallbackQuote'),
       note: this.buildRelativeNote(item.createdAt),
       imageUrl: this.resolveDestinationImage(destination),
       canOpenDetails: Boolean(destination?.id),

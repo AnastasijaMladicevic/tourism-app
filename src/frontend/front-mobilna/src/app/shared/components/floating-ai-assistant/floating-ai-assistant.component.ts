@@ -38,7 +38,6 @@ export class FloatingAiAssistantComponent {
     '/code-verification',
     '/new-credentials',
     '/password-updated',
-    '/event-planner-preview',
   ];
 
   @ViewChild('threadContainer')

@@ -114,43 +114,18 @@
                 <div class="favorite-card__content">
                   <div class="favorite-card__heading">
                     <h3>{{ item.title }}</h3>
-
-                    @if (item.canOpenDetails) {
-                      <span class="favorite-card__arrow" aria-hidden="true">
-                        <svg viewBox="0 0 24 24">
-                          <path d="m9 6 6 6-6 6" />
-                        </svg>
-                      </span>
-                    }
                   </div>
 
-                  <p class="favorite-card__location">
-                    <mat-icon>place</mat-icon>
-                    <span>{{ item.location }}</span>
-                  </p>
-                </div>
+                  <p class="favorite-card__subtitle">{{ item.quote }}</p>
 
-                <div class="favorite-card__meta">
-                  @if (item.rating) {
-                    <span class="favorite-card__rating">
-                      <svg viewBox="0 0 24 24" aria-hidden="true">
-                        <path
-                          d="m12 3.9 2.47 5 5.53.8-4 3.9.94 5.5L12 16.5l-4.94 2.6.94-5.5-4-3.9 5.53-.8z"
-                        />
-                      </svg>
-                      <strong>{{ item.rating.toFixed(1) }}</strong>
-                      @if (item.reviewCount) {
-                        <span>({{ item.reviewCount }} {{ translate('common.reviews') }})</span>
-                      }
-                    </span>
-                  } @else {
-                    <span class="favorite-card__meta-tag">{{ item.categoryLabel }}</span>
-                  }
-
-                  <span class="favorite-card__saved">{{ item.note }}</span>
                 </div>
 
                 <div class="favorite-card__footer">
+                  <p class="favorite-card__location favorite-card__location--footer">
+                    <mat-icon>place</mat-icon>
+                    <span>{{ item.location }}</span>
+                  </p>
+
                   @if (item.canOpenDetails) {
                     <button
                       type="button"
@@ -162,15 +137,6 @@
                   } @else {
                     <span class="favorite-card__helper">{{ translate('favorites.plannerEventsOnly') }}</span>
                   }
-
-                  <button
-                    type="button"
-                    class="remove-text-btn"
-                    [disabled]="removingFavoriteId() === item.id"
-                    (click)="requestRemoveFavorite(item, $event)"
-                  >
-                    {{ removingFavoriteId() === item.id ? translate('favorites.removing') : translate('common.remove') }}
-                  </button>
                 </div>
               </article>
             }
@@ -265,37 +231,6 @@
               </span>
               <mat-icon class="panel-action__arrow">chevron_right</mat-icon>
             </a>
-
-            <a class="panel-action" routerLink="/profile">
-              <span class="panel-action__icon panel-action__icon--teal">
-                <mat-icon>group</mat-icon>
-              </span>
-              <span class="panel-action__copy">
-                <strong>{{ translate('favorites.actionShareTitle') }}</strong>
-                <small>{{ translate('favorites.actionShareBody') }}</small>
-              </span>
-              <mat-icon class="panel-action__arrow">chevron_right</mat-icon>
-            </a>
-          </div>
-        </section>
-
-        <section class="panel-card panel-card--tip">
-          <div class="panel-tip">
-            <span class="panel-tip__icon">
-              <mat-icon>lightbulb</mat-icon>
-            </span>
-
-            <div>
-              <strong>{{ translate('favorites.tipTitle') }}</strong>
-              <p>{{ translate('favorites.tipBody') }}</p>
-
-              @if (latestSavedItem(); as latest) {
-                <div class="panel-tip__latest">
-                  <span>{{ translate('favorites.recentTitle') }}</span>
-                  <strong>{{ latest.title }}</strong>
-                </div>
-              }
-            </div>
           </div>
         </section>
       </aside>

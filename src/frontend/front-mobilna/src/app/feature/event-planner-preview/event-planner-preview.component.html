@@ -1,30 +1,12 @@
 <main class="planner-preview">
   <header class="planner-mobile-header">
-    <button type="button" class="planner-mobile-header__menu" aria-label="Početna" (click)="goBack()">
-      <svg viewBox="0 0 24 24">
-        <path d="M4 7h16" />
-        <path d="M4 12h16" />
-        <path d="M4 17h16" />
-      </svg>
-    </button>
-
     <h1 class="planner-mobile-header__title">Planer događaja</h1>
-
-    <div class="planner-mobile-header__actions">
-      <a routerLink="/notifications" class="planner-mobile-header__icon" aria-label="Obaveštenja">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 3a4 4 0 0 1 4 4v1.2c0 1.1.32 2.18.92 3.1L18.5 14v1H5.5v-1l1.58-2.7c.6-.92.92-2 .92-3.1V7a4 4 0 0 1 4-4Z" />
-          <path d="M10 18a2 2 0 0 0 4 0" />
-        </svg>
-      </a>
-    </div>
   </header>
 
   <div class="planner-preview__container">
     <div class="planner-preview__hero">
       <section class="hero-copy">
         <h1>Planer događaja</h1>
-        <p>Dodaj događaje koji ti se sviđaju i organizuj svoj plan za {{ regionName() }}</p>
       </section>
     </div>
 
@@ -79,155 +61,142 @@
                   (input)="updateSearchTerm(($any($event.target).value ?? '').toString())"
                 />
               </label>
+
+              <button
+                type="button"
+                class="planner-toolbar-add-button"
+                (click)="openEvents()"
+              >
+                Dodaj event
+              </button>
             </div>
 
-            @if (isMobileViewport()) {
-              <div class="chip-row chip-row--mobile">
-                @for (chip of mobilePrimaryFilterChips; track chip) {
+            <div class="planner-toolbar-panels">
+              <div class="planner-toolbar-panel">
+                <div class="planner-toolbar-panel__dropdown">
                   <button
                     type="button"
-                    class="chip"
-                    [class.chip--active]="activeChip() === chip"
-                    [class.chip--text-only]="chip === 'Svi'"
-                    (click)="setActiveChip(chip)"
+                    class="planner-toolbar-panel__control"
+                    [class.planner-toolbar-panel__control--open]="isDropdownOpen('category')"
+                    (click)="toggleDropdown('category'); $event.stopPropagation()"
                   >
-                    @if (chip !== 'Svi') {
-                      <span class="chip__icon" aria-hidden="true">
-                        @switch (chip) {
-                          @case ('Koncerti') {
-                            <svg viewBox="0 0 24 24">
-                              <path d="M15 5v9.2a2.8 2.8 0 1 1-1.5-2.48V7.4l6-1.6v7.4a2.8 2.8 0 1 1-1.5-2.48V4z" />
-                            </svg>
-                          }
-                          @case ('Kultura') {
-                            <svg viewBox="0 0 24 24">
-                              <path d="M4 20h16" />
-                              <path d="M6 20V10h12v10" />
-                              <path d="M3 10h18" />
-                              <path d="M12 4 3 8v2h18V8z" />
-                              <path d="M9 13v4" />
-                              <path d="M15 13v4" />
-                            </svg>
-                          }
-                          @case ('Sport') {
-                            <svg viewBox="0 0 24 24">
-                              <circle cx="12" cy="12" r="8" />
-                              <path d="M12 4a12 12 0 0 1 3.6 8A12 12 0 0 1 12 20a12 12 0 0 1-3.6-8A12 12 0 0 1 12 4Z" />
-                              <path d="M4.9 9.2h14.2" />
-                              <path d="M4.9 14.8h14.2" />
-                            </svg>
-                          }
-                        }
-                      </span>
-                    }
-                    <span class="chip__label">{{ chip }}</span>
+                    <span class="planner-toolbar-panel__icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24">
+                        <rect x="4" y="4" width="6" height="6" rx="1.2" />
+                        <rect x="14" y="4" width="6" height="6" rx="1.2" />
+                        <rect x="4" y="14" width="6" height="6" rx="1.2" />
+                        <rect x="14" y="14" width="6" height="6" rx="1.2" />
+                      </svg>
+                    </span>
+                    <span class="planner-toolbar-panel__value">{{ selectedCategoryLabel() }}</span>
+                    <span class="planner-toolbar-panel__chevron" aria-hidden="true">
+                      <svg viewBox="0 0 16 16">
+                        <path d="M4 6.5 8 10l4-3.5" />
+                      </svg>
+                    </span>
                   </button>
-                }
 
-                <button
-                  type="button"
-                  class="chip chip--more"
-                  [class.chip--active]="isMobileMoreActive()"
-                  (click)="toggleMobileMoreFilters()"
-                >
-                  <span class="chip__icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24">
-                      <circle cx="6" cy="12" r="1.6" />
-                      <circle cx="12" cy="12" r="1.6" />
-                      <circle cx="18" cy="12" r="1.6" />
-                    </svg>
-                  </span>
-                  <span class="chip__label">Još</span>
-                </button>
-              </div>
-
-              @if (isMobileMoreFiltersOpen) {
-                <div class="chip-row chip-row--mobile-extra">
-                  @for (chip of mobileSecondaryFilterChips(); track chip) {
-                    <button
-                      type="button"
-                      class="chip"
-                      [class.chip--active]="activeChip() === chip"
-                      (click)="setActiveChip(chip)"
-                    >
-                      <span class="chip__label">{{ chip }}</span>
-                    </button>
+                  @if (isDropdownOpen('category')) {
+                    <div class="planner-toolbar-panel__menu" (click)="$event.stopPropagation()">
+                      @for (chip of filterChips(); track chip.value) {
+                        <button
+                          type="button"
+                          class="planner-toolbar-panel__option"
+                          [class.planner-toolbar-panel__option--active]="activeChip() === chip.label"
+                          (click)="updateCategoryFilter(chip.label)"
+                        >
+                          {{ chip.label === 'Svi' ? 'Sve kategorije' : chip.label }}
+                        </button>
+                      }
+                    </div>
                   }
                 </div>
-              }
-            } @else {
-              <div class="chip-row">
-                @for (chip of filterChips; track chip) {
+              </div>
+
+              <div class="planner-toolbar-panel">
+                <div class="planner-toolbar-panel__dropdown">
                   <button
                     type="button"
-                    class="chip"
-                    [class.chip--active]="activeChip() === chip"
-                    [class.chip--text-only]="chip === 'Svi'"
-                    (click)="setActiveChip(chip)"
+                    class="planner-toolbar-panel__control"
+                    [class.planner-toolbar-panel__control--open]="isDropdownOpen('range')"
+                    (click)="toggleDropdown('range'); $event.stopPropagation()"
                   >
-                    @if (chip !== 'Svi') {
-                      <span class="chip__icon" aria-hidden="true">
-                        @switch (chip) {
-                          @case ('Koncerti') {
-                            <svg viewBox="0 0 24 24">
-                              <path d="M15 5v9.2a2.8 2.8 0 1 1-1.5-2.48V7.4l6-1.6v7.4a2.8 2.8 0 1 1-1.5-2.48V4z" />
-                            </svg>
-                          }
-                          @case ('Kultura') {
-                            <svg viewBox="0 0 24 24">
-                              <path d="M4 20h16" />
-                              <path d="M6 20V10h12v10" />
-                              <path d="M3 10h18" />
-                              <path d="M12 4 3 8v2h18V8z" />
-                              <path d="M9 13v4" />
-                              <path d="M15 13v4" />
-                            </svg>
-                          }
-                          @case ('Sport') {
-                            <svg viewBox="0 0 24 24">
-                              <circle cx="12" cy="12" r="8" />
-                              <path d="M12 4a12 12 0 0 1 3.6 8A12 12 0 0 1 12 20a12 12 0 0 1-3.6-8A12 12 0 0 1 12 4Z" />
-                              <path d="M4.9 9.2h14.2" />
-                              <path d="M4.9 14.8h14.2" />
-                            </svg>
-                          }
-                          @case ('Festival') {
-                            <svg viewBox="0 0 24 24">
-                              <path d="m12 4 2.1 4.3 4.8.7-3.4 3.3.8 4.7L12 14.7 7.7 17l.8-4.7L5.1 9l4.8-.7Z" />
-                            </svg>
-                          }
-                          @case ('Hrana i piće') {
-                            <svg viewBox="0 0 24 24">
-                              <path d="M7 4v7" />
-                              <path d="M10 4v7" />
-                              <path d="M7 7h3" />
-                              <path d="M8.5 11v9" />
-                              <path d="M15 4v7" />
-                              <path d="M18 4v16" />
-                              <path d="M15 11c1.7 0 3-1.3 3-3V4" />
-                            </svg>
-                          }
-                          @case ('Za decu') {
-                            <svg viewBox="0 0 24 24">
-                              <circle cx="12" cy="12" r="8" />
-                              <path d="M9 10h.01" />
-                              <path d="M15 10h.01" />
-                              <path d="M9 14c.9 1 1.9 1.5 3 1.5s2.1-.5 3-1.5" />
-                            </svg>
-                          }
-                        }
-                      </span>
-                    }
-                    <span class="chip__label">{{ chip }}</span>
+                    <span class="planner-toolbar-panel__icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24">
+                        <rect x="4" y="5" width="16" height="15" rx="2" />
+                        <path d="M8 3v4" />
+                        <path d="M16 3v4" />
+                        <path d="M4 10h16" />
+                      </svg>
+                    </span>
+                    <span class="planner-toolbar-panel__value">{{ selectedRangeLabel() }}</span>
+                    <span class="planner-toolbar-panel__chevron" aria-hidden="true">
+                      <svg viewBox="0 0 16 16">
+                        <path d="M4 6.5 8 10l4-3.5" />
+                      </svg>
+                    </span>
                   </button>
-                }
 
-                <button type="button" class="chip chip--cta" (click)="openEvents()">
-                  <span>+</span>
-                  <span>Dodaj event</span>
-                </button>
+                  @if (isDropdownOpen('range')) {
+                    <div class="planner-toolbar-panel__menu" (click)="$event.stopPropagation()">
+                      @for (option of rangeOptions; track option.value) {
+                        <button
+                          type="button"
+                          class="planner-toolbar-panel__option"
+                          [class.planner-toolbar-panel__option--active]="selectedRangeDays() === option.value"
+                          (click)="updateRangeDays(option.value.toString())"
+                        >
+                          {{ option.label }}
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
               </div>
-            }
+
+              <div class="planner-toolbar-panel">
+                <div class="planner-toolbar-panel__dropdown">
+                  <button
+                    type="button"
+                    class="planner-toolbar-panel__control"
+                    [class.planner-toolbar-panel__control--open]="isDropdownOpen('cards')"
+                    (click)="toggleDropdown('cards'); $event.stopPropagation()"
+                  >
+                    <span class="planner-toolbar-panel__icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24">
+                        <rect x="4" y="5" width="16" height="14" rx="2" />
+                        <path d="M9 9h6" />
+                        <path d="M9 13h6" />
+                        <path d="M7 9h.01" />
+                        <path d="M7 13h.01" />
+                      </svg>
+                    </span>
+                    <span class="planner-toolbar-panel__value">{{ selectedCardsPerPageLabel() }}</span>
+                    <span class="planner-toolbar-panel__chevron" aria-hidden="true">
+                      <svg viewBox="0 0 16 16">
+                        <path d="M4 6.5 8 10l4-3.5" />
+                      </svg>
+                    </span>
+                  </button>
+
+                  @if (isDropdownOpen('cards')) {
+                    <div class="planner-toolbar-panel__menu" (click)="$event.stopPropagation()">
+                      @for (option of cardsPerPageOptions; track option.value) {
+                        <button
+                          type="button"
+                          class="planner-toolbar-panel__option"
+                          [class.planner-toolbar-panel__option--active]="cardsPerPage() === option.value"
+                          (click)="updateCardsPerPage(option.value.toString())"
+                        >
+                          {{ option.label }}
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
           </div>
 
           <div class="event-list">
@@ -320,11 +289,36 @@
                         (click)="openEventDetails(event.id)"
                       >
                         <span>Detalji</span>
-                        <span aria-hidden="true">→</span>
                       </button>
                     </div>
                   </div>
                 </article>
+              }
+
+              @if (totalPages() > 1) {
+                <nav class="planner-pagination" aria-label="Paginacija događaja">
+                  <button
+                    type="button"
+                    class="planner-pagination__button"
+                    [disabled]="currentPage() <= 1"
+                    (click)="previousPage()"
+                  >
+                    Prethodna
+                  </button>
+
+                  <span class="planner-pagination__status">
+                    Strana {{ currentPage() }} od {{ totalPages() }}
+                  </span>
+
+                  <button
+                    type="button"
+                    class="planner-pagination__button"
+                    [disabled]="currentPage() >= totalPages()"
+                    (click)="nextPage()"
+                  >
+                    Sledeća
+                  </button>
+                </nav>
               }
             }
           </div>
@@ -518,23 +512,4 @@
     </div>
   </div>
 
-  @if (isMobileViewport()) {
-    <button type="button" class="planner-mobile-bar" (click)="setMobileTab(activeMobileTab === 'planner' ? 'events' : 'planner')">
-      <span class="planner-mobile-bar__content">
-        <span class="planner-mobile-bar__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <rect x="4" y="5" width="16" height="15" rx="2" />
-            <path d="M8 3v4" />
-            <path d="M16 3v4" />
-            <path d="M4 10h16" />
-          </svg>
-        </span>
-        <span class="planner-mobile-bar__label">Moj planer</span>
-        <span class="planner-mobile-bar__badge">{{ plannerCount() }}</span>
-      </span>
-      <span class="planner-mobile-bar__chevron" [class.planner-mobile-bar__chevron--open]="activeMobileTab === 'planner'" aria-hidden="true">⌃</span>
-    </button>
-
-    <button type="button" class="planner-mobile-fab" aria-label="Dodaj event" (click)="openEvents()">+</button>
-  }
 </main>
