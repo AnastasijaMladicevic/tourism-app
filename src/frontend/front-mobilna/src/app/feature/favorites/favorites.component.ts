@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { catchError, finalize, forkJoin, map, of, switchMap } from 'rxjs';
 import { environment } from '../../../environment/environment';
 import { ActivityDto, ActivityService } from '../../services/activity';
@@ -18,6 +18,7 @@ type FavoriteSortOption = 'newest' | 'title';
 interface FavoriteCard {
   id: number;
   title: string;
+  categoryKey: string;
   categoryLabel: string;
   location: string;
   note: string;
@@ -34,18 +35,29 @@ interface FavoriteCard {
 
 interface FavoriteChip {
   label: string;
+  value: string;
   count: number;
 }
 
 interface FavoriteBreakdownItem {
+  key: FavoriteKind;
   label: string;
   count: number;
+  icon: string;
+}
+
+interface FavoriteCollectionItem {
+  value: string;
+  label: string;
+  count: number;
+  icon: string;
+  tone: 'blue' | 'amber' | 'green' | 'violet';
 }
 
 @Component({
   selector: 'app-favorites',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatIcon],
+  imports: [CommonModule, MatIcon],
   templateUrl: './favorites.component.html',
   styleUrl: './favorites.component.scss',
 })
@@ -55,6 +67,8 @@ export class FavoritesComponent implements OnInit {
     activity: '/assets/lovcen7.jpg',
     object: '/assets/sveti-stefan-4.jpg',
   } as const;
+  private readonly mobilePageSizeOptions = [3, 5] as const;
+  private readonly desktopPageSizeOptions = [6, 9, 12] as const;
   private readonly favoriteService = inject(FavoriteService);
   private readonly translationService = inject(TranslationService);
   private readonly destinationService = inject(DestinationService);
@@ -71,9 +85,19 @@ export class FavoritesComponent implements OnInit {
   protected readonly pendingRemovalFavorite = signal<FavoriteCard | null>(null);
   protected readonly searchTerm = signal('');
   protected readonly sortOption = signal<FavoriteSortOption>('newest');
+  protected readonly activeFilter = signal('all');
+  protected readonly currentPage = signal(1);
+  protected readonly pageSize = signal(5);
+  protected readonly isDesktopViewport = signal(this.readIsDesktopViewport());
+  protected readonly showAllCollections = signal(false);
+  protected readonly isPageSizeMenuOpen = signal(false);
+  protected readonly pageSizeOptions = computed(() =>
+    this.isDesktopViewport() ? this.desktopPageSizeOptions : this.mobilePageSizeOptions,
+  );
 
   protected readonly displayedFavorites = computed(() => {
     const normalizedSearch = this.searchTerm().trim().toLowerCase();
+    const activeFilter = this.activeFilter();
     const sorted = [...this.favorites()].sort((left, right) => {
       if (this.sortOption() === 'title') {
         return left.title.localeCompare(right.title);
@@ -82,26 +106,47 @@ export class FavoritesComponent implements OnInit {
       return right.createdAtTimestamp - left.createdAtTimestamp;
     });
 
-    if (!normalizedSearch) {
-      return sorted;
-    }
-
-    return sorted.filter((item) => item.searchText.includes(normalizedSearch));
+    return sorted.filter((item) => {
+      const matchesSearch = !normalizedSearch || item.searchText.includes(normalizedSearch);
+      const matchesFilter = this.matchesActiveFilter(item, activeFilter);
+      return matchesSearch && matchesFilter;
+    });
   });
 
   protected readonly locationCount = computed(() => this.displayedFavorites().length);
 
-  protected readonly categoryChips = computed<FavoriteChip[]>(() => {
-    const counts = new Map<string, number>();
+  protected readonly filterChips = computed<FavoriteChip[]>(() => {
+    const counts = new Map<string, FavoriteChip>();
 
     for (const favorite of this.favorites()) {
-      counts.set(favorite.categoryLabel, (counts.get(favorite.categoryLabel) ?? 0) + 1);
+      const existing = counts.get(favorite.categoryKey);
+
+      if (existing) {
+        existing.count += 1;
+        continue;
+      }
+
+      counts.set(favorite.categoryKey, {
+        label: favorite.categoryLabel,
+        value: favorite.categoryKey,
+        count: 1,
+      });
     }
 
-    return [...counts.entries()]
-      .sort((left, right) => right[1] - left[1])
-      .slice(0, 4)
-      .map(([label, count]) => ({ label, count }));
+    return [
+      {
+        label: this.translate('common.all'),
+        value: 'all',
+        count: this.favorites().length,
+      },
+      ...[...counts.values()].sort((left, right) => {
+        if (right.count !== left.count) {
+          return right.count - left.count;
+        }
+
+        return left.label.localeCompare(right.label);
+      }),
+    ];
   });
 
   protected readonly savedBreakdown = computed<FavoriteBreakdownItem[]>(() => {
@@ -118,17 +163,63 @@ export class FavoritesComponent implements OnInit {
       counts[favorite.kind] += 1;
     }
 
-    return [
-      { label: this.translate('favorites.breakdown.destination'), count: counts.destination },
-      { label: this.translate('favorites.breakdown.object'), count: counts.object },
-      { label: this.translate('favorites.breakdown.activity'), count: counts.activity },
-      { label: this.translate('favorites.breakdown.locality'), count: counts.locality },
-      { label: this.translate('favorites.breakdown.route'), count: counts.route },
-    ].filter((item) => item.count > 0);
+    const rows: FavoriteBreakdownItem[] = [
+      {
+        key: 'destination',
+        label: this.translate('favorites.breakdown.destination'),
+        count: counts.destination,
+        icon: 'travel_explore',
+      },
+      {
+        key: 'object',
+        label: this.translate('favorites.breakdown.object'),
+        count: counts.object,
+        icon: 'apartment',
+      },
+      {
+        key: 'locality',
+        label: this.translate('favorites.breakdown.locality'),
+        count: counts.locality,
+        icon: 'place',
+      },
+      {
+        key: 'activity',
+        label: this.translate('favorites.breakdown.activity'),
+        count: counts.activity,
+        icon: 'directions_run',
+      },
+    ];
+
+    return rows;
   });
 
-  protected readonly latestSavedItem = computed(() => {
-    return [...this.favorites()].sort((left, right) => right.createdAtTimestamp - left.createdAtTimestamp)[0] ?? null;
+  protected readonly collectionItems = computed<FavoriteCollectionItem[]>(() =>
+    this.savedBreakdown().map((item, index) => ({
+        value: `kind:${item.key}`,
+        label: item.label,
+        count: item.count,
+        icon: item.icon,
+        tone: this.resolveCollectionTone(index),
+      })),
+  );
+
+  protected readonly visibleCollectionItems = computed<FavoriteCollectionItem[]>(() => {
+    return this.collectionItems();
+  });
+
+  protected readonly hasMoreCollectionItems = computed(
+    () => false,
+  );
+
+  protected readonly totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.displayedFavorites().length / this.pageSize())),
+  );
+
+  protected readonly visibleFavorites = computed(() => {
+    const page = Math.min(this.currentPage(), this.totalPages());
+    const currentPageSize = this.pageSize();
+    const startIndex = (page - 1) * currentPageSize;
+    return this.displayedFavorites().slice(startIndex, startIndex + currentPageSize);
   });
 
   protected readonly sortLabel = computed(() =>
@@ -143,6 +234,7 @@ export class FavoritesComponent implements OnInit {
   );
 
   ngOnInit(): void {
+    this.syncViewportPageSize();
     this.loadFavorites();
   }
 
@@ -155,19 +247,101 @@ export class FavoritesComponent implements OnInit {
   }
 
   protected trackBreakdown(_: number, item: FavoriteBreakdownItem): string {
-    return item.label;
+    return item.key;
+  }
+
+  protected trackCollection(_: number, item: FavoriteCollectionItem): string {
+    return item.value;
   }
 
   protected trackChip(_: number, item: FavoriteChip): string {
-    return item.label;
+    return item.value;
+  }
+
+  @HostListener('document:click', ['$event'])
+  protected onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement | null;
+
+    if (!target?.closest('.favorites-page-size')) {
+      this.isPageSizeMenuOpen.set(false);
+    }
+  }
+
+  @HostListener('window:resize')
+  protected onWindowResize(): void {
+    this.syncViewportPageSize();
   }
 
   protected updateSearchTerm(value: string): void {
     this.searchTerm.set(value);
+    this.resetPagination();
+  }
+
+  protected setActiveFilter(value: string, event?: Event): void {
+    const target = event?.currentTarget as HTMLElement | null;
+    const shouldPreserveScroll =
+      target?.classList.contains('favorites-mobile-collection-card') ||
+      target?.classList.contains('collection-row');
+    const scrollY =
+      shouldPreserveScroll && typeof window !== 'undefined' ? window.scrollY : null;
+
+    event?.preventDefault();
+    event?.stopPropagation();
+    target?.blur();
+    this.activeFilter.set(value);
+    this.resetPagination();
+
+    if (scrollY != null && typeof window !== 'undefined') {
+      queueMicrotask(() => {
+        window.scrollTo({ top: scrollY, behavior: 'auto' });
+      });
+    }
   }
 
   protected toggleSort(): void {
     this.sortOption.update((current) => (current === 'newest' ? 'title' : 'newest'));
+    this.resetPagination();
+  }
+
+  protected previousPage(): void {
+    this.currentPage.update((page) => Math.max(1, page - 1));
+  }
+
+  protected nextPage(): void {
+    this.currentPage.update((page) => Math.min(this.totalPages(), page + 1));
+  }
+
+  protected togglePageSizeMenu(event: Event): void {
+    event.stopPropagation();
+    this.isPageSizeMenuOpen.update((current) => !current);
+  }
+
+  protected updatePageSize(size: number): void {
+    this.pageSize.set(size);
+    this.resetPagination();
+    this.isPageSizeMenuOpen.set(false);
+  }
+
+  protected collectionCountLabel(count: number): string {
+    return count === 1
+      ? this.translate('favorites.collectionItemCountOne')
+      : this.translate('favorites.collectionItemCountMany', { count });
+  }
+
+  protected pageSizeLabel(size: number): string {
+    const key = this.usesSerbianCardPlural(size)
+      ? 'favorites.pageSizeLabelFew'
+      : 'favorites.pageSizeLabelMany';
+
+    return this.translate(key, { count: size });
+  }
+
+  protected toggleCollectionsExpanded(): void {
+    if (!this.hasMoreCollectionItems()) {
+      return;
+    }
+
+    this.showAllCollections.update((current) => !current);
   }
 
   protected requestRemoveFavorite(card: FavoriteCard, event: Event): void {
@@ -206,6 +380,8 @@ export class FavoritesComponent implements OnInit {
     }
 
     this.favorites.set(nextFavorites);
+    this.ensureActiveFilterIsValid(nextFavorites);
+    this.ensureCurrentPageIsValid(nextFavorites);
     this.profileStatsCache.write({ favorites: nextFavorites.length });
     this.removingFavoriteId.set(favoriteId);
     this.errorMessage.set('');
@@ -216,6 +392,8 @@ export class FavoritesComponent implements OnInit {
       .pipe(
         catchError(() => {
           this.favorites.set(previousFavorites);
+          this.ensureActiveFilterIsValid(previousFavorites);
+          this.ensureCurrentPageIsValid(previousFavorites);
           this.errorMessage.set(this.translate('favorites.removeError'));
           return of(false);
         }),
@@ -261,6 +439,8 @@ export class FavoritesComponent implements OnInit {
       .subscribe((items) => {
         const nextItems = items.filter(Boolean);
         this.favorites.set(nextItems);
+        this.ensureActiveFilterIsValid(nextItems);
+        this.ensureCurrentPageIsValid(nextItems);
         this.profileStatsCache.write({ favorites: nextItems.length });
       });
   }
@@ -303,10 +483,11 @@ export class FavoritesComponent implements OnInit {
 
   private mapDestinationFavorite(item: FavoriteDto, destination?: DestinationDto): FavoriteCard {
     const title =
-      destination?.displayTitle?.trim() ||
       destination?.name?.trim() ||
+      destination?.displayTitle?.trim() ||
       item.destinationName ||
       this.translationService.translate('favorites.fallbackTitle', { id: item.id });
+    const displaySubtitle = destination?.displayTitle?.trim();
     const location = this.buildLocation(destination?.name, destination?.regionName);
     const categoryLabel =
       destination?.destinationTypeName || this.translate('favorites.type.destination');
@@ -314,9 +495,14 @@ export class FavoritesComponent implements OnInit {
     return this.createCard({
       id: item.id,
       title,
+      categoryKey: this.buildCategoryKey(categoryLabel, 'destination'),
       categoryLabel,
       location,
-      quote: this.translate('favorites.fallbackQuote'),
+      quote: this.resolveDescriptionQuote(
+        title,
+        displaySubtitle,
+        destination?.description,
+      ),
       note: this.buildRelativeNote(item.createdAt),
       imageUrl: this.resolveDestinationImage(destination),
       canOpenDetails: Boolean(destination?.id),
@@ -343,11 +529,14 @@ export class FavoritesComponent implements OnInit {
     return this.createCard({
       id: item.id,
       title,
+      categoryKey: this.buildCategoryKey(categoryLabel, 'activity'),
       categoryLabel,
       location,
-      quote: activity?.durationMinutes
-        ? this.translate('favorites.activityDurationQuote', { count: activity.durationMinutes })
-        : this.translate('favorites.fallbackQuote'),
+      quote:
+        this.pickDescriptionQuote(title, activity?.description) ||
+        (activity?.durationMinutes
+          ? this.translate('favorites.activityDurationQuote', { count: activity.durationMinutes })
+          : this.translate('favorites.fallbackQuote')),
       note: this.buildRelativeNote(item.createdAt),
       imageUrl: this.resolveMediaUrl(activity?.mainImageUrl) || this.defaultImages.activity,
       canOpenDetails: Boolean(activity?.id),
@@ -372,11 +561,13 @@ export class FavoritesComponent implements OnInit {
     return this.createCard({
       id: item.id,
       title,
+      categoryKey: this.buildCategoryKey(categoryLabel, 'object'),
       categoryLabel,
       location,
-      quote: objectItem?.cuisineType?.trim()
-        ? objectItem.cuisineType
-        : this.translate('favorites.fallbackQuote'),
+      quote:
+        this.pickDescriptionQuote(title, objectItem?.description) ||
+        objectItem?.cuisineType?.trim() ||
+        this.translate('favorites.fallbackQuote'),
       note: this.buildRelativeNote(item.createdAt),
       imageUrl: this.resolveObjectImage(objectItem),
       canOpenDetails: Boolean(objectItem?.id),
@@ -399,9 +590,10 @@ export class FavoritesComponent implements OnInit {
     return this.createCard({
       id: item.id,
       title,
+      categoryKey: this.buildCategoryKey(categoryLabel, 'locality'),
       categoryLabel,
       location,
-      quote: this.translate('favorites.fallbackQuote'),
+      quote: this.resolveDescriptionQuote(title, locality?.description),
       note: this.buildRelativeNote(item.createdAt),
       imageUrl: this.resolveMediaUrl(locality?.mainImageUrl) || this.defaultImages.standard,
       canOpenDetails: Boolean(locality?.id),
@@ -418,6 +610,7 @@ export class FavoritesComponent implements OnInit {
     return this.createCard({
       id: item.id,
       title,
+      categoryKey: this.buildCategoryKey(this.translate('favorites.routeLabel'), 'route'),
       categoryLabel: this.translate('favorites.routeLabel'),
       location: this.translate('favorites.routeLocation'),
       quote: this.translate('favorites.routeQuote'),
@@ -433,6 +626,7 @@ export class FavoritesComponent implements OnInit {
     return this.createCard({
       id: item.id,
       title: this.translationService.translate('favorites.fallbackTitle', { id: item.id }),
+      categoryKey: this.buildCategoryKey(this.translate('favorites.savedItemLabel'), 'other'),
       categoryLabel: this.translate('favorites.savedItemLabel'),
       location: this.translate('favorites.locationFallback'),
       quote: this.translate('favorites.fallbackQuote'),
@@ -447,6 +641,7 @@ export class FavoritesComponent implements OnInit {
   private createCard(card: {
     id: number;
     title: string;
+    categoryKey: string;
     categoryLabel: string;
     location: string;
     note: string;
@@ -539,5 +734,146 @@ export class FavoritesComponent implements OnInit {
       month: 'short',
       year: 'numeric',
     });
+  }
+
+  private resolveDescriptionQuote(
+    title: string,
+    ...candidates: Array<string | undefined>
+  ): string {
+    return this.pickDescriptionQuote(title, ...candidates) || this.translate('favorites.fallbackQuote');
+  }
+
+  private pickDescriptionQuote(
+    title: string,
+    ...candidates: Array<string | undefined>
+  ): string | undefined {
+    for (const candidate of candidates) {
+      const normalized = candidate?.trim();
+      if (!normalized) {
+        continue;
+      }
+
+      if (normalized !== title) {
+        return normalized;
+      }
+    }
+
+    return undefined;
+  }
+
+  private buildCategoryKey(label: string, kind: FavoriteKind): string {
+    const normalized = label
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+    return normalized || kind;
+  }
+
+  private ensureActiveFilterIsValid(items: FavoriteCard[]): void {
+    const currentFilter = this.activeFilter();
+
+    if (currentFilter === 'all') {
+      return;
+    }
+
+    const hasActiveFilter = items.some((item) => this.matchesActiveFilter(item, currentFilter));
+
+    if (!hasActiveFilter) {
+      this.activeFilter.set('all');
+    }
+
+    if (items.length <= 4 && this.showAllCollections()) {
+      this.showAllCollections.set(false);
+    }
+  }
+
+  private ensureCurrentPageIsValid(items: FavoriteCard[]): void {
+    const normalizedSearch = this.searchTerm().trim().toLowerCase();
+    const activeFilter = this.activeFilter();
+    const sorted = [...items].sort((left, right) => {
+      if (this.sortOption() === 'title') {
+        return left.title.localeCompare(right.title);
+      }
+
+      return right.createdAtTimestamp - left.createdAtTimestamp;
+    });
+
+    const filtered = sorted.filter((item) => {
+      const matchesSearch = !normalizedSearch || item.searchText.includes(normalizedSearch);
+      const matchesFilter = this.matchesActiveFilter(item, activeFilter);
+      return matchesSearch && matchesFilter;
+    });
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / this.pageSize()));
+    if (this.currentPage() > totalPages) {
+      this.currentPage.set(totalPages);
+    }
+  }
+
+  private resetPagination(): void {
+    this.currentPage.set(1);
+  }
+
+  private readIsDesktopViewport(): boolean {
+    return typeof window !== 'undefined' && window.innerWidth >= 768;
+  }
+
+  private syncViewportPageSize(): void {
+    const isDesktopViewport = this.readIsDesktopViewport();
+    const validOptions = isDesktopViewport ? this.desktopPageSizeOptions : this.mobilePageSizeOptions;
+
+    this.isDesktopViewport.set(isDesktopViewport);
+    this.isPageSizeMenuOpen.set(false);
+
+    if (!(validOptions as readonly number[]).includes(this.pageSize())) {
+      this.pageSize.set(validOptions[0]);
+      this.resetPagination();
+    }
+  }
+
+  private matchesActiveFilter(item: FavoriteCard, activeFilter: string): boolean {
+    if (activeFilter === 'all') {
+      return true;
+    }
+
+    if (activeFilter.startsWith('kind:')) {
+      return item.kind === activeFilter.slice(5);
+    }
+
+    return item.categoryKey === activeFilter;
+  }
+
+  private resolveCollectionIcon(label: string): string {
+    const normalized = label.trim().toLowerCase();
+
+    if (normalized.includes('hotel')) return 'hotel';
+    if (normalized.includes('restoran')) return 'restaurant';
+    if (normalized.includes('bar')) return 'local_bar';
+    if (normalized.includes('grad')) return 'location_city';
+    if (normalized.includes('destin')) return 'travel_explore';
+    if (normalized.includes('objek')) return 'apartment';
+    if (normalized.includes('aktiv')) return 'hiking';
+    if (normalized.includes('rout') || normalized.includes('ruta')) return 'route';
+
+    return 'bookmark';
+  }
+
+  private resolveCollectionTone(index: number): FavoriteCollectionItem['tone'] {
+    const tones: FavoriteCollectionItem['tone'][] = ['blue', 'amber', 'green', 'violet'];
+    return tones[index % tones.length];
+  }
+
+  private usesSerbianCardPlural(count: number): boolean {
+    if (this.translationService.language() !== 'sr') {
+      return false;
+    }
+
+    const lastDigit = count % 10;
+    const lastTwoDigits = count % 100;
+    return lastDigit >= 2 && lastDigit <= 4 && (lastTwoDigits < 12 || lastTwoDigits > 14);
   }
 }

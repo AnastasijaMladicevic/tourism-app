@@ -599,6 +599,26 @@
     "openDetails": "Abrir detalles",
     "smartRoutes": "Sugerencias inteligentes y vista del dia",
     "summaryTitle": "Resumen de favoritos",
+    "collectionsTitle": "Tus colecciones",
+    "collectionsLink": "Ver todas las colecciones",
+    "collectionsLinkShort": "Ver todo",
+    "collectionsCollapseLink": "Mostrar menos colecciones",
+    "collectionItemCountOne": "1 elemento",
+    "collectionItemCountMany": "{{count}} elementos",
+    "pageSizeAria": "Numero de tarjetas por pagina",
+    "pageSizeLabelFew": "{{count}} tarjetas",
+    "pageSizeLabelMany": "{{count}} tarjetas",
+    "paginationAria": "Paginacion de favoritos",
+    "actionsTitle": "Que puedes hacer?",
+    "actionPlannerTitle": "Agregar al planificador",
+    "actionPlannerBody": "Convierte favoritos en tu plan de viaje.",
+    "actionMapTitle": "Abrir en el mapa",
+    "actionMapBody": "Mira lugares guardados segun su ubicacion.",
+    "actionShareTitle": "Compartir con amigos",
+    "actionShareBody": "Envia ideas favoritas directamente desde tu perfil.",
+    "tipTitle": "Consejo",
+    "tipBody": "Empieza con algunos lugares guardados y arma rapido tu proxima escapada, paseo o plan de fin de semana.",
+    "showMore": "Mostrar mas favoritos",
     "searchPlaceholder": "Busca lugares guardados...",
     "goToPlanner": "Ir al planificador",
     "readyBody": "Convierte tus favoritos en un plan real del dia y un horario de eventos.",
@@ -1089,7 +1109,49 @@
     "removeFromPlanner": "Eliminar del planificador",
     "notifications": "Notificaciones",
     "tripTitleFallback": "Tu plan de viaje",
-    "tripWeekSuffix": "Semana de {{name}}"
+    "tripWeekSuffix": "Semana de {{name}}",
+    "preview": {
+      "mobileTabs": {
+        "events": "Eventos",
+        "myPlanner": "Mi planificador"
+      },
+      "searchPlaceholder": "Buscar eventos",
+      "allCategories": "Todas las categorias",
+      "dateFilterAll": "Fecha",
+      "range7": "7 dias",
+      "range14": "14 dias",
+      "range30": "Mes",
+      "cardsPerPageFew": "{{count}} tarjetas",
+      "cardsPerPageMany": "{{count}} tarjetas",
+      "eventsLoading": "Cargando eventos...",
+      "eventsLoadError": "Error al cargar los eventos.",
+      "emptyBody": "Agrega un evento al planificador y su tarjeta aparecera aqui.",
+      "editAria": "Editar en el planificador",
+      "paginationAria": "Paginacion de eventos",
+      "highlightsTitle": "Eventos destacados",
+      "highlightsEmpty": "Todavia no hay eventos destacados en el planificador.",
+      "myPlannerTitle": "Mi planificador",
+      "loadingPlanner": "Cargando planificador...",
+      "eventTypeFallback": "Evento",
+      "eventTitleFallback": "El nombre del evento no esta disponible",
+      "locationFallback": "Ubicacion no especificada",
+      "dateAtTime": "{{date}} a las {{time}}",
+      "upcomingSubtitle": "Proximo {{day}} a las {{time}}",
+      "priority": {
+        "must": "Imprescindible",
+        "maybe": "Quizas",
+        "later": "Si hay tiempo"
+      },
+      "category": {
+        "foodDrinks": "Comida y bebida",
+        "forKids": "Para ninos",
+        "concerts": "Conciertos",
+        "festival": "Festival",
+        "sport": "Deporte",
+        "culture": "Cultura",
+        "other": "Otros"
+      }
+    }
   },
   "addToPlanner": {
     "termsLink": "Terminos del servicio",
@@ -1122,7 +1184,9 @@
     "notesPlaceholder": "Por ejemplo: lleva camara, llega 15 minutos antes...",
     "title": "Agregar evento al planificador",
     "togglePriority": "Cambiar prioridad",
-    "save": "Guardar en el planificador"
+    "save": "Guardar en el planificador",
+    "saveChanges": "Guardar cambios",
+    "lockedHint": "Este evento solo puede planificarse dentro de su fecha y duracion originales."
   },
   "destination": {
     "title": "Destino",

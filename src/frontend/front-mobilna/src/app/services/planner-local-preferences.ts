@@ -59,11 +59,12 @@ export class PlannerLocalPreferencesService {
     fallbackEnd?: string | null,
   ): PlannerResolvedSchedule {
     const preference = this.findByPlannerId(plannerId);
+    const fallbackDurationMinutes = this.resolveDurationMinutes(fallbackStart, fallbackEnd);
 
     if (preference) {
       const startDate = this.mergeDateAndTime(preference.plannedDate, preference.startTime);
       const safeStartDate = this.isValidDate(startDate) ? startDate : this.parseDate(fallbackStart);
-      const durationMinutes = this.normalizeDuration(preference.durationMinutes);
+      const durationMinutes = fallbackDurationMinutes ?? this.normalizeDuration(preference.durationMinutes);
 
       return {
         startDate: safeStartDate,
@@ -75,11 +76,8 @@ export class PlannerLocalPreferencesService {
     }
 
     const startDate = this.parseDate(fallbackStart);
-    const endDate = fallbackEnd ? this.parseDate(fallbackEnd) : this.addMinutes(startDate, 90);
-    const durationMinutes = Math.max(
-      30,
-      Math.round((endDate.getTime() - startDate.getTime()) / 60000) || 90,
-    );
+    const durationMinutes = fallbackDurationMinutes ?? 90;
+    const endDate = this.addMinutes(startDate, durationMinutes);
 
     return {
       startDate,
@@ -135,6 +133,27 @@ export class PlannerLocalPreferencesService {
     }
 
     return normalized;
+  }
+
+  private resolveDurationMinutes(
+    fallbackStart: string,
+    fallbackEnd?: string | null,
+  ): number | null {
+    const startDate = this.parseDate(fallbackStart);
+    if (!fallbackEnd) {
+      return null;
+    }
+
+    const endDate = this.parseDate(fallbackEnd);
+    const anchoredEndDate = new Date(startDate);
+    anchoredEndDate.setHours(endDate.getHours(), endDate.getMinutes(), 0, 0);
+
+    if (anchoredEndDate <= startDate) {
+      anchoredEndDate.setDate(anchoredEndDate.getDate() + 1);
+    }
+
+    const durationMinutes = Math.round((anchoredEndDate.getTime() - startDate.getTime()) / 60000);
+    return this.normalizeDuration(durationMinutes);
   }
 
   private isValidDate(date: Date): boolean {

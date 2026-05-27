@@ -1,48 +1,20 @@
 <div class="favorites-page">
   <div class="favorites-stage">
     <header class="favorites-mobile-topbar">
-      <a class="favorites-icon-btn" routerLink="/profile" [attr.aria-label]="translate('common.back')">
-        <svg viewBox="0 0 24 24">
-          <path d="m15 18-6-6 6-6" />
-        </svg>
-      </a>
-
-      <h1>{{ translate('favorites.screenTitle') }}</h1>
-
-      <a
-        class="favorites-icon-btn"
-        href="#favorites-search"
-        [attr.aria-label]="translate('favorites.searchPlaceholder')"
-      >
-        <svg viewBox="0 0 24 24">
-          <circle cx="11" cy="11" r="6.5" />
-          <path d="m16 16 4 4" />
-        </svg>
-      </a>
-    </header>
-
-    <header class="favorites-desktop-toolbar">
-      <label class="search-field search-field--desktop">
-        <span class="search-field__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="6.5" />
-            <path d="m16 16 4 4" />
-          </svg>
-        </span>
-        <input
-          id="favorites-search-desktop"
-          type="search"
-          [placeholder]="translate('favorites.searchPlaceholder')"
-          [value]="searchTerm()"
-          (input)="updateSearchTerm(($any($event.target)).value)"
-        />
-      </label>
+      <h1 class="favorites-mobile-topbar__title">{{ translate('favorites.screenTitle') }}</h1>
     </header>
 
     <section class="favorites-content-shell">
       <main class="favorites-main">
-        <section class="favorites-mobile-search-wrap">
-          <label class="search-field search-field--mobile">
+        <section class="favorites-intro">
+          <div class="favorites-intro__copy">
+            <h1>{{ translate('favorites.screenTitle') }}</h1>
+            <p>{{ translate('favorites.heroBody') }}</p>
+          </div>
+        </section>
+
+        <section class="favorites-toolbar">
+          <label class="search-field">
             <span class="search-field__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24">
                 <circle cx="11" cy="11" r="6.5" />
@@ -58,47 +30,81 @@
             />
           </label>
 
-          @if (categoryChips().length) {
-            <div class="favorites-chip-row" [attr.aria-label]="translate('favorites.summaryTitle')">
-              <span class="favorites-chip favorites-chip--primary">{{ translate('favorites.allSaved') }}</span>
-              @for (chip of categoryChips(); track trackChip($index, chip)) {
-                <span class="favorites-chip">{{ chip.label }}</span>
+          <div class="favorites-toolbar__filters">
+            @if (filterChips().length) {
+              <div class="favorites-filter-row" [attr.aria-label]="translate('favorites.summaryTitle')">
+                @for (chip of filterChips(); track trackChip($index, chip)) {
+                  <button
+                    type="button"
+                    class="favorites-chip"
+                    [class.favorites-chip--active]="activeFilter() === chip.value"
+                    (click)="setActiveFilter(chip.value, $event)"
+                  >
+                    <span>{{ chip.label }}</span>
+                  </button>
+                }
+              </div>
+            }
+
+            <div class="favorites-page-size">
+              <button
+                type="button"
+                class="favorites-page-size__trigger"
+                (click)="togglePageSizeMenu($event)"
+                [attr.aria-label]="translate('favorites.pageSizeAria')"
+                [attr.aria-expanded]="isPageSizeMenuOpen()"
+              >
+                <span class="favorites-page-size__summary">
+                  <span class="favorites-page-size__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <rect x="4" y="6" width="16" height="12" rx="2" />
+                      <path d="M8 10h8" />
+                      <path d="M8 14h5" />
+                    </svg>
+                  </span>
+                  <span>{{ pageSizeLabel(pageSize()) }}</span>
+                </span>
+                <svg viewBox="0 0 20 20" aria-hidden="true">
+                  <path d="m5 7 5 6 5-6" />
+                </svg>
+              </button>
+
+              @if (isPageSizeMenuOpen()) {
+                <div class="favorites-page-size__menu">
+                  @for (size of pageSizeOptions(); track size) {
+                    <button
+                      type="button"
+                      class="favorites-page-size__item"
+                      [class.favorites-page-size__item--active]="pageSize() === size"
+                      (click)="updatePageSize(size)"
+                    >
+                      {{ pageSizeLabel(size) }}
+                    </button>
+                  }
+                </div>
               }
             </div>
-          }
-        </section>
-
-        <!-- Hero sekcija sa opisom uklonjena — ne prikazujemo opis niti sort dugme ovde -->
-        <!--
-        <section class="favorites-hero">
-          <div class="favorites-hero__copy">
-            <span class="favorites-hero__eyebrow">{{ translate('favorites.screenTitle') }}</span>
-            <h2>{{ translate('favorites.heroTitleModern') }}</h2>
-            <p>{{ translate('favorites.heroBodyModern') }}</p>
           </div>
 
-          <div class="favorites-hero__controls">
-            <button type="button" class="sort-btn" (click)="toggleSort()">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M8 7h10M8 12h7M8 17h4" />
-                <path d="m5 6-2 2 2 2" />
+          <button type="button" class="favorites-mobile-sort" (click)="toggleSort()">
+            <span class="favorites-mobile-sort__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <rect x="4" y="5" width="16" height="15" rx="2" />
+                <path d="M8 3v4" />
+                <path d="M16 3v4" />
+                <path d="M4 10h16" />
               </svg>
-              <span>{{ sortLabel() }}</span>
-            </button>
-          </div>
+            </span>
+            <span class="favorites-mobile-sort__label">
+              {{ sortOption() === 'newest' ? translate('favorites.sortDateAdded') : translate('favorites.sortName') }}
+            </span>
+            <span class="favorites-mobile-sort__chevron" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </span>
+          </button>
         </section>
-        -->
-
-        <!-- Planer baner (mobilni) uklonjen — plavi pozivni blok sklonjen -->
-        <!--
-        <a class="planner-banner planner-banner--mobile" routerLink="/planner">
-          <div>
-            <strong>{{ translate('favorites.plannerBannerTitle') }}</strong>
-            <p>{{ translate('favorites.plannerBannerBody') }}</p>
-          </div>
-          <span>{{ translate('favorites.goToPlanner') }}</span>
-        </a>
-        -->
 
         <div class="favorites-status-row">
           <span>{{ savedCountLabel() }}</span>
@@ -116,7 +122,7 @@
           </article>
         } @else if (displayedFavorites().length) {
           <div class="favorites-grid">
-            @for (item of displayedFavorites(); track trackFavorite($index, item)) {
+            @for (item of visibleFavorites(); track trackFavorite($index, item)) {
               <article
                 class="favorite-card"
                 [class.favorite-card--clickable]="item.canOpenDetails"
@@ -130,9 +136,11 @@
                   [attr.aria-label]="translate('common.remove')"
                 >
                   <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path
-                      d="M12 20.2 4.95 13.2a4.94 4.94 0 0 1 0-7 4.95 4.95 0 0 1 7 0L12 7.25l.05-.05a4.95 4.95 0 0 1 7 7z"
-                    />
+                    <path d="M4 7h16" />
+                    <path d="M9 7V4h6v3" />
+                    <path d="M8 7v13h8V7" />
+                    <path d="M10.5 11v5" />
+                    <path d="M13.5 11v5" />
                   </svg>
                 </button>
 
@@ -140,76 +148,75 @@
                   <img [src]="item.imageUrl" [alt]="item.title" />
                   <div class="favorite-card__chips">
                     <span class="card-chip">{{ item.categoryLabel }}</span>
-                    @if (item.rating && item.rating >= 4.8) {
-                      <span class="card-chip">{{ translate('favorites.mustSee') }}</span>
-                    }
                   </div>
                 </div>
 
                 <div class="favorite-card__content">
-                  <div class="favorite-card__heading">
-                    <h3>{{ item.title }}</h3>
-
-                    @if (item.canOpenDetails) {
-                      <span class="favorite-card__arrow" aria-hidden="true">
-                        <svg viewBox="0 0 24 24">
-                          <path d="m9 6 6 6-6 6" />
-                        </svg>
-                      </span>
-                    }
+                  <div class="favorite-card__top">
+                    <div class="favorite-card__heading">
+                      <h3>{{ item.title }}</h3>
+                    </div>
                   </div>
+
+                  <p class="favorite-card__subtitle">{{ item.quote }}</p>
 
                   <p class="favorite-card__location">
                     <mat-icon>place</mat-icon>
                     <span>{{ item.location }}</span>
                   </p>
 
-                  
-                </div>
-                <div class="favorite-card__meta">
-                    @if (item.rating) {
-                      <span class="favorite-card__rating">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                          <path
-                            d="m12 3.9 2.47 5 5.53.8-4 3.9.94 5.5L12 16.5l-4.94 2.6.94-5.5-4-3.9 5.53-.8z"
-                          />
-                        </svg>
-                        <strong>{{ item.rating.toFixed(1) }}</strong>
-                        @if (item.reviewCount) {
-                          <span>({{ item.reviewCount }} {{ translate('common.reviews') }})</span>
-                        }
-                      </span>
+                  <div class="favorite-card__footer">
+                    <p class="favorite-card__location favorite-card__location--footer">
+                      <mat-icon>place</mat-icon>
+                      <span>{{ item.location }}</span>
+                    </p>
+
+                    <span class="favorite-card__action-badge">
+                      {{ item.rating && item.rating >= 4.8 ? translate('favorites.mustSee') : item.categoryLabel }}
+                    </span>
+
+                    @if (item.canOpenDetails) {
+                      <button
+                        type="button"
+                        class="card-action-btn"
+                        (click)="openFavoriteAction(item, $event)"
+                      >
+                        <span>{{ translate('common.details') }}</span>
+                      </button>
                     } @else {
-                      <span class="favorite-card__meta-tag">{{ item.categoryLabel }}</span>
+                      <span class="favorite-card__helper">{{ translate('favorites.plannerEventsOnly') }}</span>
                     }
-
-                    <span class="favorite-card__saved">{{ item.note }}</span>
                   </div>
-                <div class="favorite-card__footer">
-                  @if (item.canOpenDetails) {
-                    <button
-                      type="button"
-                      class="card-action-btn"
-                      (click)="openFavoriteAction(item, $event)"
-                    >
-                      <span>{{ translate('favorites.openDetails') }}</span>
-                    </button>
-                  } @else {
-                    <span class="favorite-card__helper">{{ translate('favorites.plannerEventsOnly') }}</span>
-                  }
-
-                  <button
-                    type="button"
-                    class="remove-text-btn"
-                    [disabled]="removingFavoriteId() === item.id"
-                    (click)="requestRemoveFavorite(item, $event)"
-                  >
-                    {{ removingFavoriteId() === item.id ? translate('favorites.removing') : translate('common.remove') }}
-                  </button>
                 </div>
               </article>
             }
           </div>
+
+          @if (totalPages() > 1) {
+            <nav class="favorites-pagination" [attr.aria-label]="translate('favorites.paginationAria')">
+              <button
+                type="button"
+                class="favorites-pagination__button"
+                [disabled]="currentPage() <= 1"
+                (click)="previousPage()"
+              >
+                {{ translate('common.prev') }}
+              </button>
+
+              <span class="favorites-pagination__status">
+                {{ translate('common.pageOf', { current: currentPage(), total: totalPages() }) }}
+              </span>
+
+              <button
+                type="button"
+                class="favorites-pagination__button"
+                [disabled]="currentPage() >= totalPages()"
+                (click)="nextPage()"
+              >
+                {{ translate('common.next') }}
+              </button>
+            </nav>
+          }
 
           <footer class="favorites-footer-note">
             {{ translate('favorites.footerShowingAll', { count: displayedFavorites().length }) }}
@@ -220,66 +227,79 @@
             <p>{{ translate('favorites.emptyBodyModern') }}</p>
           </article>
         }
+
+        <section class="favorites-mobile-section favorites-mobile-collections">
+          <div class="favorites-mobile-section__head">
+            <h2>{{ translate('favorites.collectionsTitle') }}</h2>
+            <button type="button" class="favorites-mobile-section__link">{{ translate('favorites.collectionsLinkShort') }}</button>
+          </div>
+
+          <div class="favorites-mobile-collections__grid">
+            @for (item of collectionItems().slice(0, 4); track trackCollection($index, item)) {
+              <button
+                type="button"
+                class="favorites-mobile-collection-card"
+                (click)="setActiveFilter(item.value, $event)"
+              >
+                <span class="favorites-mobile-collection-card__icon" [attr.data-tone]="item.tone">
+                  <mat-icon>{{ item.icon }}</mat-icon>
+                </span>
+
+                <span class="favorites-mobile-collection-card__copy">
+                  <strong>{{ item.label }}</strong>
+                  <small>{{ collectionCountLabel(item.count) }}</small>
+                </span>
+
+                <mat-icon class="favorites-mobile-collection-card__arrow">chevron_right</mat-icon>
+              </button>
+            }
+          </div>
+        </section>
+
       </main>
 
       <aside class="favorites-panel">
-        <!-- Planer baner (desktop aside) uklonjen — plavi pozivni blok sklonjen -->
-        <!--
-        <a class="planner-banner planner-banner--desktop" routerLink="/planner">
-          <strong>{{ translate('favorites.readyTitle') }}</strong>
-          <p>{{ translate('favorites.readyBody') }}</p>
-
-          <div class="planner-banner__feature">
-            <span aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <path d="M12 3 4 7v5c0 5 3.4 9.6 8 11 4.6-1.4 8-6 8-11V7z" />
-                <path d="m9.5 12 1.8 1.8 3.7-3.8" />
-              </svg>
-            </span>
-            <span>{{ translate('favorites.smartRoutes') }}</span>
-          </div>
-
-          <span class="planner-banner__cta">{{ translate('favorites.goToPlanner') }}</span>
-        </a>
-        -->
-
         <section class="panel-card">
           <div class="panel-card__head">
-            <h3>{{ translate('favorites.summaryTitle') }}</h3>
-            <span>{{ favorites().length }} {{ translate('common.total') }}</span>
+            <h3>{{ translate('favorites.collectionsTitle') }}</h3>
           </div>
 
-          @if (savedBreakdown().length) {
-            <div class="summary-list">
-              @for (item of savedBreakdown(); track trackBreakdown($index, item)) {
-                <div class="summary-row">
-                  <span>{{ item.label }}</span>
-                  <strong>{{ item.count }}</strong>
-                </div>
+          @if (collectionItems().length) {
+            <div class="collection-list">
+              @for (item of visibleCollectionItems(); track trackCollection($index, item)) {
+                <button
+                  type="button"
+                  class="collection-row"
+                  (click)="setActiveFilter(item.value, $event)"
+                >
+                  <span class="collection-row__icon" [attr.data-tone]="item.tone">
+                    <mat-icon>{{ item.icon }}</mat-icon>
+                  </span>
+
+                  <span class="collection-row__copy">
+                    <strong>{{ item.label }}</strong>
+                    <small>{{ collectionCountLabel(item.count) }}</small>
+                  </span>
+
+                  <mat-icon class="collection-row__arrow">chevron_right</mat-icon>
+                </button>
               }
             </div>
+
+            @if (hasMoreCollectionItems()) {
+              <button
+                type="button"
+                class="panel-card__link panel-card__link--button"
+                (click)="toggleCollectionsExpanded()"
+              >
+                {{ showAllCollections() ? translate('favorites.collectionsCollapseLink') : translate('favorites.collectionsLink') }}
+              </button>
+            }
           } @else {
             <p class="panel-empty">{{ translate('favorites.panelEmpty') }}</p>
           }
         </section>
 
-        <section class="panel-card">
-          <div class="panel-card__head">
-            <h3>{{ translate('favorites.recentTitle') }}</h3>
-            <span>{{ sortLabel() }}</span>
-          </div>
-
-          @if (latestSavedItem(); as latest) {
-            <div class="panel-recent">
-              <strong>{{ latest.title }}</strong>
-              <span>{{ latest.categoryLabel }}</span>
-              <p class="panel-note">{{ latest.location }}</p>
-              <p class="panel-note panel-note--muted">{{ latest.note }}</p>
-            </div>
-          } @else {
-            <p class="panel-note">{{ translate('favorites.latestEmpty') }}</p>
-          }
-        </section>
       </aside>
     </section>
   </div>

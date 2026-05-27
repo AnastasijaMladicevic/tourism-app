@@ -265,8 +265,8 @@
     -webkit-appearance: none;
     background: transparent !important;
     box-shadow: none !important;
-    color: var(--white);
-    color-scheme: normal;
+    color: var(--text-dark);
+    color-scheme: light;
   }
 
   input[type='date']::-webkit-date-and-time-value,
@@ -276,14 +276,14 @@
   input[type='date']::-webkit-datetime-edit-month-field,
   input[type='date']::-webkit-datetime-edit-day-field,
   input[type='date']::-webkit-datetime-edit-year-field {
-    color: var(--white);
+    color: var(--text-dark);
     background: transparent !important;
     box-shadow: none !important;
   }
 
   input[type='date']::-webkit-calendar-picker-indicator {
     opacity: 0.9;
-    filter: invert(1) brightness(1.1);
+    filter: none;
   }
 
   strong {

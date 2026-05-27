@@ -250,6 +250,13 @@ export const routes: Routes = [
     loadComponent: () => import('./feature/events/events').then((m) => m.EventsComponent),
   },
   {
+    path: 'event-planner-preview',
+    loadComponent: () =>
+      import('./feature/event-planner-preview/event-planner-preview.component').then(
+        (m) => m.EventPlannerPreviewComponent,
+      ),
+  },
+  {
     path: 'settings',
     loadComponent: () => import('./feature/settings/settings').then((m) => m.SettingsComponent),
   },
@@ -312,7 +319,7 @@ export const routes: Routes = [
     path: 'planner',
     canActivate: [profileAuthGuard],
     loadComponent: () =>
-      import('./feature/planner/planner.component').then((m) => m.PlannerComponent),
+      import('./feature/planner-page/planner-page.component').then((m) => m.PlannerPageComponent),
   },
   {
     path: 'planner/add',

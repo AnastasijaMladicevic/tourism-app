@@ -6,7 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { catchError, finalize, forkJoin, of } from 'rxjs';
 import { environment } from '../../../environment/environment';
 import { EventDto, EventService } from '../../services/event';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { LazyBackgroundDirective } from '../../shared/directives/lazy-background.directive';
 import { LocationTrackingService } from '../../services/location-tracking';
 import { AuthService } from '../../services/auth';
@@ -52,6 +52,7 @@ export class EventsComponent implements OnInit {
   private readonly ngZone = inject(NgZone);
   private readonly eventService = inject(EventService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly locationTrackingService = inject(LocationTrackingService);
   private readonly authService = inject(AuthService);
   private readonly plannerService = inject(PlannerLocalPreferencesService);
@@ -134,6 +135,8 @@ export class EventsComponent implements OnInit {
       return;
     }
 
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+
     this.router.navigate(['/planner/add'], {
       state: {
         eventId: eventItem.id,
@@ -144,6 +147,7 @@ export class EventsComponent implements OnInit {
         type: eventItem.eventTypeName || 'Dogadjaj',
         imageUrl: eventItem.imageUrl,
         description: eventItem.description,
+        returnUrl: returnUrl && returnUrl.startsWith('/') ? returnUrl : undefined,
       }
     });
 

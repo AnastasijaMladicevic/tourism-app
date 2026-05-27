@@ -601,6 +601,26 @@
     "openDetails": "Open details",
     "smartRoutes": "Smart suggestions and day overview",
     "summaryTitle": "Favorites summary",
+    "collectionsTitle": "Your collections",
+    "collectionsLink": "View all collections",
+    "collectionsLinkShort": "See all",
+    "collectionsCollapseLink": "Show fewer collections",
+    "collectionItemCountOne": "1 item",
+    "collectionItemCountMany": "{{count}} items",
+    "pageSizeAria": "Number of cards per page",
+    "pageSizeLabelFew": "{{count}} cards",
+    "pageSizeLabelMany": "{{count}} cards",
+    "paginationAria": "Favorites pagination",
+    "actionsTitle": "What can you do?",
+    "actionPlannerTitle": "Add to planner",
+    "actionPlannerBody": "Turn favorites into your trip plan.",
+    "actionMapTitle": "Open on map",
+    "actionMapBody": "See saved places grouped by location.",
+    "actionShareTitle": "Share with friends",
+    "actionShareBody": "Send favorite ideas directly from your profile.",
+    "tipTitle": "Tip",
+    "tipBody": "Start with a few saved places and quickly shape your next getaway, walk, or weekend plan.",
+    "showMore": "Show more favorites",
     "searchPlaceholder": "Search saved places...",
     "goToPlanner": "Go to planner",
     "readyBody": "Turn open favorites into a real day plan and event schedule.",
@@ -1093,7 +1113,49 @@
     "removeFromPlanner": "Remove from planner",
     "notifications": "Notifications",
     "tripTitleFallback": "Your trip plan",
-    "tripWeekSuffix": "{{name}} week"
+    "tripWeekSuffix": "{{name}} week",
+    "preview": {
+      "mobileTabs": {
+        "events": "Events",
+        "myPlanner": "My planner"
+      },
+      "searchPlaceholder": "Search events",
+      "allCategories": "All categories",
+      "dateFilterAll": "Date",
+      "range7": "7 days",
+      "range14": "14 days",
+      "range30": "Month",
+      "cardsPerPageFew": "{{count}} cards",
+      "cardsPerPageMany": "{{count}} cards",
+      "eventsLoading": "Loading events...",
+      "eventsLoadError": "Error loading events.",
+      "emptyBody": "Add an event to the planner and its card will appear here.",
+      "editAria": "Edit in planner",
+      "paginationAria": "Events pagination",
+      "highlightsTitle": "Upcoming highlights",
+      "highlightsEmpty": "There are no highlighted planner events yet.",
+      "myPlannerTitle": "My planner",
+      "loadingPlanner": "Loading planner...",
+      "eventTypeFallback": "Event",
+      "eventTitleFallback": "Event name is not available",
+      "locationFallback": "Location not specified",
+      "dateAtTime": "{{date}} at {{time}}",
+      "upcomingSubtitle": "Next {{day}} at {{time}}",
+      "priority": {
+        "must": "Must",
+        "maybe": "Maybe",
+        "later": "If there is time"
+      },
+      "category": {
+        "foodDrinks": "Food and drinks",
+        "forKids": "For kids",
+        "concerts": "Concerts",
+        "festival": "Festival",
+        "sport": "Sport",
+        "culture": "Culture",
+        "other": "Other"
+      }
+    }
   },
   "addToPlanner": {
     "termsLink": "Terms of service",
@@ -1126,7 +1188,9 @@
     "notesPlaceholder": "For example: bring a camera, arrive 15 minutes early...",
     "title": "Add event to planner",
     "togglePriority": "Toggle priority",
-    "save": "Save to planner"
+    "save": "Save to planner",
+    "saveChanges": "Save changes",
+    "lockedHint": "This event can only be planned within its original date and duration."
   },
   "destination": {
     "title": "Destination",

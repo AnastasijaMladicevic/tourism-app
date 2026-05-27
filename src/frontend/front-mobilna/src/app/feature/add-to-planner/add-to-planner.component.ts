@@ -25,6 +25,7 @@ interface PlannerPreviewState {
   description?: string;
   startDate?: string;
   endDate?: string;
+  returnUrl?: string;
 }
 
 interface PlannerPreviewViewModel {
@@ -53,8 +54,6 @@ export class AddToPlannerComponent implements OnInit {
   protected readonly selectedDayId = signal('');
   protected readonly travelDate = signal('');
   protected readonly startTime = signal('19:00');
-  protected readonly notes = signal('');
-  protected readonly isPriority = signal(false);
   protected readonly isSaving = signal(false);
   protected readonly feedback = signal('');
   protected readonly existingPlannerItems = signal<EventPlannerDto[]>([]);
@@ -66,10 +65,13 @@ export class AddToPlannerComponent implements OnInit {
   protected readonly maxSelectableDate: string | null;
   protected readonly isEventScheduleLocked: boolean;
   protected readonly fixedDurationMinutes: number;
+  private readonly returnUrl: string | null;
   protected readonly isEditMode = signal(false);
   protected readonly editingPlannerId = signal<number | null>(null);
+  protected readonly selectedStartDateTime = computed(() => this.buildSelectedStartDate());
+  protected readonly selectedEndDateTime = computed(() => this.buildSelectedEndDate());
   protected readonly estimatedEndLabel = computed(() =>
-    this.formatTimeLabel(this.addMinutes(this.buildSelectedStartDate(), this.fixedDurationMinutes)),
+    this.formatTimeLabel(this.selectedEndDateTime()),
   );
   protected readonly durationLabel = computed(() => this.formatDuration(this.fixedDurationMinutes));
   protected readonly selectedDateLabel = computed(() => this.formatFriendlyDate(this.travelDate()));
@@ -104,6 +106,8 @@ export class AddToPlannerComponent implements OnInit {
     this.isEventScheduleLocked = !!(this.eventId && this.eventStartDate && this.eventEndDate);
     this.minSelectableDate = this.eventStartDate ? this.toDateInputValue(this.eventStartDate) : null;
     this.maxSelectableDate = this.eventEndDate ? this.toDateInputValue(this.eventEndDate) : null;
+    this.returnUrl =
+      typeof state.returnUrl === 'string' && state.returnUrl.startsWith('/') ? state.returnUrl : null;
 
     const initialDate = this.eventStartDate ?? new Date();
     this.travelDate.set(this.toDateInputValue(initialDate));
@@ -127,10 +131,14 @@ export class AddToPlannerComponent implements OnInit {
       this.isEditMode.set(true);
       this.editingPlannerId.set(state.plannerId);
 
-      this.travelDate.set(state.plannedDate);
-      this.startTime.set(state.startTime ?? '19:00');
-      this.notes.set(state.notes ?? '');
-      this.isPriority.set(state.isPriority ?? false);
+      if (typeof state.plannedDate === 'string' && state.plannedDate) {
+        this.travelDate.set(state.plannedDate);
+        this.selectedDayId.set(state.plannedDate);
+      }
+
+      if (typeof state.startTime === 'string' && state.startTime) {
+        this.startTime.set(state.startTime);
+      }
     }
     if (!this.eventId) {
       return;
@@ -162,10 +170,6 @@ export class AddToPlannerComponent implements OnInit {
     this.travelDate.set(day.isoDate);
   }
 
-  protected togglePriority(): void {
-    this.isPriority.update((value) => !value);
-  }
-
   protected onTravelDateChange(value: string): void {
     const nextValue = this.clampSelectableDate(value);
     this.travelDate.set(nextValue);
@@ -181,6 +185,10 @@ export class AddToPlannerComponent implements OnInit {
       return;
     }
 
+    if (this.conflictMessage()) {
+      return;
+    }
+
     this.isSaving.set(true);
     this.feedback.set('');
 
@@ -190,14 +198,14 @@ export class AddToPlannerComponent implements OnInit {
         plannerId: this.editingPlannerId()!,
         eventId: this.eventId,
         plannedDate: this.travelDate(),
-        startTime: this.toTimeInputValue(this.eventStartDate!),
+        startTime: this.startTime(),
         durationMinutes: this.fixedDurationMinutes,
-        notes: this.notes().trim(),
-        isPriority: this.isPriority(),
+        notes: '',
+        isPriority: false,
       });
 
       this.isSaving.set(false);
-      void this.router.navigate(['/planner']);
+      void this.navigateAfterSave();
       return;
     }
 
@@ -230,12 +238,20 @@ export class AddToPlannerComponent implements OnInit {
           plannedDate: this.travelDate(),
           startTime: this.startTime(),
           durationMinutes: this.fixedDurationMinutes,
-          notes: this.notes().trim(),
-          isPriority: this.isPriority(),
+          notes: '',
+          isPriority: false,
         });
 
-        void this.router.navigate(['/planner']);
+        void this.navigateAfterSave();
       });
+  }
+
+  private navigateAfterSave(): Promise<boolean> {
+    if (this.returnUrl) {
+      return this.router.navigateByUrl(this.returnUrl);
+    }
+
+    return this.router.navigate(['/planner']);
   }
 
   private buildConflictMessage(): string {
@@ -243,18 +259,13 @@ export class AddToPlannerComponent implements OnInit {
       return '';
     }
 
-    const selectedStart = this.buildSelectedStartDate();
-    const selectedEnd = this.addMinutes(selectedStart, this.fixedDurationMinutes);
+    const selectedStart = this.selectedStartDateTime();
+    const selectedEnd = this.selectedEndDateTime();
+    const editingPlannerId = this.editingPlannerId();
 
     const conflict = this.existingPlannerItems()
-      .map((item) => {
-        const resolved = this.plannerLocalPreferences.resolveSchedule(item.id, item.startDate, item.endDate);
-        return {
-          title: item.eventName,
-          startDate: resolved.startDate,
-          endDate: resolved.endDate,
-        };
-      })
+      .filter((item) => item.id !== editingPlannerId)
+      .map((item) => this.resolvePlannerItemInterval(item))
       .find((item) => selectedStart < item.endDate && selectedEnd > item.startDate);
 
     if (!conflict) {
@@ -268,7 +279,30 @@ export class AddToPlannerComponent implements OnInit {
   }
 
   private buildSelectedStartDate(): Date {
+    const selectedDate = this.travelDate();
+    if (!selectedDate) {
+      return this.eventStartDate ?? new Date();
+    }
+
+    const merged = this.mergeDateAndTime(selectedDate, this.startTime());
+    if (merged) {
+      return merged;
+    }
+
     return this.eventStartDate ?? new Date();
+  }
+
+  private buildSelectedEndDate(): Date {
+    const selectedStart = this.buildSelectedStartDate();
+    const endTimeSource = this.eventEndDate ?? this.addMinutes(selectedStart, this.fixedDurationMinutes);
+    const endDate = new Date(selectedStart);
+    endDate.setHours(endTimeSource.getHours(), endTimeSource.getMinutes(), 0, 0);
+
+    if (endDate <= selectedStart) {
+      endDate.setDate(endDate.getDate() + 1);
+    }
+
+    return endDate;
   }
 
   private parseDate(value?: string): Date | null {
@@ -315,6 +349,68 @@ export class AddToPlannerComponent implements OnInit {
     return this.toDateInputValue(parsed);
   }
 
+  private mergeDateAndTime(dateValue: string, timeValue: string): Date | null {
+    const parsedDate = this.parseDate(dateValue);
+    if (!parsedDate) {
+      return null;
+    }
+
+    const [hoursRaw, minutesRaw] = timeValue.split(':');
+    const hours = Number(hoursRaw);
+    const minutes = Number(minutesRaw);
+
+    if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+      return parsedDate;
+    }
+
+    const merged = new Date(parsedDate);
+    merged.setHours(hours, minutes, 0, 0);
+    return merged;
+  }
+
+  private resolvePlannerItemInterval(item: EventPlannerDto): {
+    title: string;
+    startDate: Date;
+    endDate: Date;
+  } {
+    const preference = this.plannerLocalPreferences.findByPlannerId(item.id);
+    const fallbackStartDate = this.parseDate(item.startDate) ?? new Date();
+    const intervalStart =
+      (preference
+        ? this.mergeDateAndTime(preference.plannedDate, preference.startTime)
+        : null) ?? fallbackStartDate;
+    const durationMinutes = this.resolveIntervalDurationMinutes(
+      item.startDate,
+      item.endDate,
+      preference?.durationMinutes,
+    );
+
+    return {
+      title: item.eventName,
+      startDate: intervalStart,
+      endDate: this.addMinutes(intervalStart, durationMinutes),
+    };
+  }
+
+  private resolveIntervalDurationMinutes(
+    startValue?: string | null,
+    endValue?: string | null,
+    fallbackMinutes?: number,
+  ): number {
+    const startDate = this.parseDate(startValue ?? undefined);
+    const endDate = this.parseDate(endValue ?? undefined);
+
+    if (startDate && endDate) {
+      return this.computeDurationMinutes(startDate, endDate);
+    }
+
+    if (typeof fallbackMinutes === 'number' && fallbackMinutes > 0) {
+      return fallbackMinutes;
+    }
+
+    return 90;
+  }
+
   private buildEventDays(startDate: Date, endDate: Date): PlannerCalendarDay[] {
     const days: PlannerCalendarDay[] = [];
     const cursor = this.startOfDay(startDate);
@@ -346,7 +442,14 @@ export class AddToPlannerComponent implements OnInit {
       return 90;
     }
 
-    const minutes = Math.round((endDate.getTime() - startDate.getTime()) / 60000);
+    const normalizedEndDate = new Date(startDate);
+    normalizedEndDate.setHours(endDate.getHours(), endDate.getMinutes(), 0, 0);
+
+    if (normalizedEndDate <= startDate) {
+      normalizedEndDate.setDate(normalizedEndDate.getDate() + 1);
+    }
+
+    const minutes = Math.round((normalizedEndDate.getTime() - startDate.getTime()) / 60000);
     return Math.max(30, minutes || 90);
   }
 
@@ -385,9 +488,9 @@ export class AddToPlannerComponent implements OnInit {
 
   private formatTimeLabel(date: Date): string {
     return new Intl.DateTimeFormat(this.translationService.currentLocale(), {
-      hour: 'numeric',
+      hour: '2-digit',
       minute: '2-digit',
-      hour12: true,
+      hour12: false,
     }).format(date);
   }
 

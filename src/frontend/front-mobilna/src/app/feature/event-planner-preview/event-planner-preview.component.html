@@ -1,0 +1,518 @@
+<main class="planner-preview">
+  <header class="planner-mobile-header">
+    <h1 class="planner-mobile-header__title">{{ translate('planner.title') }}</h1>
+  </header>
+
+  <div class="planner-preview__container">
+    <div class="planner-preview__hero">
+      <section class="hero-copy">
+        <h1>{{ translate('planner.title') }}</h1>
+      </section>
+    </div>
+
+    <div class="planner-preview__layout">
+      <section class="planner-preview__main">
+        @if (isMobileViewport()) {
+          <div class="planner-mobile-tabs">
+            <button
+              type="button"
+              class="planner-mobile-tabs__item"
+              [class.planner-mobile-tabs__item--active]="activeMobileTab === 'events'"
+              (click)="setMobileTab('events')"
+            >
+              <span class="planner-mobile-tabs__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <rect x="4" y="5" width="16" height="15" rx="2" />
+                  <path d="M8 3v4" />
+                  <path d="M16 3v4" />
+                  <path d="M4 10h16" />
+                </svg>
+              </span>
+              <span>{{ translate('planner.preview.mobileTabs.events') }}</span>
+            </button>
+
+            <button
+              type="button"
+              class="planner-mobile-tabs__item"
+              [class.planner-mobile-tabs__item--active]="activeMobileTab === 'planner'"
+              (click)="setMobileTab('planner')"
+            >
+              <span>{{ translate('planner.preview.mobileTabs.myPlanner') }}</span>
+              <span class="planner-mobile-tabs__badge">{{ plannerCount() }}</span>
+            </button>
+          </div>
+        }
+
+        @if (!isMobileViewport() || activeMobileTab === 'events') {
+          <div class="filters-card">
+            <div class="filters-row">
+              <label class="filter-control filter-control--search">
+                <span class="filter-control__icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path
+                      d="m21 19.59-4.69-4.69A7.92 7.92 0 0 0 18 10a8 8 0 1 0-8 8 7.92 7.92 0 0 0 4.9-1.69L19.59 21 21 19.59ZM4 10a6 6 0 1 1 6 6 6 6 0 0 1-6-6Z"
+                    />
+                  </svg>
+                </span>
+                <input
+                  type="text"
+                  [placeholder]="translate('planner.preview.searchPlaceholder')"
+                  [value]="searchTerm()"
+                  (input)="updateSearchTerm(($any($event.target).value ?? '').toString())"
+                />
+              </label>
+
+              <button
+                type="button"
+                class="planner-toolbar-add-button"
+                (click)="openEvents()"
+              >
+                {{ translate('planner.addEventCta') }}
+              </button>
+            </div>
+
+            <div class="planner-toolbar-panels">
+              <div class="planner-toolbar-panel">
+                <div class="planner-toolbar-panel__dropdown">
+                  <button
+                    type="button"
+                    class="planner-toolbar-panel__control"
+                    [class.planner-toolbar-panel__control--open]="isDropdownOpen('category')"
+                    (click)="toggleDropdown('category'); $event.stopPropagation()"
+                  >
+                    <span class="planner-toolbar-panel__icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24">
+                        <rect x="4" y="4" width="6" height="6" rx="1.2" />
+                        <rect x="14" y="4" width="6" height="6" rx="1.2" />
+                        <rect x="4" y="14" width="6" height="6" rx="1.2" />
+                        <rect x="14" y="14" width="6" height="6" rx="1.2" />
+                      </svg>
+                    </span>
+                    <span class="planner-toolbar-panel__value">{{ selectedCategoryLabel() }}</span>
+                    <span class="planner-toolbar-panel__chevron" aria-hidden="true">
+                      <svg viewBox="0 0 16 16">
+                        <path d="M4 6.5 8 10l4-3.5" />
+                      </svg>
+                    </span>
+                  </button>
+
+                  @if (isDropdownOpen('category')) {
+                    <div class="planner-toolbar-panel__menu" (click)="$event.stopPropagation()">
+                      @for (chip of filterChips(); track chip.value) {
+                        <button
+                          type="button"
+                          class="planner-toolbar-panel__option"
+                          [class.planner-toolbar-panel__option--active]="activeChip() === chip.value"
+                          (click)="updateCategoryFilter(chip.value)"
+                        >
+                          {{ chip.value === 'all' ? translate('planner.preview.allCategories') : chip.label }}
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div class="planner-toolbar-panel">
+                <div class="planner-toolbar-panel__dropdown">
+                  <button
+                    type="button"
+                    class="planner-toolbar-panel__control"
+                    [class.planner-toolbar-panel__control--open]="isDropdownOpen('range')"
+                    (click)="toggleDropdown('range'); $event.stopPropagation()"
+                  >
+                    <span class="planner-toolbar-panel__icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24">
+                        <rect x="4" y="5" width="16" height="15" rx="2" />
+                        <path d="M8 3v4" />
+                        <path d="M16 3v4" />
+                        <path d="M4 10h16" />
+                      </svg>
+                    </span>
+                    <span class="planner-toolbar-panel__value">{{ selectedRangeLabel() }}</span>
+                    <span class="planner-toolbar-panel__chevron" aria-hidden="true">
+                      <svg viewBox="0 0 16 16">
+                        <path d="M4 6.5 8 10l4-3.5" />
+                      </svg>
+                    </span>
+                  </button>
+
+                  @if (isDropdownOpen('range')) {
+                    <div class="planner-toolbar-panel__menu" (click)="$event.stopPropagation()">
+                      @for (option of rangeOptions(); track option.value) {
+                        <button
+                          type="button"
+                          class="planner-toolbar-panel__option"
+                          [class.planner-toolbar-panel__option--active]="selectedRangeDays() === option.value"
+                          (click)="updateRangeDays(option.value.toString())"
+                        >
+                          {{ option.label }}
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <div class="planner-toolbar-panel">
+                <div class="planner-toolbar-panel__dropdown">
+                  <button
+                    type="button"
+                    class="planner-toolbar-panel__control"
+                    [class.planner-toolbar-panel__control--open]="isDropdownOpen('cards')"
+                    (click)="toggleDropdown('cards'); $event.stopPropagation()"
+                  >
+                    <span class="planner-toolbar-panel__icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24">
+                        <rect x="4" y="5" width="16" height="14" rx="2" />
+                        <path d="M9 9h6" />
+                        <path d="M9 13h6" />
+                        <path d="M7 9h.01" />
+                        <path d="M7 13h.01" />
+                      </svg>
+                    </span>
+                    <span class="planner-toolbar-panel__value">{{ selectedCardsPerPageLabel() }}</span>
+                    <span class="planner-toolbar-panel__chevron" aria-hidden="true">
+                      <svg viewBox="0 0 16 16">
+                        <path d="M4 6.5 8 10l4-3.5" />
+                      </svg>
+                    </span>
+                  </button>
+
+                  @if (isDropdownOpen('cards')) {
+                    <div class="planner-toolbar-panel__menu" (click)="$event.stopPropagation()">
+                      @for (option of cardsPerPageOptions(); track option.value) {
+                        <button
+                          type="button"
+                          class="planner-toolbar-panel__option"
+                          [class.planner-toolbar-panel__option--active]="cardsPerPage() === option.value"
+                          (click)="updateCardsPerPage(option.value.toString())"
+                        >
+                          {{ option.label }}
+                        </button>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="event-list">
+            @if (isLoading()) {
+              <p class="event-list__state">{{ translate('planner.preview.eventsLoading') }}</p>
+            } @else if (hasError()) {
+              <p class="event-list__state">{{ translate('planner.preview.eventsLoadError') }}</p>
+            } @else if (!previewCards().length) {
+              <section class="preview-empty-state">
+                <strong>{{ translate('planner.emptyTitle') }}</strong>
+                <p>{{ translate('planner.preview.emptyBody') }}</p>
+                <button type="button" class="planner-cta-button preview-empty-state__button" (click)="openEvents()">
+                  <span>{{ translate('planner.addEventCta') }}</span>
+                </button>
+              </section>
+            } @else {
+              @for (event of previewCards(); track event.id) {
+                <article class="event-card">
+                  <div class="event-card__media">
+                    <img [src]="event.imageUrl" [alt]="event.title" />
+                  </div>
+
+                  <div class="event-card__date-box">
+                    <strong>{{ event.day }}</strong>
+                    <span>{{ event.month }}</span>
+                  </div>
+
+                  <div class="event-card__content">
+                    <div class="event-card__top">
+                      <div class="event-card__title-wrap">
+                        <h2>{{ event.title }}</h2>
+                      </div>
+
+                      <div class="event-card__actions">
+                        <button
+                          type="button"
+                          class="event-card__icon-btn"
+                          [attr.aria-label]="translate('planner.preview.editAria')"
+                          [disabled]="!event.isAdded"
+                          (click)="editPlannerEvent(event)"
+                        >
+                          <svg viewBox="0 0 24 24">
+                            <path d="m4 20 4.5-1 9.6-9.6a1.8 1.8 0 0 0 0-2.5l-1-1a1.8 1.8 0 0 0-2.5 0L5 15.5 4 20Z" />
+                          </svg>
+                        </button>
+
+                        <button
+                          type="button"
+                          class="event-card__icon-btn event-card__icon-btn--danger"
+                          [attr.aria-label]="translate('planner.removeFromPlanner')"
+                          [disabled]="!event.plannerId || removingPlannerId() === event.plannerId"
+                          (click)="event.plannerId && removeFromPlanner(event.plannerId)"
+                        >
+                          <svg viewBox="0 0 24 24">
+                            <path d="M4 7h16" />
+                            <path d="M9 7V4h6v3" />
+                            <path d="M8 7v13h8V7" />
+                            <path d="M10.5 11v5" />
+                            <path d="M13.5 11v5" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="event-card__meta">
+                      <span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M12 21s-6-4.35-6-10a6 6 0 1 1 12 0c0 5.65-6 10-6 10Z" />
+                          <circle cx="12" cy="11" r="2.5" />
+                        </svg>
+                        {{ event.location }}
+                      </span>
+
+                      <span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <circle cx="12" cy="12" r="8" />
+                          <path d="M12 8v4l3 2" />
+                        </svg>
+                        {{ event.compactDateLabel }}
+                      </span>
+                    </div>
+
+                    <div class="event-card__bottom">
+                      <span class="event-card__action-badge">{{ event.categoryChip }}</span>
+
+                      <button
+                        type="button"
+                        class="planner-add-button event-card__details-button"
+                        (click)="openEventDetails(event.id)"
+                      >
+                        <span>{{ translate('common.details') }}</span>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              }
+
+              @if (totalPages() > 1) {
+                <nav class="planner-pagination" [attr.aria-label]="translate('planner.preview.paginationAria')">
+                  <button
+                    type="button"
+                    class="planner-pagination__button"
+                    [disabled]="currentPage() <= 1"
+                    (click)="previousPage()"
+                  >
+                    {{ translate('common.prev') }}
+                  </button>
+
+                  <span class="planner-pagination__status">
+                    {{ translate('common.pageOf', { current: currentPage(), total: totalPages() }) }}
+                  </span>
+
+                  <button
+                    type="button"
+                    class="planner-pagination__button"
+                    [disabled]="currentPage() >= totalPages()"
+                    (click)="nextPage()"
+                  >
+                    {{ translate('common.next') }}
+                  </button>
+                </nav>
+              }
+            }
+          </div>
+
+          @if (isMobileViewport()) {
+            <section class="mobile-highlights-card">
+              <div class="mobile-highlights-card__header">
+                <span class="mobile-highlights-card__star" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 2 9.5 9H2l6 4.5L5.5 22 12 17.5 18.5 22 16 13.5 22 9h-7.5L12 2Z" />
+                  </svg>
+                </span>
+                <h3>{{ translate('planner.preview.highlightsTitle') }}</h3>
+              </div>
+
+              @if (mobileHighlights().length) {
+                <div class="mobile-highlights-card__list">
+                  @for (highlight of mobileHighlights(); track highlight.eventId) {
+                    <button
+                      type="button"
+                      class="mobile-highlight-row"
+                      (click)="openEventDetails(highlight.eventId)"
+                    >
+                      <img [src]="highlight.imageUrl" [alt]="highlight.title" />
+                      <div class="mobile-highlight-row__copy">
+                        <strong>{{ highlight.title }}</strong>
+                        <span>{{ highlight.subtitle }}</span>
+                      </div>
+                      <span class="mobile-highlight-row__chevron" aria-hidden="true">›</span>
+                    </button>
+                  }
+                </div>
+              } @else {
+                <p class="mobile-highlights-card__empty">{{ translate('planner.preview.highlightsEmpty') }}</p>
+              }
+            </section>
+          }
+        }
+
+        @if (isMobileViewport() && activeMobileTab === 'planner') {
+          <section class="planner-panel planner-panel--mobile">
+            <div class="planner-panel__header">
+              <div class="planner-panel__title">
+                <h2>{{ translate('planner.preview.myPlannerTitle') }}</h2>
+                <span class="planner-panel__count">{{ plannerCount() }}</span>
+              </div>
+            </div>
+
+            <div class="planner-groups">
+              @if (plannerLoading()) {
+                <p class="planner-panel__state">{{ translate('planner.preview.loadingPlanner') }}</p>
+              } @else if (plannerError()) {
+                <p class="planner-panel__state">{{ plannerError() }}</p>
+              } @else if (plannerGroups().length === 0) {
+                <p class="planner-panel__state">{{ translate('planner.emptyBody') }}</p>
+              } @else {
+                @for (group of plannerGroups(); track group.label) {
+                  <section class="planner-group">
+                    <div class="planner-group__label">{{ group.label }}</div>
+
+                    @for (event of group.items; track event.id) {
+                      <article class="planner-item">
+                        <div class="planner-item__time">
+                          <span class="planner-item__dot" aria-hidden="true"></span>
+                          <strong>{{ formatPlannerTime(event.sortDate) }}</strong>
+                        </div>
+
+                        <div class="planner-item__content">
+                          <h3>{{ event.title }}</h3>
+                          <p>{{ event.location }}</p>
+                          @if (shouldShowPriorityBadge(event.priority)) {
+                            <span [class]="getPriorityClass(event.priority)">{{ priorityLabel(event.priority) }}</span>
+                          }
+                        </div>
+
+                        <div class="planner-item__actions">
+                          <button
+                            type="button"
+                            class="icon-ghost-button icon-ghost-button--danger"
+                            [attr.aria-label]="translate('common.delete')"
+                            [disabled]="removingPlannerId() === event.id"
+                            (click)="removeFromPlanner(event.id)"
+                          >
+                            <svg viewBox="0 0 24 24">
+                              <path d="M4 7h16" />
+                              <path d="M9 7V4h6v3" />
+                              <path d="M8 7v13h8V7" />
+                              <path d="M10.5 11v5" />
+                              <path d="M13.5 11v5" />
+                            </svg>
+                          </button>
+                        </div>
+                      </article>
+                    }
+                  </section>
+                }
+              }
+            </div>
+          </section>
+        }
+      </section>
+
+      <aside class="planner-preview__sidebar">
+        <div class="planner-panel">
+          <div class="planner-panel__header">
+            <div class="planner-panel__title">
+              <h2>{{ translate('planner.preview.myPlannerTitle') }}</h2>
+              <span class="planner-panel__count">{{ plannerCount() }}</span>
+            </div>
+          </div>
+
+          <div class="planner-groups">
+            @if (plannerLoading()) {
+              <p class="planner-panel__state">{{ translate('planner.preview.loadingPlanner') }}</p>
+            } @else if (plannerError()) {
+              <p class="planner-panel__state">{{ plannerError() }}</p>
+            } @else if (plannerGroups().length === 0) {
+              <p class="planner-panel__state">{{ translate('planner.emptyBody') }}</p>
+            } @else {
+              @for (group of plannerGroups(); track group.label) {
+                <section class="planner-group">
+                  <div class="planner-group__label">{{ group.label }}</div>
+
+                  @for (event of group.items; track event.id) {
+                    <article class="planner-item">
+                      <div class="planner-item__time">
+                        <span class="planner-item__dot" aria-hidden="true"></span>
+                        <strong>{{ formatPlannerTime(event.sortDate) }}</strong>
+                      </div>
+
+                      <div class="planner-item__content">
+                        <h3>{{ event.title }}</h3>
+                        <p>{{ event.location }}</p>
+                        @if (shouldShowPriorityBadge(event.priority)) {
+                          <span [class]="getPriorityClass(event.priority)">{{ priorityLabel(event.priority) }}</span>
+                        }
+                      </div>
+
+                      <div class="planner-item__actions">
+                      <button
+                        type="button"
+                        class="icon-ghost-button icon-ghost-button--danger"
+                        [attr.aria-label]="translate('common.delete')"
+                        [disabled]="removingPlannerId() === event.id"
+                        (click)="removeFromPlanner(event.id)"
+                      >
+                        <svg viewBox="0 0 24 24">
+                          <path d="M4 7h16" />
+                          <path d="M9 7V4h6v3" />
+                          <path d="M8 7v13h8V7" />
+                            <path d="M10.5 11v5" />
+                            <path d="M13.5 11v5" />
+                          </svg>
+                        </button>
+                      </div>
+                    </article>
+                  }
+                </section>
+              }
+            }
+          </div>
+        </div>
+
+        <section class="upcoming-highlight-card">
+          <div class="upcoming-highlight-card__header">
+            <span class="upcoming-highlight-card__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 2 9.5 9H2l6 4.5L5.5 22 12 17.5 18.5 22 16 13.5 22 9h-7.5L12 2Z" />
+              </svg>
+            </span>
+            <h3>{{ translate('planner.preview.highlightsTitle') }}</h3>
+          </div>
+
+          @if (upcomingHighlights().length > 0) {
+            <div class="upcoming-highlight-card__list">
+              @for (highlight of upcomingHighlights(); track highlight.id) {
+                <button
+                  type="button"
+                  class="upcoming-highlight-row"
+                  (click)="openEventDetails(highlight.eventId)"
+                >
+                  <img [src]="highlight.imageUrl" [alt]="highlight.title" />
+                  <div class="upcoming-highlight-row__copy">
+                    <strong>{{ highlight.title }}</strong>
+                    <span>{{ highlight.subtitle }}</span>
+                  </div>
+                </button>
+              }
+            </div>
+          } @else {
+            <p class="upcoming-highlight-card__empty">{{ translate('planner.preview.highlightsEmpty') }}</p>
+          }
+        </section>
+      </aside>
+    </div>
+  </div>
+
+</main>
