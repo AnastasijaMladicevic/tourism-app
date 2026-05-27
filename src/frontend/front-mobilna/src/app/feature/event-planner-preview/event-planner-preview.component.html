@@ -389,7 +389,9 @@
                         <div class="planner-item__content">
                           <h3>{{ event.title }}</h3>
                           <p>{{ event.location }}</p>
-                          <span [class]="getPriorityClass(event.priority)">{{ priorityLabel(event.priority) }}</span>
+                          @if (shouldShowPriorityBadge(event.priority)) {
+                            <span [class]="getPriorityClass(event.priority)">{{ priorityLabel(event.priority) }}</span>
+                          }
                         </div>
 
                         <div class="planner-item__actions">
@@ -450,7 +452,9 @@
                       <div class="planner-item__content">
                         <h3>{{ event.title }}</h3>
                         <p>{{ event.location }}</p>
-                        <span [class]="getPriorityClass(event.priority)">{{ priorityLabel(event.priority) }}</span>
+                        @if (shouldShowPriorityBadge(event.priority)) {
+                          <span [class]="getPriorityClass(event.priority)">{{ priorityLabel(event.priority) }}</span>
+                        }
                       </div>
 
                       <div class="planner-item__actions">

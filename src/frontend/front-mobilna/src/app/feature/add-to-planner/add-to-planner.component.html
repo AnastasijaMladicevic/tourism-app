@@ -62,7 +62,7 @@
           </p>
         } @else if (isEventScheduleLocked) {
           <p class="support-hint">
-            Event moze da se planira samo u okviru svog datuma i originalnog trajanja.
+            {{ translate('addToPlanner.lockedHint') }}
           </p>
         }
 
@@ -137,39 +137,6 @@
           </div>
         </div>
 
-        <article class="priority-card">
-          <div class="priority-card__icon">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="m12 3.6 2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 16l-4.8 2.5.9-5.4-3.9-3.8 5.4-.8Z" />
-            </svg>
-          </div>
-
-          <div class="priority-card__copy">
-            <strong>{{ translate('addToPlanner.priorityTitle') }}</strong>
-            <p>{{ translate('addToPlanner.priorityBody') }}</p>
-          </div>
-
-          <button
-            type="button"
-            class="toggle-btn"
-            [class.toggle-btn--active]="isPriority()"
-            (click)="togglePriority()"
-            [attr.aria-label]="translate('addToPlanner.togglePriority')"
-          >
-            <span></span>
-          </button>
-        </article>
-
-        <label class="notes-field">
-          <span>{{ translate('addToPlanner.notesLabel') }}</span>
-          <textarea
-            rows="4"
-            [placeholder]="translate('addToPlanner.notesPlaceholder')"
-            [ngModel]="notes()"
-            (ngModelChange)="notes.set($event)"
-          ></textarea>
-        </label>
-
         @if (conflictMessage()) {
           <article class="warning-card">
             <div class="warning-card__icon">
@@ -188,12 +155,12 @@
         }
 
         <div class="schedule-actions">
-          <button type="button" class="save-btn" [disabled]="isSaving()" (click)="save()">
+          <button type="button" class="save-btn" [disabled]="isSaving() || !!conflictMessage()" (click)="save()">
             {{
               isSaving()
                 ? translate('addToPlanner.saving')
                 : (isEditMode()
-                    ? 'Sačuvaj izmene'
+                    ? translate('addToPlanner.saveChanges')
                     : translate('addToPlanner.save'))
             }}
           </button>

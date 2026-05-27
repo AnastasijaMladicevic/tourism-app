@@ -1188,7 +1188,9 @@
     "notesPlaceholder": "For example: bring a camera, arrive 15 minutes early...",
     "title": "Add event to planner",
     "togglePriority": "Toggle priority",
-    "save": "Save to planner"
+    "save": "Save to planner",
+    "saveChanges": "Save changes",
+    "lockedHint": "This event can only be planned within its original date and duration."
   },
   "destination": {
     "title": "Destination",

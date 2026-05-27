@@ -186,8 +186,8 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
 
   protected readonly plannedEvents = computed(() => {
     const sortedEvents = [...this.filteredPlannerEvents()].sort((left, right) => {
-      const leftDate = this.parseDate(left.startDate)?.getTime() ?? 0;
-      const rightDate = this.parseDate(right.startDate)?.getTime() ?? 0;
+      const leftDate = this.resolveEventSchedule(left).startDate?.getTime() ?? 0;
+      const rightDate = this.resolveEventSchedule(right).startDate?.getTime() ?? 0;
       return leftDate - rightDate;
     });
 
@@ -197,18 +197,18 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
         return true;
       }
 
-      const eventDate = this.parseDate(event.startDate);
+      const eventDate = this.resolveEventSchedule(event).startDate;
       return eventDate ? this.toDayKey(eventDate) === selectedDateKey : false;
     });
 
     const eventsForRange = mobileFilteredEvents.length ? mobileFilteredEvents : sortedEvents;
-    const datedEvents = eventsForRange.filter((event) => this.parseDate(event.startDate));
+    const datedEvents = eventsForRange.filter((event) => this.resolveEventSchedule(event).startDate);
 
     if (!datedEvents.length) {
       return eventsForRange;
     }
 
-    const firstEventDate = this.parseDate(datedEvents[0].startDate);
+    const firstEventDate = this.resolveEventSchedule(datedEvents[0]).startDate;
     if (!firstEventDate) {
       return eventsForRange;
     }
@@ -218,7 +218,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     rangeEnd.setDate(rangeEnd.getDate() + this.selectedRangeDays() - 1);
 
     const rangeFilteredEvents = eventsForRange.filter((event) => {
-      const eventDate = this.parseDate(event.startDate);
+      const eventDate = this.resolveEventSchedule(event).startDate;
       if (!eventDate) {
         return false;
       }
@@ -242,27 +242,31 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     const startIndex = (currentPage - 1) * this.cardsPerPage();
     const source = planned.slice(startIndex, startIndex + this.cardsPerPage());
 
-    return source.map((event) => ({
-      id: event.id,
-      eventId: event.id,
-      title: event.title,
-      location: event.location,
-      dateLabel: this.buildDateLabel(this.parseDate(event.startDate), this.parseDate(event.endDate)),
-      compactDateLabel: this.buildCompactDateLabel(
-        this.parseDate(event.startDate),
-        this.parseDate(event.endDate),
-      ),
-      day: this.buildEventDayLabel(event.startDate),
-      month: this.buildEventMonthLabel(event.startDate),
-      imageUrl: event.imageUrl,
-      categoryChip: this.translateCategoryKey(event.categoryKey),
-      isAdded: event.isAdded,
-      plannerId: event.plannerId,
-      startDate: event.startDate,
-      endDate: event.endDate,
-      eventTypeName: event.eventTypeName,
-      description: event.description,
-    }));
+    return source.map((event) => {
+      const resolvedSchedule = this.resolveEventSchedule(event);
+
+      return {
+        id: event.id,
+        eventId: event.id,
+        title: event.title,
+        location: event.location,
+        dateLabel: this.buildDateLabel(resolvedSchedule.startDate, resolvedSchedule.endDate),
+        compactDateLabel: this.buildCompactDateLabel(
+          resolvedSchedule.startDate,
+          resolvedSchedule.endDate,
+        ),
+        day: this.buildEventDayLabel(resolvedSchedule.startDate),
+        month: this.buildEventMonthLabel(resolvedSchedule.startDate),
+        imageUrl: event.imageUrl,
+        categoryChip: this.translateCategoryKey(event.categoryKey),
+        isAdded: event.isAdded,
+        plannerId: event.plannerId,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        eventTypeName: event.eventTypeName,
+        description: event.description,
+      };
+    });
   });
 
   protected readonly dateFilterOptions = computed<PreviewDateFilterOption[]>(() => {
@@ -506,6 +510,10 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const resolvedSchedule = event.startDate
+      ? this.plannerLocalPreferences.resolveSchedule(event.plannerId, event.startDate, event.endDate)
+      : null;
+
     void this.router.navigate(['/planner/add'], {
       state: {
         plannerId: event.plannerId,
@@ -517,6 +525,8 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
         type: event.eventTypeName || this.translate('planner.preview.eventTypeFallback'),
         imageUrl: event.imageUrl,
         description: event.description,
+        plannedDate: resolvedSchedule ? this.toDayKey(resolvedSchedule.startDate) : undefined,
+        startTime: resolvedSchedule ? this.toTimeValue(resolvedSchedule.startDate) : undefined,
         returnUrl: this.router.url,
       },
     });
@@ -629,6 +639,10 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
 
   protected priorityLabel(priority: PlannerPriorityKey): string {
     return this.translate(`planner.preview.priority.${priority}`);
+  }
+
+  protected shouldShowPriorityBadge(priority: PlannerPriorityKey): boolean {
+    return priority === 'must';
   }
 
   private initializeViewportWatcher(): void {
@@ -976,21 +990,39 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     return label.replace(/\s*-\s*/g, ' • ');
   }
 
-  private buildEventDayLabel(value?: string): string {
-    const date = this.parseDate(value);
+  private buildEventDayLabel(date: Date | null): string {
     return date
       ? date.toLocaleDateString(this.translationService.currentLocale(), { day: '2-digit' })
       : '--';
   }
 
-  private buildEventMonthLabel(value?: string): string {
-    const date = this.parseDate(value);
+  private buildEventMonthLabel(date: Date | null): string {
     return date
       ? date
           .toLocaleDateString(this.translationService.currentLocale(), { month: 'short' })
           .replace('.', '')
           .toUpperCase()
       : '--';
+  }
+
+  private resolveEventSchedule(event: PreviewEventItem): { startDate: Date | null; endDate: Date | null } {
+    if (event.plannerId && event.startDate) {
+      const resolved = this.plannerLocalPreferences.resolveSchedule(
+        event.plannerId,
+        event.startDate,
+        event.endDate,
+      );
+
+      return {
+        startDate: resolved.startDate,
+        endDate: resolved.endDate,
+      };
+    }
+
+    return {
+      startDate: this.parseDate(event.startDate),
+      endDate: this.parseDate(event.endDate),
+    };
   }
 
   private cardsPerPageLabel(count: number): string {
@@ -1027,6 +1059,12 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     const month = `${date.getMonth() + 1}`.padStart(2, '0');
     const day = `${date.getDate()}`.padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  private toTimeValue(date: Date): string {
+    const hours = `${date.getHours()}`.padStart(2, '0');
+    const minutes = `${date.getMinutes()}`.padStart(2, '0');
+    return `${hours}:${minutes}`;
   }
 
   private getStartOfDay(date: Date): Date {
