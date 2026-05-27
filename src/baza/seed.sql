@@ -33943,6 +33943,7 @@ SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
 FROM source s
 JOIN "Localities" l ON l."Name" = s."LocalityName";
 
+
 -- 16.2 SPAIN EXPANSION - OBJECTS, REVIEWS, ACTIVITIES
 WITH source("Name", "Description", "Address", "PhoneNumber", "Price", "ObjectTypeName", "LocalityName", "DestinationName", "CreatorEmail", "ManagerEmail", "Profile", "Lng", "Lat") AS (
     VALUES
@@ -34161,6 +34162,298 @@ ins_reviews_two AS (
 )
 SELECT 1;
 
+-- ============================================
+-- 16.3 ITALY EXPANSION - USERS, DESTINATIONS, LOCALITIES
+-- ============================================
+
+INSERT INTO "Users"
+("FirstName", "LastName", "DateOfBirth", "Email", "PasswordHash", "PhoneNumber", "Country", "Language", "IsVerified", "IsActive", "IsBlacklisted", "HasRequestedCreatorRole",
+ "RoleId", "ManagedDestinationId", "CreatedAt", "UpdatedAt", "ProfileImageUrl")
+VALUES
+('Paolo', 'Moretti', '1989-04-16', 'manager.bari@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000016', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Elena', 'Vitale', '1991-07-08', 'manager.palermo@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000017', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Nicolo', 'De Santis', '1988-10-21', 'manager.trieste@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000018', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Chiara', 'Mancini', '1992-02-11', 'manager.matera@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000019', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Davide', 'Leone', '1987-09-05', 'manager.sorrento@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000020', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Ilaria', 'Bruno', '1990-01-27', 'manager.lecce@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000021', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Giorgio', 'Marchetti', '1989-12-02', 'manager.parma@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000022', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png'),
+('Arianna', 'Piras', '1993-05-14', 'manager.sardinia@spirego.com', '$2y$11$7H.XPw9lUVO4vWdMPbPjeeuCoMPQerWAC.OXPjX8DNlxuvMFQptAS', '+390600000023', 'Italija', 'it', true, true, false, false,
+ (SELECT "Id" FROM "Roles" WHERE "Name" = 'Manager'), NULL, NOW(), NOW(), '/images/profiles/default_icon.png');
+
+INSERT INTO "Destinations"
+("Name", "DisplayTitle", "Description", "Geolocation", "Status", "IsActive", "DestinationTypeId", "RegionId", "CreatedByUserId", "ManagedByUserId", "CreatedAt", "UpdatedAt")
+VALUES
+('Bari', 'Stari grad, obala i ležerni jug Jadrana',
+ 'Bari spaja opušten ritam južne Italije, šetališta uz more i gustu mrežu kamenih ulica koje lako uvuku posetioca u svakodnevni gradski život.',
+ ST_SetSRID(ST_MakePoint(16.8719, 41.1171), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.bari@spirego.com'),
+ NOW(), NOW()),
+('Palermo', 'Pijace, palate i energija Sicilije',
+ 'Palermo je živ, slojevit i intenzivan grad u kome pijace, trgovi, more i istorijske palate stoje veoma blizu jedni drugima, pa svaki dan lako dobije drugačiji ritam.',
+ ST_SetSRID(ST_MakePoint(13.3613, 38.1157), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.palermo@spirego.com'),
+ NOW(), NOW()),
+('Trieste', 'More, trgovi i srednjoevropski tempo',
+ 'Trst ima mirniji gradski ritam, široke trgove otvorene prema moru i atmosferu koja jednako vuče na italijanski Mediteran i srednju Evropu.',
+ ST_SetSRID(ST_MakePoint(13.7768, 45.6495), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.trieste@spirego.com'),
+ NOW(), NOW()),
+('Matera', 'Kamene četvrti i sporiji jug',
+ 'Matera je destinacija za sporiji obilazak, duže poglede i hod kroz kamene četvrti koje ostavljaju osećaj istorije u svakom prolazu.',
+ ST_SetSRID(ST_MakePoint(16.6044, 40.6663), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.matera@spirego.com'),
+ NOW(), NOW()),
+('Sorrento', 'Litice, limuni i obala zaliva',
+ 'Sorento je lagana obalska baza za dane uz more, kratke vožnje čamcem i večeri sa pogledom ka Napuljskom zalivu.',
+ ST_SetSRID(ST_MakePoint(14.3758, 40.6263), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.sorrento@spirego.com'),
+ NOW(), NOW()),
+('Lecce', 'Barok, trgovi i toplina Salenta',
+ 'Leče ima svetlije kamene fasade, opušten gradski tempo i dovoljno trgova i pešačkih zona za duže šetnje bez žurbe.',
+ ST_SetSRID(ST_MakePoint(18.1718, 40.3515), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.lecce@spirego.com'),
+ NOW(), NOW()),
+('Parma', 'Gastronomija, muzika i uredan sever',
+ 'Parma dobro spaja hranu, kulturu i mirniji gradski ritam, pa odgovara i za kraći city break i za nekoliko dana sporijeg obilaska.',
+ ST_SetSRID(ST_MakePoint(10.3279, 44.8015), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.parma@spirego.com'),
+ NOW(), NOW()),
+('Sardinija', 'Uvale, vetar i razuđena ostrvska obala',
+ 'Sardinija nudi duge obale, kristalnu vodu, vetrovite tačke i dovoljno prostora za aktivniji odmor i sporije dane na moru.',
+ ST_SetSRID(ST_MakePoint(9.0129, 40.1209), 4326), 'Approved', true,
+ (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Ostrvo'),
+ (SELECT "Id" FROM "Regions" WHERE "Code" = 'IT'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.sardinia@spirego.com'),
+ NOW(), NOW());
+
+WITH italy_expansion_manager_assignments AS (
+    SELECT d."Id" AS destination_id, u."Id" AS manager_id
+    FROM (VALUES
+        ('Bari', 'manager.bari@spirego.com'),
+        ('Palermo', 'manager.palermo@spirego.com'),
+        ('Trieste', 'manager.trieste@spirego.com'),
+        ('Matera', 'manager.matera@spirego.com'),
+        ('Sorrento', 'manager.sorrento@spirego.com'),
+        ('Lecce', 'manager.lecce@spirego.com'),
+        ('Parma', 'manager.parma@spirego.com'),
+        ('Sardinija', 'manager.sardinia@spirego.com')
+    ) AS map(destination_name, manager_email)
+    JOIN "Destinations" d ON d."Name" = map.destination_name
+    JOIN "Users" u ON u."Email" = map.manager_email
+)
+UPDATE "Users" u
+SET "ManagedDestinationId" = m.destination_id
+FROM italy_expansion_manager_assignments m
+WHERE u."Id" = m.manager_id;
+
+INSERT INTO "Localities"
+("Name", "Description", "Geolocation", "IsActive", "DestinationId", "LocalityTypeId", "CreatedByUserId", "CreatedAt")
+VALUES
+('Bari Vecchia', 'Najstariji deo Barija sa uskim ulicama, malim trgovima i osećajem svakodnevnog života koji se preliva iz kuća na ulicu.',
+ ST_SetSRID(ST_MakePoint(16.8727, 41.1282), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bari'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Stari Grad'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Lungomare Bari', 'Dugo gradsko šetalište uz more, pogodno za jutarnje šetnje, laganu vožnju bicikla i kraća zadržavanja uz obalu.',
+ ST_SetSRID(ST_MakePoint(16.8815, 41.1215), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bari'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Setaliste'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Basilica San Nicola Bari', 'Istorijska tačka Barija koja privlači posetioce arhitekturom, tišinom unutrašnjosti i položajem blizu starog jezgra.',
+ ST_SetSRID(ST_MakePoint(16.8719, 41.1295), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bari'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+
+('Quattro Canti Palermo', 'Prepoznatljiv gradski trg sa baroknim fasadama i stalnim osećajem kretanja kroz centar Palerma.',
+ ST_SetSRID(ST_MakePoint(13.3615, 38.1150), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Palermo'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Trg'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Mercato Ballaro Palermo', 'Živa pijaca i okolne ulice pune hrane, boja i glasova, sa atmosferom koja najbolje pokazuje energiju grada.',
+ ST_SetSRID(ST_MakePoint(13.3690, 38.1128), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Palermo'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Kulturna cetvrt'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Mondello Palermo', 'Gradska plaža Palerma sa svetlijim peskom, mirnijim morem i lakim prelazom iz grada na obalu.',
+ ST_SetSRID(ST_MakePoint(13.3256, 38.2000), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Palermo'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Plaza'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+
+('Piazza Unita Trieste', 'Veliki trg otvoren prema moru, sa elegantnim zgradama i ritmom koji spaja gradski centar i obalu.',
+ ST_SetSRID(ST_MakePoint(13.7681, 45.6498), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Trieste'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Trg'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Canal Grande Trieste', 'Kanal sa mostovima, kafićima i laganim gradskim koridorom za šetnju i fotografisanje.',
+ ST_SetSRID(ST_MakePoint(13.7725, 45.6533), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Trieste'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Setaliste'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Miramare Trieste', 'Dvorac i obala severno od centra sa lepim pogledima, parkom i osećajem izdvojene morske tačke.',
+ ST_SetSRID(ST_MakePoint(13.7113, 45.7025), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Trieste'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+
+('Sassi di Matera', 'Kamene četvrti Matere sa pećinskim prostorima, terasama i slojevima istorije koji traže sporiji obilazak.',
+ ST_SetSRID(ST_MakePoint(16.6073, 40.6678), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Matera'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Belvedere Murgia Matera', 'Vidikovac preko puta kamenih četvrti, poznat po širokom pogledu na grad i kanjon.',
+ ST_SetSRID(ST_MakePoint(16.6225, 40.6644), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Matera'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Vidikovac'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Piazza Duomo Matera', 'Trg u gornjem delu Matere, dobar za kraći predah, razgledanje i polazak ka različitim delovima grada.',
+ ST_SetSRID(ST_MakePoint(16.6092, 40.6680), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Matera'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Trg'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+
+('Marina Grande Sorrento', 'Manja marina Sorenta sa čamcima, restoranima i blagim prelazom iz centra grada prema vodi.',
+ ST_SetSRID(ST_MakePoint(14.3657, 40.6288), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sorrento'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Marina'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Corso Italia Sorrento', 'Glavna pešačka i gradska osovina sa prodavnicama, kafićima i večernjim šetnjama.',
+ ST_SetSRID(ST_MakePoint(14.3755, 40.6265), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sorrento'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Pesacka zona'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Villa Comunale Sorrento', 'Mirniji park i vidikovac sa pogledom na obalu, zaliv i brodove ispod litica.',
+ ST_SetSRID(ST_MakePoint(14.3712, 40.6278), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sorrento'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Park'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+
+('Piazza Sant''Oronzo Lecce', 'Glavni trg Lečea sa mešavinom antičkih tragova, baroknih fasada i živog gradskog ritma tokom celog dana.',
+ ST_SetSRID(ST_MakePoint(18.1723, 40.3533), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lecce'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Trg'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Centro Storico Lecce', 'Istorijski centar sa svetlijim kamenom, dvorištima i ulicama koje su posebno prijatne za kasnopopodnevne šetnje.',
+ ST_SetSRID(ST_MakePoint(18.1711, 40.3519), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lecce'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Stari Grad'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Porta Napoli Lecce', 'Istorijski ulaz u grad i dobra polazna tačka za razgledanje severnog dela starog jezgra.',
+ ST_SetSRID(ST_MakePoint(18.1669, 40.3575), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lecce'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+
+('Piazza Duomo Parma', 'Središnji trg Parme sa katedralom, otvorenim prostorom i ritmom pogodnim za lagani gradski obilazak.',
+ ST_SetSRID(ST_MakePoint(10.3297, 44.8010), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Parma'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Trg'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Parco Ducale Parma', 'Veliki gradski park sa stazama, zelenilom i dovoljno prostora za odmor ili kraću vožnju bicikla.',
+ ST_SetSRID(ST_MakePoint(10.3209, 44.8050), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Parma'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Park'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Oltretorrente Parma', 'Kvart sa nešto opuštenijim ritmom, lokalnim radnjama i osećajem stvarnog gradskog života van glavnih trgova.',
+ ST_SetSRID(ST_MakePoint(10.3236, 44.8018), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Parma'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Kulturna cetvrt'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+
+('Costa Smeralda Sardinija', 'Poznata obalska zona sa svetlim uvalama, tirkiznom vodom i ritmom koji se menja između mirnih jutara i življih večeri.',
+ ST_SetSRID(ST_MakePoint(9.5330, 41.1364), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sardinija'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Turisticka Zona'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Cagliari Marina Sardinija', 'Obalski deo sa marinom, kafićima i lakim pristupom urbanijem delu ostrva.',
+ ST_SetSRID(ST_MakePoint(9.1152, 39.2132), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sardinija'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Marina'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
+('Golfo Orosei Sardinija', 'Prirodni lokalitet sa uvalama, stenama i morskim bojama koje najviše dolaze do izražaja tokom dana na vodi.',
+ ST_SetSRID(ST_MakePoint(9.6902, 40.2716), 4326), true,
+ (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sardinija'),
+ (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Prirodni lokalitet'),
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW());
+
+WITH source("Url", "DestinationName", "IsMain", "AltText") AS (
+    VALUES
+    ('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80', 'Bari', true, 'Bari'),
+    ('https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80', 'Palermo', true, 'Palermo'),
+    ('https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1400&q=80', 'Trieste', true, 'Trieste'),
+    ('https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1400&q=80', 'Matera', true, 'Matera'),
+    ('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=80', 'Sorrento', true, 'Sorrento'),
+    ('https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&w=1400&q=80', 'Lecce', true, 'Lecce'),
+    ('https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1400&q=80', 'Parma', true, 'Parma'),
+    ('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80', 'Sardinija', true, 'Sardinija')
+)
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
+SELECT s."Url", s."AltText", s."IsMain", d."Id", NOW()
+FROM source s
+JOIN "Destinations" d ON d."Name" = s."DestinationName";
+
+WITH source("Url", "LocalityName", "IsMain", "AltText") AS (
+    VALUES
+    ('https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1400&q=80', 'Bari Vecchia', true, 'Bari Vecchia'),
+    ('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80', 'Lungomare Bari', true, 'Lungomare Bari'),
+    ('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80', 'Basilica San Nicola Bari', true, 'Basilica San Nicola Bari'),
+    ('https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1400&q=80', 'Quattro Canti Palermo', true, 'Quattro Canti Palermo'),
+    ('https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1400&q=80', 'Mercato Ballaro Palermo', true, 'Mercato Ballaro Palermo'),
+    ('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80', 'Mondello Palermo', true, 'Mondello Palermo'),
+    ('https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1400&q=80', 'Piazza Unita Trieste', true, 'Piazza Unita Trieste'),
+    ('https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80', 'Canal Grande Trieste', true, 'Canal Grande Trieste'),
+    ('https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=1400&q=80', 'Miramare Trieste', true, 'Miramare Trieste'),
+    ('https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1400&q=80', 'Sassi di Matera', true, 'Sassi di Matera'),
+    ('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80', 'Belvedere Murgia Matera', true, 'Belvedere Murgia Matera'),
+    ('https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1400&q=80', 'Piazza Duomo Matera', true, 'Piazza Duomo Matera'),
+    ('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80', 'Marina Grande Sorrento', true, 'Marina Grande Sorrento'),
+    ('https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1400&q=80', 'Corso Italia Sorrento', true, 'Corso Italia Sorrento'),
+    ('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80', 'Villa Comunale Sorrento', true, 'Villa Comunale Sorrento'),
+    ('https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1400&q=80', 'Piazza Sant''Oronzo Lecce', true, 'Piazza Sant''Oronzo Lecce'),
+    ('https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1400&q=80', 'Centro Storico Lecce', true, 'Centro Storico Lecce'),
+    ('https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=1400&q=80', 'Porta Napoli Lecce', true, 'Porta Napoli Lecce'),
+    ('https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1400&q=80', 'Piazza Duomo Parma', true, 'Piazza Duomo Parma'),
+    ('https://images.unsplash.com/photo-1473116763249-2faaef81ccda?auto=format&fit=crop&w=1400&q=80', 'Parco Ducale Parma', true, 'Parco Ducale Parma'),
+    ('https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1400&q=80', 'Oltretorrente Parma', true, 'Oltretorrente Parma'),
+    ('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80', 'Costa Smeralda Sardinija', true, 'Costa Smeralda Sardinija'),
+    ('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80', 'Cagliari Marina Sardinija', true, 'Cagliari Marina Sardinija'),
+    ('https://images.unsplash.com/photo-1493558103817-58b2924bce98?auto=format&fit=crop&w=1400&q=80', 'Golfo Orosei Sardinija', true, 'Golfo Orosei Sardinija')
+)
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
+SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
+FROM source s
+JOIN "Localities" l ON l."Name" = s."LocalityName";
+
 WITH source("Name", "Description", "Lng", "Lat", "Price", "DurationMinutes", "ActivityTypeName", "LocalityName", "DestinationName", "ObjectName", "CreatorEmail", "Profile") AS (
     VALUES
     ('Jutarnje plivanje Postiguet', 'Lagano jutarnje kupanje na gradskoj plaži uz dovoljno prostora za opušten početak dana.', -0.4772, 38.3472, 0.00, 90, 'Plivanje', 'Playa del Postiguet', 'Alicante', NULL, 'carmen.creator@spirego.com', 'water'),
@@ -34244,6 +34537,337 @@ ins_activities AS (
         WHEN 'Santander' THEN 'manager.santander@spirego.com'
         WHEN 'Tenerife' THEN 'manager.tenerife@spirego.com'
         ELSE 'manager.santiago@spirego.com'
+    END
+    LEFT JOIN "Objects" o ON o."Name" = s."ObjectName"
+    RETURNING "Id", "Name"
+),
+ins_activity_images AS (
+    INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
+    SELECT
+        CASE
+            WHEN s."Profile" = 'water' THEN 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'food' THEN 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'shopping' THEN 'https://images.unsplash.com/photo-1481437156560-3205f6a55735?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'view' THEN 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'bike' THEN 'https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'boat' THEN 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'night' THEN 'https://images.unsplash.com/photo-1571266028243-d220c9c3c7d8?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'wellness' THEN 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'adventure' THEN 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80'
+            ELSE 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80'
+        END,
+        s."Name",
+        true,
+        a."Id",
+        NOW()
+    FROM ranked_source s
+    JOIN "Activities" a ON a."Name" = s."Name"
+)
+SELECT 1;
+
+
+-- 16.4 ITALY EXPANSION - OBJECTS, REVIEWS, ACTIVITIES
+WITH source("Name", "Description", "Address", "PhoneNumber", "Price", "ObjectTypeName", "LocalityName", "DestinationName", "CreatorEmail", "ManagerEmail", "Profile", "Lng", "Lat") AS (
+    VALUES
+    ('Hotel Lungomare Bari', 'Moderan gradski hotel uz more, praktičan za goste koji žele kombinaciju šetališta, starog jezgra i lakog pristupa obali.', 'Lungomare Bari, Bari', '+390800000001', 152.00, 'Hotel', 'Lungomare Bari', 'Bari', 'lorenzo.creator@spirego.com', 'manager.bari@spirego.com', 'lodging', 16.8798, 41.1210),
+    ('Trattoria Bari Vecchia', 'Restoran sa jednostavnijim južnoitalijanskim jelima, fokacom i ritmom ručka koji ne žuri goste.', 'Bari Vecchia, Bari', '+390800000002', 28.00, 'Restoran', 'Bari Vecchia', 'Bari', 'lorenzo.creator@spirego.com', 'manager.bari@spirego.com', 'food', 16.8732, 41.1278),
+    ('Galerija Svetog Nikole Bari', 'Manji galerijski prostor sa savremenim radovima i lepim položajem blizu glavnih istorijskih tačaka Barija.', 'Basilica San Nicola Bari, Bari', '+390800000003', 7.00, 'Galerija', 'Basilica San Nicola Bari', 'Bari', 'lorenzo.creator@spirego.com', 'manager.bari@spirego.com', 'culture', 16.8721, 41.1292),
+    ('Centro Bari Galleria', 'Tržni centar sa modom, kozmetikom i svakodnevnim kupovinama u zoni koja ostaje aktivna i uveče.', 'Lungomare Bari, Bari', '+390800000004', 0.00, 'Trzni Centar', 'Lungomare Bari', 'Bari', 'lorenzo.creator@spirego.com', 'manager.bari@spirego.com', 'shopping', 16.8789, 41.1207),
+    ('Hospital Adriatico Bari', 'Veća bolnica sa hitnim prijemom i osnovnim specijalističkim službama za širi gradski deo.', 'Lungomare Bari, Bari', '+390800000005', 0.00, 'Bolnica', 'Lungomare Bari', 'Bari', 'lorenzo.creator@spirego.com', 'manager.bari@spirego.com', 'health', 16.8804, 41.1221),
+    ('Repsol Lungomare Bari', 'Pumpa uz obalski prilaz sa manjom prodavnicom i brzim stajanjem za kraće gradske vožnje.', 'Lungomare Bari, Bari', '+390800000006', 0.00, 'Benzinska Pumpa', 'Lungomare Bari', 'Bari', 'lorenzo.creator@spirego.com', 'manager.bari@spirego.com', 'fuel', 16.8821, 41.1208),
+    ('Suvenirnica Bari Vecchia', 'Prodavnica sa keramikom, manjim poklonima i detaljima inspirisanim starim jezgrom i obalom.', 'Bari Vecchia, Bari', '+390800000007', 0.00, 'Suvenirnica', 'Bari Vecchia', 'Bari', 'lorenzo.creator@spirego.com', 'manager.bari@spirego.com', 'shopping', 16.8736, 41.1281),
+    ('Klinika San Nicola Bari', 'Privatna klinika sa pregledima i dijagnostikom, pogodna za brže zdravstvene potrebe tokom boravka u gradu.', 'Basilica San Nicola Bari, Bari', '+390800000008', 0.00, 'Klinika', 'Basilica San Nicola Bari', 'Bari', 'lorenzo.creator@spirego.com', 'manager.bari@spirego.com', 'health', 16.8716, 41.1297),
+    ('Q8 Porto Bari', 'Benzinska pumpa na prilazu lučkom delu grada, praktična za vozila koja izlaze iz centralne zone.', 'Bari Vecchia, Bari', '+390800000009', 0.00, 'Benzinska Pumpa', 'Bari Vecchia', 'Bari', 'lorenzo.creator@spirego.com', 'manager.bari@spirego.com', 'fuel', 16.8768, 41.1248),
+
+    ('Hotel Quattro Canti Palermo', 'Centralni hotel za goste koji žele da najvažnije gradske tačke, pijace i večernje ulice obiđu peške.', 'Quattro Canti Palermo, Palermo', '+390910000001', 158.00, 'Hotel', 'Quattro Canti Palermo', 'Palermo', 'lorenzo.creator@spirego.com', 'manager.palermo@spirego.com', 'lodging', 13.3617, 38.1152),
+    ('Osteria Ballaro Palermo', 'Restoran sa sicilijanskim jelima, uličnim uticajima i energijom koja traje i posle večere.', 'Mercato Ballaro Palermo, Palermo', '+390910000002', 31.00, 'Restoran', 'Mercato Ballaro Palermo', 'Palermo', 'lorenzo.creator@spirego.com', 'manager.palermo@spirego.com', 'food', 13.3688, 38.1130),
+    ('Muzej Normanske Palate Palermo', 'Muzejski prostor koji pomaže da se istorijski slojevi Palerma razumeju kroz arhitekturu i postavke.', 'Quattro Canti Palermo, Palermo', '+390910000003', 9.00, 'Muzej', 'Quattro Canti Palermo', 'Palermo', 'lorenzo.creator@spirego.com', 'manager.palermo@spirego.com', 'culture', 13.3526, 38.1108),
+    ('Mercato Palermo Centrale', 'Tržnica sa lokalnim proizvodima, slatkišima, sirom i živom atmosferom tokom dana.', 'Mercato Ballaro Palermo, Palermo', '+390910000004', 0.00, 'Trznica', 'Mercato Ballaro Palermo', 'Palermo', 'lorenzo.creator@spirego.com', 'manager.palermo@spirego.com', 'shopping', 13.3685, 38.1125),
+    ('Hospital Palermo Centro', 'Bolnički objekat sa prijemom i pregledima, koristan za gradski deo i veći broj posetilaca tokom sezone.', 'Quattro Canti Palermo, Palermo', '+390910000005', 0.00, 'Bolnica', 'Quattro Canti Palermo', 'Palermo', 'lorenzo.creator@spirego.com', 'manager.palermo@spirego.com', 'health', 13.3624, 38.1161),
+    ('Eni Mondello Palermo', 'Pumpa blizu obale sa osnovnom ponudom i brzim pristupom za kraće vožnje između grada i plaže.', 'Mondello Palermo, Palermo', '+390910000006', 0.00, 'Benzinska Pumpa', 'Mondello Palermo', 'Palermo', 'lorenzo.creator@spirego.com', 'manager.palermo@spirego.com', 'fuel', 13.3278, 38.1978),
+    ('Suvenirnica Ballaro Palermo', 'Prodavnica sa manjim poklonima, začinima i detaljima koji nose atmosferu gradskih pijaca.', 'Mercato Ballaro Palermo, Palermo', '+390910000007', 0.00, 'Suvenirnica', 'Mercato Ballaro Palermo', 'Palermo', 'lorenzo.creator@spirego.com', 'manager.palermo@spirego.com', 'shopping', 13.3694, 38.1126),
+    ('Poliklinika Mondello Palermo', 'Poliklinika sa pregledima i analizama, pogodna za lakše zdravstvene potrebe tokom boravka uz obalu.', 'Mondello Palermo, Palermo', '+390910000008', 0.00, 'Poliklinika', 'Mondello Palermo', 'Palermo', 'lorenzo.creator@spirego.com', 'manager.palermo@spirego.com', 'health', 13.3269, 38.1988),
+    ('Q8 Foro Italico Palermo', 'Pumpa na gradskom prilazu sa brzim stajanjem pre izlaska iz centralnih delova Palerma.', 'Quattro Canti Palermo, Palermo', '+390910000009', 0.00, 'Benzinska Pumpa', 'Quattro Canti Palermo', 'Palermo', 'lorenzo.creator@spirego.com', 'manager.palermo@spirego.com', 'fuel', 13.3721, 38.1155),
+
+    ('Hotel Piazza Unita Trieste', 'Uređen gradski hotel sa lakim pristupom obali, trgu i šetalištima centralnog Trsta.', 'Piazza Unita Trieste, Trieste', '+390400000001', 149.00, 'Hotel', 'Piazza Unita Trieste', 'Trieste', 'lorenzo.creator@spirego.com', 'manager.trieste@spirego.com', 'lodging', 13.7686, 45.6501),
+    ('Ristorante Canal Grande Trieste', 'Restoran uz kanal sa morskim jelima, sporijim ručkom i prijatnim večernjim ritmom.', 'Canal Grande Trieste, Trieste', '+390400000002', 33.00, 'Restoran', 'Canal Grande Trieste', 'Trieste', 'lorenzo.creator@spirego.com', 'manager.trieste@spirego.com', 'food', 13.7728, 45.6530),
+    ('Muzej Morskog Trsta', 'Muzejski prostor koji povezuje luku, more i istoriju grada kroz preglednu i nenametljivu postavku.', 'Piazza Unita Trieste, Trieste', '+390400000003', 8.00, 'Muzej', 'Piazza Unita Trieste', 'Trieste', 'lorenzo.creator@spirego.com', 'manager.trieste@spirego.com', 'culture', 13.7698, 45.6492),
+    ('Mercato Canal Grande Trieste', 'Gradska tržnica sa lokalnom hranom, kafom i manjim delikatesima za usputnu kupovinu.', 'Canal Grande Trieste, Trieste', '+390400000004', 0.00, 'Trznica', 'Canal Grande Trieste', 'Trieste', 'lorenzo.creator@spirego.com', 'manager.trieste@spirego.com', 'shopping', 13.7732, 45.6536),
+    ('Hospital Porto Trieste', 'Bolnica dostupna iz centralne i obalske zone grada, sa hitnim prijemom i osnovnom dijagnostikom.', 'Piazza Unita Trieste, Trieste', '+390400000005', 0.00, 'Bolnica', 'Piazza Unita Trieste', 'Trieste', 'lorenzo.creator@spirego.com', 'manager.trieste@spirego.com', 'health', 13.7692, 45.6506),
+    ('Eni Miramare Trieste', 'Benzinska pumpa na pravcu ka severnoj obali i dvorcu Miramare, praktična za duže dnevne rute.', 'Miramare Trieste, Trieste', '+390400000006', 0.00, 'Benzinska Pumpa', 'Miramare Trieste', 'Trieste', 'lorenzo.creator@spirego.com', 'manager.trieste@spirego.com', 'fuel', 13.7127, 45.7018),
+    ('Suvenirnica Piazza Unita', 'Mala prodavnica sa knjigama, ilustracijama i sitnim poklonima vezanim za Trst i njegovu obalu.', 'Piazza Unita Trieste, Trieste', '+390400000007', 0.00, 'Suvenirnica', 'Piazza Unita Trieste', 'Trieste', 'lorenzo.creator@spirego.com', 'manager.trieste@spirego.com', 'shopping', 13.7678, 45.6497),
+
+    ('Apartmani Sassi Matera', 'Apartmanski smeštaj u kamenoj zoni Matere, dobar za sporiji boravak i jutra bez žurbe.', 'Sassi di Matera, Matera', '+390835000001', 136.00, 'Apartman', 'Sassi di Matera', 'Matera', 'lorenzo.creator@spirego.com', 'manager.matera@spirego.com', 'lodging', 16.6077, 40.6675),
+    ('Osteria Kamena Matera', 'Restoran sa lokalnim jelima i ambijentom koji naglašava kameni karakter grada bez previše formalnosti.', 'Sassi di Matera, Matera', '+390835000002', 30.00, 'Restoran', 'Sassi di Matera', 'Matera', 'lorenzo.creator@spirego.com', 'manager.matera@spirego.com', 'food', 16.6085, 40.6671),
+    ('Muzej Pecinskih Kuca Matera', 'Muzejski prostor koji prikazuje svakodnevni život u kamenim kućama i čini obilazak grada smislenijim.', 'Sassi di Matera, Matera', '+390835000003', 7.00, 'Muzej', 'Sassi di Matera', 'Matera', 'lorenzo.creator@spirego.com', 'manager.matera@spirego.com', 'culture', 16.6079, 40.6679),
+    ('Bottega Sassi Matera', 'Suvenirnica sa ručno rađenim predmetima, manjom keramikom i poklonima inspirisanim kamenim četvrtima.', 'Sassi di Matera, Matera', '+390835000004', 0.00, 'Suvenirnica', 'Sassi di Matera', 'Matera', 'lorenzo.creator@spirego.com', 'manager.matera@spirego.com', 'shopping', 16.6071, 40.6673),
+    ('Dom zdravlja Gravina Matera', 'Dom zdravlja za osnovne preglede i praktične zdravstvene potrebe posetilaca i lokalnog stanovništva.', 'Piazza Duomo Matera, Matera', '+390835000005', 0.00, 'Dom zdravlja', 'Piazza Duomo Matera', 'Matera', 'lorenzo.creator@spirego.com', 'manager.matera@spirego.com', 'health', 16.6105, 40.6666),
+    ('Q8 Murgia Matera', 'Pumpa na putu ka vidikovcu i širim prilazima Materi, pogodna za vozila van centralne pešačke zone.', 'Belvedere Murgia Matera, Matera', '+390835000006', 0.00, 'Benzinska Pumpa', 'Belvedere Murgia Matera', 'Matera', 'lorenzo.creator@spirego.com', 'manager.matera@spirego.com', 'fuel', 16.6211, 40.6649),
+    ('Trznica Piazza Matera', 'Manja gradska tržnica sa lokalnim sirevima, hlebom i proizvodima za usputnu kupovinu.', 'Piazza Duomo Matera, Matera', '+390835000007', 0.00, 'Trznica', 'Piazza Duomo Matera', 'Matera', 'lorenzo.creator@spirego.com', 'manager.matera@spirego.com', 'shopping', 16.6090, 40.6676),
+
+    ('Pansion Marina Grande Sorrento', 'Pansion u zoni marine, dobar za putnike kojima znače pogled na vodu i lak pristup čamcima.', 'Marina Grande Sorrento, Sorrento', '+390810000001', 141.00, 'Pansion', 'Marina Grande Sorrento', 'Sorrento', 'lorenzo.creator@spirego.com', 'manager.sorrento@spirego.com', 'lodging', 14.3661, 40.6284),
+    ('Limone Bistro Sorrento', 'Bistro sa limunskim desertima, laganijim obrocima i prijatnim ritmom za duži predah u centru.', 'Corso Italia Sorrento, Sorrento', '+390810000002', 29.00, 'Restoran', 'Corso Italia Sorrento', 'Sorrento', 'lorenzo.creator@spirego.com', 'manager.sorrento@spirego.com', 'food', 14.3752, 40.6268),
+    ('Muzej Obale Sorrenta', 'Kulturni prostor sa fokusom na lokalnu obalu, pomorsku prošlost i razvoj grada kao turističke tačke.', 'Villa Comunale Sorrento, Sorrento', '+390810000003', 6.00, 'Muzej', 'Villa Comunale Sorrento', 'Sorrento', 'lorenzo.creator@spirego.com', 'manager.sorrento@spirego.com', 'culture', 14.3715, 40.6274),
+    ('Galleria Corso Sorrento', 'Tržni centar sa modom, kozmetikom i manjim radnjama u najfrekventnijem delu Sorenta.', 'Corso Italia Sorrento, Sorrento', '+390810000004', 0.00, 'Trzni Centar', 'Corso Italia Sorrento', 'Sorrento', 'lorenzo.creator@spirego.com', 'manager.sorrento@spirego.com', 'shopping', 14.3760, 40.6262),
+    ('Hospital Costiera Sorrento', 'Bolnički objekat za obalu i okolna mesta, sa prijemom i pregledima koji su korisni tokom sezone.', 'Corso Italia Sorrento, Sorrento', '+390810000005', 0.00, 'Bolnica', 'Corso Italia Sorrento', 'Sorrento', 'lorenzo.creator@spirego.com', 'manager.sorrento@spirego.com', 'health', 14.3743, 40.6271),
+    ('Eni Marina Grande Sorrento', 'Benzinska pumpa na pristupu ka marini i obalskim rutama, pogodna za kraće gradske odlaske.', 'Marina Grande Sorrento, Sorrento', '+390810000006', 0.00, 'Benzinska Pumpa', 'Marina Grande Sorrento', 'Sorrento', 'lorenzo.creator@spirego.com', 'manager.sorrento@spirego.com', 'fuel', 14.3670, 40.6282),
+    ('Suvenirnica Villa Sorrento', 'Prodavnica sa limunskim proizvodima, keramikom i sitnijim poklonima vezanim za obalu.', 'Villa Comunale Sorrento, Sorrento', '+390810000007', 0.00, 'Suvenirnica', 'Villa Comunale Sorrento', 'Sorrento', 'lorenzo.creator@spirego.com', 'manager.sorrento@spirego.com', 'shopping', 14.3718, 40.6276),
+
+    ('Hotel Barocco Lecce', 'Uređen hotel u centru Lečea, praktičan za boravak bez auta i duže pešačke obilaske starog jezgra.', 'Piazza Sant''Oronzo Lecce, Lecce', '+390832000001', 145.00, 'Hotel', 'Piazza Sant''Oronzo Lecce', 'Lecce', 'lorenzo.creator@spirego.com', 'manager.lecce@spirego.com', 'lodging', 18.1717, 40.3528),
+    ('Trattoria Sant''Oronzo Lecce', 'Restoran sa pastom, lokalnim vinima i opuštenim ritmom večere u srcu istorijskog centra.', 'Piazza Sant''Oronzo Lecce, Lecce', '+390832000002', 30.00, 'Restoran', 'Piazza Sant''Oronzo Lecce', 'Lecce', 'lorenzo.creator@spirego.com', 'manager.lecce@spirego.com', 'food', 18.1726, 40.3531),
+    ('Galerija Lecce Pietra', 'Galerija sa manjim savremenim postavkama i fokusom na lokalne autore i kamen kao motiv regiona.', 'Centro Storico Lecce, Lecce', '+390832000003', 7.00, 'Galerija', 'Centro Storico Lecce', 'Lecce', 'lorenzo.creator@spirego.com', 'manager.lecce@spirego.com', 'culture', 18.1709, 40.3523),
+    ('Mercato Salento Lecce', 'Tržnica sa lokalnim namirnicama, uljima, slatkišima i svakodnevnom kupovinom za grad i posetioce.', 'Centro Storico Lecce, Lecce', '+390832000004', 0.00, 'Trznica', 'Centro Storico Lecce', 'Lecce', 'lorenzo.creator@spirego.com', 'manager.lecce@spirego.com', 'shopping', 18.1713, 40.3520),
+    ('Klinika Lecce Centro', 'Klinika sa pregledima i osnovnom dijagnostikom za centralni gradski deo.', 'Piazza Sant''Oronzo Lecce, Lecce', '+390832000005', 0.00, 'Klinika', 'Piazza Sant''Oronzo Lecce', 'Lecce', 'lorenzo.creator@spirego.com', 'manager.lecce@spirego.com', 'health', 18.1701, 40.3535),
+    ('Q8 Porta Napoli Lecce', 'Pumpa na izlazu iz starog dela grada, pogodna za brza stajanja i dnevne vožnje po Salentu.', 'Porta Napoli Lecce, Lecce', '+390832000006', 0.00, 'Benzinska Pumpa', 'Porta Napoli Lecce', 'Lecce', 'lorenzo.creator@spirego.com', 'manager.lecce@spirego.com', 'fuel', 18.1674, 40.3571),
+    ('Suvenirnica Barokni Lecce', 'Prodavnica sa keramikom, papirnom galanterijom i sitnim poklonima koji nose estetiku Lečea.', 'Centro Storico Lecce, Lecce', '+390832000007', 0.00, 'Suvenirnica', 'Centro Storico Lecce', 'Lecce', 'lorenzo.creator@spirego.com', 'manager.lecce@spirego.com', 'shopping', 18.1715, 40.3517),
+
+    ('Apartmani Parma Duomo', 'Apartmanski smeštaj u centru Parme, dobar za goste koji žele više prostora i lagan gradski ritam.', 'Piazza Duomo Parma, Parma', '+390521000001', 139.00, 'Apartman', 'Piazza Duomo Parma', 'Parma', 'lorenzo.creator@spirego.com', 'manager.parma@spirego.com', 'lodging', 10.3292, 44.8007),
+    ('Osteria Ducale Parma', 'Restoran sa lokalnim specijalitetima, pršutom i jelima koja dobro prate sporiju večeru u Parmi.', 'Oltretorrente Parma, Parma', '+390521000002', 32.00, 'Restoran', 'Oltretorrente Parma', 'Parma', 'lorenzo.creator@spirego.com', 'manager.parma@spirego.com', 'food', 10.3238, 44.8016),
+    ('Muzej Parma Musica', 'Muzejski prostor koji spaja gradsku muzičku tradiciju i kulturni identitet severa Italije.', 'Piazza Duomo Parma, Parma', '+390521000003', 8.00, 'Muzej', 'Piazza Duomo Parma', 'Parma', 'lorenzo.creator@spirego.com', 'manager.parma@spirego.com', 'culture', 10.3298, 44.8013),
+    ('Parma Galleria Centrale', 'Tržni centar sa modom, kućnim detaljima i svakodnevnim kupovinama u centralnoj zoni.', 'Piazza Duomo Parma, Parma', '+390521000004', 0.00, 'Trzni Centar', 'Piazza Duomo Parma', 'Parma', 'lorenzo.creator@spirego.com', 'manager.parma@spirego.com', 'shopping', 10.3288, 44.8011),
+    ('Hospital Emilia Parma', 'Bolnica za centralni deo Parme sa prijemom, pregledima i osnovnim hitnim službama.', 'Piazza Duomo Parma, Parma', '+390521000005', 0.00, 'Bolnica', 'Piazza Duomo Parma', 'Parma', 'lorenzo.creator@spirego.com', 'manager.parma@spirego.com', 'health', 10.3307, 44.8019),
+    ('Eni Oltretorrente Parma', 'Pumpa u delu grada sa lokalnim radnjama i lakim izlazom ka širim gradskim pravcima.', 'Oltretorrente Parma, Parma', '+390521000006', 0.00, 'Benzinska Pumpa', 'Oltretorrente Parma', 'Parma', 'lorenzo.creator@spirego.com', 'manager.parma@spirego.com', 'fuel', 10.3227, 44.8021),
+    ('Mercato Parma Gourmet', 'Gradska tržnica sa gurmanskim proizvodima, sirevima i delikatesima za namirnice i poklone.', 'Piazza Duomo Parma, Parma', '+390521000007', 0.00, 'Trznica', 'Piazza Duomo Parma', 'Parma', 'lorenzo.creator@spirego.com', 'manager.parma@spirego.com', 'shopping', 10.3282, 44.8009),
+
+    ('Hotel Costa Smeralda', 'Hotel uz obalu sa lakim pristupom plažama, uvalama i dnevnim izletima na severu Sardinije.', 'Costa Smeralda Sardinija, Sardinija', '+390790000001', 187.00, 'Hotel', 'Costa Smeralda Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'lodging', 9.5326, 41.1362),
+    ('Trattoria Golfo Orosei', 'Restoran sa ribom, pastom i sporijim ritmom ručka posle dana na vodi ili izleta uz obalu.', 'Golfo Orosei Sardinija, Sardinija', '+390790000002', 36.00, 'Restoran', 'Golfo Orosei Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'food', 9.6898, 40.2712),
+    ('Muzej Nuraga Sardinija', 'Muzejski prostor sa fokusom na ostrvsku istoriju i starije civilizacijske slojeve Sardinije.', 'Cagliari Marina Sardinija, Sardinija', '+390790000003', 8.00, 'Muzej', 'Cagliari Marina Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'culture', 9.1161, 39.2140),
+    ('Surf Shop Sardinija', 'Prodavnica sa opremom, suvenirima i sitnicama korisnim za aktivniji boravak na obali.', 'Costa Smeralda Sardinija, Sardinija', '+390790000004', 0.00, 'Suvenirnica', 'Costa Smeralda Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'shopping', 9.5334, 41.1367),
+    ('Poliklinika Cagliari Marina', 'Poliklinika u urbanijem delu ostrva sa pregledima i analizama za svakodnevne zdravstvene potrebe.', 'Cagliari Marina Sardinija, Sardinija', '+390790000005', 0.00, 'Poliklinika', 'Cagliari Marina Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'health', 9.1158, 39.2136),
+    ('Repsol Costa Smeralda', 'Pumpa uz glavne obalske pravce, korisna za duže vožnje između uvala i gradskih tačaka na ostrvu.', 'Costa Smeralda Sardinija, Sardinija', '+390790000006', 0.00, 'Benzinska Pumpa', 'Costa Smeralda Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'fuel', 9.5341, 41.1360),
+    ('Sardinia Sea Spa', 'Spa centar sa tretmanima i mirnijim ritmom za goste koji žele lakši predah između obilazaka i odlazaka na plažu.', 'Cagliari Marina Sardinija, Sardinija', '+390790000007', 34.00, 'Spa Centar', 'Cagliari Marina Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'wellness', 9.1170, 39.2130)
+),
+ranked_source AS (
+    SELECT s.*, ROW_NUMBER() OVER (ORDER BY s."DestinationName", s."Name") AS rn
+    FROM source s
+),
+ins_objects AS (
+    INSERT INTO "Objects"
+    ("Name", "Description", "Address", "PhoneNumber", "Website", "MenuUrl", "CuisineType", "WorkingHours", "Price", "Amenities", "Geolocation", "AverageRating", "ReviewCount",
+     "Status", "IsActive", "ObjectTypeId", "LocalityId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
+    SELECT
+        s."Name",
+        s."Description",
+        s."Address",
+        s."PhoneNumber",
+        NULL,
+        NULL,
+        CASE WHEN s."Profile" = 'food' THEN 'Lokalna i italijanska' ELSE NULL END,
+        CASE
+            WHEN s."Profile" = 'lodging' THEN '{"pon":"00:00-24:00"}'
+            WHEN s."Profile" = 'food' THEN '{"pon":"12:00-23:00"}'
+            WHEN s."Profile" = 'shopping' THEN '{"pon":"10:00-22:00"}'
+            WHEN s."Profile" = 'health' THEN '{"pon":"00:00-24:00"}'
+            WHEN s."Profile" = 'fuel' THEN '{"pon":"00:00-24:00"}'
+            WHEN s."Profile" = 'culture' THEN '{"pon":"10:00-20:00"}'
+            WHEN s."Profile" = 'wellness' THEN '{"pon":"09:00-22:00"}'
+            ELSE NULL
+        END,
+        s."Price",
+        CASE
+            WHEN s."Profile" = 'lodging' THEN ARRAY['WiFi', 'Prijem', 'Doručak']
+            WHEN s."Profile" = 'food' THEN ARRAY['Rezervacije', 'Terasa', 'Lokalna kuhinja']
+            WHEN s."Profile" = 'shopping' THEN ARRAY['Kupovina', 'Parking']
+            WHEN s."Profile" = 'health' THEN ARRAY['Prijem', 'Dostupno osoblje']
+            WHEN s."Profile" = 'fuel' THEN ARRAY['Prodavnica', 'Parking']
+            WHEN s."Profile" = 'culture' THEN ARRAY['Ulaznice', 'Vođenja']
+            WHEN s."Profile" = 'wellness' THEN ARRAY['Spa', 'Rezervacije']
+            ELSE NULL
+        END,
+        ST_SetSRID(ST_MakePoint(s."Lng", s."Lat"), 4326),
+        0,
+        0,
+        'Approved',
+        true,
+        ot."Id",
+        l."Id",
+        d."Id",
+        cu."Id",
+        mu."Id",
+        NOW(),
+        NOW(),
+        NOW()
+    FROM ranked_source s
+    JOIN "ObjectTypes" ot ON ot."Name" = s."ObjectTypeName"
+    JOIN "Localities" l ON l."Name" = s."LocalityName"
+    JOIN "Destinations" d ON d."Name" = s."DestinationName"
+    JOIN "Users" cu ON cu."Email" = s."CreatorEmail"
+    JOIN "Users" mu ON mu."Email" = s."ManagerEmail"
+    RETURNING "Id", "Name"
+),
+ins_object_images AS (
+    INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
+    SELECT
+        CASE
+            WHEN s."Profile" = 'lodging' THEN 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'food' THEN 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'shopping' THEN 'https://images.unsplash.com/photo-1481437156560-3205f6a55735?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'health' THEN 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'fuel' THEN 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'culture' THEN 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'wellness' THEN 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=1400&q=80'
+            ELSE 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80'
+        END,
+        s."Name",
+        true,
+        o."Id",
+        NOW()
+    FROM ranked_source s
+    JOIN "Objects" o ON o."Name" = s."Name"
+),
+ins_reviews_one AS (
+    INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "CreatedAt")
+    SELECT
+        u."Id",
+        o."Id",
+        CASE s."Profile"
+            WHEN 'lodging' THEN (ARRAY[5,4,4,3,5])[1 + (s.rn % 5)]
+            WHEN 'food' THEN (ARRAY[5,4,3,5,4])[1 + (s.rn % 5)]
+            WHEN 'culture' THEN (ARRAY[4,5,3,4,5])[1 + (s.rn % 5)]
+            WHEN 'shopping' THEN (ARRAY[4,3,5,4,2])[1 + (s.rn % 5)]
+            WHEN 'health' THEN (ARRAY[5,4,4,3,5])[1 + (s.rn % 5)]
+            WHEN 'fuel' THEN (ARRAY[4,3,5,2,4])[1 + (s.rn % 5)]
+            WHEN 'wellness' THEN (ARRAY[5,4,4,5,3])[1 + (s.rn % 5)]
+            ELSE 4
+        END,
+        CASE s."Profile"
+            WHEN 'lodging' THEN s."Name" || ' je imao dobru lokaciju i uredan prostor, pa je boravak protekao bez komplikacija.'
+            WHEN 'food' THEN 'U objektu ' || s."Name" || ' smo dobili ukusna jela i prijatnu uslugu, bez osećaja žurbe.'
+            WHEN 'culture' THEN s."Name" || ' je prijatno mesto za kraći obilazak i ostavio je bolji utisak nego što sam očekivao.'
+            WHEN 'shopping' THEN s."Name" || ' ima dobar izbor i pregledan raspored, pa je kupovina prošla lakše nego što sam očekivao.'
+            WHEN 'health' THEN 'Osoblje u objektu ' || s."Name" || ' bilo je ljubazno i organizacija je delovala jasno od prijema do izlaska.'
+            WHEN 'fuel' THEN 'Na pumpi ' || s."Name" || ' je sve bilo čisto, a usluga brza i korektna.'
+            WHEN 'wellness' THEN 'U objektu ' || s."Name" || ' je atmosfera bila mirna, a tretmani i prostor dovoljno uredni za opušten predah.'
+            ELSE s."Name" || ' je ostavio korektan utisak.'
+        END,
+        NOW()
+    FROM ranked_source s
+    JOIN "Objects" o ON o."Name" = s."Name"
+    JOIN "Users" u ON u."Email" = CASE
+        WHEN s.rn % 3 = 1 THEN 'chiara.italy.tourist@spirego.com'
+        WHEN s.rn % 3 = 2 THEN 'marco.italy.tourist@spirego.com'
+        ELSE 'bianca.italy.tourist@spirego.com'
+    END
+),
+ins_reviews_two AS (
+    INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "CreatedAt")
+    SELECT
+        u."Id",
+        o."Id",
+        CASE s."Profile"
+            WHEN 'lodging' THEN (ARRAY[4,3,5,4,2])[1 + (s.rn % 5)]
+            WHEN 'food' THEN (ARRAY[4,3,5,2,4])[1 + (s.rn % 5)]
+            WHEN 'culture' THEN (ARRAY[3,4,2,5,4])[1 + (s.rn % 5)]
+            WHEN 'shopping' THEN (ARRAY[3,4,2,5,4])[1 + (s.rn % 5)]
+            WHEN 'health' THEN (ARRAY[4,3,5,2,4])[1 + (s.rn % 5)]
+            WHEN 'fuel' THEN (ARRAY[3,2,4,4,5])[1 + (s.rn % 5)]
+            WHEN 'wellness' THEN (ARRAY[4,3,5,4,2])[1 + (s.rn % 5)]
+            ELSE 3
+        END,
+        CASE s."Profile"
+            WHEN 'lodging' THEN 'Boravak u objektu ' || s."Name" || ' bio je korektan, ali su se videle i sitnice oko buke ili prostora.'
+            WHEN 'food' THEN 'Hrana u objektu ' || s."Name" || ' je bila dobra, ali je ritam usluge varirao kada je bilo više gostiju.'
+            WHEN 'culture' THEN s."Name" || ' je zanimljiv, ali bi postavka i signalizacija mogli da budu jasnije organizovani.'
+            WHEN 'shopping' THEN 'Ponuda u objektu ' || s."Name" || ' je solidna, ali je u pojedinim terminima bilo više gužve nego što prija.'
+            WHEN 'health' THEN 'U objektu ' || s."Name" || ' je sve išlo korektno, mada je čekanje u jačem terminu bilo primetno.'
+            WHEN 'fuel' THEN 'Pumpa ' || s."Name" || ' radi posao, ali je u špicu znalo da bude malo sporije nego što sam očekivao.'
+            WHEN 'wellness' THEN 'Objekat ' || s."Name" || ' je prijatan, ali bi pojedini delovi usluge mogli da budu ujednačeniji.'
+            ELSE s."Name" || ' je ostavio mešovit utisak.'
+        END,
+        NOW()
+    FROM ranked_source s
+    JOIN "Objects" o ON o."Name" = s."Name"
+    JOIN "Users" u ON u."Email" = CASE
+        WHEN s.rn % 3 = 1 THEN 'marco.italy.tourist@spirego.com'
+        WHEN s.rn % 3 = 2 THEN 'bianca.italy.tourist@spirego.com'
+        ELSE 'chiara.italy.tourist@spirego.com'
+    END
+)
+SELECT 1;
+
+WITH source("Name", "Description", "Lng", "Lat", "Price", "DurationMinutes", "ActivityTypeName", "LocalityName", "DestinationName", "ObjectName", "CreatorEmail", "Profile") AS (
+    VALUES
+    ('Jutarnje plivanje Lungomare Bari', 'Lagano jutarnje kupanje i boravak uz obalu pre nego što gradsko šetalište postane prometnije.', 16.8812, 41.1214, 0.00, 90, 'Plivanje', 'Lungomare Bari', 'Bari', NULL, 'lorenzo.creator@spirego.com', 'water'),
+    ('Razgledanje Bari Vecchie', 'Pešački obilazak starog jezgra sa fokusom na male prolaze, trgove i svakodnevne detalje grada.', 16.8730, 41.1283, 0.00, 95, 'Razgledanje', 'Bari Vecchia', 'Bari', NULL, 'lorenzo.creator@spirego.com', 'walk'),
+    ('Degustacija fokace u Bariju', 'Kulinarsko iskustvo uz lokalnu fokacu i lagan ručak u delu grada koji nosi najviše karaktera.', 16.8733, 41.1279, 24.00, 85, 'Degustacija hrane', 'Bari Vecchia', 'Bari', 'Trattoria Bari Vecchia', 'lorenzo.creator@spirego.com', 'food'),
+    ('Kupovina u Centro Bari Galleriji', 'Kraći shopping obilazak sa fokusom na modne radnje, kozmetiku i svakodnevne kupovine.', 16.8790, 41.1209, 0.00, 80, 'Kupovina', 'Lungomare Bari', 'Bari', 'Centro Bari Galleria', 'lorenzo.creator@spirego.com', 'shopping'),
+
+    ('Fotografisanje Quattro Cantija', 'Kraći foto obilazak gradskog trga sa baroknim fasadama i stalnim kretanjem ljudi.', 13.3616, 38.1151, 0.00, 70, 'Fotografisanje', 'Quattro Canti Palermo', 'Palermo', NULL, 'lorenzo.creator@spirego.com', 'view'),
+    ('Degustacija sicilijanske ulične hrane', 'Obilazak ukusa Palerma kroz pijacu i tanjire koji spajaju lokalne i ulične uticaje.', 13.3689, 38.1129, 29.00, 100, 'Degustacija hrane', 'Mercato Ballaro Palermo', 'Palermo', 'Osteria Ballaro Palermo', 'lorenzo.creator@spirego.com', 'food'),
+    ('Kupanje u Mondellu', 'Plivanje i boravak na gradskoj plaži sa dovoljno prostora za opušteniji deo dana.', 13.3261, 38.1996, 0.00, 100, 'Plivanje', 'Mondello Palermo', 'Palermo', NULL, 'lorenzo.creator@spirego.com', 'water'),
+    ('Noćni provod u Palermu', 'Večernji izlazak kroz centralne ulice grada uz življu atmosferu i duže zadržavanje napolju.', 13.3621, 38.1153, 14.00, 140, 'Noćni provod', 'Quattro Canti Palermo', 'Palermo', 'Osteria Ballaro Palermo', 'lorenzo.creator@spirego.com', 'night'),
+
+    ('Biciklistički krug uz Kanal Grande', 'Lagani biciklistički krug kroz centralni deo Trsta sa kraćim pauzama za pogled i fotografiju.', 13.7724, 45.6532, 18.00, 95, 'Biciklizam', 'Canal Grande Trieste', 'Trieste', NULL, 'lorenzo.creator@spirego.com', 'bike'),
+    ('Razgledanje Piazza Unita', 'Kraći gradski obilazak velikog trga i njegovog odnosa prema moru i okolnim zgradama.', 13.7680, 45.6499, 0.00, 80, 'Razgledanje', 'Piazza Unita Trieste', 'Trieste', NULL, 'lorenzo.creator@spirego.com', 'walk'),
+    ('Poseta restoranu uz kanal u Trstu', 'Obrok uz vodu i sporiji ritam sedenja u jednom od prijatnijih delova centralnog Trsta.', 13.7727, 45.6531, 33.00, 105, 'Poseta Restoranu', 'Canal Grande Trieste', 'Trieste', 'Ristorante Canal Grande Trieste', 'lorenzo.creator@spirego.com', 'food'),
+    ('Kajak ispod Miramarea', 'Vožnja kajakom uz severnu obalu sa pogledom na dvorac i otvoreniji deo mora.', 13.7118, 45.7019, 24.00, 85, 'Kajak', 'Miramare Trieste', 'Trieste', NULL, 'lorenzo.creator@spirego.com', 'boat'),
+
+    ('Foto tura kroz Sassi', 'Fotografska šetnja kroz kamene četvrti Matere sa fokusom na teksturu, svetlo i terase.', 16.6075, 40.6677, 0.00, 95, 'Fotografisanje', 'Sassi di Matera', 'Matera', NULL, 'lorenzo.creator@spirego.com', 'view'),
+    ('Pešačenje do Belvederea Murgije', 'Kraća pešačka ruta ka vidikovcu sa pogledom preko kamenih četvrti i kanjona.', 16.6219, 40.6647, 0.00, 110, 'Pešačenje', 'Belvedere Murgia Matera', 'Matera', NULL, 'lorenzo.creator@spirego.com', 'walk'),
+    ('Razgledanje Piazza Duomo Matere', 'Lagani obilazak gornjeg dela grada sa fokusom na trg, prilaze i panoramu okolnih četvrti.', 16.6091, 40.6679, 0.00, 75, 'Razgledanje', 'Piazza Duomo Matera', 'Matera', NULL, 'lorenzo.creator@spirego.com', 'walk'),
+    ('Joga sa pogledom na Sassi', 'Mirnija jutarnja joga sesija sa otvorenim pogledom i sporijim početkom dana.', 16.6223, 40.6645, 16.00, 60, 'Joga', 'Belvedere Murgia Matera', 'Matera', NULL, 'lorenzo.creator@spirego.com', 'wellness'),
+
+    ('Vožnja čamcem ispod Sorenta', 'Kratka vožnja čamcem uz obalu i litice sa pogledom na grad iz morske perspektive.', 14.3659, 40.6286, 26.00, 75, 'Vožnja čamcem', 'Marina Grande Sorrento', 'Sorrento', NULL, 'lorenzo.creator@spirego.com', 'boat'),
+    ('Degustacija limunskih deserata Sorenta', 'Kulinarsko iskustvo sa limunskim kolačima i laganijim obrokom u centru grada.', 14.3753, 40.6267, 21.00, 80, 'Degustacija hrane', 'Corso Italia Sorrento', 'Sorrento', 'Limone Bistro Sorrento', 'lorenzo.creator@spirego.com', 'food'),
+    ('Kupovina duž Corso Italie', 'Shopping obilazak sa fokusom na radnje, modne detalje i suvenire u glavnoj pešačkoj zoni.', 14.3757, 40.6264, 0.00, 85, 'Kupovina', 'Corso Italia Sorrento', 'Sorrento', 'Galleria Corso Sorrento', 'lorenzo.creator@spirego.com', 'shopping'),
+    ('Plivanje kod Marine Grande', 'Kupanje i kraći boravak uz vodu u delu Sorenta koji najviše nosi obalski ritam grada.', 14.3660, 40.6287, 0.00, 95, 'Plivanje', 'Marina Grande Sorrento', 'Sorrento', NULL, 'lorenzo.creator@spirego.com', 'water'),
+
+    ('Razgledanje baroknog Lečea', 'Pešački obilazak svetlijih fasada, trgova i detalja koji daju prepoznatljiv karakter centru grada.', 18.1712, 40.3520, 0.00, 90, 'Razgledanje', 'Centro Storico Lecce', 'Lecce', NULL, 'lorenzo.creator@spirego.com', 'walk'),
+    ('Kupovina u istorijskom jezgru Lečea', 'Lagani shopping krug kroz stari deo grada sa fokusom na sitne poklone i lokalne radnje.', 18.1714, 40.3518, 0.00, 75, 'Kupovina', 'Centro Storico Lecce', 'Lecce', 'Suvenirnica Barokni Lecce', 'lorenzo.creator@spirego.com', 'shopping'),
+    ('Fotografisanje zlatnog kamena Lečea', 'Kraći foto obilazak sa naglaskom na kamen, prolaze i istorijske ulaze u stari grad.', 18.1671, 40.3573, 0.00, 70, 'Fotografisanje', 'Porta Napoli Lecce', 'Lecce', NULL, 'lorenzo.creator@spirego.com', 'view'),
+    ('Degustacija vina Salenta', 'Degustacija lokalnih vina uz laganiju večeru i topliji ritam juga Italije.', 18.1725, 40.3530, 27.00, 90, 'Degustacija vina', 'Piazza Sant''Oronzo Lecce', 'Lecce', 'Trattoria Sant''Oronzo Lecce', 'lorenzo.creator@spirego.com', 'food'),
+
+    ('Degustacija parmezana i pršute', 'Gurmanski obilazak ukusa Parme sa lokalnim sirevima, pršutom i sporijim tempom degustacije.', 10.3283, 44.8010, 28.00, 95, 'Degustacija hrane', 'Piazza Duomo Parma', 'Parma', 'Mercato Parma Gourmet', 'lorenzo.creator@spirego.com', 'food'),
+    ('Poseta restoranu u Parmi', 'Ručak u prijatnom delu grada uz jela koja dobro predstavljaju severni italijanski ritam obedovanja.', 10.3239, 44.8017, 32.00, 100, 'Poseta Restoranu', 'Oltretorrente Parma', 'Parma', 'Osteria Ducale Parma', 'lorenzo.creator@spirego.com', 'food'),
+    ('Biciklom kroz Parco Ducale', 'Lagani krug kroz park sa ravnim stazama i dovoljno prostora za opušten tempo vožnje.', 10.3212, 44.8048, 15.00, 85, 'Biciklizam', 'Parco Ducale Parma', 'Parma', NULL, 'lorenzo.creator@spirego.com', 'bike'),
+    ('Kupovina gurmanskih proizvoda u Parmi', 'Kraći obilazak tržnice sa fokusom na delikatese, pakovanja za poklon i lokalne proizvode.', 10.3281, 44.8008, 0.00, 80, 'Kupovina', 'Piazza Duomo Parma', 'Parma', 'Mercato Parma Gourmet', 'lorenzo.creator@spirego.com', 'shopping'),
+
+    ('Ronjenje uz Costa Smeraldu', 'Ronjenje u čistijem priobalju sa fokusom na rekreativne podvodne tačke i boju mora.', 9.5332, 41.1365, 44.00, 90, 'Ronjenje', 'Costa Smeralda Sardinija', 'Sardinija', NULL, 'lorenzo.creator@spirego.com', 'water'),
+    ('Vožnja čamcem kroz Golfo Orosei', 'Vožnja čamcem kroz uvale i uz stene sa dovoljno vremena za zadržavanja i fotografije.', 9.6900, 40.2714, 38.00, 90, 'Vožnja čamcem', 'Golfo Orosei Sardinija', 'Sardinija', NULL, 'lorenzo.creator@spirego.com', 'boat'),
+    ('Plivanje u tirkiznim uvalama Sardinije', 'Opusteno plivanje na severu ostrva sa dužim zadržavanjem uz svetliju vodu i mirnije jutro.', 9.5331, 41.1363, 0.00, 100, 'Plivanje', 'Costa Smeralda Sardinija', 'Sardinija', NULL, 'lorenzo.creator@spirego.com', 'water'),
+    ('Planinarenje iznad zaliva Orosei', 'Lakša ruta sa pogledom na more i razuđenu obalu, pogodna za aktivniji deo dana van plaže.', 9.6905, 40.2718, 18.00, 140, 'Planinarenje', 'Golfo Orosei Sardinija', 'Sardinija', NULL, 'lorenzo.creator@spirego.com', 'adventure')
+),
+ranked_source AS (
+    SELECT s.*, ROW_NUMBER() OVER (ORDER BY s."DestinationName", s."Name") AS rn
+    FROM source s
+),
+ins_activities AS (
+    INSERT INTO "Activities"
+    ("Name", "Description", "Geolocation", "Price", "DurationMinutes", "IsActive", "ActivityTypeId", "LocalityId", "DestinationId", "ObjectId", "Status", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
+    SELECT
+        s."Name",
+        s."Description",
+        ST_SetSRID(ST_MakePoint(s."Lng", s."Lat"), 4326),
+        s."Price",
+        s."DurationMinutes",
+        true,
+        at."Id",
+        l."Id",
+        d."Id",
+        o."Id",
+        1,
+        cu."Id",
+        mu."Id",
+        NOW(),
+        NOW(),
+        NOW()
+    FROM ranked_source s
+    JOIN "ActivityTypes" at ON
+        translate(replace(lower(at."Name"), 'đ', 'dj'), 'šžčć', 'szcc')
+        =
+        translate(replace(lower(s."ActivityTypeName"), 'đ', 'dj'), 'šžčć', 'szcc')
+    JOIN "Localities" l ON l."Name" = s."LocalityName"
+    JOIN "Destinations" d ON d."Name" = s."DestinationName"
+    JOIN "Users" cu ON cu."Email" = s."CreatorEmail"
+    JOIN "Users" mu ON mu."Email" = CASE s."DestinationName"
+        WHEN 'Bari' THEN 'manager.bari@spirego.com'
+        WHEN 'Palermo' THEN 'manager.palermo@spirego.com'
+        WHEN 'Trieste' THEN 'manager.trieste@spirego.com'
+        WHEN 'Matera' THEN 'manager.matera@spirego.com'
+        WHEN 'Sorrento' THEN 'manager.sorrento@spirego.com'
+        WHEN 'Lecce' THEN 'manager.lecce@spirego.com'
+        WHEN 'Parma' THEN 'manager.parma@spirego.com'
+        ELSE 'manager.sardinia@spirego.com'
     END
     LEFT JOIN "Objects" o ON o."Name" = s."ObjectName"
     RETURNING "Id", "Name"
